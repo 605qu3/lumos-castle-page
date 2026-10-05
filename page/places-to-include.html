@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Places to include</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #edf0f2;
+    --card: #ffffff;
+    --ink: #17212b;
+    --dim: #56626e;
+    --line: #d0d7dd;
+    --chip: #e3e8ec;
+    --in: #17675f;
+    --in-bg: #d6eeea;
+    --out: #8f3a46;
+    --out-bg: #f6dde1;
+    --amber: #8a5300;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161b;
+      --card: #1a2128;
+      --ink: #e8edf1;
+      --dim: #9aa6b1;
+      --line: #2c363f;
+      --chip: #242d36;
+      --in: #62c6bb;
+      --in-bg: #17403c;
+      --out: #e48e9a;
+      --out-bg: #4a2229;
+      --amber: #e3a951;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11161b;
+    --card: #1a2128;
+    --ink: #e8edf1;
+    --dim: #9aa6b1;
+    --line: #2c363f;
+    --chip: #242d36;
+    --in: #62c6bb;
+    --in-bg: #17403c;
+    --out: #e48e9a;
+    --out-bg: #4a2229;
+    --amber: #e3a951;
+  }
+  html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 64px); -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.45;
+    -webkit-tap-highlight-color: transparent;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 0 12px 28px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+  h1 { font-size: 1.55rem; line-height: 1.15; margin: 20px 0 6px; }
+  .lede { margin: 0 0 14px; color: var(--dim); font-size: 0.95rem; }
+
+  .bar {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    background: var(--bg);
+    padding: 8px 0 8px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 12px;
+  }
+  .count { font-weight: 700; margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+  .count span { font-weight: 400; color: var(--dim); }
+  .filters { display: flex; gap: 6px; }
+  .filters button {
+    flex: 1 1 0;
+    min-height: 40px;
+    padding: 0 8px;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: var(--chip);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    touch-action: manipulation;
+  }
+  .filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 5px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 12px 12px 12px;
+  }
+  .card[data-state="in"] { border-left-color: var(--in); }
+  .card[data-state="out"] { border-left-color: var(--out); }
+  .head { display: flex; gap: 10px; align-items: baseline; }
+  .num { color: var(--dim); font-variant-numeric: tabular-nums; min-width: 1.6rem; font-size: 0.95rem; }
+  .name { font-size: 1.1rem; font-weight: 700; line-height: 1.25; margin: 0; }
+  .sig { margin: 4px 0 0 calc(1.6rem + 10px); color: var(--dim); font-size: 0.93rem; }
+  .rec { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0 10px calc(1.6rem + 10px); font-size: 0.93rem; }
+  .pill { flex: none; font-weight: 700; font-size: 0.85rem; padding: 1px 8px; border-radius: 999px; }
+  .pill.in { background: var(--in-bg); color: var(--in); }
+  .pill.out { background: var(--out-bg); color: var(--out); }
+  .why { color: var(--ink); }
+  .flag { margin: -4px 0 8px calc(1.6rem + 10px); color: var(--amber); font-size: 0.88rem; font-weight: 700; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .seg button {
+    min-height: 50px;
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--chip);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    touch-action: manipulation;
+  }
+  .seg button.hint { border-color: var(--dim); border-style: dashed; }
+  .seg button[aria-pressed="true"].in { background: var(--in); color: var(--card); border-color: var(--in); border-style: solid; }
+  .seg button[aria-pressed="true"].out { background: var(--out); color: var(--card); border-color: var(--out); border-style: solid; }
+  .seg button:focus-visible, .filters button:focus-visible, .copy:focus-visible, .sheet button:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+  .empty { color: var(--dim); padding: 20px 4px; }
+  .group { font-size: 1.15rem; font-weight: 700; margin: 14px 2px 0; color: var(--ink); }
+  .group:first-child { margin-top: 2px; }
+
+  footer { margin-top: 18px; }
+  #note { color: var(--dim); font-size: 0.9rem; margin: 0 0 10px; }
+  .copy {
+    width: 100%;
+    min-height: 52px;
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--bg);
+    background: var(--ink);
+    border: 0;
+    border-radius: 10px;
+    touch-action: manipulation;
+  }
+  .toast { color: var(--in); font-weight: 700; margin: 8px 0 0; min-height: 1.4em; }
+
+  .sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-end;
+  }
+  .sheet[hidden] { display: none; }
+  .sheet-in {
+    width: 100%;
+    max-height: 85%;
+    background: var(--card);
+    border-radius: 14px 14px 0 0;
+    padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sheet textarea {
+    flex: 1;
+    min-height: 220px;
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  .sheet p { margin: 0; color: var(--dim); font-size: 0.93rem; }
+  .sheet button { min-height: 48px; font: inherit; font-weight: 700; border: 0; border-radius: 10px; background: var(--ink); color: var(--bg); touch-action: manipulation; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Places to include</h1>
+  <p class="lede">Every place in the books that could matter to the game, judged on its merits, whatever book it is in. Rec is my recommendation, with my reason under it. A place you leave untouched counts as my Rec. Settled 4 October 2026: 61 In and 22 Out, and nothing differs from Rec.</p>
+
+  <div class="bar">
+    <div class="count" id="count" role="status" aria-live="polite"></div>
+    <div class="filters" role="group" aria-label="Show">
+      <button type="button" data-f="all" aria-pressed="true">All</button>
+      <button type="button" data-f="todo" aria-pressed="false">To review</button>
+      <button type="button" data-f="diff" aria-pressed="false">Differs from Rec</button>
+    </div>
+  </div>
+
+  <ul class="list" id="list"></ul>
+
+  <footer>
+    <p id="note"></p>
+    <button type="button" class="copy" id="copy">Copy my choices</button>
+    <p class="toast" id="toast" role="status" aria-live="polite"></p>
+  </footer>
+</main>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-in" role="dialog" aria-modal="true" aria-label="Your choices">
+    <p>Your phone blocked automatic copying. Press and hold in the box, choose Select All, then Copy.</p>
+    <textarea id="sheetText" readonly></textarea>
+    <button type="button" id="sheetClose">Close</button>
+  </div>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* n, name, significance, rec ('in' or 'out'), why, def (what the row starts as) */
+var GROUPS = { c: "The castle", g: "The grounds", h: "Hogsmeade", l: "Wizarding London", m: "Wizarding homes", e: "Further afield" };
+var PLACES = [
+  ["c", 1, "Hogwarts castle", "PS 7 onward; 142 staircases, PS 8", "in", "The container; every room below is inside it"],
+  ["c", 2, "Great Hall", "PS 7: enchanted ceiling, feasts, the Sorting", "in", "The year turns here: feasts, the sky ceiling, the post, the points"],
+  ["c", 40, "Entrance hall and front steps", "PS 7, PS 9", "in", "The seam between inside and out; every outdoor place starts here"],
+  ["c", 3, "Gryffindor common room", "PS 7: portrait hole, fire, notice board", "in", "Home base; already greyboxed"],
+  ["c", 41, "Gryffindor dormitory", "PS 7: four-posters and trunks", "in", "Where a boy's own things live: trunk, journal"],
+  ["c", 4, "Corridors, portraits and moving staircases", "PS 8: stairs that change, portraits that visit", "in", "Spatial puzzles, and portraits that remember only their own lifetime"],
+  ["c", 5, "Library and Restricted Section", "PS 12: Madam Pince, the roped-off shelves", "in", "Where a claim gets checked; the Restricted Section is a real gate"],
+  ["c", 6, "Kitchens", "GF 21: tickle the pear; house-elves", "in", "House-elves, food, and a door that opens to an exact touch"],
+  ["c", 7, "Potions dungeon", "PS 8: pickled things in jars", "in", "Brewing is the best consequence machine in the world"],
+  ["c", 8, "Transfiguration classroom", "PS 8: a match into a needle", "in", "Change with rules: what can and cannot be transformed"],
+  ["c", 36, "Charms classroom", "PS 10: levitation, swish and flick", "in", "Wand movement and exact pronunciation, the core of casting"],
+  ["c", 9, "Defence classroom", "A new teacher each year: pixies CS 6, a boggart PA 7", "in", "A room that changes with its teacher and its creatures"],
+  ["c", 10, "History of Magic classroom", "PS 8: Binns, the ghost who kept teaching", "in", "A teacher whose knowledge stopped at his death; real history underneath"],
+  ["c", 11, "Divination classroom", "PA 6: North Tower, trapdoor, teacups", "in", "The most distinctive room in the castle; prophecy to test, not trust"],
+  ["c", 12, "Arithmancy classroom", "PA: Hermione's subject", "in", "Real number patterns; undescribed, so cheap to draw"],
+  ["c", 13, "Muggle Studies classroom", "PA; Charity Burbage teaches it, DH 1", "in", "Real objects as themselves; the wizard as the baffled student"],
+  ["c", 14, "Astronomy Tower", "PS 8, PS 14: the tallest tower, midnight lessons", "in", "The real night sky; the strongest send-them-outside room"],
+  ["c", 15, "Dumbledore's office", "CS 12: gargoyle, Fawkes, the Hat; Pensieve GF 30", "in", "The castle's memory: past heads in portraits, a Pensieve, a phoenix"],
+  ["c", 16, "Snape's office", "CS 5; the Map insults him PA 14; Occlumency OP 24", "out", "Occlumency lives at bedtime in the dormitory; the dungeon classroom carries Snape"],
+  ["c", 17, "McGonagall's office", "PS 15; the Firebolt confiscated PA 11; careers advice OP 29", "out", "Her classroom carries her, and confiscated things come back to her desk there"],
+  ["c", 18, "Third-floor corridor", "PS 9, PS 16: Fluffy and the harp", "in", "The first forbidden door; music puts the dog to sleep"],
+  ["c", 19, "Chambers under the trapdoor", "PS 16: snare, keys, chess, bottles, mirror", "in", "Five puzzles in a row; the books' best logic set piece"],
+  ["c", 37, "Forgotten classroom, Mirror of Erised", "PS 12: desks stacked against the walls", "in", "A room the castle forgot; a mirror that shows what you want most"],
+  ["c", 20, "Room of Requirement", "OP 18; the room of hidden things HBP 24", "in", "Found by asking precisely; centuries of hidden objects"],
+  ["c", 45, "Filch's office", "CS 8: files by pupil, confiscations", "in", "Where confiscated things come back; a drawer with a boy's name"],
+  ["c", 51, "Trophy room", "PS 9; Riddle's award CS 13", "in", "Names on old cups and plaques; where points become objects"],
+  ["c", 43, "Hospital wing", "PS 17: Madam Pomfrey", "in", "Where consequences heal"],
+  ["c", 42, "Owlery", "GF 15: top of the West Tower", "in", "Where the post lives; a boy's owl comes and goes"],
+  ["c", 52, "Moaning Myrtle's bathroom", "CS 8, CS 12, CS 16", "in", "The Chamber's door, a ghost with opinions, Polyjuice in a cubicle"],
+  ["c", 53, "Prefects' bathroom", "GF 25: the egg sings underwater", "in", "A puzzle with real physics: sound carries through water"],
+  ["c", 54, "Ravenclaw Tower", "DH 29: the door knocker asks riddles", "in", "A door that opens to a good answer, not a password"],
+  ["c", 55, "Slytherin common room", "CS 12: under the lake, green light", "in", "Another house from inside, reached in disguise"],
+  ["c", 56, "Hufflepuff common room", "The novels never show it", "out", "Nothing in the books to draw it from"],
+  ["c", 57, "Secret passages", "PA 10: seven on the Map", "in", "Shortcuts found by looking: the one-eyed witch, the Willow, a mirror"],
+  ["c", 58, "Dungeon corridors and the deathday party", "CS 8", "in", "Ghosts throw a party with rotten food; the castle's comic underside"],
+  ["c", 50, "Chamber of Secrets", "CS 16; opened by a sound DH 31", "in", "A legendary secret behind a door that opens only to the right sound"],
+  ["g", 21, "Greenhouses", "PS 8; Mandrakes CS 6", "in", "Plants on real time, frost on the glass, the season made visible"],
+  ["g", 22, "Quidditch pitch", "PS 10, PS 11", "in", "Matches from the stands; the sport the whole school watches"],
+  ["g", 23, "Hagrid's hut and garden", "PS 8; Buckbeak in the patch PA 16", "in", "Creatures, the infirmary, the Forest edge, rock cakes"],
+  ["g", 24, "Forbidden Forest", "PS 15: centaurs, unicorns", "in", "Release and reunion, moonlight, the wild beyond the rules"],
+  ["g", 38, "Whomping Willow and passage", "CS 5; PA 17", "in", "A tree that fights back, a knot that stills it"],
+  ["g", 49, "The lake and the merpeople beneath it", "PS 6 the boats; PS 16 the squid; PA 8 grindylows; GF 26 the village", "in", "The shoreline below the steps: water creatures, real and magical, on one plate"],
+  ["h", 59, "Hogsmeade village", "PA 10", "in", "The only all-wizard village; the street that holds its shops"],
+  ["h", 32, "Honeydukes", "PA 10: the cellar passage", "in", "Sweets, and a trapdoor into a secret passage"],
+  ["h", 47, "Three Broomsticks", "PA 10", "in", "Butterbeer and overheard grown-ups; news from outside school"],
+  ["h", 61, "Hog's Head", "OP 16; DH 28", "in", "The other pub: goats, a barman with a past, a passage to the castle"],
+  ["h", 60, "Hogsmeade post office", "PA 14: owls by speed", "in", "Owls sorted by how fast they fly"],
+  ["h", 31, "Quill shop (Scrivenshaft's)", "OP", "in", "Quills and inks bought and compared"],
+  ["h", 39, "Shrieking Shack", "PA 17 to 19", "in", "The most haunted house in Britain, which is not haunted"],
+  ["h", 46, "Zonko's Joke Shop", "PA 10; boarded up HBP 12", "in", "The joke shop within reach from Book 3; it closes in Book 6 as the Weasleys' takes over"],
+  ["h", 62, "Gladrags Wizardwear", "GF", "out", "A clothes shop, barely described"],
+  ["h", 63, "Madam Puddifoot's", "OP", "out", "A tea shop for couples"],
+  ["h", 64, "Dervish and Banges", "PA", "out", "An instrument shop, named but never shown"],
+  ["l", 44, "Hogwarts Express and Platform Nine and Three-Quarters", "PS 6", "in", "The year's beginning: the barrier, the compartment, the trolley"],
+  ["l", 26, "Leaky Cauldron", "PS 5", "in", "The door from the Muggle world; the bricks open to an exact sequence"],
+  ["l", 25, "Diagon Alley", "PS 5", "in", "One street holds every shop; the yearly shopping"],
+  ["l", 27, "Gringotts and a vault", "PS 5", "in", "Non-decimal money, a ledger, goblins, a cart into the deep"],
+  ["l", 28, "Ollivander's", "PS 5", "in", "Wand woods are real trees; the wand chooses"],
+  ["l", 30, "Eeylops Owl Emporium", "PS 5", "out", "The boys already have an owl; the Owlery and the post office carry the birds"],
+  ["l", 48, "Magical Menagerie", "PA 4", "in", "Pets and odd creatures; the pet that is not an owl"],
+  ["l", 29, "Weasleys' Wizard Wheezes", "HBP 6", "in", "Inventions tested and improved; a business started by two pupils"],
+  ["l", 65, "Flourish and Blotts", "CS 4; PA 4", "in", "Books, a biting Monster Book, a celebrity author's signing"],
+  ["l", 66, "Apothecary", "PS 5", "in", "Ingredients by the barrel; where a brew's parts come from"],
+  ["l", 67, "Quality Quidditch Supplies", "PA 4: the Firebolt in the window", "in", "Brooms as made things, with parts and makers"],
+  ["l", 68, "Madam Malkin's Robes", "PS 5", "out", "A fitting; it folds into the street"],
+  ["l", 69, "Florean Fortescue's", "PA 4", "out", "Homework over ice cream; the library does it better"],
+  ["l", 70, "Knockturn Alley and Borgin and Burkes", "CS 4; HBP 6", "out", "Dark objects; nothing a boy should do there"],
+  ["l", 33, "Ministry of Magic", "OP 7: the Atrium, the memos, the lifts", "in", "A fountain that lies, memos that fly, lifts that call out; courtrooms and Mysteries left out"],
+  ["l", 71, "St Mungo's", "OP 22, OP 23", "out", "The hospital wing carries healing; the rest is grief"],
+  ["m", 72, "The Burrow", "CS 3; the family clock GF 10", "in", "A wizarding home: gnomes in the garden, a clock that knows where everyone is"],
+  ["m", 73, "Number Twelve, Grimmauld Place", "OP 4 to 6: the tapestry, Kreacher", "in", "Prejudice and servitude made visible: a family tree, a house-elf, a portrait"],
+  ["m", 74, "Godric's Hollow", "DH 16, DH 17", "out", "A memorial and a grave; mourning, not play"],
+  ["m", 75, "Malfoy Manor", "DH 1, DH 23", "out", "Cruelty and captivity; nothing to do there"],
+  ["m", 76, "Spinner's End", "HBP 2", "out", "A grim house in one scene"],
+  ["m", 77, "Shell Cottage", "DH 24, DH 25", "out", "A refuge in one scene"],
+  ["m", 78, "Privet Drive", "PS 1 to 3", "out", "Harry's Muggle home; the boys have their own"],
+  ["e", 79, "Quidditch World Cup ground and campsite", "GF 7 to 9", "in", "Wizards camping badly with Muggle things; an international match"],
+  ["e", 34, "Beauxbatons", "GF 15", "out", "Never visited; only its carriage and pupils arrive"],
+  ["e", 35, "Durmstrang", "GF 15", "out", "Never visited; only its ship and pupils arrive"],
+  ["e", 80, "Azkaban", "PA; OP", "out", "A prison of despair; nothing to do there"],
+  ["e", 81, "Little Hangleton: graveyard, Riddle House, Gaunt shack", "GF 1, GF 32; HBP 10", "out", "Murder and resurrection; horror"],
+  ["e", 82, "The cave", "HBP 26", "out", "Inferi and a poisoned basin; horror"],
+  ["e", 83, "The Forest of Dean", "DH 19", "out", "A campsite on the run; nothing to do there"]
+].map(function (r) { return { g: r[0], n: String(r[1]), name: r[2], sig: r[3], rec: r[4], why: r[5], def: r[4] }; });
+
+var STORE_KEY = 'places-choices-v1';
+var state = {};            /* n -> 'in' | 'out'; only places the viewer has ruled on */
+var filter = 'all';
+var db = null;             /* the shared record, when this view can reach it */
+var chains = {};           /* per-place write queues: one write at a time per document */
+var firstSnapshot = true;
+
+var listEl = document.getElementById('list');
+var countEl = document.getElementById('count');
+var noteEl = document.getElementById('note');
+var toastEl = document.getElementById('toast');
+var sheetEl = document.getElementById('sheet');
+var sheetText = document.getElementById('sheetText');
+
+function label(c) { return c === 'in' ? 'In' : 'Out'; }
+
+/* ---------- storage on this device (a cache, and the fallback) ---------- */
+function loadLocal() {
+  try {
+    var raw = window.localStorage.getItem(STORE_KEY);
+    if (raw) { var o = JSON.parse(raw); if (o && typeof o === 'object') return o; }
+  } catch (e) {}
+  return {};
+}
+function saveLocal() {
+  try { window.localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+/* ---------- rendering ---------- */
+function visible(p) {
+  var s = state[p.n];
+  if (filter === 'todo') return !s;
+  if (filter === 'diff') return !!s && s !== p.rec;
+  return true;
+}
+
+function el(tag, cls, text) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+function card(p) {
+  var s = state[p.n] || '';
+  var li = el('li', 'card');
+  li.setAttribute('data-n', p.n);
+  li.setAttribute('data-state', s);
+
+  var head = el('div', 'head');
+  head.appendChild(el('span', 'num', p.n));
+  head.appendChild(el('h2', 'name', p.name));
+  li.appendChild(head);
+  li.appendChild(el('p', 'sig', p.sig));
+
+  var rec = el('div', 'rec');
+  rec.appendChild(el('span', 'pill ' + p.rec, 'Rec ' + label(p.rec)));
+  rec.appendChild(el('span', 'why', p.why));
+  li.appendChild(rec);
+
+  if (s && s !== p.rec) li.appendChild(el('p', 'flag', 'You chose differently from my Rec'));
+
+  var seg = el('div', 'seg');
+  seg.setAttribute('role', 'group');
+  seg.setAttribute('aria-label', p.name);
+  ['in', 'out'].forEach(function (c) {
+    var b = el('button', c + (!s && p.def === c ? ' hint' : ''), label(c));
+    b.type = 'button';
+    b.setAttribute('aria-pressed', s === c ? 'true' : 'false');
+    b.addEventListener('click', function () { choose(p.n, c); });
+    seg.appendChild(b);
+  });
+  li.appendChild(seg);
+  if (!s) {
+    var hint = el('p', 'sig', 'Not reviewed. Counts as Rec, ' + label(p.def) + '.');
+    hint.style.margin = '8px 0 0';
+    li.appendChild(hint);
+  }
+  return li;
+}
+
+function render() {
+  var keep = window.scrollY;
+  listEl.textContent = '';
+  var shown = 0, lastGroup = null;
+  PLACES.forEach(function (p) {
+    if (!visible(p)) return;
+    if (p.g !== lastGroup) {
+      lastGroup = p.g;
+      var gh = el('li', 'group', GROUPS[p.g]);
+      gh.setAttribute('role', 'presentation');
+      listEl.appendChild(gh);
+    }
+    listEl.appendChild(card(p));
+    shown++;
+  });
+  if (!shown) {
+    var msg = filter === 'todo' ? 'Everything is reviewed.' : 'Nothing differs from my Rec yet.';
+    listEl.appendChild(el('li', 'empty', msg));
+  }
+  var reviewed = 0, differs = 0;
+  PLACES.forEach(function (p) {
+    var s = state[p.n];
+    if (s) { reviewed++; if (s !== p.rec) differs++; }
+  });
+  countEl.textContent = '';
+  countEl.appendChild(document.createTextNode(reviewed + ' of ' + PLACES.length + ' reviewed '));
+  countEl.appendChild(el('span', null, differs + ' differ from Rec'));
+  window.scrollTo(0, keep);
+}
+
+/* ---------- choosing and saving ---------- */
+function choose(n, c) {
+  if (state[n] === c) return;
+  state[n] = c;
+  saveLocal();
+  render();
+  if (db) writeShared(n, c);
+}
+
+function writeShared(n, c) {
+  var ref = db.doc('places/p' + n);
+  chains[n] = (chains[n] || Promise.resolve()).then(function () {
+    return ref.set({ n: Number(n), choice: c });
+  }).catch(function () {
+    setNote('Could not save to the shared record just now. Your choice is kept on this device; Copy my choices sends everything.');
+  });
+}
+
+function setNote(t) { noteEl.textContent = t; }
+
+/* ---------- the shared record, when this view has one ---------- */
+function connect() {
+  setNote('Saved on this device.');
+  if (!window.claude || typeof window.claude.use !== 'function') return;
+  window.claude.use('db').then(function (handle) {
+    if (!handle) return;
+    db = handle;
+    db.collection('places').onSnapshot(function (snap) {
+      var next = {};
+      snap.docs.forEach(function (d) {
+        var v = d.data();
+        var n = d.id.replace(/^p/, '');
+        if (v && (v.choice === 'in' || v.choice === 'out')) next[n] = v.choice;
+      });
+      if (firstSnapshot) {
+        firstSnapshot = false;
+        /* anything ruled on before the record answered is pushed up once, and wins */
+        var local = Object.keys(state);
+        local.forEach(function (n) { if (next[n] !== state[n]) { next[n] = state[n]; writeShared(n, state[n]); } });
+      }
+      state = next;
+      saveLocal();
+      render();
+      setNote('Saved to the shared record, so I can read it back. Also kept on this device.');
+    }, function () {
+      db = null;
+      setNote('The shared record is not reachable. Saved on this device; use Copy my choices to send them.');
+    });
+  }).catch(function () {});
+}
+
+/* ---------- copy ---------- */
+function exportText() {
+  var lines = ['My choices on the places list (In or Out)'], lastGroup = null;
+  PLACES.forEach(function (p) {
+    if (p.g !== lastGroup) { lastGroup = p.g; lines.push(''); lines.push(GROUPS[p.g]); }
+    var s = state[p.n];
+    lines.push(p.n + ' ' + p.name + ': ' + (s ? label(s) : label(p.def) + ' (not reviewed, counts as Rec)'));
+  });
+  return lines.join('\n');
+}
+
+function showSheet(text) {
+  sheetText.value = text;
+  sheetEl.hidden = false;
+  sheetText.focus();
+  sheetText.select();
+}
+
+function toast(t) {
+  toastEl.textContent = t;
+  setTimeout(function () { if (toastEl.textContent === t) toastEl.textContent = ''; }, 3500);
+}
+
+document.getElementById('copy').addEventListener('click', function () {
+  var text = exportText();
+  var done = function () { toast('Copied. Paste it into the chat.'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, function () { showSheet(text); });
+  } else {
+    showSheet(text);
+  }
+});
+document.getElementById('sheetClose').addEventListener('click', function () { sheetEl.hidden = true; });
+
+/* ---------- filters ---------- */
+Array.prototype.forEach.call(document.querySelectorAll('.filters button'), function (b) {
+  b.addEventListener('click', function () {
+    filter = b.getAttribute('data-f');
+    Array.prototype.forEach.call(document.querySelectorAll('.filters button'), function (x) {
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+    render();
+  });
+});
+
+state = loadLocal();
+render();
+connect();
+
+window.placesPage = { choose: choose, exportText: exportText, state: function () { return state; } };
+})();
+</script>
+</body>
+</html>
