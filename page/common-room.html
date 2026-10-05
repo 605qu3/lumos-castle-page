@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Gryffindor common room, greybox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070605;
+    --hud-bg: rgba(24, 21, 18, 0.78);
+    --hud-fg: #d9d2c6;
+    --hud-dim: #8e877c;
+    --hud-on: #e9b86a;
+    --hud-line: rgba(255, 255, 255, 0.16);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #070605; }
+  }
+  :root[data-theme="dark"] { --bg: #070605; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+  }
+  #c { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+  #hud {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #stats {
+    font-size: 12px;
+    line-height: 1.35;
+    background: var(--hud-bg);
+    padding: 6px 9px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--hud-dim);
+    white-space: pre;
+  }
+  #btns { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; pointer-events: auto; }
+  button {
+    font: 500 13px/1 -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-line);
+    border-radius: 6px;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  button.on { color: var(--hud-on); border-color: var(--hud-on); }
+  button:focus-visible { outline: 2px solid var(--hud-on); outline-offset: 2px; }
+  #back {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+  #help {
+    position: fixed;
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    max-width: min(420px, calc(100vw - 20px));
+    background: var(--hud-bg);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    pointer-events: none;
+  }
+  [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+</style>
+</head>
+<body>
+<!--
+SOURCES for the notice board (the one object in this greybox that is not a placeholder)
+
+Governing rules cited: FDP-33 (made by someone in the world, in that maker's style), FDP-22 and LDP-42 (legibility, clear
+round hand), LDP-20 (hand and print only), LDP-22 (style and wear are separate: only the month-old notice is worn),
+LDP-97 (printed form lines in the ceremonial print voice, entries written in by hand), LDP-98 (ordinary school paperwork
+may be invented; no canon character gains a history), LDP-100 (met in the room at room scale, read in the hand),
+LDP-91 (evidence beats animation: the torn corner left under its pin), LDP-5 (Book 1 only; nothing from Book 2 is drawn).
+
+Notices, all Book 1:
+ 1. Flying lessons. A printed school form filled in by hand. Content: PS9 (a notice in the Gryffindor common room; flying
+    lessons start Thursday; Gryffindor learns with Slytherin; half past three, in the grounds) and PS5 (first-years may not
+    bring their own broomsticks). Invented as ordinary paperwork (LDP-98): the form itself, the wording, Madam Hooch's
+    signature as the flying teacher (PS9 names her as the teacher of that lesson).
+ 2. Library. Madam Pince's hand (PS12 names her as the librarian). Content: PS11 (library books are not to be taken outside
+    the school). Invented as ordinary paperwork: the Friday return day.
+ 3. Quidditch practice. Oliver Wood's hand. Content: PS10 (practice three evenings a week), PS11 (the first match is
+    against Slytherin). Invented as ordinary paperwork: the day, the hour, the wording.
+ 4. Lost toad. Neville Longbottom's hand. Content: PS6 and PS7 (Trevor, who keeps getting lost). Invented: the wording and
+    his drawing.
+ 5. A torn corner of a notice someone pulled down, still under its pin. Invented, LDP-91.
+ Dates are given as weekdays only, so the board never contradicts the real calendar (LDP-23).
+
+Hands, as settled in the hand bake-off and written into the design system's tokens/fonts.css. Print: IM Fell English,
+EB Garamond, Cinzel. Ceremonial: IM Fell English SC, print only, so it sets the printed matter of notice 1 and never an
+entry (LDP-97). Librarian's round hand: Fondamento, writing the entries of notice 1 and all of notice 2. Casual adult hand:
+Nothing You Could Do, for Wood. Child hand: Short Stack, used for Neville provisionally. Open point: Short Stack is the
+boys' shared hand, and LDP-41 gives every character a hand of their own, so a child character writing in it will read as
+one of the boys; a fifth token for child characters is needed before any character's note sits next to a boy's.
+Weight is 400 throughout; nothing is synthesised.
+
+Precedents consulted from David's folders, never reproduced: parchment-scrap-04 and -05 (printed billheads with entries
+written in, the model for notice 1), journal-05 (18th c. round hand), owl-letter-01 (1830s quick hand, the model for
+Wood's note), parchment-scrap-01 (torn edge), postcard-01 (printed small capitals), owl-letter-04 (pinned, folded paper).
+
+Paper tiles, held in the page's asset store: paper-tiles-01 (laid, buff), paper-tiles-03 (cream), paper-tiles-04 (buff), from the paper-tiles folder,
+which is public domain, CC0 or David's own photographs by the folder's rule; the folder's record file carries the exact
+licence line for each. Each is a centre crop downscaled to 640 px and mirror-tiled at draw time.
+
+Nothing on the board is generated. The HUD remains the test harness, not the app.
+
+DECISIONS LOG (FDP-45), one line per round, newest last
+armchair-left, round 1: first drawn layer. A generated image (Gemini, prompted in chat to the layer spec), recorded as
+generated under LDP-99, which admits generation for the look of a room and never for a record. Keyed from chroma
+green, edge unmixed and despilled, resized premultiplied to 420 px wide (1.05 m at tier B, 400 px/m); height follows
+the image, 1.23 m. Placed at 1.05 m wide instead of the greybox's 1.5 m, because the placeholder was oversized against
+the 2.2 m hearth opening and the 1.6 m board; the chair is now a real chair's size.
+room, colour management: the page now renders sRGB in and out (textures tagged sRGB, flat colours and lights converted
+from their design values) so a drawing appears as drawn under neutral light; default exposure lowered from 1.1 to 0.8
+to compensate. Done after the first drawn layer showed darker than its file. Tapestry placeholder moved 2 degrees
+toward the hearth, off the left window.
+cat, round 1: a nine-cell sheet generated to the plate (Gemini, anchors chair and boar), recorded as generated under
+LDP-99. Cells cut by their own component so a neighbour's whiskers never bleed in, aligned bottom-centre in uniform
+cells, kept at the sheet's native size, 600 px per metre so the sitting cat stands about 0.53 m: real size wins over the
+tier B minimum. Six stride frames advance by distance walked (one stride 0.55 m), so the feet never skate; sitting
+shows the wrapped tail, a flick every few seconds, and the look back over the shoulder when a boy tapped it. The old
+placeholder bob is gone. Drift noted in the plate log: nine stripe bands where six were asked.
+sofa, round 1: generated to the plate (Gemini, anchors chair and boar), recorded as generated under LDP-99. A white
+border with a black rule arrived despite the output paragraph and was trimmed before keying; keyed, unmixed and
+despilled as the chair was, kept at native size, 873 px wide (364 px per metre, under tier B, accepted on the far
+plane: real size wins). Placed at 1.6 m wide instead of the greybox's 2.4 m, because the drawing is a two-seater and
+at 2.4 m it stood 1.9 m tall; the width matches its arm height to the chair's (0.72 m), averaged between the near and
+far ends because the drawing carries strong perspective. Height follows the image, 1.28 m. Drifts for the plate log:
+cross-hatching over the lit faces reading as weave, a viewpoint about 25 degrees above the seat, a two-seater where
+2.4 m was asked (the two-cushion count in the prompt pulled the length down), cloth lighter and pinker than the
+chair's, and the border.
+page, tiles moved out: the three notice-board paper tiles (laid, cream, buff; 640 px JPEGs) left the page source, where
+they sat as base64 data URIs, 86 KB of a 159 KB file, and now live in the page's asset store as /_blob/6cb281ab03d752e2ec81e8c03862bcd4
+(laid), /_blob/3062746dc7810c561bdfeeb3a7338b6c (cream) and /_blob/50a4dde13aaf0350c2548356a888b793 (buff), loaded by the
+same promise-based loader as before. Nothing drawn changes; the page source is now code only, so it can be read by search.
+sofa, round 2: a fresh generation from the revised prompt (three cushions, camera stated as distance and angle, hatching
+direction per face, base colour in words, green to all four edges). It came back geometrically identical to round 1:
+silhouette 874 x 701 against 873 x 700, far-leg offset 241 px in both, the same border. Three cushions arrived and the
+cloth darkened a step; the camera, border and hatching instructions did not move it. Not placed, because its viewpoint
+is round 1's, already judged on the iPad as floating. Round 3 is an edit of this image rather than a fresh generation.
+sofa, round 3: an edit of the round-2 drawing (Gemini, the round-2 image and the armchair attached), asked to lower the
+viewpoint to the arm tops and to run the hatching one way. The camera moved: eye level at the arms, cushions as thin
+wedges, the four feet within 60 px of one line, no border. The view went square-on rather than thirty degrees, which
+suits a flat cutout. New drift: a row of seven buttons along the back, because the edit prompt did not restate the
+exclusions; the cross-hatched grid on the arms persists. Keyed from the corners (the green now runs to the edges),
+926 x 502 px native, 545 px per metre. Placed at 1.7 m wide by the arm-height datum (0.72 m), height 0.92 m; at the
+greybox's 2.4 m it would stand 1.3 m tall. Replaces round 1 in the room; round 4 is an edit for the buttons and the grid.
+plan, right armchair moved: on the iPad the sofa stood on the floor but was hidden behind the armchair-right placeholder.
+From the camera at (0, 1.9, 7) the chair at x 2.0, z -2.1 spans 7.7 to 17.1 degrees and the 1.7 m sofa at x 2.3, z -3.7
+spans 7.6 to 16.6, so the chair covered it entirely; the 2.4 m placeholder was also covered but for two degrees a side,
+which the greybox never showed because both were grey. The sofa stays, since it is placed for the far plane in firelight;
+the right armchair moves to x 3.1, z -0.6, still flanking the hearth, clear of the sofa and in front of the stair foot.
+The layer spec's table is changed to match; its plan drawing is not yet redrawn.
+sofa, round 3 verdict: on the iPad it stands on the floor and reads as the chair's workshop in the firelight on the far
+plane; 1.7 m reads right against the chair and the hearth. Round 4 is an edit for the buttons and the grid only.
+wall, notice board moved: the board at 44.7 degrees right of the hearth overlapped the right window (31.5 degrees) by
+0.13 m of wall and 0.6 m of height, a greybox collision that had been there all along: 13.2 degrees of arc at 5.5 m is
+1.27 m, and half a window plus half a board is 1.4 m. The board moves to 50.4 degrees (Math.PI - 0.88): 1.8 m from the
+window centre, clear by 0.4 m, and still clear of the stair foot from the camera. The windows stay a matched pair.
+sofa, round 4: an edit of round 3 for the two named faults. Buttons gone, and nothing else moved: silhouette 926 x 503
+against 926 x 502, the four legs within one pixel of round 3's, no border, the cloth a step deeper (139, 82, 73 against
+142, 84, 75). The one-way hatching did not take: the arms still carry a cross-hatched grid, held through three edits.
+Placed as the sofa, since the grid is the only fault left and it reads as cloth at room scale; the anchor-set question
+goes to the iPad. If the sofa joins the anchors the grid propagates, so the alternative is to leave the set at two.
+sofa, round 4 verdict: on the iPad it reads as cloth and as the chair's workshop; the grid is invisible at room scale,
+so it is a studio fault only. The anchor set stays at the armchair and the boar, and the sofa ships as a layer. Done at
+four rounds.
+cat, path moved: walking in front of the hearth, the cat's dark silhouette against the fire read as standing in it. Its
+second point sat at -3.1 degrees from the camera, inside the fire's +/- 3.1 degree span, and 11.1 m away. A point is
+added at x 1.1, z -3.4 and the old one moved to x -0.6, z -2.9, so the walk crosses the hearth a metre and a half nearer
+the viewer and the silhouette passes over hearthstone and floor instead of flame. The loop is otherwise unchanged.
+cat, path rebuilt: moving the walk forward put it level with the sofa's plane at z -3.7 inside the sofa's x span, and
+two parallel cutouts at the same depth poke through each other, which is the cat walking through the settee. The same
+fault was already there against the left armchair at z -1.9 and went unnoticed. A cat behind a piece or in front of it
+is fine, because the cutouts depth-test; level with one is not. The loop is now x 2.7 z -2.7, x 1.0 z -3.0, x -1.4
+z -3.1, x -2.8 z -2.8, x 1.6 z -2.6: it runs between z -2.5 and -3.13, so it clears every piece's plane by at least
+0.35 m, passes in front of the sofa and behind the left armchair, and never crosses the fire deep. Rule for any mover:
+a path keeps 0.35 m of depth from the plane of any cutout whose width it passes through, the cat's own half-width
+included.
+cat, stops randomised: the loop runs about nineteen seconds, the stop was pinned to one point on it and lasted six, so
+the cat halted behind the left armchair every lap and two laps in forty seconds read as a glitch. The stop point is now
+drawn fresh each lap, at least 0.3 of the loop from the last one; four laps in ten have no stop at all; the stop lasts
+four to nine seconds. A tap still sits the cat on demand and now counts as that lap's stop, so it cannot sit twice in
+a row. Nothing about the path or the sheet changes.
+wingback, round 1: the first layer through the API pipeline (Nano Banana Pro at 2K, one candidate, about thirteen
+cents) and the first piece drawn by the API's hand rather than the Gemini app's. It passed all seven checks: one
+island, 1414 px per metre, outer feet 15 px apart, cloth 20 from the anchor against a tolerance of 45, crisp edge,
+density, no border. Placed at 1.1 m wide, height 1.28 m from the image: a wing chair is the armchair's twin at about
+1.05 m, and the greybox's 2.6 m was a placeholder's guess that would have made it three metres tall. The drawing shows
+the near arm and a corner of seat, which the prompt asked it not to; kept, because a foreground frame that shows a
+corner of its own seat reads as a chair rather than a wall, and the seat corner takes the firelight.
+camera, lowered to a boy's eye line: with the wingback drawn at its real 1.1 m its top stands at 1.28 m, below the
+camera's 1.9 m, so it fell to a sliver in the corner and moving it nearer would have dropped it out of frame entirely.
+The greybox framed only because it was wrong: at 2.6 by 2.4 m its top stood above the camera and it behaved like a
+wall. A real chair cannot frame a shot taken from a standing adult's eye, and the room is a boys' common room, so
+CAM_BASE goes from 1.9 to 1.35 m and FOCUS from 1.6 to 1.25 m. Everything already placed is judged again from here.
+-->
+<canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
+<div id="hud">
+  <div id="stats">starting</div>
+  <div id="btns">
+    <button type="button" data-act="layers">Layers</button>
+    <button type="button" data-act="shadows" class="on">Shadows</button>
+    <button type="button" data-act="res">Res</button>
+    <button type="button" data-act="exp">Exp</button>
+    <button type="button" data-act="tilt">Tilt</button>
+    <button type="button" data-act="reset">Reset</button>
+    <button type="button" data-act="help">?</button>
+  </div>
+</div>
+<button id="back" type="button" hidden>Back to the room</button>
+<div id="help">Drag to look around. Tap the fire to stoke it, the portrait hole to open it, the cat to make it sit. Tap the notice board to walk up to it, then tap a notice to take it down. Everything but the board is a placeholder.</div>
+
+<script>
+var TILES = {
+  laid: "/_blob/6cb281ab03d752e2ec81e8c03862bcd4",
+  cream: "/_blob/3062746dc7810c561bdfeeb3a7338b6c",
+  buff: "/_blob/50a4dde13aaf0350c2548356a888b793",
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+'use strict';
+
+var helpEl = document.getElementById('help');
+if (typeof THREE === 'undefined') {
+  helpEl.textContent = 'three.js did not load. Check the connection and reload.';
+  return;
+}
+
+var canvas = document.getElementById('c');
+var statsEl = document.getElementById('stats');
+var backBtn = document.getElementById('back');
+var btns = {};
+Array.prototype.forEach.call(document.querySelectorAll('#btns button'), function (b) { btns[b.getAttribute('data-act')] = b; });
+
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+/* ---------- renderer, scene, camera ---------- */
+
+var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputEncoding = THREE.sRGBEncoding;
+var EXPOSURES = [0.6, 0.8, 1.0, 1.3];
+var expIndex = 1;
+renderer.toneMappingExposure = EXPOSURES[expIndex];
+var MAX_PR = Math.min(window.devicePixelRatio || 1, 2);
+var pixelRatio = MAX_PR;
+
+var scene = new THREE.Scene();
+scene.background = col(0x070605);
+scene.fog = new THREE.FogExp2(col(0x070605).getHex(), 0.035);
+
+var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 80);
+var FOCUS = new THREE.Vector3(0, 1.25, -2.0);
+var CAM_BASE = new THREE.Vector3(0, 1.35, 7.0);
+var lookTmp = new THREE.Vector3();
+
+function roomPose(yw, pt, pos, look) {
+  var r = CAM_BASE.z - FOCUS.z;
+  pos.set(FOCUS.x + Math.sin(yw) * r, CAM_BASE.y + pt * r, FOCUS.z + Math.cos(yw) * r);
+  look.copy(FOCUS);
+}
+
+/* ---------- canvas texture helpers ---------- */
+
+function makeCanvas(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function tex(c) {
+  var t = new THREE.CanvasTexture(c);
+  t.encoding = THREE.sRGBEncoding;
+  t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+  return t;
+}
+/* flat colours in this file are written as the colours they should look; the renderer wants them linear */
+function col(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
+function rr(g, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+  g.fill();
+}
+function arch(g, x, y, w, h) {
+  var r = w / 2;
+  g.beginPath();
+  g.moveTo(x, y + h);
+  g.lineTo(x, y + r);
+  g.arc(x + r, y + r, r, Math.PI, 0);
+  g.lineTo(x + w, y + h);
+  g.closePath();
+  g.fill();
+}
+function label(g, text, w, y, size, color) {
+  g.fillStyle = color || '#45423d';
+  g.font = '600 ' + size + 'px -apple-system, system-ui, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillText(text, w / 2, y);
+}
+function cutoutTexture(w, h, fill, draw, text) {
+  var c = makeCanvas(w, h), g = c.getContext('2d');
+  g.fillStyle = fill;
+  draw(g, w, h);
+  if (text) label(g, text, w, h * 0.5, Math.round(Math.min(w, h) * 0.085));
+  return tex(c);
+}
+
+/* silhouettes */
+function drawArmchair(g, w, h) {
+  rr(g, w * 0.17, h * 0.06, w * 0.66, h * 0.60, w * 0.12);
+  rr(g, w * 0.04, h * 0.42, w * 0.26, h * 0.42, w * 0.08);
+  rr(g, w * 0.70, h * 0.42, w * 0.26, h * 0.42, w * 0.08);
+  g.fillRect(w * 0.10, h * 0.64, w * 0.80, h * 0.26);
+  g.fillRect(w * 0.14, h * 0.88, w * 0.12, h * 0.12);
+  g.fillRect(w * 0.74, h * 0.88, w * 0.12, h * 0.12);
+}
+function drawSofa(g, w, h) {
+  rr(g, w * 0.08, h * 0.08, w * 0.84, h * 0.55, w * 0.05);
+  rr(g, w * 0.02, h * 0.38, w * 0.14, h * 0.46, w * 0.04);
+  rr(g, w * 0.84, h * 0.38, w * 0.14, h * 0.46, w * 0.04);
+  g.fillRect(w * 0.06, h * 0.62, w * 0.88, h * 0.26);
+  g.fillRect(w * 0.09, h * 0.86, w * 0.06, h * 0.14);
+  g.fillRect(w * 0.85, h * 0.86, w * 0.06, h * 0.14);
+}
+function drawRoundTable(g, w, h) {
+  g.beginPath(); g.ellipse(w * 0.5, h * 0.18, w * 0.48, h * 0.16, 0, 0, Math.PI * 2); g.fill();
+  g.fillRect(w * 0.46, h * 0.25, w * 0.08, h * 0.62);
+  g.beginPath(); g.ellipse(w * 0.5, h * 0.90, w * 0.26, h * 0.10, 0, 0, Math.PI * 2); g.fill();
+}
+function drawSideTable(g, w, h) {
+  g.fillRect(w * 0.08, h * 0.42, w * 0.84, h * 0.07);
+  g.fillRect(w * 0.14, h * 0.49, w * 0.07, h * 0.51);
+  g.fillRect(w * 0.79, h * 0.49, w * 0.07, h * 0.51);
+  g.fillRect(w * 0.26, h * 0.30, w * 0.44, h * 0.06);
+  g.fillRect(w * 0.30, h * 0.22, w * 0.40, h * 0.06);
+  g.fillRect(w * 0.24, h * 0.14, w * 0.46, h * 0.06);
+}
+function drawCushion(g, w, h) { rr(g, w * 0.04, h * 0.25, w * 0.92, h * 0.75, h * 0.35); }
+function drawStairs(g, w, h) {
+  var col = w * 0.14;
+  g.fillRect(w * 0.5 - col / 2, 0, col, h);
+  var n = 22, step = h / n;
+  for (var i = 0; i < n; i++) {
+    var y = h - (i + 1) * step;
+    var s = Math.cos(i * 0.42);
+    var len = w * 0.46 * Math.abs(s);
+    if (s >= 0) g.fillRect(w * 0.5, y, len, step * 0.55);
+    else g.fillRect(w * 0.5 - len, y, len, step * 0.55);
+  }
+}
+function drawWingback(g, w, h) {
+  rr(g, w * 0.12, 0, w * 0.76, h * 0.72, w * 0.18);
+  rr(g, 0, h * 0.28, w * 0.22, h * 0.5, w * 0.08);
+  rr(g, w * 0.78, h * 0.28, w * 0.22, h * 0.5, w * 0.08);
+  g.fillRect(w * 0.06, h * 0.68, w * 0.88, h * 0.32);
+}
+function drawDoor(g, w, h) {
+  g.fillStyle = '#6f665b'; arch(g, 0, 0, w, h);
+  g.fillStyle = '#857a6d'; arch(g, w * 0.06, w * 0.06, w * 0.88, h - w * 0.06);
+  g.strokeStyle = '#6a6156'; g.lineWidth = 3;
+  for (var i = 1; i < 5; i++) { g.beginPath(); g.moveTo(w * i / 5, h * 0.1); g.lineTo(w * i / 5, h); g.stroke(); }
+}
+function drawCorridor(g, w, h) {
+  var grd = g.createLinearGradient(0, 0, 0, h);
+  grd.addColorStop(0, '#5a4733'); grd.addColorStop(1, '#1c1613');
+  g.fillStyle = grd; arch(g, 0, 0, w, h);
+}
+function drawWindow(withMoon) {
+  return function (g, w, h) {
+    var grd = g.createLinearGradient(0, 0, 0, h);
+    grd.addColorStop(0, '#b4c4dc'); grd.addColorStop(1, '#5f6d88');
+    g.fillStyle = grd; arch(g, 0, 0, w, h);
+    if (withMoon) { g.fillStyle = '#eef1f6'; g.beginPath(); g.arc(w * 0.68, h * 0.22, w * 0.11, 0, Math.PI * 2); g.fill(); }
+    g.strokeStyle = '#1e2129'; g.lineWidth = w * 0.05;
+    g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(w / 2, h); g.stroke();
+    g.beginPath(); g.moveTo(0, h * 0.45); g.lineTo(w, h * 0.45); g.stroke();
+    g.beginPath(); g.moveTo(0, h * 0.72); g.lineTo(w, h * 0.72); g.stroke();
+    var r = w / 2, e = w * 0.045;
+    g.strokeStyle = '#15171d'; g.lineWidth = w * 0.09;
+    g.beginPath(); g.moveTo(e, h); g.lineTo(e, r); g.arc(r, r, r - e, Math.PI, 0); g.lineTo(w - e, h); g.stroke();
+  };
+}
+function drawFrame(g, w, h) {
+  g.fillStyle = '#4e4842'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#9c968e'; g.fillRect(w * 0.1, h * 0.08, w * 0.8, h * 0.84);
+}
+function drawTapestry(g, w, h) {
+  g.fillStyle = '#6e675f'; g.fillRect(0, 0, w, h);
+  g.strokeStyle = '#8a827a'; g.lineWidth = w * 0.03;
+  g.strokeRect(w * 0.06, h * 0.04, w * 0.88, h * 0.92);
+  g.fillStyle = '#8a827a';
+  for (var i = 0; i < 9; i++) { g.fillRect(w * (0.08 + i * 0.1), h * 0.985, w * 0.05, h * 0.015); }
+}
+function drawCatWalk(g, w, h) {
+  g.fillStyle = '#34322f';
+  g.beginPath(); g.ellipse(w * 0.46, h * 0.52, w * 0.30, h * 0.26, 0, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.arc(w * 0.80, h * 0.40, h * 0.20, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.moveTo(w * 0.72, h * 0.26); g.lineTo(w * 0.74, h * 0.06); g.lineTo(w * 0.82, h * 0.22); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(w * 0.84, h * 0.22); g.lineTo(w * 0.90, h * 0.06); g.lineTo(w * 0.90, h * 0.28); g.closePath(); g.fill();
+  var legs = [0.24, 0.38, 0.56, 0.70];
+  for (var i = 0; i < legs.length; i++) g.fillRect(w * legs[i], h * 0.62, w * 0.07, h * 0.38);
+  g.strokeStyle = '#34322f'; g.lineWidth = h * 0.1; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(w * 0.18, h * 0.46); g.quadraticCurveTo(w * 0.02, h * 0.42, w * 0.06, h * 0.12); g.stroke();
+}
+function drawCatSit(g, w, h) {
+  g.fillStyle = '#34322f';
+  g.beginPath(); g.ellipse(w * 0.5, h * 0.66, w * 0.34, h * 0.34, 0, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.arc(w * 0.56, h * 0.26, w * 0.22, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.moveTo(w * 0.38, h * 0.14); g.lineTo(w * 0.40, 0); g.lineTo(w * 0.52, h * 0.08); g.closePath(); g.fill();
+  g.beginPath(); g.moveTo(w * 0.62, h * 0.08); g.lineTo(w * 0.74, 0); g.lineTo(w * 0.74, h * 0.14); g.closePath(); g.fill();
+  g.strokeStyle = '#34322f'; g.lineWidth = w * 0.12; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(w * 0.22, h * 0.90); g.quadraticCurveTo(w * 0.02, h * 0.96, w * 0.10, h * 0.72); g.stroke();
+  g.fillRect(w * 0.16, h * 0.90, w * 0.68, h * 0.10);
+}
+function flameTexture() {
+  var c = makeCanvas(128, 128), g = c.getContext('2d');
+  var grd = g.createRadialGradient(64, 88, 4, 64, 72, 62);
+  grd.addColorStop(0, 'rgba(255,255,230,1)');
+  grd.addColorStop(0.25, 'rgba(255,200,110,0.9)');
+  grd.addColorStop(0.55, 'rgba(255,110,30,0.45)');
+  grd.addColorStop(1, 'rgba(255,60,0,0)');
+  g.fillStyle = grd;
+  g.beginPath(); g.ellipse(64, 72, 40, 58, 0, 0, Math.PI * 2); g.fill();
+  return tex(c);
+}
+function dotTexture() {
+  var c = makeCanvas(32, 32), g = c.getContext('2d');
+  var grd = g.createRadialGradient(16, 16, 1, 16, 16, 15);
+  grd.addColorStop(0, 'rgba(255,230,180,1)');
+  grd.addColorStop(0.5, 'rgba(255,170,80,0.6)');
+  grd.addColorStop(1, 'rgba(255,120,30,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 32, 32);
+  return tex(c);
+}
+
+/* ---------- mesh helpers ---------- */
+
+var layered = [];
+var TINTS = [0x6f8dff, 0x4fd1c5, 0x8bd45a, 0xf0d35a, 0xf08a4b];
+var CAT_TINT = 0xff5fd2;
+function register(mesh, layer) {
+  mesh.userData.layer = layer;
+  mesh.userData.base = mesh.material.color.clone();
+  layered.push(mesh);
+  return mesh;
+}
+function solid(color, opts) {
+  var o = { color: col(color), roughness: 0.92, metalness: 0 };
+  if (opts) for (var k in opts) o[k] = opts[k];
+  return new THREE.MeshStandardMaterial(o);
+}
+function box(parent, w, h, d, x, y, z, material, layer) {
+  var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set(x, y, z);
+  m.castShadow = true; m.receiveShadow = true;
+  parent.add(m);
+  return register(m, layer);
+}
+function cutoutMesh(t, w, h) {
+  var m = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshStandardMaterial({ map: t, color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide })
+  );
+  m.castShadow = true; m.receiveShadow = true;
+  m.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+  m.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
+  return m;
+}
+function cutout(t, w, h, x, z, layer, y) {
+  var m = cutoutMesh(t, w, h);
+  m.position.set(x, (y || 0) + h / 2, z);
+  scene.add(m);
+  return register(m, layer);
+}
+var WALL_R = 5.6;
+function onWall(mesh, theta, y, radius) {
+  radius = radius || 5.5;
+  mesh.position.set(radius * Math.sin(theta), y, radius * Math.cos(theta));
+  mesh.lookAt(0, y, 0);
+  scene.add(mesh);
+  return mesh;
+}
+
+/* ---------- the room ---------- */
+
+var floor = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 48), solid(0x6a6764));
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor); register(floor, 1);
+
+var rug = new THREE.Mesh(new THREE.CircleGeometry(2.1, 40), solid(0x55514e, { roughness: 1 }));
+rug.rotation.x = -Math.PI / 2;
+rug.position.set(0, 0.004, -2.6);
+rug.scale.set(1.35, 1, 1);
+rug.receiveShadow = true;
+scene.add(rug); register(rug, 1);
+
+var ceiling = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 48), solid(0x2b2927));
+ceiling.rotation.x = Math.PI / 2;
+ceiling.position.y = 7;
+scene.add(ceiling); register(ceiling, 0);
+
+var wall = new THREE.Mesh(
+  new THREE.CylinderGeometry(WALL_R, WALL_R, 7, 72, 1, true, Math.PI * 0.42, Math.PI * 1.16),
+  solid(0x75726e, { side: THREE.DoubleSide })
+);
+wall.position.y = 3.5;
+wall.receiveShadow = true;
+wall.castShadow = false;
+scene.add(wall); register(wall, 0);
+
+/* fireplace, built in 3D because it is part of the wall */
+var fp = new THREE.Group();
+fp.position.set(0, 0, -5.5);
+scene.add(fp);
+var stone = solid(0x807c76);
+var hearthBack = box(fp, 1.8, 2.3, 0.12, 0, 1.15, 0.06, solid(0x1c1a18, { roughness: 1 }), 0);
+box(fp, 0.55, 2.2, 0.7, -0.95, 1.1, 0.35, stone, 0);
+box(fp, 0.55, 2.2, 0.7, 0.95, 1.1, 0.35, stone, 0);
+box(fp, 2.45, 0.5, 0.7, 0, 2.45, 0.35, stone, 0);
+box(fp, 2.9, 0.16, 0.85, 0, 2.78, 0.42, stone, 0);
+box(fp, 2.6, 0.08, 1.2, 0, 0.04, 0.9, solid(0x5e5b57), 0);
+var logMat = solid(0x3a2f28, { roughness: 1 });
+var log1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.9, 10), logMat);
+log1.rotation.z = Math.PI / 2; log1.position.set(0, 0.2, 0.3); log1.castShadow = true; fp.add(log1); register(log1, 0);
+var log2 = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.8, 10), logMat);
+log2.rotation.z = Math.PI / 2; log2.rotation.y = 0.5; log2.position.set(0.05, 0.36, 0.38); log2.castShadow = true; fp.add(log2); register(log2, 0);
+
+/* flames and embers */
+var flameTex = flameTexture();
+var flames = [];
+var flameSpecs = [[0, 0.75, 0.9, 1.3, 0xffffff], [-0.22, 0.62, 0.7, 1.0, 0xffc478], [0.24, 0.6, 0.65, 0.95, 0xffb060], [-0.08, 0.7, 0.55, 1.1, 0xff8a38], [0.12, 0.55, 0.5, 0.8, 0xff7a2a], [0, 0.95, 0.45, 0.9, 0xffd9a0]];
+for (var fi = 0; fi < flameSpecs.length; fi++) {
+  var fs = flameSpecs[fi];
+  var sm = new THREE.SpriteMaterial({ map: flameTex, color: col(fs[4]), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false });
+  var sp = new THREE.Sprite(sm);
+  sp.position.set(fs[0], fs[1], -5.5 + 0.35);
+  scene.add(sp);
+  flames.push({ sprite: sp, w: fs[2], h: fs[3], y: fs[1], ph: fi * 1.7 });
+}
+var EMBERS = 70;
+var emberPos = new Float32Array(EMBERS * 3);
+var emberVel = new Float32Array(EMBERS * 3);
+var emberLife = new Float32Array(EMBERS);
+for (var ei = 0; ei < EMBERS; ei++) { emberPos[ei * 3 + 1] = -10; emberLife[ei] = 0; }
+var emberGeo = new THREE.BufferGeometry();
+emberGeo.setAttribute("position", new THREE.BufferAttribute(emberPos, 3).setUsage(THREE.DynamicDrawUsage));
+var embers = new THREE.Points(emberGeo, new THREE.PointsMaterial({ size: 0.06, map: dotTexture(), color: col(0xffb060), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, fog: false }));
+embers.frustumCulled = false;
+scene.add(embers);
+var spawnAcc = 0, emberBurst = 0;
+function spawnEmber(i) {
+  emberPos[i * 3] = (Math.random() - 0.5) * 0.5;
+  emberPos[i * 3 + 1] = 0.35 + Math.random() * 0.4;
+  emberPos[i * 3 + 2] = -5.15 + (Math.random() - 0.5) * 0.3;
+  emberVel[i * 3] = (Math.random() - 0.5) * 0.35;
+  emberVel[i * 3 + 1] = 0.5 + Math.random() * 0.7;
+  emberVel[i * 3 + 2] = (Math.random() - 0.5) * 0.2;
+  emberLife[i] = 1.0 + Math.random() * 1.6;
+}
+
+/* windows, portraits, tapestry */
+var winGeo = new THREE.PlaneGeometry(1.2, 2.7);
+var winR = new THREE.Mesh(winGeo, new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawWindow(true)), alphaTest: 0.5 }));
+onWall(winR, Math.PI - 0.55, 3.3, 5.5); register(winR, 0);
+var winL = new THREE.Mesh(winGeo, new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawWindow(false)), alphaTest: 0.5 }));
+onWall(winL, Math.PI + 0.55, 3.3, 5.5); register(winL, 0);
+
+var portraitTex = cutoutTexture(256, 332, '#000', drawFrame, 'portrait');
+var port1 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9 }));
+port1.receiveShadow = true; onWall(port1, Math.PI, 4.05, 5.5); register(port1, 0);
+var port2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9 }));
+port2.receiveShadow = true; onWall(port2, Math.PI - 0.28, 3.9, 5.5); register(port2, 0);
+var tapestry = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.6), new THREE.MeshStandardMaterial({ map: cutoutTexture(240, 520, '#000', drawTapestry, 'tapestry'), roughness: 1 }));
+tapestry.receiveShadow = true; onWall(tapestry, Math.PI + 0.23, 3.9, 5.5); register(tapestry, 0);
+
+/* ---------- notice board (tap to approach, tap a notice to take it down) ---------- */
+/* Hands and faces, as settled in the hand bake-off and the design system's tokens/fonts.css:
+   ceremonial = IM Fell English SC, a print face, used only for printed matter (LDP-97)
+   clerk      = Fondamento, the librarian's round hand, fills every entry on a printed form
+   casual     = Nothing You Could Do, the casual adult hand
+   child      = Short Stack, the boys' shared child hand; used here for Neville provisionally, see the sources block */
+var F = {
+  print: '"IM Fell English", "EB Garamond", Georgia, serif',
+  printSC: '"IM Fell English SC", "IM Fell English", Georgia, serif',
+  title: '"Cinzel", "IM Fell English", Georgia, serif',
+  small: '"EB Garamond", "IM Fell English", Georgia, serif',
+  clerk: '"Fondamento", cursive',
+  casual: '"Nothing You Could Do", cursive',
+  child: '"Short Stack", cursive'
+};
+var FONT_LOADS = [
+  '400 40px "IM Fell English"', 'italic 400 40px "IM Fell English"', '400 40px "IM Fell English SC"',
+  '400 40px "Cinzel"', '400 40px "EB Garamond"', '400 40px "Fondamento"',
+  '400 40px "Nothing You Could Do"', '400 40px "Short Stack"'
+];
+
+var BOARD_W = 1.6, BOARD_H = 1.2, BAIZE_W = 1.48, BAIZE_H = 1.08, FRAME_D = 0.035, FRAME_W = 0.06;
+var PX = 3000;          /* texture pixels per metre of paper */
+var PIN_INSET = 0.02;   /* pin sits this far below a paper's top edge */
+
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    var t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+var boardGroup = new THREE.Group();
+onWall(boardGroup, Math.PI - 0.88, 1.95, 5.56);
+var boardParts = [];
+
+/* frame */
+function woodTexture(vertical) {
+  var c = makeCanvas(512, 512), g = c.getContext('2d'), rnd = mulberry32(3);
+  g.fillStyle = '#5d4130'; g.fillRect(0, 0, 512, 512);
+  for (var i = 0; i < 140; i++) {
+    var y = rnd() * 512, w = 1 + rnd() * 3, a = 0.05 + rnd() * 0.12, dark = rnd() < 0.7;
+    g.fillStyle = dark ? 'rgba(30,16,8,' + a + ')' : 'rgba(210,170,120,' + a * 0.6 + ')';
+    if (vertical) g.fillRect(y, 0, w, 512); else g.fillRect(0, y, 512, w);
+  }
+  var t = tex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
+}
+var woodH = new THREE.MeshStandardMaterial({ map: woodTexture(false), roughness: 0.68, metalness: 0 });
+var woodV = new THREE.MeshStandardMaterial({ map: woodTexture(true), roughness: 0.68, metalness: 0 });
+function frameBar(w, h, x, y, mat) {
+  var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, FRAME_D), mat);
+  m.position.set(x, y, FRAME_D / 2);
+  m.castShadow = true; m.receiveShadow = true;
+  boardGroup.add(m); boardParts.push(m); register(m, 1);
+  return m;
+}
+frameBar(BOARD_W, FRAME_W, 0, BOARD_H / 2 - FRAME_W / 2, woodH);
+frameBar(BOARD_W, FRAME_W, 0, -BOARD_H / 2 + FRAME_W / 2, woodH);
+frameBar(FRAME_W, BOARD_H - 2 * FRAME_W, -BOARD_W / 2 + FRAME_W / 2, 0, woodV);
+frameBar(FRAME_W, BOARD_H - 2 * FRAME_W, BOARD_W / 2 - FRAME_W / 2, 0, woodV);
+
+/* baize */
+function baizeTexture() {
+  var W = 1480, H = 1080, c = makeCanvas(W, H), g = c.getContext('2d'), rnd = mulberry32(7);
+  g.fillStyle = '#365239'; g.fillRect(0, 0, W, H);
+  g.fillStyle = 'rgba(0,0,0,0.09)'; for (var y = 0; y < H; y += 3) g.fillRect(0, y, W, 1);
+  g.fillStyle = 'rgba(255,255,255,0.045)'; for (var x = 0; x < W; x += 3) g.fillRect(x, 0, 1, H);
+  for (var i = 0; i < 260; i++) {
+    var r = 30 + rnd() * 110, cx = rnd() * W, cy = rnd() * H, dark = rnd() < 0.5;
+    var gr = g.createRadialGradient(cx, cy, 0, cx, cy, r);
+    gr.addColorStop(0, dark ? 'rgba(0,0,0,0.09)' : 'rgba(255,240,200,0.06)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = gr; g.fillRect(cx - r, cy - r, r * 2, r * 2);
+  }
+  /* ghosts of notices that hung here before, sun-faded */
+  var ghosts = [[0.10, 0.18, 0.22, 0.26, 0.02], [0.58, 0.55, 0.20, 0.17, -0.05], [0.36, 0.60, 0.17, 0.24, 0.03]];
+  for (var k = 0; k < ghosts.length; k++) {
+    var gh = ghosts[k];
+    g.save(); g.translate(W * (gh[0] + gh[2] / 2), H * (gh[1] + gh[3] / 2)); g.rotate(gh[4]);
+    g.fillStyle = 'rgba(255,238,195,0.075)'; g.fillRect(-W * gh[2] / 2, -H * gh[3] / 2, W * gh[2], H * gh[3]);
+    g.restore();
+  }
+  /* old pin holes */
+  for (var j = 0; j < 70; j++) {
+    var px = rnd() * W, py = rnd() * H;
+    g.fillStyle = 'rgba(0,0,0,0.5)'; g.beginPath(); g.arc(px, py, 2.2, 0, Math.PI * 2); g.fill();
+    g.fillStyle = 'rgba(255,255,230,0.18)'; g.beginPath(); g.arc(px + 1.5, py + 1.5, 2.6, 0, Math.PI); g.fill();
+  }
+  var vg = g.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, W * 0.75);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.28)');
+  g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  return tex(c);
+}
+var baize = new THREE.Mesh(new THREE.PlaneGeometry(BAIZE_W, BAIZE_H), new THREE.MeshStandardMaterial({ map: baizeTexture(), roughness: 1, metalness: 0 }));
+baize.position.z = 0.006; baize.receiveShadow = true;
+boardGroup.add(baize); boardParts.push(baize); register(baize, 1);
+
+/* drawing pins */
+var brass = new THREE.MeshStandardMaterial({ color: col(0xd2b273), metalness: 0.6, roughness: 0.38 });
+var pinHeadGeo = new THREE.CylinderGeometry(0.0062, 0.0068, 0.0022, 18);
+var pinDomeGeo = new THREE.SphereGeometry(0.0046, 16, 10);
+function pin(x, y, z) {
+  var g = new THREE.Group();
+  var head = new THREE.Mesh(pinHeadGeo, brass); head.rotation.x = Math.PI / 2; head.position.z = 0.0011;
+  var dome = new THREE.Mesh(pinDomeGeo, brass); dome.scale.z = 0.45; dome.position.z = 0.0022;
+  g.add(head); g.add(dome); g.position.set(x, y, z);
+  boardGroup.add(g);
+  return g;
+}
+
+/* soft baked shadow under each paper (the shadow maps cannot resolve a 6 mm offset) */
+function paperShadowTexture() {
+  var c = makeCanvas(256, 256), g = c.getContext('2d');
+  for (var i = 10; i >= 0; i--) {
+    var inset = 8 + i * 3;
+    g.fillStyle = 'rgba(0,0,0,' + (0.09 + (10 - i) * 0.02) + ')';
+    rr(g, inset, inset, 256 - inset * 2, 256 - inset * 2, 10);
+  }
+  return tex(c);
+}
+var shadowTex = paperShadowTexture();
+var blankTex = (function () { var c = makeCanvas(4, 4); return tex(c); })();
+
+/* the four Book 1 notices; content, hands and canon anchors are in the sources block in the page head */
+var PAPER_SPECS = [
+  { id: 'flying', w: 0.42, h: 0.52, pin: [-0.36, 0.44], pins: 'two', rot: 0.012, z: 0.0085, tile: 'cream', torn: [], dogEar: true, age: 0.4, draw: drawFlyingNotice },
+  { id: 'pince', w: 0.34, h: 0.25, pin: [0.33, 0.40], pins: 'one', rot: -0.03, z: 0.0105, tile: 'buff', torn: [], age: 0.05, draw: drawPinceNotice },
+  { id: 'wood', w: 0.33, h: 0.23, pin: [-0.08, -0.02], pins: 'one', rot: 0.08, z: 0.0125, tile: 'laid', torn: ['top', 'left'], age: 0.1, draw: drawWoodNote },
+  { id: 'neville', w: 0.28, h: 0.24, pin: [0.45, -0.14], pins: 'one', rot: -0.12, z: 0.0115, tile: 'laid', torn: ['right', 'bottom'], age: 0.1, draw: drawNevilleNote },
+  { id: 'corner', w: 0.055, h: 0.04, pin: [0.60, 0.47], pins: 'one', rot: 0.3, z: 0.0095, tile: 'laid', torn: ['left', 'bottom', 'right'], age: 0.2, draw: function () {}, fixed: true }
+];
+var papers = [];
+function makePaper(spec, index) {
+  var geo = new THREE.PlaneGeometry(spec.w, spec.h);
+  geo.translate(0, -(spec.h / 2 - PIN_INSET), 0);
+  var mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: blankTex, color: 0xffffff, roughness: 0.96, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide }));
+  mesh.receiveShadow = true;
+  mesh.visible = false;
+  var pivot = new THREE.Group();
+  pivot.position.set(spec.pin[0], spec.pin[1], spec.z);
+  pivot.rotation.z = spec.rot;
+  var sgeo = new THREE.PlaneGeometry(spec.w + 0.035, spec.h + 0.035);
+  sgeo.translate(0, -(spec.h / 2 - PIN_INSET), 0);
+  var sh = new THREE.Mesh(sgeo, new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0.55, depthWrite: false, color: 0x000000 }));
+  sh.position.set(0.007, -0.011, -0.0022);
+  sh.visible = false;
+  pivot.add(sh); pivot.add(mesh); boardGroup.add(pivot);
+  var pinsLocal = spec.pins === 'two' ? [[-spec.w / 2 + 0.03, 0], [spec.w / 2 - 0.03, 0]] : [[0, 0]];
+  var c = Math.cos(spec.rot), s = Math.sin(spec.rot);
+  for (var i = 0; i < pinsLocal.length; i++) pin(spec.pin[0] + pinsLocal[i][0] * c, spec.pin[1] + pinsLocal[i][0] * s, spec.z + 0.0025);
+  var p = { spec: spec, pivot: pivot, mesh: mesh, shadow: sh, phase: index * 1.9, pinsLocal: pinsLocal, homePos: new THREE.Vector3(), homeQuat: new THREE.Quaternion(), lift: null };
+  if (!spec.fixed) mesh.userData.paper = p;
+  papers.push(p);
+  return p;
+}
+for (var pi = 0; pi < PAPER_SPECS.length; pi++) makePaper(PAPER_SPECS[pi], pi);
+pin(-0.66, -0.46, 0.0085); pin(0.69, -0.50, 0.0085);
+
+/* ---- paper rendering ---- */
+function tracePath(g, pts) {
+  g.beginPath(); g.moveTo(pts[0][0], pts[0][1]);
+  for (var i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+  g.closePath();
+}
+function paperPath(W, H, torn, dogEar, rnd) {
+  var pts = [], step = 9;
+  function edge(x0, y0, x1, y1, isTorn, inward) {
+    var len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.round(len / step));
+    var nx = -(y1 - y0) / len, ny = (x1 - x0) / len;   /* left-hand normal, pointing inward for clockwise traversal */
+    var amp = isTorn ? 7 + rnd() * 9 : 1.2, f1 = 0.02 + rnd() * 0.03, f2 = 0.11 + rnd() * 0.08, ph = rnd() * 9;
+    for (var i = 0; i <= n; i++) {
+      var u = i / n, x = x0 + (x1 - x0) * u, y = y0 + (y1 - y0) * u;
+      var d = isTorn
+        ? amp * (0.55 * Math.sin(i * f1 * 6 + ph) + 0.3 * Math.sin(i * f2 * 6 + ph * 2) + (rnd() - 0.5) * 0.9) + amp * 0.8
+        : (rnd() - 0.5) * amp;
+      if (i === 0 || i === n) d = isTorn ? amp * 0.8 : 0;
+      pts.push([x + nx * d * inward, y + ny * d * inward]);
+    }
+  }
+  var cut = dogEar ? Math.round(Math.min(W, H) * 0.075) : 0;
+  edge(0, 0, W, 0, torn.indexOf('top') >= 0, 1);
+  edge(W, 0, W, H - cut, torn.indexOf('right') >= 0, 1);
+  if (cut) pts.push([W - cut, H]);
+  edge(W - cut, H, 0, H, torn.indexOf('bottom') >= 0, 1);
+  edge(0, H, 0, 0, torn.indexOf('left') >= 0, 1);
+  return pts;
+}
+function fillTile(g, W, H, img, tilePx) {
+  for (var ty = 0, j = 0; ty < H; ty += tilePx, j++) {
+    for (var tx = 0, i = 0; tx < W; tx += tilePx, i++) {
+      g.save();
+      g.translate(tx + (i % 2 ? tilePx : 0), ty + (j % 2 ? tilePx : 0));
+      g.scale(i % 2 ? -1 : 1, j % 2 ? -1 : 1);
+      g.drawImage(img, 0, 0, tilePx, tilePx);
+      g.restore();
+    }
+  }
+  var vg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.8);
+  vg.addColorStop(0, 'rgba(120,95,60,0)'); vg.addColorStop(1, 'rgba(120,95,60,0.16)');
+  g.fillStyle = vg; g.fillRect(0, 0, W, H);
+}
+function ageing(g, W, H, age, rnd) {
+  var n = Math.round(8 + age * 22);
+  for (var i = 0; i < n; i++) {
+    var r = 3 + rnd() * 14, x = rnd() * W, y = rnd() * H;
+    var gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, 'rgba(150,105,55,' + (0.06 + rnd() * 0.14) + ')'); gr.addColorStop(1, 'rgba(150,105,55,0)');
+    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+}
+function fold(g, W, H, yFrac) {
+  var y = H * yFrac;
+  g.fillStyle = 'rgba(255,250,236,0.35)'; g.fillRect(0, y - 7, W, 6);
+  g.fillStyle = 'rgba(70,50,30,0.16)'; g.fillRect(0, y, W, 1.5);
+  g.fillStyle = 'rgba(70,50,30,0.06)'; g.fillRect(0, y + 1.5, W, 5);
+}
+function dogEarFlap(g, W, H) {
+  var cut = Math.round(Math.min(W, H) * 0.075);
+  g.save();
+  g.beginPath(); g.moveTo(W - cut, H); g.lineTo(W, H - cut); g.lineTo(W - cut, H - cut); g.closePath();
+  var gr = g.createLinearGradient(W - cut, H - cut, W - cut * 0.3, H - cut * 0.3);
+  gr.addColorStop(0, '#f1e9d8'); gr.addColorStop(1, '#e0d4bd');
+  g.fillStyle = gr; g.fill();
+  g.strokeStyle = 'rgba(70,50,30,0.25)'; g.lineWidth = 1.5; g.stroke();
+  g.beginPath(); g.moveTo(W - cut, H - cut); g.lineTo(W - cut - 10, H - cut - 10);
+  g.restore();
+}
+function pinhole(g, x, y, rnd) {
+  g.fillStyle = 'rgba(40,28,18,0.75)'; g.beginPath(); g.ellipse(x, y, 3.2, 3.8, rnd() * 3, 0, Math.PI * 2); g.fill();
+  g.fillStyle = 'rgba(255,250,235,0.45)'; g.beginPath(); g.arc(x - 1, y + 2.5, 3.5, Math.PI * 0.2, Math.PI * 0.9); g.fill();
+}
+function inkFont(g, px, family, style, weight) {
+  g.font = (style ? style + ' ' : '') + (weight ? weight + ' ' : '') + px + 'px ' + family;
+  g.textBaseline = 'alphabetic';
+  g.textAlign = 'left';
+}
+/* writes a block of text, wrapping on maxW; opts.jitter and opts.slant give a hand its wobble */
+function write(g, text, x, y, o) {
+  var px = o.px, lineH = px * (o.lineGap || 1.35), rnd = o.rnd || Math.random;
+  inkFont(g, px, o.family, o.style, o.weight);
+  g.fillStyle = o.color;
+  if (o.soft) { g.shadowColor = o.color; g.shadowBlur = o.soft; g.shadowOffsetX = 0; g.shadowOffsetY = 0; } else { g.shadowBlur = 0; }
+  var cy = y, paras = text.split('\n');
+  for (var p = 0; p < paras.length; p++) {
+    var para = paras[p];
+    if (para === '') { cy += lineH * 0.55; continue; }
+    var words = para.split(' '), lines = [], cur = [], curW = 0;
+    var space = g.measureText(' ').width * (o.wordGap || 1);
+    for (var w = 0; w < words.length; w++) {
+      var ww = g.measureText(words[w]).width;
+      if (cur.length && curW + space + ww > o.maxW) { lines.push(cur); cur = [words[w]]; curW = ww; }
+      else { curW += (cur.length ? space : 0) + ww; cur.push(words[w]); }
+    }
+    if (cur.length) lines.push(cur);
+    for (var l = 0; l < lines.length; l++) {
+      var ws = lines[l], widths = [], total = 0;
+      for (var k = 0; k < ws.length; k++) { widths.push(g.measureText(ws[k]).width); total += widths[k]; }
+      total += space * (ws.length - 1);
+      var sx = x; if (o.align === 'center') sx = x - total / 2; else if (o.align === 'right') sx = x - total;
+      if (!o.dry) {
+        g.save(); g.translate(sx, cy); g.rotate((o.slant || 0) * (rnd() - 0.5) * 2);
+        var cx = 0;
+        for (var m = 0; m < ws.length; m++) { g.fillText(ws[m], cx, (o.jitter || 0) * (rnd() - 0.5) * 2); cx += widths[m] + space; }
+        g.restore();
+      }
+      cy += lineH;
+    }
+  }
+  g.shadowBlur = 0;
+  return cy;
+}
+/* writes a block so that it ends above maxY, shrinking the size in steps if the hand runs long;
+   when o.pitch is set the line pitch is held fixed (ruled lines) and only the size changes */
+function fit(g, text, x, y, o, maxY) {
+  var px = o.px, i;
+  for (i = 0; i < 12; i++) {
+    o.px = px; if (o.pitch) o.lineGap = o.pitch / px;
+    var dryRnd = mulberry32(99), saved = o.rnd; o.rnd = dryRnd; o.dry = true;
+    var end = write(g, text, x, y, o);
+    o.dry = false; o.rnd = saved;
+    if (end - o.px * (o.lineGap || 1.35) * 0.3 <= maxY) break;
+    px *= 0.94;
+  }
+  return write(g, text, x, y, o);
+}
+/* letter-spaced capitals for printed headings */
+function spaced(g, text, x, y, o) {
+  inkFont(g, o.px, o.family, null, o.weight);
+  g.fillStyle = o.color; g.shadowBlur = 0;
+  var gap = o.px * o.spacing, total = 0, i;
+  for (i = 0; i < text.length; i++) total += g.measureText(text[i]).width + (i < text.length - 1 ? gap : 0);
+  var cx = o.align === 'center' ? x - total / 2 : o.align === 'right' ? x - total : x;
+  for (i = 0; i < text.length; i++) { g.fillText(text[i], cx, y); cx += g.measureText(text[i]).width + gap; }
+}
+function rule(g, x0, y, x1, color, w) { g.strokeStyle = color; g.lineWidth = w; g.beginPath(); g.moveTo(x0, y); g.lineTo(x1, y); g.stroke(); }
+function dotted(g, x0, y, x1, color) {
+  g.fillStyle = color;
+  for (var x = x0; x < x1; x += 7) g.fillRect(x, y, 2.2, 2.2);
+}
+function handLine(g, x0, y0, x1, y1, color, w, rnd) {
+  g.strokeStyle = color; g.lineWidth = w; g.lineCap = 'round';
+  g.beginPath(); g.moveTo(x0, y0);
+  g.quadraticCurveTo((x0 + x1) / 2 + (rnd() - 0.5) * 20, (y0 + y1) / 2 + (rnd() - 0.5) * w * 3, x1, y1);
+  g.stroke();
+}
+function blot(g, x, y, r, color) {
+  var gr = g.createRadialGradient(x, y, 0, x, y, r);
+  gr.addColorStop(0, color); gr.addColorStop(0.7, color); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, r, r * 0.8, 0.5, 0, Math.PI * 2); g.fill();
+}
+
+/* notice 1: the school's printed form, filled in by hand. Content: PS9 (flying lessons on Thursday, Gryffindor with
+   Slytherin, half past three in the grounds) and PS5 (first-years may not bring their own broomsticks). */
+function drawFlyingNotice(g, W, H, rnd) {
+  var M = 0.075 * W, cx = W / 2, print = '#1e1a16';
+  spaced(g, 'HOGWARTS SCHOOL', cx, 0.085 * H, { px: 0.056 * W, family: F.printSC, spacing: 0.14, color: print, align: 'center' });
+  spaced(g, 'of Witchcraft and Wizardry', cx, 0.126 * H, { px: 0.03 * W, family: F.printSC, spacing: 0.1, color: print, align: 'center' });
+  rule(g, M, 0.143 * H, W - M, print, 2);
+  spaced(g, 'NOTICE', cx, 0.238 * H, { px: 0.1 * W, family: F.printSC, spacing: 0.22, color: print, align: 'center' });
+  rule(g, M * 1.6, 0.262 * H, W - M * 1.6, print, 1.6);
+  rule(g, M * 1.6, 0.268 * H, W - M * 1.6, print, 1.6);
+  var pitch = 0.084 * H, y0 = 0.37 * H;
+  for (var i = 0; i < 6; i++) dotted(g, M, y0 + i * pitch, W - M, '#7a7064');
+  fit(g,
+    'First-year flying lessons will begin on Thursday at half past three, in the grounds. Gryffindor will be taught with Slytherin. Brooms will be provided. First-years may not bring their own.',
+    M + 8, y0 - 0.012 * H,
+    { px: 0.054 * W, family: F.clerk, color: '#2b2420', maxW: W - 2 * M - 10, pitch: pitch, slant: 0.004, jitter: 1.3, soft: 1.1, rnd: rnd },
+    y0 + 5 * pitch + 0.02 * H);
+  write(g, 'Madam Hooch', W - M - 10, 0.9 * H, { px: 0.064 * W, family: F.clerk, color: '#2b2420', maxW: W, align: 'right', slant: 0.01, soft: 1.1, rnd: rnd });
+  handLine(g, W * 0.52, 0.915 * H, W - M - 20, 0.912 * H, 'rgba(43,36,32,0.85)', 2.2, rnd);
+  write(g, 'To be posted in the House Common Room.', M, 0.968 * H, { px: 0.026 * W, family: F.small, color: '#3d3730', maxW: W });
+  fold(g, W, H, 0.5);
+}
+/* notice 2: the librarian's hand. PS11 (library books are not to be taken outside the school); the return day is ordinary paperwork, LDP-98. */
+function drawPinceNotice(g, W, H, rnd) {
+  var M = 0.07 * W, ink = '#1d1a20';
+  write(g, 'Library', M, 0.24 * H, { px: 0.072 * W, family: F.clerk, color: ink, maxW: W, slant: 0.004, soft: 1 });
+  handLine(g, M, 0.265 * H, M + 0.3 * W, 0.262 * H, 'rgba(29,26,32,0.8)', 2.4, rnd);
+  fit(g,
+    'Books borrowed from the Library are to be returned by Friday evening.\nLibrary books are not to be taken outside the school.',
+    M, 0.4 * H,
+    { px: 0.05 * W, family: F.clerk, color: ink, maxW: W - 2 * M, lineGap: 1.42, slant: 0.003, jitter: 1, soft: 1, rnd: rnd },
+    0.8 * H);
+  write(g, 'Madam Pince, Librarian', W - M, 0.9 * H, { px: 0.048 * W, family: F.clerk, color: ink, maxW: W, align: 'right', soft: 1, rnd: rnd });
+}
+/* notice 3: the Quidditch captain's scrawl. PS10 (practice three evenings a week), PS11 (first match is against Slytherin). */
+function drawWoodNote(g, W, H, rnd) {
+  var M = 0.08 * W, ink = '#15121a';
+  write(g, 'QUIDDITCH', M, 0.27 * H, { px: 0.095 * W, family: F.casual, color: ink, maxW: W, slant: 0.02, soft: 1.3, rnd: rnd });
+  handLine(g, M, 0.31 * H, M + 0.62 * W, 0.305 * H, ink, 3.2, rnd);
+  handLine(g, M + 6, 0.335 * H, M + 0.58 * W, 0.332 * H, ink, 2.4, rnd);
+  fit(g,
+    'Practice Thursday, seven o\u2019clock, on the pitch. Three evenings a week until we play Slytherin.',
+    M, 0.46 * H,
+    { px: 0.056 * W, family: F.casual, color: ink, maxW: W - 2 * M, lineGap: 1.3, slant: 0.02, jitter: 2.2, soft: 1.3, rnd: rnd },
+    0.8 * H);
+  write(g, 'O. Wood  Capt.', W - M, 0.93 * H, { px: 0.058 * W, family: F.casual, color: ink, maxW: W, align: 'right', slant: 0.02, soft: 1.3, rnd: rnd });
+  blot(g, W * 0.2, H * 0.9, 7, 'rgba(21,18,26,0.9)');
+}
+/* notice 4: a first-year's hand. PS6 and PS7 (Neville's toad Trevor keeps getting lost). */
+function drawNevilleNote(g, W, H, rnd) {
+  var M = 0.09 * W, ink = '#2a2420';
+  write(g, 'LOST', M, 0.22 * H, { px: 0.14 * W, family: F.child, color: ink, maxW: W, slant: 0.03, jitter: 3, soft: 1.4, rnd: rnd });
+  fit(g,
+    'My toad. His name is Trevor. If you find him please give him to Neville Longbottom.\nHe gets out.',
+    M, 0.36 * H,
+    { px: 0.062 * W, family: F.child, color: ink, maxW: W - 2 * M - 0.02 * W, lineGap: 1.26, slant: 0.02, jitter: 3, soft: 1.4, rnd: rnd },
+    0.8 * H);
+  /* his drawing of Trevor, in the bottom right corner */
+  g.save(); g.translate(W * 0.84, H * 0.86); g.strokeStyle = ink; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round';
+  g.beginPath(); g.ellipse(0, 0, W * 0.065, W * 0.042, 0, 0, Math.PI * 2); g.stroke();
+  g.beginPath(); g.arc(-W * 0.045, -W * 0.04, W * 0.022, 0, Math.PI * 2); g.stroke();
+  g.fillStyle = ink; g.beginPath(); g.arc(-W * 0.052, -W * 0.047, 3, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.moveTo(-W * 0.02, W * 0.035); g.lineTo(-W * 0.045, W * 0.075); g.moveTo(W * 0.03, W * 0.035); g.lineTo(W * 0.06, W * 0.07); g.stroke();
+  g.restore();
+  blot(g, W * 0.12, H * 0.9, 8, 'rgba(42,36,32,0.9)');
+}
+
+function paperCanvas(spec, seed) {
+  var W = Math.round(spec.w * PX), H = Math.round(spec.h * PX);
+  var c = makeCanvas(W, H), g = c.getContext('2d'), rnd = mulberry32(seed);
+  var path = paperPath(W, H, spec.torn, spec.dogEar, rnd);
+  g.save();
+  tracePath(g, path); g.clip();
+  fillTile(g, W, H, TILE_IMG[spec.tile], spec.tile === 'laid' ? 300 : 420);
+  if (spec.age > 0.2) ageing(g, W, H, spec.age, rnd);
+  spec.draw(g, W, H, rnd);
+  if (spec.dogEar) dogEarFlap(g, W, H);
+  var ins = PIN_INSET * PX;
+  if (spec.pins === 'two') { pinhole(g, 0.03 * PX, ins, rnd); pinhole(g, W - 0.03 * PX, ins, rnd); pinhole(g, 0.03 * PX + 14, ins + 22, rnd); }
+  else pinhole(g, W / 2, ins, rnd);
+  tracePath(g, path); g.strokeStyle = 'rgba(255,250,238,0.55)'; g.lineWidth = 4; g.stroke();
+  tracePath(g, path); g.strokeStyle = 'rgba(60,42,24,0.3)'; g.lineWidth = 2; g.stroke();
+  g.restore();
+  return c;
+}
+function paintPapers() {
+  for (var i = 0; i < papers.length; i++) {
+    var p = papers[i];
+    var t = tex(paperCanvas(p.spec, 11 + i * 7));
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    p.mesh.material.map = t; p.mesh.material.needsUpdate = true;
+    p.mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+    p.mesh.visible = true; p.shadow.visible = true;
+  }
+}
+
+/* fonts and tiles arrive, then the papers are painted; until then the board carries only pins */
+var TILE_IMG = {};
+function loadTile(key) {
+  return new Promise(function (resolve) {
+    var im = new Image();
+    im.onload = function () { TILE_IMG[key] = im; resolve(); };
+    im.onerror = function () { var c = makeCanvas(64, 64), g = c.getContext('2d'); g.fillStyle = '#e8dcc4'; g.fillRect(0, 0, 64, 64); TILE_IMG[key] = c; resolve(); };
+    im.src = TILES[key];
+  });
+}
+function whenFontsReady(ms) {
+  return new Promise(function (resolve) {
+    var done = false; function finish() { if (!done) { done = true; resolve(); } }
+    setTimeout(finish, ms);
+    if (!document.fonts || !document.fonts.load) { finish(); return; }
+    Promise.all(FONT_LOADS.map(function (f) { return document.fonts.load(f).catch(function () {}); })).then(finish, finish);
+  });
+}
+var boardReady = Promise.all([whenFontsReady(4500), loadTile('laid'), loadTile('cream'), loadTile('buff')]).then(paintPapers);
+
+/* ---- holding a notice ---- */
+var held = null, leaveAfterReturn = false, draught = 0;
+var readLight = new THREE.PointLight(col(0xffe4c0), 0, 2.6, 1.0);
+scene.add(readLight);
+var _dir = new THREE.Vector3(), _up = new THREE.Vector3(), _right = new THREE.Vector3(), _q = new THREE.Quaternion(), _e = new THREE.Euler();
+function handPose(p, t, outPos, outQuat) {
+  camera.getWorldDirection(_dir);
+  _up.set(0, 1, 0).applyQuaternion(camera.quaternion);
+  _right.set(1, 0, 0).applyQuaternion(camera.quaternion);
+  var th = Math.tan(camera.fov * Math.PI / 360);
+  var d = Math.max(p.spec.h / (0.74 * 2 * th), p.spec.w / (0.82 * 2 * th * camera.aspect), 0.3);
+  outPos.copy(camera.position).addScaledVector(_dir, d)
+    .addScaledVector(_up, p.spec.h / 2 - PIN_INSET + 0.004 * Math.sin(t * 1.7))
+    .addScaledVector(_right, 0.004 * Math.sin(t * 1.3));
+  _e.set(-0.06 + 0.01 * Math.sin(t * 0.8), 0.02 * Math.sin(t * 0.9), 0);
+  outQuat.copy(camera.quaternion).multiply(_q.setFromEuler(_e));
+}
+function liftPaper(p) {
+  if (held) return;
+  mode = 'tween'; held = p;
+  scene.updateMatrixWorld(true);
+  p.mesh.getWorldPosition(p.homePos);
+  p.mesh.getWorldQuaternion(p.homeQuat);
+  scene.attach(p.mesh);
+  p.lift = { t: 0, dur: 0.6, dir: 1 };
+}
+function returnPaper(thenLeave) {
+  if (!held || mode !== 'hand') return;
+  leaveAfterReturn = !!thenLeave;
+  mode = 'tween';
+  held.lift = { t: 0, dur: 0.55, dir: -1 };
+}
+var _p = new THREE.Vector3(), _hq = new THREE.Quaternion();
+function updatePapers(dt, t) {
+  var target = clamp(portrait.ang / DOOR_OPEN, 0, 1);
+  draught = lerp(draught, target, Math.min(1, dt * 2.5));
+  for (var i = 0; i < papers.length; i++) {
+    var p = papers[i];
+    if (p === held || p.spec.fixed) continue;
+    var a = p.spec.pins === 'two' ? 0.35 : 1;
+    p.pivot.rotation.x = -a * draught * (0.022 * (1 + Math.sin(t * 5.5 + p.phase)) + 0.008 * (1 + Math.sin(t * 9.1 + p.phase * 2)));
+    if (p.spec.pins !== 'two') p.pivot.rotation.z = p.spec.rot + draught * 0.012 * Math.sin(t * 4 + p.phase);
+  }
+  var lightTarget = 0;
+  if (held) {
+    var p2 = held;
+    handPose(p2, t, _p, _hq);
+    if (p2.lift) {
+      p2.lift.t += dt;
+      var k = easeInOut(clamp(p2.lift.t / p2.lift.dur, 0, 1));
+      if (p2.lift.dir < 0) k = 1 - k;
+      p2.mesh.position.lerpVectors(p2.homePos, _p, k);
+      p2.mesh.quaternion.copy(p2.homeQuat).slerp(_hq, k);
+      p2.shadow.material.opacity = 0.55 * (1 - k);
+      lightTarget = k;
+      if (p2.lift.t >= p2.lift.dur) {
+        var dir = p2.lift.dir; p2.lift = null;
+        if (dir > 0) { mode = 'hand'; }
+        else {
+          p2.pivot.add(p2.mesh);
+          p2.mesh.position.set(0, 0, 0); p2.mesh.quaternion.identity();
+          p2.shadow.material.opacity = 0.55;
+          held = null; mode = 'board';
+          if (leaveAfterReturn) { leaveAfterReturn = false; leaveBoard(); }
+        }
+      }
+    } else {
+      p2.mesh.position.copy(_p); p2.mesh.quaternion.copy(_hq);
+      lightTarget = 1;
+    }
+  }
+  readLight.intensity = lerp(readLight.intensity, 1.1 * lightTarget, Math.min(1, dt * 6));
+  if (readLight.intensity > 0.01) {
+    camera.getWorldDirection(_dir);
+    _up.set(0, 1, 0).applyQuaternion(camera.quaternion);
+    _right.set(1, 0, 0).applyQuaternion(camera.quaternion);
+    readLight.position.copy(camera.position).addScaledVector(_up, 0.35).addScaledVector(_right, 0.25).addScaledVector(_dir, 0.15);
+  }
+}
+
+
+/* portrait hole (tap to swing open) */
+var DOOR_W = 1.3, DOOR_H = 2.3, DOOR_THETA = Math.PI + 0.85, HINGE_R = 5.4;
+var doorAngW = DOOR_W / HINGE_R;
+var corridor = new THREE.Mesh(new THREE.PlaneGeometry(DOOR_W, DOOR_H), new THREE.MeshBasicMaterial({ map: cutoutTexture(208, 368, '#000', drawCorridor), alphaTest: 0.5 }));
+var corridorMat = corridor.material;
+corridorMat.color.setScalar(0.25);
+onWall(corridor, DOOR_THETA, DOOR_H / 2, 5.58); register(corridor, 1);
+var doorOuter = new THREE.Group();
+/* hinge sits on the back-wall side of the opening; the panel runs toward the camera side along local -x and swings into the room */
+doorOuter.position.set(HINGE_R * Math.sin(DOOR_THETA - doorAngW / 2), 0, HINGE_R * Math.cos(DOOR_THETA - doorAngW / 2));
+doorOuter.lookAt(0, 0, 0);
+scene.add(doorOuter);
+var hinge = new THREE.Group();
+doorOuter.add(hinge);
+var panel = cutoutMesh(cutoutTexture(208, 368, '#000', drawDoor, 'portrait hole'), DOOR_W, DOOR_H);
+panel.position.set(-DOOR_W / 2, DOOR_H / 2, 0);
+hinge.add(panel); register(panel, 1);
+scene.updateMatrixWorld(true);
+var corridorLight = new THREE.PointLight(col(0xffc080), 0, 6, 1.0);
+corridorLight.position.copy(doorOuter.localToWorld(new THREE.Vector3(-DOOR_W / 2, 1.3, 0.35)));
+scene.add(corridorLight);
+
+/* furniture, back to front */
+var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, 2.3, -3.7, 1);
+var stairs = cutout(cutoutTexture(192, 768, '#aaa7a1', drawStairs, 'stairs'), 1.4, 5.6, 4.7, -0.8, 1);
+var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, -1.9, -1.9, 2);
+var chairR = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, 3.1, -0.6, 2);
+var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 0.9, 0.8, 0.9, -1.2, 2);
+var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, -3.0, 0.6, 3);
+var cushion = cutout(cutoutTexture(256, 112, '#b9b6b0', drawCushion, 'cushion'), 0.8, 0.35, 2.6, 0.3, 3);
+var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.85, 4.8, 4);
+wingback.castShadow = false;
+sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left'; chairR.name = 'armchair-right';
+table.name = 'table'; sideTable.name = 'side-table'; cushion.name = 'cushion'; wingback.name = 'wingback';
+
+/* ---------- drawn layers, per the layer spec ----------
+   An entry with a url replaces its grey placeholder on load; width in metres, height follows the image.
+   Floor-standing layers pivot at bottom centre. The placeholder stays if the image never arrives (LDP-79). */
+var LAYERS = {
+  'armchair-left': { url: '/_blob/42f83f54a62bbddd74b4a981f9cf9e7b', w: 1.05 },
+  'sofa': { url: '/_blob/99cd614c3c41f0dafb5ae7bccf1dc30e', w: 1.7 },
+  'wingback': { url: '/_blob/309dc3c36f77d2d66347c53184adc42c', w: 1.1 },
+  /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
+  'cat': { sheet: '/_blob/cddd16e5c69a036c54ec23acd4a97215', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
+};
+var catSheet = null;
+function setCatFrame(t, f) { t.offset.x = f / catSheet.entry.cols; }
+function sheetTexture(im, entry) {
+  var t = tex(im);
+  t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  t.repeat.set(1 / entry.cols, 1);
+  t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+  return t;
+}
+function applyCatSheet(entry) {
+  if (!entry.sheet) return;
+  var im = new Image();
+  im.onload = function () {
+    var w = entry.cellW / entry.pxPerM, h = entry.cellH / entry.pxPerM;
+    var tw = sheetTexture(im, entry), ts = sheetTexture(im, entry);
+    [[catWalk, tw], [catSit, ts]].forEach(function (pair) {
+      var m = pair[0], t = pair[1];
+      m.geometry.dispose(); m.geometry = new THREE.PlaneGeometry(w, h); m.position.y = h / 2;
+      m.material.map = t; m.material.needsUpdate = true;
+      m.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+      m.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
+    });
+    catSheet = { entry: entry, tw: tw, ts: ts };
+    setCatFrame(tw, entry.walk[0]); setCatFrame(ts, entry.sit);
+  };
+  im.src = entry.sheet;
+}
+function applyLayer(id, entry) {
+  var mesh = scene.getObjectByName(id);
+  if (!mesh || !entry.url) return;
+  var im = new Image();
+  im.onload = function () {
+    var t = tex(im);
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    var h = entry.w * im.height / im.width;
+    mesh.geometry.dispose();
+    mesh.geometry = new THREE.PlaneGeometry(entry.w, h);
+    mesh.position.y = h / 2;
+    mesh.material.map = t; mesh.material.needsUpdate = true;
+    mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+    mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
+  };
+  im.src = entry.url;
+}
+for (var lid in LAYERS) { if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]); else applyLayer(lid, LAYERS[lid]); }
+
+/* the cat: a cutout that crosses the layers */
+var catGroup = new THREE.Group();
+scene.add(catGroup);
+var catWalk = cutoutMesh(cutoutTexture(300, 168, '#000', drawCatWalk), 0.75, 0.42);
+catWalk.position.y = 0.21;
+var catSit = cutoutMesh(cutoutTexture(180, 240, '#000', drawCatSit), 0.45, 0.6);
+catSit.position.y = 0.3;
+catSit.visible = false;
+catGroup.add(catWalk); catGroup.add(catSit);
+register(catWalk, 5); register(catSit, 5);
+var catPath = new THREE.CatmullRomCurve3([
+  new THREE.Vector3(2.7, 0, -2.7),
+  new THREE.Vector3(1.0, 0, -3.0),
+  new THREE.Vector3(-1.4, 0, -3.1),
+  new THREE.Vector3(-2.8, 0, -2.8),
+  new THREE.Vector3(1.6, 0, -2.6)
+], true, 'catmullrom', 0.5);
+var cat = { u: 0, speed: 0.052, state: 'walk', timer: 0, satThisLoop: false, facing: 1, dist: 0, frame: -1, sitElapsed: 0, flickAt: 0, lookFirst: false, sitU: 0.3, lastSitU: -1 };
+var catPathLength = catPath.getLength();
+
+/* ---------- lights ---------- */
+
+scene.add(new THREE.HemisphereLight(col(0x3a4056), col(0x1b1613), 0.28));
+
+var fireSpot = new THREE.SpotLight(col(0xffa24a), 2.6, 18, 1.05, 0.7, 1.0);
+fireSpot.position.set(0, 1.4, -4.5);
+fireSpot.target.position.set(0, 0.5, 5);
+fireSpot.castShadow = true;
+fireSpot.shadow.mapSize.set(1024, 1024);
+fireSpot.shadow.camera.near = 0.3;
+fireSpot.shadow.camera.far = 20;
+fireSpot.shadow.bias = -0.0006;
+fireSpot.shadow.normalBias = 0.02;
+scene.add(fireSpot); scene.add(fireSpot.target);
+
+var fireGlow = new THREE.PointLight(col(0xff9a3c), 1.2, 6.5, 1.2);
+fireGlow.position.set(0, 0.8, -4.95);
+scene.add(fireGlow);
+
+var moonSpot = new THREE.SpotLight(col(0x9fb6dc), 1.8, 18, 0.30, 0.6, 1.0);
+moonSpot.position.set(2.6, 4.9, -4.3);
+moonSpot.target.position.set(-1.6, 0, -0.6);
+moonSpot.castShadow = true;
+moonSpot.shadow.mapSize.set(1024, 1024);
+moonSpot.shadow.camera.near = 0.5;
+moonSpot.shadow.camera.far = 20;
+moonSpot.shadow.bias = -0.0005;
+moonSpot.shadow.normalBias = 0.02;
+scene.add(moonSpot); scene.add(moonSpot.target);
+
+var fill = new THREE.DirectionalLight(col(0xffe2c0), 0.32);
+fill.position.set(3, 5, 9);
+scene.add(fill);
+
+/* ---------- interaction state ---------- */
+
+var mode = 'room';
+var tween = null;
+var yaw = 0, pitch = 0, yawT = 0, pitchT = 0;
+var YAW_MAX = 0.24, PITCH_MAX = 0.08;
+var raycaster = new THREE.Raycaster();
+var pointer = new THREE.Vector2();
+var tappables = [hearthBack, panel, catWalk, catSit].concat(boardParts);
+for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
+
+function startTween(fromPos, fromLook, toPos, toLook, dur, done) {
+  tween = { t: 0, dur: dur, fromPos: fromPos, fromLook: fromLook, toPos: toPos, toLook: toLook, done: done };
+}
+function currentLook() {
+  var d = new THREE.Vector3();
+  camera.getWorldDirection(d);
+  return camera.position.clone().addScaledVector(d, 5);
+}
+function enterBoard() {
+  mode = 'tween';
+  scene.updateMatrixWorld(true);
+  var p = new THREE.Vector3(), n = new THREE.Vector3();
+  boardGroup.getWorldPosition(p);
+  boardGroup.getWorldDirection(n);
+  var th = Math.tan(camera.fov * Math.PI / 360);
+  var d = Math.max((BOARD_H / 2) / th, (BOARD_W / 2) / (th * camera.aspect)) * 1.12;
+  var to = p.clone().addScaledVector(n, d);
+  startTween(camera.position.clone(), currentLook(), to, p, 0.9, function () { mode = 'board'; backBtn.hidden = false; });
+}
+function leaveBoard() {
+  mode = 'tween';
+  backBtn.hidden = true;
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  roomPose(yaw, pitch, pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 0.9, function () { mode = 'room'; });
+}
+
+var stokeT = 99;
+function stokeFire() { stokeT = 0; emberBurst = 28; }
+
+var portrait = { open: false, ang: 0, target: 0, closeT: 0 };
+var DOOR_OPEN = 1.75;
+function togglePortrait() {
+  portrait.open = !portrait.open;
+  portrait.target = portrait.open ? DOOR_OPEN : 0;
+  portrait.closeT = 5;
+}
+
+function catSitDown(seconds, byTap) {
+  if (byTap) { cat.satThisLoop = true; cat.lastSitU = cat.u; }
+  cat.state = 'sit';
+  cat.timer = seconds;
+  cat.sitElapsed = 0; cat.flickAt = 2.5 + Math.random() * 2.5; cat.lookFirst = !!byTap;
+  catWalk.visible = false;
+  catSit.visible = true;
+  if (catSheet) setCatFrame(catSheet.ts, byTap ? catSheet.entry.look : catSheet.entry.sit);
+}
+function catStandUp() {
+  cat.state = 'walk';
+  catWalk.visible = true;
+  catSit.visible = false;
+}
+
+function tap(cx, cy) {
+  if (!helpEl.hidden) helpEl.hidden = true;
+  if (tween) return;
+  var r = canvas.getBoundingClientRect();
+  pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  var hits = raycaster.intersectObjects(tappables, false);
+  var hit = hits.length ? hits[0].object : null;
+  if (mode === 'hand') { returnPaper(false); return; }
+  if (mode === 'board') {
+    if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
+    if (hit && boardParts.indexOf(hit) >= 0) return;
+    leaveBoard();
+    return;
+  }
+  if (mode !== 'room' || !hit) return;
+  if (hit === hearthBack) stokeFire();
+  else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
+  else if (hit === panel) togglePortrait();
+  else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
+}
+
+/* drag versus tap */
+var dragging = false, moved = false, sx = 0, sy = 0, px = 0, py = 0;
+canvas.addEventListener('pointerdown', function (e) {
+  dragging = true; moved = false;
+  sx = px = e.clientX; sy = py = e.clientY;
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  e.preventDefault();
+});
+canvas.addEventListener('pointermove', function (e) {
+  if (!dragging) return;
+  var dx = e.clientX - px, dy = e.clientY - py;
+  px = e.clientX; py = e.clientY;
+  if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
+  if (mode === 'room' && !tiltOn) {
+    yawT = clamp(yawT - dx * 0.0022, -YAW_MAX, YAW_MAX);
+    pitchT = clamp(pitchT - dy * 0.0012, -PITCH_MAX, PITCH_MAX);
+  }
+});
+function endDrag(e) {
+  if (!dragging) return;
+  dragging = false;
+  if (!moved && e.type === 'pointerup') tap(e.clientX, e.clientY);
+}
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+/* tilt (opt in, iOS asks for permission) */
+var tiltOn = false, tiltBase = null;
+function onTilt(e) {
+  if (e.gamma == null || e.beta == null) return;
+  var o = window.orientation || 0, h, v;
+  if (o === 90) { h = e.beta; v = -e.gamma; }
+  else if (o === -90) { h = -e.beta; v = e.gamma; }
+  else { h = e.gamma; v = e.beta; }
+  if (!tiltBase) tiltBase = { h: h, v: v };
+  if (mode !== 'room') return;
+  yawT = clamp((h - tiltBase.h) * 0.012, -YAW_MAX, YAW_MAX);
+  pitchT = clamp(-(v - tiltBase.v) * 0.005, -PITCH_MAX, PITCH_MAX);
+}
+function toggleTilt() {
+  if (tiltOn) {
+    window.removeEventListener('deviceorientation', onTilt);
+    tiltOn = false; tiltBase = null;
+    btns.tilt.classList.remove('on');
+    return;
+  }
+  var start = function () {
+    window.addEventListener('deviceorientation', onTilt);
+    tiltOn = true; tiltBase = null;
+    btns.tilt.classList.add('on');
+  };
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    DeviceOrientationEvent.requestPermission().then(function (res) { if (res === 'granted') start(); }).catch(function () {});
+  } else if (typeof DeviceOrientationEvent !== 'undefined') {
+    start();
+  }
+}
+
+/* HUD */
+var tintOn = false;
+function setTint(on) {
+  tintOn = on;
+  for (var i = 0; i < layered.length; i++) {
+    var m = layered[i];
+    var c = on ? (m.userData.layer === 5 ? CAT_TINT : TINTS[m.userData.layer]) : m.userData.base;
+    m.material.color.copy(on ? col(c) : c);
+  }
+  btns.layers.classList.toggle('on', on);
+}
+var shadowsOn = true;
+function setShadows(on) {
+  shadowsOn = on;
+  renderer.shadowMap.enabled = on;
+  fireSpot.castShadow = on;
+  moonSpot.castShadow = on;
+  scene.traverse(function (o) {
+    if (!o.material) return;
+    var ms = Array.isArray(o.material) ? o.material : [o.material];
+    for (var i = 0; i < ms.length; i++) ms[i].needsUpdate = true;
+  });
+  renderer.shadowMap.needsUpdate = true;
+  btns.shadows.classList.toggle('on', on);
+}
+function updateResLabel() { btns.res.textContent = 'Res ' + (Math.round(pixelRatio * 10) / 10) + 'x'; }
+function updateExpLabel() { btns.exp.textContent = 'Exp ' + EXPOSURES[expIndex].toFixed(1); }
+document.getElementById('btns').addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('button') : null;
+  if (!b) return;
+  var act = b.getAttribute('data-act');
+  if (act === 'layers') setTint(!tintOn);
+  else if (act === 'shadows') setShadows(!shadowsOn);
+  else if (act === 'res') { pixelRatio = pixelRatio > 1 ? 1 : MAX_PR; updateResLabel(); resize(); }
+  else if (act === 'exp') { expIndex = (expIndex + 1) % EXPOSURES.length; renderer.toneMappingExposure = EXPOSURES[expIndex]; updateExpLabel(); }
+  else if (act === 'tilt') toggleTilt();
+  else if (act === 'reset') { yawT = 0; pitchT = 0; tiltBase = null; if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); }
+  else if (act === 'help') helpEl.hidden = !helpEl.hidden;
+});
+backBtn.addEventListener('click', function () { if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); });
+updateResLabel(); updateExpLabel();
+setTimeout(function () { helpEl.hidden = true; }, 9000);
+
+/* ---------- per frame ---------- */
+
+function flicker(t) {
+  return 0.86 + 0.08 * Math.sin(t * 7.1) + 0.04 * Math.sin(t * 13.7 + 1.3) + 0.02 * Math.sin(t * 23.3 + 0.7);
+}
+
+function updateCamera(dt) {
+  if (tween) {
+    tween.t += dt;
+    var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
+    camera.position.lerpVectors(tween.fromPos, tween.toPos, k);
+    lookTmp.lerpVectors(tween.fromLook, tween.toLook, k);
+    camera.lookAt(lookTmp);
+    if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
+    return;
+  }
+  if (mode === 'room') {
+    var s = Math.min(1, dt * 7);
+    yaw = lerp(yaw, yawT, s);
+    pitch = lerp(pitch, pitchT, s);
+    roomPose(yaw, pitch, camera.position, lookTmp);
+    camera.lookAt(lookTmp);
+  }
+}
+
+function updateFire(dt, t) {
+  stokeT += dt;
+  var s = stokeT < 0.25 ? stokeT / 0.25 : Math.exp(-(stokeT - 0.25) / 2.4);
+  var f = flicker(t);
+  fireSpot.intensity = 2.6 * f * (1 + 0.9 * s);
+  fireGlow.intensity = 1.2 * f * (1 + 1.0 * s);
+  var grow = 1 + 0.55 * s;
+  for (var i = 0; i < flames.length; i++) {
+    var fl = flames[i], ph = fl.ph;
+    fl.sprite.scale.set(fl.w * grow * (1 + 0.12 * Math.sin(t * 9.1 + ph)), fl.h * grow * (1 + 0.25 * Math.sin(t * 6.3 + ph * 1.7)), 1);
+    fl.sprite.position.y = fl.y + 0.06 * Math.sin(t * 4.2 + ph) + 0.15 * s;
+    fl.sprite.material.opacity = 0.5 + 0.4 * (0.5 + 0.5 * Math.sin(t * 11 + ph * 2.1));
+  }
+  spawnAcc += 10 * (1 + 4 * s) * dt + emberBurst;
+  emberBurst = 0;
+  for (var j = 0; j < EMBERS; j++) {
+    var k = j * 3;
+    if (emberLife[j] > 0) {
+      emberLife[j] -= dt;
+      emberPos[k] += emberVel[k] * dt;
+      emberPos[k + 1] += emberVel[k + 1] * dt;
+      emberPos[k + 2] += emberVel[k + 2] * dt;
+      emberVel[k] *= 1 - 0.6 * dt;
+      emberVel[k + 2] *= 1 - 0.6 * dt;
+      emberVel[k + 1] += 0.15 * dt;
+      if (emberLife[j] <= 0) emberPos[k + 1] = -10;
+    } else if (spawnAcc >= 1) {
+      spawnAcc -= 1;
+      spawnEmber(j);
+    }
+  }
+  spawnAcc = Math.min(spawnAcc, 5);
+  emberGeo.attributes.position.needsUpdate = true;
+}
+
+var catPos = new THREE.Vector3(), catTan = new THREE.Vector3();
+/* Where the cat stops is chosen fresh for each lap, and on some laps it does not stop at all, so a
+   stop never lands twice in the same place. sitU is a point on the loop; -1 means no stop this lap. */
+function planCatSit() {
+  if (Math.random() > 0.6) { cat.sitU = -1; return; }
+  var u, d, tries = 0;
+  do {
+    u = 0.04 + Math.random() * 0.92;
+    d = Math.abs(u - cat.lastSitU); d = Math.min(d, 1 - d);
+    tries++;
+  } while (tries < 16 && cat.lastSitU >= 0 && d < 0.3);
+  cat.sitU = u;
+}
+function updateCat(dt, t) {
+  if (cat.state === 'sit') {
+    cat.timer -= dt; cat.sitElapsed += dt;
+    if (catSheet) {
+      var e = catSheet.entry, f = e.sit;
+      if (cat.lookFirst && cat.sitElapsed < 1.6) f = e.look;
+      else if (cat.sitElapsed > cat.flickAt) { f = e.flick; if (cat.sitElapsed > cat.flickAt + 0.45) { cat.flickAt = cat.sitElapsed + 2.5 + Math.random() * 3; f = e.sit; } }
+      setCatFrame(catSheet.ts, f);
+    }
+    if (cat.timer <= 0) catStandUp();
+    return;
+  }
+  var before = cat.u;
+  cat.u += cat.speed * dt;
+  cat.dist += cat.speed * dt * catPathLength;
+  if (cat.u >= 1) { cat.u -= 1; cat.satThisLoop = false; planCatSit(); }
+  catPath.getPointAt(cat.u, catPos);
+  catPath.getTangentAt(cat.u, catTan);
+  if (catSheet) {
+    var e2 = catSheet.entry, fr = Math.floor(cat.dist / e2.stride * e2.walk.length) % e2.walk.length;
+    if (fr !== cat.frame) { cat.frame = fr; setCatFrame(catSheet.tw, e2.walk[fr]); }
+    catGroup.position.set(catPos.x, 0, catPos.z);
+  } else {
+    catGroup.position.set(catPos.x, 0.02 * Math.abs(Math.sin(t * 10)), catPos.z);
+  }
+  if (catTan.x < -0.05) cat.facing = -1; else if (catTan.x > 0.05) cat.facing = 1;
+  catGroup.scale.x = cat.facing;
+  if (!cat.satThisLoop && cat.sitU >= 0 && before < cat.sitU && cat.u >= cat.sitU) {
+    cat.satThisLoop = true;
+    cat.lastSitU = cat.sitU;
+    catSitDown(4 + Math.random() * 5);
+  }
+}
+
+function updatePortrait(dt) {
+  var s = Math.min(1, dt * 4);
+  portrait.ang = lerp(portrait.ang, portrait.target, s);
+  hinge.rotation.y = portrait.ang;
+  var k = portrait.ang / DOOR_OPEN;
+  corridorLight.intensity = 1.8 * k;
+  corridorMat.color.setScalar(0.25 + 0.75 * k);
+  if (portrait.open) {
+    portrait.closeT -= dt;
+    if (portrait.closeT <= 0) togglePortrait();
+  }
+}
+
+function resize() {
+  var w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  renderer.setPixelRatio(pixelRatio);
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 1 ? 58 : 42;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
+resize();
+
+var clock = new THREE.Clock();
+var t = 0, fpsN = 0, fpsT = 0;
+function frame() {
+  var dt = Math.min(0.05, clock.getDelta());
+  t += dt;
+  updateCamera(dt);
+  updateFire(dt, t);
+  updateCat(dt, t);
+  updatePortrait(dt);
+  updatePapers(dt, t);
+  renderer.render(scene, camera);
+  fpsN++; fpsT += dt;
+  if (fpsT >= 0.5) {
+    var ri = renderer.info.render;
+    statsEl.textContent = Math.round(fpsN / fpsT) + ' fps\n' + ri.calls + ' draw calls\n' + (ri.triangles / 1000).toFixed(1) + 'k triangles';
+    fpsN = 0; fpsT = 0;
+  }
+}
+renderer.setAnimationLoop(frame);
+
+/* hooks for automated checks; harmless in normal use */
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; } };
+})();
+</script>
+</body>
+</html>
