@@ -1277,7 +1277,7 @@ var LAYERS = {
      drawing is lit like the paintings, so the firelight catches lead and stone */
   'window-left': { url: '../assets/layers/window-left.png', w: 1.2, pivot: 'centre', window: true },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
-  'cat': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
+  'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
 var catSheet = null;
 function setCatFrame(t, f) { t.offset.x = f / catSheet.entry.cols; }
