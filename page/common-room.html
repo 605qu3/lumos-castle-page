@@ -1211,9 +1211,9 @@ table.name = 'table'; sideTable.name = 'side-table'; cushion.name = 'cushion'; w
    An entry with a url replaces its grey placeholder on load; width in metres, height follows the image.
    Floor-standing layers pivot at bottom centre. The placeholder stays if the image never arrives (LDP-79). */
 var LAYERS = {
-  'armchair-left': { url: '../assets/layers/armchair-left.png', w: 1.05 },
-  'sofa': { url: '../assets/layers/sofa.png', w: 1.7 },
-  'wingback': { url: '../assets/layers/wingback.png', w: 1.1 },
+  'armchair-left': { url: '../assets/layers/armchair-left.png', w: 1.05, sink: 0.067 },
+  'sofa': { url: '../assets/layers/sofa.png', w: 1.7, sink: 0.068 },
+  'wingback': { url: '../assets/layers/wingback.png', w: 1.1, sink: 0.065 },
   /* wall-hung: pivots at its centre, which stays where onWall put it */
   'tapestry': { url: '../assets/layers/tapestry.png', w: 1.44, pivot: 'centre', flutter: true },
   /* the two paintings are composed on their own canvas so a sitter can be drawn into them */
@@ -1260,7 +1260,12 @@ function applyLayer(id, entry) {
     mesh.geometry.dispose();
     mesh.geometry = entry.flutter ? new THREE.PlaneGeometry(entry.w, h, 12, 24) : new THREE.PlaneGeometry(entry.w, h);
     if (entry.flutter) mesh.geometry.userData.base = Float32Array.from(mesh.geometry.attributes.position.array);
-    if (entry.pivot !== 'centre') mesh.position.y = h / 2;
+    /* A floor piece drawn from a little above has its back feet higher in the
+       image than its front ones, so standing it on its lowest pixel leaves the
+       back pair in mid-air. sink drops it until the average of its feet is on
+       the floor: the back feet come down, the front feet go a little under, and
+       the floor hides what goes under. Measured per piece off the drawing. */
+    if (entry.pivot !== 'centre') mesh.position.y = h / 2 - (entry.sink || 0) * h;
     mesh.material.map = t; mesh.material.needsUpdate = true;
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
     mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
