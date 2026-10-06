@@ -1221,8 +1221,13 @@ function updatePapers(dt, t) {
 
 
 /* portrait hole (tap to swing open) */
-var DOOR_W = 1.3, DOOR_H = 2.3, DOOR_THETA = Math.PI + 0.85, HINGE_R = 5.4;
-var doorAngW = DOOR_W / HINGE_R;
+/* The panel is flat and the wall is round, so it is hung as a chord of the
+   wall: both edges at HINGE_R, a centimetre in front of the wall, and its
+   middle about 5 cm proud. Hung on the tangent at the hinge, as it was, one
+   edge stood 20 cm off the wall and the gap behind showed from every angle off
+   centre. A stopgap until the door is drawn with a stone reveal. */
+var DOOR_W = 1.3, DOOR_H = 2.3, DOOR_THETA = Math.PI + 0.85, HINGE_R = 5.59;
+var doorAngW = 2 * Math.asin(DOOR_W / 2 / HINGE_R);
 var corridor = new THREE.Mesh(new THREE.PlaneGeometry(DOOR_W, DOOR_H), new THREE.MeshBasicMaterial({ map: cutoutTexture(208, 368, '#000', drawCorridor), alphaTest: 0.5 }));
 var corridorMat = corridor.material;
 corridorMat.color.setScalar(0.25);
@@ -1231,6 +1236,7 @@ var doorOuter = new THREE.Group();
 /* hinge sits on the back-wall side of the opening; the panel runs toward the camera side along local -x and swings into the room */
 doorOuter.position.set(HINGE_R * Math.sin(DOOR_THETA - doorAngW / 2), 0, HINGE_R * Math.cos(DOOR_THETA - doorAngW / 2));
 doorOuter.lookAt(0, 0, 0);
+doorOuter.rotateY(doorAngW / 2);   /* from the tangent at the hinge onto the chord */
 scene.add(doorOuter);
 var hinge = new THREE.Group();
 doorOuter.add(hinge);
