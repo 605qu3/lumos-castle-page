@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
+<title>Contact sheet</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #14110e; color: #e8e0d2;
+         font: 16px/1.45 "Iowan Old Style", Georgia, serif; }
+  header { padding: 14px 16px 10px; border-bottom: 1px solid #332c23; }
+  h1 { margin: 0 0 2px; font-size: 19px; font-weight: 600; letter-spacing: .01em; }
+  p { margin: 0; font-size: 14px; color: #a99b84; }
+  #note { margin-top: 6px; color: #c9bda6; }
+  #wrap { padding: 12px 12px 28px; }
+  img { display: block; width: 100%; height: auto; border: 1px solid #332c23; background: #0b0a08; }
+  #err { padding: 16px; color: #c08a6a; font-size: 14px; }
+  footer { padding: 0 16px 24px; font-size: 13px; color: #6f6353; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">Contact sheet</h1>
+  <p id="meta"></p>
+  <p id="note"></p>
+</header>
+<div id="wrap"></div>
+<div id="err" hidden></div>
+<footer>Pinch to zoom. Reload for the latest sheet.</footer>
+<script>
+(function () {
+  'use strict';
+  var bust = '?t=' + Date.now();
+  fetch('../assets/review/sheet.json' + bust, { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('no sheet.json (' + r.status + ')'); return r.json(); })
+    .then(function (s) {
+      document.getElementById('title').textContent = s.title || 'Contact sheet';
+      document.getElementById('meta').textContent = s.meta || '';
+      document.getElementById('note').textContent = s.note || '';
+      document.title = s.title || 'Contact sheet';
+      var img = new Image();
+      img.alt = s.title || 'contact sheet';
+      img.src = '../assets/review/' + s.file + bust;
+      document.getElementById('wrap').appendChild(img);
+    })
+    .catch(function (e) {
+      var d = document.getElementById('err');
+      d.hidden = false;
+      d.textContent = 'No sheet to show: ' + e.message;
+    });
+}());
+</script>
+</body>
+</html>

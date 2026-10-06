@@ -166,8 +166,8 @@ cross-hatching over the lit faces reading as weave, a viewpoint about 25 degrees
 2.4 m was asked (the two-cushion count in the prompt pulled the length down), cloth lighter and pinker than the
 chair's, and the border.
 page, tiles moved out: the three notice-board paper tiles (laid, cream, buff; 640 px JPEGs) left the page source, where
-they sat as base64 data URIs, 86 KB of a 159 KB file, and now live in the page's asset store as /_blob/6cb281ab03d752e2ec81e8c03862bcd4
-(laid), /_blob/3062746dc7810c561bdfeeb3a7338b6c (cream) and /_blob/50a4dde13aaf0350c2548356a888b793 (buff), loaded by the
+they sat as base64 data URIs, 86 KB of a 159 KB file. They were held in the artifact's asset store until 6 October 2026,
+and now sit beside the page as assets/tiles/paper-laid.jpg, paper-cream.jpg and paper-buff.jpg, loaded by the
 same promise-based loader as before. Nothing drawn changes; the page source is now code only, so it can be read by search.
 sofa, round 2: a fresh generation from the revised prompt (three cushions, camera stated as distance and angle, hatching
 direction per face, base colour in words, green to all four edges). It came back geometrically identical to round 1:
@@ -280,9 +280,9 @@ compensate when the page moved to sRGB colour management; 1.0 now reads best.
 
 <script>
 var TILES = {
-  laid: "/_blob/6cb281ab03d752e2ec81e8c03862bcd4",
-  cream: "/_blob/3062746dc7810c561bdfeeb3a7338b6c",
-  buff: "/_blob/50a4dde13aaf0350c2548356a888b793",
+  laid: "../assets/tiles/paper-laid.jpg",
+  cream: "../assets/tiles/paper-cream.jpg",
+  buff: "../assets/tiles/paper-buff.jpg",
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1198,14 +1198,14 @@ table.name = 'table'; sideTable.name = 'side-table'; cushion.name = 'cushion'; w
    An entry with a url replaces its grey placeholder on load; width in metres, height follows the image.
    Floor-standing layers pivot at bottom centre. The placeholder stays if the image never arrives (LDP-79). */
 var LAYERS = {
-  'armchair-left': { url: '/_blob/42f83f54a62bbddd74b4a981f9cf9e7b', w: 1.05 },
-  'sofa': { url: '/_blob/99cd614c3c41f0dafb5ae7bccf1dc30e', w: 1.7 },
-  'wingback': { url: '/_blob/309dc3c36f77d2d66347c53184adc42c', w: 1.1 },
+  'armchair-left': { url: '../assets/layers/armchair-left.png', w: 1.05 },
+  'sofa': { url: '../assets/layers/sofa.png', w: 1.7 },
+  'wingback': { url: '../assets/layers/wingback.png', w: 1.1 },
   /* wall-hung: pivots at its centre, which stays where onWall put it */
-  'tapestry': { url: '/_blob/f8bd42b60d01866d92c5b78c0e0f0faf', w: 1.44, pivot: 'centre', flutter: true },
-  'portrait-mantel': { url: '/_blob/1b13b9994d388d8ecad63ed1c81eff9f', w: 1.0, pivot: 'centre' },
+  'tapestry': { url: '../assets/layers/tapestry.png', w: 1.44, pivot: 'centre', flutter: true },
+  'portrait-mantel': { url: '../assets/layers/portrait-mantel.png', w: 1.0, pivot: 'centre' },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
-  'cat': { sheet: '/_blob/cddd16e5c69a036c54ec23acd4a97215', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
+  'cat': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
 var catSheet = null;
 function setCatFrame(t, f) { t.offset.x = f / catSheet.entry.cols; }
