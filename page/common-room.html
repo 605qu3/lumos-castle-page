@@ -1216,8 +1216,9 @@ var LAYERS = {
   'wingback': { url: '../assets/layers/wingback.png', w: 1.1 },
   /* wall-hung: pivots at its centre, which stays where onWall put it */
   'tapestry': { url: '../assets/layers/tapestry.png', w: 1.44, pivot: 'centre', flutter: true },
-  'portrait-mantel': { url: '../assets/layers/portrait-mantel.png', w: 1.0, pivot: 'centre' },
-  'portrait-right': { url: '../assets/layers/portrait-right.png', w: 1.0, pivot: 'centre' },
+  /* the two paintings are composed on their own canvas so a sitter can be drawn into them */
+  'portrait-mantel': { url: '../assets/layers/portrait-mantel.png', w: 1.0, pivot: 'centre', portrait: true },
+  'portrait-right': { url: '../assets/layers/portrait-right.png', w: 1.0, pivot: 'centre', portrait: true },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -1266,7 +1267,218 @@ function applyLayer(id, entry) {
   };
   im.src = entry.url;
 }
-for (var lid in LAYERS) { if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]); else applyLayer(lid, LAYERS[lid]); }
+
+/* ---------- the portraits and their sitter ----------
+   A portrait is not a flat layer like the tapestry. Each one is its own canvas:
+   the painted interior first, then the sitter drawn into it and clipped to the
+   picture rectangle, so a figure half out of the painted room is cut by the
+   painted edge and never crosses the gilt. The frame needs no transparent hole,
+   because frame and interior are one drawing and she is drawn inside it.
+
+   One sitter moves between the two frames, which is two things in the world
+   dealing with each other (LDP-90). She is away as often as present and for
+   minutes at a time, so a boy coming back finds an empty chair more often than
+   not (LDP-91), and every dwell is drawn fresh, so nothing lands on a clock he
+   can learn. Book 1 has portraits visiting each other (PS 7, PS 8). */
+
+var SITTER = {
+  url: '../assets/layers/sitter-mantel.png',
+  cols: 6, cellW: 522, cellH: 915,
+  seated: 0, rising: 1, standing: 2, walking: 3, leaving: 4, entering: 5
+};
+
+/* Per painting: where its painted room is, how big a person is in it, and the
+   two places that matter, her seat and the way out. picture is the painted area
+   inside the gilt, measured off each drawing as a fraction of the whole image.
+   figureH is a standing figure's height as a fraction of the picture's height,
+   derived from what each painting already contains: in the mantel the chair's
+   back spans about 18 percent of the picture and a chair back is about 0.95 m,
+   so a metre is 19 percent and a 1.7 m woman is 32; in portrait-right the
+   doorway is three-quarters of the picture and a doorway is about 2 m, so a
+   metre is 37 percent and she is 64. Both are meant to be tuned by eye.
+   facesOut is the way she walks to leave: right in the mantel, left in the
+   study, so the two exits face each other and she crosses between them. */
+var SCENES = {
+  'portrait-mantel': {
+    picture: [0.156, 0.117, 0.844, 0.883],
+    figureH: 0.54, footY: 0.785,
+    seatX: 0.47, exitX: 1.06, facesOut: 1
+  },
+  'portrait-right': {
+    picture: [0.126, 0.115, 0.874, 0.885],
+    figureH: 0.64, footY: 0.90,
+    seatX: 0.62, exitX: -0.06, facesOut: -1
+  }
+};
+
+var portraits = {};        /* id -> its canvas, its clean copy and its texture */
+var sitterSheet = null;
+
+function applyPortrait(id, entry) {
+  var mesh = scene.getObjectByName(id);
+  if (!mesh || !entry.url) return;
+  var im = new Image();
+  im.onload = function () {
+    var w = im.width, h = im.height;
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    var ctx = cv.getContext('2d');
+    ctx.drawImage(im, 0, 0);
+    var clean = document.createElement('canvas'); clean.width = w; clean.height = h;
+    clean.getContext('2d').drawImage(im, 0, 0);
+
+    var t = tex(cv);
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    var hm = entry.w * h / w;
+    mesh.geometry.dispose();
+    mesh.geometry = new THREE.PlaneGeometry(entry.w, hm);
+    mesh.material.map = t; mesh.material.needsUpdate = true;
+    mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+    mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
+
+    var p = SCENES[id].picture;
+    portraits[id] = {
+      ctx: ctx, clean: clean, tex: t, w: w, h: h,
+      rect: { x: p[0] * w, y: p[1] * h, w: (p[2] - p[0]) * w, h: (p[3] - p[1]) * h },
+      drawn: false
+    };
+  };
+  im.src = entry.url;
+}
+
+function loadSitterSheet() {
+  var im = new Image();
+  im.onload = function () { sitterSheet = im; sitter.dirty = true; };
+  im.src = SITTER.url;
+}
+
+/* Wipe the painted room back to how the painter left it. */
+function clearPortrait(p) {
+  p.ctx.drawImage(p.clean, p.rect.x, p.rect.y, p.rect.w, p.rect.h,
+                           p.rect.x, p.rect.y, p.rect.w, p.rect.h);
+}
+
+/* One cell of the sheet, drawn into the painted room and clipped to it. x runs
+   across the picture, 0 at its left edge and 1 at its right, and is allowed to
+   run outside that, so she is cut by the painted edge on her way through it. */
+function drawSitter(id, cell, x, facing) {
+  var p = portraits[id], s = SCENES[id];
+  if (!p || !sitterSheet) return;
+  var r = p.rect;
+  var dh = s.figureH * r.h;
+  var dw = dh * (SITTER.cellW / SITTER.cellH);
+  var cx = r.x + x * r.w;
+  var dy = r.y + s.footY * r.h - dh;
+  var ctx = p.ctx;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(r.x, r.y, r.w, r.h);
+  ctx.clip();
+  if (facing < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.translate(-cx, 0); }
+  ctx.drawImage(sitterSheet, cell * SITTER.cellW, 0, SITTER.cellW, SITTER.cellH,
+                cx - dw / 2, dy, dw, dh);
+  ctx.restore();
+}
+
+/* ---------- what she does ----------
+   One sitter, in one frame at a time or away between them. Every duration is
+   drawn fresh. Seated belongs to the mantel, which is where her chair is
+   painted; in the study she stands, as a visitor does. */
+var sitter = {
+  where: 'portrait-mantel', phase: 'seated', t: 90 + Math.random() * 90,
+  x: SCENES['portrait-mantel'].seatX, cell: SITTER.seated,
+  facing: 1, dirty: true, lastX: null
+};
+
+function sitRnd(a, b) { return a + Math.random() * (b - a); }
+
+function sitterEnter(id) {
+  var s = SCENES[id];
+  sitter.where = id;
+  sitter.phase = 'entering';
+  sitter.x = s.exitX;
+  sitter.cell = SITTER.entering;
+  sitter.facing = -s.facesOut;
+  sitter.speed = Math.abs(s.seatX - s.exitX) / sitRnd(4.5, 7);
+  sitter.dirty = true;
+}
+
+/* Home more often than not, but away often enough that the visit is something
+   that happens rather than a trick that repeats. */
+function sitterNextFrame() {
+  return Math.random() < 0.65 ? 'portrait-mantel' : 'portrait-right';
+}
+
+function reached(from, to, x) {
+  return to > from ? x >= to : x <= to;
+}
+
+function updateSitters(dt) {
+  var st = sitter, sc = st.where ? SCENES[st.where] : null;
+  st.t -= dt;
+
+  if (st.phase === 'away') {
+    if (st.t <= 0) sitterEnter(sitterNextFrame());
+
+  } else if (st.phase === 'entering') {
+    st.x += (sc.seatX > sc.exitX ? 1 : -1) * st.speed * dt;
+    if (reached(sc.exitX, sc.seatX, st.x)) {
+      st.x = sc.seatX;
+      st.facing = sc.facesOut;
+      if (st.where === 'portrait-mantel') { st.phase = 'seated'; st.cell = SITTER.seated; st.t = sitRnd(60, 200); }
+      else { st.phase = 'standing'; st.cell = SITTER.standing; st.t = sitRnd(25, 90); }
+    }
+    st.dirty = true;
+
+  } else if (st.phase === 'seated' || st.phase === 'standing') {
+    if (st.t <= 0) {
+      if (st.phase === 'seated') { st.phase = 'rising'; st.cell = SITTER.rising; st.t = sitRnd(0.7, 1.3); }
+      else { st.phase = 'walking'; st.cell = SITTER.walking; st.speed = Math.abs(sc.exitX - sc.seatX) / sitRnd(4, 7); }
+      st.dirty = true;
+    }
+
+  } else if (st.phase === 'rising') {
+    if (st.t <= 0) {
+      st.phase = 'walking'; st.cell = SITTER.walking;
+      st.speed = Math.abs(sc.exitX - sc.seatX) / sitRnd(4, 7);
+      st.dirty = true;
+    }
+
+  } else if (st.phase === 'walking') {
+    st.facing = sc.facesOut;
+    st.x += sc.facesOut * st.speed * dt;
+    st.dirty = true;
+    if (reached(sc.seatX, sc.exitX, st.x)) {
+      st.phase = 'leaving'; st.cell = SITTER.leaving; st.t = sitRnd(0.5, 1.1);
+    }
+
+  } else if (st.phase === 'leaving') {
+    if (st.t <= 0) { st.phase = 'away'; st.where = null; st.t = sitRnd(45, 240); st.dirty = true; }
+  }
+
+  /* Repaint only what changed: the frame she is in, and the one she has just
+     left. While she walks, redraw once she has moved far enough to show, which
+     keeps the texture uploads down on the iPad without making the walk stepped. */
+  var moved = st.lastX === null || Math.abs(st.x - st.lastX) > 0.004;
+  if (!st.dirty && !moved) return;
+  for (var id in portraits) {
+    var p = portraits[id];
+    var hasHer = (st.where === id && st.phase !== 'away');
+    if (!hasHer && !p.drawn) continue;
+    clearPortrait(p);
+    if (hasHer) drawSitter(id, st.cell, st.x, st.facing);
+    p.drawn = hasHer;
+    p.tex.needsUpdate = true;
+  }
+  st.lastX = st.x;
+  st.dirty = false;
+}
+
+for (var lid in LAYERS) {
+  if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]);
+  else if (LAYERS[lid].portrait) applyPortrait(lid, LAYERS[lid]);
+  else applyLayer(lid, LAYERS[lid]);
+}
+loadSitterSheet();
 
 /* the tapestry stirs in the warm air off the fire: pinned at the pole, freest at the hem, a centimetre or two,
    harder for a few seconds when the fire is stoked and when the portrait hole lets the draught in (LDP-12) */
@@ -1676,6 +1888,7 @@ function frame() {
   updateFire(dt, t);
   updateCat(dt, t);
   updatePortrait(dt);
+  updateSitters(dt);
   updatePapers(dt, t);
   updateTapestry(dt, t);
   renderer.render(scene, camera);
