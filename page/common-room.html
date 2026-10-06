@@ -1411,10 +1411,13 @@ function drawSitter(id, cell, x, facing, onChair) {
   var two = onChair && sitterSeated, sh = two ? SITTER.seated2 : SITTER;
   var img = two ? sitterSeated : sitterSheet;
   var seatCell = two ? sh.seatCell : SITTER.seatCell;
-  /* Seated cells number differently on the two sheets. She starts the page on
-     the main sheet's seated cell, which is off the end of the four-cell sheet,
-     so without this she was drawn as nothing until her first glance. */
-  if (onChair) cell = two ? (cell < sh.cols ? cell : sh.window) : SITTER.seated;
+  /* Seated, she is drawn only from the seated sheet. The main sheet's seated
+     cell has a second stick in her raised hand, so until the seated sheet has
+     loaded the chair stays empty, which reads as her being away. She starts
+     the page on that main-sheet cell number, which is off the end of the
+     four-cell sheet, so it is mapped to her looking at the window. */
+  if (onChair && !two) return;
+  if (onChair && cell >= sh.cols) cell = sh.window;
   var r = p.rect;
   var dh = (two ? sh.figureH / SCENES['portrait-mantel'].figureH * s.figureH : s.figureH) * r.h;
   var dw = dh * (sh.cellW / sh.cellH);
