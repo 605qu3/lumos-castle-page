@@ -1284,7 +1284,14 @@ function applyLayer(id, entry) {
 var SITTER = {
   url: '../assets/layers/sitter-mantel.png',
   cols: 6, cellW: 522, cellH: 915,
-  seated: 0, rising: 1, standing: 2, walking: 3, leaving: 4, entering: 5
+  seated: 0, rising: 1, standing: 2, walking: 3, leaving: 4, entering: 5,
+  /* which way each cell is drawn, 1 facing its own right. Read off the sheet:
+     only the last cell, walking back in, was drawn facing left. */
+  native: [1, 1, 1, 1, 1, -1],
+  /* where she meets the chair in her seated cell, as a fraction of that cell.
+     A seated figure is placed by this and not by her feet, because her feet
+     belong to the chair she was drawn on rather than the one she is put in. */
+  seatCell: [0.22, 0.72]
 };
 
 /* Per painting: where its painted room is, how big a person is in it, and the
@@ -1301,13 +1308,19 @@ var SITTER = {
 var SCENES = {
   'portrait-mantel': {
     picture: [0.156, 0.117, 0.844, 0.883],
-    figureH: 0.54, footY: 0.785,
-    seatX: 0.47, exitX: 1.06, facesOut: 1
+    figureH: 0.66, footY: 0.88,
+    /* Where her hips go. Not the painted seat itself: she is drawn with her legs
+       out in front, so her feet sit only a little below her hips, while on this
+       chair with her feet under her the drop is larger. No one size satisfies
+       both, and the floor is the stronger cue, so she is set low enough for her
+       boot to land on it and her skirt covers the seat. */
+    chairSeat: [0.45, 0.745],
+    risingX: 0.34, seatX: 0.52, exitX: 1.06, facesOut: 1, sits: true
   },
   'portrait-right': {
     picture: [0.126, 0.115, 0.874, 0.885],
     figureH: 0.64, footY: 0.90,
-    seatX: 0.62, exitX: -0.06, facesOut: -1
+    risingX: 0.62, seatX: 0.62, exitX: -0.06, facesOut: -1, sits: false
   }
 };
 
@@ -1360,22 +1373,34 @@ function clearPortrait(p) {
 /* One cell of the sheet, drawn into the painted room and clipped to it. x runs
    across the picture, 0 at its left edge and 1 at its right, and is allowed to
    run outside that, so she is cut by the painted edge on her way through it. */
-function drawSitter(id, cell, x, facing) {
+function drawSitter(id, cell, x, facing, onChair) {
   var p = portraits[id], s = SCENES[id];
   if (!p || !sitterSheet) return;
   var r = p.rect;
   var dh = s.figureH * r.h;
   var dw = dh * (SITTER.cellW / SITTER.cellH);
-  var cx = r.x + x * r.w;
-  var dy = r.y + s.footY * r.h - dh;
+  var flip = (facing !== SITTER.native[cell]);
+  var left, top;
+  if (onChair && s.chairSeat) {
+    /* seated: line her hips up with the painted seat, not her feet with the floor */
+    var ax = flip ? (1 - SITTER.seatCell[0]) : SITTER.seatCell[0];
+    left = r.x + s.chairSeat[0] * r.w - ax * dw;
+    top = r.y + s.chairSeat[1] * r.h - SITTER.seatCell[1] * dh;
+  } else {
+    left = r.x + x * r.w - dw / 2;
+    top = r.y + s.footY * r.h - dh;
+  }
   var ctx = p.ctx;
   ctx.save();
   ctx.beginPath();
   ctx.rect(r.x, r.y, r.w, r.h);
   ctx.clip();
-  if (facing < 0) { ctx.translate(cx, 0); ctx.scale(-1, 1); ctx.translate(-cx, 0); }
+  if (flip) {
+    var mid = left + dw / 2;
+    ctx.translate(mid, 0); ctx.scale(-1, 1); ctx.translate(-mid, 0);
+  }
   ctx.drawImage(sitterSheet, cell * SITTER.cellW, 0, SITTER.cellW, SITTER.cellH,
-                cx - dw / 2, dy, dw, dh);
+                left, top, dw, dh);
   ctx.restore();
 }
 
@@ -1386,7 +1411,7 @@ function drawSitter(id, cell, x, facing) {
 var sitter = {
   where: 'portrait-mantel', phase: 'seated', t: 90 + Math.random() * 90,
   x: SCENES['portrait-mantel'].seatX, cell: SITTER.seated,
-  facing: 1, dirty: true, lastX: null
+  facing: -1, dirty: true, lastX: null
 };
 
 function sitRnd(a, b) { return a + Math.random() * (b - a); }
@@ -1424,14 +1449,17 @@ function updateSitters(dt) {
     if (reached(sc.exitX, sc.seatX, st.x)) {
       st.x = sc.seatX;
       st.facing = sc.facesOut;
-      if (st.where === 'portrait-mantel') { st.phase = 'seated'; st.cell = SITTER.seated; st.t = sitRnd(60, 200); }
+      if (sc.sits) { st.phase = 'seated'; st.cell = SITTER.seated; st.t = sitRnd(60, 200); st.facing = -1; }
       else { st.phase = 'standing'; st.cell = SITTER.standing; st.t = sitRnd(25, 90); }
     }
     st.dirty = true;
 
   } else if (st.phase === 'seated' || st.phase === 'standing') {
     if (st.t <= 0) {
-      if (st.phase === 'seated') { st.phase = 'rising'; st.cell = SITTER.rising; st.t = sitRnd(0.7, 1.3); }
+      if (st.phase === 'seated') {
+        st.phase = 'rising'; st.cell = SITTER.rising; st.t = sitRnd(0.7, 1.3);
+        st.x = sc.risingX; st.facing = sc.facesOut;
+      }
       else { st.phase = 'walking'; st.cell = SITTER.walking; st.speed = Math.abs(sc.exitX - sc.seatX) / sitRnd(4, 7); }
       st.dirty = true;
     }
@@ -1465,7 +1493,7 @@ function updateSitters(dt) {
     var hasHer = (st.where === id && st.phase !== 'away');
     if (!hasHer && !p.drawn) continue;
     clearPortrait(p);
-    if (hasHer) drawSitter(id, st.cell, st.x, st.facing);
+    if (hasHer) drawSitter(id, st.cell, st.x, st.facing, st.phase === 'seated');
     p.drawn = hasHer;
     p.tex.needsUpdate = true;
   }
