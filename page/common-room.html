@@ -1273,82 +1273,132 @@ function applyLayer(id, entry) {
   im.src = entry.url;
 }
 
-/* ---------- the portraits and their sitter ----------
+/* ---------- the portraits and their sitters ----------
    A portrait is not a flat layer like the tapestry. Each one is its own canvas:
-   the painted interior first, then the sitter drawn into it and clipped to the
-   picture rectangle, so a figure half out of the painted room is cut by the
-   painted edge and never crosses the gilt. The frame needs no transparent hole,
-   because frame and interior are one drawing and she is drawn inside it.
+   the painted interior first, then whoever is in it drawn into it and clipped
+   to the picture rectangle, so a figure half out of the painted room is cut by
+   the painted edge and never crosses the gilt. The frame needs no transparent
+   hole, because frame and interior are one drawing and the sitters are drawn
+   inside it.
 
-   One sitter moves between the two frames, which is two things in the world
-   dealing with each other (LDP-90). She is away as often as present and for
-   minutes at a time, so a boy coming back finds an empty chair more often than
-   not (LDP-91), and every dwell is drawn fresh, so nothing lands on a clock he
-   can learn. Book 1 has portraits visiting each other (PS 7, PS 8). */
+   Two sitters, one to each frame: a witch whose chair is in the mantel
+   painting and a man whose chair is in the study. Each is home more often
+   than not, sits in their own chair there, and now and then walks out and
+   visits the other's painting, where they stand, as a visitor does. Two things
+   in the world dealing with each other (LDP-90). Each is away as often as
+   present and for minutes at a time, so a boy coming back finds an empty chair
+   more often than not (LDP-91), and every dwell is drawn fresh, so nothing
+   lands on a clock he can learn. Book 1 has portraits visiting each other
+   (PS 7, PS 8). */
 
-var SITTER = {
-  url: '../assets/layers/sitter-mantel.png',
-  cols: 8, cellW: 465, cellH: 925,
-  /* Round 2's sheet: four frames of one stride, then the stationary states.
-     She walks back in on flipped walk frames rather than a cell of her own. */
-  walk: [0, 1, 2, 3], standing: 4, hat: 5, rising: 6, seated: 7,
-  /* every cell was drawn facing her own right; the code flips what it needs */
-  native: [1, 1, 1, 1, 1, 1, 1, 1],
-  /* where she meets the chair in her seated cell, as a fraction of that cell.
-     A seated figure is placed by this and not by her feet, because her feet
-     belong to the chair she was drawn on rather than the one she is put in. */
-  seatCell: [0.22, 0.76],
-  /* how far she travels, as a fraction of a picture's width, per four frames.
-     Short, measured steps: the painted rooms are barely a metre and a bit across,
-     so a true stride would cross one in two paces and read as a glide. */
-  strideX: 0.24,
-  /* A second, smaller sheet of her seated, so she has something to do while
-     sitting. Four states that share one body and differ only above the waist,
-     so swapping between them is a glance and not a jump. Its own cell size,
-     scale and hip anchor, because it was drawn on its own sheet: she fills more
-     of a cell here than she does on the main one, so the same figureH would
-     make her a fifth larger. */
-  seated2: {
-    url: '../assets/layers/sitter-mantel-seated.png',
-    cols: 4, cellW: 548, cellH: 913,
-    figureH: 0.55, seatCell: [0.18, 0.68],
-    window: 0, hands: 1, outward: 2, hat: 3
+/* Add ?fast to the page's address to run the cycles in seconds rather than
+   minutes, for watching the whole loop without waiting. The crossings speed up
+   less than the waits, so the walk stays legible. */
+var SITTER_FAST = /[?&]fast(=|&|$)/.test(location.search) ? 14 : 1;
+function dwell(a, b) { return (a + Math.random() * (b - a)) / SITTER_FAST; }
+function cross(a, b) { return (a + Math.random() * (b - a)) / Math.min(SITTER_FAST, 2.5); }
+
+/* Each sitter is drawn on more than one sheet, and the same cell number means
+   different things on each, so every pose names its sheet as well as its cell.
+   A sheet's scale is the height of a standing figure drawn at its scale as a
+   fraction of its cell, so figures cut from different sheets come out one size.
+   native is the way each cell was drawn facing; a flip happens only when the
+   facing wanted differs from it. seatCell is where the figure meets the chair
+   in a seated cell, as a fraction of that cell: a seated figure is placed by
+   this and not by its feet, because its feet belong to the chair it was drawn
+   on rather than the one it is put in. strideX is how far a sitter travels, as
+   a fraction of a picture's width, per four walk frames: short, measured steps,
+   because the painted rooms are barely a metre and a bit across and a true
+   stride would cross one in two paces and read as a glide. */
+var SITTERS = {
+  her: {
+    home: 'portrait-mantel',
+    sheets: {
+      /* round 2: four frames of one stride, standing, settling her hat, rising,
+         and a seated cell with a second stick in her raised hand that is never
+         drawn */
+      main: { url: '../assets/layers/sitter-mantel.png', cellW: 465, cellH: 925, scale: 1,
+              native: [1, 1, 1, 1, 1, 1, 1, 1] },
+      /* four seated states that share one body and differ only above the waist,
+         so swapping between them is a glance and not a jump. She fills more of
+         a cell here than on the main sheet, so this sheet draws her smaller. */
+      seated: { url: '../assets/layers/sitter-mantel-seated.png', cellW: 548, cellH: 913, scale: 0.55 / 0.66,
+                native: [1, 1, 1, 1], seatCell: [0.18, 0.68] }
+    },
+    walk: { sheet: 'main', cells: [0, 1, 2, 3] },
+    standing: { sheet: 'main', cell: 4 },
+    /* standing still, she settles her hat now and then: one small thing a
+       person does while waiting keeps a still figure from reading as a statue */
+    fidget: { sheet: 'main', cell: 5 },
+    rising: { sheet: 'main', cell: 6 },
+    /* mostly she looks at the window; now and then she looks at her hands,
+       settles her hat, or looks out of the painting at whoever is there */
+    seats: [
+      { sheet: 'seated', cell: 0, odds: 0.55, hold: [12, 40] },
+      { sheet: 'seated', cell: 1, odds: 0.20, hold: [3, 9] },
+      { sheet: 'seated', cell: 3, odds: 0.15, hold: [3, 9] },
+      { sheet: 'seated', cell: 2, odds: 0.10, hold: [3, 9] }
+    ],
+    strideX: 0.24
+  },
+  him: {
+    home: 'portrait-right',
+    sheets: {
+      /* round 1: its stride did not walk, so only standing, rising and seated
+         are used; cell 7, writing at a desk, is never drawn, because the
+         painted desk has no chair at it and he would write on nothing */
+      main: { url: '../assets/layers/sitter-right.png', cellW: 508, cellH: 898, scale: 1,
+              native: [1, 1, 1, 1, 1, 1, 1, 1], seatCell: [0.20, 0.70] },
+      /* his walk, drawn on its own sheet from a single figure of him */
+      walk: { url: '../assets/layers/sitter-right-walk.png', cellW: 526, cellH: 1276, scale: 1,
+              native: [1, 1, 1, 1] }
+    },
+    walk: { sheet: 'walk', cells: [0, 1, 2, 3] },
+    standing: { sheet: 'main', cell: 4 },
+    fidget: null,
+    rising: { sheet: 'main', cell: 5 },
+    seats: [{ sheet: 'main', cell: 6, odds: 1, hold: [20, 60] }],
+    strideX: 0.24
   }
 };
 
 /* Per painting: where its painted room is, how big a person is in it, and the
-   two places that matter, her seat and the way out. picture is the painted area
-   inside the gilt, measured off each drawing as a fraction of the whole image.
-   figureH is a standing figure's height as a fraction of the picture's height,
-   derived from what each painting already contains: in the mantel the chair's
-   back spans about 18 percent of the picture and a chair back is about 0.95 m,
-   so a metre is 19 percent and a 1.7 m woman is 32; in portrait-right the
-   doorway is three-quarters of the picture and a doorway is about 2 m, so a
-   metre is 37 percent and she is 64. Both are meant to be tuned by eye.
-   facesOut is the way she walks to leave: right in the mantel, left in the
-   study, so the two exits face each other and she crosses between them. */
+   places that matter. picture is the painted area inside the gilt, measured off
+   each drawing as a fraction of the whole image. figureH is a standing figure's
+   height as a fraction of the picture's height, derived from what each painting
+   already contains: in the mantel the chair's back spans about 18 percent of the
+   picture and a chair back is about 0.95 m, so a metre is 19 percent and a
+   1.7 m woman is 32; in portrait-right the doorway is three-quarters of the
+   picture and a doorway is about 2 m, so a metre is 37 percent and a man is 64.
+   Both are meant to be tuned by eye. chairSeat is where the resident's hips go
+   in the painted chair, and seatFacing the way they face sitting in it. seatX
+   is where the resident walks to and from the chair, risingX where they get up,
+   visitX where a visitor stands, clear of the chair. facesOut is the way out:
+   right in the mantel, left in the study, so the two exits face each other and
+   a visitor crosses between them. */
 var SCENES = {
   'portrait-mantel': {
     picture: [0.156, 0.117, 0.844, 0.883],
     figureH: 0.66, footY: 0.88,
-    /* Where her hips go. Not the painted seat itself: she is drawn with her legs
-       out in front, so her feet sit only a little below her hips, while on this
-       chair with her feet under her the drop is larger. No one size satisfies
-       both, and the floor is the stronger cue, so she is set low enough for her
-       boot to land on it and her skirt covers the seat. */
-    chairSeat: [0.45, 0.745],
-    risingX: 0.34, seatX: 0.52, exitX: 1.06, facesOut: 1, sits: true
+    /* Not the painted seat itself: she is drawn with her legs out in front, so
+       her feet sit only a little below her hips, while on this chair with her
+       feet under her the drop is larger. No one size satisfies both, and the
+       floor is the stronger cue, so she is set low enough for her boot to land
+       on it and her skirt covers the seat. */
+    chairSeat: [0.45, 0.745], seatFacing: -1,
+    risingX: 0.34, seatX: 0.52, visitX: 0.75, exitX: 1.06, facesOut: 1
   },
   'portrait-right': {
     picture: [0.126, 0.115, 0.874, 0.885],
     figureH: 0.64, footY: 0.90,
-    risingX: 0.62, seatX: 0.62, exitX: -0.06, facesOut: -1, sits: false
+    /* the swivel chair, turned out from the desk toward the doorway */
+    chairSeat: [0.70, 0.69], seatFacing: -1,
+    risingX: 0.62, seatX: 0.62, visitX: 0.27, exitX: -0.06, facesOut: -1
   }
 };
 
 var portraits = {};        /* id -> its canvas, its clean copy and its texture */
-var sitterSheet = null;
-var sitterSeated = null;
+var sheetImages = {};      /* sitter -> sheet name -> its loaded image */
 
 function applyPortrait(id, entry) {
   var mesh = scene.getObjectByName(id);
@@ -1377,21 +1427,23 @@ function applyPortrait(id, entry) {
       rect: { x: p[0] * w, y: p[1] * h, w: (p[2] - p[0]) * w, h: (p[3] - p[1]) * h },
       drawn: false
     };
-    /* the painting can arrive after her sheets and after her first frame, which
-       has already cleared the flag; without this she stays unpainted until her
-       next change of pose */
-    sitter.dirty = true;
+    /* the painting can arrive after the sheets and after the first frame,
+       which has already cleared the flags; without this its sitter stays
+       unpainted until their next change of pose */
+    sittersDirty();
   };
   im.src = entry.url;
 }
 
-function loadSitterSheet() {
-  var im = new Image();
-  im.onload = function () { sitterSheet = im; sitter.dirty = true; };
-  im.src = SITTER.url;
-  var im2 = new Image();
-  im2.onload = function () { sitterSeated = im2; sitter.dirty = true; };
-  im2.src = SITTER.seated2.url;
+function loadSitterSheets() {
+  for (var name in SITTERS) {
+    sheetImages[name] = {};
+    for (var sh in SITTERS[name].sheets) (function (name, sh) {
+      var im = new Image();
+      im.onload = function () { sheetImages[name][sh] = im; sittersDirty(); };
+      im.src = SITTERS[name].sheets[sh].url;
+    })(name, sh);
+  }
 }
 
 /* Wipe the painted room back to how the painter left it. */
@@ -1400,36 +1452,27 @@ function clearPortrait(p) {
                            p.rect.x, p.rect.y, p.rect.w, p.rect.h);
 }
 
-/* One cell of the sheet, drawn into the painted room and clipped to it. x runs
-   across the picture, 0 at its left edge and 1 at its right, and is allowed to
-   run outside that, so she is cut by the painted edge on her way through it. */
-function drawSitter(id, cell, x, facing, onChair) {
-  var p = portraits[id], s = SCENES[id];
-  if (!p || !sitterSheet) return;
-  /* Sitting, she comes off the seated sheet, which has its own cells and its
-     own scale; on her feet, off the main one. */
-  var two = onChair && sitterSeated, sh = two ? SITTER.seated2 : SITTER;
-  var img = two ? sitterSeated : sitterSheet;
-  var seatCell = two ? sh.seatCell : SITTER.seatCell;
-  /* Seated, she is drawn only from the seated sheet. The main sheet's seated
-     cell has a second stick in her raised hand, so until the seated sheet has
-     loaded the chair stays empty, which reads as her being away. She starts
-     the page on that main-sheet cell number, which is off the end of the
-     four-cell sheet, so it is mapped to her looking at the window. */
-  if (onChair && !two) return;
-  if (onChair && cell >= sh.cols) cell = sh.window;
-  var r = p.rect;
-  var dh = (two ? sh.figureH / SCENES['portrait-mantel'].figureH * s.figureH : s.figureH) * r.h;
+/* One sitter's current pose, drawn into a painted room and clipped to it. x
+   runs across the picture, 0 at its left edge and 1 at its right, and is
+   allowed to run outside that, so a figure is cut by the painted edge on the
+   way through it. A pose whose sheet has not loaded is not drawn at all, which
+   reads as the sitter being away. */
+function drawSitter(id, st) {
+  var p = portraits[id], s = SCENES[id], def = SITTERS[st.name];
+  var img = sheetImages[st.name][st.pose.sheet], sh = def.sheets[st.pose.sheet];
+  if (!p || !img) return;
+  var cell = st.pose.cell, r = p.rect;
+  var dh = sh.scale * s.figureH * r.h;
   var dw = dh * (sh.cellW / sh.cellH);
-  var flip = two ? (facing !== 1) : (facing !== SITTER.native[cell]);
+  var flip = st.facing !== sh.native[cell];
   var left, top;
-  if (onChair && s.chairSeat) {
-    /* seated: line her hips up with the painted seat, not her feet with the floor */
-    var ax = flip ? (1 - seatCell[0]) : seatCell[0];
+  if (st.phase === 'seated') {
+    /* seated: line the hips up with the painted seat, not the feet with the floor */
+    var ax = flip ? (1 - sh.seatCell[0]) : sh.seatCell[0];
     left = r.x + s.chairSeat[0] * r.w - ax * dw;
-    top = r.y + s.chairSeat[1] * r.h - seatCell[1] * dh;
+    top = r.y + s.chairSeat[1] * r.h - sh.seatCell[1] * dh;
   } else {
-    left = r.x + x * r.w - dw / 2;
+    left = r.x + st.x * r.w - dw / 2;
     top = r.y + s.footY * r.h - dh;
   }
   var ctx = p.ctx;
@@ -1445,109 +1488,148 @@ function drawSitter(id, cell, x, facing, onChair) {
   ctx.restore();
 }
 
-/* ---------- what she does ----------
-   One sitter, in one frame at a time or away between them. Every duration is
-   drawn fresh. Seated belongs to the mantel, which is where her chair is
-   painted; in the study she stands, as a visitor does. */
-var sitter = {
-  where: 'portrait-mantel', phase: 'seated', t: (90 + Math.random() * 90) / (/[?&]fast(=|&|$)/.test(location.search) ? 14 : 1),
-  x: SCENES['portrait-mantel'].seatX, cell: SITTER.seated,
-  facing: -1, dirty: true, lastX: null, dist: 0, idle: 8
+/* ---------- what they do ----------
+   Each sitter is in one frame at a time or away between them. A sitter sits
+   only in their own painting, where their chair is; in the other one they
+   stand, as a visitor does, at a spot clear of that painting's chair. */
+var sitters = {
+  her: { name: 'her', where: 'portrait-mantel', phase: 'seated', t: dwell(90, 180),
+         x: SCENES['portrait-mantel'].seatX, pose: SITTERS.her.seats[0], facing: SCENES['portrait-mantel'].seatFacing,
+         dirty: true, lastX: null, dist: 0, idle: dwell(12, 40) },
+  /* he starts the page home as often as not, so the two are not always both there */
+  him: Math.random() < 0.5
+    ? { name: 'him', where: 'portrait-right', phase: 'seated', t: dwell(40, 150),
+        x: SCENES['portrait-right'].seatX, pose: SITTERS.him.seats[0], facing: SCENES['portrait-right'].seatFacing,
+        dirty: true, lastX: null, dist: 0, idle: dwell(20, 60) }
+    : { name: 'him', where: null, phase: 'away', t: dwell(10, 90),
+        x: 0, pose: SITTERS.him.standing, facing: 1, dirty: true, lastX: null, dist: 0, idle: 0 }
 };
 
-/* Add ?fast to the page's address to run her cycle in seconds rather than
-   minutes, for watching the whole loop without waiting. The crossings speed up
-   less than the waits, so the walk stays legible. */
-var SITTER_FAST = /[?&]fast(=|&|$)/.test(location.search) ? 14 : 1;
-function dwell(a, b) { return (a + Math.random() * (b - a)) / SITTER_FAST; }
-function cross(a, b) { return (a + Math.random() * (b - a)) / Math.min(SITTER_FAST, 2.5); }
+function sittersDirty() { for (var n in sitters) sitters[n].dirty = true; }
 
-function sitterEnter(id) {
+var MOVING = { entering: 1, rising: 1, walking: 1, leaving: 1 };
+
+/* One figure on the move in a painting at a time: two strides crossing in a
+   room 130 pixels tall on the wall would read as a muddle. */
+function frameBusy(id, except) {
+  for (var n in sitters) {
+    var o = sitters[n];
+    if (o !== except && o.where === id && MOVING[o.phase]) return true;
+  }
+  return false;
+}
+
+function standX(st, id) {
+  return st.where === SITTERS[st.name].home ? SCENES[id].seatX : SCENES[id].visitX;
+}
+
+function sitterEnter(st, id) {
   var s = SCENES[id];
-  sitter.where = id;
-  sitter.phase = 'entering';
-  sitter.x = s.exitX;
-  sitter.dist = 0;
-  sitter.facing = -s.facesOut;
-  sitter.speed = Math.abs(s.seatX - s.exitX) / cross(4.5, 7);
-  sitter.dirty = true;
+  st.where = id;
+  st.phase = 'entering';
+  st.x = s.exitX;
+  st.dist = 0;
+  st.facing = -s.facesOut;
+  st.speed = Math.abs(standX(st, id) - s.exitX) / cross(4.5, 7);
+  st.pose = walkPose(st);
+  st.dirty = true;
 }
 
 /* Home more often than not, but away often enough that the visit is something
    that happens rather than a trick that repeats. */
-function sitterNextFrame() {
-  return Math.random() < 0.65 ? 'portrait-mantel' : 'portrait-right';
+function sitterNextFrame(st) {
+  var home = SITTERS[st.name].home;
+  if (Math.random() < 0.65) return home;
+  for (var id in SCENES) if (id !== home) return id;
+  return home;
 }
 
-/* Which frame of the stride she is on, from how far she has walked. */
-function walkFrame(dist) {
-  var n = SITTER.walk.length;
-  return SITTER.walk[((Math.floor(dist / SITTER.strideX * n) % n) + n) % n];
+/* Which frame of the stride a sitter is on, from how far they have walked, so
+   the feet cannot skate. */
+function walkPose(st) {
+  var w = SITTERS[st.name].walk, n = w.cells.length;
+  var k = ((Math.floor(st.dist / SITTERS[st.name].strideX * n) % n) + n) % n;
+  return { sheet: w.sheet, cell: w.cells[k] };
+}
+
+function pickSeat(def) {
+  var roll = Math.random(), acc = 0;
+  for (var i = 0; i < def.seats.length; i++) {
+    acc += def.seats[i].odds;
+    if (roll < acc) return def.seats[i];
+  }
+  return def.seats[0];
 }
 
 function reached(from, to, x) {
   return to > from ? x >= to : x <= to;
 }
 
-function updateSitters(dt) {
-  var st = sitter, sc = st.where ? SCENES[st.where] : null;
+function updateSitter(st, dt) {
+  var def = SITTERS[st.name], sc = st.where ? SCENES[st.where] : null;
+  var home = st.where === def.home;
   st.t -= dt;
 
   if (st.phase === 'away') {
-    if (st.t <= 0) sitterEnter(sitterNextFrame());
+    if (st.t <= 0) {
+      var next = sitterNextFrame(st);
+      if (frameBusy(next, st)) st.t = dwell(2, 5);
+      else sitterEnter(st, next);
+    }
 
   } else if (st.phase === 'entering') {
-    st.x += (sc.seatX > sc.exitX ? 1 : -1) * st.speed * dt;
+    var target = standX(st, st.where);
+    st.x += (target > sc.exitX ? 1 : -1) * st.speed * dt;
     st.dist += st.speed * dt;
-    st.cell = walkFrame(st.dist);
-    if (reached(sc.exitX, sc.seatX, st.x)) {
-      st.x = sc.seatX;
+    st.pose = walkPose(st);
+    if (reached(sc.exitX, target, st.x)) {
+      st.x = target;
       st.facing = sc.facesOut;
-      if (sc.sits) {
-        st.phase = 'seated'; st.t = dwell(60, 200); st.facing = -1;
-        st.cell = sitterSeated ? SITTER.seated2.window : SITTER.seated;
-        st.idle = dwell(12, 40);
+      if (home && sc.chairSeat) {
+        st.phase = 'seated'; st.t = dwell(60, 200); st.facing = sc.seatFacing;
+        st.pose = def.seats[0];
+        st.idle = dwell(def.seats[0].hold[0], def.seats[0].hold[1]);
+      } else {
+        st.phase = 'standing'; st.pose = def.standing; st.t = dwell(25, 90); st.idle = dwell(6, 15);
       }
-      else { st.phase = 'standing'; st.cell = SITTER.standing; st.t = dwell(25, 90); st.idle = dwell(6, 15); }
     }
     st.dirty = true;
 
   } else if (st.phase === 'seated' || st.phase === 'standing') {
-    /* Standing still, she settles her hat now and then. One small thing a person
-       does while waiting is what keeps a still figure from reading as a statue. */
-    if (st.phase === 'seated' && sitterSeated) {
-      st.idle -= dt;
-      if (st.idle <= 0) {
-        /* Mostly she looks at the window; now and then she looks at her hands,
-           settles her hat, or looks out of the painting at whoever is there. */
-        var w = SITTER.seated2, roll = Math.random();
-        var next = roll < 0.55 ? w.window : roll < 0.75 ? w.hands : roll < 0.9 ? w.hat : w.outward;
-        if (next !== st.cell) { st.cell = next; st.dirty = true; }
-        st.idle = (next === w.window) ? dwell(12, 40) : dwell(3, 9);
-      }
-    }
-    if (st.phase === 'standing') {
-      st.idle -= dt;
-      if (st.idle <= 0) {
-        var wasHat = (st.cell === SITTER.hat);
-        st.cell = wasHat ? SITTER.standing : SITTER.hat;
-        st.idle = wasHat ? dwell(6, 15) : dwell(1.2, 2.2);
+    st.idle -= dt;
+    if (st.idle <= 0) {
+      if (st.phase === 'seated') {
+        var seat = pickSeat(def);
+        if (seat !== st.pose) { st.pose = seat; st.dirty = true; }
+        st.idle = dwell(seat.hold[0], seat.hold[1]);
+      } else if (def.fidget) {
+        var wasFidget = (st.pose === def.fidget);
+        st.pose = wasFidget ? def.standing : def.fidget;
+        st.idle = wasFidget ? dwell(6, 15) : dwell(1.2, 2.2);
         st.dirty = true;
+      } else {
+        st.idle = dwell(6, 15);
       }
     }
     if (st.t <= 0) {
-      if (st.phase === 'seated') {
-        st.phase = 'rising'; st.cell = SITTER.rising; st.t = dwell(0.7, 1.3);
+      if (frameBusy(st.where, st)) st.t = dwell(2, 5);
+      else if (st.phase === 'seated') {
+        st.phase = 'rising'; st.pose = def.rising; st.t = dwell(0.7, 1.3);
         st.x = sc.risingX; st.facing = sc.facesOut;
+        st.dirty = true;
+      } else {
+        st.phase = 'walking'; st.dist = 0; st.facing = sc.facesOut;
+        st.speed = Math.abs(sc.exitX - st.x) / cross(4, 7);
+        st.pose = walkPose(st);
+        st.dirty = true;
       }
-      else { st.phase = 'walking'; st.dist = 0; st.speed = Math.abs(sc.exitX - sc.seatX) / cross(4, 7); }
-      st.dirty = true;
     }
 
   } else if (st.phase === 'rising') {
     if (st.t <= 0) {
       st.phase = 'walking'; st.dist = 0;
-      st.speed = Math.abs(sc.exitX - sc.seatX) / cross(4, 7);
+      st.speed = Math.abs(sc.exitX - st.x) / cross(4, 7);
+      st.pose = walkPose(st);
       st.dirty = true;
     }
 
@@ -1555,32 +1637,76 @@ function updateSitters(dt) {
     st.facing = sc.facesOut;
     st.x += sc.facesOut * st.speed * dt;
     st.dist += st.speed * dt;
-    st.cell = walkFrame(st.dist);
+    st.pose = walkPose(st);
     st.dirty = true;
-    if (reached(sc.seatX, sc.exitX, st.x)) {
+    if (reached(sc.risingX, sc.exitX, st.x)) {
       st.phase = 'leaving'; st.t = dwell(0.5, 1.1);
     }
 
   } else if (st.phase === 'leaving') {
     if (st.t <= 0) { st.phase = 'away'; st.where = null; st.t = dwell(45, 240); st.dirty = true; }
   }
+}
 
-  /* Repaint only what changed: the frame she is in, and the one she has just
-     left. While she walks, redraw once she has moved far enough to show, which
-     keeps the texture uploads down on the iPad without making the walk stepped. */
-  var moved = st.lastX === null || Math.abs(st.x - st.lastX) > 0.004;
-  if (!st.dirty && !moved) return;
+/* Seated first, then standing, then anyone on the move, so a figure crossing
+   the room passes in front of one who is still. */
+var DRAW_ORDER = { seated: 0, standing: 1, rising: 1 };
+
+function updateSitters(dt) {
+  var changed = false, n, st;
+  for (n in sitters) {
+    st = sitters[n];
+    updateSitter(st, dt);
+    /* while walking, redraw once they have moved far enough to show, which keeps
+       the texture uploads down on the iPad without making the walk stepped */
+    if (st.dirty || st.lastX === null || Math.abs(st.x - st.lastX) > 0.004) changed = true;
+  }
+  if (!changed) return;
+
+  /* Repaint each painting once, with everyone in it: clearing it per sitter
+     would wipe whoever was drawn first. */
   for (var id in portraits) {
-    var p = portraits[id];
-    var hasHer = (st.where === id && st.phase !== 'away');
-    if (!hasHer && !p.drawn) continue;
+    var p = portraits[id], here = [];
+    for (n in sitters) {
+      st = sitters[n];
+      if (st.where === id && st.phase !== 'away') here.push(st);
+    }
+    if (!here.length && !p.drawn) continue;
+    here.sort(function (a, b) {
+      var oa = a.phase in DRAW_ORDER ? DRAW_ORDER[a.phase] : 2;
+      var ob = b.phase in DRAW_ORDER ? DRAW_ORDER[b.phase] : 2;
+      return oa - ob;
+    });
     clearPortrait(p);
-    if (hasHer) drawSitter(id, st.cell, st.x, st.facing, st.phase === 'seated');
-    p.drawn = hasHer;
+    for (var i = 0; i < here.length; i++) drawSitter(id, here[i]);
+    p.drawn = here.length > 0;
     p.tex.needsUpdate = true;
   }
-  st.lastX = st.x;
-  st.dirty = false;
+  for (n in sitters) { sitters[n].lastX = sitters[n].x; sitters[n].dirty = false; }
+}
+
+/* For checking placements by screenshot: put a sitter in a state and hold it
+   there. spec is { her: { where, phase, x }, him: ... }, phase one of seated,
+   standing, walking or away; seated only in their own painting. */
+function placeSitters(spec) {
+  var out = {};
+  for (var n in spec) {
+    var st = sitters[n], def = SITTERS[n], o = spec[n], sc = o.where ? SCENES[o.where] : null;
+    st.where = o.phase === 'away' ? null : o.where;
+    st.phase = o.phase;
+    st.t = 1e9; st.idle = 1e9; st.dist = 0;
+    if (o.phase === 'seated') {
+      st.pose = def.seats[o.seat || 0]; st.x = sc.seatX; st.facing = sc.seatFacing;
+    } else if (o.phase === 'standing') {
+      st.pose = def.standing; st.x = o.x !== undefined ? o.x : standX(st, o.where); st.facing = sc.facesOut;
+    } else if (o.phase === 'walking') {
+      st.x = o.x; st.facing = o.facing || sc.facesOut; st.dist = o.dist || 0; st.pose = walkPose(st);
+      st.speed = 0;
+    }
+    st.dirty = true;
+    out[n] = st.phase + (st.where ? ' in ' + st.where : '');
+  }
+  return out;
 }
 
 for (var lid in LAYERS) {
@@ -1588,7 +1714,7 @@ for (var lid in LAYERS) {
   else if (LAYERS[lid].portrait) applyPortrait(lid, LAYERS[lid]);
   else applyLayer(lid, LAYERS[lid]);
 }
-loadSitterSheet();
+loadSitterSheets();
 
 /* the tapestry stirs in the warm air off the fire: pinned at the pole, freest at the hem, a centimetre or two,
    harder for a few seconds when the fire is stoked and when the portrait hole lets the draught in (LDP-12) */
@@ -2012,7 +2138,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; } };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, sitters: sitters };
 })();
 </script>
 </body>
