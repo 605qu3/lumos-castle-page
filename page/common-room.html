@@ -274,6 +274,27 @@ the desk as if just vacated. The chair's back came in at half the doorway's heig
 has its scale. Two misses accepted: the painting is 1.09 times as tall as it is wide where 1.3 was asked and the
 mantel is 1.34, so the pair are different shapes; and the chair is a swivel chair on a pedestal rather than the
 plain wooden one asked for. Its material gained the alpha cutoff, which only the mantel's mesh had.
+sitter-mantel, round 2: the mantel's sitter, a witch in umber-green robes and a soft pointed hat, by the mantel's
+painter, drawn with the painting attached for its light. Recorded as generated under LDP-99. Eight cells at
+465 x 925 px where ten were asked: four frames of
+one stride, standing, settling her hat, rising, and a seated cell with a second stick in her raised hand, which is
+never drawn. Round 1 had six cells and only one walking pose, so she slid. Drawn into the painting's canvas at 0.66
+of the picture's height and clipped to it, so she is cut by the painted edge on her way out at the right.
+sitter-mantel-seated, round 1: four seated cells at 548 x 913 px, drawn with her main sheet attached, so she is the
+same woman: at the window, at her hands, out of the painting, settling her hat. One body in all four, differing only
+above the waist, so a swap is a glance. Drawn at 0.55 / 0.66 of the main sheet's scale and placed by her hips, not her
+feet, low enough that her boot meets the painted floor; her skirt covers the seat. She sits only in her own chair.
+sitter-right, round 1: portrait-right's sitter, a man of about fifty with short grey hair and a trimmed beard in
+slate robes, by the same painter, drawn with her sheet attached for scale and told to draw a different person.
+Recorded as generated under LDP-99; looked at for likeness and judged none. Eight cells at 508 x 898 px, of which
+standing, rising and seated at ease are used. Its stride shuffled and lost the wand in three frames, and the writing
+cell is dropped because the painted desk has no chair at it. Every cell faces right where left was asked; the page
+flips him. Seated in the swivel chair by his hips; visiting the mantel he stands at 0.75, clear of her chair.
+sitter-right-walk, round 2: his stride on its own sheet, four cells at 526 x 1276 px, contact and lifted twice, the
+wand in the same hand throughout. Round 1 was given his whole sheet and copied it, half its cells kept and half
+redrawn; round 2 was given one cut-out figure of him and worked. His arms barely swing. The walk frame comes from
+distance walked, 0.24 of a picture's width per four frames, so his feet cannot skate. The two sitters now visit each
+other through exits that face across the wall, home more often than not and away for minutes at a time.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1370,7 +1391,8 @@ var SITTERS = {
    picture and a chair back is about 0.95 m, so a metre is 19 percent and a
    1.7 m woman is 32; in portrait-right the doorway is three-quarters of the
    picture and a doorway is about 2 m, so a metre is 37 percent and a man is 64.
-   Both are meant to be tuned by eye. chairSeat is where the resident's hips go
+   Both are meant to be tuned by eye, and the mantel's was: by 0.62 to 0.66,
+   where her boot meets the painted floor seated. The study's stands as derived. chairSeat is where the resident's hips go
    in the painted chair, and seatFacing the way they face sitting in it. seatX
    is where the resident walks to and from the chair, risingX where they get up,
    visitX where a visitor stands, clear of the chair. facesOut is the way out:
