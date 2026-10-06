@@ -1377,6 +1377,10 @@ function applyPortrait(id, entry) {
       rect: { x: p[0] * w, y: p[1] * h, w: (p[2] - p[0]) * w, h: (p[3] - p[1]) * h },
       drawn: false
     };
+    /* the painting can arrive after her sheets and after her first frame, which
+       has already cleared the flag; without this she stays unpainted until her
+       next change of pose */
+    sitter.dirty = true;
   };
   im.src = entry.url;
 }
@@ -1407,6 +1411,10 @@ function drawSitter(id, cell, x, facing, onChair) {
   var two = onChair && sitterSeated, sh = two ? SITTER.seated2 : SITTER;
   var img = two ? sitterSeated : sitterSheet;
   var seatCell = two ? sh.seatCell : SITTER.seatCell;
+  /* Seated cells number differently on the two sheets. She starts the page on
+     the main sheet's seated cell, which is off the end of the four-cell sheet,
+     so without this she was drawn as nothing until her first glance. */
+  if (onChair) cell = two ? (cell < sh.cols ? cell : sh.window) : SITTER.seated;
   var r = p.rect;
   var dh = (two ? sh.figureH / SCENES['portrait-mantel'].figureH * s.figureH : s.figureH) * r.h;
   var dw = dh * (sh.cellW / sh.cellH);
