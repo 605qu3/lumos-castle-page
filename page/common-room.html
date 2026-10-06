@@ -295,6 +295,16 @@ wand in the same hand throughout. Round 1 was given his whole sheet and copied i
 redrawn; round 2 was given one cut-out figure of him and worked. His arms barely swing. The walk frame comes from
 distance walked, 0.24 of a picture's width per four frames, so his feet cannot skate. The two sitters now visit each
 other through exits that face across the wall, home more often than not and away for minutes at a time.
+window-left, round 2: the first transparent glass. A glazier's leaded window in the mason's stone reveal: a
+round-headed arch, a stone transom where it begins, one mullion and two tall lights of diamond quarries with iron
+saddle bars, an opening casement in the left-hand light on black iron hinges with a brass latch and stay, and in the
+head a painted roundel of an owl in flight, wingtips on its lead ring (owls of PS 1; invented past the books under
+LDP-98, adding no lore). The glass is not drawn: it keys out and the sky shows through. Recorded as generated
+under LDP-99. Round 1, on the square canvas every piece had used, came back 1.47 times as tall as wide where about
+2.25 was asked; round 2, asked for a 9:16 canvas, came back 2.01. Keyed at 1225 x 2466 px, 1021 px per metre,
+placed at 1.2 m wide, 2.42 m tall from the image, centred 3.3 m up where the placeholder was. Lit like the paintings;
+its sky is a separate unlit plane 3 cm behind, shrunk to four-fifths by seven-eighths so it sits inside the reveal,
+since at full size it showed round the window as a halo. The right window is still the placeholder.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -475,12 +485,21 @@ function drawCorridor(g, w, h) {
   grd.addColorStop(0, '#5a4733'); grd.addColorStop(1, '#1c1613');
   g.fillStyle = grd; arch(g, 0, 0, w, h);
 }
-function drawWindow(withMoon) {
+/* The sky alone, for the plane that stands behind a drawn window and shows
+   through its glass; the moon is in the right-hand one, where the moon spot
+   throws its light from. */
+function drawSky(withMoon) {
   return function (g, w, h) {
     var grd = g.createLinearGradient(0, 0, 0, h);
     grd.addColorStop(0, '#b4c4dc'); grd.addColorStop(1, '#5f6d88');
     g.fillStyle = grd; arch(g, 0, 0, w, h);
     if (withMoon) { g.fillStyle = '#eef1f6'; g.beginPath(); g.arc(w * 0.68, h * 0.22, w * 0.11, 0, Math.PI * 2); g.fill(); }
+  };
+}
+/* The grey placeholder: the sky with bars painted over it, all one texture. */
+function drawWindow(withMoon) {
+  return function (g, w, h) {
+    drawSky(withMoon)(g, w, h);
     g.strokeStyle = '#1e2129'; g.lineWidth = w * 0.05;
     g.beginPath(); g.moveTo(w / 2, 0); g.lineTo(w / 2, h); g.stroke();
     g.beginPath(); g.moveTo(0, h * 0.45); g.lineTo(w, h * 0.45); g.stroke();
@@ -672,9 +691,17 @@ function spawnEmber(i) {
 /* windows, portraits, tapestry */
 var winGeo = new THREE.PlaneGeometry(1.2, 2.7);
 var winR = new THREE.Mesh(winGeo, new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawWindow(true)), alphaTest: 0.5 }));
-onWall(winR, Math.PI - 0.55, 3.3, 5.5); register(winR, 0);
-var winL = new THREE.Mesh(winGeo, new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawWindow(false)), alphaTest: 0.5 }));
-onWall(winL, Math.PI + 0.55, 3.3, 5.5); register(winL, 0);
+onWall(winR, Math.PI - 0.55, 3.3, 5.5); register(winR, 0); winR.name = 'window-right';
+var winL = new THREE.Mesh(winGeo.clone(), new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawWindow(false)), alphaTest: 0.5 }));
+onWall(winL, Math.PI + 0.55, 3.3, 5.5); register(winL, 0); winL.name = 'window-left';
+/* Behind each window, 3 cm further out and still in front of the wall, the sky
+   on its own unlit plane. A placeholder covers it with its own painted sky; a
+   drawn window's glass is keyed out, so the sky shows through every pane. The
+   real night sky and weather go here later (LDP-23). */
+var skyR = new THREE.Mesh(winGeo.clone(), new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawSky(true)), alphaTest: 0.5 }));
+onWall(skyR, Math.PI - 0.55, 3.3, 5.53); register(skyR, 0); skyR.name = 'window-right-sky';
+var skyL = new THREE.Mesh(winGeo.clone(), new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawSky(false)), alphaTest: 0.5 }));
+onWall(skyL, Math.PI + 0.55, 3.3, 5.53); register(skyL, 0); skyL.name = 'window-left-sky';
 
 var portraitTex = cutoutTexture(256, 332, '#000', drawFrame, 'portrait');
 var port1 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9, alphaTest: 0.5 }));
@@ -1240,6 +1267,9 @@ var LAYERS = {
   /* the two paintings are composed on their own canvas so a sitter can be drawn into them */
   'portrait-mantel': { url: '../assets/layers/portrait-mantel.png', w: 1.0, pivot: 'centre', portrait: true },
   'portrait-right': { url: '../assets/layers/portrait-right.png', w: 1.0, pivot: 'centre', portrait: true },
+  /* a window's glass is keyed out and the sky plane behind shows through; the
+     drawing is lit like the paintings, so the firelight catches lead and stone */
+  'window-left': { url: '../assets/layers/window-left.png', w: 1.2, pivot: 'centre', window: true },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -1287,6 +1317,19 @@ function applyLayer(id, entry) {
        the floor: the back feet come down, the front feet go a little under, and
        the floor hides what goes under. Measured per piece off the drawing. */
     if (entry.pivot !== 'centre') mesh.position.y = h / 2 - (entry.sink || 0) * h;
+    /* the window placeholders are unlit, because they carry their own painted
+       sky; the drawn window is not, so it gets a lit material of its own */
+    if (entry.window) {
+      mesh.material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, metalness: 0, alphaTest: 0.5 });
+      mesh.receiveShadow = true;
+      mesh.userData.base = mesh.material.color.clone();
+      /* the sky shrinks to sit inside the stone reveal, or it shows round the
+         drawn window as a halo: four-fifths of its width and seven-eighths of
+         its height keeps the sky's arch inside the window's outer arch and its
+         foot behind the sill */
+      var sky = scene.getObjectByName(id + '-sky');
+      if (sky) { sky.geometry.dispose(); sky.geometry = new THREE.PlaneGeometry(entry.w * 0.8, h * 0.88); }
+    }
     mesh.material.map = t; mesh.material.needsUpdate = true;
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
     mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
