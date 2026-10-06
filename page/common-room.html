@@ -1296,7 +1296,19 @@ var SITTER = {
   /* how far she travels, as a fraction of a picture's width, per four frames.
      Short, measured steps: the painted rooms are barely a metre and a bit across,
      so a true stride would cross one in two paces and read as a glide. */
-  strideX: 0.24
+  strideX: 0.24,
+  /* A second, smaller sheet of her seated, so she has something to do while
+     sitting. Four states that share one body and differ only above the waist,
+     so swapping between them is a glance and not a jump. Its own cell size,
+     scale and hip anchor, because it was drawn on its own sheet: she fills more
+     of a cell here than she does on the main one, so the same figureH would
+     make her a fifth larger. */
+  seated2: {
+    url: '../assets/layers/sitter-mantel-seated.png',
+    cols: 4, cellW: 548, cellH: 913,
+    figureH: 0.55, seatCell: [0.18, 0.68],
+    window: 0, hands: 1, outward: 2, hat: 3
+  }
 };
 
 /* Per painting: where its painted room is, how big a person is in it, and the
@@ -1331,6 +1343,7 @@ var SCENES = {
 
 var portraits = {};        /* id -> its canvas, its clean copy and its texture */
 var sitterSheet = null;
+var sitterSeated = null;
 
 function applyPortrait(id, entry) {
   var mesh = scene.getObjectByName(id);
@@ -1367,6 +1380,9 @@ function loadSitterSheet() {
   var im = new Image();
   im.onload = function () { sitterSheet = im; sitter.dirty = true; };
   im.src = SITTER.url;
+  var im2 = new Image();
+  im2.onload = function () { sitterSeated = im2; sitter.dirty = true; };
+  im2.src = SITTER.seated2.url;
 }
 
 /* Wipe the painted room back to how the painter left it. */
@@ -1381,16 +1397,21 @@ function clearPortrait(p) {
 function drawSitter(id, cell, x, facing, onChair) {
   var p = portraits[id], s = SCENES[id];
   if (!p || !sitterSheet) return;
+  /* Sitting, she comes off the seated sheet, which has its own cells and its
+     own scale; on her feet, off the main one. */
+  var two = onChair && sitterSeated, sh = two ? SITTER.seated2 : SITTER;
+  var img = two ? sitterSeated : sitterSheet;
+  var seatCell = two ? sh.seatCell : SITTER.seatCell;
   var r = p.rect;
-  var dh = s.figureH * r.h;
-  var dw = dh * (SITTER.cellW / SITTER.cellH);
-  var flip = (facing !== SITTER.native[cell]);
+  var dh = (two ? sh.figureH / SCENES['portrait-mantel'].figureH * s.figureH : s.figureH) * r.h;
+  var dw = dh * (sh.cellW / sh.cellH);
+  var flip = two ? (facing !== 1) : (facing !== SITTER.native[cell]);
   var left, top;
   if (onChair && s.chairSeat) {
     /* seated: line her hips up with the painted seat, not her feet with the floor */
-    var ax = flip ? (1 - SITTER.seatCell[0]) : SITTER.seatCell[0];
+    var ax = flip ? (1 - seatCell[0]) : seatCell[0];
     left = r.x + s.chairSeat[0] * r.w - ax * dw;
-    top = r.y + s.chairSeat[1] * r.h - SITTER.seatCell[1] * dh;
+    top = r.y + s.chairSeat[1] * r.h - seatCell[1] * dh;
   } else {
     left = r.x + x * r.w - dw / 2;
     top = r.y + s.footY * r.h - dh;
@@ -1404,8 +1425,7 @@ function drawSitter(id, cell, x, facing, onChair) {
     var mid = left + dw / 2;
     ctx.translate(mid, 0); ctx.scale(-1, 1); ctx.translate(-mid, 0);
   }
-  ctx.drawImage(sitterSheet, cell * SITTER.cellW, 0, SITTER.cellW, SITTER.cellH,
-                left, top, dw, dh);
+  ctx.drawImage(img, cell * sh.cellW, 0, sh.cellW, sh.cellH, left, top, dw, dh);
   ctx.restore();
 }
 
@@ -1416,7 +1436,7 @@ function drawSitter(id, cell, x, facing, onChair) {
 var sitter = {
   where: 'portrait-mantel', phase: 'seated', t: (90 + Math.random() * 90) / (/[?&]fast(=|&|$)/.test(location.search) ? 14 : 1),
   x: SCENES['portrait-mantel'].seatX, cell: SITTER.seated,
-  facing: -1, dirty: true, lastX: null, dist: 0, idle: 0
+  facing: -1, dirty: true, lastX: null, dist: 0, idle: 8
 };
 
 /* Add ?fast to the page's address to run her cycle in seconds rather than
@@ -1467,7 +1487,11 @@ function updateSitters(dt) {
     if (reached(sc.exitX, sc.seatX, st.x)) {
       st.x = sc.seatX;
       st.facing = sc.facesOut;
-      if (sc.sits) { st.phase = 'seated'; st.cell = SITTER.seated; st.t = dwell(60, 200); st.facing = -1; }
+      if (sc.sits) {
+        st.phase = 'seated'; st.t = dwell(60, 200); st.facing = -1;
+        st.cell = sitterSeated ? SITTER.seated2.window : SITTER.seated;
+        st.idle = dwell(12, 40);
+      }
       else { st.phase = 'standing'; st.cell = SITTER.standing; st.t = dwell(25, 90); st.idle = dwell(6, 15); }
     }
     st.dirty = true;
@@ -1475,6 +1499,17 @@ function updateSitters(dt) {
   } else if (st.phase === 'seated' || st.phase === 'standing') {
     /* Standing still, she settles her hat now and then. One small thing a person
        does while waiting is what keeps a still figure from reading as a statue. */
+    if (st.phase === 'seated' && sitterSeated) {
+      st.idle -= dt;
+      if (st.idle <= 0) {
+        /* Mostly she looks at the window; now and then she looks at her hands,
+           settles her hat, or looks out of the painting at whoever is there. */
+        var w = SITTER.seated2, roll = Math.random();
+        var next = roll < 0.55 ? w.window : roll < 0.75 ? w.hands : roll < 0.9 ? w.hat : w.outward;
+        if (next !== st.cell) { st.cell = next; st.dirty = true; }
+        st.idle = (next === w.window) ? dwell(12, 40) : dwell(3, 9);
+      }
+    }
     if (st.phase === 'standing') {
       st.idle -= dt;
       if (st.idle <= 0) {
