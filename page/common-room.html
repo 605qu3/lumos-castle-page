@@ -230,6 +230,21 @@ camera's 1.9 m, so it fell to a sliver in the corner and moving it nearer would 
 The greybox framed only because it was wrong: at 2.6 by 2.4 m its top stood above the camera and it behaved like a
 wall. A real chair cannot frame a shot taken from a standing adult's eye, and the room is a boys' common room, so
 CAM_BASE goes from 1.9 to 1.35 m and FOCUS from 1.6 to 1.25 m. Everything already placed is judged again from here.
+tapestry, round 3: the first wall-hung piece. Round 1 (a lion walking on a pale ground) read as a printed tea towel and
+the stone boar from the anchors was drawn into the picture; round 2 edited it and the boar stayed in two of three. Round
+3 was a fresh prompt: a griffin standing upright filling the cloth, a dark faded blue-green ground, and a sentence telling
+the model to draw neither reference object. The dark ground made it read as cloth. The griffin is invented past the
+books under LDP-98 (canon's only griffin is Dumbledore's knocker, Book 2) and adds no lore. Placed at 1.44 m wide with
+the pole, height 1.67 m from the image; the greybox's 1.2 by 2.6 was a guess and the drawing came out squarer. It hangs
+at its centre, 3.9 m up, so the loader now leaves a wall piece's height alone (pivot 'centre'), and the placeholder's
+material gained the alpha cutoff the cutouts already had. Not a third anchor: the chair's red and ochre in a new shape.
+tapestry, flutter: a hanging above a fire moves in the warm air, so the cloth is now a 12 by 24 mesh displaced a
+centimetre or two off the wall each frame, pinned at the pole and freest at the hem, uneven over time. It stirs harder
+for a few seconds when the fire is stoked and when the portrait hole lets the draught in. Behaviour, not ornament.
+tapestry, flutter retuned: at a centimetre straight toward the viewer it was invisible, so the depth went to 3 cm
+(TAPESTRY_STIR) and the hem now sways sideways by about 2 cm. That pushed the cloth into the curved wall, whose 5.6 m
+radius stands only 5 cm behind the flat cloth's edges, so the wave now only lifts away from the wall and the hanging
+moved 5 cm further into the room.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -616,8 +631,8 @@ var port1 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStan
 port1.receiveShadow = true; onWall(port1, Math.PI, 4.05, 5.5); register(port1, 0);
 var port2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9 }));
 port2.receiveShadow = true; onWall(port2, Math.PI - 0.28, 3.9, 5.5); register(port2, 0);
-var tapestry = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.6), new THREE.MeshStandardMaterial({ map: cutoutTexture(240, 520, '#000', drawTapestry, 'tapestry'), roughness: 1 }));
-tapestry.receiveShadow = true; onWall(tapestry, Math.PI + 0.23, 3.9, 5.5); register(tapestry, 0);
+var tapestry = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.6), new THREE.MeshStandardMaterial({ map: cutoutTexture(240, 520, '#000', drawTapestry, 'tapestry'), roughness: 1, alphaTest: 0.5 }));
+tapestry.receiveShadow = true; onWall(tapestry, Math.PI + 0.23, 3.9, 5.45); register(tapestry, 0); tapestry.name = 'tapestry';
 
 /* ---------- notice board (tap to approach, tap a notice to take it down) ---------- */
 /* Hands and faces, as settled in the hand bake-off and the design system's tokens/fonts.css:
@@ -1170,6 +1185,8 @@ var LAYERS = {
   'armchair-left': { url: '/_blob/42f83f54a62bbddd74b4a981f9cf9e7b', w: 1.05 },
   'sofa': { url: '/_blob/99cd614c3c41f0dafb5ae7bccf1dc30e', w: 1.7 },
   'wingback': { url: '/_blob/309dc3c36f77d2d66347c53184adc42c', w: 1.1 },
+  /* wall-hung: pivots at its centre, which stays where onWall put it */
+  'tapestry': { url: '/_blob/f8bd42b60d01866d92c5b78c0e0f0faf', w: 1.44, pivot: 'centre', flutter: true },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat': { sheet: '/_blob/cddd16e5c69a036c54ec23acd4a97215', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -1209,8 +1226,9 @@ function applyLayer(id, entry) {
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();
     var h = entry.w * im.height / im.width;
     mesh.geometry.dispose();
-    mesh.geometry = new THREE.PlaneGeometry(entry.w, h);
-    mesh.position.y = h / 2;
+    mesh.geometry = entry.flutter ? new THREE.PlaneGeometry(entry.w, h, 12, 24) : new THREE.PlaneGeometry(entry.w, h);
+    if (entry.flutter) mesh.geometry.userData.base = Float32Array.from(mesh.geometry.attributes.position.array);
+    if (entry.pivot !== 'centre') mesh.position.y = h / 2;
     mesh.material.map = t; mesh.material.needsUpdate = true;
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
     mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
@@ -1218,6 +1236,28 @@ function applyLayer(id, entry) {
   im.src = entry.url;
 }
 for (var lid in LAYERS) { if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]); else applyLayer(lid, LAYERS[lid]); }
+
+/* the tapestry stirs in the warm air off the fire: pinned at the pole, freest at the hem, a centimetre or two,
+   harder for a few seconds when the fire is stoked and when the portrait hole lets the draught in (LDP-12) */
+var TAPESTRY_STIR = 0.03;   /* metres at rest; the one number to tune */
+function smooth01(a, b, x) { var u = clamp((x - a) / (b - a), 0, 1); return u * u * (3 - 2 * u); }
+function updateTapestry(dt, t) {
+  var g = tapestry.geometry, base = g.userData.base;
+  if (!base) return;
+  var pos = g.attributes.position, arr = pos.array, h = g.parameters.height, top = h / 2;
+  var gust = 0.75 + 0.25 * Math.sin(t * 0.23) * Math.sin(t * 0.37 + 1.1);
+  var amp = TAPESTRY_STIR * (1 + 1.6 * fireStoke + 2.2 * draught) * gust;
+  var sway = 0.6 * amp * Math.sin(t * 0.9) + 0.3 * amp * Math.sin(t * 1.7 + 0.8);
+  for (var i = 0; i < arr.length; i += 3) {
+    var x = base[i], y = base[i + 1], v = (top - y) / h;
+    var w = smooth01(0.05, 0.3, v) * (0.35 + 0.65 * v);
+    arr[i] = x + sway * v * v;
+    /* the wave never goes negative: the cloth only ever lifts away from the wall, into the room */
+    arr[i + 2] = amp * w * (1.8 + Math.sin(t * 1.3 + x * 4.2 + y * 2.6) + 0.5 * Math.sin(t * 2.7 - y * 5.1 + x * 2.3) + 0.3 * Math.sin(t * 0.7 + x * 7.3)) / 1.8;
+  }
+  pos.needsUpdate = true;
+  g.computeVertexNormals();
+}
 
 /* the cat: a cutout that crosses the layers */
 var catGroup = new THREE.Group();
@@ -1486,9 +1526,11 @@ function updateCamera(dt) {
   }
 }
 
+var fireStoke = 0;
 function updateFire(dt, t) {
   stokeT += dt;
   var s = stokeT < 0.25 ? stokeT / 0.25 : Math.exp(-(stokeT - 0.25) / 2.4);
+  fireStoke = s;
   var f = flicker(t);
   fireSpot.intensity = 2.6 * f * (1 + 0.9 * s);
   fireGlow.intensity = 1.2 * f * (1 + 1.0 * s);
@@ -1604,6 +1646,7 @@ function frame() {
   updateCat(dt, t);
   updatePortrait(dt);
   updatePapers(dt, t);
+  updateTapestry(dt, t);
   renderer.render(scene, camera);
   fpsN++; fpsT += dt;
   if (fpsT >= 0.5) {
