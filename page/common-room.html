@@ -245,6 +245,22 @@ tapestry, flutter retuned: at a centimetre straight toward the viewer it was inv
 (TAPESTRY_STIR) and the hem now sways sideways by about 2 cm. That pushed the cloth into the curved wall, whose 5.6 m
 radius stands only 5 cm behind the flat cloth's edges, so the wave now only lifts away from the wall and the hanging
 moved 5 cm further into the room.
+portrait-mantel, round 2: candidate 2 of this round's set. Keyed at 1279 x 1714 px, 1279 px per metre. Placed at 1.0 m
+wide, height 1.34 m from the image, hung at its centre 4.05 m up. A framed oil painting of an empty room: a tall window
+upper left, one plain wooden high-backed chair in its light, open floor running out at the right edge, which is the
+exit the sitter will use in 0.4 and faces portrait-right. Round 1, a fresh prompt, settled the subject: a dark warm
+field inside a gilt rim read as an old painting rather than a page, and closing the painted room by count (a window
+and one chair, nothing else) kept the stone boar out. Its chair stood at about seven-tenths of the painting's height,
+right of centre, so round 2 edited it, sized against the window sill: it came down to about 54 percent and moved left,
+though it kept a three-quarter view and turned to face the window, accepted because a chair by a window faces it. The
+word portrait stays out of the prompt, since it pulls a face. The material gained the alpha cutoff, and the two
+portrait meshes now carry their layer ids as names, which the loader needs.
+tapestry, moved back to 15 degrees: its placeholder had been moved 2 degrees toward the hearth, off the left window
+(13.2 degrees, Math.PI + 0.23), a move the spec and handoff never recorded. With the tapestry drawn at 1.44 m and the
+mantel portrait at its real width, that left 5 cm between the gilt and the cloth. At 15 degrees it stands about 22 cm
+from the portrait and 27 cm from the left window, the two gaps balanced.
+room, exposure: the default goes from 0.8 to 1.0, judged with the mantel portrait placed. 0.8 had been set to
+compensate when the page moved to sRGB colour management; 1.0 now reads best.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -298,7 +314,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputEncoding = THREE.sRGBEncoding;
 var EXPOSURES = [0.6, 0.8, 1.0, 1.3];
-var expIndex = 1;
+var expIndex = 2;
 renderer.toneMappingExposure = EXPOSURES[expIndex];
 var MAX_PR = Math.min(window.devicePixelRatio || 1, 2);
 var pixelRatio = MAX_PR;
@@ -627,12 +643,12 @@ var winL = new THREE.Mesh(winGeo, new THREE.MeshBasicMaterial({ map: cutoutTextu
 onWall(winL, Math.PI + 0.55, 3.3, 5.5); register(winL, 0);
 
 var portraitTex = cutoutTexture(256, 332, '#000', drawFrame, 'portrait');
-var port1 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9 }));
-port1.receiveShadow = true; onWall(port1, Math.PI, 4.05, 5.5); register(port1, 0);
+var port1 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9, alphaTest: 0.5 }));
+port1.receiveShadow = true; onWall(port1, Math.PI, 4.05, 5.5); register(port1, 0); port1.name = 'portrait-mantel';
 var port2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9 }));
-port2.receiveShadow = true; onWall(port2, Math.PI - 0.28, 3.9, 5.5); register(port2, 0);
+port2.receiveShadow = true; onWall(port2, Math.PI - 0.28, 3.9, 5.5); register(port2, 0); port2.name = 'portrait-right';
 var tapestry = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.6), new THREE.MeshStandardMaterial({ map: cutoutTexture(240, 520, '#000', drawTapestry, 'tapestry'), roughness: 1, alphaTest: 0.5 }));
-tapestry.receiveShadow = true; onWall(tapestry, Math.PI + 0.23, 3.9, 5.45); register(tapestry, 0); tapestry.name = 'tapestry';
+tapestry.receiveShadow = true; onWall(tapestry, Math.PI + 0.262, 3.9, 5.45); register(tapestry, 0); tapestry.name = 'tapestry';
 
 /* ---------- notice board (tap to approach, tap a notice to take it down) ---------- */
 /* Hands and faces, as settled in the hand bake-off and the design system's tokens/fonts.css:
@@ -1187,6 +1203,7 @@ var LAYERS = {
   'wingback': { url: '/_blob/309dc3c36f77d2d66347c53184adc42c', w: 1.1 },
   /* wall-hung: pivots at its centre, which stays where onWall put it */
   'tapestry': { url: '/_blob/f8bd42b60d01866d92c5b78c0e0f0faf', w: 1.44, pivot: 'centre', flutter: true },
+  'portrait-mantel': { url: '/_blob/1b13b9994d388d8ecad63ed1c81eff9f', w: 1.0, pivot: 'centre' },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat': { sheet: '/_blob/cddd16e5c69a036c54ec23acd4a97215', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
