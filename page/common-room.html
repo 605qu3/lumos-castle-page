@@ -261,6 +261,19 @@ mantel portrait at its real width, that left 5 cm between the gilt and the cloth
 from the portrait and 27 cm from the left window, the two gaps balanced.
 room, exposure: the default goes from 0.8 to 1.0, judged with the mantel portrait placed. 0.8 had been set to
 compensate when the page moved to sRGB colour management; 1.0 now reads best.
+page, off the asset store: the nine images the page loads were held in the claude.ai artifact's asset store as
+/_blob/ ids. They are now files beside the page, assets/layers/*.png and assets/tiles/*.jpg, reached by relative
+path, so the room serves from GitHub Pages at 605qu3.github.io/lumos-castle-page/page/common-room.html. Nothing
+drawn changed. The claude.ai room is retired.
+portrait-right, round 1: candidate 1, taken on its first fresh prompt with all eight checks passing. Keyed at
+1747 x 1907 px, 1747 px per metre. Placed at 1.0 m wide, height 1.09 m from the image, hung at its centre 3.9 m up,
+16 degrees right of the hearth. An empty study by the mantel's painter: an open doorway at the left edge, which is
+the exit its sitter will use and faces the mantel's right-edge exit, with pale light falling from it across the
+floor in a wedge; a writing desk against the back wall right of centre; and one chair in the light, turned out from
+the desk as if just vacated. The chair's back came in at half the doorway's height, as asked, so a standing sitter
+has its scale. Two misses accepted: the painting is 1.09 times as tall as it is wide where 1.3 was asked and the
+mantel is 1.34, so the pair are different shapes; and the chair is a swivel chair on a pedestal rather than the
+plain wooden one asked for. Its material gained the alpha cutoff, which only the mantel's mesh had.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -645,7 +658,7 @@ onWall(winL, Math.PI + 0.55, 3.3, 5.5); register(winL, 0);
 var portraitTex = cutoutTexture(256, 332, '#000', drawFrame, 'portrait');
 var port1 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9, alphaTest: 0.5 }));
 port1.receiveShadow = true; onWall(port1, Math.PI, 4.05, 5.5); register(port1, 0); port1.name = 'portrait-mantel';
-var port2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9 }));
+var port2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9, alphaTest: 0.5 }));
 port2.receiveShadow = true; onWall(port2, Math.PI - 0.28, 3.9, 5.5); register(port2, 0); port2.name = 'portrait-right';
 var tapestry = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.6), new THREE.MeshStandardMaterial({ map: cutoutTexture(240, 520, '#000', drawTapestry, 'tapestry'), roughness: 1, alphaTest: 0.5 }));
 tapestry.receiveShadow = true; onWall(tapestry, Math.PI + 0.262, 3.9, 5.45); register(tapestry, 0); tapestry.name = 'tapestry';
@@ -1204,6 +1217,7 @@ var LAYERS = {
   /* wall-hung: pivots at its centre, which stays where onWall put it */
   'tapestry': { url: '../assets/layers/tapestry.png', w: 1.44, pivot: 'centre', flutter: true },
   'portrait-mantel': { url: '../assets/layers/portrait-mantel.png', w: 1.0, pivot: 'centre' },
+  'portrait-right': { url: '../assets/layers/portrait-right.png', w: 1.0, pivot: 'centre' },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
