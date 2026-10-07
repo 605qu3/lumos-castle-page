@@ -403,6 +403,12 @@ to close it. At 100 its back covers 38, 20 and 4 percent at a drag right, the de
 was placed by tracing sight lines, where it shows at the default view and a drag left. A far wall 2 m beyond, in the wall's stone, and a grey torch stand-in lit by the warm light that was already
 there, now flickering. Still to draw: the portrait's back (a framer), a voussoir ring round the mouth (the mason) and
 the torch bracket, about 5 MB in all. Closed, a tap on the hole's mouth opens it; the stone round it does nothing.
+portrait-hole-panel, round 1: candidate 1 of 1, the framer's, designed with David one question at a time. The back of
+the Fat Lady's portrait, 1.4 by 1.7 m: dark oak frame rails with mitred corners and a thin worn-gilt edge, a pine
+stretcher with corner keys and a cross brace, browned linen, two black strap hinges on the right edge, a blank label
+on the bottom rail, and a folded blank crib wedged behind the cross brace, a nod to Neville writing the passwords
+down (PA 13). Drawn from a plan made in code (pipeline/joint_plan.py portrait-back), followed line for line; passed
+all nine checks. Keyed at 560 x 680 px, 400 px per metre, about 2 MB on the GPU. One candidate, about 13 cents.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1408,6 +1414,7 @@ hinge.position.set(PORTRAIT_W / 2, 0, -HOLE_DEPTH - 0.01);
 holeFrame.add(hinge);
 var panel = cutoutMesh(cutoutTexture(232, 282, '#000', drawPortraitBack, 'portrait back'), PORTRAIT_W, PORTRAIT_H);
 panel.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
+panel.name = 'portrait-hole-panel';
 hinge.add(panel); register(panel, 1);
 /* what a tap hits: the hole's mouth, so tapping the stone round it does nothing */
 var holeTap = new THREE.Mesh(new THREE.CircleGeometry(HOLE_R, 32), new THREE.MeshBasicMaterial());
@@ -1460,6 +1467,8 @@ var LAYERS = {
      as a card facing the camera (placeCard); its stone takes the fireplace's tint */
   'stairs': { url: '../assets/layers/stairs.png', w: 1.432, floor: 0.0109, card: { x: 4.67, z: -1.4, front: 0.7 },
     tint: 0x855839 },
+  /* the framer's back of the Fat Lady's portrait, at the far end of the hole's tunnel; drawn from a plan made in code */
+  'portrait-hole-panel': { url: '../assets/layers/portrait-hole-panel.png', w: 1.4, pivot: 'centre' },
   /* a surface is opaque and lies under everything: its image replaces the placeholder's flat colour.
      The floor is drawn as a plan; with the circle laid flat, the image's top edge is the hearth side */
   'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999,
