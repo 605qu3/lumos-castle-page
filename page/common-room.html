@@ -376,6 +376,17 @@ without moving the board again. Moved to x 4.67, z -1.4, David's call: just righ
 off the wall, a sliver at the default view and whole, clear of the board, when a boy drags right. The highest point
 any view shows at that depth is 5.06 m (full drag right, tilted up), so the drawing's 5.6 m top never shows; in
 portrait the stair is never on screen.
+stairs, round 1: the castle mason's spiral stair to the boys' dormitory, designed with David one question at a time.
+An open newel stair: a stone newel with 28 wedge treads of 20 cm winding round it, 14 to a turn, two turns, 1.4 m
+across, rising clockwise seen from above with the first tread on the room side, the wall seen between the treads.
+Drawn from a plan made in code in perspective from a boy's eye (1.35 m) at the camera's 9.6 m from the newel
+(pipeline/joint_plan.py stairs), so the low treads show their tops and the high ones their undersides; followed
+tread for tread, its width to within 5 px, though it filled only 38 percent of the canvas's width. Worn hollows on
+the treads came back faint. Keyed at 569 x 2366, 401 px per metre, 7.2 MB on the GPU. Being drawn from the camera,
+it stands as a card facing the camera (placeCard), 0.7 m in front of the newel and scaled about the eye to match,
+so its front tread never falls below the floor; at a full drag right the outermost tips of its right-hand treads
+run off the edge, which a card at the newel did not fix. Tinted as the fireplace is, 0x855839. One candidate,
+about 13 cents.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1366,6 +1377,10 @@ var LAYERS = {
   /* the mason's fireplace, keyed, its opening empty so the firebox and fire in code show through;
      tinted to the wall's value, the drawing having come back a little darker than the wall's */
   'fireplace': { url: '../assets/layers/fireplace.png', w: 3.0, pivot: 'centre', tint: 0x855839 },
+  /* the mason's spiral stair, drawn in perspective from the camera at a boy's eye line, so it stands
+     as a card facing the camera (placeCard); its stone takes the fireplace's tint */
+  'stairs': { url: '../assets/layers/stairs.png', w: 1.432, floor: 0.0109, card: { x: 4.67, z: -1.4, front: 0.7 },
+    tint: 0x855839 },
   /* a surface is opaque and lies under everything: its image replaces the placeholder's flat colour.
      The floor is drawn as a plan; with the circle laid flat, the image's top edge is the hearth side */
   'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999,
@@ -1433,7 +1448,8 @@ function applyLayer(id, entry) {
        back pair in mid-air. sink drops it until the average of its feet is on
        the floor: the back feet come down, the front feet go a little under, and
        the floor hides what goes under. Measured per piece off the drawing. */
-    if (entry.pivot !== 'centre') mesh.position.y = h / 2 - (entry.sink || 0) * h;
+    if (entry.card) placeCard(mesh, entry, h);
+    else if (entry.pivot !== 'centre') mesh.position.y = h / 2 - (entry.sink || 0) * h;
     /* the window placeholders are unlit, because they carry their own painted
        sky; the drawn window is not, so it gets a lit material of its own */
     if (entry.window) {
@@ -1454,6 +1470,21 @@ function applyLayer(id, entry) {
     mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
   };
   im.src = entry.url;
+}
+
+/* A piece drawn in perspective from the camera, the spiral stair: its drawing is what the eye sees of
+   the real thing, so the card faces the camera, and it stands card.front metres in front of the
+   newel, scaled about the eye to match, so nothing near in the drawing falls below the floor and is
+   cut off by it. w is the drawing's width at the newel; floor is how far up the image the floor
+   at the newel lies, as a fraction of its height. */
+function placeCard(mesh, entry, h) {
+  var c = entry.card, dx = CAM_BASE.x - c.x, dz = CAM_BASE.z - c.z, dist = Math.hypot(dx, dz);
+  var k = (dist - c.front) / dist;
+  mesh.geometry.dispose();
+  mesh.geometry = new THREE.PlaneGeometry(entry.w * k, h * k);
+  var bottom = CAM_BASE.y + (-entry.floor * h - CAM_BASE.y) * k;
+  mesh.position.set(c.x + dx / dist * c.front, bottom + h * k / 2, c.z + dz / dist * c.front);
+  mesh.rotation.set(0, Math.atan2(dx, dz), 0);
 }
 
 /* A surface keeps its mesh and its place; only its material changes, from a flat
