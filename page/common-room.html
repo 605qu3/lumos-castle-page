@@ -396,7 +396,9 @@ portrait hole, greybox, 7 October 2026, each choice David's: the book's round ho
 drops its pixels inside the circle and a tunnel lined from the wall's own texture runs out to the corridor face, so it
 costs no memory. The portrait hangs on the corridor side and swings away into the corridor, as it does for whoever
 stands outside, so its painted front is never seen. Hinged first on the camera's side, out of sight once open; David
-had it hinged on the far side, so open it stands across the line of sight and its back shows a boy what to tap to close it. A far wall 2 m beyond, in the wall's stone, and a grey torch stand-in lit by the warm light that was already
+had it hinged on the far side, so open it stands across the line of sight and its back shows a boy what to tap to close it.
+It opens 80 degrees, not 100: measured, its back covers 38 to 53 percent of the hole at every view, where at 100
+it fell to 4 percent at a full drag left. The corridor shows whole only at a drag left, with the torch. A far wall 2 m beyond, in the wall's stone, and a grey torch stand-in lit by the warm light that was already
 there, now flickering. Still to draw: the portrait's back (a framer), a voussoir ring round the mouth (the mason) and
 the torch bracket, about 5 MB in all. Closed, a tap on the hole's mouth opens it; the stone round it does nothing.
 -->
@@ -2223,7 +2225,7 @@ var stokeT = 99;
 function stokeFire() { stokeT = 0; emberBurst = 28; }
 
 var portrait = { open: false, ang: 0, target: 0, closeT: 0 };
-var DOOR_OPEN = 1.75;
+var DOOR_OPEN = 1.4;   /* 80 degrees: open, the portrait's back still covers 38 to 53 percent of the hole at every view, so a boy sees what to tap */
 function togglePortrait() {
   portrait.open = !portrait.open;
   portrait.target = portrait.open ? DOOR_OPEN : 0;
@@ -2527,7 +2529,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, sitters: sitters };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, sitters: sitters, portrait: portrait };
 })();
 </script>
 </body>
