@@ -395,8 +395,8 @@ portrait hole, greybox, 7 October 2026, each choice David's: the book's round ho
 1.2 m across with its sill at 0.6 m, through a wall 0.8 m thick, in place of the floor-level door. The wall's shader
 drops its pixels inside the circle and a tunnel lined from the wall's own texture runs out to the corridor face, so it
 costs no memory. The portrait hangs on the corridor side and swings away into the corridor, as it does for whoever
-stands outside, so its painted front is never seen; it is hinged on the camera's side, out of the line of sight once
-open. A far wall 2 m beyond, in the wall's stone, and a grey torch stand-in lit by the warm light that was already
+stands outside, so its painted front is never seen. Hinged first on the camera's side, out of sight once open; David
+had it hinged on the far side, so open it stands across the line of sight and its back shows a boy what to tap to close it. A far wall 2 m beyond, in the wall's stone, and a grey torch stand-in lit by the warm light that was already
 there, now flickering. Still to draw: the portrait's back (a framer), a voussoir ring round the mouth (the mason) and
 the torch bracket, about 5 MB in all. Closed, a tap on the hole's mouth opens it; the stone round it does nothing.
 -->
@@ -1333,7 +1333,7 @@ function updatePapers(dt, t) {
    its sill 0.6 m up, through a wall 0.8 m thick. The wall's shader drops its pixels inside the circle; a
    stone-lined tunnel runs out to the corridor face, lined from a patch of the wall's own texture, so it
    costs no memory. The portrait hangs on the corridor side, bigger than the hole, so from inside only a
-   disc of its back shows at the tunnel's end; it is hinged on the camera's side and swings away into the
+   disc of its back shows at the tunnel's end; it is hinged on the far side and swings away into the
    corridor, as it does for whoever stands outside, opening on a far wall lit by a torch.
    Local frame: x along the wall to the right as you face the hole from inside, y up, z into the room. */
 var HOLE_THETA = Math.PI + 0.85, HOLE_R = 0.6, HOLE_Y = 1.2, HOLE_DEPTH = 0.8, CORRIDOR_D = 2.0;
@@ -1390,18 +1390,19 @@ corridorWall.receiveShadow = true;
 holeFrame.add(corridorWall); register(corridorWall, 0);
 /* the torch, a grey stand-in on the far wall where the default view's line through the hole lands */
 var torch = new THREE.Group();
-torch.position.set(1.3, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.08);
+torch.position.set(0.6, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.08);
 holeFrame.add(torch);
 box(torch, 0.08, 0.3, 0.12, 0, 0, -0.02, solid(0x2d2a27), 0);
 var torchFlame = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 10), new THREE.MeshBasicMaterial({ color: col(0xffb050) }));
 torchFlame.position.set(0, 0.25, 0.04);
 torch.add(torchFlame);
-/* the portrait's back, a grey stand-in, hinged at its left edge just beyond the tunnel's end */
+/* the portrait's back, a grey stand-in, hinged at its right edge just beyond the tunnel's end, so that open it
+   stands across the line of sight and a boy can see what to tap to close it */
 var hinge = new THREE.Group();
-hinge.position.set(-PORTRAIT_W / 2, 0, -HOLE_DEPTH - 0.01);
+hinge.position.set(PORTRAIT_W / 2, 0, -HOLE_DEPTH - 0.01);
 holeFrame.add(hinge);
 var panel = cutoutMesh(cutoutTexture(232, 282, '#000', drawPortraitBack, 'portrait back'), PORTRAIT_W, PORTRAIT_H);
-panel.position.set(PORTRAIT_W / 2, HOLE_Y, 0);
+panel.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
 hinge.add(panel); register(panel, 1);
 /* what a tap hits: the hole's mouth, so tapping the stone round it does nothing */
 var holeTap = new THREE.Mesh(new THREE.CircleGeometry(HOLE_R, 32), new THREE.MeshBasicMaterial());
@@ -1410,7 +1411,7 @@ holeTap.visible = false;
 holeFrame.add(holeTap);
 scene.updateMatrixWorld(true);
 var corridorLight = new THREE.PointLight(col(0xffc080), 0, 5, 1.2);
-corridorLight.position.copy(holeFrame.localToWorld(new THREE.Vector3(1.3, 1.9, -HOLE_DEPTH - CORRIDOR_D + 0.5)));
+corridorLight.position.copy(holeFrame.localToWorld(new THREE.Vector3(0.6, 1.9, -HOLE_DEPTH - CORRIDOR_D + 0.5)));
 scene.add(corridorLight);
 /* the drawn wall reaches the tunnel and the corridor too: one texture, no second copy on the GPU */
 function shareWallStone(map, color) {
@@ -2480,7 +2481,7 @@ function updateCat(dt, t) {
 function updatePortrait(dt) {
   var s = Math.min(1, dt * 4);
   portrait.ang = lerp(portrait.ang, portrait.target, s);
-  hinge.rotation.y = portrait.ang;
+  hinge.rotation.y = -portrait.ang;
   var k = portrait.ang / DOOR_OPEN, clockT = performance.now() / 1000;
   corridorLight.intensity = 1.8 * k * (0.85 + 0.15 * Math.sin(clockT * 11) * Math.sin(clockT * 4.3));
   torchFlame.scale.y = 0.85 + 0.2 * Math.abs(Math.sin(clockT * 9.1));
