@@ -89,9 +89,9 @@
     },
     {
       "id": "trevor.thanks-plain",
-      "tier": "fixed", "source": "device", "leans": ["neville"], "weight": 1,
+      "tier": "fixed", "source": "device", "leans": ["neville"], "weight": 2,
       "moment": "arrive",
-      "when": ["thanks = due", "today > caught_on", "found <= 2"],
+      "when": ["thanks = due", "today > caught_on"],
       "lines": [
         {"medium": "written", "hand": "neville", "at": "board", "key": "trevor.thanks-plain",
          "style": "a blot and a crossed-out word",
