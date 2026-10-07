@@ -1,0 +1,54 @@
+{
+  "chain": "fire",
+  "room": [
+    {"when": [], "show": ["bellows hanging by the hearth"]},
+    {"when": ["fire = damp"], "show": ["fire smoking, embers low, the room's light down"]},
+    {"when": ["fire != damp"], "show": ["fire burning"]},
+    {"when": ["fire = relit"], "show": ["hearth swept", "a neat stack of dry logs beside the hearth"]}
+  ],
+  "records": [
+    {
+      "id": "fire.damp",
+      "tier": "big", "source": "device", "leans": ["setback"], "weight": 1,
+      "boost": {"when": ["weather = rained"], "times": 3},
+      "moment": "arrive",
+      "when": ["days since fire_out >= 7"],
+      "starts": ["set fire = damp", "set pumps_left = 4-6", "stamp fire_out",
+                 "log \"The fire would not catch {day}\""],
+      "ends": [
+        {"when": ["fire = lit"], "do": ["log \"Got the fire going {day}\""]},
+        {"on": "leave", "do": ["set fire = relit", "log \"Left the fire smoking; it was lit by next visit\""]}
+      ]
+    },
+    {
+      "id": "fire.pump-fast",
+      "tier": "fixed", "source": "device", "leans": [],
+      "moment": "tap bellows",
+      "when": ["fire = damp", "seconds since last tap < 1"],
+      "show": ["smoke puffs back out of the grate"]
+    },
+    {
+      "id": "fire.pump-steady",
+      "tier": "fixed", "source": "device", "leans": [],
+      "moment": "tap bellows",
+      "when": ["fire = damp", "seconds since last tap >= 1", "pumps_left > 1"],
+      "show": ["the embers brighten a step"],
+      "starts": ["add pumps_left -1"]
+    },
+    {
+      "id": "fire.catch",
+      "tier": "fixed", "source": "device", "leans": [],
+      "moment": "tap bellows",
+      "when": ["fire = damp", "seconds since last tap >= 1", "pumps_left = 1"],
+      "show": ["the fire catches with a whoosh and the room's light comes up"],
+      "starts": ["set fire = lit"]
+    },
+    {
+      "id": "fire.flare",
+      "tier": "fixed", "source": "device", "leans": [],
+      "moment": "tap bellows",
+      "when": ["fire != damp"],
+      "show": ["the fire flares up happily"]
+    }
+  ]
+}
