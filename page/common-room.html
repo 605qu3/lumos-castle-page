@@ -317,7 +317,7 @@ floor, round 5: the first surface, and the first tier C image. The castle mason'
 down, and laid on the floor circle with the image's top edge at the hearth: twenty rows of about 0.57 m across the
 room, flags of irregular length from about 0.6 to 1.25 m, each joint one pen line, every flag washed in its own shade
 of the reveals' grey-buff stone, no hatching. Rounds 1 and 2, described in prose, came back as brickwork with flags
-nearly 3 m long; round 3 was given the layout as a joint plan drawn in code (pipeline/floor_plan.py) and followed it,
+nearly 3 m long; round 3 was given the layout as a joint plan drawn in code (pipeline/joint_plan.py) and followed it,
 but at fifteen rows still stood the armchair on a single flag, and its joints were doubled with pale rims and edge
 hatching. Round 4, at twenty rows with single joints, read as paper; round 5 restored the stone. The model ignores
 the colour asked for, so the floor is darkened in code, tint 60 percent. JPEG at 2048 x 2048 px, 180 px per metre
@@ -336,6 +336,17 @@ the squash where the worn field was cross-hatched, burn marks read as holes, and
 round 2 asked for wash in place of hatching, an unbroken oval and smudges. It came back a rounded rectangle, which
 reads as an oval at a boy's eye line. Keyed at 2184 x 1596 px and scaled to the spec's 1140 x 833, 200 px per metre
 (5 MB on the GPU against 18), laid flat at 5.7 m wide where the placeholder was, darkened in code, tint 60 percent.
+wall, round 2: the castle mason's squared stone in twenty level courses of 35 cm, stones 0.5 to 1.05 m long, drawn
+square on from a joint plan made in code (pipeline/joint_plan.py) and wrapped round the whole visible arc, 20.4 m by
+7 m, left end at the viewer's left. The wall is 2.9 to 1 and the model's widest canvas is 21:9, so the plan draws
+every stone 0.8 times as long and the page stretches the image back out; generated at 4K, 6336 x 2688, trimmed 2.5
+percent at each end, where the wash had not reached, and scaled to the spec's 4096 x 1408, 201 px per metre, 29 MB
+on the GPU. Round 1, from a plan at 2100 x 900 with 4 px lines, followed it but copied the lines three times as
+heavy and the wall competed with everything hung on it; round 2's plan is twice the size with 3 px lines and the
+prompt asks for joints as fine as the armchair's finest, and dark ink fell from 10.9 to 3.4 percent of the image.
+In code: quieted toward its own average colour, 15 percent overall and 50 below 2.5 m where everything stands
+against it (a blurred copy was tried first and left smudges), and darkened, tint 75 percent, a step lighter than
+the floor at David's call. No openings are drawn: the windows, the portrait hole and the hearth lie over it.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -667,6 +678,7 @@ var wall = new THREE.Mesh(
   solid(0x75726e, { side: THREE.DoubleSide })
 );
 wall.position.y = 3.5;
+wall.name = 'wall';
 wall.receiveShadow = true;
 wall.castShadow = false;
 scene.add(wall); register(wall, 0);
@@ -1321,6 +1333,11 @@ var LAYERS = {
        width and strength are the band's in metres and its paleness where the weight is 1 */
     wear: [{ path: [[2.66, -1.67, 0], [2.25, -1.19, 0.3], [1.68, -0.80, 0.6], [1.00, -0.53, 0.85], [0.26, -0.41, 1],
       [-0.51, -0.43, 0.75], [-1.24, -0.61, 0.5], [-1.89, -0.91, 0.8], [-2.40, -1.34, 0]], width: 0.9, strength: 0.22 }] },
+  /* the wall wraps the visible arc. The cylinder runs its image right to left as seen from inside, so it is
+     mirrored back, left end at the viewer's left. quiet softens the band everything stands against: below
+     `below` metres of the wall's `height` the drawing is blended with a blurred copy of itself by `amount` */
+  'wall': { url: '../assets/layers/wall.jpg', surface: true, tint: 0xbfbfbf, mirror: true,
+    quiet: { below: 2.5, height: 7, amount: 0.5, all: 0.15 } },
   /* a cutout lying flat on the floor, drawn as a plan: the image's top edge toward the hearth */
   'rug': { url: '../assets/layers/rug.png', w: 5.7, plan: true, tint: 0x999999 },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
@@ -1397,8 +1414,10 @@ function applySurface(id, entry) {
   if (!mesh) return;
   var im = new Image();
   im.onload = function () {
-    var t = tex(entry.wear ? wornCanvas(im, entry.wear, mesh) : im);
+    var src = entry.quiet ? quietCanvas(im, entry.quiet) : im;
+    var t = tex(entry.wear ? wornCanvas(src, entry.wear, mesh) : src);
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    if (entry.mirror) { t.wrapS = THREE.RepeatWrapping; t.repeat.x = -1; t.offset.x = 1; }
     mesh.material.map = t;
     /* tint darkens the drawing in place: the model ignores a hex asked for, so the floor's value is set here */
     mesh.material.color.copy(col(entry.tint || 0xffffff));
@@ -1431,6 +1450,27 @@ function applyPlan(id, entry) {
    Discs rather than a blurred stroke, because a canvas blur filter is missing in
    older iPad Safari. The floor circle maps world x, z to the image with its top
    edge at the hearth (z = -R). */
+/* Quiet is lower contrast, not darker: the drawing is blended toward its own
+   average colour, by `amount` below `below` and by `all` over the rest, the
+   change faded over 40 cm so there is no line where it starts. A blurred copy
+   was tried and left dark smudges where joints cluster. */
+function quietCanvas(im, q) {
+  var W = im.width, H = im.height;
+  var c = makeCanvas(W, H), g = c.getContext('2d');
+  g.drawImage(im, 0, 0);
+  var one = makeCanvas(1, 1), og = one.getContext('2d');
+  og.drawImage(im, 0, 0, 1, 1);
+  var m = og.getImageData(0, 0, 1, 1).data;
+  var y = function (h) { return (1 - h / q.height) * H; };
+  var grd = g.createLinearGradient(0, y(q.below + 0.2), 0, y(q.below - 0.2));
+  var rgba = function (a) { return 'rgba(' + m[0] + ',' + m[1] + ',' + m[2] + ',' + a + ')'; };
+  grd.addColorStop(0, rgba(q.all || 0));
+  grd.addColorStop(1, rgba(q.amount));
+  g.fillStyle = grd;
+  g.fillRect(0, 0, W, H);
+  return c;
+}
+
 function wornCanvas(im, wear, mesh) {
   var W = im.width, H = im.height, R = mesh.geometry.parameters.radius;
   var c = makeCanvas(W, H), g = c.getContext('2d');
