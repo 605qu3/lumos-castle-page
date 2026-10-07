@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Speech probe">
+<title>Speech probe</title>
+<style>
+  :root { --bg: #15120f; --fg: #f1e8da; --dim: #a89c8a; --ok: #9fd18b; --warn: #f0b35a; --bad: #f08a7a; --btn: #6b3a24; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 18px/1.4 -apple-system, system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0; }
+  button, select { font: inherit; color: var(--fg); background: #2a241e; border: 1px solid #4a4036; border-radius: 10px; padding: 10px 14px; }
+  #listen { background: var(--btn); font-size: 28px; padding: 22px 0; width: 100%; border-radius: 16px; }
+  #listen.on { background: #a2412a; }
+  #env { color: var(--dim); font-size: 15px; }
+  #status { font-size: 22px; min-height: 1.4em; }
+  #log { font: 15px/1.45 ui-monospace, Menlo, monospace; white-space: pre-wrap; background: #0d0b09; border-radius: 10px; padding: 12px; }
+  .ok { color: var(--ok); } .warn { color: var(--warn); } .bad { color: var(--bad); }
+  .big { font-size: 26px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Speech probe</h1>
+  <div id="env"></div>
+  <div class="row">
+    <label>Accent <select id="lang">
+      <option value="en-GB">en-GB</option><option value="en-US">en-US</option><option value="en-IE">en-IE</option>
+    </select></label>
+    <label>Listen <select id="mode">
+      <option value="once">once, stop at silence</option><option value="cont">continuously</option>
+    </select></label>
+  </div>
+  <button id="listen">Listen</button>
+  <div class="row"><div id="status"></div></div>
+  <div class="row"><button id="copy">Copy log</button><button id="clear">Clear</button></div>
+  <div id="log"></div>
+</main>
+<script>
+/* A one-page test of Safari's speech recognition on the iPad, for the spoken password. It shows every guess with its
+   confidence, how long each stage took after the tap, every error by name, and how near each guess is to the two
+   Book 1 passwords, so the page's match can be set from what a shouting boy actually produces. */
+(function () {
+  var TARGETS = ['caput draconis', 'pig snout'];
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var $ = function (id) { return document.getElementById(id); };
+  var logEl = $('log'), statusEl = $('status'), btn = $('listen');
+  var lines = [], rec = null, t0 = 0, tries = 0;
+
+  var standalone = window.navigator.standalone === true || matchMedia('(display-mode: standalone)').matches;
+  $('env').textContent = (SR ? 'Speech recognition: present' : 'Speech recognition: MISSING') +
+    ' | ' + (standalone ? 'home-screen app' : 'browser tab') + ' | secure: ' + window.isSecureContext +
+    ' | ' + navigator.userAgent.replace(/^Mozilla\/5\.0 /, '');
+
+  function ms() { return ((performance.now() - t0) / 1000).toFixed(2) + 's'; }
+  function add(text, cls) {
+    lines.push(text);
+    var d = document.createElement('div');
+    if (cls) d.className = cls;
+    d.textContent = text;
+    logEl.prepend(d);
+  }
+  function status(text, cls) { statusEl.textContent = text; statusEl.className = cls || ''; }
+
+  /* how near a guess is to a password: letters only, 1 minus the edit distance over the longer length */
+  function norm(s) { return s.toLowerCase().replace(/[^a-z]/g, ''); }
+  function near(a, b) {
+    a = norm(a); b = norm(b);
+    if (!a.length || !b.length) return 0;
+    var prev = [], cur = [], i, j;
+    for (j = 0; j <= b.length; j++) prev[j] = j;
+    for (i = 1; i <= a.length; i++) {
+      cur = [i];
+      for (j = 1; j <= b.length; j++)
+        cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = cur;
+    }
+    return 1 - prev[b.length] / Math.max(a.length, b.length);
+  }
+  function nearest(s) {
+    var best = TARGETS.map(function (t) { return [t, near(s, t)]; }).sort(function (x, y) { return y[1] - x[1]; })[0];
+    return best[0] + ' ' + Math.round(best[1] * 100) + '%';
+  }
+
+  function start() {
+    if (!SR) { status('This browser has no speech recognition.', 'bad'); return; }
+    rec = new SR();
+    rec.lang = $('lang').value;
+    rec.interimResults = true;
+    rec.maxAlternatives = 10;
+    rec.continuous = $('mode').value === 'cont';
+    tries++;
+    t0 = performance.now();
+    add('--- try ' + tries + ', ' + rec.lang + ', ' + (rec.continuous ? 'continuous' : 'once') + ', ' +
+      (standalone ? 'home screen' : 'tab') + ' ---');
+    ['start', 'audiostart', 'soundstart', 'speechstart', 'speechend', 'soundend', 'audioend'].forEach(function (ev) {
+      rec['on' + ev] = function () { add(ms() + ' ' + ev, 'warn'); if (ev === 'start') status('Listening... say it!', 'ok'); };
+    });
+    rec.onresult = function (e) {
+      for (var i = e.resultIndex; i < e.results.length; i++) {
+        var r = e.results[i], alts = [];
+        for (var k = 0; k < r.length; k++)
+          alts.push('  "' + r[k].transcript + '" conf ' + (r[k].confidence || 0).toFixed(2) + ', nearest ' + nearest(r[k].transcript));
+        add(ms() + (r.isFinal ? ' FINAL' : ' interim') + ' (' + r.length + ' guesses)\n' + alts.join('\n'), r.isFinal ? 'ok big' : '');
+        if (r.isFinal) status('Heard: "' + r[0].transcript + '"', 'ok');
+      }
+    };
+    rec.onnomatch = function () { add(ms() + ' nomatch', 'bad'); };
+    rec.onerror = function (e) { add(ms() + ' ERROR ' + e.error + (e.message ? ': ' + e.message : ''), 'bad'); status('Error: ' + e.error, 'bad'); };
+    rec.onend = function () { add(ms() + ' end', 'warn'); btn.textContent = 'Listen'; btn.className = ''; rec = null; };
+    try {
+      rec.start();
+      btn.textContent = 'Stop'; btn.className = 'on';
+      status('Starting...');
+    } catch (err) {
+      add('start threw: ' + err.name + ': ' + err.message, 'bad');
+    }
+  }
+
+  btn.addEventListener('click', function () { if (rec) rec.stop(); else start(); });
+  $('clear').addEventListener('click', function () { lines = []; logEl.textContent = ''; tries = 0; status(''); });
+  $('copy').addEventListener('click', function () {
+    var text = $('env').textContent + '\n' + lines.join('\n');
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { status('Log copied.', 'ok'); },
+      function () { status('Copy failed; select the log by hand.', 'bad'); });
+    else status('No clipboard here; select the log by hand.', 'bad');
+  });
+})();
+</script>
+</body>
+</html>
