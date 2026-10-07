@@ -794,9 +794,12 @@ scene.add(fp);
 /* dithered: the fire glow's falloff across near-black soot stepped one level at a time and showed as stripes */
 var soot = solid(0x1c1a18, { roughness: 1, dithering: true });
 var hearthBack = box(fp, 1.9, 1.5, 0.08, 0, 0.75, 0.04, soot, 0);
-box(fp, 0.08, 1.5, 0.6, -0.94, 0.75, 0.3, soot, 0);
-box(fp, 0.08, 1.5, 0.6, 0.94, 0.75, 0.3, soot, 0);
-box(fp, 1.9, 0.08, 0.6, 0, 1.46, 0.3, soot, 0);
+/* the sides and throat stop 2 cm short of the drawing at z -4.9: ending exactly in its plane, their front faces fought
+   it for depth behind the drawn stone round the opening and showed as a flickering hatched frame on a drag (David,
+   7 October 2026) */
+box(fp, 0.08, 1.5, 0.58, -0.94, 0.75, 0.29, soot, 0);
+box(fp, 0.08, 1.5, 0.58, 0.94, 0.75, 0.29, soot, 0);
+box(fp, 1.9, 0.08, 0.58, 0, 1.46, 0.29, soot, 0);
 var returnStone = solid(0x807a70);
 box(fp, 0.08, 2.5, 0.55, -1.3, 1.25, 0.3, returnStone, 0);
 box(fp, 0.08, 2.5, 0.55, 1.3, 1.25, 0.3, returnStone, 0);
