@@ -1,0 +1,36 @@
+{
+  "chain": "neville",
+  "records": [
+    {
+      "id": "neville.locked-out",
+      "tier": "big", "source": "device", "leans": ["neville"], "weight": 1,
+      "boost": {"when": ["returns this week = 0"], "times": 3},
+      "moment": "outside",
+      "when": ["portrait = shut"],
+      "who": [
+        {"as": "neville", "role": "canon", "name": "neville", "mark": "frame-foot", "pose": "hunched"}
+      ],
+      "lines": [
+        {"speaker": "neville", "medium": "said", "key": "neville.locked-out.ask",
+         "text": ["Oh, thank goodness. I've forgotten it again.",
+                  "I had it this morning, I know I did.",
+                  "Do you know it? She won't let me in."]}
+      ],
+      "starts": ["log \"Let Neville in {day}\""],
+      "ends": [
+        {
+          "on": "password",
+          "do": [],
+          "lines": [
+            {"speaker": "neville", "medium": "said", "pose": "standing, relieved", "then": "goes in ahead by the hole",
+             "key": "neville.locked-out.thanks",
+             "text": ["Thanks! I'd forget my own head."]},
+            {"speaker": "neville", "medium": "heard", "key": "neville.locked-out.stair",
+             "sound": "running up the stair"}
+          ]
+        },
+        {"on": "leave", "do": []}
+      ]
+    }
+  ]
+}

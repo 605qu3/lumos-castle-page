@@ -1,0 +1,69 @@
+{
+  "chain": "touch",
+  "records": [
+    {
+      "id": "touch.fire-green",
+      "tier": "small", "source": "device", "leans": [], "weight": 1,
+      "moment": "wait 20-90 s",
+      "show": ["fire green for 2 s"]
+    },
+    {
+      "id": "touch.notices-rustle",
+      "tier": "small", "source": "device", "leans": [], "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": ["portrait = shut"],
+      "show": ["notices lift as in the portrait's draught"]
+    },
+    {
+      "id": "touch.dorm-crash",
+      "tier": "small", "source": "device", "leans": ["setback"], "weight": 1,
+      "moment": "first tap",
+      "who": [
+        {"as": "dorm", "role": "voice", "mark": "stair-top"}
+      ],
+      "lines": [
+        {"speaker": "dorm", "medium": "heard", "key": "touch.dorm-crash", "sound": "a crash, then laughter"}
+      ]
+    },
+    {
+      "id": "touch.scarf-feet",
+      "tier": "small", "source": "device", "leans": [], "weight": 1,
+      "moment": "first tap",
+      "who": [
+        {"as": "runner", "role": "voice", "mark": "stair-foot"}
+      ],
+      "lines": [
+        {"speaker": "runner", "medium": "heard", "key": "touch.scarf-feet.down", "sound": "feet running down"},
+        {"speaker": "runner", "medium": "heard", "key": "touch.scarf-feet.says",
+         "text": ["Forgot my scarf!", "Where's my Herbology book?"]},
+        {"speaker": "runner", "medium": "heard", "key": "touch.scarf-feet.up", "sound": "feet running back up"}
+      ]
+    },
+    {
+      "id": "touch.sleeper",
+      "tier": "small", "source": "device", "leans": [], "weight": 1,
+      "moment": "arrive",
+      "when": ["time != morning"],
+      "who": [
+        {"as": "sleeper", "role": "pool", "mark": "sofa", "pose": "asleep, a book on the chest"}
+      ],
+      "lines": [
+        {"speaker": "sleeper", "medium": "said", "on_tap": true, "key": "touch.sleeper",
+         "text": ["Mmf. Five more minutes.", "Not now, I'm revising..."]}
+      ]
+    },
+    {
+      "id": "touch.chess",
+      "tier": "small", "source": "device", "leans": [], "weight": 1,
+      "moment": "arrive",
+      "who": [
+        {"as": "players", "role": "pool", "count": 2, "mark": "fire", "pose": "seated cross-legged on the rug"},
+        {"as": "chess", "role": "trace", "what": "chess set", "mark": "fire"}
+      ],
+      "lines": [
+        {"speaker": "chess", "medium": "said", "on_tap": true, "key": "touch.chess", "canon": "PS12, verify",
+         "text": ["Not there, you great lump!", "Send me, I'll take him!"]}
+      ]
+    }
+  ]
+}
