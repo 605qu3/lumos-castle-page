@@ -326,6 +326,16 @@ floor, wear: laid in code over the drawing (wornCanvas), screened on as polish. 
 hole to the fire was tried first and dropped: from the camera it is a 7 px sliver behind the side table. The wear
 is a patchy pale band along the rug's near edge instead, where everyone steps on and off, heaviest in front of the
 fire's centre and again by the armchair, nothing at either end; even all round, it read as a halo round the rug.
+rug, round 2: a weaver's plain wool hearth rug, drawn as a plan and keyed: a faded crimson field inside one darker
+oxblood-brown border band with a thin faded gold line between, the nap shown by wash with almost no hatching, faded
+where feet step on at the near edge, two loose threads there, and near the far edge a small scorch with five
+coin-sized smudges from sparks (LDP-22). Round 1 was three studies drawn side by side so David could choose the kind:
+plain wool, a braided rag rug and a Turkey carpet. In the room the braided read as rings round the fire and the
+Turkey carpet as the busiest thing on the floor; the plain held the hearth group together. Its round 1 flickered in
+the squash where the worn field was cross-hatched, burn marks read as holes, and fraying flattened the front edge;
+round 2 asked for wash in place of hatching, an unbroken oval and smudges. It came back a rounded rectangle, which
+reads as an oval at a boy's eye line. Keyed at 2184 x 1596 px and scaled to the spec's 1140 x 833, 200 px per metre
+(5 MB on the GPU against 18), laid flat at 5.7 m wide where the placeholder was, darkened in code, tint 60 percent.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -645,6 +655,7 @@ rug.position.set(0, 0.004, -2.6);
 rug.scale.set(1.35, 1, 1);
 rug.receiveShadow = true;
 scene.add(rug); register(rug, 1);
+rug.name = 'rug';
 
 var ceiling = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 48), solid(0x2b2927));
 ceiling.rotation.x = Math.PI / 2;
@@ -1310,6 +1321,8 @@ var LAYERS = {
        width and strength are the band's in metres and its paleness where the weight is 1 */
     wear: [{ path: [[2.66, -1.67, 0], [2.25, -1.19, 0.3], [1.68, -0.80, 0.6], [1.00, -0.53, 0.85], [0.26, -0.41, 1],
       [-0.51, -0.43, 0.75], [-1.24, -0.61, 0.5], [-1.89, -0.91, 0.8], [-2.40, -1.34, 0]], width: 0.9, strength: 0.22 }] },
+  /* a cutout lying flat on the floor, drawn as a plan: the image's top edge toward the hearth */
+  'rug': { url: '../assets/layers/rug.png', w: 5.7, plan: true, tint: 0x999999 },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -1391,6 +1404,24 @@ function applySurface(id, entry) {
     mesh.material.color.copy(col(entry.tint || 0xffffff));
     mesh.userData.base = mesh.material.color.clone();
     mesh.material.needsUpdate = true;
+  };
+  im.src = entry.url;
+}
+
+/* A plan cutout keeps its placeholder's place and lies flat; its own outline
+   replaces the grey shape, cut at the page's usual 50 percent alpha line. */
+function applyPlan(id, entry) {
+  var mesh = scene.getObjectByName(id);
+  if (!mesh) return;
+  var im = new Image();
+  im.onload = function () {
+    var t = tex(im);
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    mesh.geometry.dispose();
+    mesh.geometry = new THREE.PlaneGeometry(entry.w, entry.w * im.height / im.width);
+    mesh.scale.set(1, 1, 1);
+    mesh.material = new THREE.MeshStandardMaterial({ map: t, color: col(entry.tint || 0xffffff), roughness: 1, metalness: 0, alphaTest: 0.5 });
+    mesh.userData.base = mesh.material.color.clone();
   };
   im.src = entry.url;
 }
@@ -1874,6 +1905,7 @@ for (var lid in LAYERS) {
   if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]);
   else if (LAYERS[lid].portrait) applyPortrait(lid, LAYERS[lid]);
   else if (LAYERS[lid].surface) applySurface(lid, LAYERS[lid]);
+  else if (LAYERS[lid].plan) applyPlan(lid, LAYERS[lid]);
   else applyLayer(lid, LAYERS[lid]);
 }
 loadSitterSheets();
