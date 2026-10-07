@@ -420,6 +420,13 @@ beside it, a step lighter. David asked for the sill worn by boys sliding through
 (sill), the bottom rubbed smooth and pale and its joints worn away, heaviest at the bottom centre and fading 70 degrees
 up each side, the tint applied in the canvas so the wear is not capped at the tint's value. Keyed at 680 x 680 px,
 400 px per metre, about 2.4 MB on the GPU. Two candidates, about 26 cents.
+corridor-torch, round 2: the blacksmith's, designed with David. The books give little: a torch bracket strong enough for
+Mrs Norris to hang from by her tail (CoS 8), and flaming torches in the halls. Two studies were drawn for him to compare,
+one candidate each: round 1, a short arm close to its wall plate, and round 2, a long arm on a scrolled stay leaning the
+torch outward; he chose round 2. Drawn from a little to the left, about a third of the way round, so the arm's reach shows,
+as the hole sees the far wall; unlit, with the fire's own flame sprite on its head. Placed by tracing sight lines through
+the open hole: its head at 0.95 m along and 1.3 m up the corridor's far wall shows at the default view and a drag left.
+Keyed at 140 x 273 px, 400 px per metre, about 0.2 MB on the GPU. Two candidates, about 26 cents.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -587,6 +594,11 @@ function drawWingback(g, w, h) {
   rr(g, 0, h * 0.28, w * 0.22, h * 0.5, w * 0.08);
   rr(g, w * 0.78, h * 0.28, w * 0.22, h * 0.5, w * 0.08);
   g.fillRect(w * 0.06, h * 0.68, w * 0.88, h * 0.32);
+}
+/* the torch's placeholder: a plate and a stick */
+function drawTorch(g, w, h) {
+  g.fillStyle = '#3a3633'; g.fillRect(0, h * 0.25, w * 0.15, h * 0.65); g.fillRect(w * 0.15, h * 0.48, w * 0.6, h * 0.04);
+  g.fillStyle = '#5a4430'; g.fillRect(w * 0.78, 0, w * 0.18, h);
 }
 /* the ring's placeholder: a grey band round the hole, its middle clear */
 function drawRing(g, w, h) {
@@ -1413,15 +1425,19 @@ var corridorWall = new THREE.Mesh(new THREE.PlaneGeometry(5, 3.2), corridorMat);
 corridorWall.position.set(0, 1.6, -HOLE_DEPTH - CORRIDOR_D);
 corridorWall.receiveShadow = true;
 holeFrame.add(corridorWall); register(corridorWall, 0);
-/* the torch, a grey stand-in, placed by tracing sight lines through the open hole: at 0.95 m along and 1.1 m up it shows
-   at the default view and a drag left; at a drag right the tunnel's side and the portrait hide the far wall entirely */
-var torch = new THREE.Group();
-torch.position.set(0.95, 1.1, -HOLE_DEPTH - CORRIDOR_D + 0.08);
-holeFrame.add(torch);
-box(torch, 0.08, 0.3, 0.12, 0, 0, -0.02, solid(0x2d2a27), 0);
-var torchFlame = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 10), new THREE.MeshBasicMaterial({ color: col(0xffb050) }));
-torchFlame.position.set(0, 0.25, 0.04);
-torch.add(torchFlame);
+/* the blacksmith's torch on its scrolled bracket (CoS 8: a bracket a cat could hang from), a card flat on the far wall,
+   placed by tracing sight lines through the open hole: its head at 0.95 m along and 1.3 m up shows at the default view
+   and a drag left; at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
+   its flame is one of the fire's own sprites, on the head, 87 percent across the drawing's top */
+var TORCH_HEAD = new THREE.Vector3(0.95, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
+var torch = cutoutMesh(cutoutTexture(64, 124, '#000', drawTorch), 0.35, 0.68);
+torch.position.set(TORCH_HEAD.x - 0.371 * 0.35, TORCH_HEAD.y - 0.34, TORCH_HEAD.z);
+torch.castShadow = false;
+torch.name = 'corridor-torch';
+holeFrame.add(torch); register(torch, 1);
+var torchFlame = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffb060), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+torchFlame.position.set(TORCH_HEAD.x, TORCH_HEAD.y + 0.08, TORCH_HEAD.z + 0.03);
+holeFrame.add(torchFlame);
 /* the portrait's back, a grey stand-in, hinged at its right edge just beyond the tunnel's end, so that open it
    stands across the line of sight and a boy can see what to tap to close it */
 var hinge = new THREE.Group();
@@ -1498,6 +1514,8 @@ var LAYERS = {
     tint: 0x855839 },
   /* the framer's back of the Fat Lady's portrait, at the far end of the hole's tunnel; drawn from a plan made in code */
   'portrait-hole-panel': { url: '../assets/layers/portrait-hole-panel.png', w: 1.4, pivot: 'centre' },
+  /* the blacksmith's corridor torch, unlit in the drawing; its flame is a sprite */
+  'corridor-torch': { url: '../assets/layers/corridor-torch.png', w: 0.35, pivot: 'centre' },
   /* the mason's ring round the hole's mouth, bent to the round wall; tinted from the wall beside it, a step lighter */
   'portrait-hole-ring': { url: '../assets/layers/portrait-hole-ring.png', w: 1.7, pivot: 'centre', bend: true, tint: 0x483426,
     sill: { spread: 70, inner: 0.58, outer: 0.85, smooth: 1.0, strength: 0.85, pale: 1.9 } },
@@ -2567,7 +2585,7 @@ function updatePortrait(dt) {
   hinge.rotation.y = -portrait.ang;
   var k = portrait.ang / DOOR_OPEN, clockT = performance.now() / 1000;
   corridorLight.intensity = 1.8 * k * (0.85 + 0.15 * Math.sin(clockT * 11) * Math.sin(clockT * 4.3));
-  torchFlame.scale.y = 0.85 + 0.2 * Math.abs(Math.sin(clockT * 9.1));
+  torchFlame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(clockT * 7.3)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(clockT * 9.1))), 1);
   if (portrait.open) {
     portrait.closeT -= dt;
     if (portrait.closeT <= 0) togglePortrait();
