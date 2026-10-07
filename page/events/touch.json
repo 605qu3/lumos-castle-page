@@ -16,7 +16,7 @@
     },
     {
       "id": "touch.dorm-crash",
-      "tier": "small", "source": "device", "leans": ["setback"], "weight": 1,
+      "tier": "small", "source": "device", "leans": [], "weight": 1,
       "moment": "first tap",
       "who": [
         {"as": "dorm", "role": "voice", "mark": "stair-top"}
