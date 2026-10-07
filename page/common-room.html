@@ -357,6 +357,18 @@ tapestry, recoloured in code: the whole griffin gold on a red field, David's cal
 pipeline/recolour.py, from round 3's keyed drawing (assets/sources/tapestry-round3-keyed.png): the blue-green field
 takes a dark faded red, kept dark because a woven picture needs a dark ground, and the lion half takes the eagle
 half's gold. Every line and wash is round 3's. The mended patch is now red too. No round was spent.
+fireplace, round 2: the castle mason's, designed with David one question at a time. A flattened Tudor arch over
+an opening 1.8 m wide and 1.4 high, moulded, in a square-headed frame with plain spandrels; a bare shelf at 1.9 m, one
+slab on a stepped bed-moulding, so curios can come later as their own layers; two low courses of small stones under a
+cap at 2.5 m. Drawn from an elevation plan made in code (pipeline/joint_plan.py fireplace), followed at nearly every
+line, the opening left empty green. Round 1 was 3.0 m tall with three courses of the wall's big blocks above the shelf;
+David found the stone over the fire too tall and blocky, and its top 6 cm under the tapestry's corner. Keyed at 1200 x
+1000, 400 px per metre, 6.4 MB on the GPU; pick dropped round 1's specks (min_island_px). The drawing stands at z -4.9,
+the greybox's front face, 60 cm proud of the wall, with a firebox in code behind its opening (sooty back, sides and
+throat), thin stone returns to the wall and a hearthstone slab; it casts no shadow, so the fire's light is not blocked.
+Tint 0x855839, warm: the wall takes the fire's glow and the surround, standing in front of that light, does not, so a
+grey tint left it pale and cold against the wall. The tapestry and paintings stay at their heights; a 35 cm raise was
+tried and undone once the fireplace came down to 2.5 m.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -692,17 +704,33 @@ wall.receiveShadow = true;
 wall.castShadow = false;
 scene.add(wall); register(wall, 0);
 
-/* fireplace, built in 3D because it is part of the wall */
+/* fireplace: the mason's drawn surround, 3.0 m wide and 2.5 m tall, stands 60 cm proud of the wall at z -4.9, where the
+   greybox's front face was, with its opening keyed out (LAYERS 'fireplace'). Behind the opening
+   is a firebox built in code, a sooty back, sides and throat sized to the drawn opening, 1.8 m wide
+   and 1.4 m to the arch's crown; thin stone returns run from the surround back to the wall, seen
+   only on a drag; the hearthstone, in the floor's stone, runs from the firebox's back to 0.9 m in
+   front of the surround. The placeholder is a grey square with the opening cut out of it, so the
+   fire still shows if the drawing never arrives (LDP-79). */
 var fp = new THREE.Group();
 fp.position.set(0, 0, -5.5);
 scene.add(fp);
-var stone = solid(0x807c76);
-var hearthBack = box(fp, 1.8, 2.3, 0.12, 0, 1.15, 0.06, solid(0x1c1a18, { roughness: 1 }), 0);
-box(fp, 0.55, 2.2, 0.7, -0.95, 1.1, 0.35, stone, 0);
-box(fp, 0.55, 2.2, 0.7, 0.95, 1.1, 0.35, stone, 0);
-box(fp, 2.45, 0.5, 0.7, 0, 2.45, 0.35, stone, 0);
-box(fp, 2.9, 0.16, 0.85, 0, 2.78, 0.42, stone, 0);
-box(fp, 2.6, 0.08, 1.2, 0, 0.04, 0.9, solid(0x5e5b57), 0);
+var soot = solid(0x1c1a18, { roughness: 1 });
+var hearthBack = box(fp, 1.9, 1.5, 0.08, 0, 0.75, 0.04, soot, 0);
+box(fp, 0.08, 1.5, 0.6, -0.94, 0.75, 0.3, soot, 0);
+box(fp, 0.08, 1.5, 0.6, 0.94, 0.75, 0.3, soot, 0);
+box(fp, 1.9, 0.08, 0.6, 0, 1.46, 0.3, soot, 0);
+var returnStone = solid(0x807a70);
+box(fp, 0.08, 2.5, 0.55, -1.3, 1.25, 0.3, returnStone, 0);
+box(fp, 0.08, 2.5, 0.55, 1.3, 1.25, 0.3, returnStone, 0);
+box(fp, 3.0, 0.06, 1.5, 0, 0.03, 0.75, solid(0x5f594f), 0);
+var fireplace = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 2.5), new THREE.MeshStandardMaterial({
+  map: cutoutTexture(300, 250, '#807c76', function (g, w, h) {
+    g.fillRect(0, 0, w, h); g.clearRect(w * 0.2, h * (1 - 1.4 / 2.5), w * 0.6, h * 1.4 / 2.5);
+  }), roughness: 0.95, metalness: 0, alphaTest: 0.5 }));
+fireplace.position.set(0, 1.25, -4.9);
+fireplace.receiveShadow = true;
+fireplace.name = 'fireplace';
+scene.add(fireplace); register(fireplace, 0);
 var logMat = solid(0x3a2f28, { roughness: 1 });
 var log1 = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.9, 10), logMat);
 log1.rotation.z = Math.PI / 2; log1.position.set(0, 0.2, 0.3); log1.castShadow = true; fp.add(log1); register(log1, 0);
@@ -1328,6 +1356,9 @@ var LAYERS = {
      drawing is lit like the paintings, so the firelight catches lead and stone */
   'window-left': { url: '../assets/layers/window-left.png', w: 1.2, pivot: 'centre', window: true },
   'window-right': { url: '../assets/layers/window-right.png', w: 1.2, pivot: 'centre', window: true },
+  /* the mason's fireplace, keyed, its opening empty so the firebox and fire in code show through;
+     tinted to the wall's value, the drawing having come back a little darker than the wall's */
+  'fireplace': { url: '../assets/layers/fireplace.png', w: 3.0, pivot: 'centre', tint: 0x855839 },
   /* a surface is opaque and lies under everything: its image replaces the placeholder's flat colour.
      The floor is drawn as a plan; with the circle laid flat, the image's top edge is the hearth side */
   'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999,
@@ -1410,6 +1441,8 @@ function applyLayer(id, entry) {
       if (sky) { sky.geometry.dispose(); sky.geometry = new THREE.PlaneGeometry(entry.w * 0.8, h * 0.88); }
     }
     mesh.material.map = t; mesh.material.needsUpdate = true;
+    /* a drawing's value set in code, as a surface's is: the model ignores a colour asked for */
+    if (entry.tint) { mesh.material.color.set(entry.tint); mesh.userData.base = mesh.material.color.clone(); }
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
     mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
   };
