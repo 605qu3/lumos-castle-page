@@ -427,6 +427,10 @@ torch outward; he chose round 2. Drawn from a little to the left, about a third 
 as the hole sees the far wall; unlit, with the fire's own flame sprite on its head. Placed by tracing sight lines through
 the open hole: its head at 0.95 m along and 1.3 m up the corridor's far wall shows at the default view and a drag left.
 Keyed at 140 x 273 px, 400 px per metre, about 0.2 MB on the GPU. Two candidates, about 26 cents.
+fire, calmed, 7 October 2026: David saw the fire glitch and smoke as if always being stoked. Measured against the page as
+of that morning, nothing had changed; the look was older. Six flame sprites each swung in opacity between 0.5 and 0.9 on
+their own quick beat, so the outer ones strobed out of step, and the two deepest, orange-red at low opacity, read as brown
+smoke at exposure 1.0. The swing is now 0.62 to 0.8 at under a third of the speed, and those two are lifted toward orange.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -803,7 +807,7 @@ log2.rotation.z = Math.PI / 2; log2.rotation.y = 0.5; log2.position.set(0.05, 0.
 /* flames and embers */
 var flameTex = flameTexture();
 var flames = [];
-var flameSpecs = [[0, 0.75, 0.9, 1.3, 0xffffff], [-0.22, 0.62, 0.7, 1.0, 0xffc478], [0.24, 0.6, 0.65, 0.95, 0xffb060], [-0.08, 0.7, 0.55, 1.1, 0xff8a38], [0.12, 0.55, 0.5, 0.8, 0xff7a2a], [0, 0.95, 0.45, 0.9, 0xffd9a0]];
+var flameSpecs = [[0, 0.75, 0.9, 1.3, 0xffffff], [-0.22, 0.62, 0.7, 1.0, 0xffc478], [0.24, 0.6, 0.65, 0.95, 0xffb060], [-0.08, 0.7, 0.55, 1.1, 0xffa04a], [0.12, 0.55, 0.5, 0.8, 0xff9640], [0, 0.95, 0.45, 0.9, 0xffd9a0]];
 for (var fi = 0; fi < flameSpecs.length; fi++) {
   var fs = flameSpecs[fi];
   var sm = new THREE.SpriteMaterial({ map: flameTex, color: col(fs[4]), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false });
@@ -2508,7 +2512,8 @@ function updateFire(dt, t) {
     var fl = flames[i], ph = fl.ph;
     fl.sprite.scale.set(fl.w * grow * (1 + 0.12 * Math.sin(t * 9.1 + ph)), fl.h * grow * (1 + 0.25 * Math.sin(t * 6.3 + ph * 1.7)), 1);
     fl.sprite.position.y = fl.y + 0.06 * Math.sin(t * 4.2 + ph) + 0.15 * s;
-    fl.sprite.material.opacity = 0.5 + 0.4 * (0.5 + 0.5 * Math.sin(t * 11 + ph * 2.1));
+    /* a gentle, slow flicker: a faster, wider swing made the outer sprites strobe in and out of step (David, 7 October 2026) */
+    fl.sprite.material.opacity = 0.62 + 0.18 * (0.5 + 0.5 * Math.sin(t * 3.1 + ph * 2.1));
   }
   spawnAcc += 10 * (1 + 4 * s) * dt + emberBurst;
   emberBurst = 0;
