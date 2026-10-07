@@ -1551,7 +1551,10 @@ var LAYERS = {
   /* the wall wraps the visible arc. The cylinder runs its image right to left as seen from inside, so it is
      mirrored back, left end at the viewer's left. quiet softens the band everything stands against: below
      `below` metres of the wall's `height` the drawing is blended with a blurred copy of itself by `amount` */
+  /* unstain tones down the wash's water stains, worst over the right of the fireplace (David, open item 29): stone
+     darker than the wall's average, measured over `cell` px, is lifted toward it by `strength`, the joints untouched */
   'wall': { url: '../assets/layers/wall.jpg', surface: true, tint: 0xbfbfbf, mirror: true,
+    unstain: { cell: 8, strength: 1 },
     quiet: { below: 2.5, height: 7, amount: 0.5, all: 0.15 } },
   /* a cutout lying flat on the floor, drawn as a plan: the image's top edge toward the hearth */
   'rug': { url: '../assets/layers/rug.png', w: 5.7, plan: true, tint: 0x999999 },
@@ -1650,7 +1653,8 @@ function applySurface(id, entry) {
   if (!mesh) return;
   var im = new Image();
   im.onload = function () {
-    var src = entry.quiet ? quietCanvas(im, entry.quiet) : im;
+    var src = entry.unstain ? unstainCanvas(im, entry.unstain) : im;
+    src = entry.quiet ? quietCanvas(src, entry.quiet) : src;
     var t = tex(entry.wear ? wornCanvas(src, entry.wear, mesh) : src);
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();
     if (entry.mirror) { t.wrapS = THREE.RepeatWrapping; t.repeat.x = -1; t.offset.x = 1; }
@@ -1705,6 +1709,46 @@ function quietCanvas(im, q) {
   grd.addColorStop(1, rgba(q.amount));
   g.fillStyle = grd;
   g.fillRect(0, 0, W, H);
+  return c;
+}
+
+/* Unstain lifts the wash's water stains without flattening the drawing. The stone's brightness is averaged over
+   cells of `cell` px, the black pen joints left out (anything under 90 of 255), and read back between cell centres
+   so no cell edge shows. Wherever that average is darker than the whole wall's, the pixel is lifted by the ratio to
+   the power `strength`, at most 1.8 times; nothing is ever darkened. The cells are small enough that a stain's
+   tide-mark edge stays a crisp edge, only paler. Averaged by hand rather than by scaling a canvas down, since how
+   far a browser averages when it shrinks an image is its own affair. */
+function unstainCanvas(im, u) {
+  var W = im.width, H = im.height, n = u.cell;
+  var c = makeCanvas(W, H), g = c.getContext('2d');
+  g.drawImage(im, 0, 0);
+  var img = g.getImageData(0, 0, W, H), d = img.data;
+  var cw = Math.ceil(W / n), ch = Math.ceil(H / n);
+  var sum = new Float32Array(cw * ch), cnt = new Uint32Array(cw * ch), all = 0, allN = 0;
+  for (var y = 0; y < H; y++) {
+    var row = ((y / n) | 0) * cw;
+    for (var x = 0; x < W; x++) {
+      var i = (y * W + x) * 4, l = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+      if (l < 90) continue;
+      var k = row + ((x / n) | 0);
+      sum[k] += l; cnt[k]++; all += l; allN++;
+    }
+  }
+  var mean = all / allN;
+  for (var k = 0; k < sum.length; k++) sum[k] = cnt[k] ? sum[k] / cnt[k] : mean;
+  for (var y = 0; y < H; y++) {
+    var fy = Math.min(Math.max(y / n - 0.5, 0), ch - 1), y0 = fy | 0, y1 = Math.min(y0 + 1, ch - 1), ty = fy - y0;
+    for (var x = 0; x < W; x++) {
+      var fx = Math.min(Math.max(x / n - 0.5, 0), cw - 1), x0 = fx | 0, x1 = Math.min(x0 + 1, cw - 1), tx = fx - x0;
+      var a = sum[y0 * cw + x0] + (sum[y0 * cw + x1] - sum[y0 * cw + x0]) * tx;
+      var b = sum[y1 * cw + x0] + (sum[y1 * cw + x1] - sum[y1 * cw + x0]) * tx;
+      var low = a + (b - a) * ty;
+      if (low >= mean) continue;
+      var gain = Math.pow(Math.min(mean / low, 1.8), u.strength), i = (y * W + x) * 4;
+      d[i] = Math.min(255, d[i] * gain); d[i + 1] = Math.min(255, d[i + 1] * gain); d[i + 2] = Math.min(255, d[i + 2] * gain);
+    }
+  }
+  g.putImageData(img, 0, 0);
   return c;
 }
 
