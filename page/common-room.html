@@ -347,6 +347,12 @@ prompt asks for joints as fine as the armchair's finest, and dark ink fell from 
 In code: quieted toward its own average colour, 15 percent overall and 50 below 2.5 m where everything stands
 against it (a blurred copy was tried first and left smudges), and darkened, tint 75 percent, a step lighter than
 the floor at David's call. No openings are drawn: the windows, the portrait hole and the hearth lie over it.
+chairs, turned to the fire: both drawn chairs are seen from behind at three-quarters, and each faced away from the
+hearth, the armchair toward the portrait hole and the wingback, out of frame at x 1.85, z 4.8, toward the right
+wall. Both are now mirrored (mirror: true, which flips the texture and so the shadow with it), and the wingback
+stands at x 3.1, z -0.6, the right armchair's old place, so the two flank the fire as a pair, at David's call. The
+wingback no longer frames the bottom right and now casts a shadow like the other chairs. The right armchair and the
+floor cushion are dropped, also David's call: the wingback is the right-hand fireside chair.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -497,7 +503,6 @@ function drawSideTable(g, w, h) {
   g.fillRect(w * 0.30, h * 0.22, w * 0.40, h * 0.06);
   g.fillRect(w * 0.24, h * 0.14, w * 0.46, h * 0.06);
 }
-function drawCushion(g, w, h) { rr(g, w * 0.04, h * 0.25, w * 0.92, h * 0.75, h * 0.35); }
 function drawStairs(g, w, h) {
   var col = w * 0.14;
   g.fillRect(w * 0.5 - col / 2, 0, col, h);
@@ -1297,22 +1302,19 @@ scene.add(corridorLight);
 var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, 2.3, -3.7, 1);
 var stairs = cutout(cutoutTexture(192, 768, '#aaa7a1', drawStairs, 'stairs'), 1.4, 5.6, 4.7, -0.8, 1);
 var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, -1.9, -1.9, 2);
-var chairR = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, 3.1, -0.6, 2);
 var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 0.9, 0.8, 0.9, -1.2, 2);
 var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, -3.0, 0.6, 3);
-var cushion = cutout(cutoutTexture(256, 112, '#b9b6b0', drawCushion, 'cushion'), 0.8, 0.35, 2.6, 0.3, 3);
-var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.85, 4.8, 4);
-wingback.castShadow = false;
-sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left'; chairR.name = 'armchair-right';
-table.name = 'table'; sideTable.name = 'side-table'; cushion.name = 'cushion'; wingback.name = 'wingback';
+var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 3.1, -0.6, 2);
+sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
+table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
 
 /* ---------- drawn layers, per the layer spec ----------
    An entry with a url replaces its grey placeholder on load; width in metres, height follows the image.
    Floor-standing layers pivot at bottom centre. The placeholder stays if the image never arrives (LDP-79). */
 var LAYERS = {
-  'armchair-left': { url: '../assets/layers/armchair-left.png', w: 1.05, sink: 0.067 },
+  'armchair-left': { url: '../assets/layers/armchair-left.png', w: 1.05, sink: 0.067, mirror: true },
   'sofa': { url: '../assets/layers/sofa.png', w: 1.7, sink: 0.068 },
-  'wingback': { url: '../assets/layers/wingback.png', w: 1.1, sink: 0.065 },
+  'wingback': { url: '../assets/layers/wingback.png', w: 1.1, sink: 0.065, mirror: true },
   /* wall-hung: pivots at its centre, which stays where onWall put it */
   'tapestry': { url: '../assets/layers/tapestry.png', w: 1.44, pivot: 'centre', flutter: true },
   /* the two paintings are composed on their own canvas so a sitter can be drawn into them */
@@ -1377,6 +1379,9 @@ function applyLayer(id, entry) {
   im.onload = function () {
     var t = tex(im);
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    /* a chair drawn from behind faces whichever way it was drawn; mirror turns it
+       to face the fire. The shadow materials share the map, so the shadow turns too */
+    if (entry.mirror) { t.wrapS = THREE.RepeatWrapping; t.repeat.x = -1; t.offset.x = 1; }
     var h = entry.w * im.height / im.width;
     mesh.geometry.dispose();
     mesh.geometry = entry.flutter ? new THREE.PlaneGeometry(entry.w, h, 12, 24) : new THREE.PlaneGeometry(entry.w, h);
