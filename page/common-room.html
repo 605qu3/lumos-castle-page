@@ -391,6 +391,14 @@ stairs, shadow off, 7 October 2026: David saw a spiral-shaped shadow on the lit 
 front-right wall, near its end, takes the fire's spotlight, and the card, turned to the camera, showed the fire its flat
 face and threw a hard black spiral there that no round stair would cast. Off by David's choice, as the fireplace's
 is. The black stretch between the newel and that wall is unlit stone, beyond the fire glow's reach, and stays.
+portrait hole, greybox, 7 October 2026, each choice David's: the book's round hole (PS 7, "Neville needed a leg up"),
+1.2 m across with its sill at 0.6 m, through a wall 0.8 m thick, in place of the floor-level door. The wall's shader
+drops its pixels inside the circle and a tunnel lined from the wall's own texture runs out to the corridor face, so it
+costs no memory. The portrait hangs on the corridor side and swings away into the corridor, as it does for whoever
+stands outside, so its painted front is never seen; it is hinged on the camera's side, out of the line of sight once
+open. A far wall 2 m beyond, in the wall's stone, and a grey torch stand-in lit by the warm light that was already
+there, now flickering. Still to draw: the portrait's back (a framer), a voussoir ring round the mouth (the mason) and
+the torch bracket, about 5 MB in all. Closed, a tap on the hole's mouth opens it; the stone round it does nothing.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -559,16 +567,12 @@ function drawWingback(g, w, h) {
   rr(g, w * 0.78, h * 0.28, w * 0.22, h * 0.5, w * 0.08);
   g.fillRect(w * 0.06, h * 0.68, w * 0.88, h * 0.32);
 }
-function drawDoor(g, w, h) {
-  g.fillStyle = '#6f665b'; arch(g, 0, 0, w, h);
-  g.fillStyle = '#857a6d'; arch(g, w * 0.06, w * 0.06, w * 0.88, h - w * 0.06);
-  g.strokeStyle = '#6a6156'; g.lineWidth = 3;
-  for (var i = 1; i < 5; i++) { g.beginPath(); g.moveTo(w * i / 5, h * 0.1); g.lineTo(w * i / 5, h); g.stroke(); }
-}
-function drawCorridor(g, w, h) {
-  var grd = g.createLinearGradient(0, 0, 0, h);
-  grd.addColorStop(0, '#5a4733'); grd.addColorStop(1, '#1c1613');
-  g.fillStyle = grd; arch(g, 0, 0, w, h);
+/* the portrait's back: canvas, the stretcher's outer bars and its cross */
+function drawPortraitBack(g, w, h) {
+  g.fillStyle = '#857a6d'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#6a6156'; var b = w * 0.07;
+  g.fillRect(0, 0, w, b); g.fillRect(0, h - b, w, b); g.fillRect(0, 0, b, h); g.fillRect(w - b, 0, b, h);
+  g.fillRect(w / 2 - b / 2, 0, b, h); g.fillRect(0, h / 2 - b / 2, w, b);
 }
 /* The sky alone, for the plane that stands behind a drawn window and shows
    through its glass; the moon is in the right-hand one, where the moon spot
@@ -1325,32 +1329,94 @@ function updatePapers(dt, t) {
 
 
 /* portrait hole (tap to swing open) */
-/* The panel is flat and the wall is round, so it is hung as a chord of the
-   wall: both edges at HINGE_R, a centimetre in front of the wall, and its
-   middle about 5 cm proud. Hung on the tangent at the hinge, as it was, one
-   edge stood 20 cm off the wall and the gap behind showed from every angle off
-   centre. A stopgap until the door is drawn with a stone reveal. */
-var DOOR_W = 1.3, DOOR_H = 2.3, DOOR_THETA = Math.PI + 0.85, HINGE_R = 5.59;
-var doorAngW = 2 * Math.asin(DOOR_W / 2 / HINGE_R);
-var corridor = new THREE.Mesh(new THREE.PlaneGeometry(DOOR_W, DOOR_H), new THREE.MeshBasicMaterial({ map: cutoutTexture(208, 368, '#000', drawCorridor), alphaTest: 0.5 }));
-var corridorMat = corridor.material;
-corridorMat.color.setScalar(0.25);
-onWall(corridor, DOOR_THETA, DOOR_H / 2, 5.58); register(corridor, 1);
-var doorOuter = new THREE.Group();
-/* hinge sits on the back-wall side of the opening; the panel runs toward the camera side along local -x and swings into the room */
-doorOuter.position.set(HINGE_R * Math.sin(DOOR_THETA - doorAngW / 2), 0, HINGE_R * Math.cos(DOOR_THETA - doorAngW / 2));
-doorOuter.lookAt(0, 0, 0);
-doorOuter.rotateY(doorAngW / 2);   /* from the tangent at the hinge onto the chord */
-scene.add(doorOuter);
+/* The book's round hole (PS 7: "a round hole in the wall ... Neville needed a leg up"), 1.2 m across with
+   its sill 0.6 m up, through a wall 0.8 m thick. The wall's shader drops its pixels inside the circle; a
+   stone-lined tunnel runs out to the corridor face, lined from a patch of the wall's own texture, so it
+   costs no memory. The portrait hangs on the corridor side, bigger than the hole, so from inside only a
+   disc of its back shows at the tunnel's end; it is hinged on the camera's side and swings away into the
+   corridor, as it does for whoever stands outside, opening on a far wall lit by a torch.
+   Local frame: x along the wall to the right as you face the hole from inside, y up, z into the room. */
+var HOLE_THETA = Math.PI + 0.85, HOLE_R = 0.6, HOLE_Y = 1.2, HOLE_DEPTH = 0.8, CORRIDOR_D = 2.0;
+var PORTRAIT_W = 1.4, PORTRAIT_H = 1.7;
+var holeN = new THREE.Vector3(Math.sin(HOLE_THETA), 0, Math.cos(HOLE_THETA));   /* outward */
+var holeC = holeN.clone().multiplyScalar(WALL_R).setY(HOLE_Y);
+var holeT = new THREE.Vector3(-holeN.z, 0, holeN.x);
+var holeFrame = new THREE.Group();
+holeFrame.matrix.makeBasis(holeT, new THREE.Vector3(0, 1, 0), holeN.clone().negate()).setPosition(holeC.x, 0, holeC.z);
+holeFrame.matrix.decompose(holeFrame.position, holeFrame.quaternion, holeFrame.scale);
+scene.add(holeFrame);
+wall.material.onBeforeCompile = function (sh) {
+  sh.uniforms.holeC = { value: holeC };
+  sh.uniforms.holeN = { value: holeN };
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;')
+    .replace('#include <project_vertex>', '#include <project_vertex>\nvHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;\nuniform vec3 holeC;\nuniform vec3 holeN;')
+    .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' +
+      '{ vec3 d = vHoleW - holeC; float a = dot(d, holeN); if (abs(a) < 0.1 && length(d - a * holeN) < ' + HOLE_R.toFixed(3) + ') discard; }');
+};
+/* the wall's texture spans the arc and its height: u over 1.16 pi of radius WALL_R, v up 7 m */
+var WALL_ARC = WALL_R * Math.PI * 1.16, holeU = (HOLE_THETA - Math.PI * 0.42) / (Math.PI * 1.16);
+function wallUV(along, up) { return [holeU + along / WALL_ARC, up / 7]; }
+var tunnelMat = solid(0x75726e, { side: THREE.BackSide });
+var corridorMat = solid(0x75726e);
+/* the tunnel: for each step round the circle, from where its line meets the round wall to the flat corridor face */
+(function () {
+  var SEG = 48, pos = [], uv = [], idx = [];
+  for (var i = 0; i <= SEG; i++) {
+    var f = i / SEG * Math.PI * 2, ox = HOLE_R * Math.cos(f), oy = HOLE_R * Math.sin(f);
+    var start = WALL_R - Math.sqrt(WALL_R * WALL_R - ox * ox) + 0.01;   /* in front of the round wall by a centimetre */
+    var arc = f * HOLE_R;
+    pos.push(ox, HOLE_Y + oy, start, ox, HOLE_Y + oy, -HOLE_DEPTH);
+    var a = wallUV(-start, arc), b = wallUV(HOLE_DEPTH, arc);
+    uv.push(a[0], a[1], b[0], b[1]);
+    if (i < SEG) { var k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  var tunnel = new THREE.Mesh(g, tunnelMat);
+  tunnel.receiveShadow = true;
+  holeFrame.add(tunnel); register(tunnel, 0);
+})();
+/* the corridor's far wall, 2 m beyond the portrait; nothing else of the corridor is ever on screen */
+var corridorWall = new THREE.Mesh(new THREE.PlaneGeometry(5, 3.2), corridorMat);
+(function () {
+  var u = corridorWall.geometry.attributes.uv, p = corridorWall.geometry.attributes.position;
+  for (var i = 0; i < u.count; i++) { var w = wallUV(p.getX(i) - 7, p.getY(i) + 1.6); u.setXY(i, w[0], w[1]); }
+})();
+corridorWall.position.set(0, 1.6, -HOLE_DEPTH - CORRIDOR_D);
+corridorWall.receiveShadow = true;
+holeFrame.add(corridorWall); register(corridorWall, 0);
+/* the torch, a grey stand-in on the far wall where the default view's line through the hole lands */
+var torch = new THREE.Group();
+torch.position.set(1.3, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.08);
+holeFrame.add(torch);
+box(torch, 0.08, 0.3, 0.12, 0, 0, -0.02, solid(0x2d2a27), 0);
+var torchFlame = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.2, 10), new THREE.MeshBasicMaterial({ color: col(0xffb050) }));
+torchFlame.position.set(0, 0.25, 0.04);
+torch.add(torchFlame);
+/* the portrait's back, a grey stand-in, hinged at its left edge just beyond the tunnel's end */
 var hinge = new THREE.Group();
-doorOuter.add(hinge);
-var panel = cutoutMesh(cutoutTexture(208, 368, '#000', drawDoor, 'portrait hole'), DOOR_W, DOOR_H);
-panel.position.set(-DOOR_W / 2, DOOR_H / 2, 0);
+hinge.position.set(-PORTRAIT_W / 2, 0, -HOLE_DEPTH - 0.01);
+holeFrame.add(hinge);
+var panel = cutoutMesh(cutoutTexture(232, 282, '#000', drawPortraitBack, 'portrait back'), PORTRAIT_W, PORTRAIT_H);
+panel.position.set(PORTRAIT_W / 2, HOLE_Y, 0);
 hinge.add(panel); register(panel, 1);
+/* what a tap hits: the hole's mouth, so tapping the stone round it does nothing */
+var holeTap = new THREE.Mesh(new THREE.CircleGeometry(HOLE_R, 32), new THREE.MeshBasicMaterial());
+holeTap.position.set(0, HOLE_Y, 0.02);
+holeTap.visible = false;
+holeFrame.add(holeTap);
 scene.updateMatrixWorld(true);
-var corridorLight = new THREE.PointLight(col(0xffc080), 0, 6, 1.0);
-corridorLight.position.copy(doorOuter.localToWorld(new THREE.Vector3(-DOOR_W / 2, 1.3, 0.35)));
+var corridorLight = new THREE.PointLight(col(0xffc080), 0, 5, 1.2);
+corridorLight.position.copy(holeFrame.localToWorld(new THREE.Vector3(1.3, 1.9, -HOLE_DEPTH - CORRIDOR_D + 0.5)));
 scene.add(corridorLight);
+/* the drawn wall reaches the tunnel and the corridor too: one texture, no second copy on the GPU */
+function shareWallStone(map, color) {
+  [tunnelMat, corridorMat].forEach(function (m) { m.map = map; m.color.copy(color); m.needsUpdate = true; });
+  layered.forEach(function (m) { if (m.material === tunnelMat || m.material === corridorMat) m.userData.base = color.clone(); });
+}
 
 /* furniture, back to front */
 var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, 2.3, -3.7, 1);
@@ -1510,6 +1576,7 @@ function applySurface(id, entry) {
     mesh.material.color.copy(col(entry.tint || 0xffffff));
     mesh.userData.base = mesh.material.color.clone();
     mesh.material.needsUpdate = true;
+    if (id === 'wall') shareWallStone(t, mesh.material.color);
   };
   im.src = entry.url;
 }
@@ -2121,7 +2188,7 @@ var yaw = 0, pitch = 0, yawT = 0, pitchT = 0;
 var YAW_MAX = 0.24, PITCH_MAX = 0.08;
 var raycaster = new THREE.Raycaster();
 var pointer = new THREE.Vector2();
-var tappables = [hearthBack, panel, catWalk, catSit].concat(boardParts);
+var tappables = [hearthBack, holeTap, catWalk, catSit].concat(boardParts);
 for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
 
 function startTween(fromPos, fromLook, toPos, toLook, dur, done) {
@@ -2195,7 +2262,7 @@ function tap(cx, cy) {
   if (mode !== 'room' || !hit) return;
   if (hit === hearthBack) stokeFire();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
-  else if (hit === panel) togglePortrait();
+  else if (hit === holeTap) togglePortrait();
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
 }
 
@@ -2414,9 +2481,9 @@ function updatePortrait(dt) {
   var s = Math.min(1, dt * 4);
   portrait.ang = lerp(portrait.ang, portrait.target, s);
   hinge.rotation.y = portrait.ang;
-  var k = portrait.ang / DOOR_OPEN;
-  corridorLight.intensity = 1.8 * k;
-  corridorMat.color.setScalar(0.25 + 0.75 * k);
+  var k = portrait.ang / DOOR_OPEN, clockT = performance.now() / 1000;
+  corridorLight.intensity = 1.8 * k * (0.85 + 0.15 * Math.sin(clockT * 11) * Math.sin(clockT * 4.3));
+  torchFlame.scale.y = 0.85 + 0.2 * Math.abs(Math.sin(clockT * 9.1));
   if (portrait.open) {
     portrait.closeT -= dt;
     if (portrait.closeT <= 0) togglePortrait();
