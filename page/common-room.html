@@ -431,6 +431,12 @@ fire, calmed, 7 October 2026: David saw the fire glitch and smoke as if always b
 of that morning, nothing had changed; the look was older. Six flame sprites each swung in opacity between 0.5 and 0.9 on
 their own quick beat, so the outer ones strobed out of step, and the two deepest, orange-red at low opacity, read as brown
 smoke at exposure 1.0. The swing is now 0.62 to 0.8 at under a third of the speed, and those two are lifted toward orange.
+fire, two faults found, 7 October 2026: David took a shot with Layers on and saw a rectangle with hatching in the
+firebox. Read from the raw pixels: the firebox's soot back stepped one brightness level every 7 px under the fire glow's
+falloff, which showed as stripes, so the soot is dithered; and each flame sprite's gradient was clipped to an oval while
+still a third of its strength, so every sprite had a hard oval edge (18 to 67 in one pixel) and six of them stacked read
+as glitching. The gradient is now drawn squashed into the oval and reaches nothing at its edge. Both were there before
+this session.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -671,15 +677,19 @@ function drawCatSit(g, w, h) {
   g.beginPath(); g.moveTo(w * 0.22, h * 0.90); g.quadraticCurveTo(w * 0.02, h * 0.96, w * 0.10, h * 0.72); g.stroke();
   g.fillRect(w * 0.16, h * 0.90, w * 0.68, h * 0.10);
 }
+/* the gradient is drawn squashed into the flame's oval and reaches nothing at its edge; drawn round and clipped to the
+   oval, as it was, it stopped at a third of its strength there, so every sprite showed a hard oval outline (David,
+   7 October 2026) */
 function flameTexture() {
-  var c = makeCanvas(128, 128), g = c.getContext('2d');
-  var grd = g.createRadialGradient(64, 88, 4, 64, 72, 62);
+  var c = makeCanvas(128, 128), g = c.getContext('2d'), k = 58 / 40;
+  g.setTransform(1, 0, 0, k, 0, 72 - 72 * k);
+  var grd = g.createRadialGradient(64, 72 + 16 / k, 3, 64, 72, 40);
   grd.addColorStop(0, 'rgba(255,255,230,1)');
   grd.addColorStop(0.25, 'rgba(255,200,110,0.9)');
   grd.addColorStop(0.55, 'rgba(255,110,30,0.45)');
   grd.addColorStop(1, 'rgba(255,60,0,0)');
   g.fillStyle = grd;
-  g.beginPath(); g.ellipse(64, 72, 40, 58, 0, 0, Math.PI * 2); g.fill();
+  g.fillRect(0, 0, 128, 128 / k + 72);
   return tex(c);
 }
 function dotTexture() {
@@ -781,7 +791,8 @@ scene.add(wall); register(wall, 0);
 var fp = new THREE.Group();
 fp.position.set(0, 0, -5.5);
 scene.add(fp);
-var soot = solid(0x1c1a18, { roughness: 1 });
+/* dithered: the fire glow's falloff across near-black soot stepped one level at a time and showed as stripes */
+var soot = solid(0x1c1a18, { roughness: 1, dithering: true });
 var hearthBack = box(fp, 1.9, 1.5, 0.08, 0, 0.75, 0.04, soot, 0);
 box(fp, 0.08, 1.5, 0.6, -0.94, 0.75, 0.3, soot, 0);
 box(fp, 0.08, 1.5, 0.6, 0.94, 0.75, 0.3, soot, 0);
