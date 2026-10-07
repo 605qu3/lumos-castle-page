@@ -409,6 +409,17 @@ stretcher with corner keys and a cross brace, browned linen, two black strap hin
 on the bottom rail, and a folded blank crib wedged behind the cross brace, a nod to Neville writing the passwords
 down (PA 13). Drawn from a plan made in code (pipeline/joint_plan.py portrait-back), followed line for line; passed
 all nine checks. Keyed at 560 x 680 px, 400 px per metre, about 2 MB on the GPU. One candidate, about 13 cents.
+portrait-hole-ring, round 2: the castle mason's ring round the hole's mouth, designed with David one question at a time:
+1.7 m across, a band 25 cm broad, twelve equal wedge stones and one long sill stone across the bottom, no keystone and
+no moulding. Drawn from a plan made in code (pipeline/joint_plan.py portrait-ring). Round 1 drew a hatched inner face in
+every stone, as if seen in depth, which shrank the opening, and left gaps between the stones; round 2 edited both out,
+the gaps closing to small notches at the outer edge, which show the wall behind and read as mortar. The square-on check
+failed both rounds at about 4 degrees, misreading a circle's sides. Bent to the round wall a centimetre proud (bend),
+its inner edge overlapping the cut by 2 cm. The fireplace's tint came out orange on it; tint 0x483426, set from the wall
+beside it, a step lighter. David asked for the sill worn by boys sliding through on their backsides: done in code
+(sill), the bottom rubbed smooth and pale and its joints worn away, heaviest at the bottom centre and fading 70 degrees
+up each side, the tint applied in the canvas so the wear is not capped at the tint's value. Keyed at 680 x 680 px,
+400 px per metre, about 2.4 MB on the GPU. Two candidates, about 26 cents.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -576,6 +587,10 @@ function drawWingback(g, w, h) {
   rr(g, 0, h * 0.28, w * 0.22, h * 0.5, w * 0.08);
   rr(g, w * 0.78, h * 0.28, w * 0.22, h * 0.5, w * 0.08);
   g.fillRect(w * 0.06, h * 0.68, w * 0.88, h * 0.32);
+}
+/* the ring's placeholder: a grey band round the hole, its middle clear */
+function drawRing(g, w, h) {
+  g.fillStyle = '#857a6d'; g.beginPath(); g.arc(w / 2, h / 2, w / 2, 0, Math.PI * 2); g.arc(w / 2, h / 2, w * 0.58 / 1.7, 0, Math.PI * 2, true); g.fill();
 }
 /* the portrait's back: canvas, the stretcher's outer bars and its cross */
 function drawPortraitBack(g, w, h) {
@@ -1416,6 +1431,20 @@ var panel = cutoutMesh(cutoutTexture(232, 282, '#000', drawPortraitBack, 'portra
 panel.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
 panel.name = 'portrait-hole-panel';
 hinge.add(panel); register(panel, 1);
+/* the mason's ring round the mouth, 1.7 m across, bent to follow the round wall a centimetre proud; its drawn
+   inner edge overlaps the cut by 2 cm. The placeholder is a grey ring, and the cut edge shows if neither loads */
+function bentPlane(w, h) {
+  var g = new THREE.PlaneGeometry(w, h, 24, 1), p = g.attributes.position, r = WALL_R - 0.01;
+  for (var i = 0; i < p.count; i++) { var f = p.getX(i) / r; p.setXYZ(i, r * Math.sin(f), p.getY(i), WALL_R - r * Math.cos(f)); }
+  g.computeVertexNormals();
+  return g;
+}
+var ring = cutoutMesh(cutoutTexture(256, 256, '#000', drawRing), 1.7, 1.7);
+ring.geometry.dispose(); ring.geometry = bentPlane(1.7, 1.7);
+ring.position.set(0, HOLE_Y, 0);
+ring.castShadow = false;
+ring.name = 'portrait-hole-ring';
+holeFrame.add(ring); register(ring, 0);
 /* what a tap hits: the hole's mouth, so tapping the stone round it does nothing */
 var holeTap = new THREE.Mesh(new THREE.CircleGeometry(HOLE_R, 32), new THREE.MeshBasicMaterial());
 holeTap.position.set(0, HOLE_Y, 0.02);
@@ -1469,6 +1498,9 @@ var LAYERS = {
     tint: 0x855839 },
   /* the framer's back of the Fat Lady's portrait, at the far end of the hole's tunnel; drawn from a plan made in code */
   'portrait-hole-panel': { url: '../assets/layers/portrait-hole-panel.png', w: 1.4, pivot: 'centre' },
+  /* the mason's ring round the hole's mouth, bent to the round wall; tinted from the wall beside it, a step lighter */
+  'portrait-hole-ring': { url: '../assets/layers/portrait-hole-ring.png', w: 1.7, pivot: 'centre', bend: true, tint: 0x483426,
+    sill: { spread: 70, inner: 0.58, outer: 0.85, smooth: 1.0, strength: 0.85, pale: 1.9 } },
   /* a surface is opaque and lies under everything: its image replaces the placeholder's flat colour.
      The floor is drawn as a plan; with the circle laid flat, the image's top edge is the hearth side */
   'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999,
@@ -1522,14 +1554,14 @@ function applyLayer(id, entry) {
   if (!mesh || !entry.url) return;
   var im = new Image();
   im.onload = function () {
-    var t = tex(im);
+    var t = tex(entry.sill ? sillCanvas(im, entry.sill, entry.w, entry.tint) : im);
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();
     /* a chair drawn from behind faces whichever way it was drawn; mirror turns it
        to face the fire. The shadow materials share the map, so the shadow turns too */
     if (entry.mirror) { t.wrapS = THREE.RepeatWrapping; t.repeat.x = -1; t.offset.x = 1; }
     var h = entry.w * im.height / im.width;
     mesh.geometry.dispose();
-    mesh.geometry = entry.flutter ? new THREE.PlaneGeometry(entry.w, h, 12, 24) : new THREE.PlaneGeometry(entry.w, h);
+    mesh.geometry = entry.flutter ? new THREE.PlaneGeometry(entry.w, h, 12, 24) : entry.bend ? bentPlane(entry.w, h) : new THREE.PlaneGeometry(entry.w, h);
     if (entry.flutter) mesh.geometry.userData.base = Float32Array.from(mesh.geometry.attributes.position.array);
     /* A floor piece drawn from a little above has its back feet higher in the
        image than its front ones, so standing it on its lowest pixel leaves the
@@ -1553,7 +1585,7 @@ function applyLayer(id, entry) {
     }
     mesh.material.map = t; mesh.material.needsUpdate = true;
     /* a drawing's value set in code, as a surface's is: the model ignores a colour asked for */
-    if (entry.tint) { mesh.material.color.set(entry.tint); mesh.userData.base = mesh.material.color.clone(); }
+    if (entry.tint && !entry.sill) { mesh.material.color.set(entry.tint); mesh.userData.base = mesh.material.color.clone(); }
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
     mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
   };
@@ -1640,6 +1672,43 @@ function quietCanvas(im, q) {
   return c;
 }
 
+/* The portrait hole's sill, worn by centuries of boys sliding over it on their backsides: the bottom of the ring is
+   rubbed smooth and pale, heaviest at the bottom centre on the inner lip, fading up the sides over `spread` degrees and
+   toward the outer edge. Smooth is a blend toward a softened copy (scaled down and back up, which every browser does,
+   where the canvas filter is not safe on older iPads), so the hatching and the wash's mottle are rubbed away; then
+   drawn toward a paler, greyer stone by `strength`, since the plate shows wear as worn colour and never as gloss.
+   The layer's tint is applied here rather than on the material, which would cap the worn stone at the tint's value. */
+function sillCanvas(im, sill, w, tint) {
+  /* the material's tint multiplies in linear light and the drawing is sRGB, so in the canvas it is its 1/2.2 power */
+  var tr = Math.pow((tint >> 16 & 255) / 255, 1 / 2.2), tg = Math.pow((tint >> 8 & 255) / 255, 1 / 2.2),
+    tb = Math.pow((tint & 255) / 255, 1 / 2.2), tc = [tr, tg, tb];
+  var pale = [255 * tr * sill.pale, 255 * tg * sill.pale, 255 * tb * sill.pale];
+  var W = im.width, H = im.height, c = makeCanvas(W, H), g = c.getContext('2d');
+  g.drawImage(im, 0, 0);
+  var sm = makeCanvas(W, H), sg = sm.getContext('2d'), k = 10;
+  var tiny = makeCanvas(Math.ceil(W / k), Math.ceil(H / k));
+  tiny.getContext('2d').drawImage(im, 0, 0, tiny.width, tiny.height);
+  sg.imageSmoothingEnabled = true; sg.drawImage(tiny, 0, 0, W, H);
+  var a = g.getImageData(0, 0, W, H), b = sg.getImageData(0, 0, W, H), A = a.data, B = b.data, m = w / W;
+  for (var y = 0; y < H; y++) for (var x = 0; x < W; x++) {
+    var i = (y * W + x) * 4;
+    if (A[i + 3] === 0) continue;
+    for (var q = 0; q < 3; q++) { A[i + q] *= tc[q]; B[i + q] *= tc[q]; }
+    var dx = (x - W / 2) * m, dy = (y - H / 2) * m, r = Math.hypot(dx, dy);
+    var d = Math.abs(Math.atan2(dx, dy)) * 180 / Math.PI / sill.spread;       /* 0 at the bottom centre */
+    if (d >= 1) continue;
+    var ang = (1 - d * d) * (1 - d * d), t = Math.min(1, Math.max(0, (r - sill.inner) / (sill.outer - sill.inner)));
+    var wgt = ang * (1 - 0.7 * t * t);
+    for (var ch = 0; ch < 3; ch++) {
+      var v = A[i + ch] + (B[i + ch] - A[i + ch]) * wgt * sill.smooth;
+      A[i + ch] = v + (Math.min(255, pale[ch]) - v) * wgt * sill.strength;
+    }
+    var lum = 0.3 * A[i] + 0.59 * A[i + 1] + 0.11 * A[i + 2];
+    for (ch = 0; ch < 3; ch++) A[i + ch] += (lum - A[i + ch]) * wgt * 0.3;
+  }
+  g.putImageData(a, 0, 0);
+  return c;
+}
 function wornCanvas(im, wear, mesh) {
   var W = im.width, H = im.height, R = mesh.geometry.parameters.radius;
   var c = makeCanvas(W, H), g = c.getContext('2d');
