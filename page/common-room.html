@@ -321,7 +321,11 @@ nearly 3 m long; round 3 was given the layout as a joint plan drawn in code (pip
 but at fifteen rows still stood the armchair on a single flag, and its joints were doubled with pale rims and edge
 hatching. Round 4, at twenty rows with single joints, read as paper; round 5 restored the stone. The model ignores
 the colour asked for, so the floor is darkened in code, tint 60 percent. JPEG at 2048 x 2048 px, 180 px per metre
-against tier C's 200, accepted at 2K; 21 MB on the GPU. The worn path is still to come, in code.
+against tier C's 200, accepted at 2K; 21 MB on the GPU.
+floor, wear: laid in code over the drawing (wornCanvas), screened on as polish. The spec's path from the portrait
+hole to the fire was tried first and dropped: from the camera it is a 7 px sliver behind the side table. The wear
+is a patchy pale band along the rug's near edge instead, where everyone steps on and off, heaviest in front of the
+fire's centre and again by the armchair, nothing at either end; even all round, it read as a halo round the rug.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1297,7 +1301,15 @@ var LAYERS = {
   'window-right': { url: '../assets/layers/window-right.png', w: 1.2, pivot: 'centre', window: true },
   /* a surface is opaque and lies under everything: its image replaces the placeholder's flat colour.
      The floor is drawn as a plan; with the circle laid flat, the image's top edge is the hearth side */
-  'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999 },
+  'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999,
+    /* worn pale along the rug's near edge, where everyone steps on and off it; the band is centred 10 cm
+       outside the rug's edge so half of it runs under the rug. The spec's path from the portrait hole to the
+       fire was tried first and dropped: from the camera it is a 7 px sliver behind the side table.
+       Points are world x, z and how worn it is there, 0 to 1: patchy, as feet are, heaviest in front of the
+       fire's centre and again by the armchair, nothing at either end, so it reads as wear and not a halo.
+       width and strength are the band's in metres and its paleness where the weight is 1 */
+    wear: [{ path: [[2.66, -1.67, 0], [2.25, -1.19, 0.3], [1.68, -0.80, 0.6], [1.00, -0.53, 0.85], [0.26, -0.41, 1],
+      [-0.51, -0.43, 0.75], [-1.24, -0.61, 0.5], [-1.89, -0.91, 0.8], [-2.40, -1.34, 0]], width: 0.9, strength: 0.22 }] },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -1372,7 +1384,7 @@ function applySurface(id, entry) {
   if (!mesh) return;
   var im = new Image();
   im.onload = function () {
-    var t = tex(im);
+    var t = tex(entry.wear ? wornCanvas(im, entry.wear, mesh) : im);
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();
     mesh.material.map = t;
     /* tint darkens the drawing in place: the model ignores a hex asked for, so the floor's value is set here */
@@ -1381,6 +1393,44 @@ function applySurface(id, entry) {
     mesh.material.needsUpdate = true;
   };
   im.src = entry.url;
+}
+
+/* Wear is polish, so it lightens: soft discs laid along each path on a canvas of
+   their own, then screened over the drawing once, so overlaps cannot build up.
+   Discs rather than a blurred stroke, because a canvas blur filter is missing in
+   older iPad Safari. The floor circle maps world x, z to the image with its top
+   edge at the hearth (z = -R). */
+function wornCanvas(im, wear, mesh) {
+  var W = im.width, H = im.height, R = mesh.geometry.parameters.radius;
+  var c = makeCanvas(W, H), g = c.getContext('2d');
+  g.drawImage(im, 0, 0);
+  var m = makeCanvas(W, H), mg = m.getContext('2d');
+  function px(p) { return [(p[0] / R + 1) / 2 * W, (p[1] / R + 1) / 2 * H]; }
+  wear.forEach(function (w) {
+    var r = w.width / 2 / (2 * R) * W;
+    for (var i = 0; i < w.path.length - 1; i++) {
+      var a = px(w.path[i]), b = px(w.path[i + 1]);
+      var n = Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / (r * 0.25));
+      for (var k = 0; k <= n; k++) {
+        var f = k / n, x = a[0] + (b[0] - a[0]) * f, y = a[1] + (b[1] - a[1]) * f;
+        var wa = w.path[i][2], wb = w.path[i + 1][2];
+        var weight = wa === undefined ? 1 : wa + (wb - wa) * f;
+        var grd = mg.createRadialGradient(x, y, 0, x, y, r);
+        grd.addColorStop(0, 'rgba(255,255,255,' + weight.toFixed(3) + ')');
+        grd.addColorStop(1, 'rgba(255,255,255,0)');
+        mg.globalCompositeOperation = 'lighten';
+        mg.fillStyle = grd;
+        mg.fillRect(x - r, y - r, 2 * r, 2 * r);
+      }
+    }
+    g.globalCompositeOperation = 'screen';
+    g.globalAlpha = w.strength;
+    g.drawImage(m, 0, 0);
+    g.globalAlpha = 1;
+    g.globalCompositeOperation = 'source-over';
+    mg.clearRect(0, 0, W, H);
+  });
+  return c;
 }
 
 /* ---------- the portraits and their sitters ----------
