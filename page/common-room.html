@@ -313,6 +313,15 @@ was right but for a six-pointed star falling down to the left. Rounds 2 and 3 we
 drawing: a seven-pointed flat amber star whose tail ran over the ring, then every pane filled grey, which passed
 every check and led to the glass-empty check. Round 4, fresh again, named the star by count and place. Keyed at
 1226 x 2467 px, placed at 1.2 m wide and 2.41 m tall, lit like its pair, its sky plane carrying the moon.
+floor, round 5: the first surface, and the first tier C image. The castle mason's flags drawn as a plan, straight
+down, and laid on the floor circle with the image's top edge at the hearth: twenty rows of about 0.57 m across the
+room, flags of irregular length from about 0.6 to 1.25 m, each joint one pen line, every flag washed in its own shade
+of the reveals' grey-buff stone, no hatching. Rounds 1 and 2, described in prose, came back as brickwork with flags
+nearly 3 m long; round 3 was given the layout as a joint plan drawn in code (pipeline/floor_plan.py) and followed it,
+but at fifteen rows still stood the armchair on a single flag, and its joints were doubled with pale rims and edge
+hatching. Round 4, at twenty rows with single joints, read as paper; round 5 restored the stone. The model ignores
+the colour asked for, so the floor is darkened in code, tint 60 percent. JPEG at 2048 x 2048 px, 180 px per metre
+against tier C's 200, accepted at 2K; 21 MB on the GPU. The worn path is still to come, in code.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -624,6 +633,7 @@ var floor = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 48), solid(0x6
 floor.rotation.x = -Math.PI / 2;
 floor.receiveShadow = true;
 scene.add(floor); register(floor, 1);
+floor.name = 'floor';
 
 var rug = new THREE.Mesh(new THREE.CircleGeometry(2.1, 40), solid(0x55514e, { roughness: 1 }));
 rug.rotation.x = -Math.PI / 2;
@@ -1285,6 +1295,9 @@ var LAYERS = {
      drawing is lit like the paintings, so the firelight catches lead and stone */
   'window-left': { url: '../assets/layers/window-left.png', w: 1.2, pivot: 'centre', window: true },
   'window-right': { url: '../assets/layers/window-right.png', w: 1.2, pivot: 'centre', window: true },
+  /* a surface is opaque and lies under everything: its image replaces the placeholder's flat colour.
+     The floor is drawn as a plan; with the circle laid flat, the image's top edge is the hearth side */
+  'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999 },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -1348,6 +1361,24 @@ function applyLayer(id, entry) {
     mesh.material.map = t; mesh.material.needsUpdate = true;
     mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
     mesh.customDistanceMaterial = new THREE.MeshDistanceMaterial({ map: t, alphaTest: 0.5 });
+  };
+  im.src = entry.url;
+}
+
+/* A surface keeps its mesh and its place; only its material changes, from a flat
+   grey to the drawing, at full anisotropy because the floor is seen nearly edge on. */
+function applySurface(id, entry) {
+  var mesh = scene.getObjectByName(id);
+  if (!mesh) return;
+  var im = new Image();
+  im.onload = function () {
+    var t = tex(im);
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    mesh.material.map = t;
+    /* tint darkens the drawing in place: the model ignores a hex asked for, so the floor's value is set here */
+    mesh.material.color.copy(col(entry.tint || 0xffffff));
+    mesh.userData.base = mesh.material.color.clone();
+    mesh.material.needsUpdate = true;
   };
   im.src = entry.url;
 }
@@ -1792,6 +1823,7 @@ function placeSitters(spec) {
 for (var lid in LAYERS) {
   if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]);
   else if (LAYERS[lid].portrait) applyPortrait(lid, LAYERS[lid]);
+  else if (LAYERS[lid].surface) applySurface(lid, LAYERS[lid]);
   else applyLayer(lid, LAYERS[lid]);
 }
 loadSitterSheets();
