@@ -1,0 +1,23 @@
+{
+  "chain": "night",
+  "room": [
+    {"when": ["time = night"], "show": ["the fire low and warm, the room's main light, its glow reaching every corner",
+                                        "the real moon at its phase through the windows",
+                                        "both sitters asleep in their chairs",
+                                        "the cat asleep, curled by the hearth"]}
+  ],
+  "records": [
+    {
+      "id": "night.snore",
+      "tier": "fixed", "source": "date", "leans": ["night"],
+      "moment": "tap right portrait",
+      "when": ["time = night"],
+      "who": [
+        {"as": "sitter", "role": "trace", "what": "the right portrait's sitter, asleep", "mark": "right portrait"}
+      ],
+      "lines": [
+        {"speaker": "sitter", "medium": "heard", "key": "night.snore", "sound": "a soft snore, then a contented mumble"}
+      ]
+    }
+  ]
+}
