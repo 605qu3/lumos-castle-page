@@ -37,8 +37,10 @@
           "text": [
             "Oh, thank goodness. I've forgotten it again.",
             "I had it this morning, I know I did.",
-            "Do you know it? She won't let me in."
-          ]
+            "Do you know it? She won't let me in.",
+            "My Remembrall went red at breakfast. I think this is what I forgot."
+          ],
+          "canon": "PS 9, the Remembrall, verify"
         }
       ],
       "starts": [
@@ -56,8 +58,11 @@
               "then": "goes in ahead by the hole",
               "key": "neville.locked-out.thanks",
               "text": [
-                "Thanks! I'd forget my own head."
-              ]
+                "Thanks! I'd forget my own head. I'd end up like Nearly Headless Nick.",
+                "Brilliant! My Remembrall's been red all day. I think that was it.",
+                "You're a lifesaver. I'll write it on my hand next time."
+              ],
+              "canon": "PS 7, Nearly Headless Nick; PS 9, the Remembrall, verify"
             },
             {
               "speaker": "neville",
@@ -122,7 +127,9 @@
               "at": "board",
               "key": "neville.trouble.self",
               "text": [
-                "Detention was fine, honestly. McGonagall even said good morning. N."
+                "Detention was fine, honestly. McGonagall even said good morning. N.",
+                "All sorted! Only matches and needles. Fred says five points is barely worth getting up for. N.",
+                "Detention was only matches and needles. I wasn't even a little bit needled. N."
               ]
             }
           ]
@@ -156,8 +163,9 @@
           "medium": "said",
           "key": "neville.trouble.tell",
           "text": [
-            "Trevor got out in Transfiguration. He sat on McGonagall's desk. Five points and a detention. Everyone's going to know forever."
-          ]
+            "Trevor got out in Transfiguration and sat on McGonagall's desk. The one she turns into a pig. Five points and a detention. Everyone's going to know forever."
+          ],
+          "canon": "PS 8, the desk turned into a pig, verify"
         }
       ],
       "starts": [
@@ -229,8 +237,10 @@
           "text": [
             "It's only one detention, I suppose.",
             "Trevor did look pleased with himself up there.",
-            "At least it's warm in here."
-          ]
+            "At least it's warm in here.",
+            "At least I didn't melt a cauldron this time."
+          ],
+          "canon": "PS 8, Seamus's melted cauldron, verify"
         }
       ]
     },
@@ -305,8 +315,11 @@
           "pose": "sitting easier, looking at the fire",
           "key": "neville.trouble.laugh-sit",
           "text": [
-            "Trevor sat right on her inkpot, you know. Right on it."
-          ]
+            "Trevor sat right on her inkpot, you know. Right on it.",
+            "For a second I thought she'd turn him into a pig, like her desk.",
+            "Fred and George clapped. Then they lost ten points for clapping."
+          ],
+          "canon": "PS 8, the desk turned into a pig, verify"
         }
       ],
       "starts": [
@@ -358,8 +371,11 @@
           "pose": "sitting easier, looking at the fire",
           "key": "neville.trouble.box",
           "text": [
-            "Hello, you. Look what you did."
-          ]
+            "Hello, you. Look what you did.",
+            "You've been trouble since the boats, haven't you.",
+            "There you are. You're in so much trouble. Well, I am."
+          ],
+          "canon": "PS 7, Hagrid's \"Is this your toad?\" on the boats, verify"
         }
       ],
       "starts": [
@@ -411,7 +427,9 @@
           "pose": "sitting easier, looking at the fire",
           "key": "neville.trouble.laugh-box",
           "text": [
-            "You sat right on her inkpot, didn't you. Right on it."
+            "You sat right on her inkpot, didn't you. Right on it.",
+            "Inky feet. You've still got inky feet. Is that better or worse than stinky feet, I wonder.",
+            "Ten points from Trevor. That's what I'd say if I were a teacher."
           ]
         }
       ],
@@ -461,9 +479,11 @@
           "text": [
             "Longbottom. You left your scarf in my classroom. Good morning.",
             "Good morning, Longbottom. Your scarf, I believe.",
-            "Longbottom. Your scarf. Good morning to you."
+            "Longbottom. Your scarf. Good morning to you.",
+            "Good morning, Longbottom. Your scarf. And do keep the toad upstairs; I teach Transfiguration, not toads."
           ],
-          "then": "hands the scarf in and goes; the portrait swings shut"
+          "then": "hands the scarf in and goes; the portrait swings shut",
+          "canon": "PS 8, her dry wit (the pocket watch), verify"
         },
         {
           "speaker": "neville",
