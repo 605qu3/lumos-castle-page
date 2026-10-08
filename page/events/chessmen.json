@@ -1833,6 +1833,142 @@
       "show": [
         "the pieces say nothing this time"
       ]
+    },
+    {
+      "id": "chessmen.enemy-taunt",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess taken",
+      "when": [
+        "game = on",
+        "tide != losing"
+      ],
+      "one_of": "chess-taken",
+      "weight": 1,
+      "who": [
+        {
+          "as": "enemy",
+          "role": "trace",
+          "what": "the other side's pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "enemy",
+          "medium": "said",
+          "key": "chessmen.enemy.taunt",
+          "text": [
+            "Another one for the box! Mwahaha!",
+            "Too slow, too slow!",
+            "Boo, hiss, that's what YOU say. We say HA!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.enemy-check",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess checked",
+      "when": [
+        "game = on",
+        "tide != losing"
+      ],
+      "one_of": "chess-checked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "enemy",
+          "role": "trace",
+          "what": "the other side's pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "enemy",
+          "medium": "said",
+          "key": "chessmen.enemy.check",
+          "text": [
+            "Check! Feeling nervous, little king?",
+            "Check! Run along now!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.enemy-sulk",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "who": [
+        {
+          "as": "enemy",
+          "role": "trace",
+          "what": "the other side's pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "enemy",
+          "medium": "said",
+          "key": "chessmen.enemy.sulk",
+          "text": [
+            "Oi! That was my favourite pawn!",
+            "Not fair! I wasn't ready!",
+            "Hmph. Lucky.",
+            "We MEANT to do that."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.long-think",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "quiet 20-40 s",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chessmen.side.long-think",
+          "text": [
+            "Take your time. We're not going anywhere. We literally can't.",
+            "Thinking. Good. I'll just stand here, then.",
+            "Ooh, a long think. Something clever's coming."
+          ]
+        }
+      ]
     }
   ]
 }

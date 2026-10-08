@@ -62,7 +62,7 @@
         "game != on",
         "game != waiting",
         "game != showing",
-        "games < 5"
+        "games < 2"
       ],
       "who": [
         {
@@ -93,6 +93,48 @@
       ]
     },
     {
+      "id": "chess.start-warming",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess",
+      "when": [
+        "game != on",
+        "game != waiting",
+        "game != showing",
+        "games >= 2",
+        "games < 4"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "show": [
+        "the camera walks up to the board"
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.warming",
+          "text": [
+            "Back again? Fine. We'll give you a chance.",
+            "Right. Let's see what you can do this time.",
+            "We're starting to like you. Don't tell the bishops."
+          ]
+        }
+      ],
+      "starts": [
+        "set game = on"
+      ]
+    },
+    {
       "id": "chess.start-trusting",
       "tier": "fixed",
       "source": "device",
@@ -104,7 +146,7 @@
         "game != on",
         "game != waiting",
         "game != showing",
-        "games >= 5"
+        "games >= 4"
       ],
       "who": [
         {
