@@ -25,7 +25,7 @@
   #bar { position: absolute; left: 0; right: 0; bottom: 0; min-height: 64px; box-sizing: border-box; flex-wrap: wrap; padding: 8px 12px; display: flex; gap: 8px; align-items: center; justify-content: center; padding: 0 12px; }
   button { font: inherit; color: var(--fg); background: #2a241e; border: 1px solid #4a4036; border-radius: 10px; padding: 9px 14px; }
   button.sel { background: #6b3a24; }
-  @media (max-width: 640px) { :root { --barh: 120px; } button { padding: 8px 10px; } }
+  @media (max-width: 640px) { :root { --barh: 180px; } button { padding: 8px 10px; } }
   #state { color: var(--dim); min-width: 5em; text-align: center; }
 </style>
 </head>
@@ -35,6 +35,7 @@
     <img id="front" src="../assets/layers/portrait-hole-front.png?v=3" alt="">
     <img class="patch arm" id="reach" src="../assets/layers/portrait-hole-front-reach.png?v=3" alt="">
     <img class="patch arm" id="ear" src="../assets/layers/portrait-hole-front-ear.png?v=3" alt="">
+    <img class="patch arm" id="wave" src="../assets/layers/portrait-hole-front-wave.png?v=3" alt="">
     <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png?v=3" alt="">
     <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png?v=3" alt="">
     <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png?v=3" alt="">
@@ -50,6 +51,7 @@
   <button id="lastBtn">Last week's</button>
   <button id="earBtn">Can't hear</button>
   <button id="giveBtn">Giving in</button>
+  <button id="outBtn">Climbing out</button>
   <button id="zoom">Close</button>
   <span id="state">awake</span>
 </div>
@@ -61,7 +63,7 @@
   var W = 1120, H = 1360;
   var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529],
     brow: [540, 384, 666, 529], sigh: [540, 384, 666, 529],
-    reach: [549, 415, 907, 918], ear: [549, 415, 907, 918] };
+    reach: [549, 415, 907, 918], ear: [549, 415, 907, 918], wave: [549, 415, 907, 918] };
   for (var id in PATCHES) {
     var b = PATCHES[id], el = document.getElementById(id);
     el.style.left = (100 * b[0] / W) + '%'; el.style.top = (100 * b[1] / H) + '%';
@@ -124,10 +126,11 @@
   });
   // Can't hear: the hand rises from her lap through the halfway pose to her ear, the listening face with it,
   // holds three seconds, and comes back down the same way.
-  var reach = document.getElementById('reach'), ear = document.getElementById('ear'), armTimers = [];
+  var reach = document.getElementById('reach'), ear = document.getElementById('ear'), wave = document.getElementById('wave'), armTimers = [];
   function at(ms, f) { armTimers.push(setTimeout(f, ms)); }
-  function setArm(state) {   // 'lap', 'reach' or 'ear'
+  function setArm(state) {   // 'lap', 'reach', 'ear' or 'wave'
     reach.classList.toggle('on', state === 'reach'); ear.classList.toggle('on', state === 'ear');
+    wave.classList.toggle('on', state === 'wave');
   }
   function askAgain(t) {   // one ask, starting t ms from now, 3.8 s long
     at(t, function () { setArm('reach'); setListen(true); stateEl.textContent = 'asking again'; });
@@ -146,6 +149,13 @@
     reset(); askAgain(0); askAgain(4400);
     at(8600, function () { sigh.classList.add('on'); stateEl.textContent = 'giving in'; });
     at(11600, function () { sigh.classList.remove('on'); stateEl.textContent = 'awake'; });
+  });
+  // Climbing out: pleased, her hand rises through the chest pose to a wave, holds, and comes back down.
+  document.getElementById('outBtn').addEventListener('click', function () {
+    reset(); setListen(false); setPleased(true); stateEl.textContent = 'climbing out'; setArm('reach');
+    at(300, function () { setArm('wave'); });
+    at(2600, function () { setArm('reach'); });
+    at(2900, function () { setArm('lap'); setPleased(false); });
   });
   window.ladyTest = { setArm: setArm, setListen: setListen, setPleased: setPleased, setBrow: setBrow, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
   setAuto(true);
