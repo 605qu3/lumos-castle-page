@@ -36,6 +36,7 @@
     <img class="patch arm" id="reach" src="../assets/layers/portrait-hole-front-reach.png?v=3" alt="">
     <img class="patch arm" id="ear" src="../assets/layers/portrait-hole-front-ear.png?v=3" alt="">
     <img class="patch arm" id="wave" src="../assets/layers/portrait-hole-front-wave.png?v=3" alt="">
+    <img class="patch arm" id="waggle" src="../assets/layers/portrait-hole-front-waggle.png?v=3" alt="">
     <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png?v=3" alt="">
     <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png?v=3" alt="">
     <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png?v=3" alt="">
@@ -63,7 +64,8 @@
   var W = 1120, H = 1360;
   var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529],
     brow: [540, 384, 666, 529], sigh: [540, 384, 666, 529],
-    reach: [549, 415, 907, 918], ear: [549, 415, 907, 918], wave: [549, 415, 907, 918] };
+    reach: [549, 415, 907, 918], ear: [549, 415, 907, 918], wave: [549, 415, 907, 918],
+    waggle: [549, 415, 907, 918] };
   for (var id in PATCHES) {
     var b = PATCHES[id], el = document.getElementById(id);
     el.style.left = (100 * b[0] / W) + '%'; el.style.top = (100 * b[1] / H) + '%';
@@ -126,11 +128,13 @@
   });
   // Can't hear: the hand rises from her lap through the halfway pose to her ear, the listening face with it,
   // holds three seconds, and comes back down the same way.
-  var reach = document.getElementById('reach'), ear = document.getElementById('ear'), wave = document.getElementById('wave'), armTimers = [];
+  var reach = document.getElementById('reach'), ear = document.getElementById('ear'), wave = document.getElementById('wave'),
+    waggle = document.getElementById('waggle'), armTimers = [];
   function at(ms, f) { armTimers.push(setTimeout(f, ms)); }
-  function setArm(state) {   // 'lap', 'reach', 'ear' or 'wave'
+  function setArm(state) {   // 'lap', 'reach', 'ear', 'wave' or 'waggle'
     reach.classList.toggle('on', state === 'reach'); ear.classList.toggle('on', state === 'ear');
-    wave.classList.toggle('on', state === 'wave');
+    // The tilt fades over the wave, which stays on beneath it, so her front never shows through mid-rock.
+    wave.classList.toggle('on', state === 'wave' || state === 'waggle'); waggle.classList.toggle('on', state === 'waggle');
   }
   function askAgain(t) {   // one ask, starting t ms from now, 3.8 s long
     at(t, function () { setArm('reach'); setListen(true); stateEl.textContent = 'asking again'; });
@@ -150,12 +154,17 @@
     at(8600, function () { sigh.classList.add('on'); stateEl.textContent = 'giving in'; });
     at(11600, function () { sigh.classList.remove('on'); stateEl.textContent = 'awake'; });
   });
-  // Climbing out: pleased, her hand rises through the chest pose to a wave, holds, and comes back down.
+  // Climbing out: pleased, her hand rises through the chest pose to a wave, rocks between the wave and its tilt
+  // three times, and comes back down.
   document.getElementById('outBtn').addEventListener('click', function () {
     reset(); setListen(false); setPleased(true); stateEl.textContent = 'climbing out'; setArm('reach');
     at(300, function () { setArm('wave'); });
-    at(2600, function () { setArm('reach'); });
-    at(2900, function () { setArm('lap'); setPleased(false); });
+    for (var k = 0; k < 3; k++) {
+      at(700 + 800 * k, function () { setArm('waggle'); });
+      at(1100 + 800 * k, function () { setArm('wave'); });
+    }
+    at(3400, function () { setArm('reach'); });
+    at(3700, function () { setArm('lap'); setPleased(false); });
   });
   window.ladyTest = { setArm: setArm, setListen: setListen, setPleased: setPleased, setBrow: setBrow, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
   setAuto(true);
