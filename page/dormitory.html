@@ -121,10 +121,11 @@ Decisions, 8 October 2026, each David's from a plan to scale (assets/review/dorm
 - The stair head: a well round the newel in the floor, the newel post rising 1.0 m above it, the top treads coming up
   clockwise seen from above with the last on the room side, a low kerb round the well open to the room.
 - The camera: the common room's, from the open side, the eye 1.35 m up and 1.4 m outside the wall, the drags 0.55 rad
-  each way about the focus (cited from The camera). At rest on the iPad the view holds four beds, the hearth, W1 and W3
-  and the near edge of the well; a drag right opens the well whole; a drag left the fifth bed and W2. The other
-  candidate, the view from the stair head as the corridor is seen, is behind View (?view=stair) for David to judge by
-  eye from shots.
+  each way about the focus (cited from The camera). At rest on the iPad the view holds the five beds (the fifth cut at
+  the edge), the hearth, W1 and W3 and the near edge of the well; a drag right opens the well whole; a drag left the
+  fifth bed and W2. Chosen by David from shots of both (8 October 2026, evening) over the view from the stair head as
+  the corridor is seen, which stays behind View (?view=stair) for the arrival moment later: coming up the stair into
+  the room, then settling to the stage.
 - Tap a bed, a window, the hearth or the well to go to it, as the corridor's stops; Back returns. Tapping the well
   goes down to the common room under a fade (castle.js travel); the common room's half, arriving at the stair's foot,
   is the Common room's to build and is asked on the board.
@@ -364,12 +365,16 @@ function setView(v) {
    at its foot looking down it to the pillow; a window's stands a hand off the sill looking down through it (the view
    down on the lawn); the hearth's stands before the fire. */
 function bedStop(b) {
-  var g = b.group, foot = g.localToWorld(new THREE.Vector3(0, EYE, BED.l + 1.3)), pillow = g.localToWorld(new THREE.Vector3(0, 0.9, 0.4));
-  return { pos: foot, look: pillow };
+  /* two metres past the foot, looking at the bed's middle a little below the mattress, so the trunk, the foot and the
+     dark under the bed (where his own things are) are in the frame with the pillow */
+  var g = b.group, foot = g.localToWorld(new THREE.Vector3(0, EYE, BED.l + 2.0)), mid = g.localToWorld(new THREE.Vector3(0, 0.45, 1.0));
+  return { pos: foot, look: mid };
 }
 function windowStop(w) {
-  var pos = pol(WALL_R - 0.55, w.deg); pos.y = EYE;
-  var look = pol(WALL_R + 1.5, w.deg); look.y = 0.2;
+  /* 2.8 m off the wall, between the two beds' feet, so the whole window and its sill fit the frame at the room's
+     42 degrees; looking down through the glass waits on the drawn window with its sky plane and deep reveal */
+  var pos = pol(WALL_R - 2.8, w.deg); pos.y = EYE;
+  var look = pol(WALL_R, w.deg); look.y = WIN.sill + 0.85;
   return { pos: pos, look: look };
 }
 var STOPS = [
