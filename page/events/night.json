@@ -40,6 +40,38 @@
           "sound": "a soft snore, then a contented mumble"
         }
       ]
+    },
+    {
+      "id": "night.owl",
+      "tier": "small",
+      "source": "device",
+      "leans": [
+        "night"
+      ],
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "time = night",
+        "letter_open = 0"
+      ],
+      "show": [
+        "an owl lands on the moonlit sill, looks in, ruffles its feathers and flies off"
+      ]
+    },
+    {
+      "id": "night.owl-hoot",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "night"
+      ],
+      "moment": "tap owl",
+      "when": [
+        "time = night"
+      ],
+      "show": [
+        "a soft hoo, and the owl lifts away into the dark"
+      ]
     }
   ]
 }
