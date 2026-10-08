@@ -535,10 +535,21 @@ function restPose(out) {
   return out;
 }
 var poseNow = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: FOV_REST };
+/* A glide runs down the corridor's middle and turns square onto a stop at its end, a cubic through a corner at the
+   stop's x on the middle line (two corners from stop to stop), so it never passes through a standing piece near a
+   wall: the armour in its pier stands beside the way to portrait-a's stop. */
 function glideTo(to, done) {
   var from = { pos: camera.position.clone(), look: lookTmp.clone(), fov: camera.fov };
-  var dist = from.pos.distanceTo(to.pos);
-  tween = { t: 0, dur: clamp(0.8 + dist * 0.12, 0.8, 2.0), from: from, to: to, done: done };
+  var offF = Math.abs(from.pos.z - MID_Z) > 0.05, offT = Math.abs(to.pos.z - MID_Z) > 0.05;
+  var c1 = new THREE.Vector3(offF ? from.pos.x : to.pos.x, EYE, MID_Z);
+  var c2 = new THREE.Vector3(offT ? to.pos.x : from.pos.x, EYE, MID_Z);
+  var dist = from.pos.distanceTo(c1) + c1.distanceTo(c2) + c2.distanceTo(to.pos);
+  tween = { t: 0, dur: clamp(0.8 + dist * 0.12, 0.8, 2.0), from: from, to: to, c1: c1, c2: c2, done: done };
+}
+function bezier(out, a, b, c, d, k) {
+  var u = 1 - k;
+  out.set(0, 0, 0).addScaledVector(a, u * u * u).addScaledVector(b, 3 * k * u * u).addScaledVector(c, 3 * k * k * u).addScaledVector(d, k * k * k);
+  return out;
 }
 function goTo(s) {
   if (s === atStop) return;
@@ -578,7 +589,8 @@ function updateCamera(dt) {
   if (tween) {
     tween.t += dt;
     var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
-    camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
+    bezier(camera.position, tween.from.pos, tween.c1, tween.c2, tween.to.pos, k);
+    camera.position.y = lerp(tween.from.pos.y, tween.to.pos.y, k);
     lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
     setFov(lerp(tween.from.fov, tween.to.fov, k));
     if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
