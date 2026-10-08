@@ -160,101 +160,30 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door at the end to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="castle.js?v=1"></script>
 <script>
 (function () {
 'use strict';
 
-var helpEl = document.getElementById('help');
-if (typeof THREE === 'undefined') {
-  helpEl.textContent = 'three.js did not load. Check the connection and reload.';
-  return;
-}
+/* ---------- the shared frame (castle.js): renderer, scene, camera, helpers, HUD ---------- */
 
-var canvas = document.getElementById('c');
-var statsEl = document.getElementById('stats');
-var btns = {};
-Array.prototype.forEach.call(document.querySelectorAll('#btns button'), function (b) { btns[b.getAttribute('data-act')] = b; });
+var F = window.castleFrame ? castleFrame({
+  background: 0x0b0a09, fog: 0.03,
+  onAct: function (act) {
+    if (act === 'view') setView(view === 'length' ? 'stage' : 'length');
+    else if (act === 'reset') { yawT = pitchT = 0; slideT = VIEWS.stage.x0; goBack(); }
+  }
+}) : null;
+if (!F) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
+var helpEl = F.helpEl, canvas = F.canvas, btns = F.btns;
+var clamp = F.clamp, lerp = F.lerp, easeInOut = F.easeInOut, col = F.col;
+var renderer = F.renderer, scene = F.scene, camera = F.camera;
+var makeCanvas = F.makeCanvas, tex = F.tex, rr = F.rr, arch = F.arch, cutoutTexture = F.cutoutTexture, flameTexture = F.flameTexture;
+var layered = F.layered, register = F.register, solid = F.solid, box = F.box, cutoutMesh = F.cutoutMesh;
+var setTint = F.setTint;
 
-function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
-function lerp(a, b, t) { return a + (b - a) * t; }
-function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
-
-/* ---------- renderer, scene, camera (the common room's frame) ---------- */
-
-var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' });
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.outputEncoding = THREE.sRGBEncoding;
-var EXPOSURES = [0.6, 0.8, 1.0, 1.3];
-var expIndex = 2;
-renderer.toneMappingExposure = EXPOSURES[expIndex];
-var MAX_PR = Math.min(window.devicePixelRatio || 1, 2);
-var pixelRatio = MAX_PR;
-
-var scene = new THREE.Scene();
-scene.background = col(0x0b0a09);
-scene.fog = new THREE.FogExp2(col(0x0b0a09).getHex(), 0.03);
-
-var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 80);
 var lookTmp = new THREE.Vector3();
 
-/* ---------- canvas texture helpers (copied from common-room.html) ---------- */
-
-function makeCanvas(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
-function tex(c) {
-  var t = new THREE.CanvasTexture(c);
-  t.encoding = THREE.sRGBEncoding;
-  t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-  return t;
-}
-/* flat colours in this file are written as the colours they should look; the renderer wants them linear */
-function col(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
-function rr(g, x, y, w, h, r) {
-  r = Math.min(r, w / 2, h / 2);
-  g.beginPath();
-  g.moveTo(x + r, y);
-  g.arcTo(x + w, y, x + w, y + h, r);
-  g.arcTo(x + w, y + h, x, y + h, r);
-  g.arcTo(x, y + h, x, y, r);
-  g.arcTo(x, y, x + w, y, r);
-  g.closePath();
-  g.fill();
-}
-function arch(g, x, y, w, h) {
-  var r = w / 2;
-  g.beginPath();
-  g.moveTo(x, y + h);
-  g.lineTo(x, y + r);
-  g.arc(x + r, y + r, r, Math.PI, 0);
-  g.lineTo(x + w, y + h);
-  g.closePath();
-  g.fill();
-}
-function label(g, text, w, y, size, color) {
-  g.fillStyle = color || '#45423d';
-  g.font = '600 ' + size + 'px -apple-system, system-ui, sans-serif';
-  g.textAlign = 'center';
-  g.textBaseline = 'middle';
-  g.fillText(text, w / 2, y);
-}
-function cutoutTexture(w, h, fill, draw, text) {
-  var c = makeCanvas(w, h), g = c.getContext('2d');
-  g.fillStyle = fill;
-  draw(g, w, h);
-  if (text) label(g, text, w, h * 0.5, Math.round(Math.min(w, h) * 0.085));
-  return tex(c);
-}
-function flameTexture() {
-  var c = makeCanvas(128, 128), g = c.getContext('2d'), k = 58 / 40;
-  g.setTransform(1, 0, 0, k, 0, 72 - 72 * k);
-  var grd = g.createRadialGradient(64, 72 + 16 / k, 3, 64, 72, 40);
-  grd.addColorStop(0, 'rgba(255,255,230,1)');
-  grd.addColorStop(0.25, 'rgba(255,200,110,0.9)');
-  grd.addColorStop(0.55, 'rgba(255,110,30,0.45)');
-  grd.addColorStop(1, 'rgba(255,60,0,0)');
-  g.fillStyle = grd;
-  g.fillRect(0, 0, 128, 128 / k + 72);
-  return tex(c);
-}
 var flameTex = flameTexture();
 
 /* silhouettes for the placeholders */
@@ -278,33 +207,6 @@ function drawTorch(g, w, h) {
   g.fillRect(w * 0.72, h * 0.08, w * 0.16, h * 0.5);
 }
 
-/* ---------- mesh helpers (copied) ---------- */
-
-var layered = [];
-var TINTS = [0x6f8dff, 0x4fd1c5, 0x8bd45a, 0xf0d35a, 0xf08a4b];
-function register(mesh, layer) {
-  mesh.userData.layer = layer;
-  mesh.userData.base = mesh.material.color.clone();
-  layered.push(mesh);
-  return mesh;
-}
-function solid(color, opts) {
-  var o = { color: col(color), roughness: 0.92, metalness: 0 };
-  if (opts) for (var k in opts) o[k] = opts[k];
-  return new THREE.MeshStandardMaterial(o);
-}
-function box(parent, w, h, d, x, y, z, material, layer) {
-  var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
-  m.position.set(x, y, z);
-  parent.add(m);
-  return register(m, layer);
-}
-function cutoutMesh(t, w, h) {
-  return new THREE.Mesh(
-    new THREE.PlaneGeometry(w, h),
-    new THREE.MeshStandardMaterial({ map: t, color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide })
-  );
-}
 /* a flat piece on a wall: facing +1 looks toward +z (her wall, into the corridor), -1 toward -z (the far wall) */
 function onWallZ(t, w, h, x, y, z, facing, layer, name) {
   var m = cutoutMesh(t, w, h);
@@ -651,50 +553,14 @@ canvas.addEventListener('pointerup', endDrag);
 canvas.addEventListener('pointercancel', endDrag);
 canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
-/* HUD */
-var tintOn = false;
-function setTint(on) {
-  tintOn = on;
-  for (var i = 0; i < layered.length; i++) {
-    var m = layered[i];
-    m.material.color.copy(on ? col(TINTS[m.userData.layer]) : m.userData.base);
-  }
-  btns.layers.classList.toggle('on', on);
-}
-function updateResLabel() { btns.res.textContent = 'Res ' + (Math.round(pixelRatio * 10) / 10) + 'x'; }
-function updateExpLabel() { btns.exp.textContent = 'Exp ' + EXPOSURES[expIndex].toFixed(1); }
-document.getElementById('btns').addEventListener('click', function (e) {
-  var b = e.target.closest ? e.target.closest('button') : null;
-  if (!b) return;
-  var act = b.getAttribute('data-act');
-  if (act === 'view') setView(view === 'length' ? 'stage' : 'length');
-  else if (act === 'layers') setTint(!tintOn);
-  else if (act === 'res') { pixelRatio = pixelRatio > 1 ? 1 : MAX_PR; updateResLabel(); resize(); }
-  else if (act === 'exp') { expIndex = (expIndex + 1) % EXPOSURES.length; renderer.toneMappingExposure = EXPOSURES[expIndex]; updateExpLabel(); }
-  else if (act === 'reset') { yawT = pitchT = 0; slideT = VIEWS.stage.x0; goBack(); }
-  else if (act === 'help') helpEl.hidden = !helpEl.hidden;
-});
+/* HUD: Layers, Res, Exp and ? are the shared frame's; View and Reset are this page's (onAct, above) */
 backBtn.addEventListener('click', goBack);
-updateResLabel(); updateExpLabel(); setView(view);
-setTimeout(function () { helpEl.hidden = true; }, 9000);
+setView(view);
 
 /* ---------- per frame ---------- */
 
-function resize() {
-  var w = canvas.clientWidth, h = canvas.clientHeight;
-  if (!w || !h) return;
-  renderer.setPixelRatio(pixelRatio);
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  camera.fov = w / h < 1 ? 58 : 42;
-  camera.updateProjectionMatrix();
-}
-window.addEventListener('resize', resize);
-if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
-resize();
-
 var clock = new THREE.Clock();
-var t = 0, fpsN = 0, fpsT = 0;
+var t = 0;
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   t += dt;
@@ -705,12 +571,7 @@ function frame() {
     tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(t * 7.3 + i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(t * 9.1 + i))), 1);
   });
   renderer.render(scene, camera);
-  fpsN++; fpsT += dt;
-  if (fpsT >= 0.5) {
-    var ri = renderer.info.render;
-    statsEl.textContent = Math.round(fpsN / fpsT) + ' fps\n' + ri.calls + ' draw calls\n' + (ri.triangles / 1000).toFixed(1) + 'k triangles';
-    fpsN = 0; fpsT = 0;
-  }
+  F.stats(dt);
 }
 renderer.setAnimationLoop(frame);
 
