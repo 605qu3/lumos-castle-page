@@ -1,7 +1,8 @@
 {
   "chain": "fire",
+  "targets": {"bellows": "fire"},
   "room": [
-    {"when": [], "show": ["bellows hanging by the hearth"]},
+    {"when": [], "show": ["bellows hanging by the hearth; at a tap on the fire they float to the grate and pump, and hang themselves back up after a few quiet seconds"]},
     {"when": ["fire = damp"], "show": ["fire smoking, embers low, the room's light down"]},
     {"when": ["fire != damp"], "show": ["fire burning"]},
     {"when": ["fire = relit"], "show": ["hearth swept", "a neat stack of dry logs beside the hearth"]}
@@ -23,32 +24,32 @@
     {
       "id": "fire.pump-fast",
       "tier": "fixed", "source": "device", "leans": [],
-      "moment": "tap bellows",
-      "when": ["fire = damp", "seconds since last tap < 1"],
+      "moment": "tap fire",
+      "when": ["book != held", "fire = damp", "seconds since last tap < 1"],
       "show": ["smoke puffs back out of the grate"]
     },
     {
       "id": "fire.pump-steady",
       "tier": "fixed", "source": "device", "leans": [],
-      "moment": "tap bellows",
-      "when": ["fire = damp", "seconds since last tap >= 1", "pumps_left > 1"],
+      "moment": "tap fire",
+      "when": ["book != held", "fire = damp", "seconds since last tap >= 1", "pumps_left > 1"],
       "show": ["the embers brighten a step"],
       "starts": ["add pumps_left -1"]
     },
     {
       "id": "fire.catch",
       "tier": "fixed", "source": "device", "leans": [],
-      "moment": "tap bellows",
-      "when": ["fire = damp", "seconds since last tap >= 1", "pumps_left = 1"],
+      "moment": "tap fire",
+      "when": ["book != held", "fire = damp", "seconds since last tap >= 1", "pumps_left = 1"],
       "show": ["the fire catches with a whoosh and the room's light comes up"],
       "starts": ["set fire = lit"]
     },
     {
       "id": "fire.flare",
       "tier": "fixed", "source": "device", "leans": [],
-      "moment": "tap bellows",
-      "when": ["fire != damp"],
-      "show": ["the fire flares up happily"]
+      "moment": "tap fire",
+      "when": ["book != held", "fire != damp"],
+      "show": ["the bellows lift off their hook and pump once; the fire flares up happily"]
     }
   ]
 }
