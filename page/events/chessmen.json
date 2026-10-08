@@ -332,6 +332,291 @@
       ]
     },
     {
+      "id": "chessmen.knight-picked-wary",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = knight",
+        "games < 2"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.picked-wary",
+          "text": [
+            "Hold your horses! Where are you sending me?",
+            "I go in an L. Do YOU know what an L is?",
+            "Two up, one across. Or one up, two across? You check.",
+            "Careful. I'm a very expensive horse."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.knight-picked-warming",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = knight",
+        "games >= 2",
+        "games < 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.picked-warming",
+          "text": [
+            "Giddy-up, I suppose.",
+            "Fine. But I'm doing it with style.",
+            "Neigh bother. Mostly."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.knight-picked-trusting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = knight",
+        "games >= 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.picked-trusting",
+          "text": [
+            "Neigh problem!",
+            "Tally-ho!",
+            "Watch this. Right over their heads!",
+            "The best game of chess in years started with a knight, you know."
+          ],
+          "canon": "PS 17, Ron's fifty points for the best-played game, verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.knight-capture",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on",
+        "piece = knight"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.capture",
+          "text": [
+            "Didn't see me coming, did you? Nobody ever does!",
+            "A knight to remember!",
+            "Jumped right over your mates, I did!",
+            "Horse-play!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.knight-taken",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess taken",
+      "when": [
+        "game = on",
+        "piece = knight"
+      ],
+      "one_of": "chess-taken",
+      "weight": 1,
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.taken",
+          "text": [
+            "That's chess! You've got to make some sacrifices!",
+            "Tell the stables... I was magnificent...",
+            "Nay... NAAAY...",
+            "A noble end. For a horse."
+          ],
+          "canon": "PS 16, Ron under the trapdoor, verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.knight-check",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess check",
+      "when": [
+        "game = on",
+        "piece = knight"
+      ],
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.check",
+          "text": [
+            "Check! Bet you didn't see that L coming!",
+            "Check! From round the corner!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.knight-tide-losing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = losing"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.tide-losing",
+          "text": [
+            "Things look bad. Luckily, I look good.",
+            "When in doubt, gallop."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.knight-tide-winning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = winning"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "knight",
+          "role": "trace",
+          "what": "his knights",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "knight",
+          "medium": "said",
+          "key": "chessmen.knight.tide-winning",
+          "text": [
+            "We're galloping ahead!",
+            "Victory is near! Somebody polish my saddle!"
+          ]
+        }
+      ]
+    },
+    {
       "id": "chessmen.quiet-picked",
       "tier": "fixed",
       "source": "device",
