@@ -14,7 +14,8 @@
    Not yet: casts and marks, lines, bags, one_of, and the moments quiet, enter, outside and say; a record that
    needs one of them is skipped with a note in the console, never thrown.
 
-   Test links: ?event=<id> loads that record alone and fires it whenever it holds; ?wait=N sets every wait to N s;
+   Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
+   it holds and the rest of its chain follows it; ?wait=N sets every wait to N s;
    ?fresh starts this iPad's castle afresh. */
 (function () {
   'use strict';
@@ -264,6 +265,8 @@
       if (rec.lines && rec.lines.length) return 'lines';
       if (rec.one_of) return 'one_of';
       if (/^(quiet|enter|outside|say)\b/.test(rec.moment || '')) return 'the moment ' + rec.moment;
+      if (/(mark |from bag )/.test((rec.starts || []).join('|'))) return 'marks and bags';
+      for (var e = 0; e < (rec.ends || []).length; e++) if ((rec.ends[e].lines || []).length) return 'lines (in its ends)';
       return null;
     }
 
@@ -277,8 +280,8 @@
         if (r.moment !== name || !allHold(r.when)) continue;
         var missing = supported(r);
         if (missing) { note(r.id + ' skipped: the runtime does not yet do ' + missing); continue; }
-        if (r.tier === 'small' && !only && (!visit.smallOn || state.lastSmall.indexOf(r.id) >= 0)) continue;
-        if (r.tier === 'big' && !only && (!visit.bigOn || visit.bigDone)) continue;
+        if (r.tier === 'small' && r.id !== only && (!visit.smallOn || state.lastSmall.indexOf(r.id) >= 0)) continue;
+        if (r.tier === 'big' && r.id !== only && (!visit.bigOn || visit.bigDone)) continue;
         if (state.open[r.id]) continue;      /* still open from an earlier moment: it does not start again */
         eligible.push(r);
       }
@@ -286,7 +289,7 @@
       for (var j = 0; j < order.length; j++) {
         var rec = order[j];
         if (rec.tier === 'small' && smallDone) continue;
-        if (rec.tier === 'big' && visit.bigDone && !only) continue;
+        if (rec.tier === 'big' && visit.bigDone && rec.id !== only) continue;
         if (!allHold(rec.when)) continue;
         fire(rec);
         if (rec.tier === 'small') smallDone = true;
@@ -372,7 +375,7 @@
         var rs = files[f].records || [];
         JSON.stringify(rs).replace(/"stamp ([a-z_]+)/g, function (s, n) { stampNames[n] = true; return s; });
         for (var i = 0; i < rs.length; i++) {
-          if (only && rs[i].id !== only) continue;
+          if (only && files[f].chain !== only.split('.')[0]) continue;    /* ?event: only that record's chain */
           records.push(rs[i]);
           byId[rs[i].id] = rs[i];
         }
