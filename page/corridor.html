@@ -113,24 +113,28 @@ Decisions, 7 and 8 October 2026, each David's; the handoff's The corridor is the
 - Shape: a dead end. She hangs on the long side near the closed end, the torch faces her, and the corridor runs off
   to the right as you face her (toward -x). Chosen over running past her (loses PS 7's "at the very end of the
   corridor", quoted from memory), curving with the tower, and pointing at her (the room's far wall would change).
-- Length and the far end: x 2.3 to a stair head at x -11.0, where a flight goes down toward -x between the same
+- Length and the far end: x 2.3 to a stair head at x -11.4 (from -11.0, for the inglenook's width), where a flight goes down toward -x between the same
   walls (PS 7 brings the first-years up staircases; PS 8's moving stairs), behind the camera at rest. It replaced a
   90 degree turn at -10.5, which was invented, not canon. Lost: the turn; running on into the dark.
-- By day: the far wall is the castle's outer wall, with the torch opposite her, a suit of armour, a tall window with a
-  deep sill (the Remembrall's, later) and a tapestry; her wall carries her and two portraits; a second torch by the
-  stair head. The empty classroom and its door are gone (8 October): a classroom beside the dormitory makes no sense.
-  Her study (the common room's) is to be pulled out to a wall square to the corridor at x -6.4, tangent to the
-  tower, and an inglenook for visitors waiting to be fetched opens off the corridor past it, bounded by that wall;
-  its size is open (seats for five or six, and enough of her study's outer wall left past it for a window).
+- By day, the gallery (8 October), on three axes: hers (x 0), the study stretch's bay (-3.55) and the hearth's
+  (-8.6). Her wall: her, portrait-a (-2.5, nearest her) and portrait-b (-4.6). The far wall, the castle's outer wall:
+  a torch either side of her axis (+1.3, the one the room shows, and -1.3), a tall window with a deep sill opposite
+  each portrait (the sill at -4.6 is the Remembrall's, later), the armour in the pier between them, the tapestry on
+  the hearth axis facing the fire. The end wall closes the view and is held for the polite door. Chosen over a single
+  window on the bay axis with an armour opposite each portrait. The empty classroom and its door are gone: a
+  classroom beside the dormitory makes no sense.
+- Her study (the common room's to build) is pulled out to a wall square to the corridor at x -6.4, tangent to the
+  tower. Past it the inglenook, where visitors wait to be fetched: 4.4 by 2.2 m clear, a low ceiling and lintel at
+  2.4 m, a chimney breast 3.0 m wide with the room's fireplace drawing at 2.6 m, and a settle 2.0 m long each side, three seats a side. Chosen
+  over 2.6 m deep with four a side (more than asked, and half the study behind her window).
 - Camera: down the length from the stair head at a boy's eye, chosen from greybox shots of both views over a stage view
   with the far wall cut away (her wall square on, but a gallery rather than a corridor, and the far wall's four things
   lost). Everything on the walls is foreshortened from here, her most, so the view turns square at each stop. A
   standing piece (the armour) is a card turned to the eye, as the stairs are. The stage view stays behind View.
 - The stops: each stands a hand short of the facing wall and opens its field of view until the thing fits with an
-  eighth to spare, between 42 and 70 degrees: her, the window and the portraits at 42, the tapestry 43, the armour 52.
-  The armour moved from x -2.6 to -3.4, where it had stood between the first portrait and its stop;
-  from the stair head it now stands in front of the window's lower half, accepted.
-- Moving: tap a thing to go to it, her, the window, the armour, a portrait or the tapestry; the view glides there and turns
+  eighth to spare, between 42 and 70 degrees: her, the windows and the portraits at 42, the tapestry 43, the armour 52.
+  The inglenook's stop stands a hand off the far wall, square to the hearth.
+- Moving: tap a thing to go to it, her, a window, the armour, a portrait, the tapestry or the inglenook; the view glides there and turns
   square; tap off it or Back to glide back to the corner. The notice board's walk-up again. Lost: stepping along by
   tapping the floor (stops with nothing at them).
 - Hand-over: through the hole under a fade. Going in, the view glides into the tunnel, fades to black where it is
@@ -153,7 +157,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, the window or the tapestry to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
+<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry or the inglenook to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -316,7 +320,7 @@ function onWallZ(t, w, h, x, y, z, facing, layer, name) {
    The closed end is at +x, the stair head at -x. Facing her, +x is on your left. The corridor's floor runs to the
    stair head at STAIR_X, where a flight goes down toward -x between the same two walls, the way PS 7 brings the
    first-years up; it is behind the camera at rest. */
-var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.0, FAR_END_X = -14.3, CEIL = 4.5, BELOW = 2.5;
+var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.4, FAR_END_X = -14.7, CEIL = 4.5, BELOW = 2.5;
 var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - FAR_END_X, WIDTH = HER_Z - FAR_Z;
 var STEP_RISE = 0.18, STEP_RUN = 0.3, STEPS = 11;
 
@@ -328,9 +332,15 @@ var walls = new THREE.Group(); scene.add(walls);
 /* the far wall, the castle's outer wall, full length and down the stairwell; cut away in the stage view */
 var farWall = box(walls, LEN, WALL_H, T, (END_X + FAR_END_X) / 2, WALL_Y, FAR_Z - T / 2, stoneMat, 0);
 farWall.name = 'far-wall';
-/* her wall; her study lies behind it from x -2.6, and past the study an inglenook is to open off it (not yet built) */
-var herWall = box(walls, LEN, WALL_H, T, (END_X + FAR_END_X) / 2, WALL_Y, HER_Z + T / 2, stoneMat, 0);
+/* her wall; her study lies behind it from x -2.6 to its end wall at -6.4, and past that the inglenook opens off it,
+   x -6.4 to -10.8 clear, under a lintel at NOOK_H (8 October 2026: 4.4 by 2.2 m, six seats, a low ceiling
+   at 2.4 m for the nook's feel) */
+var NOOK_X0 = -6.4, NOOK_X1 = -10.8, NOOK_D = 2.2, NOOK_H = 2.4;
+var NOOK_BACK = HER_Z + NOOK_D, NOOK_MID = (NOOK_X0 + NOOK_X1) / 2, NOOK_W = NOOK_X0 - NOOK_X1;
+var herWall = box(walls, END_X - NOOK_X0, WALL_H, T, (END_X + NOOK_X0) / 2, WALL_Y, HER_Z + T / 2, stoneMat, 0);
 herWall.name = 'her-wall';
+box(walls, NOOK_X1 - FAR_END_X, WALL_H, T, (NOOK_X1 + FAR_END_X) / 2, WALL_Y, HER_Z + T / 2, stoneMat, 0).name = 'her-wall-stair';
+box(walls, NOOK_W, CEIL - NOOK_H, T, NOOK_MID, (CEIL + NOOK_H) / 2, HER_Z + T / 2, stoneMat, 0).name = 'nook-lintel';
 /* the closed end, and the wall the flight runs down toward */
 box(walls, T, WALL_H, WIDTH, END_X + T / 2, WALL_Y, MID_Z, stoneMat, 0).name = 'end-wall';
 box(walls, T, WALL_H, WIDTH, FAR_END_X - T / 2, WALL_Y, MID_Z, stoneMat, 0).name = 'stair-end-wall';
@@ -343,6 +353,49 @@ for (var si = 1; si <= STEPS; si++) {
   var top = -si * STEP_RISE;
   box(scene, STEP_RUN, 0.4, WIDTH, STAIR_X - (si - 0.5) * STEP_RUN, top - 0.2, MID_Z, stairMat, 0).name = 'stair-' + si;
 }
+/* the inglenook: her study's end wall on the near side (its outer face at x -6.4, running back to the tower), a wall
+   on the stair side, the back wall with a chimney breast 3.0 m wide standing 0.3 proud, a settle 2.0 m long against
+   each side wall from the back toward the mouth, three seats a side, and its own lower ceiling */
+var nook = new THREE.Group(); scene.add(nook);
+box(nook, T, WALL_H, 4.5, NOOK_X0 + T / 2, WALL_Y, HER_Z + 2.25, stoneMat, 0).name = 'study-end-wall';
+box(nook, T, WALL_H, NOOK_D + T, NOOK_X1 - T / 2, WALL_Y, HER_Z + (NOOK_D + T) / 2, stoneMat, 0).name = 'nook-stair-wall';
+box(nook, NOOK_W + 2 * T, WALL_H, T, NOOK_MID, WALL_Y, NOOK_BACK + T / 2, stoneMat, 0).name = 'nook-back-wall';
+var BREAST = 0.3, HEARTH_W = 3.0, HEARTH_DRAW_W = 2.6;
+var breast = box(nook, HEARTH_W, NOOK_H, BREAST, NOOK_MID, NOOK_H / 2, NOOK_BACK - BREAST / 2, stoneMat, 0);
+breast.name = 'chimney-breast';
+var nookFloor = new THREE.Mesh(new THREE.PlaneGeometry(NOOK_W, NOOK_D), floorMat);
+nookFloor.rotation.x = -Math.PI / 2; nookFloor.position.set(NOOK_MID, 0, HER_Z + NOOK_D / 2);
+nookFloor.name = 'nook-floor'; nook.add(nookFloor); register(nookFloor, 0);
+var nookCeil = new THREE.Mesh(new THREE.PlaneGeometry(NOOK_W, NOOK_D), ceilMat);
+nookCeil.rotation.x = Math.PI / 2; nookCeil.position.set(NOOK_MID, NOOK_H, HER_Z + NOOK_D / 2);
+nookCeil.name = 'nook-ceiling'; nook.add(nookCeil); register(nookCeil, 0);
+var SETTLE = { len: 2.0, d: 0.6, seat: 0.45, back: 1.5 };
+var settleMat = solid(0x7d6a55), settles = [];
+[NOOK_X0, NOOK_X1].forEach(function (wx, i) {
+  var dir = i === 0 ? -1 : 1, zc = NOOK_BACK - BREAST * 0 - SETTLE.len / 2;
+  var seat = box(nook, SETTLE.d, SETTLE.seat, SETTLE.len, wx + dir * SETTLE.d / 2, SETTLE.seat / 2, zc, settleMat, 1);
+  var back = box(nook, 0.08, SETTLE.back, SETTLE.len, wx + dir * 0.04, SETTLE.back / 2, zc, settleMat, 1);
+  var arm = box(nook, SETTLE.d, 0.75, 0.06, wx + dir * SETTLE.d / 2, 0.375, zc - SETTLE.len / 2 + 0.03, settleMat, 1);
+  seat.name = back.name = arm.name = 'settle-' + (i ? 'stair' : 'study');
+  settles.push(seat, back, arm);
+});
+/* the hearth: the common room's fireplace drawing, drawn at 2.6 m wide (2.17 tall) so it clears the low ceiling, on
+   the breast's face; grey until it loads */
+var hearth = onWallZ(cutoutTexture(150, 125, '#6a5a4c', drawRect, 'hearth'), HEARTH_DRAW_W, HEARTH_DRAW_W / 1.2, NOOK_MID, 1.25, NOOK_BACK - BREAST - 0.01, -1, 2, 'hearth');
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var h = HEARTH_DRAW_W * im.height / im.width;
+    hearth.geometry.dispose(); hearth.geometry = new THREE.PlaneGeometry(HEARTH_DRAW_W, h);
+    hearth.position.y = h / 2;
+    hearth.material.map = tex(im); hearth.material.color.set(0xffffff); hearth.userData.base = hearth.material.color.clone(); hearth.material.needsUpdate = true;
+  };
+  im.src = '../assets/layers/fireplace.png';
+})();
+var hearthLight = new THREE.PointLight(col(0xffa868), 1.3, 6, 1.4);
+hearthLight.position.set(NOOK_MID, 0.8, NOOK_BACK - 1.0);
+scene.add(hearthLight);
+
 var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(LEN, WIDTH), ceilMat);
 ceiling.rotation.x = Math.PI / 2; ceiling.position.set((END_X + FAR_END_X) / 2, CEIL, MID_Z);
 ceiling.name = 'ceiling'; scene.add(ceiling); register(ceiling, 0);
@@ -360,8 +413,9 @@ her.name = 'portrait-hole-front';
 hinge.add(her); register(her, 2);
 
 var FAR_FACE = FAR_Z + 0.01, HER_FACE = HER_Z - 0.01;
-/* the far wall, from the closed end: the torch opposite her, where the room shows it; the armour; the window; the
-   tapestry; the second torch by the stair head */
+/* the far wall, the gallery (8 October 2026), on three axes: hers at x 0, the study stretch's bay at -3.55 and
+   the hearth's at the nook's middle. A torch either side of her axis (+1.3 is the one the room shows); a tall window
+   opposite each portrait; the armour in the pier between them; the tapestry on the hearth axis, facing the fire */
 var TORCH_HEAD = new THREE.Vector3(1.3, 1.3, FAR_FACE);
 function addTorch(head, facing, name) {
   var m = onWallZ(cutoutTexture(64, 124, '#5a5550', drawTorch), 0.35, 0.68, head.x - facing * 0.371 * 0.35, head.y - 0.34, head.z, facing, 1, name);
@@ -374,23 +428,28 @@ function addTorch(head, facing, name) {
   scene.add(light);
   return { mesh: m, flame: f, light: light };
 }
-var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(-10.6, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
-var ARMOUR = { w: 0.7, h: 2.1, x: -3.4 };
+var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(-1.3, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
+var BAY_X = -3.55, PORTRAIT_XS = [-2.5, -4.6];
+var ARMOUR = { w: 0.7, h: 2.1, x: BAY_X };
 var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, FAR_Z + 0.45, 1, 1, 'armour');
-var WINDOW = { w: 1.2, h: 2.4, x: -4.6, sill: 0.9 };
-var windowSky = onWallZ(cutoutTexture(120, 240, '#c9d6e2', drawArch), WINDOW.w * 0.8, WINDOW.h * 0.88, WINDOW.x, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.005, 1, 3, 'window-sky');
-windowSky.material = new THREE.MeshBasicMaterial({ map: windowSky.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
-windowSky.userData.base = windowSky.material.color.clone();
-var win = onWallZ(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) { arch(g, 0, 0, w, h); g.clearRect(w * 0.1, h * 0.06, w * 0.8, h * 0.82); g.fillRect(w * 0.46, h * 0.06, w * 0.08, h * 0.82); }, 'window'), WINDOW.w, WINDOW.h, WINDOW.x, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.01, 1, 1, 'window');
-/* the deep sill, where the Remembrall will sit in the dark */
-var sill = box(scene, WINDOW.w * 0.9, 0.06, 0.4, WINDOW.x, WINDOW.sill, FAR_Z + 0.2, solid(0x86827c), 1);
-sill.name = 'window-sill';
-var TAPESTRY = { w: 1.4, h: 2.0, x: -7.6 };
+var WINDOW = { w: 1.2, h: 2.4, sill: 0.9 };
+/* one window per portrait, the same drawing twice; the sill at -4.6 is the Remembrall's, later */
+var windows = PORTRAIT_XS.map(function (wx, i) {
+  var name = i ? 'window' : 'window-2';
+  var sky = onWallZ(cutoutTexture(120, 240, '#c9d6e2', drawArch), WINDOW.w * 0.8, WINDOW.h * 0.88, wx, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.005, 1, 3, name + '-sky');
+  sky.material = new THREE.MeshBasicMaterial({ map: sky.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
+  sky.userData.base = sky.material.color.clone();
+  var frame = onWallZ(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) { arch(g, 0, 0, w, h); g.clearRect(w * 0.1, h * 0.06, w * 0.8, h * 0.82); g.fillRect(w * 0.46, h * 0.06, w * 0.08, h * 0.82); }, name), WINDOW.w, WINDOW.h, wx, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.01, 1, 1, name);
+  /* the deep sill, where the Remembrall will sit in the dark */
+  var sill = box(scene, WINDOW.w * 0.9, 0.06, 0.4, wx, WINDOW.sill, FAR_Z + 0.2, solid(0x86827c), 1);
+  sill.name = name + '-sill';
+  return { x: wx, name: name, frame: frame, sky: sky, sill: sill };
+});
+var TAPESTRY = { w: 1.4, h: 2.0, x: NOOK_MID };
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
-/* her wall, from her toward the stair head: a portrait on the study's stretch, then past the partition (x -5.8) a
-   portrait; the classroom's door is gone with the classroom (David, 8 October 2026) */
-var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -2.8, 1.9, HER_FACE, -1, 1, 'portrait-a');
-var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -7.6, 1.9, HER_FACE, -1, 1, 'portrait-b');
+/* her wall: two portraits on the study's stretch, symmetric about the bay axis; portrait-a is the one nearest her */
+var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[0], 1.9, HER_FACE, -1, 1, 'portrait-a');
+var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[1], 1.9, HER_FACE, -1, 1, 'portrait-b');
 
 /* the drawn torch the common room already has: same file, same size, same head */
 (function () {
@@ -410,16 +469,18 @@ var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'
 /* Daylight comes in at the window on the outer wall; the torches burn by day too, as the hole shows */
 var hemi = new THREE.HemisphereLight(col(0xbfc8d2), col(0x4a4038), 0.55);
 scene.add(hemi);
-var windowLight = new THREE.PointLight(col(0xdfe6ee), 2.2, 9, 1.4);
-windowLight.position.set(WINDOW.x, 2.2, FAR_Z + 0.8);
-scene.add(windowLight);
+windows.forEach(function (w) {
+  var l = new THREE.PointLight(col(0xdfe6ee), 1.6, 9, 1.4);
+  l.position.set(w.x, 2.2, FAR_Z + 0.8);
+  scene.add(l);
+});
 
 /* ---------- the two views ---------- */
 /* length: from the stair head at a boy's eye, looking down to her end; a drag turns the head.
    stage: the far wall cut away, the camera outside it facing her wall square on; a drag slides along it. */
 var EYE = 1.35;
 var VIEWS = {
-  length: { pos: new THREE.Vector3(-10.6, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12 },
+  length: { pos: new THREE.Vector3(-11.0, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12 },
   stage: { z: FAR_Z - 3.4, xMin: -10.0, xMax: -0.2, x0: -1.6 }
 };
 var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
@@ -454,9 +515,12 @@ var STOPS = [
   { name: 'portrait-a', meshes: [portraitA], stop: function () { return stopFor(portraitA, 1.2, 1.75); } },
   { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75); } },
   { name: 'armour', meshes: [armour], stop: function () { return stopFor(armour, ARMOUR.h, 1.3); } },
-  /* the window frames its sill, where the Remembrall will sit, and the lower lights */
-  { name: 'window', meshes: [win, windowSky, sill], stop: function () { return stopFor(win, 1.9, 1.55); } },
-  { name: 'tapestry', meshes: [tapestry], stop: function () { return stopFor(tapestry, TAPESTRY.h, 1.9); } }
+  /* each window frames its sill, where the Remembrall will sit, and the lower lights */
+  { name: 'window', meshes: [windows[1].frame, windows[1].sky, windows[1].sill], stop: function () { return stopFor(windows[1].frame, 1.9, 1.55); } },
+  { name: 'window-2', meshes: [windows[0].frame, windows[0].sky, windows[0].sill], stop: function () { return stopFor(windows[0].frame, 1.9, 1.55); } },
+  { name: 'tapestry', meshes: [tapestry], stop: function () { return stopFor(tapestry, TAPESTRY.h, 1.9); } },
+  /* the inglenook: from a hand off the far wall, square to the hearth, the settles either side */
+  { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } }
 ];
 var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
