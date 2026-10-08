@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>The boys' dormitory, greybox</title>
+<style>
+  :root {
+    --bg: #0b0a09;
+    --hud-bg: rgba(24, 21, 18, 0.78);
+    --hud-fg: #d9d2c6;
+    --hud-dim: #8e877c;
+    --hud-on: #e9b86a;
+    --hud-line: rgba(255, 255, 255, 0.16);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0a09; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0a09; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+  }
+  #c { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+  #hud {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #stats {
+    font-size: 12px;
+    line-height: 1.35;
+    background: var(--hud-bg);
+    padding: 6px 9px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--hud-dim);
+    white-space: pre;
+  }
+  #btns { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; pointer-events: auto; }
+  button {
+    font: 500 13px/1 -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-line);
+    border-radius: 6px;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  button.on { color: var(--hud-on); border-color: var(--hud-on); }
+  button:focus-visible { outline: 2px solid var(--hud-on); outline-offset: 2px; }
+  #back {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+  #help {
+    position: fixed;
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    max-width: min(420px, calc(100vw - 20px));
+    background: var(--hud-bg);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    pointer-events: none;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!--
+The boys' dormitory, the tower's top floor up the spiral stair from the common room (PS 7: five four-posters with
+hangings; PS 9: the way down; CS 5: high narrow windows and red velvet hangings; PA 15: the window looks down on the
+moonlit lawn and the castle's own shadow). Its own page with its own GPU budget, as the corridor is; the frame
+(renderer, camera, helpers, the apply functions, the HUD) is castle.js, shared since 8 October 2026. Grey only, at
+real size: nothing is drawn for this room, and nothing is generated until the board says the common room's furnishing
+is through (David, 8 October 2026, board req 12). The handoff's The dormitory (docs/handoff/dormitory.md) is the record.
+
+Decisions, 8 October 2026, each David's from a plan to scale (assets/review/dormitory-plan.jpg):
+- The same tower as the common room, 11.2 m across inside: the common room's stair rises with its newel 4.9 m from the
+  centre, so a smaller tapered room would put the stair in a turret, which lost in the common room. The frame is the
+  common room's (x right, z toward the eye, the hearth axis at -z) so the stair head sits where the room's stair rises,
+  and y is up from this floor, which stands 7.4 m above the common room's (its ceiling 7 m and a 0.4 m floor; this
+  lane's assumption). The ceiling here is 4.5 m.
+- Plan A: a low hearth at the centre of the view, on the common room's own flue, the fireplace drawing reused at 2.0 m
+  wide (nothing spent). The books this lane can cite are silent on a dormitory fire; the Occlumency script has the fire
+  low; so it is an invention under LDP-98, recorded as such. Lost: plan B, no hearth and the moonlit window at the
+  centre, the night light the moon and candles only.
+- Five four-posters radial, heads to the wall, at 24 and 53 degrees each side of the hearth and a fifth at 82 left; a
+  trunk at each foot (verify the chapter). His bed is the inner right one, nearest the stair.
+- Three high narrow windows, 0.6 by 1.9 m with sills 1.1 m up: W3 beside his bed, the one he goes to at night, looks
+  down on the moonlit lawn with the castle's roofs and shadows below (PA 15); W1 on the left looks where the common
+  room's left window does, a floor higher, Hagrid's hut and the forest edge (PA 6); W2, further left and opened by a
+  drag, looks along the castle to the lake and the mountains (invention). No direction is ever named in the app's voice.
+- The stair head: a well round the newel in the floor, the newel post rising 1.0 m above it, the top treads coming up
+  clockwise seen from above with the last on the room side, a low kerb round the well open to the room.
+- The camera: the common room's, from the open side, the eye 1.35 m up and 1.4 m outside the wall, the drags 0.55 rad
+  each way about the focus (cited from The camera). At rest on the iPad the view holds four beds, the hearth, W1 and W3
+  and the near edge of the well; a drag right opens the well whole; a drag left the fifth bed and W2. The other
+  candidate, the view from the stair head as the corridor is seen, is behind View (?view=stair) for David to judge by
+  eye from shots.
+- Tap a bed, a window, the hearth or the well to go to it, as the corridor's stops; Back returns. Tapping the well
+  goes down to the common room under a fade (castle.js travel); the common room's half, arriving at the stair's foot,
+  is the Common room's to build and is asked on the board.
+-->
+<canvas id="c" tabindex="0" aria-label="The boys' dormitory greybox"></canvas>
+<div id="hud">
+  <div id="stats">starting</div>
+  <div id="btns">
+    <button type="button" data-act="view">View</button>
+    <button type="button" data-act="layers">Layers</button>
+    <button type="button" data-act="res">Res</button>
+    <button type="button" data-act="exp">Exp</button>
+    <button type="button" data-act="reset">Reset</button>
+    <button type="button" data-act="help">?</button>
+  </div>
+</div>
+<button id="back" type="button" hidden>Back</button>
+<div id="help">Drag to look round the dormitory. Tap a bed, a window, the hearth or the stair well to go to it; tap off it or Back to return. View switches to the view from the stair head. The grey shapes are placeholders at real size.</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="castle.js?v=2"></script>
+<script>
+(function () {
+'use strict';
+
+/* ---------- the shared frame (castle.js): renderer, scene, camera, helpers, HUD ---------- */
+
+var kit = window.castleFrame ? castleFrame({
+  background: 0x0b0a09, fog: 0.025,
+  onAct: function (act) {
+    if (act === 'view') setView(view === 'stage' ? 'stair' : 'stage');
+    else if (act === 'reset') { yawT = pitchT = 0; goBack(); }
+  }
+}) : null;
+if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
+var helpEl = kit.helpEl, canvas = kit.canvas, btns = kit.btns, backBtn = kit.backBtn;
+var clamp = kit.clamp, lerp = kit.lerp, easeInOut = kit.easeInOut, col = kit.col;
+var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
+var makeCanvas = kit.makeCanvas, tex = kit.tex, label = kit.label, cutoutTexture = kit.cutoutTexture, flameTexture = kit.flameTexture;
+var layered = kit.layered, register = kit.register, solid = kit.solid, box = kit.box, cutoutMesh = kit.cutoutMesh;
+var setTint = kit.setTint;
+
+var lookTmp = new THREE.Vector3();
+
+/* ---------- the room ---------- */
+/* The common room's frame: x right, z toward the eye, the hearth axis at -z; a bearing is measured from the hearth
+   about the tower's centre, positive to the right as seen from the eye. */
+var WALL_R = 5.6, CEIL = 4.5;
+var NEWEL = new THREE.Vector3(4.67, 0, -1.4), WELL_R = 0.8;   /* The stairs: the room's newel, cited */
+function pol(r, deg) { var a = deg * Math.PI / 180; return new THREE.Vector3(r * Math.sin(a), 0, -r * Math.cos(a)); }
+function bearing(v) { return Math.atan2(v.x, -v.z) * 180 / Math.PI; }
+
+var stoneMat = solid(0x75726e, { side: THREE.BackSide });
+var floorMat = solid(0x6a6764);
+/* the floor, with the stair well cut out of it round the newel (a disc discarded in the material, as the room's wall
+   cuts its hole) */
+floorMat.onBeforeCompile = function (sh) {
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWellW;')
+    .replace('#include <project_vertex>', '#include <project_vertex>\nvWellW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWellW;')
+    .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' +
+      'if (length(vWellW.xz - vec2(' + NEWEL.x.toFixed(3) + ', ' + NEWEL.z.toFixed(3) + ')) < ' + WELL_R.toFixed(3) + ') discard;');
+};
+var floor = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 64), floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.name = 'floor'; scene.add(floor); register(floor, 1);
+/* the ground beyond the room's circle toward the eye, as the room's, so a wide drag never shows the void */
+var floorBeyond = new THREE.Mesh(new THREE.RingGeometry(WALL_R + 0.05, 14, 64), solid(0x2e2a27, { roughness: 1 }));
+floorBeyond.rotation.x = -Math.PI / 2; floorBeyond.position.y = -0.002;
+floorBeyond.name = 'floor-beyond'; scene.add(floorBeyond); register(floorBeyond, 1);
+var ceiling = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 64), solid(0x2b2927));
+ceiling.rotation.x = Math.PI / 2; ceiling.position.y = CEIL;
+ceiling.name = 'ceiling'; scene.add(ceiling); register(ceiling, 0);
+/* the whole round wall, its inside face only: the eye stands outside the circle, so the stretch nearest it is seen
+   from outside and vanishes, and the far side fills whatever the drags see (the room carries its drawn wall round the
+   same way) */
+var wall = new THREE.Mesh(new THREE.CylinderGeometry(WALL_R, WALL_R, CEIL, 96, 1, true), stoneMat);
+wall.position.y = CEIL / 2;
+wall.name = 'wall'; scene.add(wall); register(wall, 0);
+
+/* the hearth: the common room's fireplace drawing reused at 2.0 m wide (1.67 tall) on the flue line, a grey stand-in
+   until it loads; a dark firebox behind its opening, the fire low, and its warm light */
+var HEARTH_W = 2.0;
+var hearth = cutoutMesh(cutoutTexture(200, 167, '#6a5a4c', function (g, w, h) { g.fillRect(0, 0, w, h); }, 'hearth'), HEARTH_W, HEARTH_W / 1.2);
+hearth.position.set(0, HEARTH_W / 1.2 / 2, -WALL_R + 0.03);
+hearth.name = 'hearth'; scene.add(hearth); register(hearth, 2);
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var h = HEARTH_W * im.height / im.width;
+    hearth.geometry.dispose(); hearth.geometry = new THREE.PlaneGeometry(HEARTH_W, h);
+    hearth.position.y = h / 2;
+    hearth.material.map = tex(im); hearth.material.color.set(0x855839); hearth.userData.base = hearth.material.color.clone(); hearth.material.needsUpdate = true;
+  };
+  im.src = '../assets/layers/fireplace.png';
+})();
+var firebox = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.95), new THREE.MeshBasicMaterial({ color: col(0x1a0f08) }));
+firebox.position.set(0, 0.5, -WALL_R + 0.01);
+firebox.name = 'firebox'; scene.add(firebox);
+var flameTex = flameTexture();
+var flame = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffa050), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+flame.position.set(0, 0.3, -WALL_R + 0.12);
+flame.scale.set(0.45, 0.4, 1);
+scene.add(flame);
+var fireGlow = new THREE.PointLight(col(0xff9a3c), 1.5, 10, 1.3);
+fireGlow.position.set(0, 0.7, -WALL_R + 0.7);
+scene.add(fireGlow);
+
+/* the five four-posters, radial with their heads to the wall, a trunk at each foot; his is the inner right one, by
+   the stair. Each is a group at its head on the wall, turned so its local +z runs into the room. Sizes are a guess at
+   a boy's four-poster with its hangings: 1.3 by 2.2 m on the floor, 2.3 m to the tester; real size wins later. */
+var BED = { w: 1.3, l: 2.2, h: 2.3, mattress: 0.55 };
+var BED_DEGS = [-24, 24, -53, 53, -82], HIS_DEG = 24;
+var frameMat = solid(0x5a4a40), hangMat = solid(0x6e5450), hisHangMat = solid(0x7a4a48), linenMat = solid(0xa8a09a), trunkMat = solid(0x6b5236);
+var beds = [];
+BED_DEGS.forEach(function (deg, i) {
+  var g = new THREE.Group();
+  g.position.copy(pol(WALL_R - 0.02, deg));
+  g.rotation.y = -deg * Math.PI / 180;
+  scene.add(g);
+  var his = deg === HIS_DEG, name = his ? 'bed-his' : 'bed-' + (i + 1), hm = his ? hisHangMat : hangMat;
+  var parts = [];
+  parts.push(box(g, BED.w - 0.1, 1.3, 0.08, 0, 0.65, 0.06, frameMat, 1));                 /* headboard */
+  parts.push(box(g, BED.w - 0.1, BED.mattress, BED.l - 0.2, 0, BED.mattress / 2, BED.l / 2, linenMat, 1));   /* the bed itself */
+  parts.push(box(g, 0.9, 0.14, 0.45, 0, BED.mattress + 0.07, 0.4, solid(0xc8c0b8), 1));   /* pillow */
+  [[-1, 0.12], [1, 0.12], [-1, BED.l - 0.1], [1, BED.l - 0.1]].forEach(function (p) {
+    parts.push(box(g, 0.1, BED.h, 0.1, p[0] * (BED.w / 2 - 0.05), BED.h / 2, p[1], frameMat, 1));   /* posts */
+  });
+  parts.push(box(g, BED.w, 0.06, BED.l, 0, BED.h - 0.03, BED.l / 2, frameMat, 1));          /* tester */
+  parts.push(box(g, BED.w + 0.04, 0.25, BED.l + 0.04, 0, BED.h - 0.19, BED.l / 2, hm, 1));  /* valance */
+  [-1, 1].forEach(function (s) {                                                            /* hangings, tied back at the head */
+    parts.push(box(g, 0.12, BED.h - 0.4, 0.55, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, 0.45, hm, 1));
+  });
+  parts.push(box(g, 0.9, 0.5, 0.5, 0, 0.25, BED.l + 0.15 + 0.25, trunkMat, 1));            /* the trunk at the foot */
+  parts[parts.length - 1].name = his ? 'trunk-his' : 'trunk-' + (i + 1);
+  parts.forEach(function (m) { if (!m.name) m.name = name; });
+  beds.push({ deg: deg, his: his, name: name, group: g, meshes: parts });
+});
+
+/* three high narrow windows, 0.6 by 1.9 m, sills 1.1 m up: a pale sky plane on the wall naming its view (the views are
+   drawings later), a deep sill */
+var WIN = { w: 0.6, h: 1.9, sill: 1.1 };
+var WINDOWS = [
+  { name: 'W1', deg: -38.5, view: "Hagrid's hut, the forest edge" },
+  { name: 'W2', deg: -67.5, view: 'the lake, the mountains' },
+  { name: 'W3', deg: 38.5, view: "the lawn, the castle's shadow" }
+];
+function skyTexture(w, h, name, view) {
+  var c = makeCanvas(w, h), g = c.getContext('2d');
+  g.fillStyle = '#8a9db5'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#7a8da5'; g.fillRect(0, 0, w, h * 0.55);
+  label(g, name, w, h * 0.3, 40, '#2b3442');
+  view.split(', ').forEach(function (line, i) { label(g, line, w, h * 0.42 + i * 36, 22, '#2b3442'); });
+  return tex(c);
+}
+var windows = WINDOWS.map(function (W) {
+  var sky = new THREE.Mesh(new THREE.PlaneGeometry(WIN.w, WIN.h), new THREE.MeshBasicMaterial({ map: skyTexture(180, 570, W.name, W.view), color: col(0xdfe8f0) }));
+  var p = pol(WALL_R - 0.03, W.deg);
+  sky.position.set(p.x, WIN.sill + WIN.h / 2, p.z);
+  sky.lookAt(0, WIN.sill + WIN.h / 2, 0);
+  sky.name = W.name + '-sky'; scene.add(sky); register(sky, 3);
+  sky.userData.base = sky.material.color.clone();
+  var q = pol(WALL_R - 0.2, W.deg);
+  var sill = box(scene, 0.9, 0.06, 0.36, q.x, WIN.sill, q.z, solid(0x86827c), 1);
+  sill.rotation.y = -W.deg * Math.PI / 180;
+  sill.name = W.name + '-sill';
+  var moon = new THREE.PointLight(col(0x9fb6dc), W.name === 'W3' ? 1.1 : 0.6, 8, 1.4);
+  var m = pol(WALL_R - 0.6, W.deg); moon.position.set(m.x, 2.4, m.z);
+  scene.add(moon);
+  return { name: W.name, deg: W.deg, view: W.view, sky: sky, sill: sill };
+});
+
+/* the stair head: the well in the floor round the newel, its dark inside, the newel post rising 1.0 m above the floor,
+   the top treads coming up clockwise seen from above with the last flush on the room side, and a low kerb round the
+   well open to the room */
+var well = new THREE.Group(); well.position.copy(NEWEL); scene.add(well);
+var wellWall = new THREE.Mesh(new THREE.CylinderGeometry(WELL_R, WELL_R, 2.6, 32, 1, true), solid(0x4a4744, { side: THREE.BackSide }));
+wellWall.position.y = -1.3; wellWall.name = 'well'; well.add(wellWall); register(wellWall, 0);
+var newelPost = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.14, 3.6, 24), solid(0x5f5b56));
+newelPost.position.y = -0.8; newelPost.name = 'newel'; well.add(newelPost); register(newelPost, 1);
+var finial = new THREE.Mesh(new THREE.SphereGeometry(0.16, 16, 12), solid(0x5f5b56));
+finial.position.y = 1.08; finial.name = 'newel'; well.add(finial); register(finial, 1);
+var roomSide = bearing(NEWEL.clone().negate());   /* the bearing from the newel back toward the centre */
+var treadMat = solid(0x6f6b66), TREAD = 360 / 14, treads = [];
+for (var k = 0; k < 8; k++) {
+  var b = (roomSide - k * TREAD) * Math.PI / 180;      /* rising clockwise seen from above, so each lower tread is anticlockwise of the one above */
+  var tr = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.06, 0.3), treadMat);
+  tr.position.set(Math.sin(b) * 0.43, -k * 0.2 - 0.03, -Math.cos(b) * 0.43);
+  tr.rotation.y = -b;
+  tr.name = 'tread-' + k; well.add(tr); register(tr, 1); treads.push(tr);
+}
+var kerbStart = Math.PI - roomSide * Math.PI / 180 + Math.PI / 4;   /* three.js measures its arc from +z; the gap faces the room */
+var kerb = new THREE.Mesh(new THREE.CylinderGeometry(WELL_R + 0.12, WELL_R + 0.12, 0.14, 32, 1, true, kerbStart, Math.PI * 1.5), solid(0x807b75, { side: THREE.DoubleSide }));
+kerb.position.y = 0.07; kerb.name = 'kerb'; well.add(kerb); register(kerb, 1);
+var wellTap = new THREE.Mesh(new THREE.CircleGeometry(WELL_R + 0.15, 32), new THREE.MeshBasicMaterial());
+wellTap.rotation.x = -Math.PI / 2; wellTap.position.y = 0.01; wellTap.visible = false; well.add(wellTap);
+
+/* ---------- light, at night ---------- */
+scene.add(new THREE.HemisphereLight(col(0x2e3448), col(0x1b1613), 0.3));
+var fill = new THREE.DirectionalLight(col(0xffe2c0), 0.18);
+fill.position.set(3, 5, 9);
+scene.add(fill);
+
+/* ---------- the two views ---------- */
+/* stage: the common room's camera, from the open side, the eye 1.35 m up and 1.4 m outside the wall, a drag turning
+   the view 0.55 rad each way about the focus on a 9 m arm (The camera). The eye goes up to 2.07 m and down to 1.1.
+   stair: from the stair head, where he arrives, at a boy's eye, a drag turning the head (the corridor's way). */
+var FOCUS = new THREE.Vector3(0, 1.25, -2.0);
+var CAM_BASE = new THREE.Vector3(0, 1.35, 7.0);
+kit.eye = CAM_BASE;
+var EYE = 1.35, YAW_MAX = 0.55, PITCH_MAX = 0.08, PITCH_DOWN = (1.1 - 1.35) / 9;
+var STAIR_EYE = NEWEL.clone().add(pol(1.0, roomSide)); STAIR_EYE.y = EYE;
+var STAIR_LOOK = new THREE.Vector3(-1.5, 1.1, -2.5);
+var view = /[?&]view=stair/.test(location.search) ? 'stair' : 'stage';
+var yaw = 0, pitch = 0, yawT = 0, pitchT = 0;
+function stagePose(yw, pt, pos, look) {
+  var r = CAM_BASE.z - FOCUS.z;
+  pos.set(FOCUS.x + Math.sin(yw) * r, CAM_BASE.y + pt * r, FOCUS.z + Math.cos(yw) * r);
+  look.copy(FOCUS);
+}
+function stairPose(yw, pt, pos, look) {
+  pos.copy(STAIR_EYE);
+  var d = STAIR_LOOK.clone().sub(STAIR_EYE); d.y = 0;
+  var a = Math.atan2(d.x, d.z) + yw;
+  look.set(pos.x + Math.sin(a) * 10, EYE - 0.15 + pt * 10, pos.z + Math.cos(a) * 10);
+}
+function restPose(pos, look) { (view === 'stair' ? stairPose : stagePose)(yaw, pitch, pos, look); }
+function setView(v) {
+  view = v;
+  btns.view.textContent = v === 'stair' ? 'View: stair head' : 'View: stage';
+  tween = null; atStop = null; mode = 'rest'; backBtn.hidden = true;
+  yaw = yawT = 0; pitch = pitchT = 0;
+}
+
+/* ---------- the stops ---------- */
+/* Tap a thing to go to it: the view glides there and looks at it; tap off it, or Back, glides back. A bed's stop stands
+   at its foot looking down it to the pillow; a window's stands a hand off the sill looking down through it (the view
+   down on the lawn); the hearth's stands before the fire. */
+function bedStop(b) {
+  var g = b.group, foot = g.localToWorld(new THREE.Vector3(0, EYE, BED.l + 1.3)), pillow = g.localToWorld(new THREE.Vector3(0, 0.9, 0.4));
+  return { pos: foot, look: pillow };
+}
+function windowStop(w) {
+  var pos = pol(WALL_R - 0.55, w.deg); pos.y = EYE;
+  var look = pol(WALL_R + 1.5, w.deg); look.y = 0.2;
+  return { pos: pos, look: look };
+}
+var STOPS = [
+  { name: 'hearth', meshes: [hearth, firebox], stop: function () { return { pos: new THREE.Vector3(0, EYE, -WALL_R + 2.6), look: new THREE.Vector3(0, 0.9, -WALL_R) }; } },
+  { name: 'stair', meshes: [wellTap, newelPost, finial, kerb].concat(treads), stop: function () { return { pos: STAIR_EYE.clone().add(new THREE.Vector3(-1.2, 0, 0.9)), look: NEWEL.clone().setY(0.3) }; } }
+];
+beds.forEach(function (b) { STOPS.push({ name: b.name, meshes: b.meshes, stop: function () { return bedStop(b); } }); });
+windows.forEach(function (w) { STOPS.push({ name: w.name, meshes: [w.sky, w.sill], stop: function () { return windowStop(w); } }); });
+var tappables = [];
+STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
+
+var mode = 'rest', atStop = null, tween = null;
+function glideTo(to, done) {
+  var from = { pos: camera.position.clone(), look: lookTmp.clone() };
+  var dist = from.pos.distanceTo(to.pos);
+  tween = { t: 0, dur: clamp(0.8 + dist * 0.1, 0.8, 2.0), from: from, to: to, done: done };
+}
+function goTo(s) {
+  if (s === atStop) return;
+  atStop = s; mode = 'stop';
+  backBtn.hidden = false;
+  glideTo(s.stop());
+}
+function goBack() {
+  if (mode !== 'stop') return;
+  atStop = null;
+  backBtn.hidden = true;
+  yaw = yawT = 0; pitch = pitchT = 0;
+  var p = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
+  restPose(p.pos, p.look);
+  glideTo(p, function () { mode = 'rest'; });
+}
+
+/* ---------- down the stair (8 October 2026) ----------
+   From the well's stop the view drops into the well and the screen darkens there; the common room loads with
+   ?from=dormitory and comes up by itself (castle.js reveals a page that never calls reveal). Arriving at the stair's
+   foot, and the tap on the room's stair that comes up here with ?from=room, are the Common room's half, asked on the
+   board. Coming up (?from=room) this page comes up at rest with the well in view. */
+var leaving = false;
+function descend(dry) {
+  if (leaving) return false;
+  leaving = true;
+  var stairStop = STOPS[1];
+  function drop() {
+    glideTo({ pos: NEWEL.clone().add(pol(0.45, roomSide)).setY(0.4), look: NEWEL.clone().setY(-2.0) });
+    setTimeout(function () {
+      kit.travel('common-room.html?from=dormitory', { place: { room: 'common-room' }, dry: dry, done: function () {
+        leaving = false; atStop = null; mode = 'stop'; goTo(stairStop);
+      } });
+    }, tween.dur * 600);
+  }
+  if (atStop !== stairStop) {
+    goTo(stairStop);
+    var wait = setInterval(function () { if (!tween) { clearInterval(wait); drop(); } }, 50);
+  } else drop();
+  return true;
+}
+function arriveFromRoom() {
+  kit.savePlace({ room: 'dormitory' });
+  kit.reveal();
+}
+
+var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+function tap(cx, cy) {
+  if (!helpEl.hidden) helpEl.hidden = true;
+  if (tween || leaving) return;
+  var r = canvas.getBoundingClientRect();
+  pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  var hits = raycaster.intersectObjects(tappables, false);
+  if (hits.length) goTo(hits[0].object.userData.stop);
+  else goBack();
+}
+
+function updateCamera(dt) {
+  var s = Math.min(1, dt * 7);
+  if (tween) {
+    tween.t += dt;
+    var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
+    camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
+    lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
+    if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
+  } else if (mode === 'rest') {
+    yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
+    restPose(camera.position, lookTmp);
+  }
+  camera.lookAt(lookTmp);
+}
+
+/* drag versus tap */
+var dragging = false, moved = false, sx = 0, sy = 0, px = 0, py = 0;
+canvas.addEventListener('pointerdown', function (e) {
+  dragging = true; moved = false;
+  sx = px = e.clientX; sy = py = e.clientY;
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  e.preventDefault();
+});
+canvas.addEventListener('pointermove', function (e) {
+  if (!dragging) return;
+  var dx = e.clientX - px, dy = e.clientY - py;
+  px = e.clientX; py = e.clientY;
+  if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
+  if (mode === 'rest' && !tween) {
+    if (view === 'stair') {
+      yawT = clamp(yawT - dx * 0.003, -0.6, 0.6);
+      pitchT = clamp(pitchT - dy * 0.0012, -0.12, 0.12);
+    } else {
+      yawT = clamp(yawT - dx * 0.0022, -YAW_MAX, YAW_MAX);
+      pitchT = clamp(pitchT - dy * 0.0012, PITCH_DOWN, PITCH_MAX);
+    }
+  }
+});
+function endDrag(e) {
+  if (!dragging) return;
+  dragging = false;
+  if (!moved && e.type === 'pointerup') tap(e.clientX, e.clientY);
+}
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+backBtn.addEventListener('click', goBack);
+setView(view);
+if (kit.from === 'room') arriveFromRoom();
+
+/* ---------- per frame ---------- */
+
+var clock = new THREE.Clock();
+var t = 0;
+function frame() {
+  var dt = Math.min(0.05, clock.getDelta());
+  t += dt;
+  updateCamera(dt);
+  /* the fire low: a slow flicker */
+  var f = 0.85 + 0.15 * Math.sin(t * 9) * Math.sin(t * 3.7);
+  fireGlow.intensity = 1.5 * f;
+  flame.scale.set(0.45 * (0.94 + 0.06 * Math.sin(t * 6.1)), 0.4 * (0.85 + 0.15 * Math.abs(Math.sin(t * 7.9))), 1);
+  renderer.render(scene, camera);
+  kit.stats(dt);
+}
+renderer.setAnimationLoop(frame);
+
+/* hooks for automated checks; harmless in normal use */
+window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera,
+  tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
+  stops: STOPS.map(function (s) { return s.name; }),
+  mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
+  descend: descend };
+})();
+</script>
+</body>
+</html>
