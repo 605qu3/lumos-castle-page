@@ -1,126 +1,338 @@
 {
   "chain": "trevor",
-  "first_visit": ["trevor.escape"],
+  "first_visit": [
+    "trevor.escape"
+  ],
   "room": [
-    {"when": ["trevor != boxed"], "show": ["notice lost-toad", "box lid-ajar"]},
-    {"when": ["trevor = loose"], "show": ["trevor at spot", "prints from box to spot", "croak now and then"]},
-    {"when": ["trevor = boxed"], "show": ["box lid-shut"]},
-    {"when": ["trevor = boxed", "thanks = shown"], "show": ["notice thanks"]}
+    {
+      "when": [
+        "trevor != boxed"
+      ],
+      "show": [
+        "notice lost-toad",
+        "box lid-ajar"
+      ]
+    },
+    {
+      "when": [
+        "trevor = loose"
+      ],
+      "show": [
+        "trevor at spot",
+        "prints from box to spot",
+        "croak now and then"
+      ]
+    },
+    {
+      "when": [
+        "trevor = boxed"
+      ],
+      "show": [
+        "box lid-shut"
+      ]
+    },
+    {
+      "when": [
+        "trevor = boxed",
+        "thanks = shown"
+      ],
+      "show": [
+        "notice thanks"
+      ]
+    }
   ],
   "records": [
     {
       "id": "trevor.escape",
-      "tier": "fixed", "source": "device", "leans": ["neville"], "weight": 1,
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "weight": 1,
       "moment": "arrive",
-      "when": ["trevor = boxed", "today >= escape_due", "thanks != due", "slot = free"],
+      "when": [
+        "trevor = boxed",
+        "today >= escape_due",
+        "thanks != due",
+        "slot = free"
+      ],
       "starts": [
-        "set trevor = loose", "set spot = mark hiding, not last", "set hops_left = 1-2",
-        "stamp loosed_on", "take slot", "log \"Trevor escaped {day}\""
+        "set trevor = loose",
+        "set spot = mark hiding, not last",
+        "set hops_left = 1-2",
+        "stamp loosed_on",
+        "take slot",
+        "log \"Trevor escaped {day}\""
       ],
       "ends": [
-        {"when": ["trevor = boxed"], "do": ["free slot"]},
+        {
+          "when": [
+            "trevor = boxed"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
         {
           "timeout": "7 days",
-          "do": ["set trevor = boxed", "set thanks = self-found", "stamp escape_due +3-7 days", "free slot",
-                 "log \"Neville found Trevor himself\""],
+          "do": [
+            "set trevor = boxed",
+            "set thanks = self-found",
+            "stamp escape_due +3-7 days",
+            "free slot",
+            "log \"Neville found Trevor himself\""
+          ],
           "lines": [
-            {"medium": "written", "hand": "neville", "at": "board", "key": "trevor.self-found",
-             "text": ["Found him in the bathtub! Panic over. N."]}
+            {
+              "medium": "written",
+              "hand": "neville",
+              "at": "board",
+              "key": "trevor.self-found",
+              "text": [
+                "Found him in the bathtub! Panic over. N."
+              ]
+            }
           ]
         }
       ]
     },
     {
       "id": "trevor.escape-heralded",
-      "tier": "fixed", "source": "device", "leans": ["neville"], "weight": 1,
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "weight": 1,
       "moment": "arrive",
-      "when": ["trevor = boxed", "today >= escape_due", "thanks != due", "slot = free"],
+      "when": [
+        "trevor = boxed",
+        "today >= escape_due",
+        "thanks != due",
+        "slot = free"
+      ],
       "who": [
-        {"as": "herald", "role": "pool", "count": "2-3", "mark": "fire", "pose": "standing, listening"}
+        {
+          "as": "herald",
+          "role": "pool",
+          "count": "2-3",
+          "mark": "fire",
+          "pose": "standing, listening"
+        }
       ],
       "lines": [
-        {"speaker": "herald", "medium": "said", "pose": "standing, speaking", "key": "trevor.herald",
-         "text": ["Neville's lost Trevor again!",
-                  "Has anyone seen a toad? Neville's in a state.",
-                  "Trevor's out. Neville's checking under every bed."]}
+        {
+          "speaker": "herald",
+          "medium": "said",
+          "pose": "standing, speaking",
+          "key": "trevor.herald",
+          "text": [
+            "Neville's lost Trevor again!",
+            "Has anyone seen a toad? Neville's in a state.",
+            "Trevor's out. Neville's checking under every bed."
+          ]
+        }
       ],
       "starts": [
-        "set trevor = loose", "set spot = mark hiding, not last", "set hops_left = 1-2",
-        "stamp loosed_on", "take slot", "log \"Trevor escaped {day}\""
+        "set trevor = loose",
+        "set spot = mark hiding, not last",
+        "set hops_left = 1-2",
+        "stamp loosed_on",
+        "take slot",
+        "log \"Trevor escaped {day}\""
       ],
       "ends": [
-        {"when": ["trevor = boxed"], "do": ["free slot"]},
+        {
+          "when": [
+            "trevor = boxed"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
         {
           "timeout": "7 days",
-          "do": ["set trevor = boxed", "set thanks = self-found", "stamp escape_due +3-7 days", "free slot",
-                 "log \"Neville found Trevor himself\""],
+          "do": [
+            "set trevor = boxed",
+            "set thanks = self-found",
+            "stamp escape_due +3-7 days",
+            "free slot",
+            "log \"Neville found Trevor himself\""
+          ],
           "lines": [
-            {"medium": "written", "hand": "neville", "at": "board", "key": "trevor.self-found-heralded",
-             "text": ["Found him in the bathtub! Panic over. N."]}
+            {
+              "medium": "written",
+              "hand": "neville",
+              "at": "board",
+              "key": "trevor.self-found-heralded",
+              "text": [
+                "Found him in the bathtub! Panic over. N."
+              ]
+            }
           ]
         }
       ]
     },
     {
       "id": "trevor.hop",
-      "tier": "fixed", "source": "device", "leans": ["neville"],
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
       "moment": "tap trevor",
-      "when": ["trevor = loose", "hops_left > 0"],
-      "starts": ["add hops_left -1", "set spot = mark next to spot"]
+      "when": [
+        "trevor = loose",
+        "hops_left > 0"
+      ],
+      "starts": [
+        "add hops_left -1",
+        "set spot = mark next to spot"
+      ]
     },
     {
       "id": "trevor.catch",
-      "tier": "fixed", "source": "device", "leans": ["neville"],
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
       "moment": "tap trevor",
-      "when": ["trevor = loose", "hops_left = 0"],
-      "starts": ["set trevor = held"],
+      "when": [
+        "trevor = loose",
+        "hops_left = 0"
+      ],
+      "starts": [
+        "set trevor = held"
+      ],
       "ends": [
-        {"when": ["trevor = boxed"], "do": []},
-        {"on": "leave", "do": ["set trevor = loose"]}
+        {
+          "when": [
+            "trevor = boxed"
+          ],
+          "do": []
+        },
+        {
+          "on": "leave",
+          "do": [
+            "set trevor = loose"
+          ]
+        }
       ]
     },
     {
       "id": "trevor.box",
-      "tier": "fixed", "source": "device", "leans": ["neville"],
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
       "moment": "tap box",
-      "when": ["trevor = held"],
-      "starts": ["set trevor = boxed", "add found 1", "stamp caught_on", "stamp escape_due +3-7 days",
-                 "set thanks = due", "log \"found {day}\""]
+      "when": [
+        "trevor = held"
+      ],
+      "starts": [
+        "set trevor = boxed",
+        "add found 1",
+        "stamp caught_on",
+        "stamp escape_due +3-7 days",
+        "set thanks = due",
+        "log \"found {day}\""
+      ]
     },
     {
       "id": "trevor.thanks-plain",
-      "tier": "fixed", "source": "device", "leans": ["neville"], "weight": 2,
-      "moment": "arrive",
-      "when": ["thanks = due", "today > caught_on"],
-      "lines": [
-        {"medium": "written", "hand": "neville", "at": "board", "key": "trevor.thanks-plain",
-         "style": "a blot and a crossed-out word",
-         "text": ["THANK YOU for finding Trevor. He's always doing this. I owe you one! Neville"]}
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
       ],
-      "starts": ["set thanks = shown"]
+      "weight": 2,
+      "moment": "arrive",
+      "when": [
+        "thanks = due",
+        "today > caught_on"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "neville",
+          "at": "board",
+          "key": "trevor.thanks-plain",
+          "style": "a blot and a crossed-out word",
+          "text": [
+            "THANK YOU for finding Trevor. He's always doing this. I owe you one! Neville"
+          ]
+        }
+      ],
+      "starts": [
+        "set thanks = shown"
+      ]
     },
     {
       "id": "trevor.thanks-card",
-      "tier": "fixed", "source": "device", "leans": ["neville"], "weight": 1,
-      "moment": "arrive",
-      "when": ["thanks = due", "today > caught_on", "found >= 3"],
-      "show": ["chocolate frog card pinned to the thanks"],
-      "lines": [
-        {"medium": "written", "hand": "neville", "at": "board", "key": "trevor.thanks-card", "canon": "PS6",
-         "text": ["You found mine, so here's one for you! N."]}
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
       ],
-      "starts": ["set thanks = shown"]
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "thanks = due",
+        "today > caught_on",
+        "found >= 3"
+      ],
+      "show": [
+        "chocolate frog card pinned to the thanks"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "neville",
+          "at": "board",
+          "key": "trevor.thanks-card",
+          "canon": "PS6",
+          "text": [
+            "You found mine, so here's one for you! N."
+          ]
+        }
+      ],
+      "starts": [
+        "set thanks = shown",
+        "set frog_card = yes",
+        "set hypatia = home"
+      ]
     },
     {
       "id": "trevor.thanks-question",
-      "tier": "fixed", "source": "device", "leans": ["neville"], "weight": 1,
-      "moment": "arrive",
-      "when": ["thanks = due", "today > caught_on", "found >= 3"],
-      "lines": [
-        {"medium": "written", "hand": "neville", "at": "board", "key": "trevor.thanks-question",
-         "text": ["Do toads like puddles? Have a look after it rains. N."]}
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
       ],
-      "starts": ["set thanks = shown"]
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "thanks = due",
+        "today > caught_on",
+        "found >= 3"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "neville",
+          "at": "board",
+          "key": "trevor.thanks-question",
+          "text": [
+            "Do toads like puddles? Have a look after it rains. N."
+          ]
+        }
+      ],
+      "starts": [
+        "set thanks = shown"
+      ]
     }
   ]
 }

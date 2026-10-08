@@ -1,0 +1,216 @@
+{
+  "chain": "notice",
+  "room": [
+    {
+      "when": [
+        "wood_replies >= 1"
+      ],
+      "show": [
+        "under Wood's notice, Neville's reply in his hand"
+      ]
+    },
+    {
+      "when": [
+        "wood_replies >= 2"
+      ],
+      "show": [
+        "under Neville's reply, Wood's answer in his scrawl"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "notice.pince-charmed",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "look again notice pince",
+      "when": [
+        "charmed_pince != yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "pince",
+          "at": "board",
+          "key": "notice.pince-charmed",
+          "style": "a new line coming up under the last, the ink wet and darkening as he looks",
+          "text": [
+            "And do NOT fold the corners.",
+            "Nor read in the bath.",
+            "I shall know."
+          ]
+        }
+      ],
+      "starts": [
+        "set charmed_pince = yes"
+      ]
+    },
+    {
+      "id": "notice.wood-charmed",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "look again notice wood",
+      "when": [
+        "charmed_wood != yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "wood",
+          "at": "board",
+          "key": "notice.wood-charmed",
+          "style": "a new line coming up under the last, the ink wet and darkening as he looks",
+          "text": [
+            "That means YOU.",
+            "Rain or shine.",
+            "Bring your own towel."
+          ]
+        }
+      ],
+      "starts": [
+        "set charmed_wood = yes"
+      ]
+    },
+    {
+      "id": "notice.flying-charmed",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "look again notice flying",
+      "when": [
+        "charmed_flying != yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hooch",
+          "at": "board",
+          "key": "notice.flying-charmed",
+          "style": "a new line coming up under the last, the ink wet and darkening as he looks",
+          "text": [
+            "Hold on tight.",
+            "Brooms are not toys.",
+            "No showing off."
+          ]
+        }
+      ],
+      "starts": [
+        "set charmed_flying = yes"
+      ]
+    },
+    {
+      "id": "notice.neville-charmed",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "look again notice neville",
+      "when": [
+        "charmed_neville != yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "neville",
+          "at": "board",
+          "key": "notice.neville-charmed",
+          "style": "a new line coming up under the last, the ink wet and darkening as he looks",
+          "text": [
+            "He likes the bathroom.",
+            "He might be in a shoe.",
+            "Please be gentle with him."
+          ]
+        }
+      ],
+      "starts": [
+        "set charmed_neville = yes"
+      ]
+    },
+    {
+      "id": "notice.reply-neville",
+      "tier": "small",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "arrive",
+      "when": [
+        "wood_replies = 0"
+      ],
+      "weight": 1,
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "neville",
+          "at": "board",
+          "key": "notice.reply-neville",
+          "text": [
+            "Can Trevor come to practice?"
+          ]
+        }
+      ],
+      "starts": [
+        "add wood_replies 1"
+      ]
+    },
+    {
+      "id": "notice.reply-wood",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "wood_replies = 1"
+      ],
+      "weight": 1,
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "wood",
+          "at": "board",
+          "key": "notice.reply-wood",
+          "text": [
+            "NO. O.W.",
+            "Only if he can fly. O.W."
+          ]
+        }
+      ],
+      "starts": [
+        "add wood_replies 1"
+      ]
+    },
+    {
+      "id": "notice.tidy",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "weekday = monday",
+        "days since tidied_on >= 1"
+      ],
+      "show": [
+        "the board tidied for password Monday: fresh copies pinned and the replies gone"
+      ],
+      "starts": [
+        "set wood_replies = 0",
+        "stamp tidied_on"
+      ]
+    },
+    {
+      "id": "notice.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set charmed_pince = no",
+        "set charmed_wood = no",
+        "set charmed_flying = no",
+        "set charmed_neville = no"
+      ]
+    }
+  ]
+}

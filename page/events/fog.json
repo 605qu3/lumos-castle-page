@@ -1,0 +1,41 @@
+{
+  "chain": "fog",
+  "room": [
+    {
+      "when": [
+        "cold = yes"
+      ],
+      "show": [
+        "the lower panes of both windows misted on arrival, paler glass from the room",
+        "in one pane an old finger doodle by someone long ago, a small broom, strokes only, showing in the fog"
+      ]
+    },
+    {
+      "when": [
+        "cold = yes",
+        "fog_marks = yes"
+      ],
+      "show": [
+        "whatever he last drew in the fog, back faint, kept on his iPad and never published"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "fog.rub",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "rub window",
+      "when": [
+        "cold = yes"
+      ],
+      "show": [
+        "the glass rubs clear under his finger, drips run from the cleared patch, and it fogs back slowly from the edges"
+      ],
+      "starts": [
+        "set fog_marks = yes"
+      ]
+    }
+  ]
+}

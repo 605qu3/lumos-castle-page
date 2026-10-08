@@ -1,0 +1,81 @@
+{
+  "chain": "painting",
+  "records": [
+    {
+      "id": "painting.looks-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap mantel portrait",
+      "when": [
+        "mantel sitter = seated",
+        "looked != yes"
+      ],
+      "show": [
+        "the camera glides up to the painting, as the board's walk-up does",
+        "she turns in her chair and looks out of the painting at him for a few seconds, drawn fresh, then goes back to what she was doing"
+      ],
+      "starts": [
+        "set looked = yes"
+      ]
+    },
+    {
+      "id": "painting.looks",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap mantel portrait",
+      "when": [
+        "mantel sitter = seated",
+        "looked = yes"
+      ],
+      "one_of": "mantel-look",
+      "weight": 1,
+      "show": [
+        "the camera glides up to the painting",
+        "she turns in her chair and looks out of the painting at him for a few seconds, drawn fresh, then goes back to what she was doing"
+      ]
+    },
+    {
+      "id": "painting.carries-on",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap mantel portrait",
+      "when": [
+        "mantel sitter = seated",
+        "looked = yes"
+      ],
+      "one_of": "mantel-look",
+      "weight": 1,
+      "show": [
+        "the camera glides up to the painting",
+        "she carries on with what she was doing: her window, her hands, her hat"
+      ]
+    },
+    {
+      "id": "painting.not-seated",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap mantel portrait",
+      "when": [
+        "mantel sitter != seated"
+      ],
+      "show": [
+        "the camera glides up to the painting and shows what is true: an empty chair, her mid-stride, or her standing in the study"
+      ]
+    },
+    {
+      "id": "painting.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set looked = no"
+      ]
+    }
+  ]
+}

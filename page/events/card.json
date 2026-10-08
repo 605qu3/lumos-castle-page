@@ -1,0 +1,144 @@
+{
+  "chain": "card",
+  "room": [
+    {
+      "when": [
+        "frog_card = yes"
+      ],
+      "show": [
+        "the Chocolate Frog card pinned on the board, kept through password Monday's tidy"
+      ]
+    },
+    {
+      "when": [
+        "frog_card = yes",
+        "hypatia = home"
+      ],
+      "show": [
+        "Hypatia in her card"
+      ]
+    },
+    {
+      "when": [
+        "frog_card = yes",
+        "hypatia = away"
+      ],
+      "show": [
+        "her card empty: the background and her name still there"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "card.arrive-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "frog_card = yes"
+      ],
+      "one_of": "card-arrive",
+      "weight": 1,
+      "starts": [
+        "set hypatia = home"
+      ]
+    },
+    {
+      "id": "card.arrive-away",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "frog_card = yes"
+      ],
+      "one_of": "card-arrive",
+      "weight": 1,
+      "starts": [
+        "set hypatia = away"
+      ]
+    },
+    {
+      "id": "card.back",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap frog card",
+      "when": [
+        "frog_card = yes"
+      ],
+      "show": [
+        "he takes the card and it turns over"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "print",
+          "at": "hand",
+          "key": "card.back",
+          "canon": "facts, verify",
+          "text": [
+            "HYPATIA OF ALEXANDRIA. About 355 to 415. Mathematician, astronomer and teacher, who taught all who came to listen how the stars move and what shapes you get when you slice a cone."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "card.first-turn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap frog card",
+      "when": [
+        "frog_card = yes",
+        "card_turns = 0"
+      ],
+      "show": [
+        "turned back, the picture is empty: the background and her name still there"
+      ],
+      "starts": [
+        "add card_turns 1",
+        "set hypatia = away"
+      ]
+    },
+    {
+      "id": "card.turn-away",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap frog card",
+      "when": [
+        "frog_card = yes",
+        "card_turns >= 1"
+      ],
+      "one_of": "card-turn",
+      "weight": 1,
+      "show": [
+        "turned back, the picture is empty"
+      ],
+      "starts": [
+        "set hypatia = away"
+      ]
+    },
+    {
+      "id": "card.turn-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap frog card",
+      "when": [
+        "frog_card = yes",
+        "card_turns >= 1"
+      ],
+      "one_of": "card-turn",
+      "weight": 1,
+      "show": [
+        "turned back, she is there"
+      ],
+      "starts": [
+        "set hypatia = home"
+      ]
+    }
+  ]
+}

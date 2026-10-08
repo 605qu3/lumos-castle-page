@@ -18,6 +18,15 @@
       "show": [
         "the cat asleep, curled on the sofa"
       ]
+    },
+    {
+      "when": [
+        "time != night",
+        "cat_with_him = yes"
+      ],
+      "show": [
+        "the cat sitting at the rug's near edge before the fire, facing it, now and then looking back over her shoulder at him and flicking her tail"
+      ]
     }
   ],
   "records": [
@@ -153,6 +162,65 @@
       ],
       "show": [
         "the draught ruffles the sleeping cat's fur"
+      ]
+    },
+    {
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "waiting"
+      ],
+      "id": "cat.sits-with-him",
+      "moment": "quiet 30-60 s",
+      "when": [
+        "time != night",
+        "cat_sat != yes"
+      ],
+      "show": [
+        "the cat leaves her loop, walks to the rug's near edge before the fire, clear of the armchair and the round table, sits facing the fire and looks back over her shoulder at him as she settles"
+      ],
+      "starts": [
+        "set cat_sat = yes",
+        "set cat_with_him = yes"
+      ],
+      "ends": [
+        {
+          "on": "tap any but cat",
+          "do": [
+            "set cat_with_him = no"
+          ]
+        },
+        {
+          "on": "leave",
+          "do": [
+            "set cat_with_him = no"
+          ]
+        }
+      ]
+    },
+    {
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "id": "cat.looks-again",
+      "moment": "tap cat",
+      "when": [
+        "time != night",
+        "cat_with_him = yes"
+      ],
+      "show": [
+        "she looks back at him once more, and stays"
+      ]
+    },
+    {
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "id": "cat.rejoins",
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set cat_sat = no"
       ]
     },
     {

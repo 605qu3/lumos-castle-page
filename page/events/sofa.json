@@ -1,0 +1,362 @@
+{
+  "chain": "sofa",
+  "bags": {
+    "sofa": [
+      {
+        "item": "pawn"
+      },
+      {
+        "item": "bean"
+      },
+      {
+        "item": "wrapper"
+      },
+      {
+        "item": "knut"
+      },
+      {
+        "item": "paper-hat",
+        "when": [
+          "date >= 12-20",
+          "date <= 12-31"
+        ]
+      },
+      {
+        "item": "sugar-mouse",
+        "when": [
+          "date >= 10-25",
+          "date <= 11-02"
+        ]
+      }
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "holding = yes"
+      ],
+      "show": [
+        "the find in his hand, up close, as a notice is held"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "sofa.first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sofa",
+      "when": [
+        "mark sofa = free",
+        "sofa_finds = 0"
+      ],
+      "show": [
+        "a little puff of dust at one cushion, and whatever was down that side rises from the gap and comes to his hand, as a notice comes off the board"
+      ],
+      "starts": [
+        "set cushion = mark cushion, not last",
+        "set find = from bag sofa",
+        "set holding = yes",
+        "add sofa_finds 1",
+        "stamp sofa_due +2-6 days",
+        "set sofa_sat = no",
+        "set rummaged = yes",
+        "log \"Found a {find} down the side of the sofa {day}\""
+      ]
+    },
+    {
+      "id": "sofa.find",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sofa",
+      "when": [
+        "mark sofa = free",
+        "sofa_finds >= 1",
+        "today >= sofa_due",
+        "rummaged != yes"
+      ],
+      "weight": 1,
+      "boost": {
+        "when": [
+          "sofa_sat = yes"
+        ],
+        "times": 4
+      },
+      "show": [
+        "a little puff of dust at one cushion, and whatever was down that side rises from the gap and comes to his hand, as a notice comes off the board"
+      ],
+      "starts": [
+        "set cushion = mark cushion, not last",
+        "set find = from bag sofa",
+        "set holding = yes",
+        "add sofa_finds 1",
+        "stamp sofa_due +2-6 days",
+        "set sofa_sat = no",
+        "set rummaged = yes",
+        "log \"Found a {find} down the side of the sofa {day}\""
+      ]
+    },
+    {
+      "id": "sofa.fluff",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sofa",
+      "when": [
+        "mark sofa = free",
+        "sofa_finds >= 1",
+        "rummaged != yes"
+      ],
+      "weight": 2,
+      "show": [
+        "a little puff of dust at one cushion, and a crumb or two"
+      ],
+      "starts": [
+        "set cushion = mark cushion, not last",
+        "set rummaged = yes"
+      ]
+    },
+    {
+      "id": "sofa.fluff-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sofa",
+      "when": [
+        "mark sofa = free",
+        "rummaged = yes"
+      ],
+      "show": [
+        "a little puff of dust at one cushion, and a crumb or two"
+      ],
+      "starts": [
+        "set cushion = mark cushion, not last",
+        "set rummaged = yes"
+      ]
+    },
+    {
+      "id": "sofa.pawn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = pawn"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a wizard-chess pawn",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "said",
+          "key": "sofa.pawn",
+          "canon": "PS12, verify",
+          "text": [
+            "Put me back in the box, you great oaf!",
+            "Unhand me! I'm a chessman!",
+            "Do you know how long I've been down there?"
+          ]
+        }
+      ],
+      "show": [
+        "set down, the pawn stomps off under the sofa, grumbling"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.bean",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = bean"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a single Bertie Bott's bean",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "said",
+          "key": "sofa.bean",
+          "canon": "PS6 and PS17, verify",
+          "text": [
+            "Earwax!",
+            "Toffee. Phew.",
+            "Sprouts!",
+            "Grass?",
+            "Pepper! Water!"
+          ]
+        }
+      ],
+      "show": [
+        "he tastes it, and it is gone"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.wrapper",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = wrapper"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "an empty Chocolate Frog wrapper",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "sofa.wrapper.hop",
+          "sound": "a hop, somewhere under the furniture"
+        }
+      ],
+      "show": [
+        "tossed, the wrapper flies into the fire, which flares"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.knut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = knut"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a Knut",
+          "mark": "hand"
+        }
+      ],
+      "show": [
+        "the Knut goes into his pocket with a clink"
+      ],
+      "starts": [
+        "add knuts 1",
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.paper-hat",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = paper-hat"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a paper hat from a wizard cracker",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "written",
+          "hand": "print",
+          "at": "hand",
+          "key": "sofa.paper-hat",
+          "canon": "PS12, verify",
+          "text": [
+            "It unfolds into an admiral's hat.",
+            "It unfolds into a crown."
+          ]
+        }
+      ],
+      "show": [
+        "it unfolds, and he wears it until he leaves"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.sugar-mouse",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = sugar-mouse"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a sugar mouse",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "sofa.sugar-mouse",
+          "canon": "PA10, verify",
+          "sound": "a squeak"
+        }
+      ],
+      "show": [
+        "he tastes it, and it is gone"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set rummaged = no",
+        "set holding = no"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "chain": "griffin",
+  "room": [
+    {
+      "when": [
+        "time != night",
+        "griffin = folded"
+      ],
+      "show": [
+        "the tapestry's griffin with its wings folded down along its back"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "griffin.folded",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "time != night",
+        "griffin_last != folded"
+      ],
+      "one_of": "griffin-arrive",
+      "weight": 1,
+      "starts": [
+        "set griffin = folded",
+        "set griffin_last = folded"
+      ]
+    },
+    {
+      "id": "griffin.rearing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "time != night"
+      ],
+      "one_of": "griffin-arrive",
+      "weight": 3,
+      "starts": [
+        "set griffin = rearing",
+        "set griffin_last = rearing"
+      ]
+    },
+    {
+      "id": "griffin.folds-behind",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "back from walk-up",
+      "when": [
+        "time != night",
+        "griffin = rearing",
+        "griffin_moved != yes"
+      ],
+      "one_of": "griffin-behind",
+      "weight": 1,
+      "starts": [
+        "set griffin = folded",
+        "set griffin_moved = yes"
+      ]
+    },
+    {
+      "id": "griffin.rises-behind",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "back from walk-up",
+      "when": [
+        "time != night",
+        "griffin = folded",
+        "griffin_moved != yes"
+      ],
+      "one_of": "griffin-behind",
+      "weight": 1,
+      "starts": [
+        "set griffin = rearing",
+        "set griffin_moved = yes"
+      ]
+    },
+    {
+      "id": "griffin.stays",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "back from walk-up",
+      "when": [
+        "time != night",
+        "griffin_moved != yes"
+      ],
+      "one_of": "griffin-behind",
+      "weight": 3
+    },
+    {
+      "id": "griffin.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set griffin_moved = no"
+      ]
+    }
+  ]
+}
