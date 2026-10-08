@@ -3,33 +3,580 @@
   "records": [
     {
       "id": "neville.locked-out",
-      "tier": "big", "source": "device", "leans": ["neville"], "weight": 1,
-      "boost": {"when": ["returns this week = 0"], "times": 3},
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "weight": 1,
+      "boost": {
+        "when": [
+          "returns this week = 0"
+        ],
+        "times": 3
+      },
       "moment": "outside",
-      "when": ["portrait = shut"],
+      "when": [
+        "portrait = shut",
+        "trouble != fresh"
+      ],
       "who": [
-        {"as": "neville", "role": "canon", "name": "neville", "mark": "frame-foot", "pose": "hunched"}
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "frame-foot",
+          "pose": "hunched, knees up"
+        }
       ],
       "lines": [
-        {"speaker": "neville", "medium": "said", "key": "neville.locked-out.ask",
-         "text": ["Oh, thank goodness. I've forgotten it again.",
-                  "I had it this morning, I know I did.",
-                  "Do you know it? She won't let me in."]}
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.locked-out.ask",
+          "text": [
+            "Oh, thank goodness. I've forgotten it again.",
+            "I had it this morning, I know I did.",
+            "Do you know it? She won't let me in."
+          ]
+        }
       ],
-      "starts": ["log \"Let Neville in {day}\""],
+      "starts": [
+        "log \"Let Neville in {day}\""
+      ],
       "ends": [
         {
           "on": "password",
           "do": [],
           "lines": [
-            {"speaker": "neville", "medium": "said", "pose": "standing, relieved", "then": "goes in ahead by the hole",
-             "key": "neville.locked-out.thanks",
-             "text": ["Thanks! I'd forget my own head."]},
-            {"speaker": "neville", "medium": "heard", "key": "neville.locked-out.stair",
-             "sound": "running up the stair"}
+            {
+              "speaker": "neville",
+              "medium": "said",
+              "pose": "standing, relieved",
+              "then": "goes in ahead by the hole",
+              "key": "neville.locked-out.thanks",
+              "text": [
+                "Thanks! I'd forget my own head."
+              ]
+            },
+            {
+              "speaker": "neville",
+              "medium": "heard",
+              "key": "neville.locked-out.stair",
+              "sound": "running up the stair"
+            }
           ]
         },
-        {"on": "leave", "do": []}
+        {
+          "on": "leave",
+          "do": []
+        }
+      ]
+    },
+    {
+      "id": "neville.trouble",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "slot = free",
+        "trevor = boxed",
+        "thanks != due",
+        "time != morning",
+        "days since trouble_on >= 14"
+      ],
+      "starts": [
+        "set trouble = fresh",
+        "set told = no",
+        "set sat = no",
+        "set given = no",
+        "set comforted = 0",
+        "stamp trouble_on",
+        "take slot",
+        "log \"Neville in trouble: Trevor on McGonagall's desk {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "trouble = over"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set trouble = over",
+            "free slot",
+            "log \"Neville's detention came and went\""
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "neville",
+              "at": "board",
+              "key": "neville.trouble.self",
+              "text": [
+                "Detention was fine, honestly. McGonagall even said good morning. N."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "neville.trouble-tell",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap neville",
+      "when": [
+        "trouble = fresh",
+        "told = no"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "hunched, knees up"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.trouble.tell",
+          "text": [
+            "Trevor got out in Transfiguration. He sat on McGonagall's desk. Five points and a detention. Everyone's going to know forever."
+          ]
+        }
+      ],
+      "starts": [
+        "set told = yes"
+      ]
+    },
+    {
+      "id": "neville.trouble-worry",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap neville",
+      "when": [
+        "trouble = fresh",
+        "told = yes",
+        "comforted = 0"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "hunched, knees up"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.trouble.worry",
+          "text": [
+            "She'll never forget it. Never.",
+            "Everyone'll know by breakfast.",
+            "I only forgot to leave him upstairs."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "neville.trouble-easier",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap neville",
+      "when": [
+        "trouble = fresh",
+        "told = yes",
+        "comforted >= 1"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "sitting easier, looking at the fire"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.trouble.easier",
+          "text": [
+            "It's only one detention, I suppose.",
+            "Trevor did look pleased with himself up there.",
+            "At least it's warm in here."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "neville.trouble-sit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap beside neville",
+      "when": [
+        "trouble = fresh",
+        "sat = no",
+        "comforted = 0"
+      ],
+      "show": [
+        "the camera sits down on the rug beside neville, both facing the fire"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "hunched, knees up"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "pose": "sitting easier, looking at the fire",
+          "key": "neville.trouble.sit",
+          "sound": "a long breath out"
+        }
+      ],
+      "starts": [
+        "set sat = yes",
+        "add comforted 1"
+      ]
+    },
+    {
+      "id": "neville.trouble-sit-second",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap beside neville",
+      "when": [
+        "trouble = fresh",
+        "sat = no",
+        "comforted = 1"
+      ],
+      "show": [
+        "the camera sits down on the rug beside neville, both facing the fire"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "sitting easier, looking at the fire"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "pose": "sitting easier, looking at the fire",
+          "key": "neville.trouble.laugh-sit",
+          "text": [
+            "Trevor sat right on her inkpot, you know. Right on it."
+          ]
+        }
+      ],
+      "starts": [
+        "set sat = yes",
+        "add comforted 1"
+      ]
+    },
+    {
+      "id": "neville.trouble-box",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap box",
+      "when": [
+        "trouble = fresh",
+        "given = no",
+        "comforted = 0"
+      ],
+      "show": [
+        "the box comes to neville; he lifts the lid a crack"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "hunched, knees up"
+        },
+        {
+          "as": "trevor",
+          "role": "trace",
+          "what": "trevor in his box",
+          "mark": "rug"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "trevor",
+          "medium": "heard",
+          "key": "neville.trouble.croak",
+          "sound": "a croak from the box"
+        },
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "pose": "sitting easier, looking at the fire",
+          "key": "neville.trouble.box",
+          "text": [
+            "Hello, you. Look what you did."
+          ]
+        }
+      ],
+      "starts": [
+        "set given = yes",
+        "add comforted 1"
+      ]
+    },
+    {
+      "id": "neville.trouble-box-second",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap box",
+      "when": [
+        "trouble = fresh",
+        "given = no",
+        "comforted = 1"
+      ],
+      "show": [
+        "the box comes to neville; he lifts the lid a crack"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "sitting easier, looking at the fire"
+        },
+        {
+          "as": "trevor",
+          "role": "trace",
+          "what": "trevor in his box",
+          "mark": "rug"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "trevor",
+          "medium": "heard",
+          "key": "neville.trouble.croak-second",
+          "sound": "a croak from the box"
+        },
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "pose": "sitting easier, looking at the fire",
+          "key": "neville.trouble.laugh-box",
+          "text": [
+            "You sat right on her inkpot, didn't you. Right on it."
+          ]
+        }
+      ],
+      "starts": [
+        "set given = yes",
+        "add comforted 1"
+      ]
+    },
+    {
+      "id": "neville.trouble-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "arrive",
+      "when": [
+        "trouble = fresh",
+        "today > trouble_on",
+        "time = morning",
+        "portrait = shut"
+      ],
+      "show": [
+        "the portrait swings open from outside"
+      ],
+      "who": [
+        {
+          "as": "mcgonagall",
+          "role": "canon",
+          "name": "mcgonagall",
+          "mark": "hole",
+          "pose": "leaning in at the hole, waist up, holding a scarf"
+        },
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "standing, relieved"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "mcgonagall",
+          "medium": "said",
+          "key": "neville.trouble.morning",
+          "text": [
+            "Longbottom. You left your scarf in my classroom. Good morning.",
+            "Good morning, Longbottom. Your scarf, I believe.",
+            "Longbottom. Your scarf. Good morning to you."
+          ],
+          "then": "hands the scarf in and goes; the portrait swings shut"
+        },
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "pose": "standing, relieved",
+          "key": "neville.trouble.after",
+          "canon": "OP12, verify",
+          "text": [
+            "She said good morning! Detention was only sorting needles. It wasn't even bad.",
+            "It wasn't even bad. I sorted matches and needles and she gave me a biscuit.",
+            "She said good morning like nothing happened! Detention was nearly fun."
+          ]
+        }
+      ],
+      "starts": [
+        "set trouble = over",
+        "log \"Neville's detention was fine {day}\""
+      ]
+    },
+    {
+      "id": "neville.trouble-later",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "arrive",
+      "when": [
+        "trouble = fresh",
+        "today > trouble_on",
+        "time != morning",
+        "time != night",
+        "portrait = shut"
+      ],
+      "show": [
+        "the portrait swings open from outside"
+      ],
+      "who": [
+        {
+          "as": "mcgonagall",
+          "role": "canon",
+          "name": "mcgonagall",
+          "mark": "hole",
+          "pose": "leaning in at the hole, waist up, holding a scarf"
+        },
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "rug",
+          "pose": "standing, relieved"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "mcgonagall",
+          "medium": "said",
+          "key": "neville.trouble.later",
+          "text": [
+            "Ah, Longbottom. You left your scarf in my classroom. There you are.",
+            "Longbottom. Your scarf, I believe.",
+            "Ah, there you are, Longbottom. Your scarf."
+          ],
+          "then": "hands the scarf in and goes; the portrait swings shut"
+        },
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "pose": "standing, relieved",
+          "key": "neville.trouble.after-later",
+          "canon": "OP12, verify",
+          "text": [
+            "She said good morning to me at breakfast like nothing happened! And detention was only sorting needles.",
+            "It wasn't even bad. I sorted matches and needles and she gave me a biscuit.",
+            "She was nice! Detention was nearly fun."
+          ]
+        }
+      ],
+      "starts": [
+        "set trouble = over",
+        "log \"Neville's detention was fine {day}\""
+      ]
+    }
+  ],
+  "room": [
+    {
+      "when": [
+        "trouble = fresh",
+        "today = trouble_on",
+        "comforted = 0"
+      ],
+      "show": [
+        "neville on the rug, hunched, knees up"
+      ]
+    },
+    {
+      "when": [
+        "trouble = fresh",
+        "today = trouble_on",
+        "comforted >= 1"
+      ],
+      "show": [
+        "neville on the rug, sitting easier, looking at the fire"
+      ]
+    },
+    {
+      "when": [
+        "trouble = fresh",
+        "today = trouble_on",
+        "given = yes"
+      ],
+      "show": [
+        "trevor's box on neville's knees, not on the books table"
       ]
     }
   ]
