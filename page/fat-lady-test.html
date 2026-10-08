@@ -18,6 +18,8 @@
   /* A patch sits at its box in the layer's 1120 x 1360 pixels, given in percent so it scales with her. */
   .patch { opacity: 0; transition: opacity 0.2s linear; }
   .patch.on { opacity: 1; }
+  /* An arm patch fades a little slower, and through a halfway pose, so the hand reads as moving. */
+  .patch.arm { transition-duration: 0.25s; }
   #bar { position: absolute; left: 0; right: 0; bottom: 0; min-height: 64px; box-sizing: border-box; flex-wrap: wrap; padding: 8px 12px; display: flex; gap: 8px; align-items: center; justify-content: center; padding: 0 12px; }
   button { font: inherit; color: var(--fg); background: #2a241e; border: 1px solid #4a4036; border-radius: 10px; padding: 9px 14px; }
   button.sel { background: #6b3a24; }
@@ -29,6 +31,8 @@
 <div id="stage">
   <div id="lady">
     <img id="front" src="../assets/layers/portrait-hole-front.png" alt="">
+    <img class="patch arm" id="reach" src="../assets/layers/portrait-hole-front-reach.png" alt="">
+    <img class="patch arm" id="ear" src="../assets/layers/portrait-hole-front-ear.png" alt="">
     <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png" alt="">
     <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png" alt="">
     <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png" alt="">
@@ -39,6 +43,7 @@
   <button id="toggle">Doze / wake</button>
   <button id="listenBtn">Listen</button>
   <button id="rightBtn">Right password</button>
+  <button id="earBtn">Can't hear</button>
   <button id="zoom">Close</button>
   <span id="state">awake</span>
 </div>
@@ -48,7 +53,8 @@
    of a second. Auto dozes and wakes her at durations drawn fresh each time, never on a clock. */
 (function () {
   var W = 1120, H = 1360;
-  var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529] };
+  var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529],
+    reach: [549, 415, 907, 918], ear: [549, 415, 907, 918] };
   for (var id in PATCHES) {
     var b = PATCHES[id], el = document.getElementById(id);
     el.style.left = (100 * b[0] / W) + '%'; el.style.top = (100 * b[1] / H) + '%';
@@ -96,7 +102,22 @@
       listenTimer = setTimeout(function () { setPleased(false); }, 3000);
     }, 2000);
   });
-  window.ladyTest = { setListen: setListen, setPleased: setPleased, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
+  // Can't hear: the hand rises from her lap through the halfway pose to her ear, the listening face with it,
+  // holds three seconds, and comes back down the same way.
+  var reach = document.getElementById('reach'), ear = document.getElementById('ear'), armTimers = [];
+  function at(ms, f) { armTimers.push(setTimeout(f, ms)); }
+  function setArm(state) {   // 'lap', 'reach' or 'ear'
+    reach.classList.toggle('on', state === 'reach'); ear.classList.toggle('on', state === 'ear');
+  }
+  document.getElementById('earBtn').addEventListener('click', function () {
+    setAuto(false); clearTimeout(listenTimer); armTimers.forEach(clearTimeout); armTimers = [];
+    setPleased(false); setArm('reach'); setListen(true); stateEl.textContent = 'asking again';
+    clearTimeout(listenTimer);
+    at(400, function () { setArm('ear'); });
+    at(3400, function () { setArm('reach'); });
+    at(3800, function () { setArm('lap'); setListen(false); });
+  });
+  window.ladyTest = { setArm: setArm, setListen: setListen, setPleased: setPleased, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
   setAuto(true);
 })();
 </script>
