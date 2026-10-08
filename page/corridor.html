@@ -120,7 +120,7 @@ Decisions, 7 and 8 October 2026, each David's; the handoff's The corridor is the
   (-8.6). Her wall: her, portrait-a (-2.5, nearest her) and portrait-b (-4.6). The far wall, the castle's outer wall:
   a torch either side of her axis (+1.3, the one the room shows, and -1.3), a tall window with a deep sill opposite
   each portrait (the sill at -4.6 is the Remembrall's, later), the armour in the pier between them, the tapestry on
-  the hearth axis facing the fire. The end wall closes the view and is held for the polite door. Chosen over a single
+  the hearth axis facing the fire. The polite door on the end wall, on the centre line, closes the view. Chosen over a single
   window on the bay axis with an armour opposite each portrait. The empty classroom and its door are gone: a
   classroom beside the dormitory makes no sense.
 - Her study (the common room's to build) is pulled out to a wall square to the corridor at x -6.4, tangent to the
@@ -157,7 +157,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry or the inglenook to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
+<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door at the end to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -451,6 +451,15 @@ var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'),
 var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[0], 1.9, HER_FACE, -1, 1, 'portrait-a');
 var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[1], 1.9, HER_FACE, -1, 1, 'portrait-b');
 
+/* the polite door (8 October 2026): on the closed end, on the corridor's centre line, so it ends the view from the
+   stair head square on; 1.0 by 2.2 m, facing down the corridor. What waits behind it is Magic for the boys' */
+var DOOR = { w: 1.0, h: 2.2 };
+var door = cutoutMesh(cutoutTexture(100, 220, '#7a6a58', drawRect, 'door'), DOOR.w, DOOR.h);
+door.position.set(END_X - 0.01, DOOR.h / 2, MID_Z);
+door.rotation.y = -Math.PI / 2;
+door.name = 'polite-door';
+scene.add(door); register(door, 1);
+
 /* the drawn torch the common room already has: same file, same size, same head */
 (function () {
   var im = new Image();
@@ -519,6 +528,10 @@ var STOPS = [
   { name: 'window', meshes: [windows[1].frame, windows[1].sky, windows[1].sill], stop: function () { return stopFor(windows[1].frame, 1.9, 1.55); } },
   { name: 'window-2', meshes: [windows[0].frame, windows[0].sky, windows[0].sill], stop: function () { return stopFor(windows[0].frame, 1.9, 1.55); } },
   { name: 'tapestry', meshes: [tapestry], stop: function () { return stopFor(tapestry, TAPESTRY.h, 1.9); } },
+  /* the polite door: down the middle, standing back until it fits as the other stops do */
+  { name: 'door', meshes: [door], stop: function () {
+      var d = DOOR.h * STOP_MARGIN / 2 / Math.tan(FOV_REST / 2 * Math.PI / 180);
+      return { pos: new THREE.Vector3(END_X - d, EYE, MID_Z), look: new THREE.Vector3(END_X, 1.2, MID_Z), fov: FOV_REST }; } },
   /* the inglenook: from a hand off the far wall, square to the hearth, the settles either side */
   { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } }
 ];
@@ -541,8 +554,8 @@ var poseNow = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: FOV_RE
 function glideTo(to, done) {
   var from = { pos: camera.position.clone(), look: lookTmp.clone(), fov: camera.fov };
   var offF = Math.abs(from.pos.z - MID_Z) > 0.05, offT = Math.abs(to.pos.z - MID_Z) > 0.05;
-  var c1 = new THREE.Vector3(offF ? from.pos.x : to.pos.x, EYE, MID_Z);
-  var c2 = new THREE.Vector3(offT ? to.pos.x : from.pos.x, EYE, MID_Z);
+  var c1 = offF ? new THREE.Vector3(from.pos.x, EYE, MID_Z) : offT ? new THREE.Vector3(to.pos.x, EYE, MID_Z) : from.pos.clone();
+  var c2 = offT ? new THREE.Vector3(to.pos.x, EYE, MID_Z) : offF ? new THREE.Vector3(from.pos.x, EYE, MID_Z) : to.pos.clone();
   var dist = from.pos.distanceTo(c1) + c1.distanceTo(c2) + c2.distanceTo(to.pos);
   tween = { t: 0, dur: clamp(0.8 + dist * 0.12, 0.8, 2.0), from: from, to: to, c1: c1, c2: c2, done: done };
 }
