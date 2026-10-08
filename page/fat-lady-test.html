@@ -10,6 +10,9 @@
   #stage { position: absolute; inset: 0 0 64px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
   #lady { position: relative; height: 96%; aspect-ratio: 1120 / 1360; max-width: 96%; transition: transform 0.6s ease; transform-origin: 54% 27%; }
   #lady.close { transform: scale(3.2); }
+  /* While she listens the view eases a few centimetres closer, standing in for a lean the fade cannot show. */
+  #lady.lean { transform: scale(1.05); transition: transform 0.9s ease-out; }
+  #lady.close.lean { transform: scale(3.36); }
   #lady img { position: absolute; display: block; }
   #front { inset: 0; width: 100%; height: 100%; }
   /* A patch sits at its box in the layer's 1120 x 1360 pixels, given in percent so it scales with her. */
@@ -26,11 +29,13 @@
   <div id="lady">
     <img id="front" src="../assets/layers/portrait-hole-front.png" alt="">
     <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png" alt="">
+    <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png" alt="">
   </div>
 </div>
 <div id="bar">
   <button id="auto" class="sel">Auto</button>
   <button id="toggle">Doze / wake</button>
+  <button id="listenBtn">Listen</button>
   <button id="zoom">Close</button>
   <span id="state">awake</span>
 </div>
@@ -40,7 +45,7 @@
    of a second. Auto dozes and wakes her at durations drawn fresh each time, never on a clock. */
 (function () {
   var W = 1120, H = 1360;
-  var PATCHES = { doze: [543, 396, 664, 526] };
+  var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526] };
   for (var id in PATCHES) {
     var b = PATCHES[id], el = document.getElementById(id);
     el.style.left = (100 * b[0] / W) + '%'; el.style.top = (100 * b[1] / H) + '%';
@@ -65,7 +70,17 @@
     var lady = document.getElementById('lady'); lady.classList.toggle('close');
     e.target.textContent = lady.classList.contains('close') ? 'Whole' : 'Close';
   });
-  window.ladyTest = { set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
+  // Listen: wake into the listening face and hold it three seconds, the view easing in, then back to awake.
+  var listen = document.getElementById('listen'), lady = document.getElementById('lady'), listenTimer = null;
+  function setListen(on) {
+    listen.classList.toggle('on', on); lady.classList.toggle('lean', on);
+    if (on) { doze.classList.remove('on'); stateEl.textContent = 'listening'; } else stateEl.textContent = 'awake';
+  }
+  document.getElementById('listenBtn').addEventListener('click', function () {
+    setAuto(false); setListen(true); clearTimeout(listenTimer);
+    listenTimer = setTimeout(function () { setListen(false); }, 3000);
+  });
+  window.ladyTest = { setListen: setListen, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
   setAuto(true);
 })();
 </script>
