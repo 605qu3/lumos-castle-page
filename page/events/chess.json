@@ -1,0 +1,656 @@
+{
+  "chain": "chess",
+  "bags": {
+    "famous": [
+      {
+        "item": "opera",
+        "intro": "Paris, 1858. Paul Morphy played this in a box at the opera, and won in seventeen moves."
+      },
+      {
+        "item": "immortal",
+        "intro": "London, 1851. Adolf Anderssen gave away both rooks and his queen, and still won. The Immortal Game."
+      },
+      {
+        "item": "evergreen",
+        "intro": "Berlin, 1852. Anderssen again. They call this one the Evergreen Game."
+      },
+      {
+        "item": "giant",
+        "intro": "Under the trapdoor, on the giant board. A knight gives himself up so a bishop can win."
+      }
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "game != on",
+        "game != waiting",
+        "game != playing-on",
+        "game != showing"
+      ],
+      "show": [
+        "the chess set on the round table, set up and waiting"
+      ]
+    },
+    {
+      "when": [
+        "game = waiting"
+      ],
+      "show": [
+        "the game on the round table left exactly as it was, his pieces waiting"
+      ]
+    },
+    {
+      "when": [
+        "game = playing-on"
+      ],
+      "show": [
+        "the pieces on the round table playing on by themselves, quietly"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "chess.start-wary",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess",
+      "when": [
+        "game != on",
+        "game != waiting",
+        "game != showing",
+        "games < 5"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "show": [
+        "the camera walks up to the board, as the notice board's walk-up does"
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.wary",
+          "text": [
+            "Who's this, then? Are you sure you know how?",
+            "Not me first, send a pawn. They don't mind.",
+            "Careful with us. We've been dropped before."
+          ],
+          "canon": "PS12, verify"
+        }
+      ],
+      "starts": [
+        "set game = on"
+      ]
+    },
+    {
+      "id": "chess.start-trusting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess",
+      "when": [
+        "game != on",
+        "game != waiting",
+        "game != showing",
+        "games >= 5"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "show": [
+        "the camera walks up to the board"
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.trusting",
+          "text": [
+            "It's you! Right, let's have them.",
+            "Lead on. We'll go where you send us.",
+            "Back again? Good. Line up, everyone!"
+          ]
+        }
+      ],
+      "starts": [
+        "set game = on"
+      ]
+    },
+    {
+      "id": "chess.resume",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess",
+      "when": [
+        "game = waiting"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "show": [
+        "the camera walks up to the board"
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.resume",
+          "text": [
+            "There you are! Your move.",
+            "We kept your place. Nobody touched a thing.",
+            "Still your move. We waited."
+          ]
+        }
+      ],
+      "starts": [
+        "set game = on"
+      ]
+    },
+    {
+      "id": "chess.won",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "game won",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.won",
+          "text": [
+            "We did it! Did you see the rook?",
+            "Victory! Carry me round the room!",
+            "Ha! Again, again!"
+          ]
+        }
+      ],
+      "starts": [
+        "add games 1",
+        "set game = none",
+        "log \"Won a game of chess {day}\""
+      ]
+    },
+    {
+      "id": "chess.lost",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "game lost",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.lost",
+          "text": [
+            "We were robbed! The bishop wasn't looking.",
+            "Rematch! I wasn't ready.",
+            "That rook of theirs is a menace. Next time."
+          ]
+        }
+      ],
+      "starts": [
+        "add games 1",
+        "set game = none",
+        "log \"Lost a game of chess {day}\""
+      ]
+    },
+    {
+      "id": "chess.drawn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "game drawn",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.drawn",
+          "text": [
+            "Nobody wins! Shake hands, everyone.",
+            "A draw. We'll settle this another day."
+          ]
+        }
+      ],
+      "starts": [
+        "add games 1",
+        "set game = none",
+        "log \"Drew a game of chess {day}\""
+      ]
+    },
+    {
+      "id": "chess.stop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess king",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chess.stop",
+          "text": [
+            "Very well. We'll wait right here.",
+            "Halt, everyone! We wait for our general."
+          ]
+        }
+      ],
+      "starts": [
+        "set game = waiting"
+      ]
+    },
+    {
+      "id": "chess.walk-away",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "back from walk-up",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "show": [
+        "behind him the pieces carry on by themselves"
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.walk-away",
+          "text": [
+            "Off you go, we'll finish it!",
+            "Leave it to us!"
+          ]
+        }
+      ],
+      "starts": [
+        "set game = playing-on"
+      ]
+    },
+    {
+      "id": "chess.won-away",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "game won",
+      "when": [
+        "game = playing-on"
+      ],
+      "starts": [
+        "set game = none",
+        "set away_result = won"
+      ]
+    },
+    {
+      "id": "chess.lost-away",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "game lost",
+      "when": [
+        "game = playing-on"
+      ],
+      "starts": [
+        "set game = none",
+        "set away_result = lost"
+      ]
+    },
+    {
+      "id": "chess.drawn-away",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "game drawn",
+      "when": [
+        "game = playing-on"
+      ],
+      "starts": [
+        "set game = none",
+        "set away_result = drawn"
+      ]
+    },
+    {
+      "id": "chess.tell-won",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess",
+      "when": [
+        "away_result = won"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.tell-won",
+          "text": [
+            "We won without you! Well, you started it.",
+            "We finished it. We won!"
+          ]
+        }
+      ],
+      "starts": [
+        "set away_result = none"
+      ]
+    },
+    {
+      "id": "chess.tell-lost",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess",
+      "when": [
+        "away_result = lost"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.tell-lost",
+          "text": [
+            "We lost without you. Never again!",
+            "It all went wrong after you left. Rematch?"
+          ]
+        }
+      ],
+      "starts": [
+        "set away_result = none"
+      ]
+    },
+    {
+      "id": "chess.tell-drawn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess",
+      "when": [
+        "away_result = drawn"
+      ],
+      "who": [
+        {
+          "as": "side",
+          "role": "trace",
+          "what": "his chess pieces",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "side",
+          "medium": "said",
+          "key": "chess.tell-drawn",
+          "text": [
+            "A draw. We missed you."
+          ]
+        }
+      ],
+      "starts": [
+        "set away_result = none"
+      ]
+    },
+    {
+      "id": "chess.famous",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "tap chess king",
+      "when": [
+        "game != on",
+        "game != waiting",
+        "game != showing"
+      ],
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "show": [
+        "the pieces play out a famous game by themselves, at a pace he can follow"
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chess.famous",
+          "text": [
+            "Watch this. {intro}",
+            "Sit back. {intro}"
+          ],
+          "canon": "the games' facts, verify"
+        }
+      ],
+      "starts": [
+        "set famous = from bag famous",
+        "set game = showing"
+      ]
+    },
+    {
+      "id": "chess.famous-done",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "replay done",
+      "when": [
+        "game = showing"
+      ],
+      "starts": [
+        "set game = none"
+      ]
+    },
+    {
+      "id": "chess.bedtime",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "bedtime warning",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chess.bedtime",
+          "text": [
+            "Ten minutes! Tap me and we'll wait, or go and we'll play on.",
+            "Bedtime soon. Shall we wait for you, or finish without you?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chess.lights-out",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "lights out",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chess.lights-out",
+          "text": [
+            "We'll keep your place.",
+            "Sleep well, general. We'll be here."
+          ]
+        }
+      ],
+      "starts": [
+        "set game = waiting"
+      ]
+    },
+    {
+      "id": "chess.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "leave",
+      "when": [
+        "game = on"
+      ],
+      "starts": [
+        "set game = waiting"
+      ]
+    },
+    {
+      "id": "chess.leave-showing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "leave",
+      "when": [
+        "game = showing"
+      ],
+      "starts": [
+        "set game = none"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "chain": "bedtime",
+  "records": [
+    {
+      "id": "bedtime.warning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "bedtime warning",
+      "when": [
+        "bedtime = set"
+      ],
+      "who": [
+        {
+          "as": "percy",
+          "role": "voice",
+          "name": "percy",
+          "mark": "stair-top"
+        }
+      ],
+      "show": [
+        "the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair"
+      ],
+      "lines": [
+        {
+          "speaker": "percy",
+          "medium": "heard",
+          "key": "bedtime.warning",
+          "text": [
+            "Ten minutes, then up to bed, the lot of you!",
+            "Ten minutes! Finish what you're doing.",
+            "Ten minutes to lights out!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bedtime.lights-out",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "lights out",
+      "when": [
+        "bedtime = set"
+      ],
+      "who": [
+        {
+          "as": "percy",
+          "role": "voice",
+          "name": "percy",
+          "mark": "stair-top"
+        }
+      ],
+      "show": [
+        "the room dims, the fire low, the view turns to the stair and fades, and the visit ends as leaving does"
+      ],
+      "lines": [
+        {
+          "speaker": "percy",
+          "medium": "heard",
+          "key": "bedtime.lights-out",
+          "text": [
+            "Lights out! Up you go.",
+            "Bed, everyone. Lights out!"
+          ]
+        }
+      ],
+      "starts": [
+        "log \"Bedtime came {day}\""
+      ]
+    }
+  ]
+}
