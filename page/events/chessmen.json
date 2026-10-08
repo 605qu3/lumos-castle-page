@@ -1090,6 +1090,8 @@
       "when": [
         "game = on"
       ],
+      "one_of": "chess-castle",
+      "weight": 1,
       "who": [
         {
           "as": "rook",
@@ -1207,6 +1209,559 @@
           "text": [
             "Ho ho! The walls are holding!",
             "Lovely. Just lovely. Cup of tea, anyone?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-picked-wary",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = queen",
+        "games < 2"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.picked-wary",
+          "text": [
+            "Me? Already? Do you know what you're doing?",
+            "Careful, darling. I'm irreplaceable.",
+            "I'm the most important piece on this board. Don't waste me."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-picked-warming",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = queen",
+        "games >= 2",
+        "games < 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.picked-warming",
+          "text": [
+            "Fine. Point me somewhere useful.",
+            "Very well. But I'm keeping an eye on you."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-picked-trusting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = queen",
+        "games >= 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.picked-trusting",
+          "text": [
+            "Must I do everything? Yes. Yes, I must.",
+            "Any direction, any distance. Watch and learn.",
+            "Stand aside, everyone. Queen coming through."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-capture",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on",
+        "piece = queen"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.capture",
+          "text": [
+            "Royally done, if I say so myself.",
+            "That's how it's done, boys.",
+            "Was that necessary? Yes. Yes, it was."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-taken",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess taken",
+      "when": [
+        "game = on",
+        "piece = queen"
+      ],
+      "one_of": "chess-taken",
+      "weight": 1,
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.taken",
+          "text": [
+            "Who's going to do all the work now?",
+            "Look after the king... he's hopeless...",
+            "This is most irregular..."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-check",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess check",
+      "when": [
+        "game = on",
+        "piece = queen"
+      ],
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.check",
+          "text": [
+            "Check, darling.",
+            "Check. Do try to keep up."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-tide-losing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = losing"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.tide-losing",
+          "text": [
+            "Nobody panic. I'll sort it out. As usual.",
+            "If you want something done properly..."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.queen-tide-winning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = winning"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "queen",
+          "role": "trace",
+          "what": "his queen",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "queen",
+          "medium": "said",
+          "key": "chessmen.queen.tide-winning",
+          "text": [
+            "Naturally.",
+            "Did anyone doubt me? Don't answer that."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-picked-wary",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = king",
+        "games < 2"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.picked-wary",
+          "text": [
+            "Could somebody else be king today?",
+            "Do I have to move? I like it here.",
+            "Gently! I bruise."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-picked-warming",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = king",
+        "games >= 2",
+        "games < 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.picked-warming",
+          "text": [
+            "One square. ONE. Not a square more.",
+            "Is it safe over there? It looks safe."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-picked-trusting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = king",
+        "games >= 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.picked-trusting",
+          "text": [
+            "Lead on, general. I'm right behind you. Well behind you.",
+            "A king's job is to stay alive. I'm VERY good at my job."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-capture",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on",
+        "piece = king"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.capture",
+          "text": [
+            "I did it! I'd like that written down, please.",
+            "Oh! Oh my. I've never done that before."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-checked",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess checked",
+      "when": [
+        "game = on"
+      ],
+      "one_of": "chess-checked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.checked",
+          "text": [
+            "CHECK? Me? Somebody DO something!",
+            "Not check! I hate check!",
+            "Queen! QUEEN!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-castle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess castle",
+      "when": [
+        "game = on"
+      ],
+      "one_of": "chess-castle",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.castle",
+          "text": [
+            "Into the corner? Oh, lovely. Very cosy."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-tide-losing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = losing"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.tide-losing",
+          "text": [
+            "I'm not hiding. I'm being strategic.",
+            "We're doomed! Doomed! Is it bedtime yet?"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.king-tide-winning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = winning"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "king",
+          "role": "trace",
+          "what": "his king",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "king",
+          "medium": "said",
+          "key": "chessmen.king.tide-winning",
+          "text": [
+            "Hooray! Er. I mean. As planned.",
+            "I'd like it on record that I was very brave."
           ]
         }
       ]
