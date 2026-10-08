@@ -443,6 +443,47 @@ window.castleFrame = function (opts) {
     }
   }
 
+  /* ---------- between rooms: the darkening, arriving, and the saved place ----------
+     A trip through the hole is a page load under a fade (8 October 2026): travel(url) darkens the screen and then loads
+     the other room's page, whose address carries ?from=<the room he left>; that page starts black and comes up when it
+     calls reveal(), once it has set him where he arrives (or by itself after REVEAL_SAFE seconds, so a page that never
+     calls it is never left black). The place is saved on the device on every trip: { room, stop }. */
+  var PLACE_KEY = 'lumos.castle.place', DARKEN_S = 0.45, REVEAL_S = 0.7, REVEAL_SAFE = 2.5;
+  var veil = document.createElement('div');
+  veil.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;background:#000;opacity:0;pointer-events:none;z-index:50';
+  document.body.appendChild(veil);
+  var from = null;
+  try { from = new URLSearchParams(location.search).get('from'); } catch (err) {}
+  if (from) { veil.style.opacity = '1'; veil.style.pointerEvents = 'auto'; }
+  var revealedYet = !from;
+  function reveal() {
+    if (revealedYet) return;
+    revealedYet = true;
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      veil.style.transition = 'opacity ' + REVEAL_S + 's ease-out';
+      veil.style.opacity = '0';
+      veil.style.pointerEvents = 'none';
+    }); });
+  }
+  if (from) setTimeout(reveal, REVEAL_SAFE * 1000);
+  function savePlace(place) { try { localStorage.setItem(PLACE_KEY, JSON.stringify(place)); } catch (err) {} }
+  function readPlace() { try { return JSON.parse(localStorage.getItem(PLACE_KEY)); } catch (err) { return null; } }
+  /* o.place is saved before leaving; o.dry darkens and comes back up without loading, for shooting a departure */
+  function travel(url, o) {
+    o = o || {};
+    if (o.place) savePlace(o.place);
+    veil.style.transition = 'opacity ' + DARKEN_S + 's ease-in';
+    veil.style.pointerEvents = 'auto';
+    veil.style.opacity = '1';
+    setTimeout(function () {
+      if (!o.dry) { location.href = url; return; }
+      veil.style.transition = 'opacity ' + REVEAL_S + 's ease-out';
+      veil.style.opacity = '0';
+      veil.style.pointerEvents = 'none';
+      if (o.done) o.done();
+    }, (DARKEN_S + (o.dry ? 0.6 : 0.05)) * 1000);
+  }
+
   var names = { helpEl: helpEl, canvas: canvas, statsEl: statsEl, backBtn: backBtn, btns: btns,
     clamp: clamp, lerp: lerp, easeInOut: easeInOut, col: col,
     renderer: renderer, scene: scene, camera: camera,
@@ -450,7 +491,8 @@ window.castleFrame = function (opts) {
     layered: layered, TINTS: TINTS, register: register, solid: solid, box: box, cutoutMesh: cutoutMesh,
     sheetTexture: sheetTexture, applyLayer: applyLayer, placeCard: placeCard, applySurface: applySurface, applyPlan: applyPlan,
     quietCanvas: quietCanvas, unstainCanvas: unstainCanvas, sillCanvas: sillCanvas, wornCanvas: wornCanvas,
-    setTint: setTint, resize: resize, stats: stats };
+    setTint: setTint, resize: resize, stats: stats,
+    from: from, reveal: reveal, travel: travel, savePlace: savePlace, readPlace: readPlace };
   for (var k in names) F[k] = names[k];
   return F;
 };

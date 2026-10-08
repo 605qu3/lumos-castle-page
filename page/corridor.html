@@ -159,7 +159,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door at the end to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=1"></script>
+<script src="castle.js?v=2"></script>
 <script>
 (function () {
 'use strict';
@@ -312,6 +312,31 @@ her.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
 her.rotation.y = Math.PI;
 her.name = 'portrait-hole-front';
 hinge.add(her); register(her, 2);
+
+/* the hole behind her (8 October 2026): the room's round hole, 1.2 m across with its centre 1.2 m up, cut through her
+   wall as the room cuts its own (a disc discarded in the wall's material), and the 0.8 m tunnel through to the room's
+   wall at z 0, with a dark warm glow beyond for the room. Seen only when she swings open, which today only the trip in
+   does (the spoken password opens her, when it is built) */
+var HOLE_R = 0.6, DOOR_OPEN = 1.75;
+var herWallMat = solid(0x75726e);
+herWallMat.onBeforeCompile = function (sh) {
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;')
+    .replace('#include <project_vertex>', '#include <project_vertex>\nvHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;')
+    .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' +
+      'if (vHoleW.z > ' + (HER_Z - 0.02).toFixed(3) + ' && length(vHoleW.xy - vec2(0.0, ' + HOLE_Y.toFixed(3) + ')) < ' + HOLE_R.toFixed(3) + ') discard;');
+};
+herWall.material = herWallMat;
+herWall.userData.base = herWallMat.color.clone();
+var tunnel = new THREE.Mesh(new THREE.CylinderGeometry(HOLE_R, HOLE_R, -HER_Z, 32, 1, true), solid(0x5f5b56, { side: THREE.BackSide }));
+tunnel.rotation.x = Math.PI / 2;
+tunnel.position.set(0, HOLE_Y, HER_Z / 2);
+tunnel.name = 'hole-tunnel'; scene.add(tunnel); register(tunnel, 0);
+var roomGlow = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6), new THREE.MeshBasicMaterial({ color: col(0x3a2414) }));
+roomGlow.rotation.y = Math.PI;
+roomGlow.position.set(0, HOLE_Y, 0.02);
+roomGlow.name = 'room-glow'; scene.add(roomGlow);
+var herDoor = { ang: 0, target: 0 };
 
 var FAR_FACE = FAR_Z + 0.01, HER_FACE = HER_Z - 0.01;
 /* the far wall, the gallery (8 October 2026), on three axes: hers at x 0, the study stretch's bay at -3.55 and
@@ -478,10 +503,48 @@ function goBack() {
   yaw = yawT = 0; pitch = pitchT = 0;
   glideTo(restPose({ pos: new THREE.Vector3(), look: new THREE.Vector3() }), function () { mode = 'rest'; });
 }
+
+/* ---------- through the hole (8 October 2026) ----------
+   Going in: from her stop she swings open, the view walks into the tunnel and the screen darkens there, and the common
+   room loads and comes up with her swinging shut behind him. Its trigger is the spoken password, when the ear is built;
+   until then only lumosGreybox.enter() calls it, for shots, and nothing on screen opens her. Coming out of the room
+   (?from=room) he arrives at her stop as she shuts; Back goes to the stair head as from any stop. */
+var leaving = false;
+function enter(dry) {
+  if (leaving || view !== 'length') return false;
+  leaving = true;
+  var herStop = STOPS[0];
+  function swingAndWalk() {
+    herDoor.target = DOOR_OPEN;
+    setTimeout(function () {
+      glideTo({ pos: new THREE.Vector3(0, HOLE_Y, -0.3), look: new THREE.Vector3(0, HOLE_Y, 6), fov: FOV_REST });
+      setTimeout(function () {
+        kit.travel('common-room.html?from=corridor', { place: { room: 'common-room' }, dry: dry, done: function () {
+          leaving = false; herDoor.target = 0; atStop = null; mode = 'stop'; goTo(herStop);
+        } });
+      }, tween.dur * 550);
+    }, 900);
+  }
+  if (atStop !== herStop) {
+    goTo(herStop);
+    var wait = setInterval(function () { if (!tween) { clearInterval(wait); swingAndWalk(); } }, 50);
+  } else swingAndWalk();
+  return true;
+}
+function arriveFromRoom() {
+  var herStop = STOPS[0], p = herStop.stop();
+  atStop = herStop; mode = 'stop'; backBtn.hidden = false;
+  camera.position.copy(p.pos); lookTmp.copy(p.look); setFov(p.fov);
+  herDoor.ang = DOOR_OPEN; herDoor.target = DOOR_OPEN;
+  setTimeout(function () { herDoor.target = 0; }, 700);
+  kit.savePlace({ room: 'corridor', stop: 'her' });
+  kit.reveal();
+}
+
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
   if (!helpEl.hidden) helpEl.hidden = true;
-  if (tween || view !== 'length') return;
+  if (tween || leaving || view !== 'length') return;
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
@@ -555,6 +618,7 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 /* HUD: Layers, Res, Exp and ? are the shared frame's; View and Reset are this page's (onAct, above) */
 backBtn.addEventListener('click', goBack);
 setView(view);
+if (kit.from === 'room') arriveFromRoom();
 
 /* ---------- per frame ---------- */
 
@@ -564,6 +628,8 @@ function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   t += dt;
   updateCamera(dt);
+  herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
+  hinge.rotation.y = -herDoor.ang;
   torches.forEach(function (tc, i) {
     var k = 0.85 + 0.15 * Math.sin(t * 11 + i) * Math.sin(t * 4.3 + i * 2);
     tc.light.intensity = 1.6 * k;
@@ -577,7 +643,8 @@ renderer.setAnimationLoop(frame);
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
-  mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; } };
+  mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
+  enter: enter, herDoor: herDoor };
 })();
 </script>
 </body>
