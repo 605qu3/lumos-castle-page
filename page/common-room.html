@@ -425,7 +425,8 @@ Mrs Norris to hang from by her tail (CoS 8), and flaming torches in the halls. T
 one candidate each: round 1, a short arm close to its wall plate, and round 2, a long arm on a scrolled stay leaning the
 torch outward; he chose round 2. Drawn from a little to the left, about a third of the way round, so the arm's reach shows,
 as the hole sees the far wall; unlit, with the fire's own flame sprite on its head. Placed by tracing sight lines through
-the open hole: its head at 0.95 m along and 1.3 m up the corridor's far wall shows at the default view and a drag left.
+the open hole: its head at 0.95 m along and 1.3 m up the corridor's far wall shows at the default view and a drag left
+(moved to 1.3 m along on 8 October 2026, when the corridor became 3 m wide to match the corridor page).
 Keyed at 140 x 273 px, 400 px per metre, about 0.2 MB on the GPU. Two candidates, about 26 cents.
 fire, calmed, 7 October 2026: David saw the fire glitch and smoke as if always being stoked. Measured against the page as
 of that morning, nothing had changed; the look was older. Six flame sprites each swung in opacity between 0.5 and 0.9 on
@@ -1333,7 +1334,7 @@ function updatePapers(dt, t) {
    disc of its back shows at the tunnel's end; it is hinged on the far side and swings away into the
    corridor, as it does for whoever stands outside, opening on a far wall lit by a torch.
    Local frame: x along the wall to the right as you face the hole from inside, y up, z into the room. */
-var HOLE_THETA = Math.PI + 0.85, HOLE_R = 0.6, HOLE_Y = 1.2, HOLE_DEPTH = 0.8, CORRIDOR_D = 2.0;
+var HOLE_THETA = Math.PI + 0.85, HOLE_R = 0.6, HOLE_Y = 1.2, HOLE_DEPTH = 0.8, CORRIDOR_D = 3.0;
 var PORTRAIT_W = 1.4, PORTRAIT_H = 1.7;
 var holeN = new THREE.Vector3(Math.sin(HOLE_THETA), 0, Math.cos(HOLE_THETA));   /* outward */
 var holeC = holeN.clone().multiplyScalar(WALL_R).setY(HOLE_Y);
@@ -1376,7 +1377,8 @@ var corridorMat = solid(0x75726e);
   tunnel.receiveShadow = true;
   holeFrame.add(tunnel); register(tunnel, 0);
 })();
-/* the corridor's far wall, 2 m beyond the portrait; nothing else of the corridor is ever on screen */
+/* the corridor's far wall, 3 m beyond the portrait, the corridor page's width (8 October 2026; it was 2 m); nothing
+   else of the corridor is ever on screen */
 var corridorWall = new THREE.Mesh(new THREE.PlaneGeometry(5, 3.2), corridorMat);
 (function () {
   var u = corridorWall.geometry.attributes.uv, p = corridorWall.geometry.attributes.position;
@@ -1386,10 +1388,11 @@ corridorWall.position.set(0, 1.6, -HOLE_DEPTH - CORRIDOR_D);
 corridorWall.receiveShadow = true;
 holeFrame.add(corridorWall); register(corridorWall, 0);
 /* the blacksmith's torch on its scrolled bracket (CoS 8: a bracket a cat could hang from), a card flat on the far wall,
-   placed by tracing sight lines through the open hole: its head at 0.95 m along and 1.3 m up shows at the default view
-   and a drag left; at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
+   placed by tracing sight lines through the open hole: its head at 1.3 m along and 1.3 m up shows at the default view
+   and a drag left (0.95 m when the corridor was 2 m wide; moved with it to 3 m, 8 October 2026, to match the corridor
+   page); at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
    its flame is one of the fire's own sprites, on the head, 87 percent across the drawing's top */
-var TORCH_HEAD = new THREE.Vector3(0.95, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
+var TORCH_HEAD = new THREE.Vector3(1.3, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
 var torch = cutoutMesh(cutoutTexture(64, 124, '#000', drawTorch), 0.35, 0.68);
 torch.position.set(TORCH_HEAD.x - 0.371 * 0.35, TORCH_HEAD.y - 0.34, TORCH_HEAD.z);
 torch.castShadow = false;
@@ -1428,7 +1431,7 @@ holeTap.visible = false;
 holeFrame.add(holeTap);
 scene.updateMatrixWorld(true);
 var corridorLight = new THREE.PointLight(col(0xffc080), 0, 5, 1.2);
-corridorLight.position.copy(holeFrame.localToWorld(new THREE.Vector3(0.95, 1.7, -HOLE_DEPTH - CORRIDOR_D + 0.5)));
+corridorLight.position.copy(holeFrame.localToWorld(new THREE.Vector3(TORCH_HEAD.x, 1.7, -HOLE_DEPTH - CORRIDOR_D + 0.5)));
 scene.add(corridorLight);
 /* the drawn wall reaches the tunnel and the corridor too: one texture, no second copy on the GPU */
 function shareWallStone(map, color) {
