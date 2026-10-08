@@ -1,0 +1,118 @@
+{
+  "chain": "door",
+  "records": [
+    {
+      "id": "door.tickle",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = miss"
+      ],
+      "show": [
+        "the door's wood shivers and gives a creaky giggle, louder the nearer the tap to its ticklish spot"
+      ]
+    },
+    {
+      "id": "door.opens-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = hit",
+        "opened_visit != yes"
+      ],
+      "show": [
+        "the door laughs and swings open on what is behind it, then shuts itself after a few seconds"
+      ],
+      "starts": [
+        "set opened_visit = yes",
+        "add opened_visits 1",
+        "log \"Tickled the door open {day}\""
+      ]
+    },
+    {
+      "id": "door.opens-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = hit",
+        "opened_visit = yes"
+      ],
+      "show": [
+        "the door laughs and swings open on what is behind it, then shuts itself after a few seconds"
+      ]
+    },
+    {
+      "id": "door.hint",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "speech = on",
+        "opened_visits >= 3",
+        "hinted != yes"
+      ],
+      "who": [
+        {
+          "as": "fat-lady",
+          "role": "canon",
+          "name": "the fat lady",
+          "mark": "her frame",
+          "pose": "her own, turned along the corridor"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "door.hint",
+          "canon": "a draft only; her lines are settled in docs/fat-lady-lines.md, verify",
+          "text": [
+            "That door? It likes manners, dear."
+          ]
+        }
+      ],
+      "starts": [
+        "set hinted = yes"
+      ]
+    },
+    {
+      "id": "door.please",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say please",
+      "when": [
+        "place = corridor",
+        "speech = on",
+        "listening = polite door"
+      ],
+      "show": [
+        "the door swings open with a dignified creak on what is behind it, then shuts itself after a few seconds"
+      ],
+      "starts": [
+        "log \"Asked the door politely {day}\""
+      ]
+    },
+    {
+      "id": "door.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set opened_visit = no"
+      ]
+    }
+  ]
+}
