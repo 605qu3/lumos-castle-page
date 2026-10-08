@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fat Lady test</title>
 <style>
-  :root { --bg: #15120f; --fg: #f1e8da; --dim: #a89c8a; }
+  :root { --barh: 64px; --bg: #15120f; --fg: #f1e8da; --dim: #a89c8a; }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 17px/1.4 -apple-system, system-ui, sans-serif; overflow: hidden; }
-  #stage { position: absolute; inset: 0 0 64px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-  #lady { position: relative; height: 96%; aspect-ratio: 1120 / 1360; max-width: 96%; transition: transform 0.6s ease; transform-origin: 54% 27%; }
+  #stage { position: absolute; inset: 0 0 var(--barh) 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  #lady { position: relative; width: min(96vw, calc((100vh - var(--barh)) * 0.96 * 1120 / 1360)); aspect-ratio: 1120 / 1360; transition: transform 0.6s ease; transform-origin: 54% 27%; }
   #lady.close { transform: scale(3.2); }
   /* While she listens the view eases a few centimetres closer, standing in for a lean the fade cannot show. */
   #lady.lean { transform: scale(1.05); transition: transform 0.9s ease-out; }
@@ -18,9 +18,10 @@
   /* A patch sits at its box in the layer's 1120 x 1360 pixels, given in percent so it scales with her. */
   .patch { opacity: 0; transition: opacity 0.2s linear; }
   .patch.on { opacity: 1; }
-  #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; display: flex; gap: 8px; align-items: center; justify-content: center; padding: 0 12px; }
+  #bar { position: absolute; left: 0; right: 0; bottom: 0; min-height: 64px; box-sizing: border-box; flex-wrap: wrap; padding: 8px 12px; display: flex; gap: 8px; align-items: center; justify-content: center; padding: 0 12px; }
   button { font: inherit; color: var(--fg); background: #2a241e; border: 1px solid #4a4036; border-radius: 10px; padding: 9px 14px; }
   button.sel { background: #6b3a24; }
+  @media (max-width: 640px) { :root { --barh: 120px; } button { padding: 8px 10px; } }
   #state { color: var(--dim); min-width: 5em; text-align: center; }
 </style>
 </head>
@@ -30,12 +31,14 @@
     <img id="front" src="../assets/layers/portrait-hole-front.png" alt="">
     <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png" alt="">
     <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png" alt="">
+    <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png" alt="">
   </div>
 </div>
 <div id="bar">
   <button id="auto" class="sel">Auto</button>
   <button id="toggle">Doze / wake</button>
   <button id="listenBtn">Listen</button>
+  <button id="rightBtn">Right password</button>
   <button id="zoom">Close</button>
   <span id="state">awake</span>
 </div>
@@ -45,7 +48,7 @@
    of a second. Auto dozes and wakes her at durations drawn fresh each time, never on a clock. */
 (function () {
   var W = 1120, H = 1360;
-  var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526] };
+  var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529] };
   for (var id in PATCHES) {
     var b = PATCHES[id], el = document.getElementById(id);
     el.style.left = (100 * b[0] / W) + '%'; el.style.top = (100 * b[1] / H) + '%';
@@ -80,7 +83,20 @@
     setAuto(false); setListen(true); clearTimeout(listenTimer);
     listenTimer = setTimeout(function () { setListen(false); }, 3000);
   });
-  window.ladyTest = { setListen: setListen, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
+  // Right password: she listens two seconds, the view easing in, then is pleased for three, then awake.
+  var pleased = document.getElementById('pleased');
+  function setPleased(on) {
+    pleased.classList.toggle('on', on);
+    if (on) { setListen(false); doze.classList.remove('on'); stateEl.textContent = 'pleased'; } else stateEl.textContent = 'awake';
+  }
+  document.getElementById('rightBtn').addEventListener('click', function () {
+    setAuto(false); clearTimeout(listenTimer); setPleased(false); setListen(true);
+    listenTimer = setTimeout(function () {
+      setPleased(true);
+      listenTimer = setTimeout(function () { setPleased(false); }, 3000);
+    }, 2000);
+  });
+  window.ladyTest = { setListen: setListen, setPleased: setPleased, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
   setAuto(true);
 })();
 </script>
