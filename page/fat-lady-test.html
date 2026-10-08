@@ -15,6 +15,8 @@
   #lady.close.lean { transform: scale(3.36); }
   #lady img { position: absolute; display: block; }
   #front { inset: 0; width: 100%; height: 100%; }
+  /* Every image carries ?v=N, raised whenever a patch is recut: GitHub Pages lets Safari keep an image for ten
+     minutes, and David judged an old cut on 7 October because of it. */
   /* A patch sits at its box in the layer's 1120 x 1360 pixels, given in percent so it scales with her. */
   .patch { opacity: 0; transition: opacity 0.2s linear; }
   .patch.on { opacity: 1; }
@@ -30,12 +32,12 @@
 <body>
 <div id="stage">
   <div id="lady">
-    <img id="front" src="../assets/layers/portrait-hole-front.png" alt="">
-    <img class="patch arm" id="reach" src="../assets/layers/portrait-hole-front-reach.png" alt="">
-    <img class="patch arm" id="ear" src="../assets/layers/portrait-hole-front-ear.png" alt="">
-    <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png" alt="">
-    <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png" alt="">
-    <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png" alt="">
+    <img id="front" src="../assets/layers/portrait-hole-front.png?v=3" alt="">
+    <img class="patch arm" id="reach" src="../assets/layers/portrait-hole-front-reach.png?v=3" alt="">
+    <img class="patch arm" id="ear" src="../assets/layers/portrait-hole-front-ear.png?v=3" alt="">
+    <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png?v=3" alt="">
+    <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png?v=3" alt="">
+    <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png?v=3" alt="">
   </div>
 </div>
 <div id="bar">
