@@ -617,6 +617,289 @@
       ]
     },
     {
+      "id": "chessmen.bishop-picked-wary",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = bishop",
+        "games < 2"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.picked-wary",
+          "text": [
+            "Diagonally, if you please. I don't do straight.",
+            "Must I? I've only just been dusted.",
+            "I do hope you know which colour square I live on.",
+            "Mind the hat."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-picked-warming",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = bishop",
+        "games >= 2",
+        "games < 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.picked-warming",
+          "text": [
+            "Very well. A dignified slant.",
+            "I shall proceed. Diagonally. Obviously."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-picked-trusting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = bishop",
+        "games >= 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.picked-trusting",
+          "text": [
+            "Harry Potter was a bishop once, you know. Under the trapdoor.",
+            "Onward, at a respectable angle!",
+            "Bless you, general. Off I slant."
+          ],
+          "canon": "PS 16, Harry a bishop on the giant board, verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-capture",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on",
+        "piece = bishop"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.capture",
+          "text": [
+            "I'm not cross. I'm diagonal.",
+            "Nobody ever looks sideways.",
+            "Excuse me. You're on my diagonal.",
+            "Corner to corner, and good day to you!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-taken",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess taken",
+      "when": [
+        "game = on",
+        "piece = bishop"
+      ],
+      "one_of": "chess-taken",
+      "weight": 1,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.taken",
+          "text": [
+            "How... undignified...",
+            "Tell the Fat Friar I said goodbye...",
+            "I was always straight with you. Well. Slanted.",
+            "Mind my hat on the way down..."
+          ],
+          "canon": "PS 7, the Fat Friar, verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-check",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess check",
+      "when": [
+        "game = on",
+        "piece = bishop"
+      ],
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.check",
+          "text": [
+            "Check. Pardon the intrusion.",
+            "Check! Straight down the slant!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-tide-losing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = losing"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.tide-losing",
+          "text": [
+            "Let us remain calm, and slightly tilted.",
+            "I shall write a very stern letter about this."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-tide-winning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = winning"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.tide-winning",
+          "text": [
+            "Splendid. Positively splendid.",
+            "Things are looking up. And diagonally across."
+          ]
+        }
+      ]
+    },
+    {
       "id": "chessmen.quiet-picked",
       "tier": "fixed",
       "source": "device",
