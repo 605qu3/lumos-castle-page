@@ -96,9 +96,8 @@
 <body>
 <!--
 The seventh-floor corridor outside the portrait hole (PS 9), its own page with its own GPU budget, so moving between
-rooms is a page load under a fade. A copy of the common room's frame (renderer, camera, drag, helpers), not shared code,
-chosen by David on 7 October 2026 while another session edits common-room.html; a shared castle.js is flagged for when
-both rooms show what is common.
+rooms is a page load under a fade. Its frame (renderer, camera, the texture and mesh helpers, the apply functions, the
+HUD) is castle.js, shared with the common room since 8 October 2026; this page keeps its own scene, stops and loop.
 
 Decisions, 7 and 8 October 2026, each David's; the handoff's The corridor is the full record:
 - It agrees with what the hole shows from inside. Everything is in the hole's own frame, copied from common-room.html:
@@ -167,20 +166,20 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 
 /* ---------- the shared frame (castle.js): renderer, scene, camera, helpers, HUD ---------- */
 
-var F = window.castleFrame ? castleFrame({
+var kit = window.castleFrame ? castleFrame({
   background: 0x0b0a09, fog: 0.03,
   onAct: function (act) {
     if (act === 'view') setView(view === 'length' ? 'stage' : 'length');
     else if (act === 'reset') { yawT = pitchT = 0; slideT = VIEWS.stage.x0; goBack(); }
   }
 }) : null;
-if (!F) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
-var helpEl = F.helpEl, canvas = F.canvas, btns = F.btns;
-var clamp = F.clamp, lerp = F.lerp, easeInOut = F.easeInOut, col = F.col;
-var renderer = F.renderer, scene = F.scene, camera = F.camera;
-var makeCanvas = F.makeCanvas, tex = F.tex, rr = F.rr, arch = F.arch, cutoutTexture = F.cutoutTexture, flameTexture = F.flameTexture;
-var layered = F.layered, register = F.register, solid = F.solid, box = F.box, cutoutMesh = F.cutoutMesh;
-var setTint = F.setTint;
+if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
+var helpEl = kit.helpEl, canvas = kit.canvas, btns = kit.btns;
+var clamp = kit.clamp, lerp = kit.lerp, easeInOut = kit.easeInOut, col = kit.col;
+var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
+var makeCanvas = kit.makeCanvas, tex = kit.tex, rr = kit.rr, arch = kit.arch, cutoutTexture = kit.cutoutTexture, flameTexture = kit.flameTexture;
+var layered = kit.layered, register = kit.register, solid = kit.solid, box = kit.box, cutoutMesh = kit.cutoutMesh;
+var setTint = kit.setTint;
 
 var lookTmp = new THREE.Vector3();
 
@@ -571,7 +570,7 @@ function frame() {
     tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(t * 7.3 + i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(t * 9.1 + i))), 1);
   });
   renderer.render(scene, camera);
-  F.stats(dt);
+  kit.stats(dt);
 }
 renderer.setAnimationLoop(frame);
 
