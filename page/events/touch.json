@@ -76,8 +76,12 @@
           "key": "touch.scarf-feet.says",
           "text": [
             "Forgot my scarf!",
-            "Where's my Herbology book?"
-          ]
+            "Where's my Herbology book?",
+            "Forgot my wand! Flitwick'll have me swishing and flicking all lesson!",
+            "Where are my socks? Dumbledore says you can never have enough!",
+            "Forgot my homework! I'll tell Snape a three-headed dog ate it!"
+          ],
+          "canon": "PS 10, swish and flick; PS 12, socks; PS 9, the dog, verify"
         },
         {
           "speaker": "runner",
@@ -113,8 +117,13 @@
           "key": "touch.sleeper",
           "text": [
             "Mmf. Five more minutes.",
-            "Not now, I'm revising..."
-          ]
+            "Not now, I'm revising...",
+            "Mmf... nitwit... blubber... oddment... tweak...",
+            "Wingardium levi-o-SAR... no, levi-O-sa...",
+            "Mmf... no, Peeves, put the walking sticks down...",
+            "Mmf... I am NOT a dunderhead..."
+          ],
+          "canon": "PS 7, the feast words and Peeves's sticks; PS 10, levi-O-sa; PS 8, dunderheads, verify"
         }
       ],
       "starts": [
@@ -152,7 +161,10 @@
           "canon": "PS12, verify",
           "text": [
             "Not there, you great lump!",
-            "Send me, I'll take him!"
+            "Send me, I'll take him!",
+            "Send him instead, we can spare him!",
+            "Don't you dare give me up! I've got a family!",
+            "Oi! I'm a queen, not a doorstop!"
           ]
         }
       ]

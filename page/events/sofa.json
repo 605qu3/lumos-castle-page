@@ -163,7 +163,10 @@
           "text": [
             "Put me back in the box, you great oaf!",
             "Unhand me! I'm a chessman!",
-            "Do you know how long I've been down there?"
+            "Do you know how long I've been down there?",
+            "I've been down here since the Sorting! It's ever so crumby.",
+            "I'm a pawn, not a pillow!",
+            "Tell the king I fought bravely! Mostly with crumbs."
           ]
         }
       ],
@@ -197,13 +200,17 @@
           "speaker": "thing",
           "medium": "said",
           "key": "sofa.bean",
-          "canon": "PS6 and PS17, verify",
+          "canon": "PS6 and PS17, verify; PS 6, George's bogey and Ron's list, verify",
           "text": [
             "Earwax!",
             "Toffee. Phew.",
             "Sprouts!",
             "Grass?",
-            "Pepper! Water!"
+            "Pepper! Water!",
+            "Bogey! George was right!",
+            "Tripe? Who puts tripe in a sweet?",
+            "Liver! Every Flavour means EVERY flavour.",
+            "Chocolate! No, wait... earwax. It was a trick."
           ]
         }
       ],
@@ -233,6 +240,16 @@
         }
       ],
       "lines": [
+        {
+          "medium": "written",
+          "hand": "print",
+          "at": "hand",
+          "key": "sofa.wrapper.print",
+          "canon": "PS 6, Harry's frog out of the window, verify",
+          "text": [
+            "CHOCOLATE FROG. Contents: one frog (may have left)."
+          ]
+        },
         {
           "speaker": "thing",
           "medium": "heard",
@@ -298,10 +315,12 @@
           "hand": "print",
           "at": "hand",
           "key": "sofa.paper-hat",
-          "canon": "PS12, verify",
+          "canon": "PS12, verify; PS 12, the cracker's mice and his bonnet, verify",
           "text": [
             "It unfolds into an admiral's hat.",
-            "It unfolds into a crown."
+            "It unfolds into a crown.",
+            "It unfolds into an admiral's hat. Something squeaks inside.",
+            "It unfolds into a bonnet with flowers on, like Dumbledore's at Christmas."
           ]
         }
       ],
