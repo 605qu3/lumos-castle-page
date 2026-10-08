@@ -486,7 +486,7 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=1"></script>
+<script src="castle.js?v=2"></script>
 <script src="castle-events.js?v=1"></script>
 <script>
 (function () {
@@ -2144,6 +2144,27 @@ function togglePortrait() {
   portrait.target = portrait.open ? DOOR_OPEN : 0;
   portrait.closeT = 5;
 }
+/* Going out (The portrait hole, The spoken password, "Going out"; built 8 October 2026 for the trip through the hole,
+   the corridor session's split in The corridor): with her open, a second tap on the hole climbs him out. The view
+   walks up square to the hole and into the tunnel, the screen darkens there (castle.js), and the corridor loads with
+   ?from=room, where he arrives close in front of her as she swings shut. dry darkens and comes back without loading,
+   for shots. */
+function climbOut(dry) {
+  if (mode !== 'room' || tween) return false;
+  mode = 'tween';
+  portrait.closeT = 99;
+  var near = holeC.clone().addScaledVector(holeN, -1.4).setY(1.25), into = holeC.clone().addScaledVector(holeN, HOLE_DEPTH * 0.6).setY(HOLE_Y);
+  var beyond = holeC.clone().addScaledVector(holeN, 6).setY(HOLE_Y);
+  startTween(camera.position.clone(), currentLook(), near, beyond, 0.9, function () {
+    startTween(camera.position.clone(), beyond.clone(), into, beyond, 0.8, function () {});
+    setTimeout(function () {
+      kit.travel('corridor.html?from=room', { place: { room: 'corridor', stop: 'her' }, dry: dry, done: function () {
+        portrait.closeT = 1; leaveBoard();
+      } });
+    }, 350);
+  });
+  return true;
+}
 
 function catSitDown(seconds, byTap) {
   if (byTap) { cat.satThisLoop = true; cat.lastSitU = cat.u; }
@@ -2178,7 +2199,7 @@ function tap(cx, cy) {
   if (mode !== 'room' || !hit) return;
   if (hit === hearthBack) stokeFire();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
-  else if (hit === holeTap) togglePortrait();
+  else if (hit === holeTap) { if (portrait.open) climbOut(); else togglePortrait(); }
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
 }
 
@@ -2397,6 +2418,14 @@ var castle = window.CastleEvents ? CastleEvents.start({
   builtins: { portrait: function () { return portrait.open ? 'open' : 'shut'; } }
 }) : null;
 
+/* arriving through the hole from the corridor (?from=corridor): the room comes up from black at its default view with
+   her swinging shut behind him */
+if (kit.from === 'corridor') {
+  portrait.open = true; portrait.ang = DOOR_OPEN; portrait.target = DOOR_OPEN; portrait.closeT = 1.0;
+  kit.savePlace({ room: 'common-room' });
+  kit.reveal();
+}
+
 var clock = new THREE.Clock();
 var t = 0;
 function frame() {
@@ -2416,7 +2445,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen };
 })();
 </script>
 </body>
