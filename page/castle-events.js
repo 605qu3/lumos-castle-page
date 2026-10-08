@@ -6,10 +6,13 @@
    built-ins only the room can answer, such as `portrait` (`builtins`). The design is in the handoff, The
    portrait hole and Magic for the boys; the brief is docs/events-brief.md.
 
-   Built so far (the thin slice, 7 October 2026): the state, a visit's arrive and leave, the `wait N-M s` moment,
+   Built so far: the thin slice (7 October 2026): the state, a visit's arrive and leave, the `wait N-M s` moment,
    fixed and small records, conditions over state and built-ins, the effect verbs, `show` cues, `room`, the log.
-   Not yet: the big tier, casts and marks, lines, bags, one_of, ends, and the moments tap, first tap, quiet,
-   enter, outside and say; a record that needs one of them is skipped with a note in the console, never thrown.
+   Then for the fire chain (8 October 2026): the moments `tap X` and `first tap` (the room calls `tap(name)`, and
+   a chain's `targets` map one name to another, as the bellows to the fire), `seconds since last tap`, the big
+   tier and its draw, `boost`, and a record's `ends` (when, on leave, on a tap, a timeout in days).
+   Not yet: casts and marks, lines, bags, one_of, and the moments quiet, enter, outside and say; a record that
+   needs one of them is skipped with a note in the console, never thrown.
 
    Test links: ?event=<id> loads that record alone and fires it whenever it holds; ?wait=N sets every wait to N s;
    ?fresh starts this iPad's castle afresh. */
@@ -20,6 +23,7 @@
   var SETTINGS_KEY = 'lumos.castle.settings.v1';
   var LOG_LINES = 50;
   var SMALL_ODDS = 0.8;          /* small touches on most visits: about four in five */
+  var BIG_ODDS = 1 / 3;          /* big events about one visit in three, at most one a day, never two visits running */
   var AWAY_S = 5 * 60;           /* hidden this long and coming back is a new visit */
   var DAY_MS = 86400000;
   var WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -48,7 +52,8 @@
   }
 
   function freshState() {
-    return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [] };
+    return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
+             open: {}, lastBigDay: null, lastBigVisit: null };
   }
 
   function start(opts) {
@@ -63,6 +68,7 @@
     var state = load(STATE_KEY);
     var fresh = !state || state.v !== 1;
     if (fresh) state = freshState();
+    state.open = state.open || {};        /* records still open, by id: the day each fired, for its timeout */
     var settings = load(SETTINGS_KEY) || { leans: [], speech: 'on' };
 
     var chains = [];          /* the loaded files */
@@ -71,6 +77,8 @@
     var stampNames = {};      /* every name a file stamps, so a condition knows it is a date */
     var visit = null;        /* this visit: its moments still to come and what fired */
     var hiddenAt = 0;
+    var targets = {};         /* a tap's name mapped to another, from the chains' `targets` */
+    var tapping = null;       /* the thing tapped, while its moment runs */
 
     /* ---------- reading state ---------- */
 
@@ -86,6 +94,10 @@
         case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
         case 'slot': return state.slot ? 'taken' : 'free';
         case 'speech': return settings.speech || 'on';
+        case 'visits since big': return state.lastBigVisit == null ? Infinity : state.visits - state.lastBigVisit;
+        case 'seconds since last tap':      /* since his previous tap on the same thing; never tapped reads as long ago */
+          if (!tapping || !visit || visit.lastTap[tapping] == null) return Infinity;
+          return (Date.now() - visit.lastTap[tapping]) / 1000;
       }
       return undefined;
     }
@@ -178,8 +190,52 @@
         else note(rec.id + ': this room has no cue "' + sh[j] + '"');
       }
       if (rec.tier === 'small') visit.small.push(rec.id);
+      if (rec.tier === 'big') { state.lastBigDay = today(); state.lastBigVisit = state.visits; visit.bigDone = true; }
+      if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
       changed();
       note('fired ' + rec.id);
+      checkEnds('change');
+    }
+
+    /* ---------- ends ---------- */
+
+    /* A record ends at the first of its ends that holds; its `do` effects run and it is no longer open. An end's
+       lines wait for lines. `kind` is why the check runs: 'change' (a `when` end), 'leave', 'tap' with the thing
+       tapped, or 'arrive' (a timeout in days). */
+    function endMatches(end, kind, arg, opened) {
+      if (end.when) return allHold(end.when);
+      if (end.timeout) return kind === 'arrive' && today() - opened.day >= parseInt(end.timeout, 10);
+      if (end.on === 'leave') return kind === 'leave';
+      if (kind !== 'tap' || !end.on) return false;
+      var m = /^tap any but (.+)$/.exec(end.on);
+      if (m) return arg !== m[1];
+      m = /^tap (.+)$/.exec(end.on);
+      return !!m && arg === m[1];
+    }
+
+    function checkEnds(kind, arg) {
+      for (var pass = 0; pass < 20; pass++) {      /* an end's effects may let another record's `when` end hold */
+        var ended = false;
+        for (var id in state.open) {
+          var rec = byId[id];
+          if (!rec) { delete state.open[id]; continue; }
+          var ends = rec.ends || [];
+          for (var j = 0; j < ends.length && !ended; j++) {
+            if (!endMatches(ends[j], kind, arg, state.open[id])) continue;
+            delete state.open[id];
+            var d = ends[j]['do'] || [];
+            for (var k = 0; k < d.length; k++) effect(d[k], rec);
+            if (ends[j].lines && ends[j].lines.length) note(rec.id + ': an end\'s lines wait for lines');
+            note('ended ' + rec.id + ' (end ' + j + ')');
+            ended = true;
+          }
+          if (ended) break;
+        }
+        if (!ended) return;
+        save(STATE_KEY, state);
+        drawRoom(shownCues());
+        kind = 'change';                              /* after the first end, only `when` ends can follow */
+      }
     }
 
     /* ---------- the draw ---------- */
@@ -188,20 +244,26 @@
       var pool = list.slice(), out = [];
       while (pool.length) {
         var total = 0, k;
-        for (k = 0; k < pool.length; k++) total += pool[k].weight || 1;
+        for (k = 0; k < pool.length; k++) total += weightOf(pool[k]);
         var x = Math.random() * total;
-        for (k = 0; k < pool.length - 1; k++) { x -= pool[k].weight || 1; if (x < 0) break; }
+        for (k = 0; k < pool.length - 1; k++) { x -= weightOf(pool[k]); if (x < 0) break; }
         out.push(pool.splice(k, 1)[0]);
       }
       return out;
     }
 
+    /* A record's weight, times its boost while the boost's conditions hold. */
+    function weightOf(rec) {
+      var w = rec.weight || 1;
+      if (rec.boost && allHold(rec.boost.when)) w *= rec.boost.times || 1;
+      return w;
+    }
+
     function supported(rec) {
-      if (rec.tier === 'big') return 'the big tier';
       if (rec.who && rec.who.length) return 'casts and marks';
       if (rec.lines && rec.lines.length) return 'lines';
       if (rec.one_of) return 'one_of';
-      if (rec.ends && rec.ends.length) return 'ends';
+      if (/^(quiet|enter|outside|say)\b/.test(rec.moment || '')) return 'the moment ' + rec.moment;
       return null;
     }
 
@@ -216,12 +278,15 @@
         var missing = supported(r);
         if (missing) { note(r.id + ' skipped: the runtime does not yet do ' + missing); continue; }
         if (r.tier === 'small' && !only && (!visit.smallOn || state.lastSmall.indexOf(r.id) >= 0)) continue;
+        if (r.tier === 'big' && !only && (!visit.bigOn || visit.bigDone)) continue;
+        if (state.open[r.id]) continue;      /* still open from an earlier moment: it does not start again */
         eligible.push(r);
       }
       var order = weightedOrder(eligible), smallDone = false;
       for (var j = 0; j < order.length; j++) {
         var rec = order[j];
         if (rec.tier === 'small' && smallDone) continue;
+        if (rec.tier === 'big' && visit.bigDone && !only) continue;
         if (!allHold(rec.when)) continue;
         fire(rec);
         if (rec.tier === 'small') smallDone = true;
@@ -234,7 +299,9 @@
       if (state.visitOpen) leave();        /* a visit that never left runs its leave records now, before anything */
       state.visits++;
       state.visitOpen = true;
-      visit = { smallOn: Math.random() < SMALL_ODDS, small: [], waits: [] };
+      var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
+      visit = { smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [], waits: [],
+                lastTap: {}, tapped: false };
       var seen = {};
       for (var i = 0; i < records.length; i++) {
         var m = WAIT.exec(records[i].moment || '');
@@ -244,10 +311,24 @@
         visit.waits.push({ name: records[i].moment, left: secs });
       }
       save(STATE_KEY, state);
+      checkEnds('arrive');
       moment('arrive');
     }
 
+    /* A tap on a named thing in the room. The first tap of a visit is also `first tap` (sound wakes then). */
+    function tap(name) {
+      if (!visit) return;
+      name = targets[name] || name;
+      if (!visit.tapped) { visit.tapped = true; moment('first tap'); }
+      checkEnds('tap', name);
+      tapping = name;
+      moment('tap ' + name);
+      tapping = null;
+      visit.lastTap[name] = Date.now();
+    }
+
     function leave() {
+      if (visit) checkEnds('leave');
       if (visit) moment('leave');
       if (visit) state.lastSmall = visit.small;
       state.visitOpen = false;
@@ -286,6 +367,8 @@
       for (var f = 0; f < files.length; f++) {
         if (!files[f]) continue;
         chains.push(files[f]);
+        var tg = files[f].targets || {};
+        for (var t in tg) targets[t] = tg[t];
         var rs = files[f].records || [];
         JSON.stringify(rs).replace(/"stamp ([a-z_]+)/g, function (s, n) { stampNames[n] = true; return s; });
         for (var i = 0; i < rs.length; i++) {
@@ -312,6 +395,7 @@
       ready: ready,
       tick: tick,
       moment: moment,
+      tap: tap,
       fire: function (id) { if (byId[id] && visit) fire(byId[id]); },
       state: function () { return state; },
       log: function () { return state.log.slice(); },
