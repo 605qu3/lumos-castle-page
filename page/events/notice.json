@@ -38,8 +38,12 @@
           "text": [
             "And do NOT fold the corners.",
             "Nor read in the bath.",
-            "I shall know."
-          ]
+            "I shall know.",
+            "The Restricted Section is RESTRICTED.",
+            "Books are not for sitting on, leaning on, or hitting your brother with.",
+            "Yes. I can see you reading this."
+          ],
+          "canon": "PS12, the Restricted Section, verify"
         }
       ],
       "starts": [
@@ -65,8 +69,11 @@
           "text": [
             "That means YOU.",
             "Rain or shine.",
-            "Bring your own towel."
-          ]
+            "Bring your own towel.",
+            "Practice is at six. In the MORNING.",
+            "We WILL win the Cup this year. I've drawn diagrams."
+          ],
+          "canon": "PS11, Wood's diagrams, verify"
         }
       ],
       "starts": [
@@ -92,8 +99,11 @@
           "text": [
             "Hold on tight.",
             "Brooms are not toys.",
-            "No showing off."
-          ]
+            "No showing off.",
+            "Say UP and mean it. Not 'up a bit, please'.",
+            "Anyone flying without me will be gone before they can say Quidditch."
+          ],
+          "canon": "PS9, the first flying lesson, verify"
         }
       ],
       "starts": [
@@ -119,7 +129,8 @@
           "text": [
             "He likes the bathroom.",
             "He might be in a shoe.",
-            "Please be gentle with him."
+            "Please be gentle with him.",
+            "He answers to Trevor. Well, he doesn't. But that's his name."
           ]
         }
       ],
@@ -146,7 +157,8 @@
           "at": "board",
           "key": "notice.reply-neville",
           "text": [
-            "Can Trevor come to practice?"
+            "Can Trevor come to practice?",
+            "Could Trevor be Seeker? He's very good at hiding."
           ]
         }
       ],
@@ -172,7 +184,9 @@
           "key": "notice.reply-wood",
           "text": [
             "NO. O.W.",
-            "Only if he can fly. O.W."
+            "Only if he can fly. O.W.",
+            "Toads are not on the team. O.W.",
+            "Does he catch flies? ...No. NO. O.W."
           ]
         }
       ],

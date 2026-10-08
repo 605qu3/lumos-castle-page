@@ -92,7 +92,8 @@
               "text": [
                 "Found him in the bathtub! Panic over. N.",
                 "He was in my sock drawer the whole time. Panic over. N.",
-                "Panic over! He was in the bathroom sink, looking pleased with himself. N."
+                "Panic over! He was in the bathroom sink, looking pleased with himself. N.",
+                "Found him in Seamus's cauldron. Seamus is NOT pleased. N."
               ]
             }
           ]
@@ -132,8 +133,10 @@
           "text": [
             "Neville's lost Trevor again!",
             "Has anyone seen a toad? Neville's in a state.",
-            "Trevor's out. Neville's checking under every bed."
-          ]
+            "Trevor's out. Neville's checking under every bed.",
+            "Has anyone seen a toad? Neville's lost one. Again."
+          ],
+          "canon": "PS6, Hermione on the train, verify"
         }
       ],
       "starts": [
@@ -171,7 +174,8 @@
               "text": [
                 "Found him in the bathtub! Panic over. N.",
                 "He was in my sock drawer the whole time. Panic over. N.",
-                "Panic over! He was in the bathroom sink, looking pleased with himself. N."
+                "Panic over! He was in the bathroom sink, looking pleased with himself. N.",
+                "Found him in Seamus's cauldron. Seamus is NOT pleased. N."
               ]
             }
           ]
@@ -268,7 +272,8 @@
           "text": [
             "THANK YOU for finding Trevor. He's always doing this. I owe you one! Neville",
             "Thank you for finding Trevor! Gran would have had a fit. Neville",
-            "Thanks for finding Trevor. I don't know how he keeps getting out. Neville"
+            "Thanks for finding Trevor. I don't know how he keeps getting out. Neville",
+            "THANK YOU! He's the slipperiest toad in Gryffindor. Neville"
           ]
         }
       ],
@@ -334,7 +339,8 @@
           "key": "trevor.thanks-question",
           "text": [
             "Do toads like puddles? Have a look after it rains. N.",
-            "Toads like damp, shady places, under leaves and stones. See if you can spot one! N."
+            "Toads like damp, shady places, under leaves and stones. See if you can spot one! N.",
+            "Do toads croak more when it rains? Have a listen next time! N."
           ]
         }
       ],
