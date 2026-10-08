@@ -449,6 +449,18 @@ portrait hole and the case, about 66 degrees left of the hearth (x -4.55, z -2.0
 it stands in the gap between the case and the hole and hides neither; at the default view it sits whole, small, at the
 left edge under the hole. Lost: where it was (x -3.0, z 0.6, before the case's lower shelves on the drag, crowding the
 round table at the default view) and the case's near end (unseen at the default view, hiding the case's corner).
+table, round 1: the round table's base, a joiner's worn oak tripod stand drawn with no top (a turned baluster stem,
+three legs on pad feet), seen from a little to its right and a little above, as the eye sees it at x -1.2, z 2.8. Its
+level check failed at 153 px against 90, the perspective asked for: the right-back foot is nearer the eye. Keyed at
+310 x 395 px, 500 px per metre, placed 0.62 m wide with sink 0.08. One candidate, about 13 cents.
+table-top, round 1: the top as a plan, three oak boards, a darker rim band, cup rings, a wax drip and an ink blot near
+the rim, the middle clear for the live board; laid on a code disc 0.9 m across whose top is 0.755 m up, on the base's
+head. Keyed at 400 x 400 px, 444 px per metre. One candidate, about 13 cents.
+side-table, round 1: the books table, a joiner's plain oak side table with four tapered legs and a drawer, four plain
+books at its left end, the right end bare for Trevor's box, seen from in front and to its right. Drawn from higher
+than asked, so its top shows as a plane, and long and low: at the planned 0.85 m the table stood 0.52 m, so it is
+placed 1.2 m wide, about 0.72 m tall and 1.1 m long, David's call, shot both ways first. Keyed at 340 x 251 px, staged
+at 400 px per metre of 0.85 m, so about 280 per metre as placed. One candidate, about 13 cents.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1451,6 +1463,20 @@ table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
 /* the stair is a card turned to the camera, so the fire sees its flat face and threw a hard spiral on the
    front-right wall that no round stair would cast; like the fireplace, it casts none */
 stairs.castShadow = false;
+/* the round table's top, built in code (David, 8 October 2026): a real disc, so the live chessboard sits truly on
+   it at every view, where a top drawn on the flat card would part from it by 30 to 70 px on a drag. Its upper face
+   wears the joiner's plan (table-top), its rim is a dark oak band, and the rim casts the fire's shadow. The drawn
+   base's head ends about 0.727 m up, so the top sits on it and the table stands 0.755 m */
+var TABLE_TOP_Y = 0.755;
+var tableRim = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.03, 48), solid(0x4a3320));
+tableRim.position.set(-1.2, TABLE_TOP_Y - 0.015, 2.8);
+tableRim.castShadow = true; tableRim.receiveShadow = true;
+scene.add(tableRim); register(tableRim, 3); tableRim.name = 'table-rim';
+var tableTop = new THREE.Mesh(new THREE.CircleGeometry(0.45, 48), solid(0xb9b6b0));
+tableTop.rotation.x = -Math.PI / 2;
+tableTop.position.set(-1.2, TABLE_TOP_Y + 0.001, 2.8);
+tableTop.receiveShadow = true;
+scene.add(tableTop); register(tableTop, 3); tableTop.name = 'table-top';
 
 /* ---------- drawn layers, per the layer spec ----------
    An entry with a url replaces its grey placeholder on load; width in metres, height follows the image.
@@ -1503,6 +1529,11 @@ var LAYERS = {
     quiet: { below: 2.5, height: 7, amount: 0.5, all: 0.15 } },
   /* a cutout lying flat on the floor, drawn as a plan: the image's top edge toward the hearth */
   'rug': { url: '../assets/layers/rug.png', w: 5.7, plan: true, tint: 0x999999 },
+  /* the round table: the drawn base stands under the code top; the top's plan lies on the disc */
+  'table': { url: '../assets/layers/table.png', w: 0.62, sink: 0.08 },
+  'table-top': { url: '../assets/layers/table-top.png', w: 0.9, plan: true },
+  /* drawn long and low: at 1.2 m wide the table stands about 0.72 m, a real side table (David) */
+  'side-table': { url: '../assets/layers/side-table.png', w: 1.2 },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
