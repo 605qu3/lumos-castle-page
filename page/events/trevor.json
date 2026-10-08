@@ -90,7 +90,9 @@
               "at": "board",
               "key": "trevor.self-found",
               "text": [
-                "Found him in the bathtub! Panic over. N."
+                "Found him in the bathtub! Panic over. N.",
+                "He was in my sock drawer the whole time. Panic over. N.",
+                "Panic over! He was in the bathroom sink, looking pleased with himself. N."
               ]
             }
           ]
@@ -167,7 +169,9 @@
               "at": "board",
               "key": "trevor.self-found-heralded",
               "text": [
-                "Found him in the bathtub! Panic over. N."
+                "Found him in the bathtub! Panic over. N.",
+                "He was in my sock drawer the whole time. Panic over. N.",
+                "Panic over! He was in the bathroom sink, looking pleased with himself. N."
               ]
             }
           ]
@@ -262,7 +266,9 @@
           "key": "trevor.thanks-plain",
           "style": "a blot and a crossed-out word",
           "text": [
-            "THANK YOU for finding Trevor. He's always doing this. I owe you one! Neville"
+            "THANK YOU for finding Trevor. He's always doing this. I owe you one! Neville",
+            "Thank you for finding Trevor! Gran would have had a fit. Neville",
+            "Thanks for finding Trevor. I don't know how he keeps getting out. Neville"
           ]
         }
       ],
@@ -295,7 +301,8 @@
           "key": "trevor.thanks-card",
           "canon": "PS6",
           "text": [
-            "You found mine, so here's one for you! N."
+            "You found mine, so here's one for you! N.",
+            "For finding Trevor. I've got two of her anyway! N."
           ]
         }
       ],
@@ -326,7 +333,8 @@
           "at": "board",
           "key": "trevor.thanks-question",
           "text": [
-            "Do toads like puddles? Have a look after it rains. N."
+            "Do toads like puddles? Have a look after it rains. N.",
+            "Toads like damp, shady places, under leaves and stones. See if you can spot one! N."
           ]
         }
       ],
