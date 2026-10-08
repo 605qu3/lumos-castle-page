@@ -1,0 +1,616 @@
+{
+  "chain": "clementine",
+  "room": [
+    {
+      "when": [
+        "letter_open > 0"
+      ],
+      "show": [
+        "her letter on the windowsill"
+      ]
+    },
+    {
+      "when": [],
+      "show": [
+        "the bookshelf, a blue book among the others"
+      ]
+    },
+    {
+      "when": [
+        "shelf = open"
+      ],
+      "show": [
+        "the bookshelf swung open",
+        "her study: a small writing desk and chair",
+        "a lamp still burning",
+        "a lemon-juice bottle in her hand: 'for secrets'",
+        "her photograph",
+        "a faded red hair ribbon",
+        "a fancy little box"
+      ]
+    },
+    {
+      "when": [
+        "key = held"
+      ],
+      "show": [
+        "the little box open and empty"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "clementine.letter-1",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "waiting"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "letters = 0",
+        "today >= next_letter_due",
+        "slot = free"
+      ],
+      "show": [
+        "an owl at the window leaves a letter on the sill"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "clementine",
+          "at": "windowsill",
+          "key": "clementine.letter-1",
+          "text": [
+            "To whoever sits by the fire in Gryffindor Tower,\n\nI don't know who you are, or when you are. I only know that when I tuck a letter into the case of my hourglass on a chain, it is gone by morning. I think it goes a very long way.\n\nIs the great fireplace still there, and is it still black with soot right up to the shelf? Ours is. Show the owl.\n\nYours, C.A."
+          ]
+        }
+      ],
+      "starts": [
+        "set letter_open = 1",
+        "take slot",
+        "log \"A letter from C.A., 1 of 6, {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "letter_open = 0"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set letter_open = 0",
+            "add letters 1",
+            "stamp next_letter_due +5-9 days",
+            "free slot"
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "clementine",
+              "at": "windowsill",
+              "key": "clementine.never-mind-1",
+              "text": [
+                "Never mind. Perhaps you're busy. I'll write again. C.A."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clementine.answer-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap soot",
+      "when": [
+        "letter_open = 1"
+      ],
+      "show": [
+        "an owl swoops to the window and takes his answer"
+      ],
+      "starts": [
+        "set letter_open = 0",
+        "add letters 1",
+        "stamp next_letter_due +5-9 days",
+        "log \"Answered C.A.'s letter 1 {day}\""
+      ]
+    },
+    {
+      "id": "clementine.letter-2",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "waiting"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "letters = 1",
+        "today >= next_letter_due",
+        "slot = free"
+      ],
+      "show": [
+        "an owl at the window leaves a letter on the sill"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "clementine",
+          "at": "windowsill",
+          "key": "clementine.letter-2",
+          "text": [
+            "Dear friend by the fire,\n\nI have done something dreadful. I tipped my chair back by the tapestry, and the leg caught the griffin's cloth and tore a little hole in it. Nobody saw. I put a cushion in front of it.\n\nHas anybody ever mended it? Do look closely.\n\nYours, C.A."
+          ]
+        }
+      ],
+      "starts": [
+        "set letter_open = 2",
+        "take slot",
+        "log \"A letter from C.A., 2 of 6, {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "letter_open = 0"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set letter_open = 0",
+            "add letters 1",
+            "stamp next_letter_due +5-9 days",
+            "free slot"
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "clementine",
+              "at": "windowsill",
+              "key": "clementine.never-mind-2",
+              "text": [
+                "Never mind. Perhaps you're busy. I'll write again. C.A."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clementine.answer-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap tapestry patch",
+      "when": [
+        "letter_open = 2"
+      ],
+      "show": [
+        "an owl swoops to the window and takes his answer"
+      ],
+      "starts": [
+        "set letter_open = 0",
+        "add letters 1",
+        "stamp next_letter_due +5-9 days",
+        "log \"Answered C.A.'s letter 2 {day}\""
+      ]
+    },
+    {
+      "id": "clementine.letter-3",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "waiting"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "letters = 2",
+        "today >= next_letter_due",
+        "slot = free"
+      ],
+      "show": [
+        "an owl at the window leaves a letter on the sill"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "clementine",
+          "at": "windowsill",
+          "key": "clementine.letter-3",
+          "text": [
+            "Dear friend by the fire,\n\nOver our mantel hangs a cross old wizard in a green hat who tells us to sit up straight and stop slurping our cocoa. Who hangs over yours?\n\nPlease say it isn't still him.\n\nYours, C.A."
+          ]
+        }
+      ],
+      "starts": [
+        "set letter_open = 3",
+        "take slot",
+        "log \"A letter from C.A., 3 of 6, {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "letter_open = 0"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set letter_open = 0",
+            "add letters 1",
+            "stamp next_letter_due +5-9 days",
+            "free slot"
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "clementine",
+              "at": "windowsill",
+              "key": "clementine.never-mind-3",
+              "text": [
+                "Never mind. Perhaps you're busy. I'll write again. C.A."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clementine.answer-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap mantel portrait",
+      "when": [
+        "letter_open = 3"
+      ],
+      "show": [
+        "an owl swoops to the window and takes his answer"
+      ],
+      "starts": [
+        "set letter_open = 0",
+        "add letters 1",
+        "stamp next_letter_due +5-9 days",
+        "log \"Answered C.A.'s letter 3 {day}\""
+      ]
+    },
+    {
+      "id": "clementine.letter-4",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "waiting"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "letters = 3",
+        "today >= next_letter_due",
+        "slot = free"
+      ],
+      "show": [
+        "an owl at the window leaves a letter on the sill"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "clementine",
+          "at": "windowsill",
+          "key": "clementine.letter-4",
+          "text": [
+            "Dear friend by the fire,\n\nOur cat is called Marmalade. She is orange, she sleeps on the warm stones by the hearth, and she bites if you wake her. Is there still a cat in the tower? A tower needs a cat.\n\nYours, C.A."
+          ]
+        }
+      ],
+      "starts": [
+        "set letter_open = 4",
+        "take slot",
+        "log \"A letter from C.A., 4 of 6, {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "letter_open = 0"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set letter_open = 0",
+            "add letters 1",
+            "stamp next_letter_due +5-9 days",
+            "free slot"
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "clementine",
+              "at": "windowsill",
+              "key": "clementine.never-mind-4",
+              "text": [
+                "Never mind. Perhaps you're busy. I'll write again. C.A."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clementine.answer-4",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap cat",
+      "when": [
+        "letter_open = 4"
+      ],
+      "show": [
+        "an owl swoops to the window and takes his answer"
+      ],
+      "starts": [
+        "set letter_open = 0",
+        "add letters 1",
+        "stamp next_letter_due +5-9 days",
+        "log \"Answered C.A.'s letter 4 {day}\""
+      ]
+    },
+    {
+      "id": "clementine.letter-5",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "waiting"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "letters = 4",
+        "today >= next_letter_due",
+        "slot = free"
+      ],
+      "show": [
+        "an owl at the window leaves a letter on the sill"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "clementine",
+          "at": "windowsill",
+          "key": "clementine.letter-5",
+          "text": [
+            "Dear friend by the fire,\n\nSomething is the matter with my hourglass. There is a crack in it, very thin, and my teacher frowns at it. I don't think I shall be allowed to keep it much longer.\n\nMy favourite book lives on the shelf: A Hundred Hearthside Tales, with a blue spine. Is it still there?\n\nYours, C.A."
+          ]
+        }
+      ],
+      "starts": [
+        "set letter_open = 5",
+        "take slot",
+        "log \"A letter from C.A., 5 of 6, {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "letter_open = 0"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set letter_open = 0",
+            "add letters 1",
+            "stamp next_letter_due +5-9 days",
+            "free slot"
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "clementine",
+              "at": "windowsill",
+              "key": "clementine.never-mind-5",
+              "text": [
+                "Never mind. Perhaps you're busy. I'll write again. C.A."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clementine.answer-5",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap blue book",
+      "when": [
+        "letter_open = 5"
+      ],
+      "show": [
+        "an owl swoops to the window and takes his answer"
+      ],
+      "starts": [
+        "set letter_open = 0",
+        "add letters 1",
+        "stamp next_letter_due +5-9 days",
+        "log \"Answered C.A.'s letter 5 {day}\""
+      ]
+    },
+    {
+      "id": "clementine.letter-6",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "waiting"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "letters = 5",
+        "today >= next_letter_due"
+      ],
+      "show": [
+        "an owl at the window leaves a letter on the sill"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "clementine",
+          "at": "windowsill",
+          "key": "clementine.letter-6",
+          "text": [
+            "Dear friend by the fire,\n\nThey are taking my hourglass away tomorrow to be mended, so this is my last letter, and I am sorry, because I liked having someone to write to.\n\nTake my book down and warm page eighteen at the fire. You'll know what to say.\n\nYour friend, C.A."
+          ]
+        }
+      ],
+      "starts": [
+        "add letters 1",
+        "set final = open",
+        "log \"C.A.'s last letter {day}\""
+      ]
+    },
+    {
+      "id": "clementine.book",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap blue book",
+      "when": [
+        "final = open"
+      ],
+      "show": [
+        "her book in his hands, open at page eighteen"
+      ],
+      "starts": [
+        "set book = held"
+      ],
+      "ends": [
+        {
+          "on": "leave",
+          "do": [
+            "set book = shelved"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "clementine.ink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap fire",
+      "when": [
+        "book = held",
+        "inked != yes"
+      ],
+      "show": [
+        "brown letters rise on page eighteen as it warms"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "clementine",
+          "at": "page eighteen",
+          "key": "clementine.ink",
+          "text": [
+            "Clementine Ashdown"
+          ]
+        }
+      ],
+      "starts": [
+        "set inked = yes",
+        "log \"Found the name in the book {day}\""
+      ]
+    },
+    {
+      "id": "clementine.open",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say clementine ashdown",
+      "when": [
+        "inked = yes",
+        "shelf != open"
+      ],
+      "show": [
+        "the bookshelf swings open on a small hidden study"
+      ],
+      "starts": [
+        "set shelf = open",
+        "log \"Opened Clementine's study {day}\""
+      ]
+    },
+    {
+      "id": "clementine.open-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bookshelf",
+      "when": [
+        "speech = off",
+        "inked = yes",
+        "shelf != open"
+      ],
+      "show": [
+        "the bookshelf swings open on a small hidden study"
+      ],
+      "starts": [
+        "set shelf = open",
+        "log \"Opened Clementine's study {day}\""
+      ]
+    },
+    {
+      "id": "clementine.photograph",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap photograph",
+      "when": [
+        "shelf = open",
+        "waved != yes"
+      ],
+      "show": [
+        "the girl in the photograph waves at him, once"
+      ],
+      "starts": [
+        "set waved = yes"
+      ]
+    },
+    {
+      "id": "clementine.little-box",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap little box",
+      "when": [
+        "shelf = open",
+        "key != held"
+      ],
+      "show": [
+        "the little box opens on a small brass key"
+      ],
+      "starts": [
+        "set key = held",
+        "log \"Took the brass key {day}\""
+      ]
+    }
+  ]
+}
