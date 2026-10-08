@@ -70,6 +70,14 @@
   }
   button.on { color: var(--hud-on); border-color: var(--hud-on); }
   button:focus-visible { outline: 2px solid var(--hud-on); outline-offset: 2px; }
+  #back {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
   #help {
     position: fixed;
     left: calc(env(safe-area-inset-left, 0px) + 10px);
@@ -94,21 +102,29 @@ both rooms show what is common.
 
 Decisions, 7 October 2026, each David's:
 - It agrees with what the hole shows from inside. Everything is in the hole's own frame, copied from common-room.html:
-  x along the wall, toward the hearth side; y up; z into the room. Her painted face is at z -0.81, the far wall 2.0 m
-  beyond at z -2.8, the torch's head at x 0.95, 1.3 m up. From inside a boy sees only a patch of the far wall from
-  x 0.15 to 1.25, 0.5 to 1.85 m up, and never the floor.
+  x along the wall, toward the hearth side; y up; z into the room. Her painted face is at z -0.81. As built in the
+  room, the far wall is 2.0 m beyond her and the torch's head at x 0.95, 1.3 m up; from inside a boy sees only a patch
+  of the far wall from x 0.15 to 1.25, 0.5 to 1.85 m up, and never the floor.
+- Width and height: 3 m wide and 4.5 m tall, so the far wall is at z -3.81 and the torch's head at x 1.3, where the
+  default view (x 1.15 to 1.75) and a drag left (0.4 to 1.45) agree, projected through the hole. Canon gives no
+  numbers; PA 8 has the whole house crowding it (from memory). Chosen over 2 m (the room as built, but cramped, the
+  door and armour stops at 70 degrees) and 4 m. The room's far wall and torch move to match; that is the password
+  session's code, asked for in the handoff. The closed end is at x 2.3, past anything the hole shows (x 2.05 at most).
 - Shape: a dead end. She hangs on the long side near the closed end, the torch faces her, and the corridor runs off
   to the right as you face her (toward -x). Chosen over running past her (loses PS 7's "at the very end of the
   corridor", quoted from memory), curving with the tower, and pointing at her (the room's far wall would change).
-- Length: about 12 m, turning a corner at the far end, so nothing beyond it is built.
+- Length: about 12 m (x 2.3 to -10.5), turning a corner at the far end, so nothing beyond it is built.
 - By day: the far wall is the castle's outer wall, with the torch opposite her, a suit of armour, a tall window with a
   deep sill (the Remembrall's, later) and a tapestry near the corner; her wall carries her, two portraits and an empty
   classroom's door; a second torch by the corner. The five from Magic for the boys, plus the portraits.
 - Camera: down the length from the corner at a boy's eye, chosen from greybox shots of both views over a stage view
   with the far wall cut away (her wall square on, but a gallery rather than a corridor, and the far wall's four things
   lost). Everything on the walls is foreshortened from here, her most, so the view turns square at each stop. A
-  standing piece (the armour) is a card turned to the eye, as the stairs are. The stage view stays behind View until
-  the stops are built.
+  standing piece (the armour) is a card turned to the eye, as the stairs are. The stage view stays behind View.
+- The stops: each stands a hand short of the facing wall and opens its field of view until the thing fits with an
+  eighth to spare, between 42 and 70 degrees: her, the window and the portraits at 42, the tapestry 43, the door 51,
+  the armour 52. The armour moved from x -2.6 to -3.4, where it had stood between the first portrait and its stop;
+  from the corner it now stands in front of the window's lower half, accepted.
 - Moving: tap a thing to go to it, her, the window, the door, the armour or a portrait; the view glides there and turns
   square; tap off it or Back to glide back to the corner. The notice board's walk-up again. Lost: stepping along by
   tapping the floor (stops with nothing at them).
@@ -131,7 +147,8 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
     <button type="button" data-act="help">?</button>
   </div>
 </div>
-<div id="help">Drag to look along the corridor. View switches between looking down its length and the stage view. The grey shapes are placeholders.</div>
+<button id="back" type="button" hidden>Back</button>
+<div id="help">Drag to look along the corridor. Tap her, a portrait, the door, the armour, the window or the tapestry to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -151,6 +168,7 @@ Array.prototype.forEach.call(document.querySelectorAll('#btns button'), function
 
 function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
 function lerp(a, b, t) { return a + (b - a) * t; }
+function easeInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
 
 /* ---------- renderer, scene, camera (the common room's frame) ---------- */
 
@@ -291,7 +309,7 @@ function onWallZ(t, w, h, x, y, z, facing, layer, name) {
 /* ---------- the corridor ---------- */
 /* The hole's own frame from common-room.html: x along the wall toward the hearth side, y up, z into the room.
    The closed end is at +x, the corner at -x. Facing her, +x is on your left. */
-var HER_Z = -0.81, FAR_Z = -2.8, END_X = 1.5, CORNER_X = -10.5, ARM_X = -8.5, CEIL = 3.6, ARM_LEN = 3.5;
+var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, CORNER_X = -10.5, ARM_X = -8.5, CEIL = 4.5, ARM_LEN = 3.5;
 var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - CORNER_X, WIDTH = HER_Z - FAR_Z;
 
 var stoneMat = solid(0x75726e);
@@ -335,7 +353,7 @@ hinge.add(her); register(her, 2);
 var FAR_FACE = FAR_Z + 0.01, HER_FACE = HER_Z - 0.01;
 /* the far wall, from the closed end: the torch opposite her, where the room shows it; the armour; the window; the
    tapestry; the second torch by the corner */
-var TORCH_HEAD = new THREE.Vector3(0.95, 1.3, FAR_FACE);
+var TORCH_HEAD = new THREE.Vector3(1.3, 1.3, FAR_FACE);
 function addTorch(head, facing, name) {
   var m = onWallZ(cutoutTexture(64, 124, '#5a5550', drawTorch), 0.35, 0.68, head.x - facing * 0.371 * 0.35, head.y - 0.34, head.z, facing, 1, name);
   var f = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffb060), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
@@ -348,7 +366,7 @@ function addTorch(head, facing, name) {
   return { mesh: m, flame: f, light: light };
 }
 var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(-9.6, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
-var ARMOUR = { w: 0.7, h: 2.1, x: -2.6 };
+var ARMOUR = { w: 0.7, h: 2.1, x: -3.4 };
 var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, FAR_Z + 0.45, 1, 1, 'armour');
 var WINDOW = { w: 1.2, h: 2.4, x: -4.6, sill: 0.9 };
 var windowSky = onWallZ(cutoutTexture(120, 240, '#c9d6e2', drawArch), WINDOW.w * 0.8, WINDOW.h * 0.88, WINDOW.x, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.005, 1, 3, 'window-sky');
@@ -356,13 +374,14 @@ windowSky.material = new THREE.MeshBasicMaterial({ map: windowSky.material.map, 
 windowSky.userData.base = windowSky.material.color.clone();
 var win = onWallZ(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) { arch(g, 0, 0, w, h); g.clearRect(w * 0.1, h * 0.06, w * 0.8, h * 0.82); g.fillRect(w * 0.46, h * 0.06, w * 0.08, h * 0.82); }, 'window'), WINDOW.w, WINDOW.h, WINDOW.x, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.01, 1, 1, 'window');
 /* the deep sill, where the Remembrall will sit in the dark */
-box(scene, WINDOW.w * 0.9, 0.06, 0.4, WINDOW.x, WINDOW.sill, FAR_Z + 0.2, solid(0x86827c), 1).name = 'window-sill';
+var sill = box(scene, WINDOW.w * 0.9, 0.06, 0.4, WINDOW.x, WINDOW.sill, FAR_Z + 0.2, solid(0x86827c), 1);
+sill.name = 'window-sill';
 var TAPESTRY = { w: 1.4, h: 2.0, x: -7.6 };
-onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
+var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
 /* her wall, from her toward the corner: a portrait, the classroom's door, a portrait */
-onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -2.8, 1.9, HER_FACE, -1, 1, 'portrait-a');
-onWallZ(cutoutTexture(240, 480, '#6e5a48', drawArch, 'classroom door'), 1.2, 2.4, -5.6, 1.2, HER_FACE, -1, 1, 'classroom-door');
-onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -7.6, 1.9, HER_FACE, -1, 1, 'portrait-b');
+var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -2.8, 1.9, HER_FACE, -1, 1, 'portrait-a');
+var door = onWallZ(cutoutTexture(240, 480, '#6e5a48', drawArch, 'classroom door'), 1.2, 2.4, -5.6, 1.2, HER_FACE, -1, 1, 'classroom-door');
+var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -7.6, 1.9, HER_FACE, -1, 1, 'portrait-b');
 
 /* the drawn torch the common room already has: same file, same size, same head */
 (function () {
@@ -404,32 +423,114 @@ function setView(v) {
   var stage = v === 'stage';
   cutFarWall.forEach(function (m) { m.visible = !stage; });
   btns.view.textContent = stage ? 'View: stage' : 'View: length';
+  if (stage && typeof goBack === 'function') { tween = null; atStop = null; mode = 'rest'; backBtn.hidden = true; }
   yawT = pitchT = 0;
+}
+
+/* ---------- the stops ---------- */
+/* Tap a thing to go to it: the view glides there and turns square to it; tap off it, or Back, to glide back to the
+   corner. The corridor is 2 m wide, so a stop stands as far back as the corridor allows (a hand short of the facing
+   wall) and opens its field of view until the thing fits with a margin, between the room's 42 degrees and 70; the
+   password session's walk-up to her was projected the same way. look is the height the eye turns to. */
+var STOP_BACK = 0.15, STOP_MARGIN = 1.12, FOV_REST = 42, FOV_MAX = 70;
+function stopFor(mesh, h, lookY) {
+  var onHerWall = mesh.position.z > MID_Z;
+  var z = onHerWall ? FAR_Z + STOP_BACK : HER_Z - STOP_BACK;
+  var d = Math.abs(mesh.position.z - z);
+  var fov = clamp(2 * Math.atan(h * STOP_MARGIN / 2 / d) * 180 / Math.PI, FOV_REST, FOV_MAX);
+  return { pos: new THREE.Vector3(mesh.position.x, EYE, z), look: new THREE.Vector3(mesh.position.x, lookY, mesh.position.z), fov: fov };
+}
+var STOPS = [
+  { name: 'her', meshes: [her], stop: function () { return stopFor({ position: new THREE.Vector3(0, 0, HER_Z) }, PORTRAIT_H, HOLE_Y); } },
+  { name: 'portrait-a', meshes: [portraitA], stop: function () { return stopFor(portraitA, 1.2, 1.75); } },
+  { name: 'door', meshes: [door], stop: function () { return stopFor(door, 2.4, 1.3); } },
+  { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75); } },
+  { name: 'armour', meshes: [armour], stop: function () { return stopFor(armour, ARMOUR.h, 1.3); } },
+  /* the window frames its sill, where the Remembrall will sit, and the lower lights */
+  { name: 'window', meshes: [win, windowSky, sill], stop: function () { return stopFor(win, 1.9, 1.55); } },
+  { name: 'tapestry', meshes: [tapestry], stop: function () { return stopFor(tapestry, TAPESTRY.h, 1.9); } }
+];
+var tappables = [];
+STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
+
+var mode = 'rest', atStop = null, tween = null;
+var backBtn = document.getElementById('back');
+function restPose(out) {
+  var p = VIEWS.length.pos;
+  out.pos.copy(p);
+  out.look.set(p.x + Math.cos(yaw) * 10, EYE - 0.1 + pitch * 10, p.z + Math.sin(yaw) * 10);
+  out.fov = FOV_REST;
+  return out;
+}
+var poseNow = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: FOV_REST };
+function glideTo(to, done) {
+  var from = { pos: camera.position.clone(), look: lookTmp.clone(), fov: camera.fov };
+  var dist = from.pos.distanceTo(to.pos);
+  tween = { t: 0, dur: clamp(0.8 + dist * 0.12, 0.8, 2.0), from: from, to: to, done: done };
+}
+function goTo(s) {
+  if (s === atStop) return;
+  atStop = s; mode = 'stop';
+  backBtn.hidden = false;
+  glideTo(s.stop());
+}
+function goBack() {
+  if (mode !== 'stop') return;
+  atStop = null;
+  backBtn.hidden = true;
+  yaw = yawT = 0; pitch = pitchT = 0;
+  glideTo(restPose({ pos: new THREE.Vector3(), look: new THREE.Vector3() }), function () { mode = 'rest'; });
+}
+var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+function tap(cx, cy) {
+  if (!helpEl.hidden) helpEl.hidden = true;
+  if (tween || view !== 'length') return;
+  var r = canvas.getBoundingClientRect();
+  pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  var hits = raycaster.intersectObjects(tappables.filter(function (m) { return m.visible; }), false);
+  if (hits.length) goTo(hits[0].object.userData.stop);
+  else goBack();
 }
 
 function updateCamera(dt) {
   var s = Math.min(1, dt * 7);
-  if (view === 'length') {
-    yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
-    var p = VIEWS.length.pos;
-    camera.position.copy(p);
-    /* a standing piece seen down the length would be drawn from this eye and stood as a card turned to it, as the
-       stairs are (placeCard); a card flat to the wall shows as a sliver from here */
-    armour.rotation.y = Math.atan2(p.x - armour.position.x, p.z - armour.position.z);
-    lookTmp.set(p.x + Math.cos(yaw) * 10, EYE - 0.1 + pitch * 10, p.z + Math.sin(yaw) * 10);
-    camera.lookAt(lookTmp);
-  } else {
+  if (view === 'stage') {
     slide = lerp(slide, slideT, s);
     camera.position.set(slide, EYE, VIEWS.stage.z);
     lookTmp.set(slide, EYE - 0.1, HER_Z);
     camera.lookAt(lookTmp);
+    setFov(FOV_REST);
+    return;
   }
+  if (tween) {
+    tween.t += dt;
+    var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
+    camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
+    lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
+    setFov(lerp(tween.from.fov, tween.to.fov, k));
+    if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
+  } else if (mode === 'rest') {
+    yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
+    restPose(poseNow);
+    camera.position.copy(poseNow.pos); lookTmp.copy(poseNow.look);
+    setFov(FOV_REST);
+  }
+  camera.lookAt(lookTmp);
+  /* a standing piece seen down the length would be drawn from the eye and stood as a card turned to it, as the
+     stairs are (placeCard); a card flat to the wall shows as a sliver from the corner */
+  armour.rotation.y = Math.atan2(camera.position.x - armour.position.x, camera.position.z - armour.position.z);
+}
+function setFov(f) {
+  var want = camera.aspect < 1 ? f * 58 / 42 : f;
+  if (Math.abs(camera.fov - want) > 0.01) { camera.fov = want; camera.updateProjectionMatrix(); }
 }
 
 /* drag versus tap */
-var dragging = false, sx = 0, px = 0, py = 0;
+var dragging = false, moved = false, sx = 0, sy = 0, px = 0, py = 0;
 canvas.addEventListener('pointerdown', function (e) {
-  dragging = true; sx = px = e.clientX; py = e.clientY;
+  dragging = true; moved = false;
+  sx = px = e.clientX; sy = py = e.clientY;
   try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
   e.preventDefault();
 });
@@ -437,14 +538,18 @@ canvas.addEventListener('pointermove', function (e) {
   if (!dragging) return;
   var dx = e.clientX - px, dy = e.clientY - py;
   px = e.clientX; py = e.clientY;
-  if (view === 'length') {
+  if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
+  if (view === 'stage') slideT = clamp(slideT - dx * 0.02, VIEWS.stage.xMin, VIEWS.stage.xMax);
+  else if (mode === 'rest' && !tween) {
     yawT = clamp(yawT - dx * 0.003, -VIEWS.length.yawMax, VIEWS.length.yawMax);
     pitchT = clamp(pitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
-  } else {
-    slideT = clamp(slideT - dx * 0.02, VIEWS.stage.xMin, VIEWS.stage.xMax);
   }
 });
-function endDrag() { dragging = false; }
+function endDrag(e) {
+  if (!dragging) return;
+  dragging = false;
+  if (!moved && e.type === 'pointerup') tap(e.clientX, e.clientY);
+}
 canvas.addEventListener('pointerup', endDrag);
 canvas.addEventListener('pointercancel', endDrag);
 canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
@@ -469,9 +574,10 @@ document.getElementById('btns').addEventListener('click', function (e) {
   else if (act === 'layers') setTint(!tintOn);
   else if (act === 'res') { pixelRatio = pixelRatio > 1 ? 1 : MAX_PR; updateResLabel(); resize(); }
   else if (act === 'exp') { expIndex = (expIndex + 1) % EXPOSURES.length; renderer.toneMappingExposure = EXPOSURES[expIndex]; updateExpLabel(); }
-  else if (act === 'reset') { yawT = pitchT = 0; slideT = VIEWS.stage.x0; }
+  else if (act === 'reset') { yawT = pitchT = 0; slideT = VIEWS.stage.x0; goBack(); }
   else if (act === 'help') helpEl.hidden = !helpEl.hidden;
 });
+backBtn.addEventListener('click', goBack);
 updateResLabel(); updateExpLabel(); setView(view);
 setTimeout(function () { helpEl.hidden = true; }, 9000);
 
@@ -512,7 +618,9 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge };
+window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+  tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
+  mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; } };
 })();
 </script>
 </body>
