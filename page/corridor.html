@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Seventh-floor corridor, greybox</title>
+<style>
+  :root {
+    --bg: #0b0a09;
+    --hud-bg: rgba(24, 21, 18, 0.78);
+    --hud-fg: #d9d2c6;
+    --hud-dim: #8e877c;
+    --hud-on: #e9b86a;
+    --hud-line: rgba(255, 255, 255, 0.16);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0a09; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0a09; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+  }
+  #c { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+  #hud {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #stats {
+    font-size: 12px;
+    line-height: 1.35;
+    background: var(--hud-bg);
+    padding: 6px 9px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--hud-dim);
+    white-space: pre;
+  }
+  #btns { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; pointer-events: auto; }
+  button {
+    font: 500 13px/1 -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-line);
+    border-radius: 6px;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  button.on { color: var(--hud-on); border-color: var(--hud-on); }
+  button:focus-visible { outline: 2px solid var(--hud-on); outline-offset: 2px; }
+  #help {
+    position: fixed;
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    max-width: min(420px, calc(100vw - 20px));
+    background: var(--hud-bg);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    pointer-events: none;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!--
+The seventh-floor corridor outside the portrait hole (PS 9), its own page with its own GPU budget, so moving between
+rooms is a page load under a fade. A copy of the common room's frame (renderer, camera, drag, helpers), not shared code,
+chosen by David on 7 October 2026 while another session edits common-room.html; a shared castle.js is flagged for when
+both rooms show what is common.
+
+Decisions, 7 October 2026, each David's:
+- It agrees with what the hole shows from inside. Everything is in the hole's own frame, copied from common-room.html:
+  x along the wall, toward the hearth side; y up; z into the room. Her painted face is at z -0.81, the far wall 2.0 m
+  beyond at z -2.8, the torch's head at x 0.95, 1.3 m up. From inside a boy sees only a patch of the far wall from
+  x 0.15 to 1.25, 0.5 to 1.85 m up, and never the floor.
+- Shape: a dead end. She hangs on the long side near the closed end, the torch faces her, and the corridor runs off
+  to the right as you face her (toward -x). Chosen over running past her (loses PS 7's "at the very end of the
+  corridor", quoted from memory), curving with the tower, and pointing at her (the room's far wall would change).
+- Length: about 12 m, turning a corner at the far end, so nothing beyond it is built.
+- By day: the far wall is the castle's outer wall, with the torch opposite her, a suit of armour, a tall window with a
+  deep sill (the Remembrall's, later) and a tapestry near the corner; her wall carries her, two portraits and an empty
+  classroom's door; a second torch by the corner. The five from Magic for the boys, plus the portraits.
+- Camera: down the length from the corner at a boy's eye, chosen from greybox shots of both views over a stage view
+  with the far wall cut away (her wall square on, but a gallery rather than a corridor, and the far wall's four things
+  lost). Everything on the walls is foreshortened from here, her most, so the view turns square at each stop. A
+  standing piece (the armour) is a card turned to the eye, as the stairs are. The stage view stays behind View until
+  the stops are built.
+- Moving: tap a thing to go to it, her, the window, the door, the armour or a portrait; the view glides there and turns
+  square; tap off it or Back to glide back to the corner. The notice board's walk-up again. Lost: stepping along by
+  tapping the floor (stops with nothing at them).
+- Hand-over: through the hole under a fade. Going in, the view glides into the tunnel, fades to black where it is
+  darkest, and the common room loads and fades in at its default view with her swinging shut; coming out, the reverse,
+  arriving at her stop as she closes. The address carries where he came from; the place is saved on the device. The
+  room's half is the password session's code, agreed through the handoff. Lost: a plain cut (no passing through), one
+  page for both rooms (the budgets add). The room is always night, so day here meets night there until it has a day.
+Every grey shape is at its real size. Nothing is drawn yet but the torch, which the room already has.
+-->
+<canvas id="c" tabindex="0" aria-label="Seventh-floor corridor greybox"></canvas>
+<div id="hud">
+  <div id="stats">starting</div>
+  <div id="btns">
+    <button type="button" data-act="view">View</button>
+    <button type="button" data-act="layers">Layers</button>
+    <button type="button" data-act="res">Res</button>
+    <button type="button" data-act="exp">Exp</button>
+    <button type="button" data-act="reset">Reset</button>
+    <button type="button" data-act="help">?</button>
+  </div>
+</div>
+<div id="help">Drag to look along the corridor. View switches between looking down its length and the stage view. The grey shapes are placeholders.</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+'use strict';
+
+var helpEl = document.getElementById('help');
+if (typeof THREE === 'undefined') {
+  helpEl.textContent = 'three.js did not load. Check the connection and reload.';
+  return;
+}
+
+var canvas = document.getElementById('c');
+var statsEl = document.getElementById('stats');
+var btns = {};
+Array.prototype.forEach.call(document.querySelectorAll('#btns button'), function (b) { btns[b.getAttribute('data-act')] = b; });
+
+function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+/* ---------- renderer, scene, camera (the common room's frame) ---------- */
+
+var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: 'high-performance' });
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputEncoding = THREE.sRGBEncoding;
+var EXPOSURES = [0.6, 0.8, 1.0, 1.3];
+var expIndex = 2;
+renderer.toneMappingExposure = EXPOSURES[expIndex];
+var MAX_PR = Math.min(window.devicePixelRatio || 1, 2);
+var pixelRatio = MAX_PR;
+
+var scene = new THREE.Scene();
+scene.background = col(0x0b0a09);
+scene.fog = new THREE.FogExp2(col(0x0b0a09).getHex(), 0.03);
+
+var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 80);
+var lookTmp = new THREE.Vector3();
+
+/* ---------- canvas texture helpers (copied from common-room.html) ---------- */
+
+function makeCanvas(w, h) { var c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function tex(c) {
+  var t = new THREE.CanvasTexture(c);
+  t.encoding = THREE.sRGBEncoding;
+  t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+  return t;
+}
+/* flat colours in this file are written as the colours they should look; the renderer wants them linear */
+function col(hex) { return new THREE.Color(hex).convertSRGBToLinear(); }
+function rr(g, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  g.beginPath();
+  g.moveTo(x + r, y);
+  g.arcTo(x + w, y, x + w, y + h, r);
+  g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r);
+  g.arcTo(x, y, x + w, y, r);
+  g.closePath();
+  g.fill();
+}
+function arch(g, x, y, w, h) {
+  var r = w / 2;
+  g.beginPath();
+  g.moveTo(x, y + h);
+  g.lineTo(x, y + r);
+  g.arc(x + r, y + r, r, Math.PI, 0);
+  g.lineTo(x + w, y + h);
+  g.closePath();
+  g.fill();
+}
+function label(g, text, w, y, size, color) {
+  g.fillStyle = color || '#45423d';
+  g.font = '600 ' + size + 'px -apple-system, system-ui, sans-serif';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillText(text, w / 2, y);
+}
+function cutoutTexture(w, h, fill, draw, text) {
+  var c = makeCanvas(w, h), g = c.getContext('2d');
+  g.fillStyle = fill;
+  draw(g, w, h);
+  if (text) label(g, text, w, h * 0.5, Math.round(Math.min(w, h) * 0.085));
+  return tex(c);
+}
+function flameTexture() {
+  var c = makeCanvas(128, 128), g = c.getContext('2d'), k = 58 / 40;
+  g.setTransform(1, 0, 0, k, 0, 72 - 72 * k);
+  var grd = g.createRadialGradient(64, 72 + 16 / k, 3, 64, 72, 40);
+  grd.addColorStop(0, 'rgba(255,255,230,1)');
+  grd.addColorStop(0.25, 'rgba(255,200,110,0.9)');
+  grd.addColorStop(0.55, 'rgba(255,110,30,0.45)');
+  grd.addColorStop(1, 'rgba(255,60,0,0)');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 128, 128 / k + 72);
+  return tex(c);
+}
+var flameTex = flameTexture();
+
+/* silhouettes for the placeholders */
+function drawRect(g, w, h) { g.fillRect(0, 0, w, h); }
+function drawFrame(g, w, h) { g.fillRect(0, 0, w, h); g.fillStyle = '#8f8b84'; g.fillRect(w * 0.09, h * 0.08, w * 0.82, h * 0.84); }
+function drawArch(g, w, h) { arch(g, 0, 0, w, h); }
+function drawArmour(g, w, h) {
+  /* a standing suit on a plinth: helm, shoulders, body, legs */
+  g.fillRect(w * 0.12, h * 0.86, w * 0.76, h * 0.14);
+  rr(g, w * 0.36, h * 0.02, w * 0.28, h * 0.13, w * 0.1);
+  rr(g, w * 0.14, h * 0.14, w * 0.72, h * 0.12, w * 0.08);
+  g.fillRect(w * 0.27, h * 0.24, w * 0.46, h * 0.28);
+  g.fillRect(w * 0.06, h * 0.22, w * 0.14, h * 0.32);
+  g.fillRect(w * 0.80, h * 0.22, w * 0.14, h * 0.32);
+  g.fillRect(w * 0.29, h * 0.5, w * 0.18, h * 0.37);
+  g.fillRect(w * 0.53, h * 0.5, w * 0.18, h * 0.37);
+}
+function drawTorch(g, w, h) {
+  g.fillRect(w * 0.05, h * 0.3, w * 0.22, h * 0.5);
+  g.fillRect(w * 0.2, h * 0.5, w * 0.6, h * 0.06);
+  g.fillRect(w * 0.72, h * 0.08, w * 0.16, h * 0.5);
+}
+
+/* ---------- mesh helpers (copied) ---------- */
+
+var layered = [];
+var TINTS = [0x6f8dff, 0x4fd1c5, 0x8bd45a, 0xf0d35a, 0xf08a4b];
+function register(mesh, layer) {
+  mesh.userData.layer = layer;
+  mesh.userData.base = mesh.material.color.clone();
+  layered.push(mesh);
+  return mesh;
+}
+function solid(color, opts) {
+  var o = { color: col(color), roughness: 0.92, metalness: 0 };
+  if (opts) for (var k in opts) o[k] = opts[k];
+  return new THREE.MeshStandardMaterial(o);
+}
+function box(parent, w, h, d, x, y, z, material, layer) {
+  var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set(x, y, z);
+  parent.add(m);
+  return register(m, layer);
+}
+function cutoutMesh(t, w, h) {
+  return new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshStandardMaterial({ map: t, color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide })
+  );
+}
+/* a flat piece on a wall: facing +1 looks toward +z (her wall, into the corridor), -1 toward -z (the far wall) */
+function onWallZ(t, w, h, x, y, z, facing, layer, name) {
+  var m = cutoutMesh(t, w, h);
+  m.position.set(x, y, z);
+  if (facing < 0) m.rotation.y = Math.PI;
+  m.name = name;
+  scene.add(m);
+  return register(m, layer);
+}
+
+/* ---------- the corridor ---------- */
+/* The hole's own frame from common-room.html: x along the wall toward the hearth side, y up, z into the room.
+   The closed end is at +x, the corner at -x. Facing her, +x is on your left. */
+var HER_Z = -0.81, FAR_Z = -2.8, END_X = 1.5, CORNER_X = -10.5, ARM_X = -8.5, CEIL = 3.6, ARM_LEN = 3.5;
+var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - CORNER_X, WIDTH = HER_Z - FAR_Z;
+
+var stoneMat = solid(0x75726e);
+var floorMat = solid(0x6a6764);
+var ceilMat = solid(0x3d3b38);
+var T = 0.3;
+var walls = new THREE.Group(); scene.add(walls);
+/* the far wall, the castle's outer wall, full length; cut away in the stage view */
+var farWall = box(walls, LEN, CEIL, T, (END_X + CORNER_X) / 2, CEIL / 2, FAR_Z - T / 2, stoneMat, 0);
+farWall.name = 'far-wall';
+/* her wall, from the closed end to the corner's opening */
+var herWall = box(walls, END_X - ARM_X, CEIL, T, (END_X + ARM_X) / 2, CEIL / 2, HER_Z + T / 2, stoneMat, 0);
+herWall.name = 'her-wall';
+/* the closed end, and the corridor's end wall beyond the corner, which runs on into the turn */
+box(walls, T, CEIL, WIDTH, END_X + T / 2, CEIL / 2, MID_Z, stoneMat, 0).name = 'end-wall';
+box(walls, T, CEIL, WIDTH + ARM_LEN, CORNER_X - T / 2, CEIL / 2, MID_Z + ARM_LEN / 2, stoneMat, 0).name = 'corner-wall';
+/* the turn: a short arm toward +z, dark beyond */
+box(walls, T, CEIL, ARM_LEN, ARM_X + T / 2, CEIL / 2, HER_Z + ARM_LEN / 2, stoneMat, 0).name = 'turn-wall';
+var floor = new THREE.Mesh(new THREE.PlaneGeometry(LEN, WIDTH), floorMat);
+floor.rotation.x = -Math.PI / 2; floor.position.set((END_X + CORNER_X) / 2, 0, MID_Z);
+floor.name = 'floor'; scene.add(floor); register(floor, 0);
+var armFloor = new THREE.Mesh(new THREE.PlaneGeometry(ARM_X - CORNER_X, ARM_LEN), floorMat);
+armFloor.rotation.x = -Math.PI / 2; armFloor.position.set((ARM_X + CORNER_X) / 2, 0, HER_Z + ARM_LEN / 2);
+scene.add(armFloor); register(armFloor, 0);
+var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(LEN, WIDTH + ARM_LEN), ceilMat);
+ceiling.rotation.x = Math.PI / 2; ceiling.position.set((END_X + CORNER_X) / 2, CEIL, MID_Z + ARM_LEN / 2);
+ceiling.name = 'ceiling'; scene.add(ceiling); register(ceiling, 0);
+
+/* her: the Fat Lady's painted front, 1.4 x 1.7, centred on the hole 1.2 m up, hinged on the +x edge (your left as
+   you face her). A grey stand-in; the password session places the drawing (portrait-hole-front) */
+var PORTRAIT_W = 1.4, PORTRAIT_H = 1.7, HOLE_Y = 1.2;
+var hinge = new THREE.Group();
+hinge.position.set(PORTRAIT_W / 2, 0, HER_Z - 0.01);
+scene.add(hinge);
+var her = cutoutMesh(cutoutTexture(232, 282, '#b9a98c', drawFrame, 'Fat Lady'), PORTRAIT_W, PORTRAIT_H);
+her.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
+her.rotation.y = Math.PI;
+her.name = 'portrait-hole-front';
+hinge.add(her); register(her, 2);
+
+var FAR_FACE = FAR_Z + 0.01, HER_FACE = HER_Z - 0.01;
+/* the far wall, from the closed end: the torch opposite her, where the room shows it; the armour; the window; the
+   tapestry; the second torch by the corner */
+var TORCH_HEAD = new THREE.Vector3(0.95, 1.3, FAR_FACE);
+function addTorch(head, facing, name) {
+  var m = onWallZ(cutoutTexture(64, 124, '#5a5550', drawTorch), 0.35, 0.68, head.x - facing * 0.371 * 0.35, head.y - 0.34, head.z, facing, 1, name);
+  var f = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffb060), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+  f.position.set(head.x, head.y + 0.08, head.z + facing * 0.03);
+  f.scale.set(0.12, 0.2, 1);
+  scene.add(f);
+  var light = new THREE.PointLight(col(0xffc080), 1.6, 6, 1.2);
+  light.position.set(head.x, head.y + 0.4, head.z + facing * 0.5);
+  scene.add(light);
+  return { mesh: m, flame: f, light: light };
+}
+var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(-9.6, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
+var ARMOUR = { w: 0.7, h: 2.1, x: -2.6 };
+var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, FAR_Z + 0.45, 1, 1, 'armour');
+var WINDOW = { w: 1.2, h: 2.4, x: -4.6, sill: 0.9 };
+var windowSky = onWallZ(cutoutTexture(120, 240, '#c9d6e2', drawArch), WINDOW.w * 0.8, WINDOW.h * 0.88, WINDOW.x, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.005, 1, 3, 'window-sky');
+windowSky.material = new THREE.MeshBasicMaterial({ map: windowSky.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
+windowSky.userData.base = windowSky.material.color.clone();
+var win = onWallZ(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) { arch(g, 0, 0, w, h); g.clearRect(w * 0.1, h * 0.06, w * 0.8, h * 0.82); g.fillRect(w * 0.46, h * 0.06, w * 0.08, h * 0.82); }, 'window'), WINDOW.w, WINDOW.h, WINDOW.x, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.01, 1, 1, 'window');
+/* the deep sill, where the Remembrall will sit in the dark */
+box(scene, WINDOW.w * 0.9, 0.06, 0.4, WINDOW.x, WINDOW.sill, FAR_Z + 0.2, solid(0x86827c), 1).name = 'window-sill';
+var TAPESTRY = { w: 1.4, h: 2.0, x: -7.6 };
+onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
+/* her wall, from her toward the corner: a portrait, the classroom's door, a portrait */
+onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -2.8, 1.9, HER_FACE, -1, 1, 'portrait-a');
+onWallZ(cutoutTexture(240, 480, '#6e5a48', drawArch, 'classroom door'), 1.2, 2.4, -5.6, 1.2, HER_FACE, -1, 1, 'classroom-door');
+onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -7.6, 1.9, HER_FACE, -1, 1, 'portrait-b');
+
+/* the drawn torch the common room already has: same file, same size, same head */
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var t = tex(im);
+    torches.forEach(function (tc) {
+      var m = tc.mesh, h = 0.35 * im.height / im.width;
+      m.geometry.dispose(); m.geometry = new THREE.PlaneGeometry(0.35, h);
+      m.material.map = t; m.material.color.set(0xffffff); m.userData.base = m.material.color.clone(); m.material.needsUpdate = true;
+    });
+  };
+  im.src = '../assets/layers/corridor-torch.png';
+})();
+
+/* ---------- light, by day ---------- */
+/* Daylight comes in at the window on the outer wall; the torches burn by day too, as the hole shows */
+var hemi = new THREE.HemisphereLight(col(0xbfc8d2), col(0x4a4038), 0.55);
+scene.add(hemi);
+var windowLight = new THREE.PointLight(col(0xdfe6ee), 2.2, 9, 1.4);
+windowLight.position.set(WINDOW.x, 2.2, FAR_Z + 0.8);
+scene.add(windowLight);
+
+/* ---------- the two views ---------- */
+/* length: from just inside the corner at a boy's eye, looking down to her end; a drag turns the head.
+   stage: the far wall cut away, the camera outside it facing her wall square on; a drag slides along it. */
+var EYE = 1.35;
+var VIEWS = {
+  length: { pos: new THREE.Vector3(-9.6, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12 },
+  stage: { z: FAR_Z - 3.4, xMin: -8.0, xMax: -0.2, x0: -1.6 }
+};
+var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
+var yaw = 0, pitch = 0, yawT = 0, pitchT = 0, slide = VIEWS.stage.x0, slideT = slide;
+var cutFarWall = [farWall];
+layered.forEach(function (m) { if (m.position.z < FAR_Z + 0.5 && m !== farWall && m !== floor && m !== ceiling) cutFarWall.push(m); });
+torches.forEach(function (tc) { cutFarWall.push(tc.flame); });
+function setView(v) {
+  view = v;
+  var stage = v === 'stage';
+  cutFarWall.forEach(function (m) { m.visible = !stage; });
+  btns.view.textContent = stage ? 'View: stage' : 'View: length';
+  yawT = pitchT = 0;
+}
+
+function updateCamera(dt) {
+  var s = Math.min(1, dt * 7);
+  if (view === 'length') {
+    yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
+    var p = VIEWS.length.pos;
+    camera.position.copy(p);
+    /* a standing piece seen down the length would be drawn from this eye and stood as a card turned to it, as the
+       stairs are (placeCard); a card flat to the wall shows as a sliver from here */
+    armour.rotation.y = Math.atan2(p.x - armour.position.x, p.z - armour.position.z);
+    lookTmp.set(p.x + Math.cos(yaw) * 10, EYE - 0.1 + pitch * 10, p.z + Math.sin(yaw) * 10);
+    camera.lookAt(lookTmp);
+  } else {
+    slide = lerp(slide, slideT, s);
+    camera.position.set(slide, EYE, VIEWS.stage.z);
+    lookTmp.set(slide, EYE - 0.1, HER_Z);
+    camera.lookAt(lookTmp);
+  }
+}
+
+/* drag versus tap */
+var dragging = false, sx = 0, px = 0, py = 0;
+canvas.addEventListener('pointerdown', function (e) {
+  dragging = true; sx = px = e.clientX; py = e.clientY;
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  e.preventDefault();
+});
+canvas.addEventListener('pointermove', function (e) {
+  if (!dragging) return;
+  var dx = e.clientX - px, dy = e.clientY - py;
+  px = e.clientX; py = e.clientY;
+  if (view === 'length') {
+    yawT = clamp(yawT - dx * 0.003, -VIEWS.length.yawMax, VIEWS.length.yawMax);
+    pitchT = clamp(pitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
+  } else {
+    slideT = clamp(slideT - dx * 0.02, VIEWS.stage.xMin, VIEWS.stage.xMax);
+  }
+});
+function endDrag() { dragging = false; }
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+/* HUD */
+var tintOn = false;
+function setTint(on) {
+  tintOn = on;
+  for (var i = 0; i < layered.length; i++) {
+    var m = layered[i];
+    m.material.color.copy(on ? col(TINTS[m.userData.layer]) : m.userData.base);
+  }
+  btns.layers.classList.toggle('on', on);
+}
+function updateResLabel() { btns.res.textContent = 'Res ' + (Math.round(pixelRatio * 10) / 10) + 'x'; }
+function updateExpLabel() { btns.exp.textContent = 'Exp ' + EXPOSURES[expIndex].toFixed(1); }
+document.getElementById('btns').addEventListener('click', function (e) {
+  var b = e.target.closest ? e.target.closest('button') : null;
+  if (!b) return;
+  var act = b.getAttribute('data-act');
+  if (act === 'view') setView(view === 'length' ? 'stage' : 'length');
+  else if (act === 'layers') setTint(!tintOn);
+  else if (act === 'res') { pixelRatio = pixelRatio > 1 ? 1 : MAX_PR; updateResLabel(); resize(); }
+  else if (act === 'exp') { expIndex = (expIndex + 1) % EXPOSURES.length; renderer.toneMappingExposure = EXPOSURES[expIndex]; updateExpLabel(); }
+  else if (act === 'reset') { yawT = pitchT = 0; slideT = VIEWS.stage.x0; }
+  else if (act === 'help') helpEl.hidden = !helpEl.hidden;
+});
+updateResLabel(); updateExpLabel(); setView(view);
+setTimeout(function () { helpEl.hidden = true; }, 9000);
+
+/* ---------- per frame ---------- */
+
+function resize() {
+  var w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  renderer.setPixelRatio(pixelRatio);
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.fov = w / h < 1 ? 58 : 42;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize', resize);
+if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
+resize();
+
+var clock = new THREE.Clock();
+var t = 0, fpsN = 0, fpsT = 0;
+function frame() {
+  var dt = Math.min(0.05, clock.getDelta());
+  t += dt;
+  updateCamera(dt);
+  torches.forEach(function (tc, i) {
+    var k = 0.85 + 0.15 * Math.sin(t * 11 + i) * Math.sin(t * 4.3 + i * 2);
+    tc.light.intensity = 1.6 * k;
+    tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(t * 7.3 + i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(t * 9.1 + i))), 1);
+  });
+  renderer.render(scene, camera);
+  fpsN++; fpsT += dt;
+  if (fpsT >= 0.5) {
+    var ri = renderer.info.render;
+    statsEl.textContent = Math.round(fpsN / fpsT) + ' fps\n' + ri.calls + ' draw calls\n' + (ri.triangles / 1000).toFixed(1) + 'k triangles';
+    fpsN = 0; fpsT = 0;
+  }
+}
+renderer.setAnimationLoop(frame);
+
+/* hooks for automated checks; harmless in normal use */
+window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge };
+})();
+</script>
+</body>
+</html>
