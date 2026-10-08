@@ -1,0 +1,448 @@
+{
+  "chain": "visitors",
+  "room": [
+    {
+      "when": [
+        "mantel_out = yes",
+        "place = common room",
+        "time != night"
+      ],
+      "show": [
+        "the mantel painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds her away until her record brings her home"
+      ]
+    },
+    {
+      "when": [
+        "mantel_out = yes",
+        "mantel_last = chats",
+        "place = corridor"
+      ],
+      "show": [
+        "the mantel painting's sitter standing in the painting beside the Fat Lady"
+      ]
+    },
+    {
+      "when": [
+        "mantel_out = yes",
+        "mantel_last = stays",
+        "place = corridor"
+      ],
+      "show": [
+        "the mantel painting's sitter standing in the painting beside the Fat Lady"
+      ]
+    },
+    {
+      "when": [
+        "right_out = yes",
+        "place = common room",
+        "time != night"
+      ],
+      "show": [
+        "the right painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds him away until his record brings him home"
+      ]
+    },
+    {
+      "when": [
+        "right_out = yes",
+        "right_last = chats",
+        "place = corridor"
+      ],
+      "show": [
+        "the right painting's sitter standing in the painting beside the Fat Lady"
+      ]
+    },
+    {
+      "when": [
+        "right_out = yes",
+        "right_last = stays",
+        "place = corridor"
+      ],
+      "show": [
+        "the right painting's sitter standing in the painting beside the Fat Lady"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "visitors.mantel-chats",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes",
+        "mantel_last != chats"
+      ],
+      "one_of": "mantel-visit",
+      "weight": 1,
+      "show": [
+        "the mantel painting's sitter stands in the painting beside the Fat Lady, turned toward the Fat Lady, now and then settling her hat; the Fat Lady glances that way (her looking-along patch, once drawn)"
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_last = chats",
+        "add visiting 1"
+      ]
+    },
+    {
+      "id": "visitors.mantel-slips",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes",
+        "mantel_last != slips"
+      ],
+      "one_of": "mantel-visit",
+      "weight": 1,
+      "show": [
+        "the mantel painting's sitter is in the painting beside the Fat Lady as the boy climbs out and walks off through its painted door, caught visiting"
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_last = slips"
+      ]
+    },
+    {
+      "id": "visitors.mantel-stays",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes",
+        "mantel_last != stays"
+      ],
+      "one_of": "mantel-visit",
+      "weight": 1,
+      "show": [
+        "the mantel painting's sitter stands in the painting beside the Fat Lady and pays the boy no mind"
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_last = stays",
+        "add visiting 1"
+      ]
+    },
+    {
+      "id": "visitors.mantel-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes"
+      ],
+      "one_of": "mantel-visit",
+      "weight": 2,
+      "starts": [
+        "set mantel_last = home"
+      ]
+    },
+    {
+      "id": "visitors.mantel-back-soon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 20-60 s",
+      "when": [
+        "place = common room",
+        "mantel_out = yes",
+        "mantel_last = chats",
+        "time != night"
+      ],
+      "show": [
+        "the mantel painting's sitter comes home through her painting's exit and sits"
+      ],
+      "starts": [
+        "set mantel_out = no",
+        "add visiting -1"
+      ]
+    },
+    {
+      "id": "visitors.mantel-back-slips",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = common room",
+        "mantel_out = yes",
+        "mantel_last = slips",
+        "time != night"
+      ],
+      "show": [
+        "the mantel painting's sitter comes home through her painting's exit and sits"
+      ],
+      "starts": [
+        "set mantel_out = no"
+      ]
+    },
+    {
+      "id": "visitors.mantel-back-stays",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = common room",
+        "mantel_out = yes",
+        "mantel_last = stays",
+        "time != night"
+      ],
+      "show": [
+        "the mantel painting's sitter comes home through her painting's exit and sits"
+      ],
+      "starts": [
+        "set mantel_out = no",
+        "add visiting -1"
+      ]
+    },
+    {
+      "id": "visitors.right-chats",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes",
+        "right_last != chats"
+      ],
+      "one_of": "right-visit",
+      "weight": 1,
+      "show": [
+        "the right painting's sitter stands in the painting beside the Fat Lady, turned toward the Fat Lady; the Fat Lady glances that way (her looking-along patch, once drawn)"
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_last = chats",
+        "add visiting 1"
+      ]
+    },
+    {
+      "id": "visitors.right-slips",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes",
+        "right_last != slips"
+      ],
+      "one_of": "right-visit",
+      "weight": 1,
+      "show": [
+        "the right painting's sitter is in the painting beside the Fat Lady as the boy climbs out and walks off through its painted door, caught visiting"
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_last = slips"
+      ]
+    },
+    {
+      "id": "visitors.right-stays",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes",
+        "right_last != stays"
+      ],
+      "one_of": "right-visit",
+      "weight": 1,
+      "show": [
+        "the right painting's sitter stands in the painting beside the Fat Lady and pays the boy no mind"
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_last = stays",
+        "add visiting 1"
+      ]
+    },
+    {
+      "id": "visitors.right-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes"
+      ],
+      "one_of": "right-visit",
+      "weight": 2,
+      "starts": [
+        "set right_last = home"
+      ]
+    },
+    {
+      "id": "visitors.right-back-soon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 20-60 s",
+      "when": [
+        "place = common room",
+        "right_out = yes",
+        "right_last = chats",
+        "time != night"
+      ],
+      "show": [
+        "the right painting's sitter comes home through his painting's exit and sits"
+      ],
+      "starts": [
+        "set right_out = no",
+        "add visiting -1"
+      ]
+    },
+    {
+      "id": "visitors.right-back-slips",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = common room",
+        "right_out = yes",
+        "right_last = slips",
+        "time != night"
+      ],
+      "show": [
+        "the right painting's sitter comes home through his painting's exit and sits"
+      ],
+      "starts": [
+        "set right_out = no"
+      ]
+    },
+    {
+      "id": "visitors.right-back-stays",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = common room",
+        "right_out = yes",
+        "right_last = stays",
+        "time != night"
+      ],
+      "show": [
+        "the right painting's sitter comes home through his painting's exit and sits"
+      ],
+      "starts": [
+        "set right_out = no",
+        "add visiting -1"
+      ]
+    },
+    {
+      "id": "visitors.gossip",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap portrait-a",
+      "when": [
+        "visiting > 0",
+        "tap_last != gossip"
+      ],
+      "one_of": "visitor-tap",
+      "weight": 1,
+      "who": [
+        {
+          "as": "fat-lady",
+          "role": "canon",
+          "name": "the fat lady",
+          "mark": "her frame",
+          "pose": "her own, turned along the corridor"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "visitors.gossip",
+          "canon": "drafts only; her lines are settled in docs/fat-lady-lines.md, verify",
+          "text": [
+            "She comes for the cake, dear, not the company.",
+            "Don't mind her, she's been here since lunch.",
+            "We were just talking about your tower."
+          ]
+        }
+      ],
+      "starts": [
+        "set tap_last = gossip"
+      ]
+    },
+    {
+      "id": "visitors.walk-up",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap portrait-a",
+      "when": [
+        "visiting > 0",
+        "tap_last != walk-up"
+      ],
+      "one_of": "visitor-tap",
+      "weight": 1,
+      "show": [
+        "the view walks up to the painting, and the visitor pays the boy no mind"
+      ],
+      "starts": [
+        "set tap_last = walk-up"
+      ]
+    },
+    {
+      "id": "visitors.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set mantel_out = no",
+        "set right_out = no",
+        "set visiting = 0"
+      ]
+    },
+    {
+      "id": "visitors.night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "time = night"
+      ],
+      "starts": [
+        "set mantel_out = no",
+        "set right_out = no",
+        "set visiting = 0"
+      ]
+    }
+  ]
+}
