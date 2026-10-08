@@ -31,7 +31,9 @@
           "text": [
             "Ten minutes, then up to bed, the lot of you!",
             "Ten minutes! Finish what you're doing.",
-            "Ten minutes to lights out!"
+            "Ten minutes to lights out!",
+            "Ten minutes! I am a PREFECT, and I will be obeyed!",
+            "Ten minutes, and I'm counting. I'm very good at counting."
           ]
         }
       ]
@@ -65,8 +67,11 @@
           "key": "bedtime.lights-out",
           "text": [
             "Lights out! Up you go.",
-            "Bed, everyone. Lights out!"
-          ]
+            "Bed, everyone. Lights out!",
+            "Lights out! Prefect's orders. Yes, Fred, that means you. And George.",
+            "Lights out! And the P on my jumper is NOT for 'Pompous'."
+          ],
+          "canon": "PS12, the twins' P for Prefect, verify"
         }
       ],
       "starts": [

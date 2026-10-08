@@ -83,9 +83,11 @@
           "text": [
             "Who's this, then? Are you sure you know how?",
             "Not me first, send a pawn. They don't mind.",
-            "Careful with us. We've been dropped before."
+            "Careful with us. We've been dropped before.",
+            "Seamus used us once. We still haven't recovered.",
+            "Do you know how a knight moves? It isn't 'sideways and hope'."
           ],
-          "canon": "PS12, verify"
+          "canon": "PS12, verify; PS12, Seamus's set, verify"
         }
       ],
       "starts": [
@@ -167,7 +169,9 @@
           "text": [
             "It's you! Right, let's have them.",
             "Lead on. We'll go where you send us.",
-            "Back again? Good. Line up, everyone!"
+            "Back again? Good. Line up, everyone!",
+            "Our general returns! Polish your crowns, everyone.",
+            "Right, troops: bishops slant, pawns march, and nobody goes in the fire."
           ]
         }
       ],
@@ -205,7 +209,9 @@
           "text": [
             "There you are! Your move.",
             "We kept your place. Nobody touched a thing.",
-            "Still your move. We waited."
+            "Still your move. We waited.",
+            "Your move. The bishop's been holding his breath.",
+            "You're back! The king's come out of hiding."
           ]
         }
       ],
@@ -240,8 +246,12 @@
           "text": [
             "We did it! Did you see the rook?",
             "Victory! Carry me round the room!",
-            "Ha! Again, again!"
-          ]
+            "Ha! Again, again!",
+            "Checkmate! Somebody tell Ron!",
+            "The pawns want a parade. The bishops want a speech.",
+            "The king would like everyone to know he was very brave."
+          ],
+          "canon": "PS12, Ron the chess player, verify"
         }
       ],
       "starts": [
@@ -277,7 +287,10 @@
           "text": [
             "We were robbed! The bishop wasn't looking.",
             "Rematch! I wasn't ready.",
-            "That rook of theirs is a menace. Next time."
+            "That rook of theirs is a menace. Next time.",
+            "The pawns blame the knights, the knights blame the bishops, and nobody blames you.",
+            "That wasn't a loss. That was a strategic nap.",
+            "Ron would have seen that coming. Ron isn't here."
           ]
         }
       ],
@@ -313,7 +326,10 @@
           "key": "chess.drawn",
           "text": [
             "Nobody wins! Shake hands, everyone.",
-            "A draw. We'll settle this another day."
+            "A draw. We'll settle this another day.",
+            "Stalemate! Even the kings are bored.",
+            "A draw. Like a picture, but nobody gets to keep it.",
+            "Nobody wins! The queen is furious."
           ]
         }
       ],
@@ -349,7 +365,9 @@
           "key": "chess.stop",
           "text": [
             "Very well. We'll wait right here.",
-            "Halt, everyone! We wait for our general."
+            "Halt, everyone! We wait for our general.",
+            "Nobody move. And I mean nobody, knight.",
+            "Freeze! The king's already frozen. He's good at that."
           ]
         }
       ],
@@ -386,7 +404,9 @@
           "key": "chess.walk-away",
           "text": [
             "Off you go, we'll finish it!",
-            "Leave it to us!"
+            "Leave it to us!",
+            "You'll miss the good bit!",
+            "Leave it to us, general! What could possibly go wrong?"
           ]
         }
       ],
@@ -468,7 +488,9 @@
           "key": "chess.tell-won",
           "text": [
             "We won without you! Well, you started it.",
-            "We finished it. We won!"
+            "We finished it. We won!",
+            "We won! The rook did a little dance.",
+            "We won! The king hid the whole time."
           ]
         }
       ],
@@ -502,7 +524,8 @@
           "key": "chess.tell-lost",
           "text": [
             "We lost without you. Never again!",
-            "It all went wrong after you left. Rematch?"
+            "It all went wrong after you left. Rematch?",
+            "We lost. It was the bishop's fault. It's always the bishop's fault."
           ]
         }
       ],
@@ -535,7 +558,9 @@
           "medium": "said",
           "key": "chess.tell-drawn",
           "text": [
-            "A draw. We missed you."
+            "A draw. We missed you.",
+            "A draw. Nobody's gloating. Yet.",
+            "A draw. The queen wants a word with the king."
           ]
         }
       ],
@@ -625,7 +650,9 @@
           "key": "chess.bedtime",
           "text": [
             "Ten minutes! Tap me and we'll wait, or go and we'll play on.",
-            "Bedtime soon. Shall we wait for you, or finish without you?"
+            "Bedtime soon. Shall we wait for you, or finish without you?",
+            "Ten minutes! Even kings need their sleep.",
+            "Ten minutes. The king's already yawning."
           ]
         }
       ]
@@ -656,7 +683,9 @@
           "key": "chess.lights-out",
           "text": [
             "We'll keep your place.",
-            "Sleep well, general. We'll be here."
+            "Sleep well, general. We'll be here.",
+            "Sleep tight, general. Don't let the knights bite.",
+            "Night night! The pawns will keep watch. Well, try to."
           ]
         }
       ],
