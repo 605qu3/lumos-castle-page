@@ -39,6 +39,7 @@
     <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png?v=3" alt="">
     <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png?v=3" alt="">
     <img class="patch" id="brow" src="../assets/layers/portrait-hole-front-brow.png?v=3" alt="">
+    <img class="patch" id="sigh" src="../assets/layers/portrait-hole-front-sigh.png?v=3" alt="">
   </div>
 </div>
 <div id="bar">
@@ -48,6 +49,7 @@
   <button id="rightBtn">Right password</button>
   <button id="lastBtn">Last week's</button>
   <button id="earBtn">Can't hear</button>
+  <button id="giveBtn">Giving in</button>
   <button id="zoom">Close</button>
   <span id="state">awake</span>
 </div>
@@ -58,7 +60,7 @@
 (function () {
   var W = 1120, H = 1360;
   var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529],
-    brow: [540, 384, 666, 529],
+    brow: [540, 384, 666, 529], sigh: [540, 384, 666, 529],
     reach: [549, 415, 907, 918], ear: [549, 415, 907, 918] };
   for (var id in PATCHES) {
     var b = PATCHES[id], el = document.getElementById(id);
@@ -127,13 +129,23 @@
   function setArm(state) {   // 'lap', 'reach' or 'ear'
     reach.classList.toggle('on', state === 'reach'); ear.classList.toggle('on', state === 'ear');
   }
-  document.getElementById('earBtn').addEventListener('click', function () {
+  function askAgain(t) {   // one ask, starting t ms from now, 3.8 s long
+    at(t, function () { setArm('reach'); setListen(true); stateEl.textContent = 'asking again'; });
+    at(t + 400, function () { setArm('ear'); });
+    at(t + 3400, function () { setArm('reach'); });
+    at(t + 3800, function () { setArm('lap'); setListen(false); });
+  }
+  var sigh = document.getElementById('sigh');
+  function reset() {
     setAuto(false); clearTimeout(listenTimer); armTimers.forEach(clearTimeout); armTimers = [];
-    setPleased(false); setBrow(false); setArm('reach'); setListen(true); stateEl.textContent = 'asking again';
-    clearTimeout(listenTimer);
-    at(400, function () { setArm('ear'); });
-    at(3400, function () { setArm('reach'); });
-    at(3800, function () { setArm('lap'); setListen(false); });
+    setPleased(false); setBrow(false); sigh.classList.remove('on'); doze.classList.remove('on');
+  }
+  document.getElementById('earBtn').addEventListener('click', function () { reset(); askAgain(0); });
+  // Giving in: she asks twice with her hand to her ear, then sighs fondly for three seconds and lets him in.
+  document.getElementById('giveBtn').addEventListener('click', function () {
+    reset(); askAgain(0); askAgain(4400);
+    at(8600, function () { sigh.classList.add('on'); stateEl.textContent = 'giving in'; });
+    at(11600, function () { sigh.classList.remove('on'); stateEl.textContent = 'awake'; });
   });
   window.ladyTest = { setArm: setArm, setListen: setListen, setPleased: setPleased, setBrow: setBrow, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
   setAuto(true);
