@@ -100,7 +100,7 @@ rooms is a page load under a fade. A copy of the common room's frame (renderer, 
 chosen by David on 7 October 2026 while another session edits common-room.html; a shared castle.js is flagged for when
 both rooms show what is common.
 
-Decisions, 7 October 2026, each David's:
+Decisions, 7 and 8 October 2026, each David's; the handoff's The corridor is the full record:
 - It agrees with what the hole shows from inside. Everything is in the hole's own frame, copied from common-room.html:
   x along the wall, toward the hearth side; y up; z into the room. Her painted face is at z -0.81. As built in the
   room, the far wall is 2.0 m beyond her and the torch's head at x 0.95, 1.3 m up; from inside a boy sees only a patch
@@ -113,19 +113,24 @@ Decisions, 7 October 2026, each David's:
 - Shape: a dead end. She hangs on the long side near the closed end, the torch faces her, and the corridor runs off
   to the right as you face her (toward -x). Chosen over running past her (loses PS 7's "at the very end of the
   corridor", quoted from memory), curving with the tower, and pointing at her (the room's far wall would change).
-- Length: about 12 m (x 2.3 to -10.5), turning a corner at the far end, so nothing beyond it is built.
+- Length and the far end: x 2.3 to a stair head at x -11.0, where a flight goes down toward -x between the same
+  walls (PS 7 brings the first-years up staircases; PS 8's moving stairs), behind the camera at rest. It replaced a
+  90 degree turn at -10.5, which was invented, not canon. Lost: the turn; running on into the dark.
 - By day: the far wall is the castle's outer wall, with the torch opposite her, a suit of armour, a tall window with a
-  deep sill (the Remembrall's, later) and a tapestry near the corner; her wall carries her, two portraits and an empty
-  classroom's door; a second torch by the corner. The five from Magic for the boys, plus the portraits.
-- Camera: down the length from the corner at a boy's eye, chosen from greybox shots of both views over a stage view
+  deep sill (the Remembrall's, later) and a tapestry; her wall carries her and two portraits; a second torch by the
+  stair head. The empty classroom and its door are gone (8 October): a classroom beside the dormitory makes no sense.
+  Her study (the common room's) is to be pulled out to a wall square to the corridor at x -6.4, tangent to the
+  tower, and an inglenook for visitors waiting to be fetched opens off the corridor past it, bounded by that wall;
+  its size is open (seats for five or six, and enough of her study's outer wall left past it for a window).
+- Camera: down the length from the stair head at a boy's eye, chosen from greybox shots of both views over a stage view
   with the far wall cut away (her wall square on, but a gallery rather than a corridor, and the far wall's four things
   lost). Everything on the walls is foreshortened from here, her most, so the view turns square at each stop. A
   standing piece (the armour) is a card turned to the eye, as the stairs are. The stage view stays behind View.
 - The stops: each stands a hand short of the facing wall and opens its field of view until the thing fits with an
-  eighth to spare, between 42 and 70 degrees: her, the window and the portraits at 42, the tapestry 43, the door 51,
-  the armour 52. The armour moved from x -2.6 to -3.4, where it had stood between the first portrait and its stop;
-  from the corner it now stands in front of the window's lower half, accepted.
-- Moving: tap a thing to go to it, her, the window, the door, the armour or a portrait; the view glides there and turns
+  eighth to spare, between 42 and 70 degrees: her, the window and the portraits at 42, the tapestry 43, the armour 52.
+  The armour moved from x -2.6 to -3.4, where it had stood between the first portrait and its stop;
+  from the stair head it now stands in front of the window's lower half, accepted.
+- Moving: tap a thing to go to it, her, the window, the armour, a portrait or the tapestry; the view glides there and turns
   square; tap off it or Back to glide back to the corner. The notice board's walk-up again. Lost: stepping along by
   tapping the floor (stops with nothing at them).
 - Hand-over: through the hole under a fade. Going in, the view glides into the tunnel, fades to black where it is
@@ -148,7 +153,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look along the corridor. Tap her, a portrait, the door, the armour, the window or the tapestry to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
+<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, the window or the tapestry to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -308,34 +313,38 @@ function onWallZ(t, w, h, x, y, z, facing, layer, name) {
 
 /* ---------- the corridor ---------- */
 /* The hole's own frame from common-room.html: x along the wall toward the hearth side, y up, z into the room.
-   The closed end is at +x, the corner at -x. Facing her, +x is on your left. */
-var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, CORNER_X = -10.5, ARM_X = -8.5, CEIL = 4.5, ARM_LEN = 3.5;
-var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - CORNER_X, WIDTH = HER_Z - FAR_Z;
+   The closed end is at +x, the stair head at -x. Facing her, +x is on your left. The corridor's floor runs to the
+   stair head at STAIR_X, where a flight goes down toward -x between the same two walls, the way PS 7 brings the
+   first-years up; it is behind the camera at rest. */
+var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.0, FAR_END_X = -14.3, CEIL = 4.5, BELOW = 2.5;
+var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - FAR_END_X, WIDTH = HER_Z - FAR_Z;
+var STEP_RISE = 0.18, STEP_RUN = 0.3, STEPS = 11;
 
 var stoneMat = solid(0x75726e);
 var floorMat = solid(0x6a6764);
 var ceilMat = solid(0x3d3b38);
-var T = 0.3;
+var T = 0.3, WALL_H = CEIL + BELOW, WALL_Y = (CEIL - BELOW) / 2;
 var walls = new THREE.Group(); scene.add(walls);
-/* the far wall, the castle's outer wall, full length; cut away in the stage view */
-var farWall = box(walls, LEN, CEIL, T, (END_X + CORNER_X) / 2, CEIL / 2, FAR_Z - T / 2, stoneMat, 0);
+/* the far wall, the castle's outer wall, full length and down the stairwell; cut away in the stage view */
+var farWall = box(walls, LEN, WALL_H, T, (END_X + FAR_END_X) / 2, WALL_Y, FAR_Z - T / 2, stoneMat, 0);
 farWall.name = 'far-wall';
-/* her wall, from the closed end to the corner's opening */
-var herWall = box(walls, END_X - ARM_X, CEIL, T, (END_X + ARM_X) / 2, CEIL / 2, HER_Z + T / 2, stoneMat, 0);
+/* her wall; her study lies behind it from x -2.6, and past the study an inglenook is to open off it (not yet built) */
+var herWall = box(walls, LEN, WALL_H, T, (END_X + FAR_END_X) / 2, WALL_Y, HER_Z + T / 2, stoneMat, 0);
 herWall.name = 'her-wall';
-/* the closed end, and the corridor's end wall beyond the corner, which runs on into the turn */
-box(walls, T, CEIL, WIDTH, END_X + T / 2, CEIL / 2, MID_Z, stoneMat, 0).name = 'end-wall';
-box(walls, T, CEIL, WIDTH + ARM_LEN, CORNER_X - T / 2, CEIL / 2, MID_Z + ARM_LEN / 2, stoneMat, 0).name = 'corner-wall';
-/* the turn: a short arm toward +z, dark beyond */
-box(walls, T, CEIL, ARM_LEN, ARM_X + T / 2, CEIL / 2, HER_Z + ARM_LEN / 2, stoneMat, 0).name = 'turn-wall';
-var floor = new THREE.Mesh(new THREE.PlaneGeometry(LEN, WIDTH), floorMat);
-floor.rotation.x = -Math.PI / 2; floor.position.set((END_X + CORNER_X) / 2, 0, MID_Z);
+/* the closed end, and the wall the flight runs down toward */
+box(walls, T, WALL_H, WIDTH, END_X + T / 2, WALL_Y, MID_Z, stoneMat, 0).name = 'end-wall';
+box(walls, T, WALL_H, WIDTH, FAR_END_X - T / 2, WALL_Y, MID_Z, stoneMat, 0).name = 'stair-end-wall';
+var floor = new THREE.Mesh(new THREE.PlaneGeometry(END_X - STAIR_X, WIDTH), floorMat);
+floor.rotation.x = -Math.PI / 2; floor.position.set((END_X + STAIR_X) / 2, 0, MID_Z);
 floor.name = 'floor'; scene.add(floor); register(floor, 0);
-var armFloor = new THREE.Mesh(new THREE.PlaneGeometry(ARM_X - CORNER_X, ARM_LEN), floorMat);
-armFloor.rotation.x = -Math.PI / 2; armFloor.position.set((ARM_X + CORNER_X) / 2, 0, HER_Z + ARM_LEN / 2);
-scene.add(armFloor); register(armFloor, 0);
-var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(LEN, WIDTH + ARM_LEN), ceilMat);
-ceiling.rotation.x = Math.PI / 2; ceiling.position.set((END_X + CORNER_X) / 2, CEIL, MID_Z + ARM_LEN / 2);
+/* the flight down from the stair head, full width */
+var stairMat = solid(0x6f6b66);
+for (var si = 1; si <= STEPS; si++) {
+  var top = -si * STEP_RISE;
+  box(scene, STEP_RUN, 0.4, WIDTH, STAIR_X - (si - 0.5) * STEP_RUN, top - 0.2, MID_Z, stairMat, 0).name = 'stair-' + si;
+}
+var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(LEN, WIDTH), ceilMat);
+ceiling.rotation.x = Math.PI / 2; ceiling.position.set((END_X + FAR_END_X) / 2, CEIL, MID_Z);
 ceiling.name = 'ceiling'; scene.add(ceiling); register(ceiling, 0);
 
 /* her: the Fat Lady's painted front, 1.4 x 1.7, centred on the hole 1.2 m up, hinged on the +x edge (your left as
@@ -352,7 +361,7 @@ hinge.add(her); register(her, 2);
 
 var FAR_FACE = FAR_Z + 0.01, HER_FACE = HER_Z - 0.01;
 /* the far wall, from the closed end: the torch opposite her, where the room shows it; the armour; the window; the
-   tapestry; the second torch by the corner */
+   tapestry; the second torch by the stair head */
 var TORCH_HEAD = new THREE.Vector3(1.3, 1.3, FAR_FACE);
 function addTorch(head, facing, name) {
   var m = onWallZ(cutoutTexture(64, 124, '#5a5550', drawTorch), 0.35, 0.68, head.x - facing * 0.371 * 0.35, head.y - 0.34, head.z, facing, 1, name);
@@ -365,7 +374,7 @@ function addTorch(head, facing, name) {
   scene.add(light);
   return { mesh: m, flame: f, light: light };
 }
-var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(-9.6, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
+var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(-10.6, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
 var ARMOUR = { w: 0.7, h: 2.1, x: -3.4 };
 var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, FAR_Z + 0.45, 1, 1, 'armour');
 var WINDOW = { w: 1.2, h: 2.4, x: -4.6, sill: 0.9 };
@@ -378,9 +387,9 @@ var sill = box(scene, WINDOW.w * 0.9, 0.06, 0.4, WINDOW.x, WINDOW.sill, FAR_Z + 
 sill.name = 'window-sill';
 var TAPESTRY = { w: 1.4, h: 2.0, x: -7.6 };
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
-/* her wall, from her toward the corner: a portrait, the classroom's door, a portrait */
+/* her wall, from her toward the stair head: a portrait on the study's stretch, then past the partition (x -5.8) a
+   portrait; the classroom's door is gone with the classroom (David, 8 October 2026) */
 var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -2.8, 1.9, HER_FACE, -1, 1, 'portrait-a');
-var door = onWallZ(cutoutTexture(240, 480, '#6e5a48', drawArch, 'classroom door'), 1.2, 2.4, -5.6, 1.2, HER_FACE, -1, 1, 'classroom-door');
 var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, -7.6, 1.9, HER_FACE, -1, 1, 'portrait-b');
 
 /* the drawn torch the common room already has: same file, same size, same head */
@@ -406,12 +415,12 @@ windowLight.position.set(WINDOW.x, 2.2, FAR_Z + 0.8);
 scene.add(windowLight);
 
 /* ---------- the two views ---------- */
-/* length: from just inside the corner at a boy's eye, looking down to her end; a drag turns the head.
+/* length: from the stair head at a boy's eye, looking down to her end; a drag turns the head.
    stage: the far wall cut away, the camera outside it facing her wall square on; a drag slides along it. */
 var EYE = 1.35;
 var VIEWS = {
-  length: { pos: new THREE.Vector3(-9.6, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12 },
-  stage: { z: FAR_Z - 3.4, xMin: -8.0, xMax: -0.2, x0: -1.6 }
+  length: { pos: new THREE.Vector3(-10.6, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12 },
+  stage: { z: FAR_Z - 3.4, xMin: -10.0, xMax: -0.2, x0: -1.6 }
 };
 var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
 var yaw = 0, pitch = 0, yawT = 0, pitchT = 0, slide = VIEWS.stage.x0, slideT = slide;
@@ -443,7 +452,6 @@ function stopFor(mesh, h, lookY) {
 var STOPS = [
   { name: 'her', meshes: [her], stop: function () { return stopFor({ position: new THREE.Vector3(0, 0, HER_Z) }, PORTRAIT_H, HOLE_Y); } },
   { name: 'portrait-a', meshes: [portraitA], stop: function () { return stopFor(portraitA, 1.2, 1.75); } },
-  { name: 'door', meshes: [door], stop: function () { return stopFor(door, 2.4, 1.3); } },
   { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75); } },
   { name: 'armour', meshes: [armour], stop: function () { return stopFor(armour, ARMOUR.h, 1.3); } },
   /* the window frames its sill, where the Remembrall will sit, and the lower lights */
