@@ -2168,6 +2168,59 @@ function faceEye() {
     m.rotation.y = Math.atan2(camera.position.x - m.position.x, camera.position.z - m.position.z);
   }
 }
+/* Shadow twins (David, 8 October 2026). A floor piece is drawn from a standing eye, so its back feet stand a few
+   centimetres up the card, above the floor; the fire threw their shadows off the floor, detached from the legs, the
+   proof that the chair floats. Each drawn floor piece gets an invisible twin, lowered until its highest drawn foot
+   touches the floor, which casts the fire's shadow; the drawing itself casts none. The feet are read off the drawing's
+   alpha once it has loaded: the lowest opaque pixel of each run of columns in its bottom two-fifths. */
+var TWINNED = ['armchair-left', 'sofa', 'wingback', 'table', 'side-table'];
+var twins = [];
+function highestFootFrac(im) {
+  /* the outer feet, as the pipeline's level check reads them: the lowest opaque pixel in the drawing's left and right
+     quarters (of its opaque width); the highest of these and of any separate leg is the foot drawn highest */
+  var W = Math.min(256, im.width), H = Math.round(im.height * W / im.width);
+  var c = makeCanvas(W, H), g = c.getContext('2d');
+  g.drawImage(im, 0, 0, W, H);
+  var a = g.getImageData(0, 0, W, H).data, low = [], x0 = -1, x1 = -1;
+  for (var x = 0; x < W; x++) {
+    low[x] = -1;
+    for (var y = H - 1; y >= 0; y--) if (a[(y * W + x) * 4 + 3] > 127) { low[x] = y; break; }
+    if (low[x] >= 0) { if (x0 < 0) x0 = x; x1 = x; }
+  }
+  if (x0 < 0) return 0;
+  var q = Math.max(1, Math.round((x1 - x0) / 4)), left = -1, right = -1;
+  for (var k = x0; k < x0 + q; k++) left = Math.max(left, low[k]);
+  for (var k2 = x1 - q + 1; k2 <= x1; k2++) right = Math.max(right, low[k2]);
+  /* and each separate leg in the bottom two-fifths, which catches a back leg standing between the outer two */
+  var top = Math.min(left, right), run = false, runLow = 0;
+  for (var x2 = 0; x2 <= W; x2++) {
+    var l = x2 < W && low[x2] >= H * 0.6 ? low[x2] : -1;
+    if (l >= 0) { runLow = run ? Math.max(runLow, l) : l; run = true; }
+    else if (run) { top = Math.min(top, runLow); run = false; }
+  }
+  return (H - 1 - top) / H;
+}
+function updateTwins() {
+  for (var i = 0; i < TWINNED.length; i++) {
+    var m = scene.getObjectByName(TWINNED[i]);
+    /* only once the drawing has replaced the grey placeholder, whose canvas has no feet to read */
+    if (!m || m.userData.twin || !m.material.map || !m.customDepthMaterial || !m.material.map.image || m.material.map.image.tagName !== 'IMG') continue;
+    var im = m.material.map.image, h = m.geometry.parameters.height, entry = LAYERS[TWINNED[i]];
+    var lift = Math.max(0, (highestFootFrac(im) - (entry.sink || 0)) * h);
+    var tw = new THREE.Mesh(m.geometry, new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }));
+    tw.customDepthMaterial = m.customDepthMaterial; tw.customDistanceMaterial = m.customDistanceMaterial;
+    tw.castShadow = true; tw.receiveShadow = false; tw.name = TWINNED[i] + '-shadow';
+    scene.add(tw);
+    m.castShadow = false;
+    m.userData.twin = { mesh: tw, lift: lift };
+    twins.push(m);
+  }
+  for (var j = 0; j < twins.length; j++) {
+    var src = twins[j], t = src.userData.twin;
+    t.mesh.position.copy(src.position); t.mesh.position.y -= t.lift;
+    t.mesh.rotation.copy(src.rotation);
+  }
+}
 function updateBellows(dt) {
   if (!bellowsTex) return;
   if (bel.state === 'going') {
@@ -2600,6 +2653,7 @@ function frame() {
   if (castle) castle.tick(dt);
   updateCamera(dt);
   faceEye();
+  updateTwins();
   updateFire(dt, t);
   updateBellows(dt);
   updateSmoke(dt);
