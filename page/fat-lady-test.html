@@ -38,6 +38,7 @@
     <img class="patch" id="doze" src="../assets/layers/portrait-hole-front-doze.png?v=3" alt="">
     <img class="patch" id="listen" src="../assets/layers/portrait-hole-front-listen.png?v=3" alt="">
     <img class="patch" id="pleased" src="../assets/layers/portrait-hole-front-pleased.png?v=3" alt="">
+    <img class="patch" id="brow" src="../assets/layers/portrait-hole-front-brow.png?v=3" alt="">
   </div>
 </div>
 <div id="bar">
@@ -45,6 +46,7 @@
   <button id="toggle">Doze / wake</button>
   <button id="listenBtn">Listen</button>
   <button id="rightBtn">Right password</button>
+  <button id="lastBtn">Last week's</button>
   <button id="earBtn">Can't hear</button>
   <button id="zoom">Close</button>
   <span id="state">awake</span>
@@ -56,6 +58,7 @@
 (function () {
   var W = 1120, H = 1360;
   var PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529],
+    brow: [540, 384, 666, 529],
     reach: [549, 415, 907, 918], ear: [549, 415, 907, 918] };
   for (var id in PATCHES) {
     var b = PATCHES[id], el = document.getElementById(id);
@@ -98,10 +101,23 @@
     if (on) { setListen(false); doze.classList.remove('on'); stateEl.textContent = 'pleased'; } else stateEl.textContent = 'awake';
   }
   document.getElementById('rightBtn').addEventListener('click', function () {
-    setAuto(false); clearTimeout(listenTimer); setPleased(false); setListen(true);
+    setAuto(false); clearTimeout(listenTimer); setBrow(false); setPleased(false); setListen(true);
     listenTimer = setTimeout(function () {
       setPleased(true);
       listenTimer = setTimeout(function () { setPleased(false); }, 3000);
+    }, 2000);
+  });
+  // Last week's: she listens two seconds, then one brow goes up, fondly amused, for three, then awake.
+  var brow = document.getElementById('brow');
+  function setBrow(on) {
+    brow.classList.toggle('on', on);
+    if (on) { setListen(false); doze.classList.remove('on'); stateEl.textContent = "last week's"; } else stateEl.textContent = 'awake';
+  }
+  document.getElementById('lastBtn').addEventListener('click', function () {
+    setAuto(false); clearTimeout(listenTimer); setPleased(false); setBrow(false); setListen(true);
+    listenTimer = setTimeout(function () {
+      setBrow(true);
+      listenTimer = setTimeout(function () { setBrow(false); }, 3000);
     }, 2000);
   });
   // Can't hear: the hand rises from her lap through the halfway pose to her ear, the listening face with it,
@@ -113,13 +129,13 @@
   }
   document.getElementById('earBtn').addEventListener('click', function () {
     setAuto(false); clearTimeout(listenTimer); armTimers.forEach(clearTimeout); armTimers = [];
-    setPleased(false); setArm('reach'); setListen(true); stateEl.textContent = 'asking again';
+    setPleased(false); setBrow(false); setArm('reach'); setListen(true); stateEl.textContent = 'asking again';
     clearTimeout(listenTimer);
     at(400, function () { setArm('ear'); });
     at(3400, function () { setArm('reach'); });
     at(3800, function () { setArm('lap'); setListen(false); });
   });
-  window.ladyTest = { setArm: setArm, setListen: setListen, setPleased: setPleased, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
+  window.ladyTest = { setArm: setArm, setListen: setListen, setPleased: setPleased, setBrow: setBrow, set: set, setAuto: setAuto, zoom: function (on) { document.getElementById('lady').classList.toggle('close', on); } };
   setAuto(true);
 })();
 </script>
