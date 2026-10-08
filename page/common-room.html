@@ -1400,11 +1400,11 @@ corridorWall.position.set(0, 1.6, -HOLE_DEPTH - CORRIDOR_D);
 corridorWall.receiveShadow = true;
 holeFrame.add(corridorWall); register(corridorWall, 0);
 /* the blacksmith's torch on its scrolled bracket (CoS 8: a bracket a cat could hang from), a card flat on the far wall,
-   placed by tracing sight lines through the open hole: its head at 1.3 m along and 1.3 m up shows at the default view
-   and a drag left (0.95 m when the corridor was 2 m wide; moved with it to 3 m, 8 October 2026, to match the corridor
-   page); at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
+   placed by tracing sight lines through the open hole: its head at 1.5 m along and 1.3 m up, so the whole torch shows at
+   the default view and draws the eye out of the room; a drag left shows its bracket (8 October 2026: 0.95 m when the
+   corridor was 2 m wide, 1.3 when it became 3 m to match the corridor page, then 1.5 to clear the ring); at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
    its flame is one of the fire's own sprites, on the head, 87 percent across the drawing's top */
-var TORCH_HEAD = new THREE.Vector3(1.3, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
+var TORCH_HEAD = new THREE.Vector3(1.5, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
 var torch = cutoutMesh(cutoutTexture(64, 124, '#000', drawTorch), 0.35, 0.68);
 torch.position.set(TORCH_HEAD.x - 0.371 * 0.35, TORCH_HEAD.y - 0.34, TORCH_HEAD.z);
 torch.castShadow = false;
