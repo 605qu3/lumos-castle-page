@@ -727,6 +727,30 @@ wall.name = 'wall';
 wall.receiveShadow = true;
 wall.castShadow = false;
 scene.add(wall); register(wall, 0);
+/* The wall's two ends carried on round the circle (David, 8 October 2026): on a wide screen the long drag left showed
+   black past the drawn wall's end at 104 degrees from the hearth, and the right drag now goes as far as the left. The
+   eye stands outside the room's circle, so these arcs show their inside face only: the stretch nearest the eye is
+   seen from outside and vanishes, and only the far side, behind the room, is drawn. They wear the drawn stone, read
+   back from its ends as a mirror (u from 1 back toward 0.64 on the left, from 0.36 down to 0 on the right), so they
+   meet the drawn wall without a seam and cost no second texture; the two halves meet out of sight at the front. */
+var wallEndMat = solid(0x75726e, { side: THREE.BackSide });
+function wallEnd(start, length, u0, u1) {
+  var g = new THREE.CylinderGeometry(WALL_R, WALL_R, 7, 36, 1, true, start, length), uv = g.attributes.uv;
+  for (var i = 0; i < uv.count; i++) uv.setX(i, u0 + (u1 - u0) * uv.getX(i));
+  var m = new THREE.Mesh(g, wallEndMat);
+  /* no shadows on them: the fire threw the wingback and the round table on them as hard black cut-outs, the flat
+     outline a card casts (Placement rules); this far round the stone is beyond the fire's glow anyway */
+  m.position.y = 3.5; m.receiveShadow = false; m.castShadow = false;
+  scene.add(m); register(m, 0);
+  return m;
+}
+var WALL_U_PER_RAD = 1 / (Math.PI * 1.16);
+wallEnd(Math.PI * 1.58, Math.PI * 0.42, 1, 1 - Math.PI * 0.42 * WALL_U_PER_RAD).name = 'wall-end-left';
+wallEnd(0, Math.PI * 0.42, Math.PI * 0.42 * WALL_U_PER_RAD, 0).name = 'wall-end-right';
+/* the floor beyond the room's circle, toward the eye: a plain dark ground so a wide drag never shows the void */
+var floorBeyond = new THREE.Mesh(new THREE.RingGeometry(WALL_R + 0.05, 14, 64), solid(0x2e2a27, { roughness: 1 }));
+floorBeyond.rotation.x = -Math.PI / 2; floorBeyond.position.y = -0.002; floorBeyond.receiveShadow = true;
+scene.add(floorBeyond); register(floorBeyond, 1); floorBeyond.name = 'floor-beyond';
 
 /* fireplace: the mason's drawn surround, 3.0 m wide and 2.5 m tall, stands 60 cm proud of the wall at z -4.9, where the
    greybox's front face was, with its opening keyed out (LAYERS 'fireplace'). Behind the opening
@@ -1447,8 +1471,8 @@ corridorLight.position.copy(holeFrame.localToWorld(new THREE.Vector3(TORCH_HEAD.
 scene.add(corridorLight);
 /* the drawn wall reaches the tunnel and the corridor too: one texture, no second copy on the GPU */
 function shareWallStone(map, color) {
-  [tunnelMat, corridorMat].forEach(function (m) { m.map = map; m.color.copy(color); m.needsUpdate = true; });
-  layered.forEach(function (m) { if (m.material === tunnelMat || m.material === corridorMat) m.userData.base = color.clone(); });
+  [tunnelMat, corridorMat, wallEndMat].forEach(function (m) { m.map = map; m.color.copy(color); m.needsUpdate = true; });
+  layered.forEach(function (m) { if (m.material === tunnelMat || m.material === corridorMat || m.material === wallEndMat) m.userData.base = color.clone(); });
 }
 
 /* furniture, back to front */
@@ -1533,7 +1557,7 @@ var LAYERS = {
   'table': { url: '../assets/layers/table.png', w: 0.62, sink: 0.08 },
   'table-top': { url: '../assets/layers/table-top.png', w: 0.9, plan: true },
   /* drawn long and low: at 1.2 m wide the table stands about 0.72 m, a real side table (David) */
-  'side-table': { url: '../assets/layers/side-table.png', w: 1.2 },
+  'side-table': { url: '../assets/layers/side-table.png', w: 1.2, sink: 0.15 },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -2087,7 +2111,11 @@ scene.add(fill);
 var mode = 'room';
 var tween = null;
 var yaw = 0, pitch = 0, yawT = 0, pitchT = 0;
-var YAW_MAX = 0.24, PITCH_MAX = 0.08;
+/* the right drag goes as far as the left (David, 8 October 2026; it was 0.24) */
+var YAW_MAX = 0.55, PITCH_MAX = 0.08;
+/* the eye goes up to 2.07 m but down only to about 1.1 m: every drawing was made from a standing boy's eye (1.35 m),
+   and at the old 0.63 m the tabletops showed edge-on and the drawn legs sank or floated (David, 8 October 2026) */
+var PITCH_DOWN = (1.1 - 1.35) / 9;
 /* a drag to the left goes further, to frame the bookcase where the classroom meets the tower (David) */
 var YAW_LEFT = 0.55;
 var raycaster = new THREE.Raycaster();
@@ -2128,6 +2156,17 @@ function bellowsTap() {
   if (bel.state === 'hang' || bel.state === 'back') { bel.state = 'going'; bel.t = 0; bel.pumps = 1; return; }
   if (bel.state === 'going') { bel.pumps++; return; }
   bel.openT = 0.22;
+}
+/* The two tables are drawn as the eye sees them, and a flat drawing seen from far round shows its flatness: the books
+   table, a plane facing the hearth, read as tilted and flying on the drag left (David, 8 October 2026). Both turn about
+   their upright to face the eye every frame, so each is always seen as drawn; the round table's code top is round and
+   needs no turning. */
+var facers = [table, sideTable];
+function faceEye() {
+  for (var i = 0; i < facers.length; i++) {
+    var m = facers[i];
+    m.rotation.y = Math.atan2(camera.position.x - m.position.x, camera.position.z - m.position.z);
+  }
 }
 function updateBellows(dt) {
   if (!bellowsTex) return;
@@ -2335,7 +2374,7 @@ canvas.addEventListener('pointermove', function (e) {
   if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
   if (mode === 'room' && !tiltOn) {
     yawT = clamp(yawT - dx * 0.0022, -YAW_MAX, YAW_LEFT);
-    pitchT = clamp(pitchT - dy * 0.0012, -PITCH_MAX, PITCH_MAX);
+    pitchT = clamp(pitchT - dy * 0.0012, PITCH_DOWN, PITCH_MAX);
   }
 });
 function endDrag(e) {
@@ -2358,7 +2397,7 @@ function onTilt(e) {
   if (!tiltBase) tiltBase = { h: h, v: v };
   if (mode !== 'room') return;
   yawT = clamp((h - tiltBase.h) * 0.012, -YAW_MAX, YAW_LEFT);
-  pitchT = clamp(-(v - tiltBase.v) * 0.005, -PITCH_MAX, PITCH_MAX);
+  pitchT = clamp(-(v - tiltBase.v) * 0.005, PITCH_DOWN, PITCH_MAX);
 }
 function toggleTilt() {
   if (tiltOn) {
@@ -2560,6 +2599,7 @@ function frame() {
   t += dt;
   if (castle) castle.tick(dt);
   updateCamera(dt);
+  faceEye();
   updateFire(dt, t);
   updateBellows(dt);
   updateSmoke(dt);
