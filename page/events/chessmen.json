@@ -1,0 +1,403 @@
+{
+  "chain": "chessmen",
+  "records": [
+    {
+      "id": "chessmen.pawn-picked-wary",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = pawn",
+        "games < 2"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.picked-wary",
+          "text": [
+            "Me? Into THAT?",
+            "Why is it always the pawns?",
+            "I'm only small, you know.",
+            "Fine. But if I don't come back, tell my mum.",
+            "We could all be taken. Or worse, put back in the box!",
+            "Don't rush me. I've only got little legs."
+          ],
+          "canon": "PS 9, Hermione's \"or worse, expelled\", verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-picked-warming",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = pawn",
+        "games >= 2",
+        "games < 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.picked-warming",
+          "text": [
+            "All right, all right, I'm going.",
+            "One square. Two if I'm feeling brave.",
+            "Forward it is. Carefully.",
+            "I'm pondering. Pawn-dering."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-picked-trusting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = pawn",
+        "games >= 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.picked-trusting",
+          "text": [
+            "Forward! For Gryffindor!",
+            "Pawns first, and proud of it!",
+            "Little legs, big heart!",
+            "Point me at the enemy!",
+            "Where dwell the brave at heart! That's us!",
+            "Pawn to glory!"
+          ],
+          "canon": "PS 7, the Sorting Hat's song, verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-capture",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on",
+        "piece = pawn"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.capture",
+          "text": [
+            "Got one! Nobody expects the pawn!",
+            "Did you see that? Tell the others I did that!",
+            "Small but mighty!",
+            "PAWNED!",
+            "Never underestimate a pawn!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-en-passant",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess en passant",
+      "when": [
+        "game = on",
+        "piece = pawn"
+      ],
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.en-passant",
+          "text": [
+            "En passant! It's French for 'sneaky'!",
+            "En passant! Sorry, just passing."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-taken",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess taken",
+      "when": [
+        "game = on",
+        "piece = pawn"
+      ],
+      "one_of": "chess-taken",
+      "weight": 1,
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.taken",
+          "text": [
+            "Tell the queen... I nearly made it...",
+            "Avenge meeee...",
+            "Worth it!",
+            "Taken by a knight. Very posh, at least.",
+            "I regret nothing! Except that.",
+            "Back to the box... say hello to Gerald for me..."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-promote",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess promote",
+      "when": [
+        "game = on",
+        "piece = pawn"
+      ],
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.promote",
+          "text": [
+            "I MADE IT! Somebody fetch me a crown!",
+            "Told you. One day I'd be a queen.",
+            "Look at me, Mum! I'm a QUEEN!",
+            "I'm a WHAT? A queen?!"
+          ],
+          "canon": "PS 4, Harry's \"I'm a what?\", verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-tide-losing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = losing"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.tide-losing",
+          "text": [
+            "We've got them exactly where they want us.",
+            "Chin up, lads. We've got lots of chins.",
+            "It's fine. Everything's fine. Nobody panic. I'M PANICKING.",
+            "I've read about this. We win in the end. Probably."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.pawn-tide-winning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = winning"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "his pawns",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chessmen.pawn.tide-winning",
+          "text": [
+            "We're WINNING? Nobody told the pawns!",
+            "Hold on... is that hope? It tastes like hope."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.quiet-picked",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on"
+      ],
+      "one_of": "chess-picked",
+      "weight": 2,
+      "show": [
+        "the pieces say nothing this time"
+      ]
+    },
+    {
+      "id": "chessmen.quiet-capture",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "show": [
+        "the pieces say nothing this time"
+      ]
+    },
+    {
+      "id": "chessmen.quiet-taken",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess taken",
+      "when": [
+        "game = on"
+      ],
+      "one_of": "chess-taken",
+      "weight": 1,
+      "show": [
+        "the pieces say nothing this time"
+      ]
+    },
+    {
+      "id": "chessmen.quiet-tide",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "show": [
+        "the pieces say nothing this time"
+      ]
+    }
+  ]
+}
