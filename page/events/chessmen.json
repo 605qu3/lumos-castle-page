@@ -900,6 +900,318 @@
       ]
     },
     {
+      "id": "chessmen.rook-picked-wary",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = rook",
+        "games < 2"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.picked-wary",
+          "text": [
+            "Slow down. Castles don't rush.",
+            "Straight lines only. I'm a simple castle.",
+            "Are you sure? I'm ever so heavy."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-picked-warming",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = rook",
+        "games >= 2",
+        "games < 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.picked-warming",
+          "text": [
+            "Rumble, rumble. Here I come.",
+            "One big slow castle, coming through."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-picked-trusting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = rook",
+        "games >= 4"
+      ],
+      "one_of": "chess-picked",
+      "weight": 1,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.picked-trusting",
+          "text": [
+            "Hogwarts is a castle. I'm a castle. We're practically family.",
+            "Hermione Granger was a castle once. Very clever castle.",
+            "Steady as a rock. Well, a rook.",
+            "Straight at them!"
+          ],
+          "canon": "PS 16, Hermione a castle on the giant board, verify"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-capture",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess capture",
+      "when": [
+        "game = on",
+        "piece = rook"
+      ],
+      "one_of": "chess-capture",
+      "weight": 1,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.capture",
+          "text": [
+            "Squashed flat. Sorry about that.",
+            "Knock knock! Who's there? A CASTLE.",
+            "Rook-ie mistake!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-taken",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess taken",
+      "when": [
+        "game = on",
+        "piece = rook"
+      ],
+      "one_of": "chess-taken",
+      "weight": 1,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.taken",
+          "text": [
+            "Tell the king... I held the wall...",
+            "Even castles fall... gently, please...",
+            "Worth every brick."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-castle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess castle",
+      "when": [
+        "game = on"
+      ],
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.castle",
+          "text": [
+            "CASTLING! My favourite!",
+            "In you go, Your Majesty. Nice and safe.",
+            "One big step for a castle!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-check",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess check",
+      "when": [
+        "game = on",
+        "piece = rook"
+      ],
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.check",
+          "text": [
+            "Check! Straight down the corridor!",
+            "Check. Rumble."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-tide-losing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = losing"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.tide-losing",
+          "text": [
+            "Steady. Castles have stood worse.",
+            "We are a fortress. A slightly crumbly fortress."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-tide-winning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess tide",
+      "when": [
+        "game = on",
+        "tide = winning"
+      ],
+      "one_of": "chess-tide",
+      "weight": 1,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.tide-winning",
+          "text": [
+            "Ho ho! The walls are holding!",
+            "Lovely. Just lovely. Cup of tea, anyone?"
+          ]
+        }
+      ]
+    },
+    {
       "id": "chessmen.quiet-picked",
       "tier": "fixed",
       "source": "device",
