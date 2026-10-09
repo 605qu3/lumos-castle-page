@@ -227,8 +227,8 @@ function onWallZ(t, w, h, x, y, z, facing, layer, name) {
 /* The hole's own frame from common-room.html: x along the wall toward the hearth side, y up, z into the room.
    The closed end is at +x, the stair head at -x. Facing her, +x is on your left. The corridor's floor runs to the
    stair head at STAIR_X, where a flight goes down toward -x between the same two walls, the way PS 7 brings the
-   first-years up; it is behind the camera at rest. At its foot a landing 2.4 m deep (provisional, David, 9 October
-   2026, until the window's plan, req 29) ends at the end wall, so the side walls and ceiling run on to it. */
+   first-years up; it is behind the camera at rest. At its foot a landing 2.4 m deep (David, 9 October
+   2026, from the window's plan, req 29) ends at the end wall, so the side walls and ceiling run on to it. */
 var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.4, CEIL = 4.5, BELOW = 2.5;
 var STEP_RISE = 0.18, STEP_RUN = 0.3, STEPS = 11, LANDING_D = 2.4;
 var FOOT_X = STAIR_X - STEPS * STEP_RUN, FOOT_Y = -STEPS * STEP_RISE, FAR_END_X = FOOT_X - LANDING_D;
@@ -273,8 +273,8 @@ for (var si = 1; si <= STEPS; si++) {
 var landing = new THREE.Mesh(new THREE.PlaneGeometry(LANDING_D, WIDTH), floorMat);
 landing.rotation.x = -Math.PI / 2; landing.position.set((FOOT_X + FAR_END_X) / 2, FOOT_Y, MID_Z);
 landing.name = 'landing'; scene.add(landing); register(landing, 0);
-var LANDING_WINDOW = { w: 1.8, h: 4.6, sill: 0.9 };   /* grand and tall, stained glass (David, 9 October 2026); size provisional until req 29's plan */
-var landingWindow = cutoutMesh(cutoutTexture(120, 307, "#c9d6e2", drawArch, "window"), LANDING_WINDOW.w, LANDING_WINDOW.h);
+var LANDING_WINDOW = { w: 2.0, h: 4.8, sill: 0.9 };   /* grand and tall, stained glass; its size David's from a plan of three (9 October 2026, req 29) */
+var landingWindow = cutoutMesh(cutoutTexture(120, 288, "#c9d6e2", drawArch, "window"), LANDING_WINDOW.w, LANDING_WINDOW.h);
 landingWindow.material = new THREE.MeshBasicMaterial({ map: landingWindow.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
 landingWindow.position.set(FAR_END_X + 0.01, FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2, MID_Z);
 landingWindow.rotation.y = Math.PI / 2;
