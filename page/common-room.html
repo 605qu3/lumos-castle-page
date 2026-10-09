@@ -600,6 +600,10 @@ sound in words; written on a scrap in its hand (Neville the child hand, Wood and
 Clementine the clerk's). Held for 2.2 s plus 0.075 s a letter, 4 to 14 s (written 20); a tap on the words puts them
 away. A tap on a drawn figure raises its cast name, so the sleeper's mumbles come on a tap (only his card's lower
 part counts). Provisional, Godric to judge the look.
+the board's notes from the events, 9 October 2026 (board req 65): Neville's reply under Wood's notice, Wood's answer
+under it, and Neville's thanks where the lost-toad notice hung once Trevor is home, papers of the board's own kind
+drawn from written() by key and shown by notice.json's and trevor.json's room rules; the lost-toad notice hangs only
+while the rules show it. A line pinned this way gets no floating scrap.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -1139,6 +1143,12 @@ var PAPER_SPECS = [
   { id: 'pince', w: 0.34, h: 0.25, pin: [0.33, 0.40], pins: 'one', rot: -0.03, z: 0.0105, tile: 'buff', torn: [], age: 0.05, draw: drawPinceNotice },
   { id: 'wood', w: 0.33, h: 0.23, pin: [-0.08, -0.02], pins: 'one', rot: 0.08, z: 0.0125, tile: 'laid', torn: ['top', 'left'], age: 0.1, draw: drawWoodNote },
   { id: 'neville', w: 0.28, h: 0.24, pin: [0.45, -0.14], pins: 'one', rot: -0.12, z: 0.0115, tile: 'laid', torn: ['right', 'bottom'], age: 0.1, draw: drawNevilleNote },
+  /* the board's written lines from the events (board req 65): drawn from the runtime's written() by key and shown by
+     the room's rules, so a reload reads the same words. Neville's reply pinned under Wood's notice and Wood's answer
+     under it (notice.json), Neville's thanks where his lost-toad notice hung once Trevor is home (trevor.json). */
+  { id: 'reply', w: 0.25, h: 0.11, pin: [-0.06, -0.265], pins: 'one', rot: 0.05, z: 0.0135, tile: 'laid', torn: ['bottom'], age: 0.05, draw: drawEventNote, event: { keys: ['notice.reply-neville'], hand: 'neville', show: "under Wood's notice, Neville's reply in his hand" } },
+  { id: 'answer', w: 0.22, h: 0.1, pin: [0.0, -0.385], pins: 'one', rot: -0.07, z: 0.0145, tile: 'laid', torn: ['top'], age: 0.05, draw: drawEventNote, event: { keys: ['notice.reply-wood'], hand: 'wood', show: "under Neville's reply, Wood's answer in his scrawl" } },
+  { id: 'thanks', w: 0.28, h: 0.2, pin: [0.45, -0.14], pins: 'one', rot: 0.06, z: 0.0117, tile: 'laid', torn: ['right'], age: 0.05, draw: drawEventNote, event: { keys: ['trevor.thanks-plain', 'trevor.thanks-card', 'trevor.thanks-question'], hand: 'neville', show: 'notice thanks' } },
   { id: 'corner', w: 0.055, h: 0.04, pin: [0.60, 0.47], pins: 'one', rot: 0.3, z: 0.0095, tile: 'laid', torn: ['left', 'bottom', 'right'], age: 0.2, draw: function () {}, fixed: true }
 ];
 var papers = [];
@@ -1159,8 +1169,10 @@ function makePaper(spec, index) {
   pivot.add(sh); pivot.add(mesh); boardGroup.add(pivot);
   var pinsLocal = spec.pins === 'two' ? [[-spec.w / 2 + 0.03, 0], [spec.w / 2 - 0.03, 0]] : [[0, 0]];
   var c = Math.cos(spec.rot), s = Math.sin(spec.rot);
-  for (var i = 0; i < pinsLocal.length; i++) pin(spec.pin[0] + pinsLocal[i][0] * c, spec.pin[1] + pinsLocal[i][0] * s, spec.z + 0.0025);
-  var p = { spec: spec, pivot: pivot, mesh: mesh, shadow: sh, phase: index * 1.9, pinsLocal: pinsLocal, homePos: new THREE.Vector3(), homeQuat: new THREE.Quaternion(), lift: null };
+  var pinGroups = [];
+  for (var i = 0; i < pinsLocal.length; i++) pinGroups.push(pin(spec.pin[0] + pinsLocal[i][0] * c, spec.pin[1] + pinsLocal[i][0] * s, spec.z + 0.0025));
+  if (spec.event) pinGroups.forEach(function (g) { g.visible = false; });
+  var p = { spec: spec, pinGroups: pinGroups, hidden: !!spec.event, pivot: pivot, mesh: mesh, shadow: sh, phase: index * 1.9, pinsLocal: pinsLocal, homePos: new THREE.Vector3(), homeQuat: new THREE.Quaternion(), lift: null };
   if (!spec.fixed) mesh.userData.paper = p;
   papers.push(p);
   return p;
@@ -1396,7 +1408,7 @@ function paperCanvas(spec, seed) {
   tracePath(g, path); g.clip();
   fillTile(g, W, H, TILE_IMG[spec.tile], spec.tile === 'laid' ? 300 : 420);
   if (spec.age > 0.2) ageing(g, W, H, spec.age, rnd);
-  spec.draw(g, W, H, rnd);
+  spec.draw(g, W, H, rnd, spec);
   if (spec.dogEar) dogEarFlap(g, W, H);
   var ins = PIN_INSET * PX;
   if (spec.pins === 'two') { pinhole(g, 0.03 * PX, ins, rnd); pinhole(g, W - 0.03 * PX, ins, rnd); pinhole(g, 0.03 * PX + 14, ins + 22, rnd); }
@@ -1413,9 +1425,59 @@ function paintPapers() {
     t.anisotropy = renderer.capabilities.getMaxAnisotropy();
     p.mesh.material.map = t; p.mesh.material.needsUpdate = true;
     p.mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
-    p.mesh.visible = true; p.shadow.visible = true;
+    p.mesh.visible = p.shadow.visible = !p.hidden;
   }
+  papersPainted = true;
 }
+var papersPainted = false;
+/* an events note on the board: its words, the newest of its keys in written(), in its hand */
+function drawEventNote(g, W, H, rnd, spec) {
+  var e = spec.event, words = e.words || '', M = 0.08 * W, ink = e.hand === 'wood' ? '#15121a' : '#2a2420';
+  var px = (e.hand === 'wood' ? 0.085 : 0.068) * W, y = PIN_INSET * PX + 12 + px;   /* the words start below the pin */
+  if (e.style === 'a blot and a crossed-out word') {        /* he started THANKS wrong and struck it out */
+    write(g, 'THNAK', M, y, { px: 0.09 * W, family: HANDS[e.hand], color: ink, maxW: W, jitter: 3, soft: 1.4, rnd: rnd });
+    handLine(g, M - 4, y - 0.03 * W, M + 0.3 * W, y - 0.035 * W, ink, 4, rnd);
+    handLine(g, M - 2, y - 0.045 * W, M + 0.29 * W, y - 0.02 * W, ink, 3, rnd);
+    y += 0.13 * H;
+    blot(g, W * 0.82, H * 0.82, 9, 'rgba(42,36,32,0.9)');
+  }
+  fit(g, words, M, y, { px: px, family: HANDS[e.hand], color: ink, maxW: W - 2 * M,
+    lineGap: 1.25, slant: 0.02, jitter: 3, soft: 1.4, rnd: rnd }, 0.9 * H);
+}
+function paperHidden(p, hidden) {
+  p.hidden = hidden;
+  var on = papersPainted && !hidden;
+  p.mesh.visible = p.shadow.visible = on;
+  (p.pinGroups || []).forEach(function (g) { g.visible = !hidden; });
+}
+/* the room's rules decide which notes hang; written() gives each its words, so a reload reads the same. Read on the
+   next frame, as Trevor's are, since the first draw comes before the runtime can be asked. */
+var notesShows = null;
+function notesDrawRoom(shows) { notesShows = shows; }
+function updateNotes() {
+  if (!notesShows || !castle) return;
+  var shows = notesShows; notesShows = null;
+  var said = castle ? castle.written() : [];
+  papers.forEach(function (p) {
+    var e = p.spec.event;
+    if (p.spec.id === 'neville') { paperHidden(p, shows.indexOf('notice lost-toad') < 0); return; }
+    if (!e) return;
+    var w = said.filter(function (x) { return e.keys.indexOf(x.key) >= 0; })[0];
+    var on = shows.indexOf(e.show) >= 0 && !!w;
+    if (on && (w.text !== e.words)) {
+      e.words = w.text;
+      e.style = (byKeyStyle[w.key] || null);
+      if (papersPainted) {
+        var t = tex(paperCanvas(p.spec, 11 + papers.indexOf(p) * 7));
+        t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+        p.mesh.material.map = t; p.mesh.material.needsUpdate = true;
+        p.mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+      }
+    }
+    paperHidden(p, !on);
+  });
+}
+var byKeyStyle = { 'trevor.thanks-plain': 'a blot and a crossed-out word' };
 
 /* fonts and tiles arrive, then the papers are painted; until then the board carries only pins */
 var TILE_IMG = {};
@@ -2953,7 +3015,7 @@ function tap(cx, cy) {
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
-  var hits = raycaster.intersectObjects(tappables, false);
+  var hits = raycaster.intersectObjects(tappables, false).filter(function (h) { return !h.object.userData.paper || h.object.visible; });
   var hit = hits.length ? hits[0].object : null;
   if (mode === 'hand') { returnPaper(false); return; }
   if (mode === 'board') {
@@ -3300,7 +3362,9 @@ function updateLines(dt) {
   if (!lineCur && lineQ.length) {
     var l = lineQ.shift();
     lineCur = { line: l, t: lineSeconds(l), anchor: lineAnchor(l), el: null };
-    if (!l.held && (l.text || l.sound)) {
+    /* a written line the board pins as a note of its own needs no scrap: the note itself appears */
+    var pinned = l.medium === 'written' && papers.some(function (p) { return p.spec.event && p.spec.event.keys.indexOf(l.key) >= 0; });
+    if (!l.held && !pinned && (l.text || l.sound)) {
       var el = lineElement(l);
       lineCur.el = el;
       placeLine(lineCur);
@@ -3334,7 +3398,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the fire catches with a whoosh and the room's light comes up": fireCatches,
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire
   }, VISITOR_CUES),
-  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); },
+  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); },
   figures: FIGURES,
   drawFigures: drawFiguresInOrder,
   showLines: showLines,
@@ -3382,6 +3446,7 @@ function frame() {
   updateOpposite(dt);
   updateTrevor(dt);
   updateLines(dt);
+  updateNotes();
   updatePapers(dt, t);
   updateTapestry(dt, t);
   renderer.render(scene, camera);
