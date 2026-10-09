@@ -1,0 +1,294 @@
+{
+  "chain": "passers",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "passers.hole-opened",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hole",
+      "when": [
+        "place = common room",
+        "portrait = shut"
+      ],
+      "starts": [
+        "set hole_opened = yes"
+      ]
+    },
+    {
+      "id": "passers.hole-climbed",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hole",
+      "when": [
+        "place = common room",
+        "portrait = open"
+      ],
+      "starts": [
+        "set hole_opened = no"
+      ]
+    },
+    {
+      "id": "passers.nick-meeting",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time = day",
+        "nick_met != yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "ghost",
+          "name": "nearly headless nick",
+          "mark": "hole-stop",
+          "pose": "turned, bowing"
+        }
+      ],
+      "show": [
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "pose": "turned, bowing",
+          "then": "drifts away toward the rest of the corridor, out past the hole's left edge",
+          "key": "passers.nick-meeting",
+          "text": [
+            "Good afternoon! Sir Nicholas de Mimsy-Porpington, resident ghost of Gryffindor Tower, at your service."
+          ],
+          "canon": "PS 7, Sir Nicholas de Mimsy-Porpington, Gryffindor's ghost, verify"
+        }
+      ],
+      "starts": [
+        "set nick_met = yes",
+        "set nick_passed = yes",
+        "log \"Met Nearly Headless Nick {day}\""
+      ]
+    },
+    {
+      "id": "passers.nick-meeting-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time = morning",
+        "nick_met != yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "ghost",
+          "name": "nearly headless nick",
+          "mark": "hole-stop",
+          "pose": "turned, bowing"
+        }
+      ],
+      "show": [
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "pose": "turned, bowing",
+          "then": "drifts away toward the rest of the corridor, out past the hole's left edge",
+          "key": "passers.nick-meeting-morning",
+          "text": [
+            "Good morning! Sir Nicholas de Mimsy-Porpington, resident ghost of Gryffindor Tower, at your service."
+          ],
+          "canon": "PS 7, Sir Nicholas de Mimsy-Porpington, Gryffindor's ghost, verify"
+        }
+      ],
+      "starts": [
+        "set nick_met = yes",
+        "set nick_passed = yes",
+        "log \"Met Nearly Headless Nick {day}\""
+      ]
+    },
+    {
+      "id": "passers.nick-drifts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "passer",
+      "weight": 1,
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time != night",
+        "nick_met = yes",
+        "nick_passed != yes"
+      ],
+      "show": [
+        "nick drifts out from behind her open back, past the torch, its light through him, and on past the hole without stopping, out past its left edge"
+      ],
+      "starts": [
+        "set nick_passed = yes"
+      ]
+    },
+    {
+      "id": "passers.nick-bows",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "passer",
+      "weight": 1,
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time != night",
+        "nick_met = yes",
+        "nick_passed != yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "ghost",
+          "name": "nearly headless nick",
+          "mark": "hole-stop",
+          "pose": "turned, bowing"
+        }
+      ],
+      "show": [
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "pose": "turned, bowing",
+          "then": "drifts away toward the rest of the corridor, out past the hole's left edge",
+          "key": "passers.nick-bows",
+          "text": [
+            "Sir Nicholas, at your service. Again!",
+            "Ah, hello again! Do mind the trick step on the way down.",
+            "Hello again! If you see Peeves, I was never here.",
+            "Good day! Lovely weather for floating."
+          ],
+          "canon": "PS 8, the trick step, verify"
+        }
+      ],
+      "starts": [
+        "set nick_passed = yes"
+      ]
+    },
+    {
+      "id": "passers.nick-wall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "passer",
+      "weight": 1,
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time != night",
+        "nick_met = yes",
+        "nick_passed != yes"
+      ],
+      "show": [
+        "nick comes through the corridor's far wall itself, drifts across and on out past the hole's left edge"
+      ],
+      "starts": [
+        "set nick_passed = yes"
+      ]
+    },
+    {
+      "id": "passers.nick-heard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "passer",
+      "weight": 1,
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time != night",
+        "nick_met = yes",
+        "nick_passed != yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "voice",
+          "name": "nearly headless nick",
+          "mark": "beyond the hole"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "heard",
+          "key": "passers.nick-heard",
+          "text": [
+            "No, no, the other way! Gryffindor Tower is UP.",
+            "Left at the tapestry, and mind the trick step!",
+            "Lost, are we? First-years always are. Follow me!",
+            "The library? Ask Madam Pince. Quietly."
+          ],
+          "canon": "PS 8, Nick points new Gryffindors the way, and the trick step, verify"
+        }
+      ],
+      "starts": [
+        "set nick_passed = yes"
+      ]
+    },
+    {
+      "id": "passers.nobody",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "passer",
+      "weight": 12,
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time != night",
+        "nick_met = yes",
+        "nick_passed != yes"
+      ],
+      "starts": []
+    },
+    {
+      "id": "passers.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set nick_passed = no"
+      ]
+    }
+  ]
+}
