@@ -442,7 +442,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = paper-bird"
       ],
@@ -454,9 +453,14 @@
           "mark": "hand"
         }
       ],
-      "show": [
-        "the paper bird flaps off down the corridor and is gone"
-      ],
+      "show_at": {
+        "common room": [
+          "the paper bird flaps off up the dormitory stair and is gone"
+        ],
+        "corridor": [
+          "the paper bird flaps off down the corridor and is gone"
+        ]
+      },
       "starts": [
         "set door_holding = no",
         "log \"A paper bird from behind the door flew off {day}\""
@@ -469,7 +473,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = chalk"
       ],
@@ -496,7 +499,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = quill"
       ],
@@ -524,7 +526,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = snap-card"
       ],
@@ -560,7 +561,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = pawn"
       ],
@@ -588,9 +588,14 @@
           ]
         }
       ],
-      "show": [
-        "set down, the pawn stomps off along the corridor and down the stair, grumbling that the common room is THAT way"
-      ],
+      "show_at": {
+        "common room": [
+          "set down, the pawn stomps off under the sofa, grumbling, home at last"
+        ],
+        "corridor": [
+          "set down, the pawn stomps off along the corridor and down the stair, grumbling that the common room is THAT way"
+        ]
+      },
       "starts": [
         "set door_holding = no",
         "log \"The pawn he left down the sofa turned up behind the door {day}\""
@@ -603,7 +608,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = bean"
       ],
@@ -643,7 +647,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = wrapper"
       ],
@@ -673,9 +676,14 @@
           "sound": "a hop, somewhere down the corridor"
         }
       ],
-      "show": [
-        "tossed, the wrapper flutters off down the stair"
-      ],
+      "show_at": {
+        "common room": [
+          "tossed, the wrapper flies into the fire, which flares"
+        ],
+        "corridor": [
+          "tossed, the wrapper flutters off down the stair"
+        ]
+      },
       "starts": [
         "set door_holding = no",
         "log \"The wrapper he left down the sofa turned up behind the door {day}\""
@@ -688,7 +696,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = knut"
       ],
@@ -716,7 +723,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = paper-hat"
       ],
@@ -759,7 +765,6 @@
       "leans": [],
       "moment": "tap find",
       "when": [
-        "place = corridor",
         "door_holding = yes",
         "door_find = sugar-mouse"
       ],

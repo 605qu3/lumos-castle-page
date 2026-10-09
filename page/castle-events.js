@@ -264,7 +264,7 @@
     function fire(rec) {
       var s = rec.starts || [];
       for (var i = 0; i < s.length; i++) effect(s[i], rec);
-      var sh = rec.show || [];
+      var sh = (rec.show || []).concat((rec.show_at || {})[value('place')] || []);   /* show_at: a cue by the page he is on */
       for (var j = 0; j < sh.length; j++) {
         if (cues[sh[j]]) cues[sh[j]]();
         else note(rec.id + ': this room has no cue "' + sh[j] + '"');
@@ -296,6 +296,9 @@
       return !!m && arg === m[1];
     }
 
+    /* Every open record is checked in each pass, so a leave or a tap ends all the records it ends (until 9 October
+       2026 a pass stopped at the first, and the rest were checked only for `when` ends after it, so of two records
+       ending on leave one stayed open). */
     function checkEnds(kind, arg) {
       for (var pass = 0; pass < 20; pass++) {      /* an end's effects may let another record's `when` end hold */
         var ended = false;
@@ -303,7 +306,7 @@
           var rec = byId[id];
           if (!rec) { delete state.open[id]; continue; }
           var ends = rec.ends || [];
-          for (var j = 0; j < ends.length && !ended; j++) {
+          for (var j = 0; j < ends.length; j++) {
             if (!endMatches(ends[j], kind, arg, state.open[id])) continue;
             delete state.open[id];
             var d = ends[j]['do'] || [];
@@ -311,8 +314,8 @@
             if (ends[j].lines && ends[j].lines.length) note(rec.id + ': an end\'s lines wait for lines');
             note('ended ' + rec.id + ' (end ' + j + ')');
             ended = true;
+            break;
           }
-          if (ended) break;
         }
         if (!ended) return;
         save(STATE_KEY, state);

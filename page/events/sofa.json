@@ -170,9 +170,14 @@
           ]
         }
       ],
-      "show": [
-        "set down, the pawn stomps off under the sofa, grumbling"
-      ],
+      "show_at": {
+        "common room": [
+          "set down, the pawn stomps off under the sofa, grumbling"
+        ],
+        "corridor": [
+          "set down, the pawn stomps off along the corridor and down the stair, grumbling that the common room is THAT way"
+        ]
+      },
       "starts": [
         "set holding = no"
       ]
@@ -257,9 +262,14 @@
           "sound": "a hop, somewhere under the furniture"
         }
       ],
-      "show": [
-        "tossed, the wrapper flies into the fire, which flares"
-      ],
+      "show_at": {
+        "common room": [
+          "tossed, the wrapper flies into the fire, which flares"
+        ],
+        "corridor": [
+          "tossed, the wrapper flutters off down the stair"
+        ]
+      },
       "starts": [
         "set holding = no"
       ]
