@@ -551,6 +551,12 @@ hiding set, floor-a under the round table behind its stem (x -1.4, z 2.4), floor
 full drags and clear of the 0.35 m rule; provisional, put to Godric (assets/review/trevor-spots-plan.jpg). In grey: the
 damp prints from his box to his mark or to the hole, one mesh, and a faint "croak" by the hole while he is in the
 corridor's helmet. Trevor himself waits on his sheet.
+the student pool on the room's marks, 9 October 2026 (board req 41, People's first sheet; the runtime's figures, req 40):
+the page lists its four figures word for word (cells 0 to 2 'standing, listening' at fire, cell 3 'asleep, a book on
+the chest' at sofa) and stands whoever the runtime casts. The fire mark is the hearth either side of the fire, behind
+the chairs' line, each facing it; the sofa mark lays the sleeper along the seat. Projected with the cells at rest, from
+the stop and on both drags; provisional, put to Godric (assets/review/students-marks.jpg). Lost: the rug in front of the
+chairs (hid both). The sheet loads only when a student first stands, about 7 MB, one texture for every card.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -2324,6 +2330,66 @@ function updateTrevor(dt) {
   }
 }
 
+/* ---------- the student pool on the room's marks (board req 41, People's first sheet; 9 October 2026) ----------
+   The runtime casts a record's pool students from this list, word for word (role, cell, pose, mark), and hands back
+   who stands this visit; the page stands them. People's first sheet: four cells of 1.65 m, 0 to 2 standing, 3 the sleeper
+   (The people, "The student pool's first sheet", for sizes, facings and the hip point). The fire mark is the hearth,
+   one spot per cell flanking the fire behind the chairs' line, each facing it: projected with the cells themselves at
+   rest, from the fireside stop and on both full drags (the fire and both chairs clear at rest; at the stop the three
+   frame the fire), 0.35 m and more off the cat's loop. Lost: on the rug's sides in front of the chairs (larger and
+   nearer, but they hid both chairs). The sofa mark lays the sleeper along its seat, his head on its right arm, hips on
+   the seat at 0.42 m. Provisional, David to judge. The sheet is loaded only when a student first stands (about 7 MB),
+   one texture for every card, the cell and its flip in each card's UVs; the standing ones turn to the eye with the
+   tables, the sleeper keeps the sofa's line. */
+var POOL = { url: '../assets/layers/students-pool.png', cells: 4, w: 1.65, h: 1.65 * 672 / 660, native: [1, 1, -1, 1] };
+var FIGURE_SPOTS = {
+  0: { x: -1.05, z: -3.95, face: 1 },              /* the fire mark, left of the fire, facing it */
+  1: { x: 1.05, z: -3.95, face: -1 },
+  2: { x: 1.4, z: -3.75, face: -1 },
+  3: { x: 2.65 + (0.5 - 0.62) * 1.65, z: -1.98, y: 0.42 - 0.05 * POOL.h, face: 1, still: true }   /* the sofa mark */
+};
+var FIGURES = [
+  { role: 'pool', cell: 0, pose: 'standing, listening', mark: 'fire' },
+  { role: 'pool', cell: 1, pose: 'standing, listening', mark: 'fire' },
+  { role: 'pool', cell: 2, pose: 'standing, listening', mark: 'fire' },
+  { role: 'pool', cell: 3, pose: 'asleep, a book on the chest', mark: 'sofa' }
+];
+var poolTex = null, poolReady = false, poolCards = {};
+function poolCard(cell) {
+  if (poolCards[cell]) return poolCards[cell];
+  if (!poolTex) {
+    poolTex = new THREE.TextureLoader().load(POOL.url, function () {
+      poolReady = true;
+      for (var c in poolCards) poolCards[c].visible = poolCards[c].userData.wanted;
+    });
+    poolTex.encoding = THREE.sRGBEncoding;
+  }
+  var s = FIGURE_SPOTS[cell], flip = s.face !== POOL.native[cell];
+  var g = new THREE.PlaneGeometry(POOL.w, POOL.h), uv = g.attributes.uv;
+  for (var i = 0; i < uv.count; i++) {
+    var u = uv.getX(i); if (flip) u = 1 - u;
+    uv.setX(i, (cell + u) / POOL.cells);
+  }
+  var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: poolTex, color: 0xffffff, alphaTest: 0.5,
+    side: THREE.DoubleSide, roughness: 0.95, metalness: 0 }));
+  m.position.set(s.x, (s.y || 0) + POOL.h / 2, s.z);
+  m.name = 'student-' + cell; m.visible = false; m.userData.wanted = false;
+  scene.add(m);
+  if (!s.still) facers.push(m);
+  poolCards[cell] = m;
+  return m;
+}
+function drawFigures(list) {
+  var want = {};
+  for (var i = 0; i < list.length; i++) if (list[i].role === 'pool' && FIGURE_SPOTS[list[i].cell]) want[list[i].cell] = true;
+  for (var c in FIGURE_SPOTS) {
+    if (!want[c] && !poolCards[c]) continue;
+    var m = poolCard(+c);
+    m.userData.wanted = !!want[c];
+    m.visible = poolReady && m.userData.wanted;
+  }
+}
+
 for (var lid in LAYERS) {
   if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]);
   else if (LAYERS[lid].portrait) applyPortrait(lid, LAYERS[lid]);
@@ -2974,6 +3040,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire
   }, VISITOR_CUES),
   drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); trevorDrawRoom(shows); },
+  figures: FIGURES,
+  drawFigures: drawFigures,
   builtins: {
     portrait: function () { return portrait.open ? 'open' : 'shut'; },
     'mantel sitter': function () { return sitterPhase(sitters.her); },
