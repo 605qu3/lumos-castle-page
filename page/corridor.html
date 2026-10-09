@@ -624,7 +624,61 @@ SCARF.w = 1.1;
 hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w);
 /* the painting opposite (req 33, round 1, candidate 3, Godric, 9 October 2026, 5.11 pm): an empty panelled landing in a
    beaded gilt frame, a door ajar at its right edge, 0.5 by 0.54 m, its own shape about the slot's centre */
-hangDrawing(paintingOpp, '../assets/layers/painting-opposite.png', PAINTING_OPP.w);
+/* A sitter out visiting stands in it (req 58; visitors.json's rules with place corridor), drawn from her own standing
+   cell onto the painting in a canvas, one sitter at a time, until her look-out cells exist. Measured on the drawing (400
+   by 433): the painted opening runs 0.155 to 0.85 of its width and 0.15 to 0.866 of its height; the painted door is 200
+   px tall, so a sitter standing on the open boards in front of it, feet at 0.79 of the height and centred at 0.44 of the
+   width, is about 175 px, 0.4 of the drawing's height (the room's grey stand-in drew her at 0.68 of its opening). Her
+   sheet's numbers are the room's (common-room.html, SITTERS), cited and not changed. */
+var OPP_SITTERS = {
+  mantel: { url: '../assets/layers/sitter-mantel.png', cellW: 174, cellH: 346, cell: 4,
+            cue: "the mantel painting's sitter standing in the painting opposite the hole" },
+  right: { url: '../assets/layers/sitter-right.png', cellW: 152, cellH: 269, cell: 4,
+           cue: "the right painting's sitter standing in the painting opposite the hole" }
+};
+var OPP_FIG = { x: 0.44, feet: 0.79, h: 0.4 };
+var oppPaint = { img: null, who: null, canvas: null, ctx: null, tex: null };
+function drawPaintingOpp() {
+  var im = oppPaint.img;
+  if (!im) return;
+  if (!oppPaint.canvas) {
+    oppPaint.canvas = makeCanvas(im.width, im.height); oppPaint.ctx = oppPaint.canvas.getContext('2d');
+    oppPaint.tex = tex(oppPaint.canvas);
+    paintingOpp.material.map = oppPaint.tex; paintingOpp.material.color.set(0xffffff); paintingOpp.material.needsUpdate = true;
+    if (paintingOpp.customDepthMaterial) { paintingOpp.customDepthMaterial.map = oppPaint.tex; paintingOpp.customDistanceMaterial.map = oppPaint.tex; }
+    paintingOpp.geometry.dispose();
+    paintingOpp.geometry = new THREE.PlaneGeometry(PAINTING_OPP.w, PAINTING_OPP.w * im.height / im.width);
+  }
+  var g = oppPaint.ctx, w = im.width, h = im.height;
+  g.clearRect(0, 0, w, h);
+  g.drawImage(im, 0, 0);
+  var s = oppPaint.who && OPP_SITTERS[oppPaint.who];
+  if (s && s.img) {
+    var dh = OPP_FIG.h * h, dw = dh * s.cellW / s.cellH;
+    g.save();
+    g.beginPath(); g.rect(0.155 * w, 0.15 * h, 0.695 * w, 0.716 * h); g.clip();
+    g.drawImage(s.img, s.cell * s.cellW, 0, s.cellW, s.cellH, OPP_FIG.x * w - dw / 2, OPP_FIG.feet * h - dh, dw, dh);
+    g.restore();
+  }
+  oppPaint.tex.needsUpdate = true;
+}
+function setPaintingSitter(who) {
+  if (who === undefined) return oppPaint.who;               /* for automated checks */
+  if (who === oppPaint.who) return;
+  oppPaint.who = who;
+  var s = who && OPP_SITTERS[who];
+  if (s && !s.img) {
+    var im = new Image();
+    im.onload = function () { s.img = im; drawPaintingOpp(); };
+    im.src = s.url;
+  }
+  drawPaintingOpp();
+}
+(function () {
+  var im = new Image();
+  im.onload = function () { oppPaint.img = im; drawPaintingOpp(); };
+  im.src = '../assets/layers/painting-opposite.png';
+})();
 
 /* the drawn torch the common room already has: same file, same size, same head */
 (function () {
@@ -944,6 +998,7 @@ function corridorDrawRoom(shown) {
   sticksShown = has(CUE.up) ? 'up' : has(CUE.fallen) || has(CUE.boo) ? 'fallen' : 'gone';
   boo.visible = has(CUE.boo) && !sticksQueue.length;
   drawTrevor(has, back);
+  setPaintingSitter(has(OPP_SITTERS.mantel.cue) ? 'mantel' : has(OPP_SITTERS.right.cue) ? 'right' : null);
 }
 function sticksAnim(kinds) { kinds.forEach(function (k) { sticksQueue.push({ kind: k, t: 0, dur: { dodge: 0.6, drop: 0.5, jig: 1.2, drum: 0.9, scatter: 1.6, march: 1.8 }[k] }); }); }
 function updateSticks(dt) {
@@ -1233,7 +1288,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS,
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter,
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
