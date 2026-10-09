@@ -548,15 +548,15 @@ stop's left edge, 0.8 m behind the cat's loop; the log basket keeps spot 2 by th
 (x 2.5, z -3.8, hidden behind it at rest); leaving it (mostly hidden).
 Trevor's room half, 9 October 2026 (board req 55, the events lane's req 9): his three floor marks for trevor.json's
 hiding set, floor-a under the round table behind its stem (x -1.4, z 2.4), floor-b by the sofa's right front foot
-(x 3.2, z -1.65), floor-c on the hearthstone beside the log basket (x -0.75, z -4.1), each projected at rest and on both
-full drags and clear of the 0.35 m rule; provisional, put to Godric (assets/review/trevor-spots-plan.jpg). In grey: the
+(x 3.2, z -1.65), floor-c under the desk chair by his box (x 3.55, z -2.45; Godric's option 2 of
+assets/review/trevor-spots-plan.jpg, 2.56 pm, the hearth too hot for a damp toad), each clear of the 0.35 m rule. In grey: the
 damp prints from his box to his mark or to the hole, one mesh, and a faint "croak" by the hole while he is in the
 corridor's helmet. Trevor himself waits on his sheet.
 the student pool on the room's marks, 9 October 2026 (board req 41, People's first sheet; the runtime's figures, req 40):
 the page lists its four figures word for word (cells 0 to 2 'standing, listening' at fire, cell 3 'asleep, a book on
 the chest' at sofa) and stands whoever the runtime casts. The fire mark is the hearth either side of the fire, behind
 the chairs' line, each facing it; the sofa mark lays the sleeper along the seat. Projected with the cells at rest, from
-the stop and on both drags; provisional, put to Godric (assets/review/students-marks.jpg). Lost: the rug in front of the
+the stop and on both drags; Godric's option 1 (assets/review/students-marks.jpg, 2.56 pm). Lost: the rug in front of the
 chairs (hid both). The sheet loads only when a student first stands, about 7 MB, one texture for every card.
 the sitters asleep at night, 9 October 2026 (board req 35, People's sleeping cells): at night (night.json's room rule)
 both sit asleep in their own chairs, the loop stopped, nobody visiting; the cells scaled to tier B as the seated sheets
@@ -2266,22 +2266,26 @@ var VISITOR_CUES = {
   "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens": function () { oppShow('her', 'slips'); },
   "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens": function () { oppShow('him', 'slips'); },
   "the mantel painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('her', 'stays'); },
-  "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('him', 'stays'); }
+  "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('him', 'stays'); },
+  /* the bedtime (bedtime.json; board req 38) */
+  'the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair': function () { fireLevelT = Math.min(fireLevelT, 0.7); },
+  'the room dims, the fire low, the view turns to the stair, and he goes up to the dormitory for lights out (dormitory.html?from=room&bedtime)': function () { lightsOut(); }
 };
 
 /* ---------- Trevor's room half (board req 55, the events lane's req 9; 9 October 2026) ----------
    trevor.json names three floor marks under `hiding`; these are where they are. Each was projected with a stand-in at
    rest and on both full drags on the iPad (Placement rules, "Project it first"): floor-a under the round table behind
    its stem, seen at rest low in the view and on the drag right; floor-b by the sofa's right front foot, seen at every
-   view; floor-c on the hearthstone beside the log basket, seen at rest and hidden behind the basket on the drag left.
-   Each keeps 0.35 m of depth off every card whose width it sits in and off the cat's loop. Provisional, David to judge.
+   view; floor-c under the front of the desk chair by his box, the easy first find (Godric, 9 October 2026, 2.56 pm,
+   option 2: a toad leaving damp prints keeps off the hot hearth, where the plan had it beside the log basket). Each
+   keeps 0.35 m of depth off every card whose width it sits in and off the cat's loop.
    Until his sheet is drawn Trevor himself is not drawn; the damp prints and the croak are, in grey: prints laid on the
    floor in one mesh from his box on the desk to the mark he is at, or to the wall under the portrait hole while he is
    out in the corridor's helmet, the oldest by the box faintest; and a faint "croak" by the hole now and then. */
 var TREVOR_MARKS = {
   'floor-a': new THREE.Vector3(-1.4, 0, 2.4),
   'floor-b': new THREE.Vector3(3.2, 0, -1.65),
-  'floor-c': new THREE.Vector3(-0.75, 0.06, -4.1)
+  'floor-c': new THREE.Vector3(3.55, 0, -2.45)
 };
 var TREVOR_BOX_FOOT = new THREE.Vector3(3.4, 0, -2.75);     /* the floor below the desk's bare end, beside the chair */
 var HOLE_FOOT = holeN.clone().multiplyScalar(WALL_R - 0.15).setY(0);
@@ -2372,7 +2376,7 @@ function updateTrevor(dt) {
    rest, from the fireside stop and on both full drags (the fire and both chairs clear at rest; at the stop the three
    frame the fire), 0.35 m and more off the cat's loop. Lost: on the rug's sides in front of the chairs (larger and
    nearer, but they hid both chairs). The sofa mark lays the sleeper along its seat, his head on its right arm, hips on
-   the seat at 0.42 m. Provisional, David to judge. The sheet is loaded only when a student first stands (about 7 MB),
+   the seat at 0.42 m. Godric's choice, 9 October 2026, 2.56 pm. The sheet is loaded only when a student first stands (about 7 MB),
    one texture for every card, the cell and its flip in each card's UVs; the standing ones turn to the eye with the
    tables, the sleeper keeps the sofa's line. */
 var POOL = { url: '../assets/layers/students-pool.png', cells: 4, w: 1.65, h: 1.65 * 672 / 660, native: [1, 1, -1, 1] };
@@ -2702,7 +2706,7 @@ function fireCatches() { fireLevelT = 1; stokeFire(); }
 
 /* at rest, these glide to the fireside stop */
 var FIRESIDE_TAPS = [hearthBack, bellows, rug, chairL, wingback];
-var tappables = [hearthBack, holeTap, catWalk, catSit, bellows, rug, chairL, wingback].concat(boardParts);
+var tappables = [hearthBack, holeTap, catWalk, catSit, bellows, rug, chairL, wingback, stairs].concat(boardParts);
 for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
 
 function startTween(fromPos, fromLook, toPos, toLook, dur, done, fromFov, toFov) {
@@ -2803,6 +2807,45 @@ function climbOut(dry) {
   return true;
 }
 
+/* Up the stair (board req 20 and 38, the Dormitory's ask; 9 October 2026): the view walks to the stair's foot, looks
+   up the flight, and the dormitory loads under the fade, ?from=room for a tap on the stair, ?from=room&bedtime at
+   lights out. dry darkens and comes back without loading, for shots. Coming down, ?from=dormitory, the room comes up
+   at the stair's foot looking in at the fire and the view steps back to its rest. */
+var STAIR_NEAR = new THREE.Vector3(3.0, CAM_BASE.y, 0.9), STAIR_UP = new THREE.Vector3(4.6, 1.9, -1.4);
+var STAIR_IN = new THREE.Vector3(3.55, 1.7, -0.25), STAIR_TOP = new THREE.Vector3(4.75, 3.4, -1.5);
+function climbStair(dry, url) {
+  if (tween || (mode !== 'room' && mode !== 'night')) return false;
+  mode = 'tween';
+  startTween(camera.position.clone(), currentLook(), STAIR_NEAR, STAIR_UP, 1.1, function () {
+    startTween(camera.position.clone(), STAIR_UP.clone(), STAIR_IN, STAIR_TOP, 0.9, function () {});
+    setTimeout(function () {
+      kit.travel(url, { place: { room: 'dormitory' }, dry: dry, done: function () { tween = null; mode = 'room'; } });
+    }, 400);
+  });
+  return true;
+}
+var STAIR_FOOT_EYE = new THREE.Vector3(3.3, CAM_BASE.y, 0.5), STAIR_FOOT_LOOK = new THREE.Vector3(0, 1.1, -3.8);
+function arriveFromStair() {
+  kit.savePlace({ room: 'common-room' });
+  yaw = yawT = 0; pitch = pitchT = 0;
+  var rp = new THREE.Vector3(), rl = new THREE.Vector3();
+  roomPose(0, 0, rp, rl);
+  mode = 'tween';
+  camera.position.copy(STAIR_FOOT_EYE); camera.lookAt(STAIR_FOOT_LOOK);
+  tween = { t: 0, dur: 0.01, fromPos: STAIR_FOOT_EYE.clone(), fromLook: STAIR_FOOT_LOOK.clone(), toPos: STAIR_FOOT_EYE.clone(),
+            toLook: STAIR_FOOT_LOOK.clone(), done: function () {
+    setTimeout(function () { startTween(STAIR_FOOT_EYE.clone(), STAIR_FOOT_LOOK.clone(), rp, rl, 2.2, function () { mode = 'room'; }); }, 900);
+  } };
+  kit.reveal();
+}
+/* At lights out the room dims and he goes up; at the warning before it, the fire banks a little (bedtime.json) */
+function lightsOut() {
+  fireLevelT = Math.min(fireLevelT, 0.3);
+  if (mode === 'board' || mode === 'hand') leaveBoard();
+  tween = null; mode = 'room';
+  setTimeout(function () { climbStair(false, 'dormitory.html?from=room&bedtime'); }, 1200);
+}
+
 function catSitDown(seconds, byTap) {
   if (byTap) { cat.satThisLoop = true; cat.lastSitU = cat.u; }
   cat.state = 'sit';
@@ -2845,6 +2888,7 @@ function tap(cx, cy) {
   /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
   else if (hit === holeTap) { if (portrait.open) climbOut(); else { if (castle) castle.tap('hole'); togglePortrait(); } }
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
+  else if (hit === stairs) climbStair(false, 'dormitory.html?from=room');
 }
 
 /* drag versus tap */
@@ -3085,6 +3129,16 @@ var castle = window.CastleEvents ? CastleEvents.start({
 
 /* arriving through the hole from the corridor (?from=corridor): the room comes up from black at its default view with
    her swinging shut behind him */
+/* coming down the stair from the dormitory (?from=dormitory; board req 20) */
+if (kit.from === 'dormitory') arriveFromStair();
+/* the morning after lights out (board req 38): opened with no ?from and the place saved at lights out still the
+   waking, he goes straight up to wake in his bed, ?from=sleep; the place is set to the dormitory as he goes, so the
+   next opening is an ordinary one. Read here, not in the shared frame, since the common room is the page the castle is
+   opened on. */
+if (!kit.from) {
+  var saved = kit.readPlace();
+  if (saved && saved.room === 'dormitory' && saved.stop === 'waking') kit.travel('dormitory.html?from=sleep', { place: { room: 'dormitory' } });
+}
 if (kit.from === 'corridor') {
   portrait.open = true; portrait.ang = DOOR_OPEN; portrait.target = DOOR_OPEN; portrait.closeT = 1.0;
   kit.savePlace({ room: 'common-room' });
@@ -3116,7 +3170,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, climbStair: climbStair };
 })();
 </script>
 </body>
