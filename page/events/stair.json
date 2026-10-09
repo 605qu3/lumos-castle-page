@@ -1,0 +1,184 @@
+{
+  "chain": "stair",
+  "first_visit": [
+    "stair.begin"
+  ],
+  "marks": {
+    "foot": [
+      "window",
+      "torch"
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = window"
+      ],
+      "show": [
+        "at the flight's foot, a small landing with a tall window in its far wall, daylight on the flags"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = torch"
+      ],
+      "show": [
+        "at the flight's foot, the landing turning a corner under a torch, the next flight glimpsed going on and stopping at the turn"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "stair.begin",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "stair_to != window",
+        "stair_to != torch"
+      ],
+      "starts": [
+        "set stair_to = window"
+      ]
+    },
+    {
+      "id": "stair.moves-enter",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-enter",
+      "weight": 2,
+      "moment": "enter",
+      "when": [
+        "time != night"
+      ],
+      "starts": [
+        "set stair_to = mark foot, not last"
+      ]
+    },
+    {
+      "id": "stair.stays-enter",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-enter",
+      "weight": 1,
+      "moment": "enter",
+      "when": [
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stair.moves-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-leave",
+      "weight": 2,
+      "moment": "leave",
+      "when": [
+        "been corridor = yes",
+        "time != night"
+      ],
+      "starts": [
+        "set stair_to = mark foot, not last"
+      ]
+    },
+    {
+      "id": "stair.stays-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-leave",
+      "weight": 1,
+      "moment": "leave",
+      "when": [
+        "been corridor = yes",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stair.grind-behind",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-behind",
+      "weight": 1,
+      "moment": "wait 40-120 s",
+      "when": [
+        "place = corridor",
+        "at != none",
+        "at != landing",
+        "time != night"
+      ],
+      "starts": [
+        "set stair_to = mark foot, not last"
+      ],
+      "show": [
+        "stone grinds behind him, low and short, then a soft thud as it settles"
+      ]
+    },
+    {
+      "id": "stair.quiet-behind",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-behind",
+      "weight": 3,
+      "moment": "wait 40-120 s",
+      "when": [
+        "place = corridor",
+        "at != none",
+        "at != landing",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stair.down",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-down",
+      "weight": 7,
+      "moment": "tap stair",
+      "when": [
+        "place = corridor",
+        "at != landing"
+      ],
+      "starts": [
+        "add stair_trips 1"
+      ],
+      "show": [
+        "the view sinks down the flight over a few seconds to stand on the landing before the place at its foot; Back brings him up"
+      ]
+    },
+    {
+      "id": "stair.down-oof",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-down",
+      "weight": 1,
+      "moment": "tap stair",
+      "when": [
+        "place = corridor",
+        "at != landing",
+        "time != night",
+        "stair_trips >= 1"
+      ],
+      "starts": [
+        "add stair_trips 1",
+        "log \"The vanishing step caught him {day}\""
+      ],
+      "show": [
+        "on the way down the week's vanishing step is not there: the view dips a step with a small oof and goes on down to the landing"
+      ]
+    }
+  ]
+}

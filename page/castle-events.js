@@ -72,6 +72,9 @@
 
   /* A day is a whole local day counted from 1970, so dates compare as numbers and survive a reload. */
   function dayNumber(d) { return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / DAY_MS); }
+  /* The week as a whole number, turning over on Monday (password Monday), from the date alone, so both castles and
+     every page agree on it: the moving stair's vanishing step holds all week by it. 1 January 1970 was a Thursday. */
+  function weekNumber(d) { return Math.floor((dayNumber(d) + 3) / 7); }
 
   function load(key) {
     try { var s = localStorage.getItem(key); return s ? JSON.parse(s) : null; } catch (e) { return null; }
@@ -156,6 +159,7 @@
         case 'at': return 'none';                 /* a page with stops answers this itself */
         case 'hour': return now.getHours();
         case 'weekday': return WEEKDAYS[now.getDay()];
+        case 'week': return weekNumber(now);
         case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
         case 'slot': return state.slot ? 'taken' : 'free';
         case 'speech': return settings.speech || 'on';
@@ -750,5 +754,5 @@
     };
   }
 
-  window.CastleEvents = { start: start, dayNumber: dayNumber };
+  window.CastleEvents = { start: start, dayNumber: dayNumber, week: function (d) { return weekNumber(d || new Date()); } };
 })();
