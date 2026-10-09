@@ -267,10 +267,11 @@ BED_DEGS.forEach(function (deg, i) {
     var h = box(g, 0.12, BED.h - 0.4, 0.55, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, 0.45, hm, 1);
     parts.push(h); tied.push(h);
   });
-  /* the hangings drawn for the night (the bedtime, 8 October 2026): full panels down both sides and across the foot,
-     hidden until lights out; lumosGreybox.hangings(name, drawn) flips them */
+  /* the hangings drawn for the night (the bedtime, 8 October 2026): panels down both sides from the head and two
+     halves across the foot from the posts, hidden until lights out; lumosGreybox.hangings(name, k) draws them to k
+     (0 tied back, 1 closed, true and false as 1 and 0), so the closing can be shot as it goes (9 October 2026) */
   [-1, 1].forEach(function (s) { drawn.push(box(g, 0.12, BED.h - 0.4, BED.l - 0.1, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, BED.l / 2, hm, 1)); });
-  drawn.push(box(g, BED.w + 0.16, BED.h - 0.4, 0.12, 0, (BED.h - 0.4) / 2, BED.l + 0.02, hm, 1));
+  [-1, 1].forEach(function (s) { drawn.push(box(g, (BED.w + 0.16) / 2, BED.h - 0.4, 0.12, s * (BED.w + 0.16) / 4, (BED.h - 0.4) / 2, BED.l + 0.02, hm, 1)); });
   drawn.forEach(function (m) { m.visible = false; m.name = name + '-drawn'; });
   parts.push(box(g, TRUNK.l, TRUNK.h, TRUNK.w, 0, TRUNK.h / 2, BED.l + 0.15 + TRUNK.w / 2, trunkMat, 1));   /* the trunk at the foot, its long side across it */
   parts[parts.length - 1].name = his ? 'trunk-his' : 'trunk-' + (i + 1);
@@ -356,11 +357,28 @@ function dim(on) {
   windows.forEach(function (w) { w.moon.intensity = w.moon.userData.base * (on ? 0.4 : 1); });
   hemi.intensity = on ? 0.12 : 0.3;
 }
-function hangings(name, drawnOn) {
+function hangings(name, k) {
   var b = beds.filter(function (x) { return x.name === name; })[0];
   if (!b) return false;
-  b.drawn.forEach(function (m) { m.visible = drawnOn; }); b.tied.forEach(function (m) { m.visible = !drawnOn; });
+  k = k === true ? 1 : k === false ? 0 : clamp(+k || 0, 0, 1);
+  var z0 = lerp(0.175, 0.05, k), z1 = lerp(0.725, BED.l - 0.05, k), half = (BED.w + 0.16) / 2;
+  b.drawn.forEach(function (m, i) {
+    m.visible = k > 0;
+    if (i < 2) { m.scale.z = (z1 - z0) / (BED.l - 0.1); m.position.z = (z0 + z1) / 2; }   /* a side, from the head */
+    else { var s = i === 2 ? -1 : 1; m.scale.x = Math.max(k, 0.001); m.position.x = s * (half - half * k / 2); }   /* a foot half, from its post */
+  });
+  b.tied.forEach(function (m) { m.visible = k === 0; });
   return true;
+}
+/* for shots: hold the eye at pos looking at look, each [x, y, z], in his bed's frame when local (the head at the
+   wall, +z down the bed, -x the hearth's side) */
+function pose(pos, look, local) {
+  var g = beds.filter(function (x) { return x.his; })[0].group;
+  var p = new THREE.Vector3().fromArray(pos), l = new THREE.Vector3().fromArray(look);
+  if (local) { g.localToWorld(p); g.localToWorld(l); }
+  arriving = false; tween = null; atStop = null; mode = 'pose'; backBtn.hidden = false;
+  camera.position.copy(p); lookTmp.copy(l);
+  return [p.x, p.y, p.z].map(function (v) { return +v.toFixed(2); });
 }
 var fill = new THREE.DirectionalLight(col(0xffe2c0), 0.18);
 fill.position.set(3, 5, 9);
@@ -539,10 +557,65 @@ function holdArrival(t) {
   arriving = true; arriveHold = true; arriveT = t; mode = 'arrive'; tween = null; atStop = null; backBtn.hidden = true;
 }
 
+/* ---------- the bedtime (9 October 2026, third session; in grey for David's pick, not yet chosen) ----------
+   Lights out from below (?from=bedtime): the room already at lights out, he comes up the stair as the arrival does
+   and settles to the stage, and as it settles the hangings draw bed by bed, the far ones first and his last; a hold,
+   then the screen darkens and stays dark: the visit ends, the place saved as the dormitory, waking. From the bed's
+   stop the drawn hangings filled the frame as one dark panel, and from inside the bed the same; the stage sees the
+   whole room go to bed with the fire low. Waking (?from=sleep): the page opens on him sitting up in his bed, the
+   hangings already back, looking across to the next bed and W1 with the fire at the edge (the pillow's gaze down the
+   bed met the unlit front; facing the fire, 2.3 m off, filled the frame with the fireplace seen edge-on; his hangings
+   opening from inside showed only cloth), a breath, and the view settles to the stage. lumosGreybox.holdNight('bedtime' or 'waking', t) freezes either at t. */
+var NIGHT = { start: 4.5, draw: 0.8, gap: 0.45, hold: 1.2, fade: 1.6, order: ['bed-5', 'bed-3', 'bed-4', 'bed-1', 'bed-his'] };
+var WAKE = { breath: 2.4, settle: 2.0, pos: [0, 1.1, 1.0], look: [-2.4, 0.85, 1.5] };
+var endVeil = document.createElement('div');
+endVeil.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;background:#000;opacity:0;pointer-events:none;z-index:49';
+document.body.appendChild(endVeil);
+var night = null;
+function nightEnd(kind) {
+  return kind === 'bedtime' ? NIGHT.start + (NIGHT.order.length - 1) * NIGHT.gap + NIGHT.draw + NIGHT.hold + NIGHT.fade
+    : WAKE.breath + WAKE.settle;
+}
+function nightPose(t) {
+  if (night.kind === 'bedtime') {
+    arrivalPose(Math.min(t, ARRIVE.climb + ARRIVE.breath + ARRIVE.settle), camera.position, lookTmp);
+    NIGHT.order.forEach(function (n, i) { hangings(n, easeInOut(clamp((t - NIGHT.start - i * NIGHT.gap) / NIGHT.draw, 0, 1))); });
+    var f0 = nightEnd('bedtime') - NIGHT.fade;
+    endVeil.style.opacity = String(clamp((t - f0) / NIGHT.fade, 0, 1));
+  } else {
+    var g = beds.filter(function (x) { return x.his; })[0].group;
+    var a = { pos: g.localToWorld(new THREE.Vector3().fromArray(WAKE.pos)), look: g.localToWorld(new THREE.Vector3().fromArray(WAKE.look)) };
+    var r = { pos: new THREE.Vector3(), look: new THREE.Vector3() }; restPose(r.pos, r.look);
+    var k = easeInOut(clamp((t - (nightEnd('waking') - WAKE.settle)) / WAKE.settle, 0, 1));
+    camera.position.lerpVectors(a.pos, r.pos, k); lookTmp.lerpVectors(a.look, r.look, k);
+  }
+}
+function updateNight(dt) {
+  if (!night.hold) night.t += dt;
+  nightPose(night.t);
+  if (night.t >= nightEnd(night.kind) && !night.hold) {
+    if (night.kind === 'waking') { night = null; mode = 'rest'; }
+    else { night.hold = true; }   /* the visit has ended: the screen stays dark */
+  }
+}
+function startNight(kind, t, hold) {
+  night = { kind: kind, t: t || 0, hold: !!hold };
+  arriving = false; tween = null; atStop = null; mode = 'night'; backBtn.hidden = true;
+  yaw = yawT = 0; pitch = pitchT = 0;
+  endVeil.style.opacity = '0';
+  BED_NAMES.forEach(function (n) { hangings(n, 0); });
+  dim(kind === 'bedtime');
+  if (kind === 'bedtime') kit.savePlace({ room: 'dormitory', stop: 'waking' });
+  nightPose(night.t); camera.lookAt(lookTmp);
+  renderer.render(scene, camera);
+  kit.reveal();
+}
+var BED_NAMES = beds.map(function (b) { return b.name; });
+
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
   if (!helpEl.hidden) helpEl.hidden = true;
-  if (tween || leaving || arriving) return;
+  if (tween || leaving || arriving || night) return;
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
@@ -553,7 +626,8 @@ function tap(cx, cy) {
 
 function updateCamera(dt) {
   var s = Math.min(1, dt * 7);
-  if (arriving) updateArrival(dt);
+  if (night) updateNight(dt);
+  else if (arriving) updateArrival(dt);
   else if (tween) {
     tween.t += dt;
     var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
@@ -602,6 +676,8 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 backBtn.addEventListener('click', goBack);
 setView(view);
 if (kit.from === 'room') arriveFromRoom();
+else if (kit.from === 'bedtime') startNight('bedtime');
+else if (kit.from === 'sleep') startNight('waking');
 
 /* ---------- per frame ---------- */
 
@@ -625,7 +701,9 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
-  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, dim: dim };
+  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, dim: dim, pose: pose,
+  bedtime: function () { startNight('bedtime'); }, waking: function () { startNight('waking'); },
+  holdNight: function (kind, t) { startNight(kind, t, true); return nightEnd(kind); } };
 })();
 </script>
 </body>
