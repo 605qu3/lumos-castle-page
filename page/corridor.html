@@ -273,7 +273,7 @@ for (var si = 1; si <= STEPS; si++) {
 var landing = new THREE.Mesh(new THREE.PlaneGeometry(LANDING_D, WIDTH), floorMat);
 landing.rotation.x = -Math.PI / 2; landing.position.set((FOOT_X + FAR_END_X) / 2, FOOT_Y, MID_Z);
 landing.name = 'landing'; scene.add(landing); register(landing, 0);
-var LANDING_WINDOW = { w: 2.0, h: 4.8, sill: 0.9 };   /* grand and tall, stained glass; its size Godric's from a plan of three (9 October 2026, req 29) */
+var LANDING_WINDOW = { w: 2.33, h: 4.8, sill: 0.9 };   /* grand and tall, stained glass; 2.33 by 4.8 m, the drawing's own shape at the height Godric chose (9 October 2026, 2.41 pm, req 29) */
 var landingWindow = cutoutMesh(cutoutTexture(120, 288, "#c9d6e2", drawArch, "window"), LANDING_WINDOW.w, LANDING_WINDOW.h);
 landingWindow.material = new THREE.MeshBasicMaterial({ map: landingWindow.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
 landingWindow.position.set(FAR_END_X + 0.01, FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2, MID_Z);
@@ -313,6 +313,75 @@ breast.name = 'chimney-breast';
 var nookFloor = new THREE.Mesh(new THREE.PlaneGeometry(NOOK_W, NOOK_D), floorMat);
 nookFloor.rotation.x = -Math.PI / 2; nookFloor.position.set(NOOK_MID, 0, HER_Z + NOOK_D / 2);
 nookFloor.name = 'nook-floor'; nook.add(nookFloor); register(nookFloor, 0);
+
+/* the flags (req 31's worn path; nothing generated): the common room's floor drawing, floor.jpg, which covers 11.4 m
+   across in the room, painted onto a canvas of each floor's own size at 150 px a metre, so the corridor pays about 6 MB
+   for it rather than the drawing's 21. Its tiles are laid in world x and z and mirrored on alternate tiles, so the
+   joints run on unbroken from the corridor into the nook and the landing. On the corridor's floor the path is worn
+   pale down the middle from the stair head to her, as the room's rug edge is, and the mud of the stair is trodden
+   in near its head, fading in a few steps. tint is the room's, 0x999999. */
+var FLAGS = { url: '../assets/layers/floor.jpg', size: 2048 / 180, ppm: 150, tint: 0x999999, across: !/[?&]along\b/.test(location.search) };
+var WEAR_PATH = { strength: 0.32, width: 1.1, path: [[STAIR_X, MID_Z, 0.5], [-9.0, -2.36, 0.8], [-6.0, -2.26, 1], [-3.0, -2.2, 0.9],
+  [-1.3, -1.95, 1], [-0.2, -1.4, 0.8], [0, -1.05, 0.5]] };
+var NOOK_PATH = { strength: 0.2, width: 0.8, path: [[NOOK_MID, -2.3, 0.4], [NOOK_MID, -1.2, 0.35], [NOOK_MID, -0.6, 0]] };
+function flagsCanvas(im, x0, z0, wm, dm, worn) {
+  var P = FLAGS.ppm, S = FLAGS.size, W = Math.round(wm * P), H = Math.round(dm * P), Sp = S * P;
+  var c = makeCanvas(W, H), g = c.getContext('2d');
+  for (var kx = Math.floor(x0 / S); kx * S < x0 + wm; kx++) for (var kz = Math.floor(z0 / S); kz * S < z0 + dm; kz++) {
+    var X = (kx * S - x0) * P, Y = (kz * S - z0) * P, mx = kx & 1, mz = kz & 1;
+    g.save(); g.translate(X + Sp / 2, Y + Sp / 2); g.scale(mx ? -1 : 1, mz ? -1 : 1);
+    if (FLAGS.across) g.rotate(Math.PI / 2);                    /* the courses across the corridor (?along for the room's way) */
+    g.drawImage(im, -Sp / 2, -Sp / 2, Sp, Sp); g.restore();
+  }
+  function px(x, z) { return [(x - x0) * P, (z - z0) * P]; }
+  (worn || []).forEach(function (w) {
+    var m = makeCanvas(W, H), mg = m.getContext('2d'), r = w.width / 2 * P;
+    mg.globalCompositeOperation = 'lighten';
+    for (var i = 0; i < w.path.length - 1; i++) {
+      var a = w.path[i], b = w.path[i + 1], pa = px(a[0], a[1]), pb = px(b[0], b[1]);
+      var n = Math.ceil(Math.hypot(pb[0] - pa[0], pb[1] - pa[1]) / (r * 0.25));
+      for (var k = 0; k <= n; k++) {
+        var f = k / n, x = pa[0] + (pb[0] - pa[0]) * f, y = pa[1] + (pb[1] - pa[1]) * f, wt = a[2] + (b[2] - a[2]) * f;
+        var grd = mg.createRadialGradient(x, y, 0, x, y, r);
+        grd.addColorStop(0, 'rgba(255,255,255,' + wt.toFixed(3) + ')'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+        mg.fillStyle = grd; mg.fillRect(x - r, y - r, 2 * r, 2 * r);
+      }
+    }
+    g.globalCompositeOperation = 'screen'; g.globalAlpha = w.strength; g.drawImage(m, 0, 0);
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  });
+  if (worn === CORRIDOR_WEAR) {
+    /* mud from the stair, footfalls either side of the middle, fading over about 7.5 m from its head, so it reaches
+       the floor the eye at rest sees, from about 3.5 m ahead */
+    g.globalCompositeOperation = 'multiply';
+    var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (var st = 0; st < 24; st++) {
+      var x = STAIR_X + 0.35 + st * 0.32 + rnd() * 0.08, side = st & 1 ? 1 : -1, z = MID_Z + side * (0.13 + rnd() * 0.06) + (rnd() - 0.5) * 0.25;
+      var fade = Math.max(0, 1 - st / 24), q = px(x, z), rx = 0.15 * P, rz = 0.065 * P;
+      var grd = g.createRadialGradient(q[0], q[1], 0, q[0], q[1], rx);
+      grd.addColorStop(0, 'rgba(84,58,34,' + (0.9 * fade).toFixed(3) + ')'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+      g.save(); g.translate(q[0], q[1]); g.scale(1, rz / rx); g.translate(-q[0], -q[1]);
+      g.fillStyle = grd; g.fillRect(q[0] - rx, q[1] - rx, 2 * rx, 2 * rx); g.restore();
+    }
+    g.globalCompositeOperation = 'source-over';
+  }
+  return c;
+}
+var CORRIDOR_WEAR = [WEAR_PATH, NOOK_PATH];
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    [[floor, STAIR_X, FAR_Z, END_X - STAIR_X, WIDTH, CORRIDOR_WEAR],
+     [landing, FAR_END_X, FAR_Z, LANDING_D, WIDTH, null],
+     [nookFloor, NOOK_X1, HER_Z, NOOK_W, NOOK_D, null]].forEach(function (f) {
+      var t = tex(flagsCanvas(im, f[1], f[2], f[3], f[4], f[5]));
+      t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      f[0].material = solid(FLAGS.tint); f[0].material.map = t;
+      f[0].userData.base = f[0].material.color.clone();
+    });
+  };
+  im.src = FLAGS.url;
+})();
 var nookCeil = new THREE.Mesh(new THREE.PlaneGeometry(NOOK_W, NOOK_D), ceilMat);
 nookCeil.rotation.x = Math.PI / 2; nookCeil.position.set(NOOK_MID, NOOK_H, HER_Z + NOOK_D / 2);
 nookCeil.name = 'nook-ceiling'; nook.add(nookCeil); register(nookCeil, 0);
