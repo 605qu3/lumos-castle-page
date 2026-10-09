@@ -21,7 +21,7 @@
    a home in the northern mid-latitudes, never a stored place). A record with a figure in its cast (a pool
    student, a canon person, a ghost) is still skipped with a note; a trace or a voice fires, and its lines, text
    or sound, are noted as waiting.
-   Then the hole as moving, not leaving (David, 9 October 2026): one visit across every page, `arrive` once per
+   Then the hole as moving, not leaving (Godric, 9 October 2026): one visit across every page, `arrive` once per
    page per visit, `outside` and `enter` at the hole, `leave` when he really stops, run on the clock of his going
    when it runs late; the built-in `been <page>`; `chains: 'all'` from events/index.json; a record's `show_at`.
    Then the bedtime (9 October 2026, board req 37): a parent's visit length raises `bedtime warning` and `lights
@@ -397,7 +397,7 @@
 
     /* ---------- a visit ---------- */
 
-    /* A visit is one sitting at the iPad, across every page he walks to (David, 9 October 2026: the trip through the
+    /* A visit is one sitting at the iPad, across every page he walks to (Godric, 9 October 2026: the trip through the
        hole is moving inside one visit, not leaving). It opens with `arrive` on the page it opens on and ends with
        `leave` when he really stops: the page closed or dropped without a trip, or the iPad put away five minutes.
        A trip is a page load, so a page cannot tell a trip from a close as it goes; `pagehide` keeps the visit and

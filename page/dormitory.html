@@ -100,9 +100,9 @@ hangings; PS 9: the way down; CS 5: high narrow windows and red velvet hangings;
 moonlit lawn and the castle's own shadow). Its own page with its own GPU budget, as the corridor is; the frame
 (renderer, camera, helpers, the apply functions, the HUD) is castle.js, shared since 8 October 2026. Grey only, at
 real size: nothing is drawn for this room, and nothing is generated until the board says the common room's furnishing
-is through (David, 8 October 2026, board req 12). The handoff's The dormitory (docs/handoff/dormitory.md) is the record.
+is through (Godric, 8 October 2026, board req 12). The handoff's The dormitory (docs/handoff/dormitory.md) is the record.
 
-Decisions, 8 October 2026, each David's from a plan to scale (assets/review/dormitory-plan.jpg):
+Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dormitory-plan.jpg):
 - The same tower as the common room, 11.2 m across inside: the common room's stair rises with its newel 4.9 m from the
   centre, so a smaller tapered room would put the stair in a turret, which lost in the common room. The frame is the
   common room's (x right, z toward the eye, the hearth axis at -z) so the stair head sits where the room's stair rises,
@@ -123,7 +123,7 @@ Decisions, 8 October 2026, each David's from a plan to scale (assets/review/dorm
 - The camera: the common room's, from the open side, the eye 1.35 m up and 1.4 m outside the wall, the drags 0.55 rad
   each way about the focus (cited from The camera). At rest on the iPad the view holds the five beds (the fifth cut at
   the edge), the hearth, W1 and W3 and the near edge of the well; a drag right opens the well whole; a drag left the
-  fifth bed and W2. Chosen by David from shots of both (8 October 2026, evening) over the view from the stair head as
+  fifth bed and W2. Chosen by Godric from shots of both (8 October 2026, evening) over the view from the stair head as
   the corridor is seen, which stays behind View (?view=stair) and is where the arrival comes up to: ?from=room
   climbs the stair's last half turn to the stair head, holds a breath there, and settles to the stage (up the stair,
   below).
@@ -437,7 +437,7 @@ var STOPS = [
   { name: 'stair', meshes: [wellTap, newelPost, finial, kerb].concat(treads), stop: function () { return { pos: STAIR_EYE.clone().add(new THREE.Vector3(-1.2, 0, 0.9)), look: NEWEL.clone().setY(0.3) }; } }
 ];
 beds.forEach(function (b) { STOPS.push({ name: b.name, meshes: b.meshes, stop: function () { return bedStop(b); } }); });
-/* the dark under his bed, his own things (David, 8 October 2026, 10.15 pm, from a plan and a strip of three): tapping
+/* the dark under his bed, his own things (Godric, 8 October 2026, 10.15 pm, from a plan and a strip of three): tapping
    the dark under his bed takes the eye to a boy's head at the floor beside the mouth of the dark, on the hearth's side,
    1.2 m off the bed's axis and level with the foot end, 0.22 m up, looking across under the frame; Back returns. The
    trunk stays with the bed's stop, since its open lid is a standing drawing on the Curator's list and what lies under
@@ -557,7 +557,7 @@ function holdArrival(t) {
   arriving = true; arriveHold = true; arriveT = t; mode = 'arrive'; tween = null; atStop = null; backBtn.hidden = true;
 }
 
-/* ---------- the bedtime (David, 9 October 2026, 7.32 am: bed and waking, from a strip of eight) ----------
+/* ---------- the bedtime (Godric, 9 October 2026, 7.32 am: bed and waking, from a strip of eight) ----------
    Lights out from below (?from=bedtime): the room already at lights out, he comes up the stair as the arrival does
    and settles to the stage, and as it settles the hangings draw bed by bed, the far ones first and his last; a hold,
    then the screen darkens and stays dark: the visit ends, the place saved as the dormitory, waking. From the bed's
