@@ -528,6 +528,10 @@ bellows and the fire chain, and Back or a tap on anything else glides back. The 
 The cat's loop came forward 8 cm at its two middle points to keep 0.35 m off the chairs' planes. Lost: both chairs on
 the left nearer the fire (from the stop the wingback fell out of frame; at rest the two overlapped). Mocked at runtime
 from the stop and at rest first; the plan is assets/review/fireside-plan.jpg.
+the events runtime, 9 October 2026 (board req 53 and the events lane's ask): castle-events.js to ?v=9, the tag the
+corridor and dormitory pages carry, and chains 'all' from events/index.json with place 'common room', so a visit's
+leave runs over every chain and each record's place keeps it to its page; a cue this room lacks is noted, not drawn.
+Fresh load, all 21 chains started, console clean at 1180 x 820 and 2560 x 1080.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -554,7 +558,7 @@ var TILES = {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
-<script src="castle-events.js?v=6"></script>
+<script src="castle-events.js?v=9"></script>
 <script>
 (function () {
 'use strict';
@@ -2750,7 +2754,8 @@ function updatePortrait(dt) {
 
 /* the events runtime (castle-events.js): this room's cues and the built-ins only it can answer */
 var castle = window.CastleEvents ? CastleEvents.start({
-  chains: ['touch', 'fire'],
+  chains: 'all',
+  place: 'common room',
   cues: {
     'fire green for 2 s': fireGreen,
     'smoke puffs back out of the grate': smokePuff,
