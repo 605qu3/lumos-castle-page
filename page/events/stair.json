@@ -7,6 +7,10 @@
     "foot": [
       "window",
       "torch"
+    ],
+    "friday": [
+      "doors",
+      "gallery"
     ]
   },
   "room": [
@@ -27,6 +31,24 @@
       "show": [
         "at the flight's foot, the landing turning a corner under a torch, the next flight glimpsed going on and stopping at the turn"
       ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = doors"
+      ],
+      "show": [
+        "at the flight's foot, the entrance hall's great oak front doors, torchlit, daylight under them"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery"
+      ],
+      "show": [
+        "at the flight's foot, a short gallery of portraits, one frame empty"
+      ]
     }
   ],
   "records": [
@@ -38,10 +60,40 @@
       "moment": "arrive",
       "when": [
         "stair_to != window",
-        "stair_to != torch"
+        "stair_to != torch",
+        "stair_friday != yes"
       ],
       "starts": [
         "set stair_to = window"
+      ]
+    },
+    {
+      "id": "stair.friday",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "weekday = friday"
+      ],
+      "starts": [
+        "set stair_to = mark friday, by week",
+        "set stair_friday = yes"
+      ]
+    },
+    {
+      "id": "stair.after-friday",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "weekday != friday",
+        "stair_friday = yes"
+      ],
+      "starts": [
+        "set stair_to = mark foot",
+        "set stair_friday = no"
       ]
     },
     {
@@ -53,7 +105,8 @@
       "weight": 2,
       "moment": "enter",
       "when": [
-        "time != night"
+        "time != night",
+        "weekday != friday"
       ],
       "starts": [
         "set stair_to = mark foot, not last"
@@ -82,7 +135,8 @@
       "moment": "leave",
       "when": [
         "been corridor = yes",
-        "time != night"
+        "time != night",
+        "weekday != friday"
       ],
       "starts": [
         "set stair_to = mark foot, not last"
@@ -114,7 +168,8 @@
         "place = corridor",
         "at != none",
         "at != landing",
-        "time != night"
+        "time != night",
+        "weekday != friday"
       ],
       "starts": [
         "set stair_to = mark foot, not last"

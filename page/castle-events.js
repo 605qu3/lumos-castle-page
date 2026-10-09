@@ -248,12 +248,15 @@
       return t.item;
     }
 
-    /* `mark Y, not last`: one of the marks named Y, never the one X is at (unset reads as the first, the base). */
+    /* `mark Y, not last`: one of the marks named Y, never the one X is at (unset reads as the first, the base).
+       `mark Y, by week`: the week's own, in the set's order by the week from the date, so both castles agree and a
+       set of two alternates (Friday's places, board req 64). */
     function drawMark(spec, current, rec) {
-      var m = /^([a-z]+)(, not last)?$/.exec(spec);
+      var m = /^([a-z]+)(, not last|, by week)?$/.exec(spec);
       if (!m) { note(rec.id + ': the draw "mark ' + spec + '" waits on the page\'s mark neighbours'); return undefined; }
       var set = markSets[m[1]];
       if (!set || !set.length) { note(rec.id + ': no marks named ' + m[1]); return undefined; }
+      if (m[2] === ', by week') return set[weekNumber(nowDate()) % set.length];
       var at = current == null ? set[0] : current;
       var pool = m[2] ? set.filter(function (n) { return n !== at; }) : set;
       return pool.length ? pool[Math.floor(Math.random() * pool.length)] : undefined;
