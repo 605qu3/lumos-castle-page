@@ -99,8 +99,11 @@
     if (fresh) state = freshState();
     state.open = state.open || {};        /* records still open, by id: the day each fired, for its timeout */
     var settings = load(SETTINGS_KEY) || { leans: [], speech: 'on' };
-    /* A parent's bedtime: a visit length in minutes, or off (settings.bedtime); ?bedtime=N sets it for a test. */
-    var bedtimeMin = params.has('bedtime') ? Math.max(0, +params.get('bedtime') || 0) : (+settings.bedtime || 0);
+    /* A parent's bedtime: a visit length in minutes, or off (settings.bedtime); ?bedtime=N sets it for a test. A bare
+       &bedtime is the lights-out trip's own flag, not a length, so it leaves the parent's setting as it is (until
+       9 October 2026 it read as 0 and turned the bedtime off on the page it opened); ?bedtime=off turns it off. */
+    var bedtimeParam = params.get('bedtime');
+    var bedtimeMin = bedtimeParam === 'off' ? 0 : +bedtimeParam > 0 ? +bedtimeParam : (+settings.bedtime || 0);
 
     var chains = [];          /* the loaded files */
     var records = [];         /* every record, in file order */
@@ -301,15 +304,26 @@
       return !!m && arg === m[1];
     }
 
+    /* Were this chain's records read on this page? (?event reads one chain's records only.) */
+    function loadedChain(name) {
+      if (only && name !== only.split('.')[0]) return false;
+      for (var c = 0; c < chains.length; c++) if (chains[c].chain === name) return true;
+      return false;
+    }
+
     /* Every open record is checked in each pass, so a leave or a tap ends all the records it ends (until 9 October
        2026 a pass stopped at the first, and the rest were checked only for `when` ends after it, so of two records
-       ending on leave one stayed open). */
+       ending on leave one stayed open). A record open from a chain this page did not load is left for a page that
+       loads it (until 9 October 2026 it was dropped, so the common room, loading two chains, lost Trevor's escape). */
     function checkEnds(kind, arg) {
       for (var pass = 0; pass < 20; pass++) {      /* an end's effects may let another record's `when` end hold */
         var ended = false;
         for (var id in state.open) {
           var rec = byId[id];
-          if (!rec) { delete state.open[id]; continue; }
+          if (!rec) {                                 /* a chain this page did not load keeps its records open for a page that does */
+            if (loadedChain(id.split('.')[0])) delete state.open[id];   /* its chain is loaded and the record is gone from it */
+            continue;
+          }
           var ends = rec.ends || [];
           for (var j = 0; j < ends.length; j++) {
             if (!endMatches(ends[j], kind, arg, state.open[id])) continue;
@@ -465,10 +479,15 @@
       if (was === 'corridor' && place === 'common room') moment('enter');
     }
 
-    /* The page that loads decides what the last one's going was. */
+    /* The page that loads decides what the last one's going was. `?from=` names the page the visit was on, as the
+       pages' own trips write it: `room` (the common room), `corridor`, `dormitory`, with `&bedtime` after it on the
+       lights-out trip (`dormitory.html?from=room&bedtime`, `?from=corridor&bedtime`). `?from=sleep`, the waking, is
+       always a new visit (Godric, 9 October 2026, 7.32 am), as is any word that names no page. A crossing needs the
+       page it names to have run this runtime: the dormitory's stair carries the visit once that page starts it with
+       place `dormitory`, and until then a trip down from it is a new visit. */
+    var FROM = { room: 'common room', corridor: 'corridor', dormitory: 'dormitory' };
     function begin() {
-      var from = params.get('from');
-      var fromPlace = from === 'room' ? 'common room' : from;
+      var fromPlace = FROM[params.get('from')];
       var soon = state.leftAt != null && Date.now() - state.leftAt < CROSS_S * 1000;
       if (state.visitOpen && fromPlace && fromPlace === state.visitPlace && soon && state.kept) cross();
       else arrive();
