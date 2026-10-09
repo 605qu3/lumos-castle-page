@@ -19,8 +19,7 @@
    never left runs its leave as the page it was on), `at` (the page's, `opts.builtins.at`: the corridor stop he
    stands at, or `none`) and `time` (morning, day, evening or night, night from a dusk worked from the month for
    a home in the northern mid-latitudes, never a stored place). A record with a figure in its cast (a pool
-   student, a canon person, a ghost) is still skipped with a note; a trace or a voice fires, and its lines, text
-   or sound, are noted as waiting.
+   student, a canon person, a ghost) is still skipped with a note; a trace or a voice fires.
    Then the hole as moving, not leaving (Godric, 9 October 2026): one visit across every page, `arrive` once per
    page per visit, `outside` and `enter` at the hole, `leave` when he really stops, run on the clock of his going
    when it runs late; the built-in `been <page>`; `chains: 'all'` from events/index.json; a record's `show_at`.
@@ -32,12 +31,18 @@
    Then figures on marks (9 October 2026, board req 40): a page lists the figures it can draw (`figures`), a
    record's cast is chosen from them when it fires and stands for the rest of the visit, on every page, and the page
    draws who stands (`drawFigures`). On a page with no list a record with a figure is skipped, as before.
-   Not yet: lines, `mark next to X`, and the moments quiet and say; a record that needs one of them is skipped
-   with a note in the console, never thrown.
+   Then lines (9 October 2026, twenty-fourth session): the page's `showLines(list)` gets the lines of each record,
+   end or tap in order, each with its variant drawn (never the one its key said last), `{intro}` filled, its speaker's
+   cast entry and drawn figures; a line marked verify is held for the canon gate (?lines=all shows it); a written
+   line's words are kept for the room (`written()`); `pose` turns the speaker, `then` walks him off; a line `on_tap`
+   waits for a tap on its speaker.
+   Not yet: `mark next to X`, and the moments quiet and say; a record that needs one of them is skipped with a note
+   in the console, never thrown.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
-   to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh. */
+   to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh;
+   ?lines=all shows the lines still marked verify. */
 (function () {
   'use strict';
 
@@ -85,7 +90,8 @@
 
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
-             open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null };
+             open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
+             said: {}, written: {} };
   }
 
   function start(opts) {
@@ -94,6 +100,7 @@
     var waitOverride = params.has('wait') ? Math.max(0, +params.get('wait') || 0) : null;
     var timeOverride = /^(morning|day|evening|night)$/.test(params.get('time') || '') ? params.get('time') : null;
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
+    var allLines = params.get('lines') === 'all';   /* a test link: lines still marked verify are shown too */
 
     var cues = opts.cues || {};
     var builtins = opts.builtins || {};
@@ -105,6 +112,10 @@
        word. A page with no list draws no figures, and a record with a figure in its cast is skipped there. */
     var figures = opts.figures || null;
     var drawFigures = opts.drawFigures || function () {};
+    /* Lines (twenty-fourth session): the runtime picks each line's variant and its speaker, and hands the page the
+       lines of one record, or one end, or one tap, in order, as a list; the page draws them (said text by the
+       speaker, a written line in its hand at its place, a heard one off stage) and paces them. */
+    var showLines = opts.showLines || function () {};
     var place = opts.place || 'common room';     /* the page this runtime runs on: `common room` or `corridor` */
     var markSets = {};                           /* named sets of the page's marks a draw picks from: the page's `opts.marks`, then each chain's `marks` */
     for (var ms in (opts.marks || {})) markSets[ms] = (opts.marks[ms] || []).slice();
@@ -331,6 +342,96 @@
       return pick ? chosen : null;
     }
 
+    /* ---------- lines ---------- */
+
+    /* A line marked verify goes through the canon gate before it reaches a boy (Magic for the boys): it is held,
+       with a note, and ?lines=all shows it for a test. A variant is drawn fresh, never the one this line's
+       recording key said last (kept in the state, so not across visits either); `{intro}` takes the intro of the
+       thing the record's own bag draw landed on. A written line's words are kept by key, so a note pinned to the
+       board reads the same after a reload (`written()`). A line's `pose` turns its speaker to that pose (the page's
+       figure of that pose at the same mark, when it lists one); a line's `then` walks the speaker off once said, so
+       he stands no more, though his mark stays held for the visit. Nothing is shown while a leave runs: he has gone.
+       A line `on_tap` says nothing when its record fires; it waits, for the rest of the visit, for a tap on its
+       speaker (`tap(as)`), and says a fresh variant at each. */
+    var VERIFY = /\bverify\b/;
+    var BAG_SET = /^set ([a-z_]+) = from bag ([a-z]+)$/;
+    function bagIntro(rec) {
+      var st = rec.starts || [];
+      for (var i = 0; i < st.length; i++) {
+        var m = BAG_SET.exec(st[i]);
+        if (!m) continue;
+        var things = bagDefs[m[2]] || [];
+        for (var t = 0; t < things.length; t++) if (things[t].item === state.vars[m[1]] && things[t].intro) return things[t].intro;
+      }
+      return '';
+    }
+
+    function turnTo(rec, speaker, pose) {
+      for (var c = 0; c < visit.cast.length; c++) {
+        var f = visit.cast[c];
+        if (f.record !== rec.id || f.as !== speaker || f.pose === pose) continue;
+        var to = (figures || []).filter(function (g) {
+          return g.role === f.role && g.mark === f.mark && g.pose === pose && (f.role === 'pool' || g.name === f.name);
+        })[0];
+        visit.cast[c] = to ? Object.assign({}, to, { record: f.record, as: f.as }) : Object.assign({}, f, { pose: pose });
+        if (!to) note(rec.id + ': no figure on this page for ' + (f.name || f.role) + ' "' + pose + '" at ' + f.mark + '; the pose is passed on');
+      }
+    }
+
+    function sayLine(rec, line, end) {
+      if (line.pose) turnTo(rec, line.speaker, line.pose);
+      if (VERIFY.test(line.canon || '') && !allLines) { note(rec.id + ': a line held for the canon gate (' + line.canon + ')'); return null; }
+      var text = null, n = null, k = (line.text || []).length;
+      if (k) {
+        var last = state.said[line.key];
+        if (last && k > 1 && last.n < k) { n = Math.floor(Math.random() * (k - 1)); if (n >= last.n) n++; }
+        else n = Math.floor(Math.random() * k);
+        text = line.text[n].replace('{intro}', bagIntro(rec));
+        state.said[line.key] = { n: n };
+        if (line.medium === 'written') state.written[line.key] = { record: rec.id, key: line.key, hand: line.hand, at: line.at, text: text, day: today() };
+      }
+      var who = (rec.who || []).filter(function (w) { return w.as === line.speaker; })[0] || null;
+      return { record: rec.id, end: end, key: line.key, variant: n, speaker: line.speaker || null, medium: line.medium,
+               text: text, sound: line.sound || null, hand: line.hand || null, at: line.at || null, style: line.style || null,
+               pose: line.pose || null, then: line.then || null, who: who,
+               figures: visit.cast.filter(function (f) { return f.record === rec.id && f.as === line.speaker; }) };
+    }
+
+    /* The lines of a record (end null) or of one of its ends (its index), said in order. */
+    function speak(rec, list, end) {
+      if (!list || !list.length) return;
+      if (leaving || !visit) { note(rec.id + ': its lines are not shown, as he has gone'); return; }
+      var out = [], off = [];
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].on_tap) {
+          var w = visit.waiting[list[i].speaker] = visit.waiting[list[i].speaker] || [];
+          w.push({ record: rec.id, end: end, line: i });
+          continue;
+        }
+        var l = sayLine(rec, list[i], end);
+        if (l) out.push(l);
+        if (list[i].then) off.push(list[i].speaker);
+      }
+      if (out.length) showLines(out);
+      if (off.length) visit.cast = visit.cast.filter(function (f) { return f.record !== rec.id || off.indexOf(f.as) < 0; });
+    }
+
+    /* A tap on a speaker whose line waits for one: a fresh variant of each. */
+    function tapLines(name) {
+      var w = visit.waiting[name];
+      if (!w) return;
+      var out = [];
+      for (var i = 0; i < w.length; i++) {
+        var rec = byId[w[i].record];
+        if (!rec) continue;
+        var list = w[i].end == null ? rec.lines : rec.ends[w[i].end].lines;
+        var l = sayLine(rec, list[w[i].line], w[i].end);
+        if (l) out.push(l);
+      }
+      if (out.length) showLines(out);
+      save(STATE_KEY, state);
+    }
+
     function fire(rec) {
       var s = rec.starts || [];
       for (var i = 0; i < s.length; i++) effect(s[i], rec);
@@ -346,13 +447,13 @@
       if (rec.tier === 'small') visit.small.push(rec.id);
       if (rec.tier === 'big') { state.lastBigDay = today(); state.lastBigVisit = state.visits; visit.bigDone = true; }
       if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
+      speak(rec, rec.lines, null);                  /* the words with the cues, before a cue can end the visit */
       var where = value('place');
       var sh = (rec.show || []).concat((rec.show_at || {})[where] || []);   /* show_at: a cue by the page he is on */
       for (var j = 0; j < sh.length; j++) {
         if (cues[sh[j]]) cues[sh[j]]();
         else note(rec.id + ': this room has no cue "' + sh[j] + '"');
       }
-      if (rec.lines && rec.lines.length) note(rec.id + ': its lines wait for lines');
       note('fired ' + rec.id);
       if (!visit) { draw(); return; }              /* a cue ended the visit: its leave has saved and ended what it ends */
       changed();
@@ -361,8 +462,8 @@
 
     /* ---------- ends ---------- */
 
-    /* A record ends at the first of its ends that holds; its `do` effects run and it is no longer open. An end's
-       lines wait for lines. `kind` is why the check runs: 'change' (a `when` end), 'leave', 'tap' with the thing
+    /* A record ends at the first of its ends that holds; its `do` effects run, its lines are said and it is no
+       longer open. `kind` is why the check runs: 'change' (a `when` end), 'leave', 'tap' with the thing
        tapped, or 'arrive' (a timeout in days). */
     function endMatches(end, kind, arg, opened) {
       if (end.when) return allHold(end.when);
@@ -402,7 +503,7 @@
             delete state.open[id];
             var d = ends[j]['do'] || [];
             for (var k = 0; k < d.length; k++) effect(d[k], rec);
-            if (ends[j].lines && ends[j].lines.length) note(rec.id + ': an end\'s lines wait for lines');
+            speak(rec, ends[j].lines, j);
             note('ended ' + rec.id + ' (end ' + j + ')');
             ended = true;
             break;
@@ -515,13 +616,13 @@
       if (!visit) return;
       state.kept = { id: visit.id, smallOn: visit.smallOn, bigOn: visit.bigOn, bigDone: visit.bigDone,
                      small: visit.small, marks: visit.marks, cast: visit.cast, pages: visit.pages, played: visit.played,
-                     warned: visit.warned, lightsOut: visit.lightsOut };
+                     warned: visit.warned, lightsOut: visit.lightsOut, waiting: visit.waiting };
     }
     function restore() {
       var k = state.kept || {};
       return { id: k.id, smallOn: !!k.smallOn, bigOn: !!k.bigOn, bigDone: k.bigDone !== false, small: k.small || [],
                marks: k.marks || {}, cast: k.cast || [], pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false,
-               played: k.played || 0, warned: !!k.warned, lightsOut: !!k.lightsOut };
+               played: k.played || 0, warned: !!k.warned, lightsOut: !!k.lightsOut, waiting: k.waiting || {} };
     }
 
     /* A new visit on this page; one still open runs its leave first. */
@@ -533,7 +634,7 @@
       var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
       visit = { id: state.visits, smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [],
                 waits: freshWaits(), lastTap: {}, tapped: false, marks: {}, cast: [], pages: [place],
-                played: 0, warned: false, lightsOut: false };
+                played: 0, warned: false, lightsOut: false, waiting: {} };
       save(STATE_KEY, state);
       checkEnds('arrive');
       moment('arrive');
@@ -597,6 +698,7 @@
       moment('tap ' + name);
       tapping = null;
       if (!visit) return;
+      tapLines(name);
       visit.lastTap[name] = Date.now();
       afterTap(name);
     }
@@ -750,7 +852,13 @@
       state: function () { return state; },
       log: function () { return state.log.slice(); },
       settings: function () { return settings; },
-      visit: function () { return visit; }
+      visit: function () { return visit; },
+      /* The written lines' words as last drawn, by recording key, newest first: the room draws a pinned note from them. */
+      written: function () {
+        var out = [];
+        for (var k in state.written) out.push(state.written[k]);
+        return out.sort(function (a, b) { return b.day - a.day; });
+      }
     };
   }
 
