@@ -7,7 +7,7 @@
    near enough is `match()`: the speech probe's nearness (page/probe-speech.html, letters only, one minus the edit
    distance over the longer length), taken at its best over every run of the target's own word count in the guess
    and over the whole, so "please open the door" holds please. How loose is `LOOSE`, provisional at 0.6 with the
-   accent `LANG` en-GB, until Declan runs the probe on the iPad (9 October 2026). With no recognition in the
+   accent `LANG` en-GB, until the probe is run on the iPad (9 October 2026). With no recognition in the
    browser, `available()` is false and the castle's spoken things wait for a tap instead. */
 (function () {
   'use strict';
