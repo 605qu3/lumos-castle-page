@@ -1,5 +1,207 @@
 {
   "chain": "door",
+  "bags": {
+    "finds": [
+      {
+        "item": "paper-bird"
+      },
+      {
+        "item": "chalk"
+      },
+      {
+        "item": "quill"
+      },
+      {
+        "item": "snap-card"
+      }
+    ],
+    "drift": [
+      {
+        "item": "pawn",
+        "when": [
+          "sofa_lost = pawn"
+        ]
+      },
+      {
+        "item": "bean",
+        "when": [
+          "sofa_lost = bean"
+        ]
+      },
+      {
+        "item": "wrapper",
+        "when": [
+          "sofa_lost = wrapper"
+        ]
+      },
+      {
+        "item": "knut",
+        "when": [
+          "sofa_lost = knut"
+        ]
+      },
+      {
+        "item": "paper-hat",
+        "when": [
+          "sofa_lost = paper-hat"
+        ]
+      },
+      {
+        "item": "sugar-mouse",
+        "when": [
+          "sofa_lost = sugar-mouse"
+        ]
+      }
+    ]
+  },
+  "marks": {
+    "gap": [
+      "left",
+      "middle",
+      "right"
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = paper-bird"
+      ],
+      "show": [
+        "on the near shelf behind the door, a paper bird"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = chalk"
+      ],
+      "show": [
+        "on the near shelf behind the door, a stub of chalk"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = quill"
+      ],
+      "show": [
+        "on the near shelf behind the door, a lost quill"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = snap-card"
+      ],
+      "show": [
+        "on the near shelf behind the door, an Exploding Snap card"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = pawn"
+      ],
+      "show": [
+        "on the near shelf behind the door, a wizard-chess pawn"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = bean"
+      ],
+      "show": [
+        "on the near shelf behind the door, a single Bertie Bott's bean"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = wrapper"
+      ],
+      "show": [
+        "on the near shelf behind the door, an empty Chocolate Frog wrapper"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = knut"
+      ],
+      "show": [
+        "on the near shelf behind the door, a Knut"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = paper-hat"
+      ],
+      "show": [
+        "on the near shelf behind the door, a paper hat from a wizard cracker"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_find = sugar-mouse"
+      ],
+      "show": [
+        "on the near shelf behind the door, a sugar mouse"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_gap = yes",
+        "door_gap_at = left"
+      ],
+      "show": [
+        "a clean gap in the dust at the left of the near shelf, where something stood"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_gap = yes",
+        "door_gap_at = middle"
+      ],
+      "show": [
+        "a clean gap in the dust at the middle of the near shelf, where something stood"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_gap = yes",
+        "door_gap_at = right"
+      ],
+      "show": [
+        "a clean gap in the dust at the right of the near shelf, where something stood"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "door_holding = yes"
+      ],
+      "show": [
+        "the find in his hand, up close, as a notice is held"
+      ]
+    }
+  ],
   "records": [
     {
       "id": "door.tickle",
@@ -104,6 +306,489 @@
       ]
     },
     {
+      "id": "door.shelf-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = hit",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds = 0",
+        "sofa_lost_pending != due"
+      ],
+      "starts": [
+        "set door_find = from bag finds",
+        "set door_shelf = find",
+        "set door_drawn = yes"
+      ]
+    },
+    {
+      "id": "door.shelf-drift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = hit",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "sofa_lost_pending = due"
+      ],
+      "starts": [
+        "set door_find = from bag drift",
+        "set door_shelf = find",
+        "set door_drawn = yes",
+        "set sofa_lost_pending = no",
+        "log \"Something he left down the sofa has turned up behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.shelf-find",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = hit",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds >= 1",
+        "today >= door_due",
+        "sofa_lost_pending != due"
+      ],
+      "one_of": "shelf",
+      "weight": 2,
+      "starts": [
+        "set door_find = from bag finds",
+        "set door_shelf = find",
+        "set door_drawn = yes"
+      ]
+    },
+    {
+      "id": "door.shelf-gap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = hit",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds >= 1",
+        "door_gap_last != yes",
+        "sofa_lost_pending != due"
+      ],
+      "one_of": "shelf",
+      "weight": 1,
+      "starts": [
+        "set door_gap = yes",
+        "set door_gap_at = mark gap, not last",
+        "set door_gap_last = yes",
+        "set door_drawn = yes"
+      ]
+    },
+    {
+      "id": "door.shelf-dust",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "tickle = hit",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds >= 1",
+        "sofa_lost_pending != due"
+      ],
+      "one_of": "shelf",
+      "weight": 3,
+      "starts": [
+        "set door_gap_last = no",
+        "set door_drawn = yes"
+      ]
+    },
+    {
+      "id": "door.take",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap shelf find",
+      "when": [
+        "place = corridor",
+        "door_shelf = find",
+        "door_holding != yes"
+      ],
+      "show": [
+        "the find rises from the near shelf and comes to his hand, as a notice comes off the board"
+      ],
+      "starts": [
+        "set door_holding = yes",
+        "set door_shelf = bare",
+        "add door_finds 1",
+        "stamp door_due +2-6 days"
+      ]
+    },
+    {
+      "id": "door.paper-bird",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = paper-bird"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a paper bird",
+          "mark": "hand"
+        }
+      ],
+      "show": [
+        "the paper bird flaps off down the corridor and is gone"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"A paper bird from behind the door flew off {day}\""
+      ]
+    },
+    {
+      "id": "door.chalk",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = chalk"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a stub of chalk",
+          "mark": "hand"
+        }
+      ],
+      "show": [
+        "the chalk draws one squiggle on the flags by itself and is gone"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"A stub of chalk from behind the door drew a squiggle {day}\""
+      ]
+    },
+    {
+      "id": "door.quill",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = quill"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a lost quill",
+          "mark": "hand"
+        }
+      ],
+      "show": [
+        "the quill goes into his pocket; it is someone's, and one day they may ask after it"
+      ],
+      "starts": [
+        "add quills 1",
+        "set door_holding = no",
+        "log \"Took a lost quill from behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.snap-card",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = snap-card"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "an Exploding Snap card",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "door.snap-card",
+          "canon": "PS 13, Exploding Snap, verify",
+          "sound": "a bang, and a puff of smoke"
+        }
+      ],
+      "show": [
+        "it goes off with a bang and a puff of smoke, and is gone"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"An Exploding Snap card from behind the door went bang {day}\""
+      ]
+    },
+    {
+      "id": "door.pawn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = pawn"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a wizard-chess pawn",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "said",
+          "key": "door.pawn",
+          "canon": "PS 12, put back in the box, verify",
+          "text": [
+            "Oh, it's YOU. You LEFT me. On a SOFA.",
+            "Do you know what they keep in here? Shoes. Hundreds of shoes. All ODD.",
+            "Put me back in the box. The RIGHT box, this time.",
+            "Lost? I wasn't lost. I was on a QUEST.",
+            "I've been next to a sock for a fortnight. It never stopped talking.",
+            "Took you long enough. A knight would have found me in a day. Don't tell the knights I said that."
+          ]
+        }
+      ],
+      "show": [
+        "set down, the pawn stomps off along the corridor and down the stair, grumbling that the common room is THAT way"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"The pawn he left down the sofa turned up behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.bean",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = bean"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a single Bertie Bott's bean",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "said",
+          "key": "door.bean",
+          "canon": "PS 6, verify",
+          "text": [
+            "Dust!",
+            "Fluff. With a hint of sock.",
+            "Earwax. STILL earwax."
+          ]
+        }
+      ],
+      "show": [
+        "he tastes it, and it is gone"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"The bean he left down the sofa turned up behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.wrapper",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = wrapper"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "an empty Chocolate Frog wrapper",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "print",
+          "at": "hand",
+          "key": "door.wrapper.print",
+          "canon": "PS 6, Harry's frog out of the window, verify",
+          "text": [
+            "CHOCOLATE FROG. Contents: one frog (may have left)."
+          ]
+        },
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "door.wrapper.hop",
+          "sound": "a hop, somewhere down the corridor"
+        }
+      ],
+      "show": [
+        "tossed, the wrapper flutters off down the stair"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"The wrapper he left down the sofa turned up behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.knut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = knut"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a Knut",
+          "mark": "hand"
+        }
+      ],
+      "show": [
+        "the Knut goes into his pocket with a clink"
+      ],
+      "starts": [
+        "add knuts 1",
+        "set door_holding = no",
+        "log \"The Knut he left down the sofa turned up behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.paper-hat",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = paper-hat"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a paper hat from a wizard cracker",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "written",
+          "hand": "print",
+          "at": "hand",
+          "key": "door.paper-hat",
+          "canon": "PS 12, the cracker's mice and his bonnet, verify",
+          "text": [
+            "It unfolds into an admiral's hat.",
+            "It unfolds into a crown.",
+            "It unfolds into an admiral's hat. Something squeaks inside.",
+            "It unfolds into a bonnet with flowers on, like Dumbledore's at Christmas."
+          ]
+        }
+      ],
+      "show": [
+        "it unfolds, and he wears it until he leaves"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"The paper hat he left down the sofa turned up behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.sugar-mouse",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "place = corridor",
+        "door_holding = yes",
+        "door_find = sugar-mouse"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a sugar mouse",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "door.sugar-mouse",
+          "canon": "PA 10, verify",
+          "sound": "a squeak"
+        }
+      ],
+      "show": [
+        "he tastes it, and it is gone"
+      ],
+      "starts": [
+        "set door_holding = no",
+        "log \"The sugar mouse he left down the sofa turned up behind the door {day}\""
+      ]
+    },
+    {
       "id": "door.leave",
       "tier": "fixed",
       "source": "device",
@@ -111,7 +796,10 @@
       "moment": "leave",
       "when": [],
       "starts": [
-        "set opened_visit = no"
+        "set opened_visit = no",
+        "set door_drawn = no",
+        "set door_gap = no",
+        "set door_holding = no"
       ]
     }
   ]

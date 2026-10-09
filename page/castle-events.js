@@ -141,6 +141,7 @@
         var s = state.stamps[name.slice(11)];
         return s == null ? Infinity : today() - s;     /* a stamp never made reads as forever */
       }
+      if (name.indexOf('mark ') === 0) return visit && visit.marks[name.slice(5)] ? 'taken' : 'free';   /* a mark a figure stands on this visit */
       var b = builtin(name);
       if (b !== undefined) return b;
       if (stampNames[name]) return name in state.stamps ? state.stamps[name] : -Infinity;   /* never stamped: long past */
@@ -260,6 +261,8 @@
         else note(rec.id + ': this room has no cue "' + sh[j] + '"');
       }
       if (rec.lines && rec.lines.length) note(rec.id + ': its lines wait for lines');
+      var who = rec.who || [];                     /* a figure holds its mark for the visit; a trace or a voice does not */
+      for (var w = 0; w < who.length; w++) if (who[w].mark && /^(pool|canon|ghost)$/.test(who[w].role)) visit.marks[who[w].mark] = true;
       if (rec.tier === 'small') visit.small.push(rec.id);
       if (rec.tier === 'big') { state.lastBigDay = today(); state.lastBigVisit = state.visits; visit.bigDone = true; }
       if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
@@ -384,7 +387,7 @@
       state.visitPlace = place;
       var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
       visit = { smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [], waits: [],
-                lastTap: {}, tapped: false };
+                lastTap: {}, tapped: false, marks: {} };
       var seen = {};
       for (var i = 0; i < records.length; i++) {
         var m = WAIT.exec(records[i].moment || '');
@@ -415,7 +418,7 @@
     function leave() {
       leaving = true;
       var real = !!visit;
-      if (!visit && state.visitOpen) visit = { smallOn: false, bigOn: false, bigDone: true, small: [], waits: [], lastTap: {}, tapped: true };
+      if (!visit && state.visitOpen) visit = { smallOn: false, bigOn: false, bigDone: true, small: [], waits: [], lastTap: {}, tapped: true, marks: {} };
       if (visit) checkEnds('leave');
       if (visit) moment('leave');
       if (real) state.lastSmall = visit.small;

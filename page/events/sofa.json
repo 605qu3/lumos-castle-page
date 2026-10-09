@@ -366,6 +366,128 @@
       ]
     },
     {
+      "id": "sofa.lost-pawn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = pawn"
+      ],
+      "starts": [
+        "set holding = no",
+        "set sofa_lost = pawn",
+        "set sofa_lost_pending = yes",
+        "stamp sofa_lost_due +14-28 days",
+        "log \"Left the pawn in his hand {day}; it slid back down the sofa\""
+      ]
+    },
+    {
+      "id": "sofa.lost-bean",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = bean"
+      ],
+      "starts": [
+        "set holding = no",
+        "set sofa_lost = bean",
+        "set sofa_lost_pending = yes",
+        "stamp sofa_lost_due +14-28 days",
+        "log \"Left the bean in his hand {day}; it slid back down the sofa\""
+      ]
+    },
+    {
+      "id": "sofa.lost-wrapper",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = wrapper"
+      ],
+      "starts": [
+        "set holding = no",
+        "set sofa_lost = wrapper",
+        "set sofa_lost_pending = yes",
+        "stamp sofa_lost_due +14-28 days",
+        "log \"Left the wrapper in his hand {day}; it slid back down the sofa\""
+      ]
+    },
+    {
+      "id": "sofa.lost-knut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = knut"
+      ],
+      "starts": [
+        "set holding = no",
+        "set sofa_lost = knut",
+        "set sofa_lost_pending = yes",
+        "stamp sofa_lost_due +14-28 days",
+        "log \"Left the Knut in his hand {day}; it slid back down the sofa\""
+      ]
+    },
+    {
+      "id": "sofa.lost-paper-hat",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = paper-hat"
+      ],
+      "starts": [
+        "set holding = no",
+        "set sofa_lost = paper-hat",
+        "set sofa_lost_pending = yes",
+        "stamp sofa_lost_due +14-28 days",
+        "log \"Left the paper hat in his hand {day}; it slid back down the sofa\""
+      ]
+    },
+    {
+      "id": "sofa.lost-sugar-mouse",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = sugar-mouse"
+      ],
+      "starts": [
+        "set holding = no",
+        "set sofa_lost = sugar-mouse",
+        "set sofa_lost_pending = yes",
+        "stamp sofa_lost_due +14-28 days",
+        "log \"Left the sugar mouse in his hand {day}; it slid back down the sofa\""
+      ]
+    },
+    {
+      "id": "sofa.drift-due",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "sofa_lost_pending = yes",
+        "today >= sofa_lost_due"
+      ],
+      "starts": [
+        "set sofa_lost_pending = due"
+      ]
+    },
+    {
       "id": "sofa.leave",
       "tier": "fixed",
       "source": "device",
@@ -373,8 +495,7 @@
       "moment": "leave",
       "when": [],
       "starts": [
-        "set rummaged = no",
-        "set holding = no"
+        "set rummaged = no"
       ]
     }
   ]
