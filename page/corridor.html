@@ -604,6 +604,28 @@ scarf.rotation.set(-Math.PI / 2, 0, -SCARF.turn * Math.PI / 180);
 scarf.position.set(SCARF.x, 0.01, SCARF.z);
 scarf.name = 'scarf'; scene.add(scarf); register(scarf, 1);
 
+/* A drawing hung in place of its stand-in as soon as it loads, at its own width, its height (or, for a plan piece, its
+   depth) from the drawing's own shape, about its centre. */
+function hangDrawing(m, url, w) {
+  var im = new Image();
+  im.onload = function () {
+    var t = tex(im);
+    m.material.map = t; m.material.color.set(0xffffff); m.material.needsUpdate = true;
+    if (m.customDepthMaterial) { m.customDepthMaterial.map = t; m.customDistanceMaterial.map = t; }
+    m.geometry.dispose();
+    m.geometry = new THREE.PlaneGeometry(w, w * im.height / im.width);
+  };
+  im.src = url;
+}
+/* the scarf (req 31, round 2, candidate 1, Godric, 9 October 2026, 5.14 pm): a Gryffindor scarf in soft knitted wool lying
+   flat in a loose Z, fringed at both ends, 1.1 m across its bends and 0.61 deep, turned across the path as the strip was;
+   the castle's house-scarf drawing, its exemplar the first of its kind */
+SCARF.w = 1.1;
+hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w);
+/* the painting opposite (req 33, round 1, candidate 3, Godric, 9 October 2026, 5.11 pm): an empty panelled landing in a
+   beaded gilt frame, a door ajar at its right edge, 0.5 by 0.54 m, its own shape about the slot's centre */
+hangDrawing(paintingOpp, '../assets/layers/painting-opposite.png', PAINTING_OPP.w);
+
 /* the drawn torch the common room already has: same file, same size, same head */
 (function () {
   var im = new Image();
