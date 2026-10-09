@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Seventh-floor corridor, greybox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=EB+Garamond:ital@0;1&family=Short+Stack&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0b0a09;
@@ -91,6 +94,25 @@
     pointer-events: none;
   }
   [hidden] { display: none !important; }
+  /* the events' lines (board req 66), the common room's slips as they stand (req 65, their look provisional with
+     David there): said on a slip by the speaker, heard in faint italic toward where it comes from, written on a scrap;
+     one at a time, a tap on the words puts it away */
+  #lines { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  .line { position: absolute; left: 0; top: 0; pointer-events: auto; cursor: pointer; opacity: 0;
+    transition: opacity 0.35s ease; -webkit-tap-highlight-color: transparent; }
+  .line.on { opacity: 1; }
+  .line.said { max-width: min(330px, 70vw); padding: 9px 13px 10px; background: #efe5cc; color: #2a2016;
+    border-radius: 7px; box-shadow: 0 3px 14px rgba(0,0,0,0.45); font: 400 20px/1.3 "EB Garamond", Georgia, serif; }
+  .line.said::after { content: ''; position: absolute; left: var(--tail, 50%); bottom: -9px; margin-left: -9px;
+    border: 9px solid transparent; border-bottom: 0; border-top-color: #efe5cc; }
+  .line.said.below::after { bottom: auto; top: -9px; border-top: 0; border-bottom: 9px solid #efe5cc; }
+  .line.heard { max-width: min(420px, 80vw); color: #e9dfc6; text-align: center;
+    font: italic 400 21px/1.3 "IM Fell English", Georgia, serif; text-shadow: 0 0 6px #000, 0 0 14px rgba(0,0,0,0.9); }
+  .line.heard.sound { color: #cfc4aa; font-size: 19px; }
+  .line.written { max-width: min(300px, 66vw); padding: 12px 15px; background: #f1e8d2; color: #2b2a4a;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.5); transform-origin: 50% 0; font: 400 21px/1.35 "Short Stack", cursive;
+    white-space: pre-line; }
+  @media (prefers-reduced-motion: reduce) { .line { transition: none; } }
 </style>
 </head>
 <body>
@@ -164,9 +186,12 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <button id="back" type="button" hidden>Back</button>
 <div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door at the end to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
+<div id="lines" aria-live="polite"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=3"></script>
-<script src="castle-events.js?v=8"></script>
+<script src="castle-ear.js?v=1"></script>
+<script src="castle-events.js?v=10"></script>
 <script>
 (function () {
 'use strict';
@@ -865,7 +890,7 @@ if (kit.from === 'room') arriveFromRoom();
 /* ---------- the events runtime (castle-events.js, board req 23) ----------
    Every chain loads (the records' `place` keeps each to its page), this page answers `at`, the stop he stands at, and
    draws the armour and the sticks from the cues their state shows. Poses wait for the armour's sheet, so they are a
-   console note; sounds and lines are the runtime's notes. */
+   console note; the lines are shown (req 66, below), and a sound is a heard line's words until it is recorded. */
 var visorPatch = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.1), new THREE.MeshBasicMaterial({ color: col(0x2e2c2a) }));
 visorPatch.position.set(0, ARMOUR.h / 2 - 0.17, 0.005); visorPatch.visible = false; armour.add(visorPatch);
 var CUE = {
@@ -1024,6 +1049,98 @@ function updateTrevor(dt) {
   trevorHit.rotation.set(0, Math.atan2(camera.position.x - trevorHit.position.x, camera.position.z - trevorHit.position.z), 0);
 }
 function croak(text) { return function () { console.info('[corridor] ' + text + ' (sound later)'); }; }
+
+/* ---------- the events' lines (board req 66; The events runtime, Twenty-fourth session) ----------
+   The common room's way (req 65), kept the same so the two pages read alike: the runtime hands each firing's lines to
+   showLines, then runs its cues, so the lines are queued and played on the frames after, one at a time, each for as
+   long as a slow reader needs; a tap on the words puts them away. Said, on a paper slip by its speaker; heard, in
+   faint italic toward where it comes from, a `sound` in words until it is recorded; written, on a scrap. A line held
+   for the canon gate (`held`, no words) only keeps its turn. This page lists no figures, so a record with a figure in
+   its cast (Neville locked out, a pool student) does not fire here yet, and a line's `then` has no one to walk off.
+   Out here every speaker is a thing on the page, and three of them move, so each is found where it stands now. */
+function worldOf(m, up) { m.updateMatrixWorld(); return m.localToWorld(new THREE.Vector3(0, up || 0, 0)); }
+var SPEAKER_AT = {
+  'fat-lady': function () { return worldOf(her, PORTRAIT_H * 0.32); },
+  percy: function () { return worldOf(her, 0); },                      /* heard through the hole */
+  armour: helmetPos,
+  peeves: function () { return sticks.visible ? sticks.position.clone() : helmetPos(); },
+  trevor: function () { return trevorHit.visible ? trevorHit.position.clone() : helmetPos(); },
+  sitter: function () { return worldOf(paintingOpp, 0); },
+  thing: function () { return new THREE.Vector3(END_X, 1.4, MID_Z); }  /* the door at the end, behind which finds turn up */
+};
+var linesEl = document.getElementById('lines');
+var lineQ = [], lineCur = null;
+function showLines(list) { for (var i = 0; i < list.length; i++) lineQ.push(list[i]); }
+function lineAnchor(l) {
+  if (l.medium === 'written' && l.at === 'hand') return null;          /* in his hand: low in the middle */
+  var at = SPEAKER_AT[l.speaker];
+  return at ? at() : null;
+}
+function lineSeconds(l) {
+  if (l.held) return 1.0;
+  var n = (l.text || '').length + (l.sound || '').length * 0.6;
+  return clamp(2.2 + 0.075 * n, 4, l.medium === 'written' ? 20 : 14);
+}
+function lineElement(l) {
+  var el = document.createElement('div');
+  el.className = 'line ' + l.medium + (l.medium === 'heard' && !l.text ? ' sound' : '');
+  if (l.medium === 'heard') {
+    if (l.sound) { var i = document.createElement('i'); i.textContent = l.sound.charAt(0).toUpperCase() + l.sound.slice(1); el.appendChild(i); }
+    if (l.sound && l.text) el.appendChild(document.createElement('br'));
+    if (l.text) el.appendChild(document.createTextNode('“' + l.text + '”'));
+  } else {
+    el.textContent = l.text;
+    if (l.medium === 'written') el.dataset.rot = ' rotate(' + ((Math.random() - 0.5) * 3).toFixed(1) + 'deg)';
+  }
+  el.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  el.addEventListener('click', function (e) { e.stopPropagation(); if (lineCur && lineCur.el === el) lineCur.t = Math.min(lineCur.t, 0.35); });
+  linesEl.appendChild(el);
+  return el;
+}
+var lineV = new THREE.Vector3();
+function placeLine(c) {
+  var el = c.el, W = window.innerWidth, H = window.innerHeight, w = el.offsetWidth, h = el.offsetHeight;
+  var ax = W / 2, ay = H * 0.8, seen = false;
+  var anchor = lineAnchor(c.line);                                    /* each frame, so a moving speaker is followed */
+  if (anchor) {
+    lineV.copy(anchor).project(camera);
+    if (lineV.z < 1) { ax = (lineV.x + 1) / 2 * W; ay = (1 - lineV.y) / 2 * H; seen = ax > 0 && ax < W && ay > 0 && ay < H; }
+  }
+  var left = clamp(ax - w / 2, 12, W - w - 12), top, below = false;
+  if (c.line.medium === 'said') {
+    top = ay - h - 16;
+    if (top < 60) { top = ay + 18; below = true; }
+    top = clamp(top, 60, H - h - 12);
+    el.classList.toggle('below', below);
+    el.style.setProperty('--tail', seen ? clamp(ax - left, 14, w - 14) + 'px' : '-100px');
+  } else if (c.line.medium === 'written') top = clamp(ay + 10, 60, H - h - 12);
+  else top = clamp(ay - h / 2, 60, H - h - 12);
+  el.style.transform = 'translate(' + Math.round(left) + 'px,' + Math.round(top) + 'px)' + (el.dataset.rot || '');
+}
+function updateLines(dt) {
+  if (lineCur) {
+    lineCur.t -= dt;
+    if (lineCur.el) {
+      if (lineCur.t < 0.35) lineCur.el.classList.remove('on');
+      placeLine(lineCur);
+    }
+    if (lineCur.t <= 0) {
+      if (lineCur.el) linesEl.removeChild(lineCur.el);
+      lineCur = null;
+    }
+  }
+  if (!lineCur && lineQ.length) {
+    var l = lineQ.shift();
+    lineCur = { line: l, t: lineSeconds(l), el: null };
+    if (!l.held && (l.text || l.sound)) {
+      var el = lineElement(l);
+      lineCur.el = el;
+      placeLine(lineCur);
+      requestAnimationFrame(function () { el.classList.add('on'); });
+    }
+  }
+}
+
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'corridor',
@@ -1057,6 +1174,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     }
   },
   drawRoom: corridorDrawRoom,
+  showLines: showLines,
   builtins: { at: function () { return atStop ? atStop.name : 'none'; } }
 }) : null;
 
@@ -1071,6 +1189,7 @@ function frame() {
   updateCamera(dt);
   updateSticks(dt);
   updateTrevor(dt);
+  updateLines(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -1092,7 +1211,8 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS };
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS,
+  lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
