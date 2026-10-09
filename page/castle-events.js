@@ -43,6 +43,10 @@
    hands are matched forgivingly to the `say` moments that hold (`heard()`, which a page may call itself).
    Then `mark next to X` (Trevor's hop, twenty-sixth session): one of the marks the page names next to X's
    (`neighbours`), or with none named another of its set. Nothing in the records waits on the runtime now.
+   Then the password (board req 72, thirtieth session): a chain's `words`, the week's word by its `first_monday`
+   (`password`, `last password`, `next password`, and `{password}` in a line or an intro); `say {password}` hears
+   the word as it stands; `unheard X` when the ear a tap on X opened heard nothing near enough; `day of week`
+   (Monday 1); `speech` reads off where the browser cannot hear, so a spoken thing waits for a tap.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -132,6 +136,7 @@
        `{ 'floor-a': ['floor-b'], 'floor-b': ['floor-a', 'floor-c'] }`. Nearness is the page's, which places them. */
     var neighbours = opts.neighbours || {};
     var bagDefs = {};                            /* each chain's bags, by name */
+    var wordDefs = {};                           /* each chain's week-by-week words, by name (the password) */
     var leaving = false;                         /* while a visit's leave runs, `place` is the page that visit was on */
     var state = load(STATE_KEY);
     if (!state || state.v !== 1) state = freshState();
@@ -183,9 +188,11 @@
         case 'hour': return now.getHours();
         case 'weekday': return WEEKDAYS[now.getDay()];
         case 'week': return weekNumber(now);
+        case 'day of week': return (now.getDay() + 6) % 7 + 1;      /* Monday 1 to Sunday 7, so `day of week >= 4` is Thursday on */
         case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
         case 'slot': return state.slot ? 'taken' : 'free';
-        case 'speech': return settings.speech || 'on';
+        /* off as a parent sets it, or where the browser cannot hear at all, so a spoken thing waits for a tap (the ear's promise) */
+        case 'speech': return ear && ear.available && ear.available() ? settings.speech || 'on' : 'off';
         case 'listening':                    /* the thing tapped, while the ear its tap opened listens, and a beat after */
           var ls = visit && visit.listen;
           return ls && (ls.open || Date.now() < ls.until) ? ls.name : 'none';
@@ -195,7 +202,25 @@
           if (!tapping || !visit || visit.lastTap[tapping] == null) return Infinity;
           return (Date.now() - visit.lastTap[tapping]) / 1000;
       }
+      var wm = /^(?:(last|next) )?([a-z]+)$/.exec(name);
+      if (wm && wordDefs[wm[2]]) return weekWord(wm[2], wm[1] === 'last' ? -1 : wm[1] === 'next' ? 1 : 0);
       return undefined;
+    }
+
+    /* The week's word from a chain's `words` (the password, board req 72): the nth of its list in the nth week since
+       its `first_monday`, so the story starts where Harry's did and both castles agree; the list is only ever added
+       to at its end, so no week's word moves. Past the end it starts again at `again_from` (the first invented
+       word). Before the first Monday it is the first word; `last` before the first week is `none`. */
+    function weekWord(name, off) {
+      var d = wordDefs[name], list = d.list || [];
+      var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(d.first_monday || '');
+      if (!m) note('words ' + name + ': no first_monday, so this week is its first');
+      var first = m ? weekNumber(new Date(+m[1], +m[2] - 1, +m[3])) : weekNumber(nowDate());
+      var n = Math.max(0, weekNumber(nowDate()) - first) + off;
+      if (n < 0 || !list.length) return 'none';
+      var from = Math.min(Math.max(0, d.again_from || 0), list.length - 1);
+      if (n >= list.length) n = from + (n - from) % (list.length - from);
+      return list[n];
     }
 
     function value(name) {
@@ -401,6 +426,14 @@
       return '';
     }
 
+    /* `{password}`, `{last password}`, `{next password}`: a chain's week's words in a line, after `{intro}`. */
+    function fillWords(text) {
+      return text.replace(/\{((?:last |next )?[a-z]+)\}/g, function (all, n) {
+        var v = /^(?:(?:last|next) )?([a-z]+)$/.exec(n);
+        return wordDefs[v[1]] ? String(value(n)) : all;
+      });
+    }
+
     function turnTo(rec, speaker, pose) {
       for (var c = 0; c < visit.cast.length; c++) {
         var f = visit.cast[c];
@@ -422,7 +455,7 @@
         var last = state.said[line.key];
         if (last && k > 1 && last.n < k) { n = Math.floor(Math.random() * (k - 1)); if (n >= last.n) n++; }
         else n = Math.floor(Math.random() * k);
-        text = line.text[n].replace('{intro}', bagIntro(rec));
+        text = fillWords(line.text[n].replace('{intro}', bagIntro(rec)));
         state.said[line.key] = { n: n };
         if (line.medium === 'written') state.written[line.key] = { record: rec.id, key: line.key, hand: line.hand, at: line.at, text: text, day: today() };
       }
@@ -782,6 +815,11 @@
           mine.until = Date.now() + LISTEN_AFTER_S * 1000;
           if (earSession === session) earSession = null;
           note('the ear closed: ' + why);
+          /* Nothing near enough was heard: once the beat a late guess may land in has passed, `unheard <thing>`
+             (the Fat Lady asks again, blaming her ears). Not when a new tap took the ear, or he has gone. */
+          setTimeout(function () {
+            if (visit && visit.listen === mine && !mine.matched) moment('unheard ' + name);
+          }, LISTEN_AFTER_S * 1000);
         }
       });
       earSession = session;
@@ -796,9 +834,12 @@
       for (var i = 0; i < records.length; i++) {
         var m = SAY.exec(records[i].moment || '');
         if (!m || !allHold(records[i].when)) continue;
+        /* `say {password}` hears the week's word as it stands today; the braces are never words a boy says */
+        var words = /^\{.+\}$/.test(m[1]) ? fillWords(m[1]) : m[1];
+        if (/^\{.*\}$/.test(words) || words === 'none') continue;
         for (var g = 0; g < (guesses || []).length; g++) {
           var text = typeof guesses[g] === 'string' ? guesses[g] : guesses[g].text;
-          var sc = match(text, m[1]);
+          var sc = match(text, words);
           if (sc > score) { score = sc; best = m[1]; }
         }
       }
@@ -919,6 +960,8 @@
         for (var t in tg) targets[t] = tg[t];
         var bg = files[f].bags || {};
         for (var b in bg) bagDefs[b] = bg[b];
+        var wd = files[f].words || {};
+        for (var w in wd) wordDefs[w] = wd[w];
         var mk = files[f].marks || {};
         for (var mn in mk) markSets[mn] = (mk[mn] || []).slice();
         var rs = files[f].records || [];
@@ -959,6 +1002,11 @@
       moment: moment,
       tap: tap,
       password: function () { if (visit) checkEnds('password'); },   /* the password given and the Fat Lady swung open */
+      /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
+      words: function (name) {
+        name = name || 'password';
+        return wordDefs[name] ? { last: weekWord(name, -1), now: weekWord(name, 0), next: weekWord(name, 1) } : null;
+      },
       arrive: arrive,
       leave: leave,
       cues: shownCues,
