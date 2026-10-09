@@ -620,6 +620,9 @@ Percy's password note, 9 October 2026 (board req 74, Magic's design; its place G
 centre, 0.24 by 0.30 m on two pins, its words the runtime's (a written line keyed password.percy-note, the week's word
 marked *LIKE THIS*), laid out to fit, the word large a word to a line, NOT underlined twice, a flourish under the name;
 Percy's hand Handlee, provisional (assets/review/percy-hand.jpg).
+the student pool's second sheet, 9 October 2026 (board req 76, People's): cells 4 to 7 on its own texture and scale;
+the two heralds speaking where the fire's listeners stand, the chess pair seated on the rug's front left by their hip
+points with a grey board between them (provisional, assets/review/chess-pair.jpg); a tap on the board raises chess.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -2642,39 +2645,59 @@ function updateTrevor(dt) {
    the seat at 0.42 m. Godric's choice, 9 October 2026, 2.56 pm. The sheet is loaded only when a student first stands (about 7 MB),
    one texture for every card, the cell and its flip in each card's UVs; the standing ones turn to the eye with the
    tables, the sleeper keeps the sofa's line. */
-var POOL = { url: '../assets/layers/students-pool.png', cells: 4, w: 1.65, h: 1.65 * 672 / 660, native: [1, 1, -1, 1] };
+var POOL = { url: '../assets/layers/students-pool.png', cells: 4, w: 1.65, h: 1.65 * 672 / 660, native: [1, 1, -1, 1], first: 0 };
+/* People's second sheet (board req 76, 9 October 2026; The people, "The student pool's second sheet", *Folded*): four
+   cells of 1.00 m at 400 px a metre, here cells 4 to 7 as Magic numbers them: 4 the braids girl and 5 the tall boy,
+   standing, speaking (the heralds), 6 the small boy and 7 the ponytail girl, seated cross-legged on the rug for chess,
+   each placed by its hip point (6 at 0.42 across its cell, 7 at 0.48). Its own texture, loaded when one first stands,
+   about 4.5 MB. */
+var POOL2 = { url: '../assets/layers/students-pool-2.png', cells: 4, w: 1.0, h: 701 / 400, native: [1, -1, 1, -1], first: 4 };
+function poolSheet(cell) { return cell >= POOL2.first ? POOL2 : POOL; }
+/* the chess pair on the hearth rug, its front left before the armchair (provisional, Godric to judge;
+   ?chess=B tries the front right before the wingback), the board between them */
+var CHESS_AT = new URLSearchParams(location.search).get('chess') === 'B' ? new THREE.Vector3(0.95, 0, -1.45) : new THREE.Vector3(-1.27, 0, -1.45);
+var CHESS_GAP = 0.33;                          /* hips either side of the board's centre */
 var FIGURE_SPOTS = {
   0: { x: -1.05, z: -3.95, face: 1 },              /* the fire mark, left of the fire, facing it */
   1: { x: 1.05, z: -3.95, face: -1 },
   2: { x: 1.4, z: -3.75, face: -1 },
-  3: { x: 2.65 + (0.5 - 0.62) * 1.65, z: -1.98, y: 0.42 - 0.05 * POOL.h, face: 1, still: true }   /* the sofa mark */
+  3: { x: 2.65 + (0.5 - 0.62) * 1.65, z: -1.98, y: 0.42 - 0.05 * POOL.h, face: 1, still: true },  /* the sofa mark */
+  4: { x: -1.05, z: -3.95, face: 1 },             /* a herald speaking, where the listener left of the fire stands */
+  5: { x: 1.05, z: -3.95, face: -1 },             /* a herald speaking, right of the fire */
+  6: { x: CHESS_AT.x - CHESS_GAP + 0.08, z: CHESS_AT.z, face: 1 },   /* hips 0.42 across, so the card sits 0.08 right */
+  7: { x: CHESS_AT.x + CHESS_GAP + 0.02, z: CHESS_AT.z, face: -1 }
 };
 var FIGURES = [
   { role: 'pool', cell: 0, pose: 'standing, listening', mark: 'fire' },
   { role: 'pool', cell: 1, pose: 'standing, listening', mark: 'fire' },
   { role: 'pool', cell: 2, pose: 'standing, listening', mark: 'fire' },
   { role: 'pool', cell: 3, pose: 'asleep, a book on the chest', mark: 'sofa' },
+  { role: 'pool', cell: 4, pose: 'standing, speaking', mark: 'fire' },
+  { role: 'pool', cell: 5, pose: 'standing, speaking', mark: 'fire' },
+  { role: 'pool', cell: 6, pose: 'seated cross-legged on the rug', mark: 'fire' },
+  { role: 'pool', cell: 7, pose: 'seated cross-legged on the rug', mark: 'fire' },
   { role: 'ghost', name: 'nearly headless nick', pose: 'turned, bowing', mark: 'hole-stop' }   /* req 69, word for word */
 ];
-var poolTex = null, poolReady = false, poolCards = {};
+var poolCards = {};
 function poolCard(cell) {
   if (poolCards[cell]) return poolCards[cell];
-  if (!poolTex) {
-    poolTex = new THREE.TextureLoader().load(POOL.url, function () {
-      poolReady = true;
-      for (var c in poolCards) poolCards[c].visible = poolCards[c].userData.wanted;
+  var P = poolSheet(cell), k = cell - P.first;
+  if (!P.tex) {
+    P.tex = new THREE.TextureLoader().load(P.url, function () {
+      P.ready = true;
+      for (var c in poolCards) if (poolSheet(+c) === P) poolCards[c].visible = poolCards[c].userData.wanted;
     });
-    poolTex.encoding = THREE.sRGBEncoding;
+    P.tex.encoding = THREE.sRGBEncoding;
   }
-  var s = FIGURE_SPOTS[cell], flip = s.face !== POOL.native[cell];
-  var g = new THREE.PlaneGeometry(POOL.w, POOL.h), uv = g.attributes.uv;
+  var s = FIGURE_SPOTS[cell], flip = s.face !== P.native[k];
+  var g = new THREE.PlaneGeometry(P.w, P.h), uv = g.attributes.uv;
   for (var i = 0; i < uv.count; i++) {
     var u = uv.getX(i); if (flip) u = 1 - u;
-    uv.setX(i, (cell + u) / POOL.cells);
+    uv.setX(i, (k + u) / P.cells);
   }
-  var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: poolTex, color: 0xffffff, alphaTest: 0.5,
+  var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: P.tex, color: 0xffffff, alphaTest: 0.5,
     side: THREE.DoubleSide, roughness: 0.95, metalness: 0 }));
-  m.position.set(s.x, (s.y || 0) + POOL.h / 2, s.z);
+  m.position.set(s.x, (s.y || 0) + P.h / 2, s.z);
   m.name = 'student-' + cell; m.visible = false; m.userData.wanted = false;
   scene.add(m);
   if (!s.still) facers.push(m);
@@ -2689,9 +2712,29 @@ function drawFigures(list) {
     if (!want[c] && !poolCards[c]) continue;
     var m = poolCard(+c);
     m.userData.wanted = !!want[c];
-    m.visible = poolReady && m.userData.wanted;
+    m.visible = !!poolSheet(+c).ready && m.userData.wanted;
   }
+  chessBoard.visible = !!(want[6] || want[7]);
 }
+/* the chess set between the pair (touch.chess's trace, a chess set at the fire): Magic's own piece to draw; until then a
+   grey board 0.32 m square on the rug with a few pieces standing on it, and a tap on it raises `chess` */
+var chessBoard = new THREE.Group();
+(function () {
+  var c = makeCanvas(128, 128), g = c.getContext('2d');
+  for (var i = 0; i < 8; i++) for (var j = 0; j < 8; j++) { g.fillStyle = (i + j) % 2 ? '#56534e' : '#a6a29a'; g.fillRect(i * 16, j * 16, 16, 16); }
+  var board = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.32), new THREE.MeshStandardMaterial({ map: tex(c), roughness: 0.9 }));
+  board.rotation.x = -Math.PI / 2; board.position.y = 0.012;
+  var pc = makeCanvas(128, 40), q = pc.getContext('2d');
+  [[14, '#e8e4dc', 22], [40, '#e8e4dc', 30], [70, '#3a3733', 26], [98, '#3a3733', 34], [116, '#e8e4dc', 20]].forEach(function (p) {
+    q.fillStyle = p[1]; q.beginPath(); q.ellipse(p[0], 40 - p[2] + 6, 5, 6, 0, 0, Math.PI * 2); q.fill(); q.fillRect(p[0] - 5, 40 - p[2] + 8, 10, p[2] - 8);
+  });
+  var pieces = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.094), new THREE.MeshStandardMaterial({ map: tex(pc), transparent: true, alphaTest: 0.5, side: THREE.DoubleSide }));
+  pieces.position.y = 0.012 + 0.047;
+  chessBoard.add(board); chessBoard.add(pieces);                  /* the group turns to the eye (facers, below) */
+  board.userData.chess = pieces.userData.chess = true;
+})();
+chessBoard.position.copy(CHESS_AT); chessBoard.visible = false;
+scene.add(chessBoard);
 
 for (var lid in LAYERS) {
   if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]);
@@ -2833,7 +2876,7 @@ function bellowsTap() {
    table, a plane facing the hearth, read as tilted and flying on the drag left (Godric, 8 October 2026). Both turn about
    their upright to face the eye every frame, so each is always seen as drawn; the round table's code top is round and
    needs no turning. */
-var facers = [table, sideTable, deskChair, candleStand];
+var facers = [table, sideTable, deskChair, candleStand, chessBoard];
 function faceEye() {
   for (var i = 0; i < facers.length; i++) {
     var m = facers[i];
@@ -3148,6 +3191,8 @@ function tap(cx, cy) {
     else leaveFireside();
     return;
   }
+  var chessHit = mode === 'room' && castle && chessBoard.visible ? raycaster.intersectObjects(chessBoard.children, false)[0] : null;
+  if (chessHit && (!hits.length || chessHit.distance <= hits[0].distance)) { castle.tap('chess'); return; }
   var as = mode === 'room' && castle ? figureTapped(hits) : null;
   if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
