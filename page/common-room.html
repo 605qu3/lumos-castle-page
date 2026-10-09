@@ -569,6 +569,12 @@ exemplar (assets/exemplars/log-basket). Two cells cut from the drawing, 1163 x 1
 to tier B for the page, 260 x 236 each, 0.65 by 0.59 m (full size in assets/layers-full). On the hearthstone's front
 left corner, spot 2 (x -1.2, z -4.3), half full by day, full when fire.json shows the relit morning's dry stack, a soft
 pool under it so it sits on the slab. About 26 cents. Checks and the cells are in pipeline/runs/log-basket/r1/.
+Trevor's hop marks, 9 October 2026 (board req 70, the events lane's `mark next to spot`): two about half a metre from
+each hiding spot, each spot and its two a closed group of three passed as `neighbours`, so a tap sends him one hop
+near where he was found; floor-a1 (x -1.9, z 2.3), floor-a2 (x -1.0, z 2.1), floor-b1 (x 2.75, z -1.5), floor-b2
+(x 3.35, z -1.2), floor-c1 (x 3.62, z -2.0), floor-c2 (x 3.1, z -2.5, seen under the sofa's end). Projected with
+stand-ins at rest and both drags on both screens; lost, two marks right of floor-c, behind the stair's foot on the
+iPad's drag left. Tried on a fresh state: two hops within the group, then caught; the prints follow him.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -2317,8 +2323,28 @@ var VISITOR_CUES = {
 var TREVOR_MARKS = {
   'floor-a': new THREE.Vector3(-1.4, 0, 2.4),
   'floor-b': new THREE.Vector3(3.2, 0, -1.65),
-  'floor-c': new THREE.Vector3(3.55, 0, -2.45)
+  'floor-c': new THREE.Vector3(3.55, 0, -2.45),
+  /* his hop marks (board req 70, the events lane's `mark next to spot`): two about half a metre from each hiding spot,
+     so a tap that finds him sends him one hop on, near where he was found, and never across the room. Projected with
+     stand-ins at rest and both full drags at 1180 x 820 and 2560 x 1080. a1 left of floor-a, a2 right, both a little
+     further back: seen as floor-a is, low at rest and on the drag right. b1 and b2 on the floor before the sofa's right end, seen at
+     every view. c2 behind the sofa's end, seen under it at every view; c1 before the end, at the stair's edge on the long
+     drag left as floor-c is. Lost: two marks right of floor-c, hidden behind the stair's foot on the iPad's drag left.
+     Each keeps 0.35 m of depth off every card whose width it sits in (Trevor's half-width included) and off the cat. */
+  'floor-a1': new THREE.Vector3(-1.9, 0, 2.3),
+  'floor-a2': new THREE.Vector3(-1.0, 0, 2.1),
+  'floor-b1': new THREE.Vector3(2.75, 0, -1.5),
+  'floor-b2': new THREE.Vector3(3.35, 0, -1.2),
+  'floor-c1': new THREE.Vector3(3.62, 0, -2.0),
+  'floor-c2': new THREE.Vector3(3.1, 0, -2.5)
 };
+/* which marks are next to which: each spot and its two hop marks are a closed group of three, so he hops round them
+   and is caught near where he was found */
+var TREVOR_NEIGHBOURS = {};
+['a', 'b', 'c'].forEach(function (s) {
+  var group = ['floor-' + s, 'floor-' + s + '1', 'floor-' + s + '2'];
+  group.forEach(function (m) { TREVOR_NEIGHBOURS[m] = group.filter(function (n) { return n !== m; }); });
+});
 var TREVOR_BOX_FOOT = new THREE.Vector3(3.4, 0, -2.75);     /* the floor below the desk's bare end, beside the chair */
 var HOLE_FOOT = holeN.clone().multiplyScalar(WALL_R - 0.15).setY(0);
 var printTex = (function () {
@@ -3153,6 +3179,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
   drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); },
   figures: FIGURES,
   drawFigures: drawFigures,
+  neighbours: TREVOR_NEIGHBOURS,
   builtins: {
     portrait: function () { return portrait.open ? 'open' : 'shut'; },
     'mantel sitter': function () { return sitterPhase(sitters.her); },
