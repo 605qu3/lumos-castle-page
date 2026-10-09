@@ -561,6 +561,14 @@ chairs (hid both). The sheet loads only when a student first stands, about 7 MB,
 the sitters asleep at night, 9 October 2026 (board req 35, People's sleeping cells): at night (night.json's room rule)
 both sit asleep in their own chairs, the loop stopped, nobody visiting; the cells scaled to tier B as the seated sheets
 were, their page scales from People's ratios against the full-size cells. Shot by day and night: same size and seat.
+the stair's trips, 9 October 2026 (board req 20 and 38): a tap on the stair walks to its foot, looks up and loads
+dormitory.html?from=room; ?from=dormitory comes up at the stair's foot looking in at the fire and steps back to rest;
+lights out dims the fire and climbs with &bedtime; a load with no from and the waking saved goes up with ?from=sleep.
+log-basket, round 1: candidate 2 of 2, Godric's pick against the Shoolbred crop (4.25 pm), the house's log-basket
+exemplar (assets/exemplars/log-basket). Two cells cut from the drawing, 1163 x 1055 px each at 1789 px per metre, scaled
+to tier B for the page, 260 x 236 each, 0.65 by 0.59 m (full size in assets/layers-full). On the hearthstone's front
+left corner, spot 2 (x -1.2, z -4.3), half full by day, full when fire.json shows the relit morning's dry stack, a soft
+pool under it so it sits on the slab. About 26 cents. Checks and the cells are in pipeline/runs/log-basket/r1/.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1602,6 +1610,30 @@ var deskChair = cutout(cutoutTexture(128, 244, '#b9b6b0', drawDeskChair, 'chair'
 deskChair.name = 'desk-chair';
 var candleStand = cutout(cutoutTexture(90, 160, '#b9b6b0', drawCandleStand, 'stand'), 0.45, 0.8, -2.55, -3.8, 2);
 candleStand.name = 'candle-stand';
+/* the log basket by the bellows (req 28, the lived-in layer's first piece; Godric, 9 October 2026): the basket maker's
+   drawing, round 1 candidate 2, on the Shoolbred catalogue's wood basket (the house's log-basket exemplar,
+   assets/exemplars/log-basket). Two cells of one sheet: half full by day, full with a neat dry stack the morning after
+   a damp fire (fire.json's relit rule). It stands on the hearthstone's front left corner, spot 2 of
+   assets/review/log-basket-plan.jpg, 0.3 m before the bellows' hook so their float to the grate passes behind its logs;
+   drawn from the front a little from the right, as the eye sees it there, so it stands square to the room, unmirrored. */
+var BASKET = { url: '../assets/layers/log-basket.png', w: 0.65, h: 0.65 * 236 / 260, sink: 0.02, x: -1.2, z: -4.3, y: 0.06 };
+var basketTex = new THREE.TextureLoader().load(BASKET.url, function () { basket.visible = true; });
+basketTex.encoding = THREE.sRGBEncoding;
+basketTex.repeat.set(0.5, 1);
+var basket = cutoutMesh(basketTex, BASKET.w, BASKET.h);
+basket.position.set(BASKET.x, BASKET.y + BASKET.h / 2 - BASKET.sink, BASKET.z);
+basket.name = 'log-basket'; basket.visible = false;
+scene.add(basket); register(basket, 2);
+function basketCell(full) { basketTex.offset.x = full ? 0.5 : 0; }
+/* a soft dark pool where it stands, so it sits on the slab: the card's own shadow falls away from the fire, off the eye */
+var basketPool = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.55), new THREE.MeshBasicMaterial({ map: (function () {
+  var c = makeCanvas(64, 64), g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 4, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.4)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return tex(c);
+})(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+basketPool.rotation.x = -Math.PI / 2;
+basketPool.position.set(BASKET.x, BASKET.y + 0.004, BASKET.z + 0.05);
+scene.add(basketPool);
 var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.75, -3.35, 2);
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
 table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
@@ -2696,6 +2728,7 @@ function updateSmoke(dt) {
 }
 /* the room's cues for the fire chain, matched word for word to fire.json's show strings */
 function fireDrawRoom(shows) {
+  basketCell(shows.indexOf('a neat stack of dry logs beside the hearth') >= 0);
   var damp = shows.indexOf("fire smoking, embers low, the room's light down") >= 0;
   if (damp && !fireDamp) { fireLevel = fireLevelT = DAMP_LEVEL; }
   if (!damp && fireDamp) fireLevelT = 1;
