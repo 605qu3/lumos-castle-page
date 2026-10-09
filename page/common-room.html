@@ -545,6 +545,12 @@ the candle stand, 9 October 2026 (Godric, 2.24 pm, from assets/review/fireside-c
 left it behind the armchair, so it stands beside the armchair's outer arm, x -2.55, z -3.8, whole at rest and at the
 stop's left edge, 0.8 m behind the cat's loop; the log basket keeps spot 2 by the bellows. Lost: beside the wingback
 (x 2.5, z -3.8, hidden behind it at rest); leaving it (mostly hidden).
+Trevor's room half, 9 October 2026 (board req 55, the events lane's req 9): his three floor marks for trevor.json's
+hiding set, floor-a under the round table behind its stem (x -1.4, z 2.4), floor-b by the sofa's right front foot
+(x 3.2, z -1.65), floor-c on the hearthstone beside the log basket (x -0.75, z -4.1), each projected at rest and on both
+full drags and clear of the 0.35 m rule; provisional, put to Godric (assets/review/trevor-spots-plan.jpg). In grey: the
+damp prints from his box to his mark or to the hole, one mesh, and a faint "croak" by the hole while he is in the
+corridor's helmet. Trevor himself waits on his sheet.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -2223,6 +2229,101 @@ var VISITOR_CUES = {
   "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('him', 'stays'); }
 };
 
+/* ---------- Trevor's room half (board req 55, the events lane's req 9; 9 October 2026) ----------
+   trevor.json names three floor marks under `hiding`; these are where they are. Each was projected with a stand-in at
+   rest and on both full drags on the iPad (Placement rules, "Project it first"): floor-a under the round table behind
+   its stem, seen at rest low in the view and on the drag right; floor-b by the sofa's right front foot, seen at every
+   view; floor-c on the hearthstone beside the log basket, seen at rest and hidden behind the basket on the drag left.
+   Each keeps 0.35 m of depth off every card whose width it sits in and off the cat's loop. Provisional, David to judge.
+   Until his sheet is drawn Trevor himself is not drawn; the damp prints and the croak are, in grey: prints laid on the
+   floor in one mesh from his box on the desk to the mark he is at, or to the wall under the portrait hole while he is
+   out in the corridor's helmet, the oldest by the box faintest; and a faint "croak" by the hole now and then. */
+var TREVOR_MARKS = {
+  'floor-a': new THREE.Vector3(-1.4, 0, 2.4),
+  'floor-b': new THREE.Vector3(3.2, 0, -1.65),
+  'floor-c': new THREE.Vector3(-0.75, 0.06, -4.1)
+};
+var TREVOR_BOX_FOOT = new THREE.Vector3(3.4, 0, -2.75);     /* the floor below the desk's bare end, beside the chair */
+var HOLE_FOOT = holeN.clone().multiplyScalar(WALL_R - 0.15).setY(0);
+var printTex = (function () {
+  var c = makeCanvas(32, 32), g = c.getContext('2d');
+  g.fillStyle = '#fff';
+  g.beginPath(); g.ellipse(16, 20, 6, 8, 0, 0, Math.PI * 2); g.fill();
+  [[7, 8], [13, 5], [19, 5], [25, 8]].forEach(function (p) { g.beginPath(); g.arc(p[0], p[1], 2.4, 0, Math.PI * 2); g.fill(); });
+  return tex(c);
+})();
+var printMat = new THREE.MeshBasicMaterial({ map: printTex, color: col(0x1c1a17), transparent: true, opacity: 0.6,
+  depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 });
+var prints = new THREE.Mesh(new THREE.BufferGeometry(), printMat);
+prints.renderOrder = 1; prints.visible = false;
+scene.add(prints);
+/* a toad's trail: pairs of prints every 22 cm along a gentle curve; by the box, the oldest, half have dried away */
+function layPrints(points) {
+  var curve = new THREE.CatmullRomCurve3(points), len = curve.getLength(), n = Math.max(2, Math.floor(len / 0.22));
+  var pos = [], uv = [], idx = [], k = 0, S = 0.045;
+  for (var i = 0; i <= n; i++) {
+    var u = i / n, p = curve.getPointAt(u), t = curve.getTangentAt(u).setY(0).normalize();
+    var side = new THREE.Vector3(-t.z, 0, t.x);
+    for (var f = -1; f <= 1; f += 2) {
+      if (u < 0.35 && (i + (f > 0 ? 1 : 0)) % 2) continue;
+      var c = p.clone().addScaledVector(side, f * 0.04);
+      c.y = (p.y > 0.03 ? p.y : (Math.hypot(c.x, c.z + 2.6) < 2.1 ? 0.004 : 0)) + 0.008;
+      var corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+      for (var q = 0; q < 4; q++) {
+        var v = c.clone().addScaledVector(side, corners[q][0] * S).addScaledVector(t, corners[q][1] * S);
+        pos.push(v.x, v.y, v.z); uv.push((corners[q][0] + 1) / 2, (corners[q][1] + 1) / 2);
+      }
+      idx.push(k, k + 1, k + 2, k, k + 2, k + 3); k += 4;
+    }
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  prints.geometry.dispose(); prints.geometry = g;
+}
+function trailTo(end) {
+  var a = TREVOR_BOX_FOOT, mid = a.clone().lerp(end, 0.5);
+  mid.x += (end.z - a.z) * 0.12; mid.z -= (end.x - a.x) * 0.12;      /* a gentle bow, not a ruled line */
+  return [a.clone(), mid.setY(0), end.clone()];
+}
+var PRINTS_TO_HOLE = [TREVOR_BOX_FOOT.clone(), new THREE.Vector3(2.0, 0, -1.2), new THREE.Vector3(0, 0, -0.35),
+  new THREE.Vector3(-2.3, 0, -1.0), HOLE_FOOT.clone()];
+/* the croak, in grey: a word by the hole that comes and goes, until the sound is made */
+var croak = new THREE.Sprite(new THREE.SpriteMaterial({ map: (function () {
+  var c = makeCanvas(128, 48), g = c.getContext('2d');
+  g.font = 'italic 600 28px Georgia, serif'; g.fillStyle = '#d8d2c4'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('croak', 64, 24);
+  return tex(c);
+})(), transparent: true, depthWrite: false, opacity: 0 }));
+croak.scale.set(0.42, 0.16, 1);
+croak.position.copy(holeC).addScaledVector(holeN, -0.3).add(new THREE.Vector3(0, 0.75, 0));
+croak.visible = false;
+scene.add(croak);
+var trevor = { shows: null, key: '', croakT: 4, croakA: 0 };
+function trevorDrawRoom(shows) { trevor.shows = shows; }     /* read next frame, when the runtime's state can be asked */
+function updateTrevor(dt) {
+  if (trevor.shows) {
+    var sh = trevor.shows; trevor.shows = null;
+    var vars = castle ? castle.state().vars || {} : {};
+    var key = sh.indexOf('prints from box to portrait hole') >= 0 ? 'hole'
+      : (sh.indexOf('prints from box to spot') >= 0 && TREVOR_MARKS[vars.spot]) ? vars.spot : '';
+    if (key !== trevor.key) {
+      trevor.key = key;
+      if (key === 'hole') layPrints(PRINTS_TO_HOLE);
+      else if (key) layPrints(trailTo(TREVOR_MARKS[key]));
+      prints.visible = !!key;
+    }
+    croak.visible = sh.indexOf('faint croak from beyond the hole') >= 0;
+  }
+  if (croak.visible) {
+    trevor.croakT -= dt;
+    if (trevor.croakT <= 0) { trevor.croakA = 1.6; trevor.croakT = 8 + Math.random() * 10; }
+    trevor.croakA = Math.max(0, trevor.croakA - dt);
+    croak.material.opacity = Math.min(1, trevor.croakA) * 0.55;
+  }
+}
+
 for (var lid in LAYERS) {
   if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]);
   else if (LAYERS[lid].portrait) applyPortrait(lid, LAYERS[lid]);
@@ -2872,7 +2973,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the fire catches with a whoosh and the room's light comes up": fireCatches,
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire
   }, VISITOR_CUES),
-  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); },
+  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); trevorDrawRoom(shows); },
   builtins: {
     portrait: function () { return portrait.open ? 'open' : 'shut'; },
     'mantel sitter': function () { return sitterPhase(sitters.her); },
@@ -2904,6 +3005,7 @@ function frame() {
   updatePortrait(dt);
   updateSitters(dt);
   updateOpposite(dt);
+  updateTrevor(dt);
   updatePapers(dt, t);
   updateTapestry(dt, t);
   renderer.render(scene, camera);
@@ -2912,7 +3014,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor };
 })();
 </script>
 </body>
