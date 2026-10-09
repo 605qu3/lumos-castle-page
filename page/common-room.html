@@ -477,6 +477,19 @@ at rest its wing and crest show behind the armchair; on the drag right it stands
 edge; on the drag left it is half behind the armchair and overlaps the ring's lower right, the mouth clear. No hard
 shadow on the wall or the ring. The plan is assets/review/wingback-plan.jpg; the handoff's The desk under the board
 has the rest. Its small side table, queued, goes on its fire side at about x -2.1, z -4.25.
+side-table (the books table), moved under the notice board, 8 October 2026: from x -4.55, z -2.0 by the bookcase to x
+4.05, z -3.35, centred under the board with its back 0.3 m off the wall, the corner the wingback's move uncovered;
+David's choice 1 of three from a corner plan at scale and shots of the table and a grey chair placed at runtime (the
+chair pulled out and turned, and the pair 0.4 m toward the window, lost). The drawing is now mirrored: it was drawn
+seen from in front and to its right, and at rest the eye looks into this corner from the hearth side, so the mirrored
+near end is the end the eye sees nearer; the books go toward the stair, the bare end for Trevor's box toward the sofa.
+It still turns to face the eye and casts through its twin. At rest it sits between the sofa's end and the stair's
+foot; on the drag right the board is centred above it; on the drag left it stands behind the stair, the books glimpsed
+between the treads; the board's walk-up stops above it and shows the board alone. The old spot by the bookcase is left
+clear for her study's door.
+desk-chair, placeholder, 8 October 2026: a grey ladder-back 0.5 by 0.95 m square before the desk at x 3.55, z -2.93,
+0.7 m off the desk's centre line, as the chair pulled up to it (David). Its drawing is the next question; until it
+loads the grey stays (LDP-79).
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -503,7 +516,7 @@ var TILES = {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
-<script src="castle-events.js?v=3"></script>
+<script src="castle-events.js?v=4"></script>
 <script>
 (function () {
 'use strict';
@@ -573,6 +586,14 @@ function drawSideTable(g, w, h) {
   g.fillRect(w * 0.26, h * 0.30, w * 0.44, h * 0.06);
   g.fillRect(w * 0.30, h * 0.22, w * 0.40, h * 0.06);
   g.fillRect(w * 0.24, h * 0.14, w * 0.46, h * 0.06);
+}
+/* the desk chair (David, 8 October 2026): a grey placeholder, a ladder-back seen square, until it is drawn */
+function drawDeskChair(g, w, h) {
+  g.fillRect(w * 0.18, 0, w * 0.08, h * 0.6); g.fillRect(w * 0.74, 0, w * 0.08, h * 0.6);
+  g.fillRect(w * 0.18, h * 0.07, w * 0.64, h * 0.06); g.fillRect(w * 0.18, h * 0.22, w * 0.64, h * 0.06); g.fillRect(w * 0.18, h * 0.37, w * 0.64, h * 0.06);
+  g.fillRect(w * 0.08, h * 0.53, w * 0.84, h * 0.07);
+  g.fillRect(w * 0.12, h * 0.6, w * 0.07, h * 0.4); g.fillRect(w * 0.81, h * 0.6, w * 0.07, h * 0.4);
+  g.fillRect(w * 0.27, h * 0.6, w * 0.05, h * 0.3); g.fillRect(w * 0.68, h * 0.6, w * 0.05, h * 0.3);
 }
 /* the library-high bookcase (David, 7 October 2026): a case of seven shelves, books as a dark band on each */
 function drawBookcase(g, w, h) {
@@ -1496,7 +1517,9 @@ var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2
 var stairs = cutout(cutoutTexture(192, 768, '#aaa7a1', drawStairs, 'stairs'), 1.4, 5.6, 4.67, -1.4, 1);
 var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, -1.9, -1.9, 2);
 var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 0.9, 0.8, -1.2, 2.8, 3);
-var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, -4.55, -2.0, 2);
+var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, 4.05, -3.35, 2);
+var deskChair = cutout(cutoutTexture(128, 244, '#b9b6b0', drawDeskChair, 'chair'), 0.5, 0.95, 3.55, -2.93, 2);
+deskChair.name = 'desk-chair';
 var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, -2.9, -4.0, 2);
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
 table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
@@ -1573,7 +1596,7 @@ var LAYERS = {
   'table': { url: '../assets/layers/table.png', w: 0.62, sink: 0.08 },
   'table-top': { url: '../assets/layers/table-top.png', w: 0.9, plan: true },
   /* drawn long and low: at 1.2 m wide the table stands about 0.72 m, a real side table (David) */
-  'side-table': { url: '../assets/layers/side-table.png', w: 1.2, sink: 0.15 },
+  'side-table': { url: '../assets/layers/side-table.png', w: 1.2, sink: 0.15, mirror: true },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
