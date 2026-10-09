@@ -519,6 +519,15 @@ little above the size they are drawn at there: hers to cells of 174 x 346 and 20
 wide for the wingback, 216 for a window and 174 for a painting, so tier B still holds 1.6 to 2.3 times what the screen
 can show. Shot before and after at 2560 x 1080 and 1180 x 820 with the sitters held: no difference seen. About 124 MB
 freed on the GPU, the room from about 236 to about 112. The full-size drawings are kept in assets/layers-full.
+the fireside, 9 October 2026 (David): the chairs were far from the fire and the wingback off the rug, so the fireside
+group moves in and gets a stop, as the corridor's stops work. The armchair to x -1.8, z -3.45 and the wingback to x
+1.75, z -3.35, mirrored, one each side of the hearth on the rug, both turned to the fire; the sofa forward to x 2.65, z
+-2.1 at the rug's right edge. The stop: at rest a tap on the fire, the bellows, the rug or either chair glides the view
+in to x 0, z 0, 1.35 m up, looking at the hearth, the field of view opened to 50 degrees; there the fire's tap works the
+bellows and the fire chain, and Back or a tap on anything else glides back. The fire's tap at rest no longer stokes.
+The cat's loop came forward 8 cm at its two middle points to keep 0.35 m off the chairs' planes. Lost: both chairs on
+the left nearer the fire (from the stop the wingback fell out of frame; at rest the two overlapped). Mocked at runtime
+from the stop and at rest first; the plan is assets/review/fireside-plan.jpg.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -534,7 +543,7 @@ freed on the GPU, the room from about 236 to about 112. The full-size drawings a
   </div>
 </div>
 <button id="back" type="button" hidden>Back to the room</button>
-<div id="help">Drag to look around. Tap the fire to stoke it, the portrait hole to open it, the cat to make it sit. Tap the notice board to walk up to it, then tap a notice to take it down. The grey shapes are placeholders.</div>
+<div id="help">Drag to look around. Tap the fire, the rug or a chair to go up to the fireside, then tap the fire to work the bellows. Tap the portrait hole to open it, the cat to make it sit. Tap the notice board to walk up to it, then tap a notice to take it down. The grey shapes are placeholders.</div>
 
 <script>
 var TILES = {
@@ -545,7 +554,7 @@ var TILES = {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
-<script src="castle-events.js?v=5"></script>
+<script src="castle-events.js?v=6"></script>
 <script>
 (function () {
 'use strict';
@@ -1549,16 +1558,16 @@ function shareWallStone(map, color) {
 }
 
 /* furniture, back to front */
-var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, 2.3, -3.7, 1);
+var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, 2.65, -2.1, 1);
 var stairs = cutout(cutoutTexture(192, 768, '#aaa7a1', drawStairs, 'stairs'), 1.4, 5.6, 4.67, -1.4, 1);
-var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, -1.9, -1.9, 2);
+var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, -1.8, -3.45, 2);
 var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 0.9, 0.8, -1.2, 2.8, 3);
 var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, 4.05, -3.35, 2);
 var deskChair = cutout(cutoutTexture(128, 244, '#b9b6b0', drawDeskChair, 'chair'), 0.5, 0.95, 3.55, -2.93, 2);
 deskChair.name = 'desk-chair';
 var candleStand = cutout(cutoutTexture(90, 160, '#b9b6b0', drawCandleStand, 'stand'), 0.45, 0.8, -2.1, -4.25, 2);
 candleStand.name = 'candle-stand';
-var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, -2.9, -4.0, 2);
+var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.75, -3.35, 2);
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
 table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
 /* the stair is a card turned to the camera, so the fire sees its flat face and threw a hard spiral on the
@@ -1585,7 +1594,7 @@ scene.add(tableTop); register(tableTop, 3); tableTop.name = 'table-top';
 var LAYERS = {
   'armchair-left': { url: '../assets/layers/armchair-left.png', w: 1.05, sink: 0.067, mirror: true },
   'sofa': { url: '../assets/layers/sofa.png', w: 1.7, sink: 0.068 },
-  'wingback': { url: '../assets/layers/wingback.png', w: 1.1, sink: 0.065, mirror: false },
+  'wingback': { url: '../assets/layers/wingback.png', w: 1.1, sink: 0.065, mirror: true },
   /* wall-hung: pivots at its centre, which stays where onWall put it */
   'tapestry': { url: '../assets/layers/tapestry.png', w: 1.44, pivot: 'centre', flutter: true },
   /* the two paintings are composed on their own canvas so a sitter can be drawn into them */
@@ -2145,8 +2154,8 @@ catGroup.add(catWalk); catGroup.add(catSit);
 register(catWalk, 5); register(catSit, 5);
 var catPath = new THREE.CatmullRomCurve3([
   new THREE.Vector3(2.7, 0, -2.7),
-  new THREE.Vector3(1.0, 0, -3.0),
-  new THREE.Vector3(-1.4, 0, -3.1),
+  new THREE.Vector3(1.0, 0, -2.92),
+  new THREE.Vector3(-1.4, 0, -3.02),
   new THREE.Vector3(-2.8, 0, -2.8),
   new THREE.Vector3(1.6, 0, -2.6)
 ], true, 'catmullrom', 0.5);
@@ -2378,11 +2387,14 @@ function fireDrawRoom(shows) {
 function embersStep() { fireLevelT = Math.min(0.8, fireLevelT + EMBER_STEP); emberBurst = 6; }
 function fireCatches() { fireLevelT = 1; stokeFire(); }
 
-var tappables = [hearthBack, holeTap, catWalk, catSit, bellows].concat(boardParts);
+/* at rest, these glide to the fireside stop */
+var FIRESIDE_TAPS = [hearthBack, bellows, rug, chairL, wingback];
+var tappables = [hearthBack, holeTap, catWalk, catSit, bellows, rug, chairL, wingback].concat(boardParts);
 for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
 
-function startTween(fromPos, fromLook, toPos, toLook, dur, done) {
-  tween = { t: 0, dur: dur, fromPos: fromPos, fromLook: fromLook, toPos: toPos, toLook: toLook, done: done };
+function startTween(fromPos, fromLook, toPos, toLook, dur, done, fromFov, toFov) {
+  tween = { t: 0, dur: dur, fromPos: fromPos, fromLook: fromLook, toPos: toPos, toLook: toLook, done: done,
+            fromFov: fromFov, toFov: toFov };
 }
 function currentLook() {
   var d = new THREE.Vector3();
@@ -2406,6 +2418,32 @@ function leaveBoard() {
   var pos = new THREE.Vector3(), look = new THREE.Vector3();
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 0.9, function () { mode = 'room'; });
+}
+
+/* ---------- the fireside stop (David, 9 October 2026) ----------
+   As the corridor's stops: at rest a tap on the fire, the bellows, the rug or either chair glides the view in to the
+   rug's near edge, square to the hearth, the fire framed by a chair each side; there a tap on the fire or the bellows
+   works them (the fire chain), and Back or a tap on anything else glides back. The stop opens the field of view to 50
+   degrees (69 in portrait, scaled as castle.js scales the rest view's 42), held every frame so a resize keeps it. */
+var FIRESIDE = { pos: new THREE.Vector3(0, CAM_BASE.y, 0), look: new THREE.Vector3(0, 1.1, -4.9), fov: 50 };
+function baseFov() { return camera.aspect < 1 ? 58 : 42; }
+function firesideFov() { return FIRESIDE.fov * baseFov() / 42; }
+function goFireside() {
+  mode = 'tween';
+  startTween(camera.position.clone(), currentLook(), FIRESIDE.pos, FIRESIDE.look, 1.6,
+    function () { mode = 'fireside'; backBtn.hidden = false; }, camera.fov, firesideFov());
+}
+function leaveFireside() {
+  mode = 'tween';
+  backBtn.hidden = true;
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  roomPose(yaw, pitch, pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.6, function () { mode = 'room'; }, camera.fov, baseFov());
+}
+/* the fire's tap works the bellows (Magic for the boys); what the fire does is the fire chain's (fire.json) */
+function fireTap() {
+  bellowsTap();
+  if (castle) castle.tap('fire'); else stokeFire();
 }
 
 var stokeT = 99;
@@ -2482,12 +2520,14 @@ function tap(cx, cy) {
     leaveBoard();
     return;
   }
-  if (mode !== 'room' || !hit) return;
-  if (hit === hearthBack || hit === bellows) {
-    /* the fire's tap works the bellows (Magic for the boys); what the fire does is the fire chain's (fire.json) */
-    bellowsTap();
-    if (castle) castle.tap('fire'); else stokeFire();
+  if (mode === 'fireside') {
+    if (hit === hearthBack || hit === bellows) fireTap();
+    else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
+    else leaveFireside();
+    return;
   }
+  if (mode !== 'room' || !hit) return;
+  if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
   else if (hit === holeTap) { if (portrait.open) climbOut(); else togglePortrait(); }
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
@@ -2567,7 +2607,9 @@ function setShadows(on) {
   renderer.shadowMap.needsUpdate = true;
   btns.shadows.classList.toggle('on', on);
 }
-backBtn.addEventListener('click', function () { if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); });
+backBtn.addEventListener('click', function () {
+  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside();
+});
 
 /* ---------- per frame ---------- */
 
@@ -2582,9 +2624,11 @@ function updateCamera(dt) {
     camera.position.lerpVectors(tween.fromPos, tween.toPos, k);
     lookTmp.lerpVectors(tween.fromLook, tween.toLook, k);
     camera.lookAt(lookTmp);
+    if (tween.toFov != null) { camera.fov = lerp(tween.fromFov, tween.toFov, k); camera.updateProjectionMatrix(); }
     if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
     return;
   }
+  if (mode === 'fireside' && Math.abs(camera.fov - firesideFov()) > 0.01) { camera.fov = firesideFov(); camera.updateProjectionMatrix(); }
   if (mode === 'room') {
     var s = Math.min(1, dt * 7);
     yaw = lerp(yaw, yawT, s);
@@ -2749,7 +2793,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; } };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; } };
 })();
 </script>
 </body>
