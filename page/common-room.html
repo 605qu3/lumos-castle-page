@@ -95,7 +95,24 @@
     pointer-events: none;
   }
   [hidden] { display: none !important; }
-  @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+  /* the events' lines (board req 65): said on a slip by the speaker, heard in faint italic toward where it comes from,
+     written on a scrap in its hand; one at a time, a tap on the words puts it away */
+  #lines { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  .line { position: absolute; left: 0; top: 0; pointer-events: auto; cursor: pointer; opacity: 0;
+    transition: opacity 0.35s ease; -webkit-tap-highlight-color: transparent; }
+  .line.on { opacity: 1; }
+  .line.said { max-width: min(330px, 70vw); padding: 9px 13px 10px; background: #efe5cc; color: #2a2016;
+    border-radius: 7px; box-shadow: 0 3px 14px rgba(0,0,0,0.45); font: 400 20px/1.3 "EB Garamond", Georgia, serif; }
+  .line.said::after { content: ''; position: absolute; left: var(--tail, 50%); bottom: -9px; margin-left: -9px;
+    border: 9px solid transparent; border-bottom: 0; border-top-color: #efe5cc; }
+  .line.said.below::after { bottom: auto; top: -9px; border-top: 0; border-bottom: 9px solid #efe5cc; }
+  .line.heard { max-width: min(420px, 80vw); color: #e9dfc6; text-align: center;
+    font: italic 400 21px/1.3 "IM Fell English", Georgia, serif; text-shadow: 0 0 6px #000, 0 0 14px rgba(0,0,0,0.9); }
+  .line.heard.sound { color: #cfc4aa; font-size: 19px; }
+  .line.written { max-width: min(300px, 66vw); padding: 12px 15px; background: #f1e8d2; color: #2b2a4a;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.5); transform-origin: 50% 0; font: 400 21px/1.35 "Short Stack", cursive;
+    white-space: pre-line; }
+  @media (prefers-reduced-motion: reduce) { .line { transition: none; } }
 </style>
 </head>
 <body>
@@ -575,8 +592,17 @@ near where he was found; floor-a1 (x -1.9, z 2.3), floor-a2 (x -1.0, z 2.1), flo
 (x 3.35, z -1.2), floor-c1 (x 3.62, z -2.0), floor-c2 (x 3.1, z -2.5, seen under the sofa's end). Projected with
 stand-ins at rest and both drags on both screens; lost, two marks right of floor-c, behind the stair's foot on the
 iPad's drag left. Tried on a fresh state: two hops within the group, then caught; the prints follow him.
+the events' lines, 9 October 2026 (board req 65, the events lane's showLines): castle-ear.js loaded and castle-events.js
+to ?v=10. Each firing's lines are queued and played one at a time on the frames after, the speakers kept standing
+until their words are done, so a firing reads entrance, words, walk-off. Said on a paper slip by the speaker's head
+or the mark he speaks from; heard in faint italic toward where it comes from (the stair head, his box, the hole), a
+sound in words; written on a scrap in its hand (Neville the child hand, Wood and Hooch the casual, Pince and, for now,
+Clementine the clerk's). Held for 2.2 s plus 0.075 s a letter, 4 to 14 s (written 20); a tap on the words puts them
+away. A tap on a drawn figure raises its cast name, so the sleeper's mumbles come on a tap (only his card's lower
+part counts). Provisional, Godric to judge the look.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
+<div id="lines" aria-live="polite"></div>
 <div id="hud">
   <div id="stats">starting</div>
   <div id="btns">
@@ -601,7 +627,8 @@ var TILES = {
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
-<script src="castle-events.js?v=9"></script>
+<script src="castle-ear.js?v=1"></script>
+<script src="castle-events.js?v=10"></script>
 <script>
 (function () {
 'use strict';
@@ -2941,6 +2968,8 @@ function tap(cx, cy) {
     else leaveFireside();
     return;
   }
+  var as = mode === 'room' && castle ? figureTapped(hits) : null;
+  if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
   if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
@@ -3165,6 +3194,135 @@ function updatePortrait(dt) {
   }
 }
 
+/* ---------- the events' lines (board req 65; The events runtime, Twenty-fourth session) ----------
+   The runtime hands each firing's lines to showLines, then runs its cues, then calls drawFigures already without a
+   speaker his line's `then` walks off. So the lines are queued and played on the frames after, one at a time, in story
+   order: the speaker stands (the queued lines' own figures are kept drawn), his words show for as long as a slow reader
+   needs, and only when they are done does a walked-off speaker go. A tap on the words puts them away at once (and will
+   play the family recording by `key` and `variant`, once recordings exist).
+   How each medium shows: said, on a paper slip by its speaker (above his head, or the mark he speaks from); heard,
+   in faint italic toward where it comes from (the stair, his box, the hole), a `sound` in words until it is recorded;
+   written, on a scrap in its hand at its place. A line held for the canon gate (`held`, no words) only keeps its
+   speaker's entrance and walk-off. */
+var HANDS = { neville: F.child, wood: F.casual, hooch: F.casual, pince: F.clerk, clementine: F.clerk, print: F.print };
+var STAIR_HEAD = new THREE.Vector3(4.45, 3.0, -0.9);
+var LINE_PLACES = {                            /* where a line with no drawn speaker is said, heard or written */
+  sofa: new THREE.Vector3(3.1, 0.95, -1.98),
+  fire: new THREE.Vector3(0, 1.3, -4.3),
+  'hole-stop': holeC.clone().add(new THREE.Vector3(0, 0.75, 0)),
+  'beyond the hole': holeC.clone().add(new THREE.Vector3(0, 0.75, 0)),
+  board: new THREE.Vector3(4.27, 2.0, -3.53),
+  windowsill: new THREE.Vector3(2.87, 2.15, -4.6)        /* the right window's sill, until the letter is placed */
+};
+var HEARD_FROM = {                             /* off-stage speakers, by name, toward where they are heard */
+  percy: STAIR_HEAD, dorm: STAIR_HEAD, runner: STAIR_HEAD,
+  trevor: new THREE.Vector3(3.45, 0.85, -2.85),
+  sitter: new THREE.Vector3(1.52, 3.6, -5.29),
+  nick: LINE_PLACES['beyond the hole'], armour: LINE_PLACES['beyond the hole'], 'fat-lady': LINE_PLACES['beyond the hole']
+};
+var linesEl = document.getElementById('lines');
+var lineQ = [], lineCur = null, lineCast = [];
+function showLines(list) { for (var i = 0; i < list.length; i++) lineQ.push(list[i]); }
+/* the runtime's cast, with every speaker whose words are still queued or showing kept standing */
+function drawFiguresInOrder(list) { lineCast = list.slice(); standFigures(); }
+function standFigures() {
+  var all = lineCast.slice(), keep = (lineCur ? [lineCur.line] : []).concat(lineQ);
+  keep.forEach(function (l) {
+    (l.figures || []).forEach(function (f) { if (all.indexOf(f) < 0 && !all.some(function (g) { return g.cell === f.cell; })) all.push(f); });
+  });
+  drawFigures(all);
+}
+function lineAnchor(l) {
+  var f = (l.figures || [])[0], s = f && FIGURE_SPOTS[f.cell];
+  if (s && l.medium !== 'heard') return s.still ? new THREE.Vector3(s.x + 0.55, s.y + 0.5, s.z)   /* his head on the arm */
+    : new THREE.Vector3(s.x, s.y + POOL.h * 0.95, s.z);
+  if (l.medium === 'heard') return HEARD_FROM[l.speaker] || null;
+  if (l.at && LINE_PLACES[l.at]) return LINE_PLACES[l.at];
+  var mark = l.who && l.who.mark;
+  return (mark && LINE_PLACES[mark]) || null;
+}
+function lineSeconds(l) {
+  if (l.held) return 1.0;
+  var n = (l.text || '').length + (l.sound || '').length * 0.6;
+  return clamp(2.2 + 0.075 * n, 4, l.medium === 'written' ? 20 : 14);
+}
+function lineElement(l) {
+  var el = document.createElement('div');
+  el.className = 'line ' + l.medium + (l.medium === 'heard' && !l.text ? ' sound' : '');
+  if (l.medium === 'heard') {
+    if (l.sound) { var i = document.createElement('i'); i.textContent = l.sound.charAt(0).toUpperCase() + l.sound.slice(1); el.appendChild(i); }
+    if (l.sound && l.text) el.appendChild(document.createElement('br'));
+    if (l.text) el.appendChild(document.createTextNode('“' + l.text + '”'));
+  } else {
+    el.textContent = l.text;
+    if (l.medium === 'written') {
+      el.style.fontFamily = HANDS[l.hand] || F.child;
+      el.dataset.rot = ' rotate(' + ((Math.random() - 0.5) * 3).toFixed(1) + 'deg)';
+    }
+  }
+  el.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  el.addEventListener('click', function (e) { e.stopPropagation(); if (lineCur && lineCur.el === el) lineCur.t = Math.min(lineCur.t, 0.35); });
+  linesEl.appendChild(el);
+  return el;
+}
+var lineV = new THREE.Vector3();
+function placeLine(c) {
+  var el = c.el, W = window.innerWidth, H = window.innerHeight, w = el.offsetWidth, h = el.offsetHeight;
+  var ax = W / 2, ay = H * 0.8, seen = false;
+  if (c.anchor) {
+    lineV.copy(c.anchor).project(camera);
+    if (lineV.z < 1) { ax = (lineV.x + 1) / 2 * W; ay = (1 - lineV.y) / 2 * H; seen = ax > 0 && ax < W && ay > 0 && ay < H; }
+  }
+  var left = clamp(ax - w / 2, 12, W - w - 12), top, below = false;
+  if (c.line.medium === 'said') {
+    top = ay - h - 16;
+    if (top < 60) { top = ay + 18; below = true; }
+    top = clamp(top, 60, H - h - 12);
+    el.classList.toggle('below', below);
+    el.style.setProperty('--tail', seen ? clamp(ax - left, 14, w - 14) + 'px' : '-100px');
+  } else if (c.line.medium === 'written') top = clamp(ay + 10, 60, H - h - 12);
+  else top = clamp(ay - h / 2, 60, H - h - 12);
+  el.style.transform = 'translate(' + Math.round(left) + 'px,' + Math.round(top) + 'px)' + (el.dataset.rot || '');
+}
+function updateLines(dt) {
+  if (lineCur) {
+    lineCur.t -= dt;
+    if (lineCur.el) {
+      if (lineCur.t < 0.35) lineCur.el.classList.remove('on');
+      placeLine(lineCur);
+    }
+    if (lineCur.t <= 0) {
+      if (lineCur.el) linesEl.removeChild(lineCur.el);
+      lineCur = null;
+      standFigures();                          /* a speaker walked off goes now his words are done */
+    }
+  }
+  if (!lineCur && lineQ.length) {
+    var l = lineQ.shift();
+    lineCur = { line: l, t: lineSeconds(l), anchor: lineAnchor(l), el: null };
+    if (!l.held && (l.text || l.sound)) {
+      var el = lineElement(l);
+      lineCur.el = el;
+      placeLine(lineCur);
+      requestAnimationFrame(function () { el.classList.add('on'); });
+    }
+  }
+}
+/* a tap on a drawn figure raises its cast name (`as`), so a line waiting on a tap (the sleeper's mumbles) is said; the
+   sleeper lies low on his card, so only its lower part counts */
+function figureTapped(hits) {
+  var near = hits.length ? hits[0].distance : Infinity;
+  for (var i = 0; i < lineCast.length; i++) {
+    var f = lineCast[i], m = poolCards[f.cell];
+    if (!f.as || !m || !m.visible) continue;
+    var h = raycaster.intersectObject(m, false)[0];
+    if (!h || h.distance > near) continue;
+    if (FIGURE_SPOTS[f.cell].still && h.point.y > FIGURE_SPOTS[f.cell].y + 0.75) continue;
+    return f.as;
+  }
+  return null;
+}
+
 /* the events runtime (castle-events.js): this room's cues and the built-ins only it can answer */
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
@@ -3178,7 +3336,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
   }, VISITOR_CUES),
   drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); },
   figures: FIGURES,
-  drawFigures: drawFigures,
+  drawFigures: drawFiguresInOrder,
+  showLines: showLines,
   neighbours: TREVOR_NEIGHBOURS,
   builtins: {
     portrait: function () { return portrait.open ? 'open' : 'shut'; },
@@ -3222,6 +3381,7 @@ function frame() {
   updateSitters(dt);
   updateOpposite(dt);
   updateTrevor(dt);
+  updateLines(dt);
   updatePapers(dt, t);
   updateTapestry(dt, t);
   renderer.render(scene, camera);
@@ -3230,7 +3390,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, climbStair: climbStair };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
