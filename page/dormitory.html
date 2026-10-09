@@ -262,9 +262,16 @@ BED_DEGS.forEach(function (deg, i) {
   });
   parts.push(box(g, BED.w, 0.06, BED.l, 0, BED.h - 0.03, BED.l / 2, frameMat, 1));          /* tester */
   parts.push(box(g, BED.w + 0.04, 0.25, BED.l + 0.04, 0, BED.h - 0.19, BED.l / 2, hm, 1));  /* valance */
+  var tied = [], drawn = [];
   [-1, 1].forEach(function (s) {                                                            /* hangings, tied back at the head */
-    parts.push(box(g, 0.12, BED.h - 0.4, 0.55, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, 0.45, hm, 1));
+    var h = box(g, 0.12, BED.h - 0.4, 0.55, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, 0.45, hm, 1);
+    parts.push(h); tied.push(h);
   });
+  /* the hangings drawn for the night (the bedtime, 8 October 2026): full panels down both sides and across the foot,
+     hidden until lights out; lumosGreybox.hangings(name, drawn) flips them */
+  [-1, 1].forEach(function (s) { drawn.push(box(g, 0.12, BED.h - 0.4, BED.l - 0.1, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, BED.l / 2, hm, 1)); });
+  drawn.push(box(g, BED.w + 0.16, BED.h - 0.4, 0.12, 0, (BED.h - 0.4) / 2, BED.l + 0.02, hm, 1));
+  drawn.forEach(function (m) { m.visible = false; m.name = name + '-drawn'; });
   parts.push(box(g, TRUNK.l, TRUNK.h, TRUNK.w, 0, TRUNK.h / 2, BED.l + 0.15 + TRUNK.w / 2, trunkMat, 1));   /* the trunk at the foot, its long side across it */
   parts[parts.length - 1].name = his ? 'trunk-his' : 'trunk-' + (i + 1);
   parts.forEach(function (m) { if (!m.name) m.name = name; });
@@ -277,7 +284,7 @@ BED_DEGS.forEach(function (deg, i) {
     under.push(box(g, 0.02, 0.15, 0.11, 0.24, 0.075, BED.l - 0.4, solid(0x7a736c), 1));
     under[1].name = under[2].name = 'things-his';
   }
-  beds.push({ deg: deg, his: his, name: name, group: g, meshes: parts, under: under });
+  beds.push({ deg: deg, his: his, name: name, group: g, meshes: parts, under: under, tied: tied, drawn: drawn });
 });
 
 /* three high narrow windows, 0.6 by 1.9 m, sills 1.1 m up: a pale sky plane on the wall naming its view (the views are
@@ -309,8 +316,9 @@ var windows = WINDOWS.map(function (W) {
   sill.name = W.name + '-sill';
   var moon = new THREE.PointLight(col(0x9fb6dc), W.name === 'W3' ? 1.1 : 0.6, 8, 1.4);
   var m = pol(WALL_R - 0.6, W.deg); moon.position.set(m.x, 2.4, m.z);
+  moon.userData.base = moon.intensity;
   scene.add(moon);
-  return { name: W.name, deg: W.deg, view: W.view, sky: sky, sill: sill };
+  return { name: W.name, deg: W.deg, view: W.view, sky: sky, sill: sill, moon: moon };
 });
 
 /* the stair head: the well in the floor round the newel, its dark inside, the newel post rising 1.0 m above the floor,
@@ -339,7 +347,21 @@ var wellTap = new THREE.Mesh(new THREE.CircleGeometry(WELL_R + 0.15, 32), new TH
 wellTap.rotation.x = -Math.PI / 2; wellTap.position.y = 0.01; wellTap.visible = false; well.add(wellTap);
 
 /* ---------- light, at night ---------- */
-scene.add(new THREE.HemisphereLight(col(0x2e3448), col(0x1b1613), 0.3));
+var hemi = new THREE.HemisphereLight(col(0x2e3448), col(0x1b1613), 0.3);
+scene.add(hemi);
+/* lights out (the bedtime): the fire banked, the moons and the hemisphere down; lumosGreybox.dim(on) */
+var dimK = 1;
+function dim(on) {
+  dimK = on ? 0.3 : 1;
+  windows.forEach(function (w) { w.moon.intensity = w.moon.userData.base * (on ? 0.4 : 1); });
+  hemi.intensity = on ? 0.12 : 0.3;
+}
+function hangings(name, drawnOn) {
+  var b = beds.filter(function (x) { return x.name === name; })[0];
+  if (!b) return false;
+  b.drawn.forEach(function (m) { m.visible = drawnOn; }); b.tied.forEach(function (m) { m.visible = !drawnOn; });
+  return true;
+}
 var fill = new THREE.DirectionalLight(col(0xffe2c0), 0.18);
 fill.position.set(3, 5, 9);
 scene.add(fill);
@@ -410,6 +432,11 @@ beds.forEach(function (b) { STOPS.push({ name: b.name, meshes: b.meshes, stop: f
     return { pos: g.localToWorld(new THREE.Vector3(-1.2, 0.22, BED.l - 0.45)), look: g.localToWorld(new THREE.Vector3(0.3, 0.1, BED.l - 0.5)) };
   }
   STOPS.push({ name: 'under-his', meshes: his.under, stop: kneel });
+  /* the bedtime's waking frame, for shots and for the bedtime once it is designed: the eye on his pillow looking down
+     the bed to the room; nothing taps it */
+  STOPS.push({ name: 'pillow-his', meshes: [], stop: function () {
+    return { pos: g.localToWorld(new THREE.Vector3(0, 0.85, 0.6)), look: g.localToWorld(new THREE.Vector3(0, 0.45, BED.l + 3.0)) };
+  } });
 })();
 windows.forEach(function (w) { STOPS.push({ name: w.name, meshes: [w.sky, w.sill], stop: function () { return windowStop(w); } }); });
 var tappables = [];
@@ -586,7 +613,7 @@ function frame() {
   updateCamera(dt);
   /* the fire low: a slow flicker */
   var f = 0.85 + 0.15 * Math.sin(t * 9) * Math.sin(t * 3.7);
-  fireGlow.intensity = 1.5 * f;
+  fireGlow.intensity = 1.5 * f * dimK;
   flame.scale.set(0.45 * (0.94 + 0.06 * Math.sin(t * 6.1)), 0.4 * (0.85 + 0.15 * Math.abs(Math.sin(t * 7.9))), 1);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -598,7 +625,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
-  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival };
+  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, dim: dim };
 })();
 </script>
 </body>
