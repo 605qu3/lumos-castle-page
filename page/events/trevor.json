@@ -3,9 +3,39 @@
   "first_visit": [
     "trevor.escape"
   ],
+  "marks": {
+    "hiding": [
+      "floor-a",
+      "floor-b",
+      "floor-c"
+    ],
+    "suit": [
+      "suit-feet",
+      "suit-flags",
+      "suit-sill"
+    ],
+    "homeward": [
+      "halfway",
+      "by-her"
+    ]
+  },
+  "bags": {
+    "chase": [
+      {
+        "item": "by-suit"
+      },
+      {
+        "item": "homeward"
+      },
+      {
+        "item": "in-hand"
+      }
+    ]
+  },
   "room": [
     {
       "when": [
+        "place = common room",
         "trevor != boxed"
       ],
       "show": [
@@ -15,7 +45,9 @@
     },
     {
       "when": [
-        "trevor = loose"
+        "place = common room",
+        "trevor = loose",
+        "trevor_where != corridor"
       ],
       "show": [
         "trevor at spot",
@@ -25,6 +57,7 @@
     },
     {
       "when": [
+        "place = common room",
         "trevor = boxed"
       ],
       "show": [
@@ -33,11 +66,54 @@
     },
     {
       "when": [
+        "place = common room",
         "trevor = boxed",
         "thanks = shown"
       ],
       "show": [
         "notice thanks"
+      ]
+    },
+    {
+      "when": [
+        "place = common room",
+        "trevor = loose",
+        "in_helmet = yes"
+      ],
+      "show": [
+        "prints from box to portrait hole",
+        "faint croak from beyond the hole"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "in_helmet = yes",
+        "time != night"
+      ],
+      "show": [
+        "the armour's visor up, two blinking eyes inside the helmet, a hollow croak now and then"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "in_helmet = yes",
+        "time = night"
+      ],
+      "show": [
+        "the armour's visor down, a croak with its snore, his eyes catching the light through the slit"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "trevor = loose",
+        "trevor_where = corridor",
+        "in_helmet != yes"
+      ],
+      "show": [
+        "trevor at spot"
       ]
     }
   ],
@@ -49,7 +125,7 @@
       "leans": [
         "neville"
       ],
-      "weight": 1,
+      "weight": 2,
       "moment": "arrive",
       "when": [
         "trevor = boxed",
@@ -60,6 +136,9 @@
       "starts": [
         "set trevor = loose",
         "set spot = mark hiding, not last",
+        "set trevor_where = room",
+        "set in_helmet = no",
+        "set last_hide = room",
         "set hops_left = 1-2",
         "stamp loosed_on",
         "take slot",
@@ -107,7 +186,7 @@
       "leans": [
         "neville"
       ],
-      "weight": 1,
+      "weight": 2,
       "moment": "arrive",
       "when": [
         "place = common room",
@@ -143,6 +222,9 @@
       "starts": [
         "set trevor = loose",
         "set spot = mark hiding, not last",
+        "set trevor_where = room",
+        "set in_helmet = no",
+        "set last_hide = room",
         "set hops_left = 1-2",
         "stamp loosed_on",
         "take slot",
@@ -184,6 +266,157 @@
       ]
     },
     {
+      "id": "trevor.escape-helmet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "trevor = boxed",
+        "today >= escape_due",
+        "thanks != due",
+        "slot = free",
+        "found >= 3",
+        "last_hide != helmet"
+      ],
+      "starts": [
+        "set trevor = loose",
+        "set spot = helmet",
+        "set trevor_where = corridor",
+        "set in_helmet = yes",
+        "set last_hide = helmet",
+        "set chase = from bag chase",
+        "set hops_left = 0",
+        "stamp loosed_on",
+        "take slot",
+        "log \"Trevor escaped into the armour {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "trevor = boxed"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set trevor = boxed",
+            "set in_helmet = no",
+            "set thanks = self-found",
+            "stamp escape_due +3-7 days",
+            "free slot",
+            "log \"Neville found Trevor in the armour himself\""
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "neville",
+              "at": "board",
+              "key": "trevor.self-found-helmet",
+              "text": [
+                "Found him in a suit of armour! It was snoring. So was he. N.",
+                "Panic over! He was in a helmet. I don't know whose. N.",
+                "Found him in the armour. Peeves says he taught him to clank. N."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trevor.escape-helmet-heralded",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "trevor = boxed",
+        "today >= escape_due",
+        "thanks != due",
+        "slot = free",
+        "found >= 3",
+        "last_hide != helmet"
+      ],
+      "who": [
+        {
+          "as": "herald",
+          "role": "pool",
+          "count": "2-3",
+          "mark": "fire",
+          "pose": "standing, listening"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "herald",
+          "medium": "said",
+          "pose": "standing, speaking",
+          "key": "trevor.herald-helmet",
+          "text": [
+            "Neville's lost Trevor again! Someone heard croaking out in the corridor.",
+            "Trevor's out. Seamus swears the armour croaked at him.",
+            "Has anyone seen a toad? Neville says the suit of armour's gone all froggy."
+          ]
+        }
+      ],
+      "starts": [
+        "set trevor = loose",
+        "set spot = helmet",
+        "set trevor_where = corridor",
+        "set in_helmet = yes",
+        "set last_hide = helmet",
+        "set chase = from bag chase",
+        "set hops_left = 0",
+        "stamp loosed_on",
+        "take slot",
+        "log \"Trevor escaped into the armour {day}\""
+      ],
+      "ends": [
+        {
+          "when": [
+            "trevor = boxed"
+          ],
+          "do": [
+            "free slot"
+          ]
+        },
+        {
+          "timeout": "7 days",
+          "do": [
+            "set trevor = boxed",
+            "set in_helmet = no",
+            "set thanks = self-found",
+            "stamp escape_due +3-7 days",
+            "free slot",
+            "log \"Neville found Trevor in the armour himself\""
+          ],
+          "lines": [
+            {
+              "medium": "written",
+              "hand": "neville",
+              "at": "board",
+              "key": "trevor.self-found-helmet-heralded",
+              "text": [
+                "Found him in a suit of armour! It was snoring. So was he. N.",
+                "Panic over! He was in a helmet. I don't know whose. N.",
+                "Found him in the armour. Peeves says he taught him to clank. N."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "trevor.hop",
       "tier": "fixed",
       "source": "device",
@@ -192,7 +425,9 @@
       ],
       "moment": "tap trevor",
       "when": [
+        "place = common room",
         "trevor = loose",
+        "trevor_where != corridor",
         "hops_left > 0"
       ],
       "starts": [
@@ -210,6 +445,7 @@
       "moment": "tap trevor",
       "when": [
         "trevor = loose",
+        "in_helmet != yes",
         "hops_left = 0"
       ],
       "starts": [
@@ -228,6 +464,159 @@
             "set trevor = loose"
           ]
         }
+      ]
+    },
+    {
+      "id": "trevor.plop-suit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "in_helmet = yes",
+        "chase = by-suit"
+      ],
+      "starts": [
+        "set in_helmet = no",
+        "set spot = mark suit, not last",
+        "set hops_left = 1-2"
+      ],
+      "show": [
+        "Trevor plops out of the helmet with a hollow croak and lands on the flags by the suit"
+      ]
+    },
+    {
+      "id": "trevor.plop-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "in_helmet = yes",
+        "chase = homeward"
+      ],
+      "starts": [
+        "set in_helmet = no",
+        "set spot = suit-feet",
+        "set hops_left = 2"
+      ],
+      "show": [
+        "Trevor plops out of the helmet with a hollow croak, lands at the suit's feet and eyes the way home"
+      ]
+    },
+    {
+      "id": "trevor.plop-hand",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "in_helmet = yes",
+        "chase = in-hand"
+      ],
+      "starts": [
+        "set in_helmet = no",
+        "set spot = suit-feet",
+        "set hops_left = 0",
+        "set trevor = held"
+      ],
+      "show": [
+        "Trevor plops out of the helmet with a hollow croak, straight into his hand"
+      ],
+      "ends": [
+        {
+          "when": [
+            "trevor = boxed"
+          ],
+          "do": []
+        },
+        {
+          "on": "leave",
+          "do": [
+            "set trevor = loose"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trevor.hop-suit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap trevor",
+      "when": [
+        "place = corridor",
+        "trevor = loose",
+        "trevor_where = corridor",
+        "chase = by-suit",
+        "hops_left > 0"
+      ],
+      "starts": [
+        "add hops_left -1",
+        "set spot = mark suit, not last"
+      ],
+      "show": [
+        "Trevor hops to another spot by the suit"
+      ]
+    },
+    {
+      "id": "trevor.hop-home-a",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap trevor",
+      "when": [
+        "place = corridor",
+        "trevor = loose",
+        "trevor_where = corridor",
+        "chase = homeward",
+        "hops_left = 2"
+      ],
+      "starts": [
+        "add hops_left -1",
+        "set spot = halfway"
+      ],
+      "show": [
+        "Trevor hops off along the corridor toward the Fat Lady, stopping halfway"
+      ]
+    },
+    {
+      "id": "trevor.hop-home-b",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap trevor",
+      "when": [
+        "place = corridor",
+        "trevor = loose",
+        "trevor_where = corridor",
+        "chase = homeward",
+        "hops_left = 1"
+      ],
+      "starts": [
+        "add hops_left -1",
+        "set spot = by-her"
+      ],
+      "show": [
+        "Trevor hops on and sits under the Fat Lady's frame, waiting to be let in"
       ]
     },
     {

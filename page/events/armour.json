@@ -65,7 +65,8 @@
     {
       "when": [
         "place = corridor",
-        "armour_visor = down"
+        "armour_visor = down",
+        "in_helmet != yes"
       ],
       "show": [
         "the armour's visor down"
@@ -405,7 +406,8 @@
         "place = corridor",
         "at = armour",
         "armour_asleep != yes",
-        "armour_visor = down"
+        "armour_visor = down",
+        "in_helmet != yes"
       ],
       "one_of": "armour-knock",
       "weight": 14,
@@ -436,7 +438,8 @@
         "place = corridor",
         "at = armour",
         "armour_asleep != yes",
-        "armour_visor != down"
+        "armour_visor != down",
+        "in_helmet != yes"
       ],
       "one_of": "armour-knock",
       "weight": 14,
@@ -503,7 +506,8 @@
         "armour_asleep != yes",
         "time != night",
         "days since armour_special_on >= 7",
-        "armour_next = about-face"
+        "armour_next = about-face",
+        "in_helmet != yes"
       ],
       "one_of": "armour-knock",
       "weight": 1,
@@ -529,7 +533,8 @@
         "armour_asleep != yes",
         "time != night",
         "days since armour_special_on >= 7",
-        "armour_next = sneeze"
+        "armour_next = sneeze",
+        "in_helmet != yes"
       ],
       "one_of": "armour-knock",
       "weight": 1,
@@ -570,7 +575,8 @@
         "armour_asleep != yes",
         "time != night",
         "days since armour_special_on >= 7",
-        "armour_next = salute"
+        "armour_next = salute",
+        "in_helmet != yes"
       ],
       "one_of": "armour-knock",
       "weight": 1,
@@ -595,7 +601,8 @@
         "armour_asleep != yes",
         "time != night",
         "days since armour_special_on >= 7",
-        "armour_next = hum"
+        "armour_next = hum",
+        "in_helmet != yes"
       ],
       "one_of": "armour-knock",
       "weight": 1,
@@ -633,7 +640,8 @@
         "armour_asleep != yes",
         "time != night",
         "days since armour_special_on >= 7",
-        "armour_next = moth"
+        "armour_next = moth",
+        "in_helmet != yes"
       ],
       "one_of": "armour-knock",
       "weight": 1,
