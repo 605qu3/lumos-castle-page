@@ -91,7 +91,7 @@
             "Where are my socks? Dumbledore says you can never have enough!",
             "Forgot my homework! I'll tell Snape a three-headed dog ate it!"
           ],
-          "canon": "PS 10, swish and flick; PS 12, socks; PS 9, the dog, verify"
+          "canon": "PS 10, swish and flick; PS 12, socks; PS 9, the three-headed dog; checked against the text, 9 October 2026"
         },
         {
           "speaker": "runner",
@@ -172,7 +172,7 @@
           "medium": "said",
           "on_tap": true,
           "key": "touch.chess",
-          "canon": "PS12, verify",
+          "canon": "PS 12, the chessmen shouting advice, \"we can afford to lose him\"; checked against the text, 9 October 2026",
           "text": [
             "Not there, you great lump!",
             "Send me, I'll take him!",

@@ -553,6 +553,8 @@
       "leans": [],
       "moment": "say clementine ashdown",
       "when": [
+        "speech = on",
+        "listening = bookshelf",
         "inked = yes",
         "shelf != open"
       ],

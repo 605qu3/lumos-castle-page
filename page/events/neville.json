@@ -40,7 +40,7 @@
             "Do you know it? She won't let me in.",
             "My Remembrall went red at breakfast. I think this is what I forgot."
           ],
-          "canon": "PS 9, the Remembrall, verify"
+          "canon": "PS 9, the Remembrall turns red, Neville locked out without the new password; checked against the text, 9 October 2026"
         }
       ],
       "starts": [
@@ -62,7 +62,7 @@
                 "Brilliant! My Remembrall's been red all day. I think that was it.",
                 "You're a lifesaver. I'll write it on my hand next time."
               ],
-              "canon": "PS 7, Nearly Headless Nick; PS 9, the Remembrall, verify"
+              "canon": "PS 7, Nearly Headless Nick; PS 9, the Remembrall; checked against the text, 9 October 2026"
             },
             {
               "speaker": "neville",
@@ -166,7 +166,7 @@
           "text": [
             "Trevor got out in Transfiguration and sat on McGonagall's desk. The one she turns into a pig. Five points and a detention. Everyone's going to know forever."
           ],
-          "canon": "PS 8, the desk turned into a pig, verify"
+          "canon": "PS 8, McGonagall's desk into a pig; checked against the text, 9 October 2026"
         }
       ],
       "starts": [
@@ -241,7 +241,7 @@
             "At least it's warm in here.",
             "At least I didn't melt a cauldron this time."
           ],
-          "canon": "PS 8, Seamus's melted cauldron, verify"
+          "canon": "PS 8, Neville melts Seamus's cauldron; checked against the text, 9 October 2026"
         }
       ]
     },
@@ -376,7 +376,7 @@
             "You've been trouble since the boats, haven't you.",
             "There you are. You're in so much trouble. Well, I am."
           ],
-          "canon": "PS 7, Hagrid's \"Is this your toad?\" on the boats, verify"
+          "canon": "PS 6, Hagrid's \"Is this your toad?\" at the boats; checked against the text, 9 October 2026"
         }
       ],
       "starts": [
@@ -485,14 +485,14 @@
             "Good morning, Longbottom. Your scarf. And do keep the toad upstairs; I teach Transfiguration, not toads."
           ],
           "then": "hands the scarf in and goes; the portrait swings shut",
-          "canon": "PS 8, her dry wit (the pocket watch), verify"
+          "canon": "her book manner; the pocket-watch quip is the film's and no line uses it; checked against the text, 9 October 2026"
         },
         {
           "speaker": "neville",
           "medium": "said",
           "pose": "standing, relieved",
           "key": "neville.trouble.after",
-          "canon": "OP12, verify",
+          "canon": "PS 8, matches into needles; OP 12, McGonagall's biscuit; checked against the text, 9 October 2026",
           "text": [
             "She said good morning! Detention was only sorting needles. It wasn't even bad.",
             "It wasn't even bad. I sorted matches and needles and she gave me a biscuit.",
@@ -557,7 +557,7 @@
           "medium": "said",
           "pose": "standing, relieved",
           "key": "neville.trouble.after-later",
-          "canon": "OP12, verify",
+          "canon": "PS 8, matches into needles; OP 12, McGonagall's biscuit; checked against the text, 9 October 2026",
           "text": [
             "She said good morning to me at breakfast like nothing happened! And detention was only sorting needles.",
             "It wasn't even bad. I sorted matches and needles and she gave me a biscuit.",

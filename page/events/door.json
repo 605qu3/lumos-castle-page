@@ -656,7 +656,7 @@
           "speaker": "thing",
           "medium": "heard",
           "key": "door.snap-card",
-          "canon": "PS 13, Exploding Snap, verify",
+          "canon": "CoS 12, Exploding Snap (not in the first book); checked against the text, 9 October 2026",
           "sound": "a bang, and a puff of smoke"
         }
       ],
@@ -691,7 +691,7 @@
           "speaker": "thing",
           "medium": "said",
           "key": "door.pawn",
-          "canon": "PS 12, put back in the box, verify",
+          "canon": "PS 12, a wizard chessman that talks back; the rest the lost things' joke; checked against the text, 9 October 2026",
           "text": [
             "Oh, it's YOU. You LEFT me. On a SOFA.",
             "Do you know what they keep in here? Shoes. Hundreds of shoes. All ODD.",
@@ -738,7 +738,7 @@
           "speaker": "thing",
           "medium": "said",
           "key": "door.bean",
-          "canon": "PS 6, verify",
+          "canon": "PS 6 and PS 17, every flavour, ear wax; checked against the text, 9 October 2026",
           "text": [
             "Dust!",
             "Fluff. With a hint of sock.",
@@ -778,7 +778,7 @@
           "hand": "print",
           "at": "hand",
           "key": "door.wrapper.print",
-          "canon": "PS 6, Harry's frog out of the window, verify",
+          "canon": "the film of PS 1: the frog's escape (the book is silent); checked against the text, 9 October 2026",
           "text": [
             "CHOCOLATE FROG. Contents: one frog (may have left)."
           ]
@@ -855,7 +855,7 @@
           "hand": "print",
           "at": "hand",
           "key": "door.paper-hat",
-          "canon": "PS 12, the cracker's mice and his bonnet, verify",
+          "canon": "PS 12, the rear admiral's hat, the white mice, Dumbledore's flowered bonnet; checked against the text, 9 October 2026",
           "text": [
             "It unfolds into an admiral's hat.",
             "It unfolds into a crown.",
@@ -895,7 +895,7 @@
           "speaker": "thing",
           "medium": "heard",
           "key": "door.sugar-mouse",
-          "canon": "PA 10, verify",
+          "canon": "OP 26, Flitwick's squeaking sugar mice; checked against the text, 9 October 2026",
           "sound": "a squeak"
         }
       ],

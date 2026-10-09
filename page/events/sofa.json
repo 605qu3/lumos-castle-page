@@ -159,7 +159,7 @@
           "speaker": "thing",
           "medium": "said",
           "key": "sofa.pawn",
-          "canon": "PS12, verify",
+          "canon": "PS 12, a wizard chessman that talks back; checked against the text, 9 October 2026",
           "text": [
             "Put me back in the box, you great oaf!",
             "Unhand me! I'm a chessman!",
@@ -205,7 +205,7 @@
           "speaker": "thing",
           "medium": "said",
           "key": "sofa.bean",
-          "canon": "PS6 and PS17, verify; PS 6, George's bogey and Ron's list, verify",
+          "canon": "PS 6, Ron's list, George's bogey, Harry's grass and pepper, Ron's sprouts; PS 17, ear wax; checked against the text, 9 October 2026",
           "text": [
             "Earwax!",
             "Toffee. Phew.",
@@ -250,7 +250,7 @@
           "hand": "print",
           "at": "hand",
           "key": "sofa.wrapper.print",
-          "canon": "PS 6, Harry's frog out of the window, verify",
+          "canon": "the film of PS 1: the frog's escape (the book is silent); checked against the text, 9 October 2026",
           "text": [
             "CHOCOLATE FROG. Contents: one frog (may have left)."
           ]
@@ -325,7 +325,7 @@
           "hand": "print",
           "at": "hand",
           "key": "sofa.paper-hat",
-          "canon": "PS12, verify; PS 12, the cracker's mice and his bonnet, verify",
+          "canon": "PS 12, the rear admiral's hat, the white mice, Dumbledore's flowered bonnet; checked against the text, 9 October 2026",
           "text": [
             "It unfolds into an admiral's hat.",
             "It unfolds into a crown.",
@@ -364,7 +364,7 @@
           "speaker": "thing",
           "medium": "heard",
           "key": "sofa.sugar-mouse",
-          "canon": "PA10, verify",
+          "canon": "OP 26, Flitwick's squeaking sugar mice; checked against the text, 9 October 2026",
           "sound": "a squeak"
         }
       ],
