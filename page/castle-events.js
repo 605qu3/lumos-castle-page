@@ -29,8 +29,11 @@
    Then the ultra review's eleven (9 October 2026, board req 42): a chain's first visit per chain, an end `on:
    password` (the page calls `password()`), a cue may end the visit, an older saved state filled out, and the
    late leave, the hiding snapshot and the open records of chains a page did not load mended.
-   Not yet: figures on marks, lines, `mark next to X`, and the moments quiet and say; a record that needs one of
-   them is skipped with a note in the console, never thrown.
+   Then figures on marks (9 October 2026, board req 40): a page lists the figures it can draw (`figures`), a
+   record's cast is chosen from them when it fires and stands for the rest of the visit, on every page, and the page
+   draws who stands (`drawFigures`). On a page with no list a record with a figure is skipped, as before.
+   Not yet: lines, `mark next to X`, and the moments quiet and say; a record that needs one of them is skipped
+   with a note in the console, never thrown.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -92,6 +95,13 @@
     var cues = opts.cues || {};
     var builtins = opts.builtins || {};
     var drawRoom = opts.drawRoom || function () {};
+    /* The figures this page can draw (board req 40): one entry per figure, pose and mark it can stand in, as
+       `{ role: 'pool', cell: 0, pose: 'standing, listening', mark: 'fire' }` (a pool student by its cell on the pool
+       sheet) or `{ role: 'canon', name: 'the fat lady', pose: ..., mark: 'her frame' }` (a canon figure or a ghost by
+       name), and anything else the page wants handed back. A record's pose and mark must match an entry word for
+       word. A page with no list draws no figures, and a record with a figure in its cast is skipped there. */
+    var figures = opts.figures || null;
+    var drawFigures = opts.drawFigures || function () {};
     var place = opts.place || 'common room';     /* the page this runtime runs on: `common room` or `corridor` */
     var markSets = {};                           /* named sets of the page's marks a draw picks from: the page's `opts.marks`, then each chain's `marks` */
     for (var ms in (opts.marks || {})) markSets[ms] = (opts.marks[ms] || []).slice();
@@ -271,9 +281,50 @@
       return out;
     }
 
+    /* The page draws the room from its cues and the figures standing this visit. */
+    function draw() {
+      drawRoom(shownCues());
+      drawFigures(visit ? visit.cast.slice() : []);
+    }
+
     function changed() {
       save(STATE_KEY, state);
-      drawRoom(shownCues());
+      draw();
+    }
+
+    /* ---------- the cast ---------- */
+
+    /* Who stands where: a record's `who` read against the page's figures. A figure is a pool student by its cell, a
+       canon figure or a ghost by its name, so none stands in two places at once; a mark a figure already holds this
+       visit takes no other. `count` is a number or a range ("2-3"), one when absent. With `pick`, the figures are
+       chosen (at random among those that fit, as many as the range allows); without, it only says whether the cast
+       can be filled, returning the reason it cannot. A trace or a voice needs no figure. */
+    var FIGURE = /^(pool|canon|ghost)$/;
+    function figureKey(f) { return f.role === 'pool' ? 'pool ' + f.cell : f.role + ' ' + f.name; }
+    function castFor(rec, pick) {
+      var who = rec.who || [], used = {}, chosen = [];
+      for (var c = 0; visit && c < visit.cast.length; c++) used[figureKey(visit.cast[c])] = true;
+      for (var w = 0; w < who.length; w++) {
+        var role = who[w];
+        if (!FIGURE.test(role.role)) continue;
+        if (!figures) return 'figures on marks';
+        if (visit && visit.marks[role.mark]) return 'the mark ' + role.mark + ' is taken this visit';
+        var fit = figures.filter(function (f) {
+          return f.role === role.role && (role.role === 'pool' || f.name === role.name) && f.mark === role.mark &&
+                 f.pose === role.pose && !used[figureKey(f)];
+        });
+        var n = /^(\d+)(?:-(\d+))?$/.exec(String(role.count == null ? 1 : role.count));
+        var lo = n ? +n[1] : 1, hi = n && n[2] ? +n[2] : lo;
+        if (fit.length < lo) return 'no figure on this page for ' + (role.name || role.role) + ' "' + role.pose + '" at ' + role.mark;
+        if (!pick) continue;
+        var take = between(lo, Math.min(hi, fit.length));
+        for (var t = 0; t < take; t++) {
+          var f = fit.splice(Math.floor(Math.random() * fit.length), 1)[0];
+          used[figureKey(f)] = true;
+          chosen.push(Object.assign({}, f, { record: rec.id, as: role.as }));
+        }
+      }
+      return pick ? chosen : null;
     }
 
     function fire(rec) {
@@ -281,8 +332,13 @@
       for (var i = 0; i < s.length; i++) effect(s[i], rec);
       /* What the visit keeps of the record is written before its cues, since a cue may end the visit there and
          then (the dormitory's lights out calls `leave()`; until 9 October 2026 this came after and threw). */
-      var who = rec.who || [];                     /* a figure holds its mark for the visit; a trace or a voice does not */
-      for (var w = 0; w < who.length; w++) if (who[w].mark && /^(pool|canon|ghost)$/.test(who[w].role)) visit.marks[who[w].mark] = true;
+      var cast = castFor(rec, true);                /* a figure holds its mark for the visit; a trace or a voice does not */
+      if (typeof cast === 'string') {               /* fired by hand (`fire(id)`) with no figure to stand: the marks only */
+        cast = [];
+        var who = rec.who || [];
+        for (var w = 0; w < who.length; w++) if (who[w].mark && FIGURE.test(who[w].role)) visit.marks[who[w].mark] = true;
+      }
+      for (var cf = 0; cf < cast.length; cf++) { visit.marks[cast[cf].mark] = true; visit.cast.push(cast[cf]); }
       if (rec.tier === 'small') visit.small.push(rec.id);
       if (rec.tier === 'big') { state.lastBigDay = today(); state.lastBigVisit = state.visits; visit.bigDone = true; }
       if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
@@ -294,7 +350,7 @@
       }
       if (rec.lines && rec.lines.length) note(rec.id + ': its lines wait for lines');
       note('fired ' + rec.id);
-      if (!visit) { drawRoom(shownCues()); return; }   /* a cue ended the visit: its leave has saved and ended what it ends */
+      if (!visit) { draw(); return; }              /* a cue ended the visit: its leave has saved and ended what it ends */
       changed();
       checkEnds('change');
     }
@@ -350,7 +406,7 @@
         }
         if (!ended) return;
         save(STATE_KEY, state);
-        drawRoom(shownCues());
+        draw();
         kind = 'change';                              /* after the first end, only `when` ends can follow */
       }
     }
@@ -378,11 +434,12 @@
       return w;
     }
 
-    /* What a record needs that is not built: a figure in its cast (a trace or a voice has no body to draw, so it
-       fires and its lines are noted), a moment the page cannot raise, or a mark draw that needs neighbours. */
+    /* What a record needs that is not built: a figure on a page that draws none (a trace or a voice has no body to
+       draw, so it fires and its lines are noted), a moment the page cannot raise, or a mark draw that needs
+       neighbours. */
     function supported(rec) {
       var who = rec.who || [];
-      for (var w = 0; w < who.length; w++) if (/^(pool|canon|ghost)$/.test(who[w].role)) return 'figures on marks';
+      if (!figures) for (var w = 0; w < who.length; w++) if (FIGURE.test(who[w].role)) return 'figures on marks';
       if (/^(quiet|say)\b/.test(rec.moment || '')) return 'the moment ' + rec.moment;
       if (/mark next to /.test((rec.starts || []).join('|'))) return 'the page\'s mark neighbours';
       return null;
@@ -399,6 +456,8 @@
         if (r.moment !== name || !allHold(r.when)) continue;
         var missing = supported(r);
         if (missing) { note(r.id + ' skipped: the runtime does not yet do ' + missing); continue; }
+        var uncast = castFor(r, false);
+        if (uncast) { note(r.id + ' not drawn: ' + uncast); continue; }
         if (r.tier === 'small' && r.id !== only && (!visit.smallOn || state.lastSmall.indexOf(r.id) >= 0)) continue;
         if (r.tier === 'big' && r.id !== only && (!visit.bigOn || visit.bigDone)) continue;
         if (state.open[r.id]) continue;      /* still open from an earlier moment: it does not start again */
@@ -417,7 +476,7 @@
         var rec = order[j];
         if (rec.tier === 'small' && smallDone) continue;
         if (rec.tier === 'big' && visit.bigDone && rec.id !== only) continue;
-        if (!allHold(rec.when)) continue;
+        if (!allHold(rec.when) || castFor(rec, false)) continue;   /* one fired before it may hold its mark now */
         fire(rec);
         if (!visit) return;                          /* its cue ended the visit */
         if (rec.tier === 'small') smallDone = true;
@@ -451,13 +510,13 @@
     function keep() {
       if (!visit) return;
       state.kept = { id: visit.id, smallOn: visit.smallOn, bigOn: visit.bigOn, bigDone: visit.bigDone,
-                     small: visit.small, marks: visit.marks, pages: visit.pages, played: visit.played,
+                     small: visit.small, marks: visit.marks, cast: visit.cast, pages: visit.pages, played: visit.played,
                      warned: visit.warned, lightsOut: visit.lightsOut };
     }
     function restore() {
       var k = state.kept || {};
       return { id: k.id, smallOn: !!k.smallOn, bigOn: !!k.bigOn, bigDone: k.bigDone !== false, small: k.small || [],
-               marks: k.marks || {}, pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false,
+               marks: k.marks || {}, cast: k.cast || [], pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false,
                played: k.played || 0, warned: !!k.warned, lightsOut: !!k.lightsOut };
     }
 
@@ -469,11 +528,12 @@
       state.visitPlace = place;
       var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
       visit = { id: state.visits, smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [],
-                waits: freshWaits(), lastTap: {}, tapped: false, marks: {}, pages: [place],
+                waits: freshWaits(), lastTap: {}, tapped: false, marks: {}, cast: [], pages: [place],
                 played: 0, warned: false, lightsOut: false };
       save(STATE_KEY, state);
       checkEnds('arrive');
       moment('arrive');
+      draw();
     }
 
     /* The visit carries on onto this page. `arrive` comes the first time a visit reaches a page, so a page's own
@@ -492,6 +552,7 @@
       if (visit.pages.indexOf(place) < 0) { visit.pages.push(place); moment('arrive'); }
       if (was === 'common room' && place === 'corridor') moment('outside');
       if (was === 'corridor' && place === 'common room') moment('enter');
+      draw();
     }
 
     /* The page that loads decides what the last one's going was. `?from=` names the page the visit was on, as the
@@ -543,6 +604,7 @@
       state.kept = null;
       visit = null;
       save(STATE_KEY, state);
+      draw();
     }
 
     /* Called from the room's frame loop, so a wait counts only while the page is drawn: nothing fires while
@@ -652,7 +714,7 @@
         state.started[cn] = true;
       }
       save(STATE_KEY, state);
-      drawRoom(shownCues());
+      draw();
       begin();
     });
 
