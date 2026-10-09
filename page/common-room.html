@@ -8,7 +8,7 @@
 <title>Gryffindor common room, greybox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&family=Quintessential&family=Felipa&family=Petit+Formal+Script&family=Almendra+SC&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&family=Quintessential&family=Almendra+SC&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #070605;
@@ -1051,17 +1051,19 @@ var FONT_LOADS = [
   '400 40px "IM Fell English"', 'italic 400 40px "IM Fell English"', '400 40px "IM Fell English SC"',
   '400 40px "Cinzel"', '400 40px "EB Garamond"', '400 40px "Fondamento"',
   '400 40px "Nothing You Could Do"', '400 40px "Short Stack"',
-  '400 40px "Quintessential"', '400 40px "Felipa"', '400 40px "Petit Formal Script"', '400 40px "Almendra SC"'
+  '400 40px "Quintessential"', '400 40px "Almendra SC"'
 ];
 /* Percy's hand (board req 74; Magic for the boys, "The password's own pieces", *His hand*): a prefect's careful,
    upright round hand, a little proud of its capitals. None of the board's faces fits, so it is this lane's choice,
    put to Godric. His ruling (9 October 2026, 6.13 pm): none of the three marker faces first offered (Handlee,
    Patrick Hand, Coming Soon); a readable italic quill hand for the words, the password itself in his careful printed
-   capitals. Offered: Quintessential (recommended), Felipa, Petit Formal Script; ?percyface=N shows the Nth. Every
-   word he writes all in capitals (the password, GRYFFINDOR TOWER, each NOT) is printed in Almendra SC. */
-var PERCY_FACES = ['"Quintessential", cursive', '"Felipa", cursive', '"Petit Formal Script", cursive'];
+   capitals. His pick (7.05 pm): Quintessential (lost, Felipa and Petit Formal Script). Every word he writes all in
+   capitals (the password, GRYFFINDOR TOWER, each NOT) is printed in Almendra SC. His three touches (7.05 pm): a
+   postscript in smaller writing (a paragraph the runtime begins "P.S."); on Monday the old word struck through with a
+   perfectly ruled line (a password the runtime marks ~like this~ inside its stars); one small ink blot on the first
+   double-underlined NOT. */
 F.percyCaps = '"Almendra SC", "IM Fell English SC", serif';
-F.percy = PERCY_FACES[Math.min(2, Math.max(0, (+new URLSearchParams(location.search).get('percyface') || 1) - 1))];
+F.percy = '"Quintessential", cursive';
 
 var BOARD_W = 1.6, BOARD_H = 1.2, BAIZE_W = 1.48, BAIZE_H = 1.08, FRAME_D = 0.035, FRAME_W = 0.06;
 var PX = 3000;          /* texture pixels per metre of paper */
@@ -1508,7 +1510,7 @@ function drawPercyNote(g, W, H, rnd, spec) {
 /* y is the baseline of the next line; returns where the words end */
 function layPercy(g, W, H, words, k, ink) {
   var face = F.percy, M = 0.1 * W, maxX = W - M, small = 0.064 * W * k, big = 0.13 * W * k;
-  var y = PIN_INSET * PX + 24 + small;
+  var y = PIN_INSET * PX + 24 + small, blotted = false;
   g.fillStyle = g.strokeStyle = '#1d2340'; g.textBaseline = 'alphabetic'; g.shadowBlur = 0;
   var parts = words.split('\n');
   for (var i = 0; i < parts.length; i++) {
@@ -1519,37 +1521,46 @@ function layPercy(g, W, H, words, k, ink) {
       var bit = bits[b].trim();
       if (!bit) continue;
       if (b % 2) {                                    /* a word to a line, centred, capitals */
-        var by = y - small + big + small * 0.35;
+        var by = y - small + big + small * 0.35, struck = /^~.*~$/.test(bit);
+        if (struck) bit = bit.slice(1, -1).trim();
         inkFont(g, big, F.percyCaps);
         bit.split(/\s+/).forEach(function (w) {
-          if (ink) { g.textAlign = 'center'; g.fillText(w.toUpperCase(), W / 2, by); g.textAlign = 'left'; }
+          if (ink) {
+            g.textAlign = 'center'; g.fillText(w.toUpperCase(), W / 2, by); g.textAlign = 'left';
+            if (struck) {                             /* last week's word, struck through with a ruler */
+              var sw = g.measureText(w.toUpperCase()).width;
+              g.lineWidth = 2.4; g.beginPath(); g.moveTo(W / 2 - sw / 2 - 6, by - big * 0.3); g.lineTo(W / 2 + sw / 2 + 6, by - big * 0.3); g.stroke();
+            }
+          }
           by += big * 1.08;
         });
         y = by - big * 1.08 + small * 1.6;
         continue;
       }
-      inkFont(g, small, face);
+      var size = /^P\.\s?S\./.test(bit) ? small * 0.8 : small;   /* the postscript, smaller */
+      inkFont(g, size, face);
       var x = M, sig = /^P\. Weasley/.test(bit), sp = g.measureText(' ').width;
       bit.split(/\s+/).forEach(function (w) {
         var caps = /^[A-Z]{2,}[.,:;!]*$/.test(w);       /* a word all in capitals is printed, a little smaller */
-        if (caps) inkFont(g, small * 0.86, F.percyCaps);
+        if (caps) inkFont(g, size * 0.86, F.percyCaps);
         var ww = g.measureText(w).width;
-        if (x > M && x + ww > maxX) { x = M; y += small * 1.32; }
+        if (x > M && x + ww > maxX) { x = M; y += size * 1.32; }
         if (ink) {
           g.fillText(w, x, y);
           if (/^NOT\b/.test(w)) {                      /* underlined twice */
             var nw = g.measureText('NOT').width;
             g.lineWidth = 2.2; g.beginPath(); g.moveTo(x, y + 6); g.lineTo(x + nw, y + 6); g.moveTo(x + 1, y + 11); g.lineTo(x + nw - 1, y + 11); g.stroke();
+            if (!blotted) { blotted = true; blot(g, x + nw + 3, y + 12, 5, 'rgba(29,35,64,0.92)'); g.fillStyle = '#1d2340'; }
           }
         }
-        if (caps) inkFont(g, small, face);
+        if (caps) inkFont(g, size, face);
         x += ww + sp;
       });
       if (sig && ink) {                               /* the flourish under his name */
         g.lineWidth = 2.6; g.beginPath(); g.moveTo(M, y + 12);
         g.bezierCurveTo(M + 0.25 * W, y + 26, M + 0.45 * W, y + 2, x - 6, y + 14); g.stroke();
       }
-      y += small * 1.32;
+      y += size * 1.32;
     }
   }
   return y - small;
@@ -1648,7 +1659,7 @@ function updatePapers(dt, t) {
   draught = lerp(draught, target, Math.min(1, dt * 2.5));
   for (var i = 0; i < papers.length; i++) {
     var p = papers[i];
-    if (p === held || p.spec.fixed || p.spec.sill) continue;
+    if (p === held || p.spec.fixed || p.spec.sill || p.spec.onScarf) continue;
     var a = p.spec.pins === 'two' ? 0.35 : 1;
     p.pivot.rotation.x = -a * draught * (0.022 * (1 + Math.sin(t * 5.5 + p.phase)) + 0.008 * (1 + Math.sin(t * 9.1 + p.phase * 2)));
     if (p.spec.pins !== 'two') p.pivot.rotation.z = p.spec.rot + draught * 0.012 * Math.sin(t * 4 + p.phase);
@@ -1843,18 +1854,107 @@ scene.add(basketPool);
 /* the house scarf over the armchair's rolled arm on the fire side, one end hanging (req 28 item 2; Godric's spot,
    9 October 2026, 6.13 pm, option 1 of assets/review/scarf-arm-plan.jpg): the knitting mill's drawing on the house
    scarf's exemplar (the Corridor's, assets/exemplars/house-scarf). A card just before the chair's, its top curve on the
-   arm's top about 0.66 m up, casting the fire's shadow as the chair's twin does. ?scarf=N tries round 1's candidates. */
-var SCARF_TRY = +new URLSearchParams(location.search).get('scarf') || 0;   /* until Godric's pick is staged, only on ?scarf=N */
-var SCARF = { url: '../pipeline/runs/house-scarf-arm/r1/cand-' + SCARF_TRY + '.png', w: 0.32, x: -1.44, z: -3.42, top: 0.68 };
-var scarf = null;
-if (SCARF_TRY) new THREE.TextureLoader().load(SCARF.url, function (t) {
+   arm's top about 0.66 m up, casting the fire's shadow as the chair's twin does. Godric's pick, round 1 candidate 2
+   (7.05 pm), staged at tier B, 128 by 232 px. Its long end hangs down the drawing's left 0.42 of its width from 0.4 of
+   its height; the short tail on the right ends there.
+   His three touches (7.05 pm): the hanging end sways a few pixels in the fire's draught, more when the bellows work or
+   the hole stands open; a tap turns the end over to show the name tape his gran sewed in, N. LONGBOTTOM, brought to
+   his hand to read as a notice is, and the next tap puts it back; from lights out the scarf is gone from the arm (he
+   took it up), and it is back by seven the next morning. Not the runtime's night, which starts at dusk, about 6.30 pm
+   in October, while the boys are still about. */
+var SCARF = { url: '../assets/layers/house-scarf-arm.png', w: 0.32, x: -1.44, z: -3.42, top: 0.68,
+              endX: 0.42, endY: 0.4, tapeU: 0.22, tapeV: 0.8, sway: 0.006 };
+var scarf = null, scarfPuff = 0, scarfTurn = { k: 0, to: 0 }, scarfAlpha = null;
+/* a tap counts on the wool only, so the green round it still reaches the armchair behind */
+function alphaOf(im) {
+  var c = makeCanvas(im.width, im.height), g = c.getContext('2d');
+  g.drawImage(im, 0, 0);
+  return { w: im.width, h: im.height, a: g.getImageData(0, 0, im.width, im.height).data };
+}
+function scarfSolid(uv) {
+  if (!scarfAlpha || !uv) return true;
+  var x = Math.min(scarfAlpha.w - 1, Math.floor(uv.x * scarfAlpha.w)), y = Math.min(scarfAlpha.h - 1, Math.floor((1 - uv.y) * scarfAlpha.h));
+  return scarfAlpha.a[(y * scarfAlpha.w + x) * 4 + 3] > 100;
+}
+new THREE.TextureLoader().load(SCARF.url, function (t) {
   t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
   var h = SCARF.w * t.image.height / t.image.width;
   scarf = cutoutMesh(t, SCARF.w, h);
+  scarf.geometry.dispose(); scarf.geometry = new THREE.PlaneGeometry(SCARF.w, h, 12, 16);   /* a column of vertices on the end's edge */
+  scarfAlpha = alphaOf(t.image);
+  scarf.geometry.userData.base = scarf.geometry.attributes.position.array.slice();
   scarf.position.set(SCARF.x, SCARF.top - h / 2, SCARF.z);
   scarf.name = 'house-scarf-arm';
   scene.add(scarf); register(scarf, 2);
+  scarf.visible = !scarfGone();
+  tappables.push(scarf);
+  /* the tape sits on the hanging end's turned-over back, just above the fringe */
+  scarfTape.pivot.position.set(SCARF.x + (SCARF.tapeU - 0.5) * SCARF.w, SCARF.top - SCARF.tapeV * h + (scarfTape.spec.h / 2 - PIN_INSET), SCARF.z + 0.012);
 });
+/* the name tape: a woven cotton tape in red capitals, sewn on with his gran's overcast stitches */
+function drawNameTape(g, W, H, rnd) {
+  g.strokeStyle = 'rgba(150,40,40,0.55)'; g.lineWidth = 2.2;
+  for (var sx = 12; sx < W - 8; sx += 22) {            /* overcast stitches along the top and bottom edges */
+    handLine(g, sx, 2, sx + 5, 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
+    handLine(g, sx + 6, H - 2, sx + 11, H - 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
+  }
+  g.fillStyle = '#b3242c'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  var px = H * 0.46;
+  g.font = 'bold ' + Math.round(px) + 'px Georgia, "Times New Roman", serif';
+  px *= Math.min(1, 0.8 * W / g.measureText('N. LONGBOTTOM').width);
+  g.font = 'bold ' + Math.round(px) + 'px Georgia, "Times New Roman", serif';
+  g.fillText('N. LONGBOTTOM', W / 2, H / 2 + 2);
+  g.textAlign = 'left';
+}
+var scarfTape = (function () {
+  var spec = { id: 'name-tape', w: 0.11, h: 0.03, pin: [0, 0], pins: 'none', rot: 0, z: 0, tile: 'cream', torn: [], age: 0.05,
+    draw: drawNameTape, onScarf: true };
+  var tp = makePaper(spec, papers.length);
+  tp.hidden = true;
+  scene.add(tp.pivot);
+  return tp;
+})();
+function scarfTap() {
+  if (scarfTurn.to || held) return;
+  scarfTurn.to = 1;
+}
+function updateScarf(dt, t) {
+  if (!scarf) return;
+  var g = scarf.geometry, base = g.userData.base, arr = g.attributes.position.array;
+  var w = SCARF.w, h = g.parameters.height, top = h / 2, cx = (SCARF.endX / 2 - 0.5) * w;
+  if (bel.openT > 0.2) scarfPuff = 1;
+  scarfPuff = Math.max(0, scarfPuff - dt * 0.7);
+  var amp = SCARF.sway * (1 + 2.5 * scarfPuff + 1.5 * draught + 0.8 * fireStoke);
+  var sway = amp * (0.7 * Math.sin(t * 0.8) + 0.3 * Math.sin(t * 1.9 + 0.6));
+  /* the turn: over 0.5 s the end rolls over about its own middle; once round, the tape comes to his hand */
+  if (scarfTurn.to !== scarfTurn.k) {
+    scarfTurn.k = scarfTurn.to > scarfTurn.k ? Math.min(1, scarfTurn.k + dt * 2) : Math.max(0, scarfTurn.k - dt * 2);
+    scarfTape.mesh.visible = scarfTurn.k > 0.5;
+    if (scarfTurn.k === 1 && !held) liftPaper(scarfTape);
+  } else if (scarfTurn.k === 1 && !held && !scarfTape.lift) {
+    scarfTurn.to = 0;                                   /* the tape put back: the end turns home */
+  }
+  var turn = Math.cos(Math.PI * scarfTurn.k);
+  for (var i = 0; i < arr.length; i += 3) {
+    var x = base[i], y = base[i + 1], v = (top - y) / h;
+    var hang = smooth01(SCARF.endY, 1, v), onEnd = x < (SCARF.endX - 0.5) * w + 0.02 ? 1 : 0;
+    var roll = onEnd * smooth01(SCARF.endY + 0.15, SCARF.endY + 0.3, v);
+    arr[i] = (x - cx) * (1 + (turn - 1) * roll) + cx + sway * hang * hang;
+    arr[i + 2] = onEnd * roll * Math.sin(Math.PI * scarfTurn.k) * 0.03;
+  }
+  g.attributes.position.needsUpdate = true;
+  scarfTape.pivot.position.x = SCARF.x + (SCARF.tapeU - 0.5) * w + sway;
+}
+var SCARF_GONE_KEY = 'lumos.common-room.scarf-gone-at';
+function scarfGone() {
+  var at = 0;
+  try { at = +localStorage.getItem(SCARF_GONE_KEY) || 0; } catch (e) {}
+  if (!at) return false;
+  var back = new Date(at);
+  if (back.getHours() >= 7) back.setDate(back.getDate() + 1);
+  back.setHours(7, 0, 0, 0);
+  return Date.now() < back.getTime();
+}
 var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.75, -3.35, 2);
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
 table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
@@ -3171,6 +3271,8 @@ function arriveFromStair() {
 /* At lights out the room dims and he goes up; at the warning before it, the fire banks a little (bedtime.json) */
 function lightsOut() {
   fireLevelT = Math.min(fireLevelT, 0.3);
+  try { localStorage.setItem(SCARF_GONE_KEY, String(Date.now())); } catch (e) {}
+  if (scarf) scarf.visible = false;
   if (mode === 'board' || mode === 'hand') leaveBoard();
   tween = null; mode = 'room';
   setTimeout(function () { climbStair(false, 'dormitory.html?from=room&bedtime'); }, 1200);
@@ -3197,7 +3299,10 @@ function tap(cx, cy) {
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
-  var hits = raycaster.intersectObjects(tappables, false).filter(function (h) { return !h.object.userData.paper || h.object.visible; });
+  var hits = raycaster.intersectObjects(tappables, false).filter(function (h) {
+    if (h.object === scarf) return scarf.visible && scarfSolid(h.uv);
+    return !h.object.userData.paper || h.object.visible;
+  });
   var hit = hits.length ? hits[0].object : null;
   if (mode === 'hand') { returnPaper(false); return; }
   if (mode === 'board') {
@@ -3208,6 +3313,7 @@ function tap(cx, cy) {
   }
   if (mode === 'fireside') {
     if (hit === hearthBack || hit === bellows) fireTap();
+    else if (hit && hit === scarf) scarfTap();
     else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
     else leaveFireside();
     return;
@@ -3218,6 +3324,7 @@ function tap(cx, cy) {
   if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
   if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
+  else if (hit === scarf) scarfTap();
   else if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
   /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
@@ -3713,6 +3820,7 @@ function frame() {
   updateNotes();
   updatePapers(dt, t);
   updateTapestry(dt, t);
+  updateScarf(dt, t);
   renderer.render(scene, camera);
   kit.stats(dt);
 }
