@@ -1,0 +1,650 @@
+{
+  "chain": "armour",
+  "bags": {
+    "poses": [
+      {
+        "item": "straight"
+      },
+      {
+        "item": "leaning"
+      },
+      {
+        "item": "listening"
+      },
+      {
+        "item": "other-hand"
+      },
+      {
+        "item": "scratching"
+      }
+    ],
+    "specials": [
+      {
+        "item": "about-face"
+      },
+      {
+        "item": "sneeze"
+      },
+      {
+        "item": "salute"
+      },
+      {
+        "item": "hum"
+      },
+      {
+        "item": "moth"
+      }
+    ]
+  },
+  "marks": {
+    "armour": [
+      "home",
+      "step",
+      "window"
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = corridor",
+        "armour_place = step"
+      ],
+      "show": [
+        "the armour a short step out from its pier into the corridor, on its second mark; its stop follows it"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "armour_place = window"
+      ],
+      "show": [
+        "the armour half in front of the window toward her end, as if looking out, on its third mark; its stop follows it"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "armour_visor = down"
+      ],
+      "show": [
+        "the armour's visor down"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "armour_pose = leaning"
+      ],
+      "show": [
+        "the armour leaning on its halberd with its weight on one leg, as if bored"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "armour_pose = listening"
+      ],
+      "show": [
+        "the armour's head turned toward the Fat Lady's end, as if listening"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "armour_pose = other-hand"
+      ],
+      "show": [
+        "the armour with its halberd in the other hand"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "armour_pose = scratching"
+      ],
+      "show": [
+        "the armour with a hand raised, scratching its helmet"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "armour_face = back"
+      ],
+      "show": [
+        "the armour turned with its back to the corridor"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "armour.still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night"
+      ],
+      "one_of": "armour-shift",
+      "weight": 3
+    },
+    {
+      "id": "armour.visor-down",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_visor != down"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_visor = down"
+      ]
+    },
+    {
+      "id": "armour.visor-up",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_visor = down"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_visor = up"
+      ]
+    },
+    {
+      "id": "armour.steps",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_place = mark armour, not last"
+      ]
+    },
+    {
+      "id": "armour.poses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_pose = from bag poses"
+      ]
+    },
+    {
+      "id": "armour.visor-down-steps",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_visor != down"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_visor = down",
+        "set armour_place = mark armour, not last"
+      ]
+    },
+    {
+      "id": "armour.visor-up-steps",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_visor = down"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_visor = up",
+        "set armour_place = mark armour, not last"
+      ]
+    },
+    {
+      "id": "armour.visor-down-poses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_visor != down"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_visor = down",
+        "set armour_pose = from bag poses"
+      ]
+    },
+    {
+      "id": "armour.visor-up-poses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_visor = down"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_visor = up",
+        "set armour_pose = from bag poses"
+      ]
+    },
+    {
+      "id": "armour.steps-poses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night"
+      ],
+      "one_of": "armour-shift",
+      "weight": 1,
+      "starts": [
+        "set armour_place = mark armour, not last",
+        "set armour_pose = from bag poses"
+      ]
+    },
+    {
+      "id": "armour.sleeps",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time = night"
+      ],
+      "starts": [
+        "set armour_place = home",
+        "set armour_visor = down",
+        "set armour_pose = leaning",
+        "set armour_face = front",
+        "set armour_asleep = yes"
+      ]
+    },
+    {
+      "id": "armour.wakes",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_asleep = yes"
+      ],
+      "starts": [
+        "set armour_asleep = no"
+      ]
+    },
+    {
+      "id": "armour.faces-front",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "armour_face = back"
+      ],
+      "starts": [
+        "set armour_face = front"
+      ]
+    },
+    {
+      "id": "armour.shuffle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "armour_dealt != yes"
+      ],
+      "starts": [
+        "set armour_next = from bag specials",
+        "set armour_dealt = yes"
+      ]
+    },
+    {
+      "id": "armour.walk-up",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at != armour",
+        "armour_asleep != yes"
+      ],
+      "show": [
+        "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does"
+      ]
+    },
+    {
+      "id": "armour.walk-up-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at != armour",
+        "armour_asleep = yes"
+      ],
+      "who": [
+        {
+          "as": "armour",
+          "role": "trace",
+          "what": "the suit of armour",
+          "mark": "armour"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "armour",
+          "medium": "heard",
+          "key": "armour.snore",
+          "sound": "a soft tinny snore from inside the helmet"
+        }
+      ],
+      "show": [
+        "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does"
+      ]
+    },
+    {
+      "id": "armour.knock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep != yes",
+        "armour_visor = down"
+      ],
+      "one_of": "armour-knock",
+      "weight": 14,
+      "who": [
+        {
+          "as": "armour",
+          "role": "trace",
+          "what": "the suit of armour",
+          "mark": "armour"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "armour",
+          "medium": "heard",
+          "key": "armour.clank",
+          "sound": "a hollow clank"
+        }
+      ]
+    },
+    {
+      "id": "armour.knock-visor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep != yes",
+        "armour_visor != down"
+      ],
+      "one_of": "armour-knock",
+      "weight": 14,
+      "who": [
+        {
+          "as": "armour",
+          "role": "trace",
+          "what": "the suit of armour",
+          "mark": "armour"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "armour",
+          "medium": "heard",
+          "key": "armour.clang",
+          "sound": "a hollow clank, then the clang of the visor"
+        }
+      ],
+      "show": [
+        "the open visor drops shut"
+      ],
+      "starts": [
+        "set armour_visor = down"
+      ]
+    },
+    {
+      "id": "armour.knock-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep = yes"
+      ],
+      "who": [
+        {
+          "as": "armour",
+          "role": "trace",
+          "what": "the suit of armour",
+          "mark": "armour"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "armour",
+          "medium": "heard",
+          "key": "armour.snort",
+          "sound": "a snort from inside the helmet, then it settles"
+        }
+      ]
+    },
+    {
+      "id": "armour.about-face",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep != yes",
+        "time != night",
+        "days since armour_special_on >= 7",
+        "armour_next = about-face"
+      ],
+      "one_of": "armour-knock",
+      "weight": 1,
+      "show": [
+        "it turns its back on him, annoyed, and stays so until he has been out"
+      ],
+      "starts": [
+        "set armour_face = back",
+        "stamp armour_special_on",
+        "set armour_next = from bag specials",
+        "log \"The armour turned its back on him {day}\""
+      ]
+    },
+    {
+      "id": "armour.sneeze",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep != yes",
+        "time != night",
+        "days since armour_special_on >= 7",
+        "armour_next = sneeze"
+      ],
+      "one_of": "armour-knock",
+      "weight": 1,
+      "who": [
+        {
+          "as": "armour",
+          "role": "trace",
+          "what": "the suit of armour",
+          "mark": "armour"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "armour",
+          "medium": "heard",
+          "key": "armour.atchoo",
+          "sound": "a tinny atchoo"
+        }
+      ],
+      "show": [
+        "a puff of dust from the visor"
+      ],
+      "starts": [
+        "stamp armour_special_on",
+        "set armour_next = from bag specials",
+        "log \"The armour sneezed {day}\""
+      ]
+    },
+    {
+      "id": "armour.salute",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep != yes",
+        "time != night",
+        "days since armour_special_on >= 7",
+        "armour_next = salute"
+      ],
+      "one_of": "armour-knock",
+      "weight": 1,
+      "show": [
+        "it salutes with its halberd, then stands as it was"
+      ],
+      "starts": [
+        "stamp armour_special_on",
+        "set armour_next = from bag specials",
+        "log \"The armour saluted {day}\""
+      ]
+    },
+    {
+      "id": "armour.hum",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep != yes",
+        "time != night",
+        "days since armour_special_on >= 7",
+        "armour_next = hum"
+      ],
+      "one_of": "armour-knock",
+      "weight": 1,
+      "who": [
+        {
+          "as": "armour",
+          "role": "trace",
+          "what": "the suit of armour",
+          "mark": "armour"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "armour",
+          "medium": "heard",
+          "key": "armour.hum",
+          "sound": "a hum from inside the helmet, a few notes badly out of tune, soon over"
+        }
+      ],
+      "starts": [
+        "stamp armour_special_on",
+        "set armour_next = from bag specials",
+        "log \"The armour hummed {day}\""
+      ]
+    },
+    {
+      "id": "armour.moth",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "armour_asleep != yes",
+        "time != night",
+        "days since armour_special_on >= 7",
+        "armour_next = moth"
+      ],
+      "one_of": "armour-knock",
+      "weight": 1,
+      "show": [
+        "a moth flutters out of the visor and away down the corridor"
+      ],
+      "starts": [
+        "stamp armour_special_on",
+        "set armour_next = from bag specials",
+        "log \"A moth flew out of the armour {day}\""
+      ]
+    }
+  ]
+}

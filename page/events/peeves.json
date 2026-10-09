@@ -1,0 +1,424 @@
+{
+  "chain": "peeves",
+  "bags": {
+    "endings": [
+      {
+        "item": "clatter"
+      },
+      {
+        "item": "scatter"
+      },
+      {
+        "item": "march"
+      },
+      {
+        "item": "boo"
+      },
+      {
+        "item": "drum"
+      },
+      {
+        "item": "stilts"
+      },
+      {
+        "item": "jig"
+      }
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = corridor",
+        "sticks = up"
+      ],
+      "show": [
+        "a bundle of walking sticks bobbing in midair over the middle line, just above head height, at the corridor's spot for them"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "sticks = fallen",
+        "sticks_end != boo"
+      ],
+      "show": [
+        "the fallen sticks lying on the flags under their spot"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "sticks = fallen",
+        "sticks_end = boo"
+      ],
+      "show": [
+        "the fallen sticks lying on the flags spelling BOO!"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "peeves.none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "days since sticks_on >= 1",
+        "sticks_prev != yes"
+      ],
+      "one_of": "peeves-arrive",
+      "weight": 20
+    },
+    {
+      "id": "peeves.sticks",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "days since sticks_on >= 1",
+        "sticks_prev != yes"
+      ],
+      "one_of": "peeves-arrive",
+      "weight": 4,
+      "starts": [
+        "set sticks = up",
+        "set dodges = 1-2",
+        "set sticks_end = from bag endings",
+        "set peeked = no",
+        "set sticks_this = yes",
+        "stamp sticks_on",
+        "log \"Peeves's walking sticks hung in the corridor {day}\"",
+        "set sticks_peeves = no"
+      ]
+    },
+    {
+      "id": "peeves.sticks-seen",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "days since sticks_on >= 1",
+        "sticks_prev != yes"
+      ],
+      "one_of": "peeves-arrive",
+      "weight": 1,
+      "starts": [
+        "set sticks = up",
+        "set dodges = 1-2",
+        "set sticks_end = from bag endings",
+        "set peeked = no",
+        "set sticks_this = yes",
+        "stamp sticks_on",
+        "log \"Peeves's walking sticks hung in the corridor {day}\"",
+        "set sticks_peeves = yes"
+      ]
+    },
+    {
+      "id": "peeves.dodge",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges > 0"
+      ],
+      "show": [
+        "the bundle bobs out of reach, as Trevor hops"
+      ],
+      "starts": [
+        "add dodges -1"
+      ]
+    },
+    {
+      "id": "peeves.peek",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "sticks_peeves = yes",
+        "peeked != yes"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "canon",
+          "name": "peeves",
+          "mark": "sticks",
+          "pose": "popping up over the sticks, gone again at once"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "peeves.raspberry",
+          "sound": "a loud raspberry",
+          "canon": "PS 7, Peeves and the walking sticks, verify"
+        }
+      ],
+      "starts": [
+        "set peeked = yes"
+      ]
+    },
+    {
+      "id": "peeves.clatter",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_end = clatter"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "voice",
+          "mark": "sticks"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "peeves.cackle",
+          "sound": "a cackle"
+        }
+      ],
+      "show": [
+        "the bundle clatters to the flags"
+      ],
+      "starts": [
+        "set sticks = fallen"
+      ]
+    },
+    {
+      "id": "peeves.scatter",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_end = scatter"
+      ],
+      "who": [
+        {
+          "as": "fat-lady",
+          "role": "canon",
+          "name": "the fat lady",
+          "mark": "her frame",
+          "pose": "her own, looking along the corridor"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "peeves.shriek",
+          "canon": "a draft only; her lines are settled in docs/fat-lady-lines.md, verify",
+          "text": [
+            "PEEVES!"
+          ]
+        }
+      ],
+      "show": [
+        "the sticks scatter, rattling off along the floor toward the Fat Lady, and are gone"
+      ],
+      "starts": [
+        "set sticks = gone"
+      ]
+    },
+    {
+      "id": "peeves.march",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_end = march"
+      ],
+      "show": [
+        "the sticks bow, then march off down the stair in a line"
+      ],
+      "starts": [
+        "set sticks = gone"
+      ]
+    },
+    {
+      "id": "peeves.boo",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_end = boo"
+      ],
+      "show": [
+        "the sticks drop and land spelling BOO! on the flags"
+      ],
+      "starts": [
+        "set sticks = fallen"
+      ]
+    },
+    {
+      "id": "peeves.drum",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_end = drum"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "voice",
+          "mark": "sticks"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "peeves.drum",
+          "sound": "a drum roll on the helmet and a clang"
+        }
+      ],
+      "show": [
+        "the sticks drum a roll on the armour's helmet, which clangs, then drop to the flags; the armour never moves"
+      ],
+      "starts": [
+        "set sticks = fallen"
+      ]
+    },
+    {
+      "id": "peeves.stilts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_end = stilts"
+      ],
+      "show": [
+        "two sticks stilt-walk off down the corridor as a pair of legs, the rest tucked under an invisible arm"
+      ],
+      "starts": [
+        "set sticks = gone"
+      ]
+    },
+    {
+      "id": "peeves.jig",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_end = jig"
+      ],
+      "show": [
+        "the sticks dance a quick jig in midair and drop"
+      ],
+      "starts": [
+        "set sticks = fallen"
+      ]
+    },
+    {
+      "id": "peeves.drop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 60-120 s",
+      "when": [
+        "place = corridor",
+        "sticks = up"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "voice",
+          "mark": "sticks"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "peeves.cackle-ignored",
+          "sound": "a cackle"
+        }
+      ],
+      "show": [
+        "ignored, the bundle drops by itself to the flags"
+      ],
+      "starts": [
+        "set sticks = fallen"
+      ]
+    },
+    {
+      "id": "peeves.leave-came",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "place = corridor",
+        "sticks_this = yes"
+      ],
+      "starts": [
+        "set sticks_prev = yes",
+        "set sticks_this = no",
+        "set sticks = gone"
+      ]
+    },
+    {
+      "id": "peeves.leave-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "place = corridor",
+        "sticks_this != yes"
+      ],
+      "starts": [
+        "set sticks_prev = no",
+        "set sticks = gone"
+      ]
+    }
+  ]
+}
