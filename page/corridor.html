@@ -191,7 +191,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=3"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=10"></script>
+<script src="castle-events.js?v=11"></script>
 <script>
 (function () {
 'use strict';
@@ -790,6 +790,7 @@ STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s
    first, whose record walks him up or knocks (the built-in `at` must read where he stood when he tapped); the sticks
    have no stop */
 armour.userData.thing = 'armour';
+her.userData.thing = 'her';   /* at her stop the runtime's `tap her` wakes her for the password (req 79) */
 sticks.userData.thing = 'sticks'; tappables.push(sticks);
 treads.forEach(function (m) { m.userData.thing = 'stair'; });   /* the flight: the runtime's `tap stair` takes him down */
 
@@ -860,10 +861,11 @@ function goBack() {
 
 /* ---------- through the hole (8 October 2026) ----------
    Going in: from her stop she swings open, the view walks into the tunnel and the screen darkens there, and the common
-   room loads and comes up with her swinging shut behind him. Its trigger is the spoken password, when the ear is built;
-   until then only lumosGreybox.enter() calls it, for shots, and nothing on screen opens her. Coming out of the room
+   room loads and comes up with her swinging shut behind him. Its trigger is the spoken password (req 79): a tap at her
+   stop wakes her and opens the ear, and the runtime's cue for every way in calls it; lumosGreybox.enter() still calls it
+   for shots. Coming out of the room
    (?from=room) he arrives at her stop as she shuts; Back goes to the stair head as from any stop. */
-var leaving = false;
+var leaving = false, herOpening = false;
 function enter(dry, url, room) {
   if (leaving || view !== 'length') return false;
   url = url || 'common-room.html?from=corridor'; room = room || 'common-room';
@@ -899,13 +901,16 @@ function arriveFromRoom() {
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
   if (!helpEl.hidden) helpEl.hidden = true;
-  if (tween || leaving || view !== 'length') return;
+  if (tween || leaving || herOpening || view !== 'length') return;
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables.filter(function (m) { return m.visible; }), false);
   if (!hits.length) { goBack(); return; }
   var hit = hits[0].object.userData;
+  /* her (req 79): from afar a tap on her is her walk-up; at her stop it wakes her for the password, raised here inside
+     the tap's own handler, since the runtime opens the ear in it and iOS lets a page listen only from a touch */
+  if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { goTo(hit.stop); return; }
   if (hit.thing && castle && castle.visit()) {
     if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
     castle.tap(hit.thing); return;
@@ -1321,6 +1326,19 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the view sinks down the flight over a few seconds to stand on the landing before the place at its foot; Back brings him up": function () { goDownStair(false); },
     "on the way down the week's vanishing step is not there: the view dips a step with a small oof and goes on down to the landing": function () { goDownStair(true); },
     'stone grinds behind him, low and short, then a soft thud as it settles': function () { showLines([{ medium: 'heard', speaker: 'stair', sound: 'stone grinding behind you, low and short, then a soft thud' }]); },
+    /* the password (req 79; Events' password.json): every way in ends here. Her line is read first (lines play after
+       the cues, so wait until the queue is empty), then she swings open and he walks in, and the runtime is told;
+       a tap meanwhile does nothing. He has answered, so a line still up from before (her "Password?") fades at once,
+       as a tap on a line does, and her answer comes straight after */
+    'the Fat Lady swings open and he climbs through': function () {
+      herOpening = true;
+      if (lineCur) lineCur.t = Math.min(lineCur.t, 0.35);
+      setTimeout(function wait() {
+        if (lineCur || lineQ.length) { setTimeout(wait, 100); return; }
+        herOpening = false;
+        if (enter()) castle.password();
+      }, 50);
+    },
     /* the bedtime (board req 37): out here the Fat Lady sends him in, and he goes on up to bed */
     'the Fat Lady yawns behind her hand and settles her shawl': note('the Fat Lady yawns and settles her shawl'),
     'the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)': function () {
