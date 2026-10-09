@@ -623,16 +623,31 @@ function hangDrawing(m, url, w) {
    the castle's house-scarf drawing, its exemplar the first of its kind */
 SCARF.w = 1.1;
 hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w);
-/* the settle's scarf (req 31; Godric, 9 October 2026: Hufflepuff, 6.15 pm; on the stair-side settle by the mouth, 6.28 pm,
-   from a plan of three): a visitor's, left while waiting to be fetched; the house scarf's drawing recoloured yellow and
-   black in code (pipeline/recolour_scarf.py), 0.9 m across its bends, lying along the seat from the arm at the mouth,
-   seen on a look right as he arrives. 720 by 397, 800 px a metre, about 1.5 MB with mipmaps */
-var SETTLE_SCARF = { x: NOOK_X1 + SETTLE.d / 2, z: NOOK_BACK - SETTLE.len + 0.08 + 0.45, w: 0.9, turn: 84 };
+/* the settle's scarf (req 31; Godric, 9 October 2026: Hufflepuff, 6.15 pm; on the study-side settle by the mouth, 7.05 pm,
+   from a plan of three, since the stair side is never in view as he arrives): a visitor's, left while waiting to be
+   fetched; the house scarf's drawing recoloured yellow and black in code (pipeline/recolour_scarf.py), 0.9 m across its
+   bends, lying along the seat from the arm at the mouth, its top away from him, seen on a look right as he arrives.
+   720 by 397, 800 px a metre, about 1.5 MB with mipmaps */
+var SETTLE_SCARF = { x: NOOK_X0 - SETTLE.d / 2, z: NOOK_BACK - SETTLE.len + 0.08 + 0.45, w: 0.9, turn: -84 };
 var settleScarf = cutoutMesh(cutoutTexture(180, 100, '#c9a227', drawRect), SETTLE_SCARF.w, 0.5);
 settleScarf.rotation.set(-Math.PI / 2, 0, SETTLE_SCARF.turn * Math.PI / 180);
 settleScarf.position.set(SETTLE_SCARF.x, SETTLE.seat + 0.006, SETTLE_SCARF.z);
 settleScarf.name = 'settle-scarf'; scene.add(settleScarf); register(settleScarf, 1);
 hangDrawing(settleScarf, '../assets/layers/settle-scarf.png', SETTLE_SCARF.w);
+/* its name tape (Godric, 7.05 pm): a tap on the scarf bends him over it, and a cotton tape sewn inside the end at the arm
+   turns up, H. ABBOTT in red, the first name the Sorting Hat called (PS 7), a first-year waiting for a Gryffindor friend.
+   Life size, 7 by 1.4 cm, a child of the scarf so it keeps the drawing's turn; once turned up it stays for the visit
+   (my choice). At (95, 75) of the drawing's 720 by 397, on the dark band by the fringe. */
+var TAPE = { w: 0.07, h: 0.014, at: new THREE.Vector3((95 / 720 - 0.5) * SETTLE_SCARF.w, (0.5 - 75 / 397) * SETTLE_SCARF.w * 397 / 720, 0.002) };
+var scarfTape = cutoutMesh(cutoutTexture(500, 100, '#efe6cf', function (g, w, h) {
+  g.fillRect(0, 0, w, h);
+  g.strokeStyle = 'rgba(150,130,100,0.6)'; g.lineWidth = 3; g.setLineDash([9, 7]);
+  g.strokeRect(10, 9, w - 20, h - 18);
+  g.fillStyle = '#a81c1c'; g.font = 'bold 54px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('H. ABBOTT', w / 2, h / 2 + 2);
+}), TAPE.w, TAPE.h);
+scarfTape.position.copy(TAPE.at); scarfTape.visible = false; scarfTape.name = 'scarf-tape';
+settleScarf.add(scarfTape);
 /* the painting opposite (req 33, round 1, candidate 3, Godric, 9 October 2026, 5.11 pm): an empty panelled landing in a
    beaded gilt frame, a door ajar at its right edge, 0.5 by 0.54 m, its own shape about the slot's centre */
 /* A sitter out visiting stands in it (req 58; visitors.json's rules with place corridor), drawn from her own standing
@@ -782,7 +797,13 @@ var STOPS = [
   /* the landing at the flight's foot (req 59): reached by a tap on the flight, standing at its edge square to the end
      wall, the window's lower lights and the flags before it in view */
   { name: 'landing', meshes: treads, stop: function () {
-      return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } }
+      return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } },
+  /* the settle's scarf (7.05 pm): bent over it at the seat's edge, his eye a metre up, looking down at its end by the arm,
+     where its name tape turns up on arrival */
+  { name: 'settle-scarf', meshes: [settleScarf], stop: function () {
+      var t = worldOf(scarfTape);
+      return { pos: new THREE.Vector3(NOOK_X0 - SETTLE.d - 0.12, 1.0, t.z), look: t, fov: 30 }; },
+    arrive: function () { scarfTape.visible = true; } }
 ];
 var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
@@ -845,7 +866,7 @@ function goTo(s) {
   if (s === atStop) return;
   atStop = s; mode = 'stop';
   backBtn.hidden = false;
-  glideTo(s.stop());
+  glideTo(s.stop(), s.arrive);
 }
 function goBack() {
   if (mode !== 'stop') return;
