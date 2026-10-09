@@ -8,7 +8,7 @@
 <title>Gryffindor common room, greybox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&family=Handlee&family=Patrick+Hand&family=Coming+Soon&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&family=Quintessential&family=Felipa&family=Petit+Formal+Script&family=Almendra+SC&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #070605;
@@ -619,10 +619,10 @@ canvas's ground in the hole's view, 0.5 by 0.54 m, a sitter on its painted floor
 Percy's password note, 9 October 2026 (board req 74, Magic's design; its place Godric's, 5.04 pm): a board paper top
 centre, 0.24 by 0.30 m on two pins, its words the runtime's (a written line keyed password.percy-note, the week's word
 marked *LIKE THIS*), laid out to fit, the word large a word to a line, NOT underlined twice, a flourish under the name;
-Percy's hand Handlee, provisional (assets/review/percy-hand.jpg).
+Percy's hand an italic quill with printed capitals (Godric, 6.13 pm, no marker faces); the face with Godric.
 the student pool's second sheet, 9 October 2026 (board req 76, People's): cells 4 to 7 on its own texture and scale;
 the two heralds speaking where the fire's listeners stand, the chess pair seated on the rug's front left by their hip
-points with a grey board between them (provisional, assets/review/chess-pair.jpg); a tap on the board raises chess.
+points with a grey board between them (Godric's spot A, 6.13 pm, People's 1.75 m scale); a tap on the board raises chess.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -651,7 +651,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=10"></script>
+<script src="castle-events.js?v=11"></script>
 <script>
 (function () {
 'use strict';
@@ -1051,13 +1051,16 @@ var FONT_LOADS = [
   '400 40px "IM Fell English"', 'italic 400 40px "IM Fell English"', '400 40px "IM Fell English SC"',
   '400 40px "Cinzel"', '400 40px "EB Garamond"', '400 40px "Fondamento"',
   '400 40px "Nothing You Could Do"', '400 40px "Short Stack"',
-  '400 40px "Handlee"', '400 40px "Patrick Hand"', '400 40px "Coming Soon"'
+  '400 40px "Quintessential"', '400 40px "Felipa"', '400 40px "Petit Formal Script"', '400 40px "Almendra SC"'
 ];
 /* Percy's hand (board req 74; Magic for the boys, "The password's own pieces", *His hand*): a prefect's careful,
    upright round hand, a little proud of its capitals. None of the board's faces fits, so it is this lane's choice,
-   put to Godric with the note: Handlee for now, provisional; Patrick Hand and Coming Soon the others offered.
-   ?percyface=N shows the Nth for the sheet. */
-var PERCY_FACES = ['"Handlee", cursive', '"Patrick Hand", cursive', '"Coming Soon", cursive'];
+   put to Godric. His ruling (9 October 2026, 6.13 pm): none of the three marker faces first offered (Handlee,
+   Patrick Hand, Coming Soon); a readable italic quill hand for the words, the password itself in his careful printed
+   capitals. Offered: Quintessential (recommended), Felipa, Petit Formal Script; ?percyface=N shows the Nth. Every
+   word he writes all in capitals (the password, GRYFFINDOR TOWER, each NOT) is printed in Almendra SC. */
+var PERCY_FACES = ['"Quintessential", cursive', '"Felipa", cursive', '"Petit Formal Script", cursive'];
+F.percyCaps = '"Almendra SC", "IM Fell English SC", serif';
 F.percy = PERCY_FACES[Math.min(2, Math.max(0, (+new URLSearchParams(location.search).get('percyface') || 1) - 1))];
 
 var BOARD_W = 1.6, BOARD_H = 1.2, BAIZE_W = 1.48, BAIZE_H = 1.08, FRAME_D = 0.035, FRAME_W = 0.06;
@@ -1517,7 +1520,7 @@ function layPercy(g, W, H, words, k, ink) {
       if (!bit) continue;
       if (b % 2) {                                    /* a word to a line, centred, capitals */
         var by = y - small + big + small * 0.35;
-        inkFont(g, big, face);
+        inkFont(g, big, F.percyCaps);
         bit.split(/\s+/).forEach(function (w) {
           if (ink) { g.textAlign = 'center'; g.fillText(w.toUpperCase(), W / 2, by); g.textAlign = 'left'; }
           by += big * 1.08;
@@ -1528,6 +1531,8 @@ function layPercy(g, W, H, words, k, ink) {
       inkFont(g, small, face);
       var x = M, sig = /^P\. Weasley/.test(bit), sp = g.measureText(' ').width;
       bit.split(/\s+/).forEach(function (w) {
+        var caps = /^[A-Z]{2,}[.,:;!]*$/.test(w);       /* a word all in capitals is printed, a little smaller */
+        if (caps) inkFont(g, small * 0.86, F.percyCaps);
         var ww = g.measureText(w).width;
         if (x > M && x + ww > maxX) { x = M; y += small * 1.32; }
         if (ink) {
@@ -1537,6 +1542,7 @@ function layPercy(g, W, H, words, k, ink) {
             g.lineWidth = 2.2; g.beginPath(); g.moveTo(x, y + 6); g.lineTo(x + nw, y + 6); g.moveTo(x + 1, y + 11); g.lineTo(x + nw - 1, y + 11); g.stroke();
           }
         }
+        if (caps) inkFont(g, small, face);
         x += ww + sp;
       });
       if (sig && ink) {                               /* the flourish under his name */
@@ -1834,6 +1840,21 @@ var basketPool = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.55), new THREE.Me
 basketPool.rotation.x = -Math.PI / 2;
 basketPool.position.set(BASKET.x, BASKET.y + 0.004, BASKET.z + 0.05);
 scene.add(basketPool);
+/* the house scarf over the armchair's rolled arm on the fire side, one end hanging (req 28 item 2; Godric's spot,
+   9 October 2026, 6.13 pm, option 1 of assets/review/scarf-arm-plan.jpg): the knitting mill's drawing on the house
+   scarf's exemplar (the Corridor's, assets/exemplars/house-scarf). A card just before the chair's, its top curve on the
+   arm's top about 0.66 m up, casting the fire's shadow as the chair's twin does. ?scarf=N tries round 1's candidates. */
+var SCARF_TRY = +new URLSearchParams(location.search).get('scarf') || 0;   /* until Godric's pick is staged, only on ?scarf=N */
+var SCARF = { url: '../pipeline/runs/house-scarf-arm/r1/cand-' + SCARF_TRY + '.png', w: 0.32, x: -1.44, z: -3.42, top: 0.68 };
+var scarf = null;
+if (SCARF_TRY) new THREE.TextureLoader().load(SCARF.url, function (t) {
+  t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  var h = SCARF.w * t.image.height / t.image.width;
+  scarf = cutoutMesh(t, SCARF.w, h);
+  scarf.position.set(SCARF.x, SCARF.top - h / 2, SCARF.z);
+  scarf.name = 'house-scarf-arm';
+  scene.add(scarf); register(scarf, 2);
+});
 var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.75, -3.35, 2);
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
 table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
@@ -2653,9 +2674,9 @@ var POOL = { url: '../assets/layers/students-pool.png', cells: 4, w: 1.65, h: 1.
    about 4.5 MB. */
 var POOL2 = { url: '../assets/layers/students-pool-2.png', cells: 4, w: 1.0, h: 701 / 400, native: [1, -1, 1, -1], first: 4 };
 function poolSheet(cell) { return cell >= POOL2.first ? POOL2 : POOL; }
-/* the chess pair on the hearth rug, its front left before the armchair (provisional, Godric to judge;
-   ?chess=B tries the front right before the wingback), the board between them */
-var CHESS_AT = new URLSearchParams(location.search).get('chess') === 'B' ? new THREE.Vector3(0.95, 0, -1.45) : new THREE.Vector3(-1.27, 0, -1.45);
+/* the chess pair on the hearth rug, its front left before the armchair (Godric's spot A, 9 October 2026, 6.13 pm,
+   from assets/review/chess-pair.jpg; lost, B, the front right before the wingback), the board between them */
+var CHESS_AT = new THREE.Vector3(-1.27, 0, -1.45);
 var CHESS_GAP = 0.33;                          /* hips either side of the board's centre */
 var FIGURE_SPOTS = {
   0: { x: -1.05, z: -3.95, face: 1 },              /* the fire mark, left of the fire, facing it */
@@ -3605,6 +3626,7 @@ function updateLines(dt) {
     lineCur = { line: l, t: lineSeconds(l), anchor: lineAnchor(l), el: null };
     /* a written line the board pins as a note of its own needs no scrap: the note itself appears */
     var pinned = l.medium === 'written' && papers.some(function (p) { return p.spec.event && p.spec.event.keys.indexOf(l.key) >= 0; });
+    if (pinned) lineCur.t = 0;                 /* nor does it hold the queue for its reading time (Events, req 80) */
     if (!l.held && !pinned && (l.text || l.sound)) {
       var el = lineElement(l);
       lineCur.el = el;
