@@ -11,12 +11,22 @@
    Then for the fire chain (8 October 2026): the moments `tap X` and `first tap` (the room calls `tap(name)`, and
    a chain's `targets` map one name to another, as the bellows to the fire), `seconds since last tap`, the big
    tier and its draw, `boost`, and a record's `ends` (when, on leave, on a tap, a timeout in days).
-   Not yet: casts and marks, lines, bags, one_of, and the moments quiet, enter, outside and say; a record that
-   needs one of them is skipped with a note in the console, never thrown.
+   Then for the armour and Peeves's sticks on the corridor page (8 October 2026, evening): `one_of` groups (of
+   the eligible records in a group at one moment, one fires, drawn by weight), a chain's `bags` and `set X = from
+   bag Y` (none twice until every one whose `when` holds has come, then it refills; what has come is kept in the
+   state), a chain's `marks` and `set X = mark Y, not last` (a draw among the named marks, never the one X is at;
+   unset reads as the first, the base drawing), the built-ins `place` (the page's, `opts.place`; a visit that
+   never left runs its leave as the page it was on), `at` (the page's, `opts.builtins.at`: the corridor stop he
+   stands at, or `none`) and `time` (morning, day, evening or night, night from a dusk worked from the month for
+   a home in the northern mid-latitudes, never a stored place). A record with a figure in its cast (a pool
+   student, a canon person, a ghost) is still skipped with a note; a trace or a voice fires, and its lines, text
+   or sound, are noted as waiting.
+   Not yet: figures on marks, lines, `mark next to X`, and the moments quiet, enter, outside and say; a record
+   that needs one of them is skipped with a note in the console, never thrown.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
-   it holds and the rest of its chain follows it; ?wait=N sets every wait to N s;
-   ?fresh starts this iPad's castle afresh. */
+   it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
+   to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh. */
 (function () {
   'use strict';
 
@@ -28,6 +38,12 @@
   var AWAY_S = 5 * 60;           /* hidden this long and coming back is a new visit */
   var DAY_MS = 86400000;
   var WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  /* Dusk and dawn as a local hour by month, January first, for a home in the northern mid-latitudes with summer
+     time from March to early November: worked from the month, never from a stored place. Night runs from dusk to
+     dawn, morning from dawn to noon, day to five, evening from five to dusk (none in midwinter, when night comes
+     before tea). */
+  var DUSK = [17.0, 17.75, 18.75, 20.0, 20.5, 21.0, 21.0, 20.25, 19.25, 18.5, 17.0, 16.75];
+  var DAWN = [7.25, 6.75, 7.0, 6.25, 5.5, 5.25, 5.5, 6.0, 6.5, 7.0, 6.75, 7.25];
 
   var COND = /^([a-z_ ]+?)\s*(>=|<=|!=|=|<|>)\s*([A-Za-z0-9_\- ]+)$/;
   var WAIT = /^(wait|quiet) (\d+)-(\d+) s$/;
@@ -54,18 +70,24 @@
 
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
-             open: {}, lastBigDay: null, lastBigVisit: null };
+             open: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null };
   }
 
   function start(opts) {
     var params = new URLSearchParams(location.search);
     var only = params.get('event');
     var waitOverride = params.has('wait') ? Math.max(0, +params.get('wait') || 0) : null;
+    var timeOverride = /^(morning|day|evening|night)$/.test(params.get('time') || '') ? params.get('time') : null;
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
 
     var cues = opts.cues || {};
     var builtins = opts.builtins || {};
     var drawRoom = opts.drawRoom || function () {};
+    var place = opts.place || 'common room';     /* the page this runtime runs on: `common room` or `corridor` */
+    var markSets = {};                           /* named sets of the page's marks a draw picks from: the page's `opts.marks`, then each chain's `marks` */
+    for (var ms in (opts.marks || {})) markSets[ms] = (opts.marks[ms] || []).slice();
+    var bagDefs = {};                            /* each chain's bags, by name */
+    var leaving = false;                         /* while a visit's leave runs, `place` is the page that visit was on */
     var state = load(STATE_KEY);
     var fresh = !state || state.v !== 1;
     if (fresh) state = freshState();
@@ -85,11 +107,21 @@
 
     function today() { return dayNumber(new Date()); }
 
+    function timeOfDay() {
+      if (timeOverride) return timeOverride;
+      var now = new Date(), h = now.getHours() + now.getMinutes() / 60, mo = now.getMonth();
+      if (h < DAWN[mo] || h >= DUSK[mo]) return 'night';
+      return h < 12 ? 'morning' : h < 17 ? 'day' : 'evening';
+    }
+
     function builtin(name) {
       var now = new Date();
       if (builtins[name]) return builtins[name]();
       switch (name) {
         case 'today': return today();
+        case 'time': return timeOfDay();
+        case 'place': return (leaving && state.visitPlace) || place;
+        case 'at': return 'none';                 /* a page with stops answers this itself */
         case 'hour': return now.getHours();
         case 'weekday': return WEEKDAYS[now.getDay()];
         case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
@@ -149,13 +181,50 @@
       if (state.log.length > LOG_LINES) state.log.splice(0, state.log.length - LOG_LINES);
     }
 
+    /* A shuffled bag: of the things whose `when` holds now, one not yet come this round, at random; when every one
+       that holds has come, the round starts again. What has come is kept in the state, so a reload keeps the order. */
+    function drawFromBag(name, rec) {
+      var things = bagDefs[name];
+      if (!things) { note(rec.id + ': no bag named ' + name); return undefined; }
+      var drawn = state.bags[name] = state.bags[name] || [];
+      function left() {
+        return things.filter(function (t) { return allHold(t.when) && drawn.indexOf(t.item) < 0; });
+      }
+      var pool = left();
+      if (!pool.length) { drawn.length = 0; pool = left(); }
+      if (!pool.length) { note(rec.id + ': nothing in bag ' + name + ' holds now'); return undefined; }
+      var t = pool[Math.floor(Math.random() * pool.length)];
+      drawn.push(t.item);
+      return t.item;
+    }
+
+    /* `mark Y, not last`: one of the marks named Y, never the one X is at (unset reads as the first, the base). */
+    function drawMark(spec, current, rec) {
+      var m = /^([a-z]+)(, not last)?$/.exec(spec);
+      if (!m) { note(rec.id + ': the draw "mark ' + spec + '" waits on the page\'s mark neighbours'); return undefined; }
+      var set = markSets[m[1]];
+      if (!set || !set.length) { note(rec.id + ': no marks named ' + m[1]); return undefined; }
+      var at = current == null ? set[0] : current;
+      var pool = m[2] ? set.filter(function (n) { return n !== at; }) : set;
+      return pool.length ? pool[Math.floor(Math.random() * pool.length)] : undefined;
+    }
+
     function effect(text, rec) {
       for (var i = 0; i < EFFECTS.length; i++) {
         var m = EFFECTS[i][1].exec(text);
         if (!m) continue;
         switch (EFFECTS[i][0]) {
           case 'set':
-            if (/^(mark|from bag) /.test(m[2])) { note(rec.id + ': ' + text + ' waits on marks and bags'); return; }
+            if (m[2].indexOf('from bag ') === 0) {
+              var item = drawFromBag(m[2].slice(9), rec);
+              if (item !== undefined) state.vars[m[1]] = item;
+              return;
+            }
+            if (m[2].indexOf('mark ') === 0) {
+              var mark = drawMark(m[2].slice(5), state.vars[m[1]], rec);
+              if (mark !== undefined) state.vars[m[1]] = mark;
+              return;
+            }
             var r = /^(\d+)-(\d+)$/.exec(m[2]);
             state.vars[m[1]] = r ? between(+r[1], +r[2]) : (/^-?\d+$/.test(m[2]) ? +m[2] : m[2]);
             return;
@@ -190,6 +259,7 @@
         if (cues[sh[j]]) cues[sh[j]]();
         else note(rec.id + ': this room has no cue "' + sh[j] + '"');
       }
+      if (rec.lines && rec.lines.length) note(rec.id + ': its lines wait for lines');
       if (rec.tier === 'small') visit.small.push(rec.id);
       if (rec.tier === 'big') { state.lastBigDay = today(); state.lastBigVisit = state.visits; visit.bigDone = true; }
       if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
@@ -260,21 +330,22 @@
       return w;
     }
 
+    /* What a record needs that is not built: a figure in its cast (a trace or a voice has no body to draw, so it
+       fires and its lines are noted), a moment the page cannot raise, or a mark draw that needs neighbours. */
     function supported(rec) {
-      if (rec.who && rec.who.length) return 'casts and marks';
-      if (rec.lines && rec.lines.length) return 'lines';
-      if (rec.one_of) return 'one_of';
+      var who = rec.who || [];
+      for (var w = 0; w < who.length; w++) if (/^(pool|canon|ghost)$/.test(who[w].role)) return 'figures on marks';
       if (/^(quiet|enter|outside|say)\b/.test(rec.moment || '')) return 'the moment ' + rec.moment;
-      if (/(mark |from bag )/.test((rec.starts || []).join('|'))) return 'marks and bags';
-      for (var e = 0; e < (rec.ends || []).length; e++) if ((rec.ends[e].lines || []).length) return 'lines (in its ends)';
+      if (/mark next to /.test((rec.starts || []).join('|'))) return 'the page\'s mark neighbours';
       return null;
     }
 
     /* Records fire one at a time, each seeing the state the last left. The eligible set is fixed when the moment
-       starts; each is checked again just before it fires. At most one small touch fires per moment. */
+       starts; each is checked again just before it fires. At most one small touch fires per moment. Of a one_of
+       group's eligible records, one is drawn by weight and the rest are dropped (a ?event record wins its group). */
     function moment(name) {
       if (!visit) return;
-      var eligible = [];
+      var eligible = [], groups = {};
       for (var i = 0; i < records.length; i++) {
         var r = records[i];
         if (r.moment !== name || !allHold(r.when)) continue;
@@ -284,6 +355,14 @@
         if (r.tier === 'big' && r.id !== only && (!visit.bigOn || visit.bigDone)) continue;
         if (state.open[r.id]) continue;      /* still open from an earlier moment: it does not start again */
         eligible.push(r);
+        if (r.one_of) (groups[r.one_of] = groups[r.one_of] || []).push(r);
+      }
+      for (var g in groups) {
+        if (groups[g].length < 2) continue;
+        var pick = null;
+        for (var k = 0; k < groups[g].length; k++) if (groups[g][k].id === only) pick = groups[g][k];
+        if (!pick) pick = weightedOrder(groups[g])[0];
+        eligible = eligible.filter(function (r) { return r.one_of !== g || r === pick; });
       }
       var order = weightedOrder(eligible), smallDone = false;
       for (var j = 0; j < order.length; j++) {
@@ -302,6 +381,7 @@
       if (state.visitOpen) leave();        /* a visit that never left runs its leave records now, before anything */
       state.visits++;
       state.visitOpen = true;
+      state.visitPlace = place;
       var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
       visit = { smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [], waits: [],
                 lastTap: {}, tapped: false };
@@ -330,10 +410,16 @@
       visit.lastTap[name] = Date.now();
     }
 
+    /* A visit that never left (the iPad asleep, Safari dropping the page) has no visit object when the next page
+       opens: its leave records still run, as a bare visit with the draws off, before anything else. */
     function leave() {
+      leaving = true;
+      var real = !!visit;
+      if (!visit && state.visitOpen) visit = { smallOn: false, bigOn: false, bigDone: true, small: [], waits: [], lastTap: {}, tapped: true };
       if (visit) checkEnds('leave');
       if (visit) moment('leave');
-      if (visit) state.lastSmall = visit.small;
+      if (real) state.lastSmall = visit.small;
+      leaving = false;
       state.visitOpen = false;
       visit = null;
       save(STATE_KEY, state);
@@ -372,6 +458,10 @@
         chains.push(files[f]);
         var tg = files[f].targets || {};
         for (var t in tg) targets[t] = tg[t];
+        var bg = files[f].bags || {};
+        for (var b in bg) bagDefs[b] = bg[b];
+        var mk = files[f].marks || {};
+        for (var mn in mk) markSets[mn] = (mk[mn] || []).slice();
         var rs = files[f].records || [];
         JSON.stringify(rs).replace(/"stamp ([a-z_]+)/g, function (s, n) { stampNames[n] = true; return s; });
         for (var i = 0; i < rs.length; i++) {
@@ -399,6 +489,9 @@
       tick: tick,
       moment: moment,
       tap: tap,
+      arrive: arrive,
+      leave: leave,
+      cues: shownCues,
       fire: function (id) { if (byId[id] && visit) fire(byId[id]); },
       state: function () { return state; },
       log: function () { return state.log.slice(); },
