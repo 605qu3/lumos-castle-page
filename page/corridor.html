@@ -472,6 +472,15 @@ scene.add(glimpseLight);
 /* the drawing itself (round 1, candidate 2, 8 October 2026), hung in place of the stand-in as soon as it loads */
 setGlimpse('../assets/layers/door-glimpse.png').catch(function () {});
 
+/* the lived-in layer (board req 31; The curator, The lived-in layer): a Gryffindor scarf dropped on the flags across the
+   path 1.6 m short of her, as if a boy dropped it running in (David, 9 October 2026, from a plan of three); a stand-in strip
+   until its drawing, 1.27 by 0.33 m like the scarf it is drawn from */
+var SCARF = { x: -1.6, z: -2.1, w: 1.27, d: 0.33, turn: 70 };
+var scarf = cutoutMesh(cutoutTexture(254, 66, '#9e1b1b', drawRect), SCARF.w, SCARF.d);
+scarf.rotation.set(-Math.PI / 2, 0, -SCARF.turn * Math.PI / 180);
+scarf.position.set(SCARF.x, 0.01, SCARF.z);
+scarf.name = 'scarf'; scene.add(scarf); register(scarf, 1);
+
 /* the drawn torch the common room already has: same file, same size, same head */
 (function () {
   var im = new Image();
