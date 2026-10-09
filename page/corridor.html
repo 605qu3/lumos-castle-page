@@ -838,10 +838,14 @@ function goTo(s) {
 }
 function goBack() {
   if (mode !== 'stop') return;
+  /* up from the landing (req 59) he turns round as he climbs, the drag's turn in reverse, rather than the look
+     passing through him */
+  var turn = atStop && atStop.name === 'landing' ? (Math.abs(yaw) > 1.5 ? yaw : Math.PI) : 0;
   atStop = null;
   backBtn.hidden = true;
   yaw = yawT = 0; pitch = pitchT = 0;
   glideTo(restPose({ pos: new THREE.Vector3(), look: new THREE.Vector3() }), function () { mode = 'rest'; });
+  if (turn) { tween.turn = turn; tween.dur = 2.6; }
 }
 
 /* ---------- through the hole (8 October 2026) ----------
@@ -915,6 +919,10 @@ function updateCamera(dt) {
     bezier(camera.position, tween.from.pos, tween.c1, tween.c2, tween.to.pos, k);
     camera.position.y = lerp(tween.from.pos.y, tween.to.pos.y, k);
     lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
+    if (tween.turn) {
+      var ty = lerp(tween.turn, 0, k);
+      lookTmp.set(camera.position.x + Math.cos(ty) * 10, lerp(tween.from.look.y, tween.to.look.y, k), camera.position.z + Math.sin(ty) * 10);
+    }
     setFov(lerp(tween.from.fov, tween.to.fov, k));
     if (tween.dip) stairDip(tween, k);
     if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
