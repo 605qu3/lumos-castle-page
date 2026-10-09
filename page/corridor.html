@@ -166,6 +166,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
+<script src="castle-events.js?v=7"></script>
 <script>
 (function () {
 'use strict';
@@ -382,6 +383,29 @@ var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vec
 var BAY_X = -3.55, PORTRAIT_XS = [-2.5, -4.6];
 var ARMOUR = { w: 0.7, h: 2.1, x: BAY_X };
 var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, FAR_Z + 0.45, 1, 1, 'armour');
+/* its three marks (The corridor, "The armour's three marks"): where the card's foot stands, by the name the events
+   runtime's armour chain gives each */
+var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
+/* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
+   her, 1.8 to 2.7 m up, a card turned to the eye as the armour is; hidden until the sticks chain hangs it */
+var STICKS = { x: -5.5, y: 2.25, w: 0.5, h: 0.9 };
+function drawSticks(g, w, h) {
+  for (var i = 0; i < 7; i++) {
+    var x = w * (0.2 + i * 0.1);
+    g.fillRect(x, h * 0.12, w * 0.05, h * 0.86);
+    g.beginPath(); g.arc(x + w * 0.06, h * 0.12, w * 0.07, Math.PI, 0); g.lineWidth = w * 0.04; g.strokeStyle = g.fillStyle; g.stroke();
+  }
+  g.fillRect(w * 0.15, h * 0.55, w * 0.72, h * 0.05);
+}
+var sticks = cutoutMesh(cutoutTexture(100, 180, '#6b5a48', drawSticks), STICKS.w, STICKS.h);
+sticks.position.set(STICKS.x, STICKS.y, MID_Z);
+sticks.name = 'sticks'; sticks.visible = false;
+scene.add(sticks); register(sticks, 1);
+var boo = cutoutMesh(cutoutTexture(256, 96, '#6b5a48', function (g, w, h) {
+  g.font = 'bold ' + Math.round(h * 0.8) + 'px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('BOO!', w / 2, h * 0.55);
+}), 1.2, 0.45);
+boo.rotation.x = -Math.PI / 2; boo.position.set(STICKS.x, 0.02, MID_Z); boo.name = 'sticks-boo'; boo.visible = false;
+scene.add(boo); register(boo, 1);
 var WINDOW = { w: 1.2, h: 2.4, sill: 0.9 };
 /* one window per portrait, the same drawing twice; the sill at -4.6 is the Remembrall's, later */
 var windows = PORTRAIT_XS.map(function (wx, i) {
@@ -528,6 +552,11 @@ var STOPS = [
 ];
 var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
+/* things the events runtime answers by name rather than a stop of their own: a tap on the armour goes to the runtime
+   first, whose record walks him up or knocks (the built-in `at` must read where he stood when he tapped); the sticks
+   have no stop */
+armour.userData.thing = 'armour';
+sticks.userData.thing = 'sticks'; tappables.push(sticks);
 
 var mode = 'rest', atStop = null, tween = null;
 var backBtn = document.getElementById('back');
@@ -590,8 +619,9 @@ function goBack() {
    until then only lumosGreybox.enter() calls it, for shots, and nothing on screen opens her. Coming out of the room
    (?from=room) he arrives at her stop as she shuts; Back goes to the stair head as from any stop. */
 var leaving = false;
-function enter(dry) {
+function enter(dry, url, room) {
   if (leaving || view !== 'length') return false;
+  url = url || 'common-room.html?from=corridor'; room = room || 'common-room';
   leaving = true;
   var herStop = STOPS[0];
   function swingAndWalk() {
@@ -599,7 +629,7 @@ function enter(dry) {
     setTimeout(function () {
       glideTo({ pos: new THREE.Vector3(0, HOLE_Y, -0.3), look: new THREE.Vector3(0, HOLE_Y, 6), fov: FOV_REST });
       setTimeout(function () {
-        kit.travel('common-room.html?from=corridor', { place: { room: 'common-room' }, dry: dry, done: function () {
+        kit.travel(url, { place: { room: room }, dry: dry, done: function () {
           leaving = false; herDoor.target = 0; atStop = null; mode = 'stop'; goTo(herStop);
         } });
       }, tween.dur * 550);
@@ -629,8 +659,13 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables.filter(function (m) { return m.visible; }), false);
-  if (hits.length) goTo(hits[0].object.userData.stop);
-  else goBack();
+  if (!hits.length) { goBack(); return; }
+  var hit = hits[0].object.userData;
+  if (hit.thing && castle && castle.visit()) {
+    if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
+    castle.tap(hit.thing); return;
+  }
+  if (hit.stop) goTo(hit.stop);
 }
 
 function updateCamera(dt) {
@@ -703,6 +738,93 @@ backBtn.addEventListener('click', goBack);
 setView(view);
 if (kit.from === 'room') arriveFromRoom();
 
+/* ---------- the events runtime (castle-events.js, board req 23) ----------
+   Every chain loads (the records' `place` keeps each to its page), this page answers `at`, the stop he stands at, and
+   draws the armour and the sticks from the cues their state shows. Poses wait for the armour's sheet, so they are a
+   console note; sounds and lines are the runtime's notes. */
+var visorPatch = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.1), new THREE.MeshBasicMaterial({ color: col(0x2e2c2a) }));
+visorPatch.position.set(0, ARMOUR.h / 2 - 0.17, 0.005); visorPatch.visible = false; armour.add(visorPatch);
+var CUE = {
+  step: 'the armour a short step out from its pier into the corridor, on its second mark; its stop follows it',
+  window: 'the armour half in front of the window toward her end, as if looking out, on its third mark; its stop follows it',
+  visor: "the armour's visor down",
+  back: 'the armour turned with its back to the corridor',
+  up: "a bundle of walking sticks bobbing in midair over the middle line, just above head height, at the corridor's spot for them",
+  fallen: 'the fallen sticks lying on the flags under their spot',
+  boo: 'the fallen sticks lying on the flags spelling BOO!'
+};
+var POSES = {
+  'the armour leaning on its halberd with its weight on one leg, as if bored': 'leaning',
+  "the armour's head turned toward the Fat Lady's end, as if listening": 'listening',
+  'the armour with its halberd in the other hand': 'other-hand',
+  'the armour with a hand raised, scratching its helmet': 'scratching'
+};
+var armourPose = null, armourJiggle = 0, sticksShown = 'gone', sticksQueue = [];
+function corridorDrawRoom(shown) {
+  function has(s) { return shown.indexOf(s) >= 0; }
+  var mark = ARMOUR_MARKS[has(CUE.step) ? 'step' : has(CUE.window) ? 'window' : 'home'];
+  armour.position.x = mark.x; armour.position.z = mark.z;
+  var back = has(CUE.back);
+  visorPatch.visible = has(CUE.visor) && !back;
+  armour.material.color.copy(armour.userData.base).multiplyScalar(back ? 0.6 : 1);
+  var pose = 'straight';
+  for (var p in POSES) if (has(p)) pose = POSES[p];
+  if (pose !== armourPose) { armourPose = pose; console.info('[corridor] the armour stands ' + pose + (back ? ', its back turned' : '') + ' (its pose waits for the sheet)'); }
+  sticksShown = has(CUE.up) ? 'up' : has(CUE.fallen) || has(CUE.boo) ? 'fallen' : 'gone';
+  boo.visible = has(CUE.boo) && !sticksQueue.length;
+}
+function sticksAnim(kinds) { kinds.forEach(function (k) { sticksQueue.push({ kind: k, t: 0, dur: { dodge: 0.6, drop: 0.5, jig: 1.2, drum: 0.9, scatter: 1.6, march: 1.8 }[k] }); }); }
+function updateSticks(dt) {
+  var a = sticksQueue[0], k = a ? Math.min(1, (a.t += dt) / a.dur) : 0;
+  var face = Math.atan2(camera.position.x - STICKS.x, camera.position.z - MID_Z);
+  var upright = a ? !/^(scatter|march)$/.test(a.kind) : sticksShown === 'up';
+  sticks.visible = a ? true : sticksShown !== 'gone';
+  sticks.rotation.set(0, face, 0);
+  sticks.position.set(STICKS.x, STICKS.y + 0.04 * Math.sin(t * 2.1), MID_Z);
+  if (!upright || (!a && sticksShown === 'fallen')) { sticks.rotation.set(-Math.PI / 2, 0, 1.2); sticks.position.y = 0.03; }
+  if (a) {
+    var s = Math.sin(Math.PI * k);
+    if (a.kind === 'dodge') { sticks.position.y += 0.35 * s; sticks.position.z += 0.3 * s; }
+    if (a.kind === 'jig' || a.kind === 'drum') sticks.rotation.z = 0.35 * Math.sin(k * 6 * Math.PI);
+    if (a.kind === 'drum') { sticks.position.x = lerp(STICKS.x, armour.position.x + 0.3, s); sticks.position.z = lerp(MID_Z, armour.position.z + 0.3, s); }
+    if (a.kind === 'drop') { sticks.position.y = lerp(STICKS.y, 0.03, k * k); sticks.rotation.x = -Math.PI / 2 * k; }
+    if (a.kind === 'scatter') sticks.position.x = STICKS.x + 5 * k;
+    if (a.kind === 'march') sticks.position.x = STICKS.x - 5 * k;
+    if (k >= 1) { sticksQueue.shift(); if (!sticksQueue.length) boo.visible = castle && castle.cues().indexOf(CUE.boo) >= 0; }
+  }
+  if (armourJiggle > 0) { armourJiggle = Math.max(0, armourJiggle - dt); armour.rotation.z = 0.04 * Math.sin(armourJiggle * 40); }
+  else armour.rotation.z = 0;
+}
+function note(text) { return function () { console.info('[corridor] ' + text + ' (drawn later)'); }; }
+var castle = window.CastleEvents ? CastleEvents.start({
+  chains: 'all',
+  place: 'corridor',
+  cues: {
+    "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does": function () { goTo(STOPS.filter(function (s) { return s.name === 'armour'; })[0]); },
+    'the open visor drops shut': function () { armourJiggle = 0.4; },
+    'it turns its back on him, annoyed, and stays so until he has been out': function () { armourJiggle = 0.6; },
+    'a puff of dust from the visor': note('a puff of dust from the visor'),
+    'it salutes with its halberd, then stands as it was': note('a salute with its halberd'),
+    'a moth flutters out of the visor and away down the corridor': note('a moth from the visor'),
+    'the bundle bobs out of reach, as Trevor hops': function () { sticksAnim(['dodge']); },
+    'the bundle clatters to the flags': function () { sticksAnim(['drop']); },
+    'the sticks scatter, rattling off along the floor toward the Fat Lady, and are gone': function () { sticksAnim(['drop', 'scatter']); },
+    'the sticks bow, then march off down the stair in a line': function () { sticksAnim(['drop', 'march']); },
+    'the sticks drop and land spelling BOO! on the flags': function () { sticksAnim(['drop']); },
+    "the sticks drum a roll on the armour's helmet, which clangs, then drop to the flags; the armour never moves": function () { sticksAnim(['drum', 'drop']); },
+    'two sticks stilt-walk off down the corridor as a pair of legs, the rest tucked under an invisible arm': function () { sticksAnim(['drop', 'march']); },
+    'the sticks dance a quick jig in midair and drop': function () { sticksAnim(['jig', 'drop']); },
+    'ignored, the bundle drops by itself to the flags': function () { sticksAnim(['drop']); },
+    /* the bedtime (board req 37): out here the Fat Lady sends him in, and he goes on up to bed */
+    'the Fat Lady yawns behind her hand and settles her shawl': note('the Fat Lady yawns and settles her shawl'),
+    'the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)': function () {
+      if (!enter(false, 'dormitory.html?from=corridor&bedtime', 'dormitory')) kit.travel('dormitory.html?from=corridor&bedtime', { place: { room: 'dormitory' } });
+    }
+  },
+  drawRoom: corridorDrawRoom,
+  builtins: { at: function () { return atStop ? atStop.name : 'none'; } }
+}) : null;
+
 /* ---------- per frame ---------- */
 
 var clock = new THREE.Clock();
@@ -710,7 +832,9 @@ var t = 0;
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   t += dt;
+  if (castle) castle.tick(dt);
   updateCamera(dt);
+  updateSticks(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -731,7 +855,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf };
+  enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf };
 })();
 </script>
 </body>
