@@ -599,11 +599,16 @@ or the mark he speaks from; heard in faint italic toward where it comes from (th
 sound in words; written on a scrap in its hand (Neville the child hand, Wood and Hooch the casual, Pince and, for now,
 Clementine the clerk's). Held for 2.2 s plus 0.075 s a letter, 4 to 14 s (written 20); a tap on the words puts them
 away. A tap on a drawn figure raises its cast name, so the sleeper's mumbles come on a tap (only his card's lower
-part counts). Provisional, Godric to judge the look.
+part counts). The look Godric's option 1, a paper slip with a tail (5.11 pm, assets/review/lines-look.jpg).
 the board's notes from the events, 9 October 2026 (board req 65): Neville's reply under Wood's notice, Wood's answer
 under it, and Neville's thanks where the lost-toad notice hung once Trevor is home, papers of the board's own kind
 drawn from written() by key and shown by notice.json's and trevor.json's room rules; the lost-toad notice hangs only
 while the rules show it. A line pinned this way gets no floating scrap.
+her letter on the windowsill, 9 October 2026 (board req 65, clementine.json): a sheet 0.2 by 0.26 m propped against
+the right window's lower glass, the moonlit one where the owl lands, its bottom on the sill at 2.09 m; drawn from
+written() in her hand, shown while the room's rule shows it; a tap from the room brings it to his hand and puts it
+back (liftPaper now returns to the mode it was lifted from). Provisional, Godric to judge the place
+(assets/review/letter-sill.jpg); lost so far, the left window.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -1167,7 +1172,7 @@ function makePaper(spec, index) {
   sh.position.set(0.007, -0.011, -0.0022);
   sh.visible = false;
   pivot.add(sh); pivot.add(mesh); boardGroup.add(pivot);
-  var pinsLocal = spec.pins === 'two' ? [[-spec.w / 2 + 0.03, 0], [spec.w / 2 - 0.03, 0]] : [[0, 0]];
+  var pinsLocal = spec.pins === 'two' ? [[-spec.w / 2 + 0.03, 0], [spec.w / 2 - 0.03, 0]] : spec.pins === 'none' ? [] : [[0, 0]];
   var c = Math.cos(spec.rot), s = Math.sin(spec.rot);
   var pinGroups = [];
   for (var i = 0; i < pinsLocal.length; i++) pinGroups.push(pin(spec.pin[0] + pinsLocal[i][0] * c, spec.pin[1] + pinsLocal[i][0] * s, spec.z + 0.0025));
@@ -1178,6 +1183,23 @@ function makePaper(spec, index) {
   return p;
 }
 for (var pi = 0; pi < PAPER_SPECS.length; pi++) makePaper(PAPER_SPECS[pi], pi);
+/* her letter on the windowsill (board req 65, clementine.json): a sheet propped against the right window's lower glass,
+   the moonlit one where the owl lands, its bottom on the sill at 2.09 m, leaning back 0.2 rad; drawn from written() in
+   her hand and shown while the room's rule shows "her letter on the windowsill"; a tap brings it to his hand to read,
+   as a notice is, and puts it back. Provisional, Godric to judge the place. */
+var LETTER_KEYS = [1, 2, 3, 4, 5, 6].map(function (n) { return 'clementine.letter-' + n; });
+var letterPaper = (function () {
+  var spec = { id: 'letter', w: 0.2, h: 0.26, pin: [0, 0], pins: 'none', rot: 0, z: 0, tile: 'cream', torn: [], age: 0.3,
+    draw: drawEventNote, sill: true, event: { keys: LETTER_KEYS, hand: 'clementine', show: 'her letter on the windowsill' } };
+  var lp = makePaper(spec, papers.length), lean = 0.2;
+  var win = new THREE.Vector3(2.87, 0, -4.69), n = win.clone().negate().normalize();
+  scene.add(lp.pivot);
+  lp.pivot.position.copy(win).addScaledVector(n, 0.12 - (spec.h - PIN_INSET) * Math.sin(lean));
+  lp.pivot.position.y = 2.1 + (spec.h - PIN_INSET) * Math.cos(lean);
+  lp.pivot.lookAt(lp.pivot.position.clone().add(n));
+  lp.pivot.rotateX(-lean);
+  return lp;
+})();
 pin(-0.66, -0.46, 0.0085); pin(0.69, -0.50, 0.0085);
 
 /* ---- paper rendering ---- */
@@ -1412,7 +1434,7 @@ function paperCanvas(spec, seed) {
   if (spec.dogEar) dogEarFlap(g, W, H);
   var ins = PIN_INSET * PX;
   if (spec.pins === 'two') { pinhole(g, 0.03 * PX, ins, rnd); pinhole(g, W - 0.03 * PX, ins, rnd); pinhole(g, 0.03 * PX + 14, ins + 22, rnd); }
-  else pinhole(g, W / 2, ins, rnd);
+  else if (spec.pins !== 'none') pinhole(g, W / 2, ins, rnd);
   tracePath(g, path); g.strokeStyle = 'rgba(255,250,238,0.55)'; g.lineWidth = 4; g.stroke();
   tracePath(g, path); g.strokeStyle = 'rgba(60,42,24,0.3)'; g.lineWidth = 2; g.stroke();
   g.restore();
@@ -1518,6 +1540,7 @@ function handPose(p, t, outPos, outQuat) {
 }
 function liftPaper(p) {
   if (held) return;
+  p.backMode = mode;                           /* the board, or the room for her letter on the sill */
   mode = 'tween'; held = p;
   scene.updateMatrixWorld(true);
   p.mesh.getWorldPosition(p.homePos);
@@ -1537,7 +1560,7 @@ function updatePapers(dt, t) {
   draught = lerp(draught, target, Math.min(1, dt * 2.5));
   for (var i = 0; i < papers.length; i++) {
     var p = papers[i];
-    if (p === held || p.spec.fixed) continue;
+    if (p === held || p.spec.fixed || p.spec.sill) continue;
     var a = p.spec.pins === 'two' ? 0.35 : 1;
     p.pivot.rotation.x = -a * draught * (0.022 * (1 + Math.sin(t * 5.5 + p.phase)) + 0.008 * (1 + Math.sin(t * 9.1 + p.phase * 2)));
     if (p.spec.pins !== 'two') p.pivot.rotation.z = p.spec.rot + draught * 0.012 * Math.sin(t * 4 + p.phase);
@@ -1561,7 +1584,7 @@ function updatePapers(dt, t) {
           p2.pivot.add(p2.mesh);
           p2.mesh.position.set(0, 0, 0); p2.mesh.quaternion.identity();
           p2.shadow.material.opacity = 0.55;
-          held = null; mode = 'board';
+          held = null; mode = p2.backMode || 'board';
           if (leaveAfterReturn) { leaveAfterReturn = false; leaveBoard(); }
         }
       }
@@ -3033,7 +3056,8 @@ function tap(cx, cy) {
   var as = mode === 'room' && castle ? figureTapped(hits) : null;
   if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
-  if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
+  if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
+  else if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
   /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
   else if (hit === holeTap) { if (portrait.open) climbOut(); else { if (castle) castle.tap('hole'); togglePortrait(); } }
