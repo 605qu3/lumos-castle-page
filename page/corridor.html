@@ -623,6 +623,16 @@ function hangDrawing(m, url, w) {
    the castle's house-scarf drawing, its exemplar the first of its kind */
 SCARF.w = 1.1;
 hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w);
+/* the settle's scarf (req 31; Godric, 9 October 2026: Hufflepuff, 6.15 pm; on the stair-side settle by the mouth, 6.28 pm,
+   from a plan of three): a visitor's, left while waiting to be fetched; the house scarf's drawing recoloured yellow and
+   black in code (pipeline/recolour_scarf.py), 0.9 m across its bends, lying along the seat from the arm at the mouth,
+   seen on a look right as he arrives. 720 by 397, 800 px a metre, about 1.5 MB with mipmaps */
+var SETTLE_SCARF = { x: NOOK_X1 + SETTLE.d / 2, z: NOOK_BACK - SETTLE.len + 0.08 + 0.45, w: 0.9, turn: 84 };
+var settleScarf = cutoutMesh(cutoutTexture(180, 100, '#c9a227', drawRect), SETTLE_SCARF.w, 0.5);
+settleScarf.rotation.set(-Math.PI / 2, 0, SETTLE_SCARF.turn * Math.PI / 180);
+settleScarf.position.set(SETTLE_SCARF.x, SETTLE.seat + 0.006, SETTLE_SCARF.z);
+settleScarf.name = 'settle-scarf'; scene.add(settleScarf); register(settleScarf, 1);
+hangDrawing(settleScarf, '../assets/layers/settle-scarf.png', SETTLE_SCARF.w);
 /* the painting opposite (req 33, round 1, candidate 3, Godric, 9 October 2026, 5.11 pm): an empty panelled landing in a
    beaded gilt frame, a door ajar at its right edge, 0.5 by 0.54 m, its own shape about the slot's centre */
 /* A sitter out visiting stands in it (req 58; visitors.json's rules with place corridor), drawn from her own standing
