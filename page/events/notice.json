@@ -147,6 +147,7 @@
       ],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "wood_replies = 0"
       ],
       "weight": 1,
@@ -173,6 +174,7 @@
       "leans": [],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "wood_replies = 1"
       ],
       "weight": 1,
@@ -201,6 +203,7 @@
       "leans": [],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "weekday = monday",
         "days since tidied_on >= 1"
       ],

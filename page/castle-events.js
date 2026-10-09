@@ -21,8 +21,11 @@
    a home in the northern mid-latitudes, never a stored place). A record with a figure in its cast (a pool
    student, a canon person, a ghost) is still skipped with a note; a trace or a voice fires, and its lines, text
    or sound, are noted as waiting.
-   Not yet: figures on marks, lines, `mark next to X`, and the moments quiet, enter, outside and say; a record
-   that needs one of them is skipped with a note in the console, never thrown.
+   Then the hole as moving, not leaving (David, 9 October 2026): one visit across every page, `arrive` once per
+   page per visit, `outside` and `enter` at the hole, `leave` when he really stops, run on the clock of his going
+   when it runs late; the built-in `been <page>`; `chains: 'all'` from events/index.json.
+   Not yet: figures on marks, lines, `mark next to X`, and the moments quiet and say; a record that needs one of
+   them is skipped with a note in the console, never thrown.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -36,6 +39,7 @@
   var SMALL_ODDS = 0.8;          /* small touches on most visits: about four in five */
   var BIG_ODDS = 1 / 3;          /* big events about one visit in three, at most one a day, never two visits running */
   var AWAY_S = 5 * 60;           /* hidden this long and coming back is a new visit */
+  var CROSS_S = 120;             /* a page opened with ?from= this soon after the last one went carries the visit on */
   var DAY_MS = 86400000;
   var WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   /* Dusk and dawn as a local hour by month, January first, for a home in the northern mid-latitudes with summer
@@ -70,7 +74,7 @@
 
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
-             open: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null };
+             open: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null };
   }
 
   function start(opts) {
@@ -100,22 +104,26 @@
     var stampNames = {};      /* every name a file stamps, so a condition knows it is a date */
     var visit = null;        /* this visit: its moments still to come and what fired */
     var hiddenAt = 0;
-    var targets = {};         /* a tap's name mapped to another, from the chains' `targets` */
+    var clock = null;         /* while a deferred leave runs, the time he went */
+    var targets = {};        /* a tap's name mapped to another, from the chains' `targets` */
     var tapping = null;       /* the thing tapped, while its moment runs */
 
     /* ---------- reading state ---------- */
 
-    function today() { return dayNumber(new Date()); }
+    /* The clock every date, hour and time of day reads. A deferred leave sets it to the moment he went, so its
+       `time` and its stamps are those of the leaving, not of the next arrival. */
+    function nowDate() { return clock != null ? new Date(clock) : new Date(); }
+    function today() { return dayNumber(nowDate()); }
 
     function timeOfDay() {
       if (timeOverride) return timeOverride;
-      var now = new Date(), h = now.getHours() + now.getMinutes() / 60, mo = now.getMonth();
+      var now = nowDate(), h = now.getHours() + now.getMinutes() / 60, mo = now.getMonth();
       if (h < DAWN[mo] || h >= DUSK[mo]) return 'night';
       return h < 12 ? 'morning' : h < 17 ? 'day' : 'evening';
     }
 
     function builtin(name) {
-      var now = new Date();
+      var now = nowDate();
       if (builtins[name]) return builtins[name]();
       switch (name) {
         case 'today': return today();
@@ -142,6 +150,7 @@
         return s == null ? Infinity : today() - s;     /* a stamp never made reads as forever */
       }
       if (name.indexOf('mark ') === 0) return visit && visit.marks[name.slice(5)] ? 'taken' : 'free';   /* a mark a figure stands on this visit */
+      if (name.indexOf('been ') === 0) return visit && visit.pages.indexOf(name.slice(5)) >= 0 ? 'yes' : 'no';   /* did this visit reach that page */
       var b = builtin(name);
       if (b !== undefined) return b;
       if (stampNames[name]) return name in state.stamps ? state.stamps[name] : -Infinity;   /* never stamped: long past */
@@ -177,7 +186,7 @@
     /* ---------- changing state ---------- */
 
     function logLine(text) {
-      text = text.replace('{day}', WEEKDAYS[new Date().getDay()].replace(/^./, function (c) { return c.toUpperCase(); }));
+      text = text.replace('{day}', WEEKDAYS[nowDate().getDay()].replace(/^./, function (c) { return c.toUpperCase(); }));
       state.log.push({ day: today(), text: text });
       if (state.log.length > LOG_LINES) state.log.splice(0, state.log.length - LOG_LINES);
     }
@@ -338,7 +347,7 @@
     function supported(rec) {
       var who = rec.who || [];
       for (var w = 0; w < who.length; w++) if (/^(pool|canon|ghost)$/.test(who[w].role)) return 'figures on marks';
-      if (/^(quiet|enter|outside|say)\b/.test(rec.moment || '')) return 'the moment ' + rec.moment;
+      if (/^(quiet|say)\b/.test(rec.moment || '')) return 'the moment ' + rec.moment;
       if (/mark next to /.test((rec.starts || []).join('|'))) return 'the page\'s mark neighbours';
       return null;
     }
@@ -380,28 +389,81 @@
 
     /* ---------- a visit ---------- */
 
-    function arrive() {
-      if (state.visitOpen) leave();        /* a visit that never left runs its leave records now, before anything */
-      state.visits++;
-      state.visitOpen = true;
-      state.visitPlace = place;
-      var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
-      visit = { smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [], waits: [],
-                lastTap: {}, tapped: false, marks: {} };
-      var seen = {};
+    /* A visit is one sitting at the iPad, across every page he walks to (David, 9 October 2026: the trip through the
+       hole is moving inside one visit, not leaving). It opens with `arrive` on the page it opens on and ends with
+       `leave` when he really stops: the page closed or dropped without a trip, or the iPad put away five minutes.
+       A trip is a page load, so a page cannot tell a trip from a close as it goes; `pagehide` keeps the visit and
+       the time he went, and the next page to load decides. Opened with `?from=` naming the page the visit was on,
+       soon after, it is a crossing (`cross`): the visit carries on. Otherwise the kept visit's leave runs first,
+       on the clock of the moment he went, and a new visit opens. */
+
+    function freshWaits() {
+      var waits = [], seen = {};
       for (var i = 0; i < records.length; i++) {
         var m = WAIT.exec(records[i].moment || '');
         if (!m || m[1] !== 'wait' || seen[records[i].moment]) continue;
         seen[records[i].moment] = true;
         var secs = waitOverride != null ? waitOverride : between(+m[2], +m[3]);
-        visit.waits.push({ name: records[i].moment, left: secs });
+        waits.push({ name: records[i].moment, left: secs });
       }
+      return waits;
+    }
+
+    /* What of a visit outlives a page: the draws, what fired, the marks taken and the pages reached. A tap's
+       memory and the waits are the page's own; sound wakes again at the next page's first tap. */
+    function keep() {
+      if (!visit) return;
+      state.kept = { id: visit.id, smallOn: visit.smallOn, bigOn: visit.bigOn, bigDone: visit.bigDone,
+                     small: visit.small, marks: visit.marks, pages: visit.pages };
+    }
+    function restore() {
+      var k = state.kept || {};
+      return { id: k.id, smallOn: !!k.smallOn, bigOn: !!k.bigOn, bigDone: k.bigDone !== false, small: k.small || [],
+               marks: k.marks || {}, pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false };
+    }
+
+    /* A new visit on this page; one still open runs its leave first. */
+    function arrive() {
+      if (state.visitOpen) leave();
+      state.visits++;
+      state.visitOpen = true;
+      state.visitPlace = place;
+      var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
+      visit = { id: state.visits, smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [],
+                waits: freshWaits(), lastTap: {}, tapped: false, marks: {}, pages: [place] };
       save(STATE_KEY, state);
       checkEnds('arrive');
       moment('arrive');
     }
 
-    /* A tap on a named thing in the room. The first tap of a visit is also `first tap` (sound wakes then). */
+    /* The visit carries on onto this page. `arrive` comes the first time a visit reaches a page, so a page's own
+       draws (the armour's, the sticks') happen once a visit; then `outside` coming out of the hole into the
+       corridor and `enter` coming back in by it, every time. A crossing between other pages (the dormitory's
+       stair) has neither word. */
+    function cross() {
+      var was = state.visitPlace;
+      visit = restore();
+      visit.waits = freshWaits();
+      state.visitPlace = place;
+      state.leftAt = null;
+      state.kept = null;
+      save(STATE_KEY, state);
+      checkEnds('arrive');
+      if (visit.pages.indexOf(place) < 0) { visit.pages.push(place); moment('arrive'); }
+      if (was === 'common room' && place === 'corridor') moment('outside');
+      if (was === 'corridor' && place === 'common room') moment('enter');
+    }
+
+    /* The page that loads decides what the last one's going was. */
+    function begin() {
+      var from = params.get('from');
+      var fromPlace = from === 'room' ? 'common room' : from;
+      var soon = state.leftAt != null && Date.now() - state.leftAt < CROSS_S * 1000;
+      if (state.visitOpen && fromPlace && fromPlace === state.visitPlace && soon && state.kept) cross();
+      else arrive();
+    }
+
+    /* A tap on a named thing in the room. The first tap on a page is also `first tap` (sound wakes then). */
     function tap(name) {
       if (!visit) return;
       name = targets[name] || name;
@@ -413,17 +475,26 @@
       visit.lastTap[name] = Date.now();
     }
 
-    /* A visit that never left (the iPad asleep, Safari dropping the page) has no visit object when the next page
-       opens: its leave records still run, as a bare visit with the draws off, before anything else. */
+    /* The visit ends. Run on the page it ended on, or at the next page's load for a visit kept at its going (the
+       iPad asleep, Safari dropping the page, a close): then it runs as the kept visit, with `place` as the page it
+       was on and the clock at the time he went. One kept by an older runtime, with nothing saved, runs bare with
+       the draws off. */
     function leave() {
+      if (!visit && !state.visitOpen) return;
       leaving = true;
-      var real = !!visit;
-      if (!visit && state.visitOpen) visit = { smallOn: false, bigOn: false, bigDone: true, small: [], waits: [], lastTap: {}, tapped: true, marks: {} };
-      if (visit) checkEnds('leave');
-      if (visit) moment('leave');
-      if (real) state.lastSmall = visit.small;
+      if (!visit) {
+        visit = state.kept ? restore() : { smallOn: false, bigOn: false, bigDone: true, small: [], waits: [], lastTap: {},
+                                           tapped: true, marks: {}, pages: [state.visitPlace] };
+        if (state.leftAt != null) clock = state.leftAt;
+      }
+      checkEnds('leave');
+      moment('leave');
+      state.lastSmall = visit.small;
+      clock = null;
       leaving = false;
       state.visitOpen = false;
+      state.leftAt = null;
+      state.kept = null;
       visit = null;
       save(STATE_KEY, state);
     }
@@ -441,21 +512,48 @@
     }
 
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) { hiddenAt = Date.now(); save(STATE_KEY, state); return; }
+      if (document.hidden) { hiddenAt = Date.now(); keep(); save(STATE_KEY, state); return; }
       if (hiddenAt && Date.now() - hiddenAt > AWAY_S * 1000) { leave(); arrive(); }
       hiddenAt = 0;
     });
-    window.addEventListener('pagehide', function () { leave(); });
-    window.addEventListener('pageshow', function (e) { if (e.persisted && !visit) arrive(); });   /* Safari's back-forward cache */
+    /* Going: keep the visit and the time, and let the next page decide. The visit stays in memory, so a page Safari
+       brings back from its back-forward cache carries on as it was if no other page has taken the visit since. */
+    window.addEventListener('pagehide', function () {
+      if (!visit) return;
+      keep();
+      state.leftAt = Date.now();
+      save(STATE_KEY, state);
+    });
+    window.addEventListener('pageshow', function (e) {   /* Safari's back-forward cache */
+      if (!e.persisted) return;
+      var saved = load(STATE_KEY);
+      if (saved) state = saved;
+      if (visit && state.visitOpen && state.kept && state.kept.id === visit.id && state.visitPlace === place) {
+        state.leftAt = null; state.kept = null; save(STATE_KEY, state);
+        return;
+      }
+      visit = null;
+      arrive();
+    });
 
     /* ---------- loading ---------- */
 
-    var names = opts.chains || [];
-    var ready = Promise.all(names.map(function (n) {
-      return fetch('events/' + n + '.json', { cache: 'no-cache' })
+    /* `chains: 'all'` reads every chain from events/index.json, which `py events.py` keeps level with the folder:
+       a visit's leave runs only over the chains its page has loaded, so every page loads every chain, and the
+       records' `place` keeps each to its own page. */
+    var names = [];
+    function readJson(path) {
+      return fetch(path, { cache: 'no-cache' })
         .then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); })
-        .catch(function (e) { note('could not read events/' + n + '.json (' + e.message + ')'); return null; });
-    })).then(function (files) {
+        .catch(function (e) { note('could not read ' + path + ' (' + e.message + ')'); return null; });
+    }
+    var listed = opts.chains === 'all'
+      ? readJson('events/index.json').then(function (ix) { return (ix && ix.chains) || []; })
+      : Promise.resolve(opts.chains || []);
+    var ready = listed.then(function (list) {
+      names = list;
+      return Promise.all(names.map(function (n) { return readJson('events/' + n + '.json'); }));
+    }).then(function (files) {
       for (var f = 0; f < files.length; f++) {
         if (!files[f]) continue;
         chains.push(files[f]);
@@ -484,7 +582,7 @@
         }
       }
       drawRoom(shownCues());
-      arrive();
+      begin();
     });
 
     return {

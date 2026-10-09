@@ -8,6 +8,9 @@
       "leans": [],
       "weight": 1,
       "moment": "wait 20-90 s",
+      "when": [
+        "place = common room"
+      ],
       "show": [
         "fire green for 2 s"
       ]
@@ -20,6 +23,7 @@
       "weight": 1,
       "moment": "wait 20-90 s",
       "when": [
+        "place = common room",
         "portrait = shut"
       ],
       "show": [
@@ -33,6 +37,9 @@
       "leans": [],
       "weight": 1,
       "moment": "first tap",
+      "when": [
+        "place = common room"
+      ],
       "who": [
         {
           "as": "dorm",
@@ -56,6 +63,9 @@
       "leans": [],
       "weight": 1,
       "moment": "first tap",
+      "when": [
+        "place = common room"
+      ],
       "who": [
         {
           "as": "runner",
@@ -99,6 +109,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "time != morning"
       ],
       "who": [
@@ -137,6 +148,9 @@
       "leans": [],
       "weight": 1,
       "moment": "arrive",
+      "when": [
+        "place = common room"
+      ],
       "who": [
         {
           "as": "players",

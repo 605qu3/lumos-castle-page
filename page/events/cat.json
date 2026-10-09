@@ -173,6 +173,7 @@
       "id": "cat.sits-with-him",
       "moment": "quiet 30-60 s",
       "when": [
+        "place = common room",
         "time != night",
         "cat_sat != yes"
       ],

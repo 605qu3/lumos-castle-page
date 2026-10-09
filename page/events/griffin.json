@@ -19,6 +19,7 @@
       "leans": [],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "time != night",
         "griffin_last != folded"
       ],
@@ -36,6 +37,7 @@
       "leans": [],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "time != night"
       ],
       "one_of": "griffin-arrive",

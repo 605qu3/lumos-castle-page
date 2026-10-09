@@ -396,7 +396,7 @@
       "leans": [],
       "moment": "leave",
       "when": [
-        "place = corridor",
+        "been corridor = yes",
         "sticks_this = yes"
       ],
       "starts": [
@@ -412,7 +412,7 @@
       "leans": [],
       "moment": "leave",
       "when": [
-        "place = corridor",
+        "been corridor = yes",
         "sticks_this != yes"
       ],
       "starts": [

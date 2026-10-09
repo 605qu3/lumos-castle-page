@@ -110,6 +110,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "trevor = boxed",
         "today >= escape_due",
         "thanks != due",
@@ -259,6 +260,7 @@
       "weight": 2,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "thanks = due",
         "today > caught_on"
       ],
@@ -291,6 +293,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "thanks = due",
         "today > caught_on",
         "found >= 3"
@@ -327,6 +330,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "thanks = due",
         "today > caught_on",
         "found >= 3"

@@ -52,6 +52,7 @@
       "weight": 1,
       "moment": "wait 20-90 s",
       "when": [
+        "place = common room",
         "time = night",
         "letter_open = 0"
       ],

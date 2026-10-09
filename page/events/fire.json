@@ -13,7 +13,7 @@
       "tier": "big", "source": "device", "leans": ["setback"], "weight": 1,
       "boost": {"when": ["weather = rained"], "times": 3},
       "moment": "arrive",
-      "when": ["days since fire_out >= 7"],
+      "when": ["place = common room", "days since fire_out >= 7"],
       "starts": ["set fire = damp", "set pumps_left = 4-6", "stamp fire_out",
                  "log \"The fire would not catch {day}\""],
       "ends": [

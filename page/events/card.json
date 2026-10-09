@@ -36,6 +36,7 @@
       "leans": [],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "frog_card = yes"
       ],
       "one_of": "card-arrive",
@@ -51,6 +52,7 @@
       "leans": [],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "frog_card = yes"
       ],
       "one_of": "card-arrive",

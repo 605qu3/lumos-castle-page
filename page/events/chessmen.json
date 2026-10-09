@@ -1947,6 +1947,7 @@
       ],
       "moment": "quiet 20-40 s",
       "when": [
+        "place = common room",
         "game = on"
       ],
       "who": [

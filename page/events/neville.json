@@ -88,6 +88,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "slot = free",
         "trevor = boxed",
         "thanks != due",
@@ -447,6 +448,7 @@
       ],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "trouble = fresh",
         "today > trouble_on",
         "time = morning",
@@ -512,6 +514,7 @@
       ],
       "moment": "arrive",
       "when": [
+        "place = common room",
         "trouble = fresh",
         "today > trouble_on",
         "time != morning",

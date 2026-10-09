@@ -49,6 +49,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "letters = 0",
         "today >= next_letter_due",
         "slot = free"
@@ -132,6 +133,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "letters = 1",
         "today >= next_letter_due",
         "slot = free"
@@ -215,6 +217,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "letters = 2",
         "today >= next_letter_due",
         "slot = free"
@@ -298,6 +301,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "letters = 3",
         "today >= next_letter_due",
         "slot = free"
@@ -381,6 +385,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "letters = 4",
         "today >= next_letter_due",
         "slot = free"
@@ -464,6 +469,7 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
+        "place = common room",
         "letters = 5",
         "today >= next_letter_due"
       ],
