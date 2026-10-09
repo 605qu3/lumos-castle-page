@@ -148,6 +148,7 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
+<script src="castle-events.js?v=9"></script>
 <script>
 (function () {
 'use strict';
@@ -558,29 +559,40 @@ function holdArrival(t) {
 }
 
 /* ---------- the bedtime (Godric, 9 October 2026, 7.32 am: bed and waking, from a strip of eight) ----------
-   Lights out from below (?from=bedtime): the room already at lights out, he comes up the stair as the arrival does
+   Lights out from below (?from=room&bedtime, ?from=corridor&bedtime): the room already at lights out, he comes up the stair as the arrival does
    and settles to the stage, and as it settles the hangings draw bed by bed, the far ones first and his last; a hold,
    then the screen darkens and stays dark: the visit ends, the place saved as the dormitory, waking. From the bed's
    stop the drawn hangings filled the frame as one dark panel, and from inside the bed the same; the stage sees the
    whole room go to bed with the fire low. Waking (?from=sleep): the page opens on him sitting up in his bed, the
    hangings already back, looking across to the next bed and W1 with the fire at the edge (the pillow's gaze down the
    bed met the unlit front; facing the fire, 2.3 m off, filled the frame with the fireplace seen edge-on; his hangings
-   opening from inside showed only cloth), a breath, and the view settles to the stage. lumosGreybox.holdNight('bedtime' or 'waking', t) freezes either at t. */
+   opening from inside showed only cloth), a breath, and the view settles to the stage. lumosGreybox.holdNight('bedtime' or 'waking', t) freezes either at t.
+   Wired to the events runtime (board req 46, 9 October 2026): the trip up at lights out is ?from=room&bedtime or
+   ?from=corridor&bedtime (Events' address forms, req 37), the runtime reading `from` and this page the bare flag
+   `bedtime`; and when lights out comes while he is already up here, the runtime's cue for the dormitory runs the same
+   night from where he stands: the eye glides to the stage, no climb (HERE). Either way, once the screen is dark the
+   page ends the visit (events.leave). lumosGreybox.holdNight('here', t) freezes that one. */
 var NIGHT = { start: 4.5, draw: 0.8, gap: 0.45, hold: 1.2, fade: 1.6, order: ['bed-5', 'bed-3', 'bed-4', 'bed-1', 'bed-his'] };
+var HERE = { settle: 1.7, start: 1.2 };   /* lights out with him already up here: the glide to the stage, and when the first hangings begin */
 var WAKE = { breath: 2.4, settle: 2.0, pos: [0, 1.1, 1.0], look: [-2.4, 0.85, 1.5] };
 var endVeil = document.createElement('div');
 endVeil.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;background:#000;opacity:0;pointer-events:none;z-index:49';
 document.body.appendChild(endVeil);
 var night = null;
-function nightEnd(kind) {
-  return kind === 'bedtime' ? NIGHT.start + (NIGHT.order.length - 1) * NIGHT.gap + NIGHT.draw + NIGHT.hold + NIGHT.fade
+function nightEnd(kind, here) {
+  return kind === 'bedtime' ? (here ? HERE.start : NIGHT.start) + (NIGHT.order.length - 1) * NIGHT.gap + NIGHT.draw + NIGHT.hold + NIGHT.fade
     : WAKE.breath + WAKE.settle;
 }
 function nightPose(t) {
   if (night.kind === 'bedtime') {
-    arrivalPose(Math.min(t, ARRIVE.climb + ARRIVE.breath + ARRIVE.settle), camera.position, lookTmp);
-    NIGHT.order.forEach(function (n, i) { hangings(n, easeInOut(clamp((t - NIGHT.start - i * NIGHT.gap) / NIGHT.draw, 0, 1))); });
-    var f0 = nightEnd('bedtime') - NIGHT.fade;
+    var start = night.here ? HERE.start : NIGHT.start;
+    if (night.here) {
+      var r0 = { pos: new THREE.Vector3(), look: new THREE.Vector3() }; restPose(r0.pos, r0.look);
+      var kh = easeInOut(clamp(t / HERE.settle, 0, 1));
+      camera.position.lerpVectors(night.here.pos, r0.pos, kh); lookTmp.lerpVectors(night.here.look, r0.look, kh);
+    } else arrivalPose(Math.min(t, ARRIVE.climb + ARRIVE.breath + ARRIVE.settle), camera.position, lookTmp);
+    NIGHT.order.forEach(function (n, i) { hangings(n, easeInOut(clamp((t - start - i * NIGHT.gap) / NIGHT.draw, 0, 1))); });
+    var f0 = nightEnd('bedtime', night.here) - NIGHT.fade;
     endVeil.style.opacity = String(clamp((t - f0) / NIGHT.fade, 0, 1));
   } else {
     var g = beds.filter(function (x) { return x.his; })[0].group;
@@ -593,13 +605,17 @@ function nightPose(t) {
 function updateNight(dt) {
   if (!night.hold) night.t += dt;
   nightPose(night.t);
-  if (night.t >= nightEnd(night.kind) && !night.hold) {
+  if (night.t >= nightEnd(night.kind, night.here) && !night.hold) {
     if (night.kind === 'waking') { night = null; mode = 'rest'; }
-    else { night.hold = true; }   /* the visit has ended: the screen stays dark */
+    else {   /* the screen stays dark and the visit ends here */
+      night.hold = true;
+      if (castle && castle.visit()) castle.leave();
+    }
   }
 }
-function startNight(kind, t, hold) {
-  night = { kind: kind, t: t || 0, hold: !!hold };
+/* here: lights out with him already up here, the eye gliding from where it is (or a held pose for a shot) */
+function startNight(kind, t, hold, here) {
+  night = { kind: kind, t: t || 0, hold: !!hold, here: here || null };
   arriving = false; tween = null; atStop = null; mode = 'night'; backBtn.hidden = true;
   yaw = yawT = 0; pitch = pitchT = 0;
   endVeil.style.opacity = '0';
@@ -675,9 +691,31 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
 backBtn.addEventListener('click', goBack);
 setView(view);
-if (kit.from === 'room') arriveFromRoom();
-else if (kit.from === 'bedtime') startNight('bedtime');
+/* the lights-out trip's flag is bare (&bedtime); ?bedtime=N is a test's visit length in minutes, not a trip */
+var lightsOutTrip = new URLSearchParams(location.search).get('bedtime') === '';
+if ((kit.from === 'room' || kit.from === 'corridor') && lightsOutTrip) startNight('bedtime');
+else if (kit.from === 'room') arriveFromRoom();
 else if (kit.from === 'sleep') startNight('waking');
+
+/* ---------- the events runtime (castle-events.js, board req 46) ----------
+   Every chain loads (the records' `place` keeps each to its page) with this page's place, `dormitory`, so the stair
+   carries the visit both ways and the waking (?from=sleep) opens a new one. The page answers `at`, the stop he stands
+   at. Two cues are its own, from bedtime.json: the warning (a console note until a drawing gives the room a way to
+   wind down) and lights out while he is already up here. Lines and sounds are the runtime's notes. */
+var castle = window.CastleEvents ? CastleEvents.start({
+  chains: 'all',
+  place: 'dormitory',
+  cues: {
+    'the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair': function () {
+      console.info('[dormitory] the bedtime warning: the room winds down (drawn later)');
+    },
+    "the dormitory's lights out: the room dimmed, the hangings drawn bed by bed, his last, and the screen darkens; then the page ends the visit": function () {
+      if (night || leaving) return;
+      startNight('bedtime', 0, false, { pos: camera.position.clone(), look: lookTmp.clone() });
+    }
+  },
+  builtins: { at: function () { return atStop ? atStop.name : 'none'; } }
+}) : null;
 
 /* ---------- per frame ---------- */
 
@@ -686,6 +724,7 @@ var t = 0;
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   t += dt;
+  if (castle) castle.tick(dt);
   updateCamera(dt);
   /* the fire low: a slow flicker */
   var f = 0.85 + 0.15 * Math.sin(t * 9) * Math.sin(t * 3.7);
@@ -703,7 +742,12 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, dim: dim, pose: pose,
   bedtime: function () { startNight('bedtime'); }, waking: function () { startNight('waking'); },
-  holdNight: function (kind, t) { startNight(kind, t, true); return nightEnd(kind); } };
+  holdNight: function (kind, t) {
+    if (kind !== 'here') { startNight(kind, t, true); return nightEnd(kind); }
+    var s = STOPS.filter(function (x) { return x.name === 'bed-his'; })[0].stop();   /* for a shot: from his bed's stop */
+    startNight('bedtime', t, true, s); return nightEnd('bedtime', true);
+  },
+  events: castle };
 })();
 </script>
 </body>
