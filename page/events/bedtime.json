@@ -10,7 +10,8 @@
       ],
       "moment": "bedtime warning",
       "when": [
-        "bedtime = set"
+        "bedtime = set",
+        "place != corridor"
       ],
       "who": [
         {
@@ -35,6 +36,43 @@
             "Ten minutes! I am a PREFECT, and I will be obeyed!",
             "Ten minutes, and I'm counting. I'm very good at counting."
           ]
+        }
+      ]
+    },
+    {
+      "id": "bedtime.warning-corridor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "bedtime warning",
+      "when": [
+        "bedtime = set",
+        "place = corridor"
+      ],
+      "who": [
+        {
+          "as": "fat-lady",
+          "role": "voice",
+          "name": "the fat lady",
+          "mark": "her frame"
+        }
+      ],
+      "show": [
+        "the Fat Lady yawns behind her hand and settles her shawl"
+      ],
+      "lines": [
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "bedtime.warning-corridor",
+          "text": [
+            "Ten minutes, dear, then in you come.",
+            "Ten minutes! I'll be wanting my beauty sleep.",
+            "Ten minutes till lights out, and I'm not opening for stragglers. Well. Maybe once."
+          ],
+          "canon": "drafts for docs/fat-lady-lines.md"
         }
       ]
     },
