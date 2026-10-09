@@ -609,6 +609,11 @@ the right window's lower glass, the moonlit one where the owl lands, its bottom 
 written() in her hand, shown while the room's rule shows it; a tap from the room brings it to his hand and puts it
 back (liftPaper now returns to the mode it was lifted from). Provisional, Godric to judge the place
 (assets/review/letter-sill.jpg); lost so far, the left window.
+Nearly Headless Nick past the open hole, 9 October 2026 (board req 60 and 69; passers.json, req 62): his path read to
+scale off assets/review/nick-path-plan.jpg (Godric's option 1, 2.43 pm), from behind her open back past the torch to
+his stop 0.7 m outside her door, the bow, and away past the hole's left edge; the four cues word for word; his words
+wait until he has stopped, his walk-off until they are done; the hole held open and the climb-out held while he is
+there. In grey until his card (req 61).
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -2560,7 +2565,8 @@ var FIGURES = [
   { role: 'pool', cell: 0, pose: 'standing, listening', mark: 'fire' },
   { role: 'pool', cell: 1, pose: 'standing, listening', mark: 'fire' },
   { role: 'pool', cell: 2, pose: 'standing, listening', mark: 'fire' },
-  { role: 'pool', cell: 3, pose: 'asleep, a book on the chest', mark: 'sofa' }
+  { role: 'pool', cell: 3, pose: 'asleep, a book on the chest', mark: 'sofa' },
+  { role: 'ghost', name: 'nearly headless nick', pose: 'turned, bowing', mark: 'hole-stop' }   /* req 69, word for word */
 ];
 var poolTex = null, poolReady = false, poolCards = {};
 function poolCard(cell) {
@@ -2590,6 +2596,7 @@ function poolCard(cell) {
 function drawFigures(list) {
   var want = {};
   for (var i = 0; i < list.length; i++) if (list[i].role === 'pool' && FIGURE_SPOTS[list[i].cell]) want[list[i].cell] = true;
+  nick.wanted = list.some(function (f) { return f.role === 'ghost' && f.name === 'nearly headless nick'; });
   for (var c in FIGURE_SPOTS) {
     if (!want[c] && !poolCards[c]) continue;
     var m = poolCard(+c);
@@ -3060,7 +3067,7 @@ function tap(cx, cy) {
   else if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
   /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
-  else if (hit === holeTap) { if (portrait.open) climbOut(); else { if (castle) castle.tap('hole'); togglePortrait(); } }
+  else if (hit === holeTap) { if (portrait.open) { if (!nickHolds()) climbOut(); } else { if (castle) castle.tap('hole'); togglePortrait(); } }
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
   else if (hit === stairs) climbStair(false, 'dormitory.html?from=room');
 }
@@ -3275,10 +3282,85 @@ function updatePortrait(dt) {
   corridorLight.intensity = 1.8 * k * (0.85 + 0.15 * Math.sin(clockT * 11) * Math.sin(clockT * 4.3));
   torchFlame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(clockT * 7.3)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(clockT * 9.1))), 1);
   if (portrait.open) {
-    portrait.closeT -= dt;
+    if (!nickHolds()) portrait.closeT -= dt;
     if (portrait.closeT <= 0) togglePortrait();
   }
 }
+
+/* ---------- Nearly Headless Nick past the open hole (board req 60 and 69; 9 October 2026) ----------
+   His path and stop are Magic's plan, assets/review/nick-path-plan.jpg (Godric's option 1, 2.43 pm), read off it to
+   scale in the hole's frame (x along the wall to the right from inside, z into the room, the tunnel's end at -0.8,
+   the far wall at -3.8): hidden behind her open back as she swings, out past the torch with its light through him,
+   across to his stop 0.7 m outside the hole (x 0.34, z -1.5), where he turns to the hole and bows, then away past the
+   hole's left edge toward the rest of the corridor. The records are the events lane's (passers.json, req 62): the
+   meeting and the bow stop and speak; the drift goes past without stopping; the wall variation comes out of the far
+   wall. While he is on his path or his words are up, the hole stays open and a tap on it does not climb out (the
+   meeting is set once ever at the beat), and the five seconds count again only when he has gone.
+   In grey until his card is drawn (req 61): a translucent silhouette, 1.75 m, drifting or turned bowing, facing the
+   eye; it brightens and warms as he passes the torch. */
+var NICK_H = 1.75, NICK_W = 0.75;
+var NICK_IN = [[1.95, -3.29], [1.45, -3.24], [1.03, -2.93], [0.62, -2.30], [0.34, -1.5]];   /* behind her back to the stop */
+var NICK_OUT = [[0.34, -1.5], [-0.4, -1.75], [-1.1, -1.95], [-1.9, -2.15], [-2.6, -2.3]];  /* the stop and away to the left */
+var NICK_WALL = [[1.4, -3.75], [1.1, -3.1], [0.6, -2.3], [-0.4, -1.95], [-1.9, -2.15], [-2.6, -2.3]];
+var NICK_SPEED = 0.7;                          /* metres a second, a ghost's unhurried drift */
+function nickCell(bowing) {
+  var c = makeCanvas(150, 350), g = c.getContext('2d');
+  g.fillStyle = '#fff';
+  if (!bowing) {                               /* drifting: upright, robes fading out toward the floor */
+    g.beginPath(); g.arc(75, 34, 24, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.moveTo(42, 70); g.lineTo(108, 70); g.lineTo(128, 330); g.lineTo(22, 330); g.closePath(); g.fill();
+  } else {                                     /* turned to the hole and bowing: head and shoulders dipped, a hand to his chest */
+    g.beginPath(); g.arc(75, 78, 24, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.moveTo(38, 104); g.lineTo(112, 104); g.lineTo(128, 330); g.lineTo(22, 330); g.closePath(); g.fill();
+  }
+  var fade = g.createLinearGradient(0, 230, 0, 350);
+  fade.addColorStop(0, 'rgba(0,0,0,0)'); fade.addColorStop(1, 'rgba(0,0,0,1)');
+  g.globalCompositeOperation = 'destination-out'; g.fillStyle = fade; g.fillRect(0, 230, 150, 120);
+  return tex(c);
+}
+var nickTex = { drift: nickCell(false), bow: nickCell(true) };
+var NICK_TINT = col(0xc9d6e8), NICK_WARM = col(0xffd9a8);
+var nickMesh = new THREE.Mesh(new THREE.PlaneGeometry(NICK_W, NICK_H), new THREE.MeshBasicMaterial({ map: nickTex.drift,
+  color: NICK_TINT.clone(), transparent: true, opacity: 0.36, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+nickMesh.name = 'nick'; nickMesh.visible = false; nickMesh.renderOrder = 2;
+scene.add(nickMesh); facers.push(nickMesh);
+var nick = { state: 'away', path: null, d: 0, len: 0, wanted: false, after: null };
+function nickPath(pts) {
+  return new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], 0.05, p[1]); }), false, 'catmullrom', 0.5);
+}
+/* along a path: 'in' ends at the stop and waits there; 'past' and 'out' end out of sight and he is gone */
+function nickGo(pts, state, after) {
+  nick.path = nickPath(pts); nick.len = nick.path.getLength(); nick.d = 0; nick.state = state; nick.after = after || null;
+  nickMesh.material.map = nickTex.drift; nickMesh.visible = true;
+}
+function nickHolds() { return nick.state !== 'away' || (lineCur && lineCur.line.speaker === 'nick'); }
+var NICK_CUES = {
+  'nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow': function () { nickGo(NICK_IN, 'in'); },
+  'nick drifts out from behind her open back, past the torch, its light through him, and on past the hole without stopping, out past its left edge': function () { nickGo(NICK_IN.concat(NICK_OUT.slice(1)), 'past'); },
+  "nick comes through the corridor's far wall itself, drifts across and on out past the hole's left edge": function () { nickGo(NICK_WALL, 'past'); }
+};
+var _nl = new THREE.Vector3();
+function updateNick(dt) {
+  if (nick.state === 'away') return;
+  if (nick.state === 'stop') {
+    if (!nick.wanted && !(lineCur && lineCur.line.speaker === 'nick') && !lineQ.some(function (l) { return l.speaker === 'nick'; })) nickGo(NICK_OUT, 'out');
+  } else {
+    nick.d = Math.min(nick.len, nick.d + NICK_SPEED * dt);
+    if (nick.d >= nick.len) {
+      if (nick.state === 'in') { nick.state = 'stop'; nickMesh.material.map = nickTex.bow; }
+      else { nick.state = 'away'; nickMesh.visible = false; portrait.closeT = Math.max(portrait.closeT, 2.5); return; }
+    }
+  }
+  var u = nick.len ? nick.d / nick.len : 1;
+  _nl.copy(nick.path.getPointAt(u)); _nl.y += NICK_H / 2;
+  holeFrame.localToWorld(nickMesh.position.copy(_nl));
+  /* the torch's light through him: warmer and brighter as he passes it */
+  var near = Math.exp(-Math.pow(_nl.x - TORCH_HEAD.x, 2) / 0.25 - Math.pow(_nl.z - TORCH_HEAD.z, 2) / 1.2);
+  nickMesh.material.color.copy(NICK_TINT).lerp(NICK_WARM, 0.6 * near);
+  nickMesh.material.opacity = 0.36 + 0.2 * near;
+}
+/* where his words are said from: above his head wherever he is */
+function nickHead() { return nickMesh.position.clone().add(new THREE.Vector3(0, NICK_H * 0.45, 0)); }
 
 /* ---------- the events' lines (board req 65; The events runtime, Twenty-fourth session) ----------
    The runtime hands each firing's lines to showLines, then runs its cues, then calls drawFigures already without a
@@ -3320,6 +3402,7 @@ function standFigures() {
 }
 function lineAnchor(l) {
   var f = (l.figures || [])[0], s = f && FIGURE_SPOTS[f.cell];
+  if (f && f.role === 'ghost' && f.name === 'nearly headless nick' && nick.state !== 'away') return nickHead;   /* he moves */
   if (s && l.medium !== 'heard') return s.still ? new THREE.Vector3(s.x + 0.55, s.y + 0.5, s.z)   /* his head on the arm */
     : new THREE.Vector3(s.x, s.y + POOL.h * 0.95, s.z);
   if (l.medium === 'heard') return HEARD_FROM[l.speaker] || null;
@@ -3356,7 +3439,7 @@ function placeLine(c) {
   var el = c.el, W = window.innerWidth, H = window.innerHeight, w = el.offsetWidth, h = el.offsetHeight;
   var ax = W / 2, ay = H * 0.8, seen = false;
   if (c.anchor) {
-    lineV.copy(c.anchor).project(camera);
+    lineV.copy(typeof c.anchor === 'function' ? c.anchor() : c.anchor).project(camera);
     if (lineV.z < 1) { ax = (lineV.x + 1) / 2 * W; ay = (1 - lineV.y) / 2 * H; seen = ax > 0 && ax < W && ay > 0 && ay < H; }
   }
   var left = clamp(ax - w / 2, 12, W - w - 12), top, below = false;
@@ -3383,7 +3466,8 @@ function updateLines(dt) {
       standFigures();                          /* a speaker walked off goes now his words are done */
     }
   }
-  if (!lineCur && lineQ.length) {
+  /* his words wait until he has drifted in to his stop and turned to the hole */
+  if (!lineCur && lineQ.length && !(lineQ[0].speaker === 'nick' && lineQ[0].medium === 'said' && nick.state === 'in')) {
     var l = lineQ.shift();
     lineCur = { line: l, t: lineSeconds(l), anchor: lineAnchor(l), el: null };
     /* a written line the board pins as a note of its own needs no scrap: the note itself appears */
@@ -3421,7 +3505,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the embers brighten a step': embersStep,
     "the fire catches with a whoosh and the room's light comes up": fireCatches,
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire
-  }, VISITOR_CUES),
+  }, VISITOR_CUES, NICK_CUES),
   drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); },
   figures: FIGURES,
   drawFigures: drawFiguresInOrder,
@@ -3469,6 +3553,7 @@ function frame() {
   updateSitters(dt);
   updateOpposite(dt);
   updateTrevor(dt);
+  updateNick(dt);
   updateLines(dt);
   updateNotes();
   updatePapers(dt, t);
@@ -3479,7 +3564,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
