@@ -490,6 +490,14 @@ clear for her study's door.
 desk-chair, placeholder, 8 October 2026: a grey ladder-back 0.5 by 0.95 m square before the desk at x 3.55, z -2.93,
 0.7 m off the desk's centre line, as the chair pulled up to it (David). Its drawing is the next question; until it
 loads the grey stays (LDP-79).
+desk-chair, round 1: candidate 1 of 1, the joiner's oak ladder-back seen square from behind, designed with David one
+question at a time (an oak ladder-back with a rush seat, over a Windsor, the Subjects sheet's mahogany desk chair, V&A
+O368630, and a joint stool). All seven checks passed, the colour check off by design (worn oak and rush, not the
+armchair's oxblood); 2522 px per metre at the drawing's size. Keyed at 220 x 391 px, 400 px per metre, about 0.3 MB on
+the GPU. Placed at 0.55 m wide, 0.98 m from the image, sink 0.03, square before the desk at x 3.55, z -2.93; it turns
+to face the eye with the two tables and casts through a twin. David kept it with two things seen: small turned balls
+on the uprights where the brief said plain tops, and the rush seat as a band rather than a sliver. About 13 cents.
+Checks and the run are in pipeline/runs/desk-chair/r1/.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1597,6 +1605,8 @@ var LAYERS = {
   'table-top': { url: '../assets/layers/table-top.png', w: 0.9, plan: true },
   /* drawn long and low: at 1.2 m wide the table stands about 0.72 m, a real side table (David) */
   'side-table': { url: '../assets/layers/side-table.png', w: 1.2, sink: 0.15, mirror: true },
+  /* the desk chair, the joiner's oak ladder-back seen square from behind; it turns to face the eye with the tables */
+  'desk-chair': { url: '../assets/layers/desk-chair.png', w: 0.55, sink: 0.03 },
   /* the cat is a sheet: nine cells in a row, six walking frames of one stride then sit, tail flick, look back; 600 px per metre */
   'cat-sheet': { sheet: '../assets/layers/cat-sheet.png', cols: 9, cellW: 344, cellH: 336, pxPerM: 600, walk: [0, 1, 2, 3, 4, 5], sit: 6, flick: 7, look: 8, stride: 0.55 }
 };
@@ -2200,7 +2210,7 @@ function bellowsTap() {
    table, a plane facing the hearth, read as tilted and flying on the drag left (David, 8 October 2026). Both turn about
    their upright to face the eye every frame, so each is always seen as drawn; the round table's code top is round and
    needs no turning. */
-var facers = [table, sideTable];
+var facers = [table, sideTable, deskChair];
 function faceEye() {
   for (var i = 0; i < facers.length; i++) {
     var m = facers[i];
@@ -2212,7 +2222,7 @@ function faceEye() {
    proof that the chair floats. Each drawn floor piece gets an invisible twin, lowered until its highest drawn foot
    touches the floor, which casts the fire's shadow; the drawing itself casts none. The feet are read off the drawing's
    alpha once it has loaded: the lowest opaque pixel of each run of columns in its bottom two-fifths. */
-var TWINNED = ['armchair-left', 'sofa', 'wingback', 'table', 'side-table'];
+var TWINNED = ['armchair-left', 'sofa', 'wingback', 'table', 'side-table', 'desk-chair'];
 var twins = [];
 function highestFootFrac(im) {
   /* the outer feet, as the pipeline's level check reads them: the lowest opaque pixel in the drawing's left and right
