@@ -558,6 +558,9 @@ the chest' at sofa) and stands whoever the runtime casts. The fire mark is the h
 the chairs' line, each facing it; the sofa mark lays the sleeper along the seat. Projected with the cells at rest, from
 the stop and on both drags; provisional, put to Godric (assets/review/students-marks.jpg). Lost: the rug in front of the
 chairs (hid both). The sheet loads only when a student first stands, about 7 MB, one texture for every card.
+the sitters asleep at night, 9 October 2026 (board req 35, People's sleeping cells): at night (night.json's room rule)
+both sit asleep in their own chairs, the loop stopped, nobody visiting; the cells scaled to tier B as the seated sheets
+were, their page scales from People's ratios against the full-size cells. Shot by day and night: same size and seat.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1756,8 +1759,14 @@ var SITTERS = {
          so swapping between them is a glance and not a jump. She fills more of
          a cell here than on the main sheet, so this sheet draws her smaller. */
       seated: { url: '../assets/layers/sitter-mantel-seated.png', cellW: 206, cellH: 343, scale: 0.55 / 0.66,
-                native: [1, 1, 1, 1], seatCell: [0.18, 0.68] }
+                native: [1, 1, 1, 1], seatCell: [0.18, 0.68] },
+      /* asleep at night (People, The sleeping cells; board req 35): one cell drawn at about 2.03 times the seated
+         sheet's pixel scale against its full-size cell of 913 px, so its scale is the seated one times 1807 / 2.03 /
+         913; staged at tier B as the seated sheet was (full size in assets/layers-full) */
+      sleep: { url: '../assets/layers/sitter-mantel-sleep.png', cellW: 203, cellH: 334, scale: 0.55 / 0.66 * 1807 / 2.03 / 913,
+               native: [1], seatCell: [0.16, 0.67] }
     },
+    sleeping: { sheet: 'sleep', cell: 0 },
     walk: { sheet: 'main', cells: [0, 1, 2, 3] },
     standing: { sheet: 'main', cell: 4 },
     /* standing still, she settles her hat now and then: one small thing a
@@ -1784,8 +1793,12 @@ var SITTERS = {
               native: [1, 1, 1, 1, 1, 1, 1, 1], seatCell: [0.20, 0.70] },
       /* his walk, drawn on its own sheet from a single figure of him */
       walk: { url: '../assets/layers/sitter-right-walk.png', cellW: 158, cellH: 383, scale: 1,
-              native: [1, 1, 1, 1] }
+              native: [1, 1, 1, 1] },
+      /* asleep at night: one cell at about 2.4 times his main sheet's pixel scale against its full-size cell of 898 px */
+      sleep: { url: '../assets/layers/sitter-right-sleep.png', cellW: 139, cellH: 226, scale: 1815 / 2.4 / 898,
+               native: [1], seatCell: [0.13, 0.65] }
     },
+    sleeping: { sheet: 'sleep', cell: 0 },
     walk: { sheet: 'walk', cells: [0, 1, 2, 3] },
     standing: { sheet: 'main', cell: 4 },
     fidget: null,
@@ -2001,6 +2014,7 @@ function reached(from, to, x) {
 }
 
 function updateSitter(st, dt) {
+  if (st.night) return;                       /* asleep in their own chair until morning */
   var def = SITTERS[st.name], sc = st.where ? SCENES[st.where] : null;
   var home = st.where === def.home;
   st.t -= dt;
@@ -2218,6 +2232,22 @@ function updateOpposite(dt) {
   opp.dirty = false;
   drawOpposite();
   oppTex.needsUpdate = true;
+}
+/* At night (night.json's room rule, the runtime's time) both sit asleep in their own chairs on their sleeping cells,
+   no rising and no visiting (Magic for the boys, "The sitters at night"; board req 35). Morning finds them seated
+   awake, the loop taking up from there. */
+var NIGHT_SITTERS = 'both sitters asleep in their chairs';
+function setNight(on) {
+  for (var n in sitters) {
+    var st = sitters[n], def = SITTERS[n], home = def.home, sc = SCENES[home];
+    if (on === !!st.night) continue;
+    st.night = on; st.held = false; st.goHome = false;
+    st.where = home; st.phase = 'seated'; st.x = sc.seatX; st.facing = sc.seatFacing;
+    st.pose = on ? def.sleeping : def.seats[0];
+    st.t = on ? 1e9 : dwell(60, 200); st.idle = on ? 1e9 : dwell(def.seats[0].hold[0], def.seats[0].hold[1]);
+    st.dirty = true;
+  }
+  if (on) { opp.who = null; opp.mode = null; opp.dirty = true; }
 }
 function visitorsDrawRoom(shows) {
   for (var n in VISITING) {
@@ -3043,7 +3073,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the fire catches with a whoosh and the room's light comes up": fireCatches,
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire
   }, VISITOR_CUES),
-  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); trevorDrawRoom(shows); },
+  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); },
   figures: FIGURES,
   drawFigures: drawFigures,
   builtins: {
