@@ -288,10 +288,11 @@ var floor = new THREE.Mesh(new THREE.PlaneGeometry(END_X - STAIR_X, WIDTH), floo
 floor.rotation.x = -Math.PI / 2; floor.position.set((END_X + STAIR_X) / 2, 0, MID_Z);
 floor.name = 'floor'; scene.add(floor); register(floor, 0);
 /* the flight down from the stair head, full width */
-var stairMat = solid(0x6f6b66);
+var stairMat = solid(0x6f6b66), treads = [];
 for (var si = 1; si <= STEPS; si++) {
   var top = -si * STEP_RISE;
-  box(scene, STEP_RUN, 0.4, WIDTH, STAIR_X - (si - 0.5) * STEP_RUN, top - 0.2, MID_Z, stairMat, 0).name = 'stair-' + si;
+  var tread = box(scene, STEP_RUN, 0.4, WIDTH, STAIR_X - (si - 0.5) * STEP_RUN, top - 0.2, MID_Z, stairMat, 0);
+  tread.name = 'stair-' + si; treads.push(tread);
 }
 /* the landing at the flight's foot, and a grey stand-in for its tall window in the end wall (req 29 settles the window
    and what it looks onto; a pale sky shape for now so the foot of the stair is never dark) */
@@ -767,7 +768,11 @@ var STOPS = [
       var d = DOOR.h * STOP_MARGIN / 2 / Math.tan(FOV_REST / 2 * Math.PI / 180);
       return { pos: new THREE.Vector3(END_X - d, EYE, MID_Z), look: new THREE.Vector3(END_X, 1.2, MID_Z), fov: FOV_REST }; } },
   /* the inglenook: from a hand off the far wall, square to the hearth, the settles either side */
-  { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } }
+  { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } },
+  /* the landing at the flight's foot (req 59): reached by a tap on the flight, standing at its edge square to the end
+     wall, the window's lower lights and the flags before it in view */
+  { name: 'landing', meshes: treads, stop: function () {
+      return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } }
 ];
 var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
@@ -776,6 +781,7 @@ STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s
    have no stop */
 armour.userData.thing = 'armour';
 sticks.userData.thing = 'sticks'; tappables.push(sticks);
+treads.forEach(function (m) { m.userData.thing = 'stair'; });   /* the flight: the runtime's `tap stair` takes him down */
 
 var mode = 'rest', atStop = null, tween = null;
 var backBtn = document.getElementById('back');
@@ -910,6 +916,7 @@ function updateCamera(dt) {
     camera.position.y = lerp(tween.from.pos.y, tween.to.pos.y, k);
     lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
     setFov(lerp(tween.from.fov, tween.to.fov, k));
+    if (tween.dip) stairDip(tween, k);
     if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
   } else if (mode === 'rest') {
     yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
@@ -998,6 +1005,7 @@ function corridorDrawRoom(shown) {
   sticksShown = has(CUE.up) ? 'up' : has(CUE.fallen) || has(CUE.boo) ? 'fallen' : 'gone';
   boo.visible = has(CUE.boo) && !sticksQueue.length;
   drawTrevor(has, back);
+  drawFoot(has);
   setPaintingSitter(has(OPP_SITTERS.mantel.cue) ? 'mantel' : has(OPP_SITTERS.right.cue) ? 'right' : null);
 }
 function sticksAnim(kinds) { kinds.forEach(function (k) { sticksQueue.push({ kind: k, t: 0, dur: { dodge: 0.6, drop: 0.5, jig: 1.2, drum: 0.9, scatter: 1.6, march: 1.8 }[k] }); }); }
@@ -1143,7 +1151,8 @@ var SPEAKER_AT = {
   peeves: function () { return sticks.visible ? sticks.position.clone() : helmetPos(); },
   trevor: function () { return trevorHit.visible ? trevorHit.position.clone() : helmetPos(); },
   sitter: function () { return worldOf(paintingOpp, 0); },
-  thing: function () { return new THREE.Vector3(END_X, 1.4, MID_Z); }  /* the door at the end, behind which finds turn up */
+  thing: function () { return new THREE.Vector3(END_X, 1.4, MID_Z); }, /* the door at the end, behind which finds turn up */
+  stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }  /* the moving stair's grind, at its head */
 };
 var linesEl = document.getElementById('lines');
 var lineQ = [], lineCur = null;
@@ -1218,6 +1227,52 @@ function updateLines(dt) {
   }
 }
 
+/* ---------- the moving stair (board req 59; The events runtime, "The moving stair, as records") ----------
+   A tap on the flight raises `tap stair`; its record's cue sinks the view down the flight over a few seconds to the
+   landing stop (`at` answers `landing` there), and Back brings him up. About one trip in eight the week's vanishing
+   step is not there: the view dips a step on it with a small oof. The step is the week's, from CastleEvents.week(), so
+   both brothers' castles miss the same one all week: never the top or the bottom two, so the dip is seen. The grind
+   behind him is heard in words until it is recorded. The place at the flight's foot is drawn from the chain's rules;
+   only the window is drawn, so the draw holds to the window for the torch-lit turn and for Friday's doors and gallery
+   (req 68) until each is drawn (this lane's choice, which req 59 and req 68 leave to it), and the page notes which
+   place the state names. */
+var landingStop = STOPS.filter(function (s) { return s.name === 'landing'; })[0];
+function vanishingStep() {
+  var w = window.CastleEvents && CastleEvents.week ? CastleEvents.week() : 0;
+  return 2 + ((w % (STEPS - 3)) + (STEPS - 3)) % (STEPS - 3);       /* steps 2 to 9 of 11, counted from the top */
+}
+function goDownStair(dip) {
+  if (tween || leaving || view !== 'length') return;
+  atStop = landingStop; mode = 'stop'; backBtn.hidden = false;
+  var to = landingStop.stop(), from = { pos: camera.position.clone(), look: lookTmp.clone(), fov: camera.fov };
+  tween = { t: 0, dur: 3.2, from: from, to: to, c1: from.pos.clone().lerp(to.pos, 0.33), c2: from.pos.clone().lerp(to.pos, 0.67) };
+  if (dip) {
+    var stepX = STAIR_X - (vanishingStep() - 0.5) * STEP_RUN;
+    tween.dip = { at: clamp((from.pos.x - stepX) / (from.pos.x - to.pos.x), 0.1, 0.9), oof: false };
+  }
+}
+/* the dip: a step's drop and back over a sixth of the way, centred on the missing step */
+function stairDip(tw, k) {
+  var u = (k - tw.dip.at) / 0.08;
+  if (Math.abs(u) < 1) camera.position.y -= STEP_RISE * 1.2 * Math.cos(u * Math.PI / 2);
+  if (!tw.dip.oof && k >= tw.dip.at - 0.02) { tw.dip.oof = true; showLines([{ medium: 'heard', sound: 'oof!' }]); }
+}
+var FOOT_CUES = {
+  window: 'at the flight\'s foot, a small landing with a tall window in its far wall, daylight on the flags',
+  torch: 'at the flight\'s foot, the landing turning a corner under a torch, the next flight glimpsed going on and stopping at the turn',
+  doors: "at the flight's foot, the entrance hall's great oak front doors, torchlit, daylight under them",
+  gallery: "at the flight's foot, a short gallery of portraits, one frame empty"
+};
+var FOOT_DRAWN = { window: true };
+var footNamed = null;
+function drawFoot(has) {
+  var named = null;
+  for (var k in FOOT_CUES) if (has(FOOT_CUES[k])) named = k;
+  if (named === footNamed) return;
+  footNamed = named;
+  if (named && !FOOT_DRAWN[named]) console.info('[corridor] the stair leads to the ' + named + ' today; held to the window until it is drawn');
+}
+
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'corridor',
@@ -1244,6 +1299,10 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'Trevor hops to another spot by the suit': croak('a croak'),
     'Trevor hops off along the corridor toward the Fat Lady, stopping halfway': croak('a croak'),
     "Trevor hops on and sits under the Fat Lady's frame, waiting to be let in": croak('a croak'),
+    /* the moving stair (req 59) */
+    "the view sinks down the flight over a few seconds to stand on the landing before the place at its foot; Back brings him up": function () { goDownStair(false); },
+    "on the way down the week's vanishing step is not there: the view dips a step with a small oof and goes on down to the landing": function () { goDownStair(true); },
+    'stone grinds behind him, low and short, then a soft thud as it settles': function () { showLines([{ medium: 'heard', speaker: 'stair', sound: 'stone grinding behind you, low and short, then a soft thud' }]); },
     /* the bedtime (board req 37): out here the Fat Lady sends him in, and he goes on up to bed */
     'the Fat Lady yawns behind her hand and settles her shawl': note('the Fat Lady yawns and settles her shawl'),
     'the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)': function () {
@@ -1288,7 +1347,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter,
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
