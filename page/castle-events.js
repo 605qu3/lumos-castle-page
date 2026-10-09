@@ -41,7 +41,8 @@
    visit, once a quiet stretch; a tap on a thing a `say` record listens for opens the ear (page/castle-ear.js, or
    `opts.ear`), the built-in `listening` names it while the ear is open and a beat after, and the guesses the ear
    hands are matched forgivingly to the `say` moments that hold (`heard()`, which a page may call itself).
-   Not yet: `mark next to X`; a record that needs it is skipped with a note in the console, never thrown.
+   Then `mark next to X` (Trevor's hop, twenty-sixth session): one of the marks the page names next to X's
+   (`neighbours`), or with none named another of its set. Nothing in the records waits on the runtime now.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -127,6 +128,9 @@
     var place = opts.place || 'common room';     /* the page this runtime runs on: `common room` or `corridor` */
     var markSets = {};                           /* named sets of the page's marks a draw picks from: the page's `opts.marks`, then each chain's `marks` */
     for (var ms in (opts.marks || {})) markSets[ms] = (opts.marks[ms] || []).slice();
+    /* Which of the page's marks are next to which, for `mark next to X` (Trevor's hop, twenty-sixth session):
+       `{ 'floor-a': ['floor-b'], 'floor-b': ['floor-a', 'floor-c'] }`. Nearness is the page's, which places them. */
+    var neighbours = opts.neighbours || {};
     var bagDefs = {};                            /* each chain's bags, by name */
     var leaving = false;                         /* while a visit's leave runs, `place` is the page that visit was on */
     var state = load(STATE_KEY);
@@ -263,13 +267,29 @@
        `mark Y, by week`: the week's own, in the set's order by the week from the date, so both castles agree and a
        set of two alternates (Friday's places, board req 64). */
     function drawMark(spec, current, rec) {
+      var nx = /^next to ([a-z_]+)$/.exec(spec);
+      if (nx) return drawNextTo(state.vars[nx[1]], rec);
       var m = /^([a-z]+)(, not last|, by week)?$/.exec(spec);
-      if (!m) { note(rec.id + ': the draw "mark ' + spec + '" waits on the page\'s mark neighbours'); return undefined; }
+      if (!m) { note(rec.id + ': the draw "mark ' + spec + '" does not parse'); return undefined; }
       var set = markSets[m[1]];
       if (!set || !set.length) { note(rec.id + ': no marks named ' + m[1]); return undefined; }
       if (m[2] === ', by week') return set[weekNumber(nowDate()) % set.length];
       var at = current == null ? set[0] : current;
       var pool = m[2] ? set.filter(function (n) { return n !== at; }) : set;
+      return pool.length ? pool[Math.floor(Math.random() * pool.length)] : undefined;
+    }
+
+    /* `mark next to X`: one of the marks the page names next to the one X is at, never X's own. A page that names
+       none for it gives another mark of the set X's mark is in, with a note, so a hop still lands somewhere. */
+    function drawNextTo(at, rec) {
+      var pool = (neighbours[at] || []).filter(function (n) { return n !== at; });
+      if (!pool.length) {
+        for (var name in markSets) if (markSets[name].indexOf(at) >= 0) {
+          pool = markSets[name].filter(function (n) { return n !== at; });
+          break;
+        }
+        note(rec.id + ': the page names no neighbours for ' + at + (pool.length ? ', so another of its set' : ''));
+      }
       return pool.length ? pool[Math.floor(Math.random() * pool.length)] : undefined;
     }
 
@@ -554,11 +574,10 @@
     }
 
     /* What a record needs that is not built: a figure on a page that draws none (a trace or a voice has no body to
-       draw, so it fires and its lines are noted), or a mark draw that needs neighbours. */
+       draw, so it fires and its lines are noted). */
     function supported(rec) {
       var who = rec.who || [];
       if (!figures) for (var w = 0; w < who.length; w++) if (FIGURE.test(who[w].role)) return 'figures on marks';
-      if (/mark next to /.test((rec.starts || []).join('|'))) return 'the page\'s mark neighbours';
       return null;
     }
 
