@@ -539,7 +539,8 @@ her away, and her record's cue brings her home through her painting's exit. A gr
 corridor's far wall, a sitter out visiting drawn into it from her standing cell: looking in, turned away, or walking off
 through its painted door. Traced past her open back, the open hole shows 1.15 to 1.75 m along that wall at rest, which
 the torch fills, and -0.4 to 0.95 on the drag left; it hangs at 0.3 m, in the drag left's strip, provisionally, since
-whether it and the torch change places is Godric's with the Corridor's req 33 (assets/review/painting-opposite-hole.jpg).
+at 2.43 pm Godric chose to swap it with the torch: it hangs at 1.5 m, seen whole at rest, the torch at 0.9 whole on the
+drag left, the corridor's pair at 0.9 and 2.1 flanking it (req 33).
 Tried by hand on a fresh state: the first find, her coming home, the caught walk-off; console clean on both screens.
 the candle stand, 9 October 2026 (Godric, 2.24 pm, from assets/review/fireside-candle-basket.jpg): the fireside move had
 left it behind the armchair, so it stands beside the armchair's outer arm, x -2.55, z -3.8, whole at rest and at the
@@ -1537,9 +1538,11 @@ holeFrame.add(corridorWall); register(corridorWall, 0);
 /* the blacksmith's torch on its scrolled bracket (CoS 8: a bracket a cat could hang from), a card flat on the far wall,
    placed by tracing sight lines through the open hole: its head at 1.5 m along and 1.3 m up, so the whole torch shows at
    the default view and draws the eye out of the room; a drag left shows its bracket (8 October 2026: 0.95 m when the
-   corridor was 2 m wide, 1.3 when it became 3 m to match the corridor page, then 1.5 to clear the ring); at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
+   corridor was 2 m wide, 1.3 when it became 3 m to match the corridor page, then 1.5 to clear the ring; 9 October 2026,
+   0.9, seen whole on the drag left, when Godric gave its place at rest to the painting opposite the hole; the corridor's
+   pair flanks that painting, at 0.9 and 2.1, the second never seen from here); at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
    its flame is one of the fire's own sprites, on the head, 87 percent across the drawing's top */
-var TORCH_HEAD = new THREE.Vector3(1.5, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
+var TORCH_HEAD = new THREE.Vector3(0.9, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
 var torch = cutoutMesh(cutoutTexture(64, 124, '#000', drawTorch), 0.35, 0.68);
 torch.position.set(TORCH_HEAD.x - 0.371 * 0.35, TORCH_HEAD.y - 0.34, TORCH_HEAD.z);
 torch.castShadow = false;
@@ -2168,16 +2171,17 @@ function comeHome(n) {
 
 /* The painting opposite the hole, a grey stand-in until the Corridor hangs the drawn one (req 33). Traced from the eye
    through both circles of the tunnel and past her open back, the open hole shows 1.15 to 1.75 m along the corridor's
-   far wall at rest, which the torch fills, and -0.4 to 0.95 on the full drag left; no strip is seen from both. So it
-   hangs, provisionally, in the drag left's strip, nothing placed moving; whether it and the torch change places, so the
-   find lands at rest where a boy taps the hole, is David's with the Corridor's req 33. A sitter out visiting
+   far wall at rest and -0.4 to 0.95 on the full drag left; no strip is seen from both. It hangs where the torch was,
+   centred 1.5 m along and 1.25 m up, so his first look through the hole finds her, and the torch moved to 0.9 m, whole on
+   the drag left; the Corridor hangs the pair at 0.9 and 2.1 either side of it (Godric, 9 October 2026, 2.43 pm; the
+   Corridor's req 33; lost, the painting seen only on the drag left). A sitter out visiting
    stands in it, drawn from her own standing cell; looking in, she faces the room's side, paying him no mind she is
    turned away, and caught she walks off through the painted door at its right edge. One sitter at a time. */
 var OPP_W = 0.5, OPP_H = 0.55, OPP_DOOR = 0.84;
 var oppCanvas = makeCanvas(160, 176), oppCtx = oppCanvas.getContext('2d'), oppTex = tex(oppCanvas);
 var opposite = new THREE.Mesh(new THREE.PlaneGeometry(OPP_W, OPP_H),
   new THREE.MeshStandardMaterial({ map: oppTex, color: 0xffffff, roughness: 0.95, metalness: 0 }));
-opposite.position.set(0.3, 1.25, -HOLE_DEPTH - CORRIDOR_D + 0.02);
+opposite.position.set(1.5, 1.25, -HOLE_DEPTH - CORRIDOR_D + 0.02);
 opposite.name = 'painting-opposite';
 holeFrame.add(opposite); register(opposite, 1);
 var opp = { who: null, mode: null, x: 0.4, dist: 0, dirty: true };
