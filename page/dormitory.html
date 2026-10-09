@@ -124,8 +124,9 @@ Decisions, 8 October 2026, each David's from a plan to scale (assets/review/dorm
   each way about the focus (cited from The camera). At rest on the iPad the view holds the five beds (the fifth cut at
   the edge), the hearth, W1 and W3 and the near edge of the well; a drag right opens the well whole; a drag left the
   fifth bed and W2. Chosen by David from shots of both (8 October 2026, evening) over the view from the stair head as
-  the corridor is seen, which stays behind View (?view=stair) for the arrival moment later: coming up the stair into
-  the room, then settling to the stage.
+  the corridor is seen, which stays behind View (?view=stair) and is where the arrival comes up to: ?from=room
+  climbs the stair's last half turn to the stair head, holds a breath there, and settles to the stage (up the stair,
+  below).
 - Tap a bed, a window, the hearth or the well to go to it, as the corridor's stops; Back returns. Tapping the well
   goes down to the common room under a fade (castle.js travel); the common room's half, arriving at the stair's foot,
   is the Common room's to build and is asked on the board.
@@ -432,15 +433,61 @@ function descend(dry) {
   } else drop();
   return true;
 }
+/* ---------- up the stair (8 October 2026, second session) ----------
+   Arriving from the common room (?from=room) he comes up the last third of a turn of the stair. The eye starts 0.35 m
+   above the floor over the fifth tread down, beside the newel on the side away from the room, and climbs clockwise
+   with the treads looking across the room's centre to the fifth bed and W2, so the room rises into view over the
+   kerb and the newel post stays out of the frame (from the sixth tread the post stood in the middle of the view and
+   his trunk hid the fire; shot 8 October 2026); off the top tread it steps out through the kerb's gap to the stair
+   head (the same eye and gaze as View: stair head), holds there for a breath, then settles to the stage by itself.
+   The page is black until the eye is set, then reveals. A tap or drag waits until it is over.
+   lumosGreybox.holdArrival(t) freezes it at t seconds for a shot. */
+var ARRIVE = { climb: 2.5, breath: 1.5, settle: 1.7, treads: 5, r: 0.55, step: 0.75 };
+var CLIMB_LOOK = new THREE.Vector3(-1.8, 0.9, 0.1);   /* across the centre toward the fifth bed and W2; the newel post stays out of frame */
+var STAIR_GAZE = new THREE.Vector3(); stairPose(0, 0, new THREE.Vector3(), STAIR_GAZE);
+function climbPose(s, pos, look) {
+  if (s < ARRIVE.step) {                                  /* the spiral: tread 6 up to tread 0, flush with the floor */
+    var k = ARRIVE.treads * (1 - s / ARRIVE.step), b = (roomSide - k * TREAD) * Math.PI / 180;
+    pos.set(NEWEL.x + Math.sin(b) * ARRIVE.r, EYE - k * 0.2, NEWEL.z - Math.cos(b) * ARRIVE.r);   /* the eye 0.55 m out, the tread's outer half */
+  } else {                                                /* off the top tread, out through the kerb's gap to the stair head */
+    var u = (s - ARRIVE.step) / (1 - ARRIVE.step);
+    pos.copy(NEWEL).add(pol(ARRIVE.r + (1.0 - ARRIVE.r) * u, roomSide)); pos.y = EYE;
+  }
+  look.lerpVectors(CLIMB_LOOK, STAIR_GAZE, s);
+}
+var arriving = false, arriveT = 0, arriveHold = false;
+function arrivalPose(t, pos, look) {
+  var tc = ARRIVE.climb, tb = tc + ARRIVE.breath, ts = tb + ARRIVE.settle;
+  if (t <= tc) climbPose(easeInOut(t / tc), pos, look);
+  else if (t <= tb) climbPose(1, pos, look);
+  else {
+    var a = { pos: new THREE.Vector3(), look: new THREE.Vector3() }, r = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
+    climbPose(1, a.pos, a.look); restPose(r.pos, r.look);
+    var k = easeInOut(clamp((t - tb) / ARRIVE.settle, 0, 1));
+    pos.lerpVectors(a.pos, r.pos, k); look.lerpVectors(a.look, r.look, k);
+  }
+  return t >= ts;
+}
+function updateArrival(dt) {
+  if (!arriveHold) arriveT += dt;
+  if (arrivalPose(arriveT, camera.position, lookTmp) && !arriveHold) { arriving = false; mode = 'rest'; }
+}
 function arriveFromRoom() {
   kit.savePlace({ room: 'dormitory' });
+  arriving = true; arriveHold = false; arriveT = 0; mode = 'arrive'; tween = null; atStop = null; backBtn.hidden = true;
+  yaw = yawT = 0; pitch = pitchT = 0;
+  arrivalPose(0, camera.position, lookTmp); camera.lookAt(lookTmp);
+  renderer.render(scene, camera);
   kit.reveal();
+}
+function holdArrival(t) {
+  arriving = true; arriveHold = true; arriveT = t; mode = 'arrive'; tween = null; atStop = null; backBtn.hidden = true;
 }
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
   if (!helpEl.hidden) helpEl.hidden = true;
-  if (tween || leaving) return;
+  if (tween || leaving || arriving) return;
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
@@ -451,7 +498,8 @@ function tap(cx, cy) {
 
 function updateCamera(dt) {
   var s = Math.min(1, dt * 7);
-  if (tween) {
+  if (arriving) updateArrival(dt);
+  else if (tween) {
     tween.t += dt;
     var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
     camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
@@ -522,7 +570,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
-  descend: descend };
+  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival };
 })();
 </script>
 </body>
