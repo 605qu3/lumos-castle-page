@@ -569,6 +569,19 @@
       else arrive();
     }
 
+    /* `after tap X N-M s`: a delay drawn fresh at each tap on X, counted as the waits are, on this page only (the
+       painting opposite the hole, 9 October 2026: she comes home a while after he opened the hole on her). */
+    var AFTER_TAP = /^after tap (.+) (\d+)-(\d+) s$/;
+    function afterTap(name) {
+      var seen = {};
+      for (var i = 0; i < records.length; i++) {
+        var mo = records[i].moment || '', m = AFTER_TAP.exec(mo);
+        if (!m || m[1] !== name || seen[mo]) continue;
+        seen[mo] = true;
+        visit.waits.push({ name: mo, left: waitOverride != null ? waitOverride : between(+m[2], +m[3]) });
+      }
+    }
+
     /* A tap on a named thing in the room. The first tap on a page is also `first tap` (sound wakes then). */
     function tap(name) {
       if (!visit) return;
@@ -579,7 +592,9 @@
       tapping = name;
       moment('tap ' + name);
       tapping = null;
-      if (visit) visit.lastTap[name] = Date.now();
+      if (!visit) return;
+      visit.lastTap[name] = Date.now();
+      afterTap(name);
     }
 
     /* The visit ends. Run on the page it ended on, or at the next page's load for a visit kept at its going (the
