@@ -609,7 +609,7 @@ function updateNight(dt) {
     if (night.kind === 'waking') { night = null; mode = 'rest'; }
     else {   /* the screen stays dark and the visit ends here */
       night.hold = true;
-      if (castle && castle.visit()) castle.leave();
+      if (castle) castle.ready.then(function () { if (castle.visit()) castle.leave(); });   /* after the chains load, should the night outrun them */
     }
   }
 }
@@ -724,7 +724,7 @@ var t = 0;
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   t += dt;
-  if (castle) castle.tick(dt);
+  if (castle && !leaving) castle.tick(dt);   /* going down the well, the clock waits for the common room */
   updateCamera(dt);
   /* the fire low: a slow flicker */
   var f = 0.85 + 0.15 * Math.sin(t * 9) * Math.sin(t * 3.7);
