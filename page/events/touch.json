@@ -160,7 +160,7 @@
           "pose": "seated cross-legged on the rug"
         },
         {
-          "as": "chess",
+          "as": "rug-chess",
           "role": "trace",
           "what": "chess set",
           "mark": "fire"
@@ -168,7 +168,7 @@
       ],
       "lines": [
         {
-          "speaker": "chess",
+          "speaker": "rug-chess",
           "medium": "said",
           "on_tap": true,
           "key": "touch.chess",

@@ -434,10 +434,14 @@
       });
     }
 
+    /* A line's pose turns one figure, the one who speaks: of two or three heralds sharing the speaker's `as`, the first
+       turns and the rest keep listening (board req 77); one already in that pose is the speaker still, and none turns. */
     function turnTo(rec, speaker, pose) {
+      var mine = visit.cast.filter(function (f) { return f.record === rec.id && f.as === speaker; });
+      if (!mine.length || mine.some(function (f) { return f.pose === pose; })) return;
       for (var c = 0; c < visit.cast.length; c++) {
         var f = visit.cast[c];
-        if (f.record !== rec.id || f.as !== speaker || f.pose === pose) continue;
+        if (f !== mine[0]) continue;
         var to = (figures || []).filter(function (g) {
           return g.role === f.role && g.mark === f.mark && g.pose === pose && (f.role === 'pool' || g.name === f.name);
         })[0];
@@ -463,7 +467,9 @@
       return { record: rec.id, end: end, key: line.key, variant: n, speaker: line.speaker || null, medium: line.medium,
                held: held, text: text, sound: held ? null : line.sound || null, hand: line.hand || null, at: line.at || null, style: line.style || null,
                pose: line.pose || null, then: line.then || null, who: who,
-               figures: visit.cast.filter(function (f) { return f.record === rec.id && f.as === line.speaker; }) };
+               /* the speaker's figures, the one who speaks (in the line's pose) first */
+               figures: visit.cast.filter(function (f) { return f.record === rec.id && f.as === line.speaker; })
+                                  .sort(function (a, b) { return (b.pose === line.pose) - (a.pose === line.pose); }) };
     }
 
     /* The lines of a record (end null) or of one of its ends (its index), said in order. */
