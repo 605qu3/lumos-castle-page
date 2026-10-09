@@ -564,11 +564,22 @@ function stopFor(mesh, h, lookY) {
   var fov = clamp(2 * Math.atan(h * STOP_MARGIN / 2 / d) * 180 / Math.PI, FOV_REST, FOV_MAX);
   return { pos: new THREE.Vector3(mesh.position.x, EYE, z), look: new THREE.Vector3(mesh.position.x, lookY, mesh.position.z), fov: fov };
 }
+/* Trevor on a floor mark (req 54) is below every stop's view, which frames a thing on a wall: a stop whose mark he sits
+   on keeps the top of its view and lowers the bottom to his feet, widening up to FOV_MAX */
+function withTrevor(s, marks) {
+  if (!trevorHit || !trevorHit.visible || !trevorAt || marks.indexOf(trevorSpot) < 0) return s;
+  var D = Math.abs(s.look.z - s.pos.z), d = Math.abs(trevorAt.z - s.pos.z), deg = 180 / Math.PI;
+  var c = Math.atan2(s.look.y - EYE, D) * deg, top = c + s.fov / 2, bottom = -Math.atan2(EYE, d) * deg - 3;
+  if (bottom >= c - s.fov / 2) return s;
+  var fov = Math.min(FOV_MAX, top - bottom), mid = bottom + fov / 2;
+  s.look.y = EYE + D * Math.tan(mid / deg); s.fov = fov;
+  return s;
+}
 var STOPS = [
-  { name: 'her', meshes: [her], stop: function () { return stopFor({ position: new THREE.Vector3(0, 0, HER_Z) }, PORTRAIT_H, HOLE_Y); } },
-  { name: 'portrait-a', meshes: [portraitA], stop: function () { return stopFor(portraitA, 1.2, 1.75); } },
+  { name: 'her', meshes: [her], stop: function () { return withTrevor(stopFor({ position: new THREE.Vector3(0, 0, HER_Z) }, PORTRAIT_H, HOLE_Y), ['by-her']); } },
+  { name: 'portrait-a', meshes: [portraitA], stop: function () { return withTrevor(stopFor(portraitA, 1.2, 1.75), ['halfway']); } },
   { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75); } },
-  { name: 'armour', meshes: [armour], stop: function () { return stopFor(armour, ARMOUR.h, 1.3); } },
+  { name: 'armour', meshes: [armour], stop: function () { return withTrevor(stopFor(armour, ARMOUR.h, 1.3), ['suit-feet', 'suit-flags']); } },
   /* each window frames its sill, where the Remembrall will sit, and the lower lights */
   { name: 'window', meshes: [windows[1].frame, windows[1].sky, windows[1].sill], stop: function () { return stopFor(windows[1].frame, 1.9, 1.55); } },
   { name: 'window-2', meshes: [windows[0].frame, windows[0].sky, windows[0].sill], stop: function () { return stopFor(windows[0].frame, 1.9, 1.55); } },
@@ -628,6 +639,12 @@ function bezier(out, a, b, c, d, k) {
   var u = 1 - k;
   out.set(0, 0, 0).addScaledVector(a, u * u * u).addScaledVector(b, 3 * k * u * u).addScaledVector(c, 3 * k * k * u).addScaledVector(d, k * k * k);
   return out;
+}
+function reframe() {
+  if (mode !== 'stop' || !atStop || tween) return;
+  var to = atStop.stop(), from = { pos: camera.position.clone(), look: lookTmp.clone(), fov: camera.fov };
+  if (from.pos.distanceTo(to.pos) > 0.05) { glideTo(to); return; }
+  tween = { t: 0, dur: 0.8, from: from, to: to, c1: from.pos.clone(), c2: to.pos.clone() };
 }
 function goTo(s) {
   if (s === atStop) return;
@@ -802,6 +819,7 @@ function corridorDrawRoom(shown) {
   if (pose !== armourPose) { armourPose = pose; console.info('[corridor] the armour stands ' + pose + (back ? ', its back turned' : '') + ' (its pose waits for the sheet)'); }
   sticksShown = has(CUE.up) ? 'up' : has(CUE.fallen) || has(CUE.boo) ? 'fallen' : 'gone';
   boo.visible = has(CUE.boo) && !sticksQueue.length;
+  drawTrevor(has, back);
 }
 function sticksAnim(kinds) { kinds.forEach(function (k) { sticksQueue.push({ kind: k, t: 0, dur: { dodge: 0.6, drop: 0.5, jig: 1.2, drum: 0.9, scatter: 1.6, march: 1.8 }[k] }); }); }
 function updateSticks(dt) {
@@ -826,6 +844,109 @@ function updateSticks(dt) {
   else armour.rotation.z = 0;
 }
 function note(text) { return function () { console.info('[corridor] ' + text + ' (drawn later)'); }; }
+
+/* Trevor in the armour's helmet (board req 54; Events' `trevor.json`, req 9). A grey toad card turned to the eye, on
+   the five marks the chain names, each in the hole's frame and each 0.35 m clear in depth of any card whose width it
+   crosses (Placement rules): `suit-feet` 0.4 m before the suit's card, `suit-flags` on the flags beside it toward the
+   stair (clear of its width), both following the suit to whichever of its marks it stands on; `suit-sill` on the front
+   edge of the sill of the window at -2.5 (never the Remembrall's at -4.6), clear of the suit's width on every mark;
+   all three in view from the suit's stop. `halfway` back toward her, in front of portrait-a and in view from its stop,
+   clear of the dropped scarf; `by-her` under her frame a little off her centre, away from her hinge (her panel's foot
+   is 0.35 m up, so she swings over him), in view at her stop on a phone too.
+   His tap target is a larger clear card, so a small toad is easy to tap. In the helmet, two eyes in the visor's slot:
+   blinking by day with the visor up, glinting by night behind the visor down. A move between marks is a run of short
+   hops; out of the helmet, a drop to the flags first. Croaks are console notes until sound. */
+var TREVOR = { w: 0.2, h: 0.14, hitW: 0.5, hitH: 0.38 };
+var TREVOR_MARKS = {
+  'suit-feet': function () { return [armour.position.x, 0, armour.position.z + 0.4]; },
+  'suit-flags': function () { return [armour.position.x - 0.65, 0, armour.position.z + 0.25]; },
+  'suit-sill': function () { return [-2.3, WINDOW.sill + 0.03, FAR_Z + 0.37]; },
+  halfway: function () { return [-2.2, 0, -1.3]; },
+  'by-her': function () { return [-0.45, 0, HER_Z - 0.39]; }
+};
+var trevorHit = new THREE.Mesh(new THREE.PlaneGeometry(TREVOR.hitW, TREVOR.hitH), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+var trevor = cutoutMesh(cutoutTexture(80, 56, '#6e7048', function (g, w, h) {
+  g.beginPath(); g.ellipse(w / 2, h * 0.64, w * 0.46, h * 0.34, 0, 0, 2 * Math.PI); g.fill();
+  g.beginPath(); g.arc(w * 0.32, h * 0.3, w * 0.1, 0, 2 * Math.PI); g.arc(w * 0.68, h * 0.3, w * 0.1, 0, 2 * Math.PI); g.fill();
+}), TREVOR.w, TREVOR.h);
+trevor.position.y = TREVOR.h / 2 - TREVOR.hitH / 2;
+trevorHit.add(trevor); trevorHit.name = 'trevor'; trevorHit.visible = false;
+scene.add(trevorHit); register(trevor, 1);
+trevorHit.userData.thing = 'trevor'; tappables.push(trevorHit);
+var helmetEyes = new THREE.Group();
+[-0.035, 0.035].forEach(function (ex) {
+  var e = new THREE.Mesh(new THREE.CircleGeometry(0.014, 10), new THREE.MeshBasicMaterial({ color: col(0xe8c840) }));
+  e.position.set(ex, 0, 0.012); helmetEyes.add(e);
+});
+helmetEyes.position.set(0, ARMOUR.h / 2 - 0.17, 0); helmetEyes.visible = false; armour.add(helmetEyes);
+var TCUE = {
+  day: "the armour's visor up, two blinking eyes inside the helmet, a hollow croak now and then",
+  night: "the armour's visor down, a croak with its snore, his eyes catching the light through the slit",
+  at: 'trevor at spot'
+};
+var trevorAt = null, trevorHops = [], trevorWasIn = false, trevorSpot = null, trevorFollow = null;
+var TREVOR_STOP = { 'suit-feet': 'armour', 'suit-flags': 'armour', 'suit-sill': 'armour', halfway: 'portrait-a', 'by-her': 'her' };
+function helmetPos() { armour.updateMatrixWorld(); return armour.localToWorld(new THREE.Vector3(0, ARMOUR.h / 2 - 0.17, 0.05)); }
+function trevorHopTo(to, from) {
+  trevorHops = [];
+  var p = from.clone();
+  if (from.y > to.y + 0.3) {                                   /* out of the helmet: a drop to the flags first */
+    var land = new THREE.Vector3(from.x, TREVOR.hitH / 2, from.z + 0.3);
+    trevorHops.push({ from: p, to: land, t: 0, dur: 0.45, arc: 0.1 }); p = land;
+  }
+  var n = Math.max(1, Math.ceil(p.distanceTo(to) / 0.45));
+  for (var i = 1; i <= n; i++) {
+    var q = p.clone().lerp(to, 1 / (n - i + 1));
+    trevorHops.push({ from: p, to: q, t: 0, dur: 0.24, arc: 0.12 }); p = q;
+  }
+}
+/* from the cues on every draw, idempotently: where he is, and whether he is in the helmet */
+function drawTrevor(has, back) {
+  var day = has(TCUE.day), night = has(TCUE.night), inHelmet = day || night;
+  if (night && !back) visorPatch.visible = true;
+  helmetEyes.visible = inHelmet && !back;
+  helmetEyes.userData.night = night;
+  var spot = has(TCUE.at) && castle ? castle.state().vars.spot : null;
+  var mark = spot && TREVOR_MARKS[spot];
+  if (spot && !mark && spot !== trevorSpot) console.info('[corridor] Trevor\'s spot ' + spot + ' is not a corridor mark');
+  trevorSpot = spot;
+  if (!mark) { trevorHit.visible = false; trevorAt = null; trevorHops = []; trevorWasIn = inHelmet; return; }
+  var m = mark(), to = new THREE.Vector3(m[0], m[1] + TREVOR.hitH / 2, m[2]);
+  if (!trevorAt || !trevorAt.equals(to)) {
+    if (trevorWasIn) trevorHopTo(to, helmetPos());
+    else if (trevorAt && trevorHit.visible) trevorHopTo(to, trevorHit.position);
+    else { trevorHops = []; trevorHit.position.copy(to); }
+    if (trevorHops.length) trevorFollow = TREVOR_STOP[spot];
+    trevorAt = to;
+  }
+  trevorHit.visible = true;
+  trevorWasIn = inHelmet;
+}
+function updateTrevor(dt) {
+  if (helmetEyes.visible) {
+    var night = helmetEyes.userData.night, blink = !night && (t % 3.4) < 0.14;
+    helmetEyes.children.forEach(function (e, i) {
+      e.scale.y = blink ? 0.15 : 1;
+      e.material.color.setHex(night ? 0x8a7020 : 0xe8c840);
+      e.material.color.multiplyScalar(night ? 0.7 + 0.3 * Math.sin(t * 1.3 + i) : 1);
+    });
+  }
+  if (!trevorHit.visible) return;
+  var h = trevorHops[0];
+  if (h) {
+    var k = Math.min(1, (h.t += dt) / h.dur);
+    trevorHit.position.copy(h.from).lerp(h.to, k);
+    trevorHit.position.y += h.arc * Math.sin(Math.PI * k);
+    if (k >= 1) trevorHops.shift();
+  }
+  if (!trevorHops.length && trevorFollow && !tween) {
+    var fs = STOPS.filter(function (x) { return x.name === trevorFollow; })[0];
+    trevorFollow = null;
+    if (fs === atStop) reframe(); else if (fs && view === 'length') goTo(fs);
+  }
+  trevorHit.rotation.set(0, Math.atan2(camera.position.x - trevorHit.position.x, camera.position.z - trevorHit.position.z), 0);
+}
+function croak(text) { return function () { console.info('[corridor] ' + text + ' (sound later)'); }; }
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'corridor',
@@ -845,6 +966,13 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'two sticks stilt-walk off down the corridor as a pair of legs, the rest tucked under an invisible arm': function () { sticksAnim(['drop', 'march']); },
     'the sticks dance a quick jig in midair and drop': function () { sticksAnim(['jig', 'drop']); },
     'ignored, the bundle drops by itself to the flags': function () { sticksAnim(['drop']); },
+    /* Trevor (req 54): each plop and hop is drawn from his spot on the next draw; the words are the croak's */
+    'Trevor plops out of the helmet with a hollow croak and lands on the flags by the suit': croak('a hollow croak from the helmet'),
+    "Trevor plops out of the helmet with a hollow croak, lands at the suit's feet and eyes the way home": croak('a hollow croak from the helmet'),
+    'Trevor plops out of the helmet with a hollow croak, straight into his hand': function () { console.info('[corridor] a hollow croak, and Trevor in his hand'); trevorWasIn = false; },
+    'Trevor hops to another spot by the suit': croak('a croak'),
+    'Trevor hops off along the corridor toward the Fat Lady, stopping halfway': croak('a croak'),
+    "Trevor hops on and sits under the Fat Lady's frame, waiting to be let in": croak('a croak'),
     /* the bedtime (board req 37): out here the Fat Lady sends him in, and he goes on up to bed */
     'the Fat Lady yawns behind her hand and settles her shawl': note('the Fat Lady yawns and settles her shawl'),
     'the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)': function () {
@@ -865,6 +993,7 @@ function frame() {
   if (castle) castle.tick(dt);
   updateCamera(dt);
   updateSticks(dt);
+  updateTrevor(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -886,7 +1015,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow };
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS };
 })();
 </script>
 </body>
