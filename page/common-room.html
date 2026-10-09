@@ -466,6 +466,17 @@ chair's leg shadows floating off the floor (a test lowering the chair's shadow 3
 kept them, since a chair dragged over the binding snags it, and asked for more where people cross: copies of the
 weaver's own threads, rotated to lie along the binding, at the left end on the path in from the portrait hole, the
 right end toward the stair, and the front middle where feet step on (pipeline/rug_threads.py). Nothing generated.
+wingback, moved to the hearth's left jamb, 8 October 2026: from x 3.1, z -0.6 (on the stair's foot, and in front of
+the corner under the notice board where the books table and a chair go) to x -2.9, z -4.0, the left armchair's pair,
+its seat to the fire, so the drawing stands unmirrored (mirror: false). Projected first: every floor spot was scored
+for what a chair there hides, and what hides it, at the default view and both full drags on the iPad and a 2560 by
+1080 screen, then A and B were shot in place at runtime before David chose. Right of the hearth nothing clears
+everything: at rest the frame's right half is the sofa, then the desk corner, then the stair, with no gap for a 1.1 m
+chair once the corner must show, and the drag right fills it the same way. At the jamb it covers nothing at any view:
+at rest its wing and crest show behind the armchair; on the drag right it stands whole beside it before the ring's
+edge; on the drag left it is half behind the armchair and overlaps the ring's lower right, the mouth clear. No hard
+shadow on the wall or the ring. The plan is assets/review/wingback-plan.jpg; the handoff's The desk under the board
+has the rest. Its small side table, queued, goes on its fire side at about x -2.1, z -4.25.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1486,7 +1497,7 @@ var stairs = cutout(cutoutTexture(192, 768, '#aaa7a1', drawStairs, 'stairs'), 1.
 var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, -1.9, -1.9, 2);
 var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 0.9, 0.8, -1.2, 2.8, 3);
 var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, -4.55, -2.0, 2);
-var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 3.1, -0.6, 2);
+var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, -2.9, -4.0, 2);
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
 table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
 /* the stair is a card turned to the camera, so the fire sees its flat face and threw a hard spiral on the
@@ -1513,7 +1524,7 @@ scene.add(tableTop); register(tableTop, 3); tableTop.name = 'table-top';
 var LAYERS = {
   'armchair-left': { url: '../assets/layers/armchair-left.png', w: 1.05, sink: 0.067, mirror: true },
   'sofa': { url: '../assets/layers/sofa.png', w: 1.7, sink: 0.068 },
-  'wingback': { url: '../assets/layers/wingback.png', w: 1.1, sink: 0.065, mirror: true },
+  'wingback': { url: '../assets/layers/wingback.png', w: 1.1, sink: 0.065, mirror: false },
   /* wall-hung: pivots at its centre, which stays where onWall put it */
   'tapestry': { url: '../assets/layers/tapestry.png', w: 1.44, pivot: 'centre', flutter: true },
   /* the two paintings are composed on their own canvas so a sitter can be drawn into them */
