@@ -26,6 +26,9 @@
    when it runs late; the built-in `been <page>`; `chains: 'all'` from events/index.json; a record's `show_at`.
    Then the bedtime (9 October 2026, board req 37): a parent's visit length raises `bedtime warning` and `lights
    out` on whatever page he is on, the built-in `bedtime`, and ?bedtime=N (minutes) for a test.
+   Then the ultra review's eleven (9 October 2026, board req 42): a chain's first visit per chain, an end `on:
+   password` (the page calls `password()`), a cue may end the visit, an older saved state filled out, and the
+   late leave, the hiding snapshot and the open records of chains a page did not load mended.
    Not yet: figures on marks, lines, `mark next to X`, and the moments quiet and say; a record that needs one of
    them is skipped with a note in the console, never thrown.
 
@@ -76,7 +79,7 @@
 
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
-             open: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null };
+             open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null };
   }
 
   function start(opts) {
@@ -95,9 +98,13 @@
     var bagDefs = {};                            /* each chain's bags, by name */
     var leaving = false;                         /* while a visit's leave runs, `place` is the page that visit was on */
     var state = load(STATE_KEY);
-    var fresh = !state || state.v !== 1;
-    if (fresh) state = freshState();
-    state.open = state.open || {};        /* records still open, by id: the day each fired, for its timeout */
+    if (!state || state.v !== 1) state = freshState();
+    /* A state saved by an earlier runtime lacks the fields added since (bags, lastSmall, open, started, ...) while
+       `v` stayed 1: each missing one is filled from a fresh state (until 9 October 2026 only `open` was, so an old
+       state threw at its first bag draw). `started` missing means this state predates the per-chain first visit. */
+    var oldStarts = !state.started;
+    var blank = freshState();
+    for (var bk in blank) if (state[bk] === undefined || state[bk] === null && blank[bk] !== null) state[bk] = blank[bk];
     var settings = load(SETTINGS_KEY) || { leans: [], speech: 'on' };
     /* A parent's bedtime: a visit length in minutes, or off (settings.bedtime); ?bedtime=N sets it for a test. A bare
        &bedtime is the lights-out trip's own flag, not a length, so it leaves the parent's setting as it is (until
@@ -272,19 +279,23 @@
     function fire(rec) {
       var s = rec.starts || [];
       for (var i = 0; i < s.length; i++) effect(s[i], rec);
-      var sh = (rec.show || []).concat((rec.show_at || {})[value('place')] || []);   /* show_at: a cue by the page he is on */
-      for (var j = 0; j < sh.length; j++) {
-        if (cues[sh[j]]) cues[sh[j]]();
-        else note(rec.id + ': this room has no cue "' + sh[j] + '"');
-      }
-      if (rec.lines && rec.lines.length) note(rec.id + ': its lines wait for lines');
+      /* What the visit keeps of the record is written before its cues, since a cue may end the visit there and
+         then (the dormitory's lights out calls `leave()`; until 9 October 2026 this came after and threw). */
       var who = rec.who || [];                     /* a figure holds its mark for the visit; a trace or a voice does not */
       for (var w = 0; w < who.length; w++) if (who[w].mark && /^(pool|canon|ghost)$/.test(who[w].role)) visit.marks[who[w].mark] = true;
       if (rec.tier === 'small') visit.small.push(rec.id);
       if (rec.tier === 'big') { state.lastBigDay = today(); state.lastBigVisit = state.visits; visit.bigDone = true; }
       if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
-      changed();
+      var where = value('place');
+      var sh = (rec.show || []).concat((rec.show_at || {})[where] || []);   /* show_at: a cue by the page he is on */
+      for (var j = 0; j < sh.length; j++) {
+        if (cues[sh[j]]) cues[sh[j]]();
+        else note(rec.id + ': this room has no cue "' + sh[j] + '"');
+      }
+      if (rec.lines && rec.lines.length) note(rec.id + ': its lines wait for lines');
       note('fired ' + rec.id);
+      if (!visit) { drawRoom(shownCues()); return; }   /* a cue ended the visit: its leave has saved and ended what it ends */
+      changed();
       checkEnds('change');
     }
 
@@ -297,6 +308,7 @@
       if (end.when) return allHold(end.when);
       if (end.timeout) return kind === 'arrive' && today() - opened.day >= parseInt(end.timeout, 10);
       if (end.on === 'leave') return kind === 'leave';
+      if (end.on === 'password') return kind === 'password';   /* the page calls password() when she lets him in */
       if (kind !== 'tap' || !end.on) return false;
       var m = /^tap any but (.+)$/.exec(end.on);
       if (m) return arg !== m[1];
@@ -345,14 +357,16 @@
 
     /* ---------- the draw ---------- */
 
+    /* Each record's weight is worked once per ordering (until 9 October 2026, again at every step of the draw). */
     function weightedOrder(list) {
-      var pool = list.slice(), out = [];
+      var pool = list.slice(), weights = pool.map(weightOf), out = [];
       while (pool.length) {
         var total = 0, k;
-        for (k = 0; k < pool.length; k++) total += weightOf(pool[k]);
+        for (k = 0; k < pool.length; k++) total += weights[k];
         var x = Math.random() * total;
-        for (k = 0; k < pool.length - 1; k++) { x -= weightOf(pool[k]); if (x < 0) break; }
+        for (k = 0; k < pool.length - 1; k++) { x -= weights[k]; if (x < 0) break; }
         out.push(pool.splice(k, 1)[0]);
+        weights.splice(k, 1);
       }
       return out;
     }
@@ -405,6 +419,7 @@
         if (rec.tier === 'big' && visit.bigDone && rec.id !== only) continue;
         if (!allHold(rec.when)) continue;
         fire(rec);
+        if (!visit) return;                          /* its cue ended the visit */
         if (rec.tier === 'small') smallDone = true;
       }
     }
@@ -498,11 +513,12 @@
       if (!visit) return;
       name = targets[name] || name;
       if (!visit.tapped) { visit.tapped = true; moment('first tap'); }
+      if (!visit) return;
       checkEnds('tap', name);
       tapping = name;
       moment('tap ' + name);
       tapping = null;
-      visit.lastTap[name] = Date.now();
+      if (visit) visit.lastTap[name] = Date.now();
     }
 
     /* The visit ends. Run on the page it ended on, or at the next page's load for a visit kept at its going (the
@@ -513,8 +529,8 @@
       if (!visit && !state.visitOpen) return;
       leaving = true;
       if (!visit) {
-        visit = state.kept ? restore() : { smallOn: false, bigOn: false, bigDone: true, small: [], waits: [], lastTap: {},
-                                           tapped: true, marks: {}, pages: [state.visitPlace] };
+        visit = restore();                         /* with nothing kept, a bare visit with the draws off */
+        visit.tapped = true;
         if (state.leftAt != null) clock = state.leftAt;
       }
       checkEnds('leave');
@@ -537,7 +553,7 @@
         var w = visit.waits[i];
         if (w.left == null) continue;
         w.left -= dt;
-        if (w.left <= 0) { w.left = null; moment(w.name); }
+        if (w.left <= 0) { w.left = null; moment(w.name); if (!visit) return; }
       }
       bedtimeTick(dt);
     }
@@ -549,12 +565,16 @@
       if (!(bedtimeMin > 0) || visit.lightsOut) return;
       visit.played += dt;
       if (!visit.warned && visit.played >= Math.max(0, bedtimeMin - 10) * 60) { visit.warned = true; moment('bedtime warning'); }
+      if (!visit) return;
       if (visit && !visit.lightsOut && visit.played >= bedtimeMin * 60) { visit.lightsOut = true; moment('lights out'); }
     }
 
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) { hiddenAt = Date.now(); keep(); save(STATE_KEY, state); return; }
-      if (hiddenAt && Date.now() - hiddenAt > AWAY_S * 1000 && (visit || state.visitOpen)) { leave(); arrive(); }   /* never reopens a visit its page ended */
+      if (hiddenAt && Date.now() - hiddenAt > AWAY_S * 1000 && (visit || state.visitOpen)) {   /* never reopens a visit its page ended */
+        clock = hiddenAt;                          /* the leave runs at the time he put it down (until 9 October 2026, at his return) */
+        leave(); arrive();
+      } else if (state.kept) { state.kept = null; save(STATE_KEY, state); }   /* back soon: the snapshot taken at hiding is stale */
       hiddenAt = 0;
     });
     /* Going: keep the visit and the time, and let the next page decide. The visit stays in memory, so a page Safari
@@ -613,15 +633,25 @@
         }
       }
       if (only && !byId[only]) note('?event=' + only + ' names no record in ' + names.join(', '));
-      if (fresh) {
-        for (var c = 0; c < chains.length; c++) {
-          var fv = chains[c].first_visit || [];
-          for (var k = 0; k < fv.length; k++) {
-            var r = byId[fv[k]];
-            if (r) { var st = r.starts || []; for (var e = 0; e < st.length; e++) effect(st[e], r); }
-          }
+      /* A chain's first visit runs the first time a page loads that chain on this iPad, whichever page it is (until
+         9 October 2026 it ran only on the castle's very first load, over that page's chains, so a castle first
+         opened in the common room never set Trevor loose). A state from before this keeps a chain as begun when
+         its first visit's `set` names are already in the state, so nothing begun runs twice. */
+      for (var c = 0; c < chains.length; c++) {
+        var cn = chains[c].chain;
+        if (state.started[cn] || !loadedChain(cn)) continue;
+        var fv = chains[c].first_visit || [], begun = false;
+        for (var k = 0; k < fv.length && oldStarts; k++) {
+          var sets = ((byId[fv[k]] || {}).starts || []).join('|');
+          sets.replace(/(?:^|\|)set ([a-z_]+) =/g, function (x, n) { if (n in state.vars) begun = true; return x; });
         }
+        for (k = 0; k < fv.length && !begun; k++) {
+          var r = byId[fv[k]];
+          if (r) { var st = r.starts || []; for (var e = 0; e < st.length; e++) effect(st[e], r); }
+        }
+        state.started[cn] = true;
       }
+      save(STATE_KEY, state);
       drawRoom(shownCues());
       begin();
     });
@@ -631,6 +661,7 @@
       tick: tick,
       moment: moment,
       tap: tap,
+      password: function () { if (visit) checkEnds('password'); },   /* the password given and the Fat Lady swung open */
       arrive: arrive,
       leave: leave,
       cues: shownCues,
