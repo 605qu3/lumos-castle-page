@@ -12,7 +12,7 @@
       },
       {
         "item": "evergreen",
-        "intro": "Berlin, 1852. Anderssen again. They call this one the Evergreen Game."
+        "intro": "1852. Anderssen again. They call this one the Evergreen Game."
       },
       {
         "item": "giant",
@@ -601,7 +601,7 @@
             "Watch this. {intro}",
             "Sit back. {intro}"
           ],
-          "canon": "the games' facts, verify"
+          "canon": "the games' facts, checked 9 October 2026: the Opera Game, Paris 1858, in a box at the opera, 17. Rd8#, and the Immortal Game, London 1851, a bishop, both rooks and the queen given up (Wikipedia, the move lists); the Evergreen Game, 1852, its city dropped since the first printings give none (Edward Winter, chesshistory.com), provisional, Godric to confirm; the giant board, PS 16, Ron a knight taken so Harry in a bishop's place can checkmate, checked against the text"
         }
       ],
       "starts": [
