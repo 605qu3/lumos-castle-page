@@ -133,6 +133,12 @@ Decisions, 7 and 8 October 2026, each David's; the handoff's The corridor is the
 - The stops: each stands a hand short of the facing wall and opens its field of view until the thing fits with an
   eighth to spare, between 42 and 70 degrees: her, the windows and the portraits at 42, the tapestry 43, the armour 52.
   The inglenook's stop stands a hand off the far wall, square to the hearth.
+- The glimpse behind the polite door (8 October, evening): the leaf swings in on a hinge at the outer-wall jamb and lies
+  open along the shelves on that side; one flat drawing, door-glimpse, 1.8 by 3.2 m, stands 1.05 m behind the door's plane,
+  running 0.6 m below the floor, painted for the eye at the door's stop, the only place the door is ever open. Round 1,
+  candidate 2 of 3 (the narrowest aisle, the longest run, two empty shelves on the right at chest height for the find),
+  keyed at 720 x 1280, 400 px per metre, about 4.9 MB on the iPad. Lost: a door swinging out into the corridor; the
+  drawing 1.5 m in with bare floor first.
 - Moving: tap a thing to go to it, her, a window, the armour, a portrait, the tapestry or the inglenook; the view glides there and turns
   square; tap off it or Back to glide back to the corner. The notice board's walk-up again. Lost: stepping along by
   tapping the floor (stops with nothing at them).
@@ -242,8 +248,13 @@ var herWall = box(walls, END_X - NOOK_X0, WALL_H, T, (END_X + NOOK_X0) / 2, WALL
 herWall.name = 'her-wall';
 box(walls, NOOK_X1 - FAR_END_X, WALL_H, T, (NOOK_X1 + FAR_END_X) / 2, WALL_Y, HER_Z + T / 2, stoneMat, 0).name = 'her-wall-stair';
 box(walls, NOOK_W, CEIL - NOOK_H, T, NOOK_MID, (CEIL + NOOK_H) / 2, HER_Z + T / 2, stoneMat, 0).name = 'nook-lintel';
-/* the closed end, and the wall the flight runs down toward */
-box(walls, T, WALL_H, WIDTH, END_X + T / 2, WALL_Y, MID_Z, stoneMat, 0).name = 'end-wall';
+/* the closed end, with the polite door's opening cut out of it on the centre line (two sides, a lintel and a stone
+   threshold the wall's thickness deep), and the wall the flight runs down toward */
+var DOOR = { w: 1.0, h: 2.2 };
+box(walls, T, WALL_H, (WIDTH - DOOR.w) / 2, END_X + T / 2, WALL_Y, MID_Z + (WIDTH + DOOR.w) / 4, stoneMat, 0).name = 'end-wall-her-side';
+box(walls, T, WALL_H, (WIDTH - DOOR.w) / 2, END_X + T / 2, WALL_Y, MID_Z - (WIDTH + DOOR.w) / 4, stoneMat, 0).name = 'end-wall-outer-side';
+box(walls, T, CEIL - DOOR.h, DOOR.w, END_X + T / 2, (CEIL + DOOR.h) / 2, MID_Z, stoneMat, 0).name = 'end-wall-lintel';
+box(walls, T, BELOW, DOOR.w, END_X + T / 2, -BELOW / 2, MID_Z, stoneMat, 0).name = 'end-wall-threshold';
 box(walls, T, WALL_H, WIDTH, FAR_END_X - T / 2, WALL_Y, MID_Z, stoneMat, 0).name = 'stair-end-wall';
 var floor = new THREE.Mesh(new THREE.PlaneGeometry(END_X - STAIR_X, WIDTH), floorMat);
 floor.rotation.x = -Math.PI / 2; floor.position.set((END_X + STAIR_X) / 2, 0, MID_Z);
@@ -379,12 +390,50 @@ var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'
 
 /* the polite door (8 October 2026): on the closed end, on the corridor's centre line, so it ends the view from the
    stair head square on; 1.0 by 2.2 m, facing down the corridor. What waits behind it is Magic for the boys' */
-var DOOR = { w: 1.0, h: 2.2 };
+/* The leaf hangs on a hinge at the outer-wall jamb (his left, facing it) and swings in, to lie open along the shelves on
+   that side (David, 8 October 2026 evening). Nothing on screen opens it yet: the tickle is Magic for the boys' design,
+   Events' to wire; openDoor() swings it for shots. */
+var doorHinge = new THREE.Group();
+doorHinge.position.set(END_X - 0.01, 0, MID_Z - DOOR.w / 2);
+scene.add(doorHinge);
 var door = cutoutMesh(cutoutTexture(100, 220, '#7a6a58', drawRect, 'door'), DOOR.w, DOOR.h);
-door.position.set(END_X - 0.01, DOOR.h / 2, MID_Z);
+door.position.set(0, DOOR.h / 2, DOOR.w / 2);
 door.rotation.y = -Math.PI / 2;
 door.name = 'polite-door';
-scene.add(door); register(door, 1);
+doorHinge.add(door); register(door, 1);
+var doorLeaf = { ang: 0, target: 0 }, DOOR_LEAF_OPEN = Math.PI / 2;
+function openDoor(open) { doorLeaf.target = open === false ? 0 : DOOR_LEAF_OPEN; }
+/* The glimpse behind it (The corridor, "The glimpse behind it"; what is there is Magic for the boys', the room of lost
+   things): one flat drawing, door-glimpse, 1.8 by 3.2 m, standing square across the way 1.05 m behind the door's plane,
+   just clear of the open leaf, and running 0.6 m below the floor, painted for the eye at the door's stop, the only place
+   the door is ever open, so the doorway is all picture from the threshold up. Unlit, its lamplight being painted. A grey
+   stand-in until the drawing is picked; setGlimpse(url) hangs a candidate for shots. */
+var GLIMPSE = { w: 1.8, h: 3.2, d: 1.05, below: 0.6 };
+var glimpse = cutoutMesh(cutoutTexture(180, 320, '#6b5236', drawRect, 'lost things'), GLIMPSE.w, GLIMPSE.h);
+glimpse.material = new THREE.MeshBasicMaterial({ map: glimpse.material.map, alphaTest: 0.5, side: THREE.DoubleSide });
+glimpse.position.set(END_X + GLIMPSE.d, GLIMPSE.h / 2 - GLIMPSE.below, MID_Z);
+glimpse.rotation.y = -Math.PI / 2;
+glimpse.name = 'door-glimpse';
+scene.add(glimpse); register(glimpse, 1);
+function setGlimpse(url) {
+  return new Promise(function (resolve, reject) {
+    var im = new Image();
+    im.onload = function () {
+      glimpse.material.map = tex(im); glimpse.material.color.set(0xffffff); glimpse.userData.base = glimpse.material.color.clone();
+      glimpse.material.needsUpdate = true;
+      resolve(im.width + 'x' + im.height);
+    };
+    im.onerror = function () { reject(url); };
+    im.src = url;
+  });
+}
+/* the room's lamplight spilling onto the corridor's floor while the door stands open; off while it is shut, since a
+   light here passes through the wall */
+var glimpseLight = new THREE.PointLight(col(0xffc080), 0, 4.5, 1.2);
+glimpseLight.position.set(END_X + 0.5, 2.0, MID_Z);
+scene.add(glimpseLight);
+/* the drawing itself (round 1, candidate 2, 8 October 2026), hung in place of the stand-in as soon as it loads */
+setGlimpse('../assets/layers/door-glimpse.png').catch(function () {});
 
 /* the drawn torch the common room already has: same file, same size, same head */
 (function () {
@@ -630,6 +679,9 @@ function frame() {
   updateCamera(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
+  doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
+  doorHinge.rotation.y = doorLeaf.ang;
+  glimpseLight.intensity = 1.4 * Math.sin(doorLeaf.ang);
   torches.forEach(function (tc, i) {
     var k = 0.85 + 0.15 * Math.sin(t * 11 + i) * Math.sin(t * 4.3 + i * 2);
     tc.light.intensity = 1.6 * k;
@@ -644,7 +696,7 @@ renderer.setAnimationLoop(frame);
 window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
-  enter: enter, herDoor: herDoor };
+  enter: enter, herDoor: herDoor, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf };
 })();
 </script>
 </body>
