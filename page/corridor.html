@@ -272,8 +272,8 @@ for (var si = 1; si <= STEPS; si++) {
 var landing = new THREE.Mesh(new THREE.PlaneGeometry(LANDING_D, WIDTH), floorMat);
 landing.rotation.x = -Math.PI / 2; landing.position.set((FOOT_X + FAR_END_X) / 2, FOOT_Y, MID_Z);
 landing.name = 'landing'; scene.add(landing); register(landing, 0);
-var LANDING_WINDOW = { w: 1.2, h: 2.4, sill: 0.9 };
-var landingWindow = cutoutMesh(cutoutTexture(120, 240, '#c9d6e2', drawArch, 'window'), LANDING_WINDOW.w, LANDING_WINDOW.h);
+var LANDING_WINDOW = { w: 1.8, h: 4.6, sill: 0.9 };   /* grand and tall, stained glass (David, 9 October 2026); size provisional until req 29's plan */
+var landingWindow = cutoutMesh(cutoutTexture(120, 307, "#c9d6e2", drawArch, "window"), LANDING_WINDOW.w, LANDING_WINDOW.h);
 landingWindow.material = new THREE.MeshBasicMaterial({ map: landingWindow.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
 landingWindow.position.set(FAR_END_X + 0.01, FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2, MID_Z);
 landingWindow.rotation.y = Math.PI / 2;
@@ -480,7 +480,7 @@ scene.add(landingLight);
    stage: the far wall cut away, the camera outside it facing her wall square on; a drag slides along it. */
 var EYE = 1.35;
 var VIEWS = {
-  length: { pos: new THREE.Vector3(-11.0, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12, turnBand: 0.35, turnTilt: 20, turnGain: 2.5 },
+  length: { pos: new THREE.Vector3(-11.0, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12, turnBand: 0.35, turnTilt: 12, turnGain: 2.5 },
   stage: { z: FAR_Z - 3.4, xMin: -10.0, xMax: -0.2, x0: -1.6 }
 };
 var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
