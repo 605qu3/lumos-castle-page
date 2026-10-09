@@ -532,6 +532,15 @@ the events runtime, 9 October 2026 (board req 53 and the events lane's ask): cas
 corridor and dormitory pages carry, and chains 'all' from events/index.json with place 'common room', so a visit's
 leave runs over every chain and each record's place keeps it to its page; a cue this room lacks is noted, not drawn.
 Fresh load, all 21 chains started, console clean at 1180 x 820 and 2560 x 1080.
+the painting opposite the hole, the room's half, 9 October 2026 (board req 57, the events lane's req 34): the hole's
+opening tap raises events.tap('hole') while portrait still reads shut; the room answers 'mantel sitter' and 'right
+sitter' (seated, standing, walking or away) from the sitters' loop; while visitors.json has a sitter out the loop holds
+her away, and her record's cue brings her home through her painting's exit. A grey stand-in painting hangs on the
+corridor's far wall, a sitter out visiting drawn into it from her standing cell: looking in, turned away, or walking off
+through its painted door. Traced past her open back, the open hole shows 1.15 to 1.75 m along that wall at rest, which
+the torch fills, and -0.4 to 0.95 on the drag left; it hangs at 0.3 m, in the drag left's strip, provisionally, since
+whether it and the torch change places is Godric's with the Corridor's req 33 (assets/review/painting-opposite-hole.jpg).
+Tried by hand on a fresh state: the first find, her coming home, the caught walk-off; console clean on both screens.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="hud">
@@ -1932,6 +1941,7 @@ function standX(st, id) {
 function sitterEnter(st, id) {
   var s = SCENES[id];
   st.where = id;
+  st.goHome = false;
   st.phase = 'entering';
   st.x = s.exitX;
   st.dist = 0;
@@ -1945,7 +1955,7 @@ function sitterEnter(st, id) {
    that happens rather than a trick that repeats. */
 function sitterNextFrame(st) {
   var home = SITTERS[st.name].home;
-  if (Math.random() < 0.65) return home;
+  if (st.goHome || Math.random() < 0.65) return home;   /* goHome: the visitors chain has brought her home */
   for (var id in SCENES) if (id !== home) return id;
   return home;
 }
@@ -2114,6 +2124,100 @@ function placeSitters(spec) {
   }
   return out;
 }
+
+/* ---------- the sitters and the visitors chain (board req 57, the room's half of req 34; 9 October 2026) ----------
+   page/events/visitors.json keeps where each sitter is across the pages: out beside the Fat Lady, in the painting
+   opposite the hole, or home. While it has one out, the room holds her away (the loop neither brings her back nor
+   sends her visiting) until her record's cue brings her home through her painting's exit. The runtime asks where each
+   sitter is as `mantel sitter` and `right sitter`: seated, standing, walking or away. */
+var VISITING = {
+  her: { empty: "the mantel painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds her away until her record brings her home",
+         there: "the mantel painting's sitter in the painting opposite the hole, seen through the hole whenever it opens" },
+  him: { empty: "the right painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds him away until his record brings him home",
+         there: "the right painting's sitter in the painting opposite the hole, seen through the hole whenever it opens" }
+};
+function sitterPhase(st) {
+  if (st.phase === 'away' || st.phase === 'seated' || st.phase === 'standing') return st.phase;
+  return 'walking';
+}
+function holdAway(st) {
+  st.held = true; st.t = 1e9;
+  if (st.phase !== 'away') { st.phase = 'away'; st.where = null; st.dirty = true; }
+}
+function comeHome(n) {
+  var st = sitters[n];
+  st.held = false;
+  if (st.phase === 'away') { st.goHome = true; st.t = 0; }
+}
+
+/* The painting opposite the hole, a grey stand-in until the Corridor hangs the drawn one (req 33). Traced from the eye
+   through both circles of the tunnel and past her open back, the open hole shows 1.15 to 1.75 m along the corridor's
+   far wall at rest, which the torch fills, and -0.4 to 0.95 on the full drag left; no strip is seen from both. So it
+   hangs, provisionally, in the drag left's strip, nothing placed moving; whether it and the torch change places, so the
+   find lands at rest where a boy taps the hole, is David's with the Corridor's req 33. A sitter out visiting
+   stands in it, drawn from her own standing cell; looking in, she faces the room's side, paying him no mind she is
+   turned away, and caught she walks off through the painted door at its right edge. One sitter at a time. */
+var OPP_W = 0.5, OPP_H = 0.55, OPP_DOOR = 0.84;
+var oppCanvas = makeCanvas(160, 176), oppCtx = oppCanvas.getContext('2d'), oppTex = tex(oppCanvas);
+var opposite = new THREE.Mesh(new THREE.PlaneGeometry(OPP_W, OPP_H),
+  new THREE.MeshStandardMaterial({ map: oppTex, color: 0xffffff, roughness: 0.95, metalness: 0 }));
+opposite.position.set(0.3, 1.25, -HOLE_DEPTH - CORRIDOR_D + 0.02);
+opposite.name = 'painting-opposite';
+holeFrame.add(opposite); register(opposite, 1);
+var opp = { who: null, mode: null, x: 0.4, dist: 0, dirty: true };
+function oppShow(n, mode) { opp.who = n; opp.mode = mode; opp.x = 0.4; opp.dist = 0; opp.dirty = true; }
+function oppClear(n) { if (opp.who === n && opp.mode !== 'slips') { opp.who = null; opp.mode = null; opp.dirty = true; } }
+function drawOpposite() {
+  var g = oppCtx, w = oppCanvas.width, h = oppCanvas.height, f = 12, iw = w - 2 * f, ih = h - 2 * f;
+  g.fillStyle = '#5e5b55'; g.fillRect(0, 0, w, h);
+  g.fillStyle = '#9b978f'; g.fillRect(f, f, iw, ih);
+  var floorY = f + ih * 0.86;
+  g.fillStyle = '#86827a'; g.fillRect(f, f + ih * 0.7, iw, ih * 0.3);
+  g.fillStyle = '#625f59'; g.fillRect(f + iw * (OPP_DOOR - 0.07), f + ih * 0.22, iw * 0.16, ih * 0.6);
+  if (!opp.who) return;
+  var def = SITTERS[opp.who], walking = opp.mode === 'slips';
+  var pose = walking ? walkPose({ name: opp.who, dist: opp.dist }) : def.standing;
+  var img = sheetImages[opp.who] && sheetImages[opp.who][pose.sheet], sh = def.sheets[pose.sheet];
+  if (!img) return;
+  var dh = sh.scale * 0.68 * ih, dw = dh * sh.cellW / sh.cellH;
+  var left = f + opp.x * iw - dw / 2, top = floorY - dh;
+  var facing = opp.mode === 'stays' ? -1 : 1;
+  g.save();
+  g.beginPath(); g.rect(f, f, iw, ih); g.clip();
+  if (facing !== sh.native[pose.cell]) { var mid = left + dw / 2; g.translate(mid, 0); g.scale(-1, 1); g.translate(-mid, 0); }
+  g.drawImage(img, pose.cell * sh.cellW, 0, sh.cellW, sh.cellH, left, top, dw, dh);
+  g.restore();
+}
+function updateOpposite(dt) {
+  if (opp.mode === 'slips') {
+    var v = 0.16 * dt;                                  /* about 2.5 s from where she stood to the door */
+    opp.x += v; opp.dist += v; opp.dirty = true;
+    if (opp.x >= OPP_DOOR) { opp.who = null; opp.mode = null; }
+  }
+  if (!opp.dirty) return;
+  opp.dirty = false;
+  drawOpposite();
+  oppTex.needsUpdate = true;
+}
+function visitorsDrawRoom(shows) {
+  for (var n in VISITING) {
+    var st = sitters[n];
+    if (shows.indexOf(VISITING[n].empty) >= 0) holdAway(st);
+    else if (st.held) { st.held = false; st.t = dwell(5, 30); }
+    if (shows.indexOf(VISITING[n].there) >= 0) { if (opp.who !== n) oppShow(n, 'stays'); }
+    else oppClear(n);
+  }
+}
+var VISITOR_CUES = {
+  "the mantel painting's sitter comes home through her painting's exit and sits": function () { comeHome('her'); },
+  "the right painting's sitter comes home through his painting's exit and sits": function () { comeHome('him'); },
+  "the mantel painting's sitter standing in the painting opposite the hole, looking in through the hole at him": function () { oppShow('her', 'looks'); },
+  "the right painting's sitter standing in the painting opposite the hole, looking in through the hole at him": function () { oppShow('him', 'looks'); },
+  "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens": function () { oppShow('her', 'slips'); },
+  "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens": function () { oppShow('him', 'slips'); },
+  "the mantel painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('her', 'stays'); },
+  "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('him', 'stays'); }
+};
 
 for (var lid in LAYERS) {
   if (LAYERS[lid].sheet !== undefined) applyCatSheet(LAYERS[lid]);
@@ -2533,7 +2637,8 @@ function tap(cx, cy) {
   if (mode !== 'room' || !hit) return;
   if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
-  else if (hit === holeTap) { if (portrait.open) climbOut(); else togglePortrait(); }
+  /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
+  else if (hit === holeTap) { if (portrait.open) climbOut(); else { if (castle) castle.tap('hole'); togglePortrait(); } }
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
 }
 
@@ -2756,15 +2861,19 @@ function updatePortrait(dt) {
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'common room',
-  cues: {
+  cues: Object.assign({
     'fire green for 2 s': fireGreen,
     'smoke puffs back out of the grate': smokePuff,
     'the embers brighten a step': embersStep,
     "the fire catches with a whoosh and the room's light comes up": fireCatches,
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire
-  },
-  drawRoom: fireDrawRoom,
-  builtins: { portrait: function () { return portrait.open ? 'open' : 'shut'; } }
+  }, VISITOR_CUES),
+  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); },
+  builtins: {
+    portrait: function () { return portrait.open ? 'open' : 'shut'; },
+    'mantel sitter': function () { return sitterPhase(sitters.her); },
+    'right sitter': function () { return sitterPhase(sitters.him); }
+  }
 }) : null;
 
 /* arriving through the hole from the corridor (?from=corridor): the room comes up from black at its default view with
@@ -2790,6 +2899,7 @@ function frame() {
   updateCat(dt, t);
   updatePortrait(dt);
   updateSitters(dt);
+  updateOpposite(dt);
   updatePapers(dt, t);
   updateTapestry(dt, t);
   renderer.render(scene, camera);
@@ -2798,7 +2908,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; } };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp };
 })();
 </script>
 </body>
