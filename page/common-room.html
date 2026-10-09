@@ -8,7 +8,7 @@
 <title>Gryffindor common room, greybox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&family=Handlee&family=Patrick+Hand&family=Coming+Soon&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #070605;
@@ -616,6 +616,10 @@ wait until he has stopped, his walk-off until they are done; the hole held open 
 there. In grey until his card (req 61).
 the painting opposite's drawing, 9 October 2026 (the Corridor's req 33, Godric's pick at 5.11 pm): hung as the
 canvas's ground in the hole's view, 0.5 by 0.54 m, a sitter on its painted floor walking off through its doorway.
+Percy's password note, 9 October 2026 (board req 74, Magic's design; its place Godric's, 5.04 pm): a board paper top
+centre, 0.24 by 0.30 m on two pins, its words the runtime's (a written line keyed password.percy-note, the week's word
+marked *LIKE THIS*), laid out to fit, the word large a word to a line, NOT underlined twice, a flourish under the name;
+Percy's hand Handlee, provisional (assets/review/percy-hand.jpg).
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -1043,8 +1047,15 @@ var F = {
 var FONT_LOADS = [
   '400 40px "IM Fell English"', 'italic 400 40px "IM Fell English"', '400 40px "IM Fell English SC"',
   '400 40px "Cinzel"', '400 40px "EB Garamond"', '400 40px "Fondamento"',
-  '400 40px "Nothing You Could Do"', '400 40px "Short Stack"'
+  '400 40px "Nothing You Could Do"', '400 40px "Short Stack"',
+  '400 40px "Handlee"', '400 40px "Patrick Hand"', '400 40px "Coming Soon"'
 ];
+/* Percy's hand (board req 74; Magic for the boys, "The password's own pieces", *His hand*): a prefect's careful,
+   upright round hand, a little proud of its capitals. None of the board's faces fits, so it is this lane's choice,
+   put to Godric with the note: Handlee for now, provisional; Patrick Hand and Coming Soon the others offered.
+   ?percyface=N shows the Nth for the sheet. */
+var PERCY_FACES = ['"Handlee", cursive', '"Patrick Hand", cursive', '"Coming Soon", cursive'];
+F.percy = PERCY_FACES[Math.min(2, Math.max(0, (+new URLSearchParams(location.search).get('percyface') || 1) - 1))];
 
 var BOARD_W = 1.6, BOARD_H = 1.2, BAIZE_W = 1.48, BAIZE_H = 1.08, FRAME_D = 0.035, FRAME_W = 0.06;
 var PX = 3000;          /* texture pixels per metre of paper */
@@ -1161,6 +1172,11 @@ var PAPER_SPECS = [
   { id: 'reply', w: 0.25, h: 0.11, pin: [-0.06, -0.265], pins: 'one', rot: 0.05, z: 0.0135, tile: 'laid', torn: ['bottom'], age: 0.05, draw: drawEventNote, event: { keys: ['notice.reply-neville'], hand: 'neville', show: "under Wood's notice, Neville's reply in his hand" } },
   { id: 'answer', w: 0.22, h: 0.1, pin: [0.0, -0.385], pins: 'one', rot: -0.07, z: 0.0145, tile: 'laid', torn: ['top'], age: 0.05, draw: drawEventNote, event: { keys: ['notice.reply-wood'], hand: 'wood', show: "under Neville's reply, Wood's answer in his scrawl" } },
   { id: 'thanks', w: 0.28, h: 0.2, pin: [0.45, -0.14], pins: 'one', rot: 0.06, z: 0.0117, tile: 'laid', torn: ['right'], age: 0.05, draw: drawEventNote, event: { keys: ['trevor.thanks-plain', 'trevor.thanks-card', 'trevor.thanks-question'], hand: 'neville', show: 'notice thanks' } },
+  /* Percy's password note (board req 74; its place Godric's, 5.04 pm, assets/review/percy-note-plan.jpg): top centre
+     between the flying form and Pince's notice, two pins, 0.24 by 0.30 m. Its words are the runtime's, never the page's
+     (the week's word, Events' req 72): a written line keyed password.percy-note, the week's word marked *LIKE THIS*
+     and set large a word to a line, and from Thursday "From Monday: *X*" under it. Hidden until the runtime has it. */
+  { id: 'percy', w: 0.24, h: 0.30, pin: [0.0, 0.50], pins: 'two', rot: -0.008, z: 0.0110, tile: 'cream', torn: [], age: 0.02, draw: drawPercyNote, event: { keys: ['password.percy-note'], hand: 'percy' } },
   { id: 'corner', w: 0.055, h: 0.04, pin: [0.60, 0.47], pins: 'one', rot: 0.3, z: 0.0095, tile: 'laid', torn: ['left', 'bottom', 'right'], age: 0.2, draw: function () {}, fixed: true }
 ];
 var papers = [];
@@ -1473,6 +1489,62 @@ function drawEventNote(g, W, H, rnd, spec) {
   fit(g, words, M, y, { px: px, family: HANDS[e.hand], color: ink, maxW: W - 2 * M,
     lineGap: 1.25, slant: 0.02, jitter: 3, soft: 1.4, rnd: rnd }, 0.9 * H);
 }
+/* Percy's note: his words small and careful, the week's word large a word to a line, each NOT underlined twice, a
+   flourish under his signature */
+function drawPercyNote(g, W, H, rnd, spec) {
+  var words = spec.event.words || '', k = 1;
+  for (var tries = 0; tries < 8; tries++) {           /* measured first, then shrunk until it all fits */
+    if (layPercy(g, W, H, words, k, false) <= H * 0.95) break;
+    k *= 0.92;
+  }
+  layPercy(g, W, H, words, k, true);
+}
+/* y is the baseline of the next line; returns where the words end */
+function layPercy(g, W, H, words, k, ink) {
+  var face = F.percy, M = 0.1 * W, maxX = W - M, small = 0.064 * W * k, big = 0.13 * W * k;
+  var y = PIN_INSET * PX + 24 + small;
+  g.fillStyle = g.strokeStyle = '#1d2340'; g.textBaseline = 'alphabetic'; g.shadowBlur = 0;
+  var parts = words.split('\n');
+  for (var i = 0; i < parts.length; i++) {
+    var para = parts[i];
+    if (!para) { y += small * 0.5; continue; }
+    var bits = para.split('*');                       /* odd bits are the password, set large */
+    for (var b = 0; b < bits.length; b++) {
+      var bit = bits[b].trim();
+      if (!bit) continue;
+      if (b % 2) {                                    /* a word to a line, centred, capitals */
+        var by = y - small + big + small * 0.35;
+        inkFont(g, big, face);
+        bit.split(/\s+/).forEach(function (w) {
+          if (ink) { g.textAlign = 'center'; g.fillText(w.toUpperCase(), W / 2, by); g.textAlign = 'left'; }
+          by += big * 1.08;
+        });
+        y = by - big * 1.08 + small * 1.6;
+        continue;
+      }
+      inkFont(g, small, face);
+      var x = M, sig = /^P\. Weasley/.test(bit), sp = g.measureText(' ').width;
+      bit.split(/\s+/).forEach(function (w) {
+        var ww = g.measureText(w).width;
+        if (x > M && x + ww > maxX) { x = M; y += small * 1.32; }
+        if (ink) {
+          g.fillText(w, x, y);
+          if (/^NOT\b/.test(w)) {                      /* underlined twice */
+            var nw = g.measureText('NOT').width;
+            g.lineWidth = 2.2; g.beginPath(); g.moveTo(x, y + 6); g.lineTo(x + nw, y + 6); g.moveTo(x + 1, y + 11); g.lineTo(x + nw - 1, y + 11); g.stroke();
+          }
+        }
+        x += ww + sp;
+      });
+      if (sig && ink) {                               /* the flourish under his name */
+        g.lineWidth = 2.6; g.beginPath(); g.moveTo(M, y + 12);
+        g.bezierCurveTo(M + 0.25 * W, y + 26, M + 0.45 * W, y + 2, x - 6, y + 14); g.stroke();
+      }
+      y += small * 1.32;
+    }
+  }
+  return y - small;
+}
 function paperHidden(p, hidden) {
   p.hidden = hidden;
   var on = papersPainted && !hidden;
@@ -1492,7 +1564,7 @@ function updateNotes() {
     if (p.spec.id === 'neville') { paperHidden(p, shows.indexOf('notice lost-toad') < 0); return; }
     if (!e) return;
     var w = said.filter(function (x) { return e.keys.indexOf(x.key) >= 0; })[0];
-    var on = shows.indexOf(e.show) >= 0 && !!w;
+    var on = (!e.show || shows.indexOf(e.show) >= 0) && !!w;   /* a note with no rule hangs while it has words */
     if (on && (w.text !== e.words)) {
       e.words = w.text;
       e.style = (byKeyStyle[w.key] || null);
@@ -3580,7 +3652,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
