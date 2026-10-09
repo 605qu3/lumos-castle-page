@@ -306,6 +306,120 @@
       ]
     },
     {
+      "id": "door.shelf-first-please",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say please",
+      "when": [
+        "place = corridor",
+        "speech = on",
+        "listening = polite door",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds = 0",
+        "sofa_lost_pending != due"
+      ],
+      "starts": [
+        "set door_find = from bag finds",
+        "set door_shelf = find",
+        "set door_drawn = yes"
+      ]
+    },
+    {
+      "id": "door.shelf-drift-please",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say please",
+      "when": [
+        "place = corridor",
+        "speech = on",
+        "listening = polite door",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "sofa_lost_pending = due"
+      ],
+      "starts": [
+        "set door_find = from bag drift",
+        "set door_shelf = find",
+        "set door_drawn = yes",
+        "set sofa_lost_pending = no",
+        "log \"Something he left down the sofa has turned up behind the door {day}\""
+      ]
+    },
+    {
+      "id": "door.shelf-find-please",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say please",
+      "when": [
+        "place = corridor",
+        "speech = on",
+        "listening = polite door",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds >= 1",
+        "today >= door_due",
+        "sofa_lost_pending != due"
+      ],
+      "one_of": "shelf-please",
+      "weight": 2,
+      "starts": [
+        "set door_find = from bag finds",
+        "set door_shelf = find",
+        "set door_drawn = yes"
+      ]
+    },
+    {
+      "id": "door.shelf-gap-please",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say please",
+      "when": [
+        "place = corridor",
+        "speech = on",
+        "listening = polite door",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds >= 1",
+        "door_gap_last != yes",
+        "sofa_lost_pending != due"
+      ],
+      "one_of": "shelf-please",
+      "weight": 1,
+      "starts": [
+        "set door_gap = yes",
+        "set door_gap_at = mark gap, not last",
+        "set door_gap_last = yes",
+        "set door_drawn = yes"
+      ]
+    },
+    {
+      "id": "door.shelf-dust-please",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say please",
+      "when": [
+        "place = corridor",
+        "speech = on",
+        "listening = polite door",
+        "door_shelf != find",
+        "door_drawn != yes",
+        "door_finds >= 1",
+        "sofa_lost_pending != due"
+      ],
+      "one_of": "shelf-please",
+      "weight": 3,
+      "starts": [
+        "set door_gap_last = no",
+        "set door_drawn = yes"
+      ]
+    },
+    {
       "id": "door.shelf-first",
       "tier": "fixed",
       "source": "device",

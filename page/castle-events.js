@@ -37,8 +37,11 @@
    (?lines=all shows it); a written
    line's words are kept for the room (`written()`); `pose` turns the speaker, `then` walks him off; a line `on_tap`
    waits for a tap on its speaker. Then a mark drawn `by week` (Friday's places, board req 64).
-   Not yet: `mark next to X`, and the moments quiet and say; a record that needs one of them is skipped with a note
-   in the console, never thrown.
+   Then quiet and say with the ear (the same session): `quiet N-M s` when he has tapped nothing for a span drawn each
+   visit, once a quiet stretch; a tap on a thing a `say` record listens for opens the ear (page/castle-ear.js, or
+   `opts.ear`), the built-in `listening` names it while the ear is open and a beat after, and the guesses the ear
+   hands are matched forgivingly to the `say` moments that hold (`heard()`, which a page may call itself).
+   Not yet: `mark next to X`; a record that needs it is skipped with a note in the console, never thrown.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -117,6 +120,10 @@
        lines of one record, or one end, or one tap, in order, as a list; the page draws them (said text by the
        speaker, a written line in its hand at its place, a heard one off stage) and paces them. */
     var showLines = opts.showLines || function () {};
+    /* The ear (page/castle-ear.js, twenty-fourth session): `opts.ear`, else the page's CastleEar. It only hears; the
+       runtime opens it on a tap on a thing a `say` record listens for and matches its guesses to the `say` moments. */
+    var ear = opts.ear !== undefined ? opts.ear : (window.CastleEar || null);
+    var earSession = null;
     var place = opts.place || 'common room';     /* the page this runtime runs on: `common room` or `corridor` */
     var markSets = {};                           /* named sets of the page's marks a draw picks from: the page's `opts.marks`, then each chain's `marks` */
     for (var ms in (opts.marks || {})) markSets[ms] = (opts.marks[ms] || []).slice();
@@ -175,6 +182,9 @@
         case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
         case 'slot': return state.slot ? 'taken' : 'free';
         case 'speech': return settings.speech || 'on';
+        case 'listening':                    /* the thing tapped, while the ear its tap opened listens, and a beat after */
+          var ls = visit && visit.listen;
+          return ls && (ls.open || Date.now() < ls.until) ? ls.name : 'none';
         case 'bedtime': return bedtimeMin > 0 ? 'set' : 'off';
         case 'visits since big': return state.lastBigVisit == null ? Infinity : state.visits - state.lastBigVisit;
         case 'seconds since last tap':      /* since his previous tap on the same thing; never tapped reads as long ago */
@@ -544,12 +554,10 @@
     }
 
     /* What a record needs that is not built: a figure on a page that draws none (a trace or a voice has no body to
-       draw, so it fires and its lines are noted), a moment the page cannot raise, or a mark draw that needs
-       neighbours. */
+       draw, so it fires and its lines are noted), or a mark draw that needs neighbours. */
     function supported(rec) {
       var who = rec.who || [];
       if (!figures) for (var w = 0; w < who.length; w++) if (FIGURE.test(who[w].role)) return 'figures on marks';
-      if (/^(quiet|say)\b/.test(rec.moment || '')) return 'the moment ' + rec.moment;
       if (/mark next to /.test((rec.starts || []).join('|'))) return 'the page\'s mark neighbours';
       return null;
     }
@@ -614,19 +622,32 @@
       return waits;
     }
 
+    /* `quiet N-M s`: a span drawn once a visit for each, counted on each page from its load or his last tap there;
+       each fires once a quiet stretch and is ready again after his next tap. */
+    function quietSpans() {
+      var out = {};
+      for (var i = 0; i < records.length; i++) {
+        var m = WAIT.exec(records[i].moment || '');
+        if (!m || m[1] !== 'quiet' || out[records[i].moment] != null) continue;
+        out[records[i].moment] = waitOverride != null ? waitOverride : between(+m[2], +m[3]);
+      }
+      return out;
+    }
+
     /* What of a visit outlives a page: the draws, what fired, the marks taken and the pages reached. A tap's
        memory and the waits are the page's own; sound wakes again at the next page's first tap. */
     function keep() {
       if (!visit) return;
       state.kept = { id: visit.id, smallOn: visit.smallOn, bigOn: visit.bigOn, bigDone: visit.bigDone,
                      small: visit.small, marks: visit.marks, cast: visit.cast, pages: visit.pages, played: visit.played,
-                     warned: visit.warned, lightsOut: visit.lightsOut, waiting: visit.waiting };
+                     warned: visit.warned, lightsOut: visit.lightsOut, waiting: visit.waiting, quiet: visit.quiet };
     }
     function restore() {
       var k = state.kept || {};
       return { id: k.id, smallOn: !!k.smallOn, bigOn: !!k.bigOn, bigDone: k.bigDone !== false, small: k.small || [],
                marks: k.marks || {}, cast: k.cast || [], pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false,
-               played: k.played || 0, warned: !!k.warned, lightsOut: !!k.lightsOut, waiting: k.waiting || {} };
+               played: k.played || 0, warned: !!k.warned, lightsOut: !!k.lightsOut, waiting: k.waiting || {},
+               quiet: k.quiet || quietSpans(), idle: 0, quietDone: {}, listen: null };
     }
 
     /* A new visit on this page; one still open runs its leave first. */
@@ -638,7 +659,8 @@
       var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
       visit = { id: state.visits, smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [],
                 waits: freshWaits(), lastTap: {}, tapped: false, marks: {}, cast: [], pages: [place],
-                played: 0, warned: false, lightsOut: false, waiting: {} };
+                played: 0, warned: false, lightsOut: false, waiting: {}, quiet: quietSpans(), idle: 0, quietDone: {},
+                listen: null };
       save(STATE_KEY, state);
       checkEnds('arrive');
       moment('arrive');
@@ -704,7 +726,68 @@
       if (!visit) return;
       tapLines(name);
       visit.lastTap[name] = Date.now();
+      visit.idle = 0;
+      visit.quietDone = {};
       afterTap(name);
+      openEar(name);
+    }
+
+    /* ---------- the ear ---------- */
+
+    /* A tap opens the ear only on a thing a `say` record would hear just then (its `when` holding with that thing
+       listening), and only inside the tap, as iOS asks. A new tap closes the last tap's ear. The thing listens while
+       its ear is open and a beat after (a final guess can land as the ear closes); with no ear, for a few seconds. */
+    var SAY = /^say (.+)$/;
+    var LISTEN_AFTER_S = 2, LISTEN_BARE_S = 5;
+    function listensFor(name) {
+      var was = visit.listen, any = false;
+      visit.listen = { name: name, open: true, until: 0 };
+      for (var i = 0; i < records.length && !any; i++) {
+        var r = records[i];
+        if (SAY.test(r.moment || '') && (r.when || []).indexOf('listening = ' + name) >= 0 && allHold(r.when)) any = true;
+      }
+      visit.listen = was;
+      return any;
+    }
+    function openEar(name) {
+      if (earSession) { earSession.stop(); earSession = null; }
+      if (!visit) return;
+      var mine = visit.listen = { name: name, open: false, until: Date.now() + LISTEN_BARE_S * 1000, matched: false };
+      if (!listensFor(name)) return;
+      if (!ear || !ear.available()) { note('the ' + name + ' listens, but there is no ear on this page'); return; }
+      mine.open = true;
+      var session = ear.listen({
+        onHeard: function (guesses) { if (visit && visit.listen === mine) heard(guesses); },
+        onEnd: function (why) {
+          mine.open = false;
+          mine.until = Date.now() + LISTEN_AFTER_S * 1000;
+          if (earSession === session) earSession = null;
+          note('the ear closed: ' + why);
+        }
+      });
+      earSession = session;
+    }
+
+    /* Guesses from the ear (or a page's own): the `say` moment whose words come nearest, if near enough, once a tap. */
+    function heard(guesses) {
+      if (!visit || (visit.listen && visit.listen.matched)) return;
+      var match = ear && ear.match ? ear.match : function (a, b) { return String(a).toLowerCase().trim() === b ? 1 : 0; };
+      var loose = ear && ear.LOOSE != null ? ear.LOOSE : 1;
+      var best = null, score = 0;
+      for (var i = 0; i < records.length; i++) {
+        var m = SAY.exec(records[i].moment || '');
+        if (!m || !allHold(records[i].when)) continue;
+        for (var g = 0; g < (guesses || []).length; g++) {
+          var text = typeof guesses[g] === 'string' ? guesses[g] : guesses[g].text;
+          var sc = match(text, m[1]);
+          if (sc > score) { score = sc; best = m[1]; }
+        }
+      }
+      if (!best || score < loose) return;
+      if (visit.listen) visit.listen.matched = true;
+      if (earSession) earSession.stop();
+      note('heard "' + best + '" (' + Math.round(score * 100) + '%)');
+      moment('say ' + best);
     }
 
     /* The visit ends. Run on the page it ended on, or at the next page's load for a visit kept at its going (the
@@ -721,6 +804,7 @@
       }
       checkEnds('leave');
       moment('leave');
+      if (earSession) { earSession.stop(); earSession = null; }
       state.lastSmall = visit.small;
       clock = null;
       leaving = false;
@@ -741,6 +825,13 @@
         if (w.left == null) continue;
         w.left -= dt;
         if (w.left <= 0) { w.left = null; moment(w.name); if (!visit) return; }
+      }
+      visit.idle += dt;
+      for (var q in visit.quiet) {
+        if (visit.quietDone[q] || visit.idle < visit.quiet[q]) continue;
+        visit.quietDone[q] = true;
+        moment(q);
+        if (!visit) return;
       }
       bedtimeTick(dt);
     }
@@ -857,6 +948,8 @@
       log: function () { return state.log.slice(); },
       settings: function () { return settings; },
       visit: function () { return visit; },
+      heard: heard,                                   /* guesses a page heard itself, as strings or { text } */
+      listening: function () { return value('listening'); },
       /* The written lines' words as last drawn, by recording key, newest first: the room draws a pinned note from them. */
       written: function () {
         var out = [];
