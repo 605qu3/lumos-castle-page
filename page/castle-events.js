@@ -33,9 +33,10 @@
    draws who stands (`drawFigures`). On a page with no list a record with a figure is skipped, as before.
    Then lines (9 October 2026, twenty-fourth session): the page's `showLines(list)` gets the lines of each record,
    end or tap in order, each with its variant drawn (never the one its key said last), `{intro}` filled, its speaker's
-   cast entry and drawn figures; a line marked verify is held for the canon gate (?lines=all shows it); a written
+   cast entry and drawn figures; a line marked verify is held for the canon gate, handed as `held` with no words
+   (?lines=all shows it); a written
    line's words are kept for the room (`written()`); `pose` turns the speaker, `then` walks him off; a line `on_tap`
-   waits for a tap on its speaker.
+   waits for a tap on its speaker. Then a mark drawn `by week` (Friday's places, board req 64).
    Not yet: `mark next to X`, and the moments quiet and say; a record that needs one of them is skipped with a note
    in the console, never thrown.
 
@@ -348,7 +349,8 @@
     /* ---------- lines ---------- */
 
     /* A line marked verify goes through the canon gate before it reaches a boy (Magic for the boys): it is held,
-       with a note, and ?lines=all shows it for a test. A variant is drawn fresh, never the one this line's
+       with a note, and ?lines=all shows it for a test. A held line still goes to the page, `held: true` with no text
+       and no sound, so its speaker's pose and walk-off (`then`) still reach the page while no words do. A variant is drawn fresh, never the one this line's
        recording key said last (kept in the state, so not across visits either); `{intro}` takes the intro of the
        thing the record's own bag draw landed on. A written line's words are kept by key, so a note pinned to the
        board reads the same after a reload (`written()`). A line's `pose` turns its speaker to that pose (the page's
@@ -383,8 +385,9 @@
 
     function sayLine(rec, line, end) {
       if (line.pose) turnTo(rec, line.speaker, line.pose);
-      if (VERIFY.test(line.canon || '') && !allLines) { note(rec.id + ': a line held for the canon gate (' + line.canon + ')'); return null; }
-      var text = null, n = null, k = (line.text || []).length;
+      var held = VERIFY.test(line.canon || '') && !allLines;
+      if (held) note(rec.id + ': a line held for the canon gate (' + line.canon + ')');
+      var text = null, n = null, k = held ? 0 : (line.text || []).length;
       if (k) {
         var last = state.said[line.key];
         if (last && k > 1 && last.n < k) { n = Math.floor(Math.random() * (k - 1)); if (n >= last.n) n++; }
@@ -395,7 +398,7 @@
       }
       var who = (rec.who || []).filter(function (w) { return w.as === line.speaker; })[0] || null;
       return { record: rec.id, end: end, key: line.key, variant: n, speaker: line.speaker || null, medium: line.medium,
-               text: text, sound: line.sound || null, hand: line.hand || null, at: line.at || null, style: line.style || null,
+               held: held, text: text, sound: held ? null : line.sound || null, hand: line.hand || null, at: line.at || null, style: line.style || null,
                pose: line.pose || null, then: line.then || null, who: who,
                figures: visit.cast.filter(function (f) { return f.record === rec.id && f.as === line.speaker; }) };
     }
@@ -411,8 +414,7 @@
           w.push({ record: rec.id, end: end, line: i });
           continue;
         }
-        var l = sayLine(rec, list[i], end);
-        if (l) out.push(l);
+        out.push(sayLine(rec, list[i], end));
         if (list[i].then) off.push(list[i].speaker);
       }
       if (out.length) showLines(out);
@@ -428,8 +430,7 @@
         var rec = byId[w[i].record];
         if (!rec) continue;
         var list = w[i].end == null ? rec.lines : rec.ends[w[i].end].lines;
-        var l = sayLine(rec, list[w[i].line], w[i].end);
-        if (l) out.push(l);
+        out.push(sayLine(rec, list[w[i].line], w[i].end));
       }
       if (out.length) showLines(out);
       save(STATE_KEY, state);
