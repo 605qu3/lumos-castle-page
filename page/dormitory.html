@@ -238,9 +238,14 @@ scene.add(fireGlow);
 /* the five four-posters, radial with their heads to the wall, a trunk at each foot; his is the inner right one, by
    the stair. Each is a group at its head on the wall, turned so its local +z runs into the room. Sizes are a guess at
    a boy's four-poster with its hangings: 1.3 by 2.2 m on the floor, 2.3 m to the tester; real size wins later. */
-var BED = { w: 1.3, l: 2.2, h: 2.3, mattress: 0.55 };
+/* real sizes since 8 October 2026, 10.03 pm, cited from Objects' sheet (lumos main, docs/castle/dormitory-furnishing.md,
+   req 21): a boy's single four-post bedstead about 1.0 by 2.0 m and 2.2 m to the tester; the trunk 0.925 long, 0.545
+   wide, 0.425 high. The mattress top at 0.55 and the clear 0.25 beneath the frame stay this lane's guesses (verify). */
+var BED = { w: 1.0, l: 2.0, h: 2.2, mattress: 0.55, under: 0.25 };
+var TRUNK = { l: 0.925, w: 0.545, h: 0.425 };
 var BED_DEGS = [-24, 24, -53, 53, -82], HIS_DEG = 24;
 var frameMat = solid(0x5a4a40), hangMat = solid(0x6e5450), hisHangMat = solid(0x7a4a48), linenMat = solid(0xa8a09a), trunkMat = solid(0x6b5236);
+var darkMat = new THREE.MeshBasicMaterial({ color: col(0x0e0c0b) });   /* the dark under a bed: unlit, so no light reaches it */
 var beds = [];
 BED_DEGS.forEach(function (deg, i) {
   var g = new THREE.Group();
@@ -250,8 +255,8 @@ BED_DEGS.forEach(function (deg, i) {
   var his = deg === HIS_DEG, name = his ? 'bed-his' : 'bed-' + (i + 1), hm = his ? hisHangMat : hangMat;
   var parts = [];
   parts.push(box(g, BED.w - 0.1, 1.3, 0.08, 0, 0.65, 0.06, frameMat, 1));                 /* headboard */
-  parts.push(box(g, BED.w - 0.1, BED.mattress, BED.l - 0.2, 0, BED.mattress / 2, BED.l / 2, linenMat, 1));   /* the bed itself */
-  parts.push(box(g, 0.9, 0.14, 0.45, 0, BED.mattress + 0.07, 0.4, solid(0xc8c0b8), 1));   /* pillow */
+  parts.push(box(g, BED.w - 0.1, BED.mattress - BED.under, BED.l - 0.2, 0, (BED.mattress + BED.under) / 2, BED.l / 2, linenMat, 1));   /* the bed itself, on its frame above the dark */
+  parts.push(box(g, BED.w - 0.2, 0.14, 0.45, 0, BED.mattress + 0.07, 0.4, solid(0xc8c0b8), 1));   /* pillow */
   [[-1, 0.12], [1, 0.12], [-1, BED.l - 0.1], [1, BED.l - 0.1]].forEach(function (p) {
     parts.push(box(g, 0.1, BED.h, 0.1, p[0] * (BED.w / 2 - 0.05), BED.h / 2, p[1], frameMat, 1));   /* posts */
   });
@@ -260,10 +265,19 @@ BED_DEGS.forEach(function (deg, i) {
   [-1, 1].forEach(function (s) {                                                            /* hangings, tied back at the head */
     parts.push(box(g, 0.12, BED.h - 0.4, 0.55, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, 0.45, hm, 1));
   });
-  parts.push(box(g, 0.9, 0.5, 0.5, 0, 0.25, BED.l + 0.15 + 0.25, trunkMat, 1));            /* the trunk at the foot */
+  parts.push(box(g, TRUNK.l, TRUNK.h, TRUNK.w, 0, TRUNK.h / 2, BED.l + 0.15 + TRUNK.w / 2, trunkMat, 1));   /* the trunk at the foot, its long side across it */
   parts[parts.length - 1].name = his ? 'trunk-his' : 'trunk-' + (i + 1);
   parts.forEach(function (m) { if (!m.name) m.name = name; });
-  beds.push({ deg: deg, his: his, name: name, group: g, meshes: parts });
+  /* the dark under the bed: an unlit block under the frame, open 0.6 m at the foot end; under his bed, two grey
+     stand-ins for his own things in that mouth (Magic's thread, an event; nothing drawn) */
+  var under = [box(g, BED.w - 0.3, BED.under - 0.03, BED.l - 0.85, 0, (BED.under - 0.03) / 2, (BED.l - 0.85) / 2 + 0.15, darkMat, 1)];
+  under[0].name = his ? 'under-his' : 'under-' + (i + 1);
+  if (his) {
+    under.push(box(g, 0.32, 0.18, 0.22, -0.22, 0.09, BED.l - 0.45, solid(0x5e5852), 1));
+    under.push(box(g, 0.02, 0.15, 0.11, 0.24, 0.075, BED.l - 0.4, solid(0x7a736c), 1));
+    under[1].name = under[2].name = 'things-his';
+  }
+  beds.push({ deg: deg, his: his, name: name, group: g, meshes: parts, under: under });
 });
 
 /* three high narrow windows, 0.6 by 1.9 m, sills 1.1 m up: a pale sky plane on the wall naming its view (the views are
@@ -383,6 +397,20 @@ var STOPS = [
   { name: 'stair', meshes: [wellTap, newelPost, finial, kerb].concat(treads), stop: function () { return { pos: STAIR_EYE.clone().add(new THREE.Vector3(-1.2, 0, 0.9)), look: NEWEL.clone().setY(0.3) }; } }
 ];
 beds.forEach(function (b) { STOPS.push({ name: b.name, meshes: b.meshes, stop: function () { return bedStop(b); } }); });
+/* the dark under his bed, his own things (David, 8 October 2026, 10.15 pm, from a plan and a strip of three): tapping
+   the dark under his bed takes the eye to a boy's head at the floor beside the mouth of the dark, on the hearth's side,
+   1.2 m off the bed's axis and level with the foot end, 0.22 m up, looking across under the frame; Back returns. The
+   trunk stays with the bed's stop, since its open lid is a standing drawing on the Curator's list and what lies under
+   the bed is Magic's event. Lost: a crouch off the foot's corner at 0.95 m (the lid and a band of the dark), the bed's
+   stop as built with his things in the trunk, a kneel at 0.6 beside the flank (it showed the flank) and one at 0.45
+   from the foot's corner (the trunk and a post). This view gets its own drawing later, as the board's walk-up does. */
+(function () {
+  var his = beds.filter(function (b) { return b.his; })[0], g = his.group;
+  function kneel() {
+    return { pos: g.localToWorld(new THREE.Vector3(-1.2, 0.22, BED.l - 0.45)), look: g.localToWorld(new THREE.Vector3(0.3, 0.1, BED.l - 0.5)) };
+  }
+  STOPS.push({ name: 'under-his', meshes: his.under, stop: kneel });
+})();
 windows.forEach(function (w) { STOPS.push({ name: w.name, meshes: [w.sky, w.sill], stop: function () { return windowStop(w); } }); });
 var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
