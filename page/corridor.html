@@ -226,10 +226,12 @@ function onWallZ(t, w, h, x, y, z, facing, layer, name) {
 /* The hole's own frame from common-room.html: x along the wall toward the hearth side, y up, z into the room.
    The closed end is at +x, the stair head at -x. Facing her, +x is on your left. The corridor's floor runs to the
    stair head at STAIR_X, where a flight goes down toward -x between the same two walls, the way PS 7 brings the
-   first-years up; it is behind the camera at rest. */
-var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.4, FAR_END_X = -14.7, CEIL = 4.5, BELOW = 2.5;
+   first-years up; it is behind the camera at rest. At its foot a landing 2.4 m deep (provisional, David, 9 October
+   2026, until the window's plan, req 29) ends at the end wall, so the side walls and ceiling run on to it. */
+var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.4, CEIL = 4.5, BELOW = 2.5;
+var STEP_RISE = 0.18, STEP_RUN = 0.3, STEPS = 11, LANDING_D = 2.4;
+var FOOT_X = STAIR_X - STEPS * STEP_RUN, FOOT_Y = -STEPS * STEP_RISE, FAR_END_X = FOOT_X - LANDING_D;
 var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - FAR_END_X, WIDTH = HER_Z - FAR_Z;
-var STEP_RISE = 0.18, STEP_RUN = 0.3, STEPS = 11;
 
 var stoneMat = solid(0x75726e);
 var floorMat = solid(0x6a6764);
@@ -265,6 +267,17 @@ for (var si = 1; si <= STEPS; si++) {
   var top = -si * STEP_RISE;
   box(scene, STEP_RUN, 0.4, WIDTH, STAIR_X - (si - 0.5) * STEP_RUN, top - 0.2, MID_Z, stairMat, 0).name = 'stair-' + si;
 }
+/* the landing at the flight's foot, and a grey stand-in for its tall window in the end wall (req 29 settles the window
+   and what it looks onto; a pale sky shape for now so the foot of the stair is never dark) */
+var landing = new THREE.Mesh(new THREE.PlaneGeometry(LANDING_D, WIDTH), floorMat);
+landing.rotation.x = -Math.PI / 2; landing.position.set((FOOT_X + FAR_END_X) / 2, FOOT_Y, MID_Z);
+landing.name = 'landing'; scene.add(landing); register(landing, 0);
+var LANDING_WINDOW = { w: 1.2, h: 2.4, sill: 0.9 };
+var landingWindow = cutoutMesh(cutoutTexture(120, 240, '#c9d6e2', drawArch, 'window'), LANDING_WINDOW.w, LANDING_WINDOW.h);
+landingWindow.material = new THREE.MeshBasicMaterial({ map: landingWindow.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
+landingWindow.position.set(FAR_END_X + 0.01, FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2, MID_Z);
+landingWindow.rotation.y = Math.PI / 2;
+landingWindow.name = 'landing-window'; scene.add(landingWindow); register(landingWindow, 1);
 /* the inglenook: her study's end wall on the near side (its outer face at x -6.4, running back to the tower), a wall
    on the stair side, the back wall with a chimney breast 3.0 m wide standing 0.3 proud, a settle 2.0 m long against
    each side wall from the back toward the mouth, three seats a side, and its own lower ceiling */
@@ -458,13 +471,16 @@ windows.forEach(function (w) {
   l.position.set(w.x, 2.2, FAR_Z + 0.8);
   scene.add(l);
 });
+var landingLight = new THREE.PointLight(col(0xdfe6ee), 1.6, 9, 1.4);
+landingLight.position.set(FAR_END_X + 0.8, FOOT_Y + 2.2, MID_Z);
+scene.add(landingLight);
 
 /* ---------- the two views ---------- */
 /* length: from the stair head at a boy's eye, looking down to her end; a drag turns the head.
    stage: the far wall cut away, the camera outside it facing her wall square on; a drag slides along it. */
 var EYE = 1.35;
 var VIEWS = {
-  length: { pos: new THREE.Vector3(-11.0, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12 },
+  length: { pos: new THREE.Vector3(-11.0, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12, turnBand: 0.35, turnTilt: 20, turnGain: 2.5 },
   stage: { z: FAR_Z - 3.4, xMin: -10.0, xMax: -0.2, x0: -1.6 }
 };
 var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
@@ -515,12 +531,27 @@ STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s
 
 var mode = 'rest', atStop = null, tween = null;
 var backBtn = document.getElementById('back');
+/* The turn round to the moving stair (req 22; David, 9 October 2026): past the corridor's limit a drag keeps turning,
+   either way round, until he looks straight down the flight at yaw pi; as he comes round the view tilts down and opens to
+   FOV_MAX together, one movement, so the treads, the landing and its window come into view. turnBlend is 0 facing the
+   corridor and 1 facing the flight. */
+function turnBlend(y) {
+  var L = VIEWS.length, k = clamp((Math.abs(y) - L.yawMax) / (Math.PI - L.turnBand - L.yawMax), 0, 1);
+  return k * k * (3 - 2 * k);
+}
 function restPose(out) {
-  var p = VIEWS.length.pos;
+  var p = VIEWS.length.pos, b = turnBlend(yaw);
   out.pos.copy(p);
-  out.look.set(p.x + Math.cos(yaw) * 10, EYE - 0.1 + pitch * 10, p.z + Math.sin(yaw) * 10);
-  out.fov = FOV_REST;
+  out.look.set(p.x + Math.cos(yaw) * 10, EYE - 0.1 + pitch * 10 - b * 10 * Math.tan(VIEWS.length.turnTilt * Math.PI / 180), p.z + Math.sin(yaw) * 10);
+  out.fov = lerp(FOV_REST, FOV_MAX, b);
   return out;
+}
+/* On letting go: short of a right angle he eases back to the corridor's limit; past it he settles facing the flight,
+   free to look about within turnBand either side of it */
+function settleTurn() {
+  var L = VIEWS.length, a = Math.abs(yawT), s = yawT < 0 ? -1 : 1;
+  if (a <= L.yawMax) return;
+  yawT = a < Math.PI / 2 ? s * L.yawMax : s * clamp(a, Math.PI - L.turnBand, Math.PI + L.turnBand);
 }
 var poseNow = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: FOV_REST };
 /* A glide runs down the corridor's middle and turns square onto a stop at its end, a cubic through a corner at the
@@ -624,7 +655,7 @@ function updateCamera(dt) {
     yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
     restPose(poseNow);
     camera.position.copy(poseNow.pos); lookTmp.copy(poseNow.look);
-    setFov(FOV_REST);
+    setFov(poseNow.fov);
   }
   camera.lookAt(lookTmp);
   /* a standing piece seen down the length would be drawn from the eye and stood as a card turned to it, as the
@@ -651,13 +682,16 @@ canvas.addEventListener('pointermove', function (e) {
   if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
   if (view === 'stage') slideT = clamp(slideT - dx * 0.02, VIEWS.stage.xMin, VIEWS.stage.xMax);
   else if (mode === 'rest' && !tween) {
-    yawT = clamp(yawT - dx * 0.003, -VIEWS.length.yawMax, VIEWS.length.yawMax);
+    /* past the corridor's limit the turn goes faster, so turning round is about half a screen's drag, not a whole one */
+    var L = VIEWS.length, step = -dx * 0.003 * (Math.abs(yawT) > L.yawMax ? L.turnGain : 1);
+    yawT = clamp(yawT + step, -Math.PI - L.turnBand, Math.PI + L.turnBand);
     pitchT = clamp(pitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
   }
 });
 function endDrag(e) {
   if (!dragging) return;
   dragging = false;
+  if (view === 'length' && mode === 'rest') settleTurn();
   if (!moved && e.type === 'pointerup') tap(e.clientX, e.clientY);
 }
 canvas.addEventListener('pointerup', endDrag);
@@ -696,6 +730,7 @@ renderer.setAnimationLoop(frame);
 window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
+  yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf };
 })();
 </script>
