@@ -23,7 +23,9 @@
    or sound, are noted as waiting.
    Then the hole as moving, not leaving (David, 9 October 2026): one visit across every page, `arrive` once per
    page per visit, `outside` and `enter` at the hole, `leave` when he really stops, run on the clock of his going
-   when it runs late; the built-in `been <page>`; `chains: 'all'` from events/index.json.
+   when it runs late; the built-in `been <page>`; `chains: 'all'` from events/index.json; a record's `show_at`.
+   Then the bedtime (9 October 2026, board req 37): a parent's visit length raises `bedtime warning` and `lights
+   out` on whatever page he is on, the built-in `bedtime`, and ?bedtime=N (minutes) for a test.
    Not yet: figures on marks, lines, `mark next to X`, and the moments quiet and say; a record that needs one of
    them is skipped with a note in the console, never thrown.
 
@@ -97,6 +99,8 @@
     if (fresh) state = freshState();
     state.open = state.open || {};        /* records still open, by id: the day each fired, for its timeout */
     var settings = load(SETTINGS_KEY) || { leans: [], speech: 'on' };
+    /* A parent's bedtime: a visit length in minutes, or off (settings.bedtime); ?bedtime=N sets it for a test. */
+    var bedtimeMin = params.has('bedtime') ? Math.max(0, +params.get('bedtime') || 0) : (+settings.bedtime || 0);
 
     var chains = [];          /* the loaded files */
     var records = [];         /* every record, in file order */
@@ -135,6 +139,7 @@
         case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
         case 'slot': return state.slot ? 'taken' : 'free';
         case 'speech': return settings.speech || 'on';
+        case 'bedtime': return bedtimeMin > 0 ? 'set' : 'off';
         case 'visits since big': return state.lastBigVisit == null ? Infinity : state.visits - state.lastBigVisit;
         case 'seconds since last tap':      /* since his previous tap on the same thing; never tapped reads as long ago */
           if (!tapping || !visit || visit.lastTap[tapping] == null) return Infinity;
@@ -417,12 +422,14 @@
     function keep() {
       if (!visit) return;
       state.kept = { id: visit.id, smallOn: visit.smallOn, bigOn: visit.bigOn, bigDone: visit.bigDone,
-                     small: visit.small, marks: visit.marks, pages: visit.pages };
+                     small: visit.small, marks: visit.marks, pages: visit.pages, played: visit.played,
+                     warned: visit.warned, lightsOut: visit.lightsOut };
     }
     function restore() {
       var k = state.kept || {};
       return { id: k.id, smallOn: !!k.smallOn, bigOn: !!k.bigOn, bigDone: k.bigDone !== false, small: k.small || [],
-               marks: k.marks || {}, pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false };
+               marks: k.marks || {}, pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false,
+               played: k.played || 0, warned: !!k.warned, lightsOut: !!k.lightsOut };
     }
 
     /* A new visit on this page; one still open runs its leave first. */
@@ -433,7 +440,8 @@
       state.visitPlace = place;
       var bigOn = Math.random() < BIG_ODDS && state.lastBigDay !== today() && state.lastBigVisit !== state.visits - 1;
       visit = { id: state.visits, smallOn: Math.random() < SMALL_ODDS, bigOn: bigOn, bigDone: false, small: [],
-                waits: freshWaits(), lastTap: {}, tapped: false, marks: {}, pages: [place] };
+                waits: freshWaits(), lastTap: {}, tapped: false, marks: {}, pages: [place],
+                played: 0, warned: false, lightsOut: false };
       save(STATE_KEY, state);
       checkEnds('arrive');
       moment('arrive');
@@ -512,11 +520,22 @@
         w.left -= dt;
         if (w.left <= 0) { w.left = null; moment(w.name); }
       }
+      bedtimeTick(dt);
+    }
+
+    /* The bedtime counts the visit's own time, on every page it reaches and only while a page is drawn: `bedtime
+       warning` ten minutes before the length a parent set (at once for a length of ten or less), `lights out` at
+       it, each once a visit. After lights out the page carries him up to bed and ends the visit itself. */
+    function bedtimeTick(dt) {
+      if (!(bedtimeMin > 0) || visit.lightsOut) return;
+      visit.played += dt;
+      if (!visit.warned && visit.played >= Math.max(0, bedtimeMin - 10) * 60) { visit.warned = true; moment('bedtime warning'); }
+      if (visit && !visit.lightsOut && visit.played >= bedtimeMin * 60) { visit.lightsOut = true; moment('lights out'); }
     }
 
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) { hiddenAt = Date.now(); keep(); save(STATE_KEY, state); return; }
-      if (hiddenAt && Date.now() - hiddenAt > AWAY_S * 1000) { leave(); arrive(); }
+      if (hiddenAt && Date.now() - hiddenAt > AWAY_S * 1000 && (visit || state.visitOpen)) { leave(); arrive(); }   /* never reopens a visit its page ended */
       hiddenAt = 0;
     });
     /* Going: keep the visit and the time, and let the next page decide. The visit stays in memory, so a page Safari

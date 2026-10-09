@@ -47,7 +47,8 @@
       ],
       "moment": "lights out",
       "when": [
-        "bedtime = set"
+        "bedtime = set",
+        "place != corridor"
       ],
       "who": [
         {
@@ -57,9 +58,14 @@
           "mark": "stair-top"
         }
       ],
-      "show": [
-        "the room dims, the fire low, the view turns to the stair and fades, and the visit ends as leaving does"
-      ],
+      "show_at": {
+        "common room": [
+          "the room dims, the fire low, the view turns to the stair, and he goes up to the dormitory for lights out (dormitory.html?from=room&bedtime)"
+        ],
+        "dormitory": [
+          "the dormitory's lights out: the room dimmed, the hangings drawn bed by bed, his last, and the screen darkens; then the page ends the visit"
+        ]
+      },
       "lines": [
         {
           "speaker": "percy",
@@ -72,6 +78,47 @@
             "Lights out! And the P on my jumper is NOT for 'Pompous'."
           ],
           "canon": "PS12, the twins' P for Prefect, verify"
+        }
+      ],
+      "starts": [
+        "log \"Bedtime came {day}\""
+      ]
+    },
+    {
+      "id": "bedtime.lights-out-corridor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "lights out",
+      "when": [
+        "bedtime = set",
+        "place = corridor"
+      ],
+      "who": [
+        {
+          "as": "fat-lady",
+          "role": "voice",
+          "name": "the fat lady",
+          "mark": "her frame"
+        }
+      ],
+      "show": [
+        "the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)"
+      ],
+      "lines": [
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "bedtime.lights-out-corridor",
+          "text": [
+            "Bed, dear! In you go, before Percy finds you out here.",
+            "Lights out! Even I'm closing my eyes, dear.",
+            "In you go. Students out of bed at night, whatever next!",
+            "Bedtime! And mind the stair, it has opinions."
+          ],
+          "canon": "drafts for docs/fat-lady-lines.md; out of bed at night against the rules, PS 9, verify"
         }
       ],
       "starts": [
