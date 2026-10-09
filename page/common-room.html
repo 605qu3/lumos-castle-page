@@ -614,6 +614,8 @@ scale off assets/review/nick-path-plan.jpg (Godric's option 1, 2.43 pm), from be
 his stop 0.7 m outside her door, the bow, and away past the hole's left edge; the four cues word for word; his words
 wait until he has stopped, his walk-off until they are done; the hole held open and the climb-out held while he is
 there. In grey until his card (req 61).
+the painting opposite's drawing, 9 October 2026 (the Corridor's req 33, Godric's pick at 5.11 pm): hung as the
+canvas's ground in the hole's view, 0.5 by 0.54 m, a sitter on its painted floor walking off through its doorway.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -2346,10 +2348,18 @@ function comeHome(n) {
    Corridor's req 33; lost, the painting seen only on the drag left). A sitter out visiting
    stands in it, drawn from her own standing cell; looking in, she faces the room's side, paying him no mind she is
    turned away, and caught she walks off through the painted door at its right edge. One sitter at a time. */
-var OPP_W = 0.5, OPP_H = 0.55, OPP_DOOR = 0.84;
-var oppCanvas = makeCanvas(160, 176), oppCtx = oppCanvas.getContext('2d'), oppTex = tex(oppCanvas);
+/* The drawing is the Corridor's (req 33, round 1 candidate 3, Godric's pick at 5.11 pm, assets/layers/painting-opposite.png,
+   400 x 433 for 0.5 by 0.54 m): an empty panelled room in a beaded gilt frame, its door ajar on the right, so a sitter
+   stands on its floor and walks off through that doorway. It is the canvas's ground; until it loads, the grey stand-in.
+   OPP_IN is the picture inside the frame, as fractions of the drawing; OPP_DOOR the doorway, across that picture. */
+var OPP_W = 0.5, OPP_H = 0.54, OPP_DOOR = 0.68;
+var OPP_IN = { x0: 0.155, x1: 0.845, y0: 0.143, y1: 0.866, floor: 0.79 };
+var oppCanvas = makeCanvas(400, 433), oppCtx = oppCanvas.getContext('2d'), oppTex = tex(oppCanvas);
+var oppImg = new Image();
+oppImg.onload = function () { opp.dirty = true; };
+oppImg.src = '../assets/layers/painting-opposite.png';
 var opposite = new THREE.Mesh(new THREE.PlaneGeometry(OPP_W, OPP_H),
-  new THREE.MeshStandardMaterial({ map: oppTex, color: 0xffffff, roughness: 0.95, metalness: 0 }));
+  new THREE.MeshStandardMaterial({ map: oppTex, color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5 }));
 opposite.position.set(1.5, 1.25, -HOLE_DEPTH - CORRIDOR_D + 0.02);
 opposite.name = 'painting-opposite';
 holeFrame.add(opposite); register(opposite, 1);
@@ -2357,22 +2367,28 @@ var opp = { who: null, mode: null, x: 0.4, dist: 0, dirty: true };
 function oppShow(n, mode) { opp.who = n; opp.mode = mode; opp.x = 0.4; opp.dist = 0; opp.dirty = true; }
 function oppClear(n) { if (opp.who === n && opp.mode !== 'slips') { opp.who = null; opp.mode = null; opp.dirty = true; } }
 function drawOpposite() {
-  var g = oppCtx, w = oppCanvas.width, h = oppCanvas.height, f = 12, iw = w - 2 * f, ih = h - 2 * f;
-  g.fillStyle = '#5e5b55'; g.fillRect(0, 0, w, h);
-  g.fillStyle = '#9b978f'; g.fillRect(f, f, iw, ih);
-  var floorY = f + ih * 0.86;
-  g.fillStyle = '#86827a'; g.fillRect(f, f + ih * 0.7, iw, ih * 0.3);
-  g.fillStyle = '#625f59'; g.fillRect(f + iw * (OPP_DOOR - 0.07), f + ih * 0.22, iw * 0.16, ih * 0.6);
+  var g = oppCtx, w = oppCanvas.width, h = oppCanvas.height;
+  var fx = OPP_IN.x0 * w, fy = OPP_IN.y0 * h, iw = (OPP_IN.x1 - OPP_IN.x0) * w, ih = (OPP_IN.y1 - OPP_IN.y0) * h;
+  var floorY = OPP_IN.floor * h;
+  g.clearRect(0, 0, w, h);
+  if (oppImg.complete && oppImg.naturalWidth) g.drawImage(oppImg, 0, 0, w, h);
+  else {
+    g.fillStyle = '#5e5b55'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#9b978f'; g.fillRect(fx, fy, iw, ih);
+    g.fillStyle = '#86827a'; g.fillRect(fx, fy + ih * 0.7, iw, ih * 0.3);
+    g.fillStyle = '#625f59'; g.fillRect(fx + iw * (OPP_DOOR - 0.04), fy + ih * 0.22, iw * 0.08, ih * 0.6);
+  }
   if (!opp.who) return;
+  var f = fx;
   var def = SITTERS[opp.who], walking = opp.mode === 'slips';
   var pose = walking ? walkPose({ name: opp.who, dist: opp.dist }) : def.standing;
   var img = sheetImages[opp.who] && sheetImages[opp.who][pose.sheet], sh = def.sheets[pose.sheet];
   if (!img) return;
-  var dh = sh.scale * 0.68 * ih, dw = dh * sh.cellW / sh.cellH;
+  var dh = sh.scale * 0.62 * ih, dw = dh * sh.cellW / sh.cellH;
   var left = f + opp.x * iw - dw / 2, top = floorY - dh;
   var facing = opp.mode === 'stays' ? -1 : 1;
   g.save();
-  g.beginPath(); g.rect(f, f, iw, ih); g.clip();
+  g.beginPath(); g.rect(fx, fy, iw, ih); g.clip();
   if (facing !== sh.native[pose.cell]) { var mid = left + dw / 2; g.translate(mid, 0); g.scale(-1, 1); g.translate(-mid, 0); }
   g.drawImage(img, pose.cell * sh.cellW, 0, sh.cellW, sh.cellH, left, top, dw, dh);
   g.restore();
