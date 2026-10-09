@@ -329,6 +329,7 @@ window.castleFrame = function (opts) {
      drawn toward a paler, greyer stone by `strength`, since the plate shows wear as worn colour and never as gloss.
      The layer's tint is applied here rather than on the material, which would cap the worn stone at the tint's value. */
   function sillCanvas(im, sill, w, tint) {
+    if (tint === undefined) tint = 0xffffff;                   /* no tint: the drawing as it is, not black */
     /* the material's tint multiplies in linear light and the drawing is sRGB, so in the canvas it is its 1/2.2 power */
     var tr = Math.pow((tint >> 16 & 255) / 255, 1 / 2.2), tg = Math.pow((tint >> 8 & 255) / 255, 1 / 2.2),
       tb = Math.pow((tint & 255) / 255, 1 / 2.2), tc = [tr, tg, tb];
@@ -373,7 +374,9 @@ window.castleFrame = function (opts) {
         for (var k = 0; k <= n; k++) {
           var f = k / n, x = a[0] + (b[0] - a[0]) * f, y = a[1] + (b[1] - a[1]) * f;
           var wa = w.path[i][2], wb = w.path[i + 1][2];
-          var weight = wa === undefined ? 1 : wa + (wb - wa) * f;
+          if (wa === undefined) wa = wb === undefined ? 1 : wb;   /* a point with no weight takes its neighbour's */
+          if (wb === undefined) wb = wa;
+          var weight = wa + (wb - wa) * f;
           var grd = mg.createRadialGradient(x, y, 0, x, y, r);
           grd.addColorStop(0, 'rgba(255,255,255,' + weight.toFixed(3) + ')');
           grd.addColorStop(1, 'rgba(255,255,255,0)');

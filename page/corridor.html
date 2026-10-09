@@ -165,8 +165,8 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door at the end to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=2"></script>
-<script src="castle-events.js?v=7"></script>
+<script src="castle.js?v=3"></script>
+<script src="castle-events.js?v=8"></script>
 <script>
 (function () {
 'use strict';
@@ -279,6 +279,27 @@ landingWindow.material = new THREE.MeshBasicMaterial({ map: landingWindow.materi
 landingWindow.position.set(FAR_END_X + 0.01, FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2, MID_Z);
 landingWindow.rotation.y = Math.PI / 2;
 landingWindow.name = 'landing-window'; scene.add(landingWindow); register(landingWindow, 1);
+/* the drawing (round 1, candidate 3, Godric, 9 October 2026, 2.20 pm): Gryffindor's lion in scarlet and gold glass in its
+   stone reveal, unlit so the glass glows with the day behind it. Drawn about 1 to 2.06, so its height follows its width;
+   sizeLandingWindow(w) restands it, its foot staying on the sill line. */
+var landingWindowAspect = LANDING_WINDOW.h / LANDING_WINDOW.w;
+function sizeLandingWindow(w) {
+  LANDING_WINDOW.w = w; LANDING_WINDOW.h = w * landingWindowAspect;
+  landingWindow.geometry.dispose();
+  landingWindow.geometry = new THREE.PlaneGeometry(LANDING_WINDOW.w, LANDING_WINDOW.h);
+  landingWindow.position.y = FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2;
+  return LANDING_WINDOW.w.toFixed(2) + ' x ' + LANDING_WINDOW.h.toFixed(2);
+}
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    landingWindow.material.map = tex(im); landingWindow.material.color.set(0xffffff);
+    landingWindow.material.needsUpdate = true;
+    landingWindowAspect = im.height / im.width;
+    sizeLandingWindow(LANDING_WINDOW.w);
+  };
+  im.src = '../assets/layers/landing-window.png';
+})();
 /* the inglenook: her study's end wall on the near side (its outer face at x -6.4, running back to the tower), a wall
    on the stair side, the back wall with a chimney breast 3.0 m wide standing 0.3 proud, a settle 2.0 m long against
    each side wall from the back toward the mouth, three seats a side, and its own lower ceiling */
@@ -864,7 +885,8 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf };
+  enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
+  sizeLandingWindow: sizeLandingWindow };
 })();
 </script>
 </body>
