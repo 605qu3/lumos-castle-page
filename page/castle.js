@@ -487,6 +487,168 @@ window.castleFrame = function (opts) {
     }, (DARKEN_S + (o.dry ? 0.6 : 0.05)) * 1000);
   }
 
+  /* ---------- the seventh-floor corridor, one model for every page that shows it ---------- */
+  /* Godric, 10 October 2026, 5.35 pm (the Corridor's Q21, option 1): the Fat Lady hangs at the very end of the corridor
+     (PS 7) and the polite door where she hung, built once here so the corridor page and the common room's view out
+     through the open hole draw the same corridor. The corridor's frame: x along it, toward her end; y up; z across,
+     from the outer wall (FAR_Z) to the long wall the door is in (HER_Z). The architecture only: floor, ceiling, the
+     three walls with real openings (the round hole in the end wall, the door and the inglenook's mouth in the long
+     wall, the two windows in the outer wall), the windows' frames, glass and sills, the flight going down from the
+     stair head and its landing. A page draws its own door leaf, torches, paintings and lights at CORRIDOR.places.
+     The numbers are the corridor page's, moved here, and live only here. */
+  var CORRIDOR = (function () {
+    var C = { HER_Z: -0.81, FAR_Z: -3.81, END_X: 2.3, STAIR_X: -11.4, CEIL: 4.5, BELOW: 4.6, T: 0.3,
+      STEP_RISE: 0.18, STEP_RUN: 0.3, STEPS: 11, LANDING_D: 2.4,
+      NOOK_X0: -6.4, NOOK_X1: -10.8, NOOK_H: 2.4,
+      /* the outer wall 0.45 m thick (the Placement check, 5.08 pm); each window's reveal splayed toward the corridor so
+         the glass shows from the stair head (Godric, Q22, 5.53 pm), splay[0] on the stair side, splay[1] on her side;
+         the window nearer the stairs, the grounds' (Q20), splayed deepest on its stair side */
+      WINDOW: { w: 1.2, h: 2.4, sill: 0.9, deep: 0.45, xs: [-2.5, -4.6], splays: [[0.25, 0.25], [1.0, 0.25]] },
+      DOOR: { w: 1.0, h: 2.2, x: 0 },
+      HOLE: { r: 0.6, y: 1.2, depth: 0.81 },
+      PORTRAIT: { w: 1.4, h: 1.7 } };
+    C.FOOT_X = C.STAIR_X - C.STEPS * C.STEP_RUN; C.FOOT_Y = -C.STEPS * C.STEP_RISE; C.FAR_END_X = C.FOOT_X - C.LANDING_D;
+    C.MID_Z = (C.HER_Z + C.FAR_Z) / 2; C.LEN = C.END_X - C.FAR_END_X; C.WIDTH = C.HER_Z - C.FAR_Z;
+    C.WALL_H = C.CEIL + C.BELOW; C.WALL_Y = (C.CEIL - C.BELOW) / 2;
+    C.GLASS_Z = C.FAR_Z - C.WINDOW.deep;
+    /* where each page hangs its own things, in the corridor's frame */
+    C.places = {
+      hole: { x: C.END_X, y: C.HOLE.y, z: C.MID_Z },          /* the round hole's centre on the end wall's face, its axis +x */
+      door: { x: C.DOOR.x, z: C.HER_Z, w: C.DOOR.w, h: C.DOOR.h },
+      paintingOpposite: { x: 1.5, y: 1.25, z: C.FAR_Z, w: 0.5, h: 0.55 },   /* where it hung; re-homed with Magic, provisional */
+      torches: [{ x: 0.9, y: 1.3, z: C.FAR_Z }, { x: 2.1, y: 1.3, z: C.FAR_Z }],
+      windows: C.WINDOW.xs.map(function (x) { return { x: x, y: C.WINDOW.sill + C.WINDOW.h / 2, z: C.GLASS_Z }; })
+    };
+    /* The hole's own frame (the room's: x along its wall, y up, z into the room, its origin on the room's face of the
+       hole, the corridor's face at z HER_Z) turned onto the end wall: corridor = (END_X - HER_Z + z, y, MID_Z - x).
+       holeMount puts a group in that frame inside the corridor; holeView puts the corridor inside the room's hole frame. */
+    C.holeMount = { ry: Math.PI / 2, x: C.END_X - C.HER_Z, z: C.MID_Z };
+    C.holeView = { ry: -Math.PI / 2, x: C.MID_Z, z: -(C.END_X - C.HER_Z) };
+    C.holeToCorridor = function (x, y, z) { return new THREE.Vector3(C.END_X - C.HER_Z + z, y, C.MID_Z - x); };
+    return C;
+  })();
+  function mountInHole(group) { group.rotation.set(0, CORRIDOR.holeMount.ry, 0); group.position.set(CORRIDOR.holeMount.x, 0, CORRIDOR.holeMount.z); return group; }
+  function corridorInHole(group) { group.rotation.set(0, CORRIDOR.holeView.ry, 0); group.position.set(CORRIDOR.holeView.x, 0, CORRIDOR.holeView.z); return group; }
+
+  /* one window's outline, from the bottom of one jamb round the head to the bottom of the other: a round head of half
+     width r centred on x, springing at ys, the jambs down to yb; n points on the head */
+  function windowOutline(x, r, ys, yb, n) {
+    var pts = [new THREE.Vector2(x - r, yb)];
+    for (var i = 0; i <= n; i++) { var a = Math.PI - Math.PI * i / n; pts.push(new THREE.Vector2(x + r * Math.cos(a), ys + r * Math.sin(a))); }
+    pts.push(new THREE.Vector2(x + r, yb));
+    return pts;
+  }
+  function buildCorridor(parent, o) {
+    o = o || {};
+    var C = CORRIDOR, W = C.WINDOW, layer = o.layer || 0;
+    var wallMat = o.wall || solid(0x75726e), floorMat = o.floor || solid(0x6a6764), ceilMat = o.ceil || solid(0x3d3b38);
+    var stairMat = o.stair || solid(0x6f6b66), sillMat = o.sill || solid(0x86827c);
+    var group = new THREE.Group(); group.name = 'corridor'; parent.add(group);
+    var out = { group: group, windows: [] };
+    function add(m, name, lay) {
+      m.name = name;
+      if (opts.shadows) { m.castShadow = true; m.receiveShadow = true; }
+      group.add(m); register(m, lay === undefined ? layer : lay);
+      return m;
+    }
+    function rect(x0, y0, x1, y1) { var s = new THREE.Shape(); s.moveTo(x0, y0); s.lineTo(x1, y0); s.lineTo(x1, y1); s.lineTo(x0, y1); s.lineTo(x0, y0); return s; }
+    function holeOf(pts) { var p = new THREE.Path(); p.moveTo(pts[0].x, pts[0].y); for (var i = 1; i < pts.length; i++) p.lineTo(pts[i].x, pts[i].y); p.lineTo(pts[0].x, pts[0].y); return p; }
+    var y0 = C.WALL_Y - C.WALL_H / 2, y1 = C.WALL_Y + C.WALL_H / 2;
+
+    /* the outer wall, cut with the two windows' openings at their inner (splayed) outline */
+    var r = W.w / 2, yb = W.sill - 0.03, ys = W.sill + W.h - r, N = 24;
+    var outlines = W.xs.map(function (wx, i) {
+      var s = W.splays[i], ri = r + (s[0] + s[1]) / 2, xi = wx + (s[1] - s[0]) / 2;
+      return { x: wx, inner: windowOutline(xi, ri, ys, yb, N), outer: windowOutline(wx, r, ys, yb, N), splay: s };
+    });
+    var farShape = rect(C.FAR_END_X, y0, C.END_X, y1);
+    outlines.forEach(function (ol) { farShape.holes.push(holeOf(ol.inner)); });
+    var farG = new THREE.ExtrudeGeometry(farShape, { depth: W.deep, bevelEnabled: false, curveSegments: 1 });
+    farG.translate(0, 0, C.FAR_Z - W.deep);
+    out.farWall = add(new THREE.Mesh(farG, wallMat), 'far-wall');
+    /* each reveal: a surface from the inner outline on the wall's face to the glass's outline at its back */
+    outlines.forEach(function (ol, i) {
+      var pos = [], idx = [], n = ol.inner.length;
+      for (var k = 0; k < n; k++) {
+        pos.push(ol.inner[k].x, ol.inner[k].y, C.FAR_Z, ol.outer[k].x, ol.outer[k].y, C.GLASS_Z);
+        if (k < n - 1) { var a = 2 * k; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+      }
+      var g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+      var rev = add(new THREE.Mesh(g, o.reveal || new THREE.MeshStandardMaterial({ color: wallMat.color, roughness: 0.92, metalness: 0, side: THREE.DoubleSide })), (i ? 'window' : 'window-2') + '-reveal');
+      ol.reveal = rev;
+    });
+    /* the windows themselves, at the back of each reveal: the sky behind the glass and the frame in it (a narrow band
+       round the head and jambs, a bottom rail and a mullion), and the deep sill filling the reveal's floor, 5 cm proud */
+    outlines.forEach(function (ol, i) {
+      var name = i ? 'window' : 'window-2', wx = ol.x;
+      var sky = cutoutMesh(cutoutTexture(120, 240, '#c9d6e2', function (g, w, h) { arch(g, 0, 0, w, h); }), W.w, W.h);
+      sky.material = new THREE.MeshBasicMaterial({ map: sky.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
+      sky.position.set(wx, W.sill + W.h / 2, C.GLASS_Z + 0.005);
+      add(sky, name + '-sky', 3);
+      var frame = cutoutMesh(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) {
+        arch(g, 0, 0, w, h);
+        g.globalCompositeOperation = 'destination-out'; arch(g, w * 0.06, w * 0.06, w * 0.88, h * 0.97 - w * 0.06); g.globalCompositeOperation = 'source-over';
+        g.fillRect(w * 0.47, w * 0.04, w * 0.06, h * 0.94);
+      }, name), W.w, W.h);
+      frame.position.set(wx, W.sill + W.h / 2, C.GLASS_Z + 0.01);
+      add(frame, name, 1);
+      var s = ol.splay, sh = new THREE.Shape();      /* the sill's plan, v = -z: back at the glass, front 5 cm proud */
+      sh.moveTo(wx - r, -C.GLASS_Z); sh.lineTo(wx + r, -C.GLASS_Z);
+      sh.lineTo(wx + r + s[1] * (W.deep + 0.05) / W.deep, -(C.FAR_Z + 0.05)); sh.lineTo(wx - r - s[0] * (W.deep + 0.05) / W.deep, -(C.FAR_Z + 0.05));
+      sh.lineTo(wx - r, -C.GLASS_Z);
+      var sg = new THREE.ExtrudeGeometry(sh, { depth: 0.06, bevelEnabled: false });
+      var sill = new THREE.Mesh(sg, sillMat);
+      sill.rotation.x = -Math.PI / 2; sill.position.y = W.sill - 0.03;
+      add(sill, name + '-sill', 1);
+      sill.userData.front = C.FAR_Z + 0.05;
+      out.windows.push({ x: wx, name: name, frame: frame, sky: sky, sill: sill, reveal: ol.reveal });
+    });
+
+    /* the long wall, the door's opening at x 0 and the inglenook's mouth under its lintel */
+    var herShape = rect(C.FAR_END_X, y0, C.END_X, y1);
+    herShape.holes.push(holeOf([new THREE.Vector2(C.DOOR.x - C.DOOR.w / 2, 0), new THREE.Vector2(C.DOOR.x + C.DOOR.w / 2, 0), new THREE.Vector2(C.DOOR.x + C.DOOR.w / 2, C.DOOR.h), new THREE.Vector2(C.DOOR.x - C.DOOR.w / 2, C.DOOR.h)]));
+    herShape.holes.push(holeOf([new THREE.Vector2(C.NOOK_X1, 0), new THREE.Vector2(C.NOOK_X0, 0), new THREE.Vector2(C.NOOK_X0, C.NOOK_H), new THREE.Vector2(C.NOOK_X1, C.NOOK_H)]));
+    var herG = new THREE.ExtrudeGeometry(herShape, { depth: C.T, bevelEnabled: false });
+    herG.translate(0, 0, C.HER_Z);
+    out.herWall = add(new THREE.Mesh(herG, wallMat), 'her-wall');
+
+    /* the end wall, between the side walls, with her round hole; its shape drawn with u = -z, turned to face down the corridor */
+    var endShape = rect(-C.HER_Z, y0, -C.FAR_Z, y1);
+    var hole = new THREE.Path(); hole.absarc(-C.MID_Z, C.HOLE.y, C.HOLE.r, 0, Math.PI * 2, false);
+    endShape.holes.push(hole);
+    var endG = new THREE.ExtrudeGeometry(endShape, { depth: C.T, bevelEnabled: false, curveSegments: 32 });
+    var endWall = new THREE.Mesh(endG, wallMat);
+    endWall.rotation.y = Math.PI / 2; endWall.position.x = C.END_X;
+    out.endWall = add(endWall, 'end-wall');
+    /* the hole's tunnel, through to the room's wall (the room lines its own) */
+    if (o.tunnel !== false) {
+      var tunnel = new THREE.Mesh(new THREE.CylinderGeometry(C.HOLE.r, C.HOLE.r, C.HOLE.depth, 32, 1, true), o.tunnelMat || solid(0x5f5b56, { side: THREE.BackSide }));
+      tunnel.rotation.z = Math.PI / 2; tunnel.position.set(C.END_X + C.HOLE.depth / 2, C.HOLE.y, C.MID_Z);
+      out.tunnel = add(tunnel, 'hole-tunnel');
+    }
+    /* the wall the flight runs down toward */
+    out.stairEndWall = box(group, C.T, C.WALL_H, C.WIDTH, C.FAR_END_X - C.T / 2, C.WALL_Y, C.MID_Z, wallMat, layer);
+    out.stairEndWall.name = 'stair-end-wall';
+
+    /* the floor to the stair head, the flight down, full width, and the landing at its foot */
+    var floor = new THREE.Mesh(new THREE.PlaneGeometry(C.END_X - C.STAIR_X, C.WIDTH), floorMat);
+    floor.rotation.x = -Math.PI / 2; floor.position.set((C.END_X + C.STAIR_X) / 2, 0, C.MID_Z);
+    out.floor = add(floor, 'floor');
+    out.treads = [];
+    for (var si = 1; si <= C.STEPS; si++) {
+      var tr = box(group, C.STEP_RUN, 0.4, C.WIDTH, C.STAIR_X - (si - 0.5) * C.STEP_RUN, -si * C.STEP_RISE - 0.2, C.MID_Z, stairMat, layer);
+      tr.name = 'stair-' + si; out.treads.push(tr);
+    }
+    var landing = new THREE.Mesh(new THREE.PlaneGeometry(C.LANDING_D, C.WIDTH), floorMat);
+    landing.rotation.x = -Math.PI / 2; landing.position.set((C.FOOT_X + C.FAR_END_X) / 2, C.FOOT_Y, C.MID_Z);
+    out.landing = add(landing, 'landing');
+    var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(C.LEN, C.WIDTH), ceilMat);
+    ceiling.rotation.x = Math.PI / 2; ceiling.position.set((C.END_X + C.FAR_END_X) / 2, C.CEIL, C.MID_Z);
+    out.ceiling = add(ceiling, 'ceiling');
+    return out;
+  }
+
   var names = { helpEl: helpEl, canvas: canvas, statsEl: statsEl, backBtn: backBtn, btns: btns,
     clamp: clamp, lerp: lerp, easeInOut: easeInOut, col: col,
     renderer: renderer, scene: scene, camera: camera,
@@ -495,7 +657,8 @@ window.castleFrame = function (opts) {
     sheetTexture: sheetTexture, applyLayer: applyLayer, placeCard: placeCard, applySurface: applySurface, applyPlan: applyPlan,
     quietCanvas: quietCanvas, unstainCanvas: unstainCanvas, sillCanvas: sillCanvas, wornCanvas: wornCanvas,
     setTint: setTint, resize: resize, stats: stats,
-    from: from, reveal: reveal, travel: travel, savePlace: savePlace, readPlace: readPlace };
+    from: from, reveal: reveal, travel: travel, savePlace: savePlace, readPlace: readPlace,
+    CORRIDOR: CORRIDOR, buildCorridor: buildCorridor, mountInHole: mountInHole, corridorInHole: corridorInHole };
   for (var k in names) F[k] = names[k];
   return F;
 };
