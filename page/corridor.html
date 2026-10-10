@@ -645,8 +645,9 @@ scene.add(hearthLight);
    frame (your left as you face her). Since 10 October 2026, 5.35 pm (Godric: "the portrait and the door locations should
    switch", PS 7: "at the very end of the corridor hung a portrait of a very fat woman") she hangs on the end wall facing
    straight down the corridor: the hole's frame is mounted there (holeMount, castle.js), so her hinge, the room's glow
-   and their numbers are as they were, the hinge now on the window side. A grey stand-in; the password session places
-   the drawing (portrait-hole-front) */
+   and their numbers are as they were, the hinge now on the window side. Her drawing (portrait-hole-front, The portrait
+   hole) hangs here since 10 October 2026, 6.40 pm (the orchestrator's Q23, the password session no longer running), grey
+   until it loads */
 var PORTRAIT_W = C.PORTRAIT.w, PORTRAIT_H = C.PORTRAIT.h, HOLE_Y = C.HOLE.y;
 var holeMount = kit.mountInHole(new THREE.Group()); holeMount.name = 'hole-mount'; scene.add(holeMount);
 var hinge = new THREE.Group();
@@ -657,6 +658,58 @@ her.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
 her.rotation.y = Math.PI;
 her.name = 'portrait-hole-front';
 hinge.add(her); register(her, 2);
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    her.material.map = tex(im); her.material.color.set(0xffffff); her.userData.base = her.material.color.clone(); her.material.needsUpdate = true;
+  };
+  im.src = '../assets/layers/portrait-hole-front.png?v=3';
+})();
+/* her patches (The portrait hole, "Her patches"): each a feathered cut from an edit of her front, laid at its box in the
+   drawing's 1120 x 1360 pixels just proud of her, cross-faded as on page/fat-lady-test.html (a fifth of a second; an
+   arm's a quarter, through its halfway pose) */
+var HER_PX = { w: 1120, h: 1360 };
+var HER_PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529],
+  brow: [540, 384, 666, 529], sigh: [540, 384, 666, 529],
+  reach: [549, 415, 907, 918], ear: [549, 415, 907, 918], wave: [549, 415, 907, 918], waggle: [549, 415, 907, 918] };
+var herPatch = {};
+Object.keys(HER_PATCHES).forEach(function (id, i) {
+  var b = HER_PATCHES[id], arm = b[3] > 900;
+  var m = new THREE.Mesh(new THREE.PlaneGeometry((b[2] - b[0]) / HER_PX.w * PORTRAIT_W, (b[3] - b[1]) / HER_PX.h * PORTRAIT_H),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, transparent: true, opacity: 0, depthWrite: false }));
+  m.position.set(((b[0] + b[2]) / 2 / HER_PX.w - 0.5) * PORTRAIT_W, (0.5 - (b[1] + b[3]) / 2 / HER_PX.h) * PORTRAIT_H, 0.002 + i * 0.0002);
+  m.name = 'her-' + id; m.visible = false; m.renderOrder = 2;
+  m.userData = { on: 0, rate: arm ? 4 : 5 };
+  her.add(m); herPatch[id] = m;
+  var pim = new Image();
+  pim.onload = function () { m.material.map = tex(pim); m.material.needsUpdate = true; };
+  pim.src = '../assets/layers/portrait-hole-front-' + id + '.png?v=3';
+});
+function setHerArm(state) {   /* 'lap', 'reach', 'ear', 'wave' or 'waggle', as the test page's setArm */
+  ['reach', 'ear', 'wave', 'waggle'].forEach(function (id) { herPatch[id].userData.on = id === state ? 1 : 0; });
+}
+function updateHerPatches(dt) {
+  for (var id in herPatch) {
+    var m = herPatch[id], o = m.material.opacity, to = m.userData.on;
+    o = to > o ? Math.min(to, o + dt * m.userData.rate) : Math.max(to, o - dt * m.userData.rate);
+    m.material.opacity = o; m.visible = o > 0.001 && !!m.material.map;
+    m.material.color.copy(her.material.color);   /* lit and tinted as she is */
+  }
+  if (herPrimp) {
+    herPrimp.t += dt;
+    while (herPrimp.steps.length && herPrimp.t >= herPrimp.steps[0][0]) setHerArm(herPrimp.steps.shift()[1]);
+    if (!herPrimp.steps.length) herPrimp = null;
+  }
+}
+/* her primp (Godric's touch on the switch going live, 6.25 pm): as he walks up the corridor to her she smooths her bodice
+   and pats her curls twice, a beat before he reaches her; her own reach and ear poses, nothing new drawn. Timed back
+   from the walk's end so the hand is in her lap again 0.3 s before he stops */
+var herPrimp = null;
+var PRIMP = [[0, 'reach'], [0.55, 'ear'], [0.95, 'reach'], [1.2, 'ear'], [1.55, 'reach'], [1.85, 'lap']];
+function primpHer(walk) {
+  var lead = Math.max(0, (walk || 0) - 0.3 - PRIMP[PRIMP.length - 1][0]);
+  herPrimp = { t: -lead, steps: PRIMP.slice() };
+}
 
 /* the hole behind her (8 October 2026): the room's round hole, 1.2 m across with its centre 1.2 m up, cut through the
    end wall and its 0.81 m tunnel through to the room's wall (both the shared corridor's), with a dark warm glow beyond
@@ -1192,6 +1245,7 @@ function goTo(s) {
   atStop = s; mode = 'stop';
   backBtn.hidden = false;
   glideTo(s.stop(), s.arrive);
+  if (s.name === 'her' && tween.from.pos.distanceTo(tween.to.pos) > 2.5) primpHer(tween.dur);   /* her primp, only as he walks up */
 }
 function goBack() {
   if (mode !== 'stop') return;
@@ -1854,6 +1908,7 @@ function frame() {
   updateLookBack(dt);
   updateTurnRise(dt);
   updateDoorsKnock(dt);
+  updateHerPatches(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -1881,7 +1936,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
+  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
