@@ -671,20 +671,40 @@ hinge.add(her); register(her, 2);
 var HER_PX = { w: 1120, h: 1360 };
 var HER_PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pleased: [540, 384, 666, 529],
   brow: [540, 384, 666, 529], sigh: [540, 384, 666, 529],
-  reach: [549, 415, 907, 918], ear: [549, 415, 907, 918], wave: [549, 415, 907, 918], waggle: [549, 415, 907, 918] };
+  reach: [549, 415, 907, 918], ear: [549, 415, 907, 918], wave: [549, 415, 907, 918], waggle: [549, 415, 907, 918],
+  /* her cake (req 106, Magic's design, Godric's pick 6.26 pm): two edits of her front cut into five patches, laid over
+     her arms so a gesture never hides them (each checked clear of every arm pose) */
+  'cake-half': [860, 750, 953, 833], 'fan-open': [729, 823, 953, 917], 'collar-crumb': [586, 616, 619, 646],
+  'cake-crumbs': [860, 750, 953, 833], christmas: [637, 793, 953, 903] };
+var CAKE_PATCHES = ['cake-half', 'cake-crumbs', 'fan-open', 'christmas', 'collar-crumb'];
 var herPatch = {};
 Object.keys(HER_PATCHES).forEach(function (id, i) {
-  var b = HER_PATCHES[id], arm = b[3] > 900;
+  var b = HER_PATCHES[id], arm = b[3] > 900 && b[1] < 500, cake = CAKE_PATCHES.indexOf(id) >= 0;
   var m = new THREE.Mesh(new THREE.PlaneGeometry((b[2] - b[0]) / HER_PX.w * PORTRAIT_W, (b[3] - b[1]) / HER_PX.h * PORTRAIT_H),
     new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, transparent: true, opacity: 0, depthWrite: false }));
   m.position.set(((b[0] + b[2]) / 2 / HER_PX.w - 0.5) * PORTRAIT_W, (0.5 - (b[1] + b[3]) / 2 / HER_PX.h) * PORTRAIT_H, 0.002 + i * 0.0002);
-  m.name = 'her-' + id; m.visible = false; m.renderOrder = 2;
+  m.name = 'her-' + id; m.visible = false; m.renderOrder = cake ? 3 : 2;
   m.userData = { on: 0, rate: arm ? 4 : 5 };
   her.add(m); herPatch[id] = m;
   var pim = new Image();
   pim.onload = function () { m.material.map = tex(pim); m.material.needsUpdate = true; };
   pim.src = '../assets/layers/portrait-hole-front-' + id + '.png?v=3';
 });
+/* her cake between visits (req 106; the record that moves it on is Events', req 107): 'whole' (her front as drawn),
+   'half', 'crumbs' (a crumb on her fichu too) or 'christmas' (the plate down to crumbs and the emptied chocolate-liqueur
+   boxes, GoF 23; the fan shut, since the boxes lie over the open fan's place); the fan 'open' or 'shut'. Set at once,
+   never faded: it only ever changes while he is away. Until the record comes, the look switch ?cake=half&fan=open */
+var herCake = { state: 'whole', fan: 'shut' };
+function setHerCake(state, fan) {
+  herCake.state = state || 'whole'; herCake.fan = herCake.state === 'christmas' ? 'shut' : (fan || 'shut');
+  var on = { 'cake-half': herCake.state === 'half', 'cake-crumbs': herCake.state === 'crumbs' || herCake.state === 'christmas',
+    christmas: herCake.state === 'christmas', 'collar-crumb': herCake.state === 'crumbs', 'fan-open': herCake.fan === 'open' };
+  CAKE_PATCHES.forEach(function (id) { var m = herPatch[id]; m.userData.on = on[id] ? 1 : 0; m.material.opacity = m.userData.on; });
+}
+(function () {
+  var q = new URLSearchParams(location.search);
+  if (q.get('cake') || q.get('fan')) setHerCake(q.get('cake'), q.get('fan'));
+})();
 function setHerArm(state) {   /* 'lap', 'reach', 'ear', 'wave' or 'waggle', as the test page's setArm */
   ['reach', 'ear', 'wave', 'waggle'].forEach(function (id) { herPatch[id].userData.on = id === state ? 1 : 0; });
 }
@@ -1936,7 +1956,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
+  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
