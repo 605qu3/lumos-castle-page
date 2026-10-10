@@ -1189,6 +1189,9 @@ var PAPER_SPECS = [
      (the week's word, Events' req 72): a written line keyed password.percy-note, the week's word marked *LIKE THIS*
      and set large a word to a line, and from Thursday "From Monday: *X*" under it. Hidden until the runtime has it. */
   { id: 'percy', w: 0.24, h: 0.30, pin: [0.0, 0.50], pins: 'two', rot: -0.008, z: 0.0110, tile: 'cream', torn: [], age: 0.02, draw: drawPercyNote, event: { keys: ['password.percy-note'], hand: 'percy' } },
+  /* Fred and George's sign (OotP 12, on this noticeboard, checked in the text; Godric's touch, 6.54 pm): pinned up over
+     the corner of Madam Hooch's notice, as theirs was over the Hogsmeade poster; a tap brings it to his hand */
+  { id: 'gallons', w: 0.27, h: 0.33, pin: [-0.47, -0.07], pins: 'one', rot: -0.05, z: 0.0137, tile: 'buff', torn: [], age: 0.05, draw: drawGallonsNote },
   { id: 'corner', w: 0.055, h: 0.04, pin: [0.60, 0.47], pins: 'one', rot: 0.3, z: 0.0095, tile: 'laid', torn: ['left', 'bottom', 'right'], age: 0.2, draw: function () {}, fixed: true }
 ];
 var papers = [];
@@ -1437,6 +1440,17 @@ function drawWoodNote(g, W, H, rnd) {
     0.8 * H);
   write(g, 'O. Wood  Capt.', W - M, 0.93 * H, { px: 0.058 * W, family: F.casual, color: ink, maxW: W, align: 'right', slant: 0.02, soft: 1.3, rnd: rnd });
   blot(g, W * 0.2, H * 0.9, 7, 'rgba(21,18,26,0.9)');
+}
+/* the twins' sign: a showman's capitals in orange-red, the patter in a quick hand, the small print smaller */
+function drawGallonsNote(g, W, H, rnd) {
+  var M = 0.08 * W, ink = '#2e1a3a', red = '#b5401c', fam = '"Almendra SC", "IM Fell English SC", Georgia, serif';
+  write(g, 'GALLONS OF', W / 2, 0.15 * H, { px: 0.12 * W, family: fam, color: red, maxW: W, align: 'center', soft: 1.2, rnd: rnd });
+  write(g, 'GALLEONS!', W / 2, 0.29 * H, { px: 0.14 * W, family: fam, color: red, maxW: W, align: 'center', soft: 1.2, rnd: rnd });
+  fit(g, 'Pocket money failing to keep pace with your outgoings? Like to earn a little extra gold? Contact Fred and George ' +
+    'Weasley, Gryffindor common room, for simple, part-time, virtually painless jobs.', M, 0.42 * H,
+    { px: 0.058 * W, family: F.clerk, color: ink, maxW: W - 2 * M, lineGap: 1.25, jitter: 1.6, soft: 1.2, rnd: rnd }, 0.78 * H);
+  fit(g, '(We regret that all work is undertaken at applicant’s own risk.)', M, 0.86 * H,
+    { px: 0.04 * W, family: F.clerk, color: ink, maxW: W - 2 * M, lineGap: 1.2, jitter: 1, soft: 1.1, rnd: rnd }, 0.97 * H);
 }
 /* notice 4: a first-year's hand. PS6 and PS7 (Neville's toad Trevor keeps getting lost). */
 function drawNevilleNote(g, W, H, rnd) {
@@ -1859,11 +1873,21 @@ function onSofa(lx, lz) {                                         /* a point in 
 }
 function wallAt(deg, r) { var t = deg * Math.PI / 180; return { x: r * Math.sin(t), z: r * Math.cos(t) }; }
 var DESK_AT = wallAt(123, 5.26), DESK_CHAIR_AT = wallAt(125.5, 4.6);   /* the desk's back 0.3 m off the wall, as before */
-var CHAIR_L_AT = { x: -1.35, z: -2.75 };
+/* the fireside pair (Godric, 6.54 pm, on Q8: "still need to move wingbacks closer together for realistic positioning"):
+   the left armchair and the wingback either side of the hearth's axis at one depth, each turned a little toward the
+   other and the fire, as far apart as lets the whole fire show between them at rest and its right part past the left
+   chair on the long drag left */
+var PAIR = { x: 1.2, z: -3.1, yaw: 0.22 };
+var CHAIR_L_AT = { x: -PAIR.x, z: PAIR.z, yaw: -PAIR.yaw }, WINGBACK_AT = { x: PAIR.x, z: PAIR.z, yaw: PAIR.yaw };
+function onChairL(lx, lz) {                                       /* a point in the left armchair's own frame */
+  var c = Math.cos(CHAIR_L_AT.yaw), sn = Math.sin(CHAIR_L_AT.yaw);
+  return [CHAIR_L_AT.x + c * lx + sn * lz, CHAIR_L_AT.z - sn * lx + c * lz];
+}
 var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, SOFA_AT.x, SOFA_AT.z, 1);
 sofa.rotation.y = SOFA_AT.yaw;
 var stairs = cutout(cutoutTexture(192, 768, '#aaa7a1', drawStairs, 'stairs'), 1.4, 5.6, 4.67, -1.4, 1);
 var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, CHAIR_L_AT.x, CHAIR_L_AT.z, 2);
+chairL.rotation.y = CHAIR_L_AT.yaw;
 var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 0.9, 0.8, -1.2, 2.8, 3);
 var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, DESK_AT.x, DESK_AT.z, 2);
 var deskChair = cutout(cutoutTexture(128, 244, '#b9b6b0', drawDeskChair, 'chair'), 0.5, 0.95, DESK_CHAIR_AT.x, DESK_CHAIR_AT.z, 2);
@@ -1905,7 +1929,7 @@ scene.add(basketPool);
    his hand ("Twelve inches on the uses of moonstone", its last inch blank); the Remembrall glows faintly while the flap
    is up, and the flap shuts a moment after the essay goes back. WIN and GLOW are fractions of a cell, read off the
    staged drawing; a new drawing reads them again. */
-var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 1104 / 1204, sink: 0.012, x: CHAIR_L_AT.x + 0.65, z: CHAIR_L_AT.z - 0.1,
+var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 1104 / 1204, sink: 0.012, x: onChairL(0.65, -0.1)[0], z: onChairL(0.65, -0.1)[1],
   WIN: [[0.234, 0.546, 0.355, 0.655], [0.236, 0.545, 0.356, 0.655]], GLOW: [0.350, 0.305, 0.05] };
 /* set aside (Godric, 10 October 2026, 4.21 pm, after eight rounds): hidden from the room until the pipeline's eye check
    exists and it is redrawn; its card, tap, glow and essay stay built behind this flag */
@@ -2049,8 +2073,8 @@ scene.add(satchelPool);
    a flat strip in front of an arm whose outer side runs away from the eye toward the fire, so the card turns 0.7 rad
    (40 degrees) about its upright to lie along that side, brought forward so its far edge stays 2 cm before the chair's
    card. The name tape turns with it. */
-var SCARF = { url: '../assets/layers/house-scarf-arm.png', w: 0.32, x: CHAIR_L_AT.x + 0.36, z: CHAIR_L_AT.z + 0.16 * Math.sin(0.7) + 0.02,
-              yaw: 0.7, top: 0.68, endX: 0.42, endY: 0.4, tapeU: 0.22, tapeV: 0.8, sway: 0.006 };
+var SCARF = { url: '../assets/layers/house-scarf-arm.png', w: 0.32, x: onChairL(0.36, 0.16 * Math.sin(0.7) + 0.02)[0], z: onChairL(0.36, 0.16 * Math.sin(0.7) + 0.02)[1],
+              yaw: 0.7 + CHAIR_L_AT.yaw, top: 0.68, endX: 0.42, endY: 0.4, tapeU: 0.22, tapeV: 0.8, sway: 0.006 };
 var scarf = null, scarfPuff = 0, scarfTurn = { k: 0, to: 0 }, scarfAlpha = null;
 /* a tap counts on the wool only, so the green round it still reaches the armchair behind */
 function alphaOf(im) {
@@ -2245,7 +2269,8 @@ function updateCloak(dt) {
   }
   cloakGlint.material.opacity = glintT < 0 ? 0 : Math.sin(Math.PI * glintT / 0.7) * (0.55 + 0.45 * fireStoke) * (0.35 + 0.65 * fireLevel);
 }
-var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.75, -3.35, 2);
+var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, WINGBACK_AT.x, WINGBACK_AT.z, 2);
+wingback.rotation.y = WINGBACK_AT.yaw;
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
 table.name = 'table'; sideTable.name = 'side-table'; wingback.name = 'wingback';
 /* the stair is a card turned to the camera, so the fire sees its flat face and threw a hard spiral on the
@@ -3070,12 +3095,12 @@ var CHESS_AT = new THREE.Vector3(-1.27, 0, -1.45);
 var CHESS_GAP = 0.33;                          /* hips either side of the board's centre */
 var FIGURE_SPOTS = {
   0: { x: -2.25, z: -3.62, face: 1 },              /* the fire mark, left of the fire, facing it, by the left armchair's side */
-  1: { x: 1.05, z: -3.95, face: -1 },
-  2: { x: 1.4, z: -3.75, face: -1 },
+  1: { x: 2.2, z: -3.75, face: -1 },               /* right of the fire, past the wingback's side (since the pair) */
+  2: { x: 2.65, z: -3.5, face: -1 },
   3: { x: onSofa((0.5 - 0.62) * 1.65, 0.12)[0], z: onSofa((0.5 - 0.62) * 1.65, 0.12)[1], yaw: SOFA_AT.yaw,
        y: 0.42 - 0.05 * POOL.h, face: 1, still: true },  /* the sofa mark, along its seat */
   4: { x: -2.25, z: -3.62, face: 1 },             /* a herald speaking, where the listener left of the fire stands */
-  5: { x: 1.05, z: -3.95, face: -1 },             /* a herald speaking, right of the fire */
+  5: { x: 2.2, z: -3.75, face: -1 },              /* a herald speaking, right of the fire */
   6: { x: CHESS_AT.x - CHESS_GAP + 0.08, z: CHESS_AT.z, face: 1 },   /* hips 0.42 across, so the card sits 0.08 right */
   7: { x: CHESS_AT.x + CHESS_GAP + 0.02, z: CHESS_AT.z, face: -1 }
 };
@@ -3191,17 +3216,17 @@ catSit.position.y = 0.3;
 catSit.visible = false;
 catGroup.add(catWalk); catGroup.add(catSit);
 register(catWalk, 5); register(catSit, 5);
-/* out behind the left armchair, back in front of it (since Godric's moves, 10 October 2026: the chair stands on the
-   loop's old line), 0.35 m and more off its plane across its width, the cat's half-width included */
+/* before the fireside pair both ways (since Godric's moves, 10 October 2026: the chairs stand on the loop's old line),
+   0.35 m and more off their planes across their width, the cat's half-width included */
 var catPath = new THREE.CatmullRomCurve3([
   new THREE.Vector3(2.7, 0, -2.7),
-  new THREE.Vector3(1.0, 0, -2.95),
-  new THREE.Vector3(-0.6, 0, -3.2),
-  new THREE.Vector3(-1.9, 0, -3.2),
-  new THREE.Vector3(-2.8, 0, -2.85),
-  new THREE.Vector3(-2.0, 0, -2.3),
-  new THREE.Vector3(-0.5, 0, -2.3),
-  new THREE.Vector3(1.6, 0, -2.6)
+  new THREE.Vector3(1.0, 0, -2.45),
+  new THREE.Vector3(-0.6, 0, -2.45),
+  new THREE.Vector3(-1.9, 0, -2.45),
+  new THREE.Vector3(-2.8, 0, -2.35),
+  new THREE.Vector3(-2.0, 0, -1.95),
+  new THREE.Vector3(-0.5, 0, -1.95),
+  new THREE.Vector3(1.6, 0, -2.05)
 ], true, 'catmullrom', 0.5);
 var cat = { u: 0, speed: 0.052, state: 'walk', timer: 0, satThisLoop: false, facing: 1, dist: 0, frame: -1, sitElapsed: 0, flickAt: 0, lookFirst: false, sitU: 0.3, lastSitU: -1 };
 var catPathLength = catPath.getLength();
