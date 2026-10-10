@@ -81,6 +81,39 @@
     ['log', /^log "(.+)"$/]
   ];
 
+  /* The real moon (req 95, Magic's "The real moon, how real", Godric's pick of 10 October 2026, 5.16 pm), from the
+     date and clock alone, for the same northern mid-latitude home as dusk (latitude 42), no stored place. The moon's
+     and sun's longitudes by the almanac's short series (within a few hours of the true new and full moons) give its
+     phase and how much is lit; its height comes from its hour angle (the sun's, less the elongation, from a solar noon
+     of twelve o'clock, one o'clock in summer time) and its declination from its longitude, so it rises about fifty
+     minutes later each day, is up all night at full and only by day near new, and stands high on a winter's full
+     moon and low on a summer's. */
+  var RAD = Math.PI / 180, MOON_LAT = 42;
+  var PHASES = [[12, 'new'], [78, 'waxing-crescent'], [102, 'first-quarter'], [168, 'waxing-gibbous'], [192, 'full'],
+                [258, 'waning-gibbous'], [282, 'last-quarter'], [348, 'waning-crescent'], [360, 'new']];
+  var PHASE_AT = { 'new': 0, 'waxing-crescent': 45, 'first-quarter': 90, 'waxing-gibbous': 135, 'full': 180,
+                   'waning-gibbous': 225, 'last-quarter': 270, 'waning-crescent': 315 };
+  function summerTime(d) {
+    var jan = new Date(d.getFullYear(), 0, 1).getTimezoneOffset(), jul = new Date(d.getFullYear(), 6, 1).getTimezoneOffset();
+    return d.getTimezoneOffset() < Math.max(jan, jul);
+  }
+  function moonAt(d, forced) {
+    var t = (d.getTime() - 946728000000) / DAY_MS;      /* days from noon, 1 January 2000, UTC */
+    var lm = 218.316 + 13.176396 * t + 6.289 * Math.sin((134.963 + 13.064993 * t) * RAD);
+    var g = (357.528 + 0.9856003 * t) * RAD;
+    var ls = 280.46 + 0.9856474 * t + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g);
+    var e = forced ? PHASE_AT[forced] : (((lm - ls) % 360) + 360) % 360;   /* elongation: 0 new, 180 full */
+    var phase = 'new';
+    for (var i = 0; i < PHASES.length; i++) if (e < PHASES[i][0]) { phase = PHASES[i][1]; break; }
+    var lit = (1 - Math.cos(e * RAD)) / 2;
+    var dec = Math.asin(Math.sin(23.44 * RAD) * Math.sin((forced ? ls + e : lm) * RAD));
+    var noon = 12 + (summerTime(d) ? 1 : 0);
+    var ha = (15 * (d.getHours() + d.getMinutes() / 60 - noon) - e) * RAD;
+    var alt = Math.asin(Math.sin(MOON_LAT * RAD) * Math.sin(dec) + Math.cos(MOON_LAT * RAD) * Math.cos(dec) * Math.cos(ha)) / RAD;
+    return { phase: phase, age: Math.round(e / 360 * 29.53 * 10) / 10, lit: Math.round(lit * 100) / 100,
+             waxing: e < 180, up: alt > 0, altitude: Math.round(Math.max(0, alt)), height: Math.round(Math.max(0, alt) / 90 * 100) / 100 };
+  }
+
   function note(msg) { if (window.console) console.info('[castle-events] ' + msg); }
   function between(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
 
@@ -108,6 +141,7 @@
     var only = params.get('event');
     var waitOverride = params.has('wait') ? Math.max(0, +params.get('wait') || 0) : null;
     var timeOverride = /^(morning|day|evening|night)$/.test(params.get('time') || '') ? params.get('time') : null;
+    var moonOverride = PHASE_AT.hasOwnProperty(params.get('moon')) || params.get('moon') === 'down' ? params.get('moon') : null;   /* a test link: ?moon=full, ?moon=down */
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
     var allLines = params.get('lines') === 'all';   /* a test link: lines still marked verify are shown too */
 
@@ -177,12 +211,24 @@
       return h < 12 ? 'morning' : h < 17 ? 'day' : 'evening';
     }
 
+    /* The moon now: ?moon=<phase> shows that phase up and well clear of the sill, ?moon=down the real phase set. Its
+       light follows how much of it is lit while it is up, and is nothing while it is down. */
+    function moonNow() {
+      var m = moonAt(nowDate(), moonOverride !== 'down' ? moonOverride : null);
+      if (moonOverride === 'down') { m.up = false; m.altitude = 0; m.height = 0; }
+      else if (moonOverride) { m.up = true; m.altitude = 35; m.height = 0.39; }
+      m.light = m.up ? m.lit : 0;
+      return m;
+    }
+
     function builtin(name) {
       var now = nowDate();
       if (builtins[name]) return builtins[name]();
       switch (name) {
         case 'today': return today();
         case 'time': return timeOfDay();
+        case 'moon': return moonNow().phase;          /* new, waxing-crescent, ... full, ... waning-crescent */
+        case 'moon up': return moonNow().up ? 'yes' : 'no';
         case 'place': return (leaving && state.visitPlace) || place;
         case 'at': return 'none';                 /* a page with stops answers this itself */
         case 'hour': return now.getHours();
@@ -1024,6 +1070,9 @@
          reads now, ready or not; only inside a deferred leave does it read the time he went, and nothing is drawn
          then. A page that wants to follow dusk while he plays asks again from its frame loop. */
       time: timeOfDay,
+      /* The real moon now (req 95): { phase, age (days since new), lit (0 to 1), waxing, up, altitude (degrees), height
+         (0 to 1, of the way overhead), light (lit while up, else 0) }, `?moon=` honoured, so every room shows one moon. */
+      moon: moonNow,
       cues: shownCues,
       fire: function (id) { if (byId[id] && visit) fire(byId[id]); },
       state: function () { return state; },
