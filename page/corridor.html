@@ -694,7 +694,7 @@ Object.keys(HER_PATCHES).forEach(function (id, i) {
    'half', 'crumbs' (a crumb on her fichu too) or 'christmas' (the plate down to crumbs and the emptied chocolate-liqueur
    boxes, GoF 23; the fan shut, since the boxes lie over the open fan's place); the fan 'open' or 'shut'. Set at once,
    never faded: it only ever changes while he is away. Until the record comes, the look switch ?cake=half&fan=open */
-var herCake = { state: 'whole', fan: 'shut' };
+var herCake = { state: 'whole', fan: 'shut' }, cakeLook = false;
 function setHerCake(state, fan) {
   herCake.state = state || 'whole'; herCake.fan = herCake.state === 'christmas' ? 'shut' : (fan || 'shut');
   var on = { 'cake-half': herCake.state === 'half', 'cake-crumbs': herCake.state === 'crumbs' || herCake.state === 'christmas',
@@ -703,7 +703,7 @@ function setHerCake(state, fan) {
 }
 (function () {
   var q = new URLSearchParams(location.search);
-  if (q.get('cake') || q.get('fan')) setHerCake(q.get('cake'), q.get('fan'));
+  if (q.get('cake') || q.get('fan')) { cakeLook = true; setHerCake(q.get('cake'), q.get('fan')); }
 })();
 function setHerArm(state) {   /* 'lap', 'reach', 'ear', 'wave' or 'waggle', as the test page's setArm */
   ['reach', 'ear', 'wave', 'waggle'].forEach(function (id) { herPatch[id].userData.on = id === state ? 1 : 0; });
@@ -1672,7 +1672,17 @@ function corridorDrawRoom(shown) {
     ['mantel', 'right'].forEach(function (who) { [1, 2, 4, 5].forEach(function (f) { if (has(galleryCue(who, f))) gv = { who: who, frame: f }; }); });
     if ((gv ? gv.who + ':' + gv.frame : null) !== setGalleryVisitor()) setGalleryVisitor(gv ? gv.who : null, gv && gv.frame);
   }
+  /* her cake between visits (req 114, Events' cake.json, d832657): none shown is the whole cake, the fan shut; it moves
+     on only at arrival, so never while he is there; the look switch ?cake=&fan= holds whatever it shows */
+  if (!cakeLook) {
+    var cs = has(CAKE_CUE.christmas) ? 'christmas' : has(CAKE_CUE.crumbs) ? 'crumbs' : has(CAKE_CUE.half) ? 'half' : 'whole';
+    var fan = has(CAKE_CUE.fan) ? 'open' : 'shut';
+    if (cs !== herCake.state || fan !== herCake.fan) setHerCake(cs, fan);
+  }
 }
+var CAKE_CUE = { half: "the Fat Lady's cake about half gone", crumbs: "the Fat Lady's plate down to crumbs, and one crumb on her fichu",
+  christmas: "the Fat Lady's plate down to crumbs among empty boxes of chocolate liqueurs, for Christmas Day",
+  fan: "the Fat Lady's fan lying open beside her cake" };
 var GALLERY_CUE_WHO = { mantel: "the mantel painting's sitter", right: "the right painting's sitter" };
 var GALLERY_CUE_FRAME = { 1: 'top left', 2: 'top right', 4: 'bottom left', 5: 'bottom right' };
 function galleryCue(who, f) {
