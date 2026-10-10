@@ -2051,12 +2051,14 @@ function placeScarfTape(sway) {
 }
 /* the name tape: a woven cotton tape in red capitals, sewn on with his gran's overcast stitches */
 function drawNameTape(g, W, H, rnd) { tapeStrip(g, 0, W, H, 'N. LONGBOTTOM', false, rnd); }
-/* one strip of tape from y0, H tall: its stitches, the name, and a struck name's ruled line through it */
-function tapeStrip(g, y0, W, H, name, struck, rnd) {
+/* one strip of tape from y0, H tall: its stitches, the name, and a struck name's ruled line through it. Neat stitches
+   are small and even; hurried ones long, uneven and in a darker thread */
+function tapeStrip(g, y0, W, H, name, struck, rnd, hurried) {
   g.strokeStyle = 'rgba(150,40,40,0.55)'; g.lineWidth = 2.2;
-  for (var sx = 12; sx < W - 8; sx += 22) {            /* overcast stitches along the top and bottom edges */
-    handLine(g, sx, y0 + 2, sx + 5, y0 + 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
-    handLine(g, sx + 6, y0 + H - 2, sx + 11, y0 + H - 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
+  var step = hurried ? 34 : 22, len = hurried ? 9 : 5, thread = hurried ? 'rgba(60,40,30,0.6)' : 'rgba(120,30,30,0.5)';
+  for (var sx = 12; sx < W - 8; sx += step + (hurried ? (rnd() - 0.5) * 16 : 0)) {   /* overcast along top and bottom */
+    handLine(g, sx, y0 + 2, sx + len, y0 + 9 + (hurried ? rnd() * 5 : 0), thread, 1.8, rnd);
+    handLine(g, sx + 6, y0 + H - 2, sx + 6 + len, y0 + H - 9 - (hurried ? rnd() * 5 : 0), thread, 1.8, rnd);
   }
   g.fillStyle = '#b3242c'; g.textAlign = 'center'; g.textBaseline = 'middle';
   var px = H * 0.46;
@@ -2126,11 +2128,12 @@ function scarfGone() {
    behind it on the stone. His touches: the clasp's silver rim catches the firelight now and then, more when the fire
    is worked; a name tag sewn inside the collar peeks above it between the loop's legs, too small to read, and a tap
    on the cloak brings it to his hand to read, as a notice is: Ron's hand-me-down, his brothers' names struck through
-   (PS 6, "I've got Bill's old robes"). */
+   (PS 6, "I've got Bill's old robes"; Godric's Q7, 6.27 pm, with his touch: Ron's tape on a little crooked in Mrs
+   Weasley's hurried stitches beside Bill's neat one). Godric on the cloak as hung, 6.30 pm: "it's perfect". */
 var CLOAK = { url: '../assets/layers/cloak-hook.png', w: 0.5, aspect: 2488 / 1189, hangV: 0.127, hangY: 1.5,
               theta: HOLE_THETA + 1.25 / WALL_R, r: WALL_R - 0.03,
               clasp: [0.845, 0.37], peek: [0.51, 0.149],
-              names: [['B. WEASLEY', true], ['C. WEASLEY', true], ['P. WEASLEY', true], ['R. WEASLEY', false]] };
+              names: [['B. WEASLEY', true], ['C. WEASLEY', true], ['P. WEASLEY', true], ['R. WEASLEY', false, 'hurried']] };
 var cloak = null, cloakAlpha = null, cloakPeek = null, cloakGlint = null, glintT = -1, glintNext = 4 + 6 * Math.random();
 new THREE.TextureLoader().load(CLOAK.url, function (t) {
   t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -2166,11 +2169,18 @@ new THREE.TextureLoader().load(CLOAK.url, function (t) {
   cloakTape.pivot.position.copy(cloak.localToWorld(cloakPeek.position.clone().setZ(0.01)));
   cloakTape.pivot.quaternion.copy(cloak.quaternion);
 });
+/* four tapes, each sewn below the last as the cloak came down the family; Bill's the neat first, Ron's on a little
+   crooked in his mother's hurried stitches (Godric, 6.27 pm) */
 function drawCloakTape(g, W, H, rnd) {
   var n = CLOAK.names.length, s = H / n;
   for (var i = 0; i < n; i++) {
-    if (i) handLine(g, 4, i * s, W - 4, i * s + 1, 'rgba(120,100,80,0.45)', 1.5, rnd);   /* where one tape is sewn below the last */
-    tapeStrip(g, i * s, W, s, CLOAK.names[i][0], CLOAK.names[i][1], rnd);
+    var hurried = !!CLOAK.names[i][2];
+    g.save();
+    if (hurried) { g.translate(W / 2, i * s + s / 2); g.rotate(-0.035); g.translate(-W / 2, -(i * s + s / 2)); }
+    g.fillStyle = hurried ? '#efe4cc' : '#e9ddc3'; g.fillRect(3, i * s + 2, W - 6, s - 4);
+    g.strokeStyle = 'rgba(120,100,80,0.45)'; g.lineWidth = 1.5; g.strokeRect(3, i * s + 2, W - 6, s - 4);
+    tapeStrip(g, i * s, W, s, CLOAK.names[i][0], CLOAK.names[i][1], rnd, hurried);
+    g.restore();
   }
 }
 var cloakTape = (function () {
