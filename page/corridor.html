@@ -365,6 +365,17 @@ function sizeDoorsGap() {
   doorsCrack.position.set(((391 + 405) / 2 - (150 + 640) / 2) / 490, (1263 - (200 + 1262) / 2) / 10, 0);
 }
 sizeDoorsGap();
+/* the stair gallery (req 63; round 3, candidate 2, Godric, 10 October 2026, 4.06 pm): five portraits gathered over the
+   centuries, two stacked either side of a larger empty frame, its chair pushed back and its teacup steaming; on gallery
+   days it hangs on the landing's end wall in the window's place, 2.33 m wide, its height from the drawing (about 1.8 m),
+   the middle frame's centre GALLERY.mid above the landing (provisional, put to Godric) */
+var GALLERY = { w: 2.33, h: 1.79, mid: 1.6 };
+var stairGallery = cutoutMesh(cutoutTexture(120, 92, '#6a5a44', function (g, w, h) { g.fillRect(0, 0, w, h); }, 'gallery'), GALLERY.w, GALLERY.h);
+stairGallery.position.set(FAR_END_X + 0.01, FOOT_Y + GALLERY.mid, MID_Z);
+stairGallery.rotation.y = Math.PI / 2;
+stairGallery.visible = false;
+stairGallery.name = 'stair-gallery'; scene.add(stairGallery); register(stairGallery, 1);
+hangDrawing(stairGallery, '../assets/layers/stair-gallery.png', GALLERY.w, function (im) { GALLERY.h = GALLERY.w * im.height / im.width; });
 /* Hagrid's knock (Events' stair.grounds-knock, PS 6): three great knocks from outside, each shaking the doors */
 var doorsKnock = null;
 function updateDoorsKnock(dt) {
@@ -883,8 +894,8 @@ var STOPS = [
   { name: 'landing', meshes: treads, stop: function () {
       /* on doors days three steps up the flight (Godric, 9 October 2026, 7.06 pm, Q7), the whole doors and the daylight
          under them in view; the landing's edge shows the end wall only from about 1.3 m up */
-      if (footShown === 'doors') return { pos: new THREE.Vector3(FOOT_X + 3.5 * STEP_RUN, FOOT_Y + 3 * STEP_RISE + EYE, MID_Z),
-        look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.0, MID_Z), fov: FOV_MAX };
+      if (footShown === 'doors' || footShown === 'gallery') return { pos: new THREE.Vector3(FOOT_X + 3.5 * STEP_RUN, FOOT_Y + 3 * STEP_RISE + EYE, MID_Z),
+        look: new THREE.Vector3(FAR_END_X, FOOT_Y + (footShown === 'gallery' ? GALLERY.mid : 2.0), MID_Z), fov: footShown === 'gallery' ? clamp(2 * Math.atan(0.37 / camera.aspect) * 180 / Math.PI, 52, FOV_MAX) : FOV_MAX };   /* the group's width fits a phone held upright */
       return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } },
   /* the settle's scarf (7.05 pm): bent over it at the seat's edge, his eye a metre up, looking down at its end by the arm,
      where its name tape turns up on arrival */
@@ -1399,7 +1410,7 @@ var FOOT_CUES = {
   doorsNight: "at the flight's foot, the entrance hall's great oak front doors, torchlit, the gap under them dark",
   gallery: "at the flight's foot, a short gallery of portraits, one frame empty"
 };
-var FOOT_DRAWN = { window: true, doors: true, doorsNight: true };
+var FOOT_DRAWN = { window: true, doors: true, doorsNight: true, gallery: true };
 var footNamed = null;
 /* ?foot=doors shows a place at the foot whatever the day, a look for checking it, as ?along is */
 var footForced = (location.search.match(/[?&]foot=(\w+)/) || [])[1];
@@ -1419,8 +1430,9 @@ function showFoot(place) {
   footShown = place;
   landingWindow.visible = place === 'window';
   frontDoors.visible = place === 'doors';
+  stairGallery.visible = place === 'gallery';
   doorsGap.visible = night;
-  doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = place === 'doors'; });
+  doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = place === 'doors' || place === 'gallery'; });
   landingLight.intensity = place === 'window' ? 1.6 : 0.3;
 }
 /* the draught under the doors (Godric, 10 October 2026, 3.34 pm, his touch on Q10): on doors days, every 15 to 35 s a
