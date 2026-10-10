@@ -819,6 +819,186 @@ scene.add(boo); register(boo, 1);
 var GLASS_Z = C.GLASS_Z;
 var windows = shell.windows;
 windows.forEach(function (w) { w.sky.userData.base = w.sky.material.color.clone(); });
+
+/* the grounds through the window nearer the stairs (Q20, Godric's option 1, 5.15 pm; Q24, candidate 2, 6.52 pm): the
+   drawing `corridor-grounds-view`, 1.2 m wide and 2.64 m tall, stood on the sill behind the glass, its round head
+   rising past the opening's into the wall where it never shows. "He glanced out of a rain-washed window at the dark
+   grounds as they turned into the Fat Lady's corridor. There was still no light in Hagrid's cabin" (OotP 13). Over it,
+   one small canvas in the drawing's own pixels carries what changes (Godric's touches, 6.25 and 6.52 pm): Hagrid's
+   pumpkins in the bare patch, growing through October toward Hallowe'en (B2 ch7, ch8); his washing on a line beside
+   the hut, blowing with the day's wind, now and then his enormous socks; and now and then Hagrid himself with his
+   crossbow, Fang at his heels, crossing from the hut to the trees ("striding the grounds with Fang at his heels", B2
+   ch15). The corridor is always by day for now, so the cabin's lit window and the smoke wait for its night; the
+   weather and the season will come from Events' runtime (asked), and until then the day's wind and washing are drawn
+   from the date */
+var GROUNDS = { w: 1.2, px: 800, py: 1760, ov: [200, 850, 600, 420] };   /* the overlay's box in the drawing: x, y, w, h */
+GROUNDS.h = GROUNDS.w * GROUNDS.py / GROUNDS.px;
+var groundsWin = windows[1], groundsSill = groundsWin.sky.position.y - groundsWin.sky.geometry.parameters.height / 2;
+var grounds = { overlay: null, canvas: null, tex: null, img: null, crossing: null, next: 0, last: -1 };
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var sky = groundsWin.sky;
+    sky.geometry.dispose(); sky.geometry = new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h);
+    sky.position.y = groundsSill + GROUNDS.h / 2;
+    sky.material.map = tex(im); sky.material.color.set(0xffffff); sky.userData.base = sky.material.color.clone(); sky.material.needsUpdate = true;
+    var o = GROUNDS.ov;
+    grounds.canvas = makeCanvas(o[2], o[3]); grounds.tex = tex(grounds.canvas);
+    grounds.overlay = new THREE.Mesh(new THREE.PlaneGeometry(o[2] / GROUNDS.px * GROUNDS.w, o[3] / GROUNDS.px * GROUNDS.w),
+      new THREE.MeshBasicMaterial({ map: grounds.tex, transparent: true, depthWrite: false }));
+    grounds.overlay.position.set(((o[0] + o[2] / 2) / GROUNDS.px - 0.5) * GROUNDS.w, (0.5 - (o[1] + o[3] / 2) / GROUNDS.py) * GROUNDS.h, 0.002);
+    grounds.overlay.name = 'grounds-overlay'; grounds.overlay.renderOrder = 4;
+    sky.add(grounds.overlay);
+    grounds.img = im;
+    /* the stand-in frame's name would print across the view: the same frame without it */
+    groundsWin.frame.material.map = cutoutTexture(240, 480, '#8e8a84', function (g, w, h) {
+      arch(g, 0, 0, w, h);
+      g.globalCompositeOperation = 'destination-out'; arch(g, w * 0.06, w * 0.06, w * 0.88, h * 0.97 - w * 0.06); g.globalCompositeOperation = 'source-over';
+      g.fillRect(w * 0.47, w * 0.04, w * 0.06, h * 0.94);
+    });
+    groundsWin.frame.material.needsUpdate = true;
+    drawGrounds(0);
+  };
+  im.src = '../assets/layers/corridor-grounds-view.png';
+})();
+/* the day: ?date=2026-10-31 sets it for a look; a number from the date and a salt, the same all day */
+var groundsQ = new URLSearchParams(location.search);
+function groundsDate() { var d = groundsQ.get('date'); return d ? new Date(d + 'T12:00:00') : new Date(); }
+function dayRand(salt) {
+  var d = groundsDate(), k = d.getFullYear() * 400 + d.getMonth() * 32 + d.getDate(), h = (k * 2654435761 + salt * 40503) >>> 0;
+  h ^= h >>> 13; h = (h * 1274126177) >>> 0; h ^= h >>> 16;
+  return (h % 10000) / 10000;
+}
+/* the dozen pumpkins (B2 ch7: "a dozen of the largest pumpkins Harry had ever seen"), along the patch's rows, which run
+   from its near left corner up to the right; from 1 September they swell, by mid-September "the size of a large
+   boulder", by Hallowe'en "the size of garden sheds"; from 1 November they are lanterns in the Great Hall and the
+   patch is bare until next September. Their radius in the drawing's pixels, about 25 to the metre at the hut */
+var PUMPKINS = [[520, 1137, 0.85], [560, 1112, 1.0], [600, 1090, 0.8], [640, 1076, 0.9], [575, 1160, 0.95], [620, 1136, 0.8],
+  [665, 1112, 1.0], [705, 1094, 0.75], [640, 1190, 0.9], [690, 1166, 1.0], [735, 1140, 0.85], [770, 1118, 0.8]];
+function pumpkinR() {
+  var d = groundsDate(), m = d.getMonth(), day = d.getDate();
+  if (m !== 8 && m !== 9) return 0;
+  var t = (m === 8 ? day - 1 : 30 + day - 1) / 60;     /* 0 on 1 September, 1 on 31 October */
+  return 4 + 16 * Math.sqrt(t);                        /* 4 px, then about 13 by mid-September, 20 by Hallowe'en */
+}
+function drawPumpkin(g, x, y, r) {
+  g.save(); g.translate(x, y);
+  var ry = r * 0.72;
+  g.fillStyle = 'rgba(40,30,20,0.35)'; g.beginPath(); g.ellipse(r * 0.15, ry * 0.85, r * 1.05, ry * 0.35, 0, 0, 7); g.fill();
+  g.fillStyle = '#c87a32'; g.beginPath(); g.ellipse(0, 0, r, ry, 0, 0, 7); g.fill();
+  g.fillStyle = 'rgba(120,60,25,0.35)'; g.beginPath(); g.ellipse(r * 0.25, ry * 0.2, r * 0.8, ry * 0.75, 0, 0, 7); g.fill();
+  g.strokeStyle = 'rgba(70,35,15,0.75)'; g.lineWidth = Math.max(0.6, r * 0.05);
+  [0.3, 0.65].forEach(function (k) { g.beginPath(); g.ellipse(0, 0, r * k, ry, 0, 0, 7); g.stroke(); });
+  g.strokeStyle = '#2a1c12'; g.lineWidth = Math.max(0.8, r * 0.08);
+  g.beginPath(); g.ellipse(0, 0, r, ry, 0, 0, 7); g.stroke();
+  g.strokeStyle = '#3e4a26'; g.lineWidth = Math.max(1, r * 0.12);
+  g.beginPath(); g.moveTo(0, -ry * 0.9); g.lineTo(r * 0.12, -ry * 1.25); g.stroke();
+  g.restore();
+}
+/* the washing line beside the hut, out about one day in two; his enormous socks about one washing day in three; the
+   wind of the day, 0 still to 1 blowing (Events' weather when it comes) */
+var LINE = { a: [626, 1050], b: [756, 1070], post: 46 };   /* right of the hut, before the trees: the mullion hides its left */
+function groundsWind() { return 0.2 + 0.8 * dayRand(3); }
+function washing() {
+  if (groundsQ.has('washing')) return { socks: groundsQ.get('washing') === 'socks' };
+  if (dayRand(1) > 0.5) return null;
+  return { socks: dayRand(2) < 0.34 };
+}
+function hang(g, x, y, w, h, t, phase, draw) {
+  var wind = groundsWind(), sway = wind * (0.35 * Math.sin(t * (2 + 3 * wind) + phase) + 0.25);
+  g.save(); g.translate(x, y); g.transform(1, 0, sway, 1, 0, 0); draw(g, w, h); g.restore();
+}
+function drawWashing(g, t, wash) {
+  var a = LINE.a, b = LINE.b;
+  g.strokeStyle = '#3a2e24'; g.lineWidth = 2.2;
+  [a, b].forEach(function (p) { g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(p[0], p[1] - LINE.post); g.stroke(); });
+  var sag = 6 + 3 * Math.sin(t * 1.3) * groundsWind();
+  function at(k) { return [a[0] + (b[0] - a[0]) * k, a[1] - LINE.post + (b[1] - a[1]) * k + sag * 4 * k * (1 - k)]; }
+  g.lineWidth = 0.9; g.beginPath();
+  for (var k = 0; k <= 1.0001; k += 0.1) { var q = at(k); if (k === 0) g.moveTo(q[0], q[1]); else g.lineTo(q[0], q[1]); }
+  g.stroke();
+  function cloth(fill, path) { return function (c, w, h) { c.fillStyle = fill; c.strokeStyle = '#2a201a'; c.lineWidth = 0.9; path(c, w, h); c.fill(); c.stroke(); }; }
+  var shirt = cloth('#d9d0bb', function (c, w, h) { c.beginPath(); c.moveTo(-w / 2, 0); c.lineTo(w / 2, 0); c.lineTo(w * 0.62, h * 0.35); c.lineTo(w * 0.42, h * 0.38); c.lineTo(w * 0.4, h); c.lineTo(-w * 0.4, h); c.lineTo(-w * 0.42, h * 0.38); c.lineTo(-w * 0.62, h * 0.35); c.closePath(); });
+  var hanky = cloth('#a9503e', function (c, w, h) { c.beginPath(); c.rect(-w / 2, 0, w, h); });
+  var sock = function (fill) { return cloth(fill, function (c, w, h) { c.beginPath(); c.moveTo(-w / 2, 0); c.lineTo(w / 2, 0); c.lineTo(w / 2, h * 0.7); c.lineTo(w * 1.2, h * 0.78); c.lineTo(w * 1.2, h); c.lineTo(-w / 2, h); c.closePath(); }); };
+  var items = [[0.18, 22, 30, shirt], [0.46, 20, 17, hanky]];
+  if (wash.socks) items.push([0.68, 7, 26, sock('#7a5a3e')], [0.84, 7, 26, sock('#5f6e48')]);
+  else items.push([0.76, 22, 28, shirt]);
+  items.forEach(function (it, i) { var q = at(it[0]); hang(g, q[0], q[1], it[1], it[2], t, i * 1.7, it[3]); });
+  if (dayRand(4) < 0.5) {   /* the hanky's spots, some days */
+    var q = at(0.46); g.fillStyle = '#e8dcc0';
+    for (var sx = -1; sx <= 1; sx++) for (var sy = 1; sy <= 2; sy++) { g.beginPath(); g.arc(q[0] + sx * 6, q[1] + sy * 6, 1.2, 0, 7); g.fill(); }
+  }
+}
+/* Hagrid crossing, Fang at his heels: round the far corner of the hut from his door, past the washing and into the
+   trees on the right, about ten seconds (the mullion hides the hut's left); about as tall as his door (75 px), smaller
+   toward the trees, where he fades */
+var CROSS = [[612, 1064], [660, 1052], [710, 1036], [752, 1012], [778, 990]];
+function crossAt(k) {
+  var n = CROSS.length - 1, i = Math.min(n - 1, Math.floor(k * n)), f = k * n - i, a = CROSS[i], b = CROSS[i + 1];
+  return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+}
+function drawHagrid(g, x, y, h, step) {
+  var w = h * 0.42, leg = Math.sin(step) * h * 0.06;
+  g.save(); g.translate(x, y);
+  g.fillStyle = 'rgba(30,25,20,0.3)'; g.beginPath(); g.ellipse(0, 0, w * 0.7, h * 0.05, 0, 0, 7); g.fill();
+  g.fillStyle = '#2e2620'; g.strokeStyle = '#120e0a'; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(-w * 0.2 + leg, 0); g.lineTo(-w * 0.12, -h * 0.3); g.lineTo(w * 0.12, -h * 0.3); g.lineTo(w * 0.2 - leg, 0); g.lineTo(w * 0.05, 0); g.lineTo(0, -h * 0.22); g.lineTo(-w * 0.05, 0); g.closePath(); g.fill();
+  g.fillStyle = '#4a3a2c';   /* his moleskin overcoat */
+  g.beginPath(); g.moveTo(-w * 0.5, -h * 0.25); g.lineTo(-w * 0.42, -h * 0.72); g.quadraticCurveTo(0, -h * 0.82, w * 0.42, -h * 0.72); g.lineTo(w * 0.5, -h * 0.25); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle = '#1e1812';   /* his wild hair and beard */
+  g.beginPath(); g.arc(0, -h * 0.84, h * 0.11, 0, 7); g.fill();
+  g.fillStyle = '#c99a78'; g.beginPath(); g.arc(-h * 0.01, -h * 0.85, h * 0.045, 0, 7); g.fill();
+  g.strokeStyle = '#3a2a1a'; g.lineWidth = Math.max(1, h * 0.03);   /* the crossbow on his shoulder */
+  g.beginPath(); g.moveTo(w * 0.15, -h * 0.75); g.lineTo(w * 0.7, -h * 0.98); g.stroke();
+  g.beginPath(); g.moveTo(w * 0.5, -h * 1.02); g.lineTo(w * 0.62, -h * 0.84); g.stroke();
+  g.restore();
+}
+function drawFang(g, x, y, h, step) {
+  var l = h * 0.38, b = h * 0.16, leg = Math.sin(step * 1.6) * h * 0.04;
+  g.save(); g.translate(x, y); g.fillStyle = '#16120e';
+  g.beginPath(); g.ellipse(0, -b * 1.1, l / 2, b / 2, 0, 0, 7); g.fill();
+  g.beginPath(); g.ellipse(-l * 0.55, -b * 1.5, b * 0.42, b * 0.32, -0.3, 0, 7); g.fill();
+  g.strokeStyle = '#16120e'; g.lineWidth = Math.max(1, h * 0.03);
+  [[-l * 0.35, leg], [-l * 0.2, -leg], [l * 0.25, -leg], [l * 0.38, leg]].forEach(function (p) { g.beginPath(); g.moveTo(p[0], -b); g.lineTo(p[0] + p[1], 0); g.stroke(); });
+  g.beginPath(); g.moveTo(l * 0.5, -b * 1.2); g.lineTo(l * 0.7, -b * 1.6); g.stroke();
+  g.restore();
+}
+function drawGrounds(t) {
+  if (!grounds.canvas) return;
+  var g = grounds.canvas.getContext('2d'), o = GROUNDS.ov;
+  g.clearRect(0, 0, o[2], o[3]);
+  g.save(); g.translate(-o[0], -o[1]);
+  var r = pumpkinR();
+  if (r) PUMPKINS.forEach(function (pk) { drawPumpkin(g, pk[0], pk[1], r * pk[2]); });
+  var wash = washing();
+  if (wash) drawWashing(g, t, wash);
+  var c = grounds.crossing;
+  if (c) {
+    var k = Math.min(1, c.t / c.dur), p = crossAt(k), sc = 1 - 0.25 * k, h = 75 * sc;
+    g.globalAlpha = k > 0.85 ? (1 - k) / 0.15 : Math.min(1, k / 0.04);
+    drawFang(g, p[0] - 18 * sc + 6 * Math.sin(c.t * 1.7), p[1] + 3 * sc, h, c.t * 7);
+    drawHagrid(g, p[0], p[1], h, c.t * 5);
+    g.globalAlpha = 1;
+  }
+  g.restore();
+  grounds.tex.needsUpdate = true;
+}
+/* now and then: at the window's stop, a few seconds after he arrives, about one visit in three he crosses, once a visit;
+   ?hagrid sends him every visit */
+function updateGrounds(dt) {
+  if (!grounds.canvas) return;
+  var here = atStop && atStop.name === 'window';
+  if (here && grounds.last !== atStop) {
+    grounds.last = atStop;
+    if (groundsQ.has('hagrid') || Math.random() < 0.34) grounds.next = t + 3 + Math.random() * 3; else grounds.next = 0;
+  }
+  if (!here) grounds.last = -1;
+  if (grounds.next && t >= grounds.next && !grounds.crossing) { grounds.crossing = { t: 0, dur: 10 }; grounds.next = 0; }
+  if (grounds.crossing) { grounds.crossing.t += dt; if (grounds.crossing.t > grounds.crossing.dur) grounds.crossing = null; }
+  grounds.acc = (grounds.acc || 0) + dt;
+  if (grounds.acc > 1 / 20) { grounds.acc = 0; drawGrounds(t); }   /* twenty frames a second is plenty for cloth */
+}
 var TAPESTRY = { w: 1.4, h: 2.0, x: NOOK_MID };
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
 /* her wall: two portraits on the study's stretch, symmetric about the bay axis; portrait-a is the one nearest her */
@@ -1929,6 +2109,7 @@ function frame() {
   updateTurnRise(dt);
   updateDoorsKnock(dt);
   updateHerPatches(dt);
+  updateGrounds(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -1956,7 +2137,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
+  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
