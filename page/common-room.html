@@ -2838,7 +2838,8 @@ function drawFigures(list) {
   chessBoard.visible = !!(want[6] || want[7]);
 }
 /* the chess set between the pair (touch.chess's trace, a chess set at the fire): Magic's own piece to draw; until then a
-   grey board 0.32 m square on the rug with a few pieces standing on it, and a tap on it raises `chess` */
+   grey board 0.32 m square on the rug with a few pieces standing on it, and a tap on it raises `rug-chess` (req 77;
+   `chess` stays the round table's live game) */
 var chessBoard = new THREE.Group();
 (function () {
   var c = makeCanvas(128, 128), g = c.getContext('2d');
@@ -3319,7 +3320,7 @@ function tap(cx, cy) {
     return;
   }
   var chessHit = mode === 'room' && castle && chessBoard.visible ? raycaster.intersectObjects(chessBoard.children, false)[0] : null;
-  if (chessHit && (!hits.length || chessHit.distance <= hits[0].distance)) { castle.tap('chess'); return; }
+  if (chessHit && (!hits.length || chessHit.distance <= hits[0].distance)) { castle.tap('rug-chess'); return; }
   var as = mode === 'room' && castle ? figureTapped(hits) : null;
   if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
