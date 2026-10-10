@@ -1861,9 +1861,13 @@ scene.add(basketPool);
    staged drawing; a new drawing reads them again. */
 var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 1104 / 1204, sink: 0.012, x: -1.15, z: -3.55,
   WIN: [[0.234, 0.546, 0.355, 0.655], [0.236, 0.545, 0.356, 0.655]], GLOW: [0.350, 0.305, 0.05] };
+/* set aside (Godric, 10 October 2026, 4.21 pm, after eight rounds): hidden from the room until the pipeline's eye check
+   exists and it is redrawn; its card, tap, glow and essay stay built behind this flag */
+var SATCHEL_ASIDE = true;
 var satchel = null, satchelAlpha = null, satchelState = { open: false, shutIn: 0, flare: 0, essayOut: false };
 var satchelTex = new THREE.TextureLoader().load(SATCHEL.url, function (t) {
   satchelAlpha = alphaOf(t.image);
+  if (SATCHEL_ASIDE) return;
   satchel.visible = true;
   tappables.push(satchel);
 });
@@ -1982,6 +1986,7 @@ function updateSatchel(dt, t) {
 var satchelPool = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.3), basketPool.material);
 satchelPool.rotation.x = -Math.PI / 2;
 satchelPool.position.set(SATCHEL.x, 0.004, SATCHEL.z + 0.03);
+satchelPool.visible = !SATCHEL_ASIDE;
 scene.add(satchelPool);
 /* the house scarf over the armchair's rolled arm on the fire side, one end hanging (req 28 item 2; Godric's spot,
    9 October 2026, 6.13 pm, option 1 of assets/review/scarf-arm-plan.jpg): the knitting mill's drawing on the house
@@ -3131,6 +3136,85 @@ function bellowsTap() {
    their upright to face the eye every frame, so each is always seen as drawn; the round table's code top is round and
    needs no turning. */
 var facers = [table, sideTable, deskChair, candleStand, chessBoard];
+/* homework on the round table's rim (req 28 item 4; the rim nearest the eye, Godric 4.01 pm, assets/review/homework-plan.jpg;
+   canon's parchment, ink bottle and quill, 4.14 pm; candidate 2 of round 1, 4.20 pm). Three cards of one sheet at tier B
+   (120 by 108 px a cell, 0.3 by 0.27 m): the essay half unrolled, its heading "The properties of moonstone and its
+   uses in potion-making" (OotP 12) written in by homework_heading.py; the ink bottle; the quill, cut free of the second
+   bottle the drawing gave it (homework_quill_fix.py), standing in this one. They stand on the top's front rim, clear of
+   the 0.32 m square at its centre that the live game's board will take, and turn to the eye as the table does.
+   His touch (4.01 pm): now and then the quill dips itself, lifts, touches the page and leaves one careful blot, then
+   goes home, as a tired student's quill does at midnight. Blots gather on a sheet laid over the essay's card. */
+var HOMEWORK = { url: '../assets/layers/homework.png', cw: 0.3, ch: 0.3 * 108 / 120, y: TABLE_TOP_Y,
+  essay: [-1.27, 3.1], bottle: [-1.04, 3.12],
+  NIB: [0.252, 0.04],                      /* the quill's nib in its cell: across from the left, metres up from the foot */
+  WRITE: [0.25, 0.55, 0.62, 0.86] };       /* where the essay's writing lies in its cell: u from, u to, v from, v to (down) */
+var homework = { essay: null, bottle: null, quill: null, blots: null, next: 25 + 30 * Math.random(), t: -1, home: new THREE.Vector3() };
+new THREE.TextureLoader().load(HOMEWORK.url, function (t) {
+  t.encoding = THREE.sRGBEncoding;
+  function cellCard(i) {
+    var c = t.clone(); c.needsUpdate = true; c.repeat.set(1 / 3, 1); c.offset.set(i / 3, 0);
+    var m = cutoutMesh(c, HOMEWORK.cw, HOMEWORK.ch);
+    m.castShadow = false;
+    scene.add(m); facers.push(m);
+    return m;
+  }
+  homework.essay = cellCard(0); homework.bottle = cellCard(1); homework.quill = cellCard(2);
+  homework.essay.name = 'homework-essay'; homework.bottle.name = 'homework-bottle'; homework.quill.name = 'homework-quill';
+  homework.essay.position.set(HOMEWORK.essay[0], HOMEWORK.y + HOMEWORK.ch / 2, HOMEWORK.essay[1]);
+  homework.bottle.position.set(HOMEWORK.bottle[0], HOMEWORK.y + HOMEWORK.ch / 2, HOMEWORK.bottle[1]);
+  /* the quill stands behind the bottle's card, its nib 5 cm down inside the glass */
+  homework.home.set(HOMEWORK.bottle[0] + (0.5 - HOMEWORK.NIB[0]) * HOMEWORK.cw,
+                    HOMEWORK.y + 0.05 - HOMEWORK.NIB[1] + HOMEWORK.ch / 2, HOMEWORK.bottle[1] - 0.01);
+  homework.quill.position.copy(homework.home);
+  /* the blots: a clear sheet the size of the essay's card, just before it */
+  var bc = makeCanvas(240, 216);
+  homework.blots = new THREE.Mesh(new THREE.PlaneGeometry(HOMEWORK.cw, HOMEWORK.ch),
+    new THREE.MeshBasicMaterial({ map: tex(bc), transparent: true, depthWrite: false }));
+  homework.blots.userData.canvas = bc;
+  homework.essay.add(homework.blots); homework.blots.position.z = 0.002;
+});
+/* one blot, at a spot among the writing, in the drawing's ink */
+function homeworkBlot(u, v) {
+  var c = homework.blots.userData.canvas, g = c.getContext('2d');
+  var x = u * c.width, y = v * c.height, r = 1.6 + Math.random() * 1.4;
+  g.fillStyle = 'rgba(30,24,20,0.92)';
+  g.beginPath(); g.ellipse(x, y, r * 1.3, r, 0, 0, Math.PI * 2); g.fill();
+  if (Math.random() < 0.5) { g.beginPath(); g.arc(x + r * 1.8, y + r * 0.6, r * 0.45, 0, Math.PI * 2); g.fill(); }
+  homework.blots.material.map.needsUpdate = true;
+}
+/* the dip: 0.5 s down into the ink, 0.7 s up and out, 0.9 s across to the page, a touch and the blot at 2.3 s, 0.9 s home,
+   0.6 s down into the bottle; then 30 to 90 s before the next */
+var _hwA = new THREE.Vector3(), _hwB = new THREE.Vector3(), _hwT = new THREE.Vector3();
+function updateHomework(dt) {
+  if (!homework.quill) return;
+  var q = homework.quill, H0 = homework.home;
+  if (homework.t < 0) {
+    homework.next -= dt;
+    if (homework.next > 0 || mode === 'tween') return;
+    var W = HOMEWORK.WRITE;
+    homework.u = W[0] + Math.random() * (W[1] - W[0]); homework.v = W[2] + Math.random() * (W[3] - W[2]);
+    /* the nib's target on the essay's card, in the room, and where the quill's card must stand to put its nib there */
+    homework.essay.updateMatrixWorld();
+    _hwT.set((homework.u - 0.5) * HOMEWORK.cw, (0.5 - homework.v) * HOMEWORK.ch, 0.012);
+    homework.essay.localToWorld(_hwT);
+    homework.at = _hwT.clone().add(new THREE.Vector3((0.5 - HOMEWORK.NIB[0]) * HOMEWORK.cw, HOMEWORK.ch / 2 - HOMEWORK.NIB[1], 0));
+    homework.blotted = false;
+    homework.t = 0;
+  }
+  homework.t += dt;
+  var t = homework.t, up = H0.clone().setY(H0.y + 0.11);
+  if (t < 0.5) q.position.copy(H0).setY(H0.y - 0.015 * Math.sin(Math.PI * t / 0.5));
+  else if (t < 1.2) q.position.lerpVectors(H0, up, easeInOut((t - 0.5) / 0.7));
+  else if (t < 2.1) { _hwA.copy(homework.at).setY(homework.at.y + 0.06); q.position.lerpVectors(up, _hwA, easeInOut((t - 1.2) / 0.9)); }
+  else if (t < 2.6) {
+    _hwA.copy(homework.at).setY(homework.at.y + 0.06);
+    q.position.lerpVectors(_hwA, homework.at, Math.sin(Math.PI * (t - 2.1) / 0.5));
+    if (t > 2.3 && !homework.blotted) { homeworkBlot(homework.u, homework.v); homework.blotted = true; }
+  }
+  else if (t < 3.5) { _hwA.copy(homework.at).setY(homework.at.y + 0.06); q.position.lerpVectors(_hwA, up, easeInOut((t - 2.6) / 0.9)); }
+  else if (t < 4.1) q.position.lerpVectors(up, H0, easeInOut((t - 3.5) / 0.6));
+  else { q.position.copy(H0); homework.t = -1; homework.next = 30 + 60 * Math.random(); }
+}
 function faceEye() {
   for (var i = 0; i < facers.length; i++) {
     var m = facers[i];
@@ -3956,13 +4040,14 @@ function frame() {
   updateTapestry(dt, t);
   updateScarf(dt, t);
   updateSatchel(dt, t);
+  updateHomework(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
 }
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, satchelTap: satchelTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
