@@ -114,6 +114,75 @@
              waxing: e < 180, up: alt > 0, altitude: Math.round(Math.max(0, alt)), height: Math.round(Math.max(0, alt) / 90 * 100) / 100 };
   }
 
+  /* The castle's weather (board req 113, the Corridor, Godric's wish of 10 October 2026, 6.52 pm): one weather a day for
+     the whole castle, so every window agrees, worked from the date alone like dusk and the moon, so both castles agree
+     and it needs no connection. A Highlands climate by month, in spells: a pressure and a warmth that drift from day to
+     day (each day's nudge seeded by the date, carried on from 1 January 2026), so wet days come in runs and a cold snap
+     lasts. From them the sky (clear, cloudy, rain, snow or fog), the wind (0 still to 1 blowing a gale), the ground (dry,
+     wet with puddles after rain, frost on a cold clear morning, or snow lying), a warmth in degrees and the season. Two
+     anchors from the book's own year: from November the weather turns very cold and most mornings the ground is white
+     with frost (PS 11), and one morning in mid-December the castle wakes under deep snow, which lies until the new year
+     (PS 12). */
+  var WX_EPOCH = Date.UTC(2026, 0, 1) / DAY_MS;            /* the day the spells start from */
+  var WX_WARM = [3.5, 4, 5.5, 7.5, 10, 12.5, 14, 13.5, 11, 8, 4.5, 3.5];          /* a day's mean warmth by month, C */
+  var WX_WET = [0.6, 0.55, 0.52, 0.45, 0.42, 0.42, 0.47, 0.5, 0.52, 0.56, 0.3, 0.58];   /* the share of wet days */
+  var WX_WIND = [0.08, 0.08, 0.05, 0, -0.03, -0.06, -0.06, -0.04, 0, 0.04, 0.08, 0.08];  /* windier in winter */
+  var WX_SEASON = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+  var WX_SKY = /^(clear|cloudy|rain|snow|fog)$/, WX_GROUND = /^(dry|wet|frost|snow)$/;
+  var wxDays = {}, wxLast = null;
+  function wxRand(day, salt) {
+    var h = ((day * 2654435761) ^ (salt * 40503 + 0x9e3779b9)) >>> 0;
+    h ^= h >>> 13; h = Math.imul(h, 1274126177) >>> 0; h ^= h >>> 16; h = Math.imul(h, 2246822519) >>> 0; h ^= h >>> 13;
+    return ((h >>> 0) % 1000003) / 1000003;
+  }
+  function wxNormal(day, salt) {                          /* a seeded draw from the bell curve, by Box and Muller */
+    return Math.sqrt(-2 * Math.log(1 - wxRand(day, salt) * 0.999999)) * Math.cos(2 * Math.PI * wxRand(day, salt + 1));
+  }
+  function wxWarmth(d) {                                  /* the month's mean warmth, eased between mid-months */
+    var m = d.getMonth(), f = (d.getDate() - 15) / 30, n = (m + (f < 0 ? 11 : 1)) % 12;
+    return WX_WARM[m] + (WX_WARM[n] - WX_WARM[m]) * Math.abs(f);
+  }
+  function wxDay(day, prev) {
+    var u = new Date(day * DAY_MS), d = new Date(u.getUTCFullYear(), u.getUTCMonth(), u.getUTCDate(), 12);
+    var m = d.getMonth(), date = d.getDate();
+    var p = 0.7 * prev.p + 0.71 * wxNormal(day, 1), t = 0.75 * prev.t + 0.66 * wxNormal(day, 3);
+    var warm = wxWarmth(d) + 2.6 * t;
+    var snowDay = 12 + Math.floor(wxRand(d.getFullYear(), 9) * 4);        /* PS 12: one morning in mid-December */
+    var deep = m === 11 && date >= snowDay;
+    if (deep) warm = Math.min(warm, 0.5 + 0.8 * t);                      /* the lake froze solid: it stays cold to the year's end */
+    var wet = wxRand(day, 5) < WX_WET[m] * Math.max(0.15, Math.min(1.8, 1 - 0.6 * p));
+    var wind = Math.max(0, Math.min(1, 0.3 - 0.22 * p + 0.18 * wxNormal(day, 6) + WX_WIND[m]));
+    var sky;
+    if (deep && date === snowDay) sky = 'snow';
+    else if (wet) sky = warm < 0.5 || deep ? 'snow' : 'rain';
+    else if (wind < 0.3 && p > 0.4 && (m >= 8 || m <= 2) && wxRand(day, 7) < 0.4) sky = 'fog';
+    else sky = p + 0.6 * wxNormal(day, 8) > 0.2 ? 'clear' : 'cloudy';
+    var dawn = warm - (sky === 'clear' ? 5 : sky === 'fog' ? 3 : 2.5);    /* the night's cold by morning */
+    var lying = prev.lying + (sky === 'snow' ? (deep && date === snowDay ? 3 : 0.6) : 0);
+    if (warm > 1) lying -= 0.3 * (warm - 1) + (sky === 'rain' ? 0.5 : 0);
+    lying = Math.max(0, lying);
+    var ground;
+    if (lying >= 0.3) ground = 'snow';
+    else if (sky !== 'rain' && dawn < (m === 10 ? 2 : -0.5)) ground = 'frost';   /* PS 11: from November, frost most mornings */
+    else if (sky === 'rain' || (prev.sky === 'rain' && sky !== 'clear') || (prev.lying >= 0.3 && warm > 1)) ground = 'wet';
+    else ground = 'dry';
+    return { p: p, t: t, lying: lying, sky: sky, wind: wind, ground: ground, warm: warm };
+  }
+  function weatherAt(d) {
+    var day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY_MS);
+    if (!wxDays[day]) {
+      var from = wxLast != null && wxLast < day ? wxLast : WX_EPOCH - 1, prev = wxLast != null && wxLast < day ? wxDays[wxLast] : { p: 0, t: 0, lying: 0, sky: 'cloudy' };
+      if (day < WX_EPOCH) { from = day - 120; prev = { p: 0, t: 0, lying: 0, sky: 'cloudy' }; }
+      for (var k = from + 1; k <= day; k++) { prev = wxDay(k, prev); if (day >= WX_EPOCH) wxDays[k] = prev; }
+      wxDays[day] = prev;
+      if (day >= WX_EPOCH && (wxLast == null || day > wxLast)) wxLast = day;
+    }
+    var w = wxDays[day];
+    return { sky: w.sky, wind: Math.round(w.wind * 100) / 100, windy: w.wind >= 0.6, ground: w.ground, wet: w.ground === 'wet',
+             frozen: w.ground === 'frost' || (w.ground === 'snow' && w.warm < 1), warmth: Math.round(w.warm), cold: w.warm < 7,
+             season: WX_SEASON[d.getMonth()], date: ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) };
+  }
+
   function note(msg) { if (window.console) console.info('[castle-events] ' + msg); }
   function between(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
 
@@ -142,6 +211,12 @@
     var waitOverride = params.has('wait') ? Math.max(0, +params.get('wait') || 0) : null;
     var timeOverride = /^(morning|day|evening|night)$/.test(params.get('time') || '') ? params.get('time') : null;
     var moonOverride = PHASE_AT.hasOwnProperty(params.get('moon')) || params.get('moon') === 'down' ? params.get('moon') : null;   /* a test link: ?moon=full, ?moon=down */
+    /* a test link for the weather: ?weather=clear, cloudy, rain, snow, fog, windy, frost or wet (puddles), ?wind=0.8,
+       ?season=spring, and ?date=2026-12-20 for the day's own weather (the date for the weather only, as the corridor's
+       pumpkins read it; the records' clock is unchanged) */
+    var weatherOverride = /^(clear|cloudy|rain|snow|fog|windy|frost|wet)$/.test(params.get('weather') || '') ? params.get('weather') : null;
+    var seasonOverride = /^(spring|summer|autumn|winter)$/.test(params.get('season') || '') ? params.get('season') : null;
+    var weatherDate = /^\d{4}-\d\d-\d\d$/.test(params.get('date') || '') ? params.get('date') : null;
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
     var allLines = params.get('lines') === 'all';   /* a test link: lines still marked verify are shown too */
 
@@ -221,6 +296,28 @@
       return m;
     }
 
+    /* The day's weather where the castle stands (req 113): { sky, wind, windy, ground, wet, frozen, warmth, cold, season,
+       date }, the same all day, `?weather=` and its kin honoured. */
+    var FORCED = {
+      clear: { sky: 'clear', wind: 0.2, ground: 'dry' }, cloudy: { sky: 'cloudy', wind: 0.3, ground: 'dry' },
+      rain: { sky: 'rain', wind: 0.45, ground: 'wet' }, snow: { sky: 'snow', wind: 0.3, ground: 'snow', warmth: -1 },
+      fog: { sky: 'fog', wind: 0.05, ground: 'dry' }, windy: { sky: 'clear', wind: 0.85, ground: 'dry' },
+      frost: { sky: 'clear', wind: 0.1, ground: 'frost', warmth: 1 }, wet: { sky: 'cloudy', wind: 0.3, ground: 'wet' }
+    };
+    function weatherNow() {
+      var w = weatherAt(weatherDate ? new Date(weatherDate + 'T12:00:00') : nowDate()), f = FORCED[weatherOverride];
+      if (f) {
+        w.sky = f.sky; w.wind = f.wind; w.ground = f.ground;
+        if (f.warmth != null) w.warmth = Math.min(w.warmth, f.warmth);
+        else if (w.warmth < 2) w.warmth = 4;
+      }
+      if (params.has('wind')) w.wind = Math.max(0, Math.min(1, +params.get('wind') || 0));
+      if (seasonOverride) w.season = seasonOverride;
+      w.windy = w.wind >= 0.6; w.wet = w.ground === 'wet';
+      w.frozen = w.ground === 'frost' || (w.ground === 'snow' && w.warmth < 1); w.cold = w.warmth < 7;
+      return w;
+    }
+
     function builtin(name) {
       var now = nowDate();
       if (builtins[name]) return builtins[name]();
@@ -229,6 +326,11 @@
         case 'time': return timeOfDay();
         case 'moon': return moonNow().phase;          /* new, waxing-crescent, ... full, ... waning-crescent */
         case 'moon up': return moonNow().up ? 'yes' : 'no';
+        case 'weather': return weatherNow().sky;      /* clear, cloudy, rain, snow or fog */
+        case 'windy': return weatherNow().windy ? 'yes' : 'no';
+        case 'ground': return weatherNow().ground;    /* dry, wet, frost or snow */
+        case 'season': return weatherNow().season;
+        case 'cold': return weatherNow().cold ? 'yes' : 'no';
         case 'place': return (leaving && state.visitPlace) || place;
         case 'at': return 'none';                 /* a page with stops answers this itself */
         case 'hour': return now.getHours();
@@ -1073,6 +1175,10 @@
       /* The real moon now (req 95): { phase, age (days since new), lit (0 to 1), waxing, up, altitude (degrees), height
          (0 to 1, of the way overhead), light (lit while up, else 0) }, `?moon=` honoured, so every room shows one moon. */
       moon: moonNow,
+      /* The day's weather (req 113): { sky (clear, cloudy, rain, snow, fog), wind (0 to 1), windy, ground (dry, wet,
+         frost, snow), wet, frozen, warmth (C), cold, season (spring, summer, autumn, winter), date (mm-dd) }, one a day for
+         the whole castle, `?weather=`, `?wind=`, `?season=` and `?date=` honoured, so every window shows one sky. */
+      weather: weatherNow,
       cues: shownCues,
       fire: function (id) { if (byId[id] && visit) fire(byId[id]); },
       state: function () { return state; },
@@ -1090,5 +1196,5 @@
     };
   }
 
-  window.CastleEvents = { start: start, dayNumber: dayNumber, week: function (d) { return weekNumber(d || new Date()); } };
+  window.CastleEvents = { start: start, dayNumber: dayNumber, weatherAt: weatherAt, week: function (d) { return weekNumber(d || new Date()); } };
 })();
