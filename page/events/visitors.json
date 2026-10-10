@@ -1,5 +1,13 @@
 {
   "chain": "visitors",
+  "marks": {
+    "frame": [
+      "top-left",
+      "top-right",
+      "bottom-left",
+      "bottom-right"
+    ]
+  },
   "room": [
     {
       "when": [
@@ -151,6 +159,110 @@
       ],
       "show": [
         "the right painting's sitter in the painting opposite the hole, seen through the hole whenever it opens"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "mantel_out = yes",
+        "mantel_at = gallery",
+        "guest_frame = top-left"
+      ],
+      "show": [
+        "the mantel painting's sitter from the common room visiting the gallery, squeezed into its top left frame beside that frame's sitter, now and then giving him a guilty little wave"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "mantel_out = yes",
+        "mantel_at = gallery",
+        "guest_frame = top-right"
+      ],
+      "show": [
+        "the mantel painting's sitter from the common room visiting the gallery, squeezed into its top right frame beside that frame's sitter, now and then giving him a guilty little wave"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "mantel_out = yes",
+        "mantel_at = gallery",
+        "guest_frame = bottom-left"
+      ],
+      "show": [
+        "the mantel painting's sitter from the common room visiting the gallery, squeezed into its bottom left frame beside that frame's sitter, now and then giving him a guilty little wave"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "mantel_out = yes",
+        "mantel_at = gallery",
+        "guest_frame = bottom-right"
+      ],
+      "show": [
+        "the mantel painting's sitter from the common room visiting the gallery, squeezed into its bottom right frame beside that frame's sitter, now and then giving him a guilty little wave"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "right_out = yes",
+        "right_at = gallery",
+        "guest_frame = top-left"
+      ],
+      "show": [
+        "the right painting's sitter from the common room visiting the gallery, squeezed into its top left frame beside that frame's sitter, now and then giving him a guilty little wave"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "right_out = yes",
+        "right_at = gallery",
+        "guest_frame = top-right"
+      ],
+      "show": [
+        "the right painting's sitter from the common room visiting the gallery, squeezed into its top right frame beside that frame's sitter, now and then giving him a guilty little wave"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "right_out = yes",
+        "right_at = gallery",
+        "guest_frame = bottom-left"
+      ],
+      "show": [
+        "the right painting's sitter from the common room visiting the gallery, squeezed into its bottom left frame beside that frame's sitter, now and then giving him a guilty little wave"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "time != night",
+        "right_out = yes",
+        "right_at = gallery",
+        "guest_frame = bottom-right"
+      ],
+      "show": [
+        "the right painting's sitter from the common room visiting the gallery, squeezed into its bottom right frame beside that frame's sitter, now and then giving him a guilty little wave"
       ]
     }
   ],
@@ -903,7 +1015,8 @@
         "set right_out = no",
         "set visiting = 0",
         "set mantel_tried = no",
-        "set right_tried = no"
+        "set right_tried = no",
+        "set gallery_guest = none"
       ]
     },
     {
@@ -920,7 +1033,157 @@
         "set right_out = no",
         "set visiting = 0",
         "set mantel_tried = no",
-        "set right_tried = no"
+        "set right_tried = no",
+        "set gallery_guest = none"
+      ]
+    },
+    {
+      "id": "visitors.mantel-gallery",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-guest",
+      "weight": 1,
+      "moment": "tap stair",
+      "when": [
+        "place = corridor",
+        "at != landing",
+        "weekday = friday",
+        "stair_to = gallery",
+        "time != night",
+        "gallery_guest != mantel",
+        "gallery_guest != right",
+        "mantel sitter = away",
+        "mantel_out != yes"
+      ],
+      "who": [
+        {
+          "as": "host",
+          "role": "voice",
+          "name": "the gallery sitter",
+          "mark": "the guest's frame"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "host",
+          "medium": "heard",
+          "key": "visitors.mantel-gallery",
+          "sound": "a small disapproving sniff from the gallery sitter she has squeezed in beside",
+          "canon": "PS 8, the people in the portraits kept going to visit each other, checked against the text, 10 October 2026; the guilty wave and the host's disapproving sniff are Godric's touches (the gallery's yes, 3.35 pm; Q19, 4.47 pm)"
+        }
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_at = gallery",
+        "set mantel_last = gallery",
+        "set gallery_guest = mantel",
+        "set guest_frame = mark frame"
+      ]
+    },
+    {
+      "id": "visitors.right-gallery",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-guest",
+      "weight": 1,
+      "moment": "tap stair",
+      "when": [
+        "place = corridor",
+        "at != landing",
+        "weekday = friday",
+        "stair_to = gallery",
+        "time != night",
+        "gallery_guest != mantel",
+        "gallery_guest != right",
+        "right sitter = away",
+        "right_out != yes"
+      ],
+      "who": [
+        {
+          "as": "host",
+          "role": "voice",
+          "name": "the gallery sitter",
+          "mark": "the guest's frame"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "host",
+          "medium": "heard",
+          "key": "visitors.right-gallery",
+          "sound": "a small disapproving sniff from the gallery sitter he has squeezed in beside",
+          "canon": "PS 8, the people in the portraits kept going to visit each other, checked against the text, 10 October 2026; the guilty wave and the host's disapproving sniff are Godric's touches (the gallery's yes, 3.35 pm; Q19, 4.47 pm)"
+        }
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_at = gallery",
+        "set right_last = gallery",
+        "set gallery_guest = right",
+        "set guest_frame = mark frame"
+      ]
+    },
+    {
+      "id": "visitors.gallery-no-guest",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-guest",
+      "weight": 4,
+      "moment": "tap stair",
+      "when": [
+        "place = corridor",
+        "at != landing",
+        "weekday = friday",
+        "stair_to = gallery",
+        "time != night",
+        "gallery_guest != mantel",
+        "gallery_guest != right"
+      ],
+      "starts": []
+    },
+    {
+      "id": "visitors.mantel-back-gallery",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = common room",
+        "mantel_out = yes",
+        "mantel_last = gallery",
+        "time != night"
+      ],
+      "show": [
+        "the mantel painting's sitter comes home through her painting's exit and sits"
+      ],
+      "starts": [
+        "set mantel_out = no",
+        "set mantel_at = none",
+        "set gallery_guest = none"
+      ]
+    },
+    {
+      "id": "visitors.right-back-gallery",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = common room",
+        "right_out = yes",
+        "right_last = gallery",
+        "time != night"
+      ],
+      "show": [
+        "the right painting's sitter comes home through his painting's exit and sits"
+      ],
+      "starts": [
+        "set right_out = no",
+        "set right_at = none",
+        "set gallery_guest = none"
       ]
     }
   ]
