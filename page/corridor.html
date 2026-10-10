@@ -1190,26 +1190,57 @@ settleScarf.position.set(SETTLE_SCARF.x, SETTLE.seat, SETTLE_SCARF.z);
 settleScarf.name = 'settle-scarf'; scene.add(settleScarf); register(settleScarf, 1);
 hangDrawing(settleScarf, '../assets/layers/settle-scarf.png', SETTLE_SCARF.w, function (im) {
   standHeap(settleScarf, SETTLE_SCARF.w, im, new THREE.Vector3(SETTLE_SCARF.x, SETTLE.seat, SETTLE_SCARF.z), -Math.PI / 2, 40, 0.05, 0.08);
-  /* the tape lies on the heap where the drawing has it, in the drawing's plane, 2.5 cm toward its eye so the relief never covers it */
-  var eye = settleScarf.userData.eye;
-  scarfTape.position.copy(settleScarf.userData.heapAt(TAPE.u, TAPE.v)).addScaledVector(eye.d, 0.025);
-  scarfTape.rotation.copy(eye.euler); scarfTape.rotateZ(TAPE.turn * Math.PI / 180);
+  layTape();
 });
-/* its name tape (Godric, 7.05 pm): a tap on the scarf bends him over it, and a cotton tape sewn inside the end at the arm
+/* its name tape (Godric, 7.05 pm): a tap on the scarf bends him over it, and a cotton tape sewn on near the end at the arm
    turns up, H. ABBOTT in red, the first name the Sorting Hat called (PS 7), a first-year waiting for a Gryffindor friend.
-   Life size, 7 by 1.4 cm, a child of the scarf so it keeps the drawing's turn; once turned up it stays for the visit
-   (my choice). On the heap (4.11 pm) at (616, 382) of the drawing's 800 by 532, on the black band just inside its trailing
-   fringe, sewn along the fringe's edge (26.6 degrees). */
-var TAPE = { w: 0.07, h: 0.014, u: 616 / 800, v: 382 / 532, turn: 26.6 };
-var scarfTape = cutoutMesh(cutoutTexture(500, 100, '#efe6cf', function (g, w, h) {
+   Once turned up it stays for the visit (my choice). Since 10 October 2026, 7.05 pm (Godric, 6.56 pm: "need to align
+   stitched name tag"; it had stood as a flat card at its own angle across the black band): sewn onto the knit, running
+   with the band toward the fringe, smaller (5.2 by 1.05 cm), its whip stitches at both long edges; laid as a small mesh
+   on the heap's own surface, each point slid along the drawing's eye line as the knit's are (heapAt), 3 mm proud, so it
+   takes the cloth's tilt and curve and is lit as the cloth is. Centre (590, 392) of the drawing's 800 by 532, the band
+   running 24 degrees down toward the fringe there */
+var TAPE = { w: 0.052, h: 0.0105, cx: 590, cy: 392, turn: 24, px: 800, py: 532, m: 1600 };   /* m: the drawing's pixels a metre */
+var tapeTex = cutoutTexture(520, 104, '#e9dfc4', function (g, w, h) {
   g.fillRect(0, 0, w, h);
-  g.strokeStyle = 'rgba(150,130,100,0.6)'; g.lineWidth = 3; g.setLineDash([9, 7]);
-  g.strokeRect(10, 9, w - 20, h - 18);
-  g.fillStyle = '#a81c1c'; g.font = 'bold 54px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-  g.fillText('H. ABBOTT', w / 2, h / 2 + 2);
-}), TAPE.w, TAPE.h);
-scarfTape.rotation.z = TAPE.turn * Math.PI / 180; scarfTape.visible = false; scarfTape.name = 'scarf-tape';
+  var grd = g.createLinearGradient(0, 0, 0, h);    /* a hint of the tape's curve over the knit: its edges a shade down */
+  grd.addColorStop(0, 'rgba(90,70,40,0.22)'); grd.addColorStop(0.3, 'rgba(90,70,40,0)'); grd.addColorStop(0.75, 'rgba(90,70,40,0)'); grd.addColorStop(1, 'rgba(60,45,25,0.32)');
+  g.fillStyle = grd; g.fillRect(0, 0, w, h);
+  g.strokeStyle = 'rgba(120,100,70,0.25)'; g.lineWidth = 1;   /* the cotton's weave */
+  for (var x = 3; x < w; x += 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+  g.fillStyle = '#a81c1c'; g.font = 'bold 56px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('H. ABBOTT', w / 2, h / 2 + 3);
+  g.strokeStyle = '#1c1612'; g.lineWidth = 3.2; g.lineCap = 'round';   /* whip stitches in black thread over both long edges */
+  for (x = 12; x < w - 6; x += 17) {
+    g.beginPath(); g.moveTo(x, -2); g.lineTo(x + 6, 9); g.stroke();
+    g.beginPath(); g.moveTo(x + 4, h + 2); g.lineTo(x + 10, h - 9); g.stroke();
+  }
+});
+var scarfTape = new THREE.Mesh(new THREE.BufferGeometry(),
+  new THREE.MeshStandardMaterial({ map: tapeTex, color: 0xd6cebe, roughness: 0.95, metalness: 0, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 }));
+scarfTape.visible = false; scarfTape.name = 'scarf-tape';
 settleScarf.add(scarfTape);
+function layTape() {
+  var heapAt = settleScarf.userData.heapAt, d = settleScarf.userData.eye.d, a = TAPE.turn * Math.PI / 180;
+  var ax = Math.cos(a), ay = Math.sin(a), L = TAPE.w * TAPE.m, H = TAPE.h * TAPE.m, NS = 16, NT = 2;
+  function at(sx, ty) {                     /* along -0.5..0.5, across -0.5 (toward the band's upper edge) to 0.5 */
+    var x = TAPE.cx + ax * sx * L - ay * ty * H, y = TAPE.cy + ay * sx * L + ax * ty * H;
+    return heapAt(x / TAPE.px, y / TAPE.py).addScaledVector(d, 0.003);
+  }
+  var c = at(0, 0), pos = [], uv = [], idx = [];
+  for (var j = 0; j <= NT; j++) for (var i = 0; i <= NS; i++) {
+    var sx = i / NS - 0.5, ty = j / NT - 0.5, P = at(sx, ty).sub(c);
+    pos.push(P.x, P.y, P.z); uv.push(sx + 0.5, 0.5 - ty);
+  }
+  for (j = 0; j < NT; j++) for (i = 0; i < NS; i++) {
+    var k = j * (NS + 1) + i;
+    idx.push(k, k + NS + 1, k + 1, k + 1, k + NS + 1, k + NS + 2);
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  scarfTape.geometry.dispose(); scarfTape.geometry = g; scarfTape.position.copy(c); scarfTape.rotation.set(0, 0, 0);
+}
 /* the painting opposite (req 33, round 1, candidate 3, Godric, 9 October 2026, 5.11 pm): an empty panelled landing in a
    beaded gilt frame, a door ajar at its right edge, 0.5 by 0.54 m, its own shape about the slot's centre */
 /* A sitter out visiting stands in it (req 58; visitors.json's rules with place corridor), drawn from her own standing
