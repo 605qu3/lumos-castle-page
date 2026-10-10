@@ -615,6 +615,106 @@
       "starts": [
         "set knocked = no"
       ]
+    },
+    {
+      "id": "stair.gallery-spoon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 10-25 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = gallery",
+        "at = landing"
+      ],
+      "one_of": "gallery-quiet",
+      "weight": 1,
+      "who": [
+        {
+          "as": "cup",
+          "role": "trace",
+          "what": "the teacup in the gallery's empty frame",
+          "mark": "gallery"
+        }
+      ],
+      "show": [
+        "in the gallery's empty frame, the spoon stirs the tea by itself, two slow turns, taps the rim and lies still"
+      ],
+      "lines": [
+        {
+          "speaker": "cup",
+          "medium": "heard",
+          "key": "stair.gallery-spoon",
+          "sound": "a tiny clink of a spoon on china"
+        }
+      ]
+    },
+    {
+      "id": "stair.gallery-spoon-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 10-25 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = gallery",
+        "at = landing"
+      ],
+      "one_of": "gallery-quiet",
+      "weight": 1,
+      "starts": []
+    },
+    {
+      "id": "stair.torch-rise",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap stair",
+      "when": [
+        "place = corridor",
+        "at != landing",
+        "stair_to = torch",
+        "time != night"
+      ],
+      "show": [
+        "beyond the arch at the flight's foot, the steps going on up seem to rise a little as he comes down, and settle"
+      ]
+    },
+    {
+      "id": "stair.down-all-along",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "back from walk-up",
+      "when": [
+        "place = corridor",
+        "at = landing",
+        "time != night",
+        "stair_trips >= 2"
+      ],
+      "one_of": "stair-look-back",
+      "weight": 1,
+      "show": [
+        "looking back up the flight he came down, for a moment it seems to go on down, not up, as if it had been going down all along; then it is a stair up again"
+      ]
+    },
+    {
+      "id": "stair.up-as-ever",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "back from walk-up",
+      "when": [
+        "place = corridor",
+        "at = landing",
+        "time != night",
+        "stair_trips >= 2"
+      ],
+      "one_of": "stair-look-back",
+      "weight": 7,
+      "starts": []
     }
   ]
 }
