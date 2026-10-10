@@ -1842,14 +1842,17 @@ basket.position.set(BASKET.x, BASKET.y + BASKET.h / 2 - BASKET.sink, BASKET.z);
 basket.name = 'log-basket'; basket.visible = false;
 scene.add(basket); register(basket, 2);
 function basketCell(full) { basketTex.offset.x = full ? 0.5 : 0; }
-/* a soft dark pool where it stands, so it sits on the slab: the card's own shadow falls away from the fire, off the eye */
-var basketPool = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.55), new THREE.MeshBasicMaterial({ map: (function () {
-  var c = makeCanvas(64, 64), g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 4, 32, 32, 32);
-  gr.addColorStop(0, 'rgba(0,0,0,0.75)'); gr.addColorStop(0.55, 'rgba(0,0,0,0.4)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+/* a tight dark shadow where it stands, so it sits on the slab: the card's own shadow falls away from the fire, off the
+   eye. It was a wide pool 0.8 by 0.55 m centred 5 cm before the card, and its dark band on the slab in front of the
+   foot read as the gap under a floating basket (Godric, 10 October 2026, 5.04 pm); now 0.7 by 0.3 m, darker, from
+   the drawn front edge back under the basket. */
+var basketPool = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.3), new THREE.MeshBasicMaterial({ map: (function () {
+  var c = makeCanvas(64, 64), g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(0,0,0,0.9)'); gr.addColorStop(0.6, 'rgba(0,0,0,0.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return tex(c);
-})(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+})(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }));
 basketPool.rotation.x = -Math.PI / 2;
-basketPool.position.set(BASKET.x, BASKET.y + 0.004, BASKET.z + 0.05);
+basketPool.position.set(BASKET.x, BASKET.y + 0.0005, BASKET.z + 0.1);
 scene.add(basketPool);
 /* the satchel at the armchair's foot (req 28 item 3; spot C of assets/review/satchel-spot-plan.jpg, Godric 7.06 pm): a
    saddler's drawing on the V&A's school satchel, two cells of one sheet, flap shut and flap up, staged at tier B (168 by
@@ -1998,9 +2001,13 @@ scene.add(satchelPool);
    the hole stands open; a tap turns the end over to show the name tape his gran sewed in, N. LONGBOTTOM, brought to
    his hand to read as a notice is, and the next tap puts it back; from lights out the scarf is gone from the arm (he
    took it up), and it is back by seven the next morning. Not the runtime's night, which starts at dusk, about 6.30 pm
-   in October, while the boys are still about. */
-var SCARF = { url: '../assets/layers/house-scarf-arm.png', w: 0.32, x: -1.44, z: -3.42, top: 0.68,
-              endX: 0.42, endY: 0.4, tapeU: 0.22, tapeV: 0.8, sway: 0.006 };
+   in October, while the boys are still about.
+   Turned (Godric, 10 October 2026, 5.04 pm: it stood off the armchair at an angle): drawn square to the eye, it read as
+   a flat strip in front of an arm whose outer side runs away from the eye toward the fire, so the card turns 0.7 rad
+   (40 degrees) about its upright to lie along that side, brought forward so its far edge stays 2 cm before the chair's
+   card. The name tape turns with it. */
+var SCARF = { url: '../assets/layers/house-scarf-arm.png', w: 0.32, x: -1.44, z: -3.45 + 0.16 * Math.sin(0.7) + 0.02,
+              yaw: 0.7, top: 0.68, endX: 0.42, endY: 0.4, tapeU: 0.22, tapeV: 0.8, sway: 0.006 };
 var scarf = null, scarfPuff = 0, scarfTurn = { k: 0, to: 0 }, scarfAlpha = null;
 /* a tap counts on the wool only, so the green round it still reaches the armchair behind */
 function alphaOf(im) {
@@ -2021,13 +2028,22 @@ new THREE.TextureLoader().load(SCARF.url, function (t) {
   scarfAlpha = alphaOf(t.image);
   scarf.geometry.userData.base = scarf.geometry.attributes.position.array.slice();
   scarf.position.set(SCARF.x, SCARF.top - h / 2, SCARF.z);
+  scarf.rotation.y = SCARF.yaw;
   scarf.name = 'house-scarf-arm';
   scene.add(scarf); register(scarf, 2);
   scarf.visible = !scarfGone();
   tappables.push(scarf);
-  /* the tape sits on the hanging end's turned-over back, just above the fringe */
-  scarfTape.pivot.position.set(SCARF.x + (SCARF.tapeU - 0.5) * SCARF.w, SCARF.top - SCARF.tapeV * h + (scarfTape.spec.h / 2 - PIN_INSET), SCARF.z + 0.012);
+  scarfTape.pivot.rotation.y = SCARF.yaw;
+  placeScarfTape(0);
 });
+/* the tape sits on the hanging end's turned-over back, just above the fringe, in the scarf's own turned plane */
+var _scarfTapeAt = new THREE.Vector3();
+function placeScarfTape(sway) {
+  var h = scarf.geometry.parameters.height;
+  _scarfTapeAt.set((SCARF.tapeU - 0.5) * SCARF.w + sway, h / 2 - SCARF.tapeV * h + (scarfTape.spec.h / 2 - PIN_INSET), 0.012);
+  scarf.updateMatrixWorld();
+  scarfTape.pivot.position.copy(scarf.localToWorld(_scarfTapeAt));
+}
 /* the name tape: a woven cotton tape in red capitals, sewn on with his gran's overcast stitches */
 function drawNameTape(g, W, H, rnd) {
   g.strokeStyle = 'rgba(150,40,40,0.55)'; g.lineWidth = 2.2;
@@ -2080,7 +2096,7 @@ function updateScarf(dt, t) {
     arr[i + 2] = onEnd * roll * Math.sin(Math.PI * scarfTurn.k) * 0.03;
   }
   g.attributes.position.needsUpdate = true;
-  scarfTape.pivot.position.x = SCARF.x + (SCARF.tapeU - 0.5) * w + sway;
+  placeScarfTape(sway);
 }
 var SCARF_GONE_KEY = 'lumos.common-room.scarf-gone-at';
 function scarfGone() {
@@ -3145,7 +3161,7 @@ var facers = [table, sideTable, deskChair, candleStand, chessBoard];
    His touch (4.01 pm): now and then the quill dips itself, lifts, touches the page and leaves one careful blot, then
    goes home, as a tired student's quill does at midnight. Blots gather on a sheet laid over the essay's card. */
 var HOMEWORK = { url: '../assets/layers/homework.png', cw: 0.3, ch: 0.3 * 108 / 120, y: TABLE_TOP_Y,
-  essay: [-1.27, 3.1], bottle: [-1.04, 3.12],
+  essay: [-1.27, 3.1], bottle: [-1.04, 3.12], LIE: 1.2,
   NIB: [0.252, 0.04],                      /* the quill's nib in its cell: across from the left, metres up from the foot */
   WRITE: [0.25, 0.55, 0.62, 0.86] };       /* where the essay's writing lies in its cell: u from, u to, v from, v to (down) */
 var homework = { essay: null, bottle: null, quill: null, blots: null, next: 25 + 30 * Math.random(), t: -1, home: new THREE.Vector3() };
@@ -3160,7 +3176,11 @@ new THREE.TextureLoader().load(HOMEWORK.url, function (t) {
   }
   homework.essay = cellCard(0); homework.bottle = cellCard(1); homework.quill = cellCard(2);
   homework.essay.name = 'homework-essay'; homework.bottle.name = 'homework-bottle'; homework.quill.name = 'homework-quill';
-  homework.essay.position.set(HOMEWORK.essay[0], HOMEWORK.y + HOMEWORK.ch / 2, HOMEWORK.essay[1]);
+  /* the essay lies on the top (Godric, 10 October 2026, 5.04 pm: it floated above the table): the drawing shows the
+     sheet from higher than the eye sees the table, so stood upright its roll rose past the top's far rim. It tips back
+     1.2 rad about its own width, its near edge on the top, and still turns to the eye about its upright. */
+  homework.essay.rotation.order = 'YXZ'; homework.essay.rotation.x = -HOMEWORK.LIE;
+  homework.essay.position.set(HOMEWORK.essay[0], HOMEWORK.y + HOMEWORK.ch / 2 * Math.cos(HOMEWORK.LIE) + 0.003, HOMEWORK.essay[1]);
   homework.bottle.position.set(HOMEWORK.bottle[0], HOMEWORK.y + HOMEWORK.ch / 2, HOMEWORK.bottle[1]);
   /* the quill stands behind the bottle's card, its nib 5 cm down inside the glass */
   homework.home.set(HOMEWORK.bottle[0] + (0.5 - HOMEWORK.NIB[0]) * HOMEWORK.cw,
@@ -3180,8 +3200,12 @@ new THREE.TextureLoader().load(HOMEWORK.url, function (t) {
    carried around in a jam jar"), about 0.12 m, the jar drawn empty and its fire the page's. The glass came back pale and
    opaque, so the fire is laid over it as light, the glass glowing blue. His touch: a tap on the jar and the flames lean
    toward the tap, as the three warmed their hands at them in the cold stands, and settle back.
-   FIT is each object's height as a share of its cell, read off the drawing; the shelf's top is 1.9 m. */
-var CURIOS = { url: '../assets/layers/curios.png', aspect: 617 / 1383, y: 1.9, z: -4.72,
+   FIT is each object's height as a share of its cell, read off the drawing.
+   On the shelf (Godric, 10 October 2026, 5.04 pm: they stood on the wall above it): the drawn shelf's top runs from
+   1.9 m at the wall to 1.845 m at its front edge (fireplace.png, rows 240 to 262 at 400 px a metre). Stood at 1.9 m
+   and 18 cm before the drawing, seen from below, they rose onto the stone above its back line; now 2 cm before the
+   drawing, their feet on the top's middle, they keep to the drawn shelf at every drag. */
+var CURIOS = { url: '../assets/layers/curios.png', aspect: 617 / 1383, y: 1.865, z: -4.88,
   items: [{ x: -0.85, h: 0.224, fit: 1383 / 1383 }, { x: 0, h: 0.2, fit: 1171 / 1383 }, { x: 0.85, h: 0.12, fit: 865 / 1383 }] };
 var curios = { cards: [], jar: null, flames: [], lean: 0, leanT: 0 };
 new THREE.TextureLoader().load(CURIOS.url, function (t) {
