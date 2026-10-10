@@ -726,9 +726,10 @@ function updateHerPatches(dt) {
    from the walk's end so the hand is in her lap again 0.3 s before he stops */
 var herPrimp = null;
 var PRIMP = [[0, 'reach'], [0.55, 'ear'], [0.95, 'reach'], [1.2, 'ear'], [1.55, 'reach'], [1.85, 'lap']];
-function primpHer(walk) {
-  var lead = Math.max(0, (walk || 0) - 0.3 - PRIMP[PRIMP.length - 1][0]);
-  herPrimp = { t: -lead, steps: PRIMP.slice() };
+function primpHer(walk) {   /* on a shorter walk the beats close up, so it is always over before he stops */
+  var span = (walk || 0) - 0.3, end = PRIMP[PRIMP.length - 1][0], k = Math.min(1, span / end);
+  if (span < 0.9) return;
+  herPrimp = { t: -Math.max(0, span - end), steps: PRIMP.map(function (b) { return [b[0] * k, b[1]]; }) };
 }
 
 /* the hole behind her (8 October 2026): the room's round hole, 1.2 m across with its centre 1.2 m up, cut through the
@@ -766,6 +767,9 @@ var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vec
    doors (showFoot), the entrance hall "lit with flaming torches" (PS 7) */
 var doorTorches = [addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, HER_FACE), -1, 'doors-torch-her'),
   addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, FAR_FACE), 1, 'doors-torch-far')];
+/* Q25 (req 111, the Common room's): a third torch on the strip of outer wall the open hole sees, x -0.5, shown only by the
+   look switch ?strip=torch until David answers; on his yes it joins CORRIDOR.places.torches so the room draws it too */
+if (new URLSearchParams(location.search).get('strip') === 'torch') torches.push(addTorch(new THREE.Vector3(-0.5, 1.3, FAR_FACE), 1, 'corridor-torch-3'));
 doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = false; torches.push(tc); });
 /* the turn's torch, on the end wall to the left of the arch as he faces it, its flame leaning toward the arch as if a
    draught rose from far below (Godric's touch on Q14, 3.58 pm) */
@@ -996,8 +1000,11 @@ function updateGrounds(dt) {
   if (!here) grounds.last = -1;
   if (grounds.next && t >= grounds.next && !grounds.crossing) { grounds.crossing = { t: 0, dur: 10 }; grounds.next = 0; }
   if (grounds.crossing) { grounds.crossing.t += dt; if (grounds.crossing.t > grounds.crossing.dur) grounds.crossing = null; }
+  /* redrawn twenty times a second only while it can be seen moving (at the window, or Hagrid crossing); elsewhere once */
+  if (!here && !grounds.crossing) { if (!grounds.still) { drawGrounds(t); grounds.still = true; } return; }
+  grounds.still = false;
   grounds.acc = (grounds.acc || 0) + dt;
-  if (grounds.acc > 1 / 20) { grounds.acc = 0; drawGrounds(t); }   /* twenty frames a second is plenty for cloth */
+  if (grounds.acc > 1 / 20) { grounds.acc = 0; drawGrounds(t); }
 }
 var TAPESTRY = { w: 1.4, h: 2.0, x: NOOK_MID };
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
