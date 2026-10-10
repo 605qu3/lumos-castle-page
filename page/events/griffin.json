@@ -54,6 +54,7 @@
       "leans": [],
       "moment": "back from walk-up",
       "when": [
+        "place = common room",
         "time != night",
         "griffin = rearing",
         "griffin_moved != yes"
@@ -72,6 +73,7 @@
       "leans": [],
       "moment": "back from walk-up",
       "when": [
+        "place = common room",
         "time != night",
         "griffin = folded",
         "griffin_moved != yes"
@@ -90,6 +92,7 @@
       "leans": [],
       "moment": "back from walk-up",
       "when": [
+        "place = common room",
         "time != night",
         "griffin_moved != yes"
       ],

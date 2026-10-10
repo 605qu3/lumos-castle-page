@@ -35,10 +35,21 @@
     {
       "when": [
         "place = corridor",
-        "stair_to = doors"
+        "stair_to = doors",
+        "time != night"
       ],
       "show": [
         "at the flight's foot, the entrance hall's great oak front doors, torchlit, daylight under them"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = doors",
+        "time = night"
+      ],
+      "show": [
+        "at the flight's foot, the entrance hall's great oak front doors, torchlit, the gap under them dark"
       ]
     },
     {
@@ -234,6 +245,288 @@
       "show": [
         "on the way down the week's vanishing step is not there: the view dips a step with a small oof and goes on down to the landing"
       ]
+    },
+    {
+      "id": "stair.grounds-birds",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap stair 3-6 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing",
+        "time != night"
+      ],
+      "one_of": "grounds-first",
+      "weight": 4,
+      "who": [
+        {
+          "as": "grounds",
+          "role": "voice",
+          "name": "the grounds",
+          "mark": "under the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "grounds",
+          "medium": "heard",
+          "key": "stair.grounds-birds",
+          "sound": "birdsong, faint, through the gap under the doors"
+        }
+      ]
+    },
+    {
+      "id": "stair.grounds-owl",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap stair 3-6 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing",
+        "time = night"
+      ],
+      "one_of": "grounds-first",
+      "weight": 4,
+      "who": [
+        {
+          "as": "grounds",
+          "role": "voice",
+          "name": "the grounds",
+          "mark": "under the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "grounds",
+          "medium": "heard",
+          "key": "stair.grounds-owl",
+          "sound": "an owl hooting, far off, through the gap under the doors"
+        }
+      ]
+    },
+    {
+      "id": "stair.grounds-boots",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap stair 3-6 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing"
+      ],
+      "one_of": "grounds-first",
+      "weight": 1,
+      "who": [
+        {
+          "as": "grounds",
+          "role": "voice",
+          "name": "the grounds",
+          "mark": "under the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "grounds",
+          "medium": "heard",
+          "key": "stair.grounds-boots",
+          "sound": "far off across the grounds, slow heavy thuds, like a giant's boots",
+          "canon": "PS 8, Hagrid lives in a small wooden house on the edge of the forest, across the grounds; PS 4, \"a giant of a man\"; PS 5, his huge boots; checked against the text, 10 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "stair.grounds-birds-later",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 20-40 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing",
+        "time != night"
+      ],
+      "one_of": "grounds-later",
+      "weight": 4,
+      "who": [
+        {
+          "as": "grounds",
+          "role": "voice",
+          "name": "the grounds",
+          "mark": "under the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "grounds",
+          "medium": "heard",
+          "key": "stair.grounds-birds-later",
+          "sound": "birdsong, faint, through the gap under the doors"
+        }
+      ]
+    },
+    {
+      "id": "stair.grounds-owl-later",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 20-40 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing",
+        "time = night"
+      ],
+      "one_of": "grounds-later",
+      "weight": 4,
+      "who": [
+        {
+          "as": "grounds",
+          "role": "voice",
+          "name": "the grounds",
+          "mark": "under the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "grounds",
+          "medium": "heard",
+          "key": "stair.grounds-owl-later",
+          "sound": "an owl hooting, far off, through the gap under the doors"
+        }
+      ]
+    },
+    {
+      "id": "stair.grounds-boots-later",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 20-40 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing"
+      ],
+      "one_of": "grounds-later",
+      "weight": 1,
+      "who": [
+        {
+          "as": "grounds",
+          "role": "voice",
+          "name": "the grounds",
+          "mark": "under the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "grounds",
+          "medium": "heard",
+          "key": "stair.grounds-boots-later",
+          "sound": "far off across the grounds, slow heavy thuds, like a giant's boots",
+          "canon": "PS 8, Hagrid lives in a small wooden house on the edge of the forest, across the grounds; PS 4, \"a giant of a man\"; PS 5, his huge boots; checked against the text, 10 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "stair.grounds-still-later",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 20-40 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing"
+      ],
+      "one_of": "grounds-later",
+      "weight": 2,
+      "starts": []
+    },
+    {
+      "id": "stair.gallery-hush",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap stair",
+      "when": [
+        "place = corridor",
+        "at != landing",
+        "weekday = friday",
+        "stair_to = gallery",
+        "time != night"
+      ],
+      "show": [
+        "the gallery's whispering stops short as he comes down; the sitters sit very still, looking anywhere but at him"
+      ]
+    },
+    {
+      "id": "stair.gallery-whisper",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "back from walk-up",
+      "when": [
+        "place = corridor",
+        "at = landing",
+        "weekday = friday",
+        "stair_to = gallery",
+        "time != night"
+      ],
+      "one_of": "gallery-turn",
+      "weight": 3,
+      "who": [
+        {
+          "as": "sitters",
+          "role": "voice",
+          "name": "the gallery's sitters",
+          "mark": "gallery"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "sitters",
+          "medium": "heard",
+          "key": "stair.gallery-whisper",
+          "sound": "faint whispering from the gallery behind him",
+          "text": [
+            "Is that him? It is, isn't it?",
+            "Shh! He'll hear you!",
+            "Pass it on: he's turned round.",
+            "Don't point, Violet, it's rude.",
+            "The Fat Lady says he knows the password. Every week!"
+          ],
+          "canon": "PS 7, the people in the portraits whisper and point as the first-years pass; GoF 17 and 23, Violet, the Fat Lady's gossiping friend from downstairs; checked against the text, 10 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "stair.gallery-hold",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "back from walk-up",
+      "when": [
+        "place = corridor",
+        "at = landing",
+        "weekday = friday",
+        "stair_to = gallery",
+        "time != night"
+      ],
+      "one_of": "gallery-turn",
+      "weight": 1,
+      "starts": []
     }
   ]
 }

@@ -384,6 +384,7 @@
       ],
       "moment": "back from walk-up",
       "when": [
+        "place = common room",
         "game = on"
       ],
       "who": [
@@ -601,12 +602,44 @@
             "Watch this. {intro}",
             "Sit back. {intro}"
           ],
-          "canon": "the games' facts, checked 9 October 2026: the Opera Game, Paris 1858, in a box at the opera, 17. Rd8#, and the Immortal Game, London 1851, a bishop, both rooks and the queen given up (Wikipedia, the move lists); the Evergreen Game, 1852, its city dropped since the first printings give none (Edward Winter, chesshistory.com), provisional, Godric to confirm; the giant board, PS 16, Ron a knight taken so Harry in a bishop's place can checkmate, checked against the text"
+          "canon": "the games' facts, checked 9 October 2026: the Opera Game, Paris 1858, in a box at the opera, 17. Rd8#, and the Immortal Game, London 1851, a bishop, both rooks and the queen given up (Wikipedia, the move lists); the Evergreen Game, 1852, its city dropped since the first printings give none (Edward Winter, chesshistory.com), settled by Godric 9 October 2026, 7.06 pm; the giant board, PS 16, Ron a knight taken so Harry in a bishop's place can checkmate, checked against the text"
         }
       ],
       "starts": [
         "set famous = from bag famous",
         "set game = showing"
+      ]
+    },
+    {
+      "id": "chess.famous-pawn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "after tap chess king 4-8 s",
+      "when": [
+        "game = showing",
+        "famous = evergreen"
+      ],
+      "who": [
+        {
+          "as": "pawn",
+          "role": "trace",
+          "what": "a pawn in the replay",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pawn",
+          "medium": "said",
+          "key": "chess.famous-pawn",
+          "text": [
+            "Seen this one before. Anderssen. Hang on to your hat."
+          ],
+          "canon": "PS 12, wizard chessmen shout advice at their player (the set Seamus lent); Godric's words, 9 October 2026, 7.06 pm; checked against the text, 10 October 2026"
+        }
       ]
     },
     {

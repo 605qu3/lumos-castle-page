@@ -54,7 +54,8 @@
         }
       ],
       "show": [
-        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow"
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow",
+        "the torch beside the hole dips blue as nick drifts past it, then burns gold again"
       ],
       "lines": [
         {
@@ -99,7 +100,8 @@
         }
       ],
       "show": [
-        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow"
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow",
+        "the torch beside the hole dips blue as nick drifts past it, then burns gold again"
       ],
       "lines": [
         {
@@ -138,10 +140,61 @@
         "nick_passed != yes"
       ],
       "show": [
-        "nick drifts out from behind her open back, past the torch, its light through him, and on past the hole without stopping, out past its left edge"
+        "nick drifts out from behind her open back, past the torch, its light through him, and on past the hole without stopping, out past its left edge",
+        "the torch beside the hole dips blue as nick drifts past it, then burns gold again"
       ],
       "starts": [
         "set nick_passed = yes"
+      ]
+    },
+    {
+      "id": "passers.nick-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "passer",
+      "weight": 1,
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time != night",
+        "nick_met = yes",
+        "nick_passed != yes",
+        "nick_again != yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "ghost",
+          "name": "nearly headless nick",
+          "mark": "hole-stop",
+          "pose": "turned, bowing"
+        }
+      ],
+      "show": [
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow",
+        "the torch beside the hole dips blue as nick drifts past it, then burns gold again"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "pose": "turned, bowing",
+          "then": "drifts away toward the rest of the corridor, out past the hole's left edge",
+          "key": "passers.nick-again",
+          "text": [
+            "My dear boy! Back again! Sir Nicholas, at your service.",
+            "My dear boy! You came back! You must come to my deathday party one Halloween."
+          ],
+          "canon": "CoS 8, Nick's \"My dear boy!\" to Harry, and his deathday party at Halloween; checked against the text, 10 October 2026"
+        }
+      ],
+      "starts": [
+        "set nick_passed = yes",
+        "set nick_again = yes"
       ]
     },
     {
@@ -159,7 +212,8 @@
         "right_at != opposite",
         "time != night",
         "nick_met = yes",
-        "nick_passed != yes"
+        "nick_passed != yes",
+        "nick_again = yes"
       ],
       "who": [
         {
@@ -171,7 +225,8 @@
         }
       ],
       "show": [
-        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow"
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow",
+        "the torch beside the hole dips blue as nick drifts past it, then burns gold again"
       ],
       "lines": [
         {
@@ -187,6 +242,63 @@
             "Good day! Lovely weather for floating."
           ],
           "canon": "PS 8, the vanishing step; GoF 25, the trick step; checked against the text, 9 October 2026"
+        }
+      ],
+      "starts": [
+        "set nick_passed = yes"
+      ]
+    },
+    {
+      "id": "passers.nick-bows-deep",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "passer",
+      "weight": 1,
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time != night",
+        "nick_met = yes",
+        "nick_passed != yes",
+        "nick_again = yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "ghost",
+          "name": "nearly headless nick",
+          "mark": "hole-stop",
+          "pose": "turned, bowing"
+        }
+      ],
+      "show": [
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow",
+        "the torch beside the hole dips blue as nick drifts past it, then burns gold again"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "heard",
+          "pose": "bowing too deep, his head tipped past true",
+          "key": "passers.nick-cough",
+          "sound": "a small embarrassed cough as his head tips past true, and he sets it straight"
+        },
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "pose": "turned, bowing",
+          "then": "drifts away toward the rest of the corridor, out past the hole's left edge",
+          "key": "passers.nick-bows-deep",
+          "text": [
+            "Ahem. Nearly headless, you understand. Nearly.",
+            "Ahem. Do excuse me. It does that.",
+            "Ahem! Still attached. Mostly."
+          ],
+          "canon": "PS 7, his head falls onto his shoulder as if on a hinge, nearly headless; checked against the text, 10 October 2026"
         }
       ],
       "starts": [
@@ -266,7 +378,7 @@
       "source": "device",
       "leans": [],
       "one_of": "passer",
-      "weight": 12,
+      "weight": 15,
       "moment": "after tap hole 1-2 s",
       "when": [
         "place = common room",
