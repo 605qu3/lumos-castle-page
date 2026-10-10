@@ -635,7 +635,7 @@ scarf.name = 'scarf'; scene.add(scarf); register(scarf, 1);
 
 /* A drawing hung in place of its stand-in as soon as it loads, at its own width, its height (or, for a plan piece, its
    depth) from the drawing's own shape, about its centre. */
-function hangDrawing(m, url, w) {
+function hangDrawing(m, url, w, done) {
   var im = new Image();
   im.onload = function () {
     var t = tex(im);
@@ -643,14 +643,40 @@ function hangDrawing(m, url, w) {
     if (m.customDepthMaterial) { m.customDepthMaterial.map = t; m.customDistanceMaterial.map = t; }
     m.geometry.dispose();
     m.geometry = new THREE.PlaneGeometry(w, w * im.height / im.width);
+    if (done) done(im);
   };
   im.src = url;
+}
+/* A cloth lying on something (Godric, 9 October 2026, 8.21 pm: both scarves read so flat the boys may take them for
+   glitches): the drawing is laid on a gently rumpled sheet, so the light falls unevenly across its folds and it stands a
+   centimetre or two proud in places, tilted a few degrees toward the eye, with a soft shadow under it cut from its own
+   outline. lift is the rumple's height in metres, tilt the lean in degrees toward the stair head, where he first sees it */
+function clothHeight(u, v, lift) { return lift * (0.35 + 0.65 * (0.5 + 0.5 * Math.sin(u * 17 + 0.7) * Math.sin(v * 9 + 1.3))); }
+function layCloth(m, im, w, lift, tilt) {
+  var h = w * im.height / im.width, g = new THREE.PlaneGeometry(w, h, 40, 20), pos = g.attributes.position;
+  for (var i = 0; i < pos.count; i++) {
+    pos.setZ(i, clothHeight(pos.getX(i) / w, pos.getY(i) / h, lift));
+  }
+  g.computeVertexNormals();
+  m.geometry.dispose(); m.geometry = g;
+  var c = makeCanvas(Math.round(im.width / 4) + 24, Math.round(im.height / 4) + 24), cg = c.getContext('2d');
+  cg.filter = 'blur(5px)'; cg.drawImage(im, 12, 12, c.width - 24, c.height - 24); cg.filter = 'none';
+  cg.globalCompositeOperation = 'source-in'; cg.fillStyle = 'rgba(20,14,10,0.55)'; cg.fillRect(0, 0, c.width, c.height);
+  var sh = new THREE.Mesh(new THREE.PlaneGeometry(w * c.width / (c.width - 24), h * c.height / (c.height - 24)),
+    new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
+  sh.rotation.copy(m.rotation);
+  sh.position.set(m.position.x + 0.012, m.position.y - 0.004, m.position.z + 0.012);
+  sh.name = m.name + '-shadow'; scene.add(sh);
+  var toEye = new THREE.Vector3(-11.0 - m.position.x, 0, MID_Z - m.position.z).normalize();
+  m.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0).cross(toEye), tilt * Math.PI / 180));
+  m.position.y += Math.sin(tilt * Math.PI / 180) * Math.max(w, h) / 2;     /* so its near edge stays on what it lies on */
+  return sh;
 }
 /* the scarf (req 31, round 2, candidate 1, Godric, 9 October 2026, 5.14 pm): a Gryffindor scarf in soft knitted wool lying
    flat in a loose Z, fringed at both ends, 1.1 m across its bends and 0.61 deep, turned across the path as the strip was;
    the castle's house-scarf drawing, its exemplar the first of its kind */
 SCARF.w = 1.1;
-hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w);
+hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w, function (im) { layCloth(scarf, im, SCARF.w, 0.02, 2.5); });
 /* the settle's scarf (req 31; Godric, 9 October 2026: Hufflepuff, 6.15 pm; on the study-side settle by the mouth, 7.05 pm,
    from a plan of three, since the stair side is never in view as he arrives): a visitor's, left while waiting to be
    fetched; the house scarf's drawing recoloured yellow and black in code (pipeline/recolour_scarf.py), 0.9 m across its
@@ -661,7 +687,10 @@ var settleScarf = cutoutMesh(cutoutTexture(180, 100, '#c9a227', drawRect), SETTL
 settleScarf.rotation.set(-Math.PI / 2, 0, SETTLE_SCARF.turn * Math.PI / 180);
 settleScarf.position.set(SETTLE_SCARF.x, SETTLE.seat + 0.006, SETTLE_SCARF.z);
 settleScarf.name = 'settle-scarf'; scene.add(settleScarf); register(settleScarf, 1);
-hangDrawing(settleScarf, '../assets/layers/settle-scarf.png', SETTLE_SCARF.w);
+hangDrawing(settleScarf, '../assets/layers/settle-scarf.png', SETTLE_SCARF.w, function (im) {
+  layCloth(settleScarf, im, SETTLE_SCARF.w, 0.015, 2.5);
+  scarfTape.position.z = clothHeight(TAPE.at.x / SETTLE_SCARF.w, TAPE.at.y / (SETTLE_SCARF.w * im.height / im.width), 0.015) + 0.002;
+});
 /* its name tape (Godric, 7.05 pm): a tap on the scarf bends him over it, and a cotton tape sewn inside the end at the arm
    turns up, H. ABBOTT in red, the first name the Sorting Hat called (PS 7), a first-year waiting for a Gryffindor friend.
    Life size, 7 by 1.4 cm, a child of the scarf so it keeps the drawing's turn; once turned up it stays for the visit
