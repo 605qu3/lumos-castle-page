@@ -773,16 +773,43 @@ var boo = cutoutMesh(cutoutTexture(256, 96, '#6b5a48', function (g, w, h) {
 }), 1.2, 0.45);
 boo.rotation.x = -Math.PI / 2; boo.position.set(STICKS.x, 0.02, MID_Z); boo.name = 'sticks-boo'; boo.visible = false;
 scene.add(boo); register(boo, 1);
-var WINDOW = { w: 1.2, h: 2.4, sill: 0.9 };
-/* one window per portrait, the same drawing twice; the sill at -4.6 is the Remembrall's, later */
+var WINDOW = { w: 1.2, h: 2.4, sill: 0.9, deep: 0.45 };
+/* one window per portrait, the same drawing twice; the sill at -4.6 is the Remembrall's, later. Each is set in a real
+   opening through the outer wall (the Placement check, Godric, 10 October 2026, 5.08 pm: a flat painted window with a
+   shelf standing out of it read at a wrong angle): the far wall is cut with two round-headed openings the window's size,
+   the wall made WINDOW.deep thick so the openings have deep reveals, the glass and its frame at the back of each, and
+   the deep sill filling the opening's floor, its front 5 cm proud of the wall. */
+(function () {
+  var x0 = FAR_END_X, x1 = END_X, y0 = WALL_Y - WALL_H / 2, y1 = WALL_Y + WALL_H / 2;
+  var shape = new THREE.Shape();
+  shape.moveTo(x0, y0); shape.lineTo(x1, y0); shape.lineTo(x1, y1); shape.lineTo(x0, y1); shape.lineTo(x0, y0);
+  PORTRAIT_XS.forEach(function (wx) {
+    var r = WINDOW.w / 2, yb = WINDOW.sill - 0.03, ys = WINDOW.sill + WINDOW.h - r;
+    var hole = new THREE.Path();
+    hole.moveTo(wx - r, yb); hole.lineTo(wx - r, ys);
+    hole.absarc(wx, ys, r, Math.PI, 0, true);
+    hole.lineTo(wx + r, yb); hole.lineTo(wx - r, yb);
+    shape.holes.push(hole);
+  });
+  var g = new THREE.ExtrudeGeometry(shape, { depth: WINDOW.deep, bevelEnabled: false, curveSegments: 24 });
+  g.translate(0, 0, FAR_Z - WINDOW.deep);
+  farWall.geometry.dispose(); farWall.geometry = g;
+  farWall.position.set(0, 0, 0);
+})();
+var GLASS_Z = FAR_Z - WINDOW.deep;
 var windows = PORTRAIT_XS.map(function (wx, i) {
   var name = i ? 'window' : 'window-2';
-  var sky = onWallZ(cutoutTexture(120, 240, '#c9d6e2', drawArch), WINDOW.w * 0.8, WINDOW.h * 0.88, wx, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.005, 1, 3, name + '-sky');
+  var sky = onWallZ(cutoutTexture(120, 240, '#c9d6e2', drawArch), WINDOW.w, WINDOW.h, wx, WINDOW.sill + WINDOW.h / 2, GLASS_Z + 0.005, 1, 3, name + '-sky');
   sky.material = new THREE.MeshBasicMaterial({ map: sky.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
   sky.userData.base = sky.material.color.clone();
-  var frame = onWallZ(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) { arch(g, 0, 0, w, h); g.clearRect(w * 0.1, h * 0.06, w * 0.8, h * 0.82); g.fillRect(w * 0.46, h * 0.06, w * 0.08, h * 0.82); }, name), WINDOW.w, WINDOW.h, wx, WINDOW.sill + WINDOW.h / 2, FAR_FACE + 0.01, 1, 1, name);
-  /* the deep sill, where the Remembrall will sit in the dark */
-  var sill = box(scene, WINDOW.w * 0.9, 0.06, 0.4, wx, WINDOW.sill, FAR_Z + 0.2, solid(0x86827c), 1);
+  /* the frame in the glass: a narrow band round the opening's head and jambs, a bottom rail and a mullion */
+  var frame = onWallZ(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) {
+    arch(g, 0, 0, w, h);
+    g.globalCompositeOperation = 'destination-out'; arch(g, w * 0.06, w * 0.06, w * 0.88, h * 0.97 - w * 0.06); g.globalCompositeOperation = 'source-over';
+    g.fillRect(w * 0.47, w * 0.04, w * 0.06, h * 0.94);
+  }, name), WINDOW.w, WINDOW.h, wx, WINDOW.sill + WINDOW.h / 2, GLASS_Z + 0.01, 1, 1, name);
+  /* the deep sill, where the Remembrall will sit in the dark: the opening's floor, 5 cm proud of the wall */
+  var sill = box(scene, WINDOW.w, 0.06, WINDOW.deep + 0.05, wx, WINDOW.sill, FAR_Z - (WINDOW.deep - 0.05) / 2, solid(0x86827c), 1);
   sill.name = name + '-sill';
   return { x: wx, name: name, frame: frame, sky: sky, sill: sill };
 });
@@ -798,12 +825,13 @@ var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'
    that side (Godric, 8 October 2026 evening). Nothing on screen opens it yet: the tickle is Magic for the boys' design,
    Events' to wire; openDoor() swings it for shots. */
 var doorHinge = new THREE.Group();
-doorHinge.position.set(END_X - 0.01, 0, MID_Z - DOOR.w / 2);
+doorHinge.position.set(END_X + 0.001, 0, MID_Z - DOOR.w / 2);   /* the leaf in the wall's own plane, its edges on the opening's, so neither jamb shows past it from either side (the Placement check, 5.08 pm: 1 cm proud, a dark gap showed down its edge); lying open along the jamb it is drawn over it */
 scene.add(doorHinge);
 var door = cutoutMesh(cutoutTexture(100, 220, '#7a6a58', drawRect, 'door'), DOOR.w, DOOR.h);
 door.position.set(0, DOOR.h / 2, DOOR.w / 2);
 door.rotation.y = -Math.PI / 2;
 door.name = 'polite-door';
+door.material.polygonOffset = true; door.material.polygonOffsetFactor = -1; door.material.polygonOffsetUnits = -4;
 doorHinge.add(door); register(door, 1);
 var doorLeaf = { ang: 0, target: 0 }, DOOR_LEAF_OPEN = Math.PI / 2;
 function openDoor(open) { doorLeaf.target = open === false ? 0 : DOOR_LEAF_OPEN; }
@@ -862,29 +890,60 @@ function hangDrawing(m, url, w, done) {
   };
   im.src = url;
 }
-/* A heap of cloth standing on what it lies on (Godric, 9 October 2026, 8.21 pm: the flat scarves read as glitches; his
+/* A heap of cloth lying on what it lies on (Godric, 9 October 2026, 8.21 pm: the flat scarves read as glitches; his
    answer, 10 October 2026, 3.55 pm: a fresh drawing of the scarf in a loose heap seen three-quarter, round 3, candidate 3,
-   4.11 pm). The drawing is a card standing on the floor or the seat, turned to face yaw (radians) and leaning back tilt
-   degrees, with a soft round shadow under it; its plane is cut fine so its fringes can stir (stirCloth). */
+   4.11 pm; the Placement check, 5.08 pm: a card stood on a straight foot left the heap's drawn underside floating, since
+   it runs from 0.51 to 0.97 of the drawing's height across its width). The drawing is seen from an eye tilt degrees up,
+   looking along yaw (radians); each point of a finely cut plane is slid along that eye's line until it meets the
+   surface the heap lies on, raised by a low relief that grows inward from the heap's outline (rise metres at most, over
+   inward metres). From the drawing's own eye the picture is unchanged; from every other eye it lies on its surface, its
+   outline on the flags or the seat. The heap's middle is put at base, with a soft shadow the size of its footprint
+   under it; m.userData.heapAt(u, v) gives a point of the drawing (v from the top) on the heap, for what is sewn on it. */
 var HEAP_FRINGES = [{ u: 0.83, v: 0.84, r: 0.13 }, { u: 0.05, v: 0.46, r: 0.08 }];   /* on the drawing, v from the top */
-function standHeap(m, w, im, base, yaw, tilt) {
-  var h = w * im.height / im.width, g = new THREE.PlaneGeometry(w, h, 32, 22);
-  g.translate(0, h / 2, 0);                                  /* its foot on the base point */
-  var pos = g.attributes.position, rest = Float32Array.from(pos.array), weight = new Float32Array(pos.count);
-  for (var i = 0; i < pos.count; i++) {
-    var u = pos.getX(i) / w + 0.5, v = 1 - pos.getY(i) / h;
-    HEAP_FRINGES.forEach(function (f) { var d = Math.hypot(u - f.u, v - f.v) / f.r; if (d < 1) weight[i] = Math.max(weight[i], (1 - d * d)); });
+function standHeap(m, w, im, base, yaw, tilt, rise, inward) {
+  rise = rise === undefined ? 0.06 : rise; inward = inward === undefined ? 0.1 : inward;
+  var h = w * im.height / im.width, AW = 200, AH = Math.round(AW * im.height / im.width);
+  var c = makeCanvas(AW, AH), cg = c.getContext('2d');
+  cg.drawImage(im, 0, 0, AW, AH);
+  var alpha = cg.getImageData(0, 0, AW, AH).data, dist = new Float32Array(AW * AH), BIG = 1e6;
+  for (var i = 0; i < AW * AH; i++) dist[i] = alpha[i * 4 + 3] > 127 ? BIG : 0;
+  function relax(x, y, dx, dy, k) { var X = x + dx, Y = y + dy; var o = X < 0 || Y < 0 || X >= AW || Y >= AH ? 0 : dist[Y * AW + X]; if (o + k < dist[y * AW + x]) dist[y * AW + x] = o + k; }
+  for (var y = 0; y < AH; y++) for (var x = 0; x < AW; x++) { relax(x, y, -1, 0, 1); relax(x, y, 0, -1, 1); relax(x, y, -1, -1, 1.41); relax(x, y, 1, -1, 1.41); }
+  for (y = AH - 1; y >= 0; y--) for (x = AW - 1; x >= 0; x--) { relax(x, y, 1, 0, 1); relax(x, y, 0, 1, 1); relax(x, y, 1, 1, 1.41); relax(x, y, -1, 1, 1.41); }
+  function sample(u, v) {
+    var x = Math.min(AW - 1, Math.max(0, Math.round(u * AW - 0.5))), y = Math.min(AH - 1, Math.max(0, Math.round(v * AH - 0.5)));
+    return dist[y * AW + x] * w / AW;                       /* metres in from the outline, 0 outside it */
   }
+  var e = new THREE.Euler(-tilt * Math.PI / 180, yaw, 0, 'YXZ');
+  var d = new THREE.Vector3(0, 0, 1).applyEuler(e), r = new THREE.Vector3(1, 0, 0).applyEuler(e), q = new THREE.Vector3(0, 1, 0).applyEuler(e);
+  function onHeap(u, v) {                                   /* the card's point, slid along the eye's line onto the heap */
+    var C = r.clone().multiplyScalar((u - 0.5) * w).addScaledVector(q, (1 - v) * h);
+    var k = sample(u, v), lift = k > 0 ? 0.004 + rise * Math.sqrt(Math.min(1, k / inward)) : 0.002;
+    return C.addScaledVector(d, (lift - C.y) / d.y);
+  }
+  var g = new THREE.PlaneGeometry(w, h, 48, 32), pos = g.attributes.position, weight = new Float32Array(pos.count);
+  var lo = new THREE.Vector2(BIG, BIG), hi = new THREE.Vector2(-BIG, -BIG), P = new THREE.Vector3();
+  for (i = 0; i < pos.count; i++) {
+    var u = pos.getX(i) / w + 0.5, v = 0.5 - pos.getY(i) / h;
+    P.copy(onHeap(u, v)); pos.setXYZ(i, P.x, P.y, P.z);
+    if (sample(u, v) > 0) { lo.x = Math.min(lo.x, P.x); lo.y = Math.min(lo.y, P.z); hi.x = Math.max(hi.x, P.x); hi.y = Math.max(hi.y, P.z); }
+    HEAP_FRINGES.forEach(function (f) { var dd = Math.hypot(u - f.u, v - f.v) / f.r; if (dd < 1) weight[i] = Math.max(weight[i], (1 - dd * dd)); });
+  }
+  var mid = new THREE.Vector3((lo.x + hi.x) / 2, 0, (lo.y + hi.y) / 2);
+  g.translate(-mid.x, 0, -mid.z);
+  g.computeVertexNormals();
   m.geometry.dispose(); m.geometry = g;
-  m.rotation.set(-tilt * Math.PI / 180, yaw, 0, 'YXZ');
+  m.rotation.set(0, 0, 0);
   m.position.copy(base);
-  m.userData.cloth = { rest: rest, weight: weight, stir: 0, w: w, h: h };
-  var c = makeCanvas(64, 64), cg = c.getContext('2d'), grd = cg.createRadialGradient(32, 32, 4, 32, 32, 32);
-  grd.addColorStop(0, 'rgba(20,14,10,0.5)'); grd.addColorStop(1, 'rgba(20,14,10,0)');
-  cg.fillStyle = grd; cg.fillRect(0, 0, 64, 64);
-  var sh = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.05, w * 0.55), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
-  var back = 0.4 * h * Math.sin(tilt * Math.PI / 180);     /* under the heap's middle, which leans back from its foot */
-  sh.rotation.set(-Math.PI / 2, 0, yaw); sh.position.set(base.x - Math.sin(yaw) * back, Math.max(base.y, 0) + 0.003, base.z - Math.cos(yaw) * back);
+  m.userData.cloth = { rest: Float32Array.from(pos.array), weight: weight, stir: 0, w: w, h: h };
+  m.userData.heapAt = function (u, v) { return onHeap(u, v).sub(mid); };
+  m.userData.eye = { d: d, euler: e };
+  m.userData.footprint = { x: hi.x - lo.x, z: hi.y - lo.y };
+  var sc = makeCanvas(64, 64), sg = sc.getContext('2d'), grd = sg.createRadialGradient(32, 32, 6, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(20,14,10,0.55)'); grd.addColorStop(1, 'rgba(20,14,10,0)');
+  sg.fillStyle = grd; sg.fillRect(0, 0, 64, 64);
+  var sh = new THREE.Mesh(new THREE.PlaneGeometry((hi.x - lo.x) * 1.2, (hi.y - lo.y) * 1.2), new THREE.MeshBasicMaterial({ map: tex(sc), transparent: true, depthWrite: false }));
+  sh.rotation.set(-Math.PI / 2, 0, 0); sh.position.set(base.x, base.y + 0.001, base.z);
   sh.name = m.name + '-shadow'; scene.add(sh);
   m.userData.shadow = sh;
   return h;
@@ -908,12 +967,12 @@ function stirCloth(m, dt, near) {
   c.moved = c.stir > 0;
 }
 /* the dropped scarf: a Gryffindor scarf in a loose heap on the flags across the path 1.6 m short of her, as if a boy
-   dropped it running in, 0.75 m across, standing to face the stair head, leaning back a little; the house-scarf exemplar's
+   dropped it running in, 0.75 m across, lying on the flags as drawn from an eye 38 degrees up toward the stair head; the house-scarf exemplar's
    second drawing. If he walks onto it, it slides a few centimetres along the flags the way he was going (3.55 pm). */
 SCARF.w = 0.75;
 var scarfSlide = { last: null, off: new THREE.Vector3(), go: null, armed: true };
 hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w, function (im) {
-  standHeap(scarf, SCARF.w, im, new THREE.Vector3(SCARF.x, -0.02, SCARF.z), -Math.PI / 2, 38);   /* sunk 2 cm so the near fringe lies on the flags */
+  standHeap(scarf, SCARF.w, im, new THREE.Vector3(SCARF.x, 0, SCARF.z), -Math.PI / 2, 38, 0.07, 0.1);
 });
 function updateScarf(dt) {
   var cam = camera.position, moving = scarfSlide.last ? cam.distanceTo(scarfSlide.last) / Math.max(dt, 1e-3) : 0;
@@ -937,15 +996,18 @@ function updateScarf(dt) {
 /* the settle's scarf (req 31; Godric, 9 October 2026: Hufflepuff, 6.15 pm; on the study-side settle by the mouth, 7.05 pm,
    from a plan of three, since the stair side is never in view as he arrives): a visitor's, left while waiting to be
    fetched; the heap recoloured yellow and black in code (pipeline/recolour_scarf.py, 4.11 pm: "the settle's twin follows
-   as its recolour"), 0.75 m across, standing on the seat near its front edge facing out of the settle, leaning back
-   toward its back, seen on a look right as he arrives. 800 by 532 */
-var SETTLE_SCARF = { x: NOOK_X0 - SETTLE.d + 0.15, z: NOOK_BACK - SETTLE.len + 0.08 + 0.45, w: 0.75 };
+   as its recolour"), lying on the seat as drawn from an eye 40 degrees up out of the settle, 0.5 m across (0.75 until
+   the Placement check, 5.08 pm, since lying it would overhang the seat), seen on a look right as he arrives. 800 by 532 */
+var SETTLE_SCARF = { x: NOOK_X0 - 0.08 - (SETTLE.d - 0.08) / 2, z: NOOK_BACK - SETTLE.len + 0.08 + 0.45, w: 0.5 };   /* lying, its footprint 0.5 by 0.48 m, so it fits the seat between its front edge and its back (5.08 pm) */
 var settleScarf = cutoutMesh(cutoutTexture(180, 100, '#c9a227', drawRect), SETTLE_SCARF.w, 0.5);
 settleScarf.position.set(SETTLE_SCARF.x, SETTLE.seat, SETTLE_SCARF.z);
 settleScarf.name = 'settle-scarf'; scene.add(settleScarf); register(settleScarf, 1);
 hangDrawing(settleScarf, '../assets/layers/settle-scarf.png', SETTLE_SCARF.w, function (im) {
-  var h = standHeap(settleScarf, SETTLE_SCARF.w, im, new THREE.Vector3(SETTLE_SCARF.x, SETTLE.seat, SETTLE_SCARF.z), -Math.PI / 2, 40);
-  scarfTape.position.set((TAPE.u - 0.5) * SETTLE_SCARF.w, (1 - TAPE.v) * h, 0.003);
+  standHeap(settleScarf, SETTLE_SCARF.w, im, new THREE.Vector3(SETTLE_SCARF.x, SETTLE.seat, SETTLE_SCARF.z), -Math.PI / 2, 40, 0.05, 0.08);
+  /* the tape lies on the heap where the drawing has it, in the drawing's plane, 2.5 cm toward its eye so the relief never covers it */
+  var eye = settleScarf.userData.eye;
+  scarfTape.position.copy(settleScarf.userData.heapAt(TAPE.u, TAPE.v)).addScaledVector(eye.d, 0.025);
+  scarfTape.rotation.copy(eye.euler); scarfTape.rotateZ(TAPE.turn * Math.PI / 180);
 });
 /* its name tape (Godric, 7.05 pm): a tap on the scarf bends him over it, and a cotton tape sewn inside the end at the arm
    turns up, H. ABBOTT in red, the first name the Sorting Hat called (PS 7), a first-year waiting for a Gryffindor friend.
@@ -1419,7 +1481,7 @@ var TREVOR = { w: 0.2, h: 0.14, hitW: 0.5, hitH: 0.38 };
 var TREVOR_MARKS = {
   'suit-feet': function () { return [armour.position.x, 0, armour.position.z + 0.4]; },
   'suit-flags': function () { return [armour.position.x - 0.65, 0, armour.position.z + 0.25]; },
-  'suit-sill': function () { return [-2.3, WINDOW.sill + 0.03, FAR_Z + 0.37]; },
+  'suit-sill': function () { return [-2.3, WINDOW.sill + 0.03, FAR_Z + 0.02]; },   /* the sill's front edge, 5 cm proud of the wall since the openings (5.08 pm) */
   halfway: function () { return [-2.2, 0, -1.3]; },
   'by-her': function () { return [-0.45, 0, HER_Z - 0.39]; }
 };
