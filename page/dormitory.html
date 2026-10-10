@@ -172,7 +172,7 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=11"></script>
+<script src="castle-events.js?v=12"></script>
 <script>
 (function () {
 'use strict';
@@ -347,6 +347,42 @@ var windows = WINDOWS.map(function (W) {
   return { name: W.name, deg: W.deg, view: W.view, sky: sky, sill: sill, moon: moon };
 });
 
+/* the real moon in W3's sky, above the lawn (PA 15; board req 97, Magic's "The real moon, how real", Godric's pick of
+   10 October 2026, 5.16 pm): the runtime's moon() (req 95), its phase drawn lit on the right while waxing, the left
+   while waning, set as high in the glass as it stands in the sky, and gone while it is down. Seen larger than the
+   real half degree so the phase reads in the greybox; the drawing sets its size later. Its place is lumosGreybox.moon(),
+   so the full moon's owl (Magic's, to come) can cross it. */
+var MOON = { win: 'W3', d: 0.16, low: 2.0, high: 2.85 };
+var moonCanvas = makeCanvas(128, 128), moonTex = tex(moonCanvas);
+var moonDisc = new THREE.Mesh(new THREE.PlaneGeometry(MOON.d, MOON.d),
+  new THREE.MeshBasicMaterial({ map: moonTex, transparent: true, depthWrite: false, fog: false }));
+moonDisc.name = MOON.win + '-moon'; moonDisc.visible = false; scene.add(moonDisc);
+var moonNow = null;
+function drawMoon(m) {
+  var g = moonCanvas.getContext('2d'), r = 60, c = 64;
+  g.clearRect(0, 0, 128, 128);
+  g.fillStyle = 'rgba(60,70,90,0.35)'; g.beginPath(); g.arc(c, c, r, 0, Math.PI * 2); g.fill();   /* the dark limb, faint */
+  var e = m.age / 29.53 * Math.PI * 2, side = m.waxing ? 1 : -1, k = Math.cos(e);   /* the terminator's half width, +1 new to -1 full */
+  g.fillStyle = '#f4f0e2'; g.beginPath();
+  g.arc(c, c, r, -Math.PI / 2, Math.PI / 2, side < 0);                                 /* the lit limb's half */
+  g.ellipse(c, c, Math.abs(k) * r, r, 0, Math.PI / 2, -Math.PI / 2, (k > 0) === (side > 0));   /* back by the terminator */
+  g.fill();
+  moonTex.needsUpdate = true;
+}
+function placeMoon() {
+  var m = castle && castle.moon ? castle.moon() : null;
+  moonNow = m;
+  if (!m || !m.up || m.lit < 0.02) { moonDisc.visible = false; return m; }
+  drawMoon(m);
+  var W = windows.filter(function (w) { return w.name === MOON.win; })[0];
+  var p = pol(WALL_R - 0.05, W.deg);
+  moonDisc.position.set(p.x, lerp(MOON.low, MOON.high, clamp(m.height / 0.6, 0, 1)), p.z);   /* 0.6 of the way overhead fills the glass */
+  moonDisc.lookAt(0, moonDisc.position.y, 0);
+  moonDisc.material.opacity = light === 'night' ? 1 : 0.45;                           /* a day moon, pale */
+  moonDisc.visible = true;
+  return m;
+}
+
 /* the stair head: the well in the floor round the newel, its dark inside, the newel post rising 1.0 m above the floor,
    the top treads coming up clockwise seen from above with the last flush on the room side, and a low kerb round the
    well open to the room */
@@ -394,15 +430,23 @@ function clockTime() {
   var q = new URLSearchParams(location.search).get('time');
   return LIGHTS[q] ? q : 'night';
 }
+/* By night the windows' light is the moon's (req 97): starlight alone on a moonless night, the full measure at the
+   full moon, following how much of it is lit while it is up; the fire stays the room's main light and is made up warmer
+   as the moon wanes, so a moonless night is no darker in the room (the night rule), only in the glass. */
+var STARLIGHT = 0.3, MOONLESS_SKY = 0x7c8698, FIRE_MAKES_UP = { fire: 0.6, hemi: 0.6 };
 function setLight(name) {
   var L = LIGHTS[name] || LIGHTS.night;
   light = LIGHTS[name] ? name : 'night';
+  var m = placeMoon(), moonK = light === 'night' ? lerp(STARLIGHT, 1, m ? m.light : 1) : 1;
   windows.forEach(function (w) {
-    w.moon.color.copy(col(L.win)); w.moon.userData.base = (w.name === 'W3' ? 1.1 : 0.6) * L.winK;
-    w.sky.material.color.copy(col(L.sky)); w.sky.userData.base = w.sky.material.color.clone();
+    w.moon.color.copy(col(L.win)); w.moon.userData.base = (w.name === 'W3' ? 1.1 : 0.6) * L.winK * moonK;
+    w.sky.material.color.copy(col(L.sky));
+    if (light === 'night') w.sky.material.color.lerp(col(MOONLESS_SKY), 1 - (m ? m.light : 1));
+    w.sky.userData.base = w.sky.material.color.clone();
   });
-  hemi.color.copy(col(L.hemiSky)); hemi.groundColor.copy(col(L.hemiGround)); hemi.userData.base = L.hemi;
-  fireK = L.fire;
+  var dark = light === 'night' ? 1 - (m ? m.light : 1) : 0;   /* the moon's want, made up by the fire */
+  hemi.color.copy(col(L.hemiSky)); hemi.groundColor.copy(col(L.hemiGround)); hemi.userData.base = L.hemi * (1 + FIRE_MAKES_UP.hemi * dark);
+  fireK = L.fire * (1 + FIRE_MAKES_UP.fire * dark);
   dim(dimK < 1);
   return light;
 }
@@ -759,9 +803,36 @@ setView(view);
    the common room below, so they come up the stair well in faint italic. They play through the night too: lights out
    and the darkening start together, and the lines sit above the veil. This page lists no figures, so a record with a
    figure in its cast does not fire here. */
+/* Neville's bed is the corner one (CoS 15, his snores "from the corner"; board req 89): the last of the row, at the
+   far end of the arc from the stair, beside W2 */
+var CORNER_BED = 'bed-5';
 var SPEAKER_AT = {
-  percy: function () { return NEWEL.clone().setY(0.6); }   /* his mark is the stair's top, below: heard up the well */
+  percy: function () { return NEWEL.clone().setY(0.6); },  /* his mark is the stair's top, below: heard up the well */
+  neville: function () { return bedPoint(CORNER_BED, 0, 1.4, BED.l / 2); }   /* behind his drawn hangings */
 };
+function bedPoint(name, x, y, z) {
+  var b = beds.filter(function (q) { return q.name === name; })[0];
+  return b.group.localToWorld(new THREE.Vector3(x, y, z));
+}
+/* the hangings stir (the snore's cue): the drawn panels of a bed sway out and back a few centimetres and settle, as
+   cloth does when someone turns over behind it; lumosGreybox.stir(name) */
+var STIR = { secs: 1.8, cm: 0.035, hz: 2.2 };
+function stir(name) {
+  var b = beds.filter(function (q) { return q.name === name; })[0];
+  if (b) b.stirT = STIR.secs;
+  return !!b;
+}
+function updateStirs(dt) {
+  beds.forEach(function (b) {
+    if (!b.stirT) return;
+    b.stirT = Math.max(0, b.stirT - dt);
+    var u = 1 - b.stirT / STIR.secs, off = STIR.cm * Math.sin(u * STIR.secs * STIR.hz * Math.PI * 2) * (1 - u) * (1 - u);
+    b.drawn.forEach(function (m, i) {
+      if (i < 2) m.position.x = (i === 0 ? -1 : 1) * (BED.w / 2 + 0.02 + off);   /* a side bellies out */
+      else m.position.z = BED.l + 0.02 + off * (i === 2 ? 1 : 0.7);              /* the foot halves, a little apart */
+    });
+  });
+}
 var linesEl = document.getElementById('lines');
 var lineQ = [], lineCur = null;
 function showLines(list) { for (var i = 0; i < list.length; i++) lineQ.push(list[i]); }
@@ -850,7 +921,9 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the dormitory's lights out: the room dimmed, the hangings drawn bed by bed, his last, and the screen darkens; then the page ends the visit": function () {
       if (night || leaving) return;
       startNight('bedtime', 0, false, { pos: camera.position.clone(), look: lookTmp.clone() });
-    }
+    },
+    /* Neville's snore on a night waking (board req 89): his line comes from the corner bed (SPEAKER_AT) */
+    'behind the drawn hangings of the corner bed, a loud snore, and the hangings stir': function () { stir(CORNER_BED); }
   },
   showLines: showLines,
   builtins: { at: function () { return atStop ? atStop.name : 'none'; } }
@@ -867,13 +940,16 @@ else if (kit.from === 'sleep') startNight('waking');
 /* ---------- per frame ---------- */
 
 var clock = new THREE.Clock();
-var t = 0;
+var t = 0, moonClock = 0;
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   t += dt;
   if (castle && !leaving) castle.tick(dt);   /* going down the well, the clock waits for the common room */
   updateCamera(dt);
   updateLines(dt);
+  updateStirs(dt);
+  moonClock += dt;
+  if (moonClock > 60 && !night && !leaving) { moonClock = 0; setLight(light); }   /* the moon rises and sets through a long visit, never mid-sequence */
   /* the fire low: a slow flicker */
   var f = 0.85 + 0.15 * Math.sin(t * 9) * Math.sin(t * 3.7);
   fireGlow.intensity = 1.5 * f * dimK * fireK;
@@ -888,7 +964,8 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
-  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, dim: dim, pose: pose, setLight: setLight, light: function () { return light; },
+  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, stir: stir, dim: dim, pose: pose,
+  moon: function () { return { now: moonNow, shown: moonDisc.visible, window: MOON.win, at: moonDisc.position.toArray().map(function (v) { return +v.toFixed(2); }), d: MOON.d }; }, setLight: setLight, light: function () { return light; },
   bedtime: function () { startNight('bedtime'); }, waking: function () { startNight('waking'); },
   holdNight: function (kind, t) {
     if (kind !== 'here') { startNight(kind, t, true); return nightEnd(kind); }
