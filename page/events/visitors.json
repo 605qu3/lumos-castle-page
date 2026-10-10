@@ -850,10 +850,9 @@
       "who": [
         {
           "as": "fat-lady",
-          "role": "canon",
+          "role": "voice",
           "name": "the fat lady",
-          "mark": "her frame",
-          "pose": "her own, turned along the corridor"
+          "mark": "her frame"
         }
       ],
       "lines": [

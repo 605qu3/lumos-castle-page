@@ -223,10 +223,9 @@
       "who": [
         {
           "as": "fat-lady",
-          "role": "canon",
+          "role": "voice",
           "name": "the fat lady",
-          "mark": "her frame",
-          "pose": "her own, looking along the corridor"
+          "mark": "her frame"
         }
       ],
       "lines": [
