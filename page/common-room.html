@@ -623,6 +623,10 @@ Percy's hand an italic quill with printed capitals (Godric, 6.13 pm, no marker f
 the student pool's second sheet, 9 October 2026 (board req 76, People's): cells 4 to 7 on its own texture and scale;
 the two heralds speaking where the fire's listeners stand, the chess pair seated on the rug's front left by their hip
 points with a grey board between them (Godric's spot A, 6.13 pm, People's 1.75 m scale); a tap on the board raises chess.
+cloak-hook, round 2, 10 October 2026 (req 28 item 6): candidate 1 of two, Godric's pick (6.06 pm), the round 1 pair
+turned down for hanging facing out. Keyed at 1189 x 2488 px, 2378 px per metre, darkened toward true black in code
+(pipeline/cloak_darken.py: median grey 55 to 28, the ink, the lining and the clasp's rim kept), placed at 0.5 m wide,
+1.05 m high with its hook, left of the ring. Checks and the other candidate in pipeline/runs/cloak-hook/r2/.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="lines" aria-live="polite"></div>
@@ -1659,7 +1663,7 @@ function updatePapers(dt, t) {
   draught = lerp(draught, target, Math.min(1, dt * 2.5));
   for (var i = 0; i < papers.length; i++) {
     var p = papers[i];
-    if (p === held || p.spec.fixed || p.spec.sill || p.spec.onScarf || p.spec.inSatchel) continue;
+    if (p === held || p.spec.fixed || p.spec.sill || p.spec.onScarf || p.spec.onCloak || p.spec.inSatchel) continue;
     var a = p.spec.pins === 'two' ? 0.35 : 1;
     p.pivot.rotation.x = -a * draught * (0.022 * (1 + Math.sin(t * 5.5 + p.phase)) + 0.008 * (1 + Math.sin(t * 9.1 + p.phase * 2)));
     if (p.spec.pins !== 'two') p.pivot.rotation.z = p.spec.rot + draught * 0.012 * Math.sin(t * 4 + p.phase);
@@ -2015,11 +2019,12 @@ function alphaOf(im) {
   g.drawImage(im, 0, 0);
   return { w: im.width, h: im.height, a: g.getImageData(0, 0, im.width, im.height).data };
 }
-function scarfSolid(uv) {
-  if (!scarfAlpha || !uv) return true;
-  var x = Math.min(scarfAlpha.w - 1, Math.floor(uv.x * scarfAlpha.w)), y = Math.min(scarfAlpha.h - 1, Math.floor((1 - uv.y) * scarfAlpha.h));
-  return scarfAlpha.a[(y * scarfAlpha.w + x) * 4 + 3] > 100;
+function alphaSolid(al, uv) {
+  if (!al || !uv) return true;
+  var x = Math.min(al.w - 1, Math.floor(uv.x * al.w)), y = Math.min(al.h - 1, Math.floor((1 - uv.y) * al.h));
+  return al.a[(y * al.w + x) * 4 + 3] > 100;
 }
+function scarfSolid(uv) { return alphaSolid(scarfAlpha, uv); }
 new THREE.TextureLoader().load(SCARF.url, function (t) {
   t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
   var h = SCARF.w * t.image.height / t.image.width;
@@ -2045,18 +2050,22 @@ function placeScarfTape(sway) {
   scarfTape.pivot.position.copy(scarf.localToWorld(_scarfTapeAt));
 }
 /* the name tape: a woven cotton tape in red capitals, sewn on with his gran's overcast stitches */
-function drawNameTape(g, W, H, rnd) {
+function drawNameTape(g, W, H, rnd) { tapeStrip(g, 0, W, H, 'N. LONGBOTTOM', false, rnd); }
+/* one strip of tape from y0, H tall: its stitches, the name, and a struck name's ruled line through it */
+function tapeStrip(g, y0, W, H, name, struck, rnd) {
   g.strokeStyle = 'rgba(150,40,40,0.55)'; g.lineWidth = 2.2;
   for (var sx = 12; sx < W - 8; sx += 22) {            /* overcast stitches along the top and bottom edges */
-    handLine(g, sx, 2, sx + 5, 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
-    handLine(g, sx + 6, H - 2, sx + 11, H - 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
+    handLine(g, sx, y0 + 2, sx + 5, y0 + 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
+    handLine(g, sx + 6, y0 + H - 2, sx + 11, y0 + H - 9, 'rgba(120,30,30,0.5)', 1.8, rnd);
   }
   g.fillStyle = '#b3242c'; g.textAlign = 'center'; g.textBaseline = 'middle';
   var px = H * 0.46;
   g.font = 'bold ' + Math.round(px) + 'px Georgia, "Times New Roman", serif';
-  px *= Math.min(1, 0.8 * W / g.measureText('N. LONGBOTTOM').width);
+  var tw = g.measureText(name).width;
+  px *= Math.min(1, 0.8 * W / tw); tw *= Math.min(1, 0.8 * W / tw);
   g.font = 'bold ' + Math.round(px) + 'px Georgia, "Times New Roman", serif';
-  g.fillText('N. LONGBOTTOM', W / 2, H / 2 + 2);
+  g.fillText(name, W / 2, y0 + H / 2 + 2);
+  if (struck) handLine(g, (W - tw) / 2 - 6, y0 + H / 2 + 3, (W + tw) / 2 + 6, y0 + H / 2, '#2a2420', 3.2, rnd);
   g.textAlign = 'left';
 }
 var scarfTape = (function () {
@@ -2107,6 +2116,85 @@ function scarfGone() {
   if (back.getHours() >= 7) back.setDate(back.getDate() + 1);
   back.setHours(7, 0, 0, 0);
   return Date.now() < back.getTime();
+}
+/* the cloak on its hook by the portrait hole (req 28 item 6): "One winter cloak (black, silver fastenings)" and "all
+   pupils' clothes should carry name tags" (PS 5). Left of the ring, 0.15 m off it, where the boys come in (Godric's Q1,
+   assets/review/cloak-spot.jpg); hung as a cloak is always hung, by its collar loop with its back to the room (his
+   5.35 pm; round 2, candidate 1, his pick at 6.06 pm), darkened toward true black in code with the ink kept
+   (pipeline/cloak_darken.py). The loop sits on the blacksmith's hook at 1.5 m, 12.7 percent down the drawing, and the
+   hem falls to about 0.57 m. A flat card 3 cm proud of the round wall (it bows 6 mm over 0.5 m), a soft silhouette
+   behind it on the stone. His touches: the clasp's silver rim catches the firelight now and then, more when the fire
+   is worked; a name tag sewn inside the collar peeks above it between the loop's legs, too small to read, and a tap
+   on the cloak brings it to his hand to read, as a notice is: Ron's hand-me-down, his brothers' names struck through
+   (PS 6, "I've got Bill's old robes"). */
+var CLOAK = { url: '../assets/layers/cloak-hook.png', w: 0.5, aspect: 2488 / 1189, hangV: 0.127, hangY: 1.5,
+              theta: HOLE_THETA + 1.25 / WALL_R, r: WALL_R - 0.03,
+              clasp: [0.845, 0.37], peek: [0.51, 0.149],
+              names: [['B. WEASLEY', true], ['C. WEASLEY', true], ['P. WEASLEY', true], ['R. WEASLEY', false]] };
+var cloak = null, cloakAlpha = null, cloakPeek = null, cloakGlint = null, glintT = -1, glintNext = 4 + 6 * Math.random();
+new THREE.TextureLoader().load(CLOAK.url, function (t) {
+  t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  var h = CLOAK.w * CLOAK.aspect;
+  cloak = cutoutMesh(t, CLOAK.w, h);
+  cloakAlpha = alphaOf(t.image);
+  onWall(cloak, CLOAK.theta, CLOAK.hangY + CLOAK.hangV * h - h / 2, CLOAK.r);
+  cloak.name = 'cloak-hook'; register(cloak, 2); tappables.push(cloak);
+  /* its soft shadow on the stone: the drawing's own outline, shrunk and blown back up so the filtering blurs it */
+  var sc = makeCanvas(24, Math.round(24 * CLOAK.aspect)), sg = sc.getContext('2d');
+  sg.drawImage(t.image, 2, 2, sc.width - 4, sc.height - 4);
+  sg.globalCompositeOperation = 'source-in'; sg.fillStyle = '#000'; sg.fillRect(0, 0, sc.width, sc.height);
+  var shade = new THREE.Mesh(new THREE.PlaneGeometry(CLOAK.w * 1.08, h * 1.04),
+    new THREE.MeshBasicMaterial({ map: tex(sc), transparent: true, opacity: 0.5, depthWrite: false }));
+  onWall(shade, CLOAK.theta, cloak.position.y - 0.015, WALL_R - 0.012);
+  shade.name = 'cloak-hook-shade'; register(shade, 2);
+  /* the tag's peek: a sliver of cream tape, a red smudge of a name on it */
+  var pc = makeCanvas(48, 20), pg = pc.getContext('2d');
+  pg.fillStyle = '#e8dcc2'; pg.fillRect(0, 0, 48, 20);
+  pg.fillStyle = 'rgba(170,40,44,0.8)'; pg.fillRect(8, 9, 32, 4);
+  cloakPeek = new THREE.Mesh(new THREE.PlaneGeometry(0.022, 0.009), new THREE.MeshStandardMaterial({ map: tex(pc), roughness: 0.96 }));
+  cloakPeek.position.set((CLOAK.peek[0] - 0.5) * CLOAK.w, h / 2 - CLOAK.peek[1] * h, -0.004);   /* just behind the collar's line */
+  cloak.add(cloakPeek); tappables.push(cloakPeek);
+  /* the glint on the clasp's rim */
+  var gc = makeCanvas(32, 32), gg = gc.getContext('2d'), gr = gg.createRadialGradient(16, 16, 0, 16, 16, 16);
+  gr.addColorStop(0, 'rgba(255,250,235,1)'); gr.addColorStop(0.25, 'rgba(255,225,170,0.6)'); gr.addColorStop(1, 'rgba(255,200,140,0)');
+  gg.fillStyle = gr; gg.fillRect(0, 0, 32, 32);
+  cloakGlint = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(gc), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0, fog: false }));
+  cloakGlint.scale.set(0.035, 0.035, 1);
+  cloakGlint.position.set((CLOAK.clasp[0] - 0.5) * CLOAK.w, h / 2 - CLOAK.clasp[1] * h, 0.01);
+  cloak.add(cloakGlint);
+  cloak.updateMatrixWorld();
+  cloakTape.pivot.position.copy(cloak.localToWorld(cloakPeek.position.clone().setZ(0.01)));
+  cloakTape.pivot.quaternion.copy(cloak.quaternion);
+});
+function drawCloakTape(g, W, H, rnd) {
+  var n = CLOAK.names.length, s = H / n;
+  for (var i = 0; i < n; i++) {
+    if (i) handLine(g, 4, i * s, W - 4, i * s + 1, 'rgba(120,100,80,0.45)', 1.5, rnd);   /* where one tape is sewn below the last */
+    tapeStrip(g, i * s, W, s, CLOAK.names[i][0], CLOAK.names[i][1], rnd);
+  }
+}
+var cloakTape = (function () {
+  var spec = { id: 'cloak-tag', w: 0.1, h: 0.022 * CLOAK.names.length, pin: [0, 0], pins: 'none', rot: 0, z: 0, tile: 'cream',
+    torn: [], age: 0.25, draw: drawCloakTape, onCloak: true };
+  var tp = makePaper(spec, papers.length);
+  tp.hidden = true;
+  scene.add(tp.pivot);
+  return tp;
+})();
+function cloakTap() { if (!held) liftPaper(cloakTape); }
+function updateCloak(dt) {
+  if (!cloak) return;
+  cloakTape.mesh.visible = held === cloakTape;
+  cloakTape.shadow.visible = false;
+  /* now and then, and at once when the fire is worked, the firelight runs along the clasp's rim */
+  if (glintT < 0) {
+    glintNext -= dt;
+    if (glintNext <= 0 || (fireStoke > 0.9 && glintNext < 3)) { glintT = 0; glintNext = 7 + 9 * Math.random(); }
+  } else {
+    glintT += dt;
+    if (glintT > 0.7) glintT = -1;
+  }
+  cloakGlint.material.opacity = glintT < 0 ? 0 : Math.sin(Math.PI * glintT / 0.7) * (0.55 + 0.45 * fireStoke) * (0.35 + 0.65 * fireLevel);
 }
 var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, 1.75, -3.35, 2);
 sofa.name = 'sofa'; stairs.name = 'stairs'; chairL.name = 'armchair-left';
@@ -3606,6 +3694,7 @@ function tap(cx, cy) {
   var hits = raycaster.intersectObjects(tappables, false).filter(function (h) {
     if (h.object === scarf) return scarf.visible && scarfSolid(h.uv);
     if (h.object === satchel) return satchelSolid(h.uv);
+    if (h.object === cloak) return alphaSolid(cloakAlpha, h.uv);
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
@@ -3634,6 +3723,7 @@ function tap(cx, cy) {
   else if (hit === scarf) scarfTap();
   else if (hit === satchel) satchelTap();
   else if (hit === curios.jar) jarTap(hits[0].point);
+  else if (hit === cloak || hit === cloakPeek) cloakTap();
   else if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
   /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
@@ -4128,6 +4218,7 @@ function frame() {
   updatePapers(dt, t);
   updateTapestry(dt, t);
   updateScarf(dt, t);
+  updateCloak(dt);
   updateSatchel(dt, t);
   updateHomework(dt);
   updateCurios(dt, t);
