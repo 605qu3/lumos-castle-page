@@ -1145,19 +1145,18 @@
       "starts": []
     },
     {
-      "id": "visitors.mantel-back-gallery",
+      "id": "visitors.mantel-home-from-gallery",
       "tier": "fixed",
       "source": "device",
       "leans": [],
-      "moment": "wait 120-300 s",
+      "moment": "enter",
       "when": [
         "place = common room",
         "mantel_out = yes",
-        "mantel_last = gallery",
-        "time != night"
+        "mantel_at = gallery"
       ],
       "show": [
-        "the mantel painting's sitter comes home through her painting's exit and sits"
+        "the mantel painting's sitter back in her chair as he comes in, a little out of breath, straightening her hat"
       ],
       "starts": [
         "set mantel_out = no",
@@ -1166,19 +1165,18 @@
       ]
     },
     {
-      "id": "visitors.right-back-gallery",
+      "id": "visitors.right-home-from-gallery",
       "tier": "fixed",
       "source": "device",
       "leans": [],
-      "moment": "wait 120-300 s",
+      "moment": "enter",
       "when": [
         "place = common room",
         "right_out = yes",
-        "right_last = gallery",
-        "time != night"
+        "right_at = gallery"
       ],
       "show": [
-        "the right painting's sitter comes home through his painting's exit and sits"
+        "the right painting's sitter back in his chair as he comes in, a little out of breath, smoothing his robes"
       ],
       "starts": [
         "set right_out = no",
