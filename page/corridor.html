@@ -184,12 +184,12 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door at the end to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
+<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=3"></script>
+<script src="castle.js?v=4"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=11"></script>
 <script>
@@ -211,7 +211,7 @@ var clamp = kit.clamp, lerp = kit.lerp, easeInOut = kit.easeInOut, col = kit.col
 var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
 var makeCanvas = kit.makeCanvas, tex = kit.tex, rr = kit.rr, arch = kit.arch, cutoutTexture = kit.cutoutTexture, flameTexture = kit.flameTexture;
 var layered = kit.layered, register = kit.register, solid = kit.solid, box = kit.box, cutoutMesh = kit.cutoutMesh;
-var setTint = kit.setTint;
+var setTint = kit.setTint, CORRIDOR = kit.CORRIDOR;
 
 var lookTmp = new THREE.Vector3();
 
@@ -249,56 +249,35 @@ function onWallZ(t, w, h, x, y, z, facing, layer, name) {
 }
 
 /* ---------- the corridor ---------- */
-/* The hole's own frame from common-room.html: x along the wall toward the hearth side, y up, z into the room.
-   The closed end is at +x, the stair head at -x. Facing her, +x is on your left. The corridor's floor runs to the
+/* The corridor's frame (until 10 October 2026 the hole's own, from common-room.html): x along the corridor, her end
+   wall at +x, the stair head at -x; y up; z across, the outer wall at FAR_Z, the long wall with the door at HER_Z. Her
+   hole's own frame is mounted on the end wall (holeMount). The corridor's floor runs to the
    stair head at STAIR_X, where a flight goes down toward -x between the same two walls, the way PS 7 brings the
    first-years up; it is behind the camera at rest. At its foot a landing 2.4 m deep (Godric, 9 October
    2026, from the window's plan, req 29) ends at the end wall, so the side walls and ceiling run on to it. */
-var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.4, CEIL = 4.5, BELOW = 4.6;   /* below the flight's foot as far as the look back's steps go (req 86) */
-var STEP_RISE = 0.18, STEP_RUN = 0.3, STEPS = 11, LANDING_D = 2.4;
-var FOOT_X = STAIR_X - STEPS * STEP_RUN, FOOT_Y = -STEPS * STEP_RISE, FAR_END_X = FOOT_X - LANDING_D;
-var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - FAR_END_X, WIDTH = HER_Z - FAR_Z;
+/* the corridor's numbers and its architecture are the shared corridor's (castle.js, CORRIDOR and buildCorridor; Godric,
+   10 October 2026, 5.35 pm: the Fat Lady at the very end, the door where she hung, one corridor both pages draw) */
+var C = CORRIDOR;
+var HER_Z = C.HER_Z, FAR_Z = C.FAR_Z, END_X = C.END_X, STAIR_X = C.STAIR_X, CEIL = C.CEIL, BELOW = C.BELOW;   /* BELOW: below the flight's foot as far as the look back's steps go (req 86) */
+var STEP_RISE = C.STEP_RISE, STEP_RUN = C.STEP_RUN, STEPS = C.STEPS, LANDING_D = C.LANDING_D;
+var FOOT_X = C.FOOT_X, FOOT_Y = C.FOOT_Y, FAR_END_X = C.FAR_END_X;
+var MID_Z = C.MID_Z, LEN = C.LEN, WIDTH = C.WIDTH;
 
 var stoneMat = solid(0x75726e);
 var floorMat = solid(0x6a6764);
 var ceilMat = solid(0x3d3b38);
-var T = 0.3, WALL_H = CEIL + BELOW, WALL_Y = (CEIL - BELOW) / 2;
-var walls = new THREE.Group(); scene.add(walls);
-/* the far wall, the castle's outer wall, full length and down the stairwell; cut away in the stage view */
-var farWall = box(walls, LEN, WALL_H, T, (END_X + FAR_END_X) / 2, WALL_Y, FAR_Z - T / 2, stoneMat, 0);
-farWall.name = 'far-wall';
-/* her wall; her study lies behind it from x -2.6 to its end wall at -6.4, and past that the inglenook opens off it,
-   x -6.4 to -10.8 clear, under a lintel at NOOK_H (8 October 2026: 4.4 by 2.2 m, six seats, a low ceiling
+var stairMat = solid(0x6f6b66);
+var T = C.T, WALL_H = C.WALL_H, WALL_Y = C.WALL_Y;
+/* her wall (the long wall): her study lies behind it from x -2.6 to its end wall at -6.4, and past that the inglenook
+   opens off it, x -6.4 to -10.8 clear, under a lintel at NOOK_H (8 October 2026: 4.4 by 2.2 m, six seats, a low ceiling
    at 2.4 m for the nook's feel) */
-var NOOK_X0 = -6.4, NOOK_X1 = -10.8, NOOK_D = 2.2, NOOK_H = 2.4;
+var NOOK_X0 = C.NOOK_X0, NOOK_X1 = C.NOOK_X1, NOOK_D = 2.2, NOOK_H = C.NOOK_H;
 var NOOK_BACK = HER_Z + NOOK_D, NOOK_MID = (NOOK_X0 + NOOK_X1) / 2, NOOK_W = NOOK_X0 - NOOK_X1;
-var herWall = box(walls, END_X - NOOK_X0, WALL_H, T, (END_X + NOOK_X0) / 2, WALL_Y, HER_Z + T / 2, stoneMat, 0);
-herWall.name = 'her-wall';
-box(walls, NOOK_X1 - FAR_END_X, WALL_H, T, (NOOK_X1 + FAR_END_X) / 2, WALL_Y, HER_Z + T / 2, stoneMat, 0).name = 'her-wall-stair';
-box(walls, NOOK_W, CEIL - NOOK_H, T, NOOK_MID, (CEIL + NOOK_H) / 2, HER_Z + T / 2, stoneMat, 0).name = 'nook-lintel';
-/* the closed end, with the polite door's opening cut out of it on the centre line (two sides, a lintel and a stone
-   threshold the wall's thickness deep), and the wall the flight runs down toward */
-var DOOR = { w: 1.0, h: 2.2 };
-box(walls, T, WALL_H, (WIDTH - DOOR.w) / 2, END_X + T / 2, WALL_Y, MID_Z + (WIDTH + DOOR.w) / 4, stoneMat, 0).name = 'end-wall-her-side';
-box(walls, T, WALL_H, (WIDTH - DOOR.w) / 2, END_X + T / 2, WALL_Y, MID_Z - (WIDTH + DOOR.w) / 4, stoneMat, 0).name = 'end-wall-outer-side';
-box(walls, T, CEIL - DOOR.h, DOOR.w, END_X + T / 2, (CEIL + DOOR.h) / 2, MID_Z, stoneMat, 0).name = 'end-wall-lintel';
-box(walls, T, BELOW, DOOR.w, END_X + T / 2, -BELOW / 2, MID_Z, stoneMat, 0).name = 'end-wall-threshold';
-box(walls, T, WALL_H, WIDTH, FAR_END_X - T / 2, WALL_Y, MID_Z, stoneMat, 0).name = 'stair-end-wall';
-var floor = new THREE.Mesh(new THREE.PlaneGeometry(END_X - STAIR_X, WIDTH), floorMat);
-floor.rotation.x = -Math.PI / 2; floor.position.set((END_X + STAIR_X) / 2, 0, MID_Z);
-floor.name = 'floor'; scene.add(floor); register(floor, 0);
-/* the flight down from the stair head, full width */
-var stairMat = solid(0x6f6b66), treads = [];
-for (var si = 1; si <= STEPS; si++) {
-  var top = -si * STEP_RISE;
-  var tread = box(scene, STEP_RUN, 0.4, WIDTH, STAIR_X - (si - 0.5) * STEP_RUN, top - 0.2, MID_Z, stairMat, 0);
-  tread.name = 'stair-' + si; treads.push(tread);
-}
+var DOOR = C.DOOR, WINDOW = C.WINDOW;
+var shell = kit.buildCorridor(scene, { wall: stoneMat, floor: floorMat, ceil: ceilMat, stair: stairMat });
+var farWall = shell.farWall, herWall = shell.herWall, floor = shell.floor, treads = shell.treads, landing = shell.landing, ceiling = shell.ceiling;
 /* the landing at the flight's foot, and a grey stand-in for its tall window in the end wall (req 29 settles the window
    and what it looks onto; a pale sky shape for now so the foot of the stair is never dark) */
-var landing = new THREE.Mesh(new THREE.PlaneGeometry(LANDING_D, WIDTH), floorMat);
-landing.rotation.x = -Math.PI / 2; landing.position.set((FOOT_X + FAR_END_X) / 2, FOOT_Y, MID_Z);
-landing.name = 'landing'; scene.add(landing); register(landing, 0);
 var LANDING_WINDOW = { w: 2.33, h: 4.8, sill: 0.9 };   /* grand and tall, stained glass; 2.33 by 4.8 m, the drawing's own shape at the height Godric chose (9 October 2026, 2.41 pm, req 29) */
 var landingWindow = cutoutMesh(cutoutTexture(120, 288, "#c9d6e2", drawArch, "window"), LANDING_WINDOW.w, LANDING_WINDOW.h);
 landingWindow.material = new THREE.MeshBasicMaterial({ map: landingWindow.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
@@ -661,45 +640,33 @@ var hearthLight = new THREE.PointLight(col(0xffa868), 1.3, 6, 1.4);
 hearthLight.position.set(NOOK_MID, 0.8, NOOK_BACK - 1.0);
 scene.add(hearthLight);
 
-var ceiling = new THREE.Mesh(new THREE.PlaneGeometry(LEN, WIDTH), ceilMat);
-ceiling.rotation.x = Math.PI / 2; ceiling.position.set((END_X + FAR_END_X) / 2, CEIL, MID_Z);
-ceiling.name = 'ceiling'; scene.add(ceiling); register(ceiling, 0);
 
-/* her: the Fat Lady's painted front, 1.4 x 1.7, centred on the hole 1.2 m up, hinged on the +x edge (your left as
-   you face her). A grey stand-in; the password session places the drawing (portrait-hole-front) */
-var PORTRAIT_W = 1.4, PORTRAIT_H = 1.7, HOLE_Y = 1.2;
+/* her: the Fat Lady's painted front, 1.4 x 1.7, centred on the hole 1.2 m up, hinged on the +x edge of the hole's own
+   frame (your left as you face her). Since 10 October 2026, 5.35 pm (Godric: "the portrait and the door locations should
+   switch", PS 7: "at the very end of the corridor hung a portrait of a very fat woman") she hangs on the end wall facing
+   straight down the corridor: the hole's frame is mounted there (holeMount, castle.js), so her hinge, the room's glow
+   and their numbers are as they were, the hinge now on the window side. A grey stand-in; the password session places
+   the drawing (portrait-hole-front) */
+var PORTRAIT_W = C.PORTRAIT.w, PORTRAIT_H = C.PORTRAIT.h, HOLE_Y = C.HOLE.y;
+var holeMount = kit.mountInHole(new THREE.Group()); holeMount.name = 'hole-mount'; scene.add(holeMount);
 var hinge = new THREE.Group();
 hinge.position.set(PORTRAIT_W / 2, 0, HER_Z - 0.01);
-scene.add(hinge);
+holeMount.add(hinge);
 var her = cutoutMesh(cutoutTexture(232, 282, '#b9a98c', drawFrame, 'Fat Lady'), PORTRAIT_W, PORTRAIT_H);
 her.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
 her.rotation.y = Math.PI;
 her.name = 'portrait-hole-front';
 hinge.add(her); register(her, 2);
 
-/* the hole behind her (8 October 2026): the room's round hole, 1.2 m across with its centre 1.2 m up, cut through her
-   wall as the room cuts its own (a disc discarded in the wall's material), and the 0.8 m tunnel through to the room's
-   wall at z 0, with a dark warm glow beyond for the room. Seen only when she swings open, which today only the trip in
-   does (the spoken password opens her, when it is built) */
-var HOLE_R = 0.6, DOOR_OPEN = 1.75;
-var herWallMat = solid(0x75726e);
-herWallMat.onBeforeCompile = function (sh) {
-  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;')
-    .replace('#include <project_vertex>', '#include <project_vertex>\nvHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
-  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;')
-    .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' +
-      'if (vHoleW.z > ' + (HER_Z - 0.02).toFixed(3) + ' && length(vHoleW.xy - vec2(0.0, ' + HOLE_Y.toFixed(3) + ')) < ' + HOLE_R.toFixed(3) + ') discard;');
-};
-herWall.material = herWallMat;
-herWall.userData.base = herWallMat.color.clone();
-var tunnel = new THREE.Mesh(new THREE.CylinderGeometry(HOLE_R, HOLE_R, -HER_Z, 32, 1, true), solid(0x5f5b56, { side: THREE.BackSide }));
-tunnel.rotation.x = Math.PI / 2;
-tunnel.position.set(0, HOLE_Y, HER_Z / 2);
-tunnel.name = 'hole-tunnel'; scene.add(tunnel); register(tunnel, 0);
+/* the hole behind her (8 October 2026): the room's round hole, 1.2 m across with its centre 1.2 m up, cut through the
+   end wall and its 0.81 m tunnel through to the room's wall (both the shared corridor's), with a dark warm glow beyond
+   for the room. Seen only when she swings open, which today only the trip in does (the spoken password opens her) */
+var HOLE_R = C.HOLE.r, DOOR_OPEN = 1.75;
+var tunnel = shell.tunnel;
 var roomGlow = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6), new THREE.MeshBasicMaterial({ color: col(0x3a2414) }));
 roomGlow.rotation.y = Math.PI;
 roomGlow.position.set(0, HOLE_Y, 0.02);
-roomGlow.name = 'room-glow'; scene.add(roomGlow);
+roomGlow.name = 'room-glow'; holeMount.add(roomGlow);
 var herDoor = { ang: 0, target: 0 };
 
 var FAR_FACE = FAR_Z + 0.01, HER_FACE = HER_Z - 0.01;
@@ -773,63 +740,29 @@ var boo = cutoutMesh(cutoutTexture(256, 96, '#6b5a48', function (g, w, h) {
 }), 1.2, 0.45);
 boo.rotation.x = -Math.PI / 2; boo.position.set(STICKS.x, 0.02, MID_Z); boo.name = 'sticks-boo'; boo.visible = false;
 scene.add(boo); register(boo, 1);
-var WINDOW = { w: 1.2, h: 2.4, sill: 0.9, deep: 0.45 };
 /* one window per portrait, the same drawing twice; the sill at -4.6 is the Remembrall's, later. Each is set in a real
-   opening through the outer wall (the Placement check, Godric, 10 October 2026, 5.08 pm: a flat painted window with a
-   shelf standing out of it read at a wrong angle): the far wall is cut with two round-headed openings the window's size,
-   the wall made WINDOW.deep thick so the openings have deep reveals, the glass and its frame at the back of each, and
-   the deep sill filling the opening's floor, its front 5 cm proud of the wall. */
-(function () {
-  var x0 = FAR_END_X, x1 = END_X, y0 = WALL_Y - WALL_H / 2, y1 = WALL_Y + WALL_H / 2;
-  var shape = new THREE.Shape();
-  shape.moveTo(x0, y0); shape.lineTo(x1, y0); shape.lineTo(x1, y1); shape.lineTo(x0, y1); shape.lineTo(x0, y0);
-  PORTRAIT_XS.forEach(function (wx) {
-    var r = WINDOW.w / 2, yb = WINDOW.sill - 0.03, ys = WINDOW.sill + WINDOW.h - r;
-    var hole = new THREE.Path();
-    hole.moveTo(wx - r, yb); hole.lineTo(wx - r, ys);
-    hole.absarc(wx, ys, r, Math.PI, 0, true);
-    hole.lineTo(wx + r, yb); hole.lineTo(wx - r, yb);
-    shape.holes.push(hole);
-  });
-  var g = new THREE.ExtrudeGeometry(shape, { depth: WINDOW.deep, bevelEnabled: false, curveSegments: 24 });
-  g.translate(0, 0, FAR_Z - WINDOW.deep);
-  farWall.geometry.dispose(); farWall.geometry = g;
-  farWall.position.set(0, 0, 0);
-})();
-var GLASS_Z = FAR_Z - WINDOW.deep;
-var windows = PORTRAIT_XS.map(function (wx, i) {
-  var name = i ? 'window' : 'window-2';
-  var sky = onWallZ(cutoutTexture(120, 240, '#c9d6e2', drawArch), WINDOW.w, WINDOW.h, wx, WINDOW.sill + WINDOW.h / 2, GLASS_Z + 0.005, 1, 3, name + '-sky');
-  sky.material = new THREE.MeshBasicMaterial({ map: sky.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
-  sky.userData.base = sky.material.color.clone();
-  /* the frame in the glass: a narrow band round the opening's head and jambs, a bottom rail and a mullion */
-  var frame = onWallZ(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) {
-    arch(g, 0, 0, w, h);
-    g.globalCompositeOperation = 'destination-out'; arch(g, w * 0.06, w * 0.06, w * 0.88, h * 0.97 - w * 0.06); g.globalCompositeOperation = 'source-over';
-    g.fillRect(w * 0.47, w * 0.04, w * 0.06, h * 0.94);
-  }, name), WINDOW.w, WINDOW.h, wx, WINDOW.sill + WINDOW.h / 2, GLASS_Z + 0.01, 1, 1, name);
-  /* the deep sill, where the Remembrall will sit in the dark: the opening's floor, 5 cm proud of the wall */
-  var sill = box(scene, WINDOW.w, 0.06, WINDOW.deep + 0.05, wx, WINDOW.sill, FAR_Z - (WINDOW.deep - 0.05) / 2, solid(0x86827c), 1);
-  sill.name = name + '-sill';
-  return { x: wx, name: name, frame: frame, sky: sky, sill: sill };
-});
+   opening through the 0.45 m outer wall, its reveal splayed toward the corridor so the glass shows from the stair head
+   (the Placement check, 5.08 pm; Godric's Q22, 5.53 pm): the shared corridor's (castle.js) */
+var GLASS_Z = C.GLASS_Z;
+var windows = shell.windows;
+windows.forEach(function (w) { w.sky.userData.base = w.sky.material.color.clone(); });
 var TAPESTRY = { w: 1.4, h: 2.0, x: NOOK_MID };
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
 /* her wall: two portraits on the study's stretch, symmetric about the bay axis; portrait-a is the one nearest her */
 var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[0], 1.9, HER_FACE, -1, 1, 'portrait-a');
 var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[1], 1.9, HER_FACE, -1, 1, 'portrait-b');
 
-/* the polite door (8 October 2026): on the closed end, on the corridor's centre line, so it ends the view from the
-   stair head square on; 1.0 by 2.2 m, facing down the corridor. What waits behind it is Magic for the boys' */
-/* The leaf hangs on a hinge at the outer-wall jamb (his left, facing it) and swings in, to lie open along the shelves on
-   that side (Godric, 8 October 2026 evening). Nothing on screen opens it yet: the tickle is Magic for the boys' design,
+/* the polite door (8 October 2026): 1.0 by 2.2 m; since 10 October 2026, 5.35 pm (Godric's switch) in her old place on
+   the long wall, x 0, facing across the corridor. What waits behind it is Magic for the boys' */
+/* The leaf hangs on a hinge at the jamb on his left as he faces it (Godric, 8 October 2026 evening; since the switch the
+   jamb toward her end) and swings in, to lie open along the shelves on that side. Nothing on screen opens it yet: the tickle is Magic for the boys' design,
    Events' to wire; openDoor() swings it for shots. */
 var doorHinge = new THREE.Group();
-doorHinge.position.set(END_X + 0.001, 0, MID_Z - DOOR.w / 2);   /* the leaf in the wall's own plane, its edges on the opening's, so neither jamb shows past it from either side (the Placement check, 5.08 pm: 1 cm proud, a dark gap showed down its edge); lying open along the jamb it is drawn over it */
+doorHinge.position.set(DOOR.x + DOOR.w / 2, 0, HER_Z - 0.001);   /* the leaf in the wall's own plane, its edges on the opening's, so neither jamb shows past it from either side (the Placement check, 5.08 pm: 1 cm proud, a dark gap showed down its edge); lying open along the jamb it is drawn over it */
 scene.add(doorHinge);
 var door = cutoutMesh(cutoutTexture(100, 220, '#7a6a58', drawRect, 'door'), DOOR.w, DOOR.h);
-door.position.set(0, DOOR.h / 2, DOOR.w / 2);
-door.rotation.y = -Math.PI / 2;
+door.position.set(-DOOR.w / 2, DOOR.h / 2, 0);
+door.rotation.y = Math.PI;
 door.name = 'polite-door';
 door.material.polygonOffset = true; door.material.polygonOffsetFactor = -1; door.material.polygonOffsetUnits = -4;
 doorHinge.add(door); register(door, 1);
@@ -843,8 +776,8 @@ function openDoor(open) { doorLeaf.target = open === false ? 0 : DOOR_LEAF_OPEN;
 var GLIMPSE = { w: 1.8, h: 3.2, d: 1.05, below: 0.6 };
 var glimpse = cutoutMesh(cutoutTexture(180, 320, '#6b5236', drawRect, 'lost things'), GLIMPSE.w, GLIMPSE.h);
 glimpse.material = new THREE.MeshBasicMaterial({ map: glimpse.material.map, alphaTest: 0.5, side: THREE.DoubleSide });
-glimpse.position.set(END_X + GLIMPSE.d, GLIMPSE.h / 2 - GLIMPSE.below, MID_Z);
-glimpse.rotation.y = -Math.PI / 2;
+glimpse.position.set(DOOR.x, GLIMPSE.h / 2 - GLIMPSE.below, HER_Z + GLIMPSE.d);
+glimpse.rotation.y = Math.PI;
 glimpse.name = 'door-glimpse';
 scene.add(glimpse); register(glimpse, 1);
 function setGlimpse(url) {
@@ -862,7 +795,7 @@ function setGlimpse(url) {
 /* the room's lamplight spilling onto the corridor's floor while the door stands open; off while it is shut, since a
    light here passes through the wall */
 var glimpseLight = new THREE.PointLight(col(0xffc080), 0, 4.5, 1.2);
-glimpseLight.position.set(END_X + 0.5, 2.0, MID_Z);
+glimpseLight.position.set(DOOR.x, 2.0, HER_Z + 0.5);
 scene.add(glimpseLight);
 /* the drawing itself (round 1, candidate 2, 8 October 2026), hung in place of the stand-in as soon as it loads */
 setGlimpse('../assets/layers/door-glimpse.png').catch(function () {});
@@ -870,7 +803,7 @@ setGlimpse('../assets/layers/door-glimpse.png').catch(function () {});
 /* the lived-in layer (board req 31; The curator, The lived-in layer): a Gryffindor scarf dropped on the flags across the
    path 1.6 m short of her, as if a boy dropped it running in (Godric, 9 October 2026, from a plan of three); a stand-in strip
    until its drawing, 1.27 by 0.33 m like the scarf it is drawn from */
-var SCARF = { x: -1.6, z: -2.1, w: 1.27, d: 0.33, turn: 70 };
+var SCARF = { x: END_X - 1.6, z: -2.1, w: 1.27, d: 0.33, turn: 70 };   /* still 1.6 m short of her along the path since the switch (provisional) */
 var scarf = cutoutMesh(cutoutTexture(254, 66, '#9e1b1b', drawRect), SCARF.w, SCARF.d);
 scarf.rotation.set(-Math.PI / 2, 0, -SCARF.turn * Math.PI / 180);
 scarf.position.set(SCARF.x, 0.01, SCARF.z);
@@ -1038,9 +971,12 @@ var OPP_SITTERS = {
   right: { url: '../assets/layers/sitter-right.png', cellW: 152, cellH: 269, cell: 4,
            cue: "the right painting's sitter standing in the painting opposite the hole" }
 };
-/* ?visit= shows a sitter in a gallery frame for checking (req 86 (d)), now OPP_SITTERS is defined */
+/* ?visit= shows a sitter in a gallery frame for checking (req 86 (d)), now OPP_SITTERS is defined; while it does, the
+   runtime's cue is not read */
+var visitLook = false;
 (function () {
   var m = location.search.match(/[?&]visit=(her|him)(?::(\d))?/);
+  visitLook = !!m;
   if (m) setGalleryVisitor(m[1] === 'her' ? 'mantel' : 'right', m[2]);
 })();
 var OPP_FIG = { x: 0.44, feet: 0.79, h: 0.4 };
@@ -1125,6 +1061,7 @@ var VIEWS = {
 var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
 var yaw = 0, pitch = 0, yawT = 0, pitchT = 0, slide = VIEWS.stage.x0, slideT = slide;
 var cutFarWall = [farWall];
+windows.forEach(function (w) { cutFarWall.push(w.reveal, w.sill); });   /* built in the corridor's frame, so their positions say nothing of where they are */
 layered.forEach(function (m) { if (m.position.z < FAR_Z + 0.5 && m !== farWall && m !== floor && m !== ceiling && doorTorches.every(function (tc) { return tc.mesh !== m; })) cutFarWall.push(m); });
 torches.forEach(function (tc) { if (doorTorches.indexOf(tc) < 0 && tc !== turnTorch) cutFarWall.push(tc.flame); });
 function setView(v) {
@@ -1153,7 +1090,8 @@ function stopFor(mesh, h, lookY) {
    on keeps the top of its view and lowers the bottom to his feet, widening up to FOV_MAX */
 function withTrevor(s, marks) {
   if (!trevorHit || !trevorHit.visible || !trevorAt || marks.indexOf(trevorSpot) < 0) return s;
-  var D = Math.abs(s.look.z - s.pos.z), d = Math.abs(trevorAt.z - s.pos.z), deg = 180 / Math.PI;
+  var dir = new THREE.Vector3(s.look.x - s.pos.x, 0, s.look.z - s.pos.z), D = dir.length(); dir.divideScalar(D);
+  var d = (trevorAt.x - s.pos.x) * dir.x + (trevorAt.z - s.pos.z) * dir.z, deg = 180 / Math.PI;
   var c = Math.atan2(s.look.y - EYE, D) * deg, top = c + s.fov / 2, bottom = -Math.atan2(EYE, d) * deg - 3;
   if (bottom >= c - s.fov / 2) return s;
   var fov = Math.min(FOV_MAX, top - bottom), mid = bottom + fov / 2;
@@ -1161,7 +1099,10 @@ function withTrevor(s, marks) {
   return s;
 }
 var STOPS = [
-  { name: 'her', meshes: [her], stop: function () { return withTrevor(stopFor({ position: new THREE.Vector3(0, 0, HER_Z) }, PORTRAIT_H, HOLE_Y), ['by-her']); } },
+  /* her, on the end wall: standing back the corridor's width, as from a thing on a side wall, square to her */
+  { name: 'her', meshes: [her], stop: function () {
+      var d = WIDTH - STOP_BACK, fov = clamp(2 * Math.atan(PORTRAIT_H * STOP_MARGIN / 2 / d) * 180 / Math.PI, FOV_REST, FOV_MAX);
+      return withTrevor({ pos: new THREE.Vector3(END_X - d, EYE, MID_Z), look: new THREE.Vector3(END_X, HOLE_Y, MID_Z), fov: fov }, ['by-her']); } },
   { name: 'portrait-a', meshes: [portraitA], stop: function () { return withTrevor(stopFor(portraitA, 1.2, 1.75), ['halfway']); } },
   { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75); } },
   { name: 'armour', meshes: [armour], stop: function () { return withTrevor(stopFor(armour, ARMOUR.h, 1.3), ['suit-feet', 'suit-flags']); } },
@@ -1169,10 +1110,8 @@ var STOPS = [
   { name: 'window', meshes: [windows[1].frame, windows[1].sky, windows[1].sill], stop: function () { return stopFor(windows[1].frame, 1.9, 1.55); } },
   { name: 'window-2', meshes: [windows[0].frame, windows[0].sky, windows[0].sill], stop: function () { return stopFor(windows[0].frame, 1.9, 1.55); } },
   { name: 'tapestry', meshes: [tapestry], stop: function () { return stopFor(tapestry, TAPESTRY.h, 1.9); } },
-  /* the polite door: down the middle, standing back until it fits as the other stops do */
-  { name: 'door', meshes: [door], stop: function () {
-      var d = DOOR.h * STOP_MARGIN / 2 / Math.tan(FOV_REST / 2 * Math.PI / 180);
-      return { pos: new THREE.Vector3(END_X - d, EYE, MID_Z), look: new THREE.Vector3(END_X, 1.2, MID_Z), fov: FOV_REST }; } },
+  /* the polite door, on the long wall since the switch: from the far side, as for any thing on her wall */
+  { name: 'door', meshes: [door], stop: function () { return stopFor({ position: new THREE.Vector3(DOOR.x, 0, HER_Z) }, DOOR.h, 1.2); } },
   /* the inglenook: from a hand off the far wall, square to the hearth, the settles either side */
   { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } },
   /* the landing at the flight's foot (req 59): reached by a tap on the flight, standing at its edge square to the end
@@ -1285,7 +1224,7 @@ function enter(dry, url, room) {
   function swingAndWalk() {
     herDoor.target = DOOR_OPEN;
     setTimeout(function () {
-      glideTo({ pos: new THREE.Vector3(0, HOLE_Y, -0.3), look: new THREE.Vector3(0, HOLE_Y, 6), fov: FOV_REST });
+      glideTo({ pos: C.holeToCorridor(0, HOLE_Y, -0.3), look: C.holeToCorridor(0, HOLE_Y, 6), fov: FOV_REST });
       setTimeout(function () {
         kit.travel(url, { place: { room: room }, dry: dry, done: function () {
           leaving = false; herDoor.target = 0; atStop = null; mode = 'stop'; goTo(herStop);
@@ -1441,6 +1380,19 @@ function corridorDrawRoom(shown) {
   drawTrevor(has, back);
   drawFoot(has);
   setPaintingSitter(has(OPP_SITTERS.mantel.cue) ? 'mantel' : has(OPP_SITTERS.right.cue) ? 'right' : null);
+  /* the gallery's guilty visitor (req 86 (d), Events' visitors.json, 1f1135e): which sitter, in which frame; the look
+     switch ?visit= holds whatever it shows */
+  if (!visitLook) {
+    var gv = null;
+    ['mantel', 'right'].forEach(function (who) { [1, 2, 4, 5].forEach(function (f) { if (has(galleryCue(who, f))) gv = { who: who, frame: f }; }); });
+    if ((gv ? gv.who + ':' + gv.frame : null) !== setGalleryVisitor()) setGalleryVisitor(gv ? gv.who : null, gv && gv.frame);
+  }
+}
+var GALLERY_CUE_WHO = { mantel: "the mantel painting's sitter", right: "the right painting's sitter" };
+var GALLERY_CUE_FRAME = { 1: 'top left', 2: 'top right', 4: 'bottom left', 5: 'bottom right' };
+function galleryCue(who, f) {
+  return GALLERY_CUE_WHO[who] + ' from the common room visiting the gallery, squeezed into its ' + GALLERY_CUE_FRAME[f] +
+    " frame beside that frame's sitter, now and then giving him a guilty little wave";
 }
 function sticksAnim(kinds) { kinds.forEach(function (k) { sticksQueue.push({ kind: k, t: 0, dur: { dodge: 0.6, drop: 0.5, jig: 1.2, drum: 0.9, scatter: 1.6, march: 1.8 }[k] }); }); }
 function updateSticks(dt) {
@@ -1483,7 +1435,7 @@ var TREVOR_MARKS = {
   'suit-flags': function () { return [armour.position.x - 0.65, 0, armour.position.z + 0.25]; },
   'suit-sill': function () { return [-2.3, WINDOW.sill + 0.03, FAR_Z + 0.02]; },   /* the sill's front edge, 5 cm proud of the wall since the openings (5.08 pm) */
   halfway: function () { return [-2.2, 0, -1.3]; },
-  'by-her': function () { return [-0.45, 0, HER_Z - 0.39]; }
+  'by-her': function () { var v = C.holeToCorridor(-0.45, 0, HER_Z - 0.39); return [v.x, v.y, v.z]; }   /* under her frame, off her centre away from her hinge, on the end wall since the switch */
 };
 var trevorHit = new THREE.Mesh(new THREE.PlaneGeometry(TREVOR.hitW, TREVOR.hitH), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
 var trevor = cutoutMesh(cutoutTexture(80, 56, '#6e7048', function (g, w, h) {
@@ -1585,7 +1537,7 @@ var SPEAKER_AT = {
   peeves: function () { return sticks.visible ? sticks.position.clone() : helmetPos(); },
   trevor: function () { return trevorHit.visible ? trevorHit.position.clone() : helmetPos(); },
   sitter: function () { return worldOf(paintingOpp, 0); },
-  thing: function () { return new THREE.Vector3(END_X, 1.4, MID_Z); }, /* the door at the end, behind which finds turn up */
+  thing: function () { return new THREE.Vector3(DOOR.x, 1.4, HER_Z); }, /* the polite door, behind which finds turn up */
   stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }  /* the moving stair's grind, at its head */
 };
 var linesEl = document.getElementById('lines');
@@ -1930,7 +1882,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
