@@ -1659,7 +1659,7 @@ function updatePapers(dt, t) {
   draught = lerp(draught, target, Math.min(1, dt * 2.5));
   for (var i = 0; i < papers.length; i++) {
     var p = papers[i];
-    if (p === held || p.spec.fixed || p.spec.sill || p.spec.onScarf) continue;
+    if (p === held || p.spec.fixed || p.spec.sill || p.spec.onScarf || p.spec.inSatchel) continue;
     var a = p.spec.pins === 'two' ? 0.35 : 1;
     p.pivot.rotation.x = -a * draught * (0.022 * (1 + Math.sin(t * 5.5 + p.phase)) + 0.008 * (1 + Math.sin(t * 9.1 + p.phase * 2)));
     if (p.spec.pins !== 'two') p.pivot.rotation.z = p.spec.rot + draught * 0.012 * Math.sin(t * 4 + p.phase);
@@ -1851,6 +1851,138 @@ var basketPool = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.55), new THREE.Me
 basketPool.rotation.x = -Math.PI / 2;
 basketPool.position.set(BASKET.x, BASKET.y + 0.004, BASKET.z + 0.05);
 scene.add(basketPool);
+/* the satchel at the armchair's foot (req 28 item 3; spot C of assets/review/satchel-spot-plan.jpg, Godric 7.06 pm): a
+   saddler's drawing on the V&A's school satchel, two cells of one sheet, flap shut and flap up, staged at tier B (168 by
+   148 px a cell for 0.42 by 0.37 m), drawn from the front a little from the right as the eye sees it there, unmirrored.
+   His touches (7.06 pm, 10 October 3.35 pm): N. LONGBOTTOM on the card in its window, in his gran's hand; a tap lifts
+   the flap with a click of the buckles, the Remembrall's red glow brightening a moment, and brings the rolled essay to
+   his hand ("Twelve inches on the uses of moonstone", its last inch blank); the Remembrall glows faintly while the flap
+   is up, and the flap shuts a moment after the essay goes back. WIN and GLOW are fractions of a cell, read off the
+   staged drawing; a new drawing reads them again. */
+var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 148 / 168, sink: 0.012, x: -1.15, z: -3.55,
+  WIN: [[0.398, 0.581, 0.521, 0.692], [0.246, 0.545, 0.362, 0.656]], GLOW: [0.269, 0.261, 0.05] };
+var satchel = null, satchelAlpha = null, satchelState = { open: false, shutIn: 0, flare: 0, essayOut: false };
+var satchelTex = new THREE.TextureLoader().load(SATCHEL.url, function (t) {
+  satchelAlpha = alphaOf(t.image);
+  satchel.visible = true;
+  tappables.push(satchel);
+});
+satchelTex.encoding = THREE.sRGBEncoding;
+satchelTex.repeat.set(0.5, 1);
+satchel = cutoutMesh(satchelTex, SATCHEL.w, SATCHEL.h);
+satchel.position.set(SATCHEL.x, SATCHEL.h / 2 - SATCHEL.sink, SATCHEL.z);
+satchel.name = 'satchel'; satchel.visible = false;
+scene.add(satchel); register(satchel, 2);
+function satchelSolid(uv) {
+  if (!satchelAlpha || !uv) return true;
+  var u = (satchelState.open ? 0.5 : 0) + uv.x * 0.5;
+  var x = Math.min(satchelAlpha.w - 1, Math.floor(u * satchelAlpha.w)), y = Math.min(satchelAlpha.h - 1, Math.floor((1 - uv.y) * satchelAlpha.h));
+  return satchelAlpha.a[(y * satchelAlpha.w + x) * 4 + 3] > 100;
+}
+/* the name card, written over the drawing's blank card in each cell's window */
+var satchelCard = (function () {
+  var c = makeCanvas(256, 64), g = c.getContext('2d');
+  g.fillStyle = '#3a2a1e'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  var px = 40;
+  g.font = Math.round(px) + 'px ' + F.clerk;
+  px *= Math.min(1, 236 / g.measureText('N. LONGBOTTOM').width);
+  g.font = Math.round(px) + 'px ' + F.clerk;
+  g.fillText('N. LONGBOTTOM', 128, 34);
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
+  m.userData.canvas = c;
+  satchel.add(m);
+  return m;
+})();
+whenFontsReady(4500).then(function () {                  /* Fondamento may land after the first draw */
+  var c = satchelCard.userData.canvas, g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height);
+  g.fillStyle = '#3a2a1e'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  var px = 40;
+  g.font = Math.round(px) + 'px ' + F.clerk;
+  px *= Math.min(1, 236 / g.measureText('N. LONGBOTTOM').width);
+  g.font = Math.round(px) + 'px ' + F.clerk;
+  g.fillText('N. LONGBOTTOM', 128, 34);
+  satchelCard.material.map.needsUpdate = true;
+});
+function satchelCell(open) {
+  satchelState.open = open;
+  satchelTex.offset.x = open ? 0.5 : 0;
+  var r = SATCHEL.WIN[open ? 1 : 0], cw = (r[2] - r[0]) * SATCHEL.w, ch = (r[3] - r[1]) * SATCHEL.h;
+  satchelCard.scale.set(cw * 0.86, cw * 0.86 / 4, 1);
+  satchelCard.position.set(((r[0] + r[2]) / 2 - 0.5) * SATCHEL.w, (0.5 - (r[1] + r[3]) / 2) * SATCHEL.h, 0.003);
+  satchelGlow.visible = open;
+}
+/* the Remembrall's glow while the flap is up: faint and slow, bright for a moment as the flap lifts (it glows scarlet,
+   PS 9: he has forgotten something) */
+var satchelGlow = (function () {
+  var c = makeCanvas(64, 64), g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,60,50,1)'); gr.addColorStop(0.35, 'rgba(220,30,30,0.55)'); gr.addColorStop(1, 'rgba(200,0,0,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex(c), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  s.scale.set(SATCHEL.GLOW[2] * 2, SATCHEL.GLOW[2] * 2, 1);
+  s.position.set((SATCHEL.GLOW[0] - 0.5) * SATCHEL.w, (0.5 - SATCHEL.GLOW[1]) * SATCHEL.h, 0.01);
+  s.visible = false;
+  satchel.add(s);
+  return s;
+})();
+satchelCell(false);
+/* the essay, rolled in the bag until a tap brings it to his hand */
+function drawEssay(g, W, H, rnd) {
+  var ink = '#2c2620', M = 0.09 * W, end = H * 11 / 12;   /* twelve inches asked; the last inch blank */
+  var o = { family: F.child, color: ink, maxW: W - 2 * M, slant: 0.02, jitter: 3, soft: 1.3, rnd: rnd };
+  var y = fit(g, 'The Uses of Moonstone', M, 0.08 * H, Object.assign({}, o, { px: 0.075 * W }), 0.13 * H);
+  y = write(g, 'by Neville Longbottom', M, y + 0.005 * H, Object.assign({}, o, { px: 0.045 * W, color: 'rgba(44,38,32,0.8)' }));
+  y = fit(g,
+    'Moonstone is a pale stone that shines a bit like the moon, which is why it is called moonstone. ' +
+    'It is used in potions. First you grind it into a powder, very very fine, finer than that. ' +
+    'It is very useful and it is also very pretty.',
+    M, y + 0.035 * H, Object.assign({}, o, { px: 0.062 * W, lineGap: 1.45 }), 0.6 * H);
+  y = fit(g, 'It is very useful.', M, y + 0.02 * H, Object.assign({}, o, { px: 0.085 * W }), y + 0.11 * H);
+  fit(g, 'It is VERY useful.', M, y + 0.025 * H, Object.assign({}, o, { px: 0.1 * W }), end - 0.03 * H);
+  blot(g, W * 0.8, end - 0.02 * H, 6, 'rgba(42,36,32,0.85)');
+}
+var satchelEssay = (function () {
+  var spec = { id: 'essay', w: 0.2, h: 0.305, pin: [0, 0], pins: 'none', rot: 0, z: 0, tile: 'cream', torn: [], age: 0.35,
+    draw: drawEssay, inSatchel: true };
+  var ep = makePaper(spec, papers.length);
+  ep.hidden = true;
+  scene.add(ep.pivot);
+  ep.pivot.position.set(SATCHEL.x - 0.08, SATCHEL.h * 0.95 + (spec.h / 2 - PIN_INSET) - 0.15, SATCHEL.z + 0.02);
+  return ep;
+})();
+function satchelTap() {
+  if (held || satchelState.essayOut) return;
+  if (satchelState.open) { satchelCell(false); return; }
+  satchelCell(true);
+  satchelState.flare = 1;
+  lineQ.unshift({ medium: 'heard', speaker: 'satchel', sound: 'click, click' });
+  HEARD_FROM.satchel = HEARD_FROM.satchel || new THREE.Vector3(SATCHEL.x, SATCHEL.h + 0.25, SATCHEL.z);
+  setTimeout(function () {
+    if (held || !satchelState.open) return;
+    paperHidden(satchelEssay, false);
+    satchelState.essayOut = true;
+    liftPaper(satchelEssay);
+  }, 650);
+}
+function updateSatchel(dt, t) {
+  if (!satchel) return;
+  satchelState.flare = Math.max(0, satchelState.flare - dt / 0.9);
+  if (satchelGlow.visible) satchelGlow.material.opacity = 0.32 + 0.1 * Math.sin(t * 1.6) + 0.68 * satchelState.flare;
+  if (satchelState.essayOut && held !== satchelEssay) {        /* the essay is back in the bag */
+    paperHidden(satchelEssay, true);
+    satchelState.essayOut = false;
+    satchelState.shutIn = 1.2;
+  }
+  if (satchelState.shutIn > 0) {
+    satchelState.shutIn -= dt;
+    if (satchelState.shutIn <= 0 && satchelState.open) satchelCell(false);
+  }
+}
+/* a soft dark pool where it stands, as the basket's */
+var satchelPool = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.3), basketPool.material);
+satchelPool.rotation.x = -Math.PI / 2;
+satchelPool.position.set(SATCHEL.x, 0.004, SATCHEL.z + 0.03);
+scene.add(satchelPool);
 /* the house scarf over the armchair's rolled arm on the fire side, one end hanging (req 28 item 2; Godric's spot,
    9 October 2026, 6.13 pm, option 1 of assets/review/scarf-arm-plan.jpg): the knitting mill's drawing on the house
    scarf's exemplar (the Corridor's, assets/exemplars/house-scarf). A card just before the chair's, its top curve on the
@@ -3302,6 +3434,7 @@ function tap(cx, cy) {
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables, false).filter(function (h) {
     if (h.object === scarf) return scarf.visible && scarfSolid(h.uv);
+    if (h.object === satchel) return satchelSolid(h.uv);
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
@@ -3315,6 +3448,7 @@ function tap(cx, cy) {
   if (mode === 'fireside') {
     if (hit === hearthBack || hit === bellows) fireTap();
     else if (hit && hit === scarf) scarfTap();
+    else if (hit && hit === satchel) satchelTap();
     else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
     else leaveFireside();
     return;
@@ -3326,6 +3460,7 @@ function tap(cx, cy) {
   if (mode !== 'room' || !hit) return;
   if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
   else if (hit === scarf) scarfTap();
+  else if (hit === satchel) satchelTap();
   else if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
   /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
@@ -3822,13 +3957,14 @@ function frame() {
   updatePapers(dt, t);
   updateTapestry(dt, t);
   updateScarf(dt, t);
+  updateSatchel(dt, t);
   renderer.render(scene, camera);
   kit.stats(dt);
 }
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, tap: tap, satchelTap: satchelTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
