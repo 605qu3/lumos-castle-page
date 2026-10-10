@@ -396,7 +396,29 @@ hangDrawing(stairGallery, '../assets/layers/stair-gallery.png', GALLERY.w, funct
   var sw = 0.12, shh = 0.24;
   cupSteam.geometry.dispose(); cupSteam.geometry = new THREE.PlaneGeometry(sw, shh);
   cupSteam.position.set((598 / im.width - 0.5) * GALLERY.w, (0.5 - 402 / im.height) * GALLERY.h + shh / 2, 0.003);
+  CUP.x = (598 / im.width - 0.5) * GALLERY.w; CUP.y = (0.5 - 412 / im.height) * GALLERY.h;
 });
+/* the spoon (Godric's note on Q12, 3.53 pm; Events' req 86): on its cue it stirs the tea by itself, two slow turns, taps
+   the rim and lies still across the saucer, where it stays for the visit. Drawn in code, a teaspoon 9 cm long */
+var spoon = cutoutMesh(cutoutTexture(16, 96, '#c8c4bc', function (g, w, h) {
+  g.fillStyle = '#c8c4bc'; g.fillRect(w * 0.38, 0, w * 0.24, h * 0.78);
+  g.beginPath(); g.ellipse(w / 2, h * 0.86, w * 0.42, h * 0.13, 0, 0, Math.PI * 2); g.fill();
+  g.strokeStyle = '#4a4440'; g.lineWidth = 1.5; g.stroke();
+}), 0.012, 0.075);
+spoon.visible = false; spoon.name = 'cup-spoon'; stairGallery.add(spoon);
+var spoonRun = null, CUP = { x: 0, y: 0 };
+function updateSpoon(dt) {
+  if (!spoonRun) return;
+  var r = spoonRun, k = (r.t += dt);
+  if (k < 2.4) {                                     /* two slow turns in the cup, the handle up and leaning */
+    var a = k / 1.2 * Math.PI * 2;
+    spoon.position.set(CUP.x + Math.cos(a) * 0.012, CUP.y + 0.03, 0.004); spoon.rotation.z = 0.35 + Math.sin(a) * 0.15;
+  } else if (k < 2.8) {                              /* a tap on the rim */
+    spoon.position.set(CUP.x + 0.016, CUP.y + 0.03 + 0.006 * Math.abs(Math.sin((k - 2.4) * 16)), 0.004); spoon.rotation.z = 0.45;
+  } else {                                           /* lies still across the saucer */
+    spoon.position.set(CUP.x + 0.035, CUP.y - 0.012, 0.004); spoon.rotation.z = 1.35; spoonRun = null;
+  }
+}
 /* the live wisp: a few soft strands redrawn each frame, swaying, their tops leaning as the day's cue says */
 var steamCanvas = makeCanvas(64, 128), steamTex = tex(steamCanvas);
 var cupSteam = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.2), new THREE.MeshBasicMaterial({ map: steamTex, transparent: true, depthWrite: false }));
@@ -428,7 +450,7 @@ function updateSteam() {
    (Q14, 3.58 pm), a stair beyond it going on up and turning left out of sight, lit from round the corner; drawn going up,
    not down as asked, and kept so ("classic Hogwarts logic", real castles grown over centuries). 1.8 m wide, its height
    from the drawing (about 2.6 m), standing on the landing in the window's place on torch days. */
-var TORCH_TURN = { w: 1.8, h: 2.63 };
+var TORCH_TURN = { w: 1.8, h: 2.63 }, turnRise = null;
 var torchTurn = cutoutMesh(cutoutTexture(90, 132, '#8a8070', function (g, w, h) { g.fillRect(0, 0, w, h); }, 'turn'), TORCH_TURN.w, TORCH_TURN.h);
 torchTurn.position.set(FAR_END_X + 0.01, FOOT_Y + TORCH_TURN.h / 2, MID_Z);
 torchTurn.rotation.y = Math.PI / 2;
@@ -439,6 +461,13 @@ hangDrawing(torchTurn, '../assets/layers/torch-turn.png', TORCH_TURN.w, function
 });
 /* Hagrid's knock (Events' stair.grounds-knock, PS 6): three great knocks from outside, each shaking the doors */
 var doorsKnock = null;
+function updateTurnRise(dt) {
+  if (!turnRise) return;
+  var k = (turnRise.t += dt), lift = k < 1.0 ? Math.sin(k / 1.0 * Math.PI / 2) : Math.max(0, 1 - (k - 1.0) / 1.6);
+  torchTurn.scale.y = 1 + 0.035 * lift;
+  torchTurn.position.y = FOOT_Y + TORCH_TURN.h * torchTurn.scale.y / 2;
+  if (k > 2.6) { turnRise = null; torchTurn.scale.y = 1; torchTurn.position.y = FOOT_Y + TORCH_TURN.h / 2; }
+}
 function updateDoorsKnock(dt) {
   if (!doorsKnock) return;
   doorsKnock.t += dt;
@@ -1639,6 +1668,10 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'three great knocks from outside shake the front doors': function () { doorsKnock = { t: 0 }; },
     /* the gallery (req 84): the hush is heard, the sitters drawn still already */
     "the gallery's whispering stops short as he comes down; the sitters sit very still, looking anywhere but at him": note("the gallery's sitters fall still"),
+    /* req 86 */
+    "in the gallery's empty frame, the spoon stirs the tea by itself, two slow turns, taps the rim and lies still": function () { spoon.visible = true; spoonRun = { t: 0 }; },
+    "beyond the arch at the flight's foot, the steps going on up seem to rise a little as he comes down, and settle": function () { setTimeout(function () { turnRise = { t: 0 }; }, 2600); },
+    "looking back up the flight he came down, for a moment it seems to go on down, not up, as if it had been going down all along; then it is a stair up again": note('for a moment the flight seems to go on down'),
     'stone grinds behind him, low and short, then a soft thud as it settles': function () { showLines([{ medium: 'heard', speaker: 'stair', sound: 'stone grinding behind you, low and short, then a soft thud' }]); },
     /* the password (req 79; Events' password.json): every way in ends here. Her line is read first (lines play after
        the cues, so wait until the queue is empty), then she swings open and he walks in, and the runtime is told;
@@ -1679,6 +1712,8 @@ function frame() {
   updateDraught(dt);
   updateScarf(dt);
   updateSteam();
+  updateSpoon(dt);
+  updateTurnRise(dt);
   updateDoorsKnock(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
@@ -1704,7 +1739,7 @@ renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
-  tap: tap, goBack: goBack, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
+  tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
