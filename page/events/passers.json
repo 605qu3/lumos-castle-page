@@ -123,6 +123,57 @@
       ]
     },
     {
+      "id": "passers.nick-goodnight",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap hole 1-2 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "mantel_at != opposite",
+        "right_at != opposite",
+        "time = night",
+        "nick_met = yes",
+        "nick_passed != yes",
+        "nick_goodnight != yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "ghost",
+          "name": "nearly headless nick",
+          "mark": "hole-stop",
+          "pose": "turned, bowing"
+        }
+      ],
+      "show": [
+        "a pearly glow grows on the dark corridor's far wall from behind her open back, a beat before nick drifts out; his light travels with him and fades after him as he drifts away, the corridor dark again as it was",
+        "nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow",
+        "the torch beside the hole dips blue as nick drifts past it, then burns gold again"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "pose": "turned, bowing",
+          "then": "drifts away toward the rest of the corridor, out past the hole's left edge",
+          "key": "passers.nick-goodnight",
+          "text": [
+            "Goodnight, my dear boy! Sleep well. I haven't slept for nearly five hundred years. I don't need to, of course, but one does miss it.",
+            "Goodnight, my dear boy! The Headless Hunt rides tonight, and once again I have not been asked.",
+            "Good evening! Or goodnight, I should say. Sleep well, my dear boy."
+          ],
+          "canon": "PS 7, \"I haven't eaten for nearly five hundred years... I don't need to, of course, but one does miss it\", turned to sleep; CoS 8, the Headless Hunt that will not have him, and \"My dear boy!\"; checked against the text, 10 October 2026"
+        }
+      ],
+      "starts": [
+        "set nick_passed = yes",
+        "set nick_goodnight = yes",
+        "log \"Nearly Headless Nick said goodnight {day}\""
+      ]
+    },
+    {
       "id": "passers.nick-drifts",
       "tier": "fixed",
       "source": "device",
