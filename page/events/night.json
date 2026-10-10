@@ -54,10 +54,28 @@
       "when": [
         "place = common room",
         "time = night",
-        "letter_open = 0"
+        "letter_open = 0",
+        "owl_waiting != yes"
       ],
       "show": [
-        "an owl lands on the moonlit sill, looks in, ruffles its feathers and flies off"
+        "an owl lands on the moonlit sill, looks in, taps its beak on the glass three times, tap-tap-tap, ruffles its feathers and flies off"
+      ],
+      "who": [
+        {
+          "as": "owl",
+          "role": "trace",
+          "name": "the owl",
+          "mark": "the sill"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "owl",
+          "medium": "heard",
+          "key": "night.owl",
+          "sound": "tap-tap-tap: three soft taps of a beak on the dark window",
+          "canon": "PS 14, \"There was a tap on the dark window\", Hedwig at midnight; three taps, not one, Godric's pick (10 October 2026, 5.07 pm: a single tap may not be heard); checked against the text, 10 October 2026"
+        }
       ]
     },
     {
@@ -73,6 +91,9 @@
       ],
       "show": [
         "a soft hoo, and the owl lifts away into the dark"
+      ],
+      "starts": [
+        "set owl_waiting = no"
       ]
     }
   ]

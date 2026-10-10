@@ -525,7 +525,8 @@
       if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
       speak(rec, rec.lines, null);                  /* the words with the cues, before a cue can end the visit */
       var where = value('place');
-      var sh = (rec.show || []).concat((rec.show_at || {})[where] || []);   /* show_at: a cue by the page he is on */
+      /* show_at: a cue by the page he is on, or by the time of day (an owl lands before the letter by night, req 93) */
+      var sh = (rec.show || []).concat((rec.show_at || {})[where] || [], (rec.show_at || {})[value('time')] || []);
       for (var j = 0; j < sh.length; j++) {
         if (cues[sh[j]]) cues[sh[j]]();
         else note(rec.id + ': this room has no cue "' + sh[j] + '"');
