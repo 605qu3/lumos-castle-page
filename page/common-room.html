@@ -653,7 +653,7 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=2"></script>
+<script src="castle.js?v=4"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=11"></script>
 <script>
@@ -1757,32 +1757,44 @@ var corridorMat = solid(0x75726e);
   tunnel.receiveShadow = true;
   holeFrame.add(tunnel); register(tunnel, 0);
 })();
-/* the corridor's far wall, 3 m beyond the portrait, the corridor page's width (8 October 2026; it was 2 m); nothing
-   else of the corridor is ever on screen */
-var corridorWall = new THREE.Mesh(new THREE.PlaneGeometry(5, 3.2), corridorMat);
-(function () {
-  var u = corridorWall.geometry.attributes.uv, p = corridorWall.geometry.attributes.position;
-  for (var i = 0; i < u.count; i++) { var w = wallUV(p.getX(i) - 7, p.getY(i) + 1.6); u.setXY(i, w[0], w[1]); }
-})();
-corridorWall.position.set(0, 1.6, -HOLE_DEPTH - CORRIDOR_D);
-corridorWall.receiveShadow = true;
-holeFrame.add(corridorWall); register(corridorWall, 0);
-/* the blacksmith's torch on its scrolled bracket (CoS 8: a bracket a cat could hang from), a card flat on the far wall,
-   placed by tracing sight lines through the open hole: its head at 1.5 m along and 1.3 m up, so the whole torch shows at
-   the default view and draws the eye out of the room; a drag left shows its bracket (8 October 2026: 0.95 m when the
-   corridor was 2 m wide, 1.3 when it became 3 m to match the corridor page, then 1.5 to clear the ring; 9 October 2026,
-   0.9, seen whole on the drag left, when Godric gave its place at rest to the painting opposite the hole; the corridor's
-   pair flanks that painting, at 0.9 and 2.1, the second never seen from here); at a drag right the tunnel's side and the portrait hide the far wall entirely. The drawing is unlit;
-   its flame is one of the fire's own sprites, on the head, 87 percent across the drawing's top */
-var TORCH_HEAD = new THREE.Vector3(0.9, 1.3, -HOLE_DEPTH - CORRIDOR_D + 0.01);
-var torch = cutoutMesh(cutoutTexture(64, 124, '#000', drawTorch), 0.35, 0.68);
-torch.position.set(TORCH_HEAD.x - 0.371 * 0.35, TORCH_HEAD.y - 0.34, TORCH_HEAD.z);
-torch.castShadow = false;
-torch.name = 'corridor-torch';
-holeFrame.add(torch); register(torch, 1);
-var torchFlame = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffb060), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
-torchFlame.position.set(TORCH_HEAD.x, TORCH_HEAD.y + 0.08, TORCH_HEAD.z + 0.03);
-holeFrame.add(torchFlame);
+/* The corridor beyond the hole (board req 100; Godric's switch, 10 October 2026, 5.35 pm, live at 6.25 pm): she hangs on
+   the corridor's end wall facing straight down it, so the open hole shows the corridor itself, built by the one shared
+   function the corridor page builds from (castle.js, buildCorridor, the Corridor's), turned into the hole's frame by
+   corridorInHole: corridor = (3.11 + z, y, -2.31 - x). Its walls wear the room's own stone (corridorMat); the tunnel is
+   the room's. In the corridor's frame x runs from her end wall (2.3) down to the stair head (-11.4) and the landing,
+   z across from her long wall (-0.81, the door and the inglenook's mouth) to the outer wall (-3.81, the windows). This
+   page draws its own torches, the painting opposite, the door's leaf and a back to the inglenook at CORRIDOR.places, so
+   nothing shows the void behind an opening. Before the switch: a far wall 3 m beyond the portrait, the torch on it. */
+var CORR = kit.CORRIDOR, CP = CORR.places;
+var corrView = kit.corridorInHole(new THREE.Group());
+corrView.name = 'corridor-view';
+holeFrame.add(corrView);
+var corrShell = kit.buildCorridor(corrView, { wall: corridorMat, tunnel: false });
+function corrToHole(x, y, z) { return new THREE.Vector3(CORR.MID_Z - z, y, x - (CORR.END_X - CORR.HER_Z)); }
+/* the polite door's leaf, shut in its opening in her old place, and the inglenook's back wall 2.2 m behind its mouth */
+var corrDoor = new THREE.Mesh(new THREE.PlaneGeometry(CP.door.w, CP.door.h), solid(0x5a4636));
+corrDoor.position.set(CP.door.x, CP.door.h / 2, CORR.HER_Z - 0.002); corrDoor.rotation.y = Math.PI;
+corrDoor.name = 'corridor-door-leaf'; corrView.add(corrDoor); register(corrDoor, 1);
+var nookBack = new THREE.Mesh(new THREE.PlaneGeometry(CORR.NOOK_X0 - CORR.NOOK_X1 + 0.6, CORR.NOOK_H), corridorMat);
+nookBack.position.set((CORR.NOOK_X0 + CORR.NOOK_X1) / 2, CORR.NOOK_H / 2, CORR.HER_Z + 2.2); nookBack.rotation.y = Math.PI;
+nookBack.name = 'corridor-nook-back'; corrView.add(nookBack); register(nookBack, 0);
+/* the blacksmith's torches on their scrolled brackets (CoS 8: a bracket a cat could hang from), a pair on the outer wall
+   at CP.torches, either side of the painting opposite; cards flat on the wall, the drawing unlit, its flame one of the
+   fire's own sprites on the head, 87 percent across the drawing's top. The first, nearer her, is "the torch" Nick's
+   light and cues answer to (TORCH_HEAD, in the hole's frame). Before the switch: one torch on the far wall, 0.9 m along. */
+var torches = CP.torches.map(function (pl, i) {
+  var t = cutoutMesh(cutoutTexture(64, 124, '#000', drawTorch), 0.35, 0.68);
+  t.position.set(pl.x - 0.371 * 0.35, pl.y - 0.34, CORR.FAR_Z + 0.01);
+  t.castShadow = false;
+  t.name = i ? 'corridor-torch-2' : 'corridor-torch';
+  corrView.add(t); register(t, 1);
+  var f = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffb060), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+  f.position.set(pl.x, pl.y + 0.08, CORR.FAR_Z + 0.04);
+  corrView.add(f);
+  return { card: t, flame: f };
+});
+var torch = torches[0].card, torchFlame = torches[0].flame;
+var TORCH_HEAD = corrToHole(CP.torches[0].x, CP.torches[0].y, CORR.FAR_Z + 0.01);
 /* the portrait's back, a grey stand-in, hinged at its right edge just beyond the tunnel's end, so that open it
    stands across the line of sight and a boy can see what to tap to close it */
 var hinge = new THREE.Group();
@@ -1813,8 +1825,16 @@ holeTap.visible = false;
 holeFrame.add(holeTap);
 scene.updateMatrixWorld(true);
 var corridorLight = new THREE.PointLight(col(0xffc080), 0, 5, 1.2);
-corridorLight.position.copy(holeFrame.localToWorld(new THREE.Vector3(TORCH_HEAD.x, 1.7, -HOLE_DEPTH - CORRIDOR_D + 0.5)));
+corridorLight.position.copy(holeFrame.localToWorld(corrToHole(CP.paintingOpposite.x, 1.7, CORR.FAR_Z + 0.6)));
 scene.add(corridorLight);
+/* and down the corridor's length, a light between its two windows and one at the stair head, so the open hole shows the
+   corridor going away rather than a dark tube; on only while she stands open, as the torch's is */
+var corridorFarLights = [[(CORR.WINDOW.xs[0] + CORR.WINDOW.xs[1]) / 2, 0xd8d4c8, 7], [CORR.STAIR_X + 1.0, 0xffc080, 6]].map(function (l) {
+  var pl = new THREE.PointLight(col(l[1]), 0, l[2], 1.2);
+  pl.position.copy(holeFrame.localToWorld(corrToHole(l[0], 2.4, CORR.MID_Z)));
+  scene.add(pl);
+  return pl;
+});
 /* the drawn wall reaches the tunnel and the corridor too: one texture, no second copy on the GPU */
 function shareWallStone(map, color) {
   [tunnelMat, corridorMat, wallEndMat].forEach(function (m) { m.map = map; m.color.copy(color); m.needsUpdate = true; });
@@ -2826,9 +2846,9 @@ oppImg.onload = function () { opp.dirty = true; };
 oppImg.src = '../assets/layers/painting-opposite.png';
 var opposite = new THREE.Mesh(new THREE.PlaneGeometry(OPP_W, OPP_H),
   new THREE.MeshStandardMaterial({ map: oppTex, color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5 }));
-opposite.position.set(1.5, 1.25, -HOLE_DEPTH - CORRIDOR_D + 0.02);
+opposite.position.set(CP.paintingOpposite.x, CP.paintingOpposite.y, CORR.FAR_Z + 0.02);   /* where it hangs, on the outer wall (Magic, 6.04 pm) */
 opposite.name = 'painting-opposite';
-holeFrame.add(opposite); register(opposite, 1);
+corrView.add(opposite); register(opposite, 1);
 var opp = { who: null, mode: null, x: 0.4, dist: 0, dirty: true };
 function oppShow(n, mode) { opp.who = n; opp.mode = mode; opp.x = 0.4; opp.dist = 0; opp.dirty = true; }
 function oppClear(n) { if (opp.who === n && opp.mode !== 'slips') { opp.who = null; opp.mode = null; opp.dirty = true; } }
@@ -3976,7 +3996,9 @@ function updatePortrait(dt) {
   hinge.rotation.y = -portrait.ang;
   var k = portrait.ang / DOOR_OPEN, clockT = performance.now() / 1000;
   corridorLight.intensity = 1.8 * k * (0.85 + 0.15 * Math.sin(clockT * 11) * Math.sin(clockT * 4.3));
+  corridorFarLights[0].intensity = 1.2 * k; corridorFarLights[1].intensity = 1.0 * k * (0.9 + 0.1 * Math.sin(clockT * 7.7));
   torchFlame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(clockT * 7.3)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(clockT * 9.1))), 1);
+  torches[1].flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(clockT * 6.1 + 2)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(clockT * 8.3 + 1))), 1);
   if (portrait.open) {
     if (!nickHolds()) portrait.closeT -= dt;
     if (portrait.closeT <= 0) togglePortrait();
@@ -3999,9 +4021,16 @@ function updatePortrait(dt) {
    eye; lifted 6 cm off the floor while he drifts, since the drawing strides (People's ask); brighter and warmer as he
    passes the torch. */
 var NICK_W = 1.18, NICK_H = 1.85, NICK_LIFT = 0.06;
-var NICK_IN = [[1.95, -3.29], [1.45, -3.24], [1.03, -2.93], [0.62, -2.30], [0.34, -1.5]];   /* behind her back to the stop */
-var NICK_OUT = [[0.34, -1.5], [-0.4, -1.75], [-1.1, -1.95], [-1.9, -2.15], [-2.6, -2.3]];  /* the stop and away to the left */
-var NICK_WALL = [[1.4, -3.75], [1.1, -3.1], [0.6, -2.3], [-0.4, -1.95], [-1.9, -2.15], [-2.6, -2.3]];
+/* Re-traced for the switch (board req 100, 10 October 2026): the corridor now runs straight away from the hole, its
+   outer wall (the corridor's "far wall", the windows' and the torches') at x 1.5 and her long wall at x -1.5. Open, she
+   stands into the corridor along x 0.7 to 0.94, her far edge at z -2.19, so "behind her open back" is the strip
+   between her and the outer wall; the torch is on that wall at z -2.21. He comes from behind her, past the torch,
+   round her far edge to the same stop, and goes away past the hole's left edge into her long wall, as a ghost does;
+   the wall variation comes out of the outer wall. Magic's plan, overtaken by the switch: asked of Magic whether the
+   corridor's length now gives him a longer approach (req 91's light waits on it). */
+var NICK_IN = [[1.25, -3.4], [1.2, -2.9], [0.95, -2.55], [0.55, -2.25], [0.34, -1.5]];      /* behind her back to the stop */
+var NICK_OUT = [[0.34, -1.5], [-0.4, -1.75], [-1.0, -1.95], [-1.6, -2.1], [-2.1, -2.2]];   /* the stop and away into her wall */
+var NICK_WALL = [[1.75, -3.3], [1.2, -2.9], [0.6, -2.3], [-0.4, -1.95], [-1.6, -2.1], [-2.1, -2.2]];
 var NICK_SPEED = 0.7;                          /* metres a second, a ghost's unhurried drift */
 var nickSheet = new THREE.TextureLoader().load('../assets/layers/nick-ghost.png');
 nickSheet.encoding = THREE.sRGBEncoding;
@@ -4264,7 +4293,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
