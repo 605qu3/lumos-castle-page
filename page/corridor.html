@@ -346,9 +346,36 @@ frontDoors.name = 'front-doors'; scene.add(frontDoors); register(frontDoors, 1);
     FRONT_DOORS.h = FRONT_DOORS.w * im.height / im.width;
     frontDoors.geometry.dispose(); frontDoors.geometry = new THREE.PlaneGeometry(FRONT_DOORS.w, FRONT_DOORS.h);
     frontDoors.position.y = FOOT_Y + FRONT_DOORS.h / 2;
+    sizeDoorsGap();
   };
   im.src = '../assets/layers/front-doors.png';
 })();
+/* after dusk the line of daylight under them goes dark (Events' night cue, req 82): a dark strip over the drawn gap,
+   measured on the drawing, rows 1259 to 1267 of 1373 and columns 150 to 640 of 800 */
+var doorsGap = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: col(0x1c1610) }));
+doorsGap.visible = false; doorsGap.name = 'doors-gap';
+frontDoors.add(doorsGap);
+var doorsCrack = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), doorsGap.material);   /* and the crack where the leaves meet, columns 391 to 405, rows 200 to 1262 */
+doorsCrack.position.z = 0.002; doorsGap.add(doorsCrack);
+function sizeDoorsGap() {
+  doorsGap.position.set(((150 + 640) / 2 / 800 - 0.5) * FRONT_DOORS.w, (0.5 - 1263 / 1373) * FRONT_DOORS.h, 0.002);
+  doorsGap.scale.set(490 / 800 * FRONT_DOORS.w, 10 / 1373 * FRONT_DOORS.h, 1);
+  /* the crack is a child of the gap, so its numbers are in the gap's scaled units */
+  doorsCrack.scale.set(14 / 490, 1062 / 10, 1);
+  doorsCrack.position.set(((391 + 405) / 2 - (150 + 640) / 2) / 490, (1263 - (200 + 1262) / 2) / 10, 0);
+}
+sizeDoorsGap();
+/* Hagrid's knock (Events' stair.grounds-knock, PS 6): three great knocks from outside, each shaking the doors */
+var doorsKnock = null;
+function updateDoorsKnock(dt) {
+  if (!doorsKnock) return;
+  doorsKnock.t += dt;
+  var k = doorsKnock.t, beat = Math.floor(k / 0.7), u = k - beat * 0.7;
+  var shake = beat < 3 && u < 0.25 ? 0.012 * Math.sin(u * 90) * (1 - u / 0.25) : 0;
+  frontDoors.position.x = FAR_END_X + 0.01 + Math.abs(shake);
+  frontDoors.position.z = MID_Z + shake * 0.4;
+  if (k > 2.2) { doorsKnock = null; frontDoors.position.x = FAR_END_X + 0.01; frontDoors.position.z = MID_Z; }
+}
 /* the inglenook: her study's end wall on the near side (its outer face at x -6.4, running back to the tower), a wall
    on the stair side, the back wall with a chimney breast 3.0 m wide standing 0.3 proud, a settle 2.0 m long against
    each side wall from the back toward the mouth, three seats a side, and its own lower ceiling */
@@ -1369,9 +1396,10 @@ var FOOT_CUES = {
   window: 'at the flight\'s foot, a small landing with a tall window in its far wall, daylight on the flags',
   torch: 'at the flight\'s foot, the landing turning a corner under a torch, the next flight glimpsed going on and stopping at the turn',
   doors: "at the flight's foot, the entrance hall's great oak front doors, torchlit, daylight under them",
+  doorsNight: "at the flight's foot, the entrance hall's great oak front doors, torchlit, the gap under them dark",
   gallery: "at the flight's foot, a short gallery of portraits, one frame empty"
 };
-var FOOT_DRAWN = { window: true, doors: true };
+var FOOT_DRAWN = { window: true, doors: true, doorsNight: true };
 var footNamed = null;
 /* ?foot=doors shows a place at the foot whatever the day, a look for checking it, as ?along is */
 var footForced = (location.search.match(/[?&]foot=(\w+)/) || [])[1];
@@ -1386,9 +1414,12 @@ function drawFoot(has) {
 }
 /* what stands at the foot: the window, or on doors days the doors with their torches, the window's daylight lamp low */
 function showFoot(place) {
+  var night = place === 'doorsNight';
+  if (night) place = 'doors';
   footShown = place;
   landingWindow.visible = place === 'window';
   frontDoors.visible = place === 'doors';
+  doorsGap.visible = night;
   doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = place === 'doors'; });
   landingLight.intensity = place === 'window' ? 1.6 : 0.3;
 }
@@ -1464,6 +1495,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* the moving stair (req 59) */
     "the view sinks down the flight over a few seconds to stand on the landing before the place at its foot; Back brings him up": function () { goDownStair(false); },
     "on the way down the week's vanishing step is not there: the view dips a step with a small oof and goes on down to the landing": function () { goDownStair(true); },
+    'three great knocks from outside shake the front doors': function () { doorsKnock = { t: 0 }; },
     'stone grinds behind him, low and short, then a soft thud as it settles': function () { showLines([{ medium: 'heard', speaker: 'stair', sound: 'stone grinding behind you, low and short, then a soft thud' }]); },
     /* the password (req 79; Events' password.json): every way in ends here. Her line is read first (lines play after
        the cues, so wait until the queue is empty), then she swings open and he walks in, and the runtime is told;
@@ -1502,6 +1534,7 @@ function frame() {
   updateTrevor(dt);
   updateLines(dt);
   updateDraught(dt);
+  updateDoorsKnock(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
