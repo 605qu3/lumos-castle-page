@@ -375,7 +375,55 @@ stairGallery.position.set(FAR_END_X + 0.01, FOOT_Y + GALLERY.mid, MID_Z);
 stairGallery.rotation.y = Math.PI / 2;
 stairGallery.visible = false;
 stairGallery.name = 'stair-gallery'; scene.add(stairGallery); register(stairGallery, 1);
-hangDrawing(stairGallery, '../assets/layers/stair-gallery.png', GALLERY.w, function (im) { GALLERY.h = GALLERY.w * im.height / im.width; });
+hangDrawing(stairGallery, '../assets/layers/stair-gallery.png', GALLERY.w, function (im) {
+  GALLERY.h = GALLERY.w * im.height / im.width;
+  /* the empty frame's teacup always steams (Godric, 3.37 pm), and its steam leans toward the frame its sitter visits that
+     day (Events' cup_lean, req 82): the drawn steam is painted out in a canvas, each row blended across from the
+     background either side (columns 578 to 618, rows 305 to 402 of the drawing's 1067 by 818), and a live wisp rises from
+     the cup instead */
+  var c = makeCanvas(im.width, im.height), g = c.getContext('2d');
+  g.drawImage(im, 0, 0);
+  var x0 = 578, x1 = 618, y0 = 305, y1 = 402, d = g.getImageData(x0 - 3, y0, x1 - x0 + 6, y1 - y0), W = x1 - x0 + 6;
+  for (var y = 0; y < y1 - y0; y++) {
+    var L = (y * W + 1) * 4, R = (y * W + W - 2) * 4;
+    for (var x = 3; x < W - 3; x++) {
+      var k = (x - 1) / (W - 3), o = (y * W + x) * 4, n = (Math.random() - 0.5) * 4;
+      for (var ch = 0; ch < 3; ch++) d.data[o + ch] = d.data[L + ch] * (1 - k) + d.data[R + ch] * k + n;
+    }
+  }
+  g.putImageData(d, x0 - 3, y0);
+  stairGallery.material.map = tex(c); stairGallery.material.needsUpdate = true;
+  var sw = 0.12, shh = 0.24;
+  cupSteam.geometry.dispose(); cupSteam.geometry = new THREE.PlaneGeometry(sw, shh);
+  cupSteam.position.set((598 / im.width - 0.5) * GALLERY.w, (0.5 - 402 / im.height) * GALLERY.h + shh / 2, 0.003);
+});
+/* the live wisp: a few soft strands redrawn each frame, swaying, their tops leaning as the day's cue says */
+var steamCanvas = makeCanvas(64, 128), steamTex = tex(steamCanvas);
+var cupSteam = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.2), new THREE.MeshBasicMaterial({ map: steamTex, transparent: true, depthWrite: false }));
+cupSteam.name = 'cup-steam'; stairGallery.add(cupSteam);
+var steamLean = 0, steamLeanT = 0, steamOut = false;
+function updateSteam() {
+  if (!stairGallery.visible) return;
+  steamLean += (steamLeanT - steamLean) * 0.03;
+  var g = steamCanvas.getContext('2d'), W = 64, H = 128;
+  g.clearRect(0, 0, W, H);
+  g.lineCap = 'round';
+  for (var k = 0; k < 3; k++) {
+    g.beginPath();
+    for (var i = 0; i <= 24; i++) {
+      var f = i / 24, y = H - f * H * (0.9 - k * 0.12);
+      var x = W / 2 + Math.sin(t * 1.6 + f * 7 + k * 2.1) * (3 + f * 7) + steamLean * f * f * 26 + (steamOut ? Math.sin(t * 0.9 + k) * f * 10 : 0);
+      if (i) g.lineTo(x, y); else g.moveTo(x, y);
+    }
+    g.strokeStyle = 'rgba(235,230,215,' + (0.32 - k * 0.08) + ')';
+    g.lineWidth = steamOut ? 3 + k * 2 : 2 + k;
+    g.stroke();
+  }
+  var fade = g.createLinearGradient(0, 0, 0, H);
+  fade.addColorStop(0, 'rgba(0,0,0,1)'); fade.addColorStop(0.5, 'rgba(0,0,0,0)');
+  g.globalCompositeOperation = 'destination-out'; g.fillStyle = fade; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
+  steamTex.needsUpdate = true;
+}
 /* the torch-lit turn (req 29; round 1, candidate 1, Godric, 10 October 2026, 4.10 pm): an arch in the landing's end wall
    (Q14, 3.58 pm), a stair beyond it going on up and turning left out of sight, lit from round the corner; drawn going up,
    not down as asked, and kept so ("classic Hogwarts logic", real castles grown over centuries). 1.8 m wide, its height
@@ -1485,7 +1533,15 @@ var FOOT_DRAWN = { window: true, doors: true, doorsNight: true, gallery: true, t
 var footNamed = null;
 /* ?foot=doors shows a place at the foot whatever the day, a look for checking it, as ?along is */
 var footForced = (location.search.match(/[?&]foot=(\w+)/) || [])[1];
+var CUP_LEANS = {
+  left: "in the gallery's empty frame, the teacup's steam leans left, toward the next frame along, where its sitter is visiting today",
+  right: "in the gallery's empty frame, the teacup's steam leans right, toward the next frame along, where its sitter is visiting today",
+  out: "in the gallery's empty frame, the teacup's steam leans out of the frame, toward the stair, as if its sitter had gone up to the painting opposite the hole"
+};
 function drawFoot(has) {
+  /* the cup's steam leans by the week's draw (Events' cup_lean, req 82), shown with the gallery */
+  steamLeanT = has(CUP_LEANS.left) ? -1 : has(CUP_LEANS.right) ? 1 : 0;
+  steamOut = has(CUP_LEANS.out);
   var named = null;
   for (var k in FOOT_CUES) if (has(FOOT_CUES[k])) named = k;
   if (footForced && FOOT_DRAWN[footForced]) named = footForced;
@@ -1581,6 +1637,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the view sinks down the flight over a few seconds to stand on the landing before the place at its foot; Back brings him up": function () { goDownStair(false); },
     "on the way down the week's vanishing step is not there: the view dips a step with a small oof and goes on down to the landing": function () { goDownStair(true); },
     'three great knocks from outside shake the front doors': function () { doorsKnock = { t: 0 }; },
+    /* the gallery (req 84): the hush is heard, the sitters drawn still already */
+    "the gallery's whispering stops short as he comes down; the sitters sit very still, looking anywhere but at him": note("the gallery's sitters fall still"),
     'stone grinds behind him, low and short, then a soft thud as it settles': function () { showLines([{ medium: 'heard', speaker: 'stair', sound: 'stone grinding behind you, low and short, then a soft thud' }]); },
     /* the password (req 79; Events' password.json): every way in ends here. Her line is read first (lines play after
        the cues, so wait until the queue is empty), then she swings open and he walks in, and the runtime is told;
@@ -1620,6 +1678,7 @@ function frame() {
   updateLines(dt);
   updateDraught(dt);
   updateScarf(dt);
+  updateSteam();
   updateDoorsKnock(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
@@ -1645,7 +1704,7 @@ renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
-  tap: tap, goBack: goBack, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
+  tap: tap, goBack: goBack, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
