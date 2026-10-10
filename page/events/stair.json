@@ -11,6 +11,11 @@
     "friday": [
       "doors",
       "gallery"
+    ],
+    "cup": [
+      "left",
+      "right",
+      "opposite"
     ]
   },
   "room": [
@@ -60,6 +65,36 @@
       "show": [
         "at the flight's foot, a short gallery of portraits, one frame empty"
       ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "cup_lean = left"
+      ],
+      "show": [
+        "in the gallery's empty frame, the teacup's steam leans left, toward the next frame along, where its sitter is visiting today"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "cup_lean = right"
+      ],
+      "show": [
+        "in the gallery's empty frame, the teacup's steam leans right, toward the next frame along, where its sitter is visiting today"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "cup_lean = opposite"
+      ],
+      "show": [
+        "in the gallery's empty frame, the teacup's steam leans out of the frame, toward the stair, as if its sitter had gone up to the painting opposite the hole"
+      ]
     }
   ],
   "records": [
@@ -89,7 +124,8 @@
       ],
       "starts": [
         "set stair_to = mark friday, by week",
-        "set stair_friday = yes"
+        "set stair_friday = yes",
+        "set cup_lean = mark cup, by week"
       ]
     },
     {
@@ -455,6 +491,45 @@
       "starts": []
     },
     {
+      "id": "stair.grounds-knock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "grounds-later",
+      "weight": 1,
+      "moment": "quiet 20-40 s",
+      "when": [
+        "place = corridor",
+        "weekday = friday",
+        "stair_to = doors",
+        "at = landing",
+        "knocked != yes"
+      ],
+      "who": [
+        {
+          "as": "hagrid",
+          "role": "voice",
+          "name": "hagrid",
+          "mark": "outside the front doors"
+        }
+      ],
+      "show": [
+        "three great knocks from outside shake the front doors"
+      ],
+      "lines": [
+        {
+          "speaker": "hagrid",
+          "medium": "heard",
+          "key": "stair.grounds-knock",
+          "sound": "three great knocks on the front doors from outside, BOOM, BOOM, BOOM",
+          "canon": "PS 6, Hagrid raised a gigantic fist and knocked three times on the castle door; checked against the text, 10 October 2026"
+        }
+      ],
+      "starts": [
+        "set knocked = yes"
+      ]
+    },
+    {
       "id": "stair.gallery-hush",
       "tier": "fixed",
       "source": "device",
@@ -527,6 +602,19 @@
       "one_of": "gallery-turn",
       "weight": 1,
       "starts": []
+    },
+    {
+      "id": "stair.knock-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "knocked = yes"
+      ],
+      "starts": [
+        "set knocked = no"
+      ]
     }
   ]
 }
