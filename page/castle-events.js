@@ -197,6 +197,9 @@
           var ls = visit && visit.listen;
           return ls && (ls.open || Date.now() < ls.until) ? ls.name : 'none';
         case 'bedtime': return bedtimeMin > 0 ? 'set' : 'off';
+        /* how this page was reached, from its `?from=`: room, corridor, dormitory, sleep (the waking), or none (Neville's
+           snore on a night waking, 10 October 2026) */
+        case 'from': return /^(room|corridor|dormitory|sleep)$/.test(params.get('from') || '') ? params.get('from') : 'none';
         case 'visits since big': return state.lastBigVisit == null ? Infinity : state.visits - state.lastBigVisit;
         case 'seconds since last tap':      /* since his previous tap on the same thing; never tapped reads as long ago */
           if (!tapping || !visit || visit.lastTap[tapping] == null) return Infinity;

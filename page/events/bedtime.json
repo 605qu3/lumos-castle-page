@@ -162,6 +162,111 @@
       "starts": [
         "log \"Bedtime came {day}\""
       ]
+    },
+    {
+      "id": "bedtime.waking-snore",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "waking-snore",
+      "weight": 3,
+      "moment": "wait 3-5 s",
+      "when": [
+        "place = dormitory",
+        "from = sleep",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "the corner bed"
+        }
+      ],
+      "show": [
+        "behind the drawn hangings of the corner bed, a loud snore, and the hangings stir"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "bedtime.waking-snore",
+          "sound": "a loud snore from behind Neville's hangings",
+          "canon": "PS 11, Neville was snoring loudly; CoS 15, his snuffling snores from the corner; checked against the text, 10 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "bedtime.waking-mumble",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "waking-snore",
+      "weight": 1,
+      "moment": "wait 3-5 s",
+      "when": [
+        "place = dormitory",
+        "from = sleep",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "the corner bed"
+        }
+      ],
+      "show": [
+        "behind the drawn hangings of the corner bed, a loud snore, and the hangings stir"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "bedtime.waking-mumble",
+          "sound": "a loud snore from behind Neville's hangings, then a sleepy mumble",
+          "text": [
+            "Gran... I've lost my toad again...",
+            "Trevor... come back...",
+            "It's gone red... what've I forgotten..."
+          ],
+          "canon": "the mumbles are Godric's touch on the snore, each a callback: PS 6, \"Gran, I've lost my toad again\" and Trevor; PS 9, the Remembrall from Gran glowing scarlet when you've forgotten something; checked against the text, 10 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "bedtime.waking-snore-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 20-40 s",
+      "when": [
+        "place = dormitory",
+        "from = sleep",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "the corner bed"
+        }
+      ],
+      "show": [
+        "behind the drawn hangings of the corner bed, a loud snore, and the hangings stir"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "bedtime.waking-snore-again",
+          "sound": "Neville snores on, a long snuffling snore and a snort",
+          "canon": "PS 11, Neville was snoring loudly; CoS 15, his snuffling snores from the corner; checked against the text, 10 October 2026"
+        }
+      ]
     }
   ]
 }
