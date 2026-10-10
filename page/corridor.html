@@ -254,7 +254,7 @@ function onWallZ(t, w, h, x, y, z, facing, layer, name) {
    stair head at STAIR_X, where a flight goes down toward -x between the same two walls, the way PS 7 brings the
    first-years up; it is behind the camera at rest. At its foot a landing 2.4 m deep (Godric, 9 October
    2026, from the window's plan, req 29) ends at the end wall, so the side walls and ceiling run on to it. */
-var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.4, CEIL = 4.5, BELOW = 2.5;
+var HER_Z = -0.81, FAR_Z = -3.81, END_X = 2.3, STAIR_X = -11.4, CEIL = 4.5, BELOW = 4.6;   /* below the flight's foot as far as the look back's steps go (req 86) */
 var STEP_RISE = 0.18, STEP_RUN = 0.3, STEPS = 11, LANDING_D = 2.4;
 var FOOT_X = STAIR_X - STEPS * STEP_RUN, FOOT_Y = -STEPS * STEP_RISE, FAR_END_X = FOOT_X - LANDING_D;
 var MID_Z = (HER_Z + FAR_Z) / 2, LEN = END_X - FAR_END_X, WIDTH = HER_Z - FAR_Z;
@@ -1202,6 +1202,7 @@ function goBack() {
   yaw = yawT = 0; pitch = pitchT = 0;
   glideTo(restPose({ pos: new THREE.Vector3(), look: new THREE.Vector3() }), function () { mode = 'rest'; });
   if (turn) { tween.turn = turn; tween.dur = 2.6; }
+  if (turn && lookBack.asked) startLookBack(turn);
 }
 
 /* ---------- through the hole (8 October 2026) ----------
@@ -1619,6 +1620,51 @@ function goDownStair(dip) {
     tween.dip = { at: clamp((from.pos.x - stepX) / (from.pos.x - to.pos.x), 0.1, 0.9), oof: false };
   }
 }
+/* the look back (Godric's note on Q17, 4.10 pm; Events' req 86 (c), raised by 'back from walk-up'): before he climbs
+   he turns on the landing and looks up the flight he came down, and for a moment its steps seem to go on down, away
+   from him, as if it had been going down all along: each step sinks to where a flight going down from the landing
+   would put it, the farther the deeper and the darker, holds, and rises back; then he climbs as on any trip. Taken
+   whether the cue comes before the climb's glide is set or just after it starts */
+var lookBack = { asked: false, run: null }, TREAD_Y = treads.map(function (m) { return m.position.y; });
+treads.forEach(function (m) { m.material = m.material.clone(); });   /* each its own, to darken by depth */
+var LOOK_BACK = { turn: 1.3, sink: 0.7, hold: 0.7, rise: 0.8, down: 38, fog: 0.32 };   /* he glances down at the flight's first steps; the far end goes dark */
+function askLookBack() {
+  if (tween && tween.turn && tween.t < 0.4) startLookBack(tween.turn);
+  else if (!tween) lookBack.asked = true;        /* raised inside goBack, before its glide is set: goBack takes it */
+}
+function startLookBack(turn) {
+  lookBack.asked = false;
+  var P = camera.position.clone(), from = { pos: P, look: lookTmp.clone(), fov: camera.fov };
+  var up = { pos: P.clone(), look: new THREE.Vector3(P.x + 10, P.y - 10 * Math.tan(LOOK_BACK.down * Math.PI / 180), MID_Z), fov: FOV_MAX };
+  tween = { t: 0, dur: LOOK_BACK.turn, from: from, to: up, c1: P.clone(), c2: P.clone(), turn: turn, done: function () {
+    lookBack.run = { t: 0, base: treads.map(function (m) { return m.material.color.clone(); }) };
+    var L = LOOK_BACK, hold = { pos: P.clone(), look: up.look.clone(), fov: FOV_MAX };
+    tween = { t: 0, dur: L.sink + L.hold + L.rise, from: hold, to: hold, c1: P.clone(), c2: P.clone(), done: function () {
+      glideTo(restPose({ pos: new THREE.Vector3(), look: new THREE.Vector3() }), function () { mode = 'rest'; });
+      tween.dur = 2.0;
+    } };
+  } };
+}
+function updateLookBack(dt) {
+  var r = lookBack.run;
+  if (!r) return;
+  var L = LOOK_BACK, k = (r.t += dt), f;
+  if (r.fog0 === undefined) r.fog0 = scene.fog.density;
+  if (k < L.sink) f = easeInOut(k / L.sink);
+  else if (k < L.sink + L.hold) f = 1;
+  else f = 1 - easeInOut(clamp((k - L.sink - L.hold) / L.rise, 0, 1));
+  treads.forEach(function (m, i) {
+    var n = i + 1, drop = (2 * n - 2 * STEPS - 1) * STEP_RISE;      /* step n's top moves from -n to a flight going down */
+    m.position.y = TREAD_Y[i] + drop * f;
+    m.material.color.copy(r.base[i]).multiplyScalar(1 - 0.75 * f * (STEPS + 1 - n) / STEPS);
+  });
+  scene.fog.density = lerp(r.fog0, L.fog, f);
+  if (k >= L.sink + L.hold + L.rise) {
+    lookBack.run = null;
+    treads.forEach(function (m, i) { m.position.y = TREAD_Y[i]; m.material.color.copy(r.base[i]); });
+    scene.fog.density = r.fog0;
+  }
+}
 /* the dip: a step's drop and back over a sixth of the way, centred on the missing step */
 function stairDip(tw, k) {
   var u = (k - tw.dip.at) / 0.08;
@@ -1745,7 +1791,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* req 86 */
     "in the gallery's empty frame, the spoon stirs the tea by itself, two slow turns, taps the rim and lies still": function () { spoon.visible = true; spoonRun = { t: 0 }; },
     "beyond the arch at the flight's foot, the steps going on up seem to rise a little as he comes down, and settle": function () { setTimeout(function () { turnRise = { t: 0 }; }, 2600); },
-    "looking back up the flight he came down, for a moment it seems to go on down, not up, as if it had been going down all along; then it is a stair up again": note('for a moment the flight seems to go on down'),
+    "looking back up the flight he came down, for a moment it seems to go on down, not up, as if it had been going down all along; then it is a stair up again": function () { askLookBack(); },
     'stone grinds behind him, low and short, then a soft thud as it settles': function () { showLines([{ medium: 'heard', speaker: 'stair', sound: 'stone grinding behind you, low and short, then a soft thud' }]); },
     /* the password (req 79; Events' password.json): every way in ends here. Her line is read first (lines play after
        the cues, so wait until the queue is empty), then she swings open and he walks in, and the runtime is told;
@@ -1788,6 +1834,7 @@ function frame() {
   updateSteam();
   updateSpoon(dt);
   updateGalleryVisit(dt);
+  updateLookBack(dt);
   updateTurnRise(dt);
   updateDoorsKnock(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
@@ -1818,7 +1865,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
