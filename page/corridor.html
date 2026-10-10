@@ -392,12 +392,81 @@ hangDrawing(stairGallery, '../assets/layers/stair-gallery.png', GALLERY.w, funct
     }
   }
   g.putImageData(d, x0 - 3, y0);
-  stairGallery.material.map = tex(c); stairGallery.material.needsUpdate = true;
+  galleryVisit.base = c;
+  galleryVisit.canvas = makeCanvas(im.width, im.height); galleryVisit.tex = tex(galleryVisit.canvas);
+  drawGalleryVisit();
+  stairGallery.material.map = galleryVisit.tex; stairGallery.material.needsUpdate = true;
   var sw = 0.12, shh = 0.24;
   cupSteam.geometry.dispose(); cupSteam.geometry = new THREE.PlaneGeometry(sw, shh);
   cupSteam.position.set((598 / im.width - 0.5) * GALLERY.w, (0.5 - 402 / im.height) * GALLERY.h + shh / 2, 0.003);
   CUP.x = (598 / im.width - 0.5) * GALLERY.w; CUP.y = (0.5 - 412 / im.height) * GALLERY.h;
 });
+/* a common-room sitter visiting the gallery in someone else's frame (Godric's touch on the gallery's yes, 3.35 pm; req 86
+   (d); "The people in the portraits kept going to visit each other", PS 8, checked in the text): drawn from her own
+   standing cell into the painted room beside that frame's sitter, as the painting opposite draws her (OPP_SITTERS), and
+   now and then her hat-touch cell as a sheepish little greeting until her wave cell exists (req 88, People's). Which day,
+   which sitter and which frame is Events' rule, still owed (req 86); until it comes, ?visit=her:5 (or him, frames 1, 2,
+   4, 5) shows it for checking, with :near, :mid or :far for her scale. The frames' painted openings, measured on the drawing
+   (1067 by 818, the steam painted out): 1 top left, 2 top right, 4 bottom left, 5 bottom right; 3 is the empty frame.
+   side: where the painted room is left beside the sitter; she stands there turned toward him (mirrored on the right) */
+var GALLERY_FRAMES = {
+  1: { x0: 51, x1: 291, y0: 65, y1: 346, side: 'right' },
+  2: { x0: 782, x1: 1012, y0: 62, y1: 350, side: 'left' },
+  4: { x0: 73, x1: 270, y0: 500, y1: 747, side: 'right' },
+  5: { x0: 792, x1: 999, y0: 492, y1: 743, side: 'left' }
+};
+/* her scale, three looks put to Godric: near, squeezed in at the frame's edge at about the sitter's own size, hat to
+   waist, half of her cut by the frame; mid, a step behind him, hat to knees; far, a small whole figure standing back in
+   the painted room. h: her cell's height, top: her hat's top, cx: her centre from the frame's edge on her side, each
+   a fraction of the opening */
+var VISIT_LOOK = {
+  near: { h: 1.5, top: 0.02, cx: 0.12 },
+  mid: { h: 1.05, top: 0.1, cx: 0.17 },
+  far: { h: 0.6, top: 0.3, cx: 0.2 }
+};
+var galleryVisit = { base: null, canvas: null, tex: null, who: null, frame: 0, look: 'near', greet: false };
+function drawGalleryVisit() {
+  var v = galleryVisit;
+  if (!v.base) return;
+  var g = v.canvas.getContext('2d'), w = v.base.width, h = v.base.height;
+  g.clearRect(0, 0, w, h);
+  g.drawImage(v.base, 0, 0);
+  var s = v.who && OPP_SITTERS[v.who], f = GALLERY_FRAMES[v.frame], L = VISIT_LOOK[v.look];
+  if (s && s.img && f && L) {
+    var oh = f.y1 - f.y0, ow = f.x1 - f.x0, dh = L.h * oh, dw = dh * s.cellW / s.cellH;
+    var cell = v.greet && s.greet !== undefined ? s.greet : s.cell;
+    var cx = f.side === 'left' ? f.x0 + ow * L.cx : f.x1 - ow * L.cx;
+    g.save();
+    g.beginPath(); g.rect(f.x0, f.y0, ow, oh); g.clip();
+    g.translate(cx, f.y0 + L.top * oh);
+    if (f.side === 'right') g.scale(-1, 1);
+    g.drawImage(s.img, cell * s.cellW, 0, s.cellW, s.cellH, -dw / 2, 0, dw, dh);
+    g.restore();
+  }
+  v.tex.needsUpdate = true;
+}
+function setGalleryVisitor(who, frame, look) {
+  if (who === undefined) return galleryVisit.who ? galleryVisit.who + ':' + galleryVisit.frame + ':' + galleryVisit.look : null;
+  var v = galleryVisit;
+  v.who = who; v.frame = +frame || 5; v.look = VISIT_LOOK[look] ? look : v.look;
+  var s = who && OPP_SITTERS[who];
+  if (s && !s.img) {
+    var im = new Image();
+    im.onload = function () { s.img = im; drawGalleryVisit(); };
+    im.src = s.url;
+  }
+  drawGalleryVisit();
+}
+/* the greeting: a few seconds after he arrives at the landing, and now and then while he stays, she touches her hat
+   for a moment, caught out, then stands still again */
+var visitGreet = { next: 3, t: 0 };
+function updateGalleryVisit(dt) {
+  if (!galleryVisit.who || !stairGallery.visible || !OPP_SITTERS[galleryVisit.who].greet) return;
+  var g = visitGreet;
+  if (galleryVisit.greet) {
+    if ((g.t += dt) > 1.6) { galleryVisit.greet = false; g.next = 9 + Math.random() * 12; drawGalleryVisit(); }
+  } else if ((g.next -= dt) <= 0) { galleryVisit.greet = true; g.t = 0; drawGalleryVisit(); }
+}
 /* the spoon (Godric's note on Q12, 3.53 pm; Events' req 86): on its cue it stirs the tea by itself, two slow turns, taps
    the rim and lies still across the saucer, where it stays for the visit. Drawn in code, a teaspoon 9 cm long */
 var spoon = cutoutMesh(cutoutTexture(16, 96, '#c8c4bc', function (g, w, h) {
@@ -899,11 +968,16 @@ settleScarf.add(scarfTape);
    width, is about 175 px, 0.4 of the drawing's height (the room's grey stand-in drew her at 0.68 of its opening). Her
    sheet's numbers are the room's (common-room.html, SITTERS), cited and not changed. */
 var OPP_SITTERS = {
-  mantel: { url: '../assets/layers/sitter-mantel.png', cellW: 174, cellH: 346, cell: 4,
+  mantel: { url: '../assets/layers/sitter-mantel.png', cellW: 174, cellH: 346, cell: 4, greet: 5,
             cue: "the mantel painting's sitter standing in the painting opposite the hole" },
   right: { url: '../assets/layers/sitter-right.png', cellW: 152, cellH: 269, cell: 4,
            cue: "the right painting's sitter standing in the painting opposite the hole" }
 };
+/* ?visit= shows a sitter in a gallery frame for checking (req 86 (d)), now OPP_SITTERS is defined */
+(function () {
+  var m = location.search.match(/[?&]visit=(her|him)(?::(\d))?(?::(near|mid|far))?/);
+  if (m) setGalleryVisitor(m[1] === 'her' ? 'mantel' : 'right', m[2], m[3]);
+})();
 var OPP_FIG = { x: 0.44, feet: 0.79, h: 0.4 };
 var oppPaint = { img: null, who: null, canvas: null, ctx: null, tex: null };
 function drawPaintingOpp() {
@@ -1713,6 +1787,7 @@ function frame() {
   updateScarf(dt);
   updateSteam();
   updateSpoon(dt);
+  updateGalleryVisit(dt);
   updateTurnRise(dt);
   updateDoorsKnock(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
@@ -1743,7 +1818,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
