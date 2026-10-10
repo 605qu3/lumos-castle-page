@@ -1,0 +1,117 @@
+{
+  "chain": "cake",
+  "first_visit": ["cake.new"],
+  "room": [
+    {
+      "when": ["place = corridor", "cake = half"],
+      "show": ["the Fat Lady's cake about half gone"]
+    },
+    {
+      "when": ["place = corridor", "cake = crumbs"],
+      "show": ["the Fat Lady's plate down to crumbs, and one crumb on her fichu"]
+    },
+    {
+      "when": ["place = corridor", "cake = christmas"],
+      "show": ["the Fat Lady's plate down to crumbs among empty boxes of chocolate liqueurs, for Christmas Day"]
+    },
+    {
+      "when": ["place = corridor", "cake_fan = open", "cake != christmas"],
+      "show": ["the Fat Lady's fan lying open beside her cake"]
+    }
+  ],
+  "records": [
+    {
+      "id": "cake.christmas",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "date = 12-25", "cake != christmas"],
+      "starts": ["set cake = christmas", "set cake_fan = shut"]
+    },
+    {
+      "id": "cake.after-christmas",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "date != 12-25", "cake = christmas"],
+      "starts": ["set cake = whole"]
+    },
+    {
+      "id": "cake.still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "date != 12-25"],
+      "one_of": "cake-moves",
+      "weight": 1
+    },
+    {
+      "id": "cake.half",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "date != 12-25", "cake = whole"],
+      "one_of": "cake-moves",
+      "weight": 2,
+      "starts": ["set cake = half"]
+    },
+    {
+      "id": "cake.crumbs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "date != 12-25", "cake = half"],
+      "one_of": "cake-moves",
+      "weight": 2,
+      "starts": ["set cake = crumbs", "stamp cake_crumbs_on"]
+    },
+    {
+      "id": "cake.new",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "date != 12-25", "cake = crumbs", "days since cake_crumbs_on >= 1"],
+      "one_of": "cake-moves",
+      "weight": 2,
+      "starts": ["set cake = whole"]
+    },
+    {
+      "id": "cake.fan-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor"],
+      "one_of": "cake-fan",
+      "weight": 1
+    },
+    {
+      "id": "cake.fan-opens",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "date != 12-25", "cake != christmas", "cake_fan != open"],
+      "one_of": "cake-fan",
+      "weight": 1,
+      "starts": ["set cake_fan = open"]
+    },
+    {
+      "id": "cake.fan-shuts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": ["place = corridor", "cake_fan = open"],
+      "one_of": "cake-fan",
+      "weight": 1,
+      "starts": ["set cake_fan = shut"]
+    }
+  ]
+}
