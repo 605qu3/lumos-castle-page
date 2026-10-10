@@ -326,6 +326,29 @@ function sizeLandingWindow(w) {
   };
   im.src = '../assets/layers/landing-window.png';
 })();
+/* the front doors (req 63; round 1, candidate 2, Godric, 10 October 2026, 3.34 pm): the entrance hall's great oak doors,
+   shut, a thin line of daylight under them, standing on the landing in the end wall in the window's place on the days
+   the stair leads to them (showFoot). The window's width, 2.33 m; their height follows the drawing, about 4.2 m. Lit,
+   not glowing: the torch either side of them (below) lights them */
+var FRONT_DOORS = { w: 2.33, h: 4.22 };
+var frontDoors = cutoutMesh(cutoutTexture(120, 216, '#5a3e26', function (g, w, h) { g.fillRect(0, 0, w, h); }, 'doors'), FRONT_DOORS.w, FRONT_DOORS.h);
+frontDoors.position.set(FAR_END_X + 0.01, FOOT_Y + FRONT_DOORS.h / 2, MID_Z);
+frontDoors.rotation.y = Math.PI / 2;
+frontDoors.visible = false;
+frontDoors.name = 'front-doors'; scene.add(frontDoors); register(frontDoors, 1);
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var t = tex(im);
+    frontDoors.material.map = t; frontDoors.material.color.set(0xffffff); frontDoors.userData.base = frontDoors.material.color.clone();
+    frontDoors.material.needsUpdate = true;
+    if (frontDoors.customDepthMaterial) { frontDoors.customDepthMaterial.map = t; frontDoors.customDistanceMaterial.map = t; }
+    FRONT_DOORS.h = FRONT_DOORS.w * im.height / im.width;
+    frontDoors.geometry.dispose(); frontDoors.geometry = new THREE.PlaneGeometry(FRONT_DOORS.w, FRONT_DOORS.h);
+    frontDoors.position.y = FOOT_Y + FRONT_DOORS.h / 2;
+  };
+  im.src = '../assets/layers/front-doors.png';
+})();
 /* the inglenook: her study's end wall on the near side (its outer face at x -6.4, running back to the tower), a wall
    on the stair side, the back wall with a chimney breast 3.0 m wide standing 0.3 proud, a settle 2.0 m long against
    each side wall from the back toward the mouth, three seats a side, and its own lower ceiling */
@@ -499,6 +522,11 @@ function addTorch(head, facing, name) {
   return { mesh: m, flame: f, light: light };
 }
 var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(PAINTING_OPP.x + 0.6, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
+/* the front doors' torches, one on each side wall of the landing a little before the doors, 2.3 m up: shown with the
+   doors (showFoot), the entrance hall "lit with flaming torches" (PS 7) */
+var doorTorches = [addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, HER_FACE), -1, 'doors-torch-her'),
+  addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, FAR_FACE), 1, 'doors-torch-far')];
+doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = false; torches.push(tc); });
 /* a grey stand-in until its drawing (an empty painted room by the sitters' painter, its door at the right edge, where a
    caught sitter walks off, as the room's stand-in has it) */
 var paintingOpp = onWallZ(cutoutTexture(160, 176, '#b9a98c', function (g, w, h) {
@@ -744,8 +772,8 @@ var VIEWS = {
 var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
 var yaw = 0, pitch = 0, yawT = 0, pitchT = 0, slide = VIEWS.stage.x0, slideT = slide;
 var cutFarWall = [farWall];
-layered.forEach(function (m) { if (m.position.z < FAR_Z + 0.5 && m !== farWall && m !== floor && m !== ceiling) cutFarWall.push(m); });
-torches.forEach(function (tc) { cutFarWall.push(tc.flame); });
+layered.forEach(function (m) { if (m.position.z < FAR_Z + 0.5 && m !== farWall && m !== floor && m !== ceiling && doorTorches.every(function (tc) { return tc.mesh !== m; })) cutFarWall.push(m); });
+torches.forEach(function (tc) { if (doorTorches.indexOf(tc) < 0) cutFarWall.push(tc.flame); });
 function setView(v) {
   view = v;
   var stage = v === 'stage';
@@ -797,6 +825,10 @@ var STOPS = [
   /* the landing at the flight's foot (req 59): reached by a tap on the flight, standing at its edge square to the end
      wall, the window's lower lights and the flags before it in view */
   { name: 'landing', meshes: treads, stop: function () {
+      /* on doors days three steps up the flight (Godric, 9 October 2026, 7.06 pm, Q7), the whole doors and the daylight
+         under them in view; the landing's edge shows the end wall only from about 1.3 m up */
+      if (footShown === 'doors') return { pos: new THREE.Vector3(FOOT_X + 3.5 * STEP_RUN, FOOT_Y + 3 * STEP_RISE + EYE, MID_Z),
+        look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.0, MID_Z), fov: FOV_MAX };
       return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } },
   /* the settle's scarf (7.05 pm): bent over it at the seat's edge, his eye a metre up, looking down at its end by the arm,
      where its name tape turns up on arrival */
@@ -815,7 +847,7 @@ her.userData.thing = 'her';   /* at her stop the runtime's `tap her` wakes her f
 sticks.userData.thing = 'sticks'; tappables.push(sticks);
 treads.forEach(function (m) { m.userData.thing = 'stair'; });   /* the flight: the runtime's `tap stair` takes him down */
 
-var mode = 'rest', atStop = null, tween = null;
+var mode = 'rest', atStop = null, tween = null, footShown = 'window';
 var backBtn = document.getElementById('back');
 /* The turn round to the moving stair (req 22; Godric, 9 October 2026): past the corridor's limit a drag keeps turning,
    either way round, until he looks straight down the flight at yaw pi; as he comes round the view tilts down and opens to
@@ -1307,14 +1339,68 @@ var FOOT_CUES = {
   doors: "at the flight's foot, the entrance hall's great oak front doors, torchlit, daylight under them",
   gallery: "at the flight's foot, a short gallery of portraits, one frame empty"
 };
-var FOOT_DRAWN = { window: true };
+var FOOT_DRAWN = { window: true, doors: true };
 var footNamed = null;
+/* ?foot=doors shows a place at the foot whatever the day, a look for checking it, as ?along is */
+var footForced = (location.search.match(/[?&]foot=(\w+)/) || [])[1];
 function drawFoot(has) {
   var named = null;
   for (var k in FOOT_CUES) if (has(FOOT_CUES[k])) named = k;
+  if (footForced && FOOT_DRAWN[footForced]) named = footForced;
   if (named === footNamed) return;
   footNamed = named;
   if (named && !FOOT_DRAWN[named]) console.info('[corridor] the stair leads to the ' + named + ' today; held to the window until it is drawn');
+  showFoot(named && FOOT_DRAWN[named] ? named : 'window');
+}
+/* what stands at the foot: the window, or on doors days the doors with their torches, the window's daylight lamp low */
+function showFoot(place) {
+  footShown = place;
+  landingWindow.visible = place === 'window';
+  frontDoors.visible = place === 'doors';
+  doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = place === 'doors'; });
+  landingLight.intensity = place === 'window' ? 1.6 : 0.3;
+}
+/* the draught under the doors (Godric, 10 October 2026, 3.34 pm, his touch on Q10): on doors days, every 15 to 35 s a
+   thin draught slips under them, stirring the flames of the two torches nearest, and about one gust in three a dry leaf
+   skitters in from the gap across the flags and lies where it stops; they are swept when the foot changes. No words */
+var draught = { next: 8, g: 0, leaves: [] };
+var leafTex = cutoutTexture(64, 40, '#5e4428', function (g, w, h) {
+  g.fillStyle = '#5e4428'; g.beginPath();
+  for (var i = 0; i <= 24; i++) {
+    var a = i / 24 * Math.PI * 2, r = 0.5 + 0.12 * Math.cos(a * 7);
+    g.lineTo(w / 2 + Math.cos(a) * r * w * 0.48, h / 2 + Math.sin(a) * r * h * 0.9);
+  }
+  g.fill(); g.strokeStyle = '#4a3018'; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(w * 0.04, h / 2); g.lineTo(w * 0.95, h / 2); g.stroke();
+});
+function addLeaf() {
+  var m = cutoutMesh(leafTex, 0.12, 0.075);
+  m.rotation.x = -Math.PI / 2;
+  var z = MID_Z + (Math.random() - 0.5) * FRONT_DOORS.w * 0.8;
+  m.position.set(FAR_END_X + 0.03, FOOT_Y + 0.004, z);
+  m.userData.run = { t: 0, dur: 1.2 + Math.random() * 0.8, from: m.position.clone(),
+    to: new THREE.Vector3(FAR_END_X + 0.2 + Math.random() * 0.3, FOOT_Y + 0.004, z + (Math.random() - 0.5) * 0.5),   /* short, so it lies in view of the stop */
+    spin: (Math.random() < 0.5 ? -1 : 1) * (4 + Math.random() * 4) };
+  scene.add(m); draught.leaves.push(m);
+}
+function sweepLeaves() { draught.leaves.forEach(function (m) { scene.remove(m); m.geometry.dispose(); }); draught.leaves = []; }
+function updateDraught(dt) {
+  if (footShown !== 'doors') { draught.g = 0; if (draught.leaves.length) sweepLeaves(); return; }
+  draught.next -= dt;
+  if (draught.next <= 0) {
+    draught.next = 15 + Math.random() * 20; draught.g = 1;
+    if (Math.random() < 0.34 && draught.leaves.length < 6) addLeaf();
+  }
+  draught.g = Math.max(0, draught.g - dt / 2.5);
+  draught.leaves.forEach(function (m) {
+    var r = m.userData.run;
+    if (r.t >= r.dur) return;
+    r.t = Math.min(r.dur, r.t + dt);
+    var k = r.t / r.dur, e = 1 - (1 - k) * (1 - k);          /* fast out of the gap, slowing on the flags */
+    m.position.lerpVectors(r.from, r.to, e);
+    m.position.y = FOOT_Y + 0.004 + 0.03 * Math.abs(Math.sin(k * Math.PI * 3)) * (1 - k);   /* small hops as it skitters */
+    m.rotation.z += r.spin * dt * (1 - k);
+  });
 }
 
 var castle = window.CastleEvents ? CastleEvents.start({
@@ -1383,6 +1469,7 @@ function frame() {
   updateSticks(dt);
   updateTrevor(dt);
   updateLines(dt);
+  updateDraught(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -1392,6 +1479,12 @@ function frame() {
     var k = 0.85 + 0.15 * Math.sin(t * 11 + i) * Math.sin(t * 4.3 + i * 2);
     tc.light.intensity = 1.6 * k;
     tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(t * 7.3 + i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(t * 9.1 + i))), 1);
+    if (doorTorches.indexOf(tc) >= 0) {       /* the draught: fluttering and guttering */
+      var g = draught.g * (0.7 + 0.3 * Math.sin(t * 23 + i));
+      tc.flame.material.rotation = 0.6 * g * Math.sin(t * 12 + i * 1.7);   /* the lean is toward him, so it flutters side to side as well */
+      tc.flame.scale.x *= 1 + 0.5 * g; tc.flame.scale.y *= 1 - 0.3 * g;
+      tc.light.intensity *= 1 - 0.3 * g * Math.abs(Math.sin(t * 31 + i));
+    }
   });
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -1400,7 +1493,7 @@ renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
-  tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
+  tap: tap, goBack: goBack, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
