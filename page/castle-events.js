@@ -1015,6 +1015,11 @@
       },
       arrive: arrive,
       leave: leave,
+      /* The castle's time of day (morning, day, evening, night), `?time=` honoured, so a page lights itself by the
+         same dawn and dusk the records read and keeps no copy of them (req 87, the dormitory, 10 October 2026). It
+         reads now, ready or not; only inside a deferred leave does it read the time he went, and nothing is drawn
+         then. A page that wants to follow dusk while he plays asks again from its frame loop. */
+      time: timeOfDay,
       cues: shownCues,
       fire: function (id) { if (byId[id] && visit) fire(byId[id]); },
       state: function () { return state; },
