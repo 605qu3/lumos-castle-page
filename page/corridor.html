@@ -376,6 +376,19 @@ stairGallery.rotation.y = Math.PI / 2;
 stairGallery.visible = false;
 stairGallery.name = 'stair-gallery'; scene.add(stairGallery); register(stairGallery, 1);
 hangDrawing(stairGallery, '../assets/layers/stair-gallery.png', GALLERY.w, function (im) { GALLERY.h = GALLERY.w * im.height / im.width; });
+/* the torch-lit turn (req 29; round 1, candidate 1, Godric, 10 October 2026, 4.10 pm): an arch in the landing's end wall
+   (Q14, 3.58 pm), a stair beyond it going on up and turning left out of sight, lit from round the corner; drawn going up,
+   not down as asked, and kept so ("classic Hogwarts logic", real castles grown over centuries). 1.8 m wide, its height
+   from the drawing (about 2.6 m), standing on the landing in the window's place on torch days. */
+var TORCH_TURN = { w: 1.8, h: 2.63 };
+var torchTurn = cutoutMesh(cutoutTexture(90, 132, '#8a8070', function (g, w, h) { g.fillRect(0, 0, w, h); }, 'turn'), TORCH_TURN.w, TORCH_TURN.h);
+torchTurn.position.set(FAR_END_X + 0.01, FOOT_Y + TORCH_TURN.h / 2, MID_Z);
+torchTurn.rotation.y = Math.PI / 2;
+torchTurn.visible = false;
+torchTurn.name = 'torch-turn'; scene.add(torchTurn); register(torchTurn, 1);
+hangDrawing(torchTurn, '../assets/layers/torch-turn.png', TORCH_TURN.w, function (im) {
+  TORCH_TURN.h = TORCH_TURN.w * im.height / im.width; torchTurn.position.y = FOOT_Y + TORCH_TURN.h / 2;
+});
 /* Hagrid's knock (Events' stair.grounds-knock, PS 6): three great knocks from outside, each shaking the doors */
 var doorsKnock = null;
 function updateDoorsKnock(dt) {
@@ -565,6 +578,21 @@ var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vec
 var doorTorches = [addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, HER_FACE), -1, 'doors-torch-her'),
   addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, FAR_FACE), 1, 'doors-torch-far')];
 doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = false; torches.push(tc); });
+/* the turn's torch, on the end wall to the left of the arch as he faces it, its flame leaning toward the arch as if a
+   draught rose from far below (Godric's touch on Q14, 3.58 pm) */
+var turnTorch = (function () {
+  var head = new THREE.Vector3(FAR_END_X + 0.02, FOOT_Y + 2.0, MID_Z + 1.2);
+  var m = cutoutMesh(cutoutTexture(64, 124, '#5a5550', drawTorch), 0.35, 0.68);
+  m.position.set(head.x, head.y - 0.34, head.z + 0.371 * 0.35); m.rotation.y = Math.PI / 2; m.name = 'turn-torch';
+  scene.add(m); register(m, 1);
+  var f = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffb060), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+  f.position.set(head.x + 0.03, head.y + 0.08, head.z); f.scale.set(0.12, 0.2, 1); scene.add(f);
+  var light = new THREE.PointLight(col(0xffc080), 1.6, 6, 1.2);
+  light.position.set(head.x + 0.5, head.y + 0.4, head.z); scene.add(light);
+  return { mesh: m, flame: f, light: light, lean: true };
+})();
+turnTorch.mesh.visible = turnTorch.flame.visible = turnTorch.light.visible = false;
+torches.push(turnTorch);
 /* a grey stand-in until its drawing (an empty painted room by the sitters' painter, its door at the right edge, where a
    caught sitter walks off, as the room's stand-in has it) */
 var paintingOpp = onWallZ(cutoutTexture(160, 176, '#b9a98c', function (g, w, h) {
@@ -840,7 +868,7 @@ var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
 var yaw = 0, pitch = 0, yawT = 0, pitchT = 0, slide = VIEWS.stage.x0, slideT = slide;
 var cutFarWall = [farWall];
 layered.forEach(function (m) { if (m.position.z < FAR_Z + 0.5 && m !== farWall && m !== floor && m !== ceiling && doorTorches.every(function (tc) { return tc.mesh !== m; })) cutFarWall.push(m); });
-torches.forEach(function (tc) { if (doorTorches.indexOf(tc) < 0) cutFarWall.push(tc.flame); });
+torches.forEach(function (tc) { if (doorTorches.indexOf(tc) < 0 && tc !== turnTorch) cutFarWall.push(tc.flame); });
 function setView(v) {
   view = v;
   var stage = v === 'stage';
@@ -894,8 +922,9 @@ var STOPS = [
   { name: 'landing', meshes: treads, stop: function () {
       /* on doors days three steps up the flight (Godric, 9 October 2026, 7.06 pm, Q7), the whole doors and the daylight
          under them in view; the landing's edge shows the end wall only from about 1.3 m up */
-      if (footShown === 'doors' || footShown === 'gallery') return { pos: new THREE.Vector3(FOOT_X + 3.5 * STEP_RUN, FOOT_Y + 3 * STEP_RISE + EYE, MID_Z),
-        look: new THREE.Vector3(FAR_END_X, FOOT_Y + (footShown === 'gallery' ? GALLERY.mid : 2.0), MID_Z), fov: footShown === 'gallery' ? clamp(2 * Math.atan(0.37 / camera.aspect) * 180 / Math.PI, 52, FOV_MAX) : FOV_MAX };   /* the group's width fits a phone held upright */
+      if (footShown === 'doors' || footShown === 'gallery' || footShown === 'torch') return { pos: new THREE.Vector3(FOOT_X + 3.5 * STEP_RUN, FOOT_Y + 3 * STEP_RISE + EYE, MID_Z),
+        look: new THREE.Vector3(FAR_END_X, FOOT_Y + (footShown === 'gallery' ? GALLERY.mid : footShown === 'torch' ? 1.4 : 2.0), MID_Z),
+        fov: footShown === 'doors' ? FOV_MAX : clamp(2 * Math.atan((footShown === 'torch' ? 0.42 : 0.37) / camera.aspect) * 180 / Math.PI, footShown === 'torch' ? 56 : 52, FOV_MAX) };   /* the group's width fits a phone held upright */
       return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } },
   /* the settle's scarf (7.05 pm): bent over it at the seat's edge, his eye a metre up, looking down at its end by the arm,
      where its name tape turns up on arrival */
@@ -1410,7 +1439,7 @@ var FOOT_CUES = {
   doorsNight: "at the flight's foot, the entrance hall's great oak front doors, torchlit, the gap under them dark",
   gallery: "at the flight's foot, a short gallery of portraits, one frame empty"
 };
-var FOOT_DRAWN = { window: true, doors: true, doorsNight: true, gallery: true };
+var FOOT_DRAWN = { window: true, doors: true, doorsNight: true, gallery: true, torch: true };
 var footNamed = null;
 /* ?foot=doors shows a place at the foot whatever the day, a look for checking it, as ?along is */
 var footForced = (location.search.match(/[?&]foot=(\w+)/) || [])[1];
@@ -1431,6 +1460,8 @@ function showFoot(place) {
   landingWindow.visible = place === 'window';
   frontDoors.visible = place === 'doors';
   stairGallery.visible = place === 'gallery';
+  torchTurn.visible = place === 'torch';
+  turnTorch.mesh.visible = turnTorch.flame.visible = turnTorch.light.visible = place === 'torch';
   doorsGap.visible = night;
   doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = place === 'doors' || place === 'gallery'; });
   landingLight.intensity = place === 'window' ? 1.6 : 0.3;
@@ -1556,6 +1587,7 @@ function frame() {
     var k = 0.85 + 0.15 * Math.sin(t * 11 + i) * Math.sin(t * 4.3 + i * 2);
     tc.light.intensity = 1.6 * k;
     tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(t * 7.3 + i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(t * 9.1 + i))), 1);
+    if (tc.lean) tc.flame.material.rotation = -0.4 + 0.08 * Math.sin(t * 5.1);   /* leaning toward the arch */
     if (doorTorches.indexOf(tc) >= 0) {       /* the draught: fluttering and guttering */
       var g = draught.g * (0.7 + 0.3 * Math.sin(t * 23 + i));
       tc.flame.material.rotation = 0.6 * g * Math.sin(t * 12 + i * 1.7);   /* the lean is toward him, so it flutters side to side as well */
