@@ -1822,12 +1822,31 @@ function shareWallStone(map, color) {
 }
 
 /* furniture, back to front */
-var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, 2.65, -2.1, 1);
+/* Godric's moves (10 October 2026, 6.00 pm; Q4 option 1 and his own marked plan, .superpowers/watch/david-sofa-plan-1800.png):
+   the sofa against the wall under the right window, its back to the wall and facing into the room, its drawing kept;
+   the desk (the books table) along the wall to beside the stair, the notice board left where it hangs, which is where
+   his plan marks it; the desk chair before the desk at its left; the left armchair into the middle of the rug, left of
+   the hearth's axis, still turned to the fire. Everything that sits on or by them moves with them. Two nudges off his
+   marks, provisional until he says (Q8): the desk 6 degrees back from the stair (123 to his 117), since at his mark the
+   stair's drawing hid it at rest on both screens, and here its bare end with Trevor's box shows beside the stair; the
+   armchair 0.4 m left of his mark (x -1.35 to his -0.97), since there it hid the whole fire on the long drag left,
+   and here the fire's right half shows past its wing. */
+var SOFA_THETA = Math.PI - 0.55, SOFA_R = 5.12;                 /* centred under the right window, its card 0.48 m off the wall */
+var SOFA_AT = { x: SOFA_R * Math.sin(SOFA_THETA), z: SOFA_R * Math.cos(SOFA_THETA), yaw: SOFA_THETA - Math.PI };
+function onSofa(lx, lz) {                                         /* a point in the sofa's own frame, out to the room */
+  var c = Math.cos(SOFA_AT.yaw), sn = Math.sin(SOFA_AT.yaw);
+  return [SOFA_AT.x + c * lx + sn * lz, SOFA_AT.z - sn * lx + c * lz];
+}
+function wallAt(deg, r) { var t = deg * Math.PI / 180; return { x: r * Math.sin(t), z: r * Math.cos(t) }; }
+var DESK_AT = wallAt(123, 5.26), DESK_CHAIR_AT = wallAt(125.5, 4.6);   /* the desk's back 0.3 m off the wall, as before */
+var CHAIR_L_AT = { x: -1.35, z: -2.75 };
+var sofa = cutout(cutoutTexture(512, 256, '#b9b6b0', drawSofa, 'sofa'), 2.4, 1.2, SOFA_AT.x, SOFA_AT.z, 1);
+sofa.rotation.y = SOFA_AT.yaw;
 var stairs = cutout(cutoutTexture(192, 768, '#aaa7a1', drawStairs, 'stairs'), 1.4, 5.6, 4.67, -1.4, 1);
-var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, -1.8, -3.45, 2);
+var chairL = cutout(cutoutTexture(384, 384, '#b9b6b0', drawArmchair, 'armchair'), 1.5, 1.5, CHAIR_L_AT.x, CHAIR_L_AT.z, 2);
 var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 0.9, 0.8, -1.2, 2.8, 3);
-var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, 4.05, -3.35, 2);
-var deskChair = cutout(cutoutTexture(128, 244, '#b9b6b0', drawDeskChair, 'chair'), 0.5, 0.95, 3.55, -2.93, 2);
+var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, DESK_AT.x, DESK_AT.z, 2);
+var deskChair = cutout(cutoutTexture(128, 244, '#b9b6b0', drawDeskChair, 'chair'), 0.5, 0.95, DESK_CHAIR_AT.x, DESK_CHAIR_AT.z, 2);
 deskChair.name = 'desk-chair';
 var candleStand = cutout(cutoutTexture(90, 160, '#b9b6b0', drawCandleStand, 'stand'), 0.45, 0.8, -2.55, -3.8, 2);
 candleStand.name = 'candle-stand';
@@ -1866,7 +1885,7 @@ scene.add(basketPool);
    his hand ("Twelve inches on the uses of moonstone", its last inch blank); the Remembrall glows faintly while the flap
    is up, and the flap shuts a moment after the essay goes back. WIN and GLOW are fractions of a cell, read off the
    staged drawing; a new drawing reads them again. */
-var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 1104 / 1204, sink: 0.012, x: -1.15, z: -3.55,
+var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 1104 / 1204, sink: 0.012, x: CHAIR_L_AT.x + 0.65, z: CHAIR_L_AT.z - 0.1,
   WIN: [[0.234, 0.546, 0.355, 0.655], [0.236, 0.545, 0.356, 0.655]], GLOW: [0.350, 0.305, 0.05] };
 /* set aside (Godric, 10 October 2026, 4.21 pm, after eight rounds): hidden from the room until the pipeline's eye check
    exists and it is redrawn; its card, tap, glow and essay stay built behind this flag */
@@ -2010,7 +2029,7 @@ scene.add(satchelPool);
    a flat strip in front of an arm whose outer side runs away from the eye toward the fire, so the card turns 0.7 rad
    (40 degrees) about its upright to lie along that side, brought forward so its far edge stays 2 cm before the chair's
    card. The name tape turns with it. */
-var SCARF = { url: '../assets/layers/house-scarf-arm.png', w: 0.32, x: -1.44, z: -3.45 + 0.16 * Math.sin(0.7) + 0.02,
+var SCARF = { url: '../assets/layers/house-scarf-arm.png', w: 0.32, x: CHAIR_L_AT.x + 0.36, z: CHAIR_L_AT.z + 0.16 * Math.sin(0.7) + 0.02,
               yaw: 0.7, top: 0.68, endX: 0.42, endY: 0.4, tapeU: 0.22, tapeV: 0.8, sway: 0.006 };
 var scarf = null, scarfPuff = 0, scarfTurn = { k: 0, to: 0 }, scarfAlpha = null;
 /* a tap counts on the wool only, so the green round it still reaches the armchair behind */
@@ -2902,8 +2921,8 @@ var VISITOR_CUES = {
    out in the corridor's helmet, the oldest by the box faintest; and a faint "croak" by the hole now and then. */
 var TREVOR_MARKS = {
   'floor-a': new THREE.Vector3(-1.4, 0, 2.4),
-  'floor-b': new THREE.Vector3(3.2, 0, -1.65),
-  'floor-c': new THREE.Vector3(3.55, 0, -2.45),
+  'floor-b': new THREE.Vector3(onSofa(0.75, 0.6)[0], 0, onSofa(0.75, 0.6)[1]),       /* since Godric's moves: by the sofa's */
+  'floor-c': new THREE.Vector3(DESK_CHAIR_AT.x, 0, DESK_CHAIR_AT.z + 0.48),            /* right front foot; under the chair */
   /* his hop marks (board req 70, the events lane's `mark next to spot`): two about half a metre from each hiding spot,
      so a tap that finds him sends him one hop on, near where he was found, and never across the room. Projected with
      stand-ins at rest and both full drags at 1180 x 820 and 2560 x 1080. a1 left of floor-a, a2 right, both a little
@@ -2913,10 +2932,10 @@ var TREVOR_MARKS = {
      Each keeps 0.35 m of depth off every card whose width it sits in (Trevor's half-width included) and off the cat. */
   'floor-a1': new THREE.Vector3(-1.9, 0, 2.3),
   'floor-a2': new THREE.Vector3(-1.0, 0, 2.1),
-  'floor-b1': new THREE.Vector3(2.75, 0, -1.5),
-  'floor-b2': new THREE.Vector3(3.35, 0, -1.2),
-  'floor-c1': new THREE.Vector3(3.62, 0, -2.0),
-  'floor-c2': new THREE.Vector3(3.1, 0, -2.5)
+  'floor-b1': new THREE.Vector3(onSofa(0.35, 0.75)[0], 0, onSofa(0.35, 0.75)[1]),
+  'floor-b2': new THREE.Vector3(onSofa(1.1, 0.75)[0], 0, onSofa(1.1, 0.75)[1]),
+  'floor-c1': new THREE.Vector3(DESK_CHAIR_AT.x + 0.07, 0, DESK_CHAIR_AT.z + 0.93),
+  'floor-c2': new THREE.Vector3(DESK_CHAIR_AT.x - 0.45, 0, DESK_CHAIR_AT.z + 0.1)
 };
 /* which marks are next to which: each spot and its two hop marks are a closed group of three, so he hops round them
    and is caught near where he was found */
@@ -2925,7 +2944,7 @@ var TREVOR_NEIGHBOURS = {};
   var group = ['floor-' + s, 'floor-' + s + '1', 'floor-' + s + '2'];
   group.forEach(function (m) { TREVOR_NEIGHBOURS[m] = group.filter(function (n) { return n !== m; }); });
 });
-var TREVOR_BOX_FOOT = new THREE.Vector3(3.4, 0, -2.75);     /* the floor below the desk's bare end, beside the chair */
+var TREVOR_BOX_FOOT = new THREE.Vector3(DESK_AT.x - 0.65, 0, DESK_AT.z + 0.6);     /* the floor below the desk's bare end, beside the chair */
 var HOLE_FOOT = holeN.clone().multiplyScalar(WALL_R - 0.15).setY(0);
 var printTex = (function () {
   var c = makeCanvas(32, 32), g = c.getContext('2d');
@@ -3030,11 +3049,12 @@ function poolSheet(cell) { return cell >= POOL2.first ? POOL2 : POOL; }
 var CHESS_AT = new THREE.Vector3(-1.27, 0, -1.45);
 var CHESS_GAP = 0.33;                          /* hips either side of the board's centre */
 var FIGURE_SPOTS = {
-  0: { x: -1.05, z: -3.95, face: 1 },              /* the fire mark, left of the fire, facing it */
+  0: { x: -2.25, z: -3.62, face: 1 },              /* the fire mark, left of the fire, facing it, by the left armchair's side */
   1: { x: 1.05, z: -3.95, face: -1 },
   2: { x: 1.4, z: -3.75, face: -1 },
-  3: { x: 2.65 + (0.5 - 0.62) * 1.65, z: -1.98, y: 0.42 - 0.05 * POOL.h, face: 1, still: true },  /* the sofa mark */
-  4: { x: -1.05, z: -3.95, face: 1 },             /* a herald speaking, where the listener left of the fire stands */
+  3: { x: onSofa((0.5 - 0.62) * 1.65, 0.12)[0], z: onSofa((0.5 - 0.62) * 1.65, 0.12)[1], yaw: SOFA_AT.yaw,
+       y: 0.42 - 0.05 * POOL.h, face: 1, still: true },  /* the sofa mark, along its seat */
+  4: { x: -2.25, z: -3.62, face: 1 },             /* a herald speaking, where the listener left of the fire stands */
   5: { x: 1.05, z: -3.95, face: -1 },             /* a herald speaking, right of the fire */
   6: { x: CHESS_AT.x - CHESS_GAP + 0.08, z: CHESS_AT.z, face: 1 },   /* hips 0.42 across, so the card sits 0.08 right */
   7: { x: CHESS_AT.x + CHESS_GAP + 0.02, z: CHESS_AT.z, face: -1 }
@@ -3070,6 +3090,7 @@ function poolCard(cell) {
   var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: P.tex, color: 0xffffff, alphaTest: 0.5,
     side: THREE.DoubleSide, roughness: 0.95, metalness: 0 }));
   m.position.set(s.x, (s.y || 0) + P.h / 2, s.z);
+  if (s.yaw) m.rotation.y = s.yaw;
   m.name = 'student-' + cell; m.visible = false; m.userData.wanted = false;
   scene.add(m);
   if (!s.still) facers.push(m);
@@ -3150,11 +3171,16 @@ catSit.position.y = 0.3;
 catSit.visible = false;
 catGroup.add(catWalk); catGroup.add(catSit);
 register(catWalk, 5); register(catSit, 5);
+/* out behind the left armchair, back in front of it (since Godric's moves, 10 October 2026: the chair stands on the
+   loop's old line), 0.35 m and more off its plane across its width, the cat's half-width included */
 var catPath = new THREE.CatmullRomCurve3([
   new THREE.Vector3(2.7, 0, -2.7),
-  new THREE.Vector3(1.0, 0, -2.92),
-  new THREE.Vector3(-1.4, 0, -3.02),
-  new THREE.Vector3(-2.8, 0, -2.8),
+  new THREE.Vector3(1.0, 0, -2.95),
+  new THREE.Vector3(-0.6, 0, -3.2),
+  new THREE.Vector3(-1.9, 0, -3.2),
+  new THREE.Vector3(-2.8, 0, -2.85),
+  new THREE.Vector3(-2.0, 0, -2.3),
+  new THREE.Vector3(-0.5, 0, -2.3),
   new THREE.Vector3(1.6, 0, -2.6)
 ], true, 'catmullrom', 0.5);
 var cat = { u: 0, speed: 0.052, state: 'walk', timer: 0, satThisLoop: false, facing: 1, dist: 0, frame: -1, sitElapsed: 0, flickAt: 0, lookFirst: false, sitU: 0.3, lastSitU: -1 };
@@ -4043,7 +4069,7 @@ function nickHead() { return nickMesh.position.clone().add(new THREE.Vector3(0, 
 var HANDS = { neville: F.child, wood: F.casual, hooch: F.casual, pince: F.clerk, clementine: F.clerk, print: F.print };
 var STAIR_HEAD = new THREE.Vector3(4.45, 3.0, -0.9);
 var LINE_PLACES = {                            /* where a line with no drawn speaker is said, heard or written */
-  sofa: new THREE.Vector3(3.1, 0.95, -1.98),
+  sofa: new THREE.Vector3(onSofa(0.45, 0.12)[0], 0.95, onSofa(0.45, 0.12)[1]),
   fire: new THREE.Vector3(0, 1.3, -4.3),
   'hole-stop': holeC.clone().add(new THREE.Vector3(0, 0.75, 0)),
   'beyond the hole': holeC.clone().add(new THREE.Vector3(0, 0.75, 0)),
@@ -4052,7 +4078,7 @@ var LINE_PLACES = {                            /* where a line with no drawn spe
 };
 var HEARD_FROM = {                             /* off-stage speakers, by name, toward where they are heard */
   percy: STAIR_HEAD, dorm: STAIR_HEAD, runner: STAIR_HEAD,
-  trevor: new THREE.Vector3(3.45, 0.85, -2.85),
+  trevor: new THREE.Vector3(DESK_AT.x - 0.6, 0.85, DESK_AT.z + 0.5),
   sitter: new THREE.Vector3(1.52, 3.6, -5.29),
   nick: LINE_PLACES['beyond the hole'], armour: LINE_PLACES['beyond the hole'], 'fat-lady': LINE_PLACES['beyond the hole']
 };
