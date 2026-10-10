@@ -1853,14 +1853,14 @@ basketPool.position.set(BASKET.x, BASKET.y + 0.004, BASKET.z + 0.05);
 scene.add(basketPool);
 /* the satchel at the armchair's foot (req 28 item 3; spot C of assets/review/satchel-spot-plan.jpg, Godric 7.06 pm): a
    saddler's drawing on the V&A's school satchel, two cells of one sheet, flap shut and flap up, staged at tier B (168 by
-   148 px a cell for 0.42 by 0.37 m), drawn from the front a little from the right as the eye sees it there, unmirrored.
+   154 px a cell for 0.42 by 0.385 m; the shut cell drawn out of the open one, round 7 beside round 2), drawn from the front a little from the right as the eye sees it there, unmirrored.
    His touches (7.06 pm, 10 October 3.35 pm): N. LONGBOTTOM on the card in its window, in his gran's hand; a tap lifts
    the flap with a click of the buckles, the Remembrall's red glow brightening a moment, and brings the rolled essay to
    his hand ("Twelve inches on the uses of moonstone", its last inch blank); the Remembrall glows faintly while the flap
    is up, and the flap shuts a moment after the essay goes back. WIN and GLOW are fractions of a cell, read off the
    staged drawing; a new drawing reads them again. */
-var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 148 / 168, sink: 0.012, x: -1.15, z: -3.55,
-  WIN: [[0.398, 0.581, 0.521, 0.692], [0.246, 0.545, 0.362, 0.656]], GLOW: [0.269, 0.261, 0.05] };
+var SATCHEL = { url: '../assets/layers/satchel.png', w: 0.42, h: 0.42 * 1104 / 1204, sink: 0.012, x: -1.15, z: -3.55,
+  WIN: [[0.234, 0.546, 0.355, 0.655], [0.236, 0.545, 0.356, 0.655]], GLOW: [0.350, 0.305, 0.05] };
 var satchel = null, satchelAlpha = null, satchelState = { open: false, shutIn: 0, flare: 0, essayOut: false };
 var satchelTex = new THREE.TextureLoader().load(SATCHEL.url, function (t) {
   satchelAlpha = alphaOf(t.image);
