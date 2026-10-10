@@ -713,55 +713,97 @@ function hangDrawing(m, url, w, done) {
   };
   im.src = url;
 }
-/* A cloth lying on something (Godric, 9 October 2026, 8.21 pm: both scarves read so flat the boys may take them for
-   glitches): the drawing is laid on a gently rumpled sheet, so the light falls unevenly across its folds and it stands a
-   centimetre or two proud in places, tilted a few degrees toward the eye, with a soft shadow under it cut from its own
-   outline. lift is the rumple's height in metres, tilt the lean in degrees toward the stair head, where he first sees it */
-function clothHeight(u, v, lift) { return lift * (0.35 + 0.65 * (0.5 + 0.5 * Math.sin(u * 17 + 0.7) * Math.sin(v * 9 + 1.3))); }
-function layCloth(m, im, w, lift, tilt) {
-  var h = w * im.height / im.width, g = new THREE.PlaneGeometry(w, h, 40, 20), pos = g.attributes.position;
+/* A heap of cloth standing on what it lies on (Godric, 9 October 2026, 8.21 pm: the flat scarves read as glitches; his
+   answer, 10 October 2026, 3.55 pm: a fresh drawing of the scarf in a loose heap seen three-quarter, round 3, candidate 3,
+   4.11 pm). The drawing is a card standing on the floor or the seat, turned to face yaw (radians) and leaning back tilt
+   degrees, with a soft round shadow under it; its plane is cut fine so its fringes can stir (stirCloth). */
+var HEAP_FRINGES = [{ u: 0.83, v: 0.84, r: 0.13 }, { u: 0.05, v: 0.46, r: 0.08 }];   /* on the drawing, v from the top */
+function standHeap(m, w, im, base, yaw, tilt) {
+  var h = w * im.height / im.width, g = new THREE.PlaneGeometry(w, h, 32, 22);
+  g.translate(0, h / 2, 0);                                  /* its foot on the base point */
+  var pos = g.attributes.position, rest = Float32Array.from(pos.array), weight = new Float32Array(pos.count);
   for (var i = 0; i < pos.count; i++) {
-    pos.setZ(i, clothHeight(pos.getX(i) / w, pos.getY(i) / h, lift));
+    var u = pos.getX(i) / w + 0.5, v = 1 - pos.getY(i) / h;
+    HEAP_FRINGES.forEach(function (f) { var d = Math.hypot(u - f.u, v - f.v) / f.r; if (d < 1) weight[i] = Math.max(weight[i], (1 - d * d)); });
   }
-  g.computeVertexNormals();
   m.geometry.dispose(); m.geometry = g;
-  var c = makeCanvas(Math.round(im.width / 4) + 24, Math.round(im.height / 4) + 24), cg = c.getContext('2d');
-  cg.filter = 'blur(5px)'; cg.drawImage(im, 12, 12, c.width - 24, c.height - 24); cg.filter = 'none';
-  cg.globalCompositeOperation = 'source-in'; cg.fillStyle = 'rgba(20,14,10,0.55)'; cg.fillRect(0, 0, c.width, c.height);
-  var sh = new THREE.Mesh(new THREE.PlaneGeometry(w * c.width / (c.width - 24), h * c.height / (c.height - 24)),
-    new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
-  sh.rotation.copy(m.rotation);
-  sh.position.set(m.position.x + 0.012, m.position.y - 0.004, m.position.z + 0.012);
+  m.rotation.set(-tilt * Math.PI / 180, yaw, 0, 'YXZ');
+  m.position.copy(base);
+  m.userData.cloth = { rest: rest, weight: weight, stir: 0, w: w, h: h };
+  var c = makeCanvas(64, 64), cg = c.getContext('2d'), grd = cg.createRadialGradient(32, 32, 4, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(20,14,10,0.5)'); grd.addColorStop(1, 'rgba(20,14,10,0)');
+  cg.fillStyle = grd; cg.fillRect(0, 0, 64, 64);
+  var sh = new THREE.Mesh(new THREE.PlaneGeometry(w * 1.05, w * 0.55), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
+  var back = 0.4 * h * Math.sin(tilt * Math.PI / 180);     /* under the heap's middle, which leans back from its foot */
+  sh.rotation.set(-Math.PI / 2, 0, yaw); sh.position.set(base.x - Math.sin(yaw) * back, Math.max(base.y, 0) + 0.003, base.z - Math.cos(yaw) * back);
   sh.name = m.name + '-shadow'; scene.add(sh);
-  var toEye = new THREE.Vector3(-11.0 - m.position.x, 0, MID_Z - m.position.z).normalize();
-  m.quaternion.premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0).cross(toEye), tilt * Math.PI / 180));
-  m.position.y += Math.sin(tilt * Math.PI / 180) * Math.max(w, h) / 2;     /* so its near edge stays on what it lies on */
-  return sh;
+  m.userData.shadow = sh;
+  return h;
 }
-/* the scarf (req 31, round 2, candidate 1, Godric, 9 October 2026, 5.14 pm): a Gryffindor scarf in soft knitted wool lying
-   flat in a loose Z, fringed at both ends, 1.1 m across its bends and 0.61 deep, turned across the path as the strip was;
-   the castle's house-scarf drawing, its exemplar the first of its kind */
-SCARF.w = 1.1;
-hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w, function (im) { layCloth(scarf, im, SCARF.w, 0.02, 2.5); });
+/* the fringes stir as he walks past (Godric, 3.55 pm): near him and moving, a small ripple runs through each fringe and
+   dies away over a couple of seconds */
+function stirCloth(m, dt, near) {
+  var c = m.userData.cloth;
+  if (!c) return;
+  c.stir = near ? Math.min(1, c.stir + dt * 3) : Math.max(0, c.stir - dt / 2);
+  if (!c.stir && !c.moved) return;
+  var pos = m.geometry.attributes.position;
+  for (var i = 0; i < pos.count; i++) {
+    var k = c.weight[i];
+    if (!k) continue;
+    var x = c.rest[i * 3], y = c.rest[i * 3 + 1];
+    pos.setX(i, x + 0.01 * k * c.stir * Math.sin(t * 9 + y * 60));
+    pos.setY(i, y + 0.004 * k * c.stir * Math.sin(t * 7 + x * 50));
+  }
+  pos.needsUpdate = true;
+  c.moved = c.stir > 0;
+}
+/* the dropped scarf: a Gryffindor scarf in a loose heap on the flags across the path 1.6 m short of her, as if a boy
+   dropped it running in, 0.75 m across, standing to face the stair head, leaning back a little; the house-scarf exemplar's
+   second drawing. If he walks onto it, it slides a few centimetres along the flags the way he was going (3.55 pm). */
+SCARF.w = 0.75;
+var scarfSlide = { last: null, off: new THREE.Vector3(), go: null, armed: true };
+hangDrawing(scarf, '../assets/layers/corridor-scarf.png', SCARF.w, function (im) {
+  standHeap(scarf, SCARF.w, im, new THREE.Vector3(SCARF.x, -0.02, SCARF.z), -Math.PI / 2, 38);   /* sunk 2 cm so the near fringe lies on the flags */
+});
+function updateScarf(dt) {
+  var cam = camera.position, moving = scarfSlide.last ? cam.distanceTo(scarfSlide.last) / Math.max(dt, 1e-3) : 0;
+  var dir = scarfSlide.last ? new THREE.Vector3(cam.x - scarfSlide.last.x, 0, cam.z - scarfSlide.last.z) : null;
+  scarfSlide.last = (scarfSlide.last || new THREE.Vector3()).copy(cam);
+  var dx = cam.x - scarf.position.x, dz = cam.z - scarf.position.z, d = Math.hypot(dx, dz);
+  stirCloth(scarf, dt, d < 2.0 && moving > 0.3);
+  stirCloth(settleScarf, dt, Math.hypot(cam.x - settleScarf.position.x, cam.z - settleScarf.position.z) < 1.6 && moving > 0.3);
+  if (d < 0.45 && moving > 0.3 && scarfSlide.armed && !scarfSlide.go && dir.lengthSq() > 0) {
+    scarfSlide.go = { t: 0, from: scarf.position.clone(), by: dir.normalize().multiplyScalar(0.05 + Math.random() * 0.03) };
+    scarfSlide.armed = false;
+  }
+  if (d > 1.2) scarfSlide.armed = true;
+  if (scarfSlide.go) {
+    var g = scarfSlide.go, k = Math.min(1, (g.t += dt) / 0.45), e = 1 - (1 - k) * (1 - k);
+    scarf.position.copy(g.from).addScaledVector(g.by, e);
+    if (scarf.userData.shadow) { scarf.userData.shadow.position.x += scarf.position.x - (g.px === undefined ? g.from.x : g.px); scarf.userData.shadow.position.z += scarf.position.z - (g.pz === undefined ? g.from.z : g.pz); g.px = scarf.position.x; g.pz = scarf.position.z; }
+    if (k >= 1) scarfSlide.go = null;
+  }
+}
 /* the settle's scarf (req 31; Godric, 9 October 2026: Hufflepuff, 6.15 pm; on the study-side settle by the mouth, 7.05 pm,
    from a plan of three, since the stair side is never in view as he arrives): a visitor's, left while waiting to be
-   fetched; the house scarf's drawing recoloured yellow and black in code (pipeline/recolour_scarf.py), 0.9 m across its
-   bends, lying along the seat from the arm at the mouth, its top away from him, seen on a look right as he arrives.
-   720 by 397, 800 px a metre, about 1.5 MB with mipmaps */
-var SETTLE_SCARF = { x: NOOK_X0 - SETTLE.d / 2, z: NOOK_BACK - SETTLE.len + 0.08 + 0.45, w: 0.9, turn: -84 };
+   fetched; the heap recoloured yellow and black in code (pipeline/recolour_scarf.py, 4.11 pm: "the settle's twin follows
+   as its recolour"), 0.75 m across, standing on the seat near its front edge facing out of the settle, leaning back
+   toward its back, seen on a look right as he arrives. 800 by 532 */
+var SETTLE_SCARF = { x: NOOK_X0 - SETTLE.d + 0.15, z: NOOK_BACK - SETTLE.len + 0.08 + 0.45, w: 0.75 };
 var settleScarf = cutoutMesh(cutoutTexture(180, 100, '#c9a227', drawRect), SETTLE_SCARF.w, 0.5);
-settleScarf.rotation.set(-Math.PI / 2, 0, SETTLE_SCARF.turn * Math.PI / 180);
-settleScarf.position.set(SETTLE_SCARF.x, SETTLE.seat + 0.006, SETTLE_SCARF.z);
+settleScarf.position.set(SETTLE_SCARF.x, SETTLE.seat, SETTLE_SCARF.z);
 settleScarf.name = 'settle-scarf'; scene.add(settleScarf); register(settleScarf, 1);
 hangDrawing(settleScarf, '../assets/layers/settle-scarf.png', SETTLE_SCARF.w, function (im) {
-  layCloth(settleScarf, im, SETTLE_SCARF.w, 0.015, 2.5);
-  scarfTape.position.z = clothHeight(TAPE.at.x / SETTLE_SCARF.w, TAPE.at.y / (SETTLE_SCARF.w * im.height / im.width), 0.015) + 0.002;
+  var h = standHeap(settleScarf, SETTLE_SCARF.w, im, new THREE.Vector3(SETTLE_SCARF.x, SETTLE.seat, SETTLE_SCARF.z), -Math.PI / 2, 40);
+  scarfTape.position.set((TAPE.u - 0.5) * SETTLE_SCARF.w, (1 - TAPE.v) * h, 0.003);
 });
 /* its name tape (Godric, 7.05 pm): a tap on the scarf bends him over it, and a cotton tape sewn inside the end at the arm
    turns up, H. ABBOTT in red, the first name the Sorting Hat called (PS 7), a first-year waiting for a Gryffindor friend.
    Life size, 7 by 1.4 cm, a child of the scarf so it keeps the drawing's turn; once turned up it stays for the visit
-   (my choice). At (95, 75) of the drawing's 720 by 397, on the dark band by the fringe. */
-var TAPE = { w: 0.07, h: 0.014, at: new THREE.Vector3((95 / 720 - 0.5) * SETTLE_SCARF.w, (0.5 - 75 / 397) * SETTLE_SCARF.w * 397 / 720, 0.002) };
+   (my choice). On the heap (4.11 pm) at (616, 382) of the drawing's 800 by 532, on the black band just inside its trailing
+   fringe, sewn along the fringe's edge (26.6 degrees). */
+var TAPE = { w: 0.07, h: 0.014, u: 616 / 800, v: 382 / 532, turn: 26.6 };
 var scarfTape = cutoutMesh(cutoutTexture(500, 100, '#efe6cf', function (g, w, h) {
   g.fillRect(0, 0, w, h);
   g.strokeStyle = 'rgba(150,130,100,0.6)'; g.lineWidth = 3; g.setLineDash([9, 7]);
@@ -769,7 +811,7 @@ var scarfTape = cutoutMesh(cutoutTexture(500, 100, '#efe6cf', function (g, w, h)
   g.fillStyle = '#a81c1c'; g.font = 'bold 54px Georgia, serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
   g.fillText('H. ABBOTT', w / 2, h / 2 + 2);
 }), TAPE.w, TAPE.h);
-scarfTape.position.copy(TAPE.at); scarfTape.visible = false; scarfTape.name = 'scarf-tape';
+scarfTape.rotation.z = TAPE.turn * Math.PI / 180; scarfTape.visible = false; scarfTape.name = 'scarf-tape';
 settleScarf.add(scarfTape);
 /* the painting opposite (req 33, round 1, candidate 3, Godric, 9 October 2026, 5.11 pm): an empty panelled landing in a
    beaded gilt frame, a door ajar at its right edge, 0.5 by 0.54 m, its own shape about the slot's centre */
@@ -1577,6 +1619,7 @@ function frame() {
   updateTrevor(dt);
   updateLines(dt);
   updateDraught(dt);
+  updateScarf(dt);
   updateDoorsKnock(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
