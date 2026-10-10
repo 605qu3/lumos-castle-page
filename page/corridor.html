@@ -934,6 +934,9 @@ function goBack() {
   /* up from the landing (req 59) he turns round as he climbs, the drag's turn in reverse, rather than the look
      passing through him */
   var turn = atStop && atStop.name === 'landing' ? (Math.abs(yaw) > 1.5 ? yaw : Math.PI) : 0;
+  /* stepping back from the landing is a moment of its own (req 82: the gallery's whisper resumes behind him), raised
+     while `at` still reads the landing */
+  if (turn && castle && castle.moment) castle.moment('back from walk-up');
   atStop = null;
   backBtn.hidden = true;
   yaw = yawT = 0; pitch = pitchT = 0;
