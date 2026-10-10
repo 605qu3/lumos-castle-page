@@ -372,15 +372,50 @@ kerb.position.y = 0.07; kerb.name = 'kerb'; well.add(kerb); register(kerb, 1);
 var wellTap = new THREE.Mesh(new THREE.CircleGeometry(WELL_R + 0.15, 32), new THREE.MeshBasicMaterial());
 wellTap.rotation.x = -Math.PI / 2; wellTap.position.y = 0.01; wellTap.visible = false; well.add(wellTap);
 
-/* ---------- light, at night ---------- */
+/* ---------- light, by the runtime's clock ---------- */
+/* The waking's light (Magic for the boys, "The waking's light", Godric's pick of 9 October 2026, 2.43 pm; board req
+   39): the room keeps the runtime's `time`, so he wakes to the real clock's light, morning light in the morning, the
+   low sun in the evening, and by night the night room with the fire made up warmer than at lights out. By night the
+   others' hangings stay drawn, as he left them; by day their beds are empty, the hangings tied back. Each time is the
+   window lights (the moons by night), the sky and the fire; lights out dims whichever it is. */
+var LIGHTS = {
+  morning: { sky: 0xeef4fa, win: 0xe4ecf4, winK: 2.2, hemiSky: 0xbfc8d2, hemiGround: 0x4a4038, hemi: 0.5, fire: 0.25 },
+  day:     { sky: 0xf4f6f8, win: 0xeef0ee, winK: 2.4, hemiSky: 0xc4c8cc, hemiGround: 0x4e4438, hemi: 0.55, fire: 0.25 },
+  evening: { sky: 0xf2c89a, win: 0xffc88e, winK: 1.7, hemiSky: 0x8a7a72, hemiGround: 0x3a2c22, hemi: 0.38, fire: 0.6 },
+  night:   { sky: 0xdfe8f0, win: 0x9fb6dc, winK: 1, hemiSky: 0x2e3448, hemiGround: 0x1b1613, hemi: 0.3, fire: 1 }
+};
 var hemi = new THREE.HemisphereLight(col(0x2e3448), col(0x1b1613), 0.3);
 scene.add(hemi);
-/* lights out (the bedtime): the fire banked, the moons and the hemisphere down; lumosGreybox.dim(on) */
+var light = 'night', fireK = 1;
+/* the clock's time: the runtime's own once it hands one (asked of Events), ?time= as the runtime's test link, else
+   night, the room as it was drawn */
+function clockTime() {
+  if (castle && castle.time) return castle.time();
+  var q = new URLSearchParams(location.search).get('time');
+  return LIGHTS[q] ? q : 'night';
+}
+function setLight(name) {
+  var L = LIGHTS[name] || LIGHTS.night;
+  light = LIGHTS[name] ? name : 'night';
+  windows.forEach(function (w) {
+    w.moon.color.copy(col(L.win)); w.moon.userData.base = (w.name === 'W3' ? 1.1 : 0.6) * L.winK;
+    w.sky.material.color.copy(col(L.sky)); w.sky.userData.base = w.sky.material.color.clone();
+  });
+  hemi.color.copy(col(L.hemiSky)); hemi.groundColor.copy(col(L.hemiGround)); hemi.userData.base = L.hemi;
+  fireK = L.fire;
+  dim(dimK < 1);
+  return light;
+}
+/* lights out (the bedtime): the fire banked, the window lights and the hemisphere down; lumosGreybox.dim(on) */
 var dimK = 1;
 function dim(on) {
   dimK = on ? 0.3 : 1;
   windows.forEach(function (w) { w.moon.intensity = w.moon.userData.base * (on ? 0.4 : 1); });
-  hemi.intensity = on ? 0.12 : 0.3;
+  hemi.intensity = (hemi.userData.base != null ? hemi.userData.base : 0.3) * (on ? 0.4 : 1);
+}
+/* the others' beds as the clock finds them on waking: drawn by night, tied back and empty by day */
+function othersAsTheClock() {
+  beds.forEach(function (b) { if (!b.his) hangings(b.name, light === 'night' ? 1 : 0); });
 }
 function hangings(name, k) {
   var b = beds.filter(function (x) { return x.name === name; })[0];
@@ -644,6 +679,7 @@ function startNight(kind, t, hold, here) {
   yaw = yawT = 0; pitch = pitchT = 0;
   endVeil.style.opacity = '0';
   BED_NAMES.forEach(function (n) { hangings(n, 0); });
+  if (kind === 'waking') othersAsTheClock();
   dim(kind === 'bedtime');
   if (kind === 'bedtime') kit.savePlace({ room: 'dormitory', stop: 'waking' });
   nightPose(night.t); camera.lookAt(lookTmp);
@@ -715,11 +751,6 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
 backBtn.addEventListener('click', goBack);
 setView(view);
-/* the lights-out trip's flag is bare (&bedtime); ?bedtime=N is a test's visit length in minutes, not a trip */
-var lightsOutTrip = new URLSearchParams(location.search).get('bedtime') === '';
-if ((kit.from === 'room' || kit.from === 'corridor') && lightsOutTrip) startNight('bedtime');
-else if (kit.from === 'room') arriveFromRoom();
-else if (kit.from === 'sleep') startNight('waking');
 
 /* ---------- the events' lines (board req 67; The events runtime, Twenty-fourth session) ----------
    The corridor's way (req 66), kept the same so the three pages read alike: the runtime hands each firing's lines to
@@ -825,6 +856,14 @@ var castle = window.CastleEvents ? CastleEvents.start({
   builtins: { at: function () { return atStop ? atStop.name : 'none'; } }
 }) : null;
 
+/* the light first, by the clock, then the way he came: the arrival, either night, or the waking */
+setLight(clockTime());
+/* the lights-out trip's flag is bare (&bedtime); ?bedtime=N is a test's visit length in minutes, not a trip */
+var lightsOutTrip = new URLSearchParams(location.search).get('bedtime') === '';
+if ((kit.from === 'room' || kit.from === 'corridor') && lightsOutTrip) startNight('bedtime');
+else if (kit.from === 'room') arriveFromRoom();
+else if (kit.from === 'sleep') startNight('waking');
+
 /* ---------- per frame ---------- */
 
 var clock = new THREE.Clock();
@@ -837,7 +876,7 @@ function frame() {
   updateLines(dt);
   /* the fire low: a slow flicker */
   var f = 0.85 + 0.15 * Math.sin(t * 9) * Math.sin(t * 3.7);
-  fireGlow.intensity = 1.5 * f * dimK;
+  fireGlow.intensity = 1.5 * f * dimK * fireK;
   flame.scale.set(0.45 * (0.94 + 0.06 * Math.sin(t * 6.1)), 0.4 * (0.85 + 0.15 * Math.abs(Math.sin(t * 7.9))), 1);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -849,7 +888,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
-  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, dim: dim, pose: pose,
+  descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, dim: dim, pose: pose, setLight: setLight, light: function () { return light; },
   bedtime: function () { startNight('bedtime'); }, waking: function () { startNight('waking'); },
   holdNight: function (kind, t) {
     if (kind !== 'here') { startNight(kind, t, true); return nightEnd(kind); }
