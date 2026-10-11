@@ -1165,6 +1165,56 @@ function updateGrounds(dt) {
   grounds.acc = (grounds.acc || 0) + dt;
   if (grounds.acc > 1 / 20) { grounds.acc = 0; drawGrounds(t); }
 }
+/* a snowball past the window (req 115, Events' grounds.snowball, page/events/grounds.json: by day while snow lies, the
+   runtime's when): thrown up from a fight on the grounds below, it rises into the grounds' window, slows, sheds a flake
+   or two at the top and drops back out of sight; drawn as the common room draws its own (req 118, common-room.html,
+   snowballFly), its size, pen line and powder trail cited from there, into a canvas laid just in front of the view, so
+   the stone of the opening, the sill and the mullion hide it outside the glass. ?snowball throws one every few seconds */
+var snowball = null, snowballLook = groundsQ.has('snowball'), snowballNext = 4;
+var SNOW_PX = 240;   /* the canvas across the glass's width */
+var snowCanvas = null, snowTex = null;
+function snowballFly() {
+  if (!snowCanvas) {
+    var sky = groundsWin.sky, gw = GROUNDS.w, gh = sky.geometry.parameters.height;
+    snowCanvas = makeCanvas(SNOW_PX, Math.round(SNOW_PX * gh / gw)); snowTex = tex(snowCanvas);
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(gw, gh), new THREE.MeshBasicMaterial({ map: snowTex, transparent: true, depthWrite: false }));
+    m.position.z = 0.004; m.renderOrder = 5; m.name = 'grounds-snowball'; sky.add(m);
+  }
+  snowball = { t: 0, T: 1.5 + 0.4 * Math.random(), x0: (Math.random() < 0.5 ? 0.27 : 0.73) + (Math.random() - 0.5) * 0.1,
+    drift: (Math.random() - 0.5) * 0.08,   /* inside one light, clear of the mullion */ peak: 0.3 + 0.2 * Math.random(), flakes: [] };
+}
+function updateSnowball(dt) {
+  if (snowballLook && !snowball && (snowballNext -= dt) <= 0) { snowballNext = 5; snowballFly(); }
+  if (!snowball) return;
+  var s = snowball, g = snowCanvas.getContext('2d'), w = snowCanvas.width, h = snowCanvas.height;
+  s.t += dt;
+  var u = s.t / s.T, r = w * 0.14 / GROUNDS.w / 2;   /* about 14 cm across, as the room's */
+  g.clearRect(0, 0, w, h);
+  if (u < 1) {
+    var x = (s.x0 + s.drift * u) * w, y = h + r - (h * s.peak + r) * 4 * u * (1 - u);
+    if (u > 0.45 && s.flakes.length < 3 && Math.random() < 0.2) s.flakes.push({ x: x + (Math.random() - 0.5) * r, y: y - r * 0.6, t: 0 });
+    s.flakes.forEach(function (f) {
+      f.t += dt; f.y += 30 * dt;
+      g.fillStyle = 'rgba(244,246,250,' + Math.max(0, 0.9 - f.t * 1.2) + ')';
+      g.beginPath(); g.arc(f.x, f.y, r * 0.22, 0, Math.PI * 2); g.fill();
+    });
+    for (var j = 4; j >= 1; j--) {
+      var uj = Math.max(0, u - j * 0.025), xj = (s.x0 + s.drift * uj) * w, yj = h + r - (h * s.peak + r) * 4 * uj * (1 - uj);
+      g.fillStyle = 'rgba(240,244,250,' + (0.45 - j * 0.09) + ')';
+      g.beginPath(); g.arc(xj, yj, r * (0.9 - j * 0.12), 0, Math.PI * 2); g.fill();
+    }
+    var grd = g.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.15, x, y, r);
+    grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
+    g.fillStyle = grd; g.beginPath();
+    for (var i = 0; i <= 10; i++) {
+      var a = i / 10 * Math.PI * 2, k = r * (0.92 + 0.08 * Math.sin(i * 2.7));
+      if (i) g.lineTo(x + k * Math.cos(a), y + k * Math.sin(a)); else g.moveTo(x + k, y);
+    }
+    g.fill();
+    g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();
+  } else snowball = null;
+  snowTex.needsUpdate = true;
+}
 var TAPESTRY = { w: 1.4, h: 2.0, x: NOOK_MID };
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
 /* her wall: two portraits on the study's stretch, symmetric about the bay axis; portrait-a is the one nearest her */
@@ -2427,6 +2477,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
   cues: {
     "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does": function () { goTo(STOPS.filter(function (s) { return s.name === 'armour'; })[0]); },
     'the open visor drops shut': function () { armourJiggle = 0.4; },
+    /* the grounds (req 115, Events' grounds.json): the snowball; the field and the lake are not in this window's view */
+    'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
     /* the painting opposite, met as he steps out (req 119): watching, caught slipping out, or paying him no mind */
     "the mantel painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady": function () { oppMoment('watch', 'mantel'); },
     "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'mantel'); },
@@ -2512,6 +2564,7 @@ function frame() {
   updateDoorsKnock(dt);
   updateHerPatches(dt);
   updateGrounds(dt);
+  updateSnowball(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -2540,7 +2593,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
