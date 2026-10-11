@@ -172,7 +172,7 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=2"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=12"></script>
+<script src="castle-events.js?v=14"></script>
 <script>
 (function () {
 'use strict';
@@ -381,6 +381,110 @@ function placeMoon() {
   moonDisc.material.opacity = light === 'night' ? 1 : 0.45;                           /* a day moon, pale */
   moonDisc.visible = true;
   return m;
+}
+
+/* what passes the glass: a clear canvas over each window's sky, the glass's own size, so a thing flying past shows
+   only in the glass and never on the wall beside it; nearer the room than the moon, so the owl crosses in front of it.
+   Two things use it, each drawn in code, nothing spent: the snowball (req 117) and the full moon's owl (req 103). */
+var PAST_PX = 300;   /* canvas pixels a metre */
+windows.forEach(function (w) {
+  var c = makeCanvas(WIN.w * PAST_PX, WIN.h * PAST_PX), t = tex(c);
+  var plane = new THREE.Mesh(new THREE.PlaneGeometry(WIN.w, WIN.h), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, fog: false }));
+  var p = pol(WALL_R - 0.06, w.deg);
+  plane.position.set(p.x, WIN.sill + WIN.h / 2, p.z);
+  plane.lookAt(0, WIN.sill + WIN.h / 2, 0);
+  plane.name = w.name + '-past'; scene.add(plane);
+  w.past = { canvas: c, tex: t, plane: plane, busy: false };
+});
+var pastV = new THREE.Vector3();
+function inFrame(v) { pastV.copy(v).project(camera); return pastV.z < 1 && Math.abs(pastV.x) < 0.95 && Math.abs(pastV.y) < 0.95; }
+
+/* a snowball past the window (board req 117, Events' grounds.snowball, page/events/grounds.json: by day while snow
+   lies, the runtime's when): thrown up from a fight on the grounds far below, it rises into the glass, slows, sheds a
+   flake or two at the top and drops out of sight, as the common room's (req 118) and the corridor's do. A window in
+   view takes it, else any. About 12 cm across with a pen line and a short powder trail, so it reads on the pale sky.
+   The record's other two wait for the windows' views, which are drawings (nothing drawn until the common room's
+   furnishing is through): the lake frozen white at W2, and Hagrid on the Quidditch field if a view finds the field. */
+var snowball = null;
+function snowballFly(name) {
+  var seen = windows.filter(function (w) { return inFrame(w.sky.position); });
+  var pool = name ? windows.filter(function (w) { return w.name === name; }) : (seen.length ? seen : windows);
+  var w = pool[Math.floor(Math.random() * pool.length)];
+  if (!w || w.past.busy) return null;
+  w.past.busy = true;
+  snowball = { w: w, t: 0, T: 1.5 + 0.4 * Math.random(), x0: 0.35 + 0.3 * Math.random(), drift: (Math.random() - 0.5) * 0.1,
+    peak: 0.3 + 0.25 * Math.random(), flakes: [] };
+  return w.name;
+}
+function updateSnowball(dt) {
+  if (!snowball) return;
+  var s = snowball, c = s.w.past.canvas, g = c.getContext('2d'), w = c.width, h = c.height;
+  s.t += dt;
+  var u = s.t / s.T, r = 0.06 * PAST_PX;
+  g.clearRect(0, 0, w, h);
+  if (u < 1) {
+    var x = (s.x0 + s.drift * u) * w, y = h + r - (h * s.peak + r) * 4 * u * (1 - u);
+    if (u > 0.45 && s.flakes.length < 3 && Math.random() < 0.2) s.flakes.push({ x: x + (Math.random() - 0.5) * r, y: y - r * 0.6, t: 0 });
+    s.flakes.forEach(function (f) {
+      f.t += dt; f.y += 30 * dt;
+      g.fillStyle = 'rgba(244,246,250,' + Math.max(0, 0.9 - f.t * 1.2) + ')';
+      g.beginPath(); g.arc(f.x, f.y, r * 0.22, 0, Math.PI * 2); g.fill();
+    });
+    for (var j = 4; j >= 1; j--) {                 /* a short trail of powder behind it, so the throw reads */
+      var uj = Math.max(0, u - j * 0.025), xj = (s.x0 + s.drift * uj) * w, yj = h + r - (h * s.peak + r) * 4 * uj * (1 - uj);
+      g.fillStyle = 'rgba(240,244,250,' + (0.45 - j * 0.09) + ')';
+      g.beginPath(); g.arc(xj, yj, r * (0.9 - j * 0.12), 0, Math.PI * 2); g.fill();
+    }
+    var grd = g.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.15, x, y, r);
+    grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
+    g.fillStyle = grd; g.beginPath();
+    for (var i = 0; i <= 10; i++) {                   /* packed by hand, so not quite round */
+      var a = i / 10 * Math.PI * 2, k = r * (0.92 + 0.08 * Math.sin(i * 2.7));
+      if (i) g.lineTo(x + k * Math.cos(a), y + k * Math.sin(a)); else g.moveTo(x + k, y);
+    }
+    g.fill();
+    g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();
+  } else { s.w.past.busy = false; snowball = null; }
+  s.w.past.tex.needsUpdate = true;
+}
+
+/* the full moon's owl at W3 (board req 103, Magic for the boys, *The full moon's touch*; Events' night.moon-owl, req
+   101): the runtime asks the page `moon in view`, yes where the disc is in the glass inside the frame as he looks, as it
+   is on the night waking from his bed (right of centre). The page answers no until the Common room's flight cell is
+   drawn and placed here (req 102, a generate with Godric's yes): a yes spends the castle's one crossing that night and
+   marks the visit an owl's, so it waits until there is an owl to show. The crossing is built: the owl's shape carried
+   across the disc, left to right with a slight rise, in about two seconds, wings beating, a dark stand-in until the
+   cell's image is named in MOON_OWL.cell; lumosGreybox.moonOwl() flies it for a shot. */
+var MOON_OWL = { cell: null, T: 2.0, span: 0.13 };
+function moonInView() { return !!MOON_OWL.cell && light === 'night' && moonDisc.visible && inFrame(moonDisc.position); }
+var moonOwl = null;
+function moonOwlFly() {
+  var W = windows.filter(function (w) { return w.name === MOON.win; })[0];
+  if (!moonDisc.visible || W.past.busy) return false;
+  W.past.busy = true;
+  moonOwl = { w: W, t: 0, y: (WIN.sill + WIN.h - moonDisc.position.y) * PAST_PX };   /* the disc's height in the glass */
+  return true;
+}
+function updateMoonOwl(dt) {
+  if (!moonOwl) return;
+  var o = moonOwl, c = o.w.past.canvas, g = c.getContext('2d'), w = c.width, h = c.height;
+  o.t += dt;
+  var u = o.t / MOON_OWL.T, s = MOON_OWL.span * PAST_PX / 2;
+  g.clearRect(0, 0, w, h);
+  if (u < 1) {
+    var x = -s + (w + 2 * s) * u, y = o.y + 10 - 20 * u, beat = Math.sin(o.t * 14);   /* across the disc's face, rising a little */
+    g.fillStyle = 'rgba(16,18,24,0.95)';
+    g.beginPath(); g.ellipse(x, y, s * 0.28, s * 0.17, -0.1, 0, Math.PI * 2); g.fill();   /* the body */
+    g.beginPath(); g.arc(x + s * 0.3, y - s * 0.06, s * 0.14, 0, Math.PI * 2); g.fill();   /* the round head */
+    [1, 0.7].forEach(function (k) {                                                        /* the near wing and the far, beating */
+      var ty = y - s * 0.95 * beat * k;
+      g.beginPath(); g.moveTo(x + s * 0.12, y - s * 0.05);
+      g.quadraticCurveTo(x + s * 0.05, ty, x - s * 0.35, ty);                             /* the leading edge out to the tip */
+      g.quadraticCurveTo(x - s * 0.2, y - (ty - y) * 0.1, x - s * 0.2, y);                /* the trailing edge back */
+      g.fill();
+    });
+  } else { o.w.past.busy = false; moonOwl = null; }
+  o.w.past.tex.needsUpdate = true;
 }
 
 /* the stair head: the well in the floor round the newel, its dark inside, the newel post rising 1.0 m above the floor,
@@ -923,10 +1027,16 @@ var castle = window.CastleEvents ? CastleEvents.start({
       startNight('bedtime', 0, false, { pos: camera.position.clone(), look: lookTmp.clone() });
     },
     /* Neville's snore on a night waking (board req 89): his line comes from the corner bed (SPEAKER_AT) */
-    'behind the drawn hangings of the corner bed, a loud snore, and the hangings stir': function () { stir(CORNER_BED); }
+    'behind the drawn hangings of the corner bed, a loud snore, and the hangings stir': function () { stir(CORNER_BED); },
+    /* the grounds by day while snow lies (board req 117) and the full moon's owl at W3 (req 103), drawn past the glass */
+    'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
+    "an owl's dark shape crosses the full moon, wings out, and is gone": moonOwlFly
   },
   showLines: showLines,
-  builtins: { at: function () { return atStop ? atStop.name : 'none'; } }
+  builtins: {
+    at: function () { return atStop ? atStop.name : 'none'; },
+    'moon in view': function () { return moonInView() ? 'yes' : 'no'; }
+  }
 }) : null;
 
 /* the light first, by the clock, then the way he came: the arrival, either night, or the waking */
@@ -940,6 +1050,8 @@ else if (kit.from === 'sleep') startNight('waking');
 /* ---------- per frame ---------- */
 
 var clock = new THREE.Clock();
+/* ?snowball throws one every five seconds, ?moonowl flies the owl across the moon as often, for a look */
+var PAST_TEST = ['snowball', 'moonowl'].filter(function (k) { return new URLSearchParams(location.search).has(k); })[0], pastTest = 4;
 var t = 0, moonClock = 0;
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
@@ -948,6 +1060,8 @@ function frame() {
   updateCamera(dt);
   updateLines(dt);
   updateStirs(dt);
+  updateSnowball(dt); updateMoonOwl(dt);
+  if (PAST_TEST) { pastTest += dt; if (pastTest > 5) { pastTest = 0; if (PAST_TEST === 'snowball') snowballFly(); else moonOwlFly(); } }
   moonClock += dt;
   if (moonClock > 60 && !night && !leaving) { moonClock = 0; setLight(light); }   /* the moon rises and sets through a long visit, never mid-sequence */
   /* the fire low: a slow flicker */
@@ -966,6 +1080,8 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, stir: stir, dim: dim, pose: pose,
   moon: function () { return { now: moonNow, shown: moonDisc.visible, window: MOON.win, at: moonDisc.position.toArray().map(function (v) { return +v.toFixed(2); }), d: MOON.d }; }, setLight: setLight, light: function () { return light; },
+  snowball: snowballFly, snowballNow: function () { return snowball && { window: snowball.w.name, t: snowball.t }; },
+  moonOwl: moonOwlFly, moonOwlNow: function () { return moonOwl && { t: moonOwl.t }; }, moonInView: function () { return { answer: moonInView(), discInFrame: moonDisc.visible && inFrame(moonDisc.position), cell: MOON_OWL.cell }; },
   bedtime: function () { startNight('bedtime'); }, waking: function () { startNight('waking'); },
   holdNight: function (kind, t) {
     if (kind !== 'here') { startNight(kind, t, true); return nightEnd(kind); }
