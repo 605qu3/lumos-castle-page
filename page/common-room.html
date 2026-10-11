@@ -2588,6 +2588,10 @@ function homeLetterTap() {
   if (held || homeState.shown !== 'letter') return;
   homeState.stage = 0;
   homeSet(homeLetter, homeState.front);
+  /* Godric's touch on Q17 (11 October 2026): a soft paper rustle as it is picked up, in words as the room's sounds
+     are until they are recorded */
+  HEARD_FROM.letter = homeLetter.homePos.clone().add(new THREE.Vector3(0, HOME.h * 0.9, 0));
+  lineQ.unshift({ medium: 'heard', speaker: 'letter', sound: 'rustle' });
   liftPaper(homeLetter);
 }
 /* a tap with it in his hand: over, then open, then back to the desk */
