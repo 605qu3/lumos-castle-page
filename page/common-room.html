@@ -814,11 +814,37 @@ function drawPortraitBack(g, w, h) {
    throws its light from. */
 function drawSky(withMoon) {
   return function (g, w, h) {
-    var grd = g.createLinearGradient(0, 0, 0, h);
-    grd.addColorStop(0, '#b4c4dc'); grd.addColorStop(1, '#5f6d88');
+    var grd = g.createLinearGradient(0, 0, 0, h), L = sky.night ? (sky.moon ? sky.moon.light : 0) : 1;
+    if (sky.night) { grd.addColorStop(0, mixHex('#141a2a', '#43547a', L)); grd.addColorStop(1, mixHex('#232b3e', '#36425c', L)); }
+    else { grd.addColorStop(0, '#b4c4dc'); grd.addColorStop(1, '#5f6d88'); }
     g.fillStyle = grd; arch(g, 0, 0, w, h);
-    if (withMoon) { g.fillStyle = '#eef1f6'; g.beginPath(); g.arc(w * 0.68, h * 0.22, w * 0.11, 0, Math.PI * 2); g.fill(); }
+    if (withMoon && sky.shows) drawMoonDisc(g, sky.moon, w * 0.68, h * moonY(sky.moon), w * 0.11, sky.night ? 1 : 0.75);
   };
+}
+/* The real moon (board req 96, Magic's "The real moon, how real", Godric's pick of 10 October 2026, 5.16 pm): the
+   runtime's moon() (req 95) in the right window's sky, its phase lit on the right while waxing and the left while
+   waning, set as high in the glass as it stands in the sky, from the lower right light (on the horizon) to the arch
+   (0.9 of the way overhead), so the test's 35 degrees and a summer's full moon sit clear in the lower light, a
+   winter's in the arch, and only near 55 degrees does the transom hide it, as a real one would; gone while it is down or nearly new, pale by day. Read at load and once a minute.
+   By night the sky darkens with it and the window's light follows its fullness from starlight, the hemisphere made
+   up as it wanes so a moonless night is no darker than any other, the fire always the main light (the night rule). */
+var SKY_MOON = { low: 0.62, high: 0.12, top: 0.9 };
+var sky = { moon: null, night: false, shows: false };
+function lerpN(a, b, k) { return a + (b - a) * k; }
+function moonY(m) { return lerpN(SKY_MOON.low, SKY_MOON.high, Math.min(1, m.height / SKY_MOON.top)); }
+function mixHex(a, b, k) {
+  var p = parseInt(a.slice(1), 16), q = parseInt(b.slice(1), 16), o = '#';
+  for (var s = 16; s >= 0; s -= 8) o += ('0' + Math.round(lerpN((p >> s) & 255, (q >> s) & 255, k)).toString(16)).slice(-2);
+  return o;
+}
+function drawMoonDisc(g, m, cx, cy, r, alpha) {
+  var e = m.age / 29.53 * Math.PI * 2, side = m.waxing ? 1 : -1, k = Math.cos(e);   /* the terminator's half width, +1 new to -1 full */
+  g.save(); g.globalAlpha = alpha;
+  g.fillStyle = 'rgba(60,70,90,0.35)'; g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.fill();   /* the dark limb, faint */
+  g.fillStyle = '#eef1f6'; g.beginPath();
+  g.arc(cx, cy, r, -Math.PI / 2, Math.PI / 2, side < 0);                                 /* the lit limb's half */
+  g.ellipse(cx, cy, Math.abs(k) * r, r, 0, Math.PI / 2, -Math.PI / 2, (k > 0) === (side > 0));   /* back by the terminator */
+  g.fill(); g.restore();
 }
 /* The grey placeholder: the sky with bars painted over it, all one texture. */
 function drawWindow(withMoon) {
@@ -3887,7 +3913,8 @@ function updateCurl(dt, t) {
 
 /* ---------- lights ---------- */
 
-scene.add(new THREE.HemisphereLight(col(0x3a4056), col(0x1b1613), 0.28));
+var hemi = new THREE.HemisphereLight(col(0x3a4056), col(0x1b1613), 0.28);
+scene.add(hemi);
 
 var fireSpot = new THREE.SpotLight(col(0xffa24a), 2.6, 18, 1.05, 0.7, 1.0);
 fireSpot.position.set(0, 1.4, -4.5);
@@ -4939,10 +4966,27 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'right sitter': function () { return sitterPhase(sitters.him); },
     /* the full moon's owl (req 101 and 102): yes where the moon's disc is in a window's glass where his eye reaches it.
        No until the owl's flight cell is drawn (req 102, a generate with Godric's yes, on the owl sheet req 99 waits
-       for) and the disc follows moon() (req 96): the record would set owl_landed for the night with nothing to show */
+       for); the disc follows moon() since req 96 (lumosGreybox.moon() gives whether it shows and where): the record
+       would set owl_landed for the night with nothing to show */
     'moon in view': function () { return 'no'; }
   }
 }) : null;
+
+/* the real moon, read now and once a minute (req 96; drawSky above): the right window's sky redrawn, the window's
+   light following the moon's fullness by night from starlight (0.3), the hemisphere made up as it wanes */
+function updateSky() {
+  var m = castle && castle.moon ? castle.moon() : null, tm = castle && castle.time ? castle.time() : 'night';
+  sky.moon = m; sky.night = tm === 'night'; sky.shows = !!(m && m.up && m.lit >= 0.02);
+  var L = sky.night ? (m ? m.light : 0) : 1;
+  moonSpot.intensity = 1.8 * (0.3 + 0.7 * L);
+  hemi.intensity = 0.28 * (1 + 0.6 * (1 - L));
+  [[skyR, true], [skyL, false]].forEach(function (p) {
+    if (snowball && snowball.sky === p[0]) return;   /* the snowball redraws its own sky each frame */
+    var tx = p[0].material.map, c = tx.image, g = c.getContext('2d');
+    g.clearRect(0, 0, c.width, c.height); drawSky(p[1])(g, c.width, c.height); tx.needsUpdate = true;
+  });
+}
+updateSky(); setInterval(updateSky, 60000);
 
 /* arriving through the hole from the corridor (?from=corridor): the room comes up from black at its default view with
    her swinging shut behind him */
@@ -4999,7 +5043,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
