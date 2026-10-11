@@ -1,0 +1,42 @@
+{
+  "chain": "grounds",
+  "room": [
+    {
+      "when": [
+        "date >= 11-01",
+        "date <= 11-30",
+        "ground = frost",
+        "time = morning"
+      ],
+      "show": [
+        "far off on the Quidditch field, Hagrid bundled in his moleskin overcoat, fur gloves and great boots, defrosting broomsticks"
+      ]
+    },
+    {
+      "when": [
+        "ground = snow",
+        "season = winter"
+      ],
+      "show": [
+        "the lake frozen solid, white under the snow"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "grounds.snowball",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "ground = snow",
+        "time != night"
+      ],
+      "show": [
+        "a snowball flies up past the window from a fight on the grounds below and drops out of sight"
+      ]
+    }
+  ]
+}
