@@ -1714,10 +1714,11 @@ function makeNightView() {
   NIGHT.panes = mk;
   NIGHT.view = { veil: veil, lit: lit };
 }
-function drawNightView() {
+function drawNightView(cold) {   /* cold: a frosty morning, the smoke only (Godric's touch on Q26) */
   var g = NIGHT.canvas.getContext('2d'), b = NIGHT.BOX;
   g.clearRect(0, 0, b[2], b[3]);
-  if (!hagridHome()) { NIGHT.tex.needsUpdate = true; return; }
+  if (!cold && !hagridHome()) { NIGHT.tex.needsUpdate = true; return; }
+  if (!cold) {
   var f = 0.85 + 0.15 * Math.sin(t * 7.1) * Math.sin(t * 3.3);   /* his fire flickers behind the glass */
   g.save(); g.translate(-b[0], -b[1]);
   [NIGHT.WIN, NIGHT.GABLE].forEach(function (r, j) {             /* the glow round each window */
@@ -1728,6 +1729,7 @@ function drawNightView() {
   });
   g.restore();
   g.globalAlpha = 0.75 + 0.25 * f; g.drawImage(NIGHT.panes, 0, 0); g.globalAlpha = 1;
+  }
   /* the thread of smoke: soft puffs rising from the chimney, leaning with the day's wind and spreading as they climb */
   var c = NIGHT.CHIMNEY, wind = groundsWind();
   for (var n = 0; n < 14; n++) {
@@ -1767,13 +1769,15 @@ function updateNight(dt) {
   if (!NIGHT.moon) makeMoon();
   if (grounds.img && !NIGHT.view) makeNightView();
   var k = nightK(), night = k >= 0.5;
-  if (NIGHT.view && night && atStop && atStop.name === 'window') drawNightView();   /* the smoke moves only where it is seen */
+  /* on a frosted morning a thread of smoke from his chimney too (Godric's touch on Q26, 7.39 am), his fire lit */
+  var cold = !night && lightTime() === 'morning' && frostLevels().grounds > 0;
+  if (NIGHT.view && (night || cold) && atStop && atStop.name === 'window') drawNightView(cold);   /* the smoke moves only where it is seen */
   if (t < NIGHT.next) return;
   NIGHT.next = t + 2;
   var w = groundsWeather(), m = castle && castle.moon ? castle.moon() : null;
   var moonUp = !!(m && m.up && m.lit >= 0.02), clear = !w || w.sky === 'clear';
   var moonlight = moonUp ? (clear ? 1 : 0.3) * m.lit : 0;
-  var key = k + ':' + moonlight.toFixed(2) + ':' + clear + ':' + !!NIGHT.view + ':' + (m ? m.age.toFixed(1) + ':' + m.height.toFixed(2) : '');
+  var key = k + ':' + cold + ':' + moonlight.toFixed(2) + ':' + clear + ':' + !!NIGHT.view + ':' + (m ? m.age.toFixed(1) + ':' + m.height.toFixed(2) : '');
   if (key === NIGHT.key) return;
   NIGHT.key = key;
   hemi.intensity = NIGHT.hemi0 * (1 - 0.8 * k) + 0.06 * moonlight * k;
@@ -1784,8 +1788,8 @@ function updateNight(dt) {
   if (NIGHT.view) {
     NIGHT.view.veil.material.opacity = night ? 0.86 - 0.14 * moonlight : 0.25;
     NIGHT.view.veil.visible = k > 0;
-    NIGHT.view.lit.visible = night;
-    if (night) drawNightView();
+    NIGHT.view.lit.visible = night || cold;
+    if (night || cold) drawNightView(cold);
   }
   if (grounds.canvas) drawGrounds(t);   /* the washing comes in */
   NIGHT.stars.visible = night && clear;
