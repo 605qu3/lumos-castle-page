@@ -870,6 +870,7 @@ var grounds = { overlay: null, canvas: null, tex: null, img: null, crossing: nul
     sky.add(grounds.overlay);
     grounds.img = im;
     makeFrostedGrounds(im);
+    makeSnowyGrounds(im);
     /* the stand-in frame's name would print across the view: the same frame without it */
     groundsWin.frame.material.map = cutoutTexture(240, 480, '#8e8a84', function (g, w, h) {
       arch(g, 0, 0, w, h);
@@ -1005,8 +1006,8 @@ function rimeRoof(g, day) {
    about 55 at the bank, and the ground is seen at a slant, so each print is foreshortened along the walk. Drawn twice as
    large as life so they read from the corridor. Each is a sole and a heel, the frost pressed off so the grass
    shows dark through it. */
-function bootPrints(g) {
-  var y = 1088, side = 1;
+function bootPrints(g, snow) {   /* snow: pressed into snow, a blue-grey hollow, not the grass showing through frost */
+  var y = 1088, side = 1, fill = snow ? '#7d8ea8' : '#46524b', rim = snow ? '#5a6a84' : '#2a302c';
   g.save();
   while (y < 1450) {
     var t = (y - 1088) / 362, ppm = 27 + 28 * t, x = 458 + 40 * Math.pow(t, 1.3);
@@ -1014,14 +1015,109 @@ function bootPrints(g) {
     var len = 0.42 * 2 * ppm * 0.5, wid = 0.17 * 2 * ppm, off = side * 0.2 * ppm;
     var px = x + off, py = y;
     g.save(); g.translate(px, py); g.rotate(-ang * 0.5);
-    g.globalAlpha = 0.7; g.fillStyle = '#46524b';
+    g.globalAlpha = snow ? 0.6 : 0.7; g.fillStyle = fill;
     g.beginPath(); g.ellipse(0, -len * 0.18, wid * 0.5, len * 0.36, 0, 0, Math.PI * 2); g.fill();
     g.beginPath(); g.ellipse(0, len * 0.36, wid * 0.4, len * 0.2, 0, 0, Math.PI * 2); g.fill();
-    g.globalAlpha = 0.35; g.strokeStyle = '#2a302c'; g.lineWidth = 0.8;
+    g.globalAlpha = 0.35; g.strokeStyle = rim; g.lineWidth = 0.8;
     g.beginPath(); g.ellipse(0, -len * 0.18, wid * 0.5, len * 0.36, 0, Math.PI * 1.1, Math.PI * 1.9); g.stroke();
     g.restore();
     y += 0.9 * ppm * 0.42; side = -side;
   }
+  g.restore();
+}
+/* snow (Q30, David's probe of 11 October 2026, 1.42 pm, one candidate, 9 of 9 checks; Q31 his pick, 2.30 pm, with the
+   chimney put back): while snow lies (Events' ground "snow") the view is the drawn snowy grounds, an edit of the day
+   drawing that lies over it to the pixel: deep snow in the workshop's own line, the crowns laden, the roof heaped with
+   icicles, the patch buried to faint ridges, the path a trodden track, a heavy pale sky. Shown whole, no fade by time
+   of day: lying snow does not thaw by noon as the frost does; the night's veil darkens it as it does the day's. His
+   note at the pick, the chimney drawn taller under its heap: in code, the day drawing's own chimney shows again with a
+   thin lip of snow on its cap (dayChimney, CHIMNEY_BOX), nothing spent. His touch t1: Fang's prints trotting beside
+   Hagrid's in the snow, wandering off once to sniff at a buried pumpkin, a low hump in the snow on the patch (the
+   drawing has none; the hump is drawn here), and back. The bewitched snowball runs by day while it shows. The code's
+   growing pumpkins are not drawn over the buried patch. ?weather=snow and ?time= show it. */
+var SNOW = { grounds: null };
+function snowLying() { var w = groundsWeather(); return !!(w && w.ground === 'snow'); }
+function snowShowing() { return !!(SNOW.grounds && snowLying()); }
+function makeSnowyGrounds(day) {
+  var im = new Image();
+  im.onload = function () {
+    var W = im.width, H = im.height, cv = makeCanvas(W, H), g = cv.getContext('2d');
+    g.drawImage(im, 0, 0);
+    dayChimney(g, day);
+    bootPrints(g, true);
+    fangPrints(g);
+    var sky = groundsWin.sky;
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h),
+      new THREE.MeshBasicMaterial({ map: tex(cv), transparent: true, depthWrite: false }));
+    m.position.z = 0.0015; m.name = 'grounds-snow'; m.renderOrder = 3.5; m.visible = false;
+    sky.add(m); SNOW.grounds = m;
+    FROST.level = -1; SKY.key = null;
+  };
+  im.src = '../assets/layers/corridor-grounds-view-snow.png';
+}
+/* the chimney: the snowy drawing heaped its cap about 8 px taller than the day drawing's (the cap's top at the drawing's
+   y 877, where the night's smoke rises from). In the box, where the snowy drawing is snow-white over a pixel the day
+   drawing has as stone or forest, the day's pixel shows instead, the edge softened; then a thin lip of snow is laid along
+   the day cap's top face, so it still reads as a winter chimney. */
+var CHIMNEY_BOX = [528, 858, 588, 898], CHIMNEY_CAP = [539, 872, 572, 879];
+function dayChimney(g, day) {
+  var x0 = CHIMNEY_BOX[0], y0 = CHIMNEY_BOX[1], w = CHIMNEY_BOX[2] - x0, h = CHIMNEY_BOX[3] - y0;
+  var dc = makeCanvas(day.width, day.height).getContext('2d'); dc.drawImage(day, 0, 0);
+  var dd = dc.getImageData(x0, y0, w, h).data, fd = g.getImageData(x0, y0, w, h), f = fd.data;
+  var mask = new Float32Array(w * h), i, x, y;
+  function cl(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+  for (i = 0; i < w * h; i++) {
+    var r = f[i * 4], gr = f[i * 4 + 1], b = f[i * 4 + 2], lum = 0.3 * r + 0.59 * gr + 0.11 * b;
+    var sat = Math.max(r, gr, b) - Math.min(r, gr, b), dl = 0.3 * dd[i * 4] + 0.59 * dd[i * 4 + 1] + 0.11 * dd[i * 4 + 2];
+    mask[i] = cl((lum - 140) / 40) * cl((45 - sat) / 20) * cl((150 - dl) / 40);
+  }
+  for (y = 0; y < h; y++) for (x = 0; x < w; x++) {
+    var s = 0, n = 0;
+    for (var v = -1; v <= 1; v++) for (var u = -1; u <= 1; u++) {
+      var xx = x + u, yy = y + v; if (xx >= 0 && yy >= 0 && xx < w && yy < h) { s += mask[yy * w + xx]; n++; }
+    }
+    var k = s / n * cl(Math.min(x, w - 1 - x, y, h - 1 - y) / 3);
+    if (k <= 0) continue;
+    i = (y * w + x) * 4;
+    f[i] += (dd[i] - f[i]) * k; f[i + 1] += (dd[i + 1] - f[i + 1]) * k; f[i + 2] += (dd[i + 2] - f[i + 2]) * k;
+  }
+  g.putImageData(fd, x0, y0);
+  var c = CHIMNEY_CAP;                                             /* the lip of snow on the cap */
+  g.save(); g.fillStyle = 'rgba(232,237,243,0.85)'; g.strokeStyle = 'rgba(70,80,96,0.55)'; g.lineWidth = 0.8;
+  g.beginPath(); g.moveTo(c[0], c[3]); g.quadraticCurveTo(c[0] + 2, c[1], (c[0] + c[2]) / 2, c[1] + 1);
+  g.quadraticCurveTo(c[2] - 2, c[1], c[2], c[3]); g.closePath(); g.fill(); g.stroke(); g.restore();
+}
+/* Fang's prints (his touch t1 on Q30): a boarhound's paws, each a pad and four toes, twice life size as Hagrid's are,
+   trotting a little to the left of Hagrid's trail and a stride behind each of his, foreshortened the same; about a
+   third of the way down he wanders off to the right to the buried pumpkin on the patch, circles it with his nose down
+   (the prints bunched), and trots back to the trail. The pumpkin itself: a low hump in the snow with a blue-grey shadow
+   on its far side, drawn here since the drawing's patch is bare ridges. */
+var FANG_HUMP = [552, 1172];
+function fangPrints(g) {
+  function ppmAt(y) { return 27 + 28 * (y - 1088) / 362; }
+  function trailX(y) { return 458 + 40 * Math.pow(Math.max(0, (y - 1088) / 362), 1.3); }
+  var hx = FANG_HUMP[0], hy = FANG_HUMP[1], hp = ppmAt(hy);
+  g.save();                                                        /* the hump first, under the prints */
+  g.fillStyle = 'rgba(126,142,166,0.45)'; g.beginPath(); g.ellipse(hx + 0.12 * hp, hy + 0.1 * hp, 0.5 * hp, 0.22 * hp, 0, 0, 7); g.fill();
+  g.fillStyle = 'rgba(246,248,251,0.9)'; g.beginPath(); g.ellipse(hx, hy, 0.46 * hp, 0.2 * hp, 0, 0, 7); g.fill();
+  g.strokeStyle = 'rgba(90,102,122,0.5)'; g.lineWidth = 0.8;
+  g.beginPath(); g.ellipse(hx, hy, 0.46 * hp, 0.2 * hp, 0, Math.PI * 0.05, Math.PI * 0.95); g.stroke();
+  var pts = [], y, k;
+  for (y = 1096; y < 1150; y += 0.55 * ppmAt(y)) pts.push([trailX(y) - 0.55 * ppmAt(y), y]);   /* beside Hagrid */
+  var y1 = 1150, x1 = trailX(y1) - 0.55 * ppmAt(y1);
+  for (k = 0.12; k < 1; k += 0.14) pts.push([x1 + (hx - 0.6 * hp - x1) * k, y1 + (hy - 0.15 * hp - y1) * k]);   /* off to it */
+  for (k = 0; k < 1; k += 0.11) { var a = Math.PI * (1.1 - 2.2 * k); pts.push([hx + Math.cos(a) * 0.72 * hp, hy + 0.2 * hp + Math.sin(a) * 0.36 * hp]); }   /* round it, nose down */
+  var y2 = 1262, x2 = trailX(y2) - 0.55 * ppmAt(y2), sx = hx - 0.6 * hp, sy = hy + 0.25 * hp;
+  for (k = 0.15; k < 1; k += 0.14) pts.push([sx + (x2 - sx) * k, sy + (y2 - sy) * k]);   /* and back */
+  for (y = y2; y < 1440; y += 0.55 * ppmAt(y)) pts.push([trailX(y) - 0.55 * ppmAt(y), y]);
+  var side = 1;
+  pts.forEach(function (p) {
+    var ppm = ppmAt(p[1]), r = 0.06 * 2 * ppm, px = p[0] + side * 0.1 * ppm, py = p[1];
+    g.globalAlpha = 0.6; g.fillStyle = '#7d8ea8';
+    g.beginPath(); g.ellipse(px, py, r * 0.75, r * 0.45, 0, 0, 7); g.fill();          /* the pad */
+    for (var t = 0; t < 4; t++) { var ang = -Math.PI * 0.5 + (t - 1.5) * 0.55; g.beginPath(); g.ellipse(px + Math.cos(ang) * r * 1.1, py + Math.sin(ang) * r * 0.65, r * 0.26, r * 0.18, 0, 0, 7); g.fill(); }
+    side = -side;
+  });
   g.restore();
 }
 function rimeTexture() {
@@ -1056,17 +1152,20 @@ function rimeTexture() {
 function updateFrost() {
   if (t < FROST.next) return;
   FROST.next = t + 2;
-  var lv = frostLevels(), stage = view === 'stage', kN = nightK(), key = lv.grounds + ':' + lv.panes + ':' + stage + ':' + kN;
+  var lv = frostLevels(), stage = view === 'stage', kN = nightK(), sn = snowLying();
+  var key = lv.grounds + ':' + lv.panes + ':' + stage + ':' + kN + ':' + sn;
   if (key === FROST.level) return;
   FROST.level = key;
   if (FROST.grounds) { FROST.grounds.material.opacity = lv.grounds; FROST.grounds.visible = lv.grounds > 0; }
+  if (SNOW.grounds) SNOW.grounds.visible = sn;
   FROST.panes.forEach(function (m) { m.material.opacity = lv.panes; m.material.color.setScalar(1 - 0.6 * kN); m.visible = lv.panes > 0 && !stage; });
 }
 /* the day's sky over the view, in code, nothing generated (Events' weather, req 115: one sky for every window): cloudy
    dulls it under a grey wash, heavier where the sky shows; rain greys it further and runs down the glass of both
    windows ("He glanced out of a rain-washed window at the dark grounds", OotP 13); fog veils it, thick toward the
-   forest and the hills, thinner over the near lawn; the plain window's sky takes the same colour. Snow is a drawn state,
-   a spend question, so a snowy day shows as cloudy here until it is drawn. */
+   forest and the hills, thinner over the near lawn; the plain window's sky takes the same colour. Snow falling with
+   none lying yet shows as cloudy; once it lies the drawn snowy view (below) carries its own heavy sky, and a snowing
+   sky lays no veil over it, while cloud, rain and fog still do. */
 var SKY = { veil: null, rain: [], key: null, next: 0,
   plain: { clear: 0xdfe8f0, cloudy: 0xc9ccd0, rain: 0xaeb3b8, fog: 0xdcdcd8, snow: 0xd2d5d9 } };
 function veilTexture(kind) {
@@ -1120,7 +1219,7 @@ function updateSky(dt) {
   if (raining) SKY.rain[0].material.map.offset.y += dt * 0.035;
   if (t < SKY.next) return;
   SKY.next = t + 2;
-  var kN = nightK(), key = sky + ':' + stage + ':' + !!grounds.img + ':' + kN;
+  var kN = nightK(), key = sky + ':' + stage + ':' + !!grounds.img + ':' + kN + ':' + snowShowing();
   if (key === SKY.key) return;
   SKY.key = key;
   windows[0].sky.material.color.copy(col(SKY.plain[w ? w.sky : 'clear'] || SKY.plain.clear))
@@ -1133,7 +1232,7 @@ function updateSky(dt) {
     SKY.veil.position.z = 0.003; SKY.veil.name = 'grounds-veil'; SKY.veil.renderOrder = 5;
     groundsWin.sky.add(SKY.veil);
   }
-  if (sky === 'clear') { SKY.veil.visible = false; return; }
+  if (sky === 'clear' || (w.sky === 'snow' && snowShowing())) { SKY.veil.visible = false; return; }
   if (SKY.veil.material.map) SKY.veil.material.map.dispose();
   SKY.veil.material.map = veilTexture(sky); SKY.veil.material.needsUpdate = true; SKY.veil.visible = true;
 }
@@ -1202,7 +1301,7 @@ function drawGrounds(t) {
   var g = grounds.canvas.getContext('2d'), o = GROUNDS.ov;
   g.clearRect(0, 0, o[2], o[3]);
   g.save(); g.translate(-o[0], -o[1]);
-  var r = pumpkinR();
+  var r = snowShowing() ? 0 : pumpkinR();   /* under the snow the patch is buried, Fang's hump the only sign */
   if (r) PUMPKINS.forEach(function (pk) { drawPumpkin(g, pk[0], pk[1], r * pk[2]); });
   var wash = washing();
   if (wash) drawWashing(g, t, wash);
@@ -1294,9 +1393,9 @@ function updateSnowball(dt) {
    that they followed Quirrell around, bouncing off the back of his turban", PS 12): by day while snow lies, now and then
    at the window's stop a student runs across the far lawn with a snowball hunting him a little behind and above, it turns
    in the air, catches him up, bounces off the back of his head, and chases him on out of sight. Drawn in code into a canvas
-   over the lawn in the drawing's own pixels, under the thrown snowball's. Live once the snowy grounds are drawn and hung
-   (BEWITCHED.live); ?bewitched sends one every visit. */
-var BEWITCHED = { live: false, box: [0, 1080, 800, 360], canvas: null, tex: null, run: null, last: -1, next: 0 };
+   over the lawn in the drawing's own pixels, under the thrown snowball's. Live since the snowy grounds were hung (Q31,
+   11 October 2026); BEWITCHED.live false would hold it again; ?bewitched sends one every visit. */
+var BEWITCHED = { live: true, box: [0, 1080, 800, 360], canvas: null, tex: null, run: null, last: -1, next: 0 };
 function bewitchedCanvas() {
   if (BEWITCHED.canvas) return;
   var b = BEWITCHED.box, sky = groundsWin.sky;
