@@ -2675,6 +2675,15 @@ var books = (function () {
   o.dustPts = new THREE.Points(o.dustGeo, o.dustMat); o.dustPts.frustumCulled = false; scene.add(o.dustPts);
   o.motes = [];
   for (var i = 0; i < N; i++) o.motes.push({ x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 });
+  /* Q29's touch (Godric, 7.27 pm): on the days it sticks out, a few motes hang and drift in the firelight above it,
+     each on its own slow loop, glinting with the fire; they fade once it is pushed home */
+  var HN = 6;
+  o.hangGeo = new THREE.BufferGeometry(); o.hangGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(HN * 3), 3));
+  o.hangMat = new THREE.PointsMaterial({ color: 0xe8c48a, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false });
+  o.hangPts = new THREE.Points(o.hangGeo, o.hangMat); o.hangPts.frustumCulled = false; scene.add(o.hangPts);
+  o.hang = [];
+  for (var j = 0; j < HN; j++) o.hang.push({ ph: Math.random() * 6.28, r: 0.015 + Math.random() * 0.03, h: 0.02 + Math.random() * 0.1, sp: 0.15 + Math.random() * 0.2 });
+  o.hangOn = 0;
   return o;
 })();
 function booksOutToday() {
@@ -2777,6 +2786,18 @@ function updateBooks(dt) {
     books.dustMat.opacity = 0.55 * smooth01(0, 0.15, d) * (1 - smooth01(0.8, 2, d));
     if (d > 2) { books.dust = null; books.dustMat.opacity = 0; }
   }
+  var want = books.ajar && !books.out && books.hist.visible ? 1 : 0;
+  books.hangOn += clamp(want - books.hangOn, -dt, dt * 0.5);   /* in over two seconds, out over one */
+  if (books.hangOn > 0) {
+    var top = books.hist.localToWorld(new THREE.Vector3(0, (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h / 2, 0.01)), ha = books.hangGeo.attributes.position.array,
+        tt = performance.now() / 1000;
+    books.hang.forEach(function (m, i) {
+      var a = m.ph + tt * m.sp;
+      ha[i * 3] = top.x + Math.cos(a) * m.r; ha[i * 3 + 1] = top.y + m.h + Math.sin(a * 1.7) * 0.012; ha[i * 3 + 2] = top.z + Math.sin(a) * m.r;
+    });
+    books.hangGeo.attributes.position.needsUpdate = true;
+    books.hangMat.opacity = 0.5 * books.hangOn * (0.75 + 0.25 * Math.sin(tt * 7.3) * Math.sin(tt * 3.1));
+  } else books.hangMat.opacity = 0;
   if (bookPage.t > 0 && (bookPage.t -= dt) <= 0) booksPageAway();
 }
 function updateHomeLetter(dt) {
