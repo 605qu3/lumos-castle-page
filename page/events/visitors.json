@@ -119,50 +119,6 @@
     },
     {
       "when": [
-        "mantel_out = yes",
-        "mantel_at = opposite",
-        "mantel_last = chats",
-        "place = common room"
-      ],
-      "show": [
-        "the mantel painting's sitter in the painting opposite the hole, seen through the hole whenever it opens"
-      ]
-    },
-    {
-      "when": [
-        "mantel_out = yes",
-        "mantel_at = opposite",
-        "mantel_last = stays",
-        "place = common room"
-      ],
-      "show": [
-        "the mantel painting's sitter in the painting opposite the hole, seen through the hole whenever it opens"
-      ]
-    },
-    {
-      "when": [
-        "right_out = yes",
-        "right_at = opposite",
-        "right_last = chats",
-        "place = common room"
-      ],
-      "show": [
-        "the right painting's sitter in the painting opposite the hole, seen through the hole whenever it opens"
-      ]
-    },
-    {
-      "when": [
-        "right_out = yes",
-        "right_at = opposite",
-        "right_last = stays",
-        "place = common room"
-      ],
-      "show": [
-        "the right painting's sitter in the painting opposite the hole, seen through the hole whenever it opens"
-      ]
-    },
-    {
-      "when": [
         "place = corridor",
         "stair_to = gallery",
         "time != night",
@@ -278,7 +234,8 @@
         "place = corridor",
         "time != night",
         "mantel_out != yes",
-        "mantel_last != chats"
+        "mantel_last != chats",
+        "mantel_opposite_seen = yes"
       ],
       "one_of": "mantel-visit",
       "weight": 1,
@@ -303,7 +260,8 @@
         "place = corridor",
         "time != night",
         "mantel_out != yes",
-        "mantel_last != slips"
+        "mantel_last != slips",
+        "mantel_opposite_seen = yes"
       ],
       "one_of": "mantel-visit",
       "weight": 1,
@@ -327,7 +285,8 @@
         "place = corridor",
         "time != night",
         "mantel_out != yes",
-        "mantel_last != stays"
+        "mantel_last != stays",
+        "mantel_opposite_seen = yes"
       ],
       "one_of": "mantel-visit",
       "weight": 1,
@@ -354,9 +313,107 @@
         "mantel_out != yes"
       ],
       "one_of": "mantel-visit",
-      "weight": 2,
+      "weight": 4,
       "starts": [
         "set mantel_last = home"
+      ]
+    },
+    {
+      "id": "visitors.mantel-opposite-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes",
+        "mantel_opposite_seen != yes"
+      ],
+      "show": [
+        "the mantel painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady"
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_at = opposite",
+        "set mantel_last = chats",
+        "set mantel_opposite_seen = yes"
+      ]
+    },
+    {
+      "id": "visitors.mantel-opposite-looks",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "one_of": "mantel-visit",
+      "weight": 1,
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes",
+        "mantel_opposite_seen = yes",
+        "mantel_last != chats"
+      ],
+      "show": [
+        "the mantel painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady"
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_at = opposite",
+        "set mantel_last = chats"
+      ]
+    },
+    {
+      "id": "visitors.mantel-opposite-slips",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "one_of": "mantel-visit",
+      "weight": 1,
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes",
+        "mantel_opposite_seen = yes",
+        "mantel_last != slips"
+      ],
+      "show": [
+        "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out"
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_at = opposite",
+        "set mantel_last = slips"
+      ]
+    },
+    {
+      "id": "visitors.mantel-opposite-stays",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "one_of": "mantel-visit",
+      "weight": 1,
+      "when": [
+        "mantel sitter = away",
+        "place = corridor",
+        "time != night",
+        "mantel_out != yes",
+        "mantel_opposite_seen = yes",
+        "mantel_last != stays"
+      ],
+      "show": [
+        "the mantel painting's sitter standing in the painting opposite the hole, paying him no mind"
+      ],
+      "starts": [
+        "set mantel_out = yes",
+        "set mantel_at = opposite",
+        "set mantel_last = stays"
       ]
     },
     {
@@ -435,7 +492,8 @@
         "place = corridor",
         "time != night",
         "right_out != yes",
-        "right_last != chats"
+        "right_last != chats",
+        "right_opposite_seen = yes"
       ],
       "one_of": "right-visit",
       "weight": 1,
@@ -460,7 +518,8 @@
         "place = corridor",
         "time != night",
         "right_out != yes",
-        "right_last != slips"
+        "right_last != slips",
+        "right_opposite_seen = yes"
       ],
       "one_of": "right-visit",
       "weight": 1,
@@ -484,7 +543,8 @@
         "place = corridor",
         "time != night",
         "right_out != yes",
-        "right_last != stays"
+        "right_last != stays",
+        "right_opposite_seen = yes"
       ],
       "one_of": "right-visit",
       "weight": 1,
@@ -511,9 +571,107 @@
         "right_out != yes"
       ],
       "one_of": "right-visit",
-      "weight": 2,
+      "weight": 4,
       "starts": [
         "set right_last = home"
+      ]
+    },
+    {
+      "id": "visitors.right-opposite-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes",
+        "right_opposite_seen != yes"
+      ],
+      "show": [
+        "the right painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady"
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_at = opposite",
+        "set right_last = chats",
+        "set right_opposite_seen = yes"
+      ]
+    },
+    {
+      "id": "visitors.right-opposite-looks",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "one_of": "right-visit",
+      "weight": 1,
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes",
+        "right_opposite_seen = yes",
+        "right_last != chats"
+      ],
+      "show": [
+        "the right painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady"
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_at = opposite",
+        "set right_last = chats"
+      ]
+    },
+    {
+      "id": "visitors.right-opposite-slips",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "one_of": "right-visit",
+      "weight": 1,
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes",
+        "right_opposite_seen = yes",
+        "right_last != slips"
+      ],
+      "show": [
+        "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out"
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_at = opposite",
+        "set right_last = slips"
+      ]
+    },
+    {
+      "id": "visitors.right-opposite-stays",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "outside",
+      "one_of": "right-visit",
+      "weight": 1,
+      "when": [
+        "right sitter = away",
+        "place = corridor",
+        "time != night",
+        "right_out != yes",
+        "right_opposite_seen = yes",
+        "right_last != stays"
+      ],
+      "show": [
+        "the right painting's sitter standing in the painting opposite the hole, paying him no mind"
+      ],
+      "starts": [
+        "set right_out = yes",
+        "set right_at = opposite",
+        "set right_last = stays"
       ]
     },
     {
@@ -579,342 +737,6 @@
         "set right_out = no",
         "add visiting -1",
         "set right_at = none"
-      ]
-    },
-    {
-      "id": "visitors.mantel-opposite-first",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "mantel-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "mantel sitter = away",
-        "time != night",
-        "mantel_out != yes",
-        "mantel_opposite_seen != yes"
-      ],
-      "starts": [
-        "set mantel_out = yes",
-        "set mantel_at = opposite",
-        "set mantel_tried = yes",
-        "set mantel_last = chats",
-        "set mantel_opposite_seen = yes"
-      ],
-      "show": [
-        "the mantel painting's sitter standing in the painting opposite the hole, looking in through the hole at him"
-      ]
-    },
-    {
-      "id": "visitors.mantel-opposite-looks",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "mantel-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "mantel sitter = away",
-        "time != night",
-        "mantel_out != yes",
-        "mantel_opposite_seen = yes",
-        "mantel_last != chats"
-      ],
-      "starts": [
-        "set mantel_out = yes",
-        "set mantel_at = opposite",
-        "set mantel_tried = yes",
-        "set mantel_last = chats"
-      ],
-      "show": [
-        "the mantel painting's sitter standing in the painting opposite the hole, looking in through the hole at him"
-      ]
-    },
-    {
-      "id": "visitors.mantel-opposite-slips",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "mantel-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "mantel sitter = away",
-        "time != night",
-        "mantel_out != yes",
-        "mantel_opposite_seen = yes",
-        "mantel_last != slips"
-      ],
-      "starts": [
-        "set mantel_out = yes",
-        "set mantel_at = opposite",
-        "set mantel_tried = yes",
-        "set mantel_last = slips"
-      ],
-      "show": [
-        "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens"
-      ]
-    },
-    {
-      "id": "visitors.mantel-opposite-stays",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "mantel-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "mantel sitter = away",
-        "time != night",
-        "mantel_out != yes",
-        "mantel_opposite_seen = yes",
-        "mantel_last != stays"
-      ],
-      "starts": [
-        "set mantel_out = yes",
-        "set mantel_at = opposite",
-        "set mantel_tried = yes",
-        "set mantel_last = stays"
-      ],
-      "show": [
-        "the mantel painting's sitter standing in the painting opposite the hole, paying him no mind"
-      ]
-    },
-    {
-      "id": "visitors.mantel-opposite-empty",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "mantel-opposite",
-      "weight": 2,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "mantel sitter = away",
-        "time != night",
-        "mantel_out != yes",
-        "mantel_tried = yes"
-      ],
-      "starts": []
-    },
-    {
-      "id": "visitors.mantel-opposite-home-soon",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "after tap hole 20-50 s",
-      "when": [
-        "place = common room",
-        "mantel_out = yes",
-        "mantel_at = opposite",
-        "mantel_last = chats",
-        "time != night"
-      ],
-      "starts": [
-        "set mantel_out = no",
-        "set mantel_at = none"
-      ],
-      "show": [
-        "the mantel painting's sitter comes home through her painting's exit and sits"
-      ]
-    },
-    {
-      "id": "visitors.mantel-opposite-home-later",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "after tap hole 120-300 s",
-      "when": [
-        "place = common room",
-        "mantel_out = yes",
-        "mantel_at = opposite",
-        "mantel_last != chats",
-        "time != night"
-      ],
-      "starts": [
-        "set mantel_out = no",
-        "set mantel_at = none"
-      ],
-      "show": [
-        "the mantel painting's sitter comes home through her painting's exit and sits"
-      ]
-    },
-    {
-      "id": "visitors.right-opposite-first",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "right-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "right sitter = away",
-        "time != night",
-        "right_out != yes",
-        "right_opposite_seen != yes"
-      ],
-      "starts": [
-        "set right_out = yes",
-        "set right_at = opposite",
-        "set right_tried = yes",
-        "set right_last = chats",
-        "set right_opposite_seen = yes"
-      ],
-      "show": [
-        "the right painting's sitter standing in the painting opposite the hole, looking in through the hole at him"
-      ]
-    },
-    {
-      "id": "visitors.right-opposite-looks",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "right-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "right sitter = away",
-        "time != night",
-        "right_out != yes",
-        "right_opposite_seen = yes",
-        "right_last != chats"
-      ],
-      "starts": [
-        "set right_out = yes",
-        "set right_at = opposite",
-        "set right_tried = yes",
-        "set right_last = chats"
-      ],
-      "show": [
-        "the right painting's sitter standing in the painting opposite the hole, looking in through the hole at him"
-      ]
-    },
-    {
-      "id": "visitors.right-opposite-slips",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "right-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "right sitter = away",
-        "time != night",
-        "right_out != yes",
-        "right_opposite_seen = yes",
-        "right_last != slips"
-      ],
-      "starts": [
-        "set right_out = yes",
-        "set right_at = opposite",
-        "set right_tried = yes",
-        "set right_last = slips"
-      ],
-      "show": [
-        "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens"
-      ]
-    },
-    {
-      "id": "visitors.right-opposite-stays",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "right-opposite",
-      "weight": 1,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "right sitter = away",
-        "time != night",
-        "right_out != yes",
-        "right_opposite_seen = yes",
-        "right_last != stays"
-      ],
-      "starts": [
-        "set right_out = yes",
-        "set right_at = opposite",
-        "set right_tried = yes",
-        "set right_last = stays"
-      ],
-      "show": [
-        "the right painting's sitter standing in the painting opposite the hole, paying him no mind"
-      ]
-    },
-    {
-      "id": "visitors.right-opposite-empty",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hole",
-      "one_of": "right-opposite",
-      "weight": 2,
-      "when": [
-        "place = common room",
-        "portrait = shut",
-        "right sitter = away",
-        "time != night",
-        "right_out != yes",
-        "right_tried = yes"
-      ],
-      "starts": []
-    },
-    {
-      "id": "visitors.right-opposite-home-soon",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "after tap hole 20-50 s",
-      "when": [
-        "place = common room",
-        "right_out = yes",
-        "right_at = opposite",
-        "right_last = chats",
-        "time != night"
-      ],
-      "starts": [
-        "set right_out = no",
-        "set right_at = none"
-      ],
-      "show": [
-        "the right painting's sitter comes home through his painting's exit and sits"
-      ]
-    },
-    {
-      "id": "visitors.right-opposite-home-later",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "after tap hole 120-300 s",
-      "when": [
-        "place = common room",
-        "right_out = yes",
-        "right_at = opposite",
-        "right_last != chats",
-        "time != night"
-      ],
-      "starts": [
-        "set right_out = no",
-        "set right_at = none"
-      ],
-      "show": [
-        "the right painting's sitter comes home through his painting's exit and sits"
       ]
     },
     {
@@ -1014,8 +836,6 @@
         "set mantel_out = no",
         "set right_out = no",
         "set visiting = 0",
-        "set mantel_tried = no",
-        "set right_tried = no",
         "set gallery_guest = none"
       ]
     },
@@ -1032,8 +852,6 @@
         "set mantel_out = no",
         "set right_out = no",
         "set visiting = 0",
-        "set mantel_tried = no",
-        "set right_tried = no",
         "set gallery_guest = none"
       ]
     },

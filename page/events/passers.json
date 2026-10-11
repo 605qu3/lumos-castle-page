@@ -39,8 +39,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time = day",
         "nick_met != yes"
       ],
@@ -85,8 +83,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time = morning",
         "nick_met != yes"
       ],
@@ -131,8 +127,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time = night",
         "nick_met = yes",
         "nick_passed != yes",
@@ -184,8 +178,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time != night",
         "nick_met = yes",
         "nick_passed != yes"
@@ -209,8 +201,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time != night",
         "nick_met = yes",
         "nick_passed != yes",
@@ -259,8 +249,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time != night",
         "nick_met = yes",
         "nick_passed != yes",
@@ -310,8 +298,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time != night",
         "nick_met = yes",
         "nick_passed != yes",
@@ -367,8 +353,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time != night",
         "nick_met = yes",
         "nick_passed != yes"
@@ -391,8 +375,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time != night",
         "nick_met = yes",
         "nick_passed != yes"
@@ -434,8 +416,6 @@
       "when": [
         "place = common room",
         "hole_opened = yes",
-        "mantel_at != opposite",
-        "right_at != opposite",
         "time != night",
         "nick_met = yes",
         "nick_passed != yes"
