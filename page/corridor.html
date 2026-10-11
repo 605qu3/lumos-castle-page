@@ -1005,15 +1005,24 @@ function rimeRoof(g, day) {
    the near bank, the hut's side of the mullion), a stride of about 1.2 m, left and right; the lawn's scale grows from about 27 px a metre at the hut to
    about 55 at the bank, and the ground is seen at a slant, so each print is foreshortened along the walk. Drawn twice as
    large as life so they read from the corridor. Each is a sole and a heel, the frost pressed off so the grass
-   shows dark through it. */
+   shows dark through it. The track does not run straight (Godric, 11 October 2026, 2.44 pm: walking through snow
+   throws the gait off, so even he swerves): a gentle irregular weave (trailWeave, the same line Fang keeps beside),
+   uneven step spacing, and the odd scuff where a boot slid, drawn as a faint smear trailing the print; the same in
+   frost and snow, from a fixed seed so the track is the same every visit. */
+function trailWeave(y, ppm) { return (0.22 * Math.sin(y / 70 + 1.3) + 0.12 * Math.sin(y / 31)) * ppm; }
+function seeded(seed) { var r = seed; return function () { r = (r * 16807) % 2147483647; return r / 2147483647; }; }
 function bootPrints(g, snow) {   /* snow: pressed into snow, a blue-grey hollow, not the grass showing through frost */
-  var y = 1088, side = 1, fill = snow ? '#7d8ea8' : '#46524b', rim = snow ? '#5a6a84' : '#2a302c';
+  var y = 1088, side = 1, fill = snow ? '#7d8ea8' : '#46524b', rim = snow ? '#5a6a84' : '#2a302c', rand = seeded(snow ? 13 : 7);
   g.save();
   while (y < 1450) {
-    var t = (y - 1088) / 362, ppm = 27 + 28 * t, x = 458 + 40 * Math.pow(t, 1.3);
-    var dx = 40 * 1.3 * Math.pow(Math.max(t, 0.01), 0.3) / 362, ang = Math.atan(dx);
+    var t = (y - 1088) / 362, ppm = 27 + 28 * t, x = 458 + 40 * Math.pow(t, 1.3) + trailWeave(y, ppm) + (rand() - 0.5) * 0.12 * ppm;
+    var dx = 40 * 1.3 * Math.pow(Math.max(t, 0.01), 0.3) / 362 + 0.22 * Math.cos(y / 70 + 1.3) * ppm / 70, ang = Math.atan(dx);
     var len = 0.42 * 2 * ppm * 0.5, wid = 0.17 * 2 * ppm, off = side * 0.2 * ppm;
     var px = x + off, py = y;
+    if (rand() < 0.18) {                                            /* the odd scuff: the boot slid in before it set */
+      g.save(); g.translate(px, py); g.rotate(-ang * 0.5); g.globalAlpha = snow ? 0.22 : 0.26; g.fillStyle = fill;
+      g.beginPath(); g.ellipse(0, -len * 0.9, wid * 0.35, len * 0.7, 0, 0, Math.PI * 2); g.fill(); g.restore();
+    }
     g.save(); g.translate(px, py); g.rotate(-ang * 0.5);
     g.globalAlpha = snow ? 0.6 : 0.7; g.fillStyle = fill;
     g.beginPath(); g.ellipse(0, -len * 0.18, wid * 0.5, len * 0.36, 0, 0, Math.PI * 2); g.fill();
@@ -1021,7 +1030,7 @@ function bootPrints(g, snow) {   /* snow: pressed into snow, a blue-grey hollow,
     g.globalAlpha = 0.35; g.strokeStyle = rim; g.lineWidth = 0.8;
     g.beginPath(); g.ellipse(0, -len * 0.18, wid * 0.5, len * 0.36, 0, Math.PI * 1.1, Math.PI * 1.9); g.stroke();
     g.restore();
-    y += 0.9 * ppm * 0.42; side = -side;
+    y += 0.9 * ppm * 0.42 * (0.8 + 0.45 * rand()); side = -side;
   }
   g.restore();
 }
@@ -1091,11 +1100,14 @@ function dayChimney(g, day) {
    trotting a little to the left of Hagrid's trail and a stride behind each of his, foreshortened the same; about a
    third of the way down he wanders off to the right to the buried pumpkin on the patch, circles it with his nose down
    (the prints bunched), and trots back to the trail. The pumpkin itself: a low hump in the snow with a blue-grey shadow
-   on its far side, drawn here since the drawing's patch is bare ridges. */
+   on its far side, drawn here since the drawing's patch is bare ridges. His line keeps beside Hagrid's weave and wanders
+   more freely than it (Godric, 2.44 pm): a quicker weave of his own, a looser scatter in each print, uneven steps. */
 var FANG_HUMP = [552, 1172];
 function fangPrints(g) {
   function ppmAt(y) { return 27 + 28 * (y - 1088) / 362; }
-  function trailX(y) { return 458 + 40 * Math.pow(Math.max(0, (y - 1088) / 362), 1.3); }
+  var rand = seeded(29);
+  function trailX(y) { var ppm = ppmAt(y); return 458 + 40 * Math.pow(Math.max(0, (y - 1088) / 362), 1.3) + trailWeave(y, ppm) + (0.3 * Math.sin(y / 23 + 0.7) + 0.16 * Math.sin(y / 9.5)) * ppm; }
+  function step(y) { return 0.55 * ppmAt(y) * (0.75 + 0.5 * rand()); }
   var hx = FANG_HUMP[0], hy = FANG_HUMP[1], hp = ppmAt(hy);
   g.save();                                                        /* the hump first, under the prints */
   g.fillStyle = 'rgba(126,142,166,0.45)'; g.beginPath(); g.ellipse(hx + 0.12 * hp, hy + 0.1 * hp, 0.5 * hp, 0.22 * hp, 0, 0, 7); g.fill();
@@ -1103,16 +1115,16 @@ function fangPrints(g) {
   g.strokeStyle = 'rgba(90,102,122,0.5)'; g.lineWidth = 0.8;
   g.beginPath(); g.ellipse(hx, hy, 0.46 * hp, 0.2 * hp, 0, Math.PI * 0.05, Math.PI * 0.95); g.stroke();
   var pts = [], y, k;
-  for (y = 1096; y < 1150; y += 0.55 * ppmAt(y)) pts.push([trailX(y) - 0.55 * ppmAt(y), y]);   /* beside Hagrid */
+  for (y = 1096; y < 1150; y += step(y)) pts.push([trailX(y) - 0.55 * ppmAt(y), y]);   /* beside Hagrid */
   var y1 = 1150, x1 = trailX(y1) - 0.55 * ppmAt(y1);
   for (k = 0.12; k < 1; k += 0.14) pts.push([x1 + (hx - 0.6 * hp - x1) * k, y1 + (hy - 0.15 * hp - y1) * k]);   /* off to it */
   for (k = 0; k < 1; k += 0.11) { var a = Math.PI * (1.1 - 2.2 * k); pts.push([hx + Math.cos(a) * 0.72 * hp, hy + 0.2 * hp + Math.sin(a) * 0.36 * hp]); }   /* round it, nose down */
   var y2 = 1262, x2 = trailX(y2) - 0.55 * ppmAt(y2), sx = hx - 0.6 * hp, sy = hy + 0.25 * hp;
   for (k = 0.15; k < 1; k += 0.14) pts.push([sx + (x2 - sx) * k, sy + (y2 - sy) * k]);   /* and back */
-  for (y = y2; y < 1440; y += 0.55 * ppmAt(y)) pts.push([trailX(y) - 0.55 * ppmAt(y), y]);
+  for (y = y2; y < 1440; y += step(y)) pts.push([trailX(y) - 0.55 * ppmAt(y), y]);
   var side = 1;
   pts.forEach(function (p) {
-    var ppm = ppmAt(p[1]), r = 0.06 * 2 * ppm, px = p[0] + side * 0.1 * ppm, py = p[1];
+    var ppm = ppmAt(p[1]), r = 0.06 * 2 * ppm, px = p[0] + side * 0.1 * ppm + (rand() - 0.5) * 0.22 * ppm, py = p[1] + (rand() - 0.5) * 0.08 * ppm;
     g.globalAlpha = 0.6; g.fillStyle = '#7d8ea8';
     g.beginPath(); g.ellipse(px, py, r * 0.75, r * 0.45, 0, 0, 7); g.fill();          /* the pad */
     for (var t = 0; t < 4; t++) { var ang = -Math.PI * 0.5 + (t - 1.5) * 0.55; g.beginPath(); g.ellipse(px + Math.cos(ang) * r * 1.1, py + Math.sin(ang) * r * 0.65, r * 0.26, r * 0.18, 0, 0, 7); g.fill(); }
