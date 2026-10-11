@@ -55,7 +55,8 @@
         "place = common room",
         "time = night",
         "letter_open = 0",
-        "owl_waiting != yes"
+        "owl_waiting != yes",
+        "owl_landed != yes"
       ],
       "show": [
         "an owl lands on the moonlit sill, looks in, taps its beak on the glass three times, tap-tap-tap, ruffles its feathers and flies off"
@@ -76,6 +77,35 @@
           "sound": "tap-tap-tap: three soft taps of a beak on the dark window",
           "canon": "PS 14, \"There was a tap on the dark window\", Hedwig at midnight; three taps, not one, Godric's pick (10 October 2026, 5.07 pm: a single tap may not be heard); checked against the text, 10 October 2026"
         }
+      ],
+      "starts": [
+        "set owl_landed = yes"
+      ]
+    },
+    {
+      "id": "night.moon-owl",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [
+        "night"
+      ],
+      "weight": 3,
+      "moment": "wait 20-90 s",
+      "when": [
+        "time = night",
+        "moon = full",
+        "moon up = yes",
+        "moon in view = yes",
+        "owl_waiting != yes",
+        "owl_landed != yes",
+        "nights since moon_owl >= 1"
+      ],
+      "show": [
+        "an owl's dark shape crosses the full moon, wings out, and is gone"
+      ],
+      "starts": [
+        "set owl_landed = yes",
+        "stamp moon_owl by night"
       ]
     },
     {
@@ -94,6 +124,19 @@
       ],
       "starts": [
         "set owl_waiting = no"
+      ]
+    },
+    {
+      "id": "night.owl-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "owl_landed = yes"
+      ],
+      "starts": [
+        "set owl_landed = no"
       ]
     }
   ]

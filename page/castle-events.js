@@ -47,6 +47,9 @@
    (`password`, `last password`, `next password`, and `{password}` in a line or an intro); `say {password}` hears
    the word as it stands; `unheard X` when the ear a tap on X opened heard nothing near enough; `day of week`
    (Monday 1); `speech` reads off where the browser cannot hear, so a spoken thing waits for a tap.
+   Then the full moon's owl (board req 101, forty-second session): `stamp X by night` and `nights since X`, a night
+   counted from the evening it began, so once a night means once from dusk to dawn across midnight; `moon in view`
+   is the page's own built-in (yes where the moon's disc is in a window's glass where his eye reaches it).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -77,6 +80,7 @@
     ['set', /^set ([a-z_]+) = (mark [a-z ,]+|from bag [a-z]+|\d+-\d+|-?\d+|[a-z\-]+)$/],
     ['add', /^add ([a-z_]+) (-?\d+)$/],
     ['stamp', /^stamp ([a-z_]+)(?: \+(\d+)(?:-(\d+))? days)?$/],
+    ['stamp-night', /^stamp ([a-z_]+) by night$/],
     ['slot', /^(take|free) slot$/],
     ['log', /^log "(.+)"$/]
   ];
@@ -278,6 +282,8 @@
        `time` and its stamps are those of the leaving, not of the next arrival. */
     function nowDate() { return clock != null ? new Date(clock) : new Date(); }
     function today() { return dayNumber(nowDate()); }
+    /* the night as one count, a night belonging to the evening it began, so 10 pm and 2 am are one night */
+    function tonight() { return dayNumber(new Date(nowDate().getTime() - 12 * 3600000)); }
 
     function timeOfDay() {
       if (timeOverride) return timeOverride;
@@ -379,6 +385,10 @@
       if (name.indexOf('days since ') === 0) {
         var s = state.stamps[name.slice(11)];
         return s == null ? Infinity : today() - s;     /* a stamp never made reads as forever */
+      }
+      if (name.indexOf('nights since ') === 0) {      /* for a stamp made `by night` (the full moon's owl, req 101) */
+        var sn = state.stamps[name.slice(13)];
+        return sn == null ? Infinity : tonight() - sn;
       }
       if (name.indexOf('mark ') === 0) return visit && visit.marks[name.slice(5)] ? 'taken' : 'free';   /* a mark a figure stands on this visit */
       if (name.indexOf('been ') === 0) return visit && visit.pages.indexOf(name.slice(5)) >= 0 ? 'yes' : 'no';   /* did this visit reach that page */
@@ -490,6 +500,7 @@
             return;
           case 'add': state.vars[m[1]] = (+state.vars[m[1]] || 0) + (+m[2]); return;
           case 'stamp': state.stamps[m[1]] = today() + (m[2] ? between(+m[2], +(m[3] || m[2])) : 0); return;
+          case 'stamp-night': state.stamps[m[1]] = tonight(); return;
           case 'slot': state.slot = m[1] === 'take' ? rec.id : null; return;
           case 'log': logLine(m[1]); return;
         }

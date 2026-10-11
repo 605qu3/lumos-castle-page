@@ -733,7 +733,8 @@
       ],
       "starts": [
         "set letter_new = no",
-        "set owl_waiting = yes"
+        "set owl_waiting = yes",
+        "set owl_landed = yes"
       ]
     },
     {
