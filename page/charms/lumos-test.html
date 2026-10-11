@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Lumos, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0d0b10; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #say { position: fixed; left: 0; right: 0; top: max(14px, env(safe-area-inset-top)); text-align: center;
+    font: 600 22px/1.3 Georgia, 'Times New Roman', serif; color: #e9dcc0; pointer-events: none;
+    text-shadow: 0 1px 6px #000; padding: 0 16px; }
+  #why { position: fixed; left: 0; right: 0; top: calc(max(14px, env(safe-area-inset-top)) + 34px); text-align: center;
+    font: 16px/1.35 Georgia, serif; color: #b7a98d; pointer-events: none; padding: 0 16px; }
+  .btn { position: fixed; bottom: max(12px, env(safe-area-inset-bottom)); font: 14px Georgia, serif;
+    color: #cdbf9f; background: #221c26; border: 1px solid #4a3f50; border-radius: 8px; padding: 8px 12px; touch-action: manipulation; }
+  #ease { left: 12px; }
+  #logBtn { right: 12px; }
+  #log { position: fixed; left: 8px; right: 8px; bottom: 60px; max-height: 40vh; overflow: auto; display: none;
+    background: rgba(20,16,24,.94); color: #cdbf9f; font: 12px/1.4 Menlo, Consolas, monospace; padding: 8px;
+    border: 1px solid #4a3f50; border-radius: 8px; white-space: pre-wrap; -webkit-user-select: text; user-select: text; }
+  #log button { font: 13px Georgia, serif; margin: 0 6px 6px 0; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="say">Flick the wand up to light it</div>
+<div id="why">Draw a quick, straight stroke upward anywhere. A stroke down puts it out.</div>
+<button class="btn" id="ease">Ease: kind</button>
+<button class="btn" id="logBtn">Log</button>
+<div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
+<script>
+/* Lumos, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
+   A flick drawn on the screen lights the wand's tip; a miss fizzles, harmlessly, and says why.
+   The books give Lumos no motion (it is only ever muttered), so the upward flick is the lane's own.
+   The geometry: a hit shows the angle of his flick against the upright; a miss shows his stroke beside the right one. */
+
+/* judge:start  (a pure function, so the judging can be tallied in node away from the page) */
+var EASES = {
+  kind:   { angle: 40, straight: 0.70, minLen: 0.05, maxMs: 900 },
+  fair:   { angle: 30, straight: 0.78, minLen: 0.07, maxMs: 650 },
+  strict: { angle: 20, straight: 0.86, minLen: 0.09, maxMs: 450 }
+};
+/* points: [{x, y, t}] in CSS pixels and milliseconds; w, h: the screen; ease: a name in EASES.
+   Returns { verdict: 'lumos' | 'nox' | 'miss', reason, angle (degrees from upright, + to the right),
+   len (as a share of the screen's short side), straight (0 to 1), ms }. */
+function judgeFlick(points, w, h, ease) {
+  var e = EASES[ease] || EASES.kind;
+  var out = { verdict: 'miss', reason: 'tap', angle: 0, len: 0, straight: 0, ms: 0, turns: 0 };
+  if (!points || points.length < 2) return out;
+  var a = points[0], b = points[points.length - 1];
+  var dx = b.x - a.x, dy = b.y - a.y, chord = Math.hypot(dx, dy), path = 0, turn = 0, i, lastAng = null;
+  for (i = 1; i < points.length; i++) {
+    var sx = points[i].x - points[i - 1].x, sy = points[i].y - points[i - 1].y, sl = Math.hypot(sx, sy);
+    path += sl;
+    if (sl > 3) {
+      var ang = Math.atan2(sy, sx);
+      if (lastAng !== null) { var d = ang - lastAng; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; turn += Math.abs(d); }
+      lastAng = ang;
+    }
+  }
+  var short = Math.min(w, h);
+  out.len = chord / short;
+  out.straight = path > 0 ? chord / path : 0;
+  out.ms = b.t - a.t;
+  out.turns = turn / (2 * Math.PI);
+  out.angle = Math.atan2(dx, -dy) * 180 / Math.PI;           /* 0 straight up, 90 right, 180 straight down */
+  if (path / short < 0.02) { out.reason = 'tap'; return out; }
+  if (out.turns > 1.5 && path / short > 1.2) { out.reason = 'windmill'; return out; }
+  if (out.len < e.minLen) { out.reason = 'short'; return out; }
+  if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
+  if (out.ms > e.maxMs) { out.reason = 'slow'; return out; }
+  var fromDown = 180 - Math.abs(out.angle);
+  if (Math.abs(out.angle) <= e.angle) { out.verdict = 'lumos'; out.reason = 'up'; return out; }
+  if (fromDown <= e.angle) { out.verdict = 'nox'; out.reason = 'down'; return out; }
+  out.reason = 'aside';
+  return out;
+}
+/* judge:end */
+
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d');
+  var sayEl = document.getElementById('say'), whyEl = document.getElementById('why');
+  var W = 0, H = 0, DPR = 1;
+  var ease = 'kind';
+  var lit = 0, litTarget = 0;                  /* the light, 0 to 1, eased */
+  var bright = 1;                              /* how bright the last Lumos was, from its angle */
+  var stroke = null, trails = [], parts = [], ghost = null, angleMark = null;
+  var wandTilt = 0, wandKick = 0;
+  var audio = null, logLines = [];
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  /* The wand: from the hand at the foot of the screen up toward the middle, leaning a little. */
+  function wandGeom() {
+    var s = Math.min(W, H);
+    var base = { x: W * 0.5 + s * 0.08, y: H - Math.max(40, s * 0.08) };
+    var len = Math.min(H * 0.42, s * 0.62);
+    var ang = (-8 + wandTilt) * Math.PI / 180;    /* from upright, + to the right */
+    return { base: base, len: len, ang: ang,
+      tip: { x: base.x + Math.sin(ang) * len, y: base.y - Math.cos(ang) * len }, s: s };
+  }
+
+  function drawWand(g) {
+    var ux = Math.sin(g.ang), uy = -Math.cos(g.ang), nx = -uy, ny = ux;
+    var w0 = g.s * 0.022, w1 = g.s * 0.006, hl = g.len * 0.3;
+    function P(along, side) { return [g.base.x + ux * along + nx * side, g.base.y + uy * along + ny * side]; }
+    cx.save();
+    /* the shaft, a tapering dark wood */
+    var grad = cx.createLinearGradient(P(0, -w0)[0], P(0, -w0)[1], P(0, w0)[0], P(0, w0)[1]);
+    grad.addColorStop(0, '#2a1a10'); grad.addColorStop(0.45, '#6b4a2f'); grad.addColorStop(1, '#22150d');
+    cx.fillStyle = grad;
+    cx.beginPath();
+    var p;
+    p = P(hl, -w0 * 0.8); cx.moveTo(p[0], p[1]);
+    p = P(g.len, -w1); cx.lineTo(p[0], p[1]);
+    p = P(g.len + w1 * 0.8, 0); cx.lineTo(p[0], p[1]);
+    p = P(g.len, w1); cx.lineTo(p[0], p[1]);
+    p = P(hl, w0 * 0.8); cx.lineTo(p[0], p[1]);
+    cx.closePath(); cx.fill();
+    /* the handle, carved, with two rings */
+    cx.fillStyle = '#3b2617';
+    cx.beginPath();
+    p = P(-g.s * 0.02, -w0); cx.moveTo(p[0], p[1]);
+    p = P(hl, -w0); cx.lineTo(p[0], p[1]);
+    p = P(hl, w0); cx.lineTo(p[0], p[1]);
+    p = P(-g.s * 0.02, w0); cx.lineTo(p[0], p[1]);
+    cx.closePath(); cx.fill();
+    cx.strokeStyle = '#8a6a48'; cx.lineWidth = Math.max(1, g.s * 0.004);
+    [0.08, 0.95].forEach(function (f) {
+      var a = P(hl * f, -w0 * 1.05), b = P(hl * f, w0 * 1.05);
+      cx.beginPath(); cx.moveTo(a[0], a[1]); cx.lineTo(b[0], b[1]); cx.stroke();
+    });
+    cx.restore();
+  }
+
+  function drawLight(g, t) {
+    if (lit < 0.01) return;
+    var r = g.s * (0.05 + 0.6 * lit * bright);
+    var flick = 1 + 0.03 * Math.sin(t / 90) + 0.02 * Math.sin(t / 37);
+    /* the room's glow */
+    var room = cx.createRadialGradient(g.tip.x, g.tip.y, 0, g.tip.x, g.tip.y, r * 2.4 * flick);
+    room.addColorStop(0, 'rgba(255,236,190,' + (0.32 * lit * bright) + ')');
+    room.addColorStop(1, 'rgba(255,236,190,0)');
+    cx.fillStyle = room; cx.fillRect(0, 0, W, H);
+    /* the halo and the bright point */
+    var halo = cx.createRadialGradient(g.tip.x, g.tip.y, 0, g.tip.x, g.tip.y, g.s * 0.09 * flick);
+    halo.addColorStop(0, 'rgba(255,255,245,' + lit + ')');
+    halo.addColorStop(0.25, 'rgba(255,240,200,' + (0.8 * lit) + ')');
+    halo.addColorStop(1, 'rgba(255,220,150,0)');
+    cx.fillStyle = halo;
+    cx.beginPath(); cx.arc(g.tip.x, g.tip.y, g.s * 0.09 * flick, 0, Math.PI * 2); cx.fill();
+  }
+
+  /* The stones behind, faint, so the light has something to fall on. */
+  function drawWall() {
+    cx.fillStyle = '#0d0b10'; cx.fillRect(0, 0, W, H);
+    var s = Math.min(W, H), bh = s * 0.09, bw = s * 0.2, row, col, y, x;
+    cx.strokeStyle = 'rgba(80,70,90,0.35)'; cx.lineWidth = 1;
+    for (row = 0, y = 0; y < H; row++, y += bh) {
+      cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke();
+      for (x = (row % 2) * bw / 2; x < W; x += bw) { cx.beginPath(); cx.moveTo(x, y); cx.lineTo(x, y + bh); cx.stroke(); }
+    }
+  }
+
+  /* A soft chime, and a small fizz, in the page's own sound; opened on the first touch. */
+  function ensureAudio() {
+    if (audio) { if (audio.state === 'suspended') audio.resume(); return; }
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) audio = new AC();
+  }
+  function chime(up) {
+    if (!audio) return;
+    var now = audio.currentTime;
+    (up ? [784, 1175] : [523, 392]).forEach(function (f, i) {
+      var o = audio.createOscillator(), gn = audio.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      gn.gain.setValueAtTime(0, now + i * 0.08);
+      gn.gain.linearRampToValueAtTime(0.12, now + i * 0.08 + 0.02);
+      gn.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.08 + 0.9);
+      o.connect(gn); gn.connect(audio.destination); o.start(now + i * 0.08); o.stop(now + i * 0.08 + 1);
+    });
+  }
+  function fizz() {
+    if (!audio) return;
+    var n = audio.sampleRate * 0.35, buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), gn = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = 2400; gn.gain.value = 0.18;
+    src.connect(f); f.connect(gn); gn.connect(audio.destination); src.start();
+  }
+
+  /* The fizzles: every one harmless, and each kind tells a little of what went wrong. */
+  function sparks(g, n, spin) {
+    for (var i = 0; i < n; i++) {
+      var a = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, v = g.s * (0.004 + Math.random() * 0.01);
+      parts.push({ k: 'spark', x: g.tip.x, y: g.tip.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1,
+        dec: 0.012 + Math.random() * 0.02, c: Math.random() < 0.5 ? '#ffb347' : '#ff6a3d', spin: spin ? (Math.random() < 0.5 ? -1 : 1) * 0.06 : 0, r: g.s * 0.25 * Math.random() });
+    }
+  }
+  function bubbles(g) {
+    for (var i = 0; i < 9; i++)
+      parts.push({ k: 'bubble', x: g.tip.x + (Math.random() - 0.5) * g.s * 0.05, y: g.tip.y, vy: -g.s * (0.0025 + Math.random() * 0.003),
+        ph: Math.random() * 6, life: 1, dec: 0.006 + Math.random() * 0.006, r: g.s * (0.012 + Math.random() * 0.02) });
+  }
+  function smoke(g) {
+    for (var i = 0; i < 7; i++)
+      parts.push({ k: 'smoke', x: g.tip.x, y: g.tip.y, vx: (Math.random() - 0.5) * g.s * 0.002, vy: -g.s * (0.0015 + Math.random() * 0.002),
+        life: 1, dec: 0.007 + Math.random() * 0.004, r: g.s * 0.02, delay: i * 6 });
+  }
+  function stepParts() {
+    parts = parts.filter(function (p) {
+      if (p.delay > 0) { p.delay--; return true; }
+      p.life -= p.dec;
+      if (p.k === 'spark') { p.vy += 0.12; if (p.spin) { var a = Math.atan2(p.vy, p.vx) + p.spin; var v = Math.hypot(p.vx, p.vy); p.vx = Math.cos(a) * v; p.vy = Math.sin(a) * v; p.vy += 0.05; } p.x += p.vx; p.y += p.vy; }
+      if (p.k === 'bubble') { p.ph += 0.15; p.x += Math.sin(p.ph) * 0.8; p.y += p.vy; }
+      if (p.k === 'smoke') { p.x += p.vx; p.y += p.vy; p.r *= 1.012; }
+      return p.life > 0;
+    });
+  }
+  function drawParts() {
+    parts.forEach(function (p) {
+      if (p.delay > 0) return;
+      cx.save();
+      if (p.k === 'spark') { cx.globalAlpha = Math.max(0, p.life); cx.fillStyle = p.c; cx.beginPath(); cx.arc(p.x, p.y, 2.2, 0, 7); cx.fill(); }
+      if (p.k === 'bubble') {
+        cx.globalAlpha = Math.max(0, p.life) * 0.9; cx.strokeStyle = '#bfe6ff'; cx.lineWidth = 1.5;
+        cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.stroke();
+        cx.fillStyle = 'rgba(255,255,255,0.6)'; cx.beginPath(); cx.arc(p.x - p.r * 0.35, p.y - p.r * 0.35, p.r * 0.2, 0, 7); cx.fill();
+      }
+      if (p.k === 'smoke') {
+        var gr = cx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+        gr.addColorStop(0, 'rgba(150,145,140,' + (0.45 * p.life) + ')'); gr.addColorStop(1, 'rgba(150,145,140,0)');
+        cx.fillStyle = gr; cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill();
+      }
+      cx.restore();
+    });
+  }
+
+  /* After a miss, his stroke stays faint beside a gold flick of the right shape, from the same start. */
+  function drawGhost(now) {
+    if (!ghost) return;
+    var age = (now - ghost.at) / 1800;
+    if (age > 1) { ghost = null; return; }
+    var a = 1 - age, s = Math.min(W, H), p0 = ghost.pts[0];
+    cx.save();
+    cx.lineCap = 'round'; cx.lineJoin = 'round';
+    cx.strokeStyle = 'rgba(200,200,215,' + (0.5 * a) + ')'; cx.lineWidth = 4;
+    cx.beginPath(); ghost.pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke();
+    cx.strokeStyle = 'rgba(232,190,90,' + (0.85 * a) + ')'; cx.lineWidth = 5; cx.setLineDash([2, 9]);
+    var ex = p0.x, ey = p0.y - s * 0.16;
+    cx.beginPath(); cx.moveTo(p0.x, p0.y); cx.lineTo(ex, ey); cx.stroke();
+    cx.setLineDash([]); cx.fillStyle = 'rgba(232,190,90,' + (0.85 * a) + ')';
+    cx.beginPath(); cx.moveTo(ex, ey - 10); cx.lineTo(ex - 8, ey + 4); cx.lineTo(ex + 8, ey + 4); cx.closePath(); cx.fill();
+    cx.restore();
+  }
+
+  /* After a hit, the angle he drew: the upright, his line, and the arc between them, in degrees. */
+  function drawAngle(now) {
+    if (!angleMark) return;
+    var age = (now - angleMark.at) / 3000;
+    if (age > 1) { angleMark = null; return; }
+    var a = age < 0.8 ? 1 : (1 - age) / 0.2, s = Math.min(W, H), p0 = angleMark.p0, L = Math.max(130, s * 0.24);
+    var rad = angleMark.angle * Math.PI / 180, ex = p0.x + Math.sin(rad) * L, ey = p0.y - Math.cos(rad) * L;
+    cx.save();
+    cx.globalAlpha = a; cx.lineCap = 'round';
+    cx.strokeStyle = 'rgba(232,220,190,0.7)'; cx.lineWidth = 2; cx.setLineDash([5, 6]);
+    cx.beginPath(); cx.moveTo(p0.x, p0.y); cx.lineTo(p0.x, p0.y - L); cx.stroke();
+    cx.setLineDash([]); cx.strokeStyle = '#ffe9a8'; cx.lineWidth = 4;
+    cx.beginPath(); cx.moveTo(p0.x, p0.y); cx.lineTo(ex, ey); cx.stroke();
+    var r = L * 0.6, from = -Math.PI / 2, to = -Math.PI / 2 + rad;
+    cx.strokeStyle = '#e8be5a'; cx.lineWidth = 2.5;
+    cx.beginPath(); cx.arc(p0.x, p0.y, r, Math.min(from, to), Math.max(from, to)); cx.stroke();
+    var deg = Math.round(Math.abs(angleMark.angle));
+    cx.fillStyle = '#ffe9a8'; cx.font = '600 ' + Math.round(Math.max(20, s * 0.045)) + 'px Georgia, serif'; cx.textAlign = 'center';
+    var side = angleMark.angle >= 0 ? -1 : 1;          /* the number sits on the far side of the upright from his line */
+    var lx = p0.x + side * Math.max(28, s * 0.07), ly = p0.y - r;
+    cx.fillText(deg + '°', lx, ly);
+    cx.restore();
+  }
+
+  function drawStroke() {
+    trails = trails.filter(function (tr) { tr.life -= 0.04; return tr.life > 0; });
+    cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round';
+    trails.concat(stroke ? [{ pts: stroke, life: 1 }] : []).forEach(function (tr) {
+      if (tr.pts.length < 2) return;
+      cx.strokeStyle = 'rgba(220,225,255,' + (0.55 * tr.life) + ')'; cx.lineWidth = 5;
+      cx.beginPath(); tr.pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke();
+    });
+    cx.restore();
+  }
+
+  var WHY = {
+    tap: ['A tap, not a flick', 'Draw a quick stroke upward.'],
+    short: ['A puff of sparks', 'Too short: make the flick a little longer.'],
+    wiggly: ['Hic! Bubbles', 'Too wiggly: keep the flick straight, like a line.'],
+    slow: ['A wisp of smoke', 'Too slow: a flick is quick.'],
+    aside: ['Sparks, sideways', 'That went sideways. Point it up.'],
+    windmill: ['Whoa, a windmill', 'Round and round! Ron waved his arms like a windmill too. Try one straight flick.'],
+    down: ['Nothing to put out', 'A stroke down puts the light out. Light it first: flick up.']
+  };
+
+  function cast(pts) {
+    var j = judgeFlick(pts, W, H, ease), g = wandGeom(), now = performance.now();
+    wandKick = Math.max(-35, Math.min(35, j.angle > 90 || j.angle < -90 ? 0 : j.angle));
+    var line = new Date().toTimeString().slice(0, 8) + ' ' + ease + ' ' + j.verdict + '/' + j.reason +
+      ' angle ' + j.angle.toFixed(0) + ' len ' + j.len.toFixed(2) + ' straight ' + j.straight.toFixed(2) +
+      ' ' + j.ms + 'ms turns ' + j.turns.toFixed(1) + ' pts ' + pts.length + ' screen ' + W + 'x' + H;
+    logLines.unshift(line); if (logLines.length > 200) logLines.pop();
+    document.getElementById('logText').textContent = logLines.join('\n');
+    if (j.verdict === 'lumos') {
+      bright = 0.55 + 0.45 * (1 - Math.min(1, Math.abs(j.angle) / 45));
+      litTarget = 1; lit = Math.max(lit, 0.15); chime(true);
+      angleMark = { at: now, p0: pts[0], angle: j.angle };
+      var deg = Math.round(Math.abs(j.angle));
+      sayEl.textContent = 'Lumos!';
+      whyEl.textContent = deg <= 3 ? 'Straight up. The brightest light.' :
+        'Your flick leaned ' + deg + '° to the ' + (j.angle > 0 ? 'right' : 'left') + '. Straighter is brighter.';
+    } else if (j.verdict === 'nox') {
+      if (litTarget > 0) {
+        litTarget = 0; chime(false); smoke(g);
+        sayEl.textContent = 'Nox'; whyEl.textContent = 'Out it goes. Flick up to light it again.';
+      } else {
+        fizz(); sparks(g, 6);
+        sayEl.textContent = WHY.down[0]; whyEl.textContent = WHY.down[1];
+      }
+    } else {
+      fizz();
+      if (j.reason === 'wiggly') bubbles(g);
+      else if (j.reason === 'slow') smoke(g);
+      else if (j.reason === 'windmill') sparks(g, 40, true);
+      else if (j.reason !== 'tap') sparks(g, j.reason === 'short' ? 10 : 22);
+      if (j.reason !== 'tap' && j.reason !== 'windmill') ghost = { at: now, pts: pts };
+      sayEl.textContent = WHY[j.reason][0]; whyEl.textContent = WHY[j.reason][1];
+    }
+    return j;
+  }
+
+  /* The stroke: the first finger only, so a palm or a second finger cannot spoil it. */
+  var activeId = null;
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    if (activeId !== null) return;
+    ensureAudio();
+    activeId = ev.pointerId; stroke = [pt(ev)];
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+    ev.preventDefault();
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== activeId) return;
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev];
+    if (!list.length) list = [ev];
+    list.forEach(function (e2) { stroke.push(pt(e2)); });
+    ev.preventDefault();
+  });
+  function end(ev) {
+    if (ev.pointerId !== activeId) return;
+    activeId = null;
+    stroke.push(pt(ev));
+    var pts = stroke; stroke = null;
+    trails.push({ pts: pts, life: 1 });
+    cast(pts);
+  }
+  cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === activeId) { activeId = null; stroke = null; } });
+  document.addEventListener('touchmove', function (e) { if (!e.target.closest || !e.target.closest('#log')) e.preventDefault(); }, { passive: false });
+
+  var easeBtn = document.getElementById('ease'), order = ['kind', 'fair', 'strict'];
+  easeBtn.addEventListener('click', function () {
+    ease = order[(order.indexOf(ease) + 1) % order.length];
+    easeBtn.textContent = 'Ease: ' + ease;
+  });
+  var logEl = document.getElementById('log');
+  document.getElementById('logBtn').addEventListener('click', function () { logEl.style.display = logEl.style.display === 'block' ? 'none' : 'block'; });
+  document.getElementById('close').addEventListener('click', function () { logEl.style.display = 'none'; });
+  document.getElementById('copy').addEventListener('click', function () {
+    var txt = navigator.userAgent + '\n' + logLines.join('\n');
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { document.getElementById('copy').textContent = 'Copied'; });
+  });
+
+  var frames = 0, t0 = performance.now();
+  function frame(now) {
+    lit += (litTarget - lit) * (litTarget > lit ? 0.12 : 0.06);
+    wandTilt += (wandKick - wandTilt) * 0.35; wandKick *= 0.82;
+    var g = wandGeom();
+    drawWall();
+    drawWand(g);
+    drawLight(g, now);
+    stepParts(); drawParts();
+    drawStroke(); drawGhost(now); drawAngle(now);
+    frames++;
+    if (now - t0 > 2000) { window.lumosStats = Math.round(frames * 1000 / (now - t0)) + ' fps'; frames = 0; t0 = now; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* for the checks: cast a stroke from code, as a finger would */
+  window.lumosCharms = { cast: cast, judge: judgeFlick, state: function () { return { lit: lit, litTarget: litTarget, ease: ease }; } };
+})();
+</script>
+</body>
+</html>
