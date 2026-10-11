@@ -721,6 +721,20 @@ function updateHerPatches(dt) {
     if (!herPrimp.steps.length) herPrimp = null;
   }
 }
+/* asleep at night (canon checked in the text, 11 October 2026: "the Fat Lady, who was dozing peacefully with her head
+   against her frame" late at night, OotP 13, with "will I have to stay awake all night"; "'Password?' said the Fat Lady,
+   jerking out of a doze", PoA 8): by night her doze patch (her eyes closed, The portrait hole's) is on; as he starts up
+   the corridor toward her, or stands at her stop, she jerks awake, and some seconds after he has gone she nods off
+   again. Her head against the frame would be a new drawing, so the doze is her face only. Behind ?time= with the rest
+   of the night until NIGHT.live */
+var herDoze = { wake: 0 };
+function updateHerDoze(dt) {
+  var toHer = atStop && atStop.name === 'her';
+  if (toHer || herOpening) herDoze.wake = 8 + Math.random() * 6;   /* awake while he is with her, then a while after */
+  else if (herDoze.wake > 0) herDoze.wake -= dt;
+  var asleep = nightK() >= 1 && herDoze.wake <= 0 && !herPrimp;
+  herPatch.doze.userData.on = asleep ? 1 : 0;
+}
 /* her primp (Godric's touch on the switch going live, 6.25 pm): as he walks up the corridor to her she smooths her bodice
    and pats her curls twice, a beat before he reaches her; her own reach and ear poses, nothing new drawn. Timed back
    from the walk's end so the hand is in her lap again 0.3 s before he stops */
@@ -2562,6 +2576,7 @@ function frame() {
   updateLookBack(dt);
   updateTurnRise(dt);
   updateDoorsKnock(dt);
+  updateHerDoze(dt);
   updateHerPatches(dt);
   updateGrounds(dt);
   updateSnowball(dt);
