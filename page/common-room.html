@@ -2601,14 +2601,16 @@ function homePlace(p, dz, u) {
    books say is in it, each checked in the text, the first of the day marked by a ribbon at Hermione's Great Hall line
    (Q27, t1, and his note of 6.31 pm); after the first page of the day, her PoA 9 line (Q26's touch). Now and then, one
    day in four by the date, it is gone (?books=out to see it): the gap shows, a library slip stands in it, and a tap
-   brings her CoS 9 line. Never switched while he is at the desk. */
-var BOOKS = { u: 0.43, v: 0.205, dz: 0.01, w: 0.32, h: 0.32 * 732 / 1032,  /* w provisional: Q28, the plan's 0.32 m */
+   brings her CoS 9 line. Never switched while he is at the desk. Q28's touch t1 (7.07 pm): now and then, one arrival
+   in five (?books=ajar to see it), the History is already an inch out when he comes in, as if Hermione had just put it
+   back in a hurry; a tap shows its page and pushes it home, and it stays home until he next arrives. */
+var BOOKS = { u: 0.43, v: 0.205, dz: 0.01, w: 0.32, h: 0.32 * 732 / 1032,  /* w: Q28, Godric 7.07 pm, 0.32 m */
   url: '../assets/layers/books-row.png', outUrl: '../assets/layers/books-row-out.png',
   histUrl: '../assets/layers/books-row-history.png',
   HIST: [1103 / 2065, 53 / 1465, 1787 / 2065, 1444 / 1465],    /* the History's box on the row, from the left and top */
   GAP: [0.605, 0.809],                                         /* the gap it leaves, the blue's edge to the sixth's */
   SLIDE: 0.025, OUT: 0.35, HOLD: 1.4, BACK: 0.45,              /* an inch toward him; seconds out, held, back */
-  DAY: 'lumos.books.poaDay' };
+  NEAR: 0.08, LIT: 0.4, AJAR: 0.2, DAY: 'lumos.books.poaDay' };
 /* what the seven books say is in Hogwarts, A History, in its own voice from their words; checked in the text with
    the canon search. Its page numbers are invented: "over a thousand pages" (GoF 15). */
 var HISTORY_PAGES = [
@@ -2636,7 +2638,8 @@ var books = (function () {
     im.src = url;
     return m;
   }
-  var o = { out: null, check: 0, ain: null, hain: null, slide: -1, paged: false, pageAt: 0, dust: null };
+  var o = { out: null, check: 0, ain: null, hain: null, slide: -1, paged: false, pageAt: 0, dust: null,
+    ajar: /[?&]books=ajar/.test(location.search) || (!/[?&]books=/.test(location.search) && Math.random() < BOOKS.AJAR) };
   o.mesh = card(BOOKS.w, BOOKS.h, BOOKS.outUrl);
   o.mesh.name = 'books-row'; scene.add(o.mesh); register(o.mesh, 2);
   var hw = (BOOKS.HIST[2] - BOOKS.HIST[0]) * BOOKS.w, hh = (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h;
@@ -2713,7 +2716,7 @@ function booksTap() {
   }
   if (books.slide >= 0 || bookPageEl.classList.contains('on')) return;
   if (lineCur && lineCur.line.at === 'books-row') return;           /* her line still showing: let it be read */
-  books.slide = 0; books.paged = false;
+  books.slide = books.ajar ? BOOKS.OUT : 0; books.paged = false; books.ajar = false;   /* already out: held, then home */
   var p = books.hist.localToWorld(new THREE.Vector3(0, (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h / 2, 0));
   books.motes.forEach(function (m) {
     m.x = p.x + (Math.random() - 0.5) * 0.09; m.y = p.y + Math.random() * 0.02; m.z = p.z + (Math.random() - 0.5) * 0.04;
@@ -2729,6 +2732,14 @@ function booksPage() {
     localStorage.setItem(BOOKS.DAY, day);
     showLines([{ medium: 'said', speaker: 'hermione', at: 'books-row', text: '“Honestly am I the only person who’s ever bothered to read Hogwarts, A History?” said Hermione crossly.' }]);
   } : null);
+}
+/* the History out by s (0 home, 1 an inch out): an inch straight toward his eye is under a pixel from the room, so it
+   also shows as a thing nearer and catching the fire: a little larger about its middle (its foot a touch lower on the
+   desk) and a little brighter */
+function booksHistOut(s) {
+  books.hist.position.z = books.histAt.z + BOOKS.SLIDE * s;
+  books.hist.scale.setScalar(1 + BOOKS.NEAR * s);
+  books.hist.material.color.setScalar(1 + BOOKS.LIT * s);
 }
 function updateBooks(dt) {
   if (!sideTable.geometry.parameters) return;
@@ -2752,10 +2763,10 @@ function updateBooks(dt) {
     if (t < BOOKS.OUT) s = smooth01(0, BOOKS.OUT, t);
     else if (t < BOOKS.OUT + BOOKS.HOLD) s = 1;
     else s = 1 - smooth01(BOOKS.OUT + BOOKS.HOLD, BOOKS.OUT + BOOKS.HOLD + BOOKS.BACK, t);
-    books.hist.position.z = books.histAt.z + BOOKS.SLIDE * s;
+    booksHistOut(s);
     if (!books.paged && t >= BOOKS.OUT * 0.8) { books.paged = true; booksPage(); }
-    if (t >= BOOKS.OUT + BOOKS.HOLD + BOOKS.BACK) { books.slide = -1; books.hist.position.z = books.histAt.z; }
-  }
+    if (t >= BOOKS.OUT + BOOKS.HOLD + BOOKS.BACK) { books.slide = -1; booksHistOut(0); }
+  } else booksHistOut(books.ajar && !books.out ? 1 : 0);
   if (books.dust !== null) {                               /* the motes drift up and settle, gone in two seconds */
     var d = (books.dust += dt), arr = books.dustGeo.attributes.position.array;
     books.motes.forEach(function (m, i) {
