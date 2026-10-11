@@ -1290,6 +1290,92 @@ function updateSnowball(dt) {
   } else snowball = null;
   snowTex.needsUpdate = true;
 }
+/* a bewitched snowball (Godric's touch on Q30, 11 October 2026: "Fred and George ... bewitching several snowballs so
+   that they followed Quirrell around, bouncing off the back of his turban", PS 12): by day while snow lies, now and then
+   at the window's stop a student runs across the far lawn with a snowball hunting him a little behind and above, it turns
+   in the air, catches him up, bounces off the back of his head, and chases him on out of sight. Drawn in code into a canvas
+   over the lawn in the drawing's own pixels, under the thrown snowball's. Live once the snowy grounds are drawn and hung
+   (BEWITCHED.live); ?bewitched sends one every visit. */
+var BEWITCHED = { live: false, box: [0, 1080, 800, 360], canvas: null, tex: null, run: null, last: -1, next: 0 };
+function bewitchedCanvas() {
+  if (BEWITCHED.canvas) return;
+  var b = BEWITCHED.box, sky = groundsWin.sky;
+  BEWITCHED.canvas = makeCanvas(b[2], b[3]); BEWITCHED.tex = tex(BEWITCHED.canvas);
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(b[2] / GROUNDS.px * GROUNDS.w, b[3] / GROUNDS.py * GROUNDS.h),
+    new THREE.MeshBasicMaterial({ map: BEWITCHED.tex, transparent: true, depthWrite: false }));
+  m.position.set(((b[0] + b[2] / 2) / GROUNDS.px - 0.5) * GROUNDS.w, (0.5 - (b[1] + b[3] / 2) / GROUNDS.py) * GROUNDS.h, 0.003);
+  m.renderOrder = 4; m.name = 'grounds-bewitched'; sky.add(m);
+}
+function bewitchedGo() {
+  bewitchedCanvas();
+  var ltr = Math.random() < 0.5;
+  BEWITCHED.run = { t: 0, T: 6.5, ltr: ltr, y0: 1300 + Math.random() * 40, dy: -30 - Math.random() * 20 };
+}
+function drawStudent(g, x, y, h, step, dir, duck) {
+  var w = h * 0.36, leg = Math.sin(step) * h * 0.09;
+  g.save(); g.translate(x, y); g.scale(dir, 1);
+  g.fillStyle = 'rgba(60,70,90,0.25)'; g.beginPath(); g.ellipse(0, 0, w * 0.6, h * 0.04, 0, 0, 7); g.fill();
+  g.strokeStyle = '#141218'; g.lineWidth = Math.max(1, h * 0.05);   /* legs */
+  g.beginPath(); g.moveTo(0, -h * 0.3); g.lineTo(leg, 0); g.moveTo(0, -h * 0.3); g.lineTo(-leg, 0); g.stroke();
+  g.fillStyle = '#1b1a20'; g.lineWidth = 1;   /* the black robe, flying out behind */
+  g.beginPath(); g.moveTo(-w * 0.2, -h * 0.78); g.lineTo(w * 0.22, -h * 0.76); g.lineTo(w * 0.3, -h * 0.28);
+  g.lineTo(-w * 0.75, -h * 0.24 - Math.abs(leg) * 0.6); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle = '#7f1d1d'; g.fillRect(-w * 0.22, -h * 0.8, w * 0.46, h * 0.07);   /* a scarf */
+  g.fillStyle = '#c9a227'; g.fillRect(-w * 0.05, -h * 0.8, w * 0.1, h * 0.07);
+  g.strokeStyle = '#7f1d1d'; g.lineWidth = Math.max(1, h * 0.05);
+  g.beginPath(); g.moveTo(-w * 0.2, -h * 0.76); g.lineTo(-w * 0.7, -h * 0.82 + Math.sin(step * 0.5) * h * 0.04); g.stroke();
+  g.fillStyle = '#e2b99a'; g.beginPath(); g.arc(w * 0.04, -h * (duck ? 0.84 : 0.9), h * 0.1, 0, 7); g.fill();
+  g.fillStyle = '#3a2a1e'; g.beginPath(); g.arc(-w * 0.02, -h * (duck ? 0.87 : 0.93), h * 0.1, Math.PI * 0.9, Math.PI * 2.1); g.fill();
+  g.strokeStyle = '#141218'; g.lineWidth = Math.max(1, h * 0.04);   /* an arm up over his head, ducking */
+  g.beginPath(); g.moveTo(0, -h * 0.72); g.lineTo(duck ? -w * 0.1 : w * 0.4, duck ? -h * 1.02 : -h * 0.55); g.stroke();
+  g.restore();
+}
+function drawSnowballAt(g, x, y, r, gy) {
+  g.fillStyle = 'rgba(70,85,110,0.22)'; g.beginPath(); g.ellipse(x, gy, r * 1.1, r * 0.35, 0, 0, 7); g.fill();
+  var grd = g.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.15, x, y, r);
+  grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
+  g.fillStyle = grd; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+  g.strokeStyle = '#6f7a8c'; g.lineWidth = 1; g.stroke();
+}
+function updateBewitched(dt) {
+  var here = atStop && atStop.name === 'window', look = groundsQ.has('bewitched'), w = groundsWeather();
+  var ok = look || (BEWITCHED.live && w && w.ground === 'snow' && nightK() < 0.5);
+  if (here && BEWITCHED.last !== atStop) {
+    BEWITCHED.last = atStop;
+    BEWITCHED.next = ok && (look || Math.random() < 0.25) ? t + 2 + Math.random() * 3 : 0;
+  }
+  if (!here) BEWITCHED.last = -1;
+  if (BEWITCHED.next && t >= BEWITCHED.next && !BEWITCHED.run) { BEWITCHED.next = 0; bewitchedGo(); }
+  var r = BEWITCHED.run;
+  if (!r) return;
+  r.t += dt;
+  var b = BEWITCHED.box, g = BEWITCHED.canvas.getContext('2d');
+  g.clearRect(0, 0, b[2], b[3]);
+  var u = r.t / r.T;
+  if (u >= 1) { BEWITCHED.run = null; BEWITCHED.tex.needsUpdate = true; return; }
+  g.save(); g.translate(-b[0], -b[1]);
+  var X = function (k) { var x = -40 + 880 * k; return r.ltr ? x : 800 - x; }, dir = r.ltr ? 1 : -1;
+  var sy = r.y0 + r.dy * u, ppm = 27 + 28 * (sy - 1088) / 362, h = 1.5 * ppm * 1.2;
+  var sx = X(u);
+  /* the ball: behind and above him, a loop in the air at a third of the way, then it closes, strikes the back of his
+     head about 0.6 of the way, rebounds up and back, and comes on after him */
+  var lag, lift, loop = 0;
+  if (u < 0.3) { lag = 0.09; lift = 0.55; }
+  else if (u < 0.42) { var q = (u - 0.3) / 0.12; lag = 0.09 + 0.04 * Math.sin(q * Math.PI); lift = 0.55 + 0.35 * Math.sin(q * Math.PI * 2); loop = q; }
+  else if (u < 0.6) { var c = (u - 0.42) / 0.18; lag = 0.09 * (1 - c) + 0.012 * c; lift = 0.55 + (0.9 - 0.55) * c; }
+  else if (u < 0.7) { var e = (u - 0.6) / 0.1; lag = 0.012 + 0.05 * Math.sin(e * Math.PI * 0.5); lift = 0.9 + 0.5 * Math.sin(e * Math.PI); }
+  else { lag = 0.062 - 0.02 * (u - 0.7) / 0.3; lift = 0.7 + 0.12 * Math.sin(r.t * 6); }
+  var bx = X(Math.max(0, u - lag)), gy = r.y0 + r.dy * Math.max(0, u - lag), by = gy - h * lift - h * 0.1 * Math.sin(r.t * 5);
+  var duck = u > 0.58 && u < 0.7;
+  drawStudent(g, sx, sy, h, r.t * 11, dir, duck);
+  drawSnowballAt(g, bx, by, Math.max(3, 0.14 * ppm * 1.6), gy);
+  if (u > 0.6 && u < 0.66) {   /* a puff of snow off his head as it strikes */
+    g.fillStyle = 'rgba(244,246,250,' + (1 - (u - 0.6) / 0.06) + ')';
+    for (var i = 0; i < 5; i++) { g.beginPath(); g.arc(sx + dir * (-h * 0.05) + Math.cos(i * 1.3) * h * 0.12 * (u - 0.58) / 0.08, sy - h * 0.95 + Math.sin(i * 1.3) * h * 0.08, Math.max(1, h * 0.03), 0, 7); g.fill(); }
+  }
+  g.restore();
+  BEWITCHED.tex.needsUpdate = true;
+}
 var TAPESTRY = { w: 1.4, h: 2.0, x: NOOK_MID };
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, 2.1, FAR_FACE, 1, 1, 'tapestry');
 /* her wall: two portraits on the study's stretch, symmetric about the bay axis; portrait-a is the one nearest her */
@@ -2694,6 +2780,7 @@ function frame() {
   updateHerPatches(dt);
   updateGrounds(dt);
   updateSnowball(dt);
+  updateBewitched(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
@@ -2722,7 +2809,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
