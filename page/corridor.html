@@ -1163,6 +1163,7 @@ function updateGrounds(dt) {
   updateFrost();
   updateSky(dt);
   updateNight(dt);
+  updateNorris(dt);
   if (!grounds.canvas) return;
   var here = atStop && atStop.name === 'window';
   if (here && grounds.last !== atStop) {
@@ -1631,9 +1632,9 @@ dayLights.push(landingLight);
    light in Hagrid's cabin" (OotP 13), and on a lit night a thread of smoke rises from his chimney (Godric's touches,
    10 October 2026, 5.15 pm); his washing is in and he does not cross. The real moon (Magic's req 98; Events' moon(),
    req 95) hangs in the glass of the plain window as high as it stands, its phase drawn as the dormitory draws it
-   (page/dormitory.html, drawMoon); a few stars there on a clear night. Shown only with ?time= until Godric says the
-   night goes live (NIGHT.live), so the page keeps its day meanwhile. */
-var NIGHT = { live: false, key: null, next: 0, view: null, canvas: null, tex: null, moon: null, stars: null, torchBoost: 1,
+   (page/dormitory.html, drawMoon); a few stars there on a clear night. Live by the castle clock since Godric's yes to
+   Q27 (11 October 2026, 7.49 am); NIGHT.live false would keep the page's day again, ?time= still sets it for a look. */
+var NIGHT = { live: true, key: null, next: 0, view: null, canvas: null, tex: null, moon: null, stars: null, torchBoost: 1,
   fog0: scene.fog.color.clone(), bg0: scene.background.clone(), hemi0: hemi.intensity, dark: col(0x0d1220),
   WIN: [548, 1005, 571, 1038], GABLE: [447, 952, 470, 982], CHIMNEY: [555, 876], BOX: [420, 640, 280, 420] };
 function lightTime() {
@@ -1641,6 +1642,52 @@ function lightTime() {
   return NIGHT.live || groundsQ.has('time') ? castle.time() : 'day';
 }
 function nightK() { var tt = lightTime(); return tt === 'night' ? 1 : tt === 'evening' ? 0.3 : 0; }
+/* Mrs Norris at night (Godric's touch on Q27, 7.49 am; in the text: "a scrawny, dust-colored creature with bulging, lamp
+   like eyes just like Filch's. She patrolled the corridors alone", PS 8; "Mrs. Norris turned her lamplike eyes on them,
+   but didn't do anything", PS 16; "a pair of lamp-like yellow eyes", CoS 8): late at night, about one visit in two, her
+   eyes glint low down at the far end of the corridor he is looking along (by her end wall, or at the stair head), hold
+   a moment with one blink, and she is gone. Only her eyes: she is never drawn. Only while he stands still and the spot
+   is in view and at least 5 m off. ?norris shows her every few seconds */
+var NORRIS = { y: 0.22, gap: 0.05, r: 0.05, hold: 1.5 };   /* the glints a little larger than life, so they read 12 m off */
+var norris = { group: new THREE.Group(), t: -1, next: 0, look: groundsQ.has('norris'), tried: false };
+(function () {
+  var c = makeCanvas(64, 64), g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(255,248,200,1)'); grd.addColorStop(0.18, 'rgba(255,214,90,0.95)'); grd.addColorStop(0.5, 'rgba(230,170,40,0.25)'); grd.addColorStop(1, 'rgba(230,170,40,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+  var t = tex(c);
+  [-1, 1].forEach(function (side) {
+    var e = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    e.scale.set(NORRIS.r * 2, NORRIS.r * 2, 1); e.position.x = side * NORRIS.gap / 2; e.name = 'norris-eye';
+    norris.group.add(e);
+  });
+  norris.group.visible = false; norris.group.name = 'mrs-norris'; scene.add(norris.group);
+})();
+function norrisSpot() {
+  var d = new THREE.Vector3(); camera.getWorldDirection(d);
+  return d.x > 0 ? new THREE.Vector3(END_X - 0.35, NORRIS.y, FAR_Z + 0.4) : new THREE.Vector3(STAIR_X + 0.3, NORRIS.y, MID_Z + 0.5);
+}
+function updateNorris(dt) {
+  if (norris.t >= 0) {
+    norris.t += dt;
+    var k = norris.t, a = k < 0.25 ? k / 0.25 : k < NORRIS.hold ? 1 : Math.max(0, 1 - (k - NORRIS.hold) / 0.2);
+    if (k > 0.7 && k < 0.82) a = 0;                     /* one blink */
+    norris.group.children.forEach(function (e) { e.material.opacity = a; });
+    if (k > NORRIS.hold + 0.2) { norris.t = -1; norris.group.visible = false; }
+    return;
+  }
+  if (nightK() < 1 && !norris.look) { norris.next = 0; return; }
+  if (!norris.next) {
+    if (norris.tried && !norris.look) return;            /* once a visit */
+    norris.tried = true;
+    if (!norris.look && Math.random() > 0.5) return;
+    norris.next = t + (norris.look ? 3 : 8 + Math.random() * 40);
+  }
+  if (t < norris.next || tween) return;
+  var p = norrisSpot(), q = p.clone().project(camera);
+  if (camera.position.distanceTo(p) < 5 || Math.abs(q.x) > 0.9 || Math.abs(q.y) > 0.9 || q.z > 1) { norris.next = t + 3; return; }
+  norris.group.position.copy(p); norris.group.lookAt(camera.position); norris.group.visible = true; norris.t = 0;
+  norris.next = norris.look ? t + 5 : 0;
+}
 function hagridHome() { return dayRand(6) < 0.67; }   /* about two nights in three his window is lit */
 function makeNightView() {
   var b = NIGHT.BOX;
@@ -2552,7 +2599,10 @@ var castle = window.CastleEvents ? CastleEvents.start({
   },
   drawRoom: corridorDrawRoom,
   showLines: showLines,
-  builtins: { at: function () { return atStop ? atStop.name : 'none'; } }
+  builtins: { at: function () { return atStop ? atStop.name : 'none'; },
+    /* the full moon's owl (req 101, 104): no until the owl's flight cell is drawn (req 102), as the common room answers,
+       so the record never sets owl_landed for the night with nothing shown (Fawkes, Q28, 11 October 2026) */
+    'moon in view': function () { return 'no'; } }
 }) : null;
 
 /* ---------- per frame ---------- */
