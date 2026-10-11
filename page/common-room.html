@@ -2300,6 +2300,46 @@ var cloakTape = (function () {
   return tp;
 })();
 function cloakTap() { if (!held) liftPaper(cloakTape); }
+/* the twins' sign taken down (Godric's Q9 touch, 11 October 2026; OotP 12, checked in the text: "'They are the limit,'
+   said Hermione grimly, taking down the sign"): some mornings, one in three by the date, the sign is gone before he
+   comes down and a torn corner is left under its pin; a tap there brings her line. By noon the twins have pinned it
+   up again. Made last so no other paper's seed moves. */
+var gallonsPaper = papers.filter(function (p) { return p.spec.id === 'gallons'; })[0];
+var gallonsScrap = (function () {
+  var g0 = gallonsPaper.spec;
+  var spec = { id: 'gallons-scrap', w: 0.08, h: 0.05, pin: g0.pin, pins: 'none', rot: g0.rot + 0.06, z: g0.z - 0.0004,
+    tile: 'buff', torn: ['left', 'bottom', 'right'], age: 0.05, scrap: true,
+    draw: function (g, W, H, rnd) {                /* the sign's own first line where it stood, torn through */
+      write(g, 'GALLONS OF', W / 2, 0.15 * g0.h * PX, { px: 0.12 * g0.w * PX, family: '"Almendra SC", "IM Fell English SC", Georgia, serif',
+        color: '#b5401c', maxW: g0.w * PX, align: 'center', soft: 1.2, rnd: rnd });
+    } };
+  var sp = makePaper(spec, papers.length);
+  sp.hidden = true;
+  return sp;
+})();
+var signDown = false, signCheck = 0;
+function signDownToday() {
+  if (!castle || castle.time() !== 'morning') return false;
+  var d = castle.weather().date || '', h = 7;
+  for (var i = 0; i < d.length; i++) h = (h * 31 + d.charCodeAt(i)) % 1009;
+  return h % 3 === 0;
+}
+function updateSign(dt) {
+  if ((signCheck -= dt) > 0) return;
+  signCheck = 2;
+  var down = signDownToday();
+  if (down === signDown && gallonsPaper.hidden === down) return;
+  if (held === gallonsPaper) return;               /* never taken from his hand */
+  signDown = down;
+  gallonsPaper.hidden = down;                      /* its pin stays, through the torn corner */
+  gallonsPaper.mesh.visible = gallonsPaper.shadow.visible = papersPainted && !down;
+  gallonsScrap.hidden = !down;
+  gallonsScrap.mesh.visible = gallonsScrap.shadow.visible = papersPainted && down;
+}
+function signScrapTap() {
+  LINE_PLACES['sign-corner'] = gallonsScrap.mesh.getWorldPosition(new THREE.Vector3());
+  showLines([{ medium: 'said', speaker: 'hermione', at: 'sign-corner', text: '“They are the limit,” said Hermione grimly.' }]);
+}
 function updateCloak(dt) {
   if (!cloak) return;
   cloakTape.mesh.visible = held === cloakTape;
@@ -3826,6 +3866,7 @@ function tap(cx, cy) {
   var hit = hits.length ? hits[0].object : null;
   if (mode === 'hand') { returnPaper(false); return; }
   if (mode === 'board') {
+    if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return; }
     if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
     if (hit && boardParts.indexOf(hit) >= 0) return;
     leaveBoard();
@@ -4360,6 +4401,7 @@ function frame() {
   updateTapestry(dt, t);
   updateScarf(dt, t);
   updateCloak(dt);
+  updateSign(dt);
   updateSatchel(dt, t);
   updateHomework(dt);
   updateCurios(dt, t);
@@ -4370,7 +4412,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
