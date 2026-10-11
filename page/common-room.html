@@ -655,7 +655,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=5"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=11"></script>
+<script src="castle-events.js?v=13"></script>
 <script>
 (function () {
 'use strict';
@@ -1019,6 +1019,48 @@ var skyR = new THREE.Mesh(winGeo.clone(), new THREE.MeshBasicMaterial({ map: cut
 onWall(skyR, Math.PI - 0.55, 3.3, 5.53); register(skyR, 0); skyR.name = 'window-right-sky';
 var skyL = new THREE.Mesh(winGeo.clone(), new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawSky(false)), alphaTest: 0.5 }));
 onWall(skyL, Math.PI + 0.55, 3.3, 5.53); register(skyL, 0); skyL.name = 'window-left-sky';
+/* a snowball past the window (req 118, Events' grounds.snowball, page/events/grounds.json: by day while snow lies, the
+   runtime's when): thrown up from a fight on the grounds below, it rises into the glass, slows, sheds a flake or two at
+   the top and drops back out of sight. Drawn in code, nothing spent, into that window's own sky canvas, so the drawn
+   frame and the stone hide it everywhere but the panes; the right window, seen whole at rest, takes most of them. The
+   windows show only sky, so the record's lake and Hagrid on the field do not reach this room. */
+var snowball = null;
+function snowballFly() {
+  var right = Math.random() < 0.65;
+  snowball = { sky: right ? skyR : skyL, moon: right, t: 0, T: 1.5 + 0.4 * Math.random(), x0: (Math.random() < 0.5 ? 0.27 : 0.73) + (Math.random() - 0.5) * 0.1,
+    drift: (Math.random() - 0.5) * 0.08,   /* inside one light, clear of the stone mullion */ peak: 0.35 + 0.25 * Math.random(), flakes: [] };
+}
+function updateSnowball(dt) {
+  if (!snowball) return;
+  var s = snowball, tx = s.sky.material.map, c = tx.image, g = c.getContext('2d'), w = c.width, h = c.height;
+  s.t += dt;
+  var u = s.t / s.T, r = w * 0.075;                  /* about 14 cm across, a big two-handed one, so it reads through the leads */
+  g.clearRect(0, 0, w, h); drawSky(s.moon)(g, w, h);
+  if (u < 1) {
+    var x = (s.x0 + s.drift * u) * w, y = h + r - (h * s.peak + r) * 4 * u * (1 - u);
+    if (u > 0.45 && s.flakes.length < 3 && Math.random() < 0.2) s.flakes.push({ x: x + (Math.random() - 0.5) * r, y: y - r * 0.6, t: 0 });
+    s.flakes.forEach(function (f) {
+      f.t += dt; f.y += 30 * dt;
+      g.fillStyle = 'rgba(244,246,250,' + Math.max(0, 0.9 - f.t * 1.2) + ')';
+      g.beginPath(); g.arc(f.x, f.y, r * 0.22, 0, Math.PI * 2); g.fill();
+    });
+    for (var j = 4; j >= 1; j--) {                 /* a short trail of powder behind it, so the throw reads */
+      var uj = Math.max(0, u - j * 0.025), xj = (s.x0 + s.drift * uj) * w, yj = h + r - (h * s.peak + r) * 4 * uj * (1 - uj);
+      g.fillStyle = 'rgba(240,244,250,' + (0.45 - j * 0.09) + ')';
+      g.beginPath(); g.arc(xj, yj, r * (0.9 - j * 0.12), 0, Math.PI * 2); g.fill();
+    }
+    var grd = g.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.15, x, y, r);
+    grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
+    g.fillStyle = grd; g.beginPath();
+    for (var i = 0; i <= 10; i++) {                   /* packed by hand, so not quite round */
+      var a = i / 10 * Math.PI * 2, k = r * (0.92 + 0.08 * Math.sin(i * 2.7));
+      if (i) g.lineTo(x + k * Math.cos(a), y + k * Math.sin(a)); else g.moveTo(x + k, y);
+    }
+    g.fill();
+    g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();   /* a pen line, as the drawn room has, so it reads on the pale sky */
+  } else snowball = null;
+  tx.needsUpdate = true;
+}
 
 var portraitTex = cutoutTexture(256, 332, '#000', drawFrame, 'portrait');
 var port1 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.3), new THREE.MeshStandardMaterial({ map: portraitTex, roughness: 0.9, alphaTest: 0.5 }));
@@ -4257,7 +4299,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'smoke puffs back out of the grate': smokePuff,
     'the embers brighten a step': embersStep,
     "the fire catches with a whoosh and the room's light comes up": fireCatches,
-    'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire
+    'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire,
+    'a snowball flies up past the window from a fight on the grounds below and drops out of sight': snowballFly
   }, VISITOR_CUES, NICK_CUES),
   drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); },
   figures: FIGURES,
@@ -4316,13 +4359,14 @@ function frame() {
   updateSatchel(dt, t);
   updateHomework(dt);
   updateCurios(dt, t);
+  updateSnowball(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
 }
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
