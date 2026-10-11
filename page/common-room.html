@@ -3104,10 +3104,8 @@ function placeSitters(spec) {
    sends her visiting) until her record's cue brings her home through her painting's exit. The runtime asks where each
    sitter is as `mantel sitter` and `right sitter`: seated, standing, walking or away. */
 var VISITING = {
-  her: { empty: "the mantel painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds her away until her record brings her home",
-         there: "the mantel painting's sitter in the painting opposite the hole, seen through the hole whenever it opens" },
-  him: { empty: "the right painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds him away until his record brings him home",
-         there: "the right painting's sitter in the painting opposite the hole, seen through the hole whenever it opens" }
+  her: { empty: "the mantel painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds her away until her record brings her home" },
+  him: { empty: "the right painting's sitter's chair empty, the sitter out visiting; the sitters' loop holds him away until his record brings him home" }
 };
 function sitterPhase(st) {
   if (st.phase === 'away' || st.phase === 'seated' || st.phase === 'standing') return st.phase;
@@ -3130,7 +3128,9 @@ function comeHome(n) {
    the drag left; the Corridor hangs the pair at 0.9 and 2.1 either side of it (Godric, 9 October 2026, 2.43 pm; the
    Corridor's req 33; lost, the painting seen only on the drag left). A sitter out visiting
    stands in it, drawn from her own standing cell; looking in, she faces the room's side, paying him no mind she is
-   turned away, and caught she walks off through the painted door at its right edge. One sitter at a time. */
+   turned away, and caught she walks off through the painted door at its right edge. One sitter at a time. Since req 120
+   (11 October 2026) nothing raises her there: the hole no longer faces it, so the painting hangs empty in the hole's
+   view; oppShow is kept for a record that brings her back. */
 /* The drawing is the Corridor's (req 33, round 1 candidate 3, Godric's pick at 5.11 pm, assets/layers/painting-opposite.png,
    400 x 433 for 0.5 by 0.54 m): an empty panelled room in a beaded gilt frame, its door ajar on the right, so a sitter
    stands on its floor and walks off through that doorway. It is the canvas's ground; until it loads, the grey stand-in.
@@ -3208,19 +3208,13 @@ function visitorsDrawRoom(shows) {
     var st = sitters[n];
     if (shows.indexOf(VISITING[n].empty) >= 0) holdAway(st);
     else if (st.held) { st.held = false; st.t = dwell(5, 30); }
-    if (shows.indexOf(VISITING[n].there) >= 0) { if (opp.who !== n) oppShow(n, 'stays'); }
-    else oppClear(n);
   }
 }
 var VISITOR_CUES = {
   "the mantel painting's sitter comes home through her painting's exit and sits": function () { comeHome('her'); },
   "the right painting's sitter comes home through his painting's exit and sits": function () { comeHome('him'); },
-  "the mantel painting's sitter standing in the painting opposite the hole, looking in through the hole at him": function () { oppShow('her', 'looks'); },
-  "the right painting's sitter standing in the painting opposite the hole, looking in through the hole at him": function () { oppShow('him', 'looks'); },
-  "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens": function () { oppShow('her', 'slips'); },
-  "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as the hole opens": function () { oppShow('him', 'slips'); },
-  "the mantel painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('her', 'stays'); },
-  "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppShow('him', 'stays'); },
+  /* the six cues of a sitter in the painting opposite seen through the hole are gone (req 120, Events, 11 October 2026:
+     since the switch the hole no longer faces it, her visits there are met in the corridor, req 105) */
   /* the bedtime (bedtime.json; board req 38) */
   'the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair': function () { fireLevelT = Math.min(fireLevelT, 0.7); },
   'the room dims, the fire low, the view turns to the stair, and he goes up to the dormitory for lights out (dormitory.html?from=room&bedtime)': function () { lightsOut(); }
