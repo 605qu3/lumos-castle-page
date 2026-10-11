@@ -3520,6 +3520,87 @@ var catPath = new THREE.CatmullRomCurve3([
 ], true, 'catmullrom', 0.5);
 var cat = { u: 0, speed: 0.052, state: 'walk', timer: 0, satThisLoop: false, facing: 1, dist: 0, frame: -1, sitElapsed: 0, flickAt: 0, lookFirst: false, sitU: 0.3, lastSitU: -1 };
 var catPathLength = catPath.getLength();
+/* the cat curled asleep (Godric's Q9 touch t2, 11 October 2026; Q13, candidate 3, the roundest curl): on a cold evening
+   or night (castle.weather()'s cold, castle.time() 'evening' or 'night') it sleeps on the rug between the two chairs,
+   nearest the fire, and the walking cat is not out; on the coldest (warmth 0 or under) it lies a little closer to the
+   fire. One card at tier B, 0.42 m across the curl, turning to the eye with the tables. Its grid is moved in code,
+   nothing drawn: its side rises and falls slowly with its breath; a tap turns its near ear toward him, and it does not
+   wake; a second tap curls the tail tip tighter; each eases back after a while. */
+var CURL = { url: '../assets/layers/cat-curled.png', w: 0.42, x: 0, z: -3.7, zColdest: -3.88,
+  EAR: { u0: 0.62, u1: 0.77, v0: 0.16, pu: 0.69, pv: 0.37, turn: -0.38 },   /* the near ear's box and its base, in the cell (v down) */
+  TAIL: { u1: 0.8, v0: 0.82, pu: 0.6, pv: 0.87, turn: 0.2 },             /* the tail's last length, below the paws, which never move */
+  BREATH: { a: 0.005, period: 3.2 } };
+var curl = { mesh: null, shade: null, alpha: null, base: null, h: 0, on: false, check: 0, taps: 0,
+  ear: 0, earHold: 0, tail: 0, tailHold: 0 };
+new THREE.TextureLoader().load(CURL.url, function (t) {
+  t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  var h = CURL.w * t.image.height / t.image.width, m = cutoutMesh(t, CURL.w, h);
+  m.geometry.dispose(); m.geometry = new THREE.PlaneGeometry(CURL.w, h, 48, 32);
+  curl.base = Float32Array.from(m.geometry.attributes.position.array); curl.h = h; curl.alpha = alphaOf(t.image);
+  m.position.set(CURL.x, h / 2 - 0.004, CURL.z);   /* the tail along its foot lies on the rug */
+  m.name = 'cat-curled'; m.visible = false;
+  scene.add(m); register(m, 5); facers.push(m); tappables.push(m);
+  /* its soft contact shadow on the rug, under the curl */
+  var sc = makeCanvas(64, 64), sg = sc.getContext('2d'), gr = sg.createRadialGradient(32, 32, 0, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(0,0,0,0.6)'); gr.addColorStop(0.6, 'rgba(0,0,0,0.35)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  sg.fillStyle = gr; sg.fillRect(0, 0, 64, 64);
+  var shade = new THREE.Mesh(new THREE.PlaneGeometry(CURL.w * 1.12, 0.3),
+    new THREE.MeshBasicMaterial({ map: tex(sc), transparent: true, depthWrite: false }));
+  shade.rotation.x = -Math.PI / 2; shade.position.set(CURL.x, 0.008, CURL.z); shade.visible = false;
+  shade.name = 'cat-curled-shade'; scene.add(shade); register(shade, 5);
+  curl.mesh = m; curl.shade = shade;
+});
+function curlWanted() {
+  if (!castle) return false;
+  var tm = castle.time();
+  return !!castle.weather().cold && (tm === 'evening' || tm === 'night');
+}
+function setCurl(on) {
+  curl.on = on; curl.mesh.visible = on; curl.shade.visible = on;
+  catGroup.visible = !on;
+  if (on) {
+    var z = castle.weather().warmth <= 0 ? CURL.zColdest : CURL.z;
+    curl.mesh.position.z = z; curl.shade.position.z = z;
+  }
+}
+function curlTap() {
+  curl.taps++;
+  if (curl.taps % 2) curl.earHold = 6; else curl.tailHold = 7;
+}
+function updateCurl(dt, t) {
+  if (!curl.mesh) return;
+  if ((curl.check -= dt) <= 0) {
+    curl.check = 20;
+    var want = curlWanted();
+    if (want !== curl.on && mode !== 'fireside') setCurl(want);     /* never changed under his eye at the fireside */
+  }
+  if (!curl.on) return;
+  curl.earHold -= dt; curl.tailHold -= dt;
+  var et = curl.earHold > 0 ? 1 : 0, tt = curl.tailHold > 0 ? 1 : 0;
+  curl.ear += (et - curl.ear) * Math.min(1, dt * (et > curl.ear ? 6 : 1.2));
+  curl.tail += (tt - curl.tail) * Math.min(1, dt * (tt > curl.tail ? 4 : 1));
+  var p = curl.mesh.geometry.attributes.position, b = curl.base, W = CURL.w, H = curl.h, E = CURL.EAR, T = CURL.TAIL;
+  var s = 0.5 - 0.5 * Math.cos(2 * Math.PI * t / CURL.BREATH.period);
+  var epx = (E.pu - 0.5) * W, epy = (0.5 - E.pv) * H, tpx = (T.pu - 0.5) * W, tpy = (0.5 - T.pv) * H;
+  for (var i = 0; i < p.count; i++) {
+    var x = b[i * 3], y = b[i * 3 + 1], u = x / W + 0.5, v = 0.5 - y / H, k = 0, ox = 0, oy = 0;
+    if (curl.ear > 0.001 && u > E.u0 && u < E.u1 && v < E.pv) {
+      k = E.turn * curl.ear * smooth01(E.u0, E.u0 + 0.03, u) * smooth01(E.u1, E.u1 - 0.03, u) * smooth01(E.pv, E.v0, v);
+      ox = epx; oy = epy;
+    } else if (curl.tail > 0.001 && u > T.pu && u < T.u1 + 0.04 && v > T.v0) {
+      k = T.turn * curl.tail * smooth01(T.pu, T.u1, u) * smooth01(T.v0, T.v0 + 0.04, v);
+      ox = tpx; oy = tpy;
+    }
+    var nx = x, ny = y;
+    if (k) {
+      var c = Math.cos(k), sn = Math.sin(k), dx = x - ox, dy = y - oy;
+      nx = ox + c * dx - sn * dy; ny = oy + sn * dx + c * dy;
+    }
+    ny += CURL.BREATH.a * s * smooth01(0.75, 0.5, u) * (y + H / 2) / H;   /* the side rises, the foot and the head stay */
+    p.setXY(i, nx, ny);
+  }
+  p.needsUpdate = true;
+}
 
 /* ---------- lights ---------- */
 
@@ -4068,6 +4149,8 @@ function tap(cx, cy) {
     if (h.object === satchel) return satchelSolid(h.uv);
     if (h.object === cloak) return alphaSolid(cloakAlpha, h.uv);
     if (h.object === stairs) return stairsSolid(h.uv);
+    if (h.object === catWalk || h.object === catSit) return !curl.on;
+    if (h.object === curl.mesh) return curl.on && alphaSolid(curl.alpha, h.uv);
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
@@ -4085,6 +4168,7 @@ function tap(cx, cy) {
     else if (hit && hit === satchel) satchelTap();
     else if (hit && hit === curios.jar) jarTap(hits[0].point);
     else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
+    else if (hit && hit === curl.mesh) curlTap();
     else leaveFireside();
     return;
   }
@@ -4099,6 +4183,7 @@ function tap(cx, cy) {
   else if (hit === satchel) satchelTap();
   else if (hit === curios.jar) jarTap(hits[0].point);
   else if (hit === cloak || hit === cloakPeek) cloakTap();
+  else if (hit === curl.mesh) curlTap();
   else if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
   /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
@@ -4276,6 +4361,8 @@ function planCatSit() {
   cat.sitU = u;
 }
 function updateCat(dt, t) {
+  updateCurl(dt, t);
+  if (curl.on) return;
   if (cat.state === 'sit') {
     cat.timer -= dt; cat.sitElapsed += dt;
     if (catSheet) {
@@ -4621,7 +4708,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
