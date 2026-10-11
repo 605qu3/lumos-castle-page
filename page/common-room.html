@@ -2491,6 +2491,66 @@ function homePlace(p, dz, u) {
   p.pivot.lookAt(p.pivot.position.clone().add(n));
   p.pivot.rotateX(-p.lean);
 }
+/* the row of books on the desk (Godric's Q12, 11 October 2026, 9.05 am: option 1, left of the flat stack beside the
+   letter), six school books stood on the desk top, the fifth leaning on the sixth. His touch: the leaning book is
+   Hogwarts, A History, as if just pulled out and pushed back; a tap brings Hermione's line (PS 7, checked in the text:
+   "I read about it in Hogwarts, A History."); now and then, one day in four by the date, it is gone, and a tap brings
+   hers from CoS 9 (checked in the text: "All the copies of Hogwarts, A History have been taken out," she said);
+   ?books=out shows that day. A stand-in drawn here until books-row is drawn and passed. */
+var BOOKS = { u: 0.43, v: 0.205, dz: 0.01, w: 0.32, h: 0.24, PX: 1000,
+  ROW: [[0.035, 0.21, '#6e2a24'], [0.05, 0.23, '#3c4a34'], [0.04, 0.19, '#6b4a2e'], [0.045, 0.22, '#4b5560'],
+    [0.04, 0.2, '#9a7f5a'], [0.05, 0.18, '#4e2026']],      /* thickness, height, binding; the fifth is the History */
+  LEAN: 0.18 };   /* its foot's far corner its pivot, its face resting on the sixth's top corner */
+var books = (function () {
+  function rowCanvas(out) {
+    var W = BOOKS.w * BOOKS.PX, H = BOOKS.h * BOOKS.PX, c = makeCanvas(W, H), g = c.getContext('2d'), x = 0.01 * BOOKS.PX;
+    function book(b) {
+      var bw = b[0] * BOOKS.PX, bh = b[1] * BOOKS.PX;
+      g.fillStyle = b[2]; g.fillRect(-bw, -bh, bw, bh);
+      g.strokeStyle = '#1c1612'; g.lineWidth = 2; g.strokeRect(-bw, -bh, bw, bh);
+      g.fillStyle = '#b59a5a';
+      [0.12, 0.2, 0.8].forEach(function (f) { g.fillRect(-bw + 3, -bh + f * bh, bw - 6, 2); });
+    }
+    BOOKS.ROW.forEach(function (b, i) {
+      if (i === 5) x += BOOKS.ROW[5][1] * Math.tan(BOOKS.LEAN) * BOOKS.PX;
+      x += b[0] * BOOKS.PX;
+      if (i === 4 && out) return;
+      g.save(); g.translate(x, H);
+      if (i === 4) g.rotate(BOOKS.LEAN);                     /* leaning on its foot's far corner, onto the sixth */
+      book(b); g.restore();
+    });
+    return c;
+  }
+  var cin = rowCanvas(false), cout = rowCanvas(true);
+  var mesh = new THREE.Mesh(new THREE.PlaneGeometry(BOOKS.w, BOOKS.h),
+    new THREE.MeshStandardMaterial({ map: tex(cin), color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide }));
+  mesh.name = 'books-row'; scene.add(mesh); register(mesh, 2);
+  return { mesh: mesh, tin: mesh.material.map, tout: tex(cout), ain: alphaOf(cin), out: null, check: 0 };
+})();
+function booksOutToday() {
+  if (/[?&]books=out/.test(location.search)) return true;
+  return ((homeDay(homeNow()) * 40503) >>> 0) % 4 === 1;
+}
+function booksTap() {
+  LINE_PLACES['books-row'] = books.mesh.getWorldPosition(new THREE.Vector3());
+  showLines([books.out
+    ? { medium: 'said', speaker: 'hermione', at: 'books-row', text: '“All the copies of Hogwarts, A History have been taken out,” said Hermione.' }
+    : { medium: 'said', speaker: 'hermione', at: 'books-row', text: '“I read about it in Hogwarts, A History,” said Hermione.' }]);
+}
+function updateBooks(dt) {
+  if (!sideTable.geometry.parameters) return;
+  if ((books.check -= dt) <= 0) {
+    books.check = 5;
+    var out = booksOutToday();
+    if (out !== books.out && mode !== 'board') {           /* never changed under his eye at the desk */
+      books.out = out; books.mesh.material.map = out ? books.tout : books.tin; books.mesh.material.needsUpdate = true;
+    }
+  }
+  var gp = sideTable.geometry.parameters, base = new THREE.Vector3((BOOKS.u - 0.5) * gp.width, (0.5 - BOOKS.v) * gp.height, BOOKS.dz);
+  sideTable.updateMatrixWorld(); sideTable.localToWorld(base);
+  books.mesh.position.set(base.x, base.y + BOOKS.h / 2, base.z);
+  books.mesh.lookAt(camera.position.x, books.mesh.position.y, camera.position.z);
+}
 function updateHomeLetter(dt) {
   if (!papersPainted) return;
   if ((homeState.check -= dt) <= 0 && !held) {    /* a letter kept on letter-home.html shows on the next look */
@@ -3981,6 +4041,7 @@ function fireCatches() { fireLevelT = 1; stokeFire(); }
 /* at rest, these glide to the fireside stop */
 var FIRESIDE_TAPS = [hearthBack, bellows, rug, chairL, wingback];
 var tappables = [hearthBack, holeTap, catWalk, catSit, bellows, rug, chairL, wingback, stairs].concat(boardParts);
+tappables.push(books.mesh);
 for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
 tappables.push(homeLetter.mesh, homeFeather.mesh);
 
@@ -4151,12 +4212,14 @@ function tap(cx, cy) {
     if (h.object === stairs) return stairsSolid(h.uv);
     if (h.object === catWalk || h.object === catSit) return !curl.on;
     if (h.object === curl.mesh) return curl.on && alphaSolid(curl.alpha, h.uv);
+    if (h.object === books.mesh) return alphaSolid(books.ain, h.uv);   /* the gap where the History stood counts too */
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
   if (mode === 'hand') { if (homeHandTap()) return; returnPaper(false); return; }
   if (mode === 'board') {
     if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return; }
+    if (hit && hit === books.mesh) { booksTap(); return; }
     if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
     if (hit && boardParts.indexOf(hit) >= 0) return;
     leaveBoard();
@@ -4178,6 +4241,7 @@ function tap(cx, cy) {
   if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
   if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
+  else if (hit === books.mesh) booksTap();
   else if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
   else if (hit === scarf) scarfTap();
   else if (hit === satchel) satchelTap();
@@ -4698,6 +4762,7 @@ function frame() {
   updateCloak(dt);
   updateSign(dt);
   updateHomeLetter(dt);
+  updateBooks(dt);
   updateSatchel(dt, t);
   updateHomework(dt);
   updateCurios(dt, t);
@@ -4708,7 +4773,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
