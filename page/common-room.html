@@ -2371,7 +2371,8 @@ var HOME = { KEY: 'lumos.letterHome', READ: 'lumos.letterHome.read', READW: 'lum
   url: '../assets/layers/letter-desk.png',     /* the envelope's drawn front, squared onto 0.12 x 0.08 m at PX */
   backUrl: '../assets/layers/letter-desk-seal.png', /* its back, the flaps and the seal, squared the same way */
   prick: [0.16, 0.131, 0.0083],               /* the talon prick through to the front: the back's (0.84, 0.131) mirrored by the turn, radius as a share of the width */
-  addrInk: '#27408b',                          /* Godric's touch on Q22: their address in ordinary blue ink, against Hogwarts' emerald (PS 3) */
+  addrInk: '#27408b',
+  featherUrl: '../assets/layers/feather-desk.png', fw: 0.07, /* the drawn feather, 0.16 m long, its width from the drawing */                          /* Godric's touch on Q22: their address in ordinary blue ink, against Hogwarts' emerald (PS 3) */
   addrX: 0.3,                                  /* the address starts right of the mug ring, between the creases */
   ADDRESS: ['The Fourth Bed from the Window', 'Boys’ Dormitory', 'Gryffindor Tower', 'Hogwarts'],
   PS: ['Do not let Fred and George near your homework.',                       /* Godric's own, Q10 */
@@ -2404,10 +2405,10 @@ function homeCard(w, h, lean) {
   mesh.userData.paper = p;
   return p;
 }
-var homeLetter = homeCard(HOME.w, HOME.h, HOME.lean), homeFeather = homeCard(0.06, 0.16, 0.12);
+var homeLetter = homeCard(HOME.w, HOME.h, HOME.lean), homeFeather = homeCard(HOME.fw, 0.16, 0.12);
 var homeNote = homeCard(0.16, 0.21, 0);
 homeNote.shadow.visible = false;
-var homeState = { words: null, front: null, back: null, stage: 0, turn: -1, unfold: -1, shown: '', check: 0 };
+var homeState = { words: null, front: null, back: null, stage: 0, turn: -1, quill: -1, unfold: -1, shown: '', check: 0 };
 /* letter-desk, an envelope since Godric's Q22 (11 October 2026, 12.52 pm): round 4, round 3's front edited plain, the
    mug ring kept; its slight perspective squared by its four sides (pipeline/square_card.py); once loaded the front is
    redrawn on it */
@@ -2509,8 +2510,14 @@ function homeSig(g, sig, right, top, sigH, maxW) {
   g.restore();
   return top + (y1 - y0) * k;
 }
-function homeFeatherTex() {                       /* a stand-in feather until feather-desk is passed */
-  var W = 180, H = 480, c = makeCanvas(W, H), g = c.getContext('2d');
+/* feather-desk, Godric's pick of 11 October 2026 (Q25): round 1's probe, a tawny owl's feather; drawn on the card once
+   loaded, the stand-in below until then */
+var featherImg = new Image();
+featherImg.onload = function () { homeSet(homeFeather, homeFeatherTex()); };
+featherImg.src = HOME.featherUrl;
+function homeFeatherTex() {
+  var W = Math.round(HOME.fw * 4000), H = 640, c = makeCanvas(W, H), g = c.getContext('2d');
+  if (featherImg.complete && featherImg.naturalWidth) { g.drawImage(featherImg, 0, 0, W, H); return tex(c); }
   g.translate(W / 2, H); g.rotate(0.08);
   g.fillStyle = '#8a7663'; g.beginPath(); g.moveTo(0, -H * 0.05); g.bezierCurveTo(W * 0.45, -H * 0.3, W * 0.3, -H * 0.85, 0, -H * 0.98);
   g.bezierCurveTo(-W * 0.3, -H * 0.85, -W * 0.4, -H * 0.3, 0, -H * 0.05); g.fill();
@@ -2619,7 +2626,27 @@ function updateHomeLetter(dt) {
   var beside = homeState.shown === 'letter' && homeState.fresh;
   homeFeather.mesh.visible = homeFeather.shadow.visible = homeState.shown === 'feather' || beside;
   if (!inHand) { homePlace(homeLetter, HOME.dz); homePlace(homeNote, HOME.dz); }
-  homePlace(homeFeather, HOME.dz, beside ? HOME.besideU : HOME.u);
+  var fu = beside ? HOME.besideU : HOME.u, qk = 0;
+  if (homeState.quill >= 0) {                      /* up 0.4 s, poised 1.4 s with a small stroke, down 0.45 s */
+    var qt = homeState.quill += dt;
+    qk = qt < 0.4 ? easeInOut(qt / 0.4) : qt < 1.8 ? 1 : qt < 2.25 ? 1 - easeInOut((qt - 1.8) / 0.45) : 0;
+    if (qt >= 2.25) homeState.quill = -1;
+    if (beside) fu = lerp(HOME.besideU, HOME.u, 0.75 * qk);   /* over the letter beside it */
+  }
+  homePlace(homeFeather, HOME.dz + 0.03 * qk, fu);
+  if (qk > 0) {
+    homeFeather.pivot.position.y += 0.05 * qk;
+    homeFeather.pivot.rotateX(homeFeather.lean * qk);            /* the lean undone: upright */
+    homeFeather.pivot.rotateZ(-0.35 * qk + (homeState.quill > 0.4 && homeState.quill < 1.8 ? 0.05 * Math.sin((homeState.quill - 0.4) * 9) : 0));
+    homeFeather.shadow.material.opacity = 0.55 * (1 - qk);
+  } else homeFeather.shadow.material.opacity = 0.55;
+  /* Godric's touch on Q25 (11 October 2026, 2.42 pm): when the portrait hole opens, its draught stirs the feather a
+     fraction, the one thing on the desk that moves on its own */
+  if (draught > 0.01 && qk === 0) {
+    var ft = performance.now() / 1000;
+    homeFeather.pivot.rotateZ(draught * 0.05 * Math.sin(ft * 6.3) + draught * 0.02 * Math.sin(ft * 11.7));
+    homeFeather.pivot.rotateX(-draught * 0.03 * (1 + Math.sin(ft * 4.1)));
+  }
   /* turning it over: edge on at the half, where the seal side takes its place */
   if (homeState.turn >= 0) {
     homeState.turn += dt / 0.45;
@@ -2643,6 +2670,14 @@ function homeLetterTap() {
   HEARD_FROM.letter = homeLetter.homePos.clone().add(new THREE.Vector3(0, HOME.h * 0.9, 0));
   lineQ.unshift({ medium: 'heard', speaker: 'letter', sound: 'rustle' });
   liftPaper(homeLetter);
+}
+/* Godric's touches on Q24 (11 October 2026, 2.31 pm): a tap lifts the feather upright like a quill over the letter,
+   then it settles back; and the book's first owl was a tawny one (PS 1, checked in the text) */
+function homeFeatherTap() {
+  if (held || homeState.quill >= 0) return;
+  homeState.quill = 0;
+  LINE_PLACES.feather = homeFeather.mesh.getWorldPosition(new THREE.Vector3());
+  showLines([{ medium: 'written', hand: 'print', at: 'feather', text: 'None of them noticed a large, tawny owl flutter past the window.' }]);
 }
 /* a tap with it in his hand: over, then open, then back to the desk */
 function homeHandTap() {
@@ -4294,7 +4329,8 @@ function tap(cx, cy) {
   var as = mode === 'room' && castle ? figureTapped(hits) : null;
   if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
-  if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
+  if (hit === homeFeather.mesh) homeFeatherTap();
+  else if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
   else if (hit === books.mesh) booksTap();
   else if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
   else if (hit === scarf) scarfTap();
