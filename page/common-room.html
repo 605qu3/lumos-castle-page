@@ -655,7 +655,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=5"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=13"></script>
+<script src="castle-events.js?v=14"></script>
 <script>
 (function () {
 'use strict';
@@ -4310,7 +4310,11 @@ var castle = window.CastleEvents ? CastleEvents.start({
   builtins: {
     portrait: function () { return portrait.open ? 'open' : 'shut'; },
     'mantel sitter': function () { return sitterPhase(sitters.her); },
-    'right sitter': function () { return sitterPhase(sitters.him); }
+    'right sitter': function () { return sitterPhase(sitters.him); },
+    /* the full moon's owl (req 101 and 102): yes where the moon's disc is in a window's glass where his eye reaches it.
+       No until the owl's flight cell is drawn (req 102, a generate with Godric's yes, on the owl sheet req 99 waits
+       for) and the disc follows moon() (req 96): the record would set owl_landed for the night with nothing to show */
+    'moon in view': function () { return 'no'; }
   }
 }) : null;
 
