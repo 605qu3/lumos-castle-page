@@ -191,7 +191,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=5"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=11"></script>
+<script src="castle-events.js?v=13"></script>
 <script>
 (function () {
 'use strict';
@@ -901,13 +901,20 @@ function drawPumpkin(g, x, y, r) {
   g.beginPath(); g.moveTo(0, -ry * 0.9); g.lineTo(r * 0.12, -ry * 1.25); g.stroke();
   g.restore();
 }
-/* the washing line beside the hut, out about one day in two; his enormous socks about one washing day in three; the
-   wind of the day, 0 still to 1 blowing (Events' weather when it comes) */
+/* the washing line beside the hut and the day's wind, from Events' weather (req 113 and 115, castle.weather(): one sky for
+   every window; ?weather=, ?wind=, ?date= honoured there): never out in rain, snow or fog or on a frozen morning; always
+   out on a windy clear day, blowing (Godric's note, 10 October 2026, 6.52 pm); other dry days about two in three; his
+   enormous socks about one washing day in three. Without Events, the date alone as before */
 var LINE = { a: [626, 1050], b: [756, 1070], post: 46 };   /* right of the hut, before the trees: the mullion hides its left */
-function groundsWind() { return 0.2 + 0.8 * dayRand(3); }
+function groundsWeather() { return castle && castle.weather ? castle.weather() : null; }
+function groundsWind() { var w = groundsWeather(); return w ? w.wind : 0.2 + 0.8 * dayRand(3); }
 function washing() {
   if (groundsQ.has('washing')) return { socks: groundsQ.get('washing') === 'socks' };
-  if (dayRand(1) > 0.5) return null;
+  var w = groundsWeather();
+  if (w) {
+    if (w.sky === 'rain' || w.sky === 'snow' || w.sky === 'fog' || w.frozen || w.ground === 'snow') return null;
+    if (!(w.sky === 'clear' && w.windy) && dayRand(1) > 0.67) return null;
+  } else if (dayRand(1) > 0.5) return null;
   return { socks: dayRand(2) < 0.34 };
 }
 function hang(g, x, y, w, h, t, phase, draw) {
