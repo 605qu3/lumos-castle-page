@@ -1417,8 +1417,10 @@ function layTape() {
    sheet's numbers are the room's (common-room.html, SITTERS), cited and not changed. */
 var OPP_SITTERS = {
   mantel: { url: '../assets/layers/sitter-mantel.png', cellW: 174, cellH: 346, cell: 4, greet: 5,
+            walk: { cells: [0, 1, 2, 3] },
             cue: "the mantel painting's sitter standing in the painting opposite the hole" },
   right: { url: '../assets/layers/sitter-right.png', cellW: 152, cellH: 269, cell: 4,
+           walk: { url: '../assets/layers/sitter-right-walk.png', cellW: 158, cellH: 383, cells: [0, 1, 2, 3] },
            cue: "the right painting's sitter standing in the painting opposite the hole" }
 };
 /* ?visit= shows a sitter in a gallery frame for checking (req 86 (d)), now OPP_SITTERS is defined; while it does, the
@@ -1445,26 +1447,81 @@ function drawPaintingOpp() {
   var g = oppPaint.ctx, w = im.width, h = im.height;
   g.clearRect(0, 0, w, h);
   g.drawImage(im, 0, 0);
-  var s = oppPaint.who && OPP_SITTERS[oppPaint.who];
+  var sl = oppSlip, who = sl ? sl.who : oppPaint.who, s = who && OPP_SITTERS[who];
   if (s && s.img) {
-    var dh = OPP_FIG.h * h, dw = dh * s.cellW / s.cellH;
+    var sheet = s.img, cw = s.cellW, ch = s.cellH, cell = s.cell;
+    var x = OPP_FIG.x, feet = OPP_FIG.feet, size = 1, face = oppPaint.face;
+    if (sl) {
+      /* slipping out: a beat caught, then she turns and walks to the painted door, smaller as she goes back to it */
+      var p = clamp((sl.t - OPP_SLIP.caught) / OPP_SLIP.walk, 0, 1), e = p * p * (3 - 2 * p);
+      face = sl.t < OPP_SLIP.caught ? -1 : 1;
+      x = lerp(OPP_FIG.x, OPP_SLIP.x, e); feet = lerp(OPP_FIG.feet, OPP_SLIP.feet, e); size = lerp(1, OPP_SLIP.size, e);
+      if (p > 0 && p < 1) {
+        var wk = s.walk;
+        if (wk.url) { if (!wk.img) loadWalk(wk); sheet = wk.img || sheet; if (wk.img) { cw = wk.cellW; ch = wk.cellH; } }
+        cell = wk.cells[Math.floor(sl.t / 0.2) % wk.cells.length];
+        if (sheet === s.img && wk.url) cell = s.cell;
+      }
+      g.globalAlpha = 1 - clamp((sl.t - OPP_SLIP.caught - OPP_SLIP.walk) / OPP_SLIP.fade, 0, 1);
+    }
+    /* a cell's height is the figure's height on every sheet, as the room draws them (scale 1 on each, SITTERS) */
+    var dh = OPP_FIG.h * h * size, dw = dh * cw / ch;
     g.save();
-    g.beginPath(); g.rect(0.155 * w, 0.15 * h, 0.695 * w, 0.716 * h); g.clip();
-    g.drawImage(s.img, s.cell * s.cellW, 0, s.cellW, s.cellH, OPP_FIG.x * w - dw / 2, OPP_FIG.feet * h - dh, dw, dh);
+    /* the opening, less the door's leaf from its edge rightward, so she goes in behind it */
+    g.beginPath(); g.rect(0.155 * w, 0.15 * h, (sl ? OPP_SLIP.leaf - 0.155 : 0.695) * w, 0.716 * h); g.clip();
+    g.translate(x * w, feet * h - dh);
+    if (face < 0) g.scale(-1, 1);
+    g.drawImage(sheet, cell * cw, 0, cw, ch, -dw / 2, 0, dw, dh);
     g.restore();
+    g.globalAlpha = 1;
   }
   oppPaint.tex.needsUpdate = true;
+}
+function loadWalk(wk) {
+  if (wk.loading) return;
+  wk.loading = true;
+  var im = new Image();
+  im.onload = function () { wk.img = im; };
+  im.src = wk.url;
 }
 function setPaintingSitter(who) {
   if (who === undefined) return oppPaint.who;               /* for automated checks */
   if (who === oppPaint.who) return;
   oppPaint.who = who;
+  if (!who) oppPaint.face = 1;
+  loadSitter(who);
+  drawPaintingOpp();
+}
+function loadSitter(who) {
   var s = who && OPP_SITTERS[who];
   if (s && !s.img) {
     var im = new Image();
     im.onload = function () { s.img = im; drawPaintingOpp(); };
     im.src = s.url;
   }
+  if (s && s.walk.url) loadWalk(s.walk);
+}
+/* met as he steps out (req 119, Events' visitors.json, req 105): her standing cell faces right, toward the Fat Lady's
+   end and the painted door. Watching, she is turned the other way a moment and turns to face his way; paying him no
+   mind, she stays turned away, toward the painted window, for the visit; caught, she looks round a moment, turns and
+   walks to the painted door (its dark gap measured on the drawing at 0.6 to 0.63 of the width, the threshold at 0.67
+   of the height, the leaf from 0.632), smaller as she goes back to it, and is gone behind the leaf. The room's rule,
+   read on the same fire, shows her only while she chats or stays, so the slip holds its own sitter until it ends */
+var OPP_SLIP = { caught: 0.9, walk: 2.4, fade: 0.5, x: 0.615, feet: 0.675, size: 0.82, leaf: 0.632 };
+var oppSlip = null, oppTurn = 0;
+oppPaint.face = 1;
+function oppMoment(kind, who) {
+  loadSitter(who);
+  if (kind === 'slip') { oppSlip = { who: who, t: 0 }; }
+  else if (kind === 'watch') { oppPaint.face = -1; oppTurn = 0.9; }
+  else if (kind === 'stays') { oppPaint.face = -1; oppTurn = 0; }
+  drawPaintingOpp();
+}
+function updateOppMoment(dt) {
+  if (oppTurn > 0 && (oppTurn -= dt) <= 0) { oppPaint.face = 1; drawPaintingOpp(); }
+  if (!oppSlip) return;
+  oppSlip.t += dt;
+  if (oppSlip.t > OPP_SLIP.caught + OPP_SLIP.walk + OPP_SLIP.fade) oppSlip = null;
   drawPaintingOpp();
 }
 (function () {
@@ -2370,6 +2427,13 @@ var castle = window.CastleEvents ? CastleEvents.start({
   cues: {
     "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does": function () { goTo(STOPS.filter(function (s) { return s.name === 'armour'; })[0]); },
     'the open visor drops shut': function () { armourJiggle = 0.4; },
+    /* the painting opposite, met as he steps out (req 119): watching, caught slipping out, or paying him no mind */
+    "the mantel painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady": function () { oppMoment('watch', 'mantel'); },
+    "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'mantel'); },
+    "the mantel painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppMoment('stays', 'mantel'); },
+    "the right painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady": function () { oppMoment('watch', 'right'); },
+    "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'right'); },
+    "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppMoment('stays', 'right'); },
     'it turns its back on him, annoyed, and stays so until he has been out': function () { armourJiggle = 0.6; },
     'a puff of dust from the visor': note('a puff of dust from the visor'),
     'it salutes with its halberd, then stands as it was': note('a salute with its halberd'),
@@ -2442,6 +2506,7 @@ function frame() {
   updateSteam();
   updateSpoon(dt);
   updateGalleryVisit(dt);
+  updateOppMoment(dt);
   updateLookBack(dt);
   updateTurnRise(dt);
   updateDoorsKnock(dt);
@@ -2475,7 +2540,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
