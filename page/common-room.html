@@ -113,6 +113,24 @@
     box-shadow: 0 3px 14px rgba(0,0,0,0.5); transform-origin: 50% 0; font: 400 21px/1.35 "Short Stack", cursive;
     white-space: pre-line; }
   @media (prefers-reduced-motion: reduce) { .line { transition: none; } }
+  /* a page of Hogwarts, A History, shown when the History on the desk is slid out (the Common room, Q27): period type
+     on old paper in the castle's ink, a crimson ribbon on the page it marks */
+  #bookPage { position: fixed; left: 0; top: 0; width: min(330px, 78vw); box-sizing: border-box; padding: 22px 26px 16px;
+    opacity: 0; transition: opacity 0.4s ease; pointer-events: none; cursor: pointer; color: #2b2016;
+    background: radial-gradient(120% 90% at 50% 40%, #f3e9cf 0%, #eadbb5 68%, #d8c290 100%);
+    box-shadow: 0 4px 22px rgba(0,0,0,0.55), inset 0 0 28px rgba(120,90,40,0.28); border-radius: 2px;
+    font: 400 19px/1.42 "IM Fell English", "EB Garamond", Georgia, serif; text-align: left; hyphens: manual;
+    -webkit-tap-highlight-color: transparent; }
+  #bookPage.on { opacity: 1; pointer-events: auto; }
+  #bookPage .head { font: 400 12px/1 "IM Fell English SC", "IM Fell English", Georgia, serif; letter-spacing: 0.22em;
+    text-align: center; color: #5a4630; border-bottom: 1px solid rgba(60,40,20,0.45); padding-bottom: 7px; margin-bottom: 12px; }
+  #bookPage .text::first-letter { float: left; font: 400 47px/0.8 "IM Fell English", Georgia, serif; padding: 5px 6px 0 0; color: #6e1f1c; }
+  #bookPage .folio { margin-top: 10px; text-align: center; font-size: 13px; color: #5a4630; }
+  #bookPage.marked { padding-right: 52px; }
+  #bookPage .ribbon { position: absolute; top: -6px; right: 20px; width: 13px; height: calc(100% + 30px);
+    background: linear-gradient(90deg, #6a1316, #9c2a2c 45%, #761a1d); box-shadow: 1px 2px 4px rgba(0,0,0,0.45);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 10px), 0 100%); }
+  @media (prefers-reduced-motion: reduce) { #bookPage { transition: none; } }
 </style>
 </head>
 <body>
@@ -2549,64 +2567,180 @@ function homePlace(p, dz, u) {
   p.pivot.rotateX(-p.lean);
 }
 /* the row of books on the desk (Godric's Q12, 11 October 2026, 9.05 am: option 1, left of the flat stack beside the
-   letter), six school books stood on the desk top, the fifth leaning on the sixth. His touch: the leaning book is
-   Hogwarts, A History, as if just pulled out and pushed back; a tap brings Hermione's line (PS 7, checked in the text:
-   "I read about it in Hogwarts, A History."); now and then, one day in four by the date, it is gone, and a tap brings
-   hers from CoS 9 (checked in the text: "All the copies of Hogwarts, A History have been taken out," she said);
-   ?books=out shows that day. A stand-in drawn here until books-row is drawn and passed. */
-var BOOKS = { u: 0.43, v: 0.205, dz: 0.01, w: 0.32, h: 0.24, PX: 1000,
-  ROW: [[0.035, 0.21, '#6e2a24'], [0.05, 0.23, '#3c4a34'], [0.04, 0.19, '#6b4a2e'], [0.045, 0.22, '#4b5560'],
-    [0.04, 0.2, '#9a7f5a'], [0.05, 0.18, '#4e2026']],      /* thickness, height, binding; the fifth is the History */
-  LEAN: 0.18 };   /* its foot's far corner its pivot, its face resting on the sixth's top corner */
+   letter). Drawn: books-row round 1 candidate 1, his pick (Q27, 6.31 pm), its spines' lettering cleared by
+   pipeline/clear_spines.py and cut by pipeline/books_row_split.py into the row without the History and the History
+   alone, so that it can move; the two cards stand together as the drawing (books-row.png, the whole, is kept for the
+   tap's outline). His touches: the leaning fifth is Hogwarts, A History, as if just pulled out and pushed back (Q12);
+   a tap slides it an inch out and back, a whisper of dust off its top (Q27, t2), and a page of it shows: what the
+   books say is in it, each checked in the text, the first of the day marked by a ribbon at Hermione's Great Hall line
+   (Q27, t1, and his note of 6.31 pm); after the first page of the day, her PoA 9 line (Q26's touch). Now and then, one
+   day in four by the date, it is gone (?books=out to see it): the gap shows, a library slip stands in it, and a tap
+   brings her CoS 9 line. Never switched while he is at the desk. */
+var BOOKS = { u: 0.43, v: 0.205, dz: 0.01, w: 0.32, h: 0.32 * 732 / 1032,  /* w provisional: Q28, the plan's 0.32 m */
+  url: '../assets/layers/books-row.png', outUrl: '../assets/layers/books-row-out.png',
+  histUrl: '../assets/layers/books-row-history.png',
+  HIST: [1103 / 2065, 53 / 1465, 1787 / 2065, 1444 / 1465],    /* the History's box on the row, from the left and top */
+  GAP: [0.605, 0.809],                                         /* the gap it leaves, the blue's edge to the sixth's */
+  SLIDE: 0.025, OUT: 0.35, HOLD: 1.4, BACK: 0.45,              /* an inch toward him; seconds out, held, back */
+  DAY: 'lumos.books.poaDay' };
+/* what the seven books say is in Hogwarts, A History, in its own voice from their words; checked in the text with
+   the canon search. Its page numbers are invented: "over a thousand pages" (GoF 15). */
+var HISTORY_PAGES = [
+  { ribbon: true, folio: 214, text: 'The ceiling of the Great Hall is bewitched to look like the sky outside.' },       /* PS 7 */
+  { folio: 9, text: 'Hogwarts is hidden. If a Muggle looks at it, all they see is a mouldering old ruin with a sign over the entrance saying DANGER, DO NOT ENTER, UNSAFE.' },   /* GoF 11 */
+  { folio: 37, text: 'The founders thought boys were less trustworthy than girls.' },                                   /* OotP 17 */
+  { folio: 402, text: 'You cannot Apparate or Disapparate inside Hogwarts.' },                                          /* OotP 23 */
+  { folio: 611, text: 'Electricity, computers, radar and all the other substitutes for magic that Muggles use go haywire around Hogwarts. There is too much magic in the air.' },   /* GoF 28 */
+  { folio: 873, text: 'The Heads of the participating schools are always on the panel of judges, because all three of them were injured during the Tournament of 1792, when a cockatrice the champions were supposed to be catching went on the rampage.' }   /* GoF 15 */
+];
 var books = (function () {
-  function rowCanvas(out) {
-    var W = BOOKS.w * BOOKS.PX, H = BOOKS.h * BOOKS.PX, c = makeCanvas(W, H), g = c.getContext('2d'), x = 0.01 * BOOKS.PX;
-    function book(b) {
-      var bw = b[0] * BOOKS.PX, bh = b[1] * BOOKS.PX;
-      g.fillStyle = b[2]; g.fillRect(-bw, -bh, bw, bh);
-      g.strokeStyle = '#1c1612'; g.lineWidth = 2; g.strokeRect(-bw, -bh, bw, bh);
-      g.fillStyle = '#b59a5a';
-      [0.12, 0.2, 0.8].forEach(function (f) { g.fillRect(-bw + 3, -bh + f * bh, bw - 6, 2); });
-    }
-    BOOKS.ROW.forEach(function (b, i) {
-      if (i === 5) x += BOOKS.ROW[5][1] * Math.tan(BOOKS.LEAN) * BOOKS.PX;
-      x += b[0] * BOOKS.PX;
-      if (i === 4 && out) return;
-      g.save(); g.translate(x, H);
-      if (i === 4) g.rotate(BOOKS.LEAN);                     /* leaning on its foot's far corner, onto the sixth */
-      book(b); g.restore();
-    });
-    return c;
+  function card(w, h, url, ready) {
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+      new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide, transparent: false }));
+    m.visible = false;
+    var im = new Image();
+    im.onload = function () {
+      var c = makeCanvas(im.naturalWidth, im.naturalHeight); c.getContext('2d').drawImage(im, 0, 0);
+      var t = tex(c);
+      m.material.map = t; m.material.needsUpdate = true;
+      m.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+      m.visible = true;
+      if (ready) ready(im);
+    };
+    im.src = url;
+    return m;
   }
-  var cin = rowCanvas(false), cout = rowCanvas(true);
-  var mesh = new THREE.Mesh(new THREE.PlaneGeometry(BOOKS.w, BOOKS.h),
-    new THREE.MeshStandardMaterial({ map: tex(cin), color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide }));
-  mesh.name = 'books-row'; scene.add(mesh); register(mesh, 2);
-  return { mesh: mesh, tin: mesh.material.map, tout: tex(cout), ain: alphaOf(cin), out: null, check: 0 };
+  var o = { out: null, check: 0, ain: null, hain: null, slide: -1, paged: false, pageAt: 0, dust: null };
+  o.mesh = card(BOOKS.w, BOOKS.h, BOOKS.outUrl);
+  o.mesh.name = 'books-row'; scene.add(o.mesh); register(o.mesh, 2);
+  var hw = (BOOKS.HIST[2] - BOOKS.HIST[0]) * BOOKS.w, hh = (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h;
+  o.hist = card(hw, hh, BOOKS.histUrl, function (im) { o.hain = alphaOf(im); o.hist.visible = o.out !== true; });
+  o.hist.name = 'books-history';
+  o.histAt = new THREE.Vector3(((BOOKS.HIST[0] + BOOKS.HIST[2]) / 2 - 0.5) * BOOKS.w, (0.5 - (BOOKS.HIST[1] + BOOKS.HIST[3]) / 2) * BOOKS.h, 0.001);
+  o.hist.position.copy(o.histAt); o.mesh.add(o.hist); register(o.hist, 2);
+  var whole = new Image();                                 /* the whole row's outline: a tap in the gap counts too */
+  whole.onload = function () { o.ain = alphaOf(whole); };
+  whole.src = BOOKS.url;
+  /* the library slip, in Madam Pince's hand, stood in the gap and leaning on the sixth */
+  var SW = 0.055, SH = 0.085;
+  o.slipTex = function () {                                /* drawn once its two hands have loaded */
+    var c = makeCanvas(330, 510), g = c.getContext('2d');
+    g.fillStyle = '#ece0c2'; g.fillRect(0, 0, 330, 510);
+    g.strokeStyle = 'rgba(70,50,30,0.55)'; g.lineWidth = 3; g.strokeRect(6, 6, 318, 498);
+    g.fillStyle = '#3a2c20'; g.textAlign = 'center';
+    g.font = '400 30px ' + F.printSC; g.fillText('HOGWARTS LIBRARY', 165, 58);
+    g.fillRect(40, 74, 250, 2);
+    g.font = '400 40px ' + F.clerk; g.textAlign = 'left';
+    ['Hogwarts,', 'A History', '', 'All copies', 'taken out.', '', 'Waiting list:', 'two weeks.'].forEach(function (s, i) { g.fillText(s, 34, 140 + i * 46); });
+    return tex(c);
+  };
+  o.slip = new THREE.Mesh(new THREE.PlaneGeometry(SW, SH),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, side: THREE.DoubleSide }));
+  o.slip.position.set(((BOOKS.GAP[0] + BOOKS.GAP[1]) / 2 - 0.5) * BOOKS.w + 0.006, -BOOKS.h / 2 + SH / 2 * Math.cos(0.12) + 0.003, 0.004);
+  o.slip.rotation.z = -0.12; o.slip.visible = false; o.slip.name = 'books-slip';
+  o.mesh.add(o.slip); register(o.slip, 2);
+  /* the dust off its top: a few motes in screen pixels, so they read from across the room */
+  var N = 14, pos = new Float32Array(N * 3);
+  o.dustGeo = new THREE.BufferGeometry(); o.dustGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  o.dustMat = new THREE.PointsMaterial({ color: 0xcfc2a4, size: 1.6, sizeAttenuation: false, transparent: true, opacity: 0, depthWrite: false });
+  o.dustPts = new THREE.Points(o.dustGeo, o.dustMat); o.dustPts.frustumCulled = false; scene.add(o.dustPts);
+  o.motes = [];
+  for (var i = 0; i < N; i++) o.motes.push({ x: 0, y: 0, z: 0, vx: 0, vy: 0, vz: 0 });
+  return o;
 })();
 function booksOutToday() {
   if (/[?&]books=out/.test(location.search)) return true;
   return ((homeDay(homeNow()) * 40503) >>> 0) % 4 === 1;
 }
+/* the page of the book, over the desk where he looks: period type on old paper, the castle's ink */
+var bookPageEl = document.createElement('div');
+bookPageEl.id = 'bookPage';
+bookPageEl.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+bookPageEl.addEventListener('click', function (e) { e.stopPropagation(); booksPageAway(); });
+document.body.appendChild(bookPageEl);
+var bookPage = { t: 0, then: null, n: -1 };
+function booksPageShow(pg, then) {
+  bookPageEl.innerHTML = '';
+  bookPageEl.classList.toggle('marked', !!pg.ribbon);
+  if (pg.ribbon) { var rb = document.createElement('div'); rb.className = 'ribbon'; bookPageEl.appendChild(rb); }
+  var hd = document.createElement('div'); hd.className = 'head'; hd.textContent = 'Hogwarts, A History'; bookPageEl.appendChild(hd);
+  var tx = document.createElement('div'); tx.className = 'text'; tx.textContent = pg.text; bookPageEl.appendChild(tx);
+  var fo = document.createElement('div'); fo.className = 'folio'; fo.textContent = pg.folio; bookPageEl.appendChild(fo);
+  var p = books.hist.getWorldPosition(new THREE.Vector3()); p.y += BOOKS.h * 0.6; p.project(camera);
+  var W = innerWidth, H = innerHeight, pw = bookPageEl.offsetWidth || 330, ph = bookPageEl.offsetHeight || 220;
+  var x = clamp((p.x + 1) / 2 * W - pw / 2, 10, W - pw - 10), y = clamp((1 - p.y) / 2 * H - ph - 10, 10, H - ph - 10);
+  bookPageEl.style.transform = 'translate(' + x.toFixed(0) + 'px,' + y.toFixed(0) + 'px) rotate(-0.6deg)';
+  bookPageEl.classList.add('on');
+  bookPage.t = clamp(5 + 0.07 * pg.text.length, 7, 18); bookPage.then = then || null;
+}
+function booksPageAway() {
+  if (!bookPageEl.classList.contains('on')) return;
+  bookPageEl.classList.remove('on'); bookPage.t = 0;
+  var then = bookPage.then; bookPage.then = null;
+  if (then) then();
+}
 function booksTap() {
   LINE_PLACES['books-row'] = books.mesh.getWorldPosition(new THREE.Vector3());
-  showLines([books.out
-    ? { medium: 'said', speaker: 'hermione', at: 'books-row', text: '“All the copies of Hogwarts, A History have been taken out,” said Hermione.' }
-    : { medium: 'said', speaker: 'hermione', at: 'books-row', text: '“I read about it in Hogwarts, A History,” said Hermione.' }]);
+  if (books.out) {
+    showLines([{ medium: 'said', speaker: 'hermione', at: 'books-row', text: '“All the copies of Hogwarts, A History have been taken out,” said Hermione. “And there’s a two-week waiting list.”' }]);
+    return;
+  }
+  if (books.slide >= 0 || bookPageEl.classList.contains('on')) return;
+  if (lineCur && lineCur.line.at === 'books-row') return;           /* her line still showing: let it be read */
+  books.slide = 0; books.paged = false;
+  var p = books.hist.localToWorld(new THREE.Vector3(0, (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h / 2, 0));
+  books.motes.forEach(function (m) {
+    m.x = p.x + (Math.random() - 0.5) * 0.09; m.y = p.y + Math.random() * 0.02; m.z = p.z + (Math.random() - 0.5) * 0.04;
+    m.vx = (Math.random() - 0.5) * 0.03; m.vy = 0.02 + Math.random() * 0.05; m.vz = (Math.random() - 0.5) * 0.03;
+  });
+  books.dust = 0;
+}
+function booksPage() {
+  var day = homeDay(homeNow()), first = +(localStorage.getItem(BOOKS.DAY) || -1) !== day;
+  if (bookPage.n < 0) bookPage.n = day % (HISTORY_PAGES.length - 1);       /* the rest in turn, from a page set by the date */
+  var pg = first ? HISTORY_PAGES[0] : HISTORY_PAGES[1 + bookPage.n++ % (HISTORY_PAGES.length - 1)];
+  booksPageShow(pg, first ? function () {
+    localStorage.setItem(BOOKS.DAY, day);
+    showLines([{ medium: 'said', speaker: 'hermione', at: 'books-row', text: '“Honestly am I the only person who’s ever bothered to read Hogwarts, A History?” said Hermione crossly.' }]);
+  } : null);
 }
 function updateBooks(dt) {
   if (!sideTable.geometry.parameters) return;
   if ((books.check -= dt) <= 0) {
     books.check = 5;
     var out = booksOutToday();
-    if (out !== books.out && mode !== 'board') {           /* never changed under his eye at the desk */
-      books.out = out; books.mesh.material.map = out ? books.tout : books.tin; books.mesh.material.needsUpdate = true;
+    if (out && !books.slip.material.map) {
+      if (document.fonts && document.fonts.status !== 'loaded') { books.check = 0.5; out = books.out; }   /* not yet */
+      else { books.slip.material.map = books.slipTex(); books.slip.material.needsUpdate = true; }
+    }
+    if (out !== books.out && mode !== 'board' && books.slide < 0) {   /* never changed under his eye at the desk */
+      books.out = out; books.hist.visible = !out && !!books.hist.material.map; books.slip.visible = out;
     }
   }
   var gp = sideTable.geometry.parameters, base = new THREE.Vector3((BOOKS.u - 0.5) * gp.width, (0.5 - BOOKS.v) * gp.height, BOOKS.dz);
   sideTable.updateMatrixWorld(); sideTable.localToWorld(base);
   books.mesh.position.set(base.x, base.y + BOOKS.h / 2, base.z);
   books.mesh.lookAt(camera.position.x, books.mesh.position.y, camera.position.z);
+  if (books.slide >= 0) {                                  /* out an inch toward him, held, and back */
+    var t = (books.slide += dt), s;
+    if (t < BOOKS.OUT) s = smooth01(0, BOOKS.OUT, t);
+    else if (t < BOOKS.OUT + BOOKS.HOLD) s = 1;
+    else s = 1 - smooth01(BOOKS.OUT + BOOKS.HOLD, BOOKS.OUT + BOOKS.HOLD + BOOKS.BACK, t);
+    books.hist.position.z = books.histAt.z + BOOKS.SLIDE * s;
+    if (!books.paged && t >= BOOKS.OUT * 0.8) { books.paged = true; booksPage(); }
+    if (t >= BOOKS.OUT + BOOKS.HOLD + BOOKS.BACK) { books.slide = -1; books.hist.position.z = books.histAt.z; }
+  }
+  if (books.dust !== null) {                               /* the motes drift up and settle, gone in two seconds */
+    var d = (books.dust += dt), arr = books.dustGeo.attributes.position.array;
+    books.motes.forEach(function (m, i) {
+      m.vy -= 0.03 * dt; m.x += m.vx * dt; m.y += m.vy * dt; m.z += m.vz * dt;
+      arr[i * 3] = m.x; arr[i * 3 + 1] = m.y; arr[i * 3 + 2] = m.z;
+    });
+    books.dustGeo.attributes.position.needsUpdate = true;
+    books.dustMat.opacity = 0.55 * smooth01(0, 0.15, d) * (1 - smooth01(0.8, 2, d));
+    if (d > 2) { books.dust = null; books.dustMat.opacity = 0; }
+  }
+  if (bookPage.t > 0 && (bookPage.t -= dt) <= 0) booksPageAway();
 }
 function updateHomeLetter(dt) {
   if (!papersPainted) return;
@@ -4130,7 +4264,7 @@ function fireCatches() { fireLevelT = 1; stokeFire(); }
 /* at rest, these glide to the fireside stop */
 var FIRESIDE_TAPS = [hearthBack, bellows, rug, chairL, wingback];
 var tappables = [hearthBack, holeTap, catWalk, catSit, bellows, rug, chairL, wingback, stairs].concat(boardParts);
-tappables.push(books.mesh);
+tappables.push(books.mesh, books.hist, books.slip);
 for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
 tappables.push(homeLetter.mesh, homeFeather.mesh);
 
@@ -4302,13 +4436,15 @@ function tap(cx, cy) {
     if (h.object === catWalk || h.object === catSit) return !curl.on;
     if (h.object === curl.mesh) return curl.on && alphaSolid(curl.alpha, h.uv);
     if (h.object === books.mesh) return alphaSolid(books.ain, h.uv);   /* the gap where the History stood counts too */
+    if (h.object === books.hist) return books.hist.visible && alphaSolid(books.hain, h.uv);
+    if (h.object === books.slip) return books.slip.visible;
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
   if (mode === 'hand') { if (homeHandTap()) return; returnPaper(false); return; }
   if (mode === 'board') {
     if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return; }
-    if (hit && hit === books.mesh) { booksTap(); return; }
+    if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip)) { booksTap(); return; }
     if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
     if (hit && boardParts.indexOf(hit) >= 0) return;
     leaveBoard();
@@ -4331,7 +4467,7 @@ function tap(cx, cy) {
   if (mode !== 'room' || !hit) return;
   if (hit === homeFeather.mesh) homeFeatherTap();
   else if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
-  else if (hit === books.mesh) booksTap();
+  else if (hit === books.mesh || hit === books.hist || hit === books.slip) booksTap();
   else if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
   else if (hit === scarf) scarfTap();
   else if (hit === satchel) satchelTap();
