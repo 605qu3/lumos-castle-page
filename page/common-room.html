@@ -8,7 +8,7 @@
 <title>Gryffindor common room, greybox</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&family=Quintessential&family=Almendra+SC&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel&family=EB+Garamond:ital@0;1&family=Fondamento&family=Nothing+You+Could+Do&family=Short+Stack&family=Quintessential&family=Almendra+SC&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #070605;
@@ -1091,13 +1091,14 @@ var F = {
   small: '"EB Garamond", "IM Fell English", Georgia, serif',
   clerk: '"Fondamento", cursive',
   casual: '"Nothing You Could Do", cursive',
-  child: '"Short Stack", cursive'
+  child: '"Short Stack", cursive',
+  home: '"Patrick Hand", cursive'          /* the letter from home: a parent's plain, readable hand */
 };
 var FONT_LOADS = [
   '400 40px "IM Fell English"', 'italic 400 40px "IM Fell English"', '400 40px "IM Fell English SC"',
   '400 40px "Cinzel"', '400 40px "EB Garamond"', '400 40px "Fondamento"',
   '400 40px "Nothing You Could Do"', '400 40px "Short Stack"',
-  '400 40px "Quintessential"', '400 40px "Almendra SC"'
+  '400 40px "Quintessential"', '400 40px "Almendra SC"', '400 40px "Patrick Hand"'
 ];
 /* Percy's hand (board req 74; Magic for the boys, "The password's own pieces", *His hand*): a prefect's careful,
    upright round hand, a little proud of its capitals. None of the board's faces fits, so it is this lane's choice,
@@ -1734,6 +1735,7 @@ function updatePapers(dt, t) {
       if (p2.lift.dir < 0) k = 1 - k;
       p2.mesh.position.lerpVectors(p2.homePos, _p, k);
       p2.mesh.quaternion.copy(p2.homeQuat).slerp(_hq, k);
+      if (p2.turnQ) p2.mesh.quaternion.multiply(p2.turnQ);
       p2.shadow.material.opacity = 0.55 * (1 - k);
       lightTarget = k;
       if (p2.lift.t >= p2.lift.dur) {
@@ -1744,11 +1746,13 @@ function updatePapers(dt, t) {
           p2.mesh.position.set(0, 0, 0); p2.mesh.quaternion.identity();
           p2.shadow.material.opacity = 0.55;
           held = null; mode = p2.backMode || 'board';
+          if (p2.onBack) p2.onBack();
           if (leaveAfterReturn) { leaveAfterReturn = false; leaveBoard(); }
         }
       }
     } else {
       p2.mesh.position.copy(_p); p2.mesh.quaternion.copy(_hq);
+      if (p2.turnQ) p2.mesh.quaternion.multiply(p2.turnQ);
       lightTarget = 1;
     }
   }
@@ -2340,6 +2344,180 @@ function signScrapTap() {
   LINE_PLACES['sign-corner'] = gallonsScrap.mesh.getWorldPosition(new THREE.Vector3());
   showLines([{ medium: 'said', speaker: 'hermione', at: 'sign-corner', text: '“They are the limit,” said Hermione grimly.' }]);
 }
+/* the letter from home (Godric's Q10, 11 October 2026, 8.13 am: a family letter, propped against the books' near face
+   on the desk; Q11, provisional: his parents write it on letter-home.html). Its words are never in this file: the
+   page reads them from this device's own storage (lumos.letterHome), so with nothing written there is no letter. A
+   tap brings it to his hand, address side up, the address written on its blank panel; a tap turns it over to show
+   the seal; a tap opens it to read; a tap puts it back. Their P.S. holds for the week they wrote it; any other week a
+   new one from the list (book jokes, Book 1, checked in the text 11 October 2026). Once this week's letter is read,
+   on some days the owl has been back for the reply: the letter is gone and a feather lies where it stood. Until the
+   drawings are passed (letter-desk, letter-desk-seal, feather-desk) the three are stand-ins drawn here. */
+var HOME = { KEY: 'lumos.letterHome', READ: 'lumos.letterHome.read', w: 0.12, h: 0.08, lean: 0.2,
+  u: 0.705, v: 0.205, dz: 0.03,               /* the books' near face, as fractions of the desk's drawing from its left and top */
+  PX: 9000, ink: '#3a2c20',
+  ADDRESS: ['The Fourth Bed from the Window', 'Boys’ Dormitory', 'Gryffindor Tower', 'Hogwarts'],
+  PS: ['Do not let Fred and George near your homework.',                       /* Godric's own, Q10 */
+    'Remember to jump the vanishing step.',                                     /* PS 8 */
+    'Some doors will not open unless you ask politely. Say please.',            /* PS 8 */
+    'It’s Levi-o-sa. Make the “gar” nice and long.',                            /* PS 10, Hermione */
+    'Stay out of the third-floor corridor on the right-hand side. We mean it.', /* PS 7 */
+    'Mind Peeves and his bits of chalk.',                                       /* PS 8 */
+    'If Mrs Norris is watching, Mr Filch is not far behind.',                   /* PS 8 */
+    'Every Flavour Beans: we hope you got toast and not sardine.'] };           /* PS 6 */
+function homeWords() { try { var o = JSON.parse(localStorage.getItem(HOME.KEY) || 'null'); return o && o.note ? o : null; } catch (e) { return null; } }
+function homeNow() { var m = /[?&]date=(\d{4}-\d\d-\d\d)/.exec(location.search); return m ? new Date(m[1] + 'T10:00:00') : new Date(); }
+function homeDay(d) { return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 86400000); }
+function homeWeek(d) { return Math.floor((homeDay(d) + 3) / 7); }    /* weeks from Monday */
+function homePS(o) {
+  var wk = homeWeek(homeNow());
+  if (o.ps && o.written && homeWeek(new Date(o.written)) === wk) return o.ps;
+  return HOME.PS[((wk % HOME.PS.length) + HOME.PS.length) % HOME.PS.length];
+}
+function homeCard(w, h, lean) {
+  var geo = new THREE.PlaneGeometry(w, h); geo.translate(0, -(h / 2 - PIN_INSET), 0);
+  var mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: blankTex, color: 0xffffff, roughness: 0.96, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide }));
+  var sgeo = new THREE.PlaneGeometry(w + 0.03, h + 0.02); sgeo.translate(0, -(h / 2 - PIN_INSET), 0);
+  var sh = new THREE.Mesh(sgeo, new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: 0.55, depthWrite: false, color: 0x000000 }));
+  sh.position.set(0.006, -0.004, -0.006);     /* on the books' face behind it */
+  var pivot = new THREE.Group(); pivot.add(sh); pivot.add(mesh); scene.add(pivot);
+  mesh.visible = sh.visible = false;
+  var p = { spec: { w: w, h: h, desk: true }, mesh: mesh, shadow: sh, pivot: pivot, lean: lean, pinGroups: [],
+    homePos: new THREE.Vector3(), homeQuat: new THREE.Quaternion(), lift: null, turnQ: null };
+  mesh.userData.paper = p;
+  return p;
+}
+var homeLetter = homeCard(HOME.w, HOME.h, HOME.lean), homeFeather = homeCard(0.06, 0.16, 0.12);
+var homeNote = homeCard(0.16, 0.21, 0);
+homeNote.shadow.visible = false;
+var homeState = { words: null, front: null, back: null, stage: 0, turn: -1, unfold: -1, shown: '', check: 0 };
+/* the stand-ins: the packet's address side with its panel, and its back with the flaps and the seal */
+function homePacket(g, W, H, back) {
+  g.fillStyle = '#e6d9b8'; g.fillRect(0, 0, W, H);
+  g.strokeStyle = '#a8966e'; g.lineWidth = W * 0.006;
+  g.strokeRect(W * 0.01, H * 0.01, W * 0.98, H * 0.98);
+  g.beginPath();
+  if (back) { g.moveTo(0, 0); g.lineTo(W * 0.5, H * 0.55); g.lineTo(W, 0); g.moveTo(0, H); g.lineTo(W * 0.5, H * 0.45); g.lineTo(W, H); }
+  else { g.moveTo(W * 0.03, H * 0.12); g.lineTo(W * 0.97, H * 0.12); }
+  g.stroke();
+  if (back) {
+    g.fillStyle = '#a3271e'; g.beginPath(); g.arc(W * 0.5, H * 0.5, H * 0.13, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#6e1612'; g.beginPath(); g.arc(W * 0.5, H * 0.5, H * 0.08, 0, Math.PI * 2); g.fill();
+  }
+}
+function homeFront(o) {
+  var W = Math.round(HOME.w * HOME.PX), H = Math.round(HOME.h * HOME.PX), c = makeCanvas(W, H), g = c.getContext('2d');
+  homePacket(g, W, H, false);
+  var lines = (o.name ? [o.name] : []).concat(HOME.ADDRESS), rnd = mulberry32(7);
+  var px = H * 0.085, x = W * 0.2, y = H * 0.3;
+  lines.forEach(function (l, i) {
+    write(g, l, x + i * W * 0.025, y, { px: i === 0 && o.name ? px * 1.2 : px, family: F.home, color: HOME.ink, maxW: W * 0.75, slant: 0.01, jitter: 1.5, soft: 1.1, rnd: rnd });
+    y += (i === 0 && o.name ? px * 1.2 : px) * 1.3;
+  });
+  return tex(c);
+}
+function homeBack() {
+  var W = Math.round(HOME.w * HOME.PX), H = Math.round(HOME.h * HOME.PX), c = makeCanvas(W, H);
+  homePacket(c.getContext('2d'), W, H, true);
+  return tex(c);
+}
+function homeNoteTex(o) {
+  var PXN = 4500, W = Math.round(0.16 * PXN), H = Math.round(0.21 * PXN), c = makeCanvas(W, H), g = c.getContext('2d'), rnd = mulberry32(31);
+  fillTile(g, W, H, TILE_IMG.cream, 420);
+  var M = W * 0.09, o2 = { px: W * 0.058, family: F.home, color: HOME.ink, maxW: W - 2 * M, lineGap: 1.3, slant: 0.012, jitter: 1.4, soft: 1.1, rnd: rnd };
+  var y = fit(g, o.note, M, M + W * 0.06, o2, H * 0.68);
+  if (o.sign) y = write(g, o.sign, W - M, y + o2.px * 0.4, Object.assign({}, o2, { align: 'right' }));
+  fit(g, 'P.S. ' + homePS(o), M, Math.max(y + o2.px * 0.6, H * 0.74), Object.assign({}, o2, { px: o2.px * 0.92 }), H - M);
+  return tex(c);
+}
+function homeFeatherTex() {                       /* a stand-in feather until feather-desk is passed */
+  var W = 180, H = 480, c = makeCanvas(W, H), g = c.getContext('2d');
+  g.translate(W / 2, H); g.rotate(0.08);
+  g.fillStyle = '#8a7663'; g.beginPath(); g.moveTo(0, -H * 0.05); g.bezierCurveTo(W * 0.45, -H * 0.3, W * 0.3, -H * 0.85, 0, -H * 0.98);
+  g.bezierCurveTo(-W * 0.3, -H * 0.85, -W * 0.4, -H * 0.3, 0, -H * 0.05); g.fill();
+  g.strokeStyle = '#d8cfb8'; g.lineWidth = 4; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -H * 0.95); g.stroke();
+  return tex(c);
+}
+function homeSet(p, t) {
+  p.mesh.material.map = t; p.mesh.material.needsUpdate = true;
+  p.mesh.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
+}
+/* today's choice: no words, no letter; this week's letter read and a feather day (one in three, never Monday): the feather */
+function homeToday() {
+  var o = homeWords();
+  if (!o) return '';
+  var now = homeNow(), day = homeDay(now), wk = homeWeek(now), read = +(localStorage.getItem(HOME.READ) || -1);
+  var h = (day * 2654435761) >>> 0;
+  if (read === wk && now.getDay() !== 1 && h % 3 === 0) return 'feather';
+  return 'letter';
+}
+function homePlace(p, dz) {
+  if (!sideTable.geometry.parameters) return;
+  var gp = sideTable.geometry.parameters, base = new THREE.Vector3((HOME.u - 0.5) * gp.width, (0.5 - HOME.v) * gp.height, dz);
+  sideTable.updateMatrixWorld(); sideTable.localToWorld(base);
+  var n = new THREE.Vector3(camera.position.x - base.x, 0, camera.position.z - base.z).normalize();
+  var up = p.spec.h - PIN_INSET;
+  p.pivot.position.copy(base).addScaledVector(n, -up * Math.sin(p.lean));
+  p.pivot.position.y += up * Math.cos(p.lean);
+  p.pivot.lookAt(p.pivot.position.clone().add(n));
+  p.pivot.rotateX(-p.lean);
+}
+function updateHomeLetter(dt) {
+  if (!papersPainted) return;
+  if ((homeState.check -= dt) <= 0 && !held) {    /* a letter kept on letter-home.html shows on the next look */
+    homeState.check = 3;
+    var o = homeWords(), key = o ? JSON.stringify(o) + homePS(o) : '', today = homeToday();
+    if (key !== homeState.key) {
+      homeState.key = key; homeState.words = o;
+      if (o) { homeState.front = homeFront(o); homeState.back = homeBack(); homeSet(homeLetter, homeState.front); homeSet(homeNote, homeNoteTex(o)); }
+      if (!homeFeather.mesh.material.map || homeFeather.mesh.material.map === blankTex) homeSet(homeFeather, homeFeatherTex());
+    }
+    homeState.shown = today;
+  }
+  var inHand = held === homeLetter || held === homeNote;
+  homeLetter.mesh.visible = homeLetter.shadow.visible = homeState.shown === 'letter' && held !== homeNote;
+  homeFeather.mesh.visible = homeFeather.shadow.visible = homeState.shown === 'feather';
+  if (!inHand) { homePlace(homeLetter, HOME.dz); homePlace(homeNote, HOME.dz); }
+  homePlace(homeFeather, HOME.dz);
+  /* turning it over: edge on at the half, where the seal side takes its place */
+  if (homeState.turn >= 0) {
+    homeState.turn += dt / 0.45;
+    var k = Math.min(1, homeState.turn), ang = k < 0.5 ? k * Math.PI : -(1 - k) * Math.PI;
+    if (k >= 0.5 && homeLetter.mesh.material.map !== homeState.back) homeSet(homeLetter, homeState.back);
+    homeLetter.turnQ = (homeLetter.turnQ || new THREE.Quaternion()).setFromAxisAngle(new THREE.Vector3(0, 1, 0), ang);
+    if (k >= 1) { homeState.turn = -1; homeLetter.turnQ = null; }
+  }
+  if (homeState.unfold >= 0) {
+    homeState.unfold = Math.min(1, homeState.unfold + dt / 0.3);
+    homeNote.mesh.scale.setScalar(0.7 + 0.3 * easeInOut(homeState.unfold));
+    if (homeState.unfold >= 1) homeState.unfold = -1;
+  }
+}
+function homeLetterTap() {
+  if (held || homeState.shown !== 'letter') return;
+  homeState.stage = 0;
+  homeSet(homeLetter, homeState.front);
+  liftPaper(homeLetter);
+}
+/* a tap with it in his hand: over, then open, then back to the desk */
+function homeHandTap() {
+  if (held === homeLetter && mode === 'hand' && homeState.turn < 0) {
+    if (homeState.stage === 0) { homeState.stage = 1; homeState.turn = 0; return true; }
+    homeState.stage = 2;
+    homeNote.homePos.copy(homeLetter.homePos); homeNote.homeQuat.copy(homeLetter.homeQuat);
+    homeLetter.pivot.add(homeLetter.mesh); homeLetter.mesh.position.set(0, 0, 0); homeLetter.mesh.quaternion.identity();
+    homeLetter.shadow.material.opacity = 0.55;
+    homeNote.backMode = homeLetter.backMode;
+    scene.attach(homeNote.mesh); homeNote.mesh.visible = true;
+    held = homeNote; homeState.unfold = 0;
+    localStorage.setItem(HOME.READ, String(homeWeek(homeNow())));
+    return true;
+  }
+  return held === homeLetter;                    /* mid-turn: wait */
+}
+homeNote.onBack = function () {
+  homeNote.mesh.visible = false; homeNote.mesh.scale.setScalar(1);
+  homeState.stage = 0; homeSet(homeLetter, homeState.front);
+};
 function updateCloak(dt) {
   if (!cloak) return;
   cloakTape.mesh.visible = held === cloakTape;
@@ -3696,6 +3874,7 @@ function fireCatches() { fireLevelT = 1; stokeFire(); }
 var FIRESIDE_TAPS = [hearthBack, bellows, rug, chairL, wingback];
 var tappables = [hearthBack, holeTap, catWalk, catSit, bellows, rug, chairL, wingback, stairs].concat(boardParts);
 for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
+tappables.push(homeLetter.mesh, homeFeather.mesh);
 
 function startTween(fromPos, fromLook, toPos, toLook, dur, done, fromFov, toFov) {
   tween = { t: 0, dur: dur, fromPos: fromPos, fromLook: fromLook, toPos: toPos, toLook: toLook, done: done,
@@ -3864,7 +4043,7 @@ function tap(cx, cy) {
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
-  if (mode === 'hand') { returnPaper(false); return; }
+  if (mode === 'hand') { if (homeHandTap()) return; returnPaper(false); return; }
   if (mode === 'board') {
     if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return; }
     if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
@@ -3886,7 +4065,8 @@ function tap(cx, cy) {
   var as = mode === 'room' && castle ? figureTapped(hits) : null;
   if (as) { castle.tap(as); return; }
   if (mode !== 'room' || !hit) return;
-  if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
+  if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
+  else if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
   else if (hit === scarf) scarfTap();
   else if (hit === satchel) satchelTap();
   else if (hit === curios.jar) jarTap(hits[0].point);
@@ -4402,6 +4582,7 @@ function frame() {
   updateScarf(dt, t);
   updateCloak(dt);
   updateSign(dt);
+  updateHomeLetter(dt);
   updateSatchel(dt, t);
   updateHomework(dt);
   updateCurios(dt, t);
@@ -4412,7 +4593,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>

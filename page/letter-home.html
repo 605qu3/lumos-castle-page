@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A letter from home</title>
+<!--
+  The letter from home (Godric's Q10 and Q11, 11 October 2026): the boys' parents write the letter that stands on the
+  common room's desk. Linked from nowhere. Their words are never in a page file and never reach a server: opened on
+  the boy's iPad this page keeps the letter in that iPad's own storage (localStorage, key lumos.letterHome); opened on
+  a phone it makes a link whose words ride in the part after the #, which the browser never sends, to be opened once
+  on the iPad, where this page shows the letter and keeps it with one tap. The room reads the same key.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital@0;1&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #2a211a; color: #2a2016; font: 18px/1.45 "EB Garamond", Georgia, serif; }
+  main { max-width: 560px; margin: 0 auto; padding: 18px 14px 40px; }
+  .sheet { background: #efe5cc; border-radius: 4px; padding: 18px 18px 22px; box-shadow: 0 3px 14px rgba(0,0,0,0.45); }
+  h1 { font-size: 24px; margin: 0 0 4px; font-weight: 400; }
+  p.lede { margin: 0 0 14px; color: #5a4a36; font-size: 16px; }
+  label { display: block; margin: 12px 0 4px; font-size: 15px; color: #5a4a36; }
+  input, textarea { width: 100%; box-sizing: border-box; font: 20px/1.35 "Patrick Hand", cursive; color: #2a2016;
+    background: #f8f1df; border: 1px solid #c9b994; border-radius: 3px; padding: 8px 10px; }
+  textarea { min-height: 150px; resize: vertical; }
+  .hint { font-size: 14px; color: #7a6850; margin-top: 3px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  button { font: 17px "EB Garamond", Georgia, serif; padding: 10px 16px; border-radius: 4px; border: 1px solid #7a5a2a;
+    background: #7a1f16; color: #f5ead2; cursor: pointer; }
+  button.plain { background: transparent; color: #5a3a1a; }
+  .note { margin-top: 14px; padding: 10px 12px; background: #e3d6b5; border-radius: 3px; font-size: 16px; display: none; }
+  .note.on { display: block; }
+  .link { word-break: break-all; font-size: 13px; margin-top: 6px; color: #3a2c20; }
+  a { color: #7a1f16; }
+</style>
+</head>
+<body>
+<main>
+  <div class="sheet">
+    <h1>A letter from home</h1>
+    <p class="lede" id="lede">Write to the boys. Your letter stands on the desk in the common room, propped against
+      the books, until you write the next one.</p>
+
+    <label for="name">To (the first line of the address)</label>
+    <input id="name" autocomplete="off" placeholder="his name">
+    <div class="hint">The rest of the address is written for you: The Fourth Bed from the Window, Boys' Dormitory,
+      Gryffindor Tower, Hogwarts.</div>
+
+    <label for="note">The letter</label>
+    <textarea id="note" placeholder="Dear ..."></textarea>
+
+    <label for="ps">P.S. (leave it empty and a new one is chosen each week)</label>
+    <input id="ps" autocomplete="off" placeholder="Do not let Fred and George near your homework.">
+
+    <label for="sign">Signed</label>
+    <input id="sign" autocomplete="off" placeholder="Love, ...">
+
+    <div class="row">
+      <button id="keep">Keep it on this iPad</button>
+      <button id="link" class="plain">Make a link for the iPad</button>
+      <button id="clear" class="plain">Clear</button>
+    </div>
+    <div class="note" id="msg"></div>
+  </div>
+</main>
+<script>
+(function () {
+  var KEY = 'lumos.letterHome';
+  var $ = function (id) { return document.getElementById(id); };
+  var fields = ['name', 'note', 'ps', 'sign'];
+  function say(html) { var m = $('msg'); m.innerHTML = html; m.classList.add('on'); }
+  function read() { var o = {}; fields.forEach(function (f) { o[f] = $(f).value.trim(); }); return o; }
+  function fill(o) { fields.forEach(function (f) { $(f).value = (o && o[f]) || ''; }); }
+  /* the words as UTF-8 in base64url, so any letter survives the link */
+  function pack(o) {
+    var bytes = new TextEncoder().encode(JSON.stringify(o)), s = '';
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function unpack(t) {
+    var s = atob(t.replace(/-/g, '+').replace(/_/g, '/')), bytes = new Uint8Array(s.length);
+    for (var i = 0; i < s.length; i++) bytes[i] = s.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+  function keep(o) {
+    o.written = new Date().toISOString();
+    localStorage.setItem(KEY, JSON.stringify(o));
+    say('Kept on this iPad. It is on the desk now. <a href="common-room.html">Go to the common room</a>');
+  }
+  var stored = null;
+  try { stored = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { stored = null; }
+  var came = /[#&]l=([A-Za-z0-9_-]+)/.exec(location.hash);
+  if (came) {
+    try {
+      fill(unpack(came[1]));
+      $('lede').textContent = 'A letter came by link. Read it over, then keep it on this iPad.';
+      history.replaceState(null, '', location.pathname);          /* the words leave the address bar */
+    } catch (e) { say('That link did not carry a whole letter. Ask for it again.'); fill(stored); }
+  } else fill(stored);
+  $('keep').onclick = function () {
+    var o = read();
+    if (!o.note) { say('The letter is empty.'); return; }
+    keep(o);
+  };
+  $('link').onclick = function () {
+    var o = read();
+    if (!o.note) { say('The letter is empty.'); return; }
+    var url = location.origin + location.pathname + '#l=' + pack(o);
+    say('Open this link once on the iPad (send it by message), then tap "Keep it on this iPad" there.' +
+      '<div class="link" id="url"></div>');
+    $('url').textContent = url;
+    if (navigator.share) navigator.share({ title: 'A letter from home', url: url }).catch(function () {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { say($('msg').innerHTML + '<div>Copied.</div>'); }, function () {});
+  };
+  $('clear').onclick = function () { fill(null); localStorage.removeItem(KEY); say('Cleared on this device.'); };
+})();
+</script>
+</body>
+</html>
