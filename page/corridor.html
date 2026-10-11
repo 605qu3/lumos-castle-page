@@ -987,6 +987,79 @@ function updateFrost() {
   if (FROST.grounds) { FROST.grounds.material.opacity = lv.grounds * 0.85; FROST.grounds.visible = lv.grounds > 0; }
   FROST.panes.forEach(function (m) { m.material.opacity = lv.panes; m.visible = lv.panes > 0 && !stage; });
 }
+/* the day's sky over the view, in code, nothing generated (Events' weather, req 115: one sky for every window): cloudy
+   dulls it under a grey wash, heavier where the sky shows; rain greys it further and runs down the glass of both
+   windows ("He glanced out of a rain-washed window at the dark grounds", OotP 13); fog veils it, thick toward the
+   forest and the hills, thinner over the near lawn; the plain window's sky takes the same colour. Snow is a drawn state,
+   a spend question, so a snowy day shows as cloudy here until it is drawn. */
+var SKY = { veil: null, rain: [], key: null, next: 0,
+  plain: { clear: 0xdfe8f0, cloudy: 0xc9ccd0, rain: 0xaeb3b8, fog: 0xdcdcd8, snow: 0xd2d5d9 } };
+function veilTexture(kind) {
+  var w = 64, h = 256, cv = makeCanvas(w, h), g = cv.getContext('2d'), grd = g.createLinearGradient(0, 0, 0, h);
+  if (kind === 'fog') {
+    grd.addColorStop(0, 'rgba(226,227,224,0.92)'); grd.addColorStop(0.42, 'rgba(226,227,224,0.78)');
+    grd.addColorStop(0.62, 'rgba(226,227,224,0.45)'); grd.addColorStop(1, 'rgba(226,227,224,0.22)');
+  } else {
+    var c = kind === 'rain' ? [112, 118, 126] : [138, 142, 148], a = kind === 'rain' ? [0.72, 0.5, 0.42] : [0.58, 0.36, 0.3];
+    function rgba(k) { return 'rgba(' + c.join(',') + ',' + a[k] + ')'; }
+    grd.addColorStop(0, rgba(0)); grd.addColorStop(0.42, rgba(1)); grd.addColorStop(1, rgba(2));
+  }
+  g.fillStyle = grd; g.fillRect(0, 0, w, h);
+  return tex(cv);
+}
+function rainTexture() {
+  var w = 256, h = 512, cv = makeCanvas(w, h), g = cv.getContext('2d'), rnd = 11;
+  function rand() { rnd = (rnd * 16807) % 2147483647; return rnd / 2147483647; }
+  for (var n = 0; n < 420; n++) {              /* beads on the glass */
+    var x = rand() * w, y = rand() * h, r = 0.6 + 1.6 * rand();
+    g.fillStyle = 'rgba(232,238,244,' + (0.18 + 0.25 * rand()).toFixed(2) + ')'; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill();
+    g.fillStyle = 'rgba(60,66,72,0.22)'; g.beginPath(); g.arc(x + r * 0.3, y + r * 0.35, r * 0.6, 0, 7); g.fill();
+  }
+  g.lineCap = 'round';
+  for (var k = 0; k < 16; k++) {               /* runs, wandering down, tiled top to bottom so they scroll */
+    var x0 = rand() * w, y0 = rand() * h, len = 50 + 140 * rand(), wd = 0.8 + 1.0 * rand();
+    g.strokeStyle = 'rgba(228,234,240,' + (0.14 + 0.16 * rand()).toFixed(2) + ')'; g.lineWidth = wd;
+    for (var rep = -1; rep <= 0; rep++) {
+      g.beginPath(); var x = x0;
+      for (var y = 0; y <= len; y += 6) { x += (rand() - 0.5) * 3.2; var yy = y0 + y + rep * h; if (y === 0) g.moveTo(x, yy); else g.lineTo(x, yy); }
+      g.stroke();
+    }
+  }
+  var tx = tex(cv); tx.wrapS = tx.wrapT = THREE.RepeatWrapping;
+  return tx;
+}
+(function () {
+  var map = rainTexture();
+  windows.forEach(function (win) {
+    var p = win.frame.position, gp = win.frame.geometry.parameters;
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(gp.width, gp.height),
+      new THREE.MeshBasicMaterial({ map: map, transparent: true, depthWrite: false }));
+    m.position.set(p.x, p.y, GLASS_Z + 0.009); m.name = win.name + '-rain'; m.renderOrder = 6; m.visible = false;
+    scene.add(m); SKY.rain.push(m);
+  });
+})();
+function updateSky(dt) {
+  var w = groundsWeather(), sky = w ? (w.sky === 'snow' ? 'cloudy' : w.sky) : 'clear', stage = view === 'stage';
+  var raining = sky === 'rain' && !stage;
+  SKY.rain.forEach(function (m) { m.visible = raining; });
+  if (raining) SKY.rain[0].material.map.offset.y += dt * 0.035;
+  if (t < SKY.next) return;
+  SKY.next = t + 2;
+  var key = sky + ':' + stage + ':' + !!grounds.img;
+  if (key === SKY.key) return;
+  SKY.key = key;
+  windows[0].sky.material.color.copy(col(SKY.plain[w ? w.sky : 'clear'] || SKY.plain.clear));
+  windows[0].sky.userData.base = windows[0].sky.material.color.clone();
+  if (!grounds.img) return;
+  if (!SKY.veil) {
+    SKY.veil = new THREE.Mesh(new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false }));
+    SKY.veil.position.z = 0.003; SKY.veil.name = 'grounds-veil'; SKY.veil.renderOrder = 5;
+    groundsWin.sky.add(SKY.veil);
+  }
+  if (sky === 'clear') { SKY.veil.visible = false; return; }
+  if (SKY.veil.material.map) SKY.veil.material.map.dispose();
+  SKY.veil.material.map = veilTexture(sky); SKY.veil.material.needsUpdate = true; SKY.veil.visible = true;
+}
 function hang(g, x, y, w, h, t, phase, draw) {
   var wind = groundsWind(), sway = wind * (0.35 * Math.sin(t * (2 + 3 * wind) + phase) + 0.25);
   g.save(); g.translate(x, y); g.transform(1, 0, sway, 1, 0, 0); draw(g, w, h); g.restore();
@@ -1071,6 +1144,7 @@ function drawGrounds(t) {
    ?hagrid sends him every visit */
 function updateGrounds(dt) {
   updateFrost();
+  updateSky(dt);
   if (!grounds.canvas) return;
   var here = atStop && atStop.name === 'window';
   if (here && grounds.last !== atStop) {
