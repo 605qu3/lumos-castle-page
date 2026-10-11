@@ -2359,10 +2359,14 @@ function signScrapTap() {
    tap brings it to his hand, address side up, the address written on its blank panel; a tap turns it over to show
    the seal; a tap opens it to read; a tap puts it back. Their P.S. holds for the week they wrote it; any other week a
    new one from the list (book jokes, Book 1, checked in the text 11 October 2026). Once this week's letter is read,
-   on some days the owl has been back for the reply: the letter is gone and a feather lies where it stood. Until the
+   on some days the owl has been back for the reply: the letter is gone and a feather lies where it stood. Q11, his
+   8.49 am, both touches: (t1) they sign it with a fingertip on letter-home.html, the strokes kept with the words (sig)
+   and drawn here under the note in the same ink; (t2) the week a new letter comes, a feather lies beside it, gone once
+   he has read it (the letter's `written` stamp against the one he last opened, lumos.letterHome.readWritten). Until the
    drawings are passed (letter-desk, letter-desk-seal, feather-desk) the three are stand-ins drawn here. */
-var HOME = { KEY: 'lumos.letterHome', READ: 'lumos.letterHome.read', w: 0.12, h: 0.08, lean: 0.2,
+var HOME = { KEY: 'lumos.letterHome', READ: 'lumos.letterHome.read', READW: 'lumos.letterHome.readWritten', w: 0.12, h: 0.08, lean: 0.2,
   u: 0.705, v: 0.205, dz: 0.03,               /* the books' near face, as fractions of the desk's drawing from its left and top */
+  besideU: 0.63,                              /* the new letter's feather, just left of it at the books' foot */
   PX: 9000, ink: '#3a2c20',
   ADDRESS: ['The Fourth Bed from the Window', 'Boys’ Dormitory', 'Gryffindor Tower', 'Hogwarts'],
   PS: ['Do not let Fred and George near your homework.',                       /* Godric's own, Q10 */
@@ -2435,8 +2439,25 @@ function homeNoteTex(o) {
   var M = W * 0.09, o2 = { px: W * 0.058, family: F.home, color: HOME.ink, maxW: W - 2 * M, lineGap: 1.3, slant: 0.012, jitter: 1.4, soft: 1.1, rnd: rnd };
   var y = fit(g, o.note, M, M + W * 0.06, o2, H * 0.68);
   if (o.sign) y = write(g, o.sign, W - M, y + o2.px * 0.4, Object.assign({}, o2, { align: 'right' }));
+  if (o.sig && o.sig.s && o.sig.s.length) y = homeSig(g, o.sig, W - M, y + o2.px * 0.3, o2.px * 2.2, W * 0.6);
   fit(g, 'P.S. ' + homePS(o), M, Math.max(y + o2.px * 0.6, H * 0.74), Object.assign({}, o2, { px: o2.px * 0.92 }), H - M);
   return tex(c);
+}
+/* their fingertip signatures, cropped to the strokes, right-aligned under the note, at most sigH tall and maxW wide */
+function homeSig(g, sig, right, top, sigH, maxW) {
+  var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  sig.s.forEach(function (st) { for (var i = 0; i + 1 < st.length; i += 2) {
+    x0 = Math.min(x0, st[i]); x1 = Math.max(x1, st[i]); y0 = Math.min(y0, st[i + 1]); y1 = Math.max(y1, st[i + 1]); } });
+  var k = Math.min(sigH / Math.max(1, y1 - y0), maxW / Math.max(1, x1 - x0)), ox = right - (x1 - x0) * k;
+  g.save(); g.strokeStyle = HOME.ink; g.lineWidth = Math.max(2, sigH * 0.035); g.lineCap = g.lineJoin = 'round';
+  sig.s.forEach(function (st) {
+    g.beginPath();
+    for (var i = 0; i + 1 < st.length; i += 2) { var x = ox + (st[i] - x0) * k, y = top + (st[i + 1] - y0) * k; if (i) g.lineTo(x, y); else g.moveTo(x, y); }
+    if (st.length === 2) g.lineTo(ox + (st[0] - x0) * k + 0.5, top + (st[1] - y0) * k);
+    g.stroke();
+  });
+  g.restore();
+  return top + (y1 - y0) * k;
 }
 function homeFeatherTex() {                       /* a stand-in feather until feather-desk is passed */
   var W = 180, H = 480, c = makeCanvas(W, H), g = c.getContext('2d');
@@ -2459,9 +2480,9 @@ function homeToday() {
   if (read === wk && now.getDay() !== 1 && h % 3 === 0) return 'feather';
   return 'letter';
 }
-function homePlace(p, dz) {
+function homePlace(p, dz, u) {
   if (!sideTable.geometry.parameters) return;
-  var gp = sideTable.geometry.parameters, base = new THREE.Vector3((HOME.u - 0.5) * gp.width, (0.5 - HOME.v) * gp.height, dz);
+  var gp = sideTable.geometry.parameters, base = new THREE.Vector3(((u === undefined ? HOME.u : u) - 0.5) * gp.width, (0.5 - HOME.v) * gp.height, dz);
   sideTable.updateMatrixWorld(); sideTable.localToWorld(base);
   var n = new THREE.Vector3(camera.position.x - base.x, 0, camera.position.z - base.z).normalize();
   var up = p.spec.h - PIN_INSET;
@@ -2481,12 +2502,14 @@ function updateHomeLetter(dt) {
       if (!homeFeather.mesh.material.map || homeFeather.mesh.material.map === blankTex) homeSet(homeFeather, homeFeatherTex());
     }
     homeState.shown = today;
+    homeState.fresh = !!(o && o.written && localStorage.getItem(HOME.READW) !== o.written);
   }
   var inHand = held === homeLetter || held === homeNote;
   homeLetter.mesh.visible = homeLetter.shadow.visible = homeState.shown === 'letter' && held !== homeNote;
-  homeFeather.mesh.visible = homeFeather.shadow.visible = homeState.shown === 'feather';
+  var beside = homeState.shown === 'letter' && homeState.fresh;
+  homeFeather.mesh.visible = homeFeather.shadow.visible = homeState.shown === 'feather' || beside;
   if (!inHand) { homePlace(homeLetter, HOME.dz); homePlace(homeNote, HOME.dz); }
-  homePlace(homeFeather, HOME.dz);
+  homePlace(homeFeather, HOME.dz, beside ? HOME.besideU : HOME.u);
   /* turning it over: edge on at the half, where the seal side takes its place */
   if (homeState.turn >= 0) {
     homeState.turn += dt / 0.45;
@@ -2519,6 +2542,7 @@ function homeHandTap() {
     scene.attach(homeNote.mesh); homeNote.mesh.visible = true;
     held = homeNote; homeState.unfold = 0;
     localStorage.setItem(HOME.READ, String(homeWeek(homeNow())));
+    if (homeState.words && homeState.words.written) { localStorage.setItem(HOME.READW, homeState.words.written); homeState.fresh = false; }
     return true;
   }
   return held === homeLetter;                    /* mid-turn: wait */

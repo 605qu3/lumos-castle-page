@@ -34,6 +34,10 @@
   .note.on { display: block; }
   .link { word-break: break-all; font-size: 13px; margin-top: 6px; color: #3a2c20; }
   a { color: #7a1f16; }
+  #pad { display: block; width: 100%; height: 130px; background: #f8f1df; border: 1px solid #c9b994; border-radius: 3px;
+    touch-action: none; cursor: crosshair; }
+  .padrow { display: flex; justify-content: space-between; align-items: baseline; }
+  .padrow button { font-size: 14px; padding: 4px 10px; }
 </style>
 </head>
 <body>
@@ -54,8 +58,12 @@
     <label for="ps">P.S. (leave it empty and a new one is chosen each week)</label>
     <input id="ps" autocomplete="off" placeholder="Do not let Fred and George near your homework.">
 
-    <label for="sign">Signed</label>
-    <input id="sign" autocomplete="off" placeholder="Love, ...">
+    <label for="sign">Signed off (a line before your names)</label>
+    <input id="sign" autocomplete="off" placeholder="Love,">
+
+    <div class="padrow"><label for="pad">Sign here with a fingertip, each of you</label>
+      <button id="padclear" class="plain" type="button">Clear signatures</button></div>
+    <canvas id="pad"></canvas>
 
     <div class="row">
       <button id="keep">Keep it on this iPad</button>
@@ -70,9 +78,50 @@
   var KEY = 'lumos.letterHome';
   var $ = function (id) { return document.getElementById(id); };
   var fields = ['name', 'note', 'ps', 'sign'];
+  /* the signatures (Godric's Q11 touch, 11 October 2026): strokes, not a picture, so the link stays short; points on
+     a 1000-wide grid, the height in proportion, each stroke a flat list x, y, x, y ... */
+  var pad = $('pad'), pg = pad.getContext('2d'), sig = null, stroke = null;
+  function padSize() {
+    var r = pad.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    pad.width = Math.round(r.width * d); pad.height = Math.round(r.height * d);
+    drawSig();
+  }
+  function drawSig() {
+    pg.clearRect(0, 0, pad.width, pad.height);
+    if (!sig) return;
+    var k = pad.width / sig.w;
+    pg.strokeStyle = '#3a2c20'; pg.lineWidth = Math.max(2, pad.height * 0.022); pg.lineCap = pg.lineJoin = 'round';
+    sig.s.forEach(function (st) {
+      pg.beginPath();
+      for (var i = 0; i + 1 < st.length; i += 2) { if (i) pg.lineTo(st[i] * k, st[i + 1] * k); else pg.moveTo(st[i] * k, st[i + 1] * k); }
+      if (st.length === 2) pg.lineTo(st[0] * k + 1, st[1] * k);
+      pg.stroke();
+    });
+  }
+  function padPoint(e) {
+    var r = pad.getBoundingClientRect(), k = 1000 / r.width;
+    return [Math.round((e.clientX - r.left) * k), Math.round((e.clientY - r.top) * k)];
+  }
+  pad.addEventListener('pointerdown', function (e) {
+    var r = pad.getBoundingClientRect();
+    if (!sig) sig = { w: 1000, h: Math.round(1000 * r.height / r.width), s: [] };
+    stroke = padPoint(e); sig.s.push(stroke);
+    try { pad.setPointerCapture(e.pointerId); } catch (err) {}
+    drawSig(); e.preventDefault();
+  });
+  pad.addEventListener('pointermove', function (e) {
+    if (!stroke) return;
+    var p = padPoint(e), lx = stroke[stroke.length - 2], ly = stroke[stroke.length - 1];
+    if (Math.abs(p[0] - lx) + Math.abs(p[1] - ly) < 6) return;     /* drop points closer than about half a percent */
+    stroke.push(p[0], p[1]); drawSig();
+  });
+  function padUp() { stroke = null; }
+  pad.addEventListener('pointerup', padUp); pad.addEventListener('pointercancel', padUp);
+  $('padclear').onclick = function () { sig = null; drawSig(); };
+  window.addEventListener('resize', padSize);
   function say(html) { var m = $('msg'); m.innerHTML = html; m.classList.add('on'); }
-  function read() { var o = {}; fields.forEach(function (f) { o[f] = $(f).value.trim(); }); return o; }
-  function fill(o) { fields.forEach(function (f) { $(f).value = (o && o[f]) || ''; }); }
+  function read() { var o = {}; fields.forEach(function (f) { o[f] = $(f).value.trim(); }); if (sig && sig.s.length) o.sig = sig; return o; }
+  function fill(o) { fields.forEach(function (f) { $(f).value = (o && o[f]) || ''; }); sig = (o && o.sig) || null; drawSig(); }
   /* the words as UTF-8 in base64url, so any letter survives the link */
   function pack(o) {
     var bytes = new TextEncoder().encode(JSON.stringify(o)), s = '';
@@ -102,6 +151,7 @@
     } catch (e) { say('That link did not carry a whole letter. Ask for it again.'); fill(stored); }
     return true;
   }
+  padSize();
   if (!fromLink()) fill(stored);
   window.addEventListener('hashchange', fromLink);
   $('keep').onclick = function () {
