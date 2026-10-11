@@ -516,7 +516,9 @@ window.castleFrame = function (opts) {
       hole: { x: C.END_X, y: C.HOLE.y, z: C.MID_Z },          /* the round hole's centre on the end wall's face, its axis +x */
       door: { x: C.DOOR.x, z: C.HER_Z, w: C.DOOR.w, h: C.DOOR.h },
       paintingOpposite: { x: 1.5, y: 1.25, z: C.FAR_Z, w: 0.5, h: 0.55 },   /* where it hung; re-homed with Magic, provisional */
-      torches: [{ x: 0.9, y: 1.3, z: C.FAR_Z }, { x: 2.1, y: 1.3, z: C.FAR_Z }],
+      /* the pair either side of the painting opposite, and a third on the strip of outer wall the open hole sees, the one
+         Nick's passing dips blue (Godric, the Corridor's Q25, option 1, 10 October 2026, 11.19 pm; req 111, req 85) */
+      torches: [{ x: 0.9, y: 1.3, z: C.FAR_Z }, { x: 2.1, y: 1.3, z: C.FAR_Z }, { x: -0.5, y: 1.3, z: C.FAR_Z }],
       windows: C.WINDOW.xs.map(function (x) { return { x: x, y: C.WINDOW.sill + C.WINDOW.h / 2, z: C.GLASS_Z }; })
     };
     /* The hole's own frame (the room's: x along its wall, y up, z into the room, its origin on the room's face of the
