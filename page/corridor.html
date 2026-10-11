@@ -910,6 +910,7 @@ function groundsWeather() { return castle && castle.weather ? castle.weather() :
 function groundsWind() { var w = groundsWeather(); return w ? w.wind : 0.2 + 0.8 * dayRand(3); }
 function washing() {
   if (groundsQ.has('washing')) return { socks: groundsQ.get('washing') === 'socks' };
+  if (nightK() >= 0.5) return null;
   var w = groundsWeather();
   if (w) {
     if (w.sky === 'rain' || w.sky === 'snow' || w.sky === 'fog' || w.frozen || w.ground === 'snow') return null;
@@ -981,11 +982,11 @@ function rimeTexture() {
 function updateFrost() {
   if (t < FROST.next) return;
   FROST.next = t + 2;
-  var lv = frostLevels(), stage = view === 'stage', key = lv.grounds + ':' + lv.panes + ':' + stage;
+  var lv = frostLevels(), stage = view === 'stage', kN = nightK(), key = lv.grounds + ':' + lv.panes + ':' + stage + ':' + kN;
   if (key === FROST.level) return;
   FROST.level = key;
   if (FROST.grounds) { FROST.grounds.material.opacity = lv.grounds * 0.85; FROST.grounds.visible = lv.grounds > 0; }
-  FROST.panes.forEach(function (m) { m.material.opacity = lv.panes; m.visible = lv.panes > 0 && !stage; });
+  FROST.panes.forEach(function (m) { m.material.opacity = lv.panes; m.material.color.setScalar(1 - 0.6 * kN); m.visible = lv.panes > 0 && !stage; });
 }
 /* the day's sky over the view, in code, nothing generated (Events' weather, req 115: one sky for every window): cloudy
    dulls it under a grey wash, heavier where the sky shows; rain greys it further and runs down the glass of both
@@ -1045,10 +1046,12 @@ function updateSky(dt) {
   if (raining) SKY.rain[0].material.map.offset.y += dt * 0.035;
   if (t < SKY.next) return;
   SKY.next = t + 2;
-  var key = sky + ':' + stage + ':' + !!grounds.img;
+  var kN = nightK(), key = sky + ':' + stage + ':' + !!grounds.img + ':' + kN;
   if (key === SKY.key) return;
   SKY.key = key;
-  windows[0].sky.material.color.copy(col(SKY.plain[w ? w.sky : 'clear'] || SKY.plain.clear));
+  windows[0].sky.material.color.copy(col(SKY.plain[w ? w.sky : 'clear'] || SKY.plain.clear))
+    .lerp(col(kN >= 0.5 ? 0x141b2b : 0x7a8298), kN >= 0.5 ? 0.92 : kN ? 0.5 : 0);
+  SKY.rain.forEach(function (m) { m.material.color.setScalar(1 - 0.6 * kN); });
   windows[0].sky.userData.base = windows[0].sky.material.color.clone();
   if (!grounds.img) return;
   if (!SKY.veil) {
@@ -1145,11 +1148,13 @@ function drawGrounds(t) {
 function updateGrounds(dt) {
   updateFrost();
   updateSky(dt);
+  updateNight(dt);
   if (!grounds.canvas) return;
   var here = atStop && atStop.name === 'window';
   if (here && grounds.last !== atStop) {
     grounds.last = atStop;
-    if (groundsQ.has('hagrid') || Math.random() < 0.34) grounds.next = t + 3 + Math.random() * 3; else grounds.next = 0;
+    if (nightK() >= 0.5) grounds.next = 0;
+    else if (groundsQ.has('hagrid') || Math.random() < 0.34) grounds.next = t + 3 + Math.random() * 3; else grounds.next = 0;
   }
   if (!here) grounds.last = -1;
   if (grounds.next && t >= grounds.next && !grounds.crossing) { grounds.crossing = { t: 0, dur: 10 }; grounds.next = 0; }
@@ -1486,14 +1491,144 @@ function setPaintingSitter(who) {
 /* Daylight comes in at the window on the outer wall; the torches burn by day too, as the hole shows */
 var hemi = new THREE.HemisphereLight(col(0xbfc8d2), col(0x4a4038), 0.55);
 scene.add(hemi);
-windows.forEach(function (w) {
+var dayLights = windows.map(function (w) {
   var l = new THREE.PointLight(col(0xdfe6ee), 1.6, 9, 1.4);
   l.position.set(w.x, 2.2, FAR_Z + 0.8);
   scene.add(l);
+  return l;
 });
 var landingLight = new THREE.PointLight(col(0xdfe6ee), 1.6, 9, 1.4);
 landingLight.position.set(FAR_END_X + 0.8, FOOT_Y + 2.2, MID_Z);
 scene.add(landingLight);
+dayLights.push(landingLight);
+
+/* ---------- the corridor's night ---------- */
+/* By Events' clock (castle.time(): morning, day, evening, night; ?time= honoured), the corridor dims toward evening and
+   at night the daylight goes: the windows' lamps and the sky's fill sink to a moonlit blue, a little brighter under a
+   fuller moon that is up on a clear night, and the torches carry the corridor, a little stronger. Through the grounds'
+   window the view darkens; some nights a light shows in Hagrid's window and some nights it is dark, "There was still no
+   light in Hagrid's cabin" (OotP 13), and on a lit night a thread of smoke rises from his chimney (Godric's touches,
+   10 October 2026, 5.15 pm); his washing is in and he does not cross. The real moon (Magic's req 98; Events' moon(),
+   req 95) hangs in the glass of the plain window as high as it stands, its phase drawn as the dormitory draws it
+   (page/dormitory.html, drawMoon); a few stars there on a clear night. Shown only with ?time= until Godric says the
+   night goes live (NIGHT.live), so the page keeps its day meanwhile. */
+var NIGHT = { live: false, key: null, next: 0, view: null, canvas: null, tex: null, moon: null, stars: null, torchBoost: 1,
+  fog0: scene.fog.color.clone(), bg0: scene.background.clone(), hemi0: hemi.intensity, dark: col(0x0d1220),
+  WIN: [548, 1005, 571, 1038], GABLE: [447, 952, 470, 982], CHIMNEY: [555, 876], BOX: [420, 640, 280, 420] };
+function lightTime() {
+  if (!castle || !castle.time) return 'day';
+  return NIGHT.live || groundsQ.has('time') ? castle.time() : 'day';
+}
+function nightK() { var tt = lightTime(); return tt === 'night' ? 1 : tt === 'evening' ? 0.3 : 0; }
+function hagridHome() { return dayRand(6) < 0.67; }   /* about two nights in three his window is lit */
+function makeNightView() {
+  var b = NIGHT.BOX;
+  NIGHT.canvas = makeCanvas(b[2], b[3]); NIGHT.tex = tex(NIGHT.canvas);
+  var veil = new THREE.Mesh(new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h),
+    new THREE.MeshBasicMaterial({ color: 0x0b1322, transparent: true, opacity: 0, depthWrite: false }));
+  veil.position.z = 0.004; veil.name = 'grounds-night'; veil.renderOrder = 5.5; veil.visible = false;
+  var lit = new THREE.Mesh(new THREE.PlaneGeometry(b[2] / GROUNDS.px * GROUNDS.w, b[3] / GROUNDS.px * GROUNDS.w),
+    new THREE.MeshBasicMaterial({ map: NIGHT.tex, transparent: true, depthWrite: false }));
+  lit.position.set(((b[0] + b[2] / 2) / GROUNDS.px - 0.5) * GROUNDS.w, (0.5 - (b[1] + b[3] / 2) / GROUNDS.py) * GROUNDS.h, 0.005);
+  lit.name = 'grounds-night-lit'; lit.renderOrder = 5.7; lit.visible = false;
+  groundsWin.sky.add(veil); groundsWin.sky.add(lit);
+  /* his window's panes: the drawing's own dark pixels inside each frame, so the glazing bars stay */
+  var mk = makeCanvas(b[2], b[3]), g = mk.getContext('2d');
+  g.drawImage(grounds.img, -b[0], -b[1]);
+  var d = g.getImageData(0, 0, b[2], b[3]), px = d.data;
+  function inside(x, y, r) { return x >= r[0] && x <= r[2] && y >= r[1] && y <= r[3]; }
+  for (var y = 0; y < b[3]; y++) for (var x = 0; x < b[2]; x++) {
+    var i = (y * b[2] + x) * 4, X = x + b[0], Y = y + b[1], lum = 0.3 * px[i] + 0.59 * px[i + 1] + 0.11 * px[i + 2];
+    var on = (inside(X, Y, NIGHT.WIN) || inside(X, Y, NIGHT.GABLE)) && lum < 75;
+    px[i] = 255; px[i + 1] = 196; px[i + 2] = 110; px[i + 3] = on ? 255 : 0;
+  }
+  g.putImageData(d, 0, 0);
+  NIGHT.panes = mk;
+  NIGHT.view = { veil: veil, lit: lit };
+}
+function drawNightView() {
+  var g = NIGHT.canvas.getContext('2d'), b = NIGHT.BOX;
+  g.clearRect(0, 0, b[2], b[3]);
+  if (!hagridHome()) { NIGHT.tex.needsUpdate = true; return; }
+  var f = 0.85 + 0.15 * Math.sin(t * 7.1) * Math.sin(t * 3.3);   /* his fire flickers behind the glass */
+  g.save(); g.translate(-b[0], -b[1]);
+  [NIGHT.WIN, NIGHT.GABLE].forEach(function (r, j) {             /* the glow round each window */
+    var cx = (r[0] + r[2]) / 2, cy = (r[1] + r[3]) / 2, rad = (r[2] - r[0]) * (j ? 1.1 : 1.4);
+    var grd = g.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    grd.addColorStop(0, 'rgba(255,190,100,' + (0.35 * f).toFixed(2) + ')'); grd.addColorStop(1, 'rgba(255,190,100,0)');
+    g.fillStyle = grd; g.fillRect(cx - rad, cy - rad, rad * 2, rad * 2);
+  });
+  g.restore();
+  g.globalAlpha = 0.75 + 0.25 * f; g.drawImage(NIGHT.panes, 0, 0); g.globalAlpha = 1;
+  /* the thread of smoke: soft puffs rising from the chimney, leaning with the day's wind and spreading as they climb */
+  var c = NIGHT.CHIMNEY, wind = groundsWind();
+  for (var n = 0; n < 14; n++) {
+    var a = (t * 0.12 + n / 14) % 1, y = c[1] - b[1] - a * 230, x = c[0] - b[0] + a * a * (40 + 160 * wind) + 4 * Math.sin(t * 0.9 + n);
+    g.fillStyle = 'rgba(150,158,172,' + (0.34 * (1 - a)).toFixed(3) + ')';
+    g.beginPath(); g.arc(x, y, 3 + a * 16, 0, 7); g.fill();
+  }
+  NIGHT.tex.needsUpdate = true;
+}
+function makeMoon() {
+  var w = windows[0], fp = w.frame.position, gp = w.frame.geometry.parameters;
+  NIGHT.moonCanvas = makeCanvas(128, 128); NIGHT.moonTex = tex(NIGHT.moonCanvas);
+  NIGHT.moon = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.16),
+    new THREE.MeshBasicMaterial({ map: NIGHT.moonTex, transparent: true, depthWrite: false, fog: false }));
+  NIGHT.moon.position.set(fp.x + 0.25, fp.y, GLASS_Z + 0.007); NIGHT.moon.name = 'window-2-moon'; NIGHT.moon.visible = false; NIGHT.moon.renderOrder = 4;
+  scene.add(NIGHT.moon);
+  var sc = makeCanvas(128, 256), g = sc.getContext('2d'), rnd = 5;
+  function rand() { rnd = (rnd * 16807) % 2147483647; return rnd / 2147483647; }
+  for (var n = 0; n < 60; n++) { g.fillStyle = 'rgba(235,238,250,' + (0.35 + 0.6 * rand()).toFixed(2) + ')'; g.beginPath(); g.arc(rand() * 128, rand() * 256, 0.25 + rand() * 0.45, 0, 7); g.fill(); }
+  NIGHT.stars = new THREE.Mesh(new THREE.PlaneGeometry(gp.width, gp.height),
+    new THREE.MeshBasicMaterial({ map: tex(sc), transparent: true, depthWrite: false, fog: false }));
+  NIGHT.stars.position.set(fp.x, fp.y, GLASS_Z + 0.006); NIGHT.stars.name = 'window-2-stars'; NIGHT.stars.visible = false; NIGHT.stars.renderOrder = 3;
+  scene.add(NIGHT.stars);
+}
+function drawMoonDisc(m) {   /* as the dormitory draws it (page/dormitory.html, drawMoon) */
+  var g = NIGHT.moonCanvas.getContext('2d'), r = 60, c = 64;
+  g.clearRect(0, 0, 128, 128);
+  g.fillStyle = 'rgba(60,70,90,0.35)'; g.beginPath(); g.arc(c, c, r, 0, Math.PI * 2); g.fill();
+  var e = m.age / 29.53 * Math.PI * 2, side = m.waxing ? 1 : -1, k = Math.cos(e);
+  g.fillStyle = '#f4f0e2'; g.beginPath();
+  g.arc(c, c, r, -Math.PI / 2, Math.PI / 2, side < 0);
+  g.ellipse(c, c, Math.abs(k) * r, r, 0, Math.PI / 2, -Math.PI / 2, (k > 0) === (side > 0));
+  g.fill();
+  NIGHT.moonTex.needsUpdate = true;
+}
+function updateNight(dt) {
+  if (!NIGHT.moon) makeMoon();
+  if (grounds.img && !NIGHT.view) makeNightView();
+  var k = nightK(), night = k >= 0.5;
+  if (NIGHT.view && night && atStop && atStop.name === 'window') drawNightView();   /* the smoke moves only where it is seen */
+  if (t < NIGHT.next) return;
+  NIGHT.next = t + 2;
+  var w = groundsWeather(), m = castle && castle.moon ? castle.moon() : null;
+  var moonUp = !!(m && m.up && m.lit >= 0.02), clear = !w || w.sky === 'clear';
+  var moonlight = moonUp ? (clear ? 1 : 0.3) * m.lit : 0;
+  var key = k + ':' + moonlight.toFixed(2) + ':' + clear + ':' + !!NIGHT.view + ':' + (m ? m.age.toFixed(1) + ':' + m.height.toFixed(2) : '');
+  if (key === NIGHT.key) return;
+  NIGHT.key = key;
+  hemi.intensity = NIGHT.hemi0 * (1 - 0.8 * k) + 0.06 * moonlight * k;
+  hemi.color.copy(col(0xbfc8d2)).lerp(col(0x6a7898), k);
+  dayLights.forEach(function (l) { l.intensity = 1.6 * (1 - 0.85 * k) + 0.25 * moonlight * k; l.color.copy(col(0xdfe6ee)).lerp(col(0x9aaccc), k); });
+  scene.fog.color.copy(NIGHT.fog0).lerp(NIGHT.dark, k); scene.background.copy(NIGHT.bg0).lerp(NIGHT.dark, k);
+  NIGHT.torchBoost = 1 + 0.35 * k;
+  if (NIGHT.view) {
+    NIGHT.view.veil.material.opacity = night ? 0.86 - 0.14 * moonlight : 0.25;
+    NIGHT.view.veil.visible = k > 0;
+    NIGHT.view.lit.visible = night;
+    if (night) drawNightView();
+  }
+  if (grounds.canvas) drawGrounds(t);   /* the washing comes in */
+  NIGHT.stars.visible = night && clear;
+  NIGHT.moon.visible = night && moonUp;
+  if (NIGHT.moon.visible) {
+    drawMoonDisc(m);
+    var fp = windows[0].frame.position, H = windows[0].frame.geometry.parameters.height;
+    NIGHT.moon.position.y = fp.y - H / 2 + 0.5 + (H - 0.95) * Math.min(1, m.height / 0.6);   /* 0.6 of the way overhead fills the glass */
+    NIGHT.moon.material.opacity = clear ? 1 : 0.5;
+  }
+}
 
 /* ---------- the two views ---------- */
 /* length: from the stair head at a boy's eye, looking down to her end; a drag turns the head.
@@ -2319,7 +2454,7 @@ function frame() {
   glimpseLight.intensity = 1.4 * Math.sin(doorLeaf.ang);
   torches.forEach(function (tc, i) {
     var k = 0.85 + 0.15 * Math.sin(t * 11 + i) * Math.sin(t * 4.3 + i * 2);
-    tc.light.intensity = 1.6 * k;
+    tc.light.intensity = 1.6 * k * ((NIGHT && NIGHT.torchBoost) || 1);
     tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(t * 7.3 + i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(t * 9.1 + i))), 1);
     if (tc.lean) tc.flame.material.rotation = -0.4 + 0.08 * Math.sin(t * 5.1);   /* leaning toward the arch */
     if (doorTorches.indexOf(tc) >= 0) {       /* the draught: fluttering and guttering */
