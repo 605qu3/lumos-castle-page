@@ -2329,7 +2329,7 @@ function updateSign(dt) {
   signCheck = 2;
   var down = signDownToday();
   if (down === signDown && gallonsPaper.hidden === down) return;
-  if (held === gallonsPaper) return;               /* never taken from his hand */
+  if (held === gallonsPaper || mode === 'board' || mode === 'hand') return;   /* never changed under his eye */
   signDown = down;
   gallonsPaper.hidden = down;                      /* its pin stays, through the torn corner */
   gallonsPaper.mesh.visible = gallonsPaper.shadow.visible = papersPainted && !down;
