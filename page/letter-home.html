@@ -91,14 +91,19 @@
   }
   var stored = null;
   try { stored = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { stored = null; }
-  var came = /[#&]l=([A-Za-z0-9_-]+)/.exec(location.hash);
-  if (came) {
+  /* read on load, and again when a link is opened over this page already open (only the part after the # changes) */
+  function fromLink() {
+    var came = /[#&]l=([A-Za-z0-9_-]+)/.exec(location.hash);
+    if (!came) return false;
     try {
       fill(unpack(came[1]));
       $('lede').textContent = 'A letter came by link. Read it over, then keep it on this iPad.';
       history.replaceState(null, '', location.pathname);          /* the words leave the address bar */
     } catch (e) { say('That link did not carry a whole letter. Ask for it again.'); fill(stored); }
-  } else fill(stored);
+    return true;
+  }
+  if (!fromLink()) fill(stored);
+  window.addEventListener('hashchange', fromLink);
   $('keep').onclick = function () {
     var o = read();
     if (!o.note) { say('The letter is empty.'); return; }

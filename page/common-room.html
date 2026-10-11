@@ -2137,6 +2137,15 @@ function alphaSolid(al, uv) {
   return al.a[(y * al.w + x) * 4 + 3] > 100;
 }
 function scarfSolid(uv) { return alphaSolid(scarfAlpha, uv); }
+/* the stair's card stands 0.7 m before its newel, over the desk: a tap counts on its stone only, so the letter at the
+   books' foot is reached through the clear part of the drawing (11 October 2026: a real tap there climbed the stair) */
+var stairsAlpha = null;
+function stairsSolid(uv) {
+  var im = stairs.material.map && stairs.material.map.image;
+  if (!im || !im.width || im.width < 512) return true;    /* still the grey stand-in: all of it counts */
+  if (!stairsAlpha || stairsAlpha.src !== im) { stairsAlpha = alphaOf(im); stairsAlpha.src = im; }
+  return alphaSolid(stairsAlpha, uv);
+}
 new THREE.TextureLoader().load(SCARF.url, function (t) {
   t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
   var h = SCARF.w * t.image.height / t.image.width;
@@ -4040,6 +4049,7 @@ function tap(cx, cy) {
     if (h.object === scarf) return scarf.visible && scarfSolid(h.uv);
     if (h.object === satchel) return satchelSolid(h.uv);
     if (h.object === cloak) return alphaSolid(cloakAlpha, h.uv);
+    if (h.object === stairs) return stairsSolid(h.uv);
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
