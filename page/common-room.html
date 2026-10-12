@@ -674,7 +674,7 @@ turned down for hanging facing out. Keyed at 1189 x 2488 px, 2378 px per metre, 
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look around. Tap the fire, the rug or an armchair to go up to the fireside, then tap the fire to work the bellows. Tap the portrait hole to open it, the cat to make it sit. Tap the notice board to walk up to it, then tap a notice to take it down. The grey shapes are placeholders.</div>
+<div id="help">Drag to look around.</div>
 
 <script>
 var TILES = {
@@ -1142,22 +1142,45 @@ onWall(ladder, BOOKCASE_THETA + 0.07, 1.62, 5.05); ladder.rotateX(-0.12); regist
    key opens it (what lies behind is Magic's B4). 84 degrees right of the hearth (B2's plan drew it at about 87): on the
    iPad it is seen only on the long drag toward the stair, and there whole only from 83 to 86 degrees; nearer, the
    stair's stone and the desk's quill cover part of it (tools/probe-keydoor.mjs). On a wide screen it shows at rest. */
-var KEYDOOR = { deg: 84, w: 0.7, h: 1.1, r: 5.46, shake: 0, hole: 0.68 };   /* hole: the keyhole's height, of the door's */
+/* Flush with the stone (Godric, 12 October 2026, 7.09 pm, his arrow on the 2.09 pm shot: follow the wall's curve): it
+   stood 14 cm in from the wall as a flat plane; now it is bent to the round wall, as the hole's ring is, its face 1 cm
+   proud of the stone (bentPlane), its drawing kept. r is the wall's own, so its middle is where the stone is.
+   Drawn (Godric's Q70, 7.41 pm: key-door round 3 candidate 2, assets/layers/key-door.png, its LAYERS entry): 720 by 960
+   px at 800 px a metre, so the card is 0.9 by 1.2 m whole, the stone band and the sill with it, the oak leaf inside
+   about 0.67 by 0.97 m from the sill's top; the sill stands on the floor. hole is the drawn keyhole, measured off the
+   image (its dark opening's middle at 551.7, 532.3 px): u across from the left, v up from the sill's foot, so 0.535 m
+   up, a crouching boy's eye. The keyhole's tap, the spell's face, the keyhole stop follow it. */
+var KEYDOOR = { deg: 84, w: 0.9, h: 1.2, r: WALL_R, shake: 0, hole: { u: 551.7 / 720, v: 1 - 532.3 / 960 } };
+/* a point across the bent door's face, x along it from its middle: where it is in the door's frame and how it turns */
+function keyDoorFace(x) { var r = WALL_R - 0.01, f = x / r; return { x: r * Math.sin(f), z: WALL_R - r * Math.cos(f), yaw: -f }; }
 /* the big lock about two thirds of the way up (Godric's Q49 t1, 12 October 2026, 1.55 pm): its keyhole at 0.75 m, a boy's
    eye when he crouches */
 function drawKeyDoor(g, w, h) {
   arch(g, 0, 0, w, h);
-  var face = g.fillStyle, ky = h * (1 - KEYDOOR.hole);
+  var face = g.fillStyle, ky = h * (1 - KEYDOOR.hole.v), kx = w * KEYDOOR.hole.u;   /* until the drawing loads */
   g.fillStyle = '#8f8c86';
   for (var i = 1; i < 4; i++) g.fillRect(w * i / 4 - 1, h * 0.12, 2, h * 0.86);   /* the planks */
-  g.fillRect(w * 0.72, ky - h * 0.065, w * 0.16, h * 0.13);                         /* the big lock */
+  g.fillRect(kx - w * 0.08, ky - h * 0.065, w * 0.16, h * 0.13);                    /* the big lock */
   g.fillStyle = '#26221e';                                                          /* its keyhole */
-  g.beginPath(); g.arc(w * 0.8, ky - h * 0.008, h * 0.009, 0, Math.PI * 2); g.fill();
-  g.fillRect(w * 0.8 - h * 0.004, ky - h * 0.006, h * 0.008, h * 0.022);
+  g.beginPath(); g.arc(kx, ky - h * 0.008, h * 0.009, 0, Math.PI * 2); g.fill();
+  g.fillRect(kx - h * 0.004, ky - h * 0.006, h * 0.008, h * 0.022);
   g.fillStyle = face;
 }
-var keyDoor = new THREE.Mesh(new THREE.PlaneGeometry(KEYDOOR.w, KEYDOOR.h), new THREE.MeshStandardMaterial({ map: cutoutTexture(140, 220, '#b9b6b0', drawKeyDoor, 'key door'), roughness: 0.9, alphaTest: 0.5 }));
+var keyDoor = new THREE.Mesh(bentPlane(KEYDOOR.w, KEYDOOR.h), new THREE.MeshStandardMaterial({ map: cutoutTexture(180, 240, '#b9b6b0', drawKeyDoor, 'key door'), roughness: 0.9, alphaTest: 0.5 }));
 keyDoor.receiveShadow = true; onWall(keyDoor, Math.PI - KEYDOOR.deg * Math.PI / 180, KEYDOOR.h / 2, KEYDOOR.r); register(keyDoor, 0); keyDoor.name = 'key-door';
+/* a tight soft dark line where the sill meets the flagstones, so it sits on them (as the log basket's pool) */
+var keyDoorSill = new THREE.Mesh(new THREE.PlaneGeometry(0.74, 0.12), new THREE.MeshBasicMaterial({ map: (function () {
+  var c = makeCanvas(64, 32), g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 32);
+  gr.addColorStop(0, 'rgba(0,0,0,0.85)'); gr.addColorStop(0.35, 'rgba(0,0,0,0.45)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 32);
+  var e = g.createLinearGradient(0, 0, 64, 0);   /* soft at its two ends */
+  e.addColorStop(0, 'rgba(0,0,0,1)'); e.addColorStop(0.12, 'rgba(0,0,0,0)'); e.addColorStop(0.88, 'rgba(0,0,0,0)'); e.addColorStop(1, 'rgba(0,0,0,1)');
+  g.globalCompositeOperation = 'destination-out'; g.fillStyle = e; g.fillRect(0, 0, 64, 32);
+  return tex(c);
+})(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -3 }));
+keyDoorSill.rotation.x = -Math.PI / 2;
+keyDoorSill.position.set(0, -KEYDOOR.h / 2 + 0.004, 0.01 + 0.06);
+keyDoor.add(keyDoorSill); keyDoorSill.name = 'key-door-sill';
 
 /* ---------- notice board (tap to approach, tap a notice to take it down) ---------- */
 /* Hands and faces, as settled in the hand bake-off and the design system's tokens/fonts.css:
@@ -3247,6 +3270,8 @@ var LAYERS = {
   /* the mason's ring round the hole's mouth, bent to the round wall; tinted from the wall beside it, a step lighter */
   'portrait-hole-ring': { url: '../assets/layers/portrait-hole-ring.png', w: 1.7, pivot: 'centre', bend: true, tint: 0x483426,
     sill: { spread: 70, inner: 0.58, outer: 0.85, smooth: 1.0, strength: 0.85, pale: 1.9 } },
+  /* the little door, the joiner's and the locksmith's (Q70), bent to the round wall as the ring is; its sill on the floor */
+  'key-door': { url: '../assets/layers/key-door.png', w: 0.9, pivot: 'centre', bend: true },
   /* a surface is opaque and lies under everything: its image replaces the placeholder's flat colour.
      The floor is drawn as a plan; with the circle laid flat, the image's top edge is the hearth side */
   'floor': { url: '../assets/layers/floor.jpg', surface: true, tint: 0x999999,
@@ -4603,53 +4628,137 @@ function faceEye() {
    centimetres up the card, above the floor; the fire threw their shadows off the floor, detached from the legs, the
    proof that the chair floats. Each drawn floor piece gets an invisible twin, lowered until its highest drawn foot
    touches the floor, which casts the fire's shadow; the drawing itself casts none. The feet are read off the drawing's
-   alpha once it has loaded: the lowest opaque pixel of each run of columns in its bottom two-fifths. */
-var TWINNED = ['armchair-left', 'sofa', 'wingback', 'table', 'side-table', 'desk-chair', 'candle-stand'];
-var twins = [];
-function highestFootFrac(im) {
-  /* the outer feet, as the pipeline's level check reads them: the lowest opaque pixel in the drawing's left and right
-     quarters (of its opaque width); the highest of these and of any separate leg is the foot drawn highest */
+   alpha once it has loaded: the lowest opaque pixel of each run of columns in its bottom two-fifths.
+   Pinned to the eye (Godric, 12 October 2026, 7.09 pm: "stop floating", on his shots of 2.07 to 2.10 pm). A card has one
+   floor line, and a foot drawn above it reads, from the eye, as standing on the floor some way behind the card; the twin
+   lowered in the card's own plane began its shadow at that floor line, under the drawn foot, so the far legs stood clear
+   of their shadows (the pair's, the round table's, the candle stand's, the desk's) and the scarf's fringe of its. Now,
+   every frame, the twin is the drawing scaled about the eye until its highest drawn foot is on the floor: from where he
+   stands it covers the drawing exactly, so its shadow starts at the drawn feet at rest, on the drags and at every stop.
+   It lies on the card's far side from the eye, so it never shades the drawing's lit face. And each drawn foot gets a
+   small soft dark pool where it appears to stand, as the log basket has, found the same way along the eye's line: a
+   foot drawn above the card's floor line behind the card, one drawn below it before the card. No drawing moved. */
+var TWINNED = ['armchair-left', 'sofa', 'wingback', 'table', 'side-table', 'desk-chair', 'candle-stand', 'house-scarf-arm'];
+var twins = [], FOOT_ROOM = WALL_R - 0.05, FOOT_POOL = 0.8, _foot = new THREE.Vector3(), _eye = new THREE.Vector3();
+var footPoolTex = (function () {
+  var c = makeCanvas(64, 64), g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 1, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(0,0,0,0.95)'); gr.addColorStop(0.45, 'rgba(0,0,0,0.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64); return tex(c);
+})();
+var footPoolGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+var TWIN_ONE_FOOT = { 'house-scarf-arm': true };
+/* The floor cut each drawing off at its floor line, so a near foot drawn below it lost its toe and stood as a flat-cut
+   leg (the round table's at its stop). Each drawing is drawn first and marks its pixels in the stencil; the floor, the
+   rug and the pools leave those pixels alone, so the whole drawing shows, each near foot where it appears to stand.
+   Anything nearer than the drawing (the cat, a person, the wall) still covers it by depth as before. */
+function markCard(mat) {
+  mat.stencilWrite = true; mat.stencilRef = 1; mat.stencilFunc = THREE.AlwaysStencilFunc;
+  mat.stencilZPass = THREE.ReplaceStencilOp; mat.stencilFail = mat.stencilZFail = THREE.KeepStencilOp;
+}
+function underCard(mat) {
+  if (mat.userData.underCard) return;
+  mat.stencilWrite = true; mat.stencilRef = 1; mat.stencilFunc = THREE.NotEqualStencilFunc; mat.stencilWriteMask = 0;
+  mat.stencilZPass = mat.stencilFail = mat.stencilZFail = THREE.KeepStencilOp;
+  mat.userData.underCard = true; mat.needsUpdate = true;
+}
+function floorUnderCards() {   /* every frame, cheaply: the rug's drawing comes with a material of its own */
+  underCard(floor.material); underCard(rug.material); underCard(floorBeyond.material);
+}
+/* the drawn feet: the basins of the drawing's lowest opaque pixel across its width, in its bottom 35 per cent. Each is
+   u across (0 the image's left), v up from the image's foot and w wide, as fractions of the image */
+function drawnFeet(im) {
   var W = Math.min(256, im.width), H = Math.round(im.height * W / im.width);
   var c = makeCanvas(W, H), g = c.getContext('2d');
   g.drawImage(im, 0, 0, W, H);
-  var a = g.getImageData(0, 0, W, H).data, low = [], x0 = -1, x1 = -1;
+  var a = g.getImageData(0, 0, W, H).data, p = [], xs = [], used = [], feet = [], tol = Math.max(1, Math.round(H * 0.012));
   for (var x = 0; x < W; x++) {
-    low[x] = -1;
-    for (var y = H - 1; y >= 0; y--) if (a[(y * W + x) * 4 + 3] > 127) { low[x] = y; break; }
-    if (low[x] >= 0) { if (x0 < 0) x0 = x; x1 = x; }
+    p[x] = -1;
+    for (var y = H - 1; y >= 0; y--) if (a[(y * W + x) * 4 + 3] > 127) { p[x] = H - 1 - y; break; }
+    if (p[x] >= 0 && p[x] < H * 0.35) xs.push(x);
   }
-  if (x0 < 0) return 0;
-  var q = Math.max(1, Math.round((x1 - x0) / 4)), left = -1, right = -1;
-  for (var k = x0; k < x0 + q; k++) left = Math.max(left, low[k]);
-  for (var k2 = x1 - q + 1; k2 <= x1; k2++) right = Math.max(right, low[k2]);
-  /* and each separate leg in the bottom two-fifths, which catches a back leg standing between the outer two */
-  var top = Math.min(left, right), run = false, runLow = 0;
-  for (var x2 = 0; x2 <= W; x2++) {
-    var l = x2 < W && low[x2] >= H * 0.6 ? low[x2] : -1;
-    if (l >= 0) { runLow = run ? Math.max(runLow, l) : l; run = true; }
-    else if (run) { top = Math.min(top, runLow); run = false; }
+  xs.sort(function (i, j) { return p[i] - p[j]; });
+  function low(k, lim) { return k >= 0 && k < W && p[k] >= 0 && p[k] <= lim; }
+  for (var n = 0; n < xs.length; n++) {
+    var x0 = xs[n]; if (used[x0]) continue;
+    var lo = x0, hi = x0, lim = p[x0] + tol, taken = false, k;
+    while (low(lo - 1, lim)) lo--;
+    while (low(hi + 1, lim)) hi++;
+    for (k = lo; k <= hi; k++) if (used[k]) taken = true;
+    var a0 = lo, b0 = hi;   /* a new foot takes its leg too, up each side while the outline rises */
+    if (!taken) { while (a0 > 0 && p[a0 - 1] >= p[a0]) a0--; while (b0 < W - 1 && p[b0 + 1] >= p[b0]) b0++; }
+    for (k = a0; k <= b0; k++) used[k] = true;
+    if (!taken && hi > lo) feet.push({ u: (lo + hi + 1) / 2 / W, v: p[x0] / H, w: (hi - lo + 1) / W });
   }
-  return (H - 1 - top) / H;
+  return feet;
+}
+/* how far along the eye's line through p (1 at p) the floor is: where a foot drawn at p appears to stand. Short of the
+   wall's foot, so a pool never goes behind the stone (the desk's far leg is drawn as if the wall were further off) */
+function eyeToFloor(eye, p) {
+  if (eye.y < Math.max(0, p.y) + 0.2 || Math.abs(p.y) <= 0.002) return 1;
+  if (p.y < 0) return eye.y / (eye.y - p.y);   /* a near foot drawn below the card's floor line stands nearer the eye */
+  var k = eye.y / (eye.y - p.y), dx = p.x - eye.x, dz = p.z - eye.z, x = eye.x + dx * k, z = eye.z + dz * k;
+  if (x * x + z * z <= FOOT_ROOM * FOOT_ROOM) return k;
+  var A = dx * dx + dz * dz, B = 2 * (eye.x * dx + eye.z * dz), C = eye.x * eye.x + eye.z * eye.z - FOOT_ROOM * FOOT_ROOM, D = B * B - 4 * A * C;
+  return D < 0 ? 1 : clamp((-B + Math.sqrt(D)) / (2 * A), 1, k);
 }
 function updateTwins() {
   for (var i = 0; i < TWINNED.length; i++) {
     var m = scene.getObjectByName(TWINNED[i]);
     /* only once the drawing has replaced the grey placeholder, whose canvas has no feet to read */
     if (!m || m.userData.twin || !m.material.map || !m.customDepthMaterial || !m.material.map.image || m.material.map.image.tagName !== 'IMG') continue;
-    var im = m.material.map.image, h = m.geometry.parameters.height, entry = LAYERS[TWINNED[i]];
-    var lift = Math.max(0, (highestFootFrac(im) - (entry.sink || 0)) * h);
     var tw = new THREE.Mesh(m.geometry, new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }));
     tw.customDepthMaterial = m.customDepthMaterial; tw.customDistanceMaterial = m.customDistanceMaterial;
     tw.castShadow = true; tw.receiveShadow = false; tw.name = TWINNED[i] + '-shadow';
     scene.add(tw);
     m.castShadow = false;
-    m.userData.twin = { mesh: tw, lift: lift };
+    /* drawn before the floor, marking its pixels, so the floor no longer cuts the near feet off at the card's floor line */
+    m.renderOrder = -1; markCard(m.material);
+    var poolMat = new THREE.MeshBasicMaterial({ map: footPoolTex, color: 0x000000, transparent: true, opacity: FOOT_POOL, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -3 });
+    underCard(poolMat);
+    var feet = drawnFeet(m.material.map.image), w = m.geometry.parameters.width, pools = [];
+    if (TWIN_ONE_FOOT[TWINNED[i]] && feet.length > 1) {   /* the scarf's fringe: one pool across its tassels */
+      var u0 = 1, u1 = 0, vTop = 0;
+      feet.forEach(function (f) { u0 = Math.min(u0, f.u - f.w / 2); u1 = Math.max(u1, f.u + f.w / 2); vTop = Math.max(vTop, f.v); });
+      feet = [{ u: (u0 + u1) / 2, v: vTop, w: u1 - u0 }];
+    }
+    feet.forEach(function (f) {
+      var pm = new THREE.Mesh(footPoolGeo, poolMat), pw = clamp(f.w * w * 2.2, 0.07, 0.22);
+      pm.scale.set(pw, 1, pw * 0.8); pm.name = TWINNED[i] + '-foot'; scene.add(pm); pools.push(pm);
+    });
+    m.userData.twin = { mesh: tw, feet: feet, pools: pools, poolMat: poolMat, mirror: m.material.map.repeat.x < 0 };
     twins.push(m);
   }
+  floorUnderCards();
+  _eye.copy(camera.position);
   for (var j = 0; j < twins.length; j++) {
-    var src = twins[j], t = src.userData.twin;
-    t.mesh.position.copy(src.position); t.mesh.position.y -= t.lift;
+    var src = twins[j], t = src.userData.twin, gp = src.geometry.parameters, top = null, topY = -1;
+    src.castShadow = false;
+    src.updateMatrixWorld();
+    var fade = src.material.transparent ? src.material.opacity : 1;
+    t.poolMat.opacity = FOOT_POOL * fade;
+    for (var f = 0; f < t.feet.length; f++) {
+      var ft = t.feet[f], pool = t.pools[f];
+      _foot.set((t.mirror ? 0.5 - ft.u : ft.u - 0.5) * gp.width, (ft.v - 0.5) * gp.height, 0);
+      src.localToWorld(_foot);
+      if (_foot.y > topY) { topY = _foot.y; top = f; }
+      var k = eyeToFloor(_eye, _foot);
+      pool.position.copy(_eye).lerp(_foot, k);
+      pool.position.y = Math.max(0, pool.position.y) + 0.006;
+      pool.rotation.y = src.rotation.y;
+      pool.visible = src.visible;
+    }
+    /* the twin: the drawing scaled about the eye by its highest foot's k, which lays that foot on the floor */
+    var s = 1;
+    if (top !== null) {
+      _foot.set((t.mirror ? 0.5 - t.feet[top].u : t.feet[top].u - 0.5) * gp.width, (t.feet[top].v - 0.5) * gp.height, 0);
+      src.localToWorld(_foot); s = eyeToFloor(_eye, _foot);
+    }
+    t.mesh.position.copy(_eye).lerp(src.position, s);
     t.mesh.rotation.copy(src.rotation);
+    t.mesh.scale.copy(src.scale).multiplyScalar(s);
+    t.mesh.visible = src.visible;
+    t.mesh.castShadow = fade > 0.5;
   }
 }
 function updateBellows(dt) {
@@ -4774,7 +4883,8 @@ function updateDeskChair(dt) {                             /* he sits: the chair
   DESK_STOP.sat = clamp(DESK_STOP.sat + (DESK_STOP.seat ? dt : -dt) / 0.8, 0, 1);
   var m = deskChair.material;
   if (!m.transparent && DESK_STOP.sat > 0) { m.transparent = true; m.needsUpdate = true; }
-  m.opacity = 1 - DESK_STOP.sat; deskChair.visible = DESK_STOP.sat < 0.99; deskChair.castShadow = DESK_STOP.sat < 0.5;
+  m.opacity = 1 - DESK_STOP.sat; deskChair.visible = DESK_STOP.sat < 0.99;
+  if (!deskChair.userData.twin) deskChair.castShadow = DESK_STOP.sat < 0.5;   /* once twinned, its twin casts, as faded */
 }
 function leaveDesk() {
   mode = 'tween';
@@ -5157,8 +5267,11 @@ function keyDoorTap() {
     if (castle) castle.moment('tried little door');   /* req 194: his first try goes on the list, once ever (the runtime's) */
   }, function () { LOCKS.door = null; });
 }
-/* the door's lock on the screen, for the spell's face: the stand-in's box at 0.8 across, its keyhole KEYDOOR.hole up */
-function keyholeAt(z) { return keyDoor.localToWorld(new THREE.Vector3(0.3 * KEYDOOR.w, (KEYDOOR.hole - 0.5) * KEYDOOR.h, z || 0)); }
+/* the door's lock on the screen, for the spell's face: the drawn keyhole (KEYDOOR.hole) on the bent face, z off it */
+function keyholeAt(z) {
+  var f = keyDoorFace((KEYDOOR.hole.u - 0.5) * KEYDOOR.w);
+  return keyDoor.localToWorld(new THREE.Vector3(f.x, (KEYDOOR.hole.v - 0.5) * KEYDOOR.h, f.z + (z || 0)));
+}
 function keyDoorLock() { return screenOf(keyholeAt()); }
 /* ---------- the list on the little door (req 176; Magic for the boys, "Alohomora in the castle", B6 and *The list,
    written*, docs/archive/magic-to-2026-10-12.md; Godric, 12 October 2026, 2.56 pm, option 1: "let's get comical and
@@ -5235,10 +5348,11 @@ var listDoorCanvas = makeCanvas(160, 1140), listFloorCanvas = makeCanvas(160, 52
 listScribble(listDoorCanvas.getContext('2d'), 160, 1140, 7, true);
 listScribble(listFloorCanvas.getContext('2d'), 160, 520, 31, false);
 var listStrip = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, LIST.top), new THREE.MeshStandardMaterial({ map: tex(listDoorCanvas), roughness: 0.95 }));
-listStrip.position.set(LIST.x, LIST.top / 2 - KEYDOOR.h / 2, 0.004); listStrip.receiveShadow = true;
+var LIST_ON = keyDoorFace(LIST.x);   /* on the bent door's face, 4 mm proud, turned with it */
+listStrip.position.set(LIST_ON.x, LIST.top / 2 - KEYDOOR.h / 2, LIST_ON.z + 0.004); listStrip.rotation.y = LIST_ON.yaw; listStrip.receiveShadow = true;
 keyDoor.add(listStrip); listStrip.name = 'door-list';
 var listRun = new THREE.Group();
-listRun.position.set(LIST.x, -KEYDOOR.h / 2 + 0.002, 0.004); listRun.rotation.y = 0.22; keyDoor.add(listRun);
+listRun.position.set(LIST_ON.x, -KEYDOOR.h / 2 + 0.002, LIST_ON.z + 0.004); listRun.rotation.y = 0.22 + LIST_ON.yaw; keyDoor.add(listRun);
 var listFloor = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, 0.42), new THREE.MeshStandardMaterial({ map: tex(listFloorCanvas), roughness: 0.95 }));
 listFloor.rotation.x = -Math.PI / 2; listFloor.position.set(0, 0, 0.21); listFloor.receiveShadow = true; listRun.add(listFloor);
 var listRoll = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, LIST.w + 0.004, 18), new THREE.MeshStandardMaterial({ color: '#bdb8ae', roughness: 0.95 }));
@@ -5367,7 +5481,9 @@ function listDrag(dy) {                                /* screen pixels to the s
    darkness and, in words, a faint smell of chocolate; Back or any tap stands him up again. The lock's box and a finger's
    width around it count (uv: the door's width across, its height up). */
 var KEYHOLE_STOP = { d: 0.3 };                         /* metres off the door's face, his eye level with the keyhole */
-function onKeyhole(uv) { return !!uv && Math.abs(uv.x - 0.8) < 0.16 && Math.abs(uv.y - KEYDOOR.hole) < 0.11; }
+function onKeyhole(uv) {   /* the drawn lock's plate and a little round it, about 0.1 m each way of the keyhole */
+  return !!uv && Math.abs(uv.x - KEYDOOR.hole.u) < 0.12 && Math.abs(uv.y - KEYDOOR.hole.v) < 0.09;
+}
 var keyholeDark = document.getElementById('keyhole');
 function goKeyhole() {
   mode = 'tween';
