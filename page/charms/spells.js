@@ -243,6 +243,206 @@ function castOver(opts) {
     judge: function (pts) { var out = judge(pts); if (out) finish(out); return out; } };
 }
 
+/* The clear layer a room's spell waits on (req 146): over the whole page, taking touches until it is done, then gone. */
+function layer(hooks) {
+  var doc = root.document, cv = doc.createElement('canvas'), cx = cv.getContext('2d'), raf = 0, finished = false, resolve;
+  var L = { cv: cv, cx: cx, W: 0, H: 0, done: new Promise(function (r) { resolve = r; }) };
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483000;touch-action:none;background:transparent';
+  function size() {
+    var DPR = Math.min(root.devicePixelRatio || 1, 2.5); L.W = root.innerWidth; L.H = root.innerHeight;
+    cv.width = Math.round(L.W * DPR); cv.height = Math.round(L.H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (hooks.size) hooks.size();
+  }
+  function frame(now) { if (finished) return; cx.clearRect(0, 0, L.W, L.H); hooks.frame(now); raf = root.requestAnimationFrame(frame); }
+  L.pt = function (ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(root.performance.now()) }; };
+  L.finish = function (out) {
+    if (finished) return; finished = true; root.cancelAnimationFrame(raf);
+    root.removeEventListener('resize', size); if (cv.parentNode) cv.parentNode.removeChild(cv); resolve(out);
+  };
+  L.later = function (out, ms) { root.setTimeout(function () { L.finish(out); }, ms); };
+  cv.addEventListener('pointerdown', function (ev) { ev.preventDefault(); hooks.down(ev); });
+  cv.addEventListener('pointermove', function (ev) { if (hooks.move) hooks.move(ev); });
+  cv.addEventListener('pointerup', function (ev) { if (hooks.up) hooks.up(ev); });
+  cv.addEventListener('pointercancel', function (ev) { if (hooks.cancel) hooks.cancel(ev); });
+  size(); root.addEventListener('resize', size); doc.body.appendChild(cv); raf = root.requestAnimationFrame(frame);
+  return L;
+}
+
+/* Alohomora on a lock a room names (req 146, Magic for the boys, *Alohomora in the castle*: Percy's drawer, req 143,
+   and the brass key's door; tried on page/charms/room-spells-test.html). The book's tap, then the key turn (Q4,
+   Godric, 12 October 2026, 8.01 am): a tap on the lock, then one stroke round it, judged by judgeTurn. While it waits,
+   the layer draws the lock's face round the spot, marked as a clock (12, 3, 6, 9: a quarter turn is twelve to
+   three), the gold wedge he has turned and its degrees, and after the tap the traced guide (guide.js, if the room
+   loads it; the same store as the Charms page, so his guided casts carry over). A touch away from the lock costs
+   nothing. The answer is 'opened', 'tight' (the wrong way round: the lock tightens), 'missed', or for a stuck lock
+   'nothing' whatever the turn (the door that wants its own key, PS 16); cancel() answers 'cancelled'. The room says
+   and draws what follows; it asks learned('alohomora') (set on the Charms page) before it offers the spell.
+   opts: { at: {x, y} in CSS pixels, or a function returning one each frame,
+           r: the face's radius in CSS pixels, or a function (0.12 of the screen's short side by default),
+           turn: 0.25 (default), 0.5 or 0.75; dir: 1 clockwise (default) or -1; stuck: false (default) or true,
+           ease: 'kind' (default), 'fair' or 'strict' (TURN_EASES), guide: 'auto' (default), 'always' or 'off',
+           face: true (default) or false, for a room that draws its own lock face,
+           onTap: optional, called once the tap lands, for the room's "now turn it" }
+   Returns { done: a promise of { verdict, judge, traced }, cancel(), tap(), judge(points) }. */
+function openLock(opts) {
+  opts = opts || {};
+  var G = root.LumosGuide, ease = opts.ease || 'kind', mode = opts.guide || 'auto';
+  var want = { turn: opts.turn || 0.25, dir: opts.dir === -1 ? -1 : 1 };
+  var stage = 'tap', guide = null, built = null, stroke = null, active = null, trail = null, c = null, r = 0, L;
+  function place() {
+    var S = Math.min(L.W, L.H), p = typeof opts.at === 'function' ? opts.at() : opts.at, q = typeof opts.r === 'function' ? opts.r() : opts.r;
+    c = p || { x: L.W / 2, y: L.H * 0.45 }; r = q || S * 0.12;
+  }
+  if (G && mode !== 'off') {
+    var mid = want.dir * want.turn * Math.PI;
+    guide = G.create({ key: mode === 'always' ? 'lumos.spells.openLock.always' : 'lumos.charms.alohomoraGuidedHits', rest: 1.0, mirror: false,
+      box: function () { var g = r / 0.4; return { G: g, ox: c.x - g / 2, oy: c.y - g / 2 }; },
+      parts: [{ pts: G.arc([0.5, 0.5], 0.4, 0, want.dir * want.turn * 360, Math.round(want.turn * 48)), secs: 0.55 * want.turn * 4,
+        label: want.turn === 0.25 ? 'a quarter' : (want.turn === 0.5 ? 'a half' : 'three quarters'), at: 0.5,
+        dx: Math.sin(mid) * 3.2, dy: -Math.cos(mid) * 1.4 }] });
+  }
+  function sweepOf(pts) {   /* the same unwrapping as judgeTurn, for the wedge as he turns */
+    var s = 0, la = null, a0 = null;
+    for (var i = 0; i < pts.length; i++) {
+      var dx = pts[i].x - c.x, dy = pts[i].y - c.y; if (Math.hypot(dx, dy) < r * 0.3) continue;
+      var a = Math.atan2(dy, dx); if (a0 === null) a0 = a;
+      if (la !== null) { var d = a - la; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; s += d; }
+      la = a;
+    }
+    return a0 === null ? null : { a0: a0, s: s };
+  }
+  function drawFace(cx, now) {
+    var i, S = Math.min(L.W, L.H);
+    if (opts.face !== false) {
+      cx.save(); cx.strokeStyle = 'rgba(217,199,154,0.7)'; cx.lineWidth = 2; cx.beginPath(); cx.arc(c.x, c.y, r * 1.08, 0, 7); cx.stroke();
+      for (i = 0; i < 12; i++) {
+        var a = i / 12 * Math.PI * 2, q = i % 3 === 0, r0 = r * (q ? 0.86 : 0.95);
+        cx.strokeStyle = q ? '#d9c79a' : 'rgba(217,199,154,0.5)'; cx.lineWidth = q ? 3 : 1.5;
+        cx.beginPath(); cx.moveTo(c.x + Math.sin(a) * r0, c.y - Math.cos(a) * r0); cx.lineTo(c.x + Math.sin(a) * r * 1.08, c.y - Math.cos(a) * r * 1.08); cx.stroke();
+      }
+      cx.font = '600 ' + Math.round(Math.max(11, r * 0.16)) + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillStyle = '#d9c79a';
+      cx.shadowColor = '#000'; cx.shadowBlur = 4;
+      [12, 3, 6, 9].forEach(function (n, k) { var b = k * Math.PI / 2; cx.fillText(String(n), c.x + Math.sin(b) * r * 0.68, c.y - Math.cos(b) * r * 0.68); });
+      cx.restore();
+    }
+    var sw = stroke ? sweepOf(stroke) : (trail ? sweepOf(trail.pts) : null);
+    if (sw && Math.abs(sw.s) > 0.05) {
+      cx.save(); cx.fillStyle = 'rgba(243,210,122,0.28)'; cx.beginPath(); cx.moveTo(c.x, c.y);
+      cx.arc(c.x, c.y, r * 0.82, sw.a0, sw.a0 + sw.s, sw.s < 0); cx.closePath(); cx.fill();
+      cx.font = '600 ' + Math.round(Math.max(16, S * 0.045)) + 'px Georgia, serif'; cx.textAlign = 'center';
+      cx.fillStyle = '#f3d27a'; cx.shadowColor = '#000'; cx.shadowBlur = 6;
+      cx.fillText(Math.round(Math.abs(sw.s) * 180 / Math.PI) + '°', c.x, c.y + r * 1.55); cx.restore();
+    }
+    if (stage === 'turn') {
+      var gl = cx.createRadialGradient(c.x, c.y, 0, c.x, c.y, r * 0.3);
+      gl.addColorStop(0, 'rgba(255,240,200,' + (0.55 + 0.2 * Math.sin(now / 200)) + ')'); gl.addColorStop(1, 'rgba(255,220,150,0)');
+      cx.fillStyle = gl; cx.beginPath(); cx.arc(c.x, c.y, r * 0.3, 0, 7); cx.fill();
+    }
+  }
+  function tapped() { stage = 'turn'; if (opts.onTap) opts.onTap(); }
+  function judge(pts) {   /* also the way in for checks */
+    var j = judgeTurn(pts, c, r, want, L.W, L.H, ease);
+    if (j.reason === 'tap') { if (guide) guide.clear(); return null; }
+    var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null, traced = !!(tr && tr.traced);
+    var verdict = j.verdict === 'open' || (traced && j.verdict === 'miss') ? 'opened' : (j.verdict === 'tight' ? 'tight' : 'missed');
+    if (opts.stuck) verdict = 'nothing';
+    else if (guide) { if (verdict === 'opened') guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
+    return { verdict: verdict, judge: j, traced: traced };
+  }
+  L = layer({
+    size: function () { built = null; },
+    frame: function (now) {
+      place();
+      if (guide && (!built || Math.abs(built.x - c.x) + Math.abs(built.y - c.y) + Math.abs(built.r - r) > 2)) { guide.build(L.W, L.H); built = { x: c.x, y: c.y, r: r }; }
+      drawFace(L.cx, now);
+      if (stage === 'turn' && guide) guide.draw(L.cx, now, !!stroke);
+      var pts = stroke || (trail && trail.pts), a = stroke ? 1 : (trail ? Math.max(0, 1 - (now - trail.at) / 350) : 0), cx = L.cx;
+      if (pts && pts.length > 1 && a > 0) {
+        cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + 0.55 * a + ')'; cx.lineWidth = 5;
+        cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
+      }
+    },
+    down: function (ev) {
+      var p = L.pt(ev);
+      if (stage === 'tap') { if (Math.hypot(p.x - c.x, p.y - c.y) <= r * 1.1) tapped(); return; }
+      if (stage !== 'turn' || active !== null) return;
+      active = ev.pointerId; stroke = [p]; trail = null; if (guide) guide.cover(p);
+      try { L.cv.setPointerCapture(ev.pointerId); } catch (e) {}
+    },
+    move: function (ev) {
+      if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+      var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+      list.forEach(function (e2) { var q = L.pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+    },
+    up: function (ev) {
+      if (ev.pointerId !== active || !stroke) return;
+      active = null; stroke.push(L.pt(ev)); var pts = stroke; stroke = null;
+      var out = judge(pts); if (!out) return;
+      stage = 'done'; trail = { pts: pts, at: root.performance.now() }; L.later(out, 350);
+    },
+    cancel: function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } }
+  });
+  place();
+  return { done: L.done, cancel: function () { L.finish({ verdict: 'cancelled', judge: null, traced: false }); },
+    tap: function () { if (stage === 'tap') tapped(); },
+    judge: function (pts) { if (stage === 'tap') tapped(); var out = judge(pts); if (out) { stage = 'done'; L.finish(out); } return out; } };
+}
+
+/* Aparecium on a sheet a room names (req 146, Magic for the boys, *Aparecium in the castle*: Wood's blank notice on
+   the board, req 144; tried on page/charms/room-spells-test.html). Three taps on the sheet itself, judged by
+   judgeTaps as the Charms page judges them: in a line, the middle one halfway, at an even beat (or the beat alone).
+   A touch off the sheet costs nothing; a pause longer than the ease's gap starts the count again. The layer marks
+   each tap with a small gold ring, and the traced guide shows its three rings across the sheet (the same store as
+   the Charms page). The answer is 'revealed' or 'missed'; cancel() answers 'cancelled'. The room brings the ink back,
+   or not; it asks learned('aparecium') (set on the Charms page) before it offers the spell.
+   opts: { sheet: {x, y, w, h} in CSS pixels, or a function returning one each frame,
+           ease: 'kind' (default), 'fair' or 'strict' (TAP_EASES), beatAlone: false (default) or true,
+           guide: 'auto' (default), 'always' or 'off' }
+   Returns { done: a promise of { verdict, judge, traced }, cancel(), taps(list of {x, y, t}) }. */
+function revealInk(opts) {
+  opts = opts || {};
+  var G = root.LumosGuide, mode = opts.guide || 'auto', alone = !!opts.beatAlone;
+  var e = Object.assign({}, TAP_EASES[opts.ease] || TAP_EASES.kind); if (alone) e.place = false;
+  var taps = [], rings = [], R = null, guide = null, built = null, over = false, L;
+  function place() { var s = typeof opts.sheet === 'function' ? opts.sheet() : opts.sheet; R = s || { x: L.W * 0.1, y: L.H * 0.2, w: L.W * 0.8, h: L.H * 0.6 }; }
+  if (G && mode !== 'off') {
+    guide = G.create({ key: mode === 'always' ? 'lumos.spells.revealInk.always' : 'lumos.charms.apareciumGuidedHits', rest: 1.0, mirror: false, beatSecs: 0.5,
+      box: function () { return { G: R.w, ox: R.x, oy: R.y + R.h * 0.56 }; },
+      beats: alone ? [[0.5, 0], [0.5, 0], [0.5, 0]] : [[0.2, 0], [0.5, 0], [0.8, 0]],
+      beatLabels: alone ? ['tap, tap, tap', '', ''] : ['tap', 'tap', 'tap'] });
+  }
+  function tapAt(p) {   /* also the way in for checks */
+    if (over) return null;
+    if (p.x < R.x || p.x > R.x + R.w || p.y < R.y || p.y > R.y + R.h) return null;
+    taps.push(p); rings.push({ x: p.x, y: p.y, at: root.performance.now() }); if (guide) guide.cover(p);
+    var j = judgeTaps(taps, L.W, L.H, e);
+    if (j.count < taps.length && j.verdict === 'waiting') taps = taps.slice(taps.length - j.count);
+    if (j.verdict === 'waiting') return null;
+    var three = taps.slice(-3), lv = guide ? guide.level() : 0, tr = guide ? guide.scoreTaps(three) : null;
+    var traced = !!(tr && tr.traced && j.reason !== 'uneven beat'), ok = j.verdict === 'open' || traced;
+    if (guide) { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
+    over = true; taps = [];
+    return { verdict: ok ? 'revealed' : 'missed', judge: j, traced: traced };
+  }
+  L = layer({
+    size: function () { built = null; },
+    frame: function (now) {
+      place(); var cx = L.cx;
+      if (guide && (!built || Math.abs(built.x - R.x) + Math.abs(built.y - R.y) + Math.abs(built.w - R.w) > 2)) { guide.build(L.W, L.H); built = { x: R.x, y: R.y, w: R.w }; }
+      if (guide && !over) guide.draw(cx, now, false);
+      var S = Math.min(L.W, L.H);
+      rings = rings.filter(function (g) { return now - g.at < 900; });
+      rings.forEach(function (g) { var k = (now - g.at) / 900;
+        cx.save(); cx.strokeStyle = 'rgba(243,210,122,' + (0.9 * (1 - k)) + ')'; cx.lineWidth = 3;
+        cx.beginPath(); cx.arc(g.x, g.y, S * (0.025 + 0.05 * k), 0, 7); cx.stroke(); cx.restore(); });
+    },
+    down: function (ev) { var out = tapAt(L.pt(ev)); if (out) L.later(out, 450); }
+  });
+  place();
+  return { done: L.done, cancel: function () { L.finish({ verdict: 'cancelled', judge: null, traced: false }); },
+    taps: function (list) { var out = null; for (var i = 0; i < list.length && !out; i++) out = tapAt(list[i]); if (out) L.finish(out); return out; } };
+}
+
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
-  TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, learned: learned, learn: learn, castOver: castOver };
+  TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk };
 })(typeof window !== 'undefined' ? window : globalThis);

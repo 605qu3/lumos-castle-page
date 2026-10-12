@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>A lock and a page of ink in a room, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120d0a; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas#c { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 560px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1e1611;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 10px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 9px 13px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #1a1411; border-color: #e8be5a; }
+  button.go { background: #6b2a1a; border-color: #a0503a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=3"></script>
+<script src="guide.js?v=3"></script>
+<script>
+/* A lock and a page of ink in a room, a test page for the Charms lane (12 October 2026, fifth session; the owner is
+   Godric). It tries the two calls a room makes for req 146 (Magic for the boys, *Alohomora in the castle* and
+   *Aparecium in the castle*): LumosSpells.openLock on Percy's drawer (req 143) and on the brass key's door, which
+   answers "nothing" whatever the turn, and LumosSpells.revealInk on Wood's blank notice (req 144). Each waits for a
+   boy who has learned the spell (LumosSpells.learned, set on alohomora-test.html and aparecium-test.html; the
+   buttons here set it for trying). Drawn in code: the drawer, door and notice are stand-ins for the room's own, and
+   what is inside the drawer and on the notice is the room's and Events' (req 145), only marked here.
+   window.lumosRoomSpells for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1;
+  var THINGS = [
+    { id: 'drawer', name: "Percy's drawer", spell: 'alohomora' },
+    { id: 'door', name: "The brass key's door", spell: 'alohomora' },
+    { id: 'notice', name: "Wood's notice", spell: 'aparecium' } ];
+  var thing = 0, T = THINGS[0], asking = null, last = null, opened = { drawer: 0, notice: 0 }, rattle = null, shake = null;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  /* the spots a room would project */
+  function drawerRect() { var w = Math.min(W * 0.8, S * 0.95), h = w * 0.28; return { x: W / 2 - w / 2, y: H * 0.5 - h / 2, w: w, h: h }; }
+  function doorRect() { var h = H * 0.62, w = Math.min(W * 0.7, h * 0.55); return { x: W / 2 - w / 2, y: H * 0.17, w: w, h: h }; }
+  function keyhole() {
+    if (T.id === 'drawer') { var R = drawerRect(); return { x: R.x + R.w * 0.3, y: R.y + R.h * 0.55 }; }
+    var D = doorRect(); return { x: D.x + D.w * 0.78, y: D.y + D.h * 0.55 };
+  }
+  function sheetRect() { var h = Math.min(H * 0.56, W * 1.1), w = h * 0.75; w = Math.min(w, W * 0.86); return { x: W / 2 - w / 2, y: H * 0.18, w: w, h: h }; }
+
+  function say(t) { lineEl.innerHTML = t; }
+  function btn(label, fn, cls) { var b = document.createElement('button'); b.textContent = label; if (cls) b.className = cls; b.onclick = fn; return b; }
+  function menu() {
+    panel.innerHTML = '';
+    THINGS.forEach(function (t, i) { panel.appendChild(btn(t.name, function () { choose(i); }, i === thing ? 'on' : '')); });
+    var knows = LumosSpells.learned(T.spell), word = T.spell === 'alohomora' ? 'Alohomora' : 'Aparecium';
+    panel.appendChild(btn('Knows ' + word + ': ' + (knows ? 'yes' : 'no'), function () {
+      try { if (knows) localStorage.removeItem('lumos.spells.learned.' + T.spell); else LumosSpells.learn(T.spell); } catch (e) {}
+      menu();
+    }));
+    panel.appendChild(btn('Cast', cast, 'go'));
+    if (opened.drawer || opened.notice) panel.appendChild(btn('Shut it again', function () { opened = { drawer: 0, notice: 0 }; say('Shut, and blank again.'); menu(); }));
+  }
+  function choose(i) {
+    if (asking) { var old = asking; asking = null; old.cancel(); }   /* its answer is dropped: a new thing is chosen */
+    thing = i; T = THINGS[i]; menu();
+    say(T.id === 'drawer' ? 'A drawer in the books table, with a small brass keyhole and a label: <i>CONFISCATED. Prefects only. P. Weasley</i>.'
+      : T.id === 'door' ? 'A heavy door with a brass keyhole.' : 'A notice pinned to the board. It is blank.');
+  }
+  function cast() {
+    if (asking) return;
+    if (!LumosSpells.learned(T.spell)) {
+      if (T.id === 'notice') say('Still blank. A wizard who knows Aparecium might read it. (Learn it in Charms.)');
+      else { rattle = performance.now(); say('It rattles. Locked. (Learn Alohomora in Charms.)'); }
+      return;
+    }
+    panel.innerHTML = ''; panel.appendChild(btn('Step back', function () { if (asking) asking.cancel(); }));
+    if (T.id === 'notice') {
+      say('Three taps on the notice: in a line, the middle one halfway, at an even beat. <i>Aparecium!</i>');
+      asking = LumosSpells.revealInk({ sheet: sheetRect });
+    } else {
+      say('Tap the lock with your wand.');
+      asking = LumosSpells.openLock({ at: keyhole, r: S * 0.11, turn: 0.25, dir: 1, stuck: T.id === 'door',
+        onTap: function () { say('Now turn it, as a key turns: <b>a quarter turn, clockwise</b>, twelve to three. Whisper it: <i>Alohomora</i>.'); } });
+    }
+    var mine = asking;
+    mine.done.then(function (r) {
+      if (asking !== mine) return;
+      asking = null; last = r;
+      if (r.verdict === 'opened') { opened.drawer = 0.01; say('<b>Alohomora!</b> The drawer slides open.'); }
+      else if (r.verdict === 'nothing') { shake = performance.now(); say('You tapped it, you whispered <i>Alohomora</i>... but nothing happened. This one wants its own key.'); }
+      else if (r.verdict === 'tight') { shake = performance.now(); say('Click: the lock tightened. That way locks it. Clockwise, twelve to three.'); }
+      else if (r.verdict === 'revealed') { opened.notice = 0.01; say('<b>Aparecium!</b> The ink comes back.'); }
+      else if (r.verdict === 'missed') say(T.id === 'notice' ? 'The ink stays hidden. Three taps in a line, the middle one halfway, tap ... tap ... tap.' : 'Not quite. Round the keyhole, a quarter turn, twelve to three.');
+      else say('You step back; it stays as it was.');
+      menu();
+    });
+  }
+
+  function frame(now) {
+    cx.fillStyle = '#16100c'; cx.fillRect(0, 0, W, H);
+    var jig = 0;
+    if (rattle) { var t = (now - rattle) / 500; if (t > 1) rattle = null; else jig = Math.sin(t * 40) * S * 0.006 * (1 - t); }
+    if (shake) { var t2 = (now - shake) / 600; if (t2 > 1) shake = null; else jig = Math.sin(t2 * 50) * S * 0.004 * (1 - t2); }
+    cx.save(); cx.translate(jig, 0);
+    if (T.id === 'drawer') drawDrawer(now); else if (T.id === 'door') drawDoor(); else drawNotice();
+    cx.restore();
+    requestAnimationFrame(frame);
+  }
+  function drawKeyhole(k, u) {
+    cx.fillStyle = '#b8913a'; cx.beginPath(); cx.arc(k.x, k.y, u, 0, 7); cx.fill();
+    cx.fillStyle = '#1a120c'; cx.beginPath(); cx.arc(k.x, k.y - u * 0.15, u * 0.28, 0, 7); cx.fill();
+    cx.fillRect(k.x - u * 0.12, k.y - u * 0.1, u * 0.24, u * 0.55);
+  }
+  function drawDrawer(now) {
+    var R = drawerRect();
+    cx.fillStyle = '#3a2618'; cx.fillRect(R.x - R.w * 0.08, R.y - R.h * 0.5, R.w * 1.16, R.h * 2.1);   /* the table's side */
+    if (opened.drawer) {
+      opened.drawer = Math.min(1, opened.drawer + 0.04);
+      var d = R.h * 0.9 * opened.drawer;
+      cx.fillStyle = '#1a110b'; cx.fillRect(R.x, R.y - d, R.w, d);   /* inside, seen from above */
+      var items = [['#4a7a3a', 'Frisbee'], ['#7a3a3a', 'Snap'], ['#3a4a8a', 'req 145']];
+      cx.font = Math.round(Math.max(11, S * 0.03)) + 'px Georgia, serif'; cx.textAlign = 'center';
+      items.forEach(function (it, i) { var x = R.x + R.w * (0.2 + i * 0.3), y = R.y - d * 0.5;
+        cx.fillStyle = it[0]; cx.beginPath(); cx.ellipse(x, y, R.w * 0.09, d * 0.28, 0, 0, 7); cx.fill();
+        if (opened.drawer > 0.9) { cx.fillStyle = '#eadcbf'; cx.fillText(it[1], x, y + d * 0.42); } });
+    }
+    cx.fillStyle = '#5a3a22'; cx.fillRect(R.x, R.y, R.w, R.h);
+    cx.strokeStyle = '#2a1a10'; cx.lineWidth = 3; cx.strokeRect(R.x, R.y, R.w, R.h);
+    cx.fillStyle = '#eadcbf'; cx.fillRect(R.x + R.w * 0.62, R.y + R.h * 0.2, R.w * 0.32, R.h * 0.3);
+    cx.fillStyle = '#3a2a1a'; cx.font = Math.round(Math.max(9, R.h * 0.1)) + 'px Georgia, serif'; cx.textAlign = 'center';
+    cx.fillText('CONFISCATED', R.x + R.w * 0.78, R.y + R.h * 0.33); cx.fillText('Prefects only. P. Weasley', R.x + R.w * 0.78, R.y + R.h * 0.45);
+    drawKeyhole(keyhole(), S * 0.03);
+  }
+  function drawDoor() {
+    var D = doorRect();
+    cx.fillStyle = '#4a3220'; cx.fillRect(D.x, D.y, D.w, D.h);
+    cx.strokeStyle = 'rgba(0,0,0,0.35)'; cx.lineWidth = 2;
+    for (var i = 1; i < 5; i++) { cx.beginPath(); cx.moveTo(D.x + D.w * i / 5, D.y); cx.lineTo(D.x + D.w * i / 5, D.y + D.h); cx.stroke(); }
+    cx.fillStyle = '#26201c'; cx.fillRect(D.x, D.y + D.h * 0.1, D.w * 0.8, 10); cx.fillRect(D.x, D.y + D.h * 0.88, D.w * 0.8, 10);
+    drawKeyhole(keyhole(), S * 0.035);
+  }
+  function drawNotice() {
+    var B = { x: W * 0.04, y: H * 0.12, w: W * 0.92, h: H * 0.7 }, R = sheetRect();
+    cx.fillStyle = '#6a4a2a'; cx.fillRect(B.x, B.y, B.w, B.h); cx.fillStyle = '#9a7a4a'; cx.fillRect(B.x + 10, B.y + 10, B.w - 20, B.h - 20);
+    cx.fillStyle = '#e9dcc0'; cx.fillRect(R.x, R.y, R.w, R.h);
+    cx.fillStyle = '#b02a2a'; cx.beginPath(); cx.arc(R.x + R.w / 2, R.y + 10, 6, 0, 7); cx.fill();
+    if (opened.notice) {
+      opened.notice = Math.min(1, opened.notice + 0.02);
+      cx.fillStyle = 'rgba(40,24,14,' + opened.notice + ')'; cx.textAlign = 'center';
+      cx.font = 'italic ' + Math.round(R.w * 0.07) + 'px Georgia, serif'; cx.fillText("Wood's notice", R.x + R.w / 2, R.y + R.h * 0.22);
+      cx.font = Math.round(R.w * 0.05) + 'px Georgia, serif';
+      ['(his words come from', 'Events\' record, req 145)'].forEach(function (s, i) { cx.fillText(s, R.x + R.w / 2, R.y + R.h * (0.34 + i * 0.08)); });
+    }
+  }
+  addEventListener('resize', resize); resize(); choose(0); requestAnimationFrame(frame);
+  window.lumosRoomSpells = { choose: choose, cast: cast, keyhole: keyhole, sheet: sheetRect,
+    state: function () { return { thing: T.id, last: last, asking: !!asking, opened: opened }; },
+    tap: function () { return asking && asking.tap ? asking.tap() : null; },
+    judge: function (pts) { return asking && asking.judge ? asking.judge(pts) : null; },
+    taps: function (list) { return asking && asking.taps ? asking.taps(list) : null; } };
+})();
+</script>
+</body>
+</html>
