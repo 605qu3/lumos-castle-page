@@ -671,7 +671,7 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=6"></script>
+<script src="castle.js?v=7"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=15"></script>
 <script src="charms/guide.js?v=1"></script>
@@ -1903,6 +1903,10 @@ var torches = CP.torches.map(function (pl, i) {
   return { card: t, flame: f };
 });
 var torch = torches[THE_TORCH].card, torchFlame = torches[THE_TORCH].flame;
+/* the corridor's torches answer a ghost as the corridor's own do (the Corridor's req 141; castle.js torchCues, req 131):
+   on 31 October by day, a few seconds after he opens the hole, every one burns bright blue for a minute, Nick's deathday
+   (Events' torch.deathday-hole; CoS 8), the light by the painting opposite blue with them. The lean is the corridor's. */
+var torchCtl = kit.torchCues();
 var TORCH_HEAD = corrToHole(CP.torches[THE_TORCH].x, CP.torches[THE_TORCH].y, CORR.FAR_Z + 0.01);
 /* the portrait's back, a grey stand-in, hinged at its right edge just beyond the tunnel's end, so that open it
    stands across the line of sight and a boy can see what to tap to close it */
@@ -5232,9 +5236,10 @@ function updatePortrait(dt) {
   corridorFarLights[0].intensity = 1.2 * k * (1 - 0.8 * nk); corridorFarLights[1].intensity = 1.0 * k * (0.9 + 0.1 * Math.sin(clockT * 7.7));
   torches.forEach(function (tc, i) {   /* each flame on its own beat */
     tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(clockT * (7.3 - 0.6 * i) + 2 * i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(clockT * (9.1 - 0.4 * i) + i))), 1);
+    torchCtl.dress(i, tc.flame, i === 0 ? corridorLight : null);
   });
   if (portrait.open) {
-    if (!nickHolds()) portrait.closeT -= dt;
+    if (!nickHolds() && !torchCtl.busy()) portrait.closeT -= dt;   /* and she stays open while the torches burn blue */
     if (portrait.closeT <= 0) togglePortrait();
   }
 }
@@ -5327,7 +5332,7 @@ function updateNick(dt) {
   var near = Math.exp(-Math.pow(_nl.x - TORCH_HEAD.x, 2) / 0.25 - Math.pow(_nl.z - TORCH_HEAD.z, 2) / 1.2);
   nickMesh.material.color.copy(NICK_TINT).lerp(NICK_WARM, 0.6 * near);
   nickMesh.material.opacity = 0.55 + 0.2 * near;
-  if (nick.blue) torchFlame.material.color.copy(TORCH_GOLD).lerp(TORCH_BLUE, Math.min(1, 1.4 * near));
+  if (nick.blue && !torchCtl.busy()) torchFlame.material.color.copy(TORCH_GOLD).lerp(TORCH_BLUE, Math.min(1, 1.4 * near));
   /* his own light by night: grows from his start, and on his way out fades as he nears her long wall, gone in it */
   if (nick.lit) {
     nick.litT += dt; nick.lampK = Math.min(1, nick.litT / NICK_LAMP.grow);
@@ -5487,7 +5492,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the embers brighten a step': embersStep,
     "the fire catches with a whoosh and the room's light comes up": fireCatches,
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire,
-    'a snowball flies up past the window from a fight on the grounds below and drops out of sight': snowballFly
+    'a snowball flies up past the window from a fight on the grounds below and drops out of sight': snowballFly,
+    "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); }
   }, VISITOR_CUES, NICK_CUES),
   drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); },
   figures: FIGURES,
@@ -5579,7 +5585,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
