@@ -33,7 +33,7 @@
 <button class="btn" id="guideBtn">Guide</button>
 <button class="btn" id="logBtn">Log</button>
 <div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
-<script src="guide.js?v=1"></script>
+<script src="guide.js?v=2"></script>
 <script>
 /* Lumos, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
    A flick drawn on the screen lights the wand's tip; a miss fizzles, harmlessly, and says why.
@@ -367,7 +367,7 @@ function judgeFlick(points, w, h, ease) {
       else if (j.reason === 'slow') smoke(g);
       else if (j.reason === 'windmill') sparks(g, 40, true);
       else if (j.reason !== 'tap') sparks(g, j.reason === 'short' ? 10 : 22);
-      if (j.reason !== 'tap' && j.reason !== 'windmill') ghost = { at: now, pts: pts };
+      if (j.reason !== 'tap' && j.reason !== 'windmill' && !gd.level()) ghost = { at: now, pts: pts };   /* never two guides at once */
       sayEl.textContent = WHY[j.reason][0]; whyEl.textContent = WHY[j.reason][1];
     }
     return j;

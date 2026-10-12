@@ -66,7 +66,8 @@
         start: Math.hypot(stroke[0].x - pts[0].x, stroke[0].y - pts[0].y) / S,
         end: Math.hypot(stroke[stroke.length - 1].x - pts[last].x, stroke[stroke.length - 1].y - pts[last].y) / S,
         level: level() };
-      r.traced = r.cov >= 0.7 && r.dist < 0.05 && r.start < 0.1 && r.end < 0.12;
+      /* his traces on an iPhone (David, 9.42 pm) kept 0.057 to 0.063 of the screen from the path: 0.08 lets them count */
+      r.traced = r.cov >= 0.7 && r.dist < 0.08 && r.start < 0.1 && r.end < 0.12;
       return r;
     }
     function hit(guided) {
