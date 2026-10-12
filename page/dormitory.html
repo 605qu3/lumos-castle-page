@@ -170,9 +170,9 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=7"></script>
+<script src="castle.js?v=9"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=15"></script>
+<script src="castle-events.js?v=16"></script>
 <script>
 (function () {
 'use strict';
@@ -844,12 +844,30 @@ function tap(cx, cy) {
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
-  var hits = raycaster.intersectObjects(tappables, false);
+  var hits = raycaster.intersectObjects(tappables, false), wasStop = mode === 'stop';
   /* the way down (req 136; docs/interaction-vocabulary.md §6): the first tap on the well goes to its stop, a tap on it
      there goes down */
   if (hits.length && hits[0].object.userData.stop === STOPS[1] && atStop === STOPS[1]) descend();
   else if (hits.length) goTo(hits[0].object.userData.stop);
   else goBack();
+  /* every tap heard (Interaction's req 152; docs/interaction-vocabulary.md §10 and §3): a tap on a thing tells the
+     runtime its name, the one it answers to when looked at close (req 139); then the frame is told whether the tap
+     acted, so only a tap at rest that finds nothing gets the mote (a tap on nothing at a stop goes back) */
+  var name = hits.length ? tapName(hits[0]) : null;
+  if (name && castle) castle.tap(name);
+  if (kit.tapped) kit.tapped(!!hits.length || wasStop);
+}
+function tapName(hit) {
+  var o = hit.object;
+  if (o.userData.stop === STOPS[1]) return 'the dormitory stair';
+  if (o.userData.stop === STOPS[0]) return 'the dormitory hearth';
+  if (o.userData.stop.name === 'under-his') return 'his things under the bed';
+  var w = windows.filter(function (q) { return q.sky === o || q.sill === o; })[0];
+  if (w) return (w.name === MOON.win && o === w.sky && lookW3(hit)) || 'the dormitory windows';
+  var b = beds.filter(function (q) { return q.meshes.indexOf(o) >= 0; })[0];
+  if (!b) return null;
+  if (o.name.indexOf('trunk') === 0) return b.his ? 'his trunk' : 'the trunks';
+  return b.his ? 'his four-poster' : b.name === CORNER_BED ? "neville's four-poster" : 'the four-posters';
 }
 
 function updateCamera(dt) {
@@ -1073,21 +1091,29 @@ beds.forEach(function (b) {
 windows.forEach(function (w) { kit.zoom.look(w.sill, 'the dormitory windows'); if (w.name === MOON.win) kit.zoom.look(w.sky, lookW3); });
 kit.zoom.look(well, 'the dormitory stair');
 kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
+/* the Omnioculars once his pair is held (req 159, as the common room's req 158): the knobs only then, a hidden thing
+   (req 157) only shimmers, and the gold line names what is held still at the middle, in the room's own plain words */
+kit.zoom.held(function () { return !!(castle && castle.state().vars.omni === 'held'); });
+kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hidden(name)); });
+kit.zoom.shown({ 'the dormitory hearth': 'The hearth', 'the dormitory windows': 'The windows', 'the dormitory stair': 'The stair' });
 
 /* ---------- per frame ---------- */
 
 var clock = new THREE.Clock();
 /* ?snowball throws one every five seconds, ?moonowl flies the owl across the moon as often, for a look */
 var PAST_TEST = ['snowball', 'moonowl'].filter(function (k) { return new URLSearchParams(location.search).has(k); })[0], pastTest = 4;
+/* the Omnioculars' dial (the Corridor's req 159, castle.js v=9): what moves by itself (the fire, the hangings' stir,
+   the snowball, the moon's owl) runs on sdt and t, slowed while he looks through the pair; his view, the night's
+   sequences, the runtime, the lines and the moon's hour keep time */
 var t = 0, moonClock = 0;
 function frame() {
-  var dt = Math.min(0.05, clock.getDelta());
-  t += dt;
+  var dt = Math.min(0.05, clock.getDelta()), sdt = dt * kit.zoom.slow();
+  t += sdt;
   if (castle && !leaving) castle.tick(dt);   /* going down the well, the clock waits for the common room */
   updateCamera(dt);
   updateLines(dt);
-  updateStirs(dt);
-  updateSnowball(dt); updateMoonOwl(dt);
+  updateStirs(sdt);
+  updateSnowball(sdt); updateMoonOwl(sdt);
   if (PAST_TEST) { pastTest += dt; if (pastTest > 5) { pastTest = 0; if (PAST_TEST === 'snowball') snowballFly(); else moonOwlFly(); } }
   moonClock += dt;
   if (moonClock > 60 && !night && !leaving) { moonClock = 0; setLight(light); }   /* the moon rises and sets through a long visit, never mid-sequence */
@@ -1101,8 +1127,8 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, zoom: kit.zoom,
-  tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
+window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, zoom: kit.zoom, t: function () { return t; },
+  tap: tap, tapName: tapName, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, stir: stir, dim: dim, pose: pose,
