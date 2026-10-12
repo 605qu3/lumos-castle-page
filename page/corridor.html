@@ -1578,6 +1578,33 @@ door.material.polygonOffset = true; door.material.polygonOffsetFactor = -1; door
 doorHinge.add(door); register(door, 1);
 var doorLeaf = { ang: 0, target: 0 }, DOOR_LEAF_OPEN = Math.PI / 2;
 function openDoor(open) { doorLeaf.target = open === false ? 0 : DOOR_LEAF_OPEN; }
+/* The tickle (Magic for the boys, *The polite door, next*, Godric's; Events' door.json; the Interaction lane's req 150
+   (2)): at its stop a tap on the door is a tickle. Its ticklish spot stays put all week and moves on password Monday,
+   from the date alone, so both boys' doors agree; a tap within TICKLE_R of it is a hit (the built-in `tickle`), and it
+   laughs and swings open, shutting itself after a few seconds; off it the wood shivers and giggles, harder and louder
+   the nearer. Please aloud opens it too (the runtime's ear). */
+var TICKLE_R = 0.18, DOOR_SHUT_S = 4, lastTickle = null, doorShiver = null, doorShutTimer = null;
+function tickleSpot() {   /* across and up the leaf as fractions (its picture's u and v), the week's */
+  var w = window.CastleEvents && CastleEvents.week ? CastleEvents.week() : 0;
+  var r = function (k) { var s = Math.sin((w + 1) * 12.9898 + k * 78.233) * 43758.5453; return s - Math.floor(s); };
+  return { u: 0.15 + 0.7 * r(1), v: 0.1 + 0.72 * r(2) };
+}
+function tickleAt(uv) {
+  var s = tickleSpot(), d = uv ? Math.hypot((uv.x - s.u) * DOOR.w, (uv.y - s.v) * DOOR.h) : 9;
+  lastTickle = { hit: d < TICKLE_R, near: clamp(1 - (d - TICKLE_R) / 1.2, 0, 1) };
+  return lastTickle;
+}
+function doorGiggle() {
+  var n = lastTickle ? lastTickle.near : 0;
+  doorShiver = { t: 0, amp: 0.012 + 0.05 * n };
+  showLines([{ medium: 'heard', speaker: 'door', sound: n > 0.66 ? 'a loud creaky giggle, nearly a laugh' : n > 0.33 ? 'a creaky giggle' : 'a faint creak, almost a giggle' }]);
+}
+function doorSwings(sound) {
+  showLines([{ medium: 'heard', speaker: 'door', sound: sound }]);
+  openDoor(true);
+  clearTimeout(doorShutTimer);
+  doorShutTimer = setTimeout(function () { openDoor(false); }, DOOR_SHUT_S * 1000);
+}
 /* The glimpse behind it (The corridor, "The glimpse behind it"; what is there is Magic for the boys', the room of lost
    things): one flat drawing, door-glimpse, 1.8 by 3.2 m, standing square across the way 1.05 m behind the door's plane,
    just clear of the open leaf, and running 0.6 m below the floor, painted for the eye at the door's stop, the only place
@@ -2342,16 +2369,32 @@ function tap(cx, cy) {
   var hits = raycaster.intersectObjects(tappables.filter(function (m) { return m.visible; }), false);
   if (!hits.length) { said(mode === 'stop'); goBack(); return; }   /* at a stop, nothing takes him back */
   var hit = hits[0].object.userData;
+  /* every tap on a thing is told to the runtime (the vocabulary's §10, req 150), before he moves, so the built-in `at`
+     reads where he stood when he tapped */
+  var tell = function (name) { if (castle && castle.visit()) castle.tap(name); };
+  /* the polite door (req 150): from afar a tap walks him up to it; at its stop a tap is a tickle (tickleAt) */
+  if (hit.stop && hit.stop.name === 'door') {
+    var atDoor = atStop === hit.stop;
+    lastTickle = atDoor ? tickleAt(hits[0].uv) : null;   /* none from afar, so no tickle record fires on the walk-up */
+    if (castle && castle.visit()) castle.tap('polite door');
+    else if (atDoor) { if (lastTickle.hit) doorSwings('the door laughs'); else doorGiggle(); }
+    said(true);
+    if (!atDoor) goTo(hit.stop);
+    return;
+  }
   /* her (req 79): from afar a tap on her is her walk-up; at her stop it wakes her for the password, raised here inside
      the tap's own handler, since the runtime opens the ear in it and iOS lets a page listen only from a touch */
-  if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { said(true); goTo(hit.stop); return; }
+  if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { tell('her'); said(true); goTo(hit.stop); return; }
   if (hit.thing && castle && castle.visit()) {
     if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
     said(true); castle.tap(hit.thing); return;
   }
+  if (hit.thing || hit.stop) tell(hit.thing || TAP_NAMES[hit.stop.name] || hit.stop.name);
   said(!!hit.stop && hit.stop !== atStop);
   if (hit.stop) goTo(hit.stop);
 }
+/* the runtime's names for the stops that are not already a thing of its own */
+var TAP_NAMES = { 'portrait-a': 'portrait a', 'portrait-b': 'portrait b', 'window-2': 'window 2', nook: 'inglenook', 'settle-scarf': 'scarf on the settle' };
 
 function updateCamera(dt) {
   var s = Math.min(1, dt * 7);
@@ -2407,8 +2450,10 @@ canvas.addEventListener('pointermove', function (e) {
   if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
   if (view === 'stage') slideT = clamp(slideT - dx * 0.02, VIEWS.stage.xMin, VIEWS.stage.xMax);
   else if (mode === 'rest' && !tween) {
-    /* past the corridor's limit the turn goes faster, so turning round is about half a screen's drag, not a whole one */
-    var L = VIEWS.length, step = -dx * 0.003 * (Math.abs(yawT) > L.yawMax ? L.turnGain : 1);
+    /* past the corridor's limit the turn goes faster, so turning round is about half a screen's drag, not a whole one;
+       a right drag turns him right, more of the right coming into view, as in the common room (the vocabulary's §1,
+       req 150; it turned the other way until 12 October 2026) */
+    var L = VIEWS.length, step = dx * 0.003 * (Math.abs(yawT) > L.yawMax ? L.turnGain : 1);
     yawT = clamp(yawT + step, -Math.PI - L.turnBand, Math.PI + L.turnBand);
     pitchT = clamp(pitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
   }
@@ -2641,6 +2686,7 @@ var SPEAKER_AT = {
   trevor: function () { return trevorHit.visible ? trevorHit.position.clone() : helmetPos(); },
   sitter: function () { return worldOf(paintingOpp, 0); },
   thing: function () { return new THREE.Vector3(DOOR.x, 1.4, HER_Z); }, /* the polite door, behind which finds turn up */
+  door: function () { return new THREE.Vector3(DOOR.x, 1.4, HER_Z); },  /* its own giggle and creak (req 150) */
   stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }, /* the moving stair's grind, at its head */
   nick: nickHead                                                       /* above his head, beyond the torch that leaned (req 140) */
 };
@@ -2883,6 +2929,10 @@ var castle = window.CastleEvents ? CastleEvents.start({
   cues: {
     "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does": function () { goTo(STOPS.filter(function (s) { return s.name === 'armour'; })[0]); },
     'the open visor drops shut': function () { armourJiggle = 0.4; },
+    /* the polite door's tickle and please (req 150; Events' door.json): the giggle's strength is the page's, from the tap */
+    "the door's wood shivers and gives a creaky giggle, louder the nearer the tap to its ticklish spot": function () { doorGiggle(); },
+    'the door laughs and swings open on what is behind it, then shuts itself after a few seconds': function () { doorSwings('the door laughs'); },
+    'the door swings open with a dignified creak on what is behind it, then shuts itself after a few seconds': function () { doorSwings('a dignified creak'); },
     /* the grounds (req 115, Events' grounds.json): the snowball; the field and the lake are not in this window's view */
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
     /* the leaning torch and his deathday (req 131, castle.js's torchCues; Events' req 132) */
@@ -2950,6 +3000,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
   drawRoom: corridorDrawRoom,
   showLines: showLines,
   builtins: { at: function () { return atStop ? atStop.name : 'none'; },
+    tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; },   /* the polite door (req 150) */
     /* the full moon's owl (req 101, 104): no until the owl's flight cell is drawn (req 102), as the common room answers,
        so the record never sets owl_landed for the night with nothing shown (Fawkes, Q28, 11 October 2026) */
     'moon in view': function () { return 'no'; } }
@@ -3017,7 +3068,13 @@ function frame() {
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
   doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
-  doorHinge.rotation.y = doorLeaf.ang;
+  var shiver = 0;
+  if (doorShiver) {
+    doorShiver.t += dt;
+    shiver = doorShiver.amp * Math.sin(doorShiver.t * 55) * (1 - doorShiver.t / 0.6);
+    if (doorShiver.t >= 0.6) doorShiver = null;
+  }
+  doorHinge.rotation.y = doorLeaf.ang + shiver;
   glimpseLight.intensity = 1.4 * Math.sin(doorLeaf.ang);
   torches.forEach(function (tc, i) {
     var k = 0.85 + 0.15 * Math.sin(t * 11 + i) * Math.sin(t * 4.3 + i * 2);
@@ -3043,6 +3100,7 @@ window.lumosGreybox = { sheep: function () { return tapestrySheep; }, leanTorch:
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
+  tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
