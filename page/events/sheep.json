@@ -1,0 +1,61 @@
+{
+  "chain": "sheep",
+  "marks": {
+    "sheep": [
+      "first",
+      "second",
+      "third"
+    ]
+  },
+  "room": [
+    {
+      "when": ["place = corridor", "sheep_stray != yes", "sheep_place = second"],
+      "show": ["the corridor tapestry's woven sheep standing in their second places"]
+    },
+    {
+      "when": ["place = corridor", "sheep_stray != yes", "sheep_place = third"],
+      "show": ["the corridor tapestry's woven sheep standing in their third places"]
+    },
+    {
+      "when": ["place = corridor", "sheep_stray = yes"],
+      "show": ["the corridor tapestry with one woven sheep missing from it"]
+    },
+    {
+      "when": ["place = common room", "sheep_stray = yes"],
+      "show": ["a stray woven sheep from the corridor's tapestry in the griffin's hanging, whatever the griffin is doing"]
+    }
+  ],
+  "records": [
+    {
+      "id": "sheep.move",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": ["sheep_stray != yes"],
+      "one_of": "sheep-moves",
+      "weight": 4,
+      "starts": ["set sheep_place = mark sheep, not last"]
+    },
+    {
+      "id": "sheep.stray",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": ["sheep_stray != yes", "been corridor = yes", "days since sheep_strayed >= 2"],
+      "one_of": "sheep-moves",
+      "weight": 1,
+      "starts": ["set sheep_stray = yes", "stamp sheep_strayed"]
+    },
+    {
+      "id": "sheep.home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": ["sheep_stray = yes"],
+      "starts": ["set sheep_stray = no", "set sheep_place = mark sheep, not last"]
+    }
+  ]
+}
