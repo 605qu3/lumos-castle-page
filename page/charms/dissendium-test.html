@@ -25,8 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=8"></script>
-<script src="guide.js?v=5"></script>
+<script src="spells.js?v=9"></script>
 <script>
 /* Dissendium, a test page for the Charms lane (12 October 2026, seventh session; the owner is Godric). Drawn in code.
    The books (PoA 10, checked in the text): behind a statue of a humpbacked, one-eyed witch on the third floor, Harry
@@ -34,25 +33,32 @@
    stone witch again, and her hump opens wide enough to admit a fairly thin person; he climbs in headfirst, slides a
    long way down a stone slide, lands on damp earth in pitch dark, and lights his wand: a narrow, low, earthy passage,
    twisting like a giant rabbit's burrow. Later he shoves his bag in first, in a hurry (PoA 14); "you tap it and say
-   Dissendium" (PoA 16). The lift after the word is the lane's own, for the geometry: the lid swings round its hinge,
-   the angle in degrees, and the gap at its edge (the chord) set against what he needs to fit through. Judged by
-   LumosSpells.judgeHinge (spells.js), tallied in checks/dissendium-tally.js; the traced guide from guide.js; the dark
-   at the bottom is lit with Lumos's flick (judgeFlick). ?ease=, ?guide=, ?need= (degrees) for trying;
-   window.lumosDissendium for checks. */
+   Dissendium" (PoA 16). Godric's Q5 (12 October 2026, 1.58 pm): 2, the tap and the word open the hump by itself, "at
+   once", as the book has it, with his two touches. t1: as it swings, the protractor at the hinge traces the angle, a
+   tick at every ten degrees, and stops it at just wide enough to admit a fairly thin person, the gap at its edge (the
+   chord) measured against him: a lid 45 cm long, a boy 34 cm across the shoulders, so it stops at 44 degrees, and the
+   book's line becomes the sum, gap 34 cm, you 34 cm. t2: as he slides down, a faint voice from the map in his pocket
+   reminds him that Lumos is needed at the bottom. The lift he drew round the hinge (the seventh session's first
+   pass) is gone from the page; its judge, LumosSpells.judgeHinge, stays in spells.js and its tally for a later level.
+   The dark at the bottom is lit with Lumos's flick (judgeFlick). ?ease= (the flick's), ?width= (his shoulders, cm)
+   for trying; window.lumosDissendium for checks. */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
   var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
-  var NEED = Math.max(20, Math.min(90, Number(qs.get('need')) || 45)), MAX = 110, CRACK = 6;
-  var stage = 'tap', taps = 0, bubble = null, lid = 0, lidTo = null, from = 0, stroke = null, active = null, trail = null, last = null;
-  var thud = null, tickAt = 0, slideAt = 0, litAt = 0, guide = null;
+  /* the sum: the lid's length and his width in cm; the angle where the gap at the edge (2 x 45 x sin(half the angle))
+     first equals his width */
+  var LID = 45, WIDTH = Math.max(24, Math.min(44, Number(qs.get('width')) || 34)), MAX = 110;
+  var NEED = 2 * Math.asin(WIDTH / (2 * LID)) * 180 / Math.PI, SWING = 2800, SLIDE = 3600;
+  var stage = 'tap', taps = 0, bubble = null, lid = 0, lidTo = null, stroke = null, active = null, trail = null, last = null;
+  var thud = null, slideAt = 0, litAt = 0;
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W * 1.15, H * 0.8);
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    makeGuide();
   }
+  function gapAt(deg) { return 2 * LID * Math.sin(deg * Math.PI / 360); }   /* cm, at the lid's edge */
   /* the statue, side on, facing left: the hinge low on the back of her hump, the lid's edge up by her neck */
   function geo() {
     var floor = H * 0.8, x = W / 2, y0 = floor - S * 0.08;
@@ -75,25 +81,14 @@
   }
   function tick() { noise(0.04, 1800, 0.35); }
 
-  /* the guide: an arc round the hinge, from the lid's edge up past the angle he needs */
-  function makeGuide() {
-    var G0 = geo(), a0 = Math.atan2(G0.edge.x - G0.hinge.x, -(G0.edge.y - G0.hinge.y)) * 180 / Math.PI;
-    guide = LumosGuide.create({ key: 'lumos.charms.dissendiumGuidedHits', rest: 1.0, mirror: false,
-      box: function () { var g = geo(), G = g.L / 0.4; return { G: G, ox: g.hinge.x - G / 2, oy: g.hinge.y - G / 2 }; },
-      parts: [{ pts: LumosGuide.arc([0.5, 0.5], 0.4, a0 + CRACK, a0 + NEED + 12, 24), secs: 0.9, label: 'lift', at: 0.6, dx: -1.6, dy: -1.2 }] });
-    guide.build(W, H);
-  }
-
   function menu() {
     panel.innerHTML = '';
     var a = document.createElement('button'); a.textContent = 'Again'; a.onclick = function () { ensureAudio(); start(); }; panel.appendChild(a);
     var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
     e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
-    var g = document.createElement('button'); g.textContent = 'Guide';
-    g.onclick = function () { if (guide) guide.reset(); }; panel.appendChild(g);
   }
   function start() {
-    stage = 'tap'; taps = 0; bubble = null; lid = 0; lidTo = null; from = 0; stroke = null; trail = null; last = null; thud = null; slideAt = 0; litAt = 0;
+    stage = 'tap'; taps = 0; bubble = null; lid = 0; lidTo = null; stroke = null; trail = null; last = null; thud = null; slideAt = 0; litAt = 0;
     menu(); say('A statue of a humpbacked, one-eyed witch, on the third floor. Tap her hump with your wand.');
   }
 
@@ -111,43 +106,24 @@
       setTimeout(function () { if (stage === 'tap' && taps === 1) say('The map says <b><i>Dissendium</i></b>. Tap her hump again and whisper it.'); }, 1500);
       return;
     }
-    stage = 'lift'; lidTo = { at: performance.now(), a: 0, b: CRACK, ms: 300 }; from = CRACK;
-    noise(0.3, 220, 0.4);
-    say('<b><i>Dissendium!</i></b> The hump unlatches with a scrape of stone. Lift it by its edge, round the hinge: wide enough for you to climb in.');
+    /* t1: at once the hump swings open by itself, the protractor tracing it, and stops at just wide enough */
+    stage = 'swing'; lidTo = { at: performance.now(), a: 0, b: NEED, ms: SWING, swing: true };
+    noise(0.3, 220, 0.4); setTimeout(function () { noise(SWING / 1000 - 0.3, 140, 0.22); }, 200);
+    say('<b><i>Dissendium!</i></b> At once, the hump begins to open: watch the angle at its hinge, and the gap at its edge.');
   }
-
-  var MISS = { 'not wide enough': function (j) { return 'Only ' + Math.round(j.opened) + ' degrees: not wide enough for you to fit. You need about ' + NEED + '.'; },
-    'wrong way': function () { return 'That pushes it shut. Lift it the other way, up from its edge.'; },
-    'through the hinge': function () { return 'Round the hinge, not across it: lift the edge up and over.'; },
-    'short': function () { return 'Lift it further: take hold of the edge and swing it up.'; },
-    'tap': function () { return 'Take hold of the lid\'s edge and swing it up, round the hinge.'; } };
-  function judge(pts) {
-    var g = geo(), want = { need: NEED, max: MAX, from: from, dir: 1 };
-    var j = LumosSpells.judgeHinge(pts, g.hinge, g.L, want, W, H, ease);
-    var lv = guide ? guide.level() : 0, tr = guide && j.reason !== 'tap' ? guide.score(pts) : null;
-    if (tr && tr.traced && j.verdict !== 'open' && j.degrees > 0) { j.verdict = 'open'; j.reason = 'traced'; j.opened = Math.max(j.opened, NEED); j.gap = 2 * Math.sin(j.opened * Math.PI / 360); }
-    last = j; trail = { pts: pts, at: performance.now() };
-    if (j.verdict === 'open') {
-      if (guide) guide.hit(lv > 0);
-      LumosSpells.learn('dissendium');
-      stage = 'open'; lidTo = { at: performance.now(), a: lid, b: j.opened, ms: 200 };
-      if (j.stopped) noise(0.2, 400, 0.5);
-      say(Math.round(j.opened) + ' degrees: wide enough for a fairly thin person.' + (j.stopped ? ' It stops there, against the wall.' : '') + ' Tap the hole to climb in, headfirst.');
-    } else {
-      if (j.reason !== 'tap' && guide) guide.miss();
-      if (j.verdict === 'narrow') { lidTo = { at: performance.now(), a: j.opened, b: CRACK, ms: 380 }; thud = performance.now() + 380; setTimeout(function () { noise(0.25, 160, 0.6); }, 380); }
-      else lidTo = { at: performance.now(), a: lid, b: CRACK, ms: 250 };
-      say((MISS[j.reason] || MISS.short)(j));
-    }
-    return j;
+  function opened() {   /* the swing has stopped at the angle where the gap equals his width */
+    stage = 'open'; noise(0.2, 400, 0.5); LumosSpells.learn('dissendium');
+    var gap = Math.round(gapAt(lid));
+    last = { degrees: Math.round(lid), gap: gap, width: WIDTH };
+    say('It stops at <b>' + Math.round(lid) + '°</b>. The gap at its edge is <b>' + gap + ' cm</b>, and you are <b>' + WIDTH + ' cm</b> across the shoulders: just wide enough to admit a fairly thin person. Tap the hole to climb in, headfirst.');
   }
   function climb(p) {
     var g = geo(), m = { x: (g.hinge.x + g.edge.x) / 2, y: (g.hinge.y + g.edge.y) / 2 };
     if (p && Math.hypot(p.x - m.x, p.y - m.y) > g.L * 0.8) { say('Tap the hole in her hump to climb in.'); return; }
     stage = 'slide'; slideAt = performance.now(); noise(1.4, 500, 0.25);
-    say('Headfirst into the hump, and down: a long way down a stone slide...');
+    say('Headfirst into the hump, and down a long stone slide... From the map in your pocket, a faint voice: <i>Messrs Moony, Wormtail, Padfoot and Prongs remind you that Lumos is needed at the bottom.</i>');
     setTimeout(function () { if (stage !== 'slide') return; stage = 'dark'; noise(0.25, 120, 0.6);
-      say('Cold, damp earth underfoot, and pitch dark. Light your wand: flick up, <b><i>Lumos</i></b>.'); }, 1700);
+      say('Cold, damp earth underfoot, and pitch dark. Light your wand: flick up, <b><i>Lumos</i></b>.'); }, SLIDE);
   }
   var DARK = { aside: 'Straight up, a quick flick.', short: 'A little longer: a quick flick up.', wiggly: 'One straight stroke, up.',
     slow: 'Quicker: a flick, not a push.', windmill: 'Just one flick, up.', nox: 'That way puts a light out, and there is none yet. Flick up.' };
@@ -240,7 +216,10 @@
       cx.strokeStyle = '#9fb6c9'; cx.lineWidth = 3;
       cx.beginPath(); cx.moveTo(m.x - uy * 12, m.y + ux * 12); cx.lineTo(m.x + uy * 12, m.y - ux * 12); cx.stroke();
       cx.fillStyle = '#9fb6c9'; cx.font = fs + 'px Georgia, serif';
-      cx.fillText('you', m.x - uy * 26, m.y + ux * 26);
+      cx.fillText('you, ' + WIDTH + ' cm', m.x + uy * fs * 1.6 + ux * fs * 1.4, m.y - ux * fs * 1.6 + uy * fs * 1.4);   /* outside the lid, past his mark */
+      var mid = { x: (e0.x + e1.x) / 2, y: (e0.y + e1.y) / 2 };   /* the gap, in cm, as it grows */
+      cx.fillStyle = fits ? '#f3d27a' : 'rgba(243,210,122,0.8)'; cx.font = '600 ' + fs + 'px Georgia, serif';
+      cx.fillText('gap ' + Math.round(gapAt(lid)) + ' cm', mid.x + uy * fs * 2.6, mid.y - ux * fs * 2.6);
     }
     var big = Math.round(Math.max(16, S * 0.05));
     cx.font = '600 ' + big + 'px Georgia, serif'; cx.fillStyle = '#f3d27a'; cx.shadowColor = '#000'; cx.shadowBlur = 6;
@@ -275,6 +254,15 @@
     cx.strokeStyle = 'rgba(120,110,100,' + (0.35 * (1 - k)) + ')'; cx.lineWidth = 2;
     for (var i = 0; i < 14; i++) { var sx = ((i * 137) % 100) / 100 * W, sy = ((i * 71 + now * 1.4) % (H + 200)) - 100;
       cx.beginPath(); cx.moveTo(sx, H - sy); cx.lineTo(sx, H - sy - 80); cx.stroke(); }
+    /* t2: a faint voice from the map, its words in the map's ink, coming and going */
+    var v = Math.max(0, Math.min(1, (now - slideAt - 500) / 600, (slideAt + SLIDE - now) / 500)), fs = Math.round(Math.max(13, S * 0.034));
+    if (v > 0) {
+      var words = ['Messrs Moony, Wormtail, Padfoot and Prongs', 'remind you that Lumos', 'is needed at the bottom.'];
+      cx.save(); cx.globalAlpha = v * 0.75; cx.fillStyle = '#d9c79a'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+      cx.font = 'italic ' + fs + 'px Georgia, serif';
+      words.forEach(function (w, i) { cx.fillText(w, W / 2, H * 0.42 + (i - 1) * fs * 1.5); });
+      cx.restore();
+    }
   }
   function drawPassage(now) {
     var k = Math.min(1, (now - litAt) / 900), wx = W / 2, wy = H * 0.86;
@@ -295,7 +283,12 @@
     cx.beginPath(); cx.arc(wx, wy - S * 0.12, S * 0.07, 0, 7); cx.fill();
   }
   function frame(now) {
-    if (lidTo) { var u = Math.min(1, (now - lidTo.at) / lidTo.ms); lid = lidTo.a + (lidTo.b - lidTo.a) * u * u * (3 - 2 * u); if (u >= 1) lidTo = null; }
+    if (lidTo) {
+      var u = Math.min(1, (now - lidTo.at) / lidTo.ms), was = lid, k = lidTo.swing ? 1 - Math.pow(1 - u, 3) : u * u * (3 - 2 * u);
+      lid = lidTo.a + (lidTo.b - lidTo.a) * k;
+      if (lidTo.swing && Math.floor(lid / 10) !== Math.floor(was / 10)) tick();
+      if (u >= 1) { var sw = lidTo.swing; lidTo = null; if (sw && stage === 'swing') opened(); }
+    }
     if (stage === 'slide') drawSlide(now);
     else if (stage === 'dark') { cx.fillStyle = '#000'; cx.fillRect(0, 0, W, H); }
     else if (stage === 'lit') drawPassage(now);
@@ -303,56 +296,44 @@
       drawWall(); drawWitch(now);
       if (stage !== 'tap') drawMeasure(now);
       drawMap(now);
-      if (stage === 'lift' && guide && !lidTo) guide.draw(cx, now, !!stroke);
     }
     var pts = stroke || (trail && now - trail.at < 400 ? trail.pts : null);
-    if (pts && pts.length > 1 && stage !== 'open') {
+    if (pts && pts.length > 1 && stage === 'dark') {
       cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + (stroke ? 0.5 : 0.5 * (1 - (now - trail.at) / 400)) + ')'; cx.lineWidth = 5;
       cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
     }
     requestAnimationFrame(frame);
   }
 
-  /* ---- touch: two taps on the hump, the lift round the hinge, a tap on the hole, then Lumos's flick in the dark ---- */
+  /* ---- touch: two taps on the hump (the second with the word), a tap on the hole, then Lumos's flick in the dark ---- */
   function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
-  function follow() {   /* the lid follows his finger while he lifts, and ticks at every ten degrees */
-    var g = geo(), j = LumosSpells.judgeHinge(stroke, g.hinge, g.L, { need: NEED, max: MAX, from: from, dir: 1 }, W, H, ease);
-    var to = j.reason === 'through the hinge' ? lid : Math.max(0, Math.min(MAX, from + j.degrees));
-    if (Math.floor(to / 10) !== Math.floor(lid / 10)) tick();
-    lid = to;
-  }
   cv.addEventListener('pointerdown', function (ev) {
     ensureAudio(); ev.preventDefault();
     var p = pt(ev);
     if (stage === 'tap') { tapHump(p); return; }
     if (stage === 'open') { climb(p); return; }
-    if ((stage !== 'lift' && stage !== 'dark') || active !== null || lidTo) return;
-    active = ev.pointerId; stroke = [p]; trail = null; if (guide && stage === 'lift') guide.cover(p);
+    if (stage !== 'dark' || active !== null) return;
+    active = ev.pointerId; stroke = [p]; trail = null;
     try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
   });
   cv.addEventListener('pointermove', function (ev) {
     if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
     var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
-    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (guide && stage === 'lift') guide.cover(q); });
-    if (stage === 'lift') follow();
+    list.forEach(function (e2) { stroke.push(pt(e2)); });
   });
   cv.addEventListener('pointerup', function (ev) {
     if (ev.pointerId !== active || !stroke) return;
-    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
-    if (stage === 'lift') judge(pts); else if (stage === 'dark') flick(pts);
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null; trail = { pts: pts, at: performance.now() };
+    if (stage === 'dark') flick(pts);
   });
-  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; lidTo = { at: performance.now(), a: lid, b: from, ms: 200 }; if (guide) guide.clear(); } });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; } });
   document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
   addEventListener('resize', resize); resize(); start(); requestAnimationFrame(frame);
   window.lumosDissendium = { start: start, geo: geo, tap: function () { var g = geo(); tapHump({ x: (g.hinge.x + g.edge.x) / 2, y: (g.hinge.y + g.edge.y) / 2 - S * 0.04 }); },
-    /* a lift of deg degrees drawn round the hinge from the lid's edge, as a finger would */
-    lift: function (deg, n) { var g = geo(), a0 = Math.atan2(g.edge.y - g.hinge.y, g.edge.x - g.hinge.x) + from * Math.PI / 180, out = [], k; n = n || 24;
-      for (k = 0; k <= n; k++) { var a = a0 + deg * Math.PI / 180 * k / n; out.push({ x: g.hinge.x + Math.cos(a) * g.L * 0.95, y: g.hinge.y + Math.sin(a) * g.L * 0.95, t: k * 20 }); }
-      return judge(out); },
-    hold: function (deg) { lid = deg; },
+    hold: function (deg) { lid = deg; }, gapAt: gapAt,
     climb: function () { climb(null); }, flick: function (pts) { return flick(pts); },
-    state: function () { return { stage: stage, taps: taps, lid: Math.round(lid), need: NEED, last: last, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('dissendium') }; } };
+    state: function () { return { stage: stage, taps: taps, lid: Math.round(lid * 10) / 10, need: Math.round(NEED * 10) / 10, width: WIDTH, gap: Math.round(gapAt(lid) * 10) / 10, last: last, ease: ease, learned: LumosSpells.learned('dissendium') }; } };
 })();
 </script>
 </body>
