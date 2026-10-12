@@ -72,6 +72,88 @@ function judgeSwishDown(points, w, h) {
 function learned(name) { try { return localStorage.getItem('lumos.spells.learned.' + name) === '1'; } catch (e) { return false; } }
 function learn(name) { try { localStorage.setItem('lumos.spells.learned.' + name, '1'); } catch (e) {} }
 
+/* Lumos over a spot, for a room (req 125, the Common room's candle stub, Godric's Q37 t2; tried on
+   page/charms/cast-over-test.html). One stroke: the traced guide (guide.js, if the room loads it) is a flick up
+   ending just under the spot; the answer is 'cast' or 'missed', and the room draws what follows (the flame, or not).
+   A tap is ignored, so a stray touch costs nothing; cancel() answers 'cancelled'. Nothing else on the page is
+   touched while it waits: a clear layer over the page takes the one stroke and is gone.
+   opts: { at: {x, y} in CSS pixels, or a function returning one each frame (a 3D room projects its candle),
+           ease: 'kind' (default), 'fair' or 'strict' (FLICK_EASES),
+           guide: 'auto' (default: the stage of his Lumos guide in Charms, the same store, full for his first three
+                  guided casts, then faint, then gone), 'always' or 'off',
+           reach: the guide's length as a share of the screen's short side (0.32) }
+   Returns { done: a promise of { verdict: 'cast' | 'missed' | 'cancelled', judge, traced }, cancel() }. */
+function castOver(opts) {
+  opts = opts || {};
+  var doc = root.document, G = root.LumosGuide, ease = opts.ease || 'kind', mode = opts.guide || 'auto';
+  var cv = doc.createElement('canvas'), cx = cv.getContext('2d'), W = 0, H = 0, DPR = 1;
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483000;touch-action:none;background:transparent';
+  var guide = null, spot = null, built = null, stroke = null, active = null, trail = null, raf = 0, finished = false, resolve;
+  var done = new Promise(function (r) { resolve = r; });
+  function where() { var p = typeof opts.at === 'function' ? opts.at() : opts.at; return p || { x: W / 2, y: H * 0.4 }; }
+  function size() {
+    DPR = Math.min(root.devicePixelRatio || 1, 2.5); W = root.innerWidth; H = root.innerHeight;
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0); built = null;
+  }
+  function box() {   /* the line from below up to just under the spot, kept on the screen */
+    var S = Math.min(W, H), gap = S * 0.035, len = Math.max(S * 0.12, Math.min(S * (opts.reach || 0.32), H - 16 - (spot.y + gap)));
+    return { G: len, ox: spot.x - len / 2, oy: spot.y + gap };
+  }
+  if (G && mode !== 'off') {
+    var right = (typeof opts.at === 'function' ? opts.at() : opts.at || { x: 0 }).x < root.innerWidth / 2;
+    guide = G.create({ key: mode === 'always' ? 'lumos.spells.castOver.always' : 'lumos.charms.lumosGuidedHits',
+      box: function () { return box(); }, rest: 1.2, mirror: false,
+      parts: [{ pts: G.line([0.5, 1], [0.5, 0], 28), secs: 0.3, label: 'Lumos', at: 0.5, dx: right ? 2.6 : -2.6 }] });
+  }
+  function frame(now) {
+    if (finished) return;
+    spot = where();
+    if (guide && (!built || Math.abs(built.x - spot.x) + Math.abs(built.y - spot.y) > 2)) { guide.build(W, H); built = { x: spot.x, y: spot.y }; }
+    cx.clearRect(0, 0, W, H);
+    if (guide) guide.draw(cx, now, !!stroke);
+    var pts = stroke || (trail && trail.pts), a = stroke ? 1 : (trail ? Math.max(0, 1 - (now - trail.at) / 350) : 0);
+    if (pts && pts.length > 1 && a > 0) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + 0.55 * a + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
+    }
+    raf = root.requestAnimationFrame(frame);
+  }
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(root.performance.now()) }; }
+  function finish(out) {
+    if (finished) return; finished = true; root.cancelAnimationFrame(raf);
+    root.removeEventListener('resize', size); if (cv.parentNode) cv.parentNode.removeChild(cv); resolve(out);
+  }
+  cv.addEventListener('pointerdown', function (ev) {
+    ev.preventDefault(); if (active !== null) return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null; if (guide) guide.cover(stroke[0]);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    var out = judge(pts);
+    if (!out) return;   /* a tap: wait on */
+    trail = { pts: pts, at: root.performance.now() };
+    root.setTimeout(function () { finish(out); }, 350);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } });
+  function judge(pts) {   /* also the way in for checks: cast.judge(points) */
+    var j = judgeFlick(pts, W, H, ease), lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
+    if (j.reason === 'tap') { if (guide) guide.clear(); return null; }
+    var traced = !!(tr && tr.traced), ok = j.verdict === 'lumos' || traced;
+    if (guide) { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
+    return { verdict: ok ? 'cast' : 'missed', judge: j, traced: traced };
+  }
+  size(); root.addEventListener('resize', size); doc.body.appendChild(cv); raf = root.requestAnimationFrame(frame);
+  return { done: done, cancel: function () { finish({ verdict: 'cancelled', judge: null, traced: false }); },
+    judge: function (pts) { var out = judge(pts); if (out) finish(out); return out; } };
+}
+
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown,
-  learned: learned, learn: learn };
+  learned: learned, learn: learn, castOver: castOver };
 })(typeof window !== 'undefined' ? window : globalThis);

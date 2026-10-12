@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Lumos over a spot, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120d0a; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas#c { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 560px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1e1611;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(12px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 8px; padding: 0 10px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 9px 13px; touch-action: manipulation; }
+  button.go { background: #6b2a1a; border-color: #a0503a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=2"></script>
+<script src="guide.js?v=3"></script>
+<script>
+/* Lumos over a spot, a test page for the Charms lane (11 October 2026; the owner is Godric). It tries the call a room
+   makes, LumosSpells.castOver (spells.js; req 125, the Common room's candle stub, Godric's Q37 t2): the candle waits
+   for a boy who has learned Lumos (LumosSpells.learned('lumos'), set by a cast on lumos-test.html) and lights only on
+   his flick. Drawn in code; the candle here is a stand-in for the room's own. The spot drifts a little, as a 3D room's
+   would when the view is dragged, to show the guide following it. ?still holds it. window.lumosCastOver for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, qs = new URLSearchParams(location.search);
+  var lit = 0, smoke = null, asking = null, last = null;
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  function wick(now) {   /* the spot the room would project: its candle's wick */
+    var drift = qs.has('still') ? 0 : Math.sin((now || performance.now()) / 2200) * S * 0.04;
+    return { x: W * 0.6 + drift, y: H * 0.5 };
+  }
+  function say(t) { lineEl.textContent = t; }
+  function btn(label, fn, cls) { var b = document.createElement('button'); b.textContent = label; if (cls) b.className = cls; b.onclick = fn; return b; }
+  function menu() {
+    var knows = LumosSpells.learned('lumos');
+    panel.innerHTML = '';
+    panel.appendChild(btn('Sit at the desk', sit, 'go'));
+    panel.appendChild(btn(knows ? 'Knows Lumos: yes' : 'Knows Lumos: no', function () {
+      try { if (knows) localStorage.removeItem('lumos.spells.learned.lumos'); else LumosSpells.learn('lumos'); } catch (e) {}
+      menu();
+    }));
+    if (lit) panel.appendChild(btn('Snuff it', function () { lit = 0; say('Snuffed.'); menu(); }));
+  }
+  function sit() {
+    if (lit) { say('It is already lit.'); return; }
+    if (!LumosSpells.learned('lumos')) { say('The candle stays dark: a wizard who knows Lumos could light it. (Learn it in Charms.)'); return; }
+    say('The candle stub waits. Lumos!');
+    panel.innerHTML = ''; panel.appendChild(btn('Stand up', function () { if (asking) asking.cancel(); }));
+    asking = LumosSpells.castOver({ at: function () { return wick(); } });
+    asking.done.then(function (r) {
+      asking = null; last = r;
+      if (r.verdict === 'cast') { lit = 0.01; say('It lights.'); }
+      else if (r.verdict === 'missed') { smoke = performance.now(); say('A wisp of smoke, no flame. Flick up, toward the wick.'); }
+      else say('You stand up; the candle stays as it was.');
+      menu();
+    });
+  }
+  function frame(now) {
+    cx.fillStyle = '#16100c'; cx.fillRect(0, 0, W, H);
+    var w = wick(now), u = S * 0.05;
+    /* the desk */
+    cx.fillStyle = '#3a2618'; cx.fillRect(0, w.y + u * 1.6, W, H);
+    cx.fillStyle = 'rgba(255,220,170,0.08)'; cx.fillRect(0, w.y + u * 1.6, W, 2);
+    if (lit) {
+      lit = Math.min(1, lit + 0.04);
+      var fl = 1 + 0.06 * Math.sin(now / 90) + 0.04 * Math.sin(now / 37);
+      var g = cx.createRadialGradient(w.x, w.y, 0, w.x, w.y, S * 0.5 * fl);
+      g.addColorStop(0, 'rgba(255,190,110,' + 0.35 * lit + ')'); g.addColorStop(1, 'rgba(255,160,80,0)');
+      cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+    }
+    /* the chamberstick and the stub */
+    cx.fillStyle = '#8a6a32'; cx.beginPath(); cx.ellipse(w.x, w.y + u * 1.55, u * 1.2, u * 0.25, 0, 0, 7); cx.fill();
+    cx.fillStyle = '#e6dcc4'; cx.fillRect(w.x - u * 0.28, w.y + u * 0.35, u * 0.56, u * 1.15);
+    cx.strokeStyle = '#2a1a10'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(w.x, w.y + u * 0.35); cx.lineTo(w.x, w.y + u * 0.12); cx.stroke();
+    if (lit) {
+      var fh = u * 0.7 * lit * (1 + 0.08 * Math.sin(now / 70));
+      var fg = cx.createRadialGradient(w.x, w.y - fh * 0.1, 0, w.x, w.y - fh * 0.1, fh);
+      fg.addColorStop(0, 'rgba(255,250,220,1)'); fg.addColorStop(0.5, 'rgba(255,190,90,0.9)'); fg.addColorStop(1, 'rgba(255,140,40,0)');
+      cx.fillStyle = fg; cx.beginPath(); cx.ellipse(w.x, w.y - fh * 0.1, fh * 0.32, fh * 0.75, 0, 0, 7); cx.fill();
+    }
+    if (smoke) {
+      var t = (now - smoke) / 1000;
+      if (t > 2) smoke = null;
+      else { cx.strokeStyle = 'rgba(190,185,175,' + 0.5 * (1 - t / 2) + ')'; cx.lineWidth = 2; cx.beginPath();
+        for (var i = 0; i <= 20; i++) { var k = i / 20; cx.lineTo(w.x + Math.sin(k * 7 + t * 3) * u * 0.25 * k, w.y + u * 0.1 - k * u * 1.6 * (0.6 + t)); }
+        cx.stroke(); }
+    }
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', resize); resize();
+  say('A candle stub on the desk, dark.'); menu(); requestAnimationFrame(frame);
+  window.lumosCastOver = { sit: sit, wick: wick, state: function () { return { lit: lit, last: last, asking: !!asking, knows: LumosSpells.learned('lumos') }; },
+    judge: function (pts) { return asking ? asking.judge(pts) : null; } };
+})();
+</script>
+</body>
+</html>
