@@ -686,7 +686,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=10"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=19"></script>
+<script src="castle-events.js?v=21"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=9"></script>
 <script>
@@ -5154,6 +5154,7 @@ function keyDoorTap() {
     if (v !== 'nothing') return;
     KEYDOOR.shake = 1;
     lineQ.unshift({ medium: 'heard', speaker: 'little door', sound: 'nothing happened.' });
+    if (castle) castle.moment('tried little door');   /* req 194: his first try goes on the list, once ever (the runtime's) */
   }, function () { LOCKS.door = null; });
 }
 /* the door's lock on the screen, for the spell's face: the stand-in's box at 0.8 across, its keyhole KEYDOOR.hole up */
