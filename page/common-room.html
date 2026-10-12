@@ -680,9 +680,9 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=9"></script>
+<script src="castle.js?v=10"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=16"></script>
+<script src="castle-events.js?v=17"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=9"></script>
 <script>
@@ -4939,6 +4939,131 @@ function leaveSofa() {
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
 }
+/* ---------- the sofa's finds and the Chocolate Frog cards in his hand (req 173; Events' req 165 and 169, The events
+   runtime, "Fifty-second session") ----------
+   What comes up from the sofa is the records' (page/events/sofa.json): a rummage sets `find` and `find_state`, or a card
+   (`card`, `card_side`, `card_face`, `houdini_lock`), and `holding`; its room rule "the find in his hand, up close"
+   shows while he holds it. The page draws the thing held before his eye while that rule shows, and a tap on it raises
+   `tap find` (its doing, or the card's next turn: the back, the picture again, Houdini's lock, the pocket); only the
+   records put it down, so nothing here keeps a copy of whether he holds it. Nothing new joins the bag or the deck until
+   the page names its drawing in DRAWN, so each sheet adds its own name the day it is placed (`quill`, `card-dumbledore`,
+   `card-houdini-leaving`, ...), with its art in FIND_ART; `?drawn=a,b` adds names for a probe only. Until a drawing
+   lands the thing in hand is a grey stand-in lettered with its name, as the room's other grey shapes (the old six,
+   which the bag has always held, come as stand-ins today). */
+var DRAWN = [];                       /* names of the finds and cards whose drawings have landed; none yet */
+var FIND_ART = {};                    /* name: { url } as each lands; a card's by 'card-<name>' */
+function drawnNames() {
+  var q = null;
+  try { q = new URLSearchParams(location.search).get('drawn'); } catch (err) {}
+  return q ? DRAWN.concat(q.split(',')) : DRAWN;
+}
+var FIND_RULES = {                    /* sofa.json's room rules, word for word */
+  hand: 'the find in his hand, up close, as a notice is held',
+  bubble: "one bluebell bubble of Drooble's gum up by the ceiling, not popped yet"
+};
+var CARD_W = 0.063, CARD_H = 0.088, FIND_W = 0.1;
+var findCanvas = makeCanvas(512, 716), findTex = tex(findCanvas);
+var findHand = { want: false, k: 0, key: '', w: FIND_W, h: FIND_W,
+  mesh: new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: findTex, transparent: true,
+    depthTest: false, depthWrite: false, opacity: 0 })) };
+findHand.mesh.name = 'find-in-hand'; findHand.mesh.renderOrder = 20; findHand.mesh.visible = false;
+scene.add(findHand.mesh); tappables.push(findHand.mesh);
+function findVars() { return (castle && castle.state && castle.state().vars) || {}; }
+function wordsOf(s) { s = String(s || '').replace(/-/g, ' '); return s.charAt(0).toUpperCase() + s.slice(1); }
+/* the stand-ins: a find a grey pebble of a shape with its name and state; a card the card's form in grey, its picture's
+   frame, the figure there, gone, or a coat tail at the frame's edge, its back ruled with a frog roundel, Houdini's padlock */
+function drawFindStandIn(v) {
+  var c = findCanvas, g = c.getContext('2d'), W = c.width, H = c.height;
+  g.clearRect(0, 0, W, H);
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  if (v.find !== 'card') {
+    var cy = H * 0.5;
+    g.fillStyle = '#8d8a85'; g.strokeStyle = '#4a4744'; g.lineWidth = 6;
+    g.beginPath(); g.ellipse(W / 2, cy, W * 0.44, W * 0.36, 0, 0, Math.PI * 2); g.fill(); g.stroke();
+    g.fillStyle = '#26231f'; g.font = 'bold 54px ' + F.print;
+    g.fillText(wordsOf(v.find), W / 2, cy - (v.find_state ? 24 : 0));
+    if (v.find_state) { g.font = 'italic 40px ' + F.print; g.fillText(String(v.find_state), W / 2, cy + 36); }
+    return;
+  }
+  var M = 22, r = 26;
+  g.fillStyle = '#a9a59e'; g.strokeStyle = '#4a4744'; g.lineWidth = 6;
+  g.beginPath(); g.moveTo(M + r, M); g.arcTo(W - M, M, W - M, H - M, r); g.arcTo(W - M, H - M, M, H - M, r);
+  g.arcTo(M, H - M, M, M, r); g.arcTo(M, M, W - M, M, r); g.closePath(); g.fill(); g.stroke();
+  g.strokeStyle = '#6b6863'; g.lineWidth = 3; g.strokeRect(M + 18, M + 18, W - 2 * M - 36, H - 2 * M - 36);
+  g.fillStyle = '#26231f';
+  if (v.card_side === 'back') {
+    g.beginPath(); g.arc(W / 2, H * 0.24, 46, 0, Math.PI * 2); g.stroke();
+    g.font = 'bold 30px ' + F.print; g.fillText('frog', W / 2, H * 0.24);
+    g.strokeStyle = '#6b6863'; g.lineWidth = 2;
+    for (var y = H * 0.4; y < H * 0.86; y += 34) { g.beginPath(); g.moveTo(W * 0.2, y); g.lineTo(W * 0.8, y); g.stroke(); }
+    g.font = 'bold 38px ' + F.print; g.fillText(wordsOf(v.card) + ', the back', W / 2, H * 0.92 - 10);
+    return;
+  }
+  var fx = W * 0.16, fy = H * 0.1, fw = W * 0.68, fh = H * 0.66;
+  g.fillStyle = '#c4c0b8'; g.fillRect(fx, fy, fw, fh);
+  g.strokeStyle = '#4a4744'; g.lineWidth = 5; g.strokeRect(fx, fy, fw, fh);
+  g.fillStyle = '#6d6a65';
+  if (v.card_face === 'there') {                       /* a head and shoulders in grey */
+    g.beginPath(); g.arc(W / 2, fy + fh * 0.36, fw * 0.16, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.ellipse(W / 2, fy + fh * 0.92, fw * 0.36, fh * 0.34, 0, Math.PI, 0); g.fill();
+  } else if (v.card_face === 'leaving') {              /* a coat tail just going out of the frame's right side */
+    g.beginPath(); g.moveTo(fx + fw, fy + fh * 0.45); g.quadraticCurveTo(fx + fw * 0.82, fy + fh * 0.7, fx + fw, fy + fh * 0.98);
+    g.closePath(); g.fill();
+  }
+  if (v.card === 'houdini') {                          /* his padlock on the picture, shut or hanging open */
+    var lx = W / 2, ly = fy + fh * 0.62, open = v.houdini_lock === 'open';
+    g.strokeStyle = '#26231f'; g.lineWidth = 9;
+    g.beginPath(); g.arc(lx + (open ? 18 : 0), ly - 28 - (open ? 14 : 0), 26, Math.PI, 0); g.stroke();
+    g.fillStyle = '#3b3833'; g.fillRect(lx - 38, ly - 28, 76, 64);
+  }
+  g.fillStyle = '#26231f'; g.font = 'bold 40px ' + F.print;
+  g.fillText(wordsOf(v.card), W / 2, fy + fh + (H - M - fy - fh) / 2);
+}
+function findDrawRoom(shows) {
+  findHand.want = shows.indexOf(FIND_RULES.hand) >= 0;
+  bubble.want = shows.indexOf(FIND_RULES.bubble) >= 0;
+  if (!findHand.want) return;
+  var v = findVars();
+  var key = [v.find, v.find_state, v.card, v.card_side, v.card_face, v.houdini_lock].join('|');
+  if (key === findHand.key) return;
+  findHand.key = key;
+  var card = v.find === 'card';
+  findHand.w = card ? CARD_W : FIND_W; findHand.h = card ? CARD_H : FIND_W * 716 / 512;
+  drawFindStandIn(v);
+  findTex.needsUpdate = true;
+}
+/* held before his eye as a notice is, a little below the middle, breathing with his hand; it comes up and goes in 0.4 s */
+var _fp = new THREE.Vector3(), _fq = new THREE.Quaternion();
+function updateFindHand(dt, t) {
+  var h = findHand, m = h.mesh;
+  h.k = h.want ? Math.min(1, h.k + dt / 0.4) : Math.max(0, h.k - dt / 0.4);
+  m.visible = h.k > 0;
+  if (!m.visible) return;
+  camera.getWorldDirection(_dir);
+  _up.set(0, 1, 0).applyQuaternion(camera.quaternion);
+  var th = Math.tan(camera.fov * Math.PI / 360);
+  var d = Math.max(h.h / (0.62 * 2 * th), h.w / (0.62 * 2 * th * camera.aspect), 0.2);
+  var e = smooth01(0, 1, h.k);
+  _fp.copy(camera.position).addScaledVector(_dir, d).addScaledVector(_up, h.h * (-0.08 - 0.5 * (1 - e)) + 0.003 * Math.sin(t * 1.7));
+  m.position.copy(_fp);
+  _e.set(-0.05 + 0.01 * Math.sin(t * 0.8), 0.02 * Math.sin(t * 0.9), 0);
+  m.quaternion.copy(camera.quaternion).multiply(_fq.setFromEuler(_e));
+  m.scale.set(h.w, h.h, 1);
+  m.material.opacity = e;
+}
+/* the Drooble's bubble (sofa.f-drooble-bubble, PoA 10's bubbles that would not pop for days): one bluebell bubble up
+   high over the sofa while its rule shows, bobbing a little; popped by the records on the third day. The ceiling (7 m) is
+   above every view of his, so it floats at 4.6 m, near the frame's top at rest (about 120 px down on the wide screen,
+   90 on the iPad), where a boy looking up finds it */
+var bubble = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 14), new THREE.MeshStandardMaterial({ color: col(0x8c9be8),
+  emissive: col(0x2a3170), roughness: 0.15, metalness: 0, transparent: true, opacity: 0.55 }));
+bubble.position.set(onSofa(0.2, 0.3)[0], 4.6, onSofa(0.2, 0.3)[1]);
+bubble.name = 'drooble-bubble'; bubble.visible = false; bubble.want = false;
+scene.add(bubble);
+function updateBubble(t) {
+  bubble.visible = bubble.want;
+  if (bubble.visible) bubble.position.y = 4.6 + 0.03 * Math.sin(t * 0.6);
+}
 /* ---------- the bookcase and ladder's stop (Q36, 4: Godric 9.15 pm, the walk-ups in turn) ----------
    As the hole's: a tap on the bookcase or its ladder walks him up square to the wall, a boy's standing eye, framed on the
    shelves a boy can reach and the ladder's foot, the case running on up out of frame, as a library-high case should
@@ -5342,6 +5467,7 @@ function catStandUp() {
 function tapName(o) {
   if (!o) return null;
   if (o === sofa) return 'sofa';
+  if (o === findHand.mesh) return 'find';            /* the find or card in his hand (req 173) */
   if (o === catWalk || o === catSit || o === curl.mesh) return 'cat';
   if (o === stairs) return 'stair';
   if (o === bookcase) return 'bookshelf';
@@ -5390,6 +5516,7 @@ function tapHits(cx, cy) {
     if (h.object === ring) return !!h.uv && ringSolid(h.uv);
     if (h.object === stairs) return stairsSolid(h.uv);
     if (h.object === sofa) return sofaSolid(h.uv);
+    if (h.object === findHand.mesh) return findHand.want && findHand.mesh.visible;
     if (h.object === catWalk || h.object === catSit) return !curl.on;
     if (h.object === curl.mesh) return curl.on && alphaSolid(curl.alpha, h.uv);
     if (h.object === books.mesh) return alphaSolid(books.ain, h.uv);   /* the gap where the History stood counts too */
@@ -5408,6 +5535,7 @@ function tapDo(cx, cy) {
   var hit = hits.length ? hits[0].object : null;
   var told = { name: tapName(hit), acted: true }, back = { name: null, acted: true };
   if (mode === 'hand') { if (homeHandTap()) return back; returnPaper(false); return back; }
+  if (hit && hit === findHand.mesh) return told;     /* `tap find`: its doing, or the card's next turn, at any stop */
   if (mode === 'board') {
     if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return told; }
     if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) { booksTap(); return told; }
@@ -5838,7 +5966,10 @@ var LINE_PLACES = {                            /* where a line with no drawn spe
   'hole-stop': holeC.clone().add(new THREE.Vector3(0, 0.75, 0)),
   'beyond the hole': holeC.clone().add(new THREE.Vector3(0, 0.75, 0)),
   board: new THREE.Vector3(4.27, 2.0, -3.53),
-  windowsill: new THREE.Vector3(2.87, 2.15, -4.6)        /* the right window's sill, until the letter is placed */
+  windowsill: new THREE.Vector3(2.87, 2.15, -4.6),       /* the right window's sill, until the letter is placed */
+  hand: function () {                                    /* above the find in his hand (req 173) */
+    return findHand.mesh.position.clone().add(new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion).multiplyScalar(findHand.h * 0.75));
+  }
 };
 var HEARD_FROM = {                             /* off-stage speakers, by name, toward where they are heard */
   percy: STAIR_HEAD, dorm: STAIR_HEAD, runner: STAIR_HEAD,
@@ -5958,6 +6089,7 @@ function figureTapped(hits) {
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'common room',
+  drawn: drawnNames,                                   /* the finds and cards drawn so far (req 173) */
   cues: Object.assign({
     'fire green for 2 s': fireGreen,
     'smoke puffs back out of the grate': smokePuff,
@@ -5967,7 +6099,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': snowballFly,
     "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); }
   }, VISITOR_CUES, NICK_CUES),
-  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); locksDrawRoom(shows); },
+  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); locksDrawRoom(shows); findDrawRoom(shows); },
   figures: FIGURES,
   drawFigures: drawFiguresInOrder,
   showLines: showLines,
@@ -6033,6 +6165,8 @@ function frame() {
   faceEye();
   updateSofaStop(dt);
   updatePairStop(dt);
+  updateFindHand(dt, t);
+  updateBubble(slowT);
   updateLadder(dt);
   updateKeyDoor(dt);
   updateTwins();
