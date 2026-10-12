@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Ollivanders, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #140e0a; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 640px); box-sizing: border-box; text-align: center; padding: 10px 16px;
+    font: italic 600 20px/1.3 Georgia, 'Times New Roman', serif; color: #2b1d10; background: #e8dab8;
+    border: 1px solid #8a7550; border-radius: 6px; box-shadow: 0 3px 10px rgba(0,0,0,.6); pointer-events: none; }
+  #line.tell { font-style: normal; background: #1e1611; color: #eadcbf; border-color: #4a3a2c; }
+  #note { position: fixed; left: 0; right: 0; text-align: center; padding: 0 18px; pointer-events: none;
+    font: 16px/1.35 Georgia, serif; color: #cdbb98; text-shadow: 0 1px 4px #000; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); padding: 0 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 760px; }
+  .row .lab { font: 13px Georgia, serif; color: #b9a684; width: 100%; text-align: center; margin-bottom: -2px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 9px 13px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+  button.big { font-size: 18px; padding: 12px 20px; }
+  button.go { background: #6b2a1a; border-color: #a0503a; }
+  button:disabled { opacity: .35; }
+  input[type=range] { width: min(86vw, 520px); accent-color: #c9c9d6; }
+  #corner { position: fixed; right: 10px; top: calc(max(12px, env(safe-area-inset-top)) + 4px); display: flex; gap: 6px; }
+  #corner button { font-size: 13px; padding: 6px 9px; }
+  #ledger { position: fixed; left: 8px; right: 8px; top: 70px; bottom: 70px; overflow: auto; display: none;
+    background: #e8dab8; color: #2b1d10; border: 1px solid #8a7550; border-radius: 8px; padding: 12px;
+    font: 14px/1.35 Georgia, serif; box-shadow: 0 6px 24px rgba(0,0,0,.7); }
+  #ledger h2 { margin: 0 0 4px; font-size: 20px; }
+  #ledger table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+  #ledger th, #ledger td { border-bottom: 1px solid #b8a47c; padding: 5px 4px; text-align: left; }
+  #ledger td.chg { background: #f0cf73; font-weight: 700; }
+  #ledger .why { margin-top: 10px; font-style: italic; }
+  /* on a phone the line sits under the Ledger and Start again buttons, not beneath them */
+  @media (max-width: 760px) {
+    #line { top: calc(max(12px, env(safe-area-inset-top)) + 42px); font-size: 18px; }
+    #ledger { font-size: 13px; padding: 10px 8px; }
+    #ledger th, #ledger td { padding: 4px 3px; }
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line">"Good afternoon."</div>
+<div id="note"></div>
+<div id="corner"><button id="ledgerBtn">Ledger</button><button id="restart">Start again</button></div>
+<div id="panel"></div>
+<div id="ledger"></div>
+<script src="spells.js?v=1"></script>
+<script src="guide.js?v=3"></script>
+<script>
+/* Ollivanders, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
+   The plan and Godric's answers are in the lane's handoff ("The Ollivander moment, the plan"; Q2 at 7.26 pm, Q3 at
+   9.41 pm): the shop; "Which is your wand arm?"; the tape measure, his real hand and forearm on the glass for the
+   measures that count and a drawn figure for the comic ones; the bench, where each boy builds his own wand (not in the
+   books, said so); Ollivander's ledger as a fair test; and the wand choosing back when it suits him by his own measures,
+   a length near five quarters of his forearm and a flexibility that fits how his flicks land. Ollivander appears only
+   in his lines, the books' words (PS 5, checked in the text), and in what he does. The brother wand and the scar stay
+   out. The geometry: lengths in quarters on a number line, a fraction of his forearm, mirror symmetry for the wand arm,
+   and the lit floor growing as the square of the light's reach. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d');
+  var lineEl = document.getElementById('line'), noteEl = document.getElementById('note'), panel = document.getElementById('panel');
+  var ledgerEl = document.getElementById('ledger');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null;
+  var qs = new URLSearchParams(location.search), KEY = 'lumos.charms.ollivander';
+
+  /* ---- what is kept on the device: one record per wizard (the iPad names them; the public copy names no one) ---- */
+  var store = {};
+  try { store = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { store = {}; }
+  if (qs.has('reset')) store = {};
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+  var who = null;
+  function me() { if (!store[who]) store[who] = { rows: [] }; return store[who]; }
+
+  /* ---- the four choices of Q2, in the books' words ---- */
+  var WOODS = [   /* the woods PS 5 names; the colours are placeholders until Design draws the woods (its file, the Ollivander thread) */
+    { k: 'willow', c: '#b89a6a', f: 523 }, { k: 'mahogany', c: '#6e2f1e', f: 392 }, { k: 'oak', c: '#8a6440', f: 330 },
+    { k: 'beech', c: '#c09a6b', f: 440 }, { k: 'maple', c: '#d4b483', f: 587 }, { k: 'ebony', c: '#2a1f18', f: 294 },
+    { k: 'holly', c: '#e2d6bd', f: 659 } ];
+  /* stiff to whippy: "quite rigid" GoF 18; "springy", "supple", "pliable", "quite whippy" PS 5. The order is ours. */
+  var FLEX = [ { k: 'quite rigid', angle: 20, wob: 0 }, { k: 'springy', angle: 25, wob: 0.01 }, { k: 'supple', angle: 30, wob: 0.02 },
+    { k: 'pliable', angle: 35, wob: 0.035 }, { k: 'quite whippy', angle: 40, wob: 0.05 } ];
+  /* "unicorn hairs, phoenix tail feathers, and the heartstrings of dragons" (PS 5) */
+  var CORES = [ { k: 'unicorn hair', c: [225, 232, 255], reach: 1, fizz: 'gentle' },
+    { k: 'phoenix feather', c: [255, 214, 122], reach: 1, fizz: 'sparks' },
+    { k: 'dragon heartstring', c: [255, 168, 104], reach: 1.15, fizz: 'big' } ];
+  var build = { wood: 'holly', len: 11, flex: 'supple', core: 'unicorn hair' };
+  function wood(k) { return WOODS.filter(function (w) { return w.k === k; })[0] || WOODS[0]; }
+  function flex(k) { return FLEX.filter(function (w) { return w.k === k; })[0] || FLEX[2]; }
+  function core(k) { return CORES.filter(function (w) { return w.k === k; })[0] || CORES[0]; }
+
+  /* ---- lengths in quarters, said as the shop says them ---- */
+  var WORDS = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
+    'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen'];
+  function q4(x) { return Math.round(x * 4) / 4; }
+  function frac(x) {   /* 11.25 -> "11¼" */
+    x = q4(x); var n = Math.floor(x), r = Math.round((x - n) * 4);
+    return (n ? n : '') + ['', '¼', '½', '¾'][r] || '0';
+  }
+  function sayLen(x) {   /* 11.25 -> "eleven and a quarter inches" */
+    x = q4(x); var n = Math.floor(x), r = Math.round((x - n) * 4);
+    return WORDS[n] + ['', ' and a quarter', ' and a half', ' and three quarters'][r] + ' inches';
+  }
+  /* CSS pixels to an inch: Safari reports points, not inches, so this is close, not exact, and said as "about". iPads
+     show about 132 points to the inch, phones about 160. */
+  function ppi() { return Math.min(screen.width, screen.height) >= 700 ? 132 : 160; }
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+    W = window.innerWidth; H = window.innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+    cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    shop = null; flickGuide.build(W, H); swishGuide.build(W, H);
+    noteEl.style.top = (lineEl.getBoundingClientRect().bottom + 8) + 'px';
+  }
+
+  /* ---- sound, opened on the first touch ---- */
+  function ensureAudio() {
+    if (audio) { if (audio.state === 'suspended') audio.resume(); return; }
+    var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC();
+  }
+  function tone(f, at, dur, gain, type) {
+    if (!audio) return; var now = audio.currentTime + (at || 0);
+    var o = audio.createOscillator(), g = audio.createGain(); o.type = type || 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(gain || 0.1, now + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    o.connect(g); g.connect(audio.destination); o.start(now); o.stop(now + dur + 0.05);
+  }
+  function noise(dur, freq, gain) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 2);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+  function bell() { tone(1760, 0, 1.2, 0.07); tone(2349, 0.12, 1.0, 0.05); }
+
+  /* ---- the shop: boxes to the ceiling, dust in the light (PS 5), drawn once per size ---- */
+  var shop = null, motes = [];
+  function rnd(seed) { return function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+  function drawShop() {
+    var c = document.createElement('canvas'); c.width = Math.round(W * DPR); c.height = Math.round(H * DPR);
+    var g = c.getContext('2d'); g.setTransform(DPR, 0, 0, DPR, 0, 0);
+    g.fillStyle = '#1c130d'; g.fillRect(0, 0, W, H);
+    var r = rnd(7), bw = Math.max(10, S * 0.03), bh = Math.max(7, S * 0.017), x, y, col;
+    var hues = ['#33281f', '#3c3025', '#2a211a', '#44372a', '#2f2631', '#372b21', '#271f19', '#3f3328'];   /* darkened, so the words read over them */
+    for (x = 0; x < W; x += bw * 6 + 8) {
+      g.fillStyle = '#120c08'; g.fillRect(x - 4, 0, 4, H);   /* the uprights */
+      for (y = 0; y < H * 0.8; y += bh + 1) {
+        for (col = 0; col < 6; col++) {
+          var bx = x + col * bw, by = y + (r() < 0.06 ? 2 : 0);
+          if (r() < 0.04) continue;   /* a box taken down */
+          g.fillStyle = hues[Math.floor(r() * hues.length)]; g.fillRect(bx, by, bw - 1, bh);
+          g.fillStyle = 'rgba(0,0,0,0.35)'; g.fillRect(bx + bw * 0.78, by, bw * 0.08, bh);   /* the lid's edge */
+          if (r() < 0.15) { g.fillStyle = 'rgba(232,218,184,0.2)'; g.fillRect(bx + bw * 0.2, by + bh * 0.35, bw * 0.4, bh * 0.25); }   /* a label */
+        }
+      }
+    }
+    /* the gloom toward the top and the sides */
+    var v = g.createRadialGradient(W * 0.5, H * 0.55, S * 0.2, W * 0.5, H * 0.55, Math.max(W, H) * 0.75);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.75)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+    var top = g.createLinearGradient(0, 0, 0, H * 0.4);   /* deeper shadow up where his lines are written */
+    top.addColorStop(0, 'rgba(0,0,0,0.6)'); top.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = top; g.fillRect(0, 0, W, H * 0.4);
+    /* the light from the window, falling from the top left */
+    g.fillStyle = 'rgba(255,230,180,0.07)';
+    g.beginPath(); g.moveTo(0, 0); g.lineTo(W * 0.38, 0); g.lineTo(W * 0.78, H * 0.8); g.lineTo(W * 0.3, H * 0.8); g.closePath(); g.fill();
+    /* the counter */
+    var cy0 = H * 0.8, cg = g.createLinearGradient(0, cy0, 0, H);
+    cg.addColorStop(0, '#4a3020'); cg.addColorStop(1, '#22150d'); g.fillStyle = cg; g.fillRect(0, cy0, W, H - cy0);
+    g.fillStyle = 'rgba(255,220,170,0.12)'; g.fillRect(0, cy0, W, 2);
+    /* "A single wand lay on a faded purple cushion" (PS 5, in the window; here on the counter) */
+    var px = W * 0.14, py = cy0 + (H - cy0) * 0.35;
+    g.fillStyle = '#4b3550'; g.beginPath(); g.ellipse(px, py, S * 0.09, S * 0.025, 0, 0, 7); g.fill();
+    g.strokeStyle = '#2e2018'; g.lineWidth = Math.max(2, S * 0.006); g.lineCap = 'round';
+    g.beginPath(); g.moveTo(px - S * 0.07, py - S * 0.012); g.lineTo(px + S * 0.07, py - S * 0.02); g.stroke();
+    return c;
+  }
+  function drawMotes(now) {
+    if (motes.length < 40) motes.push({ x: Math.random(), y: Math.random() * 0.8, s: 0.4 + Math.random(), ph: Math.random() * 6 });
+    cx.save();
+    motes.forEach(function (m) {
+      m.y += 0.00025 * m.s; if (m.y > 0.8) m.y = 0;
+      var x = (m.x * 0.5 + m.y * 0.55) * W + Math.sin(now / 1500 + m.ph) * 6, y = m.y * H;
+      cx.fillStyle = 'rgba(255,236,200,' + (0.25 + 0.2 * Math.sin(now / 700 + m.ph)) + ')';
+      cx.beginPath(); cx.arc(x, y, 1.1 * m.s, 0, 7); cx.fill();
+    });
+    cx.restore();
+  }
+
+  /* ---- the wand, drawn in his hand at the foot of the screen, mirrored for a left hand ---- */
+  function lefty() { return who && me().hand === 'left'; }
+  function wandGeom(lenIn, tilt) {
+    var pt0 = panel.childNodes.length ? panel.getBoundingClientRect().top - 10 : H;   /* the handle clear of the buttons */
+    var base = { x: lefty() ? W * 0.5 - S * 0.12 : W * 0.5 + S * 0.12, y: Math.min(H - Math.max(36, S * 0.06), pt0) };
+    var len = S * 0.3 + (lenIn - 7) / 9 * S * 0.28;
+    var ang = ((lefty() ? 8 : -8) + (tilt || 0)) * Math.PI / 180;
+    return { base: base, len: len, ang: ang, tip: { x: base.x + Math.sin(ang) * len, y: base.y - Math.cos(ang) * len } };
+  }
+  function drawWand(gm, woodK, glow) {
+    var w = wood(woodK), ux = Math.sin(gm.ang), uy = -Math.cos(gm.ang), nx = -uy, ny = ux;
+    var w0 = S * 0.02, w1 = S * 0.005, hl = gm.len * 0.28;
+    function P(a, s) { return [gm.base.x + ux * a + nx * s, gm.base.y + uy * a + ny * s]; }
+    cx.save();
+    if (glow > 0) {   /* "a sudden warmth in his fingers" (PS 5): the handle glows */
+      var hg = cx.createRadialGradient(P(hl * 0.5, 0)[0], P(hl * 0.5, 0)[1], 0, P(hl * 0.5, 0)[0], P(hl * 0.5, 0)[1], S * 0.12);
+      hg.addColorStop(0, 'rgba(255,190,110,' + 0.55 * glow + ')'); hg.addColorStop(1, 'rgba(255,150,80,0)');
+      cx.fillStyle = hg; cx.beginPath(); cx.arc(P(hl * 0.5, 0)[0], P(hl * 0.5, 0)[1], S * 0.12, 0, 7); cx.fill();
+    }
+    cx.fillStyle = w.c; cx.beginPath();
+    var p = P(hl, -w0 * 0.75); cx.moveTo(p[0], p[1]);
+    p = P(gm.len, -w1); cx.lineTo(p[0], p[1]); p = P(gm.len + w1, 0); cx.lineTo(p[0], p[1]);
+    p = P(gm.len, w1); cx.lineTo(p[0], p[1]); p = P(hl, w0 * 0.75); cx.lineTo(p[0], p[1]); cx.closePath(); cx.fill();
+    cx.fillStyle = 'rgba(0,0,0,0.3)'; cx.beginPath();
+    p = P(hl, 0); cx.moveTo(p[0], p[1]); p = P(gm.len, w1 * 0.2); cx.lineTo(p[0], p[1]); p = P(hl, w0 * 0.75); cx.lineTo(p[0], p[1]); cx.closePath(); cx.fill();
+    cx.fillStyle = shade(w.c, -0.35); cx.beginPath();
+    p = P(-S * 0.02, -w0); cx.moveTo(p[0], p[1]); p = P(hl, -w0); cx.lineTo(p[0], p[1]);
+    p = P(hl, w0); cx.lineTo(p[0], p[1]); p = P(-S * 0.02, w0); cx.lineTo(p[0], p[1]); cx.closePath(); cx.fill();
+    cx.restore();
+  }
+  function shade(hex, k) {
+    var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+    function f(v) { return Math.max(0, Math.min(255, Math.round(k < 0 ? v * (1 + k) : v + (255 - v) * k))); }
+    return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')';
+  }
+
+  /* ---- the tape measure "with silver markings" (PS 5) ---- */
+  function drawTape(pts, label, alpha) {
+    if (pts.length < 2) return;
+    cx.save(); cx.globalAlpha = alpha == null ? 1 : alpha; cx.lineCap = 'round'; cx.lineJoin = 'round';
+    cx.strokeStyle = 'rgba(0,0,0,0.4)'; cx.lineWidth = 11; poly(pts); cx.stroke();
+    cx.strokeStyle = '#d9dbe6'; cx.lineWidth = 8; poly(pts); cx.stroke();
+    /* the markings, every quarter inch at the screen's own scale, longer at each inch */
+    var step = ppi() / 4, acc = 0, n = 0, i;
+    cx.strokeStyle = '#5a5d70'; cx.lineWidth = 1;
+    for (i = 1; i < pts.length; i++) {
+      var a = pts[i - 1], b = pts[i], d = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / (d || 1), uy = (b.y - a.y) / (d || 1);
+      while (acc <= d) {
+        var x = a.x + ux * acc, y = a.y + uy * acc, L = n % 4 === 0 ? 4 : 2;
+        cx.beginPath(); cx.moveTo(x - uy * L, y + ux * L); cx.lineTo(x + uy * L, y - ux * L); cx.stroke();
+        acc += step; n++;
+      }
+      acc -= d;
+    }
+    var e = pts[pts.length - 1];
+    cx.fillStyle = '#b08a3a'; cx.fillRect(e.x - 5, e.y - 5, 10, 10);   /* its brass end */
+    if (label) {
+      var m = pts[Math.floor(pts.length / 2)], fs = Math.round(Math.max(17, S * 0.04));
+      cx.font = '600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center';
+      cx.shadowColor = 'rgba(0,0,0,0.95)'; cx.shadowBlur = 6; cx.fillStyle = '#eef0fa';
+      cx.fillText(label, m.x, m.y - fs * 0.9);
+    }
+    cx.restore();
+  }
+  function poly(pts) { cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); }
+
+  /* ---- the guides, from guide.js: the flick up to try a wand, and the swish down when it chooses him ---- */
+  function lineBox(w, h) { var G = h * 0.34; return { G: G, ox: w * 0.26 - G * 0.5, oy: h * 0.26 }; }
+  var flickGuide = LumosGuide.create({ key: 'lumos.charms.lumosGuidedHits', box: lineBox, rest: 1.2, mirror: lefty, parts: [
+    { pts: LumosGuide.line([0.5, 1], [0.5, 0], 28), secs: 0.3, label: 'flick up', at: 0.5, dx: 3.3 } ] });
+  var swishGuide = LumosGuide.create({ key: 'lumos.charms.swishDownGuidedHits', rest: 1.0, mirror: lefty,
+    box: function (w, h) { var G = Math.min(h * 0.5, w * 0.9); return { G: G, ox: w * 0.5 - G * 0.6, oy: h * 0.2 }; },
+    parts: [ { pts: LumosGuide.quad([0.75, 0], [1.0, 0.55], [0.45, 1], 36), secs: 0.45, label: 'swishing down', at: 0.45, dx: -3.4 } ] });
+
+  /* ---- the scenes ---- */
+  var scene = 'door', T0 = 0, tape = null, handTouches = {}, taps = [], tries = null, effects = [], spots = [], glow = 0, verdictText = null;
+  function say(text, tell) { lineEl.textContent = text; lineEl.className = tell ? 'tell' : ''; noteEl.style.top = (lineEl.getBoundingClientRect().bottom + 8) + 'px'; }
+  function note(text) { noteEl.textContent = text || ''; }
+  function btn(label, fn, cls) { var b = document.createElement('button'); b.textContent = label; if (cls) b.className = cls; b.addEventListener('click', function () { ensureAudio(); fn(b); }); return b; }
+  function row(children, lab) {
+    var r = document.createElement('div'); r.className = 'row';
+    if (lab) { var l = document.createElement('div'); l.className = 'lab'; l.textContent = lab; r.appendChild(l); }
+    children.forEach(function (c) { r.appendChild(c); }); return r;
+  }
+  function setPanel(rows) { panel.innerHTML = ''; rows.forEach(function (r) { panel.appendChild(r); }); }
+
+  function go(name) {
+    scene = name; T0 = performance.now(); tape = null; taps = []; handTouches = {}; verdictText = null; note('');
+    ({ door: sDoor, remember: sRemember, arm: sArm, hand: sHand, forearm: sForearm, ruler: sRuler, comic: sComic,
+       bench: sBench, tryit: sTry, choose: sChoose, chosen: sChosen })[name]();
+  }
+
+  function sDoor() {
+    say('"Good afternoon."');
+    note('Ollivanders: Makers of Fine Wands. Who has come in?');
+    setPanel([row([1, 2, 3, 4].map(function (n) {
+      var b = btn('Wizard ' + n, function () {
+        bell(); who = String(n);
+        if (me().chosen) go('remember'); else go('arm');
+      }, 'big');
+      return b;
+    }))]);
+  }
+  /* Godric's touch (Q3 t2): Ollivander remembers each boy's wand when he comes back, and the four are compared. */
+  function sRemember() {
+    var c = me().chosen;
+    say('"I remember every wand I\'ve ever sold. Every single wand."');
+    var others = Object.keys(store).filter(function (k) { return k !== who && store[k].chosen; }).map(function (k) {
+      var d = c.len - store[k].chosen.len;
+      return 'Wizard ' + k + ': ' + store[k].chosen.wood + ', ' + frac(store[k].chosen.len) + ' in' +
+        (d ? ' (' + frac(Math.abs(d)) + ' in ' + (d > 0 ? 'shorter' : 'longer') + ' than yours)' : ' (the same length)');
+    });
+    note(cap(c.wood) + ' and ' + c.core + ', ' + sayLen(c.len) + ', ' + c.flex + '.' + (others.length ? ' ' + others.join('. ') + '.' : ''));
+    setPanel([row([btn('Build another', function () { go('bench'); }, 'big'), btn('Measure me again', function () { go('arm'); })])]);
+  }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  /* "Which is your wand arm?" (PS 5). The left hand's swish is the mirror of the right's: shown, then used. */
+  function sArm() {
+    say('"Which is your wand arm?"');
+    note('A left hand\'s swish is the mirror image of a right hand\'s.');
+    setPanel([row([btn('Left hand', function () { me().hand = 'left'; save(); resize(); go('hand'); }, 'big'),
+      btn('Right hand', function () { me().hand = 'right'; save(); resize(); go('hand'); }, 'big')])]);
+  }
+  /* The tape on his real hand (Q3, 1c): thumb to little finger, between his touches. */
+  function sHand() {
+    say('"Hold out your arm. That\'s it."');
+    note('Spread your hand flat on the glass, thumb and little finger far apart. Or tap where each one reaches.');
+    setPanel([row([btn('Skip', function () { go('forearm'); })])]);
+  }
+  function screenInches() { return Math.max(W, H) / ppi(); }
+  function sForearm() {
+    if (screenInches() < 8.5) { go('ruler'); return; }
+    say('"Hold out your arm. That\'s it."');
+    note('Lay your arm along the glass. Touch where your elbow is, then where your wrist is. A brother can help.');
+    setPanel([row([btn('Use a ruler instead', function () { go('ruler'); })])]);
+  }
+  /* On a screen too small for his arm, a real ruler: he pulls the silver tape out to the length a parent reads. */
+  function sRuler() {
+    say('"Hold out your arm. That\'s it."');
+    note('This screen is too small for your arm. Measure wrist to elbow with a ruler, then pull the tape to match.');
+    var s = document.createElement('input'); s.type = 'range'; s.min = 20; s.max = 52; s.step = 1;
+    s.value = Math.round((me().forearm || 8.5) * 4);
+    var show = btn(frac(s.value / 4) + ' inches', function () {});
+    s.addEventListener('input', function () { show.textContent = frac(s.value / 4) + ' inches'; me().forearm = s.value / 4; });
+    setPanel([row([s]), row([show, btn('That\'s it', function () { me().forearm = s.value / 4; save(); go('comic'); }, 'go')])]);
+  }
+  /* The comic measures, over a drawn figure of him: "shoulder to finger, then wrist to elbow, shoulder to floor, knee
+     to armpit and round his head", then "between his nostrils", doing this on its own (PS 5). A tap shoos it: "That
+     will do," and it "crumpled into a heap on the floor". */
+  function sComic() {
+    say('"Every Ollivander wand has a core of a powerful magical substance."');
+    note('');
+    setPanel([]);
+  }
+  function figure() {
+    /* sized to the narrower of the screen's height and width, and set back from the arm's side, so the outstretched
+       arm stays on a phone */
+    var m = lefty() ? -1 : 1, h = Math.min(H * 0.5, W * 0.9), top = H * 0.2, r = h * 0.09, x0 = W * 0.5 - m * r * 2.4;
+    return { r: r, head: { x: x0, y: top + r }, nose: { x: x0 + r * 0.05, y: top + r * 1.1 },
+      neck: { x: x0, y: top + 2 * r }, shoulder: { x: x0 + m * r * 0.9, y: top + 2.4 * r }, hip: { x: x0, y: top + h * 0.55 },
+      elbow: { x: x0 + m * r * 3.2, y: top + 2.6 * r }, wrist: { x: x0 + m * r * 5.2, y: top + 2.7 * r }, finger: { x: x0 + m * r * 6.6, y: top + 2.75 * r },
+      knee: { x: x0 + r * 0.6, y: top + h * 0.78 }, armpit: { x: x0 + m * r * 0.7, y: top + 2.9 * r },
+      floor: { x: x0 + m * r * 1.6, y: top + h }, foot: { x: x0 + r * 0.7, y: top + h } };
+  }
+  function drawFigure(f) {
+    cx.save(); cx.strokeStyle = 'rgba(233,220,192,0.75)'; cx.lineWidth = Math.max(3, S * 0.008); cx.lineCap = 'round';
+    cx.fillStyle = 'rgba(30,22,17,0.9)';
+    cx.beginPath(); cx.arc(f.head.x, f.head.y, f.r, 0, 7); cx.fill(); cx.stroke();
+    poly([f.neck, f.hip]); cx.stroke(); poly([f.shoulder, f.elbow, f.wrist, f.finger]); cx.stroke();
+    var o = { x: 2 * f.neck.x - f.shoulder.x, y: f.shoulder.y };
+    poly([o, { x: o.x - (f.elbow.x - f.shoulder.x) * 0.25, y: f.hip.y * 0.92 }]); cx.stroke();
+    poly([f.hip, f.knee, f.foot]); cx.stroke();
+    poly([f.hip, { x: 2 * f.hip.x - f.knee.x, y: f.knee.y }, { x: 2 * f.hip.x - f.foot.x, y: f.foot.y }]); cx.stroke();
+    cx.fillStyle = 'rgba(233,220,192,0.8)'; cx.beginPath(); cx.arc(f.nose.x, f.nose.y, f.r * 0.12, 0, 7); cx.fill();
+    cx.restore();
+  }
+  function comicSteps(f) {
+    var circle = []; for (var i = 0; i <= 24; i++) { var a = i / 24 * Math.PI * 2; circle.push({ x: f.head.x + Math.cos(a) * f.r * 1.2, y: f.head.y + Math.sin(a) * f.r * 1.2 }); }
+    return [ { pts: [f.shoulder, f.elbow, f.wrist, f.finger], label: 'shoulder to finger', line: '"We use unicorn hairs, phoenix tail feathers, and the heartstrings of dragons."' },
+      { pts: [f.wrist, f.elbow], label: me().forearm ? 'wrist to elbow, ' + frac(me().forearm) + ' in' : 'wrist to elbow' },
+      { pts: [f.shoulder, f.floor], label: 'shoulder to floor', line: '"No two Ollivander wands are the same."' },
+      { pts: [f.knee, f.armpit], label: 'knee to armpit' },
+      { pts: circle, label: 'round his head' },
+      { pts: [{ x: f.nose.x - f.r * 0.12, y: f.nose.y }, { x: f.nose.x + f.r * 0.12, y: f.nose.y }], label: 'between his nostrils!', nose: true } ];
+  }
+  function partial(pts, k) {   /* the first share k of a path, so the tape runs out along it */
+    var L = 0, i, seg = []; for (i = 1; i < pts.length; i++) L += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+    var want = L * k, acc = 0, out = [pts[0]];
+    for (i = 1; i < pts.length; i++) {
+      var d = Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+      if (acc + d >= want) { var f = (want - acc) / (d || 1); out.push({ x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * f, y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * f }); return out; }
+      acc += d; out.push(pts[i]);
+    }
+    return out;
+  }
+
+  /* The bench (Godric, 7.16 pm: the boys build their own wands; not canon, said so). Each choice changes one thing he
+     can see, none best at everything (Q2). The younger starts on length alone (Fawkes's touch). */
+  function sBench() {
+    say('"We\'ll find the perfect match here somewhere."');
+    var m = me(), target = m.forearm ? q4(m.forearm * 5 / 4) : null;
+    note('Not in the books: here you build your own wand.' + (target ? ' The gold mark is five quarters of your forearm.' : ''));
+    var rows = [];
+    var s = document.createElement('input'); s.type = 'range'; s.min = 28; s.max = 64; s.step = 1; s.value = Math.round(build.len * 4);
+    var lenLab = btn(frac(build.len) + ' inches', function () {});
+    s.addEventListener('input', function () { build.len = s.value / 4; lenLab.textContent = frac(build.len) + ' inches'; });
+    rows.push(row([s], 'Length: how far the light reaches'));
+    function chips(list, keyName, lab) {
+      var bs = list.map(function (o) {
+        var b = btn(o.k, function () { build[keyName] = o.k; bs.forEach(function (x) { x.className = x.textContent === o.k ? 'on' : ''; }); });
+        if (build[keyName] === o.k) b.className = 'on';
+        return b;
+      });
+      return row(bs, lab);
+    }
+    if (!m.younger) {
+      rows.push(chips(FLEX, 'flex', 'Flexibility: how forgiving the flick is'));
+      rows.push(chips(CORES, 'core', 'Core: the light\'s colour, and how it fizzles'));
+      rows.push(chips(WOODS, 'wood', 'Wood'));
+    }
+    var yb = btn(m.younger ? 'All four choices' : 'Length alone', function () { m.younger = !m.younger; save(); go('bench'); });
+    rows.push(row([lenLab, yb, btn('Give it a wave', function () { go('tryit'); }, 'go')]));
+    setPanel(rows);
+  }
+  /* The ruler under the bench: inches 0 to 16 as a number line, his forearm, the gold mark at five quarters of it, and
+     the wand he is building on the same line. */
+  function drawRuler() {
+    var m = me(), y = Math.min(H * 0.42, H - panel.getBoundingClientRect().height - S * 0.18), x0 = W * 0.06, x1 = W * 0.94, u = (x1 - x0) / 16;
+    var fs = Math.round(Math.max(12, S * 0.028));
+    cx.save();
+    cx.fillStyle = 'rgba(232,218,184,0.92)'; cx.fillRect(x0 - 6, y, x1 - x0 + 12, S * 0.07);
+    cx.strokeStyle = '#3a2a1a'; cx.fillStyle = '#3a2a1a'; cx.font = fs + 'px Georgia, serif'; cx.textAlign = 'center';
+    for (var i = 0; i <= 64; i++) {
+      var x = x0 + i / 4 * u, L = i % 4 === 0 ? S * 0.03 : (i % 2 === 0 ? S * 0.018 : S * 0.011);
+      cx.lineWidth = i % 4 === 0 ? 1.5 : 1; cx.beginPath(); cx.moveTo(x, y); cx.lineTo(x, y + L); cx.stroke();
+      if (i % 8 === 0) cx.fillText(String(i / 4), x, y + S * 0.062);
+    }
+    var wy = y - S * 0.05;
+    if (m.forearm) {
+      cx.strokeStyle = 'rgba(217,180,143,0.9)'; cx.lineWidth = S * 0.025; cx.lineCap = 'round';
+      cx.beginPath(); cx.moveTo(x0, wy - S * 0.08); cx.lineTo(x0 + m.forearm * u, wy - S * 0.08); cx.stroke();
+      cx.fillStyle = '#eadcbf'; cx.textAlign = 'left'; cx.fillText('your forearm, ' + frac(m.forearm) + ' in', x0, wy - S * 0.11);
+      var tx = x0 + m.forearm * 1.25 * u;
+      cx.strokeStyle = '#e8be5a'; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(tx, wy - S * 0.03); cx.lineTo(tx, y + S * 0.07); cx.stroke();
+    }
+    /* the wand on the line */
+    var w = wood(build.wood);
+    cx.strokeStyle = w.c; cx.lineWidth = S * 0.014; cx.lineCap = 'round';
+    cx.beginPath(); cx.moveTo(x0, wy); cx.lineTo(x0 + build.len * u, wy); cx.stroke();
+    cx.strokeStyle = shade(w.c, -0.35); cx.lineWidth = S * 0.022;
+    cx.beginPath(); cx.moveTo(x0, wy); cx.lineTo(x0 + build.len * u * 0.28, wy); cx.stroke();
+    cx.fillStyle = '#eadcbf'; cx.textAlign = 'right';
+    cx.fillText('your wand, ' + frac(build.len) + ' in', x0 + build.len * u, wy + S * 0.035 - S * 0.06);
+    cx.restore();
+  }
+
+  /* "Just take it and give it a wave" (PS 5). Five flicks of Lumos with the wand he built; each landing, how far the
+     light reaches and the angles of his flicks go into the ledger. */
+  function sTry() {
+    say('"Just take it and give it a wave."');
+    note('Flick up to light it. Five flicks.');
+    tries = { casts: 0, hits: 0, angles: [], reach: 0, light: 0, wob: 0 };
+    flickGuide.build(W, H);
+    setPanel([row([btn('Back to the bench', function () { go('bench'); })])]);
+  }
+  function reachFeet() { return Math.round(build.len * 0.75 * core(build.core).reach * 2) / 2; }   /* in halves of a foot */
+  function castTry(pts) {
+    var fl = flex(build.flex), ease = { angle: fl.angle, straight: 0.70, minLen: 0.05, maxMs: 900 };
+    var j = LumosSpells.judgeFlick(pts, W, H, ease), tr = flickGuide.score(pts), lv = flickGuide.level();
+    if (j.reason === 'tap') { flickGuide.clear(); return j; }
+    if (tr && tr.traced && j.verdict !== 'lumos') { j.verdict = 'lumos'; j.reason = 'traced'; }
+    tries.casts++;
+    if (Math.abs(j.angle) < 90) tries.angles.push(j.angle);
+    var gm = wandGeom(build.len), cr = core(build.core);
+    if (j.verdict === 'lumos') {
+      flickGuide.hit(lv > 0); tries.hits++; tries.light = 1; tries.wob = fl.wob;
+      tone(wood(build.wood).f, 0, 0.9, 0.1); tone(wood(build.wood).f * 1.5, 0.08, 0.9, 0.07);
+      note('It lights! The light reaches about ' + reachFeet() + ' feet. ' + (5 - tries.casts) + ' to go.');
+    } else {
+      flickGuide.miss(); tries.light = 0;
+      noise(0.3, cr.fizz === 'big' ? 900 : 2200, cr.fizz === 'gentle' ? 0.08 : 0.16);
+      burst(gm.tip, cr.fizz === 'big' ? 30 : (cr.fizz === 'sparks' ? 16 : 7), cr);
+      note('A fizzle. ' + (5 - tries.casts) + ' to go.');
+    }
+    if (tries.casts >= 5) setTimeout(finishTry, 900);
+    return j;
+  }
+  function spreadOf(a) {
+    if (a.length < 2) return 0;
+    var m = a.reduce(function (s, x) { return s + x; }, 0) / a.length;
+    return a.reduce(function (s, x) { return s + Math.abs(x - m); }, 0) / a.length;
+  }
+  /* Does it suit him (Q3, 3a)? A length within an inch of five quarters of his forearm; a flexibility that fits the
+     spread of his flicks (a wandering flick suits a whippier wand). The younger, on length alone, by length alone. */
+  function suits(m) {
+    var target = q4(m.forearm * 5 / 4), lenOk = Math.abs(build.len - target) <= 1;
+    var sp = spreadOf(tries.angles), want = sp < 6 ? [0, 1] : (sp < 12 ? [1, 3] : [3, 4]);
+    var fi = FLEX.indexOf(flex(build.flex)), flexOk = m.younger || (fi >= want[0] && fi <= want[1]);
+    return { ok: lenOk && flexOk && tries.hits > 0, lenOk: lenOk, flexOk: flexOk, target: target, spread: sp, want: want };
+  }
+  function finishTry() {
+    if (scene !== 'tryit') return;
+    var m = me(), fit = suits(m);
+    var rowRec = { wood: build.wood, len: build.len, flex: build.flex, core: build.core, reach: tries.hits ? reachFeet() : 0, hits: tries.hits, casts: tries.casts };
+    var prev = m.rows[m.rows.length - 1];
+    m.rows.push(rowRec); save();
+    var changed = prev ? ['wood', 'len', 'flex', 'core'].filter(function (k) { return prev[k] !== rowRec[k]; }) : [];
+    var fair = prev && changed.length === 1;
+    if (fit.ok) { go('choose'); return; }
+    /* not this one: snatched back, as in the book, with a small harmless upset of our own */
+    say(fair ? '"Curious... curious..."' : '"Tricky customer, eh? Not to worry, we\'ll find the perfect match here somewhere."');
+    effects.push({ k: 'box', at: performance.now(), x: W * (0.2 + Math.random() * 0.6), y: H * 0.15 });
+    noise(0.5, 400, 0.12);
+    var tips = [];
+    if (!fit.lenOk) tips.push('a length nearer ' + frac(fit.target) + ' inches (five quarters of your forearm)');
+    if (!fit.flexOk) tips.push(fit.spread >= 12 ? 'a whippier wand: your flicks wander' : (fit.spread < 6 ? 'a stiffer wand: your flicks are steady' : 'a supple or springy wand'));
+    if (!tries.hits) tips.push('a flick straight up');
+    note('Snatched back. Next try ' + tips.join(', and ') + '.' + (fair ? ' One thing changed: a fair test. See the ledger.' : ''));
+    setPanel([row([btn('Back to the bench', function () { go('bench'); }, 'go'), btn('Ledger', showLedger)])]);
+  }
+  /* The wand chooses him: "a sudden warmth in his fingers", the wand raised "above his head", brought "swishing down",
+     "red and gold sparks", "dancing spots of light on to the walls", and "Oh, bravo! Yes, indeed, oh, very good." (PS 5) */
+  function sChoose() {
+    say('A sudden warmth in your fingers.', true);
+    note('Raise it above your head and bring it swishing down.');
+    swishGuide.build(W, H);
+    setPanel([]);
+  }
+  function castChoose(pts) {
+    var j = LumosSpells.judgeSwishDown(pts, W, H), tr = swishGuide.score(pts), lv = swishGuide.level();
+    if (j.reason === 'tap') { swishGuide.clear(); return j; }
+    if (j.verdict === 'swish' || (tr && tr.traced)) {
+      swishGuide.hit(lv > 0);
+      var gm = wandGeom(build.len);
+      fireworks(gm.tip);
+      for (var i = 0; i < 26; i++) spots.push({ x: Math.random() * W, y: Math.random() * H * 0.7, r: S * (0.01 + Math.random() * 0.02), ph: Math.random() * 6, at: performance.now(), c: Math.random() < 0.5 ? '255,80,50' : '255,200,80' });
+      tone(523, 0, 1.4, 0.09); tone(659, 0.1, 1.4, 0.08); tone(784, 0.2, 1.6, 0.08); tone(1047, 0.3, 1.8, 0.06);
+      setTimeout(function () { go('chosen'); }, 1400);
+    } else {
+      swishGuide.miss(); note('Down, in one sweep: from above your head, swishing down.');
+    }
+    return j;
+  }
+  /* Godric's touch (Q3 t1): the tape writes the length in silver, as a sum he can check, the numbers his own. */
+  function sChosen() {
+    var m = me(), target = q4(m.forearm * 5 / 4), d = q4(build.len - target);
+    say('"Oh, bravo! Yes, indeed, oh, very good."');
+    m.chosen = { wood: build.wood, len: build.len, flex: build.flex, core: build.core }; save();
+    verdictText = [ 'Your forearm: ' + frac(m.forearm) + ' inches.',
+      'Five quarters of it: ' + frac(m.forearm) + ' × 5 ÷ 4 = ' + frac(target) + ' inches.',
+      'Your wand: ' + frac(build.len) + ' inches' + (d === 0 ? ', exactly.' : ', ' + frac(Math.abs(d)) + ' ' + (d > 0 ? 'over' : 'under') + '.') ];
+    note(cap(build.wood) + ' and ' + build.core + ', ' + sayLen(build.len) + ', ' + build.flex + '.');
+    setPanel([row([btn('Ledger', showLedger), btn('Done', function () { go('door'); }, 'go')])]);
+  }
+
+  /* ---- Ollivander's ledger: a fair-test table, a row a wand (Godric's touch to Q2) ---- */
+  function showLedger() {
+    var m = who ? me() : { rows: [] };
+    var h = '<h2>Ollivander\'s ledger</h2><div>Change one thing at a time, and see what it changes.</div><table><tr><th>Wood</th><th>Length</th><th>Flexibility</th><th>Core</th><th>Light reached</th><th>Flicks lit</th></tr>';
+    m.rows.forEach(function (r, i) {
+      var p = m.rows[i - 1];
+      function td(k, v) { return '<td' + (p && p[k] !== r[k] ? ' class="chg"' : '') + '>' + v + '</td>'; }
+      var res = p && (p.reach !== r.reach) ? ' class="chg"' : '';
+      h += '<tr>' + td('wood', r.wood) + td('len', frac(r.len) + ' in') + td('flex', r.flex) + td('core', r.core) +
+        '<td' + res + '>' + (r.reach ? r.reach + ' ft' : 'none') + '</td><td>' + r.hits + ' of ' + r.casts + '</td></tr>';
+    });
+    h += '</table>';
+    var last = m.rows[m.rows.length - 1], prev = m.rows[m.rows.length - 2];
+    if (last && prev && last.reach && prev.reach && last.len !== prev.len) {
+      var k = last.reach / prev.reach;
+      h += '<div class="why">The light reached ' + k.toFixed(2).replace(/\.?0+$/, '') + ' times as far, so it lit ' + (k * k).toFixed(2).replace(/\.?0+$/, '') +
+        ' times the floor: the lit floor grows as the square of the reach.</div>';
+    }
+    h += '<div style="margin-top:12px"><button id="ledgerClose">Close</button></div>';
+    ledgerEl.innerHTML = h; ledgerEl.style.display = 'block';
+    document.getElementById('ledgerClose').addEventListener('click', function () { ledgerEl.style.display = 'none'; });
+  }
+  document.getElementById('ledgerBtn').addEventListener('click', showLedger);
+  document.getElementById('restart').addEventListener('click', function () { go('door'); });
+
+  /* ---- sparks, fireworks, the falling box, the spots of light ---- */
+  var parts = [];
+  function burst(p, n, cr) {
+    for (var i = 0; i < n; i++) {
+      var a = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, v = S * (0.004 + Math.random() * 0.01);
+      parts.push({ x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, dec: 0.02 + Math.random() * 0.02, c: 'rgb(' + cr.c.join(',') + ')', r: 2 });
+    }
+  }
+  function fireworks(p) {   /* "a stream of red and gold sparks shot from the end like a firework" (PS 5) */
+    for (var i = 0; i < 120; i++) {
+      var a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6, v = S * (0.008 + Math.random() * 0.02);
+      parts.push({ x: p.x, y: p.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, dec: 0.008 + Math.random() * 0.012, c: Math.random() < 0.5 ? '#ff4a2a' : '#ffcf4a', r: 2.6 });
+    }
+    noise(0.8, 3000, 0.12);
+  }
+  function stepDraw(now) {
+    parts = parts.filter(function (p) { p.life -= p.dec; p.vy += S * 0.00025; p.x += p.vx; p.y += p.vy; return p.life > 0; });
+    parts.forEach(function (p) { cx.globalAlpha = Math.max(0, p.life); cx.fillStyle = p.c; cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill(); });
+    cx.globalAlpha = 1;
+    spots = spots.filter(function (s) { return now - s.at < 5000; });
+    spots.forEach(function (s) {
+      var a = Math.min(1, (now - s.at) / 300) * Math.max(0, 1 - (now - s.at - 3500) / 1500);
+      var x = s.x + Math.sin(now / 600 + s.ph) * S * 0.03, y = s.y + Math.cos(now / 800 + s.ph) * S * 0.02;
+      var g = cx.createRadialGradient(x, y, 0, x, y, s.r * 2);
+      g.addColorStop(0, 'rgba(' + s.c + ',' + 0.7 * a + ')'); g.addColorStop(1, 'rgba(' + s.c + ',0)');
+      cx.fillStyle = g; cx.beginPath(); cx.arc(x, y, s.r * 2, 0, 7); cx.fill();
+    });
+    effects = effects.filter(function (e) { return now - e.at < 1600; });
+    effects.forEach(function (e) {
+      var t = (now - e.at) / 1000, y = e.y + 0.5 * S * 3 * t * t, bw = S * 0.08, bh = S * 0.025;
+      cx.save(); cx.translate(e.x, Math.min(y, H * 0.8 - bh / 2)); cx.rotate(t * 3);
+      cx.fillStyle = '#5d4a38'; cx.fillRect(-bw / 2, -bh / 2, bw, bh); cx.fillStyle = 'rgba(232,218,184,0.4)'; cx.fillRect(-bw * 0.2, -bh * 0.15, bw * 0.4, bh * 0.3);
+      cx.restore();
+      if (y >= H * 0.8 - bh / 2) { cx.fillStyle = 'rgba(180,170,150,' + Math.max(0, 0.4 - (t - 0.5) * 0.4) + ')'; cx.beginPath(); cx.arc(e.x, H * 0.8, S * 0.05 * (1 + t), 0, 7); cx.fill(); }
+    });
+  }
+
+  /* ---- touch: strokes for the spells, touches for the tape, taps for the nostrils ---- */
+  var stroke = null, activeId = null, trails = [];
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  function farthest(list) {
+    var best = null, d = -1;
+    for (var i = 0; i < list.length; i++) for (var j = i + 1; j < list.length; j++) {
+      var e = Math.hypot(list[i].x - list[j].x, list[i].y - list[j].y); if (e > d) { d = e; best = [list[i], list[j]]; }
+    }
+    return best;
+  }
+  function measured(a, b) { return q4(Math.hypot(a.x - b.x, a.y - b.y) / ppi()); }
+  function tapeBetween(a, b, then) {
+    var inch = measured(a, b); tape = { pts: [a, b], label: 'about ' + frac(inch) + ' in', at: performance.now() };
+    tone(1200, 0, 0.15, 0.05); then(inch);
+  }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio();
+    if (scene === 'hand') {
+      handTouches[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
+      var list = Object.keys(handTouches).map(function (k) { return handTouches[k]; });
+      if (list.length >= 2) { var f = farthest(list); tapeBetween(f[0], f[1], function (inch) { me().span = inch; save(); }); armNext('forearm', 1600); }
+      else { taps.push({ x: ev.clientX, y: ev.clientY, t: performance.now() }); taps = taps.filter(function (q) { return performance.now() - q.t < 4000; });
+        if (taps.length >= 2) { tapeBetween(taps[0], taps[1], function (inch) { me().span = inch; save(); }); taps = []; armNext('forearm', 1600); } }
+      ev.preventDefault(); return;
+    }
+    if (scene === 'forearm') {
+      taps.push({ x: ev.clientX, y: ev.clientY, t: performance.now() });
+      if (taps.length >= 2) { tapeBetween(taps[0], taps[1], function (inch) { me().forearm = inch; save(); }); taps = []; armNext('comic', 1800); }
+      ev.preventDefault(); return;
+    }
+    if (scene === 'comic') {
+      var steps = comicSteps(figure()), t = (performance.now() - T0) / 1000;
+      if (t > steps.length * 1.3 - 0.4) {   /* on his nose: a tap shoos it */
+        say('"That will do."'); T0 = -1e9; tape = { crumple: performance.now() }; noise(0.3, 1500, 0.08);
+        setTimeout(function () { go('bench'); }, 1500);
+      }
+      ev.preventDefault(); return;
+    }
+    if (scene !== 'tryit' && scene !== 'choose') return;
+    if (activeId !== null) return;
+    activeId = ev.pointerId; stroke = [pt(ev)];
+    (scene === 'tryit' ? flickGuide : swishGuide).cover(stroke[0]);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+    ev.preventDefault();
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== activeId || !stroke) return;
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); (scene === 'tryit' ? flickGuide : swishGuide).cover(q); });
+    ev.preventDefault();
+  });
+  function up(ev) {
+    delete handTouches[ev.pointerId];
+    if (ev.pointerId !== activeId) return;
+    activeId = null; if (!stroke) return;
+    stroke.push(pt(ev)); var pts = stroke; stroke = null; trails.push({ pts: pts, life: 1 });
+    if (scene === 'tryit' && tries.casts < 5) castTry(pts); else if (scene === 'choose') castChoose(pts);
+  }
+  cv.addEventListener('pointerup', up);
+  cv.addEventListener('pointercancel', function (ev) { delete handTouches[ev.pointerId]; if (ev.pointerId === activeId) { activeId = null; stroke = null; } });
+  document.addEventListener('touchmove', function (e) { if (!e.target.closest || !e.target.closest('#ledger')) e.preventDefault(); }, { passive: false });
+  var armTimer = null;
+  function armNext(name, ms) { clearTimeout(armTimer); var s0 = scene; armTimer = setTimeout(function () { if (scene === s0) go(name); }, ms); }
+
+  /* ---- the frame ---- */
+  var frames = 0, f0 = performance.now();
+  function frame(now) {
+    if (!shop) shop = drawShop();
+    cx.drawImage(shop, 0, 0, W, H);
+    drawMotes(now);
+    if (scene === 'comic') {
+      var f = figure(), steps = comicSteps(f), t = Math.max(0, (now - T0) / 1000);   /* a frame can be stamped just before the scene began */
+      drawFigure(f);
+      if (tape && tape.crumple) {   /* "the tape measure crumpled into a heap on the floor" (PS 5) */
+        var k = Math.min(1, (now - tape.crumple) / 600), hx = f.foot.x + f.r * 2, hy = f.foot.y;
+        cx.save(); cx.strokeStyle = '#d9dbe6'; cx.lineWidth = 6;
+        for (var i = 0; i < 5; i++) { cx.beginPath(); cx.ellipse(hx + i * 3, hy - f.r * 0.3 * (1 - k) - i * 2, f.r * (0.5 - i * 0.06), f.r * 0.18, i * 0.4, 0, 7); cx.stroke(); }
+        cx.restore();
+      } else {
+        var idx = Math.min(steps.length - 1, Math.floor(t / 1.3)), st = steps[idx], k2 = Math.min(1, (t - idx * 1.3) / 0.8);
+        if (st.line && lineEl.textContent !== st.line) say(st.line);
+        var pts = partial(st.pts, k2);
+        if (st.nose) {   /* wiggling at his nose until he shoos it */
+          var wig = Math.sin(now / 90) * f.r * 0.05;
+          pts = st.pts.map(function (p) { return { x: p.x + wig, y: p.y + wig * 0.3 }; });
+          note('It is doing this on its own. Tap to shoo it!');
+        }
+        drawTape(pts, k2 > 0.3 ? st.label : '');
+      }
+    }
+    if (scene === 'hand' || scene === 'forearm') {
+      taps.forEach(function (q) { cx.fillStyle = 'rgba(217,219,230,0.8)'; cx.beginPath(); cx.arc(q.x, q.y, 10, 0, 7); cx.fill(); });
+    }
+    if (tape && tape.pts) drawTape(tape.pts, tape.label);
+    if (scene === 'bench') drawRuler();
+    if (scene === 'tryit' || scene === 'choose' || scene === 'chosen') {
+      var gm = wandGeom(build.len, 0);
+      if (scene === 'choose' || scene === 'chosen') glow = Math.min(1, glow + 0.03); else glow = 0;
+      drawWand(gm, build.wood, glow);
+      if (scene === 'tryit' && tries && tries.light > 0.01) {
+        var cr = core(build.core), wob = 1 + tries.wob * Math.sin(now / 70) + tries.wob * 0.6 * Math.sin(now / 23);
+        var r = S * (0.05 + reachFeet() / 12 * 0.55) * wob;
+        var g = cx.createRadialGradient(gm.tip.x, gm.tip.y, 0, gm.tip.x, gm.tip.y, r * 2.2);
+        g.addColorStop(0, 'rgba(' + cr.c.join(',') + ',0.35)'); g.addColorStop(1, 'rgba(' + cr.c.join(',') + ',0)');
+        cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+        var hg = cx.createRadialGradient(gm.tip.x, gm.tip.y, 0, gm.tip.x, gm.tip.y, S * 0.08);
+        hg.addColorStop(0, 'rgba(255,255,250,1)'); hg.addColorStop(0.3, 'rgba(' + cr.c.join(',') + ',0.85)'); hg.addColorStop(1, 'rgba(' + cr.c.join(',') + ',0)');
+        cx.fillStyle = hg; cx.beginPath(); cx.arc(gm.tip.x, gm.tip.y, S * 0.08, 0, 7); cx.fill();
+        tries.light *= 0.996;
+      }
+      if (scene === 'tryit' && tries.casts < 5) flickGuide.draw(cx, now, !!stroke);
+      if (scene === 'choose') swishGuide.draw(cx, now, !!stroke);
+    }
+    if (scene === 'chosen' && verdictText) {   /* the tape writes the sum in silver */
+      var fs = Math.round(Math.max(17, S * 0.042)), y0 = H * 0.3, kk = Math.min(1, (now - T0) / 1800);
+      cx.save(); cx.textAlign = 'center'; cx.font = '600 ' + fs + 'px Georgia, serif';
+      cx.shadowColor = 'rgba(0,0,0,0.95)'; cx.shadowBlur = 8;
+      verdictText.forEach(function (tx, i) {
+        var a = Math.max(0, Math.min(1, kk * 3 - i));
+        cx.fillStyle = 'rgba(232,236,250,' + a + ')'; cx.fillText(tx, W / 2, y0 + i * fs * 1.6);
+      });
+      drawTape([{ x: W * 0.15, y: y0 + 3 * fs * 1.6 }, { x: W * 0.15 + (W * 0.7) * kk, y: y0 + 3 * fs * 1.6 }], '');
+      cx.restore();
+    }
+    trails = trails.filter(function (tr) { tr.life -= 0.04; return tr.life > 0; });
+    cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round';
+    trails.concat(stroke ? [{ pts: stroke, life: 1 }] : []).forEach(function (tr) {
+      if (tr.pts.length < 2) return; cx.strokeStyle = 'rgba(220,225,255,' + 0.5 * tr.life + ')'; cx.lineWidth = 5; poly(tr.pts); cx.stroke();
+    });
+    cx.restore();
+    stepDraw(now);
+    frames++;
+    if (now - f0 > 2000) { window.lumosStats = Math.round(frames * 1000 / (now - f0)) + ' fps'; frames = 0; f0 = now; }
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  /* for trying: ?who=1 to pick a wizard, ?scene=bench (or arm, hand, forearm, ruler, comic, tryit, choose) to start
+     there, ?forearm=9 to set a measure, ?reset to clear the device's record */
+  if (qs.has('who')) { who = qs.get('who'); if (qs.has('forearm')) { me().forearm = Number(qs.get('forearm')); } if (qs.has('hand')) me().hand = qs.get('hand'); }
+  go(qs.has('scene') && who ? qs.get('scene') : 'door');
+  if (qs.has('reset')) save();
+  requestAnimationFrame(frame);
+
+  window.lumosOllivander = { go: go, build: build, state: function () { return { scene: scene, who: who, me: who ? me() : null, tries: tries }; },
+    castTry: function (pts) { return castTry(pts); }, castChoose: function (pts) { return castChoose(pts); }, suits: function () { return suits(me()); } };
+})();
+</script>
+</body>
+</html>

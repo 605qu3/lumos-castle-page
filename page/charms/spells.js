@@ -23,7 +23,7 @@ function judgeFlick(points, w, h, ease) {
   var short = Math.min(w, h), step = short * 0.03, anchor = a;
   for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
   /* the turning is measured between points a step apart, since a phone's many tiny touch points jitter
-     (David's iPhone, 11 October: a straight stroke read 1.4 turns point to point) */
+     (Godric's iPhone, 11 October: a straight stroke read 1.4 turns point to point) */
   for (i = 1; i < points.length; i++) {
     var sx = points[i].x - anchor.x, sy = points[i].y - anchor.y;
     if (Math.hypot(sx, sy) < step) continue;

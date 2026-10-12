@@ -1,5 +1,5 @@
 /* The traced guide, shared by every spell (Charms lane; the owner is Godric).
-   David, 11 October 2026, 9.13 pm, on the Leviosa test: "the motions may need to be drawn on screen to be traced for
+   Godric, 11 October 2026, 9.13 pm, on the Leviosa test: "the motions may need to be drawn on screen to be traced for
    the first few times and at a larger scale"; 9.30 pm: "The guide that charms came up with should go to all spells
    cast." So it is built once, here, and each spell gives only its path.
 
@@ -69,7 +69,7 @@
         start: Math.hypot(stroke[0].x - pts[0].x, stroke[0].y - pts[0].y) / S,
         end: Math.hypot(stroke[stroke.length - 1].x - pts[last].x, stroke[stroke.length - 1].y - pts[last].y) / S,
         level: level() };
-      /* his traces on an iPhone (David, 9.42 pm) kept 0.057 to 0.063 of the screen from the path: 0.08 lets them count */
+      /* his traces on an iPhone (Godric, 9.42 pm) kept 0.057 to 0.063 of the screen from the path: 0.08 lets them count */
       r.traced = r.cov >= 0.7 && r.dist < 0.08 && r.start < 0.1 && r.end < 0.12;
       return r;
     }

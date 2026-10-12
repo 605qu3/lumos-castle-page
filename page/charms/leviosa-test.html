@@ -56,7 +56,7 @@ var EASES = {
   fair:   { angle: 30, corner: 48, straight: 0.80, minSize: 0.13, maxMs: 1600, flickMax: 2.0 },
   strict: { angle: 20, corner: 55, straight: 0.87, minSize: 0.16, maxMs: 1100, flickMax: 1.6 }
 };
-/* kind loosened on David's iPhone log (11 October 2026, 9.42 pm): his waves turned 31 to 37 degrees at the corner,
+/* kind loosened on Godric's iPhone log (11 October 2026, 9.42 pm): his waves turned 31 to 37 degrees at the corner,
    under the 40 asked, and his flicks ran past 1.6 swishes, a tick with a long arm; so 28 degrees and 2.8 swishes.
    Tallied in page/charms/checks/leviosa-tally.js. */
 function resample(points, n) {
@@ -317,7 +317,7 @@ function judgeSwishFlick(points, w, h, ease) {
   };
 
   function setMode(m, now) { F.mode = m; F.t0 = now; }
-  /* The traced guide (David, 11 October 2026, 9.13 pm: traced at first, larger), now shared by every spell
+  /* The traced guide (Godric, 11 October 2026, 9.13 pm: traced at first, larger), now shared by every spell
      (9.30 pm) in guide.js; this page gives only its path: the swish, a curve slow through 0.9 s, and the flick, a
      short straight stroke up in 0.25 s. */
   var qs = new URLSearchParams(location.search);
@@ -328,7 +328,7 @@ function judgeSwishFlick(points, w, h, ease) {
   window.addEventListener('resize', function () { guide.build(W, H); });
   guide.build(W, H);
 
-  /* Baruffio's buffalo (David, 11 October 2026, 9.23 pm, on the desk: yes). Flitwick, PS 10: "never forget Wizard
+  /* Baruffio's buffalo (Godric, 11 October 2026, 9.23 pm, on the desk: yes). Flitwick, PS 10: "never forget Wizard
      Baruffio, who said 's' instead of 'f' and found himself on the floor with a buffalo on his chest." A wildly wrong
      stroke (Ron's windmill), at most once a day, brings a cartoon buffalo down on the table beside the feather; it
      sits there looking puzzled, then gets up and wanders off. After it, a tap on the word card answers in Hermione's
@@ -487,7 +487,7 @@ function judgeSwishFlick(points, w, h, ease) {
       else if (j.reason === 'slow' || j.reason === 'flicklong') setMode('hop', now);
       else if (j.reason === 'wave' || j.reason === 'line') setMode('flop', now);
       else setMode('twitch', now);
-      /* the small gold sketch beside his stroke only once the guide has gone, never two guides at once (David, 9.44 pm) */
+      /* the small gold sketch beside his stroke only once the guide has gone, never two guides at once (Godric, 9.44 pm) */
       if (j.reason !== 'windmill' && !guide.level()) ghost = { at: now, pts: pts };
       sayEl.textContent = WHY[j.reason][0]; whyEl.textContent = WHY[j.reason][1];
     }
