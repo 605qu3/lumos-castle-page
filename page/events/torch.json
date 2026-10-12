@@ -145,7 +145,7 @@
       "tier": "fixed",
       "source": "device",
       "leans": [],
-      "moment": "after tap hole 3-8 s",
+      "moment": "after tap hole 2-3 s",
       "when": [
         "place = common room",
         "hole_opened = yes",
