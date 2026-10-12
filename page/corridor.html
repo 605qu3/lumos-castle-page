@@ -804,6 +804,73 @@ var turnTorch = (function () {
 })();
 turnTorch.mesh.visible = turnTorch.flame.visible = turnTorch.light.visible = false;
 torches.push(turnTorch);
+/* the one-eyed witch's landing (req 178; Magic for the boys, "Her landing, fitted to the books"; Godric's B8, 12 October
+   2026, 2.58 pm), in grey: on witch days the end wall gives way, a lintel in its place, and the landing runs on west as
+   a stretch of the third-floor corridor, 8 m, the corridor's width, its ceiling 4.5 m up. She stands along it on a low
+   plinth 0.5 m out from the long wall, room behind her for a boy to crouch (PoA 10, 14); facing her, the empty
+   classroom's door, shut, is on her left (PoA 10), a doorway across, and the corridor turns toward her side at the far
+   end, dark beyond (PoA 14). Her card is drawn side on, facing the stair, as Charms' hump swings in profile, and turns
+   to face the eye wherever he stands, as the spiral stair's card does (castle.js placeCard), so the landing never
+   sees it edge on; she stands free of every wall, so no surface gives the turn away. Along it,
+   u metres from the end wall's place; the plan is castle-plan-1545-suite.jpg's third-floor panel */
+var WITCH = { len: 8.0, ceil: 4.5, wallTo: 6.8, turn: 1.0, doorway: [5.5, 6.5], at: 4.0, classroom: 2.5, out: 0.5,
+  plinth: { w: 0.8, h: 0.4 }, card: { w: 1.0, h: 1.9 } };
+WITCH.z = HER_Z - WITCH.out - WITCH.plinth.w / 2;
+function witchX(u) { return FAR_END_X - u; }
+function drawWitch(g, w, h) {
+  /* bent double, hooded, one eye, the hump high over her head, her stick before her: she faces left, toward the stair */
+  g.beginPath(); g.moveTo(w * 0.24, h); g.lineTo(w * 0.86, h); g.lineTo(w * 0.8, h * 0.5); g.lineTo(w * 0.36, h * 0.46); g.closePath(); g.fill();
+  g.beginPath(); g.ellipse(w * 0.6, h * 0.34, w * 0.27, h * 0.17, -0.2, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.ellipse(w * 0.3, h * 0.36, w * 0.13, h * 0.075, 0.3, 0, Math.PI * 2); g.fill();
+  g.beginPath(); g.moveTo(w * 0.2, h * 0.37); g.lineTo(w * 0.08, h * 0.41); g.lineTo(w * 0.2, h * 0.42); g.closePath(); g.fill();
+  g.fillRect(w * 0.12, h * 0.44, w * 0.05, h * 0.56);
+  g.beginPath(); g.ellipse(w * 0.16, h * 0.47, w * 0.06, h * 0.03, 0, 0, Math.PI * 2); g.fill();
+  g.lineWidth = w * 0.08; g.strokeStyle = g.fillStyle; g.beginPath(); g.moveTo(w * 0.36, h * 0.48); g.lineTo(w * 0.17, h * 0.47); g.stroke();
+  g.fillStyle = '#2a2826'; g.beginPath(); g.arc(w * 0.25, h * 0.35, w * 0.025, 0, Math.PI * 2); g.fill();
+}
+function softShadow(w, d, x, y, z, parent) {
+  var sc = makeCanvas(64, 64), sg = sc.getContext('2d'), grd = sg.createRadialGradient(32, 32, 6, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(20,14,10,0.55)'); grd.addColorStop(1, 'rgba(20,14,10,0)');
+  sg.fillStyle = grd; sg.fillRect(0, 0, 64, 64);
+  var sh = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshBasicMaterial({ map: tex(sc), transparent: true, depthWrite: false }));
+  sh.rotation.x = -Math.PI / 2; sh.position.set(x, y + 0.002, z); parent.add(sh);
+  return sh;
+}
+var witchLanding = new THREE.Group(), witchCard, witchPlinth, witchTorches;
+witchLanding.name = 'witch-landing'; witchLanding.visible = false; scene.add(witchLanding);
+(function () {
+  var W = WITCH, G = witchLanding, x0 = FAR_END_X, x1 = witchX(W.len), xw = witchX(W.wallTo), y0 = FOOT_Y, yc = FOOT_Y + W.ceil, ym = FOOT_Y + W.ceil / 2;
+  var dark = new THREE.MeshBasicMaterial({ color: col(0x0b0a09) }), zt = HER_Z + W.turn, d0 = witchX(W.doorway[0]), d1 = witchX(W.doorway[1]);
+  box(G, W.len, 0.1, WIDTH, (x0 + x1) / 2, y0 - 0.05, MID_Z, floorMat, 0);                               /* the flags */
+  box(G, xw - T - x1, 0.1, W.turn, (xw - T + x1) / 2, y0 - 0.05, HER_Z + W.turn / 2, floorMat, 0);         /* the turn's */
+  box(G, W.len, 0.1, WIDTH + W.turn, (x0 + x1) / 2, yc + 0.05, MID_Z + W.turn / 2, ceilMat, 0);
+  box(G, T, CEIL - yc, WIDTH, FAR_END_X - T / 2, (CEIL + yc) / 2, MID_Z, stoneMat, 0);                       /* the lintel */
+  box(G, W.wallTo, W.ceil, T, x0 - W.wallTo / 2, ym, HER_Z + T / 2, stoneMat, 0);                           /* her wall */
+  box(G, T, W.ceil, W.turn, xw - T / 2, ym, HER_Z + W.turn / 2, stoneMat, 0);                               /* the turn's near side */
+  box(G, xw - T - x1, W.ceil, 0.05, (xw - T + x1) / 2, ym, zt + 0.025, dark, 0);                            /* the turn, dark beyond */
+  box(G, x0 - d0, W.ceil, T, (x0 + d0) / 2, ym, FAR_Z - T / 2, stoneMat, 0);                                 /* the far wall, the doorway in it */
+  box(G, d1 - x1 + T, W.ceil, T, (d1 + x1 - T) / 2, ym, FAR_Z - T / 2, stoneMat, 0);
+  box(G, d0 - d1, W.ceil - DOOR.h, T, (d0 + d1) / 2, FOOT_Y + (DOOR.h + W.ceil) / 2, FAR_Z - T / 2, stoneMat, 0);
+  box(G, d0 - d1 + 0.2, DOOR.h + 0.1, 0.05, (d0 + d1) / 2, FOOT_Y + DOOR.h / 2, FAR_Z - T - 0.03, dark, 0);   /* the doorway, a dark recess */
+  box(G, T, W.ceil, WIDTH + T, x1 - T / 2, ym, (FAR_Z - T + HER_Z) / 2, stoneMat, 0);                       /* the end */
+  box(G, T, W.ceil, W.turn, x1 - T / 2, ym, HER_Z + W.turn / 2, solid(0x2a2826), 0);                         /* its turn in shadow, so the corner reads from the landing */
+  var cx = witchX(W.classroom), door = cutoutMesh(cutoutTexture(100, 220, '#6e5a44', function (g, w, h) { g.fillRect(0, 0, w, h); }, 'classroom'), DOOR.w, DOOR.h);
+  door.position.set(cx, FOOT_Y + DOOR.h / 2, HER_FACE); door.rotation.y = Math.PI; door.name = 'witch-classroom-door';
+  G.add(door); register(door, 1);
+  var x = witchX(W.at);
+  witchPlinth = box(G, W.plinth.w, W.plinth.h, W.plinth.w, x, FOOT_Y + W.plinth.h / 2, W.z, solid(0x85817b), 1);
+  witchPlinth.name = 'witch-plinth';
+  softShadow(W.plinth.w * 1.5, W.plinth.w * 1.5, x, FOOT_Y, W.z, G);
+  witchCard = cutoutMesh(cutoutTexture(100, 190, '#9a9690', drawWitch, 'witch'), W.card.w, W.card.h);
+  witchCard.position.set(x, FOOT_Y + W.plinth.h + W.card.h / 2, W.z); witchCard.rotation.y = Math.PI; witchCard.name = 'witch';
+  G.add(witchCard); register(witchCard, 1);
+  softShadow(W.card.w * 0.75, W.plinth.w * 0.55, x, FOOT_Y + W.plinth.h, W.z, G);
+  /* two torches, hers past her toward the corner and one across nearer the stair; in the group, so out of `torches`
+     and the leaning-torch cues stay the corridor's */
+  witchTorches = [addTorch(new THREE.Vector3(witchX(5.3), FOOT_Y + 2.0, HER_FACE), -1, 'witch-torch-her'),
+    addTorch(new THREE.Vector3(witchX(1.4), FOOT_Y + 2.0, FAR_FACE), 1, 'witch-torch-far')];
+  witchTorches.forEach(function (tc) { G.add(tc.mesh); G.add(tc.flame); G.add(tc.light); });
+})();
 /* the leaning torch and his deathday's blue minute (req 131): castle.js's torchCues, answered the same through the
    common room's hole. The lean takes a torch whose flame is in his view, never the one that leaned last, the nearest
    he can see first (kit.seen: nothing opaque between), else the nearest in the frame; it leans along the corridor, as if something cold had drifted past it */
@@ -2272,7 +2339,15 @@ var STOPS = [
       if (footShown === 'doors' || footShown === 'gallery' || footShown === 'torch') return { pos: new THREE.Vector3(FOOT_X + 3.5 * STEP_RUN, FOOT_Y + 3 * STEP_RISE + EYE, MID_Z),
         look: new THREE.Vector3(FAR_END_X, FOOT_Y + (footShown === 'gallery' ? GALLERY.mid : footShown === 'torch' ? 1.4 : 2.0), MID_Z),
         fov: footShown === 'doors' ? FOV_MAX : clamp(2 * Math.atan((footShown === 'torch' ? 0.42 : 0.37) / camera.aspect) * 180 / Math.PI, footShown === 'torch' ? 56 : 52, FOV_MAX) };   /* the group's width fits a phone held upright */
+      /* on witch days he looks on down the stretch at her height, not up at a window (req 178) */
+      if (footShown === 'witch') return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(witchX(WITCH.len), FOOT_Y + 1.3, MID_Z), fov: 56 };
       return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } },
+  /* the one-eyed witch (req 178): from across her stretch, a hand off the far wall as at any stop, about 1.9 m from her,
+     square to her, the plinth's foot on the flags and her head in view */
+  { name: 'witch', meshes: [witchCard, witchPlinth], stop: function () {
+      var x = witchX(WITCH.at), d = WITCH.z - FAR_Z - STOP_BACK;
+      return { pos: new THREE.Vector3(x, FOOT_Y + EYE, WITCH.z - d), look: new THREE.Vector3(x, FOOT_Y + 1.0, WITCH.z),
+        fov: FOV_MAX }; } },   /* the widest a stop opens: the plinth stands 0.4 m nearer than her card, so its foot needs it */
   /* the settle's scarf (7.05 pm): bent over it at the seat's edge, his eye a metre up, looking down at its end by the arm,
      where its name tape turns up on arrival */
   { name: 'settle-scarf', meshes: [settleScarf], stop: function () {
@@ -2349,6 +2424,8 @@ function goTo(s) {
 function goBack() {
   lockDrop();
   if (mode !== 'stop') return;
+  /* from her, back to the landing she stands beyond, not up the flight through the walls */
+  if (atStop && atStop.name === 'witch') { atStop = landingStop; glideTo(landingStop.stop()); return; }
   /* up from the landing (req 59) he turns round as he climbs, the drag's turn in reverse, rather than the look
      passing through him */
   var turn = atStop && atStop.name === 'landing' ? (Math.abs(yaw) > 1.5 ? yaw : Math.PI) : 0;
@@ -2898,9 +2975,10 @@ var FOOT_CUES = {
   torch: 'at the flight\'s foot, the landing turning a corner under a torch, the next flight glimpsed going on and stopping at the turn',
   doors: "at the flight's foot, the entrance hall's great oak front doors, torchlit, daylight under them",
   doorsNight: "at the flight's foot, the entrance hall's great oak front doors, torchlit, the gap under them dark",
-  gallery: "at the flight's foot, a short gallery of portraits, one frame empty"
-};
-var FOOT_DRAWN = { window: true, doors: true, doorsNight: true, gallery: true, torch: true };
+  gallery: "at the flight's foot, a short gallery of portraits, one frame empty",
+  witch: "at the flight's foot, a stretch of the third-floor corridor running on to a corner, a humpbacked, one-eyed witch on her plinth halfway along"
+};   /* witch: proposed words (req 178), until Events' record of req 59 names the place */
+var FOOT_DRAWN = { window: true, doors: true, doorsNight: true, gallery: true, torch: true, witch: true };
 var footNamed = null;
 /* ?foot=doors shows a place at the foot whatever the day, a look for checking it, as ?along is */
 var footForced = (location.search.match(/[?&]foot=(\w+)/) || [])[1];
@@ -2933,6 +3011,9 @@ function showFoot(place) {
   turnTorch.mesh.visible = turnTorch.flame.visible = turnTorch.light.visible = place === 'torch';
   doorsGap.visible = night;
   doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = place === 'doors' || place === 'gallery'; });
+  var witch = place === 'witch';   /* her landing: the end wall gives way to the stretch (req 178) */
+  witchLanding.visible = witchCard.visible = witchPlinth.visible = witch;
+  shell.stairEndWall.visible = !witch;
   landingLight.intensity = place === 'window' ? 1.6 : 0.3;
 }
 /* the draught under the doors (Godric, 10 October 2026, 3.34 pm, his touch on Q10): on doors days, every 15 to 35 s a
@@ -3127,6 +3208,7 @@ function frame() {
   updateLookBack(dt);
   updateTurnRise(wdt);
   updateDoorsKnock(wdt);
+  if (witchLanding.visible) witchCard.rotation.y = Math.atan2(camera.position.x - witchCard.position.x, camera.position.z - witchCard.position.z);
   updateHerDoze(wdt);
   updateHerPatches(wdt);
   updateGrounds(wdt);
@@ -3170,6 +3252,10 @@ window.lumosGreybox = { sheep: function () { return tapestrySheep; }, leanTorch:
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; },
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  /* her landing (req 178), for Charms' callable (req 163) and req 180: her card, her stop, the plinth and its back face */
+  witch: function () { var s = STOPS.filter(function (x) { return x.name === 'witch'; })[0];
+    return { card: witchCard, plinth: witchPlinth, landing: witchLanding, stop: s.stop(), shown: footShown === 'witch',
+      plinthBack: new THREE.Vector3(witchX(WITCH.at), FOOT_Y + WITCH.plinth.h, WITCH.z + WITCH.plinth.w / 2) }; },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
