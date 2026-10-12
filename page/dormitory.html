@@ -170,7 +170,7 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=2"></script>
+<script src="castle.js?v=6"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=14"></script>
 <script>
@@ -181,6 +181,7 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 
 var kit = window.castleFrame ? castleFrame({
   background: 0x0b0a09, fog: 0.025,
+  zoom: { max: 3 },   /* req 123: the shared zoom, the default limit kept (req 122) */
   onAct: function (act) {
     if (act === 'view') setView(view === 'stage' ? 'stair' : 'stage');
     else if (act === 'reset') { yawT = pitchT = 0; goBack(); }
