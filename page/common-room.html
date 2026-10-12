@@ -4935,6 +4935,35 @@ function leaveCase() {
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
 }
+/* Godric's touch on Q45 (12 October 2026, 12.30 pm): at the stop a tap on the ladder rolls it a hand's width along its
+   rail with a small iron squeak and lets it settle, as if someone had just climbed down: a touch past, back, and a
+   little rock on its hooks. Toward the case's middle, then home on the next tap, so it never runs off the case's end.
+   The squeak in words, as the room's sounds are until they are recorded. */
+var LADDER_ROLL = { hand: 0.1, roll: 0.6, settle: 0.7, over: 0.012, rock: 0.012, y: 1.62, r: 5.05, lean: -0.12 };
+var ladderRoll = { at: 0, from: 0, to: 0, k: 1 };
+function ladderTap() {
+  var L = LADDER_ROLL, st = ladderRoll;
+  st.from = st.at; st.to = st.to ? 0 : -L.hand; st.k = 0;
+  HEARD_FROM.ladder = ladder.position.clone().setY(2.2);
+  lineQ.unshift({ medium: 'heard', speaker: 'ladder', sound: 'squeak' });
+}
+function updateLadder(dt) {
+  var L = LADDER_ROLL, st = ladderRoll;
+  if (st.k >= 1) return;
+  var T = L.roll + L.settle;
+  st.k = Math.min(1, st.k + dt / T);
+  var s = st.k * T, dir = st.to < st.from ? -1 : 1, rock = 0;
+  if (s < L.roll) st.at = st.from + (st.to + dir * L.over - st.from) * smooth01(0, 1, s / L.roll);
+  else {
+    var u = (s - L.roll) / L.settle;
+    st.at = st.to + dir * L.over * (1 - smooth01(0, 1, u));
+    rock = L.rock * Math.sin(u * Math.PI * 3) * (1 - u);              /* it rocks on its hooks and is still */
+  }
+  if (st.k >= 1) st.at = st.to;
+  var th = BOOKCASE_THETA + 0.07 + st.at / L.r;
+  ladder.position.set(L.r * Math.sin(th), L.y, L.r * Math.cos(th));
+  ladder.lookAt(0, L.y, 0); ladder.rotateX(L.lean + rock);
+}
 /* A Snitch scratched into the desk's corner (req 122's woven touch, Fawkes on Godric's yes, 8.34 pm: the smallest things
    hide something only zoom finds). Some bored first-year's compass point, long ago: a ball the size of a fingernail
    and its two swept wings, about 4 cm across, on the apron's right corner beside the drawer, where the desk's card
@@ -5224,6 +5253,7 @@ function tapDo(cx, cy) {
   }
   if (mode === 'case') {
     if (hit !== bookcase && hit !== ladder) { leaveCase(); return back; }
+    if (hit === ladder) ladderTap();
     return told;
   }
   if (mode === 'sofa') {
@@ -5814,6 +5844,7 @@ function frame() {
   updateCamera(dt);
   faceEye();
   updateSofaStop(dt);
+  updateLadder(dt);
   updateTwins();
   updateFire(sdt, slowT);
   updateBellows(dt);
