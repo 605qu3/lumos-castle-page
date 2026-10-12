@@ -1931,7 +1931,7 @@ ring.position.set(0, HOLE_Y, 0);
 ring.castShadow = false;
 ring.name = 'portrait-hole-ring';
 holeFrame.add(ring); register(ring, 0);
-/* what a tap hits: the hole's mouth, so tapping the stone round it does nothing */
+/* what a tap hits: the hole's mouth; the stone round it, the ring, walks him up to the hole's stop (Q36, 2) */
 var holeTap = new THREE.Mesh(new THREE.CircleGeometry(HOLE_R, 32), new THREE.MeshBasicMaterial());
 holeTap.position.set(0, HOLE_Y, 0.02);
 holeTap.visible = false; holeTap.name = 'portrait-hole-tap';
@@ -4751,6 +4751,40 @@ function leaveTable() {
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
 }
+/* ---------- the portrait hole and cloak hook's stop (Q36, 2: Godric 9.15 pm, the walk-ups in turn) ----------
+   As the desk's: a tap on the hole's stone ring walks him up square to the wall, a boy's standing eye, framed on the ring
+   and the cloak beside it on its hook. The mouth and the cloak keep their own taps here as in the room: the mouth opens
+   her and, open, climbs him out, so the walk-up adds no tap to the way out (docs/interaction-vocabulary.md §6, two at
+   most); the cloak brings its name tapes to his hand and puts them back here. The ring keeps him there; Back or any other
+   tap glides back (§5, the one Back). Zoom 3x, as at rest, for the tapes' peek and the clasp. */
+var HOLE_STOP = { along: 0.33, y: 1.2, eye: 0.05, w: 2.6, h: 2.05 };   /* the ring 1.7 m with stone round it, the cloak's hem 0.57 m up, the floor's edge */
+var HOLE_RING_OUT = 0.85;   /* the ring's drawn stone, from the mouth's edge to the card's half width */
+function ringSolid(uv) { var r = 1.7 * Math.hypot(uv.x - 0.5, uv.y - 0.5); return r >= HOLE_R && r <= HOLE_RING_OUT; }
+tappables.push(ring);
+function holePose(pos, look) {
+  var th0 = HOLE_THETA + HOLE_STOP.along / WALL_R, n = new THREE.Vector3(Math.sin(th0), 0, Math.cos(th0));   /* outward */
+  look.copy(n).multiplyScalar(WALL_R).setY(HOLE_STOP.y);
+  var th = Math.tan(baseFov() * Math.PI / 360), d = Math.max(HOLE_STOP.h / 2 / th, HOLE_STOP.w / 2 / (th * camera.aspect));
+  pos.copy(look).addScaledVector(n, -d);
+  pos.y = look.y + HOLE_STOP.eye;
+}
+function goHole() {
+  mode = 'tween';
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  holePose(pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'hole'; backBtn.hidden = false; });
+  stopZoom(false);
+}
+function leaveHole() {
+  mode = 'tween';
+  backBtn.hidden = true;
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  roomPose(yaw, pitch, pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
+}
+/* the mouth's tap, the same from the room and the stop; the opening tap is raised while `portrait` still reads shut, so
+   the painting opposite is drawn as she swings */
+function holeMouthTap() { if (portrait.open) { if (!nickHolds()) climbOut(); } else { if (castle) castle.tap('hole'); togglePortrait(); } }
 /* A Snitch scratched into the desk's corner (req 122's woven touch, Fawkes on Godric's yes, 8.34 pm: the smallest things
    hide something only zoom finds). Some bored first-year's compass point, long ago: a ball the size of a fingernail
    and its two swept wings, about 4 cm across, on the apron's right corner beside the drawer, where the desk's card
@@ -4867,7 +4901,7 @@ function togglePortrait() {
    ?from=room, where he arrives close in front of her as she swings shut. dry darkens and comes back without loading,
    for shots. */
 function climbOut(dry) {
-  if (mode !== 'room' || tween) return false;
+  if ((mode !== 'room' && mode !== 'hole') || tween) return false;   /* from the room or the hole's stop */
   mode = 'tween';
   portrait.closeT = 99;
   var near = holeC.clone().addScaledVector(holeN, -1.4).setY(1.25), into = holeC.clone().addScaledVector(holeN, HOLE_DEPTH * 0.6).setY(HOLE_Y);
@@ -4949,6 +4983,7 @@ function tap(cx, cy) {
     if (h.object === scarf) return scarf.visible && scarfSolid(h.uv);
     if (h.object === satchel) return satchelSolid(h.uv);
     if (h.object === cloak) return alphaSolid(cloakAlpha, h.uv);
+    if (h.object === ring) return !!h.uv && ringSolid(h.uv);
     if (h.object === stairs) return stairsSolid(h.uv);
     if (h.object === catWalk || h.object === catSit) return !curl.on;
     if (h.object === curl.mesh) return curl.on && alphaSolid(curl.alpha, h.uv);
@@ -4985,6 +5020,12 @@ function tap(cx, cy) {
     else if (!tablePart(hit)) leaveTable();
     return;
   }
+  if (mode === 'hole') {
+    if (hit === holeTap) holeMouthTap();
+    else if (hit === cloak || hit === cloakPeek) cloakTap();
+    else if (hit !== ring) leaveHole();
+    return;
+  }
   if (mode === 'fireside') {
     if (hit === hearthBack || hit === bellows) fireTap();
     else if (hit && hit === scarf) scarfTap();
@@ -5011,8 +5052,8 @@ function tap(cx, cy) {
   else if (hit === curl.mesh) curlTap();
   else if (FIRESIDE_TAPS.indexOf(hit) >= 0) goFireside();
   else if (boardParts.indexOf(hit) >= 0 || hit.userData.paper) enterBoard();
-  /* the opening tap is raised while `portrait` still reads shut, so the painting opposite is drawn as she swings */
-  else if (hit === holeTap) { if (portrait.open) { if (!nickHolds()) climbOut(); } else { if (castle) castle.tap('hole'); togglePortrait(); } }
+  else if (hit === holeTap) holeMouthTap();
+  else if (hit === ring) goHole();
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
   else if (hit === stairs) climbStair(false, 'dormitory.html?from=room');
   else if (hit === sideTable || hit === deskChair || hit === candle.mesh) goDesk();
@@ -5094,7 +5135,7 @@ function setShadows(on) {
   btns.shadows.classList.toggle('on', on);
 }
 backBtn.addEventListener('click', function () {
-  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk(); else if (mode === 'table') leaveTable();
+  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk(); else if (mode === 'table') leaveTable(); else if (mode === 'hole') leaveHole();
 });
 
 /* ---------- per frame ---------- */
@@ -5646,7 +5687,7 @@ function lookThroughHole(hit) {
 kit.zoom.look(scene, function (hit) { return hit.object === wall ? lookThroughHole(hit) : lookName(hit.object); });
 kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
