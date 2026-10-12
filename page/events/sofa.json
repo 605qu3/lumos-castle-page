@@ -623,7 +623,7 @@
         "drawn card-dumbledore = yes"
       ],
       "one_of": "sofa-rummage",
-      "weight": 0.3333,
+      "weight": 1,
       "boost": {
         "when": [
           "sofa_sat = yes"
@@ -1152,7 +1152,8 @@
         "find = card",
         "card != houdini",
         "card_side = front",
-        "card_turns >= 2"
+        "card_turns >= 2",
+        "card_again != yes"
       ],
       "show": [
         "the card goes into his pocket, kept with the others he has found"
@@ -1173,13 +1174,97 @@
         "card = houdini",
         "card_side = front",
         "card_turns >= 2",
-        "houdini_lock = open"
+        "houdini_lock = open",
+        "card_again != yes"
       ],
       "show": [
         "the card goes into his pocket, kept with the others he has found"
       ],
       "starts": [
         "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.card-spare",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card != houdini",
+        "card_side = front",
+        "card_turns >= 2",
+        "card_again = yes"
+      ],
+      "show": [
+        "he has this one already, so it goes on the little swap pile in the den with his other spares"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "ron",
+          "role": "voice",
+          "name": "Ron",
+          "mark": "room"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "ron",
+          "medium": "said",
+          "key": "sofa.card-again",
+          "canon": "PS 6, Ron: \"I've got Morgana again\", checked against the text, 12 October 2026 (Godric's touch); the second ours",
+          "text": [
+            "I've got {card} again.",
+            "{card} again? That one's for the swap pile."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sofa.card-spare-houdini",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card = houdini",
+        "card_side = front",
+        "card_turns >= 2",
+        "houdini_lock = open",
+        "card_again = yes"
+      ],
+      "show": [
+        "he has this one already, so it goes on the little swap pile in the den with his other spares"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "ron",
+          "role": "voice",
+          "name": "Ron",
+          "mark": "room"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "ron",
+          "medium": "said",
+          "key": "sofa.card-again-houdini",
+          "canon": "PS 6, Ron: \"I've got Morgana again\", checked against the text, 12 October 2026 (Godric's touch); the second ours",
+          "text": [
+            "I've got {card} again.",
+            "{card} again? That one's for the swap pile."
+          ]
+        }
       ]
     },
     {
@@ -2307,7 +2392,8 @@
         "weight": 2,
         "when": [
           "drawn card-dumbledore = yes"
-        ]
+        ],
+        "say": "Dumbledore"
       },
       {
         "item": "morgana",
@@ -2315,7 +2401,8 @@
         "when": [
           "drawn card-morgana = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Morgana"
       },
       {
         "item": "hengist",
@@ -2323,7 +2410,8 @@
         "when": [
           "drawn card-hengist = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Hengist"
       },
       {
         "item": "grunnion",
@@ -2331,7 +2419,8 @@
         "when": [
           "drawn card-grunnion = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Grunnion"
       },
       {
         "item": "circe",
@@ -2339,7 +2428,8 @@
         "when": [
           "drawn card-circe = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Circe"
       },
       {
         "item": "paracelsus",
@@ -2347,7 +2437,8 @@
         "when": [
           "drawn card-paracelsus = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Paracelsus"
       },
       {
         "item": "merlin",
@@ -2355,7 +2446,8 @@
         "when": [
           "drawn card-merlin = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Merlin"
       },
       {
         "item": "cliodna",
@@ -2363,7 +2455,8 @@
         "when": [
           "drawn card-cliodna = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Cliodna"
       },
       {
         "item": "agrippa",
@@ -2372,7 +2465,8 @@
           "drawn card-agrippa = yes",
           "cards_found >= 1",
           "cards_found >= 12"
-        ]
+        ],
+        "say": "Agrippa"
       },
       {
         "item": "ptolemy",
@@ -2381,7 +2475,8 @@
           "drawn card-ptolemy = yes",
           "cards_found >= 1",
           "cards_found >= 12"
-        ]
+        ],
+        "say": "Ptolemy"
       },
       {
         "item": "flamel",
@@ -2390,7 +2485,8 @@
           "drawn card-flamel = yes",
           "cards_found >= 1",
           "dumbledore_back = read"
-        ]
+        ],
+        "say": "Flamel"
       },
       {
         "item": "perenelle",
@@ -2399,7 +2495,8 @@
           "drawn card-perenelle = yes",
           "cards_found >= 1",
           "dumbledore_back = read"
-        ]
+        ],
+        "say": "Perenelle"
       },
       {
         "item": "barnabas",
@@ -2407,7 +2504,8 @@
         "when": [
           "drawn card-barnabas = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Barnabas the Barmy"
       },
       {
         "item": "gregory",
@@ -2415,7 +2513,8 @@
         "when": [
           "drawn card-gregory = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Gregory the Smarmy"
       },
       {
         "item": "boris",
@@ -2423,7 +2522,8 @@
         "when": [
           "drawn card-boris = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Boris the Bewildered"
       },
       {
         "item": "lachlan",
@@ -2431,7 +2531,8 @@
         "when": [
           "drawn card-lachlan = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Lachlan the Lanky"
       },
       {
         "item": "wilfred",
@@ -2439,7 +2540,8 @@
         "when": [
           "drawn card-wilfred = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Wilfred the Wistful"
       },
       {
         "item": "uric",
@@ -2447,7 +2549,8 @@
         "when": [
           "drawn card-uric = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Uric the Oddball"
       },
       {
         "item": "wendelin",
@@ -2455,7 +2558,8 @@
         "when": [
           "drawn card-wendelin = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Wendelin the Weird"
       },
       {
         "item": "dilys",
@@ -2463,7 +2567,8 @@
         "when": [
           "drawn card-dilys = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Dilys Derwent"
       },
       {
         "item": "gryffindor",
@@ -2471,7 +2576,8 @@
         "when": [
           "drawn card-gryffindor = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Gryffindor"
       },
       {
         "item": "hufflepuff",
@@ -2479,7 +2585,8 @@
         "when": [
           "drawn card-hufflepuff = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Hufflepuff"
       },
       {
         "item": "ravenclaw",
@@ -2487,7 +2594,8 @@
         "when": [
           "drawn card-ravenclaw = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Ravenclaw"
       },
       {
         "item": "slytherin",
@@ -2495,7 +2603,8 @@
         "when": [
           "drawn card-slytherin = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Slytherin"
       },
       {
         "item": "bott",
@@ -2503,7 +2612,8 @@
         "when": [
           "drawn card-bott = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Bertie Bott"
       },
       {
         "item": "scamander",
@@ -2511,7 +2621,8 @@
         "when": [
           "drawn card-scamander = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Scamander"
       },
       {
         "item": "beedle",
@@ -2519,7 +2630,8 @@
         "when": [
           "drawn card-beedle = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Beedle"
       },
       {
         "item": "bagshot",
@@ -2527,7 +2639,8 @@
         "when": [
           "drawn card-bagshot = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Bathilda Bagshot"
       },
       {
         "item": "goshawk",
@@ -2535,7 +2648,8 @@
         "when": [
           "drawn card-goshawk = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Miranda Goshawk"
       },
       {
         "item": "borage",
@@ -2543,7 +2657,8 @@
         "when": [
           "drawn card-borage = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Borage"
       },
       {
         "item": "brand",
@@ -2551,7 +2666,8 @@
         "when": [
           "drawn card-brand = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Brand"
       },
       {
         "item": "mary",
@@ -2559,7 +2675,8 @@
         "when": [
           "drawn card-mary = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Mary the Jewess"
       },
       {
         "item": "della-porta",
@@ -2567,7 +2684,8 @@
         "when": [
           "drawn card-della-porta = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Della Porta"
       },
       {
         "item": "newton",
@@ -2575,7 +2693,8 @@
         "when": [
           "drawn card-newton = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Newton"
       },
       {
         "item": "dee",
@@ -2583,7 +2702,8 @@
         "when": [
           "drawn card-dee = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "John Dee"
       },
       {
         "item": "scot",
@@ -2591,7 +2711,8 @@
         "when": [
           "drawn card-scot = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Michael Scot"
       },
       {
         "item": "albertus",
@@ -2599,7 +2720,8 @@
         "when": [
           "drawn card-albertus = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Albertus"
       },
       {
         "item": "bacon",
@@ -2607,7 +2729,8 @@
         "when": [
           "drawn card-bacon = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Roger Bacon"
       },
       {
         "item": "davy",
@@ -2615,7 +2738,8 @@
         "when": [
           "drawn card-davy = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Davy"
       },
       {
         "item": "tycho",
@@ -2623,7 +2747,8 @@
         "when": [
           "drawn card-tycho = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Tycho"
       },
       {
         "item": "galileo",
@@ -2631,7 +2756,8 @@
         "when": [
           "drawn card-galileo = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Galileo"
       },
       {
         "item": "kepler",
@@ -2639,7 +2765,8 @@
         "when": [
           "drawn card-kepler = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Kepler"
       },
       {
         "item": "herschel",
@@ -2647,7 +2774,8 @@
         "when": [
           "drawn card-herschel = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Caroline Herschel"
       },
       {
         "item": "halley",
@@ -2655,7 +2783,8 @@
         "when": [
           "drawn card-halley = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Halley"
       },
       {
         "item": "eratosthenes",
@@ -2663,7 +2792,8 @@
         "when": [
           "drawn card-eratosthenes = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Eratosthenes"
       },
       {
         "item": "archimedes",
@@ -2671,7 +2801,8 @@
         "when": [
           "drawn card-archimedes = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Archimedes"
       },
       {
         "item": "pythagoras",
@@ -2679,7 +2810,8 @@
         "when": [
           "drawn card-pythagoras = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Pythagoras"
       },
       {
         "item": "fibonacci",
@@ -2687,7 +2819,8 @@
         "when": [
           "drawn card-fibonacci = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Fibonacci"
       },
       {
         "item": "al-khwarizmi",
@@ -2695,7 +2828,8 @@
         "when": [
           "drawn card-al-khwarizmi = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Al-Khwarizmi"
       },
       {
         "item": "ibn-al-haytham",
@@ -2703,7 +2837,8 @@
         "when": [
           "drawn card-ibn-al-haytham = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Ibn al-Haytham"
       },
       {
         "item": "hero",
@@ -2711,7 +2846,8 @@
         "when": [
           "drawn card-hero = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Hero"
       },
       {
         "item": "kempelen",
@@ -2719,7 +2855,8 @@
         "when": [
           "drawn card-kempelen = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Kempelen"
       },
       {
         "item": "al-jazari",
@@ -2727,7 +2864,8 @@
         "when": [
           "drawn card-al-jazari = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Al-Jazari"
       },
       {
         "item": "harrison",
@@ -2735,7 +2873,8 @@
         "when": [
           "drawn card-harrison = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Harrison"
       },
       {
         "item": "firnas",
@@ -2743,7 +2882,8 @@
         "when": [
           "drawn card-firnas = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Ibn Firnas"
       },
       {
         "item": "montgolfier",
@@ -2751,7 +2891,8 @@
         "when": [
           "drawn card-montgolfier = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "the Montgolfiers"
       },
       {
         "item": "leonardo",
@@ -2759,7 +2900,8 @@
         "when": [
           "drawn card-leonardo = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Leonardo"
       },
       {
         "item": "worm",
@@ -2767,7 +2909,8 @@
         "when": [
           "drawn card-worm = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Ole Worm"
       },
       {
         "item": "aldrovandi",
@@ -2775,7 +2918,8 @@
         "when": [
           "drawn card-aldrovandi = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Aldrovandi"
       },
       {
         "item": "anning",
@@ -2783,7 +2927,8 @@
         "when": [
           "drawn card-anning = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Mary Anning"
       },
       {
         "item": "linnaeus",
@@ -2791,7 +2936,8 @@
         "when": [
           "drawn card-linnaeus = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Linnaeus"
       },
       {
         "item": "pliny",
@@ -2799,7 +2945,8 @@
         "when": [
           "drawn card-pliny = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Pliny"
       },
       {
         "item": "gessner",
@@ -2807,7 +2954,8 @@
         "when": [
           "drawn card-gessner = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Gessner"
       },
       {
         "item": "hildegard",
@@ -2815,7 +2963,8 @@
         "when": [
           "drawn card-hildegard = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Hildegard"
       },
       {
         "item": "dioscorides",
@@ -2823,7 +2972,8 @@
         "when": [
           "drawn card-dioscorides = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Dioscorides"
       },
       {
         "item": "culpeper",
@@ -2831,7 +2981,8 @@
         "when": [
           "drawn card-culpeper = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Culpeper"
       },
       {
         "item": "trithemius",
@@ -2839,7 +2990,8 @@
         "when": [
           "drawn card-trithemius = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Trithemius"
       },
       {
         "item": "champollion",
@@ -2847,7 +2999,8 @@
         "when": [
           "drawn card-champollion = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Champollion"
       },
       {
         "item": "lopez",
@@ -2855,7 +3008,8 @@
         "when": [
           "drawn card-lopez = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Ruy López"
       },
       {
         "item": "philidor",
@@ -2863,7 +3017,8 @@
         "when": [
           "drawn card-philidor = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Philidor"
       },
       {
         "item": "perrault",
@@ -2871,7 +3026,8 @@
         "when": [
           "drawn card-perrault = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Perrault"
       },
       {
         "item": "mercator",
@@ -2879,7 +3035,8 @@
         "when": [
           "drawn card-mercator = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Mercator"
       },
       {
         "item": "houdini",
@@ -2887,7 +3044,8 @@
         "when": [
           "drawn card-houdini = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Houdini"
       },
       {
         "item": "robert-houdin",
@@ -2895,7 +3053,8 @@
         "when": [
           "drawn card-robert-houdin = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Robert-Houdin"
       },
       {
         "item": "maskelyne",
@@ -2903,7 +3062,8 @@
         "when": [
           "drawn card-maskelyne = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Maskelyne"
       },
       {
         "item": "melies",
@@ -2911,7 +3071,8 @@
         "when": [
           "drawn card-melies = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Méliès"
       },
       {
         "item": "pepper",
@@ -2919,7 +3080,8 @@
         "when": [
           "drawn card-pepper = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Pepper"
       },
       {
         "item": "nightingale",
@@ -2927,7 +3089,8 @@
         "when": [
           "drawn card-nightingale = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Florence Nightingale"
       },
       {
         "item": "curie",
@@ -2935,7 +3098,8 @@
         "when": [
           "drawn card-curie = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Marie Curie"
       },
       {
         "item": "lovelace",
@@ -2943,7 +3107,8 @@
         "when": [
           "drawn card-lovelace = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Ada Lovelace"
       },
       {
         "item": "turing",
@@ -2951,7 +3116,8 @@
         "when": [
           "drawn card-turing = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Turing"
       },
       {
         "item": "carroll",
@@ -2959,7 +3125,8 @@
         "when": [
           "drawn card-carroll = yes",
           "cards_found >= 1"
-        ]
+        ],
+        "say": "Lewis Carroll"
       }
     ]
   }

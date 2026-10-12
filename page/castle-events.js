@@ -59,6 +59,9 @@
    is yes once the page names X in `opts.drawn` (its drawings that have landed); a chain's `decks` and `set X = from
    deck Y` (by weight, repeats allowed, never the one X holds), every card kept in order found and read with
    `found(name)`; `easter`, the fortnight round Easter Sunday.
+   Then the cards' pace and repeats (fifty-fourth session; Godric's answers of 12 October 2026): drawing from a deck also sets
+   `<var>_again`, yes when he has found that card before; each card's first-found date is kept (`foundOn(name)`, the
+   lives shelf's link, Magic's B7); a deck's card may carry `say`, the name a line's `{card}` takes.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -223,7 +226,7 @@
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
              open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
-             said: {}, written: {}, thingStates: {}, deckFound: {} };
+             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {} };
   }
 
   function start(opts) {
@@ -491,7 +494,8 @@
     }
 
     /* A deck (req 165): of the cards whose `when` holds, one by weight, never the one the variable holds already (so
-       Morgana comes often but never twice running); every card drawn is kept in order found, for the den. */
+       Morgana comes often but never twice running); every card drawn is kept in order found, for the den, and the
+       day each card first came, for the lives shelf (Magic's B7). Returns the card and whether he had it already. */
     function drawFromDeck(name, current, rec) {
       var cards = deckDefs[name];
       if (!cards) { note(rec.id + ': no deck named ' + name); return undefined; }
@@ -502,8 +506,15 @@
       for (k = 0; k < pool.length; k++) total += pool[k].weight == null ? 1 : pool[k].weight;
       var x = Math.random() * total;
       for (k = 0; k < pool.length - 1; k++) { x -= pool[k].weight == null ? 1 : pool[k].weight; if (x < 0) break; }
-      (state.deckFound[name] = state.deckFound[name] || []).push(pool[k].item);
-      return pool[k].item;
+      var had = (state.deckFound[name] = state.deckFound[name] || []).indexOf(pool[k].item) >= 0;
+      state.deckFound[name].push(pool[k].item);
+      var first = state.deckFirst[name] = state.deckFirst[name] || {};
+      if (!had && !first[pool[k].item]) first[pool[k].item] = isoDay(nowDate());
+      return { item: pool[k].item, again: had };
+    }
+
+    function isoDay(d) {
+      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
     }
 
     /* `mark Y, not last`: one of the marks named Y, never the one X is at (unset reads as the first, the base).
@@ -554,7 +565,7 @@
             }
             if (m[2].indexOf('from deck ') === 0) {
               var card = drawFromDeck(m[2].slice(10), state.vars[m[1]], rec);
-              if (card !== undefined) state.vars[m[1]] = card;
+              if (card !== undefined) { state.vars[m[1]] = card.item; state.vars[m[1] + '_again'] = card.again ? 'yes' : 'no'; }
               return;
             }
             if (m[2].indexOf('mark ') === 0) {
@@ -655,11 +666,18 @@
       return '';
     }
 
-    /* `{password}`, `{last password}`, `{next password}`: a chain's week's words in a line, after `{intro}`. */
+    /* `{password}`, `{last password}`, `{next password}`: a chain's week's words in a line, after `{intro}`. `{card}`
+       (any variable a deck sets): the `say` of the card it holds, the name a voice uses for it. */
     function fillWords(text) {
       return text.replace(/\{((?:last |next )?[a-z]+)\}/g, function (all, n) {
         var v = /^(?:(?:last|next) )?([a-z]+)$/.exec(n);
-        return wordDefs[v[1]] ? String(value(n)) : all;
+        if (wordDefs[v[1]]) return String(value(n));
+        var held = state.vars[n];
+        for (var d in deckDefs) {
+          var c = deckDefs[d].filter(function (x) { return x.item === held && x.say; })[0];
+          if (c) return c.say;
+        }
+        return all;
       });
     }
 
@@ -1254,6 +1272,9 @@
       /* The cards of a deck he has found, in the order found, repeats and all (the Chocolate Frog cards for the den
          behind the brass key's door, req 165): `found('frogs')`. */
       found: function (name) { return ((state.deckFound || {})[name] || []).slice(); },
+      /* The day each card of a deck first came to him, yyyy-mm-dd by card (the lives shelf, Magic's B7: a life
+         arrives the day he first finds that person's card); a repeat leaves it as it was. `foundOn('frogs')`. */
+      foundOn: function (name) { return Object.assign({}, (state.deckFirst || {})[name] || {}); },
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';
