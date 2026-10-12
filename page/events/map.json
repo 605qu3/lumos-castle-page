@@ -23,7 +23,8 @@
         "place = corridor"
       ],
       "starts": [
-        "secret witch-hump"
+        "secret witch-hump",
+        "set hump_opened = yes"
       ]
     },
     {

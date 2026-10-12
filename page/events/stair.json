@@ -95,6 +95,15 @@
       "show": [
         "in the gallery's empty frame, the teacup's steam leans out of the frame, toward the stair, as if its sitter had gone up to the painting opposite the hole"
       ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "stair_to = witch"
+      ],
+      "show": [
+        "at the flight's foot, a stretch of the third-floor corridor running on to a corner, a humpbacked, one-eyed witch on her plinth halfway along"
+      ]
     }
   ],
   "records": [
@@ -160,6 +169,29 @@
       ]
     },
     {
+      "id": "stair.moves-enter-witch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-enter",
+      "weight": 0.5,
+      "moment": "enter",
+      "when": [
+        "time != night",
+        "weekday != friday",
+        "stair_to != witch"
+      ],
+      "starts": [
+        "set stair_to = witch"
+      ],
+      "boost": {
+        "when": [
+          "hump_opened = yes"
+        ],
+        "times": 2
+      }
+    },
+    {
       "id": "stair.stays-enter",
       "tier": "fixed",
       "source": "device",
@@ -188,6 +220,30 @@
       "starts": [
         "set stair_to = mark foot, not last"
       ]
+    },
+    {
+      "id": "stair.moves-leave-witch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-leave",
+      "weight": 0.5,
+      "moment": "leave",
+      "when": [
+        "been corridor = yes",
+        "time != night",
+        "weekday != friday",
+        "stair_to != witch"
+      ],
+      "starts": [
+        "set stair_to = witch"
+      ],
+      "boost": {
+        "when": [
+          "hump_opened = yes"
+        ],
+        "times": 2
+      }
     },
     {
       "id": "stair.stays-leave",
@@ -224,6 +280,35 @@
       "show": [
         "stone grinds behind him, low and short, then a soft thud as it settles"
       ]
+    },
+    {
+      "id": "stair.grind-behind-witch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-behind",
+      "weight": 0.25,
+      "moment": "wait 40-120 s",
+      "when": [
+        "place = corridor",
+        "at != none",
+        "at != landing",
+        "time != night",
+        "weekday != friday",
+        "stair_to != witch"
+      ],
+      "starts": [
+        "set stair_to = witch"
+      ],
+      "show": [
+        "stone grinds behind him, low and short, then a soft thud as it settles"
+      ],
+      "boost": {
+        "when": [
+          "hump_opened = yes"
+        ],
+        "times": 2
+      }
     },
     {
       "id": "stair.quiet-behind",
