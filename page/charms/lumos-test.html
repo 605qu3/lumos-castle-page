@@ -18,6 +18,7 @@
     color: #cdbf9f; background: #221c26; border: 1px solid #4a3f50; border-radius: 8px; padding: 8px 12px; touch-action: manipulation; }
   #ease { left: 12px; }
   #logBtn { right: 12px; }
+  #guideBtn { left: 12px; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 48px); }
   #log { position: fixed; left: 8px; right: 8px; bottom: 60px; max-height: 40vh; overflow: auto; display: none;
     background: rgba(20,16,24,.94); color: #cdbf9f; font: 12px/1.4 Menlo, Consolas, monospace; padding: 8px;
     border: 1px solid #4a3f50; border-radius: 8px; white-space: pre-wrap; -webkit-user-select: text; user-select: text; }
@@ -29,8 +30,10 @@
 <div id="say">Flick the wand up to light it</div>
 <div id="why">Draw a quick, straight stroke upward anywhere. A stroke down puts it out.</div>
 <button class="btn" id="ease">Ease: kind</button>
+<button class="btn" id="guideBtn">Guide</button>
 <button class="btn" id="logBtn">Log</button>
 <div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
+<script src="guide.js?v=1"></script>
 <script>
 /* Lumos, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
    A flick drawn on the screen lights the wand's tip; a miss fizzles, harmlessly, and says why.
@@ -101,6 +104,20 @@ function judgeFlick(points, w, h, ease) {
   }
   window.addEventListener('resize', resize);
   resize();
+
+  /* The traced guide, shared by every spell (guide.js; David, 11 October 2026, 9.30 pm: "The guide that charms came
+     up with should go to all spells cast"). This page gives two paths: while the wand is dark, a long straight
+     stroke up, the flick, quick (0.3 s); once it is lit, the same line downward, for Nox. Each counts its own good
+     casts. The line stands to the left of the wand, the right with ?hand=left. */
+  function lineBox(w, h) { var G = h * 0.38; return { G: G, ox: w * 0.28 - G * 0.5, oy: h * 0.27 }; }
+  var lumosGuide = LumosGuide.create({ key: 'lumos.charms.lumosGuidedHits', box: lineBox, rest: 1.2, parts: [
+    { pts: LumosGuide.line([0.5, 1], [0.5, 0], 28), secs: 0.3, label: 'flick up', at: 0.5, dx: 3.3 } ] });
+  var noxGuide = LumosGuide.create({ key: 'lumos.charms.noxGuidedHits', box: lineBox, rest: 1.2, parts: [
+    { pts: LumosGuide.line([0.5, 0], [0.5, 1], 28), secs: 0.3, label: 'down: Nox', at: 0.5, dx: 3.8 } ] });
+  function guideNow() { return litTarget > 0 ? noxGuide : lumosGuide; }
+  function buildGuides() { lumosGuide.build(W, H); noxGuide.build(W, H); }
+  window.addEventListener('resize', buildGuides);
+  buildGuides();
 
   /* The wand: from the hand at the foot of the screen up toward the middle, leaning a little. */
   function wandGeom() {
@@ -313,12 +330,21 @@ function judgeFlick(points, w, h, ease) {
 
   function cast(pts) {
     var j = judgeFlick(pts, W, H, ease), g = wandGeom(), now = performance.now();
+    var gd = guideNow(), lv = gd.level(), tr = gd.score(pts);
+    /* a close trace of the guide counts, his speed and a little wobble not held against him */
+    if (tr && tr.traced && j.verdict === 'miss' && j.reason !== 'tap') {
+      j.verdict = gd === lumosGuide ? 'lumos' : 'nox'; j.reason = 'traced';
+    }
     wandKick = Math.max(-35, Math.min(35, j.angle > 90 || j.angle < -90 ? 0 : j.angle));
     var line = new Date().toTimeString().slice(0, 8) + ' ' + ease + ' ' + j.verdict + '/' + j.reason +
       ' angle ' + j.angle.toFixed(0) + ' len ' + j.len.toFixed(2) + ' straight ' + j.straight.toFixed(2) +
-      ' ' + j.ms + 'ms turns ' + j.turns.toFixed(1) + ' pts ' + pts.length + ' screen ' + W + 'x' + H;
+      ' ' + j.ms + 'ms turns ' + j.turns.toFixed(1) + ' pts ' + pts.length + ' screen ' + W + 'x' + H +
+      (tr ? ' guide ' + lv + ' cov ' + tr.cov.toFixed(2) + ' dist ' + tr.dist.toFixed(3) + (tr.traced ? ' traced' : '') : '');
     logLines.unshift(line); if (logLines.length > 200) logLines.pop();
     document.getElementById('logText').textContent = logLines.join('\n');
+    if (j.reason === 'tap') gd.clear();
+    else if ((j.verdict === 'lumos' && gd === lumosGuide) || (j.verdict === 'nox' && gd === noxGuide)) gd.hit(lv > 0);
+    else gd.miss();
     if (j.verdict === 'lumos') {
       bright = 0.55 + 0.45 * (1 - Math.min(1, Math.abs(j.angle) / 45));
       litTarget = 1; lit = Math.max(lit, 0.15); chime(true);
@@ -353,7 +379,7 @@ function judgeFlick(points, w, h, ease) {
   cv.addEventListener('pointerdown', function (ev) {
     if (activeId !== null) return;
     ensureAudio();
-    activeId = ev.pointerId; stroke = [pt(ev)];
+    activeId = ev.pointerId; stroke = [pt(ev)]; guideNow().cover(stroke[0]);
     try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
     ev.preventDefault();
   });
@@ -361,7 +387,7 @@ function judgeFlick(points, w, h, ease) {
     if (ev.pointerId !== activeId) return;
     var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev];
     if (!list.length) list = [ev];
-    list.forEach(function (e2) { stroke.push(pt(e2)); });
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); guideNow().cover(q); });
     ev.preventDefault();
   });
   function end(ev) {
@@ -376,6 +402,11 @@ function judgeFlick(points, w, h, ease) {
   cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === activeId) { activeId = null; stroke = null; } });
   document.addEventListener('touchmove', function (e) { if (!e.target.closest || !e.target.closest('#log')) e.preventDefault(); }, { passive: false });
 
+  document.getElementById('guideBtn').addEventListener('click', function () {
+    var gd = guideNow(); gd.reset();
+    sayEl.textContent = gd === lumosGuide ? 'Flick the wand up to light it' : 'A stroke down puts it out';
+    whyEl.textContent = 'Start at the glowing dot and follow the gold path.';
+  });
   var easeBtn = document.getElementById('ease'), order = ['kind', 'fair', 'strict'];
   easeBtn.addEventListener('click', function () {
     ease = order[(order.indexOf(ease) + 1) % order.length];
@@ -398,6 +429,7 @@ function judgeFlick(points, w, h, ease) {
     drawWand(g);
     drawLight(g, now);
     stepParts(); drawParts();
+    guideNow().draw(cx, now, !!stroke);
     drawStroke(); drawGhost(now); drawAngle(now);
     frames++;
     if (now - t0 > 2000) { window.lumosStats = Math.round(frames * 1000 / (now - t0)) + ' fps'; frames = 0; t0 = now; }
@@ -406,7 +438,8 @@ function judgeFlick(points, w, h, ease) {
   requestAnimationFrame(frame);
 
   /* for the checks: cast a stroke from code, as a finger would */
-  window.lumosCharms = { cast: cast, judge: judgeFlick, state: function () { return { lit: lit, litTarget: litTarget, ease: ease }; } };
+  window.lumosCharms = { cast: cast, judge: judgeFlick, state: function () { return { lit: lit, litTarget: litTarget, ease: ease }; },
+    guide: function () { return guideNow().state(); } };
 })();
 </script>
 </body>
