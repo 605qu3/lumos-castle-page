@@ -54,6 +54,11 @@
    when he has held the zoom close on a thing (board req 126); each thing is counted once ever, `things looked at`
    reads the count and `look close` comes when a new one is counted; `parent parcel` is a parent's setting
    (settings.parcel, the thing a parent sends by owl, or none).
+   Then the sofa's bag filled and the Chocolate Frog cards (board req 165 and 169, fifty-second session): a bag's
+   thing may carry `states`, and drawing it sets `<var>_state` to one, never the one that thing came in last; `drawn X`
+   is yes once the page names X in `opts.drawn` (its drawings that have landed); a chain's `decks` and `set X = from
+   deck Y` (by weight, repeats allowed, never the one X holds), every card kept in order found and read with
+   `found(name)`; `easter`, the fortnight round Easter Sunday.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -78,10 +83,10 @@
   var DUSK = [17.0, 17.75, 18.75, 20.0, 20.5, 21.0, 21.0, 20.25, 19.25, 18.5, 17.0, 16.75];
   var DAWN = [7.25, 6.75, 7.0, 6.25, 5.5, 5.25, 5.5, 6.0, 6.5, 7.0, 6.75, 7.25];
 
-  var COND = /^([a-z_ ]+?)\s*(>=|<=|!=|=|<|>)\s*([A-Za-z0-9_\- ]+)$/;
+  var COND = /^([a-z_\- ]+?)\s*(>=|<=|!=|=|<|>)\s*([A-Za-z0-9_\- ]+)$/;
   var WAIT = /^(wait|quiet) (\d+)-(\d+) s$/;
   var EFFECTS = [
-    ['set', /^set ([a-z_]+) = (mark [a-z ,]+|from bag [a-z]+|\d+-\d+|-?\d+|[a-z\-]+)$/],
+    ['set', /^set ([a-z_]+) = (mark [a-z ,]+|from bag [a-z]+|from deck [a-z]+|\d+-\d+|-?\d+|[a-z\-]+)$/],
     ['add', /^add ([a-z_]+) (-?\d+)$/],
     ['stamp', /^stamp ([a-z_]+)(?: \+(\d+)(?:-(\d+))? days)?$/],
     ['stamp-night', /^stamp ([a-z_]+) by night$/],
@@ -196,6 +201,14 @@
 
   /* A day is a whole local day counted from 1970, so dates compare as numbers and survive a reload. */
   function dayNumber(d) { return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / DAY_MS); }
+  /* Easter Sunday of a year, by the Gregorian reckoning (the anonymous algorithm), for the Easter egg down the sofa. */
+  function easterSunday(y) {
+    var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4;
+    var f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+    var i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    var month = Math.floor((h + l - 7 * m + 114) / 31), day = (h + l - 7 * m + 114) % 31 + 1;
+    return new Date(y, month - 1, day, 12);
+  }
   /* The week as a whole number, turning over on Monday (password Monday), from the date alone, so both castles and
      every page agree on it: the moving stair's vanishing step holds all week by it. 1 January 1970 was a Thursday. */
   function weekNumber(d) { return Math.floor((dayNumber(d) + 3) / 7); }
@@ -210,7 +223,7 @@
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
              open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
-             said: {}, written: {} };
+             said: {}, written: {}, thingStates: {}, deckFound: {} };
   }
 
   function start(opts) {
@@ -253,6 +266,13 @@
        `{ 'floor-a': ['floor-b'], 'floor-b': ['floor-a', 'floor-c'] }`. Nearness is the page's, which places them. */
     var neighbours = opts.neighbours || {};
     var bagDefs = {};                            /* each chain's bags, by name */
+    var deckDefs = {};                           /* each chain's decks, by name (the Chocolate Frog cards, req 165) */
+    /* The things this page has drawings for (req 169): `opts.drawn`, a list of names or a function giving one, so a
+       find joins the sofa's bag, or a card the deck, only once its drawing has landed in the page. */
+    function drawnList() {
+      var d = typeof opts.drawn === 'function' ? opts.drawn() : opts.drawn;
+      return d || [];
+    }
     var wordDefs = {};                           /* each chain's week-by-week words, by name (the password) */
     var leaving = false;                         /* while a visit's leave runs, `place` is the page that visit was on */
     var state = load(STATE_KEY);
@@ -348,6 +368,7 @@
         case 'week': return weekNumber(now);
         case 'day of week': return (now.getDay() + 6) % 7 + 1;      /* Monday 1 to Sunday 7, so `day of week >= 4` is Thursday on */
         case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
+        case 'easter': return Math.abs(dayNumber(now) - dayNumber(easterSunday(now.getFullYear()))) <= 7 ? 'yes' : 'no';
         case 'slot': return state.slot ? 'taken' : 'free';
         /* off as a parent sets it, or where the browser cannot hear at all, so a spoken thing waits for a tap (the ear's promise) */
         case 'speech': return ear && ear.available && ear.available() ? settings.speech || 'on' : 'off';
@@ -398,6 +419,7 @@
       }
       if (name.indexOf('mark ') === 0) return visit && visit.marks[name.slice(5)] ? 'taken' : 'free';   /* a mark a figure stands on this visit */
       if (name.indexOf('been ') === 0) return visit && visit.pages.indexOf(name.slice(5)) >= 0 ? 'yes' : 'no';   /* did this visit reach that page */
+      if (name.indexOf('drawn ') === 0) return drawnList().indexOf(name.slice(6)) >= 0 ? 'yes' : 'no';         /* has the page a drawing of it */
       var b = builtin(name);
       if (b !== undefined) return b;
       if (stampNames[name]) return name in state.stamps ? state.stamps[name] : -Infinity;   /* never stamped: long past */
@@ -452,7 +474,36 @@
       if (!pool.length) { note(rec.id + ': nothing in bag ' + name + ' holds now'); return undefined; }
       var t = pool[Math.floor(Math.random() * pool.length)];
       drawn.push(t.item);
-      return t.item;
+      return t;
+    }
+
+    /* A thing's state as it turns up this time (req 169): by weight, never the one it came in last time. */
+    function drawState(t) {
+      var all = (t.states || []).map(function (s) { return typeof s === 'string' ? { state: s, weight: 1 } : s; });
+      if (!all.length) return undefined;
+      var last = state.thingStates[t.item];
+      var pool = all.length > 1 ? all.filter(function (s) { return s.state !== last; }) : all;
+      var total = 0, k;
+      for (k = 0; k < pool.length; k++) total += pool[k].weight == null ? 1 : pool[k].weight;
+      var x = Math.random() * total;
+      for (k = 0; k < pool.length - 1; k++) { x -= pool[k].weight == null ? 1 : pool[k].weight; if (x < 0) break; }
+      return (state.thingStates[t.item] = pool[k].state);
+    }
+
+    /* A deck (req 165): of the cards whose `when` holds, one by weight, never the one the variable holds already (so
+       Morgana comes often but never twice running); every card drawn is kept in order found, for the den. */
+    function drawFromDeck(name, current, rec) {
+      var cards = deckDefs[name];
+      if (!cards) { note(rec.id + ': no deck named ' + name); return undefined; }
+      var held = cards.filter(function (c) { return allHold(c.when); });
+      var pool = held.length > 1 ? held.filter(function (c) { return c.item !== current; }) : held;
+      if (!pool.length) { note(rec.id + ': no card in deck ' + name + ' holds now'); return undefined; }
+      var total = 0, k;
+      for (k = 0; k < pool.length; k++) total += pool[k].weight == null ? 1 : pool[k].weight;
+      var x = Math.random() * total;
+      for (k = 0; k < pool.length - 1; k++) { x -= pool[k].weight == null ? 1 : pool[k].weight; if (x < 0) break; }
+      (state.deckFound[name] = state.deckFound[name] || []).push(pool[k].item);
+      return pool[k].item;
     }
 
     /* `mark Y, not last`: one of the marks named Y, never the one X is at (unset reads as the first, the base).
@@ -492,8 +543,18 @@
         switch (EFFECTS[i][0]) {
           case 'set':
             if (m[2].indexOf('from bag ') === 0) {
-              var item = drawFromBag(m[2].slice(9), rec);
-              if (item !== undefined) state.vars[m[1]] = item;
+              var thing = drawFromBag(m[2].slice(9), rec);
+              if (thing !== undefined) {
+                state.vars[m[1]] = thing.item;
+                var st = drawState(thing);
+                if (st !== undefined) state.vars[m[1] + '_state'] = st;
+                else delete state.vars[m[1] + '_state'];
+              }
+              return;
+            }
+            if (m[2].indexOf('from deck ') === 0) {
+              var card = drawFromDeck(m[2].slice(10), state.vars[m[1]], rec);
+              if (card !== undefined) state.vars[m[1]] = card;
               return;
             }
             if (m[2].indexOf('mark ') === 0) {
@@ -1135,6 +1196,8 @@
         for (var t in tg) targets[t] = tg[t];
         var bg = files[f].bags || {};
         for (var b in bg) bagDefs[b] = bg[b];
+        var dk = files[f].decks || {};
+        for (var d in dk) deckDefs[d] = dk[d];
         var wd = files[f].words || {};
         for (var w in wd) wordDefs[w] = wd[w];
         var mk = files[f].marks || {};
@@ -1188,6 +1251,9 @@
         moment('look close');
         if (visit) changed();
       },
+      /* The cards of a deck he has found, in the order found, repeats and all (the Chocolate Frog cards for the den
+         behind the brass key's door, req 165): `found('frogs')`. */
+      found: function (name) { return ((state.deckFound || {})[name] || []).slice(); },
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';

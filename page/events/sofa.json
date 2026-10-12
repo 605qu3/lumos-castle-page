@@ -27,6 +27,433 @@
           "date >= 10-25",
           "date <= 11-02"
         ]
+      },
+      {
+        "item": "drooble",
+        "when": [
+          "drawn drooble = yes"
+        ],
+        "states": [
+          "wrapper",
+          "chewed",
+          "unopened"
+        ]
+      },
+      {
+        "item": "sugar-quill",
+        "when": [
+          "drawn sugar-quill = yes"
+        ],
+        "states": [
+          "whole",
+          "half",
+          "stub",
+          "fluffy"
+        ]
+      },
+      {
+        "item": "pepper-imp",
+        "when": [
+          "drawn pepper-imp = yes"
+        ]
+      },
+      {
+        "item": "ice-mouse",
+        "when": [
+          "drawn ice-mouse = yes"
+        ]
+      },
+      {
+        "item": "licorice-wand",
+        "when": [
+          "drawn licorice-wand = yes"
+        ],
+        "states": [
+          "whole",
+          "bitten",
+          "hooked",
+          "snapped"
+        ]
+      },
+      {
+        "item": "peppermint-toad",
+        "when": [
+          "drawn peppermint-toad = yes"
+        ]
+      },
+      {
+        "item": "jelly-slug",
+        "when": [
+          "drawn jelly-slug = yes"
+        ],
+        "states": [
+          "green",
+          "orange",
+          "red"
+        ]
+      },
+      {
+        "item": "whizbee",
+        "when": [
+          "drawn whizbee = yes"
+        ]
+      },
+      {
+        "item": "chocoball",
+        "when": [
+          "drawn chocoball = yes"
+        ],
+        "states": [
+          "whole",
+          "squashed"
+        ]
+      },
+      {
+        "item": "cauldron-crumbs",
+        "when": [
+          "drawn cauldron-crumbs = yes"
+        ]
+      },
+      {
+        "item": "hiccough-sweet",
+        "when": [
+          "drawn hiccough-sweet = yes"
+        ]
+      },
+      {
+        "item": "dungbomb",
+        "when": [
+          "drawn dungbomb = yes"
+        ]
+      },
+      {
+        "item": "ton-tongue",
+        "when": [
+          "drawn ton-tongue = yes"
+        ]
+      },
+      {
+        "item": "canary-feather",
+        "when": [
+          "drawn canary-feather = yes"
+        ]
+      },
+      {
+        "item": "screaming-yoyo",
+        "when": [
+          "drawn screaming-yoyo = yes",
+          "sofa_finds >= 12"
+        ]
+      },
+      {
+        "item": "extendable-ear",
+        "when": [
+          "drawn extendable-ear = yes",
+          "sofa_finds >= 12"
+        ],
+        "states": [
+          "coiled",
+          "knotted"
+        ]
+      },
+      {
+        "item": "order-form",
+        "when": [
+          "drawn order-form = yes"
+        ]
+      },
+      {
+        "item": "quill",
+        "when": [
+          "drawn quill = yes"
+        ],
+        "states": [
+          "goose",
+          "snapped",
+          "chewed",
+          "bald",
+          "split",
+          "eagle",
+          "swan",
+          "pink",
+          "stub"
+        ]
+      },
+      {
+        "item": "ink",
+        "when": [
+          "drawn ink = yes"
+        ],
+        "states": [
+          "full",
+          "nearly-empty",
+          "corkless"
+        ]
+      },
+      {
+        "item": "spellotape",
+        "when": [
+          "drawn spellotape = yes"
+        ],
+        "states": [
+          "new",
+          "end-lost",
+          "tangled"
+        ]
+      },
+      {
+        "item": "gobstone",
+        "when": [
+          "drawn gobstone = yes"
+        ],
+        "states": [
+          {
+            "state": "red"
+          },
+          {
+            "state": "blue"
+          },
+          {
+            "state": "green"
+          },
+          {
+            "state": "chipped"
+          },
+          {
+            "state": "gold",
+            "weight": 0.1
+          }
+        ]
+      },
+      {
+        "item": "quiz-sheet",
+        "when": [
+          "drawn quiz-sheet = yes"
+        ],
+        "states": [
+          "blank",
+          "wrong",
+          "lilac"
+        ]
+      },
+      {
+        "item": "class-note",
+        "when": [
+          "drawn class-note = yes"
+        ],
+        "states": [
+          "folded",
+          "bird",
+          "doodle"
+        ]
+      },
+      {
+        "item": "spew-badge",
+        "when": [
+          "drawn spew-badge = yes"
+        ]
+      },
+      {
+        "item": "robe-button",
+        "when": [
+          "drawn robe-button = yes"
+        ],
+        "states": [
+          "gold",
+          "brass",
+          "threaded"
+        ]
+      },
+      {
+        "item": "sickle",
+        "when": [
+          "drawn sickle = yes"
+        ]
+      },
+      {
+        "item": "galleon",
+        "when": [
+          "drawn galleon = yes",
+          "sofa_finds >= 12"
+        ]
+      },
+      {
+        "item": "fifty-pence",
+        "when": [
+          "drawn fifty-pence = yes"
+        ]
+      },
+      {
+        "item": "bus-ticket",
+        "when": [
+          "drawn bus-ticket = yes",
+          "sofa_finds >= 12"
+        ]
+      },
+      {
+        "item": "sock",
+        "when": [
+          "drawn sock = yes"
+        ],
+        "states": [
+          "striped",
+          "spotted",
+          "maroon",
+          "holed",
+          "balled"
+        ]
+      },
+      {
+        "item": "hair-ribbon",
+        "when": [
+          "drawn hair-ribbon = yes"
+        ],
+        "states": [
+          "red",
+          "gold",
+          "black",
+          "thin"
+        ]
+      },
+      {
+        "item": "hairpin",
+        "when": [
+          "drawn hairpin = yes"
+        ],
+        "states": [
+          "straight",
+          "bent"
+        ]
+      },
+      {
+        "item": "coat-button",
+        "when": [
+          "drawn coat-button = yes"
+        ],
+        "states": [
+          {
+            "state": "wooden"
+          },
+          {
+            "state": "horn"
+          },
+          {
+            "state": "big"
+          },
+          {
+            "state": "snitch",
+            "weight": 0.2
+          }
+        ]
+      },
+      {
+        "item": "toffee-wrapper",
+        "when": [
+          "drawn toffee-wrapper = yes"
+        ],
+        "states": [
+          "flat",
+          "screwed-up",
+          "hat"
+        ]
+      },
+      {
+        "item": "toast-crust",
+        "when": [
+          "drawn toast-crust = yes"
+        ],
+        "states": [
+          "buttered",
+          "burnt",
+          "bitten"
+        ]
+      },
+      {
+        "item": "string",
+        "when": [
+          "drawn string = yes"
+        ],
+        "states": [
+          "short",
+          "knotted",
+          "bow"
+        ]
+      },
+      {
+        "item": "marble",
+        "when": [
+          "drawn marble = yes"
+        ],
+        "states": [
+          "clear",
+          "cloudy",
+          "chipped"
+        ]
+      },
+      {
+        "item": "owl-feather",
+        "when": [
+          "drawn owl-feather = yes"
+        ],
+        "states": [
+          "barred",
+          "white",
+          "tawny"
+        ]
+      },
+      {
+        "item": "snap-card",
+        "when": [
+          "drawn snap-card = yes"
+        ],
+        "states": [
+          "singed",
+          "blackened",
+          "whole"
+        ]
+      },
+      {
+        "item": "cork",
+        "when": [
+          "drawn cork = yes",
+          "sofa_finds >= 12"
+        ]
+      },
+      {
+        "item": "bottle-cap",
+        "when": [
+          "drawn bottle-cap = yes",
+          "sofa_finds >= 12"
+        ]
+      },
+      {
+        "item": "lake-pebble",
+        "when": [
+          "drawn lake-pebble = yes",
+          "sofa_finds >= 12"
+        ]
+      },
+      {
+        "item": "frog-alive",
+        "when": [
+          "drawn frog-alive = yes",
+          "sofa_finds >= 12",
+          "frogs_escaped < 2"
+        ]
+      },
+      {
+        "item": "confetti",
+        "when": [
+          "drawn confetti = yes",
+          "date = 02-14"
+        ]
+      },
+      {
+        "item": "easter-egg",
+        "when": [
+          "drawn easter-egg = yes",
+          "easter = yes"
+        ]
       }
     ]
   },
@@ -37,6 +464,68 @@
       ],
       "show": [
         "the find in his hand, up close, as a notice is held"
+      ]
+    },
+    {
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = back"
+      ],
+      "show": [
+        "the Chocolate Frog card in his hand shows its back"
+      ]
+    },
+    {
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = front",
+        "card_face = there"
+      ],
+      "show": [
+        "the Chocolate Frog card in his hand, its witch or wizard in the picture"
+      ]
+    },
+    {
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = front",
+        "card_face = empty"
+      ],
+      "show": [
+        "the Chocolate Frog card in his hand, its picture empty"
+      ]
+    },
+    {
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = front",
+        "card_face = leaving"
+      ],
+      "show": [
+        "the Chocolate Frog card in his hand, a shawl or coat tail just leaving its frame"
+      ]
+    },
+    {
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card = houdini",
+        "houdini_lock = open"
+      ],
+      "show": [
+        "Houdini's padlock hanging open on its hasp, the chain loose"
+      ]
+    },
+    {
+      "when": [
+        "days since drooble_bubble <= 2"
+      ],
+      "show": [
+        "one bluebell bubble of Drooble's gum up by the ceiling, not popped yet"
       ]
     }
   ],
@@ -96,7 +585,8 @@
         "set sofa_sat = no",
         "set rummaged = yes",
         "log \"Found a {find} down the side of the sofa {day}\""
-      ]
+      ],
+      "one_of": "sofa-rummage"
     },
     {
       "id": "sofa.fluff",
@@ -116,6 +606,49 @@
       "starts": [
         "set cushion = mark cushion, not last",
         "set rummaged = yes"
+      ],
+      "one_of": "sofa-rummage"
+    },
+    {
+      "id": "sofa.find-card",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sofa",
+      "when": [
+        "mark sofa = free",
+        "sofa_finds >= 1",
+        "today >= sofa_due",
+        "rummaged != yes",
+        "drawn card-dumbledore = yes"
+      ],
+      "one_of": "sofa-rummage",
+      "weight": 0.3333,
+      "boost": {
+        "when": [
+          "sofa_sat = yes"
+        ],
+        "times": 4
+      },
+      "show": [
+        "a little puff of dust at one cushion, and a Chocolate Frog card rises from the gap and comes to his hand"
+      ],
+      "starts": [
+        "set cushion = mark cushion, not last",
+        "set find = card",
+        "set card = from deck frogs",
+        "set card_side = front",
+        "set card_face = there",
+        "set card_first = no",
+        "set card_turns = 0",
+        "set houdini_lock = shut",
+        "set holding = yes",
+        "add sofa_finds 1",
+        "add cards_found 1",
+        "stamp sofa_due +2-6 days",
+        "set sofa_sat = no",
+        "set rummaged = yes",
+        "log \"Found a Chocolate Frog card down the side of the sofa {day}\""
       ]
     },
     {
@@ -376,6 +909,1244 @@
       ]
     },
     {
+      "id": "sofa.card-back",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card != dumbledore",
+        "card_side = front",
+        "card_turns = 0"
+      ],
+      "show": [
+        "the card turns over in his hand to its back"
+      ],
+      "starts": [
+        "set card_side = back",
+        "add card_turns 1"
+      ]
+    },
+    {
+      "id": "sofa.card-back-dumbledore",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card = dumbledore",
+        "card_side = front",
+        "card_turns = 0",
+        "dumbledore_gone != yes"
+      ],
+      "show": [
+        "the card turns over in his hand to its back"
+      ],
+      "starts": [
+        "set card_side = back",
+        "add card_turns 1",
+        "set dumbledore_back = read",
+        "set card_first = gone"
+      ]
+    },
+    {
+      "id": "sofa.card-back-dumbledore-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card = dumbledore",
+        "card_side = front",
+        "card_turns = 0",
+        "dumbledore_gone = yes"
+      ],
+      "show": [
+        "the card turns over in his hand to its back"
+      ],
+      "starts": [
+        "set card_side = back",
+        "add card_turns 1",
+        "set dumbledore_back = read"
+      ]
+    },
+    {
+      "id": "sofa.card-gone-dumbledore",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = back",
+        "card_first = gone"
+      ],
+      "show": [
+        "turned back over, the picture is empty: Dumbledore has gone, the background and his name still there"
+      ],
+      "starts": [
+        "set card_side = front",
+        "set card_face = empty",
+        "add card_turns 1",
+        "set dumbledore_gone = yes",
+        "set card_first = no"
+      ]
+    },
+    {
+      "id": "sofa.card-front-there",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = back",
+        "card_first = no"
+      ],
+      "one_of": "card-front",
+      "weight": 3,
+      "show": [
+        "turned back over, the card's witch or wizard is in the picture"
+      ],
+      "starts": [
+        "set card_side = front",
+        "set card_face = there",
+        "add card_turns 1"
+      ]
+    },
+    {
+      "id": "sofa.card-front-empty",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = back",
+        "card_first = no"
+      ],
+      "one_of": "card-front",
+      "weight": 1,
+      "show": [
+        "turned back over, the picture is empty, the background and the name still there"
+      ],
+      "starts": [
+        "set card_side = front",
+        "set card_face = empty",
+        "add card_turns 1"
+      ]
+    },
+    {
+      "id": "sofa.card-front-leaving-nightingale",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = back",
+        "card_first = no",
+        "card = nightingale",
+        "drawn card-nightingale-leaving = yes"
+      ],
+      "one_of": "card-front",
+      "weight": 0.2,
+      "show": [
+        "turned back over, the edge of a shawl or a coat tail is just going out of the side of the frame, and then the picture is empty as ever"
+      ],
+      "starts": [
+        "set card_side = front",
+        "set card_face = leaving",
+        "add card_turns 1"
+      ]
+    },
+    {
+      "id": "sofa.card-front-leaving-houdini",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = back",
+        "card_first = no",
+        "card = houdini",
+        "drawn card-houdini-leaving = yes"
+      ],
+      "one_of": "card-front",
+      "weight": 0.2,
+      "show": [
+        "turned back over, the edge of a shawl or a coat tail is just going out of the side of the frame, and then the picture is empty as ever"
+      ],
+      "starts": [
+        "set card_side = front",
+        "set card_face = leaving",
+        "add card_turns 1"
+      ]
+    },
+    {
+      "id": "sofa.card-front-leaving-carroll",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card_side = back",
+        "card_first = no",
+        "card = carroll",
+        "drawn card-carroll-leaving = yes"
+      ],
+      "one_of": "card-front",
+      "weight": 0.2,
+      "show": [
+        "turned back over, the edge of a shawl or a coat tail is just going out of the side of the frame, and then the picture is empty as ever"
+      ],
+      "starts": [
+        "set card_side = front",
+        "set card_face = leaving",
+        "add card_turns 1"
+      ]
+    },
+    {
+      "id": "sofa.card-houdini-lock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card = houdini",
+        "card_side = front",
+        "card_turns >= 2",
+        "houdini_lock = shut"
+      ],
+      "show": [
+        "the padlock on the empty card clicks open and swings on its hasp, the chain sliding loose, as if he had that moment slipped out"
+      ],
+      "starts": [
+        "set houdini_lock = open"
+      ]
+    },
+    {
+      "id": "sofa.card-pocket",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card != houdini",
+        "card_side = front",
+        "card_turns >= 2"
+      ],
+      "show": [
+        "the card goes into his pocket, kept with the others he has found"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.card-pocket-houdini",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = card",
+        "card = houdini",
+        "card_side = front",
+        "card_turns >= 2",
+        "houdini_lock = open"
+      ],
+      "show": [
+        "the card goes into his pocket, kept with the others he has found"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.card-kept",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = card"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-drooble-bubble",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = drooble",
+        "find_state = unopened"
+      ],
+      "show": [
+        "he blows, and one bluebell bubble floats up to the ceiling and stays there"
+      ],
+      "starts": [
+        "stamp drooble_bubble",
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-drooble",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = drooble",
+        "find_state != unopened"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-sugar-quill",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = sugar-quill"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-pepper-imp",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = pepper-imp"
+      ],
+      "show": [
+        "he tastes it, and a puff of smoke comes out of his mouth; it is gone"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-ice-mouse",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = ice-mouse"
+      ],
+      "show": [
+        "he tastes it, and it is gone"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "an Ice Mouse",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "sofa.ice-mouse",
+          "sound": "his teeth chattering, and a squeak",
+          "canon": "PoA 10, Ice Mice: hear your teeth chatter and squeak; checked against the text, 12 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-licorice-wand",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = licorice-wand"
+      ],
+      "show": [
+        "he waves it, and it does nothing at all; a wand that is only a sweet"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-peppermint-toad",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = peppermint-toad"
+      ],
+      "show": [
+        "one hop on his palm, then it hops off out of sight"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-jelly-slug",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = jelly-slug"
+      ],
+      "show": [
+        "it wobbles on his palm"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-whizbee",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = whizbee"
+      ],
+      "show": [
+        "it lifts an inch off his palm, fizzing, and settles"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-chocoball",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = chocoball"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-cauldron-crumbs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = cauldron-crumbs"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-hiccough-sweet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = hiccough-sweet"
+      ],
+      "show": [
+        "he tastes it, and it is gone"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a Hiccough Sweet",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "sofa.hiccough",
+          "sound": "the sofa hiccups, once",
+          "canon": "ours (Lumos), a Hiccough Sweet of Zonko's, PoA 14"
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-dungbomb",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = dungbomb"
+      ],
+      "show": [
+        "it fizzes weakly, then a small green puff, and it is gone"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "someone",
+          "role": "voice",
+          "name": "someone nearby",
+          "mark": "room"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "someone",
+          "medium": "said",
+          "key": "sofa.dungbomb",
+          "canon": "ours (Lumos); a Dungbomb let off in the corridor, PoA 10, checked against the text, 12 October 2026",
+          "text": [
+            "Someone open a window.",
+            "Who did that? Honestly.",
+            "Oh, that is NOT the fire."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-ton-tongue",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = ton-tongue"
+      ],
+      "show": [
+        "he reads the note pinned to it, and keeps the toffee well away from his mouth"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "the twins",
+          "at": "hand",
+          "key": "sofa.ton-tongue",
+          "canon": "ours (Lumos), after GoF 4 and 5: the twins invented them and tested one on Dudley; checked against the text, 12 October 2026",
+          "text": [
+            "FOR TESTING. DO NOT EAT. (Unless you're Dudley.)",
+            "TOP SECRET. DO NOT EAT. That means YOU. F. & G."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-canary-feather",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = canary-feather"
+      ],
+      "show": [
+        "the feather drifts down from his hand, slowly"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-screaming-yoyo",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = screaming-yoyo"
+      ],
+      "show": [
+        "he holds it a moment, and puts it down very carefully"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "a Screaming Yo-yo",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "sofa.yoyo",
+          "sound": "one short scream from the yo-yo, then a sulky silence",
+          "canon": "ours (Lumos); on Filch's banned list, GoF 12, checked against the text, 12 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-extendable-ear",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = extendable-ear"
+      ],
+      "show": [
+        "the far end twitches, listening"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "an Extendable Ear",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "sofa.ear",
+          "sound": "a faint murmur of the room's own sounds, from the Ear",
+          "canon": "ours (Lumos); OotP 4, checked against the text, 12 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-order-form",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = order-form"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-quill",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = quill"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-ink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = ink"
+      ],
+      "show": [
+        "he tilts it, and the ink inside shifts colour"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-spellotape",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = spellotape"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-gobstone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = gobstone"
+      ],
+      "show": [
+        "it squirts a tiny smelly jet"
+      ],
+      "starts": [
+        "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "someone",
+          "role": "voice",
+          "name": "someone nearby",
+          "mark": "room"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "someone",
+          "medium": "said",
+          "key": "sofa.gobstone",
+          "canon": "ours (Lumos); Gobstones squirt a nasty-smelling liquid, PoA 4, checked against the text, 12 October 2026",
+          "text": [
+            "Oh, honestly.",
+            "Ugh. Gobstones.",
+            "Not on the cushions!"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-quiz-sheet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = quiz-sheet"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-class-note",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = class-note"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-spew-badge",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = spew-badge"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-robe-button",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = robe-button"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-sickle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = sickle"
+      ],
+      "show": [
+        "the Sickle goes into his pocket with a clink"
+      ],
+      "starts": [
+        "add sickles 1",
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-galleon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = galleon"
+      ],
+      "show": [
+        "a whole gold Galleon! It goes into his pocket"
+      ],
+      "starts": [
+        "add galleons 1",
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-fifty-pence",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = fifty-pence"
+      ],
+      "show": [
+        "the fifty pence goes into his pocket"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-bus-ticket",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = bus-ticket"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-sock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = sock"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-hair-ribbon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = hair-ribbon"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-hairpin",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = hairpin"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-coat-button",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = coat-button"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-toffee-wrapper",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = toffee-wrapper"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-toast-crust",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = toast-crust"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-string",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = string"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-marble",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = marble"
+      ],
+      "show": [
+        "it rolls off his palm and away with a little clatter"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-owl-feather",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = owl-feather"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-snap-card-pop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = snap-card",
+        "find_state = whole"
+      ],
+      "one_of": "snap-card",
+      "weight": 1,
+      "who": [
+        {
+          "as": "thing",
+          "role": "trace",
+          "what": "an Exploding Snap card",
+          "mark": "hand"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "thing",
+          "medium": "heard",
+          "key": "sofa.snap-pop",
+          "sound": "a tiny pop from the card",
+          "canon": "CoS 12; checked against the text, 12 October 2026"
+        }
+      ],
+      "show": [
+        "the card gives a tiny pop and a wisp of smoke"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-snap-card",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = snap-card"
+      ],
+      "one_of": "snap-card",
+      "weight": 2,
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-cork",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = cork"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-bottle-cap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = bottle-cap"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-lake-pebble",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = lake-pebble"
+      ],
+      "show": [
+        "he sets it down, and it is gone when he next looks"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-frog-alive",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = frog-alive"
+      ],
+      "show": [
+        "one hop, and it is gone over the back of the sofa"
+      ],
+      "starts": [
+        "add frogs_escaped 1",
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-confetti",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = confetti"
+      ],
+      "show": [
+        "the confetti drifts down from his hand"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.f-easter-egg",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = easter-egg"
+      ],
+      "show": [
+        "he tastes it, and it is gone"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
       "id": "sofa.lost-pawn",
       "tier": "fixed",
       "source": "device",
@@ -484,6 +2255,26 @@
       ]
     },
     {
+      "id": "sofa.set-down",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find != bean",
+        "find != card",
+        "find != knut",
+        "find != paper-hat",
+        "find != pawn",
+        "find != sugar-mouse",
+        "find != wrapper"
+      ],
+      "starts": [
+        "set holding = no"
+      ]
+    },
+    {
       "id": "sofa.drift-due",
       "tier": "fixed",
       "source": "device",
@@ -508,5 +2299,668 @@
         "set rummaged = no"
       ]
     }
-  ]
+  ],
+  "decks": {
+    "frogs": [
+      {
+        "item": "dumbledore",
+        "weight": 2,
+        "when": [
+          "drawn card-dumbledore = yes"
+        ]
+      },
+      {
+        "item": "morgana",
+        "weight": 4,
+        "when": [
+          "drawn card-morgana = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "hengist",
+        "weight": 2,
+        "when": [
+          "drawn card-hengist = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "grunnion",
+        "weight": 2,
+        "when": [
+          "drawn card-grunnion = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "circe",
+        "weight": 2,
+        "when": [
+          "drawn card-circe = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "paracelsus",
+        "weight": 2,
+        "when": [
+          "drawn card-paracelsus = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "merlin",
+        "weight": 2,
+        "when": [
+          "drawn card-merlin = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "cliodna",
+        "weight": 2,
+        "when": [
+          "drawn card-cliodna = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "agrippa",
+        "weight": 1,
+        "when": [
+          "drawn card-agrippa = yes",
+          "cards_found >= 1",
+          "cards_found >= 12"
+        ]
+      },
+      {
+        "item": "ptolemy",
+        "weight": 1,
+        "when": [
+          "drawn card-ptolemy = yes",
+          "cards_found >= 1",
+          "cards_found >= 12"
+        ]
+      },
+      {
+        "item": "flamel",
+        "weight": 2,
+        "when": [
+          "drawn card-flamel = yes",
+          "cards_found >= 1",
+          "dumbledore_back = read"
+        ]
+      },
+      {
+        "item": "perenelle",
+        "weight": 2,
+        "when": [
+          "drawn card-perenelle = yes",
+          "cards_found >= 1",
+          "dumbledore_back = read"
+        ]
+      },
+      {
+        "item": "barnabas",
+        "weight": 2,
+        "when": [
+          "drawn card-barnabas = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "gregory",
+        "weight": 2,
+        "when": [
+          "drawn card-gregory = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "boris",
+        "weight": 2,
+        "when": [
+          "drawn card-boris = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "lachlan",
+        "weight": 2,
+        "when": [
+          "drawn card-lachlan = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "wilfred",
+        "weight": 2,
+        "when": [
+          "drawn card-wilfred = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "uric",
+        "weight": 2,
+        "when": [
+          "drawn card-uric = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "wendelin",
+        "weight": 2,
+        "when": [
+          "drawn card-wendelin = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "dilys",
+        "weight": 2,
+        "when": [
+          "drawn card-dilys = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "gryffindor",
+        "weight": 2,
+        "when": [
+          "drawn card-gryffindor = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "hufflepuff",
+        "weight": 2,
+        "when": [
+          "drawn card-hufflepuff = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "ravenclaw",
+        "weight": 2,
+        "when": [
+          "drawn card-ravenclaw = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "slytherin",
+        "weight": 2,
+        "when": [
+          "drawn card-slytherin = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "bott",
+        "weight": 2,
+        "when": [
+          "drawn card-bott = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "scamander",
+        "weight": 2,
+        "when": [
+          "drawn card-scamander = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "beedle",
+        "weight": 2,
+        "when": [
+          "drawn card-beedle = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "bagshot",
+        "weight": 2,
+        "when": [
+          "drawn card-bagshot = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "goshawk",
+        "weight": 2,
+        "when": [
+          "drawn card-goshawk = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "borage",
+        "weight": 2,
+        "when": [
+          "drawn card-borage = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "brand",
+        "weight": 2,
+        "when": [
+          "drawn card-brand = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "mary",
+        "weight": 2,
+        "when": [
+          "drawn card-mary = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "della-porta",
+        "weight": 2,
+        "when": [
+          "drawn card-della-porta = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "newton",
+        "weight": 2,
+        "when": [
+          "drawn card-newton = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "dee",
+        "weight": 2,
+        "when": [
+          "drawn card-dee = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "scot",
+        "weight": 2,
+        "when": [
+          "drawn card-scot = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "albertus",
+        "weight": 2,
+        "when": [
+          "drawn card-albertus = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "bacon",
+        "weight": 2,
+        "when": [
+          "drawn card-bacon = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "davy",
+        "weight": 2,
+        "when": [
+          "drawn card-davy = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "tycho",
+        "weight": 2,
+        "when": [
+          "drawn card-tycho = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "galileo",
+        "weight": 2,
+        "when": [
+          "drawn card-galileo = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "kepler",
+        "weight": 2,
+        "when": [
+          "drawn card-kepler = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "herschel",
+        "weight": 2,
+        "when": [
+          "drawn card-herschel = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "halley",
+        "weight": 2,
+        "when": [
+          "drawn card-halley = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "eratosthenes",
+        "weight": 2,
+        "when": [
+          "drawn card-eratosthenes = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "archimedes",
+        "weight": 2,
+        "when": [
+          "drawn card-archimedes = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "pythagoras",
+        "weight": 2,
+        "when": [
+          "drawn card-pythagoras = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "fibonacci",
+        "weight": 2,
+        "when": [
+          "drawn card-fibonacci = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "al-khwarizmi",
+        "weight": 2,
+        "when": [
+          "drawn card-al-khwarizmi = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "ibn-al-haytham",
+        "weight": 2,
+        "when": [
+          "drawn card-ibn-al-haytham = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "hero",
+        "weight": 2,
+        "when": [
+          "drawn card-hero = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "kempelen",
+        "weight": 2,
+        "when": [
+          "drawn card-kempelen = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "al-jazari",
+        "weight": 2,
+        "when": [
+          "drawn card-al-jazari = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "harrison",
+        "weight": 2,
+        "when": [
+          "drawn card-harrison = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "firnas",
+        "weight": 2,
+        "when": [
+          "drawn card-firnas = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "montgolfier",
+        "weight": 2,
+        "when": [
+          "drawn card-montgolfier = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "leonardo",
+        "weight": 2,
+        "when": [
+          "drawn card-leonardo = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "worm",
+        "weight": 2,
+        "when": [
+          "drawn card-worm = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "aldrovandi",
+        "weight": 2,
+        "when": [
+          "drawn card-aldrovandi = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "anning",
+        "weight": 2,
+        "when": [
+          "drawn card-anning = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "linnaeus",
+        "weight": 2,
+        "when": [
+          "drawn card-linnaeus = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "pliny",
+        "weight": 2,
+        "when": [
+          "drawn card-pliny = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "gessner",
+        "weight": 2,
+        "when": [
+          "drawn card-gessner = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "hildegard",
+        "weight": 2,
+        "when": [
+          "drawn card-hildegard = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "dioscorides",
+        "weight": 2,
+        "when": [
+          "drawn card-dioscorides = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "culpeper",
+        "weight": 2,
+        "when": [
+          "drawn card-culpeper = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "trithemius",
+        "weight": 2,
+        "when": [
+          "drawn card-trithemius = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "champollion",
+        "weight": 2,
+        "when": [
+          "drawn card-champollion = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "lopez",
+        "weight": 2,
+        "when": [
+          "drawn card-lopez = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "philidor",
+        "weight": 2,
+        "when": [
+          "drawn card-philidor = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "perrault",
+        "weight": 2,
+        "when": [
+          "drawn card-perrault = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "mercator",
+        "weight": 2,
+        "when": [
+          "drawn card-mercator = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "houdini",
+        "weight": 2,
+        "when": [
+          "drawn card-houdini = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "robert-houdin",
+        "weight": 2,
+        "when": [
+          "drawn card-robert-houdin = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "maskelyne",
+        "weight": 2,
+        "when": [
+          "drawn card-maskelyne = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "melies",
+        "weight": 2,
+        "when": [
+          "drawn card-melies = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "pepper",
+        "weight": 2,
+        "when": [
+          "drawn card-pepper = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "nightingale",
+        "weight": 2,
+        "when": [
+          "drawn card-nightingale = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "curie",
+        "weight": 2,
+        "when": [
+          "drawn card-curie = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "lovelace",
+        "weight": 2,
+        "when": [
+          "drawn card-lovelace = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "turing",
+        "weight": 2,
+        "when": [
+          "drawn card-turing = yes",
+          "cards_found >= 1"
+        ]
+      },
+      {
+        "item": "carroll",
+        "weight": 2,
+        "when": [
+          "drawn card-carroll = yes",
+          "cards_found >= 1"
+        ]
+      }
+    ]
+  }
 }
