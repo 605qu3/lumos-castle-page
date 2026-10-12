@@ -5205,7 +5205,7 @@ var pairTurn = { k: 0, to: 0 };
 var PAIR_FACE = (function () {
   var f = Math.atan2(FIRESIDE.pos.x - FIRESIDE.look.x, FIRESIDE.pos.z - FIRESIDE.look.z);
   function off(yw) { var a = f - yw; return Math.atan2(Math.sin(a), Math.cos(a)); }
-  return { on: false, l: off(CHAIR_L_AT.yaw), r: off(WINGBACK_AT.yaw), glide: 1.6 };   /* on: Q53, set on David's 1 */
+  return { on: true, l: off(CHAIR_L_AT.yaw), r: off(WINGBACK_AT.yaw), glide: 1.6 };   /* on: Q53, David's 1 (2.47 to 3.05 pm) */
 })();
 function aboutChairL(x, z, a) {
   var lx = x - CHAIR_L_AT.x, lz = z - CHAIR_L_AT.z, c = Math.cos(a), sn = Math.sin(a);
