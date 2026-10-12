@@ -52,7 +52,7 @@
 <div id="corner"><button id="ledgerBtn">Ledger</button><button id="restart">Start again</button></div>
 <div id="panel"></div>
 <div id="ledger"></div>
-<script src="spells.js?v=1"></script>
+<script src="spells.js?v=7"></script>
 <script src="guide.js?v=3"></script>
 <script>
 /* Ollivanders, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
@@ -111,7 +111,7 @@
   }
   /* CSS pixels to an inch: Safari reports points, not inches, so this is close, not exact, and said as "about". iPads
      show about 132 points to the inch, phones about 160. */
-  function ppi() { return Math.min(screen.width, screen.height) >= 700 ? 132 : 160; }
+  function ppi() { return LumosSpells.ppi(); }   /* in spells.js since 12 October 2026, so a room's tape agrees */
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5);

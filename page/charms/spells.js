@@ -527,6 +527,336 @@ function revealInk(opts) {
     taps: function (list) { var out = null; for (var i = 0; i < list.length && !out; i++) out = tapAt(list[i]); if (out) L.finish(out); return out; } };
 }
 
+/* The kind answer to each Leviosa miss, the words the Charms page shows (moved from leviosa-test.html, 12 October
+   2026, req 153), so a room's feather and the page's say the same: [what the thing does, what to try]. */
+var SWISH_WHY = {
+  small: ['It twitches', 'A little bigger: a curve, then a flick up.'],
+  slow: ['It lifts a finger, and drops', 'Quicker: swish and flick is one quick stroke.'],
+  windmill: ['It spins round and round', 'Ron waved his arms like a windmill too. One curve, then one flick.'],
+  wave: ['It flops over', 'A curve with no flick. Finish with a sharp flick up.'],
+  line: ['It flops over', 'Only a line. Swish first: a curve, then the flick.'],
+  noswish: ['It twitches', 'The swish should curve, like part of a circle.'],
+  flickwiggly: ['It wobbles', 'Keep the flick straight, like a line.'],
+  flickaside: ['It scoots along the table', 'The flick went sideways. Flick it up.'],
+  flicklong: ['It drifts up, and sinks', 'The flick is short and sharp; the swish is the long part.'],
+  prod: ['You prodded it!', 'Seamus prodded his feather and set fire to it. Swish and flick, from a little way off.']
+};
+
+/* Wingardium Leviosa on a thing a room names, and his steer while it floats (req 153, the Interaction lane's §9 and
+   row 6; Godric's Q1 and Q1b, 12 October 2026; tried on page/charms/room-spells-test.html). The room offers it when
+   he taps the thing; the swish and flick is drawn on a clear layer over the room, so it never fights the look-drag,
+   judged by judgeSwishFlick as the Charms page judges it, with the traced guide in the page's own store
+   (lumos.charms.leviosaGuidedHits) and its own path, placed so the flick ends beside the thing. A tap elsewhere costs
+   nothing; a tap on the thing itself is Seamus's prod (PS 10), a miss.
+   On a hit the layer stays up: the thing rises (about 1.6 s) and hovers, and any one-finger drag steers it (it follows
+   the finger's movement, not the finger, kept inside `bounds`), still on the layer, so the room's view never turns;
+   seven quiet seconds after the last drag it floats down and settles where it was steered. Over the first seconds the
+   layer marks his own stroke, the curve blue and the line gold, the corner ringed with its angle (the geometry, way 2).
+   The room draws the thing at the point onSteer gives it, every frame from the lift to the landing.
+   Answers, by `done`: 'lifted' at the hit (the steer follows), 'missed' with its cause (judge.reason, or 'prod') and
+   `why`, the page's kind words for it (SWISH_WHY: the room moves the thing as the page does, twitch, flop, scoot,
+   spin, smoke), or 'cancelled'. `settled` answers once the thing is down: { at, cancelled }. cancel() (he left the
+   stop, or waited too long) lets the offer go before the cast, or puts the thing down at once while it floats. The
+   room asks learned('leviosa') (set on the Charms page) before it offers the spell.
+   opts: { at: {x, y} in CSS pixels, or a function returning one each frame (where the thing rests),
+           size: the thing's reach for a prod, in CSS pixels (0.06 of the screen's short side by default),
+           height: how far above its rest it hovers (0.22 of the short side), hold: quiet seconds before it settles (7),
+           bounds: {x, y, w, h} the steer keeps it in, or a function (the screen less a margin by default),
+           land: optional function(p) giving where a thing let go at p comes to rest (straight down to its rest height),
+           onSteer: function({x, y, phase: 'rise' | 'hover' | 'fall'}), onSettle: function({x, y}),
+           ease: 'kind' (default), 'fair' or 'strict' (SWISH_EASES), guide: 'auto' (default), 'always' or 'off',
+           mirror: true for a left wand arm (?hand=left otherwise), mark: true (default) or false }
+   Returns { done, settled, cancel(), judge(points), steer(dx, dy), state() }. */
+function levitate(opts) {
+  opts = opts || {};
+  var G = root.LumosGuide, ease = opts.ease || 'kind', mode = opts.guide || 'auto', L;
+  var stage = 'cast', guide = null, built = null, stroke = null, active = null, trail = null, mark = null, home = null;
+  var F = null, drag = null, quietAt = 0, settle, settled = new Promise(function (r) { settle = r; });
+  function S() { return Math.min(L.W, L.H); }
+  function spot() { var p = typeof opts.at === 'function' ? opts.at() : opts.at; return p || { x: L.W / 2, y: L.H * 0.62 }; }
+  function bounds() {
+    var b = typeof opts.bounds === 'function' ? opts.bounds() : opts.bounds, m = S() * 0.08;
+    return b || { x: m, y: m, w: L.W - 2 * m, h: L.H - 2 * m };
+  }
+  function mir() { return opts.mirror == null ? !!(G && G.mirrored) : !!opts.mirror; }
+  function box() {   /* the swish and flick's box, the flick ending just beside the thing, kept on the screen */
+    var s = spot(), x = mir() ? L.W - s.x : s.x, g = Math.min(L.W * 0.7, L.H * 0.5);
+    g = Math.max(S() * 0.45, Math.min(g, (x - S() * 0.1) / 0.95));   /* on a narrow screen, smaller, to stay beside the thing */
+    var ox = x - g * 0.95 - S() * 0.05, oy = s.y - g * 0.1;
+    ox = Math.max(S() * 0.05, Math.min(L.W - 8 - g * 0.95, ox)); oy = Math.max(g * 0.15 + 8, Math.min(L.H - 8 - g * 0.8, oy));
+    return { G: g, ox: ox, oy: oy };
+  }
+  if (G && mode !== 'off') {
+    guide = G.create({ key: mode === 'always' ? 'lumos.spells.levitate.always' : 'lumos.charms.leviosaGuidedHits', box: function () { return box(); },
+      mirror: function () { return mir(); }, parts: [
+        { pts: G.quad([0, 0], [0.08, 0.75], [0.8, 0.55], 40), secs: 0.9, label: 'swish', at: 0.55, dy: -0.9 },
+        { pts: G.line([0.8, 0.55], [0.95, -0.15], 16), secs: 0.25, label: 'and flick', at: 0.5, dx: -2.9 }] });
+  }
+  function clampIn(p) { var b = bounds(); return { x: Math.max(b.x, Math.min(b.x + b.w, p.x)), y: Math.max(b.y, Math.min(b.y + b.h, p.y)) }; }
+  function lift(now) {
+    stage = 'float'; home = spot();
+    var t = clampIn({ x: home.x, y: home.y - (opts.height || S() * 0.22) });
+    F = { phase: 'rise', t0: now, x: home.x, y: home.y, tx: t.x, ty: t.y, from: { x: home.x, y: home.y } }; quietAt = now;
+  }
+  function down(now) {
+    var p = opts.land ? opts.land({ x: F.x, y: F.y }) : { x: F.x, y: home.y };
+    F.phase = 'fall'; F.t0 = now; F.from = { x: F.x, y: F.y }; F.to = p;
+  }
+  function stepFloat(now) {
+    var t = (now - F.t0) / 1000, k, e;
+    if (F.phase === 'rise') {
+      k = Math.min(1, t / 1.6); e = 1 - Math.pow(1 - k, 3);
+      F.x = F.from.x + (F.tx - F.from.x) * e; F.y = F.from.y + (F.ty - F.from.y) * e;
+      if (k >= 1) { F.phase = 'hover'; F.t0 = now; }
+    } else if (F.phase === 'hover') {
+      F.x += (F.tx - F.x) * 0.1 + Math.sin(now / 900) * 0.3;
+      F.y += (F.ty + Math.sin(now / 650) * S() * 0.012 - F.y) * 0.1;
+      if (!drag && now - quietAt > (opts.hold || 7) * 1000) down(now);
+    } else if (F.phase === 'fall') {
+      var d = Math.hypot(F.to.x - F.from.x, F.to.y - F.from.y), secs = Math.max(0.8, d / (S() * 0.25));
+      k = Math.min(1, t / secs);
+      F.x = F.from.x + (F.to.x - F.from.x) * k + Math.sin(now / 300) * 6 * (1 - k); F.y = F.from.y + (F.to.y - F.from.y) * k;
+      if (k >= 1) { F.x = F.to.x; F.y = F.to.y; land(false); return; }
+    }
+    if (opts.onSteer) opts.onSteer({ x: F.x, y: F.y, phase: F.phase });
+  }
+  function land(cancelled) {
+    if (stage === 'gone') return; stage = 'gone';
+    var p = F ? { x: F.x, y: F.y } : null;
+    if (p && opts.onSettle) opts.onSettle(p);
+    settle({ at: p, cancelled: cancelled }); L.finish(null);
+  }
+  function drawMark(cx, now) {
+    if (!mark || opts.mark === false) return;
+    var age = (now - mark.at) / 3500; if (age > 1) { mark = null; return; }
+    var a = age < 0.8 ? 1 : (1 - age) / 0.2, p = mark.pts, c = mark.corner, fs = Math.round(Math.max(16, S() * 0.038));
+    cx.save(); cx.globalAlpha = a; cx.lineCap = 'round'; cx.lineJoin = 'round';
+    cx.strokeStyle = '#9fd0ff'; cx.lineWidth = 4; cx.beginPath(); p.slice(0, c + 1).forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke();
+    cx.strokeStyle = '#ffe9a8'; cx.beginPath(); p.slice(c).forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke();
+    cx.strokeStyle = '#e8be5a'; cx.lineWidth = 2.5; cx.beginPath(); cx.arc(p[c].x, p[c].y, 9, 0, 7); cx.stroke();
+    cx.font = '600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 6;
+    var m = p[Math.floor(c / 2)], e = p[Math.min(p.length - 1, c + Math.floor((p.length - c) * 0.6))];
+    cx.fillStyle = '#9fd0ff'; cx.fillText('a curve', m.x - fs * 2.4, m.y + fs * 0.4);
+    cx.fillStyle = '#ffe9a8'; cx.fillText('a line', e.x + fs * 2.2, e.y);
+    cx.fillStyle = '#e8be5a'; cx.fillText('corner ' + Math.round(mark.deg) + '°', p[c].x, p[c].y + fs * 1.5);
+    cx.restore();
+  }
+  function judge(pts) {   /* also the way in for checks */
+    var j = judgeSwishFlick(pts, L.W, L.H, ease), now = root.performance.now();
+    if (j.reason === 'tap') {
+      var s = spot(), q = pts[0];
+      if (guide) guide.clear();
+      if (Math.hypot(q.x - s.x, q.y - s.y) > (opts.size || S() * 0.06)) return null;   /* a tap away from the thing: wait on */
+      j.reason = 'prod';
+    }
+    var lv = guide ? guide.level() : 0, tr = guide && j.reason !== 'prod' ? guide.score(pts) : null, traced = !!(tr && tr.traced);
+    var ok = j.verdict === 'leviosa' || traced;
+    if (guide && j.reason !== 'prod') { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
+    if (ok) {
+      if (j.verdict === 'leviosa') mark = { at: now, pts: j.pts, corner: j.corner, deg: j.cornerDeg };
+      lift(now); return { verdict: 'lifted', judge: j, traced: traced, why: null };
+    }
+    return { verdict: 'missed', judge: j, traced: false, cause: j.reason, why: SWISH_WHY[j.reason] || SWISH_WHY.small };
+  }
+  var answered;
+  function answer(out) { if (answered) return; answered = true; resolveDone(out); }
+  var resolveDone, done = new Promise(function (r) { resolveDone = r; });
+  L = layer({
+    size: function () { built = null; },
+    frame: function (now) {
+      var cx = L.cx, s = spot();
+      if (stage === 'cast' && guide && (!built || Math.abs(built.x - s.x) + Math.abs(built.y - s.y) > 2)) { guide.build(L.W, L.H); built = { x: s.x, y: s.y }; }
+      if (stage === 'cast' && guide) guide.draw(cx, now, !!stroke);
+      if (stage === 'float') stepFloat(now);
+      drawMark(cx, now);
+      var pts = stroke || (trail && trail.pts), a = stroke ? 1 : (trail ? Math.max(0, 1 - (now - trail.at) / 350) : 0);
+      if (pts && pts.length > 1 && a > 0) {
+        cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + 0.55 * a + ')'; cx.lineWidth = 5;
+        cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
+      }
+    },
+    down: function (ev) {
+      if (active !== null) return;
+      var p = L.pt(ev); active = ev.pointerId;
+      try { L.cv.setPointerCapture(ev.pointerId); } catch (e) {}
+      if (stage === 'float') { drag = { x: p.x, y: p.y }; if (F.phase === 'fall') { F.phase = 'hover'; F.t0 = p.t; } return; }
+      if (stage !== 'cast') return;
+      stroke = [p]; trail = null; if (guide) guide.cover(p);
+    },
+    move: function (ev) {
+      if (ev.pointerId !== active) return; ev.preventDefault();
+      if (drag) { var q = L.pt(ev); steer(q.x - drag.x, q.y - drag.y); drag = { x: q.x, y: q.y }; return; }
+      if (!stroke) return;
+      var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+      list.forEach(function (e2) { var q = L.pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+    },
+    up: function (ev) {
+      if (ev.pointerId !== active) return; active = null;
+      if (drag) { drag = null; quietAt = root.performance.now(); return; }
+      if (!stroke) return;
+      stroke.push(L.pt(ev)); var pts = stroke; stroke = null;
+      var out = judge(pts); if (!out) return;
+      trail = { pts: pts, at: root.performance.now() };
+      if (out.verdict === 'lifted') answer(out);
+      else { stage = 'gone'; settle({ at: null, cancelled: false }); L.later(null, 350); answer(out); }
+    },
+    cancel: function (ev) { if (ev.pointerId === active) { active = null; stroke = null; drag = null; if (guide) guide.clear(); } }
+  });
+  function steer(dx, dy) {   /* also the way in for checks */
+    if (stage !== 'float') return null;
+    var t = clampIn({ x: F.tx + dx, y: F.ty + dy }); F.tx = t.x; F.ty = t.y; quietAt = root.performance.now();
+    if (F.phase === 'fall') { F.phase = 'hover'; F.t0 = quietAt; }
+    return t;
+  }
+  return { done: done, settled: settled,
+    cancel: function () {
+      if (stage === 'cast') { stage = 'gone'; answer({ verdict: 'cancelled', judge: null, traced: false }); settle({ at: null, cancelled: true }); L.finish(null); }
+      else if (stage === 'float') { var p = opts.land ? opts.land({ x: F.x, y: F.y }) : { x: F.x, y: home.y }; F.x = p.x; F.y = p.y; land(true); }
+    },
+    judge: function (pts) { if (stage !== 'cast') return null; var out = judge(pts); if (!out) return null;
+      if (out.verdict === 'lifted') answer(out); else { stage = 'gone'; settle({ at: null, cancelled: false }); L.finish(null); answer(out); } return out; },
+    steer: steer,
+    state: function () { return { stage: stage, phase: F ? F.phase : null, x: F ? Math.round(F.x) : null, y: F ? Math.round(F.y) : null }; } };
+}
+
+/* CSS pixels to an inch: Safari reports points, not inches, so this is close, not exact, and said as "about". iPads
+   show about 132 points to the inch, phones about 160 (moved from ollivander-test.html, 12 October 2026, req 153). */
+function ppi() { return Math.min(root.screen.width, root.screen.height) >= 700 ? 132 : 160; }
+function q4(x) { return Math.round(x * 4) / 4; }
+function frac(x) { x = q4(x); var n = Math.floor(x), r = Math.round((x - n) * 4); return ((n ? n : '') + ['', '¼', '½', '¾'][r]) || '0'; }
+
+/* Ollivander's tape, the two-finger span, on a thing a room names (req 153; the Ollivander page's tape on his hand,
+   PS 5's measuring tape; tried on page/charms/room-spells-test.html). The room offers it when he taps the thing; a
+   clear layer over the room takes two fingers at once (the tape stretches between them as he spreads, marked every
+   quarter inch, longer at each inch, "about 6¾ in" over it) or two taps, as the Ollivander page takes them. The
+   room's pinch never sees these touches: they land on the layer, not the room's canvas. Lifting a finger takes the
+   reading. A measuring tape has no wrong way, so a miss is only a touch it could not read: one finger alone for four
+   seconds ('one') or two less than half an inch apart ('close'); each answers kindly with `why`.
+   By default the inches are real ones on the glass (his hand, his finger); a room measuring a painted thing passes
+   `scale`, inches to a CSS pixel in the painting. With `want` (inches) the answer says whether the span is 'right'
+   (within `within`, half an inch by default), 'short' or 'long', and the layer leaves a gold mark on the tape where
+   `want` falls, so the gap shows. The traced guide is two rings where the fingers go (`ends`, the thing's two ends,
+   "this end" and "that end"; otherwise a hand's span either side of `at`, "thumb" and "little finger"), in the
+   Charms page's store, lumos.charms.spanGuidedHits.
+   opts: { at: {x, y} or a function (where the tape lies), ends: [{x, y}, {x, y}] or a function, scale, want, within,
+           guide: 'auto' (default), 'always' or 'off', onChange: function(inches) as he spreads }
+   Returns { done: a promise of { verdict: 'measured' | 'right' | 'short' | 'long' | 'missed' | 'cancelled', inches,
+             px, pts, cause, why, traced }, cancel(), measure(a, b) }. */
+var SPAN_WHY = {
+  one: ['The tape waits for the other end', 'Two fingers, one at each end; or tap one end, then the other.'],
+  close: ['The tape curls up', 'Spread them further apart: one finger at each end.']
+};
+function measureSpan(opts) {
+  opts = opts || {};
+  var G = root.LumosGuide, mode = opts.guide || 'auto', within = opts.within == null ? 0.5 : opts.within, L;
+  var touches = {}, taps = [], tape = null, over = false, oneAt = 0, guide = null, built = null;
+  function scale() { return opts.scale || 1 / ppi(); }
+  function spot() { var p = typeof opts.at === 'function' ? opts.at() : opts.at; return p || { x: L.W / 2, y: L.H / 2 }; }
+  function ends() {
+    var e = typeof opts.ends === 'function' ? opts.ends() : opts.ends; if (e) return e;
+    var s = spot(), half = Math.min(L.W * 0.32, 3.25 / scale());   /* a boy's hand, thumb to little finger, about 6½ in */
+    return [{ x: s.x - half, y: s.y }, { x: s.x + half, y: s.y }];
+  }
+  if (G && mode !== 'off') {
+    var gspec = { key: mode === 'always' ? 'lumos.spells.measureSpan.always' : 'lumos.charms.spanGuidedHits', rest: 1.2, mirror: false, beatSecs: 0.4,
+      box: function () { return { G: 1, ox: 0, oy: 0 }; },   /* the rings are placed in pixels, at the ends, before each build */
+      beats: [[0, 0], [1, 0]], beatLabels: opts.ends ? ['this end', 'that end'] : ['thumb', 'little finger'] };
+    guide = G.create(gspec);
+  }
+  function inches(a, b) { return Math.hypot(a.x - b.x, a.y - b.y) * scale(); }
+  function drawTape(cx, a, b, label, wantAt) {
+    var d = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / (d || 1), uy = (b.y - a.y) / (d || 1), S = Math.min(L.W, L.H);
+    cx.save(); cx.lineCap = 'round';
+    cx.strokeStyle = 'rgba(0,0,0,0.4)'; cx.lineWidth = 11; cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke();
+    cx.strokeStyle = '#d9dbe6'; cx.lineWidth = 8; cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke();
+    var step = 0.25 / scale(), n = 0;
+    cx.strokeStyle = '#5a5d70'; cx.lineWidth = 1;
+    for (var s = 0; s <= d; s += step, n++) {
+      var x = a.x + ux * s, y = a.y + uy * s, h = n % 4 === 0 ? 4 : 2;
+      cx.beginPath(); cx.moveTo(x - uy * h, y + ux * h); cx.lineTo(x + uy * h, y - ux * h); cx.stroke();
+    }
+    cx.fillStyle = '#b08a3a'; cx.fillRect(b.x - 5, b.y - 5, 10, 10);   /* its brass end */
+    if (wantAt != null) {
+      var w = Math.min(wantAt / scale(), Math.max(d, wantAt / scale())), wx = a.x + ux * w, wy = a.y + uy * w;
+      cx.strokeStyle = '#e8be5a'; cx.lineWidth = 3; cx.setLineDash([4, 4]);
+      if (w > d) { cx.beginPath(); cx.moveTo(b.x, b.y); cx.lineTo(wx, wy); cx.stroke(); }
+      cx.setLineDash([]); cx.beginPath(); cx.moveTo(wx - uy * 12, wy + ux * 12); cx.lineTo(wx + uy * 12, wy - ux * 12); cx.stroke();
+    }
+    if (label) {
+      var fs = Math.round(Math.max(17, S * 0.04)), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      cx.font = '600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center'; cx.shadowColor = 'rgba(0,0,0,0.95)'; cx.shadowBlur = 6;
+      cx.fillStyle = '#eef0fa'; cx.fillText(label, mx, my - fs * 0.9);
+    }
+    cx.restore();
+  }
+  function take(a, b) {   /* also the way in for checks: the reading between two points */
+    if (over) return null;
+    var inch = inches(a, b), px = Math.round(Math.hypot(a.x - b.x, a.y - b.y)), out;
+    if (inch < 0.5) out = { verdict: 'missed', inches: q4(inch), px: px, pts: [a, b], cause: 'close', why: SPAN_WHY.close, traced: false };
+    else {
+      var tr = guide ? guide.scoreTaps([a, b]) || guide.scoreTaps([b, a]) : null, lv = guide ? guide.level() : 0;
+      var v = opts.want == null ? 'measured' : (Math.abs(inch - opts.want) <= within ? 'right' : (inch < opts.want ? 'short' : 'long'));
+      out = { verdict: v, inches: q4(inch), px: px, pts: [a, b], cause: null, why: null, traced: !!(tr && tr.traced) };
+      if (guide) { if (v === 'measured' || v === 'right') guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
+    }
+    over = true; tape = { a: a, b: b, label: 'about ' + frac(inch) + ' in', at: root.performance.now(), want: out.verdict === 'short' || out.verdict === 'long' };
+    return out;
+  }
+  L = layer({
+    size: function () { built = null; },
+    frame: function (now) {
+      var cx = L.cx, e = ends();
+      if (guide && (!built || Math.abs(built.x - e[0].x) + Math.abs(built.y - e[0].y) + Math.abs(built.w - e[1].x) > 2)) { gspec.beats = [[e[0].x, e[0].y], [e[1].x, e[1].y]]; guide.build(L.W, L.H); built = { x: e[0].x, y: e[0].y, w: e[1].x }; }
+      var ids = Object.keys(touches);
+      if (!over && guide) guide.draw(cx, now, ids.length > 0);
+      if (!over && ids.length === 2) {
+        var a = touches[ids[0]], b = touches[ids[1]], inch = inches(a, b);
+        drawTape(cx, a, b, 'about ' + frac(inch) + ' in', null);
+        if (opts.onChange) opts.onChange(q4(inch));
+      }
+      if (!over && taps.length === 1) {
+        var p = taps[0]; cx.save(); cx.fillStyle = '#b08a3a'; cx.fillRect(p.x - 5, p.y - 5, 10, 10); cx.restore();
+        if (now - taps[0].at > 4000) { taps = []; miss('one'); }
+      }
+      if (!over && ids.length === 1 && oneAt && now - oneAt > 4000) miss('one');
+      if (tape) drawTape(cx, tape.a, tape.b, tape.label, tape.want ? opts.want : null);
+    },
+    down: function (ev) {
+      if (over) return;
+      var p = L.pt(ev); touches[ev.pointerId] = p; if (guide) guide.cover(p);
+      try { L.cv.setPointerCapture(ev.pointerId); } catch (e) {}
+      var n = Object.keys(touches).length;
+      if (n === 1) oneAt = root.performance.now(); else oneAt = 0;
+    },
+    move: function (ev) { if (ev.pointerId in touches && !over) { ev.preventDefault(); touches[ev.pointerId] = L.pt(ev); } },
+    up: function (ev) {
+      if (!(ev.pointerId in touches) || over) return;
+      var ids = Object.keys(touches), p = touches[ev.pointerId], out = null;
+      if (ids.length >= 2) {
+        var other = touches[ids[0] == ev.pointerId ? ids[1] : ids[0]];
+        out = take(other, L.pt(ev));
+      } else {
+        delete touches[ev.pointerId]; oneAt = 0;
+        taps.push({ x: p.x, y: p.y, at: root.performance.now() });
+        if (taps.length >= 2) { out = take(taps[0], taps[1]); taps = []; }
+        if (!out) return;
+      }
+      touches = {};
+      if (out) finishWith(out);
+    },
+    cancel: function (ev) { delete touches[ev.pointerId]; }
+  });
+  function miss(cause) {
+    if (over) return; over = true;
+    if (guide) guide.miss();
+    finishWith({ verdict: 'missed', inches: null, px: null, pts: [], cause: cause, why: SPAN_WHY[cause], traced: false });
+  }
+  function finishWith(out) { if (opts.onChange && out.inches != null) opts.onChange(out.inches); L.later(out, out.verdict === 'missed' ? 600 : 1400); }
+  return { done: L.done, cancel: function () { L.finish({ verdict: 'cancelled', inches: null, px: null, pts: [], cause: null, why: null, traced: false }); },
+    measure: function (a, b) { var out = take(a, b); if (out) L.finish(out); return out; } };
+}
+
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
-  TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk };
+  TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
+  SWISH_WHY: SWISH_WHY, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan };
 })(typeof window !== 'undefined' ? window : globalThis);

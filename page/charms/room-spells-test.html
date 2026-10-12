@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>A lock and a page of ink in a room, a test</title>
+<title>Spells in a room, a test</title>
 <style>
   html, body { margin: 0; height: 100%; background: #120d0a; overflow: hidden; overscroll-behavior: none;
     -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=3"></script>
+<script src="spells.js?v=7"></script>
 <script src="guide.js?v=3"></script>
 <script>
 /* A lock and a page of ink in a room, a test page for the Charms lane (12 October 2026, fifth session; the owner is
@@ -35,6 +35,11 @@
    boy who has learned the spell (LumosSpells.learned, set on alohomora-test.html and aparecium-test.html; the
    buttons here set it for trying). Drawn in code: the drawer, door and notice are stand-ins for the room's own, and
    what is inside the drawer and on the notice is the room's and Events' (req 145), only marked here.
+   Since 12 October 2026 (sixth session, req 153, the Interaction lane's §9): LumosSpells.levitate on a feather on a
+   table (the swish and flick, then his steer while it floats, then it settles; each miss moves it by its cause), and
+   LumosSpells.measureSpan, Ollivander's tape, on a wand in its box (the painted wand is eleven inches; the tape says
+   right, short or long) and on his own hand on the glass (real inches). The Cast button stands for his tap on the
+   thing, and Step back for leaving the stop: the room calls cancel().
    window.lumosRoomSpells for checks. */
 (function () {
   'use strict';
@@ -43,8 +48,16 @@
   var THINGS = [
     { id: 'drawer', name: "Percy's drawer", spell: 'alohomora' },
     { id: 'door', name: "The brass key's door", spell: 'alohomora' },
-    { id: 'notice', name: "Wood's notice", spell: 'aparecium' } ];
-  var thing = 0, T = THINGS[0], asking = null, last = null, opened = { drawer: 0, notice: 0 }, rattle = null, shake = null;
+    { id: 'notice', name: "Wood's notice", spell: 'aparecium' },
+    { id: 'feather', name: 'A feather', spell: 'leviosa' },
+    { id: 'wand', name: 'A wand in its box', spell: null },
+    { id: 'hand', name: 'Your hand', spell: null } ];
+  var feather = { x: 0, y: 0, phase: 'rest', mode: null, t0: 0, rot: 0 }, tape = null;
+  function featherRest() { return { x: W * 0.5, y: H * 0.6 }; }
+  function wandBox() { var w = Math.min(W * 0.82, S * 1.1), h = w * 0.16; return { x: W / 2 - w / 2, y: H * 0.45 - h / 2, w: w, h: h }; }
+  function wandEnds() { var B = wandBox(); return [{ x: B.x + B.w * 0.08, y: B.y + B.h / 2 }, { x: B.x + B.w * 0.92, y: B.y + B.h / 2 }]; }
+  function wandScale() { var e = wandEnds(); return 11 / (e[1].x - e[0].x); }   /* the painted wand is eleven inches */
+  var cur = null, thing = 0, T = THINGS[0], asking = null, last = null, opened = { drawer: 0, notice: 0 }, rattle = null, shake = null;
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -63,8 +76,8 @@
   function menu() {
     panel.innerHTML = '';
     THINGS.forEach(function (t, i) { panel.appendChild(btn(t.name, function () { choose(i); }, i === thing ? 'on' : '')); });
-    var knows = LumosSpells.learned(T.spell), word = T.spell === 'alohomora' ? 'Alohomora' : 'Aparecium';
-    panel.appendChild(btn('Knows ' + word + ': ' + (knows ? 'yes' : 'no'), function () {
+    var knows = !T.spell || LumosSpells.learned(T.spell), word = { alohomora: 'Alohomora', aparecium: 'Aparecium', leviosa: 'Leviosa' }[T.spell];
+    if (T.spell) panel.appendChild(btn('Knows ' + word + ': ' + (knows ? 'yes' : 'no'), function () {
       try { if (knows) localStorage.removeItem('lumos.spells.learned.' + T.spell); else LumosSpells.learn(T.spell); } catch (e) {}
       menu();
     }));
@@ -73,19 +86,35 @@
   }
   function choose(i) {
     if (asking) { var old = asking; asking = null; old.cancel(); }   /* its answer is dropped: a new thing is chosen */
-    thing = i; T = THINGS[i]; menu();
+    thing = i; T = THINGS[i]; menu(); tape = null;
+    var r = featherRest(); feather = { x: r.x, y: r.y, phase: 'rest', mode: null, t0: 0, rot: 0 };
+    if (T.id === 'feather') { say('A tawny owl feather, lying on the table.'); return; }
+    if (T.id === 'wand') { say('A wand in its box, on the counter. How long is it?'); return; }
+    if (T.id === 'hand') { say("Ollivander's tape, on the counter. How wide is your hand?"); return; }
     say(T.id === 'drawer' ? 'A drawer in the books table, with a small brass keyhole and a label: <i>CONFISCATED. Prefects only. P. Weasley</i>.'
       : T.id === 'door' ? 'A heavy door with a brass keyhole.' : 'A notice pinned to the board. It is blank.');
   }
   function cast() {
     if (asking) return;
-    if (!LumosSpells.learned(T.spell)) {
-      if (T.id === 'notice') say('Still blank. A wizard who knows Aparecium might read it. (Learn it in Charms.)');
+    if (T.spell && !LumosSpells.learned(T.spell)) {
+      if (T.id === 'feather') { feather.mode = 'twitch'; feather.t0 = performance.now(); say('It lies there. (Learn Wingardium Leviosa in Charms.)'); }
+      else if (T.id === 'notice') say('Still blank. A wizard who knows Aparecium might read it. (Learn it in Charms.)');
       else { rattle = performance.now(); say('It rattles. Locked. (Learn Alohomora in Charms.)'); }
       return;
     }
     panel.innerHTML = ''; panel.appendChild(btn('Step back', function () { if (asking) asking.cancel(); }));
-    if (T.id === 'notice') {
+    if (T.id === 'feather') {
+      say('Swish and flick. <i>Wing-gar-dium Levi-o-sa!</i>');
+      asking = LumosSpells.levitate({ at: featherRest, size: S * 0.08,
+        onSteer: function (p) { feather.x = p.x; feather.y = p.y; feather.phase = p.phase; },
+        onSettle: function (p) { feather.x = p.x; feather.y = p.y; feather.phase = 'rest'; } });
+      asking.settled.then(function (r) { if (r.at) say(r.cancelled ? 'You step back, and it drifts down where it was.' : 'It floats down and settles.'); });
+    } else if (T.id === 'wand' || T.id === 'hand') {
+      say(T.id === 'wand' ? 'Two fingers on the wand, one at each end; or tap one end, then the other.'
+        : 'Spread your hand on the glass: thumb on one ring, little finger on the other.');
+      asking = T.id === 'wand' ? LumosSpells.measureSpan({ ends: wandEnds, scale: wandScale(), want: 11 })
+        : LumosSpells.measureSpan({ at: function () { return { x: W / 2, y: H * 0.5 }; } });
+    } else if (T.id === 'notice') {
       say('Three taps on the notice: in a line, the middle one halfway, at an even beat. <i>Aparecium!</i>');
       asking = LumosSpells.revealInk({ sheet: sheetRect });
     } else {
@@ -93,10 +122,28 @@
       asking = LumosSpells.openLock({ at: keyhole, r: S * 0.11, turn: 0.25, dir: 1, stuck: T.id === 'door',
         onTap: function () { say('Now turn it, as a key turns: <b>a quarter turn, clockwise</b>, twelve to three. Whisper it: <i>Alohomora</i>.'); } });
     }
-    var mine = asking;
+    var mine = asking; cur = mine;
+    if (mine.settled) mine.settled.then(function () { if (cur === mine) cur = null; menu(); });
     mine.done.then(function (r) {
       if (asking !== mine) return;
       asking = null; last = r;
+      if (r.pts && r.pts.length === 2) tape = { a: r.pts[0], b: r.pts[1] };
+      if (T.id === 'feather') {
+        if (r.verdict === 'lifted') { say('<b>Wingardium Leviosa!</b> It rises. Drag a finger anywhere to steer it.'); panel.innerHTML = ''; panel.appendChild(btn('Step back', function () { if (cur) cur.cancel(); })); return; }
+        if (r.verdict === 'missed') { var c = r.cause; feather.mode = c === 'windmill' ? 'spin' : c === 'flickaside' ? 'scoot' : (c === 'slow' || c === 'flicklong') ? 'hop' : (c === 'wave' || c === 'line') ? 'flop' : c === 'prod' ? 'smoke' : 'twitch';
+          feather.dir = r.judge && r.judge.flickAngle < 0 ? -1 : 1; feather.t0 = performance.now(); say('<b>' + r.why[0] + '.</b> ' + r.why[1]); }
+        else say('You step back; it stays where it lies.');
+        menu(); return;
+      }
+      if (T.id === 'wand' || T.id === 'hand') {
+        var inch = r.inches == null ? '' : String(r.inches).replace('.25', '¼').replace('.5', '½').replace('.75', '¾');
+        if (r.verdict === 'right') say('<b>About ' + inch + ' inches.</b> Eleven inches, just as Ollivander wrote on the box.');
+        else if (r.verdict === 'short' || r.verdict === 'long') say('About ' + inch + ' inches: a little ' + r.verdict + '. The gold mark is eleven inches. One finger at each very end.');
+        else if (r.verdict === 'measured') say('<b>About ' + inch + ' inches</b> from thumb to little finger.');
+        else if (r.verdict === 'missed') say('<b>' + r.why[0] + '.</b> ' + r.why[1]);
+        else say('You step back; the tape rolls itself up.');
+        menu(); return;
+      }
       if (r.verdict === 'opened') { opened.drawer = 0.01; say('<b>Alohomora!</b> The drawer slides open.'); }
       else if (r.verdict === 'nothing') { shake = performance.now(); say('You tapped it, you whispered <i>Alohomora</i>... but nothing happened. This one wants its own key.'); }
       else if (r.verdict === 'tight') { shake = performance.now(); say('Click: the lock tightened. That way locks it. Clockwise, twelve to three.'); }
@@ -113,7 +160,8 @@
     if (rattle) { var t = (now - rattle) / 500; if (t > 1) rattle = null; else jig = Math.sin(t * 40) * S * 0.006 * (1 - t); }
     if (shake) { var t2 = (now - shake) / 600; if (t2 > 1) shake = null; else jig = Math.sin(t2 * 50) * S * 0.004 * (1 - t2); }
     cx.save(); cx.translate(jig, 0);
-    if (T.id === 'drawer') drawDrawer(now); else if (T.id === 'door') drawDoor(); else drawNotice();
+    if (T.id === 'drawer') drawDrawer(now); else if (T.id === 'door') drawDoor(); else if (T.id === 'notice') drawNotice();
+    else if (T.id === 'feather') drawFeather(now); else drawCounter(now);
     cx.restore();
     requestAnimationFrame(frame);
   }
@@ -163,12 +211,57 @@
       ['(his words come from', 'Events\' record, req 145)'].forEach(function (s, i) { cx.fillText(s, R.x + R.w / 2, R.y + R.h * (0.34 + i * 0.08)); });
     }
   }
+  /* the feather: a stand-in for the common room's, drawn lying on the table; each miss moves it by its cause */
+  function drawFeather(now) {
+    var r = featherRest();
+    cx.fillStyle = '#4a3220'; cx.fillRect(0, r.y + S * 0.02, W, H - r.y); cx.fillStyle = '#5e4129'; cx.fillRect(0, r.y + S * 0.02, W, S * 0.02);
+    var x = feather.x, y = feather.y, rot = feather.phase === 'rest' ? 0 : -0.35 + Math.sin(now / 1100) * 0.18, dy = 0;
+    if (feather.mode) {
+      var t = (now - feather.t0) / 1000;
+      if (t > 1.4) feather.mode = null;
+      else if (feather.mode === 'twitch') rot += Math.sin(t * 40) * 0.08 * (1 - t / 1.4);
+      else if (feather.mode === 'flop') rot += Math.sin(Math.min(1, t) * Math.PI) * 0.9;
+      else if (feather.mode === 'spin') rot += t / 1.4 * Math.PI * 4;
+      else if (feather.mode === 'hop') dy = -Math.sin(Math.min(1, t / 0.8) * Math.PI) * S * 0.04;
+      else if (feather.mode === 'scoot') x += feather.dir * S * 0.12 * Math.sin(Math.min(1, t / 1.4) * Math.PI / 2);
+    }
+    if (feather.phase !== 'rest') { cx.fillStyle = 'rgba(0,0,0,0.25)'; cx.beginPath(); cx.ellipse(feather.x, r.y + S * 0.025, S * 0.08, S * 0.012, 0, 0, 7); cx.fill(); }
+    var L = S * 0.2;
+    cx.save(); cx.translate(x, y + dy); cx.rotate(rot);
+    cx.fillStyle = '#c9a77a'; cx.beginPath(); cx.ellipse(L * 0.08, 0, L * 0.42, L * 0.1, 0, 0, 7); cx.fill();
+    cx.fillStyle = '#7a5a3a'; for (var i = 0; i < 6; i++) { cx.fillRect(-L * 0.25 + i * L * 0.12, -L * 0.09, L * 0.04, L * 0.18); }
+    cx.strokeStyle = '#efe4cf'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(-L * 0.5, 0); cx.lineTo(L * 0.5, 0); cx.stroke();
+    cx.restore();
+    if (feather.mode === 'smoke') {
+      var k = (now - feather.t0) / 1400;
+      for (var j = 0; j < 4; j++) { cx.fillStyle = 'rgba(160,160,160,' + 0.5 * (1 - k) + ')'; cx.beginPath(); cx.arc(x + L * 0.5 + j * 4, y - k * S * 0.12 - j * 9, 6 + j * 3 + k * 10, 0, 7); cx.fill(); }
+    }
+  }
+  /* the counter: a wand in its box, eleven inches as painted, or a bare counter for his hand; the last reading's tape */
+  function drawCounter(now) {
+    cx.fillStyle = '#3a2a1c'; cx.fillRect(0, H * 0.3, W, H * 0.45);
+    if (T.id === 'wand') {
+      var B = wandBox(), e = wandEnds();
+      cx.fillStyle = '#2a1d26'; cx.fillRect(B.x, B.y, B.w, B.h); cx.fillStyle = '#6b4a7a'; cx.fillRect(B.x + 6, B.y + 6, B.w - 12, B.h - 12);
+      cx.strokeStyle = '#7a4a26'; cx.lineCap = 'round'; cx.lineWidth = B.h * 0.16; cx.beginPath(); cx.moveTo(e[0].x, e[0].y); cx.lineTo(e[1].x, e[1].y); cx.stroke();
+      cx.strokeStyle = '#4a2a16'; cx.lineWidth = B.h * 0.22; cx.beginPath(); cx.moveTo(e[0].x, e[0].y); cx.lineTo(e[0].x + (e[1].x - e[0].x) * 0.24, e[0].y); cx.stroke();
+    }
+    if (tape) {
+      cx.save(); cx.globalAlpha = 0.6; cx.strokeStyle = '#d9dbe6'; cx.lineWidth = 8; cx.lineCap = 'round';
+      cx.beginPath(); cx.moveTo(tape.a.x, tape.a.y); cx.lineTo(tape.b.x, tape.b.y); cx.stroke(); cx.restore();
+    }
+  }
   addEventListener('resize', resize); resize(); choose(0); requestAnimationFrame(frame);
   window.lumosRoomSpells = { choose: choose, cast: cast, keyhole: keyhole, sheet: sheetRect,
     state: function () { return { thing: T.id, last: last, asking: !!asking, opened: opened }; },
     tap: function () { return asking && asking.tap ? asking.tap() : null; },
     judge: function (pts) { return asking && asking.judge ? asking.judge(pts) : null; },
-    taps: function (list) { return asking && asking.taps ? asking.taps(list) : null; } };
+    taps: function (list) { return asking && asking.taps ? asking.taps(list) : null; },
+    steer: function (dx, dy) { return cur && cur.steer ? cur.steer(dx, dy) : null; },
+    measure: function (a, b) { return asking && asking.measure ? asking.measure(a, b) : null; },
+    stepBack: function () { if (cur) cur.cancel(); else if (asking) asking.cancel(); },
+    feather: function () { return { x: Math.round(feather.x), y: Math.round(feather.y), phase: feather.phase, mode: feather.mode, cur: cur && cur.state ? cur.state() : null }; },
+    wandEnds: wandEnds, rest: featherRest };
 })();
 </script>
 </body>

@@ -43,7 +43,7 @@
 <button class="btn" id="logBtn">Log</button>
 <div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
 <script src="guide.js?v=3"></script>
-<script src="spells.js?v=5"></script>
+<script src="spells.js?v=7"></script>
 <script>
 /* Wingardium Leviosa, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code; the
    feather is the common room's tawny owl feather, reused, nothing painted.
@@ -227,18 +227,7 @@ var EASES = LumosSpells.SWISH_EASES, judgeSwishFlick = LumosSpells.judgeSwishFli
     cx.restore();
   }
 
-  var WHY = {
-    tap: null,
-    small: ['It twitches', 'A little bigger: a curve, then a flick up.'],
-    slow: ['It lifts a finger, and drops', 'Quicker: swish and flick is one quick stroke.'],
-    windmill: ['It spins round and round', 'Ron waved his arms like a windmill too. One curve, then one flick.'],
-    wave: ['It flops over', 'A curve with no flick. Finish with a sharp flick up.'],
-    line: ['It flops over', 'Only a line. Swish first: a curve, then the flick.'],
-    noswish: ['It twitches', 'The swish should curve, like part of a circle.'],
-    flickwiggly: ['It wobbles', 'Keep the flick straight, like a line.'],
-    flickaside: ['It scoots along the table', 'The flick went sideways. Flick it up.'],
-    flicklong: ['It drifts up, and sinks', 'The flick is short and sharp; the swish is the long part.']
-  };
+  var WHY = LumosSpells.SWISH_WHY;   /* the kind words, in spells.js since 12 October 2026 so a room's feather says the same */
 
   function setMode(m, now) { F.mode = m; F.t0 = now; }
   /* The traced guide (Godric, 11 October 2026, 9.13 pm: traced at first, larger), now shared by every spell
@@ -396,7 +385,7 @@ var EASES = LumosSpells.SWISH_EASES, judgeSwishFlick = LumosSpells.judgeSwishFli
       return j;
     }
     if (hit) {
-      guide.hit(lv > 0);
+      guide.hit(lv > 0); LumosSpells.learn('leviosa');   /* a room asks LumosSpells.learned('leviosa') (req 153) */
       F.smoke = 0; chime(); setMode('rise', now); F.hoverUntil = now + 7000;
       F.tx = W * 0.5; F.ty = H * 0.3;
       mark = j.verdict === 'leviosa' ? { at: now, pts: j.pts, corner: j.corner, deg: j.cornerDeg } : null;
