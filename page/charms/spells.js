@@ -293,16 +293,43 @@ function judgeHinge(points, c, r, want, w, h, ease) {
 function learned(name) { try { return localStorage.getItem('lumos.spells.learned.' + name) === '1'; } catch (e) { return false; } }
 function learn(name) { try { localStorage.setItem('lumos.spells.learned.' + name, '1'); } catch (e) {} }
 
+/* The ways out a waiting spell never covers (the Interaction lane's vocabulary, §5 and §9; its gap G2, 12 October
+   2026): the frame's Back (#back) and anything a page marks data-spell-exit (the test pages' Step back), or what a
+   room passes as `exits`. A finger landing on one lets the offer go, answered 'cancelled' (or, if the spell had
+   already answered, that answer at once), and the tap goes on to it as a click, so he can always leave the stop.
+   `wait` (seconds, off by default): left that long with no finger on the layer, the offer goes the same way. Every
+   room callable here (castOver, openLock, revealInk, levitate, measureSpan) takes `exits` and `wait` in its opts. */
+var EXITS = '#back, [data-spell-exit]';
+function exitAt(cv, ev, sel) {
+  var el = null;
+  cv.style.pointerEvents = 'none';
+  try { el = root.document.elementFromPoint(ev.clientX, ev.clientY); } finally { cv.style.pointerEvents = ''; }
+  el = el && el.closest ? el.closest(sel ? EXITS + ', ' + sel : EXITS) : null;
+  return el && !el.disabled ? el : null;
+}
+/* The tap goes on to the way out as one click, ours: the browser's own click for the same finger, which lands on
+   whatever is under it once the layer is gone (Back a second time, or the button drawn in Step back's place), is
+   swallowed. */
+function leaveBy(el) {
+  var doc = root.document, t0 = root.performance.now();
+  function eat(e) { if (!e.isTrusted) return; off(); if (root.performance.now() - t0 < 800) { e.stopImmediatePropagation(); e.preventDefault(); } }
+  function off() { doc.removeEventListener('click', eat, true); }
+  doc.addEventListener('click', eat, true); root.setTimeout(off, 800);
+  el.click();
+}
+
 /* Lumos over a spot, for a room (req 125, the Common room's candle stub, Godric's Q37 t2; tried on
    page/charms/cast-over-test.html). One stroke: the traced guide (guide.js, if the room loads it) is a flick up
    ending just under the spot; the answer is 'cast' or 'missed', and the room draws what follows (the flame, or not).
    A tap is ignored, so a stray touch costs nothing; cancel() answers 'cancelled'. Nothing else on the page is
-   touched while it waits: a clear layer over the page takes the one stroke and is gone.
+   touched while it waits: a clear layer over the page takes the one stroke and is gone, but never over a way out:
+   a finger on Back answers 'cancelled' and goes on to Back (EXITS).
    opts: { at: {x, y} in CSS pixels, or a function returning one each frame (a 3D room projects its candle),
            ease: 'kind' (default), 'fair' or 'strict' (FLICK_EASES),
            guide: 'auto' (default: the stage of his Lumos guide in Charms, the same store, full for his first three
                   guided casts, then faint, then gone), 'always' or 'off',
-           reach: the guide's length as a share of the screen's short side (0.32) }
+           reach: the guide's length as a share of the screen's short side (0.32),
+           exits: a selector for more ways out than EXITS, wait: quiet seconds before the offer goes (off) }
    Returns { done: a promise of { verdict: 'cast' | 'missed' | 'cancelled', judge, traced }, cancel() }. */
 function castOver(opts) {
   opts = opts || {};
@@ -310,7 +337,7 @@ function castOver(opts) {
   var cv = doc.createElement('canvas'), cx = cv.getContext('2d'), W = 0, H = 0, DPR = 1;
   cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483000;touch-action:none;background:transparent';
   var guide = null, spot = null, built = null, stroke = null, active = null, trail = null, raf = 0, finished = false, resolve;
-  var done = new Promise(function (r) { resolve = r; });
+  var done = new Promise(function (r) { resolve = r; }), touched = root.performance.now(), pending = null;
   function where() { var p = typeof opts.at === 'function' ? opts.at() : opts.at; return p || { x: W / 2, y: H * 0.4 }; }
   function size() {
     DPR = Math.min(root.devicePixelRatio || 1, 2.5); W = root.innerWidth; H = root.innerHeight;
@@ -328,6 +355,7 @@ function castOver(opts) {
   }
   function frame(now) {
     if (finished) return;
+    if (opts.wait && active === null && !pending && now - touched > opts.wait * 1000) { leave(); return; }
     spot = where();
     if (guide && (!built || Math.abs(built.x - spot.x) + Math.abs(built.y - spot.y) > 2)) { guide.build(W, H); built = { x: spot.x, y: spot.y }; }
     cx.clearRect(0, 0, W, H);
@@ -344,8 +372,12 @@ function castOver(opts) {
     if (finished) return; finished = true; root.cancelAnimationFrame(raf);
     root.removeEventListener('resize', size); if (cv.parentNode) cv.parentNode.removeChild(cv); resolve(out);
   }
+  function leave() { finish(pending || { verdict: 'cancelled', judge: null, traced: false }); }
   cv.addEventListener('pointerdown', function (ev) {
-    ev.preventDefault(); if (active !== null) return;
+    ev.preventDefault(); touched = root.performance.now();
+    var out = active === null && exitAt(cv, ev, opts.exits);
+    if (out) { leave(); leaveBy(out); return; }
+    if (active !== null) return;
     active = ev.pointerId; stroke = [pt(ev)]; trail = null; if (guide) guide.cover(stroke[0]);
     try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
   });
@@ -359,7 +391,7 @@ function castOver(opts) {
     active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
     var out = judge(pts);
     if (!out) return;   /* a tap: wait on */
-    trail = { pts: pts, at: root.performance.now() };
+    trail = { pts: pts, at: root.performance.now() }; pending = out;
     root.setTimeout(function () { finish(out); }, 350);
   });
   cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } });
@@ -375,27 +407,42 @@ function castOver(opts) {
     judge: function (pts) { var out = judge(pts); if (out) finish(out); return out; } };
 }
 
-/* The clear layer a room's spell waits on (req 146): over the whole page, taking touches until it is done, then gone. */
-function layer(hooks) {
+/* The clear layer a room's spell waits on (req 146): over the whole page, taking touches until it is done, then gone.
+   Never over a way out (EXITS, opts.exits): a finger there calls L.leave, the spell's own cancel, unless an answer is
+   already on its way (L.later), which then comes at once; then the tap goes on. opts.wait: quiet seconds, while
+   hooks.waiting() (or always), before L.leave is called the same way. */
+function layer(hooks, opts) {
+  opts = opts || {};
   var doc = root.document, cv = doc.createElement('canvas'), cx = cv.getContext('2d'), raf = 0, finished = false, resolve;
-  var L = { cv: cv, cx: cx, W: 0, H: 0, done: new Promise(function (r) { resolve = r; }) };
+  var L = { cv: cv, cx: cx, W: 0, H: 0, done: new Promise(function (r) { resolve = r; }), leave: null, pending: undefined };
+  var fingers = 0, touched = root.performance.now();
+  function go() { if (L.pending !== undefined) L.finish(L.pending); else if (L.leave) L.leave(); else L.finish(null); }
   cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483000;touch-action:none;background:transparent';
   function size() {
     var DPR = Math.min(root.devicePixelRatio || 1, 2.5); L.W = root.innerWidth; L.H = root.innerHeight;
     cv.width = Math.round(L.W * DPR); cv.height = Math.round(L.H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
     if (hooks.size) hooks.size();
   }
-  function frame(now) { if (finished) return; cx.clearRect(0, 0, L.W, L.H); hooks.frame(now); raf = root.requestAnimationFrame(frame); }
+  function frame(now) {
+    if (finished) return;
+    if (opts.wait && !fingers && L.pending === undefined && now - touched > opts.wait * 1000 && (!hooks.waiting || hooks.waiting())) { go(); if (finished) return; }
+    cx.clearRect(0, 0, L.W, L.H); hooks.frame(now); raf = root.requestAnimationFrame(frame);
+  }
   L.pt = function (ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(root.performance.now()) }; };
   L.finish = function (out) {
     if (finished) return; finished = true; root.cancelAnimationFrame(raf);
     root.removeEventListener('resize', size); if (cv.parentNode) cv.parentNode.removeChild(cv); resolve(out);
   };
-  L.later = function (out, ms) { root.setTimeout(function () { L.finish(out); }, ms); };
-  cv.addEventListener('pointerdown', function (ev) { ev.preventDefault(); hooks.down(ev); });
+  L.later = function (out, ms) { L.pending = out; root.setTimeout(function () { L.finish(out); }, ms); };
+  cv.addEventListener('pointerdown', function (ev) {
+    ev.preventDefault(); touched = root.performance.now();
+    var out = !fingers && exitAt(cv, ev, opts.exits);
+    if (out) { go(); leaveBy(out); return; }
+    fingers++; hooks.down(ev);
+  });
   cv.addEventListener('pointermove', function (ev) { if (hooks.move) hooks.move(ev); });
-  cv.addEventListener('pointerup', function (ev) { if (hooks.up) hooks.up(ev); });
-  cv.addEventListener('pointercancel', function (ev) { if (hooks.cancel) hooks.cancel(ev); });
+  cv.addEventListener('pointerup', function (ev) { fingers = Math.max(0, fingers - 1); touched = root.performance.now(); if (hooks.up) hooks.up(ev); });
+  cv.addEventListener('pointercancel', function (ev) { fingers = Math.max(0, fingers - 1); if (hooks.cancel) hooks.cancel(ev); });
   size(); root.addEventListener('resize', size); doc.body.appendChild(cv); raf = root.requestAnimationFrame(frame);
   return L;
 }
@@ -513,9 +560,9 @@ function openLock(opts) {
       stage = 'done'; trail = { pts: pts, at: root.performance.now() }; L.later(out, 350);
     },
     cancel: function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } }
-  });
+  }, opts);
   place();
-  return { done: L.done, cancel: function () { L.finish({ verdict: 'cancelled', judge: null, traced: false }); },
+  return { done: L.done, cancel: L.leave = function () { L.finish({ verdict: 'cancelled', judge: null, traced: false }); },
     tap: function () { if (stage === 'tap') tapped(); },
     judge: function (pts) { if (stage === 'tap') tapped(); var out = judge(pts); if (out) { stage = 'done'; L.finish(out); } return out; } };
 }
@@ -569,9 +616,9 @@ function revealInk(opts) {
         cx.beginPath(); cx.arc(g.x, g.y, S * (0.025 + 0.05 * k), 0, 7); cx.stroke(); cx.restore(); });
     },
     down: function (ev) { var out = tapAt(L.pt(ev)); if (out) L.later(out, 450); }
-  });
+  }, opts);
   place();
-  return { done: L.done, cancel: function () { L.finish({ verdict: 'cancelled', judge: null, traced: false }); },
+  return { done: L.done, cancel: L.leave = function () { L.finish({ verdict: 'cancelled', judge: null, traced: false }); },
     taps: function (list) { var out = null; for (var i = 0; i < list.length && !out; i++) out = tapAt(list[i]); if (out) L.finish(out); return out; } };
 }
 
@@ -748,8 +795,9 @@ function levitate(opts) {
       if (out.verdict === 'lifted') answer(out);
       else { stage = 'gone'; settle({ at: null, cancelled: false }); L.later(null, 350); answer(out); }
     },
+    waiting: function () { return stage === 'cast'; },
     cancel: function (ev) { if (ev.pointerId === active) { active = null; stroke = null; drag = null; if (guide) guide.clear(); } }
-  });
+  }, opts);
   function steer(dx, dy) {   /* also the way in for checks */
     if (stage !== 'float') return null;
     var t = clampIn({ x: F.tx + dx, y: F.ty + dy }); F.tx = t.x; F.ty = t.y; quietAt = root.performance.now();
@@ -757,7 +805,7 @@ function levitate(opts) {
     return t;
   }
   return { done: done, settled: settled,
-    cancel: function () {
+    cancel: L.leave = function () {
       if (stage === 'cast') { stage = 'gone'; answer({ verdict: 'cancelled', judge: null, traced: false }); settle({ at: null, cancelled: true }); L.finish(null); }
       else if (stage === 'float') { var p = opts.land ? opts.land({ x: F.x, y: F.y }) : { x: F.x, y: home.y }; F.x = p.x; F.y = p.y; land(true); }
     },
@@ -893,14 +941,14 @@ function measureSpan(opts) {
       if (out) finishWith(out);
     },
     cancel: function (ev) { delete touches[ev.pointerId]; }
-  });
+  }, opts);
   function miss(cause) {
     if (over) return; over = true;
     if (guide) guide.miss();
     finishWith({ verdict: 'missed', inches: null, px: null, pts: [], cause: cause, why: SPAN_WHY[cause], traced: false });
   }
   function finishWith(out) { if (opts.onChange && out.inches != null) opts.onChange(out.inches); L.later(out, out.verdict === 'missed' ? 600 : 1400); }
-  return { done: L.done, cancel: function () { L.finish({ verdict: 'cancelled', inches: null, px: null, pts: [], cause: null, why: null, traced: false }); },
+  return { done: L.done, cancel: L.leave = function () { L.finish({ verdict: 'cancelled', inches: null, px: null, pts: [], cause: null, why: null, traced: false }); },
     measure: function (a, b) { var out = take(a, b); if (out) L.finish(out); return out; } };
 }
 
