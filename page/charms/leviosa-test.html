@@ -43,6 +43,7 @@
 <button class="btn" id="logBtn">Log</button>
 <div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
 <script src="guide.js?v=3"></script>
+<script src="spells.js?v=5"></script>
 <script>
 /* Wingardium Leviosa, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code; the
    feather is the common room's tawny owl feather, reused, nothing painted.
@@ -50,86 +51,9 @@
    loose: any curve, a corner, then a short straight flick up, in one stroke.
    The geometry: a hit names the two parts, a curve and a line, and marks the corner with its angle. */
 
-/* judge:start  (pure functions, so the judging can be tallied in node away from the page) */
-var EASES = {
-  kind:   { angle: 40, corner: 28, straight: 0.72, minSize: 0.10, maxMs: 2200, flickMax: 2.8 },
-  fair:   { angle: 30, corner: 48, straight: 0.80, minSize: 0.13, maxMs: 1600, flickMax: 2.0 },
-  strict: { angle: 20, corner: 55, straight: 0.87, minSize: 0.16, maxMs: 1100, flickMax: 1.6 }
-};
-/* kind loosened on Godric's iPhone log (11 October 2026, 9.42 pm): his waves turned 31 to 37 degrees at the corner,
-   under the 40 asked, and his flicks ran past 1.6 swishes, a tick with a long arm; so 28 degrees and 2.8 swishes.
-   Tallied in page/charms/checks/leviosa-tally.js. */
-function resample(points, n) {
-  var path = 0, i, out = [points[0]], d, acc = 0;
-  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
-  var step = path / (n - 1), prev = points[0];
-  if (step <= 0) return [];
-  for (i = 1; i < points.length; i++) {
-    var p = points[i];
-    d = Math.hypot(p.x - prev.x, p.y - prev.y);
-    while (acc + d >= step && d > 0) {
-      var f = (step - acc) / d, q = { x: prev.x + (p.x - prev.x) * f, y: prev.y + (p.y - prev.y) * f };
-      out.push(q); prev = q; d = Math.hypot(p.x - prev.x, p.y - prev.y); acc = 0;
-    }
-    acc += d; prev = p;
-  }
-  while (out.length < n) out.push(points[points.length - 1]);
-  return out.slice(0, n);
-}
-function dirOf(a, b) { return Math.atan2(b.y - a.y, b.x - a.x); }
-function wrap(d) { while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
-function turning(pts) {
-  var t = 0, i;
-  for (i = 2; i < pts.length; i++) t += wrap(dirOf(pts[i - 1], pts[i]) - dirOf(pts[i - 2], pts[i - 1]));
-  return t;
-}
-function lengthOf(pts) { var l = 0; for (var i = 1; i < pts.length; i++) l += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y); return l; }
-/* Returns { verdict: 'leviosa' | 'miss', reason, corner (index into the 48 resampled points), cornerDeg (the angle
-   at the corner, 180 a straight run), swishTurn (degrees the curve turns), flickAngle (degrees from upright),
-   size (the stroke's box against the screen's short side), ms, pts (the resampled stroke) }. */
-function judgeSwishFlick(points, w, h, ease) {
-  var e = EASES[ease] || EASES.kind, N = 48, K = 3, short = Math.min(w, h);
-  var out = { verdict: 'miss', reason: 'tap', corner: -1, cornerDeg: 180, swishTurn: 0, flickAngle: 0, size: 0, ms: 0, turns: 0, pts: [] };
-  if (!points || points.length < 2) return out;
-  out.ms = points[points.length - 1].t - points[0].t;
-  var raw = lengthOf(points);
-  if (raw / short < 0.03) return out;
-  var p = resample(points, N), i;
-  out.pts = p;
-  var xs = p.map(function (q) { return q.x; }), ys = p.map(function (q) { return q.y; });
-  out.size = Math.max(Math.max.apply(null, xs) - Math.min.apply(null, xs), Math.max.apply(null, ys) - Math.min.apply(null, ys)) / short;
-  out.turns = Math.abs(turning(p)) / 360 * 180 / Math.PI;
-  if (out.turns > 1.4) { out.reason = 'windmill'; return out; }
-  if (out.size < e.minSize) { out.reason = 'small'; return out; }
-  if (out.ms > e.maxMs) { out.reason = 'slow'; return out; }
-  /* the corner: the sharpest turn between two runs of K points */
-  var best = -1, bestTurn = 0;
-  for (i = K; i <= N - 1 - K; i++) {
-    var tt = Math.abs(wrap(dirOf(p[i], p[i + K]) - dirOf(p[i - K], p[i])));
-    if (tt > bestTurn) { bestTurn = tt; best = i; }
-  }
-  out.corner = best;
-  out.cornerDeg = 180 - bestTurn * 180 / Math.PI;
-  var swish = p.slice(0, best + 1), flick = p.slice(best);
-  var fa = flick[0], fb = flick[flick.length - 1];
-  out.flickAngle = Math.atan2(fb.x - fa.x, -(fb.y - fa.y)) * 180 / Math.PI;
-  out.swishTurn = Math.abs(turning(swish)) * 180 / Math.PI;
-  if (bestTurn * 180 / Math.PI < e.corner) {
-    /* no corner: a wave, or one straight line */
-    out.reason = (Math.hypot(p[N - 1].x - p[0].x, p[N - 1].y - p[0].y) / raw > 0.9) ? 'line' : 'wave';
-    return out;
-  }
-  var swishChord = Math.hypot(swish[swish.length - 1].x - swish[0].x, swish[swish.length - 1].y - swish[0].y);
-  var swishLen = lengthOf(swish), flickLen = lengthOf(flick);
-  var flickStraight = flickLen > 0 ? Math.hypot(fb.x - fa.x, fb.y - fa.y) / flickLen : 0;
-  if (out.swishTurn < 35 || swishChord / swishLen > 0.97) { out.reason = 'noswish'; return out; }
-  if (flickStraight < e.straight) { out.reason = 'flickwiggly'; return out; }
-  if (Math.abs(out.flickAngle) > e.angle) { out.reason = 'flickaside'; return out; }
-  if (flickLen > swishLen * e.flickMax) { out.reason = 'flicklong'; return out; }
-  out.verdict = 'leviosa'; out.reason = 'swishflick';
-  return out;
-}
-/* judge:end */
+/* The judging lives in spells.js since 12 October 2026 (req 153: a room's Leviosa judges with it too), unchanged;
+   tallied there by checks/leviosa-tally.js. */
+var EASES = LumosSpells.SWISH_EASES, judgeSwishFlick = LumosSpells.judgeSwishFlick;
 
 (function () {
   'use strict';
