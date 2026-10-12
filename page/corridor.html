@@ -192,6 +192,8 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="castle.js?v=9"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=15"></script>
+<script src="charms/guide.js?v=5"></script>
+<script src="charms/spells.js?v=6"></script>
 <script>
 (function () {
 'use strict';
@@ -1570,7 +1572,18 @@ var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'
 var doorHinge = new THREE.Group();
 doorHinge.position.set(DOOR.x + DOOR.w / 2, 0, HER_Z - 0.001);   /* the leaf in the wall's own plane, its edges on the opening's, so neither jamb shows past it from either side (the Placement check, 5.08 pm: 1 cm proud, a dark gap showed down its edge); lying open along the jamb it is drawn over it */
 scene.add(doorHinge);
-var door = cutoutMesh(cutoutTexture(100, 220, '#7a6a58', drawRect, 'door'), DOOR.w, DOOR.h);
+/* its lock (req 154): on the latch side, about 1.0 m up, as fractions of the leaf's picture like the tickle's spot;
+   a tap within LOCK.r of it, once he has Alohomora, is his spell on it. The placeholder shows it as a keyhole on a
+   brass plate, for the door's drawing to keep in the same place */
+var LOCK = { u: 0.85, v: 0.45, r: 0.12 };
+function drawDoor(g, w, h) {
+  g.fillRect(0, 0, w, h);
+  var x = w * LOCK.u, y = h * (1 - LOCK.v);
+  g.fillStyle = '#a08a52'; rr(g, x - w * 0.055, y - h * 0.035, w * 0.11, h * 0.07, w * 0.03);
+  g.fillStyle = '#2a221a'; g.beginPath(); g.arc(x, y - h * 0.008, w * 0.018, 0, 7); g.fill();
+  g.beginPath(); g.moveTo(x - w * 0.01, y - h * 0.006); g.lineTo(x + w * 0.01, y - h * 0.006); g.lineTo(x + w * 0.016, y + h * 0.02); g.lineTo(x - w * 0.016, y + h * 0.02); g.closePath(); g.fill();
+}
+var door = cutoutMesh(cutoutTexture(100, 220, '#7a6a58', drawDoor, 'door'), DOOR.w, DOOR.h);
 door.position.set(-DOOR.w / 2, DOOR.h / 2, 0);
 door.rotation.y = Math.PI;
 door.name = 'polite-door';
@@ -1600,10 +1613,39 @@ function doorGiggle() {
   showLines([{ medium: 'heard', speaker: 'door', sound: n > 0.66 ? 'a loud creaky giggle, nearly a laugh' : n > 0.33 ? 'a creaky giggle' : 'a faint creak, almost a giggle' }]);
 }
 function doorSwings(sound) {
+  lockDrop();   /* please aloud can open it while his spell still waits on the lock */
   showLines([{ medium: 'heard', speaker: 'door', sound: sound }]);
   openDoor(true);
   clearTimeout(doorShutTimer);
   doorShutTimer = setTimeout(function () { openDoor(false); }, DOOR_SHUT_S * 1000);
+}
+/* Alohomora on it (req 154; Magic for the boys, *Alohomora in the castle*, B3, Godric's): once he has the spell, a tap
+   on its lock offers Charms' turn (LumosSpells.openLock, stuck, so every turn answers 'nothing'), his tap already the
+   book's tap; whatever his turn, the door huffs and stays shut. Manners open it, never a spell, and there is no handle.
+   The offer covers the page, so it goes by itself after LOCK_WAIT_S with no turn (the vocabulary's §9), on the clock */
+var LOCK_WAIT_S = 10, lockOffer = null, lockTimer = null, lockV = new THREE.Vector3();
+function lockAt(uv) { return uv && Math.hypot((uv.x - LOCK.u) * DOOR.w, (uv.y - LOCK.v) * DOOR.h) < LOCK.r; }
+function lockOnScreen() {
+  door.updateMatrixWorld();
+  lockV.set((LOCK.u - 0.5) * DOOR.w, (LOCK.v - 0.5) * DOOR.h, 0);
+  door.localToWorld(lockV).project(camera);
+  var r = canvas.getBoundingClientRect();
+  return { x: r.left + (lockV.x + 1) / 2 * r.width, y: r.top + (1 - lockV.y) / 2 * r.height };
+}
+function lockOffered() {
+  lockDrop();
+  var mine = lockOffer = LumosSpells.openLock({ at: lockOnScreen, stuck: true });
+  mine.tap();
+  lockTimer = setTimeout(function () { if (lockOffer === mine) mine.cancel(); }, LOCK_WAIT_S * 1000);
+  mine.done.then(function (out) {
+    if (lockOffer === mine) { lockOffer = null; clearTimeout(lockTimer); }
+    if (out.verdict !== 'cancelled') doorHuffs();
+  });
+}
+function lockDrop() { if (lockOffer) { var o = lockOffer; lockOffer = null; clearTimeout(lockTimer); o.cancel(); } }
+function doorHuffs() {
+  doorShiver = { t: 0, amp: 0.02, f: 30 };   /* stiffer than the giggle: a jolt of offended wood */
+  showLines([{ medium: 'heard', speaker: 'door', sound: 'a sniff, and a creak of offended wood', text: 'Well! Not so much as a please.' }]);
 }
 /* The glimpse behind it (The corridor, "The glimpse behind it"; what is there is Magic for the boys', the room of lost
    things): one flat drawing, door-glimpse, 1.8 by 3.2 m, standing square across the way 1.05 m behind the door's plane,
@@ -2294,6 +2336,7 @@ function reframe() {
 }
 function goTo(s) {
   if (s === atStop) return;
+  lockDrop();
   atStop = s; mode = 'stop';
   backBtn.hidden = false;
   glideTo(s.stop(), s.arrive);
@@ -2301,6 +2344,7 @@ function goTo(s) {
   if (castle && castle.moment) castle.moment('walk up');   /* he sets off toward a stop: a torch may lean (req 140) */
 }
 function goBack() {
+  lockDrop();
   if (mode !== 'stop') return;
   /* up from the landing (req 59) he turns round as he climbs, the drag's turn in reverse, rather than the look
      passing through him */
@@ -2376,6 +2420,13 @@ function tap(cx, cy) {
   if (hit.stop && hit.stop.name === 'door') {
     var atDoor = atStop === hit.stop;
     lastTickle = atDoor ? tickleAt(hits[0].uv) : null;   /* none from afar, so no tickle record fires on the walk-up */
+    /* on its lock, once he has Alohomora, his spell (req 154): no tickle, so no record giggles, but the tap is still
+       told, so the ear for please opens; the week's spot wins where the two meet */
+    if (atDoor && !lastTickle.hit && lockAt(hits[0].uv) && window.LumosSpells && LumosSpells.learned('alohomora')) {
+      lastTickle = null;
+      if (castle && castle.visit()) castle.tap('polite door');
+      lockOffered(); said(true); return;
+    }
     if (castle && castle.visit()) castle.tap('polite door');
     else if (atDoor) { if (lastTickle.hit) doorSwings('the door laughs'); else doorGiggle(); }
     said(true);
@@ -3084,7 +3135,7 @@ function frame() {
   var shiver = 0;
   if (doorShiver) {
     doorShiver.t += wdt;
-    shiver = doorShiver.amp * Math.sin(doorShiver.t * 55) * (1 - doorShiver.t / 0.6);
+    shiver = doorShiver.amp * Math.sin(doorShiver.t * (doorShiver.f || 55)) * (1 - doorShiver.t / 0.6);
     if (doorShiver.t >= 0.6) doorShiver = null;
   }
   doorHinge.rotation.y = doorLeaf.ang + shiver;
@@ -3112,7 +3163,7 @@ window.lumosGreybox = { sheep: function () { return tapestrySheep; }, leanTorch:
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf,
+  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; },
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
