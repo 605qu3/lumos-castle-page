@@ -7,20 +7,59 @@
    frame.x, frame.y; its height y as frame.z + y. A state is built (on a page), designed (settled, not built),
    books (the books fix it), proposed (the Architect's, open), or pending (waiting on a question). A bearing is in
    degrees about a round room's centre, from the group's y toward its x (clockwise seen from above); a cant is the
-   degrees a window's outer opening turns from its bearing. */
+   degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
+   corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 1,
+  "version": 2,
   "units": "metres",
+  "site": {
+    "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
+    "about": "One long east-west block, the front doors on the north, the lake and the cliff on the south (Godric's 2.1, 12 October 2026, 5.57 pm). One stair hall runs from the north range to the south face, the marble and moving staircases in its well.",
+    "cite": "the author's grounds sketch (the southern approach over the lake, the front entrance at the north); PS 7, PS 8, HBP 24"
+  },
+  "masses": [
+    { "id": "north range", "rect": [0, 50, 160, 72], "floors": "G-7", "state": "designed" },
+    { "id": "south range, west", "rect": [0, 0, 68, 18], "floors": "G-7", "state": "designed", "about": "rises to the seventh floor for the Gryffindor corridor" },
+    { "id": "south range, east", "rect": [92, 0, 160, 18], "floors": "G-6", "state": "designed" },
+    { "id": "west range", "rect": [0, 18, 16, 50], "floors": "G-7", "state": "designed" },
+    { "id": "east range", "rect": [144, 18, 160, 50], "floors": "G-7", "state": "designed" },
+    { "id": "stair hall", "rect": [68, 0, 92, 50], "floors": "G-7", "core": true, "state": "designed", "about": "the front doors to the cliff face, the marble and moving staircases in one well" },
+    { "id": "cellars", "rect": [0, 0, 160, 72], "floors": "B", "state": "designed" }
+  ],
+  "courts": [
+    { "id": "west courtyard", "rect": [16, 18, 68, 50], "state": "designed" },
+    { "id": "east courtyard", "rect": [92, 18, 144, 50], "state": "designed" }
+  ],
+  "towers": [
+    { "id": "Astronomy Tower", "c": [80, 77], "r": 8, "floors": "G-T", "high": true, "state": "designed", "about": "over the front doors", "cite": "DH 31, OotP 31, HBP 27" },
+    { "id": "Ravenclaw Tower", "c": [-7.5, 34], "r": 8.5, "floors": "G-T", "high": true, "state": "designed", "about": "on the west side", "cite": "DH 31, OotP 18, DH 29" },
+    { "id": "Gryffindor Tower", "c": [42.19, 1.95], "r": 6.4, "floors": "G-T", "high": true, "group": "gryffindor-suite", "state": "designed", "about": "the suite's tower (5.6 inside, a 0.8 wall), standing 4.45 m proud of the south face", "cite": "DH 31, OotP 21, OotP 29" },
+    { "id": "West Tower", "c": [0, 72], "r": 8, "floors": "G-T", "state": "proposed", "about": "lower than the three highest" },
+    { "id": "North Tower", "c": [160, 72], "r": 7.5, "floors": "G-T", "state": "proposed", "about": "lower than the three highest", "cite": "PoA 6, PoA 16" },
+    { "id": "south-west tower", "c": [0, 0], "r": 7, "floors": "G-T", "state": "proposed", "about": "lower than the three highest" },
+    { "id": "Dumbledore's tower", "c": [166, 40], "r": 6, "floors": "G-T", "state": "proposed", "about": "lower than the three highest" }
+  ],
   "groups": [
     {
       "id": "gryffindor-suite",
       "name": "Gryffindor Tower and the Fat Lady's corridor, seventh floor",
       "about": "The group's frame: the tower's centre at the origin, y out through the round hole along the corridor toward its stair, x to the right looking that way; z 0 the seventh floor.",
-      "place": { "x": null, "y": null, "turn": null, "z": null, "state": "pending" }
+      "place": { "x": 42.19, "y": 1.95, "turn": -90, "z": null, "state": "designed",
+        "about": "Godric's 1.1 (12 October 2026, 5.57 pm): the corridor along the south front, its windows over the lake, the tower at its west end, its landing on the stair hall's seventh floor (the landing's end at x 68). The group's y points east, its x south. z waits on the storey height.",
+        "cite": "OotP 21, OotP 29, PoA 14" }
     }
   ],
   "levels": [
-    { "id": "7", "name": "seventh floor", "z": null, "state": "pending" }
+    { "id": "B", "name": "the cellars", "z": null, "state": "pending" },
+    { "id": "G", "name": "ground floor", "z": null, "state": "pending" },
+    { "id": "1", "name": "first floor", "z": null, "state": "pending" },
+    { "id": "2", "name": "second floor", "z": null, "state": "pending" },
+    { "id": "3", "name": "third floor", "z": null, "state": "pending" },
+    { "id": "4", "name": "fourth floor", "z": null, "state": "pending" },
+    { "id": "5", "name": "fifth floor", "z": null, "state": "pending" },
+    { "id": "6", "name": "sixth floor", "z": null, "state": "pending" },
+    { "id": "7", "name": "seventh floor", "z": null, "state": "pending" },
+    { "id": "tower", "name": "Gryffindor Tower above the seventh floor: the dormitories", "z": null, "state": "pending", "about": "the tower's levels are its own, apart from the ranges' storeys" }
   ],
   "rooms": [
     {
@@ -63,9 +102,9 @@ window.CASTLE_MODEL = {
       "page": "common-room.html", "state": "built", "cite": ""
     },
     {
-      "id": "room-of-requirement", "name": "the Room of Requirement", "group": "gryffindor-suite", "level": "7",
-      "shape": { "rect": [1.95, 14.91, 5.09, 19.61] }, "magic": "there when needed",
-      "state": "pending", "cite": "OotP 18, HBP 24"
+      "id": "room-of-requirement", "name": "the Room of Requirement, on its own corridor in the north range", "level": "7",
+      "shape": { "rect": [24, 56, 40, 66] }, "magic": "there when needed",
+      "state": "pending", "cite": "OotP 18, HBP 21, HBP 24"
     }
   ],
   "openings": [
@@ -107,8 +146,8 @@ window.CASTLE_MODEL = {
       "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" }
   ],
   "open": [
-    "The group's place and the levels' heights wait on the castle floor by floor (the Architect's step 3).",
+    "The levels' heights and the group's z wait on the storey height (the Architect's next question).",
     "The tower stair rises 5.6 m against the dormitory floor's 7.4 m.",
-    "The Room of Requirement's meeting with the corridor waits on Q48b; drawn as its option 1."
+    "The Room of Requirement waits on Q48b: drawn as its option 3, a walk and a stair from her (OotP 18), the gargoyle round the other side of the castle (HBP 21)."
   ]
 };
