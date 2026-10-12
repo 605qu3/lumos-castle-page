@@ -671,7 +671,7 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=8"></script>
+<script src="castle.js?v=9"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=15"></script>
 <script src="charms/guide.js?v=1"></script>
@@ -2874,7 +2874,7 @@ function updateCandle(dt) {
   candle.shadow.rotation.set(0, sideTable.rotation.y, 0);
   candle.shadow.translateZ(-0.004);
   /* t1: lit while he sits at the desk after dark; out as he gets up, the smoke after it */
-  var F = CANDLE.FLAME, t = performance.now() / 1000,
+  var F = CANDLE.FLAME, t = slowT,
       dark = !!castle && /^(evening|night)$/.test(castle.time()),
       seated = candle.mesh.visible && dark && DESK_STOP.seat === 1 && DESK_STOP.sat > 0.6,
       want = seated && (!candleWaits() || candle.cast);                /* t2: once he knows Lumos, only his flick */
@@ -3004,7 +3004,7 @@ function updateBooks(dt) {
   } else booksHistOut(books.ajar && !books.out ? 1 : 0);
   if (books.openCard.visible && (draught > 0.003 || books.openStir)) {   /* the pages in the door's draught */
     var pa = books.openCard.geometry.attributes.position, pb = books.openBase, W = BOOKS.OPEN.w, H = BOOKS.OPEN.h,
-        st = performance.now() / 1000, on = draught > 0.003;
+        st = slowT, on = draught > 0.003;
     for (var vi = 0; vi < pa.count; vi++) {
       var xf = pb[vi * 3] / W + 0.5, vf = 0.5 - pb[vi * 3 + 1] / H;
       var side = Math.max(Math.pow(smooth01(0.52, 0.94, xf), 1.5), 0.35 * Math.pow(smooth01(0.48, 0.06, xf), 1.5));
@@ -3027,7 +3027,7 @@ function updateBooks(dt) {
   books.hangOn += clamp(want - books.hangOn, -dt, dt * 0.5);   /* in over two seconds, out over one */
   if (books.hangOn > 0) {
     var top = books.hist.localToWorld(new THREE.Vector3(0, (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h / 2, 0.01)), ha = books.hangGeo.attributes.position.array,
-        tt = performance.now() / 1000;
+        tt = slowT;
     books.hang.forEach(function (m, i) {
       var a = m.ph + tt * m.sp;
       ha[i * 3] = top.x + Math.cos(a) * m.r; ha[i * 3 + 1] = top.y + m.h + Math.sin(a * 1.7) * 0.012; ha[i * 3 + 2] = top.z + Math.sin(a) * m.r;
@@ -3072,7 +3072,7 @@ function updateHomeLetter(dt) {
   /* Godric's touch on Q25 (11 October 2026, 2.42 pm): when the portrait hole opens, its draught stirs the feather a
      fraction, the one thing on the desk that moves on its own */
   if (draught > 0.01 && qk === 0) {
-    var ft = performance.now() / 1000;
+    var ft = slowT;
     homeFeather.pivot.rotateZ(draught * 0.05 * Math.sin(ft * 6.3) + draught * 0.02 * Math.sin(ft * 11.7));
     homeFeather.pivot.rotateX(-draught * 0.03 * (1 + Math.sin(ft * 4.1)));
   }
@@ -5481,7 +5481,7 @@ function updatePortrait(dt) {
   var s = Math.min(1, dt * 4);
   portrait.ang = lerp(portrait.ang, portrait.target, s);
   hinge.rotation.y = -portrait.ang;
-  var k = portrait.ang / DOOR_OPEN, clockT = performance.now() / 1000;
+  var k = portrait.ang / DOOR_OPEN, clockT = slowT;
   corridorLight.intensity = 1.8 * k * (0.85 + 0.15 * Math.sin(clockT * 11) * Math.sin(clockT * 4.3));
   /* by night the windows' daylight goes, a dim moonlit blue left, the torches carrying the corridor (as the Corridor's
      own page does, page/corridor.html, "the corridor's night"); evening between */
@@ -5802,38 +5802,43 @@ if (kit.from === 'corridor') {
 
 var clock = new THREE.Clock();
 var t = 0;
+/* the Omnioculars' dial (the Corridor's req 158, castle.js v=9): what moves by itself (the fire and its smoke, the cat,
+   the sitters, the painting's visitors, Trevor, Nick, the hangings, the scarf, the cloak, the candle, the quill, the
+   curios, the snowball, the corridor's torches through the hole) runs on sdt and slowT, slowed while he looks through
+   the pair; his view, the runtime, the lines and what answers his own taps keep time */
+var slowT = 0;
 function frame() {
-  var dt = Math.min(0.05, clock.getDelta());
-  t += dt;
+  var dt = Math.min(0.05, clock.getDelta()), sdt = dt * kit.zoom.slow();
+  t += dt; slowT += sdt;
   if (castle) castle.tick(dt);
   updateCamera(dt);
   faceEye();
   updateSofaStop(dt);
   updateTwins();
-  updateFire(dt, t);
+  updateFire(sdt, slowT);
   updateBellows(dt);
-  updateSmoke(dt);
-  updateCat(dt, t);
+  updateSmoke(sdt);
+  updateCat(sdt, slowT);
   updatePortrait(dt);
-  updateSitters(dt);
-  updateOpposite(dt);
-  updateTrevor(dt);
-  updateNick(dt);
+  updateSitters(sdt);
+  updateOpposite(sdt);
+  updateTrevor(sdt);
+  updateNick(sdt);
   updateLines(dt);
   updateNotes();
   updatePapers(dt, t);
-  updateTapestry(dt, t);
-  updateScarf(dt, t);
-  updateCloak(dt);
+  updateTapestry(sdt, slowT);
+  updateScarf(sdt, slowT);
+  updateCloak(sdt);
   updateSign(dt);
   updateHomeLetter(dt);
   updateBooks(dt);
-  updateCandle(dt);
+  updateCandle(sdt);
   updateDeskChair(dt);
   updateSatchel(dt, t);
-  updateHomework(dt);
-  updateCurios(dt, t);
-  updateSnowball(dt);
+  updateHomework(sdt);
+  updateCurios(sdt, slowT);
+  updateSnowball(sdt);
   renderer.render(scene, camera);
   kit.stats(dt);
 }
@@ -5900,8 +5905,15 @@ function lookThroughHole(hit) {
 }
 kit.zoom.look(scene, function (hit) { return hit.object === wall ? lookThroughHole(hit) : lookName(hit.object); });
 kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
+/* the Omnioculars once his pair is held (req 158): the frame shows its knobs only then, a hidden thing (req 145, 157)
+   only shimmers, and the gold line names what is held still at the middle: the look names above are already plain
+   words, capitalised by the frame; only the books' own names are spelled here */
+kit.zoom.held(function () { return !!(castle && castle.state().vars.omni === 'held'); });
+kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hidden(name)); });
+kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless nick': 'Nearly Headless Nick',
+  'the snitch scratched in the desk': 'The Snitch scratched in the desk' });
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
