@@ -170,9 +170,9 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=6"></script>
+<script src="castle.js?v=7"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=14"></script>
+<script src="castle-events.js?v=15"></script>
 <script>
 (function () {
 'use strict';
@@ -1051,6 +1051,29 @@ if ((kit.from === 'room' || kit.from === 'corridor') && lightsOutTrip) startNigh
 else if (kit.from === 'room') arriveFromRoom();
 else if (kit.from === 'sleep') startNight('waking');
 
+/* ---------- looking close (board req 139, the Omnioculars' count, the dormitory's half; req 126 and 133) ----------
+   Held at double or closer for a second, the thing at the middle of the view is named to the runtime's lookClose,
+   counted once ever (castle.js). One name per thing across pages. A bed names its whole group, hangings and the dark
+   beneath it too; his trunk and his things under the bed answer to their own. Neville's is the corner bed (CS 15,
+   CORNER_BED); the other three are one thing, the four-posters. The moon and the owl's glass see through (glows), so
+   W3's sky answers 'the moon' where the disc stands on it; the skies themselves are nothing until the views are
+   drawn. The hit area on the well is hidden, so the stair is its post, treads and kerb. Nothing seen changes. */
+function lookW3(hit) {
+  if (!moonDisc.visible) return null;
+  var sky = windows.filter(function (w) { return w.name === MOON.win; })[0].sky;
+  var a = sky.worldToLocal(hit.point.clone()), b = sky.worldToLocal(moonDisc.position.clone());
+  return Math.hypot(a.x - b.x, a.y - b.y) <= MOON.d * 0.47 ? 'the moon' : null;   /* the disc drawn 60 of 128 across */
+}
+beds.forEach(function (b) {
+  kit.zoom.look(b.group, b.his ? 'his four-poster' : b.name === CORNER_BED ? "neville's four-poster" : 'the four-posters');
+  b.meshes.forEach(function (m) { if (m.name.indexOf('trunk') === 0) kit.zoom.look(m, b.his ? 'his trunk' : 'the trunks'); });
+  if (b.his) b.under.slice(1).forEach(function (m) { kit.zoom.look(m, 'his things under the bed'); });
+});
+[hearth, firebox].forEach(function (m) { kit.zoom.look(m, 'the dormitory hearth'); });
+windows.forEach(function (w) { kit.zoom.look(w.sill, 'the dormitory windows'); if (w.name === MOON.win) kit.zoom.look(w.sky, lookW3); });
+kit.zoom.look(well, 'the dormitory stair');
+kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
+
 /* ---------- per frame ---------- */
 
 var clock = new THREE.Clock();
@@ -1078,7 +1101,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera,
+window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, zoom: kit.zoom,
   tap: tap, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
