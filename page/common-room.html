@@ -4718,6 +4718,42 @@ function leaveTable() {
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
 }
+/* A Snitch scratched into the desk's corner (req 122's woven touch, Fawkes on Godric's yes, 8.34 pm: the smallest things
+   hide something only zoom finds). Some bored first-year's compass point, long ago: a ball the size of a fingernail
+   and its two swept wings, about 4 cm across, on the apron's right corner beside the drawer, where the desk's card
+   faces him at the stop. Pale wood through the dark varnish, each stroke with a darker lip below it, and lit as the
+   desk is, so the fire and the candle find it. About 50 px at the stop on the wide screen, plain at 3x. */
+var SNITCH_SCRATCH = { at: [0.447, 0.152], w: 0.038, h: 0.019 };
+(function () {
+  var W = 256, H = 128, c = makeCanvas(W, H), g = c.getContext('2d'), rnd = Math.random;
+  function stroke(path, lip) {
+    g.save();
+    if (lip) { g.translate(0.8, 1.6); g.strokeStyle = 'rgba(40,20,8,0.6)'; g.lineWidth = 4; }
+    else { g.strokeStyle = 'rgba(255,226,178,0.95)'; g.lineWidth = 3.4; }
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath(); path(); g.stroke(); g.restore();
+  }
+  var cx = W / 2, cy = H * 0.58, r = 19;
+  function ball() { for (var a = 0; a <= 6.4; a += 0.35) { var rr = r + (rnd() - 0.5) * 1.6; var x = cx + Math.cos(a) * rr, y = cy + Math.sin(a) * rr; if (a === 0) g.moveTo(x, y); else g.lineTo(x, y); } }
+  function seam() { g.moveTo(cx - r * 0.7, cy - r * 0.55); g.quadraticCurveTo(cx, cy + r * 0.25, cx + r * 0.72, cy - r * 0.5); }
+  function wing(sx) {
+    return function () {
+      var x0 = cx + sx * r * 0.9, y0 = cy - r * 0.35;
+      g.moveTo(x0, y0); g.quadraticCurveTo(x0 + sx * 40, y0 - 34, x0 + sx * 96, y0 - 30);      /* the leading edge */
+      g.quadraticCurveTo(x0 + sx * 70, y0 - 8, x0 + sx * 6, y0 + 10);                          /* back to the ball */
+      for (var i = 1; i <= 4; i++) {                                                          /* the feathers */
+        var t = i / 5, ex = x0 + sx * (24 + 70 * t), ey = y0 - 24 - 6 * t;
+        g.moveTo(x0 + sx * 10, y0 + 2); g.quadraticCurveTo(x0 + sx * (14 + 40 * t), y0 - 6, ex + (rnd() - 0.5) * 3, ey + (rnd() - 0.5) * 3);
+      }
+    };
+  }
+  [ball, seam, wing(-1), wing(1)].forEach(function (f) { stroke(f, true); stroke(f, false); });
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(SNITCH_SCRATCH.w, SNITCH_SCRATCH.h),
+    new THREE.MeshStandardMaterial({ map: tex(c), transparent: true, depthWrite: false, roughness: 0.8, metalness: 0 }));
+  m.name = 'snitch-scratch';
+  m.position.set(SNITCH_SCRATCH.at[0], SNITCH_SCRATCH.at[1], 0.003);
+  sideTable.add(m);
+})();
 /* the zoom (req 122, castle.js; Godric's yes, 8.34 pm): 3x at rest, where the desk's small things need it; 2x at the
    fireside and the board, already close */
 function stopZoom(at) { if (kit.zoom) kit.zoom.setLimits(1, at ? 2 : 3); }
