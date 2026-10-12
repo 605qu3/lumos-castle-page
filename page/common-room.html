@@ -4299,6 +4299,7 @@ new THREE.TextureLoader().load(HOMEWORK.url, function (t) {
      1.2 rad about its own width, its near edge on the top, and still turns to the eye about its upright. */
   homework.essay.rotation.order = 'YXZ'; homework.essay.rotation.x = -HOMEWORK.LIE;
   homework.essay.position.set(HOMEWORK.essay[0], HOMEWORK.y + HOMEWORK.ch / 2 * Math.cos(HOMEWORK.LIE) + 0.003, HOMEWORK.essay[1]);
+  homework.essayAt = homework.essay.position.clone();
   homework.bottle.position.set(HOMEWORK.bottle[0], HOMEWORK.y + HOMEWORK.ch / 2, HOMEWORK.bottle[1]);
   /* the quill stands behind the bottle's card, its nib 5 cm down inside the glass */
   homework.home.set(HOMEWORK.bottle[0] + (0.5 - HOMEWORK.NIB[0]) * HOMEWORK.cw,
@@ -4474,6 +4475,26 @@ function homeworkStart() {
   if (t >= 1.2 && t < 3.5) { homeworkJumpBlot(homework.u, homework.v); homework.blotted = true; homework.t = 2.6; }
   else if (t < 0) homework.hop = 0.45;
 }
+/* His touch on Q38 (Godric, 12 October 2026, 7.56 am): at the table a tap on the essay unrolls it a little and lets go,
+   and it springs back into its roll, as Ron's did (CoS 9, "letting go of his parchment, which sprang back into a roll").
+   A tap, not a drag (docs/interaction-vocabulary.md: a drag only looks). The card stretches from its near edge, so the
+   drawn roll runs away from him 0.45 s, holds a beat, then springs home past its rest and settles. */
+var ESSAY_CURL = { out: 0.12, unroll: 0.45, hold: 0.2, settle: 1.1 };
+function essayCurlTap() { if (homework.essay && !(homework.curlT >= 0)) homework.curlT = 0; }
+var _hwUp = new THREE.Vector3();
+function updateEssayCurl(dt) {
+  if (!homework.essay || !(homework.curlT >= 0)) return;
+  var C = ESSAY_CURL, t = homework.curlT += dt, s;
+  if (t < C.unroll) s = 1 + C.out * easeInOut(t / C.unroll);
+  else if (t < C.unroll + C.hold) s = 1 + C.out;
+  else if (t < C.unroll + C.hold + C.settle) {
+    var u = t - C.unroll - C.hold;
+    s = 1 + C.out * Math.exp(-5 * u) * Math.cos(13 * u);
+  } else { s = 1; homework.curlT = -1; }
+  homework.essay.scale.y = s;
+  _hwUp.set(0, 1, 0).applyQuaternion(homework.essay.quaternion);
+  homework.essay.position.copy(homework.essayAt).addScaledVector(_hwUp, (s - 1) * HOMEWORK.ch / 2);
+}
 /* the dip: 0.5 s down into the ink, 0.7 s up and out, 0.9 s across to the page, a touch and the blot at 2.3 s, 0.9 s home,
    0.6 s down into the bottle; then 30 to 90 s before the next */
 var _hwA = new THREE.Vector3(), _hwB = new THREE.Vector3(), _hwT = new THREE.Vector3();
@@ -4483,6 +4504,7 @@ function updateHomework(dt) {
   if (portrait.open && !homework.wasOpen) homeworkStart();
   homework.wasOpen = portrait.open;
   updateHomeworkWet(dt);
+  updateEssayCurl(dt);
   if (homework.hop > 0) {
     homework.hop = Math.max(0, homework.hop - dt);
     q.position.copy(H0).setY(H0.y + 0.035 * Math.sin(Math.PI * homework.hop / 0.45));
@@ -5017,6 +5039,7 @@ function tap(cx, cy) {
   }
   if (mode === 'table') {
     if (hit && (hit === homework.quill || hit === homework.bottle)) { if (homework.t < 0) homework.next = 0; }
+    else if (hit && hit === homework.essay) essayCurlTap();
     else if (!tablePart(hit)) leaveTable();
     return;
   }
