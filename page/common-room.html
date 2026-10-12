@@ -4242,11 +4242,12 @@ var facers = [table, sideTable, deskChair, candleStand, chessBoard];
    the 0.32 m square at its centre that the live game's board will take, and turn to the eye as the table does.
    His touch (4.01 pm): now and then the quill dips itself, lifts, touches the page and leaves one careful blot, then
    goes home, as a tired student's quill does at midnight. Blots gather on a sheet laid over the essay's card. */
-var HOMEWORK = { url: '../assets/layers/homework.png', cw: 0.3, ch: 0.3 * 108 / 120, y: TABLE_TOP_Y,
+var HOMEWORK = { url: '../assets/layers/homework.png', near: '../assets/layers/homework-near.png', cw: 0.3, ch: 0.3 * 108 / 120, y: TABLE_TOP_Y,
   essay: [-1.27, 3.1], bottle: [-1.04, 3.12], LIE: 1.2,
   NIB: [0.252, 0.04],                      /* the quill's nib in its cell: across from the left, metres up from the foot */
   WRITE: [0.25, 0.55, 0.62, 0.86] };       /* where the essay's writing lies in its cell: u from, u to, v from, v to (down) */
-var homework = { essay: null, bottle: null, quill: null, blots: null, next: 25 + 30 * Math.random(), t: -1, home: new THREE.Vector3() };
+var homework = { essay: null, bottle: null, quill: null, blots: null, wetSheet: null, wet: [], hop: 0, wasOpen: false,
+  next: 25 + 30 * Math.random(), t: -1, home: new THREE.Vector3() };
 new THREE.TextureLoader().load(HOMEWORK.url, function (t) {
   t.encoding = THREE.sRGBEncoding;
   function cellCard(i) {
@@ -4258,6 +4259,8 @@ new THREE.TextureLoader().load(HOMEWORK.url, function (t) {
   }
   homework.essay = cellCard(0); homework.bottle = cellCard(1); homework.quill = cellCard(2);
   homework.essay.name = 'homework-essay'; homework.bottle.name = 'homework-bottle'; homework.quill.name = 'homework-quill';
+  tappables.push(homework.essay, homework.bottle, homework.quill);       /* the table's stop */
+  homework.alpha = alphaOf(t.image);
   /* the essay lies on the top (Godric, 10 October 2026, 5.04 pm: it floated above the table): the drawing shows the
      sheet from higher than the eye sees the table, so stood upright its roll rose past the top's far rim. It tips back
      1.2 rad about its own width, its near edge on the top, and still turns to the eye about its upright. */
@@ -4269,11 +4272,18 @@ new THREE.TextureLoader().load(HOMEWORK.url, function (t) {
                     HOMEWORK.y + 0.05 - HOMEWORK.NIB[1] + HOMEWORK.ch / 2, HOMEWORK.bottle[1] - 0.01);
   homework.quill.position.copy(homework.home);
   /* the blots: a clear sheet the size of the essay's card, just before it */
-  var bc = makeCanvas(240, 216);
+  var bc = makeCanvas(960, 864);
   homework.blots = new THREE.Mesh(new THREE.PlaneGeometry(HOMEWORK.cw, HOMEWORK.ch),
     new THREE.MeshBasicMaterial({ map: tex(bc), transparent: true, depthWrite: false }));
   homework.blots.userData.canvas = bc;
   homework.essay.add(homework.blots); homework.blots.position.z = 0.002;
+  var wc = makeCanvas(960, 864);
+  homework.wetSheet = new THREE.Mesh(new THREE.PlaneGeometry(HOMEWORK.cw, HOMEWORK.ch),
+    new THREE.MeshBasicMaterial({ map: tex(wc), transparent: true, depthWrite: false }));
+  homework.wetSheet.userData.canvas = wc;
+  homework.essay.add(homework.wetSheet); homework.wetSheet.position.z = 0.003;
+  homeworkJumpBlot(HOMEWORK.WRITE[0] + 0.62 * (HOMEWORK.WRITE[1] - HOMEWORK.WRITE[0]), HOMEWORK.WRITE[3] - 0.02);
+  homeworkShort();
 });
 /* the mantel's curios (req 28 item 5; open item 27; Godric, 10 October 2026, 4.36 pm): one sheet of three by the house's
    own hand, round 1, at tier B (64 by 143 px a cell), each card sized to the thing's real height: a brass candlestick
@@ -4345,11 +4355,91 @@ function updateCurios(dt, t) {
 /* one blot, at a spot among the writing, in the drawing's ink */
 function homeworkBlot(u, v) {
   var c = homework.blots.userData.canvas, g = c.getContext('2d');
-  var x = u * c.width, y = v * c.height, r = 1.6 + Math.random() * 1.4;
+  var x = u * c.width, y = v * c.height, r = (1.6 + Math.random() * 1.4) * c.width / 240;
   g.fillStyle = 'rgba(30,24,20,0.92)';
   g.beginPath(); g.ellipse(x, y, r * 1.3, r, 0, 0, Math.PI * 2); g.fill();
   if (Math.random() < 0.5) { g.beginPath(); g.arc(x + r * 1.8, y + r * 0.6, r * 0.45, 0, Math.PI * 2); g.fill(); }
   homework.blots.material.map.needsUpdate = true;
+}
+/* His touch for the table (Godric, 9.15 pm, Q36): a fresh blot where the writer jumped when the portrait hole swung
+   open, the ink still glistening (PoA 12: "the ink was still glistening"). One lies by the last line as he comes in,
+   and whenever the hole swings open the quill gives a start: over the page it skids and leaves another, in its
+   bottle it hops. A jumped blot is a round drop dragged into a tail where the nib skidded, with a fleck or two
+   thrown past it; while wet it carries a small bright highlight that dulls over a minute and a half (the first, over
+   four minutes, so it still shines when he walks up). */
+function homeworkJumpBlot(u, v) {
+  var c = homework.blots.userData.canvas, g = c.getContext('2d'), k = c.width / 240;
+  var x = u * c.width, y = v * c.height, r = (2.6 + Math.random()) * k, a = -0.5 - Math.random() * 0.5;
+  var dx = Math.cos(a), dy = Math.sin(a), L = r * (3 + Math.random() * 2);
+  g.fillStyle = 'rgba(28,22,18,0.94)';
+  g.beginPath(); g.ellipse(x, y, r * 1.15, r, a, 0, Math.PI * 2); g.fill();
+  g.beginPath();                                           /* the skid: a tail narrowing to the nib's lift */
+  g.moveTo(x - dy * r * 0.8, y + dx * r * 0.8);
+  g.quadraticCurveTo(x + dx * L * 0.5 - dy * r * 0.35, y + dy * L * 0.5 + dx * r * 0.35, x + dx * L, y + dy * L);
+  g.quadraticCurveTo(x + dx * L * 0.5 + dy * r * 0.35, y + dy * L * 0.5 - dx * r * 0.35, x + dy * r * 0.8, y - dx * r * 0.8);
+  g.fill();
+  for (var i = 0; i < 2; i++) {                            /* flecks thrown past it */
+    var f = L * (1.25 + i * 0.35 + Math.random() * 0.2);
+    g.beginPath(); g.arc(x + dx * f + (Math.random() - 0.5) * r, y + dy * f + (Math.random() - 0.5) * r, r * (0.32 - i * 0.1), 0, Math.PI * 2); g.fill();
+  }
+  homework.blots.material.map.needsUpdate = true;
+  homework.wet.push({ x: x, y: y, r: r, a: a, t: 0, life: homework.wet.length ? 90 : 240 });
+}
+var _hwWetT = 0;
+function updateHomeworkWet(dt) {
+  if (!homework.wetSheet || !homework.wet.length) return;
+  _hwWetT += dt; if (_hwWetT < 0.5) return;
+  var c = homework.wetSheet.userData.canvas, g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height);
+  for (var i = homework.wet.length - 1; i >= 0; i--) {
+    var w = homework.wet[i]; w.t += _hwWetT;
+    if (w.t > w.life) { homework.wet.splice(i, 1); continue; }
+    var s = 1 - w.t / w.life;
+    g.fillStyle = 'rgba(255,248,230,' + (0.75 * s).toFixed(3) + ')';
+    g.beginPath(); g.ellipse(w.x - w.r * 0.35, w.y - w.r * 0.4, w.r * 0.42, w.r * 0.2, w.a, 0, Math.PI * 2); g.fill();
+    g.fillStyle = 'rgba(60,64,84,' + (0.3 * s).toFixed(3) + ')';   /* a faint sheen over the whole drop */
+    g.beginPath(); g.ellipse(w.x, w.y, w.r * 1.05, w.r * 0.9, w.a, 0, Math.PI * 2); g.fill();
+  }
+  _hwWetT = 0;
+  homework.wetSheet.material.map.needsUpdate = true;
+}
+/* His touch's other half (Godric, 9.15 pm): the essay a few inches short of its length. The writer has pencilled a
+   note to self on the clear parchment under the last line, along the lines' slant, and underlined it twice: Ron's
+   sum in CoS 9 ("I only need another two inches"; "still eight inches short", the tape measure). Graphite in a
+   scrawled hand (the page's Nothing You Could Do, a letter at a time), small enough to find only at the table. NOTE is where it sits on the essay's cell (u, v of its
+   middle) and the lines' slant in radians, read off the tier A drawing. */
+var HOMEWORK_NOTE = { u: 0.775, v: 0.81, slant: -0.23, text: 'only two more inches!' };
+function homeworkShort() {
+  var draw = function () {
+    var c = homework.blots.userData.canvas, g = c.getContext('2d'), k = c.width / 900, N = HOMEWORK_NOTE;
+    g.save();
+    g.translate(N.u * c.width, N.v * c.height); g.rotate(N.slant);
+    g.font = Math.round(25 * k) + 'px "Nothing You Could Do", cursive';
+    g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    g.fillStyle = 'rgba(82,76,72,0.8)';
+    var w = g.measureText(N.text).width, x = -w / 2;
+    for (var i = 0; i < N.text.length; i++) {               /* a letter at a time, each a little off its line */
+      var ch = N.text[i];
+      g.save(); g.translate(x, (Math.random() - 0.5) * 1.6 * k); g.rotate((Math.random() - 0.5) * 0.08);
+      g.fillText(ch, 0, 0); g.restore();
+      x += g.measureText(ch).width;
+    }
+    g.strokeStyle = 'rgba(82,76,72,0.62)'; g.lineWidth = 1.4 * k; g.lineCap = 'round';
+    for (var j = 0; j < 2; j++) {
+      var y = (6 + j * 5) * k;
+      g.beginPath(); g.moveTo(-w / 2 + (2 + j * 8) * k, y + 1 * k);
+      g.quadraticCurveTo(0, y - 1.5 * k, w / 2 - (4 + j * 10) * k, y + 0.5 * k); g.stroke();
+    }
+    g.restore();
+    homework.blots.material.map.needsUpdate = true;
+  };
+  if (document.fonts && document.fonts.load) document.fonts.load('25px "Nothing You Could Do"').then(draw, draw); else draw();
+}
+function homeworkStart() {
+  if (!homework.quill || !homework.blots) return;
+  var t = homework.t;
+  if (t >= 1.2 && t < 3.5) { homeworkJumpBlot(homework.u, homework.v); homework.blotted = true; homework.t = 2.6; }
+  else if (t < 0) homework.hop = 0.45;
 }
 /* the dip: 0.5 s down into the ink, 0.7 s up and out, 0.9 s across to the page, a touch and the blot at 2.3 s, 0.9 s home,
    0.6 s down into the bottle; then 30 to 90 s before the next */
@@ -4357,6 +4447,14 @@ var _hwA = new THREE.Vector3(), _hwB = new THREE.Vector3(), _hwT = new THREE.Vec
 function updateHomework(dt) {
   if (!homework.quill) return;
   var q = homework.quill, H0 = homework.home;
+  if (portrait.open && !homework.wasOpen) homeworkStart();
+  homework.wasOpen = portrait.open;
+  updateHomeworkWet(dt);
+  if (homework.hop > 0) {
+    homework.hop = Math.max(0, homework.hop - dt);
+    q.position.copy(H0).setY(H0.y + 0.035 * Math.sin(Math.PI * homework.hop / 0.45));
+    return;
+  }
   if (homework.t < 0) {
     homework.next -= dt;
     if (homework.next > 0 || mode === 'tween') return;
@@ -4575,6 +4673,51 @@ function leaveDesk() {
   startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
   DESK_STOP.seat = 0;
 }
+/* ---------- the homework table's stop (Q36, 1: Godric 9.15 pm, the walk-ups in turn, the table first) ----------
+   As the desk's: a tap on the round table, its top or the homework glides the view up to the near rim, a boy's eye a
+   little above the top, framed on the essay, the ink and the quill by the screen's shape. He walks up from where he
+   stands, so the view comes from the eye's side and the hearth stays behind the table. There a tap on the quill or its
+   ink sets it dipping, the table's own parts keep him there, and Back or any other tap glides back. Nothing sits at this
+   table, so no chair fades. */
+var TABLE_STOP = { at: [-1.16, 3.06], lift: 0.03, eye: 0.42, w: 0.72, h: 0.46 };
+tappables.push(table, tableTop, tableRim);
+function tablePose(pos, look) {
+  look.set(TABLE_STOP.at[0], TABLE_TOP_Y + TABLE_STOP.lift, TABLE_STOP.at[1]);
+  var n = new THREE.Vector3(CAM_BASE.x - look.x, 0, CAM_BASE.z - look.z).normalize();
+  var th = Math.tan(baseFov() * Math.PI / 360), d = Math.max(TABLE_STOP.h / 2 / th, TABLE_STOP.w / 2 / (th * camera.aspect));
+  pos.copy(look).addScaledVector(n, d);
+  pos.y = look.y + TABLE_STOP.eye;
+}
+function tablePart(o) { return o === table || o === tableTop || o === tableRim || (o && (o === homework.essay || o === homework.bottle || o === homework.quill)); }
+/* close up the tier B cells (120 by 108 px) blur, so the first walk-up loads the same sheet at tier A (3000 px a metre,
+   cut from assets/layers-full/homework.png, 900 by 810 a cell) and lays it on the three cards */
+function homeworkNear() {
+  if (homework.nearAsked || !homework.essay) return;
+  homework.nearAsked = true;
+  new THREE.TextureLoader().load(HOMEWORK.near, function (t) {
+    t.encoding = THREE.sRGBEncoding;
+    t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    [homework.essay, homework.bottle, homework.quill].forEach(function (m, i) {
+      var c = t.clone(); c.needsUpdate = true; c.repeat.set(1 / 3, 1); c.offset.set(i / 3, 0);
+      var old = m.material.map; m.material.map = c; m.material.needsUpdate = true; if (old) old.dispose();
+    });
+  });
+}
+function goTable() {
+  mode = 'tween';
+  homeworkNear();
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  tablePose(pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'table'; backBtn.hidden = false; });
+  stopZoom(false);
+}
+function leaveTable() {
+  mode = 'tween';
+  backBtn.hidden = true;
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  roomPose(yaw, pitch, pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
+}
 /* the zoom (req 122, castle.js; Godric's yes, 8.34 pm): 3x at rest, where the desk's small things need it; 2x at the
    fireside and the board, already close */
 function stopZoom(at) { if (kit.zoom) kit.zoom.setLimits(1, at ? 2 : 3); }
@@ -4708,7 +4851,7 @@ function lightsOut() {
   try { localStorage.setItem(SCARF_GONE_KEY, String(Date.now())); } catch (e) {}
   if (scarf) scarf.visible = false;
   if (mode === 'board' || mode === 'hand') leaveBoard();
-  tween = null; mode = 'room';
+  tween = null; mode = 'room'; DESK_STOP.seat = 0; backBtn.hidden = true;
   setTimeout(function () { climbStair(false, 'dormitory.html?from=room&bedtime'); }, 1200);
 }
 
@@ -4744,7 +4887,9 @@ function tap(cx, cy) {
     if (h.object === books.hist) return books.hist.visible && alphaSolid(books.hain, h.uv);
     if (h.object === books.slip) return books.slip.visible;
     if (h.object === books.openCard) return books.openCard.visible && alphaSolid(books.oain, h.uv);
-    if (h.object === deskChair) return DESK_STOP.sat < 0.5;            /* he sits in it at the desk */
+    if (h.object === deskChair) return DESK_STOP.sat < 0.5;
+    var hw = h.object === homework.essay ? 0 : h.object === homework.bottle ? 1 : h.object === homework.quill ? 2 : -1;
+    if (hw >= 0) return !homework.alpha || !h.uv || alphaSolid(homework.alpha, { x: (hw + h.uv.x) / 3, y: h.uv.y });   /* three cells of one sheet */            /* he sits in it at the desk */
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
@@ -4762,6 +4907,11 @@ function tap(cx, cy) {
     else if (hit && hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
     else if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) booksTap();
     else leaveDesk();
+    return;
+  }
+  if (mode === 'table') {
+    if (hit && (hit === homework.quill || hit === homework.bottle)) { if (homework.t < 0) homework.next = 0; }
+    else if (!tablePart(hit)) leaveTable();
     return;
   }
   if (mode === 'fireside') {
@@ -4795,6 +4945,7 @@ function tap(cx, cy) {
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
   else if (hit === stairs) climbStair(false, 'dormitory.html?from=room');
   else if (hit === sideTable || hit === deskChair) goDesk();
+  else if (tablePart(hit)) goTable();
 }
 
 /* drag versus tap */
@@ -4872,7 +5023,7 @@ function setShadows(on) {
   btns.shadows.classList.toggle('on', on);
 }
 backBtn.addEventListener('click', function () {
-  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk();
+  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk(); else if (mode === 'table') leaveTable();
 });
 
 /* ---------- per frame ---------- */
@@ -5333,7 +5484,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
