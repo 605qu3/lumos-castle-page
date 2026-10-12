@@ -1,0 +1,103 @@
+{
+  "chain": "omnioculars",
+  "room": [
+    {
+      "when": ["place = common room", "omni_owl = yes"],
+      "show": ["the owl waiting on the sill beside the parcel"]
+    },
+    {
+      "when": ["place = common room", "omni_parcel = yes", "omni_owl != yes"],
+      "show": ["a small brown-paper parcel waiting on the sill"]
+    },
+    {
+      "when": ["omni = held"],
+      "show": ["his Omnioculars to hand"]
+    }
+  ],
+  "records": [
+    {
+      "id": "omnioculars.first-look",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "look close",
+      "when": ["omni_looking != yes"],
+      "starts": ["set omni_looking = yes", "stamp omni_first_look"]
+    },
+    {
+      "id": "omnioculars.earned",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-20 s",
+      "when": ["place = common room", "things looked at >= 12", "days since omni_first_look >= 1", "omni != held",
+               "omni_parcel != yes", "owl_landed != yes", "owl_waiting != yes"],
+      "one_of": "omni-parcel",
+      "weight": 1,
+      "show_at": {
+        "morning": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
+        "day": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
+        "evening": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
+        "night": ["an owl lands on the moonlit sill with a small brown-paper parcel, taps its beak on the glass three times, tap-tap-tap, sets the parcel down and waits beside it"]
+      },
+      "starts": ["set omni_parcel = yes", "set omni_owl = yes", "set owl_landed = yes"]
+    },
+    {
+      "id": "omnioculars.from-a-parent",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-20 s",
+      "when": ["place = common room", "parent parcel = omnioculars", "omni != held",
+               "omni_parcel != yes", "owl_landed != yes", "owl_waiting != yes"],
+      "one_of": "omni-parcel",
+      "weight": 1,
+      "show_at": {
+        "morning": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
+        "day": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
+        "evening": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
+        "night": ["an owl lands on the moonlit sill with a small brown-paper parcel, taps its beak on the glass three times, tap-tap-tap, sets the parcel down and waits beside it"]
+      },
+      "starts": ["set omni_parcel = yes", "set omni_owl = yes", "set owl_landed = yes"]
+    },
+    {
+      "id": "omnioculars.opened",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parcel",
+      "when": ["place = common room", "omni_parcel = yes"],
+      "show": ["the parcel opened: two pairs of brass Omnioculars covered in knobs and dials, one labelled for him and one for his brother, and a short note"],
+      "starts": ["set omni_parcel = no", "set omni = held"]
+    },
+    {
+      "id": "omnioculars.owl-hoots",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parcel",
+      "when": ["place = common room", "omni_owl = yes"],
+      "show": ["the owl gives a soft hoot, ruffles its feathers and flies off"],
+      "starts": ["set omni_owl = no"]
+    },
+    {
+      "id": "omnioculars.owl-goes",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 45-75 s",
+      "when": ["place = common room", "omni_owl = yes"],
+      "show": ["the owl ruffles its feathers and flies off, the parcel left on the sill"],
+      "starts": ["set omni_owl = no"]
+    },
+    {
+      "id": "omnioculars.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": ["set omni_owl = no"]
+    }
+  ]
+}

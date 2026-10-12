@@ -50,6 +50,10 @@
    Then the full moon's owl (board req 101, forty-second session): `stamp X by night` and `nights since X`, a night
    counted from the evening it began, so once a night means once from dusk to dawn across midnight; `moon in view`
    is the page's own built-in (yes where the moon's disc is in a window's glass where his eye reaches it).
+   Then the Omnioculars earned by looking (board req 127, forty-fourth session): the page calls `lookClose(name)`
+   when he has held the zoom close on a thing (board req 126); each thing is counted once ever, `things looked at`
+   reads the count and `look close` comes when a new one is counted; `parent parcel` is a parent's setting
+   (settings.parcel, the thing a parent sends by owl, or none).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -351,6 +355,8 @@
           var ls = visit && visit.listen;
           return ls && (ls.open || Date.now() < ls.until) ? ls.name : 'none';
         case 'bedtime': return bedtimeMin > 0 ? 'set' : 'off';
+        case 'things looked at': return (state.looked || []).length;   /* different things held close in the zoom, ever (req 127) */
+        case 'parent parcel': return settings.parcel || 'none';         /* what a parent sends by owl from the grown-up corner */
         /* how this page was reached, from its `?from=`: room, corridor, dormitory, sleep (the waking), or none (Neville's
            snore on a night waking, 10 October 2026) */
         case 'from': return /^(room|corridor|dormitory|sleep)$/.test(params.get('from') || '') ? params.get('from') : 'none';
@@ -1171,6 +1177,17 @@
       moment: moment,
       tap: tap,
       password: function () { if (visit) checkEnds('password'); },   /* the password given and the Fat Lady swung open */
+      /* He has held the zoom close on a thing (board req 126, the page's name for it): counted once ever, kept on the
+         iPad, and a new one raises `look close` (the Omnioculars earned by looking, req 127). */
+      lookClose: function (name) {
+        name = String(name || '').trim().toLowerCase();
+        if (!visit || !name) return;
+        state.looked = state.looked || [];
+        if (state.looked.indexOf(name) >= 0) return;
+        state.looked.push(name);
+        moment('look close');
+        if (visit) changed();
+      },
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';
