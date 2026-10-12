@@ -138,6 +138,54 @@
       "starts": [
         "set owl_landed = no"
       ]
+    },
+    {
+      "id": "night.squawk",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "night"
+      ],
+      "moment": "outside",
+      "when": [
+        "place = corridor",
+        "time = night",
+        "nights since squawked >= 1"
+      ],
+      "who": [
+        {
+          "as": "fat-lady",
+          "role": "voice",
+          "name": "the fat lady",
+          "mark": "her frame"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "night.squawk",
+          "canon": "the book's own words, PS 12, checked: she squawks it as Harry slips out by night",
+          "text": [
+            "Who's there?"
+          ]
+        },
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "night.squawk-after",
+          "canon": "ours, in her voice; her cake (cake.json); Filch catching students out of bed (PS 13, checked)",
+          "text": [
+            "Oh. It's you. Out of bed at this hour, dear?",
+            "Hmph. Some of us were asleep.",
+            "I was having such a lovely dream about cake.",
+            "Mind Filch doesn't catch you, dear. In before morning."
+          ]
+        }
+      ],
+      "starts": [
+        "stamp squawked by night"
+      ]
     }
   ]
 }

@@ -16,6 +16,25 @@
       "show": [
         "under Neville's reply, Wood's answer in his scrawl"
       ]
+    },
+    {
+      "when": [
+        "wood_ink != written"
+      ],
+      "show": [
+        "Wood's practice notice pinned up blank"
+      ],
+      "hidden": [
+        "the practice notice"
+      ]
+    },
+    {
+      "when": [
+        "wood_ink = written"
+      ],
+      "show": [
+        "Wood's practice notice, the ink come back in his hand"
+      ]
     }
   ],
   "records": [
@@ -214,6 +233,157 @@
         "set wood_replies = 0",
         "stamp tidied_on"
       ]
+    },
+    {
+      "id": "notice.practice-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "revealed notice practice",
+      "when": [
+        "wood_ink != written",
+        "wood_reveals = 0"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "wood",
+          "at": "board",
+          "key": "notice.practice-1",
+          "canon": "ours, in Wood's voice; he woke Harry at the crack of dawn for practice and feared a Slytherin spy (CoS 7, checked)",
+          "text": [
+            "5 a.m. sharp. Tell NO ONE. Especially not Slytherins. O.W.",
+            "Practice, 5 a.m. sharp. Not a word to anyone in green. O.W."
+          ]
+        }
+      ],
+      "starts": [
+        "set wood_ink = written",
+        "add wood_reveals 1",
+        "stamp wood_ink_on",
+        "log \"Brought back Wood's hidden notice {day}\""
+      ]
+    },
+    {
+      "id": "notice.practice-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "revealed notice practice",
+      "when": [
+        "wood_ink != written",
+        "wood_reveals = 1"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "wood",
+          "at": "board",
+          "key": "notice.practice-2",
+          "canon": "ours, in Wood's voice; he woke Harry at the crack of dawn for practice and feared a Slytherin spy (CoS 7, checked)",
+          "text": [
+            "Practice moved to HALF PAST FOUR. I think we were seen. Tell NO ONE. O.W.",
+            "4.30 a.m. now. Someone was watching from the stands. O.W."
+          ]
+        }
+      ],
+      "starts": [
+        "set wood_ink = written",
+        "add wood_reveals 1",
+        "stamp wood_ink_on",
+        "log \"Brought back Wood's hidden notice {day}\""
+      ]
+    },
+    {
+      "id": "notice.practice-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "revealed notice practice",
+      "when": [
+        "wood_ink != written",
+        "wood_reveals = 2"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "wood",
+          "at": "board",
+          "key": "notice.practice-3",
+          "canon": "ours, in Wood's voice; he woke Harry at the crack of dawn for practice and feared a Slytherin spy (CoS 7, checked)",
+          "text": [
+            "4 a.m. Bring a lantern. Burn this after reading. O.W.",
+            "4 a.m. Come in your pyjamas if you must, just COME. Burn this. O.W."
+          ]
+        }
+      ],
+      "starts": [
+        "set wood_ink = written",
+        "add wood_reveals 1",
+        "stamp wood_ink_on",
+        "log \"Brought back Wood's hidden notice {day}\""
+      ]
+    },
+    {
+      "id": "notice.practice-4",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "revealed notice practice",
+      "when": [
+        "wood_ink != written",
+        "wood_reveals >= 3"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "wood",
+          "at": "board",
+          "key": "notice.practice-4",
+          "canon": "ours, in Wood's voice; he woke Harry at the crack of dawn for practice and feared a Slytherin spy (CoS 7, checked)",
+          "text": [
+            "If you are a Slytherin, STOP READING NOW. O.W.",
+            "Slytherins: this notice is blank. Nothing to see here. O.W."
+          ]
+        }
+      ],
+      "starts": [
+        "set wood_ink = written",
+        "add wood_reveals 1",
+        "stamp wood_ink_on",
+        "log \"Brought back Wood's hidden notice {day}\""
+      ]
+    },
+    {
+      "id": "notice.practice-blank",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "wood_ink = written",
+        "days since wood_ink_on >= 2"
+      ],
+      "one_of": "practice-blank",
+      "weight": 1,
+      "starts": [
+        "set wood_ink = blank"
+      ]
+    },
+    {
+      "id": "notice.practice-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "wood_ink = written",
+        "days since wood_ink_on >= 2"
+      ],
+      "one_of": "practice-blank",
+      "weight": 2
     },
     {
       "id": "notice.leave",

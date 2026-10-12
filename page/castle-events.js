@@ -629,7 +629,7 @@
         else n = Math.floor(Math.random() * k);
         text = fillWords(line.text[n].replace('{intro}', bagIntro(rec)));
         state.said[line.key] = { n: n };
-        if (line.medium === 'written') state.written[line.key] = { record: rec.id, key: line.key, hand: line.hand, at: line.at, text: text, day: today() };
+        if (line.medium === 'written') state.written[line.key] = { record: rec.id, key: line.key, hand: line.hand, at: line.at, text: text, day: today(), t: (state.wseq = (state.wseq || 0) + 1) };
       }
       var who = (rec.who || []).filter(function (w) { return w.as === line.speaker; })[0] || null;
       return { record: rec.id, end: end, key: line.key, variant: n, speaker: line.speaker || null, medium: line.medium,
@@ -1215,11 +1215,25 @@
       visit: function () { return visit; },
       heard: heard,                                   /* guesses a page heard itself, as strings or { text } */
       listening: function () { return value('listening'); },
-      /* The written lines' words as last drawn, by recording key, newest first: the room draws a pinned note from them. */
+      /* The written lines' words as last drawn, by recording key, newest first: the room draws a pinned note from them
+         (two in one day, as Percy's notes on his drawer after two visits, are told apart by the order drawn). */
       written: function () {
         var out = [];
         for (var k in state.written) out.push(state.written[k]);
-        return out.sort(function (a, b) { return b.day - a.day; });
+        return out.sort(function (a, b) { return (b.day - a.day) || ((b.t || 0) - (a.t || 0)); });
+      },
+      /* Whether magic hides the thing a page names (its zoom's look name) now: a room rule's `hidden` list, read as
+         its cues are, so the Omnioculars show only "something here" there until a spell opens it (req 145, 157). */
+      hidden: function (name) {
+        name = String(name || '').trim().toLowerCase();
+        if (!name) return false;
+        for (var c = 0; c < chains.length; c++) {
+          var rules = chains[c].room || [];
+          for (var i = 0; i < rules.length; i++) {
+            if ((rules[i].hidden || []).indexOf(name) >= 0 && allHold(rules[i].when)) return true;
+          }
+        }
+        return false;
       }
     };
   }
