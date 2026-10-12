@@ -1,0 +1,213 @@
+{
+  "chain": "howler",
+  "room": [
+    {
+      "when": [
+        "days since howler_lifted = 0",
+        "days since howler_opened >= 1"
+      ],
+      "show": [
+        "the Howler smoking at the corners"
+      ]
+    },
+    {
+      "when": [
+        "days since howler_opened = 0"
+      ],
+      "show": [
+        "a pinch of grey ash on the desk where the Howler stood"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "howler.lifted",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap howler",
+      "when": [
+        "place = common room",
+        "days since howler_opened >= 1",
+        "days since howler_lifted >= 1"
+      ],
+      "starts": [
+        "stamp howler_lifted"
+      ]
+    },
+    {
+      "id": "howler.opens-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap howler seal",
+      "when": [
+        "place = common room",
+        "days since howler_opened >= 1",
+        "home howler = written"
+      ],
+      "who": [
+        {
+          "as": "howler",
+          "role": "voice",
+          "name": "the Howler",
+          "mark": "room"
+        }
+      ],
+      "show": [
+        "the Howler bursts open in his hand and shouts, a hundred times louder than a voice, rattling the room and shaking dust from the ceiling; its words done, it drops, the scarlet goes up in flames, its black edges burn last, a thin black frame hangs in the air a heartbeat, then falls as ash"
+      ],
+      "lines": [
+        {
+          "speaker": "howler",
+          "medium": "said",
+          "key": "howler.shout-home",
+          "canon": "theirs, the Howler line written at the letter page (Godric's events-q-howler-voice, 12 October 2026, 6.23 pm, option 1); a Howler shouts and then bursts into flames (CoS 6, checked)",
+          "text": [
+            "{howler}"
+          ]
+        }
+      ],
+      "starts": [
+        "stamp howler_opened",
+        "log \"Opened a Howler from home at the desk {day}\""
+      ]
+    },
+    {
+      "id": "howler.opens-weasleys",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap howler seal",
+      "when": [
+        "place = common room",
+        "days since howler_opened >= 1",
+        "home howler = none"
+      ],
+      "who": [
+        {
+          "as": "howler",
+          "role": "voice",
+          "name": "the Howler",
+          "mark": "room"
+        }
+      ],
+      "show": [
+        "the Howler bursts open in his hand and shouts, a hundred times louder than a voice, rattling the room and shaking dust from the ceiling; its words done, it drops, the scarlet goes up in flames, its black edges burn last, a thin black frame hangs in the air a heartbeat, then falls as ash",
+        "after the ash, a small scorched note flutters down to the desk"
+      ],
+      "lines": [
+        {
+          "speaker": "howler",
+          "medium": "said",
+          "key": "howler.shout",
+          "canon": "ours, Mrs Weasley's Howler brought to the wrong desk (Godric's events-q-howler-voice, option 1, when none is written); a Howler's roar shakes dust from the ceiling, then it bursts into flames and curls into ashes (CoS 6, checked); Percy writing to Mother (our locks.relock-3)",
+          "text": [
+            "FRED AND GEORGE WEASLEY! PERCY WRITES THAT YOU LET OFF FIREWORKS AT A DOOR. A DOOR! ONE MORE WORD AND YOU ARE COMING HOME ON THE NEXT TRAIN!"
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "errol",
+          "at": "desk",
+          "key": "howler.errol",
+          "canon": "ours, Godric's touch t1 on events-q-howler-voice (6.23 pm); Errol, the Weasleys' old owl, brings Ron's Howler (CoS 6, checked)",
+          "text": [
+            "Sorry. Wrong desk. Errol."
+          ]
+        }
+      ],
+      "starts": [
+        "stamp howler_opened",
+        "log \"Opened a Howler meant for the Weasley twins at the desk {day}; Errol had the wrong desk\""
+      ]
+    },
+    {
+      "id": "howler.goes-off-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap howler 30-45 s",
+      "when": [
+        "place = common room",
+        "days since howler_opened >= 1",
+        "home howler = written"
+      ],
+      "who": [
+        {
+          "as": "howler",
+          "role": "voice",
+          "name": "the Howler",
+          "mark": "room"
+        }
+      ],
+      "show": [
+        "the Howler, left unopened, jumps, tears itself open wherever it is and shouts, a hundred times louder than a voice, rattling the room and shaking dust from the ceiling; its words done, it drops, the scarlet goes up in flames, its black edges burn last, a thin black frame hangs in the air a heartbeat, then falls as ash"
+      ],
+      "lines": [
+        {
+          "speaker": "howler",
+          "medium": "said",
+          "key": "howler.shout-home-left",
+          "canon": "theirs, the Howler line written at the letter page (Godric's events-q-howler-voice, 12 October 2026, 6.23 pm, option 1); a Howler shouts and then bursts into flames (CoS 6, checked); left unopened it is worse (Neville, CoS 6, checked)",
+          "text": [
+            "{howler}"
+          ]
+        }
+      ],
+      "starts": [
+        "stamp howler_opened",
+        "log \"A Howler from home went off by itself at the desk {day}\""
+      ]
+    },
+    {
+      "id": "howler.goes-off-weasleys",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap howler 30-45 s",
+      "when": [
+        "place = common room",
+        "days since howler_opened >= 1",
+        "home howler = none"
+      ],
+      "who": [
+        {
+          "as": "howler",
+          "role": "voice",
+          "name": "the Howler",
+          "mark": "room"
+        }
+      ],
+      "show": [
+        "the Howler, left unopened, jumps, tears itself open wherever it is and shouts, a hundred times louder than a voice, rattling the room and shaking dust from the ceiling; its words done, it drops, the scarlet goes up in flames, its black edges burn last, a thin black frame hangs in the air a heartbeat, then falls as ash",
+        "after the ash, a small scorched note flutters down to the desk"
+      ],
+      "lines": [
+        {
+          "speaker": "howler",
+          "medium": "said",
+          "key": "howler.shout-left",
+          "canon": "ours, Mrs Weasley's Howler brought to the wrong desk (Godric's events-q-howler-voice, option 1, when none is written); a Howler's roar shakes dust from the ceiling, then it bursts into flames and curls into ashes (CoS 6, checked); Percy writing to Mother (our locks.relock-3); left unopened it is worse (Neville, CoS 6, checked)",
+          "text": [
+            "FRED AND GEORGE WEASLEY! PERCY WRITES THAT YOU LET OFF FIREWORKS AT A DOOR. A DOOR! ONE MORE WORD AND YOU ARE COMING HOME ON THE NEXT TRAIN!"
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "errol",
+          "at": "desk",
+          "key": "howler.errol-left",
+          "canon": "ours, Godric's touch t1 on events-q-howler-voice (6.23 pm); Errol, the Weasleys' old owl, brings Ron's Howler (CoS 6, checked)",
+          "text": [
+            "Sorry. Wrong desk. Errol."
+          ]
+        }
+      ],
+      "starts": [
+        "stamp howler_opened",
+        "log \"A Howler for the Weasley twins went off by itself at the desk {day}; Errol had the wrong desk\""
+      ]
+    }
+  ]
+}

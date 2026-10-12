@@ -68,6 +68,8 @@
    (its `learn(X)`, kept on the device), for the twins' note that waits for Lumos (board req 179).
    Then his line on the little door's list (board req 177, Magic's B6 t1): `tried X`, a page moment, comes when his
    spell on X's lock answers nothing (Charms' `openLock` with `stuck`); `{year}` in a line is this year.
+   Then the Howler (board req 193, Godric's events-q-howler-voice): `home howler`, written or none, says whether a
+   grown-up wrote a Howler line at the letter page (its `howler`, in the letter's own key); `{howler}` shouts it.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -314,6 +316,8 @@
 
     /* The clock every date, hour and time of day reads. A deferred leave sets it to the moment he went, so its
        `time` and its stamps are those of the leaving, not of the next arrival. */
+    /* the Howler line a grown-up wrote at the letter page (page/letter-home.html keeps the letter in its own key), or '' */
+    function homeHowler() { var o = load('lumos.letterHome'); return (o && typeof o.howler === 'string' && o.howler.trim()) || ''; }
     function nowDate() { return clock != null ? new Date(clock) : new Date(); }
     function today() { return dayNumber(nowDate()); }
     /* the night as one count, a night belonging to the evening it began, so 10 pm and 2 am are one night */
@@ -389,6 +393,7 @@
         case 'things looked at': return (state.looked || []).length;   /* different things held close in the zoom, ever (req 127) */
         case 'secrets found': return (state.secrets || []).length;     /* the castle's secrets he has found, each once ever (req 180) */
         case 'parent parcel': return settings.parcel || 'none';         /* what a parent sends by owl from the grown-up corner */
+        case 'home howler': return homeHowler() ? 'written' : 'none';   /* a Howler line written at the letter page (req 193) */
         /* how this page was reached, from its `?from=`: room, corridor, dormitory, sleep (the waking), or none (Neville's
            snore on a night waking, 10 October 2026) */
         case 'from': return /^(room|corridor|dormitory|sleep)$/.test(params.get('from') || '') ? params.get('from') : 'none';
@@ -683,10 +688,12 @@
 
     /* `{password}`, `{last password}`, `{next password}`: a chain's week's words in a line, after `{intro}`. `{card}`
        (any variable a deck sets): the `say` of the card it holds, the name a voice uses for it. `{year}`: this year,
-       for his own line on the little door's list (board req 177). */
+       for his own line on the little door's list (board req 177). `{howler}`: the Howler line written at the letter
+       page, in capitals, a Howler shouting (board req 193). */
     function fillWords(text) {
       return text.replace(/\{((?:last |next )?[a-z]+)\}/g, function (all, n) {
         if (n === 'year') return String(nowDate().getFullYear());
+        if (n === 'howler') return homeHowler().toUpperCase();
         var v = /^(?:(?:last|next) )?([a-z]+)$/.exec(n);
         if (wordDefs[v[1]]) return String(value(n));
         var held = state.vars[n];
