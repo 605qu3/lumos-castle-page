@@ -441,31 +441,24 @@ window.castleFrame = function (opts) {
      camera's view offset, a window cut from the whole frame, so a page's fov, its moves and its taps (raycasts read
      the same projection) stay as they were. Zoomed in, a one-finger drag looks about inside the frame instead of
      turning the room, and a tap still taps. On for every page up to ZOOM_MAX; a page passes opts.zoom = { max } or
-     false, and sets limits at a stop with F.zoom.setLimits(min, max). As it closes in, a faint brass rim comes in at
-     the edges: the Omnioculars (GoF 7), with the saleswizard's line the first time on the device.
+     false, and sets limits at a stop with F.zoom.setLimits(min, max). The zoom is plain (Godric's Q32, 8.53 pm: no
+     rim); the first time on the device the saleswizard's line from GoF 7 shows, a hint of the Omnioculars, an item
+     the boys will get later (Magic's).
      Look switch: ?zoom=2 (or ?zoom=2,fx,fy, the point to look at as fractions of the frame from its top left). */
   var ZOOM_MAX = 3, ZOOM_DOUBLE = 2.5, ZOOM_KEY = 'lumos.castle.omnioculars';
   var zOpt = opts.zoom === undefined ? {} : opts.zoom;
   var zoom = (function () {
     var on = zOpt !== false, zMin = 1, zMax = (zOpt && zOpt.max) || ZOOM_MAX;
     var z = 1, ox = 0, oy = 0, anim = null, listeners = [];
-    var rim = document.createElement('div');
-    rim.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;opacity:0';
-    canvas.insertAdjacentElement('afterend', rim);
     var line = document.createElement('div');
     line.textContent = '“Omnioculars,” said the saleswizard eagerly. “You can replay action…slow everything down…”';
     line.style.cssText = 'position:fixed;left:50%;bottom:12%;transform:translateX(-50%);max-width:80%;text-align:center;' +
       'font:italic 17px Georgia,serif;color:#f1dfb0;text-shadow:0 1px 3px #000;pointer-events:none;opacity:0;transition:opacity 0.8s';
-    rim.insertAdjacentElement('afterend', line);
+    canvas.insertAdjacentElement('afterend', line);
     var lineShown = false;
     try { lineShown = !!localStorage.getItem(ZOOM_KEY); } catch (err) {}
 
-    function drawRim() {
-      var t = clamp((z - 1) / Math.max(0.01, zMax - 1), 0, 1);
-      var r = 104 - 16 * t;
-      rim.style.background = 'radial-gradient(ellipse closest-side at 50% 50%, rgba(0,0,0,0) ' + (r - 5) + '%, ' +
-        'rgba(214,176,92,0.5) ' + (r - 1) + '%, rgba(120,84,30,0.75) ' + r + '%, rgba(40,26,10,0.55) ' + (r + 3) + '%, rgba(8,6,3,0.7) 100%)';
-      rim.style.opacity = String(clamp((z - 1) / 0.5, 0, 1) * 0.55);
+    function hint() {
       if (!lineShown && z > 1.3) {
         lineShown = true;
         try { localStorage.setItem(ZOOM_KEY, '1'); } catch (err) {}
@@ -477,7 +470,7 @@ window.castleFrame = function (opts) {
       ox = clamp(ox, 0, z - 1); oy = clamp(oy, 0, z - 1);
       if (z <= 1.0001) { z = 1; ox = oy = 0; camera.clearViewOffset(); }
       else { var a = camera.aspect; camera.setViewOffset(z * a, z, ox * a, oy, a, 1); }   /* setViewOffset sets the aspect from these, so they carry it */
-      drawRim();
+      hint();
       for (var i = 0; i < listeners.length; i++) listeners[i](z);
     }
     /* zoom to nz keeping the point under the screen point (sx, sy), as fractions of the screen, where it is */
