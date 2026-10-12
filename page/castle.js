@@ -8,6 +8,7 @@
      background  the clear colour and the fog's, as an sRGB hex; fog is the FogExp2 density
      tintFor     function (mesh) giving a mesh's colour under the Layers button; default TINTS[its layer]
      onAct       function (act) for the page's own buttons; Layers, Res, Exp and ? are handled here
+     zoom        { max } for the pinch, double tap and wheel zoom (default 3), or false for none; F.zoom at run time
    set on the returned frame before any drawing loads:
      F.eye        the camera's resting position, about which placeCard scales a drawing made in perspective
      F.bentPlane  function (w, h) for a layer with bend: true (the round wall's radius is the page's)
@@ -435,6 +436,181 @@ window.castleFrame = function (opts) {
   if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
   resize();
 
+  /* ---------- zoom, to look closer (req 122; Godric's yes, 11 October 2026, 8.34 pm) ----------
+     A pinch, a double tap or the PC's wheel brings the view closer, the page's own camera untouched: the zoom is the
+     camera's view offset, a window cut from the whole frame, so a page's fov, its moves and its taps (raycasts read
+     the same projection) stay as they were. Zoomed in, a one-finger drag looks about inside the frame instead of
+     turning the room, and a tap still taps. On for every page up to ZOOM_MAX; a page passes opts.zoom = { max } or
+     false, and sets limits at a stop with F.zoom.setLimits(min, max). As it closes in, a faint brass rim comes in at
+     the edges: the Omnioculars (GoF 7), with the saleswizard's line the first time on the device.
+     Look switch: ?zoom=2 (or ?zoom=2,fx,fy, the point to look at as fractions of the frame from its top left). */
+  var ZOOM_MAX = 3, ZOOM_DOUBLE = 2.5, ZOOM_KEY = 'lumos.castle.omnioculars';
+  var zOpt = opts.zoom === undefined ? {} : opts.zoom;
+  var zoom = (function () {
+    var on = zOpt !== false, zMin = 1, zMax = (zOpt && zOpt.max) || ZOOM_MAX;
+    var z = 1, ox = 0, oy = 0, anim = null, listeners = [];
+    var rim = document.createElement('div');
+    rim.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;opacity:0';
+    canvas.insertAdjacentElement('afterend', rim);
+    var line = document.createElement('div');
+    line.textContent = '“Omnioculars,” said the saleswizard eagerly. “You can replay action… slow everything down…”';
+    line.style.cssText = 'position:fixed;left:50%;bottom:12%;transform:translateX(-50%);max-width:80%;text-align:center;' +
+      'font:italic 17px Georgia,serif;color:#f1dfb0;text-shadow:0 1px 3px #000;pointer-events:none;opacity:0;transition:opacity 0.8s';
+    rim.insertAdjacentElement('afterend', line);
+    var lineShown = false;
+    try { lineShown = !!localStorage.getItem(ZOOM_KEY); } catch (err) {}
+
+    function drawRim() {
+      var t = clamp((z - 1) / Math.max(0.01, zMax - 1), 0, 1);
+      var r = 104 - 16 * t;
+      rim.style.background = 'radial-gradient(ellipse closest-side at 50% 50%, rgba(0,0,0,0) ' + (r - 5) + '%, ' +
+        'rgba(214,176,92,0.5) ' + (r - 1) + '%, rgba(120,84,30,0.75) ' + r + '%, rgba(40,26,10,0.55) ' + (r + 3) + '%, rgba(8,6,3,0.7) 100%)';
+      rim.style.opacity = String(clamp((z - 1) / 0.5, 0, 1) * 0.55);
+      if (!lineShown && z > 1.3) {
+        lineShown = true;
+        try { localStorage.setItem(ZOOM_KEY, '1'); } catch (err) {}
+        line.style.opacity = '1';
+        setTimeout(function () { line.style.opacity = '0'; }, 5500);
+      }
+    }
+    function apply() {
+      ox = clamp(ox, 0, z - 1); oy = clamp(oy, 0, z - 1);
+      if (z <= 1.0001) { z = 1; ox = oy = 0; camera.clearViewOffset(); }
+      else { var a = camera.aspect; camera.setViewOffset(z * a, z, ox * a, oy, a, 1); }   /* setViewOffset sets the aspect from these, so they carry it */
+      drawRim();
+      for (var i = 0; i < listeners.length; i++) listeners[i](z);
+    }
+    /* zoom to nz keeping the point under the screen point (sx, sy), as fractions of the screen, where it is */
+    function about(nz, sx, sy) {
+      nz = clamp(nz, zMin, zMax);
+      var fx = (ox + sx) / z, fy = (oy + sy) / z;
+      z = nz; ox = fx * z - sx; oy = fy * z - sy;
+      apply();
+    }
+    function animate(nz, sx, sy, dur) {
+      var z0 = z, t0 = performance.now(), my = {};
+      anim = my;
+      (function step() {
+        if (anim !== my) return;
+        var t = clamp((performance.now() - t0) / (dur * 1000), 0, 1);
+        about(lerp(z0, nz, easeInOut(t)), sx, sy);
+        if (t < 1) requestAnimationFrame(step); else anim = null;
+      })();
+    }
+    function frac(e) {
+      var r = canvas.getBoundingClientRect();
+      return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
+    }
+
+    /* the gestures, caught on the window before the page's own handlers on the canvas */
+    var pts = {}, n = 0, pinch = null, pan = null, lastTap = null, synth = false;
+    function cancelPage(id) {
+      synth = true;
+      try { canvas.dispatchEvent(new PointerEvent('pointercancel', { pointerId: id, bubbles: true })); } catch (err) {}
+      synth = false;
+    }
+    function startPinch() {
+      var ids = Object.keys(pts), a = pts[ids[0]], b = pts[ids[1]];
+      var m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, z: z, fx: (ox + m.x) / z, fy: (oy + m.y) / z };
+    }
+    window.addEventListener('pointerdown', function (e) {
+      if (!on || synth || e.target !== canvas) return;
+      pts[e.pointerId] = frac(e); n++;
+      if (n === 2 && !pinch) {
+        anim = null;
+        for (var id in pts) if (+id !== e.pointerId) cancelPage(+id);
+        startPinch(); pan = null;
+      }
+      if (pinch) { e.stopPropagation(); e.preventDefault(); return; }
+      pan = z > 1.01 ? { x: pts[e.pointerId].x, y: pts[e.pointerId].y, moved: false, id: e.pointerId } : null;
+    }, true);
+    window.addEventListener('pointermove', function (e) {
+      if (!on || synth || !(e.pointerId in pts)) return;
+      var p = frac(e), q = pts[e.pointerId];
+      pts[e.pointerId] = p;
+      if (pinch) {
+        var ids = Object.keys(pts);
+        if (ids.length === 2) {
+          var a = pts[ids[0]], b = pts[ids[1]], m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+          z = clamp(pinch.z * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d, zMin, zMax);
+          ox = pinch.fx * z - m.x; oy = pinch.fy * z - m.y;
+          apply();
+        }
+        e.stopPropagation(); return;
+      }
+      if (pan && pan.id === e.pointerId) {
+        ox -= p.x - q.x; oy -= p.y - q.y; apply();
+        if (Math.abs(p.x - pan.x) * canvas.clientWidth + Math.abs(p.y - pan.y) * canvas.clientHeight > 8) pan.moved = true;
+        e.stopPropagation();
+      }
+    }, true);
+    function lift(e) {
+      if (!on || synth || !(e.pointerId in pts)) return;
+      var p = pts[e.pointerId];
+      delete pts[e.pointerId]; n = Math.max(0, n - 1);
+      if (pinch) {
+        e.stopPropagation();
+        if (n === 0) { pinch = null; if (z < 1.12) animate(1, 0.5, 0.5, 0.25); }
+        return;
+      }
+      if (pan && pan.id === e.pointerId) {
+        var moved = pan.moved; pan = null;
+        if (moved) { e.stopPropagation(); cancelPage(e.pointerId); lastTap = null; return; }
+      }
+      if (e.type !== 'pointerup') return;
+      var now = performance.now();
+      if (lastTap && now - lastTap.t < 330 && Math.abs(p.x - lastTap.x) * canvas.clientWidth + Math.abs(p.y - lastTap.y) * canvas.clientHeight < 40) {
+        lastTap = null;
+        e.stopPropagation(); cancelPage(e.pointerId);
+        if (z > 1.05) animate(zMin, p.x, p.y, 0.45);
+        else animate(Math.min(ZOOM_DOUBLE, zMax), p.x, p.y, 0.45);
+        return;
+      }
+      lastTap = { t: now, x: p.x, y: p.y };
+    }
+    window.addEventListener('pointerup', lift, true);
+    window.addEventListener('pointercancel', lift, true);
+    canvas.addEventListener('wheel', function (e) {
+      if (!on) return;
+      e.preventDefault();
+      anim = null;
+      var p = frac(e);
+      about(z * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), p.x, p.y);
+    }, { passive: false });
+
+    var api = {
+      level: function () { return z; },
+      set: function (nz, fx, fy, dur) {
+        /* look at the frame's point (fx, fy) at nz; dur in seconds, 0 or none at once */
+        nz = clamp(nz, zMin, zMax);
+        if (fx == null) { fx = (ox + 0.5) / z; fy = (oy + 0.5) / z; }
+        var tx = fx * nz - 0.5, ty = fy * nz - 0.5;
+        anim = null;
+        if (!dur) { z = nz; ox = tx; oy = ty; apply(); return; }
+        /* the point slides to the middle as it closes in */
+        var z0 = z, ox0 = ox, oy0 = oy, t0 = performance.now(), my = {};
+        anim = my;
+        (function step() {
+          if (anim !== my) return;
+          var t = easeInOut(clamp((performance.now() - t0) / (dur * 1000), 0, 1));
+          z = lerp(z0, nz, t); ox = lerp(ox0, tx, t); oy = lerp(oy0, ty, t); apply();
+          if (t < 1) requestAnimationFrame(step); else anim = null;
+        })();
+      },
+      reset: function (dur) { if (dur) animate(1, 0.5, 0.5, dur); else { anim = null; z = 1; apply(); } },
+      setLimits: function (min, max) { zMin = Math.max(1, min || 1); zMax = Math.max(zMin, max || ZOOM_MAX); about(z, 0.5, 0.5); },
+      enable: function (yes) { on = !!yes; if (!on) api.reset(); },
+      onChange: function (fn) { listeners.push(fn); }
+    };
+    try {
+      var zs = new URLSearchParams(location.search).get('zoom');
+      if (zs && on) { var zp = zs.split(',').map(Number); api.set(zp[0] || 1, zp.length > 2 ? zp[1] : 0.5, zp.length > 2 ? zp[2] : 0.5); }
+    } catch (err) {}
+    window.castleZoom = api;
+    return api;
+  })();
+
   /* the fps line: call once a frame, after rendering, with the frame's dt */
   var fpsN = 0, fpsT = 0;
   function stats(dt) {
@@ -658,7 +834,7 @@ window.castleFrame = function (opts) {
     layered: layered, TINTS: TINTS, register: register, solid: solid, box: box, cutoutMesh: cutoutMesh,
     sheetTexture: sheetTexture, applyLayer: applyLayer, placeCard: placeCard, applySurface: applySurface, applyPlan: applyPlan,
     quietCanvas: quietCanvas, unstainCanvas: unstainCanvas, sillCanvas: sillCanvas, wornCanvas: wornCanvas,
-    setTint: setTint, resize: resize, stats: stats,
+    setTint: setTint, resize: resize, stats: stats, zoom: zoom,
     from: from, reveal: reveal, travel: travel, savePlace: savePlace, readPlace: readPlace,
     CORRIDOR: CORRIDOR, buildCorridor: buildCorridor, mountInHole: mountInHole, corridorInHole: corridorInHole };
   for (var k in names) F[k] = names[k];
