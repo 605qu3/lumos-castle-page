@@ -12,7 +12,9 @@
    set on the returned frame before any drawing loads:
      F.eye        the camera's resting position, about which placeCard scales a drawing made in perspective
      F.bentPlane  function (w, h) for a layer with bend: true (the round wall's radius is the page's)
-     F.onSurface  function (id, texture, color), called after a surface's drawing is applied */
+     F.onSurface  function (id, texture, color), called after a surface's drawing is applied
+   and called by the page from inside each of its taps:
+     F.tapped     (acted) whether the tap did anything; one that did nothing gets the frame's mote (req 149) */
 (function () {
 'use strict';
 
@@ -454,6 +456,7 @@ window.castleFrame = function (opts) {
   var ZOOM_MAX = 3, ZOOM_DOUBLE = 2.5, ZOOM_KEY = 'lumos.castle.omnioculars', LOOK_Z = 2, LOOK_HOLD_S = 1;
   var zOpt = opts.zoom === undefined ? {} : opts.zoom;
   var seen = null;   /* seen(point): nothing opaque between the eye and a point in the world, set in the zoom's closure */
+  var markTap = null;   /* the page's word on its last tap, for the double tap (req 149) */
   var zoom = (function () {
     var on = zOpt !== false, zMin = 1, zMax = (zOpt && zOpt.max) || ZOOM_MAX;
     var z = 1, ox = 0, oy = 0, anim = null, listeners = [];
@@ -614,15 +617,18 @@ window.castleFrame = function (opts) {
       }
       if (e.type !== 'pointerup') return;
       var now = performance.now();
-      if (lastTap && now - lastTap.t < 330 && Math.abs(p.x - lastTap.x) * canvas.clientWidth + Math.abs(p.y - lastTap.y) * canvas.clientHeight < 40) {
+      /* a double tap zooms only where its first tap did nothing (the vocabulary's §7, req 149): a first tap the page
+         reported as acting (F.tapped(true)) went to a thing, so the second is an ordinary tap; unreported, as before */
+      if (lastTap && !lastTap.acted && now - lastTap.t < 330 && Math.abs(p.x - lastTap.x) * canvas.clientWidth + Math.abs(p.y - lastTap.y) * canvas.clientHeight < 40) {
         lastTap = null;
         e.stopPropagation(); cancelPage(e.pointerId);
         if (z > 1.05) animate(zMin, p.x, p.y, 0.45);
         else animate(Math.min(ZOOM_DOUBLE, zMax), p.x, p.y, 0.45);
         return;
       }
-      lastTap = { t: now, x: p.x, y: p.y };
+      lastTap = { t: now, x: p.x, y: p.y, acted: false };
     }
+    markTap = function (acted) { if (lastTap) lastTap.acted = !!acted; };
     window.addEventListener('pointerup', lift, true);
     window.addEventListener('pointercancel', lift, true);
     canvas.addEventListener('wheel', function (e) {
@@ -667,6 +673,54 @@ window.castleFrame = function (opts) {
     window.castleZoom = api;
     return api;
   })();
+
+  /* ---------- every tap answers, and one Back (req 149) ----------
+     The Interaction lane's vocabulary (docs/interaction-vocabulary.md, adopted by Godric, 12 October 2026, Q1 and Q1b).
+     §3: a page tells the frame what each of its taps did, F.tapped(acted), from inside its own tap handler (the lift
+     that made it is the point, or pass x, y); a tap that found nothing gets a mote of warm wand-light where the finger
+     lifted, gone in half a second, a tiny Lumos (his touch t1), the same in every room. At a stop a tap on nothing goes
+     back, so the page reports it as acting. A page that reports nothing gets no mote, and its double tap is as it was.
+     §7: a double tap zooms only where its first tap did nothing (the zoom's lift reads the same word).
+     §5: one Back token, kit.backBtn, bottom right, the word the page gives it: at least 2 cm square to the finger on the
+     iPad and the phone. 2 cm is 104 CSS px on an 11-inch iPad (1180 x 820 points at 264 ppi, 2x: 132 per inch) and
+     121 on a 390 x 844 iPhone (460 ppi, 3x: 153 per inch), so the token is 124 px wide and 60 tall, and a clear
+     reach above it makes its target 124 square. Rule 4 builds nothing here: no glint, no quiet clock (Q1b).
+     Look switch: ?mote=3 holds each mote three seconds, for a shot. */
+  var MOTE_S = 0.5, lift = null, motes = 0;
+  try { var ms = parseFloat(new URLSearchParams(location.search).get('mote')); if (ms > 0) MOTE_S = ms; } catch (err) {}
+  window.addEventListener('pointerup', function (e) { if (e.target === canvas) lift = { x: e.clientX, y: e.clientY }; }, true);
+  function mote(x, y) {
+    var d = document.createElement('div'), s = 36;
+    d.className = 'castle-mote';
+    d.style.cssText = 'position:fixed;left:' + (x - s / 2) + 'px;top:' + (y - s / 2) + 'px;width:' + s + 'px;height:' + s + 'px;' +
+      'border-radius:50%;pointer-events:none;mix-blend-mode:screen;z-index:5;' +
+      'background:radial-gradient(circle,rgba(255,252,236,1) 0,rgba(255,226,150,0.9) 16%,rgba(255,184,84,0.45) 38%,rgba(255,160,60,0) 70%)';
+    canvas.insertAdjacentElement('afterend', d);
+    motes++;
+    var gone = function () { if (d.parentNode) d.parentNode.removeChild(d); };
+    if (d.animate) {
+      d.animate([
+        { opacity: 0, transform: 'scale(0.35)' },
+        { opacity: 1, transform: 'scale(1)', offset: 0.15 },
+        { opacity: 0.85, transform: 'scale(1.1)', offset: 0.5 },
+        { opacity: 0, transform: 'scale(1.3)' }
+      ], { duration: MOTE_S * 1000, easing: 'ease-out', fill: 'forwards' }).onfinish = gone;
+    } else setTimeout(gone, MOTE_S * 1000);
+  }
+  function tapped(acted, x, y) {
+    if (markTap) markTap(acted);
+    if (acted) return;
+    if (x == null) { if (!lift) return; x = lift.x; y = lift.y; }
+    mote(x, y);
+  }
+  window.castleMotes = function () { return motes; };
+  if (backBtn) {
+    backBtn.style.minWidth = '124px'; backBtn.style.minHeight = '60px'; backBtn.style.fontSize = '18px';
+    backBtn.classList.add('castle-back');
+    var reach = document.createElement('style');
+    reach.textContent = '#back.castle-back::after{content:"";position:absolute;left:0;right:0;bottom:0;top:-64px}';
+    document.head.appendChild(reach);
+  }
 
   /* the fps line: call once a frame, after rendering, with the frame's dt */
   var fpsN = 0, fpsT = 0;
@@ -939,7 +993,7 @@ window.castleFrame = function (opts) {
     layered: layered, TINTS: TINTS, register: register, solid: solid, box: box, cutoutMesh: cutoutMesh,
     sheetTexture: sheetTexture, applyLayer: applyLayer, placeCard: placeCard, applySurface: applySurface, applyPlan: applyPlan,
     quietCanvas: quietCanvas, unstainCanvas: unstainCanvas, sillCanvas: sillCanvas, wornCanvas: wornCanvas,
-    setTint: setTint, resize: resize, stats: stats, zoom: zoom, seen: function (p) { return seen(p); }, torchCues: torchCues,
+    setTint: setTint, resize: resize, stats: stats, zoom: zoom, seen: function (p) { return seen(p); }, torchCues: torchCues, tapped: tapped,
     from: from, reveal: reveal, travel: travel, savePlace: savePlace, readPlace: readPlace,
     CORRIDOR: CORRIDOR, buildCorridor: buildCorridor, mountInHole: mountInHole, corridorInHole: corridorInHole };
   for (var k in names) F[k] = names[k];

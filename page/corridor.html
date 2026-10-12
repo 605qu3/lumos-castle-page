@@ -189,7 +189,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=7"></script>
+<script src="castle.js?v=8"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=15"></script>
 <script>
@@ -2331,20 +2331,25 @@ function arriveFromRoom() {
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
   if (!helpEl.hidden) helpEl.hidden = true;
-  if (tween || leaving || herOpening || view !== 'length') return;
+  /* each tap tells the frame whether it did anything (req 149 and 150): one that found nothing gets the frame's mote
+     of wand-light, and a double tap zooms only where its first tap did nothing; a glide under way is its answer */
+  var said = function (acted) { if (kit.tapped) kit.tapped(acted); };
+  if (tween || leaving || herOpening) { said(true); return; }
+  if (view !== 'length') { said(false); return; }
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables.filter(function (m) { return m.visible; }), false);
-  if (!hits.length) { goBack(); return; }
+  if (!hits.length) { said(mode === 'stop'); goBack(); return; }   /* at a stop, nothing takes him back */
   var hit = hits[0].object.userData;
   /* her (req 79): from afar a tap on her is her walk-up; at her stop it wakes her for the password, raised here inside
      the tap's own handler, since the runtime opens the ear in it and iOS lets a page listen only from a touch */
-  if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { goTo(hit.stop); return; }
+  if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { said(true); goTo(hit.stop); return; }
   if (hit.thing && castle && castle.visit()) {
     if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
-    castle.tap(hit.thing); return;
+    said(true); castle.tap(hit.thing); return;
   }
+  said(!!hit.stop && hit.stop !== atStop);
   if (hit.stop) goTo(hit.stop);
 }
 
