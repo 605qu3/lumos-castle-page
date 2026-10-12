@@ -660,8 +660,8 @@ turned down for hanging facing out. Keyed at 1189 x 2488 px, 2378 px per metre, 
     <button type="button" data-act="help">?</button>
   </div>
 </div>
-<button id="back" type="button" hidden>Back to the room</button>
-<div id="help">Drag to look around. Tap the fire, the rug or a chair to go up to the fireside, then tap the fire to work the bellows. Tap the portrait hole to open it, the cat to make it sit. Tap the notice board to walk up to it, then tap a notice to take it down. The grey shapes are placeholders.</div>
+<button id="back" type="button" hidden>Back</button>
+<div id="help">Drag to look around. Tap the fire, the rug or an armchair to go up to the fireside, then tap the fire to work the bellows. Tap the portrait hole to open it, the cat to make it sit. Tap the notice board to walk up to it, then tap a notice to take it down. The grey shapes are placeholders.</div>
 
 <script>
 var TILES = {
@@ -671,7 +671,7 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=7"></script>
+<script src="castle.js?v=8"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=15"></script>
 <script src="charms/guide.js?v=1"></script>
@@ -5067,9 +5067,52 @@ function catStandUp() {
   catSit.visible = false;
 }
 
+/* Every tap is heard (req 151, docs/interaction-vocabulary.md §10 and §3; Godric's Q1 and Q1b, 12 October 2026). A tap
+   that acts on a thing tells the runtime its name, castle.tap(name), here in one place, the stops' walk-ups and the
+   things at each stop alike; the names are the ones the events records wait on where one does (sofa, cat, stair,
+   bookshelf: page/events/sofa.json, cat.json, stair.json, clementine.json). Five things tell their own inside their
+   handlers and are left to them: the hole as it opens, the fire and bellows, the letter on the sill, a sitter, the
+   chess on the rug. A tap at a stop that only goes back names nothing. Then the frame is told whether the tap acted
+   (kit.tapped, req 149): only a tap at rest in the room that finds nothing gets the frame's mote. */
+function tapName(o) {
+  if (!o) return null;
+  if (o === sofa) return 'sofa';
+  if (o === catWalk || o === catSit || o === curl.mesh) return 'cat';
+  if (o === stairs) return 'stair';
+  if (o === bookcase) return 'bookshelf';
+  if (o === ladder) return 'ladder';
+  if (o === sideTable) return 'desk';
+  if (o === deskChair) return 'desk chair';
+  if (o === candle.mesh) return 'candle';
+  if (o === homeFeather.mesh) return 'feather';
+  if (o === books.mesh) return 'books';
+  if (o === books.hist || o === books.openCard) return 'history';
+  if (o === books.slip) return 'library slip';
+  if (o === scarf) return 'scarf';
+  if (o === satchel) return 'satchel';
+  if (o === curios.jar) return 'jar';
+  if (o === cloak || o === cloakPeek) return 'cloak';
+  if (o === ring) return 'ring';
+  if (o === hearthBack || o === bellows) return 'hearth';   /* the walk-up from the room; at the fireside they tell 'fire' */
+  if (o === rug) return 'rug';
+  if (o === chairL) return 'armchair';
+  if (o === wingback) return 'wingback';
+  if (o === homework.essay) return 'essay';
+  if (o === homework.quill) return 'quill';
+  if (o === homework.bottle) return 'ink';
+  if (tablePart(o)) return 'table';
+  if (o.userData.paper) return o.userData.paper.spec.sill ? null : o.userData.paper.spec.desk ? 'letter from home' : 'notice';
+  if (boardParts.indexOf(o) >= 0) return 'notice board';
+  return null;
+}
 function tap(cx, cy) {
   if (!helpEl.hidden) helpEl.hidden = true;
   if (tween) return;
+  var r = tapDo(cx, cy);
+  if (r.name && castle) castle.tap(r.name);
+  if (kit && kit.tapped) kit.tapped(r.acted);
+}
+function tapDo(cx, cy) {
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
@@ -5093,61 +5136,64 @@ function tap(cx, cy) {
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
-  if (mode === 'hand') { if (homeHandTap()) return; returnPaper(false); return; }
+  var told = { name: tapName(hit), acted: true }, back = { name: null, acted: true };
+  if (mode === 'hand') { if (homeHandTap()) return back; returnPaper(false); return back; }
   if (mode === 'board') {
-    if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return; }
-    if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) { booksTap(); return; }
-    if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
-    if (hit && boardParts.indexOf(hit) >= 0) return;
+    if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return told; }
+    if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) { booksTap(); return told; }
+    if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return told; }
+    if (hit && boardParts.indexOf(hit) >= 0) return told;
     leaveBoard();
-    return;
+    return back;
   }
   if (mode === 'desk') {
     if (hit === homeFeather.mesh) homeFeatherTap();
     else if (hit === candle.mesh) candleTap();
     else if (hit && hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
     else if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) booksTap();
-    else leaveDesk();
-    return;
+    else { leaveDesk(); return back; }
+    return told;
   }
   if (mode === 'table') {
     if (hit && (hit === homework.quill || hit === homework.bottle)) { if (homework.t < 0) homework.next = 0; }
     else if (hit && hit === homework.essay) essayCurlTap();
-    else if (!tablePart(hit)) leaveTable();
-    return;
+    else if (!tablePart(hit)) { leaveTable(); return back; }
+    return told;
   }
   if (mode === 'hole') {
     if (hit === holeTap) holeMouthTap();
     else if (hit === cloak || hit === cloakPeek) cloakTap();
-    else if (hit !== ring) leaveHole();
-    return;
+    else if (hit !== ring) { leaveHole(); return back; }
+    return told;
   }
   if (mode === 'case') {
-    if (hit !== bookcase && hit !== ladder) leaveCase();
-    return;
+    if (hit !== bookcase && hit !== ladder) { leaveCase(); return back; }
+    return told;
   }
   if (mode === 'sofa') {
     var sat = castle ? figureTapped(hits) : null;
     if (sat) castle.tap(sat);
     else if (hit && hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
-    else if (hit !== sofa) leaveSofa();
-    return;
+    else if (hit !== sofa) { leaveSofa(); return back; }
+    else return told;
+    return back;                                      /* told in its own call */
   }
   if (mode === 'fireside') {
-    if (hit === hearthBack || hit === bellows) fireTap();
+    if (hit === hearthBack || hit === bellows) { fireTap(); return back; }   /* told 'fire' in its own call */
     else if (hit && hit === scarf) scarfTap();
     else if (hit && hit === satchel) satchelTap();
     else if (hit && hit === curios.jar) jarTap(hits[0].point);
     else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
     else if (hit && hit === curl.mesh) curlTap();
-    else leaveFireside();
-    return;
+    else { leaveFireside(); return back; }
+    return told;
   }
+  var nothing = { name: null, acted: mode !== 'room' };   /* only a tap at rest that finds nothing gets the mote */
   var chessHit = mode === 'room' && castle && chessBoard.visible ? raycaster.intersectObjects(chessBoard.children, false)[0] : null;
-  if (chessHit && (!hits.length || chessHit.distance <= hits[0].distance)) { castle.tap('rug-chess'); return; }
+  if (chessHit && (!hits.length || chessHit.distance <= hits[0].distance)) { castle.tap('rug-chess'); return back; }
   var as = mode === 'room' && castle ? figureTapped(hits) : null;
-  if (as) { castle.tap(as); return; }
-  if (mode !== 'room' || !hit) return;
+  if (as) { castle.tap(as); return back; }
+  if (mode !== 'room' || !hit) return nothing;
   if (hit === homeFeather.mesh) homeFeatherTap();
   else if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
   else if (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard) booksTap();
@@ -5167,6 +5213,8 @@ function tap(cx, cy) {
   else if (tablePart(hit)) goTable();
   else if (hit === sofa) goSofa();
   else if (hit === bookcase || hit === ladder) goCase();
+  else return nothing;
+  return told;
 }
 
 /* drag versus tap */
