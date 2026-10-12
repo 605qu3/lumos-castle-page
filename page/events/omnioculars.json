@@ -2,16 +2,40 @@
   "chain": "omnioculars",
   "room": [
     {
-      "when": ["place = common room", "omni_owl = yes"],
-      "show": ["the owl waiting on the sill beside the parcel"]
+      "when": [
+        "place = common room",
+        "omni_owl = yes"
+      ],
+      "show": [
+        "the owl waiting on the sill beside the parcel, \"from Hagrid\" scrawled across its paper"
+      ]
     },
     {
-      "when": ["place = common room", "omni_parcel = yes", "omni_owl != yes"],
-      "show": ["a small brown-paper parcel waiting on the sill"]
+      "when": [
+        "place = common room",
+        "omni_parcel = yes",
+        "omni_owl != yes"
+      ],
+      "show": [
+        "a small brown-paper parcel waiting on the sill, \"from Hagrid\" scrawled across its paper"
+      ]
     },
     {
-      "when": ["omni = held"],
-      "show": ["his Omnioculars to hand"]
+      "when": [
+        "place = common room",
+        "omni_cake = yes"
+      ],
+      "show": [
+        "a rock cake on the sill"
+      ]
+    },
+    {
+      "when": [
+        "omni = held"
+      ],
+      "show": [
+        "his Omnioculars to hand"
+      ]
     }
   ],
   "records": [
@@ -21,8 +45,13 @@
       "source": "device",
       "leans": [],
       "moment": "look close",
-      "when": ["omni_looking != yes"],
-      "starts": ["set omni_looking = yes", "stamp omni_first_look"]
+      "when": [
+        "omni_looking != yes"
+      ],
+      "starts": [
+        "set omni_looking = yes",
+        "stamp omni_first_look"
+      ]
     },
     {
       "id": "omnioculars.earned",
@@ -30,17 +59,37 @@
       "source": "device",
       "leans": [],
       "moment": "wait 5-20 s",
-      "when": ["place = common room", "things looked at >= 12", "days since omni_first_look >= 1", "omni != held",
-               "omni_parcel != yes", "owl_landed != yes", "owl_waiting != yes"],
+      "when": [
+        "place = common room",
+        "things looked at >= 12",
+        "days since omni_first_look >= 1",
+        "omni != held",
+        "omni_parcel != yes",
+        "owl_landed != yes",
+        "owl_waiting != yes"
+      ],
       "one_of": "omni-parcel",
       "weight": 1,
       "show_at": {
-        "morning": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
-        "day": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
-        "evening": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
-        "night": ["an owl lands on the moonlit sill with a small brown-paper parcel, taps its beak on the glass three times, tap-tap-tap, sets the parcel down and waits beside it"]
+        "morning": [
+          "an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"
+        ],
+        "day": [
+          "an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"
+        ],
+        "evening": [
+          "an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"
+        ],
+        "night": [
+          "an owl lands on the moonlit sill with a small brown-paper parcel, taps its beak on the glass three times, tap-tap-tap, sets the parcel down and waits beside it"
+        ]
       },
-      "starts": ["set omni_parcel = yes", "set omni_owl = yes", "set owl_landed = yes"]
+      "starts": [
+        "set omni_parcel = yes",
+        "set omni_owl = yes",
+        "set owl_landed = yes",
+        "set omni_from = looking"
+      ]
     },
     {
       "id": "omnioculars.from-a-parent",
@@ -48,17 +97,36 @@
       "source": "device",
       "leans": [],
       "moment": "wait 5-20 s",
-      "when": ["place = common room", "parent parcel = omnioculars", "omni != held",
-               "omni_parcel != yes", "owl_landed != yes", "owl_waiting != yes"],
+      "when": [
+        "place = common room",
+        "parent parcel = omnioculars",
+        "omni != held",
+        "omni_parcel != yes",
+        "owl_landed != yes",
+        "owl_waiting != yes"
+      ],
       "one_of": "omni-parcel",
       "weight": 1,
       "show_at": {
-        "morning": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
-        "day": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
-        "evening": ["an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"],
-        "night": ["an owl lands on the moonlit sill with a small brown-paper parcel, taps its beak on the glass three times, tap-tap-tap, sets the parcel down and waits beside it"]
+        "morning": [
+          "an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"
+        ],
+        "day": [
+          "an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"
+        ],
+        "evening": [
+          "an owl swoops down to the sill with a small brown-paper parcel, sets it down and waits beside it"
+        ],
+        "night": [
+          "an owl lands on the moonlit sill with a small brown-paper parcel, taps its beak on the glass three times, tap-tap-tap, sets the parcel down and waits beside it"
+        ]
       },
-      "starts": ["set omni_parcel = yes", "set omni_owl = yes", "set owl_landed = yes"]
+      "starts": [
+        "set omni_parcel = yes",
+        "set omni_owl = yes",
+        "set owl_landed = yes",
+        "set omni_from = parent"
+      ]
     },
     {
       "id": "omnioculars.opened",
@@ -66,9 +134,63 @@
       "source": "device",
       "leans": [],
       "moment": "tap parcel",
-      "when": ["place = common room", "omni_parcel = yes"],
-      "show": ["the parcel opened: two pairs of brass Omnioculars covered in knobs and dials, one labelled for him and one for his brother, and a short note"],
-      "starts": ["set omni_parcel = no", "set omni = held"]
+      "when": [
+        "place = common room",
+        "omni_parcel = yes",
+        "omni_from != parent"
+      ],
+      "show": [
+        "the parcel opened: two pairs of brass Omnioculars covered in knobs and dials, one labelled for him and one for his brother, a short note in a big untidy hand, and a rock cake that rolls out onto the sill"
+      ],
+      "starts": [
+        "set omni_parcel = no",
+        "set omni = held",
+        "set omni_cake = yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hagrid",
+          "at": "windowsill",
+          "key": "omnioculars.hagrid-note",
+          "canon": "Hagrid's voice: Magic's draft and Godric's touch (11 October 2026, 10.04 pm), after PS 14, where he won Norbert's egg off a stranger at cards and thought the man \"quite glad ter get rid of it, ter be honest\"; checked against the text, 11 October 2026; the rest makes no book claim",
+          "text": [
+            "Saw yeh lookin' close at everythin', an' I thought o' you. Won 'em off a stranger in a game o' cards. Think he was quite glad ter get rid of 'em, ter be honest. One fer you, one fer yer brother.\n\nHagrid"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "omnioculars.opened-from-a-parent",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parcel",
+      "when": [
+        "place = common room",
+        "omni_parcel = yes",
+        "omni_from = parent"
+      ],
+      "show": [
+        "the parcel opened: two pairs of brass Omnioculars covered in knobs and dials, one labelled for him and one for his brother, a short note in a big untidy hand, and a rock cake that rolls out onto the sill"
+      ],
+      "starts": [
+        "set omni_parcel = no",
+        "set omni = held",
+        "set omni_cake = yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hagrid",
+          "at": "windowsill",
+          "key": "omnioculars.hagrid-note-parent",
+          "canon": "Hagrid's voice: Magic's draft and Godric's touch (11 October 2026, 10.04 pm), after PS 14, where he won Norbert's egg off a stranger at cards and thought the man \"quite glad ter get rid of it, ter be honest\"; checked against the text, 11 October 2026; the rest makes no book claim",
+          "text": [
+            "These made me think o' you. Won 'em off a stranger in a game o' cards. Think he was quite glad ter get rid of 'em, ter be honest. One fer you, one fer yer brother.\n\nHagrid"
+          ]
+        }
+      ]
     },
     {
       "id": "omnioculars.owl-hoots",
@@ -76,9 +198,16 @@
       "source": "device",
       "leans": [],
       "moment": "tap parcel",
-      "when": ["place = common room", "omni_owl = yes"],
-      "show": ["the owl gives a soft hoot, ruffles its feathers and flies off"],
-      "starts": ["set omni_owl = no"]
+      "when": [
+        "place = common room",
+        "omni_owl = yes"
+      ],
+      "show": [
+        "the owl gives a soft hoot, ruffles its feathers and flies off"
+      ],
+      "starts": [
+        "set omni_owl = no"
+      ]
     },
     {
       "id": "omnioculars.owl-goes",
@@ -86,9 +215,31 @@
       "source": "device",
       "leans": [],
       "moment": "wait 45-75 s",
-      "when": ["place = common room", "omni_owl = yes"],
-      "show": ["the owl ruffles its feathers and flies off, the parcel left on the sill"],
-      "starts": ["set omni_owl = no"]
+      "when": [
+        "place = common room",
+        "omni_owl = yes"
+      ],
+      "show": [
+        "the owl ruffles its feathers and flies off, the parcel left on the sill"
+      ],
+      "starts": [
+        "set omni_owl = no"
+      ]
+    },
+    {
+      "id": "omnioculars.rock-cake",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap rock cake",
+      "when": [
+        "place = common room",
+        "omni_cake = yes"
+      ],
+      "show": [
+        "a loud crunch, the rock cake not giving at all, and a polite \"Mmm\""
+      ],
+      "starts": []
     },
     {
       "id": "omnioculars.leave",
@@ -97,7 +248,10 @@
       "leans": [],
       "moment": "leave",
       "when": [],
-      "starts": ["set omni_owl = no"]
+      "starts": [
+        "set omni_owl = no",
+        "set omni_cake = no"
+      ]
     }
   ]
 }
