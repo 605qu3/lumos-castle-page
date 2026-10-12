@@ -14,12 +14,13 @@ window.CASTLE_MODEL = {
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
+    "storey": 5.2, "storey_about": "Godric's 3.1 (12 October 2026, 6.23 pm): the corridor's built 4.5 m and a 0.7 m vault, every moving flight alike; the Great Hall and the Entrance Hall rise through two storeys, the Entrance Hall opening into the stair hall's well, its ceiling too high to make out (PS 7)",
     "about": "One long east-west block, the front doors on the north, the lake and the cliff on the south (Godric's 2.1, 12 October 2026, 5.57 pm). One stair hall runs from the north range to the south face, the marble and moving staircases in its well.",
     "cite": "the author's grounds sketch (the southern approach over the lake, the front entrance at the north); PS 7, PS 8, HBP 24"
   },
   "masses": [
     { "id": "north range", "rect": [0, 50, 160, 72], "floors": "G-7", "state": "designed" },
-    { "id": "south range, west", "rect": [0, 0, 68, 18], "floors": "G-7", "state": "designed", "about": "rises to the seventh floor for the Gryffindor corridor" },
+    { "id": "south range, west", "rect": [0, 0, 68, 18], "floors": "G-7", "state": "designed", "roof": 41.6, "parapet": 42.6, "about": "rises to the seventh floor for the Gryffindor corridor; a lead flat behind battlements, low enough that the dormitory's east windows (sills at 44.9) see over it" },
     { "id": "south range, east", "rect": [92, 0, 160, 18], "floors": "G-6", "state": "designed" },
     { "id": "west range", "rect": [0, 18, 16, 50], "floors": "G-7", "state": "designed" },
     { "id": "east range", "rect": [144, 18, 160, 50], "floors": "G-7", "state": "designed" },
@@ -44,22 +45,22 @@ window.CASTLE_MODEL = {
       "id": "gryffindor-suite",
       "name": "Gryffindor Tower and the Fat Lady's corridor, seventh floor",
       "about": "The group's frame: the tower's centre at the origin, y out through the round hole along the corridor toward its stair, x to the right looking that way; z 0 the seventh floor.",
-      "place": { "x": 42.19, "y": 1.95, "turn": -90, "z": null, "state": "designed",
-        "about": "Godric's 1.1 (12 October 2026, 5.57 pm): the corridor along the south front, its windows over the lake, the tower at its west end, its landing on the stair hall's seventh floor (the landing's end at x 68). The group's y points east, its x south. z waits on the storey height.",
+      "place": { "x": 42.19, "y": 1.95, "turn": -90, "z": 36.4, "state": "designed",
+        "about": "Godric's 1.1 (12 October 2026, 5.57 pm): the corridor along the south front, its windows over the lake, the tower at its west end, its landing on the stair hall's seventh floor (the landing's end at x 68). The group's y points east, its x south. z is the seventh floor's (Godric's 3.1, 6.23 pm).",
         "cite": "OotP 21, OotP 29, PoA 14" }
     }
   ],
   "levels": [
-    { "id": "B", "name": "the cellars", "z": null, "state": "pending" },
-    { "id": "G", "name": "ground floor", "z": null, "state": "pending" },
-    { "id": "1", "name": "first floor", "z": null, "state": "pending" },
-    { "id": "2", "name": "second floor", "z": null, "state": "pending" },
-    { "id": "3", "name": "third floor", "z": null, "state": "pending" },
-    { "id": "4", "name": "fourth floor", "z": null, "state": "pending" },
-    { "id": "5", "name": "fifth floor", "z": null, "state": "pending" },
-    { "id": "6", "name": "sixth floor", "z": null, "state": "pending" },
-    { "id": "7", "name": "seventh floor", "z": null, "state": "pending" },
-    { "id": "tower", "name": "Gryffindor Tower above the seventh floor: the dormitories", "z": null, "state": "pending", "about": "the tower's levels are its own, apart from the ranges' storeys" }
+    { "id": "B", "name": "the cellars", "z": -5.2, "state": "designed" },
+    { "id": "G", "name": "ground floor", "z": 0.0, "state": "designed" },
+    { "id": "1", "name": "first floor", "z": 5.2, "state": "designed" },
+    { "id": "2", "name": "second floor", "z": 10.4, "state": "designed" },
+    { "id": "3", "name": "third floor", "z": 15.6, "state": "designed" },
+    { "id": "4", "name": "fourth floor", "z": 20.8, "state": "designed" },
+    { "id": "5", "name": "fifth floor", "z": 26.0, "state": "designed" },
+    { "id": "6", "name": "sixth floor", "z": 31.2, "state": "designed" },
+    { "id": "7", "name": "seventh floor", "z": 36.4, "state": "designed" },
+    { "id": "tower", "name": "Gryffindor Tower above the seventh floor: the dormitories", "z": 43.8, "state": "designed", "about": "the tower's levels are its own, apart from the ranges' storeys: the common room 7.0 m high on the seventh floor, the dormitory's floor 7.4 m above it" }
   ],
   "rooms": [
     {
@@ -146,7 +147,6 @@ window.CASTLE_MODEL = {
       "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" }
   ],
   "open": [
-    "The levels' heights and the group's z wait on the storey height (the Architect's next question).",
     "The tower stair rises 5.6 m against the dormitory floor's 7.4 m.",
     "The Room of Requirement waits on Q48b: drawn as its option 3, a walk and a stair from her (OotP 18), the gargoyle round the other side of the castle (HBP 21)."
   ]
