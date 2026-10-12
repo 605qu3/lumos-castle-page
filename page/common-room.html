@@ -2610,7 +2610,11 @@ var BOOKS = { u: 0.43, v: 0.205, dz: 0.01, w: 0.32, h: 0.32 * 732 / 1032,  /* w:
   HIST: [1103 / 2065, 53 / 1465, 1787 / 2065, 1444 / 1465],    /* the History's box on the row, from the left and top */
   GAP: [0.605, 0.809],                                         /* the gap it leaves, the blue's edge to the sixth's */
   SLIDE: 0.025, OUT: 0.35, HOLD: 1.4, BACK: 0.45,              /* an inch toward him; seconds out, held, back */
-  NEAR: 0.08, LIT: 0.4, AJAR: 0.2, DAY: 'lumos.books.poaDay' };
+  NEAR: 0.08, LIT: 0.4, AJAR: 0.2, DAY: 'lumos.books.poaDay',
+  /* t2 (Q28, Godric 7.07 pm): on 1 September the History lies open on the desk at its ribboned page (?books=open or
+     ?date=2026-09-01 to see it); drawn as history-open round 2 (Q32, 8.32 pm), 0.3 m across open, its foot in front of
+     the row; squash is how far the drawing is pressed down to lie at the desk's own angle (1 as drawn) */
+  openUrl: '../assets/layers/history-open.png', OPEN: { w: 0.3, h: 0.3 * 717 / 968, x: -0.03, z: 0.07, squash: 0.35 } };
 /* what the seven books say is in Hogwarts, A History, in its own voice from their words; checked in the text with
    the canon search. Its page numbers are invented: "over a thousand pages" (GoF 15). */
 var HISTORY_PAGES = [
@@ -2643,10 +2647,19 @@ var books = (function () {
   o.mesh = card(BOOKS.w, BOOKS.h, BOOKS.outUrl);
   o.mesh.name = 'books-row'; scene.add(o.mesh); register(o.mesh, 2);
   var hw = (BOOKS.HIST[2] - BOOKS.HIST[0]) * BOOKS.w, hh = (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h;
-  o.hist = card(hw, hh, BOOKS.histUrl, function (im) { o.hain = alphaOf(im); o.hist.visible = o.out !== true; });
+  o.hist = card(hw, hh, BOOKS.histUrl, function (im) { o.hain = alphaOf(im); o.hist.visible = o.out !== true && !o.open; });
   o.hist.name = 'books-history';
   o.histAt = new THREE.Vector3(((BOOKS.HIST[0] + BOOKS.HIST[2]) / 2 - 0.5) * BOOKS.w, (0.5 - (BOOKS.HIST[1] + BOOKS.HIST[3]) / 2) * BOOKS.h, 0.001);
   o.hist.position.copy(o.histAt); o.mesh.add(o.hist); register(o.hist, 2);
+  o.open = false;                                          /* 1 September: the History lies open in front of the row */
+  o.openCard = card(BOOKS.OPEN.w, BOOKS.OPEN.h, BOOKS.openUrl, function (im) { o.oain = alphaOf(im); o.openCard.visible = o.open; });
+  o.openCard.name = 'books-open'; o.mesh.add(o.openCard); register(o.openCard, 2);
+  o.openPlace = function () {
+    var k = BOOKS.OPEN.squash;
+    o.openCard.scale.y = k;
+    o.openCard.position.set(BOOKS.OPEN.x, -BOOKS.h / 2 + BOOKS.OPEN.h * k / 2, BOOKS.OPEN.z);
+  };
+  o.openPlace();
   var whole = new Image();                                 /* the whole row's outline: a tap in the gap counts too */
   whole.onload = function () { o.ain = alphaOf(whole); };
   whole.src = BOOKS.url;
@@ -2686,8 +2699,13 @@ var books = (function () {
   o.hangOn = 0;
   return o;
 })();
+function booksOpenToday() {                                  /* 1 September, the first day of term (PS 6, PoA 1) */
+  if (/[?&]books=open/.test(location.search)) return true;
+  return !!castle && castle.weather().date === '09-01';
+}
 function booksOutToday() {
   if (/[?&]books=out/.test(location.search)) return true;
+  if (booksOpenToday()) return false;
   return ((homeDay(homeNow()) * 40503) >>> 0) % 4 === 1;
 }
 /* the page of the book, over the desk where he looks: period type on old paper, the castle's ink */
@@ -2725,6 +2743,7 @@ function booksTap() {
   }
   if (books.slide >= 0 || bookPageEl.classList.contains('on')) return;
   if (lineCur && lineCur.line.at === 'books-row') return;           /* her line still showing: let it be read */
+  if (books.open) { booksPageShow(HISTORY_PAGES[0]); return; }      /* lying open at its ribbon: the Great Hall's page */
   books.slide = books.ajar ? BOOKS.OUT : 0; books.paged = false; books.ajar = false;   /* already out: held, then home */
   var p = books.hist.localToWorld(new THREE.Vector3(0, (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h / 2, 0));
   books.motes.forEach(function (m) {
@@ -2759,8 +2778,11 @@ function updateBooks(dt) {
       if (document.fonts && document.fonts.status !== 'loaded') { books.check = 0.5; out = books.out; }   /* not yet */
       else { books.slip.material.map = books.slipTex(); books.slip.material.needsUpdate = true; }
     }
-    if (out !== books.out && mode !== 'board' && books.slide < 0) {   /* never changed under his eye at the desk */
-      books.out = out; books.hist.visible = !out && !!books.hist.material.map; books.slip.visible = out;
+    var open = booksOpenToday();
+    if ((out !== books.out || open !== books.open) && mode !== 'board' && books.slide < 0) {   /* never changed under his eye at the desk */
+      books.out = out; books.open = open; if (open) books.ajar = false;
+      books.hist.visible = !out && !open && !!books.hist.material.map; books.slip.visible = out;
+      books.openCard.visible = open && !!books.openCard.material.map;
     }
   }
   var gp = sideTable.geometry.parameters, base = new THREE.Vector3((BOOKS.u - 0.5) * gp.width, (0.5 - BOOKS.v) * gp.height, BOOKS.dz);
@@ -4497,13 +4519,14 @@ function tap(cx, cy) {
     if (h.object === books.mesh) return alphaSolid(books.ain, h.uv);   /* the gap where the History stood counts too */
     if (h.object === books.hist) return books.hist.visible && alphaSolid(books.hain, h.uv);
     if (h.object === books.slip) return books.slip.visible;
+    if (h.object === books.openCard) return books.openCard.visible && alphaSolid(books.oain, h.uv);
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
   if (mode === 'hand') { if (homeHandTap()) return; returnPaper(false); return; }
   if (mode === 'board') {
     if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return; }
-    if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip)) { booksTap(); return; }
+    if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) { booksTap(); return; }
     if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
     if (hit && boardParts.indexOf(hit) >= 0) return;
     leaveBoard();
@@ -4526,7 +4549,7 @@ function tap(cx, cy) {
   if (mode !== 'room' || !hit) return;
   if (hit === homeFeather.mesh) homeFeatherTap();
   else if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
-  else if (hit === books.mesh || hit === books.hist || hit === books.slip) booksTap();
+  else if (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard) booksTap();
   else if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
   else if (hit === scarf) scarfTap();
   else if (hit === satchel) satchelTap();
