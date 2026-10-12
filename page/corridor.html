@@ -2443,8 +2443,9 @@ function tap(cx, cy) {
     if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
     said(true); castle.tap(hit.thing); return;
   }
+  /* a tap that hit a thing acted, even on the stop he stands at, since the runtime was told (Interaction's G1, req 149) */
   if (hit.thing || hit.stop) tell(hit.thing || TAP_NAMES[hit.stop.name] || hit.stop.name);
-  said(!!hit.stop && hit.stop !== atStop);
+  said(!!(hit.thing || hit.stop));
   if (hit.stop) goTo(hit.stop);
 }
 /* the runtime's names for the stops that are not already a thing of its own */
