@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Alohomora, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #110d0b; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1e1611;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=3"></script>
+<script src="guide.js?v=4"></script>
+<script>
+/* Alohomora, a test page for the Charms lane (11 October 2026, third session; the owner is Godric). Drawn in code.
+   The books give Alohomora a tap of the lock and a whisper (PS 9: the lock clicks and the door swings open); a door
+   that will not budge for it (PS 16); a window that springs open (PoA 21). The key turn after the tap is the lane's
+   own, for the geometry: turns in fractions of a circle, a quarter, a half, three quarters, said in degrees as well
+   (90, 180, 270), clockwise and anticlockwise, the lock's face marked like a clock's. The wrong way tightens the lock
+   with a click. A key turns the same way in either hand, so nothing is mirrored. Judged by LumosSpells.judgeTurn
+   (spells.js), tallied in checks/alohomora-tally.js; the traced guide from guide.js. ?door=1..4, ?ease=, ?guide=
+   for trying; window.lumosAlohomora for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+
+  /* the four doors: what each lock asks, and what is behind it */
+  var DOORS = [
+    { turn: 0.25, dir: 1, words: 'a quarter turn, clockwise', deg: 90, behind: 'cupboard',
+      after: 'A broom cupboard: a mop, a bucket, and the smell of Filch. Best shut it again.' },
+    { turn: 0.5, dir: -1, words: 'a half turn, anticlockwise', deg: 180, behind: 'sky',
+      after: 'It springs open on the battlements, and the stars.' },
+    { turn: 0.75, dir: 1, words: 'three quarters of a turn, clockwise', deg: 270, behind: 'feathers',
+      after: 'A Charms cupboard: a box of white feathers, for the first years.' },
+    { stuck: true, words: '', behind: 'none',
+      after: '' } ];
+  var door = Math.max(0, Math.min(3, (Number(qs.get('door')) || 1) - 1)), D = DOORS[door];
+  var stage = 'tap', open = 0, opening = null, tight = null, sweepNow = null, stroke = null, active = null, trail = null, tries = 0;
+  var guide = null, last = null;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (guide) guide.build(W, H);
+  }
+  function lock() { return { x: W / 2, y: H * 0.47, r: S * 0.18 }; }
+  function doorRect() { var dh = H * 0.74, dw = Math.max(S * 0.62, Math.min(W * 0.84, dh * 0.62)); return { x: W / 2 - dw / 2, y: H * 0.47 - dh * 0.48, w: dw, h: dh }; }
+
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+  function click() { noise(0.05, 3200, 0.5); }
+
+  /* the guide: the arc the lock asks for, round the keyhole, starting at twelve o'clock */
+  function makeGuide() {
+    if (D.stuck) { guide = null; return; }
+    var mid = D.dir * D.turn * 180 * Math.PI / 180;
+    guide = LumosGuide.create({ key: 'lumos.charms.alohomoraGuidedHits', rest: 1.0, mirror: false,
+      box: function () { var L = lock(), G = L.r / 0.4; return { G: G, ox: L.x - G / 2, oy: L.y - G / 2 }; },
+      parts: [{ pts: LumosGuide.arc([0.5, 0.5], 0.4, 0, D.dir * D.turn * 360, Math.round(D.turn * 48)), secs: 0.55 * D.turn * 4,
+        label: D.turn === 0.25 ? 'a quarter' : (D.turn === 0.5 ? 'a half' : 'three quarters'), at: 0.5,
+        dx: Math.sin(mid) * 3.2, dy: -Math.cos(mid) * 1.4 }] });
+    guide.build(W, H);
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    DOORS.forEach(function (d, i) {
+      var b = document.createElement('button'); b.textContent = 'Door ' + (i + 1); if (i === door) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { if (guide) { guide.reset(); } }; panel.appendChild(g);
+  }
+  function choose(i) {
+    door = i; D = DOORS[i]; stage = 'tap'; open = 0; opening = null; tight = null; sweepNow = null; trail = null; tries = 0; last = null;
+    makeGuide(); menu();
+    say(D.stuck ? 'Another locked door, heavier than the rest. Tap the lock.' : 'A locked door. Tap the lock with your wand.');
+  }
+
+  /* the sweep so far, about the keyhole, for the wedge drawn as he turns (the same unwrapping as judgeTurn) */
+  function sweepOf(pts) {
+    var L = lock(), s = 0, la = null, a0 = null;
+    for (var i = 0; i < pts.length; i++) {
+      var dx = pts[i].x - L.x, dy = pts[i].y - L.y; if (Math.hypot(dx, dy) < L.r * 0.3) continue;
+      var a = Math.atan2(dy, dx); if (a0 === null) a0 = a;
+      if (la !== null) { var d = a - la; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; s += d; }
+      la = a;
+    }
+    return a0 === null ? null : { a0: a0, s: s };
+  }
+
+  function tapLock(p) {
+    var L = lock();
+    if (Math.hypot(p.x - L.x, p.y - L.y) > L.r * 0.55) { say('Tap the lock itself, the keyhole in the middle.'); return; }
+    click();
+    if (D.stuck) {
+      tries++;
+      say(tries < 2 ? 'Nothing happened.' : 'It will not budge. Some locks are charmed against Alohomora, or want their own key (it happened in Book 1, in the room of flying keys).');
+      tight = performance.now(); return;
+    }
+    stage = 'turn';
+    say('Now turn it, as a key turns: <b>' + D.words + '</b> (' + D.deg + ' degrees). Whisper it as you turn: <i>Alohomora</i>.');
+  }
+  var MISS = { 'not far enough': function () { return 'Not far enough. ' + cap(D.words) + ' is ' + D.deg + ' degrees.'; },
+    'too far': function () { return 'Too far: a key stops where the lock says. ' + cap(D.words) + ', ' + D.deg + ' degrees.'; },
+    'off the ring': function () { return 'Keep your finger going round the keyhole, near the ring.'; },
+    'through the middle': function () { return 'Round the keyhole, not across it.'; },
+    'short': function () { return 'Turn it further round.'; } };
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function judge(pts) {
+    var L = lock(), j = LumosSpells.judgeTurn(pts, L, L.r, D, W, H, ease);
+    if (j.reason === 'tap') { if (guide) guide.clear(); return j; }
+    var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
+    if (tr && tr.traced && j.verdict === 'miss') { j.verdict = 'open'; j.reason = 'traced'; }
+    last = j; trail = { pts: pts, at: performance.now() };
+    if (j.verdict === 'open') {
+      if (guide) guide.hit(lv > 0);
+      LumosSpells.learn('alohomora');
+      click(); setTimeout(function () { noise(0.6, 300, 0.25); }, 120);
+      stage = 'open'; opening = performance.now();
+      say('<b>Alohomora!</b> The lock clicks: ' + Math.round(Math.abs(j.degrees)) + ' degrees, ' + D.words + '.');
+      setTimeout(function () { if (stage === 'open') say(D.after); }, 1800);
+    } else if (j.verdict === 'tight') {
+      if (guide) guide.miss(); tight = performance.now(); noise(0.25, 500, 0.4);
+      say('Click: the lock tightened. That way locks it. ' + cap(D.words) + '.');
+    } else {
+      if (guide) guide.miss();
+      say((MISS[j.reason] || MISS.short)());
+    }
+    return j;
+  }
+
+  /* ---- drawing ---- */
+  function drawWall() {
+    cx.fillStyle = '#1a1411'; cx.fillRect(0, 0, W, H);
+    var bw = S * 0.16, bh = S * 0.075;
+    cx.strokeStyle = 'rgba(0,0,0,0.45)'; cx.lineWidth = 2;
+    for (var y = 0, row = 0; y < H; y += bh, row++) for (var x = (row % 2) * -bw / 2; x < W; x += bw) cx.strokeRect(x, y, bw, bh);
+    var v = cx.createRadialGradient(W / 2, H * 0.45, S * 0.2, W / 2, H * 0.45, Math.max(W, H) * 0.7);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.7)'); cx.fillStyle = v; cx.fillRect(0, 0, W, H);
+  }
+  function drawBehind(R, now) {
+    cx.save(); cx.beginPath(); cx.rect(R.x, R.y, R.w, R.h); cx.clip();
+    if (D.behind === 'sky') {
+      cx.fillStyle = '#0b1430'; cx.fillRect(R.x, R.y, R.w, R.h);
+      for (var i = 0; i < 40; i++) { var sx = R.x + ((i * 97) % 100) / 100 * R.w, sy = R.y + ((i * 61) % 100) / 100 * R.h * 0.7;
+        cx.fillStyle = 'rgba(255,255,240,' + (0.5 + 0.4 * Math.sin(now / 400 + i)) + ')'; cx.fillRect(sx, sy, 2, 2); }
+      cx.fillStyle = '#e9e4cf'; cx.beginPath(); cx.arc(R.x + R.w * 0.7, R.y + R.h * 0.2, S * 0.05, 0, 7); cx.fill();
+      cx.fillStyle = '#2a2420'; cx.fillRect(R.x, R.y + R.h * 0.8, R.w, R.h * 0.2);
+      for (var k = 0; k < 4; k++) cx.fillRect(R.x + k * R.w / 4, R.y + R.h * 0.72, R.w / 8, R.h * 0.1);   /* the battlements */
+    } else {
+      cx.fillStyle = '#0d0907'; cx.fillRect(R.x, R.y, R.w, R.h);
+      cx.fillStyle = '#3a2a1c'; for (var s2 = 1; s2 <= 3; s2++) cx.fillRect(R.x, R.y + R.h * s2 / 4, R.w, R.h * 0.015);   /* shelves */
+      if (D.behind === 'cupboard') {
+        cx.strokeStyle = '#7a6040'; cx.lineWidth = S * 0.012; cx.beginPath(); cx.moveTo(R.x + R.w * 0.3, R.y + R.h * 0.3); cx.lineTo(R.x + R.w * 0.42, R.y + R.h * 0.95); cx.stroke();
+        cx.fillStyle = '#b8b0a0'; cx.beginPath(); cx.ellipse(R.x + R.w * 0.43, R.y + R.h * 0.95, S * 0.05, S * 0.02, 0.2, 0, 7); cx.fill();   /* the mop */
+        cx.fillStyle = '#5a5e66'; cx.fillRect(R.x + R.w * 0.58, R.y + R.h * 0.84, R.w * 0.22, R.h * 0.13);   /* the bucket */
+      } else if (D.behind === 'feathers') {
+        cx.fillStyle = '#6b4a2c'; cx.fillRect(R.x + R.w * 0.25, R.y + R.h * 0.62, R.w * 0.5, R.h * 0.12);
+        for (var f = 0; f < 7; f++) { var fx = R.x + R.w * (0.3 + f * 0.065), fy = R.y + R.h * 0.62, fl = 0.05 * Math.sin(now / 500 + f);
+          cx.save(); cx.translate(fx, fy); cx.rotate(-0.4 + f * 0.13 + fl); cx.fillStyle = 'rgba(245,242,232,0.95)';
+          cx.beginPath(); cx.ellipse(0, -S * 0.05, S * 0.012, S * 0.05, 0, 0, 7); cx.fill(); cx.restore(); }
+      }
+    }
+    cx.restore();
+  }
+  function drawDoor(R, k) {   /* k: 0 shut to 1 open, swinging on its left hinge */
+    var w = R.w * Math.cos(k * Math.PI * 0.45), skew = R.h * 0.06 * Math.sin(k * Math.PI * 0.45);
+    cx.fillStyle = '#4a3220';
+    cx.beginPath(); cx.moveTo(R.x, R.y); cx.lineTo(R.x + w, R.y - skew); cx.lineTo(R.x + w, R.y + R.h + skew); cx.lineTo(R.x, R.y + R.h); cx.closePath(); cx.fill();
+    cx.strokeStyle = 'rgba(0,0,0,0.35)'; cx.lineWidth = 2;
+    for (var i = 1; i < 6; i++) { var px = R.x + w * i / 6; cx.beginPath(); cx.moveTo(px, R.y - skew * i / 6); cx.lineTo(px, R.y + R.h + skew * i / 6); cx.stroke(); }
+    cx.fillStyle = '#26201c';   /* the iron straps */
+    [0.08, 0.92].forEach(function (f) { cx.beginPath(); cx.moveTo(R.x, R.y + R.h * f - 6); cx.lineTo(R.x + w * 0.8, R.y + R.h * f - 6 - skew * 0.8 * (f < 0.5 ? 1 : -1));
+      cx.lineTo(R.x + w * 0.8, R.y + R.h * f + 6 - skew * 0.8 * (f < 0.5 ? 1 : -1)); cx.lineTo(R.x, R.y + R.h * f + 6); cx.closePath(); cx.fill(); });
+  }
+  function drawLock(now) {
+    var L = lock(), i;
+    cx.save();
+    var tk = tight ? Math.max(0, 1 - (now - tight) / 700) : 0, shake = tk * Math.sin(now / 25) * S * 0.006;
+    cx.translate(shake, 0);
+    var pg = cx.createRadialGradient(L.x - L.r * 0.3, L.y - L.r * 0.3, L.r * 0.1, L.x, L.y, L.r * 1.25);
+    pg.addColorStop(0, '#6d6458'); pg.addColorStop(1, '#2c2723'); cx.fillStyle = pg;
+    cx.beginPath(); cx.arc(L.x, L.y, L.r * 1.22, 0, 7); cx.fill();
+    cx.strokeStyle = tk ? 'rgba(220,90,60,' + (0.4 + 0.6 * tk) + ')' : '#1c1814'; cx.lineWidth = 3; cx.stroke();
+    /* the face marked like a clock's: twelve small ticks, the four quarters long */
+    for (i = 0; i < 12; i++) {
+      var a = i / 12 * Math.PI * 2, q = i % 3 === 0, r0 = L.r * (q ? 0.86 : 0.95), r1 = L.r * 1.08;
+      cx.strokeStyle = q ? '#d9c79a' : 'rgba(217,199,154,0.5)'; cx.lineWidth = q ? 3 : 1.5;
+      cx.beginPath(); cx.moveTo(L.x + Math.sin(a) * r0, L.y - Math.cos(a) * r0); cx.lineTo(L.x + Math.sin(a) * r1, L.y - Math.cos(a) * r1); cx.stroke();
+    }
+    /* the wedge he has turned so far, and its degrees */
+    var sw = stroke ? sweepOf(stroke) : (trail && now - trail.at < 1500 ? sweepOf(trail.pts) : null);
+    sweepNow = sw;
+    if (sw && Math.abs(sw.s) > 0.05) {
+      cx.fillStyle = 'rgba(243,210,122,0.28)'; cx.beginPath(); cx.moveTo(L.x, L.y);
+      cx.arc(L.x, L.y, L.r * 0.82, sw.a0, sw.a0 + sw.s, sw.s < 0); cx.closePath(); cx.fill();
+      var fs = Math.round(Math.max(16, S * 0.045)); cx.font = '600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center';
+      cx.fillStyle = '#f3d27a'; cx.shadowColor = '#000'; cx.shadowBlur = 6;
+      cx.fillText(Math.round(Math.abs(sw.s) * 180 / Math.PI) + '°', L.x, L.y + L.r * 1.55);
+      cx.shadowBlur = 0;
+    }
+    /* the keyhole, and the wand's tip in it once tapped */
+    cx.fillStyle = '#0a0806';
+    cx.beginPath(); cx.arc(L.x, L.y - L.r * 0.08, L.r * 0.11, 0, 7); cx.fill();
+    cx.beginPath(); cx.moveTo(L.x - L.r * 0.06, L.y - L.r * 0.04); cx.lineTo(L.x + L.r * 0.06, L.y - L.r * 0.04); cx.lineTo(L.x + L.r * 0.1, L.y + L.r * 0.22); cx.lineTo(L.x - L.r * 0.1, L.y + L.r * 0.22); cx.closePath(); cx.fill();
+    if (stage === 'turn') {
+      var gl = cx.createRadialGradient(L.x, L.y, 0, L.x, L.y, L.r * 0.3);
+      gl.addColorStop(0, 'rgba(255,240,200,' + (0.55 + 0.2 * Math.sin(now / 200)) + ')'); gl.addColorStop(1, 'rgba(255,220,150,0)');
+      cx.fillStyle = gl; cx.beginPath(); cx.arc(L.x, L.y, L.r * 0.3, 0, 7); cx.fill();
+    }
+    cx.restore();
+  }
+  function frame(now) {
+    drawWall();
+    var R = doorRect();
+    cx.fillStyle = '#0c0907'; cx.fillRect(R.x - 8, R.y - 8, R.w + 16, R.h + 8);   /* the frame */
+    if (opening) open = Math.min(1, (now - opening) / 1400);
+    if (open > 0) drawBehind(R, now);
+    drawDoor(R, open * open * (3 - 2 * open));
+    if (!open) drawLock(now);
+    if (stage === 'turn' && guide) guide.draw(cx, now, !!stroke);
+    var pts = stroke || (trail && now - trail.at < 400 ? trail.pts : null);
+    if (pts && pts.length > 1) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + (stroke ? 0.55 : 0.55 * (1 - (now - trail.at) / 400)) + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: a tap on the lock, then one stroke round it ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (stage === 'tap') { tapLock(pt(ev)); return; }
+    if (stage !== 'turn' || active !== null) return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null; if (guide) guide.cover(stroke[0]);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null; judge(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(door); requestAnimationFrame(frame);
+  window.lumosAlohomora = { choose: choose, lock: lock, tap: function () { var L = lock(); tapLock({ x: L.x, y: L.y }); },
+    judge: function (pts) { return judge(pts); }, stroke: function (pts) { stroke = pts; },
+    state: function () { return { door: door + 1, stage: stage, open: open, last: last, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('alohomora') }; } };
+})();
+</script>
+</body>
+</html>

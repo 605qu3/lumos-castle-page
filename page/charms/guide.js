@@ -145,5 +145,12 @@
     return out;
   }
 
-  root.LumosGuide = { create: create, line: line, quad: quad, mirrored: mirror };
+  /* an arc round c, from a0 to a1 in degrees (0 at twelve o'clock, + clockwise), for Alohomora's key turn */
+  function arc(c, r, a0, a1, n) {
+    var out = [];
+    for (var i = 0; i <= n; i++) { var a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; out.push([c[0] + r * Math.sin(a), c[1] - r * Math.cos(a)]); }
+    return out;
+  }
+
+  root.LumosGuide = { create: create, line: line, quad: quad, arc: arc, mirrored: mirror };
 })(window);

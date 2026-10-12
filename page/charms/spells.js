@@ -65,6 +65,53 @@ function judgeSwishDown(points, w, h) {
   out.verdict = 'swish'; out.reason = 'down';
   return out;
 }
+
+/* Alohomora's key turn (11 October 2026, third session; the turn is the lane's own: the books give a tap of the lock
+   and a whisper, PS 9). After the tap on the keyhole he turns round it, as a key turns: a quarter, a half or three
+   quarters of a turn, clockwise or anticlockwise, as the lock asks. The sweep is the angle his finger goes round the
+   keyhole, unwrapped, so a path that wanders in and out still counts its turning about the centre only. A key turns
+   the same way in either hand, so nothing here is mirrored for a left hand.
+   points: [{x, y, t}]; c: the keyhole {x, y}; r: the ring's radius in pixels; want: { turn: 0.25 | 0.5 | 0.75,
+   dir: 1 clockwise or -1 anticlockwise }; ease: a name in TURN_EASES or an ease of its own.
+   Returns { verdict: 'open' | 'tight' | 'miss', reason, degrees (signed, + clockwise), fraction (of a whole turn,
+   unsigned), quarters (to the nearest quarter), band (the mean distance from the ring, as a share of r) }. */
+var TURN_EASES = {
+  kind:   { slack: 40, band: 0.5 },
+  fair:   { slack: 30, band: 0.38 },
+  strict: { slack: 20, band: 0.28 }
+};
+function judgeTurn(points, c, r, want, w, h, ease) {
+  var e = typeof ease === 'object' ? ease : (TURN_EASES[ease] || TURN_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', degrees: 0, fraction: 0, quarters: 0, band: 0 };
+  if (!points || points.length < 2) return out;
+  var short = Math.min(w, h), path = 0, i, sweep = 0, last = null, off = 0, n = 0;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path / short < 0.02) return out;
+  for (i = 0; i < points.length; i++) {
+    var dx = points[i].x - c.x, dy = points[i].y - c.y, d = Math.hypot(dx, dy);
+    off += Math.abs(d - r) / r; n++;
+    if (d < r * 0.3) continue;   /* too near the keyhole for its angle to mean anything */
+    var a = Math.atan2(dy, dx);  /* screen y is down, so a growing angle goes clockwise */
+    if (last !== null) {
+      var da = a - last; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+      if (Math.abs(da) > Math.PI * 0.55) { out.reason = 'through the middle'; return out; }   /* across the keyhole, not round it */
+      sweep += da;
+    }
+    last = a;
+  }
+  out.degrees = sweep * 180 / Math.PI;
+  out.fraction = Math.abs(out.degrees) / 360;
+  out.quarters = Math.round(out.fraction * 4);
+  out.band = n ? off / n : 1;
+  if (Math.abs(out.degrees) < 25) { out.reason = 'short'; return out; }
+  if ((out.degrees > 0 ? 1 : -1) !== want.dir) { out.verdict = 'tight'; out.reason = 'wrong way'; return out; }
+  if (out.band > e.band) { out.reason = 'off the ring'; return out; }
+  var need = want.turn * 360, got = Math.abs(out.degrees);
+  if (got < need - e.slack) { out.reason = 'not far enough'; return out; }
+  if (got > need + e.slack) { out.reason = 'too far'; return out; }
+  out.verdict = 'open'; out.reason = 'turned';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -154,6 +201,6 @@ function castOver(opts) {
     judge: function (pts) { var out = judge(pts); if (out) finish(out); return out; } };
 }
 
-root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown,
+root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
   learned: learned, learn: learn, castOver: castOver };
 })(typeof window !== 'undefined' ? window : globalThis);
