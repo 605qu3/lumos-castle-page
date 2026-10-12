@@ -1930,7 +1930,7 @@ holeFrame.add(ring); register(ring, 0);
 /* what a tap hits: the hole's mouth, so tapping the stone round it does nothing */
 var holeTap = new THREE.Mesh(new THREE.CircleGeometry(HOLE_R, 32), new THREE.MeshBasicMaterial());
 holeTap.position.set(0, HOLE_Y, 0.02);
-holeTap.visible = false;
+holeTap.visible = false; holeTap.name = 'portrait-hole-tap';
 holeFrame.add(holeTap);
 scene.updateMatrixWorld(true);
 var corridorLight = new THREE.PointLight(col(0xffc080), 0, 5, 1.2);
@@ -1944,6 +1944,7 @@ var corridorFarLights = [[(CORR.WINDOW.xs[0] + CORR.WINDOW.xs[1]) / 2, 0xd8d4c8,
   scene.add(pl);
   return pl;
 });
+var CORR_WIN_DAY = col(0xd8d4c8), CORR_WIN_NIGHT = col(0x7d8cb0);
 /* the drawn wall reaches the tunnel and the corridor too: one texture, no second copy on the GPU */
 function shareWallStone(map, color) {
   [tunnelMat, corridorMat, wallEndMat].forEach(function (m) { m.map = map; m.color.copy(color); m.needsUpdate = true; });
@@ -5224,7 +5225,11 @@ function updatePortrait(dt) {
   hinge.rotation.y = -portrait.ang;
   var k = portrait.ang / DOOR_OPEN, clockT = performance.now() / 1000;
   corridorLight.intensity = 1.8 * k * (0.85 + 0.15 * Math.sin(clockT * 11) * Math.sin(clockT * 4.3));
-  corridorFarLights[0].intensity = 1.2 * k; corridorFarLights[1].intensity = 1.0 * k * (0.9 + 0.1 * Math.sin(clockT * 7.7));
+  /* by night the windows' daylight goes, a dim moonlit blue left, the torches carrying the corridor (as the Corridor's
+     own page does, page/corridor.html, "the corridor's night"); evening between */
+  var tm = castle && castle.time ? castle.time() : 'day', nk = tm === 'night' ? 1 : tm === 'evening' ? 0.3 : 0;
+  corridorFarLights[0].color.copy(CORR_WIN_DAY).lerp(CORR_WIN_NIGHT, nk);
+  corridorFarLights[0].intensity = 1.2 * k * (1 - 0.8 * nk); corridorFarLights[1].intensity = 1.0 * k * (0.9 + 0.1 * Math.sin(clockT * 7.7));
   torches.forEach(function (tc, i) {   /* each flame on its own beat */
     tc.flame.scale.set(0.12 * (0.92 + 0.08 * Math.sin(clockT * (7.3 - 0.6 * i) + 2 * i)), 0.2 * (0.85 + 0.2 * Math.abs(Math.sin(clockT * (9.1 - 0.4 * i) + i))), 1);
   });
@@ -5261,6 +5266,17 @@ var NICK_IN = [[1.25, -3.4], [1.2, -2.9], [0.95, -2.55], [0.55, -2.25], [0.34, -
 var NICK_OUT = [[0.34, -1.5], [-0.4, -1.75], [-1.0, -1.95], [-1.6, -2.1], [-2.1, -2.2]];   /* the stop and away into her wall */
 var NICK_WALL = [[1.75, -3.3], [1.2, -2.9], [0.6, -2.3], [-0.4, -1.95], [-1.6, -2.1], [-2.1, -2.2]];
 var NICK_SPEED = 0.7;                          /* metres a second, a ghost's unhurried drift */
+/* His goodnight (Magic's req 91; Magic for the boys, "Passing the open hole", *Nick's goodnight* and *After the switch*;
+   Events' record passers.nick-goodnight, its first show line): by night his own pearly light leads him by a beat. His
+   path starts about 2 m (3 s) further down the same line behind her open back, so his light reaches the stretch of the
+   outer wall the hole shows at rest (2.3 to 3.3 m out) before he rounds her far edge; it grows over 2 s from the start,
+   travels with him to the stop and away, and fades as he goes into her long wall (x -1.5), the corridor dark again.
+   Shot, the trace's strip is longer than measured: at rest the hole shows him on the outer wall's side from about 4.3 m
+   out, so the figure firms up out of his own glow between 1.2 and 2.8 s (NICK_LAMP.firm), the light first. */
+var NICK_NIGHT_IN = [[1.32, -5.4], [1.3, -4.4]].concat(NICK_IN);
+var NICK_LAMP = { color: 0xdfe8ff, power: 3.2, dist: 4.2, decay: 1.5, grow: 2.0, y: 1.25, firm: [1.2, 2.8] };
+var nickLamp = new THREE.PointLight(col(NICK_LAMP.color), 0, NICK_LAMP.dist, NICK_LAMP.decay);
+nickLamp.name = 'nick-lamp'; scene.add(nickLamp);
 var nickSheet = new THREE.TextureLoader().load('../assets/layers/nick-ghost.png');
 nickSheet.encoding = THREE.sRGBEncoding;
 function nickShow(cell, flip) { nickSheet.repeat.x = (flip ? -1 : 1) / 3; nickSheet.offset.x = (cell + (flip ? 1 : 0)) / 3; }
@@ -5270,7 +5286,7 @@ var nickMesh = new THREE.Mesh(new THREE.PlaneGeometry(NICK_W, NICK_H), new THREE
   color: NICK_TINT.clone(), transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, fog: false }));
 nickMesh.name = 'nick'; nickMesh.visible = false; nickMesh.renderOrder = 2;
 scene.add(nickMesh); facers.push(nickMesh);
-var nick = { state: 'away', path: null, d: 0, len: 0, wanted: false, after: null, blue: false };
+var nick = { state: 'away', path: null, d: 0, len: 0, wanted: false, after: null, blue: false, lit: false, lampK: 0, litT: 0 };
 var TORCH_GOLD = col(0xffb060), TORCH_BLUE = col(0x86b4ff);
 function nickPath(pts) {
   return new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], 0.05, p[1]); }), false, 'catmullrom', 0.5);
@@ -5282,7 +5298,9 @@ function nickGo(pts, state, after) {
 }
 function nickHolds() { return nick.state !== 'away' || (lineCur && lineCur.line.speaker === 'nick'); }
 var NICK_CUES = {
-  'nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow': function () { nickGo(NICK_IN, 'in'); },
+  /* fired before the drift-in line in the same record: he is already on his way, the longer night path */
+  "a pearly glow grows on the dark corridor's far wall from behind her open back, a beat before nick drifts out; his light travels with him and fades after him as he drifts away, the corridor dark again as it was": function () { nickGo(NICK_NIGHT_IN, 'in'); nick.lit = true; nick.lampK = 0; nick.litT = 0; },
+  'nick drifts out from behind her open back, past the torch, its light through him, notices the hole open, comes to his stop outside it and turns to bow': function () { if (!(nick.lit && nick.state === 'in')) nickGo(NICK_IN, 'in'); },
   'nick drifts out from behind her open back, past the torch, its light through him, and on past the hole without stopping, out past its left edge': function () { nickGo(NICK_IN.concat(NICK_OUT.slice(1)), 'past'); },
   "nick comes through the corridor's far wall itself, drifts across and on out past the hole's left edge": function () { nickGo(NICK_WALL, 'past'); },
   /* every passer record shows it: the flame turns blue as he nears it and gold again as he goes, read in updateNick */
@@ -5298,7 +5316,7 @@ function updateNick(dt) {
     nick.d = Math.min(nick.len, nick.d + NICK_SPEED * dt);
     if (nick.d >= nick.len) {
       if (nick.state === 'in') { nick.state = 'stop'; nickShow(1, false); }
-      else { nick.state = 'away'; nickMesh.visible = false; nick.blue = false; torchFlame.material.color.copy(TORCH_GOLD); portrait.closeT = Math.max(portrait.closeT, 2.5); return; }
+      else { nick.state = 'away'; nickMesh.visible = false; nick.blue = false; nick.lit = false; nickLamp.intensity = 0; torchFlame.material.color.copy(TORCH_GOLD); portrait.closeT = Math.max(portrait.closeT, 2.5); return; }
     }
   }
   var u = nick.len ? nick.d / nick.len : 1;
@@ -5310,6 +5328,17 @@ function updateNick(dt) {
   nickMesh.material.color.copy(NICK_TINT).lerp(NICK_WARM, 0.6 * near);
   nickMesh.material.opacity = 0.55 + 0.2 * near;
   if (nick.blue) torchFlame.material.color.copy(TORCH_GOLD).lerp(TORCH_BLUE, Math.min(1, 1.4 * near));
+  /* his own light by night: grows from his start, and on his way out fades as he nears her long wall, gone in it */
+  if (nick.lit) {
+    nick.litT += dt; nick.lampK = Math.min(1, nick.litT / NICK_LAMP.grow);
+    var fade = nick.state === 'out' ? Math.max(0, Math.min(1, (_nl.x + 1.5) / 1.2)) : 1;
+    nickLamp.intensity = NICK_LAMP.power * nick.lampK * fade;
+    holeFrame.localToWorld(nickLamp.position.set(_nl.x, NICK_LAMP.y, _nl.z));
+    /* a light passes through stone here, so its reach stops short of the room's wall (z 0): none through it */
+    nickLamp.distance = Math.max(1.0, Math.min(NICK_LAMP.dist, -_nl.z - 0.1));
+    var firm = Math.max(0, Math.min(1, (nick.litT - NICK_LAMP.firm[0]) / (NICK_LAMP.firm[1] - NICK_LAMP.firm[0])));
+    nickMesh.material.opacity = (nickMesh.material.opacity + 0.1 * fade) * firm * firm * (3 - 2 * firm);
+  }
 }
 /* where his words are said from: above his head wherever he is */
 function nickHead() { return nickMesh.position.clone().add(new THREE.Vector3(0, NICK_H * 0.45, 0)); }
