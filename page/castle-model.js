@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 4,
+  "version": 5,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -173,7 +173,9 @@ window.CASTLE_MODEL = {
   ],
   "stairs": [
     { "id": "tower-stair", "kind": "open newel stair", "rooms": ["common-room", "dormitory"], "newel": [4.13, -2.59], "r": 0.7,
-      "from": 0, "to": 5.6, "treads": 28, "rise": 0.2, "hand": "clockwise up, seen from above", "state": "built", "cite": "PS 7" },
+      "from": 0, "to": 7.4, "treads": 37, "rise": 0.2, "hand": "clockwise up, seen from above", "state": "built", "cite": "PS 7",
+      "drawn_to": 5.6, "drawn_treads": 28,
+      "about": "Godric's Q68, 68.1 (12 October 2026, 6.51 pm; req 191, 201): the stair runs on unseen to the dormitory's floor at 7.4 m, two turns and nine treads at 14 a turn; the common room draws 28, since no view shows it above 5.37 m" },
     { "id": "corridor-flight", "kind": "straight flight down", "room": "corridor", "span": [[-1.5, 20.11], [1.5, 23.41]],
       "from": 0, "to": -1.98, "treads": 11, "rise": 0.18, "state": "built" },
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
