@@ -444,8 +444,14 @@ window.castleFrame = function (opts) {
      false, and sets limits at a stop with F.zoom.setLimits(min, max). The zoom is plain (Godric's Q32, 8.53 pm: no
      rim); the first time on the device the saleswizard's line from GoF 7 shows, a hint of the Omnioculars, an item
      the boys will get later (Magic's).
-     Look switch: ?zoom=2 (or ?zoom=2,fx,fy, the point to look at as fractions of the frame from its top left). */
-  var ZOOM_MAX = 3, ZOOM_DOUBLE = 2.5, ZOOM_KEY = 'lumos.castle.omnioculars';
+     Look switch: ?zoom=2 (or ?zoom=2,fx,fy, the point to look at as fractions of the frame from its top left).
+     Looking close (req 126 and 133, the Omnioculars earned by looking): held at LOOK_Z or closer for LOOK_HOLD_S with the
+     view still, the thing at the middle of the view is looked at; a page names its things with F.zoom.look(mesh, name)
+     (a name, or a function of the ray's hit for a drawing with several things in it) and hears each look with
+     F.zoom.onLook(fn), passing it to the events runtime's lookClose. Only the nearest thing counts, so a wall hides
+     what is behind it. Nothing seen changes: a look is not a tap and does nothing a tap does (the Interaction lane's
+     docs/interaction-vocabulary.md). No names, no listener: nothing happens. */
+  var ZOOM_MAX = 3, ZOOM_DOUBLE = 2.5, ZOOM_KEY = 'lumos.castle.omnioculars', LOOK_Z = 2, LOOK_HOLD_S = 1;
   var zOpt = opts.zoom === undefined ? {} : opts.zoom;
   var zoom = (function () {
     var on = zOpt !== false, zMin = 1, zMax = (zOpt && zOpt.max) || ZOOM_MAX;
@@ -472,6 +478,43 @@ window.castleFrame = function (opts) {
       else { var a = camera.aspect; camera.setViewOffset(z * a, z, ox * a, oy, a, 1); }   /* setViewOffset sets the aspect from these, so they carry it */
       hint();
       for (var i = 0; i < listeners.length; i++) listeners[i](z);
+      clearTimeout(lookTimer);
+      if (z >= LOOK_Z - 0.001 && lookers.length) lookTimer = setTimeout(lookNow, LOOK_HOLD_S * 1000);
+    }
+    /* the thing at the middle of the view, once the view has held still a second (every apply restarts the wait) */
+    var lookers = [], lookTimer = null, lookRay = new THREE.Raycaster(), lookMid = new THREE.Vector2(0, 0);
+    /* is a cut-out card clear where the ray met it? read from a small copy of its picture, made once per picture */
+    var alphas = {};
+    function clearAt(m, uv) {
+      var t = m && m.alphaTest > 0 && m.map, im = t && t.image;
+      if (!uv || !im || !im.width) return false;
+      if (!alphas[t.uuid] || alphas[t.uuid].v !== t.version) {   /* again when the picture is redrawn */
+        var s = Math.min(1, 256 / Math.max(im.width, im.height)), c = makeCanvas(Math.max(1, Math.round(im.width * s)), Math.max(1, Math.round(im.height * s)));
+        var g = c.getContext('2d');
+        try { g.drawImage(im, 0, 0, c.width, c.height); alphas[t.uuid] = { v: t.version, w: c.width, h: c.height, d: g.getImageData(0, 0, c.width, c.height).data }; }
+        catch (err) { return false; }
+      }
+      var a = alphas[t.uuid], u = uv.clone();
+      t.transformUv(u);   /* a sheet's cell: its repeat and offset */
+      var x = clamp(Math.floor(u.x * a.w), 0, a.w - 1), y = clamp(Math.floor(u.y * a.h), 0, a.h - 1);   /* transformUv has flipped it to the picture's rows */
+      return a.d[(y * a.w + x) * 4 + 3] / 255 < m.alphaTest;
+    }
+    function lookNow() {
+      if (z < LOOK_Z - 0.001 || n > 1) return;   /* not mid-pinch */
+      camera.updateMatrixWorld();
+      lookRay.setFromCamera(lookMid, camera);   /* the view offset is in the projection, so the middle is the zoomed middle */
+      var hits = lookRay.intersectObjects(scene.children, true);
+      for (var i = 0; i < hits.length; i++) {
+        var o = hits[i].object, shown = true;
+        for (var p = o; p; p = p.parent) if (!p.visible) shown = false;
+        var m = o.material;
+        if (!o.isMesh || !shown || (m && (m.opacity === 0 || m.colorWrite === false || m.depthWrite === false))) continue;   /* hidden things, hit areas, glows and steam */
+        if (clearAt(m, hits[i].uv)) continue;   /* a card's clear pixels, a window's glass in its frame */
+        var name = null;
+        for (p = o; p && name == null; p = p.parent) if (p.userData.look != null) name = typeof p.userData.look === 'function' ? p.userData.look(hits[i]) : p.userData.look;
+        if (name) { window.castleLooked = name; for (var k = 0; k < lookers.length; k++) lookers[k](name); }
+        return;   /* the nearest thing seen decides, named or not */
+      }
     }
     /* zoom to nz keeping the point under the screen point (sx, sy), as fractions of the screen, where it is */
     function about(nz, sx, sy) {
@@ -594,7 +637,10 @@ window.castleFrame = function (opts) {
       reset: function (dur) { if (dur) animate(1, 0.5, 0.5, dur); else { anim = null; z = 1; apply(); } },
       setLimits: function (min, max) { zMin = Math.max(1, min || 1); zMax = Math.max(zMin, max || ZOOM_MAX); about(z, 0.5, 0.5); },
       enable: function (yes) { on = !!yes; if (!on) api.reset(); },
-      onChange: function (fn) { listeners.push(fn); }
+      onChange: function (fn) { listeners.push(fn); },
+      /* name a thing for looking close (a lower-case name, one per thing across every page, or a function of the hit) */
+      look: function (mesh, name) { mesh.userData.look = name; return mesh; },
+      onLook: function (fn) { lookers.push(fn); }
     };
     try {
       var zs = new URLSearchParams(location.search).get('zoom');

@@ -189,9 +189,9 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=6"></script>
+<script src="castle.js?v=7"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=13"></script>
+<script src="castle-events.js?v=15"></script>
 <script>
 (function () {
 'use strict';
@@ -2865,6 +2865,38 @@ var castle = window.CastleEvents ? CastleEvents.start({
        so the record never sets owl_landed for the night with nothing shown (Fawkes, Q28, 11 October 2026) */
     'moon in view': function () { return 'no'; } }
 }) : null;
+
+/* looking close (req 126 and 133, the Omnioculars earned by looking; castle.js's zoom): held at double or closer for a
+   second on a thing, its name goes to the runtime, each counted once ever. One name per thing across every page, so a
+   thing another room shows answers to the same name: the corridor's torches, the strip's among them, are one thing,
+   'the corridor torches', as the common room's hole shows it. Through the grounds window the drawing's own things
+   answer by where the middle falls on it; the sky and the lawns are nothing. Nothing seen changes. */
+function lookGrounds(hit) {
+  if (!hit.uv) return null;
+  var x = hit.uv.x * 800, y = (1 - hit.uv.y) * 1760;   /* the drawing's pixels */
+  if (x >= 390 && x <= 625 && y >= 858 && y <= 1095) return "hagrid's hut";
+  if (x >= 485 && x <= 800 && y >= 1050 && y <= 1235) return 'the pumpkin patch';
+  if (y >= 500 && y <= 960) return 'the forbidden forest';
+  return null;
+}
+function lookHer(hit) {   /* her side table, her cake and teacup on it (req 114's cake), a thing of its own */
+  var u = hit.uv, x = u ? u.x : 0, y = u ? 1 - u.y : 0;
+  return x >= 0.6 && x <= 0.86 && y >= 0.54 && y <= 0.71 ? "the fat lady's cake" : 'the fat lady';
+}
+function lookGallery(hit) {
+  var p = stairGallery.worldToLocal(hit.point.clone());
+  return Math.abs(p.x - CUP.x) < 0.09 && Math.abs(p.y - CUP.y) < 0.09 ? "the gallery's teacup" : 'the stair gallery';
+}
+[[her, lookHer], [portraitA, 'corridor portrait a'], [portraitB, 'corridor portrait b'],
+  [paintingOpp, 'the painting opposite the hole'], [armour, 'the suit of armour'], [sticks, 'the walking sticks'],
+  [boo, 'the walking sticks'], [tapestry, 'the corridor tapestry'], [door, 'the polite door'], [glimpse, 'the lost things'],
+  [hearth, 'the inglenook'], [breast, 'the inglenook'], [scarf, 'the dropped scarf'], [settleScarf, 'the scarf on the settle'],
+  [trevor, 'trevor'], [landingWindow, 'the landing window'], [frontDoors, 'the front doors'], [stairGallery, lookGallery],
+  [windows[1].sky, lookGrounds]].forEach(function (t) { kit.zoom.look(t[0], t[1]); });
+settles.forEach(function (m) { kit.zoom.look(m, 'the inglenook'); });
+windows.forEach(function (w) { kit.zoom.look(w.frame, 'the corridor windows'); kit.zoom.look(w.sill, 'the corridor windows'); });
+torches.forEach(function (t) { kit.zoom.look(t.mesh, 'the corridor torches'); });
+kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
 
 /* ---------- per frame ---------- */
 
