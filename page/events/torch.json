@@ -1,0 +1,188 @@
+{
+  "chain": "torch",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "torch.lean",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "torch-lean",
+      "weight": 2,
+      "moment": "walk up",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "nick_met = yes",
+        "date != 10-31",
+        "torch_leaned != yes"
+      ],
+      "show": [
+        "a corridor torch's flame leans and dips blue for a moment, then burns gold again"
+      ],
+      "starts": [
+        "set torch_leaned = yes",
+        "set torch_follow = yes"
+      ]
+    },
+    {
+      "id": "torch.still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "torch-lean",
+      "weight": 5,
+      "moment": "walk up",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "nick_met = yes",
+        "date != 10-31",
+        "torch_leaned != yes"
+      ],
+      "starts": []
+    },
+    {
+      "id": "torch.nick-owns-up",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "torch-nick",
+      "weight": 1,
+      "moment": "quiet 2-4 s",
+      "when": [
+        "place = corridor",
+        "torch_follow = yes",
+        "nick_passed != yes"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "voice",
+          "name": "nearly headless nick",
+          "mark": "beyond the torch"
+        }
+      ],
+      "show": [
+        "nick drifts out of the wall a little beyond the torch that leaned, pauses to look at him, and drifts on along the corridor, out of sight"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "key": "torch.nick-owns-up",
+          "text": [
+            "Ah, you noticed. Torches are dreadful gossips."
+          ],
+          "canon": "Nick's voice, Godric's line (11 October 2026, 9.57 pm); makes no book claim"
+        }
+      ],
+      "starts": [
+        "set torch_follow = no",
+        "set nick_passed = yes",
+        "set nick_owned_up = yes"
+      ]
+    },
+    {
+      "id": "torch.nick-drifts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "torch-nick",
+      "weight": 1,
+      "moment": "quiet 2-4 s",
+      "when": [
+        "place = corridor",
+        "torch_follow = yes",
+        "nick_passed != yes",
+        "nick_owned_up = yes"
+      ],
+      "show": [
+        "nick drifts out of the wall a little beyond the torch that leaned and on along the corridor, out of sight"
+      ],
+      "starts": [
+        "set torch_follow = no",
+        "set nick_passed = yes"
+      ]
+    },
+    {
+      "id": "torch.unanswered",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "torch-nick",
+      "weight": 2,
+      "moment": "quiet 2-4 s",
+      "when": [
+        "place = corridor",
+        "torch_follow = yes"
+      ],
+      "starts": [
+        "set torch_follow = no"
+      ]
+    },
+    {
+      "id": "torch.deathday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 10-40 s",
+      "when": [
+        "place = corridor",
+        "date = 10-31",
+        "time != night",
+        "torch_blue != yes"
+      ],
+      "show": [
+        "every corridor torch burns bright blue for a minute, for Nick's deathday"
+      ],
+      "starts": [
+        "set torch_blue = yes"
+      ]
+    },
+    {
+      "id": "torch.deathday-hole",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap hole 3-8 s",
+      "when": [
+        "place = common room",
+        "hole_opened = yes",
+        "date = 10-31",
+        "time != night",
+        "torch_blue != yes"
+      ],
+      "show": [
+        "every corridor torch burns bright blue for a minute, for Nick's deathday"
+      ],
+      "starts": [
+        "set torch_blue = yes"
+      ]
+    },
+    {
+      "id": "torch.enter",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "enter",
+      "when": [],
+      "starts": [
+        "set torch_follow = no"
+      ]
+    },
+    {
+      "id": "torch.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set torch_leaned = no",
+        "set torch_follow = no",
+        "set torch_blue = no"
+      ]
+    }
+  ]
+}
