@@ -166,7 +166,7 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look round the dormitory. Tap a bed, a window, the hearth or the stair well to go to it; tap off it or Back to return. View switches to the view from the stair head. The grey shapes are placeholders at real size.</div>
+<div id="help">Drag to look round the dormitory. Tap a bed, a window, the hearth or the stair well to go to it; tap the well again to go down; tap off it or Back to return. View switches to the view from the stair head. The grey shapes are placeholders at real size.</div>
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -845,7 +845,10 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables, false);
-  if (hits.length) goTo(hits[0].object.userData.stop);
+  /* the way down (req 136; docs/interaction-vocabulary.md §6): the first tap on the well goes to its stop, a tap on it
+     there goes down */
+  if (hits.length && hits[0].object.userData.stop === STOPS[1] && atStop === STOPS[1]) descend();
+  else if (hits.length) goTo(hits[0].object.userData.stop);
   else goBack();
 }
 
