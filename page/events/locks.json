@@ -214,6 +214,33 @@
         "set drawer = locked",
         "set percy_notes = 0"
       ]
+    },
+    {
+      "id": "locks.door-list-his",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tried little door",
+      "when": [
+        "key != held",
+        "door_list != his"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "his",
+          "at": "door list",
+          "key": "locks.door-list-his",
+          "canon": "ours, Magic for the boys, Alohomora in the castle, B6 t1 (Godric, 12 October 2026, 2.56 pm)",
+          "text": [
+            "Alohomora, {year}. Nothing happened."
+          ]
+        }
+      ],
+      "starts": [
+        "set door_list = his",
+        "log \"Tried Alohomora on the little door {day}. Nothing happened, and he wrote it on the list.\""
+      ]
     }
   ]
 }

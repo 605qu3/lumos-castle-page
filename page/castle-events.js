@@ -66,6 +66,8 @@
    found, once ever; `secrets found` reads how many; `secrets()` lists them in the order found. `height()`, his height
    in metres from a grown-up's setting (board req 187). `learned X`, yes once he has cast spell X on the Charms page
    (its `learn(X)`, kept on the device), for the twins' note that waits for Lumos (board req 179).
+   Then his line on the little door's list (board req 177, Magic's B6 t1): `tried X`, a page moment, comes when his
+   spell on X's lock answers nothing (Charms' `openLock` with `stuck`); `{year}` in a line is this year.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -680,9 +682,11 @@
     }
 
     /* `{password}`, `{last password}`, `{next password}`: a chain's week's words in a line, after `{intro}`. `{card}`
-       (any variable a deck sets): the `say` of the card it holds, the name a voice uses for it. */
+       (any variable a deck sets): the `say` of the card it holds, the name a voice uses for it. `{year}`: this year,
+       for his own line on the little door's list (board req 177). */
     function fillWords(text) {
       return text.replace(/\{((?:last |next )?[a-z]+)\}/g, function (all, n) {
+        if (n === 'year') return String(nowDate().getFullYear());
         var v = /^(?:(?:last|next) )?([a-z]+)$/.exec(n);
         if (wordDefs[v[1]]) return String(value(n));
         var held = state.vars[n];
