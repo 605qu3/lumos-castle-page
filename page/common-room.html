@@ -1123,6 +1123,23 @@ var bookcase = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 3.4), new THREE.MeshS
 bookcase.receiveShadow = true; onWall(bookcase, BOOKCASE_THETA, 1.7, 5.25); register(bookcase, 0); bookcase.name = 'bookcase';
 var ladder = new THREE.Mesh(new THREE.PlaneGeometry(0.45, 3.3), new THREE.MeshStandardMaterial({ map: cutoutTexture(90, 660, '#a7a49e', drawLadder), roughness: 0.9, alphaTest: 0.5, side: THREE.DoubleSide }));
 onWall(ladder, BOOKCASE_THETA + 0.07, 1.62, 5.05); ladder.rotateX(-0.12); register(ladder, 0); ladder.name = 'bookcase-ladder';
+/* the brass key's little door (req 160, Magic's B and B2; Godric, 12 October 2026, 12.29 pm, option 1): a small old oak
+   door about 1.1 m tall with a big brass lock, low in the round wall at the stair's foot, a nod to the cupboard under
+   the stairs (PS 2); a grey placeholder at real size until it is drawn. Locked: a tap rattles it, and only Clementine's
+   key opens it (what lies behind is Magic's B4). 84 degrees right of the hearth (B2's plan drew it at about 87): on the
+   iPad it is seen only on the long drag toward the stair, and there whole only from 83 to 86 degrees; nearer, the
+   stair's stone and the desk's quill cover part of it (tools/probe-keydoor.mjs). On a wide screen it shows at rest. */
+var KEYDOOR = { deg: 84, w: 0.7, h: 1.1, r: 5.46, shake: 0 };
+function drawKeyDoor(g, w, h) {
+  arch(g, 0, 0, w, h);
+  var face = g.fillStyle;
+  g.fillStyle = '#8f8c86';
+  for (var i = 1; i < 4; i++) g.fillRect(w * i / 4 - 1, h * 0.12, 2, h * 0.86);   /* the planks */
+  g.fillRect(w * 0.72, h * 0.5, w * 0.16, h * 0.13);                                /* the big lock */
+  g.fillStyle = face;
+}
+var keyDoor = new THREE.Mesh(new THREE.PlaneGeometry(KEYDOOR.w, KEYDOOR.h), new THREE.MeshStandardMaterial({ map: cutoutTexture(140, 220, '#b9b6b0', drawKeyDoor, 'key door'), roughness: 0.9, alphaTest: 0.5 }));
+keyDoor.receiveShadow = true; onWall(keyDoor, Math.PI - KEYDOOR.deg * Math.PI / 180, KEYDOOR.h / 2, KEYDOOR.r); register(keyDoor, 0); keyDoor.name = 'key-door';
 
 /* ---------- notice board (tap to approach, tap a notice to take it down) ---------- */
 /* Hands and faces, as settled in the hand bake-off and the design system's tokens/fonts.css:
@@ -4964,6 +4981,21 @@ function updateLadder(dt) {
   ladder.position.set(L.r * Math.sin(th), L.y, L.r * Math.cos(th));
   ladder.lookAt(0, L.y, 0); ladder.rotateX(L.lean + rock);
 }
+/* the little door, locked (req 160): a tap rattles it in its frame, heard in words until it is recorded */
+tappables.push(keyDoor);
+var keyDoorAt = keyDoor.position.clone();
+function keyDoorTap() {
+  if (KEYDOOR.shake > 0) return;
+  KEYDOOR.shake = 1;
+  HEARD_FROM['little door'] = keyDoorAt.clone().setY(KEYDOOR.h + 0.2);
+  lineQ.unshift({ medium: 'heard', speaker: 'little door', sound: 'rattle, rattle' });
+}
+function updateKeyDoor(dt) {
+  if (KEYDOOR.shake <= 0) return;
+  KEYDOOR.shake = Math.max(0, KEYDOOR.shake - dt / 0.5);
+  var k = KEYDOOR.shake, a = 0.006 * Math.sin((1 - k) * Math.PI * 8) * k;   /* two rattles against the lock, then still */
+  keyDoor.position.copy(keyDoorAt).addScaledVector(new THREE.Vector3(Math.cos(keyDoor.rotation.y), 0, -Math.sin(keyDoor.rotation.y)), a);
+}
 /* A Snitch scratched into the desk's corner (req 122's woven touch, Fawkes on Godric's yes, 8.34 pm: the smallest things
    hide something only zoom finds). Some bored first-year's compass point, long ago: a ball the size of a fingernail
    and its two swept wings, about 4 cm across, on the apron's right corner beside the drawer, where the desk's card
@@ -5166,6 +5198,7 @@ function tapName(o) {
   if (o === stairs) return 'stair';
   if (o === bookcase) return 'bookshelf';
   if (o === ladder) return 'ladder';
+  if (o === keyDoor) return 'little door';
   if (o === sideTable) return 'desk';
   if (o === deskChair) return 'desk chair';
   if (o === candle.mesh) return 'candle';
@@ -5197,11 +5230,12 @@ function tap(cx, cy) {
   if (r.name && castle) castle.tap(r.name);
   if (kit && kit.tapped) kit.tapped(r.acted);
 }
-function tapDo(cx, cy) {
+/* what a tap at (cx, cy) finds, nearest first, the clear parts of the cutouts let through; nothing acts */
+function tapHits(cx, cy) {
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
-  var hits = raycaster.intersectObjects(tappables, false).filter(function (h) {
+  return raycaster.intersectObjects(tappables, false).filter(function (h) {
     if (h.object === scarf) return scarf.visible && scarfSolid(h.uv);
     if (h.object === satchel) return satchelSolid(h.uv);
     if (h.object === cloak) return alphaSolid(cloakAlpha, h.uv);
@@ -5220,6 +5254,9 @@ function tapDo(cx, cy) {
     if (hw >= 0) return !homework.alpha || !h.uv || alphaSolid(homework.alpha, { x: (hw + h.uv.x) / 3, y: h.uv.y });   /* three cells of one sheet */
     return !h.object.userData.paper || h.object.visible;
   });
+}
+function tapDo(cx, cy) {
+  var hits = tapHits(cx, cy);
   var hit = hits.length ? hits[0].object : null;
   var told = { name: tapName(hit), acted: true }, back = { name: null, acted: true };
   if (mode === 'hand') { if (homeHandTap()) return back; returnPaper(false); return back; }
@@ -5299,6 +5336,7 @@ function tapDo(cx, cy) {
   else if (tablePart(hit)) goTable();
   else if (hit === sofa) goSofa();
   else if (hit === bookcase || hit === ladder) goCase();
+  else if (hit === keyDoor) keyDoorTap();
   else return nothing;
   return told;
 }
@@ -5845,6 +5883,7 @@ function frame() {
   faceEye();
   updateSofaStop(dt);
   updateLadder(dt);
+  updateKeyDoor(dt);
   updateTwins();
   updateFire(sdt, slowT);
   updateBellows(dt);
@@ -5944,7 +5983,7 @@ kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hi
 kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless nick': 'Nearly Headless Nick',
   'the snitch scratched in the desk': 'The Snitch scratched in the desk' });
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
