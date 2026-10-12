@@ -673,7 +673,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=9"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=15"></script>
+<script src="castle-events.js?v=16"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=1"></script>
 <script>
@@ -4985,11 +4985,79 @@ function updateLadder(dt) {
 tappables.push(keyDoor);
 var keyDoorAt = keyDoor.position.clone();
 function keyDoorTap() {
-  if (KEYDOOR.shake > 0) return;
+  if (KEYDOOR.shake > 0 || LOCKS.door) return;
   KEYDOOR.shake = 1;
   HEARD_FROM['little door'] = keyDoorAt.clone().setY(KEYDOOR.h + 0.2);
   lineQ.unshift({ medium: 'heard', speaker: 'little door', sound: 'rattle, rattle' });
+  if (LOCKS.doorHolds && spellKnown('alohomora')) LOCKS.door = lockSpell(keyDoorLock, true, function (v) {
+    if (v !== 'nothing') return;
+    KEYDOOR.shake = 1;
+    lineQ.unshift({ medium: 'heard', speaker: 'little door', sound: 'nothing happened.' });
+  }, function () { LOCKS.door = null; });
 }
+/* the door's lock on the screen, for the spell's face: the stand-in's box at 0.8 across and 0.565 down */
+function keyDoorLock() { return screenOf(keyDoor.localToWorld(new THREE.Vector3(0.3 * KEYDOOR.w, -0.065 * KEYDOOR.h, 0))); }
+
+/* Req 161 (Events, the room's half of req 145: page/events/locks.json, notice.json; Charms' callables, req 146,
+   docs/handoff/charms.md "Room-ready Alohomora and Aparecium"). The room's rules come in through drawRoom: the little
+   door's "the small door's brass lock holding fast against any spell" shows until Clementine's key is held, and while
+   it does his Alohomora on the door answers "Nothing happened." whatever the turn (openLock, stuck). Percy's drawer
+   (req 143) and Wood's blank notice (req 144) are not drawn yet: their states are read here and their spells are
+   ready to call, raising 'opened percy drawer' and 'revealed notice practice', but nothing in the room offers them
+   until the drawer's keyhole and the blank sheet exist, with Godric's yes on each drawing. Each spell is offered only
+   once a boy has learned it on the Charms page, and goes after 10 s left alone, since its layer holds Back. */
+var LOCK_RULES = {
+  firework: "Percy's drawer standing open on the Fanged Frisbee, the pack of Exploding Snap and a Filibuster firework",
+  gobstones: "Percy's drawer standing open on the Fanged Frisbee, the pack of Exploding Snap and Percy's Gobstones",
+  note: "Percy's newest note tucked under the drawer's label",
+  door: "the small door's brass lock holding fast against any spell",
+  blank: "Wood's practice notice pinned up blank",
+  inked: "Wood's practice notice, the ink come back in his hand"
+};
+var LOCKS = { drawer: null, percyNote: false, doorHolds: false, notice: null, door: null, casting: null };
+function locksDrawRoom(shows) {
+  var R = LOCK_RULES;
+  LOCKS.drawer = shows.indexOf(R.gobstones) >= 0 ? 'gobstones' : shows.indexOf(R.firework) >= 0 ? 'firework' : null;
+  LOCKS.percyNote = shows.indexOf(R.note) >= 0;
+  LOCKS.doorHolds = shows.indexOf(R.door) >= 0;
+  LOCKS.notice = shows.indexOf(R.inked) >= 0 ? 'written' : shows.indexOf(R.blank) >= 0 ? 'blank' : null;
+  if (!LOCKS.doorHolds && LOCKS.door) LOCKS.door.cancel();
+}
+function spellKnown(name) { return !!(window.LumosSpells && LumosSpells.learned(name)); }
+function screenOf(v) {
+  v = v.clone().project(camera);
+  var r = renderer.domElement.getBoundingClientRect();                 /* the zoom scales the canvas; its box follows */
+  return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
+}
+/* the newest of a record's written lines (castle.written(), newest first) whose key starts so, for a pinned note's words */
+function newestWritten(prefix) {
+  var w = castle && castle.written ? castle.written() : [];
+  for (var i = 0; i < w.length; i++) if (w[i].key.indexOf(prefix) === 0) return w[i];
+  return null;
+}
+function lockSpell(at, stuck, then, gone) {
+  var a = LumosSpells.openLock({ at: at, stuck: stuck });
+  var idle = setTimeout(function () { a.cancel(); }, 10000);
+  a.done.then(function (r) { clearTimeout(idle); gone(); then(r.verdict); });
+  return a;
+}
+/* Percy's drawer, once drawn: a tap on its keyhole (at: its point on the screen, a function) */
+function percyDrawerSpell(at) {
+  if (LOCKS.casting || LOCKS.drawer || !spellKnown('alohomora')) return false;
+  LOCKS.casting = lockSpell(at, false, function (v) { if (v === 'opened' && castle) castle.moment('opened percy drawer'); },
+    function () { LOCKS.casting = null; });
+  return true;
+}
+function percyNoteWords() { var w = newestWritten('locks.percy-note-'); return w && w.text; }
+/* Wood's blank notice, once drawn: three taps on the sheet (sheet: its box on the screen, a function) */
+function practiceNoticeSpell(sheet) {
+  if (LOCKS.casting || LOCKS.notice !== 'blank' || !spellKnown('aparecium')) return false;
+  var a = LOCKS.casting = LumosSpells.revealInk({ sheet: sheet });
+  var idle = setTimeout(function () { a.cancel(); }, 10000);
+  a.done.then(function (r) { clearTimeout(idle); LOCKS.casting = null; if (r.verdict === 'revealed' && castle) castle.moment('revealed notice practice'); });
+  return true;
+}
+function practiceNoticeWords() { var w = newestWritten('notice.practice-'); return w && w.text; }
 function updateKeyDoor(dt) {
   if (KEYDOOR.shake <= 0) return;
   KEYDOOR.shake = Math.max(0, KEYDOOR.shake - dt / 0.5);
@@ -5817,7 +5885,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': snowballFly,
     "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); }
   }, VISITOR_CUES, NICK_CUES),
-  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); },
+  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); locksDrawRoom(shows); },
   figures: FIGURES,
   drawFigures: drawFiguresInOrder,
   showLines: showLines,
@@ -5981,9 +6049,10 @@ kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
 kit.zoom.held(function () { return !!(castle && castle.state().vars.omni === 'held'); });
 kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hidden(name)); });
 kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless nick': 'Nearly Headless Nick',
-  'the snitch scratched in the desk': 'The Snitch scratched in the desk' });
+  'the snitch scratched in the desk': 'The Snitch scratched in the desk',
+  'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
