@@ -2835,7 +2835,7 @@ function updateBooks(dt) {
       else { books.slip.material.map = books.slipTex(); books.slip.material.needsUpdate = true; }
     }
     var open = booksOpenToday();
-    if ((out !== books.out || open !== books.open) && mode !== 'board' && books.slide < 0) {   /* never changed under his eye at the desk */
+    if ((out !== books.out || open !== books.open) && mode !== 'board' && mode !== 'desk' && books.slide < 0) {   /* never changed under his eye at the desk */
       books.out = out; books.open = open; if (open) books.ajar = false;
       books.hist.visible = !out && !open && !!books.hist.material.map; books.slip.visible = out;
       books.openCard.visible = open && !!books.openCard.material.map;
@@ -4413,7 +4413,7 @@ function fireCatches() { fireLevelT = 1; stokeFire(); }
 /* at rest, these glide to the fireside stop */
 var FIRESIDE_TAPS = [hearthBack, bellows, rug, chairL, wingback];
 var tappables = [hearthBack, holeTap, catWalk, catSit, bellows, rug, chairL, wingback, stairs].concat(boardParts);
-tappables.push(books.mesh, books.hist, books.slip);
+tappables.push(books.mesh, books.hist, books.slip, books.openCard);
 for (var ti = 0; ti < papers.length; ti++) if (!papers[ti].spec.fixed) tappables.push(papers[ti].mesh);
 tappables.push(homeLetter.mesh, homeFeather.mesh);
 
@@ -4425,6 +4425,45 @@ function currentLook() {
   var d = new THREE.Vector3();
   camera.getWorldDirection(d);
   return camera.position.clone().addScaledVector(d, 5);
+}
+/* ---------- the desk stop (Q34, Godric 9.06 pm: walk up to the desk, zoom on top, the chair's post out of view) ----------
+   As the fireside: at rest a tap on the desk or its chair glides the view up to the desk, a boy's eye a little above
+   its top; he sits in the chair, so it fades as the view comes in (a card that turns to the eye cannot be framed
+   out, and its post cut across the left) and comes back as he leaves; there the
+   letter, the feather and the books answer their taps as in the room, zoom goes to 3x, and Back or a tap on anything
+   else glides back. Close enough that the desk's small things read: the wax, the pencilled name, the Snitch. */
+var DESK_STOP = { u: 0.52, lift: 0.07, eye: 0.42, side: 0, w: 1.0, h: 0.55, seat: 0, sat: 0 };
+tappables.push(sideTable, deskChair);
+function deskPose(pos, look) {
+  var gp = sideTable.geometry.parameters;
+  sideTable.updateMatrixWorld();
+  look.set((DESK_STOP.u - 0.5) * gp.width, (0.5 - HOME.v) * gp.height, 0); sideTable.localToWorld(look);
+  look.y += DESK_STOP.lift;
+  var n = new THREE.Vector3(-look.x, 0, -look.z).normalize(), right = new THREE.Vector3(n.z, 0, -n.x);
+  var th = Math.tan(baseFov() * Math.PI / 360), d = Math.max(DESK_STOP.h / 2 / th, DESK_STOP.w / 2 / (th * camera.aspect));
+  pos.copy(look).addScaledVector(n, d).addScaledVector(right, DESK_STOP.side);
+  pos.y = look.y + DESK_STOP.eye;
+}
+function goDesk() {
+  mode = 'tween';
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  deskPose(pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'desk'; backBtn.hidden = false; });
+  DESK_STOP.seat = 1; stopZoom(false);
+}
+function updateDeskChair(dt) {                             /* he sits: the chair fades as the view comes in */
+  DESK_STOP.sat = clamp(DESK_STOP.sat + (DESK_STOP.seat ? dt : -dt) / 0.8, 0, 1);
+  var m = deskChair.material;
+  if (!m.transparent && DESK_STOP.sat > 0) { m.transparent = true; m.needsUpdate = true; }
+  m.opacity = 1 - DESK_STOP.sat; deskChair.visible = DESK_STOP.sat < 0.99; deskChair.castShadow = DESK_STOP.sat < 0.5;
+}
+function leaveDesk() {
+  mode = 'tween';
+  backBtn.hidden = true;
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  roomPose(yaw, pitch, pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
+  DESK_STOP.seat = 0;
 }
 /* the zoom (req 122, castle.js; Godric's yes, 8.34 pm): 3x at rest, where the desk's small things need it; 2x at the
    fireside and the board, already close */
@@ -4447,7 +4486,7 @@ function leaveBoard() {
   var pos = new THREE.Vector3(), look = new THREE.Vector3();
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 0.9, function () { mode = 'room'; });
-  stopZoom(false);
+  stopZoom(false); DESK_STOP.seat = 0;                     /* Back with the letter in hand at the desk comes here too */
 }
 
 /* ---------- the fireside stop (Godric, 9 October 2026) ----------
@@ -4595,6 +4634,7 @@ function tap(cx, cy) {
     if (h.object === books.hist) return books.hist.visible && alphaSolid(books.hain, h.uv);
     if (h.object === books.slip) return books.slip.visible;
     if (h.object === books.openCard) return books.openCard.visible && alphaSolid(books.oain, h.uv);
+    if (h.object === deskChair) return DESK_STOP.sat < 0.5;            /* he sits in it at the desk */
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
@@ -4605,6 +4645,13 @@ function tap(cx, cy) {
     if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return; }
     if (hit && boardParts.indexOf(hit) >= 0) return;
     leaveBoard();
+    return;
+  }
+  if (mode === 'desk') {
+    if (hit === homeFeather.mesh) homeFeatherTap();
+    else if (hit && hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
+    else if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) booksTap();
+    else leaveDesk();
     return;
   }
   if (mode === 'fireside') {
@@ -4637,6 +4684,7 @@ function tap(cx, cy) {
   else if (hit === holeTap) { if (portrait.open) { if (!nickHolds()) climbOut(); } else { if (castle) castle.tap('hole'); togglePortrait(); } }
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
   else if (hit === stairs) climbStair(false, 'dormitory.html?from=room');
+  else if (hit === sideTable || hit === deskChair) goDesk();
 }
 
 /* drag versus tap */
@@ -4714,7 +4762,7 @@ function setShadows(on) {
   btns.shadows.classList.toggle('on', on);
 }
 backBtn.addEventListener('click', function () {
-  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside();
+  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk();
 });
 
 /* ---------- per frame ---------- */
@@ -5163,6 +5211,7 @@ function frame() {
   updateSign(dt);
   updateHomeLetter(dt);
   updateBooks(dt);
+  updateDeskChair(dt);
   updateSatchel(dt, t);
   updateHomework(dt);
   updateCurios(dt, t);
@@ -5173,7 +5222,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
