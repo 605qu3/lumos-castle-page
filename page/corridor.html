@@ -802,6 +802,75 @@ var turnTorch = (function () {
 })();
 turnTorch.mesh.visible = turnTorch.flame.visible = turnTorch.light.visible = false;
 torches.push(turnTorch);
+/* the leaning torch and his deathday's blue minute (req 131): castle.js's torchCues, answered the same through the
+   common room's hole. The lean takes a torch whose flame is in his view, never the one that leaned last, the nearest
+   he can see first (kit.seen: nothing opaque between), else the nearest in the frame; it leans along the corridor, as if something cold had drifted past it */
+var torchCtl = kit.torchCues(), torchFrustum = new THREE.Frustum(), torchM = new THREE.Matrix4(), leanedAt = null;
+function leanATorch() {
+  camera.updateMatrixWorld();
+  torchFrustum.setFromProjectionMatrix(torchM.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+  var best = -1, bestD = Infinity;
+  torches.forEach(function (tc, i) {
+    if (!tc.flame.visible || i === torchCtl.last() || !torchFrustum.containsPoint(tc.flame.position)) return;
+    var d = tc.flame.position.distanceTo(camera.position) + (kit.seen(tc.flame.position) ? 0 : 100);   /* one he can see first */
+    if (d < bestD) { bestD = d; best = i; }
+  });
+  if (best >= 0) { torchCtl.lean(best, Math.random() < 0.5 ? -1 : 1); leanedAt = torches[best].flame.position.clone(); return best; }
+  return -1;
+}
+/* Nick after a lean (req 140, Events' torch.json; Magic's *The leaning torch*: sometimes the lean is answered): he drifts
+   out of the outer wall a little beyond the torch that leaned, out toward the middle and on along the corridor away from
+   him, out of sight; or he pauses there to look at him while his line is up ("Ah, you noticed. Torches are dreadful
+   gossips.", Godric's), then drifts on. The common room's drawing (People's req 61, nick-ghost.png, three cells at 1.18
+   by 1.85 m: 0 drifting side-on facing right, mirrored for left; 1 turned to us, his hat swept out), pearly and
+   see-through as there, lifted 6 cm while he drifts; he fades over his last metre and a half. */
+var NICK = { w: 1.18, h: 1.85, lift: 0.06, speed: 0.7, beyond: 0.9, fade: 1.5 };
+var nickSheet = new THREE.TextureLoader().load('../assets/layers/nick-ghost.png');
+nickSheet.encoding = THREE.sRGBEncoding;
+function nickShow(cell, flip) { nickSheet.repeat.x = (flip ? -1 : 1) / 3; nickSheet.offset.x = (cell + (flip ? 1 : 0)) / 3; }
+nickShow(0, false);
+var nickMesh = new THREE.Mesh(new THREE.PlaneGeometry(NICK.w, NICK.h), new THREE.MeshBasicMaterial({ map: nickSheet,
+  color: col(0xe4ecf6), transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+nickMesh.name = 'nick'; nickMesh.visible = false; nickMesh.renderOrder = 2; scene.add(nickMesh);
+var nick = { state: 'away', path: null, len: 0, d: 0, pauseAt: 0, held: 0 };
+function nickAfterLean(pause) {
+  if (!leanedAt) return;
+  var s = leanedAt.x >= camera.position.x ? 1 : -1;      /* beyond: on the far side of the torch from him */
+  /* out of the wall inside the corridor, even where the torch is near her end; on through her end wall, or down the
+     flight's end, a ghost's way out of sight */
+  var x0 = clamp(leanedAt.x + s * NICK.beyond, FAR_END_X + 0.6, END_X - 0.6), xEnd = s > 0 ? END_X + 1.5 : FAR_END_X - 1.5;
+  var pts = [[x0, FAR_Z + 0.05], [x0 + s * 0.35, FAR_Z + 0.9], [x0 + s * 0.8, MID_Z], [xEnd, MID_Z]];
+  nick.path = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], 0, p[1]); }), false, 'catmullrom', 0.5);
+  nick.len = nick.path.getLength(); nick.d = 0; nick.state = 'drift';
+  nick.pauseAt = pause ? 1.1 : -1;   /* metres along: just out of the wall, turned to him */
+  nick.held = 0; nickMesh.visible = true;
+}
+function nickHead() { return nickMesh.position.clone().add(new THREE.Vector3(0, NICK.h * 0.45, 0)); }
+var _nk = new THREE.Vector3();
+function updateNick(dt) {
+  if (nick.state === 'away') return;
+  var speaking = (lineCur && lineCur.line.speaker === 'nick') || lineQ.some(function (l) { return l.speaker === 'nick'; });
+  if (nick.state === 'pause') {
+    nick.held += dt;
+    if (nick.held > 2.5 && !speaking) nick.state = 'drift';
+  } else {
+    nick.d = Math.min(nick.len, nick.d + NICK.speed * dt);
+    if (nick.pauseAt > 0 && nick.d >= nick.pauseAt) { nick.d = nick.pauseAt; nick.pauseAt = -1; nick.state = 'pause'; }
+    if (nick.d >= nick.len) { nick.state = 'away'; nickMesh.visible = false; return; }
+  }
+  var u = nick.d / nick.len;
+  _nk.copy(nick.path.getPointAt(u)); _nk.y = NICK.h / 2 + (nick.state === 'pause' ? 0 : NICK.lift);
+  nickMesh.position.copy(_nk);
+  nickMesh.rotation.y = Math.atan2(camera.position.x - _nk.x, camera.position.z - _nk.z);   /* facing the eye */
+  if (nick.state === 'pause') nickShow(1, false);
+  else {
+    /* side-on, facing the way he drifts as the eye sees it */
+    var tg = nick.path.getTangentAt(u), right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+    nickShow(0, tg.dot(right) < 0);
+  }
+  var left = nick.len - nick.d;
+  nickMesh.material.opacity = 0.55 * Math.min(1, nick.d / 0.6, left / NICK.fade);   /* out of the wall, and away */
+}
 /* a grey stand-in until its drawing (an empty painted room by the sitters' painter, its door at the right edge, where a
    caught sitter walks off, as the room's stand-in has it) */
 var paintingOpp = onWallZ(cutoutTexture(160, 176, '#b9a98c', function (g, w, h) {
@@ -2202,6 +2271,7 @@ function goTo(s) {
   backBtn.hidden = false;
   glideTo(s.stop(), s.arrive);
   if (s.name === 'her' && tween.from.pos.distanceTo(tween.to.pos) > 2.5) primpHer(tween.dur);   /* her primp, only as he walks up */
+  if (castle && castle.moment) castle.moment('walk up');   /* he sets off toward a stop: a torch may lean (req 140) */
 }
 function goBack() {
   if (mode !== 'stop') return;
@@ -2558,7 +2628,8 @@ var SPEAKER_AT = {
   trevor: function () { return trevorHit.visible ? trevorHit.position.clone() : helmetPos(); },
   sitter: function () { return worldOf(paintingOpp, 0); },
   thing: function () { return new THREE.Vector3(DOOR.x, 1.4, HER_Z); }, /* the polite door, behind which finds turn up */
-  stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }  /* the moving stair's grind, at its head */
+  stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }, /* the moving stair's grind, at its head */
+  nick: nickHead                                                       /* above his head, beyond the torch that leaned (req 140) */
 };
 var linesEl = document.getElementById('lines');
 var lineQ = [], lineCur = null;
@@ -2801,6 +2872,11 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the open visor drops shut': function () { armourJiggle = 0.4; },
     /* the grounds (req 115, Events' grounds.json): the snowball; the field and the lake are not in this window's view */
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
+    /* the leaning torch and his deathday (req 131, castle.js's torchCues; Events' req 132) */
+    "a corridor torch's flame leans and dips blue for a moment, then burns gold again": function () { leanATorch(); },
+    "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); },
+    'nick drifts out of the wall a little beyond the torch that leaned and on along the corridor, out of sight': function () { nickAfterLean(false); },
+    'nick drifts out of the wall a little beyond the torch that leaned, pauses to look at him, and drifts on along the corridor, out of sight': function () { nickAfterLean(true); },
     /* the painting opposite, met as he steps out (req 119): watching, caught slipping out, or paying him no mind */
     "the mantel painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady": function () { oppMoment('watch', 'mantel'); },
     "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'mantel'); },
@@ -2923,6 +2999,7 @@ function frame() {
   updateHerPatches(dt);
   updateGrounds(dt);
   updateSnowball(dt);
+  updateNick(dt);
   updateBewitched(dt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
   hinge.rotation.y = -herDoor.ang;
@@ -2940,6 +3017,7 @@ function frame() {
       tc.flame.scale.x *= 1 + 0.5 * g; tc.flame.scale.y *= 1 - 0.3 * g;
       tc.light.intensity *= 1 - 0.3 * g * Math.abs(Math.sin(t * 31 + i));
     }
+    torchCtl.dress(i, tc.flame, tc.light);
   });
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -2947,7 +3025,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },

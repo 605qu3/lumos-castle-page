@@ -102,14 +102,14 @@ window.castleFrame = function (opts) {
     if (text) label(g, text, w, h * 0.5, Math.round(Math.min(w, h) * 0.085));
     return tex(c);
   }
-  function flameTexture() {
+  function flameTexture(blue) {   /* blue: a ghost's flame, for the torches' cues (req 131) */
     var c = makeCanvas(128, 128), g = c.getContext('2d'), k = 58 / 40;
     g.setTransform(1, 0, 0, k, 0, 72 - 72 * k);
     var grd = g.createRadialGradient(64, 72 + 16 / k, 3, 64, 72, 40);
-    grd.addColorStop(0, 'rgba(255,255,230,1)');
-    grd.addColorStop(0.25, 'rgba(255,200,110,0.9)');
-    grd.addColorStop(0.55, 'rgba(255,110,30,0.45)');
-    grd.addColorStop(1, 'rgba(255,60,0,0)');
+    grd.addColorStop(0, blue ? 'rgba(235,245,255,1)' : 'rgba(255,255,230,1)');
+    grd.addColorStop(0.25, blue ? 'rgba(130,180,255,0.9)' : 'rgba(255,200,110,0.9)');
+    grd.addColorStop(0.55, blue ? 'rgba(50,100,255,0.45)' : 'rgba(255,110,30,0.45)');
+    grd.addColorStop(1, blue ? 'rgba(20,40,255,0)' : 'rgba(255,60,0,0)');
     g.fillStyle = grd;
     g.fillRect(0, 0, 128, 128 / k + 72);
     return tex(c);
@@ -453,6 +453,7 @@ window.castleFrame = function (opts) {
      docs/interaction-vocabulary.md). No names, no listener: nothing happens. */
   var ZOOM_MAX = 3, ZOOM_DOUBLE = 2.5, ZOOM_KEY = 'lumos.castle.omnioculars', LOOK_Z = 2, LOOK_HOLD_S = 1;
   var zOpt = opts.zoom === undefined ? {} : opts.zoom;
+  var seen = null;   /* seen(point): nothing opaque between the eye and a point in the world, set in the zoom's closure */
   var zoom = (function () {
     var on = zOpt !== false, zMin = 1, zMax = (zOpt && zOpt.max) || ZOOM_MAX;
     var z = 1, ox = 0, oy = 0, anim = null, listeners = [];
@@ -499,6 +500,23 @@ window.castleFrame = function (opts) {
       var x = clamp(Math.floor(u.x * a.w), 0, a.w - 1), y = clamp(Math.floor(u.y * a.h), 0, a.h - 1);   /* transformUv has flipped it to the picture's rows */
       return a.d[(y * a.w + x) * 4 + 3] / 255 < m.alphaTest;
     }
+    /* the same test for a point: a page's torch in his view, say (req 131); the point's own card and sprites never hide it */
+    seen = function (point) {
+      camera.updateMatrixWorld();
+      var eye = new THREE.Vector3().setFromMatrixPosition(camera.matrixWorld), dir = point.clone().sub(eye), far = dir.length() - 0.15;
+      if (far <= 0) return true;
+      lookRay.set(eye, dir.normalize()); lookRay.camera = camera; lookRay.far = far;   /* sprites need the camera */
+      var hits = lookRay.intersectObjects(scene.children, true);
+      lookRay.far = Infinity;
+      for (var i = 0; i < hits.length; i++) {
+        var o = hits[i].object, m = o.material, shown = true;
+        for (var p = o; p; p = p.parent) if (!p.visible) shown = false;
+        if (!o.isMesh || !shown || (m && (m.opacity === 0 || m.colorWrite === false || m.depthWrite === false))) continue;
+        if (clearAt(m, hits[i].uv)) continue;
+        return false;
+      }
+      return true;
+    };
     function lookNow() {
       if (z < LOOK_Z - 0.001 || n > 1) return;   /* not mid-pinch */
       camera.updateMatrixWorld();
@@ -747,6 +765,54 @@ window.castleFrame = function (opts) {
   function mountInHole(group) { group.rotation.set(0, CORRIDOR.holeMount.ry, 0); group.position.set(CORRIDOR.holeMount.x, 0, CORRIDOR.holeMount.z); return group; }
   function corridorInHole(group) { group.rotation.set(0, CORRIDOR.holeView.ry, 0); group.position.set(CORRIDOR.holeView.x, 0, CORRIDOR.holeView.z); return group; }
 
+  /* the corridor's torches answering a ghost (req 131; Magic for the boys, *The leaning torch*, Godric, 11 October 2026,
+     9.57 pm): two cues, Events' words (req 132) in each page's own cue map, answered the same by every page that shows a
+     corridor torch, the corridor and the common room's open hole. The lean: one flame leans over and dips blue for a moment, as the torch
+     beside the hole does for Nick, then burns gold again. His deathday: every corridor torch burns bright blue for a
+     minute (31 October; CoS 8, the tapers "all burning bright blue"). A page makes one with F.torchCues(), calls lean(i)
+     or deathday() on the cue (last() is the torch that leaned last, so a page never picks it twice running), and each
+     frame, after its own flicker, dress(i, flame, light) on each torch. When they come is the record's, never by night. */
+  function torchCues() {
+    var LEAN_S = 2.6, MINUTE_S = 60, RAMP_S = 2.5;
+    var gold = col(0xffb060), white = col(0xffffff), blueTex = null;   /* the gold is the flames' own */
+    var lightGold = col(0xffc080), lightBlue = col(0x7aa8ff);
+    var leans = {}, last = -1, day0 = -1;
+    function now() { return performance.now() / 1000; }
+    return {
+      lean: function (i, side) { leans[i] = { t0: now(), side: side || 1 }; last = i; },
+      last: function () { return last; },
+      deathday: function () { day0 = now(); },
+      busy: function () { return day0 >= 0 || Object.keys(leans).length > 0; },
+      dress: function (i, flame, light) {
+        var t = now(), l = leans[i], lean = 0, deepK = 0;
+        if (l) {
+          var k = (t - l.t0) / LEAN_S;
+          if (k >= 1) { delete leans[i]; flame.material.rotation = 0; }
+          else lean = Math.sin(Math.PI * k);   /* over and back upright */
+        }
+        if (day0 >= 0) {
+          var b = t - day0;
+          if (b >= MINUTE_S) day0 = -1;
+          else deepK = Math.max(0, Math.min(1, b / RAMP_S, (MINUTE_S - b) / RAMP_S));
+        }
+        var blue = Math.min(1, 1.5 * lean), bk = Math.max(blue, deepK), fm = flame.material;
+        /* the gold flame sinks and a blue one rises in its place: it dips, then burns blue */
+        if (!fm.userData.goldMap) fm.userData.goldMap = fm.map;
+        if (bk > 0.5) { blueTex = blueTex || flameTexture(true); fm.map = blueTex; fm.color.copy(white).multiplyScalar(2 * bk - 1); }
+        else { fm.map = fm.userData.goldMap; fm.color.copy(gold).multiplyScalar(1 - 2 * bk); }
+        if (lean > 0) {
+          flame.material.rotation = l.side * 0.85 * lean;
+          flame.scale.x *= 1 + 0.25 * lean; flame.scale.y *= 1 - 0.3 * lean;
+        }
+        if (deepK > 0) { flame.scale.x *= 1 + 0.15 * deepK; flame.scale.y *= 1 + 0.3 * deepK; }
+        if (light) {
+          light.color.copy(lightGold).lerp(lightBlue, Math.max(0.6 * blue, deepK));
+          light.intensity *= (1 - 0.35 * blue) * (1 + 0.25 * deepK);
+        }
+      }
+    };
+  }
+
   /* one window's outline, from the bottom of one jamb round the head to the bottom of the other: a round head of half
      width r centred on x, springing at ys, the jambs down to yb; n points on the head */
   function windowOutline(x, r, ys, yb, n) {
@@ -873,7 +939,7 @@ window.castleFrame = function (opts) {
     layered: layered, TINTS: TINTS, register: register, solid: solid, box: box, cutoutMesh: cutoutMesh,
     sheetTexture: sheetTexture, applyLayer: applyLayer, placeCard: placeCard, applySurface: applySurface, applyPlan: applyPlan,
     quietCanvas: quietCanvas, unstainCanvas: unstainCanvas, sillCanvas: sillCanvas, wornCanvas: wornCanvas,
-    setTint: setTint, resize: resize, stats: stats, zoom: zoom,
+    setTint: setTint, resize: resize, stats: stats, zoom: zoom, seen: function (p) { return seen(p); }, torchCues: torchCues,
     from: from, reveal: reveal, travel: travel, savePlace: savePlace, readPlace: readPlace,
     CORRIDOR: CORRIDOR, buildCorridor: buildCorridor, mountInHole: mountInHole, corridorInHole: corridorInHole };
   for (var k in names) F[k] = names[k];
