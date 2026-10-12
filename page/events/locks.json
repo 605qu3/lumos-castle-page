@@ -49,7 +49,8 @@
       "starts": [
         "set drawer = open",
         "set drawer_swap = due",
-        "log \"Opened Percy's drawer {day}\""
+        "log \"Opened Percy's drawer {day}\"",
+        "secret percy-drawer"
       ]
     },
     {

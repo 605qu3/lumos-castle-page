@@ -1,0 +1,90 @@
+{
+  "chain": "map",
+  "room": [
+    {
+      "when": [
+        "place = corridor",
+        "at = witch",
+        "map = waiting"
+      ],
+      "show": [
+        "behind the witch's plinth, where Harry crouched, a folded old parchment and a note in the twins' hand"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "map.witch-hump",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "opened witch hump",
+      "when": [
+        "place = corridor"
+      ],
+      "starts": [
+        "secret witch-hump"
+      ]
+    },
+    {
+      "id": "map.den",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "opened little door",
+      "when": [
+        "place = common room"
+      ],
+      "starts": [
+        "secret den"
+      ]
+    },
+    {
+      "id": "map.left",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "secrets found >= 6",
+        "map != waiting",
+        "map != held"
+      ],
+      "starts": [
+        "set map = waiting"
+      ]
+    },
+    {
+      "id": "map.take",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap map",
+      "when": [
+        "place = corridor",
+        "at = witch",
+        "map = waiting"
+      ],
+      "show": [
+        "he takes the folded parchment and the twins' note from behind the witch, and they are his"
+      ],
+      "starts": [
+        "set map = held",
+        "log \"Found the twins' old parchment behind the witch {day}\""
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "the twins",
+          "at": "hand",
+          "key": "map.twins-note",
+          "canon": "ours, after PoA 10 (the twins give Harry the Map: \"your need's greater than ours\", \"we know it off by heart\", \"don't forget to wipe it after you've used it\") and PS 12 (\"Gred and Forge\"); checked against the text, 12 October 2026",
+          "text": [
+            "It's a wrench, giving it to you, but your need's greater than ours. We know it off by heart anyway. Gred and Forge. P.S. Don't forget to wipe it after you've used it, or anyone can read it."
+          ]
+        }
+      ]
+    }
+  ]
+}

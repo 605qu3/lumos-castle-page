@@ -234,7 +234,8 @@
       "starts": [
         "set opened_visit = yes",
         "add opened_visits 1",
-        "log \"Tickled the door open {day}\""
+        "log \"Tickled the door open {day}\"",
+        "secret polite-door"
       ]
     },
     {

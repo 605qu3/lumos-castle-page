@@ -62,6 +62,9 @@
    Then the cards' pace and repeats (fifty-fourth session; Godric's answers of 12 October 2026): drawing from a deck also sets
    `<var>_again`, yes when he has found that card before; each card's first-found date is kept (`foundOn(name)`, the
    lives shelf's link, Magic's B7); a deck's card may carry `say`, the name a line's `{card}` takes.
+   Then the castle's secrets (board req 180, the Marauder's Map earned, Magic's B9): `secret X` counts a secret he has
+   found, once ever; `secrets found` reads how many; `secrets()` lists them in the order found. `height()`, his height
+   in metres from a grown-up's setting (board req 187).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -94,7 +97,8 @@
     ['stamp', /^stamp ([a-z_]+)(?: \+(\d+)(?:-(\d+))? days)?$/],
     ['stamp-night', /^stamp ([a-z_]+) by night$/],
     ['slot', /^(take|free) slot$/],
-    ['log', /^log "(.+)"$/]
+    ['log', /^log "(.+)"$/],
+    ['secret', /^secret ([a-z\-]+)$/]
   ];
 
   /* The real moon (req 95, Magic's "The real moon, how real", Godric's pick of 10 October 2026, 5.16 pm), from the
@@ -226,7 +230,7 @@
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
              open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
-             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {} };
+             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [] };
   }
 
   function start(opts) {
@@ -380,6 +384,7 @@
           return ls && (ls.open || Date.now() < ls.until) ? ls.name : 'none';
         case 'bedtime': return bedtimeMin > 0 ? 'set' : 'off';
         case 'things looked at': return (state.looked || []).length;   /* different things held close in the zoom, ever (req 127) */
+        case 'secrets found': return (state.secrets || []).length;     /* the castle's secrets he has found, each once ever (req 180) */
         case 'parent parcel': return settings.parcel || 'none';         /* what a parent sends by owl from the grown-up corner */
         /* how this page was reached, from its `?from=`: room, corridor, dormitory, sleep (the waking), or none (Neville's
            snore on a night waking, 10 October 2026) */
@@ -581,6 +586,7 @@
           case 'stamp-night': state.stamps[m[1]] = tonight(); return;
           case 'slot': state.slot = m[1] === 'take' ? rec.id : null; return;
           case 'log': logLine(m[1]); return;
+          case 'secret': if (state.secrets.indexOf(m[1]) < 0) state.secrets.push(m[1]); return;   /* once ever (req 180) */
         }
       }
       note(rec.id + ': effect does not parse: ' + text);
@@ -1275,6 +1281,8 @@
       /* The day each card of a deck first came to him, yyyy-mm-dd by card (the lives shelf, Magic's B7: a life
          arrives the day he first finds that person's card); a repeat leaves it as it was. `foundOn('frogs')`. */
       foundOn: function (name) { return Object.assign({}, (state.deckFirst || {})[name] || {}); },
+      /* The castle's secrets he has found, in the order found, each once (req 180; for the Map, B10). */
+      secrets: function () { return (state.secrets || []).slice(); },
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';
@@ -1299,6 +1307,12 @@
       state: function () { return state; },
       log: function () { return state.log.slice(); },
       settings: function () { return settings; },
+      /* His height in metres, a grown-up's setting (settings.height), for his line on the den's jamb (board req 187);
+         ?height=1.32 sets it for a test; null until one is set, or if it is not a child's height (0.6 to 2 m). */
+      height: function () {
+        var h = +params.get('height') || +settings.height;
+        return h >= 0.6 && h <= 2 ? h : null;
+      },
       visit: function () { return visit; },
       heard: heard,                                   /* guesses a page heard itself, as strings or { text } */
       listening: function () { return value('listening'); },

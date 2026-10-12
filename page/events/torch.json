@@ -80,7 +80,8 @@
       "starts": [
         "set torch_follow = no",
         "set nick_passed = yes",
-        "set nick_owned_up = yes"
+        "set nick_owned_up = yes",
+        "secret leaning-torch"
       ]
     },
     {

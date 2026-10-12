@@ -261,7 +261,8 @@
         "set wood_ink = written",
         "add wood_reveals 1",
         "stamp wood_ink_on",
-        "log \"Brought back Wood's hidden notice {day}\""
+        "log \"Brought back Wood's hidden notice {day}\"",
+        "secret wood-notice"
       ]
     },
     {
@@ -291,7 +292,8 @@
         "set wood_ink = written",
         "add wood_reveals 1",
         "stamp wood_ink_on",
-        "log \"Brought back Wood's hidden notice {day}\""
+        "log \"Brought back Wood's hidden notice {day}\"",
+        "secret wood-notice"
       ]
     },
     {
@@ -321,7 +323,8 @@
         "set wood_ink = written",
         "add wood_reveals 1",
         "stamp wood_ink_on",
-        "log \"Brought back Wood's hidden notice {day}\""
+        "log \"Brought back Wood's hidden notice {day}\"",
+        "secret wood-notice"
       ]
     },
     {
@@ -351,7 +354,8 @@
         "set wood_ink = written",
         "add wood_reveals 1",
         "stamp wood_ink_on",
-        "log \"Brought back Wood's hidden notice {day}\""
+        "log \"Brought back Wood's hidden notice {day}\"",
+        "secret wood-notice"
       ]
     },
     {
