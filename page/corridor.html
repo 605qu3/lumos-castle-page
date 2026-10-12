@@ -1634,6 +1634,9 @@ function lockOnScreen() {
 }
 function lockOffered() {
   lockDrop();
+  /* a giggle still showing gives way, so it never prints over the lock's face */
+  lineQ = lineQ.filter(function (l) { return l.speaker !== 'door'; });
+  if (lineCur && lineCur.line.speaker === 'door') lineCur.t = Math.min(lineCur.t, 0.35);
   var mine = lockOffer = LumosSpells.openLock({ at: lockOnScreen, stuck: true });
   mine.tap();
   lockTimer = setTimeout(function () { if (lockOffer === mine) mine.cancel(); }, LOCK_WAIT_S * 1000);
@@ -2737,7 +2740,7 @@ var SPEAKER_AT = {
   trevor: function () { return trevorHit.visible ? trevorHit.position.clone() : helmetPos(); },
   sitter: function () { return worldOf(paintingOpp, 0); },
   thing: function () { return new THREE.Vector3(DOOR.x, 1.4, HER_Z); }, /* the polite door, behind which finds turn up */
-  door: function () { return new THREE.Vector3(DOOR.x, 1.4, HER_Z); },  /* its own giggle and creak (req 150) */
+  door: function () { return new THREE.Vector3(DOOR.x, 1.85, HER_Z); }, /* its own giggle and creak (req 150), above the lock's face (req 154) */
   stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }, /* the moving stair's grind, at its head */
   nick: nickHead                                                       /* above his head, beyond the torch that leaned (req 140) */
 };
