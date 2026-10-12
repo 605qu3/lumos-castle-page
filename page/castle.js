@@ -453,7 +453,7 @@ window.castleFrame = function (opts) {
     rim.style.cssText = 'position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;opacity:0';
     canvas.insertAdjacentElement('afterend', rim);
     var line = document.createElement('div');
-    line.textContent = '“Omnioculars,” said the saleswizard eagerly. “You can replay action… slow everything down…”';
+    line.textContent = '“Omnioculars,” said the saleswizard eagerly. “You can replay action…slow everything down…”';
     line.style.cssText = 'position:fixed;left:50%;bottom:12%;transform:translateX(-50%);max-width:80%;text-align:center;' +
       'font:italic 17px Georgia,serif;color:#f1dfb0;text-shadow:0 1px 3px #000;pointer-events:none;opacity:0;transition:opacity 0.8s';
     rim.insertAdjacentElement('afterend', line);
