@@ -105,6 +105,9 @@
   #keyhole.on svg { opacity: 1; transform: translate(-50%, -24%) scale(var(--grow, 40));
     transition: opacity 0.25s ease, transform 1.3s cubic-bezier(0.55, 0, 0.8, 0.4); }
   @media (prefers-reduced-motion: reduce) { #keyhole svg, #keyhole.on svg { transition: opacity 0.4s ease; } }
+  /* the den's doorway: dark a moment as he ducks through (req 175) */
+  #denFade { position: fixed; inset: 0; pointer-events: none; background: #050403; opacity: 0; transition: opacity 0.4s ease; }
+  #denFade.on { opacity: 1; }
   #lines { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
   .line { position: absolute; left: 0; top: 0; pointer-events: auto; cursor: pointer; opacity: 0;
     transition: opacity 0.35s ease; -webkit-tap-highlight-color: transparent; }
@@ -656,6 +659,7 @@ turned down for hanging facing out. Keyed at 1189 x 2488 px, 2378 px per metre, 
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
 <div id="keyhole" aria-hidden="true"><svg viewBox="0 0 20 34"><path d="M10 0a8 8 0 0 1 4.2 14.8L17 34H3l2.8-19.2A8 8 0 0 1 10 0z"/></svg></div>
+<div id="denFade" aria-hidden="true"></div>
 <div id="lines" aria-live="polite"></div>
 <div id="hud">
   <div id="stats">starting</div>
@@ -697,7 +701,7 @@ var kit = window.castleFrame ? castleFrame({
   onAct: function (act) {
     if (act === 'shadows') setShadows(!shadowsOn);
     else if (act === 'tilt') toggleTilt();
-    else if (act === 'reset') { yawT = 0; pitchT = 0; tiltBase = null; if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); }
+    else if (act === 'reset') { yawT = 0; pitchT = 0; tiltBase = null; if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'den') denYawT = 0; }
   }
 }) : null;
 if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
@@ -4972,8 +4976,8 @@ function findVars() { return (castle && castle.state && castle.state().vars) || 
 function wordsOf(s) { s = String(s || '').replace(/-/g, ' '); return s.charAt(0).toUpperCase() + s.slice(1); }
 /* the stand-ins: a find a grey pebble of a shape with its name and state; a card the card's form in grey, its picture's
    frame, the figure there, gone, or a coat tail at the frame's edge, its back ruled with a frog roundel, Houdini's padlock */
-function drawFindStandIn(v) {
-  var c = findCanvas, g = c.getContext('2d'), W = c.width, H = c.height;
+function drawFindStandIn(v, into) {                    /* into: another canvas of the same size (the den's ring) */
+  var c = into || findCanvas, g = c.getContext('2d'), W = c.width, H = c.height;
   g.clearRect(0, 0, W, H);
   g.textAlign = 'center'; g.textBaseline = 'middle';
   if (v.find !== 'card') {
@@ -5170,6 +5174,272 @@ function leaveKeyhole() {
   var pos = new THREE.Vector3(), look = new THREE.Vector3();
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 1.4, function () { mode = 'room'; });
+}
+
+/* Clementine's den behind the little door, in grey (req 175; Magic for the boys, "The den's spec, for the Common room to
+   build in grey", with "B4, the den" and D1; Godric, 12 October 2026, 2.56 pm, option 1, both touches; plan
+   assets/review/den-plan-d1.jpg). Round, 4.5 m across inside, the wall 0.4 m thick, a cone of beams from 2.2 m at the
+   wall to 3.6 m in the middle; the little door's own doorway, 0.7 m wide, 1.1 m tall outside and a full 2.0 m inside.
+   Built 40 m under the floor, out of every view of the room, on layer 1 with her lamp: in the den the camera sees layer
+   1 alone, so the room's lights never reach it and her lamp is the one light. He goes to the door crouched, the screen
+   dark a moment, and rises inside, just inside the doorway; he turns where he stands (no walking about), far enough
+   either way to see the doorway, her marks and the shelves. A tap on the doorway, or Back, turns him to her marks a
+   moment and takes him out to the view he left. The door holds until her key exists; ?den opens it for a probe, and a
+   tap on it (off the keyhole) takes him in. */
+var DEN = { at: new THREE.Vector3(0, -40, 0), r: 2.25, wall: 0.4, hWall: 2.2, hTop: 3.6, doorW: 0.7, doorH: 2.0,
+  eye: 1.35, stand: 1.0, crouch: 0.95, turn: 2.75, tilt: -0.7, face: -153 * Math.PI / 180,
+  band: [0.95, 1.35], from: -115, to: 165,   /* the ring of slots (D1): degrees round from the far wall, + to his right */
+  cards: 82,          /* a slot a card: the deck frogs in page/events/sofa.json holds 82 (the D1 plan says 83; asked) */
+  rare: { agrippa: -5, ptolemy: 5 },         /* their slots pencilled in faint grey across from the door (D1 t1) */
+  marks: [1.40, 1.43, 1.47, 1.50, 1.53, 1.57, 1.60], year0: 1884,   /* her lines, one a year, 1884 to 1890 (B4 t1) */
+  mine: 1.1,          /* his blank line: his set height once a grown-up's setting holds one; the door's 1.1 m till then */
+  shelves: [0.5, 0.9, 1.3], shelfAt: -140, lamp: 1.1,
+  open: /[?&]den(=|&|$)/.test(location.search), SEEN: 'lumos.den.seen', doorK: 0, doorT: 0, doorW_: -1 };
+var den = new THREE.Group();
+den.position.copy(DEN.at); den.visible = false; scene.add(den);
+var denFade = document.getElementById('denFade');
+function denMat(color, o) { var p = { color: color, roughness: 0.92 }; for (var k in o) p[k] = o[k]; return new THREE.MeshStandardMaterial(p); }
+function denAdd(m, x, y, z) { m.position.set(x || 0, y || 0, z || 0); m.layers.enable(1); den.add(m); return m; }
+function denXZ(deg, rr) { var a = deg * Math.PI / 180; return [rr * Math.sin(a), -rr * Math.cos(a)]; }   /* + to his right */
+var DEN_HALF = Math.asin(DEN.doorW / 2 / DEN.r);
+/* the round wall with the doorway's gap, the lintel over it, the doorway's reveals and the dark beyond */
+denAdd(new THREE.Mesh(new THREE.CylinderGeometry(DEN.r, DEN.r, DEN.hWall, 72, 1, true, DEN_HALF, Math.PI * 2 - 2 * DEN_HALF), denMat('#8a867f', { side: THREE.BackSide })), 0, DEN.hWall / 2);
+denAdd(new THREE.Mesh(new THREE.CylinderGeometry(DEN.r, DEN.r, DEN.hWall - DEN.doorH, 6, 1, true, -DEN_HALF, 2 * DEN_HALF), denMat('#8a867f', { side: THREE.BackSide })), 0, (DEN.doorH + DEN.hWall) / 2);
+var DEN_Z0 = DEN.r * Math.cos(DEN_HALF), DEN_Z1 = DEN.r + DEN.wall, DEN_DEPTH = DEN_Z1 - DEN_Z0;
+[-1, 1].forEach(function (s) {
+  var m = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(DEN_DEPTH, DEN.doorH), denMat('#7d7973')), s * DEN.doorW / 2, DEN.doorH / 2, (DEN_Z0 + DEN_Z1) / 2);
+  m.rotation.y = -s * Math.PI / 2;
+});
+denAdd(new THREE.Mesh(new THREE.PlaneGeometry(DEN.doorW, DEN_DEPTH), denMat('#7d7973')), 0, DEN.doorH, (DEN_Z0 + DEN_Z1) / 2).rotation.x = Math.PI / 2;
+var denDoorway = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(DEN.doorW, DEN.doorH), new THREE.MeshBasicMaterial({ color: '#0d0b09' })), 0, DEN.doorH / 2, DEN_Z1 - 0.01);
+denDoorway.rotation.y = Math.PI; denDoorway.name = 'den-doorway';
+/* the floor, and the cone of beams: four rafters and a fifth meeting over the lamp */
+denAdd(new THREE.Mesh(new THREE.CircleGeometry(DEN.r + 0.02, 72), denMat('#5f5a54'))).rotation.x = -Math.PI / 2;
+denAdd(new THREE.Mesh(new THREE.ConeGeometry(DEN.r, DEN.hTop - DEN.hWall, 72, 1, true), denMat('#5d5852', { side: THREE.DoubleSide })), 0, (DEN.hWall + DEN.hTop) / 2);
+for (var dri = 0; dri < 5; dri++) {
+  var dra = dri * Math.PI * 2 / 5 + 0.31, drFoot = new THREE.Vector3(DEN.r * 0.98 * Math.sin(dra), DEN.hWall, DEN.r * 0.98 * Math.cos(dra));
+  var drTop = new THREE.Vector3(0, DEN.hTop - 0.02, 0), drDir = drTop.clone().sub(drFoot), drLen = drDir.length();
+  var raft = denAdd(new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.09, drLen), denMat('#4f4a45')));
+  raft.position.copy(drFoot).addScaledVector(drDir, 0.5).addScaledVector(new THREE.Vector3(0, -1, 0), 0.05);
+  raft.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), drDir.normalize());
+}
+/* the middle: the rag rug, the low table, her lamp and her note, the cushions */
+var denRug = denAdd(new THREE.Mesh(new THREE.CircleGeometry(1, 64), denMat('#6e5a52')), 0, 0.008, 0.1);
+denRug.rotation.x = -Math.PI / 2; denRug.scale.set(1.2, 0.8, 1);
+denAdd(new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.035, 36), denMat('#7a746c')), 0, 0.42, 0.1);
+denAdd(new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.07, 0.41, 14), denMat('#6a645d')), 0, 0.205, 0.1);
+denAdd(new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.07, 0.06, 18), denMat('#77726b')), -0.06, 0.467, 0.06);
+denAdd(new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.07, 8), denMat('#77726b')), -0.06, 0.53, 0.06);
+denAdd(new THREE.Mesh(new THREE.SphereGeometry(0.072, 20, 14), new THREE.MeshBasicMaterial({ color: '#f2c98a' })), -0.06, 0.63, 0.06);
+var denLamp = new THREE.PointLight(col(0xffc27a), DEN.lamp, 6, 2);
+denLamp.position.set(-0.06, 0.63, 0.06); denLamp.layers.set(1); den.add(denLamp);
+var denBounce = new THREE.AmbientLight(col(0xffd2a0), 0.12);   /* her lamp's light off the walls, so a shelf's top is not black */
+denBounce.layers.set(1); den.add(denBounce);
+var denNoteCanvas = makeCanvas(360, 256), denNote = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.085), denMat('#ffffff', { map: tex(denNoteCanvas) })), 0.12, 0.439, 0.16);
+denNote.rotation.set(-Math.PI / 2, 0, 0.35);
+[[-0.95, 0.15], [0.92, 0.32], [0.38, -0.82]].forEach(function (p) {
+  denAdd(new THREE.Mesh(new THREE.SphereGeometry(0.24, 18, 10), denMat('#857a72')), p[0], 0.1, p[1]).scale.set(1, 0.42, 1);
+});
+/* the shelves, left of the door between it and the ring, each with her label (B4: "for things you find") */
+var denLabelCanvas = makeCanvas(400, 100), denLabelTex = tex(denLabelCanvas);
+DEN.shelves.forEach(function (y) {
+  var a = DEN.shelfAt, xz = denXZ(a, DEN.r - 0.13), b = denAdd(new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.03, 0.22), denMat('#77716a')), xz[0], y, xz[1]);
+  b.rotation.y = -a * Math.PI / 180;
+  var lx = denXZ(a, DEN.r - 0.243), l = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.04), denMat('#ffffff', { map: denLabelTex })), lx[0], y - 0.002, lx[1]);
+  l.rotation.y = -a * Math.PI / 180;
+});
+/* her height marks on the inner jamb, the side his right hand is on as he turns back (B4 t1): a casing board beside
+   the doorway, her seven lines with "C.A." and the year, below them his blank line */
+var denCasingCanvas = makeCanvas(200, 2000);
+var denCasing = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(0.2, DEN.doorH), denMat('#ffffff', { map: tex(denCasingCanvas) })), -(DEN.doorW / 2 + 0.105), DEN.doorH / 2, DEN.r * Math.cos(Math.asin(0.56 / DEN.r)) - 0.012);
+denCasing.rotation.y = Math.PI;
+/* the ring of slots at his eye (D1): one band, one canvas, every slot drawn in it */
+var DEN_RING = { W: 4096, H: 150 };
+var denRingCanvas = makeCanvas(DEN_RING.W, DEN_RING.H), denRingTex = tex(denRingCanvas);
+var denRing = denAdd(new THREE.Mesh(new THREE.CylinderGeometry(DEN.r - 0.012, DEN.r - 0.012, DEN.band[1] - DEN.band[0], 120, 1, true,
+  (180 - DEN.to) * Math.PI / 180, (DEN.to - DEN.from) * Math.PI / 180), denMat('#ffffff', { map: denRingTex, side: THREE.BackSide, roughness: 0.7 })), 0, (DEN.band[0] + DEN.band[1]) / 2);
+var denGlintM = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(CARD_W * 1.5, CARD_H * 1.35), new THREE.MeshBasicMaterial({ color: '#fff0c0', transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false })));
+denGlintM.visible = false;
+var denScratch = makeCanvas(512, 716);
+var denState = { order: [], slots: [], key: null, count: -1, leaving: false, hold: 0, glintT: 0, painted: false };
+var denYaw = 0, denYawT = 0, denTilt = DEN.tilt, denBack = null;
+tappables.push(denDoorway);
+function denSlotDeg(i) { return DEN.from + (DEN.to - DEN.from) * (i + 0.5) / DEN.cards; }
+function denSlotNear(deg) { return Math.round((deg - DEN.from) / (DEN.to - DEN.from) * DEN.cards - 0.5); }
+function denFound() {                                  /* each card once, in the order found; a repeat is the swap pile's */
+  var all = castle && castle.found ? castle.found('frogs') : [], out = [];
+  for (var i = 0; i < all.length; i++) if (out.indexOf(all[i]) < 0) out.push(all[i]);
+  return out;
+}
+function denSlotsOf(order) {                           /* Agrippa's and Ptolemy's slots their own; the rest fill in order */
+  var slots = new Array(DEN.cards), held = {}, k, free = 0;
+  for (k in DEN.rare) held[denSlotNear(DEN.rare[k])] = k;
+  order.forEach(function (c) {
+    for (var s in held) if (held[s] === c) { slots[+s] = c; return; }
+    while (free < DEN.cards && held[free] != null) free++;
+    if (free < DEN.cards) slots[free++] = c;
+  });
+  return slots;
+}
+function denPaint() {                                  /* her hand's things, once the faces have loaded */
+  var g = denNoteCanvas.getContext('2d');
+  g.fillStyle = '#d9d4ca'; g.fillRect(0, 0, 360, 256);
+  g.fillStyle = '#2c2925'; g.font = '30px ' + F.clerk; g.textAlign = 'left'; g.textBaseline = 'top';
+  ['I made this when I was', 'small enough to fit.', "It's yours now.", 'C.A.'].forEach(function (s, i) { g.fillText(s, 26, 28 + i * 52); });
+  denNote.material.map.needsUpdate = true;
+  g = denLabelCanvas.getContext('2d');
+  g.fillStyle = '#d5d0c6'; g.fillRect(0, 0, 400, 100);
+  g.fillStyle = '#2c2925'; g.font = '44px ' + F.clerk; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText('for things you find', 200, 52);
+  denLabelTex.needsUpdate = true;
+  g = denCasingCanvas.getContext('2d');
+  var px = function (h) { return (DEN.doorH - h) / DEN.doorH * 2000; };
+  g.fillStyle = '#a39e96'; g.fillRect(0, 0, 200, 2000);
+  g.strokeStyle = '#8a857e'; g.lineWidth = 3; g.strokeRect(6, 0, 188, 2000);
+  g.font = '24px ' + F.clerk; g.textAlign = 'left'; g.textBaseline = 'middle';
+  DEN.marks.forEach(function (h, i) {
+    g.strokeStyle = 'rgba(60,56,52,0.85)'; g.lineWidth = 2.5;
+    g.beginPath(); g.moveTo(14, px(h)); g.lineTo(72, px(h)); g.stroke();
+    g.fillStyle = 'rgba(60,56,52,0.85)'; g.fillText('C.A. ' + (DEN.year0 + i), 78, px(h) - 1);
+  });
+  g.strokeStyle = '#2e2b28'; g.lineWidth = 3;
+  g.beginPath(); g.moveTo(14, px(DEN.mine)); g.lineTo(72, px(DEN.mine)); g.stroke();
+  denCasing.material.map.needsUpdate = true;
+  denState.painted = true;
+}
+function denRefresh() {
+  var order = denFound(), key = order.join(',');
+  if (key === denState.key) return;
+  denState.key = key; denState.order = order; denState.slots = denSlotsOf(order);
+  var g = denRingCanvas.getContext('2d'), W = DEN_RING.W, H = DEN_RING.H, cw = W * CARD_W / ((DEN.r - 0.012) * (DEN.to - DEN.from) * Math.PI / 180), ch = cw * CARD_H / CARD_W;
+  g.fillStyle = '#99948c'; g.fillRect(0, 0, W, H);
+  g.fillStyle = '#7f7a73'; g.fillRect(0, 0, W, 4); g.fillRect(0, H - 4, W, 4);
+  var rare = {}; for (var k in DEN.rare) rare[denSlotNear(DEN.rare[k])] = k;
+  for (var i = 0; i < DEN.cards; i++) {
+    var x = (DEN.to - denSlotDeg(i)) / (DEN.to - DEN.from) * W, y = H * 0.44, c = denState.slots[i];
+    g.save(); g.translate(x, y); g.scale(-1, 1);       /* seen from inside the round, the band's canvas reads mirrored */
+    if (c) {
+      drawFindStandIn({ find: 'card', card: c, card_side: 'front', card_face: 'there', houdini_lock: 'shut' }, denScratch);
+      g.drawImage(denScratch, -cw / 2, -ch / 2, cw, ch);
+    } else {
+      g.fillStyle = '#7b766f'; g.fillRect(-cw / 2, -ch / 2, cw, ch);
+      g.strokeStyle = '#4a4744'; g.lineWidth = 2; g.strokeRect(-cw / 2 + 1, -ch / 2 + 1, cw - 2, ch - 2);
+    }
+    if (rare[i] && !c) {
+      g.fillStyle = 'rgba(58,55,51,0.5)'; g.font = '15px ' + F.clerk; g.textAlign = 'center'; g.textBaseline = 'top';
+      g.fillText(rare[i].charAt(0).toUpperCase() + rare[i].slice(1), 0, ch / 2 + 6);
+    }
+    g.restore();
+  }
+  denRingTex.needsUpdate = true;
+}
+function denSlotWorld(i) {
+  var a = denSlotDeg(i), xz = denXZ(a, DEN.r - 0.02);
+  return new THREE.Vector3(xz[0], (DEN.band[0] + DEN.band[1]) / 2 - 0.006, xz[1]).add(DEN.at);
+}
+function denGlint() {                                  /* the newest card's slot glints once, on his first visit since (D1 t2) */
+  var seen = 0;
+  try { seen = +(localStorage.getItem(DEN.SEEN) || 0); } catch (e) {}
+  var n = denState.order.length;
+  if (n > seen) {
+    var i = denState.slots.indexOf(denState.order[n - 1]);
+    if (i >= 0) {
+      denGlintM.position.copy(denSlotWorld(i)).sub(DEN.at);
+      denGlintM.rotation.y = -denSlotDeg(i) * Math.PI / 180;
+      denGlintM.visible = true; denState.glintT = 0;
+    }
+  }
+  try { localStorage.setItem(DEN.SEEN, String(n)); } catch (e) {}
+}
+function denWatch() {                                  /* a card found at the sofa clicks into its slot, even while he is away */
+  if (!castle || !castle.found) return;
+  var n = denFound().length;
+  if (denState.count >= 0 && n > denState.count && mode !== 'den') {
+    HEARD_FROM['little door'] = keyDoorAt.clone().setY(KEYDOOR.h + 0.2);
+    lineQ.push({ medium: 'heard', speaker: 'little door', sound: 'click' });
+  }
+  denState.count = n;
+}
+function denPoseAt(yw, tilt, pos, look) {
+  pos.set(0, DEN.eye, DEN.r - DEN.stand).add(DEN.at);
+  look.set(pos.x + Math.sin(yw) * 3, pos.y + tilt, pos.z - Math.cos(yw) * 3);
+}
+function denDoorOut() { var n = keyDoor.getWorldDirection(new THREE.Vector3()); n.y = 0; return n.normalize(); }
+function denShow(on) {
+  den.visible = on; camera.layers.set(on ? 1 : 0);
+  if (!on) { denState.leaving = false; denGlintM.visible = false; }
+}
+function goDen() {
+  if (mode !== 'room') return;
+  mode = 'tween'; stopZoom(false);
+  denBack = { yaw: yaw, pitch: pitch };
+  DEN.doorT = 1;
+  var n = denDoorOut(), pos = keyDoorAt.clone().addScaledVector(n, 0.55).setY(DEN.crouch), look = keyDoorAt.clone().addScaledVector(n, -1).setY(DEN.crouch - 0.1);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.4, function () {
+    denFade.classList.add('on');
+    setTimeout(function () {
+      if (!denState.painted) denPaint();
+      denRefresh(); denShow(true);
+      denYaw = denYawT = 0; denTilt = DEN.tilt; denState.hold = 0;
+      var p0 = new THREE.Vector3(0, DEN.crouch, DEN.r + DEN.wall * 0.5).add(DEN.at), l0 = new THREE.Vector3(0, DEN.crouch - 0.1, 0).add(DEN.at);
+      var p1 = new THREE.Vector3(), l1 = new THREE.Vector3();
+      denPoseAt(0, DEN.tilt, p1, l1);
+      camera.position.copy(p0); camera.lookAt(l0);
+      denFade.classList.remove('on');
+      startTween(p0, l0, p1, l1, 1.3, function () { mode = 'den'; backBtn.hidden = false; denGlint(); });
+    }, 450);
+  });
+}
+function leaveDen() {                                  /* turned first to the doorway's side, her marks and his line */
+  if (mode !== 'den' || denState.leaving) return;
+  denState.leaving = true; denState.hold = 0; backBtn.hidden = true;
+  denYawT = denYaw > 1.5 ? DEN.face + Math.PI * 2 : DEN.face;
+}
+function denDuckOut() {
+  mode = 'tween';
+  var p2 = new THREE.Vector3(0, DEN.crouch, DEN.r + DEN.wall * 0.5).add(DEN.at), l2 = p2.clone().add(new THREE.Vector3(0, -0.1, 3));
+  startTween(camera.position.clone(), currentLook(), p2, l2, 1.0, function () {
+    denFade.classList.add('on');
+    setTimeout(function () {
+      denShow(false); DEN.doorT = 0;
+      var n = denDoorOut(), q0 = keyDoorAt.clone().addScaledVector(n, 0.35).setY(DEN.crouch), l3 = q0.clone().addScaledVector(n, 3);
+      camera.position.copy(q0); camera.lookAt(l3);
+      denFade.classList.remove('on');
+      yaw = yawT = denBack ? denBack.yaw : 0; pitch = pitchT = denBack ? denBack.pitch : 0;
+      var pos = new THREE.Vector3(), look = new THREE.Vector3();
+      roomPose(yaw, pitch, pos, look);
+      startTween(q0, l3, pos, look, 1.4, function () { mode = 'room'; });
+    }, 450);
+  });
+}
+function denOut() {                                    /* at lights out: out of the den at once */
+  tween = null; denShow(false); DEN.doorT = 0; denFade.classList.remove('on');
+}
+function denCamera(dt) {
+  var s = Math.min(1, dt * (denState.leaving ? 2.2 : 7));
+  denYaw = lerp(denYaw, denYawT, s); denTilt = lerp(denTilt, denState.leaving ? -0.05 : DEN.tilt, s);
+  denPoseAt(denYaw, denTilt, camera.position, lookTmp); camera.lookAt(lookTmp);
+}
+var denWatchT = 0;
+function updateDen(dt) {
+  DEN.doorK += (DEN.doorT - DEN.doorK) * Math.min(1, dt * 3);
+  if (Math.abs(DEN.doorK - DEN.doorW_) > 0.002 && keyDoor.userData.base) {   /* the door opens onto the dark as he goes */
+    DEN.doorW_ = DEN.doorK < 0.002 ? 0 : DEN.doorK;
+    keyDoor.material.color.copy(keyDoor.userData.base).multiplyScalar(1 - 0.8 * DEN.doorW_);
+  }
+  if (denGlintM.visible) {
+    denState.glintT += dt;
+    var k = denState.glintT / 1.6;
+    denGlintM.material.opacity = k < 1 ? 0.6 * Math.sin(Math.PI * k) : 0;
+    if (k >= 1) denGlintM.visible = false;
+  }
+  if (mode === 'den' && denState.leaving && Math.abs(denYaw - denYawT) < 0.03) {
+    denState.hold += dt;
+    if (denState.hold > 1.2) denDuckOut();
+  }
+  if (den.visible) denLamp.intensity = DEN.lamp * (sky.night ? 0.8 : 1) * (1 + 0.015 * Math.sin(performance.now() / 1000 * 1.3));
+  denWatchT -= dt;
+  if (denWatchT <= 0) { denWatchT = 1; denWatch(); }
 }
 
 /* Req 161 (Events, the room's half of req 145: page/events/locks.json, notice.json; Charms' callables, req 146,
@@ -5438,6 +5708,7 @@ function lightsOut() {
   try { localStorage.setItem(SCARF_GONE_KEY, String(Date.now())); } catch (e) {}
   if (scarf) scarf.visible = false;
   if (mode === 'board' || mode === 'hand') leaveBoard();
+  if (den.visible || mode === 'den') denOut();
   tween = null; mode = 'room'; DESK_STOP.seat = 0; backBtn.hidden = true;
   setTimeout(function () { climbStair(false, 'dormitory.html?from=room&bedtime'); }, 1200);
 }
@@ -5473,6 +5744,7 @@ function tapName(o) {
   if (o === bookcase) return 'bookshelf';
   if (o === ladder) return 'ladder';
   if (o === keyDoor) return 'little door';
+  if (o === denDoorway) return 'den doorway';         /* the den's doorway from inside (req 175) */
   if (o === sideTable) return 'desk';
   if (o === deskChair) return 'desk chair';
   if (o === candle.mesh) return 'candle';
@@ -5565,6 +5837,10 @@ function tapDo(cx, cy) {
     return told;
   }
   if (mode === 'keyhole') { leaveKeyhole(); return back; }
+  if (mode === 'den') {                              /* the doorway takes him out; nothing else in the den acts yet */
+    if (hit === denDoorway && !denState.leaving) { leaveDen(); return told; }
+    return { name: tapName(hit), acted: false };
+  }
   if (mode === 'case') {
     if (hit !== bookcase && hit !== ladder) { leaveCase(); return back; }
     if (hit === ladder) ladderTap();
@@ -5614,6 +5890,7 @@ function tapDo(cx, cy) {
   else if (hit === sofa) goSofa();
   else if (hit === bookcase || hit === ladder) goCase();
   else if (hit === keyDoor && LOCKS.doorHolds && !LOCKS.door && onKeyhole(hits[0].uv)) { told.name = 'keyhole'; goKeyhole(); }
+  else if (hit === keyDoor && DEN.open) goDen();     /* the den's probe (?den) until her key exists */
   else if (hit === keyDoor) keyDoorTap();
   else return nothing;
   return told;
@@ -5636,6 +5913,7 @@ canvas.addEventListener('pointermove', function (e) {
     yawT = clamp(yawT - dx * 0.0022, -YAW_MAX, YAW_LEFT);
     pitchT = clamp(pitchT - dy * 0.0012, PITCH_DOWN, PITCH_MAX);
   }
+  else if (mode === 'den' && !denState.leaving) denYawT = clamp(denYawT - dx * 0.005, -DEN.turn, DEN.turn);   /* he turns where he stands */
 });
 function endDrag(e) {
   if (!dragging) return;
@@ -5694,7 +5972,7 @@ function setShadows(on) {
   btns.shadows.classList.toggle('on', on);
 }
 backBtn.addEventListener('click', function () {
-  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk(); else if (mode === 'table') leaveTable(); else if (mode === 'hole') leaveHole(); else if (mode === 'sofa') leaveSofa(); else if (mode === 'case') leaveCase(); else if (mode === 'keyhole') leaveKeyhole();
+  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk(); else if (mode === 'table') leaveTable(); else if (mode === 'hole') leaveHole(); else if (mode === 'sofa') leaveSofa(); else if (mode === 'case') leaveCase(); else if (mode === 'keyhole') leaveKeyhole(); else if (mode === 'den') leaveDen();
 });
 
 /* ---------- per frame ---------- */
@@ -5722,6 +6000,7 @@ function updateCamera(dt) {
     roomPose(yaw, pitch, camera.position, lookTmp);
     camera.lookAt(lookTmp);
   }
+  if (mode === 'den') denCamera(dt);
 }
 
 var fireStoke = 0;
@@ -6169,6 +6448,7 @@ function frame() {
   updateBubble(slowT);
   updateLadder(dt);
   updateKeyDoor(dt);
+  updateDen(dt);
   updateTwins();
   updateFire(sdt, slowT);
   updateBellows(dt);
@@ -6269,7 +6549,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
