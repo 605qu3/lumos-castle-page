@@ -14,7 +14,8 @@
            parts: [{ pts: [[u, v], ...] in a unit box (v down), secs: the spark's time along it, label, at: the share
                    of the part where the label sits, dx, dy: its offset in letter heights (dx mirrored for the left) }],
            box(W, H): optional, { G: the box's side in pixels, ox, oy: its top left }; the Leviosa box by default,
-           rest: the spark's pause in seconds (1.05) } */
+           rest: the spark's pause in seconds (1.05),
+           mirror: optional, true or a function, for a page that knows his wand arm (?hand=left otherwise) } */
 (function (root) {
   'use strict';
   var qs = new URLSearchParams(location.search);
@@ -26,6 +27,7 @@
   }
 
   function create(spec) {
+    function mir() { return spec.mirror == null ? mirror : (typeof spec.mirror === 'function' ? !!spec.mirror() : !!spec.mirror); }
     var hits = 0, missRun = 0, pts = [], covered = [], ranges = [], S = 1, W = 0;
     try { hits = Number(localStorage.getItem(spec.key)) || 0; } catch (e) {}
     if (qs.has('guidehits')) hits = Number(qs.get('guidehits')) || 0;
@@ -40,7 +42,8 @@
     function build(w, h) {
       W = w; S = Math.min(w, h);
       var b = (spec.box || defaultBox)(w, h);
-      function at(q) { var x = b.ox + q[0] * b.G; return { x: mirror ? w - x : x, y: b.oy + q[1] * b.G }; }
+      var m = mir();
+      function at(q) { var x = b.ox + q[0] * b.G; return { x: m ? w - x : x, y: b.oy + q[1] * b.G }; }
       pts = []; ranges = [];
       spec.parts.forEach(function (part, n) {
         var from = Math.max(0, pts.length - 1);
@@ -103,7 +106,7 @@
       ranges.forEach(function (r) {
         var part = r.part; if (!part.label) return;
         var q = pts[Math.round(r.from + (r.to - r.from) * (part.at == null ? 0.5 : part.at))];
-        cx.fillText(part.label, q.x + (mirror ? -1 : 1) * (part.dx || 0) * fs, q.y + (part.dy || 0) * fs);
+        cx.fillText(part.label, q.x + (mir() ? -1 : 1) * (part.dx || 0) * fs, q.y + (part.dy || 0) * fs);
       });
       if (lv === 1 && !stroking) {
         var total = 0; ranges.forEach(function (r) { total += r.secs; });

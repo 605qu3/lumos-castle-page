@@ -33,56 +33,16 @@
 <button class="btn" id="guideBtn">Guide</button>
 <button class="btn" id="logBtn">Log</button>
 <div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
-<script src="guide.js?v=2"></script>
+<script src="spells.js?v=1"></script>
+<script src="guide.js?v=3"></script>
 <script>
 /* Lumos, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
    A flick drawn on the screen lights the wand's tip; a miss fizzles, harmlessly, and says why.
    The books give Lumos no motion (it is only ever muttered), so the upward flick is the lane's own.
    The geometry: a hit shows the angle of his flick against the upright; a miss shows his stroke beside the right one. */
 
-/* judge:start  (a pure function, so the judging can be tallied in node away from the page) */
-var EASES = {
-  kind:   { angle: 40, straight: 0.70, minLen: 0.05, maxMs: 900 },
-  fair:   { angle: 30, straight: 0.78, minLen: 0.07, maxMs: 650 },
-  strict: { angle: 20, straight: 0.86, minLen: 0.09, maxMs: 450 }
-};
-/* points: [{x, y, t}] in CSS pixels and milliseconds; w, h: the screen; ease: a name in EASES.
-   Returns { verdict: 'lumos' | 'nox' | 'miss', reason, angle (degrees from upright, + to the right),
-   len (as a share of the screen's short side), straight (0 to 1), ms }. */
-function judgeFlick(points, w, h, ease) {
-  var e = EASES[ease] || EASES.kind;
-  var out = { verdict: 'miss', reason: 'tap', angle: 0, len: 0, straight: 0, ms: 0, turns: 0 };
-  if (!points || points.length < 2) return out;
-  var a = points[0], b = points[points.length - 1];
-  var dx = b.x - a.x, dy = b.y - a.y, chord = Math.hypot(dx, dy), path = 0, turn = 0, i, lastAng = null;
-  var short = Math.min(w, h), step = short * 0.03, anchor = a;
-  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
-  /* the turning is measured between points a step apart, since a phone's many tiny touch points jitter
-     (David's iPhone, 11 October: a straight stroke read 1.4 turns point to point) */
-  for (i = 1; i < points.length; i++) {
-    var sx = points[i].x - anchor.x, sy = points[i].y - anchor.y;
-    if (Math.hypot(sx, sy) < step) continue;
-    var ang = Math.atan2(sy, sx);
-    if (lastAng !== null) { var d = ang - lastAng; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; turn += Math.abs(d); }
-    lastAng = ang; anchor = points[i];
-  }
-  out.len = chord / short;
-  out.straight = path > 0 ? chord / path : 0;
-  out.ms = b.t - a.t;
-  out.turns = turn / (2 * Math.PI);
-  out.angle = Math.atan2(dx, -dy) * 180 / Math.PI;           /* 0 straight up, 90 right, 180 straight down */
-  if (path / short < 0.02) { out.reason = 'tap'; return out; }
-  if (out.turns > 1.5 && path / short > 1.2) { out.reason = 'windmill'; return out; }
-  if (out.len < e.minLen) { out.reason = 'short'; return out; }
-  if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
-  if (out.ms > e.maxMs) { out.reason = 'slow'; return out; }
-  var fromDown = 180 - Math.abs(out.angle);
-  if (Math.abs(out.angle) <= e.angle) { out.verdict = 'lumos'; out.reason = 'up'; return out; }
-  if (fromDown <= e.angle) { out.verdict = 'nox'; out.reason = 'down'; return out; }
-  out.reason = 'aside';
-  return out;
-}
-/* judge:end */
+/* The judging lives in spells.js, shared with the Ollivander page and the rooms (moved 11 October 2026, 9.55 pm). */
+var EASES = LumosSpells.FLICK_EASES, judgeFlick = LumosSpells.judgeFlick;
 
 (function () {
   'use strict';
@@ -348,6 +308,7 @@ function judgeFlick(points, w, h, ease) {
     if (j.verdict === 'lumos') {
       bright = 0.55 + 0.45 * (1 - Math.min(1, Math.abs(j.angle) / 45));
       litTarget = 1; lit = Math.max(lit, 0.15); chime(true);
+      LumosSpells.learn('lumos');   /* a room can ask LumosSpells.learned('lumos') (req 125) */
       angleMark = { at: now, p0: pts[0], angle: j.angle };
       var deg = Math.round(Math.abs(j.angle));
       sayEl.textContent = 'Lumos!';
