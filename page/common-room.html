@@ -97,6 +97,14 @@
   [hidden] { display: none !important; }
   /* the events' lines (board req 65): said on a slip by the speaker, heard in faint italic toward where it comes from,
      written on a scrap in its hand; one at a time, a tap on the words puts it away */
+  /* through the little door's keyhole (Q49 t1): the keyhole's dark grows from where it sits until it fills the screen */
+  #keyhole { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  #keyhole svg { position: absolute; left: var(--x, 50%); top: var(--y, 50%); height: 9vh; fill: #050403;
+    transform: translate(-50%, -24%) scale(1); transform-origin: 50% 24%; opacity: 0;
+    transition: transform 0.5s ease-in, opacity 0.3s ease; }
+  #keyhole.on svg { opacity: 1; transform: translate(-50%, -24%) scale(var(--grow, 40));
+    transition: opacity 0.25s ease, transform 1.3s cubic-bezier(0.55, 0, 0.8, 0.4); }
+  @media (prefers-reduced-motion: reduce) { #keyhole svg, #keyhole.on svg { transition: opacity 0.4s ease; } }
   #lines { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
   .line { position: absolute; left: 0; top: 0; pointer-events: auto; cursor: pointer; opacity: 0;
     transition: opacity 0.35s ease; -webkit-tap-highlight-color: transparent; }
@@ -647,6 +655,7 @@ turned down for hanging facing out. Keyed at 1189 x 2488 px, 2378 px per metre, 
 1.05 m high with its hook, left of the ring. Checks and the other candidate in pipeline/runs/cloak-hook/r2/.
 -->
 <canvas id="c" tabindex="0" aria-label="Gryffindor common room greybox"></canvas>
+<div id="keyhole" aria-hidden="true"><svg viewBox="0 0 20 34"><path d="M10 0a8 8 0 0 1 4.2 14.8L17 34H3l2.8-19.2A8 8 0 0 1 10 0z"/></svg></div>
 <div id="lines" aria-live="polite"></div>
 <div id="hud">
   <div id="stats">starting</div>
@@ -675,7 +684,7 @@ var TILES = {
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=16"></script>
 <script src="charms/guide.js?v=1"></script>
-<script src="charms/spells.js?v=1"></script>
+<script src="charms/spells.js?v=9"></script>
 <script>
 (function () {
 'use strict';
@@ -1129,13 +1138,18 @@ onWall(ladder, BOOKCASE_THETA + 0.07, 1.62, 5.05); ladder.rotateX(-0.12); regist
    key opens it (what lies behind is Magic's B4). 84 degrees right of the hearth (B2's plan drew it at about 87): on the
    iPad it is seen only on the long drag toward the stair, and there whole only from 83 to 86 degrees; nearer, the
    stair's stone and the desk's quill cover part of it (tools/probe-keydoor.mjs). On a wide screen it shows at rest. */
-var KEYDOOR = { deg: 84, w: 0.7, h: 1.1, r: 5.46, shake: 0 };
+var KEYDOOR = { deg: 84, w: 0.7, h: 1.1, r: 5.46, shake: 0, hole: 0.68 };   /* hole: the keyhole's height, of the door's */
+/* the big lock about two thirds of the way up (Godric's Q49 t1, 12 October 2026, 1.55 pm): its keyhole at 0.75 m, a boy's
+   eye when he crouches */
 function drawKeyDoor(g, w, h) {
   arch(g, 0, 0, w, h);
-  var face = g.fillStyle;
+  var face = g.fillStyle, ky = h * (1 - KEYDOOR.hole);
   g.fillStyle = '#8f8c86';
   for (var i = 1; i < 4; i++) g.fillRect(w * i / 4 - 1, h * 0.12, 2, h * 0.86);   /* the planks */
-  g.fillRect(w * 0.72, h * 0.5, w * 0.16, h * 0.13);                                /* the big lock */
+  g.fillRect(w * 0.72, ky - h * 0.065, w * 0.16, h * 0.13);                         /* the big lock */
+  g.fillStyle = '#26221e';                                                          /* its keyhole */
+  g.beginPath(); g.arc(w * 0.8, ky - h * 0.008, h * 0.009, 0, Math.PI * 2); g.fill();
+  g.fillRect(w * 0.8 - h * 0.004, ky - h * 0.006, h * 0.008, h * 0.022);
   g.fillStyle = face;
 }
 var keyDoor = new THREE.Mesh(new THREE.PlaneGeometry(KEYDOOR.w, KEYDOOR.h), new THREE.MeshStandardMaterial({ map: cutoutTexture(140, 220, '#b9b6b0', drawKeyDoor, 'key door'), roughness: 0.9, alphaTest: 0.5 }));
@@ -4996,8 +5010,42 @@ function keyDoorTap() {
     lineQ.unshift({ medium: 'heard', speaker: 'little door', sound: 'nothing happened.' });
   }, function () { LOCKS.door = null; });
 }
-/* the door's lock on the screen, for the spell's face: the stand-in's box at 0.8 across and 0.565 down */
-function keyDoorLock() { return screenOf(keyDoor.localToWorld(new THREE.Vector3(0.3 * KEYDOOR.w, -0.065 * KEYDOOR.h, 0))); }
+/* the door's lock on the screen, for the spell's face: the stand-in's box at 0.8 across, its keyhole KEYDOOR.hole up */
+function keyholeAt(z) { return keyDoor.localToWorld(new THREE.Vector3(0.3 * KEYDOOR.w, (KEYDOOR.hole - 0.5) * KEYDOOR.h, z || 0)); }
+function keyDoorLock() { return screenOf(keyholeAt()); }
+/* the keyhole (Godric's Q49 t1, 1.55 pm): a tap on the lock while it holds crouches him close to it; through it only
+   darkness and, in words, a faint smell of chocolate; Back or any tap stands him up again. The lock's box and a finger's
+   width around it count (uv: the door's width across, its height up). */
+var KEYHOLE_STOP = { d: 0.3 };                         /* metres off the door's face, his eye level with the keyhole */
+function onKeyhole(uv) { return !!uv && Math.abs(uv.x - 0.8) < 0.16 && Math.abs(uv.y - KEYDOOR.hole) < 0.11; }
+var keyholeDark = document.getElementById('keyhole');
+function goKeyhole() {
+  mode = 'tween';
+  stopZoom(false);
+  var look = keyholeAt(), pos = keyholeAt(KEYHOLE_STOP.d);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.4, function () {
+    mode = 'keyhole'; backBtn.hidden = false;
+    var r = canvas.getBoundingClientRect(), p = keyDoorLock(), W = window.innerWidth, H = window.innerHeight;
+    var px = H * 0.09;                                  /* the shape's height, 9vh */
+    keyholeDark.style.setProperty('--x', (p ? p.x : r.left + r.width / 2) + 'px');
+    keyholeDark.style.setProperty('--y', (p ? p.y : r.top + r.height / 2) + 'px');
+    keyholeDark.style.setProperty('--grow', (3.2 * Math.max(W, H) / px).toFixed(1));
+    keyholeDark.classList.add('on');
+    HEARD_FROM.keyhole = look;
+    setTimeout(function () {
+      if (mode === 'keyhole') lineQ.unshift({ medium: 'heard', speaker: 'keyhole', sound: 'a faint smell of chocolate' });
+    }, 1300);
+  });
+}
+function leaveKeyhole() {
+  mode = 'tween';
+  backBtn.hidden = true;
+  keyholeDark.classList.remove('on');
+  if (lineCur && lineCur.line.speaker === 'keyhole') lineCur.t = Math.min(lineCur.t, 0.35);   /* the smell goes as he stands */
+  var pos = new THREE.Vector3(), look = new THREE.Vector3();
+  roomPose(yaw, pitch, pos, look);
+  startTween(camera.position.clone(), currentLook(), pos, look, 1.4, function () { mode = 'room'; });
+}
 
 /* Req 161 (Events, the room's half of req 145: page/events/locks.json, notice.json; Charms' callables, req 146,
    docs/handoff/charms.md "Room-ready Alohomora and Aparecium"). The room's rules come in through drawRoom: the little
@@ -5357,6 +5405,7 @@ function tapDo(cx, cy) {
     else if (hit !== ring) { leaveHole(); return back; }
     return told;
   }
+  if (mode === 'keyhole') { leaveKeyhole(); return back; }
   if (mode === 'case') {
     if (hit !== bookcase && hit !== ladder) { leaveCase(); return back; }
     if (hit === ladder) ladderTap();
@@ -5405,6 +5454,7 @@ function tapDo(cx, cy) {
   else if (tablePart(hit)) goTable();
   else if (hit === sofa) goSofa();
   else if (hit === bookcase || hit === ladder) goCase();
+  else if (hit === keyDoor && LOCKS.doorHolds && !LOCKS.door && onKeyhole(hits[0].uv)) { told.name = 'keyhole'; goKeyhole(); }
   else if (hit === keyDoor) keyDoorTap();
   else return nothing;
   return told;
@@ -5485,7 +5535,7 @@ function setShadows(on) {
   btns.shadows.classList.toggle('on', on);
 }
 backBtn.addEventListener('click', function () {
-  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk(); else if (mode === 'table') leaveTable(); else if (mode === 'hole') leaveHole(); else if (mode === 'sofa') leaveSofa(); else if (mode === 'case') leaveCase();
+  if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'fireside') leaveFireside(); else if (mode === 'desk') leaveDesk(); else if (mode === 'table') leaveTable(); else if (mode === 'hole') leaveHole(); else if (mode === 'sofa') leaveSofa(); else if (mode === 'case') leaveCase(); else if (mode === 'keyhole') leaveKeyhole();
 });
 
 /* ---------- per frame ---------- */
