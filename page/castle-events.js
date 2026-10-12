@@ -64,7 +64,8 @@
    lives shelf's link, Magic's B7); a deck's card may carry `say`, the name a line's `{card}` takes.
    Then the castle's secrets (board req 180, the Marauder's Map earned, Magic's B9): `secret X` counts a secret he has
    found, once ever; `secrets found` reads how many; `secrets()` lists them in the order found. `height()`, his height
-   in metres from a grown-up's setting (board req 187).
+   in metres from a grown-up's setting (board req 187). `learned X`, yes once he has cast spell X on the Charms page
+   (its `learn(X)`, kept on the device), for the twins' note that waits for Lumos (board req 179).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -428,6 +429,7 @@
       if (name.indexOf('mark ') === 0) return visit && visit.marks[name.slice(5)] ? 'taken' : 'free';   /* a mark a figure stands on this visit */
       if (name.indexOf('been ') === 0) return visit && visit.pages.indexOf(name.slice(5)) >= 0 ? 'yes' : 'no';   /* did this visit reach that page */
       if (name.indexOf('drawn ') === 0) return drawnList().indexOf(name.slice(6)) >= 0 ? 'yes' : 'no';         /* has the page a drawing of it */
+      if (name.indexOf('learned ') === 0) return learnedSpell(name.slice(8)) ? 'yes' : 'no';                  /* has he cast it on the Charms page (req 125, 179) */
       var b = builtin(name);
       if (b !== undefined) return b;
       if (stampNames[name]) return name in state.stamps ? state.stamps[name] : -Infinity;   /* never stamped: long past */
@@ -516,6 +518,11 @@
       var first = state.deckFirst[name] = state.deckFirst[name] || {};
       if (!had && !first[pool[k].item]) first[pool[k].item] = isoDay(nowDate());
       return { item: pool[k].item, again: had };
+    }
+
+    /* A spell he has learned, as the Charms page keeps it on the device (page/charms/spells.js, `learn(name)`). */
+    function learnedSpell(spell) {
+      try { return localStorage.getItem('lumos.spells.learned.' + spell) === '1'; } catch (e) { return false; }
     }
 
     function isoDay(d) {

@@ -527,6 +527,14 @@
       "show": [
         "one bluebell bubble of Drooble's gum up by the ceiling, not popped yet"
       ]
+    },
+    {
+      "when": [
+        "twins_note = held"
+      ],
+      "show": [
+        "the twins' note folded small in his pocket"
+      ]
     }
   ],
   "records": [
@@ -649,6 +657,43 @@
         "set sofa_sat = no",
         "set rummaged = yes",
         "log \"Found a Chocolate Frog card down the side of the sofa {day}\""
+      ]
+    },
+    {
+      "id": "sofa.find-twins-note",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sofa",
+      "when": [
+        "mark sofa = free",
+        "sofa_finds >= 1",
+        "today >= sofa_due",
+        "rummaged != yes",
+        "learned lumos = yes",
+        "drawn twins-note = yes",
+        "twins_note != held"
+      ],
+      "one_of": "sofa-rummage",
+      "weight": 4,
+      "boost": {
+        "when": [
+          "sofa_sat = yes"
+        ],
+        "times": 4
+      },
+      "show": [
+        "a little puff of dust at one cushion, and a scrap of parchment folded small rises from the gap and comes to his hand"
+      ],
+      "starts": [
+        "set cushion = mark cushion, not last",
+        "set find = twins-note",
+        "set holding = yes",
+        "add sofa_finds 1",
+        "stamp sofa_due +2-6 days",
+        "set sofa_sat = no",
+        "set rummaged = yes",
+        "log \"Found a note from the twins down the side of the sofa {day}\""
       ]
     },
     {
@@ -1282,6 +1327,22 @@
       ]
     },
     {
+      "id": "sofa.twins-note-kept",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = twins-note"
+      ],
+      "starts": [
+        "set holding = no",
+        "set twins_note = held",
+        "secret twins-note"
+      ]
+    },
+    {
       "id": "sofa.f-drooble-bubble",
       "tier": "fixed",
       "source": "device",
@@ -1586,6 +1647,37 @@
           "text": [
             "FOR TESTING. DO NOT EAT. (Unless you're Dudley.)",
             "TOP SECRET. DO NOT EAT. That means YOU. F. & G."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sofa.f-twins-note",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = twins-note"
+      ],
+      "show": [
+        "he reads the note, folds it small again and keeps it"
+      ],
+      "starts": [
+        "set holding = no",
+        "set twins_note = held",
+        "secret twins-note"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "the twins",
+          "at": "hand",
+          "key": "sofa.twins-note",
+          "canon": "ours (Magic for the boys, Dissendium in the castle), after PoA 16's \"you tap it and say Dissendium\", checked against the text by Charms, 12 October 2026",
+          "text": [
+            "Tap her hump and say Dissendium. You didn't get this from us. F. & G."
           ]
         }
       ]
@@ -2353,7 +2445,8 @@
         "find != paper-hat",
         "find != pawn",
         "find != sugar-mouse",
-        "find != wrapper"
+        "find != wrapper",
+        "find != twins-note"
       ],
       "starts": [
         "set holding = no"
