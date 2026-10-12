@@ -5186,6 +5186,7 @@ function goFireside() {
   startTween(camera.position.clone(), currentLook(), FIRESIDE.pos, FIRESIDE.look, 1.6,
     function () { mode = 'fireside'; backBtn.hidden = false; }, camera.fov, firesideFov());
   stopZoom(true);
+  pairTurn.to = PAIR_FACE.on ? 1 : 0;
 }
 function leaveFireside() {
   mode = 'tween';
@@ -5194,6 +5195,36 @@ function leaveFireside() {
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 1.6, function () { mode = 'room'; }, camera.fov, baseFov());
   stopZoom(false);
+  pairTurn.to = 0;
+}
+/* Square at the stop (Godric's note on Q47, 12 October 2026, 1.50 pm: square on at every stop, as the sofa is; Q53). At
+   rest the pair keep Q8's turn toward each other and the fire; as he walks up to the fireside each turns about its own
+   middle to face the stop square on (12.6 degrees each), and back as he leaves. What belongs to the left chair turns with
+   it: the scarf over its arm (and so its tape) and the satchel at its side. */
+var pairTurn = { k: 0, to: 0 };
+var PAIR_FACE = (function () {
+  var f = Math.atan2(FIRESIDE.pos.x - FIRESIDE.look.x, FIRESIDE.pos.z - FIRESIDE.look.z);
+  function off(yw) { var a = f - yw; return Math.atan2(Math.sin(a), Math.cos(a)); }
+  return { on: false, l: off(CHAIR_L_AT.yaw), r: off(WINGBACK_AT.yaw), glide: 1.6 };   /* on: Q53, set on David's 1 */
+})();
+function aboutChairL(x, z, a) {
+  var lx = x - CHAIR_L_AT.x, lz = z - CHAIR_L_AT.z, c = Math.cos(a), sn = Math.sin(a);
+  return [CHAIR_L_AT.x + c * lx + sn * lz, CHAIR_L_AT.z - sn * lx + c * lz];
+}
+function updatePairStop(dt) {
+  var st = pairTurn, was = st.k;
+  st.k = st.to ? Math.min(1, st.k + dt / PAIR_FACE.glide) : Math.max(0, st.k - dt / PAIR_FACE.glide);
+  if (st.k === was && st.k === 0) return;
+  var e = smooth01(0, 1, st.k), a = e * PAIR_FACE.l;
+  chairL.rotation.y = CHAIR_L_AT.yaw + a;
+  wingback.rotation.y = WINGBACK_AT.yaw + e * PAIR_FACE.r;
+  var p = aboutChairL(SATCHEL.x, SATCHEL.z, a);
+  satchel.position.x = p[0]; satchel.position.z = p[1];
+  if (scarf) {
+    p = aboutChairL(SCARF.x, SCARF.z, a);
+    scarf.position.x = p[0]; scarf.position.z = p[1];
+    scarf.rotation.y = SCARF.yaw + a; scarfTape.pivot.rotation.y = SCARF.yaw + a;
+  }
 }
 /* the fire's tap works the bellows (Magic for the boys); what the fire does is the fire chain's (fire.json) */
 function fireTap() {
@@ -6001,6 +6032,7 @@ function frame() {
   updateCamera(dt);
   faceEye();
   updateSofaStop(dt);
+  updatePairStop(dt);
   updateLadder(dt);
   updateKeyDoor(dt);
   updateTwins();
