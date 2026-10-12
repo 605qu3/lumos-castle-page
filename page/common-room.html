@@ -5585,6 +5585,66 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
+/* looking close (the Corridor's req 138, its room half of req 126 and 133; castle.js's zoom): held at double or closer for
+   a second on a thing, its name goes to the runtime, each counted once ever toward the Omnioculars (Magic's *The
+   Omnioculars*). One name per thing across every page: what the open hole shows answers to the corridor's names (the
+   torches, the painting opposite, the polite door, the inglenook, its windows), the stair to the dormitory's ('the
+   dormitory stair'). One look on the scene reads the nearest thing's own name up its parents, so pieces that load late
+   (the scarf, the cloak, the homework) need nothing more; the walls, the floor and the figures are nothing. Nothing seen
+   changes. */
+boardGroup.name = 'notice-board'; homeLetter.name = 'home-letter'; homeFeather.name = 'home-feather';
+catWalk.name = 'cat-walk'; catSit.name = 'cat-sit';
+var LOOK_NAMES = {
+  'fireplace': 'the common room fireplace', 'rug': 'the hearth rug', 'log-basket': 'the log basket', 'bellows': 'the bellows',
+  'curio-candlestick': 'the brass candlestick', 'curio-hourglass': 'the hourglass', 'curio-jar': 'the jar of bluebell flames',
+  'window-left': 'the common room windows', 'window-right': 'the common room windows',
+  'window-left-sky': 'the common room windows', 'window-right-sky': 'the common room windows',
+  'portrait-mantel': 'the mantel painting', 'portrait-right': 'the right-hand painting', 'tapestry': 'the griffin hanging',
+  'bookcase': 'the bookcase', 'bookcase-ladder': 'the bookcase ladder', 'stairs': 'the dormitory stair',
+  'sofa': 'the sofa', 'armchair-left': 'the armchair', 'house-scarf-arm': 'the scarf on the armchair',
+  'wingback': 'the wingback chair', 'candle-stand': 'the candle stand', 'notice-board': 'the notice board',
+  'table': 'the homework table', 'table-top': 'the homework table', 'table-rim': 'the homework table',
+  'homework-essay': 'the homework essay', 'homework-bottle': 'the ink bottle', 'homework-quill': 'the quill',
+  'side-table': 'the desk', 'desk-chair': 'the desk chair', 'snitch-scratch': 'the snitch scratched in the desk',
+  'books-row': 'the books on the desk', 'books-sixth': 'the books on the desk', 'books-slip': 'the books on the desk',
+  'books-history': 'a history of magic', 'books-open': 'a history of magic', 'candle-stub': 'the candle stub',
+  'home-letter': 'the letter from home', 'home-feather': "the owl's feather", 'satchel': 'the satchel',
+  'cloak-hook': 'the cloak on its hook', 'cat-walk': 'the cat', 'cat-sit': 'the cat', 'cat-curled': 'the cat',
+  'portrait-hole-ring': 'the portrait hole', 'portrait-hole-panel': 'the portrait hole', 'nick': 'nearly headless nick',
+  'corridor-torch': 'the corridor torches', 'corridor-torch-2': 'the corridor torches',
+  'painting-opposite': 'the painting opposite the hole', 'corridor-door-leaf': 'the polite door',
+  'corridor-nook-back': 'the inglenook'
+};
+corrShell.windows.forEach(function (w) { kit.zoom.look(w.frame, 'the corridor windows'); kit.zoom.look(w.sill, 'the corridor windows'); });
+function lookName(o) {
+  for (; o; o = o.parent) {
+    if (typeof o.userData.look === 'string') return o.userData.look;
+    if (LOOK_NAMES[o.name]) return LOOK_NAMES[o.name];
+  }
+  return null;
+}
+/* the wall's hole is cut in its shader (discard), so the zoom's ray meets the wall there: through the hole, the look
+   carries on to the nearest thing beyond it (her back when she is shut, the corridor when she is open) */
+var lookOn = new THREE.Raycaster(), _lk = new THREE.Vector3();
+function lookThroughHole(hit) {
+  _lk.copy(hit.point).sub(holeC);
+  var a = _lk.dot(holeN);
+  if (Math.abs(a) >= 0.1 || _lk.addScaledVector(holeN, -a).length() >= HOLE_R) return null;
+  lookOn.set(hit.point, lookOn.ray.direction.copy(hit.point).sub(camera.position).normalize());
+  lookOn.near = 0.01; lookOn.camera = camera;   /* the flames are sprites, which a ray tests against the eye */
+  var hs = lookOn.intersectObjects([holeFrame], true);
+  for (var i = 0; i < hs.length; i++) {
+    var o = hs[i].object, m = o.material, shown = true;
+    for (var p = o; p; p = p.parent) if (!p.visible) shown = false;
+    if (!o.isMesh || !shown || (m && (m.opacity === 0 || m.colorWrite === false || m.depthWrite === false))) continue;
+    if (o === ring) continue;   /* the ring's middle is clear */
+    return lookName(o);
+  }
+  return null;
+}
+kit.zoom.look(scene, function (hit) { return hit.object === wall ? lookThroughHole(hit) : lookName(hit.object); });
+kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
+
 window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
