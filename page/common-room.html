@@ -674,6 +674,8 @@ var TILES = {
 <script src="castle.js?v=6"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=15"></script>
+<script src="charms/guide.js?v=1"></script>
+<script src="charms/spells.js?v=1"></script>
 <script>
 (function () {
 'use strict';
@@ -2825,6 +2827,30 @@ var candle = (function () {   /* candle().spec is CANDLE, for shots */
   o.on = false; o.lit = 0; o.snuff = 0;
   return o;
 })();
+/* t2 (Godric's Q37, 9.41 pm; Charms' req 125, docs/handoff/charms.md "Req 125"): once a boy has learned Lumos in
+   Charms (LumosSpells.learned('lumos'), kept on the device), the stub no longer lights itself as he sits: it waits for
+   his flick. A tap on it at the desk after dark offers Charms' stroke over the wick (castOver: one flick up, the traced
+   guide under it at his Charms stage, a tap ignored, a clear layer over the page until the stroke); cast, and it
+   catches as t1's does; missed, a wisp of smoke and it waits for another tap; left alone 8 s, the offer goes, since
+   the layer would hold Back. Getting up puts it out and cancels any offer. Before he has learned it, t1 stands. */
+function candleWaits() { return !!(window.LumosSpells && LumosSpells.learned('lumos')); }
+function candleWick() {
+  var v = candle.mesh.localToWorld(new THREE.Vector3((CANDLE.wick[0] - 0.5) * CANDLE.w, (0.5 - CANDLE.wick[1]) * CANDLE.h, 0));
+  v.project(camera);
+  var r = renderer.domElement.getBoundingClientRect();                 /* the zoom scales the canvas; its box follows */
+  return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
+}
+function candleTap() {
+  if (candle.casting || candle.cast || !candleWaits() || !candle.mesh.visible || DESK_STOP.seat !== 1) return;
+  if (!(castle && /^(evening|night)$/.test(castle.time()))) return;
+  var a = candle.casting = LumosSpells.castOver({ at: candleWick });
+  var idle = setTimeout(function () { a.cancel(); }, 8000);
+  a.done.then(function (r) {
+    clearTimeout(idle); candle.casting = null;
+    if (r.verdict === 'cast' && DESK_STOP.seat === 1) candle.cast = true;
+    else if (r.verdict === 'missed') candle.snuff = 1.6;
+  });
+}
 function updateCandle(dt) {
   if (!sideTable.geometry.parameters) return;
   var gp = sideTable.geometry.parameters, base = new THREE.Vector3((CANDLE.u - 0.5) * gp.width, (0.5 - BOOKS.v) * gp.height, CANDLE.dz);
@@ -2842,7 +2868,9 @@ function updateCandle(dt) {
   /* t1: lit while he sits at the desk after dark; out as he gets up, the smoke after it */
   var F = CANDLE.FLAME, t = performance.now() / 1000,
       dark = !!castle && /^(evening|night)$/.test(castle.time()),
-      want = candle.mesh.visible && dark && DESK_STOP.seat === 1 && DESK_STOP.sat > 0.6;
+      seated = candle.mesh.visible && dark && DESK_STOP.seat === 1 && DESK_STOP.sat > 0.6,
+      want = seated && (!candleWaits() || candle.cast);                /* t2: once he knows Lumos, only his flick */
+  if (!seated) { candle.cast = false; if (candle.casting) candle.casting.cancel(); }
   if (want && !candle.on) candle.on = true;
   else if (!want && candle.on) { candle.on = false; candle.snuff = F.snuff; }
   candle.lit = clamp(candle.lit + (candle.on ? dt / F.catch : -dt / F.out), 0, 1);
@@ -4641,7 +4669,7 @@ function currentLook() {
    letter, the feather and the books answer their taps as in the room, zoom goes to 3x, and Back or a tap on anything
    else glides back. Close enough that the desk's small things read: the wax, the pencilled name, the Snitch. */
 var DESK_STOP = { u: 0.52, lift: 0.07, eye: 0.42, side: 0, w: 1.0, h: 0.55, seat: 0, sat: 0 };
-tappables.push(sideTable, deskChair);
+tappables.push(sideTable, deskChair, candle.mesh);
 function deskPose(pos, look) {
   var gp = sideTable.geometry.parameters;
   sideTable.updateMatrixWorld();
@@ -4923,9 +4951,10 @@ function tap(cx, cy) {
     if (h.object === books.hist) return books.hist.visible && alphaSolid(books.hain, h.uv);
     if (h.object === books.slip) return books.slip.visible;
     if (h.object === books.openCard) return books.openCard.visible && alphaSolid(books.oain, h.uv);
-    if (h.object === deskChair) return DESK_STOP.sat < 0.5;
+    if (h.object === deskChair) return DESK_STOP.sat < 0.5;            /* he sits in it at the desk */
+    if (h.object === candle.mesh) return candle.mesh.visible;
     var hw = h.object === homework.essay ? 0 : h.object === homework.bottle ? 1 : h.object === homework.quill ? 2 : -1;
-    if (hw >= 0) return !homework.alpha || !h.uv || alphaSolid(homework.alpha, { x: (hw + h.uv.x) / 3, y: h.uv.y });   /* three cells of one sheet */            /* he sits in it at the desk */
+    if (hw >= 0) return !homework.alpha || !h.uv || alphaSolid(homework.alpha, { x: (hw + h.uv.x) / 3, y: h.uv.y });   /* three cells of one sheet */
     return !h.object.userData.paper || h.object.visible;
   });
   var hit = hits.length ? hits[0].object : null;
@@ -4940,6 +4969,7 @@ function tap(cx, cy) {
   }
   if (mode === 'desk') {
     if (hit === homeFeather.mesh) homeFeatherTap();
+    else if (hit === candle.mesh) candleTap();
     else if (hit && hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
     else if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) booksTap();
     else leaveDesk();
@@ -4980,7 +5010,7 @@ function tap(cx, cy) {
   else if (hit === holeTap) { if (portrait.open) { if (!nickHolds()) climbOut(); } else { if (castle) castle.tap('hole'); togglePortrait(); } }
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
   else if (hit === stairs) climbStair(false, 'dormitory.html?from=room');
-  else if (hit === sideTable || hit === deskChair) goDesk();
+  else if (hit === sideTable || hit === deskChair || hit === candle.mesh) goDesk();
   else if (tablePart(hit)) goTable();
 }
 
@@ -5520,7 +5550,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
