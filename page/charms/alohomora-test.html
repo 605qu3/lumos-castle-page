@@ -45,10 +45,13 @@
   /* the four doors: what each lock asks, and what is behind it */
   var DOORS = [
     { turn: 0.25, dir: 1, words: 'a quarter turn, clockwise', deg: 90, behind: 'cupboard',
+      clock: 'twelve to three, as the minute hand goes from o\'clock to quarter past',
       after: 'A broom cupboard: a mop, a bucket, and the smell of Filch. Best shut it again.' },
     { turn: 0.5, dir: -1, words: 'a half turn, anticlockwise', deg: 180, behind: 'sky',
+      clock: 'twelve back round to six, the opposite way to a clock\'s hands',
       after: 'It springs open on the battlements, and the stars.' },
     { turn: 0.75, dir: 1, words: 'three quarters of a turn, clockwise', deg: 270, behind: 'feathers',
+      clock: 'twelve round to nine, as the minute hand goes from o\'clock to quarter to',
       after: 'A Charms cupboard: a box of white feathers, for the first years.' },
     { stuck: true, words: '', behind: 'none',
       after: '' } ];
@@ -123,11 +126,11 @@
     click();
     if (D.stuck) {
       tries++;
-      say(tries < 2 ? 'Nothing happened.' : 'It will not budge. Some locks are charmed against Alohomora, or want their own key (it happened in Book 1, in the room of flying keys).');
+      say(tries < 2 ? 'Nothing happened.' : 'It will not budge. Some locks are charmed against Alohomora, or want their own key, like the door in the room of flying keys (Book 1). You tapped it, you whispered <i>Alohomora</i>... but nothing happened.');
       tight = performance.now(); return;
     }
     stage = 'turn';
-    say('Now turn it, as a key turns: <b>' + D.words + '</b> (' + D.deg + ' degrees). Whisper it as you turn: <i>Alohomora</i>.');
+    say('Now turn it, as a key turns: <b>' + D.words + '</b>, ' + D.clock + ' (' + D.deg + ' degrees). Whisper it as you turn: <i>Alohomora</i>.');
   }
   var MISS = { 'not far enough': function () { return 'Not far enough. ' + cap(D.words) + ' is ' + D.deg + ' degrees.'; },
     'too far': function () { return 'Too far: a key stops where the lock says. ' + cap(D.words) + ', ' + D.deg + ' degrees.'; },
@@ -217,6 +220,10 @@
       cx.strokeStyle = q ? '#d9c79a' : 'rgba(217,199,154,0.5)'; cx.lineWidth = q ? 3 : 1.5;
       cx.beginPath(); cx.moveTo(L.x + Math.sin(a) * r0, L.y - Math.cos(a) * r0); cx.lineTo(L.x + Math.sin(a) * r1, L.y - Math.cos(a) * r1); cx.stroke();
     }
+    /* the four quarters numbered as a clock's (Q4, 12 October 2026: a quarter turn is twelve to three) */
+    var nf = Math.round(Math.max(11, L.r * 0.16)); cx.font = '600 ' + nf + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillStyle = '#d9c79a';
+    [12, 3, 6, 9].forEach(function (n, k) { var a = k * Math.PI / 2, r = L.r * 0.68; cx.fillText(String(n), L.x + Math.sin(a) * r, L.y - Math.cos(a) * r); });
+    cx.textBaseline = 'alphabetic';
     /* the wedge he has turned so far, and its degrees */
     var sw = stroke ? sweepOf(stroke) : (trail && now - trail.at < 1500 ? sweepOf(trail.pts) : null);
     sweepNow = sw;
