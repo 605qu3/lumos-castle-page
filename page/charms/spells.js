@@ -238,6 +238,54 @@ function judgeSwishFlick(points, w, h, ease) {
 return { EASES: EASES, judge: judgeSwishFlick };
 })();
 var SWISH_EASES = SWISH.EASES, judgeSwishFlick = SWISH.judge;
+
+/* Dissendium's lift (12 October 2026, seventh session; the books: Harry taps the stone witch, whispers it, and her hump
+   opens wide enough to admit a fairly thin person, PoA 10). The lift is the lane's own, for the geometry: after the
+   tap and the word the hump's lid is unlatched, and he lifts it by its edge round its hinge; the angle it opens to is
+   said in degrees, and the gap at its edge (the chord, 2 sin(angle / 2) of the lid's length) is set against what he
+   needs to fit through. The sweep about the hinge is unwrapped as judgeTurn's is; a hinge is the statue's, so nothing
+   is mirrored for a left hand.
+   points: [{x, y, t}]; c: the hinge {x, y}; r: the lid's length in pixels; want: { need: the degrees he needs to fit,
+   max: where the lid stops, from: the lid's angle when he took hold, dir: 1 if opening goes clockwise on the screen,
+   -1 if not }; ease: a name in HINGE_EASES or an ease of its own.
+   Returns { verdict: 'open' | 'narrow' | 'miss', reason, degrees (his sweep, + opening), opened (the lid's angle after
+   it, from 0 to max), gap (the chord as a share of the lid's length), stopped (he pushed past max), snug (open within
+   15 degrees of the need: just wide enough) }. */
+var HINGE_EASES = {
+  kind:   { slack: 8 },
+  fair:   { slack: 4 },
+  strict: { slack: 0 }
+};
+function judgeHinge(points, c, r, want, w, h, ease) {
+  var e = typeof ease === 'object' ? ease : (HINGE_EASES[ease] || HINGE_EASES.kind);
+  var from = want.from || 0, max = want.max || 110, dir = want.dir === -1 ? -1 : 1;
+  var out = { verdict: 'miss', reason: 'tap', degrees: 0, opened: from, gap: 2 * Math.sin(from * Math.PI / 360), stopped: false, snug: false };
+  if (!points || points.length < 2) return out;
+  var short = Math.min(w, h), path = 0, i, sweep = 0, last = null;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path / short < 0.02) return out;
+  for (i = 0; i < points.length; i++) {
+    var dx = points[i].x - c.x, dy = points[i].y - c.y;
+    if (Math.hypot(dx, dy) < r * 0.2) continue;   /* too near the hinge for its angle to mean anything */
+    var a = Math.atan2(dy, dx);
+    if (last !== null) {
+      var da = a - last; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
+      if (Math.abs(da) > Math.PI * 0.55) { out.reason = 'through the hinge'; return out; }
+      sweep += da;
+    }
+    last = a;
+  }
+  out.degrees = dir * sweep * 180 / Math.PI;
+  var to = from + out.degrees;
+  out.stopped = to > max;
+  out.opened = Math.max(0, Math.min(max, to));
+  out.gap = 2 * Math.sin(out.opened * Math.PI / 360);
+  if (out.degrees < -8) { out.reason = 'wrong way'; return out; }
+  if (out.degrees < 6) { out.reason = 'short'; return out; }
+  if (out.opened < want.need - e.slack) { out.verdict = 'narrow'; out.reason = 'not wide enough'; return out; }
+  out.verdict = 'open'; out.reason = 'lifted'; out.snug = out.opened <= want.need + 15;
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -858,5 +906,6 @@ function measureSpan(opts) {
 
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
-  SWISH_WHY: SWISH_WHY, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan };
+  SWISH_WHY: SWISH_WHY, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
+  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge };
 })(typeof window !== 'undefined' ? window : globalThis);
