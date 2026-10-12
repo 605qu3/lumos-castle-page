@@ -671,7 +671,7 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=5"></script>
+<script src="castle.js?v=6"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=14"></script>
 <script>
@@ -2614,7 +2614,9 @@ var BOOKS = { u: 0.43, v: 0.205, dz: 0.01, w: 0.32, h: 0.32 * 732 / 1032,  /* w:
   /* t2 (Q28, Godric 7.07 pm): on 1 September the History lies open on the desk at its ribboned page (?books=open or
      ?date=2026-09-01 to see it); drawn as history-open round 2 (Q32, 8.32 pm), 0.3 m across open, its foot in front of
      the row; squash is how far the drawing is pressed down to lie at the desk's own angle (1 as drawn) */
-  openUrl: '../assets/layers/history-open.png', OPEN: { w: 0.3, h: 0.3 * 717 / 968, x: -0.03, z: 0.07, squash: 0.35 } };
+  openUrl: '../assets/layers/history-open.png', OPEN: { w: 0.3, h: 0.3 * 717 / 968, x: -0.03, z: 0.07, squash: 0.35, foot: 614 / 717 },   /* foot: the covers' lowest corner, below it the ribbon only */
+  LIFT: 0.025,                                                 /* the right page's free edge in the full draught, metres */
+  SLUMP: 0.38 };                                               /* the sixth's lean into the gap on 1 September (Q33) */
 /* what the seven books say is in Hogwarts, A History, in its own voice from their words; checked in the text with
    the canon search. Its page numbers are invented: "over a thousand pages" (GoF 15). */
 var HISTORY_PAGES = [
@@ -2626,13 +2628,14 @@ var HISTORY_PAGES = [
   { folio: 873, text: 'The Heads of the participating schools are always on the panel of judges, because all three of them were injured during the Tournament of 1792, when a cockatrice the champions were supposed to be catching went on the rampage.' }   /* GoF 15 */
 ];
 var books = (function () {
-  function card(w, h, url, ready) {
+  function card(w, h, url, ready, paint) {
     var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
       new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide, transparent: false }));
     m.visible = false;
     var im = new Image();
     im.onload = function () {
       var c = makeCanvas(im.naturalWidth, im.naturalHeight); c.getContext('2d').drawImage(im, 0, 0);
+      if (paint) paint(c.getContext('2d'), c.width, c.height);
       var t = tex(c);
       m.material.map = t; m.material.needsUpdate = true;
       m.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: t, alphaTest: 0.5 });
@@ -2644,7 +2647,16 @@ var books = (function () {
   }
   var o = { out: null, check: 0, ain: null, hain: null, slide: -1, paged: false, pageAt: 0, dust: null,
     ajar: /[?&]books=ajar/.test(location.search) || (!/[?&]books=/.test(location.search) && Math.random() < BOOKS.AJAR) };
-  o.mesh = card(BOOKS.w, BOOKS.h, BOOKS.outUrl);
+  o.mesh = card(BOOKS.w, BOOKS.h, BOOKS.outUrl, function (im) {   /* the row with the sixth cut away, and the sixth alone */
+    var W = im.naturalWidth, H = im.naturalHeight, x0 = Math.floor(BOOKS.GAP[1] * W) - 3;
+    var a = makeCanvas(W, H), b = makeCanvas(W - x0, H);
+    a.getContext('2d').drawImage(im, 0, 0); a.getContext('2d').clearRect(x0, 0, W - x0, H);
+    b.getContext('2d').drawImage(im, -x0, 0);
+    o.rowWhole = o.mesh.material.map; o.rowGap = tex(a);
+    o.sixth.material.map = tex(b); o.sixth.material.needsUpdate = true;
+    o.sixth.customDepthMaterial = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking, map: o.sixth.material.map, alphaTest: 0.5 });
+    o.slumpSet();
+  });
   o.mesh.name = 'books-row'; scene.add(o.mesh); register(o.mesh, 2);
   var hw = (BOOKS.HIST[2] - BOOKS.HIST[0]) * BOOKS.w, hh = (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h;
   o.hist = card(hw, hh, BOOKS.histUrl, function (im) { o.hain = alphaOf(im); o.hist.visible = o.out !== true && !o.open; });
@@ -2652,14 +2664,34 @@ var books = (function () {
   o.histAt = new THREE.Vector3(((BOOKS.HIST[0] + BOOKS.HIST[2]) / 2 - 0.5) * BOOKS.w, (0.5 - (BOOKS.HIST[1] + BOOKS.HIST[3]) / 2) * BOOKS.h, 0.001);
   o.hist.position.copy(o.histAt); o.mesh.add(o.hist); register(o.hist, 2);
   o.open = false;                                          /* 1 September: the History lies open in front of the row */
-  o.openCard = card(BOOKS.OPEN.w, BOOKS.OPEN.h, BOOKS.openUrl, function (im) { o.oain = alphaOf(im); o.openCard.visible = o.open; });
+  o.openCard = card(BOOKS.OPEN.w, BOOKS.OPEN.h, BOOKS.openUrl, function (im) { o.oain = alphaOf(im); o.openCard.visible = o.open; }, booksWax);
   o.openCard.name = 'books-open'; o.mesh.add(o.openCard); register(o.openCard, 2);
   o.openPlace = function () {
     var k = BOOKS.OPEN.squash;
     o.openCard.scale.y = k;
-    o.openCard.position.set(BOOKS.OPEN.x, -BOOKS.h / 2 + BOOKS.OPEN.h * k / 2, BOOKS.OPEN.z);
+    o.openCard.position.set(BOOKS.OPEN.x, -BOOKS.h / 2 + BOOKS.OPEN.h * k * (BOOKS.OPEN.foot - 0.5), BOOKS.OPEN.z);
   };
   o.openPlace();
+  /* Q33's touch (Godric, 8.50 pm): on 1 September the History's place in the row is a gap and the sixth has slumped
+     into it, tipped on its foot's near corner until its top rests on the blue fourth */
+  var sw = (1 - BOOKS.GAP[1]) * BOOKS.w;
+  o.slump = new THREE.Group(); o.slump.position.set((BOOKS.GAP[1] - 0.5) * BOOKS.w, -BOOKS.h / 2, 0.0005);
+  o.slump.rotation.z = BOOKS.SLUMP; o.slump.visible = false; o.mesh.add(o.slump);
+  o.sixth = new THREE.Mesh(new THREE.PlaneGeometry(sw, BOOKS.h),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5, side: THREE.DoubleSide }));
+  o.sixth.position.set(sw / 2, BOOKS.h / 2, 0); o.sixth.name = 'books-sixth'; o.slump.add(o.sixth); register(o.sixth, 2);
+  o.slumpSet = function () {
+    if (!o.rowGap) return;
+    var on = o.open, m = on ? o.rowGap : o.rowWhole;
+    o.mesh.material.map = m; o.mesh.material.needsUpdate = true;
+    if (o.mesh.customDepthMaterial) { o.mesh.customDepthMaterial.map = m; o.mesh.customDepthMaterial.needsUpdate = true; }
+    o.slump.visible = on;
+  };
+  /* Q30's touch (Godric, 7.27 pm): the open pages lift and settle in the door's draught, as the feather does; the card
+     is a grid so the pages can bend, their foot and the covers kept still */
+  o.openCard.geometry.dispose(); o.openCard.geometry = new THREE.PlaneGeometry(BOOKS.OPEN.w, BOOKS.OPEN.h, 24, 10);
+  o.openBase = o.openCard.geometry.attributes.position.array.slice();
+  o.openStir = 0;
   var whole = new Image();                                 /* the whole row's outline: a tap in the gap counts too */
   whole.onload = function () { o.ain = alphaOf(whole); };
   whole.src = BOOKS.url;
@@ -2699,6 +2731,30 @@ var books = (function () {
   o.hangOn = 0;
   return o;
 })();
+/* Q32's touch (Godric, 8.32 pm): a small drip of candle wax dried on the right-hand page's lower corner, read up by
+   candlelight before the feast in a hurry; the grease's darker halo in the paper, the tallow's pale body and its run
+   toward the edge, a glint. About a centimetre, so it reads only close (zoom) */
+var BOOKS_WAX = { x: 0.872, y: 0.715, r: 0.011 };          /* as fractions of the drawing's width */
+function booksWax(g, w, h) {
+  var x = BOOKS_WAX.x * w, y = BOOKS_WAX.y * h, r = BOOKS_WAX.r * w;
+  function drop(cx, cy, k, tail) {                         /* an uneven pool, its tail run down toward the corner */
+    g.beginPath();
+    for (var i = 0; i <= 48; i++) {
+      var a = i / 48 * Math.PI * 2, q = k * (1 + 0.16 * Math.sin(3 * a + 1.3) + 0.09 * Math.sin(5 * a + 0.4) + 0.05 * Math.sin(9 * a));
+      var t = Math.max(0, Math.cos(a - 0.6)); q *= 1 + tail * Math.pow(t, 6);
+      g[i ? 'lineTo' : 'moveTo'](cx + Math.cos(a) * q, cy + Math.sin(a) * q * 0.78);
+    }
+    g.closePath();
+  }
+  g.save();
+  g.fillStyle = 'rgba(150,118,66,0.22)'; drop(x, y, r * 1.45, 0.9); g.fill();       /* the grease in the paper */
+  g.fillStyle = 'rgba(240,226,180,0.92)'; drop(x, y, r, 1.1); g.fill();              /* the tallow */
+  [[-1.6, -0.8, 0.2], [1.5, -1.0, 0.14], [-0.9, 1.3, 0.11]].forEach(function (d) { drop(x + d[0] * r, y + d[1] * r, d[2] * r, 0); g.fill(); });
+  g.strokeStyle = 'rgba(125,96,54,0.45)'; g.lineWidth = Math.max(1, r * 0.08);
+  g.beginPath(); g.arc(x, y, r * 0.95, 1.2, 3.4); g.stroke();                         /* its shadowed lower edge only */
+  g.fillStyle = 'rgba(255,255,246,0.7)'; drop(x - r * 0.35, y - r * 0.3, r * 0.22, 0.6); g.fill();   /* the glint */
+  g.restore();
+}
 function booksOpenToday() {                                  /* 1 September, the first day of term (PS 6, PoA 1) */
   if (/[?&]books=open/.test(location.search)) return true;
   return !!castle && castle.weather().date === '09-01';
@@ -2783,6 +2839,7 @@ function updateBooks(dt) {
       books.out = out; books.open = open; if (open) books.ajar = false;
       books.hist.visible = !out && !open && !!books.hist.material.map; books.slip.visible = out;
       books.openCard.visible = open && !!books.openCard.material.map;
+      books.slumpSet();
     }
   }
   var gp = sideTable.geometry.parameters, base = new THREE.Vector3((BOOKS.u - 0.5) * gp.width, (0.5 - BOOKS.v) * gp.height, BOOKS.dz);
@@ -2798,6 +2855,17 @@ function updateBooks(dt) {
     if (!books.paged && t >= BOOKS.OUT * 0.8) { books.paged = true; booksPage(); }
     if (t >= BOOKS.OUT + BOOKS.HOLD + BOOKS.BACK) { books.slide = -1; booksHistOut(0); }
   } else booksHistOut(books.ajar && !books.out ? 1 : 0);
+  if (books.openCard.visible && (draught > 0.003 || books.openStir)) {   /* the pages in the door's draught */
+    var pa = books.openCard.geometry.attributes.position, pb = books.openBase, W = BOOKS.OPEN.w, H = BOOKS.OPEN.h,
+        st = performance.now() / 1000, on = draught > 0.003;
+    for (var vi = 0; vi < pa.count; vi++) {
+      var xf = pb[vi * 3] / W + 0.5, vf = 0.5 - pb[vi * 3 + 1] / H;
+      var side = Math.max(Math.pow(smooth01(0.52, 0.94, xf), 1.5), 0.35 * Math.pow(smooth01(0.48, 0.06, xf), 1.5));
+      var lift = on ? BOOKS.LIFT * draught * side * (1 - smooth01(0.55, 0.8, vf)) * (0.65 + 0.35 * Math.sin(st * 5.3 + xf * 2.2)) : 0;
+      pa.array[vi * 3 + 1] = pb[vi * 3 + 1] + lift / BOOKS.OPEN.squash;
+    }
+    pa.needsUpdate = true; books.openStir = on ? 1 : 0;
+  }
   if (books.dust !== null) {                               /* the motes drift up and settle, gone in two seconds */
     var d = (books.dust += dt), arr = books.dustGeo.attributes.position.array;
     books.motes.forEach(function (m, i) {
@@ -4358,6 +4426,9 @@ function currentLook() {
   camera.getWorldDirection(d);
   return camera.position.clone().addScaledVector(d, 5);
 }
+/* the zoom (req 122, castle.js; Godric's yes, 8.34 pm): 3x at rest, where the desk's small things need it; 2x at the
+   fireside and the board, already close */
+function stopZoom(at) { if (kit.zoom) kit.zoom.setLimits(1, at ? 2 : 3); }
 function enterBoard() {
   mode = 'tween';
   scene.updateMatrixWorld(true);
@@ -4368,6 +4439,7 @@ function enterBoard() {
   var d = Math.max((BOARD_H / 2) / th, (BOARD_W / 2) / (th * camera.aspect)) * 1.12;
   var to = p.clone().addScaledVector(n, d);
   startTween(camera.position.clone(), currentLook(), to, p, 0.9, function () { mode = 'board'; backBtn.hidden = false; });
+  stopZoom(true);
 }
 function leaveBoard() {
   mode = 'tween';
@@ -4375,6 +4447,7 @@ function leaveBoard() {
   var pos = new THREE.Vector3(), look = new THREE.Vector3();
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 0.9, function () { mode = 'room'; });
+  stopZoom(false);
 }
 
 /* ---------- the fireside stop (Godric, 9 October 2026) ----------
@@ -4389,6 +4462,7 @@ function goFireside() {
   mode = 'tween';
   startTween(camera.position.clone(), currentLook(), FIRESIDE.pos, FIRESIDE.look, 1.6,
     function () { mode = 'fireside'; backBtn.hidden = false; }, camera.fov, firesideFov());
+  stopZoom(true);
 }
 function leaveFireside() {
   mode = 'tween';
@@ -4396,6 +4470,7 @@ function leaveFireside() {
   var pos = new THREE.Vector3(), look = new THREE.Vector3();
   roomPose(yaw, pitch, pos, look);
   startTween(camera.position.clone(), currentLook(), pos, look, 1.6, function () { mode = 'room'; }, camera.fov, baseFov());
+  stopZoom(false);
 }
 /* the fire's tap works the bellows (Magic for the boys); what the fire does is the fire chain's (fire.json) */
 function fireTap() {
@@ -5098,7 +5173,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { frame: frame, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
