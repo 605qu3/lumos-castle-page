@@ -14,7 +14,9 @@
      F.bentPlane  function (w, h) for a layer with bend: true (the round wall's radius is the page's)
      F.onSurface  function (id, texture, color), called after a surface's drawing is applied
    and called by the page from inside each of its taps:
-     F.tapped     (acted) whether the tap did anything; one that did nothing gets the frame's mote (req 149) */
+     F.tapped     (acted) whether the tap did anything; one that did nothing gets the frame's mote (req 149)
+   and, for the Omnioculars once his pair is held (req 147): F.zoom.held(fn), F.zoom.hidden(fn), F.zoom.shown(map),
+   and F.zoom.slow(), the dial's factor for the dt of what moves by itself */
 (function () {
 'use strict';
 
@@ -457,6 +459,7 @@ window.castleFrame = function (opts) {
   var zOpt = opts.zoom === undefined ? {} : opts.zoom;
   var seen = null;   /* seen(point): nothing opaque between the eye and a point in the world, set in the zoom's closure */
   var markTap = null;   /* the page's word on its last tap, for the double tap (req 149) */
+  var pairFrame = null;   /* the Omnioculars' replay, kept after each render (req 147) */
   var zoom = (function () {
     var on = zOpt !== false, zMin = 1, zMax = (zOpt && zOpt.max) || ZOOM_MAX;
     var z = 1, ox = 0, oy = 0, anim = null, listeners = [];
@@ -484,6 +487,7 @@ window.castleFrame = function (opts) {
       for (var i = 0; i < listeners.length; i++) listeners[i](z);
       clearTimeout(lookTimer);
       if (z >= LOOK_Z - 0.001 && lookers.length) lookTimer = setTimeout(lookNow, LOOK_HOLD_S * 1000);
+      if (pair) pair.moved();
     }
     /* the thing at the middle of the view, once the view has held still a second (every apply restarts the wait) */
     var lookers = [], lookTimer = null, lookRay = new THREE.Raycaster(), lookMid = new THREE.Vector2(0, 0);
@@ -520,8 +524,8 @@ window.castleFrame = function (opts) {
       }
       return true;
     };
-    function lookNow() {
-      if (z < LOOK_Z - 0.001 || n > 1) return;   /* not mid-pinch */
+    /* the name of the thing at the middle of the view, or null: the nearest thing seen decides, named or not */
+    function thingAtMiddle() {
       camera.updateMatrixWorld();
       lookRay.setFromCamera(lookMid, camera);   /* the view offset is in the projection, so the middle is the zoomed middle */
       var hits = lookRay.intersectObjects(scene.children, true);
@@ -533,9 +537,14 @@ window.castleFrame = function (opts) {
         if (clearAt(m, hits[i].uv)) continue;   /* a card's clear pixels, a window's glass in its frame */
         var name = null;
         for (p = o; p && name == null; p = p.parent) if (p.userData.look != null) name = typeof p.userData.look === 'function' ? p.userData.look(hits[i]) : p.userData.look;
-        if (name) { window.castleLooked = name; for (var k = 0; k < lookers.length; k++) lookers[k](name); }
-        return;   /* the nearest thing seen decides, named or not */
+        return name || null;
       }
+      return null;
+    }
+    function lookNow() {
+      if (z < LOOK_Z - 0.001 || n > 1) return;   /* not mid-pinch */
+      var name = thingAtMiddle();
+      if (name) { window.castleLooked = name; for (var k = 0; k < lookers.length; k++) lookers[k](name); }
     }
     /* zoom to nz keeping the point under the screen point (sx, sy), as fractions of the screen, where it is */
     function about(nz, sx, sy) {
@@ -639,6 +648,169 @@ window.castleFrame = function (opts) {
       about(z * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), p.x, p.y);
     }, { passive: false });
 
+    /* ---------- the Omnioculars, once his pair is held (req 147; Magic's *The Omnioculars*, questions 3 and 4, Godric's
+       option 1 each, 12 October 2026, 8.13 to 8.15 am) ----------
+       Canon gives them three gifts, "replay action ... slow everything down ... a play-by-play breakdown" (GoF 7), all on
+       the side of time and labels; what magic hides stays the spell's. Only once the page says the pair is his
+       (F.zoom.held(fn), the runtime's `omni = held`), and only while he looks through it (zoomed in), so at rest the
+       painting holds nothing but Back (the vocabulary's §5): two brass knobs bottom left, the dial and the replay.
+       The breakdown: held still a moment on a thing, a small gold line names it, the page's word for it
+       (F.zoom.shown({ name: word }); else the name itself); a thing the page says is hidden (F.zoom.hidden(fn), the
+       runtime's marks, req 145) gives only a faint shimmer at the middle and "something here", which the spell opens.
+       The dial: each tap turns its needle a notch, full, slow, slower, and back; the page multiplies the dt of what
+       moves by itself by F.zoom.slow(), never its camera or the runtime's clock, so an owl or a sitter slows till he
+       can see what he missed (GoF 8). Lowering the pair (back to no zoom) sets it to full again.
+       The replay: while the pair is held the frame keeps the last REPLAY_S seconds of the screen, small, and the
+       replay knob plays them over the room at the dial's speed, then fades; a tap ends it sooner. Only what this visit
+       showed: the keeping starts again whenever the page is left or put away, so the changes between visits are only
+       ever found, never replayed.
+       Look switch: ?omni=1 holds the pair, for a shot. */
+    var BREAK_Z = 1.3, BREAK_HOLD_S = 0.6, BREAK_SHOW_S = 2.6, DIAL = [1, 0.35, 0.12], DIAL_DEG = [55, 0, -55];
+    var REPLAY_S = 4, REPLAY_FPS = 8, REPLAY_W = 480;
+    var pair = (function () {
+      var heldFn = null, hiddenFn = null, words = {}, forced = false;
+      try { forced = new URLSearchParams(location.search).get('omni') === '1'; } catch (err) {}
+      function held() { try { return forced || !!(heldFn && heldFn()); } catch (err) { return false; } }
+      function looking() { return on && z > 1.05 && held(); }
+
+      var css = document.createElement('style');
+      css.textContent =
+        '.omni-knob{position:fixed;bottom:18px;width:96px;height:96px;border-radius:50%;z-index:20;padding:0;cursor:pointer;' +
+        'border:3px solid #5e4214;background:radial-gradient(circle at 38% 32%,#f6dc96 0,#c99a45 45%,#8a6424 100%);' +
+        'box-shadow:0 3px 8px rgba(0,0,0,0.55),inset 0 0 0 6px rgba(94,66,20,0.35);touch-action:manipulation}' +
+        '.omni-knob[hidden]{display:none}' +
+        '.omni-needle{position:absolute;left:50%;bottom:50%;width:6px;margin-left:-3px;height:34px;border-radius:3px;' +
+        'background:#3a2608;transform-origin:50% 100%;transition:transform 0.35s cubic-bezier(.3,1.6,.5,1)}' +
+        '.omni-hub{position:absolute;left:50%;top:50%;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#3a2608}' +
+        '.omni-tick{position:absolute;left:50%;top:9px;width:4px;height:10px;margin-left:-2px;background:#5e4214;transform-origin:50% 39px}' +
+        '@keyframes omni-shimmer{0%{opacity:0;transform:scale(0.7)}30%{opacity:0.55}60%{opacity:0.3;transform:scale(1.15)}100%{opacity:0;transform:scale(1.4)}}' +
+        '.omni-shimmer{position:fixed;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;pointer-events:none;' +
+        'z-index:6;mix-blend-mode:screen;background:radial-gradient(circle,rgba(255,240,190,0.7) 0,rgba(255,215,120,0.25) 35%,rgba(255,200,90,0) 70%);' +
+        'animation:omni-shimmer 1.4s ease-in-out 2}';
+      document.head.appendChild(css);
+
+      /* the breakdown's line, gold, near the top */
+      var line = document.createElement('div');
+      line.style.cssText = 'position:fixed;left:50%;top:12%;transform:translateX(-50%);max-width:80%;text-align:center;z-index:8;' +
+        'font:600 24px Georgia,serif;letter-spacing:0.04em;color:#f3cf6e;text-shadow:0 1px 2px #000,0 0 10px rgba(0,0,0,0.6);' +
+        'pointer-events:none;opacity:0;transition:opacity 0.5s';
+      canvas.insertAdjacentElement('afterend', line);
+      var breakTimer = null, lineTimer = null, last = { name: null, t: 0 };
+      function say(text, faint) {
+        line.textContent = text;
+        line.style.fontStyle = faint ? 'italic' : 'normal';
+        line.style.fontWeight = faint ? '400' : '600';
+        line.style.opacity = faint ? '0.6' : '1';
+        clearTimeout(lineTimer);
+        lineTimer = setTimeout(function () { line.style.opacity = '0'; }, BREAK_SHOW_S * 1000);
+      }
+      function shimmer() {
+        var d = document.createElement('div');
+        d.className = 'omni-shimmer';
+        canvas.insertAdjacentElement('afterend', d);
+        setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 3000);
+      }
+      function wordFor(name) {
+        if (words[name]) return words[name];
+        return name.charAt(0).toUpperCase() + name.slice(1);
+      }
+      function breakNow() {
+        if (!looking() || z < BREAK_Z || n > 1 || playing) return;
+        var name = thingAtMiddle(), now = performance.now();
+        if (!name) return;
+        if (name === last.name && now - last.t < 5000) return;   /* the same thing again, still fresh */
+        last = { name: name, t: now };
+        var hid = false;
+        try { hid = !!(hiddenFn && hiddenFn(name)); } catch (err) {}
+        window.castleBreakdown = hid ? 'something here' : wordFor(name);
+        if (hid) { say('something here', true); shimmer(); }
+        else say(wordFor(name));
+      }
+
+      /* the two knobs */
+      var dial = document.createElement('button'), dialI = 0, needle = document.createElement('div');
+      dial.className = 'omni-knob'; dial.setAttribute('aria-label', 'Slow'); dial.style.left = '18px'; dial.hidden = true;
+      DIAL_DEG.forEach(function (deg) { var t = document.createElement('div'); t.className = 'omni-tick'; t.style.transform = 'rotate(' + deg + 'deg)'; dial.appendChild(t); });
+      needle.className = 'omni-needle'; dial.appendChild(needle);
+      var hub = document.createElement('div'); hub.className = 'omni-hub'; dial.appendChild(hub);
+      function setDial(i) { dialI = i; needle.style.transform = 'rotate(' + DIAL_DEG[i] + 'deg)'; window.castleDial = DIAL[i]; }
+      setDial(0);
+      dial.addEventListener('click', function (e) { e.stopPropagation(); setDial((dialI + 1) % DIAL.length); });
+
+      var rep = document.createElement('button');
+      rep.className = 'omni-knob'; rep.setAttribute('aria-label', 'Replay'); rep.style.left = '128px'; rep.hidden = true;
+      rep.innerHTML = '<svg viewBox="0 0 48 48" width="56" height="56" style="display:block;margin:auto"><path d="M33 14a14 14 0 1 1-17 2" ' +
+        'fill="none" stroke="#3a2608" stroke-width="5" stroke-linecap="round"/><path d="M9 9l8 2-2 9z" fill="#3a2608"/></svg>';
+      rep.addEventListener('click', function (e) { e.stopPropagation(); replay(); });
+      document.body.appendChild(dial); document.body.appendChild(rep);
+
+      function moved() {
+        var show = looking() && n < 2;
+        dial.hidden = rep.hidden = !show;
+        if (show) helpEl.hidden = true;   /* the first help sits where the knobs do */
+        if (!(on && z > 1.05)) { if (dialI) setDial(0); last.name = null; }
+        clearTimeout(breakTimer);
+        if (show && z >= BREAK_Z) breakTimer = setTimeout(breakNow, BREAK_HOLD_S * 1000);
+      }
+
+      /* the replay: the last seconds kept small, after each render, while the pair is held */
+      var N = REPLAY_S * REPLAY_FPS, ring = [], at = 0, kept = 0, since = 0, playing = null;
+      var screen = document.createElement('canvas');
+      screen.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;z-index:7;opacity:0;pointer-events:none;' +
+        'filter:sepia(0.35) saturate(0.9);transition:opacity 0.35s';
+      canvas.insertAdjacentElement('afterend', screen);
+      function forget() { kept = 0; at = 0; since = 0; }
+      document.addEventListener('visibilitychange', function () { if (document.hidden) forget(); });
+      window.addEventListener('pagehide', forget);
+      function frame(dt) {
+        if (playing || !held()) { if (!playing) kept = 0; return; }
+        since += dt;
+        if (since < 1 / REPLAY_FPS) return;
+        since = 0;
+        var cw = canvas.clientWidth, ch = canvas.clientHeight;
+        if (!cw || !ch) return;
+        var w = Math.min(REPLAY_W, cw), h = Math.max(1, Math.round(w * ch / cw)), slot = ring[at];
+        if (!slot || slot.width !== w || slot.height !== h) slot = ring[at] = makeCanvas(w, h);
+        try { slot.getContext('2d').drawImage(canvas, 0, 0, w, h); } catch (err) { return; }
+        at = (at + 1) % N; kept = Math.min(N, kept + 1);
+      }
+      function replay() {
+        if (playing || kept < 2) return;
+        var frames = [];
+        for (var k = 0; k < kept; k++) frames.push(ring[(at - kept + k + N) % N]);
+        screen.width = frames[0].width; screen.height = frames[0].height;
+        var g = screen.getContext('2d'), my = { t: 0, i: -1, frames: frames }, t0 = performance.now();
+        playing = my; window.castleReplaying = true;
+        say('Replay', true);   /* "replay action" (GoF 7) */
+        screen.style.opacity = '1'; screen.style.pointerEvents = 'auto';
+        (function step() {
+          if (playing !== my) return;
+          var now = performance.now();
+          my.t += (now - t0) / 1000 * DIAL[dialI]; t0 = now;
+          var i = Math.floor(my.t * REPLAY_FPS);
+          if (i >= frames.length) { stop(); return; }
+          if (i !== my.i) { my.i = i; g.drawImage(frames[i], 0, 0); }
+          requestAnimationFrame(step);
+        })();
+      }
+      function stop() {
+        playing = null; window.castleReplaying = false;
+        screen.style.opacity = '0'; screen.style.pointerEvents = 'none';
+        forget();   /* what follows is kept afresh */
+      }
+      screen.addEventListener('pointerdown', function (e) { e.stopPropagation(); e.preventDefault(); stop(); });
+
+      return {
+        held: function (fn) { heldFn = fn; moved(); },
+        hidden: function (fn) { hiddenFn = fn; },
+        shown: function (map) { for (var k in map) words[k] = map[k]; },
+        slow: function () { return looking() ? DIAL[dialI] : 1; },
+        moved: moved, frame: frame, replay: replay,
+        isHeld: held, kept: function () { return kept; }
+      };
+    })();
+    pairFrame = pair.frame;
+
     var api = {
       level: function () { return z; },
       set: function (nz, fx, fy, dur) {
@@ -664,7 +836,10 @@ window.castleFrame = function (opts) {
       onChange: function (fn) { listeners.push(fn); },
       /* name a thing for looking close (a lower-case name, one per thing across every page, or a function of the hit) */
       look: function (mesh, name) { mesh.userData.look = name; return mesh; },
-      onLook: function (fn) { lookers.push(fn); }
+      onLook: function (fn) { lookers.push(fn); },
+      /* the Omnioculars (req 147): whether the pair is his, which names are hidden, the words the breakdown shows,
+         and the dial's factor for the dt of what moves by itself */
+      held: pair.held, hidden: pair.hidden, shown: pair.shown, slow: pair.slow, replay: pair.replay
     };
     try {
       var zs = new URLSearchParams(location.search).get('zoom');
@@ -725,6 +900,7 @@ window.castleFrame = function (opts) {
   /* the fps line: call once a frame, after rendering, with the frame's dt */
   var fpsN = 0, fpsT = 0;
   function stats(dt) {
+    if (pairFrame) pairFrame(dt);   /* right after the render, while the frame is still drawn */
     fpsN++; fpsT += dt;
     if (fpsT >= 0.5) {
       var ri = renderer.info.render;

@@ -189,7 +189,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=8"></script>
+<script src="castle.js?v=9"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=15"></script>
 <script>
@@ -3037,6 +3037,18 @@ settles.forEach(function (m) { kit.zoom.look(m, 'the inglenook'); });
 windows.forEach(function (w) { kit.zoom.look(w.frame, 'the corridor windows'); kit.zoom.look(w.sill, 'the corridor windows'); });
 torches.forEach(function (t) { kit.zoom.look(t.mesh, 'the corridor torches'); });
 kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
+/* The Omnioculars, once his pair is held (req 147; the frame's half in castle.js): the runtime says when the pair is his
+   (`omni = held`, Events' omnioculars.json) and, once Events marks them (req 145, asked; req 157 for its call), which
+   things are hidden; the breakdown's gold line shows each name in these words (plain ones, or the books' own). */
+kit.zoom.held(function () { return !!(castle && castle.state().vars.omni === 'held'); });
+kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hidden(name)); });
+kit.zoom.shown({ 'the fat lady': 'The Fat Lady', "the fat lady's cake": "The Fat Lady's cake", 'corridor portrait a': 'A portrait',
+  'corridor portrait b': 'A portrait', 'the painting opposite the hole': 'The painting opposite', 'the suit of armour': 'A suit of armour',
+  'the walking sticks': 'Walking sticks', 'the corridor tapestry': 'A tapestry', 'the polite door': 'The polite door',
+  'the lost things': 'Lost things', 'the dropped scarf': 'A scarf', 'the scarf on the settle': 'A scarf', 'trevor': 'Trevor',
+  'the landing window': 'The landing window', 'the front doors': 'The front doors', "the gallery's teacup": 'A teacup',
+  "hagrid's hut": "Hagrid's hut", 'the forbidden forest': 'The Forbidden Forest', 'the corridor windows': 'A window',
+  'the corridor torches': 'A torch' });
 
 /* ---------- per frame ---------- */
 
@@ -3044,33 +3056,34 @@ var clock = new THREE.Clock();
 var t = 0;
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
-  t += dt;
+  var wdt = dt * kit.zoom.slow();   /* what moves by itself, slowed by the Omnioculars' dial (req 147); his view, his lines and the runtime keep time */
+  t += wdt;
   if (castle) castle.tick(dt);
   updateCamera(dt);
-  updateSticks(dt);
-  updateTrevor(dt);
+  updateSticks(wdt);
+  updateTrevor(wdt);
   updateLines(dt);
-  updateDraught(dt);
-  updateScarf(dt);
+  updateDraught(wdt);
+  updateScarf(wdt);
   updateSteam();
-  updateSpoon(dt);
-  updateGalleryVisit(dt);
-  updateOppMoment(dt);
+  updateSpoon(wdt);
+  updateGalleryVisit(wdt);
+  updateOppMoment(wdt);
   updateLookBack(dt);
-  updateTurnRise(dt);
-  updateDoorsKnock(dt);
-  updateHerDoze(dt);
-  updateHerPatches(dt);
-  updateGrounds(dt);
-  updateSnowball(dt);
-  updateNick(dt);
-  updateBewitched(dt);
-  herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, dt * 4));
+  updateTurnRise(wdt);
+  updateDoorsKnock(wdt);
+  updateHerDoze(wdt);
+  updateHerPatches(wdt);
+  updateGrounds(wdt);
+  updateSnowball(wdt);
+  updateNick(wdt);
+  updateBewitched(wdt);
+  herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, wdt * 4));
   hinge.rotation.y = -herDoor.ang;
-  doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, dt * 4));
+  doorLeaf.ang = lerp(doorLeaf.ang, doorLeaf.target, Math.min(1, wdt * 4));
   var shiver = 0;
   if (doorShiver) {
-    doorShiver.t += dt;
+    doorShiver.t += wdt;
     shiver = doorShiver.amp * Math.sin(doorShiver.t * 55) * (1 - doorShiver.t / 0.6);
     if (doorShiver.t >= 0.6) doorShiver = null;
   }
