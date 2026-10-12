@@ -112,6 +112,48 @@ function judgeTurn(points, c, r, want, w, h, ease) {
   out.verdict = 'open'; out.reason = 'turned';
   return out;
 }
+
+/* Aparecium's three taps (11 October 2026, fourth session; the books: Hermione taps the diary three times and says it,
+   and nothing happens, CoS 13). The geometry is the lane's own: three taps in a line, evenly spaced, so the middle tap
+   halves the line between the outer two, and at an even beat, so the middle tap halves the time as well. With
+   place: false in the ease (the page's "Beat alone") only the beat is asked, three taps anywhere, as in the book.
+   Called on every tap: taps [{x, y, t}] in order; a gap longer than the ease's starts the count again, so a page needs
+   no timer; the first three after the last such gap are judged, and a page clears its taps after a verdict.
+   Returns { verdict: 'waiting' | 'open' | 'miss', reason, count, beat (the longer interval over the shorter), gaps
+   [px, px], even (the longer gap over the shorter), off (the middle tap's distance from the line through the outer two,
+   as a share of the span), tenths (the first gap in tenths of the span, 5 when halved exactly) }. */
+var TAP_EASES = {
+  kind:   { gap: 1500, beat: 2.0, spread: 0.12, line: 0.25, even: 1.9 },
+  fair:   { gap: 1500, beat: 1.6, spread: 0.15, line: 0.16, even: 1.5 },
+  strict: { gap: 1500, beat: 1.3, spread: 0.18, line: 0.08, even: 1.3 }
+};
+function judgeTaps(taps, w, h, ease) {
+  var e = typeof ease === 'object' ? ease : (TAP_EASES[ease] || TAP_EASES.kind);
+  var out = { verdict: 'waiting', reason: 'count', count: 0, beat: 0, gaps: [0, 0], even: 0, off: 0, tenths: 0 };
+  if (!taps || !taps.length) return out;
+  var from = 0, i;
+  for (i = 1; i < taps.length; i++) if (taps[i].t - taps[i - 1].t > e.gap) from = i;
+  var T = taps.slice(from, from + 3);
+  out.count = T.length;
+  if (T.length < 3) return out;
+  var a = T[0], b = T[1], c = T[2];
+  var i1 = Math.max(60, b.t - a.t), i2 = Math.max(60, c.t - b.t);
+  out.beat = Math.max(i1, i2) / Math.min(i1, i2);
+  var d1 = Math.hypot(b.x - a.x, b.y - a.y), d2 = Math.hypot(c.x - b.x, c.y - b.y), span = Math.hypot(c.x - a.x, c.y - a.y);
+  out.gaps = [d1, d2];
+  out.even = Math.max(d1, d2) / Math.max(1, Math.min(d1, d2));
+  out.off = span ? Math.abs((c.x - a.x) * (a.y - b.y) - (a.x - b.x) * (c.y - a.y)) / span / span : 1;
+  out.tenths = d1 + d2 ? 10 * d1 / (d1 + d2) : 0;
+  out.verdict = 'miss';
+  if (e.place !== false) {
+    if (Math.max(span, d1, d2) < e.spread * Math.min(w, h)) { out.reason = 'one spot'; return out; }
+    if (span < e.spread * Math.min(w, h) * 0.5 || out.off > e.line) { out.reason = 'not in a line'; return out; }
+    if (out.even > e.even) { out.reason = 'uneven spacing'; return out; }
+  }
+  if (out.beat > e.beat) { out.reason = 'uneven beat'; return out; }
+  out.verdict = 'open'; out.reason = 'revealed';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -202,5 +244,5 @@ function castOver(opts) {
 }
 
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
-  learned: learned, learn: learn, castOver: castOver };
+  TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, learned: learned, learn: learn, castOver: castOver };
 })(typeof window !== 'undefined' ? window : globalThis);

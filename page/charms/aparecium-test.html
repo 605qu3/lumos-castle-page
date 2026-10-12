@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Aparecium, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #110d0b; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1e1611;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+  button.red { background: #b3261e; color: #fff4ec; border-color: #d2463a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=4"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* Aparecium, a test page for the Charms lane (11 October 2026, fourth session; the owner is Godric). Drawn in code.
+   The books: "It might be invisible ink!" Hermione taps the diary three times and says "Aparecium!"; nothing happens;
+   she rubs hard on January first with a Revealer, a bright red eraser from Diagon Alley; nothing happens again (CoS
+   13). The geometry is the lane's own: three taps in a line, evenly spaced and at an even beat, so the middle tap
+   halves the line and the time; the ink spreads from each tap at one speed and meets at the two halfway points at
+   once when the gaps are equal. "Beat alone" asks only the beat, three taps anywhere, as in the book (off by default;
+   Q4's answer for Alohomora steers it). Judged by LumosSpells.judgeTaps (spells.js), tallied in
+   checks/aparecium-tally.js; the guide's three rings from guide.js. ?page=1..3, ?ease=, ?guide=, ?alone=1 for trying;
+   window.lumosAparecium for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind', alone = qs.get('alone') === '1';
+
+  var PAGES = [
+    { name: 'Note', kind: 'note', start: 'A scrap of parchment, left on the table. Blank? It might be invisible ink. Tap it three times.' },
+    { name: 'Library', kind: 'book', start: 'A library book, one page left blank in the middle of a chapter. Tap it three times.' },
+    { name: 'Diary', kind: 'diary', start: 'An old diary, every page blank. It might be invisible ink. Tap it three times.' } ];
+  var page = Math.max(0, Math.min(2, (Number(qs.get('page')) || 1) - 1)), P = PAGES[page];
+  var taps = [], reveal = null, shown = null, rubbing = null, stage = 'tap', last = null, guide = null, nothing = 0;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (guide) guide.build(W, H);
+  }
+  /* the sheet: below the line, above the buttons */
+  function sheet() {
+    var top = Math.max(110, H * 0.15), bot = H - 76, h = Math.min(bot - top, H * 0.66), w = Math.min(W * 0.88, h * (W > H ? 1.3 : 0.8));
+    if (P.kind === 'note') { w *= 0.92; h *= 0.8; }
+    return { x: W / 2 - w / 2, y: top + (bot - top - h) / 2, w: w, h: h };
+  }
+  function easeNow() { var e = Object.assign({}, LumosSpells.TAP_EASES[ease]); if (alone) e.place = false; return e; }
+
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function tone(freq, dur, gain) {
+    if (!audio) return;
+    var o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
+    o.type = 'sine'; o.frequency.value = freq; g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + dur);
+  }
+  function tick() { tone(1400, 0.08, 0.2); }
+
+  /* the guide: three rings across the sheet, halfway the middle one; in "Beat alone" one ring, tapped three times */
+  function makeGuide() {
+    var u = alone ? [[0.5, 0], [0.5, 0], [0.5, 0]] : [[0.2, 0], [0.5, 0], [0.8, 0]];
+    guide = LumosGuide.create({ key: 'lumos.charms.apareciumGuidedHits', rest: 1.0, mirror: false, beatSecs: 0.5,
+      box: function () { var R = sheet(); return { G: R.w, ox: R.x, oy: R.y + R.h * 0.56 }; },
+      beats: u, beatLabels: alone ? ['tap, tap, tap', '', ''] : ['tap', 'tap', 'tap'] });
+    guide.build(W, H);
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    PAGES.forEach(function (p, i) {
+      var b = document.createElement('button'); b.textContent = p.name; if (i === page) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    if (P.kind === 'diary' && stage === 'nothing') {
+      var r = document.createElement('button'); r.textContent = 'Try the Revealer'; r.className = 'red';
+      r.onclick = function () { ensureAudio(); rub(); }; panel.appendChild(r);
+    }
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var a = document.createElement('button'); a.textContent = 'Beat alone'; if (alone) a.className = 'on';
+    a.onclick = function () { alone = !alone; makeGuide(); menu(); }; panel.appendChild(a);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { if (guide) guide.reset(); }; panel.appendChild(g);
+  }
+  function choose(i) {
+    page = i; P = PAGES[i]; taps = []; reveal = null; shown = null; rubbing = null; stage = 'tap'; last = null; nothing = 0;
+    makeGuide(); menu(); say(P.start + (alone ? '' : ' <b>In a line, the middle tap halfway</b>, at an even beat.'));
+  }
+
+  /* ---- the spell ---- */
+  function tenthsWords(j) {
+    var a = Math.round(j.tenths), b = 10 - a;
+    return a + ' and ' + b + ' tenths of the line';
+  }
+  var MISS = {
+    'one spot': function () { return 'Spread them out: three taps in a line across the page, the middle one halfway.'; },
+    'not in a line': function () { return 'Keep the three taps in a line, like beads on a thread.'; },
+    'uneven spacing': function (j) { return 'Nearly. Your gaps were ' + tenthsWords(j) + '. Halfway is 5 and 5: put the middle tap there.'; },
+    'uneven beat': function () { return 'Keep an even beat: tap ... tap ... tap, like a clock ticking.'; } };
+  function tapAt(p) {
+    if (stage === 'revealed' || stage === 'rubbing') return;
+    var R = sheet();
+    if (p.x < R.x || p.x > R.x + R.w || p.y < R.y || p.y > R.y + R.h) { say('Tap the page itself.'); return; }
+    if (stage === 'nothing') stage = 'tap';
+    tick(); taps.push(p); if (guide) guide.cover(p);
+    var j = LumosSpells.judgeTaps(taps, W, H, easeNow());
+    if (j.count < taps.length && j.verdict === 'waiting') taps = taps.slice(taps.length - j.count);
+    if (j.verdict === 'waiting') return j;
+    var three = taps.slice(-3), lv = guide ? guide.level() : 0, tr = guide ? guide.scoreTaps(three) : null;
+    if (tr && tr.traced && j.verdict === 'miss' && j.reason !== 'uneven beat') { j.verdict = 'open'; j.reason = 'traced'; }
+    last = j; taps = [];
+    if (j.verdict === 'open') {
+      if (guide) guide.hit(lv > 0);
+      reveal = { at: performance.now(), taps: three, j: j };
+      if (P.kind === 'diary') {
+        nothing++; stage = 'nothing'; tone(220, 0.5, 0.15);
+        say('<b>Aparecium!</b> ... Nothing happened.');
+        setTimeout(function () { if (stage === 'nothing') { say('Nothing happened. Hermione had something else in her bag: a bright red <b>Revealer</b>, from Diagon Alley.'); menu(); } }, 1600);
+      } else {
+        stage = 'revealed'; LumosSpells.learn('aparecium');
+        [0, 1, 2].forEach(function (k) { setTimeout(function () { tone(660 + k * 220, 0.5, 0.12); }, k * 140); });
+        say('<b>Aparecium!</b> ' + (alone ? 'The ink comes back.' : (j.tenths > 4.5 && j.tenths < 5.5 ? 'The middle tap halved the line: 5 and 5 tenths, and the ink met in the middle at once.' : 'Your taps split the line ' + tenthsWords(j) + '. Close enough for the ink.')));
+      }
+    } else {
+      if (guide) guide.miss();
+      shown = { at: performance.now(), taps: three, j: j };
+      say(MISS[j.reason](j));
+    }
+    return j;
+  }
+  function rub() {
+    stage = 'rubbing'; rubbing = performance.now(); menu();
+    say('She rubbed hard on January the first ...');
+    setTimeout(function () {
+      stage = 'done'; rubbing = null; menu();
+      say('Nothing happened. Some things hide from every charm. &ldquo;Riddle just got a diary for Christmas and couldn&rsquo;t be bothered filling it in,&rdquo; said Ron (Book 2).');
+    }, 1800);
+  }
+
+  /* ---- drawing ---- */
+  function drawDesk() {
+    cx.fillStyle = '#2a1c12'; cx.fillRect(0, 0, W, H);
+    cx.strokeStyle = 'rgba(0,0,0,0.25)'; cx.lineWidth = 1;
+    for (var y = 0; y < H; y += S * 0.05) { cx.beginPath(); cx.moveTo(0, y); cx.bezierCurveTo(W * 0.3, y + 6, W * 0.6, y - 6, W, y + 3); cx.stroke(); }
+    var v = cx.createRadialGradient(W / 2, H * 0.5, S * 0.2, W / 2, H * 0.5, Math.max(W, H) * 0.75);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.65)'); cx.fillStyle = v; cx.fillRect(0, 0, W, H);
+  }
+  function drawSheet(R) {
+    cx.save();
+    cx.shadowColor = 'rgba(0,0,0,0.6)'; cx.shadowBlur = 18; cx.shadowOffsetY = 6;
+    if (P.kind === 'diary') { cx.fillStyle = '#16110e'; cx.fillRect(R.x - 14, R.y - 14, R.w + 28, R.h + 28); }   /* the black cover */
+    if (P.kind === 'book') { cx.fillStyle = '#4a2a1a'; cx.fillRect(R.x - 10, R.y - 10, R.w + 20, R.h + 20); }
+    cx.fillStyle = P.kind === 'diary' ? '#e6dcc4' : '#e9dcbc'; cx.fillRect(R.x, R.y, R.w, R.h);
+    cx.restore();
+    var g = cx.createRadialGradient(R.x + R.w / 2, R.y + R.h / 2, R.w * 0.2, R.x + R.w / 2, R.y + R.h / 2, R.w * 0.8);
+    g.addColorStop(0, 'rgba(120,90,40,0)'); g.addColorStop(1, 'rgba(120,90,40,0.28)'); cx.fillStyle = g; cx.fillRect(R.x, R.y, R.w, R.h);
+    var fs = Math.round(Math.max(13, R.w * 0.04));
+    cx.fillStyle = 'rgba(60,40,25,0.75)'; cx.textAlign = 'center';
+    if (P.kind === 'diary') {
+      cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillText('1 January', R.x + R.w / 2, R.y + fs * 1.8);
+      cx.strokeStyle = 'rgba(70,90,130,0.18)'; cx.lineWidth = 1;
+      for (var y = R.y + fs * 3; y < R.y + R.h - 10; y += fs * 1.5) { cx.beginPath(); cx.moveTo(R.x + 14, y); cx.lineTo(R.x + R.w - 14, y); cx.stroke(); }
+    } else if (P.kind === 'book') {
+      cx.font = 'small-caps ' + fs + 'px Georgia, serif'; cx.fillText('Chapter Three: The Middle of Things', R.x + R.w / 2, R.y + fs * 1.8);
+    }
+  }
+  /* what the ink says, drawn in the sheet's own box */
+  function drawHidden(R, a) {
+    cx.save(); cx.globalAlpha = a; cx.fillStyle = '#1d2a4a'; cx.strokeStyle = '#1d2a4a'; cx.textAlign = 'center';
+    var fs = Math.round(Math.max(15, R.w * 0.055));
+    if (P.kind === 'note') {
+      cx.font = 'italic ' + fs + 'px Georgia, serif';
+      ['Well spotted!', 'Invisible ink hides', 'from eyes, not', 'from charms.', '(Do not tell Filch.)'].forEach(function (s, i) {
+        cx.fillText(s, R.x + R.w / 2, R.y + R.h * 0.2 + i * fs * 1.45); });
+    } else if (P.kind === 'book') {
+      /* the compass way to halve a line: an arc from each end, past halfway; join where they cross */
+      var L = Math.min(R.w * 0.56, R.h * 0.55), mx = R.x + R.w / 2, ax = mx - L / 2, bx = mx + L / 2, ly = R.y + R.h * 0.42, rr = L * 0.6;
+      var hh = Math.sqrt(rr * rr - (L / 2) * (L / 2)), th = Math.atan2(hh, L / 2);
+      cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(ax, ly); cx.lineTo(bx, ly); cx.stroke();
+      cx.lineWidth = 1.5;   /* short arcs through each crossing, as a compass draws them */
+      [-1, 1].forEach(function (sg) {
+        cx.beginPath(); cx.arc(ax, ly, rr, sg * th - 0.22, sg * th + 0.22); cx.stroke();
+        cx.beginPath(); cx.arc(bx, ly, rr, Math.PI - sg * th - 0.22, Math.PI - sg * th + 0.22); cx.stroke();
+      });
+      cx.setLineDash([6, 5]); cx.beginPath(); cx.moveTo(mx, ly - hh); cx.lineTo(mx, ly + hh); cx.stroke(); cx.setLineDash([]);
+      [[ax, ly], [bx, ly], [mx, ly]].forEach(function (q) { cx.beginPath(); cx.arc(q[0], q[1], 4, 0, 7); cx.fill(); });
+      cx.font = 'italic ' + Math.round(fs * 0.8) + 'px Georgia, serif';
+      cx.fillText('A', ax - fs * 0.6, ly + fs * 0.3); cx.fillText('B', bx + fs * 0.6, ly + fs * 0.3);
+      cx.fillText('the middle', mx + fs * 2.1, ly + fs * 1.0);
+      var cap = ['To halve a line without a ruler:', 'open your compasses past halfway,', 'draw an arc from each end,', 'and join the two crossings.'];
+      cx.font = 'italic ' + Math.round(fs * 0.72) + 'px Georgia, serif';
+      cap.forEach(function (s, i) { cx.fillText(s, R.x + R.w / 2, ly + hh + fs * (2.0 + i * 0.95)); });
+    }
+    cx.restore();
+  }
+  function drawTaps(list, now, fade) {
+    list.forEach(function (p) {
+      cx.fillStyle = 'rgba(40,50,90,' + (0.5 * fade) + ')'; cx.beginPath(); cx.arc(p.x, p.y, 5, 0, 7); cx.fill();
+      cx.strokeStyle = 'rgba(255,240,200,' + (0.8 * fade) + ')'; cx.lineWidth = 2; cx.beginPath(); cx.arc(p.x, p.y, 11, 0, 7); cx.stroke();
+    });
+  }
+  /* after a miss: the line through his outer taps, its halfway mark, and the two gaps in tenths */
+  function drawMeasure(sh, now) {
+    var k = Math.max(0, 1 - (now - sh.at) / 3500); if (!k) return;
+    var a = sh.taps[0], b = sh.taps[1], c = sh.taps[2], j = sh.j;
+    drawTaps(sh.taps, now, k);
+    if (alone || j.reason === 'one spot' || j.reason === 'uneven beat') return;
+    cx.save(); cx.globalAlpha = k;
+    cx.strokeStyle = '#c99a2e'; cx.lineWidth = 2; cx.setLineDash([4, 5]); cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(c.x, c.y); cx.stroke(); cx.setLineDash([]);
+    var mx = (a.x + c.x) / 2, my = (a.y + c.y) / 2, ang = Math.atan2(c.y - a.y, c.x - a.x), nx = -Math.sin(ang), ny = Math.cos(ang);
+    cx.lineWidth = 3; cx.beginPath(); cx.moveTo(mx - nx * 14, my - ny * 14); cx.lineTo(mx + nx * 14, my + ny * 14); cx.stroke();
+    var fs = Math.round(Math.max(14, S * 0.035)); cx.font = '600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center'; cx.fillStyle = '#8a5a10';
+    cx.fillText('halfway', mx + nx * (fs + 16), my + ny * (fs + 16));
+    if (j.reason === 'uneven spacing') {
+      var t1 = Math.round(j.tenths), t2 = 10 - t1;
+      cx.fillStyle = '#1d2a4a';
+      cx.fillText(t1, (a.x + b.x) / 2 - nx * (fs + 4), (a.y + b.y) / 2 - ny * (fs + 4));
+      cx.fillText(t2, (b.x + c.x) / 2 - nx * (fs + 4), (b.y + c.y) / 2 - ny * (fs + 4));
+    }
+    cx.restore();
+  }
+  /* the ink coming back: a circle from each tap, all at one speed; where two meet, a spark */
+  function drawReveal(R, now) {
+    var t = (now - reveal.at) / 1000, r = t * S * 0.22, T = reveal.taps, full = Math.hypot(R.w, R.h);
+    if (P.kind === 'diary') {   /* the spell is right, and the diary keeps its secret */
+      var k = Math.max(0, 1 - t / 1.4);
+      if (k) T.forEach(function (p) { cx.strokeStyle = 'rgba(70,90,160,' + (0.5 * k) + ')'; cx.lineWidth = 2; cx.beginPath(); cx.arc(p.x, p.y, Math.min(r, S * 0.12), 0, 7); cx.stroke(); });
+      return;
+    }
+    cx.save(); cx.beginPath(); cx.rect(R.x, R.y, R.w, R.h); cx.clip();
+    cx.beginPath(); T.forEach(function (p) { cx.moveTo(p.x + r, p.y); cx.arc(p.x, p.y, r, 0, Math.PI * 2); }); cx.clip();
+    cx.fillStyle = 'rgba(200,215,255,0.10)'; cx.fillRect(R.x, R.y, R.w, R.h);
+    drawHidden(R, 1);
+    cx.restore();
+    cx.save(); cx.beginPath(); cx.rect(R.x, R.y, R.w, R.h); cx.clip();
+    if (r < full) T.forEach(function (p) { cx.strokeStyle = 'rgba(80,100,170,0.35)'; cx.lineWidth = 2; cx.beginPath(); cx.arc(p.x, p.y, r, 0, 7); cx.stroke(); });
+    cx.restore();
+    if (!alone) [[T[0], T[1]], [T[1], T[2]]].forEach(function (q) {   /* the meeting points: at once, when the gaps are equal */
+      var d = Math.hypot(q[1].x - q[0].x, q[1].y - q[0].y), since = r - d / 2;
+      if (since < 0 || since > S * 0.2) return;
+      var x = (q[0].x + q[1].x) / 2, y = (q[0].y + q[1].y) / 2, a = 1 - since / (S * 0.2);
+      var g = cx.createRadialGradient(x, y, 0, x, y, 22); g.addColorStop(0, 'rgba(255,250,220,' + a + ')'); g.addColorStop(1, 'rgba(255,215,120,0)');
+      cx.fillStyle = g; cx.beginPath(); cx.arc(x, y, 22, 0, 7); cx.fill();
+    });
+  }
+  function drawRevealer(R, now) {
+    var t = (now - rubbing) / 1000, x = R.x + R.w * (0.5 + 0.22 * Math.sin(t * 9)), y = R.y + R.h * 0.1;
+    cx.save(); cx.translate(x, y); cx.rotate(-0.15 + 0.05 * Math.sin(t * 9));
+    var w = S * 0.16, h = S * 0.06;
+    cx.shadowColor = 'rgba(0,0,0,0.5)'; cx.shadowBlur = 8; cx.fillStyle = '#c62a20'; cx.fillRect(-w / 2, -h / 2, w, h);
+    cx.shadowBlur = 0; cx.fillStyle = 'rgba(255,255,255,0.18)'; cx.fillRect(-w / 2, -h / 2, w, h * 0.3);
+    cx.restore();
+  }
+  function frame(now) {
+    drawDesk();
+    var R = sheet(); drawSheet(R);
+    if (reveal) drawReveal(R, now);
+    if (shown) drawMeasure(shown, now);
+    if (taps.length && now - taps[taps.length - 1].t > easeNow().gap) taps = [];
+    drawTaps(taps, now, 1);
+    if (stage === 'tap' && guide) guide.draw(cx, now, taps.length > 0);
+    if (rubbing) drawRevealer(R, now);
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: taps only ---- */
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    tapAt({ x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) });
+  });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(page); requestAnimationFrame(frame);
+  window.lumosAparecium = { choose: choose, sheet: sheet, tap: function (x, y) { return tapAt({ x: x, y: y, t: Math.round(performance.now()) }); },
+    rub: rub, guide: function () { return guide ? guide.state() : null; },
+    state: function () { return { page: page + 1, stage: stage, taps: taps.length, last: last, ease: ease, alone: alone, guide: guide ? guide.state().level : null, learned: LumosSpells.learned('aparecium') }; } };
+})();
+</script>
+</body>
+</html>

@@ -15,7 +15,10 @@
                    of the part where the label sits, dx, dy: its offset in letter heights (dx mirrored for the left) }],
            box(W, H): optional, { G: the box's side in pixels, ox, oy: its top left }; the Leviosa box by default,
            rest: the spark's pause in seconds (1.05),
-           mirror: optional, true or a function, for a page that knows his wand arm (?hand=left otherwise) } */
+           mirror: optional, true or a function, for a page that knows his wand arm (?hand=left otherwise),
+           beats: for a spell of taps (Aparecium), [[u, v], ...] the places to tap in order, drawn as rings on a faint
+           line with a spark on each at beatSecs apart, instead of parts; scoreTaps(taps) then says whether he
+           tapped them } */
 (function (root) {
   'use strict';
   var qs = new URLSearchParams(location.search);
@@ -28,7 +31,7 @@
 
   function create(spec) {
     function mir() { return spec.mirror == null ? mirror : (typeof spec.mirror === 'function' ? !!spec.mirror() : !!spec.mirror); }
-    var hits = 0, missRun = 0, pts = [], covered = [], ranges = [], S = 1, W = 0;
+    var hits = 0, missRun = 0, pts = [], covered = [], ranges = [], S = 1, W = 0, beats = [];
     try { hits = Number(localStorage.getItem(spec.key)) || 0; } catch (e) {}
     if (qs.has('guidehits')) hits = Number(qs.get('guidehits')) || 0;
 
@@ -45,7 +48,8 @@
       var m = mir();
       function at(q) { var x = b.ox + q[0] * b.G; return { x: m ? w - x : x, y: b.oy + q[1] * b.G }; }
       pts = []; ranges = [];
-      spec.parts.forEach(function (part, n) {
+      beats = (spec.beats || []).map(function (q) { var p = at(q); p.lit = false; return p; });
+      (spec.parts || []).forEach(function (part, n) {
         var from = Math.max(0, pts.length - 1);
         part.pts.forEach(function (q, i) { if (n === 0 || i > 0) pts.push(at(q)); });
         ranges.push({ from: from, to: pts.length - 1, secs: part.secs, part: part });
@@ -54,9 +58,16 @@
     }
     function cover(p) {
       var tol = S * 0.07;
+      beats.forEach(function (g) { if (Math.hypot(g.x - p.x, g.y - p.y) < tol * 1.3) g.lit = true; });
       for (var i = 0; i < pts.length; i++) if (Math.hypot(pts[i].x - p.x, pts[i].y - p.y) < tol) covered[i] = true;
     }
-    function clear() { covered = covered.map(function () { return false; }); }
+    function clear() { covered = covered.map(function () { return false; }); beats.forEach(function (g) { g.lit = false; }); }
+    /* for a spell of taps: each tap near its ring, in order */
+    function scoreTaps(taps) {
+      if (!level() || !beats.length || taps.length < beats.length) return null;
+      var tol = S * 0.09, near = beats.every(function (g, i) { return Math.hypot(taps[i].x - g.x, taps[i].y - g.y) < tol; });
+      return { traced: near, level: level() };
+    }
     /* how closely a stroke followed the path: the share of it covered, the stroke's mean distance from it, and how
        near it began at the dot and ended at the arrow, all as shares of the screen's short side */
     function score(stroke) {
@@ -82,6 +93,7 @@
 
     function draw(cx, now, stroking) {
       var lv = level();
+      if (lv && beats.length) { drawBeats(cx, now, lv, stroking); return; }
       if (!lv || !pts.length) return;
       cx.save(); cx.lineCap = 'round';
       var i, g;
@@ -126,9 +138,34 @@
       cx.restore();
     }
 
-    return { build: build, level: level, cover: cover, clear: clear, score: score, hit: hit, miss: miss, reset: reset,
+    function drawBeats(cx, now, lv, busy) {
+      var r = Math.max(14, S * 0.04), a = beats[0], b = beats[beats.length - 1], i;
+      cx.save();
+      cx.strokeStyle = 'rgba(232,190,90,' + (0.35 * lv) + ')'; cx.lineWidth = 2; cx.setLineDash([3, 7]);
+      cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.setLineDash([]);
+      var cyc = -1, secs = spec.beatSecs || 0.45;
+      if (lv === 1 && !busy) cyc = (now % ((secs * beats.length + (spec.rest == null ? 1.05 : spec.rest)) * 1000)) / 1000;
+      var fs = Math.round(Math.max(15, S * 0.036));
+      cx.font = 'italic 600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center';
+      for (i = 0; i < beats.length; i++) {
+        var g = beats[i], on = cyc >= i * secs && cyc < i * secs + 0.25;
+        cx.strokeStyle = g.lit ? 'rgba(255,233,168,' + lv + ')' : 'rgba(232,190,90,' + (0.7 * lv) + ')'; cx.lineWidth = g.lit ? 4 : 2.5;
+        cx.beginPath(); cx.arc(g.x, g.y, r, 0, 7); cx.stroke();
+        if (on || g.lit) {
+          var sg = cx.createRadialGradient(g.x, g.y, 0, g.x, g.y, r * 1.1);
+          sg.addColorStop(0, 'rgba(255,250,225,' + lv + ')'); sg.addColorStop(1, 'rgba(255,220,140,0)');
+          cx.fillStyle = sg; cx.beginPath(); cx.arc(g.x, g.y, r * 1.1, 0, 7); cx.fill();
+        }
+        cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 6; cx.fillStyle = 'rgba(233,220,192,' + lv + ')';
+        cx.fillText(spec.beatLabels ? spec.beatLabels[i] : 'tap', g.x, g.y + r + fs * 1.1); cx.shadowBlur = 0;
+      }
+      cx.restore();
+    }
+
+    return { build: build, level: level, cover: cover, clear: clear, score: score, scoreTaps: scoreTaps, hit: hit, miss: miss, reset: reset,
       draw: draw, state: function () {
-        return { level: level(), hits: hits, missRun: missRun, pts: pts.map(function (g) { return [Math.round(g.x), Math.round(g.y)]; }) };
+        return { level: level(), hits: hits, missRun: missRun, pts: pts.map(function (g) { return [Math.round(g.x), Math.round(g.y)]; }),
+          beats: beats.map(function (g) { return [Math.round(g.x), Math.round(g.y)]; }) };
       } };
   }
 
