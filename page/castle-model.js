@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 2,
+  "version": 3,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -104,8 +104,14 @@ window.CASTLE_MODEL = {
     },
     {
       "id": "room-of-requirement", "name": "the Room of Requirement, on its own corridor in the north range", "level": "7",
-      "shape": { "rect": [24, 56, 40, 66] }, "magic": "there when needed",
-      "state": "pending", "cite": "OotP 18, HBP 21, HBP 24"
+      "shape": { "rect": [29.65, 46.6, 34.35, 50.0] }, "magic": "there when needed; behind the blank stretch, over the courtyard's air",
+      "state": "designed", "cite": "OotP 18, HBP 21, HBP 24; Godric's Q48b, option 3 (12 October 2026, 6.48 pm)"
+    },
+    {
+      "id": "room-corridor", "name": "the Room's corridor, along the north range's courtyard face", "level": "7",
+      "shape": { "rect": [16, 50.6, 68, 53.6] }, "walls": { "south": 0.6, "north": 0.4 },
+      "about": "3.0 m wide as hers, from the west range to the stair hall's north landing (the top of the last staircase); windows on the courtyard; about 110 m' walk from her portrait",
+      "state": "designed", "cite": "OotP 18; Godric's Q48b, option 3 (12 October 2026, 6.48 pm)"
     }
   ],
   "openings": [
@@ -136,7 +142,15 @@ window.CASTLE_MODEL = {
   ],
   "features": [
     { "id": "hearth", "room": "common-room", "kind": "fireplace", "bearing": 48.7, "w": 3.0, "h": 2.5, "proud": 0.6, "state": "built" },
-    { "id": "fat-lady", "room": "corridor", "kind": "portrait", "at": [0, 6.41], "w": 1.4, "h": 1.7, "state": "built", "cite": "PS 7" }
+    { "id": "fat-lady", "room": "corridor", "kind": "portrait", "at": [0, 6.41], "w": 1.4, "h": 1.7, "state": "built", "cite": "PS 7" },
+    { "id": "blank-stretch", "kind": "blank wall, the Room's door when needed", "between": ["room-corridor", "room-of-requirement"],
+      "span": [[29.65, 50.6], [34.35, 50.6]], "state": "designed", "cite": "OotP 18" },
+    { "id": "barnabas", "room": "room-corridor", "kind": "tapestry, Barnabas the Barmy teaching trolls ballet, opposite the blank stretch",
+      "span": [[30.0, 53.6], [34.0, 53.6]], "w": 4.0, "h": 1.8, "state": "designed", "cite": "OotP 18, HBP 20, HBP 21" },
+    { "id": "vase", "room": "room-corridor", "kind": "man-sized vase, east of the blank stretch", "at": [35.1, 51.05],
+      "state": "designed", "cite": "OotP 18" },
+    { "id": "window-just-beyond", "kind": "window", "room": "room-corridor", "at": [28.9, 50.3], "w": 1.2,
+      "view": "the west courtyard", "state": "designed", "cite": "OotP 18 (its wall left open by the book)" }
   ],
   "stairs": [
     { "id": "tower-stair", "kind": "open newel stair", "rooms": ["common-room", "dormitory"], "newel": [4.13, -2.59], "r": 0.7,
@@ -147,7 +161,6 @@ window.CASTLE_MODEL = {
       "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" }
   ],
   "open": [
-    "The tower stair rises 5.6 m against the dormitory floor's 7.4 m.",
-    "The Room of Requirement waits on Q48b: drawn as its option 3, a walk and a stair from her (OotP 18), the gargoyle round the other side of the castle (HBP 21)."
+    "The tower stair rises 5.6 m against the dormitory floor's 7.4 m."
   ]
 };
