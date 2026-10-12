@@ -686,7 +686,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=10"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=17"></script>
+<script src="castle-events.js?v=18"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=9"></script>
 <script>
@@ -5187,7 +5187,7 @@ function leaveKeyhole() {
    moment and takes him out to the view he left. The door holds until her key exists; ?den opens it for a probe, and a
    tap on it (off the keyhole) takes him in. */
 var DEN = { at: new THREE.Vector3(0, -40, 0), r: 2.25, wall: 0.4, hWall: 2.2, hTop: 3.6, doorW: 0.7, doorH: 2.0,
-  eye: 1.35, stand: 1.0, crouch: 0.95, turn: 2.75, tilt: -0.7, face: -153 * Math.PI / 180,
+  eye: 1.35, stand: 1.0, crouch: 0.95, turn: 2.75, tilt: -0.85,   /* -0.85: her table's far side in view (req 184) */ face: -153 * Math.PI / 180,
   band: [0.95, 1.35], from: -115, to: 165,   /* the ring of slots (D1): degrees round from the far wall, + to his right */
   cards: 82,          /* a slot a card: the deck frogs in page/events/sofa.json holds 82 (the D1 plan says 83; asked) */
   rare: { agrippa: -5, ptolemy: 5 },         /* their slots pencilled in faint grey across from the door (D1 t1) */
@@ -5333,6 +5333,46 @@ function denRefresh() {
   }
   denRingTex.needsUpdate = true;
 }
+/* the swap pile (req 184; Events' "A card he has already", Godric's t1, 3.21 pm): a card he finds again goes on a little
+   pile of spares on her low table, on its far side right of her lamp, one card for each repeat in castle.found('frogs'),
+   no number shown (Godric, 4.00 pm); the cards' grey backs each laid a little askew, the newest spare face up on top,
+   its head away from him. His look in the den rests a little lower for it (DEN.tilt -0.85, was -0.7), so the table's far
+   side shows under the ring as he comes in. ?pile=shelf puts it on her middle shelf by the doorway instead, the sheet's
+   second option. Past DEN_PILE.max the pile stops growing; it is many months off. */
+var DEN_PILE = { x: 0.1, z: -0.08, y: 0.4375, yaw: 0, t: 0.0009, max: 150 };
+if (/[?&]pile=shelf/.test(location.search)) {
+  DEN_PILE.y = DEN.shelves[1] + 0.015; DEN_PILE.yaw = 148 * Math.PI / 180;
+  DEN_PILE.x = denXZ(-148, DEN.r - 0.13)[0]; DEN_PILE.z = denXZ(-148, DEN.r - 0.13)[1];
+}
+var denPileCanvas = makeCanvas(512, 716), denPileTex = tex(denPileCanvas);
+var denPile = denAdd(new THREE.InstancedMesh(new THREE.BoxGeometry(CARD_W, DEN_PILE.t, CARD_H), denMat('#8f8a83'), DEN_PILE.max));
+var denPileTop = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(CARD_W, CARD_H), denMat('#ffffff', { map: denPileTex })));
+denPile.count = 0; denPileTop.visible = false; denPileTop.rotation.order = 'YXZ';
+var denPileM = new THREE.Matrix4(), denPileQ = new THREE.Quaternion(), denPileE = new THREE.Euler(), denPileS = new THREE.Vector3(1, 1, 1), denPileP = new THREE.Vector3();
+function denSpares() {                                 /* every card after its first, in the order found */
+  var all = castle && castle.found ? castle.found('frogs') : [], seen = {}, out = [];
+  all.forEach(function (c) { if (seen[c]) out.push(c); seen[c] = 1; });
+  return out;
+}
+function denPileRefresh() {
+  var spares = denSpares(), n = Math.min(spares.length, DEN_PILE.max), key = n + ':' + (spares[spares.length - 1] || '');
+  if (key === denState.pileKey) return;
+  denState.pileKey = key; denState.pile = n;
+  var jit = function (i, k) { var s = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return s - Math.floor(s) - 0.5; };
+  for (var i = 0; i < n; i++) {
+    denPileP.set(DEN_PILE.x + jit(i, 1) * 0.012, DEN_PILE.y + DEN_PILE.t * (i + 0.5), DEN_PILE.z + jit(i, 2) * 0.012);
+    denPileQ.setFromEuler(denPileE.set(0, DEN_PILE.yaw + jit(i, 3) * 0.5, 0));
+    denPile.setMatrixAt(i, denPileM.compose(denPileP, denPileQ, denPileS));
+  }
+  denPile.count = n; denPile.instanceMatrix.needsUpdate = true;
+  denPileTop.visible = n > 0;
+  if (n) {
+    drawFindStandIn({ find: 'card', card: spares[spares.length - 1], card_side: 'front', card_face: 'there', houdini_lock: 'shut' }, denPileCanvas);
+    denPileTex.needsUpdate = true;
+    denPileTop.position.set(denPileP.x, DEN_PILE.y + DEN_PILE.t * n + 0.0004, denPileP.z);
+    denPileTop.rotation.set(-Math.PI / 2, DEN_PILE.yaw + jit(n - 1, 3) * 0.5, 0);
+  }
+}
 function denSlotWorld(i) {
   var a = denSlotDeg(i), xz = denXZ(a, DEN.r - 0.02);
   return new THREE.Vector3(xz[0], (DEN.band[0] + DEN.band[1]) / 2 - 0.006, xz[1]).add(DEN.at);
@@ -5379,7 +5419,7 @@ function goDen() {
     denFade.classList.add('on');
     setTimeout(function () {
       if (!denState.painted) denPaint();
-      denRefresh(); denShow(true);
+      denRefresh(); denPileRefresh(); denShow(true);
       denYaw = denYawT = 0; denTilt = DEN.tilt; denState.hold = 0;
       var p0 = new THREE.Vector3(0, DEN.crouch, DEN.r + DEN.wall * 0.5).add(DEN.at), l0 = new THREE.Vector3(0, DEN.crouch - 0.1, 0).add(DEN.at);
       var p1 = new THREE.Vector3(), l1 = new THREE.Vector3();
@@ -6549,7 +6589,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0 }; }, pileTop: denPileTop }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
