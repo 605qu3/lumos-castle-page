@@ -286,6 +286,38 @@ function judgeHinge(points, c, r, want, w, h, ease) {
   out.verdict = 'open'; out.reason = 'lifted'; out.snug = out.opened <= want.need + 15;
   return out;
 }
+/* Mobiliarbus, the slide (PoA 10: the Christmas tree "rose a few inches off the ground, drifted sideways and landed
+   with a soft thump right in front of their table"; the book gives no motion, so the stroke is ours, for the geometry,
+   way 1, a translation). One stroke that starts on the thing and runs straight to where it should go; the floor is a
+   grid of squares and the move is counted in them, dx right and dy down, rounded to the nearest square. points: the
+   stroke, {x, y, t} in CSS pixels; at: the thing's centre; cell: a square's side in pixels; ease: a name in
+   SLIDE_EASES or an ease of its own (start: how far from the centre, in squares, the stroke may begin; straight: the
+   chord over the path; snap: how far off a square's middle the end may land, in squares, 0.5 taking any).
+   Returns { verdict: 'slide' | 'miss', reason ('slid', 'tap', 'off', 'short', 'wiggly', 'between'), dx, dy (whole
+   squares), fx, fy (the stroke's own, in squares), straight, squares (how many squares long, along the line) }. */
+var SLIDE_EASES = {
+  kind:   { start: 0.95, straight: 0.80, snap: 0.5 },
+  fair:   { start: 0.75, straight: 0.87, snap: 0.42 },
+  strict: { start: 0.55, straight: 0.93, snap: 0.32 }
+};
+function judgeSlide(points, at, cell, ease) {
+  var e = typeof ease === 'object' ? ease : (SLIDE_EASES[ease] || SLIDE_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', dx: 0, dy: 0, fx: 0, fy: 0, straight: 0, squares: 0 };
+  if (!points || points.length < 2) return out;
+  var a = points[0], b = points[points.length - 1], path = 0, i;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path < cell * 0.15) return out;
+  var chord = Math.hypot(b.x - a.x, b.y - a.y);
+  out.fx = (b.x - a.x) / cell; out.fy = (b.y - a.y) / cell; out.squares = chord / cell;
+  out.straight = path ? chord / path : 0;
+  out.dx = Math.round(out.fx); out.dy = Math.round(out.fy);
+  if (Math.hypot(a.x - at.x, a.y - at.y) > e.start * cell) { out.reason = 'off'; return out; }
+  if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
+  if (!out.dx && !out.dy) { out.reason = 'short'; return out; }
+  if (Math.abs(out.fx - out.dx) > e.snap || Math.abs(out.fy - out.dy) > e.snap) { out.reason = 'between'; return out; }
+  out.verdict = 'slide'; out.reason = 'slid';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1105,5 +1137,6 @@ function openHump(opts) {
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
-  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump };
+  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide };
 })(typeof window !== 'undefined' ? window : globalThis);
