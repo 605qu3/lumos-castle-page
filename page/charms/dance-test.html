@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=20"></script>
+<script src="spells.js?v=24"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* The pineapple's tap dance, a test page for the Charms lane (13 October 2026, nineteenth session; the owner is Godric).
@@ -39,8 +39,13 @@
    timing (an uneven beat shows as a stumble, never a miss), and the geometry is drawn: each step bracketed under the
    desk with its share, 1/4 for a quarter. Uneven, and the equal landings show dashed above his, the odd step named.
    Three rounds: Flitwick's lesson (four steps, the guide's four rings), Your own count (no guide, three to eight) and
-   The exam (Flitwick calls the number). ?round=1..3, ?want= (the exam's number), ?ease= for trying; window.lumosDance
-   for checks. */
+   The exam (Flitwick calls the number). ?round=1..4, ?want= (the exam's number), ?ease= for trying; window.lumosDance
+   for checks.
+   A fourth round after the exam's full marks (twenty-second session), Flitwick's beat: speed as distance over time.
+   A metronome counts three, then he taps a step on every tick (judged against the tick, the clock starting at the
+   count): three steps at a tick a second, six at two a second (half the step, half the time: across in the same three
+   seconds, the same speed), three at two a second (across in half the time, twice as fast). After each, a chart of
+   how far against how long, one line a part: the first two lie together, the third twice as steep. */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -54,11 +59,25 @@
     { name: 'Your own count', want: 0,
       start: '<b>No guide.</b> Any number of steps from three to eight, but every step the same length, all the way to the far end.' },
     { name: 'The exam', want: 0,
+      start: '' },
+    { name: "Flitwick's beat", want: 0,
       start: '' } ];
-  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+  /* Flitwick's beat: three parts, n steps on a tick every ms */
+  var PARTS = [
+    { n: 3, ms: 1000, color: '#f3d27a', key: '3 steps, 1 tick a second',
+      start: "Flitwick's beat. His metronome ticks slowly, <b>one tick a second</b>. He counts three; then <b>a step on every tick</b>, three equal steps across.",
+      end: function (s) { return 'Three steps on three slow ticks: across in <b>' + s + ' seconds</b>. A third of the desk every second: that is its <b>speed</b>.'; } },
+    { n: 6, ms: 500, color: '#9fc4ff', key: '6 steps, 2 ticks a second',
+      start: 'Now the beat goes <b>twice as quick</b>, two ticks a second. Six equal steps, half as long, <b>one on every tick</b>.',
+      end: function (s) { return 'Six short steps on the quick beat: across in <b>' + s + ' seconds</b> again. Half the step in half the time is <b>the same speed</b>: its line lies on the first.'; } },
+    { n: 3, ms: 500, color: '#f0968c', key: '3 steps, 2 ticks a second',
+      start: 'The quick beat again, but <b>big steps</b>: three equal steps, one on every tick.',
+      end: function (s) { return 'Big steps on the quick beat: across in <b>' + s + ' seconds</b>, <b>twice as fast</b>. Its line is twice as steep: speed is how far, over how long.'; } } ];
+  var round = Math.max(0, Math.min(3, (Number(qs.get('round')) || 1) - 1));
   var wantQ = Number(qs.get('want')) || 0, examWant = 5;
   var desk = null, P = 0, taps = [], wait = null, done = false, last = null, misses = 0;
   var pos = 0, hop = null, show = null, dance = null, fall = null, guides = [];
+  var part = 0, clock = null, runs = [];   /* the beat round: its part, the metronome, the parts danced */
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
@@ -70,7 +89,7 @@
     desk = { a: W * m, b: W * (1 - m), y: H * 0.62, band: Math.max(16, S * 0.05) };
     P = Math.min(S * 0.15, (desk.b - desk.a) / 5.5);   /* the pineapple's height: big enough to see its feet, narrow enough for eight steps */
   }
-  function want() { return round === 0 ? 4 : round === 2 ? examWant : 0; }
+  function want() { return round === 0 ? 4 : round === 2 ? examWant : round === 3 ? PARTS[part].n : 0; }
   function say(html) { lineEl.innerHTML = html; }
   function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
   function noise(dur, freq, gain) {
@@ -82,6 +101,7 @@
     src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
   }
   function tapSound() { noise(0.05, 3200, 0.45); }   /* a tap shoe on wood */
+  function tick(count) { noise(0.03, count ? 1500 : 2300, count ? 0.6 : 0.4); }   /* the metronome; his count deeper */
   function chime() {   /* three rising notes */
     if (!audio) return;
     [660, 830, 990].forEach(function (f, i) {
@@ -114,14 +134,24 @@
   }
   function choose(i) {
     if (wait) { clearTimeout(wait); wait = null; }
-    round = i; last = null; taps = []; done = false; misses = 0; pos = 0; hop = null; show = null; dance = null; fall = null;
+    round = i; last = null; taps = []; done = false; misses = 0; pos = 0; hop = null; show = null; dance = null; fall = null; clock = null;
     if (i === 2) { var pick = [3, 5, 6]; examWant = wantQ >= 3 && wantQ <= 8 ? wantQ : pick[Math.floor(Math.random() * pick.length)]; }
     place(); makeGuide(); menu();
+    if (i === 3) { runs = []; startPart(0); return; }
     say(i === 2 ? 'The exam. Flitwick calls you in, one by one, as in the book: "Across the desk in <b>' + WORD[examWant] + ' equal steps</b>, if you please."' : ROUNDS[i].start);
   }
   function again(after) {   /* the pineapple trots back to its end and the taps clear */
-    wait = setTimeout(function () { wait = null; taps = []; show = null; fall = null; hopTo(0, performance.now(), 420); }, after);
+    wait = setTimeout(function () { var now = performance.now(); wait = null; taps = []; show = null; fall = null; hopTo(0, now, 420);
+      if (round === 3) startCount(now + 900); }, after);
   }
+  /* the beat round: a part begins, then the metronome counts three and ticks on; t0 is his third count, so the first
+     step belongs on the tick after it */
+  function startPart(k) {
+    var now = performance.now();
+    part = k; taps = []; last = null; show = null; dance = null; fall = null; hopTo(0, now, 420);
+    say(PARTS[k].start); startCount(now + 1800);
+  }
+  function startCount(at) { var ms = PARTS[part].ms; clock = { ms: ms, c0: at, t0: at + 2 * ms, tick: -1 }; }
 
   /* ---- the cast: taps, judged after each ---- */
   function hopTo(x, now, ms) { hop = { from: pos, to: x, at: now, ms: ms || 240 }; pos = x; }
@@ -133,11 +163,12 @@
   /* after every tap (fresh) and every frame while it waits, so a long pause ends the try short; the pineapple hops
      only on a fresh tap that lands it somewhere on the desk */
   function judge(now, fresh) {
-    if (!taps.length) return null;
-    var j = LumosSpells.judgePineapple(taps, desk, ease, want(), fresh ? undefined : now);
-    var p = taps[taps.length - 1], along = p.x - desk.a;
+    if (!taps.length && !clock) return null;
+    var j = LumosSpells.judgePineapple(taps, desk, ease, want(), fresh ? undefined : now, clock ? { ms: clock.ms, t0: clock.t0 } : undefined);
+    var p = taps[taps.length - 1] || { x: desk.a }, along = p.x - desk.a;
     if (j.reason === 'waiting') { if (fresh) { hopTo(along, now); tapSound(); } last = j; return j; }
     last = j;
+    var ck = clock; clock = null;   /* the try is over: the metronome stops */
     var lv = guides.length ? guides[0].level() : 0;
     if (j.verdict !== 'danced') {
       guides.forEach(function (g) { g.miss(); }); misses++;
@@ -153,7 +184,10 @@
         shuffle: 'Tiny shuffles! <b>Eight steps at most</b>: make each one longer.',
         short: 'It stopped part way, waiting for the next tap. <b>Keep tapping</b> all the way to the far end.',
         count: 'Flitwick asked for <b>' + (w ? WORD[w] : '') + '</b> steps; that was ' + (WORD[n] || n) + '. The dashed marks are where ' + (w ? WORD[w] : '') + ' equal steps land.',
-        uneven: 'Step ' + (j.worst + 1) + ' was ' + (j.long ? 'too long' : 'too short') + '. <b>Every step the same length</b>: the dashed marks are where ' + (WORD[n] || n) + ' equal steps land.'
+        uneven: 'Step ' + (j.worst + 1) + ' was ' + (j.long ? 'too long' : 'too short') + '. <b>Every step the same length</b>: the dashed marks are where ' + (WORD[n] || n) + ' equal steps land.',
+        beat: j.offbeat === 0 && !j.late ? 'Too soon! Let Flitwick count three, then <b>step on the next tick</b>.'
+          : j.late && j.offbeat >= n ? 'A tick went by with no step. <b>Tap on every tick</b>, all the way across.'
+          : 'Step ' + (j.offbeat + 1) + ' came <b>' + (j.late ? 'after' : 'before') + ' its tick</b>: tap just as the metronome ticks.'
       };
       say(words[j.reason] || 'Try again: equal steps, all the way across.');
       again(j.reason === 'past' ? 2400 : j.reason === 'uneven' || j.reason === 'count' ? 3600 : 1800);
@@ -163,15 +197,24 @@
     hopTo(along, now); tapSound();
     guides.forEach(function (g) { g.hit(lv > 0); });
     LumosSpells.learn('pineapple'); chime();
-    var gaps = [], k; for (k = 1; k < taps.length; k++) gaps.push(Math.max(260, Math.min(900, taps[k].t - taps[k - 1].t)));
+    var gaps = [], k; for (k = 1; k < taps.length; k++) gaps.push(Math.max(260, Math.min(ck ? 1100 : 900, taps[k].t - taps[k - 1].t)));
     dance = { at: now + 900, gaps: gaps, lands: taps.map(function (q) { return q.x - desk.a; }), wobble: j.beat > 1.8, done: false };
     var n2 = j.n, wob = j.beat > 1.8 ? ' Your beat wobbled, so it stumbled a little, but the steps were what counted.' : '';
-    say('<b>It dances!</b> ' + (WORD[n2] || n2) + ' equal steps across the desk.');
+    say('<b>It dances!</b> ' + (WORD[n2] || n2) + ' equal steps across the desk' + (ck ? ', on the beat.' : '.'));
+    if (ck) { var pk = part; runs[pk] = { time: j.time, pts: taps.map(function (q) { return [q.t - ck.t0, (q.x - desk.a) / (desk.b - desk.a)]; }) }; }
     var total = 900 + 300 + gaps.reduce(function (s, g) { return s + g; }, 0) + 500;
     wait = setTimeout(function () { wait = null; dance.done = true;
+      if (round === 3) {   /* the beat round: the chart, then the next part or full marks */
+        say(PARTS[part].end((j.time / 1000).toFixed(1)));
+        if (part < PARTS.length - 1) wait = setTimeout(function () { wait = null; startPart(part + 1); }, 7000);
+        else { done = true;
+          wait = setTimeout(function () { wait = null; say('<b>Full marks.</b> Speed is how far over how long. Slow ticks and big steps, or quick ticks and steps half as long: a third of the desk a second, the same. Big steps on the quick ticks: two thirds a second, twice as fast.'); }, 6000); }
+        return;
+      }
       say('The desk split into <b>' + (WORD[n2] || n2) + ' equal steps</b>: each one is <b>' + SHARE[n2] + '</b> of the desk, 1/' + n2 + '.' + wob);
       if (round === 2) { done = true;
-        wait = setTimeout(function () { wait = null; say('<b>Full marks.</b> Flitwick called them in one by one to make a pineapple tap-dance across a desk, and yours did, in ' + WORD[n2] + ' equal steps.'); }, 4200); }
+        wait = setTimeout(function () { wait = null; say('<b>Full marks.</b> Flitwick called them in one by one to make a pineapple tap-dance across a desk, and yours did, in ' + WORD[n2] + ' equal steps.');
+          wait = setTimeout(function () { wait = null; choose(3); }, 6000); }, 4200); }
       else wait = setTimeout(function () { wait = null; choose(round + 1); }, 6500);
     }, total);
     return j;
@@ -269,13 +312,64 @@
       cx.restore();
     }
   }
+  /* the beat round: Flitwick's metronome, its arm at one end on every tick; his count of three, then the step due */
+  function drawMetronome(now) {
+    if (!clock) return;
+    var mx = (desk.a + desk.b) / 2, my = desk.y - P * 1.6, h = S * 0.13, ph = (now - clock.c0) / clock.ms, k = Math.floor(ph);
+    var a = now < clock.c0 ? 0 : 0.45 * Math.cos(Math.PI * ph);
+    cx.save();
+    cx.fillStyle = '#5e4129'; cx.strokeStyle = '#8a6038'; cx.lineWidth = 2; cx.beginPath();
+    cx.moveTo(mx - h * 0.32, my); cx.lineTo(mx + h * 0.32, my); cx.lineTo(mx + h * 0.13, my - h); cx.lineTo(mx - h * 0.13, my - h); cx.closePath(); cx.fill(); cx.stroke();
+    var px = mx, py = my - h * 0.12, len = h * 0.95, tx = px + Math.sin(a) * len, ty = py - Math.cos(a) * len;
+    cx.strokeStyle = '#d9d2c2'; cx.lineWidth = Math.max(2, h * 0.03); cx.beginPath(); cx.moveTo(px, py); cx.lineTo(tx, ty); cx.stroke();
+    cx.fillStyle = '#e8be5a'; cx.fillRect(px + Math.sin(a) * len * 0.62 - h * 0.06, py - Math.cos(a) * len * 0.62 - h * 0.04, h * 0.12, h * 0.08);
+    if (now >= clock.c0 && (now - clock.c0) % clock.ms < 160) {   /* the tick: a flash at the arm's tip */
+      cx.strokeStyle = 'rgba(243,210,122,' + (1 - ((now - clock.c0) % clock.ms) / 160) + ')'; cx.lineWidth = 3;
+      cx.beginPath(); cx.arc(tx, ty, h * 0.12, 0, 7); cx.stroke();
+    }
+    cx.restore();
+    var big = Math.max(18, S * 0.05);
+    if (now < clock.c0) label(mx + h * 0.75, my - h * 0.45, 'ready', '#eadcbf', big * 0.7);
+    else if (k < 3) label(mx + h * 0.75, my - h * 0.45, String(k + 1), '#f3d27a', big);
+    else label(mx + h * 0.8, my - h * 0.45, 'step ' + (k - 2), '#f3d27a', big * 0.8);
+  }
+  /* after each part: how far against how long, one line a part, from the start of his count */
+  function drawChart(now) {
+    if (round !== 3 || clock || !(dance && dance.done) || !runs.length) return;
+    var top = lineEl.getBoundingClientRect().bottom + S * 0.03, bot = desk.y - P * 1.45;
+    var cw = Math.min(desk.b - desk.a, (bot - top) * 1.8), left = (desk.a + desk.b) / 2 - cw / 2;
+    var gx0 = left + S * 0.02, gx1 = left + cw, gy0 = top + S * 0.05, fs = Math.max(12, Math.min(S * 0.028, (bot - top) * 0.075)), gy1 = bot - fs * 2.9, TMAX = 3500;   /* lettering to the chart's size */
+    var X = function (t) { return gx0 + (gx1 - gx0) * Math.max(0, t) / TMAX; }, Y = function (f) { return gy1 - (gy1 - gy0) * f; };
+    cx.save(); cx.globalAlpha = Math.min(1, (now - (dance.doneAt || now)) / 400);
+    cx.fillStyle = 'rgba(18,15,12,0.82)'; cx.fillRect(left - S * 0.02, top, cw + S * 0.04, bot - top);
+    cx.strokeStyle = 'rgba(234,220,191,0.7)'; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(gx0, gy0 - S * 0.02); cx.lineTo(gx0, gy1); cx.lineTo(gx1, gy1); cx.stroke();
+    cx.setLineDash([4, 4]); cx.beginPath(); cx.moveTo(gx0, Y(1)); cx.lineTo(gx1, Y(1)); cx.stroke(); cx.setLineDash([]);
+    cx.font = 'italic ' + Math.round(fs) + 'px Georgia, serif'; cx.fillStyle = '#eadcbf'; cx.textAlign = 'left';
+    cx.fillText('far end of the desk', gx0 + 6, Y(1) - 5);
+    cx.textAlign = 'center';
+    for (var s = 0; s <= 3; s++) { cx.beginPath(); cx.moveTo(X(s * 1000), gy1); cx.lineTo(X(s * 1000), gy1 + 5); cx.stroke(); cx.fillText(s + (s ? ' s' : ''), X(s * 1000), gy1 + fs * 1.2); }
+    cx.fillText('seconds from the count', (gx0 + gx1) / 2, gy1 + fs * 2.4);   /* under the axis, centred as the tick labels are */
+    runs.forEach(function (r, k) {
+      if (!r) return;
+      cx.strokeStyle = PARTS[k].color; cx.fillStyle = PARTS[k].color; cx.lineWidth = k === 1 ? 2 : 3; cx.setLineDash(k === 1 ? [7, 5] : []);
+      cx.beginPath(); cx.moveTo(X(0), Y(0)); r.pts.forEach(function (p) { cx.lineTo(X(p[0]), Y(p[1])); }); cx.stroke(); cx.setLineDash([]);
+      r.pts.forEach(function (p) { cx.beginPath(); cx.arc(X(p[0]), Y(p[1]), 3.5, 0, 7); cx.fill(); });
+    });
+    cx.textAlign = 'right'; var ly = gy1 - fs * 0.6;
+    for (var k = runs.length - 1; k >= 0; k--) { if (!runs[k]) continue; cx.fillStyle = PARTS[k].color; cx.fillText(PARTS[k].key + ': ' + (runs[k].time / 1000).toFixed(1) + ' s', gx1, ly); ly -= fs * 1.3; }
+    if (runs[2]) { cx.textAlign = 'right'; cx.fillStyle = '#f0968c'; cx.fillText('steeper: faster', X(runs[2].time * 0.85) - 10, Y(0.85)); }   /* above the steep line, where no line runs */
+    cx.restore();
+  }
   function frame(now) {
     drawRoom();
     marks(now);
     drawGeometry(now);
     if (!wait && !done && !dance && !show) guides.forEach(function (g) { g.draw(cx, now, taps.length > 0); });
+    drawChart(now);
+    drawMetronome(now);
     drawPineapple(now);
-    if (taps.length && !wait && !dance && !done && last && last.reason === 'waiting') judge(now, false);   /* a long pause ends a try short */
+    if (clock && now >= clock.c0) { var tk = Math.floor((now - clock.c0) / clock.ms); if (tk > clock.tick) { clock.tick = tk; tick(tk < 3); } }
+    if (!wait && !dance && !done && (taps.length && last && last.reason === 'waiting' || clock && !taps.length)) judge(now, false);   /* a long pause ends a try short; with a beat, a tick with no step */
     requestAnimationFrame(frame);
   }
 
@@ -286,10 +380,12 @@
 
   addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
   window.lumosDance = { choose: function (i) { choose(i - 1); },
+    clock: function () { return clock ? { c0: clock.c0, t0: clock.t0, ms: clock.ms, now: performance.now() } : null; },
     desk: function () { return { a: desk.a, b: desk.b, y: desk.y, band: desk.band }; },
     state: function () { return { round: round + 1, want: want(), waiting: !!wait, done: done, misses: misses, taps: taps.length,
       dancing: !!dance, danced: !!(dance && dance.done), fell: !!fall,
-      last: last ? { verdict: last.verdict, reason: last.reason, n: last.n, steps: last.steps, share: last.share, spread: last.spread, worst: last.worst, beat: last.beat } : null,
+      last: last ? { verdict: last.verdict, reason: last.reason, n: last.n, steps: last.steps, share: last.share, spread: last.spread, worst: last.worst, beat: last.beat, offbeat: last.offbeat, late: last.late, time: last.time, speed: last.speed } : null,
+      part: round === 3 ? part + 1 : 0, counting: !!clock, runs: runs.filter(Boolean).length,
       line: lineEl.textContent, guide: guides.length ? guides[0].state().level : null, ease: ease, learned: LumosSpells.learned('pineapple') }; } };
 })();
 </script>

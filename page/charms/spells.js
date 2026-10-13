@@ -787,17 +787,27 @@ function judgeCheer(points, mouth, ease) {
    'shuffle', 'short', 'count', 'uneven'), n (steps), steps (px each), step (their mean, px), share (the mean over the
    desk: 0.25 a quarter), spread (the furthest step from the mean, a share of it), worst (that step's index), long (true
    if it was too long), fair (the equal step, the desk over n, px), beat (the longest gap in time over the shortest),
-   at (the last tap's place along the desk, 0 to 1) }. */
+   at (the last tap's place along the desk, 0 to 1) }.
+   Flitwick's beat (twenty-second session, 13 October 2026): beat, when given, is { ms: the tick's gap, t0: the page's
+   clock at Flitwick's last count, so the clock starts at his cue and never at the first tap }; tap i (from 1) belongs
+   on the tick t0 + i ms, within the ease's time (a share of the beat). Off its tick is a miss, 'beat', naming the tap
+   (offbeat, from 0) and whether it was late; a tick that passes with no tap is late too. It adds time (the last tap
+   from t0, ms) and speed (desks a second, at over time), so n steps on a beat of T/n ms cross in T whatever n is: the
+   same speed. Without beat nothing changes. */
 var DANCE_EASES = {
-  kind:   { reach: 0.07, min: 0.04, even: 0.30, most: 8, gap: 2500 },
-  fair:   { reach: 0.05, min: 0.05, even: 0.22, most: 8, gap: 2500 },
-  strict: { reach: 0.035, min: 0.06, even: 0.15, most: 8, gap: 2500 }
+  kind:   { reach: 0.07, min: 0.04, even: 0.30, most: 8, gap: 2500, time: 0.35 },
+  fair:   { reach: 0.05, min: 0.05, even: 0.22, most: 8, gap: 2500, time: 0.25 },
+  strict: { reach: 0.035, min: 0.06, even: 0.15, most: 8, gap: 2500, time: 0.18 }
 };
-function judgePineapple(taps, desk, ease, want, now) {
+function judgePineapple(taps, desk, ease, want, now, beat) {
   var e = typeof ease === 'object' ? ease : (DANCE_EASES[ease] || DANCE_EASES.kind);
   var out = { verdict: 'waiting', reason: 'waiting', n: 0, steps: [], step: 0, share: 0, spread: 0, worst: -1, long: false, fair: 0, beat: 1, at: 0 };
+  if (beat) { out.offbeat = -1; out.late = false; out.time = 0; out.speed = 0; }
   var T = taps || [], L = Math.abs(desk.b - desk.a) || 1, dir = desk.b < desk.a ? -1 : 1, i;
-  if (!T.length) return out;
+  if (!T.length) {   /* with a beat, the first tick can pass with no step */
+    if (beat && now != null && now - (beat.t0 + beat.ms) > (e.time || 0.35) * beat.ms) { out.verdict = 'miss'; out.reason = 'beat'; out.offbeat = 0; out.late = true; }
+    return out;
+  }
   var prev = 0;   /* how far along the desk the pineapple stands, px */
   for (i = 0; i < T.length; i++) {
     var along = (T[i].x - desk.a) * dir, st = along - prev;
@@ -809,11 +819,20 @@ function judgePineapple(taps, desk, ease, want, now) {
   out.step = Math.round(sum / out.n); out.share = Math.round(sum / out.n / L * 1000) / 1000; out.fair = Math.round(L / out.n);
   var lo = Infinity, hi = 0; for (i = 1; i < T.length; i++) { var g = Math.max(60, T[i].t - T[i - 1].t); lo = Math.min(lo, g); hi = Math.max(hi, g); }
   out.beat = T.length > 2 ? Math.round(hi / lo * 100) / 100 : 1;
+  if (beat) { out.time = Math.round(last.t - beat.t0); out.speed = out.time > 0 ? Math.round(prev / L / (out.time / 1000) * 1000) / 1000 : 0; }
   if (Math.abs(last.y - desk.y) > desk.band) { out.verdict = 'miss'; out.reason = 'off'; return out; }
   if (out.steps[out.n - 1] < e.min * L) { out.verdict = 'miss'; out.reason = 'back'; return out; }
   if (prev > L * (1 + e.reach)) { out.verdict = 'miss'; out.reason = 'past'; return out; }
+  if (beat) {   /* each tap on its tick */
+    var tol = (e.time || 0.35) * beat.ms;
+    for (i = 0; i < T.length; i++) {
+      var off = T[i].t - (beat.t0 + (i + 1) * beat.ms);
+      if (Math.abs(off) > tol) { out.verdict = 'miss'; out.reason = 'beat'; out.offbeat = i; out.late = off > 0; return out; }
+    }
+  }
   if (prev < L * (1 - e.reach)) {
     if (out.n >= e.most) { out.verdict = 'miss'; out.reason = 'shuffle'; return out; }
+    if (beat) { if (now != null && now - (beat.t0 + (T.length + 1) * beat.ms) > tol) { out.verdict = 'miss'; out.reason = 'beat'; out.offbeat = T.length; out.late = true; } return out; }
     if (now != null && now - last.t > e.gap) { out.verdict = 'miss'; out.reason = 'short'; }
     return out;
   }
