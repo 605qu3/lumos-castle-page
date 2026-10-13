@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 5,
+  "version": 6,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -37,13 +37,23 @@ window.CASTLE_MODEL = {
     {"id": "station", "shape": {"point": [545.0, -445.0]}, "state": "proposed", "about": "across the lake to the south-east; the boats cross to the harbour under the cliff", "cite": "PS 6; Godric's 4.1 (12 October 2026, 7.01 pm)"},
     {"id": "harbour", "shape": {"point": [86.0, -6.0]}, "state": "books", "about": "under the cliff, a passage in the rock up to the grass by the front steps", "cite": "PS 6; Godric's 4.1 (12 October 2026, 7.01 pm)"}
   ],
+  "ages": [
+    { "key": "P1", "name": "the founders", "years": "about 990" },
+    { "key": "P2", "name": "the first walls", "years": "1100 to 1200" },
+    { "key": "P3", "name": "the towers of the houses", "years": "1250 to 1350" },
+    { "key": "P4", "name": "the high towers", "years": "1400 to 1500" },
+    { "key": "P5", "name": "Tudor", "years": "1500 to 1600" },
+    { "key": "P6", "name": "the turret builders", "years": "1600 to 1750" },
+    { "key": "P7", "name": "the last additions", "years": "1800 to 1900" }
+  ],
+  "ages_about": "The history's seven ages (docs/architect/hogwarts-history-2026-10-12.md), proposed under Godric's 6.1 (13 October 2026, 7.13 am): each mass and tower lists the ages that built or raised it, the first the oldest (tools/architect-accreted-castle.py's pieces by footprint).",
   "masses": [
-    { "id": "north range", "rect": [0, 50, 160, 72], "floors": "G-7", "state": "designed" },
-    { "id": "south range, west", "rect": [0, 0, 68, 18], "floors": "G-7", "state": "designed", "roof": 41.6, "parapet": 42.6, "about": "rises to the seventh floor for the Gryffindor corridor; a lead flat behind battlements, low enough that the dormitory's east windows (sills at 44.9) see over it" },
-    { "id": "south range, east", "rect": [92, 0, 160, 18], "floors": "G-6", "state": "designed" },
-    { "id": "west range", "rect": [0, 18, 16, 50], "floors": "G-7", "state": "designed" },
-    { "id": "east range", "rect": [144, 18, 160, 50], "floors": "G-7", "state": "designed" },
-    { "id": "stair hall", "rect": [68, 0, 92, 50], "floors": "G-7", "core": true, "state": "designed", "about": "the front doors to the cliff face, the marble and moving staircases in one well" },
+    { "id": "north range", "rect": [0, 50, 160, 72], "floors": "G-7", "state": "designed", "ages": ["P2", "P3", "P4", "P5"] },
+    { "id": "south range, west", "rect": [0, 0, 68, 18], "floors": "G-7", "state": "designed", "ages": ["P3", "P5"], "roof": 41.6, "parapet": 42.6, "about": "rises to the seventh floor for the Gryffindor corridor; a lead flat behind battlements, low enough that the dormitory's east windows (sills at 44.9) see over it" },
+    { "id": "south range, east", "rect": [92, 0, 160, 18], "floors": "G-6", "state": "designed", "ages": ["P3", "P4", "P6"] },
+    { "id": "west range", "rect": [0, 18, 16, 50], "floors": "G-7", "state": "designed", "ages": ["P3", "P6"] },
+    { "id": "east range", "rect": [144, 18, 160, 50], "floors": "G-7", "state": "designed", "ages": ["P3", "P4"] },
+    { "id": "stair hall", "rect": [68, 0, 92, 50], "floors": "G-7", "core": true, "state": "designed", "ages": ["P1", "P4"], "about": "the front doors to the cliff face, the marble and moving staircases in one well" },
     { "id": "cellars", "rect": [0, 0, 160, 72], "floors": "B", "state": "designed" }
   ],
   "courts": [
@@ -51,13 +61,13 @@ window.CASTLE_MODEL = {
     { "id": "east courtyard", "rect": [92, 18, 144, 50], "state": "designed" }
   ],
   "towers": [
-    { "id": "Astronomy Tower", "c": [80, 77], "r": 8, "floors": "G-T", "high": true, "state": "designed", "about": "over the front doors", "cite": "DH 31, OotP 31, HBP 27" },
-    { "id": "Ravenclaw Tower", "c": [-7.5, 34], "r": 8.5, "floors": "G-T", "high": true, "state": "designed", "about": "on the west side", "cite": "DH 31, OotP 18, DH 29" },
-    { "id": "Gryffindor Tower", "c": [42.19, 1.95], "r": 6.4, "floors": "G-T", "high": true, "group": "gryffindor-suite", "state": "designed", "about": "the suite's tower (5.6 inside, a 0.8 wall), standing 4.45 m proud of the south face", "cite": "DH 31, OotP 21, OotP 29" },
-    { "id": "West Tower", "c": [0, 72], "r": 8, "floors": "G-T", "state": "proposed", "about": "lower than the three highest" },
-    { "id": "North Tower", "c": [160, 72], "r": 7.5, "floors": "G-T", "state": "proposed", "about": "lower than the three highest", "cite": "PoA 6, PoA 16" },
-    { "id": "south-west tower", "c": [0, 0], "r": 7, "floors": "G-T", "state": "proposed", "about": "lower than the three highest" },
-    { "id": "Dumbledore's tower", "c": [166, 40], "r": 6, "floors": "G-T", "state": "proposed", "about": "lower than the three highest" }
+    { "id": "Astronomy Tower", "c": [80, 77], "r": 8, "floors": "G-T", "high": true, "state": "designed", "ages": ["P2", "P4", "P6"], "about": "over the front doors", "cite": "DH 31, OotP 31, HBP 27" },
+    { "id": "Ravenclaw Tower", "c": [-7.5, 34], "r": 8.5, "floors": "G-T", "high": true, "state": "designed", "ages": ["P3", "P5", "P6"], "about": "on the west side", "cite": "DH 31, OotP 18, DH 29" },
+    { "id": "Gryffindor Tower", "c": [42.19, 1.95], "r": 6.4, "floors": "G-T", "high": true, "group": "gryffindor-suite", "state": "designed", "ages": ["P3", "P5", "P6"], "about": "the suite's tower (5.6 inside, a 0.8 wall), standing 4.45 m proud of the south face", "cite": "DH 31, OotP 21, OotP 29" },
+    { "id": "West Tower", "c": [0, 72], "r": 8, "floors": "G-T", "state": "proposed", "ages": ["P2", "P3", "P4", "P6"], "about": "lower than the three highest" },
+    { "id": "North Tower", "c": [160, 72], "r": 7.5, "floors": "G-T", "state": "proposed", "ages": ["P2", "P4", "P5", "P6"], "about": "lower than the three highest", "cite": "PoA 6, PoA 16" },
+    { "id": "south-west tower", "c": [0, 0], "r": 7, "floors": "G-T", "state": "proposed", "ages": ["P2", "P4", "P5", "P6"], "about": "lower than the three highest" },
+    { "id": "Dumbledore's tower", "c": [166, 40], "r": 6, "floors": "G-T", "state": "proposed", "ages": ["P4", "P5", "P6"], "about": "lower than the three highest" }
   ],
   "groups": [
     {
@@ -181,6 +191,43 @@ window.CASTLE_MODEL = {
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
       "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" }
   ],
+  "staircases": {
+    "count": 142, "state": "proposed", "cite": "PS 8",
+    "about": "PS 8's hundred and forty-two through the whole castle, one staircase one stair from a floor to the next landing: the well holds 14 (the marble staircase, the moving flights, the Friday one), the rest stand in the towers, the ranges, the walls and down (Godric's 7.18 am question, 13 October 2026; tools/architect-stairs.py, sheet architect-stairs-0735). In the castle's frame; 'ours' where no book places it.",
+    "places": [
+      { "kind": "well", "at": [84, 30], "name": "the marble staircase", "count": 7, "cite": "PS 7, HBP 24" },
+      { "kind": "well", "at": [76, 22], "name": "the moving flights", "count": 6, "cite": "OotP 32" },
+      { "kind": "odd", "at": [76, 40], "name": "the Friday staircase", "count": 1, "cite": "PS 8" },
+      { "kind": "spiral", "at": [161.8, 33.4], "name": "the head's", "count": 1, "cite": "CoS 11" },
+      { "kind": "spiral", "at": [-2, 42.8], "name": "Ravenclaw", "count": 9, "cite": "DH 29" },
+      { "kind": "spiral", "at": [86.6, 82], "name": "Astronomy", "count": 9, "cite": "PS 14" },
+      { "kind": "spiral", "at": [162.4, 63.6], "name": "North Tower", "count": 9, "cite": "PoA 6, GoF 13" },
+      { "kind": "spiral", "at": [14, 73.6], "name": "West Tower", "count": 9, "cite": "GoF 15" },
+      { "kind": "spiral", "at": [34.6, -1.8], "name": "Gryffindor's angle turret", "count": 7, "cite": "ours" },
+      { "kind": "spiral", "at": [40.5, 4.5], "name": "Gryffindor's dormitories", "count": 4, "cite": "PS 7, OotP 17" },
+      { "kind": "spiral", "at": [93.6, -2.6], "name": "the keep's", "count": 10, "cite": "ours" },
+      { "kind": "spiral", "at": [5.4, -5], "name": "the south-west", "count": 4, "cite": "ours" },
+      { "kind": "spiral", "at": [134.8, -7], "name": "the lake tower", "count": 3, "cite": "ours" },
+      { "kind": "spiral", "at": [15.6, 73.8], "name": "the north-west", "count": 3, "cite": "ours" },
+      { "kind": "range", "at": [8, 21], "name": "west range, south", "count": 7, "cite": "ours" },
+      { "kind": "range", "at": [8, 47], "name": "west range, north", "count": 7, "cite": "ours" },
+      { "kind": "range", "at": [62, 21], "name": "south range, by the keep", "count": 7, "cite": "ours" },
+      { "kind": "range", "at": [97, 15], "name": "hall range, by the keep", "count": 7, "cite": "ours" },
+      { "kind": "range", "at": [152, 34], "name": "east range", "count": 6, "cite": "ours" },
+      { "kind": "range", "at": [100, 61], "name": "north range, east", "count": 7, "cite": "ours" },
+      { "kind": "rickety", "at": [26, 12], "name": "the Tudor lodgings", "count": 3, "cite": "ours" },
+      { "kind": "rickety", "at": [8, 34], "name": "the gallery storey", "count": 1, "cite": "ours" },
+      { "kind": "rickety", "at": [130, 12], "name": "the link of 1647", "count": 2, "cite": "ours" },
+      { "kind": "hidden", "at": [60, 12], "name": "the tapestry stair to Gryffindor", "count": 1, "cite": "GoF 12" },
+      { "kind": "hidden", "at": [91, 8], "name": "in the keep's east wall", "count": 2, "cite": "ours" },
+      { "kind": "hidden", "at": [79, -1], "name": "in the keep's south wall", "count": 1, "cite": "ours" },
+      { "kind": "odd", "at": [67, 8], "name": "the vanishing step", "count": 2, "cite": "GoF 25, HBP 28" },
+      { "kind": "down", "at": [72, 60], "name": "to the dungeons", "count": 2, "cite": "CoS 5" },
+      { "kind": "down", "at": [62, 66], "name": "to the kitchens and Hufflepuff", "count": 2, "cite": "GoF 21, OotP 18" },
+      { "kind": "down", "at": [80, 92], "name": "the stone steps", "count": 1, "cite": "PS 6" },
+      { "kind": "down", "at": [84, -6], "name": "from the harbour", "count": 2, "cite": "PS 6" }
+    ]
+  },
   "open": [
     "The tower stair rises 5.6 m against the dormitory floor's 7.4 m."
   ]
