@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Impervius, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0d1116; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1a1714;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=12"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* Impervius, a test page for the Charms lane (12 October 2026, eleventh session; the owner is Godric). Drawn in code.
+   The book (PoA 9, checked in the text): at the storm-soaked match against Hufflepuff, in Wood's time out, Hermione
+   takes Harry's glasses, "tapped them with her wand and said, 'Impervius!'", and hands them back: "They'll repel
+   water!" A tap and the word; no motion. As with Alohomora, the book's tap comes first and the stroke after is ours,
+   for the geometry: a ring drawn right round the thing, and is all of it inside? Then the smallest circle that holds
+   it is drawn beside his, in silver dashes with its centre and radius (a rectangle's has its diagonal for a diameter;
+   the pennant's runs through its three corners), and nothing is graded: how snug his ring is, is only said. The
+   Quidditch stands in the storm from the front, rain slanting; three rounds, each a thing on the bench: Harry's
+   glasses (the book's), a sheet of parchment and a Gryffindor pennant (both ours). Dry: the rain beads on his ring
+   and runs off round it, and the thing clears. Too small: the points his ring left out drip where it missed. Judged
+   by LumosSpells.judgeRing round the very outlines drawn here (checks/impervius-tally.js tallies the same ones); the
+   traced guide from guide.js, a circle round the thing. ?thing=1..3, ?ease=, ?guide= for trying;
+   window.lumosImpervius for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+
+  /* the three things, their outlines in units of u round their middle (the tally's own), and what the smallest
+     circle teaches on each */
+  var THINGS = [
+    { name: 'Glasses', the: 'the glasses', it: 'them', self: 'themselves', outline: function (u) {
+        var out = [], r = 0.42 * u, i;
+        [-1, 1].forEach(function (s) { for (i = 0; i < 16; i++) { var a = i / 16 * Math.PI * 2; out.push({ x: s * 0.55 * u + r * Math.cos(a), y: r * Math.sin(a) }); } });
+        out.push({ x: 0, y: -0.12 * u });
+        [-1, 1].forEach(function (s) { out.push({ x: s * 1.1 * u, y: -0.08 * u }); });
+        return out; },
+      start: 'Harry\'s glasses on the bench, streaming with rain. <b>Tap them</b> with your wand.',
+      why: 'The smallest ring runs from hinge to hinge: that line is its diameter.' },
+    { name: 'Parchment', the: 'the parchment', it: 'it', self: 'itself', outline: function (u) {
+        var out = [], i, n = 6, w = 1.6, h = 1.1;
+        for (i = 0; i < n; i++) { var k = i / n;
+          out.push({ x: (-w / 2 + w * k) * u, y: -h / 2 * u }, { x: w / 2 * u, y: (-h / 2 + h * k) * u }, { x: (w / 2 - w * k) * u, y: h / 2 * u }, { x: -w / 2 * u, y: (h / 2 - h * k) * u }); }
+        return out; },
+      start: 'Your Charms homework, left on the bench in the rain. <b>Tap it</b> before the ink runs.',
+      why: 'The smallest ring has the diagonal for its diameter, corner to corner.' },
+    { name: 'Pennant', the: 'the pennant', it: 'it', self: 'itself', outline: function (u) {
+        var A = { x: -0.9 * u, y: -0.4 * u }, B = { x: -0.9 * u, y: 0.4 * u }, C = { x: 1.0 * u, y: 0.05 * u }, out = [], i, n = 8;
+        [[A, B], [B, C], [C, A]].forEach(function (e) { for (i = 0; i < n; i++) out.push({ x: e[0].x + (e[1].x - e[0].x) * i / n, y: e[0].y + (e[1].y - e[0].y) * i / n }); });
+        return out; },
+      start: 'A Gryffindor pennant, drooping in the wet. <b>Tap it</b> and keep it flying for the match.',
+      why: 'The smallest ring runs through all three of its corners.' } ];
+  var thing = Math.max(0, Math.min(2, (Number(qs.get('thing')) || 1) - 1)), T = THINGS[thing];
+  var stage = 'tap', u = 40, mid = { x: 0, y: 0 }, shape = [], circ = null, glint = null, dryAt = null, last = null, wait = null, done = false;
+  var stroke = null, active = null, trail = null, ring = null, wet = null, guide = null, drops = [], beads = [], downAt = null;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    u = S * 0.19; mid = { x: W / 2, y: H * 0.5 };
+    place();
+    if (guide) guide.build(W, H);
+    drops = []; for (var i = 0; i < Math.round(W * H / 2600); i++) drops.push(newDrop(true));
+  }
+  function place() {
+    shape = T.outline(u).map(function (p) { return { x: p.x + mid.x, y: p.y + mid.y }; });
+    circ = LumosSpells.smallestCircle(shape);
+  }
+  function bench() { var m = -1e9; shape.forEach(function (p) { if (p.y > m) m = p.y; }); return m - u * 0.03; }
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+
+  /* the guide: a circle a quarter wider than the smallest, from the top, clockwise */
+  function makeGuide() {
+    guide = LumosGuide.create({ key: 'lumos.charms.imperviusGuidedHits', rest: 1.0, mirror: false,
+      box: function () { var G = circ.r * 1.25 / 0.4; return { G: G, ox: circ.x - G / 2, oy: circ.y - G / 2 }; },
+      parts: [{ pts: LumosGuide.arc([0.5, 0.5], 0.4, 0, 355, 48), secs: 1.3, label: 'right round', at: 0.5, dx: 0, dy: 1.5 }] });
+    guide.build(W, H);
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    THINGS.forEach(function (t, i) {
+      var b = document.createElement('button'); b.textContent = t.name; if (i === thing) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { if (guide) guide.reset(); }; panel.appendChild(g);
+  }
+  function choose(i) {
+    if (wait) { clearTimeout(wait); wait = null; }
+    thing = i; T = THINGS[i]; stage = 'tap'; glint = null; dryAt = null; last = null; ring = null; wet = null; trail = null; beads = []; done = false;
+    place(); makeGuide(); menu(); say(T.start);
+  }
+
+  /* ---- the tap, then the ring ---- */
+  function onThing(p) {
+    var best = 1e9; shape.forEach(function (q) { best = Math.min(best, Math.hypot(q.x - p.x, q.y - p.y)); });
+    return best < u * 0.35 || Math.hypot(p.x - circ.x, p.y - circ.y) < circ.r * 0.7;
+  }
+  function tapThing(p) {
+    if (stage !== 'tap' || wait) return;
+    if (!onThing(p)) { say('Tap ' + T.the + ' ' + T.self + '.'); return; }
+    glint = performance.now(); noise(0.05, 3600, 0.4); stage = 'ring';
+    say('Whisper <i>Impervius</i> and draw <b>a ring right round ' + T.it + '</b>, all of ' + T.it + ' inside.');
+  }
+  function where(idx) {   /* where his ring missed, said as a side of the thing */
+    var x = 0, y = 0; idx.forEach(function (i) { x += shape[i].x - circ.x; y += shape[i].y - circ.y; });
+    x /= idx.length; y /= idx.length;
+    var a = Math.atan2(y, x) * 180 / Math.PI, sides = ['on the right', 'at the bottom right', 'at the bottom', 'at the bottom left', 'on the left', 'at the top left', 'at the top', 'at the top right'];
+    return sides[((Math.round(a / 45) % 8) + 8) % 8];
+  }
+  function judge(pts) {
+    if (stage !== 'ring' || wait) return null;
+    var j = LumosSpells.judgeRing(pts, shape, ease);
+    if (j.reason === 'tap') { if (guide) guide.clear(); say('Draw a ring right round ' + T.the + ', in one stroke.'); last = j; return j; }
+    var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
+    if (tr && tr.traced && j.verdict === 'miss') { j.verdict = 'dry'; j.reason = 'traced'; j.wet = []; }
+    last = j;
+    if (j.verdict === 'dry') {
+      if (guide) guide.hit(lv > 0);
+      LumosSpells.learn('impervius');
+      ring = pts.slice(); trail = null; wet = null; dryAt = performance.now(); stage = 'dry';
+      noise(0.5, 900, 0.25); setTimeout(function () { noise(0.3, 1800, 0.15); }, 160);
+      var k = Math.round(j.snug * 10) / 10;
+      var snug = k <= 1.05 ? 'yours is just about as snug as it can be' : 'yours is about ' + k.toFixed(1) + ' times as wide';
+      say('<b>Impervius!</b> ' + cap(T.the) + ' stay' + (T.it === 'them' ? '' : 's') + ' dry. The silver ring is the smallest that holds ' + T.it + ': ' + snug + '.');
+      setTimeout(function () { if (stage === 'dry' && last === j) say(T.why + ' ' + (thing < 2 ? 'Next...' : 'All three dry. Wood would be proud.')); }, 2600);
+      if (thing < 2) wait = setTimeout(function () { wait = null; choose(thing + 1); }, 6200); else done = true;
+    } else {
+      if (guide) guide.miss();
+      trail = { pts: pts, at: performance.now() };
+      if (j.reason === 'small') { wet = { idx: j.wet.slice(), at: performance.now() }; noise(0.3, 700, 0.2);
+        say('Drip, drip: your ring left some of ' + T.it + ' out ' + where(j.wet) + '. Draw it a little wider there.'); }
+      else if (j.reason === 'open') say('Go right round ' + T.it + ', back to where you began.');
+      else if (j.reason === 'scribble') say('Just once round: one ring, not a scribble.');
+      else say('Draw the ring round ' + T.the + ' ' + T.self + '.');
+    }
+    return j;
+  }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  /* ---- the rain: slanting streaks; inside a dry ring none fall, and those that reach it bead and run off round it ---- */
+  var SLANT = -0.28;
+  function newDrop(any) { return { x: Math.random() * (W + H * 0.3), y: any ? Math.random() * H : -20 - Math.random() * 60, v: 0.9 + Math.random() * 0.5, l: 10 + Math.random() * 12 }; }
+  function inside(p, poly) {
+    var w = 0, n = poly.length;
+    for (var i = 0, j = n - 1; i < n; j = i++) {
+      var a = poly[j], b = poly[i];
+      if ((a.y > p.y) !== (b.y > p.y) && p.x < a.x + (b.x - a.x) * (p.y - a.y) / (b.y - a.y)) w++;
+    }
+    return w % 2 === 1;
+  }
+  function ringAt(ang) {   /* the point of his ring nearest a direction from its middle */
+    var best = null, bd = 1e9, c = ringMid();
+    for (var i = 0; i < ring.length; i += 2) {
+      var d = Math.atan2(ring[i].y - c.y, ring[i].x - c.x) - ang; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+      if (Math.abs(d) < bd) { bd = Math.abs(d); best = ring[i]; }
+    }
+    return best;
+  }
+  var rmid = null;
+  function ringMid() { if (!rmid || rmid.of !== ring) { var x = 0, y = 0; ring.forEach(function (p) { x += p.x; y += p.y; }); rmid = { of: ring, x: x / ring.length, y: y / ring.length }; } return rmid; }
+  function rain(dt) {
+    var sp = H * 1.4 * dt, holding = ring && stage === 'dry';
+    cx.save(); cx.strokeStyle = 'rgba(170,195,220,0.42)'; cx.lineWidth = 1.3; cx.beginPath();
+    drops.forEach(function (d, i) {
+      d.y += sp * d.v; d.x += sp * d.v * SLANT;
+      if (d.y > H + 20 || d.x < -40) { drops[i] = newDrop(false); return; }
+      if (holding && inside(d, ring)) {   /* it meets the charm: a bead on the ring where it struck */
+        if (Math.random() < 0.18 && beads.length < 40) { var c = ringMid(); beads.push({ ang: Math.atan2(d.y - c.y, d.x - c.x), fall: null }); }
+        drops[i] = newDrop(false); return;
+      }
+      cx.moveTo(d.x, d.y); cx.lineTo(d.x - d.l * SLANT, d.y - d.l);
+    });
+    cx.stroke(); cx.restore();
+  }
+  function drawBeads(dt) {
+    if (!ring) { beads = []; return; }
+    cx.save(); cx.fillStyle = 'rgba(205,225,245,0.9)';
+    beads = beads.filter(function (b) {
+      if (b.fall) { b.fall.y += H * 0.9 * dt; b.fall.a -= dt * 1.4; if (b.fall.a <= 0) return false;
+        cx.globalAlpha = b.fall.a; cx.beginPath(); cx.arc(b.fall.x, b.fall.y, 2.6, 0, 7); cx.fill(); cx.globalAlpha = 1; return true; }
+      var d = Math.PI / 2 - b.ang; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+      b.ang += Math.sign(d) * Math.min(Math.abs(d), dt * 2.2);   /* runs round the ring, down to its bottom */
+      var p = ringAt(b.ang);
+      if (Math.abs(d) < 0.08) { b.fall = { x: p.x, y: p.y, a: 1 }; }
+      cx.beginPath(); cx.arc(p.x, p.y, 3, 0, 7); cx.fill();
+      return true;
+    });
+    cx.restore();
+  }
+
+  /* ---- drawing ---- */
+  function drawStands(now) {
+    var g = cx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#1d2733'); g.addColorStop(0.45, '#2a3440'); g.addColorStop(1, '#151a20'); cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+    /* far stands: tiers of benches under the storm, Gryffindor's red and gold hangings drooping */
+    var top = H * 0.16, rowH = Math.max(14, S * 0.05), rows = 5, i;
+    for (i = 0; i < rows; i++) {
+      var y = top + i * rowH * 1.3;
+      cx.fillStyle = i % 2 ? '#3a2f26' : '#43362b'; cx.fillRect(0, y, W, rowH * 0.5);
+      cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.fillRect(0, y + rowH * 0.5, W, rowH * 0.8);
+      /* the crowd, hunched and hooded: small dark heads in a row */
+      cx.fillStyle = 'rgba(20,22,28,0.85)';
+      for (var x = (i * 13) % 22; x < W; x += Math.max(16, S * 0.045)) { cx.beginPath(); cx.arc(x, y - rowH * 0.15, rowH * 0.32, Math.PI, 0); cx.fill(); }
+    }
+    var hangY = top + rows * rowH * 1.3, hw = Math.max(26, S * 0.07);
+    for (var k = 0; k * hw * 2.2 < W; k++) {
+      var hx = k * hw * 2.2 + hw * 0.3, sway = Math.sin(now / 900 + k) * 2;
+      cx.fillStyle = k % 2 ? '#7a1f1a' : '#8f6a1e';
+      cx.beginPath(); cx.moveTo(hx, hangY); cx.lineTo(hx + hw, hangY); cx.lineTo(hx + hw * 0.92 + sway, hangY + hw * 1.3); cx.lineTo(hx + hw * 0.5 + sway, hangY + hw * 1.05); cx.lineTo(hx + hw * 0.08 + sway, hangY + hw * 1.3); cx.closePath(); cx.fill();
+    }
+    cx.fillStyle = 'rgba(28,36,46,0.42)'; cx.fillRect(0, 0, W, bench());   /* the storm's mist over the far stands */
+    /* the near bench the thing lies on */
+    var by = bench(), sh = cx.createRadialGradient(mid.x, by, 0, mid.x, by, u * 1.1);   /* the thing rests on its top, a shadow under it */
+    cx.fillStyle = '#5a4430'; cx.fillRect(0, by, W, Math.max(18, S * 0.05));
+    cx.fillStyle = '#3a2b1e'; cx.fillRect(0, by + Math.max(18, S * 0.05), W, H - by);
+    cx.fillStyle = 'rgba(160,190,220,0.08)'; cx.fillRect(0, by, W, 3);   /* the wet sheen */
+    sh.addColorStop(0, 'rgba(0,0,0,0.45)'); sh.addColorStop(1, 'rgba(0,0,0,0)'); cx.fillStyle = sh;
+    cx.beginPath(); cx.ellipse(mid.x, by + 4, u * 1.1, u * 0.12, 0, 0, 7); cx.fill();
+    var v = cx.createRadialGradient(W / 2, H * 0.5, S * 0.25, W / 2, H * 0.5, Math.max(W, H) * 0.75);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)'); cx.fillStyle = v; cx.fillRect(0, 0, W, H);
+  }
+  function drawThing(now) {
+    var x = mid.x, y = mid.y, i;
+    cx.save(); cx.lineJoin = 'round'; cx.lineCap = 'round';
+    if (thing === 0) {
+      cx.strokeStyle = '#1b1b1d'; cx.lineWidth = Math.max(3, u * 0.07);
+      [-1, 1].forEach(function (s) { cx.fillStyle = 'rgba(180,200,220,0.16)'; cx.beginPath(); cx.arc(x + s * 0.55 * u, y, 0.42 * u, 0, 7); cx.fill(); cx.stroke(); });
+      cx.beginPath(); cx.moveTo(x - 0.13 * u, y - 0.08 * u); cx.quadraticCurveTo(x, y - 0.2 * u, x + 0.13 * u, y - 0.08 * u); cx.stroke();
+      [-1, 1].forEach(function (s) { cx.beginPath(); cx.moveTo(x + s * 0.97 * u, y - 0.08 * u); cx.lineTo(x + s * 1.1 * u, y - 0.08 * u); cx.stroke(); });
+    } else if (thing === 1) {
+      cx.fillStyle = '#e4d6b2'; cx.fillRect(x - 0.8 * u, y - 0.55 * u, 1.6 * u, 1.1 * u);
+      cx.strokeStyle = 'rgba(60,45,30,0.55)'; cx.lineWidth = 1.4;
+      for (i = 0; i < 6; i++) { var ly = y - 0.38 * u + i * 0.15 * u; cx.beginPath(); cx.moveTo(x - 0.62 * u, ly); cx.lineTo(x + (i === 5 ? 0.1 : 0.6) * u, ly); cx.stroke(); }
+    } else {
+      cx.fillStyle = '#8e1f1b';
+      cx.beginPath(); cx.moveTo(x - 0.9 * u, y - 0.4 * u); cx.lineTo(x - 0.9 * u, y + 0.4 * u); cx.lineTo(x + 1.0 * u, y + 0.05 * u); cx.closePath(); cx.fill();
+      cx.fillStyle = '#d9a83a'; cx.fillRect(x - 0.9 * u, y - 0.4 * u, 0.1 * u, 0.8 * u);   /* the gold hem along its pole edge */
+      cx.beginPath(); cx.moveTo(x - 0.45 * u, y - 0.1 * u); cx.lineTo(x - 0.25 * u, y - 0.04 * u); cx.lineTo(x - 0.45 * u, y + 0.12 * u); cx.lineTo(x - 0.3 * u, y + 0.02 * u); cx.closePath(); cx.fill();   /* a little gold lion's mark */
+    }
+    /* wet: beads all over it, fading once it is dry */
+    var wetK = dryAt ? Math.max(0, 1 - (now - dryAt) / 900) : 1;
+    if (wetK > 0) {
+      cx.fillStyle = 'rgba(210,230,250,' + (0.75 * wetK) + ')';
+      for (i = 0; i < shape.length; i += 2) { var p = shape[i], q = shape[(i + 7) % shape.length];
+        cx.beginPath(); cx.arc((p.x * 2 + q.x + mid.x) / 4, (p.y * 2 + q.y + mid.y) / 4 + Math.sin(now / 600 + i) * 1.2, Math.max(1.8, u * 0.025), 0, 7); cx.fill(); }
+    }
+    if (glint && now - glint < 700) {   /* the tap's glint */
+      var k = 1 - (now - glint) / 700, gg = cx.createRadialGradient(x, y, 0, x, y, u * 0.9);
+      gg.addColorStop(0, 'rgba(255,245,210,' + (0.7 * k) + ')'); gg.addColorStop(1, 'rgba(255,220,150,0)');
+      cx.fillStyle = gg; cx.beginPath(); cx.arc(x, y, u * 0.9, 0, 7); cx.fill();
+    }
+    cx.restore();
+  }
+  function drawWet(now) {   /* the points his ring left out, dripping */
+    if (!wet) return;
+    var t = (now - wet.at) / 1000; if (t > 3.2) { wet = null; return; }
+    cx.save();
+    wet.idx.forEach(function (i, n) {
+      var p = shape[i], ph = (t * 1.4 + n * 0.37) % 1;
+      cx.fillStyle = 'rgba(120,170,230,0.95)'; cx.beginPath(); cx.arc(p.x, p.y, Math.max(3, u * 0.045), 0, 7); cx.fill();
+      cx.fillStyle = 'rgba(150,195,240,' + (1 - ph) + ')';
+      cx.beginPath(); cx.ellipse(p.x, p.y + ph * u * 0.6, 2.2, 3.6, 0, 0, 7); cx.fill();
+    });
+    cx.restore();
+  }
+  function drawDry(now) {   /* his ring, and the smallest circle beside it */
+    if (!ring || stage !== 'dry') return;
+    var k = Math.min(1, (now - dryAt) / 600), c = circ;
+    cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round';
+    cx.strokeStyle = 'rgba(232,190,90,' + (0.85 * k) + ')'; cx.lineWidth = 4;
+    cx.beginPath(); ring.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.closePath(); cx.stroke();
+    var s = Math.min(1, Math.max(0, (now - dryAt - 900) / 700));
+    if (s > 0) {
+      cx.globalAlpha = s; cx.strokeStyle = '#c9d8e6'; cx.lineWidth = 2.4; cx.setLineDash([7, 6]);
+      cx.shadowColor = 'rgba(10,14,20,0.95)'; cx.shadowBlur = 3;
+      cx.beginPath(); cx.arc(c.x, c.y, c.r, 0, 7); cx.stroke();
+      /* what fixes it: the diameter hinge to hinge, the diagonal corner to corner, or the three corners on it */
+      var fs = Math.round(Math.max(14, S * 0.032)), below = c.y + c.r;
+      ring.forEach(function (p) { below = Math.max(below, p.y); }); below += fs * 1.4;   /* the label under his ring */ cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillStyle = '#dbe6f0'; cx.textAlign = 'center';
+      cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 5;
+      if (thing === 0) {
+        var h1 = shape[shape.length - 2], h2 = shape[shape.length - 1];
+        seg(h1, h2, true); cx.setLineDash([]);
+        cx.fillText('diameter', c.x, below);
+      } else if (thing === 1) {
+        var r0 = { x: mid.x - 0.8 * u, y: mid.y - 0.55 * u }, r1 = { x: mid.x + 0.8 * u, y: mid.y + 0.55 * u };
+        seg(r0, r1, true); cx.setLineDash([]);
+        cx.fillText('diagonal = diameter', c.x, below);
+      } else {
+        cx.setLineDash([]);
+        [[-0.9, -0.4], [-0.9, 0.4], [1.0, 0.05]].forEach(function (q) { cx.beginPath(); cx.arc(mid.x + q[0] * u, mid.y + q[1] * u, 6, 0, 7); cx.stroke(); });
+        cx.fillText('three corners on the ring', c.x, below);
+      }
+      /* its centre and a radius, up and to the right */
+      cx.setLineDash([]); cx.fillStyle = '#dbe6f0'; cx.beginPath(); cx.arc(c.x, c.y, 3.5, 0, 7); cx.fill();
+      seg(c, { x: c.x, y: c.y - c.r }, false);   /* straight up, so its label sits clear of the thing */
+      cx.fillText('r', c.x + fs * 0.6, c.y - c.r * 0.8);
+    }
+    cx.restore();
+  }
+  function seg(a, b, dashed) {
+    cx.save(); cx.setLineDash([]); cx.shadowBlur = 0; cx.strokeStyle = 'rgba(25,40,60,0.8)'; cx.lineWidth = 4.5;
+    cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.restore();
+    cx.save(); cx.setLineDash(dashed ? [7, 6] : []); cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.restore();
+  }
+  var lastT = 0;
+  function frame(now) {
+    var dt = lastT ? Math.min(0.05, (now - lastT) / 1000) : 0.016; lastT = now;
+    drawStands(now);
+    drawThing(now);
+    drawDry(now);
+    drawBeads(dt);
+    rain(dt);
+    drawWet(now);
+    if (stage === 'ring' && guide && !wait) guide.draw(cx, now, !!stroke);
+    var pts = stroke || (trail && now - trail.at < 600 ? trail.pts : null);
+    if (pts && pts.length > 1) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + (stroke ? 0.6 : 0.6 * (1 - (now - trail.at) / 600)) + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: in the tap stage a short touch on the thing is the tap, a long stroke is too soon; then one ring ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (wait || done || active !== null || (stage !== 'tap' && stage !== 'ring')) return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null;
+    if (stage === 'ring' && guide) guide.cover(stroke[0]);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (stage === 'ring' && guide) guide.cover(q); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    if (stage === 'tap') {
+      var len = 0; for (var i = 1; i < pts.length; i++) len += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
+      if (len > S * 0.06) say('Tap it first, as Hermione tapped Harry\'s glasses. Then the ring.');
+      else tapThing(pts[0]);
+      return;
+    }
+    judge(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(thing); requestAnimationFrame(frame);
+  window.lumosImpervius = { choose: function (i) { choose(i - 1); }, circle: function () { return { x: circ.x, y: circ.y, r: circ.r }; }, shape: function () { return shape.slice(); },
+    tap: function () { tapThing({ x: circ.x, y: circ.y }); }, judge: function (pts) { return judge(pts); },
+    state: function () { return { thing: thing + 1, stage: stage, waiting: !!wait, done: done, last: last ? { verdict: last.verdict, reason: last.reason, wet: last.wet.length, snug: Math.round(last.snug * 100) / 100, turns: Math.round(last.turns * 100) / 100 } : null,
+      line: lineEl.textContent, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('impervius') }; } };
+})();
+</script>
+</body>
+</html>
