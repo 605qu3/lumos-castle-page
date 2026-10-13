@@ -193,7 +193,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=22"></script>
 <script src="charms/guide.js?v=5"></script>
-<script src="charms/spells.js?v=11"></script>
+<script src="charms/spells.js?v=27"></script>
 <script>
 (function () {
 'use strict';
@@ -1754,12 +1754,15 @@ function lockOnScreen() {
   var r = canvas.getBoundingClientRect();
   return { x: r.left + (lockV.x + 1) / 2 * r.width, y: r.top + (1 - lockV.y) / 2 * r.height };
 }
+/* a stray tap while an offer waits (req 232; Godric, Q4, 13 October 2026, 7.13 am, option 4.1 with t1): one spark in
+   his house's colours where his finger lifted, the frame's (req 229), and nothing else; the offer keeps him at the stop */
+function strayTap(x, y) { if (kit && kit.spark) kit.spark(x, y, castle && castle.house ? castle.house() : null); }
 function lockOffered() {
   lockDrop();
   /* a giggle still showing gives way, so it never prints over the lock's face */
   lineQ = lineQ.filter(function (l) { return l.speaker !== 'door'; });
   if (lineCur && lineCur.line.speaker === 'door') lineCur.t = Math.min(lineCur.t, 0.35);
-  var mine = lockOffer = LumosSpells.openLock({ at: lockOnScreen, stuck: true, wait: LOCK_WAIT_S });
+  var mine = lockOffer = LumosSpells.openLock({ at: lockOnScreen, stuck: true, wait: LOCK_WAIT_S, stray: strayTap });
   mine.tap();
   mine.done.then(function (out) {
     if (lockOffer === mine) lockOffer = null;
@@ -2512,7 +2515,7 @@ function humpOffered() {
     hinge: function () { return onWitch(HUMP.hinge.u, HUMP.hinge.v); },
     edge: function () { return onWitch(HUMP.edge.u, HUMP.edge.v); },
     dir: h.x > e.x ? 1 : -1,   /* the edge rises over her back, whichever way her side faces him */
-    wait: HUMP_WAIT_S });
+    wait: HUMP_WAIT_S, stray: strayTap });
   mine.tap();
   mine.done.then(function (out) {
     if (humpOffer === mine) humpOffer = null;
