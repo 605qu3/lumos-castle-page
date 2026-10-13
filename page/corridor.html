@@ -279,13 +279,15 @@ var NOOK_BACK = HER_Z + NOOK_D, NOOK_MID = (NOOK_X0 + NOOK_X1) / 2, NOOK_W = NOO
 var DOOR = C.DOOR, WINDOW = C.WINDOW;
 var shell = kit.buildCorridor(scene, { wall: stoneMat, floor: floorMat, ceil: ceilMat, stair: stairMat });
 var farWall = shell.farWall, herWall = shell.herWall, floor = shell.floor, treads = shell.treads, landing = shell.landing, ceiling = shell.ceiling;
-/* the landing at the flight's foot, and a grey stand-in for its tall window in the end wall (req 29 settles the window
-   and what it looks onto; a pale sky shape for now so the foot of the stair is never dark) */
+/* the landing at the flight's foot, and its tall window (req 29), on the landing's south wall, the outer wall, centred on
+   the landing (Godric's 1 on corridor-landing-end-1013, 6.55 pm; the Architect's ledger line 1, model v14: the end
+   opens onto the stair hall's bay instead); a pale sky shape until the drawing loads, so the foot of the stair is
+   never dark */
 var LANDING_WINDOW = { w: 2.33, h: 4.8, sill: 0.9 };   /* grand and tall, stained glass; 2.33 by 4.8 m, the drawing's own shape at the height Godric chose (9 October 2026, 2.41 pm, req 29) */
 var landingWindow = cutoutMesh(cutoutTexture(120, 288, "#c9d6e2", drawArch, "window"), LANDING_WINDOW.w, LANDING_WINDOW.h);
 landingWindow.material = new THREE.MeshBasicMaterial({ map: landingWindow.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
-landingWindow.position.set(FAR_END_X + 0.01, FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2, MID_Z);
-landingWindow.rotation.y = Math.PI / 2;
+landingWindow.position.set((FOOT_X + FAR_END_X) / 2, FOOT_Y + LANDING_WINDOW.sill + LANDING_WINDOW.h / 2, FAR_Z + 0.01);
+landingWindow.rotation.y = 0;
 landingWindow.name = 'landing-window'; scene.add(landingWindow); register(landingWindow, 1);
 /* the drawing (round 1, candidate 3, Godric, 9 October 2026, 2.20 pm): Gryffindor's lion in scarlet and gold glass in its
    stone reveal, unlit so the glass glows with the day behind it. Drawn about 1 to 2.06, so its height follows its width;
@@ -872,6 +874,28 @@ witchLanding.name = 'witch-landing'; witchLanding.visible = false; scene.add(wit
   witchTorches = [addTorch(new THREE.Vector3(witchX(5.3), FOOT_Y + 2.0, HER_FACE), -1, 'witch-torch-her'),
     addTorch(new THREE.Vector3(witchX(1.4), FOOT_Y + 2.0, FAR_FACE), 1, 'witch-torch-far')];
   witchTorches.forEach(function (tc) { G.add(tc.mesh); G.add(tc.flame); G.add(tc.light); });
+})();
+/* the landing's far end open to the stair hall's bay (Godric's 1 on corridor-landing-end-1013, 6.55 pm; the Architect's
+   ledger line 1, drawn in model v14): on the days the stair comes to its own landing the end wall is not there, and the
+   landing runs on level into the bay, a tall stone room the corridor's width and full height, 8 m long, at its end a
+   stone balustrade over the stair hall's dark well, the hall's far side faint across it. Grey, a stand-in until it is
+   drawn. On the moving stair's other days its places stand at the end as before (req 59) */
+var BAY = { len: 8, rail: 1.0, railT: 0.3, across: 14 };
+var bayRoom = new THREE.Group(), bayTorches;
+bayRoom.name = 'bay'; bayRoom.visible = false; scene.add(bayRoom);
+(function () {
+  var G = bayRoom, x0 = FAR_END_X, x1 = FAR_END_X - BAY.len, xm = (x0 + x1) / 2, y0 = FOOT_Y, hgt = CEIL - FOOT_Y, ym = (CEIL + FOOT_Y) / 2;
+  box(G, BAY.len, 0.1, WIDTH, xm, y0 - 0.05, MID_Z, floorMat, 0);                                   /* the flags, level with the landing */
+  box(G, BAY.len, 0.1, WIDTH + 2 * T, xm, CEIL + 0.05, MID_Z, ceilMat, 0);                          /* the ceiling, as high as the corridor's */
+  box(G, BAY.len, hgt, T, xm, ym, HER_Z + T / 2, stoneMat, 0);                                       /* her wall runs on */
+  box(G, BAY.len, hgt, T, xm, ym, FAR_Z - T / 2, stoneMat, 0);                                       /* and the outer wall */
+  box(G, BAY.railT, BAY.rail, WIDTH, x1 + BAY.railT / 2, y0 + BAY.rail / 2, MID_Z, stoneMat, 0);     /* the balustrade over the well */
+  var far = x1 - BAY.across;                                                                           /* the hall's far side, across the well */
+  box(G, 0.1, hgt + 30, WIDTH + 16, far, ym - 15, MID_Z, solid(0x1c1915), 0);
+  box(G, 0.12, 0.35, WIDTH + 16, far + 0.1, y0 + 0.4, MID_Z, solid(0x3a342c), 0);                     /* a gallery's edge over there, faint */
+  bayTorches = [addTorch(new THREE.Vector3(x0 - 3.2, FOOT_Y + 2.0, HER_FACE), -1, 'bay-torch-her'),
+    addTorch(new THREE.Vector3(x0 - 5.6, FOOT_Y + 2.0, FAR_FACE), 1, 'bay-torch-far')];
+  bayTorches.forEach(function (tc) { G.add(tc.mesh); G.add(tc.flame); G.add(tc.light); });
 })();
 /* the leaning torch and his deathday's blue minute (req 131): castle.js's torchCues, answered the same through the
    common room's hole. The lean takes a torch whose flame is in his view, never the one that leaned last, the nearest
@@ -2380,7 +2404,7 @@ var dayLights = windows.map(function (w) {
   return l;
 });
 var landingLight = new THREE.PointLight(col(0xdfe6ee), 1.6, 9, 1.4);
-landingLight.position.set(FAR_END_X + 0.8, FOOT_Y + 2.2, MID_Z);
+landingLight.position.set((FOOT_X + FAR_END_X) / 2, FOOT_Y + 2.2, FAR_Z + 0.9);   /* the window's daylight, by it */
 scene.add(landingLight);
 dayLights.push(landingLight);
 
@@ -2638,11 +2662,12 @@ var STOPS = [
         fov: footShown === 'doors' ? FOV_MAX : clamp(2 * Math.atan((footShown === 'torch' ? 0.42 : 0.37) / camera.aspect) * 180 / Math.PI, footShown === 'torch' ? 56 : 52, FOV_MAX) };   /* the group's width fits a phone held upright */
       /* on witch days he looks on down the stretch at her height, not up at a window (req 178) */
       if (footShown === 'witch') return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(witchX(WITCH.len), FOOT_Y + 1.3, MID_Z), fov: 56 };
-      return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; },
-    /* the landing is the corridor's width, so a full turn meets a blank side wall a metre off: on window days, whose side
-       walls stand unlit, his head turns only as far as the window holds; on doors, gallery and torch days as far as the
+      /* on its own days he looks on into the open bay at his own height, the lion window on his right (the end open, line 1) */
+      return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X - BAY.len, FOOT_Y + 1.5, MID_Z), fov: 56 }; },
+    /* the landing is the corridor's width, so a full turn meets a blank side wall a metre off: on the bay's days the full
+       turn, to the lion window on the landing's south wall and back up the flight; on doors, gallery and torch days as far as the
        side wall's torch; on witch days the full turn, down her stretch and back up the flight */
-    turn: function () { return footShown === 'window' ? 0.3 : footShown === 'witch' ? HEAD_TURN : 0.5; } },
+    turn: function () { return footShown === 'window' || footShown === 'witch' ? HEAD_TURN : 0.5; } },
   /* the one-eyed witch (req 178): from across her stretch, a hand off the far wall as at any stop, about 1.9 m from her,
      square to her, the plinth's foot on the flags and her head in view */
   { name: 'witch', meshes: [witchCard, witchPlinth], stop: function () {
@@ -2901,20 +2926,18 @@ function arriveFromBay() {
   kit.reveal();
 }
 /* and back down (req 286): at the landing's stop a tap on its far end goes down into the stair hall's bay, arriving
-   there (shell.html takes ?from=corridor). How the far end reads, the model's open mouth against the landing's window
-   and the stair's other places, waits on Godric; until then the end is drawn as before and only answers the tap.
-   Not on witch days, when the end gives way to her stretch */
+   there (shell.html takes ?from=corridor). Only on the days the end is open to the bay (Godric's 1, line 1); on the
+   moving stair's other days its place stands there instead */
 function downToBay() {
   if (leaving) return;
   leaving = true;
   /* the stair that swings away (Godric's t1 on corridor-landing-end-1013, 6.55 pm; "some that led somewhere different
-     on a Friday", PS 8): now and then, just as he reaches the end, the stair below grinds off from the bay and he
-     waits for it to come back before going down. Heard only while the end is drawn as before; ?stairAway=1 or 0
-     forces it */
+     on a Friday", PS 8): now and then, just as he reaches the opening, the stair beyond grinds off from the bay and he
+     waits for it to come back before going down; ?stairAway=1 or 0 forces it */
   var force = new URLSearchParams(location.search).get('stairAway');
   if (force === '1' || (force !== '0' && Math.random() < STAIR_AWAY_CHANCE)) {
     stairAway = 'away';
-    showLines([{ medium: 'heard', speaker: 'bay', sound: 'stone grinding below: the stair swings away from the landing' }]);
+    showLines([{ medium: 'heard', speaker: 'bay', sound: 'stone grinding beyond the bay: the stair swings away from it' }]);
     setTimeout(function () {
       stairAway = 'back';
       showLines([{ medium: 'heard', speaker: 'bay', sound: 'and grinds slowly back, with a soft thud' }]);
@@ -2937,7 +2960,7 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables.filter(function (m) {
-    return m.visible && (m !== wayDown || (atStop === landingStop && footShown !== 'witch'));
+    return m.visible && (m !== wayDown || (atStop === landingStop && footShown === 'window'));   /* only when the end is open */
   }), false);
   if (!hits.length) { said(mode === 'stop'); goBack(); return; }   /* at a stop, nothing takes him back */
   if (hits[0].object === wayDown) { said(true); downToBay(); return; }   /* down into the stair hall (req 286) */
@@ -3485,12 +3508,12 @@ function drawFoot(has) {
   if (named && !FOOT_DRAWN[named]) console.info('[corridor] the stair leads to the ' + named + ' today; held to the window until it is drawn');
   showFoot(named && FOOT_DRAWN[named] ? named : 'window');
 }
-/* what stands at the foot: the window, or on doors days the doors with their torches, the window's daylight lamp low */
+/* what stands at the foot: the open bay (the window on its side wall always), or on doors days the doors with their torches, the window's daylight lamp low */
 function showFoot(place) {
   var night = place === 'doorsNight';
   if (night) place = 'doors';
   footShown = place;
-  landingWindow.visible = place === 'window';
+  bayRoom.visible = place === 'window';   /* the stair at its own landing: the end open to the bay */
   frontDoors.visible = place === 'doors';
   stairGallery.visible = place === 'gallery';
   torchTurn.visible = place === 'torch';
@@ -3499,7 +3522,7 @@ function showFoot(place) {
   doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = place === 'doors' || place === 'gallery'; });
   var witch = place === 'witch';   /* her landing: the end wall gives way to the stretch (req 178) */
   witchLanding.visible = witchCard.visible = witchPlinth.visible = witch;
-  shell.stairEndWall.visible = !witch;
+  shell.stairEndWall.visible = !witch && place !== 'window';
   landingLight.intensity = place === 'window' ? 1.6 : 0.3;
 }
 /* the draught under the doors (Godric, 10 October 2026, 3.34 pm, his touch on Q10): on doors days, every 15 to 35 s a
