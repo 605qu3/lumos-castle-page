@@ -2026,7 +2026,8 @@ function updatePapers(dt, t) {
     var p = papers[i];
     if (p === held || p.spec.fixed || p.spec.sill || p.spec.onScarf || p.spec.onCloak || p.spec.inSatchel) continue;
     var a = p.spec.pins === 'two' ? 0.35 : 1;
-    p.pivot.rotation.x = -a * draught * (0.022 * (1 + Math.sin(t * 5.5 + p.phase)) + 0.008 * (1 + Math.sin(t * 9.1 + p.phase * 2)));
+    p.pivot.rotation.x = -a * draught * (0.022 * (1 + Math.sin(t * 5.5 + p.phase)) + 0.008 * (1 + Math.sin(t * 9.1 + p.phase * 2)))
+      - (p.gust || 0);                                  /* a gust at the edge of a turn (Q72 t1) lifts it further */
     if (p.spec.pins !== 'two') p.pivot.rotation.z = p.spec.rot + draught * 0.012 * Math.sin(t * 4 + p.phase);
   }
   var lightTarget = 0;
@@ -7465,6 +7466,140 @@ function updateHead(dt) {
   camera.position.copy(HEAD.pos);
   camera.lookAt(lookTmp);
 }
+
+/* the room answers at the edge of a turn (Godric's Q72 t1, 12 October 2026: "where a look-round turn stops, the room
+   answers with a small thing at the edge of the view, so the stop feels like the room's choice, not a wall"). Only the
+   three trimmed sides answer, each with its own small thing: from the desk turned left, the cat leaving past the front
+   of the sofa, only its hindquarters and tail still in view; from the board turned right, toward the stair's dark
+   corner, a notice on the board lifting in the draught from the stair, his own "a page turning on the board" (a cat
+   leaving round the stair's foot was tried first, but from the board the eye is 1.95 m up and level and no floor shows
+   there, so it had nowhere to be seen); from the sofa turned right, a notice on the board lifting its lower edge in a draught from the stair
+   and settling. The cat is placed from the eye when it answers, not at a fixed spot, so on any screen its rear is just
+   inside the edge: a floor point straight ahead at its range, carried across to the screen's edge, the card square to
+   the view so it walks in its own plane, the room cat's drawing and size, at half its pace, unhurried, so the rear takes
+   most of the 1.2 s to leave (at the full pace it was gone in 0.4 s, too quick to see); frames by distance, so the feet
+   do not slide. It answers when the turn reaches the limit, once until he turns 0.15 back, at most once in 10 s, never
+   in a walk or a spell; the cat only when the room's own cat is not in view (one cat in the room). It takes no taps. */
+var EDGE_ANSWERS = {
+  'desk:left': { cat: -1, range: 1.6 },        /* the sofa goes flat at the left edge: the cat leaves past its front */
+  'sofa:right': { gust: 0.5 },                 /* the stair goes to a sliver: a notice on the board lifts and settles */
+  'board:right': { gust: 0.5 }                 /* the stair's dark corner: its draught lifts a notice on the board */
+};
+var EDGE = { last: null, at: null, count: 0, armed: {}, skipped: null, mode: null,
+  cat: null, catOn: false, catT: 0, catDist: 0, catDir: new THREE.Vector3(), catFrame: -1, where: null,
+  paper: null, gustT: 0, gustMax: 0 };
+var EDGE_CAT_S = 1.2, EDGE_CAT_PACE = 0.5, EDGE_CAT_IN = 0.04, EDGE_GUST_S = 1.4, EDGE_AGAIN_S = 10;
+var _edgeV = new THREE.Vector3(), _edgeF = new THREE.Vector3(), _edgeR = new THREE.Vector3(), _edgeRay = new THREE.Raycaster(),
+  _edgeN = new THREE.Vector2(), _edgeFloor = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), _edgeHit = new THREE.Vector3();
+function edgeOnScreen(o) {                       /* a thing's centre in front of the eye and inside the screen */
+  o.getWorldPosition(_edgeV).project(camera);
+  return _edgeV.z < 1 && Math.abs(_edgeV.x) <= 1 && Math.abs(_edgeV.y) <= 1;
+}
+function roomCatInView() {
+  if (curl.on) return !!(curl.mesh && curl.mesh.visible && edgeOnScreen(curl.mesh));
+  if (!catGroup.visible) return false;
+  return (catWalk.visible && edgeOnScreen(catWalk)) || (catSit.visible && edgeOnScreen(catSit));
+}
+function edgeCatMesh() {                        /* its own texture of the room cat's sheet, so its frames are its own */
+  if (EDGE.cat || !catSheet) return EDGE.cat;
+  var e = catSheet.entry, w = e.cellW / e.pxPerM, h = e.cellH / e.pxPerM;
+  var m = cutoutMesh(sheetTexture(catSheet.tw.image, e), w, h);
+  m.position.y = h / 2; m.visible = false; m.name = 'cat-leaving';
+  m.raycast = function () {};
+  scene.add(m); register(m, 5);
+  EDGE.cat = m;
+  return m;
+}
+function edgeCatStart(a) {                      /* where the cat starts: its rear just inside the screen's edge */
+  var m = edgeCatMesh();
+  if (!m) return 'no drawing yet';
+  camera.getWorldDirection(_edgeF); _edgeF.y = 0; _edgeF.normalize();
+  _edgeR.set(-_edgeF.z, 0, _edgeF.x);                       /* the eye's right along the floor */
+  _edgeV.copy(camera.position).addScaledVector(_edgeF, a.range).setY(0).project(camera);
+  _edgeN.set(a.cat, _edgeV.y);
+  _edgeRay.setFromCamera(_edgeN, camera);
+  if (!_edgeRay.ray.intersectPlane(_edgeFloor, _edgeHit)) return 'the floor is not in view';
+  /* the centre 0.04 m beyond the edge: of the 0.57 m drawing the rear 0.25 m shows, the hindquarters and the tail */
+  m.position.set(_edgeHit.x + _edgeR.x * a.cat * EDGE_CAT_IN, m.position.y, _edgeHit.z + _edgeR.z * a.cat * EDGE_CAT_IN);
+  m.rotation.y = Math.atan2(-_edgeF.x, -_edgeF.z);           /* square to the view, so it walks in its own plane */
+  m.scale.x = a.cat;                                          /* drawn facing right; leaving left, mirrored */
+  _edgeV.set(m.position.x, 2 * m.position.y * 0.62, m.position.z).project(camera);   /* its back, about 0.35 m up */
+  if (_edgeV.y < -1 || _edgeV.z > 1) return 'the floor is not in view';
+  if (Math.hypot(m.position.x, m.position.z) > 5.6 - 0.35) return 'outside the room';
+  EDGE.catDir.copy(_edgeR).multiplyScalar(a.cat);
+  EDGE.where = [+m.position.x.toFixed(2), +m.position.z.toFixed(2)];
+  return null;
+}
+function edgePaper() {                          /* of the board's notices in view, the one nearest the top or right edge */
+  var best = null, bestS = 9;
+  for (var i = 0; i < papers.length; i++) {
+    var p = papers[i], s = p.spec;
+    if (p === held || p.hidden || !p.mesh.visible || p.pivot.parent !== boardGroup || s.fixed || s.sill || s.onScarf || s.onCloak || s.inSatchel) continue;
+    if (s.pins !== 'one' || s.w < 0.1) continue;              /* a two-pinned sheet would tear; the corner scrap is too small */
+    var whole = true;                           /* the whole sheet in view, so its lift is seen */
+    for (var c = 0; c < 4 && whole; c++) {
+      _edgeV.set((c & 1 ? 0.5 : -0.5) * s.w, c & 2 ? PIN_INSET : PIN_INSET - s.h, 0);
+      p.pivot.localToWorld(_edgeV).project(camera);
+      whole = _edgeV.z < 1 && Math.abs(_edgeV.x) <= 0.98 && Math.abs(_edgeV.y) <= 0.98;
+    }
+    if (!whole) continue;
+    _edgeV.set(0, -(s.h / 2 - PIN_INSET), 0);
+    p.pivot.localToWorld(_edgeV).project(camera);
+    var sc = Math.min(1 - _edgeV.x, 1 - _edgeV.y);
+    if (sc < bestS) { bestS = sc; best = p; }
+  }
+  return best;
+}
+function edgeFire(key) {
+  var a = EDGE_ANSWERS[key];
+  if (!a) return 'no answer for ' + key;
+  var why = null;
+  if (a.cat) {
+    if (roomCatInView()) why = 'the room cat is in view';
+    else why = edgeCatStart(a);
+    if (!why) { EDGE.catOn = true; EDGE.catT = 0; EDGE.catDist = 0; EDGE.catFrame = -1; EDGE.cat.visible = true; }
+  } else {
+    var p = edgePaper();
+    if (!p) why = 'no notice in view';
+    else { if (EDGE.paper && EDGE.paper !== p) EDGE.paper.gust = 0; EDGE.paper = p; EDGE.gustT = 0; EDGE.gustMax = a.gust; EDGE.where = p.spec.id; }
+  }
+  if (why) { EDGE.skipped = { key: key, why: why, at: t }; return why; }
+  EDGE.last = key; EDGE.at = t; EDGE.count++; EDGE.mode = mode;
+  return null;
+}
+function updateEdgeAnswers(dt) {
+  if (EDGE.catOn) {
+    EDGE.catT += dt;
+    if (EDGE.catT >= EDGE_CAT_S || mode !== EDGE.mode) { EDGE.catOn = false; EDGE.cat.visible = false; }
+    else {
+      var e = catSheet.entry, step = cat.speed * catPathLength * EDGE_CAT_PACE * dt;   /* half the room cat's pace */
+      EDGE.catDist += step;
+      EDGE.cat.position.addScaledVector(EDGE.catDir, step);
+      var fr = Math.floor(EDGE.catDist / e.stride * e.walk.length) % e.walk.length;
+      if (fr !== EDGE.catFrame) { EDGE.catFrame = fr; EDGE.cat.material.map.offset.x = e.walk[fr] / e.cols; }
+    }
+  }
+  if (EDGE.paper) {
+    EDGE.gustT += dt;
+    var u = EDGE.gustT, g;
+    if (u >= EDGE_GUST_S || mode !== EDGE.mode) g = 0;
+    else if (u < 0.4) g = easeInOut(u / 0.4);                             /* up in 0.4 s */
+    else { var k = (u - 0.4) / (EDGE_GUST_S - 0.4); g = (1 - easeInOut(k)) * (1 + 0.15 * Math.sin(k * 3 * Math.PI)); }   /* down with a flutter */
+    EDGE.paper.gust = EDGE.gustMax * g;
+    if (!g) EDGE.paper = null;
+  }
+  if (!headTurns()) return;
+  for (var sd = 0; sd < 2; sd++) {
+    var key = HEAD.mode + (sd ? ':right' : ':left');
+    if (!EDGE_ANSWERS[key]) continue;
+    var lim = sd ? HEAD.right : HEAD.left, y = sd ? HEAD.yaw : -HEAD.yaw;
+    if (y < lim - 0.15) EDGE.armed[key] = true;
+    else if (EDGE.armed[key] !== false && y >= lim - 0.01) {
+      EDGE.armed[key] = false;                                            /* reaching the limit spends it, answered or not */
+      if (EDGE.at === null || t - EDGE.at >= EDGE_AGAIN_S) edgeFire(key);
+    }
+  }
+}
 function updateCamera(dt) {
   if (tween) {
     tween.t += dt;
@@ -7971,6 +8106,7 @@ function frame() {
   updateSign(dt);
   updateHomeLetter(dt);
   updateHowler(dt);
+  updateEdgeAnswers(dt);
   updateStairGlow(dt, t);
   updateBooks(dt);
   updateCandle(sdt);
@@ -8056,7 +8192,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, edges: function () { return { last: EDGE.last, at: EDGE.at, count: EDGE.count, cat: EDGE.catOn, gust: EDGE.paper ? +(EDGE.paper.gust || 0).toFixed(3) : 0, skipped: EDGE.skipped, where: EDGE.where, now: t }; }, edgeFire: function (key) { return edgeFire(key); }, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 window.lumosGreybox.howlerBurst = { state: howlerReport, at: howlerAt, ash: howlerAshAt, note: function () { var p = howlerNote.position.clone().project(camera); return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)]; } };   /* req 199's checks */
 })();
 </script>
