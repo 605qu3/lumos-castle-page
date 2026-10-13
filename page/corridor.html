@@ -2371,6 +2371,58 @@ her.userData.thing = 'her';   /* at her stop the runtime's `tap her` wakes her f
 sticks.userData.thing = 'sticks'; tappables.push(sticks);
 treads.forEach(function (m) { m.userData.thing = 'stair'; });   /* the flight: the runtime's `tap stair` takes him down */
 
+/* the Marauder's Map's grant (req 188, the page half of Events' req 180; page/events/map.json), in grey: once six of
+   the castle's seven secrets are found, from his next corridor visit the twins' old parchment and their note wait
+   behind her plinth, where Harry crouched (PoA 10, 14), on the flags at its back corner toward the stair, one end
+   showing past its side. The rule shows it at her stop only (`at = witch`), so it is drawn when he stands there and
+   put away when he leaves; a tap on it (`map`) takes both, and they rise to his hand and are gone, the note read in
+   the twins' hand. The drawing waits on a spend. Her hump's moment for Charms' callable (req 163) is witchHump */
+var MAP_CUE = { waiting: "behind the witch's plinth, where Harry crouched, a folded old parchment and a note in the twins' hand",
+  take: "he takes the folded parchment and the twins' note from behind the witch, and they are his" };
+var witchMap = new THREE.Group(), mapHit, mapMats = [], mapTake = null, mapShown = false, mapStop;
+witchMap.name = 'witch-map'; witchMap.visible = false; witchLanding.add(witchMap);
+(function () {
+  var M = witchMap, half = WITCH.plinth.w / 2;
+  M.position.set(witchX(WITCH.at) + half + 0.17, FOOT_Y, WITCH.z + half + 0.1); M.rotation.y = 0.35;
+  mapMats = [solid(0xc9c3b8, { transparent: true }), solid(0xe4e0d8, { transparent: true })];
+  box(M, 0.26, 0.025, 0.19, 0, 0.0125, 0, mapMats[0], 1).name = 'map-parchment';   /* folded small, as the twins gave it */
+  box(M, 0.11, 0.008, 0.075, 0.05, 0.029, -0.02, mapMats[1], 1).name = 'map-note';
+  mapMats.push(softShadow(0.34, 0.26, 0, 0, 0, M).material);   /* it meets the flags */
+  /* the tap reaches a little past it, out from her side, for a small finger */
+  mapHit = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.35, 0.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+  mapHit.position.set(0.1, 0.17, 0); mapHit.visible = false; mapHit.userData.thing = 'map';
+  M.add(mapHit); tappables.push(mapHit);
+})();
+function drawMap(has) {
+  mapShown = has(MAP_CUE.waiting);
+  witchMap.visible = mapShown || !!mapTake;
+  mapHit.visible = mapShown && !mapTake;
+}
+function takeMap() {
+  if (!witchMap.visible) return;
+  mapTake = { t: 0, from: witchMap.position.clone() }; mapHit.visible = false;
+}
+/* the rule reads where he stands, which the runtime is not told of, so the page asks again whenever his stop changes */
+function updateMap(dt) {
+  var s = atStop && atStop.name;
+  if (s !== mapStop) { mapStop = s; if (castle) drawMap(function (c) { return castle.cues().indexOf(c) >= 0; }); }
+  if (!mapTake) return;
+  var k = Math.min(1, (mapTake.t += dt) / 0.9), to = witchLanding.worldToLocal(camera.position.clone().add(new THREE.Vector3(0, -0.45, 0)));
+  witchMap.position.lerpVectors(mapTake.from, to, k * k * 0.6);
+  mapMats.forEach(function (m) { m.opacity = 1 - k * k; });
+  if (k < 1) return;
+  witchMap.position.copy(mapTake.from); mapMats.forEach(function (m) { m.opacity = 1; });
+  mapTake = null; witchMap.visible = mapShown; mapHit.visible = mapShown;
+}
+/* her hump opens (Charms' callable, req 163, calls this): the runtime is told once a visit, and counts it once ever as a
+   secret (map.json's map.witch-hump) */
+var humpTold = false;
+function witchHump() {
+  if (humpTold || !castle) return false;
+  humpTold = true; castle.moment('opened witch hump');
+  return true;
+}
+
 var mode = 'rest', atStop = null, tween = null, footShown = 'window';
 /* looking round at a stop (req 208; David, Q3, 12 October 2026, 7.56 pm: "I definitely want to be able to look around
    when I arrive at a spot"): the drag turns his head from where he stands, about 60 degrees each way, or a stop's own
@@ -2678,6 +2730,7 @@ function corridorDrawRoom(shown) {
   boo.visible = has(CUE.boo) && !sticksQueue.length;
   drawTrevor(has, back);
   drawFoot(has);
+  drawMap(has);
   /* the tapestry's woven sheep (req 129, Events' sheep.json, req 110): where they stand this visit, or one missing,
      strayed into the griffin's hanging inside; the cells are req 108's, once the tapestry is drawn, so until then the
      tapestry's stand-in holds and this is a console note. Marks: first (as drawn), second, third */
@@ -3166,6 +3219,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     },
     /* the bedtime (board req 37): out here the Fat Lady sends him in, and he goes on up to bed */
     'the Fat Lady yawns behind her hand and settles her shawl': note('the Fat Lady yawns and settles her shawl'),
+    /* the Marauder's Map's grant (req 188): the parchment and the note rise to his hand; the note is read after */
+    "he takes the folded parchment and the twins' note from behind the witch, and they are his": function () { takeMap(); },
     'the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)': function () {
       if (!enter(false, 'dormitory.html?from=corridor&bedtime', 'dormitory')) kit.travel('dormitory.html?from=corridor&bedtime', { place: { room: 'dormitory' } });
     }
@@ -3245,6 +3300,7 @@ function frame() {
   updateLookBack(dt);
   updateTurnRise(wdt);
   updateDoorsKnock(wdt);
+  updateMap(dt);
   if (witchLanding.visible) witchCard.rotation.y = Math.atan2(camera.position.x - witchCard.position.x, camera.position.z - witchCard.position.z);
   updateHerDoze(wdt);
   updateHerPatches(wdt);
@@ -3294,6 +3350,8 @@ window.lumosGreybox = { sheep: function () { return tapestrySheep; }, leanTorch:
   witch: function () { var s = STOPS.filter(function (x) { return x.name === 'witch'; })[0];
     return { card: witchCard, plinth: witchPlinth, landing: witchLanding, stop: s.stop(), shown: footShown === 'witch',
       plinthBack: new THREE.Vector3(witchX(WITCH.at), FOOT_Y + WITCH.plinth.h, WITCH.z + WITCH.plinth.w / 2) }; },
+  /* req 188: her hump's moment for Charms' callable (req 163), and the twins' parchment behind her */
+  witchHump: witchHump, map: function () { return { shown: mapShown, taking: !!mapTake, group: witchMap, hit: mapHit }; },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
