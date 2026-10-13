@@ -725,7 +725,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=22"></script>
+<script src="castle-events.js?v=25"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=27"></script>
 <script>
@@ -8093,6 +8093,37 @@ function figureTapped(hits) {
   return null;
 }
 
+/* ---------- the owl's post (board req 239, Events' req 216; page/events/points.json, points.owl and points.errol) ----------
+   With the two iPads paired, the moment `owl post` brings his brother's slips: the runtime gives the owl's cue first and
+   then tells opts.point each slip at once, so a slip with `from` waits here till the owl has landed and its gems leave
+   from the right window's sill then; his own go on at once. The landing beats are the cues' own: the swoop, by night
+   the three taps on the glass first, Errol's crash and slump (CoS 6). The owl and Errol are not drawn yet (req 99's
+   family, a drawing on Godric's yes), so, as with Trevor, what they bring is kept and they themselves are not drawn;
+   every slip goes to hourglassPoint, which the house hourglass takes over when it stands in the room (req 238), and a
+   slip taken back to hourglassBack (req 237). Until then both only keep what came, in order. */
+var OWL_POST = { land: 0, queue: [], held: [], backs: [], LAND: { day: 1.6, night: 3.2, errol: 2.4 } };
+function owlLands(beat) {
+  var s = OWL_POST.LAND[beat];
+  OWL_POST.land = performance.now() + s * 1000;
+  setTimeout(owlRelease, s * 1000);
+}
+function owlRelease() {
+  var q = OWL_POST.queue;
+  OWL_POST.queue = [];
+  for (var i = 0; i < q.length; i++) hourglassPoint(q[i], 'sill');
+}
+function roomPoint(slip) {
+  if (slip.from && performance.now() < OWL_POST.land) OWL_POST.queue.push(slip);
+  else hourglassPoint(slip, slip.from ? 'sill' : 'here');
+}
+function hourglassPoint(slip, from) { OWL_POST.held.push({ slip: slip, from: from }); }
+function hourglassBack(slip) { OWL_POST.backs.push(slip); }
+var OWL_POST_CUES = {
+  "an owl swoops down to the sill with a little pouch tied to its leg, and his brother's gems tumble out of it and fly across the room into the hourglass, each in its own house's colours": function () { owlLands('day'); },
+  "an owl lands on the moonlit sill, taps its beak on the glass three times, tap-tap-tap, and his brother's gems tumble out of the little pouch tied to its leg and fly across the room into the hourglass, each in its own house's colours": function () { owlLands('night'); },
+  "Errol, the Weasleys' ancient owl, crash-lands on the sill and slumps over, legs in the air, and his brother's gems tumble out of the little pouch tied to his leg and fly across the room into the hourglass, each in its own house's colours; after a while Errol picks himself up and flaps off": function () { owlLands('errol'); }
+};
+
 /* the events runtime (castle-events.js): this room's cues and the built-ins only it can answer */
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
@@ -8106,7 +8137,9 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire,
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': snowballFly,
     "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); }
-  }, VISITOR_CUES, NICK_CUES, HOWLER_CUES),
+  }, VISITOR_CUES, NICK_CUES, HOWLER_CUES, OWL_POST_CUES),
+  point: roomPoint,                                    /* a slip as it lands (req 222, 239); owl post first */
+  back: hourglassBack,                                 /* a slip taken back (req 237) */
   drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); locksDrawRoom(shows); findDrawRoom(shows); howlerDrawRoom(shows); denState.boardCard = shows.indexOf(CARD_PINNED) >= 0; },
   figures: FIGURES,
   drawFigures: drawFiguresInOrder,
