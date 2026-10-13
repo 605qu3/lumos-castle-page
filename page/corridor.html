@@ -2341,7 +2341,11 @@ var STOPS = [
         fov: footShown === 'doors' ? FOV_MAX : clamp(2 * Math.atan((footShown === 'torch' ? 0.42 : 0.37) / camera.aspect) * 180 / Math.PI, footShown === 'torch' ? 56 : 52, FOV_MAX) };   /* the group's width fits a phone held upright */
       /* on witch days he looks on down the stretch at her height, not up at a window (req 178) */
       if (footShown === 'witch') return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(witchX(WITCH.len), FOOT_Y + 1.3, MID_Z), fov: 56 };
-      return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; } },
+      return { pos: new THREE.Vector3(FOOT_X - 0.1, FOOT_Y + EYE, MID_Z), look: new THREE.Vector3(FAR_END_X, FOOT_Y + 2.9, MID_Z), fov: FOV_MAX }; },
+    /* the landing is the corridor's width, so a full turn meets a blank side wall a metre off: on window days, whose side
+       walls stand unlit, his head turns only as far as the window holds; on doors, gallery and torch days as far as the
+       side wall's torch; on witch days the full turn, down her stretch and back up the flight */
+    turn: function () { return footShown === 'window' ? 0.3 : footShown === 'witch' ? HEAD_TURN : 0.5; } },
   /* the one-eyed witch (req 178): from across her stretch, a hand off the far wall as at any stop, about 1.9 m from her,
      square to her, the plinth's foot on the flags and her head in view */
   { name: 'witch', meshes: [witchCard, witchPlinth], stop: function () {
@@ -2353,7 +2357,7 @@ var STOPS = [
   { name: 'settle-scarf', meshes: [settleScarf], stop: function () {
       var t = worldOf(scarfTape);
       return { pos: new THREE.Vector3(NOOK_X0 - SETTLE.d - 0.12, 1.0, t.z), look: t, fov: 30 }; },
-    arrive: function () { scarfTape.visible = true; } }
+    arrive: function () { scarfTape.visible = true; }, turn: 0.35 }   /* bent over the seat, a small turn only */
 ];
 var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
@@ -2366,6 +2370,16 @@ sticks.userData.thing = 'sticks'; tappables.push(sticks);
 treads.forEach(function (m) { m.userData.thing = 'stair'; });   /* the flight: the runtime's `tap stair` takes him down */
 
 var mode = 'rest', atStop = null, tween = null, footShown = 'window';
+/* looking round at a stop (req 208; David, Q3, 12 October 2026, 7.56 pm: "I definitely want to be able to look around
+   when I arrive at a spot"): the drag turns his head from where he stands, about 60 degrees each way, or a stop's own
+   `turn` where it needs less; the turn is about stopPose, where the glide set him down, never re-asked of the stop */
+var HEAD_TURN = 1.05, headYaw = 0, headYawT = 0, headPitch = 0, headPitchT = 0, stopPose = null;
+var UP = new THREE.Vector3(0, 1, 0), headDir = new THREE.Vector3();
+function headLimit() {
+  var t = atStop && atStop.turn;
+  return typeof t === 'function' ? t() : t !== undefined && t !== null ? t : HEAD_TURN;
+}
+function headReset() { headYaw = headYawT = headPitch = headPitchT = 0; }
 var backBtn = document.getElementById('back');
 /* The turn round to the moving stair (req 22; Godric, 9 October 2026): past the corridor's limit a drag keeps turning,
    either way round, until he looks straight down the flight at yaw pi; as he comes round the view tilts down and opens to
@@ -2409,6 +2423,7 @@ function bezier(out, a, b, c, d, k) {
 function reframe() {
   if (mode !== 'stop' || !atStop || tween) return;
   var to = atStop.stop(), from = { pos: camera.position.clone(), look: lookTmp.clone(), fov: camera.fov };
+  headReset();
   if (from.pos.distanceTo(to.pos) > 0.05) { glideTo(to); return; }
   tween = { t: 0, dur: 0.8, from: from, to: to, c1: from.pos.clone(), c2: to.pos.clone() };
 }
@@ -2417,6 +2432,7 @@ function goTo(s) {
   lockDrop();
   atStop = s; mode = 'stop';
   backBtn.hidden = false;
+  headReset();   /* the glide starts from where his head is turned and sets him down square to the new stop */
   glideTo(s.stop(), s.arrive);
   if (s.name === 'her' && tween.from.pos.distanceTo(tween.to.pos) > 2.5) primpHer(tween.dur);   /* her primp, only as he walks up */
   if (castle && castle.moment) castle.moment('walk up');   /* he sets off toward a stop: a torch may lean (req 140) */
@@ -2425,10 +2441,11 @@ function goBack() {
   lockDrop();
   if (mode !== 'stop') return;
   /* from her, back to the landing she stands beyond, not up the flight through the walls */
-  if (atStop && atStop.name === 'witch') { atStop = landingStop; glideTo(landingStop.stop()); return; }
+  if (atStop && atStop.name === 'witch') { headReset(); atStop = landingStop; glideTo(landingStop.stop()); return; }
   /* up from the landing (req 59) he turns round as he climbs, the drag's turn in reverse, rather than the look
-     passing through him */
-  var turn = atStop && atStop.name === 'landing' ? (Math.abs(yaw) > 1.5 ? yaw : Math.PI) : 0;
+     passing through him; from wherever his head is turned there (req 208) */
+  var turn = atStop && atStop.name === 'landing' ? (Math.abs(yaw) > 1.5 ? yaw : Math.PI) + headYaw : 0;
+  headReset();
   /* stepping back from the landing is a moment of its own (req 82: the gallery's whisper resumes behind him), raised
      while `at` still reads the landing */
   if (turn && castle && castle.moment) castle.moment('back from walk-up');
@@ -2473,6 +2490,7 @@ function arriveFromRoom() {
   var herStop = STOPS[0], p = herStop.stop();
   atStop = herStop; mode = 'stop'; backBtn.hidden = false;
   camera.position.copy(p.pos); lookTmp.copy(p.look); setFov(p.fov);
+  stopPose = { pos: p.pos.clone(), look: p.look.clone() }; headReset();
   herDoor.ang = DOOR_OPEN; herDoor.target = DOOR_OPEN;
   setTimeout(function () { herDoor.target = 0; }, 700);
   kit.savePlace({ room: 'corridor', stop: 'her' });
@@ -2545,17 +2563,30 @@ function updateCamera(dt) {
     camera.position.y = lerp(tween.from.pos.y, tween.to.pos.y, k);
     lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
     if (tween.turn) {
-      var ty = lerp(tween.turn, 0, k);
-      lookTmp.set(camera.position.x + Math.cos(ty) * 10, lerp(tween.from.look.y, tween.to.look.y, k), camera.position.z + Math.sin(ty) * 10);
+      /* the tilt carried as a slope, so a look up at the landing's window 2 m off does not jump flat at the turn's start */
+      var ty = lerp(tween.turn, 0, k), slope = function (p) { return (p.look.y - p.pos.y) / Math.max(0.1, Math.hypot(p.look.x - p.pos.x, p.look.z - p.pos.z)); };
+      lookTmp.set(camera.position.x + Math.cos(ty) * 10, camera.position.y + lerp(slope(tween.from), slope(tween.to), k) * 10, camera.position.z + Math.sin(ty) * 10);
     }
     setFov(lerp(tween.from.fov, tween.to.fov, k));
     if (tween.dip) stairDip(tween, k);
-    if (tween.t >= tween.dur) { var d = tween.done; tween = null; if (d) d(); }
+    if (tween.t >= tween.dur) {
+      if (mode === 'stop') { stopPose = { pos: tween.to.pos.clone(), look: tween.to.look.clone() }; headReset(); }
+      var d = tween.done; tween = null; if (d) d();
+    }
   } else if (mode === 'rest') {
     yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
     restPose(poseNow);
     camera.position.copy(poseNow.pos); lookTmp.copy(poseNow.look);
     setFov(poseNow.fov);
+  } else if (mode === 'stop' && stopPose && (headYaw || headYawT || headPitch || headPitchT)) {
+    /* his head turned at a stop (req 208): the look about where he stands, a right drag turning him right as at rest
+       (restPose's yaw runs the same way, so the turn is about -y) */
+    headYaw = lerp(headYaw, headYawT, s); headPitch = lerp(headPitch, headPitchT, s);
+    headDir.subVectors(stopPose.look, stopPose.pos);
+    var D = Math.hypot(headDir.x, headDir.z);
+    headDir.applyAxisAngle(UP, -headYaw);
+    headDir.y += headPitch * D;
+    lookTmp.copy(stopPose.pos).add(headDir);
   }
   camera.lookAt(lookTmp);
   /* a standing piece seen down the length would be drawn from the eye and stood as a card turned to it, as the
@@ -2588,6 +2619,11 @@ canvas.addEventListener('pointermove', function (e) {
     var L = VIEWS.length, step = dx * 0.003 * (Math.abs(yawT) > L.yawMax ? L.turnGain : 1);
     yawT = clamp(yawT + step, -Math.PI - L.turnBand, Math.PI + L.turnBand);
     pitchT = clamp(pitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
+  } else if (mode === 'stop' && !tween && stopPose && !leaving && !herOpening) {
+    /* at a stop the same drag turns his head from where he stands (req 208), the same way and feel as at rest */
+    var lim = headLimit();
+    headYawT = clamp(headYawT + dx * 0.003, -lim, lim);
+    headPitchT = clamp(headPitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
   }
 });
 function endDrag(e) {
@@ -3248,6 +3284,7 @@ renderer.setAnimationLoop(frame);
 window.lumosGreybox = { sheep: function () { return tapestrySheep; }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
+  head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; },
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
