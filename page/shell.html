@@ -141,8 +141,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
 <script src="castle-model.js?v=13"></script>
-<script src="castle-shell.js?v=3"></script>
-<script src="castle-events.js?v=29"></script>
+<script src="castle-shell.js?v=4"></script>
+<script src="castle-events.js?v=31"></script>
 <script>
 (function () {
 'use strict';
@@ -249,20 +249,175 @@ function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(trail.
 
 /* a shut door answers: it shakes on its latch, and the hooks hear of it (the events' lines, t1's polite doors) */
 var shakes = [];
-function answer(d) {
-  shakes.push({ m: d.mesh, t: 0, base: d.mesh.position.clone(), dir: d.inward.clone() });
+function answer(d, point) {
   lineDoor = d;
-  if (events) events.tap(d.id);
+  lastTickle = point ? tickleAt(d, point) : null;
+  turnDone = null;
+  if (events) events.tap(d.id);   /* a turn's cue fires inside the tap (Events, 6.17 pm), so the shake is decided after */
+  if (turnDone === 'giggle') shake(d, 0.85, 45, 0.012 + 0.03 * (lastTickle ? lastTickle.near : 0.5));
+  else if (!turnDone) shake(d, 0.45, 70, 0.025);
   if (hooks.onDoorTap) hooks.onDoorTap({ id: d.id, to: d.to, place: d.place });
+}
+function shake(d, s, f, a) {
+  shakes = shakes.filter(function (x) { return x.m !== d.mesh; });
+  shakes.push({ m: d.mesh, t: 0, s: s, f: f, a: a, base: d.rest.pos, dir: d.inward.clone() });
 }
 function updateShakes(dt) {
   shakes = shakes.filter(function (s) {
     s.t += dt;
-    var k = s.t < 0.45 ? Math.sin(s.t * 70) * 0.025 * (1 - s.t / 0.45) : 0;
+    var k = s.t < s.s ? Math.sin(s.t * s.f) * s.a * (1 - s.t / s.s) : 0;
     s.m.position.copy(s.base).addScaledVector(s.dir, k);
-    return s.t < 0.45;
+    return s.t < s.s;
   });
 }
+
+/* the doors' turns by the week (Magic's B19, Godric's 1 with t1, 5.21 pm; board req 284, the page half of Events'
+   req 283). From password Monday one shut door some weeks is the polite one, the ticklish one or a wall pretending
+   (Events' word `doors` and its records in events/doors.json, which say which door and when); the page draws what
+   each record shows. Polite: please, or a second knock with speech off, swings the leaf open a hand's width on its
+   hinge, warm light spilling through the gap across the grey floor, then it shuts. Ticklish: a few knots in its wood,
+   one of them the right one this week (from the week alone, so both boys' doors agree); a tap on it laughs the door
+   open a hand's width, off it the wood shivers and giggles, harder the nearer. A wall: the tap thuds with no shake, and
+   for a breath the planks fade to the grey stone they really are. ?doors=polite (ticklish, wall, none) sets the week
+   for checks. */
+var HAND = 0.11, KNOT_R = 0.07, TICKLE_R = 0.13, KNOTS = 4, WALL_GREY = kit.col(0x75726e), Y_AXIS = new THREE.Vector3(0, 1, 0);
+var TURN = /^(polite|ticklish|wall|none)$/.test(Q.get('doors') || '') ? Q.get('doors') : null;
+var lastTickle = null, turnDone = null, swings = [], fades = [], turnDoors = { ticklish: [] }, knotsDrawn = false;
+function turnNow() { if (TURN) return TURN; var w = events && events.words('doors'); return w ? w.now : 'none'; }
+shell.doors.forEach(function (d) {
+  var m = d.mesh, along = new THREE.Vector3(1, 0, 0).applyAxisAngle(Y_AXIS, m.rotation.y), W = d.w - 0.08;
+  var th = Math.asin(Math.min(0.5, HAND / W)), s = along.clone().applyAxisAngle(Y_AXIS, th).dot(d.inward) < 0 ? 1 : -1;
+  d.rest = { pos: m.position.clone(), rot: m.rotation.y };
+  d.hinge = { at: m.position.clone().addScaledVector(along, -W / 2), along: along, half: W / 2, th: th * s };
+  d.face = new THREE.Vector3().copy(d.inward).applyAxisAngle(Y_AXIS, -m.rotation.y).z > 0 ? 1 : -1;   /* the leaf's side toward him */
+});
+/* the warm light beyond: one glow behind each shut leaf and a spill on the floor before it, shown only while it stands
+   open; one shared light, set at its door when it swings, so the scene's lights never change in number */
+var glowTex = (function () {
+  var c = document.createElement('canvas'); c.width = 64; c.height = 128;
+  var g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 128);
+  gr.addColorStop(0, 'rgba(255,170,80,0.8)'); gr.addColorStop(1, 'rgba(255,150,60,0)');
+  g.fillStyle = gr; g.beginPath(); g.moveTo(26, 0); g.lineTo(38, 0); g.lineTo(64, 128); g.lineTo(0, 128); g.closePath(); g.fill();
+  return new THREE.CanvasTexture(c);
+})();
+var crackTex = (function () {   /* bright at the jamb, gone a few centimetres onto the leaf */
+  var c = document.createElement('canvas'); c.width = 32; c.height = 4;
+  var g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 32, 0);
+  gr.addColorStop(0, 'rgba(255,160,70,0)'); gr.addColorStop(0.75, 'rgba(255,175,90,0.75)'); gr.addColorStop(1, 'rgba(255,200,130,1)');
+  g.fillStyle = gr; g.fillRect(0, 0, 32, 4);
+  return new THREE.CanvasTexture(c);
+})();
+var spillLight = new THREE.PointLight(0xffb56a, 0, 7, 1.6); scene.add(spillLight);
+var turnFx = new THREE.Group(); scene.add(turnFx);
+shell.doors.forEach(function (d) {
+  var back = new THREE.Mesh(new THREE.PlaneGeometry(d.w, d.h), new THREE.MeshBasicMaterial({ color: 0xffc27a, transparent: true, opacity: 0, side: THREE.DoubleSide }));
+  back.position.copy(d.rest.pos).addScaledVector(d.inward, -0.35); back.rotation.y = d.rest.rot + (d.face > 0 ? 0 : Math.PI);
+  var spill = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 2.6), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, opacity: 0,
+    depthWrite: false, blending: THREE.AdditiveBlending }));
+  var free = d.hinge.at.clone().addScaledVector(d.hinge.along, d.hinge.half * 2);
+  spill.position.copy(free).addScaledVector(d.inward, 1.3); spill.position.y = d.mid.y + d.sill + 0.015;
+  spill.rotation.set(-Math.PI / 2, Math.atan2(d.inward.x, d.inward.z), 0, 'YXZ');   /* its narrow end at the gap */
+  /* the crack: light along the leaf's free edge as it stands back from its jamb, drawn where the edge stood shut */
+  var crack = new THREE.Mesh(new THREE.PlaneGeometry(0.07, d.h - 0.06), new THREE.MeshBasicMaterial({ map: crackTex, transparent: true,
+    opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide }));
+  crack.position.copy(free).addScaledVector(d.hinge.along, -0.03).addScaledVector(d.inward, 0.065); crack.position.y = d.rest.pos.y;
+  crack.rotation.y = d.rest.rot;
+  back.visible = spill.visible = crack.visible = false; turnFx.add(back); turnFx.add(spill); turnFx.add(crack);
+  d.glow = { back: back, spill: spill, crack: crack, free: free };
+});
+function swing(d, laugh) {
+  if (!d) return;
+  shakes = shakes.filter(function (x) { return x.m !== d.mesh; });
+  swings = swings.filter(function (x) { return x.d !== d; });
+  swings.push({ d: d, t: 0, laugh: !!laugh });
+  spillLight.position.copy(d.glow.free).addScaledVector(d.inward, 0.5); spillLight.position.y = d.mid.y + d.sill + 1.0;
+  d.glow.back.visible = d.glow.spill.visible = d.glow.crack.visible = true;
+}
+function updateSwings(dt) {
+  swings = swings.filter(function (s) {
+    s.t += dt;
+    var t = s.t, open = t < 0.6 ? easeInOut(t / 0.6) : t < 2.4 ? 1 : t < 2.95 ? 1 - easeInOut((t - 2.4) / 0.55) : 0;
+    if (s.laugh && t > 0.6 && t < 2.4) open *= 1 - 0.18 * Math.abs(Math.sin((t - 0.6) * 14)) * (1 - (t - 0.6) / 1.8);
+    var d = s.d, h = d.hinge, a = h.th * open, m = d.mesh;
+    m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half);
+    m.rotation.y = d.rest.rot + a;
+    d.glow.back.material.opacity = 0.9 * open; d.glow.spill.material.opacity = 0.45 * open; d.glow.crack.material.opacity = 0.8 * open;
+    spillLight.intensity = 1.6 * open;
+    if (t >= 2.95) { m.position.copy(d.rest.pos); m.rotation.y = d.rest.rot; d.glow.back.visible = d.glow.spill.visible = d.glow.crack.visible = false; spillLight.intensity = 0; }
+    return t < 2.95;
+  });
+}
+function fade(d) {
+  if (!d) return;
+  shakes = shakes.filter(function (x) { return x.m !== d.mesh; });
+  d.mesh.position.copy(d.rest.pos);
+  fades = fades.filter(function (x) { return x.d !== d; });
+  var own = d.mesh.material, stone = own.clone(); d.mesh.material = stone;
+  fades.push({ d: d, t: 0, own: own, stone: stone, from: own.color.clone() });
+}
+function updateFades(dt) {
+  fades = fades.filter(function (f) {
+    f.t += dt;
+    var t = f.t, k = t < 0.35 ? t / 0.35 : t < 1.3 ? 1 : t < 1.9 ? 1 - (t - 1.3) / 0.6 : 0;
+    f.stone.color.copy(f.from).lerp(WALL_GREY, easeInOut(k));
+    (f.d.knots || []).forEach(function (n) { n.visible = k < 0.5; });
+    if (t >= 1.9) { f.d.mesh.material = f.own; f.stone.dispose(); return false; }
+    return true;
+  });
+}
+/* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
+   its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
+function knotSpots(d) {
+  var w = window.CastleEvents && CastleEvents.week ? CastleEvents.week() : 0, seed = 0, out = [], tries = 0;
+  for (var i = 0; i < d.id.length; i++) seed = (seed * 31 + d.id.charCodeAt(i)) % 9973;
+  var r = function (k) { var s = Math.sin((w + 1) * 12.9898 + seed * 0.731 + k * 78.233) * 43758.5453; return s - Math.floor(s); };
+  var hx = d.hinge.half - 0.14, y0 = -d.h / 2 + 0.55, y1 = Math.min(d.h / 2 - 0.3, -d.h / 2 + 1.75);
+  while (out.length < KNOTS && tries < 60) {
+    var p = { x: -hx + 2 * hx * r(tries * 2 + 1), y: y0 + (y1 - y0) * r(tries * 2 + 2) };
+    tries++;
+    if (out.every(function (q) { return Math.hypot(q.x - p.x, q.y - p.y) > 0.32; })) out.push(p);
+  }
+  return out;
+}
+function drawKnots() {
+  if (knotsDrawn || turnNow() !== 'ticklish') return;
+  knotsDrawn = true;
+  var ring = kit.solid(0x2c2722), eye = kit.solid(0x1a1714);
+  shell.doors.forEach(function (d) {
+    if (turnDoors.ticklish.indexOf(d.id) < 0) return;
+    d.knots = knotSpots(d).map(function (p, i) {
+      var k = new THREE.Group(), r = KNOT_R * (i ? 0.75 + 0.3 * ((i * 0.37) % 1) : 1);
+      var a = new THREE.Mesh(new THREE.CircleGeometry(r, 20), ring), b = new THREE.Mesh(new THREE.CircleGeometry(r * 0.45, 14), eye);
+      a.scale.y = b.scale.y = 1.5; b.position.z = 0.001;
+      k.add(a); k.add(b);
+      k.position.set(p.x, p.y, d.face * 0.061); if (d.face < 0) k.rotation.y = Math.PI;
+      d.mesh.add(k);
+      return k;
+    });
+    d.knotAt = knotSpots(d)[0];
+  });
+}
+/* the built-in `tickle`: hit within TICKLE_R of the right knot, else miss with how near (the giggle's strength) */
+function tickleAt(d, point) {
+  if (turnNow() !== 'ticklish' || !d.knotAt) return null;
+  var p = d.mesh.worldToLocal(point.clone()), dist = Math.hypot(p.x - d.knotAt.x, p.y - d.knotAt.y);
+  return { hit: dist < TICKLE_R, near: clamp(1 - (dist - TICKLE_R) / 0.9, 0, 1) };
+}
+function readTurnDoors() {   /* after the events have loaded, so the week's word is known */
+  return fetch('events/doors.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+    (j.records || []).forEach(function (rec) {
+      var m = /^tap (.+)$/.exec(rec.moment || '');
+      if (m && (rec.when || []).indexOf('doors = ticklish') >= 0 && turnDoors.ticklish.indexOf(m[1]) < 0) turnDoors.ticklish.push(m[1]);
+    });
+    drawKnots();
+  }).catch(function () {});
+}
+var turnCues = {
+  "the door swings open a hand's width, warm light spilling across the grey floor, then shuts": function () { turnDone = 'swing'; swing(lineDoor, false); },
+  "the door laughs and swings open a hand's width, warm light spilling across the grey floor, then shuts": function () { turnDone = 'swing'; swing(lineDoor, true); },
+  "the door's wood shivers and gives a creaky giggle, louder the nearer the tap to the knot": function () { turnDone = 'giggle'; },
+  "the door thuds dull as stone under his tap, and for a breath its planks fade to the grey stone they really are, then it is a door again": function () { turnDone = 'wall'; fade(lineDoor); }
+};
 function through(d) {
   if (hooks.onWay) hooks.onWay({ id: d.id, to: d.to, place: d.place });
   /* a built room has its own page (the bay's mouth to corridor.html); a way still a shell, this page */
@@ -278,7 +433,7 @@ function tap(cx, cy) {
   var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
-  if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d); acted = true; }
+  if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) acted = goTo(d);
   else if (f) acted = useFlight(f);
   else { goBack(); acted = wasStand; }
@@ -327,6 +482,8 @@ function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   updateCamera(dt);
   updateShakes(dt);
+  updateSwings(dt);
+  updateFades(dt);
   updateLines(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -376,8 +533,11 @@ function updateLines(dt) {
   }
 }
 var events = window.CastleEvents ? CastleEvents.start({
-  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: function () {}, cues: {}, showLines: showLines
+  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: function () {}, cues: turnCues, showLines: showLines,
+  builtins: Object.assign({ tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; } },
+    TURN ? { doors: function () { return TURN; } } : {})
 }) : null;
+if (events && events.ready) events.ready.then(readTurnDoors); else readTurnDoors();
 
 /* the hooks: the events and magic set these (a shut door's tap, a way taken); harmless when unset */
 var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
@@ -392,7 +552,14 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },
   stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
   head: function () { return { yaw: hy, limit: HEAD_MAX }; },
-  answer: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; if (d) answer(d); return !!d; } };
+  /* a shut door's tap; x and y (metres across and up from the leaf's middle) put it on a spot, as on a knot */
+  answer: function (id, x, y) {
+    var d = things.filter(function (x) { return x.id === id; })[0];
+    if (d) answer(d, x != null ? d.mesh.localToWorld(new THREE.Vector3(x, y, d.face * 0.06)) : null);
+    return !!d;
+  },
+  turn: function () { return turnNow(); }, turnDone: function () { return turnDone; },
+  knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
 </script>
 </body>

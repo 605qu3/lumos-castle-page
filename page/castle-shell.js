@@ -7,7 +7,8 @@
    CastleShell.build(F, M, placeId) builds the place and, one step on, every way joined to it by an open mouth, into
    one THREE.Group in the place's own frame: x east, y up, z south (so -z is north), the origin at the place's plan
    centre on its floor. It returns { group, place, places, doors, ways, stairs, flights, stands, toLocal, route }:
-     doors   a shut door each: { id, to, mesh, stand, level } (the mesh is the leaf, userData.door its id)
+     doors   a shut door each: { id, to, mesh, stand, level } (the mesh is the leaf, userData.door its id; under it
+             a threshold through the wall, v4)
      ways    an open mouth each to another way: { id, to, mesh, stand, level, page } (the mesh fills the opening,
              unseen, for taps; page when the way leads into a built room, which is never shelled)
      flights a straight flight each: { id, foot, head, footPt, headPt } (foot and head are stands on the floors it
@@ -183,6 +184,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var leaf = slab(w - 0.08, hh - 0.02, 0.12, mats.door, 'door');
           leaf.position.set(mid.x + nx * t * 0.5, mid.y + g.sill + (hh - 0.02) / 2, mid.z - ny * t * 0.5);
           leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
+          /* its threshold through the wall (v4, req 284): the floor under a leaf that swings, else the void shows */
+          var sl = slab(w, 0.02, t, mats.floor, 'floor'), sp = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
+          sl.position.set(sp.x, sp.y + g.sill + 0.01, sp.z); sl.rotation.y = ang; sl.name = Q.id + '-threshold-' + g.op.id; group.add(sl);
           out.doors.push({ id: g.op.id, to: to, mesh: leaf, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: g.sill, lift: lift, level: level });
         } else if (isWay(g.op.kind) && !out.ways.some(function (d) { return d.id === g.op.id; })) {
           var fill = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false }));
