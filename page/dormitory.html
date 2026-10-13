@@ -166,13 +166,13 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look round the dormitory. Tap a bed, a window, the hearth or the stair well to go to it; tap the well again to go down; tap off it or Back to return. View switches to the view from the stair head. The grey shapes are placeholders at real size.</div>
+<div id="help">Drag to look around.</div>
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=9"></script>
+<script src="castle.js?v=11"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=16"></script>
+<script src="castle-events.js?v=22"></script>
 <script>
 (function () {
 'use strict';
@@ -670,6 +670,17 @@ var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
 
 var mode = 'rest', atStop = null, tween = null;
+/* looking round at a stand (board req 210; David, Q3, 12 October 2026, 7.56 pm; docs/interaction-vocabulary.md §2): at
+   a stop a drag turns his head from where he stands, the stair head's way and feel, up to 60 degrees each way (under his
+   bed a small turn, 20, the frame's mouth); he arrives square to the thing and a tap on another stop's thing walks him
+   straight there from wherever he is looking */
+var HEAD_MAX = Math.PI / 3, HEAD_PITCH = 0.15, here = null, hy = 0, hp = 0, hyT = 0, hpT = 0;
+function headLimit(s) { return s && s.name === 'under-his' ? Math.PI / 9 : HEAD_MAX; }
+function headPose(pos, look) {
+  pos.copy(here.pos);
+  var d = here.look.clone().sub(here.pos), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
+  look.set(pos.x + Math.sin(a) * Math.cos(el) * 10, pos.y + Math.sin(el) * 10, pos.z + Math.cos(a) * Math.cos(el) * 10);
+}
 function glideTo(to, done) {
   var from = { pos: camera.position.clone(), look: lookTmp.clone() };
   var dist = from.pos.distanceTo(to.pos);
@@ -679,11 +690,12 @@ function goTo(s) {
   if (s === atStop) return;
   atStop = s; mode = 'stop';
   backBtn.hidden = false;
-  glideTo(s.stop());
+  here = s.stop(); hy = hyT = hp = hpT = 0;
+  glideTo(here);
 }
 function goBack() {
   if (mode !== 'stop') return;
-  atStop = null;
+  atStop = null; here = null; hy = hyT = hp = hpT = 0;
   backBtn.hidden = true;
   yaw = yawT = 0; pitch = pitchT = 0;
   var p = { pos: new THREE.Vector3(), look: new THREE.Vector3() };
@@ -839,7 +851,7 @@ var BED_NAMES = beds.map(function (b) { return b.name; });
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
-  if (!helpEl.hidden) helpEl.hidden = true;
+  /* the help line is the frame's now (req 203, 205): it stays through taps and goes at his first look-drag */
   if (tween || leaving || arriving || night) return;
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
@@ -883,6 +895,9 @@ function updateCamera(dt) {
   } else if (mode === 'rest') {
     yaw = lerp(yaw, yawT, s); pitch = lerp(pitch, pitchT, s);
     restPose(camera.position, lookTmp);
+  } else if (mode === 'stop' && here) {
+    hy = lerp(hy, hyT, s); hp = lerp(hp, hpT, s);
+    headPose(camera.position, lookTmp);
   }
   camera.lookAt(lookTmp);
 }
@@ -908,6 +923,10 @@ canvas.addEventListener('pointermove', function (e) {
       yawT = clamp(yawT - dx * 0.0022, -YAW_MAX, YAW_MAX);
       pitchT = clamp(pitchT - dy * 0.0012, PITCH_DOWN, PITCH_MAX);
     }
+  } else if (mode === 'stop' && here && !tween) {
+    var lim = headLimit(atStop);
+    hyT = clamp(hyT - dx * 0.003, -lim, lim);
+    hpT = clamp(hpT - dy * 0.0012, -HEAD_PITCH, HEAD_PITCH);
   }
 });
 function endDrag(e) {
@@ -1131,6 +1150,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   tap: tap, tapName: tapName, goBack: goBack, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   stops: STOPS.map(function (s) { return s.name; }),
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
+  head: function () { return mode === 'stop' ? { yaw: hy, limit: headLimit(atStop) } : { yaw: yaw, limit: null }; },
   descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, stir: stir, dim: dim, pose: pose,
   moon: function () { return { now: moonNow, shown: moonDisc.visible, window: MOON.win, at: moonDisc.position.toArray().map(function (v) { return +v.toFixed(2); }), d: MOON.d }; }, setLight: setLight, light: function () { return light; },
   snowball: snowballFly, snowballNow: function () { return snowball && { window: snowball.w.name, t: snowball.t }; },
