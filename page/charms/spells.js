@@ -402,16 +402,18 @@ function judgeCoil(points, leg, ease) {
     var now = q.c > e.side ? 1 : (q.c < -e.side ? -1 : 0);
     if (now && now !== side) { if (side) marks.push(q.s); side = now; }
   });
-  /* a turn is there and back: two half swings, each a visit to one side; its climb runs from the crossing two before
-     (his start, for the first) to the crossing two after (his highest point, for the last). The bandage is as wide as
+  /* a turn is there and back: two half swings, each a visit to one side; the leg is split into turns at every second
+     crossing, from his start to his highest point, and each turn's climb is its share. The bandage is as wide as
      a turn may climb without a gap, and half of it reaches below his start and above his end: the foot and the top
      are bare only if he leaves more than that. */
   out.turns = Math.floor((marks.length + (side ? 1 : 0)) / 2);
   if (out.turns < 1) { out.reason = 'straight'; return out; }
   if (drop > e.back) { out.reason = 'down'; return out; }
   if (hi < e.reach) { out.reason = 'short'; return out; }
-  var s0 = Math.max(0, sc[0].s), end = Math.min(1, hi), m = [s0].concat(marks, [end]), lim = leg.w * e.slack;
-  for (i = 2; i < m.length; i++) if (m[i - 2] < 1) out.climbs.push({ from: m[i - 2], to: Math.min(1, m[i]), px: Math.round(Math.max(0, Math.min(1, m[i]) - m[i - 2]) * L) });   /* past the top, nothing to cover */
+  var s0 = Math.max(0, sc[0].s), end = Math.min(1, hi), m = [s0], lim = leg.w * e.slack;
+  for (i = 1; i < marks.length - 1; i += 2) m.push(marks[i]);   /* the leg split into turns: his start, every second crossing, his top */
+  m.push(end);
+  for (i = 1; i < m.length; i++) if (m[i - 1] < 1) out.climbs.push({ from: m[i - 1], to: Math.min(1, m[i]), px: Math.round(Math.max(0, Math.min(1, m[i]) - m[i - 1]) * L) });   /* past the top, nothing to cover */
   if (s0 * L > lim / 2) out.gaps.push({ from: 0, to: Math.round(s0 * 100) / 100, px: Math.round(s0 * L) });
   out.climbs.forEach(function (c) { if (c.px > lim) out.gaps.push({ from: Math.round(c.from * 100) / 100, to: Math.round(c.to * 100) / 100, px: c.px }); });
   if ((1 - end) * L > lim / 2) out.gaps.push({ from: Math.round(end * 100) / 100, to: 1, px: Math.round((1 - end) * L) });
