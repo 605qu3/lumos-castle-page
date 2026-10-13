@@ -129,6 +129,11 @@
    held at 7. The first visit's day is kept in the state, so it is each boy's own (his satchel carries it); a grown-up
    corrects it with settings.firstYear (the year of the September he started, as 2026); ?yearin=N for a test (v=28).
 
+   The shut doors (board req 265, Godric's events-shut-doors-265 Try 1): the shells (page/shell.html) start the runtime
+   at place `entrance hall` and tap a shut door's id from `lumosShell.onDoorTap`, so `doors.json` answers each door with
+   a sound and a short line from the books by the time of day; a voice heard there stands on the Map in the model's
+   `entrance-hall`; a shell's trip, `?from=<its place id>`, carries the visit to a shell started with that place (v=29).
+
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
    to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh;
@@ -525,7 +530,7 @@
     /* ---------- the Marauder's Map (board req 242) ---------- */
 
     /* The page he is on as the castle model's room, for his own dot; the den is the page's to say (`map here`). */
-    var PAGE_ROOM = { 'common room': 'common-room', corridor: 'corridor', dormitory: 'dormitory' };
+    var PAGE_ROOM = { 'common room': 'common-room', corridor: 'corridor', dormitory: 'dormitory', 'entrance hall': 'entrance-hall' };
     function readingBook() {
       var r = Math.floor(+(params.get('reading') || settings.reading || 0));
       return r >= 1 && r <= 7 ? r : 0;
@@ -1584,8 +1589,14 @@
        page it names to have run this runtime: the dormitory's stair carries the visit once that page starts it with
        place `dormitory`, and until then a trip down from it is a new visit. */
     var FROM = { room: 'common room', corridor: 'corridor', dormitory: 'dormitory' };
+    /* the shells' own trips write their place's id (`shell.html?place=<to>&from=entrance-hall`, req 278): a shell
+       started with that place, its hyphens as spaces, carries the visit as a room does */
+    function fromPage(w) {
+      if (FROM[w]) return FROM[w];
+      return /^[a-z][a-z0-9\-]{1,39}$/.test(w || '') && w !== 'sleep' ? w.replace(/-/g, ' ') : null;
+    }
     function begin() {
-      var fromPlace = FROM[params.get('from')];
+      var fromPlace = fromPage(params.get('from'));
       var soon = state.leftAt != null && Date.now() - state.leftAt < CROSS_S * 1000;
       if (state.visitOpen && fromPlace && fromPlace === state.visitPlace && soon && state.kept) cross();
       else arrive();

@@ -1,0 +1,360 @@
+{
+  "chain": "doors",
+  "about": "Godric's events-shut-doors-265 Try 1 (13 October 2026, 1.55 pm): each shut door its own answer from the books, by the time of day. A second tap on a shut door in the shells (page/shell.html, board req 265) shakes it on its latch and calls lumosShell.onDoorTap; the page then taps the door's id here, at place entrance hall. Each door's lines are drawn fresh, never the variant its key said last. Magic's req 266, the polite doors, answers the same tap.",
+  "records": [
+    {
+      "id": "doors.front-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap front-doors",
+      "when": [
+        "place = entrance hall",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "hooch",
+          "role": "voice",
+          "name": "madam hooch",
+          "mark": "out on the lawn beyond the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "hooch",
+          "medium": "heard",
+          "key": "doors.front-day",
+          "text": [
+            "Well, what are you all waiting for?",
+            "Come on, hurry up.",
+            "Everyone stand by a broomstick."
+          ],
+          "sound": "a blast on a silver whistle out on the lawn; the great oak doors creak and hold",
+          "canon": "PS 9, Madam Hooch's first flying lesson on the lawn; PS 11, her silver whistle; CoS 15, the creaking oak front doors; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.front-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap front-doors",
+      "when": [
+        "place = entrance hall",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "voice",
+          "name": "peeves",
+          "mark": "on the far side of the front doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "doors.front-night",
+          "text": [
+            "Wandering around at midnight, Ickle Firsties?",
+            "Tut, tut, tut.",
+            "Naughty, naughty, you'll get caughty."
+          ],
+          "sound": "the lock on the oak front doors holds with a clank, and somewhere outside a cackle",
+          "canon": "PS 9, Peeves finds them out of bed at midnight; CoS 15, the lock on the oak front doors; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.hall-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap great-hall-doors",
+      "when": [
+        "place = entrance hall",
+        "time = morning"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "at the Gryffindor table behind the Great Hall's doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "doors.hall-morning",
+          "text": [
+            "It's a Remembrall!",
+            "Gran knows I forget things."
+          ],
+          "sound": "a rush of wings behind the doors, a hundred owls streaming in with the post",
+          "canon": "PS 8, about a hundred owls stream into the Great Hall at breakfast; PS 9, Neville's Remembrall from Gran comes with the post; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.hall-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap great-hall-doors",
+      "when": [
+        "place = entrance hall",
+        "time != morning",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "dumbledore",
+          "role": "voice",
+          "name": "dumbledore",
+          "mark": "at the staff table behind the Great Hall's doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "dumbledore",
+          "medium": "heard",
+          "key": "doors.hall-day",
+          "text": [
+            "Nitwit! Blubber! Oddment! Tweak!",
+            "Tuck in!"
+          ],
+          "sound": "the drone of hundreds of voices behind the doors, and the clatter of plates",
+          "canon": "PS 7, the drone of hundreds of voices and Dumbledore's few words; PoA 11, his \"Tuck in!\" at the Christmas table; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.hall-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap great-hall-doors",
+      "when": [
+        "place = entrance hall",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "in the dark Great Hall behind its doors"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "doors.hall-night",
+          "text": [
+            "They're in here somewhere, probably hiding.",
+            "Which way did they go, Peeves? Quick, tell me."
+          ],
+          "sound": "the doors hold; behind them, slow shuffling footsteps and a cat's soft mew",
+          "canon": "PS 9, Filch hunting students out of bed at night, Mrs Norris with him; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.kitchens-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap kitchens-door",
+      "when": [
+        "place = entrance hall",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "elves",
+          "role": "voice",
+          "name": "the house-elves",
+          "mark": "down the passage to the kitchens"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "elves",
+          "medium": "heard",
+          "key": "doors.kitchens-day",
+          "text": [
+            "Anything we can get you, sir?",
+            "Anything at all, sir!"
+          ],
+          "sound": "the clatter of pots and pans and a crowd of tiny squeaking voices",
+          "canon": "GoF 21, the kitchens' house-elves, as Fred imitates them, and their high squeak; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.kitchens-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap kitchens-door",
+      "when": [
+        "place = entrance hall",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "pear",
+          "role": "voice",
+          "name": "the pear in the painting of a bowl of fruit",
+          "mark": "far down the passage to the kitchens"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pear",
+          "medium": "heard",
+          "key": "doors.kitchens-night",
+          "sound": "a giggle, far down the passage, as if someone had tickled a pear",
+          "canon": "GoF 21, the kitchens' door behind a painting of a bowl of fruit: tickle the pear and it giggles; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.chamber-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "time != night"
+      ],
+      "one_of": "chamber-door",
+      "weight": 6,
+      "who": [
+        {
+          "as": "ron",
+          "role": "voice",
+          "name": "ron",
+          "mark": "among the first years crowded in the small chamber"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "ron",
+          "medium": "heard",
+          "key": "doors.chamber-day",
+          "text": [
+            "Some sort of test, I think.",
+            "Fred said it hurts a lot, but I think he was joking."
+          ],
+          "sound": "nervous whispering behind the door, first years standing close together",
+          "canon": "PS 7, the first years wait in a small, empty chamber off the hall before the Sorting, Ron guessing at it; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.chamber-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "time = night"
+      ],
+      "one_of": "chamber-door",
+      "weight": 6,
+      "who": [
+        {
+          "as": "nick",
+          "role": "voice",
+          "name": "nearly headless nick",
+          "mark": "drifting in the dark small chamber"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "heard",
+          "key": "doors.chamber-night",
+          "text": [
+            "I haven't eaten for nearly five hundred years.",
+            "I don't need to, of course, but one does miss it."
+          ],
+          "sound": "a chill through the keyhole and a polite ghostly cough",
+          "canon": "PS 7, Nearly Headless Nick at the feast, before he introduces himself (his introduction is passers.json's); checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.chamber-ghosts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "days since chamber_ghosts >= 14"
+      ],
+      "one_of": "chamber-door",
+      "weight": 1,
+      "who": [
+        {
+          "as": "gasp",
+          "role": "voice",
+          "name": "first years",
+          "mark": "in the small chamber"
+        },
+        {
+          "as": "friar",
+          "role": "voice",
+          "name": "the fat friar",
+          "mark": "in the small chamber, just through the back wall"
+        },
+        {
+          "as": "ruff",
+          "role": "voice",
+          "name": "a ghost in a ruff and tights",
+          "mark": "in the small chamber, just through the back wall"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "gasp",
+          "medium": "heard",
+          "key": "doors.chamber-gasp",
+          "sound": "a gasp behind the door, then ghostly chatter, as if a crowd of ghosts had just come through the back wall arguing",
+          "canon": "PS 7, the first years gasp as about twenty ghosts stream through the back wall of the small chamber, arguing; Godric's t1 on events-shut-doors-265, once in a long while; checked against the text, 13 October 2026"
+        },
+        {
+          "speaker": "friar",
+          "medium": "heard",
+          "key": "doors.chamber-friar",
+          "text": [
+            "Forgive and forget, I say, we ought to give him a second chance."
+          ],
+          "canon": "PS 7, the Fat Friar on Peeves, as the ghosts come through the wall; checked against the text, 13 October 2026"
+        },
+        {
+          "speaker": "ruff",
+          "medium": "heard",
+          "key": "doors.chamber-ruff",
+          "text": [
+            "My dear Friar, haven't we given Peeves all the chances he deserves?"
+          ],
+          "canon": "PS 7, the ghost in a ruff and tights answers him; checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "stamp chamber_ghosts"
+      ]
+    }
+  ]
+}
