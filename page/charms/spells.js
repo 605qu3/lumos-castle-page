@@ -411,7 +411,17 @@ function judgeAim(points, from, to, ease) {
    'beside'), axis ('down' or 'across', the nearer to his line), tilt (degrees his line leans off that axis, +
    clockwise on the screen), cover (the share of the boggart it spans), share (where it crosses: 0 the middle, 1 the
    edge, + right or below), at (px: the mirror's x for 'down', its y for 'across'), straight }. 'across' and 'down'
-   name the line he drew when the other was wanted. */
+   name the line he drew when the other was wanted.
+   A slanted mirror (13 October 2026, twenty-eighth session): want a number, a mirror leaning that many degrees off
+   upright, either way (Parvati's mummy, 45, so it tips over flat). The flip is then over his own line, straightened
+   (his first point to his last), and an upright thing comes out leaning twice as far as the line leans. Its own
+   answer, from judgeSlant: { verdict, reason ('flip', 'tap', 'wiggly', 'slant', 'beside', 'short'), axis 'slant',
+   lean (degrees his line leans off upright, + clockwise, the top to the right), tilt (how far that lean is from the
+   wanted, + leaning further, - nearer upright), turn (twice the lean: how far an upright thing tips), cover (the share
+   of the line's own run across the boggart he spans), share (how far his line passes from the middle, square to it,
+   as a share of the boggart's half extent that way; + right or below), at ({x, y} the point on his line nearest the
+   middle), a and b (his first and last points, the mirror), straight }. The eases' tilt is then the most degrees off
+   the wanted lean; mid, cover and straight as before. */
 var MIRROR_EASES = {
   kind:   { straight: 0.85, tilt: 22, cover: 0.7, mid: 0.75 },
   fair:   { straight: 0.90, tilt: 15, cover: 0.85, mid: 0.5 },
@@ -419,6 +429,7 @@ var MIRROR_EASES = {
 };
 function judgeMirror(points, box, want, ease) {
   var e = typeof ease === 'object' ? ease : (MIRROR_EASES[ease] || MIRROR_EASES.kind);
+  if (typeof want === 'number') return judgeSlant(points, box, want, e);
   var out = { verdict: 'miss', reason: 'tap', axis: '', tilt: 0, cover: 0, share: 0, at: 0, straight: 0 };
   if (!points || points.length < 2) return out;
   var a = points[0], b = points[points.length - 1], path = 0, i;
@@ -453,6 +464,41 @@ function reflectOver(p, a, b) {
   var dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy || 1, k = ((p.x - a.x) * dx + (p.y - a.y) * dy) / L2;
   var fx = a.x + k * dx, fy = a.y + k * dy;
   return { x: 2 * fx - p.x, y: 2 * fy - p.y };
+}
+/* judgeMirror with a slanted mirror (want a number, degrees off upright): see judgeMirror's comment */
+function judgeSlant(points, box, want, e) {
+  var r1 = function (v) { return Math.round(v * 10) / 10; };
+  var out = { verdict: 'miss', reason: 'tap', axis: 'slant', lean: 0, tilt: 0, turn: 0, cover: 0, share: 0, at: null, a: null, b: null, straight: 0 };
+  if (!points || points.length < 2) return out;
+  var a = points[0], b = points[points.length - 1], path = 0, i;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path < Math.min(box.w, box.h) * 0.25) return out;
+  var dx = b.x - a.x, dy = b.y - a.y, chord = Math.hypot(dx, dy);
+  out.straight = path ? chord / path : 0;
+  out.a = { x: a.x, y: a.y }; out.b = { x: b.x, y: b.y };
+  /* u along his line pointing up the screen (level: to the right), n square to it pointing right or down */
+  var ux = dx / chord, uy = dy / chord;
+  if (uy > 0 || (uy === 0 && ux < 0)) { ux = -ux; uy = -uy; }
+  var nx = -uy, ny = ux, lean = Math.atan2(ux, -uy) * 180 / Math.PI;
+  out.lean = r1(lean); out.tilt = r1(Math.abs(lean) - want); out.turn = r1(2 * lean);
+  var cx = box.x + box.w / 2, cy = box.y + box.h / 2, k = ((cx - a.x) * dx + (cy - a.y) * dy) / (chord * chord);
+  var fx = a.x + k * dx, fy = a.y + k * dy;
+  out.at = { x: Math.round(fx), y: Math.round(fy) };
+  out.share = Math.round(((fx - cx) * nx + (fy - cy) * ny) / (Math.abs(nx) * box.w / 2 + Math.abs(ny) * box.h / 2) * 100) / 100;
+  /* the line's own run across the box, as s from his first point (0) to his last (1), and the share he spans */
+  var s0 = -Infinity, s1 = Infinity, lo, hi, q;
+  [[a.x, dx, box.x, box.x + box.w], [a.y, dy, box.y, box.y + box.h]].forEach(function (c) {
+    if (Math.abs(c[1]) < 1e-9) { if (c[0] < c[2] || c[0] > c[3]) { s0 = 1; s1 = 0; } return; }
+    lo = (c[2] - c[0]) / c[1]; hi = (c[3] - c[0]) / c[1]; if (lo > hi) { q = lo; lo = hi; hi = q; }
+    s0 = Math.max(s0, lo); s1 = Math.min(s1, hi);
+  });
+  out.cover = s1 > s0 ? Math.round(Math.max(0, Math.min(s1, 1) - Math.max(s0, 0)) / (s1 - s0) * 100) / 100 : 0;
+  if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
+  if (Math.abs(out.tilt) > e.tilt) { out.reason = 'slant'; return out; }
+  if (Math.abs(out.share) > e.mid) { out.reason = 'beside'; return out; }
+  if (out.cover < e.cover - 1e-9) { out.reason = 'short'; return out; }
+  out.verdict = 'flip'; out.reason = 'flip';
+  return out;
 }
 /* Expelliarmus, the swing and the point (CoS 11, the Duelling Club: Lockhart and Snape "swung their wands above their
    heads and pointed them at their opponent; Snape cried: 'Expelliarmus!' There was a dazzling flash of scarlet light"):

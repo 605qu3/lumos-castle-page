@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=28"></script>
+<script src="spells.js?v=31"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* Riddikulus, a test page for the Charms lane (13 October 2026, twenty-fifth session; the owner is Godric; his Q7,
@@ -46,8 +46,17 @@
    lands it as far the other side. Then a tap on it is the laugh, and it goes in wisps of smoke. Judged by
    LumosSpells.judgeMirror on the tally's own boxes (checks/riddikulus-tally.js: Snape 0.32 by 0.6 of the short
    side, the spider 0.5 by 0.3); images by LumosSpells.reflectOver. The traced guide, a line down through Snape, shows
-   in the first round only. Nothing graded; the first flip marks learned('riddikulus'). ?round=1..2, ?ease=,
-   ?guide=off for trying; window.lumosRiddikulus for checks. */
+   in the first round only. Nothing graded; the first flip marks learned('riddikulus'). ?round=1..3, ?ease=,
+   ?guide=off for trying; window.lumosRiddikulus for checks.
+   The third round, a slanted mirror (13 October 2026, twenty-eighth session; Q8, 8.1, the built spells' later rounds;
+   the spellbook's idea "a slanted mirror: the Boggart tips over and lands tilted twice as far as the line leans").
+   The book (PoA 7, checked in the text): "where he had stood was a bloodstained, bandaged mummy; its sightless face
+   was turned to Parvati and it began to walk towards her, very slowly" (L15997); "'Riddikulus!' cried Parvati. A
+   bandage unravelled at the mummy's feet; it became entangled, fell face forwards and its head rolled off" (L16001).
+   Ours (the bandages drawn old and brown, no blood): one straight line through it leaning halfway between up and
+   across, and it flips over his own line, so it tips over twice as far as the line leans (judgeMirror with want 45,
+   the tally's slant and twice); the sum shows his line's lean and the tip, twice it, beside the three marks; then it
+   topples the rest of the way flat, the trailing bandage at its feet, and its head rolls off. */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -57,8 +66,10 @@
     { name: 'Snape', want: 'down', start: 'The old wardrobe in the staff room wobbles and bangs off the wall. First the word, without your wand, as Lupin\'s class did: <b>tap the word and say it aloud</b>.',
       cast: 'Out steps Professor Snape, the Boggart\'s idea of him. Raise your wand and draw <b>one straight line down through him</b>, top to bottom.' },
     { name: 'Spider', want: 'across', start: 'The wardrobe shakes again: it is Ron\'s turn. <b>Tap the word and say it aloud</b> first.',
-      cast: 'A giant spider, hairy legs clicking. Draw <b>one straight line across it</b>, side to side.' } ];
-  var round = Math.max(0, Math.min(1, (Number(qs.get('round')) || 1) - 1));
+      cast: 'A giant spider, hairy legs clicking. Draw <b>one straight line across it</b>, side to side.' },
+    { name: 'Mummy', want: 45, start: 'The wardrobe shakes a third time: it is Parvati\'s turn. <b>Tap the word and say it aloud</b> first.',
+      cast: 'A bandaged mummy walks out, very slowly. This mirror is slanted: draw <b>one straight line through it, leaning halfway between up and across</b>. It will tip over twice as far as your line leans.' } ];
+  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
   var stage = 'word', saidAt = 0, castAt = 0, flip = null, marks = null, laughAt = 0, doneAt = 0, last = null, wobbleAt = 0, chain = null;
   var stroke = null, active = null, trail = null, guide = null, missAt = 0;
   var floorY = 0, card = null;
@@ -73,7 +84,7 @@
   }
   /* the boggart's box where it stands, in front of the wardrobe: Snape 0.32 by 0.6 of the short side, the spider 0.5 by 0.3 */
   function box() {
-    var w = S * (round === 0 ? 0.32 : 0.5), h = S * (round === 0 ? 0.6 : 0.3);
+    var w = S * (round !== 1 ? 0.32 : 0.5), h = S * (round !== 1 ? 0.6 : 0.3);
     return { x: W / 2 - w / 2, y: floorY - h, w: w, h: h };
   }
   function say(html) { lineEl.innerHTML = html; }
@@ -124,11 +135,12 @@
   }
   var WHY = {
     wiggly: 'One straight line, like a ruler: a mirror is flat.',
-    slant: function (j) { return round === 0 ? 'Straighter up and down: your line leaned ' + Math.abs(Math.round(j.tilt)) + ' degrees. A mirror stood upright turns him round.' : 'Flatter, level like the floor: your line tipped ' + Math.abs(Math.round(j.tilt)) + ' degrees.'; },
+    slant: function (j) { if (round === 2) return j.tilt < 0 ? 'Lean it further: your line leaned ' + Math.abs(Math.round(j.lean)) + ' degrees, so it would tip only ' + Math.abs(Math.round(j.turn)) + ' and stand back up. Halfway between up and across.' : 'Not so far over: your line leaned ' + Math.abs(Math.round(j.lean)) + ' degrees and would tip it ' + Math.abs(Math.round(j.turn)) + ', past flat. Halfway between up and across.';
+      return round === 0 ? 'Straighter up and down: your line leaned ' + Math.abs(Math.round(j.tilt)) + ' degrees. A mirror stood upright turns him round.' : 'Flatter, level like the floor: your line tipped ' + Math.abs(Math.round(j.tilt)) + ' degrees.'; },
     across: 'That line goes across: it would stand him on his head. For Snape, draw down through him, hat to boots.',
     down: 'That line goes down: it would only turn it round. To roll the spider over, draw across it, side to side.',
-    beside: function () { return round === 0 ? 'Through him, not beside him: the line goes through the middle.' : 'Through the spider, not past it: the line goes through its middle.'; },
-    short: function () { return round === 0 ? 'Right through him, from his hair to his boots.' : 'Right across, from its legs on one side to the other.'; }
+    beside: function () { return round === 2 ? 'Through the mummy, not beside it: the line goes through its middle.' : round === 0 ? 'Through him, not beside him: the line goes through the middle.' : 'Through the spider, not past it: the line goes through its middle.'; },
+    short: function () { return round === 2 ? 'Right through it, from one side of it out past the other.' : round === 0 ? 'Right through him, from his hair to his boots.' : 'Right across, from its legs on one side to the other.'; }
   };
   function judge(pts) {
     if (stage === 'word' || stage === 'saying') {
@@ -151,6 +163,12 @@
     LumosSpells.learn('riddikulus');
     trail = { pts: pts, at: performance.now(), keep: true };
     var axis = ROUNDS[round].want, A = axis === 'down' ? { x: j.at, y: 0 } : { x: 0, y: j.at }, B = axis === 'down' ? { x: j.at, y: H } : { x: W, y: j.at };
+    if (typeof axis === 'number') {   /* the slanted mirror: over his own line, straightened */
+      A = j.a; B = j.b;
+      var mid = LumosSpells.reflectOver({ x: b.x + b.w / 2, y: b.y + b.h / 2 }, A, B), sg = j.lean < 0 ? -1 : 1;
+      flip = { at: performance.now(), axis: 'slant', lean: j.lean, turn: j.turn, P: j.at, A: A, B: B, his: pts, C: mid,
+        F: { x: mid.x, y: floorY - b.w * 0.36 }, fall: sg * 90 - j.turn, sg: sg, head: null };
+    } else
     flip = { at: performance.now(), axis: axis, m: j.at, A: A, B: B, his: pts };
     marks = points(b).map(function (p) { return { p: p, q: LumosSpells.reflectOver(p, A, B) }; });
     stage = 'flip'; wobbleAt = performance.now(); noise(0.09, 2600, 0.6);   /* a noise like a whip-crack */
@@ -160,7 +178,7 @@
   /* three points of the boggart before, in its box (Snape: his hooked nose, his wand hand, his cloak's billowing
      corner; the spider: its eyes, a front foot, a back knee), each a feature it still has after */
   function points(b) {
-    var L = round === 0 ? [[0.17, 0.21], [0.42, 0.5], [-0.47, 0.97]] : [[0.27, 0.42], [0.47, 0.96], [-0.33, 0.1]];
+    var L = round === 0 ? [[0.17, 0.21], [0.42, 0.5], [-0.47, 0.97]] : round === 2 ? [[0.13, 0.04], [0.46, 0.34], [-0.48, 0.99]] : [[0.27, 0.42], [0.47, 0.96], [-0.33, 0.1]];
     return L.map(function (q) { return { x: b.x + b.w / 2 + q[0] * b.w, y: b.y + q[1] * b.h }; });
   }
 
@@ -266,6 +284,60 @@
     cx.fillStyle = '#e8e0c8'; [[0.25, 0.42], [0.28, 0.46], [0.22, 0.47], [0.26, 0.5]].forEach(function (q) { var p = P(b, q[0], q[1]); cx.beginPath(); cx.arc(p[0], p[1], b.w * 0.014, 0, 7); cx.fill(); });
     cx.restore();
   }
+  /* Parvati's mummy (the third round's points: the bandage's end at its head, its raised right hand, the loose bandage
+     trailing at its left foot); head false leaves the head off, for when it has rolled away */
+  var BAND = '#cdbf9f', BAND_D = '#9c8d6c', BAND_L = 'rgba(80,66,46,0.75)';
+  function drawMummy(b, now, head) {
+    var walk = flip ? 0 : Math.sin(now / 500) * 0.012;
+    cx.lineWidth = 1.6; cx.lineJoin = 'round';
+    poly(b, [[-0.12, 0.62], [-0.02, 0.62], [-0.05 + walk, 0.97], [-0.17 + walk, 0.97]], BAND_D, BAND_L);   /* the legs, dragging */
+    poly(b, [[0.02, 0.62], [0.12, 0.62], [0.16 - walk, 0.97], [0.04 - walk, 0.97]], BAND_D, BAND_L);
+    poly(b, [[-0.17, 0.2], [0.17, 0.2], [0.15, 0.64], [-0.15, 0.64]], BAND, BAND_L);                       /* the body */
+    poly(b, [[0.13, 0.22], [0.2, 0.2], [0.48, 0.32], [0.45, 0.38], [0.16, 0.32]], BAND, BAND_L);           /* the right arm, raised */
+    poly(b, [[-0.13, 0.22], [-0.2, 0.2], [-0.44, 0.42], [-0.39, 0.46], [-0.15, 0.33]], BAND, BAND_L);      /* the left, lower */
+    cx.strokeStyle = BAND_L; cx.lineWidth = 1.2;
+    [[0.27, 0.62, 0.02], [0.35, 0.55, 0.03], [0.43, 0.48, 0.04], [0.51, 0.41, 0.05], [0.59, 0.34, 0.06]].forEach(function (q) {
+      var p1 = P(b, -0.16, q[0]), p2 = P(b, 0.16, q[0] - q[2] * 0.3); cx.beginPath(); cx.moveTo(p1[0], p1[1]); cx.lineTo(p2[0], p2[1]); cx.stroke();
+    });
+    /* the loose bandage, unravelling from the left foot along the floor */
+    var f1 = P(b, -0.12, 0.92), f2 = P(b, -0.3, 1.0), f3 = P(b, -0.48, 0.99);
+    cx.strokeStyle = BAND; cx.lineWidth = Math.max(3, b.w * 0.05); cx.lineCap = 'round';
+    cx.beginPath(); cx.moveTo(f1[0], f1[1]); cx.quadraticCurveTo(f2[0], f2[1], f3[0], f3[1]); cx.stroke(); cx.lineCap = 'butt';
+    if (head !== false) drawMummyHead(P(b, 0, 0.1), b.w * 0.17, 0);
+  }
+  function drawMummyHead(c, r, turn) {
+    cx.save(); cx.translate(c[0], c[1]); cx.rotate(turn);
+    cx.fillStyle = BAND; cx.strokeStyle = BAND_L; cx.lineWidth = 1.6;
+    cx.beginPath(); cx.ellipse(0, 0, r, r * 1.08, 0, 0, 7); cx.fill(); cx.stroke();
+    cx.lineWidth = 1.1; [-0.55, -0.1, 0.5].forEach(function (y) { cx.beginPath(); cx.moveTo(-r * 0.95, y * r); cx.lineTo(r * 0.95, y * r - r * 0.25); cx.stroke(); });
+    cx.fillStyle = '#1a140e'; cx.fillRect(-r * 0.55, -r * 0.3, r * 0.4, r * 0.14); cx.fillRect(r * 0.15, -r * 0.3, r * 0.4, r * 0.14);   /* the sightless eye slits */
+    cx.strokeStyle = BAND; cx.lineWidth = Math.max(2, r * 0.18); cx.beginPath(); cx.moveTo(r * 0.6, -r * 0.8); cx.quadraticCurveTo(r * 1.0, -r * 1.3, r * 0.75, -r * 1.55); cx.stroke();   /* a bandage's end */
+    cx.restore();
+  }
+  /* the mummy's turn: t ms since the flip; the flip over his line (700), held with the sum (to 3200), toppling flat
+     (to 4000), lying, its head rolling off (4200 to 5400) */
+  function drawMummyFlip(b, now) {
+    var t = now - flip.at, k = Math.min(1, t / 700), th = flip.lean * Math.PI / 180, Pp = flip.P;
+    var u = Math.max(0, Math.min(1, (t - 3200) / 800)), e = u * u;
+    if (u > 0) {   /* toppling: turned about its mirrored middle as that middle falls to the floor */
+      cx.translate(flip.C.x + (flip.F.x - flip.C.x) * e, flip.C.y + (flip.F.y - flip.C.y) * e); cx.rotate(flip.fall * Math.PI / 180 * e); cx.translate(-flip.C.x, -flip.C.y);
+    }
+    cx.translate(Pp.x, Pp.y); cx.rotate(th); cx.scale(Math.cos(Math.PI * k) || 0.001, 1); cx.rotate(-th); cx.translate(-Pp.x, -Pp.y);
+    var off = t > 4200;
+    if (u >= 1 && !flip.head) {   /* where its head lies once it has fallen, in screen pixels */
+      var m = cx.getTransform(), hp = P(b, 0, 0.1), q = m.transformPoint(new DOMPoint(hp[0], hp[1]));
+      flip.head = { x: q.x / DPR, y: q.y / DPR }; noise(0.14, 160, 0.7);   /* the thump */
+    }
+    drawMummy(b, now, !off);
+    if (off && flip.head) {
+      cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      if (laughAt) cx.globalAlpha = Math.max(0, 1 - (now - laughAt) / 500);
+      var r = b.w * 0.17, v = Math.min(1, (t - 4200) / 1200), ev = 1 - Math.pow(1 - v, 3), room = flip.sg > 0 ? W - r * 1.6 - flip.head.x : flip.head.x - r * 1.6;
+      var d = flip.sg * ev * Math.max(0, Math.min(S * 0.22, room));   /* rolls away, short of the screen's edge */
+      var hy = flip.head.y + (floorY - r - flip.head.y) * Math.min(1, v * 3);
+      drawMummyHead([flip.head.x + d, hy], r, d / r);
+    }
+  }
   /* the boggart: before, in the flip (scaled through zero about the mirror line), after, rolling, laughing, smoke */
   function drawBoggart(now) {
     var b = box(), appear = castAt ? Math.min(1, (now - castAt) / 400) : 0;
@@ -276,6 +348,12 @@
     var k = 0, silly = false;
     if (flip) { k = Math.min(1, (now - flip.at) / 700); silly = k >= 0.5; }
     var sc = Math.cos(Math.PI * k);
+    if (round === 2) {
+      if (laughAt) { cx.globalAlpha = appear * Math.max(0, 1 - (now - laughAt) / 500); }
+      cx.translate(miss, 0);
+      if (flip) drawMummyFlip(b, now); else drawMummy(b, now, true);
+      cx.restore(); return;
+    }
     if (flip) {
       if (flip.axis === 'down') { cx.translate(flip.m, 0); cx.scale(sc || 0.001, 1); cx.translate(-flip.m, 0); }
       else { cx.translate(0, flip.m); cx.scale(1, sc || 0.001); cx.translate(0, -flip.m); }
@@ -298,6 +376,7 @@
     if (!flip || !marks) return;
     var t = now - flip.at, a = Math.min(1, Math.max(0, (t - 700) / 300));
     if (round === 1 && t > 2600) a *= Math.max(0, 1 - (t - 2600) / 500);
+    if (round === 2 && t > 2900) a *= Math.max(0, 1 - (t - 2900) / 300);
     if (laughAt) a *= Math.max(0, 1 - (now - laughAt) / 400);
     if (a <= 0) return;
     cx.save(); cx.globalAlpha = a; cx.lineCap = 'round';
@@ -305,12 +384,33 @@
     cx.beginPath(); his.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke();
     var b = box(), pad = S * 0.06, fs = Math.round(Math.max(12, S * 0.032));
     cx.strokeStyle = '#e8be5a'; cx.lineWidth = 2.5; cx.setLineDash([10, 7]); cx.beginPath();
-    if (flip.axis === 'down') { cx.moveTo(flip.m, b.y - (round === 0 ? S * 0.17 : pad)); cx.lineTo(flip.m, b.y + b.h + pad); }
+    if (flip.axis === 'slant') {
+      var A = flip.A, B2 = flip.B, L = Math.hypot(B2.x - A.x, B2.y - A.y) || 1, ux = (B2.x - A.x) / L, uy = (B2.y - A.y) / L, R = b.h * 0.62, Pp = flip.P;
+      if (uy > 0) { ux = -ux; uy = -uy; }
+      cx.moveTo(Pp.x - ux * R, Pp.y - uy * R); cx.lineTo(Pp.x + ux * R, Pp.y + uy * R); cx.stroke();
+      /* the upright through where it crosses, faint, and the mummy's own upright as it came out, solid */
+      var th = flip.lean * Math.PI / 180, tt = flip.turn * Math.PI / 180, r = b.h * 0.42, ar = b.h * 0.2, ar2 = b.h * 0.3;
+      cx.strokeStyle = 'rgba(232,190,90,0.45)'; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(Pp.x, Pp.y); cx.lineTo(Pp.x, Pp.y - r); cx.stroke();
+      cx.setLineDash([]); cx.strokeStyle = '#9fd0ff'; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(Pp.x, Pp.y); cx.lineTo(Pp.x + Math.sin(tt) * r, Pp.y - Math.cos(tt) * r); cx.stroke();
+      cx.lineWidth = 2; cx.strokeStyle = '#e8be5a'; cx.beginPath(); cx.arc(Pp.x, Pp.y, ar, -Math.PI / 2, -Math.PI / 2 + th, th < 0); cx.stroke();
+      cx.strokeStyle = '#9fd0ff'; cx.beginPath(); cx.arc(Pp.x, Pp.y, ar2, -Math.PI / 2, -Math.PI / 2 + tt, tt < 0); cx.stroke();
+      cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 5; cx.textAlign = flip.lean < 0 ? 'right' : 'left';
+      var sx = flip.lean < 0 ? -1 : 1, h1 = th / 2, h2 = tt / 2;
+      /* each label at the far end of its own line: the mirror's upper end, the mummy's upright as it came out */
+      var lf = Math.round(Math.max(15, S * 0.036)); cx.font = 'italic 600 ' + lf + 'px Georgia, serif';
+      var put = function (text, x, y) { var w = cx.measureText(text).width, x0 = sx < 0 ? x - w : x; x0 = Math.max(6, Math.min(W - 6 - w, x0)); cx.fillText(text, sx < 0 ? x0 + w : x0, y); };
+      cx.fillStyle = '#e8be5a'; put('your line, ' + Math.abs(Math.round(flip.lean)) + '\u00b0', Pp.x + ux * R + sx * 6, Pp.y + uy * R);
+      cx.fillStyle = '#9fd0ff'; put(Math.abs(Math.round(flip.turn)) + '\u00b0, twice', Pp.x + Math.sin(tt) * r + sx * 8, Pp.y - Math.cos(tt) * r - lf * 0.4);
+      cx.font = 'italic ' + fs + 'px Georgia, serif';
+      cx.textAlign = sx < 0 ? 'left' : 'right'; cx.fillStyle = '#e8be5a';
+      cx.fillText('the mirror line', Pp.x - ux * R * 0.95 - sx * 6, Pp.y - uy * R * 0.95 + fs);
+      cx.shadowBlur = 0;
+    } else if (flip.axis === 'down') { cx.moveTo(flip.m, b.y - (round === 0 ? S * 0.17 : pad)); cx.lineTo(flip.m, b.y + b.h + pad); }
     else { cx.moveTo(b.x - pad, flip.m); cx.lineTo(b.x + b.w + pad, flip.m); }
     cx.stroke(); cx.setLineDash([]);
     cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillStyle = '#e8be5a'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 5;
     if (flip.axis === 'down') { cx.textAlign = 'left'; cx.fillText('the mirror line', flip.m + 8, b.y - S * 0.15); }
-    else { cx.textAlign = 'right'; cx.fillText('the mirror line', b.x - pad - 4, flip.m + fs * 0.35); }
+    else if (flip.axis === 'across') { cx.textAlign = 'right'; cx.fillText('the mirror line', b.x - pad - 4, flip.m + fs * 0.35); }
     cx.shadowBlur = 0;
     marks.forEach(function (m) {
       var p = m.p, q = m.q, f = { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 }, d = Math.hypot(q.x - p.x, q.y - p.y);
@@ -349,6 +449,7 @@
   /* where the boggart is after the flip: its box mirrored over the line (for the laugh's tap) */
   function afterBox() {
     var b = box(); if (!flip) return b;
+    if (flip.axis === 'slant') return { x: flip.F.x - b.h / 2, y: flip.F.y - b.w / 2, w: b.h, h: b.w };   /* lying flat */
     if (flip.axis === 'down') return { x: 2 * flip.m - (b.x + b.w), y: b.y, w: b.w, h: b.h };
     var nb = { x: b.x, y: 2 * flip.m - (b.y + b.h), w: b.w, h: b.h };
     if (round === 1) nb.x += S * 0.18;   /* where it rolled to */
@@ -363,8 +464,8 @@
     say('<b>Ha!</b> The Boggart bursts into a thousand tiny wisps of smoke, and is gone.');
     chain = setTimeout(function () {
       chain = null; stage = 'gone'; doneAt = performance.now();
-      if (round === 0) choose(1);
-      else say('Both Boggarts gone. <b>Riddikulus</b>: a mirror line through it, and laughter finishes it. Try either again below.');
+      if (round < 2) choose(round + 1);
+      else say('All three Boggarts gone. <b>Riddikulus</b>: a mirror line through it, upright, level or slanted, and laughter finishes it. Try any again below.');
     }, 2200);
     return true;
   }
@@ -384,11 +485,13 @@
   function frame(now) {
     drawRoom(now);
     if (flip && stage === 'flip') {
-      var t = now - flip.at, end = round === 0 ? 2400 : 4900;
+      var t = now - flip.at, end = round === 0 ? 2400 : round === 1 ? 4900 : 5600;
+      if (round === 2 && t > 800 && !flip.said) { flip.said = true; say('Your line leans <b>' + Math.abs(Math.round(flip.lean)) + ' degrees</b>, so it tipped <b>' + Math.abs(Math.round(flip.turn)) + '</b>: twice as far. Each point as far beyond the line as it was before it, square to it.'); }
       if (t > end) {
         stage = 'laugh';
         say(round === 0 ? (Math.abs(last.share) > 0.15 ? 'Your line was to one side, so he landed <b>as far on the other side</b>: each point the same distance either side, straight across. Now <b>tap him and laugh</b>!' : 'Each point lands <b>the same distance on the other side</b> of your line, straight across: a reflection. Now <b>tap him and laugh</b>!')
-          : 'Upside down, each point as far below your line as it was above. Its legs have vanished and it rolled to a halt. <b>Tap it and laugh</b>!');
+          : round === 1 ? 'Upside down, each point as far below your line as it was above. Its legs have vanished and it rolled to a halt. <b>Tap it and laugh</b>!'
+          : 'It tipped over <b>twice as far as your line leans</b>, ' + Math.abs(Math.round(flip.turn)) + ' degrees, then fell flat on its face, and its head rolled off. <b>Tap it and laugh</b>!');
       }
     }
     drawBoggart(now);
@@ -436,7 +539,7 @@
     word: function () { return sayWord(); }, laugh: function () { return laugh(); },
     state: function () { return { round: round + 1, stage: stage, ease: ease, line: lineEl.textContent,
       last: last ? { verdict: last.verdict, reason: last.reason, tilt: last.tilt, share: last.share, cover: last.cover, at: last.at } : null,
-      flip: flip ? { axis: flip.axis, m: flip.m } : null, marks: marks ? marks.map(function (m) { return { p: m.p, q: m.q }; }) : null,
+      flip: flip ? { axis: flip.axis, m: flip.m, lean: flip.lean, turn: flip.turn, A: flip.axis === 'slant' ? flip.A : undefined, B: flip.axis === 'slant' ? flip.B : undefined, head: flip.head } : null, marks: marks ? marks.map(function (m) { return { p: m.p, q: m.q }; }) : null,
       guide: guide ? guide.state().level : null, learned: LumosSpells.learned('riddikulus') }; } };
 })();
 </script>
