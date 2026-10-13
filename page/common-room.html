@@ -6195,8 +6195,25 @@ function leaveSofa() {
    `card-houdini-leaving`, ...), with its art in FIND_ART; `?drawn=a,b` adds names for a probe only. Until a drawing
    lands the thing in hand is a grey stand-in lettered with its name, as the room's other grey shapes (the old six,
    which the bag has always held, come as stand-ins today). */
-var DRAWN = [];                       /* names of the finds and cards whose drawings have landed; none yet */
-var FIND_ART = {};                    /* name: { url } as each lands; a card's by 'card-<name>' */
+/* the first sheet (req 168; Godric's Q77, Try 2, 13 October 2026, 1.51 pm): sofa-finds-1, one row of four cells, each
+   find in the state it was drawn in; a state not drawn yet shows the drawn one till its edit lands (Object persistence),
+   and `<find>.<state>` names the drawn states for the runtime, so it can bring up only those */
+var FIND_SHEETS = { 'sofa-finds-1': { url: '../assets/layers/sofa-finds-1.png', cols: 4 } };
+var DRAWN = ['quill', 'dungbomb', 'drooble', 'sock', 'quill.goose', 'drooble.unopened', 'sock.striped'];
+var FIND_ART = {                      /* name: its sheet and cell as each lands; a card's by 'card-<name>' */
+  quill: { sheet: 'sofa-finds-1', cell: 0 }, dungbomb: { sheet: 'sofa-finds-1', cell: 1 },
+  drooble: { sheet: 'sofa-finds-1', cell: 2 }, sock: { sheet: 'sofa-finds-1', cell: 3 }
+};
+function findArt(name) {              /* the sheet's image once it has loaded, else null (asked for on first need) */
+  var a = FIND_ART[name], sh = a && FIND_SHEETS[a.sheet];
+  if (!sh) return null;
+  if (!sh.img) {
+    sh.img = new Image();
+    sh.img.onload = function () { sh.ready = true; findHand.key = ''; if (findHand.shows) findDrawRoom(findHand.shows); };
+    sh.img.src = sh.url;
+  }
+  return sh.ready ? { img: sh.img, cell: a.cell, cols: sh.cols } : null;
+}
 function drawnNames() {
   var q = null;
   try { q = new URLSearchParams(location.search).get('drawn'); } catch (err) {}
@@ -6213,6 +6230,7 @@ var findHand = { want: false, k: 0, key: '', w: FIND_W, h: FIND_W,
     depthTest: false, depthWrite: false, opacity: 0 })) };
 findHand.mesh.name = 'find-in-hand'; findHand.mesh.renderOrder = 20; findHand.mesh.visible = false;
 scene.add(findHand.mesh); tappables.push(findHand.mesh);
+Object.keys(FIND_ART).forEach(findArt);               /* the sheets asked for at the start, so a find comes up drawn */
 function findVars() { return (castle && castle.state && castle.state().vars) || {}; }
 function wordsOf(s) { s = String(s || '').replace(/-/g, ' '); return s.charAt(0).toUpperCase() + s.slice(1); }
 /* the stand-ins: a find a grey pebble of a shape with its name and state; a card the card's form in grey, its picture's
@@ -6265,6 +6283,7 @@ function drawFindStandIn(v, into) {                    /* into: another canvas o
   g.fillText(wordsOf(v.card), W / 2, fy + fh + (H - M - fy - fh) / 2);
 }
 function findDrawRoom(shows) {
+  findHand.shows = shows;
   findHand.want = shows.indexOf(FIND_RULES.hand) >= 0;
   bubble.want = shows.indexOf(FIND_RULES.bubble) >= 0;
   if (!findHand.want) return;
@@ -6274,8 +6293,16 @@ function findDrawRoom(shows) {
   findHand.key = key;
   var card = v.find === 'card';
   findHand.w = card ? CARD_W : FIND_W; findHand.h = card ? CARD_H : FIND_W * 716 / 512;
-  drawFindStandIn(v);
+  var art = card ? null : findArt(v.find);
+  if (art) drawFindArt(art); else drawFindStandIn(v);
   findTex.needsUpdate = true;
+}
+/* a drawn find: its cell across the canvas's width, standing in the middle of its height */
+function drawFindArt(a) {
+  var g = findCanvas.getContext('2d'), W = findCanvas.width, H = findCanvas.height;
+  var cw = a.img.width / a.cols, ch = a.img.height, h = W * ch / cw;
+  g.clearRect(0, 0, W, H);
+  g.drawImage(a.img, a.cell * cw, 0, cw, ch, 0, (H - h) / 2, W, h);
 }
 /* held before his eye as a notice is, a little below the middle, breathing with his hand; it comes up and goes in 0.4 s */
 var _fp = new THREE.Vector3(), _fq = new THREE.Quaternion();
@@ -8381,7 +8408,8 @@ function nickHead() { return nickMesh.position.clone().add(new THREE.Vector3(0, 
    written, on a scrap in its hand at its place. A line held for the canon gate (`held`, no words) only keeps its
    speaker's entrance and walk-off. */
 var HANDS = { neville: F.child, wood: F.casual, hooch: F.casual, pince: F.clerk, clementine: F.clerk, print: F.print,
-  errol: F.casual };                           /* an old owl's scrawl (req 199): the scratchiest hand there is */
+  errol: F.casual,                             /* an old owl's scrawl (req 199): the scratchiest hand there is */
+  dobby: F.child };                            /* a house-elf's careful big letters (req 273, the odd sock's note) */
 var STAIR_HEAD = new THREE.Vector3(4.45, 3.0, -0.9);
 var LINE_PLACES = {                            /* where a line with no drawn speaker is said, heard or written */
   sofa: new THREE.Vector3(onSofa(0.45, 0.12)[0], 0.95, onSofa(0.45, 0.12)[1]),
