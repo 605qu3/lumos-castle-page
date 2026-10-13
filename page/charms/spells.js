@@ -875,6 +875,85 @@ function judgeFreeze(points, pixies, ease) {
   out.verdict = 'frozen'; out.reason = 'frozen';
   return out;
 }
+/* Hermione's bluebell flames (PS 11: in the freezing courtyard "she had conjured them up a bright blue fire that could
+   be carried around in a jam jar. They were standing with their backs to it, getting warm"; the same flames onto the
+   hem of Snape's robes, PS 11, and "the same bluebell flames she had used on Snape" at the Devil's Snare, PS 16). No
+   word and no motion in the book; the stroke is ours, for the geometry: a circle is every point the same distance from
+   its middle, and three friends not in a row stand on exactly one circle. One ring drawn through where they stand;
+   the jar goes down at its middle, and each friend is warm when on its edge, as far from the fire as the others.
+   points: [{x, y, t}] in CSS pixels, either way round; friends: [{x, y, r}], r each one's size; ease: a name in
+   FLAMES_EASES or one of its own (wind: how far round its own middle, in turns, the ring must go; turns: the most
+   before it is a scribble; round: how far the stroke may stray from its circle, as a share of the radius, the root of
+   the mean square; near: how far off the ring a friend may stand and still be warm, in its sizes).
+   Returns { verdict: 'warm' | 'miss', reason ('warm', 'tap', 'open', 'scribble', 'lumpy', 'out'), c (the stroke's own
+   circle { x, y, r }, its middle where the jar goes), turns, round, off (each friend's distance off the ring, in its
+   sizes, plus outside and minus inside), warm [true, ...], cold (the friends left outside the ring, too far from the
+   fire), close (the ones inside it, too near), row (three or more friends in a line, within a size: no circle passes
+   through them), through (the one circle through the first three friends, null when they are in a row) }. */
+var FLAMES_EASES = {
+  kind:   { wind: 0.80, turns: 1.8, round: 0.16, near: 1.4 },
+  fair:   { wind: 0.88, turns: 1.6, round: 0.12, near: 1.0 },
+  strict: { wind: 0.95, turns: 1.4, round: 0.08, near: 0.7 }
+};
+function circleThrough(a, b, d) {   /* the one circle through three points, or null when they are in a row */
+  var D = 2 * (a.x * (b.y - d.y) + b.x * (d.y - a.y) + d.x * (a.y - b.y));
+  if (Math.abs(D) < 1e-9) return null;
+  var a2 = a.x * a.x + a.y * a.y, b2 = b.x * b.x + b.y * b.y, d2 = d.x * d.x + d.y * d.y;
+  var c = { x: (a2 * (b.y - d.y) + b2 * (d.y - a.y) + d2 * (a.y - b.y)) / D, y: (a2 * (d.x - b.x) + b2 * (a.x - d.x) + d2 * (b.x - a.x)) / D };
+  c.r = Math.hypot(a.x - c.x, a.y - c.y);
+  return c;
+}
+function fitCircle(P) {   /* the circle nearest the points (least squares on x² + y² + Dx + Ey + F = 0), about their mean */
+  var n = P.length, mx = 0, my = 0, i;
+  for (i = 0; i < n; i++) { mx += P[i].x; my += P[i].y; }
+  mx /= n; my /= n;
+  var xx = 0, xy = 0, yy = 0, xz = 0, yz = 0, zz = 0;
+  for (i = 0; i < n; i++) { var x = P[i].x - mx, y = P[i].y - my, z = x * x + y * y; xx += x * x; xy += x * y; yy += y * y; xz += x * z; yz += y * z; zz += z; }
+  /* with the points about their mean, Σx = Σy = 0: [xx xy][D] = -[xz], [xy yy][E] = -[yz], F = -zz/n */
+  var det = xx * yy - xy * xy;
+  if (Math.abs(det) < 1e-9) return { x: mx, y: my, r: 0 };
+  var D = (-xz * yy + yz * xy) / det, E = (-yz * xx + xz * xy) / det, F = -zz / n;
+  var cx = -D / 2, cy = -E / 2;
+  return { x: cx + mx, y: cy + my, r: Math.sqrt(Math.max(0, cx * cx + cy * cy - F)) };
+}
+function judgeFlames(points, friends, ease) {
+  var e = typeof ease === 'object' ? ease : (FLAMES_EASES[ease] || FLAMES_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', c: null, turns: 0, round: 0, off: [], warm: [], cold: [], close: [], row: false, through: null };
+  var P = points || [], i, path = 0, r0 = friends.length ? friends[0].r : 10;
+  if (friends.length > 2) {   /* in a row: every friend within a size of the line through the outer two */
+    var s = friends.slice().sort(function (p, q) { return p.x - q.x || p.y - q.y; }), f = s[0], l = s[s.length - 1], fl = Math.hypot(l.x - f.x, l.y - f.y) || 1, bend = 0;
+    for (i = 1; i < s.length - 1; i++) bend = Math.max(bend, Math.abs((l.x - f.x) * (f.y - s[i].y) - (f.x - s[i].x) * (l.y - f.y)) / fl / s[i].r);
+    out.row = bend < 1;
+    out.through = out.row ? null : circleThrough(friends[0], friends[1], friends[2]);
+  }
+  for (i = 1; i < P.length; i++) path += Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
+  if (P.length < 3 || path < r0 * 4) return out;
+  var c = fitCircle(P);
+  out.c = { x: Math.round(c.x), y: Math.round(c.y), r: Math.round(c.r) };
+  /* how far round its own middle the stroke goes */
+  var sum = 0, la = null;
+  for (i = 0; i < P.length; i++) {
+    var a = Math.atan2(P[i].y - c.y, P[i].x - c.x);
+    if (la !== null) { var d = a - la; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; sum += d; }
+    la = a;
+  }
+  out.turns = Math.round(Math.abs(sum) / (2 * Math.PI) * 100) / 100;
+  var sq = 0;
+  for (i = 0; i < P.length; i++) { var dd = Math.hypot(P[i].x - c.x, P[i].y - c.y) - c.r; sq += dd * dd; }
+  out.round = c.r ? Math.round(Math.sqrt(sq / P.length) / c.r * 100) / 100 : 1;
+  for (i = 0; i < friends.length; i++) {
+    var p = friends[i], o = (Math.hypot(p.x - c.x, p.y - c.y) - c.r) / p.r;
+    out.off.push(Math.round(o * 100) / 100);
+    out.warm.push(Math.abs(o) <= e.near);
+    if (o > e.near) out.cold.push(i); else if (o < -e.near) out.close.push(i);
+  }
+  if (out.turns < e.wind) { out.reason = 'open'; return out; }
+  if (out.turns > e.turns) { out.reason = 'scribble'; return out; }
+  if (out.round > e.round) { out.reason = 'lumpy'; return out; }
+  if (out.cold.length || out.close.length) { out.reason = 'out'; return out; }
+  out.verdict = 'warm'; out.reason = 'warm';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1749,5 +1828,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
