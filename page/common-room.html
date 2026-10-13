@@ -6109,6 +6109,7 @@ function keyDoorTap() {
     if (v !== 'nothing') return;
     KEYDOOR.shake = 1;
     lineQ.unshift({ medium: 'heard', speaker: 'little door', sound: 'nothing happened.' });
+    LIST.triedT = 3;                                  /* his try, just now: a line it writes comes up to be written (Q66p t1) */
     if (castle) castle.moment('tried little door');   /* req 194: his first try goes on the list, once ever (the runtime's) */
   }, function () { LOCKS.door = null; });
 }
@@ -6258,6 +6259,15 @@ function listMine() {                                  /* his line at the foot, 
   var w = castle && castle.written ? castle.written() : [];
   return w.filter(function (x) { return x.at === 'door list'; }).reverse();
 }
+/* his line with the day he wrote it (Godric's Q66p t1, 13 October 2026, 7.12 am: when his Alohomora leaves the little
+   door shut, a new line writes itself at the list's foot in his own hand, with the date): the runtime's `day` is the
+   local day's number since 1970, so its date is read in UTC; the date goes before the year if the line has one */
+var LIST_MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+function listDated(m) {
+  if (m.day == null) return m.text;
+  var d = new Date(m.day * 86400000), on = d.getUTCDate() + ' ' + LIST_MONTHS[d.getUTCMonth()];
+  return /\b\d{4}\b/.test(m.text) ? m.text.replace(/\b(\d{4})\b/, on + ' $1') : m.text + ' (' + on + ')';
+}
 function listWrap(g, text, width) {
   var words = text.split(' '), lines = [], cur = '';
   words.forEach(function (wd) {
@@ -6277,7 +6287,7 @@ function listLayout() {
   var bands = [0, 1, 2].map(function (i) { return [(listCellTop(i) + LIST_ART.text) * m, (listCellTop(i) + LIST_ART.ends[i]) * m]; });
   var b = 0, y = bands[0][0], his = -1;
   function room(h) { while (b < bands.length - 1 && y + h > bands[b][1]) { b++; y = bands[b][0]; } }   /* past a band's end, on to the next piece */
-  var mine = listMine(), all = DOOR_LIST.concat(mine.map(function (m) { return { t: m.text, h: 'his', ink: 'pencil', his: true }; }));
+  var mine = listMine(), all = DOOR_LIST.concat(mine.map(function (m) { return { t: listDated(m), h: 'his', ink: 'pencil', his: true }; }));
   if (!mine.length) all = all.concat([{ blank: true, his: true }]);
   all.forEach(function (e) {
     if (e.his && his < 0) his = out.length;
@@ -6286,7 +6296,7 @@ function listLayout() {
     g.font = listFont(e.h, size);
     listWrap(g, text, e.head ? W : W - 6).forEach(function (ln, i) {
       room(size * 1.1);
-      out.push({ text: ln, x: e.head ? LIST.cw / 2 : LIST.margin + (i ? 22 : 0), y: y, h: e.h, size: size, ink: e.ink, head: e.head });
+      out.push({ text: ln, x: e.head ? LIST.cw / 2 : LIST.margin + (i ? 22 : 0), y: y, h: e.h, size: size, ink: e.ink, head: e.head, his: e.his });
       y += size * LIST.lead;
     });
     if (e.sub) { g.font = listFont(e.h, size * 0.92); listWrap(g, e.sub, W - 60).forEach(function (ln) { room(size); out.push({ text: ln, x: LIST.margin + 54, y: y, h: e.h, size: size * 0.92, ink: e.ink }); y += size * (LIST.lead - 0.07); }); }
@@ -6297,6 +6307,7 @@ function listLayout() {
   LIST.over = Math.max(0, Math.round(y - foot)); LIST.room = Math.round(foot - y);   /* room left at the foot, before his line is moved down to it */
   LIST.items = out; LIST.max = Math.max(0, Math.max(listLen() * m, y + 40) - LIST.ch);
   LIST.key = mine.map(function (m) { return m.key + m.t; }).join('|');
+  LIST.hisChars = out.reduce(function (n, it) { return n + (it.his && it.text ? it.text.length : 0); }, 0);
 }
 /* the pieces and the lines on them, from `from` down `H` (both in the hand's pixels), scaled by k; with clip the ink
    goes only on the paper. Grey pieces until the drawing loads. */
@@ -6315,8 +6326,10 @@ function listPaint(g, k, from, H, clip) {
   }
   if (clip) g.globalCompositeOperation = 'source-atop';
   g.textBaseline = 'top';
+  var hisLeft = LIST.write ? Math.floor(LIST.hisChars * Math.min(1, LIST.write.t / LIST.write.dur)) : Infinity;   /* his new line, written as he watches */
   LIST.items.forEach(function (it) {
-    var y = it.y;
+    var y = it.y, text = it.text;
+    if (it.his && text) { text = text.slice(0, Math.max(0, hisLeft)); hisLeft -= it.text.length; }
     if (y < from - 80 || y > from + H + 40) return;
     if (it.blank) {                                   /* his line, waiting */
       g.strokeStyle = '#8a857d'; g.lineWidth = 2; g.setLineDash([10, 8]);
@@ -6336,7 +6349,7 @@ function listPaint(g, k, from, H, clip) {
       return;
     }
     g.font = listFont(it.h, it.size);
-    g.fillText(it.text, it.x, y);
+    g.fillText(text, it.x, y);
   });
   g.restore();
 }
@@ -6366,9 +6379,39 @@ function returnList() {
   mode = 'tween'; backBtn.hidden = true;
   LIST.lift = { t: 0, dur: 0.5, dir: -1 };
 }
+var LIST_WRITE_S = 2.6, LIST_WRITE_STEP = 0.12;    /* his new line takes 2.6 s to write, a few letters a step */
+var LIST_WRITE_AFTER = 1.2;                           /* and the list comes up 1.2 s into the door's "nothing happened." */
 function updateList(dt, t) {
+  if (LIST.write && mode !== 'tween') {               /* his new line writing itself, repainted a few times a second */
+    LIST.write.t += dt;
+    if ((LIST.write.next -= dt) < 0 || LIST.write.t >= LIST.write.dur) {
+      LIST.write.next = LIST_WRITE_STEP;
+      if (LIST.write.t >= LIST.write.dur) { LIST.write = null; listPlace(); }
+      if (listHand.visible) listDraw(); else if (LIST.write) listPlace();
+    }
+  }
   if (!listHand.visible) {                            /* a line of his written since: the room's strip again, checked once a second */
-    if ((LIST.check -= dt) < 0) { LIST.check = 1; if (listMine().map(function (m) { return m.key + m.t; }).join('|') !== LIST.placed) listPlace(); }
+    if (LIST.pend) {                                  /* his new line waits till the door's "nothing happened." has been said */
+      var doorSays = function (l) { return l && l.speaker === 'little door'; };
+      if (!lineQ.some(doorSays) && ((LIST.pend.t -= dt) < 0 || !doorSays(lineCur && lineCur.line))) {
+        if (LIST.pend.t > 0 && doorSays(lineCur && lineCur.line)) return;
+        LIST.pend = null; LIST.write = { t: 0, dur: LIST_WRITE_S, next: LIST_WRITE_STEP };
+        listPlace();
+        /* from where he casts the door is far off, so the list comes up to his hand at its foot to be written on */
+        if (mode === 'room' && !held) { liftList(); LIST.scroll = LIST.scrollT = LIST.max; listDraw(); }
+      }
+      return;
+    }
+    if (LIST.triedT > 0) LIST.triedT -= dt;
+    if (!LIST.write && (LIST.check -= dt) < 0) {
+      LIST.check = 1;
+      var mine = listMine();
+      if (mine.map(function (m) { return m.key + m.t; }).join('|') !== LIST.placed) {
+        if (LIST.triedT > 0 && LIST.mineN != null && mine.length > LIST.mineN) LIST.pend = { t: LIST_WRITE_AFTER };
+        else listPlace();
+      }
+      LIST.mineN = mine.length;
+    }
     return;
   }
   handPose(listPose, t, _p, _hq);
