@@ -2113,6 +2113,195 @@ var holeFrame = new THREE.Group();
 holeFrame.matrix.makeBasis(holeT, new THREE.Vector3(0, 1, 0), holeN.clone().negate()).setPosition(holeC.x, 0, holeC.z);
 holeFrame.matrix.decompose(holeFrame.position, holeFrame.quaternion, holeFrame.scale);
 scene.add(holeFrame);
+/* ---------- the house hourglass over the portrait hole (board req 238; Q74, spot 74.1) ----------
+   Built ahead behind ?hourglass, 13 October 2026, Godric to answer Q74: without the flag nothing here is built or loaded
+   and the room is as it was. Design's glass (page/design/house-hourglass.js, its API in docs/handoff/design.md, "The
+   house cup (Q21 answered 2)", the paragraph on the glass live) is mounted in an element off the screen, and its SVG,
+   the still glass and the light layer of stones in flight, is drawn into a canvas worn by a plane 0.6 by 1.2 m, 2.2
+   to 3.4 m up over the hole, facing the room as the paintings do. The canvas goes up to the GPU only when the SVG
+   changes, so only while stones move. It stands in a round-headed recess cut in the room's own stone, as the window
+   seats are: the wall's shader drops the opening (below, hourglassCut) and the lining wears bayMat, the drawn stone at
+   the wall's scale, darkened toward the back (the SVG's own niche is flat ashlar of its own and a squatter shape).
+   The year so far, read from the runtime, stands in it from the start; what landed before the glass had loaded is
+   replayed in order; a slip from the owl's post (from 'sill') flies as a few stones in its house's colours from the
+   right window's sill over the fire to the glass's top, and then falls in. */
+var HOURGLASS = { on: /[?&]hourglass(=|&|$)/.test(location.search), w: 0.6, h: 1.2, foot: 2.2, z: -0.12, px: [256, 512],
+  cut: { hw: 0.36, foot: 2.2, spring: 3.1, deep: 0.3, shade: [0.72, 0.28] },   /* half width, springing, depth; shade at the room face and at the back */
+  sill: { th: Math.PI - 0.55, r: 5.3, y: 2.15 }, over: [0, 5.0, -4.3], to: [0, 3.25, -0.08],   /* the flight: from, over the fire, into the glass (its frame) */
+  fly: { s: 1.5, gap: 0.09, size: 0.14, jitter: 0.25, next: 0.35 },
+  flyHz: 30, scripts: ['design/drawn.js', 'design/lumos-icon.js', 'design/house-hourglass.js'] };
+var hourglassLive = { glass: null, el: null, still: null, fly: null, stillImg: null, flyImg: null, dirty: { still: false, fly: false },
+  loading: false, mesh: null, tex: null, ctx: null, flights: [], clock: 0, flyAt: 0, flyT: 0, houses: [], gems: {}, v: new THREE.Vector3(),
+  state: { on: HOURGLASS.on, scripts: 0, mounted: false, replayed: 0, flying: 0, redraws: 0 } };
+function hourglassCut() {   /* the recess's opening in the wall's shader, 3 mm inside its lining as the bays' are */
+  var c = HOURGLASS.cut, e = 0.003, hw = c.hw - e;
+  return '{ vec3 d = vHoleW - holeC; float a = dot(d, holeN), x = dot(d, vec3(-holeN.z, 0.0, holeN.x)), y = vHoleW.y - ' + c.spring.toFixed(3) + ';' +
+    ' if (abs(a) < 0.1 && abs(x) < ' + hw.toFixed(3) + ' && vHoleW.y > ' + (c.foot + e).toFixed(3) + ' && (y < 0.0 || x * x + y * y < ' + (hw * hw).toFixed(5) + ')) discard; }\n';
+}
+if (HOURGLASS.on) (function () {
+  /* the recess's lining in the hole's frame: the jambs, the floor, the round head and the back, the stone folded in
+     round each edge (u and v carried on into the depth, as the bays' are) */
+  var c = HOURGLASS.cut, K = WALL_U_PER_M, pos = [], uv = [], shade = [], idx = [], N = 12;
+  function zw(x) { return WALL_R - Math.sqrt(WALL_R * WALL_R - x * x) + 0.005; }   /* the round wall's face */
+  function uAt(x) { return wallU(HOLE_THETA - Math.asin(x / WALL_R)); }
+  function sh(dep) { return c.shade[0] + (c.shade[1] - c.shade[0]) * Math.min(1, dep / c.deep); }
+  function piece(rows, cols, fn) {
+    var base = pos.length / 3;
+    for (var i = 0; i <= rows; i++) for (var j = 0; j <= cols; j++) { var q = fn(i / rows, j / cols); pos.push(q[0], q[1], q[2]); uv.push(q[3], q[4]); shade.push(q[5], q[5], q[5]); }
+    for (i = 0; i < rows; i++) for (j = 0; j < cols; j++) { var k = base + i * (cols + 1) + j, l = k + cols + 1; idx.push(k, l, k + 1, k + 1, l, l + 1); }
+  }
+  [-1, 1].forEach(function (s) {
+    var x = s * c.hw, z0 = zw(x), u0 = uAt(x);
+    piece(1, 1, function (i, k) { var y = i ? c.spring : c.foot, z = k ? -c.deep : z0, dep = z0 - z; return [x, y, z, u0 + s * dep * K, y / 7, sh(dep)]; });
+  });
+  piece(1, N, function (i, f) { var x = c.hw * (2 * f - 1), z0 = zw(x), z = i ? -c.deep : z0, dep = z0 - z; return [x, c.foot, z, uAt(x), (c.foot + dep) / 7, sh(dep)]; });
+  piece(1, 2 * N, function (i, f) {
+    var a = Math.PI * f, x = -c.hw * Math.cos(a), y = c.spring + c.hw * Math.sin(a), z0 = zw(x), z = i ? -c.deep : z0, dep = z0 - z;
+    return [x, y, z, uAt(x), (y - dep) / 7, sh(dep)];
+  });
+  var uL = uAt(-c.hw) - (zw(c.hw) + c.deep) * K, uR = uAt(c.hw) + (zw(c.hw) + c.deep) * K;
+  piece(N, N, function (i, f) {
+    var x = c.hw * (2 * f - 1), y = c.foot + (c.spring + Math.sqrt(Math.max(0, c.hw * c.hw - x * x)) - c.foot) * i;
+    return [x, y, -c.deep, uL + (uR - uL) * f, y / 7, c.shade[1]];
+  });
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(shade, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  var m = new THREE.Mesh(g, bayMat);
+  m.receiveShadow = true; m.castShadow = false; m.name = 'hourglass-recess';
+  holeFrame.add(m); register(m, 0);
+  /* the glass's plane, hidden till its first drawing is in */
+  var L = hourglassLive, cv = document.createElement('canvas');
+  cv.width = HOURGLASS.px[0]; cv.height = HOURGLASS.px[1];
+  L.ctx = cv.getContext('2d');
+  L.tex = new THREE.CanvasTexture(cv); L.tex.encoding = THREE.sRGBEncoding; L.tex.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+  L.mesh = new THREE.Mesh(new THREE.PlaneGeometry(HOURGLASS.w, HOURGLASS.h), new THREE.MeshStandardMaterial({ map: L.tex, transparent: true, roughness: 0.9, metalness: 0 }));
+  L.mesh.position.set(0, HOURGLASS.foot + HOURGLASS.h / 2, HOURGLASS.z);
+  L.mesh.visible = false; L.mesh.name = 'house-hourglass';
+  holeFrame.add(L.mesh); register(L.mesh, 1);
+  hourglassLoad();
+})();
+/* Design's three scripts, fetched together and run in order, then the glass */
+function hourglassLoad() {
+  HOURGLASS.scripts.forEach(function (src) {
+    var s = document.createElement('script');
+    s.src = src + '?v=1'; s.async = false;
+    s.onload = function () { if (++hourglassLive.state.scripts === HOURGLASS.scripts.length) hourglassMount(); };
+    document.head.appendChild(s);
+  });
+}
+function hourglassKey(s) { return s.kind + ' ' + s.thing + ' ' + (s.from || ''); }
+function hourglassMount() {
+  var L = hourglassLive, held = OWL_POST.held, landed = {}, yr = castle && castle.year ? castle.year() : null;
+  if (!window.LumosHourglass) return;
+  held.forEach(function (h) { landed[hourglassKey(h.slip)] = 1; });
+  /* this school year's slips, the year's own slip left out of the heap as the runtime leaves it; the boys' houses from
+     this castle's own and the slips', two at most */
+  var year = (castle && castle.points ? castle.points() : []).filter(function (p) { return p.kind !== 'year' && (!p.year || p.year === yr); });
+  [castle && castle.house ? castle.house() : null].concat(year.map(function (p) { return p.house; })).forEach(function (h) {
+    if (h && L.houses.indexOf(h) < 0 && L.houses.length < 2) L.houses.push(h);
+  });
+  L.el = document.createElement('div');
+  L.el.setAttribute('aria-hidden', 'true');
+  L.el.style.cssText = 'position:fixed;left:-4000px;top:0;width:240px;pointer-events:none';
+  document.body.appendChild(L.el);
+  L.glass = LumosHourglass.mount(L.el, { slips: year.filter(function (p) { return !landed[hourglassKey(p)]; }), houses: L.houses });
+  L.still = L.el.firstChild; L.fly = L.el.lastChild;
+  L.dirty.still = L.dirty.fly = true;
+  new MutationObserver(function (ms) {
+    ms.forEach(function (m) { if (L.fly.contains(m.target)) L.dirty.fly = true; else L.dirty.still = true; });
+  }).observe(L.el, { childList: true, subtree: true });
+  L.state.mounted = true;
+  held.forEach(function (h) { hourglassDrop(h.slip); L.state.replayed++; });
+  OWL_POST.backs.forEach(function (s) { L.glass.back(s); L.state.replayed++; });
+}
+function hourglassDrop(slip) { if (slip.kind !== 'year') hourglassLive.glass.point(slip); }
+/* a stone's sprite, one small canvas per house, in Design's stone colours: the gem, its lit facet and a faint glow */
+function hourglassGem(house) {
+  var L = hourglassLive;
+  if (L.gems[house]) return L.gems[house];
+  var c = LumosHourglass.STONE[house] || LumosHourglass.STONE.lion, cv = document.createElement('canvas');
+  cv.width = cv.height = 64;
+  var g = cv.getContext('2d'), glow = g.createRadialGradient(32, 32, 4, 32, 32, 31);
+  glow.addColorStop(0, c[1] + '90'); glow.addColorStop(1, c[1] + '00');
+  g.fillStyle = glow; g.fillRect(0, 0, 64, 64);
+  g.beginPath();
+  for (var i = 0; i < 6; i++) { var a = 0.3 + i * Math.PI / 3; g.lineTo(32 + Math.cos(a) * 14, 32 + Math.sin(a) * 12); }
+  g.closePath(); g.fillStyle = c[0]; g.fill(); g.lineWidth = 2; g.strokeStyle = c[2]; g.stroke();
+  g.beginPath(); g.moveTo(24, 31); g.lineTo(30, 23); g.lineTo(34, 30); g.closePath(); g.fillStyle = c[1]; g.fill();
+  var t = new THREE.CanvasTexture(cv);
+  t.encoding = THREE.sRGBEncoding;
+  return (L.gems[house] = t);
+}
+function hourglassFlyFrom(slip) {
+  var L = hourglassLive, H = HOURGLASS, house = slip.house || L.houses[0] || 'lion', j = H.fly.jitter;
+  var n = Math.max(3, Math.min(6, Math.round(slip.points / 8))), stones = [];
+  var a = new THREE.Vector3(H.sill.r * Math.sin(H.sill.th), H.sill.y, H.sill.r * Math.cos(H.sill.th));
+  var b = holeFrame.localToWorld(new THREE.Vector3(H.to[0], H.to[1], H.to[2]));
+  for (var i = 0; i < n; i++) {
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: hourglassGem(house), transparent: true, depthWrite: false }));
+    s.scale.setScalar(H.fly.size); s.visible = false; s.raycast = function () {};
+    scene.add(s);
+    stones.push({ s: s, a: a.clone().add(new THREE.Vector3((Math.random() - 0.5) * 0.3, Math.random() * 0.1, (Math.random() - 0.5) * 0.3)),
+      c: new THREE.Vector3(H.over[0] + (Math.random() - 0.5) * j, H.over[1] + (Math.random() - 0.5) * j, H.over[2] + (Math.random() - 0.5) * j) });
+  }
+  var t0 = Math.max(L.clock, L.flyAt);
+  L.flyAt = t0 + H.fly.next;
+  L.flights.push({ slip: slip, t0: t0, stones: stones, b: b });
+}
+function updateHourglass(dt) {
+  var L = hourglassLive, H = HOURGLASS, v = L.v, flying = 0, left = [];
+  L.clock += dt;
+  L.flights.forEach(function (fl) {
+    var done = true;
+    fl.stones.forEach(function (st, i) {
+      var u = (L.clock - fl.t0 - i * H.fly.gap) / H.fly.s;
+      if (u < 1) done = false;
+      st.s.visible = u > 0 && u < 1;
+      if (!st.s.visible) return;
+      var e = 0.5 * u + 0.5 * u * u * (3 - 2 * u), k = 1 - e;   /* thrown, a touch of ease at each end */
+      v.copy(st.a).multiplyScalar(k * k).addScaledVector(st.c, 2 * k * e).addScaledVector(fl.b, e * e);
+      st.s.position.copy(v);
+      st.s.scale.setScalar(H.fly.size * (1 - 0.45 * Math.max(0, (u - 0.8) / 0.2)));
+      st.s.material.rotation += dt * 5;
+      flying++;
+    });
+    if (!done) { left.push(fl); return; }
+    fl.stones.forEach(function (st) { scene.remove(st.s); st.s.material.dispose(); });
+    hourglassDrop(fl.slip);
+  });
+  L.flights = left;
+  L.state.flying = flying;
+  /* the falling stones read again at most HOURGLASS.flyHz a second: each read is an SVG decoded on the main thread */
+  if (L.glass && !L.loading && (L.dirty.still || (L.dirty.fly && L.clock - L.flyT >= 1 / H.flyHz))) { L.flyT = L.clock; hourglassRaster(); }
+}
+/* the SVG to the canvas: the still glass read again only when it changes, the stones in flight over it */
+function hourglassSvg(svg, done) {
+  var c = svg.cloneNode(true), im = new Image();
+  c.removeAttribute('style'); c.setAttribute('width', HOURGLASS.px[0]); c.setAttribute('height', HOURGLASS.px[1]);
+  im.onload = function () { done(im); }; im.onerror = function () { done(null); };
+  im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(c));
+}
+function hourglassRaster() {
+  var L = hourglassLive, still = L.dirty.still, fly = L.dirty.fly, W = HOURGLASS.px[0], Hh = HOURGLASS.px[1];
+  L.dirty.still = L.dirty.fly = false; L.loading = true;
+  function paint() {
+    L.ctx.clearRect(0, 0, W, Hh);
+    if (L.stillImg) L.ctx.drawImage(L.stillImg, 0, 0, W, Hh);
+    if (L.flyImg) L.ctx.drawImage(L.flyImg, 0, 0, W, Hh);
+    L.tex.needsUpdate = true; L.mesh.visible = !!L.stillImg;
+    L.state.redraws++; L.loading = false;
+  }
+  function flyThen() {
+    if (!fly) return paint();
+    if (!L.fly.lastChild.childNodes.length) { L.flyImg = null; return paint(); }
+    hourglassSvg(L.fly, function (im) { L.flyImg = im; paint(); });
+  }
+  if (still && L.still.firstChild) hourglassSvg(L.still.firstChild, function (im) { if (im) L.stillImg = im; flyThen(); });
+  else flyThen();
+}
 wall.material.onBeforeCompile = function (sh) {
   sh.uniforms.holeC = { value: holeC };
   sh.uniforms.holeN = { value: holeN };
@@ -2121,6 +2310,7 @@ wall.material.onBeforeCompile = function (sh) {
   sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;\nuniform vec3 holeC;\nuniform vec3 holeN;')
     .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' +
       '{ vec3 d = vHoleW - holeC; float a = dot(d, holeN); if (abs(a) < 0.1 && length(d - a * holeN) < ' + HOLE_R.toFixed(3) + ') discard; }\n' +
+      (HOURGLASS.on ? hourglassCut() : '') +   /* the house hourglass's recess, only behind ?hourglass (req 238, above) */
       /* the two window seats' openings (req 174, BAY above): the room face's angle either side of each bay's centre, kept
          3 mm inside the nook's stone so no hairline of what lies behind shows at its edges */
       'if (vHoleW.y > ' + (BAY.seat + 0.003).toFixed(3) + ' && vHoleW.y < ' + (BAY.head - 0.003).toFixed(3) + ') { vec2 p = vHoleW.xz;' +
@@ -8133,8 +8323,13 @@ function roomPoint(slip) {
   if (slip.from && performance.now() < OWL_POST.land) OWL_POST.queue.push(slip);
   else hourglassPoint(slip, slip.from ? 'sill' : 'here');
 }
-function hourglassPoint(slip, from) { OWL_POST.held.push({ slip: slip, from: from }); }
-function hourglassBack(slip) { OWL_POST.backs.push(slip); }
+/* behind ?hourglass (req 238, by the portrait hole), once the glass stands: a slip from the sill flies to it, his own
+   drop at once, one taken back flies up; till then, and always without the flag, they are kept as before */
+function hourglassPoint(slip, from) {
+  if (!hourglassLive.glass) { OWL_POST.held.push({ slip: slip, from: from }); return; }
+  if (from === 'sill') hourglassFlyFrom(slip); else hourglassDrop(slip);
+}
+function hourglassBack(slip) { if (hourglassLive.glass) hourglassLive.glass.back(slip); else OWL_POST.backs.push(slip); }
 var OWL_POST_CUES = {
   "an owl swoops down to the sill with a little pouch tied to its leg, and his brother's gems tumble out of it and fly across the room into the hourglass, each in its own house's colours": function () { owlLands('day'); },
   "an owl lands on the moonlit sill, taps its beak on the glass three times, tap-tap-tap, and his brother's gems tumble out of the little pouch tied to its leg and fly across the room into the hourglass, each in its own house's colours": function () { owlLands('night'); },
@@ -8259,6 +8454,7 @@ function frame() {
   updateHomework(sdt);
   updateCurios(sdt, slowT);
   updateSnowball(sdt);
+  if (HOURGLASS.on) updateHourglass(dt);
   var shook = howlerShake();
   renderer.render(scene, camera);
   if (shook) howlerUnshake();
@@ -8338,6 +8534,9 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
 
 window.lumosGreybox = { frame: frame, edges: function () { return { last: EDGE.last, at: EDGE.at, count: EDGE.count, cat: EDGE.catOn, gust: EDGE.paper ? +(EDGE.paper.gust || 0).toFixed(3) : 0, skipped: EDGE.skipped, where: EDGE.where, now: t }; }, edgeFire: function (key) { return edgeFire(key); }, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 window.lumosGreybox.howlerBurst = { state: howlerReport, at: howlerAt, ash: howlerAshAt, note: function () { var p = howlerNote.position.clone().project(camera); return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)]; } };   /* req 199's checks */
+/* req 238's checks: the glass's state, and a slip handed in as the runtime hands one (the owl's post queues it till the
+   owl has landed), since the runtime keeps its owl's delivery to itself */
+window.lumosGreybox.hourglass = { state: function () { return Object.assign({}, hourglassLive.state); }, deliver: function (slip) { roomPoint(slip); }, mesh: function () { return hourglassLive.mesh; } };
 })();
 </script>
 </body>
