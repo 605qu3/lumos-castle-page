@@ -360,6 +360,66 @@ function judgeAim(points, from, to, ease) {
   out.verdict = 'hit'; out.reason = 'hit';
   return out;
 }
+/* Ferula, the coil (PoA 19: Lupin "tapped Ron's leg with his wand and muttered, 'Ferula.' Bandages spun up Ron's leg,
+   strapping it tightly to a splint"). The book's is the tap; the stroke after it is ours, for the geometry: a coil drawn
+   up the leg from its foot to its top, side to side across it, each crossing there and back one turn of the bandage (a
+   helix seen from the side). The bandage climbs his turns; where a turn climbs further than the bandage is wide, the
+   leg shows through: so the turns needed are the leg's length over the bandage's width, and a narrower bandage needs
+   more of them.
+   points: the stroke, {x, y, t} in CSS pixels; leg: { a: {x, y} its foot, b: {x, y} its top, r: its half width, w: the
+   bandage's width, all px }; ease: a name in COIL_EASES or an ease of its own (start: how far up the leg the coil may
+   begin, a share of its length; reach: how far up it must end; wide: how far off the leg's line it may stray, in half
+   widths; side: how far across the line a swing must go to count as crossing it, in half widths; back: how far it may
+   run back down, a share; slack: a turn may climb this many bandage widths before it leaves a gap).
+   Returns { verdict: 'bound' | 'miss', reason ('bound', 'tap', 'start', 'down', 'off', 'straight', 'short', 'gaps'),
+   turns (whole turns counted), climbs ([px] each turn's climb up the leg), gaps ([{ from, to, px }] where the leg shows through,
+   shares of it: a turn that climbed more than the bandage allows, or a bare foot or top), need (the fewest turns that cover the leg at this width, without
+   gaps), from, to (where the coil began and ended up the leg, shares of its length) }. */
+var COIL_EASES = {
+  kind:   { start: 0.45, reach: 0.82, wide: 2.6, side: 0.35, back: 0.15, slack: 1.35 },
+  fair:   { start: 0.35, reach: 0.88, wide: 2.2, side: 0.50, back: 0.10, slack: 1.15 },
+  strict: { start: 0.25, reach: 0.93, wide: 1.8, side: 0.65, back: 0.06, slack: 1.00 }
+};
+function judgeCoil(points, leg, ease) {
+  var e = typeof ease === 'object' ? ease : (COIL_EASES[ease] || COIL_EASES.kind);
+  var L = Math.hypot(leg.b.x - leg.a.x, leg.b.y - leg.a.y), ux = (leg.b.x - leg.a.x) / L, uy = (leg.b.y - leg.a.y) / L;
+  var out = { verdict: 'miss', reason: 'tap', turns: 0, climbs: [], gaps: [], need: Math.ceil(L / leg.w), from: 0, to: 0 };
+  if (!points || points.length < 2) return out;
+  var path = 0, i;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path < leg.r * 0.5) return out;
+  /* each point as (s, c): s up the leg as a share of its length, c across it in half widths */
+  var sc = points.map(function (p) { var vx = p.x - leg.a.x, vy = p.y - leg.a.y; return { s: (vx * ux + vy * uy) / L, c: (vx * -uy + vy * ux) / leg.r }; });
+  var hi = -1e9, top = -1e9, drop = 0, far = 0;
+  sc.forEach(function (q) { top = Math.max(top, q.s); drop = Math.max(drop, top - q.s); far = Math.max(far, Math.abs(q.c)); hi = Math.max(hi, q.s); });
+  out.from = Math.round(sc[0].s * 100) / 100; out.to = Math.round(sc[sc.length - 1].s * 100) / 100;
+  if (sc[0].s > e.start || sc[0].s < -0.15 || Math.abs(sc[0].c) > e.wide) { out.reason = 'start'; return out; }
+  if (sc[sc.length - 1].s < sc[0].s) { out.reason = 'down'; return out; }
+  if (far > e.wide) { out.reason = 'off'; return out; }
+  /* the crossings: the side he is on changes only once a swing passes side on the other side (no counting a tremble) */
+  var side = 0, marks = [];
+  sc.forEach(function (q) {
+    var now = q.c > e.side ? 1 : (q.c < -e.side ? -1 : 0);
+    if (now && now !== side) { if (side) marks.push(q.s); side = now; }
+  });
+  /* a turn is there and back: two half swings, each a visit to one side; its climb runs from the crossing two before
+     (his start, for the first) to the crossing two after (his highest point, for the last). The bandage is as wide as
+     a turn may climb without a gap, and half of it reaches below his start and above his end: the foot and the top
+     are bare only if he leaves more than that. */
+  out.turns = Math.floor((marks.length + (side ? 1 : 0)) / 2);
+  if (out.turns < 1) { out.reason = 'straight'; return out; }
+  if (drop > e.back) { out.reason = 'down'; return out; }
+  if (hi < e.reach) { out.reason = 'short'; return out; }
+  var s0 = Math.max(0, sc[0].s), end = Math.min(1, hi), m = [s0].concat(marks, [end]), lim = leg.w * e.slack;
+  for (i = 2; i < m.length; i++) if (m[i - 2] < 1) out.climbs.push({ from: m[i - 2], to: Math.min(1, m[i]), px: Math.round(Math.max(0, Math.min(1, m[i]) - m[i - 2]) * L) });   /* past the top, nothing to cover */
+  if (s0 * L > lim / 2) out.gaps.push({ from: 0, to: Math.round(s0 * 100) / 100, px: Math.round(s0 * L) });
+  out.climbs.forEach(function (c) { if (c.px > lim) out.gaps.push({ from: Math.round(c.from * 100) / 100, to: Math.round(c.to * 100) / 100, px: c.px }); });
+  if ((1 - end) * L > lim / 2) out.gaps.push({ from: Math.round(end * 100) / 100, to: 1, px: Math.round((1 - end) * L) });
+  out.climbs = out.climbs.map(function (c) { return c.px; });
+  if (out.gaps.length) { out.reason = 'gaps'; return out; }
+  out.verdict = 'bound'; out.reason = 'bound';
+  return out;
+}
 /* The smallest circle that holds every point (for Impervius, below): tried on every pair as a diameter and every three
    through their circle, the smallest that holds them all kept. A rectangle's has its diagonal for a diameter; an
    acute triangle's runs through its three corners. points: [{x, y}], a few dozen. Returns { x, y, r }. */
@@ -1319,5 +1379,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
 })(typeof window !== 'undefined' ? window : globalThis);
