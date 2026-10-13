@@ -318,6 +318,91 @@ function judgeSlide(points, at, cell, ease) {
   out.verdict = 'slide'; out.reason = 'slid';
   return out;
 }
+/* The smallest circle that holds every point (for Impervius, below): tried on every pair as a diameter and every three
+   through their circle, the smallest that holds them all kept. A rectangle's has its diagonal for a diameter; an
+   acute triangle's runs through its three corners. points: [{x, y}], a few dozen. Returns { x, y, r }. */
+function smallestCircle(P) {
+  var best = null, i, j, k, c, eps = 1e-6;
+  function holds(c) { for (var n = 0; n < P.length; n++) if (Math.hypot(P[n].x - c.x, P[n].y - c.y) > c.r * (1 + eps) + eps) return false; return true; }
+  function keep(c) { if (c && (!best || c.r < best.r) && holds(c)) best = c; }
+  if (P.length === 1) return { x: P[0].x, y: P[0].y, r: 0 };
+  for (i = 0; i < P.length; i++) for (j = i + 1; j < P.length; j++) {
+    keep({ x: (P[i].x + P[j].x) / 2, y: (P[i].y + P[j].y) / 2, r: Math.hypot(P[i].x - P[j].x, P[i].y - P[j].y) / 2 });
+    for (k = j + 1; k < P.length; k++) {
+      var a = P[i], b = P[j], d = P[k], D = 2 * (a.x * (b.y - d.y) + b.x * (d.y - a.y) + d.x * (a.y - b.y));
+      if (Math.abs(D) < eps) continue;
+      var a2 = a.x * a.x + a.y * a.y, b2 = b.x * b.x + b.y * b.y, d2 = d.x * d.x + d.y * d.y;
+      c = { x: (a2 * (b.y - d.y) + b2 * (d.y - a.y) + d2 * (a.y - b.y)) / D, y: (a2 * (d.x - b.x) + b2 * (a.x - d.x) + d2 * (b.x - a.x)) / D };
+      c.r = Math.hypot(a.x - c.x, a.y - c.y); keep(c);
+    }
+  }
+  return best;
+}
+/* Impervius, the ring (PoA 9: Hermione "tapped them with her wand and said, 'Impervius!'", and Harry's glasses "repel
+   water"; the book's tap, then the ring is ours, for the geometry: inside and outside a closed curve). One stroke
+   right round the thing; the thing is kept dry if every point of its outline is inside the ring, the ring closed by a
+   straight line from where the stroke ended back to where it began. points: the stroke, {x, y, t}; shape: the
+   thing's outline, [{x, y}], its corners and enough points along its edges; ease: a name in RING_EASES or an ease of
+   its own (wind: how far round the thing, in turns, the ring must go; tol: how far outside the ring a point of the
+   thing may lie and still count as in, as a share of the smallest circle's radius; turns: the most turns before it is
+   a scribble). Returns { verdict: 'dry' | 'miss', reason ('kept', 'tap', 'off', 'open', 'small', 'scribble'), turns,
+   wet (the outline's points left outside, by index), inside (their share inside), snug (the ring's own radius, from
+   its area, over the smallest circle's), c: the smallest circle { x, y, r } }. Nothing graded: snug is for showing. */
+var RING_EASES = {
+  kind:   { wind: 0.80, tol: 0.12, turns: 2.6 },
+  fair:   { wind: 0.90, tol: 0.07, turns: 2.6 },
+  strict: { wind: 0.97, tol: 0.03, turns: 2.6 }
+};
+function judgeRing(points, shape, ease) {
+  var e = typeof ease === 'object' ? ease : (RING_EASES[ease] || RING_EASES.kind);
+  var c = smallestCircle(shape), out = { verdict: 'miss', reason: 'tap', turns: 0, wet: [], inside: 0, snug: 0, c: c };
+  if (!points || points.length < 3) return out;
+  var path = 0, i, n = points.length;
+  for (i = 1; i < n; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path < c.r * 0.3) return out;
+  /* how far round the thing's middle the stroke goes, in turns */
+  var s = 0, la = null;
+  for (i = 0; i < n; i++) {
+    var a = Math.atan2(points[i].y - c.y, points[i].x - c.x);
+    if (la !== null) { var d = a - la; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; s += d; }
+    la = a;
+  }
+  out.turns = Math.abs(s) / (2 * Math.PI);
+  /* the ring's own size, from the area it closes (the shoelace), as a radius */
+  var area = 0;
+  for (i = 0; i < n; i++) { var p = points[i], q = points[(i + 1) % n]; area += p.x * q.y - q.x * p.y; }
+  out.snug = Math.sqrt(Math.abs(area) / 2 / Math.PI) / (c.r || 1);
+  if (out.turns < 0.5) {
+    var mx = 0, my = 0; for (i = 0; i < n; i++) { mx += points[i].x; my += points[i].y; }
+    out.reason = Math.hypot(mx / n - c.x, my / n - c.y) > c.r * 2.5 ? 'off' : 'open'; return out;
+  }
+  if (out.turns > e.turns) { out.reason = 'scribble'; return out; }
+  if (out.turns < e.wind) { out.reason = 'open'; return out; }
+  /* each point of the outline: inside the closed ring (it winds round the point), or near enough its edge */
+  function winds(p) {
+    var w = 0, l = null;
+    for (var k = 0; k <= n; k++) {
+      var q = points[k % n], a = Math.atan2(q.y - p.y, q.x - p.x);
+      if (l !== null) { var dd = a - l; while (dd > Math.PI) dd -= 2 * Math.PI; while (dd < -Math.PI) dd += 2 * Math.PI; w += dd; }
+      l = a;
+    }
+    return Math.abs(w) > Math.PI;
+  }
+  function near(p) {
+    var lim = e.tol * c.r;
+    for (var k = 0; k < n; k++) {
+      var a = points[k], b = points[(k + 1) % n], vx = b.x - a.x, vy = b.y - a.y, L2 = vx * vx + vy * vy;
+      var t = L2 ? Math.max(0, Math.min(1, ((p.x - a.x) * vx + (p.y - a.y) * vy) / L2)) : 0;
+      if (Math.hypot(a.x + vx * t - p.x, a.y + vy * t - p.y) <= lim) return true;
+    }
+    return false;
+  }
+  for (i = 0; i < shape.length; i++) if (!winds(shape[i]) && !near(shape[i])) out.wet.push(i);
+  out.inside = 1 - out.wet.length / shape.length;
+  if (!out.wet.length) { out.verdict = 'dry'; out.reason = 'kept'; return out; }
+  out.reason = out.wet.length === shape.length ? 'off' : 'small';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1138,5 +1223,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
 })(typeof window !== 'undefined' ? window : globalThis);
