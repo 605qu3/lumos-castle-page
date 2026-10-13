@@ -727,7 +727,7 @@ var TILES = {
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=25"></script>
 <script src="charms/guide.js?v=1"></script>
-<script src="charms/spells.js?v=27"></script>
+<script src="charms/spells.js?v=29"></script>
 <script>
 (function () {
 'use strict';
@@ -2114,7 +2114,7 @@ holeFrame.matrix.makeBasis(holeT, new THREE.Vector3(0, 1, 0), holeN.clone().nega
 holeFrame.matrix.decompose(holeFrame.position, holeFrame.quaternion, holeFrame.scale);
 scene.add(holeFrame);
 /* ---------- the house hourglass over the portrait hole (board req 238; Q74, spot 74.1) ----------
-   Built ahead behind ?hourglass, 13 October 2026, Godric to answer Q74: without the flag nothing here is built or loaded
+   For the Entrance Hall, not the common room (Q74, Godric, 13 October 2026, 11.00 am: where the books put it, PS 15; its niche is req 236): built ahead behind ?hourglass, the flag kept down here for good; without the flag nothing here is built or loaded
    and the room is as it was. Design's glass (page/design/house-hourglass.js, its API in docs/handoff/design.md, "The
    house cup (Q21 answered 2)", the paragraph on the glass live) is mounted in an element off the screen, and its SVG,
    the still glass and the light layer of stones in flight, is drawn into a canvas worn by a plane 0.6 by 1.2 m, 2.2
@@ -4871,7 +4871,11 @@ var TREVOR_MARKS = {
   'floor-b1': new THREE.Vector3(onSofa(0.35, 0.75)[0], 0, onSofa(0.35, 0.75)[1]),
   'floor-b2': new THREE.Vector3(onSofa(1.1, 0.75)[0], 0, onSofa(1.1, 0.75)[1]),
   'floor-c1': new THREE.Vector3(DESK_CHAIR_AT.x + 0.07, 0, DESK_CHAIR_AT.z + 0.93),
-  'floor-c2': new THREE.Vector3(DESK_CHAIR_AT.x - 0.45, 0, DESK_CHAIR_AT.z + 0.1)
+  'floor-c2': new THREE.Vector3(DESK_CHAIR_AT.x - 0.45, 0, DESK_CHAIR_AT.z + 0.1),
+  /* a fourth spot behind the left armchair, hidden by it at rest and at the fireside stop until Mobiliarbus moves it
+     (req 252; Q75, 75.1, provisional, Godric to confirm, 13 October 2026). The runtime draws it only once trevor.json's
+     `hiding` names it; until then a dropped Knut lies there (ARMCHAIR_MOVE) */
+  'floor-d': new THREE.Vector3(-1.2, 0, -3.45)
 };
 /* which marks are next to which: each spot and its two hop marks are a closed group of three, so he hops round them
    and is caught near where he was found */
@@ -4945,6 +4949,7 @@ function updateTrevor(dt) {
     var vars = castle ? castle.state().vars || {} : {};
     var key = sh.indexOf('prints from box to portrait hole') >= 0 ? 'hole'
       : (sh.indexOf('prints from box to spot') >= 0 && TREVOR_MARKS[vars.spot]) ? vars.spot : '';
+    if (trevor.force) key = trevor.force;                 /* a check's spot (req 252's lumosGreybox.armchair.trevorHere) */
     if (key !== trevor.key) {
       trevor.key = key;
       if (key === 'hole') layPrints(PRINTS_TO_HOLE);
@@ -5694,7 +5699,7 @@ function updateTwins() {
     src.castShadow = false;
     src.updateMatrixWorld();
     var fade = src.material.transparent ? src.material.opacity : 1;
-    t.poolMat.opacity = FOOT_POOL * fade;
+    t.poolMat.opacity = FOOT_POOL * fade * (1 - 0.85 * (src.userData.lift || 0));   /* a lifted piece leaves its pools (req 252) */
     for (var f = 0; f < t.feet.length; f++) {
       var ft = t.feet[f], pool = t.pools[f];
       _foot.set((t.mirror ? 0.5 - ft.u : ft.u - 0.5) * gp.width, (ft.v - 0.5) * gp.height, 0);
@@ -7299,24 +7304,224 @@ var PAIR_FACE = (function () {
   function off(yw) { var a = f - yw; return Math.atan2(Math.sin(a), Math.cos(a)); }
   return { on: true, l: off(CHAIR_L_AT.yaw), r: off(WINGBACK_AT.yaw), glide: 1.6 };   /* on: Q53, Godric's 1 (2.47 to 3.05 pm) */
 })();
-function aboutChairL(x, z, a) {
-  var lx = x - CHAIR_L_AT.x, lz = z - CHAIR_L_AT.z, c = Math.cos(a), sn = Math.sin(a);
-  return [CHAIR_L_AT.x + c * lx + sn * lz, CHAIR_L_AT.z - sn * lx + c * lz];
+function aboutChairL(x, z, a, at) {   /* about where the chair stands now (req 252: Mobiliarbus moves it), or about `at` */
+  at = at || armchair;
+  var lx = x - at.x, lz = z - at.z, c = Math.cos(a), sn = Math.sin(a);
+  return [at.x + c * lx + sn * lz, at.z - sn * lx + c * lz];
 }
 function updatePairStop(dt) {
-  var st = pairTurn, was = st.k;
+  var st = pairTurn, was = st.k, A = armchair;
   st.k = st.to ? Math.min(1, st.k + dt / PAIR_FACE.glide) : Math.max(0, st.k - dt / PAIR_FACE.glide);
-  if (st.k === was && st.k === 0) return;
-  var e = smooth01(0, 1, st.k), a = e * PAIR_FACE.l;
+  if (st.k === was && st.k === 0 && armchairHome() && !A.up && !A.upOn) return;
+  var e = smooth01(0, 1, st.k), a = e * PAIR_FACE.l, lift = A.up - A.upOn;
+  chairL.position.x = A.x; chairL.position.z = A.z; chairL.position.y += lift;
   chairL.rotation.y = CHAIR_L_AT.yaw + a;
   wingback.rotation.y = WINGBACK_AT.yaw + e * PAIR_FACE.r;
-  var p = aboutChairL(SATCHEL.x, SATCHEL.z, a);
+  var p = aboutChairL(SATCHEL.x, SATCHEL.z, a, CHAIR_L_AT);   /* the satchel stays by the chair's home (req 252) */
   satchel.position.x = p[0]; satchel.position.z = p[1];
-  if (scarf) {
-    p = aboutChairL(SCARF.x, SCARF.z, a);
-    scarf.position.x = p[0]; scarf.position.z = p[1];
+  if (scarf) {                                                 /* the scarf over its arm goes where it goes */
+    p = aboutChairL(SCARF.x + A.x - CHAIR_L_AT.x, SCARF.z + A.z - CHAIR_L_AT.z, a);
+    scarf.position.x = p[0]; scarf.position.z = p[1]; scarf.position.y += lift;
     scarf.rotation.y = SCARF.yaw + a; scarfTape.pivot.rotation.y = SCARF.yaw + a;
   }
+  A.upOn = A.up;
+}
+
+/* ---------- Mobiliarbus on the left armchair (req 252; Q76, 76.1 and Q75, 75.1, both provisional, Godric to confirm,
+   13 October 2026) ----------
+   Once he has learned Mobiliarbus in Charms (learned('mobiliarbus')), a tap on the armchair at the fireside stop is the
+   spell's own tap (Charms' moveThing): his head turns just enough to bring the chair and the square on its left wholly
+   into view (on a phone, where no turn shows both, the chair's square in the middle), the word's card comes up, and
+   the floor's squares show in faint chalk until the thump. Q76's squares: 1.05 m, one chair wide, in the room's own
+   lines, columns along x and rows along z toward the eye (moveThing's down), the home square on the chair's spot; a
+   field of four columns (-2 to +1) by four rows (-1 toward the hearth to +2). What is in the way is judged at the
+   square he names, counted from the chair's square now: the wall, the log basket, the fire (the whole column right, so
+   the fire stays in view), a student standing by the fire, the chess players on the rug, or too far. It lifts a few
+   inches, drifts along his stroke (an L along both legs) with its shadow twin and the scarf over its arm, and lands
+   with a soft thump; the satchel stays put. It stays where he put it for the visit (a reload brings it home), and the
+   pair's square-on turn at the stop turns it about where it stands. The cat waits, sitting, rather than walk through
+   it. Q75's find: Trevor's fourth spot behind it (floor-d); on a visit he hides there his prints run behind the chair
+   and he croaks as it lifts; on any other, a little dust and a dropped Knut lie where it stood. */
+var ARMCHAIR_MOVE = {
+  sq: 1.05, cols: [-2, 1], rows: [-1, 2],          /* a square's side; the field's columns and rows about home */
+  lift: 0.1,                                        /* how high it rises, m */
+  lineY: 0.012, lineW: 0.014, chalk: 0.24,          /* the squares: height over the floor, width, opacity */
+  fadeIn: 0.35, fadeOut: 0.6,                       /* s */
+  margin: 0.04,                                     /* of the screen's width kept clear each side by the head's turn */
+  catClear: 0.35,                                   /* m from the chair's line across its width to the loop, the cat's half-width included */
+  catAhead: 0.03,                                   /* how far ahead on its loop the cat looks, a share of the loop */
+  mark: TREVOR_MARKS['floor-d'],                    /* Q75's spot behind it */
+  knut: 0.05, dust: { w: 0.8, d: 0.36, opacity: 0.55 }
+};
+/* the visit's chair: the square it stands on (0, 0 home), where it is drawn, its lift (and the lift drawn), the cast */
+var armchair = { col: 0, row: 0, x: CHAIR_L_AT.x, z: CHAIR_L_AT.z, up: 0, upOn: 0, casting: null, last: null, grid: 0, gridTo: 0,
+  croaked: false, catZone: null };
+function armchairHome() { return !armchair.col && !armchair.row; }
+function armSquare(col, row) { return { x: CHAIR_L_AT.x + col * ARMCHAIR_MOVE.sq, z: CHAIR_L_AT.z + row * ARMCHAIR_MOVE.sq }; }
+/* the floor (y = 0) under a point on the screen, CSS px; past the horizon, far off */
+var _armRay = new THREE.Raycaster(), _armNdc = new THREE.Vector2();
+function armFloor(p) {
+  var r = renderer.domElement.getBoundingClientRect();                 /* the zoom scales the canvas; its box follows */
+  _armNdc.set((p.x - r.left) / r.width * 2 - 1, 1 - (p.y - r.top) / r.height * 2);
+  _armRay.setFromCamera(_armNdc, camera);
+  var o = _armRay.ray.origin, d = _armRay.ray.direction, k = d.y < -1e-3 ? Math.min(60, -o.y / d.y) : 60;
+  return { x: o.x + d.x * k, z: o.z + d.z * k };
+}
+/* moveThing's floor: screen px to squares counted from the chair's square now (whole at square centres), and back */
+var ARM_FLOOR = {
+  toSquares: function (p) {
+    var f = armFloor(p), s = armSquare(armchair.col, armchair.row);
+    return { x: (f.x - s.x) / ARMCHAIR_MOVE.sq, y: (f.z - s.z) / ARMCHAIR_MOVE.sq };
+  },
+  toScreen: function (q) { var s = armSquare(armchair.col + q.x, armchair.row + q.y); return screenOf(new THREE.Vector3(s.x, 0, s.z)); }
+};
+function armFireMark() { return [0, 4].some(function (c) { return poolCards[c] && poolCards[c].userData.wanted; }); }
+function armchairBlocked(dx, dy) {   /* what is on the square he names, or null */
+  var M = ARMCHAIR_MOVE, c = armchair.col + dx, r = armchair.row + dy;
+  if (c < M.cols[0] || c > M.cols[1] || r < M.rows[0] || r > M.rows[1]) return 'too far';
+  if (c === 1) return 'the fire';
+  if (r === -1 && c === -2) return 'the wall';
+  if (r === -1 && c === 0) return 'the log basket';
+  if (r === -1 && c === -1 && armFireMark()) return 'a student by the fire';
+  if (r === 2 && (c === -1 || c === 0) && chessBoard.visible) return 'the chess players';
+  return null;
+}
+/* the head's turn: the least from where he looks that shows the chair's card and the square on its left wholly, the
+   screen's margin kept; where none does (a phone), the one that puts the chair's square in the middle, the squares
+   either side of it cut evenly by the screen's edges */
+var _armCam = new THREE.PerspectiveCamera(), _armV = new THREE.Vector3(), _armDir = new THREE.Vector3(), _armP = new THREE.Vector3();
+function armchairLookYaw() {
+  if (!HEAD.pos || HEAD.mode !== 'fireside') return null;
+  var M = ARMCHAIR_MOVE, s = armSquare(armchair.col, armchair.row), gp = chairL.geometry.parameters, hw = gp.width / 2;
+  var y0 = chairL.position.y - gp.height / 2, c = Math.cos(chairL.rotation.y), sn = Math.sin(chairL.rotation.y), pts = [];
+  [-hw, hw].forEach(function (u) { [y0, y0 + gp.height].forEach(function (y) { pts.push([s.x + c * u, y, s.z - sn * u]); }); });
+  [[-1.5, -0.5], [-1.5, 0.5], [-0.5, -0.5], [-0.5, 0.5]].forEach(function (q) { pts.push([s.x + q[0] * M.sq, 0, s.z + q[1] * M.sq]); });
+  _armCam.copy(camera, false);
+  var D = Math.hypot(HEAD.look.x - HEAD.pos.x, HEAD.look.z - HEAD.pos.z), best = null, mid = null, lim = 1 - 2 * M.margin;
+  for (var yw = -HEAD.left; yw <= HEAD.right + 1e-9; yw += 0.005) {
+    _armDir.subVectors(HEAD.look, HEAD.pos).applyAxisAngle(HEAD_UP, -yw); _armDir.y += HEAD.pitchT * D;
+    _armCam.position.copy(HEAD.pos); _armCam.lookAt(_armV.copy(HEAD.pos).add(_armDir)); _armCam.updateMatrixWorld();
+    var fits = true;
+    for (var i = 0; i < pts.length && fits; i++) { _armV.set(pts[i][0], pts[i][1], pts[i][2]).project(_armCam); fits = _armV.z < 1 && Math.abs(_armV.x) <= lim; }
+    if (fits && (best === null || Math.abs(yw - HEAD.yawT) < Math.abs(best - HEAD.yawT))) best = yw;
+    var l = _armV.set(s.x - M.sq, 0, s.z).project(_armCam).x, r = _armV.set(s.x + M.sq, 0, s.z).project(_armCam).x;
+    if (mid === null || Math.abs(l + r) < mid.x) mid = { yaw: yw, x: Math.abs(l + r) };
+  }
+  return best !== null ? best : (mid ? mid.yaw : null);
+}
+/* the squares of the field, faint chalk on the floor, shown from the word's card till the thump */
+var armGrid = (function () {
+  var M = ARMCHAIR_MOVE, pos = [], idx = [], k = 0, w = M.lineW / 2;
+  var x0 = CHAIR_L_AT.x + (M.cols[0] - 0.5) * M.sq, x1 = CHAIR_L_AT.x + (M.cols[1] + 0.5) * M.sq;
+  var z0 = CHAIR_L_AT.z + (M.rows[0] - 0.5) * M.sq, z1 = CHAIR_L_AT.z + (M.rows[1] + 0.5) * M.sq;
+  function strip(ax, az, bx, bz) {
+    var l = Math.hypot(bx - ax, bz - az), nx = -(bz - az) / l * w, nz = (bx - ax) / l * w;
+    pos.push(ax + nx, M.lineY, az + nz, bx + nx, M.lineY, bz + nz, bx - nx, M.lineY, bz - nz, ax - nx, M.lineY, az - nz);
+    idx.push(k, k + 1, k + 2, k, k + 2, k + 3); k += 4;
+  }
+  for (var c = M.cols[0]; c <= M.cols[1] + 1; c++) { var x = CHAIR_L_AT.x + (c - 0.5) * M.sq; strip(x, z0, x, z1); }
+  for (var r = M.rows[0]; r <= M.rows[1] + 1; r++) { var z = CHAIR_L_AT.z + (r - 0.5) * M.sq; strip(x0, z, x1, z); }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx);
+  var m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: col(0xece4cf), transparent: true, opacity: 0, depthWrite: false,
+    side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 }));
+  underCard(m.material);                              /* never over a drawn foot below its card's floor line */
+  m.name = 'armchair-squares'; m.visible = false; m.renderOrder = 1; m.raycast = function () {};
+  scene.add(m);
+  return m;
+})();
+/* what lies where it stood on any visit Trevor is not there: a little dust and a dropped Knut, drawn here */
+var armFind = (function () {
+  var M = ARMCHAIR_MOVE, grp = new THREE.Group(), rnd = mulberry32(252);
+  var c = makeCanvas(256, 128), g = c.getContext('2d');
+  for (var i = 0; i < 70; i++) {                      /* soft grey fluff, thickest in the middle */
+    var a = rnd() * Math.PI * 2, d = Math.sqrt(rnd()), px = 128 + Math.cos(a) * d * 100, py = 64 + Math.sin(a) * d * 46, r = 5 + rnd() * 18;
+    var gr = g.createRadialGradient(px, py, 0, px, py, r);
+    gr.addColorStop(0, 'rgba(196,188,172,' + (0.32 * (1 - 0.6 * d)).toFixed(3) + ')'); gr.addColorStop(1, 'rgba(196,188,172,0)');
+    g.fillStyle = gr; g.fillRect(px - r, py - r, 2 * r, 2 * r);
+  }
+  var dust = new THREE.Mesh(new THREE.PlaneGeometry(M.dust.w, M.dust.d).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: tex(c),
+    transparent: true, opacity: M.dust.opacity, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+  dust.position.set(M.mark.x, 0.007, M.mark.z + 0.06);
+  var k = makeCanvas(64, 64), kg = k.getContext('2d'), kr = kg.createRadialGradient(26, 24, 2, 32, 32, 30);
+  kr.addColorStop(0, '#e2a467'); kr.addColorStop(0.55, '#b06d36'); kr.addColorStop(1, '#6e3f1c');
+  kg.fillStyle = kr; kg.beginPath(); kg.arc(32, 32, 30, 0, Math.PI * 2); kg.fill();
+  kg.strokeStyle = 'rgba(70,38,14,0.8)'; kg.lineWidth = 3; kg.beginPath(); kg.arc(32, 32, 25, 0, Math.PI * 2); kg.stroke();
+  kg.fillStyle = 'rgba(70,38,14,0.7)'; kg.font = 'bold 22px Georgia, serif'; kg.textAlign = 'center'; kg.textBaseline = 'middle'; kg.fillText('K', 32, 33);
+  var knut = new THREE.Mesh(new THREE.CircleGeometry(M.knut / 2, 28).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({ map: tex(k),
+    roughness: 0.45, metalness: 0.35, polygonOffset: true, polygonOffsetFactor: -3 }));
+  knut.position.set(M.mark.x + 0.08, 0.004, M.mark.z + 0.04);
+  var glint = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTexture(), color: col(0xffd9a0), transparent: true, opacity: 0,
+    blending: THREE.AdditiveBlending, depthWrite: false }));
+  glint.scale.set(0.09, 0.09, 1); glint.position.copy(knut.position).setY(0.012);
+  [dust, knut, glint].forEach(function (o) { o.raycast = function () {}; grp.add(o); });
+  grp.name = 'armchair-find'; grp.visible = false; grp.userData.glint = glint;
+  scene.add(grp);
+  return grp;
+})();
+/* the croak as the chair lifts off him, heard from behind it as the room's lines are */
+function armchairCroak() {
+  if (trevor.key !== 'floor-d') return;
+  HEARD_FROM['trevor behind the chair'] = ARMCHAIR_MOVE.mark.clone().setY(0.45);
+  lineQ.unshift({ medium: 'heard', speaker: 'trevor behind the chair', sound: 'croak' });
+}
+/* which stretch of the cat's loop the chair stands too near, away from home (at home the loop was laid clear of it) */
+function armchairCatZone() {
+  var A = armchair, N = 240, zone = [], any = false, c = Math.cos(CHAIR_L_AT.yaw), sn = Math.sin(CHAIR_L_AT.yaw);
+  var hw = chairL.geometry.parameters.width / 2;
+  A.catZone = null;
+  if (armchairHome()) return;
+  for (var i = 0; i < N; i++) {
+    catPath.getPointAt(i / N, _armP);
+    var dx = _armP.x - A.x, dz = _armP.z - A.z, u = clamp(dx * c - dz * sn, -hw, hw);
+    zone[i] = Math.hypot(dx - c * u, dz + sn * u) < ARMCHAIR_MOVE.catClear; any = any || zone[i];
+  }
+  if (any) A.catZone = zone;
+}
+function armchairStopsCat(u) {   /* the loop just ahead runs into the chair, and the cat is not there yet */
+  var Z = armchair.catZone;
+  if (!Z) return false;
+  var N = Z.length, i0 = Math.floor((u % 1) * N) % N, i1 = Math.floor(((u + ARMCHAIR_MOVE.catAhead) % 1) * N) % N;
+  return !Z[i0] && Z[i1];
+}
+function armchairTap() {
+  var A = armchair;
+  if (mode !== 'fireside' || A.casting || !spellKnown('mobiliarbus')) return false;
+  HEARD_FROM.armchair = function () { return new THREE.Vector3(armchair.x, 1.1, armchair.z); };   /* a miss's words, from it */
+  A.croaked = false;
+  var a = A.casting = LumosSpells.moveThing({
+    at: function () { var s = armSquare(A.col, A.row); return screenOf(new THREE.Vector3(s.x, 0, s.z)); },
+    floor: ARM_FLOOR, blocked: armchairBlocked, wait: SPELL_WAIT_S, stray: strayTap,
+    onTap: function () { A.gridTo = 1; var yw = armchairLookYaw(); if (yw !== null) HEAD.yawT = yw; },
+    onDrift: function (p) {
+      var f = armFloor(p); A.x = f.x; A.z = f.z; A.up = p.lift * ARMCHAIR_MOVE.lift;
+      if (p.lift > 0.2 && !A.croaked) { A.croaked = true; armchairCroak(); }
+    },
+    onThump: function (o) {
+      A.col += o.dx; A.row += o.dy;
+      var s = armSquare(A.col, A.row); A.x = s.x; A.z = s.z; A.up = 0; A.gridTo = 0;
+      armchairCatZone();
+    }
+  });
+  a.tap();                                            /* his tap on the chair was the book's tap: the word comes next */
+  a.done.then(function (r) {
+    var s = armSquare(A.col, A.row);
+    A.casting = null; A.gridTo = 0; A.up = 0; A.x = s.x; A.z = s.z;
+    A.last = r ? { verdict: r.verdict, what: r.what || null, dx: r.dx, dy: r.dy } : null;
+    if (!r) return;
+    if (r.verdict === 'moved') spellFirst('mobiliarbus', r);
+    else if (r.verdict === 'blocked' || r.verdict === 'missed') spellWhy('armchair', r);
+  });
+  return true;
+}
+function updateArmchair(dt, t) {
+  var A = armchair, M = ARMCHAIR_MOVE;
+  A.grid = A.gridTo ? Math.min(1, A.grid + dt / M.fadeIn) : Math.max(0, A.grid - dt / M.fadeOut);
+  armGrid.visible = A.grid > 0; armGrid.material.opacity = M.chalk * A.grid;
+  armFind.visible = trevor.key !== 'floor-d' && Math.hypot(A.x - CHAIR_L_AT.x, A.z - CHAIR_L_AT.z) > 0.15;
+  if (armFind.visible) { var g = (t % 4.5) / 4.5; armFind.userData.glint.material.opacity = g < 0.12 ? 0.8 * Math.sin(Math.PI * g / 0.12) : 0; }
+  chairL.userData.lift = A.up / M.lift;
+  if (scarf) scarf.userData.lift = chairL.userData.lift;
 }
 /* the fire's tap works the bellows (Magic for the boys); what the fire does is the fire chain's (fire.json) */
 function fireTap() {
@@ -7606,6 +7811,7 @@ function tapDo(cx, cy) {
     else if (hit && hit === curios.jar) jarTap(hits[0].point);
     else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
     else if (hit && hit === curl.mesh) curlTap();
+    else if (hit === chairL && armchairTap()) return told;   /* Mobiliarbus, once learned (req 252) */
     else { var wf = walkOn(hit); if (wf) return wf; leaveFireside(); return back; }
     return told;
   }
@@ -7754,7 +7960,7 @@ function headAt(look) {                                   /* where a walk ends: 
   var lim = HEAD_TURN_AT[HEAD.mode] || [HEAD.turn, HEAD.turn];
   HEAD.left = lim[0]; HEAD.right = lim[1];
 }
-function headTurns() { return HEAD.pos && mode === HEAD.mode && !tween && !candle.casting && !LOCKS.casting; }
+function headTurns() { return HEAD.pos && mode === HEAD.mode && !tween && !candle.casting && !LOCKS.casting && !armchair.casting; }
 function updateHead(dt) {
   if (!HEAD.pos || mode !== HEAD.mode || !(HEAD.yaw || HEAD.yawT || HEAD.pitch || HEAD.pitchT)) return;
   var s = Math.min(1, dt * 7);
@@ -7991,6 +8197,7 @@ function updateCat(dt, t) {
   updateCurl(dt, t);
   if (curl.on) return;
   if (cat.state === 'sit') {
+    if (cat.armWait) { if (armchairStopsCat(cat.u)) cat.timer = Math.max(cat.timer, 0.5); else cat.armWait = false; }   /* until the chair is clear (req 252) */
     cat.timer -= dt; cat.sitElapsed += dt;
     if (catSheet) {
       var e = catSheet.entry, f = e.sit;
@@ -8001,6 +8208,7 @@ function updateCat(dt, t) {
     if (cat.timer <= 0) catStandUp();
     return;
   }
+  if (armchairStopsCat(cat.u)) { catSitDown(0.5); cat.armWait = true; return; }   /* a moved armchair in its way: it sits and waits */
   var before = cat.u;
   cat.u += cat.speed * dt;
   cat.dist += cat.speed * dt * catPathLength;
@@ -8420,6 +8628,7 @@ function frame() {
   faceEye();
   updateSofaStop(dt);
   updatePairStop(dt);
+  updateArmchair(dt, t);
   updateFindHand(dt, t);
   updateBubble(slowT);
   updateLadder(dt);
@@ -8537,6 +8746,22 @@ window.lumosGreybox.howlerBurst = { state: howlerReport, at: howlerAt, ash: howl
 /* req 238's checks: the glass's state, and a slip handed in as the runtime hands one (the owl's post queues it till the
    owl has landed), since the runtime keeps its owl's delivery to itself */
 window.lumosGreybox.hourglass = { state: function () { return Object.assign({}, hourglassLive.state); }, deliver: function (slip) { roomPoint(slip); }, mesh: function () { return hourglassLive.mesh; } };
+/* req 252's checks: where the armchair stands (home, or the square it stands on), the cast and its last answer, the
+   spell's own state (its word card), a square's centre on the screen, what lies behind it, and Trevor put there */
+window.lumosGreybox.armchair = {
+  state: function () {
+    var A = armchair;
+    return { at: armchairHome() ? 'home' : { col: A.col, row: A.row }, x: +A.x.toFixed(3), z: +A.z.toFixed(3), up: +A.up.toFixed(3),
+      casting: !!A.casting, last: A.last, squares: +A.grid.toFixed(2), find: armFind.visible ? 'knut' : (trevor.key === 'floor-d' ? 'trevor' : null),
+      catWaits: !!cat.armWait, catZone: armchair.catZone ? armchair.catZone.filter(Boolean).length : 0, mesh: { x: +chairL.position.x.toFixed(3), y: +chairL.position.y.toFixed(3), z: +chairL.position.z.toFixed(3) } };
+  },
+  spell: function () { return armchair.casting ? armchair.casting.state() : null; },
+  judge: function (pts) { return armchair.casting ? armchair.casting.judge(pts) : null; },   /* a stroke handed in, screen px */
+  toScreen: function (q) { return ARM_FLOOR.toScreen(q); },
+  mark: function () { return screenOf(ARMCHAIR_MOVE.mark); },
+  blocked: armchairBlocked, cast: armchairTap, mesh: chairL,
+  trevorHere: function () { trevor.force = trevor.key = 'floor-d'; layPrints(trailTo(TREVOR_MARKS['floor-d'])); prints.visible = true; }
+};
 })();
 </script>
 </body>
