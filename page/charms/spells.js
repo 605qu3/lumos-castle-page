@@ -1015,12 +1015,18 @@ function judgeFreeze(points, pixies, ease, fix) {
    FLAMES_EASES or one of its own (wind: how far round its own middle, in turns, the ring must go; turns: the most
    before it is a scribble; round: how far the stroke may stray from its circle, as a share of the radius, the root of
    the mean square; near: how far off the ring a friend may stand and still be warm, in its sizes).
-   Returns { verdict: 'warm' | 'miss', reason ('warm', 'tap', 'open', 'scribble', 'lumpy', 'row', 'out'; 'row' when the
+   Returns { verdict: 'warm' | 'miss', reason ('warm', 'tap', 'open', 'scribble', 'lumpy', 'row', 'apart', 'out'; 'row' when the
    friends stand in a row, before naming who is left out), c (the stroke's own
    circle { x, y, r }, its middle where the jar goes), turns, round, off (each friend's distance off the ring, in its
    sizes, plus outside and minus inside), warm [true, ...], cold (the friends left outside the ring, too far from the
    fire), close (the ones inside it, too near), row (three or more friends in a line, within a size: no circle passes
-   through them), through (the one circle through the first three friends, null when they are in a row) }. */
+   through them), through (the one circle through the first three friends, null when they are in a row) }.
+   fix (optional, the round Four friends): [i, j, k], the three friends that fix the ring; any other is on it or off
+   it, measured along the line from its middle. It adds fixC (the one circle through those three), fixOff (each
+   friend's distance from it, in its sizes, plus outside and minus inside, 0 for the three), onFix (how many stand
+   within near of it, the three included) and apart (the friend furthest off it among those the stroke left out, or
+   -1), and the miss 'apart': the stroke went through the three that fix the ring, but another stood off it at the
+   lift (not yet on one ring). Without fix nothing changes. */
 var FLAMES_EASES = {
   kind:   { wind: 0.80, turns: 1.8, round: 0.16, near: 1.4 },
   fair:   { wind: 0.88, turns: 1.6, round: 0.12, near: 1.0 },
@@ -1047,7 +1053,7 @@ function fitCircle(P) {   /* the circle nearest the points (least squares on x²
   var cx = -D / 2, cy = -E / 2;
   return { x: cx + mx, y: cy + my, r: Math.sqrt(Math.max(0, cx * cx + cy * cy - F)) };
 }
-function judgeFlames(points, friends, ease) {
+function judgeFlames(points, friends, ease, fix) {
   var e = typeof ease === 'object' ? ease : (FLAMES_EASES[ease] || FLAMES_EASES.kind);
   var out = { verdict: 'miss', reason: 'tap', c: null, turns: 0, round: 0, off: [], warm: [], cold: [], close: [], row: false, through: null };
   var P = points || [], i, path = 0, r0 = friends.length ? friends[0].r : 10;
@@ -1056,6 +1062,14 @@ function judgeFlames(points, friends, ease) {
     for (i = 1; i < s.length - 1; i++) bend = Math.max(bend, Math.abs((l.x - f.x) * (f.y - s[i].y) - (f.x - s[i].x) * (l.y - f.y)) / fl / s[i].r);
     out.row = bend < 1;
     out.through = out.row ? null : circleThrough(friends[0], friends[1], friends[2]);
+  }
+  if (fix) {   /* the three that fix the ring: each friend's distance from it, along the line from its middle */
+    var fc = circleThrough(friends[fix[0]], friends[fix[1]], friends[fix[2]]);
+    out.fixC = fc ? { x: Math.round(fc.x), y: Math.round(fc.y), r: Math.round(fc.r) } : null; out.fixOff = []; out.onFix = 0; out.apart = -1;
+    for (i = 0; i < friends.length; i++) {
+      var fo = !fc || fix.indexOf(i) >= 0 ? 0 : (Math.hypot(friends[i].x - fc.x, friends[i].y - fc.y) - fc.r) / friends[i].r;
+      out.fixOff.push(Math.round(fo * 100) / 100); if (Math.abs(fo) <= e.near) out.onFix++;
+    }
   }
   for (i = 1; i < P.length; i++) path += Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
   if (P.length < 3 || path < r0 * 4) return out;
@@ -1078,10 +1092,13 @@ function judgeFlames(points, friends, ease) {
     out.warm.push(Math.abs(o) <= e.near);
     if (o > e.near) out.cold.push(i); else if (o < -e.near) out.close.push(i);
   }
+  if (out.fixOff && fix.every(function (k) { return out.warm[k]; }))   /* the three that fix it on the ring: another off theirs? */
+    for (i = 0; i < friends.length; i++) if (!out.warm[i] && Math.abs(out.fixOff[i]) > e.near && (out.apart < 0 || Math.abs(out.fixOff[i]) > Math.abs(out.fixOff[out.apart]))) out.apart = i;
   if (out.turns < e.wind) { out.reason = 'open'; return out; }
   if (out.turns > e.turns) { out.reason = 'scribble'; return out; }
   if (out.round > e.round) { out.reason = 'lumpy'; return out; }
   if (out.row) { out.reason = 'row'; return out; }   /* no ring passes through three in a row, however near it comes */
+  if (out.apart >= 0) { out.reason = 'apart'; return out; }   /* the three fix the ring, and one more stands off it */
   if (out.cold.length || out.close.length) { out.reason = 'out'; return out; }
   out.verdict = 'warm'; out.reason = 'warm';
   return out;

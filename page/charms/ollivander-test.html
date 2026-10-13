@@ -54,6 +54,7 @@
 <div id="ledger"></div>
 <script src="spells.js?v=7"></script>
 <script src="guide.js?v=3"></script>
+<script src="../design/lumos-icon.js"></script>
 <script>
 /* Ollivanders, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
    The plan and Godric's answers are in the lane's handoff ("The Ollivander moment, the plan"; Q2 at 7.26 pm, Q3 at
@@ -81,10 +82,16 @@
   function me() { if (!store[who]) store[who] = { rows: [] }; return store[who]; }
 
   /* ---- the four choices of Q2, in the books' words ---- */
-  var WOODS = [   /* the woods PS 5 names; the colours are placeholders until Design draws the woods (its file, the Ollivander thread) */
+  var WOODS = [   /* the woods PS 5 names; these colours only if the icon's script is missing: each wood looks as the icon draws it (below) */
     { k: 'willow', c: '#b89a6a', f: 523 }, { k: 'mahogany', c: '#6e2f1e', f: 392 }, { k: 'oak', c: '#8a6440', f: 330 },
     { k: 'beech', c: '#c09a6b', f: 440 }, { k: 'maple', c: '#d4b483', f: 587 }, { k: 'ebony', c: '#2a1f18', f: 294 },
     { k: 'holly', c: '#e2d6bd', f: 659 } ];
+  /* each wood as the Lumos icon draws it (Design's req 246; Godric's Q23, answered 1: wood and length, each wand keeping
+     its own handle): its colour, its grain's kind and colours and its polish from LumosIcon.LOOK in
+     page/design/lumos-icon.js, read only, so a wand on the bench is the wand the icon shows. The bench's handle stays
+     its own. */
+  var LOOK = window.LumosIcon && window.LumosIcon.LOOK;
+  if (LOOK) WOODS.forEach(function (w) { var L = LOOK[w.k]; if (L) { w.c = L.wood; w.grain = L.grain; w.grainC = L.grainC; w.rayC = L.rayC; w.sheen = L.sheen; } });
   /* stiff to whippy: "quite rigid" GoF 18; "springy", "supple", "pliable", "quite whippy" PS 5. The order is ours. */
   var FLEX = [ { k: 'quite rigid', angle: 20, wob: 0 }, { k: 'springy', angle: 25, wob: 0.01 }, { k: 'supple', angle: 30, wob: 0.02 },
     { k: 'pliable', angle: 35, wob: 0.035 }, { k: 'quite whippy', angle: 40, wob: 0.05 } ];
@@ -219,11 +226,36 @@
     var p = P(hl, -w0 * 0.75); cx.moveTo(p[0], p[1]);
     p = P(gm.len, -w1); cx.lineTo(p[0], p[1]); p = P(gm.len + w1, 0); cx.lineTo(p[0], p[1]);
     p = P(gm.len, w1); cx.lineTo(p[0], p[1]); p = P(hl, w0 * 0.75); cx.lineTo(p[0], p[1]); cx.closePath(); cx.fill();
+    drawGrain(w, P, gm.len, hl, w0, w1);
     cx.fillStyle = 'rgba(0,0,0,0.3)'; cx.beginPath();
     p = P(hl, 0); cx.moveTo(p[0], p[1]); p = P(gm.len, w1 * 0.2); cx.lineTo(p[0], p[1]); p = P(hl, w0 * 0.75); cx.lineTo(p[0], p[1]); cx.closePath(); cx.fill();
     cx.fillStyle = shade(w.c, -0.35); cx.beginPath();
     p = P(-S * 0.02, -w0); cx.moveTo(p[0], p[1]); p = P(hl, -w0); cx.lineTo(p[0], p[1]);
     p = P(hl, w0); cx.lineTo(p[0], p[1]); p = P(-S * 0.02, w0); cx.lineTo(p[0], p[1]); cx.closePath(); cx.fill();
+    cx.restore();
+  }
+  /* the wood's figure along the wand, as the icon draws it (lumos-icon.js, grain): streaks, flecks, curl, the oak's open
+     grain and its rays, mahogany's ribbon, and the polish as a light streak; the icon's widths scaled to this wand */
+  function drawGrain(w, P, len, hl, w0, w1) {
+    if (!w.grain) return;
+    var a0 = -S * 0.02, sc = w0 * 1.25 / 3.5, rs = 7;
+    function hw(a) { return a < hl ? w0 : w0 * 0.75 + (w1 - w0 * 0.75) * (a - hl) / (len - hl); }
+    function at(t, q) { var a = a0 + (len - a0) * t; return P(a, q * hw(a)); }
+    function rnd() { rs = (rs * 9301 + 49297) % 233280; return rs / 233280; }
+    function pen(col, sw, op) { cx.strokeStyle = col; cx.lineWidth = Math.max(0.8, sw * sc); cx.globalAlpha = op; cx.lineCap = 'round'; }
+    function streak(q, t0, t1, col, sw, op) { pen(col, sw, op); cx.beginPath(); for (var i = 0; i <= 12; i++) { var p = at(t0 + (t1 - t0) * i / 12, q); i ? cx.lineTo(p[0], p[1]) : cx.moveTo(p[0], p[1]); } cx.stroke(); }
+    function dash(t, q, dt, col, sw, op) { pen(col, sw, op); var p = at(t, q), p2 = at(t + dt, q); cx.beginPath(); cx.moveTo(p[0], p[1]); cx.lineTo(p2[0], p2[1]); cx.stroke(); }
+    var c = w.grainC, j, t, q;
+    cx.save();
+    if (w.grain === 'plain') streak(0.15, 0.06, 0.9, c, 0.08, 0.35);
+    if (w.grain === 'straight') [-0.5, -0.15, 0.2, 0.55].forEach(function (q) { streak(q, 0.03, 0.95, c, 0.09, 0.6); });
+    if (w.grain === 'fleck') { streak(-0.1, 0.05, 0.9, c, 0.07, 0.3); for (j = 0; j < 18; j++) { t = 0.05 + rnd() * 0.85; q = rnd() * 1.4 - 0.7; dash(t, q, 0.03, c, 0.12, 0.55); } }
+    if (w.grain === 'curl') for (t = 0.05; t < 0.92; t += 0.045) { pen(c, 0.11, 0.45); var u = at(t, -0.8), v = at(t + 0.012, 0.8); cx.beginPath(); cx.moveTo(u[0], u[1]); cx.lineTo(v[0], v[1]); cx.stroke(); }
+    if (w.grain === 'open') { [-0.45, 0.05, 0.5].forEach(function (q) { streak(q, 0.03, 0.94, c, 0.12, 0.65); });
+      for (j = 0; j < 8; j++) { t = 0.06 + rnd() * 0.8; q = rnd() * 1.2 - 0.6; dash(t, q, 0.025, w.rayC || c, 0.16, 0.6); } }
+    if (w.grain === 'ribbon') [-0.3, 0.35].forEach(function (q) { streak(q, 0.04, 0.93, c, 3.5 * 0.2, 0.35); });
+    if (w.grain === 'polished') streak(-0.2, 0.06, 0.9, c, 0.06, 0.3);
+    if (w.sheen) streak(0.42, 0.08, 0.95, '#fff3d6', 0.12 + 0.14 * w.sheen, w.sheen * 0.7);
     cx.restore();
   }
   function shade(hex, k) {
@@ -401,12 +433,18 @@
     note('Not in the books: here you build your own wand.' + (target ? ' The gold mark is five quarters of your forearm.' : ''));
     var rows = [];
     var s = document.createElement('input'); s.type = 'range'; s.min = 28; s.max = 64; s.step = 1; s.value = Math.round(build.len * 4);
-    var lenLab = btn(frac(build.len) + ' inches', function () {});
-    s.addEventListener('input', function () { build.len = s.value / 4; lenLab.textContent = frac(build.len) + ' inches'; });
+    var lenLab = btn(frac(build.len) + ' inches', function () {}), nodded = false;
+    function nod() {   /* oak at the full sixteen inches: Hagrid's own wand, and Ollivander remembers it (PS 5; Design's req 247) */
+      if (nodded || m.younger || build.wood !== 'oak' || build.len !== 16) return;
+      nodded = true; tone(330, 0, 0.5, 0.06); tone(495, 0.1, 0.6, 0.05);
+      say('"Oak, sixteen inches, rather bendy, wasn\'t it? ... Good wand, that one."');
+      note('Hagrid\'s wand, the very one: Ollivander remembers every wand he has ever sold.');
+    }
+    s.addEventListener('input', function () { build.len = s.value / 4; lenLab.textContent = frac(build.len) + ' inches'; nod(); });
     rows.push(row([s], 'Length: how far the light reaches'));
     function chips(list, keyName, lab) {
       var bs = list.map(function (o) {
-        var b = btn(o.k, function () { build[keyName] = o.k; bs.forEach(function (x) { x.className = x.textContent === o.k ? 'on' : ''; }); });
+        var b = btn(o.k, function () { build[keyName] = o.k; bs.forEach(function (x) { x.className = x.textContent === o.k ? 'on' : ''; }); nod(); });
         if (build[keyName] === o.k) b.className = 'on';
         return b;
       });
@@ -419,7 +457,7 @@
     }
     var yb = btn(m.younger ? 'All four choices' : 'Length alone', function () { m.younger = !m.younger; save(); go('bench'); });
     rows.push(row([lenLab, yb, btn('Give it a wave', function () { go('tryit'); }, 'go')]));
-    setPanel(rows);
+    setPanel(rows); nod();
   }
   /* The ruler under the bench: inches 0 to 16 as a number line, his forearm, the gold mark at five quarters of it, and
      the wand he is building on the same line. */
