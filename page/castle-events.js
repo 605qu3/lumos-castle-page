@@ -77,6 +77,10 @@
    `house points` reads the total; the page's `opts.point(slip)` is told of each new one as it lands, so its gems fall
    then; a line in the grown-ups' log. `first cast`, a page moment, comes when a spell's cast in a room answers its
    first true cast ever (Charms' `first`), with the page's built-in `spell` naming it.
+   Then whose each point is (board req 227, Design's house cup, Godric's Q21 t1): a slip carries `house`, the earner's
+   house as the hourglass draws it (lion, snake, badger, eagle), stamped as it lands from this castle's own, a
+   grown-up's setting (settings.house, ?house= for a test; `house()` reads it, null till set), so it keeps it whichever
+   way the two castles' slips merge later (v=23).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -87,6 +91,9 @@
 
   var STATE_KEY = 'lumos.castle.state.v1';
   var SETTINGS_KEY = 'lumos.castle.settings.v1';
+  /* A house as a grown-up may write it, read to the beast the hourglass draws (Design's house-hourglass.js; req 227) */
+  var HOUSES = { lion: 'lion', gryffindor: 'lion', snake: 'snake', slytherin: 'snake',
+                 badger: 'badger', hufflepuff: 'badger', eagle: 'eagle', ravenclaw: 'eagle' };
   var LOG_LINES = 50;
   var SMALL_ODDS = 0.8;          /* small touches on most visits: about four in five */
   var BIG_ODDS = 1 / 3;          /* big events about one visit in three, at most one a day, never two visits running */
@@ -309,6 +316,17 @@
        9 October 2026 it read as 0 and turned the bedtime off on the page it opened); ?bedtime=off turns it off. */
     var bedtimeParam = params.get('bedtime');
     var bedtimeMin = bedtimeParam === 'off' ? 0 : +bedtimeParam > 0 ? +bedtimeParam : (+settings.bedtime || 0);
+    /* This castle's own house, the house of the boy whose iPad this is (board req 227): a grown-up's setting
+       (settings.house), ?house= for a test, as the beast the hourglass draws (lion, snake, badger, eagle; the house's
+       own name is read to its beast); null until one is set. Each slip earned here is stamped with it as it lands, so
+       a slip says whose it is and keeps it whichever way the two castles' slips merge later. A slip earned before a
+       house was set is stamped at the first start that knows one; a slip with `from` came from the other castle and
+       is never stamped here. */
+    function castleHouse() {
+      var h = String(params.get('house') || settings.house || '').trim().toLowerCase();
+      return HOUSES[h] || null;
+    }
+    if (castleHouse()) (state.points || []).forEach(function (p) { if (!p.house && !p.from) p.house = castleHouse(); });
 
     var chains = [];          /* the loaded files */
     var records = [];         /* every record, in file order */
@@ -626,6 +644,7 @@
       }
       for (var i = 0; i < state.points.length; i++) if (state.points[i].kind === kind && state.points[i].thing === thing) return;
       var slip = { kind: kind, thing: thing, points: n, on: isoDay(nowDate()), record: rec.id };
+      if (castleHouse()) slip.house = castleHouse();               /* whose it is (req 227) */
       state.points.push(slip);
       logLine(n + ' house points for ' + kind + ' ' + thing + ', {day}');
       if (opts.point) { try { opts.point(Object.assign({}, slip)); } catch (e) { note('the page could not take a point: ' + e); } }
@@ -1327,8 +1346,12 @@
       /* The castle's secrets he has found, in the order found, each once (req 180; for the Map, B10). */
       secrets: function () { return (state.secrets || []).slice(); },
       /* The house points earned on this iPad, a slip each in the order earned: { kind, thing, points, on (yyyy-mm-dd),
-         record } (req 216; for the hourglass and the leaving feast's slips, Magic's t1). */
+         record, house } (req 216; for the hourglass and the leaving feast's slips, Magic's t1); `house` is the earner's
+         (req 227), missing only while no house is set, when the hourglass reads it as this castle's own. */
       points: function () { return (state.points || []).map(function (p) { return Object.assign({}, p); }); },
+      /* This castle's own house as the hourglass draws it (lion, snake, badger, eagle), or null until a grown-up sets
+         it (settings.house; ?house= for a test): the first of the hourglass's `houses` (req 227). */
+      house: castleHouse,
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';
