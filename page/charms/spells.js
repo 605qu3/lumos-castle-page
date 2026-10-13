@@ -829,6 +829,52 @@ function judgePineapple(taps, desk, ease, want, now) {
   out.verdict = 'danced'; out.reason = 'danced';
   return out;
 }
+/* The Freezing Charm (CoS 6: Lockhart's "Peskipiksi Pesternomi!" has "absolutely no effect"; Hermione is "immobilizing
+   two pixies at once with a clever Freezing Charm and stuffing them back into their cage"). The book gives no motion;
+   the stroke is ours, for the geometry: two points make one straight line, so two pixies at once is one straight
+   stroke through both. Three at once only when they fly into a line.
+   points: [{x, y, t}] in CSS pixels, either way drawn; pixies: [{x, y, r}] where each is at the moment the finger
+   lifts, r its size; ease: a name in FREEZE_EASES or one of its own (straight: the least of the stroke's end to end
+   over its path; near: how far the line may pass from a pixie's middle, in its sizes; reach: how far past either end
+   of the stroke a pixie may be and still be caught, in its sizes).
+   Returns { verdict: 'frozen' | 'miss', reason ('frozen', 'tap', 'curved', 'none', 'missed'), caught [true, ...],
+   off (each pixie's distance from the line, in its sizes), missed (the first pixie not caught, or -1), angle
+   (degrees, the line's slope from the level), straight (end to end over path), bend (for three or more: how far the
+   middle ones sit off the line through the outer two, in sizes, 0 when they are exactly in a row) }. */
+var FREEZE_EASES = {
+  kind:   { straight: 0.90, near: 1.6, reach: 1.6 },
+  fair:   { straight: 0.93, near: 1.25, reach: 1.2 },
+  strict: { straight: 0.96, near: 0.95, reach: 0.9 }
+};
+function judgeFreeze(points, pixies, ease) {
+  var e = typeof ease === 'object' ? ease : (FREEZE_EASES[ease] || FREEZE_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', caught: [], off: [], missed: -1, angle: 0, straight: 0, bend: 0 };
+  var P = points || [], i, path = 0, r0 = pixies.length ? pixies[0].r : 10;
+  for (i = 1; i < P.length; i++) path += Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
+  if (P.length < 2 || path < r0 * 2) return out;
+  var a = P[0], b = P[P.length - 1], c = Math.hypot(b.x - a.x, b.y - a.y) || 1, u = { x: (b.x - a.x) / c, y: (b.y - a.y) / c };
+  out.straight = Math.round(c / path * 100) / 100;
+  var ang = Math.atan2(-(b.y - a.y), b.x - a.x) * 180 / Math.PI; if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+  out.angle = Math.round(ang) || 0;
+  if (pixies.length > 2) {   /* how far the middle ones sit off the line through the outer two */
+    var s = pixies.slice().sort(function (p, q) { return p.x - q.x || p.y - q.y; }), f = s[0], l = s[s.length - 1], fl = Math.hypot(l.x - f.x, l.y - f.y) || 1;
+    for (i = 1; i < s.length - 1; i++) out.bend = Math.max(out.bend, Math.abs((l.x - f.x) * (f.y - s[i].y) - (f.x - s[i].x) * (l.y - f.y)) / fl / s[i].r);
+    out.bend = Math.round(out.bend * 100) / 100;
+  }
+  var n = 0;
+  for (i = 0; i < pixies.length; i++) {
+    var p = pixies[i], dx = p.x - a.x, dy = p.y - a.y, along = dx * u.x + dy * u.y, side = Math.abs(dx * u.y - dy * u.x);
+    var past = along < 0 ? -along : along > c ? along - c : 0;
+    var off = Math.round(side / p.r * 100) / 100, ok = side <= e.near * p.r && past <= e.reach * p.r;
+    out.off.push(past > e.reach * p.r ? Math.round(Math.hypot(side, past) / p.r * 100) / 100 : off);
+    out.caught.push(ok); if (ok) n++; else if (out.missed < 0) out.missed = i;
+  }
+  if (out.straight < e.straight) { out.reason = 'curved'; return out; }
+  if (!n) { out.reason = 'none'; return out; }
+  if (n < pixies.length) { out.reason = 'missed'; return out; }
+  out.verdict = 'frozen'; out.reason = 'frozen';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1703,5 +1749,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

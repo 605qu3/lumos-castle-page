@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>The Freezing Charm, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120f0c; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1a1714;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=21"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* The Freezing Charm, a test page for the Charms lane (13 October 2026, nineteenth session; the owner is Godric).
+   Drawn in code. The book (CoS 6, checked in the text): Lockhart's Cornish pixies, "electric blue and about eight
+   inches high, with pointed faces"; his "Peskipiksi Pesternomi!" has "absolutely no effect"; Hermione, "immobilizing
+   two pixies at once with a clever Freezing Charm and stuffing them back into their cage." No word and no motion in the
+   book; the stroke is ours, for the geometry: two points make one straight line, so one straight stroke through two
+   pixies freezes both, judged by LumosSpells.judgeFreeze at the moment the finger lifts against where the pixies are
+   then (checks/freeze-tally.js: their size a twenty-second of the short side). Frozen, they stop mid-air, their paths
+   ahead shown dotted, the line through them drawn on; then they float back into their cage. Three rounds: Lockhart's
+   pixies (two hovering, the guide's line through them), Flitting (two on loops, no guide) and Three in a row (three
+   bobbing, in a line only twice a swing: wait for it). ?round=1..3, ?ease= for trying; window.lumosFreeze for checks
+   (pixies(ms): where they will be that many ms from now; nextRow(): ms until the three are next in a row). */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, R = 10, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+  var ROUNDS = [
+    { name: "Lockhart's pixies",
+      start: 'Lockhart bellows "Peskipiksi Pesternomi!" It has absolutely no effect. Do what Hermione did: freeze <b>two at once</b>, with <b>one straight line through both</b>.' },
+    { name: 'Flitting',
+      start: '<b>No guide</b>, and these two will not sit still. One straight line through both, caught where they are when you lift.' },
+    { name: 'Three in a row',
+      start: 'Three at once! A straight line only goes through three when they are <b>in a row</b>, and they only line up now and then. <b>Wait for it.</b>' } ];
+  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+  var t0 = 0, wait = null, done = false, last = null, misses = 0, frozen = null, shown = null;
+  var stroke = null, active = null, trail = null, guides = [];
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H); R = S / 22;
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    makeGuide();
+  }
+  /* where each pixie is, ms after the round began: deterministic paths, so a check can ask ahead */
+  function posAt(ms) {
+    var t = ms / 1000;
+    if (round === 0) return [[0.32 * W + 0.15 * R * Math.sin(t * 1.7), 0.42 * H + 0.3 * R * Math.sin(t * 2.3)],
+                             [0.68 * W + 0.15 * R * Math.sin(t * 1.9 + 1), 0.50 * H + 0.3 * R * Math.sin(t * 2.1 + 2)]].map(px);
+    if (round === 1) return [[0.35 * W + 0.12 * W * Math.sin(0.9 * t), 0.45 * H + 0.10 * H * Math.sin(1.3 * t + 1)],
+                             [0.65 * W + 0.12 * W * Math.sin(1.1 * t + 2), 0.45 * H + 0.10 * H * Math.sin(0.8 * t)]].map(px);
+    var th = t * 1.0, c = 0.45 * H, A = 0.085 * H;   /* the middle swings twice as far as the line through the outer two */
+    return [[0.25 * W, c + A * Math.sin(th)], [0.5 * W, c + 2 * A * Math.sin(th + Math.PI / 4)], [0.75 * W, c + A * Math.sin(th + Math.PI / 2)]].map(px);
+  }
+  function px(q) { return { x: q[0], y: q[1], r: R }; }
+  function nowMs() { return performance.now() - t0; }
+  function nextRow() {   /* in a row when sin(th + pi/4) is 0: th = k pi - pi/4 */
+    var th = nowMs() / 1000, k = Math.ceil((th + Math.PI / 4) / Math.PI), next = k * Math.PI - Math.PI / 4;
+    return Math.round((next - th) * 1000);
+  }
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+  function notes(list, gap, gain) {
+    if (!audio) return;
+    list.forEach(function (f, i) {
+      var o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * gap;
+      o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4); o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.45);
+    });
+  }
+  function freezeSound() { notes([2093, 1760, 1568, 1319], 0.07, 0.12); noise(0.3, 6000, 0.12); }   /* ice, cracking over */
+  function giggle() { for (var k = 0; k < 4; k++) setTimeout(function () { noise(0.07, 4200 + Math.random() * 1800, 0.22); }, k * 110); }   /* voices so shrill */
+
+  /* the guide, in the first round only: the line through the two hovering pixies, on past each */
+  function makeGuide() {
+    guides = [];
+    if (round !== 0) return;
+    var p = [[0.32 * W, 0.42 * H], [0.68 * W, 0.50 * H]], d = Math.hypot(p[1][0] - p[0][0], p[1][1] - p[0][1]), u = [(p[1][0] - p[0][0]) / d, (p[1][1] - p[0][1]) / d];
+    var a = [p[0][0] - u[0] * R * 1.8, p[0][1] - u[1] * R * 1.8], b = [p[1][0] + u[0] * R * 1.8, p[1][1] + u[1] * R * 1.8], G = Math.max(Math.abs(b[0] - a[0]), 1);
+    var box = function () { return { G: G, ox: a[0], oy: a[1] }; };
+    var gd = LumosGuide.create({ key: 'lumos.charms.freezeGuidedHits', rest: 1.1, mirror: false, box: box,
+      parts: [{ pts: [[0, 0], [1, (b[1] - a[1]) / G]], secs: 0.45, label: 'through both', at: 0.5, dx: 0, dy: -1.6 }] });
+    gd.build(W, H); guides = [gd];
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    ROUNDS.forEach(function (r, i) {
+      var b = document.createElement('button'); b.textContent = r.name; if (i === round) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { guides.forEach(function (gd) { gd.reset(); }); }; panel.appendChild(g);
+  }
+  function choose(i) {
+    if (wait) { clearTimeout(wait); wait = null; }
+    round = i; last = null; trail = null; done = false; misses = 0; frozen = null; shown = null; t0 = performance.now();
+    makeGuide(); menu(); say(ROUNDS[i].start);
+  }
+
+  /* ---- the cast: one stroke, judged where the pixies are when it lifts ---- */
+  function judge(pts) {
+    if (wait || done || frozen) return null;
+    var ms = nowMs(), px0 = posAt(ms), j = LumosSpells.judgeFreeze(pts, px0, ease), now = performance.now();
+    var lv = guides.length ? guides[0].level() : 0;
+    last = j;
+    if (j.verdict !== 'frozen') {
+      guides.forEach(function (g) { g.miss(); }); misses++; giggle();
+      trail = { pts: pts, at: now };
+      shown = j.reason === 'missed' || j.reason === 'none' ? { at: now, pts: pts, px: px0, j: j } : null;
+      var k = j.missed, far = k >= 0 ? Math.round(j.off[k] * 10) / 10 : 0;
+      var words = {
+        tap: 'A line, not a dot: <b>one straight stroke</b> through both pixies.',
+        curved: '<b>Straight!</b> A curve that bends round to each of them is not the charm: one straight line.',
+        none: 'Missed them both: the line went beside them. <b>Through their middles</b>, and it is a giggling, shrieking mess.',
+        missed: px0.length > 2 && j.bend > 1.6 ? 'One got away! They were <b>not in a row</b> just then: three only fit one straight line when they line up. Wait for it.'
+          : 'One got away, cackling! The line passed ' + far + ' pixie-widths from it. <b>Through both middles</b>.'
+      };
+      say(words[j.reason] || 'Try again: one straight line through them all.');
+      return j;
+    }
+    /* frozen: stopped mid-air on their paths, then back into the cage */
+    guides.forEach(function (g) { g.hit(lv > 0); });
+    var a = pts[0], b = pts[pts.length - 1];
+    frozen = { at: now, ms: ms, px: px0, a: a, b: b }; freezeSound(); LumosSpells.learn('freezing');
+    if (round === 0) say('<b>Frozen!</b> Both stopped dead in mid-air. Two points always make <b>exactly one straight line</b>, so two pixies can always be caught at once.');
+    else if (round === 1) say('<b>Frozen</b> mid-flight! The dotted lines are where they were going. However they fly, <b>two points, one line</b>.');
+    else say('<b>All three!</b> Three points only sit on one straight line now and then, and you caught them <b>in a row</b>.');
+    wait = setTimeout(function () { wait = null;
+      frozen.cage = performance.now();
+      if (round < 2) { say('Into the cage they go, as Hermione stuffed hers back.'); wait = setTimeout(function () { wait = null; choose(round + 1); }, 3200); }
+      else { done = true; say('<b>Full marks.</b> Hermione managed two at once; you caught three. Lockhart, under his desk, is very impressed.'); }
+    }, 3600);
+    return j;
+  }
+
+  /* ---- the classroom, the cage, the pixies ---- */
+  function cageAt() { return { x: W * 0.86, y: H * 0.2, w: Math.max(R * 3.2, S * 0.13) }; }
+  function drawRoom(now) {
+    var g = cx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#1e1a24'); g.addColorStop(1, '#14100d');
+    cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+    cx.strokeStyle = 'rgba(255,255,255,0.03)'; cx.lineWidth = 1;
+    for (var y = H * 0.12; y < H * 0.86; y += S * 0.08) { cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke(); }
+    var c = cageAt(), w = c.w, h = w * 1.25;   /* the cage, hung up, its door open */
+    cx.save(); cx.strokeStyle = '#b8955a'; cx.lineWidth = 2;
+    cx.beginPath(); cx.moveTo(c.x, c.y - h * 0.62); cx.lineTo(c.x, c.y - h * 0.5 - S); cx.stroke();
+    cx.beginPath(); cx.ellipse(c.x, c.y - h * 0.15, w / 2, h * 0.38, 0, Math.PI, 2 * Math.PI); cx.stroke();
+    for (var k = 0; k <= 6; k++) { var x = c.x - w / 2 + w * k / 6; cx.beginPath(); cx.moveTo(x, c.y - h * 0.15 - (k === 0 || k === 6 ? 0 : h * 0.38 * Math.sqrt(1 - Math.pow((x - c.x) / (w / 2), 2)))); cx.lineTo(x, c.y + h * 0.42); cx.stroke(); }
+    cx.beginPath(); cx.moveTo(c.x - w / 2, c.y + h * 0.42); cx.lineTo(c.x + w / 2, c.y + h * 0.42); cx.stroke();
+    cx.beginPath(); cx.arc(c.x, c.y - h * 0.53 - 6, 6, 0, 7); cx.stroke();
+    cx.restore();
+  }
+  function drawPixie(p, now, ice, k) {
+    var flap = ice ? 0.5 : 0.5 + 0.5 * Math.sin(now / 38 + k * 2), r = p.r;
+    cx.save(); cx.translate(p.x, p.y);
+    cx.fillStyle = ice ? 'rgba(220,240,255,0.55)' : 'rgba(180,220,255,0.35)';   /* wings */
+    cx.beginPath(); cx.ellipse(-r * 0.75, -r * 0.35, r * 0.75, r * 0.32 * (0.4 + flap), -0.6, 0, 7); cx.ellipse(r * 0.75, -r * 0.35, r * 0.75, r * 0.32 * (0.4 + flap), 0.6, 0, 7); cx.fill();
+    var body = ice ? '#bfe6ff' : '#2b9bff', dark = ice ? '#7fb6d6' : '#145fae';
+    cx.fillStyle = body; cx.beginPath(); cx.ellipse(0, r * 0.35, r * 0.38, r * 0.55, 0, 0, 7); cx.fill();   /* body */
+    cx.beginPath(); cx.moveTo(-r * 0.5, -r * 0.45); cx.quadraticCurveTo(0, -r * 1.05, r * 0.5, -r * 0.45); cx.lineTo(0, r * 0.1); cx.closePath(); cx.fill();   /* the pointed face */
+    cx.beginPath(); cx.moveTo(-r * 0.42, -r * 0.6); cx.lineTo(-r * 0.95, -r * 0.95); cx.lineTo(-r * 0.3, -r * 0.42); cx.moveTo(r * 0.42, -r * 0.6); cx.lineTo(r * 0.95, -r * 0.95); cx.lineTo(r * 0.3, -r * 0.42); cx.fill();   /* ears */
+    cx.strokeStyle = dark; cx.lineWidth = Math.max(1.5, r * 0.12); cx.lineCap = 'round';
+    var kick = ice ? 0 : Math.sin(now / 90 + k) * r * 0.25;
+    cx.beginPath(); cx.moveTo(-r * 0.15, r * 0.8); cx.lineTo(-r * 0.3 - kick, r * 1.2); cx.moveTo(r * 0.15, r * 0.8); cx.lineTo(r * 0.3 + kick, r * 1.2);
+    cx.moveTo(-r * 0.35, r * 0.25); cx.lineTo(-r * 0.75, r * 0.05 - kick); cx.moveTo(r * 0.35, r * 0.25); cx.lineTo(r * 0.75, r * 0.05 + kick); cx.stroke();
+    cx.fillStyle = ice ? '#ffffff' : '#ffef6a'; cx.beginPath(); cx.arc(-r * 0.17, -r * 0.42, r * 0.09, 0, 7); cx.arc(r * 0.17, -r * 0.42, r * 0.09, 0, 7); cx.fill();
+    cx.strokeStyle = '#0b2a4a'; cx.lineWidth = Math.max(1, r * 0.06); cx.beginPath();
+    if (ice) { cx.moveTo(-r * 0.12, -r * 0.2); cx.lineTo(r * 0.12, -r * 0.2); } else cx.arc(0, -r * 0.24, r * 0.13, 0.2, Math.PI - 0.2);
+    cx.stroke();
+    if (ice) { cx.strokeStyle = 'rgba(255,255,255,0.85)'; cx.lineWidth = 1.5; for (var s = 0; s < 3; s++) { var a = s * 2.1 + 0.4, sx = Math.cos(a) * r * 0.9, sy = Math.sin(a) * r * 0.7, l = r * 0.18;
+      cx.beginPath(); cx.moveTo(sx - l, sy); cx.lineTo(sx + l, sy); cx.moveTo(sx, sy - l); cx.lineTo(sx, sy + l); cx.stroke(); } }
+    cx.restore();
+  }
+  function line2(a, b, color, w, dash) { cx.save(); cx.strokeStyle = color; cx.lineWidth = w; if (dash) cx.setLineDash(dash); cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.restore(); }
+  function label(x, y, text, color) {
+    cx.save(); var fs = Math.max(13, S * 0.034); cx.font = 'italic ' + Math.round(fs) + 'px Georgia, serif'; cx.textAlign = 'center';
+    var w = cx.measureText(text).width; cx.fillStyle = 'rgba(18,15,12,0.75)'; cx.fillRect(x - w / 2 - 4, y - fs * 0.85, w + 8, fs * 1.15);
+    cx.fillStyle = color; cx.fillText(text, x, y); cx.restore();
+  }
+  function longLine(a, b) {   /* the stroke's line, run on to the screen's edges */
+    var d = Math.hypot(b.x - a.x, b.y - a.y) || 1, u = { x: (b.x - a.x) / d, y: (b.y - a.y) / d }, L = W + H;
+    return [{ x: a.x - u.x * L, y: a.y - u.y * L }, { x: a.x + u.x * L, y: a.y + u.y * L }];
+  }
+  function drawPixies(now) {
+    if (frozen) {
+      var f = frozen, cage = f.cage ? Math.min(1, (now - f.cage) / 1400) : 0, c = cageAt(), e = cage * cage * (3 - 2 * cage);
+      if (!f.cage) {   /* the geometry: the line through them, run on; their paths ahead, dotted */
+        var ll = longLine(f.a, f.b);
+        line2(ll[0], ll[1], 'rgba(200,235,255,0.75)', 2, [10, 7]);
+        f.px.forEach(function (p, k) {
+          cx.save(); cx.fillStyle = 'rgba(200,235,255,0.5)';
+          for (var s = 1; s <= 14; s++) { var q = posAt(f.ms + s * 110)[k]; cx.beginPath(); cx.arc(q.x, q.y, 2, 0, 7); cx.fill(); }
+          cx.restore();
+        });
+        var mid = { x: (f.px[0].x + f.px[f.px.length - 1].x) / 2, y: (f.px[0].y + f.px[f.px.length - 1].y) / 2 };
+        label(mid.x, mid.y + R * 2.6, f.px.length > 2 ? 'three in a row: one line' : 'two points, one line', '#cfeaff');
+      }
+      f.px.forEach(function (p, k) {
+        var q = { x: p.x + (c.x + (k - 1) * R * 0.9 - p.x) * e, y: p.y + (c.y + R * 0.2 - p.y) * e, r: p.r * (1 - 0.35 * e) };
+        drawPixie(q, now, true, k);
+      });
+      return;
+    }
+    var P = posAt(nowMs());
+    if (round === 2 && ease === 'kind' && !wait && !done) {   /* for the younger boy: a faint line when they are nearly in a row */
+      var j = LumosSpells.judgeFreeze([{ x: P[0].x, y: P[0].y }, { x: P[2].x, y: P[2].y }], P, ease);
+      if (j.bend < 1.2) { var l2 = longLine(P[0], P[2]); line2(l2[0], l2[1], 'rgba(243,210,122,' + (0.45 * (1 - j.bend / 1.2)).toFixed(2) + ')', 2, [4, 8]); }
+    }
+    P.forEach(function (p, k) { drawPixie(p, now, false, k); });
+  }
+  function drawShown(now) {   /* a miss worth showing: the line run on, and the one it missed ringed */
+    if (!shown || now - shown.at > 2600) return;
+    cx.save(); cx.globalAlpha = Math.min(1, (now - shown.at) / 250) * (now - shown.at > 2000 ? (2600 - (now - shown.at)) / 600 : 1);
+    var ll = longLine(shown.pts[0], shown.pts[shown.pts.length - 1]);
+    line2(ll[0], ll[1], 'rgba(240,150,140,0.7)', 2, [8, 7]);
+    shown.px.forEach(function (p, k) { if (!shown.j.caught[k]) { cx.strokeStyle = 'rgba(240,150,140,0.95)'; cx.lineWidth = 2.5; cx.beginPath(); cx.arc(p.x, p.y, p.r * 1.5, 0, 7); cx.stroke(); } });
+    cx.restore();
+  }
+  function frame(now) {
+    drawRoom(now);
+    drawShown(now);
+    if (!wait && !done && !frozen && !(shown && now - shown.at <= 2600)) guides.forEach(function (g) { g.draw(cx, now, !!stroke); });
+    drawPixies(now);
+    function ink(pts, a, rose) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = rose ? 'rgba(240,150,140,' + a + ')' : 'rgba(220,240,255,' + a + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
+    }
+    if (stroke && stroke.length > 1) ink(stroke, 0.7);
+    if (frozen && !frozen.cage) ink([frozen.a, frozen.b], 0.9);
+    if (trail && now - trail.at < 1800) ink(trail.pts, 0.75 * (1 - (now - trail.at) / 1800), true);
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: one straight stroke ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (wait || done || active !== null || frozen) return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null; shown = null;
+    guides.forEach(function (g) { g.cover(stroke[0]); });
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); guides.forEach(function (g) { g.cover(q); }); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    judge(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
+  window.lumosFreeze = { choose: function (i) { choose(i - 1); },
+    pixies: function (ahead) { return posAt(nowMs() + (ahead || 0)); }, nextRow: nextRow,
+    state: function () { return { round: round + 1, waiting: !!wait, done: done, misses: misses, frozen: !!frozen, caged: !!(frozen && frozen.cage),
+      last: last ? { verdict: last.verdict, reason: last.reason, caught: last.caught, off: last.off, missed: last.missed, bend: last.bend, straight: last.straight } : null,
+      line: lineEl.textContent, guide: guides.length ? guides[0].state().level : null, ease: ease, learned: LumosSpells.learned('freezing') }; } };
+})();
+</script>
+</body>
+</html>
