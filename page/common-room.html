@@ -2458,6 +2458,45 @@ function stairsSolid(uv) {
   if (!stairsAlpha || stairsAlpha.src !== im) { stairsAlpha = alphaOf(im); stairsAlpha.src = im; }
   return alphaSolid(stairsAlpha, uv);
 }
+/* the candle glow from the dormitory door (Godric's Q68 t1, 12 October 2026): at night a faint warm light spills down
+   the highest treads he can see, as if the door were open up there. One additive card, a child of the stair's on its
+   geometry, its map the stair's own drawing warmed and faded pixel by pixel: full from 4.4 m up the newel (the
+   highest treads seen at rest), gone by 2.6 m, each pixel keeping the drawing's value, so the lit faces of the treads
+   take it and the shadows under them do not; the flight by the desk stays as it was. It
+   breathes slowly, shown only while the room's night holds (setNight), and eases in and out over two seconds. */
+var STAIR_GLOW = { warm: [1, 0.66, 0.34], full: 4.4, gone: 2.6, peak: 0.7 };
+var stairGlow = null, stairGlowOn = false, stairGlowLevel = 0;
+function stairGlowBuild() {
+  var im = stairs.material.map && stairs.material.map.image;
+  if (!im || !im.width || im.width < 512) return null;
+  var W = Math.round(im.width / 2), H = Math.round(im.height / 2), H_M = 1.432 * im.height / im.width;
+  var c = makeCanvas(W, H), g = c.getContext('2d');
+  g.drawImage(im, 0, 0, W, H);
+  function at(m) { return Math.max(0, Math.min(1, 1 - (m / H_M + 0.0109))); }   /* metres up the newel to the image's v */
+  var y0 = at(STAIR_GLOW.full) * H, y1 = at(STAIR_GLOW.gone) * H, warm = STAIR_GLOW.warm;
+  var d = g.getImageData(0, 0, W, H), p = d.data;
+  for (var y = 0; y < H; y++) {
+    var f = y <= y0 ? 1 : y >= y1 ? 0 : 1 - (y - y0) / (y1 - y0);
+    f = f * f * (3 - 2 * f);                                        /* a soft fall, not a line */
+    for (var x = 0, i = y * W * 4; x < W; x++, i += 4) {
+      p[i] = p[i] * warm[0] * f; p[i + 1] = p[i + 1] * warm[1] * f; p[i + 2] = p[i + 2] * warm[2] * f;
+    }
+  }
+  g.putImageData(d, 0, 0);
+  var m = new THREE.Mesh(stairs.geometry, new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, opacity: 0,
+    blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+  m.name = 'stair-glow'; m.position.z = 0.004; m.raycast = function () {};
+  stairs.add(m);
+  return m;
+}
+function updateStairGlow(dt, t) {
+  stairGlowLevel += Math.max(-dt / 2, Math.min(dt / 2, (stairGlowOn ? 1 : 0) - stairGlowLevel));
+  if (!stairGlow) { if (stairGlowLevel <= 0) return; stairGlow = stairGlowBuild(); if (!stairGlow) return; }
+  if (stairGlow.geometry !== stairs.geometry) stairGlow.geometry = stairs.geometry;   /* placeCard swapped it */
+  var breathe = 0.86 + 0.09 * Math.sin(t * 0.9) + 0.05 * Math.sin(t * 2.3 + 1.7);
+  stairGlow.material.opacity = STAIR_GLOW.peak * stairGlowLevel * breathe;
+  stairGlow.visible = stairGlowLevel > 0;
+}
 new THREE.TextureLoader().load(SCARF.url, function (t) {
   t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
   var h = SCARF.w * t.image.height / t.image.width;
@@ -4561,6 +4600,7 @@ function setNight(on) {
     st.dirty = true;
   }
   if (on) { opp.who = null; opp.mode = null; opp.dirty = true; }
+  stairGlowOn = on;                                   /* the candle glow down the stair (Q68 t1) */
 }
 function visitorsDrawRoom(shows) {
   for (var n in VISITING) {
@@ -7812,6 +7852,7 @@ function frame() {
   updateSign(dt);
   updateHomeLetter(dt);
   updateHowler(dt);
+  updateStairGlow(dt, t);
   updateBooks(dt);
   updateCandle(sdt);
   updateDeskChair(dt);
