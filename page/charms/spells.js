@@ -318,6 +318,48 @@ function judgeSlide(points, at, cell, ease) {
   out.verdict = 'slide'; out.reason = 'slid';
   return out;
 }
+/* Waddiwasi, the aim (PoA 7: Lupin "raised the wand to shoulder height, said 'Waddiwasi!' and pointed it at Peeves",
+   and the wad of gum "shot out of the keyhole and straight down Peeves's left nostril"). The book's is a point at the
+   target and a straight flight; the stroke is ours, for the geometry: one straight line drawn from the thing (the gum)
+   toward the target, and the thing flies along it. A hit is the line passing within the target's reach, so the same
+   angle off misses more the further away the target is (a degree at the gum is a hand's width across the room).
+   points: the stroke, {x, y, t} in CSS pixels; from: { x, y, r } the thing and its reach; to: { x, y, r } the target
+   (the nose) and its size; ease: a name in AIM_EASES or an ease of its own (start: how far from the thing the stroke
+   may begin, in its reaches; straight: the chord over the path; len: the shortest line, in the thing's reaches;
+   slack: the target's size widened by this much).
+   Returns { verdict: 'hit' | 'miss', reason ('hit', 'tap', 'off', 'short', 'wiggly', 'away', 'wide'), off (degrees
+   between his line and the true one, at his start, + clockwise on the screen), allow (the degrees the target allows at
+   its distance), by (how far the line passes from the target's middle, px), dist (px, his start to the target),
+   side ('high', 'low', 'left' or 'right': where the line passes, for a miss's words), straight }. */
+var AIM_EASES = {
+  kind:   { start: 1.6, straight: 0.80, len: 1.5, slack: 1.5 },
+  fair:   { start: 1.3, straight: 0.87, len: 2.0, slack: 1.2 },
+  strict: { start: 1.0, straight: 0.93, len: 2.5, slack: 1.0 }
+};
+function judgeAim(points, from, to, ease) {
+  var e = typeof ease === 'object' ? ease : (AIM_EASES[ease] || AIM_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', off: 0, allow: 0, by: 0, dist: 0, side: '', straight: 0 };
+  if (!points || points.length < 2) return out;
+  var a = points[0], b = points[points.length - 1], path = 0, i;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path < from.r * 0.5) return out;
+  var chord = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / (chord || 1), uy = (b.y - a.y) / (chord || 1);
+  var vx = to.x - a.x, vy = to.y - a.y, dist = Math.hypot(vx, vy), along = vx * ux + vy * uy, cross = vx * uy - vy * ux;
+  var reach = to.r * e.slack;
+  out.straight = path ? chord / path : 0; out.dist = Math.round(dist);
+  out.off = Math.round(Math.atan2(cross, along) * 1800 / Math.PI) / 10;
+  out.allow = Math.round(Math.asin(Math.min(1, reach / (dist || 1))) * 1800 / Math.PI) / 10;
+  out.by = Math.round(along > 0 ? Math.abs(cross) : dist);
+  var px = a.x + ux * Math.max(0, along) - to.x, py = a.y + uy * Math.max(0, along) - to.y;   /* the line's nearest pass */
+  out.side = Math.abs(vx) >= Math.abs(vy) ? (py < 0 ? 'high' : 'low') : (px < 0 ? 'left' : 'right');
+  if (Math.hypot(a.x - from.x, a.y - from.y) > e.start * from.r) { out.reason = 'off'; return out; }
+  if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
+  if (chord < e.len * from.r) { out.reason = 'short'; return out; }
+  if (along <= 0) { out.reason = 'away'; return out; }
+  if (Math.abs(cross) > reach) { out.reason = 'wide'; return out; }
+  out.verdict = 'hit'; out.reason = 'hit';
+  return out;
+}
 /* The smallest circle that holds every point (for Impervius, below): tried on every pair as a diameter and every three
    through their circle, the smallest that holds them all kept. A rectangle's has its diagonal for a diameter; an
    acute triangle's runs through its three corners. points: [{x, y}], a few dozen. Returns { x, y, r }. */
@@ -1277,5 +1319,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
 })(typeof window !== 'undefined' ? window : globalThis);
