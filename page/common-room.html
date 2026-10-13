@@ -1104,14 +1104,16 @@ onWall(skyL, Math.PI + 0.55, 3.3, 5.53); register(skyL, 0); skyL.name = 'window-
    the bay is cut down through the 0.8 m wall to a stone seat 0.45 m up with a cushion on it, and the glass stands at the
    wall's outer face, clear from the cushion to the bay's head at 2.09 m, where the drawn window (kept as drawn) takes
    over: its drawing, 1.2 m wide and 2.415 m tall about 3.3 m, stands on its painted sill at 2.09 (the placeholder card
-   reached 1.95, and a head there left a 14 cm band of stone between the glass and the sill). The nook is the card's
-   1.2 m wide at the room face and 1.0 m at the glass, its outer opening turned 0.12 rad toward the hearth about the
-   tower's centre, as tools/castle-plan.py and the Q34 sheet draw the cant: the left one's outer jamb then stands
-   0.21 m off the corner where the corridor's outer wall meets the tower (corridor frame x 2.61, z -4.26; req 192 asks
-   0.01), 0.20 m outside that wall's face. The right is its mirror about the hearth. The wall is not split: its shader
+   reached 1.95, and a head there left a 14 cm band of stone between the glass and the sill). The nook is the Q34
+   plan's 1.79 m wide at the room face and 1.41 m at the glass (Godric's Q73, 13 October 2026, 7.24 am, option 73.2; the
+   card's 1.2 and 1.0 before), wider than the drawn window above it, its outer opening turned toward the hearth about
+   the tower's centre as tools/castle-plan.py and the Q34 sheet draw the cant: at their 0.12 rad the left one's outer
+   jamb lands 1 mm off the corner where the corridor's outer wall meets the tower (corridor frame x 2.61, z -4.26), so
+   it turns 0.122 rad and clears it by 0.014 m, outside that wall's face (req 192 asks 0.01). The right is its mirror
+   about the hearth. The wall is not split: its shader
    drops the openings' fragments as it does the hole's (below), so its stone runs on unbroken, and the nook's own stone
    (bayMat) wears the drawn wall's texture at the wall's scale, folded round each corner, one draw call for both nooks. */
-var BAY = { th: 0.55, cant: 0.12, inW: 1.2, outW: 1.0, deep: 0.8, seat: 0.45, head: 2.09, lip: 0.04, lipH: 0.05,
+var BAY = { th: 0.55, cant: 0.122, inW: 1.79, outW: 1.41, deep: 0.8, seat: 0.45, head: 2.09, lip: 0.04, lipH: 0.05,
   glassPx: 150, over: 0.03, shade: { head: [0.7, 0.45], seat: [0.95, 0.6], jamb: [0.8, 0.5] }, cushion: { inset: 0.08, depth: 0.05, bevel: 0.025, round: 0.03 } };
 /* shade: the nook's stone darkened at its edge with the room [0] and at the glass [1], so the reveal reads as deep: with
    its joints carried on round the corner, at full value the far jamb read as flat wall (the room's lights barely reach in) */
