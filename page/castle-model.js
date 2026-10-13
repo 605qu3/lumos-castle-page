@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 11,
+  "version": 12,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -248,7 +248,11 @@ window.CASTLE_MODEL = {
       "cite": "PS 7, PoA 16, OotP 31" },
     { "id": "classrooms-mouth", "kind": "archway", "between": ["entrance-hall", "classroom-corridor"], "at": [92, 59.0], "w": 3.0, "h": 4.0,
       "state": "books", "about": "the corridor of classrooms opposite the Great Hall's doors, classroom eleven's (the layout PDF's 12); its width ours",
-      "cite": "OotP 27" }
+      "cite": "OotP 27" },
+    { "id": "corridor-mouth", "kind": "open mouth, the Fat Lady's corridor's full section", "between": ["stair hall", "corridor"],
+      "span": [[68, 0.45], [68, 3.45]], "sill": 34.42, "h": 6.48, "state": "designed",
+      "about": "the landing bay at +34.42 (the sixth moving flight's head) runs on west through the stair hall's wall into the corridor's landing (corridor-landing, x 65.6 to 68 in the castle's frame), the corridor's 3.0 m width and its ceiling (40.9) kept; corridor.html takes ?from=stair-hall",
+      "cite": "PS 7, OotP 32; Godric's 12.1 (13 October 2026, 4.57 pm)" }
   ],
   "features": [
     { "id": "hearth", "room": "common-room", "kind": "fireplace", "bearing": 48.7, "w": 3.0, "h": 2.5, "proud": 0.6, "state": "built" },
@@ -271,11 +275,55 @@ window.CASTLE_MODEL = {
       "from": 0, "to": -1.98, "treads": 11, "rise": 0.18, "state": "built" },
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
       "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" },
-    { "id": "marble-staircase", "kind": "magnificent marble staircase, facing the front doors: its first flight and half-landing",
+    { "id": "marble-staircase", "kind": "magnificent marble staircase, facing the front doors: its first flight and half-landing (the well's M1)",
       "rooms": ["stair hall"], "span": [[73, 50], [87, 45.2]], "up": [0, -1], "from": 0, "to": 2.6, "treads": 15, "rise": 0.173,
-      "landing": [73, 43, 87, 45.2], "state": "proposed",
-      "about": "the layout PDF's 9 ([73, 43, 87, 50]): 14 m wide, rising south from the Entrance Hall into the well, fifteen treads of 0.32 m to a half-landing at 2.6 m; its turn above to the first floor is the stair hall's, not yet drawn",
-      "cite": "PS 7, PoA 14" }
+      "landing": [70.4, 43, 89.6, 45.2], "state": "designed",
+      "about": "the layout PDF's 9 ([73, 43, 87, 50]): 14 m wide, rising south from the Entrance Hall into the well, fifteen treads of 0.32 m to a half-landing at 2.6 m. Godric's 12.1 (13 October 2026, 4.57 pm; sheet architect-well-1013-1653): the half-landing widened to the strips (x 70.4 to 89.6), the stair dividing there into two flights rising south to the first-floor galleries (well-M1w, well-M1e), then one flight a floor up the east strip (well-M2 to well-M7), the six moving flights up the west (well-S1 to well-S6, the sixth to the Fat Lady's landing bay at +34.42), galleries along both long walls and a landing at each end on every floor; the entries well-* below, from tools/architect-well-sheet.py by tools/architect-well-model.py",
+      "cite": "PS 7, PoA 14, PS 8, OotP 32; Godric's 12.1 (13 October 2026, 4.57 pm)" },
+    {"id": "well-1-south-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 0, 92, 3.6]}, "z": 5.2, "state": "designed"},
+    {"id": "well-1-north-landing-w", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 46.4, 73.4, 50]}, "z": 5.2, "state": "designed"},
+    {"id": "well-1-north-landing-e", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [86.6, 46.4, 92, 50]}, "z": 5.2, "state": "designed"},
+    {"id": "well-1-west-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [68, 3.6, 70.4, 46.4]}, "z": 5.2, "state": "designed"},
+    {"id": "well-1-east-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [89.6, 3.6, 92, 46.4]}, "z": 5.2, "state": "designed"},
+    {"id": "well-2-south-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 0, 92, 3.6]}, "z": 10.4, "state": "designed"},
+    {"id": "well-2-north-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 46.4, 92, 50]}, "z": 10.4, "state": "designed"},
+    {"id": "well-2-west-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [68, 3.6, 70.4, 46.4]}, "z": 10.4, "state": "designed"},
+    {"id": "well-2-east-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [89.6, 3.6, 92, 46.4]}, "z": 10.4, "state": "designed"},
+    {"id": "well-3-south-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 0, 92, 3.6]}, "z": 15.6, "state": "designed"},
+    {"id": "well-3-north-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 46.4, 92, 50]}, "z": 15.6, "state": "designed"},
+    {"id": "well-3-west-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [68, 3.6, 70.4, 46.4]}, "z": 15.6, "state": "designed"},
+    {"id": "well-3-east-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [89.6, 3.6, 92, 46.4]}, "z": 15.6, "state": "designed"},
+    {"id": "well-4-south-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 0, 92, 3.6]}, "z": 20.8, "state": "designed"},
+    {"id": "well-4-north-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 46.4, 92, 50]}, "z": 20.8, "state": "designed"},
+    {"id": "well-4-west-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [68, 3.6, 70.4, 46.4]}, "z": 20.8, "state": "designed"},
+    {"id": "well-4-east-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [89.6, 3.6, 92, 46.4]}, "z": 20.8, "state": "designed"},
+    {"id": "well-5-south-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 0, 92, 3.6]}, "z": 26.0, "state": "designed"},
+    {"id": "well-5-north-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 46.4, 92, 50]}, "z": 26.0, "state": "designed"},
+    {"id": "well-5-west-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [68, 3.6, 70.4, 46.4]}, "z": 26.0, "state": "designed"},
+    {"id": "well-5-east-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [89.6, 3.6, 92, 46.4]}, "z": 26.0, "state": "designed"},
+    {"id": "well-6-south-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 0, 92, 3.6]}, "z": 31.2, "state": "designed"},
+    {"id": "well-6-north-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 46.4, 92, 50]}, "z": 31.2, "state": "designed"},
+    {"id": "well-6-west-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [68, 3.6, 70.4, 46.4]}, "z": 31.2, "state": "designed"},
+    {"id": "well-6-east-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [89.6, 3.6, 92, 46.4]}, "z": 31.2, "state": "designed"},
+    {"id": "well-7-south-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [76.0, 0, 92, 3.6]}, "z": 36.4, "state": "designed"},
+    {"id": "well-bay", "kind": "landing bay, the sixth moving flight's head", "rooms": ["stair hall"], "shape": {"rect": [68, 0, 76.0, 3.6]}, "z": 34.42, "state": "designed"},
+    {"id": "well-7-north-landing", "kind": "landing", "rooms": ["stair hall"], "shape": {"rect": [68, 46.4, 92, 50]}, "z": 36.4, "state": "designed"},
+    {"id": "well-7-west-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [68, 3.6, 70.4, 46.4]}, "z": 36.4, "state": "designed"},
+    {"id": "well-7-east-gallery", "kind": "gallery", "rooms": ["stair hall"], "shape": {"rect": [89.6, 3.6, 92, 46.4]}, "z": 36.4, "state": "designed"},
+    {"id": "well-M1w", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[70.4, 43], [73.4, 38.2]], "up": [0, -1], "from": 2.6, "to": 5.2, "treads": 15, "rise": 0.173, "state": "designed"},
+    {"id": "well-M1e", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 43], [89.6, 38.2]], "up": [0, -1], "from": 2.6, "to": 5.2, "treads": 15, "rise": 0.173, "state": "designed"},
+    {"id": "well-M2", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 46.4], [89.6, 37.4]], "up": [0, -1], "from": 5.2, "to": 10.4, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-S1", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 46.4], [73.4, 37.4]], "up": [0, -1], "from": 5.2, "to": 10.4, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-M3", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 3.6], [89.6, 12.6]], "up": [0, 1], "from": 10.4, "to": 15.6, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-S2", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 3.6], [73.4, 12.6]], "up": [0, 1], "from": 10.4, "to": 15.6, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-M4", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 46.4], [89.6, 37.4]], "up": [0, -1], "from": 15.6, "to": 20.8, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-S3", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 46.4], [73.4, 37.4]], "up": [0, -1], "from": 15.6, "to": 20.8, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-M5", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 3.6], [89.6, 12.6]], "up": [0, 1], "from": 20.8, "to": 26.0, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-S4", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 3.6], [73.4, 12.6]], "up": [0, 1], "from": 20.8, "to": 26.0, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-M6", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 46.4], [89.6, 37.4]], "up": [0, -1], "from": 26.0, "to": 31.2, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-S5", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 46.4], [73.4, 37.4]], "up": [0, -1], "from": 26.0, "to": 31.2, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-M7", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 3.6], [89.6, 12.6]], "up": [0, 1], "from": 31.2, "to": 36.4, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "well-S6", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 9.0], [73.4, 3.6]], "up": [0, -1], "from": 31.2, "to": 34.42, "treads": 19, "rise": 0.169, "state": "designed"}
   ],
   "dormitories": {
     "state": "proposed",
@@ -368,6 +416,7 @@ window.CASTLE_MODEL = {
   },
   "open": [
     "The tower stair is drawn to 5.6 m in the common room; it climbs on unseen to the top dormitory's floor at 27.8 m (Godric's 235.1).",
-    "The 142 staircases (PS 8): the places' tally predates 235.1, which gives Gryffindor's dormitories fourteen (seven a stair, were 4) and Ravenclaw's two stair turrets seven each (were 9 in one); the tally to be settled with Godric (the Architect)."
+    "The 142 staircases (PS 8): the places' tally predates 235.1, which gives Gryffindor's dormitories fourteen (seven a stair, were 4) and Ravenclaw's two stair turrets seven each (were 9 in one); the tally to be settled with Godric (the Architect).",
+    "The well as built under 12.1 holds fifteen flights (the marble staircase's first flight, its two divided flights and six more; six moving flights) where the tally's two well places say seven and six; for the tally, with the rest."
   ]
 };
