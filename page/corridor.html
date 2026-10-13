@@ -2750,8 +2750,24 @@ function arriveFromBay() {
 function downToBay() {
   if (leaving) return;
   leaving = true;
+  /* the stair that swings away (Godric's t1 on corridor-landing-end-1013, 6.55 pm; "some that led somewhere different
+     on a Friday", PS 8): now and then, just as he reaches the end, the stair below grinds off from the bay and he
+     waits for it to come back before going down. Heard only while the end is drawn as before; ?stairAway=1 or 0
+     forces it */
+  var force = new URLSearchParams(location.search).get('stairAway');
+  if (force === '1' || (force !== '0' && Math.random() < STAIR_AWAY_CHANCE)) {
+    stairAway = 'away';
+    showLines([{ medium: 'heard', speaker: 'bay', sound: 'stone grinding below: the stair swings away from the landing' }]);
+    setTimeout(function () {
+      stairAway = 'back';
+      showLines([{ medium: 'heard', speaker: 'bay', sound: 'and grinds slowly back, with a soft thud' }]);
+    }, 4400);
+    setTimeout(function () { stairAway = null; kit.travel('shell.html?place=stair-hall&from=corridor'); }, 7600);
+    return;
+  }
   kit.travel('shell.html?place=stair-hall&from=corridor');
 }
+var STAIR_AWAY_CHANCE = 1 / 6, stairAway = null;   /* about one trip down in six */
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
@@ -3126,6 +3142,7 @@ var SPEAKER_AT = {
   thing: function () { return new THREE.Vector3(DOOR.x, 1.4, HER_Z); }, /* the polite door, behind which finds turn up */
   door: function () { return new THREE.Vector3(DOOR.x, 1.85, HER_Z); }, /* its own giggle and creak (req 150), above the lock's face (req 154) */
   stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }, /* the moving stair's grind, at its head */
+  bay: function () { return new THREE.Vector3(FAR_END_X - 0.3, FOOT_Y + 1.3, MID_Z); }, /* the stair below the landing's far end */
   nick: nickHead                                                       /* above his head, beyond the torch that leaned (req 140) */
 };
 var linesEl = document.getElementById('lines');
@@ -3575,7 +3592,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
