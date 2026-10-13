@@ -134,6 +134,14 @@
    a sound and a short line from the books by the time of day; a voice heard there stands on the Map in the model's
    `entrance-hall`; a shell's trip, `?from=<its place id>`, carries the visit to a shell started with that place (v=29).
 
+   His castle backed up (Godric's events-q-one-ipad-1013, 1, 13 October 2026: the boys play on one iPad only, so a
+   sealed backup, never a sync): each named boy's castle, every lumos. key of his, sealed on the iPad (AES-GCM, its
+   key the SHA-256 of "lumos satchel " and the family key) and kept at the store, a blob it cannot read, never a name;
+   it goes up at an owl's look when he has played since its last copy, at most once in ten minutes a boy. If Safari
+   or a reset empties the iPad, the grown-up opens the pairing link again; on an iPad with no castle on it, each boy's
+   copy comes down into his satchel, and his tap unpacks it, with his trunk already at the foot of his bed
+   (`carried`, trunk.json, PS 7). Nothing posts over a backup until the restore has had its answer (v=30).
+
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
    to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh;
@@ -328,6 +336,14 @@
     var seasonOverride = /^(spring|summer|autumn|winter)$/.test(params.get('season') || '') ? params.get('season') : null;
     var weatherDate = /^\d{4}-\d\d-\d\d$/.test(params.get('date') || '') ? params.get('date') : null;
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
+    /* No castle on this iPad at all, neither a state nor a boy's satchel: the backup's restore may come down (v=30). */
+    var bare = !params.has('fresh') && (function () {
+      try {
+        if (localStorage.getItem(STATE_KEY) !== null) return false;
+        for (var i = 0; i < localStorage.length; i++) if ((localStorage.key(i) || '').indexOf(SATCHEL) === 0) return false;
+        return true;
+      } catch (e) { return false; }
+    })();
     var allLines = params.get('lines') === 'all';   /* a test link: lines still marked verify are shown too */
 
     var cues = opts.cues || {};
@@ -908,6 +924,7 @@
         } else note('the owl\'s link does not name a store and a key');
       } catch (e) { note('the owl\'s link does not read'); }
       try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* no history: nothing to tidy */ }
+      if (bare && (owl.players || []).length && owl.store && owl.key) owl.restoring = true;   /* his castle backed up: bring it down */
     }
     save(OWL_KEY, owl);
     var owlBusy = false, owlAgain = false, owlRun = null, owlClock = 0, owlWaited = false, heapGrew = false;
@@ -995,7 +1012,7 @@
       }, function (e) { o.postFailed = true; note('the owl could not take this castle\'s slips (' + e.message + ')'); });
       var whereSent = !w ? Promise.resolve() : owlCall('POST', '/where', { castle: me(), room: w.room, since: w.since, at: w.at })
         .then(null, function (e) { note('the owl could not take where he stands (' + e.message + ')'); });
-      owlRun = sent.then(postBacks).then(function () { return whereSent; }).then(function () {
+      owlRun = sent.then(postBacks).then(postSatchels).then(function () { return whereSent; }).then(function () {
         return owlCall('GET', '/slips?castle=' + me() + '&after=' + (o.after || 0) + '&afterBack=' + (o.afterBack || 0));
       }).then(function (got) {
         var landed = near;
@@ -1090,24 +1107,101 @@
       return { ask: list.length >= 2 && (!playerOf(owl.playing) || !!owl.ask), playing: playerOf(owl.playing) ? owl.playing : null,
                list: list };
     }
-    /* His tap on his name. The same boy, or the first tap on an iPad that had no player yet (he takes the castle as
-       it stands): the castle carries on, false. His brother's: the satchels swap and the page reloads, true. */
-    function play(id) {
-      if (!playerOf(id)) { note('no player ' + id); return false; }
-      var was = playerOf(owl.playing) ? owl.playing : null;
-      owl.ask = false; owl.chosenAt = Date.now();
-      if (!was || was === id) {
-        owl.playing = id;
+    /* ---------- his castle backed up (Godric's events-q-one-ipad-1013, 1, 13 October 2026) ---------- */
+    /* One iPad, so a backup, never a sync. Each named boy's castle, every lumos. key of his, is sealed on the iPad
+       (AES-GCM, its key drawn from the family key) and kept at the store, which holds a blob it cannot read and never
+       a name. `owl.played` is when he last tapped anything; at an owl's look, when he has played since his copy last
+       went up (`owl.sent`) and ten minutes have passed since then (`owl.sentAt`), the copy goes up, the live castle
+       for the boy playing and the satchel for his brother. The pairing link opened on an iPad with no castle on it
+       (Safari emptied it, or a reset) sets `owl.restoring`: each boy's copy comes down into his satchel, `carried`
+       yes in its state for his trunk at his bed's foot (trunk.json, PS 7), and nothing posts until the store has
+       answered, so an empty castle never goes up over his. No crypto, no store or no signal: the castle here. */
+    var SEAL_MAX = 900000, BACKUP_S = 600;
+    owl.played = owl.played || {}; owl.sent = owl.sent || {}; owl.sentAt = owl.sentAt || {};
+    var sealKeyP = null, restoreRun = null, restoreLast = Promise.resolve(false);
+    function sealable() {
+      return !!(owl.store && owl.key && owl.players && window.crypto && window.crypto.subtle && window.TextEncoder);
+    }
+    function sealKey() {
+      if (!sealKeyP) sealKeyP = window.crypto.subtle.digest('SHA-256', new TextEncoder().encode('lumos satchel ' + owl.key))
+        .then(function (raw) { return window.crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['encrypt', 'decrypt']); });
+      return sealKeyP;
+    }
+    function toB64(u) { var s = ''; for (var i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+    function fromB64(b) { var s = atob(b), u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+    function seal(bag) {
+      var iv = new Uint8Array(12);
+      window.crypto.getRandomValues(iv);
+      return sealKey().then(function (k) {
+        return window.crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, k, new TextEncoder().encode(JSON.stringify(bag)));
+      }).then(function (ct) { var c = new Uint8Array(ct), all = new Uint8Array(12 + c.length); all.set(iv); all.set(c, 12); return toB64(all); });
+    }
+    function unseal(b) {
+      var all = fromB64(b);
+      return sealKey().then(function (k) { return window.crypto.subtle.decrypt({ name: 'AES-GCM', iv: all.subarray(0, 12) }, k, all.subarray(12)); })
+        .then(function (pt) { return JSON.parse(new TextDecoder().decode(pt)); });
+    }
+    function liveBag() { var bag = {}; liveKeys().forEach(function (k) { bag[k] = localStorage.getItem(k); }); return bag; }
+    function playedNow() { if (owl.players && playerOf(owl.playing)) { owl.played[owl.playing] = Date.now(); save(OWL_KEY, owl); } }
+    /* Up: each boy's castle he has played since its copy last went up, at most once in ten minutes a boy. */
+    function postSatchels() {
+      if (!sealable() || owl.restoring || packed) return Promise.resolve();
+      return Promise.all(owl.players.map(function (pl) {
+        var at = +owl.played[pl.id] || 0, now = Date.now();
+        if (!at || at <= (+owl.sent[pl.id] || 0) || now - (+owl.sentAt[pl.id] || 0) < BACKUP_S * 1000) return null;
+        if (pl.id === owl.playing) save(STATE_KEY, state);
+        var bag = pl.id === owl.playing ? liveBag() : load(SATCHEL + pl.id);
+        if (!bag) return null;
+        return seal(bag).then(function (blob) {
+          if (blob.length > SEAL_MAX) { note('his castle is too big for the owl to carry (' + blob.length + ')'); return null; }
+          return owlCall('POST', '/satchel', { castle: pl.id, at: at, blob: blob }).then(function () {
+            if ((+owl.sent[pl.id] || 0) < at) owl.sent[pl.id] = at;
+            owl.sentAt[pl.id] = now;
+            if (!packed) save(OWL_KEY, owl);
+          });
+        }).then(null, function (e) { note('the owl could not take his castle (' + e.message + ')'); });
+      }));
+    }
+    /* Down, once, on an iPad emptied and paired again: each boy's copy into his satchel; for the boy already
+       playing (he tapped before it came), his castle unpacked at once and the page reloaded. No answer from the
+       store: `owl.restoring` stays, and the next start asks again. */
+    function restoreBackup() {
+      if (!owl.restoring || !sealable()) return Promise.resolve();
+      if (restoreRun) return restoreRun;
+      var failed = false, landed = [];
+      restoreRun = Promise.all(owl.players.map(function (pl) {
+        return owlCall('GET', '/satchel?castle=' + pl.id).then(function (got) {
+          if (!got || typeof got.blob !== 'string' || !(+got.at > 0)) return null;
+          return unseal(got.blob).then(function (bag) {
+            var his = {};
+            Object.keys(bag || {}).forEach(function (k) { if (k.indexOf('lumos.') === 0 && !iPadKey(k)) his[k] = bag[k]; });
+            var st = null;
+            try { st = his[STATE_KEY] ? JSON.parse(his[STATE_KEY]) : null; } catch (e) { st = null; }
+            if (st) { st.vars = st.vars || {}; st.vars.carried = 'yes'; his[STATE_KEY] = JSON.stringify(st); }   /* t1, his trunk */
+            save(SATCHEL + pl.id, his);
+            owl.played[pl.id] = owl.sent[pl.id] = +got.at; owl.sentAt[pl.id] = Date.now();
+            landed.push(pl.id);
+          });
+        }).then(null, function (e) { failed = true; note('the owl could not bring his castle back (' + e.message + ')'); });
+      })).then(function () {
+        restoreRun = null;
+        if (failed) return false;
+        owl.restoring = false;
         save(OWL_KEY, owl);
-        draw();
-        owlSync();
-        return false;
-      }
+        note('his castle backed up: ' + landed.length + ' brought back');
+        if (playerOf(owl.playing) && landed.indexOf(owl.playing) >= 0) unpack(owl.playing, null);
+        return landed.length > 0;
+      });
+      restoreLast = restoreRun;
+      return restoreRun;
+    }
+    /* His castle in for the castle here: the castle here into `away` (his brother's satchel), or kept one deep at
+       `lumos.player.<id>.before` when no one else owns it; then the page reloads. */
+    function unpack(id, away) {
       if (visit) leave();
       save(STATE_KEY, state);
-      var bag = {};
-      liveKeys().forEach(function (k) { bag[k] = localStorage.getItem(k); });
-      save(SATCHEL + was, bag);
+      var bag = liveBag();
+      save(away ? SATCHEL + away : SATCHEL + id + '.before', bag);
       var his = load(SATCHEL + id) || {};
       Object.keys(bag).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
       Object.keys(his).forEach(function (k) { if (k.indexOf('lumos.') === 0 && !iPadKey(k)) try { localStorage.setItem(k, his[k]); } catch (e) {} });
@@ -1116,6 +1210,22 @@
       save(OWL_KEY, owl);
       packed = true;                                   /* nothing of the boy who went is saved over his brother's */
       (opts.reload || function () { location.reload(); })();
+    }
+    /* His tap on his name. The same boy, or the first tap on an iPad that had no player yet (he takes the castle as
+       it stands): the castle carries on, false. His brother's, or a first tap with his castle brought back from the
+       backup waiting in his satchel: the castles swap and the page reloads, true. */
+    function play(id) {
+      if (!playerOf(id)) { note('no player ' + id); return false; }
+      var was = playerOf(owl.playing) ? owl.playing : null;
+      owl.ask = false; owl.chosenAt = Date.now();
+      if (was === id || (!was && !load(SATCHEL + id))) {
+        owl.playing = id;
+        save(OWL_KEY, owl);
+        draw();
+        owlSync();
+        return false;
+      }
+      unpack(id, was);
       return true;
     }
     /* In the common room, the owl brings what has landed: the moment `owl post` (its cue the owl at the sill, or
@@ -1618,6 +1728,7 @@
     /* A tap on a named thing in the room. The first tap on a page is also `first tap` (sound wakes then). */
     function tap(name) {
       if (!visit) return;
+      playedNow();
       name = targets[name] || name;
       if (!visit.tapped) { visit.tapped = true; moment('first tap'); }
       if (!visit) return;
@@ -1851,6 +1962,7 @@
       save(STATE_KEY, state);
       draw();
       begin();
+      restoreBackup();
       owlSync();
     });
 
@@ -1914,6 +2026,8 @@
          false, carry on; true, his brother's castle is unpacked and the page reloads (`opts.reload` for a test). The
          names come in the pairing link from the family file and stay on the iPad. */
       players: playersNow,
+      /* resolves once a restore from the backup has had the store's answer (true if a castle came back) */
+      restored: function () { return restoreRun || restoreLast; },
       play: play,
       sync: owlSync,
       /* A grown-up takes a point back (Design's req 237; only a grown-up, a slip given in error: points are never lost

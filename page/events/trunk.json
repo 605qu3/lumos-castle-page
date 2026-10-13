@@ -1,0 +1,26 @@
+{
+  "chain": "trunk",
+  "first_visit": [],
+  "room": [],
+  "records": [
+    {
+      "id": "trunk.carried",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = dormitory",
+        "carried = yes"
+      ],
+      "starts": [
+        "set carried = no"
+      ],
+      "show": [
+        "his trunk already at the foot of his bed, brought up ahead of him, as on his first night"
+      ],
+      "canon": "PS 7, the first years' trunks already brought up to the dormitory, checked against the text, 13 October 2026, 4.50 pm; Godric's t1 on events-q-one-ipad-1013 (13 October 2026, 5.17 pm): a castle restored from the backup comes back with his trunk at the foot of his bed; the runtime sets carried = yes on the restored state"
+    }
+  ]
+}
