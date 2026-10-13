@@ -123,7 +123,16 @@
   .line.written { max-width: min(300px, 66vw); padding: 12px 15px; background: #f1e8d2; color: #2b2a4a;
     box-shadow: 0 3px 14px rgba(0,0,0,0.5); transform-origin: 50% 0; font: 400 21px/1.35 "Short Stack", cursive;
     white-space: pre-line; }
-  @media (prefers-reduced-motion: reduce) { .line { transition: none; } }
+  /* the Howler's shout (req 199): bold capitals far larger than a voice, on a slip gone pink with its scarlet, the words
+     shaking fast and small; placeLine owns the slip's transform, so the shake is on the words inside it */
+  .line.said.howler { max-width: min(1100px, 92vw); padding: 12px 18px 14px; background: #f4d9cc; color: #6a0f08;
+    font: 700 clamp(32px, 4.8vh, 58px)/1.06 "IM Fell English", Georgia, serif; text-transform: uppercase; letter-spacing: 0.01em; }
+  .line.said.howler::after { border-top-color: #f4d9cc; }
+  .line.said.howler.below::after { border-bottom-color: #f4d9cc; }
+  .line.said.howler span { display: inline-block; animation: howlerShout 0.09s linear infinite; }
+  @keyframes howlerShout { 0% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(2px, -1.5px) rotate(0.5deg); }
+    50% { transform: translate(-1.5px, 2px) rotate(-0.4deg); } 75% { transform: translate(-2px, -1px) rotate(0.3deg); } 100% { transform: translate(1px, 1px) rotate(0deg); } }
+  @media (prefers-reduced-motion: reduce) { .line { transition: none; } .line.said.howler span { animation: none; } }
   /* a page of Hogwarts, A History, shown when the History on the desk is slid out (the Common room, Q27): period type
      on old paper in the castle's ink, a crimson ribbon on the page it marks */
   #bookPage { position: fixed; left: 0; top: 0; width: min(330px, 78vw); box-sizing: border-box; padding: 22px 26px 16px;
@@ -1992,6 +2001,7 @@ function liftPaper(p) {
 }
 function returnPaper(thenLeave) {
   if (!held || mode !== 'hand') return;
+  if (held === howler && hb.on) return;        /* the Howler bursting in his hand is not put back (req 199) */
   leaveAfterReturn = !!thenLeave;
   mode = 'tween';
   held.lift = { t: 0, dur: 0.55, dir: -1 };
@@ -2900,6 +2910,420 @@ function homePlace(p, dz, u) {
   p.pivot.lookAt(p.pivot.position.clone().add(n));
   p.pivot.rotateX(-p.lean);
 }
+/* ---------- the Howler opened, or gone off by itself (board req 199, Events: page/events/howler.json) ----------
+   With it in his hand a tap on its drawn seal tells the runtime 'howler seal' and the records cue the burst; left
+   unopened, the runtime's own timer cues it 30 to 45 s after the lift, in his hand or back on the desk while he is
+   anywhere in the room. The burst: it jumps and shakes where it is, the view rattles and pale dust sifts down while the
+   shout shows (the said line's `howler` class, huge and shaking); its words done it drops, and the drawing burns on its
+   own 1080 x 744 canvas from a burn time per pixel worked out once from the drawing: the scarlet first, outward from
+   the torn seal with a ragged front (value noise), scorched just ahead and an ember rim glowing behind it, the black
+   bands after, the outer frame not at all; the frame hangs a heartbeat, then breaks into ash flakes that drift down to
+   the desk top, leaving the pinch the ash rule shows from then on, a reload mid-burst included. Held, the hand view
+   ends with the ash, nothing put back. With no Howler written at home it was Mrs Weasley's: after the ash Errol's
+   scorched note flutters down by the pinch (gone by the next load, no rule keeps it), and his line waits in
+   updateLines until it has landed. The room rules come through howlerDrawRoom, the cues through HOWLER_CUES, keyed by
+   the records' own show strings. */
+var HOWLER_SEAL = { u: 0.5, v: 0.55, r: 0.1 };   /* the drawn wax on howler-desk.png: its centre from the left and the top, its radius as a share of the width (measured on the drawing, 13 October 2026) */
+var HOWLER_SMOKE = 'the Howler smoking at the corners', HOWLER_ASH = 'a pinch of grey ash on the desk where the Howler stood';
+var HB = { JUMP: 0.5, DROP: 0.35, BURN: 2.7, HANG: 0.8, ASH: 1.9, NOTE: 2.6, ALONE: 3, FPS: 25, SCORCH: 0.32, RIM: 0.24, FRAME_PX: 30, NB: 600 };
+var hb = { smoke: false, ash: false, on: false, stage: '', t: 0, line: null, shown: false, inHand: false, noteWanted: false, landed: false,
+  card: true, burnt: false, shake: 0, jy: 0, pinchK: 0, burn: null, acc: 0, upd: 0, ms: 0, prepMs: 0, origTex: null, base: new THREE.Vector3() };
+function howlerOnSeal(uv) {        /* a hit's uv on the card (y from its foot) against the drawn seal, in widths */
+  return !!uv && Math.hypot(uv.x - HOWLER_SEAL.u, ((1 - uv.y) - HOWLER_SEAL.v) * HOWLER.h / HOWLER.w) < HOWLER_SEAL.r;
+}
+var _hn = new THREE.Vector3(), _ha = new THREE.Vector3(), _hu = new THREE.Vector3(), _hr = new THREE.Vector3(), _hq2 = new THREE.Quaternion(), _hz = new THREE.Vector3(0, 0, 1);
+function howlerFoot(out) {         /* where its foot stands on the desk top, homePlace's base; _hn the desk's facing, _ha along it */
+  var gp = sideTable.geometry.parameters;
+  out.set((HOME.u - 0.5) * gp.width, (0.5 - HOME.v) * gp.height, HOWLER.dz);
+  sideTable.updateMatrixWorld(); sideTable.localToWorld(out);
+  _hn.set(Math.sin(sideTable.rotation.y), 0, Math.cos(sideTable.rotation.y));
+  _ha.set(Math.cos(sideTable.rotation.y), 0, -Math.sin(sideTable.rotation.y));
+  return out;
+}
+function howlerMouth() {           /* its shout is anchored at its top edge, wherever it is */
+  return howler.mesh.getWorldPosition(new THREE.Vector3()).add(new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion).multiplyScalar(0.01));
+}
+function howlerSoftTex() {
+  var c = makeCanvas(32, 32), g = c.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 32, 32);
+  return tex(c);
+}
+var HOWLER_SOFT = howlerSoftTex();
+/* the smoke rule: a few thin grey wisps curling up off its corners, children of the card so they go to his hand with it */
+function howlerWispTex() {         /* a thin soft curl of smoke, taller than wide */
+  var c = makeCanvas(32, 96), g = c.getContext('2d');
+  g.strokeStyle = 'rgba(255,255,255,0.55)'; g.lineCap = 'round'; g.shadowColor = '#fff'; g.shadowBlur = 7;
+  [[5, 0.9], [2.5, 1]].forEach(function (s) {
+    g.lineWidth = s[0]; g.globalAlpha = s[1];
+    g.beginPath(); g.moveTo(16, 90); g.bezierCurveTo(4, 66, 28, 46, 15, 26); g.quadraticCurveTo(8, 14, 18, 5); g.stroke();
+  });
+  return tex(c);
+}
+var HOWLER_WISP = howlerWispTex(), howlerWisps = [];
+for (var hwi = 0; hwi < 12; hwi++) {
+  var hws = new THREE.Sprite(new THREE.SpriteMaterial({ map: HOWLER_WISP, color: col(0xc4beb5), transparent: true, opacity: 0, depthWrite: false }));
+  hws.userData = { corner: hwi % 4, t: -hwi * 0.17, life: 1.2 + (hwi % 3) * 0.3, sway: hwi * 1.7 };
+  hws.visible = false; howler.mesh.add(hws); howlerWisps.push(hws);
+}
+function updateHowlerWisps(dt) {
+  var on = hb.smoke && !hb.on && !hb.burnt && howler.mesh.visible;
+  for (var i = 0; i < howlerWisps.length; i++) {
+    var s = howlerWisps[i], u = s.userData;
+    s.visible = on;
+    if (!on) continue;
+    u.t += dt;
+    if (u.t >= u.life) { u.t -= u.life; u.sway = Math.random() * 6.3; }
+    if (u.t < 0) { s.material.opacity = 0; continue; }
+    /* each from its corner, a hair outside the paper, curling up and out, strongest just off the corner */
+    var k = u.t / u.life, sx = u.corner & 1 ? 1 : -1, cy = u.corner < 2 ? PIN_INSET - 0.003 : PIN_INSET - HOWLER.h + 0.004;
+    s.position.set(sx * (0.49 * HOWLER.w + 0.005 * k) + 0.003 * Math.sin(u.sway + u.t * 3.4), cy + 0.008 + 0.026 * k, 0.004);
+    s.scale.set(0.006 + 0.008 * k, 0.016 + 0.014 * k, 1);
+    s.material.rotation = sx * (0.15 + 0.25 * k) + 0.15 * Math.sin(u.sway + u.t * 2.1);
+    s.material.opacity = 0.62 * (k < 0.18 ? k / 0.18 : Math.pow((1 - k) / 0.82, 1.3));
+  }
+}
+/* the dust off the ceiling while it shouts: pale motes sifting down across his view */
+var HB_DUST = 160, hbDustPos = new Float32Array(HB_DUST * 3), hbDustVel = new Float32Array(HB_DUST * 3);
+var hbDustGeo = new THREE.BufferGeometry();
+hbDustGeo.setAttribute('position', new THREE.BufferAttribute(hbDustPos, 3).setUsage(THREE.DynamicDrawUsage));
+var howlerDust = new THREE.Points(hbDustGeo, new THREE.PointsMaterial({ size: 0.005, map: HOWLER_SOFT, color: col(0xe8dfcf), transparent: true, opacity: 0, depthWrite: false, sizeAttenuation: true }));
+howlerDust.frustumCulled = false; howlerDust.visible = false; scene.add(howlerDust);
+function howlerDustMote(i, top) {  /* somewhere in his view, 0.15 to 2.4 m out; from above its top edge once it is falling */
+  var d = 0.15 + Math.random() * 2.25, th = Math.tan(camera.fov * Math.PI / 360) * d;
+  camera.getWorldDirection(_hu); _hr.set(1, 0, 0).applyQuaternion(camera.quaternion);
+  var x = (Math.random() * 2 - 1) * th * camera.aspect * 1.1, y = top ? th * (1.05 + Math.random() * 0.3) : (Math.random() * 2 - 1) * th * 1.1;
+  hbDustPos[i * 3] = camera.position.x + _hu.x * d + _hr.x * x; hbDustPos[i * 3 + 1] = camera.position.y + _hu.y * d + y; hbDustPos[i * 3 + 2] = camera.position.z + _hu.z * d + _hr.z * x;
+  hbDustVel[i * 3] = (Math.random() - 0.5) * 0.04; hbDustVel[i * 3 + 1] = -(0.05 + Math.random() * 0.12); hbDustVel[i * 3 + 2] = (Math.random() - 0.5) * 0.04;
+  hbDustVel[i * 3 + 1] *= Math.max(0.4, d / 1.2);   /* nearer motes fall no faster across the view than far ones */
+}
+function updateHowlerDust(dt, on) {
+  var m = howlerDust.material;
+  if (on && !howlerDust.visible) { for (var i = 0; i < HB_DUST; i++) howlerDustMote(i, false); howlerDust.visible = true; }
+  if (!howlerDust.visible) return;
+  m.opacity = on ? Math.min(0.6, m.opacity + dt * 2.5) : Math.max(0, m.opacity - dt * 0.6);
+  if (m.opacity <= 0) { howlerDust.visible = false; return; }
+  var floorY = camera.position.y - 1.6;
+  for (var j = 0; j < HB_DUST; j++) {
+    hbDustPos[j * 3] += hbDustVel[j * 3] * dt; hbDustPos[j * 3 + 1] += hbDustVel[j * 3 + 1] * dt; hbDustPos[j * 3 + 2] += hbDustVel[j * 3 + 2] * dt;
+    if (hbDustPos[j * 3 + 1] < floorY && on) howlerDustMote(j, true);
+  }
+  hbDustGeo.attributes.position.needsUpdate = true;
+}
+/* the frame's ash: small grey flakes, tumbling as they drift down, gone on the desk top */
+var HB_FLAKES = 120, hbFlakeGeo = new THREE.PlaneGeometry(0.0055, 0.0036);
+var howlerFlakes = new THREE.InstancedMesh(hbFlakeGeo, new THREE.MeshStandardMaterial({ color: col(0x3c3936), roughness: 1, metalness: 0, side: THREE.DoubleSide, transparent: true, depthWrite: false }), HB_FLAKES);
+howlerFlakes.frustumCulled = false; howlerFlakes.visible = false; scene.add(howlerFlakes);
+var hbFlake = [], _hm = new THREE.Matrix4(), _hfq = new THREE.Quaternion(), _hfe = new THREE.Euler(), _hfs = new THREE.Vector3(1, 1, 1);
+for (var hfi = 0; hfi < HB_FLAKES; hfi++) hbFlake.push({ p: new THREE.Vector3(), v: new THREE.Vector3(), r: new THREE.Vector3(), w: new THREE.Vector3(), wait: 0, down: false });
+function howlerFlakesFrom(B) {     /* each flake from a pixel of the hanging frame, falling in turn */
+  howler.mesh.updateMatrixWorld();
+  for (var k = 0; k < HB_FLAKES; k++) {
+    var f = hbFlake[k], i = B.frame[(Math.random() * B.frame.length) | 0], x = i % B.W, y = (i / B.W) | 0;
+    f.p.set((x / B.W - 0.5) * HOWLER.w, PIN_INSET - (y / B.H) * HOWLER.h, 0); howler.mesh.localToWorld(f.p);
+    f.v.set((Math.random() - 0.5) * 0.05, 0, (Math.random() - 0.5) * 0.05);
+    f.r.set(Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3); f.w.set((Math.random() - 0.5) * 9, (Math.random() - 0.5) * 9, (Math.random() - 0.5) * 9);
+    f.wait = Math.random() * 0.4; f.down = false;
+  }
+  howlerFlakes.material.opacity = 1; howlerFlakes.material.color.copy(col(0x3c3936)); howlerFlakes.visible = true;
+}
+function updateHowlerFlakes(dt) {
+  if (!howlerFlakes.visible) return;
+  var landY = hb.base.y + 0.0015;
+  for (var k = 0; k < HB_FLAKES; k++) {
+    var f = hbFlake[k];
+    if ((f.wait -= dt) <= 0 && !f.down) {
+      f.v.y = Math.max(-0.2, f.v.y - 0.5 * dt);
+      f.p.addScaledVector(f.v, dt); f.p.x += 0.012 * Math.sin(f.r.y * 3) * dt;
+      f.r.addScaledVector(f.w, dt);
+      if (f.p.y <= landY && f.p.y > landY - 0.03) { f.p.y = landY; f.down = true; f.r.x = -Math.PI / 2; }
+    }
+    _hm.compose(f.p, _hfq.setFromEuler(_hfe.set(f.r.x, f.r.y, f.r.z)), _hfs);
+    howlerFlakes.setMatrixAt(k, _hm);
+  }
+  howlerFlakes.instanceMatrix.needsUpdate = true;
+}
+/* the ash rule's pinch: a soft grey heap flat on the desk top where its foot stood, its own contact shade under it */
+function howlerAshTex() {
+  var W = 256, H = 156, c = makeCanvas(W, H), g = c.getContext('2d'), rnd = mulberry32(199);
+  g.save(); g.translate(W / 2, H / 2); g.scale(1, 0.6);
+  var gr = g.createRadialGradient(0, 0, 4, 0, 0, 122);
+  gr.addColorStop(0, 'rgba(18,14,12,0.6)'); gr.addColorStop(0.5, 'rgba(18,14,12,0.25)'); gr.addColorStop(1, 'rgba(18,14,12,0)');
+  g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 122, 0, Math.PI * 2); g.fill();
+  var heap = g.createRadialGradient(-6, -4, 2, 0, 0, 70);     /* the heap itself, pale where it is thickest */
+  heap.addColorStop(0, 'rgba(204,199,191,0.97)'); heap.addColorStop(0.55, 'rgba(160,155,148,0.7)'); heap.addColorStop(1, 'rgba(120,115,108,0)');
+  g.fillStyle = heap; g.beginPath(); g.arc(0, 0, 70, 0, Math.PI * 2); g.fill(); g.restore();
+  for (var i = 0; i < 700; i++) {
+    var r = Math.pow(rnd(), 1.5), a = rnd() * 6.283, x = W / 2 + Math.cos(a) * r * W * 0.42, y = H / 2 + Math.sin(a) * r * H * 0.4;
+    var v = (125 + rnd() * 120 * (1 - r * 0.5)) | 0, s = 0.8 + rnd() * 3.4 * (1 - r * 0.6);
+    g.fillStyle = 'rgba(' + v + ',' + (v - 4) + ',' + (v - 9) + ',' + (0.5 + 0.5 * rnd()).toFixed(2) + ')';
+    g.beginPath(); g.ellipse(x, y, s, s * (0.45 + rnd() * 0.55), rnd() * 3.14, 0, 6.283); g.fill();
+  }
+  for (i = 0; i < 16; i++) {       /* curled slivers of the black frame */
+    g.save(); g.translate(W / 2 + (rnd() - 0.5) * W * 0.5, H / 2 + (rnd() - 0.5) * H * 0.45); g.rotate(rnd() * 3.14);
+    g.fillStyle = 'rgba(32,29,27,0.9)'; g.fillRect(-4 - rnd() * 4, -1, 8 + rnd() * 6, 1.6 + rnd()); g.restore();
+  }
+  return tex(c);
+}
+var howlerPinch = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.042), new THREE.MeshStandardMaterial({ map: howlerAshTex(), transparent: true, depthWrite: false, roughness: 1, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2 }));
+howlerPinch.rotation.order = 'YXZ'; howlerPinch.visible = false; scene.add(howlerPinch);
+/* Errol's note: a small scrap of parchment, scorched round its edges, scrawled on in an old owl's hand */
+function howlerNoteTex() {
+  var W = 208, H = 144, c = makeCanvas(W, H), g = c.getContext('2d'), rnd = mulberry32(1992), path = new Path2D(), i, n = 34;
+  for (i = 0; i < n; i++) {
+    var k = i / n, x, y, m = 9 + rnd() * 9;
+    if (k < 0.25) { x = W * k * 4; y = m; } else if (k < 0.5) { x = W - m; y = H * (k - 0.25) * 4; }
+    else if (k < 0.75) { x = W * (1 - (k - 0.5) * 4); y = H - m; } else { x = m; y = H * (1 - (k - 0.75) * 4); }
+    x = clamp(x, m, W - m); y = clamp(y, m, H - m);
+    if (i) path.lineTo(x, y); else path.moveTo(x, y);
+  }
+  path.closePath();
+  g.fillStyle = '#e8dbbb'; g.fill(path);
+  g.save(); g.clip(path);
+  var gr = g.createRadialGradient(W * 0.45, H * 0.42, 12, W / 2, H / 2, W * 0.6);
+  gr.addColorStop(0, 'rgba(120,80,30,0)'); gr.addColorStop(0.65, 'rgba(120,70,25,0.28)'); gr.addColorStop(1, 'rgba(55,24,6,0.9)');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  g.strokeStyle = 'rgba(40,30,22,0.85)'; g.lineWidth = 2.4; g.lineCap = 'round';
+  for (var l = 0; l < 3; l++) {    /* three lines of scrawl, the words themselves in his line */
+    var y0 = 42 + l * 27, x1 = l === 2 ? 118 : 176;
+    g.beginPath(); g.moveTo(28, y0);
+    for (var xx = 28; xx < x1; xx += 3) g.lineTo(xx, y0 + Math.sin(xx * 0.45 + l) * 5 * rnd() + (rnd() - 0.5) * 3);
+    g.stroke();
+  }
+  g.restore();
+  g.lineJoin = 'round'; g.strokeStyle = 'rgba(70,32,10,0.6)'; g.lineWidth = 9; g.stroke(path);
+  g.strokeStyle = 'rgba(24,12,4,0.95)'; g.lineWidth = 3.5; g.stroke(path);
+  return tex(c);
+}
+var howlerNote = new THREE.Mesh(new THREE.PlaneGeometry(0.064, 0.044), new THREE.MeshStandardMaterial({ map: howlerNoteTex(), alphaTest: 0.4, roughness: 0.95, metalness: 0, side: THREE.DoubleSide }));
+howlerNote.rotation.order = 'YXZ'; howlerNote.visible = false; scene.add(howlerNote);
+function placeHowlerNote(k) {      /* k 0 at the top of its flutter, 1 flat on the desk by the pinch */
+  howlerFoot(hb.base);
+  var e = 1 - Math.pow(1 - k, 1.6), sway = 0.035 * Math.sin(k * Math.PI * 3.2) * (1 - k);
+  howlerNote.position.copy(hb.base).addScaledVector(_ha, 0.068 + sway).addScaledVector(_hn, 0.02 + 0.02 * (1 - k));
+  howlerNote.position.y += 0.0025 + 0.32 * (1 - e);
+  howlerNote.rotation.set(-Math.PI / 2 + 0.6 * Math.sin(k * Math.PI * 3.6) * (1 - k), sideTable.rotation.y + 0.7 * k - 0.2, 0.35 * Math.sin(k * Math.PI * 2.4 + 1) * (1 - k));
+}
+/* the burn's data, once from the drawing: a burn time per pixel, the pixels in burn-time order, the frame's own pixels */
+function howlerBurnPrep() {
+  var t0 = performance.now(), W = 1080, H = 744, N = W * H, c = makeCanvas(W, H), g = c.getContext('2d');
+  g.drawImage(howlerImg, 0, 0, W, H);
+  var img = g.getImageData(0, 0, W, H), d = img.data, orig = new Uint8ClampedArray(d), dist = new Float32Array(N), bt = new Float32Array(N), i, x, y;
+  for (i = 0; i < N; i++) { x = i % W; y = (i / W) | 0; dist[i] = d[i * 4 + 3] < 128 ? 0 : Math.min(x + 1, y + 1, W - x, H - y); }
+  for (y = 0; y < H; y++) for (x = 0; x < W; x++) {            /* the distance in from the card's edge, two chamfer passes */
+    i = y * W + x; var v = dist[i];
+    if (x > 0) v = Math.min(v, dist[i - 1] + 1);
+    if (y > 0) { v = Math.min(v, dist[i - W] + 1); if (x > 0) v = Math.min(v, dist[i - W - 1] + 1.414); if (x < W - 1) v = Math.min(v, dist[i - W + 1] + 1.414); }
+    dist[i] = v;
+  }
+  for (y = H - 1; y >= 0; y--) for (x = W - 1; x >= 0; x--) {
+    i = y * W + x; var u = dist[i];
+    if (x < W - 1) u = Math.min(u, dist[i + 1] + 1);
+    if (y < H - 1) { u = Math.min(u, dist[i + W] + 1); if (x < W - 1) u = Math.min(u, dist[i + W + 1] + 1.414); if (x > 0) u = Math.min(u, dist[i + W - 1] + 1.414); }
+    dist[i] = u;
+  }
+  var rnd = mulberry32(1990), oct = [120, 40, 13].map(function (n) {
+    var gw = Math.ceil(W / n) + 2, a = new Float32Array(gw * (Math.ceil(H / n) + 2));
+    for (var k = 0; k < a.length; k++) a[k] = rnd();
+    return { n: n, gw: gw, a: a };
+  }), amp = [0.55, 0.3, 0.15];
+  function noise(px, py) {
+    var s = 0;
+    for (var o = 0; o < 3; o++) {
+      var G = oct[o], fx = px / G.n, fy = py / G.n, ix = fx | 0, iy = fy | 0, tx = fx - ix, ty = fy - iy, a = G.a, w = G.gw, k = iy * w + ix;
+      tx = tx * tx * (3 - 2 * tx); ty = ty * ty * (3 - 2 * ty);
+      s += amp[o] * ((a[k] * (1 - tx) + a[k + 1] * tx) * (1 - ty) + (a[k + w] * (1 - tx) + a[k + w + 1] * tx) * ty);
+    }
+    return s;
+  }
+  var sx = HOWLER_SEAL.u * W, sy = HOWLER_SEAL.v * H, far = Math.hypot(Math.max(sx, W - sx), Math.max(sy, H - sy));
+  var NB = HB.NB, count = new Uint32Array(NB + 1), frame = [], last = HB.BURN - HB.RIM - 0.02;
+  for (i = 0; i < N; i++) {
+    var p = i * 4;
+    if (d[p + 3] < 128) { bt[i] = -1; continue; }
+    x = i % W; y = (i / W) | 0;
+    var dark = Math.max(d[p], d[p + 1], d[p + 2]) < 80, ds = Math.hypot(x - sx, y - sy) / far, nz = noise(x, y) - 0.5;
+    if (dark && dist[i] < HB.FRAME_PX) { bt[i] = 1e9; frame.push(i); continue; }     /* the thin frame: it never burns, it falls */
+    bt[i] = clamp(dark ? 1.8 + 0.5 * ds + 0.3 * nz : 0.04 + 1.35 * ds + 0.7 * nz, 0, last);
+    count[Math.floor(bt[i] / HB.BURN * NB)]++;
+  }
+  var start = new Uint32Array(NB + 1), fill = new Uint32Array(NB), s = 0, b;
+  for (b = 0; b < NB; b++) { start[b] = fill[b] = s; s += count[b]; }
+  start[NB] = s;
+  var order = new Uint32Array(s);
+  for (i = 0; i < N; i++) if (bt[i] >= 0 && bt[i] < 1e8) order[fill[Math.floor(bt[i] / HB.BURN * NB)]++] = i;
+  var GW = W >> 2, GH = H >> 2, gc = makeCanvas(GW, GH), gg = gc.getContext('2d'), gimg = gg.createImageData(GW, GH);
+  hb.prepMs = Math.round(performance.now() - t0);
+  return { W: W, H: H, c: c, g: g, img: img, d: d, orig: orig, bt: bt, order: order, start: start, frame: Uint32Array.from(frame),
+    GW: GW, gc: gc, gg: gg, gimg: gimg, tex: tex(c), glow: tex(gc), last: -1 };
+}
+/* the burn at `now` s: only the pixels whose look changes (scorching ahead, the rim, just gone) are written */
+function howlerBurnDraw(B, now) {
+  var t0 = performance.now(), lo = Math.max(0, (B.last < 0 ? 0 : B.last) - HB.RIM - 0.05), hi = Math.min(HB.BURN, now + HB.SCORCH);
+  var b0 = Math.floor(lo / HB.BURN * HB.NB), b1 = Math.min(HB.NB - 1, Math.floor(hi / HB.BURN * HB.NB));
+  var d = B.d, o = B.orig, bt = B.bt, gd = B.gimg.data, W = B.W, GW = B.GW;
+  gd.fill(0);
+  for (var k = B.start[b0], end = B.start[b1 + 1]; k < end; k++) {
+    var i = B.order[k], p = i * 4, a = now - bt[i];
+    if (a < -HB.SCORCH) { d[p] = o[p]; d[p + 1] = o[p + 1]; d[p + 2] = o[p + 2]; d[p + 3] = o[p + 3]; }
+    else if (a < 0) {
+      var s = 1 + a / HB.SCORCH; s = s * s * 0.85;
+      d[p] = o[p] + (34 - o[p]) * s; d[p + 1] = o[p + 1] + (16 - o[p + 1]) * s; d[p + 2] = o[p + 2] + (8 - o[p + 2]) * s; d[p + 3] = 255;
+    } else if (a < HB.RIM) {
+      var e = a / HB.RIM, gl = 1 - e, q = (((i / W) | 0) >> 2) * GW + ((i % W) >> 2);
+      d[p] = 255 - 150 * e; d[p + 1] = 196 - 172 * e; d[p + 2] = 84 - 80 * e; d[p + 3] = 255;
+      q *= 4;
+      if (gd[q] < 255 * gl) { gd[q] = 255 * gl; gd[q + 1] = 120 * gl * gl; gd[q + 2] = 24 * gl * gl; gd[q + 3] = 255; }
+    } else d[p + 3] = 0;
+  }
+  B.g.putImageData(B.img, 0, 0); B.tex.needsUpdate = true;
+  B.gg.putImageData(B.gimg, 0, 0); B.glow.needsUpdate = true;
+  B.last = now;
+  hb.upd++; hb.ms += performance.now() - t0;
+}
+function howlerBurnStart() {       /* the drawing as it is onto the burn's canvas, which the card now wears */
+  var B = hb.burn, m = howler.mesh.material;
+  hb.origTex = m.map;
+  if (!B) return;
+  B.d.set(B.orig); B.g.putImageData(B.img, 0, 0); B.tex.needsUpdate = true; B.last = -1;
+  B.gimg.data.fill(0); B.gg.putImageData(B.gimg, 0, 0); B.glow.needsUpdate = true;
+  homeSet(howler, B.tex);
+  m.emissiveMap = B.glow; m.emissive = col(0xffffff); m.emissiveIntensity = 2.2; m.needsUpdate = true;
+}
+function howlerBurnEnd() {         /* the drawing back on the card, which the ash rule now keeps hidden */
+  var m = howler.mesh.material;
+  if (hb.origTex) homeSet(howler, hb.origTex);
+  m.emissiveMap = null; m.emissive = col(0x000000); m.emissiveIntensity = 1; m.needsUpdate = true;
+  howler.shadow.material.opacity = 0.55;
+}
+function howlerHandEnd() {         /* held, the hand view ends with the ash: back where he was, nothing put back */
+  if (held !== howler) return;
+  howler.pivot.add(howler.mesh); howler.mesh.position.set(0, 0, 0); howler.mesh.quaternion.identity();
+  howler.lift = null; held = null; leaveAfterReturn = false;
+  mode = howler.backMode || 'desk';
+}
+function howlerBurstCue() {
+  if (hb.on) return;                                   /* one burst at a time: a cue while one runs is ignored */
+  hb.on = true; hb.stage = 'wait'; hb.t = 0; hb.card = true; hb.shown = false; hb.noteWanted = false; hb.landed = false; hb.line = null;
+  for (var i = 0; i < lineQ.length; i++) if (/^howler\.shout/.test(lineQ[i].key || '')) { hb.line = lineQ.splice(i, 1)[0]; lineQ.unshift(hb.line); break; }
+  if (hb.line && lineCur && lineCur.line !== hb.line) lineCur.t = Math.min(lineCur.t, 0.35);   /* a Howler drowns whatever was being said */
+  if (!hb.burn && howlerImg.naturalWidth) hb.burn = howlerBurnPrep();
+}
+var HOWLER_CUES = {
+  'the Howler bursts open in his hand and shouts, a hundred times louder than a voice, rattling the room and shaking dust from the ceiling; its words done, it drops, the scarlet goes up in flames, its black edges burn last, a thin black frame hangs in the air a heartbeat, then falls as ash': howlerBurstCue,
+  'the Howler, left unopened, jumps, tears itself open wherever it is and shouts, a hundred times louder than a voice, rattling the room and shaking dust from the ceiling; its words done, it drops, the scarlet goes up in flames, its black edges burn last, a thin black frame hangs in the air a heartbeat, then falls as ash': howlerBurstCue,
+  'after the ash, a small scorched note flutters down to the desk': function () { if (hb.on) hb.noteWanted = true; }
+};
+function howlerDrawRoom(shows) { hb.smoke = shows.indexOf(HOWLER_SMOKE) >= 0; hb.ash = shows.indexOf(HOWLER_ASH) >= 0; }
+/* per frame, after updateHomeLetter has placed it: the wisps, then the burst's stages on the card's own pose */
+function updateHowler(dt) {
+  if (held === howler && mode === 'hand' && !hb.burn && howlerImg.naturalWidth) hb.burn = howlerBurnPrep();   /* in his hand a burst may follow: the burn's data now, held still, not at the jump */
+  updateHowlerWisps(dt);
+  updateHowlerFlakes(dt);
+  var m = howler.mesh, onDesk = held !== howler, up = 0, side = 0, roll = 0, shake = 0, dust = false, T = hb.t;
+  if (hb.on) {
+    hb.t += dt; T = hb.t;
+    if (hb.stage === 'wait' && !howler.lift) { hb.inHand = held === howler; hb.stage = 'jump'; hb.t = T = 0; howlerBurnStart(); }
+    var hover = hb.inHand ? 0 : 0.05;
+    if (hb.stage === 'jump') {                         /* it leaps, tearing itself open, and shakes */
+      var kj = Math.min(1, T / HB.JUMP);
+      up = hb.inHand ? 0.03 * Math.sin(Math.PI * kj) : hover * (1 - Math.pow(1 - kj, 3)) + 0.012 * Math.sin(Math.PI * kj);
+      side = 0.006 * (1 - kj) * Math.sin(T * 71); roll = 0.16 * (1 - 0.6 * kj) * Math.sin(T * 47);
+      shake = 0.012 * (1 - kj) + 0.004; dust = true;
+      if (T >= HB.JUMP) { hb.stage = 'shout'; hb.t = 0; }
+    } else if (hb.stage === 'shout') {                 /* it shouts while its words show, the room rattling */
+      var cur = !!(lineCur && lineCur.line === hb.line);
+      if (cur) hb.shown = true;
+      var done = hb.line ? (hb.shown ? !cur : lineQ.indexOf(hb.line) < 0 || T > 20) : T >= HB.ALONE;
+      up = hover; side = 0.0025 * Math.sin(T * 83); roll = 0.05 * Math.sin(T * 41) + 0.03 * Math.sin(T * 67);
+      shake = 0.0045; dust = true;
+      if (done) { hb.stage = 'drop'; hb.t = 0; }
+    } else if (hb.stage === 'drop') {                  /* its words done, it drops, and catches */
+      var kd = Math.min(1, T / HB.DROP);
+      up = hb.inHand ? -0.03 * easeInOut(kd) : hover - 0.03 * easeInOut(kd);
+      roll = 0.03 * (1 - kd) * Math.sin(T * 41); shake = 0.004 * (1 - kd);
+      if (T >= HB.DROP) { hb.stage = hb.burn ? 'burn' : 'hang'; hb.t = 0; hb.acc = 1; }
+    } else if (hb.stage === 'burn') {                  /* the scarlet first, the black bands last, a few times a second */
+      up = hb.inHand ? -0.03 : hover - 0.03; roll = 0.01 * Math.sin(T * 9);
+      hb.acc += dt;
+      if (hb.acc >= 1 / HB.FPS || T >= HB.BURN) { hb.acc = 0; howlerBurnDraw(hb.burn, Math.min(T, HB.BURN)); }
+      if (onDesk) howler.shadow.material.opacity = 0.55 * (1 - clamp(T / HB.BURN, 0, 1));
+      if (T >= HB.BURN) { hb.stage = 'hang'; hb.t = 0; }
+    } else if (hb.stage === 'hang') {                  /* the thin black frame alone, a heartbeat */
+      up = hb.inHand ? -0.03 : hover - 0.03;
+      if (onDesk) howler.shadow.material.opacity = 0;
+      if (T >= HB.HANG) { hb.stage = 'ash'; hb.t = 0; hb.spawn = true; }   /* the flakes from its pose this frame, below */
+    } else if (hb.stage === 'ash') {                   /* it falls as ash, the pinch left where it stood */
+      up = hb.inHand ? -0.03 : hover - 0.03;
+      hb.pinchK = clamp((T - 0.5) / 1.1, 0, 1);
+      howlerFlakes.material.color.copy(col(0x3c3936)).lerp(col(0x8d8781), clamp(T / HB.ASH, 0, 1));
+      howlerFlakes.material.opacity = 1 - clamp((T - (HB.ASH - 0.5)) / 0.5, 0, 1);
+      if (T >= HB.ASH) {
+        howlerFlakes.visible = false;
+        if (hb.inHand) howlerHandEnd();
+        hb.t = 0;
+        if (hb.noteWanted) { hb.stage = 'note'; howlerNote.visible = true; placeHowlerNote(0); }
+        else { hb.stage = 'done'; hb.on = false; }
+      }
+    } else if (hb.stage === 'note') {                  /* Errol's note flutters down by the pinch */
+      placeHowlerNote(Math.min(1, T / HB.NOTE));
+      if (T >= HB.NOTE) { hb.landed = true; hb.stage = 'done'; hb.on = false; }
+    }
+  }
+  hb.shake = shake; hb.jy = up;
+  updateHowlerDust(dt, dust);
+  if (hb.card && hb.on && hb.stage !== 'wait') {     /* the card's own jump, drop and shake, on its pose this frame */
+    if (!onDesk) {
+      _hu.set(0, 1, 0).applyQuaternion(camera.quaternion); _hr.set(1, 0, 0).applyQuaternion(camera.quaternion);
+      m.position.addScaledVector(_hu, up).addScaledVector(_hr, side);
+      m.quaternion.multiply(_hq2.setFromAxisAngle(_hz, roll));
+    } else {                                           /* on the desk: straight up and a little out from the letter it leant on, never back through it */
+      howlerFoot(hb.base);
+      _hu.set(0, up, 0).addScaledVector(_hn, 0.7 * Math.max(0, up)).addScaledVector(_ha, side).applyQuaternion(_hq2.copy(howler.pivot.quaternion).invert());
+      m.position.copy(_hu); m.rotation.set(0, 0, roll);
+    }
+    if (hb.spawn) {                                    /* the frame breaks into flakes where it hangs; the card is gone */
+      hb.spawn = false; howlerFoot(hb.base);
+      if (hb.burn) howlerFlakesFrom(hb.burn);
+      hb.card = false; hb.burnt = true; howlerBurnEnd();
+    }
+  } else if (onDesk && !hb.on) { m.position.set(0, 0, 0); m.rotation.set(0, 0, 0); }
+  howlerPinch.visible = (hb.ash || hb.burnt) && (!hb.on || hb.pinchK > 0);
+  if (howlerPinch.visible && sideTable.geometry.parameters) {
+    howlerFoot(hb.base);
+    howlerPinch.position.copy(hb.base).addScaledVector(_hn, 0.02); howlerPinch.position.y += 0.0012;   /* fallen in front of its foot, clear of the letter's */
+    howlerPinch.rotation.set(-Math.PI / 2, sideTable.rotation.y, 0);
+    howlerPinch.material.opacity = hb.on ? hb.pinchK : 1;
+  }
+  if (howlerNote.visible && hb.landed) placeHowlerNote(1);
+}
+/* the room rattling while it shouts: the view turned a hair this frame only, put back once it is drawn */
+var _hcq = new THREE.Quaternion(), _hcp = new THREE.Vector3();
+function howlerShake() {
+  if (!(hb.shake > 0)) return false;
+  var a = hb.shake, s = performance.now() / 1000;
+  _hcq.copy(camera.quaternion); _hcp.copy(camera.position);
+  camera.rotateX(a * (0.6 * Math.sin(s * 53) + 0.4 * Math.sin(s * 31.7)));
+  camera.rotateY(a * (0.6 * Math.sin(s * 47.3) + 0.4 * Math.sin(s * 23.1)));
+  camera.rotateZ(a * 0.5 * Math.sin(s * 61.9));
+  camera.updateMatrixWorld();
+  return true;
+}
+function howlerUnshake() { camera.quaternion.copy(_hcq); camera.position.copy(_hcp); camera.updateMatrixWorld(); }
+function howlerReport() {          /* for the checks (tools/touch-howler.mjs) */
+  var el = lineCur && lineCur.el;
+  return { on: hb.on, stage: hb.stage, t: +hb.t.toFixed(2), inHand: hb.inHand, held: held === howler, mode: mode, card: howler.mesh.visible,
+    smoke: hb.smoke, wisps: howlerWisps.filter(function (s) { return s.visible && s.material.opacity > 0.02; }).length, ash: hb.ash, burnt: hb.burnt,
+    pinch: howlerPinch.visible, shake: +hb.shake.toFixed(4), jy: +hb.jy.toFixed(4), dust: howlerDust.visible, flakes: howlerFlakes.visible,
+    note: { wanted: hb.noteWanted, shown: howlerNote.visible, landed: hb.landed }, burnUpdates: hb.upd, burnMs: hb.upd ? +(hb.ms / hb.upd).toFixed(2) : 0, prepMs: hb.prepMs,
+    line: lineCur ? { key: lineCur.line.key || null, speaker: lineCur.line.speaker, text: lineCur.line.text, cls: el ? el.className : '', px: el ? getComputedStyle(el).fontSize : '', on: !!(el && el.classList.contains('on')) } : null };
+}
+function howlerAt(u, v) {          /* a point of the card's drawing (from its left and top) on the screen */
+  var p = new THREE.Vector3((u - 0.5) * HOWLER.w, PIN_INSET - v * HOWLER.h, 0);
+  howler.mesh.updateMatrixWorld(); howler.mesh.localToWorld(p); p.project(camera);
+  return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)];
+}
+function howlerAshAt() { var p = howlerPinch.getWorldPosition(new THREE.Vector3()).project(camera); return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)]; }
 /* the row of books on the desk (Godric's Q12, 11 October 2026, 9.05 am: option 1, left of the flat stack beside the
    letter). Drawn: books-row round 1 candidate 1, his pick (Q27, 6.31 pm), its spines' lettering cleared by
    pipeline/clear_spines.py and cut by pipeline/books_row_split.py into the row without the History and the History
@@ -3356,7 +3780,8 @@ function updateHomeLetter(dt) {
   var beside = homeState.shown === 'letter' && homeState.fresh;
   homeFeather.mesh.visible = homeFeather.shadow.visible = homeState.shown === 'feather' || beside;
   if (!inHand) { homePlace(homeLetter, HOME.dz); homePlace(homeNote, HOME.dz); }
-  howler.mesh.visible = howler.shadow.visible = held === howler || (homeState.shown === 'letter' && held !== homeNote && howlerToday());
+  /* bursting (req 199) it shows until the frame falls; once burnt, or the ash rule holds, it is not there that day */
+  howler.mesh.visible = howler.shadow.visible = hb.on ? hb.card : !hb.ash && !hb.burnt && (held === howler || (homeState.shown === 'letter' && held !== homeNote && howlerToday()));
   if (held !== howler) homePlace(howler, HOWLER.dz);
   var fu = beside ? HOME.besideU : HOME.u, qk = 0;
   if (homeState.quill >= 0) {                      /* up 0.4 s, poised 1.4 s with a small stroke, down 0.45 s */
@@ -6642,7 +7067,12 @@ function tapDo(cx, cy) {
   var hits = tapHits(cx, cy);
   var hit = hits.length ? hits[0].object : null;
   var told = { name: tapName(hit), acted: true }, back = { name: null, acted: true };
-  if (mode === 'hand') { if (homeHandTap()) return back; returnPaper(false); return back; }
+  if (mode === 'hand') {
+    /* the Howler in his hand (req 199): bursting, a tap does nothing; on its drawn seal it is opened, the runtime told */
+    if (held === howler && hb.on) return back;
+    if (held === howler && hit === howler.mesh && howlerOnSeal(hits[0].uv)) return { name: 'howler seal', acted: true };
+    if (homeHandTap()) return back; returnPaper(false); return back;
+  }
   if (mode === 'list') { returnList(); return back; }
   if (hit && hit === findHand.mesh) return told;     /* `tap find`: its doing, or the card's next turn, at any stop */
   if (mode === 'board') {
@@ -6656,7 +7086,7 @@ function tapDo(cx, cy) {
   }
   if (mode === 'desk') {
     if (hit === homeFeather.mesh) homeFeatherTap();
-    else if (hit === howler.mesh) liftPaper(howler);
+    else if (hit === howler.mesh) { if (hb.on) return back; liftPaper(howler); }   /* bursting, it is not to be picked up */
     else if (hit === candle.mesh) candleTap();
     else if (hit && hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
     else if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) booksTap();
@@ -6710,7 +7140,7 @@ function tapDo(cx, cy) {
   if (as) { castle.tap(as); return back; }
   if (mode !== 'room' || !hit) return nothing;
   if (hit === homeFeather.mesh) homeFeatherTap();
-  else if (hit === howler.mesh) liftPaper(howler);
+  else if (hit === howler.mesh) { if (hb.on) return back; liftPaper(howler); }
   else if (hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
   else if (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard) booksTap();
   else if (hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
@@ -7118,7 +7548,8 @@ function nickHead() { return nickMesh.position.clone().add(new THREE.Vector3(0, 
    in faint italic toward where it comes from (the stair, his box, the hole), a `sound` in words until it is recorded;
    written, on a scrap in its hand at its place. A line held for the canon gate (`held`, no words) only keeps its
    speaker's entrance and walk-off. */
-var HANDS = { neville: F.child, wood: F.casual, hooch: F.casual, pince: F.clerk, clementine: F.clerk, print: F.print };
+var HANDS = { neville: F.child, wood: F.casual, hooch: F.casual, pince: F.clerk, clementine: F.clerk, print: F.print,
+  errol: F.casual };                           /* an old owl's scrawl (req 199): the scratchiest hand there is */
 var STAIR_HEAD = new THREE.Vector3(4.45, 3.0, -0.9);
 var LINE_PLACES = {                            /* where a line with no drawn speaker is said, heard or written */
   sofa: new THREE.Vector3(onSofa(0.45, 0.12)[0], 0.95, onSofa(0.45, 0.12)[1]),
@@ -7127,6 +7558,10 @@ var LINE_PLACES = {                            /* where a line with no drawn spe
   'beyond the hole': holeC.clone().add(new THREE.Vector3(0, 0.75, 0)),
   board: new THREE.Vector3(4.27, 2.0, -3.53),
   windowsill: new THREE.Vector3(2.87, 2.15, -4.6),       /* the right window's sill, until the letter is placed */
+  desk: function () {                                    /* just above the desk top where Errol's note lands (req 199) */
+    /* the scrap shows under the anchor, so the anchor is the note's near edge, and the note stays seen above it */
+    return (howlerNote.visible ? howlerNote.position.clone() : howlerFoot(new THREE.Vector3())).addScaledVector(_hn, 0.03);
+  },
   hand: function () {                                    /* above the find in his hand (req 173) */
     return findHand.mesh.position.clone().add(new THREE.Vector3(0, 1, 0).applyQuaternion(camera.quaternion).multiplyScalar(findHand.h * 0.75));
   }
@@ -7158,6 +7593,7 @@ function lineAnchor(l) {
   if (f && f.role === 'ghost' && f.name === 'nearly headless nick' && nick.state !== 'away') return nickHead;   /* he moves */
   if (s && l.medium !== 'heard') return s.still ? new THREE.Vector3(s.x + 0.55, s.y + 0.5, s.z)   /* his head on the arm */
     : new THREE.Vector3(s.x, s.y + POOL.h * 0.95, s.z);
+  if (l.speaker === 'howler' && l.medium === 'said') return howlerMouth;              /* it shouts from wherever it is (req 199) */
   if (l.medium === 'heard') return HEARD_FROM[l.speaker] || null;
   if (l.at && LINE_PLACES[l.at]) return LINE_PLACES[l.at];
   var mark = l.who && l.who.mark;
@@ -7175,6 +7611,9 @@ function lineElement(l) {
     if (l.sound) { var i = document.createElement('i'); i.textContent = l.sound.charAt(0).toUpperCase() + l.sound.slice(1); el.appendChild(i); }
     if (l.sound && l.text) el.appendChild(document.createElement('br'));
     if (l.text) el.appendChild(document.createTextNode('“' + l.text + '”'));
+  } else if (l.speaker === 'howler' && l.medium === 'said') {   /* the shout, huge, its words shaking inside the slip (req 199) */
+    el.classList.add('howler');
+    var sp = document.createElement('span'); sp.textContent = l.text; el.appendChild(sp);
   } else {
     el.textContent = l.text;
     if (l.medium === 'written') {
@@ -7220,7 +7659,9 @@ function updateLines(dt) {
     }
   }
   /* his words wait until he has drifted in to his stop and turned to the hole */
-  if (!lineCur && lineQ.length && !(lineQ[0].speaker === 'nick' && lineQ[0].medium === 'said' && nick.state === 'in')) {
+  /* and Errol's line waits until the Howler has burnt and his note has landed (req 199) */
+  if (!lineCur && lineQ.length && !(lineQ[0].speaker === 'nick' && lineQ[0].medium === 'said' && nick.state === 'in') &&
+      !(/^howler\.errol/.test(lineQ[0].key || '') && hb.on)) {
     var l = lineQ.shift();
     lineCur = { line: l, t: lineSeconds(l), anchor: lineAnchor(l), el: null };
     /* a written line the board pins as a note of its own needs no scrap: the note itself appears */
@@ -7262,8 +7703,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the bellows lift off their hook and pump once; the fire flares up happily': stokeFire,
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': snowballFly,
     "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); }
-  }, VISITOR_CUES, NICK_CUES),
-  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); locksDrawRoom(shows); findDrawRoom(shows); },
+  }, VISITOR_CUES, NICK_CUES, HOWLER_CUES),
+  drawRoom: function (shows) { fireDrawRoom(shows); visitorsDrawRoom(shows); setNight(shows.indexOf(NIGHT_SITTERS) >= 0); trevorDrawRoom(shows); notesDrawRoom(shows); locksDrawRoom(shows); findDrawRoom(shows); howlerDrawRoom(shows); },
   figures: FIGURES,
   drawFigures: drawFiguresInOrder,
   showLines: showLines,
@@ -7355,6 +7796,7 @@ function frame() {
   updateCloak(sdt);
   updateSign(dt);
   updateHomeLetter(dt);
+  updateHowler(dt);
   updateBooks(dt);
   updateCandle(sdt);
   updateDeskChair(dt);
@@ -7362,7 +7804,9 @@ function frame() {
   updateHomework(sdt);
   updateCurios(sdt, slowT);
   updateSnowball(sdt);
+  var shook = howlerShake();
   renderer.render(scene, camera);
+  if (shook) howlerUnshake();
   kit.stats(dt);
 }
 renderer.setAnimationLoop(frame);
@@ -7438,6 +7882,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
 window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox.howlerBurst = { state: howlerReport, at: howlerAt, ash: howlerAshAt, note: function () { var p = howlerNote.position.clone().project(camera); return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)]; } };   /* req 199's checks */
 })();
 </script>
 </body>
