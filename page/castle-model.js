@@ -226,7 +226,7 @@ window.CASTLE_MODEL = {
       "cite": "" },
     { "id": "landing-window", "kind": "window", "room": "corridor", "at": [1.95, 24.61], "w": 2.33, "sill": -1.08, "h": 4.8,
       "view": "the lake", "state": "designed",
-      "about": "the lion window, Gryffindor's lion in scarlet and gold glass (req 29; the drawing's shape, 2.33 by 4.8 m), moved from the landing's far end to its south side wall, the castle's south face, centred on the landing (Godric's 1 on corridor-landing-end-1013, 13 October 2026, 6.55 pm; ledger line 1). Its sill 0.9 m above the landing's floor, which is 1.98 m below the corridor's (so -1.08 in the corridor's heights, +35.32 in the castle's); the landing's wall is 2.40 m long, so 3.5 cm of wall a side",
+      "about": "the lion window, Gryffindor's lion in scarlet and gold glass (req 29; the drawing's shape, 2.33 by 4.8 m), moved from the landing's far end to its south side wall, the castle's south face, centred on the landing (Godric's 1 on corridor-landing-end-1013, 13 October 2026, 6.55 pm; ledger line 1). Its sill 0.9 m above the landing's floor, which is 1.98 m below the corridor's (so -1.08 in the corridor's heights, +35.32 in the castle's); the landing's floor is 2.40 m long, 3.5 cm more than the window, and the outer wall runs on west along the flight and east along the bay, so its jambs stand in whole wall",
       "cite": "" },
     { "id": "common-room-window-left", "kind": "window, a seat in a splayed reveal", "room": "common-room",
       "bearing": 17.2, "w": 1.2, "sill": 1.95, "h": 2.7, "cant": 6.9, "state": "built", "cite": "" },
