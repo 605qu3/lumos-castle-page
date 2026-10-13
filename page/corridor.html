@@ -1644,11 +1644,53 @@ function meshTapestry() {
   tapestry.position.y = TAPESTRY.y = TAPESTRY.hem + TAPESTRY.h / 2;
 }
 meshTapestry();
-hangDrawing(tapestry, '../assets/layers/tapestry-hillside.png', TAPESTRY.w, function (im) {
-  TAPESTRY.h = TAPESTRY.w * im.height / im.width;
-  meshTapestry();
-  placeShepherd();
-});
+/* the woven sheep's cells (req 108 and 129; Godric, 13 October 2026, 1.51 pm: Tries 1, 3 and 4 hang now, Try 2 waits
+   for its one-sheep edit, so until it hangs `third` shows the second places): each cell is a whole edit of the hung
+   drawing (rounds 3, 5 and 6, scaled as it was), with the shepherd's cap patch cut again against it. Which one hangs is
+   chosen when the runtime first draws the room (or after 1.5 s without it), and afterwards a cell swaps whole only while
+   the tapestry is out of his view, so a sheep never moves under his eye. The lit window (round 6) is the sheep as drawn,
+   by night; on a night the sheep stand elsewhere or one has strayed, that cell holds and the window is dark. The look
+   switch ?sheep= (first, second, third, missing, lit) holds whatever it names */
+var TAPESTRY_CELLS = { first: '', second: '-second', third: '-second', missing: '-missing', lit: '-lit' };
+var tapestryCell = { shown: null, drawn: false, loading: null, held: {} };
+function tapestryCellWanted() {
+  var q = groundsQ.get('sheep');
+  if (q && TAPESTRY_CELLS[q] !== undefined) return q;
+  return tapestrySheep === 'first' && nightK() >= 0.5 ? 'lit' : tapestrySheep;
+}
+function loadTapestryCell(key) {   /* the cell and its cap patch, both loaded before either shows */
+  var file = '../assets/layers/tapestry-hillside' + TAPESTRY_CELLS[key], got = {}, n = 0;
+  if (tapestryCell.held[file]) return;
+  tapestryCell.loading = file;
+  ['', '-cap'].forEach(function (part) {
+    var im = new Image();
+    im.onload = function () {
+      got[part] = im;
+      if (++n < 2) return;
+      tapestryCell.held[file] = { cell: tex(got['']), cap: tex(got['-cap']), w: got[''].width, h: got[''].height };
+      tapestryCell.loading = null;
+    };
+    im.src = file + part + '.png?v=1';
+  });
+}
+function tapestryInView() {
+  var f = new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+  return f.intersectsBox(new THREE.Box3().setFromObject(tapestry));
+}
+function updateTapestryCell() {
+  if (!tapestryCell.drawn && t < 1.5 && castle) return;   /* the runtime's first draw names the sheep's places */
+  var key = tapestryCellWanted();
+  if (key === tapestryCell.shown || TAPESTRY_CELLS[key] === TAPESTRY_CELLS[tapestryCell.shown]) { tapestryCell.shown = key; return; }
+  if (tapestryCell.shown && tapestryInView()) return;
+  var file = '../assets/layers/tapestry-hillside' + TAPESTRY_CELLS[key], c = tapestryCell.held[file];
+  if (!c) { if (!tapestryCell.loading) loadTapestryCell(key); return; }
+  var m = tapestry.material;
+  m.map = c.cell; m.color.set(0xffffff); m.needsUpdate = true;
+  if (tapestry.customDepthMaterial) { tapestry.customDepthMaterial.map = c.cell; tapestry.customDistanceMaterial.map = c.cell; }
+  shepherdCap.material.map = c.cap; shepherdCap.material.needsUpdate = true;
+  if (!tapestryCell.shown) { TAPESTRY.h = TAPESTRY.w * c.h / c.w; meshTapestry(); placeShepherd(); }
+  tapestryCell.shown = key;
+}
 /* the door behind it, the polite door's size, 1.0 by 2.2 m, under the cloth's right half, so the lifted corner shows
    its foot; at rest the stone shows under the hem, and the dark only while the draught holds the corner up, so the
    strip under the hem never reads as a black box */
@@ -1692,12 +1734,7 @@ var shepherdCap = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
   new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, transparent: true, opacity: 0, depthWrite: false }));
 shepherdCap.name = 'tapestry-shepherd-cap'; shepherdCap.visible = false; shepherdCap.renderOrder = 2;
 shepherdCap.receiveShadow = tapestry.receiveShadow;
-tapestry.add(shepherdCap);
-(function () {
-  var pim = new Image();
-  pim.onload = function () { shepherdCap.material.map = tex(pim); shepherdCap.material.needsUpdate = true; };
-  pim.src = '../assets/layers/tapestry-hillside-cap.png?v=1';
-})();
+tapestry.add(shepherdCap);   /* its map is the hanging cell's own cap patch (updateTapestryCell) */
 function placeShepherd() {   /* the cloth's size is the drawing's, known once it loads */
   var b = SHEPHERD.box, P = SHEPHERD.px;
   shepherdCap.scale.set((b[2] - b[0]) / P[0] * TAPESTRY.w, (b[3] - b[1]) / P[1] * TAPESTRY.h, 1);
@@ -2878,10 +2915,11 @@ function corridorDrawRoom(shown) {
   drawFoot(has);
   drawMap(has);
   /* the tapestry's woven sheep (req 129, Events' sheep.json, req 110): where they stand this visit, or one missing,
-     strayed into the griffin's hanging inside; the cells are req 108's, once the tapestry is drawn, so until then the
-     tapestry's stand-in holds and this is a console note. Marks: first (as drawn), second, third */
+     strayed into the griffin's hanging inside; the cell hangs by updateTapestryCell, out of his view. Marks: first (as
+     drawn), second, third (the second places until Try 2's cell hangs) */
   var sh = has(SHEEP_CUE.missing) ? 'missing' : has(SHEEP_CUE.third) ? 'third' : has(SHEEP_CUE.second) ? 'second' : 'first';
-  if (sh !== tapestrySheep) { tapestrySheep = sh; console.info('[corridor] the tapestry sheep: ' + sh + ' (its cells wait for the drawn tapestry, req 108)'); }
+  if (sh !== tapestrySheep) { tapestrySheep = sh; console.info('[corridor] the tapestry sheep: ' + sh); }
+  tapestryCell.drawn = true;
   setPaintingSitter(has(OPP_SITTERS.mantel.cue) ? 'mantel' : has(OPP_SITTERS.right.cue) ? 'right' : null);
   /* the gallery's guilty visitor (req 86 (d), Events' visitors.json, 1f1135e): which sitter, in which frame; the look
      switch ?visit= holds whatever it shows */
@@ -3441,6 +3479,7 @@ function frame() {
   updateDraught(wdt);
   updateTapestryLift(wdt);
   updateShepherd(wdt);
+  updateTapestryCell();
   updateScarf(wdt);
   updateSteam();
   updateSpoon(wdt);
@@ -3487,7 +3526,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { sheep: function () { return tapestrySheep; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
