@@ -191,7 +191,8 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=25"></script>
+<script src="castle-events.js?v=27"></script>
+<script src="castle-map.js?v=2"></script>
 <script src="charms/guide.js?v=5"></script>
 <script src="charms/spells.js?v=27"></script>
 <script>
@@ -3333,10 +3334,15 @@ function updateDraught(dt) {
   });
 }
 
+/* the Marauder's Map in his hands (req 268, the play of req 242; castle-map.js): its pocket button, the parchment over
+   the room, the oath's and Mischief managed's cards and Closer are the script's; the room only passes its cues, its
+   draw and its lines through. Taking the parchment from behind the witch stays this page's (req 188, takeMap) */
+var mapPlay = window.CastleMap ? CastleMap.make({ castle: function () { return castle; } }) : null;
+
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'corridor',
-  cues: {
+  cues: Object.assign({
     "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does": function () { goTo(STOPS.filter(function (s) { return s.name === 'armour'; })[0]); },
     'the open visor drops shut': function () { armourJiggle = 0.4; },
     /* the polite door's tickle and please (req 150; Events' door.json): the giggle's strength is the page's, from the tap */
@@ -3408,9 +3414,15 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)': function () {
       if (!enter(false, 'dormitory.html?from=corridor&bedtime', 'dormitory')) kit.travel('dormitory.html?from=corridor&bedtime', { place: { room: 'dormitory' } });
     }
+  }, mapPlay ? mapPlay.cues : {}),
+  drawRoom: function (shown) {
+    corridorDrawRoom(shown);
+    if (!mapPlay) return;
+    mapPlay.drawRoom(shown);
+    /* the folded parchment sits at the foot of the screen on the left, where the help is: the help rises above it */
+    document.getElementById('help').style.bottom = mapPlay.state().pocket ? 'calc(env(safe-area-inset-bottom, 0px) + 66px)' : '';
   },
-  drawRoom: corridorDrawRoom,
-  showLines: showLines,
+  showLines: function (list) { showLines(mapPlay ? mapPlay.lines(list) : list); },
   builtins: { at: function () { return atStop ? atStop.name : 'none'; },
     tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; },   /* the polite door (req 150) */
     /* the full moon's owl (req 101, 104): no until the owl's flight cell is drawn (req 102), as the common room answers,
@@ -3531,7 +3543,7 @@ window.lumosGreybox = { sheep: function () { return tapestrySheep; }, tapestryCe
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; }, offerLock: lockOffered, firstCast: firstCast,
+  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, mapPlay: mapPlay, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; }, offerLock: lockOffered, firstCast: firstCast,
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   /* her landing (req 178), for Charms' callable (req 163) and req 180: her card, her stop, the plinth and its back face */
