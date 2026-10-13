@@ -1078,46 +1078,224 @@ var skyR = new THREE.Mesh(winGeo.clone(), new THREE.MeshBasicMaterial({ map: cut
 onWall(skyR, Math.PI - 0.55, 3.3, 5.53); register(skyR, 0); skyR.name = 'window-right-sky';
 var skyL = new THREE.Mesh(winGeo.clone(), new THREE.MeshBasicMaterial({ map: cutoutTexture(192, 432, '#000', drawSky(false)), alphaTest: 0.5 }));
 onWall(skyL, Math.PI + 0.55, 3.3, 5.53); register(skyL, 0); skyL.name = 'window-left-sky';
+/* The two windows as seats in the reveal (req 174; Godric's Q34b, 12 October 2026, 2.54 pm, option 1, the Corridor's sheet
+   assets/review/corridor-trombe-q34.jpg, his note dropping its Trombe stone, air gap and grille). Under each drawn window
+   the bay is cut down through the 0.8 m wall to a stone seat 0.45 m up with a cushion on it, and the glass stands at the
+   wall's outer face, clear from the cushion to the bay's head at 2.09 m, where the drawn window (kept as drawn) takes
+   over: its drawing, 1.2 m wide and 2.415 m tall about 3.3 m, stands on its painted sill at 2.09 (the placeholder card
+   reached 1.95, and a head there left a 14 cm band of stone between the glass and the sill). The nook is the card's
+   1.2 m wide at the room face and 1.0 m at the glass, its outer opening turned 0.12 rad toward the hearth about the
+   tower's centre, as tools/castle-plan.py and the Q34 sheet draw the cant: the left one's outer jamb then stands
+   0.21 m off the corner where the corridor's outer wall meets the tower (corridor frame x 2.61, z -4.26; req 192 asks
+   0.01), 0.20 m outside that wall's face. The right is its mirror about the hearth. The wall is not split: its shader
+   drops the openings' fragments as it does the hole's (below), so its stone runs on unbroken, and the nook's own stone
+   (bayMat) wears the drawn wall's texture at the wall's scale, folded round each corner, one draw call for both nooks. */
+var BAY = { th: 0.55, cant: 0.12, inW: 1.2, outW: 1.0, deep: 0.8, seat: 0.45, head: 2.09, lip: 0.04, lipH: 0.05,
+  glassPx: 150, over: 0.03, shade: { head: [0.7, 0.45], seat: [0.95, 0.6], jamb: [0.8, 0.5] }, cushion: { inset: 0.08, depth: 0.05, bevel: 0.025, round: 0.03 } };
+/* shade: the nook's stone darkened at its edge with the room [0] and at the glass [1], so the reveal reads as deep: with
+   its joints carried on round the corner, at full value the far jamb read as flat wall (the room's lights barely reach in) */
+var bayMat = solid(0x75726e, { side: THREE.DoubleSide, vertexColors: true });
+var cushionMat = solid(0x7a2a22, { roughness: 0.95 });   /* the house red of the sofa's leather, soft and matt */
+var WALL_U_PER_M = WALL_U_PER_RAD / WALL_R;
+function wallU(th) { return (th - Math.PI * 0.42) * WALL_U_PER_RAD; }   /* the cylinder's own u, for the folds */
+function bayPlan(s) {                                  /* s +1 the left bay, -1 the right; x and z as a Vector2's x and y */
+  var tc = Math.PI + s * BAY.th, to = tc - s * BAY.cant, rO = WALL_R + BAY.deep;
+  var a = BAY.inW / 2 / WALL_R, b = BAY.outW / 2 / rO;
+  function at(t, r) { return new THREE.Vector2(r * Math.sin(t), r * Math.cos(t)); }
+  var p = { s: s, tc: tc, a: a, at: at, inH: tc - s * a, inF: tc + s * a,      /* the room face's edges, hearth side and far */
+    outH: at(to - s * b, rO), outF: at(to + s * b, rO) };                      /* the glass's corners */
+  p.mid = p.outH.clone().add(p.outF).multiplyScalar(0.5);
+  p.out = new THREE.Vector2(p.outF.y - p.outH.y, p.outH.x - p.outF.x).normalize();   /* the glass's outward normal */
+  if (p.out.dot(p.mid) < 0) p.out.negate();
+  return p;
+}
+var BAYS = [bayPlan(1), bayPlan(-1)];
+(function () {
+  var pos = [], uv = [], shade = [], idx = [], N = 8, H = BAY.head, S = BAY.seat;
+  function piece(rows, cols, fn) {                     /* a grid of (rows+1) x (cols+1) points, fn(i, j) gives [x, y, z, u, v, shade] */
+    var base = pos.length / 3;
+    for (var i = 0; i <= rows; i++) for (var j = 0; j <= cols; j++) { var q = fn(i / rows, j / cols); pos.push(q[0], q[1], q[2]); uv.push(q[3], q[4]); var k5 = q[5] === undefined ? 1 : q[5]; shade.push(k5, k5, k5); }
+    for (i = 0; i < rows; i++) for (j = 0; j < cols; j++) {
+      var k = base + i * (cols + 1) + j, l = k + cols + 1;
+      idx.push(k, l, k + 1, k + 1, l, l + 1);
+    }
+  }
+  BAYS.forEach(function (p) {
+    var s = p.s, uMid = wallU(p.tc);
+    function edgeAt(e, r) {                            /* a jamb's line (e 0 the hearth side, 1 the far), carried to radius r */
+      var A = p.at(e ? p.inF : p.inH, WALL_R - 0.01), dir = A.clone().sub(e ? p.outF : p.outH).normalize(), ad = A.dot(dir);
+      return A.addScaledVector(dir, -ad - Math.sqrt(ad * ad - A.lengthSq() + r * r));
+    }
+    function front(f, r) {                             /* the room face's edge at radius r, its ends on the jambs' lines */
+      var q = f === 0 || f === 1 ? edgeAt(f, r) : p.at(p.inH + (p.inF - p.inH) * f, r), t = Math.atan2(q.x, q.y);
+      return { q: q, u: wallU(t < 0 ? t + Math.PI * 2 : t) };
+    }
+    function back(f) { return { q: p.outH.clone().lerp(p.outF, f), u: uMid + (f - 0.5) * s * BAY.outW * WALL_U_PER_M }; }
+    /* the soffit and the seat's top: from the room face back to the glass, the stone folded up and down off the wall */
+    [[H, -1, WALL_R - 0.01, BAY.shade.head], [S, 1, WALL_R - BAY.lip, BAY.shade.seat]].forEach(function (h) {
+      piece(1, N, function (i, f) {
+        var fr = front(f, h[2]);
+        if (!i) return [fr.q.x, h[0], fr.q.y, fr.u, h[0] / 7, h[3][0]];
+        var bk = back(f), d = bk.q.distanceTo(fr.q);
+        return [bk.q.x, h[0], bk.q.y, bk.u, (h[0] + h[1] * d) / 7, h[3][1]];
+      });
+    });
+    /* the jambs, the stone turning in round each edge: u runs on past the edge into the depth */
+    [[p.inH, p.outH, s], [p.inF, p.outF, -s]].forEach(function (j) {
+      var a = p.at(j[0], WALL_R - 0.01), u0 = wallU(j[0]), d = a.distanceTo(j[1]);
+      piece(1, 1, function (i, k) {
+        var q = k ? j[1] : a, y = i ? H : S;
+        return [q.x, y, q.y, u0 + (k ? j[2] * d * WALL_U_PER_M : 0), y / 7, BAY.shade.jamb[k]];
+      });
+    });
+    /* the seat's lip, 4 cm proud of the wall: its front, following the wall's curve, its underside and its two ends */
+    piece(1, N, function (i, f) { var fr = front(f, WALL_R - BAY.lip), y = i ? S : S - BAY.lipH; return [fr.q.x, y, fr.q.y, fr.u, y / 7]; });
+    piece(1, N, function (i, f) { var fr = front(f, i ? WALL_R - BAY.lip : WALL_R + 0.005), y = S - BAY.lipH; return [fr.q.x, y, fr.q.y, fr.u, (y - (i ? BAY.lip : 0)) / 7]; });
+    [0, 1].forEach(function (e) {
+      piece(1, 1, function (i, k) { var fr = front(e, k ? WALL_R - BAY.lip : WALL_R + 0.005), y = i ? S : S - BAY.lipH; return [fr.q.x, y, fr.q.y, fr.u, y / 7]; });
+    });
+  });
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(shade, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  var m = new THREE.Mesh(g, bayMat);
+  m.receiveShadow = true; m.castShadow = false; m.name = 'window-seats';
+  scene.add(m); register(m, 0);
+})();
+/* the cushions: each the seat's own plan drawn in from its edges, a soft-edged slab 10 cm thick, both in one mesh */
+(function () {
+  var C = BAY.cushion, lists = { position: [], normal: [] };
+  BAYS.forEach(function (p) {
+    var r0 = WALL_R - BAY.lip;
+    var poly = [p.at(p.inH, r0), p.at(p.inF, r0), p.outF, p.outH], d = C.inset + C.round, out = [];
+    var cx = 0, cz = 0; poly.forEach(function (q) { cx += q.x / 4; cz += q.y / 4; });
+    for (var i = 0; i < 4; i++) {                        /* each edge moved in by d, corners where neighbours meet */
+      var a0 = poly[(i + 3) % 4], a1 = poly[i], b1 = poly[(i + 1) % 4];
+      var na = new THREE.Vector2(a0.y - a1.y, a1.x - a0.x).normalize(), nb = new THREE.Vector2(a1.y - b1.y, b1.x - a1.x).normalize();
+      if (na.dot(new THREE.Vector2(cx - a1.x, cz - a1.y)) < 0) na.negate();
+      if (nb.dot(new THREE.Vector2(cx - a1.x, cz - a1.y)) < 0) nb.negate();
+      var bis = na.clone().add(nb), k = d / bis.dot(na);
+      out.push(new THREE.Vector2(a1.x + bis.x * k, a1.y + bis.y * k));
+    }
+    var sh = new THREE.Shape(); sh.moveTo(out[0].x, -out[0].y);
+    for (i = 1; i < 4; i++) sh.lineTo(out[i].x, -out[i].y);
+    sh.lineTo(out[0].x, -out[0].y);
+    var g = new THREE.ExtrudeGeometry(sh, { depth: C.depth, bevelEnabled: true, bevelThickness: C.bevel, bevelSize: C.round, bevelSegments: 3, curveSegments: 1 });
+    g.rotateX(-Math.PI / 2); g.computeBoundingBox(); g.translate(0, BAY.seat + 0.002 - g.boundingBox.min.y, 0);
+    if (g.index) g = g.toNonIndexed();
+    lists.position.push.apply(lists.position, g.attributes.position.array);
+    lists.normal.push.apply(lists.normal, g.attributes.normal.array);
+    g.dispose();
+  });
+  var cg = new THREE.BufferGeometry();
+  cg.setAttribute('position', new THREE.Float32BufferAttribute(lists.position, 3));
+  cg.setAttribute('normal', new THREE.Float32BufferAttribute(lists.normal, 3));
+  var cm = new THREE.Mesh(cg, cushionMat);
+  cm.receiveShadow = true; cm.castShadow = false; cm.name = 'window-seat-cushions';
+  scene.add(cm); register(cm, 1);
+})();
+/* the glass at the back of each nook, with the grounds' sky behind it, on one unlit plane as the drawn windows' skies are:
+   the sky carried on down from the window's own, then a faint pane and its leading over it, two lights of diamond
+   quarries in a narrow iron casement. Repainted with the sky (updateSky) and by a snowball passing (updateSnowball). */
+function paintBaySky(g, w, h) {
+  var L = sky.night ? (sky.moon ? sky.moon.light : 0) : 1, grd = g.createLinearGradient(0, 0, 0, h), top;
+  if (sky.night) { top = mixHex('#232b3e', '#36425c', L); grd.addColorStop(0, top); grd.addColorStop(1, mixHex(top, '#4a5670', 0.25)); }
+  else { top = '#5f6d88'; grd.addColorStop(0, top); grd.addColorStop(1, mixHex(top, '#c4ccd8', 0.35)); }
+  g.fillStyle = grd; g.fillRect(0, 0, w, h);
+}
+function paintBayLeads(g, w, h) {
+  var px = BAY.glassPx, e = BAY.over * px, gw = w - 2 * e, gh = h - 2 * e;
+  var sheen = g.createLinearGradient(e, e, e + gw, e + gh);   /* the pane: a faint cool sheen, brightest across one diagonal */
+  sheen.addColorStop(0, 'rgba(235,240,248,0.04)'); sheen.addColorStop(0.45, 'rgba(235,240,248,0.11)'); sheen.addColorStop(0.6, 'rgba(235,240,248,0.04)'); sheen.addColorStop(1, 'rgba(235,240,248,0.06)');
+  g.fillStyle = sheen; g.fillRect(e, e, gw, gh);
+  g.save(); g.beginPath(); g.rect(e, e, gw, gh); g.clip();
+  g.strokeStyle = 'rgba(28,31,38,0.72)'; g.lineWidth = 1.3;
+  var qw = 0.16 * px, qh = 0.24 * px;                  /* the quarries, 16 by 24 cm */
+  for (var x = e - gh / qh * qw; x < e + gw + qw; x += qw) {
+    g.beginPath(); g.moveTo(x, e); g.lineTo(x + gh / qh * qw, e + gh); g.stroke();
+    g.beginPath(); g.moveTo(x + gh / qh * qw, e); g.lineTo(x, e + gh); g.stroke();
+  }
+  g.restore();
+  g.fillStyle = '#1e2129';                               /* the casement and its mullion */
+  g.fillRect(e, e, gw, 4); g.fillRect(e, e + gh - 4, gw, 4); g.fillRect(e, e, 4, gh); g.fillRect(e + gw - 4, e, 4, gh);
+  g.fillRect(e + gw / 2 - 2.5, e, 5, gh);
+  g.fillRect(e, e + gh * 0.5 - 1.5, gw, 3);               /* a saddle bar across at half height */
+}
+BAYS.forEach(function (p, i) {
+  var w = Math.round((BAY.outW + 2 * BAY.over) * BAY.glassPx), h = Math.round((BAY.head - BAY.seat + 2 * BAY.over) * BAY.glassPx);
+  var c = makeCanvas(w, h), t = tex(c);
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(w / BAY.glassPx, h / BAY.glassPx), new THREE.MeshBasicMaterial({ map: t }));
+  m.position.set(p.mid.x + p.out.x * 0.01, (BAY.seat + BAY.head) / 2, p.mid.y + p.out.y * 0.01);
+  m.lookAt(m.position.x - p.out.x, m.position.y, m.position.z - p.out.y);
+  scene.add(m); register(m, 0); m.name = (i ? 'window-right' : 'window-left') + '-seat-glass';
+  p.glass = m; p.canvas = c; p.tex = t;
+  paintBayGlass(p);
+});
+function paintBayGlass(p, ball) {
+  var c = p.canvas, g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height); paintBaySky(g, c.width, c.height);
+  if (ball) ball(g, c.width, c.height);
+  paintBayLeads(g, c.width, c.height); p.tex.needsUpdate = true;
+}
 /* a snowball past the window (req 118, Events' grounds.snowball, page/events/grounds.json: by day while snow lies, the
    runtime's when): thrown up from a fight on the grounds below, it rises into the glass, slows, sheds a flake or two at
    the top and drops back out of sight. Drawn in code, nothing spent, into that window's own sky canvas, so the drawn
    frame and the stone hide it everywhere but the panes; the right window, seen whole at rest, takes most of them. The
    windows show only sky, so the record's lake and Hagrid on the field do not reach this room. */
 var snowball = null;
+/* Since the seats (req 174) it rises from below the seat's glass, through it and on up into the window, and falls back
+   the same way: its height in metres, Y0 under the cushion to the old peak, drawn into each canvas where it shows, the
+   throw's time stretched with the square root of the longer rise so it climbs as fast as before. The window's card
+   spans WIN_Y0 to WIN_Y0 + WIN_H; the seat's glass canvas BAY.head + BAY.over down. */
+var WIN_Y0 = 1.95, WIN_H = 2.7, SNOW_R = 0.09;
 function snowballFly() {
-  var right = Math.random() < 0.65;
-  snowball = { sky: right ? skyR : skyL, moon: right, t: 0, T: 1.5 + 0.4 * Math.random(), x0: (Math.random() < 0.5 ? 0.27 : 0.73) + (Math.random() - 0.5) * 0.1,
-    drift: (Math.random() - 0.5) * 0.08,   /* inside one light, clear of the stone mullion */ peak: 0.35 + 0.25 * Math.random(), flakes: [] };
+  var right = Math.random() < 0.65, peak = 0.35 + 0.25 * Math.random();
+  var yp = WIN_Y0 + WIN_H * peak, y0 = BAY.seat - SNOW_R, T = 1.5 + 0.4 * Math.random();
+  snowball = { sky: right ? skyR : skyL, low: BAYS[right ? 1 : 0], moon: right, t: 0, T: T * Math.sqrt((yp - y0) / (yp - WIN_Y0 + SNOW_R)),
+    x0: (Math.random() < 0.5 ? 0.27 : 0.73) + (Math.random() - 0.5) * 0.1,
+    drift: (Math.random() - 0.5) * 0.08,   /* inside one light, clear of the stone mullion */ y0: y0, yp: yp, peak: peak, flakes: [] };
+}
+function drawSnowball(g, x, y, r, trail) {
+  trail.forEach(function (p, j) {                   /* a short trail of powder behind it, so the throw reads */
+    g.fillStyle = 'rgba(240,244,250,' + (0.45 - (4 - j) * 0.09) + ')';
+    g.beginPath(); g.arc(p[0], p[1], r * (0.9 - (4 - j) * 0.12), 0, Math.PI * 2); g.fill();
+  });
+  var grd = g.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.15, x, y, r);
+  grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
+  g.fillStyle = grd; g.beginPath();
+  for (var i = 0; i <= 10; i++) {                   /* packed by hand, so not quite round */
+    var a = i / 10 * Math.PI * 2, k = r * (0.92 + 0.08 * Math.sin(i * 2.7));
+    if (i) g.lineTo(x + k * Math.cos(a), y + k * Math.sin(a)); else g.moveTo(x + k, y);
+  }
+  g.fill();
+  g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();   /* a pen line, as the drawn room has, so it reads on the pale sky */
 }
 function updateSnowball(dt) {
   if (!snowball) return;
   var s = snowball, tx = s.sky.material.map, c = tx.image, g = c.getContext('2d'), w = c.width, h = c.height;
   s.t += dt;
   var u = s.t / s.T, r = w * 0.075;                  /* about 14 cm across, a big two-handed one, so it reads through the leads */
+  function at(k) { return s.y0 + (s.yp - s.y0) * 4 * k * (1 - k); }
   g.clearRect(0, 0, w, h); drawSky(s.moon)(g, w, h);
   if (u < 1) {
-    var x = (s.x0 + s.drift * u) * w, y = h + r - (h * s.peak + r) * 4 * u * (1 - u);
+    var us = [4, 3, 2, 1].map(function (j) { return Math.max(0, u - j * 0.025); });
+    var x = (s.x0 + s.drift * u) * w, y = (WIN_Y0 + WIN_H - at(u)) / WIN_H * h;
     if (u > 0.45 && s.flakes.length < 3 && Math.random() < 0.2) s.flakes.push({ x: x + (Math.random() - 0.5) * r, y: y - r * 0.6, t: 0 });
     s.flakes.forEach(function (f) {
       f.t += dt; f.y += 30 * dt;
       g.fillStyle = 'rgba(244,246,250,' + Math.max(0, 0.9 - f.t * 1.2) + ')';
       g.beginPath(); g.arc(f.x, f.y, r * 0.22, 0, Math.PI * 2); g.fill();
     });
-    for (var j = 4; j >= 1; j--) {                 /* a short trail of powder behind it, so the throw reads */
-      var uj = Math.max(0, u - j * 0.025), xj = (s.x0 + s.drift * uj) * w, yj = h + r - (h * s.peak + r) * 4 * uj * (1 - uj);
-      g.fillStyle = 'rgba(240,244,250,' + (0.45 - j * 0.09) + ')';
-      g.beginPath(); g.arc(xj, yj, r * (0.9 - j * 0.12), 0, Math.PI * 2); g.fill();
-    }
-    var grd = g.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.15, x, y, r);
-    grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
-    g.fillStyle = grd; g.beginPath();
-    for (var i = 0; i <= 10; i++) {                   /* packed by hand, so not quite round */
-      var a = i / 10 * Math.PI * 2, k = r * (0.92 + 0.08 * Math.sin(i * 2.7));
-      if (i) g.lineTo(x + k * Math.cos(a), y + k * Math.sin(a)); else g.moveTo(x + k, y);
-    }
-    g.fill();
-    g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();   /* a pen line, as the drawn room has, so it reads on the pale sky */
-  } else snowball = null;
+    drawSnowball(g, x, y, r, us.map(function (k) { return [(s.x0 + s.drift * k) * w, (WIN_Y0 + WIN_H - at(k)) / WIN_H * h]; }));
+    /* and in the seat's glass below, at the same height in metres and the same place across its two lights */
+    var px = BAY.glassPx, top = BAY.head + BAY.over;
+    paintBayGlass(s.low, function (lg) {
+      function lx(k) { return (BAY.over + (s.x0 + s.drift * k) * BAY.outW) * px; }
+      drawSnowball(lg, lx(u), (top - at(u)) * px, SNOW_R * px, us.map(function (k) { return [lx(k), (top - at(k)) * px]; }));
+    });
+  } else { snowball = null; paintBayGlass(s.low); }
   tx.needsUpdate = true;
 }
 
@@ -1894,7 +2072,14 @@ wall.material.onBeforeCompile = function (sh) {
     .replace('#include <project_vertex>', '#include <project_vertex>\nvHoleW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
   sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vHoleW;\nuniform vec3 holeC;\nuniform vec3 holeN;')
     .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\n' +
-      '{ vec3 d = vHoleW - holeC; float a = dot(d, holeN); if (abs(a) < 0.1 && length(d - a * holeN) < ' + HOLE_R.toFixed(3) + ') discard; }');
+      '{ vec3 d = vHoleW - holeC; float a = dot(d, holeN); if (abs(a) < 0.1 && length(d - a * holeN) < ' + HOLE_R.toFixed(3) + ') discard; }\n' +
+      /* the two window seats' openings (req 174, BAY above): the room face's angle either side of each bay's centre, kept
+         3 mm inside the nook's stone so no hairline of what lies behind shows at its edges */
+      'if (vHoleW.y > ' + (BAY.seat + 0.003).toFixed(3) + ' && vHoleW.y < ' + (BAY.head - 0.003).toFixed(3) + ') { vec2 p = vHoleW.xz;' +
+      BAYS.map(function (b) {
+        var cx = Math.sin(b.tc).toFixed(6), cz = Math.cos(b.tc).toFixed(6);
+        return ' if (dot(p, vec2(' + cx + ', ' + cz + ')) > 4.0 && abs(atan(p.x * ' + cz + ' - p.y * ' + cx + ', dot(p, vec2(' + cx + ', ' + cz + ')))) < ' + (b.a - 0.003 / WALL_R).toFixed(6) + ') discard;';
+      }).join('') + ' }');
 };
 /* the wall's texture spans the arc and its height: u over 1.16 pi of radius WALL_R, v up 7 m */
 var WALL_ARC = WALL_R * Math.PI * 1.16, holeU = (HOLE_THETA - Math.PI * 0.42) / (Math.PI * 1.16);
@@ -2009,8 +2194,8 @@ var corridorFarLights = [[(CORR.WINDOW.xs[0] + CORR.WINDOW.xs[1]) / 2, 0xd8d4c8,
 var CORR_WIN_DAY = col(0xd8d4c8), CORR_WIN_NIGHT = col(0x7d8cb0);
 /* the drawn wall reaches the tunnel and the corridor too: one texture, no second copy on the GPU */
 function shareWallStone(map, color) {
-  [tunnelMat, corridorMat, wallEndMat].forEach(function (m) { m.map = map; m.color.copy(color); m.needsUpdate = true; });
-  layered.forEach(function (m) { if (m.material === tunnelMat || m.material === corridorMat || m.material === wallEndMat) m.userData.base = color.clone(); });
+  [tunnelMat, corridorMat, wallEndMat, bayMat].forEach(function (m) { m.map = map; m.color.copy(color); m.needsUpdate = true; });
+  layered.forEach(function (m) { if (m.material === tunnelMat || m.material === corridorMat || m.material === wallEndMat || m.material === bayMat) m.userData.base = color.clone(); });
 }
 
 /* furniture, back to front */
@@ -2052,7 +2237,10 @@ var table = cutout(cutoutTexture(256, 228, '#b9b6b0', drawRoundTable, 'table'), 
 var sideTable = cutout(cutoutTexture(256, 288, '#b9b6b0', drawSideTable, 'books'), 0.8, 0.9, DESK_AT.x, DESK_AT.z, 2);
 var deskChair = cutout(cutoutTexture(128, 244, '#b9b6b0', drawDeskChair, 'chair'), 0.5, 0.95, DESK_CHAIR_AT.x, DESK_CHAIR_AT.z, 2);
 deskChair.name = 'desk-chair';
-var candleStand = cutout(cutoutTexture(90, 160, '#b9b6b0', drawCandleStand, 'stand'), 0.45, 0.8, -2.55, -3.8, 2);
+/* the candle stand stood under the left window (x -2.55, z -3.8, in front of the seat's middle) until the seat (req 174):
+   it stands aside, past the seat's far end toward the hole, 0.4 m off the wall, so the cushion and the glass show whole */
+var CANDLE_STAND_AT = wallAt(180 + 0.71 * 180 / Math.PI, 5.2);
+var candleStand = cutout(cutoutTexture(90, 160, '#b9b6b0', drawCandleStand, 'stand'), 0.45, 0.8, CANDLE_STAND_AT.x, CANDLE_STAND_AT.z, 2);
 candleStand.name = 'candle-stand';
 /* the log basket by the bellows (req 28, the lived-in layer's first piece; Godric, 9 October 2026): the basket maker's
    drawing, round 1 candidate 2, on the Shoolbred catalogue's wood basket (the house's log-basket exemplar,
@@ -7099,6 +7287,7 @@ function updateSky() {
     var tx = p[0].material.map, c = tx.image, g = c.getContext('2d');
     g.clearRect(0, 0, c.width, c.height); drawSky(p[1])(g, c.width, c.height); tx.needsUpdate = true;
   });
+  BAYS.forEach(function (b) { if (!(snowball && snowball.low === b)) paintBayGlass(b); });   /* the seats' glass with them */
 }
 updateSky(); setInterval(updateSky, 60000);
 
