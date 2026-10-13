@@ -36,7 +36,8 @@
    turns; where a turn climbs further than the bandage is wide, the leg shows through, ringed. The turns needed are the
    leg's length over the bandage's width, so a narrower bandage needs more: the sum is drawn every time, nothing graded.
    The hospital wing, a bed; three rounds: a teddy's leg with a wide bandage, the same leg with a narrow one (the pair:
-   the same turns now leave gaps), and Ron's snapped wand on a splint (better than Spellotape, CoS 6). Judged by
+   the same turns now leave gaps), and Ron's snapped wand on a splint (better than Spellotape, CoS 6). Q9's fix (Godric,
+   13 October 2026): a bigger leg, wider bandages (4, 6 and 5 turns), and only the widest gap ringed. Judged by
    LumosSpells.judgeCoil (checks/ferula-tally.js tallies it); the traced guide, a zigzag up the leg, in the first round
    only, since after it the count is the lesson. ?round=1..3, ?ease=, ?guide= for trying; window.lumosFerula for checks. */
 (function () {
@@ -46,11 +47,11 @@
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
   /* cm: the real lengths for the sum; per: turns needed = cm / band */
   var ROUNDS = [
-    { name: 'Teddy', the: 'the teddy\'s leg', cm: 24, band: 4, thin: false,
+    { name: 'Teddy', the: 'the teddy\'s leg', cm: 24, band: 6, thin: false,
       start: 'A teddy on the end of the bed, one leg broken. <b>Tap the leg</b> with your wand, as Lupin tapped Ron\'s.' },
-    { name: 'Narrow', the: 'the teddy\'s leg', cm: 24, band: 2.4, thin: false,
+    { name: 'Narrow', the: 'the teddy\'s leg', cm: 24, band: 4, thin: false,
       start: 'Madam Pomfrey has only a narrow bandage left. <b>Tap the leg</b>, and count your turns.' },
-    { name: 'Ron\'s wand', the: 'the wand', cm: 32, band: 4, thin: true,
+    { name: 'Ron\'s wand', the: 'the wand', cm: 30, band: 6, thin: true,
       start: 'Ron\'s wand, snapped and patched with Spellotape. A splint will do better. <b>Tap it.</b>' } ];
   var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1)), R = ROUNDS[round];
   var leg = null, stage = 'tap', wait = null, done = false, last = null, glint = null, spun = null, stroke = null, active = null, trail = null, guide = null;
@@ -60,9 +61,9 @@
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
     place(); makeGuide();
   }
-  function place() {   /* the leg stands up the screen, its foot below: 0.62 of the short side long where it fits */
-    var L = Math.min(S * 0.62, H * 0.42), x = W / 2, foot = H * 0.6 + L / 2;
-    leg = { a: { x: x, y: foot }, b: { x: x, y: foot - L }, r: S * (R.thin ? 0.035 : 0.07), L: L };
+  function place() {   /* the leg stands up the screen, its foot below: 0.78 of the short side long where it fits */
+    var L = Math.min(S * 0.78, H * 0.46), x = W / 2, foot = H * 0.62 + L / 2;
+    leg = { a: { x: x, y: foot }, b: { x: x, y: foot - L }, r: S * (R.thin ? 0.045 : 0.09), L: L };
     leg.w = L * R.band / R.cm;
   }
   function say(html) { lineEl.innerHTML = html; }
@@ -135,24 +136,23 @@
     if (j.verdict === 'bound') {
       if (guide) guide.hit(lv > 0);
       LumosSpells.learn('ferula');
+      if (j.turns < need()) sum = sum.replace(/You made \d+\.$/, 'You made ' + j.turns + ': pulled tight, it just covers.');
       say('<b>Ferula!</b> The bandage spins up and pulls tight.' + sum);
       if (round < 2) wait = setTimeout(function () { wait = null; choose(round + 1); }, 6800);
       else { done = true; setTimeout(function () { if (done) say('All three strapped. Madam Pomfrey could not have done it better. (She would say she could.)'); }, 5200); }
     } else {
       if (guide) guide.miss();
-      var n = j.gaps.length;
-      say('The bandage spins up, but ' + R.the + ' shows through in ' + (n === 1 ? 'one place' : n + ' places') + ': ' + gapWords(j) + '.' + sum);
+      say('The bandage spins up, but ' + R.the + ' shows through, widest where it is ringed: ' + gapWords(j) + '.' + sum);
       wait = setTimeout(function () { wait = null; stage = 'coil'; spun = null; say('Unwind it and try again: <b>more turns, closer together</b>.'); }, 5200);
     }
     return j;
   }
+  function widest(j) {   /* only the widest gap is ringed and named (Q9's fix) */
+    return j.gaps.reduce(function (w, g) { return !w || g.px > w.px ? g : w; }, null);
+  }
   function gapWords(j) {
-    var foot = j.gaps.some(function (g) { return g.from === 0; }), top = j.gaps.some(function (g) { return g.to === 1; }), mid = j.gaps.length - foot - top;
-    var bits = [];
-    if (foot) bits.push('the foot left bare');
-    if (mid > 0) bits.push('your turns climbed too far apart');
-    if (top) bits.push('the top left bare');
-    return bits.join(', ');
+    var g = widest(j);
+    return g.from === 0 ? 'the foot left bare' : (g.to === 1 ? 'the top left bare' : 'your turns climbed too far apart');
   }
 
   /* ---- drawing ---- */
@@ -217,14 +217,14 @@
     if (k < 1) return;
     var t = Math.min(1, (now - spun.at - 1100) / 500), fs = Math.round(Math.max(14, S * 0.032));
     cx.save(); cx.globalAlpha = Math.max(0, t);
-    spun.j.gaps.forEach(function (g) {   /* where the leg shows through */
+    (spun.j.gaps.length ? [widest(spun.j)] : []).forEach(function (g) {   /* where the leg shows through: the widest gap only */
       var y0 = leg.a.y - leg.L * g.from, y1 = leg.a.y - leg.L * g.to;
       cx.strokeStyle = '#ff8a6a'; cx.lineWidth = 2.6; cx.setLineDash([6, 5]);
       cx.beginPath(); cx.ellipse(a.x, (y0 + y1) / 2, r * 1.9, Math.max(r * 0.6, Math.abs(y0 - y1) / 2 + 4), 0, 0, 7); cx.stroke();
     });
     cx.setLineDash([]);
     /* the sum beside it: the length bracketed, the bandage's width, the turns */
-    var bx = a.x - r * (R.thin ? 3 : 4.6) - fs * 0.5;
+    var bx = a.x - r * (R.thin ? 3 : 3.6) - fs * 0.5;
     cx.strokeStyle = '#1c242e'; cx.lineWidth = 2; cx.shadowColor = 'rgba(255,255,255,0.5)'; cx.shadowBlur = 2;
     cx.beginPath(); cx.moveTo(bx + 6, leg.a.y); cx.lineTo(bx, leg.a.y); cx.lineTo(bx, leg.b.y); cx.lineTo(bx + 6, leg.b.y); cx.stroke();
     cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillStyle = '#141b23'; cx.textAlign = 'right';
@@ -281,6 +281,7 @@
     tap: function () { tapLeg({ x: leg.a.x, y: (leg.a.y + leg.b.y) / 2 }); }, judge: function (pts) { return judge(pts); },
     state: function () { return { round: round + 1, stage: stage, waiting: !!wait, done: done,
       last: last ? { verdict: last.verdict, reason: last.reason, turns: last.turns, gaps: last.gaps.length, need: last.need } : null,
+      ringed: spun && spun.j.gaps.length ? widest(spun.j) : null,
       line: lineEl.textContent, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('ferula') }; } };
 })();
 </script>
