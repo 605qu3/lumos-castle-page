@@ -149,6 +149,15 @@
     text-align: center; color: #5a4630; border-bottom: 1px solid rgba(60,40,20,0.45); padding-bottom: 7px; margin-bottom: 12px; }
   #bookPage .text::first-letter { float: left; font: 400 47px/0.8 "IM Fell English", Georgia, serif; padding: 5px 6px 0 0; color: #6e1f1c; }
   #bookPage .folio { margin-top: 10px; text-align: center; font-size: 13px; color: #5a4630; }
+  /* the essay from the gap behind the desk (Q71 t1): a student's hand, no drop cap, the writing growing to fill the length */
+  #bookPage.essay { font: 400 17px/1.5 "Nothing You Could Do", cursive; color: #1f1a2e; padding: 18px 22px 14px; }
+  #bookPage.essay .head { font: 400 16px/1.25 "Nothing You Could Do", cursive; letter-spacing: 0; color: #1f1a2e;
+    border-bottom: none; text-decoration: underline; text-underline-offset: 4px; margin-bottom: 8px; }
+  #bookPage.essay .text::first-letter { float: none; font: inherit; padding: 0; color: inherit; }
+  #bookPage.essay .folio { text-align: right; font: 400 16px/1.2 "Nothing You Could Do", cursive; color: #55504a;
+    transform: rotate(-4deg); margin-top: 6px; }
+  #bookPage.essay .blot { display: inline-block; width: 0.7em; height: 0.55em; margin-left: 2px; border-radius: 48% 52% 40% 60%;
+    background: #1f1a2e; vertical-align: -0.05em; }
   #bookPage.marked { padding-right: 52px; }
   #bookPage .ribbon { position: absolute; top: -6px; right: 20px; width: 13px; height: calc(100% + 30px);
     background: linear-gradient(90deg, #6a1316, #9c2a2c 45%, #761a1d); box-shadow: 1px 2px 4px rgba(0,0,0,0.45);
@@ -3686,6 +3695,7 @@ document.body.appendChild(bookPageEl);
 var bookPage = { t: 0, then: null, n: -1 };
 function booksPageShow(pg, then) {
   bookPageEl.innerHTML = '';
+  bookPageEl.classList.remove('essay');
   bookPageEl.classList.toggle('marked', !!pg.ribbon);
   if (pg.ribbon) { var rb = document.createElement('div'); rb.className = 'ribbon'; bookPageEl.appendChild(rb); }
   var hd = document.createElement('div'); hd.className = 'head'; hd.textContent = 'Hogwarts, A History'; bookPageEl.appendChild(hd);
@@ -5614,6 +5624,112 @@ function leaveDesk() {
   startTween(camera.position.clone(), currentLook(), pos, look, 1.3, function () { mode = 'room'; });
   DESK_STOP.seat = 0;
 }
+
+/* the gap behind the desk (Godric's Q71 t1, 12 October 2026: with the desk clear of the wall "a few quills and a
+   half-finished essay have slipped down the gap behind it, found when he looks behind"): on the flags between the
+   desk's back and the wall (0.76 m), seen under the desk at rest and from the desk when he looks down, three quills
+   and a History of Magic essay half sprung back into its roll, drawn here in code until a drawing is asked for. A tap
+   on it at rest walks him to the desk; there a tap holds its page up, the writing growing as it goes. The essay is the
+   one Binns set (CoS 9: "a three foot long composition on The Medieval Assembly of European Wizards"), where Ron was
+   "still eight inches short" and his parchment "sprang back into a roll". */
+var GAP = { deg: 123.6, r: 5.2, yaw: 0.15, w: 0.52, h: 0.27 };
+var GAP_ESSAY = {
+  head: 'The Medieval Assembly of European Wizards (three feet)',
+  text: ['The Medieval Assembly of European Wizards was a very important assembly. It was in medieval times, which ' +
+    'were a long time ago, and it was in Europe, and there were wizards at it, assembling. ', 'They assembled for a long time. ',
+    'A VERY long time. ', 'Some of them may have assembled for even longer than'],
+  note: 'still eight inches short!!'
+};
+function drawGapFind(g, W, H) {
+  g.save();
+  g.translate(W * 0.06, H * 0.12);                                   /* the sheet, lying a little askew */
+  g.rotate(-0.05);
+  var pw = W * 0.62, ph = H * 0.7;
+  var pg = g.createLinearGradient(0, 0, pw, ph);
+  pg.addColorStop(0, '#e6d5ac'); pg.addColorStop(0.6, '#dcc898'); pg.addColorStop(1, '#c9b07c');
+  g.fillStyle = pg; g.strokeStyle = '#4a3a26'; g.lineWidth = 2.5;
+  g.beginPath(); g.moveTo(0, 6); g.lineTo(pw, 0); g.lineTo(pw, ph); g.lineTo(4, ph - 3); g.closePath(); g.fill(); g.stroke();
+  g.strokeStyle = 'rgba(31,26,46,0.75)';                             /* the writing, as wavy lines, bigger as it goes */
+  for (var i = 0, y = 22; i < 8 && y < ph - 10; i++) {
+    var sz = 1.6 + i * 0.5, len = i === 7 ? pw * 0.45 : pw - 30;
+    g.lineWidth = sz; g.beginPath(); g.moveTo(14, y);
+    for (var x = 14; x < 14 + len; x += 6) g.lineTo(x, y + Math.sin(x * 0.45 + i) * sz * 0.9);
+    g.stroke(); y += 12 + i * 3.2;
+  }
+  g.fillStyle = 'rgba(31,26,46,0.85)';                               /* the blot where it stops */
+  g.beginPath(); g.ellipse(14 + pw * 0.45 + 10, ph - 30, 7, 5, 0.4, 0, Math.PI * 2); g.fill();
+  var rx = pw, rw = W * 0.12;                                        /* the roll it sprang back into */
+  var rg = g.createLinearGradient(0, 0, 0, ph);
+  rg.addColorStop(0, '#b89a62'); rg.addColorStop(0.35, '#ead9b0'); rg.addColorStop(0.7, '#cdb27c'); rg.addColorStop(1, '#8f7346');
+  g.fillStyle = rg; g.strokeStyle = '#4a3a26'; g.lineWidth = 2.5;
+  g.beginPath(); g.rect(rx - 4, -6, rw, ph + 10); g.fill(); g.stroke();
+  g.beginPath(); g.moveTo(rx + rw * 0.35, -6); g.lineTo(rx + rw * 0.35, ph + 4); g.lineWidth = 1.2; g.stroke();
+  g.restore();
+  function quill(x, y, a, len, snapped) {                            /* a goose quill: shaft, vane, a cut nib */
+    g.save(); g.translate(x, y); g.rotate(a);
+    var vg = g.createLinearGradient(0, -10, 0, 10);
+    vg.addColorStop(0, '#f2eee4'); vg.addColorStop(1, '#cfc7b6');
+    g.fillStyle = vg; g.strokeStyle = '#3e3830'; g.lineWidth = 2.5;
+    g.beginPath(); g.moveTo(len * 0.25, 0);
+    g.quadraticCurveTo(len * 0.6, -22, len, -5); g.quadraticCurveTo(len * 0.75, 3, len * 0.25, 0);
+    g.quadraticCurveTo(len * 0.62, 18, len * 0.96, 6); g.quadraticCurveTo(len * 0.7, 1, len * 0.25, 0);
+    g.fill(); g.stroke();
+    g.strokeStyle = 'rgba(90,82,72,0.5)'; g.lineWidth = 0.8;           /* a few barbs */
+    for (var b = 0.35; b < 0.95; b += 0.08) { g.beginPath(); g.moveTo(len * b, 0); g.lineTo(len * (b + 0.05), -7); g.stroke(); }
+    g.strokeStyle = '#6b5a40'; g.lineWidth = 2.2;
+    g.beginPath(); g.moveTo(snapped ? len * 0.08 : 0, 0); g.lineTo(len, -1); g.stroke();
+    if (!snapped) { g.fillStyle = '#1f1a2e'; g.beginPath(); g.moveTo(-2, 0); g.lineTo(9, -2); g.lineTo(9, 2); g.closePath(); g.fill(); }
+    g.restore();
+  }
+  quill(W * 0.12, H * 0.1, 0.12, W * 0.5, false);
+  quill(W * 0.55, H * 0.2, 0.42, W * 0.4, true);
+  quill(W * 0.86, H * 0.12, 1.75, W * 0.3, false);
+}
+var gapFind = (function () {
+  var c = makeCanvas(512, 266), g = c.getContext('2d');
+  drawGapFind(g, 512, 266);
+  var m = cutoutMesh(tex(c), GAP.w, GAP.h), at = wallAt(GAP.deg, GAP.r);
+  m.rotation.order = 'YXZ'; m.rotation.set(-Math.PI / 2, GAP.deg * Math.PI / 180 + GAP.yaw, 0);   /* its long side along the wall */
+  m.position.set(at.x, 0.004, at.z);
+  m.castShadow = false; m.name = 'desk-gap';
+  m.material.color.set(0x8f8577);                                   /* in the desk's shade, never as bright as the top */
+  m.userData.alpha = alphaOf(c);
+  scene.add(m); register(m, 2);
+  tappables.push(m);
+  return m;
+})();
+var deskAlpha = null;
+function deskClear(uv) {                                  /* the desk's drawing is clear here: the gap shows through */
+  var im = sideTable.material.map && sideTable.material.map.image;
+  if (!im || !im.width || im.width < 300 || !uv) return false;
+  if (!deskAlpha || deskAlpha.src !== im) { deskAlpha = alphaOf(im); deskAlpha.src = im; }
+  return !alphaSolid(deskAlpha, { x: 1 - uv.x, y: uv.y });          /* the drawing is mirrored on its card */
+}
+function gapThrough(hits) {                               /* a tap between the desk's legs reaches the gap behind */
+  if (hits.length < 2 || hits[0].object !== sideTable || !deskClear(hits[0].uv)) return hits;
+  for (var i = 1; i < hits.length; i++) if (hits[i].object === gapFind) return [hits[i]].concat(hits.slice(0, i), hits.slice(i + 1));
+  return hits;
+}
+function gapTap() {
+  if (bookPageEl.classList.contains('on')) { booksPageAway(); return; }
+  bookPageEl.innerHTML = '';
+  bookPageEl.classList.remove('marked'); bookPageEl.classList.add('essay');
+  var hd = document.createElement('div'); hd.className = 'head'; hd.textContent = GAP_ESSAY.head; bookPageEl.appendChild(hd);
+  var tx = document.createElement('div'); tx.className = 'text';
+  GAP_ESSAY.text.forEach(function (s, i) {                           /* each run a size bigger, to stretch it to length */
+    var sp = document.createElement('span'); sp.textContent = s; sp.style.fontSize = (1 + i * 0.22).toFixed(2) + 'em';
+    tx.appendChild(sp);
+  });
+  var bl = document.createElement('span'); bl.className = 'blot'; tx.appendChild(bl);
+  bookPageEl.appendChild(tx);
+  var fo = document.createElement('div'); fo.className = 'folio'; fo.textContent = GAP_ESSAY.note; bookPageEl.appendChild(fo);
+  var p = gapFind.getWorldPosition(new THREE.Vector3()); p.y = 0.9; p.project(camera);
+  var W = innerWidth, H = innerHeight, pw = bookPageEl.offsetWidth || 330, ph = bookPageEl.offsetHeight || 260;
+  var x = clamp((p.x + 1) / 2 * W - pw / 2, 10, W - pw - 10), y = clamp((1 - p.y) / 2 * H - ph - 10, 10, H - ph - 10);
+  bookPageEl.style.transform = 'translate(' + x.toFixed(0) + 'px,' + y.toFixed(0) + 'px) rotate(1.2deg)';
+  bookPageEl.classList.add('on');
+  bookPage.t = 14; bookPage.then = null;
+}
 /* ---------- the homework table's stop (Q36, 1: Godric 9.15 pm, the walk-ups in turn, the table first) ----------
    As the desk's: a tap on the round table, its top or the homework glides the view up to the near rim, a boy's eye a
    little above the top, framed on the essay, the ink and the quill by the screen's shape. He walks up from where he
@@ -7020,6 +7136,7 @@ function tapName(o) {
   if (o === findHand.mesh) return 'find';            /* the find or card in his hand (req 173) */
   if (o === catWalk || o === catSit || o === curl.mesh) return 'cat';
   if (o === stairs) return 'stair';
+  if (o === gapFind) return 'desk gap';
   if (o === bookcase) return 'bookshelf';
   if (o === ladder) return 'ladder';
   if (listPart(o)) return 'door list';               /* the list on the little door (req 176) */
@@ -7068,6 +7185,7 @@ function tapHits(cx, cy) {
     if (h.object === cloak) return alphaSolid(cloakAlpha, h.uv);
     if (h.object === ring) return !!h.uv && ringSolid(h.uv);
     if (h.object === stairs) return stairsSolid(h.uv);
+    if (h.object === gapFind) return alphaSolid(gapFind.userData.alpha, h.uv);
     if (h.object === sofa) return sofaSolid(h.uv);
     if (h.object === findHand.mesh) return findHand.want && findHand.mesh.visible;
     if (h.object === catWalk || h.object === catSit) return !curl.on;
@@ -7095,7 +7213,7 @@ function stopOf(hit) {
   var paper = hit.userData.paper && hit.userData.paper.spec;
   if (FIRESIDE_TAPS.indexOf(hit) >= 0) return { mode: 'fireside', go: goFireside, name: tapName(hit) };
   if (hit === scarf || hit === satchel || hit === curios.jar) return { mode: 'fireside', go: goFireside, name: 'hearth' };
-  if (hit === sideTable || hit === deskChair || hit === candle.mesh) return { mode: 'desk', go: goDesk, name: tapName(hit) };
+  if (hit === sideTable || hit === deskChair || hit === candle.mesh || hit === gapFind) return { mode: 'desk', go: goDesk, name: tapName(hit) };
   if (hit === homeFeather.mesh || hit === howler.mesh || (paper && paper.desk) ||
       hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)
     return { mode: 'desk', go: goDesk, name: tapName(sideTable) };
@@ -7119,7 +7237,7 @@ function walkOn(hit) {                                   /* what to tell, if it 
   return { name: s.name, acted: true };
 }
 function tapDo(cx, cy) {
-  var hits = tapHits(cx, cy);
+  var hits = gapThrough(tapHits(cx, cy));
   var hit = hits.length ? hits[0].object : null;
   var told = { name: tapName(hit), acted: true }, back = { name: null, acted: true };
   if (mode === 'hand') {
@@ -7143,6 +7261,7 @@ function tapDo(cx, cy) {
     if (hit === homeFeather.mesh) homeFeatherTap();
     else if (hit === howler.mesh) { if (hb.on) return back; liftPaper(howler); }   /* bursting, it is not to be picked up */
     else if (hit === candle.mesh) candleTap();
+    else if (hit === gapFind) gapTap();
     else if (hit && hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
     else if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) booksTap();
     else { var wd = walkOn(hit); if (wd) return wd; leaveDesk(); return back; }
@@ -7210,7 +7329,7 @@ function tapDo(cx, cy) {
   else if (hit === ring) goHole();
   else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
   else if (hit === stairs) climbStair(false, 'dormitory.html?from=room');
-  else if (hit === sideTable || hit === deskChair || hit === candle.mesh) goDesk();
+  else if (hit === sideTable || hit === deskChair || hit === candle.mesh || hit === gapFind) goDesk();
   else if (tablePart(hit)) goTable();
   else if (hit === sofa) goSofa();
   else if (hit === bookcase || hit === ladder) goCase();
@@ -7937,7 +8056,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 window.lumosGreybox.howlerBurst = { state: howlerReport, at: howlerAt, ash: howlerAshAt, note: function () { var p = howlerNote.position.clone().project(camera); return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)]; } };   /* req 199's checks */
 })();
 </script>
