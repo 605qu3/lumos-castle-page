@@ -257,7 +257,8 @@
       "starts": [
         "add games 1",
         "set game = none",
-        "log \"Won a game of chess {day}\""
+        "log \"Won a game of chess {day}\"",
+        "point chess game 10"
       ]
     },
     {
@@ -297,7 +298,8 @@
       "starts": [
         "add games 1",
         "set game = none",
-        "log \"Lost a game of chess {day}\""
+        "log \"Lost a game of chess {day}\"",
+        "point chess game 10"
       ]
     },
     {
@@ -336,7 +338,8 @@
       "starts": [
         "add games 1",
         "set game = none",
-        "log \"Drew a game of chess {day}\""
+        "log \"Drew a game of chess {day}\"",
+        "point chess game 10"
       ]
     },
     {

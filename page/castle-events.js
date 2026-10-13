@@ -70,6 +70,13 @@
    spell on X's lock answers nothing (Charms' `openLock` with `stuck`); `{year}` in a line is this year.
    Then the Howler (board req 193, Godric's events-q-howler-voice): `home howler`, written or none, says whether a
    grown-up wrote a Howler line at the letter page (its `howler`, in the letter's own key); `{howler}` shouts it.
+   Then the house points (board req 216, Magic's B11, Godric's option 1 with both touches): `point <kind> <thing> <n>`
+   awards n points for that kind of learning and that thing, once ever however often its record fires (the thing a
+   word or a `{name}` read from a variable or built-in, as `point card {card} 5`); each award is kept as a slip, its
+   kind, thing, points, day and record, in the order earned, for the hourglass and the leaving feast (`points()`);
+   `house points` reads the total; the page's `opts.point(slip)` is told of each new one as it lands, so its gems fall
+   then; a line in the grown-ups' log. `first cast`, a page moment, comes when a spell's cast in a room answers its
+   first true cast ever (Charms' `first`), with the page's built-in `spell` naming it.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -103,7 +110,8 @@
     ['stamp-night', /^stamp ([a-z_]+) by night$/],
     ['slot', /^(take|free) slot$/],
     ['log', /^log "(.+)"$/],
-    ['secret', /^secret ([a-z\-]+)$/]
+    ['secret', /^secret ([a-z\-]+)$/],
+    ['point', /^point ([a-z\-]+) (\{[a-z_ ]+\}|[a-z\-]+) (\d+)$/]
   ];
 
   /* The real moon (req 95, Magic's "The real moon, how real", Godric's pick of 10 October 2026, 5.16 pm), from the
@@ -235,7 +243,7 @@
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
              open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
-             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [] };
+             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [], points: [] };
   }
 
   function start(opts) {
@@ -392,6 +400,7 @@
         case 'bedtime': return bedtimeMin > 0 ? 'set' : 'off';
         case 'things looked at': return (state.looked || []).length;   /* different things held close in the zoom, ever (req 127) */
         case 'secrets found': return (state.secrets || []).length;     /* the castle's secrets he has found, each once ever (req 180) */
+        case 'house points': return (state.points || []).reduce(function (t, p) { return t + p.points; }, 0);   /* req 216 */
         case 'parent parcel': return settings.parcel || 'none';         /* what a parent sends by owl from the grown-up corner */
         case 'home howler': return homeHowler() ? 'written' : 'none';   /* a Howler line written at the letter page (req 193) */
         /* how this page was reached, from its `?from=`: room, corridor, dormitory, sleep (the waking), or none (Neville's
@@ -601,9 +610,25 @@
           case 'slot': state.slot = m[1] === 'take' ? rec.id : null; return;
           case 'log': logLine(m[1]); return;
           case 'secret': if (state.secrets.indexOf(m[1]) < 0) state.secrets.push(m[1]); return;   /* once ever (req 180) */
+          case 'point': award(m[1], m[2], +m[3], rec); return;
         }
       }
       note(rec.id + ': effect does not parse: ' + text);
+    }
+
+    /* A house point (req 216): once ever by kind and thing, kept as a slip in the order earned; the page is told of
+       each new one as it lands, so the gems fall as it is given. */
+    function award(kind, thing, n, rec) {
+      if (thing.charAt(0) === '{') {
+        var v = value(thing.slice(1, -1));
+        if (v === undefined || v === null || v === '') { note(rec.id + ': no ' + thing + ' to award a point for'); return; }
+        thing = String(v);
+      }
+      for (var i = 0; i < state.points.length; i++) if (state.points[i].kind === kind && state.points[i].thing === thing) return;
+      var slip = { kind: kind, thing: thing, points: n, on: isoDay(nowDate()), record: rec.id };
+      state.points.push(slip);
+      logLine(n + ' house points for ' + kind + ' ' + thing + ', {day}');
+      if (opts.point) { try { opts.point(Object.assign({}, slip)); } catch (e) { note('the page could not take a point: ' + e); } }
     }
 
     function shownCues() {
@@ -1301,6 +1326,9 @@
       foundOn: function (name) { return Object.assign({}, (state.deckFirst || {})[name] || {}); },
       /* The castle's secrets he has found, in the order found, each once (req 180; for the Map, B10). */
       secrets: function () { return (state.secrets || []).slice(); },
+      /* The house points earned on this iPad, a slip each in the order earned: { kind, thing, points, on (yyyy-mm-dd),
+         record } (req 216; for the hourglass and the leaving feast's slips, Magic's t1). */
+      points: function () { return (state.points || []).map(function (p) { return Object.assign({}, p); }); },
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';

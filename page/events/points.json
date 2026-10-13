@@ -1,0 +1,16 @@
+{
+  "chain": "points",
+  "records": [
+    {
+      "id": "points.spell",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "first cast",
+      "when": [],
+      "starts": [
+        "point spell {spell} 10"
+      ]
+    }
+  ]
+}

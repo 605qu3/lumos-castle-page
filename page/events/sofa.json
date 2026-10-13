@@ -971,7 +971,8 @@
       ],
       "starts": [
         "set card_side = back",
-        "add card_turns 1"
+        "add card_turns 1",
+        "point card {card} 5"
       ]
     },
     {
@@ -995,7 +996,8 @@
         "set card_side = back",
         "add card_turns 1",
         "set dumbledore_back = read",
-        "set card_first = gone"
+        "set card_first = gone",
+        "point card {card} 5"
       ]
     },
     {
@@ -1018,7 +1020,8 @@
       "starts": [
         "set card_side = back",
         "add card_turns 1",
-        "set dumbledore_back = read"
+        "set dumbledore_back = read",
+        "point card {card} 5"
       ]
     },
     {
