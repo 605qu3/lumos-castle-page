@@ -1119,7 +1119,7 @@ function firstCast(name) {
    room passes as `exits`. A finger landing on one lets the offer go, answered 'cancelled' (or, if the spell had
    already answered, that answer at once), and the tap goes on to it as a click, so he can always leave the stop.
    `wait` (seconds, off by default): left that long with no finger on the layer, the offer goes the same way. Every
-   room callable here (castOver, openLock, revealInk, levitate, measureSpan, openHump) takes `exits` and `wait` in its opts.
+   room callable here (castOver, openLock, revealInk, levitate, measureSpan, openHump, moveThing) takes `exits` and `wait` in its opts.
    `stray(x, y)` (off by default; Interaction's vocabulary, §9, *A stray tap while an offer waits*, Godric's Q4, req
    230): called once for a lone touch, off the offer's thing, that moved under TAP_SLOP (the frame's tap), where his
    finger lifted; never for a way out, a second finger or a drag. Nothing else changes: the stroke is not judged, the
@@ -1179,6 +1179,24 @@ function inkWhy(j) {
     'not in a line': 'Keep the three taps in a line, like beads on a thread.',
     'uneven spacing': 'Nearly. Your gaps were ' + a + ' and ' + b + ' tenths of the line. Halfway is 5 and 5: put the middle tap there.'
   })[j.reason] || 'Keep an even beat: tap ... tap ... tap, like a clock ticking.'];
+}
+
+/* The word's card a room callable shows (Aligned with Magic, point 2: the word comes from the syllable card until the
+   ear, castle-ear.js, is probed): its syllables, each lighting in turn over 0.8 s once it is tapped, as he says it.
+   c: { x, y, w, h, fs } in CSS px; said: when it was tapped (performance.now()), or 0. */
+function drawWordCard(cx, c, parts, said, now) {
+  var k = said ? Math.min(1, (now - said) / 800) : 0;
+  cx.save(); cx.fillStyle = said ? 'rgba(58,42,22,0.95)' : 'rgba(30,22,17,0.92)'; cx.strokeStyle = said ? '#f3d27a' : '#8a7050'; cx.lineWidth = 2;
+  cx.beginPath(); cx.rect(c.x, c.y, c.w, c.h); cx.fill(); cx.stroke();
+  cx.font = 'italic 600 ' + c.fs + 'px Georgia, serif'; cx.textBaseline = 'middle'; cx.textAlign = 'left';
+  var text = parts.join('-'), x = c.x + (c.w - cx.measureText(text).width) / 2;
+  parts.forEach(function (s, i) {   /* each syllable lights in turn as the word is said */
+    var lit = said && k >= (i + 1) / parts.length;
+    cx.fillStyle = lit ? '#f3d27a' : '#eadcbf'; cx.fillText(s, x, c.y + c.h / 2);
+    x += cx.measureText(s).width;
+    if (i < parts.length - 1) { cx.fillStyle = 'rgba(234,220,191,0.5)'; cx.fillText('-', x, c.y + c.h / 2); x += cx.measureText('-').width; }
+  });
+  cx.restore();
 }
 
 /* Lumos over a spot, for a room (req 125, the Common room's candle stub, Godric's Q37 t2; tried on
@@ -1911,20 +1929,7 @@ function openHump(opts) {
     if (opts.onStop) opts.onStop(out);
     L.later(out, HOLD);
   }
-  function drawCard(cx, now) {
-    var c = card, k = said ? Math.min(1, (now - said) / 800) : 0, parts = ['Dis', 'sen', 'di', 'um'];
-    cx.save(); cx.fillStyle = said ? 'rgba(58,42,22,0.95)' : 'rgba(30,22,17,0.92)'; cx.strokeStyle = said ? '#f3d27a' : '#8a7050'; cx.lineWidth = 2;
-    cx.beginPath(); cx.rect(c.x, c.y, c.w, c.h); cx.fill(); cx.stroke();
-    cx.font = 'italic 600 ' + c.fs + 'px Georgia, serif'; cx.textBaseline = 'middle'; cx.textAlign = 'left';
-    var text = parts.join('-'), x = c.x + (c.w - cx.measureText(text).width) / 2;
-    parts.forEach(function (s, i) {   /* each syllable lights in turn as the word is said */
-      var lit = said && k >= (i + 1) / parts.length;
-      cx.fillStyle = lit ? '#f3d27a' : '#eadcbf'; cx.fillText(s, x, c.y + c.h / 2);
-      x += cx.measureText(s).width;
-      if (i < parts.length - 1) { cx.fillStyle = 'rgba(234,220,191,0.5)'; cx.fillText('-', x, c.y + c.h / 2); x += cx.measureText('-').width; }
-    });
-    cx.restore();
-  }
+  function drawCard(cx, now) { drawWordCard(cx, card, ['Dis', 'sen', 'di', 'um'], said, now); }
   function drawMeasure(cx) {
     var S = Math.min(L.W, L.H), len = Math.hypot(ed.x - hi.x, ed.y - hi.y), R = len * 0.62, i;
     var a0 = Math.atan2(ed.y - hi.y, ed.x - hi.x), fs = Math.round(Math.max(11, S * 0.03)), sweep = DIR * Math.PI / 180;
@@ -1994,9 +1999,210 @@ function openHump(opts) {
     state: function () { return { stage: stage, taps: taps, said: !!said, degrees: Math.round(deg * 10) / 10, need: Math.round(NEED * 10) / 10, card: card, hump: h }; } };
 }
 
+/* Mobiliarbus on a piece a room names (Q6, 6.3, both ways, Godric, 13 October 2026, 7.11 am; the Mobiliarbus page's
+   slide, PoA 10: the tree "rose a few inches off the ground, drifted sideways and landed with a soft thump"; tried on
+   page/charms/room-spells-test.html). A tap on the piece, then the word's card (Mo-bi-li-ar-bus, tapped as he says it;
+   `word: false` leaves it out), then one stroke from the piece to where it should go on the floor's squares, judged by
+   judgeSlide both ways: one straight line on any slant, or an L along the squares. While it moves the layer draws the
+   arrow growing from the lift to the thump (his t1), its two legs counted at the end, and calls onDrift each frame so
+   the room draws the piece itself, lifted a few inches and drifting; at the thump, onThump. The answer is 'moved'
+   (whole squares dx right, dy down), 'blocked' (blocked(dx, dy) named what is in the way: it rises, drifts toward it,
+   bumps and lands back), 'missed' (a stroke the judge could not read, with `why`), or 'cancelled'. A finger on a way
+   out while it drifts lands it at once, moved. The room asks learned('mobiliarbus') (set on the Charms page) first.
+   opts: { at: {x, y} the piece's centre on the screen, or a function returning one each frame,
+           floor: { toSquares(p), toScreen(q) }: the room's floor, screen px to squares and back (a room drawn in
+                  perspective passes its own); or cell: a square's side in CSS px for a flat floor seen from above
+                  (0.1 of the screen's short side by default), the squares' corners on whole multiples of it,
+           reach: the piece's tap reach in px (0.12 of the short side), word: true (default) or false,
+           want: optional { dx, dy }, the move the room asks for: the traced guide draws it (guide.js, if the room
+                  loads it) and the answer says `right`,
+           blocked: optional function (dx, dy) returning what is in the way ('the table', 'the wall') or null,
+           ease: 'kind' (default), 'fair' or 'strict' (SLIDE_EASES), guide: 'auto' (default), 'always' or 'off',
+           onTap(), onWord(), onDrift({ x, y, k (0 to 1 along), lift (0 to 1 off the floor), dx, dy }), onThump(out),
+           exits, wait, stray: as every room callable }
+   Returns { done: a promise of { verdict, dx, dy, shape ('line' or 'L'), legs, right (with want), judge, traced,
+             first, why (a miss's or a bump's [what he sees, what to try]), what (blocked's word) }, cancel(), tap(),
+             say(), judge(points), state() }. */
+var SLIDE_WHY = {
+  off: ['It stays put', 'Start on it: touch it, then draw straight to where it should go.'],
+  wiggly: ['It lifts, wobbles and settles back', 'One straight line to its new square, or two straight legs along the squares.'],
+  short: ['It lifts a few inches and lands where it was', 'Draw all the way to the new square.'],
+  between: ['It hovers between two squares and settles back', 'End your line in the middle of a square.']
+};
+function slideWords(dx, dy) {   /* "3 right and 1 down", "2 left", "no squares" */
+  var a = [];
+  if (dx) a.push(Math.abs(dx) + ' ' + (dx > 0 ? 'right' : 'left'));
+  if (dy) a.push(Math.abs(dy) + ' ' + (dy > 0 ? 'down' : 'up'));
+  return a.length ? a.join(' and ') : 'no squares';
+}
+function moveThing(opts) {
+  opts = opts || {};
+  var G = root.LumosGuide, ease = opts.ease || 'kind', mode = opts.guide || 'auto', useWord = opts.word !== false;
+  var PARTS = ['Mo', 'bi', 'li', 'ar', 'bus'];
+  var stage = 'tap', said = 0, c = null, reach = 0, card = null, guide = null, built = null, stroke = null, active = null, trail = null;
+  var move = null, out = null, took = false, L;   /* took: this touch tapped the piece or said the word, so its lift is never a stray */
+  function val(v) { return typeof v === 'function' ? v() : v; }
+  function cellPx() { return val(opts.cell) || Math.min(L.W, L.H) * 0.1; }
+  function toSq(p) { return opts.floor ? opts.floor.toSquares(p) : { x: p.x / cellPx(), y: p.y / cellPx() }; }
+  function toScr(q) { return opts.floor ? opts.floor.toScreen(q) : { x: q.x * cellPx(), y: q.y * cellPx() }; }
+  function place() {
+    var S = Math.min(L.W, L.H);
+    c = val(opts.at) || { x: L.W / 2, y: L.H * 0.55 }; reach = val(opts.reach) || Math.max(28, S * 0.12);
+    var fs = Math.round(Math.max(16, S * 0.045)), w = fs * 8.6, hh = fs * 2.1, cy = c.y - reach * 1.25 - hh;
+    if (cy < 70) cy = c.y + reach * 1.25;
+    card = { x: Math.max(8, Math.min(L.W - w - 8, c.x - w / 2)), y: Math.max(8, Math.min(L.H - hh - 8, cy)), w: w, h: hh, fs: fs };
+  }
+  function onPiece(p) { return Math.hypot(p.x - c.x, p.y - c.y) <= reach; }
+  function onCard(p) { return card && p.x >= card.x - 6 && p.x <= card.x + card.w + 6 && p.y >= card.y - 6 && p.y <= card.y + card.h + 6; }
+  function wantEnd() { var f = toSq(c); return toScr({ x: f.x + opts.want.dx, y: f.y + opts.want.dy }); }
+  var gparts = [];   /* guide.js keeps its spec in its own closure: the parts are refilled in place */
+  if (G && mode !== 'off' && opts.want) {
+    guide = G.create({ key: mode === 'always' ? 'lumos.spells.moveThing.always' : 'lumos.charms.mobiliarbusGuidedHits', rest: 1.0, mirror: false,
+      box: function () { var e = wantEnd(), g = Math.max(Math.abs(e.x - c.x), Math.abs(e.y - c.y), 1); return { G: g, ox: (c.x + e.x) / 2 - g / 2, oy: (c.y + e.y) / 2 - g / 2 }; },
+      parts: gparts });
+  }
+  function buildGuide() {   /* the line from the piece to the square wanted, rebuilt as the piece or the screen moves */
+    var e = wantEnd(), g = Math.max(Math.abs(e.x - c.x), Math.abs(e.y - c.y), 1), vx = (e.x - c.x) / g / 2, vy = (e.y - c.y) / g / 2;
+    gparts.length = 0;
+    gparts.push({ pts: G.line([0.5 - vx, 0.5 - vy], [0.5 + vx, 0.5 + vy], 14), secs: 0.5, label: slideWords(opts.want.dx, opts.want.dy), at: 0.5, dx: 0, dy: 1.6 });
+    guide.build(L.W, L.H); built = { x: c.x, y: c.y, ex: e.x, ey: e.y };
+  }
+  function tapped() { if (stage !== 'tap') return; stage = useWord ? 'word' : 'slide'; if (opts.onTap) opts.onTap(); }
+  function sayIt() { if (stage !== 'word') return; said = root.performance.now(); stage = 'slide'; if (opts.onWord) opts.onWord(); }
+  function judge(pts) {   /* also the way in for checks */
+    if (stage !== 'slide') return null;
+    var at = toSq(c), j = judgeSlide(pts.map(function (p) { var q = toSq(p); return { x: q.x, y: q.y, t: p.t }; }), at, 1, ease);
+    if (j.reason === 'tap') { if (guide) guide.clear(); return null; }
+    var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null, traced = !!(tr && tr.traced);
+    if (traced && j.verdict !== 'slide' && j.reason !== 'off') { j.verdict = 'slide'; j.dx = opts.want.dx; j.dy = opts.want.dy; j.shape = 'line'; }
+    if (j.verdict !== 'slide') {
+      if (guide) guide.miss();
+      return { verdict: 'missed', dx: 0, dy: 0, shape: j.shape, judge: j, traced: false, first: false, why: SLIDE_WHY[j.reason] || SLIDE_WHY.short };
+    }
+    var what = opts.blocked ? opts.blocked(j.dx, j.dy) : null;
+    if (what) return { verdict: 'blocked', dx: j.dx, dy: j.dy, shape: j.shape, legs: j.legs || null, judge: j, traced: traced, first: false, what: what,
+      why: ['It bumps into ' + what, 'It lands back where it was: ' + slideWords(j.dx, j.dy) + ' would put it on ' + what + '.'] };
+    if (guide) guide.hit(lv > 0 && mode !== 'always');
+    return { verdict: 'moved', dx: j.dx, dy: j.dy, shape: j.shape, legs: j.legs || null, right: opts.want ? j.dx === opts.want.dx && j.dy === opts.want.dy : null,
+      judge: j, traced: traced, first: firstCast('mobiliarbus'), why: null };
+  }
+  function begin(o) {   /* the lift, the drift and the soft thump (or the bump), from where the piece stands now */
+    out = o; stage = 'moving';
+    var f0 = toSq(c), ell = o.shape === 'L', across = !ell || o.legs[0][0] !== 0;
+    var corner = ell ? { x: f0.x + (across ? o.dx : 0), y: f0.y + (across ? 0 : o.dy) } : null;
+    var dist = Math.hypot(o.dx, o.dy);
+    move = { at: root.performance.now(), f0: f0, corner: corner, f1: { x: f0.x + o.dx, y: f0.y + o.dy }, bump: o.verdict === 'blocked',
+      lift: 250, drift: Math.min(1100, 450 + 120 * dist), settle: 200, thumped: false };
+  }
+  function along(m, k) {   /* the floor point k of the way along the move, legs in his order */
+    if (!m.corner) return { x: m.f0.x + (m.f1.x - m.f0.x) * k, y: m.f0.y + (m.f1.y - m.f0.y) * k };
+    var a = Math.hypot(m.corner.x - m.f0.x, m.corner.y - m.f0.y), b = Math.hypot(m.f1.x - m.corner.x, m.f1.y - m.corner.y), d = k * (a + b);
+    if (d <= a) return { x: m.f0.x + (m.corner.x - m.f0.x) * (a ? d / a : 0), y: m.f0.y + (m.corner.y - m.f0.y) * (a ? d / a : 0) };
+    return { x: m.corner.x + (m.f1.x - m.corner.x) * (b ? (d - a) / b : 0), y: m.corner.y + (m.f1.y - m.corner.y) * (b ? (d - a) / b : 0) };
+  }
+  function step(now) {
+    var m = move, t = now - m.at, k, lift, total;
+    if (m.bump) {
+      total = 650; var u = Math.min(1, t / total); k = Math.sin(Math.PI * u) * 0.3; lift = Math.sin(Math.PI * u);
+    } else {
+      total = m.lift + m.drift + m.settle;
+      var d = Math.max(0, Math.min(1, (t - m.lift) / m.drift)); k = d * d * (3 - 2 * d);
+      lift = t < m.lift ? t / m.lift : (t < m.lift + m.drift ? 1 : Math.max(0, 1 - (t - m.lift - m.drift) / m.settle));
+    }
+    var f = along(m, k), p = toScr(f);
+    if (opts.onDrift && !m.thumped) opts.onDrift({ x: p.x, y: p.y, k: k, lift: lift, dx: out.dx, dy: out.dy });
+    if (t >= total && !m.thumped) {
+      m.thumped = true; m.end = now; stage = 'done';
+      if (!m.bump && opts.onThump) opts.onThump(out);
+      L.later(out, m.bump ? 150 : 900);
+    }
+    if (!m.bump) drawArrow(L.cx, Math.min(1, t / total), now);
+  }
+  function drawArrow(cx, g, now) {   /* grows from the lift to the thump; whole, its legs counted */
+    var m = move, S = Math.min(L.W, L.H), fs = Math.round(Math.max(13, S * 0.034)), pts = [], i, n = 24;
+    for (i = 0; i <= n; i++) pts.push(toScr(along(m, g * i / n)));
+    cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = '#f3d27a'; cx.lineWidth = Math.max(3, S * 0.009);
+    cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke();
+    var a = pts[pts.length - 2], b = pts[pts.length - 1], ang = Math.atan2(b.y - a.y, b.x - a.x), h = S * 0.03;
+    if (Math.hypot(b.x - a.x, b.y - a.y) > 0.5) {
+      cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.moveTo(b.x, b.y);
+      cx.lineTo(b.x - h * Math.cos(ang - 0.45), b.y - h * Math.sin(ang - 0.45)); cx.lineTo(b.x - h * Math.cos(ang + 0.45), b.y - h * Math.sin(ang + 0.45)); cx.fill();
+    }
+    if (g >= 1) {   /* the two legs, counted: across then up or down (his order for an L; a line's legs dotted under it) */
+      var across = !m.corner || m.corner.y === m.f0.y, mid = across ? { x: m.f1.x, y: m.f0.y } : { x: m.f0.x, y: m.f1.y };
+      var p0 = toScr(m.f0), pm = toScr(mid), p1 = toScr(m.f1);
+      if (!m.corner && out.dx && out.dy) {
+        cx.strokeStyle = 'rgba(159,182,201,0.8)'; cx.lineWidth = 2; cx.setLineDash([5, 5]);
+        cx.beginPath(); cx.moveTo(p0.x, p0.y); cx.lineTo(pm.x, pm.y); cx.lineTo(p1.x, p1.y); cx.stroke(); cx.setLineDash([]);
+      }
+      cx.font = '600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 5; cx.fillStyle = '#f3d27a';
+      var h1 = across ? slideWords(out.dx, 0) : slideWords(0, out.dy), h2 = across ? slideWords(0, out.dy) : slideWords(out.dx, 0);
+      if (h1 !== 'no squares') cx.fillText(h1, (p0.x + pm.x) / 2 + (across ? 0 : fs * 2.4), (p0.y + pm.y) / 2 + (across ? -fs * 0.7 : fs * 0.35));
+      if (h2 !== 'no squares') cx.fillText(h2, (pm.x + p1.x) / 2 + (across ? fs * 2.4 : 0), (pm.y + p1.y) / 2 + (across ? fs * 0.35 : -fs * 0.7));
+      var k = Math.min(1, (now - m.end) / 600);   /* the soft thump's dust */
+      if (k < 1) { cx.strokeStyle = 'rgba(234,220,191,' + (0.6 * (1 - k)) + ')'; cx.lineWidth = 2; cx.shadowBlur = 0; cx.beginPath(); cx.arc(p1.x, p1.y, S * (0.04 + 0.05 * k), 0, 7); cx.stroke(); }
+    }
+    cx.restore();
+  }
+  function land() {   /* a way out while it drifts: it lands at once */
+    var p = toScr(move.f1);
+    if (opts.onDrift) opts.onDrift({ x: p.x, y: p.y, k: 1, lift: 0, dx: out.dx, dy: out.dy });
+    move.thumped = true; if (opts.onThump) opts.onThump(out);
+    L.finish(out);
+  }
+  L = layer({
+    size: function () { built = null; },
+    waiting: function () { return stage === 'tap' || stage === 'word' || stage === 'slide'; },
+    frame: function (now) {
+      if (stage === 'tap' || stage === 'word' || stage === 'slide') place();
+      if (guide && stage === 'slide') {
+        var e = wantEnd(); if (!built || Math.abs(built.x - c.x) + Math.abs(built.y - c.y) + Math.abs(built.ex - e.x) + Math.abs(built.ey - e.y) > 2) buildGuide();
+        guide.draw(L.cx, now, !!stroke);
+      }
+      if (useWord && (stage === 'word' || (stage === 'slide' && now - said < 1400))) drawWordCard(L.cx, card, PARTS, said, now);
+      if (move) step(now);
+      var pts = stroke || (trail && trail.pts), a = stroke ? 1 : (trail ? Math.max(0, 1 - (now - trail.at) / 350) : 0), cx = L.cx;
+      if (pts && pts.length > 1 && a > 0) {
+        cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + 0.55 * a + ')'; cx.lineWidth = 5;
+        cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
+      }
+    },
+    down: function (ev) {
+      var p = L.pt(ev);
+      took = false;
+      if (stage === 'tap') { if (onPiece(p)) { tapped(); took = true; } return; }
+      if (stage === 'word') { if (onCard(p)) { sayIt(); took = true; } return; }
+      if (stage !== 'slide' || active !== null) return;
+      active = ev.pointerId; stroke = [p]; trail = null; if (guide) guide.cover(p);
+      try { L.cv.setPointerCapture(ev.pointerId); } catch (e) {}
+    },
+    move: function (ev) {
+      if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+      var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+      list.forEach(function (e2) { var q = L.pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+    },
+    up: function (ev) {
+      if (ev.pointerId !== active || !stroke) return;
+      active = null; stroke.push(L.pt(ev)); var pts = stroke; stroke = null;
+      var o = judge(pts); if (!o) return;
+      trail = { pts: pts, at: root.performance.now() };
+      if (o.verdict === 'missed') { stage = 'done'; L.later(o, 350); return; }
+      begin(o);
+    },
+    off: function (p) { return !took && (stage === 'tap' || stage === 'word' || stage === 'slide') && !onPiece(p) && !(stage === 'word' && onCard(p)); },
+    cancel: function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } }
+  }, opts);
+  place();
+  return { done: L.done,
+    cancel: L.leave = function () { if (move && !move.thumped && !move.bump) land(); else L.finish(out && stage !== 'tap' && move ? out : { verdict: 'cancelled', dx: 0, dy: 0, judge: null, traced: false, first: false }); },
+    tap: tapped, say: sayIt,
+    judge: function (pts) { if (stage === 'tap') tapped(); if (stage === 'word') sayIt(); var o = judge(pts); if (o) { if (o.verdict === 'missed') { stage = 'done'; L.finish(o); } else begin(o); } return o; },
+    state: function () { return { stage: stage, said: !!said, card: card, at: c, reach: reach, move: move ? { dx: out.dx, dy: out.dy, bump: move.bump, thumped: move.thumped } : null }; } };
+}
+
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
-  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
+  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
   SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

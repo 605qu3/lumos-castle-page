@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=27"></script>
+<script src="spells.js?v=29"></script>
 <script src="guide.js?v=3"></script>
 <script>
 /* A lock and a page of ink in a room, a test page for the Charms lane (12 October 2026, fifth session; the owner is
@@ -45,6 +45,11 @@
    for trying), a first tap does nothing, the word's card comes up, a tap on it says the word, and the next tap on the
    hump swings it open by itself, the protractor and the chord stopping it where the gap equals his width. The witch
    is a stand-in side on; the corridor draws its own and calls witchHump() on 'opened'.
+   Since 13 October 2026 (twenty-sixth session, Q6's room callable): LumosSpells.moveThing on an armchair in a room seen
+   from above, its floor in squares: a tap on the chair, the word's card (Mo-bi-li-ar-bus), then one stroke to its new
+   square, a line or an L along the squares; the wall and the fireplace are in the way (it bumps and lands back), and
+   once it has moved a silver Sickle glints where it stood (the spellbook's idea: slide the armchair and find what fell
+   behind it). The room asks for 3 squares right; the traced guide draws that while he is new to it.
    window.lumosRoomSpells for checks. */
 (function () {
   'use strict';
@@ -57,7 +62,21 @@
     { id: 'feather', name: 'A feather', spell: 'leviosa' },
     { id: 'wand', name: 'A wand in its box', spell: null },
     { id: 'hand', name: 'Your hand', spell: null },
-    { id: 'hump', name: "The witch's hump", spell: null } ];
+    { id: 'hump', name: "The witch's hump", spell: null },
+    { id: 'chair', name: 'The armchair', spell: 'mobiliarbus' } ];
+  /* the armchair's room, seen from above: whole squares of floor, the wall along the top with the fireplace in it */
+  var chair = null, drift = null;
+  function room() {
+    var c = Math.round(S * 0.1), i0 = 1, i1 = Math.floor(W / c) - 1, j0 = Math.ceil(H * 0.2 / c), j1 = Math.floor(H * 0.64 / c);
+    return { c: c, i0: i0, i1: i1, j0: j0, j1: j1, fire: [i1 - 3, i1 - 2], start: { i: i0 + 1, j: j0 + 1 } };
+  }
+  function sqMid(i, j) { var c = room().c; return { x: (i + 0.5) * c, y: (j + 0.5) * c }; }
+  function inTheWay(dx, dy) {
+    var R = room(), i = chair.i + dx, j = chair.j + dy;
+    if (i < R.i0 || i >= R.i1 || j < R.j0 || j >= R.j1) return 'the wall';
+    if (j === R.j0 && i >= R.fire[0] && i <= R.fire[1]) return 'the fireplace';
+    return null;
+  }
   var hump = { deg: 0 }, note = false;   /* the lid's angle, and whether he holds the twins' note (req 179) */
   function humpGeo() {
     var x = W / 2, y = H * 0.52, hinge = { x: x + S * 0.2, y: y }, edge = { x: x - S * 0.12, y: y - S * 0.12 };
@@ -90,7 +109,7 @@
   function menu() {
     panel.innerHTML = '';
     THINGS.forEach(function (t, i) { panel.appendChild(btn(t.name, function () { choose(i); }, i === thing ? 'on' : '')); });
-    var knows = !T.spell || LumosSpells.learned(T.spell), word = { alohomora: 'Alohomora', aparecium: 'Aparecium', leviosa: 'Leviosa' }[T.spell];
+    var knows = !T.spell || LumosSpells.learned(T.spell), word = { alohomora: 'Alohomora', aparecium: 'Aparecium', leviosa: 'Leviosa', mobiliarbus: 'Mobiliarbus' }[T.spell];
     if (T.spell) panel.appendChild(btn('Knows ' + word + ': ' + (knows ? 'yes' : 'no'), function () {
       try { if (knows) localStorage.removeItem('lumos.spells.learned.' + T.spell); else LumosSpells.learn(T.spell); } catch (e) {}
       menu();
@@ -98,6 +117,7 @@
     panel.appendChild(btn('Cast', cast, 'go'));
     if (T.id === 'hump') panel.appendChild(btn("Holds the twins' note: " + (note ? 'yes' : 'no'), function () { note = !note; menu(); }));
     if (opened.drawer || opened.notice || hump.deg) panel.appendChild(btn('Shut it again', function () { opened = { drawer: 0, notice: 0 }; hump.deg = 0; say('Shut, and blank again.'); menu(); }));
+    if (T.id === 'chair' && chair && (chair.i !== room().start.i || chair.j !== room().start.j)) panel.appendChild(btn('Put it back', function () { chair = room().start; say('The armchair is back by the wall.'); menu(); }));
   }
   function choose(i) {
     if (asking) { var old = asking; asking = null; old.cancel(); }   /* its answer is dropped: a new thing is chosen */
@@ -107,6 +127,7 @@
     if (T.id === 'wand') { say('A wand in its box, on the counter. How long is it?'); return; }
     if (T.id === 'hand') { say("Ollivander's tape, on the counter. How wide is your hand?"); return; }
     if (T.id === 'hump') { say('A statue of a humpbacked, one-eyed witch, on her plinth.'); return; }
+    if (T.id === 'chair') { chair = chair || room().start; drift = null; say('A squashy armchair by the fire. Something rolled under it once.'); return; }
     say(T.id === 'drawer' ? 'A drawer in the books table, with a small brass keyhole and a label: <i>CONFISCATED. Prefects only. P. Weasley</i>.'
       : T.id === 'door' ? 'A heavy door with a brass keyhole.' : 'A notice pinned to the board. It is blank.');
   }
@@ -115,12 +136,21 @@
     if (T.spell && !LumosSpells.learned(T.spell)) {
       if (T.id === 'feather') { feather.mode = 'twitch'; feather.t0 = performance.now(); say('It lies there. (Learn Wingardium Leviosa in Charms.)'); }
       else if (T.id === 'notice') say('Still blank. A wizard who knows Aparecium might read it. (Learn it in Charms.)');
+      else if (T.id === 'chair') { shake = performance.now(); say('You push. It does not budge. (Learn Mobiliarbus in Charms.)'); }
       else { rattle = performance.now(); say('It rattles. Locked. (Learn Alohomora in Charms.)'); }
       return;
     }
     if (T.id === 'hump' && !note) { shake = performance.now(); say('Cold stone. Nothing happens. (Find the twins\' note first: it gives the word.)'); return; }
     panel.innerHTML = ''; panel.appendChild(btn('Step back', function () { if (asking) asking.cancel(); }));
-    if (T.id === 'hump') {
+    if (T.id === 'chair') {
+      say('Tap the armchair with your wand.');
+      asking = LumosSpells.moveThing({ at: function () { return sqMid(chair.i, chair.j); }, cell: function () { return room().c; },
+        reach: function () { return room().c * 0.6; }, want: { dx: 3, dy: 0 }, blocked: inTheWay,
+        onTap: function () { say('Tap the word as you say it: <i>Mo-bi-li-ar-bus</i>.'); },
+        onWord: function () { say('<i>Mobiliarbus...</i> Now draw from the chair to its new square: <b>3 right</b>. A straight line, or two legs along the squares.'); },
+        onDrift: function (p) { drift = p; },
+        onThump: function (o) { chair = { i: chair.i + o.dx, j: chair.j + o.dy }; drift = null; } });
+    } else if (T.id === 'hump') {
       say('Tap her hump with your wand.');
       asking = LumosSpells.openHump({ hump: function () { return humpGeo().spot; }, r: function () { return humpGeo().r; },
         hinge: function () { return humpGeo().hinge; }, edge: function () { return humpGeo().edge; },
@@ -170,6 +200,15 @@
         else say('You step back; the tape rolls itself up.');
         menu(); return;
       }
+      if (T.id === 'chair') {
+        drift = null;
+        var R0 = room().start, gone = chair.i !== R0.i || chair.j !== R0.j;
+        if (r.verdict === 'moved') say('<b>Mobiliarbus!</b> It rises a few inches, drifts ' + LumosSpells.slideWords(r.dx, r.dy) + (r.shape === 'L' ? ' (an L)' : '') + ' and lands with a soft thump.'
+          + (r.right === false ? ' Not quite the 3 right the room wanted.' : '') + (gone ? ' Something glints where it stood: a silver Sickle.' : ''));
+        else if (r.verdict === 'blocked' || r.verdict === 'missed') { shake = performance.now(); say('<b>' + r.why[0] + '.</b> ' + r.why[1]); }
+        else say('You step back; it stays where it is.');
+        menu(); return;
+      }
       if (T.id === 'hump') {
         if (r.verdict === 'opened') say('<b>Dissendium!</b> Open at ' + r.degrees + '\u00b0, a gap of ' + r.gap + ' cm: wide enough for you.' + (r.first ? ' (Her first time open: the corridor tells the castle, witchHump().)' : ''));
         else { hump.deg = 0; say('You step back; she stays shut.'); }
@@ -192,7 +231,7 @@
     if (shake) { var t2 = (now - shake) / 600; if (t2 > 1) shake = null; else jig = Math.sin(t2 * 50) * S * 0.004 * (1 - t2); }
     cx.save(); cx.translate(jig, 0);
     if (T.id === 'drawer') drawDrawer(now); else if (T.id === 'door') drawDoor(); else if (T.id === 'notice') drawNotice();
-    else if (T.id === 'feather') drawFeather(now); else if (T.id === 'hump') drawHump(); else drawCounter(now);
+    else if (T.id === 'feather') drawFeather(now); else if (T.id === 'hump') drawHump(); else if (T.id === 'chair') drawRoom(now); else drawCounter(now);
     cx.restore();
     requestAnimationFrame(frame);
   }
@@ -286,6 +325,34 @@
     cx.fillStyle = '#7a7480'; lid(hump.deg); cx.fill();
     cx.strokeStyle = '#2a262e'; cx.lineWidth = 2; lid(hump.deg); cx.stroke();
   }
+  /* the armchair's room from above: boards in squares, the wall and the fireplace, the chair (lifted while it drifts),
+     and the Sickle where it first stood, once it has moved */
+  function drawRoom(now) {
+    var R = room(), c = R.c, i, j;
+    for (j = R.j0; j < R.j1; j++) for (i = R.i0; i < R.i1; i++) {
+      cx.fillStyle = (i + j) % 2 ? '#4a3322' : '#553b27'; cx.fillRect(i * c, j * c, c, c);
+    }
+    cx.strokeStyle = 'rgba(234,220,191,0.12)'; cx.lineWidth = 1;
+    for (i = R.i0; i <= R.i1; i++) { cx.beginPath(); cx.moveTo(i * c, R.j0 * c); cx.lineTo(i * c, R.j1 * c); cx.stroke(); }
+    for (j = R.j0; j <= R.j1; j++) { cx.beginPath(); cx.moveTo(R.i0 * c, j * c); cx.lineTo(R.i1 * c, j * c); cx.stroke(); }
+    cx.fillStyle = '#6a2a22'; cx.fillRect((R.i0 - 0.3) * c, (R.j0 - 0.7) * c, (R.i1 - R.i0 + 0.6) * c, 0.7 * c);   /* the wall */
+    cx.fillStyle = '#8a8076'; cx.fillRect(R.fire[0] * c, R.j0 * c, 2 * c, c);   /* the hearth's stones */
+    cx.fillStyle = '#1a0f0a'; cx.fillRect((R.fire[0] + 0.25) * c, (R.j0 - 0.6) * c, 1.5 * c, 0.6 * c);
+    var fl = 0.5 + 0.5 * Math.sin(now / 160);
+    cx.fillStyle = 'rgba(240,140,50,' + (0.6 + 0.3 * fl) + ')'; cx.beginPath(); cx.ellipse((R.fire[0] + 1) * c, (R.j0 - 0.2) * c, 0.45 * c, (0.18 + 0.05 * fl) * c, 0, 0, 7); cx.fill();
+    var st = R.start;
+    if (chair && (chair.i !== st.i || chair.j !== st.j)) {   /* the Sickle where it stood */
+      var m = sqMid(st.i, st.j); cx.fillStyle = '#d9dbe6'; cx.beginPath(); cx.arc(m.x, m.y, c * 0.13, 0, 7); cx.fill();
+      cx.strokeStyle = '#8a8c96'; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(m.x, m.y, c * 0.09, 0, 7); cx.stroke();
+    }
+    var p = drift ? { x: drift.x, y: drift.y } : sqMid(chair.i, chair.j), up = drift ? drift.lift : 0;
+    cx.fillStyle = 'rgba(0,0,0,' + (0.35 - 0.15 * up) + ')'; cx.beginPath(); cx.ellipse(p.x, p.y + c * 0.06, c * (0.42 - 0.04 * up), c * (0.36 - 0.04 * up), 0, 0, 7); cx.fill();
+    var y = p.y - up * c * 0.18, w = c * 0.78;   /* lifted a few inches */
+    cx.fillStyle = '#8a2a24'; cx.beginPath(); cx.roundRect(p.x - w / 2, y - w / 2, w, w, c * 0.12); cx.fill();
+    cx.fillStyle = '#6e1f1b'; cx.fillRect(p.x - w / 2, y - w / 2, w, w * 0.24);   /* the back */
+    cx.fillRect(p.x - w / 2, y - w / 2, w * 0.18, w); cx.fillRect(p.x + w / 2 - w * 0.18, y - w / 2, w * 0.18, w);   /* the arms */
+    cx.fillStyle = '#a3362e'; cx.beginPath(); cx.roundRect(p.x - w * 0.3, y - w * 0.24, w * 0.6, w * 0.66, c * 0.08); cx.fill();   /* the cushion */
+  }
   /* the counter: a wand in its box, eleven inches as painted, or a bare counter for his hand; the last reading's tape */
   function drawCounter(now) {
     cx.fillStyle = '#3a2a1c'; cx.fillRect(0, H * 0.3, W, H * 0.45);
@@ -307,7 +374,8 @@
     judge: function (pts) { return asking && asking.judge ? asking.judge(pts) : null; },
     taps: function (list) { return asking && asking.taps ? asking.taps(list) : null; },
     word: function () { return asking && asking.say ? asking.say() : null; },
-    note: function (v) { note = !!v; menu(); }, hump: function () { return { deg: Math.round(hump.deg * 10) / 10, note: note, offer: asking && asking.state ? asking.state() : null }; },
+    note: function (v) { note = !!v; menu(); },
+    chair: function () { var R = room(); return { at: chair, start: R.start, c: R.c, i0: R.i0, i1: R.i1, j0: R.j0, j1: R.j1, fire: R.fire, drift: drift, offer: asking && asking.state ? asking.state() : null }; }, hump: function () { return { deg: Math.round(hump.deg * 10) / 10, note: note, offer: asking && asking.state ? asking.state() : null }; },
     steer: function (dx, dy) { return cur && cur.steer ? cur.steer(dx, dy) : null; },
     measure: function (a, b) { return asking && asking.measure ? asking.measure(a, b) : null; },
     stepBack: function () { if (cur) cur.cancel(); else if (asking) asking.cancel(); },
