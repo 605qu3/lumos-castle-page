@@ -2030,7 +2030,9 @@ function onSofa(lx, lz) {                                         /* a point in 
   return [SOFA_AT.x + c * lx + sn * lz, SOFA_AT.z - sn * lx + c * lz];
 }
 function wallAt(deg, r) { var t = deg * Math.PI / 180; return { x: r * Math.sin(t), z: r * Math.cos(t) }; }
-var DESK_AT = wallAt(123, 5.26), DESK_CHAIR_AT = wallAt(125.5, 4.6);   /* the desk's back 0.3 m off the wall, as before */
+/* the desk out from under the stair (Godric's Q71, option 71.1, 12 October 2026): r 5.26 to 4.8, its back 0.76 m off
+   the wall, the chair with it (4.6 to 4.15) */
+var DESK_AT = wallAt(123, 4.8), DESK_CHAIR_AT = wallAt(125.5, 4.15);
 /* the fireside pair (Godric, 6.54 pm, on Q8: "still need to move wingbacks closer together for realistic positioning"):
    the left armchair and the wingback either side of the hearth's axis at one depth, each turned a little toward the
    other and the fire, as far apart as lets the whole fire show between them at rest and its right part past the left
@@ -5338,9 +5340,9 @@ function keyDoorLock() { return screenOf(keyholeAt()); }
 /* ---------- the list on the little door (req 176; Magic for the boys, "Alohomora in the castle", B6 and *The list,
    written*, docs/archive/magic-to-2026-10-12.md; Godric, 12 October 2026, 2.56 pm, option 1: "let's get comical and
    extensive with our list of failed attempts") ----------
-   One long strip of parchment pinned to the door's planks left of the lock, too long for the door: it runs off the
-   door's foot and out over the flagstones to a loose roll, more pieces tied on as it grew. In grey until it is drawn
-   (a generate with Godric's yes); its lines are written by code, each in its writer's hand, never drawn into the
+   Three pieces of paper tied end on down the door's planks left of the lock, oldest at the top, too long for the
+   door: the last runs off the door's foot onto the flagstones (Q66's placement, below, LIST_ART). The paper is drawn
+   (Godric's pick for Q66); its lines are written by code, each in its writer's hand, never drawn into the
    picture. A tap on it brings it to his hand ('door list'); a drag up or down scrolls it; a tap, or Back, puts it back.
    His own line at the foot waits blank until his first Alohomora on the door (Events' req 177): a written line the
    runtime keeps at 'door list' is written there in his hand. The hands are stand-ins from the page's faces, this
@@ -5389,37 +5391,83 @@ var DOOR_LIST = [
 ];
 var LIST_FACE = { clerk: F.clerk, casual: F.casual, small: F.small, printSC: F.printSC, child: F.child, percy: F.percy, his: F.child };
 var LIST_INK = { ink: '#2a2520', pencil: '#6f6b64', brown: '#4f3f2e', faded: '#7a6e60' };
-var LIST = { w: 0.13, h: 0.2, x: -0.14, top: 0.93, cw: 600, size: 30, margin: 34, scroll: 0, scrollT: 0, max: 0,
-  items: null, key: '', lift: null, k: 0 };
+var LIST = { w: 0.13, h: 0.2, x: -0.14, top: 0.80, turn: 0.22, cw: 600, size: 25, margin: 60, lead: 1.22, gap: 8, scroll: 0, scrollT: 0, max: 0,
+  items: null, key: '', lift: null, k: 0, over: 0, placed: null, check: 0 };
 LIST.ch = Math.round(LIST.cw * LIST.h / LIST.w);
-/* in the room, a stand-in: the strip on the door, the run over the flagstones and the roll, scribbled, not written */
-function listScribble(g, w, h, seed, head) {
-  g.fillStyle = '#c8c3b9'; g.fillRect(0, 0, w, h);
-  g.fillStyle = '#b7b1a6'; g.fillRect(0, 0, 3, h); g.fillRect(w - 3, 0, 3, h);
-  var y = head ? 70 : 18, s = seed;
-  if (head) { g.fillStyle = '#5a4c3c'; g.fillRect(18, 22, w - 36, 7); g.fillRect(30, 38, w - 60, 6); }
-  while (y < h - 12) {
-    s = (s * 9301 + 49297) % 233280;
-    var len = 40 + (s / 233280) * (w - 70), dark = (s % 3) ? '#7d776f' : '#5f5348';
-    g.fillStyle = dark; g.fillRect(14, y, len, 3);
-    y += 13 + (s % 7);
-    if (s % 11 === 0) { g.fillStyle = '#8f887d'; g.fillRect(0, y, w, 5); g.fillStyle = '#4a4440'; g.fillRect(w * 0.42, y - 4, 12, 13); y += 18; }   /* a piece tied on */
-  }
-}
-var listDoorCanvas = makeCanvas(160, 1140), listFloorCanvas = makeCanvas(160, 520);
-listScribble(listDoorCanvas.getContext('2d'), 160, 1140, 7, true);
-listScribble(listFloorCanvas.getContext('2d'), 160, 520, 31, false);
-var listStrip = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, LIST.top), new THREE.MeshStandardMaterial({ map: tex(listDoorCanvas), roughness: 0.95 }));
+/* the writing at size 25, five sixths of the 30 it had on the grey strip, so every line and his own fit on the three
+   drawn pieces with a little room at the foot (Q66); a fourth piece would let it grow back */
+/* the drawing (Godric's pick for Q66, 12 October 2026): assets/layers/door-list.png, one row of three pieces, oldest
+   first, each cell 450 x 1241 px, 0.13 x 0.3585 m (3462 px a metre), its string rising from a hole near its top and
+   nothing round the paper. Tied end on down the door, oldest at the top: each next cell's top `lap` above the foot of
+   the one before, its string lying over that foot, drawn over it; about 0.93 m in all. LIST.top is piece 0's cell top
+   above the flagstones (listPlace(top) moves it): at 0.80 the last piece runs about 0.13 m past the door's foot and
+   lies on the flags, bent there, turned LIST.turn off square. paper is where each piece's paper starts and ends below
+   its cell's top; the lines start `text` below it, clear of the string and the hole, and stop at `ends`, clear of the
+   next piece's string (the last piece, its own foot). room is the room's textures' width in pixels. */
+var LIST_ART = { url: '../assets/layers/door-list.png', px: 450, cell: 1241 / 3462, lap: 0.075, paper: [0.071, 0.354],
+  text: 0.105, ends: [0.2785, 0.2785, 0.342], room: 300 };
+var listImg = new Image();
+listImg.onload = function () { listPlace(); };
+listImg.src = LIST_ART.url;
+function listCellTop(i) { return i * (LIST_ART.cell - LIST_ART.lap); }   /* metres down from piece 0's cell top */
+function listLen() { return listCellTop(2) + LIST_ART.cell; }
+/* in the room: the strip on the door's face down to the flagstones, the rest lying on them bent at the door's foot,
+   each a canvas cut out round the paper and its strings (alphaTest), with a soft shadow of its own outline under it so
+   nothing floats; both are drawn by listPaint at the room's width, the lines written on as in his hand */
 var LIST_ON = keyDoorFace(LIST.x);   /* on the bent door's face, 4 mm proud, turned with it */
-listStrip.position.set(LIST_ON.x, LIST.top / 2 - KEYDOOR.h / 2, LIST_ON.z + 0.004); listStrip.rotation.y = LIST_ON.yaw; listStrip.receiveShadow = true;
-keyDoor.add(listStrip); listStrip.name = 'door-list';
+function listMat() { return new THREE.MeshStandardMaterial({ map: blankTex, roughness: 0.95, alphaTest: 0.5 }); }
+function listShadowMat() { return new THREE.MeshBasicMaterial({ map: blankTex, transparent: true, opacity: 0.75, depthWrite: false, color: 0x000000 }); }
+var listStrip = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, 0.1), listMat());
+listStrip.rotation.y = LIST_ON.yaw; listStrip.receiveShadow = true;
+var listStripShade = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, 0.1), listShadowMat());
+listStripShade.rotation.y = LIST_ON.yaw;
+keyDoor.add(listStripShade); keyDoor.add(listStrip); listStrip.name = 'door-list';
 var listRun = new THREE.Group();
-listRun.position.set(LIST_ON.x, -KEYDOOR.h / 2 + 0.002, LIST_ON.z + 0.004); listRun.rotation.y = 0.22 + LIST_ON.yaw; keyDoor.add(listRun);
-var listFloor = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, 0.42), new THREE.MeshStandardMaterial({ map: tex(listFloorCanvas), roughness: 0.95 }));
-listFloor.rotation.x = -Math.PI / 2; listFloor.position.set(0, 0, 0.21); listFloor.receiveShadow = true; listRun.add(listFloor);
+listRun.position.set(LIST_ON.x, -KEYDOOR.h / 2 + 0.002, LIST_ON.z + 0.004); listRun.rotation.y = LIST.turn + LIST_ON.yaw; keyDoor.add(listRun);
+var listFloor = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, 0.1), listMat());
+listFloor.rotation.x = -Math.PI / 2; listFloor.receiveShadow = true; listRun.add(listFloor);
+var listFloorShade = new THREE.Mesh(new THREE.PlaneGeometry(LIST.w, 0.1), listShadowMat());
+listFloorShade.rotation.x = -Math.PI / 2; listRun.add(listFloorShade);
 var listRoll = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, LIST.w + 0.004, 18), new THREE.MeshStandardMaterial({ color: '#bdb8ae', roughness: 0.95 }));
-listRoll.rotation.z = Math.PI / 2; listRoll.position.set(0, 0.03, 0.44); listRoll.castShadow = true; listRun.add(listRoll);
-tappables.push(listStrip, listFloor, listRoll);
+listRoll.rotation.z = Math.PI / 2; listRoll.position.set(0, 0.03, 0.44); listRoll.visible = false; listRun.add(listRoll);   /* the grey stand-in's roll, no longer shown */
+tappables.push(listStrip, listFloor);
+/* a soft dark copy of a canvas's outline, `pad` pixels wider each way and nudged (dx, dy): drawn small and enlarged,
+   which blurs it on every browser */
+function listShadowCanvas(src, pad, dx, dy) {
+  var W = src.width + 2 * pad, H = src.height + 2 * pad, q = 9;
+  var small = makeCanvas(Math.ceil(W / q), Math.ceil(H / q)), sg = small.getContext('2d');
+  sg.drawImage(src, (pad + dx) / q, (pad + dy) / q, src.width / q, src.height / q);
+  var c = makeCanvas(W, H), g = c.getContext('2d');
+  g.imageSmoothingEnabled = true; g.drawImage(small, 0, 0, W, H);
+  g.globalCompositeOperation = 'source-in'; g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  return c;
+}
+function listSetMap(mesh, c) { if (mesh.material.map !== blankTex) mesh.material.map.dispose(); mesh.material.map = tex(c); mesh.material.needsUpdate = true; }
+function listSetGeo(mesh, w, h) { mesh.geometry.dispose(); mesh.geometry = new THREE.PlaneGeometry(w, h); }
+/* piece 0's cell top `top` metres above the flagstones (0.80 unless given): redraws both parts and sets them in place */
+function listPlace(top) {
+  if (top != null) LIST.top = top;
+  listLayout();
+  var len = listLen(), m = LIST.cw / LIST.w, rpm = LIST_ART.room / LIST.w, rk = LIST_ART.room / LIST.cw;
+  var pad = 18, pm = pad / rpm;                        /* the shadow's margin, in pixels and metres */
+  var foot = Math.max(0.002, LIST.top - len), hs = LIST.top - foot;   /* the strip runs down to the floor, or to its own end */
+  var dc = makeCanvas(LIST_ART.room, Math.round(hs * rpm));
+  listPaint(dc.getContext('2d'), rk, 0, dc.height / rk, true);
+  listSetGeo(listStrip, LIST.w, hs); listSetMap(listStrip, dc);
+  listStrip.position.set(LIST_ON.x, (LIST.top + foot) / 2 - KEYDOOR.h / 2, LIST_ON.z + 0.004);
+  listSetGeo(listStripShade, LIST.w + 2 * pm, hs + 2 * pm); listSetMap(listStripShade, listShadowCanvas(dc, pad, 6, 9));
+  listStripShade.position.set(LIST_ON.x, listStrip.position.y, LIST_ON.z + 0.002);
+  var e = LIST.w / 2 * Math.tan(LIST.turn), lf = len - hs;   /* turned, its near corner meets the door and the other runs under it */
+  listRun.visible = lf > 0.004;
+  if (listRun.visible) {
+    var L = lf + e, fc = makeCanvas(LIST_ART.room, Math.round(L * rpm));
+    listPaint(fc.getContext('2d'), rk, (hs - e) * m, fc.height / rk, true);
+    listSetGeo(listFloor, LIST.w, L); listSetMap(listFloor, fc); listFloor.position.set(0, 0, L / 2 - e);
+    listSetGeo(listFloorShade, LIST.w + 2 * pm, L + 2 * pm); listSetMap(listFloorShade, listShadowCanvas(fc, pad, 6, 7));
+    listFloorShade.position.set(0, -0.001, L / 2 - e);
+  }
+  LIST.placed = LIST.key;
+}
 function listPart(o) { return o === listStrip || o === listFloor || o === listRoll; }
 /* in his hand: a window on the whole strip, redrawn as it scrolls */
 var listCanvas = makeCanvas(LIST.cw, LIST.ch), listTex = tex(listCanvas);
@@ -5439,41 +5487,56 @@ function listWrap(g, text, width) {
   return lines;
 }
 function listFont(h, size) { return h === 'fellI' ? 'italic ' + size + 'px "IM Fell English", Georgia, serif' : size + 'px ' + LIST_FACE[h]; }
+/* the lines flow down the three pieces in the hand's pixels (LIST.cw across 0.13 m), each piece's band from below its
+   hole to above the next piece's string, the last to its foot; the old ties' flags are the drawn strings' now and
+   draw nothing. His line (blank, or written) goes to the last piece's foot when there is room; LIST.over is how far
+   the lines run past it, in the hand's pixels (0 when they fit) */
 function listLayout() {
-  var g = listCanvas.getContext('2d'), y = 46, out = [], W = LIST.cw - 2 * LIST.margin;
+  var g = listCanvas.getContext('2d'), m = LIST.cw / LIST.w, out = [], W = LIST.cw - 2 * LIST.margin;
+  var bands = [0, 1, 2].map(function (i) { return [(listCellTop(i) + LIST_ART.text) * m, (listCellTop(i) + LIST_ART.ends[i]) * m]; });
+  var b = 0, y = bands[0][0], his = -1;
+  function room(h) { while (b < bands.length - 1 && y + h > bands[b][1]) { b++; y = bands[b][0]; } }   /* past a band's end, on to the next piece */
   var mine = listMine(), all = DOOR_LIST.concat(mine.map(function (m) { return { t: m.text, h: 'his', ink: 'pencil', his: true }; }));
-  if (!mine.length) all = all.concat([{ blank: true }]);
+  if (!mine.length) all = all.concat([{ blank: true, his: true }]);
   all.forEach(function (e) {
-    if (e.tie) { out.push({ tie: true, y: y + 6 }); y += 34; }
-    if (e.blank) { out.push({ blank: true, y: y + 30 }); y += 60; return; }
+    if (e.his && his < 0) his = out.length;
+    if (e.blank) { room(60); out.push({ blank: true, y: y + 30 }); y += 60; return; }
     var size = e.head ? LIST.size * 1.12 : LIST.size, text = e.caps ? e.t.toUpperCase() : e.t;
     g.font = listFont(e.h, size);
     listWrap(g, text, e.head ? W : W - 6).forEach(function (ln, i) {
+      room(size * 1.1);
       out.push({ text: ln, x: e.head ? LIST.cw / 2 : LIST.margin + (i ? 22 : 0), y: y, h: e.h, size: size, ink: e.ink, head: e.head });
-      y += size * 1.32;
+      y += size * LIST.lead;
     });
-    if (e.sub) { g.font = listFont(e.h, size * 0.92); listWrap(g, e.sub, W - 60).forEach(function (ln) { out.push({ text: ln, x: LIST.margin + 54, y: y, h: e.h, size: size * 0.92, ink: e.ink }); y += size * 1.25; }); }
-    y += e.head ? 22 : 12;
+    if (e.sub) { g.font = listFont(e.h, size * 0.92); listWrap(g, e.sub, W - 60).forEach(function (ln) { room(size); out.push({ text: ln, x: LIST.margin + 54, y: y, h: e.h, size: size * 0.92, ink: e.ink }); y += size * (LIST.lead - 0.07); }); }
+    y += e.head ? 18 : LIST.gap;
   });
-  LIST.items = out; LIST.max = Math.max(0, y + 40 - LIST.ch);
+  var foot = bands[2][1];
+  if (his >= 0 && b === 2 && y < foot && out[his].y >= bands[2][0]) for (var i = his; i < out.length; i++) out[i].y += foot - y;
+  LIST.over = Math.max(0, Math.round(y - foot)); LIST.room = Math.round(foot - y);   /* room left at the foot, before his line is moved down to it */
+  LIST.items = out; LIST.max = Math.max(0, Math.max(listLen() * m, y + 40) - LIST.ch);
   LIST.key = mine.map(function (m) { return m.key + m.t; }).join('|');
 }
-function listDraw() {
-  var g = listCanvas.getContext('2d'), W = LIST.cw, H = LIST.ch, s = Math.round(LIST.scroll);
-  g.fillStyle = '#d6d1c7'; g.fillRect(0, 0, W, H);
-  g.fillStyle = '#c4beb3'; g.fillRect(0, 0, 6, H); g.fillRect(W - 6, 0, 6, H);
-  if (s < 4) { g.fillStyle = '#4a4440'; g.beginPath(); g.arc(W / 2, 16, 7, 0, Math.PI * 2); g.fill(); }   /* the pin */
+/* the pieces and the lines on them, from `from` down `H` (both in the hand's pixels), scaled by k; with clip the ink
+   goes only on the paper. Grey pieces until the drawing loads. */
+function listPaint(g, k, from, H, clip) {
+  var m = LIST.cw / LIST.w, W = LIST.cw;
+  g.save(); g.scale(k, k); g.translate(0, -from);
+  for (var i = 0; i < 3; i++) {
+    var y0 = listCellTop(i) * m, ch = LIST_ART.cell * m;
+    if (y0 > from + H || y0 + ch < from) continue;
+    if (listImg.naturalWidth) g.drawImage(listImg, i * LIST_ART.px, 0, LIST_ART.px, listImg.naturalHeight, 0, y0, W, ch);
+    else {
+      var p0 = y0 + LIST_ART.paper[0] * m, p1 = y0 + LIST_ART.paper[1] * m;
+      g.fillStyle = '#d6d1c7'; g.fillRect(8, p0, W - 16, p1 - p0);
+      g.fillStyle = '#c4beb3'; g.fillRect(8, p0, 6, p1 - p0); g.fillRect(W - 14, p0, 6, p1 - p0);
+    }
+  }
+  if (clip) g.globalCompositeOperation = 'source-atop';
   g.textBaseline = 'top';
   LIST.items.forEach(function (it) {
-    var y = it.y - s;
-    if (y < -80 || y > H + 40) return;
-    if (it.tie) {                                     /* a piece tied on: the overlap and its string */
-      g.fillStyle = '#c3bdb2'; g.fillRect(0, y - 3, W, 16);
-      g.strokeStyle = '#5b544c'; g.lineWidth = 3;
-      g.beginPath(); g.moveTo(0, y + 5); g.lineTo(W, y + 5); g.stroke();
-      g.beginPath(); g.ellipse(W * 0.46, y + 5, 14, 7, -0.4, 0, Math.PI * 2); g.ellipse(W * 0.54, y + 5, 14, 7, 0.4, 0, Math.PI * 2); g.stroke();
-      return;
-    }
+    var y = it.y;
+    if (y < from - 80 || y > from + H + 40) return;
     if (it.blank) {                                   /* his line, waiting */
       g.strokeStyle = '#8a857d'; g.lineWidth = 2; g.setLineDash([10, 8]);
       g.beginPath(); g.moveTo(LIST.margin, y); g.lineTo(W - LIST.margin, y); g.stroke(); g.setLineDash([]);
@@ -5494,10 +5557,20 @@ function listDraw() {
     g.font = listFont(it.h, it.size);
     g.fillText(it.text, it.x, y);
   });
+  g.restore();
+}
+function listDraw() {
+  var g = listCanvas.getContext('2d'), W = LIST.cw, H = LIST.ch, s = Math.round(LIST.scroll);
+  g.clearRect(0, 0, W, H);
+  listPaint(g, 1, s, H, false);
+  g.globalCompositeOperation = 'source-atop';         /* the fades at the window's ends, on the paper only */
   if (s > 2) { var gt = g.createLinearGradient(0, 0, 0, 40); gt.addColorStop(0, 'rgba(120,114,105,0.55)'); gt.addColorStop(1, 'rgba(120,114,105,0)'); g.fillStyle = gt; g.fillRect(0, 0, W, 40); }
   if (s < LIST.max - 2) { var gb = g.createLinearGradient(0, H - 40, 0, H); gb.addColorStop(0, 'rgba(120,114,105,0)'); gb.addColorStop(1, 'rgba(120,114,105,0.55)'); g.fillStyle = gb; g.fillRect(0, H - 40, W, 40); }
+  g.globalCompositeOperation = 'source-over';
   listTex.needsUpdate = true;
 }
+listPlace();
+whenFontsReady(4500).then(function () { listPlace(); });   /* the hands drawn once their faces are in */
 var listFrom = new THREE.Vector3(), listFromQ = new THREE.Quaternion(), listPose = { spec: { w: LIST.w, h: LIST.h } };
 function liftList() {
   if (mode !== 'room' || held) return;
@@ -5513,7 +5586,10 @@ function returnList() {
   LIST.lift = { t: 0, dur: 0.5, dir: -1 };
 }
 function updateList(dt, t) {
-  if (!listHand.visible) return;
+  if (!listHand.visible) {                            /* a line of his written since: the room's strip again, checked once a second */
+    if ((LIST.check -= dt) < 0) { LIST.check = 1; if (listMine().map(function (m) { return m.key + m.t; }).join('|') !== LIST.placed) listPlace(); }
+    return;
+  }
   handPose(listPose, t, _p, _hq);
   _up.set(0, 1, 0).applyQuaternion(camera.quaternion);
   _p.addScaledVector(_up, PIN_INSET - LIST.h / 2);    /* held at the middle of the screen, not hung from a pin */
@@ -6304,6 +6380,7 @@ function tapHits(cx, cy) {
     if (h.object === books.openCard) return books.openCard.visible && alphaSolid(books.oain, h.uv);
     if (h.object === deskChair) return DESK_STOP.sat < 0.5;            /* he sits in it at the desk */
     if (h.object === candle.mesh) return candle.mesh.visible;
+    if (h.object === listFloor) return listRun.visible;               /* none on the flags when it ends on the door */
     var hw = h.object === homework.essay ? 0 : h.object === homework.bottle ? 1 : h.object === homework.quill ? 2 : -1;
     if (hw >= 0) return !homework.alpha || !h.uv || alphaSolid(homework.alpha, { x: (hw + h.uv.x) / 3, y: h.uv.y });   /* three cells of one sheet */
     return !h.object.userData.paper || h.object.visible;
@@ -7140,7 +7217,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
