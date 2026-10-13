@@ -563,6 +563,89 @@ function judgeRing(points, shape, ease) {
   out.reason = out.wet.length === shape.length ? 'off' : 'small';
   return out;
 }
+/* Finite Incantatem, the ring round all of it (CoS 11: Snape "took charge. 'Finite Incantatem!' he shouted; Harry's
+   feet stopped dancing, Malfoy stopped laughing"; the motion is ours, for the geometry: inside and outside, and a ring
+   that need not be round). One stroke round every thing still under a spell, closed as Impervius's is, by a straight
+   line from where it ended back to where it began. A thing is held when every point of its outline is inside the ring
+   (the ring winds round it) or near its edge; a thing to keep (keep: true, his own lit lantern) is caught when its
+   middle is inside. Inside is told as the books of geometry tell it too: a straight line from the thing's middle out to
+   the right crosses the ring an odd number of times when it is inside, an even number when it is out (cross, below).
+   points: the stroke, {x, y, t}; things: [{ x, y, r, keep, shape }] (shape: its outline, [{x, y}]; else a circle of
+   radius r); ease: a name in FINITE_EASES or an ease of its own (tol: how far outside the ring a point of the outline
+   may lie and still count in, as a share of the thing's r; gap: how far apart the stroke's two ends may be, as a share
+   of the ring's size, the diagonal of its box; loops: the most times round any thing before it is a scribble).
+   Returns { verdict: 'stopped' | 'miss', reason ('all', 'tap', 'open', 'scribble', 'off', 'some', 'caught'), held
+   (the things inside, by index, kept ones too), going (the ones to stop left outside), caught (the kept ones inside),
+   cross (for each thing, the crossings to the right of its middle), loops (for each, how many times round), gap }.
+   A miss still holds what it holds: a room stops those and leaves the rest going. Nothing graded. */
+var FINITE_EASES = {
+  kind:   { tol: 0.35, gap: 0.35, loops: 2.6 },
+  fair:   { tol: 0.20, gap: 0.22, loops: 2.6 },
+  strict: { tol: 0.08, gap: 0.12, loops: 2.6 }
+};
+function windAround(points, p) {   /* signed turns the closed ring makes round p */
+  var w = 0, l = null, n = points.length;
+  for (var k = 0; k <= n; k++) {
+    var q = points[k % n], a = Math.atan2(q.y - p.y, q.x - p.x);
+    if (l !== null) { var d = a - l; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; w += d; }
+    l = a;
+  }
+  return w / (2 * Math.PI);
+}
+function crossings(points, p) {   /* times the closed ring crosses the line from p out to the right */
+  var c = 0, n = points.length;
+  for (var k = 0; k < n; k++) {
+    var a = points[k], b = points[(k + 1) % n];
+    if ((a.y > p.y) !== (b.y > p.y) && a.x + (p.y - a.y) / (b.y - a.y) * (b.x - a.x) > p.x) c++;
+  }
+  return c;
+}
+function judgeFinite(points, things, ease) {
+  var e = typeof ease === 'object' ? ease : (FINITE_EASES[ease] || FINITE_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', held: [], going: [], caught: [], cross: [], loops: [], gap: 0 };
+  var i, k, n = points ? points.length : 0, mr = 0;
+  for (i = 0; i < things.length; i++) mr += things[i].r / things.length;
+  if (n < 3) return out;
+  var path = 0, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (i = 0; i < n; i++) {
+    if (i) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+    x0 = Math.min(x0, points[i].x); x1 = Math.max(x1, points[i].x); y0 = Math.min(y0, points[i].y); y1 = Math.max(y1, points[i].y);
+  }
+  if (path < mr * 1.5) return out;
+  var size = Math.hypot(x1 - x0, y1 - y0) || 1;
+  /* the gap: how near the end comes back to the stroke's first half (a ring drawn on past its start is closed) */
+  var g = Infinity, h = Math.floor(n / 2);
+  for (i = 0; i <= h; i++) g = Math.min(g, Math.hypot(points[n - 1].x - points[i].x, points[n - 1].y - points[i].y));
+  for (i = h; i < n; i++) g = Math.min(g, Math.hypot(points[0].x - points[i].x, points[0].y - points[i].y));
+  out.gap = g / size;
+  for (i = 0; i < things.length; i++) {
+    var t = things[i]; out.loops.push(Math.abs(windAround(points, t))); out.cross.push(crossings(points, t));
+  }
+  if (out.gap > e.gap) { out.reason = 'open'; return out; }
+  for (i = 0; i < things.length; i++) if (out.loops[i] > e.loops) { out.reason = 'scribble'; return out; }
+  function near(p, lim) {
+    for (var j = 0; j < n; j++) {
+      var a = points[j], b = points[(j + 1) % n], vx = b.x - a.x, vy = b.y - a.y, L2 = vx * vx + vy * vy;
+      var s = L2 ? Math.max(0, Math.min(1, ((p.x - a.x) * vx + (p.y - a.y) * vy) / L2)) : 0;
+      if (Math.hypot(a.x + vx * s - p.x, a.y + vy * s - p.y) <= lim) return true;
+    }
+    return false;
+  }
+  var targets = 0;
+  for (i = 0; i < things.length; i++) {
+    var th = things[i], shape = th.shape, inside = true;
+    if (!shape) { shape = []; for (k = 0; k < 12; k++) shape.push({ x: th.x + th.r * Math.cos(k * Math.PI / 6), y: th.y + th.r * Math.sin(k * Math.PI / 6) }); }
+    if (th.keep) { if (out.loops[i] > 0.5) { out.held.push(i); out.caught.push(i); } continue; }
+    targets++;
+    for (k = 0; k < shape.length && inside; k++) if (Math.abs(windAround(points, shape[k])) <= 0.5 && !near(shape[k], e.tol * th.r)) inside = false;
+    if (inside) out.held.push(i); else out.going.push(i);
+  }
+  if (out.caught.length) out.reason = 'caught';
+  else if (out.going.length === targets) out.reason = 'off';
+  else if (out.going.length) out.reason = 'some';
+  else { out.verdict = 'stopped'; out.reason = 'all'; }
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1437,5 +1520,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Finite Incantatem, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120f0c; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1a1714;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=17"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* Finite Incantatem, a test page for the Charms lane (13 October 2026, sixteenth session; the owner is Godric). Drawn
+   in code. The book (CoS 11, checked in the text): at the Duelling Club, with Harry's feet dancing and Malfoy laughing,
+   "Snape took charge. 'Finite Incantatem!' he shouted; Harry's feet stopped dancing, Malfoy stopped laughing"; and
+   "Hermione and Millicent Bulstrode were still moving", wrestling: no spell had started that. The stroke is ours, for
+   the geometry: one ring round every spell still going, judged by LumosSpells.judgeFinite on the tally's own layout
+   (checks/finite-tally.js: shares of the short side from the middle, 0.065 a thing, 0.055 the lantern). The things
+   going are the castle's own spells, never a person: a feather floating (Leviosa), a wand spinning (Expelliarmus), a
+   stool sliding (Mobiliarbus), a teddy's bandage winding (Ferula), a key turning (Alohomora). His own lantern, lit
+   by Lumos, is the thing to keep: Finite ends every spell inside the ring, his light too. Three rounds: all of it (the
+   guide a ring), keep the light (four on an arch over the lantern: the ring must bend in), and the horseshoe (five all
+   round the lantern, open at the bottom: the older boy's edge, a hint after a miss). After a cast the inside glows,
+   and in the last two rounds a dashed line runs from each thing out to the right, its crossings with the ring ticked
+   and counted: odd inside, even out. A ring that holds only some stops those; the rest go on for another ring.
+   ?round=1..3, ?ease= for trying; window.lumosFinite for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+  var ARC = function (a) { return [0.28 * Math.cos(a * Math.PI / 180), 0.28 * Math.sin(a * Math.PI / 180)]; };
+  var ROUNDS = [
+    { name: 'All of it', things: [['feather', -0.2, -0.14], ['wand', 0.18, -0.16], ['teddy', -0.16, 0.14], ['stool', 0.2, 0.13]],
+      start: 'The Duelling Club, after the duels: spells still going everywhere. A feather floats, a wand spins, a stool slides, a teddy\'s bandage winds on and on. <b>Draw one ring round all of them</b>: <i>Finite Incantatem!</i>' },
+    { name: 'Keep the light', things: [['stool', -0.3, 0.06], ['feather', -0.16, -0.16], ['wand', 0.16, -0.16], ['teddy', 0.3, 0.06], ['lantern', 0, 0.02]],
+      start: 'Your own lantern is lit, <i>Lumos</i>, right among them. Finite ends every spell inside the ring, your light too. <b>Ring the four and leave the lantern out</b>: a ring can bend.' },
+    { name: 'Horseshoe', things: [['key'].concat(ARC(150)), ['feather'].concat(ARC(210)), ['wand'].concat(ARC(270)), ['teddy'].concat(ARC(330)), ['stool'].concat(ARC(30)), ['lantern', 0, 0]],
+      start: 'Now five stand all round your lantern. <b>Stop all five and keep your light.</b> What shape of ring could do it?',
+      hint: 'Try a horseshoe: round the outside, in through the gap at the bottom, back round the inside, and out where you began.' } ];
+  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+  var things = [], wait = null, done = false, last = null, shown = null, misses = 0, t0 = performance.now();
+  var stroke = null, active = null, trail = null, guide = null, candles = [], puffs = [];
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    candles = []; for (var i = 0; i < 26; i++) { var u = Math.sin(i * 12.9898) * 43758.5453; u -= Math.floor(u); var v = Math.sin(i * 78.233) * 12543.123; v -= Math.floor(v);
+      candles.push({ x: u * W, y: v * H, k: 0.6 + ((i * 7) % 5) / 10, ph: i * 1.7 }); }
+    things.forEach(place); makeGuide(); shown = null;
+  }
+  function place(t) { t.x = W / 2 + t.ox * S; t.y = H / 2 + t.oy * S; t.r = (t.keep ? 0.055 : 0.065) * S; }
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+
+  /* the guide, in the first round only: a ring right round the four, from the top, clockwise */
+  function makeGuide() {
+    if (round !== 0) { guide = null; return; }
+    guide = LumosGuide.create({ key: 'lumos.charms.finiteGuidedHits', rest: 1.0, mirror: false,
+      box: function () { var G = S * 0.38 / 0.4; return { G: G, ox: W / 2 - G / 2, oy: H / 2 - G / 2 }; },
+      parts: [{ pts: LumosGuide.arc([0.5, 0.5], 0.4, 0, 355, 48), secs: 1.4, label: 'right round', at: 0.5, dx: 0, dy: 1.5 }] });
+    guide.build(W, H);
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    ROUNDS.forEach(function (r, i) {
+      var b = document.createElement('button'); b.textContent = r.name; if (i === round) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { if (guide) guide.reset(); }; panel.appendChild(g);
+  }
+  function setThings() {
+    things = ROUNDS[round].things.map(function (d, i) {
+      var t = { kind: d[0], ox: d[1], oy: d[2], keep: d[0] === 'lantern', going: true, lit: true, stopAt: 0, ph: i * 1.9 };
+      place(t); return t;
+    });
+  }
+  function choose(i) {
+    if (wait) { clearTimeout(wait); wait = null; }
+    round = i; last = null; shown = null; trail = null; done = false; misses = 0; puffs = [];
+    setThings(); makeGuide(); menu(); say(ROUNDS[i].start);
+  }
+
+  /* ---- the cast: one ring ---- */
+  function judge(pts) {
+    if (wait || done) return null;
+    var targets = things.map(function (t) { return { x: t.x, y: t.y, r: t.r, keep: t.keep }; });
+    var j = LumosSpells.judgeFinite(pts, targets, ease), now = performance.now(), R = ROUNDS[round];
+    if (j.reason === 'tap') { if (guide) guide.clear(); say('Draw a ring right round them, in one stroke.'); last = j; return j; }
+    var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
+    if (tr && tr.traced && j.verdict === 'miss' && !j.caught.length) { j.verdict = 'stopped'; j.reason = 'all'; j.held = things.map(function (t, i) { return i; }); j.going = []; }
+    last = j;
+    if (j.reason === 'open' || j.reason === 'scribble' || j.reason === 'off') {
+      if (guide) guide.miss(); misses++;
+      trail = { pts: pts, at: now };
+      say(j.reason === 'open' ? 'Bring the ring back to where you began, so it closes.' :
+          j.reason === 'scribble' ? 'Once round is enough: one ring, not a scribble.' : 'That ring held none of them. Draw it round them.');
+      return j;
+    }
+    /* the ring holds what it holds: those spells end */
+    shown = { pts: pts.slice(), at: now, cross: round > 0 };
+    var stopped = 0;
+    j.held.forEach(function (i) { var t = things[i]; if (t.keep) { t.lit = false; return; } if (t.going) { t.going = false; t.stopAt = now; stopped++; puff(t, now); } });
+    var left = things.filter(function (t) { return !t.keep && t.going; }).length;
+    if (stopped) noise(0.6, 500, 0.3);
+    if (j.caught.length) {
+      if (guide) guide.miss(); misses++; noise(0.25, 1500, 0.25);
+      say('<b>Phut.</b> Your lantern went out too: it was inside the ring. ' + (R.hint && misses > 0 ? R.hint : 'Bend the ring in, so the lantern stays outside.'));
+      wait = setTimeout(function () { wait = null; setThings(); shown = null;
+        say('<i>Lumos!</i> Your lantern is lit again, and they are all off again. ' + (R.hint ? R.hint : '<b>Ring the four, and leave the light out.</b>')); }, 3600);
+      return j;
+    }
+    if (left) {
+      if (guide) guide.miss();
+      say('<b>' + (stopped ? stopped + ' stopped.' : 'Those were already stopped.') + '</b> ' + left + ' still going. Draw another ring round the rest.' +
+        (round > 0 ? ' The dashed lines count the crossings: odd inside, even out.' : ''));
+      return j;
+    }
+    if (guide) guide.hit(lv > 0);
+    LumosSpells.learn('finite');
+    if (round === 0) {
+      say('<b>Finite Incantatem!</b> Everything stopped at once, as Harry\'s feet did when Snape shouted it. In the book two were still moving: Hermione and Millicent Bulstrode, wrestling. No spell had started that, so no spell could stop it.');
+      wait = setTimeout(function () { wait = null; choose(1); }, 7800);
+    } else {
+      var ins = [], outs = [];
+      things.forEach(function (t, i) { (t.keep ? outs : ins).push(j.cross[i]); });
+      var uniq = function (a) { return a.filter(function (v, k) { return a.indexOf(v) === k; }).sort(); };
+      var count = 'from a thing inside it crosses your ring ' + uniq(ins).map(function (v) { return '<b>' + v + '</b>'; }).join(' or ') +
+        ' times, odd; from the lantern, <b>' + uniq(outs).join(' or ') + '</b>, even: outside.';
+      say(round === 1 ? '<b>All stopped, and your light still burns.</b> Follow each dashed line out to the right: ' + count :
+        '<b>All five stopped, and your light still burns.</b> The inside of a horseshoe is the band all round, not the middle. Count along the lines: ' + count + ' Every spell inside, ended; the one outside, kept.');
+      if (round === 1) wait = setTimeout(function () { wait = null; choose(2); }, 9000);
+      else done = true;
+    }
+    return j;
+  }
+  function puff(t, now) { for (var k = 0; k < 10; k++) puffs.push({ x: t.x, y: t.y, a: k / 10 * 6.283, at: now, r: t.r }); }
+
+  /* ---- drawing ---- */
+  function drawFloor(now) {
+    cx.fillStyle = '#2a231c'; cx.fillRect(0, 0, W, H);
+    var bw = Math.max(56, S * 0.17), r, c;   /* the Great Hall's flagstones, from above */
+    for (r = -1; r * bw < H; r++) for (c = -1; c * bw < W; c++) {
+      var x = c * bw + (r % 2 ? bw / 2 : 0), y = r * bw, t = (((r * 7 + c * 13) % 5) + 5) % 5 / 5;
+      cx.fillStyle = 'rgb(' + Math.round(58 + t * 14) + ',' + Math.round(50 + t * 12) + ',' + Math.round(42 + t * 10) + ')';
+      cx.fillRect(x + 2, y + 2, bw - 4, bw - 4);
+    }
+    candles.forEach(function (k) {   /* the floating candles' light on the floor */
+      var s = S * 0.05 * k.k * (1 + Math.sin(now / 900 + k.ph) * 0.08);
+      var gl = cx.createRadialGradient(k.x, k.y, 0, k.x, k.y, s); gl.addColorStop(0, 'rgba(255,200,120,0.14)'); gl.addColorStop(1, 'rgba(255,180,100,0)');
+      cx.fillStyle = gl; cx.fillRect(k.x - s, k.y - s, s * 2, s * 2);
+    });
+    var vg = cx.createRadialGradient(W / 2, H * 0.5, S * 0.3, W / 2, H * 0.5, Math.max(W, H) * 0.75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.55)'); cx.fillStyle = vg; cx.fillRect(0, 0, W, H);
+  }
+  function at(t, now) { return t.going ? now : t.stopAt; }   /* a stopped thing keeps the moment it stopped */
+  function shadow(x, y, rx) { cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.beginPath(); cx.ellipse(x, y, rx, rx * 0.6, 0, 0, 7); cx.fill(); }
+  function drawThing(t, now) {
+    var n = at(t, now) / 1000, r = t.r, x = t.x, y = t.y;
+    if (t.going && !t.keep) {   /* the spell on it: a faint violet shimmer going round */
+      cx.save(); cx.fillStyle = 'rgba(190,160,255,0.55)';
+      for (var k = 0; k < 7; k++) { var a = k / 7 * 6.283 + now / 900 + t.ph; cx.beginPath(); cx.arc(x + Math.cos(a) * r * 0.95, y + Math.sin(a) * r * 0.95, Math.max(1.5, S * 0.004), 0, 7); cx.fill(); }
+      cx.restore();
+    }
+    cx.save(); cx.translate(x, y);
+    if (t.kind === 'feather') {
+      var lift = t.going ? 0.18 + Math.sin(n * 2.2 + t.ph) * 0.1 : 0;
+      shadow(r * lift * 0.6, r * lift, r * 0.45);
+      cx.translate(0, -r * lift); cx.rotate(-0.6 + Math.sin(n * 0.9 + t.ph) * 0.4);
+      cx.fillStyle = '#f4efe2'; cx.beginPath(); cx.moveTo(-r * 0.7, 0); cx.quadraticCurveTo(0, -r * 0.42, r * 0.7, 0); cx.quadraticCurveTo(0, r * 0.3, -r * 0.7, 0); cx.fill();
+      cx.strokeStyle = '#b9ad94'; cx.lineWidth = Math.max(1.2, r * 0.05); cx.beginPath(); cx.moveTo(-r * 0.85, r * 0.04); cx.lineTo(r * 0.7, 0); cx.stroke();
+    } else if (t.kind === 'wand') {
+      shadow(0, r * 0.1, r * 0.5);
+      cx.rotate(n * 3.4 + t.ph); var L = r * 1.6; cx.lineCap = 'round';
+      cx.strokeStyle = '#5a3a1e'; cx.lineWidth = Math.max(2.5, r * 0.12); cx.beginPath(); cx.moveTo(-L / 2, 0); cx.lineTo(L / 2, 0); cx.stroke();
+      cx.strokeStyle = '#3a2412'; cx.lineWidth = Math.max(4, r * 0.2); cx.beginPath(); cx.moveTo(-L / 2, 0); cx.lineTo(-L * 0.18, 0); cx.stroke();
+    } else if (t.kind === 'stool') {
+      var dx = Math.sin(n * 2.6 + t.ph) * r * 0.28; cx.translate(dx, 0);
+      shadow(r * 0.08, r * 0.12, r * 0.6);
+      cx.fillStyle = '#6b4a2a'; cx.beginPath(); cx.arc(0, 0, r * 0.55, 0, 7); cx.fill();
+      cx.strokeStyle = 'rgba(40,24,10,0.5)'; cx.lineWidth = 1.2;
+      for (var q = 1; q < 4; q++) { cx.beginPath(); cx.arc(0, 0, r * 0.13 * q, 0, 7); cx.stroke(); }
+    } else if (t.kind === 'teddy') {
+      shadow(r * 0.05, r * 0.1, r * 0.62);
+      cx.fillStyle = '#8a5a32';
+      cx.beginPath(); cx.arc(0, r * 0.12, r * 0.42, 0, 7); cx.fill();   /* body */
+      cx.beginPath(); cx.arc(0, -r * 0.42, r * 0.3, 0, 7); cx.fill();   /* head */
+      cx.beginPath(); cx.arc(-r * 0.24, -r * 0.66, r * 0.11, 0, 7); cx.arc(r * 0.24, -r * 0.66, r * 0.11, 0, 7); cx.fill();
+      cx.save(); cx.translate(r * 0.3, r * 0.42); cx.rotate(0.5);   /* the bandaged leg, its bandage winding */
+      cx.fillStyle = '#8a5a32'; cx.fillRect(0, -r * 0.13, r * 0.55, r * 0.26);
+      cx.beginPath(); cx.rect(0, -r * 0.15, r * 0.55, r * 0.3); cx.clip();
+      cx.strokeStyle = '#f1ece0'; cx.lineWidth = r * 0.08;
+      for (var b = -2; b < 6; b++) { var bx = ((b * 0.14 + n * 0.22) % 0.84) * r; cx.beginPath(); cx.moveTo(bx, -r * 0.16); cx.lineTo(bx + r * 0.1, r * 0.16); cx.stroke(); }
+      cx.restore();
+      cx.fillStyle = '#2a1a0c'; cx.beginPath(); cx.arc(-r * 0.1, -r * 0.46, r * 0.04, 0, 7); cx.arc(r * 0.1, -r * 0.46, r * 0.04, 0, 7); cx.fill();
+    } else if (t.kind === 'key') {
+      shadow(0, r * 0.1, r * 0.5);
+      cx.rotate(-0.4 + Math.sin(n * 2.2 + t.ph) * 0.9);
+      cx.strokeStyle = '#d6a945'; cx.fillStyle = '#d6a945'; cx.lineWidth = Math.max(2, r * 0.1);
+      cx.beginPath(); cx.arc(-r * 0.5, 0, r * 0.22, 0, 7); cx.stroke();
+      cx.beginPath(); cx.moveTo(-r * 0.28, 0); cx.lineTo(r * 0.7, 0); cx.stroke();
+      cx.fillRect(r * 0.42, 0, r * 0.1, r * 0.22); cx.fillRect(r * 0.6, 0, r * 0.1, r * 0.16);
+    } else if (t.kind === 'lantern') {
+      if (t.lit) {
+        var fl = 1 + Math.sin(now / 90) * 0.06, gl = cx.createRadialGradient(0, 0, 0, 0, 0, r * 2.6 * fl);
+        gl.addColorStop(0, 'rgba(255,214,130,0.55)'); gl.addColorStop(1, 'rgba(255,190,100,0)'); cx.fillStyle = gl; cx.fillRect(-r * 2.7, -r * 2.7, r * 5.4, r * 5.4);
+      }
+      cx.fillStyle = '#4a3a24'; cx.beginPath(); cx.arc(0, 0, r * 0.62, 0, 7); cx.fill();
+      cx.strokeStyle = '#b08a44'; cx.lineWidth = Math.max(2, r * 0.1); cx.beginPath(); cx.arc(0, 0, r * 0.62, 0, 7); cx.stroke();
+      cx.fillStyle = t.lit ? '#ffe2a0' : '#2a241c'; cx.beginPath(); cx.arc(0, 0, r * 0.32, 0, 7); cx.fill();
+      if (!t.lit) { cx.strokeStyle = 'rgba(200,200,200,0.35)'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(0, 0); cx.quadraticCurveTo(r * 0.3, -r * 0.6, 0, -r * 1.1); cx.stroke(); }
+    }
+    cx.restore();
+  }
+  function closed(pts) { return pts.concat([pts[0]]); }
+  function drawShown(now) {
+    if (!shown) return;
+    var age = (now - shown.at) / 1000, fade = wait && last && last.caught.length ? Math.max(0, 1 - age / 3.4) : 1;
+    var P = closed(shown.pts);
+    cx.save(); cx.globalAlpha = fade;
+    cx.fillStyle = 'rgba(243,210,122,0.13)'; cx.beginPath(); P.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.fill('nonzero');
+    cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = '#e8be5a'; cx.lineWidth = Math.max(2.5, S * 0.007);
+    cx.beginPath(); shown.pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke();
+    var e = shown.pts[shown.pts.length - 1], s0 = shown.pts[0];   /* the closing line, dashed */
+    cx.setLineDash([5, 6]); cx.beginPath(); cx.moveTo(e.x, e.y); cx.lineTo(s0.x, s0.y); cx.stroke(); cx.setLineDash([]);
+    if (shown.cross) things.forEach(function (t) {   /* the crossings: a dashed line out to the right, each crossing ticked */
+      var xs = [], k;
+      for (k = 0; k + 1 < P.length; k++) { var a = P[k], b = P[k + 1];
+        if ((a.y > t.y) !== (b.y > t.y)) { var X = a.x + (t.y - a.y) / (b.y - a.y) * (b.x - a.x); if (X > t.x) xs.push(X); } }
+      var odd = xs.length % 2 === 1, col = odd ? '#f3d27a' : 'rgba(200,200,210,0.75)';
+      cx.strokeStyle = col; cx.lineWidth = 1.5; cx.setLineDash([3, 6]); cx.beginPath(); cx.moveTo(t.x, t.y); cx.lineTo(W, t.y); cx.stroke(); cx.setLineDash([]);
+      cx.lineWidth = 2.5; xs.forEach(function (X) { cx.beginPath(); cx.moveTo(X, t.y - S * 0.014); cx.lineTo(X, t.y + S * 0.014); cx.stroke(); });
+      var lx = t.x + t.r * 0.9, ly = t.y - t.r * 0.55, rr = Math.max(10, S * 0.024);
+      cx.fillStyle = 'rgba(20,16,12,0.85)'; cx.beginPath(); cx.arc(lx, ly, rr, 0, 7); cx.fill();
+      cx.strokeStyle = col; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(lx, ly, rr, 0, 7); cx.stroke();
+      cx.fillStyle = col; cx.font = 'bold ' + Math.round(rr * 1.2) + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.fillText(String(xs.length), lx, ly + 1);
+    });
+    cx.restore();
+  }
+  function frame(now) {
+    drawFloor(now);
+    drawShown(now);
+    things.forEach(function (t) { drawThing(t, now); });
+    puffs = puffs.filter(function (p) { return now - p.at < 700; });
+    puffs.forEach(function (p) {   /* a spell ending: a little white puff */
+      var a = (now - p.at) / 700, d = p.r * (0.5 + a * 0.9);
+      cx.fillStyle = 'rgba(255,255,255,' + (0.8 * (1 - a)) + ')'; cx.beginPath(); cx.arc(p.x + Math.cos(p.a) * d, p.y + Math.sin(p.a) * d, Math.max(1.5, S * 0.005), 0, 7); cx.fill();
+    });
+    if (!wait && !done && guide) guide.draw(cx, now, !!stroke);
+    var pts = stroke || (trail && now - trail.at < 900 ? trail.pts : null);
+    if (pts && pts.length > 1) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + (stroke ? 0.65 : 0.65 * (1 - (now - trail.at) / 900)) + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: one stroke, the ring ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (wait || done || active !== null) return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null; shown = null;
+    if (guide) guide.cover(stroke[0]);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    judge(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); setThings(); resize(); choose(round); requestAnimationFrame(frame);
+  window.lumosFinite = { choose: function (i) { choose(i - 1); }, judge: function (pts) { return judge(pts); },
+    things: function () { return things.map(function (t) { return { kind: t.kind, x: t.x, y: t.y, r: t.r, keep: t.keep, going: t.going, lit: t.lit }; }); },
+    state: function () { return { round: round + 1, waiting: !!wait, done: done, misses: misses,
+      last: last ? { verdict: last.verdict, reason: last.reason, held: last.held, going: last.going, caught: last.caught, cross: last.cross } : null,
+      going: things.filter(function (t) { return !t.keep && t.going; }).length, lit: things.every(function (t) { return !t.keep || t.lit; }),
+      line: lineEl.textContent, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('finite') }; } };
+})();
+</script>
+</body>
+</html>
