@@ -1626,24 +1626,40 @@ function updateBewitched(dt) {
   g.restore();
   BEWITCHED.tex.needsUpdate = true;
 }
-var TAPESTRY = { w: 1.4, h: 2.0, x: NOOK_MID, y: 2.1 };
+/* the hillside tapestry (Godric, 13 October 2026, 8.05 am: round 1, Try 3; hung "2 m wide, to the floor", the rod
+   about 2.8 m up and its hem a hand off the flags, a door behind it): the drawing is 2 m across its rod, the cloth
+   1.74 m inside it; h is the drawing's own, set when it loads */
+var TAPESTRY = { w: 2.0, h: 2.66, x: NOOK_MID, hem: 0.1 };
+TAPESTRY.y = TAPESTRY.hem + TAPESTRY.h / 2;
 var tapestry = onWallZ(cutoutTexture(140, 200, '#8a6a5e', drawRect, 'tapestry'), TAPESTRY.w, TAPESTRY.h, TAPESTRY.x, TAPESTRY.y, FAR_FACE, 1, 1, 'tapestry');
 /* t1 on the hillside tapestry (Godric, 13 October 2026, 7.11 am): as with PS 9's tapestry and the way behind it, now
    and then a draught from behind lifts one bottom corner, the right as he faces it, and drops it again; the passage
    it hints at is for a later day. The cloth is a 12 by 24 mesh, as a layer's flutter (castle.js) makes it, still but
    for the lift; the dark behind shows only where the hem hangs low enough for a doorway */
-var TAPESTRY_LIFT = { next: 20 + Math.random() * 20, t: -1, dur: 2.8, out: 0.16, reach: 0.6 };
-tapestry.geometry.dispose();
-tapestry.geometry = new THREE.PlaneGeometry(TAPESTRY.w, TAPESTRY.h, 12, 24);
-tapestry.geometry.userData.base = Float32Array.from(tapestry.geometry.attributes.position.array);
-var tapestryDark = new THREE.Mesh(new THREE.PlaneGeometry(0.62, 0.8), new THREE.MeshBasicMaterial({ color: 0x0c0907 }));
-tapestryDark.position.set(TAPESTRY.x + TAPESTRY.w / 2 - 0.33, TAPESTRY.y - TAPESTRY.h / 2 + 0.4, FAR_Z + 0.004);
+var TAPESTRY_LIFT = { next: 20 + Math.random() * 20, t: -1, dur: 2.8, out: 0.23, reach: 0.85, up: 0.31, inward: 0.11 };
+function meshTapestry() {
+  tapestry.geometry.dispose();
+  tapestry.geometry = new THREE.PlaneGeometry(TAPESTRY.w, TAPESTRY.h, 12, 24);
+  tapestry.geometry.userData.base = Float32Array.from(tapestry.geometry.attributes.position.array);
+  tapestry.position.y = TAPESTRY.y = TAPESTRY.hem + TAPESTRY.h / 2;
+}
+meshTapestry();
+hangDrawing(tapestry, '../assets/layers/tapestry-hillside.png', TAPESTRY.w, function (im) {
+  TAPESTRY.h = TAPESTRY.w * im.height / im.width;
+  meshTapestry();
+});
+/* the door behind it, the polite door's size, 1.0 by 2.2 m, under the cloth's right half, so the lifted corner shows
+   its foot; at rest the stone shows under the hem, and the dark only while the draught holds the corner up, so the
+   strip under the hem never reads as a black box */
+var tapestryDark = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 2.2), new THREE.MeshBasicMaterial({ color: 0x0c0907 }));
+tapestryDark.position.set(TAPESTRY.x + 0.3, 1.1, FAR_Z + 0.004);
 tapestryDark.name = 'tapestry-dark';
-tapestryDark.visible = TAPESTRY.y - TAPESTRY.h / 2 < 0.3;
+tapestryDark.visible = false;
 scene.add(tapestryDark);
 function liftTapestry() { TAPESTRY_LIFT.t = 0; TAPESTRY_LIFT.next = 25 + Math.random() * 30; }
 function updateTapestryLift(dt) {
   var L = TAPESTRY_LIFT;
+  tapestryDark.visible = L.t >= 0 && TAPESTRY.hem < 0.3;
   if (L.t < 0) { L.next -= dt; if (L.next <= 0) liftTapestry(); return; }
   var g = tapestry.geometry, base = g.userData.base;
   if (!base) { L.t = -1; return; }   /* a drawn layer without flutter: a flat card, nothing to lift */
@@ -1658,8 +1674,8 @@ function updateTapestryLift(dt) {
     var x = base[i], y = base[i + 1];
     var d = Math.hypot(w / 2 - x, y + h / 2), q = 1 - clamp(d / L.reach, 0, 1);
     q = q * q * (3 - 2 * q);
-    arr[i] = x - 0.08 * e * q * q;                                       /* the corner curls up and in, so the gap under it shows */
-    arr[i + 1] = y + 0.22 * e * q * q;
+    arr[i] = x - L.inward * e * q * q;                                   /* the corner curls up and in, so the gap under it shows */
+    arr[i + 1] = y + L.up * e * q * q;
     arr[i + 2] = L.out * e * q;                                          /* only ever away from the wall */
   }
   pos.needsUpdate = true;
