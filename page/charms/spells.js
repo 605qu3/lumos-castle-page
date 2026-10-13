@@ -292,17 +292,48 @@ function judgeHinge(points, c, r, want, w, h, ease) {
    grid of squares and the move is counted in them, dx right and dy down, rounded to the nearest square. points: the
    stroke, {x, y, t} in CSS pixels; at: the thing's centre; cell: a square's side in pixels; ease: a name in
    SLIDE_EASES or an ease of its own (start: how far from the centre, in squares, the stroke may begin; straight: the
-   chord over the path; snap: how far off a square's middle the end may land, in squares, 0.5 taking any).
-   Returns { verdict: 'slide' | 'miss', reason ('slid', 'tap', 'off', 'short', 'wiggly', 'between'), dx, dy (whole
-   squares), fx, fy (the stroke's own, in squares), straight, squares (how many squares long, along the line) }. */
+   chord over the path; snap: how far off a square's middle the end may land, in squares, 0.5 taking any; axis: how
+   many degrees off the squares an L's leg may run).
+   An L along the squares works too (Q6, 6.3, David, 13 October 2026, 7.11 am): two straight legs, one across and one
+   up or down, turning once; its legs join into the one move, the same translation added up from its two parts. The
+   corner is the stroke's point furthest from the line start to end; each leg at least half a square, as straight as
+   a line must be, and within `axis` degrees of the squares.
+   Returns { verdict: 'slide' | 'miss', reason ('slid', 'tap', 'off', 'short', 'wiggly', 'between'), shape ('line' or
+   'L'), dx, dy (whole squares), fx, fy (the stroke's own, in squares), straight, squares (how many squares long,
+   along the line), and for an L: legs (its two legs in whole squares, in his order, [[dx, 0], [0, dy]] or the other
+   way round), corner ({ fx, fy }, the turn from the start, in squares), legOff (each leg's degrees off the squares) }. */
 var SLIDE_EASES = {
-  kind:   { start: 0.95, straight: 0.80, snap: 0.5 },
-  fair:   { start: 0.75, straight: 0.87, snap: 0.42 },
-  strict: { start: 0.55, straight: 0.93, snap: 0.32 }
+  kind:   { start: 0.95, straight: 0.80, snap: 0.5, axis: 20 },
+  fair:   { start: 0.75, straight: 0.87, snap: 0.42, axis: 15 },
+  strict: { start: 0.55, straight: 0.93, snap: 0.32, axis: 10 }
 };
+/* the L test: split the stroke at its point furthest from the chord; both halves straight, long enough, along the
+   squares and on different axes */
+function slideEll(points, cell, e) {
+  var a = points[0], b = points[points.length - 1], cl = Math.hypot(b.x - a.x, b.y - a.y), best = -1, ci = 0, i;
+  if (cl < cell * 0.5) return null;
+  for (i = 1; i < points.length - 1; i++) {
+    var d = Math.abs((b.x - a.x) * (points[i].y - a.y) - (b.y - a.y) * (points[i].x - a.x)) / cl;
+    if (d > best) { best = d; ci = i; }
+  }
+  if (best < cell * 0.3) return null;
+  function leg(i0, i1) {
+    var p = 0, k, q = points[i0], r = points[i1];
+    for (k = i0 + 1; k <= i1; k++) p += Math.hypot(points[k].x - points[k - 1].x, points[k].y - points[k - 1].y);
+    var lx = r.x - q.x, ly = r.y - q.y, len = Math.hypot(lx, ly), across = Math.abs(lx) >= Math.abs(ly);
+    var off = Math.atan2(across ? Math.abs(ly) : Math.abs(lx), across ? Math.abs(lx) : Math.abs(ly)) * 180 / Math.PI;
+    return { len: len / cell, straight: p ? len / p : 0, across: across, off: off };
+  }
+  var one = leg(0, ci), two = leg(ci, points.length - 1);
+  if (one.len < 0.5 || two.len < 0.5 || one.across === two.across) return null;
+  if (one.straight < e.straight || two.straight < e.straight || one.off > e.axis || two.off > e.axis) return null;
+  return { corner: { fx: (points[ci].x - a.x) / cell, fy: (points[ci].y - a.y) / cell }, acrossFirst: one.across,
+    legOff: [Math.round(one.off * 10) / 10, Math.round(two.off * 10) / 10] };
+}
 function judgeSlide(points, at, cell, ease) {
   var e = typeof ease === 'object' ? ease : (SLIDE_EASES[ease] || SLIDE_EASES.kind);
-  var out = { verdict: 'miss', reason: 'tap', dx: 0, dy: 0, fx: 0, fy: 0, straight: 0, squares: 0 };
+  if (e.axis === undefined) e = { start: e.start, straight: e.straight, snap: e.snap, axis: 20 };
+  var out = { verdict: 'miss', reason: 'tap', shape: 'line', dx: 0, dy: 0, fx: 0, fy: 0, straight: 0, squares: 0 };
   if (!points || points.length < 2) return out;
   var a = points[0], b = points[points.length - 1], path = 0, i;
   for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
@@ -312,7 +343,11 @@ function judgeSlide(points, at, cell, ease) {
   out.straight = path ? chord / path : 0;
   out.dx = Math.round(out.fx); out.dy = Math.round(out.fy);
   if (Math.hypot(a.x - at.x, a.y - at.y) > e.start * cell) { out.reason = 'off'; return out; }
-  if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
+  var ell = slideEll(points, cell, e);
+  if (ell) {
+    out.shape = 'L'; out.corner = ell.corner; out.legOff = ell.legOff;
+    out.legs = ell.acrossFirst ? [[out.dx, 0], [0, out.dy]] : [[0, out.dy], [out.dx, 0]];
+  } else if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
   if (!out.dx && !out.dy) { out.reason = 'short'; return out; }
   if (Math.abs(out.fx - out.dx) > e.snap || Math.abs(out.fy - out.dy) > e.snap) { out.reason = 'between'; return out; }
   out.verdict = 'slide'; out.reason = 'slid';

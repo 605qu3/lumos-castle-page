@@ -24,7 +24,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=11"></script>
+<script src="spells.js?v=26"></script>
 <script>
 /* Mobiliarbus, a test page for the Charms lane (12 October 2026, ninth session; the owner is Godric). Drawn in code.
    The book (PoA 10, checked in the text): in the Three Broomsticks, with the teachers and the Minister coming in out of
@@ -37,6 +37,10 @@
    a move told in words along one line, a move told in words on a slant (two legs), and the book's own, hiding the
    table from the door, where he finds the move himself; a wrong move still moves the tree, and the line says what is
    left, so the moves add up; at the end all three are summed, start to finish. Judged by LumosSpells.judgeSlide.
+   Both ways (Q6, 6.3, Godric, 13 October 2026, 7.11 am): one slanted line, or an L along the squares, across then
+   up or down, whose two legs join into one arrow; his legs are drawn in his order. The lift and the thump frame the
+   arrow (his t1): it grows from the tree as it rises a few inches and is whole at the soft thump. Hermione whispered
+   it (his t2), so the hiding round asks for a whisper and praises one: "Quietly done. Fudge never noticed."
    ?ease= for trying; window.lumosMobiliarbus for checks. */
 (function () {
   'use strict';
@@ -100,10 +104,11 @@
     var R = Lo.rounds[round]; roundMoves = [];
     if (R.hide) {
       target = [Lo.table[0], Lo.table[1] - 1]; doorOpen = performance.now();
-      say('The door swings open: in come Professor McGonagall, Professor Flitwick, Hagrid and the Minister for Magic! Quick: <b>slide the tree right in front of your table</b>, between it and the door.');
+      say('The door swings open: in come Professor McGonagall, Professor Flitwick, Hagrid and the Minister for Magic! Quick, and quietly: <b>slide the tree right in front of your table</b>, between it and the door. Whisper it: <i>Mobiliarbus!</i>');
     } else {
       target = [pos[0] + R.move[0], pos[1] + R.move[1]];
-      say((round ? 'Now slide it ' : 'The Christmas tree in the Three Broomsticks. Touch it and draw one straight line to where it should go. Slide it ') + told(R.move) + '. <i>Mobiliarbus!</i>');
+      say((round ? 'Now slide it ' : 'The Christmas tree in the Three Broomsticks. Touch it and draw one straight line to where it should go. Slide it ') + told(R.move) + '.' +
+        (R.move[0] && R.move[1] ? ' One slanted line, or two legs along the squares: across, then up or down.' : '') + ' <i>Mobiliarbus!</i>');
     }
   }
   function blockedAt(s) {
@@ -114,7 +119,7 @@
   }
   var WHY = {
     off: 'Start on the tree: touch it, then draw straight to where it should go.',
-    wiggly: 'It lifts, wobbles and settles back. One straight line, from the tree to its new square.',
+    wiggly: 'It lifts, wobbles and settles back. One straight line from the tree to its new square, or two straight legs along the squares.',
     short: 'It lifts a few inches and lands where it was. Draw all the way to the new square.',
     between: 'It hovers between two squares and settles back. End your line in the middle of a square.' };
   function cast(pts) {
@@ -129,21 +134,23 @@
       return j;
     }
     LumosSpells.learn('mobiliarbus');
-    anim = { at: performance.now(), from: pos.slice(), to: to, dx: j.dx, dy: j.dy }; arrow = null;
+    anim = { at: performance.now(), from: pos.slice(), to: to, dx: j.dx, dy: j.dy, ell: j.shape === 'L', acrossFirst: j.shape !== 'L' || j.legs[0][0] !== 0 };
+    arrow = { from: pos.slice(), to: to, at: performance.now(), ell: anim.ell, acrossFirst: anim.acrossFirst, grow: true };   /* framed by the lift and the thump */
     noise(0.25, 700, 0.12);
     return j;
   }
   function landed(a) {
     pos = a.to; noise(0.18, 110, 0.7); dust = { at: performance.now(), sq: pos.slice() };
     moves.push([a.dx, a.dy]); roundMoves.push([a.dx, a.dy]);
-    arrow = { from: a.from, to: a.to, at: performance.now() };
+    arrow = { from: a.from, to: a.to, at: arrow && arrow.grow ? arrow.at : performance.now(), ell: a.ell, acrossFirst: a.acrossFirst };
     var left = [target[0] - pos[0], target[1] - pos[1]], R = Lo.rounds[round];
     if (!left[0] && !left[1]) {
-      var line = 'A soft thump. <b>' + words(a.dx, a.dy) + '</b>' + (roundMoves.length > 1 ? ', and altogether this round <b>' + words(sum(roundMoves)[0], sum(roundMoves)[1]) + '</b>' : '') + ': just as it should.';
+      var line = 'A soft thump. ' + (a.ell ? 'Your two legs, <b>' + words(a.acrossFirst ? a.dx : 0, a.acrossFirst ? 0 : a.dy) + '</b> then <b>' +
+        words(a.acrossFirst ? 0 : a.dx, a.acrossFirst ? a.dy : 0) + '</b>, join into one slide, ' : '') + '<b>' + words(a.dx, a.dy) + '</b>' + (roundMoves.length > 1 ? ', and altogether this round <b>' + words(sum(roundMoves)[0], sum(roundMoves)[1]) + '</b>' : '') + ': just as it should.';
       if (R.hide) {
         done = true; var tot = [pos[0] - startPos[0], pos[1] - startPos[1]];
         arrow = { from: startPos, to: pos.slice(), at: performance.now(), total: true };
-        say('Hidden! The tree landed with a soft thump right in front of your table; through its branches, four pairs of feet go by. ' +
+        say('Hidden! Quietly done. Fudge never noticed. The tree landed with a soft thump right in front of your table; through its branches, four pairs of feet go by. ' +
           'All its moves together: from where it began, <b>' + words(tot[0], tot[1]) + '</b>.');
         return;
       }
@@ -203,20 +210,28 @@
   function drawArrow(now) {
     if (!arrow) return;
     var a = centre(arrow.from), b = centre(arrow.to), dx = arrow.to[0] - arrow.from[0], dy = arrow.to[1] - arrow.from[1];
-    var k = Math.min(1, (now - arrow.at) / 400), fs = Math.round(Math.max(13, cell * 0.28)), corner = { x: b.x, y: a.y };
+    var k = Math.min(1, (now - arrow.at) / 400), fs = Math.round(Math.max(13, cell * 0.28)), af = arrow.acrossFirst !== false;
+    var corner = af ? { x: b.x, y: a.y } : { x: a.x, y: b.y }, grow = 1;   /* the corner where his legs turn: across first, or up or down first */
+    if (arrow.grow && anim) {   /* the arrow grows as the tree drifts: nothing at the lift, whole at the thump */
+      var t0 = now - anim.at, Dd = 300 + 250 * Math.hypot(anim.dx, anim.dy); grow = Math.max(0, Math.min(1, (t0 - 300) / Dd)); grow = grow * grow * (3 - 2 * grow); k = 1; }
     cx.save(); cx.globalAlpha = k; cx.lineCap = 'round'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '600 ' + fs + 'px Georgia, serif';
-    if (dx && dy) {   /* the legs, along the squares: across first, then up or down */
-      cx.strokeStyle = '#9fb6c9'; cx.lineWidth = 2.5; cx.setLineDash([6, 6]);
+    if (dx && dy) {   /* the legs, along the squares, in his order (across first for a slanted line) */
+      cx.strokeStyle = '#9fb6c9'; cx.lineWidth = arrow.ell ? 3.5 : 2.5; cx.setLineDash(arrow.ell ? [10, 5] : [6, 6]);
       cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(corner.x, corner.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.setLineDash([]);
     }
     if (dx) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
-      cx.fillText(Math.abs(dx) + ' ' + (dx > 0 ? 'right' : 'left'), (a.x + corner.x) / 2, a.y + (dy > 0 ? -fs : fs) * 0.95); }
+      var lab = Math.abs(dx) + ' ' + (dx > 0 ? 'right' : 'left');
+      if (af) cx.fillText(lab, (a.x + b.x) / 2, a.y + (dy > 0 ? -fs : fs) * 0.95);   /* the across label away from the arrow */
+      else { cx.textAlign = dx > 0 ? 'right' : 'left'; cx.fillText(lab, corner.x - Math.sign(dx) * fs * 0.5, b.y); cx.textAlign = 'center'; } }   /* up or down first: just past the turn, outside the L, clear of the tree landing at the leg's end */
     if (dy) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
-      cx.textAlign = dx >= 0 ? 'left' : 'right'; cx.fillText(Math.abs(dy) + ' ' + (dy > 0 ? 'down' : 'up'), b.x + (dx >= 0 ? 1 : -1) * fs * 0.5, (a.y + b.y) / 2); cx.textAlign = 'center'; }
+      var vx = af ? b.x : a.x, vs = (af ? 1 : -1) * (dx >= 0 ? 1 : -1);
+      cx.textAlign = vs > 0 ? 'left' : 'right'; cx.fillText(Math.abs(dy) + ' ' + (dy > 0 ? 'down' : 'up'), vx + vs * fs * 0.5, (a.y + b.y) / 2); cx.textAlign = 'center'; }
     cx.shadowBlur = 0;
     cx.strokeStyle = arrow.total ? '#ffe9a8' : '#f3d27a'; cx.lineWidth = arrow.total ? 5 : 4;   /* the move itself, straight */
     var L = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / L, uy = (b.y - a.y) / L, e = { x: b.x - ux * cell * 0.66, y: b.y - uy * cell * 0.66 };   /* its head stops short of the tree */
+    if (grow < 1) { var gl = Math.max(0, (L - cell * 0.66) * grow); e = { x: a.x + ux * gl, y: a.y + uy * gl }; }
     cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(e.x, e.y); cx.stroke();
+    if (grow < 0.08) { cx.fillStyle = 'rgba(243,210,122,0.9)'; cx.beginPath(); cx.arc(a.x, a.y, 4, 0, 7); cx.fill(); cx.restore(); return; }
     cx.fillStyle = cx.strokeStyle; cx.beginPath(); cx.moveTo(e.x + ux * 12, e.y + uy * 12); cx.lineTo(e.x - ux * 4 - uy * 9, e.y - uy * 4 + ux * 9); cx.lineTo(e.x - ux * 4 + uy * 9, e.y - uy * 4 - ux * 9); cx.closePath(); cx.fill();
     cx.fillStyle = 'rgba(243,210,122,0.9)'; cx.beginPath(); cx.arc(a.x, a.y, 4, 0, 7); cx.fill();
     cx.restore();
@@ -276,6 +291,11 @@
   addEventListener('resize', resize); resize(); start(); requestAnimationFrame(frame);
   window.lumosMobiliarbus = { start: start, centre: centre, cell: function () { return cell; },
     cast: function (pts) { return cast(pts); },
+    ell: function (legs) {   /* an L along the squares from the tree: legs [[dx, 0], [0, dy]] or the other way round, in squares */
+      if (anim || done || wait) return null; var a = centre(pos), out = [{ x: a.x, y: a.y, t: 0 }], x = a.x, y = a.y, t = 0;
+      legs.forEach(function (L) { for (var i = 1; i <= 12; i++) out.push({ x: x + L[0] * cell * i / 12, y: y + L[1] * cell * i / 12, t: (t += 25) }); x += L[0] * cell; y += L[1] * cell; });
+      return cast(out);
+    },
     slide: function (dx, dy, wob) {   /* a drawn line from the tree, dx and dy in squares, wob a sideways wobble as a share of a square */
       if (anim || done || wait) return null; var a = centre(pos), out = [];
       for (var i = 0; i <= 20; i++) { var k = i / 20, w = (wob || 0) * Math.sin(k * Math.PI * 3) * cell;
@@ -283,7 +303,7 @@
       return cast(out);
     },
     state: function () { return { round: round, pos: pos, target: target, moves: moves, done: done, moving: !!anim, waiting: !!wait, ease: ease, layout: Lo === LAYOUTS.wide ? 'wide' : 'tall',
-      line: lineEl.textContent, last: last, learned: LumosSpells.learned('mobiliarbus') }; } };
+      line: lineEl.textContent, last: last, learned: LumosSpells.learned('mobiliarbus'), arrow: arrow ? { ell: !!arrow.ell, acrossFirst: arrow.acrossFirst !== false, grow: !!arrow.grow } : null }; } };
 })();
 </script>
 </body>
