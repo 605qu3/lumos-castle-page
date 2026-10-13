@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=16"></script>
+<script src="spells.js?v=35"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* Expelliarmus, a test page for the Charms lane (13 October 2026, fifteenth session; the owner is Godric). Drawn in code.
@@ -42,7 +42,13 @@
    through the top dashed, and the two halves on the start's level ticked as equal. Three rounds: a short throw, a long
    one, and the dummy up on the stage, where the wand starts higher than his hand and so lands further on than the
    mirror of its start (the older boy's edge). Each throw varies a little, so the rise has to be read, not remembered.
-   The traced guide, the swing and the point, shows in the first round only. ?round=1..3, ?ease=, ?guide= for trying;
+   A fourth round, the top (8.1, thirty-second session): he calls the very top itself while the wand still rises,
+   from the rise alone, judged by LumosSpells.judgeTop; the line down through his call is his mirror, the rise turned
+   over in it is drawn as his fall, and a line a foot off lands that fall two feet off: a mirror doubles it.
+   Q9's fix (Godric, 13 October 2026, 5.05 pm: awkward in the hand): the swing and the point may be two strokes, the
+   finger lifted at the top and the point drawn from there (LumosSpells.joinStrokes), and in the three catch rounds the
+   wand hangs a beat at its top, the flight's clock standing still, so the catch is a read, not a race.
+   The traced guide, the swing and the point, shows in the first round only. ?round=1..4, ?ease=, ?guide= for trying;
    window.lumosExpelliarmus for checks. */
 (function () {
   'use strict';
@@ -50,19 +56,21 @@
   var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
   /* the catch: how near the landing his tap must be (a share of the short side), and how far back down the wand may
-     have fallen when he calls it (a share of its rise; 0 is at its top) */
-  var CATCH = { kind: { tol: 0.075, late: 0.5 }, fair: { tol: 0.055, late: 0.25 }, strict: { tol: 0.04, late: 0.05 } };
+     have fallen when he calls it (a share of its rise; 0 is at its top), and how long it hangs at its top, s (Q9) */
+  var CATCH = { kind: { tol: 0.075, late: 0.5, hang: 0.7 }, fair: { tol: 0.055, late: 0.25, hang: 0.5 }, strict: { tol: 0.04, late: 0.05, hang: 0.3 } };
   var ROUNDS = [
     { name: 'Short', up: 0, span: 0.28, rise: 0.30,
-      start: 'The Duelling Club, in the Great Hall. A straw dummy holds up its wand. <b>Swing your wand up above your head, then point it at the dummy\'s wand hand</b>, in one stroke: <i>Expelliarmus!</i>' },
+      start: 'The Duelling Club, in the Great Hall. A straw dummy holds up its wand. <b>Swing your wand up above your head, then point it at the dummy\'s wand hand</b>: one stroke, or lift at the top and point from there. <i>Expelliarmus!</i>' },
     { name: 'Long', up: 0, span: 0.48, rise: 0.42,
       start: 'A harder flash this time: its wand will fly higher and further. Disarm it, then <b>tap where it will come down</b> while it is still high.' },
     { name: 'Stage', up: 0.2, span: 0.36, rise: 0.22,
-      start: 'Now the dummy is up on the golden stage, higher than your hand. Disarm it: <b>where will its wand come down to you?</b>' } ];
-  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+      start: 'Now the dummy is up on the golden stage, higher than your hand. Disarm it: <b>where will its wand come down to you?</b>' },
+    { name: 'Top', up: 0, span: 0.42, rise: 0.36,
+      start: 'For the older boy: <b>catch it at its very top</b>, the moment it stops rising. Disarm it, watch it rise, and <b>tap where the top will be</b> before it gets there.' } ];
+  var round = Math.max(0, Math.min(3, (Number(qs.get('round')) || 1) - 1));
   var hand = { x: 0, y: 0, r: 10 }, dummy = { x: 0, y: 0, r: 8 }, FT = 1;   /* FT: pixels to the foot, from the dummy's height */
   var stage = 'cast', wait = null, done = false, last = null, bolt = null, flash = 0, rock = 0, fly = null, sum = null, sparks = [], t0 = performance.now();
-  var stroke = null, active = null, trail = null, guide = null, candles = [];
+  var stroke = null, active = null, trail = null, guide = null, candles = [], upHeld = null;   /* upHeld: a swing alone, waiting for its point (Q9) */
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
@@ -87,6 +95,7 @@
     src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
   }
   function ft(px) { var v = Math.round(px / FT * 2) / 2; return (v >= 1 ? String(Math.floor(v)) : '') + (v % 1 ? '½' : '') + ' ft'; }
+  function ftq(px) { return Math.abs(px) < FT / 4 ? 'under ½ ft' : ft(Math.abs(px)); }
 
   /* the guide, in the first round only: the swing up from the hand, then the point at the dummy's wand hand */
   function makeGuide() {
@@ -113,21 +122,28 @@
   }
   function choose(i) {
     if (wait) { clearTimeout(wait); wait = null; }
-    round = i; stage = 'cast'; last = null; bolt = null; fly = null; sum = null; trail = null; done = false; sparks = []; rock = 0;
+    round = i; stage = 'cast'; last = null; upHeld = null; bolt = null; fly = null; sum = null; trail = null; done = false; sparks = []; rock = 0;
     place(); makeGuide(); menu(); say(ROUNDS[i].start);
   }
-  function again(html) { stage = 'cast'; bolt = null; fly = null; sum = null; sparks = []; say(html); }
+  function again(html) { stage = 'cast'; upHeld = null; bolt = null; fly = null; sum = null; sparks = []; say(html); }
 
   /* ---- the cast: the swing and the point ---- */
   var SIDE = { high: 'above', low: 'below', left: 'to the left of', right: 'to the right of' };
   function judge(pts) {
     if (stage !== 'cast' || wait) return null;
+    var jn = upHeld ? LumosSpells.joinStrokes(upHeld, pts, hand, ease) : null; upHeld = null;   /* the point as a second stroke from the swing's top */
+    if (jn) pts = jn;
     var j = LumosSpells.judgeDisarm(pts, hand, dummy, ease);
-    if (j.reason === 'tap') { if (guide) guide.clear(); say('Swing your wand up above your head, then point it at the dummy\'s wand hand, all in one stroke.'); last = j; return j; }
+    if (j.reason === 'tap') { if (guide) guide.clear(); say('Swing your wand up above your head, then point it at the dummy\'s wand hand: one stroke, or lift at the top and point from there.'); last = j; return j; }
     var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
     if (tr && tr.traced && j.verdict === 'miss' && j.reason !== 'off') {
       j.verdict = 'disarmed'; j.reason = 'traced'; if (!j.top) j.top = { x: hand.x - hand.r / 3, y: hand.y - hand.r * 2.5 }; }
     last = j;
+    if (j.reason === 'up') {   /* a swing alone: held, drawn, for the point from its top */
+      upHeld = pts; trail = { pts: pts, at: performance.now() };
+      say('A good swing! Now <b>point</b> it at the dummy\'s wand hand from the top: keep your finger down, or lift it and point from there.');
+      return j;
+    }
     if (j.verdict !== 'disarmed' && j.reason !== 'wide') {
       if (guide) guide.miss();
       trail = { pts: pts, at: performance.now() };
@@ -137,7 +153,6 @@
                   j.top ? 'Higher! Swing it right up above your head first, then point.' :
                   peak >= hand.r ? 'A rainbow! Swing straight up, then turn sharply at the top and point straight from there: a corner, not a curve.' :
                   'Swing your wand up above your head first, then point: the book\'s duellists swing, then point.',
-            up: 'A good swing! Now, without lifting your finger, <b>point</b> it at the dummy\'s wand hand.',
             wiggly: 'Point straight, like a finger at the dummy\'s hand: the flash flies straight.',
             short: 'A longer point, well out toward the dummy.',
             away: 'At the dummy, not away from it!' }[j.reason] || 'Swing up, then point.');
@@ -164,7 +179,8 @@
       return;
     }
     stage = 'catch'; flash = now; rock = now; noise(0.5, 300, 0.4, 6); throwWand(now);
-    say('<b>A dazzling flash of scarlet light</b>, and its wand flies up! <b>Tap where it will come down</b>, while it is still high.');
+    say(round === 3 ? '<b>A dazzling flash of scarlet light</b>, and its wand flies up! <b>Tap where its top will be</b>, before it gets there.' :
+        '<b>A dazzling flash of scarlet light</b>, and its wand flies up and hangs a beat at its top! <b>Tap where it will come down</b>, while it is still high.');
   }
   function deg(v) { return (v < 1 ? v.toFixed(1) : String(Math.round(v * 10) / 10)) + '°'; }
 
@@ -177,22 +193,26 @@
       if (land >= W * 0.06) break; span *= 0.88;
     }
     var yt = dummy.y - rise, tUp = 0.9 + 0.6 * rise / (0.4 * S), vx = span / 2 / tUp;
-    var late = xt - span / 2 * Math.sqrt(c.late);
+    var late = xt - span / 2 * Math.sqrt(round === 3 ? CATCH.strict.late : c.late);   /* the top's round: called on the rise, every ease */
     fly = { at: now, start: { x: dummy.x, y: dummy.y }, top: { x: xt, y: yt }, span: span, rise: rise, mirror: dummy.x - span,
-            land: land, catchY: catchY, vx: vx, lateAt: (dummy.x - late) / vx, landAt: (dummy.x - land) / vx,
+            land: land, catchY: catchY, vx: vx, lateAt: (dummy.x - late) / vx, landAt: (dummy.x - land) / vx, topAt: tUp, judge: null, hang: round === 3 ? 0 : c.hang,
             floorAt: (dummy.x - (xt - span / 2 * Math.sqrt((floorY() - yt) / rise))) / vx, tap: null, told: false, caught: null };
   }
   function wandAt(t) {   /* t in seconds since the throw */
     var x = fly.start.x - fly.vx * t, k = (x - fly.top.x) / (fly.span / 2);
     return { x: x, y: fly.top.y + fly.rise * k * k };
   }
+  function flightT(now) {   /* the flight's own clock, which stands still while the wand hangs at its top (Q9) */
+    var t = (now - fly.at) / 1000; return t <= fly.topAt ? t : t <= fly.topAt + fly.hang ? fly.topAt : t - fly.hang;
+  }
   function call(p) {   /* his tap: his catching hand goes to that place along his hand's level */
-    var t = (performance.now() - fly.at) / 1000;
+    var t = flightT(performance.now());
     if (fly.tap || fly.caught !== null) return;
-    if (t > fly.lateAt) { if (!fly.told) { fly.told = true; say('Too late to call it: next time, tap while it is still high.'); } return; }
-    fly.tap = { x: p.x, y: fly.catchY }; noise(0.08, 2600, 0.15);
+    if (t > fly.lateAt) { if (!fly.told) { fly.told = true; say(round === 3 ? 'Too late: it has passed its top. Call the top while it is still rising.' : 'Too late to call it: next time, tap while it is still high.'); } return; }
+    fly.tap = { x: p.x, y: round === 3 ? p.y : fly.catchY }; noise(0.08, 2600, 0.15);   /* the top's round: his hand goes up to the top he called */
   }
   function settle(now) {   /* at his hand's level: caught, or on down to the floor */
+    if (round === 3) return settleTop(now);
     var tol = CATCH[ease].tol * S, gap = fly.tap ? fly.tap.x - fly.land : null;
     fly.caught = fly.tap && Math.abs(gap) <= tol;
     sum = { shown: now + 250, gap: gap };
@@ -200,12 +220,30 @@
       stage = 'caught'; noise(0.12, 1200, 0.3);
       var tail = round === 2 ? ' Level with its start it was as far past its top as it began before it, then it fell on down to your hand.' : ' It came down as far past its top as it started before it.';
       say('<b>Caught it!</b> As Ron caught Lockhart\'s wand (Book 2).' + tail);
-      if (round < 2) wait = setTimeout(function () { wait = null; choose(round + 1); }, 7000);
-      else { done = true; setTimeout(function () { if (done) say('All three caught. <i>"That was a Disarming Charm, as you see, I\'ve lost my wand,"</i> as Lockhart said (Book 2).'); }, 5200); }
+      wait = setTimeout(function () { wait = null; choose(round + 1); }, 7000);
     } else stage = 'falling';
+  }
+  function settleTop(now) {   /* the top's round: at its top, caught in his hand there, or on over and down */
+    var jt = fly.tap ? LumosSpells.judgeTop(fly.tap, fly.start, fly.top, S, ease) : null;
+    fly.judge = jt; fly.caught = !!jt && jt.verdict === 'caught'; sum = { shown: now + 250, gap: null };
+    if (!fly.caught) { stage = 'falling'; return; }
+    stage = 'caught'; noise(0.12, 1200, 0.3); done = true;
+    say('<b>Caught at the very top</b>, where it stopped rising! Dashed through your hand: its fall, the rise turned over in your line.');
+    setTimeout(function () { if (done) say('All four caught. <i>"That was a Disarming Charm, as you see, I\'ve lost my wand,"</i> as Lockhart said (Book 2).'); }, 5200);
   }
   function clatter(now) {
     stage = 'missed'; noise(0.25, 700, 0.35, 30);
+    if (round === 3) {   /* the top's round: how far his hand was from the top, and what his line does to the fall */
+      var jt = fly.judge, ow;
+      if (!jt) ow = fly.told ? 'You called it after its top.' : 'You didn\'t call it.';
+      else {
+        ow = 'Your hand was ' + (jt.reason === 'before' || jt.reason === 'past' ? ftq(jt.along) + ' ' + jt.reason : ftq(jt.up) + (jt.reason === 'high' ? ' above' : ' below')) + ' its top. ';
+        ow += Math.abs(jt.gap) >= FT / 4 ? 'Turned over in your line, the fall lands ' + ft(Math.abs(jt.gap)) + ' off: a mirror doubles it.' : 'Your line was true, so its fall turns over right: only the height was off.';
+      }
+      say('<b>Clatter!</b> ' + ow);
+      wait = setTimeout(function () { wait = null; again('The dummy picks its wand back up. Again: <b>swing up, then point</b>, then call its top.'); }, 6200);
+      return;
+    }
     var where = sum.gap === null ? (fly.told ? 'You called it too late.' : 'You didn\'t call it.') :
       'Your hand was ' + ft(Math.abs(sum.gap)) + (sum.gap > 0 ? ' short of' : ' past') + ' where it came down.';
     say('<b>Clatter!</b> ' + where + ' See the two halves: it comes down as far past its top as it went up before it.');
@@ -319,6 +357,19 @@
       cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(f.mirror, f.catchY); cx.lineTo(f.land, f.catchY); cx.stroke();
       cx.fillStyle = '#f3e6c8'; cx.textAlign = 'center'; cx.fillText(ft(f.mirror - f.land) + ' further', (f.mirror + f.land) / 2, f.catchY + fs * 1.5);
     }
+    if (round === 3 && f.tap && f.judge) {   /* the top's round: his line, the rise turned over in it, where that fall lands */
+      var jt = f.judge, lx = f.tap.x;
+      cx.strokeStyle = 'rgba(240,226,198,0.9)'; cx.lineWidth = 2; cx.setLineDash([3, 6]);
+      cx.beginPath(); cx.moveTo(lx, f.tap.y - fs); cx.lineTo(lx, y0 + fs * 0.6); cx.stroke();
+      cx.beginPath(); for (i = 0; i <= 30; i++) { x = f.start.x + (f.top.x - f.start.x) * i / 30; p = wandAt((f.start.x - x) / f.vx); i ? cx.lineTo(2 * lx - p.x, p.y) : cx.moveTo(2 * lx - p.x, p.y); } cx.stroke();
+      cx.setLineDash([]); cx.fillStyle = '#f0e2c6'; cx.beginPath(); cx.arc(jt.land, y0, 4, 0, 7); cx.fill();
+      if (!f.caught && Math.abs(jt.gap) >= FT / 4) {   /* the gap at the start's level: twice his line's */
+        var gy = y0 + fs * 2.4; cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2;
+        cx.beginPath(); cx.moveTo(jt.land, gy); cx.lineTo(f.mirror, gy); cx.stroke();
+        [jt.land, f.mirror].forEach(function (q) { cx.beginPath(); cx.moveTo(q, gy - fs * 0.4); cx.lineTo(q, gy + fs * 0.4); cx.stroke(); });
+        cx.fillStyle = '#f3e6c8'; cx.textAlign = 'center'; cx.fillText(ft(Math.abs(jt.gap)) + ' off: twice ' + ftq(jt.gap / 2), (jt.land + f.mirror) / 2, gy + fs * 1.5);
+      }
+    }
     cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(f.land, f.catchY, 4.5, 0, 7); cx.fill();   /* where it came down to his hand's level */
     if (sum.gap !== null && !f.caught) {   /* the gap from his hand */
       cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(f.tap.x, f.catchY + fs * 2.4); cx.lineTo(f.land, f.catchY + fs * 2.4); cx.stroke();
@@ -347,24 +398,35 @@
       if (stage === 'bolt' && bf >= 1) struck(now);
     }
     if (fly) {
-      var t = (now - fly.at) / 1000, p;
-      if (stage === 'catch' && t >= fly.landAt) settle(now);
+      var t = flightT(now), p;
+      if (stage === 'catch' && (round === 3 ? (fly.tap && t >= fly.topAt) || t >= fly.lateAt : t >= fly.landAt)) settle(now);
       if (stage === 'falling' && t >= fly.floorAt) clatter(now);
-      if (fly.tap) drawCatcher(fly.tap.x, fly.catchY);
+      if (round === 3 && stage === 'catch') {   /* the top's round: the rise so far, dotted, to read its curve by */
+        cx.save(); cx.fillStyle = 'rgba(240,226,198,0.55)';
+        for (var q = 0.05; q < t; q += 0.05) { var rp = wandAt(q); cx.beginPath(); cx.arc(rp.x, rp.y, 2, 0, 7); cx.fill(); }
+        cx.restore();
+      }
+      if (fly.tap) drawCatcher(fly.tap.x, fly.tap.y);
       drawSum(now);
-      if (fly.caught) { drawWand(fly.tap.x, fly.catchY - S * 0.01, 0.15, 1); }
-      else { var tt = stage === 'missed' ? fly.floorAt : t; p = wandAt(tt); drawWand(p.x, Math.min(p.y, floorY() - S * 0.006), stage === 'missed' ? 0.05 : tt * 9, 1); }
-      if (stage === 'catch' && !fly.tap && t <= fly.lateAt) {   /* his hand's level, faint, while he may still call it */
+      if (fly.caught) { drawWand(fly.tap.x, fly.tap.y - S * 0.01, 0.15, 1); }
+      else { var tt = stage === 'missed' ? fly.floorAt : t; p = wandAt(tt); drawWand(p.x, Math.min(p.y, floorY() - S * 0.006), stage === 'missed' ? 0.05 : (now - fly.at) / 1000 * 9, 1);
+        if (fly.hang && stage === 'catch' && t === fly.topAt) {   /* hanging at its top: a soft gold glow, still turning */
+          var hg = cx.createRadialGradient(p.x, p.y, 0, p.x, p.y, S * 0.07); hg.addColorStop(0, 'rgba(255,215,130,0.35)'); hg.addColorStop(1, 'rgba(255,215,130,0)');
+          cx.fillStyle = hg; cx.fillRect(p.x - S * 0.07, p.y - S * 0.07, S * 0.14, S * 0.14); } }
+      if (stage === 'catch' && !fly.tap && t <= fly.lateAt && round !== 3) {   /* his hand's level, faint, while he may still call it */
         cx.save(); cx.strokeStyle = 'rgba(232,201,168,0.28)'; cx.setLineDash([3, 8]); cx.lineWidth = 2; cx.beginPath(); cx.moveTo(W * 0.03, fly.catchY); cx.lineTo(dummy.x - S * 0.04, fly.catchY); cx.stroke(); cx.restore();
       }
     }
     if (flash && now - flash < 450) { cx.fillStyle = 'rgba(255,40,30,' + (0.45 * (1 - (now - flash) / 450)) + ')'; cx.fillRect(0, 0, W, H); }
     if (stage === 'cast' && !wait && guide) guide.draw(cx, now, !!stroke);
-    var pts = stroke || (trail && now - trail.at < 600 ? trail.pts : null);
-    if (pts && pts.length > 1) {
-      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + (stroke ? 0.6 : 0.6 * (1 - (now - trail.at) / 600)) + ')'; cx.lineWidth = 5;
-      cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
-    }
+    var held = upHeld && now - upHeld[upHeld.length - 1].t < LumosSpells.DISARM_EASES[ease].pause, lists = [];   /* a held swing stays drawn */
+    if (held) lists.push([upHeld, 0.6]);
+    if (stroke) lists.push([stroke, 0.6]); else if (!held && trail && now - trail.at < 600) lists.push([trail.pts, 0.6 * (1 - (now - trail.at) / 600)]);
+    lists.forEach(function (L) {
+      if (L[0].length < 2) return;
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + L[1] + ')'; cx.lineWidth = 5;
+      cx.beginPath(); L[0].forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
+    });
     requestAnimationFrame(frame);
   }
 
@@ -394,9 +456,9 @@
   addEventListener('resize', resize); resize(); requestAnimationFrame(frame);
   window.lumosExpelliarmus = { choose: function (i) { choose(i - 1); }, hand: function () { return { x: hand.x, y: hand.y, r: hand.r }; },
     dummy: function () { return { x: dummy.x, y: dummy.y, r: dummy.r }; }, judge: function (pts) { return judge(pts); },
-    flight: function () { return fly ? { t: (performance.now() - fly.at) / 1000, land: fly.land, top: fly.top, start: fly.start, mirror: fly.mirror,
-      catchY: fly.catchY, lateAt: fly.lateAt, landAt: fly.landAt, tol: CATCH[ease].tol * S, tap: fly.tap, caught: fly.caught } : null; },
-    state: function () { return { round: round + 1, stage: stage, waiting: !!wait, done: done,
+    flight: function () { return fly ? { t: flightT(performance.now()), hang: fly.hang, land: fly.land, top: fly.top, start: fly.start, mirror: fly.mirror,
+      catchY: fly.catchY, lateAt: fly.lateAt, landAt: fly.landAt, topAt: fly.topAt, judge: fly.judge, tol: CATCH[ease].tol * S, tap: fly.tap, caught: fly.caught } : null; },
+    state: function () { return { round: round + 1, stage: stage, waiting: !!wait, done: done, held: !!upHeld,
       last: last ? { verdict: last.verdict, reason: last.reason, lift: last.lift, off: last.off, allow: last.allow, by: last.by, side: last.side } : null,
       line: lineEl.textContent, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('expelliarmus') }; } };
 })();

@@ -610,6 +610,31 @@ function judgeTwoMirrors(first, second, box, want, ease, stage) {
   out.verdict = 'slide'; out.reason = 'slide';
   return out;
 }
+/* The catch called at the very top, from the rise alone (Expelliarmus, call the catch at the top; 8.1, thirty-second
+   session, 13 October 2026). A thrown wand's flight is an arc whose two halves are equal: its top is halfway along,
+   and the line straight down through the top is a mirror, the fall the rise turned over. Seeing only the rise, he
+   calls where the top will be; the vertical line through his call is his mirror, and the start turned over in it is
+   where his fall lands on the start's level. So a line off by a foot lands the fall two feet off: a mirror doubles it.
+   tap: { x, y } his call, px; start: { x, y } where the throw began; top: { x, y } its true top; short: the screen's
+   short side, px; ease: a name in TOP_EASES or { tol } of its own (tol: how near the top his call must be, a share of
+   the short side, either way, along and up or down).
+   Returns { verdict: 'caught' | 'miss', reason ('caught', 'before', 'past', 'high', 'low': the larger way off), by
+   (px from the top), along (px past the top along the throw, minus before it), up (px above the top, minus below),
+   tol (px), line (his line's x), land (the start turned over in his line, x on the start's level), mirror (the same
+   in the true line), gap (land minus mirror: twice his line's error) }. The timing, before the top, is the page's. */
+var TOP_EASES = {
+  kind:   { tol: 0.075 },
+  fair:   { tol: 0.055 },
+  strict: { tol: 0.04 }
+};
+function judgeTop(tap, start, top, short, ease) {
+  var e = typeof ease === 'object' ? ease : (TOP_EASES[ease] || TOP_EASES.kind);
+  var dir = top.x < start.x ? -1 : 1, dx = tap.x - top.x, along = dx * dir, up = top.y - tap.y;
+  var by = Math.hypot(dx, up), tol = e.tol * short, ok = by <= tol;
+  var land = 2 * tap.x - start.x, mirror = 2 * top.x - start.x;
+  return { verdict: ok ? 'caught' : 'miss', reason: ok ? 'caught' : Math.abs(along) >= Math.abs(up) ? (along < 0 ? 'before' : 'past') : (up > 0 ? 'high' : 'low'),
+           by: by, along: along, up: up, tol: tol, line: tap.x, land: land, mirror: mirror, gap: land - mirror };
+}
 /* Expelliarmus, the swing and the point (CoS 11, the Duelling Club: Lockhart and Snape "swung their wands above their
    heads and pointed them at their opponent; Snape cried: 'Expelliarmus!' There was a dazzling flash of scarlet light"):
    the book's own stroke. One stroke that starts at the wand hand, swings up above it, then points straight from the
@@ -622,11 +647,11 @@ function judgeTwoMirrors(first, second, box, want, ease, stage) {
    highest place the stroke turns 40 degrees or more over half a reach, or 50 over a reach, so a point aimed a little
    high still finds it and a finger's rounded corner counts), and the point's
    off, allow, by, side, straight as judgeAim gives them }. 'flat': no swing above (pointed straight from the hand, or
-   pointed first and swung after); 'up': swung up and never pointed. */
+   pointed first and swung after); 'up': swung up and never pointed (a page may hold it for joinStrokes, below). */
 var DISARM_EASES = {
-  kind:   { start: 1.6, lift: 1.0, straight: 0.80, len: 1.5, slack: 1.5 },
-  fair:   { start: 1.3, lift: 1.5, straight: 0.87, len: 2.0, slack: 1.2 },
-  strict: { start: 1.0, lift: 2.0, straight: 0.93, len: 2.5, slack: 1.0 }
+  kind:   { start: 1.6, lift: 1.0, straight: 0.80, len: 1.5, slack: 1.5, join: 1.8, pause: 2500 },
+  fair:   { start: 1.3, lift: 1.5, straight: 0.87, len: 2.0, slack: 1.2, join: 1.4, pause: 1800 },
+  strict: { start: 1.0, lift: 2.0, straight: 0.93, len: 2.5, slack: 1.0, join: 1.0, pause: 1200 }
 };
 function judgeDisarm(points, from, to, ease) {
   var e = typeof ease === 'object' ? ease : (DISARM_EASES[ease] || DISARM_EASES.kind);
@@ -665,6 +690,20 @@ function judgeDisarm(points, from, to, ease) {
   if (j.verdict !== 'hit') { out.reason = j.reason; return out; }
   out.verdict = 'disarmed'; out.reason = 'disarmed';
   return out;
+}
+/* Expelliarmus in two strokes (Q9, 9.2, Godric, 13 October 2026, 5.05 pm: the swing and the point were one stroke that
+   is really two, awkward in his hand). The swing may end with the finger lifted at its top and the point drawn as a
+   second stroke, so long as it begins near where the swing ended (join, in reaches of the wand hand) and soon after
+   (pause, ms); the two are then judged as one stroke by judgeDisarm, the lift at the top its corner. A second stroke
+   begun anywhere else, or later, is a fresh cast and is judged alone.
+   first, second: the two strokes, {x, y, t} in CSS pixels; from: { x, y, r } the wand hand; ease: a name in
+   DISARM_EASES or an ease of its own (join, pause). Returns the joined points, or null for a fresh cast. */
+function joinStrokes(first, second, from, ease) {
+  var e = typeof ease === 'object' ? ease : (DISARM_EASES[ease] || DISARM_EASES.kind);
+  if (!first || !second || first.length < 2 || !second.length) return null;
+  var a = first[first.length - 1], b = second[0];
+  if (Math.hypot(b.x - a.x, b.y - a.y) > (e.join || 0) * from.r || b.t - a.t > (e.pause || 0)) return null;
+  return first.concat(second);
 }
 /* Ferula, the coil (PoA 19: Lupin "tapped Ron's leg with his wand and muttered, 'Ferula.' Bandages spun up Ron's leg,
    strapping it tightly to a splint"). The book's is the tap; the stroke after it is ours, for the geometry: a coil drawn
@@ -2384,5 +2423,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
