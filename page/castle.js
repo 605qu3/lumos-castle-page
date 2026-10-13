@@ -883,14 +883,14 @@ window.castleFrame = function (opts) {
   var MOTE_S = 0.5, lift = null, motes = 0;
   try { var ms = parseFloat(new URLSearchParams(location.search).get('mote')); if (ms > 0) MOTE_S = ms; } catch (err) {}
   window.addEventListener('pointerup', function (e) { if (e.target === canvas) lift = { x: e.clientX, y: e.clientY }; }, true);
-  function mote(x, y) {
+  var WAND_LIGHT = 'radial-gradient(circle,rgba(255,252,236,1) 0,rgba(255,226,150,0.9) 16%,rgba(255,184,84,0.45) 38%,rgba(255,160,60,0) 70%)';
+  function mote(x, y, look, z) {
     var d = document.createElement('div'), s = 36;
     d.className = 'castle-mote';
     d.style.cssText = 'position:fixed;left:' + (x - s / 2) + 'px;top:' + (y - s / 2) + 'px;width:' + s + 'px;height:' + s + 'px;' +
-      'border-radius:50%;pointer-events:none;mix-blend-mode:screen;z-index:5;' +
-      'background:radial-gradient(circle,rgba(255,252,236,1) 0,rgba(255,226,150,0.9) 16%,rgba(255,184,84,0.45) 38%,rgba(255,160,60,0) 70%)';
+      'border-radius:50%;pointer-events:none;mix-blend-mode:screen;z-index:' + (z || 5) + ';background:' + (look || WAND_LIGHT);
     canvas.insertAdjacentElement('afterend', d);
-    motes++;
+    if (!z) motes++;   /* a spark (z above the offer) is counted by castleSparks, not here */
     var gone = function () { if (d.parentNode) d.parentNode.removeChild(d); };
     if (d.animate) {
       d.animate([
@@ -901,6 +901,24 @@ window.castleFrame = function (opts) {
       ], { duration: MOTE_S * 1000, easing: 'ease-out', fill: 'forwards' }).onfinish = gone;
     } else setTimeout(gone, MOTE_S * 1000);
   }
+  /* a stray tap while a spell's offer waits (req 229; the vocabulary's §9, A stray tap while an offer waits; Godric, Q4,
+     13 October 2026, 7.13 am, option 4.1 with his touch t1): one spark where his finger lifted, the mote's size and half
+     second, in his house's colour, one tiny spark of the "red and gold sparks" of Ollivander's (PS 5), the bright one at
+     its heart; with no house, the mote's warm wand-light. Above the offer's own layer, so it shows over it. It reports
+     nothing to markTap and changes nothing else; the house is the runtime's castle.house(), passed in by the room */
+  var HOUSE_SPARK = {
+    lion: ['255,236,200', '214,40,40', '242,184,48'],      /* scarlet and gold */
+    snake: ['236,255,240', '40,150,90', '200,208,216'],    /* green and silver */
+    badger: ['255,250,220', '250,214,60', '236,176,30'],   /* yellow */
+    eagle: ['236,244,255', '60,110,220', '196,132,70']     /* blue and bronze */
+  };
+  var sparks = 0;
+  function spark(x, y, house) {
+    var c = HOUSE_SPARK[house];
+    sparks++;
+    mote(x, y, c ? 'radial-gradient(circle,rgba(' + c[0] + ',1) 0,rgba(' + c[1] + ',0.95) 18%,rgba(' + c[2] + ',0.55) 40%,rgba(' + c[2] + ',0) 70%)' : null, 2147483001);
+  }
+  window.castleSparks = function () { return sparks; };
   function tapped(acted, x, y) {
     if (markTap) markTap(acted);
     if (acted) return;
@@ -1189,7 +1207,7 @@ window.castleFrame = function (opts) {
     layered: layered, TINTS: TINTS, register: register, solid: solid, box: box, cutoutMesh: cutoutMesh,
     sheetTexture: sheetTexture, applyLayer: applyLayer, placeCard: placeCard, applySurface: applySurface, applyPlan: applyPlan,
     quietCanvas: quietCanvas, unstainCanvas: unstainCanvas, sillCanvas: sillCanvas, wornCanvas: wornCanvas,
-    setTint: setTint, resize: resize, stats: stats, zoom: zoom, seen: function (p) { return seen(p); }, torchCues: torchCues, tapped: tapped,
+    setTint: setTint, resize: resize, stats: stats, zoom: zoom, seen: function (p) { return seen(p); }, torchCues: torchCues, tapped: tapped, spark: spark,
     from: from, reveal: reveal, travel: travel, savePlace: savePlace, readPlace: readPlace,
     CORRIDOR: CORRIDOR, buildCorridor: buildCorridor, mountInHole: mountInHole, corridorInHole: corridorInHole };
   for (var k in names) F[k] = names[k];
