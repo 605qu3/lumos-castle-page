@@ -28,7 +28,7 @@
       "tier": "small",
       "source": "date",
       "leans": [],
-      "weight": 1,
+      "weight": 3,
       "moment": "wait 20-90 s",
       "when": [
         "ground = snow",
@@ -36,6 +36,27 @@
       ],
       "show": [
         "a snowball flies up past the window from a fight on the grounds below and drops out of sight"
+      ],
+      "canon": "the twins' bewitched snowballs: PS 12, the Weasley twins punished for bewitching several snowballs to follow Quirrell about, checked against the text, 13 October 2026; Godric's events-snowball-262 Try 1 (13 October 2026, 1.55 pm): so one reaches a window 65 m up"
+    },
+    {
+      "id": "grounds.snowball-splat",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "ground = snow",
+        "time != night",
+        "days since snowball_splat >= 7"
+      ],
+      "starts": [
+        "stamp snowball_splat"
+      ],
+      "canon": "Godric's touch on events-snowball-262 (t1, 13 October 2026, 1.55 pm): now and then one of the twins' bewitched snowballs misses and hits the glass (PS 12)",
+      "show": [
+        "a snowball smacks into the glass, a round white splat that slides slowly down the pane"
       ]
     }
   ]

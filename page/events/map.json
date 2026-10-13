@@ -462,6 +462,52 @@
         ]
       },
       {
+        "who": "fred",
+        "label": "Fred Weasley",
+        "names": [
+          "fred"
+        ],
+        "move": "walk",
+        "when": [
+          "ground = snow",
+          "time != night"
+        ],
+        "canon": "Godric's touch on events-snowball-262 (t2, 13 October 2026, 1.55 pm): on the grounds while their bewitched snowballs fly (PS 12, checked against the text, 13 October 2026), the snowball's own weather and hours (grounds.json, grounds.snowball)",
+        "rounds": [
+          {
+            "places": [
+              "drive",
+              "flying-lawn"
+            ],
+            "every": 10,
+            "agrees": "the snowball at the windows, grounds.json's grounds.snowball and grounds.snowball-splat, on the same weather"
+          }
+        ]
+      },
+      {
+        "who": "george",
+        "label": "George Weasley",
+        "names": [
+          "george"
+        ],
+        "move": "walk",
+        "when": [
+          "ground = snow",
+          "time != night"
+        ],
+        "canon": "Godric's touch on events-snowball-262 (t2, 13 October 2026, 1.55 pm): on the grounds while their bewitched snowballs fly (PS 12, checked against the text, 13 October 2026), the snowball's own weather and hours (grounds.json, grounds.snowball)",
+        "rounds": [
+          {
+            "places": [
+              "drive",
+              "flying-lawn"
+            ],
+            "every": 10,
+            "agrees": "the snowball at the windows, grounds.json's grounds.snowball and grounds.snowball-splat, on the same weather"
+          }
+        ]
+      },
+      {
         "who": "pettigrew",
         "label": "Peter Pettigrew",
         "move": "flicker",
