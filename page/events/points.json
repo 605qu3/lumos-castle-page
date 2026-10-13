@@ -32,6 +32,10 @@
     "callback": {
       "words": "for {thing}, seen with his own eyes and not in a book, which Miss Granger would tell you is the second-best kind of learning",
       "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am)"
+    },
+    "year": {
+      "words": "for the best year this castle has seen in many years",
+      "canon": "Magic's reasons' words (Against the year, 13 October 2026), after Dumbledore's 'the best-played game of chess Hogwarts has seen in many years' and its fifty points (PS 17, checked)"
     }
   },
   "records": [
@@ -44,6 +48,69 @@
       "when": [],
       "starts": [
         "point spell {spell} 10"
+      ]
+    },
+    {
+      "id": "points.owl",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "owl post",
+      "when": [
+        "owl waited = no"
+      ],
+      "show_at": {
+        "morning": [
+          "an owl swoops down to the sill with a little pouch tied to its leg, and his brother's gems tumble out of it and fly across the room into the hourglass, each in its own house's colours"
+        ],
+        "day": [
+          "an owl swoops down to the sill with a little pouch tied to its leg, and his brother's gems tumble out of it and fly across the room into the hourglass, each in its own house's colours"
+        ],
+        "evening": [
+          "an owl swoops down to the sill with a little pouch tied to its leg, and his brother's gems tumble out of it and fly across the room into the hourglass, each in its own house's colours"
+        ],
+        "night": [
+          "an owl lands on the moonlit sill, taps its beak on the glass three times, tap-tap-tap, and his brother's gems tumble out of the little pouch tied to its leg and fly across the room into the hourglass, each in its own house's colours"
+        ]
+      },
+      "starts": []
+    },
+    {
+      "id": "points.errol",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "owl post",
+      "when": [
+        "owl waited = yes"
+      ],
+      "show_at": {
+        "morning": [
+          "Errol, the Weasleys' ancient owl, crash-lands on the sill and slumps over, legs in the air, and his brother's gems tumble out of the little pouch tied to his leg and fly across the room into the hourglass, each in its own house's colours; after a while Errol picks himself up and flaps off"
+        ],
+        "day": [
+          "Errol, the Weasleys' ancient owl, crash-lands on the sill and slumps over, legs in the air, and his brother's gems tumble out of the little pouch tied to his leg and fly across the room into the hourglass, each in its own house's colours; after a while Errol picks himself up and flaps off"
+        ],
+        "evening": [
+          "Errol, the Weasleys' ancient owl, crash-lands on the sill and slumps over, legs in the air, and his brother's gems tumble out of the little pouch tied to his leg and fly across the room into the hourglass, each in its own house's colours; after a while Errol picks himself up and flaps off"
+        ],
+        "night": [
+          "Errol, the Weasleys' ancient owl, crash-lands on the sill and slumps over, legs in the air, and his brother's gems tumble out of the little pouch tied to his leg and fly across the room into the hourglass, each in its own house's colours; after a while Errol picks himself up and flaps off"
+        ]
+      },
+      "starts": []
+    },
+    {
+      "id": "points.best-year",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "points grow",
+      "when": [
+        "best year = yes"
+      ],
+      "starts": [
+        "point year {year} 50"
       ]
     }
   ]

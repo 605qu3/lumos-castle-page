@@ -88,6 +88,18 @@
    feast's day, the boys' own last school day as a grown-up sets it (settings.feast, ?feast= for a test), the last
    Friday of June till then; `year()`, the school year now, named by its feast's year; each slip handed out carries
    its `year` (v=24).
+   Then the owl's post (board req 216; Godric's events-two-castles-server, 1, a small store online, the owl brings
+   them, with his t1, Errol): each castle has a random id, made at its first start and kept apart from its state
+   (`lumos.castle.owl.v1`, so ?fresh keeps it); a grown-up opens the pairing link once on each iPad (`#owl=`, the
+   store's address and the family key, read and taken off the address at once). Then each castle posts a copy of
+   each slip that has a house (only points and houses, never a name: `{ kind, thing, points, on, record, house,
+   late }`), and fetches the other castle's at its start and each minute of a visit; a slip fetched lands with
+   `from`, its house untouched, once however often it is fetched. In the common room the moment `owl post` brings
+   the waiting ones (built-in `owl waited`: yes when a copy waited out of signal on either iPad, and the owl is
+   Errol, CoS 6), then the page is told each slip as its own are. With no pairing, nothing is sent. The best-year
+   slip (Magic's *Against the year*): the moment `points grow` after any slip lands, the built-in `best year` yes
+   when this school year's heap, both boys', passes last year's (from the second year, once a year), `year` the
+   school year now; a `year` slip is never posted, since each castle reads the same heap and gives its own (v=25).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -98,6 +110,8 @@
 
   var STATE_KEY = 'lumos.castle.state.v1';
   var SETTINGS_KEY = 'lumos.castle.settings.v1';
+  var OWL_KEY = 'lumos.castle.owl.v1';      /* this castle's id and the owl's store, kept apart so ?fresh keeps them (req 216) */
+  var OWL_S = 60;                           /* the owl looks for the other castle's slips each minute of a visit */
   /* A house as a grown-up may write it, read to the beast the hourglass draws (Design's house-hourglass.js; req 227) */
   var HOUSES = { lion: 'lion', gryffindor: 'lion', snake: 'snake', slytherin: 'snake',
                  badger: 'badger', hufflepuff: 'badger', eagle: 'eagle', ravenclaw: 'eagle' };
@@ -257,7 +271,8 @@
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
              open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
-             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [], points: [] };
+             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [], points: [],
+             owl: { after: 0, posted: {}, postFailed: false, fetchFailed: false, waiting: [], waited: false } };
   }
 
   function start(opts) {
@@ -440,6 +455,9 @@
         case 'things looked at': return (state.looked || []).length;   /* different things held close in the zoom, ever (req 127) */
         case 'secrets found': return (state.secrets || []).length;     /* the castle's secrets he has found, each once ever (req 180) */
         case 'house points': return (state.points || []).reduce(function (t, p) { return t + p.points; }, 0);   /* req 216 */
+        case 'owl waited': return owlWaited ? 'yes' : 'no';           /* the owl's copies waited out of signal: Errol (req 216, t1) */
+        case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
+        case 'year': return schoolYear(isoDay(now));                   /* the school year now, named by its feast's year */
         case 'parent parcel': return settings.parcel || 'none';         /* what a parent sends by owl from the grown-up corner */
         case 'home howler': return homeHowler() ? 'written' : 'none';   /* a Howler line written at the letter page (req 193) */
         /* how this page was reached, from its `?from=`: room, corridor, dormitory, sleep (the waking), or none (Neville's
@@ -663,12 +681,17 @@
         if (v === undefined || v === null || v === '') { note(rec.id + ': no ' + thing + ' to award a point for'); return; }
         thing = String(v);
       }
-      for (var i = 0; i < state.points.length; i++) if (state.points[i].kind === kind && state.points[i].thing === thing) return;
+      for (var i = 0; i < state.points.length; i++) {
+        var had = state.points[i];
+        if (!had.from && had.kind === kind && had.thing === thing) return;   /* his brother's first lumos never blocks his own */
+      }
       var slip = { kind: kind, thing: thing, points: n, on: isoDay(nowDate()), record: rec.id };
       if (castleHouse()) slip.house = castleHouse();               /* whose it is (req 227) */
       state.points.push(slip);
       logLine(n + ' house points for ' + kind + ' ' + thing + ', {day}');
       if (opts.point) { try { opts.point(withReason(slip)); } catch (e) { note('the page could not take a point: ' + e); } }
+      heapGrew = true;
+      if (kind !== 'year') owlSync();
     }
 
     /* A slip as handed out, with its reason as the leaving feast reads it (Magic's reasons' words, req 216): the
@@ -688,6 +711,134 @@
       if (p.kind === 'spell') said = said.replace(/(^| )\S/g, function (ch) { return ch.toUpperCase(); });
       out.reason = r.words.replace(/\{thing\}/g, said);
       return out;
+    }
+
+    /* ---------- the owl's post (board req 216; Godric's events-two-castles-server, 1, with t1) ---------- */
+    /* Copies only: every slip stays on this iPad and is earned with no signal; the store (tools/owl-store, a small
+       Worker on the free plan) carries copies between the two castles, so a castle offline, or a store gone, loses
+       nothing here. Only points and houses travel, never a name. */
+    function randomId() {
+      var a = new Uint8Array(16), s = '';
+      if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(a);
+      else for (var i = 0; i < a.length; i++) a[i] = Math.floor(Math.random() * 256);
+      for (var j = 0; j < a.length; j++) s += (a[j] % 36).toString(36);
+      return s;
+    }
+    var owl = load(OWL_KEY) || {};
+    if (!/^[a-z0-9]{8,32}$/.test(owl.castle || '')) owl.castle = randomId();
+    /* The pairing link, opened once on each iPad by a grown-up: #owl= the store's address and the family key, as
+       base64 of { s, k }; read, kept and taken off the address at once, so it is never in a bookmark or a shot. */
+    var pairing = /[#&]owl=([A-Za-z0-9_\-]+)/.exec(location.hash || '');
+    if (pairing) {
+      try {
+        var pj = JSON.parse(atob(pairing[1].replace(/-/g, '+').replace(/_/g, '/')));
+        if (/^https:\/\/[a-z0-9.\-]+(:\d+)?\/?$/.test(pj.s || '') && /^[A-Za-z0-9_\-]{16,}$/.test(pj.k || '')) {
+          owl.store = pj.s.replace(/\/+$/, ''); owl.key = pj.k;
+          note('paired with the owl\'s store');
+        } else note('the owl\'s link does not name a store and a key');
+      } catch (e) { note('the owl\'s link does not read'); }
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* no history: nothing to tidy */ }
+    }
+    save(OWL_KEY, owl);
+    var owlBusy = false, owlAgain = false, owlRun = null, owlClock = 0, owlWaited = false, heapGrew = false;
+    function slipKey(p) { return p.kind + ' ' + p.thing; }
+    function owlCall(method, path, body) {
+      return fetch(owl.store + path, {
+        method: method, cache: 'no-store', body: body ? JSON.stringify(body) : undefined,
+        headers: { authorization: 'Bearer ' + owl.key, 'content-type': 'application/json' }
+      }).then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); });
+    }
+    /* Post this castle's new slips, then fetch the other's since the last. A slip waits to be posted till it has a
+       house (stamped at the first start that knows one); a `year` slip is never posted. A slip posted after a post
+       failed, or on a later day than it was earned, goes marked `late`. Resolves true if anything new landed. */
+    function owlSync() {
+      if (!owl.store || !owl.key) return Promise.resolve(false);
+      if (owlBusy) { owlAgain = true; return owlRun; }     /* one at a time: a second asks the first to go again */
+      owlBusy = true;
+      var o = state.owl, day = isoDay(nowDate());
+      var out = (state.points || []).filter(function (p) {
+        return !p.from && p.house && p.kind !== 'year' && !o.posted[slipKey(p)];
+      });
+      var sent = !out.length ? Promise.resolve() : owlCall('POST', '/slips', { castle: owl.castle, slips: out.map(function (p) {
+        var c = { kind: p.kind, thing: String(p.thing), points: p.points, on: p.on, record: p.record, house: p.house };
+        if (o.postFailed || p.on < day) c.late = true;
+        return c;
+      }) }).then(function () {
+        out.forEach(function (p) { o.posted[slipKey(p)] = 1; });
+        o.postFailed = false;
+      }, function (e) { o.postFailed = true; note('the owl could not take this castle\'s slips (' + e.message + ')'); });
+      owlRun = sent.then(function () {
+        return owlCall('GET', '/slips?castle=' + owl.castle + '&after=' + (o.after || 0));
+      }).then(function (got) {
+        var landed = 0;
+        (got.slips || []).forEach(function (s) {
+          if (!s || s.castle === owl.castle) return;
+          for (var i = 0; i < state.points.length; i++) {
+            var p = state.points[i];
+            if (p.from === s.castle && p.kind === s.kind && p.thing === s.thing) return;   /* fetched before */
+          }
+          var slip = { kind: s.kind, thing: s.thing, points: s.points, on: s.on, record: s.record };
+          if (s.house) slip.house = s.house;
+          slip.from = s.castle;
+          state.points.push(slip);
+          o.waiting.push(state.points.length - 1);
+          if (s.late || o.fetchFailed) o.waited = true;
+          landed++;
+        });
+        if (+got.last > (o.after || 0)) o.after = +got.last;
+        o.fetchFailed = false;
+        return landed;
+      }, function (e) {
+        o.fetchFailed = true;
+        note('the owl could not reach the store (' + e.message + ')');
+        return 0;
+      }).then(function (landed) {
+        owlBusy = false;
+        save(STATE_KEY, state);
+        owlDeliver();
+        if (owlAgain) { owlAgain = false; return owlSync().then(function (more) { return landed > 0 || more; }); }
+        return landed > 0;
+      });
+      return owlRun;
+    }
+    /* In the common room, the owl brings what has landed: the moment `owl post` (its cue the owl at the sill, or
+       Errol when a copy waited out of signal), then the page is told each slip, so his brother's gems fall. Away
+       from the common room they wait for his next time there. */
+    function owlDeliver() {
+      var o = state.owl;
+      if (!visit || place !== 'common room' || !o.waiting.length) return;
+      var slips = o.waiting.map(function (i) { return state.points[i]; }).filter(Boolean);
+      owlWaited = o.waited;
+      o.waiting = []; o.waited = false;
+      save(STATE_KEY, state);
+      heapGrew = true;
+      moment('owl post');
+      owlWaited = false;
+      for (var i = 0; i < slips.length; i++) {
+        if (opts.point) { try { opts.point(withReason(slips[i])); } catch (e) { note('the page could not take a point: ' + e); } }
+      }
+      settleHeap();
+    }
+    /* This school year's heap, both boys' gems, and whether it has passed last year's (Magic's *Against the year*):
+       from the second year, once a year, the `year` slip itself left out of every heap. */
+    function heap(y) {
+      return (state.points || []).reduce(function (t, p) {
+        return t + (p.kind !== 'year' && /^\d{4}-\d\d-\d\d$/.test(p.on || '') && schoolYear(p.on) === y ? p.points : 0);
+      }, 0);
+    }
+    function bestYear() {
+      var y = schoolYear(isoDay(nowDate())), last = heap(y - 1);
+      for (var i = 0; i < state.points.length; i++) {
+        if (!state.points[i].from && state.points[i].kind === 'year' && state.points[i].thing === String(y)) return false;
+      }
+      return last > 0 && heap(y) > last;
+    }
+    /* After a slip lands, once the moment that gave it is over: `points grow`. */
+    var momentDepth = 0;
+    function settleHeap() {
+      if (!heapGrew || momentDepth || !visit) return;
+      heapGrew = false;
+      moment('points grow');
     }
 
     function shownCues() {
@@ -980,6 +1131,11 @@
        starts; each is checked again just before it fires. At most one small touch fires per moment. Of a one_of
        group's eligible records, one is drawn by weight and the rest are dropped (a ?event record wins its group). */
     function moment(name) {
+      momentDepth++;
+      try { momentNow(name); } finally { momentDepth--; }
+      settleHeap();
+    }
+    function momentNow(name) {
       if (!visit) return;
       var eligible = [], groups = {};
       for (var i = 0; i < records.length; i++) {
@@ -1079,6 +1235,7 @@
       checkEnds('arrive');
       moment('arrive');
       draw();
+      owlDeliver();
     }
 
     /* The visit carries on onto this page. `arrive` comes the first time a visit reaches a page, so a page's own
@@ -1098,6 +1255,7 @@
       if (was === 'common room' && place === 'corridor') moment('outside');
       if (was === 'corridor' && place === 'common room') moment('enter');
       draw();
+      owlDeliver();
     }
 
     /* The page that loads decides what the last one's going was. `?from=` names the page the visit was on, as the
@@ -1242,6 +1400,8 @@
        the iPad sleeps. */
     function tick(dt) {
       if (!visit) return;
+      owlClock += dt;
+      if (owlClock >= OWL_S) { owlClock = 0; owlSync(); }
       for (var i = 0; i < visit.waits.length; i++) {
         var w = visit.waits[i];
         if (w.left == null) continue;
@@ -1360,6 +1520,7 @@
       save(STATE_KEY, state);
       draw();
       begin();
+      owlSync();
     });
 
     return {
@@ -1396,6 +1557,11 @@
       /* This castle's own house as the hourglass draws it (lion, snake, badger, eagle), or null until a grown-up sets
          it (settings.house; ?house= for a test): the first of the hourglass's `houses` (req 227). */
       house: castleHouse,
+      /* The owl's post (req 216): `owl()` gives this castle's id and whether it is paired, never the key; `sync()`
+         posts and fetches now (the runtime does so at its start and each minute of a visit), resolving true if
+         anything new landed. */
+      owl: function () { return { castle: owl.castle, paired: !!(owl.store && owl.key) }; },
+      sync: owlSync,
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';
