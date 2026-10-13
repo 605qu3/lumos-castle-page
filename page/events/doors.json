@@ -233,7 +233,8 @@
       "moment": "tap chamber-door",
       "when": [
         "place = entrance hall",
-        "time != night"
+        "time != night",
+        "doors = none"
       ],
       "one_of": "chamber-door",
       "weight": 6,
@@ -267,7 +268,8 @@
       "moment": "tap chamber-door",
       "when": [
         "place = entrance hall",
-        "time = night"
+        "time = night",
+        "doors = none"
       ],
       "one_of": "chamber-door",
       "weight": 6,
@@ -301,7 +303,8 @@
       "moment": "tap chamber-door",
       "when": [
         "place = entrance hall",
-        "days since chamber_ghosts >= 14"
+        "days since chamber_ghosts >= 14",
+        "doors = none"
       ],
       "one_of": "chamber-door",
       "weight": 1,
@@ -355,6 +358,260 @@
       "starts": [
         "stamp chamber_ghosts"
       ]
+    },
+    {
+      "id": "doors.chamber-ahem",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "doors = polite",
+        "speech = on"
+      ],
+      "who": [
+        {
+          "as": "door",
+          "role": "trace",
+          "what": "the small chamber's door",
+          "mark": "the door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "door",
+          "medium": "heard",
+          "key": "doors.chamber-ahem",
+          "text": [
+            "Ahem."
+          ],
+          "sound": "a small throat-clearing from the door, waiting",
+          "canon": "ours (Lumos), B19: a door that will not open unless asked politely, PS 8; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.chamber-please",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say please",
+      "when": [
+        "place = entrance hall",
+        "doors = polite",
+        "speech = on",
+        "listening = chamber-door"
+      ],
+      "who": [
+        {
+          "as": "door",
+          "role": "trace",
+          "what": "the small chamber's door",
+          "mark": "the door"
+        }
+      ],
+      "show": [
+        "the door swings open a hand's width, warm light spilling across the grey floor, then shuts"
+      ],
+      "lines": [
+        {
+          "speaker": "door",
+          "medium": "heard",
+          "key": "doors.chamber-thanks",
+          "text": [
+            "Thank you."
+          ],
+          "sound": "the small chamber's own sound through the gap, then the latch",
+          "canon": "ours (Lumos), B19: asked politely, PS 8; checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "log \"Asked a door in the Entrance Hall politely {day}\""
+      ]
+    },
+    {
+      "id": "doors.chamber-ahem-quiet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "doors = polite",
+        "speech = off",
+        "seconds since last tap > 8"
+      ],
+      "who": [
+        {
+          "as": "door",
+          "role": "trace",
+          "what": "the small chamber's door",
+          "mark": "the door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "door",
+          "medium": "heard",
+          "key": "doors.chamber-ahem-quiet",
+          "text": [
+            "Ahem."
+          ],
+          "sound": "a small throat-clearing from the door, waiting for a polite knock",
+          "canon": "ours (Lumos), B19, with speech off a second gentle knock is his please; PS 8; checked against the text, 13 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "doors.chamber-knock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "doors = polite",
+        "speech = off",
+        "seconds since last tap <= 8"
+      ],
+      "who": [
+        {
+          "as": "door",
+          "role": "trace",
+          "what": "the small chamber's door",
+          "mark": "the door"
+        }
+      ],
+      "show": [
+        "the door swings open a hand's width, warm light spilling across the grey floor, then shuts"
+      ],
+      "lines": [
+        {
+          "speaker": "door",
+          "medium": "heard",
+          "key": "doors.chamber-thanks-knock",
+          "text": [
+            "Thank you."
+          ],
+          "sound": "the small chamber's own sound through the gap, then the latch",
+          "canon": "ours (Lumos), B19; PS 8; checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "log \"Knocked politely on a door in the Entrance Hall {day}\""
+      ]
+    },
+    {
+      "id": "doors.chamber-giggle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "doors = ticklish",
+        "tickle = miss"
+      ],
+      "who": [
+        {
+          "as": "door",
+          "role": "trace",
+          "what": "the small chamber's door",
+          "mark": "the door"
+        }
+      ],
+      "show": [
+        "the door's wood shivers and gives a creaky giggle, louder the nearer the tap to the knot"
+      ],
+      "canon": "B19's t1, Fawkes's touch: a door tickled in exactly the right place, PS 8; the corridor door's giggle met again; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "doors.chamber-tickled",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "doors = ticklish",
+        "tickle = hit"
+      ],
+      "who": [
+        {
+          "as": "door",
+          "role": "trace",
+          "what": "the small chamber's door",
+          "mark": "the door"
+        }
+      ],
+      "show": [
+        "the door laughs and swings open a hand's width, warm light spilling across the grey floor, then shuts"
+      ],
+      "lines": [
+        {
+          "speaker": "door",
+          "medium": "heard",
+          "key": "doors.chamber-laugh",
+          "sound": "a creaky laugh from the wood, and the small chamber's own sound through the gap",
+          "canon": "B19's t1; PS 8; checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "log \"Tickled a door in the Entrance Hall open {day}\""
+      ]
+    },
+    {
+      "id": "doors.chamber-wall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chamber-door",
+      "when": [
+        "place = entrance hall",
+        "doors = wall"
+      ],
+      "who": [
+        {
+          "as": "door",
+          "role": "trace",
+          "what": "the small chamber's door",
+          "mark": "the door"
+        }
+      ],
+      "show": [
+        "the door thuds dull as stone under his tap, and for a breath its planks fade to the grey stone they really are, then it is a door again"
+      ],
+      "lines": [
+        {
+          "speaker": "door",
+          "medium": "heard",
+          "key": "doors.chamber-thud",
+          "sound": "a dull thud, as on solid stone",
+          "canon": "B19: doors that weren't really doors at all, but solid walls just pretending, PS 8; checked against the text, 13 October 2026"
+        }
+      ]
     }
-  ]
+  ],
+  "words": {
+    "doors": {
+      "first_monday": "2026-10-05",
+      "again_from": 0,
+      "canon": "Magic's B19 (Godric, 5.20 pm, with Fawkes's t1): PS 8, doors that open only if asked politely, or tickled in exactly the right place, and doors that are solid walls pretending; checked against the text, 13 October 2026; by the week from password Monday (the password's first_monday), so both brothers' castles agree; a twelve-week round, most weeks none, polite twice, ticklish and a wall once each; only ever added to at the end",
+      "list": [
+        "none",
+        "none",
+        "polite",
+        "none",
+        "none",
+        "wall",
+        "none",
+        "none",
+        "ticklish",
+        "none",
+        "polite",
+        "none"
+      ]
+    }
+  }
 }

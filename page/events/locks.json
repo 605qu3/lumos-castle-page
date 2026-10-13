@@ -13,10 +13,33 @@
     {
       "when": [
         "drawer = open",
-        "drawer_third = gobstones"
+        "drawer_third = gobstones",
+        "parchment != in"
       ],
       "show": [
         "Percy's drawer standing open on the Fanged Frisbee, the pack of Exploding Snap and Percy's Gobstones"
+      ]
+    },
+    {
+      "when": [
+        "drawer = open",
+        "drawer_third = gobstones",
+        "parchment = in",
+        "parchment_ink != shown"
+      ],
+      "show": [
+        "Percy's drawer standing open on the Fanged Frisbee, the pack of Exploding Snap and a sheet of parchment labelled in Percy's hand \"Confiscated: suspicious blank parchment\""
+      ]
+    },
+    {
+      "when": [
+        "drawer = open",
+        "drawer_third = gobstones",
+        "parchment = in",
+        "parchment_ink = shown"
+      ],
+      "show": [
+        "Percy's drawer standing open on the Fanged Frisbee, the pack of Exploding Snap and the confiscated parchment covered in the twins' ink"
       ]
     },
     {
@@ -33,6 +56,24 @@
       ],
       "show": [
         "the small door's brass lock holding fast against any spell"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "cupboard != open"
+      ],
+      "show": [
+        "the broom cupboard's narrow door, shut and locked"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "cupboard = open"
+      ],
+      "show": [
+        "the broom cupboard standing open on buckets and mops and an ancient Shooting Star leaning hard to the left, an old luggage tag on its handle"
       ]
     }
   ],
@@ -196,7 +237,8 @@
       ],
       "starts": [
         "set drawer = locked",
-        "add percy_notes 1"
+        "add percy_notes 1",
+        "set fine_reached = yes"
       ]
     },
     {
@@ -240,6 +282,146 @@
       "starts": [
         "set door_list = his",
         "log \"Tried Alohomora on the little door {day}. Nothing happened, and he wrote it on the list.\""
+      ]
+    },
+    {
+      "id": "locks.cupboard-opens",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "opened broom cupboard",
+      "when": [
+        "place = corridor",
+        "cupboard != open"
+      ],
+      "show": [
+        "the cupboard door swings open on buckets and mops, and one ancient school broom leaning hard to the left"
+      ],
+      "starts": [
+        "set cupboard = open",
+        "log \"Opened the broom cupboard {day}\"",
+        "secret broom-cupboard"
+      ],
+      "canon": "Magic's B18 (Godric, 5.20 pm): a broom cupboard amongst the buckets and mops, PoA 21; the school brooms that always flew slightly to the left, PS 9; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "locks.broom-stood",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap cupboard broom",
+      "when": [
+        "place = corridor",
+        "cupboard = open"
+      ],
+      "show": [
+        "he stands the broom up straight; it gives a slow, jerky lurch and leans left again"
+      ],
+      "canon": "B18's t1, Fawkes's touch: the ancient Shooting Star, very slow and jerky, PoA 10; it pulls left, PS 9; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "locks.cupboard-locks",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "cupboard = open"
+      ],
+      "starts": [
+        "set cupboard = locked"
+      ],
+      "canon": "B18: shut, the cupboard locks itself again by the next visit, so the spell has a reason to be cast again"
+    },
+    {
+      "id": "locks.parchment-in",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "fine_reached = yes",
+        "learned aparecium = yes",
+        "parchment != in"
+      ],
+      "starts": [
+        "set parchment = in",
+        "set parchment_ink = blank",
+        "log \"A suspicious blank parchment has turned up in Percy's drawer {day}\""
+      ],
+      "canon": "Magic's B20 (Godric, 5.21 pm): once he has Aparecium and Percy's notes have reached \"Fine.\", a sheet of parchment takes the Gobstones' place, so the drawer stays at three"
+    },
+    {
+      "id": "locks.parchment-ink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "revealed percy parchment",
+      "when": [
+        "drawer = open",
+        "drawer_third = gobstones",
+        "parchment = in",
+        "parchment_ink != shown"
+      ],
+      "show": [
+        "the twins' ink spreads across the parchment from nowhere"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Fred",
+          "at": "parchment",
+          "key": "locks.parchment-fred",
+          "text": [
+            "Messrs Fred and George present their compliments to Percy, and beg him to keep his very important nose out of other people's parchment."
+          ],
+          "canon": "ours (Lumos), B20, in the shape of the Map's insult to Snape, PoA 14; checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "set parchment_ink = shown",
+        "set parchment_george = no",
+        "log \"Brought up the twins' ink on Percy's parchment {day}\""
+      ],
+      "ends": [
+        {
+          "on": "tap any but percy parchment",
+          "do": [
+            "set parchment_ink = blank"
+          ]
+        },
+        {
+          "on": "leave",
+          "do": [
+            "set parchment_ink = blank"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "locks.parchment-george",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap percy parchment",
+      "when": [
+        "parchment_ink = shown",
+        "parchment_george != added"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr George",
+          "at": "parchment",
+          "key": "locks.parchment-george",
+          "text": [
+            "Mr George agrees with Mr Fred, and would like to add that Percy's badge is on upside down."
+          ],
+          "canon": "ours (Lumos), B20's t1, Fawkes's touch: a second hand adds a line, as Mr Prongs agrees with Mr Moony, PoA 14; checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "set parchment_george = added"
       ]
     }
   ]
