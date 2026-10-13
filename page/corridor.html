@@ -1647,6 +1647,7 @@ meshTapestry();
 hangDrawing(tapestry, '../assets/layers/tapestry-hillside.png', TAPESTRY.w, function (im) {
   TAPESTRY.h = TAPESTRY.w * im.height / im.width;
   meshTapestry();
+  placeShepherd();
 });
 /* the door behind it, the polite door's size, 1.0 by 2.2 m, under the cloth's right half, so the lifted corner shows
    its foot; at rest the stone shows under the hem, and the dark only while the draught holds the corner up, so the
@@ -1680,6 +1681,42 @@ function updateTapestryLift(dt) {
   }
   pos.needsUpdate = true;
   g.computeVertexNormals();
+}
+/* t2 on the hillside tapestry (Godric, 13 October 2026, 7.11 am; the edit round on his 8.37 am yes): at its stop a tap
+   on the sleeping shepherd and he pulls his cap lower and sleeps on, the one person Peeves cannot wake (PS 8). His pose
+   is a feathered patch cut from the picked try (patch.py, in the layer's 1233 by 1638 pixels; the try redraws the
+   whole cloth a touch, so only he is laid over it), cross-faded on in a fifth of a second, held, and back. It lies on
+   the cloth's lower left, beyond the lifting corner's reach, so the flat patch never parts from the mesh */
+var SHEPHERD = { px: [1233, 1638], box: [248, 904, 424, 1124], hold: 3.5, t: -1 };
+var shepherdCap = new THREE.Mesh(new THREE.PlaneGeometry(1, 1),
+  new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, transparent: true, opacity: 0, depthWrite: false }));
+shepherdCap.name = 'tapestry-shepherd-cap'; shepherdCap.visible = false; shepherdCap.renderOrder = 2;
+shepherdCap.receiveShadow = tapestry.receiveShadow;
+tapestry.add(shepherdCap);
+(function () {
+  var pim = new Image();
+  pim.onload = function () { shepherdCap.material.map = tex(pim); shepherdCap.material.needsUpdate = true; };
+  pim.src = '../assets/layers/tapestry-hillside-cap.png?v=1';
+})();
+function placeShepherd() {   /* the cloth's size is the drawing's, known once it loads */
+  var b = SHEPHERD.box, P = SHEPHERD.px;
+  shepherdCap.scale.set((b[2] - b[0]) / P[0] * TAPESTRY.w, (b[3] - b[1]) / P[1] * TAPESTRY.h, 1);
+  shepherdCap.position.set(((b[0] + b[2]) / 2 / P[0] - 0.5) * TAPESTRY.w, (0.5 - (b[1] + b[3]) / 2 / P[1]) * TAPESTRY.h, 0.002);
+}
+placeShepherd();
+function shepherdAt(uv) {
+  if (!uv) return false;
+  var b = SHEPHERD.box, x = uv.x * SHEPHERD.px[0], y = (1 - uv.y) * SHEPHERD.px[1];
+  return x >= b[0] && x <= b[2] && y >= b[1] && y <= b[3];
+}
+function shepherdStirs() { if (SHEPHERD.t < 0) SHEPHERD.t = 0; }
+function updateShepherd(dt) {
+  if (SHEPHERD.t < 0) return;
+  SHEPHERD.t += dt;
+  var t = SHEPHERD.t, o = t < 0.2 ? t / 0.2 : t < 0.2 + SHEPHERD.hold ? 1 : 1 - (t - 0.2 - SHEPHERD.hold) / 0.4;
+  if (o <= 0 && t > 0.2) { o = 0; SHEPHERD.t = -1; }
+  shepherdCap.material.opacity = clamp(o, 0, 1);
+  shepherdCap.visible = shepherdCap.material.opacity > 0;
 }
 /* her wall: two portraits on the study's stretch, symmetric about the bay axis; portrait-a is the one nearest her */
 var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[0], 1.9, HER_FACE, -1, 1, 'portrait-a');
@@ -2692,6 +2729,10 @@ function tap(cx, cy) {
   /* her hump (req 215): at her stop, once he holds the twins' note, a tap on it offers Dissendium */
   if (hits[0].object === witchCard && atStop && atStop.name === 'witch' && humpAt(hits[0].uv)
       && window.LumosSpells && LumosSpells.openHump && noteHeld()) { tell('witch'); humpOffered(); said(true); return; }
+  /* the sleeping shepherd (t2): at the tapestry's stop a tap on him and he pulls his cap lower */
+  if (hits[0].object === tapestry && atStop && atStop.name === 'tapestry' && shepherdAt(hits[0].uv)) {
+    tell('tapestry'); shepherdStirs(); said(true); return;
+  }
   if (hit.thing && castle && castle.visit()) {
     if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
     said(true); castle.tap(hit.thing); return;
@@ -3399,6 +3440,7 @@ function frame() {
   updateLines(dt);
   updateDraught(wdt);
   updateTapestryLift(wdt);
+  updateShepherd(wdt);
   updateScarf(wdt);
   updateSteam();
   updateSpoon(wdt);
@@ -3445,7 +3487,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { sheep: function () { return tapestrySheep; }, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { sheep: function () { return tapestrySheep; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
