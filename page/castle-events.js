@@ -103,6 +103,15 @@
    Then a point taken back (Design's req 237, Godric's Q22 t2): only a grown-up takes one back, a slip given in
    error (`back(slip)`); it stays, marked `back: true` and `backOn` (yyyy-mm-dd), out of every heap and total, the
    page told by `opts.back(slip)`, and the owl carries it to the other castle, which marks its copy the same (v=25).
+   Then the Marauder's Map (board req 242, Magic's B10 to B15): a chain's own `dots` (map.json) give who the dots are,
+   each on rounds by the real clock through the castle model's places (page/castle-model.js, req 244), so both castles'
+   Maps agree; `map()` hands the page the dots now (his own first, then each named one with its label, place and way
+   of moving), the Great Hall's crowd at meals and the places not on the Map. A figure standing or heard on a page this
+   visit is drawn there instead of on its round (the Map never lies, PoA 18); PoA 10's three on his first look. The
+   built-ins `map here` (the model room his own dot is in, from the page; a page may answer it itself, as the den),
+   `map nearest` (the grown-up whose dot stands nearest his, by the model, for the cheek of B14; Snape where the
+   model is not loaded) and `reading` (the book he is reading, a grown-up's setting, settings.reading, 1 to 7, 0 till
+   set, ?reading= for a test: Pettigrew's flicker, B12 t1). His own dot's label is settings.name, never in a file (v=26).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -327,6 +336,7 @@
       return d || [];
     }
     var wordDefs = {};                           /* each chain's week-by-week words, by name (the password) */
+    var dotDefs = null;                          /* the Marauder's Map's dots, one chain's own (map.json; req 242) */
     var reasonDefs = {};                         /* each house point's reason as the feast reads it, by kind or kind and thing (req 216) */
     var leaving = false;                         /* while a visit's leave runs, `place` is the page that visit was on */
     var state = load(STATE_KEY);
@@ -462,6 +472,9 @@
         case 'owl waited': return owlWaited ? 'yes' : 'no';           /* the owl's copies waited out of signal: Errol (req 216, t1) */
         case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
         case 'year': return schoolYear(isoDay(now));                   /* the school year now, named by its feast's year */
+        case 'map here': return PAGE_ROOM[(leaving && state.visitPlace) || place] || 'none';   /* his own dot's model room (req 242) */
+        case 'map nearest': return mapNearest();                        /* the grown-up whose dot is nearest his (B14 t1) */
+        case 'reading': return readingBook();                           /* the book he is reading, 0 till set (B12 t1) */
         case 'parent parcel': return settings.parcel || 'none';         /* what a parent sends by owl from the grown-up corner */
         case 'home howler': return homeHowler() ? 'written' : 'none';   /* a Howler line written at the letter page (req 193) */
         /* how this page was reached, from its `?from=`: room, corridor, dormitory, sleep (the waking), or none (Neville's
@@ -475,6 +488,100 @@
       var wm = /^(?:(last|next) )?([a-z]+)$/.exec(name);
       if (wm && wordDefs[wm[2]]) return weekWord(wm[2], wm[1] === 'last' ? -1 : wm[1] === 'next' ? 1 : 0);
       return undefined;
+    }
+
+    /* ---------- the Marauder's Map (board req 242) ---------- */
+
+    /* The page he is on as the castle model's room, for his own dot; the den is the page's to say (`map here`). */
+    var PAGE_ROOM = { 'common room': 'common-room', corridor: 'corridor', dormitory: 'dormitory' };
+    function readingBook() {
+      var r = Math.floor(+(params.get('reading') || settings.reading || 0));
+      return r >= 1 && r <= 7 ? r : 0;
+    }
+    function clockMin(t) { var m = /^(\d\d):(\d\d)$/.exec(t || ''); return m ? +m[1] * 60 + +m[2] : null; }
+    function inHours(from, to, mins) {
+      var a = clockMin(from), b = clockMin(to);
+      if (a == null || b == null) return true;
+      return a <= b ? mins >= a && mins < b : mins >= a || mins < b;      /* a span may run past midnight */
+    }
+    function atMeals(mins) {
+      return ((dotDefs && dotDefs.meals) || []).some(function (m) { return inHours(m.from, m.to, mins); });
+    }
+    /* Each dot's place now: the first of its rounds whose hours and `when` hold, its places taken in turn every so
+       many minutes (10 unless named) counted from the date and clock alone, so both castles' Maps agree. A figure
+       standing or heard on a page this visit is drawn on that page instead (the Map never lies, PoA 18), then PoA 10's
+       three on his first look; his own dot comes first, where he stands, labelled by a grown-up's settings.name. */
+    function mapDots() {
+      if (!dotDefs) return null;
+      var now = nowDate(), mins = now.getHours() * 60 + now.getMinutes(), abs = dayNumber(now) * 1440 + mins;
+      var fl = dotDefs.first_look || {}, first = fl.dots && allHold(fl.when || []) ? fl.dots : [];
+      var seen = (visit && visit.seen) || {};
+      var out = [{ who: 'me', label: settings.name || null, place: value('map here'), move: 'walk', me: true }];
+      (dotDefs.people || []).forEach(function (p) {
+        if (p.when && !allHold(p.when)) return;
+        var dot = { who: p.who, label: p.label, move: p.move || 'walk', cheek: !!p.cheek };
+        var met = (p.names || []).map(function (n) { return seen[n]; }).filter(Boolean)[0];
+        var f = first.filter(function (x) { return x.who === p.who; })[0];
+        if (met) { dot.place = PAGE_ROOM[met] || met; dot.met = true; }
+        else if (f) { dot.place = f.place; dot.move = f.move || dot.move; dot.first = true; }
+        else {
+          var step = (p.rounds || []).filter(function (st) {
+            var hours = st.at === 'meals' ? atMeals(mins) : inHours(st.from, st.to, mins);
+            return hours && allHold(st.when || []);
+          })[0];
+          if (!step || !(step.places || []).length) return;              /* off the Map at this hour */
+          dot.place = step.places[Math.floor(abs / (step.every || 10)) % step.places.length];
+        }
+        out.push(dot);
+      });
+      return out;
+    }
+    /* A place's middle in the castle's frame, x, y and z in metres, from the Architect's model if the page loaded it. */
+    function placeAt(id) {
+      var M = window.CASTLE_MODEL;
+      if (!M) return null;
+      function mid(sh) {
+        if (!sh) return null;
+        if (sh.point) return sh.point;
+        if (sh.circle) return sh.circle;
+        if (sh.c) return sh.c;
+        if (sh.ellipse) return sh.ellipse.slice(0, 2);
+        var r = sh.rect ? [sh.rect] : sh.rects, pts = sh.poly || sh.line;
+        if (r) pts = r.map(function (q) { return [(q[0] + q[2]) / 2, (q[1] + q[3]) / 2]; });
+        if (!pts || !pts.length) return null;
+        return [pts.reduce(function (t, q) { return t + q[0]; }, 0) / pts.length, pts.reduce(function (t, q) { return t + q[1]; }, 0) / pts.length];
+      }
+      function levelZ(l) { var v = (M.levels || []).filter(function (x) { return x.id === l; })[0]; return v ? v.z : 0; }
+      function inRoom(room, xy) {
+        var g = room.group && (M.groups || []).filter(function (x) { return x.id === room.group; })[0];
+        if (!g || !g.place) return [xy[0], xy[1], room.z != null ? room.z : levelZ(room.level)];
+        var t = (g.place.turn || 0) * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+        return [g.place.x + xy[0] * c - xy[1] * s, g.place.y + xy[0] * s + xy[1] * c, (g.place.z || 0) + (room.floor || 0)];
+      }
+      var room = (M.rooms || []).filter(function (x) { return x.id === id; })[0];
+      if (room) { var m = mid(room.shape); return m && inRoom(room, m); }
+      var ft = (M.features || []).filter(function (x) { return x.id === id; })[0];
+      if (ft && ft.at) { var fr = (M.rooms || []).filter(function (x) { return x.id === ft.room; })[0]; return fr ? inRoom(fr, ft.at) : null; }
+      var lists = [M.grounds, M.masses, M.courts, M.towers];
+      for (var l = 0; l < lists.length; l++) {
+        var e = (lists[l] || []).filter(function (x) { return x.id === id; })[0];
+        if (e) { var em = mid(e.shape || e); return em && [em[0], em[1], 0]; }
+      }
+      return null;
+    }
+    /* The grown-up whose dot stands nearest his own (B14 t1: a pupil's dot is passed over), by the model; Snape where
+       the model is not loaded or his own place is not in it, since the first tap ever is Snape's (B14). */
+    function mapNearest() {
+      var dots = mapDots() || [], here = placeAt(dots.length ? dots[0].place : null), best = 'snape', bd = Infinity;
+      if (!here) return best;
+      dots.forEach(function (d) {
+        if (!d.cheek) return;
+        var at = placeAt(d.place);
+        if (!at) return;
+        var dd = Math.pow(at[0] - here[0], 2) + Math.pow(at[1] - here[1], 2) + Math.pow(at[2] - here[2], 2);
+        if (dd < bd) { bd = dd; best = d.who; }
+      });
+      return best;
     }
 
     /* The week's word from a chain's `words` (the password, board req 72): the nth of its list in the nth week since
@@ -1064,6 +1171,11 @@
         for (var w = 0; w < who.length; w++) if (who[w].mark && FIGURE.test(who[w].role)) visit.marks[who[w].mark] = true;
       }
       for (var cf = 0; cf < cast.length; cf++) { visit.marks[cast[cf].mark] = true; visit.cast.push(cast[cf]); }
+      /* Who stands or is heard on this page this visit, by name, so the Map draws his dot here (req 242) */
+      var seenWho = rec.who || [];
+      for (var sw = 0; sw < seenWho.length && !leaving; sw++) {
+        if (seenWho[sw].name && /^(canon|ghost|voice)$/.test(seenWho[sw].role)) (visit.seen = visit.seen || {})[seenWho[sw].name] = place;
+      }
       if (rec.tier === 'small') visit.small.push(rec.id);
       if (rec.tier === 'big') { state.lastBigDay = today(); state.lastBigVisit = state.visits; visit.bigDone = true; }
       if (rec.ends && rec.ends.length) state.open[rec.id] = { day: today() };
@@ -1251,14 +1363,15 @@
       if (!visit) return;
       state.kept = { id: visit.id, smallOn: visit.smallOn, bigOn: visit.bigOn, bigDone: visit.bigDone,
                      small: visit.small, marks: visit.marks, cast: visit.cast, pages: visit.pages, played: visit.played,
-                     warned: visit.warned, lightsOut: visit.lightsOut, waiting: visit.waiting, quiet: visit.quiet };
+                     warned: visit.warned, lightsOut: visit.lightsOut, waiting: visit.waiting, quiet: visit.quiet,
+                     seen: visit.seen || {} };
     }
     function restore() {
       var k = state.kept || {};
       return { id: k.id, smallOn: !!k.smallOn, bigOn: !!k.bigOn, bigDone: k.bigDone !== false, small: k.small || [],
                marks: k.marks || {}, cast: k.cast || [], pages: k.pages || [state.visitPlace], waits: [], lastTap: {}, tapped: false,
                played: k.played || 0, warned: !!k.warned, lightsOut: !!k.lightsOut, waiting: k.waiting || {},
-               quiet: k.quiet || quietSpans(), idle: 0, quietDone: {}, listen: null };
+               quiet: k.quiet || quietSpans(), idle: 0, quietDone: {}, listen: null, seen: k.seen || {} };
     }
 
     /* A new visit on this page; one still open runs its leave first. */
@@ -1529,6 +1642,7 @@
         for (var w in wd) wordDefs[w] = wd[w];
         var rd = files[f].reasons || {};
         for (var rn in rd) reasonDefs[rn] = rd[rn];
+        if (files[f].dots) dotDefs = files[f].dots;
         var mk = files[f].marks || {};
         for (var mn in mk) markSets[mn] = (mk[mn] || []).slice();
         var rs = files[f].records || [];
@@ -1587,6 +1701,22 @@
       /* The day each card of a deck first came to him, yyyy-mm-dd by card (the lives shelf, Magic's B7: a life
          arrives the day he first finds that person's card); a repeat leaves it as it was. `foundOn('frogs')`. */
       foundOn: function (name) { return Object.assign({}, (state.deckFirst || {})[name] || {}); },
+      /* The Marauder's Map now (req 242): { dots, crowd, unmapped, here }. `dots` his own first ({ who: 'me', label,
+         place, me: true }), then each named dot { who, label, place (a castle model id), move (pace, prowl, bounce,
+         drift, stride, walk, still, flicker), cheek, met (seen on a page this visit), first (PoA 10's first look) };
+         `crowd` the Great Hall's place at meals, or null; `unmapped` the places not on the Map just now (the Room of
+         Requirement; the den till his first visit). Null if no chain has dots. Whether it is blank or inked is the
+         room's cues (map.json's room rules). */
+      map: function () {
+        var dots = mapDots();
+        if (!dots) return null;
+        var now = nowDate(), mins = now.getHours() * 60 + now.getMinutes();
+        return { dots: dots, here: dots[0].place,
+                 crowd: dotDefs.crowd && atMeals(mins) ? dotDefs.crowd.place : null,
+                 unmapped: (dotDefs.unmapped || []).filter(function (u) { return !(u.until && allHold(u.until)); })
+                                                   .map(function (u) { return u.place; }) };
+      },
+      reading: readingBook,
       /* The castle's secrets he has found, in the order found, each once (req 180; for the Map, B10). */
       secrets: function () { return (state.secrets || []).slice(); },
       /* The house points earned on this iPad, a slip each in the order earned: { kind, thing, points, on (yyyy-mm-dd),

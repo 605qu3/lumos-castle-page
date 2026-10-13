@@ -10,8 +10,469 @@
       "show": [
         "behind the witch's plinth, where Harry crouched, a folded old parchment and a note in the twins' hand"
       ]
+    },
+    {
+      "when": [
+        "map_open = blank"
+      ],
+      "show": [
+        "the old parchment open in his hands, blank"
+      ]
+    },
+    {
+      "when": [
+        "map_open = inked"
+      ],
+      "show": [
+        "the Marauder's Map open in his hands, the castle and its dots in ink"
+      ]
+    },
+    {
+      "when": [
+        "map_open = inked",
+        "den_visited = yes"
+      ],
+      "show": [
+        "the den on the Map in Clementine's older brown ink behind the little door, labelled C.A.'s"
+      ]
     }
   ],
+  "dots": {
+    "about": "Magic for the boys, The Marauder's Map, earned (B10, B12 to B15), req 242; the places are page/castle-model.js's ids (req 244). Each dot's place is the first of its rounds whose hours hold now and whose when holds, its places taken in turn every so many minutes, from the clock alone, so both castles' Maps agree; a figure standing or heard on a page this visit is drawn there instead (the Map never lies, PoA 18). The rounds and their hours ours.",
+    "walkable": [
+      "common-room",
+      "corridor",
+      "dormitory",
+      "den",
+      "inglenook",
+      "study",
+      "lost-things",
+      "fat-lady"
+    ],
+    "meals": [
+      {
+        "from": "07:30",
+        "to": "08:30"
+      },
+      {
+        "from": "12:30",
+        "to": "13:30"
+      },
+      {
+        "from": "18:30",
+        "to": "19:30"
+      }
+    ],
+    "crowd": {
+      "place": "great-hall",
+      "at": "meals",
+      "about": "the Great Hall full at meals: the four tables' dots, too many and too small to read (B12)"
+    },
+    "unmapped": [
+      {
+        "place": "room-of-requirement",
+        "canon": "HBP 24 (Harry cannot find Malfoy's dot while he is in the Room), checked against the text, 13 October 2026"
+      },
+      {
+        "place": "den",
+        "until": [
+          "den_visited = yes"
+        ],
+        "canon": "Magic's B15: not on the Map until his first visit, then in her ink (the door's list, Not on our map either)"
+      }
+    ],
+    "first_look": {
+      "when": [
+        "map_first = yes"
+      ],
+      "canon": "PoA 10 (\"Professor Dumbledore was pacing his study; ... Mrs Norris, was prowling the second floor, and Peeves ... bouncing around the trophy room\"), checked against the text, 13 October 2026",
+      "dots": [
+        {
+          "who": "dumbledore",
+          "place": "dumbledores-office",
+          "move": "pace"
+        },
+        {
+          "who": "mrs-norris",
+          "place": "second-floor-corridor",
+          "move": "prowl"
+        },
+        {
+          "who": "peeves",
+          "place": "trophy-room",
+          "move": "bounce"
+        }
+      ]
+    },
+    "people": [
+      {
+        "who": "dumbledore",
+        "label": "Albus Dumbledore",
+        "cheek": true,
+        "move": "pace",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "great-hall"
+            ]
+          },
+          {
+            "places": [
+              "dumbledores-office"
+            ]
+          }
+        ]
+      },
+      {
+        "who": "mcgonagall",
+        "label": "Minerva McGonagall",
+        "names": [
+          "mcgonagall"
+        ],
+        "cheek": true,
+        "move": "walk",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "great-hall"
+            ]
+          },
+          {
+            "from": "20:00",
+            "to": "22:00",
+            "places": [
+              "mcgonagalls-office",
+              "second-floor-corridor",
+              "stair hall"
+            ],
+            "every": 20
+          },
+          {
+            "places": [
+              "mcgonagalls-office"
+            ]
+          }
+        ]
+      },
+      {
+        "who": "snape",
+        "label": "Severus Snape",
+        "cheek": true,
+        "move": "prowl",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "great-hall"
+            ]
+          },
+          {
+            "from": "21:00",
+            "to": "01:00",
+            "places": [
+              "dungeon-corridor",
+              "stair hall",
+              "second-floor-corridor",
+              "dungeon-corridor"
+            ],
+            "every": 15
+          },
+          {
+            "places": [
+              "dungeon-corridor"
+            ]
+          }
+        ]
+      },
+      {
+        "who": "filch",
+        "label": "Argus Filch",
+        "cheek": true,
+        "move": "walk",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "filchs-office"
+            ]
+          },
+          {
+            "from": "21:00",
+            "to": "06:00",
+            "places": [
+              "filchs-office",
+              "second-floor-corridor",
+              "trophy-room",
+              "witch-landing",
+              "stair hall"
+            ],
+            "every": 12
+          },
+          {
+            "places": [
+              "filchs-office",
+              "trophy-room",
+              "second-floor-corridor",
+              "filchs-office"
+            ],
+            "every": 25
+          }
+        ]
+      },
+      {
+        "who": "mrs-norris",
+        "label": "Mrs Norris",
+        "cheek": true,
+        "move": "prowl",
+        "rounds": [
+          {
+            "places": [
+              "second-floor-corridor",
+              "trophy-room",
+              "witch-landing",
+              "stair hall",
+              "filchs-office"
+            ],
+            "every": 8
+          }
+        ]
+      },
+      {
+        "who": "peeves",
+        "label": "Peeves",
+        "names": [
+          "peeves"
+        ],
+        "cheek": true,
+        "move": "bounce",
+        "rounds": [
+          {
+            "places": [
+              "trophy-room",
+              "witch-landing",
+              "second-floor-corridor",
+              "stair hall",
+              "dungeon-corridor",
+              "trophy-room"
+            ],
+            "every": 6
+          }
+        ]
+      },
+      {
+        "who": "nick",
+        "label": "Nearly Headless Nick",
+        "names": [
+          "nearly headless nick"
+        ],
+        "cheek": true,
+        "move": "drift",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "great-hall"
+            ]
+          },
+          {
+            "places": [
+              "stair hall",
+              "second-floor-corridor",
+              "witch-landing",
+              "trophy-room"
+            ],
+            "every": 15
+          }
+        ]
+      },
+      {
+        "who": "fat-lady",
+        "label": "The Fat Lady",
+        "names": [
+          "the fat lady"
+        ],
+        "move": "still",
+        "rounds": [
+          {
+            "places": [
+              "fat-lady"
+            ],
+            "agrees": "her portrait on the corridor page, drawn there always"
+          }
+        ]
+      },
+      {
+        "who": "hagrid",
+        "label": "Rubeus Hagrid",
+        "names": [
+          "hagrid"
+        ],
+        "cheek": true,
+        "move": "stride",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "great-hall"
+            ]
+          },
+          {
+            "from": "21:00",
+            "to": "07:00",
+            "places": [
+              "hagrids-cabin"
+            ]
+          },
+          {
+            "from": "09:00",
+            "to": "16:30",
+            "when": [
+              "weekday != saturday",
+              "weekday != sunday"
+            ],
+            "places": [
+              "hagrids-cabin",
+              "vegetable-patch",
+              "forbidden-forest",
+              "hagrids-cabin"
+            ],
+            "every": 30
+          },
+          {
+            "places": [
+              "hagrids-cabin",
+              "forbidden-forest"
+            ],
+            "every": 45
+          }
+        ]
+      },
+      {
+        "who": "neville",
+        "label": "Neville Longbottom",
+        "names": [
+          "neville"
+        ],
+        "move": "walk",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "great-hall"
+            ]
+          },
+          {
+            "from": "21:30",
+            "to": "07:00",
+            "places": [
+              "dormitory"
+            ],
+            "agrees": "the dormitory by night, the other four-posters' curtains drawn (Neville's snore, bedtime's goodnight)"
+          },
+          {
+            "from": "09:00",
+            "to": "16:30",
+            "when": [
+              "weekday != saturday",
+              "weekday != sunday"
+            ],
+            "places": [
+              "greenhouses",
+              "dungeon-corridor",
+              "mcgonagalls-office",
+              "greenhouses"
+            ],
+            "every": 60
+          },
+          {
+            "places": [
+              "greenhouses",
+              "beech",
+              "great-hall"
+            ],
+            "every": 40
+          }
+        ]
+      },
+      {
+        "who": "percy",
+        "label": "Percy Weasley",
+        "names": [
+          "percy"
+        ],
+        "cheek": true,
+        "move": "walk",
+        "rounds": [
+          {
+            "at": "meals",
+            "places": [
+              "great-hall"
+            ]
+          },
+          {
+            "from": "22:30",
+            "to": "07:00",
+            "places": [
+              "Gryffindor Tower"
+            ]
+          },
+          {
+            "from": "19:30",
+            "to": "22:30",
+            "places": [
+              "second-floor-corridor",
+              "trophy-room",
+              "stair hall"
+            ],
+            "every": 15
+          },
+          {
+            "from": "09:00",
+            "to": "16:30",
+            "when": [
+              "weekday != saturday",
+              "weekday != sunday"
+            ],
+            "places": [
+              "dungeon-corridor",
+              "mcgonagalls-office",
+              "trophy-room"
+            ],
+            "every": 60
+          },
+          {
+            "places": [
+              "trophy-room",
+              "great-hall"
+            ],
+            "every": 40
+          }
+        ]
+      },
+      {
+        "who": "pettigrew",
+        "label": "Peter Pettigrew",
+        "move": "flicker",
+        "when": [
+          "reading = 3",
+          "time = night"
+        ],
+        "canon": "Magic's B12 t1 (Godric's, 12 October 2026): only in the year he reads Prisoner of Azkaban (PoA 13, 18)",
+        "rounds": [
+          {
+            "from": "23:00",
+            "to": "04:00",
+            "places": [
+              "dormitory"
+            ],
+            "agrees": "a rat unseen in the dark of the dormitory; the dot flickers once and is gone"
+          }
+        ]
+      }
+    ]
+  },
   "records": [
     {
       "id": "map.witch-hump",
@@ -37,7 +498,8 @@
         "place = common room"
       ],
       "starts": [
-        "secret den"
+        "secret den",
+        "set den_visited = yes"
       ]
     },
     {
@@ -83,6 +545,1335 @@
           "canon": "ours, after PoA 10 (the twins give Harry the Map: \"your need's greater than ours\", \"we know it off by heart\", \"don't forget to wipe it after you've used it\") and PS 12 (\"Gred and Forge\"); checked against the text, 12 October 2026",
           "text": [
             "It's a wrench, giving it to you, but your need's greater than ours. We know it off by heart anyway. Gred and Forge. P.S. Don't forget to wipe it after you've used it, or anyone can read it."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.unfold",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap map",
+      "when": [
+        "map = held",
+        "map_open != blank",
+        "map_open != inked"
+      ],
+      "show": [
+        "he unfolds the old parchment: blank"
+      ],
+      "starts": [
+        "set map_open = blank"
+      ]
+    },
+    {
+      "id": "map.left-note",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap map",
+      "when": [
+        "map = held",
+        "map_left = yes"
+      ],
+      "starts": [
+        "set map_left = no"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot, Mr Prongs and Mr Moony",
+          "at": "map",
+          "key": "map.left-open",
+          "canon": "ours, after PoA 14's form and George's P.S. (PoA 10, \"don't forget to wipe it\"); never Mr Wormtail (Magic's B13 t2, Godric's 13 October 2026)",
+          "text": [
+            "Mr Padfoot notes that somebody left us open all night. Mr Prongs thinks it was Filch. Mr Moony thinks it was not.",
+            "Mr Prongs would like to know who left us open. Mr Padfoot has had Mrs Norris reading over his shoulder since midnight.",
+            "Mr Moony reminds the owner that a Marauder always wipes the parchment. Mr Padfoot reminds Mr Moony that he forgot twice last week.",
+            "Mr Padfoot spent the whole night watching Filch go round and round. Mr Prongs says it was the best fun either of them has had in years.",
+            "Mr Prongs reports that Peeves walked across us four times in the night. Mr Moony is still trying to get the ink straight."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.fold-blank",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap map",
+      "when": [
+        "map = held",
+        "map_open = blank"
+      ],
+      "show": [
+        "he folds the blank parchment away"
+      ],
+      "starts": [
+        "set map_open = no"
+      ]
+    },
+    {
+      "id": "map.fold-inked",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap map",
+      "when": [
+        "map = held",
+        "map_open = inked"
+      ],
+      "show": [
+        "he folds it away with the ink still on it"
+      ],
+      "starts": [
+        "set map_open = no",
+        "set map_left = yes",
+        "set map_first = no"
+      ]
+    },
+    {
+      "id": "map.leave-inked",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "map_open = inked"
+      ],
+      "starts": [
+        "set map_open = no",
+        "set map_left = yes",
+        "set map_first = no"
+      ]
+    },
+    {
+      "id": "map.leave-blank",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "map_open = blank"
+      ],
+      "starts": [
+        "set map_open = no"
+      ]
+    },
+    {
+      "id": "map.oath",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say i solemnly swear that i am up to no good",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "listening = parchment"
+      ],
+      "show": [
+        "his wand's touch and the oath: thin ink lines spread like a spider's web from the dot by his own name, the curly green title blossoms across the top, then the castle and its dots"
+      ],
+      "starts": [
+        "set map_open = inked"
+      ]
+    },
+    {
+      "id": "map.first-look",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say i solemnly swear that i am up to no good",
+      "when": [
+        "map = held",
+        "map_looked != yes",
+        "listening = parchment"
+      ],
+      "show": [
+        "on his first look ever, Professor Dumbledore pacing his study, Mrs Norris prowling the second floor and Peeves bouncing around the trophy room"
+      ],
+      "starts": [
+        "set map_looked = yes",
+        "set map_first = yes"
+      ]
+    },
+    {
+      "id": "map.den-ink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say i solemnly swear that i am up to no good",
+      "when": [
+        "map = held",
+        "den_visited = yes",
+        "den_inked != yes",
+        "listening = parchment"
+      ],
+      "show": [
+        "a beat after the Marauders' web, and more slowly, brown lines of an older ink spread on their own from the little door and draw the round den, labelled C.A.'s in Clementine's hand"
+      ],
+      "starts": [
+        "set den_inked = yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony, Mr Padfoot and Mr Prongs",
+          "at": "map",
+          "key": "map.den-line",
+          "canon": "ours (Magic for the boys, B15, Godric's option 1 with t1, 13 October 2026); the three of PoA 10's title, Wormtail left out (B13 t2)",
+          "text": [
+            "Messrs Moony, Padfoot and Prongs did not draw this."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.oath-card",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap oath",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off"
+      ],
+      "show": [
+        "his wand's touch and the oath: thin ink lines spread like a spider's web from the dot by his own name, the curly green title blossoms across the top, then the castle and its dots"
+      ],
+      "starts": [
+        "set map_open = inked"
+      ]
+    },
+    {
+      "id": "map.first-look-card",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap oath",
+      "when": [
+        "map = held",
+        "map_looked != yes",
+        "speech = off"
+      ],
+      "show": [
+        "on his first look ever, Professor Dumbledore pacing his study, Mrs Norris prowling the second floor and Peeves bouncing around the trophy room"
+      ],
+      "starts": [
+        "set map_looked = yes",
+        "set map_first = yes"
+      ]
+    },
+    {
+      "id": "map.den-ink-card",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap oath",
+      "when": [
+        "map = held",
+        "den_visited = yes",
+        "den_inked != yes",
+        "speech = off"
+      ],
+      "show": [
+        "a beat after the Marauders' web, and more slowly, brown lines of an older ink spread on their own from the little door and draw the round den, labelled C.A.'s in Clementine's hand"
+      ],
+      "starts": [
+        "set den_inked = yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony, Mr Padfoot and Mr Prongs",
+          "at": "map",
+          "key": "map.den-line-card",
+          "canon": "ours (Magic for the boys, B15, Godric's option 1 with t1, 13 October 2026); the three of PoA 10's title, Wormtail left out (B13 t2)",
+          "text": [
+            "Messrs Moony, Padfoot and Prongs did not draw this."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.wipe",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "say mischief managed",
+      "when": [
+        "map = held",
+        "map_open = inked",
+        "listening = parchment"
+      ],
+      "show": [
+        "he taps it and says Mischief managed: the ink sinks away and the parchment is blank again"
+      ],
+      "starts": [
+        "set map_open = blank",
+        "set map_first = no"
+      ]
+    },
+    {
+      "id": "map.wipe-card",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap managed",
+      "when": [
+        "map = held",
+        "map_open = inked",
+        "speech = off"
+      ],
+      "show": [
+        "he taps it and says Mischief managed: the ink sinks away and the parchment is blank again"
+      ],
+      "starts": [
+        "set map_open = blank",
+        "set map_first = no"
+      ]
+    },
+    {
+      "id": "map.cheek-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked != yes"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "starts": [
+        "set map_cheeked = yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-first.1",
+          "canon": "PoA 14, Mr Moony's first line to Snape word for word, checked against the text, 13 October 2026",
+          "text": [
+            "Mr Moony presents his compliments to Professor Snape, and begs him to keep his abnormally large nose out of other people's business."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-first.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor Snape. The hair is far too clean."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-first.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-snape",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = snape",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-snape.1",
+          "canon": "PoA 14, Mr Moony's first line to Snape word for word, checked against the text, 13 October 2026",
+          "text": [
+            "Mr Moony presents his compliments to Professor Snape, and begs him to keep his abnormally large nose out of other people's business."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-snape.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor Snape. The hair is far too clean."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-snape.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-dumbledore",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = dumbledore",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-dumbledore.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Professor Dumbledore, and wonders if he would care for a sherbet lemon."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-dumbledore.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor Dumbledore. The beard is all wrong."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-dumbledore.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-filch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = filch",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-filch.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Mr Filch, and would rather not go back in the drawer."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-filch.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Mr Filch. Mr Filch would have put us back already."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-filch.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-mrs-norris",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = mrs-norris",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-mrs-norris.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot would like to register his astonishment that a cat has learned to read."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-mrs-norris.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Mrs Norris. No paw prints."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-mrs-norris.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = peeves",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-peeves.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Peeves, and begs him to put the armour back together."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-peeves.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Peeves. It is holding the parchment the right way up."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-peeves.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-nick",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = nick",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-nick.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Sir Nicholas, and begs him to keep his head on."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-nick.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Sir Nicholas. We cannot see through it."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-nick.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-mcgonagall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = mcgonagall",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-mcgonagall.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Professor McGonagall, and swears that whatever it was, it was Mr Padfoot."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-mcgonagall.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor McGonagall. Nobody has been given a detention yet."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-mcgonagall.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-hagrid",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = hagrid",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-hagrid.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Hagrid, and begs him not to sit on us."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-hagrid.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Hagrid. The parchment is not in the least squashed."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-hagrid.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-percy",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map nearest = percy",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-percy.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to the prefect, and begs him to polish his badge somewhere else."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-percy.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not a prefect. Not nearly shiny enough."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-percy.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-dungeon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "map_cheeked = yes",
+        "map here = dungeon-corridor"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-dungeon",
+          "canon": "PoA 14, Mr Moony's first line to Snape word for word, checked against the text, 13 October 2026; in the dungeon corridor the Map is sure he is Snape, no putting right (B14 t2)",
+          "text": [
+            "Mr Moony presents his compliments to Professor Snape, and begs him to keep his abnormally large nose out of other people's business."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-first-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked != yes"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "starts": [
+        "set map_cheeked = yes"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-first-tap.1",
+          "canon": "PoA 14, Mr Moony's first line to Snape word for word, checked against the text, 13 October 2026",
+          "text": [
+            "Mr Moony presents his compliments to Professor Snape, and begs him to keep his abnormally large nose out of other people's business."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-first-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor Snape. The hair is far too clean."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-first-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-snape-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = snape",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-snape-tap.1",
+          "canon": "PoA 14, Mr Moony's first line to Snape word for word, checked against the text, 13 October 2026",
+          "text": [
+            "Mr Moony presents his compliments to Professor Snape, and begs him to keep his abnormally large nose out of other people's business."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-snape-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor Snape. The hair is far too clean."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-snape-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-dumbledore-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = dumbledore",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-dumbledore-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Professor Dumbledore, and wonders if he would care for a sherbet lemon."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-dumbledore-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor Dumbledore. The beard is all wrong."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-dumbledore-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-filch-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = filch",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-filch-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Mr Filch, and would rather not go back in the drawer."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-filch-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Mr Filch. Mr Filch would have put us back already."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-filch-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-mrs-norris-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = mrs-norris",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-mrs-norris-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot would like to register his astonishment that a cat has learned to read."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-mrs-norris-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Mrs Norris. No paw prints."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-mrs-norris-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-peeves-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = peeves",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-peeves-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Peeves, and begs him to put the armour back together."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-peeves-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Peeves. It is holding the parchment the right way up."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-peeves-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-nick-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = nick",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-nick-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Sir Nicholas, and begs him to keep his head on."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-nick-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Sir Nicholas. We cannot see through it."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-nick-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-mcgonagall-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = mcgonagall",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-mcgonagall-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Professor McGonagall, and swears that whatever it was, it was Mr Padfoot."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-mcgonagall-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Professor McGonagall. Nobody has been given a detention yet."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-mcgonagall-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-hagrid-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = hagrid",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-hagrid-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to Hagrid, and begs him not to sit on us."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-hagrid-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not Hagrid. The parchment is not in the least squashed."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-hagrid-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-percy-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map nearest = percy",
+        "map here != dungeon-corridor"
+      ],
+      "show": [
+        "the oath's card glints"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-percy-tap.1",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Moony presents his compliments to the prefect, and begs him to polish his badge somewhere else."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Prongs",
+          "at": "map",
+          "key": "map.cheek-percy-tap.2",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Prongs notes that this is not a prefect. Not nearly shiny enough."
+          ]
+        },
+        {
+          "medium": "written",
+          "hand": "Mr Padfoot",
+          "at": "map",
+          "key": "map.cheek-percy-tap.3",
+          "canon": "ours, after PoA 14's form (Magic for the boys, B14's set by the nearest dot, Godric's option 1 with t1 and t2, 13 October 2026)",
+          "text": [
+            "Mr Padfoot apologises, and suggests the usual words."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map.cheek-dungeon-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parchment",
+      "when": [
+        "map = held",
+        "map_open = blank",
+        "speech = off",
+        "map_cheeked = yes",
+        "map here = dungeon-corridor"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "Mr Moony",
+          "at": "map",
+          "key": "map.cheek-dungeon-tap",
+          "canon": "PoA 14, Mr Moony's first line to Snape word for word, checked against the text, 13 October 2026; in the dungeon corridor the Map is sure he is Snape, no putting right (B14 t2)",
+          "text": [
+            "Mr Moony presents his compliments to Professor Snape, and begs him to keep his abnormally large nose out of other people's business."
           ]
         }
       ]
