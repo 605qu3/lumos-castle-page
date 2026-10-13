@@ -158,6 +158,24 @@
     transform: rotate(-4deg); margin-top: 6px; }
   #bookPage.essay .blot { display: inline-block; width: 0.7em; height: 0.55em; margin-left: 2px; border-radius: 48% 52% 40% 60%;
     background: #1f1a2e; vertical-align: -0.05em; }
+  /* Ron's tape measure and Hermione's roll by his essay (Godric's Q71 t1 and t2, 13 October 2026) */
+  #bookPage .tapeCase { position: absolute; left: -22px; top: 6px; width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+    background: radial-gradient(circle at 38% 34%, #f3d98c 0%, #c79a3c 42%, #7a5a1c 100%); box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 0 0 3px rgba(90,60,20,0.55); }
+  #bookPage .tapeCase::after { content: ''; position: absolute; left: 12px; top: 12px; width: 10px; height: 10px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #fbe8b0, #a07a2c); }
+  #bookPage .tapeRun { position: absolute; left: 3px; top: 24px; width: 13px; height: 0; overflow: hidden; pointer-events: none;
+    background: #e8c75a repeating-linear-gradient(to bottom, rgba(40,28,10,0.8) 0 1px, transparent 1px var(--inch, 9px)) 0 0 / 6px 100% no-repeat;
+    box-shadow: 1px 0 2px rgba(0,0,0,0.35); transition: height 1.6s cubic-bezier(0.3, 0.1, 0.2, 1); }
+  #bookPage .tapeRun span { position: absolute; left: 0; width: 13px; font: 700 7px/1 Georgia, serif; color: #3a2a10; text-align: right;
+    writing-mode: vertical-rl; }
+  #bookPage .tapeTag { position: absolute; left: -4px; padding: 2px 5px; font: 400 13px/1 "Nothing You Could Do", cursive; color: #6e1f1c;
+    background: #f3e7c6; border: 1px solid #b08a3a; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.4); opacity: 0;
+    transition: opacity 0.4s ease; pointer-events: none; white-space: nowrap; }
+  #bookPage .tapeTag.on { opacity: 1; }
+  #bookPage .roll2 { position: absolute; left: 28%; right: -16px; bottom: -21px; height: 21px; border-radius: 10px; overflow: hidden;
+    background: linear-gradient(to bottom, #9c8150 0%, #efe2bf 38%, #e2d0a0 70%, #a68a55 100%); box-shadow: 0 3px 6px rgba(0,0,0,0.45);
+    font: italic 400 9px/21px "EB Garamond", Georgia, serif; color: #2a2440; white-space: nowrap; padding: 0 10px; cursor: default; }
+  #bookPage .roll2::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: linear-gradient(rgba(0,0,0,0.35), transparent); }
   #bookPage.marked { padding-right: 52px; }
   #bookPage .ribbon { position: absolute; top: -6px; right: 20px; width: 13px; height: calc(100% + 30px);
     background: linear-gradient(90deg, #6a1316, #9c2a2c 45%, #761a1d); box-shadow: 1px 2px 4px rgba(0,0,0,0.45);
@@ -5641,7 +5659,13 @@ var GAP_ESSAY = {
   text: ['The Medieval Assembly of European Wizards was a very important assembly. It was in medieval times, which ' +
     'were a long time ago, and it was in Europe, and there were wizards at it, assembling. ', 'They assembled for a long time. ',
     'A VERY long time. ', 'Some of them may have assembled for even longer than'],
-  note: 'still eight inches short!!'
+  note: 'still eight inches short!!',
+  /* Q71 t1: his tape measure, coiled beside it, unrolls down the parchment to where the writing stops (CoS 9: Ron
+     "measuring his History of Magic homework", "still eight inches short" of Binns's three feet; Harry "grabbing the
+     tape measure"); t2: under it a second roll in tiny neat writing (CoS 9: "Hermione's done four feet seven inches
+     and her writing's tiny") */
+  inches: 28, marks: [[12, '1 ft'], [24, '2 ft']], tag: 'two feet four',
+  roll2: 'Hermione Granger. Four feet seven inches.'
 };
 function drawGapFind(g, W, H) {
   g.save();
@@ -5726,12 +5750,34 @@ function gapTap() {
   var bl = document.createElement('span'); bl.className = 'blot'; tx.appendChild(bl);
   bookPageEl.appendChild(tx);
   var fo = document.createElement('div'); fo.className = 'folio'; fo.textContent = GAP_ESSAY.note; bookPageEl.appendChild(fo);
+  var r2 = document.createElement('div'); r2.className = 'roll2'; r2.textContent = GAP_ESSAY.roll2; bookPageEl.appendChild(r2);
+  r2.addEventListener('click', function (e) { e.stopPropagation(); });
+  var run = document.createElement('div'); run.className = 'tapeRun'; bookPageEl.appendChild(run);
+  var tag = document.createElement('div'); tag.className = 'tapeTag'; tag.textContent = GAP_ESSAY.tag; bookPageEl.appendChild(tag);
+  var cs = document.createElement('div'); cs.className = 'tapeCase'; bookPageEl.appendChild(cs);
+  cs.addEventListener('click', function (e) { e.stopPropagation(); gapTape(run, tag, bl); });
   var p = gapFind.getWorldPosition(new THREE.Vector3()); p.y = 0.9; p.project(camera);
   var W = innerWidth, H = innerHeight, pw = bookPageEl.offsetWidth || 330, ph = bookPageEl.offsetHeight || 260;
-  var x = clamp((p.x + 1) / 2 * W - pw / 2, 10, W - pw - 10), y = clamp((1 - p.y) / 2 * H - ph - 10, 10, H - ph - 10);
+  var x = clamp((p.x + 1) / 2 * W - pw / 2, 28, W - pw - 22), y = clamp((1 - p.y) / 2 * H - ph - 10, 10, H - ph - 32);
   bookPageEl.style.transform = 'translate(' + x.toFixed(0) + 'px,' + y.toFixed(0) + 'px) rotate(1.2deg)';
   bookPageEl.classList.add('on');
   bookPage.t = 14; bookPage.then = null;
+}
+/* a tap on the tape's case: out it runs down the left margin from the head to the blot where the writing stops, an
+   inch a tick, and the tag says how far; a second tap winds it back */
+function gapTape(run, tag, blot) {
+  var top = run.offsetTop, L = Math.max(40, blot.offsetTop + blot.offsetHeight - top), inch = L / GAP_ESSAY.inches;
+  if (run.classList.contains('out')) {
+    run.classList.remove('out'); run.style.height = '0px'; tag.classList.remove('on'); return;
+  }
+  if (!run.childNodes.length) GAP_ESSAY.marks.forEach(function (m) {
+    var sp = document.createElement('span'); sp.textContent = m[1]; sp.style.top = (m[0] * inch - 16).toFixed(1) + 'px'; run.appendChild(sp);
+  });
+  run.style.setProperty('--inch', inch.toFixed(2) + 'px');
+  run.classList.add('out'); run.style.height = L.toFixed(0) + 'px';
+  tag.style.top = (top + L + 3).toFixed(0) + 'px'; tag.style.left = '6px';   /* under its end, left of the note */
+  setTimeout(function () { if (run.classList.contains('out')) tag.classList.add('on'); }, 1600);
+  bookPage.t = Math.max(bookPage.t, 10);
 }
 /* ---------- the homework table's stop (Q36, 1: Godric 9.15 pm, the walk-ups in turn, the table first) ----------
    As the desk's: a tap on the round table, its top or the homework glides the view up to the near rim, a boy's eye a
