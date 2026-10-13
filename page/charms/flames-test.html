@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=30"></script>
+<script src="spells.js?v=36"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* Hermione's bluebell flames, a test page for the Charms lane (13 October 2026, twentieth session; the owner is Godric).
@@ -46,7 +46,9 @@
    (27th session: Harry, Ron and Hermione stand still and fix one ring, and Neville stamps to and fro along the line
    out from its middle, on it only now and then; LumosSpells.judgeFlames with fix, its 'apart' when the ring goes
    through the three while he is off it, the gap drawn along that line; on kind the three's ring shows faint and he
-   glows while on it). Seen from above:
+   glows while on it). Q9's fix (13 October 2026, David tried it: a freehand ring judged for roundness was too hard):
+   any closed loop through all three is warm, judged by LumosSpells.judgeLoop, and the true circle is drawn from
+   where they stand, his loop drawn into it as the jar goes down at its middle. Seen from above:
    "jet-black hair" (PS 1), the Weasleys' "red hair" (PS 6), "lots of bushy brown hair" (PS 6); the fourth in a
    woolly hat. ?round=1..5, ?ease= for trying; window.lumosFlames for checks (friends(), ring(): the one circle through
    them, walker(ms): Neville in Four friends, ms from now, state()). */
@@ -58,9 +60,9 @@
   var HAIR = { Harry: '#15110e', Ron: '#c4562a', Hermione: '#6b4423', Neville: null };
   var ROUNDS = [
     { name: 'The freezing courtyard', at: [-90, 30, 150], who: ['Harry', 'Ron', 'Hermione'],
-      start: 'A freezing courtyard. Hermione has bright blue fire in a jam jar: draw <b>one ring through where they stand</b>, and it goes down in the middle.' },
+      start: 'A freezing courtyard. Hermione has bright blue fire in a jam jar: draw <b>a loop through where they stand</b>, any shape, and the magic finds the one ring through them, the jar in its middle.' },
     { name: 'Find the ring', at: [-60, 20, 200], who: ['Hermione', 'Harry', 'Ron'],
-      start: '<b>No guide</b> this time. They have moved: find the one ring that goes through all three.' },
+      start: '<b>No guide</b> this time. They have moved: a loop through all three, and the ring through them shows.' },
     { name: 'Room for one more', at: [90, 210, 330], who: ['Ron', 'Hermione', 'Harry'],
       start: 'One ring through all three again, and keep an eye out: someone else is cold too.' },
     { name: 'Three in a row', row: true, who: ['Hermione', 'Harry', 'Ron'],
@@ -168,21 +170,20 @@
   /* ---- the cast: one ring through where they stand ---- */
   function judge(pts) {
     if (wait || done || warm) return null;
-    var four = !!ROUNDS[round].four, fr = four ? friends() : spots(), j = LumosSpells.judgeFlames(pts, fr, ease, four ? [0, 1, 2] : undefined), now = performance.now();
+    var four = !!ROUNDS[round].four, fr = four ? friends() : spots(), j = LumosSpells.judgeLoop(pts, fr, ease, four ? [0, 1, 2] : undefined), now = performance.now();
     var lv = guides.length ? guides[0].level() : 0;
     last = j;
     if (j.verdict !== 'warm') {
       guides.forEach(function (g) { g.miss(); }); misses++; shiver();
       trail = { pts: pts, at: now };
-      shown = /^(out|lumpy|row|apart)$/.test(j.reason) ? { at: now, j: j, fr: fr } : null;
+      shown = /^(out|row|apart)$/.test(j.reason) ? { at: now, j: j, fr: fr } : null;
       var cold = j.cold.map(function (k) { return fr[k].who; }), near = j.close.map(function (k) { return fr[k].who; });
       var ap = j.apart >= 0 ? fr[j.apart] : null, apOff = ap ? j.fixOff[j.apart] : 0;
       var words = {
         tap: 'A ring, not a dot: <b>draw right round</b>, through where they stand.',
         open: 'Close it up: <b>right round</b>, back to where you began.',
         scribble: '<b>Once round</b> is enough: one ring.',
-        lumpy: '<b>Rounder!</b> A fire warms the same all the way round, so the ring must be round.',
-        row: 'No ring goes through <b>three in a row</b>, however it is drawn: the middle one is never on it. <b>Drag Harry</b> out of line.',
+        row: 'No <b>ring</b> goes through <b>three in a row</b>, whatever loop you draw: the middle one is never on it. <b>Drag Harry</b> out of line.',
         apart: ap ? 'Harry, Ron and Hermione <b>fix the ring</b>, and ' + ap.who + ' was <b>' + Math.abs(apOff).toFixed(1) + ' sizes ' + (apOff > 0 ? 'outside' : 'inside') + '</b> it just then. <b>Wait till he is on it</b>, then draw.' : '',
         out: (cold.length ? '<b>' + list(cold) + '</b> ' + (cold.length > 1 ? 'are' : 'is') + ' left out in the cold. ' : '') +
              (near.length ? '<b>' + list(near) + '</b> would be far too close: robes catch, like the hem of Snape\'s. ' : '') + 'Through <b>where each one stands</b>.'
@@ -193,8 +194,8 @@
     }
     guides.forEach(function (g) { g.hit(lv > 0); });
     warm = { at: now, c: j.c, pts: pts, nev: four ? fr[3] : null }; flameSound(); LumosSpells.learn('bluebell');
-    if (round === 0) say('<b>Warm!</b> The jar sits in the middle and each of them is <b>the same distance</b> from it. That is what a circle is.');
-    else if (round === 1) say('<b>Warm!</b> Three friends not in a row always have <b>exactly one</b> ring through them, and you found it.');
+    if (round === 0) say('<b>Warm!</b> Your loop went through all three, and here is the ring through them: the jar sits in its middle and each of them is <b>the same distance</b> from it. That is what a circle is.');
+    else if (round === 1) say('<b>Warm!</b> Three friends not in a row always have <b>exactly one</b> ring through them: any loop through all three finds the same one.');
     else if (round === 3) say('<b>Warm!</b> Out of line, there is <b>exactly one</b> ring again.' + (stepNow().smallest ? ' And the smallest: Ron and Hermione stand <b>opposite each other</b> across the fire.' : ''));
     else if (four) say('<b>Warm, all four!</b> Harry, Ron and Hermione fixed the ring, and Neville was on it just then: <b>one ring through four</b>.');
     else say('<b>Warm!</b> Backs to the fire, all three the same distance from it.');
@@ -311,7 +312,7 @@
     if (!shown || now - shown.at > 2600 || !shown.j.c) return;
     var j = shown.j, fr = shown.fr || spots();
     cx.save(); cx.globalAlpha = Math.min(1, (now - shown.at) / 250) * (now - shown.at > 2000 ? (2600 - (now - shown.at)) / 600 : 1);
-    if (j.reason !== 'apart') {
+    if (j.reason !== 'apart' && !j.loop) {   /* the old judge's fitted ring; a loop's own line shows in rose instead */
       circ(j.c, j.c.r, 'rgba(240,150,140,0.7)', 2, [8, 7]);
       cx.fillStyle = 'rgba(240,150,140,0.9)'; cx.beginPath(); cx.arc(j.c.x, j.c.y, 4, 0, 7); cx.fill();
     } else if (j.fixC) {   /* Four friends: the ring the three fix, and how far off it he stood, along the line from its middle */
@@ -367,7 +368,11 @@
       cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
     }
     if (stroke && stroke.length > 1) ink(stroke, 0.7);
-    if (warm && now - warm.at < 900) ink(warm.pts, 0.8 * (1 - (now - warm.at) / 900));
+    if (warm && now - warm.at < 1100) {   /* his loop drawn into the true ring through them, then gone into the gold */
+      var mc = warm.c, mt = ez((now - warm.at) / 700);
+      ink(warm.pts.map(function (q) { var d = Math.hypot(q.x - mc.x, q.y - mc.y) || 1; return { x: q.x + (mc.x + (q.x - mc.x) * mc.r / d - q.x) * mt, y: q.y + (mc.y + (q.y - mc.y) * mc.r / d - q.y) * mt }; }),
+        0.8 * (now - warm.at < 700 ? 1 : 1 - (now - warm.at - 700) / 400));
+    }
     if (trail && now - trail.at < 1800) ink(trail.pts, 0.75 * (1 - (now - trail.at) / 1800), true);
     requestAnimationFrame(frame);
   }
