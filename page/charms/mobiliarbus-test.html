@@ -24,7 +24,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=26"></script>
+<script src="spells.js?v=34"></script>
 <script>
 /* Mobiliarbus, a test page for the Charms lane (12 October 2026, ninth session; the owner is Godric). Drawn in code.
    The book (PoA 10, checked in the text): in the Three Broomsticks, with the teachers and the Minister coming in out of
@@ -41,6 +41,11 @@
    up or down, whose two legs join into one arrow; his legs are drawn in his order. The lift and the thump frame the
    arrow (his t1): it grows from the tree as it rises a few inches and is whole at the soft thump. Hermione whispered
    it (his t2), so the hiding round asks for a whisper and praises one: "Quietly done. Fudge never noticed."
+   Two moves add up (8.1, thirty-first session, 13 October 2026): a round before the hiding tells two moves, each its
+   own slide; landed, his arrows stay end to end, numbered, and the one arrow from where the round began is their sum
+   (LumosSpells.addMoves: the rights and lefts added with their signs, the ups and downs the same); the other order,
+   dashed through its own middle square, lands on the same square. A wrong slide is never wasted: from there, what is
+   left adds up to the move he wanted. In any round, a wrong slide's arrow stays and the round ends on the sum.
    ?ease= for trying; window.lumosMobiliarbus for checks. */
 (function () {
   'use strict';
@@ -50,11 +55,12 @@
   /* the room, in squares: portrait and landscape keep the same story on a board that fits */
   var LAYOUTS = {
     tall: { cols: 6, rows: 8, door: 4, table: [4, 6], stools: [[3, 6], [5, 6], [4, 7]], tree: [1, 3],
-      rounds: [{ move: [3, 0] }, { move: [-1, -3] }, { hide: true }] },
+      rounds: [{ move: [3, 0] }, { move: [-1, -3] }, { two: [[2, 1], [-3, 1]] }, { hide: true }] },
     wide: { cols: 9, rows: 6, door: 6, table: [6, 4], stools: [[5, 4], [7, 4], [6, 5]], tree: [1, 2],
-      rounds: [{ move: [3, 0] }, { move: [-1, -2] }, { hide: true }] } };
+      rounds: [{ move: [3, 0] }, { move: [-1, -2] }, { two: [[2, 1], [-3, 1]] }, { hide: true }] } };
   var Lo = null, cell = 40, gx = 0, gy = 0, round = 0, pos = null, startPos = null, target = null, moves = [], roundMoves = [];
   var stroke = null, active = null, trail = null, anim = null, arrow = null, bump = null, dust = null, doorOpen = 0, done = false, last = null, wait = null;
+  var kept = [], ghost = null, roundStart = null;   /* this round's moves end to end, the other order, where the round began */
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight;
@@ -101,8 +107,11 @@
     doorOpen = 0; done = false; last = null; menu(); begin();
   }
   function begin() {
-    var R = Lo.rounds[round]; roundMoves = [];
-    if (R.hide) {
+    var R = Lo.rounds[round]; roundMoves = []; kept = []; ghost = null; roundStart = pos.slice();
+    if (R.two) {   /* two moves add up: told as two, each its own slide */
+      target = [pos[0] + R.two[0][0] + R.two[1][0], pos[1] + R.two[0][1] + R.two[1][1]];
+      say('Two moves this time: first ' + told(R.two[0]) + ', then ' + told(R.two[1]) + '. Each its own slide. Watch what they add up to. <i>Mobiliarbus!</i>');
+    } else if (R.hide) {
       target = [Lo.table[0], Lo.table[1] - 1]; doorOpen = performance.now();
       say('The door swings open: in come Professor McGonagall, Professor Flitwick, Hagrid and the Minister for Magic! Quick, and quietly: <b>slide the tree right in front of your table</b>, between it and the door. Whisper it: <i>Mobiliarbus!</i>');
     } else {
@@ -134,6 +143,7 @@
       return j;
     }
     LumosSpells.learn('mobiliarbus');
+    if (arrow && roundMoves.length && !arrow.sum) kept.push({ from: arrow.from, to: arrow.to });   /* his last move stays, end to end */
     anim = { at: performance.now(), from: pos.slice(), to: to, dx: j.dx, dy: j.dy, ell: j.shape === 'L', acrossFirst: j.shape !== 'L' || j.legs[0][0] !== 0 };
     arrow = { from: pos.slice(), to: to, at: performance.now(), ell: anim.ell, acrossFirst: anim.acrossFirst, grow: true };   /* framed by the lift and the thump */
     noise(0.25, 700, 0.12);
@@ -148,17 +158,43 @@
       var line = 'A soft thump. ' + (a.ell ? 'Your two legs, <b>' + words(a.acrossFirst ? a.dx : 0, a.acrossFirst ? 0 : a.dy) + '</b> then <b>' +
         words(a.acrossFirst ? 0 : a.dx, a.acrossFirst ? a.dy : 0) + '</b>, join into one slide, ' : '') + '<b>' + words(a.dx, a.dy) + '</b>' + (roundMoves.length > 1 ? ', and altogether this round <b>' + words(sum(roundMoves)[0], sum(roundMoves)[1]) + '</b>' : '') + ': just as it should.';
       if (R.hide) {
-        done = true; var tot = [pos[0] - startPos[0], pos[1] - startPos[1]];
+        done = true; kept = []; ghost = null; var tot = [pos[0] - startPos[0], pos[1] - startPos[1]];
         arrow = { from: startPos, to: pos.slice(), at: performance.now(), total: true };
         say('Hidden! Quietly done. Fudge never noticed. The tree landed with a soft thump right in front of your table; through its branches, four pairs of feet go by. ' +
           'All its moves together: from where it began, <b>' + words(tot[0], tot[1]) + '</b>.');
         return;
       }
-      say(line); round++; wait = setTimeout(function () { wait = null; if (!done && round < Lo.rounds.length && !anim) begin(); }, 2600);
+      var many = R.two || roundMoves.length > 1;
+      if (many) { var added = addedUp(R); if (R.two) line = added; }
+      say(line); round++; wait = setTimeout(function () { wait = null; if (!done && round < Lo.rounds.length && !anim) begin(); }, many ? 6500 : 2600);
       return;
     }
-    say('A soft thump: that was <b>' + words(a.dx, a.dy) + '</b>. ' + (R.hide ? 'Not hidden yet: the door can still see your table. ' : 'The words said ' + words(R.move[0], R.move[1]) + '. ') +
+    if (R.two && roundMoves.length === 1 && same(roundMoves[0], R.two[0])) { say('A soft thump: <b>' + words(a.dx, a.dy) + '</b>, the first move. Now the second: ' + told(R.two[1]) + '.'); return; }
+    say('A soft thump: that was <b>' + words(a.dx, a.dy) + '</b>. ' + (R.hide ? 'Not hidden yet: the door can still see your table. ' : R.two ? 'Not the move the words said, but never wasted. ' : 'The words said ' + words(R.move[0], R.move[1]) + '. ') +
       'From here, <b>' + words(left[0], left[1]) + '</b> to go.');
+  }
+  function same(p, q) { return p[0] === q[0] && p[1] === q[1]; }
+  /* "2 right and 3 left make 1 left": one axis of the moves added with their signs */
+  function addUp(list, key) {
+    var parts = list.map(function (m) { return m[key]; }).filter(function (v) { return v; }), tot = parts.reduce(function (p, v) { return p + v; }, 0);
+    function nm(v) { return Math.abs(v) + ' ' + (key ? (v > 0 ? 'down' : 'up') : (v > 0 ? 'right' : 'left')); }
+    if (!parts.length) return '';
+    if (parts.length === 1) return '<b>' + nm(tot) + '</b>';
+    return parts.map(nm).join(' and ') + ' make <b>' + (tot ? nm(tot) : 'none') + '</b>';
+  }
+  /* the round landed after more than one move, or the two-move round: his arrows kept end to end, the sum arrow from
+     where the round began, the other order dashed through its middle square when that square is free */
+  function addedUp(R) {
+    var A = LumosSpells.addMoves(roundMoves), n = roundMoves.length, mid = null, now = performance.now();
+    if (arrow && n > 1) kept.push({ from: arrow.from, to: arrow.to });
+    arrow = { from: roundStart.slice(), to: pos.slice(), at: now, sum: true };
+    if (n === 2) mid = [roundStart[0] + A.swapped[0], roundStart[1] + A.swapped[1]];
+    else if (n === 1 && R.two) mid = [roundStart[0] + R.two[0][0], roundStart[1] + R.two[0][1]];
+    ghost = mid && !blockedAt(mid) ? { from: roundStart.slice(), mid: mid, to: pos.slice(), at: now } : null;
+    var list = n === 1 && R.two ? R.two : roundMoves, ax = addUp(list, 0), dn = addUp(list, 1), add = 'Added up: ' + ax + (ax && dn ? '; ' : '') + dn;
+    if (n === 1) return 'A soft thump: one slide does both moves at once. ' + add + '.' + (ghost ? ' Dashed, the two moves the words told: the same square.' : '');
+    return 'A soft thump. ' + (n === 2 ? 'Two moves' : 'All ' + n + ' moves') + ' end to end. ' + add + ': one slide from where it began.' +
+      (ghost ? ' Dashed, the other way round: the same square.' : '') + (R.two && !same(roundMoves[0], R.two[0]) ? ' A wrong slide is never wasted.' : '');
   }
   function sum(list) { return list.reduce(function (s, m) { return [s[0] + m[0], s[1] + m[1]]; }, [0, 0]); }
 
@@ -206,6 +242,40 @@
       cx.fillStyle = b[2]; cx.beginPath(); cx.arc(p.x + b[0] * s, base + b[1] * s, s * 0.045, 0, 7); cx.fill(); });
     cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(p.x, base - s * 0.8, s * 0.06 + Math.sin(now / 300) * s * 0.008, 0, 7); cx.fill();   /* the star */
   }
+  /* his moves this round kept end to end, numbered, and the other order dashed: moves add up */
+  function drawKept(now, numbers) {   /* the arrows under the sum, their numbers over it */
+    if (!kept.length && !ghost) return;
+    var fs = Math.round(Math.max(12, cell * 0.22));
+    if (numbers) {
+      var S = roundStart ? centre(roundStart) : null, P = centre(pos), mid = S ? { x: (S.x + P.x) / 2, y: (S.y + P.y) / 2 } : P;
+      cx.save(); cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.globalAlpha = 0.95;
+      kept.forEach(function (m, i) {
+        var a = centre(m.from), b = centre(m.to), L = Math.hypot(b.x - a.x, b.y - a.y); if (L < 1) return;
+        var nx = -(b.y - a.y) / L * fs * 0.95, ny = (b.x - a.x) / L * fs * 0.95, cxm = (a.x + b.x) / 2, cym = (a.y + b.y) / 2;
+        var p1 = { x: cxm + nx, y: cym + ny }, p2 = { x: cxm - nx, y: cym - ny }, q = Math.hypot(p1.x - mid.x, p1.y - mid.y) >= Math.hypot(p2.x - mid.x, p2.y - mid.y) ? p1 : p2;   /* the side away from the sum */
+        cx.fillStyle = '#1a1411'; cx.beginPath(); cx.arc(q.x, q.y, fs * 0.62, 0, 7); cx.fill(); cx.strokeStyle = '#c9a24e'; cx.lineWidth = 1.5; cx.stroke();
+        cx.fillStyle = '#f3d27a'; cx.font = '600 ' + fs + 'px Georgia, serif'; cx.fillText(String(i + 1), q.x, q.y + 1);
+      });
+      cx.restore(); return;
+    }
+    cx.save(); cx.lineCap = 'round'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    function line(a, b, col, w, dash, back) {
+      var L = Math.hypot(b.x - a.x, b.y - a.y); if (L < 1) return null;
+      var ux = (b.x - a.x) / L, uy = (b.y - a.y) / L, e = { x: b.x - ux * back, y: b.y - uy * back };
+      cx.strokeStyle = col; cx.fillStyle = col; cx.lineWidth = w; cx.setLineDash(dash); cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(e.x, e.y); cx.stroke(); cx.setLineDash([]);
+      cx.beginPath(); cx.moveTo(e.x + ux * 9, e.y + uy * 9); cx.lineTo(e.x - ux * 3 - uy * 7, e.y - uy * 3 + ux * 7); cx.lineTo(e.x - ux * 3 + uy * 7, e.y - uy * 3 - ux * 7); cx.closePath(); cx.fill();
+      return { ux: ux, uy: uy };
+    }
+    if (ghost) {   /* the other order, through the square it would pass */
+      var g0 = centre(ghost.from), g1 = centre(ghost.mid), g2 = centre(ghost.to);
+      cx.globalAlpha = 0.8 * Math.min(1, (now - ghost.at) / 900);
+      cx.strokeStyle = '#cfe0ff'; cx.lineWidth = 1.5; cx.beginPath(); cx.arc(g1.x, g1.y, cell * 0.2, 0, 7); cx.stroke();
+      line(g0, g1, '#cfe0ff', 2.5, [5, 6], cell * 0.24); line(g1, g2, '#cfe0ff', 2.5, [5, 6], cell * 0.5);
+    }
+    cx.globalAlpha = 0.9;
+    kept.forEach(function (m) { line(centre(m.from), centre(m.to), '#c9a24e', 3, [], cell * 0.3); });
+    cx.restore();
+  }
   /* the move as an arrow, and its two legs counted in squares (the translation) */
   function drawArrow(now) {
     if (!arrow) return;
@@ -215,30 +285,37 @@
     if (arrow.grow && anim) {   /* the arrow grows as the tree drifts: nothing at the lift, whole at the thump */
       var t0 = now - anim.at, Dd = 300 + 250 * Math.hypot(anim.dx, anim.dy); grow = Math.max(0, Math.min(1, (t0 - 300) / Dd)); grow = grow * grow * (3 - 2 * grow); k = 1; }
     cx.save(); cx.globalAlpha = k; cx.lineCap = 'round'; cx.textAlign = 'center'; cx.textBaseline = 'middle'; cx.font = '600 ' + fs + 'px Georgia, serif';
-    if (dx && dy) {   /* the legs, along the squares, in his order (across first for a slanted line) */
+    if (dx && dy && !arrow.sum) {   /* the legs, along the squares, in his order (across first for a slanted line) */
       cx.strokeStyle = '#9fb6c9'; cx.lineWidth = arrow.ell ? 3.5 : 2.5; cx.setLineDash(arrow.ell ? [10, 5] : [6, 6]);
       cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(corner.x, corner.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.setLineDash([]);
     }
-    if (dx) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
+    if (dx && !arrow.sum) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
       var lab = Math.abs(dx) + ' ' + (dx > 0 ? 'right' : 'left');
       if (af) cx.fillText(lab, (a.x + b.x) / 2, a.y + (dy > 0 ? -fs : fs) * 0.95);   /* the across label away from the arrow */
       else { cx.textAlign = dx > 0 ? 'right' : 'left'; cx.fillText(lab, corner.x - Math.sign(dx) * fs * 0.5, b.y); cx.textAlign = 'center'; } }   /* up or down first: just past the turn, outside the L, clear of the tree landing at the leg's end */
-    if (dy) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
+    if (dy && !arrow.sum) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
       var vx = af ? b.x : a.x, vs = (af ? 1 : -1) * (dx >= 0 ? 1 : -1);
       cx.textAlign = vs > 0 ? 'left' : 'right'; cx.fillText(Math.abs(dy) + ' ' + (dy > 0 ? 'down' : 'up'), vx + vs * fs * 0.5, (a.y + b.y) / 2); cx.textAlign = 'center'; }
     cx.shadowBlur = 0;
-    cx.strokeStyle = arrow.total ? '#ffe9a8' : '#f3d27a'; cx.lineWidth = arrow.total ? 5 : 4;   /* the move itself, straight */
+    cx.strokeStyle = arrow.total || arrow.sum ? '#ffe9a8' : '#f3d27a'; cx.lineWidth = arrow.total || arrow.sum ? 5 : 4;   /* the move itself, straight */
     var L = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / L, uy = (b.y - a.y) / L, e = { x: b.x - ux * cell * 0.66, y: b.y - uy * cell * 0.66 };   /* its head stops short of the tree */
     if (grow < 1) { var gl = Math.max(0, (L - cell * 0.66) * grow); e = { x: a.x + ux * gl, y: a.y + uy * gl }; }
     cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(e.x, e.y); cx.stroke();
     if (grow < 0.08) { cx.fillStyle = 'rgba(243,210,122,0.9)'; cx.beginPath(); cx.arc(a.x, a.y, 4, 0, 7); cx.fill(); cx.restore(); return; }
     cx.fillStyle = cx.strokeStyle; cx.beginPath(); cx.moveTo(e.x + ux * 12, e.y + uy * 12); cx.lineTo(e.x - ux * 4 - uy * 9, e.y - uy * 4 + ux * 9); cx.lineTo(e.x - ux * 4 + uy * 9, e.y - uy * 4 - ux * 9); cx.closePath(); cx.fill();
     cx.fillStyle = 'rgba(243,210,122,0.9)'; cx.beginPath(); cx.arc(a.x, a.y, 4, 0, 7); cx.fill();
+    if (arrow.sum) {   /* the sum's count on the arrow itself, on a dark tab; the line says how it adds up */
+      var st = words(dx, dy), mx = (a.x + e.x) / 2, my = (a.y + e.y) / 2, tw = cx.measureText(st).width + fs, th = fs * 1.5;
+      cx.fillStyle = 'rgba(26,20,17,0.9)'; cx.beginPath(); if (cx.roundRect) cx.roundRect(mx - tw / 2, my - th / 2, tw, th, fs * 0.5); else cx.rect(mx - tw / 2, my - th / 2, tw, th); cx.fill();
+      cx.strokeStyle = '#ffe9a8'; cx.lineWidth = 1.5; cx.stroke(); cx.fillStyle = '#ffe9a8'; cx.fillText(st, mx, my + 1);
+    }
     cx.restore();
   }
   function frame(now) {
     drawRoom(now);
+    drawKept(now, false);
     drawArrow(now);
+    drawKept(now, true);
     var p = centre(pos), lift = 0;
     if (anim) {   /* up a few inches, drift along the line, down with a soft thump */
       var t = now - anim.at, A = 300, D = 300 + 250 * Math.hypot(anim.dx, anim.dy), Z = 220, f = centre(anim.from), g = centre(anim.to);
@@ -303,7 +380,8 @@
       return cast(out);
     },
     state: function () { return { round: round, pos: pos, target: target, moves: moves, done: done, moving: !!anim, waiting: !!wait, ease: ease, layout: Lo === LAYOUTS.wide ? 'wide' : 'tall',
-      line: lineEl.textContent, last: last, learned: LumosSpells.learned('mobiliarbus'), arrow: arrow ? { ell: !!arrow.ell, acrossFirst: arrow.acrossFirst !== false, grow: !!arrow.grow } : null }; } };
+      line: lineEl.textContent, last: last, learned: LumosSpells.learned('mobiliarbus'), arrow: arrow ? { ell: !!arrow.ell, acrossFirst: arrow.acrossFirst !== false, grow: !!arrow.grow, sum: !!arrow.sum, from: arrow.from, to: arrow.to } : null,
+      kept: kept.length, ghost: ghost ? ghost.mid : null, roundStart: roundStart }; } };
 })();
 </script>
 </body>

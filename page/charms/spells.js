@@ -353,6 +353,22 @@ function judgeSlide(points, at, cell, ease) {
   out.verdict = 'slide'; out.reason = 'slid';
   return out;
 }
+/* Moves add up (Mobiliarbus, two moves add up; 8.1, thirty-first session, 13 October 2026). A move is an arrow on the
+   squares, [dx, dy], dx right and dy down; moves drawn end to end make the one arrow from the first start to the last
+   end, their rights and lefts added with their signs and their ups and downs the same, so the order never matters:
+   either way round they land on the same square. A wrong slide is never wasted: what is left to go, added to it,
+   makes the move he wanted. list: the moves in his order. Returns { sum: [dx, dy], across: each move's dx, down: each
+   move's dy, path: the squares it stood on from [0, 0], one more than the moves, swapped: for two moves the other
+   order's middle square (the second move made first), else null }. */
+function addMoves(list) {
+  var sx = 0, sy = 0, path = [[0, 0]], across = [], down = [], i;
+  list = list || [];
+  for (i = 0; i < list.length; i++) {
+    sx += list[i][0]; sy += list[i][1];
+    across.push(list[i][0]); down.push(list[i][1]); path.push([sx, sy]);
+  }
+  return { sum: [sx, sy], across: across, down: down, path: path, swapped: list.length === 2 ? [list[1][0], list[1][1]] : null };
+}
 /* A start on the piece is its own square (req 256, the Common room, 13 October 2026). In a room drawn in perspective
    the piece stands up off the floor, so a stroke begun on its seat reads, through the floor, a square or two behind it
    and judgeSlide finds it off the piece. points: the stroke on the screen, {x, y, t}; foot: the piece's square on the
@@ -2368,5 +2384,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
