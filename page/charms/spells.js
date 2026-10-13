@@ -294,7 +294,7 @@ function judgeHinge(points, c, r, want, w, h, ease) {
    SLIDE_EASES or an ease of its own (start: how far from the centre, in squares, the stroke may begin; straight: the
    chord over the path; snap: how far off a square's middle the end may land, in squares, 0.5 taking any; axis: how
    many degrees off the squares an L's leg may run).
-   An L along the squares works too (Q6, 6.3, David, 13 October 2026, 7.11 am): two straight legs, one across and one
+   An L along the squares works too (Q6, 6.3, Godric, 13 October 2026, 7.11 am): two straight legs, one across and one
    up or down, turning once; its legs join into the one move, the same translation added up from its two parts. The
    corner is the stroke's point furthest from the line start to end; each leg at least half a square, as straight as
    a line must be, and within `axis` degrees of the squares.
