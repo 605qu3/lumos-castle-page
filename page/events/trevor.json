@@ -7,7 +7,8 @@
     "hiding": [
       "floor-a",
       "floor-b",
-      "floor-c"
+      "floor-c",
+      "floor-d"
     ],
     "suit": [
       "suit-feet",
@@ -114,6 +115,15 @@
       ],
       "show": [
         "trevor at spot"
+      ]
+    },
+    {
+      "when": [
+        "place = common room",
+        "chair_knut != kept"
+      ],
+      "show": [
+        "a Knut on the floor behind the armchair, where Trevor hides"
       ]
     }
   ],
@@ -428,7 +438,8 @@
         "place = common room",
         "trevor = loose",
         "trevor_where != corridor",
-        "hops_left > 0"
+        "hops_left > 0",
+        "spot != floor-d"
       ],
       "starts": [
         "add hops_left -1",
@@ -446,7 +457,8 @@
       "when": [
         "trevor = loose",
         "in_helmet != yes",
-        "hops_left = 0"
+        "hops_left = 0",
+        "spot != floor-d"
       ],
       "starts": [
         "set trevor = held"
@@ -464,6 +476,78 @@
             "set trevor = loose"
           ]
         }
+      ]
+    },
+    {
+      "id": "trevor.found-chair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "moment": "tap trevor",
+      "when": [
+        "place = common room",
+        "trevor = loose",
+        "in_helmet != yes",
+        "spot = floor-d"
+      ],
+      "starts": [
+        "set hops_left = 0",
+        "set trevor = held"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "the boys' stair"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "trevor.found-chair",
+          "sound": "a glad cry from the foot of the boys' stair",
+          "text": [
+            "Trevor!"
+          ],
+          "canon": "PS 6, \"'Trevor!' cried Neville blissfully\"; PS 16, Neville appeared from behind an armchair, clutching Trevor; Godric's t1 on Q75 (13 October 2026): cornered behind the chair, Trevor is caught at the first tap; checked against the text, 13 October 2026"
+        }
+      ],
+      "ends": [
+        {
+          "when": [
+            "trevor = boxed"
+          ],
+          "do": []
+        },
+        {
+          "on": "leave",
+          "do": [
+            "set trevor = loose"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trevor.chair-knut",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chair-knut",
+      "when": [
+        "place = common room",
+        "chair_knut != kept"
+      ],
+      "starts": [
+        "set chair_knut = kept",
+        "add knuts 1",
+        "log \"Found a Knut behind the armchair {day}\""
+      ],
+      "show": [
+        "the Knut goes into his pocket with a clink"
       ]
     },
     {

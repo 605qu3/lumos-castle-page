@@ -124,6 +124,11 @@
    his brother's dot there, labelled by this iPad's name for him, `move` pace after fifteen minutes in one room, as
    Dumbledore's paces his study (Godric's events-map-brother-1013, 1, with t1, PoA 10), else still (v=27).
 
+   His year at the castle (board req 263, the dormitory door's sign; Godric's touch: FIRST YEARS, then SECOND YEARS
+   each September, CoS 5): `yearIn()` is 1 through the school year of his first visit, one more each 1 September,
+   held at 7. The first visit's day is kept in the state, so it is each boy's own (his satchel carries it); a grown-up
+   corrects it with settings.firstYear (the year of the September he started, as 2026); ?yearin=N for a test (v=28).
+
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
    to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh;
@@ -299,7 +304,7 @@
   function freshState() {
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
              open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
-             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [], points: [],
+             said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [], points: [], firstDay: null,
              owl: { after: 0, posted: {}, postFailed: false, fetchFailed: false, waiting: [], waited: false,
                     afterBack: 0, backsPosted: {} } };
   }
@@ -365,6 +370,7 @@
     var blank = freshState();
     for (var bk in blank) if (state[bk] === undefined || state[bk] === null && blank[bk] !== null) state[bk] = blank[bk];
     var settings = load(SETTINGS_KEY) || { leans: [], speech: 'on' };
+    if (!state.firstDay) state.firstDay = isoDay(new Date());   /* his first visit, for his year (req 263); saved with the state */
     /* A parent's bedtime: a visit length in minutes, or off (settings.bedtime); ?bedtime=N sets it for a test. A bare
        &bedtime is the lights-out trip's own flag, not a length, so it leaves the parent's setting as it is (until
        9 October 2026 it read as 0 and turned the bedtime off on the page it opened); ?bedtime=off turns it off. */
@@ -394,6 +400,14 @@
       return isoDay(d);
     }
     function schoolYear(day) { var y = +day.slice(0, 4); return day <= feastDay(y) ? y : y + 1; }
+    /* His year by Septembers (req 263): the summer after the feast keeps last year's, as the books' do (CoS 5). */
+    function septemberYear(day) { var y = +day.slice(0, 4); return +day.slice(5, 7) >= 9 ? y : y - 1; }
+    function yearIn() {
+      var t = +params.get('yearin');
+      if (t >= 1 && t <= 7) return Math.floor(t);
+      var first = +settings.firstYear >= 1990 && +settings.firstYear <= 2200 ? +settings.firstYear : septemberYear(state.firstDay);
+      return Math.max(1, Math.min(7, septemberYear(isoDay(nowDate())) - first + 1));
+    }
 
     var chains = [];          /* the loaded files */
     var records = [];         /* every record, in file order */
@@ -1936,6 +1950,8 @@
          year's if none is named): the boys' own last school day as a grown-up sets it, the last Friday of June till
          then, ?feast=06-19 for a test (Magic's *Against the year*). Each slip handed out carries its `year`. */
       year: function () { return schoolYear(isoDay(nowDate())); },
+      /* His year at the castle, 1 to 7, turning each 1 September (req 263, the dormitory door's FIRST YEARS sign). */
+      yearIn: yearIn,
       feast: function (y) { return feastDay(+y || schoolYear(isoDay(nowDate()))); },
       visit: function () { return visit; },
       heard: heard,                                   /* guesses a page heard itself, as strings or { text } */
