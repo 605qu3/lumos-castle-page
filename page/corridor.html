@@ -1691,8 +1691,8 @@ function doorSwings(sound) {
    on its lock offers Charms' turn (LumosSpells.openLock, stuck, so every turn answers 'nothing'), his tap already the
    book's tap; whatever his turn, the door huffs and stays shut. Manners open it, never a spell, and there is no handle.
    The offer covers the page, so it goes by itself after LOCK_WAIT_S quiet seconds since his last touch (openLock's
-   wait, the vocabulary's §9; req 220), never midway through a turn */
-var LOCK_WAIT_S = 10, lockOffer = null, lockV = new THREE.Vector3();
+   wait, the vocabulary's §9; req 220; 12, as the hump and the common room, req 224), never midway through a turn */
+var LOCK_WAIT_S = 12, lockOffer = null, lockV = new THREE.Vector3();
 function lockAt(uv) { return uv && Math.hypot((uv.x - LOCK.u) * DOOR.w, (uv.y - LOCK.v) * DOOR.h) < LOCK.r; }
 function lockOnScreen() {
   door.updateMatrixWorld();
