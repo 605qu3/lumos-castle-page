@@ -395,6 +395,65 @@ function judgeAim(points, from, to, ease) {
   out.verdict = 'hit'; out.reason = 'hit';
   return out;
 }
+/* Riddikulus, the mirror line (PoA 7: Lupin's class practise the word without wands first, then "you will raise your
+   wand - thus - and cry 'Riddikulus'", and the Boggart is "forced into that vulture-topped hat, that green dress, that
+   big red handbag"; Ron's spider's "legs vanished. It rolled over and over"). The book gives no stroke; ours, for the
+   geometry: one straight line drawn through the boggart, and it flips over that line like a reflection, into
+   something silly. A line down through it turns it round, left for right (Snape, into the grandmother's clothes); a
+   line across turns it upside down (the spider, onto its back). The flip is about the wanted axis through the place
+   his line crosses the boggart's middle, so a line a little to one side flips it across and it lands as far on the
+   other side: every point keeps its distance to the line.
+   points: the stroke, {x, y, t} in CSS pixels; box: { x, y, w, h } the boggart, px; want: 'down', 'across' or null
+   (either); ease: a name in MIRROR_EASES or an ease of its own (straight: the chord over the path; tilt: the most
+   degrees off the wanted axis; cover: the share of the boggart's height (down) or width (across) the line must span;
+   mid: how far from the boggart's middle the line may cross it, as a share of its half width (down) or half height).
+   Returns { verdict: 'flip' | 'miss', reason ('flip', 'tap', 'wiggly', 'slant', 'across', 'down', 'short',
+   'beside'), axis ('down' or 'across', the nearer to his line), tilt (degrees his line leans off that axis, +
+   clockwise on the screen), cover (the share of the boggart it spans), share (where it crosses: 0 the middle, 1 the
+   edge, + right or below), at (px: the mirror's x for 'down', its y for 'across'), straight }. 'across' and 'down'
+   name the line he drew when the other was wanted. */
+var MIRROR_EASES = {
+  kind:   { straight: 0.85, tilt: 22, cover: 0.7, mid: 0.75 },
+  fair:   { straight: 0.90, tilt: 15, cover: 0.85, mid: 0.5 },
+  strict: { straight: 0.95, tilt: 8, cover: 1.0, mid: 0.3 }
+};
+function judgeMirror(points, box, want, ease) {
+  var e = typeof ease === 'object' ? ease : (MIRROR_EASES[ease] || MIRROR_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', axis: '', tilt: 0, cover: 0, share: 0, at: 0, straight: 0 };
+  if (!points || points.length < 2) return out;
+  var a = points[0], b = points[points.length - 1], path = 0, i;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path < Math.min(box.w, box.h) * 0.25) return out;
+  var dx = b.x - a.x, dy = b.y - a.y, chord = Math.hypot(dx, dy);
+  out.straight = path ? chord / path : 0;
+  var down = Math.abs(dy) >= Math.abs(dx), cx = box.x + box.w / 2, cy = box.y + box.h / 2;
+  out.axis = down ? 'down' : 'across';
+  /* the lean off the axis, + clockwise: a line down leaning its foot left, or a line across dipping to the right */
+  var lean = down ? Math.atan2(-dx * Math.sign(dy || 1), Math.abs(dy)) : Math.atan2(dy * Math.sign(dx || 1), Math.abs(dx));
+  out.tilt = Math.round(lean * 1800 / Math.PI) / 10;
+  if (down) {
+    out.cover = (Math.min(Math.max(a.y, b.y), box.y + box.h) - Math.max(Math.min(a.y, b.y), box.y)) / box.h;
+    out.at = dy ? a.x + (cy - a.y) * dx / dy : a.x; out.share = (out.at - cx) / (box.w / 2);
+  } else {
+    out.cover = (Math.min(Math.max(a.x, b.x), box.x + box.w) - Math.max(Math.min(a.x, b.x), box.x)) / box.w;
+    out.at = dx ? a.y + (cx - a.x) * dy / dx : a.y; out.share = (out.at - cy) / (box.h / 2);
+  }
+  out.cover = Math.round(Math.max(0, out.cover) * 100) / 100; out.share = Math.round(out.share * 100) / 100; out.at = Math.round(out.at);
+  if (out.straight < e.straight) { out.reason = 'wiggly'; return out; }
+  if (want && want !== out.axis) { out.reason = out.axis; return out; }
+  if (Math.abs(out.tilt) > e.tilt) { out.reason = 'slant'; return out; }
+  if (Math.abs(out.share) > e.mid) { out.reason = 'beside'; return out; }
+  if (out.cover < e.cover - 1e-9) { out.reason = 'short'; return out; }
+  out.verdict = 'flip'; out.reason = 'flip';
+  return out;
+}
+/* A point's mirror image over the line through a and b: on the perpendicular from p to the line, as far on the other
+   side (the geometry Riddikulus draws: each point and its image joined square to the line, the two halves equal). */
+function reflectOver(p, a, b) {
+  var dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy || 1, k = ((p.x - a.x) * dx + (p.y - a.y) * dy) / L2;
+  var fx = a.x + k * dx, fy = a.y + k * dy;
+  return { x: 2 * fx - p.x, y: 2 * fy - p.y };
+}
 /* Expelliarmus, the swing and the point (CoS 11, the Duelling Club: Lockhart and Snape "swung their wands above their
    heads and pointed them at their opponent; Snape cried: 'Expelliarmus!' There was a dazzling flash of scarlet light"):
    the book's own stroke. One stroke that starts at the wand hand, swings up above it, then points straight from the
@@ -1939,5 +1998,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
