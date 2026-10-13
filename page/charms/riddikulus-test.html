@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=31"></script>
+<script src="spells.js?v=33"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* Riddikulus, a test page for the Charms lane (13 October 2026, twenty-fifth session; the owner is Godric; his Q7,
@@ -46,7 +46,7 @@
    lands it as far the other side. Then a tap on it is the laugh, and it goes in wisps of smoke. Judged by
    LumosSpells.judgeMirror on the tally's own boxes (checks/riddikulus-tally.js: Snape 0.32 by 0.6 of the short
    side, the spider 0.5 by 0.3); images by LumosSpells.reflectOver. The traced guide, a line down through Snape, shows
-   in the first round only. Nothing graded; the first flip marks learned('riddikulus'). ?round=1..3, ?ease=,
+   in the first round only. Nothing graded; the first flip marks learned('riddikulus'). ?round=1..4, ?ease=,
    ?guide=off for trying; window.lumosRiddikulus for checks.
    The third round, a slanted mirror (13 October 2026, twenty-eighth session; Q8, 8.1, the built spells' later rounds;
    the spellbook's idea "a slanted mirror: the Boggart tips over and lands tilted twice as far as the line leans").
@@ -56,7 +56,18 @@
    Ours (the bandages drawn old and brown, no blood): one straight line through it leaning halfway between up and
    across, and it flips over his own line, so it tips over twice as far as the line leans (judgeMirror with want 45,
    the tally's slant and twice); the sum shows his line's lean and the tip, twice it, beside the three marks; then it
-   topples the rest of the way flat, the trailing bandage at its feet, and its head rolls off. */
+   topples the rest of the way flat, the trailing bandage at its feet, and its head rolls off.
+   The fourth round, two mirrors side by side (13 October 2026, twenty-ninth session; Q8, 8.1; the spellbook's idea
+   "Reflect it twice over two lines side by side: it slides along, twice the gap between them, the way into
+   translations"). The book (PoA 7, checked in the text): "Crack! Where the mummy had been was a woman with floor-length
+   black hair and a skeletal, green-tinged face - a banshee. She opened her mouth wide, and an unearthly sound filled
+   the room, a long, wailing shriek" (L16007); "'Riddikulus!' shouted Seamus" (L16009); "The banshee made a rasping
+   noise and clutched her throat; her voice was gone" (L16011). Ours, kept gentle (her face pale with a green tinge,
+   never skeletal; her wail soft): one straight line down through her, then a second beside it, standing the same way
+   (LumosSpells.judgeTwoMirrors, the tally's two and slide); she flips over the first and turns round, then over the
+   second and turns back, and lands slid along, square to the mirrors, twice the gap between them, the right way round
+   again; the sum shows each mark over the first mirror and on over the second, the gap, and the slide as two gaps end
+   to end; then her voice goes, as the book has it. */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -68,10 +79,12 @@
     { name: 'Spider', want: 'across', start: 'The wardrobe shakes again: it is Ron\'s turn. <b>Tap the word and say it aloud</b> first.',
       cast: 'A giant spider, hairy legs clicking. Draw <b>one straight line across it</b>, side to side.' },
     { name: 'Mummy', want: 45, start: 'The wardrobe shakes a third time: it is Parvati\'s turn. <b>Tap the word and say it aloud</b> first.',
-      cast: 'A bandaged mummy walks out, very slowly. This mirror is slanted: draw <b>one straight line through it, leaning halfway between up and across</b>. It will tip over twice as far as your line leans.' } ];
-  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+      cast: 'A bandaged mummy walks out, very slowly. This mirror is slanted: draw <b>one straight line through it, leaning halfway between up and across</b>. It will tip over twice as far as your line leans.' },
+    { name: 'Banshee', want: 0, two: true, start: 'The wardrobe shakes a fourth time: it is Seamus\'s turn. <b>Tap the word and say it aloud</b> first.',
+      cast: 'A banshee, her black hair to the floor, opens her mouth and wails. Two mirrors this time, side by side: draw <b>one straight line down through her</b>, then <b>a second beside it, to her right</b>, standing the same way.' } ];
+  var round = Math.max(0, Math.min(3, (Number(qs.get('round')) || 1) - 1));
   var stage = 'word', saidAt = 0, castAt = 0, flip = null, marks = null, laughAt = 0, doneAt = 0, last = null, wobbleAt = 0, chain = null;
-  var stroke = null, active = null, trail = null, guide = null, missAt = 0;
+  var stroke = null, active = null, trail = null, guide = null, missAt = 0, mirror1 = null;   /* mirror1: the fourth round's first line, kept */
   var floorY = 0, card = null;
 
   function resize() {
@@ -82,10 +95,20 @@
     card = { x: W / 2 - w / 2, y: Math.min(H - 120 - hh, floorY + S * 0.04), w: w, h: hh, fs: fs };
     makeGuide();
   }
-  /* the boggart's box where it stands, in front of the wardrobe: Snape 0.32 by 0.6 of the short side, the spider 0.5 by 0.3 */
+  /* the boggart's box where it stands, in front of the wardrobe: Snape 0.32 by 0.6 of the short side, the spider 0.5 by
+     0.3; the banshee 0.28 by 0.6, to the left, so she has room to slide along to the right */
   function box() {
+    if (round === 3) return { x: W / 2 - S * 0.44, y: floorY - S * 0.6, w: S * 0.28, h: S * 0.6 };
     var w = S * (round !== 1 ? 0.32 : 0.5), h = S * (round !== 1 ? 0.6 : 0.3);
     return { x: W / 2 - w / 2, y: floorY - h, w: w, h: h };
+  }
+  function stageBox() { return { x: 6, y: 0, w: W - 12, h: H }; }   /* she must land wholly on the screen */
+  function wail() {   /* the banshee's wail, soft: a sine rising and falling, once */
+    if (!audio) return;
+    var o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
+    o.type = 'sine'; o.frequency.setValueAtTime(620, t); o.frequency.linearRampToValueAtTime(980, t + 0.5); o.frequency.linearRampToValueAtTime(700, t + 1.2);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.05, t + 0.2); g.gain.linearRampToValueAtTime(0.0001, t + 1.3);
+    o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 1.35);
   }
   function say(html) { lineEl.innerHTML = html; }
   function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
@@ -121,7 +144,7 @@
   }
   function choose(i) {
     if (chain) { clearTimeout(chain); chain = null; }
-    round = i; stage = 'word'; saidAt = 0; castAt = 0; flip = null; marks = null; laughAt = 0; doneAt = 0; last = null; trail = null; missAt = 0;
+    round = i; stage = 'word'; saidAt = 0; castAt = 0; flip = null; marks = null; laughAt = 0; doneAt = 0; last = null; trail = null; missAt = 0; mirror1 = null;
     makeGuide(); menu(); say(ROUNDS[i].start);
   }
 
@@ -130,17 +153,27 @@
   function sayWord() {
     if (stage !== 'word') return false;
     stage = 'saying'; saidAt = performance.now(); say('<b>Rid-di-KU-lus!</b> Say it aloud as it lights.');
-    setTimeout(function () { if (stage !== 'saying') return; stage = 'cast'; castAt = performance.now(); noise(0.18, 300, 0.4); say(ROUNDS[round].cast); }, 1000);
+    setTimeout(function () { if (stage !== 'saying') return; stage = 'cast'; castAt = performance.now(); noise(0.18, 300, 0.4); if (round === 3) setTimeout(wail, 350); say(ROUNDS[round].cast); }, 1000);
     return true;
   }
   var WHY = {
     wiggly: 'One straight line, like a ruler: a mirror is flat.',
-    slant: function (j) { if (round === 2) return j.tilt < 0 ? 'Lean it further: your line leaned ' + Math.abs(Math.round(j.lean)) + ' degrees, so it would tip only ' + Math.abs(Math.round(j.turn)) + ' and stand back up. Halfway between up and across.' : 'Not so far over: your line leaned ' + Math.abs(Math.round(j.lean)) + ' degrees and would tip it ' + Math.abs(Math.round(j.turn)) + ', past flat. Halfway between up and across.';
+    slant: function (j) { if (round === 3) return 'Straighter up and down: your line leaned ' + Math.abs(Math.round(j.lean)) + ' degrees. Both mirrors stand upright.';
+      if (round === 2) return j.tilt < 0 ? 'Lean it further: your line leaned ' + Math.abs(Math.round(j.lean)) + ' degrees, so it would tip only ' + Math.abs(Math.round(j.turn)) + ' and stand back up. Halfway between up and across.' : 'Not so far over: your line leaned ' + Math.abs(Math.round(j.lean)) + ' degrees and would tip it ' + Math.abs(Math.round(j.turn)) + ', past flat. Halfway between up and across.';
       return round === 0 ? 'Straighter up and down: your line leaned ' + Math.abs(Math.round(j.tilt)) + ' degrees. A mirror stood upright turns him round.' : 'Flatter, level like the floor: your line tipped ' + Math.abs(Math.round(j.tilt)) + ' degrees.'; },
     across: 'That line goes across: it would stand him on his head. For Snape, draw down through him, hat to boots.',
     down: 'That line goes down: it would only turn it round. To roll the spider over, draw across it, side to side.',
-    beside: function () { return round === 2 ? 'Through the mummy, not beside it: the line goes through its middle.' : round === 0 ? 'Through him, not beside him: the line goes through the middle.' : 'Through the spider, not past it: the line goes through its middle.'; },
-    short: function () { return round === 2 ? 'Right through it, from one side of it out past the other.' : round === 0 ? 'Right through him, from his hair to his boots.' : 'Right across, from its legs on one side to the other.'; }
+    beside: function () { if (round === 3) return 'Through her, not beside her: the first line goes through her middle.';
+      return round === 2 ? 'Through the mummy, not beside it: the line goes through its middle.' : round === 0 ? 'Through him, not beside him: the line goes through the middle.' : 'Through the spider, not past it: the line goes through its middle.'; },
+    short: function () { if (round === 3) return 'Right through her, from her hair down to the hem of her gown.';
+      return round === 2 ? 'Right through it, from one side of it out past the other.' : round === 0 ? 'Right through him, from his hair to his boots.' : 'Right across, from its legs on one side to the other.'; }
+  };
+  var WHY2 = {   /* the fourth round's second line */
+    wiggly2: 'The second one straight too, like a ruler: a mirror is flat.',
+    cross: function (j) { return 'Stand the second the same way as the first, side by side: yours leaned ' + Math.abs(Math.round(j.par)) + ' degrees off it, so the two would cross.'; },
+    short2: 'The second as long as the first, from her hair down to the floor.',
+    close: 'A little further apart: so close, she would hardly move.',
+    far: 'Not so far apart: she would slide right off the edge. Draw the second nearer the first.'
   };
   function judge(pts) {
     if (stage === 'word' || stage === 'saying') {
@@ -148,6 +181,7 @@
       say('Say it first, without your wand: <b>tap the word, Riddikulus</b>, and say it aloud.'); last = { verdict: 'refused', reason: 'word' }; return last;
     }
     if (stage !== 'cast') return null;
+    if (ROUNDS[round].two) return judgeTwo(pts);
     var b = box(), j = LumosSpells.judgeMirror(pts, b, ROUNDS[round].want, ease);
     if (j.reason === 'tap') { if (guide) guide.clear(); last = j; return j; }
     var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
@@ -175,10 +209,41 @@
     say('<b>Riddikulus!</b>');
     return j;
   }
+  /* the fourth round: the first line alone (a mirror through her, judged as the slanted mirror is, upright), kept;
+     then the second beside it, judged with the first by judgeTwoMirrors */
+  function judgeTwo(pts) {
+    var b = box(), j, w;
+    if (!mirror1) {
+      j = LumosSpells.judgeMirror(pts, b, 0, ease); last = j;
+      if (j.reason === 'tap') return j;
+      if (j.verdict !== 'flip') {
+        trail = { pts: pts, at: performance.now() }; missAt = performance.now(); noise(0.12, 900, 0.2);
+        w = WHY[j.reason]; say(typeof w === 'function' ? w(j) : w); return j;
+      }
+      mirror1 = { pts: pts, j: j }; noise(0.06, 1800, 0.25);
+      say('That is the first mirror. Now <b>the second, beside it to her right</b>: one more straight line down, standing the same way, a little apart.');
+      return j;
+    }
+    j = LumosSpells.judgeTwoMirrors(mirror1.pts, pts, b, 0, ease, stageBox()); last = j;
+    if (j.reason === 'tap2') return j;
+    if (j.verdict !== 'slide') {
+      trail = { pts: pts, at: performance.now() }; missAt = performance.now(); noise(0.12, 900, 0.2);
+      w = WHY2[j.reason]; say(typeof w === 'function' ? w(j) : w); return j;
+    }
+    LumosSpells.learn('riddikulus');
+    trail = { pts: pts, at: performance.now(), keep: true };
+    var P1 = j.first.at, P2 = { x: P1.x + j.n.x * j.gap, y: P1.y + j.n.y * j.gap };
+    flip = { at: performance.now(), axis: 'two', lean: j.first.lean, A: j.a1, B: j.b1, A2: j.a2, B2: j.b2, P: P1, P2: P2, his: mirror1.pts, his2: pts,
+      slide: j.slide, gap: j.gap, n: j.n };
+    marks = points(b).map(function (p) { var q1 = LumosSpells.reflectOver(p, j.a1, j.b1); return { p: p, q1: q1, q: LumosSpells.reflectOver(q1, j.a2, j.b2) }; });
+    stage = 'flip'; wobbleAt = performance.now(); noise(0.09, 2600, 0.6);   /* a noise like a whip-crack */
+    say('<b>Riddikulus!</b>');
+    return j;
+  }
   /* three points of the boggart before, in its box (Snape: his hooked nose, his wand hand, his cloak's billowing
      corner; the spider: its eyes, a front foot, a back knee), each a feature it still has after */
   function points(b) {
-    var L = round === 0 ? [[0.17, 0.21], [0.42, 0.5], [-0.47, 0.97]] : round === 2 ? [[0.13, 0.04], [0.46, 0.34], [-0.48, 0.99]] : [[0.27, 0.42], [0.47, 0.96], [-0.33, 0.1]];
+    var L = round === 3 ? [[0.36, 0.08], [-0.42, 0.98], [0.2, 0.97]] : round === 0 ? [[0.17, 0.21], [0.42, 0.5], [-0.47, 0.97]] : round === 2 ? [[0.13, 0.04], [0.46, 0.34], [-0.48, 0.99]] : [[0.27, 0.42], [0.47, 0.96], [-0.33, 0.1]];
     return L.map(function (q) { return { x: b.x + b.w / 2 + q[0] * b.w, y: b.y + q[1] * b.h }; });
   }
 
@@ -338,6 +403,51 @@
       drawMummyHead([flip.head.x + d, hy], r, d / r);
     }
   }
+  /* Seamus's banshee, kept gentle (the fourth round's points: her raised right hand, the tip of her hair on the floor,
+     the corner of her hem); hush 0 to 1, her voice going: her hands to her throat, her mouth closing, the wail gone */
+  function drawBanshee(b, now, hush) {
+    var drift = flip ? 0 : Math.sin(now / 700) * 0.01, hu = hush || 0;
+    cx.lineWidth = 1.6; cx.lineJoin = 'round';
+    /* her floor-length black hair, behind her, swept to her left and lying along the floor */
+    poly(b, [[-0.16, 0.02], [0.14, 0.0], [0.2, 0.3], [0.12, 0.7], [0.02, 0.99], [-0.42, 0.99], [-0.3, 0.86], [-0.24, 0.5], [-0.2, 0.2]], '#15121a', 'rgba(60,54,70,0.8)');
+    /* the gown, pale grey-green, to the floor */
+    poly(b, [[-0.13, 0.2], [0.13, 0.2], [0.22 + drift, 0.97], [-0.2 + drift, 0.97]], '#a9b8ad', 'rgba(60,74,64,0.8)');
+    cx.strokeStyle = 'rgba(60,74,64,0.5)'; cx.lineWidth = 1.1;
+    [[-0.06, 0.4], [0.05, 0.42], [-0.1, 0.62], [0.1, 0.64]].forEach(function (q) { var p1 = P(b, q[0], q[1]), p2 = P(b, q[0] * 1.6, 0.95); cx.beginPath(); cx.moveTo(p1[0], p1[1]); cx.lineTo(p2[0], p2[1]); cx.stroke(); });
+    /* her arms: the right raised high, the left out low; as her voice goes both come to her throat */
+    var thr = [0, 0.19], r1 = [[0.36, 0.08], [0.26, 0.2]], l1 = [[-0.36, 0.42], [-0.24, 0.32]];
+    function arm(hand, elbow, side) {
+      var hx = hand[0] + (thr[0] + side * 0.05 - hand[0]) * hu, hy = hand[1] + (thr[1] - hand[1]) * hu;
+      var ex = elbow[0] + (side * 0.16 - elbow[0]) * hu, ey = elbow[1] + (0.3 - elbow[1]) * hu, sh = P(b, side * 0.12, 0.22), e1 = P(b, ex, ey), h1 = P(b, hx, hy);
+      cx.strokeStyle = '#a9b8ad'; cx.lineWidth = Math.max(4, b.w * 0.07); cx.lineCap = 'round';
+      cx.beginPath(); cx.moveTo(sh[0], sh[1]); cx.lineTo(e1[0], e1[1]); cx.lineTo(h1[0], h1[1]); cx.stroke();
+      cx.fillStyle = '#d6e3d4'; cx.beginPath(); cx.arc(h1[0], h1[1], b.w * 0.035, 0, 7); cx.fill(); cx.lineCap = 'butt';
+    }
+    arm(r1[0], r1[1], 1); arm(l1[0], l1[1], -1);
+    /* her face, pale with a green tinge; her mouth open in the wail, closing as her voice goes */
+    var f = P(b, 0, 0.11), r = b.w * 0.15;
+    cx.fillStyle = '#d6e3d4'; cx.strokeStyle = 'rgba(80,100,86,0.8)'; cx.lineWidth = 1.4;
+    cx.beginPath(); cx.ellipse(f[0], f[1], r * 0.82, r, 0, 0, 7); cx.fill(); cx.stroke();
+    cx.fillStyle = '#15121a'; cx.beginPath(); cx.moveTo(f[0] - r * 0.9, f[1] - r * 0.2); cx.quadraticCurveTo(f[0] - r * 0.2, f[1] - r * 1.5, f[0] + r * 0.9, f[1] - r * 0.5); cx.lineTo(f[0] + r * 0.85, f[1] - r * 0.9); cx.quadraticCurveTo(f[0], f[1] - r * 1.35, f[0] - r * 0.9, f[1] - r * 0.6); cx.fill();   /* her fringe, swept */
+    cx.fillStyle = '#4a5a50'; cx.beginPath(); cx.arc(f[0] - r * 0.32, f[1] - r * 0.12, r * 0.1, 0, 7); cx.arc(f[0] + r * 0.32, f[1] - r * 0.12, r * 0.1, 0, 7); cx.fill();
+    var mo = 1 - hu * 0.8; cx.fillStyle = '#3a2a30'; cx.beginPath(); cx.ellipse(f[0], f[1] + r * 0.45, r * 0.22, r * 0.3 * mo + 0.5, 0, 0, 7); cx.fill();
+    /* the wail: soft rings spreading from her mouth, gone with her voice */
+    if (hu < 1 && castAt) {
+      cx.strokeStyle = 'rgba(190,220,200,' + (0.45 * (1 - hu)) + ')'; cx.lineWidth = 1.5;
+      for (var i = 0; i < 3; i++) { var k = ((now / 900) + i / 3) % 1, rr = r * (0.6 + k * 1.6); cx.beginPath(); cx.arc(f[0], f[1] + r * 0.45, rr, -0.6, 0.6); cx.stroke(); cx.beginPath(); cx.arc(f[0], f[1] + r * 0.45, rr, Math.PI - 0.6, Math.PI + 0.6); cx.stroke(); }
+    }
+  }
+  /* the two flips, as transforms of the canvas: over the first mirror (0 to 700 ms), then over the second (1000 to
+     1700); each scales her through zero about its line, so after both she is slid along and the right way round */
+  function twoFlips(now) {
+    var t = now - flip.at, k1 = Math.min(1, t / 700), k2 = Math.max(0, Math.min(1, (t - 1000) / 700)), th = flip.lean * Math.PI / 180;
+    [[flip.P2, k2], [flip.P, k1]].forEach(function (f) {
+      var Pp = f[0]; cx.translate(Pp.x, Pp.y); cx.rotate(th); cx.scale(Math.cos(Math.PI * f[1]) || 0.001, 1); cx.rotate(-th); cx.translate(-Pp.x, -Pp.y);
+    });
+  }
+  function hushOf(now) {   /* her voice going, once she has landed: 3600 to 4400 ms */
+    return flip && flip.axis === 'two' ? Math.max(0, Math.min(1, (now - flip.at - 3600) / 800)) : 0;
+  }
   /* the boggart: before, in the flip (scaled through zero about the mirror line), after, rolling, laughing, smoke */
   function drawBoggart(now) {
     var b = box(), appear = castAt ? Math.min(1, (now - castAt) / 400) : 0;
@@ -348,6 +458,13 @@
     var k = 0, silly = false;
     if (flip) { k = Math.min(1, (now - flip.at) / 700); silly = k >= 0.5; }
     var sc = Math.cos(Math.PI * k);
+    if (round === 3) {
+      if (laughAt) { cx.globalAlpha = appear * Math.max(0, 1 - (now - laughAt) / 500); }
+      cx.translate(miss, 0);
+      if (flip) twoFlips(now);
+      drawBanshee(b, now, hushOf(now));
+      cx.restore(); return;
+    }
     if (round === 2) {
       if (laughAt) { cx.globalAlpha = appear * Math.max(0, 1 - (now - laughAt) / 500); }
       cx.translate(miss, 0);
@@ -374,6 +491,7 @@
   /* the sum: his line, the mirror line, and each point joined to its image, square to the line, ticked equal */
   function drawSum(now) {
     if (!flip || !marks) return;
+    if (flip.axis === 'two') return drawSumTwo(now);
     var t = now - flip.at, a = Math.min(1, Math.max(0, (t - 700) / 300));
     if (round === 1 && t > 2600) a *= Math.max(0, 1 - (t - 2600) / 500);
     if (round === 2 && t > 2900) a *= Math.max(0, 1 - (t - 2900) / 300);
@@ -430,6 +548,77 @@
     });
     cx.restore();
   }
+  /* the first mirror, kept while he draws the second */
+  function drawMirror1() {
+    if (!mirror1 || flip || stage !== 'cast') return;
+    var b = box(), A = mirror1.j.a, B2 = mirror1.j.b, Pp = mirror1.j.at, L = Math.hypot(B2.x - A.x, B2.y - A.y) || 1, ux = (B2.x - A.x) / L, uy = (B2.y - A.y) / L, R = b.h * 0.62, fs = Math.round(Math.max(12, S * 0.032));
+    cx.save(); cx.strokeStyle = 'rgba(220,225,255,0.4)'; cx.lineWidth = 4; cx.lineCap = 'round';
+    cx.beginPath(); mirror1.pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke();
+    if (uy > 0) { ux = -ux; uy = -uy; }
+    cx.strokeStyle = '#e8be5a'; cx.lineWidth = 2.5; cx.setLineDash([10, 7]); cx.beginPath(); cx.moveTo(Pp.x - ux * R, Pp.y - uy * R); cx.lineTo(Pp.x + ux * R, Pp.y + uy * R); cx.stroke(); cx.setLineDash([]);
+    cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillStyle = '#e8be5a'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 5; cx.textAlign = 'left';
+    cx.fillText('first mirror', Pp.x + ux * R + 6, Pp.y + uy * R + fs * 0.4); cx.restore();
+  }
+  /* the fourth round's sum, from 1800 ms: both mirrors dashed, the gap bracketed over her head, each mark joined to its
+     image over the first (one tick each half) and on to its image over the second (two ticks each half), and the slide
+     along the floor from where she stood to where she landed, drawn as two gaps end to end */
+  function drawSumTwo(now) {
+    var t = now - flip.at, a = Math.min(1, Math.max(0, (t - 1800) / 300));
+    if (t > 3300) a *= Math.max(0, 1 - (t - 3300) / 300);
+    if (laughAt) a = 0;
+    if (a <= 0) return;
+    var b = box(), A = flip.A, B2 = flip.B, L = Math.hypot(B2.x - A.x, B2.y - A.y) || 1, ux = (B2.x - A.x) / L, uy = (B2.y - A.y) / L, R = b.h * 0.62;
+    if (uy > 0) { ux = -ux; uy = -uy; }
+    var n = flip.n, g = flip.gap, fs = Math.round(Math.max(12, S * 0.032)), lf = Math.round(Math.max(15, S * 0.036)), s = S * 0.016;
+    cx.save(); cx.globalAlpha = a; cx.lineCap = 'round';
+    [flip.his, flip.his2].forEach(function (his) { cx.strokeStyle = 'rgba(220,225,255,0.45)'; cx.lineWidth = 4; cx.beginPath(); his.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); });
+    cx.strokeStyle = '#e8be5a'; cx.lineWidth = 2.5; cx.setLineDash([10, 7]);
+    [flip.P, flip.P2].forEach(function (Pp) { cx.beginPath(); cx.moveTo(Pp.x - ux * R, Pp.y - uy * R); cx.lineTo(Pp.x + ux * R, Pp.y + uy * R); cx.stroke(); });
+    cx.setLineDash([]);
+    cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillStyle = '#e8be5a'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 5;
+    /* the gap, bracketed over her head between the two mirrors */
+    var top = { x: flip.P.x + ux * R * 0.92, y: flip.P.y + uy * R * 0.92 }, top2 = { x: top.x + n.x * g, y: top.y + n.y * g };
+    cx.strokeStyle = '#e8be5a'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(top.x, top.y); cx.lineTo(top2.x, top2.y);
+    [top, top2].forEach(function (q) { cx.moveTo(q.x - ux * s, q.y - uy * s); cx.lineTo(q.x + ux * s, q.y + uy * s); }); cx.stroke();
+    cx.font = 'italic 600 ' + lf + 'px Georgia, serif'; cx.textAlign = 'center'; cx.fillText('gap', (top.x + top2.x) / 2, (top.y + top2.y) / 2 - lf * 0.5);
+    /* each mark: over the first mirror (one tick each half), on over the second (two ticks each half) */
+    function half(p, q, ticks) {
+      var d = Math.hypot(q.x - p.x, q.y - p.y); if (d < 8) return;
+      var vx = (q.x - p.x) / d, vy = (q.y - p.y) / d, f = { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 };
+      cx.strokeStyle = 'rgba(159,208,255,0.85)'; cx.lineWidth = 1.8; cx.setLineDash([5, 5]); cx.beginPath(); cx.moveTo(p.x, p.y); cx.lineTo(q.x, q.y); cx.stroke(); cx.setLineDash([]);
+      cx.strokeStyle = '#e8be5a'; cx.lineWidth = 1.5; cx.beginPath();
+      cx.moveTo(f.x + vx * s, f.y + vy * s); cx.lineTo(f.x + vx * s - vy * s, f.y + vy * s + vx * s); cx.lineTo(f.x - vy * s, f.y + vx * s); cx.stroke();
+      cx.strokeStyle = 'rgba(159,208,255,1)'; cx.lineWidth = 2;
+      [[p, f], [f, q]].forEach(function (h) {
+        var mx = (h[0].x + h[1].x) / 2, my = (h[0].y + h[1].y) / 2;
+        for (var k = 0; k < ticks; k++) { var o = (k - (ticks - 1) / 2) * 5; cx.beginPath(); cx.moveTo(mx + vx * o - vy * s * 0.7, my + vy * o + vx * s * 0.7); cx.lineTo(mx + vx * o + vy * s * 0.7, my + vy * o - vx * s * 0.7); cx.stroke(); }
+      });
+    }
+    marks.forEach(function (m) {
+      half(m.p, m.q1, 1); half(m.q1, m.q, 2);
+      cx.fillStyle = '#c8d4e0'; cx.beginPath(); cx.arc(m.p.x, m.p.y, S * 0.009, 0, 7); cx.fill();
+      cx.fillStyle = 'rgba(243,210,122,0.55)'; cx.beginPath(); cx.arc(m.q1.x, m.q1.y, S * 0.008, 0, 7); cx.fill();
+      cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(m.q.x, m.q.y, S * 0.011, 0, 7); cx.fill();
+    });
+    /* the slide, along the floor: two gaps end to end, from where she stood to where she landed; kept above the
+       buttons: on a low floor (a wide screen) the arrow rises just enough for its labels, the line beside its head */
+    var pt = panel.getBoundingClientRect().top - 6, low = floorY + S * 0.05 + fs * 1.3 + lf * 1.45 > pt;
+    var f0 = { x: b.x + b.w / 2, y: low ? Math.min(floorY + S * 0.05, pt - fs * 1.6) : floorY + S * 0.05 }, f1 = { x: f0.x + flip.slide.x, y: f0.y + flip.slide.y }, fm = { x: (f0.x + f1.x) / 2, y: (f0.y + f1.y) / 2 };
+    var sl = Math.hypot(flip.slide.x, flip.slide.y) || 1, vx = flip.slide.x / sl, vy = flip.slide.y / sl, h = S * 0.025;
+    cx.strokeStyle = '#9fd0ff'; cx.fillStyle = '#9fd0ff'; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(f0.x, f0.y); cx.lineTo(f1.x, f1.y);
+    [f0, fm].forEach(function (q) { cx.moveTo(q.x - vy * s, q.y + vx * s); cx.lineTo(q.x + vy * s, q.y - vx * s); }); cx.stroke();
+    cx.beginPath(); cx.moveTo(f1.x, f1.y); cx.lineTo(f1.x - vx * h - vy * h * 0.5, f1.y - vy * h + vx * h * 0.5); cx.lineTo(f1.x - vx * h + vy * h * 0.5, f1.y - vy * h - vx * h * 0.5); cx.fill();
+    cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.textAlign = 'center';
+    cx.fillText('gap', (f0.x + fm.x) / 2, f0.y + fs * 1.3); cx.fillText('gap', (fm.x + f1.x) / 2, f0.y + fs * 1.3);
+    cx.font = 'italic 600 ' + lf + 'px Georgia, serif';
+    if (!low) cx.fillText('slid twice the gap', fm.x, f0.y + fs * 1.3 + lf * 1.15);
+    else {
+      var tw = cx.measureText('slid twice the gap').width, right = vx >= 0 ? f1.x + h + 10 : f0.x + 10;
+      if (right + tw > W - 8) right = (vx >= 0 ? f0.x : f1.x - h) - 10 - tw;
+      cx.textAlign = 'left'; cx.fillText('slid twice the gap', right, f0.y + lf * 0.35); cx.textAlign = 'center';
+    }
+    cx.shadowBlur = 0; cx.restore();
+  }
   function drawCard(now) {
     if (stage !== 'word' && stage !== 'saying') return;
     var c = card, k = saidAt ? Math.min(1, (now - saidAt) / 900) : 0, parts = ['Rid', 'di', 'ku', 'lus'];
@@ -450,6 +639,7 @@
   function afterBox() {
     var b = box(); if (!flip) return b;
     if (flip.axis === 'slant') return { x: flip.F.x - b.h / 2, y: flip.F.y - b.w / 2, w: b.h, h: b.w };   /* lying flat */
+    if (flip.axis === 'two') return { x: b.x + flip.slide.x, y: b.y + flip.slide.y, w: b.w, h: b.h };   /* slid along */
     if (flip.axis === 'down') return { x: 2 * flip.m - (b.x + b.w), y: b.y, w: b.w, h: b.h };
     var nb = { x: b.x, y: 2 * flip.m - (b.y + b.h), w: b.w, h: b.h };
     if (round === 1) nb.x += S * 0.18;   /* where it rolled to */
@@ -464,8 +654,8 @@
     say('<b>Ha!</b> The Boggart bursts into a thousand tiny wisps of smoke, and is gone.');
     chain = setTimeout(function () {
       chain = null; stage = 'gone'; doneAt = performance.now();
-      if (round < 2) choose(round + 1);
-      else say('All three Boggarts gone. <b>Riddikulus</b>: a mirror line through it, upright, level or slanted, and laughter finishes it. Try any again below.');
+      if (round < 3) choose(round + 1);
+      else say('All four Boggarts gone. <b>Riddikulus</b>: a mirror line through it, upright, level or slanted, or two side by side to slide it along, and laughter finishes it. Try any again below.');
     }, 2200);
     return true;
   }
@@ -485,17 +675,21 @@
   function frame(now) {
     drawRoom(now);
     if (flip && stage === 'flip') {
-      var t = now - flip.at, end = round === 0 ? 2400 : round === 1 ? 4900 : 5600;
+      var t = now - flip.at, end = round === 0 ? 2400 : round === 1 ? 4900 : round === 2 ? 5600 : 5000;
+      if (round === 3 && t > 1800 && !flip.said) { flip.said = true; say('Over the first mirror she turned round; over the second, <b>back the right way round</b>, and slid along: each point <b>twice the gap</b> between the mirrors, straight across them.'); }
+      if (round === 3 && t > 3600 && !flip.hushed) { flip.hushed = true; noise(0.3, 240, 0.35); say('She makes a rasping noise and clutches her throat: <b>her voice is gone</b>.'); }
       if (round === 2 && t > 800 && !flip.said) { flip.said = true; say('Your line leans <b>' + Math.abs(Math.round(flip.lean)) + ' degrees</b>, so it tipped <b>' + Math.abs(Math.round(flip.turn)) + '</b>: twice as far. Each point as far beyond the line as it was before it, square to it.'); }
       if (t > end) {
         stage = 'laugh';
         say(round === 0 ? (Math.abs(last.share) > 0.15 ? 'Your line was to one side, so he landed <b>as far on the other side</b>: each point the same distance either side, straight across. Now <b>tap him and laugh</b>!' : 'Each point lands <b>the same distance on the other side</b> of your line, straight across: a reflection. Now <b>tap him and laugh</b>!')
           : round === 1 ? 'Upside down, each point as far below your line as it was above. Its legs have vanished and it rolled to a halt. <b>Tap it and laugh</b>!'
-          : 'It tipped over <b>twice as far as your line leans</b>, ' + Math.abs(Math.round(flip.turn)) + ' degrees, then fell flat on its face, and its head rolled off. <b>Tap it and laugh</b>!');
+          : round === 2 ? 'It tipped over <b>twice as far as your line leans</b>, ' + Math.abs(Math.round(flip.turn)) + ' degrees, then fell flat on its face, and its head rolled off. <b>Tap it and laugh</b>!'
+          : 'Two mirrors side by side, and she <b>slid along twice the gap</b>, the right way round. And her voice is gone. <b>Tap her and laugh</b>!');
       }
     }
     drawBoggart(now);
     drawSum(now);
+    drawMirror1();
     drawWisps(now);
     drawCard(now);
     if (stage === 'cast' && guide) guide.draw(cx, now, !!stroke);
@@ -538,8 +732,11 @@
     card: function () { return { x: card.x, y: card.y, w: card.w, h: card.h }; }, judge: function (pts) { return judge(pts); },
     word: function () { return sayWord(); }, laugh: function () { return laugh(); },
     state: function () { return { round: round + 1, stage: stage, ease: ease, line: lineEl.textContent,
-      last: last ? { verdict: last.verdict, reason: last.reason, tilt: last.tilt, share: last.share, cover: last.cover, at: last.at } : null,
-      flip: flip ? { axis: flip.axis, m: flip.m, lean: flip.lean, turn: flip.turn, A: flip.axis === 'slant' ? flip.A : undefined, B: flip.axis === 'slant' ? flip.B : undefined, head: flip.head } : null, marks: marks ? marks.map(function (m) { return { p: m.p, q: m.q }; }) : null,
+      last: last ? { verdict: last.verdict, reason: last.reason, tilt: last.tilt, share: last.share, cover: last.cover, at: last.at, par: last.par, gap: last.gap } : null,
+      mirror1: !!mirror1,
+      flip: flip ? { axis: flip.axis, m: flip.m, lean: flip.lean, turn: flip.turn, A: flip.axis === 'slant' ? flip.A : undefined, B: flip.axis === 'slant' ? flip.B : undefined, head: flip.head,
+        slide: flip.slide, gap: flip.gap, n: flip.n, A2: flip.A2, B2: flip.B2, A1: flip.axis === 'two' ? flip.A : undefined, B1: flip.axis === 'two' ? flip.B : undefined, hushed: !!flip.hushed } : null,
+      marks: marks ? marks.map(function (m) { return { p: m.p, q1: m.q1, q: m.q }; }) : null,
       guide: guide ? guide.state().level : null, learned: LumosSpells.learned('riddikulus') }; } };
 })();
 </script>

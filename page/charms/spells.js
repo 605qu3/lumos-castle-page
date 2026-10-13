@@ -462,11 +462,12 @@ function judgeAim(points, from, to, ease) {
    of the line's own run across the boggart he spans), share (how far his line passes from the middle, square to it,
    as a share of the boggart's half extent that way; + right or below), at ({x, y} the point on his line nearest the
    middle), a and b (his first and last points, the mirror), straight }. The eases' tilt is then the most degrees off
-   the wanted lean; mid, cover and straight as before. */
+   the wanted lean; mid, cover and straight as before.
+   Two mirrors side by side (13 October 2026, twenty-ninth session): judgeTwoMirrors, below; par and gap are its own. */
 var MIRROR_EASES = {
-  kind:   { straight: 0.85, tilt: 22, cover: 0.7, mid: 0.75 },
-  fair:   { straight: 0.90, tilt: 15, cover: 0.85, mid: 0.5 },
-  strict: { straight: 0.95, tilt: 8, cover: 1.0, mid: 0.3 }
+  kind:   { straight: 0.85, tilt: 22, cover: 0.7, mid: 0.75, par: 12, gap: 0.25 },
+  fair:   { straight: 0.90, tilt: 15, cover: 0.85, mid: 0.5, par: 8, gap: 0.3 },
+  strict: { straight: 0.95, tilt: 8, cover: 1.0, mid: 0.3, par: 5, gap: 0.35 }
 };
 function judgeMirror(points, box, want, ease) {
   var e = typeof ease === 'object' ? ease : (MIRROR_EASES[ease] || MIRROR_EASES.kind);
@@ -539,6 +540,58 @@ function judgeSlant(points, box, want, e) {
   if (Math.abs(out.share) > e.mid) { out.reason = 'beside'; return out; }
   if (out.cover < e.cover - 1e-9) { out.reason = 'short'; return out; }
   out.verdict = 'flip'; out.reason = 'flip';
+  return out;
+}
+/* Riddikulus, two mirrors side by side (13 October 2026, twenty-ninth session; Q8, 8.1; the spellbook's idea "Reflect
+   it twice over two lines side by side: it slides along, twice the gap between them, the way into translations").
+   Two straight lines, the first through the boggart (judged by judgeSlant, want its lean off upright, 0 for upright),
+   the second beside it and parallel; the boggart flips over the first, then over the second, and lands slid along,
+   square to the lines, twice the gap between them, the right way round again (two flips undo each other's turning
+   round). The second mirror is stood parallel to the first through the middle of his second line, as a 'down' line
+   is stood upright, so the two flips make a slide and never a turn (two crossing mirrors make a turn of twice their
+   angle: an idea for later).
+   first, second: the two strokes, {x, y, t} in CSS pixels; box: the boggart; want: the lean, degrees off upright;
+   ease: a name in MIRROR_EASES or its own (as judgeMirror's, and par: the most degrees between the two lines; gap: the
+   least gap, as a share of the boggart's extent square to the lines); stage: optional { x, y, w, h }, the boggart
+   must land wholly inside it.
+   Returns { verdict: 'slide' | 'miss', reason ('slide'; the first line's 'tap', 'wiggly', 'slant', 'beside', 'short';
+   the second's 'tap2', 'wiggly2', 'cross' (not side by side: they would cross), 'short2', 'close' (too near the
+   first to see it move), 'far' (it would slide off the stage)), first (judgeSlant's answer for the first line), par
+   (degrees from the first line to the second, + clockwise), gap (px from the first line to the second, square to
+   them, + right or down), slide ({x, y} px, twice the gap along n), n ({x, y}, square to the lines, right or down),
+   a1, b1 (the first mirror), a2, b2 (the second, stood parallel), straight2, cover2 (the second's length along the
+   lines as a share of the first mirror's run across her, through her middle; the ease's cover) }. */
+function judgeTwoMirrors(first, second, box, want, ease, stage) {
+  var e = typeof ease === 'object' ? ease : (MIRROR_EASES[ease] || MIRROR_EASES.kind), r1 = function (v) { return Math.round(v * 10) / 10; };
+  var j1 = judgeSlant(first, box, want, e);
+  var out = { verdict: 'miss', reason: j1.reason, first: j1, par: 0, gap: 0, slide: null, n: null, a1: j1.a, b1: j1.b, a2: null, b2: null, straight2: 0, cover2: 0 };
+  if (j1.verdict !== 'flip') return out;
+  out.reason = 'tap2';
+  if (!second || second.length < 2) return out;
+  var a = second[0], b = second[second.length - 1], path = 0, i;
+  for (i = 1; i < second.length; i++) path += Math.hypot(second[i].x - second[i - 1].x, second[i].y - second[i - 1].y);
+  if (path < Math.min(box.w, box.h) * 0.25) return out;
+  var A = j1.a, B = j1.b, L1 = Math.hypot(B.x - A.x, B.y - A.y), ux = (B.x - A.x) / L1, uy = (B.y - A.y) / L1;
+  if (uy > 0 || (uy === 0 && ux < 0)) { ux = -ux; uy = -uy; }   /* along the first, up the screen; n square to it, right or down */
+  var nx = -uy, ny = ux, dx = b.x - a.x, dy = b.y - a.y, L2 = Math.hypot(dx, dy);
+  out.n = { x: nx, y: ny }; out.straight2 = path ? L2 / path : 0;
+  var vx = dx / L2, vy = dy / L2; if (vy > 0 || (vy === 0 && vx < 0)) { vx = -vx; vy = -vy; }
+  out.par = r1(Math.atan2(ux * vy - uy * vx, ux * vx + uy * vy) * 180 / Math.PI);
+  var m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, g = (m.x - A.x) * nx + (m.y - A.y) * ny;
+  /* the first mirror's run across her, through her middle (the second must span as much), and her extent across the lines */
+  var along = Math.min(Math.abs(ux) > 1e-9 ? box.w / Math.abs(ux) : Infinity, Math.abs(uy) > 1e-9 ? box.h / Math.abs(uy) : Infinity), across = Math.abs(nx) * box.w + Math.abs(ny) * box.h;
+  out.gap = Math.round(g * 10) / 10; out.cover2 = Math.round(Math.abs(dx * ux + dy * uy) / along * 100) / 100;
+  out.a2 = { x: A.x + nx * g, y: A.y + ny * g }; out.b2 = { x: B.x + nx * g, y: B.y + ny * g };
+  out.slide = { x: 2 * g * nx, y: 2 * g * ny };
+  if (out.straight2 < e.straight) { out.reason = 'wiggly2'; return out; }
+  if (Math.abs(out.par) > e.par) { out.reason = 'cross'; return out; }
+  if (out.cover2 < e.cover - 1e-9) { out.reason = 'short2'; return out; }
+  if (Math.abs(g) < e.gap * across) { out.reason = 'close'; return out; }
+  if (stage) {
+    var x0 = box.x + out.slide.x, y0 = box.y + out.slide.y;
+    if (x0 < stage.x || y0 < stage.y || x0 + box.w > stage.x + stage.w || y0 + box.h > stage.y + stage.h) { out.reason = 'far'; return out; }
+  }
+  out.verdict = 'slide'; out.reason = 'slide';
   return out;
 }
 /* Expelliarmus, the swing and the point (CoS 11, the Duelling Club: Lockhart and Snape "swung their wands above their
@@ -2315,5 +2368,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
