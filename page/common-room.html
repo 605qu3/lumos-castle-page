@@ -2517,7 +2517,7 @@ function homeCard(w, h, lean) {
 var homeLetter = homeCard(HOME.w, HOME.h, HOME.lean), homeFeather = homeCard(HOME.fw, 0.16, 0.12);
 var homeNote = homeCard(0.16, 0.21, 0);
 homeNote.shadow.visible = false;
-var homeState = { words: null, front: null, back: null, stage: 0, turn: -1, quill: -1, unfold: -1, shown: '', check: 0 };
+var homeState = { words: null, front: null, back: null, stage: 0, turn: -1, quill: -1, unfold: -1, shown: '', check: 0, sealFrame: 0, crack: -1 };
 /* letter-desk, an envelope since Godric's Q22 (11 October 2026, 12.52 pm): round 4, round 3's front edited plain, the
    mug ring kept; its slight perspective squared by its four sides (pipeline/square_card.py); once loaded the front is
    redrawn on it */
@@ -2529,6 +2529,33 @@ homeImg.src = HOME.url;
 var homeBackImg = new Image();
 homeBackImg.onload = homeImg.onload;
 homeBackImg.src = HOME.backUrl;
+/* the seal cracking as he opens it (req 202, Design, Godric's Q12 t2, 12 October 2026, 6.51 pm: "when he opens a letter
+   the seal cracks in two with a small crisp snap and a few purple flakes fall onto the desk"). The seal is Design's
+   (LumosSeal, the crest in silhouettes with the large H), set in the drawn thumb seal's place on the back: the room
+   cannot load Design's scripts (the public copy holds page/ and assets/layers/ only), so tools/bake-seal-crack.py bakes
+   LumosSeal.svg({ crack }) to one row of frames, at the crack values `crack` lists as tools/seal-crack-bake.html bakes
+   them; re-bake when Design changes the seal. The opening tap plays it over `dur` with the snap in words, holds `beat`
+   for the flakes to be seen lying round it, then opens the note; once read it stays broken until a new letter comes.
+   cx, cy, size and under are in the drawn back's own pixels (1080 x 720): the seal's centre, the frame's side (its
+   wax a little wider than the thumb seal), and the paper laid under it so no red shows round its lobes or in the
+   break; the drip, below and right, is covered by the paper just below it. */
+var SEAL = { url: '../assets/layers/seal-crack.png', px: 320, crack: [0, 0.03, 0.06, 0.09, 0.12, 0.18, 0.25, 0.33, 0.42, 0.52, 0.62, 0.72, 0.82, 0.92, 1],
+  cx: 538, cy: 378, size: 320, under: 146, drip: [632, 472, 28], dur: 0.4, beat: 0.3 };
+var sealImg = new Image(), sealPaper = null;
+sealImg.onload = function () { if (homeState.backCanvas) homeBackDraw(); };
+sealImg.src = SEAL.url;
+function homeSeal(g, k, f) {
+  if (!sealPaper) {               /* the top flap's plain paper above the seal, laid in tiles */
+    sealPaper = makeCanvas(100, 100); sealPaper.getContext('2d').drawImage(homeBackImg, 490, 90, 100, 100, 0, 0, 100, 100);
+  }
+  g.save(); g.scale(k, k);
+  g.save(); g.beginPath(); g.arc(SEAL.drip[0], SEAL.drip[1], SEAL.drip[2], 0, Math.PI * 2); g.clip();
+  g.drawImage(homeBackImg, SEAL.drip[0] - 35, SEAL.drip[1] + 30, 70, 70, SEAL.drip[0] - 35, SEAL.drip[1] - 35, 70, 70); g.restore();
+  g.save(); g.beginPath(); g.arc(SEAL.cx, SEAL.cy, SEAL.under, 0, Math.PI * 2); g.clip();
+  g.fillStyle = g.createPattern(sealPaper, 'repeat'); g.fillRect(SEAL.cx - SEAL.under, SEAL.cy - SEAL.under, 2 * SEAL.under, 2 * SEAL.under); g.restore();
+  g.drawImage(sealImg, f * SEAL.px, 0, SEAL.px, SEAL.px, SEAL.cx - SEAL.size / 2, SEAL.cy - SEAL.size / 2, SEAL.size, SEAL.size);
+  g.restore();
+}
 /* Godric's touch on Q18 (11 October 2026, 11.35 am): a slightly deeper contact shadow under the left fold, the
    paper's shadow darkened where it shows under the foot's left end */
 homeLetter.shadow.material.map = (function () {
@@ -2590,8 +2617,19 @@ function homeFront(o) {
 }
 function homeBack() {
   var W = Math.round(HOME.w * HOME.PX), H = Math.round(HOME.h * HOME.PX), c = makeCanvas(W, H);
-  homePacket(c.getContext('2d'), W, H, true);
-  return tex(c);
+  homeState.backCanvas = c; homeState.backTex = tex(c);
+  homeBackDraw();
+  return homeState.backTex;
+}
+function homeBackDraw() {          /* redrawn in place for each frame of the seal's crack (req 202) */
+  var c = homeState.backCanvas, g = c.getContext('2d');
+  g.clearRect(0, 0, c.width, c.height);
+  homePacket(g, c.width, c.height, true);
+  if (homeBackImg.naturalWidth && sealImg.complete && sealImg.naturalWidth) homeSeal(g, c.width / homeBackImg.naturalWidth, homeState.sealFrame);
+  homeState.backTex.needsUpdate = true;
+}
+function homeOpened(o) {           /* this letter read already, so its seal is broken */
+  return o.written ? localStorage.getItem(HOME.READW) === o.written : localStorage.getItem(HOME.READ) === String(homeWeek(homeNow()));
 }
 function homeNoteTex(o) {
   var PXN = 4500, W = Math.round(0.16 * PXN), H = Math.round(0.21 * PXN), c = makeCanvas(W, H), g = c.getContext('2d'), rnd = mulberry32(31);
@@ -3117,7 +3155,7 @@ function updateHomeLetter(dt) {
     var o = homeWords(), key = o ? JSON.stringify(o) + homePS(o) : '', today = homeToday();
     if (key !== homeState.key) {
       homeState.key = key; homeState.words = o;
-      if (o) { homeState.front = homeFront(o); homeState.back = homeBack(); homeSet(homeLetter, homeState.front); homeSet(homeNote, homeNoteTex(o)); }
+      if (o) { homeState.sealFrame = homeOpened(o) ? SEAL.crack.length - 1 : 0; homeState.front = homeFront(o); homeState.back = homeBack(); homeSet(homeLetter, homeState.front); homeSet(homeNote, homeNoteTex(o)); }
       if (!homeFeather.mesh.material.map || homeFeather.mesh.material.map === blankTex) homeSet(homeFeather, homeFeatherTex());
     }
     homeState.shown = today;
@@ -3159,6 +3197,18 @@ function updateHomeLetter(dt) {
     homeLetter.turnQ = (homeLetter.turnQ || new THREE.Quaternion()).setFromAxisAngle(new THREE.Vector3(0, 1, 0), ang);
     if (k >= 1) { homeState.turn = -1; homeLetter.turnQ = null; }
   }
+  /* the seal cracking (req 202), then the note opened; put back mid-crack, it stays broken */
+  if (homeState.crack >= 0) {
+    var last = SEAL.crack.length - 1, fi = last;
+    if (held === homeLetter) {
+      homeState.crack += dt;
+      var ck = Math.min(1, homeState.crack / SEAL.dur);
+      for (fi = 0; fi < last && SEAL.crack[fi + 1] <= ck; fi++);
+    }
+    if (fi !== homeState.sealFrame) { homeState.sealFrame = fi; homeBackDraw(); }
+    if (held !== homeLetter) homeState.crack = -1;
+    else if (homeState.crack >= SEAL.dur + SEAL.beat) { homeState.crack = -1; homeOpen(); }
+  }
   if (homeState.unfold >= 0) {
     homeState.unfold = Math.min(1, homeState.unfold + dt / 0.3);
     homeNote.mesh.scale.setScalar(0.7 + 0.3 * easeInOut(homeState.unfold));
@@ -3187,18 +3237,30 @@ function homeFeatherTap() {
 function homeHandTap() {
   if (held === homeLetter && mode === 'hand' && homeState.turn < 0) {
     if (homeState.stage === 0) { homeState.stage = 1; homeState.turn = 0; return true; }
-    homeState.stage = 2;
-    homeNote.homePos.copy(homeLetter.homePos); homeNote.homeQuat.copy(homeLetter.homeQuat);
-    homeLetter.pivot.add(homeLetter.mesh); homeLetter.mesh.position.set(0, 0, 0); homeLetter.mesh.quaternion.identity();
-    homeLetter.shadow.material.opacity = 0.55;
-    homeNote.backMode = homeLetter.backMode;
-    scene.attach(homeNote.mesh); homeNote.mesh.visible = true;
-    held = homeNote; homeState.unfold = 0;
-    localStorage.setItem(HOME.READ, String(homeWeek(homeNow())));
-    if (homeState.words && homeState.words.written) { localStorage.setItem(HOME.READW, homeState.words.written); homeState.fresh = false; }
+    if (homeState.crack >= 0) return true;        /* cracking: wait */
+    if (homeState.sealFrame < SEAL.crack.length - 1 && sealImg.naturalWidth) {
+      homeState.crack = 0;
+      HEARD_FROM.letter = homeLetter.mesh.getWorldPosition(new THREE.Vector3());
+      if (lineCur && lineCur.line.speaker === 'letter') lineCur.t = 0;   /* its rustle gives way: the snap is now */
+      lineQ.unshift({ medium: 'heard', speaker: 'letter', sound: 'snap' });
+      return true;
+    }
+    homeOpen();
     return true;
   }
   return held === homeLetter;                    /* mid-turn: wait */
+}
+function homeOpen() {          /* the note out of it, to read */
+  if (held !== homeLetter) return;
+  homeState.stage = 2;
+  homeNote.homePos.copy(homeLetter.homePos); homeNote.homeQuat.copy(homeLetter.homeQuat);
+  homeLetter.pivot.add(homeLetter.mesh); homeLetter.mesh.position.set(0, 0, 0); homeLetter.mesh.quaternion.identity();
+  homeLetter.shadow.material.opacity = 0.55;
+  homeNote.backMode = homeLetter.backMode;
+  scene.attach(homeNote.mesh); homeNote.mesh.visible = true;
+  held = homeNote; homeState.unfold = 0;
+  localStorage.setItem(HOME.READ, String(homeWeek(homeNow())));
+  if (homeState.words && homeState.words.written) { localStorage.setItem(HOME.READW, homeState.words.written); homeState.fresh = false; }
 }
 homeNote.onBack = function () {
   homeNote.mesh.visible = false; homeNote.mesh.scale.setScalar(1);
@@ -7078,7 +7140,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = tapHits(cx, cy); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>
 </body>
