@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><title>The house hourglass, live</title>
+<style>body { margin: 0; background: #14100b; display: flex; justify-content: center; } #g { width: 320px; margin-top: 20px; }</style>
+</head><body><div id="g"></div>
+<script src="drawn.js"></script>
+<script src="lumos-icon.js"></script>
+<script src="house-hourglass.js"></script>
+<script>
+// LumosHourglass.mount as a room would use it (req 222): ?niche for his t1. It plays, a second apart: a spell's
+// point falling, a brother taught falling slower, then the first taken back, flying up with its clink.
+// window.hourglassPlayed counts the steps done, for a shot.
+const q = new URLSearchParams(location.search), HOUSES = ['lion', 'eagle'];
+const slips = [10, 5, 20, 10, 50, 10, 5, 10].map((p, i) => ({ kind: 'spell', thing: 's' + i, points: p, house: HOUSES[i % 2] }));
+const audio = window.AudioContext ? new AudioContext() : null;
+const glass = LumosHourglass.mount(document.getElementById('g'), { slips, houses: HOUSES, full: 400, niche: q.has('niche'), audio });
+window.hourglassPlayed = 0;
+const one = { kind: 'card', thing: 'dumbledore', points: 30, house: 'eagle' };
+setTimeout(() => glass.point(one).then(() => window.hourglassPlayed++), 800);
+setTimeout(() => glass.point({ kind: 'taught', thing: 'lumos', points: 20, house: 'lion' }).then(() => window.hourglassPlayed++), 900);
+setTimeout(() => glass.back(one).then(() => window.hourglassPlayed++), 1000);
+</script>
+</body></html>

@@ -1,0 +1,334 @@
+// The house points' hourglass (Q21 answered 2, Godric, 12 October 2026, 9.38 pm, with his t1: both boys' points fill
+// the one hourglass of whatever houses they choose, the cup won together, never brother against brother; Magic's B11,
+// req 213: points for learning, never lost, once each, each reason dropping as a slip into the base, t1 there).
+// Canon, the canon tool: "the giant hourglasses that recorded the house points" (PS 15, B1 L5089), "set in niches
+// along the wall" (OotP 28, B5 L49050); "a shower of rubies fell down into the bottom bulb of Gryffindor's
+// hour-glass ... a number of sapphires fell into Ravenclaw's glass" (OotP 38, B5 L53906); Slytherin's "spilled its
+// emeralds" (DH 32, B7 L77235). The books never name Hufflepuff's stones: the films' yellow ones stand in.
+// Form after ledgers-and-instruments-03 (the Curator's shelf row: two 17th-century hourglass frames, the pierced
+// brass one with twisted posts and the oak one with plain pillars). Drawn in the castle's ink and wash, in code, so
+// the stones can fall live; it needs lumos-icon.js (and beasts/drawn.js) loaded first, for the crest.
+//
+// Q22 answered 1 (Godric, 13 October 2026, 7.31 am, relayed by Fawkes): pierced brass, twisted posts, the crest on a
+// cartouche above, so 'brass' is the default frame. His t1: the brass glass stands in a niche along a wall (OotP 28)
+// once the Architect places the entrance hall, the brass frame inside (niche: true; the placing is the Architect's).
+// His t2: if a point is ever taken back, its stone flies up into the top bulb ("Even as they watched, stones flew
+// upwards", OotP 28, B5 L49050) with a cross little clink (rising, clink()). Magic's against the year (Godric, 8.11 am,
+// 1): no rival but their own best year, the top bulb the house's store, magically never lower, so 'store' is the
+// default top.
+//
+// LumosHourglass.svg({ slips, houses, frame, niche, full, falling, rising, top, id })
+//   slips    the year's awards in the order earned, as Events' record keeps them ({ kind, thing, points, on, record },
+//            castle.points()), each with a house ('lion', 'snake', 'badger', 'eagle'): the house of the boy who earned
+//            it. A slip without one takes houses[0], this castle's own. Both boys' stones lie in the one bottom bulb,
+//            in bands as they were earned, so the year can be read in the glass. A slip with `back` (taken back)
+//            leaves the heap and the base.
+//   houses   the boys' houses, one or two (both the same if they choose one); their quarters light on the crest
+//   frame    'brass' (default, Godric's 22.1), 'oak' (plain pillars) or 'niche' (the stone niche alone, Q22's 22.3)
+//   niche    true: the brass glass stands in a stone niche, its wall round it (his t1); the viewBox grows to
+//            -24 -22 168 274 so the glass keeps its own coordinates
+//   full     the points that fill the bottom bulb (their own best year is the mark, Magic's 1; 1000 till one is set)
+//   falling  { house, n, slow, at } a shower in the air between the neck and the heap (OotP 38): n stones; slow, a
+//            brother taught (Magic's t2), the stones fewer and spaced, as if drifting; at 0..1, the moment in a live
+//            fall (mount() drives it), absent for a still
+//   rising   { house, n, at } a stone taken back, flying up from the heap through the neck (his t2)
+//   top      the top bulb: 'store' (default, the house's store, never lower), 'clear', or a fraction 0..1
+// LumosHourglass.cup({ houses, year, gems, id }) the house cup's crest on a stand-in cup; the cup's body is Objects' (req 48);
+//   gems, the year's slips, poured into its mouth at the leaving feast (Magic's against the year, req 233).
+// LumosHourglass.mount(el, { slips, houses, full, niche, audio }) draws the glass into el and gives { set(slips),
+//   point(slip), back(slip) }: point is the runtime's opts.point (req 222), its stones falling as it lands, slower
+//   for a brother taught (kind 'taught'); back flies its stones up and clinks. audio: an AudioContext, else none.
+// LumosHourglass.clink(audio) the cross little clink, glass on glass, a little sharp.
+(function () {
+  const STONE = {  // the stone, its lit facet, its dark edge
+    lion: ['#a3162c', '#f07a86', '#4a0812'], eagle: ['#1e4c9e', '#8fb2f0', '#0b1d45'],
+    snake: ['#1b7a46', '#7fdca5', '#08341c'], badger: ['#e3b52a', '#fff0a8', '#6b4e08'],
+  };
+  const NAME = { lion: 'Gryffindor', snake: 'Slytherin', badger: 'Hufflepuff', eagle: 'Ravenclaw' };
+  const CX = 60, TOP = 36, NECK = 113, BOT = 190;
+  // the bulb's half width at u, 0 at the cap and 1 at the neck: a blown bulb, rounded into the cap, widest a third
+  // of the way in, closing round to a narrow waist, as the precedent's glasses are
+  const g = u => { const m = 0.36, e = u < m ? 1 - Math.pow((m - u) / 0.52, 2) : 1 - Math.pow((u - m) / (1 - m), 2.2); return 2.4 + 31.6 * Math.pow(Math.max(0, e), 0.62); };
+  const hwAt = y => y <= NECK ? g((y - TOP) / (NECK - TOP)) : g((BOT - y) / (BOT - NECK));
+  const rnd = seed => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  const f = n => n.toFixed(2);
+  let n = 0;
+
+  function bulbPath() {
+    const L = [], R = [];
+    for (let i = 0; i <= 80; i++) { const y = TOP + (BOT - TOP) * i / 80, w = hwAt(y); L.push(`${f(CX - w)},${f(y)}`); R.push(`${f(CX + w)},${f(y)}`); }
+    return `M${L.join(' L')} L${R.reverse().join(' L')} Z`;
+  }
+  function defs(id) {
+    return `<defs>
+    <filter id="wob${id}" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="1" seed="3" result="t"/>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="0.9" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <filter id="wc${id}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.12" numOctaves="3" seed="9" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0.5 0 0 0 0.66  0.5 0 0 0 0.66  0.5 0 0 0 0.66  0 0 0 0 1" result="g"/>
+      <feComposite in="SourceGraphic" in2="g" operator="arithmetic" k1="1" k2="0" k3="0" k4="0"/></filter>
+    <linearGradient id="brass${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2bf6a"/><stop offset="0.5" stop-color="#b48a3a"/><stop offset="1" stop-color="#7a5a22"/></linearGradient>
+    <linearGradient id="post${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e4f1c"/><stop offset="0.4" stop-color="#e8c878"/><stop offset="1" stop-color="#7a5a22"/></linearGradient>
+    <linearGradient id="oak${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6238"/><stop offset="1" stop-color="#5a3c1e"/></linearGradient>
+    <linearGradient id="pill${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4e3418"/><stop offset="0.45" stop-color="#9a7246"/><stop offset="1" stop-color="#4e3418"/></linearGradient>
+    <linearGradient id="glass${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/><stop offset="0.25" stop-color="#ffffff" stop-opacity="0.42"/>
+      <stop offset="0.4" stop-color="#ffffff" stop-opacity="0.08"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.2"/></linearGradient>
+    <linearGradient id="stone${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8d8270"/><stop offset="1" stop-color="#5e5546"/></linearGradient>
+    <radialGradient id="niche${id}" cx="0.5" cy="0.35" r="0.7"><stop offset="0" stop-color="#3a3126"/><stop offset="1" stop-color="#1a150f"/></radialGradient>
+    <clipPath id="bulb${id}"><path d="${bulbPath()}"/></clipPath>
+  </defs>`;
+  }
+  // one stone: a cut gem seen side on, its lit facet up and left
+  function stone(x, y, r, house, R) {
+    const [c, lit, dark] = STONE[house] || STONE.lion, a = R() * Math.PI, k = 6;
+    const pts = []; for (let i = 0; i < k; i++) { const t = a + i * 2 * Math.PI / k, q = r * (0.82 + 0.3 * R()); pts.push(`${f(x + Math.cos(t) * q)},${f(y + Math.sin(t) * q * 0.85)}`); }
+    return `<polygon points="${pts.join(' ')}" fill="${c}" stroke="${dark}" stroke-width="0.28"/>
+      <path d="M${f(x - r * 0.55)},${f(y - r * 0.05)} L${f(x - r * 0.1)},${f(y - r * 0.6)} L${f(x + r * 0.15)},${f(y - r * 0.15)} Z" fill="${lit}" opacity="0.85"/>`;
+  }
+  // where the stones lie: packed rows bottom up, filled in order as from one stream onto a cone under the neck
+  function places(capR) {
+    const P = [], dy = capR * 1.55;
+    for (let y = BOT - capR * 1.2, row = 0; y > NECK + 6; y -= dy, row++) {
+      const w = hwAt(y) - 1.9 - capR * 0.6;
+      for (let x = CX - w + (row % 2) * capR; x <= CX + w; x += capR * 2.05) P.push([x, y, (BOT - y) - 20 * Math.pow(1 - Math.abs(x - CX) / Math.max(w, 1), 1.4)]);
+    }
+    return P.sort((a, b) => a[2] - b[2]);
+  }
+  function heap(id, slips, houses, full) {
+    const total = slips.reduce((s, x) => s + x.points, 0); if (!total) return { svg: '', topY: BOT };
+    const P = places(1.8), count = Math.round(P.length * Math.min(1, total / full)), R = rnd(11);
+    const cum = []; let c = 0; for (const s of slips) { cum.push([c, c + s.points, s.house || houses[0]]); c += s.points; }
+    let out = '', topY = BOT, j = 0;
+    for (let i = 0; i < count; i++) {
+      const v = (i + 0.5) / count * total; while (j < cum.length - 1 && v >= cum[j][1]) j++;
+      const [x, y] = P[i]; out += stone(x + (R() - 0.5) * 1.3, y + (R() - 0.5) * 1.1, 1.8 * (0.8 + 0.4 * R()), cum[j][2], R); topY = Math.min(topY, y);
+    }
+    return { svg: out, topY };
+  }
+  // a shower: still, the stones scattered down the fall; live (at 0..1), each stone leaves the neck in its turn and
+  // drops onto the heap, so mount() can play it as the point lands
+  function shower(fall, topY) {
+    if (!fall || !fall.n) return '';
+    const R = rnd(29), n = fall.slow ? Math.max(3, Math.round(fall.n / 3)) : fall.n, live = typeof fall.at === 'number';
+    let s = '';
+    for (let i = 0; i < n; i++) {
+      let t;
+      if (!live) t = fall.slow ? (i + 0.5) / n : Math.pow(R(), 0.8);
+      else { const go = i / n * 0.55, p = (fall.at - go) / 0.45; R(); if (p <= 0 || p >= 1) { R(); R(); continue; } t = fall.slow ? p : p * p; }
+      const y = NECK + 2 + t * (topY - NECK - 5);
+      s += stone(CX + (R() - 0.5) * (1 + t * 7), y, 1.35, fall.house, R);
+    }
+    return s;
+  }
+  // a stone taken back (Godric's t2): it lifts off the heap and flies up through the neck into the store, a short
+  // streak under it; live at 0..1, or still at its mid flight
+  function rise(up, topY) {
+    if (!up || !up.n) return '';
+    const R = rnd(41), at = typeof up.at === 'number' ? up.at : 0.3;
+    let s = '';
+    for (let i = 0; i < up.n; i++) {
+      const p = (at - i * 0.12) / Math.max(0.4, 1 - (up.n - 1) * 0.12); if (p <= 0 || p >= 1) continue;
+      const e = 1 - Math.pow(1 - p, 2), y = topY - 2 - e * (topY - NECK + 22), x = CX + (R() - 0.5) * 6 * (1 - e);
+      s += `<path d="M${f(x)},${f(y + 2.4)} V${f(y + 7.5)}" stroke="${(STONE[up.house] || STONE.lion)[1]}" stroke-width="0.8" opacity="0.55" stroke-linecap="round"/>` + stone(x, y, 1.8, up.house, R);
+    }
+    return s;
+  }
+  function topBulb(top, houses) {
+    if (top === undefined || top === 'store') top = 0.86;   // the house's store, never lower (Magic's 1)
+    if (typeof top !== 'number' || top <= 0) return '';
+    const R = rnd(5); let s = '';
+    // packed loosely, row on row offset, each stone a little out of line, so it reads as a heap and not a grid
+    for (let y = NECK - 6, row = 0; y > NECK - 6 - top * 62; y -= 2.5, row++) {
+      const w = hwAt(y) - 2.4;
+      for (let x = CX - w + (row % 2) * 1.6; x <= CX + w; x += 3.3) s += stone(x + (R() - 0.5) * 1.4, y + (R() - 0.5) * 1.1, 1.5 * (0.85 + 0.3 * R()), houses[Math.floor(R() * houses.length)], R);
+    }
+    return s;
+  }
+  // rolled slips of parchment, each tied with a thread of its earner's house
+  function slipsIn(x0, y0, w, h, slips, houses) {
+    // dropped in loosely as they were earned, the first at the bottom, each lying where it falls on the ones below
+    const R = rnd(17), cols = Math.floor(w / 2), ht = new Array(cols).fill(0); let s = '';
+    slips.forEach(sl => {
+      const len = 8 + R() * 2.5, c0 = Math.floor(R() * (cols - len / 2)), c1 = c0 + Math.ceil(len / 2);
+      const base = Math.max(...ht.slice(c0, c1)), y = y0 + h - 1.6 - base;
+      if (y < y0 + 1.6) return;
+      for (let c = c0; c < c1; c++) ht[c] = base + 2.2 + R() * 0.4;
+      const x = x0 + c0 * 2, tie = STONE[sl.house || houses[0]][0], tone = ['#e2d0a4', '#d9c596', '#eadbb4', '#cfba88'][Math.floor(R() * 4)];
+      s += `<g transform="rotate(${f((R() - 0.5) * 14)} ${f(x + len / 2)} ${f(y)})"><rect x="${f(x)}" y="${f(y - 1.2)}" width="${f(len)}" height="2.4" rx="1.2" fill="${tone}" stroke="#4a3820" stroke-width="0.25"/>
+        <ellipse cx="${f(x + len - 0.4)}" cy="${f(y)}" rx="0.45" ry="1.15" fill="#b9a273" stroke="#4a3820" stroke-width="0.2"/>
+        <path d="M${f(x + len * 0.45)},${f(y - 1.2)} V${f(y + 1.2)}" stroke="${tie}" stroke-width="0.8"/></g>`;
+    });
+    return s;
+  }
+  // the crest as built (Q14 to Q20), the boys' houses' quarters lit in their colours, the other two at rest
+  function crestAt(id, x, y, size, houses, colour) {
+    const I = window.LumosIcon, tint = { lion: 0, snake: 0, badger: 0, eagle: 0 };
+    houses.forEach(h => { tint[h] = 1; });
+    return `<g transform="translate(${f(x - size / 2)},${f(y - size / 2)}) scale(${f(size / 64)})">${I.crest('hg' + id, 'drawn', 0, 'seal', colour, tint)}</g>`;
+  }
+  function posts(id, xs, y1, y2, back) {
+    let s = '';
+    for (const x of xs) {
+      if (back) { s += `<rect x="${x - 1.4}" y="${y1}" width="2.8" height="${y2 - y1}" fill="#6e5428" opacity="0.55"/>`; continue; }
+      for (let y = y1, i = 0; y < y2; y += 3.1, i++) s += `<ellipse cx="${f(x + (i % 2 ? 0.55 : -0.55))}" cy="${f(y + 1.5)}" rx="2.5" ry="1.75" fill="url(#post${id})" stroke="#3e2c10" stroke-width="0.3"/>`;
+    }
+    return s;
+  }
+  function pierced(x1, x2, y, h, down) {
+    // a pierced brass band: a row of holes and a scalloped edge
+    let s = `<rect x="${x1}" y="${y}" width="${x2 - x1}" height="${h}" fill="url(#brassB)"/>`, sc = '';
+    for (let x = x1 + 3; x < x2 - 2; x += 4.4) s += `<circle cx="${f(x)}" cy="${f(y + h / 2)}" r="0.85" fill="#3a2a10"/>`;
+    const e = down ? y + h : y;
+    for (let x = x1; x < x2 - 0.1; x += 4.4) sc += `M${f(x)},${f(e)} q2.2,${down ? 2.6 : -2.6} 4.4,0 `;
+    return s + `<path d="${sc}" fill="url(#brassB)" stroke="#3e2c10" stroke-width="0.35"/>
+      <rect x="${x1}" y="${y}" width="${x2 - x1}" height="${h}" fill="none" stroke="#3e2c10" stroke-width="0.4"/>`;
+  }
+  function frameBrass(id, inner, slips, houses) {
+    const back = posts(id, [27, 93], 30, 194, true), front = posts(id, [16, 104], 30, 194, false);
+    const top = pierced(10, 110, 22, 10, true).replace(/brassB/g, 'brass' + id), foot = pierced(10, 110, 192, 9, false).replace(/brassB/g, 'brass' + id);
+    const cart = `<path d="M44,2 H76 L80,8 V26 C80,34 70,39 60,41 C50,39 40,34 40,26 V8 Z" fill="url(#brass${id})" stroke="#3e2c10" stroke-width="0.6"/>`;
+    const drawer = `<rect x="14" y="201" width="92" height="31" rx="1.5" fill="url(#brass${id})" stroke="#3e2c10" stroke-width="0.5"/>
+      <rect x="21" y="205" width="78" height="23" fill="#1d160e"/>${slipsIn(21, 205, 78, 23, slips, houses)}<rect x="21" y="205" width="78" height="23" fill="url(#glass${id})" stroke="#3e2c10" stroke-width="0.6"/>`;
+    return back + inner + front + top + foot + cart + crestAt(id, 60, 20, 36, houses, '#4a3313') + drawer;
+  }
+  function frameOak(id, inner, slips, houses) {
+    const pillar = x => { let s = `<rect x="${x - 2.6}" y="32" width="5.2" height="160" fill="url(#pill${id})" stroke="#2a1a0a" stroke-width="0.35"/>`; for (const y of [36, 40, 184, 188]) s += `<rect x="${x - 3.3}" y="${y}" width="6.6" height="2" rx="0.8" fill="url(#pill${id})" stroke="#2a1a0a" stroke-width="0.3"/>`; return s; };
+    const board = (y, h) => `<rect x="8" y="${y}" width="104" height="${h}" rx="1" fill="url(#oak${id})" stroke="#2a1a0a" stroke-width="0.5"/><path d="M10,${y + 2} H110" stroke="#c49a62" stroke-width="0.4" opacity="0.6"/>`;
+    const grain = y => { let s = ''; for (let i = 0; i < 5; i++) s += `<path d="M${12 + i * 3},${y + 3 + i * 1.6} C40,${y + 1 + i * 1.6} 80,${y + 6 + i * 1.6} ${108 - i * 2},${y + 3 + i * 1.6}" stroke="#3e2812" stroke-width="0.3" fill="none" opacity="0.5"/>`; return s; };
+    const drawer = `<rect x="12" y="202" width="96" height="30" rx="1" fill="url(#oak${id})" stroke="#2a1a0a" stroke-width="0.5"/>
+      <rect x="20" y="206" width="80" height="20" fill="#1d160e"/>${slipsIn(20, 206, 80, 20, slips, houses)}<rect x="20" y="206" width="80" height="20" fill="url(#glass${id})" stroke="#2a1a0a" stroke-width="0.6"/>
+      <circle cx="60" cy="229" r="1.6" fill="url(#brass${id})" stroke="#3e2c10" stroke-width="0.3"/>`;
+    return pillar(26) + pillar(94) + inner + pillar(14) + pillar(106) + board(4, 30) + grain(4) + board(190, 12)
+      + crestAt(id, 60, 19, 32, houses, '#2a1a0a') + drawer;
+  }
+  function frameNiche(id, inner, slips, houses) {
+    const wall = `<rect x="0" y="0" width="120" height="240" fill="url(#stone${id})"/>`;
+    let joints = ''; for (let y = 14; y < 240; y += 14) joints += `<path d="M0,${y} H120" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
+    for (let y = 0, r = 0; y < 240; y += 14, r++) for (let x = (r % 2) * 13; x < 120; x += 26) joints += `<path d="M${x},${y} V${y + 14}" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
+    const arch = 'M14,204 V64 C14,34 36,22 60,22 C84,22 106,34 106,64 V204 Z';
+    const caps = `<rect x="22" y="30" width="76" height="7" rx="1.5" fill="url(#brass${id})" stroke="#3e2c10" stroke-width="0.4"/><rect x="22" y="189" width="76" height="7" rx="1.5" fill="url(#brass${id})" stroke="#3e2c10" stroke-width="0.4"/>
+      <rect x="23" y="36" width="2.4" height="154" fill="url(#post${id})"/><rect x="94.6" y="36" width="2.4" height="154" fill="url(#post${id})"/>`;
+    const ledge = `<rect x="8" y="196" width="104" height="9" fill="#9a8f7c" stroke="#3a3328" stroke-width="0.5"/>
+      <rect x="18" y="207" width="84" height="26" fill="#1d160e" stroke="#3a3328" stroke-width="0.6"/>${slipsIn(18, 207, 84, 26, slips, houses)}<rect x="18" y="207" width="84" height="26" fill="url(#glass${id})"/>`;
+    const key = `<path d="M50,4 H70 L67,24 H53 Z" fill="#9a8f7c" stroke="#3a3328" stroke-width="0.5"/>`;
+    return wall + joints + `<path d="${arch}" fill="url(#niche${id})" stroke="#3a3328" stroke-width="0.8"/>` + caps + inner + ledge
+      + key + crestAt(id, 60, 13, 20, houses, '#3a3328');
+  }
+
+  // Godric's t1: the brass glass in a niche along the wall (OotP 28), the stone round it, the frame standing on the sill
+  function nicheRound(id) {
+    let w = `<rect x="-24" y="-22" width="168" height="274" fill="url(#stone${id})"/>`, j = '';
+    for (let y = -8, r = 0; y < 252; y += 14, r++) {
+      j += `<path d="M-24,${y} H144" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
+      for (let x = -24 + (r % 2) * 13; x < 144; x += 26) j += `<path d="M${x},${y} V${y + 14}" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
+    }
+    const arch = 'M0,233 V44 C0,6 28,-10 60,-10 C92,-10 120,6 120,44 V233 Z';
+    return w + j + `<path d="${arch}" fill="url(#niche${id})" stroke="#3a3328" stroke-width="0.9"/>
+      <path d="M52,-21 H68 L66,-8 H54 Z" fill="#9a8f7c" stroke="#3a3328" stroke-width="0.5"/>
+      <rect x="-8" y="232" width="136" height="10" fill="#9a8f7c" stroke="#3a3328" stroke-width="0.5"/>
+      <ellipse cx="60" cy="233" rx="50" ry="2.2" fill="#0d0a06" opacity="0.55"/>`;
+  }
+
+  function svg(o = {}) {
+    const id = o.id || 'h' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'];
+    const slips = (o.slips || []).filter(x => !x.back), full = o.full || 1000;
+    const h = heap(id, slips, houses, full), path = bulbPath();
+    const inner = `<path d="${path}" fill="#2a2016" opacity="0.35"/>
+      <g clip-path="url(#bulb${id})">${topBulb(o.top, houses)}${h.svg}${shower(o.falling, h.topY)}${rise(o.rising, h.topY)}</g>
+      <path d="${path}" fill="url(#glass${id})"/>
+      <g filter="url(#wob${id})"><path d="${path}" fill="none" stroke="#120d08" stroke-width="0.7" stroke-linejoin="round"/>
+      <path d="M${CX - 22},${TOP + 14} C${CX - 26},${TOP + 30} ${CX - 18},${TOP + 52} ${CX - 8},${NECK - 10}" stroke="#ffffff" stroke-width="1.2" fill="none" opacity="0.45"/>
+      <path d="M${CX - 24},${BOT - 50} C${CX - 30},${BOT - 34} ${CX - 26},${BOT - 18} ${CX - 18},${BOT - 8}" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.35"/></g>`;
+    const fr = o.frame === 'oak' ? frameOak : o.frame === 'niche' ? frameNiche : frameBrass;
+    const body = fr(id, inner, slips, houses);
+    if (o.niche && fr !== frameNiche)
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -22 168 274">${defs(id)}<g filter="url(#wc${id})">${nicheRound(id)}${body}</g></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 240">${defs(id)}<g filter="url(#wc${id})">${body}</g></svg>`;
+  }
+
+  // the house cup's crest on a stand-in cup (the cup itself is Objects', from req 48's trophies sheet): the crest as
+  // built, engraved in the gold, the boys' houses' quarters enamelled; the year engraved on the foot, their names under
+  function cup(o = {}) {
+    const id = o.id || 'c' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'], plain = o.plain;
+    const body = 'M30,20 H90 C90,62 78,82 64,88 V104 C64,110 76,112 80,118 H40 C44,112 56,110 56,104 V88 C42,82 30,62 30,20 Z';
+    const handles = 'M30,28 C14,28 12,56 34,62 M90,28 C106,28 108,56 86,62';
+    const crest = plain ? crestAt(id, 60, 48, 34, [], '#5a3d12') : crestAt(id, 60, 48, 34, houses, '#5a3d12');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140">${defs(id)}
+      <g filter="url(#wc${id})"><path d="${handles}" fill="none" stroke="url(#post${id})" stroke-width="5" stroke-linecap="round"/>
+      <path d="${body}" fill="url(#brass${id})" stroke="#3e2c10" stroke-width="0.8"/><ellipse cx="60" cy="20" rx="30" ry="4" fill="#7a5a22" stroke="#3e2c10" stroke-width="0.6"/>
+      ${crest}${pour(o.gems, houses)}
+      <rect x="36" y="118" width="48" height="14" fill="url(#brass${id})" stroke="#3e2c10" stroke-width="0.6"/>
+      <text x="60" y="126.5" text-anchor="middle" font-family="Georgia, serif" font-size="5.2" fill="#3e2c10">${o.year || '2026 – 2027'}</text>
+      <path d="M44,129.5 H56 M64,129.5 H76" stroke="#3e2c10" stroke-width="0.5" opacity="0.7"/></g></svg>`;
+  }
+
+  // the cross little clink (Godric's t2): two small glass notes a semitone apart, short and a little sharp
+  function clink(audio) {
+    if (!audio || !audio.createOscillator) return;
+    const t = audio.currentTime, out = audio.createGain();
+    out.gain.setValueAtTime(0.0001, t); out.gain.exponentialRampToValueAtTime(0.16, t + 0.004); out.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+    out.connect(audio.destination);
+    for (const [hz, d] of [[2637, 0], [2794, 0.045]]) {
+      const o = audio.createOscillator(); o.type = 'triangle'; o.frequency.setValueAtTime(hz, t + d);
+      o.connect(out); o.start(t + d); o.stop(t + d + 0.2);
+    }
+  }
+
+  // the glass, live: the still glass drawn once, and the stones in flight on a light layer above it, so a fall
+  // redraws only a few stones a frame (the wash filter is drawn once)
+  function mount(el, o = {}) {
+    let slips = (o.slips || []).slice(), busy = Promise.resolve();
+    const houses = o.houses && o.houses.length ? o.houses : ['lion'], full = o.full || 1000, id = 'm' + (++n);
+    const box = o.niche ? '-24 -22 168 274' : '0 0 120 240';
+    el.style.position = el.style.position || 'relative';
+    el.innerHTML = `<div></div><svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none">
+      <defs><clipPath id="fly${id}"><path d="${bulbPath()}"/></clipPath></defs><g clip-path="url(#fly${id})"></g></svg>`;
+    const still = el.firstChild, fly = el.lastChild.lastChild;
+    const draw = () => { still.innerHTML = svg({ slips, houses, full, niche: o.niche, id }); const v = still.firstChild; v.style.width = '100%'; v.style.height = 'auto'; v.style.display = 'block'; };
+    const stones = sl => Math.max(3, Math.min(24, Math.round(places(1.8).length * sl.points / full)));
+    const play = (ms, frame) => new Promise(done => {
+      const t0 = performance.now();
+      const step = now => { const at = Math.min(1, (now - t0) / ms); fly.innerHTML = frame(at); if (at < 1) requestAnimationFrame(step); else { fly.innerHTML = ''; done(); } };
+      requestAnimationFrame(step);
+    });
+    const topY = () => heap(id, slips.filter(x => !x.back), houses, full).topY;
+    draw();
+    return {
+      set(next) { slips = next.slice(); draw(); },
+      point(sl) {
+        const house = sl.house || houses[0], slow = sl.kind === 'taught';
+        busy = busy.then(() => play(slow ? 3400 : 1700, at => shower({ house, n: stones(sl), slow, at }, topY())))
+          .then(() => { slips.push(sl); draw(); });
+        return busy;
+      },
+      back(sl) {
+        const house = sl.house || houses[0], from = topY();
+        busy = busy.then(() => {
+          const i = slips.findIndex(x => x.kind === sl.kind && x.thing === sl.thing);
+          if (i >= 0) slips[i] = Object.assign({}, slips[i], { back: true });
+          draw();
+          return play(1300, at => rise({ house, n: Math.min(4, stones(sl)), at }, from));
+        }).then(() => clink(o.audio));
+        return busy;
+      },
+    };
+  }
+
+  // the year's gems poured into the cup at the leaving feast (Magic's against the year, req 233), heaped in its mouth,
+  // each in its earner's house, as many as the year's points give, up to a brimming mound
+  function pour(gems, houses) {
+    if (!gems || !gems.length) return '';
+    const total = gems.reduce((t, x) => t + (x.back ? 0 : x.points), 0), k = Math.max(12, Math.min(140, Math.round(total / 6)));
+    const cum = []; let c = 0; for (const g of gems) if (!g.back) { cum.push([c + g.points, g.house || houses[0]]); c += g.points; }
+    const R = rnd(53); let s = '', j = 0;
+    for (let i = 0; i < k; i++) {
+      const v = (i + 0.5) / k * total; while (j < cum.length - 1 && v >= cum[j][0]) j++;
+      const u = R() * 2 - 1, h = 9 * Math.pow(1 - Math.abs(u), 0.7) * Math.min(1, k / 80);
+      s += stone(60 + u * 27, 20 - R() * h, 1.7 * (0.8 + 0.4 * R()), cum[j][1], R);
+    }
+    return s;
+  }
+
+  const api = { svg, cup, mount, clink, STONE, NAME };
+  if (typeof window !== 'undefined') window.LumosHourglass = api;
+  if (typeof module !== 'undefined') module.exports = api;
+})();
