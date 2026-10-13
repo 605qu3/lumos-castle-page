@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>The Map, live</title>
+<link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&family=Caveat:wght@400;600&family=Homemade+Apple&family=Covered+By+Your+Grace&family=Fondamento&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>body { margin: 0; background: #222; } svg { display: block; }</style></head><body><div id="m"></div>
+<script src="../castle-model.js"></script>
+<script src="marauders-map.js"></script>
+<script>
+// LumosMap.mount as the Map's play would use it (req 242, Events'): the oath's spread, the den a beat later, the wipe, then a
+// left-open note in Padfoot's hand. window.mapPlayed counts the steps done, for a shot.
+const DOTS = [{ name: 'his own name', at: { group: 'gryffindor-suite', p: [-1.8, -1.6] }, me: true, side: -1 },
+  { name: 'Neville Longbottom', at: { group: 'gryffindor-suite', p: [2.6, 2.3] } }, { name: 'The Fat Lady', at: 'fat-lady', side: -1 }];
+window.mapPlayed = 0;
+document.fonts.ready.then(async () => {
+  const map = LumosMap.mount(document.getElementById('m'), window.CASTLE_MODEL, { look: 'raised', view: LumosMap.phone(40, 4, 9, 390, 500), dots: DOTS, denNew: true, denNote: true });
+  await map.open(1600); window.mapPlayed++;
+  await map.wipe(600); window.mapPlayed++;
+  await map.note('padfoot', 'Mr Padfoot notes that somebody left us open all night.', 10, 60, 11, 900); window.mapPlayed++;
+});
+</script></body></html>
