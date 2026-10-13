@@ -6,19 +6,27 @@
 
    CastleShell.build(F, M, placeId) builds the place and, one step on, every way joined to it by an open mouth, into
    one THREE.Group in the place's own frame: x east, y up, z south (so -z is north), the origin at the place's plan
-   centre on its floor. It returns { group, place, places, doors, ways, stairs, stands, toLocal }:
-     doors   a shut door each: { id, to, mesh, stand } (the mesh is the leaf, userData.door its id)
-     ways    an open mouth each to another way: { id, to, mesh, stand } (the mesh fills the opening, unseen, for taps)
-     stands  where he can stand: { name, pos, look, thing } in the group's frame; the first is the start. These are
-             the defaults (a stand square to each door and mouth, the start inside the way he arrives by); the stands
-             and the look round at each are Interaction's to set (docs/interaction-vocabulary.md §2, req 208), by
-             passing their own list to the page.
+   centre on its floor. It returns { group, place, places, doors, ways, stairs, flights, stands, toLocal, route }:
+     doors   a shut door each: { id, to, mesh, stand, level } (the mesh is the leaf, userData.door its id)
+     ways    an open mouth each to another way: { id, to, mesh, stand, level, page } (the mesh fills the opening,
+             unseen, for taps; page when the way leads into a built room, which is never shelled)
+     flights a straight flight each: { id, foot, head, footPt, headPt } (foot and head are stands on the floors it
+             joins; the treads carry userData.stair its id). Godric's 12.1 (13 October 2026, 4.57 pm): the stair
+             hall's well, its landings and galleries drawn from the model's slabs ({ shape: { rect }, z }).
+     stands  where he can stand: { name, pos, look, thing, level } in the group's frame (level: the floor under him,
+             in the castle's frame); the first is the start. These are the defaults (a stand square to each door and
+             mouth, one at each end of a flight, the start inside the way he arrives by); the stands and the look
+             round at each are Interaction's to set (docs/interaction-vocabulary.md §2, req 208), by passing their
+             own list to the page.
+     route   route(a, b, level): the turns between two stands on one floor that keep him on the floor (null if none).
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
 
 var GREY = { wall: 0x75726e, floor: 0x6a6764, ceil: 0x5e5b58, door: 0x4a4540, stair: 0x807c77, frame: 0x625e59 };
 var WALL_T = 0.8, EYE = 1.35, STAND_OFF = 2.4;
+var SLAB = 0.7, WAIST = 0.6, STEP_OFF = 1.2, RAISED = 1.0;   /* a floor's vault, a flight's depth under its nosings (the
+   well sheet's), a step off a flight's end, and the sill above which a way is reached from its own floor, not this one */
 var LAYER = { wall: 0, floor: 1, ceiling: 1, door: 2, stair: 3, way: 4 };   /* castle.js's five tints, under Layers */
 
 function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
@@ -91,7 +99,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var mats = {};
   for (var k in GREY) mats[k] = F.solid(GREY[k]);
   mats.wall.side = THREE.DoubleSide;
-  var out = { group: group, place: P, places: [P], doors: [], ways: [], stairs: [], stands: [], toLocal: toLocal };
+  var out = { group: group, place: P, places: [P], doors: [], ways: [], stairs: [], flights: [], stands: [], toLocal: toLocal };
 
   function quad(w, h, mat, layer) { return F.register(new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat), LAYER[layer]); }
   function slab(w, h, d, mat, layer) { return F.register(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat), LAYER[layer]); }
@@ -149,16 +157,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
         var to = other(g.op, Q.id);
+        /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
+        var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;
         if (isDoor(g.op.kind) && !out.doors.some(function (d) { return d.id === g.op.id; })) {
           var leaf = slab(w - 0.08, hh - 0.02, 0.12, mats.door, 'door');
-          leaf.position.set(mid.x + nx * t * 0.5, g.sill + (hh - 0.02) / 2, mid.z - ny * t * 0.5);
+          leaf.position.set(mid.x + nx * t * 0.5, mid.y + g.sill + (hh - 0.02) / 2, mid.z - ny * t * 0.5);
           leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
-          out.doors.push({ id: g.op.id, to: to, mesh: leaf, w: w, h: hh, mid: mid, inward: inward, place: Q.id });
+          out.doors.push({ id: g.op.id, to: to, mesh: leaf, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: g.sill, lift: lift, level: level });
         } else if (isWay(g.op.kind) && !out.ways.some(function (d) { return d.id === g.op.id; })) {
           var fill = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false }));
-          fill.position.set(mid.x, g.sill + hh / 2, mid.z); fill.rotation.y = ang; fill.name = 'way-' + g.op.id; fill.userData.way = g.op.id;
+          fill.position.set(mid.x, mid.y + g.sill + hh / 2, mid.z); fill.rotation.y = ang; fill.name = 'way-' + g.op.id; fill.userData.way = g.op.id;
           group.add(fill);
-          out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm] });
+          out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm],
+            sill: g.sill, lift: lift, level: level });
         }
       });
       piece(at, L, 0, H, Q.id + '-wall-' + i + '-end');
@@ -171,18 +182,33 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   out.ways.slice().forEach(function (w) {
     if (out.places.some(function (q) { return q.id === w.to; })) return;
     var Q = findPlace(M, w.to);
-    if (Q && onEdge(Q.poly, w.at)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
+    /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
+    if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; }
+    else if (Q && onEdge(Q.poly, w.at)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
     var depth = 3.0, rec = slab(w.w + 0.4, w.h + 0.2, depth, F.solid(0x141210), 'way');
-    rec.position.set(w.mid.x - w.inward.x * (depth / 2 + 0.9), w.h / 2, w.mid.z - w.inward.z * (depth / 2 + 0.9));
+    rec.position.set(w.mid.x - w.inward.x * (depth / 2 + 0.9), w.mid.y + w.sill + w.h / 2, w.mid.z - w.inward.z * (depth / 2 + 0.9));
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
     group.add(rec);
   });
 
-  /* the stairs in the places built: a straight flight's treads along its rise, from its span's foot to its head */
+  /* the stairs in the places built: a straight flight's treads along its rise, from its span's foot to its head; a
+     landing, gallery or bay ({ shape: { rect }, z }) as a floor's vault, SLAB deep under its top (Godric's 12.1) */
+  var slabs = [], raw = [];
+  function siteRect(gid, r) {
+    var a = toSite(M, gid, [r[0], r[1]]), b = toSite(M, gid, [r[2], r[3]]);
+    return [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1])];
+  }
   (M.stairs || []).forEach(function (s) {
-    if (!s.up || !s.span) return;
     var inIt = out.places.filter(function (q) { return (s.rooms || [s.room]).some(function (r) { return r === q.id || slug(r) === q.id; }); })[0];
     if (!inIt) return;
+    if (!s.span && s.shape && s.shape.rect && s.z != null) {
+      var R = siteRect(s.group, s.shape.rect), top = inIt.floor + s.z, c = toLocal((R[0] + R[2]) / 2, (R[1] + R[3]) / 2, top - SLAB / 2);
+      var sl = slab(R[2] - R[0], SLAB, R[3] - R[1], mats.floor, 'floor');
+      sl.position.copy(c); sl.name = s.id; sl.userData.landing = s.id; group.add(sl);
+      slabs.push({ id: s.id, rect: R, z: top, kind: s.kind || '' });
+      return;
+    }
+    if (!s.up || !s.span) return;
     var a = toSite(M, s.group, s.span[0]), b = toSite(M, s.group, s.span[1]);
     var bx0 = Math.min(a[0], b[0]), bx1 = Math.max(a[0], b[0]), by0 = Math.min(a[1], b[1]), by1 = Math.max(a[1], b[1]);
     var alongY = s.up[1] !== 0, run = alongY ? by1 - by0 : bx1 - bx0, across = alongY ? bx1 - bx0 : by1 - by0;
@@ -191,40 +217,102 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var f = (i + 0.5) / n, top = inIt.floor + s.from + rise * (i + 1);
       var sx = alongY ? (bx0 + bx1) / 2 : (s.up[0] > 0 ? bx0 + f * run : bx1 - f * run);
       var sy = alongY ? (s.up[1] > 0 ? by0 + f * run : by1 - f * run) : (by0 + by1) / 2;
-      var hgt = top - inIt.floor, p = toLocal(sx, sy, inIt.floor);
+      /* a flight from the floor stands on it; one higher up is a waist under its nosings */
+      var base = s.from > 0.01 ? top - rise - WAIST : inIt.floor;
+      var hgt = top - base, p = toLocal(sx, sy, base);
       var tr = slab(alongY ? across : go, Math.max(0.05, hgt), alongY ? go : across, mats.stair, 'stair');
       tr.position.set(p.x, p.y + hgt / 2, p.z); tr.name = s.id + '-' + (i + 1); tr.userData.stair = s.id; group.add(tr);
     }
     if (s.landing) {
-      var L = s.landing, la = toSite(M, s.group, [L[0], L[1]]), lb = toSite(M, s.group, [L[2], L[3]]);
-      var lw = Math.abs(lb[0] - la[0]), ld = Math.abs(lb[1] - la[1]), lt = s.to;
-      var lp = toLocal((la[0] + lb[0]) / 2, (la[1] + lb[1]) / 2, inIt.floor);
-      var land = slab(lw, lt, ld, mats.stair, 'stair');
+      var L = siteRect(s.group, s.landing), lt = s.to;
+      var lp = toLocal((L[0] + L[2]) / 2, (L[1] + L[3]) / 2, inIt.floor);
+      var land = slab(L[2] - L[0], lt, L[3] - L[1], mats.stair, 'stair');
       land.position.set(lp.x, lp.y + lt / 2, lp.z); land.name = s.id + '-landing'; land.userData.stair = s.id; group.add(land);
+      slabs.push({ id: s.id + '-landing', rect: L, z: inIt.floor + lt, kind: 'landing' });
     }
+    var ux = alongY ? 0 : s.up[0], uy = alongY ? s.up[1] : 0, mx = (bx0 + bx1) / 2, my = (by0 + by1) / 2;
+    var foot = alongY ? [mx, uy > 0 ? by0 : by1] : [ux > 0 ? bx0 : bx1, my];
+    var head = alongY ? [mx, uy > 0 ? by1 : by0] : [ux > 0 ? bx1 : bx0, my];
+    raw.push({ s: s, foot: foot, head: head, u: [ux, uy], side: [uy !== 0 ? 1 : 0, ux !== 0 ? 1 : 0], half: across / 2,
+      zf: inIt.floor + s.from, zh: inIt.floor + s.to });
     out.stairs.push({ id: s.id, place: inIt.id });
   });
 
+  /* standing on a floor: a site point is on the floor at height z if a slab's top is there, or the floor of a place
+     built is */
+  function onLevel(x, y, z) {
+    for (var i = 0; i < slabs.length; i++) {
+      var r = slabs[i].rect;
+      if (Math.abs(slabs[i].z - z) < 0.02 && x >= r[0] - 0.01 && x <= r[2] + 0.01 && y >= r[1] - 0.01 && y <= r[3] + 0.01) return true;
+    }
+    return out.places.some(function (q) {
+      if (Math.abs(q.floor - z) > 0.02) return false;
+      var xs = q.poly.map(function (p) { return p[0]; }), ys = q.poly.map(function (p) { return p[1]; });
+      return x >= Math.min.apply(null, xs) - 0.01 && x <= Math.max.apply(null, xs) + 0.01 && y >= Math.min.apply(null, ys) - 0.01 && y <= Math.max.apply(null, ys) + 0.01;
+    });
+  }
+  function siteOf(v) { return [v.x + cx, cy - v.z]; }
+  function clearRun(a, b, z) {
+    var n = Math.max(2, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / 0.25));
+    for (var k = 0; k <= n; k++) if (!onLevel(a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n, z)) return false;
+    return true;
+  }
+  /* the turns between two stands on one floor: straight, one turn, or along a landing of that floor */
+  out.route = function (from, to, z) {
+    var a = siteOf(from), b = siteOf(to), tries = [[], [[a[0], b[1]]], [[b[0], a[1]]]];
+    slabs.forEach(function (sl) {
+      if (Math.abs(sl.z - z) > 0.02 || !/landing/.test(sl.kind)) return;
+      var ly = (sl.rect[1] + sl.rect[3]) / 2, lx = (sl.rect[0] + sl.rect[2]) / 2;
+      tries.push([[a[0], ly], [b[0], ly]], [[lx, a[1]], [lx, b[1]]]);
+    });
+    for (var t = 0; t < tries.length; t++) {
+      var pts = [a].concat(tries[t], [b]), ok = true;
+      for (var j = 0; j + 1 < pts.length && ok; j++) ok = clearRun(pts[j], pts[j + 1], z);
+      if (ok) return tries[t].map(function (p) { return toLocal(p[0], p[1], z + EYE); });
+    }
+    return null;
+  };
+
   /* the default stands: square to each door and each mouth, STAND_OFF inside it, the eye at EYE (§11); the start is
      inside the way he arrives by (o.from), or else inside the first door of this place that leads out of the castle's
-     ways, facing in */
+     ways, facing in. A raised way (the bay's mouth) is stood at on its own floor, a step inside it */
   function standAt(d, name) {
-    var off = Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole */
-    var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = (pos.y || 0) + EYE;
-    var look = d.mid.clone(); look.y = Math.max(EYE, d.h * 0.45);
-    return { name: name, pos: pos, look: look, thing: d.mesh };
+    var off = d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole */
+    var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
+    var look = d.mid.clone(); look.y = d.mid.y + d.lift + (d.lift ? EYE : Math.max(EYE, d.h * 0.45));
+    return { name: name, pos: pos, look: look, thing: d.mesh, level: d.level };
   }
-  /* he arrives through a mouth standing in it, a step back on the side he came from, looking in; through a door, a
-     step inside it */
+  /* he arrives through a mouth standing in it, a step back on the side he came from, looking in (only into the wall's
+     depth where the far side is a room's page, short of the dark beyond); through a door, a step inside it */
   function facingIn(d, name) {
-    var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(d.mesh.userData.way ? -1.0 : STAND_OFF)); pos.y = EYE;
-    var look = d.mid.clone().add(d.inward.clone().multiplyScalar(STAND_OFF + 20)); look.y = EYE + 0.3;
-    return { name: name, pos: pos, look: look, thing: null };
+    var back = d.mesh.userData.way ? (d.page || !d.built ? -0.3 : -1.0) : STAND_OFF;
+    var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
+    var look = d.mid.clone().add(d.inward.clone().multiplyScalar(STAND_OFF + 20)); look.y = d.mid.y + d.lift + EYE + 0.3;
+    return { name: name, pos: pos, look: look, thing: null, level: d.level };
   }
-  var mine = out.doors.concat(out.ways).filter(function (d) { return d.place === P.id; });
+  var all = out.doors.concat(out.ways), mine = all.filter(function (d) { return d.place === P.id; });
   var entry = mine.filter(function (d) { return o.from && d.to === o.from; })[0] || mine.filter(function (d) { return o.start && d.id === o.start; })[0] || mine[0];
   if (entry) out.stands.push(facingIn(entry, 'start'));
-  mine.forEach(function (d) { var s = standAt(d, d.id); d.stand = s; out.stands.push(s); });
+  all.forEach(function (d) { var s = standAt(d, d.id); d.stand = s; out.stands.push(s); });
+
+  /* a flight's two stands: a step off each end onto the floor it joins (straight on, or to the side onto a gallery),
+     the foot's looking up the flight, the head's on along it */
+  function endStand(F0, z, back, name, lookAt) {
+    var e = F0.u, sd = F0.side, P0 = back ? F0.foot : F0.head, sg = back ? -1 : 1, off = F0.half + STEP_OFF;
+    var tries = [[P0[0] + sg * e[0] * STEP_OFF, P0[1] + sg * e[1] * STEP_OFF]];
+    [-1, 1].forEach(function (k) { tries.push([P0[0] - sg * e[0] * 1.5 + k * sd[0] * off, P0[1] - sg * e[1] * 1.5 + k * sd[1] * off]); });
+    var at = tries.filter(function (p) { return onLevel(p[0], p[1], z); })[0] || tries[0];
+    var pos = toLocal(at[0], at[1], z + EYE);
+    var look = lookAt || toLocal(at[0] + e[0] * 20, at[1] + e[1] * 20, z + EYE);
+    return { name: name, pos: pos, look: look, thing: null, level: z };
+  }
+  raw.forEach(function (F0) {
+    var headPt = toLocal(F0.head[0], F0.head[1], F0.zh + EYE), footPt = toLocal(F0.foot[0], F0.foot[1], F0.zf + EYE);
+    var fs = endStand(F0, F0.zf, true, F0.s.id + ' foot', headPt.clone());
+    var hs = endStand(F0, F0.zh, false, F0.s.id + ' head', null);
+    out.flights.push({ id: F0.s.id, foot: fs, head: hs, footPt: footPt, headPt: headPt });
+    out.stands.push(fs, hs);
+  });
   return out;
 } };
 })();

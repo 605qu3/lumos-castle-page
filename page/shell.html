@@ -108,6 +108,11 @@ line, the mote, travel and reveal) is castle.js's, unedited.
   (§11); a second tap there answers: a shut door shakes on its latch and tells the hooks (§6), an open mouth to a way
   takes him through under the frame's fade (§8), a way not yet built answers as a shut door. A tap on nothing at a
   stand goes back to the start; Back does the same (§3, §5). The stands are defaults; Interaction sets them (req 208).
+- The stair hall's well (Godric's 12.1, 13 October 2026, 4.57 pm): ?place=stair-hall&from=entrance-hall arrives at the
+  marble staircase's foot. A tap on a flight at one of its ends walks him up or down it to the other; on the floor of
+  an end, to that end first. He walks a floor by its landings, never across the well's air; a thing on another floor
+  waits until he climbs to it. Back walks him the same way down. The sixth moving flight's head, the landing bay at
+  +34.42, opens west into corridor.html (?from=stair-hall); from it he arrives on the bay.
 - Grey light only: a cool sky light from above and a warm one from the floor, no torches drawn yet.
 -->
 <canvas id="c" tabindex="0" aria-label="A castle shell, greybox"></canvas>
@@ -125,8 +130,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=10"></script>
-<script src="castle-shell.js?v=1"></script>
+<script src="castle-model.js?v=12"></script>
+<script src="castle-shell.js?v=2"></script>
 <script>
 (function () {
 'use strict';
@@ -134,7 +139,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 var Q = new URLSearchParams(location.search);
 var PLACE = Q.get('place') || 'entrance-hall';
 /* each place's start on a plain load: the way he first comes in by */
-var STARTS = { 'entrance-hall': 'front-doors' };
+var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth' };
 
 var kit = window.castleFrame ? castleFrame({
   background: 0x0b0a09, fog: 0.012,
@@ -166,25 +171,70 @@ shell.places.forEach(function (p, pi) {
     scene.add(l);
   });
 });
+/* a well's floors above the ground: one more at the middle of each, 3.2 m over it, or the upper galleries go dark */
+var lit = {};
+shell.flights.forEach(function (f) {
+  var st = shell.stairs.filter(function (s) { return s.id === f.id; })[0], p = st && shell.places.filter(function (q) { return q.id === st.place; })[0];
+  if (!p || f.head.level - p.floor < 4 || lit[p.id + f.head.level]) return;
+  lit[p.id + f.head.level] = true;
+  var xs = p.poly.map(function (q) { return q[0]; }), ys = p.poly.map(function (q) { return q[1]; });
+  var l = new THREE.PointLight(0xffc98a, 0.8, 30, 1.6);
+  l.position.copy(shell.toLocal((Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2, (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2, f.head.level + 3.2));
+  scene.add(l);
+});
 
-/* standing and looking round (the dormitory's way, req 210's: a drag turns his head from where he stands) */
+/* standing and looking round (the dormitory's way, req 210's: a drag turns his head from where he stands). He walks
+   between stands on one floor by its landings, and up or down a flight from one end to the other (Godric's 12.1, the
+   stair hall's well); a thing on another floor waits until he has climbed to it. Back walks the same way down. */
 var HEAD_MAX = Math.PI / 3, HEAD_PITCH = 0.25;
-var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, lookTmp = new THREE.Vector3();
+var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
 var things = shell.doors.concat(shell.ways), tappables = things.map(function (d) { return d.mesh; });
+var trail = [START.pos.clone()];
 function thingOf(mesh) { return things.filter(function (d) { return d.mesh === mesh; })[0]; }
+function flightOf(mesh) { var id = mesh.userData.stair; return id ? shell.flights.filter(function (f) { return f.id === id; })[0] : null; }
 function headPose(pos, look) {
   pos.copy(here.pos);
   var d = here.look.clone().sub(here.pos), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
   look.set(pos.x + Math.sin(a) * Math.cos(el) * 10, pos.y + Math.sin(el) * 10, pos.z + Math.cos(a) * Math.cos(el) * 10);
 }
-function glideTo(s, done) {
-  var from = { pos: camera.position.clone(), look: lookTmp.clone() };
-  here = s; hy = hyT = hp = hpT = 0;
-  var to = { pos: new THREE.Vector3(), look: new THREE.Vector3() }; headPose(to.pos, to.look);
-  tween = { t: 0, dur: clamp(0.8 + from.pos.distanceTo(to.pos) * 0.08, 0.8, 2.6), from: from, to: to, done: done };
+function sameLevel(a, b) { return Math.abs(a - b) < 0.02; }
+function near(s) { return sameLevel(here.level, s.level) && Math.hypot(here.pos.x - s.pos.x, here.pos.z - s.pos.z) < 1.6; }
+function startLeg() {
+  var to = legs.shift(), from = { pos: camera.position.clone(), look: lookTmp.clone() }, dist = from.pos.distanceTo(to.pos);
+  tween = { t: 0, dur: to.fast ? clamp(0.3 + dist * 0.04, 0.3, 1.2) : clamp(0.8 + dist * 0.08, 0.8, 2.6), from: from, to: to };
 }
-function goTo(d) { if (here === d.stand) return; backBtn.hidden = false; glideTo(d.stand); }
-function goBack() { if (here === START) { hyT = hpT = 0; return; } backBtn.hidden = true; glideTo(START); }
+/* through eye points to a stand, each leg looking on along itself, the last as the stand looks */
+function walkTo(points, s, fast) {
+  legs = [];
+  var prev = camera.position.clone();
+  points.forEach(function (p, i) {
+    var dir = (i + 1 < points.length ? points[i + 1] : s.pos).clone().sub(p);
+    if (dir.lengthSq() < 1e-4) dir = p.clone().sub(prev);
+    legs.push({ pos: p.clone(), look: p.clone().add(dir.setLength(10)), fast: fast }); prev = p;
+  });
+  here = s; hy = hyT = hp = hpT = 0;
+  var fp = new THREE.Vector3(), fl = new THREE.Vector3(); headPose(fp, fl);
+  legs.push({ pos: fp, look: fl, fast: fast });
+  trail = trail.concat(points.map(function (p) { return p.clone(); }), [s.pos.clone()]);
+  for (var j = 0; j < trail.length - 1; j++) if (trail[j].distanceTo(s.pos) < 0.05) { trail = trail.slice(0, j + 1); break; }
+  backBtn.hidden = s === START;
+  startLeg();
+}
+/* to a stand on his own floor, by its landings; false if it is on another floor */
+function goStand(s) {
+  if (here === s) return true;
+  if (!sameLevel(here.level, s.level)) return false;
+  walkTo(shell.route(here.pos, s.pos, s.level) || [], s);
+  return true;
+}
+/* a flight: at one end, a tap takes him to the other; on the floor of an end, to that end first (two taps, §6) */
+function useFlight(f) {
+  if (near(f.foot)) { walkTo([f.footPt, f.headPt], f.head); return true; }
+  if (near(f.head)) { walkTo([f.headPt, f.footPt], f.foot); return true; }
+  return goStand(f.foot) || goStand(f.head);
+}
+function goTo(d) { return goStand(d.stand); }
+function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(trail.slice(1, -1).reverse(), START, true); }
 
 /* a shut door answers: it shakes on its latch, and the hooks hear of it (the events' lines, t1's polite doors) */
 var shakes = [];
@@ -202,7 +252,8 @@ function updateShakes(dt) {
 }
 function through(d) {
   if (hooks.onWay) hooks.onWay({ id: d.id, to: d.to, place: d.place });
-  kit.travel('shell.html?place=' + encodeURIComponent(d.to) + '&from=' + encodeURIComponent(PLACE));
+  /* a built room has its own page (the bay's mouth to corridor.html); a way still a shell, this page */
+  kit.travel((d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE));
 }
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
@@ -212,11 +263,13 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
-  var d = hits.length && tappables.indexOf(hits[0].object) >= 0 ? thingOf(hits[0].object) : null, wasStand = here !== START;
-  if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d); }
-  else if (d) goTo(d);
-  else goBack();
-  kit.tapped(!!d || wasStand);
+  var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
+  var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
+  if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d); acted = true; }
+  else if (d) acted = goTo(d);
+  else if (f) acted = useFlight(f);
+  else { goBack(); acted = wasStand; }
+  kit.tapped(acted);
 }
 
 function updateCamera(dt) {
@@ -225,7 +278,7 @@ function updateCamera(dt) {
     var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
     camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
     lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
-    if (tween.t >= tween.dur) { var dn = tween.done; tween = null; if (dn) dn(); }
+    if (tween.t >= tween.dur) { tween = null; if (legs.length) startLeg(); }
   } else {
     var s = Math.min(1, dt * 7);
     hy = lerp(hy, hyT, s); hp = lerp(hp, hpT, s);
@@ -274,8 +327,11 @@ var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
   stands: shell.stands.map(function (s) { return s.name; }) };
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
-  goTo: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; if (d) goTo(d); return !!d; },
-  stand: function () { return here.name; }, head: function () { return { yaw: hy, limit: HEAD_MAX }; },
+  goTo: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; return d ? goTo(d) : false; },
+  flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
+  flights: function () { return shell.flights.map(function (f) { return f.id; }); },
+  stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
+  head: function () { return { yaw: hy, limit: HEAD_MAX }; },
   answer: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; if (d) answer(d); return !!d; } };
 })();
 </script>
