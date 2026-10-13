@@ -360,6 +360,56 @@ function judgeAim(points, from, to, ease) {
   out.verdict = 'hit'; out.reason = 'hit';
   return out;
 }
+/* Expelliarmus, the swing and the point (CoS 11, the Duelling Club: Lockhart and Snape "swung their wands above their
+   heads and pointed them at their opponent; Snape cried: 'Expelliarmus!' There was a dazzling flash of scarlet light"):
+   the book's own stroke. One stroke that starts at the wand hand, swings up above it, then points straight from the
+   top of the swing at the thing to disarm. The point is judged as judgeAim judges a line, from the top of the swing.
+   points: the stroke, {x, y, t} in CSS pixels; from: { x, y, r } where the stroke starts (the wand hand); to: { x, y, r }
+   the opponent's wand hand, all px; ease: a name in DISARM_EASES or an ease of its own (start, straight, len, slack as
+   in AIM_EASES; lift: how far above the start the swing must rise, in from.r).
+   Returns { verdict: 'disarmed' | 'miss', reason ('disarmed', 'tap', 'off', 'flat', 'up', 'wiggly', 'short', 'away',
+   'wide'), lift (px the swing rose above the start), top ({ x, y } the swing's top, where the point begins: the
+   highest place the stroke turns 40 degrees or more, so a point aimed a little high still finds it), and the point's
+   off, allow, by, side, straight as judgeAim gives them }. 'flat': no swing above (pointed straight from the hand, or
+   pointed first and swung after); 'up': swung up and never pointed. */
+var DISARM_EASES = {
+  kind:   { start: 1.6, lift: 1.0, straight: 0.80, len: 1.5, slack: 1.5 },
+  fair:   { start: 1.3, lift: 1.5, straight: 0.87, len: 2.0, slack: 1.2 },
+  strict: { start: 1.0, lift: 2.0, straight: 0.93, len: 2.5, slack: 1.0 }
+};
+function judgeDisarm(points, from, to, ease) {
+  var e = typeof ease === 'object' ? ease : (DISARM_EASES[ease] || DISARM_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', lift: 0, top: null, off: 0, allow: 0, by: 0, side: '', straight: 0 };
+  if (!points || points.length < 2) return out;
+  var a = points[0], path = 0, i;
+  for (i = 1; i < points.length; i++) path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+  if (path < from.r * 0.5) return out;
+  if (Math.hypot(a.x - from.x, a.y - from.y) > e.start * from.r) { out.reason = 'off'; return out; }
+  /* the top of the swing is where the stroke turns: walk it in steps of a quarter reach and take the highest place
+     where it turns 40 degrees or more over half a reach either side */
+  var step = from.r * 0.25, q = [{ x: a.x, y: a.y }], left = 0, w = 2, k = -1, turn, d1, d2;
+  for (i = 1; i < points.length; i++) {
+    var p0 = points[i - 1], p1 = points[i], seg = Math.hypot(p1.x - p0.x, p1.y - p0.y), u = step - left;
+    while (seg > 0 && u <= seg) { q.push({ x: p0.x + (p1.x - p0.x) * u / seg, y: p0.y + (p1.y - p0.y) * u / seg }); u += step; }
+    left = seg - (u - step);
+  }
+  for (i = w; i < q.length - w; i++) {
+    d1 = Math.atan2(q[i].y - q[i - w].y, q[i].x - q[i - w].x); d2 = Math.atan2(q[i + w].y - q[i].y, q[i + w].x - q[i].x);
+    turn = Math.abs(Math.atan2(Math.sin(d2 - d1), Math.cos(d2 - d1)));
+    if (turn >= 40 * Math.PI / 180 && (k < 0 || q[i].y < q[k].y)) k = i;
+  }
+  var z = q[q.length - 1];
+  if (k < 0) {   /* no turn: one line, swung up and never pointed, or pointed with no swing */
+    out.lift = Math.round(a.y - Math.min(a.y, z.y));
+    out.reason = a.y - z.y > Math.abs(z.x - a.x) ? 'up' : 'flat'; return out; }
+  out.top = { x: q[k].x, y: q[k].y }; out.lift = Math.round(a.y - q[k].y);
+  if (out.lift < e.lift * from.r) { out.reason = 'flat'; return out; }
+  var j = judgeAim(q.slice(k), { x: out.top.x, y: out.top.y, r: from.r }, to, e);
+  out.off = j.off; out.allow = j.allow; out.by = j.by; out.side = j.side; out.straight = j.straight;
+  if (j.verdict !== 'hit') { out.reason = j.reason; return out; }
+  out.verdict = 'disarmed'; out.reason = 'disarmed';
+  return out;
+}
 /* Ferula, the coil (PoA 19: Lupin "tapped Ron's leg with his wand and muttered, 'Ferula.' Bandages spun up Ron's leg,
    strapping it tightly to a splint"). The book's is the tap; the stroke after it is ours, for the geometry: a coil drawn
    up the leg from its foot to its top, side to side across it, each crossing there and back one turn of the bandage (a
@@ -1381,5 +1431,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
 })(typeof window !== 'undefined' ? window : globalThis);
