@@ -723,11 +723,11 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=11"></script>
+<script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=22"></script>
 <script src="charms/guide.js?v=1"></script>
-<script src="charms/spells.js?v=13"></script>
+<script src="charms/spells.js?v=27"></script>
 <script>
 (function () {
 'use strict';
@@ -3646,7 +3646,7 @@ function candleWick() {
 function candleTap() {
   if (candle.casting || candle.cast || !candleWaits() || !candle.mesh.visible || DESK_STOP.seat !== 1) return;
   if (!(castle && /^(evening|night)$/.test(castle.time()))) return;
-  var a = candle.casting = LumosSpells.castOver({ at: candleWick, wait: SPELL_WAIT_S });
+  var a = candle.casting = LumosSpells.castOver({ at: candleWick, wait: SPELL_WAIT_S, stray: strayTap });
   a.done.then(function (r) {
     candle.casting = null;
     if (r.verdict === 'cast') spellFirst('lumos', r);
@@ -6957,8 +6957,11 @@ function newestWritten(prefix) {
   for (var i = 0; i < w.length; i++) if (w[i].key.indexOf(prefix) === 0) return w[i];
   return null;
 }
+/* a stray tap while an offer waits (req 231; Godric, Q4, 13 October 2026, 7.13 am, option 4.1 with t1): one spark in
+   his house's colours where his finger lifted, the frame's (req 229), and nothing else; the offer keeps him at the stop */
+function strayTap(x, y) { if (kit && kit.spark) kit.spark(x, y, castle && castle.house ? castle.house() : null); }
 function lockSpell(at, stuck, then, gone, tapped) {
-  var a = LumosSpells.openLock({ at: at, stuck: stuck, wait: SPELL_WAIT_S });
+  var a = LumosSpells.openLock({ at: at, stuck: stuck, wait: SPELL_WAIT_S, stray: strayTap });
   if (tapped) a.tap();
   a.done.then(function (r) { gone(); then(r.verdict, r); });
   return a;
@@ -6980,7 +6983,7 @@ function percyNoteWords() { var w = newestWritten('locks.percy-note-'); return w
 /* Wood's blank notice, once drawn: three taps on the sheet (sheet: its box on the screen, a function) */
 function practiceNoticeSpell(sheet) {
   if (LOCKS.casting || LOCKS.notice !== 'blank' || !spellKnown('aparecium')) return false;
-  var a = LOCKS.casting = LumosSpells.revealInk({ sheet: sheet, wait: SPELL_WAIT_S });
+  var a = LOCKS.casting = LumosSpells.revealInk({ sheet: sheet, wait: SPELL_WAIT_S, stray: strayTap });
   a.done.then(function (r) {
     LOCKS.casting = null;
     if (r.verdict === 'revealed') { spellFirst('aparecium', r); if (castle) castle.moment('revealed notice practice'); }
