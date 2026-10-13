@@ -191,7 +191,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=21"></script>
+<script src="castle-events.js?v=22"></script>
 <script src="charms/guide.js?v=5"></script>
 <script src="charms/spells.js?v=11"></script>
 <script>
@@ -1690,8 +1690,9 @@ function doorSwings(sound) {
 /* Alohomora on it (req 154; Magic for the boys, *Alohomora in the castle*, B3, Godric's): once he has the spell, a tap
    on its lock offers Charms' turn (LumosSpells.openLock, stuck, so every turn answers 'nothing'), his tap already the
    book's tap; whatever his turn, the door huffs and stays shut. Manners open it, never a spell, and there is no handle.
-   The offer covers the page, so it goes by itself after LOCK_WAIT_S with no turn (the vocabulary's §9), on the clock */
-var LOCK_WAIT_S = 10, lockOffer = null, lockTimer = null, lockV = new THREE.Vector3();
+   The offer covers the page, so it goes by itself after LOCK_WAIT_S quiet seconds since his last touch (openLock's
+   wait, the vocabulary's §9; req 220), never midway through a turn */
+var LOCK_WAIT_S = 10, lockOffer = null, lockV = new THREE.Vector3();
 function lockAt(uv) { return uv && Math.hypot((uv.x - LOCK.u) * DOOR.w, (uv.y - LOCK.v) * DOOR.h) < LOCK.r; }
 function lockOnScreen() {
   door.updateMatrixWorld();
@@ -1705,15 +1706,22 @@ function lockOffered() {
   /* a giggle still showing gives way, so it never prints over the lock's face */
   lineQ = lineQ.filter(function (l) { return l.speaker !== 'door'; });
   if (lineCur && lineCur.line.speaker === 'door') lineCur.t = Math.min(lineCur.t, 0.35);
-  var mine = lockOffer = LumosSpells.openLock({ at: lockOnScreen, stuck: true });
+  var mine = lockOffer = LumosSpells.openLock({ at: lockOnScreen, stuck: true, wait: LOCK_WAIT_S });
   mine.tap();
-  lockTimer = setTimeout(function () { if (lockOffer === mine) mine.cancel(); }, LOCK_WAIT_S * 1000);
   mine.done.then(function (out) {
-    if (lockOffer === mine) { lockOffer = null; clearTimeout(lockTimer); }
+    if (lockOffer === mine) lockOffer = null;
+    firstCast(out, 'alohomora');   /* stuck, so never yet; kept should a lock here ever open */
     if (out.verdict !== 'cancelled') doorHuffs();
   });
 }
-function lockDrop() { if (lockOffer) { var o = lockOffer; lockOffer = null; clearTimeout(lockTimer); o.cancel(); } }
+function lockDrop() { if (lockOffer) { var o = lockOffer; lockOffer = null; o.cancel(); } }
+/* a spell's first true cast here, ever (Charms' `first`), raised for the house points (req 223, Events' req 216):
+   the moment 'first cast', with the built-in `spell` naming it in lower case while the moment runs */
+var castSpell = 'none';
+function firstCast(out, name) {
+  if (!out || !out.first || !castle || !castle.moment) return;
+  castSpell = name; castle.moment('first cast'); castSpell = 'none';
+}
 function doorHuffs() {
   doorShiver = { t: 0, amp: 0.02, f: 30 };   /* stiffer than the giggle: a jolt of offended wood */
   showLines([{ medium: 'heard', speaker: 'door', sound: 'a sniff, and a creak of offended wood', text: 'Well! Not so much as a please.' }]);
@@ -2455,6 +2463,7 @@ function humpOffered() {
   mine.tap();
   mine.done.then(function (out) {
     if (humpOffer === mine) humpOffer = null;
+    firstCast(out, 'dissendium');
     if (out && out.verdict === 'opened') witchHump();
   });
 }
@@ -3271,7 +3280,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; },   /* the polite door (req 150) */
     /* the full moon's owl (req 101, 104): no until the owl's flight cell is drawn (req 102), as the common room answers,
        so the record never sets owl_landed for the night with nothing shown (Fawkes, Q28, 11 October 2026) */
-    'moon in view': function () { return 'no'; } }
+    'moon in view': function () { return 'no'; },
+    spell: function () { return castSpell; } }
 }) : null;
 
 /* looking close (req 126 and 133, the Omnioculars earned by looking; castle.js's zoom): held at double or closer for a
@@ -3383,7 +3393,7 @@ window.lumosGreybox = { sheep: function () { return tapestrySheep; }, leanTorch:
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; },
+  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; }, offerLock: lockOffered, firstCast: firstCast,
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   /* her landing (req 178), for Charms' callable (req 163) and req 180: her card, her stop, the plinth and its back face */
