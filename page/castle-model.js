@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 13,
+  "version": 14,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -124,6 +124,12 @@ window.CASTLE_MODEL = {
       "state": "built", "cite": ""
     },
     {
+      "id": "corridor-cupboard", "name": "the broom cupboard on her corridor, locked, the old broom inside", "group": "gryffindor-suite", "level": "7",
+      "shape": { "rect": [-2.7, 13.66, -1.8, 14.86] }, "floor": 0, "ceiling": 2.4,
+      "about": "Godric's 1 on corridor-cupboard-place-1013 (13 October 2026, 6.55 pm; req 281, Magic's B18; the Architect's ledger, line 2): behind her long wall just before the fireside nook, past the second portrait; 1.2 m along the wall by 0.9 deep behind its 0.3 m wall, its door at its nook end, 0.25 m of wall left between it and the nook",
+      "state": "designed", "cite": ""
+    },
+    {
       "id": "study", "name": "Clementine's study, a turret corbelled out from the tower", "group": "gryffindor-suite", "level": "7",
       "shape": { "circle": [-3.27, 5.55], "r": 2.2, "clip": { "x_max": -1.8 } }, "wall": 0.35, "floor": 0, "ceiling": 3.0,
       "state": "designed", "cite": ""
@@ -215,6 +221,13 @@ window.CASTLE_MODEL = {
       "view": "the grounds", "state": "built", "cite": "" },
     { "id": "corridor-window-2", "kind": "window", "room": "corridor", "at": [1.95, 13.31], "w": 1.2, "sill": 0.9, "h": 2.4,
       "state": "built", "cite": "" },
+    { "id": "cupboard-door", "kind": "door, narrow, plain and locked", "between": ["corridor", "corridor-cupboard"], "at": [-1.5, 14.46], "w": 0.8, "h": 2.0,
+      "state": "designed", "about": "the corridor page's x -5.75 on her wall: 0.25 m clear of the second portrait's frame (x -5.1) and of the nook's mouth (x -6.4); Godric's 1 on corridor-cupboard-place-1013 (13 October 2026, 6.55 pm; ledger line 2)",
+      "cite": "" },
+    { "id": "landing-window", "kind": "window", "room": "corridor", "at": [1.95, 24.61], "w": 2.33, "sill": -1.08, "h": 4.8,
+      "view": "the lake", "state": "designed",
+      "about": "the lion window, Gryffindor's lion in scarlet and gold glass (req 29; the drawing's shape, 2.33 by 4.8 m), moved from the landing's far end to its south side wall, the castle's south face, centred on the landing (Godric's 1 on corridor-landing-end-1013, 13 October 2026, 6.55 pm; ledger line 1). Its sill 0.9 m above the landing's floor, which is 1.98 m below the corridor's (so -1.08 in the corridor's heights, +35.32 in the castle's); the landing's wall is 2.40 m long, so 3.5 cm of wall a side",
+      "cite": "" },
     { "id": "common-room-window-left", "kind": "window, a seat in a splayed reveal", "room": "common-room",
       "bearing": 17.2, "w": 1.2, "sill": 1.95, "h": 2.7, "cant": 6.9, "state": "built", "cite": "" },
     { "id": "common-room-window-right", "kind": "window, a seat in a splayed reveal", "room": "common-room",
@@ -251,7 +264,7 @@ window.CASTLE_MODEL = {
       "cite": "OotP 27" },
     { "id": "corridor-mouth", "kind": "open mouth, the Fat Lady's corridor's full section", "between": ["stair hall", "corridor"],
       "span": [[68, 0.45], [68, 3.45]], "sill": 34.42, "h": 6.48, "state": "designed",
-      "about": "the landing bay at +34.42 (the sixth moving flight's head) runs on west through the stair hall's wall into the corridor's landing (corridor-landing, x 65.6 to 68 in the castle's frame), the corridor's 3.0 m width and its ceiling (40.9) kept; corridor.html takes ?from=stair-hall",
+      "about": "the landing bay at +34.42 (the sixth moving flight's head) runs on west through the stair hall's wall into the corridor's landing (corridor-landing, x 65.6 to 68 in the castle's frame), the corridor's 3.0 m width and its ceiling (40.9) kept; corridor.html takes ?from=stair-hall. The landing's far end stands open to the bay, no end wall, the lion window moved to the landing's south side wall (landing-window; Godric's 1 on corridor-landing-end-1013, 13 October 2026, 6.55 pm; ledger line 1)",
       "cite": "PS 7, OotP 32; Godric's 12.1 (13 October 2026, 4.57 pm)" }
   ],
   "features": [
