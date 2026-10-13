@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 7,
+  "version": 8,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -19,11 +19,11 @@ window.CASTLE_MODEL = {
     "cite": "the author's grounds sketch (the southern approach over the lake, the front entrance at the north); PS 7, PS 8, HBP 24"
   },
   "grounds": [
-    {"id": "lake", "shape": {"poly": [[-20, -8], [180, -8], [215, -25], [300, -52], [380, -60], [425, -85], [450, -160], [470, -300], [500, -450], [450, -600], [250, -660], [0, -650], [-200, -600], [-290, -450], [-310, -250], [-280, -80], [-250, 30], [-200, 85], [-130, 95], [-80, 60], [-45, 20]]}, "state": "books", "about": "south under the cliff, its east arm round the south-east corner, a west bay", "cite": "PS 6, OotP 29, HBP 30; Godric's 4.1 (12 October 2026, 7.01 pm)"},
+    {"id": "lake", "shape": {"poly": [[-20, -8], [180, -8], [215, -25], [262, -40], [268, 0], [276, 36], [285, 66], [291, 82], [302, 84], [311, 77], [316, 52], [319, 18], [328, -16], [346, -46], [380, -60], [425, -85], [450, -160], [470, -300], [500, -450], [450, -600], [250, -660], [0, -650], [-200, -600], [-290, -450], [-310, -250], [-280, -80], [-250, 30], [-200, 85], [-130, 95], [-80, 60], [-45, 20]]}, "state": "books", "about": "south under the cliff, its east arm round the south-east corner, a west bay; an arm about 140 m long reaching north from the east shore to the beech, 46 m below the lawn in a glen (Godric's 225.1)", "cite": "PS 6, OotP 29, HBP 30; Godric's 4.1 (12 October 2026, 7.01 pm); Godric's 225.1 (13 October 2026, 10.55 am)"},
     {"id": "forbidden-forest", "shape": {"poly": [[300, 440], [330, 330], [362, 240], [400, 160], [425, 100], [432, 40], [425, -20], [440, -90], [470, -160], [490, -300], [640, -300], [640, 440]]}, "state": "books", "about": "from the north-east down the east side to the water", "cite": "PS 8, PS 9, HBP 30; Godric's 4.1 (12 October 2026, 7.01 pm)"},
-    {"id": "hagrids-cabin", "shape": {"point": [396.7, 64.5]}, "state": "books", "about": "on the forest's edge, 80 degrees and 360 m from Gryffindor Tower: into the April sunrise from the dormitory's W1; a pumpkin patch behind, a paddock by it", "cite": "PS 8, CoS 7, PoA 6, OotP 11, OotP 29, GoF 24; Godric's 4.1 (12 October 2026, 7.01 pm)"},
-    {"id": "beech", "shape": {"point": [308.1, -44.9]}, "state": "books", "about": "on the lake's edge, on W1's axis (100 degrees, 270 m); one worn patch of grass under it (Godric's t2)", "cite": "OotP 17, OotP 28, OotP 29; Godric's 4.1 (12 October 2026, 7.01 pm)"},
-    {"id": "whomping-willow", "shape": {"point": [285.0, 60.0]}, "state": "proposed", "about": "between the castle and the cabin", "cite": "CoS 5, PoA 17; Godric's 4.1 (12 October 2026, 7.01 pm)"},
+    {"id": "hagrids-cabin", "shape": {"point": [396.7, 64.5]}, "state": "books", "about": "on the forest's edge, 80 degrees and 360 m from Gryffindor Tower: into the April sunrise from the dormitory's W2, 9 degrees right of its axis (Godric's 225.1); a pumpkin patch behind, a paddock by it", "cite": "PS 8, CoS 7, PoA 6, OotP 11, OotP 29, GoF 24; Godric's 4.1 (12 October 2026, 7.01 pm)"},
+    {"id": "beech", "shape": {"point": [297.8, 89.0]}, "state": "books", "about": "at the head of the lake's arm, on its edge, on the dormitory's W2 axis, the window beside Neville's corner bed (71.2 degrees, 270 m from Gryffindor Tower); one worn patch of grass under it (Godric's t2)", "cite": "OotP 17, OotP 28, OotP 29, CoS 15; Godric's 4.1 (12 October 2026, 7.01 pm); Godric's 225.1 (13 October 2026, 10.55 am)"},
+    {"id": "whomping-willow", "shape": {"point": [255.0, 110.0]}, "state": "proposed", "about": "between the castle and the cabin, clear of the lake's arm, about 50 m north-west of the beech", "cite": "CoS 5, PoA 17; Godric's 4.1 (12 October 2026, 7.01 pm); Godric's 225.1 (13 October 2026, 10.55 am)"},
     {"id": "greenhouses", "shape": {"rects": [[200, 24, 236, 30], [200, 33, 236, 39], [200, 42, 236, 48], [200, 51, 236, 57]]}, "state": "proposed", "about": "across the vegetable patch at the castle's east end (\"behind the castle\")", "cite": "PS 8, CoS 6; Godric's 4.1 (12 October 2026, 7.01 pm)"},
     {"id": "vegetable-patch", "shape": {"rect": [166, 22, 194, 62]}, "state": "proposed", "about": "between the castle and the greenhouses", "cite": "CoS 6; Godric's 4.1 (12 October 2026, 7.01 pm)"},
     {"id": "quidditch-pitch", "shape": {"ellipse": [-120.0, 230.0, 27.5, 76]}, "state": "proposed", "about": "north-west, down the sloping lawns, opposite the forest", "cite": "CoS 7, OotP 19; Godric's 4.1 (12 October 2026, 7.01 pm)"},
