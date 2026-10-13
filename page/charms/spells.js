@@ -859,16 +859,29 @@ function judgePineapple(taps, desk, ease, want, now, beat) {
    Returns { verdict: 'frozen' | 'miss', reason ('frozen', 'tap', 'curved', 'none', 'missed'), caught [true, ...],
    off (each pixie's distance from the line, in its sizes), missed (the first pixie not caught, or -1), angle
    (degrees, the line's slope from the level), straight (end to end over path), bend (for three or more: how far the
-   middle ones sit off the line through the outer two, in sizes, 0 when they are exactly in a row) }. */
+   middle ones sit off the line through the outer two, in sizes, 0 when they are exactly in a row) }.
+   fix (optional, Four in a row, twenty-third session): [i, j], the two pixies that fix the line (two points fix a
+   line; the others must lie on it). It adds fixOff (each pixie's distance from the line through pixies i and j, in
+   its sizes, 0 for the two), onFix (how many lie within near of that line, the two included) and apart (the one
+   furthest off it among those not caught, or -1); and the miss 'apart': the stroke caught the two that fix the line,
+   but one or more of the others was off it at the lift (not yet in a row). Without fix nothing changes. */
 var FREEZE_EASES = {
   kind:   { straight: 0.90, near: 1.6, reach: 1.6 },
   fair:   { straight: 0.93, near: 1.25, reach: 1.2 },
   strict: { straight: 0.96, near: 0.95, reach: 0.9 }
 };
-function judgeFreeze(points, pixies, ease) {
+function judgeFreeze(points, pixies, ease, fix) {
   var e = typeof ease === 'object' ? ease : (FREEZE_EASES[ease] || FREEZE_EASES.kind);
   var out = { verdict: 'miss', reason: 'tap', caught: [], off: [], missed: -1, angle: 0, straight: 0, bend: 0 };
   var P = points || [], i, path = 0, r0 = pixies.length ? pixies[0].r : 10;
+  if (fix && pixies[fix[0]] && pixies[fix[1]]) {   /* the line the two fix, and how far each sits off it */
+    var F0 = pixies[fix[0]], F1 = pixies[fix[1]], fd = Math.hypot(F1.x - F0.x, F1.y - F0.y) || 1;
+    out.fixOff = []; out.onFix = 0; out.apart = -1;
+    for (i = 0; i < pixies.length; i++) {
+      var fo = Math.abs((F1.x - F0.x) * (F0.y - pixies[i].y) - (F0.x - pixies[i].x) * (F1.y - F0.y)) / fd / pixies[i].r;
+      out.fixOff.push(Math.round(fo * 100) / 100); if (fo <= e.near) out.onFix++;
+    }
+  }
   for (i = 1; i < P.length; i++) path += Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
   if (P.length < 2 || path < r0 * 2) return out;
   var a = P[0], b = P[P.length - 1], c = Math.hypot(b.x - a.x, b.y - a.y) || 1, u = { x: (b.x - a.x) / c, y: (b.y - a.y) / c };
@@ -890,7 +903,11 @@ function judgeFreeze(points, pixies, ease) {
   }
   if (out.straight < e.straight) { out.reason = 'curved'; return out; }
   if (!n) { out.reason = 'none'; return out; }
-  if (n < pixies.length) { out.reason = 'missed'; return out; }
+  if (n < pixies.length) {
+    if (out.fixOff && out.caught[fix[0]] && out.caught[fix[1]])   /* the two that fix it caught: the others off their line? */
+      for (i = 0; i < pixies.length; i++) if (!out.caught[i] && out.fixOff[i] > e.near && (out.apart < 0 || out.fixOff[i] > out.fixOff[out.apart])) out.apart = i;
+    out.reason = out.apart >= 0 ? 'apart' : 'missed'; return out;
+  }
   out.verdict = 'frozen'; out.reason = 'frozen';
   return out;
 }
