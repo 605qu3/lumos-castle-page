@@ -184,12 +184,12 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
   </div>
 </div>
 <button id="back" type="button" hidden>Back</button>
-<div id="help">Drag to look along the corridor. Tap her, a portrait, the armour, a window, the tapestry, the inglenook or the door to go to it; tap off it or Back to return. View switches to the stage view. The grey shapes are placeholders.</div>
+<div id="help">Drag to look around.</div>
 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=10"></script>
+<script src="castle.js?v=11"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=21"></script>
 <script src="charms/guide.js?v=5"></script>
@@ -2501,7 +2501,6 @@ function arriveFromRoom() {
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
-  if (!helpEl.hidden) helpEl.hidden = true;
   /* each tap tells the frame whether it did anything (req 149 and 150): one that found nothing gets the frame's mote
      of wand-light, and a double tap zooms only where its first tap did nothing; a glide under way is its answer */
   var said = function (acted) { if (kit.tapped) kit.tapped(acted); };

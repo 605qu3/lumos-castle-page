@@ -421,11 +421,30 @@ window.castleFrame = function (opts) {
     if (act === 'layers') setTint(!tintOn);
     else if (act === 'res') { pixelRatio = pixelRatio > 1 ? 1 : MAX_PR; updateResLabel(); resize(); }
     else if (act === 'exp') { expIndex = (expIndex + 1) % EXPOSURES.length; renderer.toneMappingExposure = EXPOSURES[expIndex]; updateExpLabel(); }
-    else if (act === 'help') helpEl.hidden = !helpEl.hidden;
+    else if (act === 'help') { clearTimeout(helpFade); helpEl.style.opacity = ''; helpEl.hidden = !helpEl.hidden; }
     else if (opts.onAct) opts.onAct(act);
   });
   updateResLabel(); updateExpLabel();
-  setTimeout(function () { helpEl.hidden = true; }, 9000);
+  /* the help line (req 203; David, Q2, 12 October 2026, 2.47 pm, with his t1): it stays until his first look-drag, then
+     fades by itself in about a second and never comes back in any room, as the Marauder's Map goes blank at "Mischief
+     managed!" (PoA 10); one stored flag; the knobs' ? still shows it on request, and a drag fades it again */
+  var DRAGGED = 'lumos.dragged', helpFade = null, helpDown = null;
+  function stored(set) {
+    try { if (set) localStorage.setItem(DRAGGED, '1'); return localStorage.getItem(DRAGGED) === '1'; } catch (err) { return !!set; }
+  }
+  function fadeHelp() {
+    stored(true);
+    if (helpEl.hidden || helpFade) return;
+    helpEl.style.transition = 'opacity 1s'; helpEl.style.opacity = '0';
+    helpFade = setTimeout(function () { helpFade = null; helpEl.hidden = true; helpEl.style.opacity = ''; }, 1000);
+  }
+  if (stored()) helpEl.hidden = true;
+  canvas.addEventListener('pointerdown', function (e) { helpDown = { id: e.pointerId, x: e.clientX, y: e.clientY }; });
+  canvas.addEventListener('pointermove', function (e) {
+    if (helpDown && helpDown.id === e.pointerId && Math.abs(e.clientX - helpDown.x) + Math.abs(e.clientY - helpDown.y) > 12) { helpDown = null; fadeHelp(); }
+  });
+  canvas.addEventListener('pointerup', function () { helpDown = null; });
+  canvas.addEventListener('pointercancel', function () { helpDown = null; });
 
   function resize() {
     var w = canvas.clientWidth, h = canvas.clientHeight;
