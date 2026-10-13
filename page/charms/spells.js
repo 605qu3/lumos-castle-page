@@ -353,6 +353,47 @@ function judgeSlide(points, at, cell, ease) {
   out.verdict = 'slide'; out.reason = 'slid';
   return out;
 }
+/* A start on the piece is its own square (req 256, the Common room, 13 October 2026). In a room drawn in perspective
+   the piece stands up off the floor, so a stroke begun on its seat reads, through the floor, a square or two behind it
+   and judgeSlide finds it off the piece. points: the stroke on the screen, {x, y, t}; foot: the piece's square on the
+   screen (where it meets the floor); toSq(p): the floor, screen px to squares; on(p): true where a screen point is on
+   the piece (or a boolean, the stroke began on it). Begun on it, the start is pinned to the foot and the end kept as
+   drawn (where he ends is the square he means), the pin let go along the stroke as the finger comes down to the floor,
+   three ways: over the whole stroke (a line, which stays a line, since the floor maps lines to lines), over an L's
+   second leg (its first drawn at the piece's height) or over its first (down to the floor, then along it); the first
+   reading that slides is taken, so the move is always the end's square from the piece's, and a stroke no reading
+   takes is judged as the whole one. A stroke that never leaves the piece is a drag of the piece itself, pinned all
+   the way, so it lands where it was (short), never read through the floor behind it. Begun off it, judgeSlide as it
+   was. Returns judgeSlide's answer, with pinned: 'line', 'late', 'early' or 'drag' when the start was pinned. */
+function slideFromPiece(points, foot, toSq, ease, on) {
+  function sq(ps) { return ps.map(function (p) { var q = toSq(p); return { x: q.x, y: q.y, t: p.t }; }); }
+  var at = toSq(foot), onIt = typeof on === 'function' ? on : function () { return !!on; };
+  if (!points || points.length < 2 || !onIt(points[0])) return judgeSlide(sq(points || []), at, 1, ease);
+  var a = points[0], b = points[points.length - 1], ox = foot.x - a.x, oy = foot.y - a.y, s = [0], path = 0, i;
+  for (i = 1; i < points.length; i++) { path += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y); s.push(path); }
+  var ways;
+  if (typeof on === 'function' && points.every(function (p) { return on(p); })) ways = [['drag', function () { return 1; }]];
+  else {
+    if (!path || Math.hypot(ox, oy) < 1) return judgeSlide(sq(points), at, 1, ease);
+    var cl = Math.hypot(b.x - a.x, b.y - a.y) || 1, best = -1, ci = 0;
+    for (i = 1; i < points.length - 1; i++) {   /* the corner, if it is an L: the point furthest from the chord */
+      var d = Math.abs((b.x - a.x) * (points[i].y - a.y) - (b.y - a.y) * (points[i].x - a.x)) / cl;
+      if (d > best) { best = d; ci = i; }
+    }
+    var sc = s[ci] / path;
+    ways = [['line', function (u) { return 1 - u; }]];
+    if (sc > 0.05 && sc < 0.95) ways.push(['late', function (u) { return u <= sc ? 1 : (1 - u) / (1 - sc); }],
+      ['early', function (u) { return u < sc ? 1 - u / sc : 0; }]);
+  }
+  var first = null;
+  for (i = 0; i < ways.length; i++) {
+    var f = ways[i][1], j = judgeSlide(sq(points.map(function (p, k) { var w = f(path ? s[k] / path : 0); return { x: p.x + ox * w, y: p.y + oy * w, t: p.t }; })), at, 1, ease);
+    j.pinned = ways[i][0];
+    if (j.verdict === 'slide') return j;
+    if (!first) first = j;
+  }
+  return first;
+}
 /* Waddiwasi, the aim (PoA 7: Lupin "raised the wand to shoulder height, said 'Waddiwasi!' and pointed it at Peeves",
    and the wad of gum "shot out of the keyhole and straight down Peeves's left nostril"). The book's is a point at the
    target and a straight flight; the stroke is ours, for the geometry: one straight line drawn from the thing (the gum)
@@ -2077,6 +2118,9 @@ function openHump(opts) {
                   perspective passes its own); or cell: a square's side in CSS px for a flat floor seen from above
                   (0.1 of the screen's short side by default), the squares' corners on whole multiples of it,
            reach: the piece's tap reach in px (0.12 of the short side), word: true (default) or false,
+           onPiece: optional function (p) true where the screen point is on the piece as drawn (the room's own hit),
+                  so a stroke begun anywhere on it, its seat or its back, starts from its square (req 256); without it,
+                  within the reach of its foot, and with a room's floor also of the point a reach above (it stands up),
            want: optional { dx, dy }, the move the room asks for: the traced guide draws it (guide.js, if the room
                   loads it) and the answer says `right`,
            blocked: optional function (dx, dy) returning what is in the way ('the table', 'the wall') or null,
@@ -2115,7 +2159,11 @@ function moveThing(opts) {
     if (cy < 70) cy = c.y + reach * 1.25;
     card = { x: Math.max(8, Math.min(L.W - w - 8, c.x - w / 2)), y: Math.max(8, Math.min(L.H - hh - 8, cy)), w: w, h: hh, fs: fs };
   }
-  function onPiece(p) { return Math.hypot(p.x - c.x, p.y - c.y) <= reach; }
+  function onPiece(p) {
+    if (Math.hypot(p.x - c.x, p.y - c.y) <= reach) return true;
+    if (opts.onPiece) return !!opts.onPiece(p);
+    return !!opts.floor && Math.hypot(p.x - c.x, p.y - c.y + reach) <= reach;   /* a piece in a room stands up off its square */
+  }
   function onCard(p) { return card && p.x >= card.x - 6 && p.x <= card.x + card.w + 6 && p.y >= card.y - 6 && p.y <= card.y + card.h + 6; }
   function wantEnd() { var f = toSq(c); return toScr({ x: f.x + opts.want.dx, y: f.y + opts.want.dy }); }
   var gparts = [];   /* guide.js keeps its spec in its own closure: the parts are refilled in place */
@@ -2134,7 +2182,7 @@ function moveThing(opts) {
   function sayIt() { if (stage !== 'word') return; said = root.performance.now(); stage = 'slide'; if (opts.onWord) opts.onWord(); }
   function judge(pts) {   /* also the way in for checks */
     if (stage !== 'slide') return null;
-    var at = toSq(c), j = judgeSlide(pts.map(function (p) { var q = toSq(p); return { x: q.x, y: q.y, t: p.t }; }), at, 1, ease);
+    var j = slideFromPiece(pts, c, toSq, ease, (opts.floor || opts.onPiece) ? onPiece : false);
     if (j.reason === 'tap') { if (guide) guide.clear(); return null; }
     var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null, traced = !!(tr && tr.traced);
     if (traced && j.verdict !== 'slide' && j.reason !== 'off') { j.verdict = 'slide'; j.dx = opts.want.dx; j.dy = opts.want.dy; j.shape = 'line'; }
@@ -2267,5 +2315,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
