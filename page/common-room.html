@@ -688,7 +688,7 @@ var TILES = {
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=21"></script>
 <script src="charms/guide.js?v=1"></script>
-<script src="charms/spells.js?v=9"></script>
+<script src="charms/spells.js?v=13"></script>
 <script>
 (function () {
 'use strict';
@@ -2950,8 +2950,8 @@ var candle = (function () {   /* candle().spec is CANDLE, for shots */
    Charms (LumosSpells.learned('lumos'), kept on the device), the stub no longer lights itself as he sits: it waits for
    his flick. A tap on it at the desk after dark offers Charms' stroke over the wick (castOver: one flick up, the traced
    guide under it at his Charms stage, a tap ignored, a clear layer over the page until the stroke); cast, and it
-   catches as t1's does; missed, a wisp of smoke and it waits for another tap; left alone 8 s, the offer goes, since
-   the layer would hold Back. Getting up puts it out and cancels any offer. Before he has learned it, t1 stands. */
+   catches as t1's does; missed, a wisp of smoke and it waits for another tap; left SPELL_WAIT_S with no finger on it,
+   the offer goes, since the layer would hold Back (req 219: Charms' `wait`, quiet seconds, never a timer mid-stroke). Getting up puts it out and cancels any offer. Before he has learned it, t1 stands. */
 function candleWaits() { return !!(window.LumosSpells && LumosSpells.learned('lumos')); }
 function candleWick() {
   var v = candle.mesh.localToWorld(new THREE.Vector3((CANDLE.wick[0] - 0.5) * CANDLE.w, (0.5 - CANDLE.wick[1]) * CANDLE.h, 0));
@@ -2962,12 +2962,11 @@ function candleWick() {
 function candleTap() {
   if (candle.casting || candle.cast || !candleWaits() || !candle.mesh.visible || DESK_STOP.seat !== 1) return;
   if (!(castle && /^(evening|night)$/.test(castle.time()))) return;
-  var a = candle.casting = LumosSpells.castOver({ at: candleWick });
-  var idle = setTimeout(function () { a.cancel(); }, 8000);
+  var a = candle.casting = LumosSpells.castOver({ at: candleWick, wait: SPELL_WAIT_S });
   a.done.then(function (r) {
-    clearTimeout(idle); candle.casting = null;
+    candle.casting = null;
     if (r.verdict === 'cast' && DESK_STOP.seat === 1) candle.cast = true;
-    else if (r.verdict === 'missed') candle.snuff = 1.6;
+    else if (r.verdict === 'missed') { candle.snuff = 1.6; spellWhy('candle', r); }
   });
 }
 function updateCandle(dt) {
@@ -6030,7 +6029,17 @@ function updateDen(dt) {
    (req 143) and Wood's blank notice (req 144) are not drawn yet: their states are read here and their spells are
    ready to call, raising 'opened percy drawer' and 'revealed notice practice', but nothing in the room offers them
    until the drawer's keyhole and the blank sheet exist, with Godric's yes on each drawing. Each spell is offered only
-   once a boy has learned it on the Charms page, and goes after 10 s left alone, since its layer holds Back. */
+   once a boy has learned it on the Charms page, and goes after SPELL_WAIT_S with no finger on it, since its layer holds
+   Back. Req 219 (Interaction's review of the spells, req 214, break 2 and differences 3 and 4): one quiet wait for every
+   offer here, as the corridor's hump (12 s); the drawer's offering tap is the book's own tap (a.tap(), the corridor's
+   door), so its turn comes at once; a miss answers: the drawer rattles in words, and the drawer and the notice say the
+   Charms page's kind words when the callable gives them (`why`, req 218). The little door's offer is not passed on: his
+   tap there is on the leaf, and a tap on its keyhole walks him to the keyhole's stop. */
+var SPELL_WAIT_S = 12;
+function spellWhy(speaker, r) {
+  var w = r && r.why;
+  if (w) lineQ.push({ medium: 'heard', speaker: speaker, sound: Array.isArray(w) ? w[w.length - 1] : w });
+}
 var LOCK_RULES = {
   firework: "Percy's drawer standing open on the Fanged Frisbee, the pack of Exploding Snap and a Filibuster firework",
   gobstones: "Percy's drawer standing open on the Fanged Frisbee, the pack of Exploding Snap and Percy's Gobstones",
@@ -6060,26 +6069,35 @@ function newestWritten(prefix) {
   for (var i = 0; i < w.length; i++) if (w[i].key.indexOf(prefix) === 0) return w[i];
   return null;
 }
-function lockSpell(at, stuck, then, gone) {
-  var a = LumosSpells.openLock({ at: at, stuck: stuck });
-  var idle = setTimeout(function () { a.cancel(); }, 10000);
-  a.done.then(function (r) { clearTimeout(idle); gone(); then(r.verdict); });
+function lockSpell(at, stuck, then, gone, tapped) {
+  var a = LumosSpells.openLock({ at: at, stuck: stuck, wait: SPELL_WAIT_S });
+  if (tapped) a.tap();
+  a.done.then(function (r) { gone(); then(r.verdict, r); });
   return a;
 }
-/* Percy's drawer, once drawn: a tap on its keyhole (at: its point on the screen, a function) */
-function percyDrawerSpell(at) {
+/* Percy's drawer, once drawn: a tap on its keyhole (at: its point on the screen, a function; from: the drawer in the
+   room, for its rattle's words) */
+function percyDrawerSpell(at, from) {
   if (LOCKS.casting || LOCKS.drawer || !spellKnown('alohomora')) return false;
-  LOCKS.casting = lockSpell(at, false, function (v) { if (v === 'opened' && castle) castle.moment('opened percy drawer'); },
-    function () { LOCKS.casting = null; });
+  LOCKS.casting = lockSpell(at, false, function (v, r) {
+    if (v === 'opened') { if (castle) castle.moment('opened percy drawer'); return; }
+    if (v !== 'tight' && v !== 'missed') return;
+    if (from) HEARD_FROM['percy drawer'] = from.clone();
+    lineQ.unshift({ medium: 'heard', speaker: 'percy drawer', sound: 'rattle, rattle' });
+    spellWhy('percy drawer', r);
+  }, function () { LOCKS.casting = null; }, true);
   return true;
 }
 function percyNoteWords() { var w = newestWritten('locks.percy-note-'); return w && w.text; }
 /* Wood's blank notice, once drawn: three taps on the sheet (sheet: its box on the screen, a function) */
 function practiceNoticeSpell(sheet) {
   if (LOCKS.casting || LOCKS.notice !== 'blank' || !spellKnown('aparecium')) return false;
-  var a = LOCKS.casting = LumosSpells.revealInk({ sheet: sheet });
-  var idle = setTimeout(function () { a.cancel(); }, 10000);
-  a.done.then(function (r) { clearTimeout(idle); LOCKS.casting = null; if (r.verdict === 'revealed' && castle) castle.moment('revealed notice practice'); });
+  var a = LOCKS.casting = LumosSpells.revealInk({ sheet: sheet, wait: SPELL_WAIT_S });
+  a.done.then(function (r) {
+    LOCKS.casting = null;
+    if (r.verdict === 'revealed') { if (castle) castle.moment('revealed notice practice'); }
+    else if (r.verdict === 'missed') spellWhy('notice', r);          /* it stays blank, and the page's words say why */
+  });
   return true;
 }
 function practiceNoticeWords() { var w = newestWritten('notice.practice-'); return w && w.text; }
@@ -6353,7 +6371,7 @@ function tapName(o) {
   return null;
 }
 function tap(cx, cy) {
-  if (!helpEl.hidden) helpEl.hidden = true;
+  /* a tap leaves the help line; only his first look-drag fades it, the kit's (req 203, 204) */
   if (tween) return;
   var r = tapDo(cx, cy);
   if (r.name && castle) castle.tap(r.name);
