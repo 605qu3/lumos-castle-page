@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=19"></script>
+<script src="spells.js?v=37"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* The Cheering Charm, a test page for the Charms lane (13 October 2026, eighteenth session; the owner is Godric).
@@ -40,7 +40,11 @@
    and the geometry is drawn: the line it flips over, dashed, the frown's ghost above and the smile below, the same
    depth marked on each. Far too deep and the sitter is in fits, as Ron was. Three rounds: Flitwick's lesson (the guide
    the flipped arc), The wide frown (no guide: a wider mouth, the same depth, so a flatter curve from a bigger circle)
-   and The exam (not too much). ?round=1..3, ?ease= for trying; window.lumosCheer for checks. */
+   and The exam (not too much). ?round=1..3, ?ease= for trying; window.lumosCheer for checks.
+   Q9's fix 5 (thirty-eighth session, 13 October 2026; "as deep and as wide" by eye was too hard): corner to corner, the
+   mirror does the depth. The mouth's two corners glow; LumosSpells.judgeSmile reads a stroke begun at one and ended at
+   the other, any bow downward from a third of the frown's depth to the exam's overdoing, deepest in the middle half;
+   then his line slides into the true smile, the frown mirrored over the line through the corners, exactly as deep. */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -123,7 +127,7 @@
   /* ---- the cast: one stroke ---- */
   function judge(pts) {
     if (wait || done || fits) return null;
-    var j = LumosSpells.judgeCheer(pts, mouth, ease), now = performance.now();
+    var j = LumosSpells.judgeSmile(pts, mouth, ease), now = performance.now();
     var lv = guides.length ? guides[0].level() : 0, sc = lv ? guides[0].score(pts) : null;
     /* traced along the guide, only a wobble is forgiven: the guide's reach is wide beside so small a mouth, and a
        tilted, narrow or crooked smile can still cover it */
@@ -141,9 +145,10 @@
     if (j.verdict !== 'cheered') {
       guides.forEach(function (g) { g.miss(); }); misses++;
       trail = { pts: pts, at: now };
-      shown = ['glum', 'flat', 'tilted', 'lopsided'].indexOf(j.reason) >= 0 ? { pts: pts, at: now, j: j } : null;
+      shown = ['glum', 'flat', 'corners', 'lopsided'].indexOf(j.reason) >= 0 ? { pts: pts, at: now, j: j } : null;
       var words = {
         tap: 'Draw a smile: from one corner of the mouth to the other, curving down.',
+        corners: 'Start on one <b>glowing corner</b> of the mouth and end on the other: the corners hold the smile in place.',
         wiggly: 'Smoother: one curve, like the frown, only the other way up.',
         off: 'On the mouth: start at one corner and end at the other.',
         narrow: 'Wider: right out to both corners of the mouth.',
@@ -158,13 +163,13 @@
     }
     /* cheered: the sitter grins, then the geometry */
     guides.forEach(function (g) { g.hit(lv > 0); });
-    cheer = { at: now, sag: Math.max(mouth.depth * 0.5, Math.min(j.sagitta, mouth.depth * 2.4)), r: j.radius, chord: j.chord };
+    cheer = { at: now, sag: mouth.depth, r: j.radius, chord: j.chord, pts: pts };   /* the mirror does the depth: the true smile */
     chime(); LumosSpells.learn('cheering');
     var times = Math.round(j.ratio * 10) / 10;
     if (round === 0) {
       say('<b>Cheered!</b> He is grinning broadly, with "a feeling of great contentment", like Flitwick\'s whole class in the book.');
       wait = setTimeout(function () { wait = null;
-        say('Your smile is his frown flipped over the dotted line: <b>a reflection</b>. Corner to corner, and ' + (times === 1 ? 'just as deep' : times + ' times as deep') + ' down as the frown was up.');
+        say('His smile is the frown flipped over the dotted line: <b>a reflection</b>. The mirror makes it exactly as deep, corner to corner: ' + (times === 1 ? 'yours was just as deep.' : 'yours was ' + times + ' of it.'));
         wait = setTimeout(function () { wait = null; choose(1); }, 6500); }, 4200);
     } else if (round === 1) {
       say('<b>Cheered!</b> A wider mouth, the same depth: <b>a flatter curve</b>. It is part of a bigger circle; the dashed one is all of it.');
@@ -252,8 +257,37 @@
     label(m.x, m.y + m.depth + S * 0.05, 'the frown, flipped', '#f3d27a');
     cx.restore();
   }
+  function corners(now) {   /* the two corners, glowing: begin at one, end at the other */
+    if (cheer || fits || done) return;
+    var m = mouth, p = 0.5 + 0.5 * Math.sin(now / 380), rr = Math.max(7, m.w * 0.3);
+    [-1, 1].forEach(function (sd) {
+      var x = m.x + sd * m.w, g = cx.createRadialGradient(x, m.y, 0, x, m.y, rr);
+      g.addColorStop(0, 'rgba(243,210,122,' + (0.55 + 0.3 * p) + ')'); g.addColorStop(1, 'rgba(243,210,122,0)');
+      cx.fillStyle = g; cx.beginPath(); cx.arc(x, m.y, rr, 0, 7); cx.fill();
+      cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(x, m.y, 3.5, 0, 7); cx.fill();
+    });
+  }
+  function slide(now) {   /* once cheered, his line slides into the true smile from the corners */
+    var t = cheer && cheer.pts ? now - cheer.at : -1;
+    if (t < 0 || t > 1300) return;
+    var P = cheer.pts.slice(), N = 40, i, k = 0, L = [0];
+    if (P[P.length - 1].x < P[0].x) P.reverse();
+    for (i = 1; i < P.length; i++) L.push(L[i - 1] + Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y));
+    var f = Math.min(1, Math.max(0, (t - 250) / 750)); f = f * f * (3 - 2 * f);
+    cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.lineWidth = 5;
+    cx.strokeStyle = 'rgba(243,210,122,' + (t > 1000 ? (1300 - t) / 300 : 1) * 0.85 + ')'; cx.beginPath();
+    for (i = 0; i <= N; i++) {
+      var want = L[L.length - 1] * i / N; while (k < L.length - 2 && L[k + 1] < want) k++;
+      var u = L[k + 1] > L[k] ? (want - L[k]) / (L[k + 1] - L[k]) : 0, q = { x: P[k].x + u * (P[k + 1].x - P[k].x), y: P[k].y + u * (P[k + 1].y - P[k].y) };
+      var c = -1 + 2 * i / N, tx = mouth.x + c * mouth.w, ty = mouth.y + mouth.depth * (1 - c * c);
+      var x = q.x + (tx - q.x) * f, y = q.y + (ty - q.y) * f; i ? cx.lineTo(x, y) : cx.moveTo(x, y);
+    }
+    cx.stroke(); cx.restore();
+  }
   function frame(now) {
     drawPortrait(now);
+    corners(now);
+    slide(now);
     drawGeometry(now);
     drawShown(now);
     var showing = shown && now >= shown.at && now - shown.at <= 4000;   /* its label sits where the guide's would */

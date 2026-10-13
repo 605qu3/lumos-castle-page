@@ -1020,11 +1020,12 @@ function judgeBind(strokes, fig, ease) {
    'glum', 'lopsided', 'fits'), chord (px, corner to corner as drawn), sagitta (px, + bowed down, a smile), ratio (the
    sagitta over the frown's depth), radius (px, of the arc through the corners and the deepest point: a wider smile of
    the same depth is a flatter arc), tilt (degrees, + its right end lower), at (where the deepest point falls along the
-   line, 0 to 1) }. */
+   line, 0 to 1) }. judgeSmile (Q9's fix 5, below) also reads reach (how near a corner the stroke must begin and end,
+   in half widths) and least (the least bow, a share of the frown's depth); this judge reads neither. */
 var CHEER_EASES = {
-  kind:   { off: 0.45, width: 0.40, level: 16, wiggle: 1.30, flat: 0.40, over: 2.4, mid: 0.24 },
-  fair:   { off: 0.35, width: 0.30, level: 12, wiggle: 1.22, flat: 0.55, over: 2.0, mid: 0.18 },
-  strict: { off: 0.25, width: 0.22, level: 8,  wiggle: 1.15, flat: 0.70, over: 1.6, mid: 0.13 }
+  kind:   { off: 0.45, width: 0.40, level: 16, wiggle: 1.30, flat: 0.40, over: 2.4, mid: 0.24, reach: 0.35, least: 0.33 },
+  fair:   { off: 0.35, width: 0.30, level: 12, wiggle: 1.22, flat: 0.55, over: 2.0, mid: 0.18, reach: 0.28, least: 0.4 },
+  strict: { off: 0.25, width: 0.22, level: 8,  wiggle: 1.15, flat: 0.70, over: 1.6, mid: 0.13, reach: 0.22, least: 0.5 }
 };
 function judgeCheer(points, mouth, ease) {
   var e = typeof ease === 'object' ? ease : (CHEER_EASES[ease] || CHEER_EASES.kind);
@@ -1059,6 +1060,38 @@ function judgeCheer(points, mouth, ease) {
   if (s > e.over * mouth.depth) { out.reason = 'fits'; return out; }
   out.verdict = 'cheered'; out.reason = 'cheered';
   return out;
+}
+/* The Cheering Charm, corner to corner (Q9's fix 5; David tried the spells, 13 October 2026, 5.05 pm: the frown flipped
+   "as deep and as wide" by eye was too hard). judgeSmile(points, mouth, ease) takes judgeCheer's arguments and returns
+   its fields, plus ends ([the start's and the end's distance from the corner each is nearest, in half widths]). The
+   mouth's two corners are targets: a stroke begun within reach of one and ended within reach of the other, either way
+   round, is read corner to corner, so the corners fix the line (as the three friends fix the bluebell ring) and 'off',
+   'narrow', 'wide' and 'tilted' fall away; begun or ended away from them is 'corners'. Then any bow downward from least
+   of the frown's depth to the exam's overdoing is cheered, its deepest point anywhere in the middle half ('lopsided'
+   only past that); 'wiggly', 'glum', 'flat' and 'fits' as before, wiggle and over at kind's at every ease. The page
+   then draws the true smile from the corners: the mirror makes it exactly as deep. The old judge stays as it was. */
+function judgeSmile(points, mouth, ease) {
+  var e = typeof ease === 'object' ? ease : (CHEER_EASES[ease] || CHEER_EASES.kind), o = {}, k;
+  for (k in e) o[k] = e[k];
+  o.off = Infinity; o.width = Infinity; o.level = 180; o.flat = 0; o.mid = 0.5;
+  o.wiggle = CHEER_EASES.kind.wiggle; o.over = Infinity;
+  var v = judgeCheer(points, mouth, o);   /* only 'tap' and 'wiggly' can miss with these */
+  v.ends = [];
+  if (v.reason === 'tap' || v.reason === 'wiggly') return v;
+  var P = points, a = P[0], b = P[P.length - 1], L = { x: mouth.x - mouth.w, y: mouth.y }, R = { x: mouth.x + mouth.w, y: mouth.y };
+  function d(p, q) { return Math.hypot(p.x - q.x, p.y - q.y) / mouth.w; }
+  var lr = Math.max(d(a, L), d(b, R)), rl = Math.max(d(a, R), d(b, L));
+  v.ends = lr <= rl ? [d(a, L), d(b, R)] : [d(a, R), d(b, L)];
+  v.ends = v.ends.map(function (x) { return Math.round(x * 100) / 100; });
+  v.verdict = 'miss';
+  if (Math.min(lr, rl) > e.reach) { v.reason = 'corners'; return v; }
+  var as = Math.abs(v.sagitta);
+  if (as < e.least * mouth.depth) { v.reason = 'flat'; return v; }
+  if (v.sagitta < 0) { v.reason = 'glum'; return v; }
+  if (Math.abs(v.at - 0.5) > 0.25) { v.reason = 'lopsided'; return v; }
+  if (v.sagitta > CHEER_EASES.kind.over * mouth.depth) { v.reason = 'fits'; return v; }
+  v.verdict = 'cheered'; v.reason = 'cheered';
+  return v;
 }
 /* The pineapple's tap dance (PS 16: Flitwick "called them one by one into his class to see if they could make a pineapple
    tapdance across a desk"). The book gives no motion; the taps are ours, for the geometry: equal steps across a length,
@@ -2469,5 +2502,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, judgeLoop: judgeLoop, offLine: offLine, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, judgeSmile: judgeSmile, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, judgeLoop: judgeLoop, offLine: offLine, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
