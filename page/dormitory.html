@@ -128,18 +128,21 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 - The same tower as the common room, 11.2 m across inside: the common room's stair rises with its newel 4.9 m from the
   centre, so a smaller tapered room would put the stair in a turret, which lost in the common room. The frame is the
   common room's (x right, z toward the eye, the hearth axis at -z) so the stair head sits where the room's stair rises,
-  and y is up from this floor, which stands 7.4 m above the common room's (its ceiling 7 m and a 0.4 m floor; this
-  lane's assumption). The ceiling here is 4.5 m.
+  and y is up from this floor, which stands 27.8 m above the common room's: the seventh room up the boys' stair, the
+  top one, the other years' rooms below it (Godric's 235.1, 13 October 2026; page/castle-model.js version 9 holds the
+  tower's numbers). The ceiling here is 4.5 m.
 - Plan A: a low hearth at the centre of the view, on the common room's own flue, the fireplace drawing reused at 2.0 m
   wide (nothing spent). The books this lane can cite are silent on a dormitory fire; the Occlumency script has the fire
   low; so it is an invention under LDP-98, recorded as such. Lost: plan B, no hearth and the moonlit window at the
   centre, the night light the moon and candles only.
 - Five four-posters radial, heads to the wall, at 24 and 53 degrees each side of the hearth and a fifth at 82 left; a
-  trunk at each foot (verify the chapter). His bed is the inner right one, nearest the stair.
+  trunk at each foot (CoS 5: "stood at the ends of their beds"). His bed is the inner right one, nearest the stair.
 - Three high narrow windows, 0.6 by 1.9 m with sills 1.1 m up: W3 beside his bed, the one he goes to at night, looks
-  down on the moonlit lawn with the castle's roofs and shadows below (PA 15); W1 on the left looks where the common
-  room's left window does, a floor higher, Hagrid's hut and the forest edge (PA 6); W2, further left and opened by a
-  drag, looks along the castle to the lake and the mountains (invention). No direction is ever named in the app's voice.
+  down on the moonlit lawn with the castle's roofs and shadows below (PA 15), the crag's edge and the lake far below;
+  W2, beside Neville's corner bed and opened by a drag, looks straight at the beech at the head of the lake's arm with
+  Hagrid's cabin just right of it, into the morning sun (OotP 29; Godric's 225.1); W1 looks to the forest and the
+  mountains at dawn. The windows' heights and bearings are page/castle-model.js's (version 9). No direction is ever
+  named in the app's voice.
 - The stair head: a well round the newel in the floor, the newel post rising 1.0 m above it, the top treads coming up
   clockwise seen from above with the last on the room side, a low kerb round the well open to the room.
 - The camera: the common room's, from the open side, the eye 1.35 m up and 1.4 m outside the wall, the drags 0.55 rad
@@ -318,9 +321,9 @@ BED_DEGS.forEach(function (deg, i) {
    drawings later), a deep sill */
 var WIN = { w: 0.6, h: 1.9, sill: 1.1 };
 var WINDOWS = [
-  { name: 'W1', deg: -38.5, view: "Hagrid's hut, the forest edge" },
-  { name: 'W2', deg: -67.5, view: 'the lake, the mountains' },
-  { name: 'W3', deg: 38.5, view: "the lawn, the castle's shadow" }
+  { name: 'W1', deg: -38.5, view: 'the forest, the mountains' },
+  { name: 'W2', deg: -67.5, view: "the beech, the lake's arm, Hagrid's hut" },
+  { name: 'W3', deg: 38.5, view: "the lawn, the castle's shadow, the lake below" }
 ];
 function skyTexture(w, h, name, view) {
   var c = makeCanvas(w, h), g = c.getContext('2d');
