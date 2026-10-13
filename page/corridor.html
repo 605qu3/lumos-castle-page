@@ -2727,6 +2727,31 @@ function arriveFromRoom() {
   kit.savePlace({ room: 'corridor', stop: 'her' });
   kit.reveal();
 }
+/* up from the stair hall (req 286; the Architect's model v12, Godric's 12.1): the sixth moving flight's head, the bay,
+   runs on west into the landing, so ?from=stair-hall sets him down on the landing at the flight's foot, as from the
+   moving stair, turned to look up the flight toward her. A stop of its own (no thing to tap): Back, a tap on the
+   flight or on nothing walks him up to the stair head, already facing her, so no turn on the way */
+var BAY_UP = { back: 0.3, up: 3 };   /* where he stands: a hand back from the first step, or that many steps up */
+var bayStop = { name: 'from-bay', meshes: [], stop: function () {
+  var x = BAY_UP.up ? FOOT_X + (BAY_UP.up + 0.5) * STEP_RUN : FOOT_X - BAY_UP.back, y = FOOT_Y + BAY_UP.up * STEP_RISE + EYE;
+  return { pos: new THREE.Vector3(x, y, MID_Z), look: new THREE.Vector3(END_X, HOLE_Y, MID_Z), fov: FOV_MAX };
+}, turn: function () { return 0.5; } };
+function arriveFromBay() {
+  var p = bayStop.stop();
+  atStop = bayStop; mode = 'stop'; backBtn.hidden = false;
+  camera.position.copy(p.pos); lookTmp.copy(p.look); setFov(p.fov);
+  stopPose = { pos: p.pos.clone(), look: p.look.clone() }; headReset();
+  kit.reveal();
+}
+/* and back down (req 286): at the landing's stop a tap on its far end goes down into the stair hall's bay, arriving
+   there (shell.html takes ?from=corridor). How the far end reads, the model's open mouth against the landing's window
+   and the stair's other places, waits on Godric; until then the end is drawn as before and only answers the tap.
+   Not on witch days, when the end gives way to her stretch */
+function downToBay() {
+  if (leaving) return;
+  leaving = true;
+  kit.travel('shell.html?place=stair-hall&from=corridor');
+}
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
@@ -2738,9 +2763,14 @@ function tap(cx, cy) {
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
-  var hits = raycaster.intersectObjects(tappables.filter(function (m) { return m.visible; }), false);
+  var hits = raycaster.intersectObjects(tappables.filter(function (m) {
+    return m.visible && (m !== wayDown || (atStop === landingStop && footShown !== 'witch'));
+  }), false);
   if (!hits.length) { said(mode === 'stop'); goBack(); return; }   /* at a stop, nothing takes him back */
+  if (hits[0].object === wayDown) { said(true); downToBay(); return; }   /* down into the stair hall (req 286) */
   var hit = hits[0].object.userData;
+  /* come up from the stair hall, a tap on the flight walks him on up it (req 286) */
+  if (atStop === bayStop && hit.thing === 'stair') { said(true); goBack(); return; }
   /* every tap on a thing is told to the runtime (the vocabulary's §10, req 150), before he moves, so the built-in `at`
      reads where he stood when he tapped */
   var tell = function (name) { if (castle && castle.visit()) castle.tap(name); };
@@ -2877,6 +2907,7 @@ canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 backBtn.addEventListener('click', goBack);
 setView(view);
 if (kit.from === 'room') arriveFromRoom();
+else if (kit.from === 'stair-hall') arriveFromBay();
 
 /* ---------- the events runtime (castle-events.js, board req 23) ----------
    Every chain loads (the records' `place` keeps each to its page), this page answers `at`, the stop he stands at, and
@@ -3180,6 +3211,12 @@ function updateLines(dt) {
    (req 68) until each is drawn (this lane's choice, which req 59 and req 68 leave to it), and the page notes which
    place the state names. */
 var landingStop = STOPS.filter(function (s) { return s.name === 'landing'; })[0];
+/* the landing's far end as a tap target only (req 286, downToBay): unseen, the corridor's section, a hand off the end */
+var wayDown = new THREE.Mesh(new THREE.PlaneGeometry(WIDTH, C.CEIL), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+wayDown.rotation.y = Math.PI / 2;
+wayDown.position.set(FAR_END_X + 0.05, FOOT_Y + C.CEIL / 2, MID_Z);
+wayDown.name = 'way-down'; scene.add(wayDown);
+tappables.push(wayDown);
 function vanishingStep() {
   var w = window.CastleEvents && CastleEvents.week ? CastleEvents.week() : 0;
   return 2 + ((w % (STEPS - 3)) + (STEPS - 3)) % (STEPS - 3);       /* steps 2 to 9 of 11, counted from the top */
