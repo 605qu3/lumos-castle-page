@@ -942,6 +942,62 @@ function updateNick(dt) {
   var left = nick.len - nick.d;
   nickMesh.material.opacity = 0.55 * Math.min(1, nick.d / 0.6, left / NICK.fade);   /* out of the wall, and away */
 }
+/* his head on its hinge (Fawkes's t1 on B22, Godric's 1; "He seized his left ear and pulled. His whole head swung off
+   his neck and fell onto his shoulder as if it was on a hinge", PS 7, read in the canon tool): in the bow that goes a
+   little too deep, the head tips slowly off his neck onto his shoulder, his light already round it, holds, comes back
+   up with a small cough, never a snap or a drop (Magic's note, the night rule). Cell 2, the deep bow, is cut in two at
+   the ruff's top on first use: the body with the head cleared, and the head alone on its own card, which turns about
+   the left side of his neck as we see it, so the head falls toward his left shoulder (pulled by the left ear). Pixels of the 472 by 740 cell, 400 to the metre */
+var NICK_HEAD = { cut: [[112, 70], [320, 70], [320, 204], [266, 207], [242, 214], [216, 219], [194, 212], [180, 198], [162, 174], [138, 160], [118, 148]],
+  pivot: [190, 208], tip: -1.05, up: 1.6, hold: 0.8, down: 1.4 };
+var nickHeadCut = null;
+function cutNickHead() {
+  var im = nickSheet.image;
+  if (!im || !im.width) return null;
+  var cw = im.width / 3, ch = im.height, s = cw / 472;
+  function shape(g) {
+    g.beginPath();
+    NICK_HEAD.cut.forEach(function (p, i) { g[i ? 'lineTo' : 'moveTo'](p[0] * s, p[1] * s); });
+    g.closePath();
+  }
+  function mask(grow) {   /* the head's shape, softened; the head's own a little over the cut, so no seam */
+    var m = makeCanvas(cw, ch), g = m.getContext('2d');
+    g.filter = 'blur(' + Math.round(2 * s) + 'px)';
+    shape(g); g.fillStyle = '#000'; g.fill();
+    if (grow) { g.lineWidth = 8 * s; g.lineJoin = 'round'; g.strokeStyle = '#000'; g.stroke(); }
+    return m;
+  }
+  function part(keepHead) {
+    var c = makeCanvas(cw, ch), g = c.getContext('2d');
+    g.drawImage(im, 2 * cw, 0, cw, ch, 0, 0, cw, ch);
+    g.globalCompositeOperation = keepHead ? 'destination-in' : 'destination-out';
+    g.drawImage(mask(keepHead), 0, 0);
+    return tex(c);
+  }
+  var body = part(false), head = part(true);
+  var px = NICK_HEAD.pivot[0] / 472 * NICK.w - NICK.w / 2, py = NICK.h / 2 - NICK_HEAD.pivot[1] / 740 * NICK.h;
+  var geo = new THREE.PlaneGeometry(NICK.w, NICK.h); geo.translate(-px, -py, 0);   /* turning about the neck */
+  var mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: head, color: nickMesh.material.color, transparent: true,
+    opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+  mesh.position.set(px, py, 0.002); mesh.name = 'nick-head'; mesh.visible = false; mesh.renderOrder = 3;
+  nickMesh.add(mesh);
+  return { body: body, head: mesh };
+}
+/* k from 0 to 1 over the tip's whole run, or null for the whole drawing again */
+function nickHeadTip(k) {
+  if (k === null) {
+    if (nickHeadCut && nickMesh.material.map !== nickSheet) { nickMesh.material.map = nickSheet; nickMesh.material.needsUpdate = true; }
+    if (nickHeadCut) nickHeadCut.head.visible = false;
+    return;
+  }
+  if (!nickHeadCut) nickHeadCut = cutNickHead();
+  if (!nickHeadCut) return;
+  if (nickMesh.material.map !== nickHeadCut.body) { nickMesh.material.map = nickHeadCut.body; nickMesh.material.needsUpdate = true; }
+  var h = nickHeadCut.head, T = NICK_HEAD, run = T.up + T.hold + T.down, s = k * run, a;
+  a = s < T.up ? ease(s / T.up) : s < T.up + T.hold ? 1 : 1 - ease((s - T.up - T.hold) / T.down);
+  h.visible = true; h.rotation.z = T.tip * a; h.material.opacity = nickMesh.material.opacity;
+}
+function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
 /* Nick lights him home (Magic's B22, Godric's 1, 13 October 2026, 6.56 pm; "Nearly Headless Nick was always happy to
    point new Gryffindors in the right direction", PS 8): the first night he walks up to her along the dark corridor, a
    pearly glow is already waiting on the end wall beside her frame (the side away from her hinge, so she never swings
@@ -952,7 +1008,7 @@ function updateNick(dt) {
    walk and the bow. Nothing at night is sudden: every light fades up and away. ?nickHome=walk or glow forces it on
    the next walk up to her */
 var HOME = { glowZ: MID_Z + PORTRAIT_W / 2 + 0.42, glowY: 1.35, glowW: 0.95, glowH: 1.7, up: 1.6, down: 1.5,
-  spotX: END_X - 0.4, spotZ: MID_Z + 0.9, look: 0.5, wide: 1.18, meet: 2.0, speed: 0.9, glide: 5.5 };
+  spotX: END_X - 0.4, spotZ: MID_Z + 0.9, look: 0.5, wide: 1.18, bow: { deep: 1.0, tip: 1.5 }, meet: 2.0, speed: 0.9, glide: 5.5 };
 var home = { kind: null, k: 0, t: 0, nick: null, ending: false, q: new URLSearchParams(location.search).get('nickHome') };
 function pearlGlow(w, h) {
   var c = makeCanvas(64, 64), g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 1, 32, 32, 32);
@@ -974,7 +1030,7 @@ function nickHomeShift() {
 /* the cue's answer, as he sets off toward her: 'walk' the first night, 'glow' every night after */
 function nickHome(kind) {
   if (home.kind || leaving) return;
-  home.kind = kind; home.t = 0; home.k = 0; home.ending = false; home.nick = kind === 'walk' ? 'waiting' : null;
+  home.kind = kind; home.t = 0; home.k = 0; home.ending = false; home.cough = false; home.nick = kind === 'walk' ? 'waiting' : null;
   homeGlow.visible = true;
   if (tween && atStop === STOPS[0]) tween.to = STOPS[0].stop();   /* a look toward the light */
   if (kind === 'walk' && tween && atStop === STOPS[0]) {   /* the walk up to her goes at a walking pace, beside him */
@@ -1011,9 +1067,13 @@ function updateNickHome(dt) {
     } else if (home.nick === 'bow' || home.nick === 'by-her') {
       nick.held += dt;
       _nk.set(HOME.spotX, NICK.h / 2, HOME.spotZ);
-      /* turned to him, the hat swept out; then the bow goes a little too deep */
-      nickShow(home.nick === 'bow' && nick.held > 1.0 && nick.held < 3.2 ? 2 : 1, false);
-      if (home.nick === 'bow' && nick.held > 3.2 && !tween) {
+      /* turned to him, the hat swept out; then the bow goes a little too deep and his head tips off on its hinge,
+         slowly, and back up with a small cough; then his line */
+      var B = HOME.bow, run = NICK_HEAD.up + NICK_HEAD.hold + NICK_HEAD.down, deep = home.nick === 'bow' && nick.held > B.deep && nick.held < B.tip + run + 0.3;
+      nickShow(deep ? 2 : 1, false);
+      nickHeadTip(home.nick === 'bow' && nick.held > B.tip && nick.held < B.tip + run ? (nick.held - B.tip) / run : null);
+      if (home.nick === 'bow' && !home.cough && nick.held > B.tip + run - 0.7) { home.cough = true; showLines([{ medium: 'heard', speaker: 'nick', sound: 'a small cough' }]); }
+      if (home.nick === 'bow' && nick.held > B.tip + run + 0.5 && !tween) {
         home.nick = 'by-her';
         showLines([{ medium: 'said', speaker: 'nick', text: 'Home safe. I shall tell the Fat Lady you were very brave.' }]);
       }
@@ -1022,7 +1082,8 @@ function updateNickHome(dt) {
     if (home.nick === 'into-wall') {   /* back into the wall he came out of, fading as he goes */
       _nk.x = Math.min(END_X - 0.1, _nk.x + 0.5 * dt); _nk.z += (HOME.glowZ - _nk.z) * Math.min(1, dt * 1.5);
       nickMesh.material.opacity = Math.max(0, nickMesh.material.opacity - dt * 0.55 / HOME.down);
-      if (nickMesh.material.opacity <= 0) { home.nick = 'gone'; nickMesh.visible = false; nick.state = 'away'; }
+      if (nickHeadCut) nickHeadCut.head.material.opacity = nickMesh.material.opacity;
+      if (nickMesh.material.opacity <= 0) { home.nick = 'gone'; nickMesh.visible = false; nick.state = 'away'; nickHeadTip(null); }
     }
     if (home.nick !== 'gone') {
       nickMesh.position.copy(_nk);
@@ -3692,7 +3753,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
