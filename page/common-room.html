@@ -684,7 +684,7 @@ var TILES = {
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=10"></script>
+<script src="castle.js?v=11"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=21"></script>
 <script src="charms/guide.js?v=1"></script>
@@ -5996,7 +5996,7 @@ function enterBoard() {
   var p = new THREE.Vector3(), n = new THREE.Vector3();
   boardGroup.getWorldPosition(p);
   boardGroup.getWorldDirection(n);
-  var th = Math.tan(camera.fov * Math.PI / 360);
+  var th = Math.tan(baseFov() * Math.PI / 360);     /* the room's own, so a walk from the fireside's wider view frames it the same */
   var d = Math.max((BOARD_H / 2) / th, (BOARD_W / 2) / (th * camera.aspect)) * 1.12;
   var to = p.clone().addScaledVector(n, d);
   startTween(camera.position.clone(), currentLook(), to, p, 0.9, function () { mode = 'board'; backBtn.hidden = false; });
@@ -6247,6 +6247,40 @@ function tapHits(cx, cy) {
     return !h.object.userData.paper || h.object.visible;
   });
 }
+/* stop to stop (req 206, Interaction; Godric, 12 October 2026, 7.12 pm: "They should be able to move from one to another
+   without going back to the starting point"): at a stop, a tap on another stop's thing walks him straight there, as the
+   corridor's goTo does. The stop he leaves undoes its own on the way (the sofa and the pair turn back, the desk chair
+   comes back, the fireside's wider view narrows); a tap on nothing and Back still go to the start. Each stop's things
+   are the ones it answers to; a thing that acts where it stands at rest (the letter, the scarf, the cloak) walks him
+   to its stop from another stop, and acts there on the next tap. The keyhole and the den are left as they were. */
+function stopOf(hit) {
+  if (!hit) return null;
+  var paper = hit.userData.paper && hit.userData.paper.spec;
+  if (FIRESIDE_TAPS.indexOf(hit) >= 0) return { mode: 'fireside', go: goFireside, name: tapName(hit) };
+  if (hit === scarf || hit === satchel || hit === curios.jar) return { mode: 'fireside', go: goFireside, name: 'hearth' };
+  if (hit === sideTable || hit === deskChair || hit === candle.mesh) return { mode: 'desk', go: goDesk, name: tapName(hit) };
+  if (hit === homeFeather.mesh || hit === howler.mesh || (paper && paper.desk) ||
+      hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)
+    return { mode: 'desk', go: goDesk, name: tapName(sideTable) };
+  if (tablePart(hit)) return { mode: 'table', go: goTable, name: 'table' };
+  if (hit === sofa) return { mode: 'sofa', go: goSofa, name: tapName(sofa) };
+  if (paper && paper.sill) return { mode: 'sofa', go: goSofa, name: tapName(sofa) };
+  if (boardParts.indexOf(hit) >= 0 || paper) return { mode: 'board', go: enterBoard, name: 'notice board' };
+  if (hit === ring || hit === holeTap || hit === cloak || hit === cloakPeek) return { mode: 'hole', go: goHole, name: tapName(ring) };
+  if (hit === bookcase || hit === ladder) return { mode: 'case', go: goCase, name: tapName(hit) };
+  return null;
+}
+function walkOn(hit) {                                   /* what to tell, if it walked him on from the stop he stands at */
+  var s = stopOf(hit);
+  if (!s || s.mode === mode) return null;
+  if (mode === 'desk' || mode === 'board') DESK_STOP.seat = 0;
+  if (mode === 'sofa') sofaTurn.to = 0;
+  if (mode === 'fireside') pairTurn.to = 0;
+  var fov = camera.fov;
+  s.go();
+  if (tween && tween.toFov == null && Math.abs(fov - baseFov()) > 0.01) { tween.fromFov = fov; tween.toFov = baseFov(); }
+  return { name: s.name, acted: true };
+}
 function tapDo(cx, cy) {
   var hits = tapHits(cx, cy);
   var hit = hits.length ? hits[0].object : null;
@@ -6259,6 +6293,7 @@ function tapDo(cx, cy) {
     if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) { booksTap(); return told; }
     if (hit && hit.userData.paper) { liftPaper(hit.userData.paper); return told; }
     if (hit && boardParts.indexOf(hit) >= 0) return told;
+    var wb = walkOn(hit); if (wb) return wb;
     leaveBoard();
     return back;
   }
@@ -6268,19 +6303,19 @@ function tapDo(cx, cy) {
     else if (hit === candle.mesh) candleTap();
     else if (hit && hit.userData.paper && hit.userData.paper.spec.desk) homeLetterTap();
     else if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) booksTap();
-    else { leaveDesk(); return back; }
+    else { var wd = walkOn(hit); if (wd) return wd; leaveDesk(); return back; }
     return told;
   }
   if (mode === 'table') {
     if (hit && (hit === homework.quill || hit === homework.bottle)) { if (homework.t < 0) homework.next = 0; }
     else if (hit && hit === homework.essay) essayCurlTap();
-    else if (!tablePart(hit)) { leaveTable(); return back; }
+    else if (!tablePart(hit)) { var wt = walkOn(hit); if (wt) return wt; leaveTable(); return back; }
     return told;
   }
   if (mode === 'hole') {
     if (hit === holeTap) holeMouthTap();
     else if (hit === cloak || hit === cloakPeek) cloakTap();
-    else if (hit !== ring) { leaveHole(); return back; }
+    else if (hit !== ring) { var wh = walkOn(hit); if (wh) return wh; leaveHole(); return back; }
     return told;
   }
   if (mode === 'keyhole') { leaveKeyhole(); return back; }
@@ -6289,7 +6324,7 @@ function tapDo(cx, cy) {
     return { name: tapName(hit), acted: false };
   }
   if (mode === 'case') {
-    if (hit !== bookcase && hit !== ladder) { leaveCase(); return back; }
+    if (hit !== bookcase && hit !== ladder) { var wc = walkOn(hit); if (wc) return wc; leaveCase(); return back; }
     if (hit === ladder) ladderTap();
     return told;
   }
@@ -6297,7 +6332,7 @@ function tapDo(cx, cy) {
     var sat = castle ? figureTapped(hits) : null;
     if (sat) castle.tap(sat);
     else if (hit && hit.userData.paper && hit.userData.paper.spec.sill) { if (castle) castle.tap('letter'); liftPaper(hit.userData.paper); }
-    else if (hit !== sofa) { leaveSofa(); return back; }
+    else if (hit !== sofa) { var ws = walkOn(hit); if (ws) return ws; leaveSofa(); return back; }
     else return told;
     return back;                                      /* told in its own call */
   }
@@ -6308,7 +6343,7 @@ function tapDo(cx, cy) {
     else if (hit && hit === curios.jar) jarTap(hits[0].point);
     else if (hit === catWalk || hit === catSit) { if (cat.state === 'walk') catSitDown(5, true); }
     else if (hit && hit === curl.mesh) curlTap();
-    else { leaveFireside(); return back; }
+    else { var wf = walkOn(hit); if (wf) return wf; leaveFireside(); return back; }
     return told;
   }
   var nothing = { name: null, acted: mode !== 'room' };   /* only a tap at rest that finds nothing gets the mote */
