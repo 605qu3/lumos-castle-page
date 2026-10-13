@@ -109,7 +109,9 @@
     document.body.appendChild(pocket); document.body.appendChild(shade);
 
     var st = { pocket: false, open: null, den: false }, live = null, near = false, notesY = 0, queue = Promise.resolve();
+    var liveAs = null;                                        /* the sheet as drawn: blank, or inked (or about to be) */
     var pending = null;                                       /* the oath's cues of one moment, gathered, then played */
+    var held = [], settling = false;                          /* the Map's lines of one moment, written once it settles */
     function tap(name) { var c = castle(); if (c) c.tap(name); }
     function speechOff() {
       var c = castle(), s = c && c.settings ? c.settings() : {};
@@ -122,10 +124,22 @@
     function size() { return { w: Math.min(window.innerWidth - 24, 620), h: Math.min(window.innerHeight - 110, 760) }; }
     function view() {
       var M = window.CASTLE_MODEL, L = window.LumosMap, z = size(), c = castle(), m = c && c.map ? c.map() : null;
-      var at = (m && m.dots[0] && L.locate(M, m.dots[0].place)) || [0, 0];
+      var mine = m && (m.dots.filter(function (d) { return d.me; })[0] || m.dots[0]);
+      var at = (mine && L.locate(M, mine.place)) || [0, 0];
       if (near) return L.phone(at[0], at[1], 6, z.w, z.h);
-      var k = Math.min(z.w, z.h) / 340;                      /* the castle whole, about 340 m across */
-      return L.phone(at[0] * 0.3, at[1] * 0.3 + 40, k, z.w, z.h);
+      var b = whole(M, L), k = Math.min(1.9, z.w / b.span, z.h / b.span);   /* under k 2, where the towers lie flat */
+      return L.phone(b.mid[0], b.mid[1], k, z.w, z.h);
+    }
+    /* The castle whole: the middle and breadth of its rooms as the model has them, with a margin for the walls. */
+    var bounds = null;
+    function whole(M, L) {
+      if (bounds && bounds.model === M) return bounds;
+      var xs = [], ys = [];
+      (M.rooms || []).forEach(function (r) { var p = L.locate(M, r.id); if (p) { xs.push(p[0]); ys.push(p[1]); } });
+      var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+      bounds = xs.length ? { model: M, mid: [(x0 + x1) / 2, (y0 + y1) / 2], span: Math.max(x1 - x0, y1 - y0) + 150 }
+                         : { model: M, mid: [80, 40], span: 320 };
+      return bounds;
     }
     function dots() {
       var c = castle(), m = c && c.map ? c.map() : null;
@@ -133,30 +147,38 @@
         .filter(function (d) { return d.at; });
     }
     /* Draw the sheet afresh: blank, or inked at once (a reload, a zoom), or ready for the oath's spread. */
-    function mount(inked, denNew) {
+    function mount(inked, denNew, spreading) {
       var v = view();
+      liveAs = inked || spreading ? 'inked' : 'blank';
       sheet.style.width = v.w + 'px'; sheet.style.height = v.h + 'px';
       live = window.LumosMap.mount(sheet, window.CASTLE_MODEL, { look: 'raised', view: v, dots: dots(), den: st.den && !denNew, denNew: !!denNew });
       notesY = 0;
       return inked ? live.open(1) : Promise.resolve();
     }
+    /* The sheet as the record has it now, drawn afresh only if it is not already (so a line lands on the right one). */
+    function ensure() {
+      if (!st.open || (live && liveAs === st.open)) return Promise.resolve();
+      return mount(st.open === 'inked');
+    }
+    function cards() {
+      oathCard.style.display = st.open === 'blank' && speechOff() ? '' : 'none';
+      managedCard.style.display = st.open === 'inked' && speechOff() ? '' : 'none';
+      closer.style.display = st.open === 'inked' ? '' : 'none';   /* a blank sheet has nothing to come closer to */
+    }
     function zoom(close) {
       near = close; closer.textContent = near ? 'The whole castle' : 'Closer';
-      if (st.open) queue = queue.then(function () { return mount(st.open === 'inked'); });
+      if (st.open) queue = queue.then(ready).then(function () { return mount(st.open === 'inked'); });
     }
     function show(state) {
       var was = st.open;
       st.open = state;
       shade.style.display = state ? 'flex' : 'none';
-      oathCard.style.display = state === 'blank' && speechOff() ? '' : 'none';
-      managedCard.style.display = state === 'inked' && speechOff() ? '' : 'none';
+      cards();
       if (!state || state === was) return;
-      queue = queue.then(ready).then(function () { if (!live || !was || state === 'inked') return mount(state === 'inked'); });
+      queue = queue.then(ready).then(ensure);
     }
     function note(line) {
-      queue = queue.then(ready).then(function () {
-        if (!live) return mount(st.open === 'inked');
-      }).then(function () {
+      queue = queue.then(ready).then(ensure).then(function () {
         var px = Math.max(11, Math.min(15, size().w / 30)), chars = Math.floor((size().w - 28) / (px * 0.52));
         return inHands(line).reduce(function (p, s) {
           return wrap(s.text, chars).reduce(function (q, row) {
@@ -168,15 +190,31 @@
     function playOath() {
       var denNew = pending.den;
       pending = null;
-      queue = queue.then(ready).then(function () { return mount(false, denNew); }).then(function () { return live.open(2600); })
+      st.open = 'inked'; shade.style.display = 'flex'; cards();
+      queue = queue.then(ready).then(function () { return mount(false, denNew, true); }).then(function () { return live.open(2600); })
         .then(function () { if (denNew) st.den = true; });
+    }
+    /* A moment's records fire in the castle's own order, so the oath's spread and the lines wait till it settles:
+       the spread first, then each line on the sheet as the record left it (an unfold's blank, the oath's ink). */
+    function settle() {
+      if (settling) return;
+      settling = true;
+      setTimeout(function () {
+        settling = false;
+        if (pending) playOath();
+        var list = held; held = [];
+        list.forEach(note);
+      }, 0);
     }
 
     var cues = {};
     cues[UNFOLD] = function () { show('blank'); };
-    cues[OATH] = function () { pending = pending || { den: false }; setTimeout(function () { if (pending) playOath(); }, 0); };
+    cues[OATH] = function () { pending = pending || { den: false }; settle(); };
     cues[DEN_NEW] = function () { pending = pending || { den: false }; pending.den = true; };
-    cues[WIPE] = function () { queue = queue.then(function () { return live && live.wipe(1200); }).then(function () { notesY = 0; }); };
+    cues[WIPE] = function () {
+      st.open = 'blank'; cards();
+      queue = queue.then(function () { return live && live.wipe(1200); }).then(function () { notesY = 0; liveAs = 'blank'; });
+    };
     cues[FOLD_INKED] = cues[FOLD_BLANK] = function () { show(null); };
     cues[FIRST] = function () {};                         /* the three are dots of map(), marked first, drawn with the rest */
     cues[GLINT] = function () { oathCard.classList.remove('glint'); void oathCard.offsetWidth; oathCard.classList.add('glint'); };
@@ -186,16 +224,15 @@
       st.den = st.den || shows.indexOf(DEN) >= 0;
       pocket.style.display = shows.indexOf(POCKET) >= 0 && !inked && !blank ? 'block' : 'none';
       if (pending) return;                                    /* the oath's spread is on its way */
-      if (inked && st.open !== 'inked') { st.open = 'inked'; shade.style.display = 'flex'; queue = queue.then(ready).then(function () { return mount(true); }); }
+      if (inked && st.open !== 'inked') { st.open = 'inked'; shade.style.display = 'flex'; queue = queue.then(ready).then(ensure); }
       else if (blank && st.open !== 'blank' && st.open !== 'inked') show('blank');
       else if (!inked && !blank && st.open) show(null);
-      oathCard.style.display = st.open === 'blank' && speechOff() ? '' : 'none';
-      managedCard.style.display = st.open === 'inked' && speechOff() ? '' : 'none';
+      cards();
     }
     function lines(list) {
       return (list || []).filter(function (l) {
         if (l.at !== 'map') return true;
-        note(l);
+        held.push(l); settle();
         return false;
       });
     }
