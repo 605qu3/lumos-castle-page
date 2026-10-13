@@ -771,6 +771,64 @@ function judgeCheer(points, mouth, ease) {
   out.verdict = 'cheered'; out.reason = 'cheered';
   return out;
 }
+/* The pineapple's tap dance (PS 16: Flitwick "called them one by one into his class to see if they could make a pineapple
+   tapdance across a desk"). The book gives no motion; the taps are ours, for the geometry: equal steps across a length,
+   the desk split into equal parts. The pineapple stands at one end; he taps where it lands, step by step, until a tap
+   reaches the far end. Each step is measured and they must be equal; the beat is reported, never a miss (the pineapple
+   dances back at his own timing, so an uneven beat shows as a stumble).
+   taps: [{x, y, t}] in CSS pixels, in order, all of this try (a page clears them after a verdict); desk: { a, b the x
+   of the pineapple's start and of the far end (b < a dances right to left), y the desktop's line, band how far above
+   or below it a tap still lands on the desk }, px; ease: a name in DANCE_EASES or one of its own (reach: how near the
+   far end a tap must come to arrive, and how far past it before the pineapple dances off, as shares of the desk; min:
+   the least step, a share of the desk; even: how far any step may stray from their mean, a share of the mean; most: the
+   most steps; gap: ms with no tap before a try that has not arrived is stopped short); want: the steps Flitwick asks
+   for, or 0 for any; now: the page's clock in ms, so a pause can end a try (leave it out to wait).
+   Returns { verdict: 'waiting' | 'danced' | 'miss', reason ('waiting', 'danced', 'off', 'back', 'past', 'leap',
+   'shuffle', 'short', 'count', 'uneven'), n (steps), steps (px each), step (their mean, px), share (the mean over the
+   desk: 0.25 a quarter), spread (the furthest step from the mean, a share of it), worst (that step's index), long (true
+   if it was too long), fair (the equal step, the desk over n, px), beat (the longest gap in time over the shortest),
+   at (the last tap's place along the desk, 0 to 1) }. */
+var DANCE_EASES = {
+  kind:   { reach: 0.07, min: 0.04, even: 0.30, most: 8, gap: 2500 },
+  fair:   { reach: 0.05, min: 0.05, even: 0.22, most: 8, gap: 2500 },
+  strict: { reach: 0.035, min: 0.06, even: 0.15, most: 8, gap: 2500 }
+};
+function judgePineapple(taps, desk, ease, want, now) {
+  var e = typeof ease === 'object' ? ease : (DANCE_EASES[ease] || DANCE_EASES.kind);
+  var out = { verdict: 'waiting', reason: 'waiting', n: 0, steps: [], step: 0, share: 0, spread: 0, worst: -1, long: false, fair: 0, beat: 1, at: 0 };
+  var T = taps || [], L = Math.abs(desk.b - desk.a) || 1, dir = desk.b < desk.a ? -1 : 1, i;
+  if (!T.length) return out;
+  var prev = 0;   /* how far along the desk the pineapple stands, px */
+  for (i = 0; i < T.length; i++) {
+    var along = (T[i].x - desk.a) * dir, st = along - prev;
+    out.steps.push(Math.round(st)); prev = along;
+  }
+  var last = T[T.length - 1];
+  out.n = T.length; out.at = Math.round(prev / L * 100) / 100;
+  var sum = 0; for (i = 0; i < out.steps.length; i++) sum += out.steps[i];
+  out.step = Math.round(sum / out.n); out.share = Math.round(sum / out.n / L * 1000) / 1000; out.fair = Math.round(L / out.n);
+  var lo = Infinity, hi = 0; for (i = 1; i < T.length; i++) { var g = Math.max(60, T[i].t - T[i - 1].t); lo = Math.min(lo, g); hi = Math.max(hi, g); }
+  out.beat = T.length > 2 ? Math.round(hi / lo * 100) / 100 : 1;
+  if (Math.abs(last.y - desk.y) > desk.band) { out.verdict = 'miss'; out.reason = 'off'; return out; }
+  if (out.steps[out.n - 1] < e.min * L) { out.verdict = 'miss'; out.reason = 'back'; return out; }
+  if (prev > L * (1 + e.reach)) { out.verdict = 'miss'; out.reason = 'past'; return out; }
+  if (prev < L * (1 - e.reach)) {
+    if (out.n >= e.most) { out.verdict = 'miss'; out.reason = 'shuffle'; return out; }
+    if (now != null && now - last.t > e.gap) { out.verdict = 'miss'; out.reason = 'short'; }
+    return out;
+  }
+  out.verdict = 'miss';
+  if (out.n < 3) { out.reason = 'leap'; return out; }
+  if (out.n > e.most) { out.reason = 'shuffle'; return out; }
+  if (want && out.n !== want) { out.reason = 'count'; return out; }
+  var mean = sum / out.n;
+  for (i = 0; i < out.n; i++) { var d = Math.abs(out.steps[i] - mean) / mean; if (d > out.spread) { out.spread = d; out.worst = i; } }
+  out.long = out.worst >= 0 && out.steps[out.worst] > mean;
+  out.spread = Math.round(out.spread * 100) / 100;
+  if (out.spread > e.even) { out.reason = 'uneven'; return out; }
+  out.verdict = 'danced'; out.reason = 'danced';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1645,5 +1703,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
