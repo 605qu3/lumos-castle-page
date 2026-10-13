@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Map's play</title>
+<style>body { margin: 0; background: #2a2018; color: #e9d9ad; font: 15px Georgia, serif; } p { margin: 16px; }</style></head>
+<body><p>The Marauder's Map in his hands (board req 242's play, the events lane's; the ink and hand Design's, req 243).
+A test page, driven from the console: <code>castle.state().vars.map = 'held'</code>, then the taps.</p>
+<script src="castle-ear.js?v=1"></script>
+<script src="castle-events.js?v=27"></script>
+<script src="castle-map.js?v=1"></script>
+<script>
+/* A room as the Map's play needs it: the corridor by the witch, so the record's own taps and moments run. */
+var mapPlay = CastleMap.make({ castle: function () { return castle; } });
+var said = [];
+var castle = CastleEvents.start({
+  chains: ['map', 'points'],
+  place: 'corridor',
+  cues: Object.assign({}, mapPlay.cues),
+  drawRoom: function (shows) { mapPlay.drawRoom(shows); },
+  showLines: function (lines) { mapPlay.lines(lines).forEach(function (l) { said.push(l.text); }); },
+  builtins: { at: function () { return 'witch'; } }
+});
+</script></body></html>

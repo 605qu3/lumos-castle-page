@@ -13,6 +13,16 @@
     },
     {
       "when": [
+        "map = held",
+        "map_open != blank",
+        "map_open != inked"
+      ],
+      "show": [
+        "the old parchment folded small in his pocket"
+      ]
+    },
+    {
+      "when": [
         "map_open = blank"
       ],
       "show": [
