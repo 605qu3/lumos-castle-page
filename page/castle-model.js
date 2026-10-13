@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 9,
+  "version": 10,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -168,6 +168,12 @@ window.CASTLE_MODEL = {
       "state": "books", "cite": "PS 9, PoA 10"
     },
     {
+      "id": "entrance-hall", "name": "the Entrance Hall", "level": "G",
+      "shape": { "rect": [68, 50, 92, 70] }, "floor": 0, "ceiling": 10.4, "map": "the front doors, the marble staircase",
+      "about": "the layout PDF's 8: 24 by 20 m ours, in the north range under the Astronomy Tower; so big the Dursleys' house would fit in it, stone walls lit by torches, a flagged floor, its ceiling too high to make out (PS 7); rises through two storeys and opens south into the stair hall's well (Godric's 3.1); a balcony overhead (DH 32), not yet placed",
+      "state": "books", "cite": "PS 7, CoS 5, HBP 8, DH 32"
+    },
+    {
       "id": "great-hall", "name": "the Great Hall", "level": "G",
       "shape": { "rect": [15, 51.5, 65, 69.5] }, "map": "the meals",
       "about": "through a doorway to the right on entering (PS 7); 50 by 18 m ours; rises through two storeys",
@@ -222,7 +228,27 @@ window.CASTLE_MODEL = {
     { "id": "dorm-W2", "kind": "window", "room": "dormitory", "bearing": -18.8, "w": 0.6, "sill": 1.1, "h": 1.9,
       "view": "the lake, the mountains", "state": "built", "cite": "" },
     { "id": "dorm-W3", "kind": "window", "room": "dormitory", "bearing": 87.2, "w": 0.6, "sill": 1.1, "h": 1.9,
-      "view": "the lawn, the castle's shadow", "state": "built", "cite": "PoA 15" }
+      "view": "the lawn, the castle's shadow", "state": "built", "cite": "PoA 15" },
+    { "id": "front-doors", "kind": "the great oak front doors, two leaves", "between": ["entrance-hall", "grounds"], "at": [80, 70],
+      "w": 4.0, "h": 6.0, "state": "books", "about": "at the top of a flight of stone steps, facing the marble staircase; their size ours",
+      "cite": "PS 6, PS 7, CoS 15, GoF 12" },
+    { "id": "great-hall-doors", "kind": "double doors", "between": ["entrance-hall", "great-hall"], "at": [68, 60.5], "w": 3.2, "h": 5.0,
+      "state": "books", "about": "to the right on entering, on the hall's axis; their size ours", "cite": "PS 7, OotP 33" },
+    { "id": "well-mouth", "kind": "open mouth", "between": ["entrance-hall", "stair hall"], "span": [[72.5, 50], [87.5, 50]], "h": 10.4,
+      "state": "designed", "about": "the Entrance Hall opens into the stair hall's well, the marble staircase facing the front doors (Godric's 3.1)",
+      "cite": "PS 7" },
+    { "id": "kitchens-door", "kind": "door, stone steps down beyond", "between": ["entrance-hall", "hufflepuff-basement"], "at": [70.3, 50],
+      "w": 1.4, "h": 2.6, "state": "books", "about": "to the right of the marble staircase, the steps down to the torch-lit basement corridor of the kitchens and Hufflepuff; its size ours",
+      "cite": "GoF 17, GoF 21, OotP 18" },
+    { "id": "dungeon-stair", "kind": "archway down, a narrow stone stair", "between": ["entrance-hall", "dungeon-corridor"], "at": [89.7, 50],
+      "w": 1.4, "h": 2.6, "state": "proposed", "about": "the books give the stair, not its side; the left of the marble staircase ours, the kitchens' door's mirror",
+      "cite": "CoS 5, OotP 26" },
+    { "id": "chamber-door", "kind": "door", "between": ["entrance-hall", "waiting-chamber"], "at": [92, 66.0], "w": 1.4, "h": 2.6,
+      "state": "inferred", "about": "the small empty chamber off the hall where the first years wait: they go back across the hall to the Great Hall's doors, so the left on entering (inferred)",
+      "cite": "PS 7, PoA 16, OotP 31" },
+    { "id": "classrooms-mouth", "kind": "archway", "between": ["entrance-hall", "classroom-corridor"], "at": [92, 59.0], "w": 3.0, "h": 4.0,
+      "state": "books", "about": "the corridor of classrooms opposite the Great Hall's doors, classroom eleven's (the layout PDF's 12); its width ours",
+      "cite": "OotP 27" }
   ],
   "features": [
     { "id": "hearth", "room": "common-room", "kind": "fireplace", "bearing": 48.7, "w": 3.0, "h": 2.5, "proud": 0.6, "state": "built" },
@@ -244,7 +270,12 @@ window.CASTLE_MODEL = {
     { "id": "corridor-flight", "kind": "straight flight down", "room": "corridor", "span": [[-1.5, 20.11], [1.5, 23.41]],
       "from": 0, "to": -1.98, "treads": 11, "rise": 0.18, "state": "built" },
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
-      "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" }
+      "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" },
+    { "id": "marble-staircase", "kind": "magnificent marble staircase, facing the front doors: its first flight and half-landing",
+      "rooms": ["stair hall"], "span": [[73, 50], [87, 45.2]], "up": [0, -1], "from": 0, "to": 2.6, "treads": 15, "rise": 0.173,
+      "landing": [73, 43, 87, 45.2], "state": "proposed",
+      "about": "the layout PDF's 9 ([73, 43, 87, 50]): 14 m wide, rising south from the Entrance Hall into the well, fifteen treads of 0.32 m to a half-landing at 2.6 m; its turn above to the first floor is the stair hall's, not yet drawn",
+      "cite": "PS 7, PoA 14" }
   ],
   "dormitories": {
     "state": "proposed",

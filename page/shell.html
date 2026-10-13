@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>A castle shell, greybox</title>
+<style>
+  :root {
+    --bg: #0b0a09;
+    --hud-bg: rgba(24, 21, 18, 0.78);
+    --hud-fg: #d9d2c6;
+    --hud-dim: #8e877c;
+    --hud-on: #e9b86a;
+    --hud-line: rgba(255, 255, 255, 0.16);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0a09; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0a09; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+  }
+  #c { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+  #hud {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #stats {
+    font-size: 12px;
+    line-height: 1.35;
+    background: var(--hud-bg);
+    padding: 6px 9px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--hud-dim);
+    white-space: pre;
+  }
+  #btns { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; pointer-events: auto; }
+  button {
+    font: 500 13px/1 -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-line);
+    border-radius: 6px;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  button.on { color: var(--hud-on); border-color: var(--hud-on); }
+  button:focus-visible { outline: 2px solid var(--hud-on); outline-offset: 2px; }
+  #back {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+  #help {
+    position: fixed;
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    max-width: min(420px, calc(100vw - 20px));
+    background: var(--hud-bg);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    pointer-events: none;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!--
+A castle shell (the Architect's page; docs/handoff/architect.md, "The shells plan, Q10"). Godric's Q10, answered 10.1
+(13 October 2026, 12.22 pm): the ways walk as grey shells straight from the model, every room off them a shut door that
+answers a tap; a room opens when it is built. His touch t1 (PS 8: doors that open only if asked politely, or are solid
+walls pretending) is the events' and magic's to wire, by the hooks at the foot of this file. One page for every way:
+shell.html?place=<id>, a room's id or a mass's made a slug (entrance-hall, stair-hall); page/castle-shell.js builds it
+from page/castle-model.js, so a model change re-shapes the shell. The frame (renderer, camera, HUD, zoom, the help
+line, the mote, travel and reveal) is castle.js's, unedited.
+- He stands, as in the corridor: the start is inside the way he came in by (?from=<place>), or on a plain load inside
+  the place's own start (the Entrance Hall's front doors, facing the marble staircase); a drag turns his head up to
+  60 degrees each way (docs/interaction-vocabulary.md §1, §2). A tap on a door or a mouth walks him square to it
+  (§11); a second tap there answers: a shut door shakes on its latch and tells the hooks (§6), an open mouth to a way
+  takes him through under the frame's fade (§8), a way not yet built answers as a shut door. A tap on nothing at a
+  stand goes back to the start; Back does the same (§3, §5). The stands are defaults; Interaction sets them (req 208).
+- Grey light only: a cool sky light from above and a warm one from the floor, no torches drawn yet.
+-->
+<canvas id="c" tabindex="0" aria-label="A castle shell, greybox"></canvas>
+<div id="hud">
+  <div id="stats">starting</div>
+  <div id="btns">
+    <button type="button" data-act="layers">Layers</button>
+    <button type="button" data-act="res">Res</button>
+    <button type="button" data-act="exp">Exp</button>
+    <button type="button" data-act="reset">Reset</button>
+    <button type="button" data-act="help">?</button>
+  </div>
+</div>
+<button id="back" type="button" hidden>Back</button>
+<div id="help">Drag to look around.</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="castle.js?v=11"></script>
+<script src="castle-model.js?v=10"></script>
+<script src="castle-shell.js?v=1"></script>
+<script>
+(function () {
+'use strict';
+
+var Q = new URLSearchParams(location.search);
+var PLACE = Q.get('place') || 'entrance-hall';
+/* each place's start on a plain load: the way he first comes in by */
+var STARTS = { 'entrance-hall': 'front-doors' };
+
+var kit = window.castleFrame ? castleFrame({
+  background: 0x0b0a09, fog: 0.012,
+  zoom: { max: 3 },
+  onAct: function (act) { if (act === 'reset') goBack(); }
+}) : null;
+if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
+var canvas = kit.canvas, backBtn = kit.backBtn, clamp = kit.clamp, lerp = kit.lerp, easeInOut = kit.easeInOut;
+var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
+camera.far = 220; camera.updateProjectionMatrix();
+
+var shell = window.CastleShell && window.CASTLE_MODEL ? CastleShell.build(kit, CASTLE_MODEL, PLACE, { from: kit.from, start: STARTS[PLACE] }) : null;
+if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
+scene.add(shell.group);
+document.title = shell.place.name + ', a shell';
+
+/* grey light */
+scene.add(new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, 0.85));
+var sun = new THREE.DirectionalLight(0xfff1dc, 0.45); sun.position.set(-6, 14, 9); scene.add(sun);
+scene.add(new THREE.AmbientLight(0xffffff, 0.12));
+/* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
+   3.2 m, a quarter of the way in from each corner, so the walls take light and fall off */
+shell.places.forEach(function (p, pi) {
+  var xs = p.poly.map(function (q) { return q[0]; }), ys = p.poly.map(function (q) { return q[1]; });
+  var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+  [[0.25, 0.25], [0.75, 0.25], [0.75, 0.75], [0.25, 0.75]].forEach(function (f) {
+    var l = new THREE.PointLight(0xffc98a, pi ? 0.7 : 1.0, 26, 1.6);
+    l.position.copy(shell.toLocal(x0 + (x1 - x0) * f[0], y0 + (y1 - y0) * f[1], p.floor + 3.2));
+    scene.add(l);
+  });
+});
+
+/* standing and looking round (the dormitory's way, req 210's: a drag turns his head from where he stands) */
+var HEAD_MAX = Math.PI / 3, HEAD_PITCH = 0.25;
+var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, lookTmp = new THREE.Vector3();
+var things = shell.doors.concat(shell.ways), tappables = things.map(function (d) { return d.mesh; });
+function thingOf(mesh) { return things.filter(function (d) { return d.mesh === mesh; })[0]; }
+function headPose(pos, look) {
+  pos.copy(here.pos);
+  var d = here.look.clone().sub(here.pos), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
+  look.set(pos.x + Math.sin(a) * Math.cos(el) * 10, pos.y + Math.sin(el) * 10, pos.z + Math.cos(a) * Math.cos(el) * 10);
+}
+function glideTo(s, done) {
+  var from = { pos: camera.position.clone(), look: lookTmp.clone() };
+  here = s; hy = hyT = hp = hpT = 0;
+  var to = { pos: new THREE.Vector3(), look: new THREE.Vector3() }; headPose(to.pos, to.look);
+  tween = { t: 0, dur: clamp(0.8 + from.pos.distanceTo(to.pos) * 0.08, 0.8, 2.6), from: from, to: to, done: done };
+}
+function goTo(d) { if (here === d.stand) return; backBtn.hidden = false; glideTo(d.stand); }
+function goBack() { if (here === START) { hyT = hpT = 0; return; } backBtn.hidden = true; glideTo(START); }
+
+/* a shut door answers: it shakes on its latch, and the hooks hear of it (the events' lines, t1's polite doors) */
+var shakes = [];
+function answer(d) {
+  shakes.push({ m: d.mesh, t: 0, base: d.mesh.position.clone(), dir: d.inward.clone() });
+  if (hooks.onDoorTap) hooks.onDoorTap({ id: d.id, to: d.to, place: d.place });
+}
+function updateShakes(dt) {
+  shakes = shakes.filter(function (s) {
+    s.t += dt;
+    var k = s.t < 0.45 ? Math.sin(s.t * 70) * 0.025 * (1 - s.t / 0.45) : 0;
+    s.m.position.copy(s.base).addScaledVector(s.dir, k);
+    return s.t < 0.45;
+  });
+}
+function through(d) {
+  if (hooks.onWay) hooks.onWay({ id: d.id, to: d.to, place: d.place });
+  kit.travel('shell.html?place=' + encodeURIComponent(d.to) + '&from=' + encodeURIComponent(PLACE));
+}
+
+var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+function tap(cx, cy) {
+  if (tween) return;
+  var r = canvas.getBoundingClientRect();
+  pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
+  var d = hits.length && tappables.indexOf(hits[0].object) >= 0 ? thingOf(hits[0].object) : null, wasStand = here !== START;
+  if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d); }
+  else if (d) goTo(d);
+  else goBack();
+  kit.tapped(!!d || wasStand);
+}
+
+function updateCamera(dt) {
+  if (tween) {
+    tween.t += dt;
+    var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
+    camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
+    lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
+    if (tween.t >= tween.dur) { var dn = tween.done; tween = null; if (dn) dn(); }
+  } else {
+    var s = Math.min(1, dt * 7);
+    hy = lerp(hy, hyT, s); hp = lerp(hp, hpT, s);
+    headPose(camera.position, lookTmp);
+  }
+  camera.lookAt(lookTmp);
+}
+
+var dragging = false, moved = false, sx = 0, sy = 0, px = 0, py = 0;
+canvas.addEventListener('pointerdown', function (e) {
+  dragging = true; moved = false; sx = px = e.clientX; sy = py = e.clientY;
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  e.preventDefault();
+});
+canvas.addEventListener('pointermove', function (e) {
+  if (!dragging) return;
+  var dx = e.clientX - px, dy = e.clientY - py;
+  px = e.clientX; py = e.clientY;
+  if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
+  if (!tween) { hyT = clamp(hyT - dx * 0.003, -HEAD_MAX, HEAD_MAX); hpT = clamp(hpT - dy * 0.0012, -HEAD_PITCH, HEAD_PITCH); }
+});
+function endDrag(e) { if (!dragging) return; dragging = false; if (!moved && e.type === 'pointerup') tap(e.clientX, e.clientY); }
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+backBtn.addEventListener('click', goBack);
+
+headPose(camera.position, lookTmp); camera.lookAt(lookTmp);
+kit.reveal();
+
+var clock = new THREE.Clock();
+function frame() {
+  var dt = Math.min(0.05, clock.getDelta());
+  updateCamera(dt);
+  updateShakes(dt);
+  renderer.render(scene, camera);
+  kit.stats(dt);
+}
+renderer.setAnimationLoop(frame);
+
+/* the hooks: the events and magic set these (a shut door's tap, a way taken); harmless when unset */
+var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
+  place: shell.place.id, places: shell.places.map(function (p) { return p.id; }),
+  doors: shell.doors.map(function (d) { return { id: d.id, to: d.to }; }),
+  ways: shell.ways.map(function (d) { return { id: d.id, to: d.to, built: !!d.built }; }),
+  stands: shell.stands.map(function (s) { return s.name; }) };
+/* hooks for automated checks; harmless in normal use */
+window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
+  goTo: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; if (d) goTo(d); return !!d; },
+  stand: function () { return here.name; }, head: function () { return { yaw: hy, limit: HEAD_MAX }; },
+  answer: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; if (d) answer(d); return !!d; } };
+})();
+</script>
+</body>
+</html>
