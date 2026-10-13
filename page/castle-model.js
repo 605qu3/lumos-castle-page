@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 6,
+  "version": 7,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -141,6 +141,54 @@ window.CASTLE_MODEL = {
       "shape": { "rect": [16, 50.6, 68, 53.6] }, "walls": { "south": 0.6, "north": 0.4 },
       "about": "3.0 m wide as hers, from the west range to the stair hall's north landing (the top of the last staircase); windows on the courtyard; about 110 m' walk from her portrait",
       "state": "designed", "cite": "OotP 18; Godric's Q48b, option 3 (12 October 2026, 6.48 pm)"
+    },
+    {
+      "id": "dumbledores-office", "name": "Dumbledore's office, circular, at the top of his tower", "level": "T",
+      "shape": { "circle": [166, 40], "r": 4.5 }, "z": 43.0, "ceiling": 49.0, "map": "PoA 10: pacing his study",
+      "about": "z and ceiling in the castle's frame; circular, so a tower (CoS 11, OotP 22); which tower is ours, by the gargoyle of HBP 25",
+      "state": "inferred", "cite": "CoS 11, CoS 12, PoA 10"
+    },
+    {
+      "id": "second-floor-corridor", "name": "the second floor's corridor, from the stair hall west along the court", "level": "2",
+      "shape": { "rect": [16, 14.5, 68, 17.5] }, "map": "PoA 10: Mrs Norris prowling the second floor",
+      "about": "the books give the floor only; 3.0 m wide, along the south range's courtyard face to the west range",
+      "state": "proposed", "cite": "PoA 10"
+    },
+    {
+      "id": "trophy-room", "name": "the trophy room", "level": "3",
+      "shape": { "rect": [0, 24, 16, 44] }, "map": "PoA 10: Peeves bouncing around the trophy room",
+      "about": "its floor from the books, its spot in the west range ours (the spaces list, 24)",
+      "state": "books", "cite": "PS 9, PoA 10"
+    },
+    {
+      "id": "great-hall", "name": "the Great Hall", "level": "G",
+      "shape": { "rect": [15, 51.5, 65, 69.5] }, "map": "the meals",
+      "about": "through a doorway to the right on entering (PS 7); 50 by 18 m ours; rises through two storeys",
+      "state": "books", "cite": "PS 7, OotP 11"
+    },
+    {
+      "id": "filchs-office", "name": "Filch's office", "level": "G",
+      "shape": { "rect": [104, 62, 118, 70] }, "map": "his rounds start and end here",
+      "about": "Harry follows him \"back downstairs\" (CoS 8); the ground floor and the north range ours",
+      "state": "inferred", "cite": "CoS 8"
+    },
+    {
+      "id": "mcgonagalls-office", "name": "Professor McGonagall's study", "level": "1",
+      "shape": { "rect": [146, 52, 158, 60] }, "map": "a teacher's dot",
+      "about": "\"Professor McGonagall's study on the first floor\" (PS 15); its spot beside her classroom ours",
+      "state": "books", "cite": "PS 15"
+    },
+    {
+      "id": "dungeon-corridor", "name": "the dungeon corridors", "level": "B",
+      "shape": { "rect": [16, 3, 120, 15] }, "map": "B14 t2: the dot on the dungeon corridor is Snape",
+      "about": "the dungeons under the south ranges, Potions and the deathday party's corridors (CoS 8); the spot ours",
+      "state": "books", "cite": "CoS 8"
+    },
+    {
+      "id": "witch-landing", "name": "the one-eyed witch's landing, near the marble staircase", "level": "3",
+      "shape": { "rect": [60, 31, 68, 34] }, "map": "the passage to Honeydukes behind her hump",
+      "about": "8 by 3 m (req 178, B8); the spot inferred, the spaces list's 26; the Architect's step 3 recommends it directly beneath the corridor page's landing run (site x 68 to 76, y 0.45 to 3.45), waiting on Godric's marks",
+      "state": "inferred", "cite": "PoA 10, PoA 14"
     }
   ],
   "openings": [
