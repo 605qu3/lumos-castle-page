@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Waddiwasi, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #14110e; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1a1714;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=14"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* Waddiwasi, a test page for the Charms lane (13 October 2026, thirteenth session; the owner is Godric). Drawn in code.
+   The book (PoA 7, checked in the text): round a corner of a deserted corridor, Peeves "floating upside-down in mid-air
+   and stuffing the nearest keyhole with chewing gum", singing "Loony loopy Lupin"; he blows "a loud wet raspberry";
+   Lupin "raised the wand to shoulder height, said 'Waddiwasi!' and pointed it at Peeves", and "With the force of a
+   bullet, the wad of chewing gum shot out of the keyhole and straight down Peeves's left nostril; he whirled right way
+   up and zoomed away, cursing." "Cool, sir!" said Dean Thomas. Peeves (PS 7): a little man with wicked, dark eyes and a
+   wide mouth; curly-toed feet (PoA 7). The book's is the point at the target and the straight flight; the stroke is
+   ours, for the geometry: one straight line drawn from the gum toward his nose, and the gum flies along it. A hit is
+   the line passing within the nose's size, so the same angle off misses more the further away he is: a degree at the
+   gum is a hand's width across the room. Three rounds: Peeves near (two feet away, as the book has Lupin), Peeves far
+   up by the ceiling (the same small slip misses), and Peeves drifting along the corridor, aimed at where he is when
+   the line is drawn. Hit or miss, the sum is drawn and nothing is graded: his line in gold, the true line from the gum
+   to the nose in silver dashes, the angle between them at the gum, the room the nose allows at that distance as a
+   faint wedge, and on a miss the gap at his nose in inches. Judged by LumosSpells.judgeAim on the tally's own sizes
+   (checks/waddiwasi-tally.js: the gum's reach 0.06 and the nose 0.035 of the short side, near 0.35 and far 0.8 of it
+   away). The traced guide, a line from the gum to his nose, shows in the near round only: in the others the aim is
+   the lesson. ?round=1..3, ?ease=, ?guide= for trying; window.lumosWaddiwasi for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+  var ROUNDS = [
+    { name: 'Near', start: 'Peeves, upside down by Filch\'s cupboard, gum in the keyhole: <i>"Loony loopy Lupin!"</i> Whisper <i>Waddiwasi</i> and draw <b>one straight line from the gum to his nose</b>.' },
+    { name: 'Far', start: 'Back again, up by the ceiling this time, and a fresh wad in the keyhole. <b>The same small slip misses further away</b>: aim with care.' },
+    { name: 'Drifting', start: 'Now he drifts along the corridor, blowing raspberries. <b>Aim at where he is</b> when you draw.' } ];
+  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+  var gum = { x: 0, y: 0, r: 10 }, nose = { x: 0, y: 0, r: 5 }, IN = 1;   /* IN: pixels to the inch, from his head's size */
+  var stage = 'aim', wait = null, done = false, last = null, sum = null, fly = null, zoom = null, splats = [], razz = null, t0 = performance.now();
+  var stroke = null, active = null, trail = null, guide = null;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    gum = { x: W * 0.25, y: H * 0.7, r: S * 0.06 };
+    IN = S * 0.035 * 2.2 / 4;   /* his head is 2.2 noses across in radius, about 8 inches tall */
+    place(performance.now()); splats = []; sum = null;
+    makeGuide();
+  }
+  /* where Peeves's nose is: near and far at a fixed bearing that fits the screen, drifting along a level track */
+  function place(now) {
+    var portrait = H > W, d, a;
+    if (round < 2) {
+      d = S * (round === 0 ? 0.35 : 0.8); a = (round === 0 ? (portrait ? 40 : 30) : (portrait ? 65 : 20)) * Math.PI / 180;
+      nose = { x: gum.x + Math.cos(a) * d, y: gum.y - Math.sin(a) * d, r: S * 0.035 };
+    } else {
+      var lo = W * (portrait ? 0.38 : 0.45), hi = W * (portrait ? 0.84 : 0.9), k = (Math.sin((now - t0) / 1000 * 0.3) + 1) / 2;
+      nose = { x: lo + (hi - lo) * k, y: H * (portrait ? 0.4 : 0.36) + Math.sin((now - t0) / 1000 * 1.3) * S * 0.012, r: S * 0.035 };
+    }
+  }
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain, q) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3) * (q ? 0.6 + 0.4 * Math.sin(i / audio.sampleRate * q * 6.283) : 1);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+
+  /* the guide, in the near round only: a straight line from the gum to his nose */
+  function makeGuide() {
+    if (round !== 0) { guide = null; return; }
+    var a = [gum.x / S, gum.y / S], b = [nose.x / S, nose.y / S];
+    guide = LumosGuide.create({ key: 'lumos.charms.waddiwasiGuidedHits', rest: 1.0, mirror: false,
+      box: function () { return { G: S, ox: 0, oy: 0 }; },
+      parts: [{ pts: LumosGuide.line(a, b, 12), secs: 0.5, label: 'straight at his nose', at: 0.5, dx: 0, dy: 1.6 }] });
+    guide.build(W, H);
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    ROUNDS.forEach(function (r, i) {
+      var b = document.createElement('button'); b.textContent = r.name; if (i === round) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { if (guide) guide.reset(); }; panel.appendChild(g);
+  }
+  function choose(i) {
+    if (wait) { clearTimeout(wait); wait = null; }
+    round = i; stage = 'aim'; last = null; sum = null; fly = null; zoom = null; trail = null; done = false; splats = [];
+    place(performance.now()); makeGuide(); menu(); say(ROUNDS[i].start);
+  }
+
+  /* ---- the aim ---- */
+  var SIDE = { high: 'above', low: 'below', left: 'to the left of', right: 'to the right of' };
+  function judge(pts) {
+    if (stage !== 'aim' || wait) return null;
+    place(performance.now());
+    var at = { x: nose.x, y: nose.y, r: nose.r }, j = LumosSpells.judgeAim(pts, gum, at, ease);
+    if (j.reason === 'tap') { if (guide) guide.clear(); say('Draw a line from the gum toward his nose, in one stroke.'); last = j; return j; }
+    var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
+    if (tr && tr.traced && j.verdict === 'miss') { j.verdict = 'hit'; j.reason = 'traced'; }
+    last = j;
+    if (j.reason === 'off' || j.reason === 'wiggly' || j.reason === 'short' || j.reason === 'away') {
+      if (guide) guide.miss();
+      trail = { pts: pts, at: performance.now() };
+      say({ off: 'Start on the gum in the keyhole, then draw toward him.',
+            wiggly: 'One straight line, like a pointing finger: the gum flies straight.',
+            short: 'A longer line, well out from the gum toward him.',
+            away: 'Toward Peeves, not away from him!' }[j.reason]);
+      return j;
+    }
+    /* a true aim: the gum flies along his line, from the keyhole */
+    var a = pts[0], b = pts[pts.length - 1], len = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / len, uy = (b.y - a.y) / len;
+    var along = (at.x - a.x) * ux + (at.y - a.y) * uy, pass = { x: a.x + ux * along, y: a.y + uy * along };
+    sum = { a: { x: a.x, y: a.y }, ux: ux, uy: uy, at: at, pass: pass, j: j, shown: performance.now() + 380 };
+    stage = 'fly'; trail = null; noise(0.25, 2400, 0.3);
+    var end = j.verdict === 'hit' ? { x: at.x + 0.3 * (pass.x - at.x), y: at.y + 0.3 * (pass.y - at.y) } : wall(a, ux, uy, along);
+    fly = { from: { x: gum.x, y: gum.y }, to: end, at: performance.now(), dur: 340 * Math.max(0.6, Math.hypot(end.x - gum.x, end.y - gum.y) / (S * 0.5)), hit: j.verdict === 'hit' };
+    if (j.verdict === 'hit') {
+      if (guide) guide.hit(lv > 0);
+      LumosSpells.learn('waddiwasi');
+      say('<b>Waddiwasi!</b>');
+    } else {
+      if (guide) guide.miss();
+      say('<b>Waddiwasi!</b>');
+    }
+    return j;
+  }
+  function wall(a, ux, uy, along) {   /* where a missed wad smacks: on past him, to the wall or the screen's edge */
+    var s = along + S * 0.25, x = a.x + ux * s, y = a.y + uy * s, m = S * 0.04;
+    var k = 1; if (x < m) k = Math.min(k, (m - a.x) / (x - a.x)); if (x > W - m) k = Math.min(k, (W - m - a.x) / (x - a.x));
+    if (y < m + 70) k = Math.min(k, (m + 70 - a.y) / (y - a.y)); if (y > floorY()) k = Math.min(k, (floorY() - a.y) / (y - a.y));
+    return { x: a.x + (x - a.x) * k, y: a.y + (y - a.y) * k };
+  }
+  function landed(now) {
+    var j = sum.j, off = Math.abs(j.off), allow = j.allow;
+    if (fly.hit) {
+      stage = 'hit'; zoom = { at: now, x: nose.x, y: nose.y }; noise(0.5, 900, 0.3, 14);
+      say('<b>Straight down his left nostril!</b> He whirls right way up and zooms off, cursing. <i>"Cool, sir!"</i> You were ' + deg(off) + ' off; from here, anything under ' + deg(allow) + ' hits.');
+      if (round < 2) wait = setTimeout(function () { wait = null; choose(round + 1); }, 6400);
+      else { done = true; setTimeout(function () { if (done) say('All three. Peeves won\'t be back in a hurry, and Filch can get in to his brooms.'); }, 4200); }
+    } else {
+      stage = 'miss'; splats.push({ x: fly.to.x, y: fly.to.y, at: now }); noise(0.18, 500, 0.35); razz = now + 500;
+      var inch = Math.max(1, Math.round(j.by / IN));
+      say('<b>Splat!</b> It passed about ' + inch + ' inch' + (inch === 1 ? '' : 'es') + ' ' + SIDE[j.side] + ' his nose. Your line was ' + deg(off) + ' off; from here he allows only ' + deg(allow) + '.');
+      wait = setTimeout(function () { wait = null; stage = 'aim'; fly = null; place(performance.now());
+        say('Peeves cackles and stuffs a fresh wad in the keyhole. Try again: <b>one straight line to his nose</b>.'); }, 4200);
+    }
+  }
+  function deg(v) { return (v < 1 ? v.toFixed(1) : String(Math.round(v * 10) / 10)) + '°'; }
+
+  /* ---- drawing ---- */
+  function floorY() { return H * 0.86; }
+  function drawCorridor(now) {
+    var fy = floorY(), bw = Math.max(34, S * 0.11), bh = bw * 0.48, r, c;
+    cx.fillStyle = '#3a332c'; cx.fillRect(0, 0, W, fy);
+    for (r = 0; r * bh < fy; r++) for (c = -1; c * bw < W; c++) {   /* the stones, a running bond */
+      var x = c * bw + (r % 2 ? bw / 2 : 0), y = r * bh, t = ((r * 7 + c * 13) % 5) / 5;
+      cx.fillStyle = 'rgb(' + Math.round(70 + t * 14) + ',' + Math.round(62 + t * 12) + ',' + Math.round(54 + t * 10) + ')';
+      cx.fillRect(x + 1.5, y + 1.5, bw - 3, bh - 3);
+    }
+    cx.fillStyle = '#2a231d'; cx.fillRect(0, fy, W, H - fy);
+    cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.fillRect(0, fy, W, 4);
+    [0.07, 0.6].forEach(function (f, i) {   /* two torches in brackets, flickering */
+      var tx = W * (H > W ? (i ? 0.88 : 0.08) : f + 0.05), ty = fy * 0.42, fl = 1 + Math.sin(now / 90 + i * 2) * 0.08 + Math.sin(now / 37 + i) * 0.05;
+      var g = cx.createRadialGradient(tx, ty, 0, tx, ty, S * 0.45 * fl);
+      g.addColorStop(0, 'rgba(255,190,110,0.30)'); g.addColorStop(1, 'rgba(255,160,80,0)'); cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+      cx.fillStyle = '#2b2219'; cx.fillRect(tx - 3, ty, 6, S * 0.06);
+      cx.fillStyle = '#ffcf7a'; cx.beginPath(); cx.ellipse(tx, ty - S * 0.012, S * 0.012 * fl, S * 0.026 * fl, 0, 0, 7); cx.fill();
+    });
+    /* Filch's broom cupboard: an oak door, the keyhole where the gum is */
+    var dw = S * 0.26, dt = gum.y - S * 0.34, dx = gum.x - dw * 0.62;
+    cx.fillStyle = '#4b321d'; cx.fillRect(dx, dt, dw, fy - dt);
+    cx.strokeStyle = '#2c1d10'; cx.lineWidth = 2;
+    for (var p = 1; p < 4; p++) { cx.beginPath(); cx.moveTo(dx + dw * p / 4, dt + 3); cx.lineTo(dx + dw * p / 4, fy); cx.stroke(); }
+    cx.strokeRect(dx, dt, dw, fy - dt);
+    cx.fillStyle = '#8a6a2e'; cx.beginPath(); cx.ellipse(gum.x, gum.y, S * 0.026, S * 0.04, 0, 0, 7); cx.fill();   /* the escutcheon */
+    cx.fillStyle = '#120c07'; cx.beginPath(); cx.arc(gum.x, gum.y - S * 0.008, S * 0.009, 0, 7); cx.fill(); cx.fillRect(gum.x - S * 0.004, gum.y - S * 0.008, S * 0.008, S * 0.022);
+    var v = cx.createRadialGradient(W / 2, H * 0.5, S * 0.3, W / 2, H * 0.5, Math.max(W, H) * 0.75);
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)'); cx.fillStyle = v; cx.fillRect(0, 0, W, H);
+  }
+  function drawGum(x, y, k) {
+    cx.save(); cx.fillStyle = '#e68fb0'; cx.strokeStyle = '#a85477'; cx.lineWidth = 1.5;
+    cx.beginPath(); cx.ellipse(x, y, S * 0.02 * k, S * 0.016 * k, 0.3, 0, 7); cx.fill(); cx.stroke();
+    cx.fillStyle = 'rgba(255,255,255,0.45)'; cx.beginPath(); cx.arc(x - S * 0.006 * k, y - S * 0.005 * k, S * 0.004 * k, 0, 7); cx.fill();
+    cx.restore();
+  }
+  /* Peeves upside down: his head below, his nose on the target; body and curly-toed feet above */
+  function drawPeeves(now, x, y, turn) {
+    var hr = nose.r * 2.2, bob = Math.sin(now / 400) * S * 0.004;
+    cx.save(); cx.translate(x, y + bob); cx.rotate(Math.PI * turn);   /* turn 0: upside down; 1: right way up */
+    var hy = hr * 0.25;   /* the head's middle, just below the nose (upside down, his eyes are below it and his mouth above) */
+    cx.fillStyle = '#6d3f8a'; cx.beginPath();   /* the body, up from the head */
+    cx.moveTo(-hr * 0.7, -hr * 0.6); cx.lineTo(hr * 0.7, -hr * 0.6); cx.lineTo(hr * 0.55, -hr * 2.4); cx.lineTo(-hr * 0.55, -hr * 2.4); cx.closePath(); cx.fill();
+    cx.fillStyle = '#e8902f'; cx.beginPath(); cx.moveTo(0, -hr * 0.75); cx.lineTo(-hr * 0.32, -hr * 0.6); cx.lineTo(-hr * 0.32, -hr * 0.9); cx.closePath(); cx.fill();
+    cx.beginPath(); cx.moveTo(0, -hr * 0.75); cx.lineTo(hr * 0.32, -hr * 0.6); cx.lineTo(hr * 0.32, -hr * 0.9); cx.closePath(); cx.fill();   /* a bow tie */
+    cx.strokeStyle = '#3a2350'; cx.lineWidth = Math.max(3, hr * 0.22); cx.lineCap = 'round';
+    var wig = Math.sin(now / 160) * 0.25;   /* legs up, the curly-toed feet wiggling */
+    [-1, 1].forEach(function (s) {
+      cx.beginPath(); cx.moveTo(s * hr * 0.3, -hr * 2.3); cx.lineTo(s * hr * 0.45, -hr * 3.3); cx.stroke();
+      cx.save(); cx.translate(s * hr * 0.45, -hr * 3.3); cx.rotate(s * wig);
+      cx.strokeStyle = '#1e1a16'; cx.beginPath(); cx.moveTo(0, 0); cx.quadraticCurveTo(s * hr * 0.5, -hr * 0.1, s * hr * 0.5, -hr * 0.45); cx.arc(s * hr * 0.4, -hr * 0.45, hr * 0.1, 0, Math.PI, s > 0); cx.stroke();
+      cx.restore();
+    });
+    cx.strokeStyle = '#6d3f8a'; [-1, 1].forEach(function (s) { cx.beginPath(); cx.moveTo(s * hr * 0.6, -hr * 1.6); cx.lineTo(s * hr * 1.2, -hr * 0.9); cx.stroke(); });   /* arms hanging down past his head */
+    cx.fillStyle = '#e9d9c0'; cx.beginPath(); cx.arc(0, hy, hr, 0, 7); cx.fill();
+    cx.fillStyle = '#1c1410';   /* wicked, dark eyes, below the nose since he is upside down */
+    [-1, 1].forEach(function (s) { cx.beginPath(); cx.ellipse(s * hr * 0.36, hr * 0.42, hr * 0.13, hr * 0.17, 0, 0, 7); cx.fill(); });
+    cx.strokeStyle = '#1c1410'; cx.lineWidth = Math.max(1.5, hr * 0.07);
+    [-1, 1].forEach(function (s) { cx.beginPath(); cx.moveTo(s * hr * 0.15, hr * 0.68); cx.lineTo(s * hr * 0.55, hr * 0.62); cx.stroke(); });   /* the brows, slanting */
+    cx.fillStyle = '#5a1e1e'; cx.beginPath(); cx.ellipse(0, -hr * 0.32, hr * 0.55, hr * 0.17, 0, 0, Math.PI, true); cx.fill();   /* the wide mouth, above */
+    if (razz && now > razz && now - razz < 900) { cx.fillStyle = '#d0606a'; cx.beginPath(); cx.ellipse(0, -hr * 0.5, hr * 0.2, hr * 0.28, 0, 0, 7); cx.fill(); }   /* the tongue out */
+    cx.fillStyle = '#d9a98a'; cx.beginPath(); cx.ellipse(0, 0, nose.r * 0.55, nose.r * 0.75, 0, 0, 7); cx.fill();   /* the nose */
+    cx.fillStyle = '#3a2418'; [-1, 1].forEach(function (s) { cx.beginPath(); cx.arc(s * nose.r * 0.22, -nose.r * 0.35, nose.r * 0.13, 0, 7); cx.fill(); });   /* the nostrils, up */
+    cx.restore();
+    if (razz && now > razz && now - razz < 900 && !turn) {
+      var fs = Math.round(Math.max(13, S * 0.034)); cx.save(); cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.textAlign = 'center';
+      cx.fillStyle = '#f0e2c6'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 4; cx.fillText('Pthbbbt!', x, y - hr * 3.9); cx.restore();
+    }
+  }
+  function drawSplats(now) {
+    splats.forEach(function (s) {
+      cx.save(); cx.fillStyle = '#e68fb0'; cx.strokeStyle = '#a85477'; cx.lineWidth = 1.2; cx.beginPath();
+      for (var i = 0; i < 12; i++) { var a = i / 12 * 6.283, r = S * (i % 2 ? 0.016 : 0.026); i ? cx.lineTo(s.x + Math.cos(a) * r, s.y + Math.sin(a) * r) : cx.moveTo(s.x + r, s.y); }
+      cx.closePath(); cx.fill(); cx.stroke(); cx.restore();
+    });
+  }
+  /* the sum: his line, the true line, the angle between them at his start, the room the nose allows, the gap */
+  function drawSum(now) {
+    if (!sum || now < sum.shown) return;
+    var k = Math.min(1, (now - sum.shown) / 500), a = sum.a, at = sum.at, j = sum.j, fs = Math.round(Math.max(14, S * 0.032));
+    var tx = at.x - a.x, ty = at.y - a.y, dist = Math.hypot(tx, ty), t0 = Math.atan2(ty, tx), t1 = Math.atan2(sum.uy, sum.ux), al = j.allow * Math.PI / 180;
+    cx.save(); cx.globalAlpha = k; cx.lineCap = 'round';
+    cx.fillStyle = 'rgba(201,216,230,0.13)'; cx.beginPath(); cx.moveTo(a.x, a.y); cx.arc(a.x, a.y, dist + nose.r * 2, t0 - al, t0 + al); cx.closePath(); cx.fill();   /* the wedge */
+    var reach = Math.max(dist, Math.hypot(sum.pass.x - a.x, sum.pass.y - a.y)) + nose.r * 3;
+    cx.strokeStyle = 'rgba(232,190,90,0.95)'; cx.lineWidth = 4; cx.shadowColor = 'rgba(0,0,0,0.8)'; cx.shadowBlur = 3;
+    cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(a.x + sum.ux * reach, a.y + sum.uy * reach); cx.stroke();   /* his line, gold */
+    cx.strokeStyle = '#c9d8e6'; cx.lineWidth = 2.4; cx.setLineDash([7, 6]);
+    cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(at.x, at.y); cx.stroke();   /* the true line, silver dashes */
+    cx.setLineDash([]);
+    var ar = Math.min(dist * 0.45, S * 0.16), d = t1 - t0; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2; cx.beginPath(); cx.arc(a.x, a.y, ar, Math.min(t0, t0 + d), Math.max(t0, t0 + d)); cx.stroke();
+    cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillStyle = '#f3e6c8'; cx.shadowBlur = 5; cx.shadowColor = 'rgba(0,0,0,0.95)';
+    var side = d >= 0 ? 1 : -1, w = cx.measureText('00.0° off').width * 0.6;   /* each label on the outer side of its line, clear of the other */
+    var lx = a.x + Math.cos(t1) * ar - Math.sin(t1) * side * (fs * 0.9 + w * Math.abs(Math.cos(t1))), ly = a.y + Math.sin(t1) * ar + Math.cos(t1) * side * fs * 1.3 + fs * 0.35;
+    cx.textAlign = 'center'; cx.fillText(deg(Math.abs(j.off)) + ' off', lx, ly);
+    var te = t0 - al * side, wx = a.x + Math.cos(te) * dist * 0.75 + Math.sin(te) * side * (fs * 0.9 + w * 1.3 * Math.abs(Math.cos(te))), wy = a.y + Math.sin(te) * dist * 0.75 - Math.cos(te) * side * fs * 1.3 + fs * 0.35;
+    cx.fillStyle = '#c9d8e6'; cx.fillText('±' + deg(j.allow) + ' hits', wx, wy);
+    if (j.verdict !== 'hit') {   /* the gap at his nose */
+      cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(at.x, at.y); cx.lineTo(sum.pass.x, sum.pass.y); cx.stroke();
+      [at, sum.pass].forEach(function (q) { cx.beginPath(); cx.arc(q.x, q.y, 3, 0, 7); cx.fillStyle = '#f0e2c6'; cx.fill(); });
+      var inch = Math.max(1, Math.round(j.by / IN)), gx = (at.x + sum.pass.x) / 2, gy = (at.y + sum.pass.y) / 2;
+      cx.fillStyle = '#f3e6c8'; cx.textAlign = gx > W * 0.7 ? 'right' : 'left'; cx.fillText(inch + ' in', gx + (gx > W * 0.7 ? -fs * 0.6 : fs * 0.6), gy + fs * 0.35);
+    }
+    cx.restore();
+  }
+  var lastT = 0;
+  function frame(now) {
+    lastT = now;
+    if (stage === 'aim' || stage === 'miss') place(now);
+    drawCorridor(now);
+    drawSplats(now);
+    var px = nose.x, py = nose.y, turn = 0;
+    if (zoom) {   /* whirled right way up, then away, cursing */
+      var zt = (now - zoom.at) / 1000; turn = Math.min(1, zt / 0.45);
+      var go = Math.max(0, zt - 0.9); px = zoom.x + go * go * S * 0.9; py = zoom.y - go * go * S * 0.7;
+      if (zt < 2.4) {
+        var fs = Math.round(Math.max(13, S * 0.034)); cx.save(); cx.font = 'bold ' + fs + 'px Georgia, serif'; cx.textAlign = 'center';
+        cx.fillStyle = '#f0b0a0'; cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 4; cx.fillText('!#@%!', px, py - nose.r * 2.2 * 2.8); cx.restore();
+      }
+    }
+    if (!zoom || (now - zoom.at) < 3000) drawPeeves(now, px, py, turn);
+    drawSum(now);
+    if (fly) {
+      var f = Math.min(1, (now - fly.at) / fly.dur), x = fly.from.x + (fly.to.x - fly.from.x) * f, y = fly.from.y + (fly.to.y - fly.from.y) * f;
+      if (f < 1) {
+        cx.save(); cx.strokeStyle = 'rgba(240,160,190,0.5)'; cx.lineWidth = S * 0.012; cx.lineCap = 'round';
+        cx.beginPath(); cx.moveTo(fly.from.x + (fly.to.x - fly.from.x) * Math.max(0, f - 0.25), fly.from.y + (fly.to.y - fly.from.y) * Math.max(0, f - 0.25)); cx.lineTo(x, y); cx.stroke(); cx.restore();
+        drawGum(x, y, 1);
+      } else if (stage === 'fly') landed(now);
+    }
+    if (stage === 'aim' || (stage === 'miss' && !fly)) drawGum(gum.x + S * 0.006, gum.y - S * 0.004, 1);
+    if (stage === 'aim' && !wait) {   /* the gum glows faintly: start here */
+      var gk = 0.5 + 0.5 * Math.sin(now / 420), gg = cx.createRadialGradient(gum.x, gum.y, 0, gum.x, gum.y, gum.r * 1.1);
+      gg.addColorStop(0, 'rgba(255,220,235,' + (0.22 * gk) + ')'); gg.addColorStop(1, 'rgba(255,200,220,0)'); cx.fillStyle = gg; cx.beginPath(); cx.arc(gum.x, gum.y, gum.r * 1.1, 0, 7); cx.fill();
+      if (guide) guide.draw(cx, now, !!stroke);
+    }
+    if (!razz || now - razz > 5200) { if (stage === 'aim' && Math.random() < 0.004) razz = now; }
+    var pts = stroke || (trail && now - trail.at < 600 ? trail.pts : null);
+    if (pts && pts.length > 1) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + (stroke ? 0.6 : 0.6 * (1 - (now - trail.at) / 600)) + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (p, i) { i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); }); cx.stroke(); cx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: one stroke, refused while the gum flies or between rounds ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (wait || done || active !== null || stage !== 'aim') return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null; sum = null;
+    if (guide) guide.cover(stroke[0]);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    judge(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
+  window.lumosWaddiwasi = { choose: function (i) { choose(i - 1); }, gum: function () { return { x: gum.x, y: gum.y, r: gum.r }; },
+    nose: function () { place(performance.now()); return { x: nose.x, y: nose.y, r: nose.r }; }, judge: function (pts) { return judge(pts); },
+    state: function () { return { round: round + 1, stage: stage, waiting: !!wait, done: done, splats: splats.length,
+      last: last ? { verdict: last.verdict, reason: last.reason, off: last.off, allow: last.allow, by: last.by, side: last.side } : null,
+      line: lineEl.textContent, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('waddiwasi') }; } };
+})();
+</script>
+</body>
+</html>
