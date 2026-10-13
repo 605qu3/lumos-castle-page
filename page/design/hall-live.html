@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><title>The house glasses, live</title>
+<style>body { margin: 0; background: #14100b; display: flex; justify-content: center; } #g { width: 100%; max-width: 1000px; margin-top: 20px; }</style>
+</head><body><div id="g"></div>
+<script src="drawn.js"></script>
+<script src="lumos-icon.js"></script>
+<script src="house-hourglass.js"></script>
+<script>
+// LumosHourglass.hallMount as the entrance hall would use it (Q25 answered 25.1): the four glasses in their niches,
+// Gryffindor and Ravenclaw the boys' houses. It plays: the morning's jump (seen 6 of the 8 slips, so last night's
+// two land at once, his t1), then a spell's point falling in Ravenclaw's glass, a brother taught falling slower in
+// Gryffindor's, then the first taken back, flying up with its clink. window.hallPlayed counts the steps done.
+const HOUSES = ['lion', 'eagle'];
+const slips = [10, 5, 20, 10, 50, 10, 40, 60].map((p, i) => ({ kind: 'spell', thing: 's' + i, points: p, house: HOUSES[i % 2 ? 1 : 0], on: i < 6 ? '2026-10-12' : '2026-10-13' }));
+const audio = window.AudioContext ? new AudioContext() : null;
+const hall = LumosHourglass.hallMount(document.getElementById('g'), { slips, houses: HOUSES, full: 400, audio });
+window.hallPlayed = 0;
+const one = { kind: 'card', thing: 'dumbledore', points: 30, house: 'eagle' };
+hall.jump(6).then(() => window.hallPlayed++);
+setTimeout(() => hall.point(one).then(() => window.hallPlayed++), 800);
+setTimeout(() => hall.point({ kind: 'taught', thing: 'lumos', points: 20, house: 'lion' }).then(() => window.hallPlayed++), 900);
+setTimeout(() => hall.back(one).then(() => window.hallPlayed++), 1000);
+</script>
+</body></html>

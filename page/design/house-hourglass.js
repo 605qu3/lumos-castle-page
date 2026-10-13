@@ -16,6 +16,11 @@
 // upwards", OotP 28, B5 L49050) with a cross little clink (rising, clink()). Magic's against the year (Godric, 8.11 am,
 // 1): no rival but their own best year, the top bulb the house's store, magically never lower, so 'store' is the
 // default top.
+// Q25 answered 25.1 (Godric, 13 October 2026, 1.55 pm): four glasses in four niches along the entrance hall's wall,
+// one a house, as the books draw them ("the giant hourglasses", PS 15; "set in niches along the wall", OotP 28): each
+// boy's stones fall in his own house's glass, the two filling together, the other two still, their stones all kept
+// above. His t1: the morning after a big night his house's glass has jumped ("passing the giant hourglasses ... the
+// next day thought there'd been a mistake", PS 15, B1 L5089), and only ever upward (seen, below).
 //
 // LumosHourglass.svg({ slips, houses, frame, niche, full, falling, rising, top, id })
 //   slips    the year's awards in the order earned, as Events' record keeps them ({ kind, thing, points, on, record },
@@ -38,6 +43,16 @@
 // LumosHourglass.mount(el, { slips, houses, full, niche, audio }) draws the glass into el and gives { set(slips),
 //   point(slip), back(slip) }: point is the runtime's opts.point (req 222), its stones falling as it lands, slower
 //   for a brother taught (kind 'taught'); back flies its stones up and clinks. audio: an AudioContext, else none.
+//   seen: how many slips the glass showed when he last looked (the room keeps it, and passes it at the first look
+//   of a new day); the slips after it land at once a beat after the glass is drawn, one heavy shower a house, so the
+//   glass has jumped (his t1). A slip taken back meanwhile is simply gone: nothing falls in the morning. Also jump(n).
+// LumosHourglass.hall({ slips, houses, full, order, top, falling, id }) the entrance hall's wall: the four houses'
+//   glasses, each in its niche (25.1), in `order` (default HALL: the Sorting Hat's, PS 7, as the crest lights).
+//   A glass takes the slips of its own house (a slip without one, houses[0]'s) and lights only its own quarter;
+//   the boys' houses are the ones that fill. Each niche is PITCH wide in the glass's units; viewBox
+//   -24 -22 PITCH*4 274, the wall continuous behind the four.
+// LumosHourglass.hallMount(el, { slips, houses, full, order, audio, seen }) the hall live, as mount(): set, point,
+//   back and jump, each slip's stones falling in its own house's glass.
 // LumosHourglass.clink(audio) the cross little clink, glass on glass, a little sharp.
 (function () {
   const STONE = {  // the stone, its lit facet, its dark edge
@@ -215,14 +230,19 @@
   }
 
   // Godric's t1: the brass glass in a niche along the wall (OotP 28), the stone round it, the frame standing on the sill
-  function nicheRound(id) {
-    let w = `<rect x="-24" y="-22" width="168" height="274" fill="url(#stone${id})"/>`, j = '';
+  function nicheRound(id) { return wallOf(id, 168) + archOf(id); }
+  // the coursed stone behind the niches, w wide from x -24 (one niche's 168, or the hall's four)
+  function wallOf(id, w) {
+    let s = `<rect x="-24" y="-22" width="${w}" height="274" fill="url(#stone${id})"/>`;
     for (let y = -8, r = 0; y < 252; y += 14, r++) {
-      j += `<path d="M-24,${y} H144" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
-      for (let x = -24 + (r % 2) * 13; x < 144; x += 26) j += `<path d="M${x},${y} V${y + 14}" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
+      s += `<path d="M-24,${y} H${w - 24}" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
+      for (let x = -24 + (r % 2) * 13; x < w - 24; x += 26) s += `<path d="M${x},${y} V${y + 14}" stroke="#3a3328" stroke-width="0.4" opacity="0.6"/>`;
     }
+    return s;
+  }
+  function archOf(id) {
     const arch = 'M0,233 V44 C0,6 28,-10 60,-10 C92,-10 120,6 120,44 V233 Z';
-    return w + j + `<path d="${arch}" fill="url(#niche${id})" stroke="#3a3328" stroke-width="0.9"/>
+    return `<path d="${arch}" fill="url(#niche${id})" stroke="#3a3328" stroke-width="0.9"/>
       <path d="M52,-21 H68 L66,-8 H54 Z" fill="#9a8f7c" stroke="#3a3328" stroke-width="0.5"/>
       <rect x="-8" y="232" width="136" height="10" fill="#9a8f7c" stroke="#3a3328" stroke-width="0.5"/>
       <ellipse cx="60" cy="233" rx="50" ry="2.2" fill="#0d0a06" opacity="0.55"/>`;
@@ -230,19 +250,35 @@
 
   function svg(o = {}) {
     const id = o.id || 'h' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'];
-    const slips = (o.slips || []).filter(x => !x.back), full = o.full || 1000;
-    const h = heap(id, slips, houses, full), path = bulbPath();
+    const fr = o.frame === 'oak' ? frameOak : o.frame === 'niche' ? frameNiche : frameBrass;
+    const body = glassBody(id, o, houses, (o.slips || []).filter(x => !x.back), fr);
+    if (o.niche && fr !== frameNiche)
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -22 168 274">${defs(id)}<g filter="url(#wc${id})">${nicheRound(id)}${body}</g></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 240">${defs(id)}<g filter="url(#wc${id})">${body}</g></svg>`;
+  }
+  // the glass in its frame, in the glass's own units: the bulbs, their stones and the frame round them
+  function glassBody(id, o, houses, slips, fr) {
+    const full = o.full || 1000, h = heap(id, slips, houses, full), path = bulbPath();
     const inner = `<path d="${path}" fill="#2a2016" opacity="0.35"/>
       <g clip-path="url(#bulb${id})">${topBulb(o.top, houses)}${h.svg}${shower(o.falling, h.topY)}${rise(o.rising, h.topY)}</g>
       <path d="${path}" fill="url(#glass${id})"/>
       <g filter="url(#wob${id})"><path d="${path}" fill="none" stroke="#120d08" stroke-width="0.7" stroke-linejoin="round"/>
       <path d="M${CX - 22},${TOP + 14} C${CX - 26},${TOP + 30} ${CX - 18},${TOP + 52} ${CX - 8},${NECK - 10}" stroke="#ffffff" stroke-width="1.2" fill="none" opacity="0.45"/>
       <path d="M${CX - 24},${BOT - 50} C${CX - 30},${BOT - 34} ${CX - 26},${BOT - 18} ${CX - 18},${BOT - 8}" stroke="#ffffff" stroke-width="1" fill="none" opacity="0.35"/></g>`;
-    const fr = o.frame === 'oak' ? frameOak : o.frame === 'niche' ? frameNiche : frameBrass;
-    const body = fr(id, inner, slips, houses);
-    if (o.niche && fr !== frameNiche)
-      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -22 168 274">${defs(id)}<g filter="url(#wc${id})">${nicheRound(id)}${body}</g></svg>`;
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 240">${defs(id)}<g filter="url(#wc${id})">${body}</g></svg>`;
+    return fr(id, inner, slips, houses);
+  }
+
+  // Q25 answered 25.1: the entrance hall's four glasses, each in its niche along the one wall, each its own house's
+  const HALL = ['lion', 'badger', 'eagle', 'snake'], PITCH = 168;
+  const ownOf = (houses) => sl => sl.house || houses[0];
+  function hall(o = {}) {
+    const id = o.id || 'w' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'];
+    const order = o.order || HALL, own = ownOf(houses), slips = (o.slips || []).filter(x => !x.back);
+    const glasses = order.map((h, i) => {
+      const mine = { full: o.full, top: o.top, falling: o.falling && o.falling.house === h ? o.falling : null };
+      return `<g transform="translate(${i * PITCH} 0)">${archOf(id)}${glassBody(id, mine, [h], slips.filter(s => own(s) === h), frameBrass)}</g>`;
+    }).join('');
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -22 ${PITCH * order.length} 274">${defs(id)}<g filter="url(#wc${id})">${wallOf(id, PITCH * order.length)}${glasses}</g></svg>`;
   }
 
   // the house cup's crest on a stand-in cup (the cup itself is Objects', from req 48's trophies sheet): the crest as
@@ -282,34 +318,73 @@
     el.style.position = el.style.position || 'relative';
     el.innerHTML = `<div></div><svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none">
       <defs><clipPath id="fly${id}"><path d="${bulbPath()}"/></clipPath></defs><g clip-path="url(#fly${id})"></g></svg>`;
-    const still = el.firstChild, fly = el.lastChild.lastChild;
+    const still = el.firstChild, fly = el.lastChild.lastChild, own = ownOf(houses);
     const draw = () => { still.innerHTML = svg({ slips, houses, full, niche: o.niche, id }); const v = still.firstChild; v.style.width = '100%'; v.style.height = 'auto'; v.style.display = 'block'; };
-    const stones = sl => Math.max(3, Math.min(24, Math.round(places(1.8).length * sl.points / full)));
+    const stones = (pts, most) => Math.max(3, Math.min(most || 24, Math.round(places(1.8).length * pts / full)));
     const play = (ms, frame) => new Promise(done => {
       const t0 = performance.now();
-      const step = now => { const at = Math.min(1, (now - t0) / ms); fly.innerHTML = frame(at); if (at < 1) requestAnimationFrame(step); else { fly.innerHTML = ''; done(); } };
+      const step = now => { const at = Math.min(1, Math.max(0, (now - t0) / ms)); fly.innerHTML = frame(at); if (at < 1) requestAnimationFrame(step); else { fly.innerHTML = ''; done(); } };
       requestAnimationFrame(step);
     });
     const topY = () => heap(id, slips.filter(x => !x.back), houses, full).topY;
+    // his t1: the slips after the first `seen` land at once, a beat after the glass is drawn, one heavy shower a house
+    const jump = seen => {
+      let all, by;
+      busy = busy.then(() => {
+        all = slips; const late = all.slice(seen).filter(x => !x.back);
+        by = {}; late.forEach(sl => { const h = own(sl); (by[h] = by[h] || []).push(sl); });
+        if (!late.length) return;
+        slips = all.slice(0, seen); draw();
+        return new Promise(r => setTimeout(r, 450)).then(() => Object.keys(by).reduce((p, h) => p.then(() => {
+          const pts = by[h].reduce((s, x) => s + x.points, 0), y = topY();
+          return play(1500, at => shower({ house: h, n: stones(pts, 40), at }, y)).then(() => { slips = slips.concat(by[h]); draw(); });
+        }), Promise.resolve()));
+      }).then(() => { slips = all; draw(); });
+      return busy;
+    };
     draw();
+    if (typeof o.seen === 'number') jump(o.seen);
     return {
       set(next) { slips = next.slice(); draw(); },
       point(sl) {
-        const house = sl.house || houses[0], slow = sl.kind === 'taught';
-        busy = busy.then(() => play(slow ? 3400 : 1700, at => shower({ house, n: stones(sl), slow, at }, topY())))
+        const house = own(sl), slow = sl.kind === 'taught';
+        busy = busy.then(() => play(slow ? 3400 : 1700, at => shower({ house, n: stones(sl.points), slow, at }, topY())))
           .then(() => { slips.push(sl); draw(); });
         return busy;
       },
       back(sl) {
-        const house = sl.house || houses[0], from = topY();
+        const house = own(sl), from = topY();
         busy = busy.then(() => {
           const i = slips.findIndex(x => x.kind === sl.kind && x.thing === sl.thing);
           if (i >= 0) slips[i] = Object.assign({}, slips[i], { back: true });
           draw();
-          return play(1300, at => rise({ house, n: Math.min(4, stones(sl)), at }, from));
+          return play(1300, at => rise({ house, n: Math.min(4, stones(sl.points)), at }, from));
         }).then(() => clink(o.audio));
         return busy;
       },
+      jump,
+    };
+  }
+  // the hall live (25.1): the wall and its four niches drawn once, and over each niche a glass of its own, mount()
+  // as above, so a landing redraws only its own house's glass
+  function hallMount(el, o = {}) {
+    const houses = o.houses && o.houses.length ? o.houses : ['lion'], order = o.order || HALL, own = ownOf(houses);
+    const W = PITCH * order.length, id = 'k' + (++n), pc = v => (v * 100).toFixed(4) + '%';
+    el.style.position = el.style.position || 'relative';
+    el.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -22 ${W} 274" style="display:block;width:100%;height:auto">${defs(id)}<g filter="url(#wc${id})">${wallOf(id, W)}${order.map((h, i) => `<g transform="translate(${i * PITCH} 0)">${archOf(id)}</g>`).join('')}</g></svg>`
+      + order.map((h, i) => `<div style="position:absolute;left:${pc((i * PITCH + 24) / W)};top:${pc(22 / 274)};width:${pc(120 / W)};height:${pc(240 / 274)}"></div>`).join('');
+    let all = (o.slips || []).slice();
+    const mine = (list, h) => list.filter(s => own(s) === h);
+    const seenOf = h => typeof o.seen === 'number' ? mine(all.slice(0, o.seen), h).length : undefined;
+    const glass = {};
+    order.forEach((h, i) => { glass[h] = mount(el.children[i + 1], { slips: mine(all, h), houses: [h], full: o.full, audio: o.audio, seen: seenOf(h) }); });
+    const to = sl => glass[own(sl)] || glass[order[0]];
+    return {
+      glass,
+      set(next) { all = next.slice(); order.forEach(h => glass[h].set(mine(all, h))); },
+      point(sl) { all.push(sl); return to(sl).point(Object.assign({ house: own(sl) }, sl)); },
+      back(sl) { return to(sl).back(Object.assign({ house: own(sl) }, sl)); },
+      jump(seen) { return Promise.all(order.map(h => glass[h].jump(mine(all.slice(0, seen), h).length))); },
     };
   }
 
@@ -328,7 +403,7 @@
     return s;
   }
 
-  const api = { svg, cup, mount, clink, STONE, NAME };
+  const api = { svg, cup, mount, hall, hallMount, clink, STONE, NAME, HALL, PITCH };
   if (typeof window !== 'undefined') window.LumosHourglass = api;
   if (typeof module !== 'undefined') module.exports = api;
 })();

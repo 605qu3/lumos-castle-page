@@ -357,7 +357,7 @@ ${parch.body}<g filter="url(#ink${id})" opacity="0.92">${map}${web}${sp >= 1 || 
     const root = el.querySelector('svg'), id = root.getAttribute('data-map'), $ = s => root.querySelector(s);
     const far = Math.hypot(+root.getAttribute('width'), +root.getAttribute('height'));
     const tween = (ms, fn) => new Promise(done => { const t0 = performance.now();
-      const step = now => { const t = Math.min(1, (now - t0) / ms); fn(t); t < 1 ? requestAnimationFrame(step) : done(); };
+      const step = now => { const t = Math.min(1, Math.max(0, (now - t0) / ms)); fn(t); t < 1 ? requestAnimationFrame(step) : done(); };
       requestAnimationFrame(step); });
     const ease = t => t * t * (3 - 2 * t);
     const spread = v => { $('#wg' + id).setAttribute('r', Math.max(0.01, v * far)); $('#wr' + id).setAttribute('r', Math.max(0.01, v * far * 1.4)); };
