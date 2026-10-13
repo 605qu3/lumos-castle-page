@@ -81,6 +81,13 @@
    house as the hourglass draws it (lion, snake, badger, eagle), stamped as it lands from this castle's own, a
    grown-up's setting (settings.house, ?house= for a test; `house()` reads it, null till set), so it keeps it whichever
    way the two castles' slips merge later (v=23).
+   Then the reasons (Magic's reasons' words, req 216): a chain's `reasons` give each kind's words, or a kind and a
+   thing's (`card dumbledore`), "for ..." as the leaving feast reads them, `{thing}` the thing as said; every slip
+   handed out (`points()`, `opts.point`) carries its `reason`, read fresh, never kept (v=24).
+   Then the year's end (Magic's *Against the year*, Godric's magic-against-year-1013, 1): `feast(y)`, the leaving
+   feast's day, the boys' own last school day as a grown-up sets it (settings.feast, ?feast= for a test), the last
+   Friday of June till then; `year()`, the school year now, named by its feast's year; each slip handed out carries
+   its `year` (v=24).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -301,6 +308,7 @@
       return d || [];
     }
     var wordDefs = {};                           /* each chain's week-by-week words, by name (the password) */
+    var reasonDefs = {};                         /* each house point's reason as the feast reads it, by kind or kind and thing (req 216) */
     var leaving = false;                         /* while a visit's leave runs, `place` is the page that visit was on */
     var state = load(STATE_KEY);
     if (!state || state.v !== 1) state = freshState();
@@ -327,6 +335,19 @@
       return HOUSES[h] || null;
     }
     if (castleHouse()) (state.points || []).forEach(function (p) { if (!p.house && !p.from) p.house = castleHouse(); });
+    /* The leaving feast, the school year's end (Magic's *Against the year*; Godric's magic-against-year-1013, 1, their
+       own best year): the boys' own last school day, a grown-up's setting (settings.feast, month and day as 06-19, a
+       whole date read for its month and day), ?feast= for a test; the last Friday of June until one is set (exams from
+       the first of June, CoS 16, and the feast after their results). A school year runs from the day after one feast
+       to the next and is named by the year its feast falls in. */
+    function feastDay(y) {
+      var m = /^(?:\d{4}-)?(\d{1,2})-(\d{1,2})$/.exec(String(params.get('feast') || settings.feast || '').trim());
+      if (m && +m[1] >= 1 && +m[1] <= 12 && +m[2] >= 1 && +m[2] <= 31) return y + '-' + ('0' + m[1]).slice(-2) + '-' + ('0' + m[2]).slice(-2);
+      var d = new Date(y, 5, 30);
+      d.setDate(30 - (d.getDay() + 2) % 7);        /* back from 30 June to its Friday */
+      return isoDay(d);
+    }
+    function schoolYear(day) { var y = +day.slice(0, 4); return day <= feastDay(y) ? y : y + 1; }
 
     var chains = [];          /* the loaded files */
     var records = [];         /* every record, in file order */
@@ -647,7 +668,26 @@
       if (castleHouse()) slip.house = castleHouse();               /* whose it is (req 227) */
       state.points.push(slip);
       logLine(n + ' house points for ' + kind + ' ' + thing + ', {day}');
-      if (opts.point) { try { opts.point(Object.assign({}, slip)); } catch (e) { note('the page could not take a point: ' + e); } }
+      if (opts.point) { try { opts.point(withReason(slip)); } catch (e) { note('the page could not take a point: ' + e); } }
+    }
+
+    /* A slip as handed out, with its reason as the leaving feast reads it (Magic's reasons' words, req 216): the
+       words for its kind and thing, else for its kind, `{thing}` the thing as said (a card's `say`, a spell's words
+       each with its capital, else its words, hyphens as spaces). Read fresh each time, never kept, so an old slip, or one from the other
+       castle, reads the newest words; its `year` too, the school year it was earned in, read from its day. */
+    function withReason(p) {
+      var out = Object.assign({}, p);
+      if (/^\d{4}-\d\d-\d\d$/.test(p.on || '')) out.year = schoolYear(p.on);   /* the school year it fell in */
+      var r = reasonDefs[p.kind + ' ' + p.thing] || reasonDefs[p.kind];
+      if (!r || !r.words) return out;
+      var said = String(p.thing).replace(/-/g, ' ');
+      for (var d in deckDefs) {
+        var c = deckDefs[d].filter(function (x) { return x.item === p.thing && x.say; })[0];
+        if (c) { said = c.say; break; }
+      }
+      if (p.kind === 'spell') said = said.replace(/(^| )\S/g, function (ch) { return ch.toUpperCase(); });
+      out.reason = r.words.replace(/\{thing\}/g, said);
+      return out;
     }
 
     function shownCues() {
@@ -1286,6 +1326,8 @@
         for (var d in dk) deckDefs[d] = dk[d];
         var wd = files[f].words || {};
         for (var w in wd) wordDefs[w] = wd[w];
+        var rd = files[f].reasons || {};
+        for (var rn in rd) reasonDefs[rn] = rd[rn];
         var mk = files[f].marks || {};
         for (var mn in mk) markSets[mn] = (mk[mn] || []).slice();
         var rs = files[f].records || [];
@@ -1346,9 +1388,11 @@
       /* The castle's secrets he has found, in the order found, each once (req 180; for the Map, B10). */
       secrets: function () { return (state.secrets || []).slice(); },
       /* The house points earned on this iPad, a slip each in the order earned: { kind, thing, points, on (yyyy-mm-dd),
-         record, house } (req 216; for the hourglass and the leaving feast's slips, Magic's t1); `house` is the earner's
-         (req 227), missing only while no house is set, when the hourglass reads it as this castle's own. */
-      points: function () { return (state.points || []).map(function (p) { return Object.assign({}, p); }); },
+         record, house, reason } (req 216; for the hourglass and the leaving feast's slips, Magic's t1); `house` is the
+         earner's (req 227), missing only while no house is set, when the hourglass reads it as this castle's own;
+         `reason` is read from the records' reasons as the slip is handed out (Magic's reasons' words), and `year`,
+         the school year it was earned in (its leaving feast's year, `feast()`). */
+      points: function () { return (state.points || []).map(withReason); },
       /* This castle's own house as the hourglass draws it (lion, snake, badger, eagle), or null until a grown-up sets
          it (settings.house; ?house= for a test): the first of the hourglass's `houses` (req 227). */
       house: castleHouse,
@@ -1382,6 +1426,11 @@
         var h = +params.get('height') || +settings.height;
         return h >= 0.6 && h <= 2 ? h : null;
       },
+      /* The school year now, named by the year its leaving feast falls in, and a year's feast day (yyyy-mm-dd; this
+         year's if none is named): the boys' own last school day as a grown-up sets it, the last Friday of June till
+         then, ?feast=06-19 for a test (Magic's *Against the year*). Each slip handed out carries its `year`. */
+      year: function () { return schoolYear(isoDay(nowDate())); },
+      feast: function (y) { return feastDay(+y || schoolYear(isoDay(nowDate()))); },
       visit: function () { return visit; },
       heard: heard,                                   /* guesses a page heard itself, as strings or { text } */
       listening: function () { return value('listening'); },

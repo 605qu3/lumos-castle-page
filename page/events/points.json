@@ -1,5 +1,39 @@
 {
   "chain": "points",
+  "reasons": {
+    "spell": {
+      "words": "for a first {thing} that worked, wand and word together",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am), after Dumbledore's awards at the leaving feast (PS 17, checked)"
+    },
+    "card": {
+      "words": "for reading the back of {thing}'s card to the very end, which is more than most of us manage",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am)"
+    },
+    "card dumbledore": {
+      "words": "for reading my own card to the very end, chamber music, tenpin bowling and all",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am); his card's back, chamber music and tenpin bowling (PS 6, checked)"
+    },
+    "chess": {
+      "words": "for a game of chess played to its very last move, every piece given its say",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am), after Ron's fifty points for chess (PS 17, checked)"
+    },
+    "copybook": {
+      "words": "for a page of fine handwriting, which is rarer in this castle than you might think",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am)"
+    },
+    "case": {
+      "words": "for finding out how Muggles do it, which Mr Arthur Weasley would call ingenious",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am); Mr Weasley on Muggles' ingenuity (CoS 4, checked)"
+    },
+    "taught": {
+      "words": "for a thing taught and a thing learned, so that two people know it now instead of one",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am), after the leaving feast's all kinds of courage (PS 17, checked); the feast says it with both names"
+    },
+    "callback": {
+      "words": "for {thing}, seen with his own eyes and not in a book, which Miss Granger would tell you is the second-best kind of learning",
+      "canon": "ours, Magic's reasons' words (13 October 2026, 7.20 am)"
+    }
+  },
   "records": [
     {
       "id": "points.spell",
