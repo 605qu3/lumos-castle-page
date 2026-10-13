@@ -112,6 +112,17 @@
    `map nearest` (the grown-up whose dot stands nearest his, by the model, for the cheek of B14; Snape where the
    model is not loaded) and `reading` (the book he is reading, a grown-up's setting, settings.reading, 1 to 7, 0 till
    set, ?reading= for a test: Pettigrew's flicker, B12 t1). His own dot's label is settings.name, never in a file (v=26).
+   Then one castle (Godric's fawkes-one-castle-1013, his option 4: no passwords, a player selection, one castle,
+   shared points, sending things to each other): the pairing link also names the two boys (`p`, each a random id made
+   once at the deploy, with his name if the family file holds one, which stays on the iPad). On opening, and at a new
+   visit a minute or more after the last tap, `players()` says ask, and the page draws the names to tap; `play(id)`
+   is his tap. The first tap on an iPad takes the castle as it stands; his brother's packs every lumos. key into the
+   boy's satchel (`lumos.player.<id>`, any lane's keys, so no page need know), unpacks his brother's and reloads the
+   page. The store knows each boy by his id, so his slips are his on either iPad (his own from the other iPad land as
+   his own, once ever wherever earned), and his brother's on this iPad come straight from the satchel. Where each boy
+   last stood (`map here`, a model room's id, never a name) is kept on the iPad and carried by the owl; `map()` adds
+   his brother's dot there, labelled by this iPad's name for him, `move` pace after fifteen minutes in one room, as
+   Dumbledore's paces his study (Godric's events-map-brother-1013, 1, with t1, PoA 10), else still (v=27).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -124,6 +135,9 @@
   var SETTINGS_KEY = 'lumos.castle.settings.v1';
   var OWL_KEY = 'lumos.castle.owl.v1';      /* this castle's id and the owl's store, kept apart so ?fresh keeps them (req 216) */
   var OWL_S = 60;                           /* the owl looks for the other castle's slips each minute of a visit */
+  var SATCHEL = 'lumos.player.';            /* a boy's satchel while his brother plays: every lumos. key of his (one castle) */
+  var ASK_S = 60;                           /* a new visit this long after a name was tapped asks again who is playing */
+  var PACE_MIN = 15;                        /* his brother this long in one room: his dot paces there (map-brother t1) */
   /* A house as a grown-up may write it, read to the beast the hourglass draws (Design's house-hourglass.js; req 227) */
   var HOUSES = { lion: 'lion', gryffindor: 'lion', snake: 'snake', slytherin: 'snake',
                  badger: 'badger', hufflepuff: 'badger', eagle: 'eagle', ravenclaw: 'eagle' };
@@ -276,7 +290,9 @@
   function load(key) {
     try { var s = localStorage.getItem(key); return s ? JSON.parse(s) : null; } catch (e) { return null; }
   }
+  var packed = false;            /* his satchel packed for his brother's turn: nothing more is saved before the reload */
   function save(key, v) {
+    if (packed) return;
     try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* private mode: the castle forgets, kindly */ }
   }
 
@@ -289,6 +305,7 @@
   }
 
   function start(opts) {
+    packed = false;
     var params = new URLSearchParams(location.search);
     var only = params.get('event');
     var waitOverride = params.has('wait') ? Math.max(0, +params.get('wait') || 0) : null;
@@ -472,6 +489,7 @@
         case 'owl waited': return owlWaited ? 'yes' : 'no';           /* the owl's copies waited out of signal: Errol (req 216, t1) */
         case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
         case 'year': return schoolYear(isoDay(now));                   /* the school year now, named by its feast's year */
+        case 'who plays': return playersNow().ask ? 'ask' : (owl.players || []).length >= 2 ? 'chosen' : 'one';   /* one castle: his name to tap */
         case 'map here': return PAGE_ROOM[(leaving && state.visitPlace) || place] || 'none';   /* his own dot's model room (req 242) */
         case 'map nearest': return mapNearest();                        /* the grown-up whose dot is nearest his (B14 t1) */
         case 'reading': return readingBook();                           /* the book he is reading, 0 till set (B12 t1) */
@@ -516,7 +534,16 @@
       var now = nowDate(), mins = now.getHours() * 60 + now.getMinutes(), abs = dayNumber(now) * 1440 + mins;
       var fl = dotDefs.first_look || {}, first = fl.dots && allHold(fl.when || []) ? fl.dots : [];
       var seen = (visit && visit.seen) || {};
-      var out = [{ who: 'me', label: settings.name || null, place: value('map here'), move: 'walk', me: true }];
+      var mine = playerOf(owl.playing);
+      var out = [{ who: 'me', label: (mine && mine.name) || settings.name || null, place: value('map here'), move: 'walk', me: true }];
+      /* his brother's dot where he last stood (Godric's events-map-brother-1013, 1), his name from this iPad; pacing
+         when he stayed long in one room, as Dumbledore paces his study (t1, PoA 10) */
+      (owl.players || []).forEach(function (pl) {
+        var w = (owl.where || {})[pl.id];
+        if (pl.id === owl.playing || !mine || !w || !ROOM.test(w.room || '')) return;
+        out.push({ who: 'brother', label: pl.name, place: w.room, brother: true, at: w.at,
+                   move: w.at - w.since >= PACE_MIN * 60000 ? 'pace' : 'still' });
+      });
       (dotDefs.people || []).forEach(function (p) {
         if (p.when && !allHold(p.when)) return;
         var dot = { who: p.who, label: p.label, move: p.move || 'walk', cheek: !!p.cheek };
@@ -837,6 +864,10 @@
     }
     var owl = load(OWL_KEY) || {};
     if (!/^[a-z0-9]{8,32}$/.test(owl.castle || '')) owl.castle = randomId();
+    var PLAYER = /^[a-z0-9]{8,32}$/, NAME = /^[\p{L}][\p{L} '\-]{0,23}$/u, ROOM = /^[a-z][a-z0-9\-]{1,39}$/;
+    function playerOf(id) { return (owl.players || []).filter(function (x) { return x.id === id; })[0] || null; }
+    /* Who this castle is at the store: the boy playing, once the boys are named in the link; else this iPad's id. */
+    function me() { return (owl.players && playerOf(owl.playing)) ? owl.playing : owl.castle; }
     /* The pairing link, opened once on each iPad by a grown-up: #owl= the store's address and the family key, as
        base64 of { s, k }; read, kept and taken off the address at once, so it is never in a bookmark or a shot. */
     var pairing = /[#&]owl=([A-Za-z0-9_\-]+)/.exec(location.hash || '');
@@ -845,6 +876,15 @@
         var pj = JSON.parse(atob(pairing[1].replace(/-/g, '+').replace(/_/g, '/')));
         if (/^https:\/\/[a-z0-9.\-]+(:\d+)?\/?$/.test(pj.s || '') && /^[A-Za-z0-9_\-]{16,}$/.test(pj.k || '')) {
           owl.store = pj.s.replace(/\/+$/, ''); owl.key = pj.k;
+          /* one castle (Godric's fawkes-one-castle-1013): the boys as `p`, each a random id made once at the deploy
+             and the same on every iPad, with his name if the family file holds one; the name stays on the iPad */
+          var ps = (Array.isArray(pj.p) ? pj.p : []).filter(function (x) { return x && PLAYER.test(x.i || ''); });
+          if (ps.length) {
+            owl.players = ps.map(function (x) {
+              return { id: x.i, name: typeof x.n === 'string' && NAME.test(x.n.trim()) ? x.n.trim() : null };
+            });
+            if (!playerOf(owl.playing)) owl.playing = null;   /* the first name tapped takes the castle as it stands */
+          }
           note('paired with the owl\'s store');
         } else note('the owl\'s link does not name a store and a key');
       } catch (e) { note('the owl\'s link does not read'); }
@@ -859,18 +899,74 @@
         headers: { authorization: 'Bearer ' + owl.key, 'content-type': 'application/json' }
       }).then(function (res) { if (!res.ok) throw new Error(res.status); return res.json(); });
     }
+    /* A slip lands here once, by whose it is, kind and thing, however often it comes (the store, or his brother's
+       satchel on this iPad): his brother's with `from`; his own earned on the other iPad as his own, so it counts
+       once ever wherever he plays (one castle). Returns true if it was new. */
+    function landSlip(s, from, waited) {
+      var own = from === me();
+      for (var i = 0; i < state.points.length; i++) {
+        var p = state.points[i];
+        if ((own ? !p.from : p.from === from) && p.kind === s.kind && p.thing === s.thing) return false;   /* landed before */
+      }
+      var slip = { kind: s.kind, thing: s.thing, points: s.points, on: s.on, record: s.record };
+      if (s.house) slip.house = s.house;
+      if (own) state.owl.posted[slipKey(slip)] = 1;
+      else slip.from = from;
+      state.points.push(slip);
+      state.owl.waiting.push(state.points.length - 1);
+      if (waited) state.owl.waited = true;
+      return true;
+    }
+    /* One castle, two boys on one iPad: his brother's slips come straight from his satchel here, signal or none, and
+       a slip of his a grown-up took back is marked here too. */
+    function landFromSatchels() {
+      var landed = 0;
+      state.owl.backsPosted = state.owl.backsPosted || {};
+      (owl.players || []).forEach(function (pl) {
+        if (pl.id === me()) return;
+        var bag = load(SATCHEL + pl.id), st = null;
+        try { st = bag && bag[STATE_KEY] ? JSON.parse(bag[STATE_KEY]) : null; } catch (e) { st = null; }
+        ((st && st.points) || []).forEach(function (s) {
+          if (s.from || !s.house || s.kind === 'year') return;
+          if (landSlip(s, pl.id, false)) landed++;
+          var mine = slipOf(pl.id, s.kind, s.thing);
+          if (s.back && mine && !mine.back) { state.owl.backsPosted[pl.id + ' ' + s.kind + ' ' + s.thing] = 1; markBack(mine, s.backOn); }
+        });
+      });
+      return landed;
+    }
+    /* Where each boy last stood, a castle model room's id and never a name (Godric's events-map-brother-1013, 1): kept
+       on the iPad for both, so a brother on this iPad is known without signal, and carried by the owl. `since` is when
+       he came into that room, so a long stay shows (t1, his dot paces there). */
+    function noteWhere() {
+      if (!owl.players || !playerOf(owl.playing)) return null;
+      var room = value('map here');
+      if (!ROOM.test(room || '') || room === 'none') return null;
+      owl.where = owl.where || {};
+      var w = owl.where[owl.playing], now = Date.now();
+      if (!w || w.room !== room) w = { room: room, since: now };
+      w.at = now;
+      owl.where[owl.playing] = w;
+      save(OWL_KEY, owl);
+      return w;
+    }
     /* Post this castle's new slips, then fetch the other's since the last. A slip waits to be posted till it has a
        house (stamped at the first start that knows one); a `year` slip is never posted. A slip posted after a post
        failed, or on a later day than it was earned, goes marked `late`. Resolves true if anything new landed. */
     function owlSync() {
-      if (!owl.store || !owl.key) return Promise.resolve(false);
+      var near = owl.players ? landFromSatchels() : 0;
+      var w = noteWhere();
+      if (!owl.store || !owl.key) {
+        if (near) { save(STATE_KEY, state); owlDeliver(); }
+        return Promise.resolve(near > 0);
+      }
       if (owlBusy) { owlAgain = true; return owlRun; }     /* one at a time: a second asks the first to go again */
       owlBusy = true;
       var o = state.owl, day = isoDay(nowDate());
       var out = (state.points || []).filter(function (p) {
         return !p.from && p.house && p.kind !== 'year' && !o.posted[slipKey(p)];
       });
-      var sent = !out.length ? Promise.resolve() : owlCall('POST', '/slips', { castle: owl.castle, slips: out.map(function (p) {
+      var sent = !out.length ? Promise.resolve() : owlCall('POST', '/slips', { castle: me(), slips: out.map(function (p) {
         var c = { kind: p.kind, thing: String(p.thing), points: p.points, on: p.on, record: p.record, house: p.house };
         if (o.postFailed || p.on < day) c.late = true;
         return c;
@@ -878,23 +974,15 @@
         out.forEach(function (p) { o.posted[slipKey(p)] = 1; });
         o.postFailed = false;
       }, function (e) { o.postFailed = true; note('the owl could not take this castle\'s slips (' + e.message + ')'); });
-      owlRun = sent.then(postBacks).then(function () {
-        return owlCall('GET', '/slips?castle=' + owl.castle + '&after=' + (o.after || 0) + '&afterBack=' + (o.afterBack || 0));
+      var whereSent = !w ? Promise.resolve() : owlCall('POST', '/where', { castle: me(), room: w.room, since: w.since, at: w.at })
+        .then(null, function (e) { note('the owl could not take where he stands (' + e.message + ')'); });
+      owlRun = sent.then(postBacks).then(function () { return whereSent; }).then(function () {
+        return owlCall('GET', '/slips?castle=' + me() + '&after=' + (o.after || 0) + '&afterBack=' + (o.afterBack || 0));
       }).then(function (got) {
-        var landed = 0;
+        var landed = near;
         (got.slips || []).forEach(function (s) {
-          if (!s || s.castle === owl.castle) return;
-          for (var i = 0; i < state.points.length; i++) {
-            var p = state.points[i];
-            if (p.from === s.castle && p.kind === s.kind && p.thing === s.thing) return;   /* fetched before */
-          }
-          var slip = { kind: s.kind, thing: s.thing, points: s.points, on: s.on, record: s.record };
-          if (s.house) slip.house = s.house;
-          slip.from = s.castle;
-          state.points.push(slip);
-          o.waiting.push(state.points.length - 1);
-          if (s.late || o.fetchFailed) o.waited = true;
-          landed++;
+          if (!s || !PLAYER.test(s.castle || '')) return;
+          if (landSlip(s, s.castle, s.late || o.fetchFailed)) landed++;
         });
         if (+got.last > (o.after || 0)) o.after = +got.last;
         (got.backs || []).forEach(function (b) {
@@ -903,12 +991,19 @@
           if (p && !p.back) markBack(p, b.on);
         });
         if (+got.lastBack > (o.afterBack || 0)) o.afterBack = +got.lastBack;
+        (got.wheres || []).forEach(function (x) {                         /* his brother's last room, the newer kept */
+          if (!x || x.castle === me() || !playerOf(x.castle) || !ROOM.test(x.room || '')) return;
+          owl.where = owl.where || {};
+          var had = owl.where[x.castle];
+          if (!had || +x.at > +had.at) owl.where[x.castle] = { room: x.room, since: +x.since || +x.at, at: +x.at };
+        });
+        save(OWL_KEY, owl);
         o.fetchFailed = false;
         return landed;
       }, function (e) {
         o.fetchFailed = true;
         note('the owl could not reach the store (' + e.message + ')');
-        return 0;
+        return near;
       }).then(function (landed) {
         owlBusy = false;
         save(STATE_KEY, state);
@@ -922,7 +1017,7 @@
     function slipOf(castle, kind, thing) {
       for (var i = 0; i < state.points.length; i++) {
         var p = state.points[i];
-        if (p.kind === kind && p.thing === thing && (castle === owl.castle ? !p.from : p.from === castle)) return p;
+        if (p.kind === kind && p.thing === thing && (castle === me() ? !p.from : p.from === castle)) return p;
       }
       return null;
     }
@@ -939,16 +1034,71 @@
       var o = state.owl;
       o.backsPosted = o.backsPosted || {};
       var out = (state.points || []).filter(function (p) {
-        return p.back && p.kind !== 'year' && !o.backsPosted[(p.from || owl.castle) + ' ' + p.kind + ' ' + p.thing];
+        return p.back && p.kind !== 'year' && !o.backsPosted[(p.from || me()) + ' ' + p.kind + ' ' + p.thing];
       });
       if (!out.length) return Promise.resolve();
-      return owlCall('POST', '/backs', { castle: owl.castle, backs: out.map(function (p) {
-        return { castle: p.from || owl.castle, kind: p.kind, thing: String(p.thing), on: p.backOn };
+      return owlCall('POST', '/backs', { castle: me(), backs: out.map(function (p) {
+        return { castle: p.from || me(), kind: p.kind, thing: String(p.thing), on: p.backOn };
       }) }).then(function () {
-        out.forEach(function (p) { o.backsPosted[(p.from || owl.castle) + ' ' + p.kind + ' ' + p.thing] = 1; });
+        out.forEach(function (p) { o.backsPosted[(p.from || me()) + ' ' + p.kind + ' ' + p.thing] = 1; });
       }, function (e) { note('the owl could not take the slips taken back (' + e.message + ')'); });
     }
 
+    /* ---------- one castle, a player for each boy (Godric's fawkes-one-castle-1013, his option 4) ---------- */
+    /* No password: on opening, the castle asks who is playing and he taps his name. Each boy keeps his own place,
+       finds and letters: every lumos. key on the iPad is his while he plays (every lane's, so no page need know),
+       and at his brother's tap they are packed into his satchel (SATCHEL + his id), his brother's unpacked, and the
+       page reloads, so every page reads the right boy's castle from its first line. The owl's pairing, the satchels
+       and who is playing are the iPad's, never packed. The house points both boys earn reach each other's glass as
+       before (the owl, or a satchel on this iPad). */
+    function iPadKey(k) { return k === OWL_KEY || k.indexOf(SATCHEL) === 0; }
+    function liveKeys() {
+      var out = [];
+      try { for (var i = 0; i < localStorage.length; i++) out.push(localStorage.key(i)); }
+      catch (e) { return []; }
+      return out.filter(function (k) { return k && k.indexOf('lumos.') === 0 && !iPadKey(k); });
+    }
+    function satchelHouse(id) {
+      var raw = id === me() ? localStorage.getItem(SETTINGS_KEY) : ((load(SATCHEL + id) || {})[SETTINGS_KEY]);
+      var s = null;
+      try { s = raw ? JSON.parse(raw) : null; } catch (e) { s = null; }
+      return (s && HOUSES[String(s.house || '').trim().toLowerCase()]) || null;
+    }
+    function playersNow() {
+      var list = (owl.players || []).map(function (p) {
+        return { id: p.id, name: p.name, house: satchelHouse(p.id), playing: p.id === owl.playing };
+      });
+      return { ask: list.length >= 2 && (!playerOf(owl.playing) || !!owl.ask), playing: playerOf(owl.playing) ? owl.playing : null,
+               list: list };
+    }
+    /* His tap on his name. The same boy, or the first tap on an iPad that had no player yet (he takes the castle as
+       it stands): the castle carries on, false. His brother's: the satchels swap and the page reloads, true. */
+    function play(id) {
+      if (!playerOf(id)) { note('no player ' + id); return false; }
+      var was = playerOf(owl.playing) ? owl.playing : null;
+      owl.ask = false; owl.chosenAt = Date.now();
+      if (!was || was === id) {
+        owl.playing = id;
+        save(OWL_KEY, owl);
+        draw();
+        owlSync();
+        return false;
+      }
+      if (visit) leave();
+      save(STATE_KEY, state);
+      var bag = {};
+      liveKeys().forEach(function (k) { bag[k] = localStorage.getItem(k); });
+      save(SATCHEL + was, bag);
+      var his = load(SATCHEL + id) || {};
+      Object.keys(bag).forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+      Object.keys(his).forEach(function (k) { if (k.indexOf('lumos.') === 0 && !iPadKey(k)) try { localStorage.setItem(k, his[k]); } catch (e) {} });
+      try { localStorage.removeItem(SATCHEL + id); } catch (e) {}
+      owl.playing = id;
+      save(OWL_KEY, owl);
+      packed = true;                                   /* nothing of the boy who went is saved over his brother's */
+      (opts.reload || function () { location.reload(); })();
+      return true;
+    }
     /* In the common room, the owl brings what has landed: the moment `owl post` (its cue the owl at the sill, or
        Errol when a copy waited out of signal), then the page is told each slip, so his brother's gems fall. Away
        from the common room they wait for his next time there. */
@@ -1377,6 +1527,7 @@
     /* A new visit on this page; one still open runs its leave first. */
     function arrive() {
       if (state.visitOpen) leave();
+      if ((owl.players || []).length >= 2 && Date.now() - (owl.chosenAt || 0) > ASK_S * 1000) { owl.ask = true; save(OWL_KEY, owl); }   /* who is playing? */
       state.visits++;
       state.visitOpen = true;
       state.visitPlace = place;
@@ -1731,7 +1882,14 @@
       /* The owl's post (req 216): `owl()` gives this castle's id and whether it is paired, never the key; `sync()`
          posts and fetches now (the runtime does so at its start and each minute of a visit), resolving true if
          anything new landed. */
-      owl: function () { return { castle: owl.castle, paired: !!(owl.store && owl.key) }; },
+      owl: function () { return { castle: owl.castle, paired: !!(owl.store && owl.key), player: playerOf(owl.playing) ? owl.playing : null }; },
+      /* One castle (Godric's fawkes-one-castle-1013): `players()` gives { ask, playing, list: [{ id, name, house,
+         playing }] }; `ask` true when the castle should ask who is playing (on opening, a new visit a minute or more
+         after the last tap, or no one chosen yet), the page drawing the boys' names to tap. `play(id)` is his tap:
+         false, carry on; true, his brother's castle is unpacked and the page reloads (`opts.reload` for a test). The
+         names come in the pairing link from the family file and stay on the iPad. */
+      players: playersNow,
+      play: play,
       sync: owlSync,
       /* A grown-up takes a point back (Design's req 237; only a grown-up, a slip given in error: points are never lost
          in play, Magic's B11): `back(slip)`, the slip as `points()` handed it (its kind, thing and any `from`). It stays
@@ -1739,7 +1897,7 @@
          `opts.back(slip)`; the owl carries it to the other castle. Resolves true if a slip was taken back. */
       back: function (slip) {
         if (!slip) return Promise.resolve(false);
-        var p = slipOf(slip.from || owl.castle, slip.kind, String(slip.thing));
+        var p = slipOf(slip.from || me(), slip.kind, String(slip.thing));
         if (!p || p.back) return Promise.resolve(false);
         markBack(p);
         return owlSync().then(function () { return true; });
