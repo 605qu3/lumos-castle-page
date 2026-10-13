@@ -905,7 +905,7 @@ var nickMesh = new THREE.Mesh(new THREE.PlaneGeometry(NICK.w, NICK.h), new THREE
 nickMesh.name = 'nick'; nickMesh.visible = false; nickMesh.renderOrder = 2; scene.add(nickMesh);
 var nick = { state: 'away', path: null, len: 0, d: 0, pauseAt: 0, held: 0 };
 function nickAfterLean(pause) {
-  if (!leanedAt) return;
+  if (!leanedAt || home.kind === 'walk') return;
   var s = leanedAt.x >= camera.position.x ? 1 : -1;      /* beyond: on the far side of the torch from him */
   /* out of the wall inside the corridor, even where the torch is near her end; on through her end wall, or down the
      flight's end, a ghost's way out of sight */
@@ -919,7 +919,7 @@ function nickAfterLean(pause) {
 function nickHead() { return nickMesh.position.clone().add(new THREE.Vector3(0, NICK.h * 0.45, 0)); }
 var _nk = new THREE.Vector3();
 function updateNick(dt) {
-  if (nick.state === 'away') return;
+  if (nick.state === 'away' || nick.state === 'home') return;
   var speaking = (lineCur && lineCur.line.speaker === 'nick') || lineQ.some(function (l) { return l.speaker === 'nick'; });
   if (nick.state === 'pause') {
     nick.held += dt;
@@ -941,6 +941,100 @@ function updateNick(dt) {
   }
   var left = nick.len - nick.d;
   nickMesh.material.opacity = 0.55 * Math.min(1, nick.d / 0.6, left / NICK.fade);   /* out of the wall, and away */
+}
+/* Nick lights him home (Magic's B22, Godric's 1, 13 October 2026, 6.56 pm; "Nearly Headless Nick was always happy to
+   point new Gryffindors in the right direction", PS 8): the first night he walks up to her along the dark corridor, a
+   pearly glow is already waiting on the end wall beside her frame (the side away from her hinge, so she never swings
+   through him) before anyone is seen; Nick drifts out of it, comes a little way to meet him, turns and goes along
+   beside him to the frame, bows (a little too deep), says his line and waits, a second lamp, and fades into the wall
+   as the hole opens or as he walks away. Every night after, the glow alone waits there for him, his light left on.
+   Which night is which is Events' record (two cues and nick_home, asked of Events); the page draws the light, the
+   walk and the bow. Nothing at night is sudden: every light fades up and away. ?nickHome=walk or glow forces it on
+   the next walk up to her */
+var HOME = { glowZ: MID_Z + PORTRAIT_W / 2 + 0.42, glowY: 1.35, glowW: 0.95, glowH: 1.7, up: 1.6, down: 1.5,
+  spotX: END_X - 0.4, spotZ: MID_Z + 0.9, look: 0.5, wide: 1.18, meet: 2.0, speed: 0.9, glide: 5.5 };
+var home = { kind: null, k: 0, t: 0, nick: null, ending: false, q: new URLSearchParams(location.search).get('nickHome') };
+function pearlGlow(w, h) {
+  var c = makeCanvas(64, 64), g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 1, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(236,242,250,0.9)'); grd.addColorStop(0.35, 'rgba(214,226,242,0.42)'); grd.addColorStop(1, 'rgba(200,214,236,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, opacity: 0,
+    depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
+}
+var homeGlow = pearlGlow(HOME.glowW, HOME.glowH);   /* on the end wall's face, beside her frame */
+homeGlow.rotation.y = -Math.PI / 2; homeGlow.position.set(END_X - 0.02, HOME.glowY, HOME.glowZ);
+homeGlow.name = 'nick-home-glow'; homeGlow.visible = false; homeGlow.renderOrder = 1; scene.add(homeGlow);
+var nickLamp = pearlGlow(1.7, 2.2);                 /* his own light round him as he goes */
+nickLamp.name = 'nick-lamp'; nickLamp.visible = false; nickLamp.renderOrder = 1; scene.add(nickLamp);
+/* while he walks home with Nick, her stop looks a little toward Nick's side, so both show on a phone held upright */
+function nickHomeShift() {
+  if (home.kind === 'glow') return camera.aspect < 1 ? 0.3 : 0;   /* the light left on, at the phone's edge */
+  return home.kind === 'walk' && home.nick !== 'gone' ? HOME.look * (camera.aspect < 1 ? 1 : 0.5) : 0;
+}
+/* the cue's answer, as he sets off toward her: 'walk' the first night, 'glow' every night after */
+function nickHome(kind) {
+  if (home.kind || leaving) return;
+  home.kind = kind; home.t = 0; home.k = 0; home.ending = false; home.nick = kind === 'walk' ? 'waiting' : null;
+  homeGlow.visible = true;
+  if (tween && atStop === STOPS[0]) tween.to = STOPS[0].stop();   /* a look toward the light */
+  if (kind === 'walk' && tween && atStop === STOPS[0]) {   /* the walk up to her goes at a walking pace, beside him */
+    tween.to = STOPS[0].stop(); tween.dur = Math.max(tween.dur, HOME.glide);
+  }
+}
+function nickHomeStart() {
+  var gx = END_X - 0.05, z0 = HOME.glowZ, meetX = Math.max(END_X - HOME.meet, camera.position.x + 1.6);
+  var pts = [[gx, z0], [gx - 0.6, z0 + 0.05], [meetX, z0 + 0.1], [HOME.spotX - 0.3, HOME.spotZ + 0.1], [HOME.spotX, HOME.spotZ]];
+  nick.path = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], 0, p[1]); }), false, 'catmullrom', 0.5);
+  nick.len = nick.path.getLength(); nick.d = 0; nick.state = 'home'; nick.held = 0; nick.pauseAt = -1;
+  nickMesh.visible = true; nickLamp.visible = true; home.nick = 'walking';
+}
+function updateNickHome(dt) {
+  if (!home.kind) return;
+  home.t += dt;
+  var herStop = STOPS[0];
+  if (!home.ending && home.t > 0.3 && (leaving || herDoor.target > 0 || atStop !== herStop)) home.ending = true;
+  /* the glow: up as he sets off, away as the hole opens or he turns back */
+  home.k = home.ending ? Math.max(0, home.k - dt / HOME.down) : Math.min(1, home.k + dt / HOME.up);
+  homeGlow.material.opacity = 0.55 * home.k * (0.92 + 0.08 * Math.sin(t * 1.7));
+  if (home.kind === 'walk' && home.nick && home.nick !== 'gone') {
+    if (home.nick === 'waiting') {
+      if (home.ending) home.nick = 'gone';
+      else if (home.t > 1.2) nickHomeStart();
+    }
+    if (home.nick === 'walking') {
+      nick.d = Math.min(nick.len, nick.d + HOME.speed * dt);
+      var u = nick.d / nick.len, tg = nick.path.getTangentAt(u), right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+      _nk.copy(nick.path.getPointAt(u)); _nk.y = NICK.h / 2 + NICK.lift;
+      nickShow(0, tg.dot(right) < 0);
+      nickMesh.material.opacity = 0.55 * Math.min(1, nick.d / 0.6);
+      if (nick.d >= nick.len) { home.nick = 'bow'; nick.held = 0; }
+    } else if (home.nick === 'bow' || home.nick === 'by-her') {
+      nick.held += dt;
+      _nk.set(HOME.spotX, NICK.h / 2, HOME.spotZ);
+      /* turned to him, the hat swept out; then the bow goes a little too deep */
+      nickShow(home.nick === 'bow' && nick.held > 1.0 && nick.held < 3.2 ? 2 : 1, false);
+      if (home.nick === 'bow' && nick.held > 3.2 && !tween) {
+        home.nick = 'by-her';
+        showLines([{ medium: 'said', speaker: 'nick', text: 'Home safe. I shall tell the Fat Lady you were very brave.' }]);
+      }
+    }
+    if (home.ending && home.nick !== 'into-wall' && home.nick !== 'gone') { home.nick = 'into-wall'; nick.held = 0; }
+    if (home.nick === 'into-wall') {   /* back into the wall he came out of, fading as he goes */
+      _nk.x = Math.min(END_X - 0.1, _nk.x + 0.5 * dt); _nk.z += (HOME.glowZ - _nk.z) * Math.min(1, dt * 1.5);
+      nickMesh.material.opacity = Math.max(0, nickMesh.material.opacity - dt * 0.55 / HOME.down);
+      if (nickMesh.material.opacity <= 0) { home.nick = 'gone'; nickMesh.visible = false; nick.state = 'away'; }
+    }
+    if (home.nick !== 'gone') {
+      nickMesh.position.copy(_nk);
+      nickMesh.rotation.y = Math.atan2(camera.position.x - _nk.x, camera.position.z - _nk.z);
+      nickLamp.position.set(_nk.x - 0.05, _nk.y + 0.1, _nk.z); nickLamp.rotation.copy(nickMesh.rotation);
+      nickLamp.material.opacity = 0.5 * nickMesh.material.opacity;
+    } else nickLamp.visible = false;
+  }
+  if (home.ending && home.k <= 0 && (home.kind !== 'walk' || home.nick === 'gone')) {
+    homeGlow.visible = false; nickLamp.visible = false;
+    home.kind = null; home.ending = false; home.nick = null;
+  }
 }
 /* a grey stand-in until its drawing (an empty painted room by the sitters' painter, its door at the right edge, where a
    caught sitter walks off, as the room's stand-in has it) */
@@ -2460,7 +2554,8 @@ var STOPS = [
   /* her, on the end wall: standing back the corridor's width, as from a thing on a side wall, square to her */
   { name: 'her', meshes: [her], stop: function () {
       var d = WIDTH - STOP_BACK, fov = clamp(2 * Math.atan(PORTRAIT_H * STOP_MARGIN / 2 / d) * 180 / Math.PI, FOV_REST, FOV_MAX);
-      return withTrevor({ pos: new THREE.Vector3(END_X - d, EYE, MID_Z), look: new THREE.Vector3(END_X, HOLE_Y, MID_Z), fov: fov }, ['by-her']); } },
+      if (home.kind === 'walk' && nickHomeShift()) fov = Math.min(FOV_MAX, fov * HOME.wide);
+      return withTrevor({ pos: new THREE.Vector3(END_X - d, EYE, MID_Z), look: new THREE.Vector3(END_X, HOLE_Y, MID_Z + nickHomeShift()), fov: fov }, ['by-her']); } },
   { name: 'portrait-a', meshes: [portraitA], stop: function () { return withTrevor(stopFor(portraitA, 1.2, 1.75), ['halfway']); } },
   { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75); } },
   { name: 'armour', meshes: [armour], stop: function () { return withTrevor(stopFor(armour, ARMOUR.h, 1.3), ['suit-feet', 'suit-flags']); } },
@@ -2667,6 +2762,7 @@ function goTo(s) {
   glideTo(s.stop(), s.arrive);
   if (s.name === 'her' && tween.from.pos.distanceTo(tween.to.pos) > 2.5) primpHer(tween.dur);   /* her primp, only as he walks up */
   if (castle && castle.moment) castle.moment('walk up');   /* he sets off toward a stop: a torch may lean (req 140) */
+  if (s.name === 'her' && home.q && !home.kind) nickHome(home.q === 'glow' ? 'glow' : 'walk');   /* ?nickHome=, for a look */
 }
 function goBack() {
   lockDrop(); humpDrop();
@@ -3410,6 +3506,9 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); },
     'nick drifts out of the wall a little beyond the torch that leaned and on along the corridor, out of sight': function () { nickAfterLean(false); },
     'nick drifts out of the wall a little beyond the torch that leaned, pauses to look at him, and drifts on along the corridor, out of sight': function () { nickAfterLean(true); },
+    /* Nick lights him home (B22): the first night, then his light left on every night after (Events' record, nick_home) */
+    "a pearly glow waits on the wall beside the Fat Lady's frame; nick drifts out of it, walks the last stretch beside him, bows a little too deep, and fades into the wall as the hole opens": function () { nickHome('walk'); },
+    "a pearly glow waits on the wall beside the Fat Lady's frame, nick's light left on for him, and fades as the hole opens": function () { nickHome('glow'); },
     /* the painting opposite, met as he steps out (req 119): watching, caught slipping out, or paying him no mind */
     "the mantel painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady": function () { oppMoment('watch', 'mantel'); },
     "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'mantel'); },
@@ -3561,6 +3660,7 @@ function frame() {
   updateGrounds(wdt);
   updateSnowball(wdt);
   updateNick(wdt);
+  updateNickHome(wdt);
   updateBewitched(wdt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, wdt * 4));
   hinge.rotation.y = -herDoor.ang;
@@ -3592,7 +3692,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
