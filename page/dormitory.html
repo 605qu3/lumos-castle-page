@@ -173,9 +173,10 @@ Decisions, 8 October 2026, each Godric's from a plan to scale (assets/review/dor
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=11"></script>
+<script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=25"></script>
+<script src="castle-events.js?v=31"></script>
+<script src="castle-map.js?v=2"></script>
 <script>
 (function () {
 'use strict';
@@ -302,7 +303,7 @@ BED_DEGS.forEach(function (deg, i) {
   [-1, 1].forEach(function (s) { drawn.push(box(g, 0.12, BED.h - 0.4, BED.l - 0.1, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, BED.l / 2, hm, 1)); });
   [-1, 1].forEach(function (s) { drawn.push(box(g, (BED.w + 0.16) / 2, BED.h - 0.4, 0.12, s * (BED.w + 0.16) / 4, (BED.h - 0.4) / 2, BED.l + 0.02, hm, 1)); });
   drawn.forEach(function (m) { m.visible = false; m.name = name + '-drawn'; });
-  parts.push(box(g, TRUNK.l, TRUNK.h, TRUNK.w, 0, TRUNK.h / 2, BED.l + 0.15 + TRUNK.w / 2, trunkMat, 1));   /* the trunk at the foot, its long side across it */
+  parts.push(box(g, TRUNK.l, TRUNK.h, TRUNK.w, 0, TRUNK.h / 2, BED.l + 0.15 + TRUNK.w / 2, his ? trunkMat.clone() : trunkMat, 1));   /* the trunk at the foot, its long side across it; his own material, for its glow (req 287) */
   parts[parts.length - 1].name = his ? 'trunk-his' : 'trunk-' + (i + 1);
   parts.forEach(function (m) { if (!m.name) m.name = name; });
   /* the dark under the bed: an unlit block under the frame, open 0.6 m at the foot end; under his bed, two grey
@@ -450,6 +451,90 @@ function updateSnowball(dt) {
     g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();
   } else { s.w.past.busy = false; snowball = null; }
   s.w.past.tex.needsUpdate = true;
+}
+
+/* the snowball's splat on the pane (board req 277, Events' grounds.snowball-splat, Godric's t1 on events-snowball-262:
+   one of the twins' bewitched snowballs misses and hits the glass, by day while snow lies, at most once a week): the
+   snowball of req 117, the same packed ball, colours and pen line (Object persistence), rises fast into the glass,
+   smacks flat into a round white splat with a few flecks, and slides slowly down the pane, thinning, until it is gone.
+   A window in view takes it, else any; lumosGreybox.splat() throws one for a shot. */
+var splat = null;
+function splatFly(name) {
+  var seen = windows.filter(function (w) { return inFrame(w.sky.position); });
+  var pool = name ? windows.filter(function (w) { return w.name === name; }) : (seen.length ? seen : windows);
+  var w = pool[Math.floor(Math.random() * pool.length)];
+  if (!w || w.past.busy) return null;
+  w.past.busy = true;
+  var flecks = [];
+  for (var i = 0; i < 7; i++) flecks.push({ a: Math.random() * Math.PI * 2, d: 1.15 + Math.random() * 0.5, k: 0.12 + Math.random() * 0.14 });
+  splat = { w: w, t: 0, rise: 0.45, slide: 9, x: 0.4 + 0.2 * Math.random(), y: 0.45 + 0.1 * Math.random(), flecks: flecks };
+  return w.name;
+}
+function updateSplat(dt) {
+  if (!splat) return;
+  var s = splat, c = s.w.past.canvas, g = c.getContext('2d'), w = c.width, h = c.height, r = 0.06 * PAST_PX;
+  s.t += dt;
+  g.clearRect(0, 0, w, h);
+  var x = s.x * w, y0 = s.y * h;
+  function ball(cx, cy, rad) {                       /* the snowball as req 117 draws it */
+    var grd = g.createRadialGradient(cx - rad * 0.35, cy - rad * 0.35, rad * 0.15, cx, cy, rad);
+    grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
+    g.fillStyle = grd; g.beginPath();
+    for (var i = 0; i <= 10; i++) {
+      var a = i / 10 * Math.PI * 2, k = rad * (0.92 + 0.08 * Math.sin(i * 2.7));
+      if (i) g.lineTo(cx + k * Math.cos(a), cy + k * Math.sin(a)); else g.moveTo(cx + k, cy);
+    }
+    g.fill(); g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();
+  }
+  if (s.t < s.rise) {                                /* up from below, fast, straight at the glass */
+    var u = s.t / s.rise;
+    ball(x, h + r - (h + r - y0) * (1 - (1 - u) * (1 - u)), r * (0.8 + 0.2 * u));
+  } else {
+    var v = Math.min(1, (s.t - s.rise) / s.slide), fall = v * v * (h - y0 + r * 2) * 0.9, y = y0 + fall;
+    var fade = v < 0.7 ? 1 : 1 - (v - 0.7) / 0.3, R = r * 1.55;
+    g.globalAlpha = 0.55 * fade;                     /* the wet track it leaves behind as it slides */
+    g.fillStyle = '#e6eaf1'; g.fillRect(x - R * 0.55, y0, R * 1.1, fall);
+    g.globalAlpha = fade;
+    var grd = g.createRadialGradient(x - R * 0.2, y - R * 0.25, R * 0.1, x, y, R);
+    grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.7, '#e6eaf1'); grd.addColorStop(1, '#c9d0db');
+    g.fillStyle = grd; g.beginPath();
+    for (var i = 0; i <= 14; i++) {                  /* flattened on the glass: round, its edge ragged */
+      var a = i / 14 * Math.PI * 2, k = R * (0.88 + 0.12 * Math.sin(i * 3.1) + 0.06 * Math.sin(i * 5.3));
+      if (i) g.lineTo(x + k * Math.cos(a), y + k * Math.sin(a) * (1 + v * 0.25)); else g.moveTo(x + k, y);
+    }
+    g.closePath(); g.fill(); g.strokeStyle = '#6f7a8c'; g.lineWidth = 1.5; g.stroke();
+    s.flecks.forEach(function (f) {                  /* flecks thrown out at the smack, sliding with it a little */
+      g.fillStyle = '#eef1f6';
+      g.beginPath(); g.arc(x + Math.cos(f.a) * R * f.d, y0 + Math.sin(f.a) * R * f.d + fall * 0.4, R * f.k, 0, Math.PI * 2); g.fill();
+    });
+    g.globalAlpha = 1;
+    if (v >= 1) { g.clearRect(0, 0, w, h); s.w.past.busy = false; splat = null; }
+  }
+  s.w.past.tex.needsUpdate = true;
+}
+
+/* his trunk already at the foot of his bed after his castle comes back from the backup (board req 287, Events'
+   trunk.carried, Godric's t1 on events-q-one-ipad-1013; PS 7, the trunks brought up ahead of them): the first time he
+   reaches the room after a restore, his trunk glows warm for a moment, as if just set down, and settles. If it is
+   out of view when the cue comes, the glow waits until he first looks at it (up to a minute); lumosGreybox.trunkGlow()
+   for a shot. */
+var TRUNK_GLOW = { secs: 3.2, wait: 60, color: 0x2e1e0a };
+var trunkGlow = null;
+function trunkGlowStart() { trunkGlow = { m: beds.filter(function (b) { return b.his; })[0].meshes.filter(function (m) { return m.name === 'trunk-his'; })[0], t: -1, wait: TRUNK_GLOW.wait }; return true; }
+var trunkGlowV = new THREE.Vector3();
+function updateTrunkGlow(dt) {
+  if (!trunkGlow) return;
+  var g = trunkGlow, m = g.m;
+  if (g.t < 0) {
+    m.getWorldPosition(trunkGlowV);
+    if (inFrame(trunkGlowV)) g.t = 0;
+    else if ((g.wait -= dt) <= 0) { trunkGlow = null; return; }
+    else return;
+  }
+  g.t += dt;
+  var u = g.t / TRUNK_GLOW.secs, k = u < 0.15 ? u / 0.15 : Math.max(0, 1 - (u - 0.15) / 0.85);
+  m.material.emissive.setHex(TRUNK_GLOW.color).multiplyScalar(k * k);
+  if (u >= 1) { m.material.emissive.setHex(0x000000); trunkGlow = null; }
 }
 
 /* the full moon's owl at W3 (board req 103, Magic for the boys, *The full moon's touch*; Events' night.moon-owl, req
@@ -1059,10 +1144,14 @@ function updateLines(dt) {
    carries the visit both ways and the waking (?from=sleep) opens a new one. The page answers `at`, the stop he stands
    at. Two cues are its own, from bedtime.json: the warning (a console note until a drawing gives the room a way to
    wind down) and lights out while he is already up here. Lines and sounds are the runtime's notes. */
+/* the Marauder's Map in his hands (req 269, the play of req 242; castle-map.js): its pocket button, the parchment over
+   the room, the oath's and Mischief managed's cards and Closer are the script's; the room only passes its cues, its
+   draw and its lines through, as the corridor does (req 268) */
+var mapPlay = window.CastleMap ? CastleMap.make({ castle: function () { return castle; } }) : null;
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'dormitory',
-  cues: {
+  cues: Object.assign({
     'the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair': function () {
       console.info('[dormitory] the bedtime warning: the room winds down (drawn later)');
     },
@@ -1074,9 +1163,18 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'behind the drawn hangings of the corner bed, a loud snore, and the hangings stir': function () { stir(CORNER_BED); },
     /* the grounds by day while snow lies (board req 117) and the full moon's owl at W3 (req 103), drawn past the glass */
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
-    "an owl's dark shape crosses the full moon, wings out, and is gone": moonOwlFly
+    "an owl's dark shape crosses the full moon, wings out, and is gone": moonOwlFly,
+    /* the twins' snowball that misses (req 277) and his trunk after a restore (req 287) */
+    'a snowball smacks into the glass, a round white splat that slides slowly down the pane': function () { splatFly(); },
+    'his trunk already at the foot of his bed, brought up ahead of him, as on his first night': trunkGlowStart
+  }, mapPlay ? mapPlay.cues : {}),
+  drawRoom: function (shown) {
+    if (!mapPlay) return;
+    mapPlay.drawRoom(shown);
+    /* the folded parchment sits at the foot of the screen on the left, where the help is: the help rises above it */
+    document.getElementById('help').style.bottom = mapPlay.state().pocket ? 'calc(env(safe-area-inset-bottom, 0px) + 66px)' : '';
   },
-  showLines: showLines,
+  showLines: function (list) { showLines(mapPlay ? mapPlay.lines(list) : list); },
   builtins: {
     at: function () { return atStop ? atStop.name : 'none'; },
     'moon in view': function () { return moonInView() ? 'yes' : 'no'; }
@@ -1122,8 +1220,8 @@ kit.zoom.shown({ 'the dormitory hearth': 'The hearth', 'the dormitory windows': 
 /* ---------- per frame ---------- */
 
 var clock = new THREE.Clock();
-/* ?snowball throws one every five seconds, ?moonowl flies the owl across the moon as often, for a look */
-var PAST_TEST = ['snowball', 'moonowl'].filter(function (k) { return new URLSearchParams(location.search).has(k); })[0], pastTest = 4;
+/* ?snowball throws one every five seconds, ?splat one at the glass once the last has slid away, ?moonowl flies the owl across the moon as often, for a look */
+var PAST_TEST = ['snowball', 'splat', 'moonowl'].filter(function (k) { return new URLSearchParams(location.search).has(k); })[0], pastTest = 4;
 /* the Omnioculars' dial (the Corridor's req 159, castle.js v=9): what moves by itself (the fire, the hangings' stir,
    the snowball, the moon's owl) runs on sdt and t, slowed while he looks through the pair; his view, the night's
    sequences, the runtime, the lines and the moon's hour keep time */
@@ -1135,8 +1233,8 @@ function frame() {
   updateCamera(dt);
   updateLines(dt);
   updateStirs(sdt);
-  updateSnowball(sdt); updateMoonOwl(sdt);
-  if (PAST_TEST) { pastTest += dt; if (pastTest > 5) { pastTest = 0; if (PAST_TEST === 'snowball') snowballFly(); else moonOwlFly(); } }
+  updateSnowball(sdt); updateSplat(sdt); updateMoonOwl(sdt); updateTrunkGlow(dt);
+  if (PAST_TEST) { pastTest += dt; if (pastTest > 5) { pastTest = 0; if (PAST_TEST === 'snowball') snowballFly(); else if (PAST_TEST === 'splat') { if (!splat) splatFly(); } else moonOwlFly(); } }
   moonClock += dt;
   if (moonClock > 60 && !night && !leaving) { moonClock = 0; setLight(light); }   /* the moon rises and sets through a long visit, never mid-sequence */
   /* the fire low: a slow flicker */
@@ -1157,6 +1255,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   descend: descend, arrive: arriveFromRoom, holdArrival: holdArrival, hangings: hangings, stir: stir, dim: dim, pose: pose,
   moon: function () { return { now: moonNow, shown: moonDisc.visible, window: MOON.win, at: moonDisc.position.toArray().map(function (v) { return +v.toFixed(2); }), d: MOON.d }; }, setLight: setLight, light: function () { return light; },
   snowball: snowballFly, snowballNow: function () { return snowball && { window: snowball.w.name, t: snowball.t }; },
+  splat: splatFly, splatNow: function () { return splat && { window: splat.w.name, t: splat.t }; }, trunkGlow: trunkGlowStart, trunkGlowNow: function () { return trunkGlow && { t: trunkGlow.t }; }, map: mapPlay,
   moonOwl: moonOwlFly, moonOwlNow: function () { return moonOwl && { t: moonOwl.t }; }, moonInView: function () { return { answer: moonInView(), discInFrame: moonDisc.visible && inFrame(moonDisc.position), cell: MOON_OWL.cell }; },
   bedtime: function () { startNight('bedtime'); }, waking: function () { startNight('waking'); },
   holdNight: function (kind, t) {
