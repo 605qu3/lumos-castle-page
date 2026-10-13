@@ -442,6 +442,42 @@ function leaveBy(el) {
   el.click();
 }
 
+/* A miss's kind words, as the Charms pages say them, so a room says the same (Interaction, req 218; its §9: a miss
+   answers kindly and visibly). Each is [what he sees, what to try], as SWISH_WHY and SPAN_WHY. FLICK_WHY is the Lumos
+   page's (lumos-test.html), for castOver; lockWhy and inkWhy follow the Alohomora and Aparecium pages, for openLock
+   and revealInk, and take the turn wanted or the taps' judge, since their words name them. */
+var FLICK_WHY = {
+  short: ['A puff of sparks', 'Too short: make the flick a little longer.'],
+  wiggly: ['Hic! Bubbles', 'Too wiggly: keep the flick straight, like a line.'],
+  slow: ['A wisp of smoke', 'Too slow: a flick is quick.'],
+  aside: ['Sparks, sideways', 'That went sideways. Point it up.'],
+  windmill: ['Whoa, a windmill', 'Round and round! Ron waved his arms like a windmill too. Try one straight flick.'],
+  down: ['Nothing to put out', 'A stroke down puts the light out. Light it first: flick up.']
+};
+function turnWords(want) {
+  return (want.turn === 0.25 ? 'a quarter turn' : (want.turn === 0.5 ? 'a half turn' : 'three quarters of a turn')) +
+    (want.dir === -1 ? ', anticlockwise' : ', clockwise');
+}
+function lockWhy(verdict, reason, want) {
+  var w = turnWords(want), W = w.charAt(0).toUpperCase() + w.slice(1), deg = Math.round(want.turn * 360);
+  if (verdict === 'nothing') return ['Nothing happened', 'It will not budge. Some locks are charmed against Alohomora, or want their own key, like the door in the room of flying keys (Book 1).'];
+  if (verdict === 'tight') return ['Click: the lock tightened', 'That way locks it. ' + W + '.'];
+  return ({
+    'not far enough': ['The key stops short', 'Not far enough. ' + W + ' is ' + deg + ' degrees.'],
+    'too far': ['It turns too far', 'Too far: a key stops where the lock says. ' + W + ', ' + deg + ' degrees.'],
+    'off the ring': ['The key slips', 'Keep your finger going round the keyhole, near the ring.'],
+    'through the middle': ['The key slips', 'Round the keyhole, not across it.']
+  })[reason] || ['The key barely moves', 'Turn it further round.'];
+}
+function inkWhy(j) {
+  var a = Math.round(j.tenths), b = 10 - a;
+  return ['The page stays blank', ({
+    'one spot': 'Spread them out: three taps in a line across the page, the middle one halfway.',
+    'not in a line': 'Keep the three taps in a line, like beads on a thread.',
+    'uneven spacing': 'Nearly. Your gaps were ' + a + ' and ' + b + ' tenths of the line. Halfway is 5 and 5: put the middle tap there.'
+  })[j.reason] || 'Keep an even beat: tap ... tap ... tap, like a clock ticking.'];
+}
+
 /* Lumos over a spot, for a room (req 125, the Common room's candle stub, Godric's Q37 t2; tried on
    page/charms/cast-over-test.html). One stroke: the traced guide (guide.js, if the room loads it) is a flick up
    ending just under the spot; the answer is 'cast' or 'missed', and the room draws what follows (the flame, or not).
@@ -454,7 +490,8 @@ function leaveBy(el) {
                   guided casts, then faint, then gone), 'always' or 'off',
            reach: the guide's length as a share of the screen's short side (0.32),
            exits: a selector for more ways out than EXITS, wait: quiet seconds before the offer goes (off) }
-   Returns { done: a promise of { verdict: 'cast' | 'missed' | 'cancelled', judge, traced }, cancel() }. */
+   Returns { done: a promise of { verdict: 'cast' | 'missed' | 'cancelled', judge, traced, first, why (a miss's
+             FLICK_WHY) }, cancel() }. */
 function castOver(opts) {
   opts = opts || {};
   var doc = root.document, G = root.LumosGuide, ease = opts.ease || 'kind', mode = opts.guide || 'auto';
@@ -524,7 +561,7 @@ function castOver(opts) {
     if (j.reason === 'tap') { if (guide) guide.clear(); return null; }
     var traced = !!(tr && tr.traced), ok = j.verdict === 'lumos' || traced;
     if (guide) { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
-    return { verdict: ok ? 'cast' : 'missed', judge: j, traced: traced, first: ok && firstCast('lumos') };
+    return { verdict: ok ? 'cast' : 'missed', judge: j, traced: traced, first: ok && firstCast('lumos'), why: ok ? null : FLICK_WHY[j.reason] || FLICK_WHY.short };
   }
   size(); root.addEventListener('resize', size); doc.body.appendChild(cv); raf = root.requestAnimationFrame(frame);
   return { done: done, cancel: function () { finish({ verdict: 'cancelled', judge: null, traced: false }); },
@@ -586,7 +623,8 @@ function layer(hooks, opts) {
            ease: 'kind' (default), 'fair' or 'strict' (TURN_EASES), guide: 'auto' (default), 'always' or 'off',
            face: true (default) or false, for a room that draws its own lock face,
            onTap: optional, called once the tap lands, for the room's "now turn it" }
-   Returns { done: a promise of { verdict, judge, traced }, cancel(), tap(), judge(points) }. */
+   Returns { done: a promise of { verdict, judge, traced, first, why (lockWhy, for every answer but 'opened') },
+             cancel(), tap(), judge(points) }. */
 function openLock(opts) {
   opts = opts || {};
   var G = root.LumosGuide, ease = opts.ease || 'kind', mode = opts.guide || 'auto';
@@ -650,7 +688,8 @@ function openLock(opts) {
     var verdict = j.verdict === 'open' || (traced && j.verdict === 'miss') ? 'opened' : (j.verdict === 'tight' ? 'tight' : 'missed');
     if (opts.stuck) verdict = 'nothing';
     else if (guide) { if (verdict === 'opened') guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
-    return { verdict: verdict, judge: j, traced: traced, first: verdict === 'opened' && firstCast('alohomora') };
+    return { verdict: verdict, judge: j, traced: traced, first: verdict === 'opened' && firstCast('alohomora'),
+      why: verdict === 'opened' ? null : lockWhy(verdict, j.reason, want) };
   }
   L = layer({
     size: function () { built = null; },
@@ -701,7 +740,8 @@ function openLock(opts) {
    opts: { sheet: {x, y, w, h} in CSS pixels, or a function returning one each frame,
            ease: 'kind' (default), 'fair' or 'strict' (TAP_EASES), beatAlone: false (default) or true,
            guide: 'auto' (default), 'always' or 'off' }
-   Returns { done: a promise of { verdict, judge, traced }, cancel(), taps(list of {x, y, t}) }. */
+   Returns { done: a promise of { verdict, judge, traced, first, why (a miss's inkWhy) }, cancel(), taps(list of
+             {x, y, t}) }. */
 function revealInk(opts) {
   opts = opts || {};
   var G = root.LumosGuide, mode = opts.guide || 'auto', alone = !!opts.beatAlone;
@@ -725,7 +765,7 @@ function revealInk(opts) {
     var traced = !!(tr && tr.traced && j.reason !== 'uneven beat'), ok = j.verdict === 'open' || traced;
     if (guide) { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
     over = true; taps = [];
-    return { verdict: ok ? 'revealed' : 'missed', judge: j, traced: traced, first: ok && firstCast('aparecium') };
+    return { verdict: ok ? 'revealed' : 'missed', judge: j, traced: traced, first: ok && firstCast('aparecium'), why: ok ? null : inkWhy(j) };
   }
   L = layer({
     size: function () { built = null; },
@@ -951,7 +991,9 @@ function frac(x) { x = q4(x); var n = Math.floor(x), r = Math.round((x - n) * 4)
    quarter inch, longer at each inch, "about 6¾ in" over it) or two taps, as the Ollivander page takes them. The
    room's pinch never sees these touches: they land on the layer, not the room's canvas. Lifting a finger takes the
    reading. A measuring tape has no wrong way, so a miss is only a touch it could not read: one finger alone for four
-   seconds ('one') or two less than half an inch apart ('close'); each answers kindly with `why`.
+   seconds ('one') or two less than half an inch apart ('close'); each answers kindly with `why`. A lone touch is
+   an end only if it moved less than TAP_SLOP (the frame's 12 px: a look-drag's lift is no end) and, with `ends`,
+   only within reach of one (0.12 of the screen's short side); any other costs nothing (Interaction, req 218).
    By default the inches are real ones on the glass (his hand, his finger); a room measuring a painted thing passes
    `scale`, inches to a CSS pixel in the painting. With `want` (inches) the answer says whether the span is 'right'
    (within `within`, half an inch by default), 'short' or 'long', and the layer leaves a gold mark on the tape where
@@ -962,6 +1004,7 @@ function frac(x) { x = q4(x); var n = Math.floor(x), r = Math.round((x - n) * 4)
            guide: 'auto' (default), 'always' or 'off', onChange: function(inches) as he spreads }
    Returns { done: a promise of { verdict: 'measured' | 'right' | 'short' | 'long' | 'missed' | 'cancelled', inches,
              px, pts, cause, why, traced }, cancel(), measure(a, b) }. */
+var TAP_SLOP = 12;   /* CSS pixels a touch may move and still be a tap, the frame's (Interaction's vocabulary, §3: a look-drag never taps) */
 var SPAN_WHY = {
   one: ['The tape waits for the other end', 'Two fingers, one at each end; or tap one end, then the other.'],
   close: ['The tape curls up', 'Spread them further apart: one finger at each end.']
@@ -969,7 +1012,7 @@ var SPAN_WHY = {
 function measureSpan(opts) {
   opts = opts || {};
   var G = root.LumosGuide, mode = opts.guide || 'auto', within = opts.within == null ? 0.5 : opts.within, L;
-  var touches = {}, taps = [], tape = null, over = false, oneAt = 0, guide = null, built = null;
+  var touches = {}, starts = {}, taps = [], tape = null, over = false, oneAt = 0, guide = null, built = null;
   function scale() { return opts.scale || 1 / ppi(); }
   function spot() { var p = typeof opts.at === 'function' ? opts.at() : opts.at; return p || { x: L.W / 2, y: L.H / 2 }; }
   function ends() {
@@ -1043,20 +1086,26 @@ function measureSpan(opts) {
     },
     down: function (ev) {
       if (over) return;
-      var p = L.pt(ev); touches[ev.pointerId] = p; if (guide) guide.cover(p);
+      var p = L.pt(ev); touches[ev.pointerId] = p; starts[ev.pointerId] = p; if (guide) guide.cover(p);
       try { L.cv.setPointerCapture(ev.pointerId); } catch (e) {}
       var n = Object.keys(touches).length;
       if (n === 1) oneAt = root.performance.now(); else oneAt = 0;
     },
-    move: function (ev) { if (ev.pointerId in touches && !over) { ev.preventDefault(); touches[ev.pointerId] = L.pt(ev); } },
+    move: function (ev) {
+      if (!(ev.pointerId in touches) || over) return;
+      ev.preventDefault(); var p = touches[ev.pointerId] = L.pt(ev), s = starts[ev.pointerId];
+      if (Object.keys(touches).length === 1 && s && Math.hypot(p.x - s.x, p.y - s.y) > TAP_SLOP) oneAt = 0;   /* a drag, not a held end */
+    },
     up: function (ev) {
       if (!(ev.pointerId in touches) || over) return;
-      var ids = Object.keys(touches), p = touches[ev.pointerId], out = null;
+      var ids = Object.keys(touches), p = touches[ev.pointerId], s = starts[ev.pointerId], out = null;
       if (ids.length >= 2) {
         var other = touches[ids[0] == ev.pointerId ? ids[1] : ids[0]];
         out = take(other, L.pt(ev));
       } else {
-        delete touches[ev.pointerId]; oneAt = 0;
+        delete touches[ev.pointerId]; delete starts[ev.pointerId]; oneAt = 0;
+        if (s && Math.hypot(p.x - s.x, p.y - s.y) > TAP_SLOP) return;   /* a look-drag's lift is no end (Interaction, req 218) */
+        if (opts.ends && !nearEnd(p)) return;   /* a stray tap away from both ends costs nothing */
         taps.push({ x: p.x, y: p.y, at: root.performance.now() });
         if (taps.length >= 2) { out = take(taps[0], taps[1]); taps = []; }
         if (!out) return;
@@ -1064,8 +1113,12 @@ function measureSpan(opts) {
       touches = {};
       if (out) finishWith(out);
     },
-    cancel: function (ev) { delete touches[ev.pointerId]; }
+    cancel: function (ev) { delete touches[ev.pointerId]; delete starts[ev.pointerId]; }
   }, opts);
+  function nearEnd(p) {   /* within an end's reach: 0.12 of the screen's short side, as the other callables' tap */
+    var e = ends(), reach = Math.max(28, Math.min(L.W, L.H) * 0.12);
+    return Math.hypot(p.x - e[0].x, p.y - e[0].y) <= reach || Math.hypot(p.x - e[1].x, p.y - e[1].y) <= reach;
+  }
   function miss(cause) {
     if (over) return; over = true;
     if (guide) guide.miss();
@@ -1191,6 +1244,7 @@ function openHump(opts) {
     cx.restore();
   }
   L = layer({
+    waiting: function () { return stage === 'tap'; },   /* `wait` never ends the swing midway (Interaction, req 218) */
     frame: function (now) {
       place();
       if (stage === 'swing') {
@@ -1221,7 +1275,7 @@ function openHump(opts) {
 
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
-  SWISH_WHY: SWISH_WHY, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
+  SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
   SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing };
 })(typeof window !== 'undefined' ? window : globalThis);
