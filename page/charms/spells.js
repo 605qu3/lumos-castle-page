@@ -646,6 +646,76 @@ function judgeFinite(points, things, ease) {
   else { out.verdict = 'stopped'; out.reason = 'all'; }
   return out;
 }
+/* Petrificus Totalus, the Body-Bind (PS 16: Hermione "raised her wand. 'Petrificus Totalus!' she cried, pointing it at
+   Neville. Neville's arms snapped to his sides. His legs sprang together. His whole body rigid, he swayed where he stood
+   and then fell flat on his face, stiff as a board"). The book's is a point; the strokes are ours, for the geometry:
+   two straight lines, one down each side of the figure, parallel to each other and to the figure's own line, the way
+   the arms snap to the sides. Parallel is judged as the lines' directions, either way drawn; two that are not would
+   meet somewhere, and the miss says where.
+   strokes: [points, points], each {x, y, t} in CSS pixels, in the order drawn; fig: { x, y the figure's middle, h its
+   height, w its half width, lean its tilt in degrees, + its top to the right }, px; ease: a name in BIND_EASES or an
+   ease of its own (straight: each line's chord over its path; len: each line's shortest, a share of the height; par:
+   the most degrees between the two; along: the most degrees their mean may stray from the figure's line; wide: how
+   far out from the figure's line a stroke may run, in half widths).
+   Returns { verdict: 'bound' | 'miss', reason ('bound', 'tap', 'one', 'wiggly', 'short', 'same', 'far', 'off', 'meet',
+   'slant'), which (the stroke a miss is about, 0 or 1, or -1), angle (degrees between the two lines), off (their mean's
+   degrees from the figure's line, + when they run further right toward the feet than it does), gapTop, gapBottom (px
+   between the lines across the figure's top and its feet), meet ({ x, y } where the two lines would cross, or null),
+   where ('above' or 'below' the figure's middle, for the meet), meetAt (the meet's distance along the figure's line
+   from its middle, in heights), straight ([each line's]), sides ([each line's middle across the figure's line, px]) }. */
+var BIND_EASES = {
+  kind:   { straight: 0.85, len: 0.40, par: 12, along: 20, wide: 3.0 },
+  fair:   { straight: 0.90, len: 0.50, par: 8,  along: 14, wide: 2.5 },
+  strict: { straight: 0.94, len: 0.60, par: 5,  along: 9,  wide: 2.0 }
+};
+function judgeBind(strokes, fig, ease) {
+  var e = typeof ease === 'object' ? ease : (BIND_EASES[ease] || BIND_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', which: -1, angle: 0, off: 0, gapTop: 0, gapBottom: 0, meet: null, where: '',
+    meetAt: 0, straight: [], sides: [] };
+  var L = (fig.lean || 0) * Math.PI / 180, d = { x: -Math.sin(L), y: Math.cos(L) }, n = { x: Math.cos(L), y: Math.sin(L) };
+  var lines = [], i;
+  function pathOf(s) { var l = 0; for (var k = 1; k < s.length; k++) l += Math.hypot(s[k].x - s[k - 1].x, s[k].y - s[k - 1].y); return l; }
+  strokes = (strokes || []).filter(function (s) { return s && s.length >= 2 && pathOf(s) >= fig.h * 0.08; });
+  if (!strokes.length) return out;
+  for (i = 0; i < Math.min(2, strokes.length); i++) {
+    var s = strokes[i], a = s[0], b = s[s.length - 1], vx = b.x - a.x, vy = b.y - a.y, ch = Math.hypot(vx, vy);
+    var m = { x: (a.x + b.x) / 2 - fig.x, y: (a.y + b.y) / 2 - fig.y };
+    var ang = Math.atan2(vx * n.x + vy * n.y, vx * d.x + vy * d.y) * 180 / Math.PI;   /* from the figure's line, as a line */
+    while (ang > 90) ang -= 180; while (ang <= -90) ang += 180;
+    lines.push({ ch: ch, straight: ch / pathOf(s), ang: ang, s: m.x * n.x + m.y * n.y, t: m.x * d.x + m.y * d.y,
+      ux: vx / (ch || 1), uy: vy / (ch || 1), mx: (a.x + b.x) / 2, my: (a.y + b.y) / 2 });
+  }
+  out.straight = lines.map(function (l) { return Math.round(l.straight * 100) / 100; });
+  out.sides = lines.map(function (l) { return Math.round(l.s); });
+  for (i = 0; i < lines.length; i++) {
+    if (lines[i].straight < e.straight) { out.reason = 'wiggly'; out.which = i; return out; }
+    if (lines[i].ch < e.len * fig.h) { out.reason = 'short'; out.which = i; return out; }
+  }
+  if (lines.length < 2) { out.reason = 'one'; out.which = 0; return out; }
+  var p = lines[0], q = lines[1];
+  out.angle = Math.round(Math.abs(p.ang - q.ang) * 10) / 10;
+  out.off = Math.round((p.ang + q.ang) / 2 * 10) / 10;
+  /* across the figure's top and its feet: where each line crosses, and the gap between them there */
+  function sAt(l, t) { var c = Math.cos(l.ang * Math.PI / 180); return Math.abs(c) < 0.2 ? NaN : l.s + (t - l.t) * Math.tan(l.ang * Math.PI / 180); }
+  out.gapTop = Math.round(Math.abs(sAt(p, -fig.h / 2) - sAt(q, -fig.h / 2))) || 0;
+  out.gapBottom = Math.round(Math.abs(sAt(p, fig.h / 2) - sAt(q, fig.h / 2))) || 0;
+  var den = p.ux * q.uy - p.uy * q.ux;   /* where the two would meet, drawn on and on */
+  if (Math.abs(den) > 1e-6) {
+    var k = ((q.mx - p.mx) * q.uy - (q.my - p.my) * q.ux) / den;
+    out.meet = { x: Math.round(p.mx + p.ux * k), y: Math.round(p.my + p.uy * k) };
+    var mt = (out.meet.x - fig.x) * d.x + (out.meet.y - fig.y) * d.y;
+    out.where = mt > 0 ? 'below' : 'above'; out.meetAt = Math.round(mt / fig.h * 10) / 10;
+  }
+  if (p.s * q.s >= 0) { out.reason = 'same'; out.which = 1; return out; }
+  for (i = 0; i < 2; i++) {
+    if (Math.abs(lines[i].s) > e.wide * fig.w) { out.reason = 'far'; out.which = i; return out; }
+    if (Math.abs(lines[i].t) > fig.h * 0.5) { out.reason = 'off'; out.which = i; return out; }
+  }
+  if (out.angle > e.par) { out.reason = 'meet'; return out; }
+  if (Math.abs(out.off) > e.along) { out.reason = 'slant'; return out; }
+  out.verdict = 'bound'; out.reason = 'bound';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1520,5 +1590,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

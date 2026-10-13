@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Petrificus Totalus, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120f0c; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1a1714;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=18"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* Petrificus Totalus, a test page for the Charms lane (13 October 2026, seventeenth session; the owner is Godric).
+   Drawn in code. The book (PS 16, checked in the text): Hermione, "really, really sorry", on Neville in the common room:
+   "Neville's arms snapped to his sides. His legs sprang together. His whole body rigid, he swayed where he stood and
+   then fell flat on his face, stiff as a board"; "It's the full Body-Bind". In the castle only on a safe target (Magic's
+   flag): a suit of armour in a corridor. The book's is a point; the strokes are ours, for the geometry: two straight
+   lines, one down each side of the armour, parallel to each other and to the armour's own line, judged by
+   LumosSpells.judgeBind on the tally's own layout (checks/bind-tally.js: its middle at W/2, 0.47 H; its height the
+   smaller of 0.4 of the screen's height and 0.95 of the short side; its half width 0.16 of that). When they hold, his
+   lines snap true like the arms, marked with the textbook's arrows for parallel, the gap measured at its helmet and
+   at its feet, the same both places (the armour six feet tall); the arms snap to its sides, the legs spring
+   together, it sways and falls flat on its face with a clang. Two lines that are not parallel are drawn on, dashed,
+   to where they would meet. Three rounds: Stiff as a board (the guide two lines), Never meet (at Christmas, a light
+   inside it, PoA 11: "mysterious lights shone from inside every suit of armour"; no guide) and The leaning one
+   (against a pillar: parallel the way it leans, a hint after a miss). ?round=1..3, ?ease= for trying;
+   window.lumosBind for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+  var ROUNDS = [
+    { name: 'Stiff as a board', lean: 0, lit: false,
+      start: 'A suit of armour in the corridor, its sword raised. <b>Draw one line down each side of it, helmet to feet</b>: <i>Petrificus Totalus!</i>' },
+    { name: 'Never meet', lean: 0, lit: true,
+      start: 'Christmas, and in the book a light shines from inside every suit of armour. This one keeps waving its sword. <b>Bind it, no guide</b>: two lines the same distance apart all the way down.' },
+    { name: 'The leaning one', lean: 24, lit: false,
+      start: 'This one leans on a pillar. <b>Bind it as it stands</b>: your two lines the same way as each other, and the same way as it.',
+      hint: 'Parallel means going the same way. Lean both lines just as the armour leans, one each side of it.' } ];
+  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+  var fig = null, wait = null, done = false, last = null, shown = null, misses = 0, bound = null, t0 = performance.now();
+  var stroke = null, active = null, first = null, trail = null, guides = [], dust = [];
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    place(); makeGuide(); shown = null; first = null;
+  }
+  function place() {
+    var h = Math.min(H * 0.4, S * 0.95);
+    fig = { x: W / 2, y: H * 0.47, h: h, w: h * 0.16, lean: ROUNDS[round].lean };
+  }
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+  /* the figure's own frame: s across (+ right), t down its line (+ toward the feet), both px from its middle */
+  function axes() { var L = fig.lean * Math.PI / 180; return { d: { x: -Math.sin(L), y: Math.cos(L) }, n: { x: Math.cos(L), y: Math.sin(L) } }; }
+  function toScreen(s, t) { var a = axes(); return { x: fig.x + s * a.n.x + t * a.d.x, y: fig.y + s * a.n.y + t * a.d.y }; }
+  function toFrame(p) { var a = axes(), x = p.x - fig.x, y = p.y - fig.y; return { s: x * a.n.x + y * a.n.y, t: x * a.d.x + y * a.d.y }; }
+  function inches(px) { var i = Math.round(px / fig.h * 72), f = Math.floor(i / 12); return f && !(i % 12) ? f + ' ft' : (f ? f + ' ft ' : '') + (i % 12) + ' in'; }
+
+  /* the guide, in the first round only: a line down each side, both at once, as the arms snap */
+  function makeGuide() {
+    guides = [];
+    if (round !== 0) return;
+    var box = function () { return { G: fig.h, ox: fig.x - fig.h / 2, oy: fig.y - fig.h / 2 }; };
+    guides = [[0.25, 'down', -1.3, 'lumos.charms.bindGuidedHits'], [0.75, 'down', 1.3, 'lumos.charms.bindGuidedHits2']].map(function (g) {
+      var gd = LumosGuide.create({ key: g[3], rest: 1.2, mirror: false, box: box,
+        parts: [{ pts: LumosGuide.line([g[0], 0.06], [g[0], 0.94], 24), secs: 0.45, label: g[1], at: 0.5, dx: g[2], dy: 0 }] });
+      gd.build(W, H); return gd;
+    });
+  }
+  function guideFor(pts) {   /* the guide nearer the stroke's middle */
+    if (!guides.length) return null;
+    var m = toFrame(pts[Math.floor(pts.length / 2)]);
+    return m.s < 0 ? guides[0] : guides[1];
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    ROUNDS.forEach(function (r, i) {
+      var b = document.createElement('button'); b.textContent = r.name; if (i === round) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { guides.forEach(function (gd) { gd.reset(); }); }; panel.appendChild(g);
+  }
+  function choose(i) {
+    if (wait) { clearTimeout(wait); wait = null; }
+    round = i; last = null; shown = null; trail = null; first = null; done = false; misses = 0; bound = null; dust = [];
+    place(); makeGuide(); menu(); say(ROUNDS[i].start);
+  }
+
+  /* ---- the cast: two lines ---- */
+  function stroked(pts) {   /* each stroke as it ends: the first waits for its twin */
+    if (wait || done) return null;
+    var len = 0; for (var k = 1; k < pts.length; k++) len += Math.hypot(pts[k].x - pts[k - 1].x, pts[k].y - pts[k - 1].y);
+    if (len < fig.h * 0.08) { say('Draw a line, from its helmet right down to its feet.'); guides.forEach(function (g) { g.clear(); }); return null; }
+    if (!first) { first = pts; say('<b>Now the other side.</b>'); return null; }
+    var pair = [first, pts]; first = null;
+    return judge(pair);
+  }
+  function judge(pair) {
+    if (wait || done) return null;
+    var j = LumosSpells.judgeBind(pair, fig, ease), now = performance.now(), R = ROUNDS[round];
+    var lv = guides.length ? guides[0].level() : 0, traced = false;
+    if (lv && pair.length === 2) {
+      var g0 = guideFor(pair[0]), g1 = guideFor(pair[1]);
+      if (g0 && g1 && g0 !== g1) { var a = g0.score(pair[0]), b = g1.score(pair[1]); traced = !!(a && b && a.traced && b.traced); }
+    }
+    if (traced && j.verdict === 'miss' && ['wiggly', 'short', 'far'].indexOf(j.reason) >= 0) { j.verdict = 'bound'; j.reason = 'bound'; }
+    last = j;
+    if (j.verdict !== 'bound') {
+      guides.forEach(function (g) { g.miss(); }); misses++;
+      trail = { pts: pair, at: now, which: j.which };
+      shown = (j.reason === 'meet' || j.reason === 'slant') ? { pair: pair, at: now, j: j } : null;
+      var where = j.where === 'below' ? 'down past its feet: its legs would cross, not spring together' : 'up over its helmet';
+      var words = {
+        tap: 'Draw a line from its helmet down to its feet, then one down the other side.',
+        one: 'Now the other side.',
+        wiggly: 'Straighter: its arms snap straight, and a wobbly line cannot.',
+        short: 'Longer: from its helmet right down to its feet.',
+        same: 'One line down each side of it: one for its left arm, one for its right.',
+        far: 'Closer in: right beside it, where its arms hang.',
+        off: 'Beside it, from its helmet to its feet.',
+        meet: 'These two would meet, ' + where + '. ' + inches(j.gapTop) + ' apart at its helmet, ' + inches(j.gapBottom) + ' at its feet. <b>Parallel lines never meet</b>: keep them the same distance apart all the way.',
+        slant: R.lean ? (R.hint) : 'Parallel to each other, but not to it: its arms hang straight down, so <b>draw straight down</b>.'
+      };
+      say(words[j.reason] || 'Try again: two lines, one down each side.');
+      if (R.hint && misses > 1 && j.reason !== 'slant') say(words[j.reason] + ' ' + R.hint);
+      return j;
+    }
+    /* bound: his lines snap true, the arms snap to the sides, it sways and falls */
+    guides.forEach(function (g) { g.hit(lv > 0); });
+    var s0 = toFrame(mid(pair[0])).s, s1 = toFrame(mid(pair[1])).s;
+    bound = { at: now, s: [s0, s1], gap: Math.abs(s1 - s0) };
+    noise(0.08, 3200, 0.35);
+    setTimeout(function () { if (bound) noise(0.5, 900, 0.5); }, 2300);
+    setTimeout(function () { if (bound) noise(0.35, 2600, 0.3); }, 2350);
+    LumosSpells.learn('petrificus');
+    var gap = inches(bound.gap);
+    if (round === 0) {
+      say('<b>Petrificus Totalus!</b> Its arms snapped to its sides, its legs sprang together, and over it went, stiff as a board. In the book it was Neville, and Hermione was really, really sorry.');
+      wait = setTimeout(function () { wait = null;
+        say('Your two lines snapped true: ' + gap + ' apart at its helmet and ' + gap + ' at its feet. <b>The same distance all the way: parallel.</b> The little arrows are how a maths book marks it.');
+        wait = setTimeout(function () { wait = null; choose(1); }, 6500); }, 5200);
+    } else if (round === 1) {
+      say('<b>Bound, light and all.</b> ' + gap + ' apart at the top, ' + gap + ' at the bottom. Draw them on forever and they would never meet.');
+      wait = setTimeout(function () { wait = null; choose(2); }, 7800);
+    } else {
+      say('<b>Bound, leaning and all.</b> ' + gap + ' apart at both ends. Parallel is not about straight down: it is two lines going the same way, never meeting, however far you draw them.');
+      done = true;
+    }
+    return j;
+  }
+  function mid(pts) { var a = pts[0], b = pts[pts.length - 1]; return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; }
+
+  /* ---- the armour's pose, from the moment it was bound ---- */
+  function pose(now) {
+    var R = ROUNDS[round], p = { armL: 150, armR: 40, legs: 9, sway: 0, fall: 0 };
+    if (R.lit) p.armL = 120 + Math.sin(now / 420) * 30;   /* waving its sword */
+    if (R.lean) { p.armL = 25; p.armR = 60; p.legs = 4; }
+    if (!bound) return p;
+    var t = now - bound.at, snap = Math.min(1, t / 160), spring = Math.max(0, Math.min(1, (t - 80) / 160));
+    p.armL *= 1 - snap; p.armR *= 1 - snap; p.legs *= 1 - spring;
+    if (t > 350 && t < 1700) { var u = (t - 350) / 1350; p.sway = 0.07 * Math.sin(u * Math.PI * 3) * (1 - u * 0.5); }
+    if (t > 1700) { var v = Math.min(1, (t - 1700) / 600); p.fall = v * v; }
+    return p;
+  }
+
+  /* ---- drawing ---- */
+  function drawCorridor(now) {
+    var feet = toScreen(0, fig.h / 2).y, bw = Math.max(48, fig.h * 0.2), bh = bw * 0.5, r, c;
+    cx.fillStyle = '#2b2520'; cx.fillRect(0, 0, W, H);
+    for (r = 0; r * bh < feet; r++) for (c = -1; c * bw < W; c++) {   /* the wall's stones */
+      var x = c * bw + (r % 2 ? bw / 2 : 0), y = r * bh, k = (((r * 5 + c * 11) % 7) + 7) % 7 / 7;
+      cx.fillStyle = 'rgb(' + Math.round(70 + k * 16) + ',' + Math.round(62 + k * 14) + ',' + Math.round(54 + k * 12) + ')';
+      cx.fillRect(x + 1.5, y + 1.5, bw - 3, bh - 3);
+    }
+    cx.fillStyle = '#3a3129'; cx.fillRect(0, feet, W, H - feet);   /* the floor, its flags toward us */
+    cx.strokeStyle = 'rgba(0,0,0,0.35)'; cx.lineWidth = 1;
+    for (r = 1; r < 6; r++) { var fy = feet + (H - feet) * (r * r) / 36; cx.beginPath(); cx.moveTo(0, fy); cx.lineTo(W, fy); cx.stroke(); }
+    [W * 0.12, W * 0.88].forEach(function (tx, i) {   /* two torches */
+      var ty = feet - fig.h * 0.85, fl = 1 + Math.sin(now / 110 + i * 2) * 0.08, s = fig.h * 0.5 * fl;
+      var gl = cx.createRadialGradient(tx, ty, 0, tx, ty, s); gl.addColorStop(0, 'rgba(255,190,110,0.32)'); gl.addColorStop(1, 'rgba(255,170,90,0)');
+      cx.fillStyle = gl; cx.fillRect(tx - s, ty - s, s * 2, s * 2);
+      cx.fillStyle = '#ffcf7a'; cx.beginPath(); cx.ellipse(tx, ty, fig.h * 0.018, fig.h * 0.035 * fl, 0, 0, 7); cx.fill();
+      cx.fillStyle = '#4a3420'; cx.fillRect(tx - fig.h * 0.012, ty + fig.h * 0.03, fig.h * 0.024, fig.h * 0.08);
+    });
+    if (ROUNDS[round].lean) {   /* the pillar it leans on */
+      var top = toScreen(0, -fig.h / 2), px = top.x + fig.h * 0.1;
+      cx.fillStyle = '#4f453b'; cx.fillRect(px, 0, fig.h * 0.16, feet);
+      cx.fillStyle = 'rgba(255,255,255,0.06)'; cx.fillRect(px, 0, fig.h * 0.03, feet);
+    }
+    var vg = cx.createRadialGradient(W / 2, H * 0.5, S * 0.3, W / 2, H * 0.5, Math.max(W, H) * 0.75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.5)'); cx.fillStyle = vg; cx.fillRect(0, 0, W, H);
+  }
+  function limb(x0, y0, ang, len, wd, side) {   /* an arm or a leg: from (x0, y0) at ang degrees out from straight down */
+    var a = ang * Math.PI / 180, dx = side * Math.sin(a), dy = Math.cos(a);
+    cx.lineCap = 'round'; cx.strokeStyle = '#8d939a'; cx.lineWidth = wd;
+    cx.beginPath(); cx.moveTo(x0, y0); cx.lineTo(x0 + dx * len, y0 + dy * len); cx.stroke();
+    cx.strokeStyle = 'rgba(255,255,255,0.35)'; cx.lineWidth = wd * 0.25;
+    cx.beginPath(); cx.moveTo(x0 - dy * wd * 0.2 * side, y0 + dx * wd * 0.2 * side); cx.lineTo(x0 + dx * len - dy * wd * 0.2 * side, y0 + dy * len + dx * wd * 0.2 * side); cx.stroke();
+    cx.fillStyle = '#6c7178'; cx.beginPath(); cx.arc(x0 + dx * len * 0.5, y0 + dy * len * 0.5, wd * 0.6, 0, 7); cx.fill();   /* elbow, knee */
+    return { x: x0 + dx * len, y: y0 + dy * len, dx: dx, dy: dy };
+  }
+  function drawArmour(now) {
+    var p = pose(now), h = fig.h, feet = toScreen(0, h / 2), lit = ROUNDS[round].lit;
+    cx.save();
+    cx.translate(feet.x, feet.y); cx.rotate(fig.lean * Math.PI / 180 * (1 - p.fall) + p.sway + 0.12 * p.fall);   /* it lands a little askew */
+    var sy = Math.cos(p.fall * Math.PI / 2) - 0.55 * Math.sin(p.fall * Math.PI / 2), back = sy < 0;
+    cx.transform(1, 0, 0, sy, 0, 0);   /* falls flat on its face, toward us: past upright we see its back */
+    cx.translate(0, -h / 2); cx.scale(h, h);   /* now in heights, its middle at 0, its feet at 0.5 */
+    if (!back) { cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.beginPath(); cx.ellipse(0, 0.5, 0.16, 0.025, 0, 0, 7); cx.fill(); }
+    else { cx.fillStyle = 'rgba(0,0,0,0.25)'; cx.beginPath(); cx.ellipse(0, 0.02, 0.15, 0.5, 0, 0, 7); cx.fill(); }   /* its shadow on the flags */
+    var hipY = 0.06, legL = 0.41;
+    [-1, 1].forEach(function (side) {   /* legs, then the feet */
+      var f = limb(side * 0.04, hipY, p.legs, legL, 0.07, side);
+      cx.fillStyle = '#7a8087'; cx.beginPath(); cx.ellipse(f.x + side * 0.02, f.y + 0.012, 0.045, 0.022, 0, 0, 7); cx.fill();
+    });
+    cx.fillStyle = '#7d838a'; cx.beginPath(); cx.moveTo(-0.12, -0.05); cx.lineTo(0.12, -0.05); cx.lineTo(0.13, 0.08); cx.lineTo(-0.13, 0.08); cx.closePath(); cx.fill();   /* the skirt of plates */
+    cx.strokeStyle = 'rgba(0,0,0,0.3)'; cx.lineWidth = 0.004; for (var k = 0; k < 3; k++) { cx.beginPath(); cx.moveTo(-0.125, -0.01 + k * 0.03); cx.lineTo(0.125, -0.01 + k * 0.03); cx.stroke(); }
+    var gb = cx.createLinearGradient(-0.13, 0, 0.13, 0); gb.addColorStop(0, '#6d737a'); gb.addColorStop(0.4, '#c3c8cd'); gb.addColorStop(1, '#5d6268');
+    cx.fillStyle = gb; cx.beginPath(); cx.moveTo(-0.13, -0.31); cx.lineTo(0.13, -0.31); cx.lineTo(0.1, -0.04); cx.quadraticCurveTo(0, 0, -0.1, -0.04); cx.closePath(); cx.fill();   /* the breastplate */
+    cx.strokeStyle = back ? 'rgba(0,0,0,0.35)' : 'rgba(255,255,255,0.3)'; cx.lineWidth = back ? 0.012 : 0.004; cx.beginPath(); cx.moveTo(0, -0.3); cx.lineTo(0, -0.03); cx.stroke();   /* the ridge, or its backbone */
+    [[-1, p.armL], [1, p.armR]].forEach(function (a) {   /* arms; the sword in its right hand (on our left) */
+      var side = a[0], sh = { x: side * 0.155, y: -0.27 }, hand = limb(sh.x, sh.y, a[1], 0.3, 0.055, side);
+      if (side < 0 && !back) {
+        cx.strokeStyle = '#d9dde2'; cx.lineWidth = 0.022; cx.lineCap = 'butt';
+        cx.beginPath(); cx.moveTo(hand.x, hand.y); cx.lineTo(hand.x + hand.dx * 0.3, hand.y + hand.dy * 0.3); cx.stroke();
+        cx.strokeStyle = '#a07a30'; cx.lineWidth = 0.014; cx.beginPath();
+        cx.moveTo(hand.x - hand.dy * 0.05, hand.y + hand.dx * 0.05); cx.lineTo(hand.x + hand.dy * 0.05, hand.y - hand.dx * 0.05); cx.stroke();
+      }
+      cx.fillStyle = '#5f646a'; cx.beginPath(); cx.arc(hand.x, hand.y, 0.032, 0, 7); cx.fill();   /* gauntlet */
+      cx.fillStyle = '#8e949b'; cx.beginPath(); cx.arc(sh.x, sh.y, 0.055, 0, 7); cx.fill();   /* pauldron */
+    });
+    cx.fillStyle = '#80868d'; cx.fillRect(-0.045, -0.345, 0.09, 0.04);   /* gorget */
+    var hg = cx.createLinearGradient(-0.075, 0, 0.075, 0); hg.addColorStop(0, '#6a7077'); hg.addColorStop(0.45, '#cdd2d7'); hg.addColorStop(1, '#5a5f65');
+    cx.fillStyle = hg; cx.beginPath(); cx.moveTo(-0.07, -0.33); cx.lineTo(-0.075, -0.43); cx.quadraticCurveTo(0, -0.5, 0.075, -0.43); cx.lineTo(0.07, -0.33); cx.closePath(); cx.fill();   /* helmet */
+    cx.fillStyle = lit ? 'rgba(255,214,130,' + (0.75 + Math.sin(now / 300) * 0.2) + ')' : '#1a1714';
+    if (!back) cx.fillRect(-0.05, -0.405, 0.1, 0.014);   /* the visor's slit, lit at Christmas */
+    if (lit && !back) { var lg = cx.createRadialGradient(0, -0.4, 0, 0, -0.4, 0.12); lg.addColorStop(0, 'rgba(255,214,130,0.35)'); lg.addColorStop(1, 'rgba(255,214,130,0)'); cx.fillStyle = lg; cx.fillRect(-0.12, -0.52, 0.24, 0.24); }
+    cx.fillStyle = '#9b2a22'; cx.beginPath(); cx.moveTo(0, -0.47); cx.quadraticCurveTo(-0.07, -0.56, -0.09, -0.5); cx.quadraticCurveTo(-0.04, -0.52, 0, -0.46); cx.fill();   /* plume */
+    cx.restore();
+  }
+  function line2(a, b, col, w, dash) { cx.strokeStyle = col; cx.lineWidth = w; cx.setLineDash(dash || []); cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.setLineDash([]); }
+  function label(x, y, text, col) {
+    var fs = Math.round(Math.max(13, S * 0.032)); cx.font = 'bold ' + fs + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    var w = cx.measureText(text).width + fs * 0.6;
+    x = Math.max(w / 2 + 4, Math.min(W - w / 2 - 4, x));
+    cx.fillStyle = 'rgba(20,16,12,0.85)'; cx.fillRect(x - w / 2, y - fs * 0.7, w, fs * 1.4);
+    cx.fillStyle = col; cx.fillText(text, x, y);
+  }
+  function gapBar(t, sA, sB, col) {   /* a measured gap across the figure at t, between two places across it */
+    var a = toScreen(sA, t), b = toScreen(sB, t);
+    line2(a, b, col, 2, [4, 4]);
+    [a, b].forEach(function (q, i) { var o = toScreen(i ? sB - 1 : sA + 1, t), ang = Math.atan2(o.y - q.y, o.x - q.x);
+      cx.fillStyle = col; cx.beginPath(); cx.moveTo(q.x, q.y); cx.lineTo(q.x + Math.cos(ang + 0.5) * 9, q.y + Math.sin(ang + 0.5) * 9); cx.lineTo(q.x + Math.cos(ang - 0.5) * 9, q.y + Math.sin(ang - 0.5) * 9); cx.fill(); });
+    var m = toScreen(Math.max(sA, sB) + fig.h * 0.13, t); label(m.x, m.y, inches(Math.abs(sB - sA)), col);
+  }
+  function drawBound(now) {   /* his lines snapped true, the parallel arrows, the two gaps the same */
+    if (!bound) return;
+    var t = now - bound.at, a = Math.min(1, t / 250), col = '#f3d27a', top = -fig.h * 0.45, bot = fig.h * 0.45;
+    cx.save(); cx.globalAlpha = a; cx.lineCap = 'round';
+    bound.s.forEach(function (s) {
+      line2(toScreen(s, top), toScreen(s, bot), col, Math.max(3, S * 0.008));
+      var m = toScreen(s, 0), d = axes().d, ch = fig.h * 0.03;   /* the parallel mark: an arrowhead on each, the same way */
+      cx.strokeStyle = col; cx.lineWidth = 3; cx.beginPath();
+      cx.moveTo(m.x - d.x * ch + d.y * ch, m.y - d.y * ch - d.x * ch); cx.lineTo(m.x, m.y); cx.lineTo(m.x - d.x * ch - d.y * ch, m.y - d.y * ch + d.x * ch); cx.stroke();
+    });
+    if (t > 2600) { var lo = Math.min(bound.s[0], bound.s[1]), hi = Math.max(bound.s[0], bound.s[1]);
+      cx.globalAlpha = Math.min(1, (t - 2600) / 400); gapBar(top, lo, hi, col); gapBar(bot, lo, hi, col); }
+    cx.restore();
+  }
+  function drawShown(now) {   /* a miss's lines drawn on, dashed, to where they would meet; or the armour's own line */
+    if (!shown) return;
+    var j = shown.j, col = '#e7a37a', P = shown.pair.map(function (pts) { return [pts[0], pts[pts.length - 1]]; });
+    cx.save(); cx.lineCap = 'round';
+    P.forEach(function (ab) { line2(ab[0], ab[1], 'rgba(220,225,255,0.8)', 4); });
+    if (j.reason === 'meet' && j.meet) {
+      P.forEach(function (ab) {   /* on from the end nearer the meet */
+        var e = Math.hypot(ab[0].x - j.meet.x, ab[0].y - j.meet.y) < Math.hypot(ab[1].x - j.meet.x, ab[1].y - j.meet.y) ? ab[0] : ab[1];
+        line2(e, j.meet, col, 2, [6, 6]);
+      });
+      var on = j.meet.x > -20 && j.meet.x < W + 20 && j.meet.y > -20 && j.meet.y < H + 20;
+      if (on) { cx.fillStyle = col; cx.beginPath(); cx.arc(j.meet.x, j.meet.y, Math.max(6, S * 0.014), 0, 7); cx.fill();
+        label(j.meet.x, j.meet.y + (j.where === 'below' ? -1 : 1) * S * 0.06, 'they meet here', col); }
+      var f = P.map(function (ab) { return { a: toFrame(ab[0]), b: toFrame(ab[1]) }; });
+      function sAt(k, t) { var q = f[k], u = (t - q.a.t) / ((q.b.t - q.a.t) || 1); return q.a.s + (q.b.s - q.a.s) * u; }
+      [-fig.h / 2, fig.h / 2].forEach(function (t) { var a = sAt(0, t), b = sAt(1, t); gapBar(t, Math.min(a, b), Math.max(a, b), col); });
+    } else if (j.reason === 'slant') {
+      line2(toScreen(0, -fig.h * 0.6), toScreen(0, fig.h * 0.55), 'rgba(243,210,122,0.8)', 2, [6, 6]);
+      var q = toScreen(0, -fig.h * 0.6); label(q.x, q.y - S * 0.03, 'its line', '#f3d27a');
+    }
+    cx.restore();
+  }
+  function frame(now) {
+    drawCorridor(now);
+    drawArmour(now);
+    if (bound && now - bound.at > 2300 && now - bound.at < 2400 && !dust.length) for (var k = 0; k < 14; k++) dust.push({ a: k / 14 * 6.283, at: now });
+    var feet = toScreen(0, fig.h / 2);
+    dust = dust.filter(function (p) { return now - p.at < 900; });
+    dust.forEach(function (p) { var a = (now - p.at) / 900, d = fig.h * (0.08 + a * 0.25);
+      cx.fillStyle = 'rgba(210,200,180,' + (0.6 * (1 - a)) + ')'; cx.beginPath(); cx.arc(feet.x + Math.cos(p.a) * d * 1.4, feet.y + fig.h * 0.12 + Math.sin(p.a) * d * 0.35, Math.max(2, S * 0.008), 0, 7); cx.fill(); });
+    drawBound(now);
+    drawShown(now);
+    if (!wait && !done && !bound) guides.forEach(function (g) { g.draw(cx, now, !!stroke || !!first); });
+    function ink(pts, a, rose) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = rose ? 'rgba(240,150,140,' + a + ')' : 'rgba(220,225,255,' + a + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
+    }
+    if (first) ink(first, 0.75);
+    if (stroke && stroke.length > 1) ink(stroke, 0.65);
+    if (trail && !shown && now - trail.at < 1400) trail.pts.forEach(function (pts, i) { ink(pts, 0.7 * (1 - (now - trail.at) / 1400), i === trail.which); });
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: two strokes, one down each side ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (wait || done || active !== null || bound) return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null; shown = null;
+    guides.forEach(function (g) { g.cover(stroke[0]); });
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); guides.forEach(function (g) { g.cover(q); }); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    stroked(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
+  window.lumosBind = { choose: function (i) { choose(i - 1); }, judge: function (pair) { return judge(pair); },
+    figure: function () { return { x: fig.x, y: fig.y, h: fig.h, w: fig.w, lean: fig.lean }; },
+    state: function () { return { round: round + 1, waiting: !!wait, done: done, misses: misses, first: !!first, bound: !!bound,
+      last: last ? { verdict: last.verdict, reason: last.reason, which: last.which, angle: last.angle, off: last.off, gapTop: last.gapTop, gapBottom: last.gapBottom, meet: last.meet, where: last.where } : null,
+      line: lineEl.textContent, guide: guides.length ? guides[0].state().level : null, ease: ease, learned: LumosSpells.learned('petrificus') }; } };
+})();
+</script>
+</body>
+</html>
