@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 8,
+  "version": 9,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -61,9 +61,10 @@ window.CASTLE_MODEL = {
     { "id": "east courtyard", "rect": [92, 18, 144, 50], "state": "designed" }
   ],
   "towers": [
-    { "id": "Astronomy Tower", "c": [80, 77], "r": 8, "floors": "G-T", "high": true, "state": "designed", "ages": ["P2", "P4", "P6"], "about": "over the front doors", "cite": "DH 31, OotP 31, HBP 27" },
-    { "id": "Ravenclaw Tower", "c": [-7.5, 34], "r": 8.5, "floors": "G-T", "high": true, "state": "designed", "ages": ["P3", "P5", "P6"], "about": "on the west side", "cite": "DH 31, OotP 18, DH 29" },
-    { "id": "Gryffindor Tower", "c": [42.19, 1.95], "r": 6.4, "floors": "G-T", "high": true, "group": "gryffindor-suite", "state": "designed", "ages": ["P3", "P5", "P6"], "about": "the suite's tower (5.6 inside, a 0.8 wall), standing 4.45 m proud of the south face", "cite": "DH 31, OotP 21, OotP 29" },
+    { "id": "Astronomy Tower", "c": [80, 77], "r": 8, "floors": "G-T", "high": true, "state": "designed", "ages": ["P2", "P4", "P6"], "about": "over the front doors", "cite": "DH 31, OotP 31, HBP 27", "eaves": 82.0, "top": 83.2, "stair_top": 87.0, "classroom": [75.8, 81.3], "heights_state": "proposed", "heights_about": "Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): raised a stage to stay the highest (HBP 27) over the houses' raised towers: the ramparts 83.2 (were 67.2), its stair turret's cap 87.0, the classroom 75.8 to 81.3" },
+    { "id": "Ravenclaw Tower", "c": [-7.5, 34], "r": 8.5, "floors": "G-T", "high": true, "state": "designed", "ages": ["P3", "P5", "P6"], "about": "on the west side", "cite": "DH 31, OotP 18, DH 29", "eaves": 66.8, "ridge": 77.1, "heights_state": "proposed", "heights_about": "Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): the common room lowered to the seventh floor (+36.4 to 42.6), the drum split into a boys' and a girls' half a level, seven levels over it (see dormitories); the eaves were 53.7, the cone 64.0" },
+    { "id": "Gryffindor Tower", "c": [42.19, 1.95], "r": 6.4, "floors": "G-T", "high": true, "group": "gryffindor-suite", "state": "designed", "ages": ["P3", "P5", "P6"], "about": "the suite's tower (5.6 inside, a 0.8 wall), standing 4.45 m proud of the south face", "cite": "DH 31, OotP 21, OotP 29", "eaves": 69.1, "ridge": 80.4, "heights_state": "proposed", "heights_about": "Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): seven boys' rooms up the tower's stair, the built dormitory the seventh at the top (+64.2); the eaves were 48.7, the cone 60.0 (see dormitories)" },
+    { "id": "Gryffindor girls' tower", "c": [42.19, 13.95], "r": 6.4, "floors": "7-T", "state": "proposed", "eaves": 69.1, "ridge": 80.4, "about": "the girls' drum, the built tower's size 12 m north of it, the two sharing a stretch of wall; it rises from the south range at the seventh floor, behind the tower seen from the lake; its stair hall at the common room's level, entered through the shared wall (the door's place the Common room's), seven rooms over it at the boys' levels (Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935))", "cite": "PS 7, OotP 17" },
     { "id": "West Tower", "c": [0, 72], "r": 8, "floors": "G-T", "state": "proposed", "ages": ["P2", "P3", "P4", "P6"], "about": "lower than the three highest" },
     { "id": "North Tower", "c": [160, 72], "r": 7.5, "floors": "G-T", "state": "proposed", "ages": ["P2", "P4", "P5", "P6"], "about": "lower than the three highest", "cite": "PoA 6, PoA 16" },
     { "id": "south-west tower", "c": [0, 0], "r": 7, "floors": "G-T", "state": "proposed", "ages": ["P2", "P4", "P5", "P6"], "about": "lower than the three highest" },
@@ -89,7 +90,13 @@ window.CASTLE_MODEL = {
     { "id": "5", "name": "fifth floor", "z": 26.0, "state": "designed" },
     { "id": "6", "name": "sixth floor", "z": 31.2, "state": "designed" },
     { "id": "7", "name": "seventh floor", "z": 36.4, "state": "designed" },
-    { "id": "tower", "name": "Gryffindor Tower above the seventh floor: the dormitories", "z": 43.8, "state": "designed", "about": "the tower's levels are its own, apart from the ranges' storeys: the common room 7.0 m high on the seventh floor, the dormitory's floor 7.4 m above it" }
+    { "id": "tower-1", "name": "Gryffindor Tower, the boys' stair's first dormitory level (the girls' drum alike)", "z": 43.8, "state": "proposed" },
+    { "id": "tower-2", "name": "Gryffindor Tower, the boys' stair's second dormitory level (the girls' drum alike)", "z": 47.2, "state": "proposed" },
+    { "id": "tower-3", "name": "Gryffindor Tower, the boys' stair's third dormitory level (the girls' drum alike)", "z": 50.6, "state": "proposed" },
+    { "id": "tower-4", "name": "Gryffindor Tower, the boys' stair's fourth dormitory level (the girls' drum alike)", "z": 54.0, "state": "proposed" },
+    { "id": "tower-5", "name": "Gryffindor Tower, the boys' stair's fifth dormitory level (the girls' drum alike)", "z": 57.4, "state": "proposed" },
+    { "id": "tower-6", "name": "Gryffindor Tower, the boys' stair's sixth dormitory level (the girls' drum alike)", "z": 60.8, "state": "proposed" },
+    { "id": "tower", "name": "Gryffindor Tower's top: Harry's year's dormitory, the seventh up the boys' stair", "z": 64.2, "state": "designed", "about": "Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): the tower's levels are its own, apart from the ranges' storeys: the common room 7.0 m high on the seventh floor, then seven dormitories a stair at 3.4 m storeys (3.0 clear), the built room at the top, 27.8 m above the common room (CoS 5, GoF 12)" }
   ],
   "rooms": [
     {
@@ -99,10 +106,10 @@ window.CASTLE_MODEL = {
       "state": "built", "cite": "PS 7, PS 9"
     },
     {
-      "id": "dormitory", "name": "the first years' dormitory", "group": "gryffindor-suite", "level": "tower",
-      "shape": { "circle": [0, 0], "r": 5.6 }, "wall": 0.8, "floor": 7.4, "ceiling": 11.9,
-      "page": "dormitory.html", "frame": { "x": 0, "y": 0, "turn": -48.7, "z": 7.4 },
-      "state": "built", "cite": "PS 7"
+      "id": "dormitory", "name": "Harry's year's dormitory, at the top of the boys' stair (FIRST YEARS on its door, then SECOND YEARS)", "group": "gryffindor-suite", "level": "tower",
+      "shape": { "circle": [0, 0], "r": 5.6 }, "wall": 0.8, "floor": 27.8, "ceiling": 32.3,
+      "page": "dormitory.html", "frame": { "x": 0, "y": 0, "turn": -48.7, "z": 27.8 },
+      "state": "built", "cite": "PS 7, CoS 5, GoF 12"
     },
     {
       "id": "corridor", "name": "the Fat Lady's corridor", "group": "gryffindor-suite", "level": "7",
@@ -231,14 +238,66 @@ window.CASTLE_MODEL = {
   ],
   "stairs": [
     { "id": "tower-stair", "kind": "open newel stair", "rooms": ["common-room", "dormitory"], "newel": [4.13, -2.59], "r": 0.7,
-      "from": 0, "to": 7.4, "treads": 37, "rise": 0.2, "hand": "clockwise up, seen from above", "state": "built", "cite": "PS 7",
+      "from": 0, "to": 27.8, "treads": 139, "rise": 0.2, "hand": "clockwise up, seen from above", "state": "built", "cite": "PS 7",
       "drawn_to": 5.6, "drawn_treads": 28,
-      "about": "Godric's Q68, 68.1 (12 October 2026, 6.51 pm; req 191, 201): the stair runs on unseen to the dormitory's floor at 7.4 m, two turns and nine treads at 14 a turn; the common room draws 28, since no view shows it above 5.37 m" },
+      "about": "Godric's Q68, 68.1 (12 October 2026, 6.51 pm; req 191, 201): the common room draws 28, since no view shows it above 5.37 m. Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): the stair climbs on unseen past six doors, a room a level (PoA 13, \"Doors opened behind them\"), walled in below the top, to the built room's floor at 27.8 m; the dormitory page's open stair head is the top's" },
     { "id": "corridor-flight", "kind": "straight flight down", "room": "corridor", "span": [[-1.5, 20.11], [1.5, 23.41]],
       "from": 0, "to": -1.98, "treads": 11, "rise": 0.18, "state": "built" },
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
       "shape": { "rect": [-1.5, 23.41, 1.5, 25.81] }, "z": -1.98, "state": "built" }
   ],
+  "dormitories": {
+    "state": "proposed",
+    "cite": "PS 7, CoS 5, PoA 13, GoF 12, OotP 17, OotP 18, HBP 21, CoS 12, DH 23, DH 29",
+    "about": "Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): each house a room per year group, the boys' and the girls' on their own stairs; a year group keeps its room all seven years, the sign on its door changing each September (CoS 5), so Harry's year's is at the top of the boys' stair. His note: \"We will keep the other years very basic.\" Heights in the castle's frame; all proposed but the built room.",
+    "houses": [
+      {
+        "house": "Gryffindor",
+        "tower": "Gryffindor Tower",
+        "girls_tower": "Gryffindor girls' tower",
+        "levels": [
+          43.8,
+          47.2,
+          50.6,
+          54.0,
+          57.4,
+          60.8,
+          64.2
+        ],
+        "clear": 3.0,
+        "top_clear": 4.5,
+        "built": "dormitory",
+        "about": "the boys' seven up the built tower's stair, the built room the seventh; the girls' seven up their own drum, entered from the common room through the shared wall (OotP 17's slide is theirs); each stair walled in below the top, a door a room (PoA 13)"
+      },
+      {
+        "house": "Ravenclaw",
+        "tower": "Ravenclaw Tower",
+        "common_room": [
+          36.4,
+          42.6
+        ],
+        "levels": [
+          43.0,
+          46.4,
+          49.8,
+          53.2,
+          56.6,
+          60.0,
+          63.4
+        ],
+        "clear": 3.0,
+        "about": "the common room lowered to the seventh floor; the drum split, a boys' and a girls' half a level, each up its own stair turret from a lobby behind the one door (DH 29: \"a door that led, he guessed, to dormitories above\")"
+      },
+      {
+        "house": "Hufflepuff",
+        "about": "below ground near the kitchens (HBP 21, OotP 18): two passages off the common room's level, a boys' and a girls', seven doors each; the common room not yet placed"
+      },
+      {
+        "house": "Slytherin",
+        "about": "a long, low underground room (CoS 12) under the lake (DH 23): two passages off it, a boys' and a girls', seven doors each; the common room not yet placed"
+      }
+    ]
+  },
   "staircases": {
     "count": 142, "state": "proposed", "cite": "PS 8",
     "about": "PS 8's hundred and forty-two through the whole castle, one staircase one stair from a floor to the next landing: the well holds 14 (the marble staircase, the moving flights, the Friday one), the rest stand in the towers, the ranges, the walls and down (Godric's 7.18 am question, 13 October 2026; tools/architect-stairs.py, sheet architect-stairs-0735). In the castle's frame; 'ours' where no book places it.",
@@ -277,6 +336,7 @@ window.CASTLE_MODEL = {
     ]
   },
   "open": [
-    "The tower stair rises 5.6 m against the dormitory floor's 7.4 m."
+    "The tower stair is drawn to 5.6 m in the common room; it climbs on unseen to the top dormitory's floor at 27.8 m (Godric's 235.1).",
+    "The 142 staircases (PS 8): the places' tally predates 235.1, which gives Gryffindor's dormitories fourteen (seven a stair, were 4) and Ravenclaw's two stair turrets seven each (were 9 in one); the tally to be settled with Godric (the Architect)."
   ]
 };
