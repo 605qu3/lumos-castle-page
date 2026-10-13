@@ -40,9 +40,13 @@
    bobbing, in a line only twice a swing: wait for it); then, after the three's full marks, Four in a row (twenty-third
    session): two hover still and fix a line (two points fix a line), the other two fly across it, one twice as often,
    so all four lie on it only now and then; judgeFreeze's fix names the two, and a miss with those two caught but
-   another off their line is 'apart', its distance drawn square to the line. ?round=1..4, ?ease= for trying;
-   window.lumosFreeze for checks (pixies(ms): where they will be that many ms from now; nextRow(): ms until the three,
-   or the four, are next in a row). */
+   another off their line is 'apart', its distance drawn square to the line. Q9's fix (13 October 2026, David tried
+   it: moving pixies judged at the lift were awkward): while his wand is down they slow almost to a stop (a clock of
+   their own, eased toward SLOW of real time), so he aims where he sees them; a frost creeps in at the edges while
+   they crawl. The judge is unchanged. ?round=1..4, ?ease= for trying;
+   window.lumosFreeze for checks (pixies(ms, held): where they will be that many ms from now, held: with a finger down
+   all that time; heldMs(ms): their clock's ms in that many held; clock(): their ms and rate; nextRow(): their ms until
+   the three, or the four, are next in a row). */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -52,13 +56,13 @@
     { name: "Lockhart's pixies",
       start: 'Lockhart bellows "Peskipiksi Pesternomi!" It has absolutely no effect. Do what Hermione did: freeze <b>two at once</b>, with <b>one straight line through both</b>.' },
     { name: 'Flitting',
-      start: '<b>No guide</b>, and these two will not sit still. One straight line through both, caught where they are when you lift.' },
+      start: '<b>No guide</b>, and these two will not sit still, but while your wand is down they <b>slow almost to a stop</b>. One straight line through both, caught where they are when you lift.' },
     { name: 'Three in a row',
       start: 'Three at once! A straight line only goes through three when they are <b>in a row</b>, and they only line up now and then. <b>Wait for it.</b>' },
     { name: 'Four in a row', fix: [0, 2],
       start: 'Four! <b>Two points fix a line</b>: the two hovering still fix it. The other two must fly <b>onto that line</b> before one stroke catches all four. <b>Wait for both.</b>' } ];
   var round = Math.max(0, Math.min(3, (Number(qs.get('round')) || 1) - 1));
-  var t0 = 0, wait = null, done = false, last = null, misses = 0, frozen = null, shown = null;
+  var wait = null, done = false, last = null, misses = 0, frozen = null, shown = null;
   var stroke = null, active = null, trail = null, guides = [];
 
   function resize() {
@@ -83,7 +87,15 @@
     return [[0.25 * W, c + A * Math.sin(th)], [0.5 * W, c + 2 * A * Math.sin(th + Math.PI / 4)], [0.75 * W, c + A * Math.sin(th + Math.PI / 2)]].map(px);
   }
   function px(q) { return { x: q[0], y: q[1], r: R }; }
-  function nowMs() { return performance.now() - t0; }
+  /* the pixies' own clock (Q9's fix): eased, TAU ms, toward SLOW of real time while a finger is down and back to 1 when
+     it lifts; the step is exact, so the clock is the same however often it is read */
+  var SLOW = 0.08, TAU = 120, pc = 0, rate = 1, pl = 0;
+  function tick(now) {
+    var dt = Math.max(0, now - pl), T = active !== null ? SLOW : 1, k = Math.exp(-dt / TAU);
+    pc += T * dt + (rate - T) * TAU * (1 - k); rate = T + (rate - T) * k; pl = now; return pc;
+  }
+  function heldMs(ms) { return SLOW * ms + (rate - SLOW) * TAU * (1 - Math.exp(-ms / TAU)); }
+  function nowMs() { return tick(performance.now()); }
   function nextRow() {   /* in a row when sin(th + pi/4) is 0: th = k pi - pi/4; the four when sin(ph) is 0, ph = 0.8 t + pi/3 */
     if (round === 3) { var ph = 0.8 * nowMs() / 1000 + Math.PI / 3, m = Math.ceil(ph / Math.PI) * Math.PI; return Math.round((m - ph) / 0.8 * 1000); }
     var th = nowMs() / 1000, k = Math.ceil((th + Math.PI / 4) / Math.PI), next = k * Math.PI - Math.PI / 4;
@@ -135,7 +147,7 @@
   }
   function choose(i) {
     if (wait) { clearTimeout(wait); wait = null; }
-    round = i; last = null; trail = null; done = false; misses = 0; frozen = null; shown = null; t0 = performance.now();
+    round = i; last = null; trail = null; done = false; misses = 0; frozen = null; shown = null; pc = 0; rate = 1; pl = performance.now();
     makeGuide(); menu(); say(ROUNDS[i].start);
   }
 
@@ -250,7 +262,7 @@
       });
       return;
     }
-    var P = posAt(nowMs());
+    var pm = nowMs(), P = posAt(pm);
     if (round === 2 && ease === 'kind' && !wait && !done) {   /* for the younger boy: a faint line when they are nearly in a row */
       var j = LumosSpells.judgeFreeze([{ x: P[0].x, y: P[0].y }, { x: P[2].x, y: P[2].y }], P, ease);
       if (j.bend < 1.2) { var l2 = longLine(P[0], P[2]); line2(l2[0], l2[1], 'rgba(243,210,122,' + (0.45 * (1 - j.bend / 1.2)).toFixed(2) + ')', 2, [4, 8]); }
@@ -260,7 +272,7 @@
       line2(l4[0], l4[1], 'rgba(243,210,122,0.35)', 2, [4, 8]);
       [1, 3].forEach(function (k) { if (jf.fixOff[k] <= LumosSpells.FREEZE_EASES.kind.near) { cx.save(); cx.strokeStyle = 'rgba(243,210,122,0.8)'; cx.lineWidth = 2; cx.beginPath(); cx.arc(P[k].x, P[k].y, P[k].r * 1.45, 0, 7); cx.stroke(); cx.restore(); } });
     }
-    P.forEach(function (p, k) { drawPixie(p, now, false, k); });
+    P.forEach(function (p, k) { drawPixie(p, pm, false, k); });   /* their wings on their own clock: slowed, they crawl */
   }
   function drawShown(now) {   /* a miss worth showing: the line run on, and the one it missed ringed */
     if (!shown || now - shown.at > 2600) return;
@@ -280,11 +292,17 @@
     }
     cx.restore();
   }
+  function frost(a) {   /* while they crawl: a frost creeping in at the edges */
+    var g = cx.createRadialGradient(W / 2, H / 2, S * 0.3, W / 2, H / 2, Math.hypot(W, H) / 2);
+    g.addColorStop(0, 'rgba(200,235,255,0)'); g.addColorStop(1, 'rgba(200,235,255,' + (0.3 * a).toFixed(3) + ')');
+    cx.fillStyle = g; cx.fillRect(0, 0, W, H);
+  }
   function frame(now) {
     drawRoom(now);
     drawShown(now);
     if (!wait && !done && !frozen && !(shown && now - shown.at <= 2600)) guides.forEach(function (g) { g.draw(cx, now, !!stroke); });
     drawPixies(now);
+    if (!frozen && rate < 0.995) frost((1 - rate) / (1 - SLOW));
     function ink(pts, a, rose) {
       cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = rose ? 'rgba(240,150,140,' + a + ')' : 'rgba(220,240,255,' + a + ')'; cx.lineWidth = 5;
       cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
@@ -300,7 +318,7 @@
   cv.addEventListener('pointerdown', function (ev) {
     ensureAudio(); ev.preventDefault();
     if (wait || done || active !== null || frozen) return;
-    active = ev.pointerId; stroke = [pt(ev)]; trail = null; shown = null;
+    tick(performance.now()); active = ev.pointerId; stroke = [pt(ev)]; trail = null; shown = null;
     guides.forEach(function (g) { g.cover(stroke[0]); });
     try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
   });
@@ -311,15 +329,16 @@
   });
   cv.addEventListener('pointerup', function (ev) {
     if (ev.pointerId !== active || !stroke) return;
-    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    tick(performance.now()); active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
     judge(pts);
   });
-  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; } });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { tick(performance.now()); active = null; stroke = null; } });
   document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
   addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
   window.lumosFreeze = { choose: function (i) { choose(i - 1); },
-    pixies: function (ahead) { return posAt(nowMs() + (ahead || 0)); }, nextRow: nextRow,
+    pixies: function (ahead, held) { return posAt(nowMs() + (held ? heldMs(ahead || 0) : (ahead || 0))); }, nextRow: nextRow,
+    heldMs: function (ms) { nowMs(); return heldMs(ms); }, clock: function () { return { ms: nowMs(), rate: rate }; },
     state: function () { return { round: round + 1, waiting: !!wait, done: done, misses: misses, frozen: !!frozen, caged: !!(frozen && frozen.cage),
       last: last ? { verdict: last.verdict, reason: last.reason, caught: last.caught, off: last.off, missed: last.missed, bend: last.bend, straight: last.straight, fixOff: last.fixOff, onFix: last.onFix, apart: last.apart } : null,
       line: lineEl.textContent, guide: guides.length ? guides[0].state().level : null, ease: ease, learned: LumosSpells.learned('freezing') }; } };
