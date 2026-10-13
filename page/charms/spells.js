@@ -716,6 +716,61 @@ function judgeBind(strokes, fig, ease) {
   out.verdict = 'bound'; out.reason = 'bound';
   return out;
 }
+/* The Cheering Charm (PoA 15: practised in pairs, the class leaving "all grinning broadly - the Cheering Charms had
+   left them with a feeling of great contentment"; PoA 16: in the exam Harry "slightly overdid his out of nerves and
+   Ron, who was partnering him, ended up in fits of hysterical laughter"). The book gives no motion; the stroke is ours,
+   for the geometry: the glum mouth is an arc bowed up, and he draws the same arc flipped, a reflection across the line
+   through its two corners: corner to corner, as wide, bowed down as deep. Far deeper is the exam's overdoing ('fits').
+   points: [{x, y, t}] in CSS pixels, either way drawn; mouth: { x, y the middle of the line through its corners, w half
+   that line, depth how far the frown's middle stands above it }, px, the line level; ease: a name in CHEER_EASES or
+   one of its own (off: how far the drawn line's middle may stray, in half widths; width: the share the drawn line may
+   be narrower or wider than the mouth's; level: the most degrees it may tilt; wiggle: the path over the length of a
+   true arc of that line and depth; flat, over: the least and most depth, as shares of the frown's; mid: how far the
+   deepest point may stray from the middle, a share of the line).
+   Returns { verdict: 'cheered' | 'miss', reason ('cheered', 'tap', 'off', 'narrow', 'wide', 'tilted', 'wiggly', 'flat',
+   'glum', 'lopsided', 'fits'), chord (px, corner to corner as drawn), sagitta (px, + bowed down, a smile), ratio (the
+   sagitta over the frown's depth), radius (px, of the arc through the corners and the deepest point: a wider smile of
+   the same depth is a flatter arc), tilt (degrees, + its right end lower), at (where the deepest point falls along the
+   line, 0 to 1) }. */
+var CHEER_EASES = {
+  kind:   { off: 0.45, width: 0.40, level: 16, wiggle: 1.30, flat: 0.40, over: 2.4, mid: 0.24 },
+  fair:   { off: 0.35, width: 0.30, level: 12, wiggle: 1.22, flat: 0.55, over: 2.0, mid: 0.18 },
+  strict: { off: 0.25, width: 0.22, level: 8,  wiggle: 1.15, flat: 0.70, over: 1.6, mid: 0.13 }
+};
+function judgeCheer(points, mouth, ease) {
+  var e = typeof ease === 'object' ? ease : (CHEER_EASES[ease] || CHEER_EASES.kind);
+  var out = { verdict: 'miss', reason: 'tap', chord: 0, sagitta: 0, ratio: 0, radius: 0, tilt: 0, at: 0.5 };
+  var P = points || [], i, path = 0;
+  for (i = 1; i < P.length; i++) path += Math.hypot(P[i].x - P[i - 1].x, P[i].y - P[i - 1].y);
+  if (P.length < 2 || path < mouth.w * 0.3) return out;
+  var a = P[0], b = P[P.length - 1];
+  if (b.x < a.x) { var tmp = a; a = b; b = tmp; }   /* either way drawn: read it left to right */
+  var c = Math.hypot(b.x - a.x, b.y - a.y) || 1, u = { x: (b.x - a.x) / c, y: (b.y - a.y) / c }, n = { x: -u.y, y: u.x };
+  if (n.y < 0) n = { x: -n.x, y: -n.y };   /* n points down the screen: + is bowed down, a smile */
+  var s = 0, at = 0.5, hi = 0, lo = 0;
+  for (i = 0; i < P.length; i++) {
+    var dx = P[i].x - a.x, dy = P[i].y - a.y, o = dx * n.x + dy * n.y;
+    if (Math.abs(o) > Math.abs(s)) { s = o; at = (dx * u.x + dy * u.y) / c; }
+    if (o > hi) hi = o; if (o < lo) lo = o;
+  }
+  out.chord = Math.round(c); out.sagitta = Math.round(s); out.ratio = Math.round(s / mouth.depth * 100) / 100;
+  out.tilt = Math.round(Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI * 10) / 10; out.at = Math.round(at * 100) / 100;
+  var as = Math.abs(s) || 0.01, r = c * c / (8 * as) + as / 2;
+  out.radius = Math.round(r);
+  var arc = 2 * r * Math.asin(Math.min(1, c / (2 * r)));   /* a true arc's length on that line, that deep */
+  if (as > c / 2) arc = 2 * Math.PI * r - arc;              /* deeper than a half circle: the long way round */
+  if (path > e.wiggle * arc || Math.min(hi, -lo) > 0.25 * as) { out.reason = 'wiggly'; return out; }
+  if (Math.hypot((a.x + b.x) / 2 - mouth.x, (a.y + b.y) / 2 - mouth.y) > e.off * mouth.w) { out.reason = 'off'; return out; }
+  if (c < (1 - e.width) * 2 * mouth.w) { out.reason = 'narrow'; return out; }
+  if (c > (1 + e.width) * 2 * mouth.w) { out.reason = 'wide'; return out; }
+  if (Math.abs(out.tilt) > e.level) { out.reason = 'tilted'; return out; }
+  if (as < e.flat * mouth.depth) { out.reason = 'flat'; return out; }
+  if (s < 0) { out.reason = 'glum'; return out; }
+  if (Math.abs(at - 0.5) > e.mid) { out.reason = 'lopsided'; return out; }
+  if (s > e.over * mouth.depth) { out.reason = 'fits'; return out; }
+  out.verdict = 'cheered'; out.reason = 'cheered';
+  return out;
+}
 /* judge:end */
 
 /* What a boy has learned, kept on the device: learn('lumos') once he has cast it, learned('lumos') for a room to ask
@@ -1590,5 +1645,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>The Cheering Charm, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120f0c; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1a1714;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=19"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* The Cheering Charm, a test page for the Charms lane (13 October 2026, eighteenth session; the owner is Godric).
+   Drawn in code. The book (PoA 15 and 16, checked in the text): Flitwick, "we're experimenting with Cheering Charms
+   today"; the class leaves "all grinning broadly", with "a feeling of great contentment"; in the exam Harry "slightly
+   overdid his out of nerves and Ron, who was partnering him, ended up in fits of hysterical laughter". In the castle: a
+   glum portrait. No motion in the book; the stroke is ours, for the geometry, a reflection: the sitter's mouth is an
+   arc bowed up, and he draws the same arc flipped across the line through its two corners, as wide, as deep, judged by
+   LumosSpells.judgeCheer on the tally's own layout (checks/cheer-tally.js: the portrait's height the smaller of 0.5 of
+   the screen's height and 0.9 of the short side; the frame's middle at W/2, 0.44 H; the mouth 0.18 of that height
+   below it; its half width and the frown's depth shares of that height per round). When it holds the sitter grins,
+   and the geometry is drawn: the line it flips over, dashed, the frown's ghost above and the smile below, the same
+   depth marked on each. Far too deep and the sitter is in fits, as Ron was. Three rounds: Flitwick's lesson (the guide
+   the flipped arc), The wide frown (no guide: a wider mouth, the same depth, so a flatter curve from a bigger circle)
+   and The exam (not too much). ?round=1..3, ?ease= for trying; window.lumosCheer for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+  var WIDE = [0.14, 0.20, 0.15], DEEP = [0.05, 0.05, 0.06];
+  var ROUNDS = [
+    { name: "Flitwick's lesson", bg: '#2d3b2c', robe: '#4a2f5c', skin: '#e2c09a', hat: 'point',
+      start: 'Flitwick: "Wands out, we\'re experimenting with Cheering Charms today." This old wizard has been glum in his frame for a century. <b>Draw his frown the other way up</b>: from corner to corner of his mouth, curving down.' },
+    { name: 'The wide frown', bg: '#3b2c2a', robe: '#27424f', skin: '#d9b28c', hat: 'bun',
+      start: 'A witch with a wide, sad mouth. <b>No guide</b>: the same curve as her frown, flipped over, corner to corner.' },
+    { name: 'The exam', bg: '#2a2f3d', robe: '#5c2a2a', skin: '#e6c6a4', hat: 'cap',
+      start: 'The exam, and Flitwick is watching. In the book Harry was so nervous he overdid it. <b>Not too much</b>: just as deep as the frown, flipped.' } ];
+  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+  var mouth = null, ph = 0, wait = null, done = false, last = null, shown = null, misses = 0, cheer = null, fits = null;
+  var stroke = null, active = null, trail = null, guides = [];
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    place(); makeGuide(); shown = null;
+  }
+  function place() {
+    ph = Math.min(H * 0.5, S * 0.9);
+    mouth = { x: W / 2, y: H * 0.44 + ph * 0.18, w: ph * WIDE[round], depth: ph * DEEP[round] };
+  }
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+  function chime() {   /* three rising notes, the class grinning */
+    if (!audio) return;
+    [660, 830, 990].forEach(function (f, i) {
+      var o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + i * 0.12;
+      o.frequency.value = f; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5); o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.55);
+    });
+  }
+
+  /* the guide, in the first round only: the frown's arc flipped, corner to corner */
+  function smileArc(sag, n) {   /* the mouth's frame: x -1..1 across, y down, both in half widths */
+    var out = [], s = Math.abs(sag) || 0.001, r = 1 / (2 * s) + s / 2, th = Math.asin(Math.min(1, 1 / r)), i;
+    if (s > 1) th = Math.PI - th;
+    for (i = 0; i <= n; i++) { var a = -th + 2 * th * i / n; out.push([r * Math.sin(a), (r * Math.cos(a) - (r - s)) * (sag < 0 ? -1 : 1)]); }
+    return out;
+  }
+  function makeGuide() {
+    guides = [];
+    if (round !== 0) return;
+    var box = function () { return { G: 2 * mouth.w, ox: mouth.x - mouth.w, oy: mouth.y - mouth.w }; };
+    var pts = smileArc(mouth.depth / mouth.w, 24).map(function (q) { return [(q[0] + 1) / 2, (q[1] + 1) / 2]; });
+    var gd = LumosGuide.create({ key: 'lumos.charms.cheerGuidedHits', rest: 1.2, mirror: false, box: box,
+      parts: [{ pts: pts, secs: 0.6, label: 'flip it', at: 0.5, dx: 0, dy: 1.6 }] });
+    gd.build(W, H); guides = [gd];
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    ROUNDS.forEach(function (r, i) {
+      var b = document.createElement('button'); b.textContent = r.name; if (i === round) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { guides.forEach(function (gd) { gd.reset(); }); }; panel.appendChild(g);
+  }
+  function choose(i) {
+    if (wait) { clearTimeout(wait); wait = null; }
+    round = i; last = null; shown = null; trail = null; done = false; misses = 0; cheer = null; fits = null;
+    place(); makeGuide(); menu(); say(ROUNDS[i].start);
+  }
+
+  /* ---- the cast: one stroke ---- */
+  function judge(pts) {
+    if (wait || done || fits) return null;
+    var j = LumosSpells.judgeCheer(pts, mouth, ease), now = performance.now();
+    var lv = guides.length ? guides[0].level() : 0, sc = lv ? guides[0].score(pts) : null;
+    /* traced along the guide, only a wobble is forgiven: the guide's reach is wide beside so small a mouth, and a
+       tilted, narrow or crooked smile can still cover it */
+    if (sc && sc.traced && j.verdict === 'miss' && j.reason === 'wiggly') { j.verdict = 'cheered'; j.reason = 'cheered'; }
+    last = j;
+    if (j.reason === 'fits') {   /* the exam's overdoing: in fits, then glum again, and again */
+      guides.forEach(function (g) { g.miss(); }); misses++;
+      fits = { at: now }; shown = { pts: pts, at: now + 3200, j: j };
+      for (var k = 0; k < 6; k++) setTimeout(function () { noise(0.12, 1400 + Math.random() * 900, 0.25); }, k * 330);
+      say('<b>Too much!</b> In fits, like Ron in the exam when Harry overdid it out of nerves.');
+      wait = setTimeout(function () { wait = null; fits = null;
+        say('In the book Ron had to be led away to a quiet room for an hour. Yours was ' + (Math.round(j.ratio * 10) / 10) + ' times as deep as the frown: <b>just as deep</b>, flipped.'); }, 3200);
+      return j;
+    }
+    if (j.verdict !== 'cheered') {
+      guides.forEach(function (g) { g.miss(); }); misses++;
+      trail = { pts: pts, at: now };
+      shown = ['glum', 'flat', 'tilted', 'lopsided'].indexOf(j.reason) >= 0 ? { pts: pts, at: now, j: j } : null;
+      var words = {
+        tap: 'Draw a smile: from one corner of the mouth to the other, curving down.',
+        wiggly: 'Smoother: one curve, like the frown, only the other way up.',
+        off: 'On the mouth: start at one corner and end at the other.',
+        narrow: 'Wider: right out to both corners of the mouth.',
+        wide: 'Not so wide: corner to corner, no further.',
+        tilted: 'One end higher than the other: that is a smirk. Keep both ends on the dotted line, level, like the corners.',
+        flat: 'Hardly a curve at all, and no happier. Bow it down as deep as the frown bows up.',
+        glum: 'That is the frown again, high in the middle! <b>Flip it</b>: the same curve, upside down, over the dotted line.',
+        lopsided: 'Deepest off to one side: a crooked grin. The deepest part goes in the middle, under the frown\'s top.'
+      };
+      say(words[j.reason] || 'Try again: the frown, flipped, corner to corner.');
+      return j;
+    }
+    /* cheered: the sitter grins, then the geometry */
+    guides.forEach(function (g) { g.hit(lv > 0); });
+    cheer = { at: now, sag: Math.max(mouth.depth * 0.5, Math.min(j.sagitta, mouth.depth * 2.4)), r: j.radius, chord: j.chord };
+    chime(); LumosSpells.learn('cheering');
+    var times = Math.round(j.ratio * 10) / 10;
+    if (round === 0) {
+      say('<b>Cheered!</b> He is grinning broadly, with "a feeling of great contentment", like Flitwick\'s whole class in the book.');
+      wait = setTimeout(function () { wait = null;
+        say('Your smile is his frown flipped over the dotted line: <b>a reflection</b>. Corner to corner, and ' + (times === 1 ? 'just as deep' : times + ' times as deep') + ' down as the frown was up.');
+        wait = setTimeout(function () { wait = null; choose(1); }, 6500); }, 4200);
+    } else if (round === 1) {
+      say('<b>Cheered!</b> A wider mouth, the same depth: <b>a flatter curve</b>. It is part of a bigger circle; the dashed one is all of it.');
+      wait = setTimeout(function () { wait = null; choose(2); }, 7800);
+    } else {
+      say('<b>Full marks</b>, and nobody led away to a quiet room. As Ron said of Hermione, "She could\'ve done with a Cheering Charm on her, too."');
+      done = true;
+    }
+    return j;
+  }
+
+  /* ---- the portrait ---- */
+  function arcPath(x, y, w, sag) {   /* a mouth: corners (x - w, y) and (x + w, y), its middle sag down (+) or up (-) */
+    cx.beginPath(); cx.moveTo(x - w, y); cx.quadraticCurveTo(x, y + 2 * sag, x + w, y);
+  }
+  function drawPortrait(now) {
+    var R = ROUNDS[round], fx = W / 2, fy = H * 0.44, pw = ph * 0.8, shake = 0, sag = -mouth.depth, joy = 0;
+    if (cheer) { var a = Math.min(1, (now - cheer.at) / 600); joy = a; sag = -mouth.depth + (cheer.sag + mouth.depth) * (1 - Math.pow(1 - a, 3)); }
+    if (fits) { var b = Math.min(1, (now - fits.at) / 300); joy = 1; sag = mouth.w * 0.9 * b; shake = Math.sin(now / 45) * ph * 0.012 * b; }
+    cx.fillStyle = '#1d1915'; cx.fillRect(0, 0, W, H);   /* the stone wall */
+    cx.strokeStyle = 'rgba(255,255,255,0.04)'; cx.lineWidth = 1;
+    for (var yy = 0; yy < H; yy += S * 0.09) { cx.beginPath(); cx.moveTo(0, yy); cx.lineTo(W, yy); cx.stroke(); }
+    cx.fillStyle = '#9b7a32'; cx.fillRect(fx - pw / 2 - ph * 0.05, fy - ph / 2 - ph * 0.05, pw + ph * 0.1, ph * 1.1);   /* the gilt frame */
+    cx.strokeStyle = '#e1bf63'; cx.lineWidth = Math.max(2, ph * 0.012); cx.strokeRect(fx - pw / 2 - ph * 0.03, fy - ph / 2 - ph * 0.03, pw + ph * 0.06, ph * 1.06);
+    cx.save(); cx.beginPath(); cx.rect(fx - pw / 2, fy - ph / 2, pw, ph); cx.clip();
+    cx.fillStyle = R.bg; cx.fillRect(fx - pw / 2, fy - ph / 2, pw, ph);
+    cx.translate(shake, 0);
+    var hx = fx, hy = fy + ph * 0.02, rx = ph * (round === 1 ? 0.28 : 0.25), ry = ph * 0.3;
+    cx.fillStyle = R.robe; cx.beginPath(); cx.ellipse(fx, fy + ph * 0.56, pw * 0.48, ph * 0.3, 0, 0, 7); cx.fill();   /* shoulders */
+    if (R.hat === 'bun') { cx.fillStyle = '#8d8a86'; cx.beginPath(); cx.ellipse(hx, hy - ry * 0.95, rx * 0.55, ry * 0.32, 0, 0, 7); cx.fill(); }
+    cx.fillStyle = R.skin; cx.beginPath(); cx.ellipse(hx, hy, rx, ry, 0, 0, 7); cx.fill();
+    if (R.hat === 'bun') { cx.fillStyle = '#8d8a86'; cx.beginPath(); cx.ellipse(hx, hy - ry * 0.72, rx * 1.02, ry * 0.36, 0, Math.PI, 0); cx.fill(); }
+    if (R.hat === 'point') { cx.fillStyle = '#3a2350'; cx.beginPath(); cx.moveTo(hx - rx * 1.25, hy - ry * 0.62); cx.lineTo(hx + rx * 0.35, hy - ry * 2.0); cx.lineTo(hx + rx * 1.25, hy - ry * 0.62); cx.fill(); }
+    if (R.hat === 'cap') { cx.fillStyle = '#2b2b2b'; cx.fillRect(hx - rx * 1.05, hy - ry * 0.95, rx * 2.1, ry * 0.3); cx.fillRect(hx - rx * 0.6, hy - ry * 1.25, rx * 1.2, ry * 0.32); }
+    /* the eyes and brows: sad brows, inner ends up; cheered, they lift and the eyes crinkle shut */
+    cx.strokeStyle = '#2a1d14'; cx.lineCap = 'round'; cx.lineWidth = Math.max(2, ph * 0.012);
+    [-1, 1].forEach(function (sd) {
+      var ex = hx + sd * ph * 0.1, ey = fy - ph * 0.05, ew = ph * 0.045;
+      cx.beginPath(); cx.moveTo(ex - ew, ey - ph * (0.05 + 0.03 * joy) - (sd > 0 ? 1 : 0) * ph * 0.025 * (1 - joy));
+      cx.lineTo(ex + ew, ey - ph * (0.05 + 0.03 * joy) - (sd > 0 ? 0 : 1) * ph * 0.025 * (1 - joy)); cx.stroke();
+      if (joy > 0.5) { cx.beginPath(); cx.arc(ex, ey + ph * 0.01, ew * 0.8, Math.PI * 1.15, Math.PI * 1.85); cx.stroke(); }
+      else { cx.fillStyle = '#2a1d14'; cx.beginPath(); cx.arc(ex, ey, ph * 0.016, 0, 7); cx.fill(); }
+      if (joy) { cx.fillStyle = 'rgba(225,110,100,' + (0.35 * joy) + ')'; cx.beginPath(); cx.arc(ex + sd * ph * 0.02, ey + ph * 0.1, ph * 0.035, 0, 7); cx.fill(); }
+    });
+    cx.beginPath(); cx.moveTo(hx, fy + ph * 0.0); cx.lineTo(hx - ph * 0.02, fy + ph * 0.09); cx.lineTo(hx + ph * 0.01, fy + ph * 0.095); cx.stroke();
+    if (fits) {   /* in fits: the mouth wide open, and the laughing */
+      cx.fillStyle = '#4a1d1d'; arcPath(mouth.x, mouth.y, mouth.w, sag); cx.closePath(); cx.fill();
+      cx.font = 'bold ' + Math.round(ph * 0.07) + 'px Georgia, serif'; cx.textAlign = 'center';
+      for (var k = 0; k < 3; k++) { var t = ((now - fits.at) / 1000 + k / 3) % 1;
+        cx.fillStyle = 'rgba(243,210,122,' + (1 - t) + ')'; cx.fillText('Ha!', fx + (k - 1) * pw * 0.32, fy - ph * 0.2 - t * ph * 0.25); }
+    } else { cx.strokeStyle = '#7a2e28'; cx.lineWidth = Math.max(3, ph * 0.016); arcPath(mouth.x, mouth.y, mouth.w, sag); cx.stroke(); }
+    cx.restore();
+  }
+  function line2(a, b, col, w, dash) { cx.strokeStyle = col; cx.lineWidth = w; cx.setLineDash(dash || []); cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(b.x, b.y); cx.stroke(); cx.setLineDash([]); }
+  function label(x, y, text, col) {
+    cx.font = Math.round(Math.max(13, S * 0.032)) + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.lineWidth = 4; cx.strokeStyle = 'rgba(18,15,12,0.85)'; cx.strokeText(text, x, y); cx.fillStyle = col; cx.fillText(text, x, y);
+  }
+  function depthBar(x, y0, y1, col) {   /* a little measure from the line to the arc's middle */
+    line2({ x: x, y: y0 }, { x: x, y: y1 }, col, 2);
+    [y0, y1].forEach(function (y) { line2({ x: x - 5, y: y }, { x: x + 5, y: y }, col, 2); });
+  }
+  /* the geometry, once cheered: the line it flips over, the frown's ghost above, the smile below, the same depth on
+     each; in the wide round, the whole circle the flatter smile is part of */
+  function drawGeometry(now) {
+    var t = cheer ? now - cheer.at : -1, gold = '#f3d27a', m = mouth;
+    if (t < 1100) return;
+    cx.save(); cx.globalAlpha = Math.min(1, (t - 1100) / 400); cx.lineCap = 'round';
+    line2({ x: m.x - m.w * 1.9, y: m.y }, { x: m.x + m.w * 1.9, y: m.y }, 'rgba(243,210,122,0.9)', 2, [7, 6]);
+    label(m.x + m.w * 1.9, m.y - S * 0.035, 'flips over', gold);
+    cx.setLineDash([5, 5]); cx.strokeStyle = 'rgba(220,225,255,0.85)'; cx.lineWidth = 2; arcPath(m.x, m.y, m.w, -m.depth); cx.stroke(); cx.setLineDash([]);
+    depthBar(m.x, m.y, m.y - m.depth, 'rgba(220,225,255,0.9)'); depthBar(m.x + 9, m.y, m.y + cheer.sag, gold);
+    if (round === 1 && cheer.r) {
+      var r = cheer.sag / 2 + m.w * m.w / (2 * cheer.sag);
+      cx.setLineDash([4, 7]); cx.strokeStyle = 'rgba(243,210,122,0.45)'; cx.beginPath(); cx.arc(m.x, m.y + cheer.sag - r, r, 0, 7); cx.stroke(); cx.setLineDash([]);
+    }
+    cx.restore();
+  }
+  function drawShown(now) {   /* a miss worth showing: the dotted line, and the frown flipped where his smile should go */
+    if (!shown || now < shown.at || now - shown.at > 4000) return;
+    var m = mouth;
+    cx.save(); cx.globalAlpha = Math.min(1, (now - shown.at) / 300) * (now - shown.at > 3400 ? (4000 - (now - shown.at)) / 600 : 1);
+    line2({ x: m.x - m.w * 1.6, y: m.y }, { x: m.x + m.w * 1.6, y: m.y }, 'rgba(243,210,122,0.9)', 2, [7, 6]);
+    cx.setLineDash([6, 6]); cx.strokeStyle = 'rgba(243,210,122,0.9)'; cx.lineWidth = 3; arcPath(m.x, m.y, m.w, m.depth); cx.stroke(); cx.setLineDash([]);
+    label(m.x, m.y + m.depth + S * 0.05, 'the frown, flipped', '#f3d27a');
+    cx.restore();
+  }
+  function frame(now) {
+    drawPortrait(now);
+    drawGeometry(now);
+    drawShown(now);
+    var showing = shown && now >= shown.at && now - shown.at <= 4000;   /* its label sits where the guide's would */
+    if (!wait && !done && !cheer && !fits && !showing) guides.forEach(function (g) { g.draw(cx, now, !!stroke); });
+    function ink(pts, a, rose) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = rose ? 'rgba(240,150,140,' + a + ')' : 'rgba(220,225,255,' + a + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
+    }
+    if (stroke && stroke.length > 1) ink(stroke, 0.65);
+    if (trail && now - trail.at < 1800) ink(trail.pts, 0.75 * (1 - (now - trail.at) / 1800), true);
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: one stroke, corner to corner ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (wait || done || active !== null || cheer || fits) return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null; shown = null;
+    guides.forEach(function (g) { g.cover(stroke[0]); });
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); guides.forEach(function (g) { g.cover(q); }); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    judge(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
+  window.lumosCheer = { choose: function (i) { choose(i - 1); }, judge: function (pts) { return judge(pts); },
+    mouth: function () { return { x: mouth.x, y: mouth.y, w: mouth.w, depth: mouth.depth }; },
+    state: function () { return { round: round + 1, waiting: !!wait, done: done, misses: misses, cheered: !!cheer, fits: !!fits,
+      last: last ? { verdict: last.verdict, reason: last.reason, chord: last.chord, sagitta: last.sagitta, ratio: last.ratio, radius: last.radius, tilt: last.tilt } : null,
+      line: lineEl.textContent, guide: guides.length ? guides[0].state().level : null, ease: ease, learned: LumosSpells.learned('cheering') }; } };
+})();
+</script>
+</body>
+</html>
