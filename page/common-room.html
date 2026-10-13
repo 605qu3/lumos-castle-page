@@ -108,6 +108,19 @@
   /* the den's doorway: dark a moment as he ducks through (req 175) */
   #denFade { position: fixed; inset: 0; pointer-events: none; background: #050403; opacity: 0; transition: opacity 0.4s ease; }
   #denFade.on { opacity: 1; }
+  /* who is playing (req 258): the boys' names on a slip as he comes in, each with his house's ribbon, a tap on his own */
+  #who { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px;
+    background: rgba(5,4,3,0.55); opacity: 0; transition: opacity 0.4s ease; -webkit-tap-highlight-color: transparent; }
+  #who.on { opacity: 1; }
+  #who .slip { width: min(340px, 100%); padding: 18px 18px 20px; background: #efe5cc; color: #2a2016; border-radius: 7px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6); text-align: center; }
+  #who .ask { font: italic 400 26px/1.2 "IM Fell English", Georgia, serif; margin: 0 0 14px; }
+  #who button { display: block; width: 100%; min-height: 58px; margin: 10px 0 0; padding: 8px 14px; border: 0;
+    border-left: 12px solid var(--ribbon, #8a7d68); border-radius: 5px; background: #f7f0de; color: #2a2016;
+    box-shadow: inset 0 0 0 1px rgba(42,32,22,0.18), 0 2px 6px rgba(0,0,0,0.18); cursor: pointer; text-align: left;
+    font: 400 25px/1.15 "EB Garamond", Georgia, serif; }
+  #who button:active { background: #e8dcc0; }
+  #who button small { display: block; font: italic 400 15px/1.2 "EB Garamond", Georgia, serif; color: #6b5a44; }
   #lines { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
   .line { position: absolute; left: 0; top: 0; pointer-events: auto; cursor: pointer; opacity: 0;
     transition: opacity 0.35s ease; -webkit-tap-highlight-color: transparent; }
@@ -714,6 +727,7 @@ turned down for hanging facing out. Keyed at 1189 x 2488 px, 2378 px per metre, 
 </div>
 <button id="back" type="button" hidden>Back</button>
 <div id="help">Drag to look around.</div>
+<div id="who" hidden><div class="slip" role="dialog" aria-label="Who is playing"><p class="ask">Who is it?</p><div class="names"></div></div></div>
 
 <script>
 var TILES = {
@@ -725,7 +739,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=25"></script>
+<script src="castle-events.js?v=27"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=33"></script>
 <script>
@@ -8577,6 +8591,48 @@ var castle = window.CastleEvents ? CastleEvents.start({
     spell: function () { return castSpell; }      /* the spell whose first cast this is (req 222) */
   }
 }) : null;
+
+/* who is playing (req 258, Events' one castle, Godric's option 4: no passwords, a player selection): while the runtime
+   asks, the boys' names on a slip, each with his house's ribbon and "here last" under the one who played last; a tap
+   on his name is play(id): his own carries on and the slip goes, his brother's swaps the satchels and the runtime
+   reloads the page. Nothing shows until a grown-up's pairing link names the boys; the names live on the iPad only. */
+var WHO_RIBBON = { lion: '#7a1a17', snake: '#1f4a2c', badger: '#c9a227', eagle: '#1f3a68' };
+var who = { el: document.getElementById('who'), on: false, ids: '' };
+function whoShow(list) {
+  var box = who.el.querySelector('.names');
+  box.textContent = '';
+  list.forEach(function (p, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = p.name || ('Player ' + (i + 1));
+    if (p.house) b.style.setProperty('--ribbon', WHO_RIBBON[p.house]);
+    if (p.playing) { var s = document.createElement('small'); s.textContent = 'here last'; b.appendChild(s); }
+    b.addEventListener('click', function (e) { e.stopPropagation(); whoTap(p.id); });
+    box.appendChild(b);
+  });
+  who.ids = list.map(function (p) { return p.id; }).join();
+  who.on = true; who.el.hidden = false;
+  requestAnimationFrame(function () { who.el.classList.add('on'); });
+}
+function whoHide() {
+  who.on = false; who.el.classList.remove('on');
+  setTimeout(function () { if (!who.on) who.el.hidden = true; }, 420);
+}
+function whoTap(id) {
+  if (!who.on) return;
+  if (!castle.play(id)) whoHide();                    /* true: the runtime reloads into his brother's castle */
+}
+function updateWho() {
+  if (!castle || !castle.players) return;
+  var p = castle.players();
+  if (p.ask && !who.on) whoShow(p.list);
+  else if (!p.ask && who.on) whoHide();
+}
+['pointerdown', 'pointerup', 'touchstart', 'touchend', 'click'].forEach(function (k) {
+  who.el.addEventListener(k, function (e) { e.stopPropagation(); });   /* the room under the slip takes no tap */
+});
+updateWho();
+setInterval(updateWho, 500);
 
 /* the real moon, read now and once a minute (req 96; drawSky above): the right window's sky redrawn, the window's
    light following the moon's fullness by night from starlight (0.3), the hemisphere made up as it wanes */
