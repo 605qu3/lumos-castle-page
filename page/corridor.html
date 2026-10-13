@@ -193,7 +193,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=21"></script>
 <script src="charms/guide.js?v=5"></script>
-<script src="charms/spells.js?v=9"></script>
+<script src="charms/spells.js?v=11"></script>
 <script>
 (function () {
 'use strict';
@@ -2422,9 +2422,46 @@ function witchHump() {
   humpTold = true; castle.moment('opened witch hump');
   return true;
 }
+/* Dissendium on her hump (req 215, Charms' callable LumosSpells.openHump, req 163; Magic's B8): at her stop, once he
+   holds the twins' note (sofa.json's cue, req 179), a tap on her hump offers Charms' two taps, his tap already the
+   book's first, which does nothing (PoA 10); the word's card comes up, a tap on it says the word, and the next tap on
+   the hump swings it open over the protractor and chord to the gap his shoulders need; on 'opened', witchHump. Before
+   the note the tap is as it was. The grey card draws no lid, so the layer's protractor and chord show the sum; her
+   drawing (a spend) may draw the lid from onSwing. The hump, the lid's hinge (toward her back) and its closed edge
+   (toward her head) are points on her card, as fractions of it from its top left, projected each frame; the lid is
+   about 45 cm, Charms' default. The offer covers the page, so Back lets it go, and so does HUMP_WAIT_S untouched */
+var NOTE_CUE = "the twins' note folded small in his pocket", HUMP_WAIT_S = 12;
+var HUMP = { u: 0.6, v: 0.34, r: 0.3, hinge: { u: 0.82, v: 0.38 }, edge: { u: 0.4, v: 0.3 } };
+var humpOffer = null, humpV = new THREE.Vector3();
+function noteHeld() { return !!castle && castle.cues().indexOf(NOTE_CUE) >= 0; }
+function humpAt(uv) { return uv && Math.hypot((uv.x - HUMP.u) * WITCH.card.w, (1 - uv.y - HUMP.v) * WITCH.card.h) < HUMP.r; }
+function onWitch(u, v) {
+  witchCard.updateMatrixWorld();
+  humpV.set((u - 0.5) * WITCH.card.w, (0.5 - v) * WITCH.card.h, 0);
+  witchCard.localToWorld(humpV).project(camera);
+  var r = canvas.getBoundingClientRect();
+  return { x: r.left + (humpV.x + 1) / 2 * r.width, y: r.top + (1 - humpV.y) / 2 * r.height };
+}
+function humpOffered() {
+  lockDrop(); humpDrop();
+  var h = onWitch(HUMP.hinge.u, HUMP.hinge.v), e = onWitch(HUMP.edge.u, HUMP.edge.v);
+  var mine = humpOffer = LumosSpells.openHump({
+    hump: function () { return onWitch(HUMP.u, HUMP.v); },
+    r: function () { var c = onWitch(HUMP.u, HUMP.v), s = onWitch(HUMP.u + HUMP.r / WITCH.card.w, HUMP.v); return Math.hypot(s.x - c.x, s.y - c.y); },
+    hinge: function () { return onWitch(HUMP.hinge.u, HUMP.hinge.v); },
+    edge: function () { return onWitch(HUMP.edge.u, HUMP.edge.v); },
+    dir: h.x > e.x ? 1 : -1,   /* the edge rises over her back, whichever way her side faces him */
+    wait: HUMP_WAIT_S });
+  mine.tap();
+  mine.done.then(function (out) {
+    if (humpOffer === mine) humpOffer = null;
+    if (out && out.verdict === 'opened') witchHump();
+  });
+}
+function humpDrop() { if (humpOffer) { var o = humpOffer; humpOffer = null; o.cancel(); } }
 
 var mode = 'rest', atStop = null, tween = null, footShown = 'window';
-/* looking round at a stop (req 208; David, Q3, 12 October 2026, 7.56 pm: "I definitely want to be able to look around
+/* looking round at a stop (req 208; Godric, Q3, 12 October 2026, 7.56 pm: "I definitely want to be able to look around
    when I arrive at a spot"): the drag turns his head from where he stands, about 60 degrees each way, or a stop's own
    `turn` where it needs less; the turn is about stopPose, where the glide set him down, never re-asked of the stop */
 var HEAD_TURN = 1.05, headYaw = 0, headYawT = 0, headPitch = 0, headPitchT = 0, stopPose = null;
@@ -2483,7 +2520,7 @@ function reframe() {
 }
 function goTo(s) {
   if (s === atStop) return;
-  lockDrop();
+  lockDrop(); humpDrop();
   atStop = s; mode = 'stop';
   backBtn.hidden = false;
   headReset();   /* the glide starts from where his head is turned and sets him down square to the new stop */
@@ -2492,7 +2529,7 @@ function goTo(s) {
   if (castle && castle.moment) castle.moment('walk up');   /* he sets off toward a stop: a torch may lean (req 140) */
 }
 function goBack() {
-  lockDrop();
+  lockDrop(); humpDrop();
   if (mode !== 'stop') return;
   /* from her, back to the landing she stands beyond, not up the flight through the walls */
   if (atStop && atStop.name === 'witch') { headReset(); atStop = landingStop; glideTo(landingStop.stop()); return; }
@@ -2587,6 +2624,9 @@ function tap(cx, cy) {
   /* her (req 79): from afar a tap on her is her walk-up; at her stop it wakes her for the password, raised here inside
      the tap's own handler, since the runtime opens the ear in it and iOS lets a page listen only from a touch */
   if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { tell('her'); said(true); goTo(hit.stop); return; }
+  /* her hump (req 215): at her stop, once he holds the twins' note, a tap on it offers Dissendium */
+  if (hits[0].object === witchCard && atStop && atStop.name === 'witch' && humpAt(hits[0].uv)
+      && window.LumosSpells && LumosSpells.openHump && noteHeld()) { tell('witch'); humpOffered(); said(true); return; }
   if (hit.thing && castle && castle.visit()) {
     if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
     said(true); castle.tap(hit.thing); return;
@@ -3351,7 +3391,8 @@ window.lumosGreybox = { sheep: function () { return tapestrySheep; }, leanTorch:
     return { card: witchCard, plinth: witchPlinth, landing: witchLanding, stop: s.stop(), shown: footShown === 'witch',
       plinthBack: new THREE.Vector3(witchX(WITCH.at), FOOT_Y + WITCH.plinth.h, WITCH.z + WITCH.plinth.w / 2) }; },
   /* req 188: her hump's moment for Charms' callable (req 163), and the twins' parchment behind her */
-  witchHump: witchHump, map: function () { return { shown: mapShown, taking: !!mapTake, group: witchMap, hit: mapHit }; },
+  witchHump: witchHump, hump: function () { return humpOffer ? humpOffer.state() : null; }, humpOnScreen: function () { return onWitch(HUMP.u, HUMP.v); },
+  map: function () { return { shown: mapShown, taking: !!mapTake, group: witchMap, hit: mapHit }; },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
 </script>

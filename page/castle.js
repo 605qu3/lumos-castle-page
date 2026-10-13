@@ -425,7 +425,7 @@ window.castleFrame = function (opts) {
     else if (opts.onAct) opts.onAct(act);
   });
   updateResLabel(); updateExpLabel();
-  /* the help line (req 203; David, Q2, 12 October 2026, 2.47 pm, with his t1): it stays until his first look-drag, then
+  /* the help line (req 203; Godric, Q2, 12 October 2026, 2.47 pm, with his t1): it stays until his first look-drag, then
      fades by itself in about a second and never comes back in any room, as the Marauder's Map goes blank at "Mischief
      managed!" (PoA 10); one stored flag; the knobs' ? still shows it on request, and a drag fades it again */
   var DRAGGED = 'lumos.dragged', helpFade = null, helpDown = null;
