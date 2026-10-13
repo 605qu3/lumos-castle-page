@@ -100,6 +100,9 @@
    slip (Magic's *Against the year*): the moment `points grow` after any slip lands, the built-in `best year` yes
    when this school year's heap, both boys', passes last year's (from the second year, once a year), `year` the
    school year now; a `year` slip is never posted, since each castle reads the same heap and gives its own (v=25).
+   Then a point taken back (Design's req 237, Godric's Q22 t2): only a grown-up takes one back, a slip given in
+   error (`back(slip)`); it stays, marked `back: true` and `backOn` (yyyy-mm-dd), out of every heap and total, the
+   page told by `opts.back(slip)`, and the owl carries it to the other castle, which marks its copy the same (v=25).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -272,7 +275,8 @@
     return { v: 1, vars: {}, stamps: {}, slot: null, visits: 0, visitOpen: false, lastSmall: [], bags: {}, log: [],
              open: {}, started: {}, lastBigDay: null, lastBigVisit: null, visitPlace: null, leftAt: null, kept: null,
              said: {}, written: {}, thingStates: {}, deckFound: {}, deckFirst: {}, secrets: [], points: [],
-             owl: { after: 0, posted: {}, postFailed: false, fetchFailed: false, waiting: [], waited: false } };
+             owl: { after: 0, posted: {}, postFailed: false, fetchFailed: false, waiting: [], waited: false,
+                    afterBack: 0, backsPosted: {} } };
   }
 
   function start(opts) {
@@ -454,7 +458,7 @@
         case 'bedtime': return bedtimeMin > 0 ? 'set' : 'off';
         case 'things looked at': return (state.looked || []).length;   /* different things held close in the zoom, ever (req 127) */
         case 'secrets found': return (state.secrets || []).length;     /* the castle's secrets he has found, each once ever (req 180) */
-        case 'house points': return (state.points || []).reduce(function (t, p) { return t + p.points; }, 0);   /* req 216 */
+        case 'house points': return (state.points || []).reduce(function (t, p) { return t + (p.back ? 0 : p.points); }, 0);   /* req 216; a slip taken back is out (req 237) */
         case 'owl waited': return owlWaited ? 'yes' : 'no';           /* the owl's copies waited out of signal: Errol (req 216, t1) */
         case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
         case 'year': return schoolYear(isoDay(now));                   /* the school year now, named by its feast's year */
@@ -767,8 +771,8 @@
         out.forEach(function (p) { o.posted[slipKey(p)] = 1; });
         o.postFailed = false;
       }, function (e) { o.postFailed = true; note('the owl could not take this castle\'s slips (' + e.message + ')'); });
-      owlRun = sent.then(function () {
-        return owlCall('GET', '/slips?castle=' + owl.castle + '&after=' + (o.after || 0));
+      owlRun = sent.then(postBacks).then(function () {
+        return owlCall('GET', '/slips?castle=' + owl.castle + '&after=' + (o.after || 0) + '&afterBack=' + (o.afterBack || 0));
       }).then(function (got) {
         var landed = 0;
         (got.slips || []).forEach(function (s) {
@@ -786,6 +790,12 @@
           landed++;
         });
         if (+got.last > (o.after || 0)) o.after = +got.last;
+        (got.backs || []).forEach(function (b) {
+          var p = slipOf(b.castle, b.kind, b.thing);
+          o.backsPosted[b.castle + ' ' + b.kind + ' ' + b.thing] = 1;     /* known at the store: never posted again */
+          if (p && !p.back) markBack(p, b.on);
+        });
+        if (+got.lastBack > (o.afterBack || 0)) o.afterBack = +got.lastBack;
         o.fetchFailed = false;
         return landed;
       }, function (e) {
@@ -801,6 +811,37 @@
       });
       return owlRun;
     }
+    /* A slip by the castle that earned it, its kind and thing: this castle's own, or one with `from`. */
+    function slipOf(castle, kind, thing) {
+      for (var i = 0; i < state.points.length; i++) {
+        var p = state.points[i];
+        if (p.kind === kind && p.thing === thing && (castle === owl.castle ? !p.from : p.from === castle)) return p;
+      }
+      return null;
+    }
+    /* A point taken back (Design's req 237): marked, never removed, and the page told, so its stones fly up. */
+    function markBack(p, day) {
+      p.back = true;
+      p.backOn = /^\d{4}-\d\d-\d\d$/.test(day || '') ? day : isoDay(nowDate());
+      save(STATE_KEY, state);
+      logLine(p.points + ' house points for ' + p.kind + ' ' + p.thing + ' taken back, {day}');
+      if (opts.back) { try { opts.back(withReason(p)); } catch (e) { note('the page could not take a point back: ' + e); } }
+    }
+    /* The backs this castle's grown-up took, posted once each, by the castle that earned the slip. */
+    function postBacks() {
+      var o = state.owl;
+      o.backsPosted = o.backsPosted || {};
+      var out = (state.points || []).filter(function (p) {
+        return p.back && p.kind !== 'year' && !o.backsPosted[(p.from || owl.castle) + ' ' + p.kind + ' ' + p.thing];
+      });
+      if (!out.length) return Promise.resolve();
+      return owlCall('POST', '/backs', { castle: owl.castle, backs: out.map(function (p) {
+        return { castle: p.from || owl.castle, kind: p.kind, thing: String(p.thing), on: p.backOn };
+      }) }).then(function () {
+        out.forEach(function (p) { o.backsPosted[(p.from || owl.castle) + ' ' + p.kind + ' ' + p.thing] = 1; });
+      }, function (e) { note('the owl could not take the slips taken back (' + e.message + ')'); });
+    }
+
     /* In the common room, the owl brings what has landed: the moment `owl post` (its cue the owl at the sill, or
        Errol when a copy waited out of signal), then the page is told each slip, so his brother's gems fall. Away
        from the common room they wait for his next time there. */
@@ -823,7 +864,7 @@
        from the second year, once a year, the `year` slip itself left out of every heap. */
     function heap(y) {
       return (state.points || []).reduce(function (t, p) {
-        return t + (p.kind !== 'year' && /^\d{4}-\d\d-\d\d$/.test(p.on || '') && schoolYear(p.on) === y ? p.points : 0);
+        return t + (p.kind !== 'year' && !p.back && /^\d{4}-\d\d-\d\d$/.test(p.on || '') && schoolYear(p.on) === y ? p.points : 0);
       }, 0);
     }
     function bestYear() {
@@ -1562,6 +1603,17 @@
          anything new landed. */
       owl: function () { return { castle: owl.castle, paired: !!(owl.store && owl.key) }; },
       sync: owlSync,
+      /* A grown-up takes a point back (Design's req 237; only a grown-up, a slip given in error: points are never lost
+         in play, Magic's B11): `back(slip)`, the slip as `points()` handed it (its kind, thing and any `from`). It stays
+         in the record marked `back: true` and `backOn`, out of the heap and every total; the page is told by
+         `opts.back(slip)`; the owl carries it to the other castle. Resolves true if a slip was taken back. */
+      back: function (slip) {
+        if (!slip) return Promise.resolve(false);
+        var p = slipOf(slip.from || owl.castle, slip.kind, String(slip.thing));
+        if (!p || p.back) return Promise.resolve(false);
+        markBack(p);
+        return owlSync().then(function () { return true; });
+      },
       /* A chain's week's words as they stand today (the parents' page shows the password): last, now and next. */
       words: function (name) {
         name = name || 'password';
