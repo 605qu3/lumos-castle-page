@@ -369,7 +369,8 @@ function judgeAim(points, from, to, ease) {
    in AIM_EASES; lift: how far above the start the swing must rise, in from.r).
    Returns { verdict: 'disarmed' | 'miss', reason ('disarmed', 'tap', 'off', 'flat', 'up', 'wiggly', 'short', 'away',
    'wide'), lift (px the swing rose above the start), top ({ x, y } the swing's top, where the point begins: the
-   highest place the stroke turns 40 degrees or more, so a point aimed a little high still finds it), and the point's
+   highest place the stroke turns 40 degrees or more over half a reach, or 50 over a reach, so a point aimed a little
+   high still finds it and a finger's rounded corner counts), and the point's
    off, allow, by, side, straight as judgeAim gives them }. 'flat': no swing above (pointed straight from the hand, or
    pointed first and swung after); 'up': swung up and never pointed. */
 var DISARM_EASES = {
@@ -386,18 +387,23 @@ function judgeDisarm(points, from, to, ease) {
   if (path < from.r * 0.5) return out;
   if (Math.hypot(a.x - from.x, a.y - from.y) > e.start * from.r) { out.reason = 'off'; return out; }
   /* the top of the swing is where the stroke turns: walk it in steps of a quarter reach and take the highest place
-     where it turns 40 degrees or more over half a reach either side */
-  var step = from.r * 0.25, q = [{ x: a.x, y: a.y }], left = 0, w = 2, k = -1, turn, d1, d2;
+     where it turns 40 degrees or more over half a reach either side, or 50 or more over a reach either side (a real
+     finger rounds the corner: one of a reach and a half turns too gently over half a reach; a rainbow arch over to the
+     dummy turns gently over both, and finds no top) */
+  var step = from.r * 0.25, q = [{ x: a.x, y: a.y }], left = 0, k = -1, turn, d1, d2;
   for (i = 1; i < points.length; i++) {
     var p0 = points[i - 1], p1 = points[i], seg = Math.hypot(p1.x - p0.x, p1.y - p0.y), u = step - left;
     while (seg > 0 && u <= seg) { q.push({ x: p0.x + (p1.x - p0.x) * u / seg, y: p0.y + (p1.y - p0.y) * u / seg }); u += step; }
     left = seg - (u - step);
   }
-  for (i = w; i < q.length - w; i++) {
-    d1 = Math.atan2(q[i].y - q[i - w].y, q[i].x - q[i - w].x); d2 = Math.atan2(q[i + w].y - q[i].y, q[i + w].x - q[i].x);
-    turn = Math.abs(Math.atan2(Math.sin(d2 - d1), Math.cos(d2 - d1)));
-    if (turn >= 40 * Math.PI / 180 && (k < 0 || q[i].y < q[k].y)) k = i;
-  }
+  [[2, 40], [4, 50]].forEach(function (wd) {
+    var w = wd[0];
+    for (i = w; i < q.length - w; i++) {
+      d1 = Math.atan2(q[i].y - q[i - w].y, q[i].x - q[i - w].x); d2 = Math.atan2(q[i + w].y - q[i].y, q[i + w].x - q[i].x);
+      turn = Math.abs(Math.atan2(Math.sin(d2 - d1), Math.cos(d2 - d1)));
+      if (turn >= wd[1] * Math.PI / 180 && (k < 0 || q[i].y < q[k].y)) k = i;
+    }
+  });
   var z = q[q.length - 1];
   if (k < 0) {   /* no turn: one line, swung up and never pointed, or pointed with no swing */
     out.lift = Math.round(a.y - Math.min(a.y, z.y));

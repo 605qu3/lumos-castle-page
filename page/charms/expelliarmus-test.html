@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Expelliarmus, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120f0c; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1a1714;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=16"></script>
+<script src="guide.js?v=5"></script>
+<script>
+/* Expelliarmus, a test page for the Charms lane (13 October 2026, fifteenth session; the owner is Godric). Drawn in code.
+   The book (CoS 11, checked in the text): "The long dining tables had vanished and a golden stage had appeared along
+   one wall, lit by thousands of candles floating overhead"; Lockhart and Snape "swung their wands above their heads and
+   pointed them at their opponent; Snape cried: 'Expelliarmus!' There was a dazzling flash of scarlet light". And the
+   catch (CoS 16): Harry bellowed "Expelliarmus!" at Lockhart, whose "wand flew high into the air; Ron caught it". The
+   stroke is the book's: one stroke from the wand hand, swung up above it, then pointed at the straw dummy's wand hand,
+   judged by LumosSpells.judgeDisarm on the tally's own sizes (checks/expelliarmus-tally.js: the hand at 0.3 of the
+   short side left of the middle and 0.72 down, its reach 0.06; the dummy's hand 0.55 across, its size 0.05). The rest
+   is ours, for the geometry: the dummy's wand flies up in an arc toward him and he catches it with one tap where it
+   will come down, called while it is still high. A throw comes down as it went up, its top halfway along, so it lands
+   as far past its top as it started before it (symmetry); after each throw the arc is drawn, its top marked, the line
+   through the top dashed, and the two halves on the start's level ticked as equal. Three rounds: a short throw, a long
+   one, and the dummy up on the stage, where the wand starts higher than his hand and so lands further on than the
+   mirror of its start (the older boy's edge). Each throw varies a little, so the rise has to be read, not remembered.
+   The traced guide, the swing and the point, shows in the first round only. ?round=1..3, ?ease=, ?guide= for trying;
+   window.lumosExpelliarmus for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+  /* the catch: how near the landing his tap must be (a share of the short side), and how far back down the wand may
+     have fallen when he calls it (a share of its rise; 0 is at its top) */
+  var CATCH = { kind: { tol: 0.075, late: 0.5 }, fair: { tol: 0.055, late: 0.25 }, strict: { tol: 0.04, late: 0.05 } };
+  var ROUNDS = [
+    { name: 'Short', up: 0, span: 0.28, rise: 0.30,
+      start: 'The Duelling Club, in the Great Hall. A straw dummy holds up its wand. <b>Swing your wand up above your head, then point it at the dummy\'s wand hand</b>, in one stroke: <i>Expelliarmus!</i>' },
+    { name: 'Long', up: 0, span: 0.48, rise: 0.42,
+      start: 'A harder flash this time: its wand will fly higher and further. Disarm it, then <b>tap where it will come down</b> while it is still high.' },
+    { name: 'Stage', up: 0.2, span: 0.36, rise: 0.22,
+      start: 'Now the dummy is up on the golden stage, higher than your hand. Disarm it: <b>where will its wand come down to you?</b>' } ];
+  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+  var hand = { x: 0, y: 0, r: 10 }, dummy = { x: 0, y: 0, r: 8 }, FT = 1;   /* FT: pixels to the foot, from the dummy's height */
+  var stage = 'cast', wait = null, done = false, last = null, bolt = null, flash = 0, rock = 0, fly = null, sum = null, sparks = [], t0 = performance.now();
+  var stroke = null, active = null, trail = null, guide = null, candles = [];
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight; S = Math.min(W, H);
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    hand = { x: W / 2 - S * 0.3, y: H * 0.72, r: S * 0.06 };
+    FT = S * 0.42 / 5.5;   /* the dummy stands about five and a half feet */
+    candles = []; for (var i = 0; i < 70; i++) { var u = Math.sin(i * 12.9898) * 43758.5453; u -= Math.floor(u); var v = Math.sin(i * 78.233) * 12543.123; v -= Math.floor(v);
+      candles.push({ x: u * W, y: H * (0.04 + v * 0.36), k: 0.6 + ((i * 7) % 5) / 10, ph: i * 1.7 }); }
+    place(); choose(round);
+  }
+  function place() { var r = ROUNDS[round]; dummy = { x: hand.x + S * 0.55, y: hand.y - r.up * S, r: S * 0.05 }; }
+  function floorY() { return hand.y + S * 0.2; }
+  function stageTop() { return floorY() - ROUNDS[round].up * S; }
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function noise(dur, freq, gain, q) {
+    if (!audio) return;
+    var n = Math.floor(audio.sampleRate * dur), buf = audio.createBuffer(1, n, audio.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3) * (q ? 0.6 + 0.4 * Math.sin(i / audio.sampleRate * q * 6.283) : 1);
+    var src = audio.createBufferSource(), f = audio.createBiquadFilter(), g = audio.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; g.gain.value = gain;
+    src.connect(f); f.connect(g); g.connect(audio.destination); src.start();
+  }
+  function ft(px) { var v = Math.round(px / FT * 2) / 2; return (v >= 1 ? String(Math.floor(v)) : '') + (v % 1 ? '½' : '') + ' ft'; }
+
+  /* the guide, in the first round only: the swing up from the hand, then the point at the dummy's wand hand */
+  function makeGuide() {
+    if (round !== 0) { guide = null; return; }
+    var a = [hand.x / S, hand.y / S], top = [(hand.x - hand.r / 3) / S, (hand.y - hand.r * 2.5) / S];
+    var c = [(a[0] + top[0]) / 2 - hand.r * 0.25 / S, (a[1] + top[1]) / 2], b = [top[0] + (dummy.x / S - top[0]) * 0.85, top[1] + (dummy.y / S - top[1]) * 0.85];
+    guide = LumosGuide.create({ key: 'lumos.charms.expelliarmusGuidedHits', rest: 1.0, mirror: false,
+      box: function () { return { G: S, ox: 0, oy: 0 }; },
+      parts: [{ pts: LumosGuide.quad(a, c, top, 10), secs: 0.45, label: 'swing up', at: 0.5, dx: -2.6, dy: 0 },
+              { pts: LumosGuide.line(top, b, 12), secs: 0.4, label: 'point', at: 0.5, dx: 0, dy: -1.4 }] });
+    guide.build(W, H);
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    ROUNDS.forEach(function (r, i) {
+      var b = document.createElement('button'); b.textContent = r.name; if (i === round) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+    var g = document.createElement('button'); g.textContent = 'Guide';
+    g.onclick = function () { if (guide) guide.reset(); }; panel.appendChild(g);
+  }
+  function choose(i) {
+    if (wait) { clearTimeout(wait); wait = null; }
+    round = i; stage = 'cast'; last = null; bolt = null; fly = null; sum = null; trail = null; done = false; sparks = []; rock = 0;
+    place(); makeGuide(); menu(); say(ROUNDS[i].start);
+  }
+  function again(html) { stage = 'cast'; bolt = null; fly = null; sum = null; sparks = []; say(html); }
+
+  /* ---- the cast: the swing and the point ---- */
+  var SIDE = { high: 'above', low: 'below', left: 'to the left of', right: 'to the right of' };
+  function judge(pts) {
+    if (stage !== 'cast' || wait) return null;
+    var j = LumosSpells.judgeDisarm(pts, hand, dummy, ease);
+    if (j.reason === 'tap') { if (guide) guide.clear(); say('Swing your wand up above your head, then point it at the dummy\'s wand hand, all in one stroke.'); last = j; return j; }
+    var lv = guide ? guide.level() : 0, tr = guide ? guide.score(pts) : null;
+    if (tr && tr.traced && j.verdict === 'miss' && j.reason !== 'off') {
+      j.verdict = 'disarmed'; j.reason = 'traced'; if (!j.top) j.top = { x: hand.x - hand.r / 3, y: hand.y - hand.r * 2.5 }; }
+    last = j;
+    if (j.verdict !== 'disarmed' && j.reason !== 'wide') {
+      if (guide) guide.miss();
+      trail = { pts: pts, at: performance.now() };
+      var peak = pts[0].y - Math.min.apply(null, pts.map(function (q) { return q.y; }));
+      say({ off: 'Start at your wand hand, down by your side, where it glows.',
+            flat: j.top && Math.abs(j.top.x - hand.x) > hand.r * 2 ? 'You pointed, then swung: <b>swing up first</b>, above your head, then point from the top.' :
+                  j.top ? 'Higher! Swing it right up above your head first, then point.' :
+                  peak >= hand.r ? 'A rainbow! Swing straight up, then turn sharply at the top and point straight from there: a corner, not a curve.' :
+                  'Swing your wand up above your head first, then point: the book\'s duellists swing, then point.',
+            up: 'A good swing! Now, without lifting your finger, <b>point</b> it at the dummy\'s wand hand.',
+            wiggly: 'Point straight, like a finger at the dummy\'s hand: the flash flies straight.',
+            short: 'A longer point, well out toward the dummy.',
+            away: 'At the dummy, not away from it!' }[j.reason] || 'Swing up, then point.');
+      return j;
+    }
+    /* a cast: the scarlet flash flies from the top of the swing along his point */
+    var top = j.top, e = pts[pts.length - 1], len = Math.hypot(e.x - top.x, e.y - top.y) || 1, ux = (e.x - top.x) / len, uy = (e.y - top.y) / len;
+    if (j.reason === 'traced') { var dl = Math.hypot(dummy.x - top.x, dummy.y - top.y); ux = (dummy.x - top.x) / dl; uy = (dummy.y - top.y) / dl; }
+    var along = (dummy.x - top.x) * ux + (dummy.y - top.y) * uy, hit = j.verdict === 'disarmed';
+    var end = hit ? { x: dummy.x, y: dummy.y } : { x: top.x + ux * (along + S * 0.35), y: top.y + uy * (along + S * 0.35) };
+    stage = 'bolt'; trail = { pts: pts, at: performance.now() };
+    bolt = { from: { x: top.x, y: top.y }, to: end, at: performance.now(), dur: 260, hit: hit, j: j };
+    noise(0.3, 1800, 0.35); say('<b>Expelliarmus!</b>');
+    if (hit) { if (guide) guide.hit(lv > 0); LumosSpells.learn('expelliarmus'); } else if (guide) guide.miss();
+    return j;
+  }
+  function struck(now) {
+    var j = bolt.j;
+    if (!bolt.hit) {
+      stage = 'missed'; sparks.push({ x: bolt.to.x, y: bolt.to.y, at: now }); noise(0.2, 600, 0.3);
+      var inch = Math.max(1, Math.round(j.by / (FT / 12)));
+      say('The flash went past its hand, about ' + inch + ' inch' + (inch === 1 ? '' : 'es') + ' ' + SIDE[j.side] + ' it. Your point was ' + deg(Math.abs(j.off)) + ' off; from up there it allows ' + deg(j.allow) + '.');
+      wait = setTimeout(function () { wait = null; again('Again: <b>swing up above your head, then point</b> at its wand hand.'); }, 4000);
+      return;
+    }
+    stage = 'catch'; flash = now; rock = now; noise(0.5, 300, 0.4, 6); throwWand(now);
+    say('<b>A dazzling flash of scarlet light</b>, and its wand flies up! <b>Tap where it will come down</b>, while it is still high.');
+  }
+  function deg(v) { return (v < 1 ? v.toFixed(1) : String(Math.round(v * 10) / 10)) + '°'; }
+
+  /* ---- the throw: a parabola toward him, its top halfway between the start and its mirror on the start's level ---- */
+  function throwWand(now) {
+    var r = ROUNDS[round], c = CATCH[ease], span = r.span * S * (0.88 + Math.random() * 0.24), lim = Math.max(110, H * 0.16);
+    var rise = Math.min(r.rise * S * (0.88 + Math.random() * 0.24), dummy.y - lim), catchY = hand.y, xt, land, m;
+    for (m = 0; m < 8; m++) {   /* keep the landing on the screen */
+      xt = dummy.x - span / 2; land = xt - span / 2 * Math.sqrt((catchY - (dummy.y - rise)) / rise);
+      if (land >= W * 0.06) break; span *= 0.88;
+    }
+    var yt = dummy.y - rise, tUp = 0.9 + 0.6 * rise / (0.4 * S), vx = span / 2 / tUp;
+    var late = xt - span / 2 * Math.sqrt(c.late);
+    fly = { at: now, start: { x: dummy.x, y: dummy.y }, top: { x: xt, y: yt }, span: span, rise: rise, mirror: dummy.x - span,
+            land: land, catchY: catchY, vx: vx, lateAt: (dummy.x - late) / vx, landAt: (dummy.x - land) / vx,
+            floorAt: (dummy.x - (xt - span / 2 * Math.sqrt((floorY() - yt) / rise))) / vx, tap: null, told: false, caught: null };
+  }
+  function wandAt(t) {   /* t in seconds since the throw */
+    var x = fly.start.x - fly.vx * t, k = (x - fly.top.x) / (fly.span / 2);
+    return { x: x, y: fly.top.y + fly.rise * k * k };
+  }
+  function call(p) {   /* his tap: his catching hand goes to that place along his hand's level */
+    var t = (performance.now() - fly.at) / 1000;
+    if (fly.tap || fly.caught !== null) return;
+    if (t > fly.lateAt) { if (!fly.told) { fly.told = true; say('Too late to call it: next time, tap while it is still high.'); } return; }
+    fly.tap = { x: p.x, y: fly.catchY }; noise(0.08, 2600, 0.15);
+  }
+  function settle(now) {   /* at his hand's level: caught, or on down to the floor */
+    var tol = CATCH[ease].tol * S, gap = fly.tap ? fly.tap.x - fly.land : null;
+    fly.caught = fly.tap && Math.abs(gap) <= tol;
+    sum = { shown: now + 250, gap: gap };
+    if (fly.caught) {
+      stage = 'caught'; noise(0.12, 1200, 0.3);
+      var tail = round === 2 ? ' Level with its start it was as far past its top as it began before it, then it fell on down to your hand.' : ' It came down as far past its top as it started before it.';
+      say('<b>Caught it!</b> As Ron caught Lockhart\'s wand (Book 2).' + tail);
+      if (round < 2) wait = setTimeout(function () { wait = null; choose(round + 1); }, 7000);
+      else { done = true; setTimeout(function () { if (done) say('All three caught. <i>"That was a Disarming Charm, as you see, I\'ve lost my wand,"</i> as Lockhart said (Book 2).'); }, 5200); }
+    } else stage = 'falling';
+  }
+  function clatter(now) {
+    stage = 'missed'; noise(0.25, 700, 0.35, 30);
+    var where = sum.gap === null ? (fly.told ? 'You called it too late.' : 'You didn\'t call it.') :
+      'Your hand was ' + ft(Math.abs(sum.gap)) + (sum.gap > 0 ? ' short of' : ' past') + ' where it came down.';
+    say('<b>Clatter!</b> ' + where + ' See the two halves: it comes down as far past its top as it went up before it.');
+    wait = setTimeout(function () { wait = null; again('The dummy picks its wand back up. Again: <b>swing up, then point</b>.'); }, 5200);
+  }
+
+  /* ---- drawing ---- */
+  function drawHall(now) {
+    var fy = floorY(), g = cx.createLinearGradient(0, 0, 0, fy);
+    g.addColorStop(0, '#0d1020'); g.addColorStop(0.3, '#1b1a22'); g.addColorStop(1, '#3a3027'); cx.fillStyle = g; cx.fillRect(0, 0, W, fy);
+    cx.fillStyle = 'rgba(230,225,255,0.55)';   /* the enchanted ceiling's stars */
+    for (var i = 0; i < 40; i++) { var u = Math.sin(i * 91.7) * 9999; u -= Math.floor(u); var v = Math.sin(i * 17.3) * 9999; v -= Math.floor(v); cx.fillRect(u * W, v * H * 0.18, 1.2, 1.2); }
+    var bw = Math.max(48, S * 0.16), bh = bw * 0.45, y0 = H * 0.3, r, c;   /* the wall's stones, below the ceiling */
+    for (r = 0; y0 + r * bh < fy; r++) for (c = -1; c * bw < W; c++) {
+      var x = c * bw + (r % 2 ? bw / 2 : 0), y = y0 + r * bh, t = ((r * 7 + c * 13) % 5) / 5;
+      cx.fillStyle = 'rgba(' + Math.round(78 + t * 14) + ',' + Math.round(66 + t * 12) + ',' + Math.round(54 + t * 10) + ',' + Math.min(1, (y - y0) / (bh * 3)) + ')';
+      cx.fillRect(x + 1.5, y + 1.5, bw - 3, bh - 3);
+    }
+    cx.fillStyle = '#2b231c'; cx.fillRect(0, fy, W, H - fy);
+    for (c = 0; c * bw < W; c++) { cx.fillStyle = c % 2 ? '#30271f' : '#271f18'; cx.fillRect(c * bw, fy + 3, bw - 2, H - fy); }
+    cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.fillRect(0, fy, W, 4);
+    candles.forEach(function (k) {   /* thousands of candles floating overhead (a few dozen of them) */
+      var y = k.y + Math.sin(now / 1100 + k.ph) * S * 0.006, s = S * 0.012 * k.k, fl = 1 + Math.sin(now / 80 + k.ph) * 0.12;
+      var gl = cx.createRadialGradient(k.x, y - s * 2, 0, k.x, y - s * 2, s * 6); gl.addColorStop(0, 'rgba(255,200,120,0.22)'); gl.addColorStop(1, 'rgba(255,180,100,0)');
+      cx.fillStyle = gl; cx.fillRect(k.x - s * 6, y - s * 8, s * 12, s * 12);
+      cx.fillStyle = '#efe4c8'; cx.fillRect(k.x - s * 0.35, y - s, s * 0.7, s * 2.6);
+      cx.fillStyle = '#ffd27a'; cx.beginPath(); cx.ellipse(k.x, y - s * 1.6, s * 0.3 * fl, s * 0.7 * fl, 0, 0, 7); cx.fill();
+    });
+    if (ROUNDS[round].up) {   /* the golden stage along the wall, under the dummy */
+      var st = stageTop(), sx = dummy.x - S * 0.12;
+      var sg = cx.createLinearGradient(0, st, 0, fy); sg.addColorStop(0, '#c99a3c'); sg.addColorStop(1, '#7a5520');
+      cx.fillStyle = '#e2bb62'; cx.fillRect(sx, st - 5, W - sx, 7);
+      cx.fillStyle = sg; cx.fillRect(sx, st + 2, W - sx, fy - st - 2);
+      cx.strokeStyle = 'rgba(255,230,160,0.35)'; cx.lineWidth = 1.5;
+      for (var p = sx + S * 0.08; p < W; p += S * 0.14) { cx.strokeRect(p, st + (fy - st) * 0.2, S * 0.1, (fy - st) * 0.6); }
+    }
+    var vg = cx.createRadialGradient(W / 2, H * 0.5, S * 0.3, W / 2, H * 0.5, Math.max(W, H) * 0.75);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.5)'); cx.fillStyle = vg; cx.fillRect(0, 0, W, H);
+  }
+  function drawWand(x, y, a, k) {
+    var L = S * 0.1 * (k || 1);
+    cx.save(); cx.translate(x, y); cx.rotate(a); cx.lineCap = 'round';
+    cx.strokeStyle = '#5a3a1e'; cx.lineWidth = Math.max(2.5, S * 0.008); cx.beginPath(); cx.moveTo(-L / 2, 0); cx.lineTo(L / 2, 0); cx.stroke();
+    cx.strokeStyle = '#3a2412'; cx.lineWidth = Math.max(4, S * 0.012); cx.beginPath(); cx.moveTo(-L / 2, 0); cx.lineTo(-L * 0.18, 0); cx.stroke();
+    cx.restore();
+  }
+  /* the straw dummy on its post: a sacking body and head, a crossbar for arms, its wand hand toward him */
+  function drawDummy(now) {
+    var base = stageTop(), bx = dummy.x + S * 0.12, hgt = S * 0.42, top = base - hgt;
+    var ang = 0; if (rock) { var rt = (now - rock) / 1000; ang = rt < 2.5 ? 0.35 * Math.exp(-rt * 2.2) * Math.cos(rt * 9) : 0; }
+    cx.save(); cx.translate(bx, base); cx.rotate(ang); cx.translate(-bx, -base);
+    cx.fillStyle = '#4a3420'; cx.fillRect(bx - S * 0.008, top + hgt * 0.4, S * 0.016, hgt * 0.6);   /* the post */
+    cx.fillRect(bx - S * 0.06, base - S * 0.012, S * 0.12, S * 0.012);
+    cx.strokeStyle = '#8a6a3c'; cx.lineWidth = Math.max(4, S * 0.016); cx.lineCap = 'round';   /* the crossbar, out to its wand hand */
+    cx.beginPath(); cx.moveTo(dummy.x, dummy.y); cx.lineTo(bx + S * 0.1, dummy.y + S * 0.01); cx.stroke();
+    cx.fillStyle = '#b08a52'; cx.beginPath(); cx.ellipse(bx, dummy.y + hgt * 0.06, S * 0.065, hgt * 0.24, 0, 0, 7); cx.fill();   /* the sacking body */
+    cx.strokeStyle = '#6e5230'; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(bx - S * 0.06, dummy.y + hgt * 0.02); cx.lineTo(bx + S * 0.06, dummy.y + hgt * 0.02); cx.stroke();
+    cx.fillStyle = '#c29a5e'; cx.beginPath(); cx.arc(bx, top + S * 0.05, S * 0.05, 0, 7); cx.fill();   /* the head */
+    cx.strokeStyle = '#4a3420'; cx.lineWidth = Math.max(1.5, S * 0.005);   /* stitched eyes and mouth */
+    [-1, 1].forEach(function (s) { var ex = bx + s * S * 0.018, ey = top + S * 0.042, q = S * 0.008;
+      cx.beginPath(); cx.moveTo(ex - q, ey - q); cx.lineTo(ex + q, ey + q); cx.moveTo(ex + q, ey - q); cx.lineTo(ex - q, ey + q); cx.stroke(); });
+    cx.beginPath(); cx.moveTo(bx - S * 0.02, top + S * 0.072); cx.lineTo(bx + S * 0.02, top + S * 0.072); cx.stroke();
+    cx.strokeStyle = '#e0c070'; cx.lineWidth = 1.5;   /* straw tufts at the neck and the hand */
+    for (var i = -3; i <= 3; i++) { cx.beginPath(); cx.moveTo(bx + i * S * 0.006, top + S * 0.1); cx.lineTo(bx + i * S * 0.011, top + S * 0.122); cx.stroke();
+      cx.beginPath(); cx.moveTo(dummy.x, dummy.y); cx.lineTo(dummy.x - S * 0.02 + i * 0.4, dummy.y + i * S * 0.006); cx.stroke(); }
+    cx.fillStyle = '#c29a5e'; cx.beginPath(); cx.arc(dummy.x, dummy.y, dummy.r * 0.45, 0, 7); cx.fill();
+    if (!fly && stage !== 'caught') drawWand(dummy.x - S * 0.012, dummy.y - S * 0.035, -1.2, 1);   /* its wand, held up */
+    cx.restore();
+  }
+  /* his wand arm from the bottom left, the hand at the stroke's start */
+  function drawArm(now) {
+    cx.save(); cx.lineCap = 'round';
+    cx.strokeStyle = '#151214'; cx.lineWidth = S * 0.07; cx.beginPath(); cx.moveTo(hand.x - S * 0.22, H + S * 0.05); cx.lineTo(hand.x - S * 0.02, hand.y + S * 0.04); cx.stroke();
+    cx.fillStyle = '#e8c9a8'; cx.beginPath(); cx.arc(hand.x, hand.y, S * 0.028, 0, 7); cx.fill();
+    if (stage === 'cast' && !stroke) drawWand(hand.x + S * 0.03, hand.y - S * 0.03, -0.8, 0.9);
+    if (stage === 'cast' && !wait) {   /* the hand glows faintly: start here */
+      var gk = 0.5 + 0.5 * Math.sin(now / 420), gg = cx.createRadialGradient(hand.x, hand.y, 0, hand.x, hand.y, hand.r * 1.2);
+      gg.addColorStop(0, 'rgba(255,230,190,' + (0.3 * gk) + ')'); gg.addColorStop(1, 'rgba(255,220,180,0)'); cx.fillStyle = gg; cx.beginPath(); cx.arc(hand.x, hand.y, hand.r * 1.2, 0, 7); cx.fill();
+    }
+    cx.restore();
+  }
+  function drawCatcher(x, y) {   /* his open catching hand, palm up */
+    cx.save(); cx.fillStyle = '#e8c9a8'; cx.strokeStyle = '#a7826a'; cx.lineWidth = 1.5;
+    cx.beginPath(); cx.ellipse(x, y + S * 0.012, S * 0.034, S * 0.016, 0, 0, 7); cx.fill(); cx.stroke();
+    for (var i = -1.5; i <= 1.5; i++) { cx.beginPath(); cx.ellipse(x + i * S * 0.016, y - S * 0.004, S * 0.007, S * 0.014, 0, 0, 7); cx.fill(); cx.stroke(); }
+    cx.restore();
+  }
+  /* the sum: the arc, its top, the line through the top, the two equal halves on the start's level, his hand's gap */
+  function drawSum(now) {
+    if (!sum || now < sum.shown) return;
+    var f = fly, k = Math.min(1, (now - sum.shown) / 500), fs = Math.round(Math.max(14, S * 0.032)), y0 = f.start.y, i, x, p;
+    cx.save(); cx.globalAlpha = k; cx.lineCap = 'round';
+    cx.strokeStyle = 'rgba(232,190,90,0.95)'; cx.lineWidth = 3.5; cx.shadowColor = 'rgba(0,0,0,0.8)'; cx.shadowBlur = 3;   /* the arc, gold */
+    cx.beginPath(); for (i = 0; i <= 60; i++) { x = f.start.x + (f.land - f.start.x) * i / 60; p = wandAt((f.start.x - x) / f.vx); i ? cx.lineTo(p.x, p.y) : cx.moveTo(p.x, p.y); } cx.stroke();
+    cx.shadowBlur = 0; cx.setLineDash([6, 6]); cx.lineWidth = 2;
+    cx.strokeStyle = '#c9d8e6'; cx.beginPath(); cx.moveTo(f.top.x, f.top.y); cx.lineTo(f.top.x, y0); cx.stroke();   /* through the top, silver dashes */
+    cx.strokeStyle = 'rgba(201,216,230,0.6)'; cx.beginPath(); cx.moveTo(f.start.x, y0); cx.lineTo(f.mirror, y0); cx.stroke();   /* the start's level */
+    cx.setLineDash([]);
+    cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(f.top.x, f.top.y, 5, 0, 7); cx.fill();
+    cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.textAlign = 'center'; cx.shadowColor = 'rgba(0,0,0,0.95)'; cx.shadowBlur = 5;
+    cx.fillStyle = '#f3e6c8'; cx.fillText('top', f.top.x, f.top.y - fs * 0.6);
+    cx.strokeStyle = '#c9d8e6'; cx.lineWidth = 2;   /* the halves: equal, each ticked once */
+    [f.start.x, f.top.x, f.mirror].forEach(function (q) { cx.beginPath(); cx.moveTo(q, y0 - 6); cx.lineTo(q, y0 + 6); cx.stroke(); });
+    [(f.start.x + f.top.x) / 2, (f.top.x + f.mirror) / 2].forEach(function (q) {
+      cx.beginPath(); cx.moveTo(q - 3, y0 + 7); cx.lineTo(q + 3, y0 - 7); cx.stroke();
+      cx.fillStyle = '#c9d8e6'; cx.fillText(ft(f.span / 2), q, y0 - fs * 1.05);
+    });
+    if (round === 2) {   /* the stage: level with its start at the mirror, then on down to his hand's level */
+      cx.fillStyle = '#f3e6c8'; cx.beginPath(); cx.arc(f.mirror, y0, 4, 0, 7); cx.fill();
+      cx.strokeStyle = 'rgba(240,226,198,0.8)'; cx.setLineDash([4, 5]); cx.beginPath(); cx.moveTo(f.mirror, y0); cx.lineTo(f.mirror, f.catchY); cx.stroke(); cx.setLineDash([]);
+      cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(f.mirror, f.catchY); cx.lineTo(f.land, f.catchY); cx.stroke();
+      cx.fillStyle = '#f3e6c8'; cx.textAlign = 'center'; cx.fillText(ft(f.mirror - f.land) + ' further', (f.mirror + f.land) / 2, f.catchY + fs * 1.5);
+    }
+    cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(f.land, f.catchY, 4.5, 0, 7); cx.fill();   /* where it came down to his hand's level */
+    if (sum.gap !== null && !f.caught) {   /* the gap from his hand */
+      cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(f.tap.x, f.catchY + fs * 2.4); cx.lineTo(f.land, f.catchY + fs * 2.4); cx.stroke();
+      [f.tap.x, f.land].forEach(function (q) { cx.beginPath(); cx.moveTo(q, f.catchY + fs * 2); cx.lineTo(q, f.catchY + fs * 2.8); cx.stroke(); });
+      cx.fillStyle = '#f3e6c8'; cx.fillText(ft(Math.abs(sum.gap)) + (sum.gap > 0 ? ' short' : ' past'), (f.tap.x + f.land) / 2, f.catchY + fs * 3.9);
+    }
+    cx.restore();
+  }
+  function frame(now) {
+    drawHall(now);
+    drawDummy(now);
+    drawArm(now);
+    sparks.forEach(function (s) {   /* where a wide flash struck the wall */
+      var a = (now - s.at) / 1000; if (a > 1.6) return;
+      cx.save(); cx.globalAlpha = Math.max(0, 1 - a / 1.6); cx.fillStyle = '#ff5a3c';
+      for (var i = 0; i < 10; i++) { var t = i / 10 * 6.283, r = S * 0.01 + a * S * 0.06 * (0.6 + (i % 3) * 0.2); cx.beginPath(); cx.arc(s.x + Math.cos(t) * r, s.y + Math.sin(t) * r, 2.5, 0, 7); cx.fill(); }
+      cx.restore();
+    });
+    if (bolt && (stage === 'bolt' || now - bolt.at < bolt.dur + 200)) {   /* the scarlet flash along his point */
+      var bf = Math.min(1, (now - bolt.at) / bolt.dur), bx = bolt.from.x + (bolt.to.x - bolt.from.x) * bf, by = bolt.from.y + (bolt.to.y - bolt.from.y) * bf;
+      var tf = Math.max(0, bf - 0.45), tx = bolt.from.x + (bolt.to.x - bolt.from.x) * tf, ty = bolt.from.y + (bolt.to.y - bolt.from.y) * tf;
+      cx.save(); cx.lineCap = 'round'; cx.globalAlpha = stage === 'bolt' ? 1 : Math.max(0, 1 - (now - bolt.at - bolt.dur) / 200);
+      cx.strokeStyle = 'rgba(255,60,40,0.5)'; cx.lineWidth = S * 0.03; cx.beginPath(); cx.moveTo(tx, ty); cx.lineTo(bx, by); cx.stroke();
+      cx.strokeStyle = '#ffd0c0'; cx.lineWidth = S * 0.008; cx.beginPath(); cx.moveTo(tx, ty); cx.lineTo(bx, by); cx.stroke();
+      cx.restore();
+      if (stage === 'bolt' && bf >= 1) struck(now);
+    }
+    if (fly) {
+      var t = (now - fly.at) / 1000, p;
+      if (stage === 'catch' && t >= fly.landAt) settle(now);
+      if (stage === 'falling' && t >= fly.floorAt) clatter(now);
+      if (fly.tap) drawCatcher(fly.tap.x, fly.catchY);
+      drawSum(now);
+      if (fly.caught) { drawWand(fly.tap.x, fly.catchY - S * 0.01, 0.15, 1); }
+      else { var tt = stage === 'missed' ? fly.floorAt : t; p = wandAt(tt); drawWand(p.x, Math.min(p.y, floorY() - S * 0.006), stage === 'missed' ? 0.05 : tt * 9, 1); }
+      if (stage === 'catch' && !fly.tap && t <= fly.lateAt) {   /* his hand's level, faint, while he may still call it */
+        cx.save(); cx.strokeStyle = 'rgba(232,201,168,0.28)'; cx.setLineDash([3, 8]); cx.lineWidth = 2; cx.beginPath(); cx.moveTo(W * 0.03, fly.catchY); cx.lineTo(dummy.x - S * 0.04, fly.catchY); cx.stroke(); cx.restore();
+      }
+    }
+    if (flash && now - flash < 450) { cx.fillStyle = 'rgba(255,40,30,' + (0.45 * (1 - (now - flash) / 450)) + ')'; cx.fillRect(0, 0, W, H); }
+    if (stage === 'cast' && !wait && guide) guide.draw(cx, now, !!stroke);
+    var pts = stroke || (trail && now - trail.at < 600 ? trail.pts : null);
+    if (pts && pts.length > 1) {
+      cx.save(); cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.strokeStyle = 'rgba(220,225,255,' + (stroke ? 0.6 : 0.6 * (1 - (now - trail.at) / 600)) + ')'; cx.lineWidth = 5;
+      cx.beginPath(); pts.forEach(function (q, i) { i ? cx.lineTo(q.x, q.y) : cx.moveTo(q.x, q.y); }); cx.stroke(); cx.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: one stroke to cast; then one tap to call the catch ---- */
+  function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    if (stage === 'catch' && fly) { call(pt(ev)); return; }
+    if (wait || done || active !== null || stage !== 'cast') return;
+    active = ev.pointerId; stroke = [pt(ev)]; trail = null;
+    if (guide) guide.cover(stroke[0]);
+    try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+  });
+  cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
+    var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
+    list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (guide) guide.cover(q); });
+  });
+  cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId !== active || !stroke) return;
+    active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
+    judge(pts);
+  });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; if (guide) guide.clear(); } });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); requestAnimationFrame(frame);
+  window.lumosExpelliarmus = { choose: function (i) { choose(i - 1); }, hand: function () { return { x: hand.x, y: hand.y, r: hand.r }; },
+    dummy: function () { return { x: dummy.x, y: dummy.y, r: dummy.r }; }, judge: function (pts) { return judge(pts); },
+    flight: function () { return fly ? { t: (performance.now() - fly.at) / 1000, land: fly.land, top: fly.top, start: fly.start, mirror: fly.mirror,
+      catchY: fly.catchY, lateAt: fly.lateAt, landAt: fly.landAt, tol: CATCH[ease].tol * S, tap: fly.tap, caught: fly.caught } : null; },
+    state: function () { return { round: round + 1, stage: stage, waiting: !!wait, done: done,
+      last: last ? { verdict: last.verdict, reason: last.reason, lift: last.lift, off: last.off, allow: last.allow, by: last.by, side: last.side } : null,
+      line: lineEl.textContent, guide: guide ? guide.state().level : null, ease: ease, learned: LumosSpells.learned('expelliarmus') }; } };
+})();
+</script>
+</body>
+</html>
