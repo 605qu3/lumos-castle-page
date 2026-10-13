@@ -761,9 +761,14 @@ kit.eye = CAM_BASE;
 var lookTmp = new THREE.Vector3();
 
 function roomPose(yw, pt, pos, look) {
-  var r = CAM_BASE.z - FOCUS.z;
+  var r = CAM_BASE.z - FOCUS.z, turn = yw < -YAW_MAX ? -yw - YAW_MAX : 0;   /* past the long drag right, his head turns (doorTurn) */
+  if (turn) yw = -YAW_MAX;
   pos.set(FOCUS.x + Math.sin(yw) * r, CAM_BASE.y + pt * r, FOCUS.z + Math.cos(yw) * r);
   look.copy(FOCUS);
+  if (turn) {
+    var dx = look.x - pos.x, dz = look.z - pos.z, c = Math.cos(turn), s = Math.sin(turn);
+    look.x = pos.x + dx * c - dz * s; look.z = pos.z + dx * s + dz * c;
+  }
 }
 
 /* the canvas texture helpers are the shared frame's (castle.js) */
@@ -5055,6 +5060,18 @@ var YAW_MAX = 0.55, PITCH_MAX = 0.08;
 var PITCH_DOWN = (1.1 - 1.35) / 9;
 /* a drag to the left goes further, to frame the bookcase where the classroom meets the tower (Godric) */
 var YAW_LEFT = 0.55;
+/* the little door in a phone's view (req 250; Interaction's recheck of req 231, 13 October 2026, 9.13 am): on a screen
+   too narrow for the long drag right to show the little door, the drag goes on past it as a turn of his head, the eye
+   held where the long drag left it, just far enough to bring the door wholly in with DOOR_TURN_PAD of stone beyond its
+   far edge; a screen that already shows it (the wide screen) turns no further than before. Nothing marks the door. */
+var DOOR_TURN_PAD = 0.07;
+function doorTurn() {
+  var r = CAM_BASE.z - FOCUS.z, ex = FOCUS.x - Math.sin(YAW_MAX) * r, ez = FOCUS.z + Math.cos(YAW_MAX) * r;
+  var bear = function (x, z) { return Math.atan2(x - ex, ez - z); };
+  var half = Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect), a = KEYDOOR.deg * Math.PI / 180, w = KEYDOOR.w / 2 / KEYDOOR.r;
+  var far = Math.max(bear(KEYDOOR.r * Math.sin(a - w), KEYDOOR.r * Math.cos(a - w)), bear(KEYDOOR.r * Math.sin(a + w), KEYDOOR.r * Math.cos(a + w)));
+  return Math.max(0, far + DOOR_TURN_PAD - bear(FOCUS.x, FOCUS.z) - half);
+}
 var raycaster = new THREE.Raycaster();
 var pointer = new THREE.Vector2();
 /* ---------- the bellows (The bellows; Godric, 8 October 2026) ----------
@@ -7450,7 +7467,7 @@ canvas.addEventListener('pointermove', function (e) {
   px = e.clientX; py = e.clientY;
   if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
   if (mode === 'room' && !tiltOn) {
-    yawT = clamp(yawT - dx * 0.0022, -YAW_MAX, YAW_LEFT);
+    yawT = clamp(yawT - dx * 0.0022, -YAW_MAX - doorTurn(), YAW_LEFT);
     pitchT = clamp(pitchT - dy * 0.0012, PITCH_DOWN, PITCH_MAX);
   }
   else if (headTurns()) {                            /* at a stop he turns his head where he stands (req 209) */
@@ -7479,7 +7496,7 @@ function onTilt(e) {
   else { h = e.gamma; v = e.beta; }
   if (!tiltBase) tiltBase = { h: h, v: v };
   if (mode !== 'room') return;
-  yawT = clamp((h - tiltBase.h) * 0.012, -YAW_MAX, YAW_LEFT);
+  yawT = clamp((h - tiltBase.h) * 0.012, -YAW_MAX - doorTurn(), YAW_LEFT);
   pitchT = clamp(-(v - tiltBase.v) * 0.005, PITCH_DOWN, PITCH_MAX);
 }
 function toggleTilt() {
