@@ -291,6 +291,39 @@ shell.doors.forEach(function (d) {
   d.hinge = { at: m.position.clone().addScaledVector(along, -W / 2), along: along, half: W / 2, th: th * s };
   d.face = new THREE.Vector3().copy(d.inward).applyAxisAngle(Y_AXIS, -m.rotation.y).z > 0 ? 1 : -1;   /* the leaf's side toward him */
 });
+/* the wear (Godric's note on architect-knots-284-1013, 6.51 to 6.56 pm: "slightly worn from use by students over the
+   decades"; the Architect's ledger, line 4): on every shut leaf, both faces, the wood rubbed paler and smoother where
+   hands push it, by the free edge at the corridor door's lock height (about 1.0 m up), a scuffed foot paler toward
+   that edge, and the threshold dished paler down its middle. Low contrast, a grey shell's; they swing with the leaf */
+var wearTex = (function () {
+  var c = document.createElement('canvas'); c.width = c.height = 64;
+  var g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.55, 'rgba(255,255,255,0.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+})();
+var WEAR = { hand: { up: 1.0, in: 0.17, w: 0.3, h: 0.42 }, foot: { h: 0.32 }, sill: { frac: 0.6 } };
+function wearPatch(w, h, color, opacity) {
+  var mat = kit.solid(color, { map: wearTex, transparent: true, opacity: opacity, depthWrite: false, roughness: 0.62 });
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+}
+shell.doors.forEach(function (d) {
+  var half = d.hinge.half, H = d.h - 0.02;
+  d.wear = [];
+  [1, -1].forEach(function (f) {
+    var hand = wearPatch(WEAR.hand.w, WEAR.hand.h, 0x7a7168, 0.5);
+    hand.position.set(half - WEAR.hand.in, -H / 2 + WEAR.hand.up, f * 0.0605);
+    var foot = wearPatch(half * 2 * 0.8, WEAR.foot.h, 0x6f675f, 0.42);
+    foot.position.set(half * 0.15, -H / 2 + WEAR.foot.h * 0.42, f * 0.0605);
+    [hand, foot].forEach(function (p) { if (f < 0) p.rotation.y = Math.PI; p.name = 'wear-' + d.id; d.mesh.add(p); d.wear.push(p); });
+  });
+  var sill = shell.group.getObjectByName(d.place + '-threshold-' + d.id);
+  if (sill) {
+    var dish = wearPatch(d.w * WEAR.sill.frac, 0.6, 0x8a837b, 0.45);
+    dish.rotation.x = -Math.PI / 2; dish.position.y = 0.011; dish.scale.y = 0.75;
+    dish.name = 'wear-sill-' + d.id; sill.add(dish);
+  }
+});
 /* the warm light beyond: one glow behind each shut leaf and a spill on the floor before it, shown only while it stands
    open; one shared light, set at its door when it swings, so the scene's lights never change in number */
 var glowTex = (function () {
@@ -360,7 +393,7 @@ function updateFades(dt) {
     f.t += dt;
     var t = f.t, k = t < 0.35 ? t / 0.35 : t < 1.3 ? 1 : t < 1.9 ? 1 - (t - 1.3) / 0.6 : 0;
     f.stone.color.copy(f.from).lerp(WALL_GREY, easeInOut(k));
-    (f.d.knots || []).forEach(function (n) { n.visible = k < 0.5; });
+    (f.d.knots || []).concat(f.d.wear || []).forEach(function (n) { n.visible = k < 0.5; });   /* a wall pretending has no knots and no wear */
     if (t >= 1.9) { f.d.mesh.material = f.own; f.stone.dispose(); return false; }
     return true;
   });
