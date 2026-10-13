@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=9"></script>
+<script src="spells.js?v=10"></script>
 <script>
 /* Dissendium, a test page for the Charms lane (12 October 2026, seventh session; the owner is Godric). Drawn in code.
    The books (PoA 10, checked in the text): behind a statue of a humpbacked, one-eyed witch on the third floor, Harry
@@ -41,7 +41,11 @@
    reminds him that Lumos is needed at the bottom. The lift he drew round the hinge (the seventh session's first
    pass) is gone from the page; its judge, LumosSpells.judgeHinge, stays in spells.js and its tally for a later level.
    The dark at the bottom is lit with Lumos's flick (judgeFlick). ?ease= (the flick's), ?width= (his shoulders, cm)
-   for trying; window.lumosDissendium for checks. */
+   for trying; window.lumosDissendium for checks. Since 12 October 2026 (ninth session, req 163) the two taps, the
+   word's card and the swing with its protractor and chord are LumosSpells.openHump, the call the witch's landing makes
+   (the card says the word for him while the ear waits on its probe; here the map's bubble gives the word, as in the
+   book, where the castle has the twins' note); the page draws her, and the lid where the swing puts it. Down in the
+   burrow, the twins' chalk line, seen only by wand light (req 178). */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -50,8 +54,8 @@
   /* the sum: the lid's length and his width in cm; the angle where the gap at the edge (2 x 45 x sin(half the angle))
      first equals his width */
   var LID = 45, WIDTH = Math.max(24, Math.min(44, Number(qs.get('width')) || 34)), MAX = 110;
-  var NEED = 2 * Math.asin(WIDTH / (2 * LID)) * 180 / Math.PI, SWING = 2800, SLIDE = 3600;
-  var stage = 'tap', taps = 0, bubble = null, lid = 0, lidTo = null, stroke = null, active = null, trail = null, last = null;
+  var NEED = LumosSpells.humpNeed(LID, WIDTH), SLIDE = 3600;
+  var stage = 'tap', taps = 0, bubble = null, lid = 0, stroke = null, active = null, trail = null, last = null, asking = null;
   var thud = null, slideAt = 0, litAt = 0;
 
   function resize() {
@@ -85,37 +89,46 @@
     panel.innerHTML = '';
     var a = document.createElement('button'); a.textContent = 'Again'; a.onclick = function () { ensureAudio(); start(); }; panel.appendChild(a);
     var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    a.setAttribute('data-spell-exit', ''); e.setAttribute('data-spell-exit', '');   /* the hump's layer never covers them */
     e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
   }
   function start() {
-    stage = 'tap'; taps = 0; bubble = null; lid = 0; lidTo = null; stroke = null; trail = null; last = null; thud = null; slideAt = 0; litAt = 0;
+    if (asking) { var old = asking; asking = null; old.cancel(); }
+    stage = 'tap'; taps = 0; bubble = null; lid = 0; stroke = null; trail = null; last = null; thud = null; slideAt = 0; litAt = 0;
     menu(); say('A statue of a humpbacked, one-eyed witch, on the third floor. Tap her hump with your wand.');
+    offer();
   }
-
-  function onHump(p) {   /* inside the hump's round, generously */
-    var g = geo(), m = { x: (g.hinge.x + g.edge.x) / 2, y: (g.hinge.y + g.edge.y) / 2 - S * 0.04 };
-    return Math.hypot(p.x - m.x, p.y - m.y) < g.L * 0.75;
-  }
-  function tapHump(p) {
-    if (!onHump(p)) { say(taps ? 'Tap her hump again, and whisper it: <b><i>Dissendium</i></b>.' : 'Tap the witch\'s hump, the round of her back.'); return; }
-    noise(0.05, 2600, 0.5); taps++;
-    if (taps === 1) {
-      thud = performance.now();
-      say('Nothing happened. Look at the map: by your dot, a tiny speech bubble...');
-      bubble = performance.now() + 700;
-      setTimeout(function () { if (stage === 'tap' && taps === 1) say('The map says <b><i>Dissendium</i></b>. Tap her hump again and whisper it.'); }, 1500);
-      return;
-    }
-    /* t1: at once the hump swings open by itself, the protractor tracing it, and stops at just wide enough */
-    stage = 'swing'; lidTo = { at: performance.now(), a: 0, b: NEED, ms: SWING, swing: true };
-    noise(0.3, 220, 0.4); setTimeout(function () { noise(SWING / 1000 - 0.3, 140, 0.22); }, 200);
-    say('<b><i>Dissendium!</i></b> At once, the hump begins to open: watch the angle at its hinge, and the gap at its edge.');
-  }
-  function opened() {   /* the swing has stopped at the angle where the gap equals his width */
-    stage = 'open'; noise(0.2, 400, 0.5); LumosSpells.learn('dissendium');
-    var gap = Math.round(gapAt(lid));
-    last = { degrees: Math.round(lid), gap: gap, width: WIDTH };
-    say('It stops at <b>' + Math.round(lid) + '°</b>. The gap at its edge is <b>' + gap + ' cm</b>, and you are <b>' + WIDTH + ' cm</b> across the shoulders: just wide enough to admit a fairly thin person. Tap the hole to climb in, headfirst.');
+  function humpSpot() { var g = geo(); return { x: (g.hinge.x + g.edge.x) / 2, y: (g.hinge.y + g.edge.y) / 2 - S * 0.04 }; }
+  /* the hump's two taps, the word's card and the swing: LumosSpells.openHump, as the witch's landing calls it */
+  function offer() {
+    var mine = asking = LumosSpells.openHump({ hump: humpSpot, r: function () { return geo().L * 0.75; },
+      hinge: function () { return geo().hinge; }, edge: function () { return geo().edge; }, dir: 1, lid: LID, width: WIDTH, max: MAX, hold: 4,
+      onTap: function (n) {
+        noise(0.05, 2600, 0.5); taps = n; thud = performance.now();
+        if (n === 1) {
+          say('Nothing happened. Look at the map: by your dot, a tiny speech bubble...');
+          bubble = performance.now() + 700;
+          setTimeout(function () { if (stage === 'tap' && taps === 1) say('The map says <b><i>Dissendium</i></b>. Tap the word to whisper it, then tap her hump again.'); }, 1500);
+        } else say('Nothing again. Whisper the word first: tap <b><i>Dis-sen-di-um</i></b>, then her hump.');
+      },
+      onWord: function () { noise(0.5, 3200, 0.12); say('<i>Dissendium...</i> you whisper. Now tap her hump again.'); },
+      onSwing: function (d) {
+        if (stage === 'tap') {   /* t1: at once the hump swings open by itself, the protractor tracing it */
+          stage = 'swing'; noise(0.3, 220, 0.4); setTimeout(function () { noise(2.5, 140, 0.22); }, 200);
+          say('<b><i>Dissendium!</i></b> At once, the hump begins to open: watch the angle at its hinge, and the gap at its edge.');
+        }
+        if (Math.floor(d / 10) !== Math.floor(lid / 10)) tick();
+        lid = d;
+      },
+      onStop: function (o) {   /* it stops where the gap equals his width */
+        lid = NEED; noise(0.2, 400, 0.5); last = { degrees: o.degrees, gap: o.gap, width: o.width, first: o.first };
+        say('It stops at <b>' + o.degrees + '°</b>. The gap at its edge is <b>' + o.gap + ' cm</b>, and you are <b>' + o.width + ' cm</b> across the shoulders: just wide enough to admit a fairly thin person.');
+      } });
+    mine.done.then(function (o) {
+      if (asking !== mine) return;
+      asking = null;
+      if (o.verdict === 'opened') { stage = 'open'; say('It stops at <b>' + o.degrees + '°</b>, a gap of <b>' + o.gap + ' cm</b>: just wide enough for you. Tap the hole to climb in, headfirst.'); }
+    });
   }
   function climb(p) {
     var g = geo(), m = { x: (g.hinge.x + g.edge.x) / 2, y: (g.hinge.y + g.edge.y) / 2 };
@@ -186,46 +199,7 @@
     cx.strokeStyle = lid > 0.5 ? '#2a262e' : 'rgba(40,36,44,0.55)'; cx.lineWidth = lid > 0.5 ? 2.5 : 1.5; lidPath(g, lid); cx.stroke();
     cx.restore();
   }
-  /* the angle at the hinge, in tens, and the gap at the edge against what he needs */
-  function drawMeasure(now) {
-    var g = geo(), a0 = Math.atan2(g.edge.y - g.hinge.y, g.edge.x - g.hinge.x), R = g.L * 0.62, i;
-    cx.save();
-    cx.strokeStyle = 'rgba(159,182,201,0.55)'; cx.lineWidth = 1.5;
-    cx.beginPath(); cx.arc(g.hinge.x, g.hinge.y, R, a0, a0 + MAX * Math.PI / 180); cx.stroke();
-    var fs = Math.round(Math.max(11, S * 0.03));
-    cx.font = fs + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
-    for (i = 0; i <= MAX; i += 10) {
-      var a = a0 + i * Math.PI / 180, long = i % 30 === 0, r0 = R * (long ? 0.86 : 0.93);
-      cx.strokeStyle = long ? 'rgba(217,199,154,0.9)' : 'rgba(159,182,201,0.6)'; cx.lineWidth = long ? 2.2 : 1.2;
-      cx.beginPath(); cx.moveTo(g.hinge.x + Math.cos(a) * r0, g.hinge.y + Math.sin(a) * r0); cx.lineTo(g.hinge.x + Math.cos(a) * R, g.hinge.y + Math.sin(a) * R); cx.stroke();
-      if (long && i > 0) { cx.fillStyle = 'rgba(217,199,154,0.95)'; cx.fillText(String(i), g.hinge.x + Math.cos(a) * R * 1.16, g.hinge.y + Math.sin(a) * R * 1.16); }
-    }
-    if (lid > 1) {   /* the gold wedge he has opened */
-      cx.fillStyle = 'rgba(243,210,122,0.28)'; cx.beginPath(); cx.moveTo(g.hinge.x, g.hinge.y);
-      cx.arc(g.hinge.x, g.hinge.y, R * 0.84, a0, a0 + lid * Math.PI / 180); cx.closePath(); cx.fill();
-    }
-    cx.fillStyle = '#9fb6c9'; cx.beginPath(); cx.arc(g.hinge.x, g.hinge.y, Math.max(3, S * 0.008), 0, 7); cx.fill();
-    /* the chord: from where the edge was to where it is, and his own width marked along it */
-    var e0 = g.edge, e1 = rot(g.edge, g.hinge, lid), gap = Math.hypot(e1.x - e0.x, e1.y - e0.y), need = 2 * g.L * Math.sin(NEED * Math.PI / 360);
-    if (gap > 2) {
-      var ux = (e1.x - e0.x) / gap, uy = (e1.y - e0.y) / gap, fits = gap >= need - 0.5;
-      cx.lineCap = 'round';
-      cx.strokeStyle = fits ? '#f3d27a' : 'rgba(243,210,122,0.6)'; cx.lineWidth = 4;
-      cx.beginPath(); cx.moveTo(e0.x, e0.y); cx.lineTo(e1.x, e1.y); cx.stroke();
-      var m = { x: e0.x + ux * need, y: e0.y + uy * need };
-      cx.strokeStyle = '#9fb6c9'; cx.lineWidth = 3;
-      cx.beginPath(); cx.moveTo(m.x - uy * 12, m.y + ux * 12); cx.lineTo(m.x + uy * 12, m.y - ux * 12); cx.stroke();
-      cx.fillStyle = '#9fb6c9'; cx.font = fs + 'px Georgia, serif';
-      cx.fillText('you, ' + WIDTH + ' cm', m.x + uy * fs * 1.6 + ux * fs * 1.4, m.y - ux * fs * 1.6 + uy * fs * 1.4);   /* outside the lid, past his mark */
-      var mid = { x: (e0.x + e1.x) / 2, y: (e0.y + e1.y) / 2 };   /* the gap, in cm, as it grows */
-      cx.fillStyle = fits ? '#f3d27a' : 'rgba(243,210,122,0.8)'; cx.font = '600 ' + fs + 'px Georgia, serif';
-      cx.fillText('gap ' + Math.round(gapAt(lid)) + ' cm', mid.x + uy * fs * 2.6, mid.y - ux * fs * 2.6);
-    }
-    var big = Math.round(Math.max(16, S * 0.05));
-    cx.font = '600 ' + big + 'px Georgia, serif'; cx.fillStyle = '#f3d27a'; cx.shadowColor = '#000'; cx.shadowBlur = 6;
-    cx.fillText(Math.round(lid) + '°', g.hinge.x + R * 0.3, g.hinge.y + R * 0.55);
-    cx.restore();
-  }
+  /* the angle at the hinge and the gap at its edge: drawn by LumosSpells.openHump's layer */
   /* a corner of the map, his dot, and the tiny speech bubble (PoA 10) */
   function drawMap(now) {
     var w = Math.min(W * 0.34, S * 0.42), h = w * 0.62, x = 12, y = H - h - Math.max(64, H * 0.1);
@@ -281,20 +255,19 @@
     var tg = cx.createRadialGradient(wx, wy - S * 0.12, 0, wx, wy - S * 0.12, S * 0.07);
     tg.addColorStop(0, 'rgba(255,250,230,' + k + ')'); tg.addColorStop(1, 'rgba(255,230,170,0)'); cx.fillStyle = tg;
     cx.beginPath(); cx.arc(wx, wy - S * 0.12, S * 0.07, 0, 7); cx.fill();
+    /* a few steps down, the twins' chalk on the earth wall, seen only by wand light (req 178) */
+    var cf = Math.round(Math.max(13, S * 0.034));
+    cx.save(); cx.globalAlpha = 0.85 * k; cx.fillStyle = '#e6e1d6'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.translate(W * 0.27, H * 0.36); cx.rotate(-0.08); cx.font = cf + 'px "Segoe Print", "Bradley Hand", cursive';
+    cx.fillText('Mischief this way', 0, 0); cx.fillText('Honeydukes 1 mile \u2192', 0, cf * 1.4);
+    cx.restore();
   }
   function frame(now) {
-    if (lidTo) {
-      var u = Math.min(1, (now - lidTo.at) / lidTo.ms), was = lid, k = lidTo.swing ? 1 - Math.pow(1 - u, 3) : u * u * (3 - 2 * u);
-      lid = lidTo.a + (lidTo.b - lidTo.a) * k;
-      if (lidTo.swing && Math.floor(lid / 10) !== Math.floor(was / 10)) tick();
-      if (u >= 1) { var sw = lidTo.swing; lidTo = null; if (sw && stage === 'swing') opened(); }
-    }
     if (stage === 'slide') drawSlide(now);
     else if (stage === 'dark') { cx.fillStyle = '#000'; cx.fillRect(0, 0, W, H); }
     else if (stage === 'lit') drawPassage(now);
     else {
       drawWall(); drawWitch(now);
-      if (stage !== 'tap') drawMeasure(now);
       drawMap(now);
     }
     var pts = stroke || (trail && now - trail.at < 400 ? trail.pts : null);
@@ -310,7 +283,6 @@
   cv.addEventListener('pointerdown', function (ev) {
     ensureAudio(); ev.preventDefault();
     var p = pt(ev);
-    if (stage === 'tap') { tapHump(p); return; }
     if (stage === 'open') { climb(p); return; }
     if (stage !== 'dark' || active !== null) return;
     active = ev.pointerId; stroke = [p]; trail = null;
@@ -330,10 +302,11 @@
   document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
   addEventListener('resize', resize); resize(); start(); requestAnimationFrame(frame);
-  window.lumosDissendium = { start: start, geo: geo, tap: function () { var g = geo(); tapHump({ x: (g.hinge.x + g.edge.x) / 2, y: (g.hinge.y + g.edge.y) / 2 - S * 0.04 }); },
+  window.lumosDissendium = { start: start, geo: geo, tap: function () { if (asking) asking.tap(); }, word: function () { if (asking) asking.say(); },
+    offer: function () { return asking ? asking.state() : null; },
     hold: function (deg) { lid = deg; }, gapAt: gapAt,
     climb: function () { climb(null); }, flick: function (pts) { return flick(pts); },
-    state: function () { return { stage: stage, taps: taps, lid: Math.round(lid * 10) / 10, need: Math.round(NEED * 10) / 10, width: WIDTH, gap: Math.round(gapAt(lid) * 10) / 10, last: last, ease: ease, learned: LumosSpells.learned('dissendium') }; } };
+    state: function () { return { stage: stage, taps: taps, lid: Math.round(lid * 10) / 10, need: Math.round(NEED * 10) / 10, width: WIDTH, gap: Math.round(gapAt(lid) * 10) / 10, last: last, ease: ease, learned: LumosSpells.learned('dissendium'), offered: !!asking }; } };
 })();
 </script>
 </body>

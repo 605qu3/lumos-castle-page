@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=9"></script>
+<script src="spells.js?v=10"></script>
 <script src="guide.js?v=3"></script>
 <script>
 /* A lock and a page of ink in a room, a test page for the Charms lane (12 October 2026, fifth session; the owner is
@@ -40,6 +40,11 @@
    LumosSpells.measureSpan, Ollivander's tape, on a wand in its box (the painted wand is eleven inches; the tape says
    right, short or long) and on his own hand on the glass (real inches). The Cast button stands for his tap on the
    thing, and Step back for leaving the stop: the room calls cancel().
+   Since 12 October 2026 (ninth session, req 163): LumosSpells.openHump on the one-eyed witch's hump, the call her
+   landing makes (req 178, the Corridor's): offered only while he holds the twins' note (req 179; the button sets it
+   for trying), a first tap does nothing, the word's card comes up, a tap on it says the word, and the next tap on the
+   hump swings it open by itself, the protractor and the chord stopping it where the gap equals his width. The witch
+   is a stand-in side on; the corridor draws its own and calls witchHump() on 'opened'.
    window.lumosRoomSpells for checks. */
 (function () {
   'use strict';
@@ -51,7 +56,14 @@
     { id: 'notice', name: "Wood's notice", spell: 'aparecium' },
     { id: 'feather', name: 'A feather', spell: 'leviosa' },
     { id: 'wand', name: 'A wand in its box', spell: null },
-    { id: 'hand', name: 'Your hand', spell: null } ];
+    { id: 'hand', name: 'Your hand', spell: null },
+    { id: 'hump', name: "The witch's hump", spell: null } ];
+  var hump = { deg: 0 }, note = false;   /* the lid's angle, and whether he holds the twins' note (req 179) */
+  function humpGeo() {
+    var x = W / 2, y = H * 0.52, hinge = { x: x + S * 0.2, y: y }, edge = { x: x - S * 0.12, y: y - S * 0.12 };
+    return { x: x, y: y, hinge: hinge, edge: edge, bulge: { x: x + S * 0.06, y: y - S * 0.4 }, floor: H * 0.78,
+      spot: { x: x + S * 0.04, y: y - S * 0.12 }, r: Math.hypot(edge.x - hinge.x, edge.y - hinge.y) * 0.7 };
+  }
   var feather = { x: 0, y: 0, phase: 'rest', mode: null, t0: 0, rot: 0 }, tape = null;
   function featherRest() { return { x: W * 0.5, y: H * 0.6 }; }
   function wandBox() { var w = Math.min(W * 0.82, S * 1.1), h = w * 0.16; return { x: W / 2 - w / 2, y: H * 0.45 - h / 2, w: w, h: h }; }
@@ -84,7 +96,8 @@
       menu();
     }));
     panel.appendChild(btn('Cast', cast, 'go'));
-    if (opened.drawer || opened.notice) panel.appendChild(btn('Shut it again', function () { opened = { drawer: 0, notice: 0 }; say('Shut, and blank again.'); menu(); }));
+    if (T.id === 'hump') panel.appendChild(btn("Holds the twins' note: " + (note ? 'yes' : 'no'), function () { note = !note; menu(); }));
+    if (opened.drawer || opened.notice || hump.deg) panel.appendChild(btn('Shut it again', function () { opened = { drawer: 0, notice: 0 }; hump.deg = 0; say('Shut, and blank again.'); menu(); }));
   }
   function choose(i) {
     if (asking) { var old = asking; asking = null; old.cancel(); }   /* its answer is dropped: a new thing is chosen */
@@ -93,6 +106,7 @@
     if (T.id === 'feather') { say('A tawny owl feather, lying on the table.'); return; }
     if (T.id === 'wand') { say('A wand in its box, on the counter. How long is it?'); return; }
     if (T.id === 'hand') { say("Ollivander's tape, on the counter. How wide is your hand?"); return; }
+    if (T.id === 'hump') { say('A statue of a humpbacked, one-eyed witch, on her plinth.'); return; }
     say(T.id === 'drawer' ? 'A drawer in the books table, with a small brass keyhole and a label: <i>CONFISCATED. Prefects only. P. Weasley</i>.'
       : T.id === 'door' ? 'A heavy door with a brass keyhole.' : 'A notice pinned to the board. It is blank.');
   }
@@ -104,8 +118,18 @@
       else { rattle = performance.now(); say('It rattles. Locked. (Learn Alohomora in Charms.)'); }
       return;
     }
+    if (T.id === 'hump' && !note) { shake = performance.now(); say('Cold stone. Nothing happens. (Find the twins\' note first: it gives the word.)'); return; }
     panel.innerHTML = ''; panel.appendChild(btn('Step back', function () { if (asking) asking.cancel(); }));
-    if (T.id === 'feather') {
+    if (T.id === 'hump') {
+      say('Tap her hump with your wand.');
+      asking = LumosSpells.openHump({ hump: function () { return humpGeo().spot; }, r: function () { return humpGeo().r; },
+        hinge: function () { return humpGeo().hinge; }, edge: function () { return humpGeo().edge; },
+        onTap: function (n) { shake = performance.now();
+          say(n === 1 ? 'Nothing happened. The twins\' note says: <i>tap it and say Dissendium</i>. Tap the word to whisper it.' : 'Nothing again. Tap the word first, then her hump.'); },
+        onWord: function () { say('<i>Dissendium...</i> you whisper. Now tap her hump again.'); },
+        onSwing: function (d) { hump.deg = d; },
+        onStop: function (o) { say('It stops at <b>' + o.degrees + '\u00b0</b>: a gap of <b>' + o.gap + ' cm</b>, and you are <b>' + o.width + ' cm</b> across the shoulders. Just wide enough.'); } });
+    } else if (T.id === 'feather') {
       say('Swish and flick. <i>Wing-gar-dium Levi-o-sa!</i>');
       asking = LumosSpells.levitate({ at: featherRest, size: S * 0.08,
         onSteer: function (p) { feather.x = p.x; feather.y = p.y; feather.phase = p.phase; },
@@ -146,6 +170,11 @@
         else say('You step back; the tape rolls itself up.');
         menu(); return;
       }
+      if (T.id === 'hump') {
+        if (r.verdict === 'opened') say('<b>Dissendium!</b> Open at ' + r.degrees + '\u00b0, a gap of ' + r.gap + ' cm: wide enough for you.' + (r.first ? ' (Her first time open: the corridor tells the castle, witchHump().)' : ''));
+        else { hump.deg = 0; say('You step back; she stays shut.'); }
+        menu(); return;
+      }
       if (r.verdict === 'opened') { opened.drawer = 0.01; say('<b>Alohomora!</b> The drawer slides open.'); }
       else if (r.verdict === 'nothing') { shake = performance.now(); say('You tapped it, you whispered <i>Alohomora</i>... but nothing happened. This one wants its own key.'); }
       else if (r.verdict === 'tight') { shake = performance.now(); say('Click: the lock tightened. That way locks it. Clockwise, twelve to three.'); }
@@ -163,7 +192,7 @@
     if (shake) { var t2 = (now - shake) / 600; if (t2 > 1) shake = null; else jig = Math.sin(t2 * 50) * S * 0.004 * (1 - t2); }
     cx.save(); cx.translate(jig, 0);
     if (T.id === 'drawer') drawDrawer(now); else if (T.id === 'door') drawDoor(); else if (T.id === 'notice') drawNotice();
-    else if (T.id === 'feather') drawFeather(now); else drawCounter(now);
+    else if (T.id === 'feather') drawFeather(now); else if (T.id === 'hump') drawHump(); else drawCounter(now);
     cx.restore();
     requestAnimationFrame(frame);
   }
@@ -239,6 +268,24 @@
       for (var j = 0; j < 4; j++) { cx.fillStyle = 'rgba(160,160,160,' + 0.5 * (1 - k) + ')'; cx.beginPath(); cx.arc(x + L * 0.5 + j * 4, y - k * S * 0.12 - j * 9, 6 + j * 3 + k * 10, 0, 7); cx.fill(); }
     }
   }
+  /* the witch, side on, a stand-in for the corridor's: the lid drawn where the swing puts it, about its hinge */
+  function drawHump() {
+    var g = humpGeo(), x = g.x, y = g.y;
+    function rot(p, deg) { var a = deg * Math.PI / 180, dx = p.x - g.hinge.x, dy = p.y - g.hinge.y;
+      return { x: g.hinge.x + dx * Math.cos(a) - dy * Math.sin(a), y: g.hinge.y + dx * Math.sin(a) + dy * Math.cos(a) }; }
+    function lid(deg) { var e = rot(g.edge, deg), b = rot(g.bulge, deg);
+      cx.beginPath(); cx.moveTo(g.hinge.x, g.hinge.y); cx.quadraticCurveTo(b.x, b.y, e.x, e.y); cx.closePath(); }
+    cx.fillStyle = '#231b15'; cx.fillRect(0, g.floor, W, H - g.floor);
+    cx.fillStyle = '#4b4650'; cx.fillRect(x - S * 0.26, g.floor - S * 0.1, S * 0.52, S * 0.1);   /* the plinth */
+    cx.fillStyle = '#625d68';   /* her cloak, bent double, up to the hump */
+    cx.beginPath(); cx.moveTo(x - S * 0.2, g.floor - S * 0.1); cx.quadraticCurveTo(x - S * 0.2, y - S * 0.02, g.edge.x, g.edge.y);
+    cx.lineTo(g.hinge.x, g.hinge.y); cx.quadraticCurveTo(x + S * 0.26, y + S * 0.1, x + S * 0.2, g.floor - S * 0.1); cx.closePath(); cx.fill();
+    cx.fillStyle = '#69646e'; cx.beginPath(); cx.ellipse(x - S * 0.19, y - S * 0.08, S * 0.06, S * 0.055, -0.4, 0, 7); cx.fill();   /* her hooded head */
+    cx.fillStyle = '#16121a'; cx.beginPath(); cx.arc(x - S * 0.225, y - S * 0.08, S * 0.007, 0, 7); cx.fill();   /* her one eye */
+    if (hump.deg > 0.5) { cx.fillStyle = '#060404'; lid(0); cx.fill(); }
+    cx.fillStyle = '#7a7480'; lid(hump.deg); cx.fill();
+    cx.strokeStyle = '#2a262e'; cx.lineWidth = 2; lid(hump.deg); cx.stroke();
+  }
   /* the counter: a wand in its box, eleven inches as painted, or a bare counter for his hand; the last reading's tape */
   function drawCounter(now) {
     cx.fillStyle = '#3a2a1c'; cx.fillRect(0, H * 0.3, W, H * 0.45);
@@ -259,6 +306,8 @@
     tap: function () { return asking && asking.tap ? asking.tap() : null; },
     judge: function (pts) { return asking && asking.judge ? asking.judge(pts) : null; },
     taps: function (list) { return asking && asking.taps ? asking.taps(list) : null; },
+    word: function () { return asking && asking.say ? asking.say() : null; },
+    note: function (v) { note = !!v; menu(); }, hump: function () { return { deg: Math.round(hump.deg * 10) / 10, note: note, offer: asking && asking.state ? asking.state() : null }; },
     steer: function (dx, dy) { return cur && cur.steer ? cur.steer(dx, dy) : null; },
     measure: function (a, b) { return asking && asking.measure ? asking.measure(a, b) : null; },
     stepBack: function () { if (cur) cur.cancel(); else if (asking) asking.cancel(); },

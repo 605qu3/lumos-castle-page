@@ -292,13 +292,20 @@ function judgeHinge(points, c, r, want, w, h, ease) {
    (req 125). The key is 'lumos.spells.learned.' and the spell's name. */
 function learned(name) { try { return localStorage.getItem('lumos.spells.learned.' + name) === '1'; } catch (e) { return false; } }
 function learn(name) { try { localStorage.setItem('lumos.spells.learned.' + name, '1'); } catch (e) {} }
+/* The first true cast of a spell in a room, ever, on this device (Magic, 12 October 2026, 9.53 pm, for the house
+   points, req 213: a spell earns its point on its first true cast, once): every room callable's answer carries
+   `first`, true only on that cast. The key is 'lumos.spells.cast.' and the spell's name. */
+function firstCast(name) {
+  try { if (localStorage.getItem('lumos.spells.cast.' + name) === '1') return false; localStorage.setItem('lumos.spells.cast.' + name, '1'); return true; }
+  catch (e) { return false; }
+}
 
 /* The ways out a waiting spell never covers (the Interaction lane's vocabulary, §5 and §9; its gap G2, 12 October
    2026): the frame's Back (#back) and anything a page marks data-spell-exit (the test pages' Step back), or what a
    room passes as `exits`. A finger landing on one lets the offer go, answered 'cancelled' (or, if the spell had
    already answered, that answer at once), and the tap goes on to it as a click, so he can always leave the stop.
    `wait` (seconds, off by default): left that long with no finger on the layer, the offer goes the same way. Every
-   room callable here (castOver, openLock, revealInk, levitate, measureSpan) takes `exits` and `wait` in its opts. */
+   room callable here (castOver, openLock, revealInk, levitate, measureSpan, openHump) takes `exits` and `wait` in its opts. */
 var EXITS = '#back, [data-spell-exit]';
 function exitAt(cv, ev, sel) {
   var el = null;
@@ -400,7 +407,7 @@ function castOver(opts) {
     if (j.reason === 'tap') { if (guide) guide.clear(); return null; }
     var traced = !!(tr && tr.traced), ok = j.verdict === 'lumos' || traced;
     if (guide) { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
-    return { verdict: ok ? 'cast' : 'missed', judge: j, traced: traced };
+    return { verdict: ok ? 'cast' : 'missed', judge: j, traced: traced, first: ok && firstCast('lumos') };
   }
   size(); root.addEventListener('resize', size); doc.body.appendChild(cv); raf = root.requestAnimationFrame(frame);
   return { done: done, cancel: function () { finish({ verdict: 'cancelled', judge: null, traced: false }); },
@@ -526,7 +533,7 @@ function openLock(opts) {
     var verdict = j.verdict === 'open' || (traced && j.verdict === 'miss') ? 'opened' : (j.verdict === 'tight' ? 'tight' : 'missed');
     if (opts.stuck) verdict = 'nothing';
     else if (guide) { if (verdict === 'opened') guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
-    return { verdict: verdict, judge: j, traced: traced };
+    return { verdict: verdict, judge: j, traced: traced, first: verdict === 'opened' && firstCast('alohomora') };
   }
   L = layer({
     size: function () { built = null; },
@@ -601,7 +608,7 @@ function revealInk(opts) {
     var traced = !!(tr && tr.traced && j.reason !== 'uneven beat'), ok = j.verdict === 'open' || traced;
     if (guide) { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
     over = true; taps = [];
-    return { verdict: ok ? 'revealed' : 'missed', judge: j, traced: traced };
+    return { verdict: ok ? 'revealed' : 'missed', judge: j, traced: traced, first: ok && firstCast('aparecium') };
   }
   L = layer({
     size: function () { built = null; },
@@ -749,7 +756,7 @@ function levitate(opts) {
     if (guide && j.reason !== 'prod') { if (ok) guide.hit(lv > 0 && mode !== 'always'); else guide.miss(); }
     if (ok) {
       if (j.verdict === 'leviosa') mark = { at: now, pts: j.pts, corner: j.corner, deg: j.cornerDeg };
-      lift(now); return { verdict: 'lifted', judge: j, traced: traced, why: null };
+      lift(now); return { verdict: 'lifted', judge: j, traced: traced, why: null, first: firstCast('leviosa') };
     }
     return { verdict: 'missed', judge: j, traced: false, cause: j.reason, why: SWISH_WHY[j.reason] || SWISH_WHY.small };
   }
@@ -952,8 +959,151 @@ function measureSpan(opts) {
     measure: function (a, b) { var out = take(a, b); if (out) L.finish(out); return out; } };
 }
 
+/* Dissendium on the one-eyed witch's hump, for a room (req 163; Magic for the boys, *Dissendium in the castle*, B8: her
+   own third-floor landing, req 178, the Corridor's; Godric's Q5, 12 October 2026, 1.58 pm, option 2 with t1; tried on
+   page/charms/room-spells-test.html and used by dissendium-test.html). The book's two taps ("you tap it and say
+   Dissendium", PoA 16): a first tap on her hump does nothing (PoA 10), and the word's card comes up beside it in
+   syllables, Dis-sen-di-um, for the ear (castle-ear.js) is not yet probed on his iPad or phone, so a tap on the card
+   says the word for him (Magic, 12 October 2026, 9.53 pm). Then the next tap on the hump opens it by itself, at once.
+   As it swings (2.8 s, easing to its stop) the layer draws the protractor at the hinge, a tick at every ten degrees
+   (30, 60 and 90 numbered), the gold wedge and its degrees, and the chord: the gap at the lid's edge as a gold line in
+   cm, toward his own mark, "you, 34 cm". It stops where the gap equals his width: a lid 45 cm long and a boy 34 cm
+   across the shoulders, 44 degrees (humpNeed). The room draws the lid where onSwing puts it each frame. A touch
+   anywhere else costs nothing. The answer is 'opened' (a few seconds after the stop, so the sum can be read; onStop
+   comes at the stop itself) or 'cancelled'. Who may be offered it is the room's: Magic's answer has the hump offered
+   once he holds the twins' note (req 179), with no learned flag; the first open sets learned('dissendium'). No map
+   bubble: the Map is its own design and comes after the hump. On 'opened' the Corridor calls its witchHump() (req 188).
+   opts: { hump: {x, y} in CSS pixels, or a function returning one each frame: the round of her back, to tap,
+           r: the tap's reach in CSS pixels, or a function (0.12 of the screen's short side by default),
+           hinge, edge: {x, y} or functions: the lid's hinge and its closed edge on the screen, for the protractor
+                  and the chord (by default a lid laid out from hump, its hinge right and below, its edge left),
+           dir: 1 if the lid opens clockwise on the screen (default) or -1,
+           lid: the lid's length in cm (45), width: his shoulders in cm (34), max: the protractor's reach (110),
+           hold: seconds the sum stays drawn after the stop before the answer (3),
+           onTap(n): each tap on the hump that does not open it (n counts them: 1 is the book's "nothing"),
+           onWord(): the card tapped, the word said, onSwing(degrees, gapCm): each frame of the swing,
+           onStop(out): at the stop, with the answer to come,
+           exits, wait: as every room callable (EXITS) }
+   Returns { done: a promise of { verdict: 'opened' | 'cancelled', degrees, gap, width, need, first }, cancel(),
+             tap() (a tap on the hump), say() (a tap on the card), state() }. */
+function humpNeed(lid, width) { return 2 * Math.asin(Math.min(1, width / (2 * lid))) * 180 / Math.PI; }
+function openHump(opts) {
+  opts = opts || {};
+  var LID = opts.lid || 45, WIDTH = opts.width || 34, MAX = opts.max || 110, NEED = humpNeed(LID, WIDTH);
+  var DIR = opts.dir === -1 ? -1 : 1, SWING = 2800, HOLD = (opts.hold == null ? 3 : opts.hold) * 1000;
+  var stage = 'tap', taps = 0, said = 0, deg = 0, swingAt = 0, out = null, L;
+  var h = null, r = 0, hi = null, ed = null, card = null;
+  function val(v) { return typeof v === 'function' ? v() : v; }
+  function place() {
+    var S = Math.min(L.W, L.H);
+    h = val(opts.hump) || { x: L.W / 2, y: L.H * 0.45 }; r = val(opts.r) || S * 0.12;
+    hi = val(opts.hinge) || { x: h.x + r * 0.9, y: h.y + r * 0.5 };
+    ed = val(opts.edge) || { x: h.x - r * 0.9, y: h.y - r * 0.1 };
+    var fs = Math.round(Math.max(16, S * 0.045)), w = fs * 7.2, hh = fs * 2.1;   /* the card, above the hump, kept on the screen */
+    var cy = h.y - r * 1.25 - hh; if (cy < 70) cy = h.y + r * 1.25;
+    card = { x: Math.max(8, Math.min(L.W - w - 8, h.x - w / 2)), y: Math.max(8, Math.min(L.H - hh - 8, cy)), w: w, h: hh, fs: fs };
+  }
+  function gapAt(d) { return 2 * LID * Math.sin(d * Math.PI / 360); }
+  function rot(p, c, d) { var a = DIR * d * Math.PI / 180, dx = p.x - c.x, dy = p.y - c.y;
+    return { x: c.x + dx * Math.cos(a) - dy * Math.sin(a), y: c.y + dx * Math.sin(a) + dy * Math.cos(a) }; }
+  function onHump(p) { return Math.hypot(p.x - h.x, p.y - h.y) <= r * 1.1; }
+  function onCard(p) { return card && p.x >= card.x - 6 && p.x <= card.x + card.w + 6 && p.y >= card.y - 6 && p.y <= card.y + card.h + 6; }
+  function tap() {
+    if (stage !== 'tap') return;
+    if (!said) { taps++; if (opts.onTap) opts.onTap(taps); return; }
+    stage = 'swing'; swingAt = root.performance.now();
+  }
+  function say() { if (stage !== 'tap' || !taps || said) return; said = root.performance.now(); if (opts.onWord) opts.onWord(); }
+  function stop() {
+    stage = 'stopped'; deg = NEED;
+    var first = !learned('dissendium'); learn('dissendium'); firstCast('dissendium');
+    out = { verdict: 'opened', degrees: Math.round(NEED), gap: Math.round(gapAt(NEED)), width: WIDTH, need: Math.round(NEED * 10) / 10, first: first };
+    if (opts.onStop) opts.onStop(out);
+    L.later(out, HOLD);
+  }
+  function drawCard(cx, now) {
+    var c = card, k = said ? Math.min(1, (now - said) / 800) : 0, parts = ['Dis', 'sen', 'di', 'um'];
+    cx.save(); cx.fillStyle = said ? 'rgba(58,42,22,0.95)' : 'rgba(30,22,17,0.92)'; cx.strokeStyle = said ? '#f3d27a' : '#8a7050'; cx.lineWidth = 2;
+    cx.beginPath(); cx.rect(c.x, c.y, c.w, c.h); cx.fill(); cx.stroke();
+    cx.font = 'italic 600 ' + c.fs + 'px Georgia, serif'; cx.textBaseline = 'middle'; cx.textAlign = 'left';
+    var text = parts.join('-'), x = c.x + (c.w - cx.measureText(text).width) / 2;
+    parts.forEach(function (s, i) {   /* each syllable lights in turn as the word is said */
+      var lit = said && k >= (i + 1) / parts.length;
+      cx.fillStyle = lit ? '#f3d27a' : '#eadcbf'; cx.fillText(s, x, c.y + c.h / 2);
+      x += cx.measureText(s).width;
+      if (i < parts.length - 1) { cx.fillStyle = 'rgba(234,220,191,0.5)'; cx.fillText('-', x, c.y + c.h / 2); x += cx.measureText('-').width; }
+    });
+    cx.restore();
+  }
+  function drawMeasure(cx) {
+    var S = Math.min(L.W, L.H), len = Math.hypot(ed.x - hi.x, ed.y - hi.y), R = len * 0.62, i;
+    var a0 = Math.atan2(ed.y - hi.y, ed.x - hi.x), fs = Math.round(Math.max(11, S * 0.03)), sweep = DIR * Math.PI / 180;
+    cx.save(); cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.strokeStyle = 'rgba(159,182,201,0.55)'; cx.lineWidth = 1.5;
+    cx.beginPath(); cx.arc(hi.x, hi.y, R, a0, a0 + MAX * sweep, DIR < 0); cx.stroke();
+    cx.font = fs + 'px Georgia, serif';
+    for (i = 0; i <= MAX; i += 10) {
+      var a = a0 + i * sweep, long = i % 30 === 0, r0 = R * (long ? 0.86 : 0.93);
+      cx.strokeStyle = long ? 'rgba(217,199,154,0.9)' : 'rgba(159,182,201,0.6)'; cx.lineWidth = long ? 2.2 : 1.2;
+      cx.beginPath(); cx.moveTo(hi.x + Math.cos(a) * r0, hi.y + Math.sin(a) * r0); cx.lineTo(hi.x + Math.cos(a) * R, hi.y + Math.sin(a) * R); cx.stroke();
+      if (long && i > 0) { cx.fillStyle = 'rgba(217,199,154,0.95)'; cx.fillText(String(i), hi.x + Math.cos(a) * R * 1.16, hi.y + Math.sin(a) * R * 1.16); }
+    }
+    if (deg > 1) {   /* the gold wedge it has opened */
+      cx.fillStyle = 'rgba(243,210,122,0.28)'; cx.beginPath(); cx.moveTo(hi.x, hi.y);
+      cx.arc(hi.x, hi.y, R * 0.84, a0, a0 + deg * sweep, DIR < 0); cx.closePath(); cx.fill();
+    }
+    cx.fillStyle = '#9fb6c9'; cx.beginPath(); cx.arc(hi.x, hi.y, Math.max(3, S * 0.008), 0, 7); cx.fill();
+    /* the chord: from where the edge was to where it is, his own width marked along it */
+    var e1 = rot(ed, hi, deg), gap = Math.hypot(e1.x - ed.x, e1.y - ed.y), need = 2 * len * Math.sin(NEED * Math.PI / 360);
+    if (gap > 2) {
+      var ux = (e1.x - ed.x) / gap, uy = (e1.y - ed.y) / gap, fits = gap >= need - 0.5, side = DIR;
+      cx.lineCap = 'round'; cx.strokeStyle = fits ? '#f3d27a' : 'rgba(243,210,122,0.6)'; cx.lineWidth = 4;
+      cx.beginPath(); cx.moveTo(ed.x, ed.y); cx.lineTo(e1.x, e1.y); cx.stroke();
+      var m = { x: ed.x + ux * need, y: ed.y + uy * need };
+      cx.strokeStyle = '#9fb6c9'; cx.lineWidth = 3;
+      cx.beginPath(); cx.moveTo(m.x - uy * 12, m.y + ux * 12); cx.lineTo(m.x + uy * 12, m.y - ux * 12); cx.stroke();
+      cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 4;
+      cx.fillText('you, ' + WIDTH + ' cm', m.x + side * uy * fs * 1.6 + ux * fs * 1.4, m.y - side * ux * fs * 1.6 + uy * fs * 1.4);   /* outside the lid, past his mark */
+      var mid = { x: (ed.x + e1.x) / 2, y: (ed.y + e1.y) / 2 };
+      cx.fillStyle = fits ? '#f3d27a' : 'rgba(243,210,122,0.8)'; cx.font = '600 ' + fs + 'px Georgia, serif';
+      cx.fillText('gap ' + Math.round(gapAt(deg)) + ' cm', mid.x + side * uy * fs * 2.6, mid.y - side * ux * fs * 2.6);
+    }
+    var big = Math.round(Math.max(16, S * 0.05));
+    cx.font = '600 ' + big + 'px Georgia, serif'; cx.fillStyle = '#f3d27a'; cx.shadowColor = '#000'; cx.shadowBlur = 6;
+    cx.fillText(Math.round(deg) + '°', hi.x + DIR * R * 0.3, hi.y + R * 0.55);
+    cx.restore();
+  }
+  L = layer({
+    frame: function (now) {
+      place();
+      if (stage === 'swing') {
+        var u = Math.min(1, (now - swingAt) / SWING); deg = NEED * (1 - Math.pow(1 - u, 3));
+        if (opts.onSwing) opts.onSwing(deg, gapAt(deg));
+        if (u >= 1) stop();
+      }
+      if (stage === 'tap' && taps) drawCard(L.cx, now);
+      if (stage === 'tap' && said) {   /* the word said: the hump glows for the second tap */
+        var gl = L.cx.createRadialGradient(h.x, h.y, 0, h.x, h.y, r);
+        gl.addColorStop(0, 'rgba(255,240,200,' + (0.3 + 0.15 * Math.sin(now / 200)) + ')'); gl.addColorStop(1, 'rgba(255,220,150,0)');
+        L.cx.fillStyle = gl; L.cx.beginPath(); L.cx.arc(h.x, h.y, r, 0, 7); L.cx.fill();
+      }
+      if (stage === 'swing' || stage === 'stopped') drawMeasure(L.cx);
+    },
+    down: function (ev) {
+      var p = L.pt(ev);
+      if (stage !== 'tap') return;
+      if (taps && onCard(p)) { say(); return; }
+      if (onHump(p)) tap();
+    }
+  }, opts);
+  place();
+  return { done: L.done, cancel: L.leave = function () { L.finish({ verdict: 'cancelled', degrees: Math.round(deg), gap: Math.round(gapAt(deg)), width: WIDTH, need: Math.round(NEED * 10) / 10, first: false }); },
+    tap: tap, say: say,
+    state: function () { return { stage: stage, taps: taps, said: !!said, degrees: Math.round(deg * 10) / 10, need: Math.round(NEED * 10) / 10, card: card, hump: h }; } };
+}
+
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
-  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge };
+  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump };
 })(typeof window !== 'undefined' ? window : globalThis);
