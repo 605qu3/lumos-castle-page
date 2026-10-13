@@ -805,8 +805,9 @@ var turnTorch = (function () {
 turnTorch.mesh.visible = turnTorch.flame.visible = turnTorch.light.visible = false;
 torches.push(turnTorch);
 /* the one-eyed witch's landing (req 178; Magic for the boys, "Her landing, fitted to the books"; Godric's B8, 12 October
-   2026, 2.58 pm), in grey: on witch days the end wall gives way, a lintel in its place, and the landing runs on west as
-   a stretch of the third-floor corridor, 8 m, the corridor's width, its ceiling 4.5 m up. She stands along it on a low
+   2026, 2.58 pm), in grey: on witch days the end wall gives way, a lintel in its place, and the landing runs on past the
+   landing's end wall (the page's -x; true east in the castle, req 207) as a stretch of the third-floor corridor, 8 m,
+   the corridor's width, its ceiling 4.5 m up. She stands along it on a low
    plinth 0.5 m out from the long wall, room behind her for a boy to crouch (PoA 10, 14); facing her, the empty
    classroom's door, shut, is on her left (PoA 10), a doorway across, and the corridor turns toward her side at the far
    end, dark beyond (PoA 14). Her card is drawn side on, facing the stair, as Charms' hump swings in profile, and turns
@@ -2292,7 +2293,8 @@ function setView(v) {
 
 /* ---------- the stops ---------- */
 /* Tap a thing to go to it: the view glides there and turns square to it; tap off it, or Back, to glide back to the
-   corner. The corridor is 2 m wide, so a stop stands as far back as the corridor allows (a hand short of the facing
+   corner. The corridor is 3 m wide (WIDTH, req 207), so a stop stands as far back as the corridor allows (a hand short
+   of the facing
    wall) and opens its field of view until the thing fits with a margin, between the room's 42 degrees and 70; the
    password session's walk-up to her was projected the same way. look is the height the eye turns to. */
 var STOP_BACK = 0.15, STOP_MARGIN = 1.12, FOV_REST = 42, FOV_MAX = 70;
