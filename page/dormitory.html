@@ -670,7 +670,7 @@ var tappables = [];
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
 
 var mode = 'rest', atStop = null, tween = null;
-/* looking round at a stand (board req 210; David, Q3, 12 October 2026, 7.56 pm; docs/interaction-vocabulary.md §2): at
+/* looking round at a stand (board req 210; Godric, Q3, 12 October 2026, 7.56 pm; docs/interaction-vocabulary.md §2): at
    a stop a drag turns his head from where he stands, the stair head's way and feel, up to 60 degrees each way (under his
    bed a small turn, 20, the frame's mouth); he arrives square to the thing and a tap on another stop's thing walks him
    straight there from wherever he is looking */
