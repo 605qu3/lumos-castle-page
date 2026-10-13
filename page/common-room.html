@@ -686,7 +686,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=21"></script>
+<script src="castle-events.js?v=22"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=13"></script>
 <script>
@@ -3153,6 +3153,7 @@ function candleTap() {
   var a = candle.casting = LumosSpells.castOver({ at: candleWick, wait: SPELL_WAIT_S });
   a.done.then(function (r) {
     candle.casting = null;
+    if (r.verdict === 'cast') spellFirst('lumos', r);
     if (r.verdict === 'cast' && DESK_STOP.seat === 1) candle.cast = true;
     else if (r.verdict === 'missed') { candle.snuff = 1.6; spellWhy('candle', r); }
   });
@@ -6230,6 +6231,11 @@ function updateDen(dt) {
    Charms page's kind words when the callable gives them (`why`, req 218). The little door's offer is not passed on: his
    tap there is on the leaf, and a tap on its keyhole walks him to the keyhole's stop. */
 var SPELL_WAIT_S = 12;
+/* a spell's first cast on this device (Charms' firstCast, `first: true`) earns the house points: the room raises 'first
+   cast' with the built-in `spell` naming it in lower case (req 222, Events' req 216); the hourglass, once Design's is
+   drawn, takes `point(slip)` in the runtime's options and draws from castle.points() */
+var castSpell = 'none';
+function spellFirst(name, r) { if (r && r.first && castle) { castSpell = name; castle.moment('first cast'); } }
 function spellWhy(speaker, r) {
   var w = r && r.why;
   if (w) lineQ.push({ medium: 'heard', speaker: speaker, sound: Array.isArray(w) ? w[w.length - 1] : w });
@@ -6274,7 +6280,7 @@ function lockSpell(at, stuck, then, gone, tapped) {
 function percyDrawerSpell(at, from) {
   if (LOCKS.casting || LOCKS.drawer || !spellKnown('alohomora')) return false;
   LOCKS.casting = lockSpell(at, false, function (v, r) {
-    if (v === 'opened') { if (castle) castle.moment('opened percy drawer'); return; }
+    if (v === 'opened') { spellFirst('alohomora', r); if (castle) castle.moment('opened percy drawer'); return; }
     if (v !== 'tight' && v !== 'missed') return;
     if (from) HEARD_FROM['percy drawer'] = from.clone();
     lineQ.unshift({ medium: 'heard', speaker: 'percy drawer', sound: 'rattle, rattle' });
@@ -6289,7 +6295,7 @@ function practiceNoticeSpell(sheet) {
   var a = LOCKS.casting = LumosSpells.revealInk({ sheet: sheet, wait: SPELL_WAIT_S });
   a.done.then(function (r) {
     LOCKS.casting = null;
-    if (r.verdict === 'revealed') { if (castle) castle.moment('revealed notice practice'); }
+    if (r.verdict === 'revealed') { spellFirst('aparecium', r); if (castle) castle.moment('revealed notice practice'); }
     else if (r.verdict === 'missed') spellWhy('notice', r);          /* it stays blank, and the page's words say why */
   });
   return true;
@@ -7270,7 +7276,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
        No until the owl's flight cell is drawn (req 102, a generate with Godric's yes, on the owl sheet req 99 waits
        for); the disc follows moon() since req 96 (lumosGreybox.moon() gives whether it shows and where): the record
        would set owl_landed for the night with nothing to show */
-    'moon in view': function () { return 'no'; }
+    'moon in view': function () { return 'no'; },
+    spell: function () { return castSpell; }      /* the spell whose first cast this is (req 222) */
   }
 }) : null;
 
