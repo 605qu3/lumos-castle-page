@@ -50,7 +50,7 @@
     wide: { cols: 9, rows: 6, door: 6, table: [6, 4], stools: [[5, 4], [7, 4], [6, 5]], tree: [1, 2],
       rounds: [{ move: [3, 0] }, { move: [-1, -2] }, { hide: true }] } };
   var Lo = null, cell = 40, gx = 0, gy = 0, round = 0, pos = null, startPos = null, target = null, moves = [], roundMoves = [];
-  var stroke = null, active = null, trail = null, anim = null, arrow = null, bump = null, dust = null, doorOpen = 0, done = false, last = null;
+  var stroke = null, active = null, trail = null, anim = null, arrow = null, bump = null, dust = null, doorOpen = 0, done = false, last = null, wait = null;
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight;
@@ -59,7 +59,7 @@
     if (lo !== Lo) { Lo = lo; if (pos) start(); }
     var top = Math.max(110, H * 0.17), bottom = Math.max(70, H * 0.1);
     cell = Math.floor(Math.min((W - 24) / Lo.cols, (H - top - bottom - 30) / (Lo.rows + 0.6)));
-    gx = Math.round((W - cell * Lo.cols) / 2); gy = Math.round(top + cell * 0.6 + 10);
+    gx = Math.round((W - cell * Lo.cols) / 2); gy = Math.round(H - bottom - cell * Lo.rows);   /* down by the buttons, the line box free above */
   }
   function centre(sq) { return { x: gx + (sq[0] + 0.5) * cell, y: gy + (sq[1] + 0.5) * cell }; }
   function say(html) { lineEl.innerHTML = html; }
@@ -93,7 +93,7 @@
     e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
   }
   function start() {
-    pos = Lo.tree.slice(); startPos = pos.slice(); round = 0; moves = []; stroke = null; trail = null; anim = null; arrow = null; bump = null; dust = null;
+    clearTimeout(wait); wait = null; pos = Lo.tree.slice(); startPos = pos.slice(); round = 0; moves = []; stroke = null; trail = null; anim = null; arrow = null; bump = null; dust = null;
     doorOpen = 0; done = false; last = null; menu(); begin();
   }
   function begin() {
@@ -147,7 +147,7 @@
           'All its moves together: from where it began, <b>' + words(tot[0], tot[1]) + '</b>.');
         return;
       }
-      say(line); round++; setTimeout(function () { if (!done && round < Lo.rounds.length && !anim) begin(); }, 2600);
+      say(line); round++; wait = setTimeout(function () { wait = null; if (!done && round < Lo.rounds.length && !anim) begin(); }, 2600);
       return;
     }
     say('A soft thump: that was <b>' + words(a.dx, a.dy) + '</b>. ' + (R.hide ? 'Not hidden yet: the door can still see your table. ' : 'The words said ' + words(R.move[0], R.move[1]) + '. ') +
@@ -174,7 +174,7 @@
     cx.save(); cx.translate(d + cell * 0.12, top + cell * 0.58); cx.rotate(-open * 1.3);
     cx.fillStyle = '#5a3a22'; cx.fillRect(0, -cell * 0.06, cell * 0.76, cell * 0.12); cx.restore();
     cx.fillStyle = '#c9b48a'; cx.font = 'italic ' + Math.round(cell * 0.2) + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
-    cx.fillText('door', d + cell * 0.5, top - cell * 0.18);
+    cx.textAlign = 'right'; cx.fillText('door', d + cell * 0.04, top + cell * 0.3); cx.textAlign = 'center';   /* in the wall beside it */
     /* their table, three tankards of Butterbeer, and the stools */
     Lo.stools.forEach(function (s) { var p = centre(s); cx.fillStyle = 'rgba(0,0,0,0.3)'; cx.beginPath(); cx.ellipse(p.x + 3, p.y + 4, cell * 0.28, cell * 0.24, 0, 0, 7); cx.fill();
       cx.fillStyle = '#6a4a2c'; cx.beginPath(); cx.arc(p.x, p.y, cell * 0.26, 0, 7); cx.fill(); cx.strokeStyle = '#3a2616'; cx.lineWidth = 2; cx.stroke(); });
@@ -186,9 +186,9 @@
     cx.fillStyle = '#eadcbf'; cx.font = 'italic ' + Math.round(cell * 0.19) + 'px Georgia, serif'; cx.fillText('your table', t.x, t.y + cell * 0.62);
   }
   function drawTree(p, lift, now) {
-    var s = cell, base = p.y + s * 0.3 - lift * s * 0.22;
+    var s = cell * 1.25, base = p.y + cell * 0.36 - lift * cell * 0.22;   /* standing tall in its square */
     cx.fillStyle = 'rgba(0,0,0,' + (0.38 - lift * 0.18) + ')';   /* its shadow stays on the floor as it rises */
-    cx.beginPath(); cx.ellipse(p.x + 3, p.y + s * 0.32, s * (0.34 - lift * 0.06), s * (0.12 - lift * 0.02), 0, 0, 7); cx.fill();
+    cx.beginPath(); cx.ellipse(p.x + 3, p.y + cell * 0.38, s * (0.34 - lift * 0.06), s * (0.12 - lift * 0.02), 0, 0, 7); cx.fill();
     cx.fillStyle = '#7a4a2a'; cx.fillRect(p.x - s * 0.13, base - s * 0.04, s * 0.26, s * 0.12);   /* its pot */
     var tiers = [[0.38, 0.0], [0.3, -0.24], [0.21, -0.45]];
     tiers.forEach(function (q, i) {
@@ -212,10 +212,10 @@
     if (dx) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
       cx.fillText(Math.abs(dx) + ' ' + (dx > 0 ? 'right' : 'left'), (a.x + corner.x) / 2, a.y + (dy > 0 ? -fs : fs) * 0.95); }
     if (dy) { cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 5;
-      cx.fillText(Math.abs(dy) + ' ' + (dy > 0 ? 'down' : 'up'), b.x + (dx >= 0 ? 1 : -1) * fs * 1.9, (a.y + b.y) / 2); }
+      cx.textAlign = dx >= 0 ? 'left' : 'right'; cx.fillText(Math.abs(dy) + ' ' + (dy > 0 ? 'down' : 'up'), b.x + (dx >= 0 ? 1 : -1) * fs * 0.5, (a.y + b.y) / 2); cx.textAlign = 'center'; }
     cx.shadowBlur = 0;
     cx.strokeStyle = arrow.total ? '#ffe9a8' : '#f3d27a'; cx.lineWidth = arrow.total ? 5 : 4;   /* the move itself, straight */
-    var L = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / L, uy = (b.y - a.y) / L, e = { x: b.x - ux * cell * 0.3, y: b.y - uy * cell * 0.3 };
+    var L = Math.hypot(b.x - a.x, b.y - a.y), ux = (b.x - a.x) / L, uy = (b.y - a.y) / L, e = { x: b.x - ux * cell * 0.66, y: b.y - uy * cell * 0.66 };   /* its head stops short of the tree */
     cx.beginPath(); cx.moveTo(a.x, a.y); cx.lineTo(e.x, e.y); cx.stroke();
     cx.fillStyle = cx.strokeStyle; cx.beginPath(); cx.moveTo(e.x + ux * 12, e.y + uy * 12); cx.lineTo(e.x - ux * 4 - uy * 9, e.y - uy * 4 + ux * 9); cx.lineTo(e.x - ux * 4 + uy * 9, e.y - uy * 4 - ux * 9); cx.closePath(); cx.fill();
     cx.fillStyle = 'rgba(243,210,122,0.9)'; cx.beginPath(); cx.arc(a.x, a.y, 4, 0, 7); cx.fill();
@@ -256,7 +256,7 @@
   function pt(ev) { return { x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) }; }
   cv.addEventListener('pointerdown', function (ev) {
     ensureAudio(); ev.preventDefault();
-    if (anim || done || active !== null) return;
+    if (anim || done || wait || active !== null) return;   /* none while it moves or the next round waits */
     active = ev.pointerId; stroke = [pt(ev)]; trail = null;
     try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
   });
@@ -277,12 +277,12 @@
   window.lumosMobiliarbus = { start: start, centre: centre, cell: function () { return cell; },
     cast: function (pts) { return cast(pts); },
     slide: function (dx, dy, wob) {   /* a drawn line from the tree, dx and dy in squares, wob a sideways wobble as a share of a square */
-      var a = centre(pos), out = [];
+      if (anim || done || wait) return null; var a = centre(pos), out = [];
       for (var i = 0; i <= 20; i++) { var k = i / 20, w = (wob || 0) * Math.sin(k * Math.PI * 3) * cell;
         var L = Math.hypot(dx, dy) || 1; out.push({ x: a.x + dx * cell * k - dy / L * w, y: a.y + dy * cell * k + dx / L * w, t: i * 25 }); }
       return cast(out);
     },
-    state: function () { return { round: round, pos: pos, target: target, moves: moves, done: done, moving: !!anim, ease: ease, layout: Lo === LAYOUTS.wide ? 'wide' : 'tall',
+    state: function () { return { round: round, pos: pos, target: target, moves: moves, done: done, moving: !!anim, waiting: !!wait, ease: ease, layout: Lo === LAYOUTS.wide ? 'wide' : 'tall',
       line: lineEl.textContent, last: last, learned: LumosSpells.learned('mobiliarbus') }; } };
 })();
 </script>
