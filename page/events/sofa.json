@@ -2029,6 +2029,36 @@
       ],
       "starts": [
         "set holding = no"
+      ],
+      "who": [
+        {
+          "as": "dobby",
+          "role": "voice",
+          "name": "dobby",
+          "mark": "behind the sofa"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "dobby",
+          "medium": "heard",
+          "key": "sofa.sock-whisper",
+          "text": [
+            "Master has given a sock."
+          ],
+          "sound": "a house-elf's whisper from behind the sofa, full of wonder",
+          "canon": "CoS 18, Dobby freed by Lucius Malfoy's sock, his words checked against the text, 13 October 2026; the Common room's req 273 (Godric's Q77 t1, 1.51 pm, with Magic's woven touch)"
+        },
+        {
+          "medium": "written",
+          "hand": "dobby",
+          "at": "hand",
+          "key": "sofa.sock-note",
+          "text": [
+            "Dobby would like this one, sir."
+          ],
+          "canon": "ours (Lumos), after CoS 18; Dobby calls Harry sir (CoS 2, 10, 18), checked against the text, 13 October 2026; req 273"
+        }
       ]
     },
     {

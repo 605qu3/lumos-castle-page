@@ -142,6 +142,9 @@
    copy comes down into his satchel, and his tap unpacks it, with his trunk already at the foot of his bed
    (`carried`, trunk.json, PS 7). Nothing posts over a backup until the restore has had its answer (v=30).
 
+   Drawn states only (board req 274): where the page names any state of a find as drawn (`quill.goose` in
+   `opts.drawn`), the find turns up in one of those only, so the thing in his hand is the one drawn (v=31).
+
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
    to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh;
@@ -733,9 +736,17 @@
       return t;
     }
 
-    /* A thing's state as it turns up this time (req 169): by weight, never the one it came in last time. */
+    /* A thing's state as it turns up this time (req 169): by weight, never the one it came in last time. Where the
+       page names any state of it as drawn (`<find>.<state>` in `opts.drawn`, req 274), only those, so the thing in
+       his hand is the state drawn (v=31). */
     function drawState(t) {
       var all = (t.states || []).map(function (s) { return typeof s === 'string' ? { state: s, weight: 1 } : s; });
+      var named = drawnList().filter(function (d) { return d.indexOf(t.item + '.') === 0; })
+        .map(function (d) { return d.slice(t.item.length + 1); });
+      if (named.length) {
+        all = all.filter(function (s) { return named.indexOf(s.state) >= 0; });
+        if (!all.length) note(t.item + ': the page draws ' + named.join(', ') + ', none of them a state of it');
+      }
       if (!all.length) return undefined;
       var last = state.thingStates[t.item];
       var pool = all.length > 1 ? all.filter(function (s) { return s.state !== last; }) : all;
