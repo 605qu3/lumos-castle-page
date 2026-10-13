@@ -885,7 +885,8 @@ function judgeFreeze(points, pixies, ease) {
    FLAMES_EASES or one of its own (wind: how far round its own middle, in turns, the ring must go; turns: the most
    before it is a scribble; round: how far the stroke may stray from its circle, as a share of the radius, the root of
    the mean square; near: how far off the ring a friend may stand and still be warm, in its sizes).
-   Returns { verdict: 'warm' | 'miss', reason ('warm', 'tap', 'open', 'scribble', 'lumpy', 'out'), c (the stroke's own
+   Returns { verdict: 'warm' | 'miss', reason ('warm', 'tap', 'open', 'scribble', 'lumpy', 'row', 'out'; 'row' when the
+   friends stand in a row, before naming who is left out), c (the stroke's own
    circle { x, y, r }, its middle where the jar goes), turns, round, off (each friend's distance off the ring, in its
    sizes, plus outside and minus inside), warm [true, ...], cold (the friends left outside the ring, too far from the
    fire), close (the ones inside it, too near), row (three or more friends in a line, within a size: no circle passes
@@ -950,9 +951,24 @@ function judgeFlames(points, friends, ease) {
   if (out.turns < e.wind) { out.reason = 'open'; return out; }
   if (out.turns > e.turns) { out.reason = 'scribble'; return out; }
   if (out.round > e.round) { out.reason = 'lumpy'; return out; }
+  if (out.row) { out.reason = 'row'; return out; }   /* no ring passes through three in a row, however near it comes */
   if (out.cold.length || out.close.length) { out.reason = 'out'; return out; }
   out.verdict = 'warm'; out.reason = 'warm';
   return out;
+}
+/* One friend steps out of the row (the bluebell flames' fourth round, Three in a row): friend k moves d pixels square
+   to the line through the other two (plus to that line's left, walking from the first to the second). Returns
+   { friends (moved, the rest as they were), row (still in a row: no circle), through (the one circle, or null), fits
+   (that circle inside the yard { x0, y0, x1, y1 }, the room it may take), smallest (the other two near opposite ends of the ring,
+   its radius within a twentieth of half the gap between them: the smallest ring through those two) }. */
+function stepOut(friends, k, d, yard) {
+  var o = friends.filter(function (q, i) { return i !== k; }), a = o[0], b = o[1], L = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  var nx = (b.y - a.y) / L, ny = -(b.x - a.x) / L, p = friends[k];
+  var moved = friends.map(function (q, i) { return i === k ? { x: p.x + nx * d, y: p.y + ny * d, r: p.r } : q; });
+  var v = judgeFlames([], moved, 'kind'), c = v.through;
+  return { friends: moved, row: v.row, through: c,
+    fits: !!c && !!yard && c.x - c.r >= yard.x0 && c.y - c.r >= yard.y0 && c.x + c.r <= yard.x1 && c.y + c.r <= yard.y1,
+    smallest: !!c && c.r <= L / 2 * 1.05 };
 }
 /* judge:end */
 
@@ -1828,5 +1844,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

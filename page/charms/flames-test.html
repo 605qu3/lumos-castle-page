@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=22"></script>
+<script src="spells.js?v=23"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* Hermione's bluebell flames, a test page for the Charms lane (13 October 2026, twentieth session; the owner is Godric).
@@ -37,11 +37,14 @@
    point the same distance from its middle, and three friends not in a row stand on exactly one. One ring drawn through
    where they stand, judged by LumosSpells.judgeFlames (checks/flames-tally.js: their size an eighteenth of the short
    side); the jar goes down at the ring's middle, they step onto its edge and stop shivering, and a gold line runs from
-   the jar to each, all the same length. Three rounds: The freezing courtyard (the guide's ring through them), Find the
-   ring (stood elsewhere, no guide) and Room for one more (a fourth comes shivering: tap where he should stand; then
-   Snape limps by and they close up round the jar, a smaller ring, still all the same distance). Seen from above:
+   the jar to each, all the same length. Four rounds: The freezing courtyard (the guide's ring through them), Find the
+   ring (stood elsewhere, no guide), Room for one more (a fourth comes shivering: tap where he should stand; then
+   Snape limps by and they close up round the jar, a smaller ring, still all the same distance) and Three in a row
+   (21st session: lined up along the wall, no ring passes through them, LumosSpells.judgeFlames's 'row'; he drags
+   Harry out of line, the one ring through them shown faint as he goes, too big for the courtyard until he is far
+   enough out, by LumosSpells.stepOut; then he draws it; half the row out is the smallest ring). Seen from above:
    "jet-black hair" (PS 1), the Weasleys' "red hair" (PS 6), "lots of bushy brown hair" (PS 6); the fourth in a
-   woolly hat. ?round=1..3, ?ease= for trying; window.lumosFlames for checks (friends(), ring(): the one circle through
+   woolly hat. ?round=1..4, ?ease= for trying; window.lumosFlames for checks (friends(), ring(): the one circle through
    them, state()). */
 (function () {
   'use strict';
@@ -55,9 +58,12 @@
     { name: 'Find the ring', at: [-60, 20, 200], who: ['Hermione', 'Harry', 'Ron'],
       start: '<b>No guide</b> this time. They have moved: find the one ring that goes through all three.' },
     { name: 'Room for one more', at: [90, 210, 330], who: ['Ron', 'Hermione', 'Harry'],
-      start: 'One ring through all three again, and keep an eye out: someone else is cold too.' } ];
-  var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
+      start: 'One ring through all three again, and keep an eye out: someone else is cold too.' },
+    { name: 'Three in a row', row: true, who: ['Hermione', 'Harry', 'Ron'],
+      start: 'They have lined up along the wall, <b>all three in a row</b>. Find one ring through all three.' } ];
+  var round = Math.max(0, Math.min(3, (Number(qs.get('round')) || 1) - 1));
   var wait = null, done = false, last = null, misses = 0, warm = null, shown = null, nev = null, closing = null;
+  var step = { on: false, placed: false, drag: false, d: 0 };   /* Three in a row: Harry stepping out of line */
   var stroke = null, active = null, trail = null, guides = [], puffs = [];
 
   function resize() {
@@ -69,6 +75,10 @@
   /* where they stand: round the courtyard's middle at 0.30 of the short side */
   function spots() {
     var m = mid(), k = 0.30 * S;
+    if (ROUNDS[round].row) {   /* in a row, 0.3 of the short side apart; Harry, the middle one, stepped out by step.d */
+      var row = [-1, 0, 1].map(function (u, i) { return { x: m.x + u * k, y: m.y, r: R, who: ROUNDS[round].who[i] }; });
+      return step.d ? LumosSpells.stepOut(row, 1, step.d, yard()).friends.map(function (p, i) { return { x: p.x, y: p.y, r: R, who: row[i].who }; }) : row;
+    }
     return ROUNDS[round].at.map(function (a, i) { a *= Math.PI / 180; return { x: m.x + k * Math.cos(a), y: m.y + k * Math.sin(a), r: R, who: ROUNDS[round].who[i] }; });
   }
   function friends() {   /* where they are now: on their spots, or stepped onto the ring once warm, or closed up */
@@ -88,6 +98,8 @@
   }
   function ez(u) { u = Math.max(0, Math.min(1, u)); return u * u * (3 - 2 * u); }
   function ring() { var f = spots(); return LumosSpells.circleThrough(f[0], f[1], f[2]); }
+  function yard() { return { x0: R * 0.4, y0: 64, x1: W - R * 0.4, y1: H - 58 }; }   /* the room a ring may take, clear of the words and buttons */
+  function stepNow() { var m = mid(), k = 0.30 * S, row = [-1, 0, 1].map(function (u) { return { x: m.x + u * k, y: m.y, r: R }; }); return LumosSpells.stepOut(row, 1, step.d, yard()); }
   function say(html) { lineEl.innerHTML = html; }
   function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
   function noise(dur, freq, gain) {
@@ -134,6 +146,7 @@
   function choose(i) {
     if (wait) { clearTimeout(wait); wait = null; }
     round = i; last = null; trail = null; done = false; misses = 0; warm = null; shown = null; nev = null; closing = null; puffs = [];
+    step = { on: false, placed: false, drag: false, d: 0 };
     makeGuide(); menu(); say(ROUNDS[i].start);
   }
   function later(ms, fn) { wait = setTimeout(function () { wait = null; fn(); }, ms); }
@@ -147,26 +160,30 @@
     if (j.verdict !== 'warm') {
       guides.forEach(function (g) { g.miss(); }); misses++; shiver();
       trail = { pts: pts, at: now };
-      shown = j.reason === 'out' || j.reason === 'lumpy' ? { at: now, j: j } : null;
+      shown = j.reason === 'out' || j.reason === 'lumpy' || j.reason === 'row' ? { at: now, j: j } : null;
       var cold = j.cold.map(function (k) { return fr[k].who; }), near = j.close.map(function (k) { return fr[k].who; });
       var words = {
         tap: 'A ring, not a dot: <b>draw right round</b>, through where they stand.',
         open: 'Close it up: <b>right round</b>, back to where you began.',
         scribble: '<b>Once round</b> is enough: one ring.',
         lumpy: '<b>Rounder!</b> A fire warms the same all the way round, so the ring must be round.',
+        row: 'No ring goes through <b>three in a row</b>, however it is drawn: the middle one is never on it. <b>Drag Harry</b> out of line.',
         out: (cold.length ? '<b>' + list(cold) + '</b> ' + (cold.length > 1 ? 'are' : 'is') + ' left out in the cold. ' : '') +
              (near.length ? '<b>' + list(near) + '</b> would be far too close: robes catch, like the hem of Snape\'s. ' : '') + 'Through <b>where each one stands</b>.'
       };
       say(words[j.reason] || 'Try again: one ring through all three.');
+      if (j.reason === 'row') step.on = true;
       return j;
     }
     guides.forEach(function (g) { g.hit(lv > 0); });
     warm = { at: now, c: j.c, pts: pts }; flameSound(); LumosSpells.learn('bluebell');
     if (round === 0) say('<b>Warm!</b> The jar sits in the middle and each of them is <b>the same distance</b> from it. That is what a circle is.');
     else if (round === 1) say('<b>Warm!</b> Three friends not in a row always have <b>exactly one</b> ring through them, and you found it.');
+    else if (round === 3) say('<b>Warm!</b> Out of line, there is <b>exactly one</b> ring again.' + (stepNow().smallest ? ' And the smallest: Ron and Hermione stand <b>opposite each other</b> across the fire.' : ''));
     else say('<b>Warm!</b> Backs to the fire, all three the same distance from it.');
     later(3800, function () {
       if (round < 2) { choose(round + 1); return; }
+      if (round === 3) { done = true; say('<b>Full marks.</b> Three in a row: no ring at all. One step out of line: exactly one.'); return; }
       var c = warm.c, a = 30 * Math.PI / 180, to = { x: c.x + (c.r + 2.6 * R) * Math.cos(a), y: c.y + (c.r + 2.6 * R) * Math.sin(a) };
       nev = { shown: true, since: performance.now(), dur: 1400, from: { x: W + R * 2, y: to.y }, to: to, warm: false, tries: 0 };
       say('<b>Neville</b> comes over, shivering. <b>Tap where he should stand</b> to be as warm as the others.');
@@ -191,7 +208,8 @@
       closing = performance.now();
       say('Snape crosses the yard, limping. Quick, <b>close up</b> to hide the fire: they are sure it is not allowed.');
       later(2600, function () { done = true;
-        say('<b>Full marks.</b> A smaller ring, and still all the same distance from the jar. Snape takes Harry\'s library book instead. Five points from Gryffindor.'); });
+        say('<b>Full marks.</b> A smaller ring, and still all the same distance from the jar. Snape takes Harry\'s library book instead. Five points from Gryffindor.');
+        later(4500, function () { choose(3); }); });
     });
   }
 
@@ -280,12 +298,31 @@
     j.cold.concat(j.close).forEach(function (k) { circ(fr[k], fr[k].r * 1.5, 'rgba(240,150,140,0.95)', 2.5); });
     cx.restore();
   }
+  function drawStep(now) {   /* Three in a row: Harry glows to be dragged; while he moves, the one ring through them, faint */
+    if (!step.on || warm) return;
+    var h = spots()[1];
+    if (!step.placed && !step.drag) {
+      var a = 0.5 + 0.4 * Math.sin(now / 260);
+      circ(h, R * 1.55, 'rgba(243,210,122,' + a.toFixed(2) + ')', 2.5);
+      cx.save(); cx.strokeStyle = 'rgba(243,210,122,' + a.toFixed(2) + ')'; cx.lineWidth = 2.5;   /* up and down, the ways he can step */
+      [-1, 1].forEach(function (sg) { var y = h.y + sg * R * 2.1; cx.beginPath(); cx.moveTo(h.x - R * 0.45, y - sg * R * 0.3); cx.lineTo(h.x, y); cx.lineTo(h.x + R * 0.45, y - sg * R * 0.3); cx.stroke(); });
+      cx.restore();
+    }
+    if (!step.drag) return;
+    var z = stepNow(), m = mid();
+    if (!z.through) { label(m.x, m.y + R * 2.6, 'still in a row: no ring at all', '#f0968c'); return; }
+    var col = z.fits ? 'rgba(200,220,240,0.75)' : 'rgba(240,150,140,0.75)';
+    circ(z.through, z.through.r, col, 2, [6, 7]);
+    cx.fillStyle = col; cx.beginPath(); cx.arc(z.through.x, z.through.y, 4, 0, 7); cx.fill();
+    label(m.x, Math.min(H - 70, m.y + R * 2.6), z.fits ? (z.smallest ? 'one ring, the smallest' : 'one ring, and it fits') : 'one ring, too big for the courtyard', z.fits ? '#dce8f4' : '#f0968c');
+  }
   function frame(now) {
     drawYard();
     drawWarmth(now);
     drawShown(now);
+    drawStep(now);
     if (!wait && !done && !warm && !(shown && now - shown.at <= 2600)) guides.forEach(function (g) { g.draw(cx, now, !!stroke); });
-    var fr = friends(), c = warm ? warm.c : (ring() || mid());
+    var fr = friends(), c = warm ? warm.c : (ring() || { x: mid().x, y: -H });   /* in a row, backs to the wall */
     drawGeometry(now, fr);
     fr.forEach(function (p, k) { drawFriend(p, now, p.who === 'Neville' ? !(nev && nev.warm) : !warm, k, c); });
     drawPuffs(now);
@@ -307,28 +344,45 @@
     ensureAudio(); ev.preventDefault();
     if (wait || done || active !== null) return;
     if (warm && !(nev && !nev.warm && performance.now() - nev.since > nev.dur)) return;
+    if (step.on && !step.placed && !warm) {   /* Three in a row: a touch on Harry drags him out of line; elsewhere, a word */
+      var h = spots()[1];
+      if (Math.hypot(ev.clientX - h.x, ev.clientY - h.y) > R * 1.8) { say('First <b>drag Harry</b> out of the line: up or down.'); return; }
+      active = ev.pointerId; step.drag = true; step.from = ev.clientY + step.d; shown = null; trail = null;
+      try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
+      return;
+    }
     active = ev.pointerId; stroke = [pt(ev)]; trail = null; shown = null;
     if (!warm) guides.forEach(function (g) { g.cover(stroke[0]); });
     try { cv.setPointerCapture(ev.pointerId); } catch (e) {}
   });
   cv.addEventListener('pointermove', function (ev) {
+    if (ev.pointerId === active && step.drag) { ev.preventDefault(); step.d = Math.max(-(H - 58 - R - mid().y), Math.min(mid().y - 64 - R, step.from - ev.clientY)); return; }
     if (ev.pointerId !== active || !stroke) return; ev.preventDefault();
     var list = ev.getCoalescedEvents ? ev.getCoalescedEvents() : [ev]; if (!list.length) list = [ev];
     list.forEach(function (e2) { var q = pt(e2); stroke.push(q); if (!warm) guides.forEach(function (g) { g.cover(q); }); });
   });
   cv.addEventListener('pointerup', function (ev) {
+    if (ev.pointerId === active && step.drag) { active = null; step.drag = false; letGo(); return; }
     if (ev.pointerId !== active || !stroke) return;
     active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
     if (warm) tapNeville(pts[pts.length - 1]); else judge(pts);
   });
-  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; } });
+  cv.addEventListener('pointercancel', function (ev) { if (ev.pointerId === active) { active = null; stroke = null; step.drag = false; } });
+  function letGo() {   /* Harry let go: still in a row, a ring too big, or one that fits, and then he draws it */
+    var z = stepNow();
+    if (!z.through) { say('Still <b>in a row</b>: no ring at all. Further out of line.'); return; }
+    if (!z.fits) { say('There is one ring now, but it is <b>too big for the courtyard</b>: the smaller the step, the bigger the ring. Further out.'); return; }
+    step.placed = true;
+    say('Out of line: now there is <b>exactly one</b> ring through all three. Draw it.');
+  }
   document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
 
   addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
   window.lumosFlames = { choose: function (i) { choose(i - 1); },
     friends: function () { return friends().map(function (p) { return { x: p.x, y: p.y, r: p.r, who: p.who }; }); },
-    ring: function () { var c = ring(); return { x: c.x, y: c.y, r: c.r }; },
+    ring: function () { var c = ring(); return c ? { x: c.x, y: c.y, r: c.r } : null; },
     state: function () { return { round: round + 1, waiting: !!wait, done: done, misses: misses, warm: !!warm, jar: warm ? warm.c : null,
+      step: ROUNDS[round].row ? { on: step.on, placed: step.placed, d: Math.round(step.d), fits: stepNow().fits, smallest: stepNow().smallest } : null,
       neville: nev ? { here: !!(performance.now() - nev.since > nev.dur), warm: nev.warm, tries: nev.tries, tap: nev.tap || null } : null, closing: !!closing,
       last: last ? { verdict: last.verdict, reason: last.reason, off: last.off, cold: last.cold, close: last.close, turns: last.turns, round: last.round } : null,
       line: lineEl.textContent, guide: guides.length ? guides[0].state().level : null, ease: ease, learned: LumosSpells.learned('bluebell') }; } };
