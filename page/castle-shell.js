@@ -131,6 +131,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var sill = op.sill || 0, h = Math.min(H, (op.h || 2.2) + sill);
       gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op });
     });
+    /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
+       part, its head round */
+    (M.features || []).forEach(function (ft) {
+      if (!ft.depth || !ft.at || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
+      var e = onEdge(Q.poly, toSite(M, ft.group || null, ft.at));
+      if (!e) return;
+      gaps[e.i].push({ s0: e.s - ft.w / 2, s1: e.s + ft.w / 2, sill: ft.sill || 0, h: Math.min(H, (ft.h || 2.2) + (ft.sill || 0)), op: ft, niche: true });
+    });
     Q.poly.forEach(function (a, i) {
       var b = Q.poly[(i + 1) % Q.poly.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
       /* a wall already built from the other side (the place one step on shares it) is not built twice */
@@ -156,6 +164,18 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
+        if (g.niche) {
+          var dp = Math.min(g.op.depth, t - 0.05), back = slab(w, hh, t - dp, mats.wall, 'wall');
+          var bp = toLocal(a[0] + ux * sm + nx * (dp + (t - dp) / 2), a[1] + uy * sm + ny * (dp + (t - dp) / 2), Q.floor);
+          back.position.set(bp.x, bp.y + g.sill + hh / 2, bp.z); back.rotation.y = ang; back.name = Q.id + '-niche-' + g.op.id; group.add(back);
+          var r = w / 2, sh = new THREE.Shape();
+          sh.moveTo(-r, 0); sh.lineTo(-r, r); sh.lineTo(r, r); sh.lineTo(r, 0); sh.absarc(0, 0, r, 0, Math.PI, false);
+          var head = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: dp, bevelEnabled: false, curveSegments: 16 }), mats.wall), LAYER.wall);
+          head.position.set(mid.x, mid.y + g.h - r, mid.z); head.rotation.y = ang; head.name = Q.id + '-niche-head-' + g.op.id; group.add(head);
+          var fl = slab(w, 0.02, dp, mats.floor, 'floor'), fp = toLocal(a[0] + ux * sm + nx * dp / 2, a[1] + uy * sm + ny * dp / 2, Q.floor);
+          fl.position.set(fp.x, fp.y + g.sill + 0.01, fp.z); fl.rotation.y = ang; fl.name = Q.id + '-niche-floor-' + g.op.id; group.add(fl);
+          return;
+        }
         var to = other(g.op, Q.id);
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
         var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;

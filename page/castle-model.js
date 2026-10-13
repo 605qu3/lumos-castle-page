@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 12,
+  "version": 13,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -264,7 +264,11 @@ window.CASTLE_MODEL = {
     { "id": "vase", "room": "room-corridor", "kind": "man-sized vase, east of the blank stretch", "at": [35.1, 51.05],
       "state": "designed", "cite": "OotP 18" },
     { "id": "window-just-beyond", "kind": "window", "room": "room-corridor", "at": [28.9, 50.3], "w": 1.2,
-      "view": "the west courtyard", "state": "designed", "cite": "OotP 18 (its wall left open by the book)" }
+      "view": "the west courtyard", "state": "designed", "cite": "OotP 18 (its wall left open by the book)" },
+    {"id": "hourglass-niche-gryffindor", "room": "entrance-hall", "kind": "round-headed niche, the Gryffindor hourglass", "at": [68, 51.93], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "about": "Godric's 13.1 (13 October 2026, 5.09 pm; sheet architect-niches-1013-1701): four niches in a row on the west wall south of the Great Hall's doors, nearest the marble staircase's foot, one glass a house in the Sorting Hat's order from the south, 1.68 m apart (Design's PITCH), the foot on the flags; the glasses Design's LumosHourglass.hall()", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
+    {"id": "hourglass-niche-hufflepuff", "room": "entrance-hall", "kind": "round-headed niche, the Hufflepuff hourglass", "at": [68, 53.61], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
+    {"id": "hourglass-niche-ravenclaw", "room": "entrance-hall", "kind": "round-headed niche, the Ravenclaw hourglass", "at": [68, 55.29], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
+    {"id": "hourglass-niche-slytherin", "room": "entrance-hall", "kind": "round-headed niche, the Slytherin hourglass", "at": [68, 56.97], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"}
   ],
   "stairs": [
     { "id": "tower-stair", "kind": "open newel stair", "rooms": ["common-room", "dormitory"], "newel": [4.13, -2.59], "r": 0.7,
