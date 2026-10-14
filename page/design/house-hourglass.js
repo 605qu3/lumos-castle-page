@@ -39,10 +39,11 @@
 //            fall (mount() drives it), absent for a still
 //   rising   { house, n, at } a stone taken back, flying up from the heap through the neck (his t2)
 //   top      the top bulb: 'store' (default, the house's store, never lower), 'clear', or a fraction 0..1
-// LumosHourglass.cup({ houses, year, gems, id, metal, cover, age, letter }) the year's cup (req 306): Objects'
+// LumosHourglass.cup({ houses, year, gems, id, metal, cover, age, yearsAgo, letter }) the year's cup (req 306): Objects'
 //   trophies sheet's rank 1 drawn in code, silver, the crest on its cartouche, the year on its plinth; gems, the
 //   year's slips, poured into its mouth at the leaving feast (Magic's against the year, req 233), the cover lifted;
-//   age 0..1 fades an old year's cup (req 279). form: 'stand-in' draws Q22's stand-in, for its sheets.
+//   age 0..1 fades an old year's cup (req 279), or yearsAgo (age = yearsAgo / 8). form: 'stand-in' draws Q22's
+//   stand-in, for its sheets.
 // LumosHourglass.mount(el, { slips, houses, full, niche, audio }) draws the glass into el and gives { set(slips),
 //   point(slip), back(slip) }: point is the runtime's opts.point (req 222), its stones falling as it lands, slower
 //   for a brother taught (kind 'taught') and for a thing given, which passed between the brothers (kind 'given',
@@ -298,11 +299,13 @@
   // silver and gold"); metal 'gold' or 'parcel' (silver, the rims, beads, cartouche and flame gilt) for the question.
   // cover: 'on' (the cup as it stands on the shelf), 'lifted' (at the leaving feast, while the gems pour into its
   // mouth) or 'off'; by default lifted when gems are given, else on. age 0..1: faded means old (req 279, the Curator's
-  // advisory; Magic's req 280): the oldest year's cup the dullest, its silver greyed and warm with tarnish.
+  // advisory; Magic's req 280): the oldest year's cup the dullest, its silver greyed and warm with tarnish. yearsAgo
+  // sets it for the den's row (req 234: eight cups a shelf): age = yearsAgo / 8, this year's cup bright, the one eight
+  // years back and older at their dullest.
   function cup(o = {}) {
     if (o.form === 'stand-in') return standIn(o);
     const id = o.id || 'c' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'], plain = o.plain;
-    const metal = o.metal || 'silver', age = Math.max(0, Math.min(1, o.age || 0));
+    const metal = o.metal || 'silver', age = Math.max(0, Math.min(1, typeof o.yearsAgo === 'number' ? o.yearsAgo / 8 : o.age || 0));
     const cover = o.cover || (o.gems && o.gems.length ? 'lifted' : 'on');
     const year = o.year || '2026 – 2027', letter = o.letter || 'a';
     const SIL = ['#5d6267', '#c9ced3', '#ffffff', '#aab0b6', '#71767c', '#c4c9ce', '#53575c'];
