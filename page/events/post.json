@@ -1,0 +1,175 @@
+{
+  "chain": "post",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = common room",
+        "parcel = coming",
+        "post_owl = school"
+      ],
+      "show": [
+        "a school owl at the right-hand window with a parcel in brown paper and string, waiting to be let in"
+      ]
+    },
+    {
+      "when": [
+        "place = common room",
+        "parcel = coming",
+        "post_owl = errol"
+      ],
+      "show": [
+        "Errol in a heap on the right-hand sill beside a parcel in brown paper and string, legs in the air"
+      ]
+    },
+    {
+      "when": [
+        "place = common room",
+        "parcel = sill"
+      ],
+      "show": [
+        "a parcel in brown paper and string waiting on the right-hand sill, unopened"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "post.sent",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "owl sent",
+      "when": [
+        "place = common room"
+      ],
+      "show": [
+        "a school owl swoops down to the right-hand sill, takes the parcel in brown paper and string with his name on its label, and flies off"
+      ],
+      "show_at": {
+        "night": [
+          "a soft light at the right-hand window first, then a school owl on the moonlit sill takes the parcel in brown paper and string with his name on its label, and flies off"
+        ]
+      },
+      "starts": [],
+      "canon": "Magic's B26 (Godric's 1 with t1, 7.40 pm): free, as the school owls are, \"anyone can use them\", GoF 18; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "post.owl",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "post-owl",
+      "weight": 7,
+      "moment": "wait 6-15 s",
+      "when": [
+        "place = common room",
+        "parcel = coming",
+        "post_owl != school",
+        "post_owl != errol"
+      ],
+      "show": [
+        "a school owl swoops down to the right-hand window with a parcel in brown paper and string and taps on the glass"
+      ],
+      "show_at": {
+        "night": [
+          "a soft light at the right-hand window first, then a school owl on the moonlit sill with a parcel in brown paper and string, tapping on the glass"
+        ]
+      },
+      "starts": [
+        "set post_owl = school"
+      ]
+    },
+    {
+      "id": "post.errol",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "post-owl",
+      "weight": 1,
+      "moment": "wait 6-15 s",
+      "when": [
+        "place = common room",
+        "parcel = coming",
+        "post_owl != school",
+        "post_owl != errol",
+        "time != night"
+      ],
+      "show": [
+        "Errol, the Weasleys' ancient owl, lent by the twins, comes at the right-hand window with a parcel, misses the sill and lands on it in a heap, legs in the air"
+      ],
+      "starts": [
+        "set post_owl = errol"
+      ],
+      "canon": "B26's t1, Fawkes's touch (Godric, 7.40 pm), by day only by the night rule (Magic's note): Errol flopped straight off again and was laid down, CoS 4; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "post.let-in",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parcel owl",
+      "when": [
+        "place = common room",
+        "parcel = coming",
+        "post_owl = school"
+      ],
+      "show": [
+        "the owl hops in, sets the parcel down on the sill and flies off"
+      ],
+      "starts": [
+        "land parcel",
+        "set post_owl = gone"
+      ]
+    },
+    {
+      "id": "post.errol-laid",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parcel owl",
+      "when": [
+        "place = common room",
+        "parcel = coming",
+        "post_owl = errol"
+      ],
+      "show": [
+        "he lays Errol down gently on the sill to recover; after a while Errol picks himself up, leaves the parcel and flaps off"
+      ],
+      "starts": [
+        "land parcel",
+        "set post_owl = gone"
+      ],
+      "canon": "B26's t1: Ron lay him on the draining board instead, CoS 4; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "post.open",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap parcel",
+      "when": [
+        "place = common room",
+        "parcel = sill"
+      ],
+      "show": [
+        "he pulls the string, the brown paper falls open, and the label says who it is from"
+      ],
+      "starts": [
+        "open parcel",
+        "log \"Opened a parcel from his brother {day}\""
+      ],
+      "canon": "B26: the thing into his own den; req 216's point for a thing passed waits on the words for it (req 298 of Magic), taught's words being for a thing taught"
+    },
+    {
+      "id": "post.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set post_owl = none"
+      ]
+    }
+  ]
+}

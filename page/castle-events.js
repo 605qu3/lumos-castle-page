@@ -145,6 +145,14 @@
    Drawn states only (board req 274): where the page names any state of a find as drawn (`quill.goose` in
    `opts.drawn`), the find turns up in one of those only, so the thing in his hand is the one drawn (v=31).
 
+   The owl post between the boys (Magic's B26, req 294): `canSend()` says whether he can send his brother a thing
+   now ({ to, name, waiting }, null with one boy); `send({ kind: 'card', name })` or `send({ kind: 'knut' })`, from
+   his den, takes it out of his castle (the card's last copy in `found('frogs')`, or a Knut from `knuts`) and gives
+   it to the owl, raising `owl sent`. One parcel waits each way, in the iPad's owl, never packed into a satchel, so it
+   waits for his brother's own turn, however long. There, `parcel` reads `coming`, then `sill` once a record's
+   `land parcel` has set it down, and `open parcel` puts the thing into his castle, `parcel thing` naming it (the
+   card, or `knut`); `parcel()` gives the page { from, name, kind, thing, landed } for the label. Free (v=32).
+
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
    to N s; ?time=night (or morning, day, evening) overrides the clock; ?fresh starts this iPad's castle afresh;
@@ -186,7 +194,8 @@
     ['slot', /^(take|free) slot$/],
     ['log', /^log "(.+)"$/],
     ['secret', /^secret ([a-z\-]+)$/],
-    ['point', /^point ([a-z\-]+) (\{[a-z_ ]+\}|[a-z\-]+) (\d+)$/]
+    ['point', /^point ([a-z\-]+) (\{[a-z_ ]+\}|[a-z\-]+) (\d+)$/],
+    ['parcel', /^(land|open) parcel$/]
   ];
 
   /* The real moon (req 95, Magic's "The real moon, how real", Godric's pick of 10 October 2026, 5.16 pm), from the
@@ -528,6 +537,8 @@
         case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
         case 'year': return schoolYear(isoDay(now));                   /* the school year now, named by its feast's year */
         case 'who plays': return playersNow().ask ? 'ask' : (owl.players || []).length >= 2 ? 'chosen' : 'one';   /* one castle: his name to tap */
+        case 'parcel': var pc = parcelFor(me()); return pc && playerOf(owl.playing) ? (pc.landed ? 'sill' : 'coming') : 'none';   /* B26 */
+        case 'parcel thing': var pt = parcelFor(me()); return pt ? pt.name : parcelOpened || 'none';
         case 'map here': return PAGE_ROOM[(leaving && state.visitPlace) || place] || 'none';   /* his own dot's model room (req 242) */
         case 'map nearest': return mapNearest();                        /* the grown-up whose dot is nearest his (B14 t1) */
         case 'reading': return readingBook();                           /* the book he is reading, 0 till set (B12 t1) */
@@ -852,6 +863,7 @@
           case 'log': logLine(m[1]); return;
           case 'secret': if (state.secrets.indexOf(m[1]) < 0) state.secrets.push(m[1]); return;   /* once ever (req 180) */
           case 'point': award(m[1], m[2], +m[3], rec); return;
+          case 'parcel': parcelDo(m[1], rec); return;   /* the owl post between the boys (B26) */
         }
       }
       note(rec.id + ': effect does not parse: ' + text);
@@ -1117,6 +1129,61 @@
       });
       return { ask: list.length >= 2 && (!playerOf(owl.playing) || !!owl.ask), playing: playerOf(owl.playing) ? owl.playing : null,
                list: list };
+    }
+    /* ---------- the owl post between the boys (Magic's B26, req 294) ---------- */
+    /* A thing from his den to his brother's, by a school owl, free (GoF 18: anyone can use them). The parcel waits in
+       the iPad's owl, one each way, for his brother's own turn; it is gone from the sender's castle as the owl takes it
+       and in his brother's once opened, nothing lost between. */
+    var parcelOpened = null;
+    function brotherOf(id) { return (owl.players || []).filter(function (p) { return p.id !== id; })[0] || null; }
+    function parcelFor(id) { return (owl.parcels || {})[id] || null; }
+    function canSend() {
+      if ((owl.players || []).length < 2 || !playerOf(owl.playing)) return null;
+      var b = brotherOf(owl.playing);
+      return b ? { to: b.id, name: b.name, waiting: !!parcelFor(b.id) } : null;
+    }
+    function send(thing) {
+      var c = canSend();
+      if (!c || c.waiting || !thing) return false;
+      var name;
+      if (thing.kind === 'card') {
+        var list = (state.deckFound || {}).frogs || [], at = list.lastIndexOf(thing.name);
+        if (at < 0) return false;
+        list.splice(at, 1);                                    /* a spare goes first: the copy found last */
+        name = thing.name;
+      } else if (thing.kind === 'knut') {
+        if (!(+state.vars.knuts > 0)) return false;
+        state.vars.knuts = +state.vars.knuts - 1;
+        name = 'knut';
+      } else return false;
+      owl.parcels = owl.parcels || {};
+      owl.parcels[c.to] = { from: owl.playing, kind: thing.kind, name: name, at: Date.now(), landed: false };
+      save(OWL_KEY, owl);
+      save(STATE_KEY, state);
+      logLine('Sent his brother ' + (name === 'knut' ? 'a Knut' : 'a card') + ' by owl, {day}');
+      if (visit) { moment('owl sent'); changed(); }
+      return true;
+    }
+    /* `land parcel`: the owl has set it on the sill; `open parcel`: the thing goes into his castle. */
+    function parcelDo(how, rec) {
+      var p = parcelFor(me());
+      if (!p || !playerOf(owl.playing)) { note(rec.id + ': no parcel waiting for him'); return; }
+      if (how === 'land') { p.landed = true; save(OWL_KEY, owl); return; }
+      if (p.kind === 'card') {
+        var found = (state.deckFound.frogs = state.deckFound.frogs || []), had = found.indexOf(p.name) >= 0;
+        found.push(p.name);
+        var first = state.deckFirst.frogs = state.deckFirst.frogs || {};
+        if (!had && !first[p.name]) first[p.name] = isoDay(nowDate());
+      } else state.vars.knuts = (+state.vars.knuts || 0) + 1;
+      parcelOpened = p.name;
+      delete owl.parcels[me()];
+      save(OWL_KEY, owl);
+    }
+    function parcelNow() {
+      var p = parcelFor(me());
+      if (!p || !playerOf(owl.playing)) return null;
+      var from = playerOf(p.from);
+      return { from: p.from, name: from ? from.name : null, kind: p.kind, thing: p.name, landed: !!p.landed };
     }
     /* ---------- his castle backed up (Godric's events-q-one-ipad-1013, 1, 13 October 2026) ---------- */
     /* One iPad, so a backup, never a sync. Each named boy's castle, every lumos. key of his, is sealed on the iPad
@@ -2040,6 +2107,11 @@
       /* resolves once a restore from the backup has had the store's answer (true if a castle came back) */
       restored: function () { return restoreRun || restoreLast; },
       play: play,
+      /* The owl post between the boys (B26, v=32): whether he can send now, his send from the den, and the parcel
+         waiting for him (its label's name is this iPad's name for his brother, never posted anywhere). */
+      canSend: canSend,
+      send: send,
+      parcel: parcelNow,
       sync: owlSync,
       /* A grown-up takes a point back (Design's req 237; only a grown-up, a slip given in error: points are never lost
          in play, Magic's B11): `back(slip)`, the slip as `points()` handed it (its kind, thing and any `from`). It stays
