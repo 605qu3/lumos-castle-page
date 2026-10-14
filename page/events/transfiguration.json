@@ -1,0 +1,188 @@
+{
+  "chain": "transfiguration",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 1",
+        "date >= 09-01",
+        "date <= 09-07",
+        "day of week <= 4",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "a match laid on every desk, waiting to be turned into a needle"
+      ],
+      "canon": "Interiors' req 369: PS 8 L2740, her first class, \"each given a match\"; the first week of lessons, Monday to Thursday (Friday is Potions, L2746), in the year he reads the Stone; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 1",
+        "date >= 09-08"
+      ],
+      "show": [
+        "on the sill of the front window, a match gone all silver and pointy"
+      ],
+      "canon": "Fawkes's t1 on interiors-transfig-desks-1014 (provisional, Godric to confirm), Interiors' spot: Hermione's match, PS 8 L2740, kept from the first week on and in every later book's year; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 1",
+        "date <= 08-31"
+      ],
+      "show": [
+        "on the sill of the front window, a match gone all silver and pointy"
+      ],
+      "canon": "as above, January to the summer's end"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading >= 2"
+      ],
+      "show": [
+        "on the sill of the front window, a match gone all silver and pointy"
+      ],
+      "canon": "as above, every later year"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 2",
+        "date = 09-02",
+        "time = morning"
+      ],
+      "show": [
+        "a beetle on every desk, each to be turned into a button"
+      ],
+      "canon": "Interiors' req 369: CoS 6 L8441, the first morning's Transfiguration, a beetle into a button (09-02, before Lockhart's afternoon); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 2",
+        "date = 05-25",
+        "time = morning"
+      ],
+      "show": [
+        "a pair of white rabbits on every desk, to be turned into slippers"
+      ],
+      "canon": "Interiors' req 369: CoS 16 L12159 to L12171, their first lesson of the day she tells them the exams start on the first of June, \"one week from today\", so 05-25; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 1",
+        "date >= 06-01",
+        "date <= 06-07",
+        "day of week <= 5",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "a row of snuffboxes along her desk from the morning's practical, one of them with whiskers"
+      ],
+      "canon": "Interiors' req 369: PS 16 L5460, the practical exam, a mouse into a snuffbox, points taken away if it had whiskers; exam week, 1 to 7 June (as the Charms pineapple), school days, by day; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 3",
+        "weekday = monday",
+        "date >= 05-31",
+        "date <= 06-06",
+        "time = morning"
+      ],
+      "show": [
+        "a teapot on every desk for the exam"
+      ],
+      "canon": "Interiors' req 369: PoA 16 L19666, exam week's Monday, Transfiguration in the morning, a teapot into a tortoise; the Monday of the week ending with the Shrieking Shack's night (06-06, as the wing's chocolate); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 3",
+        "weekday = monday",
+        "date >= 05-31",
+        "date <= 06-06",
+        "time = day"
+      ],
+      "show": [
+        "tortoises crawling slowly among the desks after the exam, one of them still with a spout for a tail"
+      ],
+      "canon": "PoA 16 L19666 to L19668 (out at lunchtime; \"Mine still had a spout for a tail\"); left in the room that afternoon, ours (provisional, Godric to confirm); checked against the text, 14 October 2026"
+    }
+  ],
+  "records": [
+    {
+      "id": "transfiguration.pig",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 1",
+        "date >= 09-01",
+        "date <= 09-07",
+        "day of week <= 4",
+        "time != evening",
+        "time != night",
+        "mcgonagall_pig != done"
+      ],
+      "show": [
+        "Professor McGonagall flicks her wand and her desk becomes a pig, which trots snuffling round the clear floor before it; another flick, and it is a desk again"
+      ],
+      "starts": [
+        "set mcgonagall_pig = done"
+      ],
+      "canon": "Interiors' req 369, the clear floor kept 1.0 either side: PS 8 L2740, \"she changed her desk into a pig and back again\", at their first class; once ever, his first visit in the first week of lessons in the year he reads the Stone; checked against the text, 14 October 2026"
+    },
+    {
+      "id": "transfiguration.cat",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 3",
+        "date >= 09-01",
+        "date <= 09-07",
+        "day of week <= 5",
+        "time != evening",
+        "time != night",
+        "mcgonagall_pop != done"
+      ],
+      "show": [
+        "a tabby cat with square markings round its eyes sits very upright on her desk; then, with a faint pop, it is Professor McGonagall, looking round as if waiting for applause"
+      ],
+      "starts": [
+        "set mcgonagall_pop = done"
+      ],
+      "canon": "Interiors' req 369: PoA 6 L15398 to L15400, the first lesson of the year, \"turning back into herself with a faint pop\" and no applause; the markings the shape of her square glasses, PS 1 L95; once ever, his first visit in the first week in the year he reads Prisoner of Azkaban; checked against the text, 14 October 2026"
+    },
+    {
+      "id": "transfiguration.desk-leg",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = transfiguration classroom",
+        "reading = 2",
+        "date = 05-25",
+        "time = morning"
+      ],
+      "show": [
+        "a loud bang from the back row on the aisle's left: one leg of the desk there vanishes and the desk lurches; a wave of a wand from the front, and the leg is back"
+      ],
+      "canon": "Interiors' req 369, Neville's desk the back row's on the aisle's left: CoS 16 L12163, his wand slips, vanishing a leg of his desk, and she restores it; that lesson, 05-25; checked against the text, 14 October 2026"
+    }
+  ]
+}
