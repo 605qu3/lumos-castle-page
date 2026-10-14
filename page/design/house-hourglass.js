@@ -39,8 +39,10 @@
 //            fall (mount() drives it), absent for a still
 //   rising   { house, n, at } a stone taken back, flying up from the heap through the neck (his t2)
 //   top      the top bulb: 'store' (default, the house's store, never lower), 'clear', or a fraction 0..1
-// LumosHourglass.cup({ houses, year, gems, id }) the house cup's crest on a stand-in cup; the cup's body is Objects' (req 48);
-//   gems, the year's slips, poured into its mouth at the leaving feast (Magic's against the year, req 233).
+// LumosHourglass.cup({ houses, year, gems, id, metal, cover, age, letter }) the year's cup (req 306): Objects'
+//   trophies sheet's rank 1 drawn in code, silver, the crest on its cartouche, the year on its plinth; gems, the
+//   year's slips, poured into its mouth at the leaving feast (Magic's against the year, req 233), the cover lifted;
+//   age 0..1 fades an old year's cup (req 279). form: 'stand-in' draws Q22's stand-in, for its sheets.
 // LumosHourglass.mount(el, { slips, houses, full, niche, audio }) draws the glass into el and gives { set(slips),
 //   point(slip), back(slip) }: point is the runtime's opts.point (req 222), its stones falling as it lands, slower
 //   for a brother taught (kind 'taught') and for a thing given, which passed between the brothers (kind 'given',
@@ -285,7 +287,93 @@
 
   // the house cup's crest on a stand-in cup (the cup itself is Objects', from req 48's trophies sheet): the crest as
   // built, engraved in the gold, the boys' houses' quarters enamelled; the year engraved on the foot, their names under
+  // the year's cup (req 306, the Curator's: Objects' trophies sheet, rank 1, `castle/trophy-cup-1.jpg`, a Sheffield
+  // two-handled cup and cover of 1859 to 1860): the thistle body, its belly chased in a band of scrolls and flowers and
+  // its neck plain where the light pools, the handles lopped branches rising from the belly to the lip, a domed cover,
+  // a knopped stem and a spreading foot scrolled and beaded. Named out: the angler finial and the angling scene; the
+  // finial is ours, a little silver flame (Lumos), and the front's empty cartouche carries the crest, the boys' houses
+  // enamelled. The year in spaced capitals, pale on an ebonised plinth, set on its curve (`castle/engraved-lettering-
+  // 1.jpg`, its words out); under the lip a row of the castle's own marks (`castle/hallmark-1.jpg`, as marks only):
+  // a tower, the H, the year's letter, a star. Silver, as the precedent and the trophy room's cups (PS 9, "winked
+  // silver and gold"); metal 'gold' or 'parcel' (silver, the rims, beads, cartouche and flame gilt) for the question.
+  // cover: 'on' (the cup as it stands on the shelf), 'lifted' (at the leaving feast, while the gems pour into its
+  // mouth) or 'off'; by default lifted when gems are given, else on. age 0..1: faded means old (req 279, the Curator's
+  // advisory; Magic's req 280): the oldest year's cup the dullest, its silver greyed and warm with tarnish.
   function cup(o = {}) {
+    if (o.form === 'stand-in') return standIn(o);
+    const id = o.id || 'c' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'], plain = o.plain;
+    const metal = o.metal || 'silver', age = Math.max(0, Math.min(1, o.age || 0));
+    const cover = o.cover || (o.gems && o.gems.length ? 'lifted' : 'on');
+    const year = o.year || '2026 – 2027', letter = o.letter || 'a';
+    const SIL = ['#5d6267', '#c9ced3', '#ffffff', '#aab0b6', '#71767c', '#c4c9ce', '#53575c'];
+    const GLD = ['#6e4f1c', '#d8b25c', '#fff1c2', '#c49a48', '#7a5a22', '#d4ad5e', '#5a3f14'];
+    const body = metal === 'gold' ? GLD : SIL, trim = metal === 'silver' ? SIL : GLD;
+    const ink = metal === 'gold' ? '#3e2c10' : '#2a2e33', deep = metal === 'gold' ? '#4a3510' : '#3a3f45';
+    const grad = (k, c) => `<linearGradient id="${k}${id}" x1="0" y1="0" x2="1" y2="0">${[0, 0.16, 0.3, 0.46, 0.7, 0.88, 1].map((t, i) => `<stop offset="${t}" stop-color="${c[i]}"/>`).join('')}</linearGradient>`;
+    const sat = (1 - 0.7 * age).toFixed(3), dim = (1 - 0.42 * age).toFixed(3), warm = (0.12 * age).toFixed(3);
+    const extra = `<defs>${grad('cb', body)}${grad('ct', trim)}
+      <linearGradient id="eb${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26302b"/><stop offset="0.5" stop-color="#121815"/><stop offset="1" stop-color="#070a09"/></linearGradient>
+      <filter id="age${id}"><feColorMatrix type="saturate" values="${sat}"/>
+        <feComponentTransfer><feFuncR type="linear" slope="${dim}" intercept="${warm}"/><feFuncG type="linear" slope="${dim}" intercept="${(0.75 * warm).toFixed(3)}"/><feFuncB type="linear" slope="${dim}" intercept="${(0.35 * warm).toFixed(3)}"/></feComponentTransfer></filter>
+      <path id="yr${id}" d="M31,153.6 Q60,156.4 89,153.6"/></defs>`;
+    // the body: a thistle, bulb below and a tall plain neck flaring to the lip
+    const bowl = 'M54,120 C40,119 34,112 35,103 C36,95 40,90 40,86 C41,72 39,60 34,50 H86 C81,60 79,72 80,86 C80,90 84,95 85,103 C86,112 80,119 66,120 Z';
+    const R = rnd(306);
+    // the chased band round the belly: raised scrolls and leaves, bright on their crowns and dark in the ground between
+    let chase = `<path d="M30,91 C50,93.6 70,93.6 90,91 V121 H30 Z" fill="${deep}" opacity="0.42"/>`;
+    for (const [y0, off] of [[97.5, 0], [104.5, 2.6], [111.5, 0]]) for (let x = 31 + off; x < 90; x += 5.2) {
+      const s = (Math.round((x - off) / 5.2) + (off ? 1 : 0)) % 2 ? 1 : -1, y = y0 + (R() - 0.5) * 1.6, k = 0.85 + R() * 0.3;
+      chase += `<g transform="translate(${f(x)} ${f(y)}) scale(${f(s * k)} ${f(k)})"><path d="M-2.6,1.8 C-3,-1.6 0,-3.4 2.2,-2 C3.6,-1 3,1.2 1.4,1.1 C0.2,1 0.2,-0.4 1.2,-0.6" fill="url(#cb${id})" stroke="${ink}" stroke-width="0.32"/>
+        <path d="M-2.4,1.6 C-1.6,2.8 0.6,3 1.6,2.2" fill="none" stroke="${ink}" stroke-width="0.3"/><path d="M-1.8,-1 C-1,-2.2 0.6,-2.6 1.6,-1.8" fill="none" stroke="#ffffff" stroke-width="0.4" opacity="0.7"/></g>`;
+    }
+    const bead = (y, x1, x2, r, step) => { let s = ''; for (let x = x1; x <= x2; x += step) s += `<circle cx="${f(x)}" cy="${f(y)}" r="${r}" fill="url(#ct${id})" stroke="${ink}" stroke-width="0.2"/>`; return s; };
+    // a handle: a lopped branch from the belly to the lip, bark streaks along it and the stubs of its twigs
+    const branch = s => {
+      const X = x => f(60 + s * (x - 60)), d = `M${X(37)},101 C${X(22)},98 ${X(13)},86 ${X(14)},72 C${X(15)},62 ${X(22)},55 ${X(36)},54`;
+      const stubs = [[16.6, 88, 13.4, 84.6], [14.6, 66, 12.8, 62.4]].map(([a, b, c, e]) => `<path d="M${X(a)},${b} L${X(c)},${e}" stroke="${ink}" stroke-width="3.4" stroke-linecap="round"/><path d="M${X(a)},${b} L${X(c)},${e}" stroke="url(#cb${id})" stroke-width="2.2" stroke-linecap="round"/><ellipse cx="${X(c)}" cy="${e}" rx="0.9" ry="0.7" fill="${deep}"/>`).join('');
+      return `${stubs}<path d="${d}" fill="none" stroke="${ink}" stroke-width="5.4" stroke-linecap="round"/><path d="${d}" fill="none" stroke="url(#cb${id})" stroke-width="4" stroke-linecap="round"/>
+        <path d="${d}" fill="none" stroke="${deep}" stroke-width="0.4" stroke-dasharray="3 2.2 1.4 2.6" transform="translate(${f(s * 0.8)} 0.4)"/>`;
+    };
+    // the cartouche on the front: a scrolled frame, the crest inside it
+    const cart = `<path d="M47,58 C47,55 50,56 52,55 C55,53 58,55 60,53 C62,55 65,53 68,55 C70,56 73,55 73,58 C75,64 72,70 73,76 C74,80 70,82 66,82 C63,82 61,84 60,86 C59,84 57,82 54,82 C50,82 46,80 47,76 C48,70 45,64 47,58 Z" fill="none" stroke="url(#ct${id})" stroke-width="1.6"/>
+      <path d="M47,58 C47,55 50,56 52,55 C55,53 58,55 60,53 C62,55 65,53 68,55 C70,56 73,55 73,58 C75,64 72,70 73,76 C74,80 70,82 66,82 C63,82 61,84 60,86 C59,84 57,82 54,82 C50,82 46,80 47,76 C48,70 45,64 47,58 Z" fill="none" stroke="${ink}" stroke-width="0.35"/>`;
+    const crest = plain ? crestAt(id, 60, 69, 22, [], ink) : crestAt(id, 60, 69, 22, houses, ink);
+    // the castle's own marks: a tower, the H, the year's letter, a star; punched under the lip
+    const punch = (x, inner) => `<g transform="translate(${x} 61)"><path d="M-1.15,-1.1 H1.15 V0.45 Q0,1.55 -1.15,0.45 Z" fill="${deep}" opacity="0.75"/>${inner}</g>`;
+    const marks = punch(74.4, '<path d="M-0.7,0.6 V-0.6 H-0.45 V-0.9 H-0.15 V-0.6 H0.15 V-0.9 H0.45 V-0.6 H0.7 V0.6 Z" fill="#e8ebee"/>')
+      + punch(77, '<path d="M-0.6,-0.8 V0.7 M0.6,-0.8 V0.7 M-0.6,0 H0.6" stroke="#e8ebee" stroke-width="0.3"/>')
+      + punch(79.6, `<text x="0" y="0.6" text-anchor="middle" font-family="Georgia, serif" font-size="1.9" fill="#e8ebee">${letter}</text>`)
+      + punch(82.2, '<path d="M0,-0.9 L0.25,-0.2 L0.9,-0.2 L0.4,0.2 L0.6,0.8 L0,0.4 L-0.6,0.8 L-0.4,0.2 L-0.9,-0.2 L-0.25,-0.2 Z" fill="#e8ebee"/>');
+    // the cover: a domed lid on its rim, a second small dome, and the flame
+    const lid = `<path d="M33,49.6 C34,39 46,34.6 60,34.6 C74,34.6 86,39 87,49.6 Z" fill="url(#cb${id})" stroke="${ink}" stroke-width="0.6"/>
+      <ellipse cx="60" cy="49.6" rx="27" ry="2.6" fill="url(#ct${id})" stroke="${ink}" stroke-width="0.5"/>
+      <path d="M38,45 C42,41 48,39 52,40 M82,45 C78,41 72,39 68,40" fill="none" stroke="${deep}" stroke-width="0.6"/>
+      <path d="M49,36.2 C50,31 54,29 60,29 C66,29 70,31 71,36.2 Z" fill="url(#cb${id})" stroke="${ink}" stroke-width="0.5"/>
+      <ellipse cx="60" cy="28.6" rx="3.4" ry="1.3" fill="url(#ct${id})" stroke="${ink}" stroke-width="0.4"/>
+      <path d="M60,16 C61.6,19.6 63.6,21.6 63,24.6 C62.6,26.8 61.2,27.8 60,27.8 C58.8,27.8 57.4,26.8 57,24.6 C56.6,22.4 58.6,21.4 58.4,19 C59.4,20.2 59.8,18.4 60,16 Z" fill="url(#ct${id})" stroke="${ink}" stroke-width="0.4"/>`;
+    const lidAt = cover === 'on' ? lid : cover === 'lifted' ? `<g transform="translate(9 -24) rotate(8 60 49)">${lid}</g>` : '';
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160">${defs(id)}${extra}
+      <g filter="url(#age${id})"><g filter="url(#wc${id})">
+      <path d="M26,147 V155.4 A34,4.4 0 0 0 94,155.4 V147 Z" fill="url(#eb${id})" stroke="#050706" stroke-width="0.5"/>
+      <ellipse cx="60" cy="147" rx="34" ry="3.6" fill="#1f2924" stroke="#050706" stroke-width="0.5"/>
+      <path d="M27,149.8 A33,4 0 0 0 93,149.8" fill="none" stroke="#3a4640" stroke-width="0.4"/>
+      <text font-family="'IM Fell English SC', Georgia, serif" font-size="4.6" letter-spacing="1.1" fill="#d6dad4" opacity="0.92"><textPath href="#yr${id}" startOffset="50%" text-anchor="middle">${year}</textPath></text>
+      ${branch(-1)}${branch(1)}
+      <path d="M35,146 C35,141 42,138.6 50,136.6 C54,135.6 55.4,133.4 55.6,131 H64.4 C64.6,133.4 66,135.6 70,136.6 C78,138.6 85,141 85,146 Z" fill="url(#cb${id})" stroke="${ink}" stroke-width="0.6"/>
+      <path d="M40,143 c2,-3 6,-3 7,-0.6 c0.6,1.4 -1.4,2 -2,0.8 M80,143 c-2,-3 -6,-3 -7,-0.6 c-0.6,1.4 1.4,2 2,0.8 M54,140.4 c2,-1.6 4,-1.6 6,0 c2,-1.6 4,-1.6 6,0" fill="none" stroke="${deep}" stroke-width="0.6"/>
+      ${bead(145.6, 36, 84, 0.62, 1.6)}
+      <rect x="56" y="120" width="8" height="11" fill="url(#cb${id})" stroke="${ink}" stroke-width="0.5"/>
+      <ellipse cx="60" cy="125.4" rx="6.4" ry="2.8" fill="url(#ct${id})" stroke="${ink}" stroke-width="0.5"/>
+      ${bead(125.4, 54.4, 65.6, 0.5, 1.4)}
+      <path d="${bowl}" fill="url(#cb${id})" stroke="${ink}" stroke-width="0.7"/>
+      <clipPath id="bw${id}"><path d="${bowl}"/></clipPath>
+      <g clip-path="url(#bw${id})">${chase}<path d="M30,90 C50,92.6 70,92.6 90,90" fill="none" stroke="url(#ct${id})" stroke-width="1.3"/>${bead(89.8, 40.6, 79.4, 0.5, 1.5)}</g>
+      ${cart}${crest}${marks}
+      <ellipse cx="60" cy="50" rx="26" ry="2.8" fill="${cover === 'on' ? deep : '#1c1f22'}" stroke="url(#ct${id})" stroke-width="1.4"/>
+      ${cover === 'on' ? '' : pour(o.gems, houses, 50, 22)}${lidAt}</g></g></svg>`;
+  }
+  // the stand-in of Q22's sheets, kept so those sheets still draw as sent: cup({ form: 'stand-in' })
+  function standIn(o) {
     const id = o.id || 'c' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'], plain = o.plain;
     const body = 'M30,20 H90 C90,62 78,82 64,88 V104 C64,110 76,112 80,118 H40 C44,112 56,110 56,104 V88 C42,82 30,62 30,20 Z';
     const handles = 'M30,28 C14,28 12,56 34,62 M90,28 C106,28 108,56 86,62';
@@ -392,7 +480,7 @@
 
   // the year's gems poured into the cup at the leaving feast (Magic's against the year, req 233), heaped in its mouth,
   // each in its earner's house, as many as the year's points give, up to a brimming mound
-  function pour(gems, houses) {
+  function pour(gems, houses, y = 20, hw = 27) {
     if (!gems || !gems.length) return '';
     const total = gems.reduce((t, x) => t + (x.back ? 0 : x.points), 0), k = Math.max(12, Math.min(140, Math.round(total / 6)));
     const cum = []; let c = 0; for (const g of gems) if (!g.back) { cum.push([c + g.points, g.house || houses[0]]); c += g.points; }
@@ -400,7 +488,7 @@
     for (let i = 0; i < k; i++) {
       const v = (i + 0.5) / k * total; while (j < cum.length - 1 && v >= cum[j][0]) j++;
       const u = R() * 2 - 1, h = 9 * Math.pow(1 - Math.abs(u), 0.7) * Math.min(1, k / 80);
-      s += stone(60 + u * 27, 20 - R() * h, 1.7 * (0.8 + 0.4 * R()), cum[j][1], R);
+      s += stone(60 + u * hw, y - R() * h, 1.7 * (0.8 + 0.4 * R()), cum[j][1], R);
     }
     return s;
   }
