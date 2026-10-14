@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 15,
+  "version": 16,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -248,6 +248,9 @@ window.CASTLE_MODEL = {
       "view": "the lake, the mountains", "state": "built", "cite": "" },
     { "id": "dorm-W3", "kind": "window", "room": "dormitory", "bearing": 87.2, "w": 0.6, "sill": 1.1, "h": 1.9,
       "view": "the lawn, the castle's shadow", "state": "built", "cite": "PoA 15" },
+    { "id": "dorm-door", "kind": "door, panelled, the year's sign on its stair side", "between": ["dormitory", "tower-stair"], "group": "gryffindor-suite", "at": [3.579, -2.244], "w": 0.8, "h": 2.0,
+      "state": "designed", "about": "the dormitory's door at the stair head (Godric's 1 on dormitory-sign-door-1013, 13 October 2026, 1.51 to 1.55 pm, req 260's t1; the Architect's ledger line 5, req 296): in the kerb's gap of the screen round the newel (dorm-stair-screen), across the gap's 1.30 m chord, 0.65 m from the newel's centre toward the room's (bearing 122.1), its face to the room, the year's sign on its stair side; the dormitory page's newel (4.67, -1.4) through the room's frame is the stair's newel here. His t1: on Christmas morning the twins fling it open and bound in (PS 12)",
+      "cite": "CoS 5, PS 12" },
     { "id": "front-doors", "kind": "the great oak front doors, two leaves", "between": ["entrance-hall", "grounds"], "at": [80, 70],
       "w": 4.0, "h": 6.0, "state": "books", "about": "at the top of a flight of stone steps, facing the marble staircase; their size ours",
       "cite": "PS 6, PS 7, CoS 15, GoF 12" },
@@ -292,13 +295,16 @@ window.CASTLE_MODEL = {
     {"id": "hourglass-niche-ravenclaw", "room": "entrance-hall", "kind": "round-headed niche, the Ravenclaw hourglass", "at": [68, 55.29], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
     {"id": "hourglass-niche-slytherin", "room": "entrance-hall", "kind": "round-headed niche, the Slytherin hourglass", "at": [68, 56.97], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
     { "id": "upturned-bucket", "room": "hall-cupboard", "kind": "a bucket always upturned among the buckets and mops, just right to sit on", "at": [67.0, 63.6], "w": 0.3, "h": 0.35,
-      "state": "designed", "about": "Godric's t1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm): \"Hermione sat down on an upturned bucket\"", "cite": "PoA 21" }
+      "state": "designed", "about": "Godric's t1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm): \"Hermione sat down on an upturned bucket\"", "cite": "PoA 21" },
+    { "id": "dorm-stair-screen", "room": "dormitory", "group": "gryffindor-suite", "kind": "panelled screen round the stair head, three quarters of a circle, the door in its gap", "centre": [4.13, -2.59], "r": 0.92, "h": 2.15, "arc": 270, "gap_bearing": 122.1,
+      "state": "designed", "about": "Godric's 1 on dormitory-sign-door-1013 (13 October 2026, 1.51 to 1.55 pm; the Architect's ledger line 5, req 296): on the kerb's line, 0.92 m from the newel's centre, 2.15 m high, its quarter gap toward the room's centre (gap_bearing, the bearing of the gap's middle about the room's centre) and holding dorm-door; the bed at 53 right stays 0.19 m clear (the Dormitory's mock, tools/dormitory-sign-mock.js); the stair head is no longer open",
+      "cite": "CoS 5" }
   ],
   "stairs": [
     { "id": "tower-stair", "kind": "open newel stair", "rooms": ["common-room", "dormitory"], "newel": [4.13, -2.59], "r": 0.7,
       "from": 0, "to": 27.8, "treads": 139, "rise": 0.2, "hand": "clockwise up, seen from above", "state": "built", "cite": "PS 7",
       "drawn_to": 5.6, "drawn_treads": 28,
-      "about": "Godric's Q68, 68.1 (12 October 2026, 6.51 pm; req 191, 201): the common room draws 28, since no view shows it above 5.37 m. Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): the stair climbs on unseen past six doors, a room a level (PoA 13, \"Doors opened behind them\"), walled in below the top, to the built room's floor at 27.8 m; the dormitory page's open stair head is the top's" },
+      "about": "Godric's Q68, 68.1 (12 October 2026, 6.51 pm; req 191, 201): the common room draws 28, since no view shows it above 5.37 m. Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): the stair climbs on unseen past six doors, a room a level (PoA 13, \"Doors opened behind them\"), walled in below the top, to the built room's floor at 27.8 m; the dormitory page's stair head, once open, is closed by a screen round the newel and its door (dorm-stair-screen, dorm-door; Godric's 1 on dormitory-sign-door-1013, ledger line 5)" },
     { "id": "corridor-flight", "kind": "straight flight down", "room": "corridor", "span": [[-1.5, 20.11], [1.5, 23.41]],
       "from": 0, "to": -1.98, "treads": 11, "rise": 0.18, "state": "built" },
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
