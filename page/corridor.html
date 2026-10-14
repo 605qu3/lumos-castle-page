@@ -1654,6 +1654,7 @@ function updateGrounds(dt) {
   updateSky(dt);
   updateNight(dt);
   updateNorris(dt);
+  updateNorrisDoor(dt);
   if (!grounds.canvas) return;
   var here = atStop && atStop.name === 'window';
   if (here && grounds.last !== atStop) {
@@ -2505,7 +2506,7 @@ function updateNorris(dt) {
     if (k > NORRIS.hold + 0.2) { norris.t = -1; norris.group.visible = false; }
     return;
   }
-  if (nightK() < 1 && !norris.look) { norris.next = 0; return; }
+  if ((nightK() < 1 && !norris.look) || norrisSits()) { norris.next = 0; return; }   /* not two of her at once */
   if (!norris.next) {
     if (norris.tried && !norris.look) return;            /* once a visit */
     norris.tried = true;
@@ -2517,6 +2518,57 @@ function updateNorris(dt) {
   if (camera.position.distanceTo(p) < 5 || Math.abs(q.x) > 0.9 || Math.abs(q.y) > 0.9 || q.z > 1) { norris.next = t + 3; return; }
   norris.group.position.copy(p); norris.group.lookAt(camera.position); norris.group.visible = true; norris.t = 0;
   norris.next = norris.look ? t + 5 : 0;
+}
+/* Mrs Norris before the broom cupboard (Godric's t1 on corridor-cupboard-place-1013, 6.53 pm; "Mrs. Norris turned her
+   lamplike eyes on them", PS 16, and "she patrolled the corridors alone", PS 8): some evenings by the date she sits in
+   front of the cupboard door, only her eyes as ever, low on the floor, watching him, a blink now and then; while she
+   sits the cupboard's stop lowers its view to the floor so she shows in it. When he walks away from that stop her eyes
+   slide off along the floor toward the fireside nook and fade, gone for the visit. Evening or night only, about one
+   evening in three; ?norris=cupboard puts her there whatever the date or the hour */
+var NORRIS_DOOR = { chance: 0.34, r: 0.032, gap: 0.06, out: 0.32, slink: 2.2,
+                    path: [[CUPBOARD.x, -0.32], [NOOK_X0 - 0.2, -0.32], [NOOK_X0 - 0.55, 0.45]] };   /* x, and z off her wall */
+var norrisDoor = { q: groundsQ.get('norris') === 'cupboard', group: new THREE.Group(), state: 'away', k: 0, a: 0, seen: false, blink: 2.5 };
+if (norrisDoor.q) norris.look = false;   /* the forced look is hers alone, not the end's glints */
+(function () {
+  var map = norris.group.children[0].material.map;
+  [-1, 1].forEach(function (side) {
+    var e = new THREE.Sprite(new THREE.SpriteMaterial({ map: map, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    e.scale.set(NORRIS_DOOR.r * 2, NORRIS_DOOR.r * 2, 1); e.position.x = side * NORRIS_DOOR.gap / 2; e.name = 'norris-door-eye';
+    norrisDoor.group.add(e);
+  });
+  norrisDoor.group.visible = false; norrisDoor.group.name = 'mrs-norris-cupboard'; scene.add(norrisDoor.group);
+})();
+function norrisDoorEvening() {
+  if (norrisDoor.q) return true;
+  return nightK() > 0 && dayRand(9) < NORRIS_DOOR.chance;
+}
+function norrisSits() { return norrisDoor.state === 'sits'; }
+function norrisDoorAt(u) {   /* u from 0 at the door to 1 in the nook's mouth, along the path's two legs */
+  var p = NORRIS_DOOR.path, i = u < 0.5 ? 0 : 1, v = u < 0.5 ? u * 2 : u * 2 - 1;
+  return new THREE.Vector3(p[i][0] + (p[i + 1][0] - p[i][0]) * v, NORRIS.y, HER_Z + p[i][1] + (p[i + 1][1] - p[i][1]) * v);
+}
+function updateNorrisDoor(dt) {
+  var g = norrisDoor.group, here = atStop && atStop.name === 'cupboard';
+  if (norrisDoor.state === 'away') {
+    if (norrisDoor.k === 0 && norrisDoorEvening()) { norrisDoor.state = 'sits'; norrisDoor.k = 1; g.position.copy(norrisDoorAt(0)); }
+    else return;
+  }
+  if (norrisDoor.state === 'sits') {
+    norrisDoor.a = Math.min(1, norrisDoor.a + dt * 2);
+    if (here) norrisDoor.seen = true;
+    else if (norrisDoor.seen) { norrisDoor.state = 'slinks'; norrisDoor.k = -0.3; }   /* she waits till he has turned away */
+  } else if (norrisDoor.state === 'slinks') {
+    norrisDoor.k += dt / NORRIS_DOOR.slink;
+    var u = Math.max(0, norrisDoor.k);
+    g.position.copy(norrisDoorAt(Math.min(1, u * u * (3 - 2 * u))));
+    norrisDoor.a = u < 0.55 ? 1 : Math.max(0, 1 - (u - 0.55) / 0.45);
+    if (u >= 1) { norrisDoor.state = 'gone'; g.visible = false; return; }
+  } else return;
+  norrisDoor.blink -= dt;
+  var shut = norrisDoor.blink < 0;
+  if (norrisDoor.blink < -0.13) norrisDoor.blink = 2.5 + Math.random() * 3.5;
+  g.lookAt(camera.position); g.visible = true;
+  g.children.forEach(function (e) { e.material.opacity = shut ? 0 : norrisDoor.a; });
 }
 function hagridHome() { return dayRand(6) < 0.67; }   /* about two nights in three his window is lit */
 function makeNightView() {
@@ -2697,7 +2749,7 @@ var STOPS = [
   /* the polite door, on the long wall since the switch: from the far side, as for any thing on her wall */
   { name: 'door', meshes: [door], stop: function () { return stopFor({ position: new THREE.Vector3(DOOR.x, 0, HER_Z) }, DOOR.h, 1.2); } },
   /* the broom cupboard (ledger line 2): square to it from across the corridor, as the polite door */
-  { name: 'cupboard', meshes: [cupboardDoor], stop: function () { return stopFor({ position: new THREE.Vector3(CUPBOARD.x, 0, HER_Z) }, CUPBOARD.h, 1.15); } },
+  { name: 'cupboard', meshes: [cupboardDoor], stop: function () { return stopFor({ position: new THREE.Vector3(CUPBOARD.x, 0, HER_Z) }, CUPBOARD.h, norrisSits() ? 1.05 : 1.15); } },   /* lower while Mrs Norris sits before it, so she shows */
   /* the inglenook: from a hand off the far wall, square to the hearth, the settles either side */
   { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } },
   /* the landing at the flight's foot (req 59): reached by a tap on the flight, standing at its edge square to the end
@@ -3830,7 +3882,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { cupboard: { rattle: cupboardRattle, swing: cupboardSwing, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { cupboard: { rattle: cupboardRattle, swing: cupboardSwing, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
