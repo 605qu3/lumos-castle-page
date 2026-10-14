@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 17,
+  "version": 18,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -181,8 +181,8 @@ window.CASTLE_MODEL = {
     },
     {
       "id": "great-hall", "name": "the Great Hall", "level": "G",
-      "shape": { "rect": [15, 51.5, 65, 69.5] }, "map": "the meals",
-      "about": "through a doorway to the right on entering (PS 7); 50 by 18 m ours; rises through two storeys",
+      "shape": { "rect": [15, 51.5, 65, 69.5] }, "floor": 0, "ceiling": 15.6, "map": "the meals",
+      "about": "through a doorway to the right on entering (PS 7); 50 by 18 m ours; rises through three storeys to 15.6, nothing on the first or second floor over it (Godric's 15.1 on architect-q15-hall-1013, 13 October 2026, 9.07 pm; sheet architect-look-1013-2059; ledger line 12), with his t1: from the doors the first look up shows the ceiling bewitched to look like the sky outside, the floating candles hanging well below it, so the sky reads far away (PS 7)",
       "state": "books", "cite": "PS 7, OotP 11"
     },
     {
