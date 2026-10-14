@@ -2765,7 +2765,7 @@ function updateNight(dt) {
    stage: the far wall cut away, the camera outside it facing her wall square on; a drag slides along it. */
 var EYE = 1.35;
 var VIEWS = {
-  length: { pos: new THREE.Vector3(-11.0, EYE, MID_Z), yawMax: 0.45, pitchMax: 0.12, turnBand: 0.35, turnTilt: 12, turnGain: 2.5 },
+  length: { pos: new THREE.Vector3(-11.0, EYE, MID_Z), yawMax: 0.45, pitchMax: 1.0, turnBand: 0.35, turnTilt: 12, turnGain: 2.5 },
   stage: { z: FAR_Z - 3.4, xMin: -10.0, xMax: -0.2, x0: -1.6 }
 };
 var view = /[?&]view=stage/.test(location.search) ? 'stage' : 'length';
@@ -3255,6 +3255,14 @@ function setFov(f) {
 
 /* drag versus tap */
 var dragging = false, moved = false, sx = 0, sy = 0, px = 0, py = 0;
+/* the look up and down (req 303; the Architect's docs/architect/vertical-views.md, the corridor's rows): -45 to +45 down
+   the length and at every stop (pitchMax and STOP_PITCH as slopes, 1.0), Mrs Norris on the flags in view at the down
+   limit and the frames and the vault at the up; at the landing on the moving stair's own days -65 to +55, the flight
+   below in the well and the well above. A drag moves the look by angle, 0.003 rad a pixel as the turn does (the common
+   room's lookDrag, req 302), so the limits are a thumb's reach; slope in, slope out, a drag down looks down */
+var STOP_PITCH = { down: 1.0, up: 1.0 }, LANDING_PITCH = { down: Math.tan(65 * Math.PI / 180), up: Math.tan(55 * Math.PI / 180) };
+function pitchLimit() { return atStop && atStop.name === 'landing' && footShown === 'window' ? LANDING_PITCH : STOP_PITCH; }
+function lookDrag(slope, dy, lo, hi) { return clamp(Math.tan(Math.atan(slope) - dy * 0.003), lo, hi); }
 canvas.addEventListener('pointerdown', function (e) {
   dragging = true; moved = false;
   sx = px = e.clientX; sy = py = e.clientY;
@@ -3273,12 +3281,14 @@ canvas.addEventListener('pointermove', function (e) {
        req 150; it turned the other way until 12 October 2026) */
     var L = VIEWS.length, step = dx * 0.003 * (Math.abs(yawT) > L.yawMax ? L.turnGain : 1);
     yawT = clamp(yawT + step, -Math.PI - L.turnBand, Math.PI + L.turnBand);
-    pitchT = clamp(pitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
+    pitchT = lookDrag(pitchT, dy, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
   } else if (mode === 'stop' && !tween && stopPose && !leaving && !herOpening) {
     /* at a stop the same drag turns his head from where he stands (req 208), the same way and feel as at rest */
     var lim = headLimit();
     headYawT = clamp(headYawT + dx * 0.003, -lim, lim);
-    headPitchT = clamp(headPitchT - dy * 0.0012, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
+    /* up and down about the stop's own look, its slope added to the head's, held within the stand's limits */
+    var base = (stopPose.look.y - stopPose.pos.y) / Math.max(0.1, Math.hypot(stopPose.look.x - stopPose.pos.x, stopPose.look.z - stopPose.pos.z)), pl = pitchLimit();
+    headPitchT = lookDrag(base + headPitchT, dy, -pl.down, pl.up) - base;
   }
 });
 function endDrag(e) {
