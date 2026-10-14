@@ -1,0 +1,163 @@
+{
+  "chain": "mirror",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date >= 12-20",
+        "date <= 12-27"
+      ],
+      "show": [
+        "a tall mirror propped against the far wall, as high as the ceiling, in an ornate gold frame on two clawed feet, words carved round its top"
+      ],
+      "canon": "Interiors' req 384 (Fawkes agreeing, 3.02 am, 1, provisional, Godric to confirm; desk events-mirror-nights-1014): PS 12 L4260 to L4262, propped against the wall facing him \"as if someone had just put it there\", as high as the ceiling, gold, two clawed feet, the inscription round the top; there through the Christmas holidays, 12-20 to 12-27, by day and night (ours: Magic's Mirror thread wants it by day first), in the year he reads the Stone; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date >= 12-28"
+      ],
+      "show": [
+        "the far wall bare, two pale scrapes on the floor where a heavy thing on two feet once stood"
+      ],
+      "canon": "Interiors' req 384: PS 12 L4424, \"The Mirror will be moved to a new home tomorrow\", so from 12-28 the far wall is bare; the scrapes ours, a lasting trace kept in every later book's year; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date <= 06-30"
+      ],
+      "show": [
+        "the far wall bare, two pale scrapes on the floor where a heavy thing on two feet once stood"
+      ],
+      "canon": "as above, the spring after"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading >= 2"
+      ],
+      "show": [
+        "the far wall bare, two pale scrapes on the floor where a heavy thing on two feet once stood"
+      ],
+      "canon": "as above, in every later book's year"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date >= 12-25",
+        "date <= 12-27",
+        "time = night"
+      ],
+      "show": [
+        "the door standing ajar on the dark corridor"
+      ],
+      "canon": "Interiors' req 384: PS 12 L4258, \"A door stood ajar to his left\", Christmas night (L4226 to L4234, the cloak that night); kept so the next two nights, when he comes back (ours); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-27",
+        "time = night"
+      ],
+      "show": [
+        "Albus Dumbledore sitting on one of the desks by the wall, so still he is easy to walk straight past"
+      ],
+      "canon": "Interiors' req 384: PS 12 L4388 to L4396, that third night, \"Sitting on one of the desks by the wall was none other than Albus Dumbledore. Harry must have walked straight past him\"; checked against the text, 14 October 2026"
+    }
+  ],
+  "records": [
+    {
+      "id": "mirror.norris",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 6-20 s",
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-26",
+        "time = night",
+        "norris_eyes != done"
+      ],
+      "show": [
+        "a pair of luminous eyes comes round the door and stares into the room for what seems an age; then Mrs Norris turns and goes"
+      ],
+      "starts": [
+        "set norris_eyes = done"
+      ],
+      "canon": "Interiors' req 384: PS 12 L4356, the second night, \"the luminous eyes of Mrs. Norris came round the door\", \"After what seemed an age, she turned and left\"; once ever; checked against the text, 14 October 2026"
+    },
+    {
+      "id": "mirror.back-again",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-27",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "dumbledore",
+          "role": "voice",
+          "name": "dumbledore",
+          "mark": "on the desk by the wall"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "dumbledore",
+          "medium": "said",
+          "key": "mirror.back-again",
+          "text": [
+            "So, back again?"
+          ],
+          "canon": "PS 12 L4394, \"So — back again, Harry?\", his name left off, the boy not Harry; from behind him as he comes in, before he sees who; checked against the text, 14 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "mirror.socks",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "tap dumbledore",
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-27",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "dumbledore",
+          "role": "voice",
+          "name": "dumbledore",
+          "mark": "on the desk by the wall"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "dumbledore",
+          "medium": "said",
+          "key": "mirror.socks",
+          "on_tap": true,
+          "text": [
+            "I? I see myself holding a pair of thick, woolen socks."
+          ],
+          "canon": "PS 12 L4434, word for word, what he sees in the Mirror; the given point's socks (PS 12 L4438, req 298) answered; checked against the text, 14 October 2026"
+        }
+      ]
+    }
+  ]
+}
