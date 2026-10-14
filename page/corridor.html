@@ -2570,7 +2570,13 @@ function updateNorrisDoor(dt) {
   g.lookAt(camera.position); g.visible = true;
   g.children.forEach(function (e) { e.material.opacity = shut ? 0 : norrisDoor.a; });
 }
-function hagridHome() { return dayRand(6) < 0.67; }   /* about two nights in three his window is lit */
+function hagridHome() { return groundsQ.has('hutLight') || dayRand(6) < 0.67; }   /* about two nights in three his window is lit; ?hutLight, every night */
+/* his light comes on (req 249's t1, Godric's, 13 October 2026, the desk's words: "on a night visit, the hut's window is
+   dark, as in OotP 13 ('There was still no light in Hagrid's cabin'), and some nights a light comes on in it"): on a
+   lit night the window is dark when he first reaches the grounds' window's stop, and a few seconds on the light fades up
+   behind the glass and the thread of smoke starts from the chimney; once on, it stays on for the visit */
+var HUT = { on: 0, delay: [3.5, 6], fade: 2.5 };
+function hutK() { return HUT.on && t > HUT.on ? Math.min(1, (t - HUT.on) / HUT.fade) : 0; }
 function makeNightView() {
   var b = NIGHT.BOX;
   NIGHT.canvas = makeCanvas(b[2], b[3]); NIGHT.tex = tex(NIGHT.canvas);
@@ -2600,8 +2606,10 @@ function drawNightView(cold) {   /* cold: a frosty morning, the smoke only (Godr
   var g = NIGHT.canvas.getContext('2d'), b = NIGHT.BOX;
   g.clearRect(0, 0, b[2], b[3]);
   if (!cold && !hagridHome()) { NIGHT.tex.needsUpdate = true; return; }
+  var L = cold ? 1 : hutK(), since = cold ? 1e9 : t - HUT.on;
+  if (!L) { NIGHT.tex.needsUpdate = true; return; }
   if (!cold) {
-  var f = 0.85 + 0.15 * Math.sin(t * 7.1) * Math.sin(t * 3.3);   /* his fire flickers behind the glass */
+  var f = L * (0.85 + 0.15 * Math.sin(t * 7.1) * Math.sin(t * 3.3));   /* his fire flickers behind the glass, coming up as he lights it */
   g.save(); g.translate(-b[0], -b[1]);
   [NIGHT.WIN, NIGHT.GABLE].forEach(function (r, j) {             /* the glow round each window */
     var cx = (r[0] + r[2]) / 2, cy = (r[1] + r[3]) / 2, rad = (r[2] - r[0]) * (j ? 1.1 : 1.4);
@@ -2610,12 +2618,14 @@ function drawNightView(cold) {   /* cold: a frosty morning, the smoke only (Godr
     g.fillStyle = grd; g.fillRect(cx - rad, cy - rad, rad * 2, rad * 2);
   });
   g.restore();
-  g.globalAlpha = 0.75 + 0.25 * f; g.drawImage(NIGHT.panes, 0, 0); g.globalAlpha = 1;
+  g.globalAlpha = L * (0.75 + 0.25 * f / L); g.drawImage(NIGHT.panes, 0, 0); g.globalAlpha = 1;
   }
   /* the thread of smoke: soft puffs rising from the chimney, leaning with the day's wind and spreading as they climb */
   var c = NIGHT.CHIMNEY, wind = groundsWind();
   for (var n = 0; n < 14; n++) {
-    var a = (t * 0.12 + n / 14) % 1, y = c[1] - b[1] - a * 230, x = c[0] - b[0] + a * a * (40 + 160 * wind) + 4 * Math.sin(t * 0.9 + n);
+    var a = (t * 0.12 + n / 14) % 1;
+    if (a / 0.12 > since) continue;   /* only puffs made since his fire was lit, so the thread starts at the chimney */
+    var y = c[1] - b[1] - a * 230, x = c[0] - b[0] + a * a * (40 + 160 * wind) + 4 * Math.sin(t * 0.9 + n);
     g.fillStyle = 'rgba(150,158,172,' + (0.34 * (1 - a)).toFixed(3) + ')';
     g.beginPath(); g.arc(x, y, 3 + a * 16, 0, 7); g.fill();
   }
@@ -2653,6 +2663,7 @@ function updateNight(dt) {
   var k = nightK(), night = k >= 0.5;
   /* on a frosted morning a thread of smoke from his chimney too (Godric's touch on Q26, 7.39 am), his fire lit */
   var cold = !night && lightTime() === 'morning' && frostLevels().grounds > 0;
+  if (night && !cold && !HUT.on && atStop && atStop.name === 'window') HUT.on = t + HUT.delay[0] + Math.random() * (HUT.delay[1] - HUT.delay[0]);
   if (NIGHT.view && (night || cold) && atStop && atStop.name === 'window') drawNightView(cold);   /* the smoke moves only where it is seen */
   if (t < NIGHT.next) return;
   NIGHT.next = t + 2;
@@ -3887,7 +3898,7 @@ window.lumosGreybox = { cupboard: { rattle: cupboardRattle, swing: cupboardSwing
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
-  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing }; } }, events: castle, mapPlay: mapPlay, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; }, offerLock: lockOffered, firstCast: firstCast,
+  enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing, hut: +hutK().toFixed(2) }; } }, events: castle, mapPlay: mapPlay, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; }, offerLock: lockOffered, firstCast: firstCast,
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
   sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   /* her landing (req 178), for Charms' callable (req 163) and req 180: her card, her stop, the plinth and its back face */
