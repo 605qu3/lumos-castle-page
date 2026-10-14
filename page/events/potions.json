@@ -1,0 +1,127 @@
+{
+  "chain": "potions",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "weekday = friday",
+        "date >= 09-02",
+        "date <= 09-08",
+        "time = morning",
+        "neville_cauldron = done"
+      ],
+      "show": [
+        "on the right desk of the third row, a cauldron melted into a twisted blob, and a scorched trail across the stone floor where the potion seeped"
+      ],
+      "canon": "the Curator's req 377, item 12: PS 8 L2822 to L2824, Neville's first lesson, Seamus's cauldron melted \"into a twisted blob\", the potion burning holes in people's shoes; Neville and Seamus at the third row's right desk, Interiors' schedule; the first Friday of lessons (L2746), after he has seen it happen; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "weekday = friday",
+        "date >= 09-02",
+        "date <= 09-08",
+        "time = day"
+      ],
+      "show": [
+        "on the right desk of the third row, a cauldron melted into a twisted blob, and a scorched trail across the stone floor where the potion seeped"
+      ],
+      "canon": "as above, that afternoon, seen or not"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 2",
+        "weekday = thursday",
+        "date >= 12-08",
+        "date <= 12-14",
+        "time = day",
+        "potions_burst = done"
+      ],
+      "show": [
+        "Swelling Solution splashed over the desks and dripping down the walls round one burst cauldron"
+      ],
+      "canon": "the Curator's req 377, item 13: CoS 11 L10260 to L10272, Thursday afternoon's double Potions in the second week of December (L10250, L10254), Goyle's cauldron exploded by Fred's Filibuster firework, the whole class showered; after he has seen it, that afternoon and evening; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 2",
+        "weekday = thursday",
+        "date >= 12-08",
+        "date <= 12-14",
+        "time != morning",
+        "time != day"
+      ],
+      "show": [
+        "Swelling Solution splashed over the desks and dripping down the walls round one burst cauldron"
+      ],
+      "canon": "as above, that evening and night (dusk falls before five in December), seen or not"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 3",
+        "weekday = thursday",
+        "date >= 09-03",
+        "date <= 09-09",
+        "time = morning"
+      ],
+      "show": [
+        "two cauldrons side by side on the left desk of the third row, a heap of daisy roots cut all sizes beside one, a skinned Shrivelfig beside the other"
+      ],
+      "canon": "the Curator's req 377, item 14: PoA 7 L15695 to L15711 and on to L15807, the Shrinking Solution, Malfoy's cauldron set up beside Harry and Ron's, Ron cutting his roots, the Shrivelfig skinned; Thursday morning's double Potions the day of Lupin's first lesson (the staff room's wardrobe ends that Thursday, about 09-09, staff.json); checked against the text, 14 October 2026"
+    }
+  ],
+  "records": [
+    {
+      "id": "potions.neville-cauldron",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "weekday = friday",
+        "date >= 09-02",
+        "date <= 09-08",
+        "time = morning",
+        "neville_cauldron != done"
+      ],
+      "show": [
+        "clouds of acid green smoke and a loud hissing fill the dungeon from the third row's right desk; a cauldron there sags and melts, the potion seeps hissing across the stone floor, and all round the room people scramble up onto their stools"
+      ],
+      "starts": [
+        "set neville_cauldron = done"
+      ],
+      "canon": "PS 8 L2822, read; once ever, his first visit that Friday morning in the year he reads the Stone; checked against the text, 14 October 2026"
+    },
+    {
+      "id": "potions.filibuster",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = potions dungeon",
+        "reading = 2",
+        "weekday = thursday",
+        "date >= 12-08",
+        "date <= 12-14",
+        "time = day",
+        "potions_burst != done"
+      ],
+      "show": [
+        "a fizz and a sputter behind a cauldron, then a bang: one cauldron explodes, showering the room with Swelling Solution, and amid the shrieks somebody's nose begins to swell like a balloon"
+      ],
+      "starts": [
+        "set potions_burst = done"
+      ],
+      "canon": "CoS 11 L10264 to L10266, read; once ever, his first visit that Thursday afternoon in the year he reads the Chamber; checked against the text, 14 October 2026"
+    }
+  ]
+}
