@@ -710,6 +710,28 @@ function setHerCake(state, fan) {
   var q = new URLSearchParams(location.search);
   if (q.get('cake') || q.get('fan')) { cakeLook = true; setHerCake(q.get('cake'), q.get('fan')); }
 })();
+/* her frame while she hides in the map of Argyllshire (req 380, the page half of Events' req 356, stairhall.json;
+   provisional, Godric to confirm): 'her' (her front as it hangs), 'slashed' (Halloween night of that year, PoA 8) or
+   'cadogan' (Sir Cadogan and his fat grey pony keep it until that Sunday, PoA 9; his Christmas party the same, PoA 11).
+   Until each is drawn (a spend on his yes, req 397) her frame shows its grey card, so she is never in two places;
+   nothing on her front plays meanwhile, and the hole still swings for the password. Look switch ?frame=slashed|cadogan */
+var FRAME_CUE = { slashed: 'her canvas slashed, strips of it littering the floor and great chunks torn away, the frame empty',
+  cadogan: 'Sir Cadogan and his fat grey pony in her frame',
+  party: 'Sir Cadogan enjoying a Christmas party in her frame with a couple of monks and several previous headmasters' };
+var herFrame = { state: 'her', look: false, cards: {} };
+['slashed', 'cadogan'].forEach(function (id) {
+  var m = cutoutMesh(cutoutTexture(232, 282, '#b9a98c', drawFrame, id === 'slashed' ? 'slashed' : 'Sir Cadogan'), PORTRAIT_W, PORTRAIT_H);
+  m.position.z = 0.006; m.name = 'her-frame-' + id; m.visible = false; m.renderOrder = 4;
+  her.add(m); herFrame.cards[id] = m;
+});
+function setHerFrame(state) {
+  herFrame.state = state === 'slashed' || state === 'cadogan' ? state : 'her';
+  for (var id in herFrame.cards) herFrame.cards[id].visible = id === herFrame.state;
+}
+(function () {
+  var f = new URLSearchParams(location.search).get('frame');
+  if (f) { herFrame.look = true; setHerFrame(f); }
+})();
 function setHerArm(state) {   /* 'lap', 'reach', 'ear', 'wave' or 'waggle', as the test page's setArm */
   ['reach', 'ear', 'wave', 'waggle'].forEach(function (id) { herPatch[id].userData.on = id === state ? 1 : 0; });
 }
@@ -717,7 +739,7 @@ function updateHerPatches(dt) {
   for (var id in herPatch) {
     var m = herPatch[id], o = m.material.opacity, to = m.userData.on;
     o = to > o ? Math.min(to, o + dt * m.userData.rate) : Math.max(to, o - dt * m.userData.rate);
-    m.material.opacity = o; m.visible = o > 0.001 && !!m.material.map;
+    m.material.opacity = o; m.visible = o > 0.001 && !!m.material.map && herFrame.state === 'her';
     m.material.color.copy(her.material.color);   /* lit and tinted as she is */
   }
   if (herPrimp) {
@@ -3366,6 +3388,11 @@ function corridorDrawRoom(shown) {
     var fan = has(CAKE_CUE.fan) ? 'open' : 'shut';
     if (cs !== herCake.state || fan !== herCake.fan) setHerCake(cs, fan);
   }
+  /* her frame while she hides (req 380): the slashed canvas, or Sir Cadogan (his Christmas party drawn as he is) */
+  if (!herFrame.look) {
+    var fs = has(FRAME_CUE.slashed) ? 'slashed' : has(FRAME_CUE.cadogan) || has(FRAME_CUE.party) ? 'cadogan' : 'her';
+    if (fs !== herFrame.state) { setHerFrame(fs); console.info('[corridor] her frame: ' + fs); }
+  }
 }
 var SHEEP_CUE = { second: "the corridor tapestry's woven sheep standing in their second places",
   third: "the corridor tapestry's woven sheep standing in their third places",
@@ -4100,7 +4127,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
