@@ -1,0 +1,202 @@
+{
+  "chain": "booklist",
+  "room": [
+    {
+      "when": [
+        "booklist = waiting"
+      ],
+      "show": [
+        "the book list's letter propped against the ink bottle on the round table, sealed"
+      ],
+      "canon": "the Common room's req 379 and the room's half asked of Events (req 390; Q1 taken 3.26 am, propped against the ink bottle, provisional, Godric to confirm); Fawkes's t1 on events-reading-year-1014 (provisional, Godric to confirm): the books send it by owl in the summer (PS 3 L525, CoS 4 L7465), the common room's table is ours"
+    },
+    {
+      "when": [
+        "booklist = read"
+      ],
+      "show": [
+        "the book list lying open on the round table"
+      ],
+      "canon": "req 390: once read it lies open the rest of that visit, then is gone, taken up to the dormitory (ours, the Common room's proposal)"
+    }
+  ],
+  "records": [
+    {
+      "id": "booklist.comes-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "reading = 1",
+        "booklist_book != 1"
+      ],
+      "starts": [
+        "set booklist_book = 1",
+        "set booklist = waiting"
+      ]
+    },
+    {
+      "id": "booklist.comes-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "reading = 2",
+        "booklist_book != 2"
+      ],
+      "starts": [
+        "set booklist_book = 2",
+        "set booklist = waiting"
+      ]
+    },
+    {
+      "id": "booklist.comes-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "reading = 3",
+        "booklist_book != 3"
+      ],
+      "starts": [
+        "set booklist_book = 3",
+        "set booklist = waiting"
+      ]
+    },
+    {
+      "id": "booklist.opens-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap booklist seal",
+      "when": [
+        "place = common room",
+        "booklist = waiting",
+        "booklist_book = 1"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hogwarts",
+          "at": "booklist",
+          "key": "booklist.list-1",
+          "canon": "PS 5 L1249 to L1267, the course books in the text's order, titles and authors only; checked against the text, 14 October 2026",
+          "text": [
+            "COURSE BOOKS\nThe Standard Book of Spells (Grade 1) by Miranda Goshawk\nA History of Magic by Bathilda Bagshot\nMagical Theory by Adalbert Waffling\nA Beginners' Guide to Transfiguration by Emeric Switch\nOne Thousand Magical Herbs and Fungi by Phyllida Spore\nMagical Drafts and Potions by Arsenius Jigger\nFantastic Beasts and Where to Find Them by Newt Scamander\nThe Dark Forces: A Guide to Self-Protection by Quentin Trimble"
+          ]
+        }
+      ],
+      "starts": [
+        "set booklist = read",
+        "log \"Opened his first-year book list at the round table {day}\""
+      ]
+    },
+    {
+      "id": "booklist.opens-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap booklist seal",
+      "when": [
+        "place = common room",
+        "booklist = waiting",
+        "booklist_book = 2"
+      ],
+      "who": [
+        {
+          "as": "fred",
+          "role": "voice",
+          "name": "fred",
+          "mark": "room"
+        }
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hogwarts",
+          "at": "booklist",
+          "key": "booklist.list-2",
+          "canon": "CoS 4 L7469 to L7485, the Chamber's list word for word (L7479's \"43\" is this copy's page number, left out), the seven Lockhart titles in a row the letter's only joke (Fawkes and the Common room, 3.30 am); checked against the text, 14 October 2026",
+          "text": [
+            "SECOND-YEAR STUDENTS WILL REQUIRE:\nThe Standard Book of Spells, Grade 2 by Miranda Goshawk\nBreak with a Banshee by Gilderoy Lockhart\nGadding with Ghouls by Gilderoy Lockhart\nHolidays with Hags by Gilderoy Lockhart\nTravels with Trolls by Gilderoy Lockhart\nVoyages with Vampires by Gilderoy Lockhart\nWanderings with Werewolves by Gilderoy Lockhart\nYear with the Yeti by Gilderoy Lockhart"
+          ]
+        },
+        {
+          "speaker": "fred",
+          "medium": "said",
+          "key": "booklist.fred",
+          "canon": "CoS 4 L7489 to L7491, Fred peering over at Harry's list at the Burrow's table; a voice from behind as he reads it, the name left off (the Common room's put-back of Fawkes's t1, 3.29 am); checked against the text, 14 October 2026",
+          "text": [
+            "You've been told to get all Lockhart's books, too! The new Defense Against the Dark Arts teacher must be a fan. Bet it's a witch."
+          ]
+        }
+      ],
+      "starts": [
+        "set booklist = read",
+        "log \"Opened his second-year book list at the round table {day}\""
+      ]
+    },
+    {
+      "id": "booklist.opens-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap booklist seal",
+      "when": [
+        "place = common room",
+        "booklist = waiting",
+        "booklist_book = 3"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hogwarts",
+          "at": "booklist",
+          "key": "booklist.list-3",
+          "canon": "Prisoner of Azkaban prints no list: the heading ours, after the Chamber's; the four books the text names from his booklist that summer, PoA 4 L14258 (The Monster Book of Monsters, the set book for Care of Magical Creatures), L14276 (Unfogging the Future, by Cassandra Vablatsky), L14292 (Intermediate Transfiguration and The Standard Book of Spells, Grade Three); checked against the text, 14 October 2026",
+          "text": [
+            "THIRD-YEAR STUDENTS WILL REQUIRE:\nThe Standard Book of Spells, Grade Three\nIntermediate Transfiguration\nUnfogging the Future by Cassandra Vablatsky\nThe Monster Book of Monsters"
+          ]
+        }
+      ],
+      "starts": [
+        "set booklist = read",
+        "log \"Opened his third-year book list at the round table {day}\""
+      ]
+    },
+    {
+      "id": "booklist.none-yet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "reading >= 4",
+        "booklist = waiting"
+      ],
+      "starts": [
+        "set booklist = away"
+      ]
+    },
+    {
+      "id": "booklist.away",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "booklist = read"
+      ],
+      "starts": [
+        "set booklist = away"
+      ]
+    }
+  ]
+}
