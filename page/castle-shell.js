@@ -88,6 +88,12 @@ function onEdge(poly, p, tol) {
   return best && best.d < (tol || 1.2) ? best : null;
 }
 
+/* how far along edge i a point lies, held to the edge */
+function alongEdge(poly, i, p) {
+  var a = poly[i], b = poly[(i + 1) % poly.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+  return Math.max(0, Math.min(L, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L));
+}
+
 window.CastleShell = { build: function (F, M, placeId, o) {
   o = o || {};
   var P = findPlace(M, placeId);
@@ -180,7 +186,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var e = onEdge(Q.poly, pts[0], op.depth ? op.depth + 0.2 : null);
       if (!e) return;
       var s0, s1;
-      if (pts.length > 1) { var e2 = onEdge(Q.poly, pts[1]); s0 = Math.min(e.s, e2 ? e2.s : e.s); s1 = Math.max(e.s, e2 ? e2.s : e.s); }
+      /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
+         found on the next wall, its sill and head then running the length of this one */
+      if (pts.length > 1) { var s2 = alongEdge(Q.poly, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
       else { s0 = e.s - (op.w || 1) / 2; s1 = e.s + (op.w || 1) / 2; }
       var sill = op.sill || 0, h = Math.min(H, (op.h || 2.2) + sill);
       gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0 });
