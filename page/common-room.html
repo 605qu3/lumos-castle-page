@@ -754,7 +754,7 @@ var kit = window.castleFrame ? castleFrame({
   onAct: function (act) {
     if (act === 'shadows') setShadows(!shadowsOn);
     else if (act === 'tilt') toggleTilt();
-    else if (act === 'reset') { yawT = 0; pitchT = 0; tiltBase = null; if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'den') denYawT = 0; else if (mode === 'list') returnList(); }
+    else if (act === 'reset') { yawT = 0; pitchT = 0; tiltBase = null; if (mode === 'hand') returnPaper(true); else if (mode === 'board') leaveBoard(); else if (mode === 'den') { denYawT = 0; denTiltT = DEN.tilt; } else if (mode === 'list') returnList(); }
   }
 }) : null;
 if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
@@ -6786,6 +6786,7 @@ function leaveKeyhole() {
    tap on it (off the keyhole) takes him in. */
 var DEN = { at: new THREE.Vector3(0, -40, 0), r: 2.25, wall: 0.4, hWall: 2.2, hTop: 3.6, doorW: 0.7, doorH: 2.0,
   eye: 1.35, stand: 1.0, crouch: 0.95, turn: 2.75, tilt: -0.85,   /* -0.85: her table's far side in view (req 184) */ face: -153 * Math.PI / 180,
+  down: -3.0, up: 3.58,   /* how far a drag tilts his look, -45 to +50 degrees: her note on the low table below, the beams meeting above (req 302; docs/architect/vertical-views.md, the den's row) */
   band: [0.95, 1.35], from: -115, to: 165,   /* the ring of slots (D1): degrees round from the far wall, + to his right */
   cards: 83,          /* a slot a card: the deck frogs in page/events/sofa.json's 82 and Hypatia's (req 185, Magic) */
   rare: { agrippa: -5, ptolemy: 5 },         /* their slots pencilled in faint grey across from the door (D1 t1) */
@@ -6900,7 +6901,7 @@ var denGlintM = denAdd(new THREE.Mesh(new THREE.PlaneGeometry(CARD_W * 1.5, CARD
 denGlintM.visible = false;
 var denScratch = makeCanvas(512, 716);
 var denState = { order: [], slots: [], key: null, count: -1, leaving: false, hold: 0, glintT: 0, painted: false, rise: -1, dustT: 0 };
-var denYaw = 0, denYawT = 0, denTilt = DEN.tilt, denBack = null;
+var denYaw = 0, denYawT = 0, denTilt = DEN.tilt, denTiltT = DEN.tilt, denBack = null;
 tappables.push(denDoorway);
 function denSlotDeg(i) { return DEN.from + (DEN.to - DEN.from) * (i + 0.5) / DEN.cards; }
 function denSlotNear(deg) { return Math.round((deg - DEN.from) / (DEN.to - DEN.from) * DEN.cards - 0.5); }
@@ -7070,7 +7071,7 @@ function goDen() {
       if (lineCur) lineCur.t = Math.min(lineCur.t, 0.35);
       var first = false;                               /* his first time in (Q64): no visit kept yet */
       try { first = localStorage.getItem(DEN.SEEN) == null; } catch (e) {}
-      denYaw = denYawT = 0; denTilt = first ? denNoteTilt() : DEN.tilt; denState.hold = 0; denState.rise = -1;
+      denYaw = denYawT = 0; denTiltT = DEN.tilt; denTilt = first ? denNoteTilt() : DEN.tilt; denState.hold = 0; denState.rise = -1;
       var p0 = new THREE.Vector3(0, DEN.crouch, DEN.r + DEN.wall * 0.5).add(DEN.at), l0 = new THREE.Vector3(0, DEN.crouch - 0.1, 0).add(DEN.at);
       var p1 = new THREE.Vector3(), l1 = new THREE.Vector3();
       denPoseAt(0, denTilt, p1, l1);
@@ -7116,7 +7117,7 @@ function denCamera(dt) {
     var r = (denState.rise += dt) - DEN.hold, k = clamp(r / DEN.rise, 0, 1);
     denTilt = denNoteTilt() + (DEN.tilt - denNoteTilt()) * k * k * (3 - 2 * k);
     if (r >= DEN.rise) { denState.rise = -1; denGlint(); }
-  } else denTilt = lerp(denTilt, denState.leaving ? -0.05 : DEN.tilt, s);
+  } else denTilt = lerp(denTilt, denState.leaving ? -0.05 : denTiltT, s);
   denPoseAt(denYaw, denTilt, camera.position, lookTmp); camera.lookAt(lookTmp);
 }
 var denWatchT = 0, denFlickerT = -1;
@@ -7892,6 +7893,9 @@ function tapDo(cx, cy) {
 
 /* drag versus tap */
 var dragging = false, moved = false, sx = 0, sy = 0, px = 0, py = 0;
+/* a drag up or down moves his look by angle, 0.003 rad a pixel as the stops' turn does, so the wide limits of req 302
+   (docs/architect/vertical-views.md) are a thumb's reach on any screen; slope in, slope out (a drag down looks down) */
+function lookDrag(slope, dy, lo, hi) { return clamp(Math.tan(Math.atan(slope) - dy * 0.003), lo, hi); }
 canvas.addEventListener('pointerdown', function (e) {
   dragging = true; moved = false;
   sx = px = e.clientX; sy = py = e.clientY;
@@ -7909,9 +7913,12 @@ canvas.addEventListener('pointermove', function (e) {
   }
   else if (headTurns()) {                            /* at a stop he turns his head where he stands (req 209) */
     HEAD.yawT = clamp(HEAD.yawT + dx * 0.003, -HEAD.left, HEAD.right);
-    HEAD.pitchT = clamp(HEAD.pitchT - dy * 0.0012, -HEAD.pitchMax, HEAD.pitchMax);
+    HEAD.pitchT = lookDrag(HEAD.pitchT, dy, -HEAD.pitchMax, HEAD.pitchMax);
   }
-  else if (mode === 'den' && !denState.leaving) denYawT = clamp(denYawT - dx * 0.005, -DEN.turn, DEN.turn);   /* he turns where he stands */
+  else if (mode === 'den' && !denState.leaving) {     /* he turns where he stands, and looks up and down once his first look has risen (req 302) */
+    denYawT = clamp(denYawT - dx * 0.005, -DEN.turn, DEN.turn);
+    if (denState.rise < 0) denTiltT = 3 * lookDrag(denTiltT / 3, dy, DEN.down / 3, DEN.up / 3);
+  }
   else if (mode === 'list') listDrag(dy);             /* the list scrolls under his finger */
 });
 function endDrag(e) {
@@ -7986,7 +7993,7 @@ function flicker(t) {
    the pose the walk set him down in, so he arrives square (§11) and a tap on any stop's thing he then sees walks him
    there (req 206). The wall's ends carry round the circle, so no turn looks out of the room. A drag a stop already uses
    keeps it (the candle's Lumos at the desk, a lock's Alohomora); the sofa's and the pair's turn to him hold. */
-var HEAD = { turn: 1.05, pitchMax: 0.12, yaw: 0, yawT: 0, pitch: 0, pitchT: 0, pos: null, look: null, mode: null, left: 0, right: 0 };
+var HEAD = { turn: 1.05, pitchMax: 1.0 /* -45 to +45 degrees (req 302; docs/architect/vertical-views.md, the common room's row) */, yaw: 0, yawT: 0, pitch: 0, pitchT: 0, pos: null, look: null, mode: null, left: 0, right: 0 };
 var HEAD_STOPS = ['desk', 'table', 'hole', 'sofa', 'case', 'board', 'fireside'];
 /* each stop its own limit where a turn would show a standing card side-on or only the dark (rad, left and right;
    shot 12 October 2026, 9.00 pm): from the desk the sofa goes flat past 0.75 left; from the sofa the stair goes to a
