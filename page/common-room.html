@@ -7923,7 +7923,7 @@ function tapDo(cx, cy) {
   var chessHit = mode === 'room' && castle && chessBoard.visible ? raycaster.intersectObjects(chessBoard.children, false)[0] : null;
   if (chessHit && (!hits.length || chessHit.distance <= hits[0].distance)) { castle.tap('rug-chess'); return back; }
   var as = mode === 'room' && castle ? figureTapped(hits) : null;
-  if (as) { castle.tap(as); return back; }
+  if (as) return figureTap(as) ? back : nothing;
   if (mode !== 'room' || !hit) return nothing;
   if (hit === homeFeather.mesh) homeFeatherTap();
   else if (hit === howler.mesh) { if (hb.on) return back; liftPaper(howler); }
@@ -8502,10 +8502,11 @@ var HEARD_FROM = {                             /* off-stage speakers, by name, t
   nick: LINE_PLACES['beyond the hole'], armour: LINE_PLACES['beyond the hole'], 'fat-lady': LINE_PLACES['beyond the hole']
 };
 var linesEl = document.getElementById('lines');
-var lineQ = [], lineCur = null, lineCast = [];
+var lineQ = [], lineCur = null, lineCast = [], tapHeardBy = {};   /* lines so far by speaker (figureTap) */
 /* in the den the room's lines are not heard (req 186, Events: the page holds them), but for Ron's swap-pile line */
 var DEN_LINES = ['sofa.card-again', 'sofa.card-again-houdini'];
 function showLines(list) {
+  for (var j = 0; j < list.length; j++) if (list[j].speaker) tapHeardBy[list[j].speaker] = (tapHeardBy[list[j].speaker] || 0) + 1;
   for (var i = 0; i < list.length; i++) if (!den.visible || DEN_LINES.indexOf(list[i].key) >= 0) lineQ.push(list[i]);
 }
 /* the runtime's cast, with every speaker whose words are still queued or showing kept standing */
@@ -8605,7 +8606,9 @@ function updateLines(dt) {
   }
 }
 /* a tap on a drawn figure raises its cast name (`as`), so a line waiting on a tap (the sleeper's mumbles) is said; the
-   sleeper lies low on his card, so only its lower part counts */
+   sleeper lies low on his card, so only its lower part counts. A tap counts on the figure's drawn pixels only, as the
+   scarf's wool does (Interaction's req 326, vocabulary §2: the chess players on the rug caught every tap on the armchair
+   behind them, over the card's clear part too) */
 function figureTapped(hits) {
   var near = hits.length ? hits[0].distance : Infinity;
   for (var i = 0; i < lineCast.length; i++) {
@@ -8614,9 +8617,22 @@ function figureTapped(hits) {
     var h = raycaster.intersectObject(m, false)[0];
     if (!h || h.distance > near) continue;
     if (FIGURE_SPOTS[f.cell].still && h.point.y > FIGURE_SPOTS[f.cell].y + 0.75) continue;
+    var P = poolSheet(f.cell), im = m.material.map && m.material.map.image;
+    if (im && im.width && h.uv) {
+      if (!P.alpha || P.alpha.im !== im) { P.alpha = alphaOf(im); P.alpha.im = im; }
+      if (!alphaSolid(P.alpha, h.uv)) continue;
+    }
     return f.as;
   }
   return null;
+}
+/* a tap on a sitter: told to the runtime, and true if it answered in the sitter's own voice; a sitter with nothing
+   waiting is never silent: the caller gives the mote (req 326, vocabulary §3; Events' req 327 gives the players words).
+   The page's first tap may bring a voice from the stair or a draught (touch.json), which is not his answer */
+function figureTap(as) {
+  var said = tapHeardBy[as] || 0;
+  castle.tap(as);
+  return (tapHeardBy[as] || 0) !== said;
 }
 
 /* ---------- the owl's post (board req 239, Events' req 216; page/events/points.json, points.owl and points.errol) ----------
