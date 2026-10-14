@@ -1,0 +1,70 @@
+{
+  "chain": "staff",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = staff room",
+        "reading = 1",
+        "weekday = friday",
+        "date >= 10-31",
+        "date <= 11-06",
+        "time != morning",
+        "time != day"
+      ],
+      "show": [
+        "a roll of bandages half unwound over the arm of the chair nearest the door, its loose end trailing to the floor"
+      ],
+      "canon": "the Curator's item 5 (req 364): the evening before the first Quidditch match, Filch handing Snape bandages for his leg, PS 11 L3749 to L3751; the match the first Saturday of November, so its eve the Friday from 10-31 to 11-06; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "reading = 2",
+        "date >= 04-24",
+        "date <= 05-29"
+      ],
+      "show": [
+        "a fresh sheet pinned over the older notices on the staff notice board: every lesson of the week and the teacher who walks each class to it"
+      ],
+      "canon": "the Curator's item 6 (req 364): from the day Hermione is found Petrified, students escorted to each lesson by a teacher, CoS 14 L11669 (the Hufflepuff match, a Saturday after Easter, about 04-24); down after the Chamber's night, 05-29, CoS 18, when the danger is over; checked against the text, 14 October 2026; the sheet's words are Magic's"
+    }
+  ],
+  "records": [
+    {
+      "id": "staff.wardrobe-wobble",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = staff room",
+        "reading = 3",
+        "date >= 09-01",
+        "date <= 09-09"
+      ],
+      "show": [
+        "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
+      ],
+      "canon": "Interiors' req 354, the orchestrator's t1 on interiors-staff-room-1014 (provisional, Godric to confirm): the Boggart in the wardrobe where the teachers keep their spare robes, PoA 7 L15903 to L15909; it moved in the afternoon before Lupin's first lesson, a Thursday in the second week of term (about 09-09), and that lesson ends it; so only in the year he reads Prisoner of Azkaban, from the first of September to that Thursday; checked against the text, 14 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wardrobe",
+      "when": [
+        "place = staff room",
+        "reading = 3",
+        "date >= 09-01",
+        "date <= 09-09"
+      ],
+      "show": [
+        "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
+      ],
+      "canon": "PoA 7 L15907, the now rattling doorknob; Interiors' req 354 asked whether it rattles: on his tap, so the thing he touches answers and nothing opens; checked against the text, 14 October 2026"
+    }
+  ]
+}

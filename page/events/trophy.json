@@ -1,0 +1,57 @@
+{
+  "chain": "trophy",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = trophy room",
+        "reading = 2",
+        "weekday = sunday",
+        "date >= 09-03",
+        "date <= 09-09",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "a faint silvery smear drying in one corner of T. M. Riddle's Special Award for Services to the School, where the slime was missed"
+      ],
+      "canon": "the Curator's req 343, item 8: Ron's detention polishing the trophy room's silver on the first Saturday of term, the slugs all over a Special Award, CoS 7 L8960 (\"took ages to get the slime off\", so only a smear missed), Riddle's, CoS 13 L11136; the Sunday morning after, in the year he reads the Chamber; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "reading = 3",
+        "weekday = saturday",
+        "date >= 12-12",
+        "date <= 12-18"
+      ],
+      "show": [
+        "a small silver cup lying on its side in one case, that case's glass door left ajar"
+      ],
+      "canon": "the Curator's req 343, item 9: on the last Hogsmeade Saturday before Christmas the Map shows Peeves bouncing around the trophy room, PoA 10 L17186; what he leaves is the Curator's; the Saturday before term ends, in the year he reads Prisoner of Azkaban; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "reading = 2",
+        "date >= 05-29",
+        "date <= 08-31"
+      ],
+      "show": [
+        "two new Special Awards for Services to the School, bright and unscratched, beside T. M. Riddle's"
+      ],
+      "canon": "the Curator's req 343, item 10: Dumbledore gives Harry and Ron Special Awards for Services to the School on the Chamber's night, CoS 18 L13097 (05-29, three days before the exams); from that night on, and in every later book's year; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "reading >= 3"
+      ],
+      "show": [
+        "two new Special Awards for Services to the School, bright and unscratched, beside T. M. Riddle's"
+      ],
+      "canon": "as above, every later year"
+    }
+  ],
+  "records": []
+}

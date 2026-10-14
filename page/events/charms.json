@@ -1,0 +1,153 @@
+{
+  "chain": "charms",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = charms classroom",
+        "date >= 12-05"
+      ],
+      "show": [
+        "shimmering lights along the cornice and across the window heads that turn out to be real, fluttering fairies"
+      ],
+      "canon": "Interiors' req 361: PoA 10 L17110, two weeks before the end of term Flitwick had already decorated his classroom with real fluttering fairies; every year, as a teacher's Christmas habit, from two weeks before term ends through the holidays; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "date <= 01-06"
+      ],
+      "show": [
+        "shimmering lights along the cornice and across the window heads that turn out to be real, fluttering fairies"
+      ],
+      "canon": "as above: the fairies stay through the holidays, down after Twelfth Night"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "reading = 1",
+        "date = 10-31",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "a feather on every pair's desk: Harry and Seamus's lying flat on the desktop, singed black at one end, and Hermione and Ron's hovering about four feet above their desk"
+      ],
+      "canon": "the Curator's req 366, item 5: the Halloween lesson, PS 10 L3506 to L3520, Seamus's feather set on fire and put out with Harry's hat, Hermione's hovering about four feet up; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "reading = 1",
+        "date >= 10-31"
+      ],
+      "show": [
+        "a small black scorch on Harry and Seamus's desktop where the feather burned"
+      ],
+      "canon": "the orchestrator's t1 on req 366 (provisional, Godric to confirm): from the Halloween lesson on, the scorch where Harry put the fire out with his hat stays, PS 10 L3508; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "reading = 1",
+        "date <= 08-31"
+      ],
+      "show": [
+        "a small black scorch on Harry and Seamus's desktop where the feather burned"
+      ],
+      "canon": "as above, January to the summer of that year"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "reading >= 2"
+      ],
+      "show": [
+        "a small black scorch on Harry and Seamus's desktop where the feather burned"
+      ],
+      "canon": "as above, and in every later year, the desk keeping it"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "reading = 1",
+        "date >= 06-01",
+        "date <= 06-07",
+        "day of week <= 5",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "a pineapple sitting on the front row's desk on the aisle's left, waiting for the next one called in"
+      ],
+      "canon": "Interiors' req 361: the practical exam, PS 16 L5460, Flitwick calling them in one by one to make a pineapple tapdance across a desk; the exams from the first of June (CoS 16, the runtime's feast day), the first week's school days; checked against the text, 14 October 2026"
+    }
+  ],
+  "records": [
+    {
+      "id": "charms.pineapple-dance",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = charms classroom",
+        "reading = 1",
+        "date >= 06-01",
+        "date <= 06-07",
+        "day of week <= 5",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "the pineapple on the front desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still"
+      ],
+      "canon": "PS 16 L5460, as the room rule; once while he waits each visit of the exam week"
+    },
+    {
+      "id": "charms.pineapple-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap pineapple",
+      "when": [
+        "place = charms classroom",
+        "reading = 1",
+        "date >= 06-01",
+        "date <= 06-07",
+        "day of week <= 5",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "the pineapple tapdances a few quick steps on the spot and stops still"
+      ],
+      "canon": "PS 16 L5460: a tap on the thing answers, as every tap does"
+    },
+    {
+      "id": "charms.roll-call",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = charms classroom",
+        "reading = 1",
+        "date >= 09-01",
+        "date <= 09-07",
+        "day of week <= 5",
+        "time != evening",
+        "time != night",
+        "flitwick_roll != done"
+      ],
+      "show": [
+        "Professor Flitwick, standing on his pile of books to see over his desk, takes the roll call; at Harry Potter's name he gives an excited squeak and topples out of sight behind the desk"
+      ],
+      "starts": [
+        "set flitwick_roll = done"
+      ],
+      "canon": "the orchestrator's t1 on interiors-charms-desks-1014 (provisional, Godric to confirm): PS 8 L2734, at the start of their first class; once ever, his first visit in the first week of lessons in the year he reads the Stone; checked against the text, 14 October 2026"
+    }
+  ]
+}

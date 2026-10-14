@@ -5,6 +5,7 @@
     "cake",
     "card",
     "cat",
+    "charms",
     "chess",
     "chessmen",
     "clementine",
@@ -16,6 +17,7 @@
     "grounds",
     "hall",
     "howler",
+    "library",
     "locks",
     "map",
     "neville",
@@ -30,11 +32,14 @@
     "post",
     "sheep",
     "sofa",
+    "staff",
     "stair",
     "torch",
     "touch",
     "trevor",
+    "trophy",
     "trunk",
-    "visitors"
+    "visitors",
+    "wing"
   ]
 }

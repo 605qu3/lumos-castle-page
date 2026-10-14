@@ -1,0 +1,139 @@
+{
+  "chain": "wing",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 1",
+        "date >= 06-05",
+        "date <= 06-30"
+      ],
+      "show": [
+        "a toilet seat propped against the wall beside Madam Pomfrey's office door, confiscated"
+      ],
+      "canon": "the Curator's req 347, the wing's item 9: the twins tried to send Harry a toilet seat and Madam Pomfrey confiscated it, PS 17 L6293; from the night of the Stone (the exams' last day, about 06-05 here) to the term's end, in the year he reads the Stone; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 1",
+        "date >= 06-08",
+        "date <= 06-30"
+      ],
+      "show": [
+        "a heap of sweets on Harry's bedside table, an open box of Bertie Bott's Every Flavor Beans on top"
+      ],
+      "canon": "Interiors' req 349, the Curator's 3: the sweets from his friends and admirers when he wakes three days after the Stone, Dumbledore trying a bean, PS 17 L6385; to the term's end; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 2",
+        "weekday = saturday",
+        "date >= 11-01",
+        "date <= 11-07",
+        "time != morning",
+        "time != day"
+      ],
+      "show": [
+        "a large bottle labelled Skele-Gro and a beaker on Harry's bedside table"
+      ],
+      "canon": "Interiors' req 349, the Curator's 5: the night after the first match, his arm's bones regrown, CoS 10 L10059 to L10063; the first Saturday of November, as the Stone's first match, the books giving no day; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 2",
+        "weekday = sunday",
+        "date >= 11-02",
+        "date <= 11-08",
+        "time = morning"
+      ],
+      "show": [
+        "a large bottle labelled Skele-Gro and a beaker on Harry's bedside table, and no water jug beside them, a few pieces of it swept under the bed"
+      ],
+      "canon": "as above, the Sunday morning; the jug is gone because Dobby cracked it over his own head in the night, CoS 10 L10117; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 3",
+        "weekday = saturday",
+        "date >= 11-01",
+        "date <= 11-07",
+        "time != morning"
+      ],
+      "show": [
+        "a dozen bits of splintered wood and twig heaped at the foot of Harry's bed, all that is left of his Nimbus Two Thousand"
+      ],
+      "canon": "the Curator's req 347, the wing's item 12: the broom tipped out of a bag onto his bed after the Hufflepuff match, PoA 9 L16979, the first match of that season, a Saturday after Halloween; that afternoon to his going on Monday; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 3",
+        "weekday = sunday",
+        "date >= 11-02",
+        "date <= 11-08"
+      ],
+      "show": [
+        "a dozen bits of splintered wood and twig heaped at the foot of Harry's bed, all that is left of his Nimbus Two Thousand",
+        "a homemade get-well card shut under the bowl of fruit on Harry's bedside table, and a bunch of earwiggy flowers like yellow cabbages beside it"
+      ],
+      "canon": "the Curator's req 347, the wing's items 10 and 11: Hagrid's earwiggy flowers and Ginny's card that sang shrilly unless kept shut under his bowl of fruit, PoA 10 L17000, the weekend he was kept in; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 3",
+        "weekday = monday",
+        "date >= 11-03",
+        "date <= 11-09",
+        "time = morning"
+      ],
+      "show": [
+        "a dozen bits of splintered wood and twig heaped at the foot of Harry's bed, all that is left of his Nimbus Two Thousand",
+        "a homemade get-well card shut under the bowl of fruit on Harry's bedside table, and a bunch of earwiggy flowers like yellow cabbages beside it"
+      ],
+      "canon": "as above, the Monday morning before he goes back, PoA 10"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 2",
+        "date >= 01-07",
+        "date <= 01-31"
+      ],
+      "show": [
+        "the corner of a get-well card poking out from under the pillow of Hermione's curtained bed, a flourish of a signature on it"
+      ],
+      "canon": "the Curator's req 347, the wing's item 11: Lockhart's card, which she sleeps with under her pillow, CoS 13 L11062 to L11072, seen one evening after the new term; she is out at the beginning of February; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 3",
+        "date = 06-06",
+        "time = night"
+      ],
+      "show": [
+        "an enormous block of chocolate on Harry's bedside table, broken into pieces, a small hammer beside it"
+      ],
+      "canon": "Interiors' req 349, the Curator's 4: Madam Pomfrey breaks the chocolate on his bedside table with a small hammer, PoA 21 L21137, the night of the sixth; to noon the next day, when they leave; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "reading = 3",
+        "date = 06-07",
+        "time = morning"
+      ],
+      "show": [
+        "an enormous block of chocolate on Harry's bedside table, broken into pieces, a small hammer beside it"
+      ],
+      "canon": "as above, the morning of 06-07"
+    }
+  ],
+  "records": []
+}

@@ -1,0 +1,44 @@
+{
+  "chain": "library",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = library",
+        "reading = 1",
+        "easter = yes",
+        "time != night"
+      ],
+      "show": [
+        "a pile of books about dragons slammed down on a table: Dragon Species of Great Britain and Ireland, From Egg to Inferno, A Dragon Keeper's Guide"
+      ],
+      "canon": "the Curator's req 347, library item 10: Hagrid looking up dragons in the library, Ron bringing the pile from his section and slamming it on the table, PS 14 L4778 to L4780, the Easter holidays; the fortnight round Easter in the year he reads the Stone; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = library",
+        "reading = 1",
+        "date = 12-25",
+        "time = night"
+      ],
+      "show": [
+        "a lamp lying on its side on the floor by the Restricted Section's bottom shelf, gone out"
+      ],
+      "canon": "the Curator's req 347, library item 11: Christmas night under the cloak, the lamp set down on the floor by the bottom shelf and knocked over as the book screamed, gone out at once, PS 12 L4246 to L4248; till the next morning; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = library",
+        "reading = 1",
+        "date = 12-26",
+        "time != day",
+        "time != evening"
+      ],
+      "show": [
+        "a lamp lying on its side on the floor by the Restricted Section's bottom shelf, gone out"
+      ],
+      "canon": "as above, the small hours and the morning of 12-26"
+    }
+  ],
+  "records": []
+}
