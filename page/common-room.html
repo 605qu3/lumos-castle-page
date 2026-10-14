@@ -6198,11 +6198,16 @@ function leaveSofa() {
 /* the first sheet (req 168; Godric's Q77, Try 2, 13 October 2026, 1.51 pm): sofa-finds-1, one row of four cells, each
    find in the state it was drawn in; a state not drawn yet shows the drawn one till its edit lands (Object persistence),
    and `<find>.<state>` names the drawn states for the runtime, so it can bring up only those */
-var FIND_SHEETS = { 'sofa-finds-1': { url: '../assets/layers/sofa-finds-1.png', cols: 4 } };
-var DRAWN = ['quill', 'dungbomb', 'drooble', 'sock', 'quill.goose', 'drooble.unopened', 'sock.striped'];
+/* a state drawn later as an edit of its passed cell is a sheet of one, named `<find>.<state>` in FIND_ART: the Drooble's
+   half unwrapped (Godric's t1 on Q77; drooble-half round 1, his Try 2, 13 October 2026, 9.50 pm), cut so the stick is as
+   long as the unopened one's */
+var FIND_SHEETS = { 'sofa-finds-1': { url: '../assets/layers/sofa-finds-1.png', cols: 4 },
+  'drooble-half': { url: '../assets/layers/drooble-half.png', cols: 1 } };
+var DRAWN = ['quill', 'dungbomb', 'drooble', 'sock', 'quill.goose', 'drooble.unopened', 'drooble.half', 'sock.striped'];
 var FIND_ART = {                      /* name: its sheet and cell as each lands; a card's by 'card-<name>' */
   quill: { sheet: 'sofa-finds-1', cell: 0 }, dungbomb: { sheet: 'sofa-finds-1', cell: 1 },
-  drooble: { sheet: 'sofa-finds-1', cell: 2 }, sock: { sheet: 'sofa-finds-1', cell: 3 }
+  drooble: { sheet: 'sofa-finds-1', cell: 2 }, sock: { sheet: 'sofa-finds-1', cell: 3 },
+  'drooble.half': { sheet: 'drooble-half', cell: 0 }
 };
 function findArt(name) {              /* the sheet's image once it has loaded, else null (asked for on first need) */
   var a = FIND_ART[name], sh = a && FIND_SHEETS[a.sheet];
@@ -6221,7 +6226,8 @@ function drawnNames() {
 }
 var FIND_RULES = {                    /* sofa.json's room rules, word for word */
   hand: 'the find in his hand, up close, as a notice is held',
-  bubble: "one bluebell bubble of Drooble's gum up by the ceiling, not popped yet"
+  bubble: "one bluebell bubble of Drooble's gum up by the ceiling, not popped yet",
+  stuck: "one bluebell bubble of Drooble's gum stuck to the sofa's arm, never popping"   /* asked of Events, req 310 */
 };
 var CARD_W = 0.063, CARD_H = 0.088, FIND_W = 0.1;
 var findCanvas = makeCanvas(512, 716), findTex = tex(findCanvas);
@@ -6286,6 +6292,7 @@ function findDrawRoom(shows) {
   findHand.shows = shows;
   findHand.want = shows.indexOf(FIND_RULES.hand) >= 0;
   bubble.want = shows.indexOf(FIND_RULES.bubble) >= 0;
+  stuck.want = shows.indexOf(FIND_RULES.stuck) >= 0 || STUCK.probe;
   if (!findHand.want) return;
   var v = findVars();
   var key = [v.find, v.find_state, v.card, v.card_side, v.card_face, v.houdini_lock].join('|');
@@ -6293,7 +6300,7 @@ function findDrawRoom(shows) {
   findHand.key = key;
   var card = v.find === 'card';
   findHand.w = card ? CARD_W : FIND_W; findHand.h = card ? CARD_H : FIND_W * 716 / 512;
-  var art = card ? null : findArt(v.find);
+  var art = card ? null : findArt(v.find + '.' + v.find_state) || findArt(v.find);
   if (art) drawFindArt(art); else drawFindStandIn(v);
   findTex.needsUpdate = true;
 }
@@ -6338,6 +6345,26 @@ scene.add(bubble);
 function updateBubble(t) {
   bubble.visible = bubble.want;
   if (bubble.visible) bubble.position.y = 4.6 + 0.03 * Math.sin(t * 0.6);
+}
+/* the bubble stuck to the sofa (Godric's t1 on Q77, placed with his Try 2, 13 October 2026, 9.50 pm: the Drooble's half
+   unwrapped, one bluebell bubble stuck to the sofa that never pops, PoA 10): the ceiling bubble's glass, smaller, sat on
+   the top of the sofa's left arm (u, v across the sofa's card from its middle); his t1 on common-drooble-pick-1013: a tap
+   bobs it a hand's width off the arm and it drifts back to the same spot, unpopped. Its cue is Events' (req 310); ?stuck
+   shows it for a probe */
+var STUCK = { u: -0.40, v: 0.255, r: 0.075, bob: 0, up: 0.1, probe: /[?&]stuck\b/.test(location.search) };
+var stuck = new THREE.Mesh(new THREE.SphereGeometry(STUCK.r, 20, 14), bubble.material);
+stuck.name = 'drooble-stuck'; stuck.visible = false; stuck.want = STUCK.probe;
+scene.add(stuck); tappables.push(stuck);
+var _sp = new THREE.Vector3();
+function stuckTap() { if (STUCK.bob <= 0) STUCK.bob = 1; }
+function updateStuck(dt) {
+  stuck.visible = stuck.want;
+  if (!stuck.visible) return;
+  var gp = sofa.geometry.parameters;
+  sofa.localToWorld(_sp.set(STUCK.u * gp.width, STUCK.v * gp.height, 0.04));
+  STUCK.bob = Math.max(0, STUCK.bob - dt / 1.8);
+  var lift = STUCK.bob > 0 ? STUCK.up * Math.sin(Math.PI * (1 - STUCK.bob)) : 0;   /* up and slowly back down in 1.8 s */
+  stuck.position.copy(_sp); stuck.position.y += STUCK.r * 0.8 + lift;
 }
 /* ---------- the bookcase and ladder's stop (Q36, 4: Godric 9.15 pm, the walk-ups in turn) ----------
    As the hole's: a tap on the bookcase or its ladder walks him up square to the wall, a boy's standing eye, framed on the
@@ -7797,6 +7824,7 @@ function tapDo(cx, cy) {
   }
   if (mode === 'list') { returnList(); return back; }
   if (hit && hit === findHand.mesh) return told;     /* `tap find`: its doing, or the card's next turn, at any stop */
+  if (hit && hit === stuck) { stuckTap(); return told; }   /* the stuck bubble bobs, wherever he stands */
   if (mode === 'board') {
     if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return told; }
     if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) { booksTap(); return told; }
@@ -8721,7 +8749,7 @@ function frame() {
   updatePairStop(dt);
   updateArmchair(dt, t);
   updateFindHand(dt, t);
-  updateBubble(slowT);
+  updateBubble(slowT); updateStuck(dt);
   updateLadder(dt);
   updateKeyDoor(dt);
   updateDen(dt);
@@ -8832,7 +8860,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, edges: function () { return { last: EDGE.last, at: EDGE.at, count: EDGE.count, cat: EDGE.catOn, gust: EDGE.paper ? +(EDGE.paper.gust || 0).toFixed(3) : 0, skipped: EDGE.skipped, where: EDGE.where, now: t }; }, edgeFire: function (key) { return edgeFire(key); }, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, edges: function () { return { last: EDGE.last, at: EDGE.at, count: EDGE.count, cat: EDGE.catOn, gust: EDGE.paper ? +(EDGE.paper.gust || 0).toFixed(3) : 0, skipped: EDGE.skipped, where: EDGE.where, now: t }; }, edgeFire: function (key) { return edgeFire(key); }, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, findRedraw: function () { var s = (findHand.shows || []).slice(); if (s.indexOf(FIND_RULES.hand) < 0) s.push(FIND_RULES.hand); findHand.key = ''; findDrawRoom(s); return findHand.key; }, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 window.lumosGreybox.howlerBurst = { state: howlerReport, at: howlerAt, ash: howlerAshAt, note: function () { var p = howlerNote.position.clone().project(camera); return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)]; } };   /* req 199's checks */
 /* req 238's checks: the glass's state, and a slip handed in as the runtime hands one (the owl's post queues it till the
    owl has landed), since the runtime keeps its owl's delivery to itself */
