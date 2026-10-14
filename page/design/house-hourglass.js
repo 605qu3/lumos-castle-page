@@ -34,7 +34,8 @@
 //            -24 -22 168 274 so the glass keeps its own coordinates
 //   full     the points that fill the bottom bulb (their own best year is the mark, Magic's 1; 1000 till one is set)
 //   falling  { house, n, slow, at } a shower in the air between the neck and the heap (OotP 38): n stones; slow, a
-//            brother taught (Magic's t2), the stones fewer and spaced, as if drifting; at 0..1, the moment in a live
+//            brother taught (Magic's t2) or a thing given him (req 298), the stones fewer and spaced, as if
+//            drifting; at 0..1, the moment in a live
 //            fall (mount() drives it), absent for a still
 //   rising   { house, n, at } a stone taken back, flying up from the heap through the neck (his t2)
 //   top      the top bulb: 'store' (default, the house's store, never lower), 'clear', or a fraction 0..1
@@ -42,7 +43,8 @@
 //   gems, the year's slips, poured into its mouth at the leaving feast (Magic's against the year, req 233).
 // LumosHourglass.mount(el, { slips, houses, full, niche, audio }) draws the glass into el and gives { set(slips),
 //   point(slip), back(slip) }: point is the runtime's opts.point (req 222), its stones falling as it lands, slower
-//   for a brother taught (kind 'taught'); back flies its stones up and clinks. audio: an AudioContext, else none.
+//   for a brother taught (kind 'taught') and for a thing given, which passed between the brothers (kind 'given',
+//   Magic's req 298, Events' req 385); back flies its stones up and clinks. audio: an AudioContext, else none.
 //   seen: how many slips the glass showed when he last looked (the room keeps it, and passes it at the first look
 //   of a new day); the slips after it land at once a beat after the glass is drawn, one heavy shower a house, so the
 //   glass has jumped (his t1). A slip taken back meanwhile is simply gone: nothing falls in the morning. Also jump(n).
@@ -347,7 +349,7 @@
     return {
       set(next) { slips = next.slice(); draw(); },
       point(sl) {
-        const house = own(sl), slow = sl.kind === 'taught';
+        const house = own(sl), slow = sl.kind === 'taught' || sl.kind === 'given';
         busy = busy.then(() => play(slow ? 3400 : 1700, at => shower({ house, n: stones(sl.points), slow, at }, topY())))
           .then(() => { slips.push(sl); draw(); });
         return busy;
