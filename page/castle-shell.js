@@ -58,8 +58,9 @@ function findPlace(M, id) {
   if (m && m.rect) {
     var fl = String(m.floors || 'G').split('-'), lo = levelZ(M, fl[0]), hi = levelZ(M, fl[fl.length - 1]) + (M.site.storey || 5.2);
     var b = m.rect;
+    /* a mass with its roof in the model (v20, the stair hall's: ledger line 15) rises to it, its flat part the ceiling */
     return { id: slug(m.id), name: m.id, kind: 'mass', poly: [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]]], floor: lo,
-      ceiling: m.court ? null : hi, wall: WALL_T, walls: null, rec: m };
+      ceiling: m.court ? null : m.roof ? m.roof.flat.z : hi, wall: WALL_T, walls: null, rec: m, roof: m.roof || null };
   }
   return null;
 }
@@ -76,7 +77,7 @@ function isWay(kind) { return /open mouth|archway|arch\b/.test(kind || ''); }
 function isDoor(kind) { return /door/.test(kind || '') && !isWay(kind); }
 
 /* the edge of a polygon a site point lies on (within a wall's thickness), and how far along it */
-function onEdge(poly, p) {
+function onEdge(poly, p, tol) {
   var best = null;
   for (var i = 0; i < poly.length; i++) {
     var a = poly[i], b = poly[(i + 1) % poly.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
@@ -84,7 +85,7 @@ function onEdge(poly, p) {
     if (s < -0.01 || s > L + 0.01) continue;
     if (!best || d < best.d) best = { i: i, s: s, d: d, L: L };
   }
-  return best && best.d < 1.2 ? best : null;
+  return best && best.d < (tol || 1.2) ? best : null;
 }
 
 window.CastleShell = { build: function (F, M, placeId, o) {
@@ -100,10 +101,59 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var mats = {};
   for (var k in GREY) mats[k] = F.solid(GREY[k]);
   mats.wall.side = THREE.DoubleSide;
+  mats.roof = F.solid(GREY.ceil); mats.roof.side = THREE.DoubleSide;
+  mats.glass = F.solid(0xc9d2d8); mats.glass.side = THREE.DoubleSide;     /* the lantern's lights, the palest grey */
   var out = { group: group, place: P, places: [P], doors: [], ways: [], stairs: [], flights: [], stands: [], toLocal: toLocal };
 
   function quad(w, h, mat, layer) { return F.register(new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat), LAYER[layer]); }
   function slab(w, h, d, mat, layer) { return F.register(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat), LAYER[layer]); }
+
+  /* a roof seen from below (v6, ledger line 15): its flat part a ceiling; its hip over roof.rect open beneath, the
+     planes cut round each lantern on the ridge (a feature in this place with a centre, r and ridge: well-lantern), whose
+     drum rises from the curb where the slopes meet it, glazed from its z to its top, under its cap */
+  function buildRoof(Q) {
+    var R = Q.roof, f = R.flat.rect, r = R.rect, x0 = r[0], y0 = r[1], x1 = r[2], y1 = r[3];
+    var fl = quad(f[2] - f[0], f[3] - f[1], mats.ceil, 'ceiling');
+    fl.rotation.x = Math.PI / 2; fl.position.copy(toLocal((f[0] + f[2]) / 2, (f[1] + f[3]) / 2, R.flat.z)); fl.name = Q.id + '-ceiling'; group.add(fl);
+    if (Math.abs(R.flat.z - R.eaves) > 0.02) {                          /* the step where the flat meets the hip's eaves */
+      var st = quad(x1 - x0, Math.abs(R.flat.z - R.eaves), mats.wall, 'wall');
+      st.position.copy(toLocal((x0 + x1) / 2, f[3], (R.flat.z + R.eaves) / 2)); st.name = Q.id + '-roof-step'; group.add(st);
+    }
+    var half = Math.min(x1 - x0, y1 - y0) / 2, pitch = (R.ridge - R.eaves) / half, alongY = y1 - y0 >= x1 - x0;
+    function h(X, Y) { return Math.min(R.ridge, R.eaves + pitch * Math.min(X - x0, x1 - X, Y - y0, y1 - Y)); }
+    var rx = (x0 + x1) / 2, ry = (y0 + y1) / 2, ra = alongY ? [[rx, y0 + half], [rx, y1 - half]] : [[x0 + half, ry], [x1 - half, ry]];
+    var lan = (M.features || []).filter(function (ft) { return ft.centre && ft.r && ft.ridge && (ft.room === Q.id || slug(ft.room) === Q.id); });
+    function arc(cx_, cy_, rr, a0, a1) { var p = []; for (var k = 0; k <= 24; k++) { var a = (a0 + (a1 - a0) * k / 24) * Math.PI / 180; p.push([cx_ + rr * Math.cos(a), cy_ + rr * Math.sin(a)]); } return p; }
+    var L0 = lan[0], pieces;
+    if (alongY) {
+      var cutW = L0 ? arc(L0.centre[0], L0.centre[1], L0.r, -90, -270) : [];
+      var cutE = L0 ? arc(L0.centre[0], L0.centre[1], L0.r, 90, -90) : [];
+      pieces = [[[x0, y0], ra[0]].concat(cutW, [ra[1], [x0, y1]]),
+                [[x1, y0], [x1, y1], ra[1]].concat(cutE, [ra[0]]),
+                [[x0, y0], [x1, y0], ra[0]], [[x1, y1], [x0, y1], ra[1]]];
+    } else {
+      pieces = [[[x0, y0], [x1, y0], ra[1], ra[0]], [[x1, y1], [x0, y1], ra[0], ra[1]], [[x0, y0], ra[0], [x0, y1]], [[x1, y0], [x1, y1], ra[1]]];
+    }
+    pieces.forEach(function (pts, i) {
+      var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]);
+      for (var k = 1; k < pts.length; k++) sh.lineTo(pts[k][0], pts[k][1]);
+      var geo = new THREE.ShapeGeometry(sh), pos = geo.attributes.position;
+      for (var k2 = 0; k2 < pos.count; k2++) { var X = pos.getX(k2), Y = pos.getY(k2), v = toLocal(X, Y, h(X, Y)); pos.setXYZ(k2, v.x, v.y, v.z); }
+      geo.computeVertexNormals();
+      var m = F.register(new THREE.Mesh(geo, mats.roof), LAYER.ceiling); m.name = Q.id + '-roof-' + i; group.add(m);
+    });
+    lan.forEach(function (L) {
+      var curb = R.ridge - L.r * pitch, c = L.centre;
+      function ring(z0_, z1_, mat, nm) {
+        var g = F.register(new THREE.Mesh(new THREE.CylinderGeometry(L.r, L.r, z1_ - z0_, 40, 1, true), mat), LAYER.wall);
+        g.position.copy(toLocal(c[0], c[1], (z0_ + z1_) / 2)); g.name = L.id + '-' + nm; group.add(g);
+      }
+      ring(curb, L.z, mats.wall, 'drum');
+      ring(L.z, L.top, mats.glass, 'glass');
+      var cap = F.register(new THREE.Mesh(new THREE.ConeGeometry(L.r + 0.2, L.ridge - L.top, 40), mats.roof), LAYER.ceiling);
+      cap.position.copy(toLocal(c[0], c[1], (L.top + L.ridge) / 2)); cap.name = L.id + '-cap'; group.add(cap);
+    });
+  }
 
   /* one place: floor, ceiling and its walls with their openings */
   function buildPlace(Q) {
@@ -113,7 +163,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var c = toLocal((x0 + x1) / 2, (y0 + y1) / 2, Q.floor);
     var floor = quad(x1 - x0, y1 - y0, mats.floor, 'floor');
     floor.rotation.x = -Math.PI / 2; floor.position.copy(c); floor.name = Q.id + '-floor'; group.add(floor);
-    if (Q.ceiling != null) {
+    if (Q.roof) buildRoof(Q);
+    else if (Q.ceiling != null) {
       var ceil = quad(x1 - x0, y1 - y0, mats.ceil, 'ceiling');
       ceil.rotation.x = Math.PI / 2; ceil.position.set(c.x, c.y + H, c.z); ceil.name = Q.id + '-ceiling'; group.add(ceil);
     }
@@ -125,13 +176,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var gid = op.group || null;
       var pts = op.span ? op.span.map(function (p) { return toSite(M, gid, p); }) : op.at ? [toSite(M, gid, op.at)] : null;
       if (!pts) return;
-      var e = onEdge(Q.poly, pts[0]);
+      /* a doorway with a depth (v6: the Great Hall's doors, a 3 m passage, Godric's Q16) is found from the far face too */
+      var e = onEdge(Q.poly, pts[0], op.depth ? op.depth + 0.2 : null);
       if (!e) return;
       var s0, s1;
       if (pts.length > 1) { var e2 = onEdge(Q.poly, pts[1]); s0 = Math.min(e.s, e2 ? e2.s : e.s); s1 = Math.max(e.s, e2 ? e2.s : e.s); }
       else { s0 = e.s - (op.w || 1) / 2; s1 = e.s + (op.w || 1) / 2; }
       var sill = op.sill || 0, h = Math.min(H, (op.h || 2.2) + sill);
-      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op });
+      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0 });
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
        part, its head round */
@@ -183,7 +235,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;
         if (isDoor(g.op.kind) && !out.doors.some(function (d) { return d.id === g.op.id; })) {
           var leaf = slab(w - 0.08, hh - 0.02, 0.12, mats.door, 'door');
-          leaf.position.set(mid.x + nx * t * 0.5, mid.y + g.sill + (hh - 0.02) / 2, mid.z - ny * t * 0.5);
+          var lo = g.far ? g.far - 0.1 : t * 0.5;                        /* a passage's leaves hang at its far face */
+          leaf.position.set(mid.x + nx * lo, mid.y + g.sill + (hh - 0.02) / 2, mid.z - ny * lo);
           leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
           /* its threshold through the wall (v4, req 284): the floor under a leaf that swings, else the void shows */
           var sl = slab(w, 0.02, t, mats.floor, 'floor'), sp = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
