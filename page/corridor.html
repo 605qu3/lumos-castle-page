@@ -1996,9 +1996,32 @@ cupboardDark.position.set(CUPBOARD.x, CUPBOARD.h / 2, HER_FACE - 0.001); cupboar
 cupboardDark.name = 'cupboard-dark'; cupboardDark.visible = false; scene.add(cupboardDark);
 var cupboard = { ang: 0, target: 0, rattle: 0, shut: 0 };
 /* locked: the handle rattles, the leaf shivers in its frame, and it stays shut */
-function cupboardRattle() {
+function cupboardRattle(why) {   /* why: openLock's kind words on a turn that missed, [what he sees, what to try] */
   cupboard.rattle = 0.6;
-  showLines([{ medium: 'heard', speaker: 'cupboard', sound: 'the handle rattles; locked' }]);
+  showLines([{ medium: 'heard', speaker: 'cupboard', sound: why ? 'the handle rattles; ' + why[0].toLowerCase() + '. ' + why[1] : 'the handle rattles; locked' }]);
+}
+/* Alohomora on it (req 282; Charms' *Req 282, delivered*; Magic's B18): once he has the spell, a tap on its ring handle
+   offers Charms' turn, his tap the book's tap; opened, it swings open on the dark; a turn that misses rattles it with
+   the turn's own words; stepping back leaves it be. Anywhere else on the leaf, or before he has the spell, the rattle */
+var CUPBOARD_LOCK_R = 0.2, cupLockV = new THREE.Vector3();
+function cupboardLockAt(uv) { return uv && Math.hypot((uv.x - CUPBOARD.lock.u) * CUPBOARD.w, (uv.y - CUPBOARD.lock.v) * CUPBOARD.h) < CUPBOARD_LOCK_R; }
+function cupboardLockOnScreen() {
+  cupboardDoor.updateMatrixWorld();
+  cupLockV.set((CUPBOARD.lock.u - 0.5) * CUPBOARD.w, (CUPBOARD.lock.v - 0.5) * CUPBOARD.h, 0);
+  cupboardDoor.localToWorld(cupLockV).project(camera);
+  var r = canvas.getBoundingClientRect();
+  return { x: r.left + (cupLockV.x + 1) / 2 * r.width, y: r.top + (1 - cupLockV.y) / 2 * r.height };
+}
+function cupboardLockOffered() {
+  lockDrop();
+  var mine = lockOffer = LumosSpells.openLock({ at: cupboardLockOnScreen, wait: LOCK_WAIT_S, stray: strayTap });
+  mine.tap();
+  mine.done.then(function (out) {
+    if (lockOffer === mine) lockOffer = null;
+    if (!out) return;
+    if (out.verdict === 'opened') { cupboardSwing(true); firstCast(out, 'alohomora'); }
+    else if (out.verdict === 'tight' || out.verdict === 'missed') cupboardRattle(out.why);
+  });
 }
 /* Charms' openLock (req 282): it swings open on the dark, and shuts itself after a few seconds unless held */
 function cupboardSwing(open, hold) {
@@ -3105,7 +3128,10 @@ function tap(cx, cy) {
   }
   /* the broom cupboard (ledger line 2): at its stop a tap tries the handle, locked; from afar the walk up */
   if (hit.stop && hit.stop.name === 'cupboard' && atStop === hit.stop) {
-    tell('broom cupboard'); if (cupboard.ang < 0.1) cupboardRattle(); said(true); return;
+    tell('broom cupboard');
+    if (cupboard.ang < 0.1 && cupboardLockAt(hits[0].uv) && window.LumosSpells && LumosSpells.learned('alohomora')) cupboardLockOffered();
+    else if (cupboard.ang < 0.1) cupboardRattle();
+    said(true); return;
   }
   /* her (req 79): from afar a tap on her is her walk-up; at her stop it wakes her for the password, raised here inside
      the tap's own handler, since the runtime opens the ear in it and iOS lets a page listen only from a touch */
@@ -4021,7 +4047,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
