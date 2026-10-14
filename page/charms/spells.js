@@ -1115,11 +1115,12 @@ function judgeSmile(points, mouth, ease) {
    on the tick t0 + i ms, within the ease's time (a share of the beat). Off its tick is a miss, 'beat', naming the tap
    (offbeat, from 0) and whether it was late; a tick that passes with no tap is late too. It adds time (the last tap
    from t0, ms) and speed (desks a second, at over time), so n steps on a beat of T/n ms cross in T whatever n is: the
-   same speed. Without beat nothing changes. */
+   same speed. Without beat nothing changes. judgeSteps (Q9's fix 6, below) reads loose in place of even (the kinder
+   stray, a share of the mean); this judge does not read loose. */
 var DANCE_EASES = {
-  kind:   { reach: 0.07, min: 0.04, even: 0.30, most: 8, gap: 2500, time: 0.35 },
-  fair:   { reach: 0.05, min: 0.05, even: 0.22, most: 8, gap: 2500, time: 0.25 },
-  strict: { reach: 0.035, min: 0.06, even: 0.15, most: 8, gap: 2500, time: 0.18 }
+  kind:   { reach: 0.07, min: 0.04, even: 0.30, most: 8, gap: 2500, time: 0.35, loose: 0.45 },
+  fair:   { reach: 0.05, min: 0.05, even: 0.22, most: 8, gap: 2500, time: 0.25, loose: 0.35 },
+  strict: { reach: 0.035, min: 0.06, even: 0.15, most: 8, gap: 2500, time: 0.18, loose: 0.25 }
 };
 function judgePineapple(taps, desk, ease, want, now, beat) {
   var e = typeof ease === 'object' ? ease : (DANCE_EASES[ease] || DANCE_EASES.kind);
@@ -1169,6 +1170,17 @@ function judgePineapple(taps, desk, ease, want, now, beat) {
   if (out.spread > e.even) { out.reason = 'uneven'; return out; }
   out.verdict = 'danced'; out.reason = 'danced';
   return out;
+}
+/* Q9's fix 6 (thirty-ninth session, 13 October 2026; equal steps judged by eye were too hard): Q11, option 2, David,
+   7.40 pm: every step, judged more kindly. He taps every step as before, and judgePineapple judges them with even
+   loosened to the ease's loose (0.45, 0.35, 0.25 of the mean); all else as judgePineapple, which is untouched and
+   gives the page worst and long on a dance too, so it can draw the equal steps under his and ring the step furthest
+   out. Arguments and returns as judgePineapple's. */
+function judgeSteps(taps, desk, ease, want, now, beat) {
+  var e = typeof ease === 'object' ? ease : (DANCE_EASES[ease] || DANCE_EASES.kind), o = {}, k;
+  for (k in e) o[k] = e[k];
+  if (e.loose != null) o.even = e.loose;
+  return judgePineapple(taps, desk, o, want, now, beat);
 }
 /* The Freezing Charm (CoS 6: Lockhart's "Peskipiksi Pesternomi!" has "absolutely no effect"; Hermione is "immobilizing
    two pixies at once with a clever Freezing Charm and stuffing them back into their cage"). The book gives no motion;
@@ -2502,5 +2514,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, judgeSmile: judgeSmile, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, judgeLoop: judgeLoop, offLine: offLine, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, judgeSmile: judgeSmile, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, judgeSteps: judgeSteps, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, judgeLoop: judgeLoop, offLine: offLine, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

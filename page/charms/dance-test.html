@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=24"></script>
+<script src="spells.js?v=38"></script>
 <script src="guide.js?v=5"></script>
 <script>
 /* The pineapple's tap dance, a test page for the Charms lane (13 October 2026, nineteenth session; the owner is Godric).
@@ -45,7 +45,13 @@
    A metronome counts three, then he taps a step on every tick (judged against the tick, the clock starting at the
    count): three steps at a tick a second, six at two a second (half the step, half the time: across in the same three
    seconds, the same speed), three at two a second (across in half the time, twice as fast). After each, a chart of
-   how far against how long, one line a part: the first two lie together, the third twice as steep. */
+   how far against how long, one line a part: the first two lie together, the third twice as steep.
+   Q9's fix 6 (thirty-ninth session, 13 October 2026; equal steps judged by eye were too hard; Q11, option 2, David,
+   7.40 pm): every step, judged more kindly. LumosSpells.judgeSteps reads his taps as judgePineapple does, each step
+   allowed to stray from their mean by 0.45, 0.35, 0.25 of it; after the dance the exactly equal steps are drawn, dashed,
+   under his, and his step furthest out is ringed. His t1, woven: when his steps carry it too far the pineapple
+   tap-dances off the end of the desk with a soft thump, and Flitwick, who stands on a pile of books to see over his desk
+   (PS 8), peers over the edge at it. Flitwick's numbers are ours, not the book's, so no line quotes him with one. */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -138,7 +144,7 @@
     if (i === 2) { var pick = [3, 5, 6]; examWant = wantQ >= 3 && wantQ <= 8 ? wantQ : pick[Math.floor(Math.random() * pick.length)]; }
     place(); makeGuide(); menu();
     if (i === 3) { runs = []; startPart(0); return; }
-    say(i === 2 ? 'The exam. Flitwick calls you in, one by one, as in the book: "Across the desk in <b>' + WORD[examWant] + ' equal steps</b>, if you please."' : ROUNDS[i].start);
+    say(i === 2 ? 'The exam. Flitwick calls you in, one by one, as in the book. Your pineapple must cross the desk in <b>' + WORD[examWant] + ' equal steps</b>.' : ROUNDS[i].start);
   }
   function again(after) {   /* the pineapple trots back to its end and the taps clear */
     wait = setTimeout(function () { var now = performance.now(); wait = null; taps = []; show = null; fall = null; hopTo(0, now, 420);
@@ -164,7 +170,7 @@
      only on a fresh tap that lands it somewhere on the desk */
   function judge(now, fresh) {
     if (!taps.length && !clock) return null;
-    var j = LumosSpells.judgePineapple(taps, desk, ease, want(), fresh ? undefined : now, clock ? { ms: clock.ms, t0: clock.t0 } : undefined);
+    var j = LumosSpells.judgeSteps(taps, desk, ease, want(), fresh ? undefined : now, clock ? { ms: clock.ms, t0: clock.t0 } : undefined);
     var p = taps[taps.length - 1] || { x: desk.a }, along = p.x - desk.a;
     if (j.reason === 'waiting') { if (fresh) { hopTo(along, now); tapSound(); } last = j; return j; }
     last = j;
@@ -173,13 +179,15 @@
     if (j.verdict !== 'danced') {
       guides.forEach(function (g) { g.miss(); }); misses++;
       var n = j.n, w = want();
-      if (j.reason === 'past') { hopTo(along, now); tapSound(); fall = { at: now + 240, x: along }; setTimeout(function () { noise(0.25, 220, 0.6); }, 760); }
+      if (j.reason === 'past') {   /* too far: off the end, a soft thump, Flitwick peering over the edge */
+        var edge = Math.min(along, desk.b - desk.a + S * 0.03 + P * 0.1);
+        hopTo(edge, now); tapSound(); fall = { at: now + 240, x: edge }; setTimeout(function () { noise(0.3, 160, 0.35); }, 760); }
       else if (fresh && j.reason !== 'off' && j.reason !== 'back') { hopTo(along, now); tapSound(); }
       if (j.reason === 'uneven' || j.reason === 'count' || j.reason === 'leap') show = { j: j, at: now + 260, taps: taps.slice() };
       var words = {
         off: 'That one missed the desk! <b>Tap on the desktop</b>, where the pineapple can land.',
         back: 'Forwards each time, a real step: a pineapple cannot tap-dance backwards, or on the spot.',
-        past: 'Off the end of the desk, and onto the floor! <b>Land the last step on the far end</b>, not past it.',
+        past: 'Too far: off the end of the desk, with a soft thump! Flitwick, on his pile of books, peers over the edge at it. <b>Land the last step on the far end</b>, not past it.',
         leap: 'That was a leap, not a dance. <b>At least three steps</b>, all the same length.',
         shuffle: 'Tiny shuffles! <b>Eight steps at most</b>: make each one longer.',
         short: 'It stopped part way, waiting for the next tap. <b>Keep tapping</b> all the way to the far end.',
@@ -190,7 +198,7 @@
           : 'Step ' + (j.offbeat + 1) + ' came <b>' + (j.late ? 'after' : 'before') + ' its tick</b>: tap just as the metronome ticks.'
       };
       say(words[j.reason] || 'Try again: equal steps, all the way across.');
-      again(j.reason === 'past' ? 2400 : j.reason === 'uneven' || j.reason === 'count' ? 3600 : 1800);
+      again(j.reason === 'past' ? 3400 : j.reason === 'uneven' || j.reason === 'count' ? 3600 : 1800);
       return j;
     }
     /* danced: the last hop, then the whole dance again at his own timing, then the geometry */
@@ -198,7 +206,7 @@
     guides.forEach(function (g) { g.hit(lv > 0); });
     LumosSpells.learn('pineapple'); chime();
     var gaps = [], k; for (k = 1; k < taps.length; k++) gaps.push(Math.max(260, Math.min(ck ? 1100 : 900, taps[k].t - taps[k - 1].t)));
-    dance = { at: now + 900, gaps: gaps, lands: taps.map(function (q) { return q.x - desk.a; }), wobble: j.beat > 1.8, done: false };
+    dance = { at: now + 900, gaps: gaps, lands: taps.map(function (q) { return q.x - desk.a; }), wobble: j.beat > 1.8, done: false, j: j };
     var n2 = j.n, wob = j.beat > 1.8 ? ' Your beat wobbled, so it stumbled a little, but the steps were what counted.' : '';
     say('<b>It dances!</b> ' + (WORD[n2] || n2) + ' equal steps across the desk' + (ck ? ', on the beat.' : '.'));
     if (ck) { var pk = part; runs[pk] = { time: j.time, pts: taps.map(function (q) { return [q.t - ck.t0, (q.x - desk.a) / (desk.b - desk.a)]; }) }; }
@@ -211,7 +219,8 @@
           wait = setTimeout(function () { wait = null; say('<b>Full marks.</b> Speed is how far over how long. Slow ticks and big steps, or quick ticks and steps half as long: a third of the desk a second, the same. Big steps on the quick ticks: two thirds a second, twice as fast.'); }, 6000); }
         return;
       }
-      say('The desk split into <b>' + (WORD[n2] || n2) + ' equal steps</b>: each one is <b>' + SHARE[n2] + '</b> of the desk, 1/' + n2 + '.' + wob);
+      say('The desk split into <b>' + (WORD[n2] || n2) + ' equal steps</b>: each one is <b>' + SHARE[n2] + '</b> of the desk, 1/' + n2 + '.' +
+        (j.spread >= 0.05 ? ' Under yours, dashed, the exactly equal steps; your step furthest out is ringed.' : '') + wob);
       if (round === 2) { done = true;
         wait = setTimeout(function () { wait = null; say('<b>Full marks.</b> Flitwick called them in one by one to make a pineapple tap-dance across a desk, and yours did, in ' + WORD[n2] + ' equal steps.');
           wait = setTimeout(function () { wait = null; choose(3); }, 6000); }, 4200); }
@@ -253,7 +262,7 @@
       }
     }
     var y = desk.y - lift, drop = 0;
-    if (fall && now >= fall.at) { var ft = (now - fall.at) / 520; x = deskX(fall.x) + Math.min(1, ft) * P * 0.6; drop = Math.min(1, ft) * Math.min(1, ft) * (H * 0.94 - desk.y); tilt = Math.min(1, ft) * 1.6; }
+    if (fall && now >= fall.at) { var ft = (now - fall.at) / 520; x = Math.min(deskX(fall.x) + Math.min(1, ft) * P * 0.6, W - P * 1.0);   /* on its side on the floor, still in sight */ drop = Math.min(1, ft) * Math.min(1, ft) * (Math.min(H * 0.94, panel.getBoundingClientRect().top - 4) - desk.y); tilt = Math.min(1, ft) * 1.6; }
     cx.save(); cx.translate(x, y + drop); cx.rotate(tilt);
     var rx = P * 0.3, ry = P * 0.38, cy = -P * 0.08 - ry;
     cx.fillStyle = '#16120e'; cx.beginPath(); cx.ellipse(-rx * 0.45, -P * 0.04, rx * 0.42, P * 0.06, 0, 0, 7); cx.ellipse(rx * 0.45, -P * 0.04, rx * 0.42, P * 0.06, 0, 0, 7); cx.fill();   /* tap shoes */
@@ -272,6 +281,17 @@
     });
     cx.fillStyle = '#2b1d10'; cx.beginPath(); cx.arc(-rx * 0.32, cy - ry * 0.12, P * 0.025, 0, 7); cx.arc(rx * 0.32, cy - ry * 0.12, P * 0.025, 0, 7); cx.fill();
     cx.strokeStyle = '#2b1d10'; cx.lineWidth = Math.max(1, P * 0.022); cx.beginPath(); cx.arc(0, cy + ry * 0.08, rx * 0.32, 0.2, Math.PI - 0.2); cx.stroke();
+    cx.restore();
+  }
+  /* Flitwick behind the far end of the desk, head and shoulders over it (PS 8: "a tiny little wizard who had to stand on
+     a pile of books to see over his desk"); when the pineapple goes off the end he leans over the edge and peers at it */
+  function drawFlitwick(now) {
+    var u = P, peer = fall && now >= fall.at + 520 ? Math.min(1, (now - fall.at - 520) / 450) : 0, hr = u * 0.14;
+    cx.save(); cx.translate(desk.b + S * 0.015, desk.y - 1 - peer * u * 0.06); cx.rotate(0.55 * peer);
+    cx.fillStyle = '#2a2440'; cx.beginPath(); cx.moveTo(-u * 0.16, 0); cx.lineTo(u * 0.16, 0); cx.lineTo(u * 0.11, -u * 0.23); cx.lineTo(-u * 0.11, -u * 0.23); cx.closePath(); cx.fill();
+    cx.fillStyle = '#e2c4a0'; cx.beginPath(); cx.arc(0, -u * 0.36, hr, 0, 7); cx.fill();
+    var lx = peer * hr * 0.25, ly = peer * hr * 0.3;
+    cx.fillStyle = '#2b1d10'; cx.beginPath(); cx.arc(-hr * 0.35 + lx, -u * 0.37 + ly, hr * 0.13, 0, 7); cx.arc(hr * 0.35 + lx, -u * 0.37 + ly, hr * 0.13, 0, 7); cx.fill();
     cx.restore();
   }
   function label(x, y, text, color, size) {
@@ -296,6 +316,12 @@
       var n = dance.lands.length, from = 0;
       cx.save(); cx.globalAlpha = Math.min(1, (now - (dance.doneAt || (dance.doneAt = now))) / 400);
       dance.lands.forEach(function (l) { bracket(deskX(from), deskX(l), y, '#f3d27a', '1/' + n); from = l; });
+      if (dance.j && dance.j.spread >= 0.05) {   /* the exactly equal steps under his, dashed, and his step furthest out ringed */
+        var L = desk.b - desk.a, fs = Math.max(13, S * 0.034), y2 = y + fs * 2.2, k;
+        cx.setLineDash([5, 4]); for (k = 0; k < n; k++) bracket(deskX(L * k / n), deskX(L * (k + 1) / n), y2, '#dce1ff', k === n - 1 ? 'equal' : ''); cx.setLineDash([]);
+        var wk = dance.j.worst, w0 = wk > 0 ? dance.lands[wk - 1] : 0, w1 = dance.lands[wk];
+        if (wk >= 0) { cx.strokeStyle = '#f0968c'; cx.lineWidth = 2.5; cx.beginPath(); cx.ellipse(deskX((w0 + w1) / 2), y + fs * 0.4, Math.abs(w1 - w0) / 2 + S * 0.02, fs * 1.15, 0, 0, 7); cx.stroke(); }
+      }
       cx.restore();
     }
     if (show && now >= show.at) {   /* a miss worth showing: where equal steps land, dashed, and the odd step */
@@ -367,6 +393,7 @@
     if (!wait && !done && !dance && !show) guides.forEach(function (g) { g.draw(cx, now, taps.length > 0); });
     drawChart(now);
     drawMetronome(now);
+    drawFlitwick(now);
     drawPineapple(now);
     if (clock && now >= clock.c0) { var tk = Math.floor((now - clock.c0) / clock.ms); if (tk > clock.tick) { clock.tick = tk; tick(tk < 3); } }
     if (!wait && !dance && !done && (taps.length && last && last.reason === 'waiting' || clock && !taps.length)) judge(now, false);   /* a long pause ends a try short; with a beat, a tick with no step */
@@ -383,7 +410,8 @@
     clock: function () { return clock ? { c0: clock.c0, t0: clock.t0, ms: clock.ms, now: performance.now() } : null; },
     desk: function () { return { a: desk.a, b: desk.b, y: desk.y, band: desk.band }; },
     state: function () { return { round: round + 1, want: want(), waiting: !!wait, done: done, misses: misses, taps: taps.length,
-      dancing: !!dance, danced: !!(dance && dance.done), fell: !!fall,
+      dancing: !!dance, danced: !!(dance && dance.done), fell: !!fall, peering: !!(fall && performance.now() >= fall.at + 520),
+      ringed: !!(dance && dance.done && dance.j && dance.j.spread >= 0.05 && dance.j.worst >= 0),
       last: last ? { verdict: last.verdict, reason: last.reason, n: last.n, steps: last.steps, share: last.share, spread: last.spread, worst: last.worst, beat: last.beat, offbeat: last.offbeat, late: last.late, time: last.time, speed: last.speed } : null,
       part: round === 3 ? part + 1 : 0, counting: !!clock, runs: runs.filter(Boolean).length,
       line: lineEl.textContent, guide: guides.length ? guides[0].state().level : null, ease: ease, learned: LumosSpells.learned('pineapple') }; } };
