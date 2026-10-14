@@ -2025,6 +2025,7 @@ function cupboardLockOffered() {
 }
 /* Charms' openLock (req 282): it swings open on the dark, and shuts itself after a few seconds unless held */
 function cupboardSwing(open, hold) {
+  if (open !== false && cupboard.target === 0) cupboardButterfly();
   cupboard.target = open === false ? 0 : 1.35;
   clearTimeout(cupboard.shut);
   if (open !== false && !hold) cupboard.shut = setTimeout(function () { cupboard.target = 0; }, 6000);
@@ -2035,6 +2036,47 @@ function updateCupboard(dt) {
   if (cupboard.rattle > 0) { cupboard.rattle = Math.max(0, cupboard.rattle - dt); shiver = 0.012 * Math.sin(cupboard.rattle * 60) * (cupboard.rattle / 0.6); }
   cupboardHinge.rotation.y = cupboard.ang + shiver;   /* opens out into the corridor, about its nook-side edge */
   cupboardDark.visible = cupboard.ang > 0.02;
+  updateButterfly(dt);
+}
+/* The butterfly (Godric's t1 on corridor-broom-spend-1013, 9.54 pm: "often outstripped by passing butterflies", CoS 4):
+   each time the cupboard swings open, a small pale butterfly flutters out of the dark past the old broom and away down
+   the corridor toward her, faster than the broom will ever go, fading as it goes. Drawn as if seen from above, its
+   wings opening and closing (a large one, about 10 cm across, so a boy sees it), heading across his view; unlit, so it shows on the dark, a little dimmer by night. ?butterfly opens the cupboard as he reaches it, for a look */
+var BUTTERFLY_S = 4.2;
+function butterflyWing(flip) {
+  var c = makeCanvas(64, 80), g = c.getContext('2d');
+  if (flip) { g.translate(64, 0); g.scale(-1, 1); }
+  g.fillStyle = '#efe9d6'; g.strokeStyle = '#3a342c'; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(2, 38); g.bezierCurveTo(10, 4, 50, -2, 60, 14); g.bezierCurveTo(62, 30, 40, 40, 2, 40); g.fill(); g.stroke();   /* the forewing */
+  g.beginPath(); g.moveTo(2, 40); g.bezierCurveTo(30, 42, 52, 56, 40, 72); g.bezierCurveTo(26, 80, 8, 66, 2, 44); g.fill(); g.stroke();  /* the hindwing */
+  g.fillStyle = '#5a554c'; g.beginPath(); g.moveTo(44, 8); g.bezierCurveTo(54, 6, 61, 12, 60, 18); g.bezierCurveTo(54, 16, 48, 14, 44, 8); g.fill();   /* its grey tip */
+  g.beginPath(); g.arc(36, 26, 3.5, 0, 7); g.fill();                                                                                   /* and its spot */
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(0.05, 0.0625), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, alphaTest: 0.4, side: THREE.DoubleSide, depthWrite: false }));
+  m.position.x = flip ? -0.025 : 0.025;
+  var hinge = new THREE.Group(); hinge.add(m);
+  return hinge;
+}
+var butterfly = { group: new THREE.Group(), left: butterflyWing(true), right: butterflyWing(false), t: -1, q: new URLSearchParams(location.search).has('butterfly') };
+butterfly.group.add(butterfly.left, butterfly.right);
+butterfly.group.add(new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.003, 0.045, 6), new THREE.MeshBasicMaterial({ color: col(0x2e2a24) })));
+butterfly.group.visible = false; scene.add(butterfly.group);
+function cupboardButterfly() { butterfly.t = -0.5; }   /* it waits half a second while the door comes open */
+function updateButterfly(dt) {
+  if (butterfly.t === -1) return;
+  butterfly.t += dt;
+  var k = butterfly.t / BUTTERFLY_S, b = butterfly.group;
+  if (butterfly.t < 0) { b.visible = false; return; }
+  if (k >= 1) { b.visible = false; butterfly.t = -1; return; }
+  b.visible = true;
+  var out = Math.min(1, k * 4), e = 1 - (1 - out) * (1 - out);                       /* out of the doorway first, quickly */
+  var x = CUPBOARD.x + 6 * k * k, z = HER_FACE - 0.05 - e * 0.55 - 0.1 * Math.sin(k * 9);
+  var y = 1.05 + 0.55 * k + 0.07 * Math.sin(k * 23);                                /* rising, bobbing as it goes */
+  b.position.set(x, y, z);
+  b.rotation.set(0, Math.PI + 0.25 * Math.sin(k * 7), Math.PI / 2 + 0.3 * Math.sin(k * 11));   /* face to him, head first down the corridor, wandering */
+  var flap = 0.2 + 0.8 * Math.abs(Math.cos(butterfly.t * 20));
+  butterfly.left.scale.x = butterfly.right.scale.x = flap;
+  var fade = k > 0.7 ? (1 - k) / 0.3 : 1, dim = 1 - 0.3 * nightK();
+  [butterfly.left, butterfly.right].forEach(function (w) { w.children[0].material.opacity = fade; w.children[0].material.color.setScalar(dim); });
 }
 /* The tickle (Magic for the boys, *The polite door, next*, Godric's; Events' door.json; the Interaction lane's req 150
    (2)): at its stop a tap on the door is a tickle. Its ticklish spot stays put all week and moves on password Monday,
@@ -2983,6 +3025,7 @@ function goTo(s) {
   if (s.name === 'her' && tween.from.pos.distanceTo(tween.to.pos) > 2.5) primpHer(tween.dur);   /* her primp, only as he walks up */
   if (castle && castle.moment) castle.moment('walk up');   /* he sets off toward a stop: a torch may lean (req 140) */
   if (s.name === 'her' && home.q && !home.kind) nickHome(home.q === 'glow' ? 'glow' : 'walk');   /* ?nickHome=, for a look */
+  if (s.name === 'cupboard' && butterfly.q) cupboardSwing(true);                                    /* ?butterfly, for a look */
 }
 function goBack() {
   lockDrop(); humpDrop();
@@ -4047,7 +4090,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
