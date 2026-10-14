@@ -3429,15 +3429,18 @@ function croak(text) { return function () { console.info('[corridor] ' + text + 
 
 /* ---------- Neville locked out (req 297; Events' neville.json; Magic's B24, Godric's 1, 8.27 pm) ----------
    "It was Neville. He was curled up on the floor, fast asleep ... I couldn't remember the new password to get in to
-   bed" (PS 9). When the runtime casts him at `frame-foot` he sits hunched, knees up, in the corner on her hinge side by
-   the windows, clear of her swing, of Nick's glow and of Trevor's mark (Try 1 on corridor-neville-297-1013,
-   provisional, Godric to confirm). A grey stand-in until he is drawn; his Remembrall a scarlet glow in his hands
+   bed" (PS 9). When the runtime casts him at `frame-foot` he sits curled up asleep under her frame, as PS 9 has him
+   (Try 3 on corridor-neville-297-1013, Godric's, 8.40 pm), and "jerked suddenly awake as they crept nearer": when he
+   comes within NEVILLE_WAKE.near of him Neville jolts up and says PS 9's own words (Godric's t1), which stand in for
+   the record's first line that visit (held while he sleeps). A grey stand-in until he is drawn; his Remembrall a scarlet glow in his hands
    when the room shows it, clearing and flushing again when he is given his quill; patting his pockets on the night
    he looks for his list of passwords. From afar a tap on him walks up to his own stop; there it goes to the runtime
    as `neville`. When the hole opens on the password he goes in ahead of him */
 var NEVILLE_SEATS = { 1: { x: END_X - 0.32, z: FAR_Z + 0.34 }, 3: { x: END_X - 0.32, z: MID_Z } };   /* the sheet's tries; 3: under her frame, as PS 9 */
-var NEVILLE_SEAT = NEVILLE_SEATS[groundsQ.get('nevilleSeat')] ? +groundsQ.get('nevilleSeat') : 1;   /* Try 1 provisional, the desk's corridor-neville-seat-1013 to settle */
+var NEVILLE_SEAT = NEVILLE_SEATS[groundsQ.get('nevilleSeat')] ? +groundsQ.get('nevilleSeat') : 3;   /* Try 3, Godric's; ?nevilleSeat=1 shows Try 1 */
 var NEVILLE = { x: NEVILLE_SEATS[NEVILLE_SEAT].x, z: NEVILLE_SEATS[NEVILLE_SEAT].z, w: 0.5, h: 0.78, glowAt: [0.04, 0.4], glowR: 0.05 };
+var NEVILLE_WAKE = { near: 3.4, after: 1.0, slump: 0.86, jolt: 0.35,   /* metres, seconds, his height asleep, the jolt's seconds */
+  line: "Thank goodness you found me! I've been out here for hours, I couldn't remember the new password to get in to bed." };   /* PS 9, checked in the book text */
 var NEV_CUE = {
   frown: "neville's remembrall glowing scarlet in his hand, him frowning at it",
   again: "neville's remembrall glowing scarlet in his hand again",
@@ -3465,11 +3468,13 @@ nevilleCard.userData.thing = 'neville';
 var nevilleStop = { name: 'neville', meshes: [nevilleCard], stop: function () {
   return { pos: new THREE.Vector3(END_X - 3.3, EYE, NEVILLE.z + 1.1), look: new THREE.Vector3(NEVILLE.x, 0.7, NEVILLE.z + 0.35), fov: 44 }; } };
 STOPS.push(nevilleStop); nevilleCard.userData.stop = nevilleStop; tappables.push(nevilleCard);
-var neville = { out: false, glass: 0, glassT: 0, clearAt: -1, patAt: -1, goIn: -1, look: groundsQ.get('neville') };   /* ?neville=out, or glass, for a look */
+var neville = { out: false, glass: 0, glassT: 0, clearAt: -1, patAt: -1, goIn: -1, look: groundsQ.get('neville'),
+  asleep: false, nearT: 0, wokeAt: -1 };   /* ?neville=out, or glass, for a look */
 function drawNeville(cast) {
   var out = !!neville.look || cast.some(function (f) { return f.name === 'neville' && f.mark === 'frame-foot'; });
   if (out === neville.out) return;
   neville.out = out; neville.goIn = -1;
+  neville.asleep = out; neville.nearT = 0; neville.wokeAt = -1;
   nevilleCard.visible = out; nevilleCard.material.opacity = 1;
   nevilleCard.position.set(NEVILLE.x, NEVILLE.h / 2, NEVILLE.z);
   if (!out && atStop === nevilleStop) goBack();
@@ -3477,9 +3482,18 @@ function drawNeville(cast) {
 function drawNevilleGlass(has) { neville.glassT = neville.look === 'glass' || has(NEV_CUE.frown) || has(NEV_CUE.again) ? 1 : 0; }
 if (neville.look) drawNeville([]);
 function nevilleHead() { return new THREE.Vector3(NEVILLE.x, NEVILLE.h * 0.9, NEVILLE.z); }
+/* while he sleeps the record's first line is not said; waking, PS 9's words are said in its place */
+function nevilleLines(list) {
+  if (neville.out && !neville.asleep) return list;   /* the runtime hands over the lines before it draws him */
+  return list.filter(function (l) { return !(l.speaker === 'neville' && l.key === 'neville.locked-out.ask'); });
+}
+function nevilleWakes() {
+  neville.asleep = false; neville.wokeAt = t;
+  showLines([{ medium: 'said', speaker: 'neville', text: NEVILLE_WAKE.line }]);
+}
 function nevilleGoesIn() {   /* the seconds her swing waits: under her frame (Try 3) he must be up first */
   if (!(neville.out && nevilleCard.visible)) return 0;
-  neville.goIn = 0;
+  neville.goIn = 0; neville.asleep = false;
   return NEVILLE_SEAT === 3 ? 0.7 : 0;
 }
 function updateNeville(dt) {
@@ -3499,6 +3513,20 @@ function updateNeville(dt) {
     if (p >= 2.4) neville.patAt = -1;
   }
   nevilleCard.position.set(NEVILLE.x, NEVILLE.h / 2, NEVILLE.z + pat);
+  var dx = camera.position.x - NEVILLE.x, dz = camera.position.z - NEVILLE.z;
+  if (neville.asleep) {                         /* "jerked suddenly awake as they crept nearer" (PS 9) */
+    neville.nearT = Math.sqrt(dx * dx + dz * dz) < NEVILLE_WAKE.near ? neville.nearT + dt : 0;
+    if (neville.nearT >= NEVILLE_WAKE.after) nevilleWakes();
+  }
+  var sy = 1, up = 0;
+  if (neville.asleep) sy = NEVILLE_WAKE.slump * (1 + 0.012 * Math.sin(t * 1.6));   /* curled up, breathing slow */
+  else if (neville.wokeAt >= 0) {               /* the jolt: up with a start */
+    var j = (t - neville.wokeAt) / NEVILLE_WAKE.jolt;
+    if (j < 1) { sy = NEVILLE_WAKE.slump + (1 - NEVILLE_WAKE.slump) * Math.min(1, j * 2); up = 0.06 * Math.sin(j * Math.PI); }
+    else neville.wokeAt = -1;
+  }
+  nevilleCard.scale.y = sy;
+  nevilleCard.position.y = NEVILLE.h * sy / 2 + up;
   if (neville.goIn >= 0) {                      /* up and in ahead of him as she swings */
     neville.goIn += dt;
     var u = Math.min(1, neville.goIn / 0.9), hole = C.holeToCorridor(0, 0, HER_Z - 0.1);
@@ -3870,7 +3898,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* the folded parchment sits at the foot of the screen on the left, where the help is: the help rises above it */
     document.getElementById('help').style.bottom = mapPlay.state().pocket ? 'calc(env(safe-area-inset-bottom, 0px) + 66px)' : '';
   },
-  showLines: function (list) { showLines(mapPlay ? mapPlay.lines(list) : list); },
+  showLines: function (list) { list = nevilleLines(list); showLines(mapPlay ? mapPlay.lines(list) : list); },
   /* the one figure this page draws (req 297): Neville locked out, at her frame's foot */
   figures: [{ role: 'canon', name: 'neville', pose: 'hunched, knees up', mark: 'frame-foot' }],
   drawFigures: drawNeville,
@@ -3993,7 +4021,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { neville: function () { return { out: neville.out, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
