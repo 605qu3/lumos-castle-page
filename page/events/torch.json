@@ -162,6 +162,41 @@
       ]
     },
     {
+      "id": "torch.nick-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "walk up",
+      "when": [
+        "place = corridor",
+        "at = her",
+        "time = night",
+        "nick_home != yes"
+      ],
+      "show": [
+        "a pearly glow waits on the wall beside the Fat Lady's frame; nick drifts out of it, walks the last stretch beside him, bows a little too deep, and fades into the wall as the hole opens"
+      ],
+      "starts": [
+        "set nick_home = yes"
+      ]
+    },
+    {
+      "id": "torch.nick-light",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "walk up",
+      "when": [
+        "place = corridor",
+        "at = her",
+        "time = night",
+        "nick_home = yes"
+      ],
+      "show": [
+        "a pearly glow waits on the wall beside the Fat Lady's frame, nick's light left on for him, and fades as the hole opens"
+      ]
+    },
+    {
       "id": "torch.enter",
       "tier": "fixed",
       "source": "device",
