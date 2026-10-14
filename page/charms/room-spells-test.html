@@ -27,6 +27,7 @@
 <div id="panel"></div>
 <script src="spells.js?v=32"></script>
 <script src="guide.js?v=3"></script>
+<script src="../castle-ear.js"></script>
 <script>
 /* A lock and a page of ink in a room, a test page for the Charms lane (12 October 2026, fifth session; the owner is
    Godric). It tries the two calls a room makes for req 146 (Magic for the boys, *Alohomora in the castle* and
@@ -50,6 +51,16 @@
    square, a line or an L along the squares; the wall and the fireplace are in the way (it bumps and lands back), and
    once it has moved a silver Sickle glints where it stood (the spellbook's idea: slide the armchair and find what fell
    behind it). The room asks for 3 squares right; the traced guide draws that while he is new to it.
+   Since 13 October 2026 (forty-first session, req 282, Magic for the boys' B18 to B20, Godric's picks of 5.20 pm):
+   the broom cupboard, LumosSpells.openLock as Percy's drawer has it, swinging the door open on buckets, a mop and an
+   old school broom leaning hard to the left with a luggage tag on its handle (the tag's words are Magic's, drawn
+   later); a tap on the broom stands it up straight and it slowly leans left again (the corridor calls cupboardSwing()
+   on 'opened'). A polite door, as in the shells in its polite week: Alohomora is openLock with stuck, so it never
+   opens, and the door huffs, as the corridor's ("Well! Not so much as a please."); Say please listens once through
+   the castle's ear (page/castle-ear.js, the Events lane's, its match() at its LOOSE), and with no ear in the browser
+   (or ?ear=off) the tap stands for the word; please swings it a hand's width and warm light spills out. Percy's
+   parchment, the swap in his drawer: LumosSpells.revealInk as Wood's notice, bringing up the twins' line; a tap on the
+   sheet adds Mr George's (Godric's t1); Look away blanks it, and each Aparecium brings it back.
    window.lumosRoomSpells for checks. */
 (function () {
   'use strict';
@@ -63,7 +74,16 @@
     { id: 'wand', name: 'A wand in its box', spell: null },
     { id: 'hand', name: 'Your hand', spell: null },
     { id: 'hump', name: "The witch's hump", spell: null },
-    { id: 'chair', name: 'The armchair', spell: 'mobiliarbus' } ];
+    { id: 'chair', name: 'The armchair', spell: 'mobiliarbus' },
+    { id: 'cupboard', name: 'The broom cupboard', spell: 'alohomora' },
+    { id: 'polite', name: 'A polite door', spell: 'alohomora' },
+    { id: 'parchment', name: "Percy's parchment", spell: 'aparecium' } ];
+  /* req 282: the cupboard's leaf (0 shut to 1 open) and its broom's lean (1 hard left, 0 upright); the polite door's
+     hand's width; the parchment's ink and how many of the twins' lines are showing */
+  var cup = { open: 0, target: 0, lean: 1, upAt: 0 }, polite = { open: 0, target: 0, ear: null }, parch = { ink: 0, lines: 0, at: 0 };
+  var EAR = window.CastleEar && new URLSearchParams(location.search).get('ear') !== 'off' ? window.CastleEar : null;
+  var FRED = 'Messrs Fred and George present their compliments to Percy, and beg him to keep his very important nose out of other people\u2019s parchment.';
+  var GEORGE = 'Mr George agrees with Mr Fred, and would like to add that Percy\u2019s badge is on upside down.';
   /* the armchair's room, seen from above: whole squares of floor, the wall along the top with the fireplace in it */
   var chair = null, drift = null;
   function room() {
@@ -96,7 +116,13 @@
   /* the spots a room would project */
   function drawerRect() { var w = Math.min(W * 0.8, S * 0.95), h = w * 0.28; return { x: W / 2 - w / 2, y: H * 0.5 - h / 2, w: w, h: h }; }
   function doorRect() { var h = H * 0.62, w = Math.min(W * 0.7, h * 0.55); return { x: W / 2 - w / 2, y: H * 0.17, w: w, h: h }; }
+  function cupRect() {   /* kept above the buttons, which take half a phone's height, so the broom's foot and the buckets show */
+    var y = Math.max(108, H * 0.15), h = Math.min(H * 0.6, (panel.getBoundingClientRect().top || H) - 14 - y), w = Math.min(W * 0.5, h * 0.4);
+    return { x: W / 2 - w / 2, y: y, w: w, h: h }; }
+  function broomAt() { var C = cupRect(), f = { x: C.x + C.w * 0.62, y: C.y + C.h * 0.98 }, a = -0.32 * cup.lean, L = C.h * 0.82;
+    return { foot: f, top: { x: f.x + Math.sin(a) * L, y: f.y - Math.cos(a) * L } }; }
   function keyhole() {
+    if (T.id === 'cupboard') { var C = cupRect(); return { x: C.x + C.w * 0.18, y: C.y + C.h * 0.52 }; }
     if (T.id === 'drawer') { var R = drawerRect(); return { x: R.x + R.w * 0.3, y: R.y + R.h * 0.55 }; }
     var D = doorRect(); return { x: D.x + D.w * 0.78, y: D.y + D.h * 0.55 };
   }
@@ -116,7 +142,9 @@
     }));
     panel.appendChild(btn('Cast', cast, 'go'));
     if (T.id === 'hump') panel.appendChild(btn("Holds the twins' note: " + (note ? 'yes' : 'no'), function () { note = !note; menu(); }));
-    if (opened.drawer || opened.notice || hump.deg) panel.appendChild(btn('Shut it again', function () { opened = { drawer: 0, notice: 0 }; hump.deg = 0; say('Shut, and blank again.'); menu(); }));
+    if (opened.drawer || opened.notice || hump.deg || cup.target || polite.target) panel.appendChild(btn('Shut it again', function () { opened = { drawer: 0, notice: 0 }; hump.deg = 0; cup.target = 0; polite.target = 0; say('Shut, and blank again.'); menu(); }));
+    if (T.id === 'polite') panel.appendChild(btn('Say please', sayPlease));
+    if (T.id === 'parchment' && parch.lines) panel.appendChild(btn('Look away', function () { parch.ink = 0; parch.lines = 0; say('You look away. When you look back, the parchment is blank again.'); menu(); }));
     if (T.id === 'chair' && chair && (chair.i !== room().start.i || chair.j !== room().start.j)) panel.appendChild(btn('Put it back', function () { chair = room().start; say('The armchair is back by the wall.'); menu(); }));
   }
   function choose(i) {
@@ -128,6 +156,9 @@
     if (T.id === 'hand') { say("Ollivander's tape, on the counter. How wide is your hand?"); return; }
     if (T.id === 'hump') { say('A statue of a humpbacked, one-eyed witch, on her plinth.'); return; }
     if (T.id === 'chair') { chair = chair || room().start; drift = null; say('A squashy armchair by the fire. Something rolled under it once.'); return; }
+    if (T.id === 'cupboard') { say('A plain narrow door in the corridor, with a ring handle and a keyhole.'); return; }
+    if (T.id === 'polite') { say('A door in the stone, older than the wall round it. It has no handle.'); return; }
+    if (T.id === 'parchment') { say('In Percy&rsquo;s drawer, a sheet labelled in his hand: <i>Confiscated: suspicious blank parchment</i>. It is blank.'); return; }
     say(T.id === 'drawer' ? 'A drawer in the books table, with a small brass keyhole and a label: <i>CONFISCATED. Prefects only. P. Weasley</i>.'
       : T.id === 'door' ? 'A heavy door with a brass keyhole.' : 'A notice pinned to the board. It is blank.');
   }
@@ -135,7 +166,7 @@
     if (asking) return;
     if (T.spell && !LumosSpells.learned(T.spell)) {
       if (T.id === 'feather') { feather.mode = 'twitch'; feather.t0 = performance.now(); say('It lies there. (Learn Wingardium Leviosa in Charms.)'); }
-      else if (T.id === 'notice') say('Still blank. A wizard who knows Aparecium might read it. (Learn it in Charms.)');
+      else if (T.id === 'notice' || T.id === 'parchment') say('Still blank. A wizard who knows Aparecium might read it. (Learn it in Charms.)');
       else if (T.id === 'chair') { shake = performance.now(); say('You push. It does not budge. (Learn Mobiliarbus in Charms.)'); }
       else { rattle = performance.now(); say('It rattles. Locked. (Learn Alohomora in Charms.)'); }
       return;
@@ -170,12 +201,12 @@
         : 'Spread your hand on the glass: thumb on one ring, little finger on the other.');
       asking = T.id === 'wand' ? LumosSpells.measureSpan({ ends: wandEnds, scale: wandScale(), want: 11 })
         : LumosSpells.measureSpan({ at: function () { return { x: W / 2, y: H * 0.5 }; } });
-    } else if (T.id === 'notice') {
-      say('Three taps on the notice: in a line, the middle one halfway, at an even beat. <i>Aparecium!</i>');
+    } else if (T.id === 'notice' || T.id === 'parchment') {
+      say('Three taps on the ' + (T.id === 'notice' ? 'notice' : 'parchment') + ': in a line, the middle one halfway, at an even beat. <i>Aparecium!</i>');
       asking = LumosSpells.revealInk({ sheet: sheetRect });
     } else {
       say('Tap the lock with your wand.');
-      asking = LumosSpells.openLock({ at: keyhole, r: S * 0.11, turn: 0.25, dir: 1, stuck: T.id === 'door',
+      asking = LumosSpells.openLock({ at: keyhole, r: S * 0.11, turn: 0.25, dir: 1, stuck: T.id === 'door' || T.id === 'polite',
         onTap: function () { say('Now turn it, as a key turns: <b>a quarter turn, clockwise</b>, twelve to three. Whisper it: <i>Alohomora</i>.'); } });
     }
     var mine = asking; cur = mine;
@@ -214,7 +245,10 @@
         else { hump.deg = 0; say('You step back; she stays shut.'); }
         menu(); return;
       }
-      if (r.verdict === 'opened') { opened.drawer = 0.01; say('<b>Alohomora!</b> The drawer slides open.'); }
+      if (r.verdict === 'opened' && T.id === 'cupboard') { cup.target = 1; say('<b>Alohomora!</b> The door swings open on buckets, a mop and an old school broom, leaning hard to the left, a luggage tag on its handle. Tap the broom.'); }
+      else if (r.verdict === 'opened') { opened.drawer = 0.01; say('<b>Alohomora!</b> The drawer slides open.'); }
+      else if (r.verdict === 'nothing' && T.id === 'polite') { shake = performance.now(); say('<i>A sniff, and a creak of offended wood.</i> &ldquo;Well! Not so much as a <b>please</b>.&rdquo;'); }
+      else if (r.verdict === 'revealed' && T.id === 'parchment') { parch.ink = 0.01; parch.lines = 1; parch.at = performance.now(); say('<b>Aparecium!</b> Ink rises out of the blank sheet, in a hand you know. Tap the parchment.'); }
       else if (r.verdict === 'nothing') { shake = performance.now(); say('You tapped it, you whispered <i>Alohomora</i>... but nothing happened. This one wants its own key.'); }
       else if (r.verdict === 'tight') { shake = performance.now(); say('Click: the lock tightened. That way locks it. Clockwise, twelve to three.'); }
       else if (r.verdict === 'revealed') { opened.notice = 0.01; say('<b>Aparecium!</b> The ink comes back.'); }
@@ -224,6 +258,91 @@
     });
   }
 
+  /* the polite door's please: one listen through the castle's ear, or the tap standing for the word */
+  function heard(text) { var E = window.CastleEar; return !!E && E.match(text, 'please') >= E.LOOSE; }
+  function politeOpens() { polite.target = 1; say('&ldquo;Please.&rdquo; The door swings open a hand&rsquo;s width, and warm light spills across the floor.'); menu(); }
+  function sayPlease() {
+    if (asking || polite.target) return;
+    if (!EAR || !EAR.available()) { politeOpens(); return; }
+    if (polite.ear) return;
+    say('Listening&hellip; say it to the door.');
+    var got = false;
+    polite.ear = EAR.listen({ seconds: 6,
+      onHeard: function (g) { if (got) return; if (g.some(function (x) { return heard(x.text); })) { got = true; polite.ear.stop(); politeOpens(); } },
+      onEnd: function (why) { polite.ear = null; if (got) return;
+        if (/^error/.test(why) && !/no-speech|aborted/.test(why)) politeOpens();   /* no ear after all: the tap stands for the word */
+        else say('The door waits, politely. Tap Say please and say it.'); } });
+  }
+  /* the room's own taps: the broom stood up, the parchment's second line */
+  cv.addEventListener('pointerdown', function (ev) {
+    if (asking) return;
+    var p = { x: ev.clientX, y: ev.clientY };
+    if (T.id === 'cupboard' && cup.open > 0.9) {
+      var b = broomAt(), dx = b.top.x - b.foot.x, dy = b.top.y - b.foot.y, t = Math.max(0, Math.min(1, ((p.x - b.foot.x) * dx + (p.y - b.foot.y) * dy) / (dx * dx + dy * dy)));
+      if (Math.hypot(p.x - b.foot.x - dx * t, p.y - b.foot.y - dy * t) < S * 0.07) { cup.upAt = performance.now(); say('You stand the broom up straight. Slowly, it leans left again.'); }
+    } else if (T.id === 'parchment' && parch.lines === 1 && parch.ink > 0.9) {
+      var R = sheetRect();
+      if (p.x >= R.x && p.x <= R.x + R.w && p.y >= R.y && p.y <= R.y + R.h) { parch.lines = 2; parch.at = performance.now(); say('A second hand joins the first.'); }
+    }
+  });
+  function wrap(text, x, y, w, lh) {
+    var words = text.split(' '), line = '', n = 0;
+    words.forEach(function (wd) { var t = line ? line + ' ' + wd : wd; if (cx.measureText(t).width > w && line) { cx.fillText(line, x, y + n++ * lh); line = wd; } else line = t; });
+    if (line) cx.fillText(line, x, y + n++ * lh);
+    return n;
+  }
+  function drawCupboard(now) {
+    var C = cupRect();
+    cup.open += (cup.target - cup.open) * 0.08;
+    if (cup.upAt) { var q = (now - cup.upAt) / 1000; cup.lean = q < 0.3 ? 1 - q / 0.3 : Math.min(1, (q - 0.3) / 3.2); if (q > 3.5) cup.upAt = 0; }
+    cx.fillStyle = '#5c544c'; cx.fillRect(0, C.y - 20, W, C.h + 20); cx.fillStyle = '#3a332d'; cx.fillRect(0, C.y + C.h, W, H - C.y - C.h);
+    if (cup.open > 0.02) {
+      cx.fillStyle = '#0d0b09'; cx.fillRect(C.x, C.y, C.w, C.h);
+      cx.fillStyle = '#6e7275'; [[0.18, 0.18], [0.36, 0.16]].forEach(function (k) { var x = C.x + C.w * k[0], bw = C.w * k[1];   /* two buckets */
+        cx.beginPath(); cx.moveTo(x, C.y + C.h * 0.84); cx.lineTo(x + bw, C.y + C.h * 0.84); cx.lineTo(x + bw * 0.88, C.y + C.h); cx.lineTo(x + bw * 0.12, C.y + C.h); cx.fill(); });
+      cx.strokeStyle = '#8a6a3a'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(C.x + C.w * 0.08, C.y + C.h * 0.9); cx.lineTo(C.x + C.w * 0.12, C.y + C.h * 0.1); cx.stroke();   /* the mop, against the far side, clear of the open leaf */
+      cx.fillStyle = '#b8b0a0'; cx.fillRect(C.x + C.w * 0.02, C.y + C.h * 0.88, C.w * 0.12, C.h * 0.1);
+      var b = broomAt(); cx.strokeStyle = '#7a5a30'; cx.lineWidth = 5; cx.beginPath(); cx.moveTo(b.foot.x, b.foot.y - C.h * 0.12); cx.lineTo(b.top.x, b.top.y); cx.stroke();
+      cx.fillStyle = '#a8863e'; cx.save(); cx.translate(b.foot.x, b.foot.y); cx.rotate(-0.32 * cup.lean);   /* its twigs */
+      cx.beginPath(); cx.moveTo(-3, -C.h * 0.13); cx.lineTo(3, -C.h * 0.13); cx.lineTo(C.w * 0.08, 0); cx.lineTo(-C.w * 0.08, 0); cx.fill(); cx.restore();
+      var tg = { x: b.foot.x + (b.top.x - b.foot.x) * 0.7, y: b.foot.y + (b.top.y - b.foot.y) * 0.7 };   /* the luggage tag (its words are Magic's) */
+      cx.fillStyle = '#e8dcc0'; cx.fillRect(tg.x + 4, tg.y, C.w * 0.16, C.w * 0.1);
+    }
+    var lw = C.w * Math.cos(cup.open * 1.35);   /* the leaf, hinged on its right, swinging out */
+    cx.fillStyle = '#8d8882'; cx.fillRect(C.x + C.w - lw, C.y, lw, C.h);
+    if (lw > C.w * 0.5) {
+      cx.strokeStyle = 'rgba(40,36,32,0.35)'; cx.lineWidth = 2;
+      for (var i = 1; i < 4; i++) { cx.beginPath(); cx.moveTo(C.x + C.w - lw + lw * i / 4, C.y); cx.lineTo(C.x + C.w - lw + lw * i / 4, C.y + C.h); cx.stroke(); }
+      var k = keyhole(); cx.strokeStyle = '#4a4440'; cx.lineWidth = 3; cx.beginPath(); cx.arc(k.x, k.y - C.h * 0.04, C.w * 0.05, 0, 7); cx.stroke();
+      drawKeyhole(k, S * 0.025);
+    }
+  }
+  function drawPolite(now) {
+    var D = doorRect();
+    polite.open += (polite.target - polite.open) * 0.06;
+    cx.fillStyle = '#4e4840'; cx.fillRect(0, 0, W, H);
+    if (polite.open > 0.02) {   /* a hand's width: warm light in the gap and spilling across the floor */
+      var gap = D.w * 0.22 * polite.open;
+      cx.fillStyle = 'rgba(255,214,140,' + (0.9 * polite.open) + ')'; cx.fillRect(D.x, D.y, gap, D.h);
+      var g = cx.createLinearGradient(0, D.y + D.h, 0, H); g.addColorStop(0, 'rgba(255,200,120,' + (0.45 * polite.open) + ')'); g.addColorStop(1, 'rgba(255,200,120,0)');
+      cx.fillStyle = g; cx.beginPath(); cx.moveTo(D.x, D.y + D.h); cx.lineTo(D.x + gap, D.y + D.h); cx.lineTo(D.x + gap * 3, H); cx.lineTo(D.x - gap * 1.5, H); cx.fill();
+      cx.save(); cx.translate(gap, 0); drawDoor(); cx.restore();
+    } else drawDoor();
+  }
+  function drawParchment(now) {
+    var R = sheetRect();
+    cx.fillStyle = '#3a2618'; cx.fillRect(0, H * 0.12, W, H * 0.72);
+    cx.fillStyle = '#e9dcc0'; cx.fillRect(R.x, R.y, R.w, R.h);
+    cx.fillStyle = '#5a4a3a'; cx.textAlign = 'center'; cx.font = 'italic ' + Math.round(Math.max(11, R.w * 0.045)) + 'px Georgia, serif';
+    wrap('Confiscated: suspicious blank parchment. P.W.', R.x + R.w / 2, R.y + R.h * 0.07, R.w * 0.86, R.w * 0.055);
+    if (parch.lines) {
+      parch.ink = Math.min(1, parch.ink + 0.015);
+      cx.font = 'italic ' + Math.round(R.w * 0.062) + 'px Georgia, serif'; var lh = R.w * 0.08;
+      cx.fillStyle = 'rgba(40,24,14,' + parch.ink + ')';
+      var n = wrap(FRED, R.x + R.w / 2, R.y + R.h * 0.24, R.w * 0.84, lh);
+      if (parch.lines > 1) { var a2 = Math.min(1, (now - parch.at) / 1500); cx.fillStyle = 'rgba(30,40,70,' + a2 + ')'; wrap(GEORGE, R.x + R.w / 2, R.y + R.h * 0.24 + (n + 0.8) * lh, R.w * 0.84, lh); }
+    }
+  }
   function frame(now) {
     cx.fillStyle = '#16100c'; cx.fillRect(0, 0, W, H);
     var jig = 0;
@@ -231,7 +350,8 @@
     if (shake) { var t2 = (now - shake) / 600; if (t2 > 1) shake = null; else jig = Math.sin(t2 * 50) * S * 0.004 * (1 - t2); }
     cx.save(); cx.translate(jig, 0);
     if (T.id === 'drawer') drawDrawer(now); else if (T.id === 'door') drawDoor(); else if (T.id === 'notice') drawNotice();
-    else if (T.id === 'feather') drawFeather(now); else if (T.id === 'hump') drawHump(); else if (T.id === 'chair') drawRoom(now); else drawCounter(now);
+    else if (T.id === 'feather') drawFeather(now); else if (T.id === 'hump') drawHump(); else if (T.id === 'chair') drawRoom(now);
+    else if (T.id === 'cupboard') drawCupboard(now); else if (T.id === 'polite') drawPolite(now); else if (T.id === 'parchment') drawParchment(now); else drawCounter(now);
     cx.restore();
     requestAnimationFrame(frame);
   }
@@ -380,7 +500,11 @@
     measure: function (a, b) { return asking && asking.measure ? asking.measure(a, b) : null; },
     stepBack: function () { if (cur) cur.cancel(); else if (asking) asking.cancel(); },
     feather: function () { return { x: Math.round(feather.x), y: Math.round(feather.y), phase: feather.phase, mode: feather.mode, cur: cur && cur.state ? cur.state() : null }; },
-    wandEnds: wandEnds, rest: featherRest };
+    wandEnds: wandEnds, rest: featherRest,
+    cupboard: function () { var b = broomAt(); return { open: Math.round(cup.open * 100) / 100, target: cup.target, lean: Math.round(cup.lean * 100) / 100, broom: { x: (b.foot.x + b.top.x) / 2, y: (b.foot.y + b.top.y) / 2 } }; },
+    polite: function () { return { open: Math.round(polite.open * 100) / 100, target: polite.target, ear: !!EAR }; },
+    parchment: function () { return { ink: Math.round(parch.ink * 100) / 100, lines: parch.lines }; },
+    heard: heard, line: function () { return lineEl.textContent; } };
 })();
 </script>
 </body>
