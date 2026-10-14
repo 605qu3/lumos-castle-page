@@ -63,6 +63,90 @@
       "when": [
         "place = mirror classroom",
         "reading = 1",
+        "date >= 12-25",
+        "date <= 12-27",
+        "time = night",
+        "moon up = yes"
+      ],
+      "show": [
+        "a pale patch of moonlight on the floor just inside the door, the room's only light, and the window small and bright in the glass behind him"
+      ],
+      "canon": "Q20's t1 (Fawkes's, on architect-q20-mirror-room-1014), its stripe to the Mirror's feet put back to this patch at 3.34 am, provisional, Godric to confirm: model v24's mirror-window is north-facing in a 3.4 deep reveal, so its light falls just inside the door and shows again in the glass (Interiors' schedule, The window's light; req 391 the Architect's); the books give no window, only \"dark shapes\" (PS 12 L4260); only while the real moon is up (ours), the three nights he comes; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-26",
+        "time = night"
+      ],
+      "show": [
+        "a silvery cloak dropped in loose folds on the floor just inside the door"
+      ],
+      "canon": "Interiors' req 392: PS 12 L4312, the second night, \"Harry dropped the cloak from around his shoulders and ran to the mirror\", and L4356, Ron throws it back over them when Mrs Norris comes, so it lies there that night only; its spot Interiors'; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-25",
+        "time = night"
+      ],
+      "show": [
+        "a boy's small footprints in the dust of the walk, to the far end and back"
+      ],
+      "canon": "Interiors' req 392 and the Curator's item 8 with Fawkes's t1 (curator-mirror-list-1014, provisional, Godric to confirm): the first night Harry came alone (PS 12 L4258); the prints ours; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-26",
+        "time != night"
+      ],
+      "show": [
+        "a boy's small footprints in the dust of the walk, to the far end and back"
+      ],
+      "canon": "as above, the day after the first night"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date = 12-26",
+        "time = night"
+      ],
+      "show": [
+        "two boys' small footprints side by side in the dust of the walk, to the far end and back"
+      ],
+      "canon": "Interiors' req 392 and the Curator's item 8 with Fawkes's t1: the second night Ron came too (PS 12 L4312 to L4356), so from then a second boy's beside the first; kept through the Stone's year to June, the far wall bare (ours); not in later books' years, a summer's dust over them (ours); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date >= 12-27"
+      ],
+      "show": [
+        "two boys' small footprints side by side in the dust of the walk, to the far end and back"
+      ],
+      "canon": "as above, to the year's end"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
+        "date <= 06-30"
+      ],
+      "show": [
+        "two boys' small footprints side by side in the dust of the walk, to the far end and back"
+      ],
+      "canon": "as above, the spring after"
+    },
+    {
+      "when": [
+        "place = mirror classroom",
+        "reading = 1",
         "date = 12-27",
         "time = night"
       ],
