@@ -121,6 +121,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var gaps = Q.poly.map(function () { return []; });
     (M.openings || []).forEach(function (op) {
       if (!matches(M, op, Q.id)) return;
+      if (/hidden/.test(op.kind || '')) return;                       /* a doorway behind a panel or a tapestry reads as wall */
       var gid = op.group || null;
       var pts = op.span ? op.span.map(function (p) { return toSite(M, gid, p); }) : op.at ? [toSite(M, gid, op.at)] : null;
       if (!pts) return;
@@ -330,13 +331,50 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var look = lookAt || toLocal(at[0] + e[0] * 20, at[1] + e[1] * 20, z + EYE);
     return { name: name, pos: pos, look: look, thing: null, level: z };
   }
+  /* at a flight's head he faces where he goes on (req 318): the nearest flight up from that floor, else the way out on
+     it, else on along the flight */
+  function onward(F0) {
+    var best = null, bd = 1e9;
+    raw.forEach(function (G) {
+      if (G === F0 || Math.abs(G.zf - F0.zh) > 0.02) return;
+      var d = Math.hypot(G.foot[0] - F0.head[0], G.foot[1] - F0.head[1]);
+      if (d < bd) { bd = d; best = G; }
+    });
+    if (best) return toLocal(best.foot[0], best.foot[1], F0.zh + EYE);
+    var w = out.ways.filter(function (x) { return Math.abs(x.level - F0.zh) < 0.3; })[0];
+    if (w) { var v = w.mid.clone(); v.y = F0.zh - z0 + EYE; return v; }
+    return null;
+  }
   raw.forEach(function (F0) {
     var headPt = toLocal(F0.head[0], F0.head[1], F0.zh + EYE), footPt = toLocal(F0.foot[0], F0.foot[1], F0.zf + EYE);
     var fs = endStand(F0, F0.zf, true, F0.s.id + ' foot', headPt.clone());
-    var hs = endStand(F0, F0.zh, false, F0.s.id + ' head', null);
+    var hs = endStand(F0, F0.zh, false, F0.s.id + ' head', onward(F0));
     out.flights.push({ id: F0.s.id, foot: fs, head: hs, footPt: footPt, headPt: headPt });
     out.stands.push(fs, hs);
   });
+
+  /* the look up and down (the model's look a place, version 19, from docs/architect/vertical-views.md): each stand's
+     limits in degrees about the eye, its own by name or else the place's (14 each way where the model gives none),
+     and how far the head turns (60 each way, 180 all the way round); a stand the model names with a spot is added
+     here, and it and the start take the rest as their pitch */
+  var LK = (P.rec && P.rec.look) || {}, named = LK.stands || {};
+  Object.keys(named).forEach(function (n) {
+    var L = named[n]; if (!L.at) return;
+    var z = P.floor + (L.z || 0), f = L.face || [0, 1], ex = out.stands.filter(function (s) { return s.name === n; })[0];
+    var pos = toLocal(L.at[0], L.at[1], z + EYE), look = toLocal(L.at[0] + f[0] * 20, L.at[1] + f[1] * 20, z + EYE);
+    if (ex) { ex.pos = pos; ex.look = look; ex.level = z; }          /* a default stand the model moves (the awe stand) */
+    else out.stands.push({ name: n, pos: pos, look: look, thing: null, level: z });
+  });
+  function pick(L, k, d) { return L[k] != null ? L[k] : LK[k] != null ? LK[k] : d; }
+  out.stands.forEach(function (st) {
+    var L = named[st.name] || {};
+    st.lim = { rest: pick(L, 'rest', null), down: pick(L, 'down', -14), up: pick(L, 'up', 14), turn: pick(L, 'turn', 60) };
+    if (st.lim.rest != null && (st.name === 'start' || named[st.name])) {
+      var d = st.look.clone().sub(st.pos), hz = Math.hypot(d.x, d.z) || 1, k = 10 / hz;
+      st.look = st.pos.clone().add(new THREE.Vector3(d.x * k, Math.tan(st.lim.rest * Math.PI / 180) * 10, d.z * k));
+    }
+  });
+  out.look = LK;
   return out;
 } };
 })();

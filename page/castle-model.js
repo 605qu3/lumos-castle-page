@@ -10,11 +10,11 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 18,
+  "version": 19,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
-    "storey": 5.2, "storey_about": "Godric's 3.1 (12 October 2026, 6.23 pm): the corridor's built 4.5 m and a 0.7 m vault, every moving flight alike; the Great Hall and the Entrance Hall rise through two storeys, the Entrance Hall opening into the stair hall's well, its ceiling too high to make out (PS 7)",
+    "storey": 5.2, "slab": 0.7, "slab_about": "the depth between a storey's 4.5 ceiling and the next floor, Godric's 3.1's 0.7 m vault, unseen above the flat ceiling the corridor page draws (req 308); every gallery and landing clear 4.5 under the next", "storey_about": "Godric's 3.1 (12 October 2026, 6.23 pm): the corridor's built 4.5 m and a 0.7 m vault, every moving flight alike; the Great Hall and the Entrance Hall rise through two storeys, the Entrance Hall opening into the stair hall's well, its ceiling too high to make out (PS 7)",
     "about": "One long east-west block, the front doors on the north, the lake and the cliff on the south (Godric's 2.1, 12 October 2026, 5.57 pm). One stair hall runs from the north range to the south face, the marble and moving staircases in its well.",
     "cite": "the author's grounds sketch (the southern approach over the lake, the front entrance at the north); PS 7, PS 8, HBP 24"
   },
@@ -53,7 +53,7 @@ window.CASTLE_MODEL = {
     { "id": "south range, east", "rect": [92, 0, 160, 18], "floors": "G-6", "state": "designed", "ages": ["P3", "P4", "P6"] },
     { "id": "west range", "rect": [0, 18, 16, 50], "floors": "G-7", "state": "designed", "ages": ["P3", "P6"] },
     { "id": "east range", "rect": [144, 18, 160, 50], "floors": "G-7", "state": "designed", "ages": ["P3", "P4"] },
-    { "id": "stair hall", "rect": [68, 0, 92, 50], "floors": "G-7", "core": true, "state": "designed", "ages": ["P1", "P4"], "about": "the front doors to the cliff face, the marble and moving staircases in one well" },
+    { "id": "stair hall", "rect": [68, 0, 92, 50], "floors": "G-7", "core": true, "state": "designed", "ages": ["P1", "P4"], "look": {"rest": 0, "down": -70, "up": 60, "about": "each landing and gallery, floors 1 to 7 (vertical-views.md)", "stands": {"start": {"rest": 10, "down": -30, "up": 40, "about": "the well's mouth, under the first landings"}, "marble-staircase foot": {"rest": 10, "down": -30, "up": 40}, "marble-staircase head": {"at": [80.0, 44.6], "z": 2.6, "face": [0, -1], "rest": 10, "down": -40, "up": 75, "about": "the awe stand, where the first flight lands him: the marble staircase's half-landing, the shaft open overhead to the lantern (79 up); Godric's ask of 8.39 pm"}}}, "about": "the front doors to the cliff face, the marble and moving staircases in one well" },
     { "id": "cellars", "rect": [0, 0, 160, 72], "floors": "B", "state": "designed" }
   ],
   "courts": [
@@ -101,18 +101,21 @@ window.CASTLE_MODEL = {
   "rooms": [
     {
       "id": "common-room", "name": "Gryffindor common room", "group": "gryffindor-suite", "level": "7",
+      "look": {"down": -45, "up": 45, "about": "each stop's own rest; req 302"},
       "shape": { "circle": [0, 0], "r": 5.6 }, "wall": 0.8, "floor": 0, "ceiling": 7.0,
       "page": "common-room.html", "frame": { "x": 0, "y": 0, "turn": -48.7, "z": 0 },
       "state": "built", "cite": "PS 7, PS 9"
     },
     {
       "id": "dormitory", "name": "Harry's year's dormitory, at the top of the boys' stair (FIRST YEARS on its door, then SECOND YEARS)", "group": "gryffindor-suite", "level": "tower",
+      "look": {"down": -50, "up": 40, "about": "each stop's own rest; req 304"},
       "shape": { "circle": [0, 0], "r": 5.6 }, "wall": 0.8, "floor": 27.8, "ceiling": 32.3,
       "page": "dormitory.html", "frame": { "x": 0, "y": 0, "turn": -48.7, "z": 27.8 },
       "state": "built", "cite": "PS 7, CoS 5, GoF 12"
     },
     {
       "id": "corridor", "name": "the Fat Lady's corridor", "group": "gryffindor-suite", "level": "7",
+      "look": {"rest": -1, "down": -45, "up": 45, "about": "the landing at -1.98: down -65, up +55 (req 303)"},
       "shape": { "rect": [-1.5, 6.41, 1.5, 25.81] }, "walls": { "west": 0.3, "east": 0.45, "north": 0.3 },
       "floor": 0, "ceiling": 4.5,
       "page": "corridor.html", "frame": { "x": -2.31, "y": 8.71, "turn": -90, "z": 0 },
@@ -120,101 +123,121 @@ window.CASTLE_MODEL = {
     },
     {
       "id": "inglenook", "name": "the inglenook, where visitors wait", "group": "gryffindor-suite", "level": "7",
+      "look": {"rest": -10, "down": -55, "up": 40, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [-3.7, 15.11, -1.5, 19.51] }, "floor": 0, "ceiling": 2.4,
       "state": "built", "cite": ""
     },
     {
       "id": "corridor-cupboard", "name": "the broom cupboard on her corridor, locked, the old broom inside", "group": "gryffindor-suite", "level": "7",
+      "look": {"rest": -10, "down": -55, "up": 40, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [-2.7, 13.66, -1.8, 14.86] }, "floor": 0, "ceiling": 2.4,
       "about": "Godric's 1 on corridor-cupboard-place-1013 (13 October 2026, 6.55 pm; req 281, Magic's B18; the Architect's ledger, line 2): behind her long wall just before the fireside nook, past the second portrait; 1.2 m along the wall by 0.9 deep behind its 0.3 m wall, its door at its nook end, 0.25 m of wall left between it and the nook",
       "state": "designed", "cite": ""
     },
     {
       "id": "study", "name": "Clementine's study, a turret corbelled out from the tower", "group": "gryffindor-suite", "level": "7",
+      "look": {"rest": -10, "down": -55, "up": 40, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "circle": [-3.27, 5.55], "r": 2.2, "clip": { "x_max": -1.8 } }, "wall": 0.35, "floor": 0, "ceiling": 3.0,
       "state": "designed", "cite": ""
     },
     {
       "id": "lost-things", "name": "the room of lost things, behind the polite door", "group": "gryffindor-suite", "level": "7",
+      "look": {"rest": -10, "down": -55, "up": 40, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [-5.21, 8.16, -1.8, 9.26] }, "magic": "bigger inside", "floor": 0,
       "state": "designed", "cite": ""
     },
     {
       "id": "den", "name": "the den, behind the little door", "group": "gryffindor-suite", "level": "7",
+      "look": {"rest": -16, "down": -45, "up": 50, "about": "req 302"},
       "shape": { "circle": [6.5, -6.0], "r": 2.25 }, "magic": "bigger inside; drawn where its door looks", "floor": 0, "ceiling": 3.6,
       "page": "common-room.html", "state": "built", "cite": ""
     },
     {
       "id": "room-of-requirement", "name": "the Room of Requirement, on its own corridor in the north range", "level": "7",
+      "look": {"rest": 0, "down": -45, "up": 60, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [29.65, 46.6, 34.35, 50.0] }, "magic": "there when needed; behind the blank stretch, over the courtyard's air",
       "state": "designed", "cite": "OotP 18, HBP 21, HBP 24; Godric's Q48b, option 3 (12 October 2026, 6.48 pm)"
     },
     {
       "id": "room-corridor", "name": "the Room's corridor, along the north range's courtyard face", "level": "7",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [16, 50.6, 68, 53.6] }, "walls": { "south": 0.6, "north": 0.4 },
       "about": "3.0 m wide as hers, from the west range to the stair hall's north landing (the top of the last staircase); windows on the courtyard; about 110 m' walk from her portrait",
       "state": "designed", "cite": "OotP 18; Godric's Q48b, option 3 (12 October 2026, 6.48 pm)"
     },
     {
       "id": "dumbledores-office", "name": "Dumbledore's office, circular, at the top of his tower", "level": "T",
+      "look": {"rest": 0, "down": -45, "up": 60, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "circle": [166, 40], "r": 4.5 }, "z": 43.0, "ceiling": 49.0, "map": "PoA 10: pacing his study",
       "about": "z and ceiling in the castle's frame; circular, so a tower (CoS 11, OotP 22); which tower is ours, by the gargoyle of HBP 25",
       "state": "inferred", "cite": "CoS 11, CoS 12, PoA 10"
     },
     {
       "id": "second-floor-corridor", "name": "the second floor's corridor, from the stair hall west along the court", "level": "2",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [16, 14.5, 68, 17.5] }, "map": "PoA 10: Mrs Norris prowling the second floor",
       "about": "the books give the floor only; 3.0 m wide, along the south range's courtyard face to the west range",
       "state": "proposed", "cite": "PoA 10"
     },
     {
       "id": "trophy-room", "name": "the trophy room", "level": "3",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [0, 24, 16, 44] }, "map": "PoA 10: Peeves bouncing around the trophy room",
-      "about": "its floor from the books, its spot in the west range ours (the spaces list, 24)",
+      "about": "its floor from the books, its spot in the west range ours (the spaces list, 24); a door at either end, always unlocked, four windows on the west face for the moonlight on the cases (PS 9); the next room through its south door, the long gallery of armour through its north (PS 9). Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)",
       "state": "books", "cite": "PS 9, PoA 10"
     },
     {
       "id": "entrance-hall", "name": "the Entrance Hall", "level": "G",
+      "look": {"rest": 5, "down": -35, "up": 60, "stands": {"start": {"turn": 180, "about": "req 316: the start turns all the way round, so the front doors are seen; provisional, Godric to confirm (interaction-eh-doors-1013)"}}},
       "shape": { "rect": [68, 50, 92, 70] }, "floor": 0, "ceiling": 10.4, "map": "the front doors, the marble staircase",
       "about": "the layout PDF's 8: 24 by 20 m ours, in the north range under the Astronomy Tower; so big the Dursleys' house would fit in it, stone walls lit by torches, a flagged floor, its ceiling too high to make out (PS 7); rises through two storeys and opens south into the stair hall's well (Godric's 3.1); a balcony overhead (DH 32), not yet placed",
       "state": "books", "cite": "PS 7, CoS 5, HBP 8, DH 32"
     },
     {
       "id": "great-hall", "name": "the Great Hall", "level": "G",
+      "look": {"rest": 5, "down": -30, "up": 70, "stands": {"start": {"up": 80, "about": "req 315: just inside the doors, up +80 so the sky over the doors shows; provisional, Godric to confirm"}, "staff table": {"at": [19.6, 60.5], "face": [1, 0], "rest": 5, "down": -30, "up": 85, "turn": 180, "about": "req 315: on the gold chair's line (y 60.5) short of the stool (x 20.6, Interiors' schedule), looking down the hall, the head all the way round; provisional, Godric to confirm"}}},
       "shape": { "rect": [15, 51.5, 65, 69.5] }, "floor": 0, "ceiling": 15.6, "map": "the meals",
       "about": "through a doorway to the right on entering (PS 7); 50 by 18 m ours; rises through three storeys to 15.6, nothing on the first or second floor over it (Godric's 15.1 on architect-q15-hall-1013, 13 October 2026, 9.07 pm; sheet architect-look-1013-2059; ledger line 12), with his t1: from the doors the first look up shows the ceiling bewitched to look like the sky outside, the floating candles hanging well below it, so the sky reads far away (PS 7)",
       "state": "books", "cite": "PS 7, OotP 11"
     },
     {
       "id": "hall-cupboard", "name": "the broom cupboard off the Entrance Hall, buckets and mops inside", "level": "G",
+      "look": {"rest": -20, "down": -55, "up": 35, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [66.4, 63.2, 67.6, 64.8] }, "floor": 0, "ceiling": 2.4,
       "about": "Godric's 14.1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm; Magic's B21, the Architect's ledger, line 3): in the 3 m of wall between the two halls, its door on the Entrance Hall's west wall north of the Great Hall's doors; 1.6 m along the wall by 1.2 deep behind 0.4 m of the hall's wall, 1.4 m of wall left to the Great Hall; across the hall from the front doors; unlocked (PoA 21). Inside, among the buckets and mops, one bucket always upturned, just right to sit on (upturned-bucket; Godric's t1)",
       "state": "designed", "cite": "PoA 21"
     },
     {
       "id": "filchs-office", "name": "Filch's office", "level": "G",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [104, 62, 118, 70] }, "map": "his rounds start and end here",
       "about": "Harry follows him \"back downstairs\" (CoS 8); the ground floor and the north range ours",
       "state": "inferred", "cite": "CoS 8"
     },
     {
       "id": "mcgonagalls-office", "name": "Professor McGonagall's study", "level": "1",
-      "shape": { "rect": [146, 52, 158, 60] }, "map": "a teacher's dot",
-      "about": "\"Professor McGonagall's study on the first floor\" (PS 15); its spot beside her classroom ours",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
+      "shape": { "rect": [152, 53, 158, 58] }, "map": "a teacher's dot",
+      "about": "\"Professor McGonagall's study on the first floor\" (PS 15); \"a small room with a large, welcoming fire\" (PoA 5), eight people stand in it (CoS 18): 6 by 5 inside the old block of 12 by 8 (x 146 to 158, y 52 to 60), its door off the first floor's corridor (CoS 17, PoA 5), its fire on the wall facing the door (CoS 18); the block's rest (x 146 to 152, y 58 to 60) left for her classroom beside it, unplaced. Ledger line 10; provisional, Godric to confirm (interiors-study-size-1013)",
       "state": "books", "cite": "PS 15"
     },
     {
       "id": "dungeon-corridor", "name": "the dungeon corridors", "level": "B",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [16, 3, 120, 15] }, "map": "B14 t2: the dot on the dungeon corridor is Snape",
       "about": "the dungeons under the south ranges, Potions and the deathday party's corridors (CoS 8); the spot ours",
       "state": "books", "cite": "CoS 8"
     },
     {
       "id": "witch-landing", "name": "the one-eyed witch's landing, near the marble staircase", "level": "3",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "rect": [60, 31, 68, 34] }, "map": "the passage to Honeydukes behind her hump",
       "about": "8 by 3 m (req 178, B8); the spot inferred, the spaces list's 26; the Architect's step 3 recommends it directly beneath the corridor page's landing run (site x 68 to 76, y 0.45 to 3.45), waiting on Godric's marks",
       "state": "inferred", "cite": "PoA 10, PoA 14"
-    }
+    },
+    {"id": "first-floor-corridor", "name": "the first floor's corridor, from the marble staircase east to her study", "level": "1", "shape": {"rect": [89.6, 50, 158, 53]}, "about": "\"up the marble staircase and along a corridor\" (PoA 5): the stair hall's east gallery on the first floor runs on north through the hall's wall (first-floor-mouth) and turns east along the north range's courtyard face; its first 2.4 m over the Entrance Hall's south-east corner, east of the well's mouth. Ledger line 10; provisional, Godric to confirm (interiors-study-size-1013)", "state": "proposed", "cite": "PoA 5, CoS 17", "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"}},
+    {"id": "trophy-next-room", "name": "the room next to the trophy room, where Filch is heard", "level": "3", "shape": {"rect": [0, 18, 16, 24]}, "about": "\"a noise in the next room\" (PS 9): through the trophy room's south door, the west range's last 6 m before the south range. Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "state": "proposed", "cite": "PS 9", "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"}},
+    {"id": "armour-gallery", "name": "the long gallery full of suits of armour", "level": "3", "shape": {"rect": [5, 44, 11, 70]}, "about": "\"a long gallery full of suits of armor\" (PS 9): through the trophy room's north door, 26 m north up the west range's end and into the north range's west end over the Great Hall's floor (the hall's ceiling at 15.6 is this floor), 6 m wide. Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "state": "proposed", "cite": "PS 9", "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"}}
   ],
   "openings": [
     { "id": "portrait-hole", "kind": "round hole behind the Fat Lady", "between": ["corridor", "common-room"],
@@ -224,9 +247,9 @@ window.CASTLE_MODEL = {
     { "id": "nook-mouth", "kind": "open mouth", "between": ["corridor", "inglenook"], "span": [[-1.5, 15.11], [-1.5, 19.51]],
       "h": 2.4, "state": "built", "cite": "" },
     { "id": "corridor-window-1", "kind": "window", "room": "corridor", "at": [1.95, 11.21], "w": 1.2, "sill": 0.9, "h": 2.4,
-      "about": "a noted exception, not a change (ledger line 6; req 249, Godric's 1 on corridor-lake-view-249 with t1): facing south over the lake, yet the page's drawn view shows Hagrid's hut, the pumpkins and the forest, which the hut 350 m east and 100 degrees off would not give; kept for OotP 13, \"There was still no light in Hagrid's cabin\", seen from the castle", "view": "the grounds", "state": "built", "cite": "" },
+      "about": "a noted exception, not a change (ledger line 6; req 249, Godric's 1 on corridor-lake-view-249 with t1): facing south over the lake, yet the page's drawn view shows Hagrid's hut, the pumpkins and the forest, which the hut 350 m east and 100 degrees off would not give; kept for OotP 13, \"There was still no light in Hagrid's cabin\", seen from the castle; the page calls this one (page x -2.5) window-2 (req 308)", "state": "built", "cite": "" },
     { "id": "corridor-window-2", "kind": "window", "room": "corridor", "at": [1.95, 13.31], "w": 1.2, "sill": 0.9, "h": 2.4,
-      "about": "a noted exception, not a change (ledger line 6; req 249, Godric's 1 on corridor-lake-view-249 with t1): facing south over the lake, yet the page's drawn view shows Hagrid's hut, the pumpkins and the forest, which the hut 350 m east and 100 degrees off would not give; kept for OotP 13, \"There was still no light in Hagrid's cabin\", seen from the castle", "state": "built", "cite": "" },
+      "about": "a noted exception, not a change (ledger line 6; req 249, Godric's 1 on corridor-lake-view-249 with t1): facing south over the lake, yet the page's drawn view shows Hagrid's hut, the pumpkins and the forest, which the hut 350 m east and 100 degrees off would not give; kept for OotP 13, \"There was still no light in Hagrid's cabin\", seen from the castle; the page hangs the grounds' drawing here (page x -4.6, the window nearer the stairs, the Remembrall's sill; Q20) and calls it window (req 308: the view moved here from corridor-window-1)", "view": "the grounds", "state": "built", "cite": "" },
     { "id": "cupboard-door", "kind": "door, narrow, plain and locked", "between": ["corridor", "corridor-cupboard"], "at": [-1.5, 14.46], "w": 0.8, "h": 2.0,
       "state": "designed", "about": "the corridor page's x -5.75 on her wall: 0.25 m clear of the second portrait's frame (x -5.1) and of the nook's mouth (x -6.4); Godric's 1 on corridor-cupboard-place-1013 (13 October 2026, 6.55 pm; ledger line 2)",
       "cite": "" },
@@ -235,21 +258,21 @@ window.CASTLE_MODEL = {
       "about": "the lion window, Gryffindor's lion in scarlet and gold glass (req 29; the drawing's shape, 2.33 by 4.8 m), moved from the landing's far end to its south side wall, the castle's south face, centred on the landing (Godric's 1 on corridor-landing-end-1013, 13 October 2026, 6.55 pm; ledger line 1). Its sill 0.9 m above the landing's floor, which is 1.98 m below the corridor's (so -1.08 in the corridor's heights, +35.32 in the castle's); the landing's floor is 2.40 m long, 3.5 cm more than the window, and the outer wall runs on west along the flight and east along the bay, so its jambs stand in whole wall",
       "cite": "" },
     { "id": "common-room-window-left", "kind": "window, a seat in a splayed reveal", "room": "common-room",
-      "bearing": 17.2, "w": 1.2, "sill": 1.95, "h": 2.7, "cant": 6.9, "state": "built", "cite": "" },
+      "bearing": 17.2, "w": 1.2, "sill": 2.09, "h": 2.42, "cant": 6.9, "state": "built", "about": "the drawn window from the bay's head (2.09) to about 4.51, as the page has it (req 308; was the grey card's 1.95 and 2.7)", "cite": "" },
     { "id": "common-room-window-right", "kind": "window, a seat in a splayed reveal", "room": "common-room",
-      "bearing": 80.2, "w": 1.2, "sill": 1.95, "h": 2.7, "cant": -6.9, "state": "built", "cite": "" },
+      "bearing": 80.2, "w": 1.2, "sill": 2.09, "h": 2.42, "cant": -6.9, "state": "built", "about": "as the left (req 308)", "cite": "" },
     { "id": "bookcase", "kind": "swinging bookcase", "between": ["common-room", "study"], "bearing": -31.3, "w": 1.2,
       "h": 3.4, "state": "built", "cite": "" },
     { "id": "little-door", "kind": "little door with a big lock", "between": ["common-room", "den"], "bearing": 132.7,
-      "w": 0.7, "h": 1.1, "state": "built", "cite": "" },
+      "w": 0.9, "h": 1.2, "state": "built", "about": "the page's piece with its stone band and sill, the oak leaf itself about 0.67 by 0.97 (req 308; was 0.7 by 1.1)", "cite": "" },
     { "id": "dorm-W1", "kind": "window", "room": "dormitory", "bearing": 10.2, "w": 0.6, "sill": 1.1, "h": 1.9,
-      "view": "Hagrid's hut, the forest edge", "state": "built", "cite": "" },
+      "view": "the forest, the mountains", "about": "as the page has it (req 308): the model's own grounds put the hut and the beech on W2's side", "state": "built", "cite": "" },
     { "id": "dorm-W2", "kind": "window", "room": "dormitory", "bearing": -18.8, "w": 0.6, "sill": 1.1, "h": 1.9,
-      "view": "the lake, the mountains", "state": "built", "cite": "" },
+      "view": "the beech, the lake's arm, Hagrid's hut", "about": "as the page has it (req 308; was the lake, the mountains)", "state": "built", "cite": "" },
     { "id": "dorm-W3", "kind": "window", "room": "dormitory", "bearing": 87.2, "w": 0.6, "sill": 1.1, "h": 1.9,
       "view": "the lawn, the castle's shadow", "state": "built", "cite": "PoA 15" },
     { "id": "dorm-door", "kind": "door, panelled, the year's sign on its stair side", "between": ["dormitory", "tower-stair"], "group": "gryffindor-suite", "at": [3.579, -2.244], "w": 0.8, "h": 2.0,
-      "state": "designed", "about": "the dormitory's door at the stair head (Godric's 1 on dormitory-sign-door-1013, 13 October 2026, 1.51 to 1.55 pm, req 260's t1; the Architect's ledger line 5, req 296): in the kerb's gap of the screen round the newel (dorm-stair-screen), across the gap's 1.30 m chord, 0.65 m from the newel's centre toward the room's (bearing 122.1), its face to the room, the year's sign on its stair side; the dormitory page's newel (4.67, -1.4) through the room's frame is the stair's newel here. His t1: on Christmas morning the twins fling it open and bound in (PS 12)",
+      "state": "built", "about": "the dormitory's door at the stair head (Godric's 1 on dormitory-sign-door-1013, 13 October 2026, 1.51 to 1.55 pm, req 260's t1; the Architect's ledger line 5, req 296): in the kerb's gap of the screen round the newel (dorm-stair-screen), across the gap's 1.30 m chord, 0.65 m from the newel's centre toward the room's (bearing 122.1), its face to the room, the year's sign on its stair side; the dormitory page's newel (4.67, -1.4) through the room's frame is the stair's newel here. His t1: on Christmas morning the twins fling it open and bound in (PS 12)",
       "cite": "CoS 5, PS 12" },
     { "id": "front-doors", "kind": "the great oak front doors, two leaves", "between": ["entrance-hall", "grounds"], "at": [80, 70],
       "w": 4.0, "h": 6.0, "state": "books", "about": "at the top of a flight of stone steps, facing the marble staircase; their size ours",
@@ -277,7 +300,22 @@ window.CASTLE_MODEL = {
     { "id": "corridor-mouth", "kind": "open mouth, the Fat Lady's corridor's full section", "between": ["stair hall", "corridor"],
       "span": [[68, 0.45], [68, 3.45]], "sill": 34.42, "h": 6.48, "state": "designed",
       "about": "the landing bay at +34.42 (the sixth moving flight's head) runs on west through the stair hall's wall into the corridor's landing (corridor-landing, x 65.6 to 68 in the castle's frame), the corridor's 3.0 m width and its ceiling (40.9) kept; corridor.html takes ?from=stair-hall. The landing's far end stands open to the bay, no end wall, the lion window moved to the landing's south side wall (landing-window; Godric's 1 on corridor-landing-end-1013, 13 October 2026, 6.55 pm; ledger line 1)",
-      "cite": "PS 7, OotP 32; Godric's 12.1 (13 October 2026, 4.57 pm)" }
+      "cite": "PS 7, OotP 32; Godric's 12.1 (13 October 2026, 4.57 pm)" },
+    {"id": "dumbledores-door", "kind": "door, oak, the griffin knocker at 1.45", "between": ["dumbledores-office", "heads-spiral"], "at": [163.62, 36.18], "compass": 212, "w": 1.0, "h": 2.3, "state": "pending", "about": "facing the head's spiral (compass 212 about the office's centre, 166, 40); opens inward, its hinge on the west side (163.2, 36.47), the leaf stopping at about 80 degrees short of Fawkes's perch \"behind the door\" (CoS 12); through the tower's 1.5 m wall, its threshold 0.6 m from the spiral's top step. pending Godric's answer on interiors-office-level-1013 (one level, recommended, or the films' gallery); modelled on one level. Ledger line 7", "cite": "CoS 11, CoS 12"},
+    {"id": "dumbledores-window-1", "kind": "window, arched", "room": "dumbledores-office", "at": [170.43, 40.78], "compass": 80, "w": 0.9, "sill": 1.0, "h": 2.6, "view": "the vegetable patch, the greenhouses and the forest beyond", "state": "pending", "about": "on the east arc, head 3.6 (ours; books 1 to 3 silent). pending Godric's answer on interiors-office-level-1013 (one level, recommended, or the films' gallery); modelled on one level. Ledger line 7", "cite": ""},
+    {"id": "dumbledores-window-2", "kind": "window, arched", "room": "dumbledores-office", "at": [170.08, 38.1], "compass": 115, "w": 0.9, "sill": 1.0, "h": 2.6, "view": "the lake's east arm, the forest's edge", "state": "pending", "about": "on the east arc, head 3.6 (ours). pending Godric's answer on interiors-office-level-1013 (one level, recommended, or the films' gallery); modelled on one level. Ledger line 7", "cite": ""},
+    {"id": "girls-door", "kind": "door, arched, oak", "between": ["common-room", "Gryffindor girls' tower"], "group": "gryffindor-suite", "bearing": -90, "w": 1.0, "h": 2.1, "state": "pending", "about": "the door to the girls' dormitories (OotP 13, 17; GoF 12): through the 0.8 m wall shared with the girls' drum, due north (compass 0, 138.7 degrees left of the hearth, the middle of the shared stretch), its sill on the flags, opening into their drum onto the foot of their stair (OotP 17's slide). Ledger line 8, req 261 and 317; pending Godric's answer on common-girls-door-1013 (126 and 151 left the alternatives); modelled on the recommended", "cite": "OotP 13, OotP 17, GoF 12, PS 7"},
+    {"id": "study-window", "kind": "window, enchanted, two oak shutters and an iron latch", "room": "study", "group": "gryffindor-suite", "bearing": -26.8, "w": 0.6, "sill": 0.75, "h": 0.75, "magic": "enchanted (OotP 7: \"Those are enchanted windows\"): blind in the stone behind (the room of lost things), it shows the grounds of 1890 from her floor, the willow's spot in the middle of its frame and no tree there", "view": "the grounds of 1890, the whomping-willow spot centred (232 m, compass 63)", "state": "proposed", "about": "her window (Magic's B16, req 253 and 255): about her desk's top, deep in the turret's wall on the willow's bearing; no real window in her study sees the spot, which lies behind the castle (sheet architect-req255-1013-2326: the line runs 76 m through the range, the stair hall and the north range). Taken 11.28 pm with Fawkes agreeing, provisional, Godric to confirm (architect-req255-window-1013)", "cite": "OotP 7, PoA 18"},
+    {"id": "first-floor-mouth", "kind": "open mouth", "between": ["stair hall", "first-floor-corridor"], "span": [[89.6, 50], [92, 50]], "sill": 5.2, "h": 4.5, "state": "proposed", "about": "the east gallery's first floor runs on north into the corridor to her study (PoA 5). Ledger line 10; provisional, Godric to confirm (interiors-study-size-1013)", "cite": "PoA 5"},
+    {"id": "mcgonagalls-door", "kind": "door, oak", "between": ["first-floor-corridor", "mcgonagalls-office"], "at": [155, 53], "w": 1.0, "h": 2.2, "state": "proposed", "about": "\"Harry knocked and pushed the door open\" (CoS 17): in her study's south wall off the corridor, on its middle, the fire straight ahead across the room. Ledger line 10; provisional, Godric to confirm (interiors-study-size-1013)", "cite": "CoS 17, PoA 5"},
+    {"id": "trophy-door-south", "kind": "door, oak, unlocked", "between": ["trophy-room", "trophy-next-room"], "at": [8, 24], "w": 1.2, "h": 2.4, "state": "proposed", "about": "\"the doors at either end of the room\" (PS 9); opens in, no lock (the room is always unlocked). Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "cite": "PS 9"},
+    {"id": "trophy-door-north", "kind": "door, oak, unlocked", "between": ["trophy-room", "armour-gallery"], "at": [8, 44], "w": 1.2, "h": 2.4, "state": "proposed", "about": "the other end's door (PS 9), to the long gallery of armour. Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "cite": "PS 9"},
+    {"id": "trophy-window-1", "kind": "window", "room": "trophy-room", "at": [0, 27.5], "w": 1.4, "sill": 1.0, "h": 3.0, "view": "the west grounds by moonlight", "state": "proposed", "about": "\"The crystal trophy cases glimmered where the moonlight caught them\" (PS 9): on the west face. Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "cite": "PS 9"},
+    {"id": "trophy-window-2", "kind": "window", "room": "trophy-room", "at": [0, 32.0], "w": 1.4, "sill": 1.0, "h": 3.0, "view": "the west grounds by moonlight", "state": "proposed", "about": "\"The crystal trophy cases glimmered where the moonlight caught them\" (PS 9): on the west face. Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "cite": "PS 9"},
+    {"id": "trophy-window-3", "kind": "window", "room": "trophy-room", "at": [0, 36.0], "w": 1.4, "sill": 1.0, "h": 3.0, "view": "the west grounds by moonlight", "state": "proposed", "about": "\"The crystal trophy cases glimmered where the moonlight caught them\" (PS 9): on the west face. Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "cite": "PS 9"},
+    {"id": "trophy-window-4", "kind": "window", "room": "trophy-room", "at": [0, 40.5], "w": 1.4, "sill": 1.0, "h": 3.0, "view": "the west grounds by moonlight", "state": "proposed", "about": "\"The crystal trophy cases glimmered where the moonlight caught them\" (PS 9): on the west face. Ledger line 11; provisional, Godric to confirm (interiors-trophy-middle-1013)", "cite": "PS 9"},
+    {"id": "hidden-doorway-panel", "kind": "hidden doorway behind a sliding panel", "between": ["stair hall", "a hidden passage"], "at": [92, 24.0], "sill": 10.4, "w": 0.9, "h": 2.1, "state": "proposed", "about": "\"twice Percy led them through doorways hidden behind sliding panels and hanging tapestries\" (PS 7): the second floor's east gallery, its outer wall's middle, on the climb by the fixed flights (M2 to M3). The shell draws it as wall. Ledger line 9; Interiors keeps 2.0 m either side clear and hangs the tapestry; provisional, Godric to confirm (interiors-stair-surfaces-1013)", "cite": "PS 7"},
+    {"id": "hidden-doorway-tapestry", "kind": "hidden doorway behind a hanging tapestry", "between": ["stair hall", "a hidden passage"], "at": [92, 24.0], "sill": 26.0, "w": 0.9, "h": 2.1, "state": "proposed", "about": "the second of PS 7's two: the fifth floor's east gallery, above the first, on the climb (M5 to M6). The shell draws it as wall. Ledger line 9; Interiors keeps 2.0 m either side clear and hangs the tapestry; provisional, Godric to confirm (interiors-stair-surfaces-1013)", "cite": "PS 7"}
   ],
   "features": [
     { "id": "hearth", "room": "common-room", "kind": "fireplace", "bearing": 48.7, "w": 3.0, "h": 2.5, "proud": 0.6, "state": "built" },
@@ -297,8 +335,14 @@ window.CASTLE_MODEL = {
     { "id": "upturned-bucket", "room": "hall-cupboard", "kind": "a bucket always upturned among the buckets and mops, just right to sit on", "at": [67.0, 63.6], "w": 0.3, "h": 0.35,
       "state": "designed", "about": "Godric's t1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm): \"Hermione sat down on an upturned bucket\"", "cite": "PoA 21" },
     { "id": "dorm-stair-screen", "room": "dormitory", "group": "gryffindor-suite", "kind": "panelled screen round the stair head, three quarters of a circle, the door in its gap", "centre": [4.13, -2.59], "r": 0.92, "h": 2.15, "arc": 270, "gap_bearing": 122.1,
-      "state": "designed", "about": "Godric's 1 on dormitory-sign-door-1013 (13 October 2026, 1.51 to 1.55 pm; the Architect's ledger line 5, req 296): on the kerb's line, 0.92 m from the newel's centre, 2.15 m high, its quarter gap toward the room's centre (gap_bearing, the bearing of the gap's middle about the room's centre) and holding dorm-door; the bed at 53 right stays 0.19 m clear (the Dormitory's mock, tools/dormitory-sign-mock.js); the stair head is no longer open",
-      "cite": "CoS 5" }
+      "state": "built", "about": "Godric's 1 on dormitory-sign-door-1013 (13 October 2026, 1.51 to 1.55 pm; the Architect's ledger line 5, req 296): on the kerb's line, 0.92 m from the newel's centre, 2.15 m high, its quarter gap toward the room's centre (gap_bearing, the bearing of the gap's middle about the room's centre) and holding dorm-door; the bed at 53 right stays 0.19 m clear (the Dormitory's mock, tools/dormitory-sign-mock.js); the stair head is no longer open",
+      "cite": "CoS 5" },
+    {"id": "dumbledores-fireplace", "room": "dumbledores-office", "kind": "fireplace and its flue", "at": [165.37, 35.54], "compass": 188, "w": 1.2, "h": 1.4, "proud": 0.5, "state": "pending", "about": "in the wall on his right as he enters, 0.8 m of wall from the door's latch side (ours, a tower room's hearth); its flue up the tower's wall to the roof. pending Godric's answer on interiors-office-level-1013 (one level, recommended, or the films' gallery); modelled on one level. Ledger line 7", "cite": ""},
+    {"id": "mcgonagalls-fireplace", "room": "mcgonagalls-office", "kind": "fireplace, large, with a mantelpiece, and its flue", "at": [155, 58], "w": 1.8, "h": 1.4, "proud": 0.6, "mantel": 1.5, "state": "proposed", "about": "\"a large, welcoming fire\" (PoA 5) on the wall facing the door, seen from the doorway: Mrs Weasley crying in front of the fire, Dumbledore by the mantelpiece (CoS 18); its flue up the north range's inner wall to the roof. Ledger line 10; provisional, Godric to confirm (interiors-study-size-1013)", "cite": "PoA 5, CoS 18"},
+    {"id": "marble-banisters", "room": "stair hall", "kind": "the marble staircase's banisters, both sides of its first flight, their ends flat-topped at a boy's reach", "span": [[73, 50], [73, 45.2]], "span2": [[87, 50], [87, 45.2]], "h": 0.95, "end_h": 1.05, "end_top": [0.3, 0.3], "state": "proposed", "about": "\"perched the chocolate cakes on the end of the banisters\" (CoS 12): a balustrade along each side of the first flight (x 73 and 87, y 50 to 45.2), a square newel at each foot, its top 0.3 by 0.3 at 1.05. Ledger line 9; Interiors keeps 2.0 m either side clear and hangs the tapestry; provisional, Godric to confirm (interiors-stair-surfaces-1013)", "cite": "CoS 12"},
+    {"id": "north-tower-way", "room": "stair hall", "kind": "where the way to the North Tower leaves the seventh floor (kept, nothing built)", "span": [[88.5, 50], [91.5, 50]], "z": 36.4, "state": "proposed", "about": "off the seventh floor's north landing at its east end, into the north range and east to the North Tower's spiral (162.4, 63.6), on whose climb Sir Cadogan's lonely landing lies (PoA 6, PoA 14); Interiors keeps the landing's wall clear here. Ledger line 9; Interiors keeps 2.0 m either side clear and hangs the tapestry; provisional, Godric to confirm (interiors-stair-surfaces-1013)", "cite": "PoA 6, PoA 14"},
+    {"id": "well-lantern", "room": "stair hall", "kind": "lantern over the well, an ogee cap", "centre": [80, 34], "r": 3.2, "z": 56.0, "top": 59.0, "ridge": 62.0, "state": "proposed", "about": "the massing's (tools/architect-accreted-castle.py, its P6 lantern): light for the well of moving stairs, 79 degrees up from the awe stand on the half-landing; on the stair hall's roof over the void (x 73.4 to 86.6). Ledger line 9's note (d), closed", "cite": ""},
+    {"id": "great-south-window", "room": "stair hall", "kind": "the great window in the lake wall, lighting the void", "span": [[75.5, 0], [84.5, 0]], "sill": 12.0, "h": 19.0, "state": "proposed", "about": "the accreted sections' great window cut through the founders' stone (tools/architect-accreted-sections.py, sill 12, head 31): 9 m wide on the void's middle; the south landings of floors 3, 4 and 5 pass before it as bridges, so Interiors keeps their back wall clear over x 75.5 to 84.5. Ledger line 9's note (d), closed", "cite": ""}
   ],
   "stairs": [
     { "id": "tower-stair", "kind": "open newel stair", "rooms": ["common-room", "dormitory"], "newel": [4.13, -2.59], "r": 0.7,
@@ -357,6 +401,7 @@ window.CASTLE_MODEL = {
     {"id": "well-M6", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 46.4], [89.6, 37.4]], "up": [0, -1], "from": 26.0, "to": 31.2, "treads": 30, "rise": 0.173, "state": "designed"},
     {"id": "well-S5", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 46.4], [73.4, 37.4]], "up": [0, -1], "from": 26.0, "to": 31.2, "treads": 30, "rise": 0.173, "state": "designed"},
     {"id": "well-M7", "kind": "marble staircase, fixed", "rooms": ["stair hall"], "span": [[86.6, 3.6], [89.6, 12.6]], "up": [0, 1], "from": 31.2, "to": 36.4, "treads": 30, "rise": 0.173, "state": "designed"},
+    {"id": "heads-spiral", "kind": "spiral staircase, moving smoothly upward (CoS 11), in its own turret engaged on the head's tower", "rooms": ["dumbledores-office"], "newel": [161.8, 33.4], "r": 1.2, "turret_r": 2.0, "to": 43.0, "state": "pending", "about": "the head's spiral (the model's spirals list) stands 7.82 m from the office's centre, outside the tower's 6.0; its turret, 2.0 round with a 0.8 wall, meets the tower's face, the spiral's top step 0.6 m from the door's outer reveal. Its foot, the gargoyle's corridor, is not yet placed. Ledger line 7; pending interiors-office-level-1013", "cite": "CoS 11, HBP 25"},
     {"id": "well-S6", "kind": "moving staircase", "rooms": ["stair hall"], "span": [[70.4, 9.0], [73.4, 3.6]], "up": [0, -1], "from": 31.2, "to": 34.42, "treads": 19, "rise": 0.169, "state": "designed"}
   ],
   "dormitories": {

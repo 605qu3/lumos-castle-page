@@ -140,8 +140,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="lines"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=18"></script>
-<script src="castle-shell.js?v=4"></script>
+<script src="castle-model.js?v=19"></script>
+<script src="castle-shell.js?v=5"></script>
 <script src="castle-events.js?v=31"></script>
 <script>
 (function () {
@@ -197,7 +197,13 @@ shell.flights.forEach(function (f) {
 /* standing and looking round (the dormitory's way, req 210's: a drag turns his head from where he stands). He walks
    between stands on one floor by its landings, and up or down a flight from one end to the other (Godric's 12.1, the
    stair hall's well); a thing on another floor waits until he has climbed to it. Back walks the same way down. */
-var HEAD_MAX = Math.PI / 3, HEAD_PITCH = 0.25;
+var D2R = Math.PI / 180;
+/* how far his head goes at a stand (the model's look, version 19): the turn each way (all round at 180), the pitch
+   between the stand's down and up, measured about the level, whatever the stand looks at */
+function limits(s) {
+  var L = s.lim || { down: -14, up: 14, turn: 60 }, d = s.look.clone().sub(s.pos), el0 = Math.atan2(d.y, Math.hypot(d.x, d.z));
+  return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
+}
 var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
 var things = shell.doors.concat(shell.ways), tappables = things.map(function (d) { return d.mesh; });
 var trail = [START.pos.clone()];
@@ -622,7 +628,7 @@ canvas.addEventListener('pointermove', function (e) {
   var dx = e.clientX - px, dy = e.clientY - py;
   px = e.clientX; py = e.clientY;
   if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
-  if (!tween) { hyT = clamp(hyT - dx * 0.003, -HEAD_MAX, HEAD_MAX); hpT = clamp(hpT - dy * 0.0012, -HEAD_PITCH, HEAD_PITCH); }
+  if (!tween) { var lm = limits(here); hyT = lm.yaw == null ? hyT - dx * 0.003 : clamp(hyT - dx * 0.003, -lm.yaw, lm.yaw); hpT = clamp(hpT - dy * 0.003, lm.lo, lm.hi); }
 });
 function endDrag(e) { if (!dragging) return; dragging = false; if (!moved && e.type === 'pointerup') tap(e.clientX, e.clientY); }
 canvas.addEventListener('pointerup', endDrag);
@@ -708,7 +714,13 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },
   stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
-  head: function () { return { yaw: hy, limit: HEAD_MAX }; },
+  head: function () { var lm = limits(here); return { yaw: hy, pitch: hp, limit: lm.yaw, lo: lm.lo, hi: lm.hi, lim: here.lim }; },
+  /* a stand by name at once, and the head set and held within its limits (the shots at both limits) */
+  standNamed: function (n) {
+    var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
+    tween = null; legs = []; here = s; hy = hyT = hp = hpT = 0; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
+  },
+  look: function (y, p) { var lm = limits(here); hy = hyT = lm.yaw == null ? y : clamp(y, -lm.yaw, lm.yaw); hp = hpT = clamp(p, lm.lo, lm.hi); return { yaw: hy, pitch: hp }; },
   /* a shut door's tap; x and y (metres across and up from the leaf's middle) put it on a spot, as on a knot */
   answer: function (id, x, y) {
     var d = things.filter(function (x) { return x.id === id; })[0];
