@@ -152,6 +152,13 @@
    waits for his brother's own turn, however long. There, `parcel` reads `coming`, then `sill` once a record's
    `land parcel` has set it down, and `open parcel` puts the thing into his castle, `parcel thing` naming it (the
    card, or `knut`); `parcel()` gives the page { from, name, kind, thing, landed } for the label. Free (v=32).
+   Then the point for a thing given (Magic's req 298, `given`, Dumbledore's socks, PS 12): `point given {parcel thing}
+   N` after `open parcel` gives the point to the sender, never the boy opening it. Only the first parcel opened each
+   week each way earns it, so the owl stays for giving and a Knut sent to and fro is never a points mill. The slip's
+   thing is the thing and the week's Monday (`morgana 2026-10-12`); its reason reads `given <thing>`, else `given`.
+   At the opening his brother's copy (`from` the sender, the sender's house from his satchel's settings) goes
+   straight to the page, so its gems fly from the sill where the parcel stood, with no second owl; the sender's own
+   waits in the iPad's owl (`owl.given`) and is his from the start of his next turn, posted as his own (v=33).
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -877,6 +884,7 @@
         if (v === undefined || v === null || v === '') { note(rec.id + ': no ' + thing + ' to award a point for'); return; }
         thing = String(v);
       }
+      if (kind === 'given') { giveFor(thing, n, rec); return; }
       for (var i = 0; i < state.points.length; i++) {
         var had = state.points[i];
         if (!had.from && had.kind === kind && had.thing === thing) return;   /* his brother's first lumos never blocks his own */
@@ -897,11 +905,12 @@
     function withReason(p) {
       var out = Object.assign({}, p);
       if (/^\d{4}-\d\d-\d\d$/.test(p.on || '')) out.year = schoolYear(p.on);   /* the school year it fell in */
-      var r = reasonDefs[p.kind + ' ' + p.thing] || reasonDefs[p.kind];
+      var what = p.kind === 'given' ? String(p.thing).split(' ')[0] : p.thing;   /* a gift's slip: the thing, its week after */
+      var r = reasonDefs[p.kind + ' ' + what] || reasonDefs[p.kind];
       if (!r || !r.words) return out;
-      var said = String(p.thing).replace(/-/g, ' ');
+      var said = String(what).replace(/-/g, ' ');
       for (var d in deckDefs) {
-        var c = deckDefs[d].filter(function (x) { return x.item === p.thing && x.say; })[0];
+        var c = deckDefs[d].filter(function (x) { return x.item === what && x.say; })[0];
         if (c) { said = c.say; break; }
       }
       if (p.kind === 'spell') said = said.replace(/(^| )\S/g, function (ch) { return ch.toUpperCase(); });
@@ -950,6 +959,22 @@
       if (bare && (owl.players || []).length && owl.store && owl.key) owl.restoring = true;   /* his castle backed up: bring it down */
     }
     save(OWL_KEY, owl);
+    /* A point for a thing he gave (req 298), waiting in the iPad's owl since his brother opened it: his own from the
+       start of his turn, so it is in his heap before the page draws it, and posted as his own. */
+    if (owl.given && !owl.restoring && playerOf(owl.playing) && (owl.given[owl.playing] || []).length) {
+      owl.given[owl.playing].forEach(function (g) {
+        for (var i = 0; i < state.points.length; i++) {
+          var p = state.points[i];
+          if (!p.from && p.kind === g.kind && p.thing === g.thing) return;
+        }
+        var mine = { kind: g.kind, thing: g.thing, points: g.points, on: g.on, record: g.record };
+        if (castleHouse()) mine.house = castleHouse();
+        state.points.push(mine);
+      });
+      delete owl.given[owl.playing];
+      save(OWL_KEY, owl);
+      save(STATE_KEY, state);
+    }
     var owlBusy = false, owlAgain = false, owlRun = null, owlClock = 0, owlWaited = false, heapGrew = false;
     function slipKey(p) { return p.kind + ' ' + p.thing; }
     function owlCall(method, path, body) {
@@ -1134,7 +1159,7 @@
     /* A thing from his den to his brother's, by a school owl, free (GoF 18: anyone can use them). The parcel waits in
        the iPad's owl, one each way, for his brother's own turn; it is gone from the sender's castle as the owl takes it
        and in his brother's once opened, nothing lost between. */
-    var parcelOpened = null;
+    var parcelOpened = null, parcelOpenedFrom = null;
     function brotherOf(id) { return (owl.players || []).filter(function (p) { return p.id !== id; })[0] || null; }
     function parcelFor(id) { return (owl.parcels || {})[id] || null; }
     function canSend() {
@@ -1175,9 +1200,35 @@
         var first = state.deckFirst.frogs = state.deckFirst.frogs || {};
         if (!had && !first[p.name]) first[p.name] = isoDay(nowDate());
       } else state.vars.knuts = (+state.vars.knuts || 0) + 1;
-      parcelOpened = p.name;
+      parcelOpened = p.name; parcelOpenedFrom = p.from;
       delete owl.parcels[me()];
       save(OWL_KEY, owl);
+    }
+    /* `point given`: the point is the sender's (Magic's req 298). The first parcel opened each week from him earns it;
+       his copy goes to the page now, as his brother's slips do but from the sill and with no owl, and his own waits in
+       the iPad's owl for his next turn. */
+    function giveFor(thing, n, rec) {
+      var from = parcelOpenedFrom;
+      if (!from || !playerOf(from) || from === me()) { note(rec.id + ': no parcel opened from his brother to give a point for'); return; }
+      var d = nowDate(), monday = new Date(d.getFullYear(), d.getMonth(), d.getDate() - (d.getDay() + 6) % 7);
+      var week = isoDay(monday);
+      for (var i = 0; i < state.points.length; i++) {
+        var had = state.points[i];
+        if (had.kind === 'given' && had.from === from && String(had.thing).split(' ')[1] === week) return;   /* one a week each way */
+      }
+      var slip = { kind: 'given', thing: thing + ' ' + week, points: n, on: isoDay(d), record: rec.id };
+      var bag = load(SATCHEL + from), his = null;
+      try { his = bag && bag[SETTINGS_KEY] ? JSON.parse(bag[SETTINGS_KEY]) : null; } catch (e) { his = null; }
+      var house = his && HOUSES[String(his.house || '').trim().toLowerCase()];
+      owl.given = owl.given || {};
+      (owl.given[from] = owl.given[from] || []).push(Object.assign({}, slip));
+      save(OWL_KEY, owl);
+      if (house) slip.house = house;
+      slip.from = from;
+      state.points.push(slip);
+      logLine(n + ' house points to his brother for a thing given, {day}');
+      if (opts.point) { try { opts.point(withReason(slip)); } catch (e) { note('the page could not take a point: ' + e); } }
+      heapGrew = true;
     }
     function parcelNow() {
       var p = parcelFor(me());

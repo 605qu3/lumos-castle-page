@@ -156,9 +156,10 @@
       ],
       "starts": [
         "open parcel",
+        "point given {parcel thing} 5",
         "log \"Opened a parcel from his brother {day}\""
       ],
-      "canon": "B26: the thing into his own den; req 216's point for a thing passed waits on the words for it (req 298 of Magic), taught's words being for a thing taught"
+      "canon": "B26: the thing into his own den; req 216's point for a thing passed is the sender's, `given` (Magic's req 298, Dumbledore's socks, PS 12), the first parcel opened each week each way, 5 as a card read"
     },
     {
       "id": "post.leave",

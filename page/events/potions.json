@@ -74,6 +74,207 @@
         "two cauldrons side by side on the left desk of the third row, a heap of daisy roots cut all sizes beside one, a skinned Shrivelfig beside the other"
       ],
       "canon": "the Curator's req 377, item 14: PoA 7 L15695 to L15711 and on to L15807, the Shrinking Solution, Malfoy's cauldron set up beside Harry and Ron's, Ron cutting his roots, the Shrivelfig skinned; Thursday morning's double Potions the day of Lupin's first lesson (the staff room's wardrobe ends that Thursday, about 09-09, staff.json); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "weekday = friday",
+        "date >= 09-02",
+        "date <= 12-19",
+        "time = morning"
+      ],
+      "show": [
+        "the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+      ],
+      "canon": "Interiors' req 381 (Fawkes agreeing, 2.58 am, provisional, Godric to confirm; desk events-potions-days-1014): his class's double Potions on the book's own day, in term, in the year he reads it: the Stone's Friday morning (PS 8 L2746 to L2750); the pupils' own cauldrons, scales and jars (PS 5 L1275, L1281) set out and the fires lit, packed away after (PoA 7 L15799); out of a lesson the room's rest state, bare desks and cold stands, the page's; term 09-02 to 12-19 and 01-07 to 05-31, not Easter week, the exams from 06-01; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "weekday = friday",
+        "date >= 01-07",
+        "date <= 05-31",
+        "easter = no",
+        "time = morning"
+      ],
+      "show": [
+        "the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+      ],
+      "canon": "as above, the spring term"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 2",
+        "weekday = thursday",
+        "date >= 09-02",
+        "date <= 12-19",
+        "time = day"
+      ],
+      "show": [
+        "the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+      ],
+      "canon": "as above: the Chamber's Thursday afternoon's double Potions (CoS 11 L10254)"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 2",
+        "weekday = thursday",
+        "date >= 01-07",
+        "date <= 05-31",
+        "easter = no",
+        "time = day"
+      ],
+      "show": [
+        "the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+      ],
+      "canon": "as above, the spring term"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 3",
+        "weekday = thursday",
+        "date >= 09-02",
+        "date <= 12-19",
+        "time = morning"
+      ],
+      "show": [
+        "the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+      ],
+      "canon": "as above: Prisoner of Azkaban's Thursday morning's double Potions (PoA 7 L15695)"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 3",
+        "weekday = thursday",
+        "date >= 01-07",
+        "date <= 05-31",
+        "easter = no",
+        "time = morning"
+      ],
+      "show": [
+        "the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+      ],
+      "canon": "as above, the spring term"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date >= 09-02",
+        "date <= 09-08",
+        "weekday = friday",
+        "time != morning",
+        "time != day"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "Fawkes's t1 on events-potions-days-1014 (2.58 am, provisional, Godric to confirm): Seamus's cauldron, melted by Neville's potion (PS 8 L2822, read), left by the sink; Snape clears only the spilled potion with a wave (L2824), so the blob stays; from the Friday evening after the Stone's first lesson to the end of June, cleared for the summer, in that book's year only (ours); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date >= 09-03",
+        "date <= 09-08",
+        "weekday = saturday"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date >= 09-03",
+        "date <= 09-08",
+        "weekday = sunday"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date >= 09-05",
+        "date <= 09-08",
+        "weekday = monday"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date >= 09-06",
+        "date <= 09-08",
+        "weekday = tuesday"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date >= 09-07",
+        "date <= 09-08",
+        "weekday = wednesday"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date = 09-08",
+        "weekday = thursday"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date >= 09-09"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "reading = 1",
+        "date <= 06-30"
+      ],
+      "show": [
+        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner"
+      ],
+      "canon": "as above, the days after that first Friday"
     }
   ],
   "records": [
