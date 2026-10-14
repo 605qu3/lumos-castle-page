@@ -1,0 +1,46 @@
+{
+  "chain": "mcgonagall",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "reading = 2",
+        "date = 05-29",
+        "time = night"
+      ],
+      "show": [
+        "on her desk the Sorting Hat, the ruby-encrusted sword and what remains of a small black diary, a hole burned right through it, ink still oozing"
+      ],
+      "canon": "the Curator's req 358, item 4: CoS 18 L13047, Harry lays the Sorting Hat, the sword and what remained of Riddle's diary on her desk (the venom's hole and the ink, CoS 17 L12939), the Chamber's night (05-29, three days before the exams); the night only, as the feast follows; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "reading = 3",
+        "date = 12-25",
+        "time != morning",
+        "time != day"
+      ],
+      "show": [
+        "Harry's Firebolt laid across her desk, its twigs gleaming, waiting to be checked for jinxes"
+      ],
+      "canon": "Fawkes's t1 on req 358 (provisional, Godric to confirm): PoA 11 L17927 to L17933, she takes it on Christmas evening to be checked, \"a few weeks\"; Madam Hooch and Professor Flitwick strip it down, so it lies on her desk the night she takes it, not the weeks between (the Curator's caveat: the books do not say where); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "reading = 3",
+        "weekday = thursday",
+        "date >= 01-30",
+        "date <= 02-05",
+        "time = day"
+      ],
+      "show": [
+        "Harry's Firebolt back on her desk, whole and as magnificent as ever, waiting to be handed back"
+      ],
+      "canon": "PoA 12 L18266 to L18272: checked and found clean, she brings it back the Thursday evening before \"Saturday's match\" (Ravenclaw, the first Saturday of February here; the book gives no day); on her desk that afternoon; checked against the text, 14 October 2026"
+    }
+  ],
+  "records": []
+}

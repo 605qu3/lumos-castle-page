@@ -1,0 +1,278 @@
+{
+  "chain": "defence",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = defence classroom",
+        "reading = 2",
+        "date = 09-02",
+        "time = morning"
+      ],
+      "show": [
+        "a tall pile of quiz papers on the teacher's desk, three sides each, ready for the first lesson",
+        "the covered cage on the floor behind the desk, something inside jabbering shrilly"
+      ],
+      "canon": "the Curator's req 353, item 23: Lockhart's quiz, CoS 6 L8527 to L8551 (handed out in the lesson, three sides of paper, collected half an hour later), so before the lesson a pile on his desk, not one on every desk; the cage behind his desk, L8563, its pixies jabbering like budgies arguing, L8583; his first lesson the first afternoon of term, after lunch (L8503), 09-02 in 1992; the year he reads the Chamber; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "reading = 2",
+        "date = 09-02",
+        "time != morning"
+      ],
+      "show": [
+        "broken glass over the back row's desks under the smashed window, ink sprayed across desks and floor, books and papers shredded, pictures torn down, the waste basket up-ended, the iron chandelier lying on the floor before the teacher's desk",
+        "the cage back on the teacher's desk, two frozen pixies stuffed inside it"
+      ],
+      "canon": "the Curator's req 353, item 22: the pixies, CoS 6 L8587 to L8593 (glass on the back row, ink sprayed, books and papers shredded, pictures torn from the walls, the waste basket up-ended, the chandelier gave way); Hermione freezes two and stuffs them back in the cage, L8599; from the lesson that afternoon, set right by the next day; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 2",
+        "weekday = saturday",
+        "date >= 09-02",
+        "date <= 09-08",
+        "time = night"
+      ],
+      "show": [
+        "the candles burned low and spitting, a heap of addressed envelopes and a pile still blank on the desk before the visitor's chair"
+      ],
+      "canon": "the Curator's req 353, item 24: Harry's detention, the first Saturday of term from eight (CoS 7 L8918), addressing envelopes, the candles burning lower and lower, L8932; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 2",
+        "date = 05-29",
+        "time != morning",
+        "time != day"
+      ],
+      "show": [
+        "the office almost stripped: two large trunks open on the floor, robes folded into one, books jumbled into the other, the photographs off the walls and crammed into boxes on the desk"
+      ],
+      "canon": "Interiors' schedule, the two trunks an event's state (docs/interiors/defence-classroom.md, the office); CoS 16 L12447, the evening Ginny is taken, the Chamber's night (05-29); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 2",
+        "date >= 05-30",
+        "date <= 08-31"
+      ],
+      "show": [
+        "the office almost stripped: two large trunks open on the floor, robes folded into one, books jumbled into the other, the photographs off the walls and crammed into boxes on the desk"
+      ],
+      "canon": "as above: he went to St Mungo's, CoS 18, and never came back to finish packing (ours, from the book's own end; provisional, Godric to confirm)"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 3",
+        "date = 10-31",
+        "time = day",
+        "moon != waxing-gibbous"
+      ],
+      "show": [
+        "a goblet on the desk, smoking faintly"
+      ],
+      "canon": "the Curator's req 353, item 25: Snape sets the smoking goblet down on Lupin's desk, PoA 8 L16414 to L16418, Halloween afternoon, the Hogsmeade day; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 3",
+        "moon = waxing-gibbous",
+        "date >= 09-01",
+        "time != night"
+      ],
+      "show": [
+        "a goblet on the desk, smoking faintly"
+      ],
+      "canon": "PoA 18 L20452: he takes the potion \"in the week preceding the full moon\", so in Lupin's year whenever the real moon is waxing gibbous, by day, the term from September to Christmas and beyond; checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 3",
+        "moon = waxing-gibbous",
+        "date <= 06-06",
+        "time != night"
+      ],
+      "show": [
+        "a goblet on the desk, smoking faintly"
+      ],
+      "canon": "as above, January to the night of the Shrieking Shack, 06-06 (PoA 21)"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 3",
+        "date = 06-07",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "the Grindylow's tank standing empty beside a battered old suitcase, open and nearly full; the desk drawers pulled out; an old parchment open on the desk: the Marauder's Map"
+      ],
+      "canon": "the Curator's req 353, item 26: Lupin's last day, PoA 22 L21946 to L21952 (resigned first thing that morning, L21932; the morning after the Shrieking Shack, 06-07 here, as the wing's chocolate); checked against the text, 14 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 3",
+        "date >= 06-07",
+        "date <= 08-31",
+        "time != morning",
+        "time != day"
+      ],
+      "show": [
+        "the office bare: the tank, the suitcase and the tea things gone, the drawers shut and empty"
+      ],
+      "canon": "PoA 22 L21978: he closes the drawers and leaves that evening; from then on the office stands empty (ours, provisional, Godric to confirm)"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "reading = 3",
+        "date >= 06-08",
+        "date <= 08-31",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "the office bare: the tank, the suitcase and the tea things gone, the drawers shut and empty"
+      ],
+      "canon": "as above, from the next morning to the summer's end"
+    }
+  ],
+  "records": [
+    {
+      "id": "defence.quiz-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap quiz",
+      "when": [
+        "place = defence classroom",
+        "reading = 2",
+        "date = 09-02",
+        "time = morning"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "lockhart",
+          "on_tap": true,
+          "key": "defence.quiz",
+          "canon": "CoS 6 L8535 and L8547, the first and the fifty-fourth questions word for word; the third ours, in the paper's way; checked against the text, 14 October 2026",
+          "text": [
+            "1. What is Gilderoy Lockhart's favorite color?",
+            "54. When is Gilderoy Lockhart's birthday, and what would his ideal gift be?",
+            "31. Which of Gilderoy Lockhart's smiles is the most charming? Give reasons."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "defence.cage-rattle",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = defence classroom",
+        "reading = 2",
+        "date = 09-02",
+        "time = morning"
+      ],
+      "show": [
+        "the cover over the cage behind the desk jerks, and a shrill jabbering bursts out, like a lot of budgies arguing"
+      ],
+      "canon": "CoS 6 L8583, the pixies' voices; the cage kept behind the desk, Interiors' schedule; ours that it rattles before the lesson (provisional, Godric to confirm); checked against the text, 14 October 2026"
+    },
+    {
+      "id": "defence.pixie-loose",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = defence classroom",
+        "reading = 2",
+        "date = 09-02",
+        "time != morning"
+      ],
+      "show": [
+        "an electric-blue pixie dances along a shelf just out of reach, sticks its tongue out at him and zips out through the broken window"
+      ],
+      "canon": "CoS 6 L8583 (electric blue, about eight inches high) and L8601 (a pixie \"dancing out of reach with its tongue out\"); one still loose after the lesson is ours (provisional, Godric to confirm); checked against the text, 14 October 2026"
+    },
+    {
+      "id": "defence.envelope-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap envelopes",
+      "when": [
+        "place = defence office",
+        "reading = 2",
+        "weekday = saturday",
+        "date >= 09-02",
+        "date <= 09-08",
+        "time = night"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "harry",
+          "on_tap": true,
+          "key": "defence.envelope",
+          "canon": "CoS 7 L8928 (the first, to Gladys Gudgeon) and L8932 (the thousandth, Veronica Smethley's); checked against the text, 14 October 2026",
+          "text": [
+            "Gladys Gudgeon",
+            "Veronica Smethley"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "defence.rollers",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = defence office",
+        "reading = 2",
+        "date >= 09-01",
+        "time = night"
+      ],
+      "show": [
+        "as he comes into the dark office, a flurry across the walls: the Lockharts in the pictures dodge out of sight, their hair in rollers"
+      ],
+      "canon": "Fawkes's t1 on req 353 (provisional, Godric to confirm): CoS 9 L9412, Halloween night; widened here to every night of Lockhart's year, a habit as the fairies are (provisional, Godric to confirm); checked against the text, 14 October 2026"
+    },
+    {
+      "id": "defence.rollers-spring",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = defence office",
+        "reading = 2",
+        "date <= 05-28",
+        "time = night"
+      ],
+      "show": [
+        "as he comes into the dark office, a flurry across the walls: the Lockharts in the pictures dodge out of sight, their hair in rollers"
+      ],
+      "canon": "as defence.rollers, January to the eve of the Chamber's night, when the photographs go into boxes (CoS 16 L12447)"
+    }
+  ]
+}
