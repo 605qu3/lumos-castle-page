@@ -44,12 +44,15 @@
         }
       ],
       "starts": [
-        "log \"Let Neville in {day}\""
+        "log \"Let Neville in {day}\"",
+        "set neville_out = yes"
       ],
       "ends": [
         {
           "on": "password",
-          "do": [],
+          "do": [
+            "set neville_out = no"
+          ],
           "lines": [
             {
               "speaker": "neville",
@@ -74,8 +77,122 @@
         },
         {
           "on": "leave",
-          "do": []
+          "do": [
+            "set neville_out = no"
+          ]
         }
+      ]
+    },
+    {
+      "id": "neville.quill-back",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap neville",
+      "when": [
+        "place = corridor",
+        "neville_out = yes",
+        "nl_quill = pocket"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "frame-foot"
+        }
+      ],
+      "show": [
+        "neville takes the quill, and the smoke in his remembrall clears, then flushes scarlet again a moment later"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.quill-back.found",
+          "text": [
+            "My quill! That's what it was."
+          ],
+          "canon": "ours, Magic's B24 (Godric's 1, 6.51 pm); the Remembrall glows scarlet when you've forgotten something, PS 9; checked against the text, 13 October 2026"
+        },
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.quill-back.password",
+          "text": [
+            "...and the password."
+          ],
+          "canon": "B24's t1, Fawkes's touch (Godric, 6.51 pm): he always had trouble remembering the passwords, PoA 5; checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "set nl_quill = given",
+        "set glass_flushed = yes",
+        "log \"Gave Neville back his quill {day}; his Remembrall cleared, then went red again\""
+      ],
+      "canon": "Magic's B24 (Godric's 1 with t1, 6.51 pm): a quill marked N.L., Neville's, once ever; ours"
+    },
+    {
+      "id": "neville.pockets",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "neville-pockets",
+      "weight": 1,
+      "moment": "tap neville",
+      "when": [
+        "place = corridor",
+        "neville_out = yes",
+        "nl_quill = given",
+        "glass_flushed != yes",
+        "time = night",
+        "pockets_patted != yes"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "frame-foot"
+        }
+      ],
+      "show": [
+        "neville pats every pocket of his robes for the scrap of parchment he wrote the passwords on, and can't find it"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.pockets",
+          "text": [
+            "I wrote them all down, I know I did! I must've dropped them somewhere."
+          ],
+          "canon": "provisional, Godric to confirm: Fawkes's touch on events-b24-neville-pass-1013, 8.01 pm; Neville's lost list of passwords, PoA (B3 L18284 in the canon copy); checked against the text, 13 October 2026"
+        }
+      ],
+      "starts": [
+        "set pockets_patted = yes"
+      ],
+      "canon": "provisional, Godric to confirm: Fawkes's touch on events-b24-neville-pass-1013, 8.01 pm; Neville's lost list of passwords, PoA (B3 L18284 in the canon copy); checked against the text, 13 October 2026"
+    },
+    {
+      "id": "neville.pockets-not",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "neville-pockets",
+      "weight": 2,
+      "moment": "tap neville",
+      "when": [
+        "place = corridor",
+        "neville_out = yes",
+        "nl_quill = given",
+        "glass_flushed != yes",
+        "time = night",
+        "pockets_patted != yes"
+      ],
+      "starts": [
+        "set pockets_patted = yes"
       ]
     },
     {
@@ -569,6 +686,19 @@
         "set trouble = over",
         "log \"Neville's detention was fine {day}\""
       ]
+    },
+    {
+      "id": "neville.quill-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set neville_out = no",
+        "set glass_flushed = no",
+        "set pockets_patted = no"
+      ]
     }
   ],
   "room": [
@@ -600,6 +730,26 @@
       ],
       "show": [
         "trevor's box on neville's knees, not on the books table"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "neville_out = yes",
+        "nl_quill = pocket"
+      ],
+      "show": [
+        "neville's remembrall glowing scarlet in his hand, him frowning at it"
+      ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "neville_out = yes",
+        "glass_flushed = yes"
+      ],
+      "show": [
+        "neville's remembrall glowing scarlet in his hand again"
       ]
     }
   ]

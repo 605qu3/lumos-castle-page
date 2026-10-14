@@ -454,6 +454,22 @@
           "drawn easter-egg = yes",
           "easter = yes"
         ]
+      },
+      {
+        "item": "nl-quill",
+        "when": [
+          "drawn nl-quill = yes",
+          "nl_quill != pocket",
+          "nl_quill != given"
+        ]
+      },
+      {
+        "item": "answer-quill",
+        "when": [
+          "drawn answer-quill = yes",
+          "sofa_finds >= 12",
+          "answer_quills < 2"
+        ]
       }
     ]
   },
@@ -534,6 +550,15 @@
       ],
       "show": [
         "the twins' note folded small in his pocket"
+      ]
+    },
+    {
+      "when": [
+        "place = common room",
+        "answer_shown = yes"
+      ],
+      "show": [
+        "the Auto-Answer Quill's one word under the notice it hopped to"
       ]
     }
   ],
@@ -1805,6 +1830,324 @@
       ]
     },
     {
+      "id": "sofa.f-nl-quill",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = nl-quill"
+      ],
+      "starts": [
+        "set holding = no",
+        "set nl_quill = pocket",
+        "log \"Found a quill marked N.L. down the side of the sofa and put it in his pocket {day}\""
+      ],
+      "canon": "Magic's B24 (Godric's 1 with t1, 6.51 pm): a quill marked N.L., Neville's, once ever; ours"
+    },
+    {
+      "id": "sofa.f-answer-quill-neville",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer != mcgonagall",
+        "nearest notice = neville"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board and writes one word under the lost toad's notice, then drops flat and lies still"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "auto-answer quill",
+          "at": "nearest notice",
+          "key": "sofa.answer-quill-neville",
+          "canon": "ours, Magic's B23 (Godric's 1 with t1, 6.51 pm); Auto-Answer Quills banned from the examination hall, OotP 31; checked against the text, 13 October 2026",
+          "text": [
+            "Probably."
+          ]
+        }
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "set answer_shown = yes",
+        "set answer_at = neville",
+        "stamp answered_on",
+        "log \"An Auto-Answer Quill from down the sofa wrote under a notice {day}\""
+      ]
+    },
+    {
+      "id": "sofa.f-answer-quill-pince",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer != mcgonagall",
+        "nearest notice = pince"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board and writes one word under Madam Pince's notice, then drops flat and lies still"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "auto-answer quill",
+          "at": "nearest notice",
+          "key": "sofa.answer-quill-pince",
+          "canon": "ours, Magic's B23 (Godric's 1 with t1, 6.51 pm); Auto-Answer Quills banned from the examination hall, OotP 31; checked against the text, 13 October 2026",
+          "text": [
+            "No."
+          ]
+        }
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "set answer_shown = yes",
+        "set answer_at = pince",
+        "stamp answered_on",
+        "log \"An Auto-Answer Quill from down the sofa wrote under a notice {day}\""
+      ]
+    },
+    {
+      "id": "sofa.f-answer-quill-flying",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer != mcgonagall",
+        "nearest notice = flying"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board and writes one word under the flying lessons' notice, then drops flat and lies still"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "auto-answer quill",
+          "at": "nearest notice",
+          "key": "sofa.answer-quill-flying",
+          "canon": "ours, Magic's B23 (Godric's 1 with t1, 6.51 pm); Auto-Answer Quills banned from the examination hall, OotP 31; checked against the text, 13 October 2026",
+          "text": [
+            "No."
+          ]
+        }
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "set answer_shown = yes",
+        "set answer_at = flying",
+        "stamp answered_on",
+        "log \"An Auto-Answer Quill from down the sofa wrote under a notice {day}\""
+      ]
+    },
+    {
+      "id": "sofa.f-answer-quill-wood",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer != mcgonagall",
+        "nearest notice = wood"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board and writes one word under Wood's notice, then drops flat and lies still"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "auto-answer quill",
+          "at": "nearest notice",
+          "key": "sofa.answer-quill-wood",
+          "canon": "ours, Magic's B23 (Godric's 1 with t1, 6.51 pm); Auto-Answer Quills banned from the examination hall, OotP 31; checked against the text, 13 October 2026",
+          "text": [
+            "Again?"
+          ]
+        }
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "set answer_shown = yes",
+        "set answer_at = wood",
+        "stamp answered_on",
+        "log \"An Auto-Answer Quill from down the sofa wrote under a notice {day}\""
+      ]
+    },
+    {
+      "id": "sofa.f-answer-quill-practice",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer != mcgonagall",
+        "nearest notice = practice",
+        "wood_ink != written"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board and writes one word under Wood's blank notice, then drops flat and lies still"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "auto-answer quill",
+          "at": "nearest notice",
+          "key": "sofa.answer-quill-practice",
+          "canon": "ours, Magic's B23 (Godric's 1 with t1, 6.51 pm); Auto-Answer Quills banned from the examination hall, OotP 31; checked against the text, 13 October 2026",
+          "text": [
+            "What?"
+          ]
+        }
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "set answer_shown = yes",
+        "set answer_at = practice",
+        "stamp answered_on",
+        "log \"An Auto-Answer Quill from down the sofa wrote under a notice {day}\""
+      ]
+    },
+    {
+      "id": "sofa.f-answer-quill-practice-inked",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer != mcgonagall",
+        "nearest notice = practice",
+        "wood_ink = written"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board and writes one word under Wood's practice notice, then drops flat and lies still"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "auto-answer quill",
+          "at": "nearest notice",
+          "key": "sofa.answer-quill-practice-inked",
+          "canon": "ours, Magic's B23 (Godric's 1 with t1, 6.51 pm); Auto-Answer Quills banned from the examination hall, OotP 31; checked against the text, 13 October 2026",
+          "text": [
+            "Again?"
+          ]
+        }
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "set answer_shown = yes",
+        "set answer_at = practice",
+        "stamp answered_on",
+        "log \"An Auto-Answer Quill from down the sofa wrote under a notice {day}\""
+      ]
+    },
+    {
+      "id": "sofa.f-answer-quill-other",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer != mcgonagall",
+        "nearest notice != neville",
+        "nearest notice != pince",
+        "nearest notice != flying",
+        "nearest notice != wood",
+        "nearest notice != practice"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board and writes one word under the nearest notice, then drops flat and lies still"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "auto-answer quill",
+          "at": "nearest notice",
+          "key": "sofa.answer-quill-other",
+          "canon": "ours, Magic's B23 (Godric's 1 with t1, 6.51 pm); Auto-Answer Quills banned from the examination hall, OotP 31; checked against the text, 13 October 2026",
+          "text": [
+            "Why?"
+          ]
+        }
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "set answer_shown = yes",
+        "set answer_at = other",
+        "stamp answered_on",
+        "log \"An Auto-Answer Quill from down the sofa wrote under a notice {day}\""
+      ]
+    },
+    {
+      "id": "sofa.f-answer-quill-mcgonagall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap find",
+      "when": [
+        "holding = yes",
+        "find = answer-quill",
+        "nearest signer = mcgonagall"
+      ],
+      "show": [
+        "the quill springs out of his hand, hops across to the notice board, comes to a notice of Professor McGonagall's and drops flat, very still, as if caught"
+      ],
+      "starts": [
+        "set holding = no",
+        "add answer_quills 1",
+        "set answer_quill = den",
+        "log \"An Auto-Answer Quill from down the sofa came to one of Professor McGonagall's notices and wrote nothing {day}\""
+      ],
+      "canon": "B23's t1, Fawkes's touch (Godric, 6.51 pm): her \"I can only hope that it is nobody in Gryffindor\", in the speech that bans the quills, OotP 31; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "sofa.answer-fades",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "answer_shown = yes",
+        "days since answered_on >= 1"
+      ],
+      "starts": [
+        "set answer_shown = no"
+      ]
+    },
+    {
       "id": "sofa.f-ink",
       "tier": "fixed",
       "source": "device",
@@ -2479,10 +2822,26 @@
         "find != pawn",
         "find != sugar-mouse",
         "find != wrapper",
-        "find != twins-note"
+        "find != twins-note",
+        "find != nl-quill"
       ],
       "starts": [
         "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.nl-quill-kept",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "holding = yes",
+        "find = nl-quill"
+      ],
+      "starts": [
+        "set holding = no",
+        "set nl_quill = pocket"
       ]
     },
     {
@@ -2638,10 +2997,26 @@
         "find != pawn",
         "find != sugar-mouse",
         "find != wrapper",
-        "find != twins-note"
+        "find != twins-note",
+        "find != nl-quill"
       ],
       "starts": [
         "set holding = no"
+      ]
+    },
+    {
+      "id": "sofa.left-nl-quill",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "left sofa",
+      "when": [
+        "holding = yes",
+        "find = nl-quill"
+      ],
+      "starts": [
+        "set holding = no",
+        "set nl_quill = pocket"
       ]
     },
     {

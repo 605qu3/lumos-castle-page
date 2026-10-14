@@ -281,7 +281,65 @@
       ],
       "starts": [
         "set door_list = his",
+        "stamp door_list_on",
         "log \"Tried Alohomora on the little door {day}. Nothing happened, and he wrote it on the list.\""
+      ]
+    },
+    {
+      "id": "locks.door-list-rumour",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "door_list = his",
+        "door_rumour != written",
+        "days since door_list_on >= 1"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "the twins",
+          "at": "door list",
+          "key": "locks.door-list-rumour",
+          "canon": "ours, Magic's B25 (Godric's 1, 6.51 pm); Lee Jordan the twins' friend, who \"reckons he's found a new secret passageway\", PS 9; checked against the text, 13 October 2026",
+          "text": [
+            "Lee says it only opens for whoever finds her key. Whose key? Lee won't say. (Lee doesn't know.) F. & G."
+          ]
+        }
+      ],
+      "starts": [
+        "set door_rumour = written",
+        "stamp door_jordan_due +21-35 days"
+      ]
+    },
+    {
+      "id": "locks.door-list-jordan",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = common room",
+        "door_rumour = written",
+        "door_jordan != written",
+        "today >= door_jordan_due"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "mcgonagall",
+          "at": "door list",
+          "key": "locks.door-list-jordan",
+          "canon": "B25's t1, Fawkes's touch (Godric, 6.51 pm): a third, very neat hand, never named; McGonagall's \"JORDAN!\" at the commentary, PS 11; checked against the text, 13 October 2026",
+          "text": [
+            "Jordan."
+          ]
+        }
+      ],
+      "starts": [
+        "set door_jordan = written"
       ]
     },
     {
