@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 16,
+  "version": 17,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -224,9 +224,9 @@ window.CASTLE_MODEL = {
     { "id": "nook-mouth", "kind": "open mouth", "between": ["corridor", "inglenook"], "span": [[-1.5, 15.11], [-1.5, 19.51]],
       "h": 2.4, "state": "built", "cite": "" },
     { "id": "corridor-window-1", "kind": "window", "room": "corridor", "at": [1.95, 11.21], "w": 1.2, "sill": 0.9, "h": 2.4,
-      "view": "the grounds", "state": "built", "cite": "" },
+      "about": "a noted exception, not a change (ledger line 6; req 249, Godric's 1 on corridor-lake-view-249 with t1): facing south over the lake, yet the page's drawn view shows Hagrid's hut, the pumpkins and the forest, which the hut 350 m east and 100 degrees off would not give; kept for OotP 13, \"There was still no light in Hagrid's cabin\", seen from the castle", "view": "the grounds", "state": "built", "cite": "" },
     { "id": "corridor-window-2", "kind": "window", "room": "corridor", "at": [1.95, 13.31], "w": 1.2, "sill": 0.9, "h": 2.4,
-      "state": "built", "cite": "" },
+      "about": "a noted exception, not a change (ledger line 6; req 249, Godric's 1 on corridor-lake-view-249 with t1): facing south over the lake, yet the page's drawn view shows Hagrid's hut, the pumpkins and the forest, which the hut 350 m east and 100 degrees off would not give; kept for OotP 13, \"There was still no light in Hagrid's cabin\", seen from the castle", "state": "built", "cite": "" },
     { "id": "cupboard-door", "kind": "door, narrow, plain and locked", "between": ["corridor", "corridor-cupboard"], "at": [-1.5, 14.46], "w": 0.8, "h": 2.0,
       "state": "designed", "about": "the corridor page's x -5.75 on her wall: 0.25 m clear of the second portrait's frame (x -5.1) and of the nook's mouth (x -6.4); Godric's 1 on corridor-cupboard-place-1013 (13 October 2026, 6.55 pm; ledger line 2)",
       "cite": "" },
