@@ -1061,7 +1061,7 @@ function judgeCheer(points, mouth, ease) {
   out.verdict = 'cheered'; out.reason = 'cheered';
   return out;
 }
-/* The Cheering Charm, corner to corner (Q9's fix 5; David tried the spells, 13 October 2026, 5.05 pm: the frown flipped
+/* The Cheering Charm, corner to corner (Q9's fix 5; Godric tried the spells, 13 October 2026, 5.05 pm: the frown flipped
    "as deep and as wide" by eye was too hard). judgeSmile(points, mouth, ease) takes judgeCheer's arguments and returns
    its fields, plus ends ([the start's and the end's distance from the corner each is nearest, in half widths]). The
    mouth's two corners are targets: a stroke begun within reach of one and ended within reach of the other, either way
@@ -1171,7 +1171,7 @@ function judgePineapple(taps, desk, ease, want, now, beat) {
   out.verdict = 'danced'; out.reason = 'danced';
   return out;
 }
-/* Q9's fix 6 (thirty-ninth session, 13 October 2026; equal steps judged by eye were too hard): Q11, option 2, David,
+/* Q9's fix 6 (thirty-ninth session, 13 October 2026; equal steps judged by eye were too hard): Q11, option 2, Godric,
    7.40 pm: every step, judged more kindly. He taps every step as before, and judgePineapple judges them with even
    loosened to the ease's loose (0.45, 0.35, 0.25 of the mean); all else as judgePineapple, which is untouched and
    gives the page worst and long on a dance too, so it can draw the equal steps under his and ring the step furthest
@@ -1343,7 +1343,7 @@ function judgeFlames(points, friends, ease, fix) {
   out.verdict = 'warm'; out.reason = 'warm';
   return out;
 }
-/* Hermione's bluebell flames, any loop (Q9's fix 4; David tried the spells, 13 October 2026, 5.05 pm: a freehand ring
+/* Hermione's bluebell flames, any loop (Q9's fix 4; Godric tried the spells, 13 October 2026, 5.05 pm: a freehand ring
    judged for roundness was too hard). judgeLoop(points, friends, ease, fix) takes the same arguments and returns the
    same fields as judgeFlames, which it calls with no limit on roundness, so 'tap', 'open' and 'scribble' are judged as
    before; then the friends are measured from the stroke itself, not from the circle fitted to it: each is through it
