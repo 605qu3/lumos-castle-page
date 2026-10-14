@@ -10,7 +10,7 @@
    degrees a window's outer opening turns from its bearing. The castle's own frame (site): the block's south-west
    corner at x 0, y 0, y true north. A room with no group, and every mass, court and tower, is in that frame. */
 window.CASTLE_MODEL = {
-  "version": 14,
+  "version": 15,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -186,6 +186,12 @@ window.CASTLE_MODEL = {
       "state": "books", "cite": "PS 7, OotP 11"
     },
     {
+      "id": "hall-cupboard", "name": "the broom cupboard off the Entrance Hall, buckets and mops inside", "level": "G",
+      "shape": { "rect": [66.4, 63.2, 67.6, 64.8] }, "floor": 0, "ceiling": 2.4,
+      "about": "Godric's 14.1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm; Magic's B21, the Architect's ledger, line 3): in the 3 m of wall between the two halls, its door on the Entrance Hall's west wall north of the Great Hall's doors; 1.6 m along the wall by 1.2 deep behind 0.4 m of the hall's wall, 1.4 m of wall left to the Great Hall; across the hall from the front doors; unlocked (PoA 21). Inside, among the buckets and mops, one bucket always upturned, just right to sit on (upturned-bucket; Godric's t1)",
+      "state": "designed", "cite": "PoA 21"
+    },
+    {
       "id": "filchs-office", "name": "Filch's office", "level": "G",
       "shape": { "rect": [104, 62, 118, 70] }, "map": "his rounds start and end here",
       "about": "Harry follows him \"back downstairs\" (CoS 8); the ground floor and the north range ours",
@@ -247,6 +253,9 @@ window.CASTLE_MODEL = {
       "cite": "PS 6, PS 7, CoS 15, GoF 12" },
     { "id": "great-hall-doors", "kind": "double doors", "between": ["entrance-hall", "great-hall"], "at": [68, 60.5], "w": 3.2, "h": 5.0,
       "state": "books", "about": "to the right on entering, on the hall's axis; their size ours", "cite": "PS 7, OotP 33" },
+    { "id": "hall-cupboard-door", "kind": "door, narrow and plain, unlocked", "between": ["entrance-hall", "hall-cupboard"], "at": [68, 64.0], "w": 0.8, "h": 2.0,
+      "state": "designed", "about": "on the Entrance Hall's west wall, 1.5 m clear of the Great Hall's doors to the south; Godric's 14.1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm; ledger line 3)",
+      "cite": "PoA 21" },
     { "id": "well-mouth", "kind": "open mouth", "between": ["entrance-hall", "stair hall"], "span": [[72.5, 50], [87.5, 50]], "h": 10.4,
       "state": "designed", "about": "the Entrance Hall opens into the stair hall's well, the marble staircase facing the front doors (Godric's 3.1)",
       "cite": "PS 7" },
@@ -281,7 +290,9 @@ window.CASTLE_MODEL = {
     {"id": "hourglass-niche-gryffindor", "room": "entrance-hall", "kind": "round-headed niche, the Gryffindor hourglass", "at": [68, 51.93], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "about": "Godric's 13.1 (13 October 2026, 5.09 pm; sheet architect-niches-1013-1701): four niches in a row on the west wall south of the Great Hall's doors, nearest the marble staircase's foot, one glass a house in the Sorting Hat's order from the south, 1.68 m apart (Design's PITCH), the foot on the flags; the glasses Design's LumosHourglass.hall()", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
     {"id": "hourglass-niche-hufflepuff", "room": "entrance-hall", "kind": "round-headed niche, the Hufflepuff hourglass", "at": [68, 53.61], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
     {"id": "hourglass-niche-ravenclaw", "room": "entrance-hall", "kind": "round-headed niche, the Ravenclaw hourglass", "at": [68, 55.29], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
-    {"id": "hourglass-niche-slytherin", "room": "entrance-hall", "kind": "round-headed niche, the Slytherin hourglass", "at": [68, 56.97], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"}
+    {"id": "hourglass-niche-slytherin", "room": "entrance-hall", "kind": "round-headed niche, the Slytherin hourglass", "at": [68, 56.97], "w": 1.2, "h": 2.45, "depth": 0.5, "sill": 0, "state": "designed", "cite": "OotP 28, OotP 38, DH 32, PS 15; Godric's 13.1 (13 October 2026, 5.09 pm)"},
+    { "id": "upturned-bucket", "room": "hall-cupboard", "kind": "a bucket always upturned among the buckets and mops, just right to sit on", "at": [67.0, 63.6], "w": 0.3, "h": 0.35,
+      "state": "designed", "about": "Godric's t1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm): \"Hermione sat down on an upturned bucket\"", "cite": "PoA 21" }
   ],
   "stairs": [
     { "id": "tower-stair", "kind": "open newel stair", "rooms": ["common-room", "dormitory"], "newel": [4.13, -2.59], "r": 0.7,
