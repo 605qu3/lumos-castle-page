@@ -2994,6 +2994,11 @@ function enter(dry, url, room) {
   leaving = true;
   var herStop = STOPS[0];
   function swingAndWalk() {
+    var first = nevilleGoesIn();   /* Neville, locked out, goes in ahead of him (req 297); under her frame she waits till he is up */
+    if (first) { setTimeout(swing, first * 1000); return; }
+    swing();
+  }
+  function swing() {
     herDoor.target = DOOR_OPEN;
     setTimeout(function () {
       glideTo({ pos: C.holeToCorridor(0, HOLE_Y, -0.3), look: C.holeToCorridor(0, HOLE_Y, 6), fov: FOV_REST });
@@ -3112,6 +3117,9 @@ function tap(cx, cy) {
   if (hits[0].object === tapestry && atStop && atStop.name === 'tapestry' && shepherdAt(hits[0].uv)) {
     tell('tapestry'); shepherdStirs(); said(true); return;
   }
+  /* Neville (req 297): from afar the walk up to him, told to the runtime only at his stop, since his records answer
+     any tap on him */
+  if (hit.thing === 'neville' && atStop !== nevilleStop) { said(true); goTo(nevilleStop); return; }
   if (hit.thing && castle && castle.visit()) {
     if (hit.thing === 'armour' && atStop && atStop.name === 'armour') armourJiggle = 0.3;   /* the knock */
     said(true); castle.tap(hit.thing); return;
@@ -3255,6 +3263,7 @@ function corridorDrawRoom(shown) {
   sticksShown = has(CUE.up) ? 'up' : has(CUE.fallen) || has(CUE.boo) ? 'fallen' : 'gone';
   boo.visible = has(CUE.boo) && !sticksQueue.length;
   drawTrevor(has, back);
+  drawNevilleGlass(has);
   drawFoot(has);
   drawMap(has);
   /* the tapestry's woven sheep (req 129, Events' sheep.json, req 110): where they stand this visit, or one missing,
@@ -3418,6 +3427,88 @@ function updateTrevor(dt) {
 }
 function croak(text) { return function () { console.info('[corridor] ' + text + ' (sound later)'); }; }
 
+/* ---------- Neville locked out (req 297; Events' neville.json; Magic's B24, Godric's 1, 8.27 pm) ----------
+   "It was Neville. He was curled up on the floor, fast asleep ... I couldn't remember the new password to get in to
+   bed" (PS 9). When the runtime casts him at `frame-foot` he sits hunched, knees up, in the corner on her hinge side by
+   the windows, clear of her swing, of Nick's glow and of Trevor's mark (Try 1 on corridor-neville-297-1013,
+   provisional, Godric to confirm). A grey stand-in until he is drawn; his Remembrall a scarlet glow in his hands
+   when the room shows it, clearing and flushing again when he is given his quill; patting his pockets on the night
+   he looks for his list of passwords. From afar a tap on him walks up to his own stop; there it goes to the runtime
+   as `neville`. When the hole opens on the password he goes in ahead of him */
+var NEVILLE_SEATS = { 1: { x: END_X - 0.32, z: FAR_Z + 0.34 }, 3: { x: END_X - 0.32, z: MID_Z } };   /* the sheet's tries; 3: under her frame, as PS 9 */
+var NEVILLE_SEAT = NEVILLE_SEATS[groundsQ.get('nevilleSeat')] ? +groundsQ.get('nevilleSeat') : 1;   /* Try 1 provisional, the desk's corridor-neville-seat-1013 to settle */
+var NEVILLE = { x: NEVILLE_SEATS[NEVILLE_SEAT].x, z: NEVILLE_SEATS[NEVILLE_SEAT].z, w: 0.5, h: 0.78, glowAt: [0.04, 0.4], glowR: 0.05 };
+var NEV_CUE = {
+  frown: "neville's remembrall glowing scarlet in his hand, him frowning at it",
+  again: "neville's remembrall glowing scarlet in his hand again",
+  quill: 'neville takes the quill, and the smoke in his remembrall clears, then flushes scarlet again a moment later',
+  pockets: "neville pats every pocket of his robes for the scrap of parchment he wrote the passwords on, and can't find it"
+};
+var nevilleCard = cutoutMesh(cutoutTexture(100, 156, '#4b4743', function (g, w, h) {
+  g.beginPath(); g.arc(w * 0.5, h * 0.15, w * 0.15, 0, 2 * Math.PI); g.fill();                    /* his head, bent */
+  g.beginPath(); g.moveTo(w * 0.2, h); g.lineTo(w * 0.16, h * 0.55); g.quadraticCurveTo(w * 0.2, h * 0.27, w * 0.5, h * 0.27);
+  g.quadraticCurveTo(w * 0.8, h * 0.27, w * 0.84, h * 0.55); g.lineTo(w * 0.8, h); g.closePath(); g.fill();   /* his robes */
+  g.fillStyle = 'rgba(0,0,0,0.18)';
+  g.beginPath(); g.ellipse(w * 0.5, h * 0.62, w * 0.3, h * 0.17, 0, 0, 2 * Math.PI); g.fill();     /* his knees, drawn up */
+}, 'Neville'), NEVILLE.w, NEVILLE.h);
+nevilleCard.name = 'neville'; nevilleCard.visible = false; nevilleCard.material.transparent = true;   /* so he can fade as he goes in */
+nevilleCard.position.set(NEVILLE.x, NEVILLE.h / 2, NEVILLE.z);
+scene.add(nevilleCard); register(nevilleCard, 1);
+var nevilleGlass = new THREE.Sprite(new THREE.SpriteMaterial({ map: (function () {
+  var c = makeCanvas(64, 64), g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(255,200,190,1)'); grd.addColorStop(0.22, 'rgba(225,30,40,0.95)'); grd.addColorStop(0.55, 'rgba(200,20,30,0.3)'); grd.addColorStop(1, 'rgba(200,20,30,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 64, 64); return tex(c); })(), transparent: true, depthWrite: false, opacity: 0 }));
+nevilleGlass.scale.set(NEVILLE.glowR * 2, NEVILLE.glowR * 2, 1);
+nevilleGlass.position.set(NEVILLE.glowAt[0], NEVILLE.glowAt[1] - NEVILLE.h / 2, 0.03); nevilleGlass.name = 'neville-remembrall';
+nevilleCard.add(nevilleGlass);
+nevilleCard.userData.thing = 'neville';
+var nevilleStop = { name: 'neville', meshes: [nevilleCard], stop: function () {
+  return { pos: new THREE.Vector3(END_X - 3.3, EYE, NEVILLE.z + 1.1), look: new THREE.Vector3(NEVILLE.x, 0.7, NEVILLE.z + 0.35), fov: 44 }; } };
+STOPS.push(nevilleStop); nevilleCard.userData.stop = nevilleStop; tappables.push(nevilleCard);
+var neville = { out: false, glass: 0, glassT: 0, clearAt: -1, patAt: -1, goIn: -1, look: groundsQ.get('neville') };   /* ?neville=out, or glass, for a look */
+function drawNeville(cast) {
+  var out = !!neville.look || cast.some(function (f) { return f.name === 'neville' && f.mark === 'frame-foot'; });
+  if (out === neville.out) return;
+  neville.out = out; neville.goIn = -1;
+  nevilleCard.visible = out; nevilleCard.material.opacity = 1;
+  nevilleCard.position.set(NEVILLE.x, NEVILLE.h / 2, NEVILLE.z);
+  if (!out && atStop === nevilleStop) goBack();
+}
+function drawNevilleGlass(has) { neville.glassT = neville.look === 'glass' || has(NEV_CUE.frown) || has(NEV_CUE.again) ? 1 : 0; }
+if (neville.look) drawNeville([]);
+function nevilleHead() { return new THREE.Vector3(NEVILLE.x, NEVILLE.h * 0.9, NEVILLE.z); }
+function nevilleGoesIn() {   /* the seconds her swing waits: under her frame (Try 3) he must be up first */
+  if (!(neville.out && nevilleCard.visible)) return 0;
+  neville.goIn = 0;
+  return NEVILLE_SEAT === 3 ? 0.7 : 0;
+}
+function updateNeville(dt) {
+  if (!nevilleCard.visible) return;
+  var g = neville.glassT;
+  if (neville.clearAt >= 0) {                   /* the smoke clears, then flushes scarlet again (PS 9's Remembrall) */
+    var k = t - neville.clearAt;
+    g = k < 1.4 ? 0 : Math.min(1, (k - 1.4) / 0.6);
+    if (k > 2.0) neville.clearAt = -1;
+  }
+  neville.glass += (g - neville.glass) * Math.min(1, dt * 4);
+  nevilleGlass.material.opacity = neville.glass * (0.85 + 0.15 * Math.sin(t * 3.1));
+  var pat = 0;
+  if (neville.patAt >= 0) {                     /* he pats every pocket: a fidget this way and that */
+    var p = t - neville.patAt;
+    pat = p < 2.4 ? Math.sin(p * 11) * 0.025 * (1 - p / 2.4) : 0;
+    if (p >= 2.4) neville.patAt = -1;
+  }
+  nevilleCard.position.set(NEVILLE.x, NEVILLE.h / 2, NEVILLE.z + pat);
+  if (neville.goIn >= 0) {                      /* up and in ahead of him as she swings */
+    neville.goIn += dt;
+    var u = Math.min(1, neville.goIn / 0.9), hole = C.holeToCorridor(0, 0, HER_Z - 0.1);
+    nevilleCard.position.set(NEVILLE.x + (hole.x - NEVILLE.x) * u, NEVILLE.h / 2 + 0.35 * u, NEVILLE.z + (hole.z - NEVILLE.z) * u);
+    nevilleCard.material.opacity = 1 - u;
+    if (u >= 1) { nevilleCard.visible = false; neville.goIn = -1; }
+  }
+  nevilleCard.rotation.set(0, Math.atan2(camera.position.x - nevilleCard.position.x, camera.position.z - nevilleCard.position.z), 0);
+}
+
 /* ---------- the events' lines (board req 66; The events runtime, Twenty-fourth session) ----------
    The common room's way (req 65), kept the same so the two pages read alike: the runtime hands each firing's lines to
    showLines, then runs its cues, so the lines are queued and played on the frames after, one at a time, each for as
@@ -3439,7 +3530,8 @@ var SPEAKER_AT = {
   cupboard: function () { return new THREE.Vector3(CUPBOARD.x, 1.3, HER_Z); },   /* the broom cupboard's rattle */
   stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }, /* the moving stair's grind, at its head */
   bay: function () { return new THREE.Vector3(FAR_END_X - 0.3, FOOT_Y + 1.3, MID_Z); }, /* the stair below the landing's far end */
-  nick: nickHead                                                       /* above his head, beyond the torch that leaned (req 140) */
+  nick: nickHead,                                                      /* above his head, beyond the torch that leaned (req 140) */
+  neville: function () { return nevilleHead(); }                     /* locked out at her frame's foot (req 297) */
 };
 var linesEl = document.getElementById('lines');
 var lineQ = [], lineCur = null;
@@ -3717,6 +3809,9 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'right'); },
     "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppMoment('stays', 'right'); },
     'it turns its back on him, annoyed, and stays so until he has been out': function () { armourJiggle = 0.6; },
+    /* Neville locked out (req 297): his quill given back, and the night he pats his pockets */
+    [NEV_CUE.quill]: function () { neville.clearAt = t; },
+    [NEV_CUE.pockets]: function () { neville.patAt = t; },
     'a puff of dust from the visor': note('a puff of dust from the visor'),
     'it salutes with its halberd, then stands as it was': note('a salute with its halberd'),
     'a moth flutters out of the visor and away down the corridor': note('a moth from the visor'),
@@ -3776,7 +3871,11 @@ var castle = window.CastleEvents ? CastleEvents.start({
     document.getElementById('help').style.bottom = mapPlay.state().pocket ? 'calc(env(safe-area-inset-bottom, 0px) + 66px)' : '';
   },
   showLines: function (list) { showLines(mapPlay ? mapPlay.lines(list) : list); },
+  /* the one figure this page draws (req 297): Neville locked out, at her frame's foot */
+  figures: [{ role: 'canon', name: 'neville', pose: 'hunched, knees up', mark: 'frame-foot' }],
+  drawFigures: drawNeville,
   builtins: { at: function () { return atStop ? atStop.name : 'none'; },
+    portrait: function () { return herDoor.ang > 0.05 ? 'open' : 'shut'; },   /* as the common room answers it (req 297: Neville's record asks) */
     tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; },   /* the polite door (req 150) */
     /* the full moon's owl (req 101, 104): no until the owl's flight cell is drawn (req 102), as the common room answers,
        so the record never sets owl_landed for the night with nothing shown (Fawkes, Q28, 11 October 2026) */
@@ -3840,6 +3939,7 @@ function frame() {
   updateCamera(dt);
   updateSticks(wdt);
   updateTrevor(wdt);
+  updateNeville(wdt);
   updateLines(dt);
   updateDraught(wdt);
   updateTapestryLift(wdt);
@@ -3893,7 +3993,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { cupboard: { rattle: cupboardRattle, swing: cupboardSwing, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { neville: function () { return { out: neville.out, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
