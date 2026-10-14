@@ -254,6 +254,7 @@ function answer(d, point) {
   lastTickle = point ? tickleAt(d, point) : null;
   turnDone = null;
   if (events) events.tap(d.id);   /* a turn's cue fires inside the tap (Events, 6.17 pm), so the shake is decided after */
+  else if (CUP && d === CUP.d) { turnDone = 'cupboard'; cupSet(CUP.target < 1); }   /* B21 with the events absent */
   if (turnDone === 'giggle') shake(d, 0.85, 45, 0.012 + 0.03 * (lastTickle ? lastTickle.near : 0.5));
   else if (!turnDone) shake(d, 0.45, 70, 0.025);
   if (hooks.onDoorTap) hooks.onDoorTap({ id: d.id, to: d.to, place: d.place });
@@ -398,6 +399,123 @@ function updateFades(dt) {
     return true;
   });
 }
+/* B21, the broom cupboard across the hall (Magic's B21, Godric's 1 with t1, 6.51 pm; board req 290, the page half of
+   Events' req 292; its place Godric's 14.1, 7.40 pm, model v15, the Architect's ledger line 3). Not locked, as Hermione
+   opened it (PoA 21): a tap at its stand swings the leaf in against its hinge jamb; another swings it shut; it stays as
+   the events left it (events/hall.json: hall_cupboard, a leave shuts it). Inside, from the model's hall-cupboard,
+   buckets and mops, one bucket always upturned where the model puts it (upturned-bucket, Godric's t1: "Hermione sat
+   down on an upturned bucket", PoA 21), and across the floor a crack between two flagstones holding a thin line of
+   sparkling gold grains, light in the grey shell until the hall is drawn. A tap on the grains while it stands open runs
+   them a little way uphill: they climb out of the crack and up the back flag's lip toward the back wall, a hand's
+   length, against their fall, then trickle back and settle (Magic's words, "run a little way uphill and settle back");
+   how many runs a day is the events' (three, then they lie still till the next day). The shell's walls are 0.8 m
+   thick where the model gives this wall 0.4, so the box's first 0.4 m sits hidden in the wall's slab. ?cupboard=open
+   opens it on load and ?grains=run runs the grains with the events absent, for checks. */
+var CUP = (function () {
+  var d = shell.doors.filter(function (x) { return x.id === 'hall-cupboard-door'; })[0];
+  var room = (CASTLE_MODEL.rooms || []).filter(function (r) { return r.id === 'hall-cupboard'; })[0];
+  if (!d || !room) return null;
+  var r = room.shape.rect, H = room.ceiling || 2.4, g = new THREE.Group(), z0 = shell.place.floor;
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + (z || 0)); };
+  var stone = kit.solid(0x6c6863), floorM = kit.solid(0x5e5a55), tin = kit.solid(0x4f4c48, { roughness: 0.5 }), wood = kit.solid(0x5a4c3e), rag = kit.solid(0x77726a);
+  function box(x0, y0, x1, y1, z0b, z1b, mat, name) {
+    var a = P(x0, y0, z0b), b = P(x1, y1, z1b), m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mat);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); m.name = name; g.add(m); return m;
+  }
+  var T = 0.12;
+  box(r[0] - T, r[1] - T, r[2], r[3] + T, -0.02, 0, floorM, 'cupboard-floor');
+  box(r[0] - T, r[1] - T, r[2], r[3] + T, H, H + T, stone, 'cupboard-ceiling');
+  box(r[0] - T, r[1] - T, r[0], r[3] + T, 0, H, stone, 'cupboard-back');
+  box(r[0], r[1] - T, r[2], r[1], 0, H, stone, 'cupboard-south');
+  box(r[0], r[3], r[2], r[3] + T, 0, H, stone, 'cupboard-north');
+  /* the crack, a dark seam across the floor between two flags, north to south a little in from the back */
+  var CX = r[0] + 0.45, cy0 = r[1] + 0.25, cy1 = r[3] - 0.25;
+  box(CX - 0.012, cy0, CX + 0.012, cy1, 0, 0.002, kit.solid(0x1c1a18), 'cupboard-crack');
+  function bucket(x, y, up, s) {
+    var b = new THREE.Mesh(new THREE.CylinderGeometry(0.15 * s, 0.11 * s, 0.3 * s, 18, 1, false), tin);
+    var p = P(x, y, 0.15 * s); b.position.copy(p); if (up) b.rotation.x = Math.PI; b.name = up ? 'upturned-bucket' : 'bucket'; g.add(b);
+    if (!up) { var rim = new THREE.Mesh(new THREE.TorusGeometry(0.15 * s, 0.008, 6, 20), tin); rim.rotation.x = Math.PI / 2; rim.position.set(p.x, p.y + 0.15 * s, p.z); g.add(rim); }
+    return b;
+  }
+  var ub = (CASTLE_MODEL.features || []).filter(function (f) { return f.id === 'upturned-bucket'; })[0];
+  bucket(ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, true, 1.15);
+  bucket(r[0] + 0.22, r[3] - 0.25, false, 1);
+  bucket(r[0] + 0.24, r[3] - 0.58, false, 0.9);
+  function mop(x, y, lean, turn) {
+    var m = new THREE.Group(), stick = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 1.35, 8), wood);
+    stick.position.y = 0.75; m.add(stick);
+    var head = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.11, 0.16, 10), rag); head.position.y = 0.08; m.add(head);
+    m.position.copy(P(x, y, 0)); m.rotation.set(0, turn, lean); m.name = 'mop'; g.add(m);
+  }
+  var back = P(r[0], r[1], 0), side = P(r[0], r[3], 0), bx = new THREE.Vector3().subVectors(side, back);
+  var yaw = Math.atan2(bx.x, bx.z);   /* the back wall's run in the local frame */
+  mop(r[0] + 0.14, r[1] + 0.22, -0.16, yaw);
+  mop(r[0] + 0.12, r[1] + 0.42, -0.2, yaw + 0.2);
+  /* the grains: points along the crack, gold, additive; one hit strip over them for the tap */
+  var N = 110, pos = new Float32Array(N * 3), home = [], gtex = (function () {
+    var c = document.createElement('canvas'); c.width = c.height = 32;
+    var x = c.getContext('2d'), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16);
+    gr.addColorStop(0, 'rgba(255,240,190,1)'); gr.addColorStop(0.4, 'rgba(255,200,90,0.7)'); gr.addColorStop(1, 'rgba(255,180,60,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c);
+  })();
+  for (var i = 0; i < N; i++) {
+    var q = P(CX + (Math.random() - 0.5) * 0.016, cy0 + (cy1 - cy0) * (i + Math.random()) / N, 0.006);
+    home.push(q); pos[i * 3] = q.x; pos[i * 3 + 1] = q.y; pos[i * 3 + 2] = q.z;
+  }
+  var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  var pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.04, map: gtex, color: 0xffc04a, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  pts.name = 'cupboard-grains'; pts.raycast = function () {}; g.add(pts);
+  var up = new THREE.Vector3().subVectors(P(r[0], r[1], 0), P(r[2], r[1], 0)).setLength(1);   /* toward the back wall */
+  var hit = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.06, 1), new THREE.MeshBasicMaterial({ visible: false }));
+  hit.position.copy(P(CX, (cy0 + cy1) / 2, 0.03)); hit.scale.z = Math.abs(P(CX, cy1).z - P(CX, cy0).z) || 1; hit.rotation.y = 0;
+  hit.name = 'grains-hit'; hit.userData.grains = true;
+  g.visible = false; shell.group.add(g); shell.group.add(hit); hit.visible = false;
+  var seeds = home.map(function () { return Math.random(); });
+  return { d: d, g: g, hit: hit, pts: pts, home: home, seeds: seeds, up: up, open: 0, target: 0, run: -1, first: true,
+           angle: Math.sign(d.hinge.th || 1) * 1.55 };
+})();
+function cupSet(open, now) {
+  if (!CUP) return;
+  CUP.target = open ? 1 : 0;
+  if (now) CUP.open = CUP.target;
+  if (open) { CUP.g.visible = CUP.hit.visible = true; shakes = shakes.filter(function (x) { return x.m !== CUP.d.mesh; }); }
+}
+function cupRun() { if (CUP && CUP.open > 0.9) CUP.run = 0; }
+function updateCupboard(dt) {
+  if (!CUP) return;
+  var c = CUP, d = c.d, h = d.hinge, m = d.mesh;
+  if (c.open !== c.target) c.open = c.target > c.open ? Math.min(1, c.open + dt / 0.8) : Math.max(0, c.open - dt / 0.7);
+  if (c.open > 0 || c.target > 0) {
+    var a = c.angle * easeInOut(c.open);
+    m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half);
+    m.rotation.y = d.rest.rot + a;
+  }
+  if (c.open === 0 && c.target === 0 && c.g.visible) { c.g.visible = c.hit.visible = false; m.rotation.y = d.rest.rot; m.position.copy(d.rest.pos); }
+  /* the grains: a twinkle always; a run climbs each a hand's length up toward the back wall and back, staggered */
+  var t = performance.now() / 1000, arr = c.pts.geometry.attributes.position.array, k = 0;
+  if (c.run >= 0) { c.run += dt; if (c.run > 3.2) c.run = -1; }
+  for (var i = 0; i < c.home.length; i++) {
+    var p = c.home[i], s = c.seeds[i], lift = 0;
+    if (c.run >= 0) { var u = clamp((c.run - s * 0.6) / 2.4, 0, 1); lift = Math.sin(u * Math.PI) * (u < 0.5 ? 1 : 1 - 0.15 * Math.sin((u - 0.5) * 30)); }
+    arr[k++] = p.x + c.up.x * lift * (0.12 + 0.06 * s);
+    arr[k++] = p.y + lift * (0.05 + 0.04 * s);
+    arr[k++] = p.z + c.up.z * lift * (0.12 + 0.06 * s);
+  }
+  c.pts.geometry.attributes.position.needsUpdate = true;
+  c.pts.material.opacity = 0.75 + 0.25 * Math.sin(t * 3.1);
+}
+var cupCues = {
+  "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones": function () { turnDone = 'cupboard'; cupSet(true); },
+  "the broom cupboard's door swings shut": function () { turnDone = 'cupboard'; cupSet(false); },
+  "the gold grains in the crack run a little way uphill and settle back": function () { cupRun(); }
+};
+var CUP_OPEN_SHOW = "the broom cupboard standing open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones";
+function cupDrawRoom(shown) {
+  if (!CUP || Q.get('cupboard') === 'open') return;
+  var open = shown.indexOf(CUP_OPEN_SHOW) >= 0;
+  cupSet(open, CUP.first); CUP.first = false;
+}
+if (Q.get('cupboard') === 'open') cupSet(true, true);
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
    its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
 function knotSpots(d) {
@@ -465,6 +583,11 @@ function tap(cx, cy) {
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
+  if (hit && hit.userData.grains && CUP) {   /* B21's grains, from the cupboard's stand while it stands open */
+    if (here !== CUP.d.stand) acted = goTo(CUP.d);
+    else { lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else if (Q.get('grains') === 'run') cupRun(); acted = true; }
+    kit.tapped(acted); return;
+  }
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) acted = goTo(d);
@@ -517,6 +640,7 @@ function frame() {
   updateShakes(dt);
   updateSwings(dt);
   updateFades(dt);
+  updateCupboard(dt);
   updateLines(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -566,7 +690,7 @@ function updateLines(dt) {
   }
 }
 var events = window.CastleEvents ? CastleEvents.start({
-  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: function () {}, cues: turnCues, showLines: showLines,
+  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: cupDrawRoom, cues: Object.assign({}, turnCues, cupCues), showLines: showLines,
   builtins: Object.assign({ tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; } },
     TURN ? { doors: function () { return TURN; } } : {})
 }) : null;
@@ -592,6 +716,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return !!d;
   },
   turn: function () { return turnNow(); }, turnDone: function () { return turnDone; },
+  /* B21: the cupboard's state, and a tap on its grains as from its stand (true if they run) */
+  cupboard: function () { return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run } : null; },
+  grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
 </script>
