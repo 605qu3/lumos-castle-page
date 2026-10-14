@@ -35,9 +35,12 @@
    the lane's: two numbers name one brick, counted from one corner, the bin; up and across the other way round is
    another brick; one number alone names a whole column. Hagrid counts steps from the bin's column (two across),
    Harry counts bricks from the left (the third): the same brick. Rounds: Hagrid's way; Harry's way (one number lights
-   the column, then the height). The cast is three taps on one brick at an even beat (judgeTaps, place: false); which
-   brick by LumosSpells.judgeBrick (spells.js), tallied in checks/diagon-tally.js. ?round=1..2, ?ease= for trying;
-   window.lumosDiagon for checks. */
+   the column, then the height); the chalk grid (forty-first session: numbers chalked along the bottom from the bin's
+   column, 0, and up it, 1, 2, 3...; the page names a pair across first, as maths books write it, and he finds the
+   brick, the second pair Hagrid's own; then the other way, a brick glows and he names its pair from the chalk, the
+   number along the bottom, then the one up the side). The cast is three taps on one brick at an even beat (judgeTaps,
+   place: false); which brick by LumosSpells.judgeBrick (spells.js), tallied in checks/diagon-tally.js. ?round=1..3,
+   ?ease= for trying; window.lumosDiagon for checks. */
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -45,18 +48,21 @@
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
   var ROUNDS = [
     { name: 'Hagrid’s way', kind: 'hagrid', want: { a: 2, u: 3 } },
-    { name: 'Harry’s way', kind: 'harry', want: { a: 2, u: 3 } } ];
+    { name: 'Harry’s way', kind: 'harry', want: { a: 2, u: 3 } },
+    { name: 'Chalk grid', kind: 'grid', want: { a: 4, u: 2 }, finds: [{ a: 4, u: 2 }, { a: 2, u: 3 }], names: [{ a: 3, u: 4 }, { a: 1, u: 5 }] } ];
   var round = Math.max(0, Math.min(ROUNDS.length - 1, (Number(qs.get('round')) || 1) - 1)), R = ROUNDS[round];
   var run = [], runKey = null, stage = 'cast', last = null, shown = null, open = null, lit = null, running = false;
+  var step = 0, pair = null, target = null, picks = null, timers = [];   /* the chalk grid: which pair, the pair drawn, the brick to name and what he has named */
 
   function resize() {
     DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight;
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
   }
   /* the wall, as checks/diagon-tally.js lays it out: six courses above the bin's lid and two beside it; five bricks
-     across on a narrow screen, six on a wide one; a course at most 56 px, the brick 1.6 to 2.6 times as long */
+     across on a narrow screen, six on a wide one; a course at most 56 px, the brick 1.6 to 2.6 times as long; the
+     ground kept clear of the buttons when they wrap to a second row on a phone */
   function wallOf() {
-    var top = Math.max(110, H * 0.16), bot = H - 70, cols = W >= 700 ? 6 : 5, rows = 6, below = 2;
+    var top = Math.max(110, H * 0.16), bot = Math.min(H - 70, (panel.getBoundingClientRect().top || H) - 8), cols = W >= 700 ? 6 : 5, rows = 6, below = 2;
     var bh = Math.min(56, (bot - top) / (rows + below + 0.6)), bw = Math.min(W * 0.92 / cols, bh * 2.6);
     if (bw < bh * 1.6) bh = bw / 1.6;
     var x = W / 2 - cols * bw / 2, y = bot - below * bh;
@@ -89,10 +95,14 @@
     var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
     e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
   }
+  function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
   function choose(i) {
+    timers.forEach(clearTimeout); timers = [];
     round = i; R = ROUNDS[i]; run = []; runKey = null; last = null; shown = null; open = null; lit = null;
+    step = 0; pair = null; target = null; picks = null;
     stage = R.kind === 'harry' ? 'column' : 'cast'; menu();
-    if (R.kind === 'hagrid') say('<b>&ldquo;Three up&hellip; two across&hellip;&rdquo;</b> Hagrid muttered (Book 1). Count from the dustbin, then tap that brick <b>three times</b>.');
+    if (R.kind === 'grid') { R.want = R.finds[0]; say('Chalk numbers from the bin: <b>across</b> the bottom, <b>up</b> its column. Maths books write across first: <b>(4, 2)</b> is 4 across, 2 up. Tap that brick three times.'); }
+    else if (R.kind === 'hagrid') say('<b>&ldquo;Three up&hellip; two across&hellip;&rdquo;</b> Hagrid muttered (Book 1). Count from the dustbin, then tap that brick <b>three times</b>.');
     else say('Harry&rsquo;s way in, a summer later: <b>&ldquo;the third brick from the left above the dustbin&rdquo;</b> (Book 3). Tap the third brick from the left.');
   }
 
@@ -111,10 +121,71 @@
       default: return 'Tap a brick in the wall.';
     }
   }
+  function pairOf(b) { return '(' + b.a + ', ' + b.u + ')'; }
+  function gridMiss(j) {   /* the chalk grid's words: across first */
+    var want = R.want, d;
+    switch (j.reason) {
+      case 'swapped': return 'That brick wriggled and sneezed a puff of mortar dust. That was ' + pairOf(j.brick) + ': <b>across first, then up</b>. Hagrid says it the other way round.';
+      case 'column': d = j.du; return 'The right column, ' + want.a + ' across, but ' + bricks(Math.abs(d)) + ' too ' + (d > 0 ? 'high' : 'low') + ': then ' + want.u + ' up, by the chalk on the bin&rsquo;s column.';
+      case 'row': d = j.da; return 'The right height, ' + want.u + ' up, but ' + bricks(Math.abs(d)) + ' too far ' + (d > 0 ? 'right' : 'left') + ': find ' + want.a + ' along the bottom first.';
+      case 'off': return 'That was ' + pairOf(j.brick) + '. Across first: <b>' + want.a + '</b> along the bottom, then <b>' + want.u + '</b> up.';
+      case 'below': return 'That&rsquo;s the bottom course, where the across numbers are chalked. Find ' + want.a + ' there, then count <b>' + want.u + ' up</b>.';
+      case 'bin': return 'That&rsquo;s the dustbin, the corner where both counts start: 0 across. Find ' + want.a + ' along the bottom.';
+      default: return 'Tap a brick in the wall.';
+    }
+  }
+  function found(j) {   /* the chalk grid's first pair: the brick quivers and the count is drawn, across first; then Hagrid's pair */
+    stage = 'shown'; shown = { at: performance.now(), j: j }; pair = { a: R.want.a, u: R.want.u, at: performance.now() };
+    [0, 1].forEach(function (k) { setTimeout(function () { tone(587 + k * 196, 0.4, 0.12); }, k * 140); });
+    say('<b>' + pairOf(R.want) + '</b>: ' + R.want.a + ' along the bottom, then ' + R.want.u + ' up. Across first, as maths books write it.');
+    later(function () {
+      step = 1; R.want = R.finds[1]; pair = null; shown = null; stage = 'cast';
+      say('Now <b>' + pairOf(R.want) + '</b>: ' + R.want.a + ' across, then ' + R.want.u + ' up. Tap it three times.');
+    }, 3600);
+  }
+  function startName() {   /* the other way round: a brick glows and he names its pair from the chalk */
+    open = null; pair = null; shown = null; stage = 'name'; target = R.names[step]; picks = { a: null, at: 0 };
+    say(step === 0 ? 'Now the other way: name the glowing brick. Tap its number <b>along the bottom</b>, then its number <b>up the side</b>.'
+      : 'And this one: its number along the bottom, then up the side.');
+  }
+  /* where the chalk is: the across numbers on the bottom course beside the bin and 0 on the bin, counted by the bin's
+     columns; the up numbers on the bin's column. Anywhere else is the field */
+  function labelAt(p, w) {
+    var B = w.bin;
+    if (p.x >= B.x && p.x <= B.x + B.w && p.y >= B.y && p.y <= B.y + B.h) return { axis: 'a', n: 0 };
+    var b = LumosSpells.brickAt(p, w); if (!b) return null;
+    if (b.u <= 0) return { axis: 'a', n: Math.floor((p.x - w.x) / w.bw) };
+    if (p.x < w.x + w.bw) return { axis: 'u', n: b.u };
+    return { axis: 'field', brick: b };
+  }
+  function nameTap(p, w) {
+    var L = labelAt(p, w), T = target, j = { label: L, reason: 'away' };
+    last = { j: j }; tone(L && L.axis !== 'field' ? 560 : 300, 0.07, 0.18, 'triangle');
+    if (!L) { say('Name it from the chalk: its number along the bottom, then up the side.'); return j; }
+    if (L.axis === 'field') { j.reason = 'field'; say('Not the brick itself: name it from the chalk. Its number <b>along the bottom</b> first.'); return j; }
+    if (picks.a === null) {
+      if (L.axis === 'u') { j.reason = 'up first'; say('Across first, as maths books write it: its number <b>along the bottom</b>, then up.'); return j; }
+      if (L.n !== T.a) { j.reason = 'across'; say('That&rsquo;s ' + L.n + ' along the bottom. Follow the glowing brick&rsquo;s column straight down to its number.'); return j; }
+      picks.a = L.n; j.reason = 'across right'; tone(660, 0.25, 0.1);
+      say('<b>' + T.a + ' across.</b> Now its number <b>up the side</b>, on the bin&rsquo;s column.'); return j;
+    }
+    if (L.axis === 'a') { j.reason = 'across again'; say('You have its across, ' + picks.a + '. Now its number <b>up the side</b>, on the bin&rsquo;s column.'); return j; }
+    if (L.n !== T.u) { j.reason = 'up'; say('That&rsquo;s ' + L.n + ' up. Follow the glowing brick&rsquo;s course across to the bin&rsquo;s column.'); return j; }
+    j.reason = 'right'; stage = 'named'; picks.at = performance.now(); pair = { a: T.a, u: T.u, at: performance.now() };
+    [0, 1, 2].forEach(function (k) { setTimeout(function () { tone(523 + k * 131, 0.45, 0.12); }, k * 140); });
+    say('<b>' + pairOf(T) + '</b>: ' + T.a + ' across, ' + T.u + ' up.');
+    later(function () {
+      if (++step < R.names.length) return startName();
+      stage = 'done'; target = null;
+      say('Two numbers, <b>across first</b>, name one brick; swap them and it is another brick. Hagrid says them the other way round, so he counts carefully.');
+    }, 3000);
+    return j;
+  }
   function tapAt(p) {
-    if (stage === 'open' || stage === 'done') return;
+    if (stage === 'open' || stage === 'done' || stage === 'shown' || stage === 'named') return;
     var w = wallOf();
     if (stage === 'column') return columnTap(p, w);
+    if (stage === 'name') return nameTap(p, w);
     var j = LumosSpells.judgeBrick(p, w, R.want, ease), key = j.brick ? j.brick.a + ',' + j.brick.u : j.reason;
     if (key !== runKey || (run.length && p.t - run[run.length - 1].t > 1500)) { run = []; runKey = key; }
     run.push(p); tone(j.brick ? 520 : 300, 0.07, 0.18, 'triangle');
@@ -122,9 +193,10 @@
     var jt = LumosSpells.judgeTaps(run, W, H, { gap: 1500, beat: LumosSpells.TAP_EASES[ease].beat, place: false });
     last = { j: j, beat: jt }; run = []; runKey = null;
     if (jt.verdict !== 'open') { shown = { at: performance.now(), j: j, beat: true }; say('Keep an even beat, like Hagrid with his umbrella: tap &hellip; tap &hellip; tap.'); return j; }
+    if (j.verdict === 'right' && R.kind === 'grid' && step === 0) { found(j); return j; }
     if (j.verdict === 'right') { stage = 'open'; open = { at: performance.now() }; shown = null; opening(); return j; }
     shown = { at: performance.now(), j: j }; tone(j.reason === 'swapped' ? 180 : 240, 0.3, 0.15);
-    say(missWords(j));
+    say(R.kind === 'grid' ? gridMiss(j) : missWords(j));
     return j;
   }
   function columnTap(p, w) {
@@ -144,10 +216,15 @@
   function opening() {
     tone(90, 0.6, 0.25, 'sawtooth');
     say('<b>The brick quivered &hellip; it wriggled &hellip; a small hole appeared &hellip; it grew wider and wider</b> (Book 1).');
-    setTimeout(function () { [0, 1, 2].forEach(function (k) { setTimeout(function () { tone(523 + k * 131, 0.5, 0.12); }, k * 150); }); }, 1700);
-    setTimeout(function () {
+    later(function () { [0, 1, 2].forEach(function (k) { setTimeout(function () { tone(523 + k * 131, 0.5, 0.12); }, k * 150); }); }, 1700);
+    later(function () {
       stage = 'done'; LumosSpells.learn('diagon');
-      if (R.kind === 'hagrid') say('From the bin: <b>' + R.want.u + ' up</b>, then <b>' + R.want.a + ' across</b>. Two numbers, counted from one corner, name one brick.');
+      if (R.kind === 'grid') {   /* Hagrid's own brick: the wall comes back, the count is drawn across first, then the other way */
+        pair = { a: R.want.a, u: R.want.u, at: performance.now() + 600 };
+        say('<b>(2, 3)</b>: 2 across, 3 up. Hagrid&rsquo;s own brick: he says it the other way round, <b>&ldquo;three up&hellip; two across&rdquo;</b>, so he mutters it carefully.');
+        later(function () { step = 0; startName(); }, 4200);
+      }
+      else if (R.kind === 'hagrid') say('From the bin: <b>' + R.want.u + ' up</b>, then <b>' + R.want.a + ' across</b>. Two numbers, counted from one corner, name one brick.');
       else say('Hagrid counts steps from the bin&rsquo;s column: <b>two across</b>. Harry counts bricks from the left: <b>the third</b>. Two ways to count, one brick; and one number alone names a whole column.');
     }, 5200);
   }
@@ -238,6 +315,32 @@
       if (R.kind === 'harry') course(w, u).slice(0, 3).forEach(function (b, i) { chalk(['1st', '2nd', '3rd'][i], (b[1] + b[2]) / 2, w.y - (u - 0.5) * w.bh + w.bh * 0.02, s * 0.75); });
     }
   }
+  function drawGrid(w) {   /* the chalk: 0 on the bin, 1, 2, 3... along the bottom course by the bin's columns, 1 to 6 up the bin's column */
+    var s = Math.max(14, w.bh * 0.42), B = w.bin;
+    chalk('0', B.x + B.w / 2, B.y + B.h * 0.42, s);
+    for (var n = 1; n < w.cols; n++) chalk(String(n), w.x + (n + 0.5) * w.bw, w.y + w.bh * 0.5, s);
+    for (var k = 1; k <= w.rows; k++) chalk(String(k), w.x + w.bw * 0.5, w.y - (k - 0.5) * w.bh, s);
+  }
+  function drawPair(w, now) {   /* the count drawn across first: from the bin along the lid's line, then up the column, the brick ringed and named */
+    var t = (now - pair.at) / 1000; if (t < 0) return;
+    var to = mid(w, pair.a, pair.u), o = { x: w.x + w.bw * 0.5, y: w.y }, f = Math.min(1, t / 1.2), s = Math.max(14, w.bh * 0.42);
+    cx.save(); cx.setLineDash([7, 6]); cx.strokeStyle = '#f3d27a'; cx.lineWidth = 2.5;
+    cx.beginPath(); cx.moveTo(o.x, o.y); cx.lineTo(o.x + (to.x - o.x) * Math.min(1, f * 2), o.y);
+    if (f > 0.5) cx.lineTo(to.x, o.y + (to.y - o.y) * (f - 0.5) * 2);
+    cx.stroke(); cx.restore();
+    if (f >= 1) {
+      cx.strokeStyle = '#f3d27a'; cx.lineWidth = 3; cx.beginPath(); cx.ellipse(to.x, to.y, w.bw * 0.58, w.bh * 0.72, 0, 0, 7); cx.stroke();
+      chalk(pairOf(pair), to.x, to.y - w.bh * 0.95, s);
+    }
+  }
+  function drawTarget(w, now) {   /* the brick to name glows; once he has its across, the half-named pair is chalked over it */
+    var c = mid(w, target.a, target.u);
+    cx.fillStyle = 'rgba(243,210,122,' + (0.22 + 0.12 * Math.sin(now / 260)) + ')';
+    var b = course(w, target.u).filter(function (q) { return q[0] === target.a; })[0];
+    if (b) cx.fillRect(b[1] + 2, w.y - target.u * w.bh + 2, b[2] - b[1] - 4, w.bh - 4);
+    glowBrick(w, target.a, target.u, 'rgba(255,236,170,0.95)', 3);
+    if (picks && picks.a !== null && stage === 'name') chalk('(' + picks.a + ', ?)', c.x, c.y - w.bh * 0.95, Math.max(14, w.bh * 0.42));
+  }
   function drawPuff(w, now) {
     if (!shown || shown.j.reason !== 'swapped') return;
     var t = (now - shown.at) / 1000; if (t > 1.6) return;
@@ -255,7 +358,12 @@
     if (run.length && runKey && runKey.indexOf(',') > 0) { var k = runKey.split(',').map(Number); glowBrick(w, k[0], k[1], 'rgba(255,236,170,0.9)', 3);
       var c = mid(w, k[0], k[1]); for (var i = 0; i < run.length; i++) { cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(c.x - 10 + i * 10, c.y + w.bh * 0.3, 3, 0, 7); cx.fill(); } }
     drawPuff(w, now);
-    if (open) { drawOpen(w, now); if (stage === 'done') drawSum(w, now); }
+    if (open) { drawOpen(w, now); if (stage === 'done' && R.kind !== 'grid') drawSum(w, now); }
+    if (R.kind === 'grid' && !(open && (now - open.at) / 1000 < 5.8)) {   /* the chalk hidden while the arch stands open */
+      drawGrid(w);
+      if (target) drawTarget(w, now);
+      if (pair) drawPair(w, now);
+    }
     requestAnimationFrame(frame);
   }
 
@@ -269,7 +377,10 @@
   addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
   window.lumosDiagon = { choose: choose, wall: wallOf, mid: function (a, u) { return mid(wallOf(), a, u); },
     tap: function (x, y) { return tapAt({ x: x, y: y, t: Math.round(performance.now()) }); },
-    state: function () { return { round: round + 1, stage: stage, run: run.length, last: last, ease: ease, lit: !!lit, line: lineEl.textContent }; } };
+    state: function () { return { round: round + 1, stage: stage, run: run.length, last: last, ease: ease, lit: !!lit, line: lineEl.textContent,
+      step: step, want: R.want, target: target, picks: picks, pair: pair }; },
+    across: function (n) { var w = wallOf(); return n === 0 ? { x: w.bin.x + w.bin.w / 2, y: w.bin.y + w.bin.h * 0.42 } : { x: w.x + (n + 0.5) * w.bw, y: w.y + w.bh * 0.5 }; },
+    upNum: function (k) { var w = wallOf(); return { x: w.x + w.bw * 0.5, y: w.y - (k - 0.5) * w.bh }; } };
 })();
 </script>
 </body>
