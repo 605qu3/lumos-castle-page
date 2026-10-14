@@ -90,6 +90,19 @@
     line-height: 1.45;
     pointer-events: none;
   }
+  /* the room's states the grey shell does not draw yet (req 372), above the help line */
+  #roomnote {
+    position: fixed;
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
+    max-width: min(420px, calc(100vw - 20px));
+    background: var(--hud-bg);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font: italic 400 15px/1.4 "IM Fell English", Georgia, serif;
+    color: #e9dfc6;
+    pointer-events: none;
+  }
   [hidden] { display: none !important; }
   /* the events' lines by a shut door (req 278), as the dormitory and the corridor show a heard line */
   #lines { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
@@ -138,9 +151,10 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <button id="back" type="button" hidden>Back</button>
 <div id="help">Drag to look around.</div>
 <div id="lines"></div>
+<div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=21"></script>
+<script src="castle-model.js?v=24"></script>
 <script src="castle-shell.js?v=7"></script>
 <script src="castle-events.js?v=31"></script>
 <script>
@@ -522,6 +536,102 @@ function cupDrawRoom(shown) {
   cupSet(open, CUP.first); CUP.first = false;
 }
 if (Q.get('cupboard') === 'open') cupSet(true, true);
+/* the rooms' things and states (board req 372, the page half of Events' The rooms' states, how they are written): in a
+   room's shell the things its event records move stand as plain boxes where Interiors' schedules put them, each with a
+   stand 2 m off it; a tap there goes to the events as the thing's name (the staff room's `wardrobe`, PoA 7; the Charms
+   classroom's `pineapple`, PS 16), and the records' cues shake or hop it. The pineapple and its desk stand only while
+   the room's state shows it (the exam week). Every other state the room shows, which the grey shell does not draw (the
+   fairies, the scorch, the bandages, a notice), is written in a note at the foot until the room is built.
+   ?pineapple=on stands the pineapple with the events absent, for checks. */
+var PINE_SHOW = "a pineapple sitting on the front row's desk on the aisle's left, waiting for the next one called in";
+var ROOM_THINGS = {
+  /* docs/interiors/staff-room.md: against the far (east) end wall, x' 2.25 to 3.75 (y = 50.6 + x'), 0.7 deep, 2.2 high */
+  'staff-room': [{ id: 'wardrobe', rect: [141.3, 52.85, 142.0, 54.35], z: [0, 2.2], col: 0x5a4c3e, stand: [139.3, 53.6], look: 1.3 }],
+  /* docs/interiors/charms-classroom.md: the front row's desk on the aisle's left, x' 2.3 to 3.6 (y = 71.4 - x'),
+     y' 6.0 to 6.6 (x = 139.6 + y'), 0.72 high; the stand in the aisle short of it */
+  'charms-classroom': [{ id: 'pineapple-desk', rect: [145.6, 67.8, 146.2, 69.1], z: [0, 0.72], col: 0x6a5a48, show: PINE_SHOW, still: true },
+                       { id: 'pineapple', at: [145.9, 68.45], z: [0.72, 0.9], col: 0xb08a3a, show: PINE_SHOW, stand: [144.6, 66.7], look: 0.8 }]
+};
+var roomThings = (function () {
+  var list = ROOM_THINGS[PLACE] || [], out = [], z0 = shell.place.floor;
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + (z || 0)); };
+  list.forEach(function (t) {
+    var m;
+    if (t.rect) {
+      var a = P(t.rect[0], t.rect[1], t.z[0]), b = P(t.rect[2], t.rect[3], t.z[1]);
+      m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), kit.solid(t.col));
+      m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+    } else {
+      /* one mesh, so the shell's tap (its direct children only) finds it: the fruit, its crown a child */
+      var fg = new THREE.SphereGeometry(0.075, 14, 10); fg.scale(1, 1.35, 1); fg.translate(0, 0.1, 0);
+      m = new THREE.Mesh(fg, kit.solid(t.col));
+      var crown = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.14, 7), kit.solid(0x4c6a3a)); crown.position.y = 0.26; m.add(crown);
+      m.position.copy(P(t.at[0], t.at[1], t.z[0]));
+    }
+    m.name = 'thing-' + t.id; shell.group.add(m);
+    var base = t.rect ? P((t.rect[0] + t.rect[2]) / 2, (t.rect[1] + t.rect[3]) / 2, t.z[0]) : P(t.at[0], t.at[1], t.z[0]);
+    var d = { id: t.id, mesh: m, t: t, rest: { pos: m.position.clone() }, inward: new THREE.Vector3(1, 0, 0), place: PLACE,
+              mid: base, sill: 0, h: t.z[1] - t.z[0] };   /* mid, sill and h place a heard line over it, as over a door */
+    if (t.stand) {
+      var c = t.rect ? [(t.rect[0] + t.rect[2]) / 2, (t.rect[1] + t.rect[3]) / 2] : t.at;
+      d.stand = { name: t.id, pos: P(t.stand[0], t.stand[1], 1.35), look: P(c[0], c[1], t.look), thing: m, level: z0 };
+      d.inward = new THREE.Vector3().subVectors(d.stand.pos, d.stand.look).setY(0).normalize();
+      if (!t.still) { things.push(d); tappables.push(m); }
+    }
+    if (t.show) m.visible = Q.get(t.id.split('-')[0]) === 'on';
+    out.push(d);
+  });
+  return out;
+})();
+function roomThing(id) { return roomThings.filter(function (d) { return d.id === id; })[0]; }
+var hops = [];
+function hop(d, s, n, along) {   /* n quick hops in s seconds, sliding `along` metres on the desk's length and back */
+  if (!d) return;
+  hops = hops.filter(function (h) { return h.d !== d; });
+  var dir = new THREE.Vector3().crossVectors(d.inward, Y_AXIS).normalize();
+  hops.push({ d: d, t: 0, s: s, n: n, along: along || 0, dir: dir });
+}
+function updateHops(dt) {
+  hops = hops.filter(function (h) {
+    h.t += dt;
+    var u = Math.min(1, h.t / h.s), m = h.d.mesh;
+    m.position.copy(h.d.rest.pos).addScaledVector(h.dir, Math.sin(u * Math.PI) * h.along);
+    m.position.y += Math.abs(Math.sin(u * Math.PI * h.n)) * 0.05 * (1 - u * 0.5);
+    m.rotation.z = Math.sin(u * Math.PI * h.n * 2) * 0.15 * (1 - u);
+    if (u >= 1) { m.position.copy(h.d.rest.pos); m.rotation.z = 0; }
+    return u < 1;
+  });
+}
+var thingCues = {
+  "the old wardrobe at the far end gives a sudden wobble, banging off the wall": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 0.9, 38, 0.05); },
+  "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 1.1, 44, 0.06); },
+  "the pineapple on the front desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 2.4, 9, 0.45); },
+  "the pineapple tapdances a few quick steps on the spot and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 1.0, 4, 0); }
+};
+var noteEl = document.getElementById('roomnote');
+/* the note lists only this room's own states, from its own chain (every one names its place, `place = staff room`):
+   the older chains' room rules name none and would show their common room's things everywhere */
+var ROOM_CHAIN = { 'staff-room': 'staff', 'charms-classroom': 'charms', 'trophy-room': 'trophy', 'library': 'library',
+                   'hospital-wing': 'wing', 'mirror-classroom': 'mirror' };
+var ownShows = {}, lastShown = [];
+if (ROOM_CHAIN[PLACE]) fetch('events/' + ROOM_CHAIN[PLACE] + '.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+  (j.room || []).forEach(function (rule) { (rule.show || []).forEach(function (s) { ownShows[s] = true; }); });
+  thingsDrawRoom(lastShown);
+}).catch(function () {});
+function thingsDrawRoom(shown) {
+  lastShown = shown;
+  var drawn = {};
+  roomThings.forEach(function (d) {
+    if (!d.t.show) return;
+    drawn[d.t.show] = true;
+    if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
+  });
+  drawn[CUP_OPEN_SHOW] = true;
+  var rest = shown.filter(function (s) { return ownShows[s] && !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
+  noteEl.hidden = !rest.length;
+  noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
+}
+function roomDraw(shown) { cupDrawRoom(shown); thingsDrawRoom(shown); }
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
    its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
 function knotSpots(d) {
@@ -647,6 +757,7 @@ function frame() {
   updateSwings(dt);
   updateFades(dt);
   updateCupboard(dt);
+  updateHops(dt);
   updateLines(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -696,7 +807,7 @@ function updateLines(dt) {
   }
 }
 var events = window.CastleEvents ? CastleEvents.start({
-  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: cupDrawRoom, cues: Object.assign({}, turnCues, cupCues), showLines: showLines,
+  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: roomDraw, cues: Object.assign({}, turnCues, cupCues, thingCues), showLines: showLines,
   builtins: Object.assign({ tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; } },
     TURN ? { doors: function () { return TURN; } } : {})
 }) : null;
