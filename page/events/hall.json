@@ -1,0 +1,114 @@
+{
+  "chain": "hall",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard != open"
+      ],
+      "show": [
+        "the broom cupboard's door in the west wall beside the Great Hall's doors, shut"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open"
+      ],
+      "show": [
+        "the broom cupboard standing open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "hall.cupboard-opens",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-door",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard != open"
+      ],
+      "show": [
+        "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones"
+      ],
+      "starts": [
+        "set hall_cupboard = open",
+        "log \"Opened the broom cupboard in the Entrance Hall {day}\""
+      ],
+      "canon": "Magic's B21 (Godric's 1 with t1, 6.51 pm; the Architect's ledger line 3, drawn in model v15, hall-cupboard-door): not locked, as Hermione opened it and pushed him inside amongst the buckets and mops, PoA 21; the upturned bucket, Godric's t1 on the place (14.1); checked against the text, 13 October 2026"
+    },
+    {
+      "id": "hall.cupboard-shuts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-door",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open"
+      ],
+      "show": [
+        "the broom cupboard's door swings shut"
+      ],
+      "starts": [
+        "set hall_cupboard = shut"
+      ]
+    },
+    {
+      "id": "hall.grains-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-grains",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open",
+        "days since grains_day >= 1"
+      ],
+      "show": [
+        "the gold grains in the crack run a little way uphill and settle back"
+      ],
+      "starts": [
+        "set grains_taps = 1",
+        "stamp grains_day"
+      ],
+      "canon": "Magic's B21 with t1 (Godric, 6.51 pm): an hourglass's sand, never named; three taps a day, as Hermione turned the hourglass over three times, PoA 21; checked against the text, 13 October 2026"
+    },
+    {
+      "id": "hall.grains-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-grains",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open",
+        "days since grains_day < 1",
+        "grains_taps < 3"
+      ],
+      "show": [
+        "the gold grains in the crack run a little way uphill and settle back"
+      ],
+      "starts": [
+        "add grains_taps 1"
+      ]
+    },
+    {
+      "id": "hall.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "hall_cupboard = open"
+      ],
+      "starts": [
+        "set hall_cupboard = shut"
+      ]
+    }
+  ]
+}
