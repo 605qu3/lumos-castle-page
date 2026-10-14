@@ -7411,7 +7411,8 @@ function updatePairStop(dt) {
    with a soft thump; the satchel stays put. It stays where he put it for the visit (a reload brings it home), and the
    pair's square-on turn at the stop turns it about where it stands. The cat waits, sitting, rather than walk through
    it. Q75's find: Trevor's fourth spot behind it (floor-d); on a visit he hides there his prints run behind the chair
-   and he croaks as it lifts; on any other, a little dust and a dropped Knut lie where it stood. */
+   and he croaks as it lifts; on any other, a little dust and a dropped Knut lie where it stood. Req 257: tapped, the Knut
+   lifts to his hand and is kept, once ever (Events' trevor.chair-knut). */
 var ARMCHAIR_MOVE = {
   sq: 1.05, cols: [-2, 1], rows: [-1, 2],          /* a square's side; the field's columns and rows about home */
   lift: 0.1,                                        /* how high it rises, m */
@@ -7421,7 +7422,8 @@ var ARMCHAIR_MOVE = {
   catClear: 0.35,                                   /* m from the chair's line across its width to the loop, the cat's half-width included */
   catAhead: 0.03,                                   /* how far ahead on its loop the cat looks, a share of the loop */
   mark: TREVOR_MARKS['floor-d'],                    /* Q75's spot behind it */
-  knut: 0.05, dust: { w: 0.8, d: 0.36, opacity: 0.55 }
+  knut: 0.05, dust: { w: 0.8, d: 0.36, opacity: 0.55 },
+  knutReach: 0.16, knutLift: 0.9                    /* the Knut's tap: its reach round the coin, m; its lift to his hand, s */
 };
 /* the visit's chair: the square it stands on (0, 0 home), where it is drawn, its lift (and the lift drawn), the cast */
 var armchair = { col: 0, row: 0, x: CHAIR_L_AT.x, z: CHAIR_L_AT.z, up: 0, upOn: 0, casting: null, last: null, grid: 0, gridTo: 0,
@@ -7525,10 +7527,37 @@ var armFind = (function () {
     blending: THREE.AdditiveBlending, depthWrite: false }));
   glint.scale.set(0.09, 0.09, 1); glint.position.copy(knut.position).setY(0.012);
   [dust, knut, glint].forEach(function (o) { o.raycast = function () {}; grp.add(o); });
-  grp.name = 'armchair-find'; grp.visible = false; grp.userData.glint = glint;
+  /* the Knut's tap (req 257, Events' trevor.chair-knut): a fingertip's reach round the coin, unseen */
+  var hit = new THREE.Mesh(new THREE.CircleGeometry(M.knutReach, 20).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({
+    transparent: true, opacity: 0, depthWrite: false, colorWrite: false }));
+  hit.position.copy(knut.position).setY(0.01); hit.name = 'chair-knut';
+  grp.add(hit); tappables.push(hit);
+  grp.name = 'armchair-find'; grp.visible = false;
+  grp.userData = { glint: glint, knut: knut, hit: hit, home: knut.position.clone(), lift: null };
   scene.add(grp);
   return grp;
 })();
+/* req 257's Knut: tapped, it lifts to his hand and is kept, once ever (Events, 13 October 2026, 1.58 pm: tap
+   `chair-knut`; the runtime adds it to his Knuts and says it goes into his pocket with a clink) */
+function armKnutOn() {
+  return !!castle && armFind.visible && !armFind.userData.lift && findVars().chair_knut !== 'kept';
+}
+function armKnutTap() { armFind.userData.lift = { k: 0 }; }
+var _kq = new THREE.Quaternion(), _kf = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+function updateArmKnut(dt) {
+  var K = armFind.userData, kn = K.knut, L = K.lift;
+  if (!L) { kn.visible = K.glint.visible = armFind.visible && findVars().chair_knut !== 'kept'; return; }
+  L.k = Math.min(1, L.k + dt / ARMCHAIR_MOVE.knutLift);
+  var e = smooth01(0, 0.7, L.k), s = 1 - smooth01(0.75, 1, L.k);        /* up to his hand, then into his pocket */
+  camera.getWorldDirection(_dir);
+  _up.set(0, 1, 0).applyQuaternion(camera.quaternion);
+  _fp.copy(camera.position).addScaledVector(_dir, 0.45).addScaledVector(_up, -0.1);
+  kn.position.copy(K.home).lerp(_fp, e);
+  kn.quaternion.copy(_kq.identity()).slerp(_fq.copy(camera.quaternion).multiply(_kf), e);
+  kn.scale.setScalar(Math.max(0.001, s));
+  kn.material.depthTest = false; kn.renderOrder = 20; kn.visible = true; K.glint.visible = false;
+  if (L.k >= 1) { K.lift = null; kn.visible = false; }
+}
 /* the croak as the chair lifts off him, heard from behind it as the room's lines are */
 function armchairCroak() {
   if (trevor.key !== 'floor-d') return;
@@ -7590,6 +7619,7 @@ function updateArmchair(dt, t) {
   armGrid.visible = A.grid > 0; armGrid.material.opacity = M.chalk * A.grid;
   armFind.visible = trevor.key !== 'floor-d' && Math.hypot(A.x - CHAIR_L_AT.x, A.z - CHAIR_L_AT.z) > 0.15;
   if (armFind.visible) { var g = (t % 4.5) / 4.5; armFind.userData.glint.material.opacity = g < 0.12 ? 0.8 * Math.sin(Math.PI * g / 0.12) : 0; }
+  updateArmKnut(dt);
   chairL.userData.lift = A.up / M.lift;
   if (scarf) scarf.userData.lift = chairL.userData.lift;
 }
@@ -7711,6 +7741,7 @@ function tapName(o) {
   if (!o) return null;
   if (o === sofa) return 'sofa';
   if (o === findHand.mesh) return 'find';            /* the find or card in his hand (req 173) */
+  if (o === armFind.userData.hit) return 'chair-knut';   /* the Knut behind the armchair (req 257) */
   if (o === catWalk || o === catSit || o === curl.mesh) return 'cat';
   if (o === stairs) return 'stair';
   if (o === gapFind) return 'desk gap';
@@ -7765,6 +7796,7 @@ function tapHits(cx, cy) {
     if (h.object === gapFind) return alphaSolid(gapFind.userData.alpha, h.uv);
     if (h.object === sofa) return sofaSolid(h.uv);
     if (h.object === findHand.mesh) return findHand.want && findHand.mesh.visible;
+    if (h.object === armFind.userData.hit) return armKnutOn();
     if (h.object === catWalk || h.object === catSit) return !curl.on;
     if (h.object === curl.mesh) return curl.on && alphaSolid(curl.alpha, h.uv);
     if (h.object === books.mesh) return alphaSolid(books.ain, h.uv);   /* the gap where the History stood counts too */
@@ -7826,6 +7858,7 @@ function tapDo(cx, cy) {
   if (mode === 'list') { returnList(); return back; }
   if (hit && hit === findHand.mesh) return told;     /* `tap find`: its doing, or the card's next turn, at any stop */
   if (hit && hit === stuck) { stuckTap(); return told; }   /* the stuck bubble bobs, wherever he stands */
+  if (hit && hit === armFind.userData.hit) { armKnutTap(); return told; }   /* the Knut lifts to his hand (req 257) */
   if (mode === 'board') {
     if (hit && hit.userData.paper && hit.userData.paper.spec.scrap) { signScrapTap(); return told; }
     if (hit && (hit === books.mesh || hit === books.hist || hit === books.slip || hit === books.openCard)) { booksTap(); return told; }
@@ -8861,7 +8894,7 @@ kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless ni
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
   'the practice notice': "Wood's practice notice" });   /* its look name once the blank sheet is drawn (req 161) */
 
-window.lumosGreybox = { frame: frame, edges: function () { return { last: EDGE.last, at: EDGE.at, count: EDGE.count, cat: EDGE.catOn, gust: EDGE.paper ? +(EDGE.paper.gust || 0).toFixed(3) : 0, skipped: EDGE.skipped, where: EDGE.where, now: t }; }, edgeFire: function (key) { return edgeFire(key); }, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, findRedraw: function () { var s = (findHand.shows || []).slice(); if (s.indexOf(FIND_RULES.hand) < 0) s.push(FIND_RULES.hand); findHand.key = ''; findDrawRoom(s); return findHand.key; }, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
+window.lumosGreybox = { frame: frame, edges: function () { return { last: EDGE.last, at: EDGE.at, count: EDGE.count, cat: EDGE.catOn, gust: EDGE.paper ? +(EDGE.paper.gust || 0).toFixed(3) : 0, skipped: EDGE.skipped, where: EDGE.where, now: t }; }, edgeFire: function (key) { return edgeFire(key); }, gapFind: gapFind, zoom: kit.zoom, goDesk: function () { goDesk(); }, leaveDesk: function () { leaveDesk(); }, deskStop: function () { return DESK_STOP; }, goTable: function () { goTable(); }, leaveTable: function () { leaveTable(); }, tableStop: function () { return TABLE_STOP; }, holeStop: function () { return HOLE_STOP; }, sofaStop: function () { return SOFA_STOP; }, sofa: sofa, goSofa: function () { goSofa(); }, sofaTurn: function () { return sofaTurn; }, head: function () { return { yaw: HEAD.yaw, pitch: HEAD.pitch, limit: HEAD.turn, left: HEAD.left, right: HEAD.right, at: HEAD.mode }; }, slowT: function () { return slowT; }, caseStop: function () { return CASE_STOP; }, bookcase: bookcase, ladder: ladder, keyDoor: keyDoor, keyDoorAt: function () { return KEYDOOR; }, locks: function () { return LOCKS; }, keyDoorLock: keyDoorLock, den: { lamp: denLamp, go: function () { goDen(); }, leave: function () { leaveDen(); }, doorway: denDoorway, casing: denCasing, ring: denRing, slotWorld: denSlotWorld, DEN: DEN, state: function () { return { mode: mode, shown: den.visible, layers: camera.layers.mask, yaw: +denYaw.toFixed(3), leaving: denState.leaving, order: denState.order.slice(), filled: denState.slots.filter(Boolean).length, glint: denGlintM.visible, pile: denState.pile || 0, flicker: denFlickerT, marksSeen: !!localStorage.getItem(DEN.MARKS), tilt: +denTilt.toFixed(2), noteTilt: +denNoteTilt().toFixed(2), rise: +denState.rise.toFixed(2), dust: denDust.visible ? +denDust.material.opacity.toFixed(2) : 0 }; }, pileTop: denPileTop }, list: { lift: function () { liftList(); }, back: function () { returnList(); }, strip: listStrip, floor: listFloor, roll: listRoll, held: listHand, LIST: LIST, place: function (t) { listPlace(t); return { top: LIST.top, len: +listLen().toFixed(4), over: LIST.over, onFloor: listRun.visible }; }, shades: [listStripShade, listFloorShade], state: function () { return { mode: mode, scroll: Math.round(LIST.scroll), max: Math.round(LIST.max), lines: LIST.items ? LIST.items.length : 0, back: !backBtn.hidden }; } }, pick: function (cx, cy) { var h = gapThrough(tapHits(cx, cy)); return h.length ? tapName(h[0].object) || h[0].object.name || 'unnamed' : null; }, figureAt: function (cx, cy) { return castle ? figureTapped(gapThrough(tapHits(cx, cy))) : null; }, ring: ring, cloak: function () { return cloak; }, sign: function () { return { down: signDown, paper: gallonsPaper, scrap: gallonsScrap }; }, home: { letter: homeLetter, note: homeNote, feather: homeFeather, howler: howler, state: homeState, tap: homeLetterTap, hand: homeHandTap, seal: SEAL },snowball: snowballFly, snowballNow: function () { return snowball; }, tap: tap, satchelTap: satchelTap, homework: homework, homeworkDip: function () { homework.next = 0; }, curios: curios, jarTap: jarTap, satchel: function () { return satchelState; }, stokeFire: stokeFire, enterBoard: enterBoard, leaveBoard: leaveBoard, togglePortrait: togglePortrait, climbOut: climbOut, catSitDown: catSitDown, curl: function () { return curl; }, books: function () { return books; }, candle: function () { return candle; }, candleTap: candleTap, candleWick: candleWick, setTint: setTint, setShadows: setShadows, scene: scene, camera: camera, papers: papers, liftPaper: liftPaper, returnPaper: returnPaper, boardReady: boardReady, boardGroup: boardGroup, mode: function () { return mode; }, placeSitters: placeSitters, goFireside: goFireside, leaveFireside: leaveFireside, sitters: sitters, portrait: portrait, events: castle, fireGreen: fireGreen, bellows: bel, bellowsTap: bellowsTap, fire: function () { return { level: fireLevel, target: fireLevelT, damp: fireDamp }; }, opposite: opp, cue: function (c) { var f = NICK_CUES[c] || VISITOR_CUES[c]; if (f) f(); return !!f; }, trevorMarks: TREVOR_MARKS, trevor: trevor, nick: nick, torchCtl: torchCtl, findRedraw: function () { var s = (findHand.shows || []).slice(); if (s.indexOf(FIND_RULES.hand) < 0) s.push(FIND_RULES.hand); findHand.key = ''; findDrawRoom(s); return findHand.key; }, redrawNotes: function () { notesShows = (castle && castle.cues && castle.cues()) || []; }, climbStair: climbStair, moonRead: function () { updateSky(); }, moon: function () { return { moon: sky.moon, night: sky.night, shows: sky.shows, window: 'window-right', x: 0.68, y: sky.moon ? moonY(sky.moon) : null }; }, lines: { show: showLines, cast: drawFiguresInOrder, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 window.lumosGreybox.howlerBurst = { state: howlerReport, at: howlerAt, ash: howlerAshAt, note: function () { var p = howlerNote.position.clone().project(camera); return [Math.round((p.x + 1) / 2 * innerWidth), Math.round((1 - p.y) / 2 * innerHeight)]; } };   /* req 199's checks */
 /* req 238's checks: the glass's state, and a slip handed in as the runtime hands one (the owl's post queues it till the
    owl has landed), since the runtime keeps its owl's delivery to itself */
@@ -8872,13 +8905,15 @@ window.lumosGreybox.armchair = {
   state: function () {
     var A = armchair;
     return { at: armchairHome() ? 'home' : { col: A.col, row: A.row }, x: +A.x.toFixed(3), z: +A.z.toFixed(3), up: +A.up.toFixed(3),
-      casting: !!A.casting, last: A.last, squares: +A.grid.toFixed(2), find: armFind.visible ? 'knut' : (trevor.key === 'floor-d' ? 'trevor' : null),
+      casting: !!A.casting, last: A.last, squares: +A.grid.toFixed(2), find: armFind.visible ? (armFind.userData.knut.visible ? 'knut' : 'dust') : (trevor.key === 'floor-d' ? 'trevor' : null),
       catWaits: !!cat.armWait, catZone: armchair.catZone ? armchair.catZone.filter(Boolean).length : 0, mesh: { x: +chairL.position.x.toFixed(3), y: +chairL.position.y.toFixed(3), z: +chairL.position.z.toFixed(3) } };
   },
   spell: function () { return armchair.casting ? armchair.casting.state() : null; },
   judge: function (pts) { return armchair.casting ? armchair.casting.judge(pts) : null; },   /* a stroke handed in, screen px */
   toScreen: function (q) { return ARM_FLOOR.toScreen(q); },
   mark: function () { return screenOf(ARMCHAIR_MOVE.mark); },
+  knut: function () { var K = armFind.userData, v = findVars();
+    return { on: armKnutOn(), lifting: !!K.lift, shown: K.knut.visible, kept: v.chair_knut === 'kept', knuts: v.knuts || 0, at: screenOf(K.home) }; },
   blocked: armchairBlocked, cast: armchairTap, mesh: chairL,
   trevorHere: function () { trevor.force = trevor.key = 'floor-d'; layPrints(trailTo(TREVOR_MARKS['floor-d'])); prints.visible = true; }
 };
