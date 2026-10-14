@@ -1182,6 +1182,59 @@ function judgeSteps(taps, desk, ease, want, now, beat) {
   if (e.loose != null) o.even = e.loose;
   return judgePineapple(taps, desk, o, want, now, beat);
 }
+/* The Diagon Alley wall (Q10, option 1, coordinates; Godric, 13 October 2026, 5.02 pm; fortieth session). The books:
+   Hagrid in the little walled courtyard behind the Leaky Cauldron, "Three up... two across..." he muttered, and tapped
+   the wall three times with the point of his umbrella (PS 5); a summer later Harry's own way in, "tap the third brick
+   from the left above the dustbin" (PoA 4). The geometry is the lane's: two numbers name one brick, counted from a
+   fixed corner, the bin; swap them and it is another brick; one number alone names a whole row or column.
+   The wall: { x, y, bw, bh, cols, rows, below, running, bin } in CSS pixels; x the wall's left edge, y the line of the
+   bin's lid; the bin stands at the wall's left end, so its column is the wall's first. Course u runs from y - u*bh to
+   y - (u-1)*bh: u = 1 the first course above the lid, rows the top one, 1 - below the lowest beside the bin. Across, a
+   is counted along the brick's own course from the left end: a = 0 the brick above the bin, so Hagrid's "two across"
+   is "the third brick from the left". running: a real wall's running bond, every even course shifted half a brick, a
+   half brick (the bat) at each end, and the bat counts as a brick of its course. bin: { x, y, w, h }, a tap on it is the
+   bin. ease: a name in BRICK_EASES or one of its own (edge: how far outside the wanted brick a tap still counts, as a
+   share of the course height).
+   brickAt(p, wall) returns { a, u } or null off the wall. judgeBrick(tap, wall, want, ease), want { a, u }, returns
+   { verdict: 'right' | 'miss', reason ('right', 'swapped' up and across the other way round, 'column' right across
+   and wrong height, 'row' right height and wrong across, 'off', 'below' at or under the bin's lid, 'bin', 'away' off
+   the wall), brick { a, u } or null, da and du (the brick less the wanted one), near (true when the edge counted it),
+   place (the brick's place from the left, a + 1) }. The three taps are judgeTaps's with place: false, on the page. */
+var BRICK_EASES = {
+  kind:   { edge: 0.25 },
+  fair:   { edge: 0.12 },
+  strict: { edge: 0 }
+};
+function shifted(u) { return ((u % 2) + 2) % 2 === 0; }
+function brickAt(p, wall) {
+  var u = Math.ceil((wall.y - p.y) / wall.bh);
+  if (p.x < wall.x || p.x > wall.x + wall.cols * wall.bw || u > wall.rows || u < 1 - (wall.below || 0)) return null;
+  var dx = p.x - wall.x + (wall.running && shifted(u) ? wall.bw / 2 : 0);
+  return { a: Math.floor(dx / wall.bw), u: u };
+}
+function brickRect(b, wall) {   /* the brick's own box, a bat at either end of a shifted course cut to half */
+  var off = wall.running && shifted(b.u) ? wall.bw / 2 : 0, x0 = wall.x + b.a * wall.bw - off, x1 = x0 + wall.bw;
+  return { x: Math.max(wall.x, x0), y: wall.y - b.u * wall.bh, w: Math.min(wall.x + wall.cols * wall.bw, x1) - Math.max(wall.x, x0), h: wall.bh };
+}
+function judgeBrick(tap, wall, want, ease) {
+  var e = typeof ease === 'object' ? ease : (BRICK_EASES[ease] || BRICK_EASES.kind);
+  var out = { verdict: 'miss', reason: 'away', brick: null, da: 0, du: 0, near: false, place: 0 }, B = wall.bin;
+  if (B && tap.x >= B.x && tap.x <= B.x + B.w && tap.y >= B.y && tap.y <= B.y + B.h) { out.reason = 'bin'; return out; }
+  var b = brickAt(tap, wall);
+  if (b && (b.a !== want.a || b.u !== want.u) && e.edge > 0) {
+    var R = brickRect(want, wall), m = e.edge * wall.bh;
+    if (tap.x >= R.x - m && tap.x <= R.x + R.w + m && tap.y >= R.y - m && tap.y <= R.y + R.h + m) { b = { a: want.a, u: want.u }; out.near = true; }
+  }
+  if (!b) return out;
+  out.brick = b; out.da = b.a - want.a; out.du = b.u - want.u; out.place = b.a + 1;
+  if (!out.da && !out.du) { out.verdict = 'right'; out.reason = 'right'; return out; }
+  if (b.u < 1) out.reason = 'below';
+  else if (want.a !== want.u && b.a === want.u && b.u === want.a) out.reason = 'swapped';
+  else if (!out.da) out.reason = 'column';
+  else if (!out.du) out.reason = 'row';
+  else out.reason = 'off';
+  return out;
+}
 /* The Freezing Charm (CoS 6: Lockhart's "Peskipiksi Pesternomi!" has "absolutely no effect"; Hermione is "immobilizing
    two pixies at once with a clever Freezing Charm and stuffing them back into their cage"). The book gives no motion;
    the stroke is ours, for the geometry: two points make one straight line, so two pixies at once is one straight
@@ -2514,5 +2567,5 @@ root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwis
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
   HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
-  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, judgeSmile: judgeSmile, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, judgeSteps: judgeSteps, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, judgeLoop: judgeLoop, offLine: offLine, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
+  SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, judgeSmile: judgeSmile, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, judgeSteps: judgeSteps, BRICK_EASES: BRICK_EASES, brickAt: brickAt, brickRect: brickRect, judgeBrick: judgeBrick, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, judgeLoop: judgeLoop, offLine: offLine, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);

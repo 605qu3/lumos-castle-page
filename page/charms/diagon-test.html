@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>The Diagon Alley wall, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #120e0b; overflow: hidden; overscroll-behavior: none;
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; touch-action: none; display: block; }
+  #line { position: fixed; left: 50%; transform: translateX(-50%); top: max(12px, env(safe-area-inset-top));
+    width: min(92vw, 600px); box-sizing: border-box; text-align: center; padding: 10px 14px;
+    font: 17px/1.35 Georgia, 'Times New Roman', serif; color: #eadcbf; background: #1e1611;
+    border: 1px solid #4a3a2c; border-radius: 6px; pointer-events: none; }
+  #line b { color: #f3d27a; }
+  #panel { position: fixed; left: 0; right: 0; bottom: max(10px, env(safe-area-inset-bottom)); display: flex;
+    flex-wrap: wrap; justify-content: center; gap: 6px; padding: 0 8px; }
+  button { font: 15px Georgia, serif; color: #eadcbf; background: #2a2019; border: 1px solid #5a4636; border-radius: 8px;
+    padding: 8px 12px; touch-action: manipulation; }
+  button.on { background: #e8be5a; color: #2b1d10; border-color: #e8be5a; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line"></div>
+<div id="panel"></div>
+<script src="spells.js?v=39"></script>
+<script>
+/* The Diagon Alley wall, a test page for the Charms lane (13 October 2026, fortieth session; the owner is Godric).
+   Drawn in code. Q10, option 1: coordinates, geometry beyond angles. The books: in the little walled courtyard behind
+   the Leaky Cauldron, "Three up... two across..." Hagrid muttered, and tapped the wall three times with the point of
+   his umbrella; the brick quivered, it wriggled, a small hole appeared and grew wider and wider into an archway (PS 5);
+   a summer later Harry's own way in, "tap the third brick from the left above the dustbin" (PoA 4). The geometry is
+   the lane's: two numbers name one brick, counted from one corner, the bin; up and across the other way round is
+   another brick; one number alone names a whole column. Hagrid counts steps from the bin's column (two across),
+   Harry counts bricks from the left (the third): the same brick. Rounds: Hagrid's way; Harry's way (one number lights
+   the column, then the height). The cast is three taps on one brick at an even beat (judgeTaps, place: false); which
+   brick by LumosSpells.judgeBrick (spells.js), tallied in checks/diagon-tally.js. ?round=1..2, ?ease= for trying;
+   window.lumosDiagon for checks. */
+(function () {
+  'use strict';
+  var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
+  var W = 0, H = 0, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
+  var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
+  var ROUNDS = [
+    { name: 'Hagrid’s way', kind: 'hagrid', want: { a: 2, u: 3 } },
+    { name: 'Harry’s way', kind: 'harry', want: { a: 2, u: 3 } } ];
+  var round = Math.max(0, Math.min(ROUNDS.length - 1, (Number(qs.get('round')) || 1) - 1)), R = ROUNDS[round];
+  var run = [], runKey = null, stage = 'cast', last = null, shown = null, open = null, lit = null, running = false;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5); W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  /* the wall, as checks/diagon-tally.js lays it out: six courses above the bin's lid and two beside it; five bricks
+     across on a narrow screen, six on a wide one; a course at most 56 px, the brick 1.6 to 2.6 times as long */
+  function wallOf() {
+    var top = Math.max(110, H * 0.16), bot = H - 70, cols = W >= 700 ? 6 : 5, rows = 6, below = 2;
+    var bh = Math.min(56, (bot - top) / (rows + below + 0.6)), bw = Math.min(W * 0.92 / cols, bh * 2.6);
+    if (bw < bh * 1.6) bh = bw / 1.6;
+    var x = W / 2 - cols * bw / 2, y = bot - below * bh;
+    return { x: x, y: y, bw: bw, bh: bh, cols: cols, rows: rows, below: below, running: running,
+      bin: { x: x + bw * 0.08, y: y + 2, w: bw * 0.84, h: below * bh - 2 } };
+  }
+  function course(w, u) {   /* the bricks of course u, left to right, each [a, x0, x1]; a shifted course starts with its bat */
+    var out = [], x = w.x, end = w.x + w.cols * w.bw, a = 0;
+    if (w.running && u % 2 === 0) { out.push([0, x, x + w.bw / 2]); x += w.bw / 2; a = 1; }
+    for (; x < end - 1e-6; a++) { var x1 = Math.min(end, x + w.bw); out.push([a, x, x1]); x = x1; }
+    return out;
+  }
+  function mid(w, a, u) { var b = course(w, u).filter(function (q) { return q[0] === a; })[0]; return b ? { x: (b[1] + b[2]) / 2, y: w.y - (u - 0.5) * w.bh } : null; }
+
+  function say(html) { lineEl.innerHTML = html; }
+  function ensureAudio() { if (audio) { if (audio.state === 'suspended') audio.resume(); return; } var AC = window.AudioContext || window.webkitAudioContext; if (AC) audio = new AC(); }
+  function tone(freq, dur, gain, type) {
+    if (!audio) return;
+    var o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
+    o.type = type || 'sine'; o.frequency.value = freq; g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + dur);
+  }
+
+  function menu() {
+    panel.innerHTML = '';
+    ROUNDS.forEach(function (r, i) {
+      var b = document.createElement('button'); b.textContent = r.name; if (i === round) b.className = 'on';
+      b.onclick = function () { ensureAudio(); choose(i); }; panel.appendChild(b);
+    });
+    var e = document.createElement('button'); e.textContent = 'Ease: ' + ease;
+    e.onclick = function () { ease = EASES[(EASES.indexOf(ease) + 1) % 3]; menu(); }; panel.appendChild(e);
+  }
+  function choose(i) {
+    round = i; R = ROUNDS[i]; run = []; runKey = null; last = null; shown = null; open = null; lit = null;
+    stage = R.kind === 'harry' ? 'column' : 'cast'; menu();
+    if (R.kind === 'hagrid') say('<b>&ldquo;Three up&hellip; two across&hellip;&rdquo;</b> Hagrid muttered (Book 1). Count from the dustbin, then tap that brick <b>three times</b>.');
+    else say('Harry&rsquo;s way in, a summer later: <b>&ldquo;the third brick from the left above the dustbin&rdquo;</b> (Book 3). Tap the third brick from the left.');
+  }
+
+  /* ---- the spell ---- */
+  var ORD = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh'];
+  function bricks(n) { return n + (n === 1 ? ' brick' : ' bricks'); }
+  function missWords(j) {
+    var want = R.want, d;
+    switch (j.reason) {
+      case 'swapped': return 'That brick wriggled and sneezed a puff of mortar dust. That was ' + j.brick.u + ' up, ' + j.brick.a + ' across: Hagrid counts <b>up first</b>, ' + want.u + ', <b>then across</b>, ' + want.a + '.';
+      case 'column': d = j.du; return 'The right column, ' + want.a + ' across, but ' + bricks(Math.abs(d)) + ' too ' + (d > 0 ? 'high' : 'low') + ': count ' + want.u + ' up from the top of the bin.';
+      case 'row': d = j.da; return 'The right height, ' + want.u + ' up, but ' + bricks(Math.abs(d)) + ' too far ' + (d > 0 ? 'right' : 'left') + ': ' + want.a + ' across from the bin&rsquo;s column.';
+      case 'off': return 'That was ' + j.brick.u + ' up and ' + j.brick.a + ' across. Start at the bin: <b>' + want.u + ' up</b>, then <b>' + want.a + ' across</b>.';
+      case 'below': return 'That one is level with the bin. Count up from the top of the bin: the first brick above its lid is <b>one up</b>.';
+      case 'bin': return 'That&rsquo;s the dustbin itself. Start counting from it: the brick just above its lid is one up.';
+      default: return 'Tap a brick in the wall.';
+    }
+  }
+  function tapAt(p) {
+    if (stage === 'open' || stage === 'done') return;
+    var w = wallOf();
+    if (stage === 'column') return columnTap(p, w);
+    var j = LumosSpells.judgeBrick(p, w, R.want, ease), key = j.brick ? j.brick.a + ',' + j.brick.u : j.reason;
+    if (key !== runKey || (run.length && p.t - run[run.length - 1].t > 1500)) { run = []; runKey = key; }
+    run.push(p); tone(j.brick ? 520 : 300, 0.07, 0.18, 'triangle');
+    if (run.length < 3) return j;
+    var jt = LumosSpells.judgeTaps(run, W, H, { gap: 1500, beat: LumosSpells.TAP_EASES[ease].beat, place: false });
+    last = { j: j, beat: jt }; run = []; runKey = null;
+    if (jt.verdict !== 'open') { shown = { at: performance.now(), j: j, beat: true }; say('Keep an even beat, like Hagrid with his umbrella: tap &hellip; tap &hellip; tap.'); return j; }
+    if (j.verdict === 'right') { stage = 'open'; open = { at: performance.now() }; shown = null; opening(); return j; }
+    shown = { at: performance.now(), j: j }; tone(j.reason === 'swapped' ? 180 : 240, 0.3, 0.15);
+    say(missWords(j));
+    return j;
+  }
+  function columnTap(p, w) {
+    var b = LumosSpells.brickAt(p, w), B = w.bin, j = { brick: b, reason: b ? (b.u < 1 ? 'below' : 'column') : 'away' };
+    if (p.x >= B.x && p.x <= B.x + B.w && p.y >= B.y && p.y <= B.y + B.h) j.reason = 'bin';
+    tone(b ? 520 : 300, 0.07, 0.18, 'triangle'); last = { j: j };
+    if (j.reason === 'column' && b.a === R.want.a) {
+      stage = 'cast'; lit = { a: b.a, at: performance.now() }; tone(660, 0.4, 0.1);
+      say('The third brick from the left: <b>one number</b>, and it lights a whole column. Above the dustbin, but how high? Hagrid&rsquo;s count gives the other number: <b>three up</b>. Tap that brick three times.');
+      return j;
+    }
+    shown = { at: performance.now(), j: j };
+    if (j.reason === 'column') say('That&rsquo;s the ' + ORD[b.a] + ' brick from the left. Count from the left end, the bin&rsquo;s column first: first, second, <b>third</b>.');
+    else say(missWords(j));
+    return j;
+  }
+  function opening() {
+    tone(90, 0.6, 0.25, 'sawtooth');
+    say('<b>The brick quivered &hellip; it wriggled &hellip; a small hole appeared &hellip; it grew wider and wider</b> (Book 1).');
+    setTimeout(function () { [0, 1, 2].forEach(function (k) { setTimeout(function () { tone(523 + k * 131, 0.5, 0.12); }, k * 150); }); }, 1700);
+    setTimeout(function () {
+      stage = 'done'; LumosSpells.learn('diagon');
+      if (R.kind === 'hagrid') say('From the bin: <b>' + R.want.u + ' up</b>, then <b>' + R.want.a + ' across</b>. Two numbers, counted from one corner, name one brick.');
+      else say('Hagrid counts steps from the bin&rsquo;s column: <b>two across</b>. Harry counts bricks from the left: <b>the third</b>. Two ways to count, one brick; and one number alone names a whole column.');
+    }, 5200);
+  }
+
+  /* ---- drawing ---- */
+  function shade(a, u) { var h = Math.sin(a * 12.9898 + u * 78.233) * 43758.5453; h -= Math.floor(h); return h; }
+  function drawYard(w) {
+    cx.fillStyle = '#16110d'; cx.fillRect(0, 0, W, H);
+    var g = w.y + w.below * w.bh;
+    cx.fillStyle = '#2a241e'; cx.fillRect(0, g, W, H - g);
+    cx.strokeStyle = 'rgba(0,0,0,0.35)'; cx.lineWidth = 1;
+    for (var x = (W / 2) % 70 - 70; x < W; x += 70) { cx.beginPath(); cx.moveTo(x, g); cx.lineTo(x - 20, H); cx.stroke(); }
+  }
+  function drawWall(w, now) {
+    var top = w.y - w.rows * w.bh, m = Math.max(2, w.bh * 0.07);
+    cx.fillStyle = '#5e554a'; cx.fillRect(w.x, top, w.cols * w.bw, (w.rows + w.below) * w.bh);
+    for (var u = 1 - w.below; u <= w.rows; u++) course(w, u).forEach(function (b) {
+      var a = b[0], s = shade(a, u), y0 = w.y - u * w.bh, dx = 0, dy = 0, rot = 0;
+      if (shown && shown.j.brick && shown.j.brick.a === a && shown.j.brick.u === u) {
+        var t = (now - shown.at) / 1000;
+        if (t < 0.9) { rot = Math.sin(t * 40) * 0.06 * (1 - t / 0.9); dx = Math.sin(t * 31) * 2 * (1 - t / 0.9); }
+      }
+      if (open && a === R.want.a && u === R.want.u) { var q = (now - open.at) / 1000; if (q < 0.9) { dx = Math.sin(q * 55) * 2.5; dy = Math.cos(q * 47) * 1.5; } }
+      cx.save(); cx.translate((b[1] + b[2]) / 2 + dx, y0 + w.bh / 2 + dy); cx.rotate(rot);
+      cx.fillStyle = 'rgb(' + Math.round(118 + 28 * s) + ',' + Math.round(54 + 16 * s) + ',' + Math.round(36 + 10 * s) + ')';
+      cx.fillRect(-(b[2] - b[1]) / 2 + m / 2, -w.bh / 2 + m / 2, b[2] - b[1] - m, w.bh - m);
+      cx.fillStyle = 'rgba(255,220,180,0.07)'; cx.fillRect(-(b[2] - b[1]) / 2 + m / 2, -w.bh / 2 + m / 2, b[2] - b[1] - m, w.bh * 0.22);
+      cx.restore();
+    });
+  }
+  function glowBrick(w, a, u, col, lw) {
+    var b = course(w, u).filter(function (q) { return q[0] === a; })[0]; if (!b) return;
+    cx.strokeStyle = col; cx.lineWidth = lw; cx.strokeRect(b[1] + 2, w.y - u * w.bh + 2, b[2] - b[1] - 4, w.bh - 4);
+  }
+  function drawBin(w) {
+    var B = w.bin;
+    cx.fillStyle = '#4f5559'; cx.fillRect(B.x, B.y + B.h * 0.08, B.w, B.h * 0.92);
+    cx.strokeStyle = 'rgba(0,0,0,0.35)'; cx.lineWidth = 2;
+    for (var k = 1; k < 4; k++) { var y = B.y + B.h * (0.08 + 0.23 * k); cx.beginPath(); cx.moveTo(B.x, y); cx.lineTo(B.x + B.w, y); cx.stroke(); }
+    cx.fillStyle = '#6a7175'; cx.beginPath(); cx.ellipse(B.x + B.w / 2, B.y + B.h * 0.06, B.w * 0.56, B.h * 0.07, 0, 0, 7); cx.fill();
+    cx.fillStyle = '#3a3f42'; cx.fillRect(B.x + B.w * 0.42, B.y - B.h * 0.03, B.w * 0.16, B.h * 0.05);
+    cx.strokeStyle = '#4c6b2c'; cx.lineWidth = 2;   /* a few weeds */
+    [[-0.3, 0.5], [1.15, 0.35], [2.6, 0.45], [4.2, 0.4]].forEach(function (q) {
+      var x = w.x + q[0] * w.bw + w.bw * 0.5, g = w.y + w.below * w.bh;
+      if (x < w.x - w.bw * 0.4 || x > w.x + w.cols * w.bw) return;
+      for (var i = -1; i <= 1; i++) { cx.beginPath(); cx.moveTo(x + i * 4, g); cx.quadraticCurveTo(x + i * 9, g - w.bh * q[1] * 0.6, x + i * 12, g - w.bh * q[1]); cx.stroke(); }
+    });
+  }
+  function archPath(w, r, c) {   /* the arch three bricks wide over the wanted one, from the ground to the fifth course, cut by a circle of radius r about c */
+    var x0 = w.x + (R.want.a - 1) * w.bw + w.bw * 0.1, x1 = w.x + (R.want.a + 2) * w.bw - w.bw * 0.1, rr = (x1 - x0) / 2, g = w.y + w.below * w.bh, top = w.y - 5 * w.bh + rr;
+    cx.beginPath(); cx.arc(c.x, c.y, r, 0, 7); cx.clip();
+    cx.beginPath(); cx.moveTo(x0, g); cx.lineTo(x0, top); cx.arc((x0 + x1) / 2, top, rr, Math.PI, 0); cx.lineTo(x1, g); cx.closePath();
+  }
+  function drawOpen(w, now) {
+    var t = (now - open.at) / 1000; if (t < 0.9) return;
+    var c = mid(w, R.want.a, R.want.u), grow = Math.min(1, (t - 0.9) / 1.4), r = 4 + (Math.max(W, H)) * grow * grow;
+    var back = stage === 'done' ? Math.min(1, (t - 5.2) / 0.6) : 0; if (back >= 1) return;
+    cx.save(); archPath(w, r, c); cx.clip();
+    var g = w.y + w.below * w.bh, sky = cx.createLinearGradient(0, w.y - 6 * w.bh, 0, g);
+    sky.addColorStop(0, '#f6d58a'); sky.addColorStop(1, '#a8652a'); cx.fillStyle = sky; cx.fillRect(0, 0, W, H);
+    [[-0.9, 3.2, '#4a2c1c'], [-0.2, 4.2, '#5b2f2a'], [0.6, 3.6, '#2f3a4a'], [1.4, 4.6, '#4b3a1e']].forEach(function (s) {   /* shop fronts down the street */
+      var x = c.x + s[0] * w.bw, hgt = s[1] * w.bh * 0.8;
+      cx.fillStyle = s[2]; cx.fillRect(x, g - hgt, w.bw * 0.7, hgt);
+      cx.fillStyle = 'rgba(255,214,120,0.85)'; cx.fillRect(x + w.bw * 0.12, g - hgt * 0.62, w.bw * 0.46, hgt * 0.22);
+    });
+    cx.fillStyle = '#6d5a44'; cx.fillRect(0, g - w.bh * 0.15, W, w.bh * 0.15);
+    cx.restore();
+    if (back > 0) { cx.save(); cx.globalAlpha = back; drawWall(w, now); cx.restore(); }
+  }
+  function chalk(text, x, y, size) {
+    cx.font = 'italic ' + size + 'px Georgia, serif'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+    cx.lineWidth = 4; cx.strokeStyle = 'rgba(20,14,10,0.85)'; cx.strokeText(text, x, y); cx.fillStyle = '#f1ead8'; cx.fillText(text, x, y);
+  }
+  function drawSum(w, now) {   /* after the arch: from the bin, the count up its column and along the course, the brick ringed */
+    var t = (now - open.at) / 1000 - 5.8; if (t < 0) return;
+    var a = R.want.a, u = R.want.u, base = mid(w, 0, 1), up = mid(w, 0, u), to = mid(w, a, u), f = Math.min(1, t / 1.2);
+    base = { x: base.x, y: w.y };
+    cx.save(); cx.setLineDash([7, 6]); cx.strokeStyle = '#f1ead8'; cx.lineWidth = 2.5;
+    cx.beginPath(); cx.moveTo(base.x, base.y); cx.lineTo(base.x, base.y + (up.y - base.y) * Math.min(1, f * 2));
+    if (f > 0.5) cx.lineTo(up.x + (to.x - up.x) * (f - 0.5) * 2, up.y);
+    cx.stroke(); cx.restore();
+    var s = Math.max(14, w.bh * 0.42);
+    for (var k = 1; k <= u && f * 2 >= k / u; k++) chalk(String(k), base.x - w.bw * 0.32, w.y - (k - 0.5) * w.bh, s * 0.8);
+    if (f >= 0.5) chalk(u + ' up', base.x, w.y - (u + 0.6) * w.bh, s);
+    if (f >= 1) {
+      chalk(a + ' across', (up.x + to.x) / 2, up.y - w.bh * 0.62, s);
+      cx.strokeStyle = '#f3d27a'; cx.lineWidth = 3; cx.beginPath(); cx.ellipse(to.x, to.y, w.bw * 0.58, w.bh * 0.72, 0, 0, 7); cx.stroke();
+      if (R.kind === 'harry') course(w, u).slice(0, 3).forEach(function (b, i) { chalk(['1st', '2nd', '3rd'][i], (b[1] + b[2]) / 2, w.y - (u - 0.5) * w.bh + w.bh * 0.02, s * 0.75); });
+    }
+  }
+  function drawPuff(w, now) {
+    if (!shown || shown.j.reason !== 'swapped') return;
+    var t = (now - shown.at) / 1000; if (t > 1.6) return;
+    var c = mid(w, shown.j.brick.a, shown.j.brick.u);
+    for (var i = 0; i < 14; i++) {
+      var an = i * 2.4, d = (8 + i * 2) * Math.min(1, t * 2.5) * w.bh / 40, x = c.x + Math.cos(an) * d * 1.6, y = c.y + Math.sin(an) * d - t * 14;
+      cx.fillStyle = 'rgba(205,195,175,' + (0.55 * (1 - t / 1.6)) + ')'; cx.beginPath(); cx.arc(x, y, 3 + i % 4 + t * 6, 0, 7); cx.fill();
+    }
+  }
+  function frame(now) {
+    var w = wallOf();
+    drawYard(w); drawWall(w, now); drawBin(w);
+    if (lit && stage !== 'done') for (var u = 1; u <= w.rows; u++) glowBrick(w, lit.a, u, 'rgba(243,210,122,' + (0.35 + 0.15 * Math.sin(now / 300)) + ')', 2.5);
+    if (run.length && now - run[run.length - 1].t > 1500) { run = []; runKey = null; }
+    if (run.length && runKey && runKey.indexOf(',') > 0) { var k = runKey.split(',').map(Number); glowBrick(w, k[0], k[1], 'rgba(255,236,170,0.9)', 3);
+      var c = mid(w, k[0], k[1]); for (var i = 0; i < run.length; i++) { cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(c.x - 10 + i * 10, c.y + w.bh * 0.3, 3, 0, 7); cx.fill(); } }
+    drawPuff(w, now);
+    if (open) { drawOpen(w, now); if (stage === 'done') drawSum(w, now); }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- touch: taps only ---- */
+  cv.addEventListener('pointerdown', function (ev) {
+    ensureAudio(); ev.preventDefault();
+    tapAt({ x: ev.clientX, y: ev.clientY, t: Math.round(performance.now()) });
+  });
+  document.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
+
+  addEventListener('resize', resize); resize(); choose(round); requestAnimationFrame(frame);
+  window.lumosDiagon = { choose: choose, wall: wallOf, mid: function (a, u) { return mid(wallOf(), a, u); },
+    tap: function (x, y) { return tapAt({ x: x, y: y, t: Math.round(performance.now()) }); },
+    state: function () { return { round: round + 1, stage: stage, run: run.length, last: last, ease: ease, lit: !!lit, line: lineEl.textContent }; } };
+})();
+</script>
+</body>
+</html>
