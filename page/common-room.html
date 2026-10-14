@@ -739,7 +739,7 @@ var TILES = {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=27"></script>
+<script src="castle-events.js?v=32"></script>
 <script src="charms/guide.js?v=1"></script>
 <script src="charms/spells.js?v=33"></script>
 <script>
@@ -6348,10 +6348,11 @@ function updateBubble(t) {
 }
 /* the bubble stuck to the sofa (Godric's t1 on Q77, placed with his Try 2, 13 October 2026, 9.50 pm: the Drooble's half
    unwrapped, one bluebell bubble stuck to the sofa that never pops, PoA 10): the ceiling bubble's glass, smaller, sat on
-   the top of the sofa's left arm (u, v across the sofa's card from its middle); his t1 on common-drooble-pick-1013: a tap
+   the top of the sofa's right arm (u, v across the sofa's card from its middle; the left arm hid it behind the wingback at
+   390 x 844, so moved 13 October 2026, 10.40 pm, provisional, Godric to confirm); his t1 on common-drooble-pick-1013: a tap
    bobs it a hand's width off the arm and it drifts back to the same spot, unpopped. Its cue is Events' (req 310); ?stuck
    shows it for a probe */
-var STUCK = { u: -0.40, v: 0.255, r: 0.075, bob: 0, up: 0.1, probe: /[?&]stuck\b/.test(location.search) };
+var STUCK = { u: 0.40, v: 0.255, r: 0.075, bob: 0, up: 0.1, probe: /[?&]stuck\b/.test(location.search) };
 var stuck = new THREE.Mesh(new THREE.SphereGeometry(STUCK.r, 20, 14), bubble.material);
 stuck.name = 'drooble-stuck'; stuck.visible = false; stuck.want = STUCK.probe;
 scene.add(stuck); tappables.push(stuck);
