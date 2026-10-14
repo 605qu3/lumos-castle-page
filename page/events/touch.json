@@ -180,6 +180,21 @@
             "Don't you dare give me up! I've got a family!",
             "Oi! I'm a queen, not a doorstop!"
           ]
+        },
+        {
+          "speaker": "players",
+          "medium": "said",
+          "on_tap": true,
+          "key": "touch.chess-players",
+          "canon": "PS 12, the borrowed chessmen that \"didn't trust him at all\"; PS 17, fifty points \"for the best-played game of chess Hogwarts has seen in many years\"; checked against the text, 14 October 2026",
+          "text": [
+            "Shh. He's thinking. He's been thinking since lunch.",
+            "Don't mind them, they shout at everyone.",
+            "Mine don't trust me either. They're borrowed.",
+            "Dumbledore gave fifty points for a game of chess once. I'm practising.",
+            "Want to play the winner? It'll be me.",
+            "Check! ...No. Not check. Sorry."
+          ]
         }
       ]
     }
