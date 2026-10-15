@@ -132,9 +132,9 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=25"></script>
+<script src="castle-model.js?v=31"></script>
 <script src="castle-shell.js?v=7"></script>
-<script src="castle-events.js?v=31"></script>
+<script src="castle-events.js?v=35"></script>
 <script>
 (function () {
 'use strict';
@@ -179,7 +179,8 @@ var P = function (x, y, z) { return shell.toLocal(x, y, (z || 0)); };
 
 /* the clock (docs/room-states.md §1): one runtime, every chain, this room's place */
 var READY = false;   /* the runtime may call drawRoom before the room below is built */
-var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () { if (READY) draw(); }, cues: {}, showLines: function () {} }) : null;
+var CUES = {};       /* a record's cues, by its show string, filled once the room is built (the Howler) */
+var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () { if (READY) draw(); }, cues: CUES, showLines: function () {} }) : null;
 function drivers() {
   var e = events;
   var occ = e ? String(e.occasion()).replace(/-/g, ' ') : 'none';
@@ -264,22 +265,76 @@ var furniture = room.children.filter(function (m) { return /^(table|bench)/.test
 /* ================= the candles (Interiors' field, The look up; what they do is Magic's: req 311) */
 var rnd = (function (seed) { return function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }; })(1013);
 function U(a, b) { return a + (b - a) * rnd(); }
-var C = [];
+var C = [], G = [];   /* each candle's home point, and its own draw, so one that breaks a rule is drawn again in its own part */
 function band(x0, x1, yc, along) {
   var L = x1 - x0, cs = S.candles, n = Math.round(L * 2 * cs.dense * cs.rho), ne = Math.round(L * cs.edge * (cs.rho + 0.5) / 2);
-  function put(a, b, z) { C.push(along ? [a, b, z] : [b, a, z]); }
-  for (var i = 0; i < n; i++) put(U(x0, x1), yc + U(-cs.dense, cs.dense), U(cs.lo, cs.hi));
+  function put(f) { function g() { var p = f(); return along ? p : [p[1], p[0], p[2]]; } C.push(g()); G.push(g); }
+  for (var i = 0; i < n; i++) put(function () { return [U(x0, x1), yc + U(-cs.dense, cs.dense), U(cs.lo, cs.hi)]; });
   [-1, 1].forEach(function (s) {
-    for (var j = 0; j < ne; j++) { var t = 1 - Math.sqrt(rnd()); put(U(x0, x1), yc + s * (cs.dense + t * cs.edge), U(cs.lo, cs.hi + 0.2 * t)); }
+    for (var j = 0; j < ne; j++) put(function () { var t = 1 - Math.sqrt(rnd()); return [U(x0, x1), yc + s * (cs.dense + t * cs.edge), U(cs.lo, cs.hi + 0.2 * t)]; });
   });
 }
 /* a scatter over a rectangle of the model's frame, rho a square metre, its flames between z0 and z1 */
 function scatter(x0, x1, y0, y1, rho, z0, z1) {
   var n = Math.round((x1 - x0) * (y1 - y0) * rho);
-  for (var i = 0; i < n; i++) C.push([U(x0, x1), U(y0, y1), U(z0, z1)]);
+  function g() { return [U(x0, x1), U(y0, y1), U(z0, z1)]; }
+  for (var i = 0; i < n; i++) { C.push(g()); G.push(g); }
+}
+/* Interiors' three rules for field b (req 482, *The field*, Godric's b), each candle that breaks one drawn again in its own
+   part, so the count and the spread stand: (1) no two home points nearer than 0.25 m, and none within 0.06 m in plan of
+   another nearer than 0.40 m in height (no candle in another's flame at the ends of their bob); (2) every home point 0.3
+   m off the long walls' faces (the model's 51.5 and 69.5); (3) clear of each Christmas tree's cone at the taper's foot by
+   the candle's own bob and sway */
+var FIELD_CHECK = null;
+function keepRules() {
+  var cell = 0.4, grid = {}, cs = S.candles, tr = S.trees, move = Math.sqrt(cs.bob * cs.bob + cs.sway * cs.sway);
+  var w0 = 51.5 + 0.3, w1 = 69.5 - 0.3, redrawn = 0, givenUp = 0, nearest = [];
+  function k(a, b, c) { return Math.floor(a / cell) + ',' + Math.floor(b / cell) + ',' + Math.floor(c / cell); }
+  function coneR(z) { return Math.max(0, tr.spread / 2 * (tr.h - z) / (tr.h - tr.from)); }
+  function gap(p) {   /* the nearest home point already kept, or -1 if a rule is broken */
+    if (p[1] < w0 || p[1] > w1) return -1;
+    for (var a = 0; a < tr.xs.length; a++) for (var b = 0; b < tr.ys.length; b++)
+      if (Math.hypot(p[0] - tr.xs[a], p[1] - tr.ys[b]) < coneR(p[2] - 0.265) + move) return -1;
+    var best = 9, fx = Math.floor(p[0] / cell), fy = Math.floor(p[1] / cell), fz = Math.floor(p[2] / cell);
+    for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) for (var dz = -1; dz <= 1; dz++) {
+      var list = grid[(fx + dx) + ',' + (fy + dy) + ',' + (fz + dz)]; if (!list) continue;
+      for (var j = 0; j < list.length; j++) {
+        var q = list[j], pl = Math.hypot(p[0] - q[0], p[1] - q[1]), v = Math.abs(p[2] - q[2]), d = Math.hypot(pl, v);
+        if (d < 0.25 || (pl < 0.06 && v < 0.40)) return -1;
+        if (d < best) best = d;
+      }
+    }
+    return best;
+  }
+  for (var i = 0; i < C.length; i++) {
+    var p = C[i], n = 0, g;
+    while ((g = gap(p)) < 0) { if (++n > 300) { givenUp++; break; } p = G[i](); redrawn++; }
+    C[i] = p; (grid[k(p[0], p[1], p[2])] = grid[k(p[0], p[1], p[2])] || []).push(p);
+  }
+  /* each kept point's nearest neighbour, for the checks */
+  var all = C.map(function (p) { return p; }); grid = {};
+  all.forEach(function (p) { (grid[k(p[0], p[1], p[2])] = grid[k(p[0], p[1], p[2])] || []).push(p); });
+  var minGap = 9, broken = 0;
+  all.forEach(function (p) {
+    var best = 9, fx = Math.floor(p[0] / cell), fy = Math.floor(p[1] / cell), fz = Math.floor(p[2] / cell);
+    for (var dx = -1; dx <= 1; dx++) for (var dy = -1; dy <= 1; dy++) for (var dz = -1; dz <= 1; dz++) {
+      var list = grid[(fx + dx) + ',' + (fy + dy) + ',' + (fz + dz)]; if (!list) continue;
+      for (var j = 0; j < list.length; j++) { var q = list[j]; if (q === p) continue;
+        var pl = Math.hypot(p[0] - q[0], p[1] - q[1]), v = Math.abs(p[2] - q[2]), d = Math.hypot(pl, v);
+        if (d < 0.25 || (pl < 0.06 && v < 0.40)) broken++; if (d < best) best = d; }
+    }
+    nearest.push(best); if (best < minGap) minGap = best;
+  });
+  nearest.sort(function (a, b) { return a - b; });
+  var walls = all.filter(function (p) { return p[1] < w0 || p[1] > w1; }).length;
+  var trees = all.filter(function (p) { for (var a = 0; a < tr.xs.length; a++) for (var b = 0; b < tr.ys.length; b++)
+    if (Math.hypot(p[0] - tr.xs[a], p[1] - tr.ys[b]) < coneR(p[2] - 0.265) + move) return true; return false; }).length;
+  FIELD_CHECK = { count: all.length, redrawn: redrawn, givenUp: givenUp, pairsBroken: broken / 2, nearWall: walls, inTree: trees,
+                  nearestMin: +minGap.toFixed(3), nearestMedian: +nearest[nearest.length >> 1].toFixed(3) };
 }
 /* Which field: b is Godric's pick (greathall-candles-1015, 1, 6.07 pm, 15 October 2026: the bands three times as thick,
-   the aisles scattered, a thinner lane of sky up the middle), the default; Interiors to confirm the count (req 482).
+   the aisles scattered, a thinner lane of sky up the middle), the default; its count, 7,587, confirmed by Interiors with
+   its three rules, drawn in here (req 482, 7.13 pm).
    ?field=a is Interiors' field as it stood (*The look up*), c the even span he passed over; both kept for comparison.
    Every field begins 3.5 m inside the mouth (trick 2). */
 var FIELD = (Q.get('field') || 'b').toLowerCase();
@@ -289,6 +344,7 @@ if (FIELD === 'b') {          /* the bands three times as thick, the aisles scat
   band(S.staff.y0, S.staff.y1, S.candles.staffX, false);
   S.candles.strays.forEach(function (r) { scatter(S.candles.x0, S.candles.x1, r[0], r[1], 4, 5.2, 6.6); });
   scatter(S.candles.x0, S.candles.x1, 59.6, 61.4, 1.5, 5.6, 6.8);
+  keepRules();
 } else if (FIELD === 'c') {   /* the whole span evenly, a little thicker over the tables, no lane */
   scatter(16.3, S.candles.x1, 51.8, 69.2, 9, 5.0, 6.8);
   S.tables.forEach(function (t) { scatter(S.candles.x0, S.candles.x1, t[1] - 0.9, t[1] + 0.9, 4, 5.0, 6.0); });
@@ -458,7 +514,7 @@ S.tables.forEach(function (t) {
 
 /* ================= the chain's other cues in grey, each a stand-in for its owner's part (Interiors and Objects the
    things, People the owls and bats, Magic the streamers and snow), one group a cue, shown when the chain shows it */
-var EXTRA = {};
+var EXTRA = {}, SCORCHES = [];
 function extra(words) { var g = new THREE.Group(); g.name = 'cue: ' + words; g.visible = false; room.add(g); EXTRA[words] = g; return g; }
 function bit(g, geo, m, x, y, z, ry) { var b = new THREE.Mesh(geo, m); b.position.copy(P(x, y, z)); if (ry) b.rotation.y = ry; g.add(b); return b; }
 var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat(0x2a2622);
@@ -517,6 +573,54 @@ var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat
     for (var q = 0; q <= 12; q++) pts.push(P(20 + q * 3.6, y0 + Math.sin(q * 0.8 + i) * 1.2, z0 + Math.sin(q * 0.5 + i) * 0.4));
     g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.08, 4, false), orange));
   }
+  /* old Howler scorches worn into the oak, every year (Godric's 1 on fawkes-howler-scorches-1015, 7.17 pm; Interiors'
+     item 24, req 497): about eight a house table along x 23 to 61, no two within 2 m, most in the plates' band 0.15 to
+     0.40 in from a long edge, one or two mid-table, none on the staff table; each 0.06 to 0.15 across, a darker ring
+     round a paler heart, flush with the top. Two draws for the iPad */
+  g = extra('old scorch marks worn into the oak');
+  var at = [];
+  S.tables.forEach(function (t) {
+    var xs = [], tries = 0;
+    while (xs.length < 8 && tries++ < 400) {
+      var x = S.tx0 + 0.1 + r2() * (S.tx1 - S.tx0 - 0.2);
+      if (xs.some(function (o) { return Math.abs(o - x) < 2; })) continue;
+      xs.push(x);
+    }
+    xs.forEach(function (x, j) {
+      var y = j < 2 ? t[1] + (r2() - 0.5) * 0.2 : t[1] + (r2() < 0.5 ? -1 : 1) * (S.tw / 2 - 0.15 - r2() * 0.25);
+      at.push([x, y, 0.03 + r2() * 0.045, 0.3 + r2() * 0.5]);   /* centre, radius, how worn */
+    });
+  });
+  var ringGeo = new THREE.CylinderGeometry(1, 1, 0.002, 16), heartGeo = new THREE.CylinderGeometry(0.6, 0.6, 0.002, 12);
+  var rings = new THREE.InstancedMesh(ringGeo, mat(0x2e1f14), at.length), hearts = new THREE.InstancedMesh(heartGeo, mat(0x6a4c34), at.length);
+  rings.frustumCulled = hearts.frustumCulled = false; g.add(rings); g.add(hearts);
+  at.forEach(function (s, j) {
+    tmpV.copy(P(s[0], s[1], S.top + 0.001));
+    tmpM.makeScale(s[2], 1, s[2]).setPosition(tmpV.x, tmpV.y, tmpV.z); rings.setMatrixAt(j, tmpM);
+    tmpM.makeScale(s[2], 1, s[2]).setPosition(tmpV.x, tmpV.y + 0.0012, tmpV.z); hearts.setMatrixAt(j, tmpM);
+  });
+  SCORCHES = at;
+}());
+
+/* the Howler (Events' great-hall.howler, Godric's t1 on fawkes-howler-scorches-1015, 7.17 pm): now and then on a post
+   morning, at another house's table, an older pupil's scarlet envelope; a grey stand-in for People's owl and pupil and
+   Magic's burning, shown while the runtime's cue lasts its few seconds, then the ash. The voice is sound's, not yet */
+var howler = new THREE.Group(); howler.name = 'cue: the Howler'; howler.visible = false; room.add(howler);
+(function () {
+  var env = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.18, 0.28), mat(0xc8201c, { emissive: col(0x5a0806) }));
+  env.position.copy(P(46.0, 62.6, S.top + 1.05)); env.name = 'envelope'; howler.add(env);   /* over the table, clear of the heads */
+  var ash = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.004, 10), mat(0x3a3430)); ash.name = 'ash';
+  ash.position.copy(P(46.0, 62.6, S.top + 0.003)); ash.visible = false; howler.add(ash);
+  var line = "at another house's table an owl drops a scarlet envelope";
+  fetch('events/great-hall.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+    (j.records || []).forEach(function (rec) { (rec.show || []).forEach(function (s) {
+      if (s.indexOf(line) === 0) CUES[s] = function () {
+        howler.visible = true; env.visible = true; ash.visible = false;
+        setTimeout(function () { env.visible = false; ash.visible = true; }, 6000);
+        setTimeout(function () { howler.visible = false; }, 20000);
+      };
+    }); });
+  }).catch(function () {});
 }());
 /* the moving ones: the post owls circling at breakfast, the bats over the tables, the snow falling */
 var flyers = { owls: extra('the post owls streaming'), bats: extra('live bats fluttering'), snow: extra('warm, dry enchanted snow') };
@@ -621,11 +725,12 @@ var stars = (function () {   /* the ceiling's stars at night, a stand-in for Mag
 
 /* ================= the room's state: what the clock gives, drawn (docs/room-states.md §2) */
 var STATE = null;
-/* every page loads every chain (the runtime's rule), and some rooms' rules name no place, so the hall keeps only its own
-   chain's cues: those of page/events/great-hall.json, read once */
+/* every page loads every chain (the runtime's rule), so the hall keeps only its own chain's cues: those of
+   page/events/great-hall.json, its room rules' and its records' (the Howler), read once. Since Events' fix (6.45 pm) a
+   rule naming no place holds only on the first three rooms (Events, 6.45 pm), so this is a guard, not a fix */
 var HALL = {};
 fetch('events/great-hall.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
-  (j.room || []).forEach(function (r) { (r.show || []).forEach(function (c) { HALL[c] = true; }); });
+  (j.room || []).concat(j.records || []).forEach(function (r) { (r.show || []).forEach(function (c) { HALL[c] = true; }); });
   if (READY) draw();
 }).catch(function () {});
 /* the chain's cues this page draws in grey, by their opening words; the rest are listed in the state as not drawn */
@@ -633,7 +738,8 @@ var DRAWN = ['the high windows', 'the floating candles burning', 'the floating c
   'the enchanted ceiling', 'the four house tables crowded', 'the few who stay for Christmas', 'a few pupils at the tables',
   'one or two pupils', 'the hall empty', 'the house ghosts', 'the first years in one line', 'breakfast set at every place',
   'the golden plates and goblets set', 'the places laid for the feast', 'the golden goblets stacked', 'twelve Christmas trees',
-  'about one floating candle in five', "Hagrid's four vast pumpkins", "the winner's hangings"];
+  'about one floating candle in five', "Hagrid's four vast pumpkins", "the winner's hangings", "the Duelling Club's evening",
+  'two straw dummies'];
 function draw() {
   var d = drivers(), feast = d.meal === 'dinner' && /^(start of term|halloween|christmas day|leaving feast)$/.test(d.occasion);
   var xmas = d.occasion === 'christmas' || d.occasion === 'christmas day';
@@ -675,9 +781,9 @@ function draw() {
   doorsOpen.visible = open; st.doors = open ? 'open' : 'shut';
   /* the figures (Interiors' occupancy; People's to draw) */
   var list = [], who = 'empty';
-  /* the Duelling Club's evening: after dinner, when Events' chain says a club evening falls (asked by row); until then
-     shown by ?club=duelling with ?time=evening */
-  var club = (Q.get('club') || '') === 'duelling' && d.time === 'evening' && d.meal === 'none';
+  /* the Duelling Club's evening: Fridays at eight from the Chamber's spring term, when Events' chain says (req 499, the
+     runtime's `club`; ?club=duelling for a look) */
+  var club = cue("the Duelling Club's evening");
   st.club = club;
   furniture.forEach(function (m) { m.visible = !club; }); clubG.visible = club;
   /* Christmas: the few who stay at their own table's middle, about one place in ten (Interiors, req 473) */
@@ -713,7 +819,7 @@ function draw() {
   occ.lanterns.visible = cue("Hagrid's four vast pumpkins");
   occ.feastEnd.visible = cue("the winner's hangings");
   /* sound: no room plays any yet, so the hall names the chain's sound cue in its state until the castle's sound comes */
-  st.sound = (shows.filter(function (s) { return /^(the hall quiet|a meal's murmur|a feast's roar|a few voices|the few at Christmas dinner|rain drumming)/.test(s); })
+  st.sound = (shows.filter(function (s) { return /^(the hall quiet|a meal's murmur|a feast's roar|a few voices|the few at Christmas dinner|rain drumming|pairs muttering spells)/.test(s); })
     .map(function (s) { return s.split(',')[0]; })).join('; ') || 'none';
   /* the chain's cues not yet drawn here, each its owner's to give (the lane file, The layers) */
   for (var ex in EXTRA) EXTRA[ex].visible = !club && cue(ex);
@@ -856,7 +962,8 @@ renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
-  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
+  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC, field: function () { return FIELD_CHECK; }, scorches: function () { return SCORCHES; },
+  howler: function () { for (var c in CUES) CUES[c](); return Object.keys(CUES).length; }, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
   stand: function () { return here.name; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
