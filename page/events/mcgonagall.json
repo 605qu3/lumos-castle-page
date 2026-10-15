@@ -21,9 +21,9 @@
         "castle date >= 2 05-29"
       ],
       "show": [
-        "a small black ink stain soaked into the wood in the middle of her desk"
+        "a small black ink stain soaked into her blotter, off its centre toward the visitors' chairs"
       ],
-      "canon": "the change list's Rework 6 under the 15 October rulings (traces keep their dates): CoS 18 L13047, what remained of the diary laid on her desk the Chamber's night (05-29, the reckoning of the rule above), the ink oozing from it (CoS 17 L12939); so from 29 May of the Chamber's castle and in every later year; the stain ours, in the desk's middle where Interiors' schedule laid the diary (docs/interiors/mcgonagalls-study.md, list 4), not the list's blotter, which the room does not have; nothing names whose diary; checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 6 under the 15 October rulings (traces keep their dates): CoS 18 L13047, what remained of the diary laid on her desk the Chamber's night (05-29, the reckoning of the rule above), the ink oozing from it (CoS 17 L12939); so from 29 May of the Chamber's castle and in every later year; the stain ours, in the blotter Interiors placed on the desk's middle where the diary was laid (docs/interiors/mcgonagalls-study.md, the blotter, 3.24 pm); nothing names whose diary; checked against the text, 15 October 2026"
     },
     {
       "when": [
@@ -53,6 +53,17 @@
       ],
       "canon": "PoA 12 L18266 to L18272: checked and found clean, she brings it back the Thursday evening before \"Saturday's match\" (Ravenclaw, the first Saturday of February here; the book gives no day); on her desk that afternoon; checked against the text, 14 October 2026",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the Firebolt in its moment (EV-12)"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "date >= 06-01",
+        "date <= 08-31"
+      ],
+      "show": [
+        "a row of six snuffboxes along the front edge of her desk, lids up, the last one with whiskers"
+      ],
+      "canon": "Interiors' schedule (docs/interiors/mcgonagalls-study.md, the first years' snuffboxes, list 7): a habit of every year's end, from the first years' exam to the end of term, Events' to time; PS 16 L5460, the exam's mice into snuffboxes, points taken away for whiskers; the exams from 1 June (the old exam-week reckoning), to the leaving feast and the summer hold's feast week; every castle, an ordinary year's end; moved from the classroom (the change list's Rework 10 put one on her shelf, which the room does not have); checked against the text, 15 October 2026"
     }
   ],
   "records": []

@@ -21,34 +21,12 @@
     {
       "when": [
         "place = transfiguration classroom",
-        "reading = 1",
-        "date >= 09-08"
+        "castle date >= 1 09-08"
       ],
       "show": [
         "on the sill of the front window, a match gone all silver and pointy"
       ],
-      "canon": "Fawkes's t1 on interiors-transfig-desks-1014 (provisional, Godric to confirm), Interiors' spot: Hermione's match, PS 8 L2740, kept from the first week on and in every later book's year; checked against the text, 14 October 2026"
-    },
-    {
-      "when": [
-        "place = transfiguration classroom",
-        "reading = 1",
-        "date <= 08-31"
-      ],
-      "show": [
-        "on the sill of the front window, a match gone all silver and pointy"
-      ],
-      "canon": "as above, January to the summer's end"
-    },
-    {
-      "when": [
-        "place = transfiguration classroom",
-        "reading >= 2"
-      ],
-      "show": [
-        "on the sill of the front window, a match gone all silver and pointy"
-      ],
-      "canon": "as above, every later year"
+      "canon": "the change list's Rework 10 under the 15 October rulings (traces keep their dates): PS 8 L2736 to L2740, the match gone \"all silver and pointy\" in her first class, the term's first week (the book gives no day, so from the Monday after it, 8 September, that it never shows before its lesson); Interiors' schedule (docs/interiors/transfiguration-classroom.md, the match, touch t1 woven by Godric, 15 October 2026) keeps it on the front window's sill, from the Stone's castle and in every later year; no name on it; checked against the text, 15 October 2026"
     },
     {
       "when": [
@@ -79,21 +57,6 @@
     {
       "when": [
         "place = transfiguration classroom",
-        "reading = 1",
-        "date >= 06-01",
-        "date <= 06-07",
-        "day of week <= 5",
-        "time != evening",
-        "time != night"
-      ],
-      "show": [
-        "a row of snuffboxes along her desk from the morning's practical, one of them with whiskers"
-      ],
-      "canon": "Interiors' req 369: PS 16 L5460, the practical exam, a mouse into a snuffbox, points taken away if it had whiskers; exam week, 1 to 7 June (as the Charms pineapple), school days, by day; checked against the text, 14 October 2026"
-    },
-    {
-      "when": [
-        "place = transfiguration classroom",
         "reading = 3",
         "weekday = monday",
         "date >= 05-31",
@@ -109,16 +72,22 @@
     {
       "when": [
         "place = transfiguration classroom",
-        "reading = 3",
-        "weekday = monday",
-        "date >= 05-31",
-        "date <= 06-06",
-        "time = day"
+        "castle date >= 3 06-06"
       ],
       "show": [
-        "tortoises crawling slowly among the desks after the exam, one of them still with a spout for a tail"
+        "a tortoise in a box beside her desk, a spout for a tail"
       ],
-      "canon": "PoA 16 L19666 to L19668 (out at lunchtime; \"Mine still had a spout for a tail\"); left in the room that afternoon, ours (provisional, Godric to confirm); checked against the text, 14 October 2026"
+      "canon": "the change list's Rework 10 under the 15 October rulings: PoA 16 L19666 to L19668, the third-years' exam on the Monday of exam week, a teapot into a tortoise, \"Mine still had a spout for a tail\"; that she kept one, ours (the list's); from 6 June of the Azkaban castle, the latest that Monday can fall (the set-aside teapots' window, 31 May to 6 June), so it never shows before the exam, and in every later year; its place by her desk Interiors' to set (asked by row); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "castle date >= 2 05-25"
+      ],
+      "show": [
+        "a third-row desk with one leg newer and paler than the other three"
+      ],
+      "canon": "Interiors' schedule (docs/interiors/transfiguration-classroom.md, a desk with one newer leg; its Rework 7): CoS 16 L12163, a wand slips and vanishes a desk's leg and she restores it, the lesson the week before the exams, 25 May (the reckoning of the set-aside rabbits' rule, CoS 16 L12159 to L12171); so from 25 May of the Chamber's castle and in every later year; the newer leg ours; no name on it; checked against the text, 15 October 2026"
     }
   ],
   "records": [
