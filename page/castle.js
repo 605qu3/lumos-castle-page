@@ -490,8 +490,10 @@ window.castleFrame = function (opts) {
     var lineShown = false;
     try { lineShown = !!localStorage.getItem(ZOOM_KEY); } catch (err) {}
 
+    /* the saleswizard's line (GoF 7) is set aside on every page (req 424; docs/ministry/set-aside.md): the Omnioculars
+       do not exist in the boys' years; ?setaside shows it as it was (15 October 2026) */
     function hint() {
-      if (!lineShown && z > 1.3) {
+      if (!lineShown && z > 1.3 && /[?&]setaside(=|&|$)/.test(location.search)) {
         lineShown = true;
         try { localStorage.setItem(ZOOM_KEY, '1'); } catch (err) {}
         line.style.opacity = '1';

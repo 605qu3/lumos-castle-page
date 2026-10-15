@@ -199,6 +199,13 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 (function () {
 'use strict';
 
+/* What the Ministry's sweep sets aside (docs/ministry/changes/corridor.md, Set aside; docs/ministry/set-aside.md) is
+   off by default, its code kept until Godric's yes to remove it; ?setaside shows each as it was (15 October 2026) */
+var SET_ASIDE = /[?&]setaside(=|&|$)/.test(location.search);
+/* The last book he has finished, 0 to 7: his castle's year (the world rules, Time). Until Events' clock gives it as a
+   driver (docs/room-states.md, asked by row) the page reads ?finished=N, and 0 meanwhile: the Stone's year, no traces */
+var FINISHED = Math.max(0, Math.min(7, +(location.search.match(/[?&]finished=(\d)/) || [])[1] || 0));
+
 /* ---------- the shared frame (castle.js): renderer, scene, camera, helpers, HUD ---------- */
 
 var kit = window.castleFrame ? castleFrame({
@@ -696,8 +703,8 @@ Object.keys(HER_PATCHES).forEach(function (id, i) {
   pim.src = '../assets/layers/portrait-hole-front-' + id + '.png?v=3';
 });
 /* her cake between visits (req 106; the record that moves it on is Events', req 107): 'whole' (her front as drawn),
-   'half', 'crumbs' (a crumb on her fichu too) or 'christmas' (the plate down to crumbs and the emptied chocolate-liqueur
-   boxes, GoF 23; the fan shut, since the boxes lie over the open fan's place); the fan 'open' or 'shut'. Set at once,
+   'half', 'crumbs' (a crumb on her fichu too) or 'christmas' (the plate down to crumbs and a couple of emptied sweet
+   boxes, ordinary ones, pointing nowhere until GoF is finished, Rework 10; the fan shut, since the boxes lie over the open fan's place); the fan 'open' or 'shut'. Set at once,
    never faded: it only ever changes while he is away. Until the record comes, the look switch ?cake=half&fan=open */
 var herCake = { state: 'whole', fan: 'shut' }, cakeLook = false;
 function setHerCake(state, fan) {
@@ -710,7 +717,10 @@ function setHerCake(state, fan) {
   var q = new URLSearchParams(location.search);
   if (q.get('cake') || q.get('fan')) { cakeLook = true; setHerCake(q.get('cake'), q.get('fan')); }
 })();
-/* her frame while she hides in the map of Argyllshire (req 380, the page half of Events' req 356, stairhall.json;
+/* SET ASIDE by the Ministry's sweep (Rework 1, 15 October 2026): her front is her only state and nothing on it is
+   switched off by date; once PoA is finished a fine mended seam (an edit of her drawing, a spend on Godric's yes) will
+   carry the trace. What follows shows only with ?setaside, kept until his yes to remove it.
+   Her frame while she hides in the map of Argyllshire (req 380, the page half of Events' req 356, stairhall.json;
    provisional, Godric to confirm): 'her' (her front as it hangs), 'slashed' (Halloween night of that year, PoA 8) or
    'cadogan' (Sir Cadogan and his fat grey pony keep it until that Sunday, PoA 9; his Christmas party the same, PoA 11).
    Until each is drawn (a spend on his yes, req 397) her frame shows its grey card, so she is never in two places;
@@ -724,8 +734,8 @@ var herFrame = { state: 'her', look: false, cards: {} };
   m.position.z = 0.006; m.name = 'her-frame-' + id; m.visible = false; m.renderOrder = 4;
   her.add(m); herFrame.cards[id] = m;
 });
-function setHerFrame(state) {
-  herFrame.state = state === 'slashed' || state === 'cadogan' ? state : 'her';
+function setHerFrame(state) {   /* set aside (Rework 1): her front is her only state unless ?setaside */
+  herFrame.state = SET_ASIDE && (state === 'slashed' || state === 'cadogan') ? state : 'her';
   for (var id in herFrame.cards) herFrame.cards[id].visible = id === herFrame.state;
 }
 (function () {
@@ -748,9 +758,8 @@ function updateHerPatches(dt) {
     if (!herPrimp.steps.length) herPrimp = null;
   }
 }
-/* asleep at night (canon checked in the text, 11 October 2026: "the Fat Lady, who was dozing peacefully with her head
-   against her frame" late at night, OotP 13, with "will I have to stay awake all night"; "'Password?' said the Fat Lady,
-   jerking out of a doze", PoA 8): by night her doze patch (her eyes closed, The portrait hole's) is on; as he starts up
+/* asleep at night (canon checked in the text, 11 October 2026: "'Password?' said the Fat Lady, jerking out of a doze",
+   PoA 8; Rework 10, cited from PoA only): by night her doze patch (her eyes closed, The portrait hole's) is on; as he starts up
    the corridor toward her, or stands at her stop, she jerks awake, and some seconds after he has gone she nods off
    again. Her head against the frame would be a new drawing, so the doze is her face only. Behind ?time= with the rest
    of the night until NIGHT.live */
@@ -813,6 +822,22 @@ var doorTorches = [addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, HE
    blue there (req 85's cue, the room's) */
 var STRIP_TORCH = CORRIDOR.places.torches[2];
 torches.push(addTorch(new THREE.Vector3(STRIP_TORCH.x, STRIP_TORCH.y, FAR_FACE), 1, 'corridor-torch-3'));
+/* the deathday's trace (Rework 7, 15 October 2026; CoS 8, the black candles of Nick's five hundredth deathday party):
+   once CoS is finished, on any day, a stub of black candle wedged at the bracket of the strip's torch, the one Nick
+   passes, blue-black drips run down the iron. A tap goes to the runtime as `candle stub`: Nick, passing, mentions his
+   deathday as old news (Events' lines, EV-48, asked by row), and gives no invitation. Drawn in code, 4 by 9 cm */
+var candleStub = onWallZ(cutoutTexture(24, 64, '#151318', function (g, w, h) {
+  g.fillRect(w * 0.3, h * 0.08, w * 0.4, h * 0.32);                                   /* the stub, burnt down */
+  g.fillStyle = '#2a2f44';                                                            /* the drips, blue-black */
+  [[0.32, 0.62], [0.5, 0.88], [0.64, 0.5]].forEach(function (d) {
+    g.beginPath(); g.moveTo(w * (d[0] - 0.05), h * 0.38); g.lineTo(w * (d[0] + 0.05), h * 0.38);
+    g.lineTo(w * (d[0] + 0.03), h * d[1]); g.arc(w * d[0], h * d[1], w * 0.04, 0, Math.PI); g.closePath(); g.fill();
+  });
+  g.fillStyle = '#3a3a3a'; g.fillRect(w * 0.48, 0, w * 0.04, h * 0.1);                /* the burnt wick */
+}), 0.04, 0.106, STRIP_TORCH.x + 0.07, STRIP_TORCH.y - 0.2, FAR_FACE + 0.012, 1, 1, 'deathday-candle-stub');
+candleStub.rotation.y = -Math.PI / 2; candleStub.position.z = FAR_FACE + 0.06;   /* stood in the bracket's ring, turned down the corridor so the length view meets it */
+candleStub.visible = FINISHED >= 2 || /[?&]candleStub\b/.test(location.search);   /* ?candleStub for a look */
+candleStub.userData.thing = 'candle stub';   /* tappable from where the tappables are gathered */
 doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = false; torches.push(tc); });
 /* the turn's torch, on the end wall to the left of the arch as he faces it, its flame leaning toward the arch as if a
    draught rose from far below (Godric's touch on Q14, 3.58 pm) */
@@ -1052,7 +1077,11 @@ function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
    as the hole opens or as he walks away. Every night after, the glow alone waits there for him, his light left on.
    Which night is which is Events' record (two cues and nick_home, asked of Events); the page draws the light, the
    walk and the bow. Nothing at night is sudden: every light fades up and away. ?nickHome=walk or glow forces it on
-   the next walk up to her */
+   the next walk up to her.
+   REWORKED (Rework 5, GL-20, 15 October 2026: nothing announces itself): no light without its source. The empty glow
+   on the wall is set aside (?setaside shows it); on his first walk to her by night Nick comes out of the wall in his
+   own pearly light (GL-35, fine), and on the nights after, Nick himself waits by her frame, in his own light, and
+   fades into the wall as the hole opens or he walks away */
 var HOME = { glowZ: MID_Z + PORTRAIT_W / 2 + 0.42, glowY: 1.35, glowW: 0.95, glowH: 1.7, up: 1.6, down: 1.5,
   spotX: END_X - 0.4, spotZ: MID_Z + 0.9, look: 0.5, wide: 1.18, bow: { deep: 1.0, tip: 1.5 }, meet: 2.0, speed: 0.9, glide: 5.5 };
 var home = { kind: null, k: 0, t: 0, nick: null, ending: false, q: new URLSearchParams(location.search).get('nickHome') };
@@ -1077,7 +1106,12 @@ function nickHomeShift() {
 function nickHome(kind) {
   if (home.kind || leaving) return;
   home.kind = kind; home.t = 0; home.k = 0; home.ending = false; home.cough = false; home.nick = kind === 'walk' ? 'waiting' : null;
-  homeGlow.visible = true;
+  homeGlow.visible = SET_ASIDE;   /* the empty glow, set aside (GL-20) */
+  home.waits = kind === 'glow' && !SET_ASIDE;
+  if (home.waits) {               /* the nights after his first walk: Nick himself waits by her frame */
+    home.nick = 'by-her'; nick.state = 'home'; nick.held = 0;
+    nickMesh.visible = true; nickLamp.visible = true; nickMesh.material.opacity = 0;
+  }
   if (tween && atStop === STOPS[0]) tween.to = STOPS[0].stop();   /* a look toward the light */
   if (kind === 'walk' && tween && atStop === STOPS[0]) {   /* the walk up to her goes at a walking pace, beside him */
     tween.to = STOPS[0].stop(); tween.dur = Math.max(tween.dur, HOME.glide);
@@ -1098,7 +1132,7 @@ function updateNickHome(dt) {
   /* the glow: up as he sets off, away as the hole opens or he turns back */
   home.k = home.ending ? Math.max(0, home.k - dt / HOME.down) : Math.min(1, home.k + dt / HOME.up);
   homeGlow.material.opacity = 0.55 * home.k * (0.92 + 0.08 * Math.sin(t * 1.7));
-  if (home.kind === 'walk' && home.nick && home.nick !== 'gone') {
+  if ((home.kind === 'walk' || home.waits) && home.nick && home.nick !== 'gone') {
     if (home.nick === 'waiting') {
       if (home.ending) home.nick = 'gone';
       else if (home.t > 1.2) nickHomeStart();
@@ -1113,6 +1147,7 @@ function updateNickHome(dt) {
     } else if (home.nick === 'bow' || home.nick === 'by-her') {
       nick.held += dt;
       _nk.set(HOME.spotX, NICK.h / 2, HOME.spotZ);
+      if (home.waits) nickMesh.material.opacity = 0.55 * home.k;   /* there already, fading up as he sets off */
       /* turned to him, the hat swept out; then the bow goes a little too deep and his head tips off on its hinge,
          slowly, and back up with a small cough; then his line */
       var B = HOME.bow, run = NICK_HEAD.up + NICK_HEAD.hold + NICK_HEAD.down, deep = home.nick === 'bow' && nick.held > B.deep && nick.held < B.tip + run + 0.3;
@@ -1138,9 +1173,9 @@ function updateNickHome(dt) {
       nickLamp.material.opacity = 0.5 * nickMesh.material.opacity;
     } else nickLamp.visible = false;
   }
-  if (home.ending && home.k <= 0 && (home.kind !== 'walk' || home.nick === 'gone')) {
+  if (home.ending && home.k <= 0 && ((home.kind !== 'walk' && !home.waits) || home.nick === 'gone')) {
     homeGlow.visible = false; nickLamp.visible = false;
-    home.kind = null; home.ending = false; home.nick = null;
+    home.kind = null; home.ending = false; home.nick = null; home.waits = false;
   }
 }
 /* a grey stand-in until its drawing (an empty painted room by the sitters' painter, its door at the right edge, where a
@@ -1183,8 +1218,7 @@ windows.forEach(function (w) { w.sky.userData.base = w.sky.material.color.clone(
 
 /* the grounds through the window nearer the stairs (Q20, Godric's option 1, 5.15 pm; Q24, candidate 2, 6.52 pm): the
    drawing `corridor-grounds-view`, 1.2 m wide and 2.64 m tall, stood on the sill behind the glass, its round head
-   rising past the opening's into the wall where it never shows. "He glanced out of a rain-washed window at the dark
-   grounds as they turned into the Fat Lady's corridor. There was still no light in Hagrid's cabin" (OotP 13). Over it,
+   rising past the opening's into the wall where it never shows. Over it,
    one small canvas in the drawing's own pixels carries what changes (Godric's touches, 6.25 and 6.52 pm): Hagrid's
    pumpkins in the bare patch, growing through October toward Hallowe'en (B2 ch7, ch8); his washing on a line beside
    the hut, blowing with the day's wind, now and then his enormous socks; and now and then Hagrid himself with his
@@ -1515,7 +1549,7 @@ function updateFrost() {
 }
 /* the day's sky over the view, in code, nothing generated (Events' weather, req 115: one sky for every window): cloudy
    dulls it under a grey wash, heavier where the sky shows; rain greys it further and runs down the glass of both
-   windows ("He glanced out of a rain-washed window at the dark grounds", OotP 13); fog veils it, thick toward the
+   windows; fog veils it, thick toward the
    forest and the hills, thinner over the near lawn; the plain window's sky takes the same colour. Snow falling with
    none lying yet shows as cloudy; once it lies the drawn snowy view (below) carries its own heavy sky, and a snowing
    sky lays no veil over it, while cloud, rain and fog still do. */
@@ -1711,7 +1745,40 @@ function snowballFly() {
   snowball = { t: 0, T: 1.5 + 0.4 * Math.random(), x0: (Math.random() < 0.5 ? 0.27 : 0.73) + (Math.random() - 0.5) * 0.1,
     drift: (Math.random() - 0.5) * 0.08,   /* inside one light, clear of the mullion */ peak: 0.3 + 0.2 * Math.random(), flakes: [] };
 }
+/* the bewitched snowball's trace (Rework 8, 15 October 2026; PS 12): once PS is finished, on days while snow lies, a
+   lump of snow stuck high on the outside of the glass, far higher than any throw from the lawn rises (the snowball
+   peaks at half the glass at most); it was bounced off something up there. Drawn in code, about 13 cm across, with a
+   short slide mark under it. ?snowLump shows it whatever the year or the weather */
+var snowLump = { mesh: null, look: groundsQ.has('snowLump'), next: 0 };
+function updateSnowLump() {
+  if (t < snowLump.next) return;
+  snowLump.next = t + 1;
+  var w = groundsWeather(), on = snowLump.look || (FINISHED >= 1 && !!w && w.ground === 'snow');
+  if (on && !snowLump.mesh) {
+    var c = makeCanvas(48, 64), g = c.getContext('2d');
+    g.fillStyle = 'rgba(226,232,240,0.6)';                                               /* where it slid a little, tapering */
+    g.beginPath(); g.moveTo(17, 26); g.lineTo(31, 26); g.lineTo(26, 58); g.lineTo(22, 58); g.closePath(); g.fill();
+    var grd = g.createRadialGradient(19, 15, 2, 24, 22, 17);
+    grd.addColorStop(0, '#fdfeff'); grd.addColorStop(0.55, '#e8ecf2'); grd.addColorStop(1, '#a9b3c2');
+    g.fillStyle = grd; g.beginPath();                                                    /* the packed lump, flattened where it hit */
+    for (var i = 0; i <= 28; i++) {
+      var a = i / 28 * Math.PI * 2, k = 15 * (0.78 + 0.13 * Math.sin(i * 1.7) + 0.09 * Math.sin(i * 4.1));
+      if (i) g.lineTo(24 + k * Math.cos(a) * 1.1, 21 + k * 0.85 * Math.sin(a)); else g.moveTo(24 + k * 1.1, 21);
+    }
+    g.fill(); g.strokeStyle = 'rgba(94,104,122,0.7)'; g.lineWidth = 1; g.stroke();
+    g.fillStyle = '#eef1f6';                                                             /* the burst of crumbs round it */
+    [[5, 12, 2.2], [43, 16, 1.8], [8, 30, 1.5], [41, 31, 2], [24, 3, 1.6], [36, 5, 1.2]].forEach(function (s) {
+      g.beginPath(); g.arc(s[0], s[1], s[2], 0, Math.PI * 2); g.fill();
+    });
+    var sky = groundsWin.sky, h = GROUNDS.h;   /* the sky takes the drawing's height once it loads */
+    snowLump.mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.17), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
+    snowLump.mesh.position.set(-GROUNDS.w * 0.19, h * 0.15, 0.0045); snowLump.mesh.renderOrder = 6; snowLump.mesh.name = 'grounds-snow-lump';
+    sky.add(snowLump.mesh);
+  }
+  if (snowLump.mesh) snowLump.mesh.visible = on;
+}
 function updateSnowball(dt) {
+  updateSnowLump();
   if (snowballLook && !snowball && (snowballNext -= dt) <= 0) { snowballNext = 5; snowballFly(); }
   if (!snowball) return;
   var s = snowball, g = snowCanvas.getContext('2d'), w = snowCanvas.width, h = snowCanvas.height;
@@ -1748,8 +1815,10 @@ function updateSnowball(dt) {
    at the window's stop a student runs across the far lawn with a snowball hunting him a little behind and above, it turns
    in the air, catches him up, bounces off the back of his head, and chases him on out of sight. Drawn in code into a canvas
    over the lawn in the drawing's own pixels, under the thrown snowball's. Live since the snowy grounds were hung (Q31,
-   11 October 2026); BEWITCHED.live false would hold it again; ?bewitched sends one every visit. */
-var BEWITCHED = { live: true, box: [0, 1080, 800, 360], canvas: null, tex: null, run: null, last: -1, next: 0 };
+   11 October 2026); BEWITCHED.live false would hold it again; ?bewitched sends one every visit.
+   SET ASIDE (Rework 8, 15 October 2026): PS 12's prank with a stand-in; shown only with ?setaside. Its trace is the lump
+   of snow stuck high on the glass (snowLump, below); the ordinary snowball fight stays */
+var BEWITCHED = { live: SET_ASIDE, box: [0, 1080, 800, 360], canvas: null, tex: null, run: null, last: -1, next: 0 };
 function bewitchedCanvas() {
   if (BEWITCHED.canvas) return;
   var b = BEWITCHED.box, sky = groundsWin.sky;
@@ -1791,7 +1860,7 @@ function drawSnowballAt(g, x, y, r, gy) {
   g.strokeStyle = '#6f7a8c'; g.lineWidth = 1; g.stroke();
 }
 function updateBewitched(dt) {
-  var here = atStop && atStop.name === 'window', look = groundsQ.has('bewitched'), w = groundsWeather();
+  var here = atStop && atStop.name === 'window', look = SET_ASIDE && groundsQ.has('bewitched'), w = groundsWeather();
   var ok = look || (BEWITCHED.live && w && w.ground === 'snow' && nightK() < 0.5);
   if (here && BEWITCHED.last !== atStop) {
     BEWITCHED.last = atStop;
@@ -2546,9 +2615,8 @@ dayLights.push(landingLight);
 /* By Events' clock (castle.time(): morning, day, evening, night; ?time= honoured), the corridor dims toward evening and
    at night the daylight goes: the windows' lamps and the sky's fill sink to a moonlit blue, a little brighter under a
    fuller moon that is up on a clear night, and the torches carry the corridor, a little stronger. Through the grounds'
-   window the view darkens; some nights a light shows in Hagrid's window and some nights it is dark, "There was still no
-   light in Hagrid's cabin" (OotP 13), and on a lit night a thread of smoke rises from his chimney (Godric's touches,
-   10 October 2026, 5.15 pm); his washing is in and he does not cross. The real moon (Magic's req 98; Events' moon(),
+   window the view darkens; Hagrid's window is lit by his own fire (the Architect's ledger line 6, Rework 10), and a
+   thread of smoke rises from his chimney (Godric's touches, 10 October 2026, 5.15 pm); his washing is in and he does not cross. The real moon (Magic's req 98; Events' moon(),
    req 95) hangs in the glass of the plain window as high as it stands, its phase drawn as the dormitory draws it
    (page/dormitory.html, drawMoon); a few stars there on a clear night. Live by the castle clock since Godric's yes to
    Q27 (11 October 2026, 7.49 am); NIGHT.live false would keep the page's day again, ?time= still sets it for a look. */
@@ -2619,10 +2687,25 @@ if (norrisDoor.q) norris.look = false;   /* the forced look is hers alone, not t
 (function () {
   var map = norris.group.children[0].material.map;
   [-1, 1].forEach(function (side) {
-    var e = new THREE.Sprite(new THREE.SpriteMaterial({ map: map, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 }));
+    /* REWORKED (Rework 5, GL-22): eyeshine only as the torchlight reaches her, never additive, over a dim cat shape;
+       the additive eyes alone are set aside (?setaside) */
+    var e = new THREE.Sprite(new THREE.SpriteMaterial({ map: map, transparent: true, depthWrite: false,
+      blending: SET_ASIDE ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: 0 }));
     e.scale.set(NORRIS_DOOR.r * 2, NORRIS_DOOR.r * 2, 1); e.position.x = side * NORRIS_DOOR.gap / 2; e.name = 'norris-door-eye';
+    e.userData.peak = SET_ASIDE ? 1 : 0.6;
     norrisDoor.group.add(e);
   });
+  if (!SET_ASIDE) {   /* a sitting cat, dark against the flags, the eyes near its top */
+    var cat = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.26), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0,
+      map: cutoutTexture(44, 52, '#1e1a16', function (g, w, h) {
+        g.beginPath(); g.ellipse(w * 0.5, h * 0.72, w * 0.36, h * 0.28, 0, 0, 2 * Math.PI); g.fill();             /* her haunches */
+        g.beginPath(); g.ellipse(w * 0.5, h * 0.3, w * 0.22, h * 0.17, 0, 0, 2 * Math.PI); g.fill();              /* her head */
+        g.beginPath(); g.moveTo(w * 0.3, h * 0.22); g.lineTo(w * 0.33, h * 0.04); g.lineTo(w * 0.44, h * 0.16); g.fill();   /* her ears */
+        g.beginPath(); g.moveTo(w * 0.7, h * 0.22); g.lineTo(w * 0.67, h * 0.04); g.lineTo(w * 0.56, h * 0.16); g.fill();
+      }) }));
+    cat.position.set(0, -0.09, -0.01); cat.name = 'norris-door-cat'; cat.userData.peak = 0.55;
+    norrisDoor.group.add(cat);
+  }
   norrisDoor.group.visible = false; norrisDoor.group.name = 'mrs-norris-cupboard'; scene.add(norrisDoor.group);
 })();
 function norrisDoorEvening() {
@@ -2655,10 +2738,17 @@ function updateNorrisDoor(dt) {
   var shut = norrisDoor.blink < 0;
   if (norrisDoor.blink < -0.13) norrisDoor.blink = 2.5 + Math.random() * 3.5;
   g.lookAt(camera.position); g.visible = true;
-  g.children.forEach(function (e) { e.material.opacity = shut ? 0 : norrisDoor.a; });
+  g.children.forEach(function (e) {
+    var cat = e.name === 'norris-door-cat';
+    e.material.opacity = (shut && !cat ? 0 : norrisDoor.a) * e.userData.peak;
+  });
 }
-function hagridHome() { return groundsQ.has('hutLight') || dayRand(6) < 0.67; }   /* about two nights in three his window is lit; ?hutLight, every night */
-/* his light comes on (req 249's t1, Godric's, 13 October 2026, the desk's words: "on a night visit, the hut's window is
+/* REWORKED (Rework 10, req 418, req 249's carried item; 15 October 2026): one rule, the Architect's ledger line 6 as
+   reworded: the hut's window is lit by its own fire on evenings by the real clock, never as a plot beat. So every dark
+   visit his window is already lit when the view is first seen, and nothing comes on. The dark nights and the light
+   coming on (req 249's woven t1, cited to OotP 13) are set aside until Godric taps it; ?setaside shows them */
+function hagridHome() { return !SET_ASIDE || groundsQ.has('hutLight') || dayRand(6) < 0.67; }   /* set aside: about two nights in three lit; ?hutLight, every night */
+/* SET ASIDE (see hagridHome): his light comes on (req 249's t1, Godric's, 13 October 2026, the desk's words: "on a night visit, the hut's window is
    dark, as in OotP 13 ('There was still no light in Hagrid's cabin'), and some nights a light comes on in it"): on a
    lit night the window is dark when he first reaches the grounds' window's stop, and a few seconds on the light fades up
    behind the glass and the thread of smoke starts from the chimney; once on, it stays on for the visit */
@@ -2750,7 +2840,7 @@ function updateNight(dt) {
   var k = nightK(), night = k >= 0.5;
   /* on a frosted morning a thread of smoke from his chimney too (Godric's touch on Q26, 7.39 am), his fire lit */
   var cold = !night && lightTime() === 'morning' && frostLevels().grounds > 0;
-  if (night && !cold && !HUT.on && atStop && atStop.name === 'window') HUT.on = t + HUT.delay[0] + Math.random() * (HUT.delay[1] - HUT.delay[0]);
+  if (night && !cold && !HUT.on && atStop && atStop.name === 'window') HUT.on = SET_ASIDE ? t + HUT.delay[0] + Math.random() * (HUT.delay[1] - HUT.delay[0]) : t - HUT.fade;   /* lit already (ledger 6) */
   if (NIGHT.view && (night || cold) && atStop && atStop.name === 'window') drawNightView(cold);   /* the smoke moves only where it is seen */
   if (t < NIGHT.next) return;
   NIGHT.next = t + 2;
@@ -2879,7 +2969,7 @@ var STOPS = [
       return { pos: new THREE.Vector3(NOOK_X0 - SETTLE.d - 0.12, 1.0, t.z), look: t, fov: 30 }; },
     arrive: function () { scarfTape.visible = true; }, turn: 0.35 }   /* bent over the seat, a small turn only */
 ];
-var tappables = [];
+var tappables = [candleStub];   /* the deathday's candle stub (Rework 7) answers by name */
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
 /* things the events runtime answers by name rather than a stop of their own: a tap on the armour goes to the runtime
    first, whose record walks him up or knocks (the built-in `at` must read where he stood when he tapped); the sticks
@@ -2911,13 +3001,14 @@ witchMap.name = 'witch-map'; witchMap.visible = false; witchLanding.add(witchMap
   mapHit.position.set(0.1, 0.17, 0); mapHit.visible = false; mapHit.userData.thing = 'map';
   M.add(mapHit); tappables.push(mapHit);
 })();
+/* SET ASIDE (Rework 3, 15 October 2026): nothing waits behind her plinth; the grant shows only with ?setaside */
 function drawMap(has) {
-  mapShown = has(MAP_CUE.waiting);
+  mapShown = SET_ASIDE && has(MAP_CUE.waiting);
   witchMap.visible = mapShown || !!mapTake;
   mapHit.visible = mapShown && !mapTake;
 }
 function takeMap() {
-  if (!witchMap.visible) return;
+  if (!SET_ASIDE || !witchMap.visible) return;
   mapTake = { t: 0, from: witchMap.position.clone() }; mapHit.visible = false;
 }
 /* the rule reads where he stands, which the runtime is not told of, so the page asks again whenever his stop changes */
@@ -2948,10 +3039,19 @@ function witchHump() {
    drawing (a spend) may draw the lid from onSwing. The hump, the lid's hinge (toward her back) and its closed edge
    (toward her head) are points on her card, as fractions of it from its top left, projected each frame; the lid is
    about 45 cm, Charms' default. The offer covers the page, so Back lets it go, and so does HUMP_WAIT_S untouched */
-var NOTE_CUE = "the twins' note folded small in his pocket", HUMP_WAIT_S = 12;
+/* REWORKED (Rework 4, 15 October 2026; the charter's Dissendium ruling): the hump opens only once PoA is finished
+   (PoA 10 explains the passage), learned from a note Fred dropped for George, found, never written to him: its cue is
+   Magic's (MC-06, asked by row), FRED_NOTE_CUE, and until Magic gives it the hump stays shut. Behind the lid only the
+   dark passage going down. The offer stays up until Back: nothing times out. The twins' note addressed to him and
+   HUMP_WAIT_S are set aside, shown only with ?setaside */
+var NOTE_CUE = "the twins' note folded small in his pocket", HUMP_WAIT_S = 12, FRED_NOTE_CUE = null;
 var HUMP = { u: 0.6, v: 0.34, r: 0.3, hinge: { u: 0.82, v: 0.38 }, edge: { u: 0.4, v: 0.3 } };
 var humpOffer = null, humpV = new THREE.Vector3();
-function noteHeld() { return !!castle && castle.cues().indexOf(NOTE_CUE) >= 0; }
+function noteHeld() {
+  if (!castle) return false;
+  if (SET_ASIDE) return castle.cues().indexOf(NOTE_CUE) >= 0;
+  return FINISHED >= 3 && !!FRED_NOTE_CUE && castle.cues().indexOf(FRED_NOTE_CUE) >= 0;
+}
 function humpAt(uv) { return uv && Math.hypot((uv.x - HUMP.u) * WITCH.card.w, (1 - uv.y - HUMP.v) * WITCH.card.h) < HUMP.r; }
 function onWitch(u, v) {
   witchCard.updateMatrixWorld();
@@ -2969,7 +3069,7 @@ function humpOffered() {
     hinge: function () { return onWitch(HUMP.hinge.u, HUMP.hinge.v); },
     edge: function () { return onWitch(HUMP.edge.u, HUMP.edge.v); },
     dir: h.x > e.x ? 1 : -1,   /* the edge rises over her back, whichever way her side faces him */
-    wait: HUMP_WAIT_S, stray: strayTap });
+    wait: SET_ASIDE ? HUMP_WAIT_S : 0, stray: strayTap });   /* 0: no time out, the offer stays until Back */
   mine.tap();
   mine.done.then(function (out) {
     if (humpOffer === mine) humpOffer = null;
@@ -3389,7 +3489,7 @@ function corridorDrawRoom(shown) {
     if (cs !== herCake.state || fan !== herCake.fan) setHerCake(cs, fan);
   }
   /* her frame while she hides (req 380): the slashed canvas, or Sir Cadogan (his Christmas party drawn as he is) */
-  if (!herFrame.look) {
+  if (SET_ASIDE && !herFrame.look) {
     var fs = has(FRAME_CUE.slashed) ? 'slashed' : has(FRAME_CUE.cadogan) || has(FRAME_CUE.party) ? 'cadogan' : 'her';
     if (fs !== herFrame.state) { setHerFrame(fs); console.info('[corridor] her frame: ' + fs); }
   }
@@ -3512,8 +3612,10 @@ function updateTrevor(dt) {
     var night = helmetEyes.userData.night, blink = !night && (t % 3.4) < 0.14;
     helmetEyes.children.forEach(function (e, i) {
       e.scale.y = blink ? 0.15 : 1;
-      e.material.color.setHex(night ? 0x8a7020 : 0xe8c840);
-      e.material.color.multiplyScalar(night ? 0.7 + 0.3 * Math.sin(t * 1.3 + i) : 1);
+      if (SET_ASIDE) {   /* the self-lit, pulsing eyes, set aside (GL-12) */
+        e.material.color.setHex(night ? 0x8a7020 : 0xe8c840);
+        e.material.color.multiplyScalar(night ? 0.7 + 0.3 * Math.sin(t * 1.3 + i) : 1);
+      } else e.material.color.setHex(night ? 0x4a3c18 : 0x8a7834);   /* unlit toad's eyes; by night a steady dim catch of the torch through the slit (Rework 5) */
     });
   }
   if (!trevorHit.visible) return;
@@ -3541,9 +3643,13 @@ function croak(text) { return function () { console.info('[corridor] ' + text + 
    the record's first line that visit (held while he sleeps). A grey stand-in until he is drawn; his Remembrall a scarlet glow in his hands
    when the room shows it, clearing and flushing again when he is given his quill; patting his pockets on the night
    he looks for his list of passwords. From afar a tap on him walks up to his own stop; there it goes to the runtime
-   as `neville`. When the hole opens on the password he goes in ahead of him */
+   as `neville`. When the hole opens on the password he goes in ahead of him.
+   REWORKED by the Ministry's sweep (Rework 2, 15 October 2026): he is awake, never curled asleep under her frame, and
+   sits in the window corner (Try 1); PS 9's wake line and the jolt, his seat under her frame (Try 3) and his patting
+   for the lost password list (PoA 12) are set aside, shown only with ?setaside. His words are Events' records
+   (neville.json; the fresh first line and the help line asked of Events by row) */
 var NEVILLE_SEATS = { 1: { x: END_X - 0.32, z: FAR_Z + 0.34 }, 3: { x: END_X - 0.32, z: MID_Z } };   /* the sheet's tries; 3: under her frame, as PS 9 */
-var NEVILLE_SEAT = NEVILLE_SEATS[groundsQ.get('nevilleSeat')] ? +groundsQ.get('nevilleSeat') : 3;   /* Try 3, Godric's; ?nevilleSeat=1 shows Try 1 */
+var NEVILLE_SEAT = NEVILLE_SEATS[groundsQ.get('nevilleSeat')] ? +groundsQ.get('nevilleSeat') : SET_ASIDE ? 3 : 1;   /* Try 1, the window corner (Rework 2); Try 3 set aside */
 var NEVILLE = { x: NEVILLE_SEATS[NEVILLE_SEAT].x, z: NEVILLE_SEATS[NEVILLE_SEAT].z, w: 0.5, h: 0.78, glowAt: [0.04, 0.4], glowR: 0.05 };
 var NEVILLE_WAKE = { near: 3.4, after: 1.0, slump: 0.86, jolt: 0.35,   /* metres, seconds, his height asleep, the jolt's seconds */
   line: "Thank goodness you found me! I've been out here for hours, I couldn't remember the new password to get in to bed." };   /* PS 9, checked in the book text */
@@ -3580,7 +3686,7 @@ function drawNeville(cast) {
   var out = !!neville.look || cast.some(function (f) { return f.name === 'neville' && f.mark === 'frame-foot'; });
   if (out === neville.out) return;
   neville.out = out; neville.goIn = -1;
-  neville.asleep = out; neville.nearT = 0; neville.wokeAt = -1;
+  neville.asleep = out && SET_ASIDE; neville.nearT = 0; neville.wokeAt = -1;   /* awake (Rework 2) */
   nevilleCard.visible = out; nevilleCard.material.opacity = 1;
   nevilleCard.position.set(NEVILLE.x, NEVILLE.h / 2, NEVILLE.z);
   if (!out && atStop === nevilleStop) goBack();
@@ -3611,7 +3717,7 @@ function updateNeville(dt) {
     if (k > 2.0) neville.clearAt = -1;
   }
   neville.glass += (g - neville.glass) * Math.min(1, dt * 4);
-  nevilleGlass.material.opacity = neville.glass * (0.85 + 0.15 * Math.sin(t * 3.1));
+  nevilleGlass.material.opacity = neville.glass * (SET_ASIDE ? 0.85 + 0.15 * Math.sin(t * 3.1) : 0.9);   /* a steady scarlet, its own light (GL-27) */
   var pat = 0;
   if (neville.patAt >= 0) {                     /* he pats every pocket: a fidget this way and that */
     var p = t - neville.patAt;
@@ -3929,7 +4035,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
     /* the leaning torch and his deathday (req 131, castle.js's torchCues; Events' req 132) */
     "a corridor torch's flame leans and dips blue for a moment, then burns gold again": function () { leanATorch(); },
-    "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { torchCtl.deathday(); },
+    /* the blue minute, CoS 8 staged as an effect, set aside (Rework 7); the black candle stub is its trace */
+    "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { if (SET_ASIDE) torchCtl.deathday(); },
     'nick drifts out of the wall a little beyond the torch that leaned and on along the corridor, out of sight': function () { nickAfterLean(false); },
     'nick drifts out of the wall a little beyond the torch that leaned, pauses to look at him, and drifts on along the corridor, out of sight': function () { nickAfterLean(true); },
     /* Nick lights him home (B22): the first night, then his light left on every night after (Events' record, nick_home) */
@@ -3945,7 +4052,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'it turns its back on him, annoyed, and stays so until he has been out': function () { armourJiggle = 0.6; },
     /* Neville locked out (req 297): his quill given back, and the night he pats his pockets */
     [NEV_CUE.quill]: function () { neville.clearAt = t; },
-    [NEV_CUE.pockets]: function () { neville.patAt = t; },
+    [NEV_CUE.pockets]: function () { if (SET_ASIDE) neville.patAt = t; },   /* PoA 12's lost list, set aside */
     'a puff of dust from the visor': note('a puff of dust from the visor'),
     'it salutes with its halberd, then stands as it was': note('a salute with its halberd'),
     'a moth flutters out of the visor and away down the corridor': note('a moth from the visor'),
@@ -3968,7 +4075,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* the moving stair (req 59) */
     "the view sinks down the flight over a few seconds to stand on the landing before the place at its foot; Back brings him up": function () { goDownStair(false); },
     "on the way down the week's vanishing step is not there: the view dips a step with a small oof and goes on down to the landing": function () { goDownStair(true); },
-    'three great knocks from outside shake the front doors': function () { doorsKnock = { t: 0 }; },
+    /* PS 6's knocks, the first-years' arrival re-sounded, set aside (Rework 9) */
+    'three great knocks from outside shake the front doors': function () { if (SET_ASIDE) doorsKnock = { t: 0 }; },
     /* the gallery (req 84): the hush is heard, the sitters drawn still already */
     "the gallery's whispering stops short as he comes down; the sitters sit very still, looking anywhere but at him": note("the gallery's sitters fall still"),
     /* req 86 */
@@ -3993,7 +4101,9 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the Fat Lady yawns behind her hand and settles her shawl': note('the Fat Lady yawns and settles her shawl'),
     /* the Marauder's Map's grant (req 188): the parchment and the note rise to his hand; the note is read after */
     "he takes the folded parchment and the twins' note from behind the witch, and they are his": function () { takeMap(); },
+    /* set aside: they never sleep in the castle (the world rules), so no climb to bed for lights out; ?setaside keeps it */
     'the Fat Lady swings open, he climbs in, and goes up to the dormitory for lights out (dormitory.html?from=corridor&bedtime)': function () {
+      if (!SET_ASIDE) return;
       if (!enter(false, 'dormitory.html?from=corridor&bedtime', 'dormitory')) kit.travel('dormitory.html?from=corridor&bedtime', { place: { room: 'dormitory' } });
     }
   }, mapPlay ? mapPlay.cues : {}),
@@ -4042,7 +4152,7 @@ function lookGallery(hit) {
   [paintingOpp, 'the painting opposite the hole'], [armour, 'the suit of armour'], [sticks, 'the walking sticks'],
   [boo, 'the walking sticks'], [tapestry, 'the corridor tapestry'], [door, 'the polite door'], [glimpse, 'the lost things'],
   [hearth, 'the inglenook'], [breast, 'the inglenook'], [scarf, 'the dropped scarf'], [settleScarf, 'the scarf on the settle'],
-  [trevor, 'trevor'], [landingWindow, 'the landing window'], [frontDoors, 'the front doors'], [stairGallery, lookGallery],
+  [trevor, 'trevor'], [candleStub, 'the black candle stub'], [landingWindow, 'the landing window'], [frontDoors, 'the front doors'], [stairGallery, lookGallery],
   [windows[1].sky, lookGrounds]].forEach(function (t) { kit.zoom.look(t[0], t[1]); });
 settles.forEach(function (m) { kit.zoom.look(m, 'the inglenook'); });
 windows.forEach(function (w) { kit.zoom.look(w.frame, 'the corridor windows'); kit.zoom.look(w.sill, 'the corridor windows'); });
@@ -4051,8 +4161,10 @@ kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
 /* The Omnioculars, once his pair is held (req 147; the frame's half in castle.js): the runtime says when the pair is his
    (`omni = held`, Events' omnioculars.json) and, once Events marks them (req 145, asked; req 157 for its call), which
    things are hidden; the breakdown's gold line shows each name in these words (plain ones, or the books' own). */
-kit.zoom.held(function () { return !!(castle && castle.state().vars.omni === 'held'); });
-kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hidden(name)); });
+/* SET ASIDE (the list's Set aside, 15 October 2026): GoF 7's Omnioculars do not exist in the boys' years, so the held
+   pair's slowed dial and shimmer show only with ?setaside; the plain zoom by looking stays */
+kit.zoom.held(function () { return SET_ASIDE && !!(castle && castle.state().vars.omni === 'held'); });
+kit.zoom.hidden(function (name) { return SET_ASIDE && !!(castle && castle.hidden && castle.hidden(name)); });
 kit.zoom.shown({ 'the fat lady': 'The Fat Lady', "the fat lady's cake": "The Fat Lady's cake", 'corridor portrait a': 'A portrait',
   'corridor portrait b': 'A portrait', 'the painting opposite the hole': 'The painting opposite', 'the suit of armour': 'A suit of armour',
   'the walking sticks': 'Walking sticks', 'the corridor tapestry': 'A tapestry', 'the polite door': 'The polite door',
