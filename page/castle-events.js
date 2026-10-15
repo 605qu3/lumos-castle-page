@@ -1591,11 +1591,20 @@
       moment('points grow');
     }
 
+    /* A room rule that names no place was written for the first three pages, which share their chains (the common
+       room, the corridor, the dormitory); on any other page it holds nowhere, so a new room shows only the rules that
+       name it (the Great Hall lane's note, 15 October 2026: the chess set and the fire showed in the hall). */
+    var FIRST_PAGES = ['common room', 'corridor', 'dormitory'];
+    function roomRuleHolds(rule) {
+      var w = rule.when || [];
+      if (FIRST_PAGES.indexOf(builtin('place')) < 0 && !w.some(function (k) { return /^place\s*(=|!=)/.test(k); })) return false;
+      return allHold(w);
+    }
     function shownCues() {
       var out = [];
       for (var c = 0; c < chains.length; c++) {
         var rules = chains[c].room || [];
-        for (var i = 0; i < rules.length; i++) if (allHold(rules[i].when)) out = out.concat(rules[i].show || []);
+        for (var i = 0; i < rules.length; i++) if (roomRuleHolds(rules[i])) out = out.concat(rules[i].show || []);
       }
       return out;
     }
@@ -2461,7 +2470,7 @@
         for (var c = 0; c < chains.length; c++) {
           var rules = chains[c].room || [];
           for (var i = 0; i < rules.length; i++) {
-            if ((rules[i].hidden || []).indexOf(name) >= 0 && allHold(rules[i].when)) return true;
+            if ((rules[i].hidden || []).indexOf(name) >= 0 && roomRuleHolds(rules[i])) return true;
           }
         }
         return false;
