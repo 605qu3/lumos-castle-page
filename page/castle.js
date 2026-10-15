@@ -1002,11 +1002,11 @@ window.castleFrame = function (opts) {
     var C = { HER_Z: -0.81, FAR_Z: -3.81, END_X: 2.3, STAIR_X: -11.4, CEIL: 4.5, BELOW: 4.6, T: 0.3,
       STEP_RISE: 0.18, STEP_RUN: 0.3, STEPS: 11, LANDING_D: 2.4,
       NOOK_X0: -6.4, NOOK_X1: -10.8, NOOK_H: 2.4,
-      /* the outer wall 0.45 m thick (the Placement check, 5.08 pm); each window's reveal splayed toward the corridor so
-         the glass shows from the stair head (Godric, Q22, 5.53 pm), splay[0] on the stair side, splay[1] on her side;
-         the window nearer the stairs, the grounds' (Q20), splayed deepest on its stair side, and the other its mirror about
-         the armour between them, deepest on her side (Godric, 12 October 2026, 3.28 pm: the two windows symmetrical) */
-      WINDOW: { w: 1.2, h: 2.4, sill: 0.9, deep: 0.45, xs: [-2.5, -4.6], splays: [[0.25, 1.0], [1.0, 0.25]] },
+      /* the outer wall 0.45 m thick (the Placement check, 5.08 pm); splay[0] on the stair side, splay[1] on her side.
+         Each window an arched embrasure centred on its light, the common room's 13 degree splay the same each side, the
+         head round and concentric with the glass's (Godric's Try 1 on architect-windows-1015, 15 October 2026, 5.46 pm;
+         the Architect's model v29, corridor-window-1 and -2; req 469): Q22's glimpse from the stair head given up */
+      WINDOW: { w: 1.2, h: 2.4, sill: 0.9, deep: 0.45, xs: [-2.5, -4.6], splays: [[0.11, 0.11], [0.11, 0.11]] },
       DOOR: { w: 1.0, h: 2.2, x: 0 },
       HOLE: { r: 0.6, y: 1.2, depth: 0.81 },
       PORTRAIT: { w: 1.4, h: 1.7 } };

@@ -189,7 +189,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=13"></script>
+<script src="castle.js?v=14"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=32"></script>
 <script src="castle-map.js?v=2"></script>
@@ -1363,8 +1363,8 @@ var boo = cutoutMesh(cutoutTexture(256, 96, '#6b5a48', function (g, w, h) {
 boo.rotation.x = -Math.PI / 2; boo.position.set(STICKS.x, 0.02, MID_Z); boo.name = 'sticks-boo'; boo.visible = false;
 scene.add(boo); register(boo, 1);
 /* one window per portrait, the same drawing twice; the sill at -4.6 is the Remembrall's, later. Each is set in a real
-   opening through the 0.45 m outer wall, its reveal splayed toward the corridor so the glass shows from the stair head
-   (the Placement check, 5.08 pm; Godric's Q22, 5.53 pm): the shared corridor's (castle.js) */
+   opening through the 0.45 m outer wall, its reveal splayed 13 degrees each side, an arched embrasure centred on its
+   light (Godric's Try 1 on architect-windows-1015, 15 October 2026, 5.46 pm): the shared corridor's (castle.js) */
 var GLASS_Z = C.GLASS_Z;
 var windows = shell.windows;
 windows.forEach(function (w) { w.sky.userData.base = w.sky.material.color.clone(); });
