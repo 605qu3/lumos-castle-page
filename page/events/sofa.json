@@ -550,7 +550,8 @@
       ],
       "show": [
         "the twins' note folded small in his pocket"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the twins' note goes with the handover (Rework 29)"
     },
     {
       "when": [
@@ -719,7 +720,8 @@
         "set sofa_sat = no",
         "set rummaged = yes",
         "log \"Found a note from the twins down the side of the sofa {day}\""
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the twins' Dissendium note goes with the handover (Rework 29)"
     },
     {
       "id": "sofa.fluff-again",
@@ -1368,7 +1370,8 @@
         "set holding = no",
         "set twins_note = held",
         "secret twins-note"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the twins' Dissendium note goes with the handover (Rework 29)"
     },
     {
       "id": "sofa.f-drooble-bubble",
@@ -1708,7 +1711,8 @@
             "Tap her hump and say Dissendium. You didn't get this from us. F. & G."
           ]
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the twins' Dissendium note goes with the handover (Rework 29)"
     },
     {
       "id": "sofa.f-canary-feather",
@@ -2390,7 +2394,8 @@
             "Master has given a sock."
           ],
           "sound": "a house-elf's whisper from behind the sofa, full of wonder",
-          "canon": "CoS 18, Dobby freed by Lucius Malfoy's sock, his words checked against the text, 13 October 2026; the Common room's req 273 (Godric's Q77 t1, 1.51 pm, with Magic's woven touch)"
+          "canon": "CoS 18, Dobby freed by Lucius Malfoy's sock, his words checked against the text, 13 October 2026; the Common room's req 273 (Godric's Q77 t1, 1.51 pm, with Magic's woven touch)",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Dobby's sock: a plain odd sock, no Dobby (Rework 22; the Common room's set-aside line)"
         },
         {
           "medium": "written",
@@ -2400,7 +2405,8 @@
           "text": [
             "Dobby would like this one, sir."
           ],
-          "canon": "ours (Lumos), after CoS 18; Dobby calls Harry sir (CoS 2, 10, 18), checked against the text, 13 October 2026; req 273"
+          "canon": "ours (Lumos), after CoS 18; Dobby calls Harry sir (CoS 2, 10, 18), checked against the text, 13 October 2026; req 273",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Dobby's sock: a plain odd sock, no Dobby (Rework 22; the Common room's set-aside line)"
         }
       ]
     },
@@ -2872,7 +2878,8 @@
         "set holding = no",
         "set twins_note = held",
         "secret twins-note"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the twins' Dissendium note goes with the handover (Rework 29)"
     },
     {
       "id": "sofa.left-lost-pawn",

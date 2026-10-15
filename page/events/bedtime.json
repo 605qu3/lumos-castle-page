@@ -1,5 +1,6 @@
 {
   "chain": "bedtime",
+  "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): no bedtime, lights out or dormitory of theirs (where they sleep)",
   "records": [
     {
       "id": "bedtime.warning",

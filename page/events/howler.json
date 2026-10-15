@@ -120,7 +120,8 @@
       "starts": [
         "stamp howler_opened",
         "log \"Opened a Howler meant for the Weasley twins at the desk {day}; Errol had the wrong desk\""
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Ron's Howler re-staged (the Howler ruling)"
     },
     {
       "id": "howler.goes-off-home",
@@ -207,7 +208,8 @@
       "starts": [
         "stamp howler_opened",
         "log \"A Howler for the Weasley twins went off by itself at the desk {day}; Errol had the wrong desk\""
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Ron's Howler re-staged (the Howler ruling)"
     }
   ]
 }

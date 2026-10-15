@@ -13,7 +13,8 @@
         "a tall pile of quiz papers on the teacher's desk, three sides each, ready for the first lesson",
         "the covered cage on the floor behind the desk, something inside jabbering shrilly"
       ],
-      "canon": "the Curator's req 353, item 23: Lockhart's quiz, CoS 6 L8527 to L8551 (handed out in the lesson, three sides of paper, collected half an hour later), so before the lesson a pile on his desk, not one on every desk; the cage behind his desk, L8563, its pixies jabbering like budgies arguing, L8583; his first lesson the first afternoon of term, after lunch (L8503), 09-02 in 1992; the year he reads the Chamber; checked against the text, 14 October 2026"
+      "canon": "the Curator's req 353, item 23: Lockhart's quiz, CoS 6 L8527 to L8551 (handed out in the lesson, three sides of paper, collected half an hour later), so before the lesson a pile on his desk, not one on every desk; the cage behind his desk, L8563, its pixies jabbering like budgies arguing, L8583; his first lesson the first afternoon of term, after lunch (L8503), 09-02 in 1992; the year he reads the Chamber; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the moment before the pixies staged (EV-15); the crumpled sheet returns by Rework 7"
     },
     {
       "when": [
@@ -40,7 +41,8 @@
       "show": [
         "the candles burned low and spitting, a heap of addressed envelopes and a pile still blank on the desk before the visitor's chair"
       ],
-      "canon": "the Curator's req 353, item 24: Harry's detention, the first Saturday of term from eight (CoS 7 L8918), addressing envelopes, the candles burning lower and lower, L8932; checked against the text, 14 October 2026"
+      "canon": "the Curator's req 353, item 24: Harry's detention, the first Saturday of term from eight (CoS 7 L8918), addressing envelopes, the candles burning lower and lower, L8932; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Harry's detention (EV-16)"
     },
     {
       "when": [
@@ -53,7 +55,8 @@
       "show": [
         "the office almost stripped: two large trunks open on the floor, robes folded into one, books jumbled into the other, the photographs off the walls and crammed into boxes on the desk"
       ],
-      "canon": "Interiors' schedule, the two trunks an event's state (docs/interiors/defence-classroom.md, the office); CoS 16 L12447, the evening Ginny is taken, the Chamber's night (05-29); checked against the text, 14 October 2026"
+      "canon": "Interiors' schedule, the two trunks an event's state (docs/interiors/defence-classroom.md, the office); CoS 16 L12447, the evening Ginny is taken, the Chamber's night (05-29); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Lockhart's packing, a plot moment (EV-20)"
     },
     {
       "when": [
@@ -65,7 +68,8 @@
       "show": [
         "the office almost stripped: two large trunks open on the floor, robes folded into one, books jumbled into the other, the photographs off the walls and crammed into boxes on the desk"
       ],
-      "canon": "as above: he went to St Mungo's, CoS 18, and never came back to finish packing (ours, from the book's own end; provisional, Godric to confirm)"
+      "canon": "as above: he went to St Mungo's, CoS 18, and never came back to finish packing (ours, from the book's own end; provisional, Godric to confirm)",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Lockhart's packing, a plot moment (EV-20)"
     },
     {
       "when": [
@@ -117,7 +121,8 @@
       "show": [
         "the Grindylow's tank standing empty beside a battered old suitcase, open and nearly full; the desk drawers pulled out; an old parchment open on the desk: the Marauder's Map"
       ],
-      "canon": "the Curator's req 353, item 26: Lupin's last day, PoA 22 L21946 to L21952 (resigned first thing that morning, L21932; the morning after the Shrieking Shack, 06-07 here, as the wing's chocolate); checked against the text, 14 October 2026"
+      "canon": "the Curator's req 353, item 26: Lupin's last day, PoA 22 L21946 to L21952 (resigned first thing that morning, L21932; the morning after the Shrieking Shack, 06-07 here, as the wing's chocolate); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Lupin's last day and the Map (EV-19)"
     },
     {
       "when": [
@@ -131,7 +136,8 @@
       "show": [
         "the office bare: the tank, the suitcase and the tea things gone, the drawers shut and empty"
       ],
-      "canon": "PoA 22 L21978: he closes the drawers and leaves that evening; from then on the office stands empty (ours, provisional, Godric to confirm)"
+      "canon": "PoA 22 L21978: he closes the drawers and leaves that evening; from then on the office stands empty (ours, provisional, Godric to confirm)",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Lupin's last day (EV-19)"
     },
     {
       "when": [
@@ -145,7 +151,8 @@
       "show": [
         "the office bare: the tank, the suitcase and the tea things gone, the drawers shut and empty"
       ],
-      "canon": "as above, from the next morning to the summer's end"
+      "canon": "as above, from the next morning to the summer's end",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Lupin's last day (EV-19)"
     }
   ],
   "records": [
@@ -174,7 +181,8 @@
             "31. Which of Gilderoy Lockhart's smiles is the most charming? Give reasons."
           ]
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the moment before staged (EV-15)"
     },
     {
       "id": "defence.cage-rattle",
@@ -192,7 +200,8 @@
       "show": [
         "the cover over the cage behind the desk jerks, and a shrill jabbering bursts out, like a lot of budgies arguing"
       ],
-      "canon": "CoS 6 L8583, the pixies' voices; the cage kept behind the desk, Interiors' schedule; ours that it rattles before the lesson (provisional, Godric to confirm); checked against the text, 14 October 2026"
+      "canon": "CoS 6 L8583, the pixies' voices; the cage kept behind the desk, Interiors' schedule; ours that it rattles before the lesson (provisional, Godric to confirm); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the moment before staged (EV-15)"
     },
     {
       "id": "defence.pixie-loose",
@@ -210,7 +219,8 @@
       "show": [
         "an electric-blue pixie dances along a shelf just out of reach, sticks its tongue out at him and zips out through the broken window"
       ],
-      "canon": "CoS 6 L8583 (electric blue, about eight inches high) and L8601 (a pixie \"dancing out of reach with its tongue out\"); one still loose after the lesson is ours (provisional, Godric to confirm); checked against the text, 14 October 2026"
+      "canon": "CoS 6 L8583 (electric blue, about eight inches high) and L8601 (a pixie \"dancing out of reach with its tongue out\"); one still loose after the lesson is ours (provisional, Godric to confirm); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a replay (EV-14)"
     },
     {
       "id": "defence.envelope-tap",
@@ -238,7 +248,8 @@
             "Veronica Smethley"
           ]
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Harry's detention (EV-16)"
     },
     {
       "id": "defence.rollers",

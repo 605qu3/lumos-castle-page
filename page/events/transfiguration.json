@@ -15,7 +15,8 @@
       "show": [
         "a match laid on every desk, waiting to be turned into a needle"
       ],
-      "canon": "Interiors' req 369: PS 8 L2740, her first class, \"each given a match\"; the first week of lessons, Monday to Thursday (Friday is Potions, L2746), in the year he reads the Stone; checked against the text, 14 October 2026"
+      "canon": "Interiors' req 369: PS 8 L2740, her first class, \"each given a match\"; the first week of lessons, Monday to Thursday (Friday is Potions, L2746), in the year he reads the Stone; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson's set-up (lessons ruling)"
     },
     {
       "when": [
@@ -59,7 +60,8 @@
       "show": [
         "a beetle on every desk, each to be turned into a button"
       ],
-      "canon": "Interiors' req 369: CoS 6 L8441, the first morning's Transfiguration, a beetle into a button (09-02, before Lockhart's afternoon); checked against the text, 14 October 2026"
+      "canon": "Interiors' req 369: CoS 6 L8441, the first morning's Transfiguration, a beetle into a button (09-02, before Lockhart's afternoon); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson's set-up (lessons ruling)"
     },
     {
       "when": [
@@ -71,7 +73,8 @@
       "show": [
         "a pair of white rabbits on every desk, to be turned into slippers"
       ],
-      "canon": "Interiors' req 369: CoS 16 L12159 to L12171, their first lesson of the day she tells them the exams start on the first of June, \"one week from today\", so 05-25; checked against the text, 14 October 2026"
+      "canon": "Interiors' req 369: CoS 16 L12159 to L12171, their first lesson of the day she tells them the exams start on the first of June, \"one week from today\", so 05-25; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson's set-up (lessons ruling)"
     },
     {
       "when": [
@@ -100,7 +103,8 @@
       "show": [
         "a teapot on every desk for the exam"
       ],
-      "canon": "Interiors' req 369: PoA 16 L19666, exam week's Monday, Transfiguration in the morning, a teapot into a tortoise; the Monday of the week ending with the Shrieking Shack's night (06-06, as the wing's chocolate); checked against the text, 14 October 2026"
+      "canon": "Interiors' req 369: PoA 16 L19666, exam week's Monday, Transfiguration in the morning, a teapot into a tortoise; the Monday of the week ending with the Shrieking Shack's night (06-06, as the wing's chocolate); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon exam's set-up (lessons ruling)"
     },
     {
       "when": [
@@ -140,7 +144,8 @@
       "starts": [
         "set mcgonagall_pig = done"
       ],
-      "canon": "Interiors' req 369, the clear floor kept 1.0 either side: PS 8 L2740, \"she changed her desk into a pig and back again\", at their first class; once ever, his first visit in the first week of lessons in the year he reads the Stone; checked against the text, 14 October 2026"
+      "canon": "Interiors' req 369, the clear floor kept 1.0 either side: PS 8 L2740, \"she changed her desk into a pig and back again\", at their first class; once ever, his first visit in the first week of lessons in the year he reads the Stone; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson replayed (EV-27)"
     },
     {
       "id": "transfiguration.cat",
@@ -164,7 +169,8 @@
       "starts": [
         "set mcgonagall_pop = done"
       ],
-      "canon": "Interiors' req 369: PoA 6 L15398 to L15400, the first lesson of the year, \"turning back into herself with a faint pop\" and no applause; the markings the shape of her square glasses, PS 1 L95; once ever, his first visit in the first week in the year he reads Prisoner of Azkaban; checked against the text, 14 October 2026"
+      "canon": "Interiors' req 369: PoA 6 L15398 to L15400, the first lesson of the year, \"turning back into herself with a faint pop\" and no applause; the markings the shape of her square glasses, PS 1 L95; once ever, his first visit in the first week in the year he reads Prisoner of Azkaban; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson replayed (EV-27)"
     },
     {
       "id": "transfiguration.desk-leg",
@@ -182,7 +188,8 @@
       "show": [
         "a loud bang from the back row on the aisle's left: one leg of the desk there vanishes and the desk lurches; a wave of a wand from the front, and the leg is back"
       ],
-      "canon": "Interiors' req 369, Neville's desk the back row's on the aisle's left: CoS 16 L12163, his wand slips, vanishing a leg of his desk, and she restores it; that lesson, 05-25; checked against the text, 14 October 2026"
+      "canon": "Interiors' req 369, Neville's desk the back row's on the aisle's left: CoS 16 L12163, his wand slips, vanishing a leg of his desk, and she restores it; that lesson, 05-25; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson replayed (EV-27)"
     }
   ]
 }

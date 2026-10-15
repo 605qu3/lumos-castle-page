@@ -33,7 +33,8 @@
       "show": [
         "a feather on every pair's desk: Harry and Seamus's lying flat on the desktop, singed black at one end, and Hermione and Ron's hovering about four feet above their desk"
       ],
-      "canon": "the Curator's req 366, item 5: the Halloween lesson, PS 10 L3506 to L3520, Seamus's feather set on fire and put out with Harry's hat, Hermione's hovering about four feet up; checked against the text, 14 October 2026"
+      "canon": "the Curator's req 366, item 5: the Halloween lesson, PS 10 L3506 to L3520, Seamus's feather set on fire and put out with Harry's hat, Hermione's hovering about four feet up; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): PS 10's lesson staged (A3-36)"
     },
     {
       "when": [
@@ -147,7 +148,8 @@
       "starts": [
         "set flitwick_roll = done"
       ],
-      "canon": "the orchestrator's t1 on interiors-charms-desks-1014 (provisional, Godric to confirm): PS 8 L2734, at the start of their first class; once ever, his first visit in the first week of lessons in the year he reads the Stone; checked against the text, 14 October 2026"
+      "canon": "the orchestrator's t1 on interiors-charms-desks-1014 (provisional, Godric to confirm): PS 8 L2734, at the start of their first class; once ever, his first visit in the first week of lessons in the year he reads the Stone; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): PS 8 re-enacted (EV-24)"
     }
   ]
 }

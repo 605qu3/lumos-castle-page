@@ -15,7 +15,8 @@
       "show": [
         "on the right desk of the third row, a cauldron melted into a twisted blob, and a scorched trail across the stone floor where the potion seeped"
       ],
-      "canon": "the Curator's req 377, item 12: PS 8 L2822 to L2824, Neville's first lesson, Seamus's cauldron melted \"into a twisted blob\", the potion burning holes in people's shoes; Neville and Seamus at the third row's right desk, Interiors' schedule; the first Friday of lessons (L2746), after he has seen it happen; checked against the text, 14 October 2026"
+      "canon": "the Curator's req 377, item 12: PS 8 L2822 to L2824, Neville's first lesson, Seamus's cauldron melted \"into a twisted blob\", the potion burning holes in people's shoes; Neville and Seamus at the third row's right desk, Interiors' schedule; the first Friday of lessons (L2746), after he has seen it happen; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Neville's cauldron staged (EV-29)"
     },
     {
       "when": [
@@ -29,7 +30,8 @@
       "show": [
         "on the right desk of the third row, a cauldron melted into a twisted blob, and a scorched trail across the stone floor where the potion seeped"
       ],
-      "canon": "as above, that afternoon, seen or not"
+      "canon": "as above, that afternoon, seen or not",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Neville's cauldron staged (EV-29)"
     },
     {
       "when": [
@@ -44,7 +46,8 @@
       "show": [
         "Swelling Solution splashed over the desks and dripping down the walls round one burst cauldron"
       ],
-      "canon": "the Curator's req 377, item 13: CoS 11 L10260 to L10272, Thursday afternoon's double Potions in the second week of December (L10250, L10254), Goyle's cauldron exploded by Fred's Filibuster firework, the whole class showered; after he has seen it, that afternoon and evening; checked against the text, 14 October 2026"
+      "canon": "the Curator's req 377, item 13: CoS 11 L10260 to L10272, Thursday afternoon's double Potions in the second week of December (L10250, L10254), Goyle's cauldron exploded by Fred's Filibuster firework, the whole class showered; after he has seen it, that afternoon and evening; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the Filibuster lesson staged (EV-29)"
     },
     {
       "when": [
@@ -59,7 +62,8 @@
       "show": [
         "Swelling Solution splashed over the desks and dripping down the walls round one burst cauldron"
       ],
-      "canon": "as above, that evening and night (dusk falls before five in December), seen or not"
+      "canon": "as above, that evening and night (dusk falls before five in December), seen or not",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the Filibuster lesson staged (EV-29)"
     },
     {
       "when": [
@@ -73,7 +77,8 @@
       "show": [
         "two cauldrons side by side on the left desk of the third row, a heap of daisy roots cut all sizes beside one, a skinned Shrivelfig beside the other"
       ],
-      "canon": "the Curator's req 377, item 14: PoA 7 L15695 to L15711 and on to L15807, the Shrinking Solution, Malfoy's cauldron set up beside Harry and Ron's, Ron cutting his roots, the Shrivelfig skinned; Thursday morning's double Potions the day of Lupin's first lesson (the staff room's wardrobe ends that Thursday, about 09-09, staff.json); checked against the text, 14 October 2026"
+      "canon": "the Curator's req 377, item 14: PoA 7 L15695 to L15711 and on to L15807, the Shrinking Solution, Malfoy's cauldron set up beside Harry and Ron's, Ron cutting his roots, the Shrivelfig skinned; Thursday morning's double Potions the day of Lupin's first lesson (the staff room's wardrobe ends that Thursday, about 09-09, staff.json); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Harry's desk staged (EV-31)"
     },
     {
       "when": [
@@ -299,7 +304,8 @@
       "starts": [
         "set neville_cauldron = done"
       ],
-      "canon": "PS 8 L2822, read; once ever, his first visit that Friday morning in the year he reads the Stone; checked against the text, 14 October 2026"
+      "canon": "PS 8 L2822, read; once ever, his first visit that Friday morning in the year he reads the Stone; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon scene staged (EV-29)"
     },
     {
       "id": "potions.filibuster",
@@ -322,7 +328,8 @@
       "starts": [
         "set potions_burst = done"
       ],
-      "canon": "CoS 11 L10264 to L10266, read; once ever, his first visit that Thursday afternoon in the year he reads the Chamber; checked against the text, 14 October 2026"
+      "canon": "CoS 11 L10264 to L10266, read; once ever, his first visit that Thursday afternoon in the year he reads the Chamber; checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon scene staged (EV-29)"
     }
   ]
 }

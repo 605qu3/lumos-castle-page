@@ -174,6 +174,7 @@
   var SATCHEL = 'lumos.player.';            /* a boy's satchel while his brother plays: every lumos. key of his (one castle) */
   var ASK_S = 60;                           /* a new visit this long after a name was tapped asks again who is playing */
   var PACE_MIN = 15;                        /* his brother this long in one room: his dot paces there (map-brother t1) */
+  var BROTHER_DOT_ASIDE = true;             /* the brother's dot is set aside (docs/ministry/set-aside.md) */
   /* A house as a grown-up may write it, read to the beast the hourglass draws (Design's house-hourglass.js; req 227) */
   var HOUSES = { lion: 'lion', gryffindor: 'lion', snake: 'snake', slytherin: 'snake',
                  badger: 'badger', hufflepuff: 'badger', eagle: 'eagle', ravenclaw: 'eagle' };
@@ -594,7 +595,8 @@
       var out = [{ who: 'me', label: (mine && mine.name) || settings.name || null, place: value('map here'), move: 'walk', me: true }];
       /* his brother's dot where he last stood (Godric's events-map-brother-1013, 1), his name from this iPad; pacing
          when he stayed long in one room, as Dumbledore paces his study (t1, PoA 10) */
-      (owl.players || []).forEach(function (pl) {
+      /* set aside (changes/events.md, the brother's dot ruled out; docs/ministry/set-aside.md), kept until Godric's yes */
+      if (!BROTHER_DOT_ASIDE) (owl.players || []).forEach(function (pl) {
         var w = (owl.where || {})[pl.id];
         if (pl.id === owl.playing || !mine || !w || !ROOM.test(w.room || '')) return;
         out.push({ who: 'brother', label: pl.name, place: w.room, brother: true, at: w.at,
@@ -2032,6 +2034,21 @@
     /* `chains: 'all'` reads every chain from events/index.json, which `py events.py` keeps level with the folder:
        a visit's leave runs only over the chains its page has loaded, so every page loads every chain, and the
        records' `place` keeps each to its own page. */
+    /* Set aside (the Ministry's sweep; Fawkes, 15 October 2026, 1.27 pm, provisional, Godric to confirm): a part
+       of a chain marked `aside` (a record, a room rule, a bag's thing, a card, a dot, a line, or the whole chain) is
+       out of play, every word kept in its file until Godric says yes to its line in docs/ministry/set-aside.md.
+       It is taken out here, once, as the chain is read, so nothing else in the runtime ever sees it. */
+    function unAside(x) {
+      if (Array.isArray(x)) {
+        return x.filter(function (v) { return !(v && typeof v === 'object' && 'aside' in v); }).map(unAside);
+      }
+      if (x && typeof x === 'object') {
+        var out = {};
+        for (var k in x) if (!(x[k] && typeof x[k] === 'object' && !Array.isArray(x[k]) && 'aside' in x[k])) out[k] = unAside(x[k]);
+        return out;
+      }
+      return x;
+    }
     var names = [];
     function readJson(path) {
       return fetch(path, { cache: 'no-cache' })
@@ -2047,6 +2064,8 @@
     }).then(function (files) {
       for (var f = 0; f < files.length; f++) {
         if (!files[f]) continue;
+        if ('aside' in files[f]) { note(files[f].chain + ' is set aside'); continue; }
+        files[f] = unAside(files[f]);
         chains.push(files[f]);
         var tg = files[f].targets || {};
         for (var t in tg) targets[t] = tg[t];

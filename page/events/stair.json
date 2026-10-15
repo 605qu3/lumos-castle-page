@@ -612,7 +612,8 @@
       ],
       "starts": [
         "set knocked = yes"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): PS 7's arrival, Hagrid's three knocks (A3-07)"
     },
     {
       "id": "stair.gallery-hush",
@@ -699,7 +700,8 @@
       ],
       "starts": [
         "set knocked = no"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the leave of Hagrid's three knocks (A3-07)"
     },
     {
       "id": "stair.gallery-spoon",
