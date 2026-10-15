@@ -1410,6 +1410,86 @@ var grounds = { overlay: null, canvas: null, tex: null, img: null, crossing: nul
   };
   im.src = '../assets/layers/corridor-grounds-view.png';
 })();
+/* the grounds through window 2, the one toward her end (Godric's Try 2 on corridor-window2-pick-1015, 15 October 2026,
+   6.17 pm; corridor-grounds-view-2 round 1, the grounds-view exemplar attached first): window 1's view carried on to the
+   right, the same forest edge thinning to a far glimpse of the lake, plain lawns, no hut. Stood on its sill as window 1's
+   is, 1.2 by 2.64 m, its round head rising into the wall. Matched to window 1 (Object persistence, measured against it):
+   the two drawings' skies agree, but its lawn came 6 to 8 levels brighter, so its grass is drawn at 0.935; and window 1's
+   veils lie over it as they lie over window 1 (mirrorWindow2: the day's weather, the dusk and the night, frost and snow).
+   Until its own frost and snow drawings (an edit each, on Godric's yes), frost and snow lay a pale wash over its grass,
+   drawn here. The moon and the stars keep to its drawn sky, above the hills at about 2.6 m */
+var GROUNDS2 = { win: windows[0], img: null, veil: null, night: null, frost: null, snow: null,
+  grass: 0.935, skyline: 0.355 };
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var W = im.width, H = im.height, cv = makeCanvas(W, H), g = cv.getContext('2d');
+    g.drawImage(im, 0, 0);
+    var d = g.getImageData(0, 0, W, H), px = d.data;
+    for (var i = 0; i < px.length; i += 4) {
+      var r = px[i], gr = px[i + 1], b = px[i + 2];
+      if (gr > r && gr > b && 0.3 * r + 0.59 * gr + 0.11 * b < 200) { px[i] = r * GROUNDS2.grass; px[i + 1] = gr * GROUNDS2.grass; px[i + 2] = b * GROUNDS2.grass; }
+    }
+    g.putImageData(d, 0, 0);
+    var sky = GROUNDS2.win.sky, sill = sky.position.y - sky.geometry.parameters.height / 2;
+    sky.geometry.dispose(); sky.geometry = new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h);
+    sky.position.y = sill + GROUNDS.h / 2;
+    sky.material.map = tex(cv); sky.material.color.set(0xffffff); sky.userData.base = sky.material.color.clone(); sky.material.needsUpdate = true;
+    function over(name, z, order, map, color) {
+      var m = new THREE.Mesh(new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h), new THREE.MeshBasicMaterial({ map: map || null, color: color === undefined ? 0xffffff : color, transparent: true, opacity: 0, depthWrite: false }));
+      m.position.z = z; m.name = name; m.renderOrder = order; m.visible = false; sky.add(m); return m;
+    }
+    /* frost and snow, drawn here till their drawings come: the grass lifted toward a pale blue-white, the ink kept */
+    function wintry(lift) {
+      var c2 = makeCanvas(W, H), g2 = c2.getContext('2d'); g2.drawImage(cv, 0, 0);
+      var d2 = g2.getImageData(0, 0, W, H), q = d2.data;
+      for (var j = 0; j < q.length; j += 4) {
+        var y = (j / 4 / W) | 0, rr = q[j], gg = q[j + 1], bb = q[j + 2], lum = 0.3 * rr + 0.59 * gg + 0.11 * bb;
+        var ground = y > H * GROUNDS2.skyline && gg >= rr && gg >= bb - 6 && lum > 55;
+        q[j + 3] = ground ? Math.round(255 * lift * Math.min(1, (lum - 55) / 60)) : 0;
+        q[j] = 236; q[j + 1] = 241; q[j + 2] = 246;
+      }
+      g2.putImageData(d2, 0, 0);
+      return tex(c2);
+    }
+    GROUNDS2.frost = over('grounds-2-frost', 0.001, 3, wintry(0.55));
+    GROUNDS2.snow = over('grounds-2-snow', 0.0015, 3.5, wintry(0.92));
+    GROUNDS2.veil = over('grounds-2-veil', 0.003, 5);
+    GROUNDS2.night = over('grounds-2-night', 0.004, 5.5, null, 0x0b1322);
+    GROUNDS2.img = im;
+    /* the stars and the moon in its sky only */
+    if (NIGHT.stars) fitNightSky2();
+    SKY.key = null; NIGHT.key = null; FROST.level = -1;
+  };
+  im.src = '../assets/layers/corridor-grounds-view-2.png';
+})();
+function skyBand2() {   /* the drawn sky's band on window 2's glass, in metres up from the flags */
+  var fr = GROUNDS2.win.frame, top = fr.position.y + fr.geometry.parameters.height / 2;
+  var sill = GROUNDS2.win.sky.position.y - GROUNDS.h / 2;
+  return { lo: sill + (1 - GROUNDS2.skyline) * GROUNDS.h, hi: top };
+}
+function fitNightSky2() {
+  var b = skyBand2(), st = NIGHT.stars, w = st.geometry.parameters.width;
+  st.geometry.dispose(); st.geometry = new THREE.PlaneGeometry(w, b.hi - b.lo);
+  st.position.y = (b.lo + b.hi) / 2;
+}
+/* window 1's veils, copied onto window 2 each frame they change */
+function mirrorWindow2() {
+  if (!GROUNDS2.img) return;
+  function copy(from, to, mapToo) {
+    var on = !!(from && from.visible);
+    to.visible = on;
+    if (!on) return;
+    to.material.opacity = from.material.opacity;
+    if (mapToo && to.material.map !== from.material.map) { to.material.map = from.material.map; to.material.needsUpdate = true; }
+  }
+  copy(SKY.veil, GROUNDS2.veil, true);
+  copy(NIGHT.view && NIGHT.view.veil, GROUNDS2.night, false);
+  copy(FROST.grounds, GROUNDS2.frost, false);
+  GROUNDS2.snow.visible = !!(SNOW.grounds && SNOW.grounds.visible);
+  if (GROUNDS2.snow.visible) GROUNDS2.snow.material.opacity = 1;
+  if (GROUNDS2.frost.visible && GROUNDS2.snow.visible) GROUNDS2.frost.visible = false;
+}
 /* the day: ?date=2026-10-31 sets it for a look; a number from the date and a salt, the same all day */
 var groundsQ = new URLSearchParams(location.search);
 function groundsDate() { var d = groundsQ.get('date'); return d ? new Date(d + 'T12:00:00') : new Date(); }
@@ -1762,8 +1842,8 @@ function updateSky(dt) {
   var kN = nightK(), key = sky + ':' + stage + ':' + !!grounds.img + ':' + kN + ':' + snowShowing();
   if (key === SKY.key) return;
   SKY.key = key;
-  windows[0].sky.material.color.copy(col(SKY.plain[w ? w.sky : 'clear'] || SKY.plain.clear))
-    .lerp(col(kN >= 0.5 ? 0x141b2b : 0x7a8298), kN >= 0.5 ? 0.92 : kN ? 0.5 : 0);
+  if (!GROUNDS2.img) windows[0].sky.material.color.copy(col(SKY.plain[w ? w.sky : 'clear'] || SKY.plain.clear))
+    .lerp(col(kN >= 0.5 ? 0x141b2b : 0x7a8298), kN >= 0.5 ? 0.92 : kN ? 0.5 : 0);   /* the plain pane's colour, till its view loads */
   SKY.rain.forEach(function (m) { m.material.color.setScalar(1 - 0.6 * kN); });
   windows[0].sky.userData.base = windows[0].sky.material.color.clone();
   if (!grounds.img) return;
@@ -1862,6 +1942,7 @@ function updateGrounds(dt) {
   updateFrost();
   updateSky(dt);
   updateNight(dt);
+  mirrorWindow2();
   updateNorris(dt);
   updateNorrisDoor(dt);
   if (!grounds.canvas) return;
@@ -3147,6 +3228,7 @@ function makeMoon() {
     new THREE.MeshBasicMaterial({ map: tex(sc), transparent: true, depthWrite: false, fog: false }));
   NIGHT.stars.position.set(fp.x, fp.y, GLASS_Z + 0.006); NIGHT.stars.name = 'window-2-stars'; NIGHT.stars.visible = false; NIGHT.stars.renderOrder = 3;
   scene.add(NIGHT.stars);
+  if (GROUNDS2.img) fitNightSky2();
 }
 function drawMoonDisc(m) {   /* as the dormitory draws it (page/dormitory.html, drawMoon) */
   var g = NIGHT.moonCanvas.getContext('2d'), r = 60, c = 64;
@@ -3193,6 +3275,7 @@ function updateNight(dt) {
     drawMoonDisc(m);
     var fp = windows[0].frame.position, H = windows[0].frame.geometry.parameters.height;
     NIGHT.moon.position.y = fp.y - H / 2 + 0.5 + (H - 0.95) * Math.min(1, m.height / 0.6);   /* 0.6 of the way overhead fills the glass */
+    if (GROUNDS2.img) { var sb = skyBand2(); NIGHT.moon.position.y = sb.lo + 0.12 + (sb.hi - 0.18 - sb.lo - 0.12) * Math.min(1, m.height / 0.6); }   /* in its drawn sky, above the hills */
     NIGHT.moon.material.opacity = clear ? 1 : 0.5;
   }
 }
