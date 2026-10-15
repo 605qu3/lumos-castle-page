@@ -4448,6 +4448,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* the full moon's owl (req 101, 104): no until the owl's flight cell is drawn (req 102), as the common room answers,
        so the record never sets owl_landed for the night with nothing shown (Fawkes, Q28, 11 October 2026) */
     'moon in view': function () { return 'no'; },
+    /* Mrs Norris sat before the broom cupboard (Events' ask on req 454, 5.16 pm: Filch's cupboard mutter) */
+    norris: function () { return norrisSits() ? 'cupboard' : 'none'; },
     spell: function () { return castSpell; } }
 }) : null;
 
