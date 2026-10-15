@@ -683,7 +683,7 @@ var hearth = onWallZ(cutoutTexture(150, 125, '#6a5a4c', drawRect, 'hearth'), HEA
 var hearthLight = new THREE.PointLight(col(0xffa868), 1.3, 6, 1.4);
 hearthLight.position.set(NOOK_MID, 0.8, NOOK_BACK - 1.0);
 scene.add(hearthLight);
-/* the nook's fire (the Stone's year walk, 15 October 2026, finding 2, provisional, Godric to confirm): the warm light
+/* the nook's fire (the Stone's year walk, 15 October 2026, finding 2; Godric kept it, 5.05 pm, corridor-stone-walk-1015): the warm light
    came from an empty hearth, a light with no source (the world rules: light only where it is the thing's own). Now a
    fire burns there by evening and night from October to March and the light is its own; by day, and through the
    warmer months, the hearth is cold and gives none. The flames are the common room's own (common-room.html, flames
@@ -1055,7 +1055,7 @@ bayRoom.name = 'bay'; bayRoom.visible = false; scene.add(bayRoom);
   box(G, BAY.railT, BAY.rail, WIDTH, x1 + BAY.railT / 2, y0 + BAY.rail / 2, MID_Z, stoneMat, 0);     /* the balustrade over the well */
   var far = x1 - BAY.across;                                                                           /* the hall's far side, across the well */
   /* lit stone, never a black hole (the Keep: the dark is never deep; the Stone's year walk, 15 October 2026, finding 1,
-     provisional, Godric to confirm): the hall's far side a shade darker than the corridor's stone, two torches on it
+     Godric kept it, 5.05 pm, corridor-stone-walk-1015): the hall's far side a shade darker than the corridor's stone, two torches on it
      burning as the corridor's own do, a stand-in until the bay is drawn (the light Design's to review, by row) */
   box(G, 0.1, hgt + 60, WIDTH + 16, far, ym, MID_Z, solid(0x5c5852), 0);                             /* down the well and up past the bay's ceiling, the hall being tall */
   box(G, 0.12, 0.35, WIDTH + 16, far + 0.1, y0 + 0.4, MID_Z, solid(0x47423b), 0);                     /* a gallery's edge over there, faint */
