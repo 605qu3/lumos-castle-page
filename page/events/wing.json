@@ -6,18 +6,6 @@
       "when": [
         "place = hospital wing",
         "reading = 1",
-        "date >= 06-05",
-        "date <= 06-30"
-      ],
-      "show": [
-        "a toilet seat propped against the wall beside Madam Pomfrey's office door, confiscated"
-      ],
-      "canon": "the Curator's req 347, the wing's item 9: the twins tried to send Harry a toilet seat and Madam Pomfrey confiscated it, PS 17 L6293; from the night of the Stone (the exams' last day, about 06-05 here) to the term's end, in the year he reads the Stone; checked against the text, 14 October 2026"
-    },
-    {
-      "when": [
-        "place = hospital wing",
-        "reading = 1",
         "date >= 06-08",
         "date <= 06-30"
       ],
@@ -26,35 +14,6 @@
       ],
       "canon": "Interiors' req 349, the Curator's 3: the sweets from his friends and admirers when he wakes three days after the Stone, Dumbledore trying a bean, PS 17 L6385; to the term's end; checked against the text, 14 October 2026",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a shrine to Harry's stays (BD-10)"
-    },
-    {
-      "when": [
-        "place = hospital wing",
-        "reading = 2",
-        "weekday = saturday",
-        "date >= 11-01",
-        "date <= 11-07",
-        "time != morning",
-        "time != day"
-      ],
-      "show": [
-        "a large bottle labelled Skele-Gro and a beaker on Harry's bedside table"
-      ],
-      "canon": "Interiors' req 349, the Curator's 5: the night after the first match, his arm's bones regrown, CoS 10 L10059 to L10063; the first Saturday of November, as the Stone's first match, the books giving no day; checked against the text, 14 October 2026"
-    },
-    {
-      "when": [
-        "place = hospital wing",
-        "reading = 2",
-        "weekday = sunday",
-        "date >= 11-02",
-        "date <= 11-08",
-        "time = morning"
-      ],
-      "show": [
-        "a large bottle labelled Skele-Gro and a beaker on Harry's bedside table, and no water jug beside them, a few pieces of it swept under the bed"
-      ],
-      "canon": "as above, the Sunday morning; the jug is gone because Dobby cracked it over his own head in the night, CoS 10 L10117; checked against the text, 14 October 2026"
     },
     {
       "when": [
@@ -140,7 +99,103 @@
       ],
       "canon": "as above, the morning of 06-07",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Harry's PoA 21 chocolate by his bed"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "castle date >= 1 06-06"
+      ],
+      "show": [
+        "a toilet seat propped against the wall beside Madam Pomfrey's office door, confiscated"
+      ],
+      "canon": "the change list's Rework 14 under the 15 October rulings (traces keep their dates), with Interiors' schedule, docs/interiors/hospital-wing.md (the toilet seat, a trace from the PS castle on, its calendar day Events'): PS 17 L6293, the twins tried to send a toilet seat and Madam Pomfrey confiscated it, in the three days he lay there (L6297) after the night of the Stone (about 5 June, the set-aside rule's reckoning); so from 6 June of the Stone's castle and in every later year, by her office's door; no bed named; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "castle date >= 3 11-08"
+      ],
+      "show": [
+        "one splinter of broom twig on the floor under a bed"
+      ],
+      "canon": "the change list's Rework 14: PoA 9 L16979, a broom smashed in the first match of the season, a Saturday early in November (the set-aside rule's reckoning, 1 to 7 November), its pieces brought to the wing; from 8 November of the Azkaban castle, after the latest that Saturday can fall, and in every later year; under no bed named; its bed Interiors' to set (asked by row); checked against the text, 15 October 2026"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "wing.sweets",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "a heap of sweets on the right row's third bedside table, a tin and a box among the wrappers, the jug pushed to the back"
+      ],
+      "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; PS 17 L6291 to L6293, CoS 10 L10069; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "wing.skele-gro",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "a large bottle labelled Skele-Gro and a beaker on the left row's second bedside table"
+      ],
+      "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; CoS 10 L10059, CoS 13 L11224; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "wing.books",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "a stack of four books beside the jug on the right row's fifth bedside table"
+      ],
+      "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; CoS 13 L11052; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "wing.card",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "a get-well card half under a bowl of fruit on the left row's fourth bedside table, muffled"
+      ],
+      "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; PoA 10 L17000, the kind of thing, no name on it; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "wing.chair",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "a visitor's chair drawn up close to the right row's third bed and turned toward its head, as a visitor left it"
+      ],
+      "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; PS 17 L6449; checked against the text, 15 October 2026"
+    }
+  ]
 }
