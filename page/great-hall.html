@@ -204,7 +204,14 @@ var S = {
   trees: { xs: [26, 32, 38, 44, 50, 56], ys: [69.0, 52.0], tub: 0.8, from: 1.6, spread: 2.4, h: 7.0 },
   lanterns: { x: 63.0, d: 2.0 },
   festoon: { hi: 4.4, lo: 3.6 },
-  banner: { foot: 6.5, top: 14.5, w: 6.0 }
+  banner: { foot: 6.5, top: 14.5, w: 6.0 },
+  /* the winner's hangings on the piers between the windows, six a side (Godric's 1 on greathall-hangings-1015, 6.08 pm;
+     the piers the Architect's v27, between windows on a 6 m bay from x 23 to 59); Interiors writes them into item 5 */
+  hangings: { xs: [26, 32, 38, 44, 50, 56], ys: [69.45, 51.55], w: 2.4, foot: 6.5, top: 13.0 },
+  /* the Duelling Club's evening (Godric's 1 on interiors-duelling-1015, 6.10 pm; Interiors' *The Duelling Club's evening*):
+     the tables gone, no stage, the teacher at the front, pairs in seven rows, the brothers' two dummies and their marks */
+  club: { teacher: [21.0, 60.5], rows: [30, 34, 38, 42, 46, 50, 54], pairs: [[53.5, 57.5], [63.5, 67.5]],
+          dummies: [[25.0, 62.5], [27.0, 62.5]], boys: [[25.0, 58.5], [27.0, 58.5]], dummyH: 1.4 }
 };
 var HOUSE = { gryffindor: 0x8a4a40, ravenclaw: 0x46566e, hufflepuff: 0x8a7a44, slytherin: 0x46684e };
 
@@ -250,6 +257,9 @@ S.tables.forEach(function (t) {
   });
 });
 
+/* the tables and benches, gone on a Duelling Club evening (CoS 11 L10298: "The long dining tables had vanished") */
+var furniture = room.children.filter(function (m) { return /^(table|bench)/.test(m.name); });
+
 /* ================= the candles (Interiors' field, The look up; what they do is Magic's: req 311) */
 var rnd = (function (seed) { return function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }; })(1013);
 function U(a, b) { return a + (b - a) * rnd(); }
@@ -267,10 +277,11 @@ function scatter(x0, x1, y0, y1, rho, z0, z1) {
   var n = Math.round((x1 - x0) * (y1 - y0) * rho);
   for (var i = 0; i < n; i++) C.push([U(x0, x1), U(y0, y1), U(z0, z1)]);
 }
-/* Which field: ?field=a is Interiors' field as it stands (*The look up*); b and c are this lane's proofs of Godric's note
-   of 5.44 pm, 15 October 2026 ("many more candles scattered across the ceiling", PS 7 "thousands and thousands"), for
-   his eye, numbers to Interiors once he picks (req 482). Every field begins 3.5 m inside the mouth (trick 2). */
-var FIELD = (Q.get('field') || 'a').toLowerCase();
+/* Which field: b is Godric's pick (greathall-candles-1015, 1, 6.07 pm, 15 October 2026: the bands three times as thick,
+   the aisles scattered, a thinner lane of sky up the middle), the default; Interiors to confirm the count (req 482).
+   ?field=a is Interiors' field as it stood (*The look up*), c the even span he passed over; both kept for comparison.
+   Every field begins 3.5 m inside the mouth (trick 2). */
+var FIELD = (Q.get('field') || 'b').toLowerCase();
 if (FIELD === 'b') {          /* the bands three times as thick, the aisles scattered, a thinner lane kept up the middle */
   S.candles.rho *= 3;
   S.tables.forEach(function (t) { band(S.candles.x0, S.candles.x1, t[1], true); });
@@ -363,10 +374,18 @@ S.tables.forEach(function (t) {
   var l = new THREE.Mesh(new THREE.SphereGeometry(S.lanterns.d / 2, 16, 12), M.lantern);
   l.scale.set(1, 0.85, 1); l.position.copy(P(S.lanterns.x, t[1], S.lanterns.d / 2 * 0.85)); occ.lanterns.add(l);
 });
-/* the winner's banner on the west wall at the leaving feast (Interiors' item 5); the long walls' hangings wait on the
-   windows (the lane file's flag) */
+/* the winner's banner on the west wall at the leaving feast (Interiors' item 5), and the hangings on the twelve piers,
+   never out with the Christmas trees (their days never meet) */
 var ban = new THREE.Mesh(new THREE.PlaneGeometry(S.banner.w, S.banner.top - S.banner.foot), M.banner);
 ban.position.copy(P(15.05, 60.5, (S.banner.foot + S.banner.top) / 2)); ban.rotation.y = Math.PI / 2; occ.feastEnd.add(ban);
+var hangGeo = new THREE.PlaneGeometry(S.hangings.w, S.hangings.top - S.hangings.foot);
+S.hangings.xs.forEach(function (x) {
+  S.hangings.ys.forEach(function (y) {
+    var h = new THREE.Mesh(hangGeo, M.banner); h.name = 'hanging';
+    var a = P(x, y, (S.hangings.foot + S.hangings.top) / 2), b = P(x, 60.5, (S.hangings.foot + S.hangings.top) / 2);
+    h.position.copy(a); h.lookAt(b); occ.feastEnd.add(h);   /* hung flat, facing into the hall */
+  });
+});
 
 /* ================= the figures, empty to crowded (Interiors' Occupancy; the figures are People's): grey stand-ins */
 var seats = [];
@@ -394,6 +413,23 @@ var lineUp = new THREE.Group(); lineUp.name = 'first-years'; room.add(lineUp);  
 for (var fy = 0; fy < S.firstYears.n; fy++) {
   var b = new THREE.Mesh(bodyGeo, figMat); b.scale.set(0.85, 1.45, 0.85); b.position.copy(P(S.firstYears.x, S.firstYears.y0 + (fy + 0.5) * S.firstYears.gap, 0)); lineUp.add(b);
 }
+/* the Duelling Club's evening: the brothers' two straw dummies on their stands and a chalk cross at every place */
+var clubG = new THREE.Group(); clubG.name = 'duelling-club'; clubG.visible = false; room.add(clubG);
+var chalk = mat(0xe4e0d6), straw = mat(0xb89a5a);
+function cross(x, y) {
+  [[0.5, 0.06], [0.06, 0.5]].forEach(function (d) {
+    var c = new THREE.Mesh(new THREE.BoxGeometry(d[0], 0.01, d[1]), chalk); c.position.copy(P(x, y, 0.005)); clubG.add(c);
+  });
+}
+var pupils = [];
+S.club.rows.forEach(function (x) { S.club.pairs.forEach(function (p) { p.forEach(function (y) { pupils.push([x, y]); cross(x, y); }); }); });
+S.club.boys.forEach(function (b) { cross(b[0], b[1]); });
+S.club.dummies.forEach(function (d) {
+  var post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.6, 6), M.tub); post.position.copy(P(d[0], d[1], 0.3)); clubG.add(post);
+  var foot = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.05, 10), M.tub); foot.position.copy(P(d[0], d[1], 0.025)); clubG.add(foot);
+  var body = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, S.club.dummyH - 0.6, 8), straw);
+  body.position.copy(P(d[0], d[1], 0.6 + (S.club.dummyH - 0.6) / 2)); clubG.add(body);
+});
 function setFigures(list) {
   var n = 0;
   list.forEach(function (f) {
@@ -465,9 +501,18 @@ function draw() {
   stars.visible = !d.sun.up && !wet;
   /* the figures (Interiors' occupancy; People's to draw) */
   var list = [], who = 'empty';
+  /* the Duelling Club's evening: after dinner, when Events' chain says a club evening falls (asked by row); until then
+     shown by ?club=duelling with ?time=evening */
+  var club = (Q.get('club') || '') === 'duelling' && d.time === 'evening' && d.meal === 'none';
+  st.club = club;
+  furniture.forEach(function (m) { m.visible = !club; }); clubG.visible = club;
   /* Christmas: the few who stay at their own table's middle, about one place in ten; nobody between meals (Interiors, req 473) */
   var mid = (S.tx0 + S.tx1) / 2;
-  if (d.meal !== 'none') {
+  if (club) {
+    who = 'the Duelling Club, about thirty in pairs';
+    pupils.forEach(function (p) { list.push({ x: p[0], y: p[1], z: 0, k: [1, 1.5] }); });
+    list.push({ x: S.club.teacher[0], y: S.club.teacher[1], z: 0, k: [1.1, 1.75] });
+  } else if (d.meal !== 'none') {
     who = xmas ? 'a meal, thin over Christmas' : 'a meal, crowded';
     seats.forEach(function (s) { if (xmas ? (Math.abs(s.x - mid) < 6 && s.r < 0.18) : s.r < s.p) list.push({ x: s.x, y: s.y, z: S.bench.seat - 0.15 }); });
     chairYs.forEach(function (y, i) { if (i % 3 !== 1 || Math.abs(y - S.gold[1]) < 0.4) list.push({ x: S.staff.chairX, y: y, z: S.dais.h }); });
@@ -481,7 +526,7 @@ function draw() {
   ghosts.visible = feast; lineUp.visible = feast && d.occasion === 'start of term';
   stool.visible = d.occasion === 'start of term';
   /* props: the places at meals, the goblet towers between them */
-  plates.visible = d.meal !== 'none'; towers.visible = d.meal === 'none' && who !== 'empty';
+  plates.visible = d.meal !== 'none'; towers.visible = d.meal === 'none' && who !== 'empty' && !club;
   st.props = plates.visible ? 'the places set' : towers.visible ? 'the goblet towers' : 'bare';
   /* the occasions, every year on their day (never a book's night) */
   occ.christmas.visible = xmas;
@@ -577,8 +622,36 @@ backBtn.addEventListener('click', goBack);
 headPose(camera.position, lookTmp); camera.lookAt(lookTmp);
 kit.reveal();
 
+/* ?measure=1: the iPad's measure (docs/room-states.md §5 3). Half a minute of real frames after a warm-up, then one plain
+   word on screen, Smooth, A little slow or Slow, so Godric answers yes or no to "did it say Smooth", never a number */
+var MEASURE = Q.get('measure') === '1' ? { t0: 0, last: 0, secs: [], n: 0, s0: 0, done: false } : null;
+var measureEl = null;
+if (MEASURE) {
+  measureEl = document.createElement('div');
+  measureEl.style.cssText = 'position:fixed;left:50%;top:38%;transform:translate(-50%,-50%);background:var(--hud-bg);' +
+    'padding:18px 26px;border-radius:10px;font-size:22px;line-height:1.4;text-align:center;pointer-events:none;max-width:80vw';
+  measureEl.textContent = 'Measuring. Look around for half a minute.';
+  document.body.appendChild(measureEl);
+}
+function measure() {
+  var now = performance.now(), m = MEASURE;
+  if (!m.t0) { m.t0 = m.s0 = now; return; }
+  if (now - m.t0 < 3000) { m.s0 = now; m.n = 0; return; }   /* the warm-up: the field built, the first frames out of the way */
+  m.n++;
+  if (now - m.s0 >= 1000) { m.secs.push(m.n * 1000 / (now - m.s0)); m.n = 0; m.s0 = now; }
+  if (m.secs.length >= 30 && !m.done) {
+    m.done = true;
+    var s = m.secs.slice().sort(function (a, b) { return a - b; }), worst = s[0], mid = s[15];
+    var word = worst >= 45 ? 'Smooth' : mid >= 30 ? 'A little slow' : 'Slow';
+    m.result = { word: word, typical: Math.round(mid), worst: Math.round(worst), candles: NC, state: STATE && STATE.figures };
+    measureEl.innerHTML = '<div style="font-size:44px;font-weight:600;color:var(--hud-on)">' + word + '</div>' +
+      '<div style="font-size:14px;color:var(--hud-dim)">' + m.result.typical + ' fps typical, ' + m.result.worst + ' at the slowest, ' + NC + ' candles</div>';
+  }
+}
+
 var clock = new THREE.Clock(), T = 0, redraw = 0;
 function frame() {
+  if (MEASURE) measure();
   var dt = Math.min(0.05, clock.getDelta());
   T += dt * (kit.zoom && kit.zoom.slow ? kit.zoom.slow() : 1);
   updateCamera(dt);
@@ -591,7 +664,7 @@ renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
-  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC,
+  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC, measure: function () { return MEASURE && MEASURE.result; },
   stand: function () { return here.name; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
