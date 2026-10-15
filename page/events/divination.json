@@ -45,7 +45,17 @@
         "a few chipped and mended cups pushed to the back of the teacups' middle shelf, behind the blue patterned ones",
         "a dustpan and brush on the floor at the foot of the teacups' shelf"
       ],
-      "canon": "Interiors' req 444 (a few chipped and mended cups; the dustpan and brush; undated, from the Azkaban castle on): PoA 6 L15318, \"a tinkle of breaking china\", \"a dustpan and brush\", \"One of the blue ones\"; no cup named as anyone's, the pink cup set aside; checked against the text, 15 October 2026"
+      "canon": "Interiors' req 444 (a few chipped and mended cups; the dustpan and brush; undated, from the Azkaban castle on): PoA 6 L15318, \"a tinkle of breaking china\", \"a dustpan and brush\", \"One of the blue ones\"; no cup named as anyone's, the pink cup's pieces a trace of their own (the rule after this); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "castle date >= 3 09-02"
+      ],
+      "show": [
+        "the broken pieces of a pink teacup on the saucer at one place of a little table"
+      ],
+      "canon": "Interiors' req 444, its line of 15 October 2026, 4.09 pm (Godric's t1 on interiors-divination-tables-1014): PoA 6 L15316, after a first cup is broken, \"one of the blue patterned ones? I'm rather attached to the pink\", and L15362, a cup smashed in that lesson; its table nameless and never Neville's place (Interiors' place, docs/interiors/divination-classroom.md); a trace from 2 September of the Azkaban castle, the first lesson, and every later year; checked against the text, 15 October 2026"
     }
   ],
   "records": []
