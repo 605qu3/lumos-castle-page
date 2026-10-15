@@ -1313,8 +1313,32 @@ var paintingOpp = onWallZ(cutoutTexture(160, 176, '#b9a98c', function (g, w, h) 
   drawFrame(g, w, h); g.fillStyle = '#6d655b'; g.fillRect(w * 0.7, h * 0.3, w * 0.14, h * 0.58);
 }, 'painting'), PAINTING_OPP.w, PAINTING_OPP.h, PAINTING_OPP.x, PAINTING_OPP.y, FAR_FACE + 0.02, 1, 1, 'painting-opposite');
 var BAY_X = -3.55, PORTRAIT_XS = [-2.5, -4.6];
-var ARMOUR = { w: 0.7, h: 2.1, x: BAY_X };
+/* the armour (Godric's Try 2 on corridor-armour-pick-1015, 5.11 pm; corridor-armour round 1, plain steel, visor shut,
+   halberd in its right hand; the castle's suit-of-armour exemplar): 1078 x 2473 px, the suit from its helmet's top (row
+   141) to its feet (row 2468) 1.70 m tall as the Curator measured the Met's (docs/exemplars.md), so 1369 px a metre and
+   the card 0.787 by 1.806 m, the halberd's head above; the visor's slit at (584, 326) px, 0.033 m right of the card's
+   middle and 0.665 m above it, where Trevor's eyes catch. Grey until it loads */
+var ARMOUR = { w: 1078 / 1369, h: 2473 / 1369, x: BAY_X, slitX: (584 - 539) / 1369, slitY: (2473 / 2 - 326) / 1369 };
 var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, FAR_Z + 0.45, 1, 1, 'armour');
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    armour.material.map = tex(im); armour.material.color.set(0xffffff); armour.userData.base = armour.material.color.clone(); armour.material.needsUpdate = true;
+  };
+  im.src = '../assets/layers/corridor-armour.png';
+})();
+/* a soft shadow under its feet (the placement check: it meets the flags), as the scarf's: the sabatons span 400 to 900 px,
+   so 0.37 m wide and centred 0.08 m right of the card's middle; it follows the armour to its marks */
+var armourShadow = (function () {
+  var sc = makeCanvas(64, 64), sg = sc.getContext('2d'), grd = sg.createRadialGradient(32, 32, 6, 32, 32, 32);
+  grd.addColorStop(0, 'rgba(20,14,10,0.5)'); grd.addColorStop(1, 'rgba(20,14,10,0)');
+  sg.fillStyle = grd; sg.fillRect(0, 0, 64, 64);
+  var sh = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.34), new THREE.MeshBasicMaterial({ map: tex(sc), transparent: true, depthWrite: false }));
+  sh.rotation.set(-Math.PI / 2, 0, 0); sh.name = 'armour-shadow'; scene.add(sh);
+  return sh;
+})();
+function placeArmourShadow() { armourShadow.position.set(armour.position.x + 0.08, 0.002, armour.position.z + 0.02); }
+placeArmourShadow();
 /* its three marks (The corridor, "The armour's three marks"): where the card's foot stands, by the name the events
    runtime's armour chain gives each */
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
@@ -3749,7 +3773,7 @@ else if (kit.from === 'stair-hall') arriveFromBay();
    draws the armour and the sticks from the cues their state shows. Poses wait for the armour's sheet, so they are a
    console note; the lines are shown (req 66, below), and a sound is a heard line's words until it is recorded. */
 var visorPatch = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.1), new THREE.MeshBasicMaterial({ color: col(0x2e2c2a) }));
-visorPatch.position.set(0, ARMOUR.h / 2 - 0.17, 0.005); visorPatch.visible = false; armour.add(visorPatch);
+visorPatch.position.set(ARMOUR.slitX, ARMOUR.slitY, 0.005); visorPatch.visible = false; armour.add(visorPatch);
 var CUE = {
   step: 'the armour a short step out from its pier into the corridor, on its second mark; its stop follows it',
   window: 'the armour half in front of the window toward her end, as if looking out, on its third mark; its stop follows it',
@@ -3770,8 +3794,9 @@ function corridorDrawRoom(shown) {
   function has(s) { return shown.indexOf(s) >= 0; }
   var mark = ARMOUR_MARKS[has(CUE.step) ? 'step' : has(CUE.window) ? 'window' : 'home'];
   armour.position.x = mark.x; armour.position.z = mark.z;
+  placeArmourShadow();
   var back = has(CUE.back);
-  visorPatch.visible = has(CUE.visor) && !back;
+  visorPatch.visible = false;   /* the drawn visor is shut already; its open state waits for an edit of the drawing */
   armour.material.color.copy(armour.userData.base).multiplyScalar(back ? 0.6 : 1);
   var pose = 'straight';
   for (var p in POSES) if (has(p)) pose = POSES[p];
@@ -3878,7 +3903,7 @@ var helmetEyes = new THREE.Group();
   var e = new THREE.Mesh(new THREE.CircleGeometry(0.014, 10), new THREE.MeshBasicMaterial({ color: col(0xe8c840) }));
   e.position.set(ex, 0, 0.012); helmetEyes.add(e);
 });
-helmetEyes.position.set(0, ARMOUR.h / 2 - 0.17, 0); helmetEyes.visible = false; armour.add(helmetEyes);
+helmetEyes.position.set(ARMOUR.slitX, ARMOUR.slitY, 0); helmetEyes.visible = false; armour.add(helmetEyes);
 var TCUE = {
   day: "the armour's visor up, two blinking eyes inside the helmet, a hollow croak now and then",
   night: "the armour's visor down, a croak with its snore, his eyes catching the light through the slit",
@@ -3886,7 +3911,7 @@ var TCUE = {
 };
 var trevorAt = null, trevorHops = [], trevorWasIn = false, trevorSpot = null, trevorFollow = null;
 var TREVOR_STOP = { 'suit-feet': 'armour', 'suit-flags': 'armour', 'suit-sill': 'armour', halfway: 'portrait-a', 'by-her': 'her' };
-function helmetPos() { armour.updateMatrixWorld(); return armour.localToWorld(new THREE.Vector3(0, ARMOUR.h / 2 - 0.17, 0.05)); }
+function helmetPos() { armour.updateMatrixWorld(); return armour.localToWorld(new THREE.Vector3(ARMOUR.slitX, ARMOUR.slitY, 0.05)); }
 function trevorHopTo(to, from) {
   trevorHops = [];
   var p = from.clone();
