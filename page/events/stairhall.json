@@ -49,7 +49,9 @@
       ],
       "show": [
         "halfway up the staircase to the third floor one brass stair rod lies loose, its tread's runner rucked"
-      ]
+      ],
+      "canon": "the change list's Rework 15: PS 16 L5718, \"Peeves was bobbing halfway up, loosening the carpet so that people would trip\"; a lasting trace from 6 June of the Stone's castle (the seventy-ninth session, req 429)",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Events' Q2, Fawkes agreeing, provisional, Godric to confirm: Interiors' Rework 14 (docs/interiors/stair-hall.md, the carpet) makes the loose rods Peeves's habit any day, which carries the same wink, so the trace would show the same rod twice"
     },
     {
       "when": [
@@ -250,6 +252,21 @@
       ],
       "canon": "as stairhall.map-tap, January to the first of February; the days after, till her Sunday, answer no tap (a small gap, ours)",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the Fat Lady hiding (EV-34)"
+    },
+    {
+      "id": "stairhall.rods-loose",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "halfway up the staircase to the third floor a brass stair rod or two lie loose, the runner rucked over their treads"
+      ],
+      "canon": "Interiors' Rework 14 (docs/interiors/stair-hall.md, the carpet: a rod or two come loose now and then, any day, Peeves's doing, set right and loosened again), Events' Q2, Fawkes agreeing, provisional, Godric to confirm: PS 16 L5718, \"Peeves was bobbing halfway up, loosening the carpet so that people would trip\", read as his everyday mischief; any day and any castle, a small record on arrival, so never two visits running; no Peeves seen; checked against the text, 15 October 2026"
     }
   ]
 }
