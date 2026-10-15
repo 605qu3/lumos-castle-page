@@ -1052,7 +1052,76 @@
       "show": [
         "inside the small chamber off the hall, the golden stage's panels stacked on edge against the wall, the gilt flaking, one panel's edge scorched black"
       ]
+    },
+    {
+      "when": [
+        "place = great hall"
+      ],
+      "show": [
+        "old scorch marks worn into the oak of all four house tables here and there, where Howlers have burst over the years"
+      ],
+      "canon": "Godric's 1 on fawkes-howler-scorches-1015 (7.17 pm): many old scorches worn into every house table, every year, none of them Ron's; the marks placed by Interiors (great-hall.md item 24, req 497); a Howler bursts into flames, CoS 6 L8345"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "great-hall.howler",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-howler",
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = great hall",
+        "meal = breakfast",
+        "occasion = none",
+        "days since hall_howler >= 14"
+      ],
+      "who": [
+        {
+          "as": "howler",
+          "role": "voice",
+          "name": "a Howler",
+          "mark": "another table"
+        }
+      ],
+      "show": [
+        "at another house's table an owl drops a scarlet envelope before an older pupil, who opens it flinching; a voice a hundred times louder than usual rattles the plates and echoes off the stone walls, the whole Hall turns to look, the envelope curls into ashes, and the Hall laughs and goes back to breakfast"
+      ],
+      "lines": [
+        {
+          "speaker": "howler",
+          "medium": "heard",
+          "key": "great-hall.howler",
+          "sound": "a parent's voice a hundred times louder than usual, from across the Hall",
+          "text": [
+            "AND YOUR AUNT IS STILL PICKING DUNGBOMB OUT OF HER HAT, YOUNG MAN!",
+            "NOT ONE LETTER SINCE SEPTEMBER! YOUR GRANDMOTHER THINKS SOMETHING HAS EATEN YOU!",
+            "THE NEIGHBOURS' CAT IS STILL BRIGHT GREEN! YOU WAIT TILL YOU GET HOME!"
+          ],
+          "canon": "ours, a parent's voice to some older pupil, nobody in particular, never to him (Godric's t1 on fawkes-howler-scorches-1015, 7.17 pm, PoA 14); a Howler at breakfast, the yells \"a hundred times louder than usual\" rattling the plates and echoing off the stone walls, the hall swivelling round to see (CoS 6 L8333 to L8337), a scarlet envelope as the post comes in (PoA 14 L18728), checked against the text 15 October 2026, 7.29 pm"
+        }
+      ],
+      "starts": [
+        "stamp hall_howler"
+      ]
+    },
+    {
+      "id": "great-hall.howler-none",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-howler",
+      "weight": 6,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = great hall",
+        "meal = breakfast",
+        "occasion = none",
+        "days since hall_howler >= 14"
+      ],
+      "starts": []
+    }
+  ]
 }
