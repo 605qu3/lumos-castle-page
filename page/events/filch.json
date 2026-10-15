@@ -138,7 +138,8 @@
           ],
           "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a lesson is under way in this room at any hour (the change list's New work), so no boy hides from Filch behind its door; events-filch-lessons-1015, provisional, Godric to confirm"
     },
     {
       "id": "filch.miss-transfiguration",
@@ -208,7 +209,8 @@
           ],
           "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a lesson is under way in this room at any hour (the change list's New work), so no boy hides from Filch behind its door; events-filch-lessons-1015, provisional, Godric to confirm"
     },
     {
       "id": "filch.miss-potions",
@@ -243,7 +245,8 @@
           ],
           "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules); \"Mess and muck everywhere!\", CoS 8 L9027, read 15 October 2026"
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a lesson is under way in this room at any hour (the change list's New work), so no boy hides from Filch behind its door; events-filch-lessons-1015, provisional, Godric to confirm"
     },
     {
       "id": "filch.miss-trophy",
@@ -393,7 +396,8 @@
       "moment": "filch passes",
       "when": [
         "place = greenhouses",
-        "time != night"
+        "time != night",
+        "hour >= 13"
       ],
       "who": [
         {
