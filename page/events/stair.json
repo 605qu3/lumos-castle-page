@@ -662,13 +662,14 @@
           "key": "stair.gallery-whisper",
           "sound": "faint whispering from the gallery behind him",
           "text": [
-            "Is that him? It is, isn't it?",
+            "Peeves has been at the suits of armour again. Clank, clank, clank, half the night!",
             "Shh! He'll hear you!",
             "Pass it on: he's turned round.",
             "Don't point, Violet, it's rude.",
-            "The Fat Lady says he knows the password. Every week!"
+            "The Fat Lady says he knows the password. Every week!",
+            "Mind your frame, Cuthbert, you're dripping varnish on my picnic."
           ],
-          "canon": "PS 7, the people in the portraits whisper and point as the first-years pass; GoF 17 and 23, Violet, the Fat Lady's gossiping friend from downstairs; checked against the text, 10 October 2026"
+          "canon": "PS 7, the people in the portraits whisper and point as the first-years pass; GoF 17 and 23, Violet, the Fat Lady's gossiping friend from downstairs; checked against the text, 10 October 2026; the Peeves and frame whispers ours (Rework 22: the gallery whispers about each other and Peeves, never \"Is that him?\"), 15 October 2026"
         }
       ]
     },

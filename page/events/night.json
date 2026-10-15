@@ -165,7 +165,7 @@
           "speaker": "fat-lady",
           "medium": "said",
           "key": "night.squawk",
-          "canon": "the book's own words, PS 12, checked: she squawks it as Harry slips out by night",
+          "canon": "the book's own words, PS 12, checked: she squawks it from her frame by night",
           "text": [
             "Who's there?"
           ]
@@ -174,12 +174,12 @@
           "speaker": "fat-lady",
           "medium": "said",
           "key": "night.squawk-after",
-          "canon": "ours, in her voice; her cake (cake.json); Filch catching students out of bed (PS 13, checked)",
+          "canon": "ours, in her voice; her cake (cake.json); Filch catching students about at night (PS 13, checked); no bed and no \"in before morning\": the boys sleep at home (Rework 23)",
           "text": [
-            "Oh. It's you. Out of bed at this hour, dear?",
+            "Oh. It's you. Wandering about at this hour, dear?",
             "Hmph. Some of us were asleep.",
             "I was having such a lovely dream about cake.",
-            "Mind Filch doesn't catch you, dear. In before morning."
+            "Mind Filch doesn't catch you, dear."
           ]
         }
       ],

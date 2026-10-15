@@ -3171,7 +3171,7 @@
         "when": [
           "drawn card-flamel = yes",
           "cards_found >= 1",
-          "dumbledore_back = read"
+          "year >= 1"
         ],
         "say": "Flamel"
       },
@@ -3181,7 +3181,7 @@
         "when": [
           "drawn card-perenelle = yes",
           "cards_found >= 1",
-          "dumbledore_back = read"
+          "year >= 1"
         ],
         "say": "Perenelle"
       },
@@ -3631,7 +3631,8 @@
         "weight": 2,
         "when": [
           "drawn card-pliny = yes",
-          "cards_found >= 1"
+          "cards_found >= 1",
+          "year >= 2"
         ],
         "say": "Pliny"
       },
