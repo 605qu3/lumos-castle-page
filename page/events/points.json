@@ -81,7 +81,8 @@
           "an owl lands on the moonlit sill, taps its beak on the glass three times, tap-tap-tap, and his brother's gems tumble out of the little pouch tied to its leg and fly across the room into the hourglass, each in its own house's colours"
         ]
       },
-      "starts": []
+      "starts": [],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the two-iPad owl post and his brother's gems (one iPad; never scored between them)"
     },
     {
       "id": "points.errol",
@@ -106,7 +107,8 @@
           "Errol, the Weasleys' ancient owl, crash-lands on the sill and slumps over, legs in the air, and his brother's gems tumble out of the little pouch tied to his leg and fly across the room into the hourglass, each in its own house's colours; after a while Errol picks himself up and flaps off"
         ]
       },
-      "starts": []
+      "starts": [],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the two-iPad owl post and his brother's gems (one iPad; never scored between them)"
     },
     {
       "id": "points.best-year",
@@ -119,7 +121,8 @@
       ],
       "starts": [
         "point year {year} 50"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): a cup won against the year is a cup race, ruled out"
     }
   ]
 }

@@ -98,7 +98,8 @@
           "sound": "a rush of wings behind the doors, a hundred owls streaming in with the post",
           "canon": "PS 8, about a hundred owls stream into the Great Hall at breakfast; PS 9, Neville's Remembrall from Gran comes with the post; checked against the text, 13 October 2026"
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): PS 9's Remembrall breakfast replayed (Rework 21 gives the owls' wings and the clatter)"
     },
     {
       "id": "doors.hall-day",
@@ -258,7 +259,8 @@
           "sound": "nervous whispering behind the door, first years standing close together",
           "canon": "PS 7, the first years wait in a small, empty chamber off the hall before the Sorting, Ron guessing at it; checked against the text, 13 October 2026"
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Ron heard before the Sorting, the first night (PS 7), a trio line"
     },
     {
       "id": "doors.chamber-night",

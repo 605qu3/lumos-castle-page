@@ -173,7 +173,8 @@
       "starts": [
         "set pockets_patted = yes"
       ],
-      "canon": "provisional, Godric to confirm: Fawkes's touch on events-b24-neville-pass-1013, 8.01 pm; Neville's lost list of passwords, PoA (B3 L18284 in the canon copy); checked against the text, 13 October 2026"
+      "canon": "provisional, Godric to confirm: Fawkes's touch on events-b24-neville-pass-1013, 8.01 pm; Neville's lost list of passwords, PoA (B3 L18284 in the canon copy); checked against the text, 13 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): replays PoA 13's plot moment (Rework 30 makes it a found scrap)"
     },
     {
       "id": "neville.pockets-not",
@@ -193,7 +194,8 @@
       ],
       "starts": [
         "set pockets_patted = yes"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the other half of the pockets draw"
     },
     {
       "id": "neville.trouble",

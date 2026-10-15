@@ -1284,7 +1284,8 @@
           "as": "ron",
           "role": "voice",
           "name": "Ron",
-          "mark": "room"
+          "mark": "room",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Ron's voice on a repeat card, a trio line; the swap pile stays"
         }
       ],
       "lines": [
@@ -1296,7 +1297,8 @@
           "text": [
             "I've got {card} again.",
             "{card} again? That one's for the swap pile."
-          ]
+          ],
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Ron's voice on a repeat card, a trio line; the swap pile stays"
         }
       ]
     },
@@ -1326,7 +1328,8 @@
           "as": "ron",
           "role": "voice",
           "name": "Ron",
-          "mark": "room"
+          "mark": "room",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Ron's voice on a repeat card, a trio line; the swap pile stays"
         }
       ],
       "lines": [
@@ -1338,7 +1341,8 @@
           "text": [
             "I've got {card} again.",
             "{card} again? That one's for the swap pile."
-          ]
+          ],
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Ron's voice on a repeat card, a trio line; the swap pile stays"
         }
       ]
     },
@@ -2382,7 +2386,8 @@
           "as": "dobby",
           "role": "voice",
           "name": "dobby",
-          "mark": "behind the sofa"
+          "mark": "behind the sofa",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Dobby's voice entry with the lines already aside"
         }
       ],
       "lines": [

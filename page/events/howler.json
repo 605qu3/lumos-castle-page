@@ -159,7 +159,8 @@
       "starts": [
         "stamp howler_opened",
         "log \"A Howler from home went off by itself at the desk {day}\""
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): a brother's post destroyed unheard by a self-burst"
     },
     {
       "id": "howler.goes-off-weasleys",

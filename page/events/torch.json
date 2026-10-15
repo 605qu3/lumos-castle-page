@@ -139,7 +139,8 @@
       ],
       "starts": [
         "set torch_blue = yes"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Nick's blue Halloween torches set aside (README; the Corridor's black candle stub stays)"
     },
     {
       "id": "torch.deathday-hole",
@@ -159,7 +160,8 @@
       ],
       "starts": [
         "set torch_blue = yes"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Nick's blue Halloween torches set aside (README)"
     },
     {
       "id": "torch.nick-home",
