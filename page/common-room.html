@@ -2215,7 +2215,7 @@ function hourglassLoad() {
 }
 function hourglassKey(s) { return s.kind + ' ' + s.thing + ' ' + (s.from || ''); }
 function hourglassMount() {
-  var L = hourglassLive, held = OWL_POST.held, landed = {}, yr = castle && castle.year ? castle.year() : null;
+  var L = hourglassLive, held = OWL_POST.held, landed = {}, yr = castle && castle.schoolYear ? castle.schoolYear() : null;
   if (!window.LumosHourglass) return;
   held.forEach(function (h) { landed[hourglassKey(h.slip)] = 1; });
   /* this school year's slips, the year's own slip left out of the heap as the runtime leaves it; the boys' houses from

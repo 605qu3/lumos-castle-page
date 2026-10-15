@@ -2378,8 +2378,10 @@
       },
       /* The school year now, named by the year its leaving feast falls in, and a year's feast day (yyyy-mm-dd; this
          year's if none is named): the boys' own last school day as a grown-up sets it, the last Friday of June till
-         then, ?feast=06-19 for a test (Magic's *Against the year*). Each slip handed out carries its `year`. */
-      year: function () { return schoolYear(isoDay(nowDate())); },
+         then, ?feast=06-19 for a test (Magic's *Against the year*). Each slip handed out carries its `year`. Named
+         `schoolYear` since 15 October 2026: it had shared the key `year` with the castle's year above and won, so
+         `year()` gave 2027, not 0 to 7 (the Corridor's find; Events' Q3, Fawkes's leave, 3.46 pm). */
+      schoolYear: function () { return schoolYear(isoDay(nowDate())); },
       /* His year at the castle, 1 to 7, turning each 1 September (req 263, the dormitory door's FIRST YEARS sign). */
       yearIn: yearIn,
       feast: function (y) { return feastDay(+y || schoolYear(isoDay(nowDate()))); },
