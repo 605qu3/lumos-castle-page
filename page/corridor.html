@@ -683,6 +683,54 @@ var hearth = onWallZ(cutoutTexture(150, 125, '#6a5a4c', drawRect, 'hearth'), HEA
 var hearthLight = new THREE.PointLight(col(0xffa868), 1.3, 6, 1.4);
 hearthLight.position.set(NOOK_MID, 0.8, NOOK_BACK - 1.0);
 scene.add(hearthLight);
+/* the nook's fire (the Stone's year walk, 15 October 2026, finding 2, provisional, Godric to confirm): the warm light
+   came from an empty hearth, a light with no source (the world rules: light only where it is the thing's own). Now a
+   fire burns there by evening and night from October to March and the light is its own; by day, and through the
+   warmer months, the hearth is cold and gives none. The flames are the common room's own (common-room.html, flames
+   and embers), scaled to this hearth's drawing (2.6 m to the common room's 3.0), just behind the drawing so its
+   stone frames them. ?nookFire=1 or 0 for a look */
+var NOOK_FIRE = { s: HEARTH_DRAW_W / 3.0, months: [10, 11, 12, 1, 2, 3], look: new URLSearchParams(location.search).get('nookFire'),
+  specs: [[0, 0.75, 0.9, 1.3, 0xffffff], [-0.22, 0.62, 0.7, 1.0, 0xffc478], [0.24, 0.6, 0.65, 0.95, 0xffb060], [-0.08, 0.7, 0.55, 1.1, 0xffa04a], [0.12, 0.55, 0.5, 0.8, 0xff9640], [0, 0.95, 0.45, 0.9, 0xffd9a0]] };
+var nookFire = { flames: [], lit: false, next: 0 };
+(function () {
+  var ft = flameTexture(), s = NOOK_FIRE.s;
+  /* the firebox's back, sooty, as any used hearth's is (the drawing's opening is see-through, 0.20 to 0.80 of its width
+     and from 0.44 of its height down, fireplace.png), and two logs on it; both stay, lit or cold */
+  var bw = 0.59 * HEARTH_DRAW_W, bh = 0.56 * HEARTH_DRAW_W / 1.2, zb = NOOK_BACK - BREAST - 0.003;
+  var soot = new THREE.Mesh(new THREE.PlaneGeometry(bw, bh), new THREE.MeshStandardMaterial({ color: col(0x241d18), roughness: 1, metalness: 0 }));
+  soot.position.set(NOOK_MID, bh / 2, zb); soot.rotation.y = Math.PI; soot.name = 'nook-firebox'; scene.add(soot);
+  [[-0.12, 0.06], [0.14, 0.13]].forEach(function (lg, i) {
+    var log = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.62, 10), new THREE.MeshStandardMaterial({ color: col(0x3a2a1e), roughness: 1, metalness: 0 }));
+    log.rotation.z = Math.PI / 2 + (i ? -0.12 : 0.1); log.position.set(NOOK_MID + lg[0], 0.08 + 0.1 * i, zb - 0.12 - lg[1]); log.name = 'nook-log'; scene.add(log);
+  });
+  NOOK_FIRE.specs.forEach(function (fs, i) {
+    var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: ft, color: col(fs[4]), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+    var k = 0.62 * s;   /* a smaller fire than the common room's, a corridor's for the evening */
+    sp.position.set(NOOK_MID + fs[0] * k, fs[1] * k, NOOK_BACK - BREAST - 0.2);
+    sp.name = 'nook-flame'; sp.visible = false; scene.add(sp);
+    nookFire.flames.push({ sprite: sp, w: fs[2] * k, h: fs[3] * k, y: fs[1] * k, ph: i * 1.7 });
+  });
+})();
+function nookFireLit() {
+  if (NOOK_FIRE.look === '1' || NOOK_FIRE.look === '0') return NOOK_FIRE.look === '1';
+  var tt = lightTime();
+  if (tt !== 'evening' && tt !== 'night') return false;
+  var iso = typeof castle !== 'undefined' && castle && castle.date ? castle.date() : (location.search.match(/[?&]date=(\d{4}-\d\d-\d\d)/) || [])[1];
+  var d = iso ? new Date(iso + 'T12:00:00') : new Date();
+  return NOOK_FIRE.months.indexOf(d.getMonth() + 1) >= 0;
+}
+function updateNookFire(t) {
+  if (t >= nookFire.next) { nookFire.next = t + 1; nookFire.lit = nookFireLit(); }   /* the clock asked once a second */
+  var lit = nookFire.lit;
+  hearthLight.intensity = lit ? 1.3 * (0.92 + 0.08 * Math.sin(t * 3.1)) : 0;
+  nookFire.flames.forEach(function (fl) {
+    fl.sprite.visible = lit;
+    if (!lit) return;
+    fl.sprite.scale.set(fl.w * (1 + 0.12 * Math.sin(t * 9.1 + fl.ph)), fl.h * (1 + 0.25 * Math.sin(t * 6.3 + fl.ph * 1.7)), 1);
+    fl.sprite.position.y = fl.y + 0.03 * Math.sin(t * 4.2 + fl.ph);
+    fl.sprite.material.opacity = 0.5 + 0.15 * (0.5 + 0.5 * Math.sin(t * 3.1 + fl.ph * 2.1));
+  });
+}
 
 
 /* her: the Fat Lady's painted front, 1.4 x 1.7, centred on the hole 1.2 m up, hinged on the +x edge of the hole's own
@@ -1006,8 +1054,20 @@ bayRoom.name = 'bay'; bayRoom.visible = false; scene.add(bayRoom);
   box(G, BAY.len, hgt, T, xm, ym, FAR_Z - T / 2, stoneMat, 0);                                       /* and the outer wall */
   box(G, BAY.railT, BAY.rail, WIDTH, x1 + BAY.railT / 2, y0 + BAY.rail / 2, MID_Z, stoneMat, 0);     /* the balustrade over the well */
   var far = x1 - BAY.across;                                                                           /* the hall's far side, across the well */
-  box(G, 0.1, hgt + 30, WIDTH + 16, far, ym - 15, MID_Z, solid(0x1c1915), 0);
-  box(G, 0.12, 0.35, WIDTH + 16, far + 0.1, y0 + 0.4, MID_Z, solid(0x3a342c), 0);                     /* a gallery's edge over there, faint */
+  /* lit stone, never a black hole (the Keep: the dark is never deep; the Stone's year walk, 15 October 2026, finding 1,
+     provisional, Godric to confirm): the hall's far side a shade darker than the corridor's stone, two torches on it
+     burning as the corridor's own do, a stand-in until the bay is drawn (the light Design's to review, by row) */
+  box(G, 0.1, hgt + 30, WIDTH + 16, far, ym - 15, MID_Z, solid(0x5c5852), 0);
+  box(G, 0.12, 0.35, WIDTH + 16, far + 0.1, y0 + 0.4, MID_Z, solid(0x47423b), 0);                     /* a gallery's edge over there, faint */
+  [-2.4, 2.4].forEach(function (dz, i) {
+    var head = new THREE.Vector3(far + 0.12, FOOT_Y + 2.2, MID_Z + dz);
+    box(G, 0.06, 0.34, 0.06, far + 0.08, head.y - 0.2, head.z, solid(0x2e2a26), 0);                   /* its bracket */
+    var f = new THREE.Sprite(new THREE.SpriteMaterial({ map: flameTex, color: col(0xffb060), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, fog: false }));
+    f.position.set(head.x + 0.03, head.y + 0.08, head.z); f.scale.set(0.16, 0.26, 1); f.name = 'bay-far-torch-' + i;
+    var l = new THREE.PointLight(col(0xffc080), 1.4, 7, 1.2);
+    l.position.set(head.x + 0.6, head.y + 0.3, head.z);
+    G.add(f); G.add(l);
+  });
   bayTorches = [addTorch(new THREE.Vector3(x0 - 3.2, FOOT_Y + 2.0, HER_FACE), -1, 'bay-torch-her'),
     addTorch(new THREE.Vector3(x0 - 5.6, FOOT_Y + 2.0, FAR_FACE), 1, 'bay-torch-far')];
   bayTorches.forEach(function (tc) { G.add(tc.mesh); G.add(tc.flame); G.add(tc.light); });
@@ -4478,6 +4538,7 @@ function frame() {
   updateCupboard(wdt);
   updateFilch(wdt);
   updateCandleStub();
+  updateNookFire(t);
   updateBewitched(wdt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, wdt * 4));
   hinge.rotation.y = -herDoor.ang;
