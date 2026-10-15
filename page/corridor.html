@@ -2915,6 +2915,49 @@ function updateNorrisDoor(dt) {
     e.material.opacity = (shut && !cat ? 0 : norrisDoor.a) * e.userData.peak;
   });
 }
+/* Filch's comic near miss (the Ministry's corridor list, New work; the world rules: comic, he never catches them; built
+   heard and lit, no figure, on Fawkes's lead of 15 October 2026, 4.00 pm; asked of Godric, not settled). On some days
+   (dayRand, about one in two), by day or evening, the first time in a visit he lingers at a hiding place (behind the
+   tapestry's lifted corner by the dark door, the nook between the settles, the broom cupboard opened or with Mrs Norris
+   sat before it, the armour on its step mark), Filch shuffles past along the corridor behind him: his slow steps and
+   his lamp's creak heard, his lamp's warm light travelling along the walls and flags past the stop and away, never
+   turning to him. Nothing follows from it, the way back is open throughout, and Back works as ever. The runtime hears
+   `filch passes` (his grumble to Mrs Norris is Events' record, asked by row); where Mrs Norris sits before the cupboard
+   she stares at it while he walks straight past. The light is his lamp's own (no sprite, nothing glowing to say tap
+   me), a shade below the torches; it stays in the scene at 0 so a pass never recompiles a material. Design's later
+   look is req 452, his figure req 451 (People). ?filch makes him pass at the next hiding stop whatever the day */
+var FILCH = { chance: 0.5, linger: 4, reach: 4.5, speed: 0.75, y: 0.85, peak: 1.15, stops: ['tapestry', 'nook', 'cupboard', 'armour'] };
+var filch = { q: groundsQ.has('filch'), done: false, wait: 0, t: -1, from: null, dir: 1,
+  light: new THREE.PointLight(col(0xf2a860), 0, 4.5, 1.6) };
+filch.light.name = 'filch-lamp'; filch.light.position.set(0, -10, MID_Z); scene.add(filch.light);
+function filchHides() {   /* is he at a hiding place now */
+  if (!atStop || FILCH.stops.indexOf(atStop.name) < 0) return false;
+  if (atStop.name === 'cupboard') return cupboard.ang > 0.5 || norrisSits();
+  return true;
+}
+function filchDay() { return filch.q || (lightTime() !== 'night' && dayRand(23) < FILCH.chance); }
+function filchLamp() { return filch.light.position.clone(); }
+function filchPass() {
+  var at = camera.position.x;
+  filch.dir = Math.random() < 0.5 ? 1 : -1;
+  filch.from = at - filch.dir * FILCH.reach;
+  filch.t = 0; filch.done = true;
+  if (castle && castle.moment) castle.moment('filch passes');
+  showLines([{ medium: 'heard', speaker: 'filch', sound: 'slow, shuffling steps and the creak of a lamp, passing behind you' }]);
+}
+function updateFilch(dt) {
+  if (filch.t >= 0) {
+    filch.t += dt;
+    var d = filch.t * FILCH.speed, span = FILCH.reach * 2, k = d / span;
+    var x = filch.from + filch.dir * d + 0.04 * Math.sin(filch.t * 5.5);   /* his shuffle sways the lamp a little */
+    filch.light.position.set(x, FILCH.y + 0.03 * Math.sin(filch.t * 11), MID_Z);
+    filch.light.intensity = FILCH.peak * Math.sin(Math.PI * Math.min(1, k));
+    if (k >= 1) { filch.t = -1; filch.light.intensity = 0; filch.light.position.y = -10; }
+    return;
+  }
+  if (filch.done || !filchHides() || tween) { filch.wait = 0; return; }
+  if ((filch.wait += dt) >= FILCH.linger && filchDay()) filchPass();
+}
 /* REWORKED (Rework 10, req 418, req 249's carried item; 15 October 2026): one rule, the Architect's ledger line 6 as
    reworded: the hut's window is lit by its own fire on evenings by the real clock, never as a plot beat. So every dark
    visit his window is already lit when the view is first seen, and nothing comes on. The dark nights and the light
@@ -3945,6 +3988,7 @@ function updateNeville(dt) {
    Out here every speaker is a thing on the page, and three of them move, so each is found where it stands now. */
 function worldOf(m, up) { m.updateMatrixWorld(); return m.localToWorld(new THREE.Vector3(0, up || 0, 0)); }
 var SPEAKER_AT = {
+  filch: filchLamp,                                                    /* his lamp, passing behind him */
   'fat-lady': function () { return worldOf(her, PORTRAIT_H * 0.32); },
   percy: function () { return worldOf(her, 0); },                      /* heard through the hole */
   armour: helmetPos,
@@ -4404,6 +4448,7 @@ function frame() {
   updateNick(wdt);
   updateNickHome(wdt);
   updateCupboard(wdt);
+  updateFilch(wdt);
   updateCandleStub();
   updateBewitched(wdt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, wdt * 4));
@@ -4450,6 +4495,7 @@ window.lumosGreybox = { herFrame: function (s) { if (s) { herFrame.look = true; 
       plinthBack: new THREE.Vector3(witchX(WITCH.at), FOOT_Y + WITCH.plinth.h, WITCH.z + WITCH.plinth.w / 2) }; },
   /* req 188: her hump's moment for Charms' callable (req 163), and the twins' parchment behind her */
   witchHump: witchHump, hump: function () { return humpOffer ? humpOffer.state() : null; }, humpOnScreen: function () { return onWitch(HUMP.u, HUMP.v); },
+  filch: function () { filchPass(); return true; },   /* a pass now, for a shot */
   map: function () { return { shown: mapShown, taking: !!mapTake, group: witchMap, hit: mapHit }; },
   lines: { show: showLines, now: function () { return lineCur && { text: lineCur.line.text, t: lineCur.t }; }, queued: function () { return lineQ.length; } } };
 })();
