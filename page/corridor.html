@@ -214,6 +214,18 @@ function traceFrom(book, month, day) {
   function k(m, dd) { return (m >= 9 ? m - 9 : m + 3) * 32 + dd; }
   return k(d.getMonth() + 1, d.getDate()) >= k(month, day);
 }
+/* The woven touches built on this page (the touch review, approved by Godric 15 October 2026; docs/notes/touch-relay-
+   2026-10-15.md, section A, Corridor), each with its cite, castle year and the ordinary-student test; all every year:
+   corridor-broom-spend-1013 t1, the butterfly out of the opened cupboard (`butterfly`; CoS 4; any pupil, an ordinary
+   butterfly and a school broom). corridor-cupboard-place-1013 t1, Mrs Norris before the cupboard some evenings, slinking
+   off when he turns away (`norrisDoor`; PS 8; she patrols for every pupil). corridor-hillside-1013 t2, the shepherd
+   pulls his cap lower and sleeps on (`shepherdCap`; invented; a painting anyone passes). corridor-landing-end-1013 t1,
+   the stair swings away from the bay and comes back (`stairAway`; PS 8; it happens to every pupil).
+   corridor-tapestry-subject-2 t1, the hillside's corner lifting in a draught on the dark door (`liftTapestry`; PS 9;
+   the castle's hidden ways are there for anyone; the short-cut stair behind it is the Architect's, asked by row).
+   corridor-tapestry-subject-2 t2, the far Hogwarts' tower window lit at night (the `lit` cell; invented; a painting
+   anyone sees). corridor-req249-lake-view t1, the hut lit or dark on his ordinary schedule (`hagridHome`; PS 8, PS 15;
+   anyone looking out). Waiting: the tag's turned-over joke (with the broom), the Barnabas trolls (its drawing). */
 
 /* ---------- the shared frame (castle.js): renderer, scene, camera, helpers, HUD ---------- */
 
@@ -2763,7 +2775,11 @@ function updateNorrisDoor(dt) {
    reworded: the hut's window is lit by its own fire on evenings by the real clock, never as a plot beat. So every dark
    visit his window is already lit when the view is first seen, and nothing comes on. The dark nights and the light
    coming on (req 249's woven t1, cited to OotP 13) are set aside until Godric taps it; ?setaside shows them */
-function hagridHome() { return !SET_ASIDE || groundsQ.has('hutLight') || dayRand(6) < 0.67; }   /* set aside: about two nights in three lit; ?hutLight, every night */
+/* WOVEN (the touch review, corridor-req249-lake-view t1, ADJUST, Godric's approval of 15 October 2026; PS 8, PS 15; every
+   year; the test: anyone looking out sees it): on a night visit the hut's window is lit or dark on Hagrid's ordinary
+   schedule, about two nights in three lit, already so when the view is first seen. It overtakes the always-lit rule above
+   (2.40 pm); the light coming on stays set aside */
+function hagridHome() { return groundsQ.has('hutLight') || dayRand(6) < 0.67; }   /* ?hutLight, every night */
 /* SET ASIDE (see hagridHome): his light comes on (req 249's t1, Godric's, 13 October 2026, the desk's words: "on a night visit, the hut's window is
    dark, as in OotP 13 ('There was still no light in Hagrid's cabin'), and some nights a light comes on in it"): on a
    lit night the window is dark when he first reaches the grounds' window's stop, and a few seconds on the light fades up
