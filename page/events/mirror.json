@@ -4,7 +4,7 @@
   "room": [
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date >= 12-20",
         "date <= 12-27"
@@ -39,7 +39,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date >= 12-25",
         "date <= 12-27",
@@ -53,7 +53,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date >= 12-25",
         "date <= 12-27",
@@ -68,7 +68,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-26",
         "time = night"
@@ -81,7 +81,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-25",
         "time = night"
@@ -94,7 +94,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-26",
         "time != night"
@@ -107,7 +107,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-26",
         "time = night"
@@ -120,7 +120,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date >= 12-27"
       ],
@@ -132,7 +132,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date <= 06-30"
       ],
@@ -144,7 +144,7 @@
     },
     {
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-27",
         "time = night"
@@ -164,7 +164,7 @@
       "leans": [],
       "moment": "wait 6-20 s",
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-26",
         "time = night",
@@ -186,7 +186,7 @@
       "leans": [],
       "moment": "arrive",
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-27",
         "time = night"
@@ -219,7 +219,7 @@
       "leans": [],
       "moment": "tap dumbledore",
       "when": [
-        "place = mirror classroom",
+        "place = forgotten classroom",
         "reading = 1",
         "date = 12-27",
         "time = night"
