@@ -458,7 +458,10 @@ function updateFades(dt) {
    fine gold grains, matte and still in the grey shell (GL-07: nothing glints to say tap me; the uphill run is the magic). A tap on the grains while it stands open runs
    them a little way uphill: they climb out of the crack and up the back flag's lip toward the back wall, a hand's
    length, against their fall, then trickle back and settle (Magic's words, "run a little way uphill and settle back");
-   how many runs a day is the events' (three, then they lie still till the next day). The shell's walls are 0.8 m
+   every tap runs them (the events' hall.grains-run). The grains are drawn only when the events' line names them (req
+   438: from 7 June of the Azkaban year and every later year, the trace of that night); before, the cupboard opens on
+   its buckets and mops alone. The run's faint trickle is a sound, and the shell plays none yet: the line says it. With
+   the events absent the grains lie there, for checks. The shell's walls are 0.8 m
    thick where the model gives this wall 0.4, so the box's first 0.4 m sits hidden in the wall's slab. ?cupboard=open
    opens it on load and ?grains=run runs the grains with the events absent, for checks. */
 var CUP = (function () {
@@ -523,16 +526,18 @@ var CUP = (function () {
   hit.name = 'grains-hit'; hit.userData.grains = true;
   g.visible = false; shell.group.add(g); shell.group.add(hit); hit.visible = false;
   var seeds = home.map(function () { return Math.random(); });
-  return { d: d, g: g, hit: hit, pts: pts, home: home, seeds: seeds, up: up, open: 0, target: 0, run: -1, first: true,
+  return { d: d, g: g, hit: hit, pts: pts, home: home, seeds: seeds, up: up, open: 0, target: 0, run: -1, first: true, grains: true,
            angle: Math.sign(d.hinge.th || 1) * 1.55 };
 })();
-function cupSet(open, now) {
+function cupSet(open, now, grains) {
   if (!CUP) return;
   CUP.target = open ? 1 : 0;
   if (now) CUP.open = CUP.target;
-  if (open) { CUP.g.visible = CUP.hit.visible = true; shakes = shakes.filter(function (x) { return x.m !== CUP.d.mesh; }); }
+  if (grains !== undefined) CUP.grains = grains;
+  CUP.pts.visible = CUP.grains;
+  if (open) { CUP.g.visible = true; CUP.hit.visible = CUP.grains; shakes = shakes.filter(function (x) { return x.m !== CUP.d.mesh; }); }
 }
-function cupRun() { if (CUP && CUP.open > 0.9) CUP.run = 0; }
+function cupRun() { if (CUP && CUP.grains && CUP.open > 0.9) CUP.run = 0; }
 function updateCupboard(dt) {
   if (!CUP) return;
   var c = CUP, d = c.d, h = d.hinge, m = d.mesh;
@@ -555,19 +560,23 @@ function updateCupboard(dt) {
   }
   c.pts.geometry.attributes.position.needsUpdate = true;
 }
-/* both spellings answer while Events' hall.json drops "sparkling" (its list, Rework 17; the Architect's row) */
+/* Events' words, req 438 (hall.json, 822f1eab): the grains only where the line names them; "sparkling" gone with its
+   Rework 17, and the run's older words kept answering while its set-aside records stand */
+var CUP_GRAINS = ", and a thin line of fine gold grains in a crack between two flagstones";
+var CUP_OPENS = "the broom cupboard's door swings open on buckets and mops, one bucket upturned";
 var cupCues = {
-  "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of fine gold grains in a crack between two flagstones": function () { turnDone = 'cupboard'; cupSet(true); },
-  "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones": function () { turnDone = 'cupboard'; cupSet(true); },
   "the broom cupboard's door swings shut": function () { turnDone = 'cupboard'; cupSet(false); },
+  "the gold grains in the crack run a little way uphill with a faint trickle, and settle back": function () { cupRun(); },
   "the gold grains in the crack run a little way uphill and settle back": function () { cupRun(); }
 };
-var CUP_OPEN_SHOW = "the broom cupboard standing open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones";
-var CUP_OPEN_SHOWS = [CUP_OPEN_SHOW, CUP_OPEN_SHOW.replace('sparkling gold', 'fine gold')];
+cupCues[CUP_OPENS] = function () { turnDone = 'cupboard'; cupSet(true, false, false); };
+cupCues[CUP_OPENS + CUP_GRAINS] = function () { turnDone = 'cupboard'; cupSet(true, false, true); };
+var CUP_OPEN_SHOW = "the broom cupboard standing open on buckets and mops, one bucket upturned";
+var CUP_OPEN_SHOWS = [CUP_OPEN_SHOW, CUP_OPEN_SHOW + CUP_GRAINS];
 function cupDrawRoom(shown) {
   if (!CUP || Q.get('cupboard') === 'open') return;
-  var open = CUP_OPEN_SHOWS.some(function (x) { return shown.indexOf(x) >= 0; });
-  cupSet(open, CUP.first); CUP.first = false;
+  var bare = shown.indexOf(CUP_OPEN_SHOWS[0]) >= 0, grains = shown.indexOf(CUP_OPEN_SHOWS[1]) >= 0;
+  cupSet(bare || grains, CUP.first, grains); CUP.first = false;
 }
 if (Q.get('cupboard') === 'open') cupSet(true, true);
 /* the rooms' things and states (board req 372, the page half of Events' The rooms' states, how they are written): in a
