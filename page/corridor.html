@@ -1475,6 +1475,7 @@ function placeArmourShadow() { armourShadow.position.set(armour.position.x + 0.0
 placeArmourShadow();
 /* its three marks (The corridor, "The armour's three marks"): where the card's foot stands, by the name the events
    runtime's armour chain gives each */
+var ARMOUR_BOUNCE = 0.35;   /* the torches' warmth on the suit at full night (updateNight), a stand-in look, in grey */
 var ARMOUR_TURN = 30 * Math.PI / 180;   /* the most its card turns toward the eye, either way (the camera's update) */
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
 /* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
@@ -3391,7 +3392,7 @@ function updateNight(dt) {
   var w = groundsWeather(), m = castle && castle.moon ? castle.moon() : null;
   var moonUp = !!(m && m.up && m.lit >= 0.02), clear = !w || w.sky === 'clear';
   var moonlight = moonUp ? (clear ? 1 : 0.3) * m.lit : 0;
-  var key = k + ':' + cold + ':' + moonlight.toFixed(2) + ':' + clear + ':' + !!NIGHT.view + ':' + (m ? m.age.toFixed(1) + ':' + m.height.toFixed(2) : '');
+  var key = k + ':' + cold + ':' + moonlight.toFixed(2) + ':' + clear + ':' + !!NIGHT.view + ':' + !!armour.material.map + ':' + (m ? m.age.toFixed(1) + ':' + m.height.toFixed(2) : '');
   if (key === NIGHT.key) return;
   NIGHT.key = key;
   hemi.intensity = NIGHT.hemi0 * (1 - 0.8 * k) + 0.06 * moonlight * k;
@@ -3399,6 +3400,13 @@ function updateNight(dt) {
   dayLights.forEach(function (l) { l.intensity = 1.6 * (1 - 0.85 * k) + 0.25 * moonlight * k; l.color.copy(col(0xdfe6ee)).lerp(col(0x9aaccc), k); });
   scene.fog.color.copy(NIGHT.fog0).lerp(NIGHT.dark, k); scene.background.copy(NIGHT.bg0).lerp(NIGHT.dark, k);
   NIGHT.torchBoost = 1 + 0.35 * k;
+  /* the suit's torchlight: every torch near it hangs on its own wall, in line with its card, so their light grazes it
+     edge on and by night it went near black; the steel takes their warmth back off the walls instead (ARMOUR_BOUNCE
+     at full night), its own drawing lit by it */
+  if (armour.material.map) {
+    if (armour.material.emissiveMap !== armour.material.map) { armour.material.emissiveMap = armour.material.map; armour.material.needsUpdate = true; }
+    armour.material.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * k);
+  }
   if (NIGHT.view) {
     NIGHT.view.veil.material.opacity = night ? 0.86 - 0.14 * moonlight : 0.25;
     NIGHT.view.veil.visible = k > 0;
