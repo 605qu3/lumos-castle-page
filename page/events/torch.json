@@ -212,7 +212,7 @@
         "nick_home != yes"
       ],
       "show": [
-        "a pearly glow waits on the wall beside the Fat Lady's frame; nick drifts out of it, walks the last stretch beside him, bows a little too deep, and fades into the wall as the hole opens"
+        "nick drifts out of the wall beside the Fat Lady's frame in his own pearly light, walks the last stretch beside him, bows a little too deep, and fades into the wall as the hole opens"
       ],
       "starts": [
         "set nick_home = yes"
@@ -231,7 +231,7 @@
         "nick_home = yes"
       ],
       "show": [
-        "a pearly glow waits on the wall beside the Fat Lady's frame, nick's light left on for him, and fades as the hole opens"
+        "nick waits by the Fat Lady's frame in his own pearly light, bows, and fades into the wall as the hole opens"
       ]
     },
     {

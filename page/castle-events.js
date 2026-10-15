@@ -125,10 +125,11 @@
    his brother's dot there, labelled by this iPad's name for him, `move` pace after fifteen minutes in one room, as
    Dumbledore's paces his study (Godric's events-map-brother-1013, 1, with t1, PoA 10), else still (v=27).
 
-   His year at the castle (board req 263, the dormitory door's sign; Godric's touch: FIRST YEARS, then SECOND YEARS
-   each September, CoS 5): `yearIn()` is 1 through the school year of his first visit, one more each 1 September,
-   held at 7. The first visit's day is kept in the state, so it is each boy's own (his satchel carries it); a grown-up
-   corrects it with settings.firstYear (the year of the September he started, as 2026); ?yearin=N for a test (v=28).
+   The dormitory door's year (board req 263, CoS 5): `yearIn()` reads the one clock, the castle's year (the change
+   list's Rework 35, RM-24: the boys sleep at home, so they have no year of their own in the castle): the dormitory is
+   Harry's year's, seen by day, so the sign reads FIRST YEARS in the Stone's castle and before any book, SECOND YEARS in
+   the Chamber's, and so on; ?yearin=N for a test. The count by Septembers from his first visit is retired; the first
+   visit's day is still kept in the state (v=28).
 
    The shut doors (board req 265, Godric's events-shut-doors-265 Try 1): the shells (page/shell.html) start the runtime
    at place `entrance hall` and tap a shut door's id from `lumosShell.onDoorTap`, so `doors.json` answers each door with
@@ -493,13 +494,11 @@
       return isoDay(d);
     }
     function schoolYear(day) { var y = +day.slice(0, 4); return day <= feastDay(y) ? y : y + 1; }
-    /* His year by Septembers (req 263): the summer after the feast keeps last year's, as the books' do (CoS 5). */
-    function septemberYear(day) { var y = +day.slice(0, 4); return +day.slice(5, 7) >= 9 ? y : y - 1; }
+    /* The dormitory's year (req 263) on the one clock (Rework 35): the castle's year, the Stone's before any book. */
     function yearIn() {
       var t = +params.get('yearin');
       if (t >= 1 && t <= 7) return Math.floor(t);
-      var first = +settings.firstYear >= 1990 && +settings.firstYear <= 2200 ? +settings.firstYear : septemberYear(state.firstDay);
-      return Math.max(1, Math.min(7, septemberYear(isoDay(nowDate())) - first + 1));
+      return Math.max(1, castleYear());
     }
 
     var chains = [];          /* the loaded files */
@@ -2382,7 +2381,7 @@
          `schoolYear` since 15 October 2026: it had shared the key `year` with the castle's year above and won, so
          `year()` gave 2027, not 0 to 7 (the Corridor's find; Events' Q3, Fawkes's leave, 3.46 pm). */
       schoolYear: function () { return schoolYear(isoDay(nowDate())); },
-      /* His year at the castle, 1 to 7, turning each 1 September (req 263, the dormitory door's FIRST YEARS sign). */
+      /* The dormitory door's year, 1 to 7, the castle's year on the one clock (req 263; Rework 35). */
       yearIn: yearIn,
       feast: function (y) { return feastDay(+y || schoolYear(isoDay(nowDate()))); },
       visit: function () { return visit; },
