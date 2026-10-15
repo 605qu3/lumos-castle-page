@@ -108,11 +108,15 @@
    each on rounds by the real clock through the castle model's places (page/castle-model.js, req 244), so both castles'
    Maps agree; `map()` hands the page the dots now (his own first, then each named one with its label, place and way
    of moving), the Great Hall's crowd at meals and the places not on the Map. A figure standing or heard on a page this
-   visit is drawn there instead of on its round (the Map never lies, PoA 18); PoA 10's three on his first look. The
-   built-ins `map here` (the model room his own dot is in, from the page; a page may answer it itself, as the den),
-   `map nearest` (the grown-up whose dot stands nearest his, by the model, for the cheek of B14; Snape where the
-   model is not loaded) and `reading` (the book he is reading, a grown-up's setting, settings.reading, 1 to 7, 0 till
-   set, ?reading= for a test: Pettigrew's flicker, B12 t1). His own dot's label is settings.name, never in a file (v=26).
+   visit is drawn there instead of on its round (the Map never lies, PoA 18). The built-ins `map here` (the model room
+   his own dot is in, from the page; a page may answer it itself, as the den) and `map nearest` (the grown-up whose dot
+   stands nearest his, by the model; Snape where the model is not loaded). His own dot's label is settings.name, never
+   in a file (v=26). SET ASIDE (Godric, 14 and 15 October 2026; docs/ministry/set-aside.md; the change list's Rework 36):
+   the Marauder's Map stays a wink, so its handover, oath, cheek, notes, first look (PoA 10's three), Pettigrew's dot
+   and the twins' dots are marked `aside` in map.json and out of play; the dots' rounds and `map()` stay for Clementine's
+   plan, which shows places first as he finds them and a few regulars later as a stacked reward, never the trio (the
+   world rules; built with the first night and the plan, the change list's row 18, not before). `reading` is a
+   deprecated alias of `year`, the castle's year (Rework 2); nothing is gated on the book he is reading.
    Then one castle (Godric's fawkes-one-castle-1013, his option 4: no passwords, a player selection, one castle,
    shared points, sending things to each other): the pairing link also names the two boys (`p`, each a random id made
    once at the deploy, with his name if the family file holds one, which stays on the iPad). On opening, and at a new
@@ -123,7 +127,11 @@
    his own, once ever wherever earned), and his brother's on this iPad come straight from the satchel. Where each boy
    last stood (`map here`, a model room's id, never a name) is kept on the iPad and carried by the owl; `map()` adds
    his brother's dot there, labelled by this iPad's name for him, `move` pace after fifteen minutes in one room, as
-   Dumbledore's paces his study (Godric's events-map-brother-1013, 1, with t1, PoA 10), else still (v=27).
+   Dumbledore's paces his study (Godric's events-map-brother-1013, 1, with t1, PoA 10), else still (v=27). Since 14
+   October 2026 the brothers share one iPad (the charter): the player selection and the satchels hold, the owl post
+   between two paired iPads is set aside (req 420) and the brother's dot with it (BROTHER_DOT_ASIDE); each visit ends
+   with a turn of the hourglass home, at the edge of the woods, and the first night, going home and the plan wait for
+   the change list's rows 18, 24, 25 and 34 (the world rules; the Ministry's set-aside).
 
    The dormitory door's year (board req 263, CoS 5): `yearIn()` reads the one clock, the castle's year (the change
    list's Rework 35, RM-24: the boys sleep at home, so they have no year of their own in the castle): the dormitory is
