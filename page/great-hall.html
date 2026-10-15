@@ -294,18 +294,30 @@ var flameMat = new THREE.MeshBasicMaterial({ color: 0xffd27a });
 var flameGeo = new THREE.OctahedronGeometry(0.02, 0); flameGeo.scale(1, 1.8, 1);
 var waxes = new THREE.InstancedMesh(waxGeo, M.wax, NC), flames = new THREE.InstancedMesh(flameGeo, flameMat, NC);
 waxes.name = 'candles'; flames.name = 'flames'; room.add(waxes); room.add(flames);
-var phase = C.map(function () { return [U(0, Math.PI * 2), U(4, 7), U(0, Math.PI * 2)]; });
-var tmpM = new THREE.Matrix4(), tmpV = new THREE.Vector3();
-function placeCandles(t) {
-  for (var i = 0; i < NC; i++) {
-    var c = C[i], ph = phase[i];
-    var dz = S.candles.bob * Math.sin(t * 2 * Math.PI / ph[1] + ph[0]), dx = S.candles.sway * Math.sin(t * 0.7 + ph[2]);
-    tmpV.copy(P(c[0] + dx, c[1], c[2] + dz));
-    tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z); waxes.setMatrixAt(i, tmpM); flames.setMatrixAt(i, tmpM);
-  }
-  waxes.instanceMatrix.needsUpdate = true; flames.instanceMatrix.needsUpdate = true;
+/* each candle's own bob and sway about its home point (Interiors' envelope), moved on the graphics card so a field of
+   thousands costs the iPad nothing a frame: the home points are set once, each candle's phase, period and sway phase
+   ride with it as aPhase, and one clock uniform moves them all */
+var phase = new Float32Array(NC * 3);
+for (var ph = 0; ph < NC; ph++) { phase[ph * 3] = U(0, Math.PI * 2); phase[ph * 3 + 1] = U(4, 7); phase[ph * 3 + 2] = U(0, Math.PI * 2); }
+var bobClock = { value: 0 };
+function bobbing(mat) {
+  mat.onBeforeCompile = function (sh) {
+    sh.uniforms.uBob = bobClock;
+    sh.vertexShader = 'uniform float uBob;\nattribute vec3 aPhase;\n' + sh.vertexShader.replace('#include <begin_vertex>',
+      '#include <begin_vertex>\n  transformed.x += ' + S.candles.sway.toFixed(3) + ' * sin(uBob * 0.7 + aPhase.z);\n' +
+      '  transformed.y += ' + S.candles.bob.toFixed(3) + ' * sin(uBob * 6.2831853 / aPhase.y + aPhase.x);');
+  };
 }
-placeCandles(0);
+waxGeo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phase, 3));
+flameGeo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phase, 3));
+bobbing(M.wax); bobbing(flameMat);
+waxes.frustumCulled = flames.frustumCulled = false;   /* the field fills the room; never culled by the base taper's bounds */
+var tmpM = new THREE.Matrix4(), tmpV = new THREE.Vector3();
+for (var ci = 0; ci < NC; ci++) {
+  tmpV.copy(P(C[ci][0], C[ci][1], C[ci][2])); tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z);
+  waxes.setMatrixAt(ci, tmpM); flames.setMatrixAt(ci, tmpM);
+}
+waxes.instanceMatrix.needsUpdate = true; flames.instanceMatrix.needsUpdate = true;
 
 /* ================= the occasions (Interiors' The occasions, Godric's 1): grey stand-ins, out by the clock */
 var occ = { christmas: new THREE.Group(), halloween: new THREE.Group(), lanterns: new THREE.Group(), feastEnd: new THREE.Group() };
@@ -338,8 +350,14 @@ function swag(x0, y0, x1, y1) {
 [[51.8, 56.4], [56.4, 60.5], [60.5, 64.6], [64.6, 69.2]].forEach(function (r) { swag(15.15, r[0], 15.15, r[1]); });
 /* the carved pumpkins: about one floating candle in five, at that candle's own home point (they move with it) */
 var pumpIdx = []; for (var pi = 0; pi < NC; pi += 5) pumpIdx.push(pi);
-var pumps = new THREE.InstancedMesh(new THREE.SphereGeometry(0.15, 10, 8), M.pumpkin, pumpIdx.length);
-pumps.name = 'pumpkins'; occ.halloween.add(pumps);
+var pumpGeo = new THREE.SphereGeometry(0.15, 8, 5), pumpPhase = new Float32Array(pumpIdx.length * 3);
+pumpIdx.forEach(function (ci, i) { for (var k = 0; k < 3; k++) pumpPhase[i * 3 + k] = phase[ci * 3 + k]; });
+pumpGeo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(pumpPhase, 3));
+bobbing(M.pumpkin);
+var pumps = new THREE.InstancedMesh(pumpGeo, M.pumpkin, pumpIdx.length);
+pumps.name = 'pumpkins'; pumps.frustumCulled = false; occ.halloween.add(pumps);
+pumpIdx.forEach(function (ci, i) { waxes.getMatrixAt(ci, tmpM); pumps.setMatrixAt(i, tmpM); });   /* each at its own candle's home point */
+pumps.instanceMatrix.needsUpdate = true;
 /* Hagrid's great lanterns, in the Chamber's year only, before the four tables' east ends */
 S.tables.forEach(function (t) {
   var l = new THREE.Mesh(new THREE.SphereGeometry(S.lanterns.d / 2, 16, 12), M.lantern);
@@ -365,7 +383,7 @@ var headGeo = new THREE.SphereGeometry(0.11, 8, 6); headGeo.translate(0, 0.93, 0
 var figMat = mat(0x8c857a), ghostMat = new THREE.MeshStandardMaterial({ color: col(0xd8dde4), transparent: true, opacity: 0.35, roughness: 1 });
 var MAXF = seats.length + 64;
 var bodies = new THREE.InstancedMesh(bodyGeo, figMat, MAXF), heads = new THREE.InstancedMesh(headGeo, figMat, MAXF);
-bodies.name = 'figures'; heads.name = 'figures'; room.add(bodies); room.add(heads);
+bodies.name = 'figures'; heads.name = 'figures'; bodies.frustumCulled = heads.frustumCulled = false; room.add(bodies); room.add(heads);
 bodies.instanceColor = null;
 var ghosts = new THREE.Group(); ghosts.name = 'ghosts'; room.add(ghosts);
 S.tables.forEach(function (t, i) {
@@ -389,7 +407,7 @@ function setFigures(list) {
 
 /* ================= props: the places set at meals, the goblet towers between them (Interiors' items 6 and 18) */
 var plateGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.02, 12);
-var plates = new THREE.InstancedMesh(plateGeo, M.gold, seats.length); plates.name = 'places'; room.add(plates);
+var plates = new THREE.InstancedMesh(plateGeo, M.gold, seats.length); plates.name = 'places'; plates.frustumCulled = false; room.add(plates);
 seats.forEach(function (s, i) {
   tmpV.copy(P(s.x, s.y - s.side * (S.bench.deep / 2 + S.bench.off + 0.02) - s.side * 0.17, S.top + 0.01));
   tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z); plates.setMatrixAt(i, tmpM);
@@ -564,11 +582,7 @@ function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   T += dt * (kit.zoom && kit.zoom.slow ? kit.zoom.slow() : 1);
   updateCamera(dt);
-  placeCandles(T);
-  if (pumps.parent.visible) {
-    for (var i = 0; i < pumpIdx.length; i++) { waxes.getMatrixAt(pumpIdx[i], tmpM); pumps.setMatrixAt(i, tmpM); }
-    pumps.instanceMatrix.needsUpdate = true;
-  }
+  bobClock.value = T;
   redraw += dt; if (redraw > 30) { redraw = 0; draw(); }   /* the clock moves on while he stays: dusk comes, a meal begins */
   renderer.render(scene, camera);
   kit.stats(dt);
