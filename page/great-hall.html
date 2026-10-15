@@ -468,6 +468,58 @@ var staffL = new THREE.PointLight(0xffc27a, 0, 14, 1.6); staffL.position.copy(P(
 var ceiling = shell.group.getObjectByName(PLACE + '-ceiling');
 var skyMat = new THREE.MeshBasicMaterial({ color: 0x223050, side: THREE.DoubleSide });
 if (ceiling) ceiling.material = skyMat;
+/* the windows, the doors and the light through them, the Architect's req 472 (docs/handoff/architect.md, *The Great Hall's
+   windows, doors and outside*), mapped here: each opening shows the sky; a patch of direct sun on the floor only while
+   the chain shows the windows bright and the sun's bearing and height carry it through the deep reveal (so the south in
+   April to August round noon, the north low at a summer morning or evening); a full moon's pale patches through the
+   south only. The patches are worked through both faces of the wall, its depth the model's. */
+var WIN = MODEL.openings.filter(function (o) { return o.room === PLACE && /^great-hall-window-/.test(o.id); });
+var winSky = new THREE.MeshBasicMaterial({ color: 0x8aa6cc, side: THREE.DoubleSide });
+var HALL_Y = { n: 69.5, s: 51.5 };
+WIN.forEach(function (o) {
+  var north = o.at[1] > 60.5, pane = new THREE.Mesh(new THREE.PlaneGeometry(o.w, o.h), winSky);
+  pane.position.copy(P(o.at[0], o.at[1] + (north ? -0.05 : 0.05), o.sill + o.h / 2));
+  pane.lookAt(P(o.at[0], 60.5, o.sill + o.h / 2)); pane.name = 'window-sky'; room.add(pane);
+});
+var patchMat = new THREE.MeshBasicMaterial({ color: 0xfff0c8, transparent: true, opacity: 0.32, depthWrite: false, side: THREE.DoubleSide,
+  polygonOffset: true, polygonOffsetFactor: -2 });
+var patchPos = new Float32Array(WIN.length * 6 * 3), patchGeo = new THREE.BufferGeometry();
+patchGeo.setAttribute('position', new THREE.BufferAttribute(patchPos, 3));
+var patches = new THREE.Mesh(patchGeo, patchMat); patches.name = 'light-patches'; patches.frustumCulled = false; room.add(patches);
+/* bearing and altitude in degrees; which: 'all' or 'south'; returns how many windows let a patch through */
+function lightPatches(bearing, altitude, which) {
+  var az = bearing * Math.PI / 180, al = altitude * Math.PI / 180, hx = -Math.sin(az), hy = -Math.cos(az), n = 0, v = 0;
+  patchPos.fill(0);
+  WIN.forEach(function (o) {
+    var north = o.at[1] > 60.5;
+    if (which === 'south' && north) return;
+    var ny = north ? -1 : 1, hp = hy * ny, hl = hx;                    /* into the hall, and along the wall (east +) */
+    if (hp <= 0.02 || al <= 0) return;
+    var depth = Math.abs(o.at[1] - (north ? HALL_Y.n : HALL_Y.s)), k = hp / Math.tan(al);
+    /* the south range's roof (+41.6) shades the south lights September to March: ours, a sun under 38 degrees, read from the
+       Architect's months at the castle's latitude */
+    if (!north && altitude < 38) return;
+    var top = o.sill + o.h, D0 = o.sill * k, D1 = Math.min(top * k - depth, HALL_Y.n - HALL_Y.s - 0.05);   /* both faces of the reveal pass the ray; the far wall stops it */
+    var u0 = Math.max(-o.w / 2, -o.w / 2 + depth * hl / hp), u1 = Math.min(o.w / 2, o.w / 2 + depth * hl / hp);
+    if (D1 <= D0 || u1 <= u0) return;
+    var y0 = north ? HALL_Y.n : HALL_Y.s;
+    function pt(D, u) { var q = P(o.at[0] + u + D * hl / hp, y0 + ny * D, 0.02); return [q.x, q.y, q.z]; }
+    var a = pt(D0, u0), b = pt(D0, u1), c = pt(D1, u1), e = pt(D1, u0);
+    [a, b, c, a, c, e].forEach(function (q) { patchPos[v++] = q[0]; patchPos[v++] = q[1]; patchPos[v++] = q[2]; });
+    n++;
+  });
+  patchGeo.attributes.position.needsUpdate = true; patchGeo.computeBoundingSphere();
+  return n;
+}
+/* the great doors (the Architect's: open from breakfast's start to dinner's end, a feast's dinner till it ends, shut
+   from then till breakfast; read as Events' Entrance Hall rule reads them): shut, the shell's leaf; open, two leaves
+   folded back against the passage's sides */
+var DOOR = shell.doors.filter(function (x) { return x.id === 'great-hall-doors'; })[0];
+var doorsOpen = new THREE.Group(); doorsOpen.name = 'doors-open'; room.add(doorsOpen);
+[58.98, 62.02].forEach(function (y) {
+  var lf = new THREE.Mesh(new THREE.BoxGeometry(1.56, 4.98, 0.12), DOOR ? DOOR.mesh.material : M.oak);
+  lf.position.copy(P(67.1, y, 2.49)); lf.rotation.y = DOOR ? DOOR.mesh.rotation.y + Math.PI / 2 : 0; doorsOpen.add(lf);
+});
 var stars = (function () {   /* the ceiling's stars at night, a stand-in for Magic's sky at infinity */
   var g = new THREE.BufferGeometry(), a = [];
   for (var i = 0; i < 900; i++) { var v = P(U(15.2, 64.8), U(51.7, 69.3), 14.85); a.push(v.x, v.y, v.z); }
@@ -518,6 +570,18 @@ function draw() {
   if (d.sun.up && sh < 0.3) skyHex = wet ? 0x5a5f68 : 0x8a7e86;
   skyMat.color.set(skyHex);
   stars.visible = !d.sun.up && !wet;
+  winSky.color.set(d.sun.up ? (wet ? 0xa4a8ae : 0xb4cbe6) : (d.moon && d.moon.light > 0.3 ? 0x2a3456 : 0x141a2c));
+  if (d.sun.up && sh < 0.3) winSky.color.set(wet ? 0x6e737c : 0xb09a96);
+  var through = 0;
+  if (cue('the high windows bright')) { patchMat.color.set(0xfff0c8); patchMat.opacity = 0.32; through = lightPatches(d.sun.bearing || 180, d.sun.altitude || 0, 'all'); }
+  else if (cue('the high windows dark, moonlight') && d.moon.phase === 'full' && (d.moon.altitude || 0) > 41) {
+    patchMat.color.set(0xc8d4ff); patchMat.opacity = 0.16; through = lightPatches(180, d.moon.altitude, 'south');
+  }
+  patches.visible = through > 0; st.light = through ? through + ' windows let a patch through' : 'sky light only';
+  if (!(through && cue('the high windows bright'))) sunL.intensity = Math.min(sunL.intensity, 0.12);
+  var open = d.time !== 'night' || d.meal !== 'none';
+  if (DOOR) DOOR.mesh.visible = !open;
+  doorsOpen.visible = open; st.doors = open ? 'open' : 'shut';
   /* the figures (Interiors' occupancy; People's to draw) */
   var list = [], who = 'empty';
   /* the Duelling Club's evening: after dinner, when Events' chain says a club evening falls (asked by row); until then
