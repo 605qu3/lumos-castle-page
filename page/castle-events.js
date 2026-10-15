@@ -215,6 +215,10 @@
      the occasion with `meal = dinner`. */
   var OCCASIONS = ['start of term', 'halloween', 'christmas', 'christmas day', 'easter', 'leaving feast', 'none'];
   var CHRISTMAS = { from: '12-18', to: '01-02' };
+  /* The Quidditch fixtures, ours (req 480, the `match` built-in): the season from November, its matches on a Saturday
+     (PS 11 L3715 to L3717), six a year for four houses, clear of Christmas and of Easter's fortnight, never a book's own
+     match day. Each is [month, which Saturday of it], 1 the first and -1 the last. */
+  var MATCHES = [[11, 2], [11, -1], [2, 1], [2, -1], [3, 2], [5, 3]];
 
   var COND = /^([a-z_\- ]+?)\s*(>=|<=|!=|=|<|>)\s*([A-Za-z0-9_\- ]+)$/;
   var WAIT = /^(wait|quiet) (\d+)-(\d+) s$/;
@@ -415,6 +419,11 @@
     var mealOverride = /^(breakfast|lunch|dinner|none)$/.test(params.get('meal') || '') ? params.get('meal') : null;
     var occasionOverride = (function (o) { return OCCASIONS.indexOf(o) >= 0 ? o : null; })(String(params.get('occasion') || '').replace(/[-_+]/g, ' ').trim());
     var lessonsOverride = /^(on|off)$/.test(params.get('lessons') || '') ? params.get('lessons') : null;
+    /* the Great Hall's three (req 480): ?last-meal=breakfast, lunch, dinner or none for what a meal leaves; ?match=yes or
+       no; ?summer=yes or no. With ?time= alone the last meal reads none, as the meal does. */
+    var lastMealOverride = /^(breakfast|lunch|dinner|none)$/.test(params.get('last-meal') || '') ? params.get('last-meal') : null;
+    var matchOverride = /^(yes|no)$/.test(params.get('match') || '') ? params.get('match') : null;
+    var summerOverride = /^(yes|no)$/.test(params.get('summer') || '') ? params.get('summer') : null;
     var sunOverride = /^(up|down)$/.test(params.get('sun') || '') ? params.get('sun') : null;   /* ?sun=up or down */
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
     /* No castle on this iPad at all, neither a state nor a boy's satchel: the backup's restore may come down (v=30). */
@@ -607,6 +616,9 @@
         case 'meal': return mealNow();                 /* breakfast, lunch, dinner or none (§7 2) */
         case 'occasion': return occasionNow();         /* start of term, halloween, christmas, christmas day, easter, leaving feast, none (§7 3) */
         case 'lessons': return lessonsNow();           /* on in a school day's teaching hours, off otherwise (§7 4) */
+        case 'last meal': return lastMealNow();        /* the meal last ended today, none from midnight till breakfast's end (req 480) */
+        case 'match': return matchNow();               /* yes on a Quidditch Saturday of ours (req 480) */
+        case 'summer': return summerNow();             /* yes while the summer holds the castle in the feast week (req 480) */
         case 'slot': return state.slot ? 'taken' : 'free';
         /* off as a parent sets it, or where the browser cannot hear at all, so a spoken thing waits for a tap (the ear's promise) */
         case 'speech': return ear && ear.available && ear.available() ? settings.speech || 'on' : 'off';
@@ -726,6 +738,32 @@
       if (/^(christmas|christmas day|easter|start of term|leaving feast)$/.test(occ)) return 'off';
       var mins = minsNow();
       return LESSON_HOURS.some(function (h) { return inHours(h.from, h.to, mins); }) ? 'on' : 'off';
+    }
+    /* The meal last ended (req 480), for what a meal leaves until the next: the latest of the day's meals whose hours
+       are over, so lunch's leavings stand from half past one until dinner, and none from midnight until breakfast is
+       done, the hall cleared in the night (the hours ours). With ?time= alone none; ?last-meal= sets it for a look. */
+    function lastMealNow() {
+      if (lastMealOverride) return lastMealOverride;
+      if (timeOverride) return 'none';
+      var mins = minsNow(), last = 'none';
+      for (var i = 0; i < MEALS.length; i++) if (mins >= clockMin(MEALS[i].to)) last = MEALS[i].meal;
+      return last;
+    }
+    /* A match day (req 480): the castle's day is one of MATCHES's Saturdays, read through the summer hold (whose June
+       has none). The whole day; a match morning is `match = yes` with `meal = breakfast`. */
+    function matchNow() {
+      if (matchOverride) return matchOverride;
+      var d = castleDay();
+      if (d.getDay() !== 6) return 'no';
+      var m = d.getMonth() + 1, nth = Math.ceil(d.getDate() / 7);
+      var last = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 7).getMonth() !== d.getMonth();
+      return MATCHES.some(function (f) { return f[0] === m && (f[1] === nth || (f[1] === -1 && last)); }) ? 'yes' : 'no';
+    }
+    /* The summer (req 480): yes while the hold is on (§7 6), from the day after the leaving feast to 31 August, so a
+       thing that stays from the feast through the summer visits (the winner's hangings) reads it. */
+    function summerNow() {
+      if (summerOverride) return summerOverride;
+      return dayNumber(castleDay()) !== dayNumber(nowDate()) ? 'yes' : 'no';
     }
     /* Each dot's place now: the first of its rounds whose hours and `when` hold, its places taken in turn every so
        many minutes (10 unless named) counted from the date and clock alone, so both castles' Maps agree. A figure
@@ -2368,6 +2406,11 @@
       meal: mealNow,
       occasion: occasionNow,
       lessons: lessonsNow,
+      /* The Great Hall's three (req 480): the meal last ended, a match day, the summer hold, `?last-meal=`, `?match=`
+         and `?summer=` honoured. */
+      lastMeal: lastMealNow,
+      match: matchNow,
+      summer: summerNow,
       /* The day's weather (req 113): { sky (clear, cloudy, rain, snow, fog), wind (0 to 1), windy, ground (dry, wet,
          frost, snow), wet, frozen, warmth (C), cold, season (spring, summer, autumn, winter), date (mm-dd) }, one a day for
          the whole castle, `?weather=`, `?wind=`, `?season=` and `?date=` honoured, so every window shows one sky. */
