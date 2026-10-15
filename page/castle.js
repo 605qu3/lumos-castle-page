@@ -1143,7 +1143,7 @@ window.castleFrame = function (opts) {
         arch(g, 0, 0, w, h);
         g.globalCompositeOperation = 'destination-out'; arch(g, w * 0.06, w * 0.06, w * 0.88, h * 0.97 - w * 0.06); g.globalCompositeOperation = 'source-over';
         g.fillRect(w * 0.47, w * 0.04, w * 0.06, h * 0.94);
-      }, /[?&]labels/.test(location.search) ? name : null), W.w, W.h);   /* its name only for a test (?labels), never for the boy */
+      }, /[?&]labels(=|&|$)/.test(location.search) ? name : null), W.w, W.h);   /* its name only for a test (?labels), never for the boy */
       frame.position.set(wx, W.sill + W.h / 2, C.GLASS_Z + 0.01);
       add(frame, name, 1);
       var s = ol.splay, sh = new THREE.Shape();      /* the sill's plan, v = -z: back at the glass, front 5 cm proud */
