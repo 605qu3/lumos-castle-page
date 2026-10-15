@@ -39,49 +39,22 @@
     {
       "when": [
         "place = charms classroom",
-        "reading = 1",
-        "date >= 10-31"
+        "castle date >= 1 10-31"
       ],
       "show": [
-        "a small black scorch on Harry and Seamus's desktop where the feather burned"
+        "a small black scorch on a middle-row desk top, near its aisle end, where a feather burned"
       ],
-      "canon": "the orchestrator's t1 on req 366 (provisional, Godric to confirm): from the Halloween lesson on, the scorch where Harry put the fire out with his hat stays, PS 10 L3508; checked against the text, 14 October 2026"
+      "canon": "the change list's Rework 9 under the 15 October rulings (traces keep their dates): the orchestrator's t1 on req 366 (provisional, Godric to confirm), PS 10 L3504 to L3508, the feather set on fire in the Halloween lesson; so from 31 October of the Stone's castle and in every later year (Interiors' schedule, docs/interiors/charms-classroom.md, the scorch: a middle-row desk on the aisle's left, near its aisle end, no names); no desk named as anyone's; checked against the text, 15 October 2026"
     },
     {
       "when": [
-        "place = charms classroom",
-        "reading = 1",
-        "date <= 08-31"
+        "place = charms classroom"
       ],
       "show": [
-        "a small black scorch on Harry and Seamus's desktop where the feather burned"
+        "a lesson under way: Professor Flitwick perched on his pile of books behind his desk, the pupils in pairs at their desks",
+        "a pineapple sitting on a front-row desk"
       ],
-      "canon": "as above, January to the summer of that year"
-    },
-    {
-      "when": [
-        "place = charms classroom",
-        "reading >= 2"
-      ],
-      "show": [
-        "a small black scorch on Harry and Seamus's desktop where the feather burned"
-      ],
-      "canon": "as above, and in every later year, the desk keeping it"
-    },
-    {
-      "when": [
-        "place = charms classroom",
-        "reading = 1",
-        "date >= 06-01",
-        "date <= 06-07",
-        "day of week <= 5",
-        "time != evening",
-        "time != night"
-      ],
-      "show": [
-        "a pineapple sitting on the front row's desk on the aisle's left, waiting for the next one called in"
-      ],
-      "canon": "Interiors' req 361: the practical exam, PS 16 L5460, Flitwick calling them in one by one to make a pineapple tapdance across a desk; the exams from the first of June (CoS 16, the runtime's feast day), the first week's school days; checked against the text, 14 October 2026"
+      "canon": "the change list's Rework 9 and New work (a lesson under way in every open classroom): his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock: \"Lessons run whenever they visit, weekends included\"; Fawkes, 3.29 pm, on Events' Q1); `lessons` stays the castle's own timetable for the other pupils; the Charms classroom open in every castle; Flitwick on his pile of books, PS 10 L3506 (\"perched on top of his pile of books as usual\"); the pineapple a lesson consequence (the touch review's KEEP of charms-q11-pineapple-1013 t1), from PS 16 L5460's exam, never the exam itself and on no named desk (the exam's desk set aside, docs/ministry/set-aside.md); the lesson's content the Timetable's; checked against the text, 15 October 2026"
     }
   ],
   "records": [
@@ -93,18 +66,27 @@
       "weight": 1,
       "moment": "wait 8-30 s",
       "when": [
-        "place = charms classroom",
-        "reading = 1",
-        "date >= 06-01",
-        "date <= 06-07",
-        "day of week <= 5",
-        "time != evening",
-        "time != night"
+        "place = charms classroom"
       ],
       "show": [
-        "the pineapple on the front desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still"
+        "the pineapple on the front-row desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still"
       ],
-      "canon": "PS 16 L5460, as the room rule; once while he waits each visit of the exam week"
+      "canon": "PS 16 L5460, as the room rule: someone's charm taking at last; now and then while he waits, in any lesson"
+    },
+    {
+      "id": "charms.flitwick-topples",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = charms classroom"
+      ],
+      "show": [
+        "Professor Flitwick leans too far over the edge of his desk, gives a squeak and topples off his pile of books out of sight, then clambers back up, straightening his robes"
+      ],
+      "canon": "the Ministry's Interiors list, Rework 5 (docs/ministry/changes/interiors.md): he topples off his pile now and then, a habit, any lesson, the pile behind the desk so he falls out of the stand's sight; PS 8 L2734's toppling at a name set aside with the roll call; the squeak his (PS 10 L3506, \"squeaked Professor Flitwick\"); ours as a habit; checked against the text, 15 October 2026"
     },
     {
       "id": "charms.pineapple-tap",
@@ -113,13 +95,7 @@
       "leans": [],
       "moment": "tap pineapple",
       "when": [
-        "place = charms classroom",
-        "reading = 1",
-        "date >= 06-01",
-        "date <= 06-07",
-        "day of week <= 5",
-        "time != evening",
-        "time != night"
+        "place = charms classroom"
       ],
       "show": [
         "the pineapple tapdances a few quick steps on the spot and stops still"
