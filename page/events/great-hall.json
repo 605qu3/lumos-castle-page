@@ -921,15 +921,6 @@
     },
     {
       "when": [
-        "place = great hall",
-        "castle date >= 2 09-02"
-      ],
-      "show": [
-        "a small scorch on the oak of Gryffindor's table, where a red envelope once burst into flames"
-      ]
-    },
-    {
-      "when": [
         "place = entrance hall",
         "time != night"
       ],
