@@ -18,19 +18,6 @@
     },
     {
       "when": [
-        "place = defence classroom",
-        "reading = 2",
-        "date = 09-02",
-        "time != morning"
-      ],
-      "show": [
-        "broken glass over the back row's desks under the smashed window, ink sprayed across desks and floor, books and papers shredded, pictures torn down, the waste basket up-ended, the iron chandelier lying on the floor before the teacher's desk",
-        "the cage back on the teacher's desk, two frozen pixies stuffed inside it"
-      ],
-      "canon": "the Curator's req 353, item 22: the pixies, CoS 6 L8587 to L8593 (glass on the back row, ink sprayed, books and papers shredded, pictures torn from the walls, the waste basket up-ended, the chandelier gave way); Hermione freezes two and stuffs them back in the cage, L8599; from the lesson that afternoon, set right by the next day; checked against the text, 14 October 2026"
-    },
-    {
-      "when": [
         "place = defence office",
         "reading = 2",
         "weekday = saturday",
@@ -75,45 +62,6 @@
       "when": [
         "place = defence office",
         "reading = 3",
-        "date = 10-31",
-        "time = day",
-        "moon != waxing-gibbous"
-      ],
-      "show": [
-        "a goblet on the desk, smoking faintly"
-      ],
-      "canon": "the Curator's req 353, item 25: Snape sets the smoking goblet down on Lupin's desk, PoA 8 L16414 to L16418, Halloween afternoon, the Hogsmeade day; checked against the text, 14 October 2026"
-    },
-    {
-      "when": [
-        "place = defence office",
-        "reading = 3",
-        "moon = waxing-gibbous",
-        "date >= 09-01",
-        "time != night"
-      ],
-      "show": [
-        "a goblet on the desk, smoking faintly"
-      ],
-      "canon": "PoA 18 L20452: he takes the potion \"in the week preceding the full moon\", so in Lupin's year whenever the real moon is waxing gibbous, by day, the term from September to Christmas and beyond; checked against the text, 14 October 2026"
-    },
-    {
-      "when": [
-        "place = defence office",
-        "reading = 3",
-        "moon = waxing-gibbous",
-        "date <= 06-06",
-        "time != night"
-      ],
-      "show": [
-        "a goblet on the desk, smoking faintly"
-      ],
-      "canon": "as above, January to the night of the Shrieking Shack, 06-06 (PoA 21)"
-    },
-    {
-      "when": [
-        "place = defence office",
-        "reading = 3",
         "date = 06-07",
         "time != evening",
         "time != night"
@@ -153,6 +101,140 @@
       ],
       "canon": "as above, from the next morning to the summer's end",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): Lupin's last day (EV-19)"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year <= 1"
+      ],
+      "show": [
+        "a lesson under way: Professor Quirrell at the front, the class in the rows, the room smelling strongly of garlic"
+      ],
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PS 8 L2742, \"His classroom smelled strongly of garlic\", Quirrell's; the Stone's castle and the castle before any book is finished; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year = 2"
+      ],
+      "show": [
+        "a lesson under way: Professor Lockhart on the clear floor before his desk, reading a passage from one of his books to the class in the rows"
+      ],
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); CoS 10 L9831, Lockhart \"read passages from his books to them\" (Interiors' canon 7, the floor where he tells his tales); the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year = 3"
+      ],
+      "show": [
+        "a lesson under way: Professor Lupin at the front, the class in the rows"
+      ],
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PoA 7 L15857 on, Lupin's year; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "castle date >= 2 09-03"
+      ],
+      "show": [
+        "one pane of the back-row window clearer and newer than the old glass round it",
+        "a dark ink splash on the boards at the left of the clear floor, faded and scrubbed at, still there",
+        "the iron chandelier hanging a little crooked, mended where it gave way"
+      ],
+      "canon": "the change list's Rework 7 under the 15 October rulings (traces keep their dates), with Interiors' schedule, docs/interiors/defence-classroom.md (the patched pane, the ink that will not scrub out, the chandelier mended, the lead's touch kept by the touch review): CoS 6 L8587 to L8593, the pixies' lesson, the window shot through, the ink bottles grabbed, the chandelier gave way, the afternoon of 2 September; from then in the Chamber's castle and in every later year; no desk named; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year = 2",
+        "date = 09-02",
+        "time != morning"
+      ],
+      "show": [
+        "one pane of the back-row window clearer and newer than the old glass round it",
+        "a dark ink splash on the boards at the left of the clear floor, faded and scrubbed at, still there",
+        "the iron chandelier hanging a little crooked, mended where it gave way"
+      ],
+      "canon": "as above, that afternoon, after the lesson"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year = 2",
+        "castle date >= 2 09-03"
+      ],
+      "show": [
+        "Lockhart's cage on the floor under his desk, covered and empty, one bar bent outward"
+      ],
+      "canon": "the change list's Rework 7 with Interiors' schedule, docs/interiors/defence-classroom.md (Lockhart's cage, a trace of the Chamber's castle, gone with him): CoS 6 L8563, L8571 to L8583; the crumpled quiz CoS 6 L8527 to L8551 (the change list's, room[0] reduced to it), the waste basket emptied by the month's end (ours); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year = 2",
+        "date = 09-02",
+        "time != morning"
+      ],
+      "show": [
+        "Lockhart's cage on the floor under his desk, covered and empty, one bar bent outward",
+        "a crumpled quiz sheet in the waste basket"
+      ],
+      "canon": "as above, that afternoon"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year = 2",
+        "date >= 09-03",
+        "date <= 09-30"
+      ],
+      "show": [
+        "a crumpled quiz sheet in the waste basket"
+      ],
+      "canon": "as above, to the month's end"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "year = 2"
+      ],
+      "show": [
+        "a heap of fan mail on the desk, letters in many hands"
+      ],
+      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the fan mail, the Chamber's castle): CoS 7 L8926, L8932, any day of Lockhart's year (replaces the detention's envelopes, set aside); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "year >= 3"
+      ],
+      "show": [
+        "about forty pale squares on the walls where frames once hung, a nail or two left"
+      ],
+      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the pale squares, a trace from the Azkaban castle on, the list's year = 3 widened to Interiors' every later castle): CoS 7 L8924, the countless framed photographs that hung there; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "year = 3"
+      ],
+      "show": [
+        "the grindylow's tank on its stand in the far right corner, a sickly green creature in it pressing its face to the glass"
+      ],
+      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the grindylow's tank, Lupin's year): PoA 8 L16354, L16358, any day of the Azkaban castle; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "year = 3",
+        "moon = waxing-gibbous",
+        "time != night"
+      ],
+      "show": [
+        "a goblet on the desk, smoking faintly"
+      ],
+      "canon": "the change list's Rework 8 (room[5] to [7] merged, no date bounds): PoA 18 L20452, he takes the potion \"in the week preceding the full moon\", so in Lupin's year whenever the real moon is waxing gibbous, by day; never Halloween's handing over (PoA 8 L16414 to L16418, a plot moment); checked against the text, 15 October 2026"
     }
   ],
   "records": [
@@ -259,31 +341,13 @@
       "moment": "arrive",
       "when": [
         "place = defence office",
-        "reading = 2",
-        "date >= 09-01",
+        "year = 2",
         "time = night"
       ],
       "show": [
         "as he comes into the dark office, a flurry across the walls: the Lockharts in the pictures dodge out of sight, their hair in rollers"
       ],
-      "canon": "Fawkes's t1 on req 353 (provisional, Godric to confirm): CoS 9 L9412, Halloween night; widened here to every night of Lockhart's year, a habit as the fairies are (provisional, Godric to confirm); checked against the text, 14 October 2026"
-    },
-    {
-      "id": "defence.rollers-spring",
-      "tier": "fixed",
-      "source": "date",
-      "leans": [],
-      "moment": "arrive",
-      "when": [
-        "place = defence office",
-        "reading = 2",
-        "date <= 05-28",
-        "time = night"
-      ],
-      "show": [
-        "as he comes into the dark office, a flurry across the walls: the Lockharts in the pictures dodge out of sight, their hair in rollers"
-      ],
-      "canon": "as defence.rollers, January to the eve of the Chamber's night, when the photographs go into boxes (CoS 16 L12447)"
+      "canon": "the change list's Rework 8 (the two rollers records merged, the date split dropped), Fawkes's t1 on req 353: CoS 9 L9412, widened to every night of Lockhart's year, a habit as the fairies are (Interiors' schedule, docs/interiors/defence-classroom.md, The office, the photographs: on any visit after dark the Lockharts dodge out of sight in their rollers, Interiors' Rework 4c); checked against the text, 14 October 2026"
     }
   ]
 }
