@@ -621,6 +621,9 @@ function draw() {
   occ.halloween.visible = cue('about one floating candle in five');
   occ.lanterns.visible = cue("Hagrid's four vast pumpkins");
   occ.feastEnd.visible = cue("the winner's hangings");
+  /* sound: no room plays any yet, so the hall names the chain's sound cue in its state until the castle's sound comes */
+  st.sound = (shows.filter(function (s) { return /^(the hall quiet|a meal's murmur|a feast's roar|a few voices|the few at Christmas dinner|rain drumming)/.test(s); })
+    .map(function (s) { return s.split(',')[0]; })).join('; ') || 'none';
   /* the chain's cues not yet drawn here, each its owner's to give (the lane file, The layers) */
   st.notDrawn = shows.filter(function (s) { return !DRAWN.some(function (w) { return s.indexOf(w) === 0; }); }).map(function (s) { return s.slice(0, 48); });
   st.occasions = ['christmas', 'halloween', 'lanterns', 'feastEnd'].filter(function (k) { return occ[k].visible; });
@@ -663,6 +666,7 @@ function through(d) {
   kit.travel((d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE));
 }
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+var lastTold = '';
 function tap(cx, cy) {
   if (tween) return;
   var r = canvas.getBoundingClientRect();
@@ -676,6 +680,10 @@ function tap(cx, cy) {
     if (here === d.stand || here === START) { if (d.mesh.userData.way && d.built) { through(d); acted = true; } }
   } else if (hit && tapTop.indexOf(hit) >= 0 && here === START) acted = walkTo(STAFF_STAND);
   else if (here !== START) { goBack(); acted = true; }
+  /* every tap on a thing is told to the runtime (Interaction's §10, req 479): the platform, the staff table, the gold
+     chair and the doors' way, by their names with spaces, so a record waiting on one can fire */
+  var told = wi >= 0 ? ways[wi].id : hit && tapTop.indexOf(hit) >= 0 ? hit.name : '';
+  if (told) { lastTold = told.replace(/-/g, ' '); if (events && events.tap) events.tap(lastTold); }
   kit.tapped(acted);
 }
 function updateCamera(dt) {
@@ -755,7 +763,7 @@ renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
-  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC, measure: function () { return MEASURE && MEASURE.result; },
+  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
   stand: function () { return here.name; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
