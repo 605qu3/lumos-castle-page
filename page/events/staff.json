@@ -5,34 +5,48 @@
     {
       "when": [
         "place = staff room",
-        "reading = 1",
-        "weekday = friday",
-        "date >= 10-31",
-        "date <= 11-06",
-        "time != morning",
-        "time != day"
+        "castle date >= 1 11-07"
       ],
       "show": [
         "a roll of bandages half unwound over the arm of the chair nearest the door, its loose end trailing to the floor"
       ],
-      "canon": "the Curator's item 5 (req 364): the evening before the first Quidditch match, Filch handing Snape bandages for his leg, PS 11 L3749 to L3751; the match the first Saturday of November, so its eve the Friday from 10-31 to 11-06; checked against the text, 14 October 2026"
+      "canon": "the change list's Rework 12 under the 15 October rulings (traces keep their dates), with Interiors' schedule (docs/interiors/staff-room.md, the roll of bandage; its Rework 10): PS 11 L3749 to L3751, Filch handing Snape bandages the evening before the first match, a Friday in early November (the match the first Saturday of November, so its eve from 31 October to 6 November); from 7 November of the Stone's castle, after the latest that Friday can fall, so it never shows before, and in every later year; no figure, no wound; checked against the text, 15 October 2026"
     },
     {
       "when": [
         "place = staff room",
-        "reading = 2",
-        "date >= 04-24",
-        "date <= 05-29"
+        "year = 2",
+        "castle date >= 2 04-24"
       ],
       "show": [
         "a fresh sheet pinned over the older notices on the staff notice board: every lesson of the week and the teacher who walks each class to it"
       ],
-      "canon": "the Curator's item 6 (req 364): from the day Hermione is found Petrified, students escorted to each lesson by a teacher, CoS 14 L11669 (the Hufflepuff match, a Saturday after Easter, about 04-24); down after the Chamber's night, 05-29, CoS 18, when the danger is over; checked against the text, 14 October 2026; the sheet's words are Magic's"
+      "canon": "the change list's Rework 12 with Interiors' schedule (docs/interiors/staff-room.md, the notice board; its Rework 10): CoS 14 L11537, L11559, L11669, \"You will be escorted to each lesson by a teacher\", from the Saturday of the Hufflepuff match after the Easter holidays (about 24 April, the set-aside rule's reckoning); fresh in the Chamber's castle from then to the year's end; its words Magic's; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "year >= 3"
+      ],
+      "show": [
+        "an old curling sheet half hidden under newer notices on the staff notice board: every lesson of the week and the teacher who walks each class to it"
+      ],
+      "canon": "as above: in every later castle the rota stays, old and curling, half under newer notices (Interiors' schedule; the change list's Rework 12)"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "castle date >= 2 05-29"
+      ],
+      "show": [
+        "the wardrobe's left door standing an inch ajar, a dark fold of cloak showing in the gap"
+      ],
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven; docs/interiors/staff-room.md, the wardrobe): its left leaf an inch ajar, a still trace from 29 May of the Chamber's castle, \"Three days before their first exam\" (CoS 16 L12179), when two boys hid in the wardrobe full of the teachers' cloaks (L12361 to L12363), and in every later year; no figure in it; checked against the text, 15 October 2026"
     }
   ],
   "records": [
     {
-      "id": "staff.wardrobe-wobble",
+      "id": "staff.wardrobe-wobble-monday",
       "tier": "small",
       "source": "date",
       "leans": [],
@@ -40,31 +54,257 @@
       "moment": "wait 8-30 s",
       "when": [
         "place = staff room",
-        "reading = 3",
+        "year = 3",
         "date >= 09-01",
-        "date <= 09-09"
+        "date <= 09-04",
+        "day of week = 1"
       ],
       "show": [
         "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
       ],
-      "canon": "Interiors' req 354, the orchestrator's t1 on interiors-staff-room-1014 (provisional, Godric to confirm): the Boggart in the wardrobe where the teachers keep their spare robes, PoA 7 L15903 to L15909; it moved in the afternoon before Lupin's first lesson, a Thursday in the second week of term (about 09-09), and that lesson ends it; so only in the year he reads Prisoner of Azkaban, from the first of September to that Thursday; checked against the text, 14 October 2026"
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven, as the touch review adjusted it; overtakes req 354's dates): the boggart in the wardrobe, PoA 7 L15903 (\"a sudden wobble, banging off the wall\"), a habit of the Azkaban castle only, before Lupin's first lesson on the Thursday afternoon of the term's first week (PoA 7 L15695, L15849, L15857), so from 1 September to that Thursday's morning; the rules have no 'or', so one record a weekday; checked against the text, 15 October 2026"
     },
     {
-      "id": "staff.wardrobe-rattle",
+      "id": "staff.wardrobe-wobble-tuesday",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-05",
+        "day of week = 2"
+      ],
+      "show": [
+        "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
+      ],
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven, as the touch review adjusted it; overtakes req 354's dates): the boggart in the wardrobe, PoA 7 L15903 (\"a sudden wobble, banging off the wall\"), a habit of the Azkaban castle only, before Lupin's first lesson on the Thursday afternoon of the term's first week (PoA 7 L15695, L15849, L15857), so from 1 September to that Thursday's morning; the rules have no 'or', so one record a weekday; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-wobble-wednesday",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-06",
+        "day of week = 3"
+      ],
+      "show": [
+        "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
+      ],
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven, as the touch review adjusted it; overtakes req 354's dates): the boggart in the wardrobe, PoA 7 L15903 (\"a sudden wobble, banging off the wall\"), a habit of the Azkaban castle only, before Lupin's first lesson on the Thursday afternoon of the term's first week (PoA 7 L15695, L15849, L15857), so from 1 September to that Thursday's morning; the rules have no 'or', so one record a weekday; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-wobble-thursday",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-07",
+        "day of week = 4",
+        "time = morning"
+      ],
+      "show": [
+        "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
+      ],
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven, as the touch review adjusted it; overtakes req 354's dates): the boggart in the wardrobe, PoA 7 L15903 (\"a sudden wobble, banging off the wall\"), a habit of the Azkaban castle only, before Lupin's first lesson on the Thursday afternoon of the term's first week (PoA 7 L15695, L15849, L15857), so from 1 September to that Thursday's morning; the rules have no 'or', so one record a weekday; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-wobble-friday",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-01",
+        "day of week = 5"
+      ],
+      "show": [
+        "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
+      ],
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven, as the touch review adjusted it; overtakes req 354's dates): the boggart in the wardrobe, PoA 7 L15903 (\"a sudden wobble, banging off the wall\"), a habit of the Azkaban castle only, before Lupin's first lesson on the Thursday afternoon of the term's first week (PoA 7 L15695, L15849, L15857), so from 1 September to that Thursday's morning; the rules have no 'or', so one record a weekday; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-wobble-saturday",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-02",
+        "day of week = 6"
+      ],
+      "show": [
+        "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
+      ],
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven, as the touch review adjusted it; overtakes req 354's dates): the boggart in the wardrobe, PoA 7 L15903 (\"a sudden wobble, banging off the wall\"), a habit of the Azkaban castle only, before Lupin's first lesson on the Thursday afternoon of the term's first week (PoA 7 L15695, L15849, L15857), so from 1 September to that Thursday's morning; the rules have no 'or', so one record a weekday; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-wobble-sunday",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 8-30 s",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-03",
+        "day of week = 7"
+      ],
+      "show": [
+        "the old wardrobe at the far end gives a sudden wobble, banging off the wall"
+      ],
+      "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven, as the touch review adjusted it; overtakes req 354's dates): the boggart in the wardrobe, PoA 7 L15903 (\"a sudden wobble, banging off the wall\"), a habit of the Azkaban castle only, before Lupin's first lesson on the Thursday afternoon of the term's first week (PoA 7 L15695, L15849, L15857), so from 1 September to that Thursday's morning; the rules have no 'or', so one record a weekday; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle-monday",
       "tier": "fixed",
       "source": "device",
       "leans": [],
       "moment": "tap wardrobe",
       "when": [
         "place = staff room",
-        "reading = 3",
+        "year = 3",
         "date >= 09-01",
-        "date <= 09-09"
+        "date <= 09-04",
+        "day of week = 1"
       ],
       "show": [
         "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
       ],
-      "canon": "PoA 7 L15907, the now rattling doorknob; Interiors' req 354 asked whether it rattles: on his tap, so the thing he touches answers and nothing opens; checked against the text, 14 October 2026"
+      "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle-tuesday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wardrobe",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-05",
+        "day of week = 2"
+      ],
+      "show": [
+        "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
+      ],
+      "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle-wednesday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wardrobe",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-06",
+        "day of week = 3"
+      ],
+      "show": [
+        "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
+      ],
+      "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle-thursday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wardrobe",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-07",
+        "day of week = 4",
+        "time = morning"
+      ],
+      "show": [
+        "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
+      ],
+      "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle-friday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wardrobe",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-01",
+        "day of week = 5"
+      ],
+      "show": [
+        "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
+      ],
+      "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle-saturday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wardrobe",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-02",
+        "day of week = 6"
+      ],
+      "show": [
+        "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
+      ],
+      "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.wardrobe-rattle-sunday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wardrobe",
+      "when": [
+        "place = staff room",
+        "year = 3",
+        "date >= 09-01",
+        "date <= 09-03",
+        "day of week = 7"
+      ],
+      "show": [
+        "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
+      ],
+      "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
     }
   ]
 }
