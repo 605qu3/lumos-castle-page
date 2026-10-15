@@ -129,13 +129,15 @@
       {
         "item": "ton-tongue",
         "when": [
-          "drawn ton-tongue = yes"
+          "drawn ton-tongue = yes",
+          "year >= 4"
         ]
       },
       {
         "item": "canary-feather",
         "when": [
-          "drawn canary-feather = yes"
+          "drawn canary-feather = yes",
+          "year >= 4"
         ]
       },
       {
@@ -149,6 +151,7 @@
         "item": "extendable-ear",
         "when": [
           "drawn extendable-ear = yes",
+          "year >= 5",
           "sofa_finds >= 12"
         ],
         "states": [
@@ -159,7 +162,8 @@
       {
         "item": "order-form",
         "when": [
-          "drawn order-form = yes"
+          "drawn order-form = yes",
+          "year >= 4"
         ]
       },
       {
@@ -250,7 +254,8 @@
       {
         "item": "spew-badge",
         "when": [
-          "drawn spew-badge = yes"
+          "drawn spew-badge = yes",
+          "year >= 4"
         ]
       },
       {
