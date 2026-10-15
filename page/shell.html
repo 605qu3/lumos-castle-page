@@ -587,7 +587,19 @@ if (Q.get('cupboard') === 'open') cupSet(true, true);
    fairies, the scorch, the bandages, a notice), is written in a note at the foot until the room is built.
    ?pineapple=on stands the pineapple with the events absent, for checks. */
 var PINE_SHOW = "a pineapple sitting on the front row's desk on the aisle's left, waiting for the next one called in";
+/* Events' words, req 441 (mirror.json, Rework 5): where the Mirror stood, from 28 December of the Stone's castle on, and
+   the window's moonlit sky on the floor by the door (sky light, never a beam: the window faces north; no glass, req 443).
+   ?scrape=on, ?oblong=on, ?moonpatch=on stand them with the events absent, for checks. */
+var MIRROR_GONE = "two pale scrapes on the floor where a heavy thing on two feet once stood, and a cleaner oblong on the wall above them";
+var MOON_PATCH = "a pale patch of moonlight on the floor just inside the door";
 var ROOM_THINGS = {
+  /* docs/interiors/mirror-classroom.md (x = 71.4 + y', y = 68.6 - x'): the scrapes x' 2.95 to 3.35 and 4.65 to 5.05,
+     y' 9.65 to 9.95; the cleaner oblong on the far wall x' 2.85 to 5.15, 3.95 to 4.5 high; the patch y' 0.3 to 2.5, from
+     the window wall (x' 0) to the walk's edge (x' 4.2), the window at y' 0.5 to 1.5 (model v27, mirror-window) */
+  'forgotten-classroom': [{ id: 'scrape-n', rect: [81.05, 65.25, 81.35, 65.65], z: [0, 0.006], col: 0x948c80, show: MIRROR_GONE, still: true },
+                          { id: 'scrape-s', rect: [81.05, 63.55, 81.35, 63.95], z: [0, 0.006], col: 0x948c80, show: MIRROR_GONE, still: true },
+                          { id: 'oblong', rect: [81.37, 63.45, 81.4, 65.75], z: [3.95, 4.5], col: 0xaaa397, show: MIRROR_GONE, still: true },
+                          { id: 'moonpatch', rect: [71.7, 64.4, 73.9, 68.3], z: [0, 0.008], col: 0x9fb0c4, show: MOON_PATCH, still: true }],
   /* docs/interiors/staff-room.md: against the far (east) end wall, x' 2.25 to 3.75 (y = 50.6 + x'), 0.7 deep, 2.2 high */
   'staff-room': [{ id: 'wardrobe', rect: [141.3, 52.85, 142.0, 54.35], z: [0, 2.2], col: 0x5a4c3e, stand: [139.3, 53.6], look: 1.3 }],
   /* docs/interiors/charms-classroom.md: the front row's desk on the aisle's left, x' 2.3 to 3.6 (y = 71.4 - x'),
