@@ -205,6 +205,15 @@ var SET_ASIDE = /[?&]setaside(=|&|$)/.test(location.search);
 /* The last book he has finished, 0 to 7: his castle's year (the world rules, Time). Until Events' clock gives it as a
    driver (docs/room-states.md, asked by row) the page reads ?finished=N, and 0 meanwhile: the Stone's year, no traces */
 var FINISHED = Math.max(0, Math.min(7, +(location.search.match(/[?&]finished=(\d)/) || [])[1] || 0));
+/* A trace keeps its date (the world rules, Time): in the visited year, the year of its own book, it shows from the day
+   its event happened and stays; in every later year it is always there. The school year counts from 1 September; ?date=
+   as the grounds' look switch */
+function traceFrom(book, month, day) {
+  if (FINISHED !== book) return FINISHED > book;
+  var q = (location.search.match(/[?&]date=(\d{4}-\d\d-\d\d)/) || [])[1], d = q ? new Date(q + 'T12:00:00') : new Date();
+  function k(m, dd) { return (m >= 9 ? m - 9 : m + 3) * 32 + dd; }
+  return k(d.getMonth() + 1, d.getDate()) >= k(month, day);
+}
 
 /* ---------- the shared frame (castle.js): renderer, scene, camera, helpers, HUD ---------- */
 
@@ -822,8 +831,8 @@ var doorTorches = [addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, HE
    blue there (req 85's cue, the room's) */
 var STRIP_TORCH = CORRIDOR.places.torches[2];
 torches.push(addTorch(new THREE.Vector3(STRIP_TORCH.x, STRIP_TORCH.y, FAR_FACE), 1, 'corridor-torch-3'));
-/* the deathday's trace (Rework 7, 15 October 2026; CoS 8, the black candles of Nick's five hundredth deathday party):
-   once CoS is finished, on any day, a stub of black candle wedged at the bracket of the strip's torch, the one Nick
+/* the deathday's trace (Rework 7, 15 October 2026; CoS 8, L9125 his five hundredth deathday this Halloween, L9159 the
+   long, thin, jet-black tapers burning blue): in the Chamber's year from 31 October, and in every later year, on any day, a stub of black candle wedged at the bracket of the strip's torch, the one Nick
    passes, blue-black drips run down the iron. A tap goes to the runtime as `candle stub`: Nick, passing, mentions his
    deathday as old news (Events' lines, EV-48, asked by row), and gives no invitation. Drawn in code, 4 by 9 cm */
 var candleStub = onWallZ(cutoutTexture(24, 64, '#151318', function (g, w, h) {
@@ -834,9 +843,11 @@ var candleStub = onWallZ(cutoutTexture(24, 64, '#151318', function (g, w, h) {
     g.lineTo(w * (d[0] + 0.03), h * d[1]); g.arc(w * d[0], h * d[1], w * 0.04, 0, Math.PI); g.closePath(); g.fill();
   });
   g.fillStyle = '#3a3a3a'; g.fillRect(w * 0.48, 0, w * 0.04, h * 0.1);                /* the burnt wick */
-}), 0.04, 0.106, STRIP_TORCH.x + 0.07, STRIP_TORCH.y - 0.2, FAR_FACE + 0.012, 1, 1, 'deathday-candle-stub');
-candleStub.rotation.y = -Math.PI / 2; candleStub.position.z = FAR_FACE + 0.06;   /* stood in the bracket's ring, turned down the corridor so the length view meets it */
-candleStub.visible = FINISHED >= 2 || /[?&]candleStub\b/.test(location.search);   /* ?candleStub for a look */
+}), 0.04, 0.106, STRIP_TORCH.x - 0.19, STRIP_TORCH.y - 0.341, FAR_FACE + 0.014, 1, 1, 'deathday-candle-stub');
+/* flat on the wall as the torch's own drawing is, its foot stood on the bracket's arm (0.33 m under the head, between
+   the wall plate and the ring) and its drips down over the iron; until 15 October 2026 it hung in the air beside the
+   torch, turned down the corridor */
+candleStub.visible = traceFrom(2, 10, 31) ||/[?&]candleStub\b/.test(location.search);   /* ?candleStub for a look */
 candleStub.userData.thing = 'candle stub';   /* tappable from where the tappables are gathered */
 doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = false; torches.push(tc); });
 /* the turn's torch, on the end wall to the left of the arch as he faces it, its flame leaning toward the arch as if a
@@ -1745,7 +1756,8 @@ function snowballFly() {
   snowball = { t: 0, T: 1.5 + 0.4 * Math.random(), x0: (Math.random() < 0.5 ? 0.27 : 0.73) + (Math.random() - 0.5) * 0.1,
     drift: (Math.random() - 0.5) * 0.08,   /* inside one light, clear of the mullion */ peak: 0.3 + 0.2 * Math.random(), flakes: [] };
 }
-/* the bewitched snowball's trace (Rework 8, 15 October 2026; PS 12): once PS is finished, on days while snow lies, a
+/* the bewitched snowball's trace (Rework 8, 15 October 2026; PS 12 L4014, the twins' bewitched snowballs, from
+   mid-December): in the Stone's year from 15 December, and in every later year, on days while snow lies, a
    lump of snow stuck high on the outside of the glass, far higher than any throw from the lawn rises (the snowball
    peaks at half the glass at most); it was bounced off something up there. Drawn in code, about 13 cm across, with a
    short slide mark under it. ?snowLump shows it whatever the year or the weather */
@@ -1753,7 +1765,7 @@ var snowLump = { mesh: null, look: groundsQ.has('snowLump'), next: 0 };
 function updateSnowLump() {
   if (t < snowLump.next) return;
   snowLump.next = t + 1;
-  var w = groundsWeather(), on = snowLump.look || (FINISHED >= 1 && !!w && w.ground === 'snow');
+  var w = groundsWeather(), on = snowLump.look || (traceFrom(1, 12, 15) && !!w && w.ground === 'snow');
   if (on && !snowLump.mesh) {
     var c = makeCanvas(48, 64), g = c.getContext('2d');
     g.fillStyle = 'rgba(226,232,240,0.6)';                                               /* where it slid a little, tapering */
@@ -3145,8 +3157,8 @@ function goTo(s) {
   headReset();   /* the glide starts from where his head is turned and sets him down square to the new stop */
   glideTo(s.stop(), s.arrive);
   if (s.name === 'her' && tween.from.pos.distanceTo(tween.to.pos) > 2.5) primpHer(tween.dur);   /* her primp, only as he walks up */
+  if (s.name === 'her' && home.q && !home.kind) nickHome(home.q === 'glow' ? 'glow' : 'walk');   /* ?nickHome=, for a look, ahead of the runtime's own cue */
   if (castle && castle.moment) castle.moment('walk up');   /* he sets off toward a stop: a torch may lean (req 140) */
-  if (s.name === 'her' && home.q && !home.kind) nickHome(home.q === 'glow' ? 'glow' : 'walk');   /* ?nickHome=, for a look */
   if (s.name === 'cupboard' && butterfly.q) cupboardSwing(true);                                    /* ?butterfly, for a look */
 }
 function goBack() {
