@@ -10,7 +10,8 @@
       "moment": "filch passes",
       "when": [
         "place = corridor",
-        "time != night"
+        "time != night",
+        "norris != cupboard"
       ],
       "who": [
         {
@@ -33,6 +34,39 @@
             "My knees, my sweet. Up and down these stairs all day, and who thanks me?"
           ],
           "canon": "ours, in his voice (the Corridor's req 454; the Ministry's corridor list, New work: \"Nothing here, my sweet. Nothing here.\"); Filch's \"my sweet\" to Mrs Norris and his wish to have Peeves out, CoS 8 L9091, checked against the text, 15 October 2026; \"Sniff around, my sweet\" (PS 9 L3237) never used, since it is Harry's night; comic, he never sees him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.grumble-norris",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "norris = cupboard"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.grumble-norris",
+          "sound": "Filch muttering to Mrs Norris, sat staring at the broom cupboard, as he shuffles straight past",
+          "text": [
+            "Come away, my sweet. It's only the cupboard.",
+            "Mops and buckets, my sweet. Nothing in there but mops and buckets."
+          ],
+          "canon": "ours, in his voice (the Corridor's req 454: where Mrs Norris sits before the cupboard he mutters at her for staring at it; the page's built-in norris, 73bc09a0); his \"my sweet\" to her, CoS 8 L9091, checked against the text, 15 October 2026; comic, he never sees him (the world rules)"
         }
       ]
     }

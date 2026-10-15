@@ -1,0 +1,97 @@
+{
+  "chain": "myrtle",
+  "room": [
+    {
+      "when": [
+        "place = myrtles bathroom"
+      ],
+      "show": [
+        "the stone flags damp and dull-shining, a thin film of water near the end stall and under the sinks"
+      ],
+      "canon": "Interiors' req 463 (docs/interiors/myrtles-bathroom.md, the damp floor, a habit any day; its depth Events'): CoS 9 L9704, \"The floor was damp and reflected the dull light\"; CoS 8 L9181, out of order all year for her flooding; every castle, any day; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = myrtles bathroom",
+        "castle date >= 2 12-15"
+      ],
+      "show": [
+        "a sooty scorch under the rim of one toilet in a nameless stall, where a little fire once crackled"
+      ],
+      "canon": "Interiors' req 463 (a sooty scorch under one toilet's rim in a nameless stall; its place Interiors'): CoS 11 L10216, \"An old cauldron was perched on the toilet, and a crackling from under the rim\"; the book gives that stall's fire no date (the day after the season's first match), so from 15 December of the Chamber's castle, the splash stain's reckoning in the same chapter, never before, and in every later year; no stall or name given; checked against the text, 15 October 2026"
+    }
+  ],
+  "records": [
+    {
+      "id": "myrtle.flooded",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = myrtles bathroom"
+      ],
+      "show": [
+        "the floor awash from wall to wall, water still seeping out under the door into the corridor"
+      ],
+      "canon": "Interiors' req 463 (the water seeping under the door, as the floor's wet habit): CoS 13 L11090, water \"still seeping from under the door\", and CoS 8 L9181, her tantrums flooding the place, so now and then, any day and any castle, never that CoS night; a small record on arrival, so one habit a visit at most and never two visits running; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "myrtle.sobs",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = myrtles bathroom"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "moaning myrtle",
+          "mark": "her stall"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.sobs",
+          "sound": "long, wet sobs from behind the end stall's door, then a loud sniff"
+        }
+      ],
+      "canon": "Interiors' req 463 (her moods and when she is in; her figure People's and Magic's): she haunts her own stall, her own business, never a scene's figure (Interiors' schedule, Under the rulings); CoS 9 L9736, \"a tragic sob\"; sounds only, no words said to him; a small record on arrival; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "myrtle.u-bend",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = myrtles bathroom"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "moaning myrtle",
+          "mark": "her stall"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.u-bend",
+          "sound": "a splash in the end stall's toilet, then muffled sobbing from somewhere down in the U-bend, fading"
+        }
+      ],
+      "canon": "Interiors' req 463 (her moods): CoS 9 L9736, she dives headfirst into the toilet, \"her muffled sobs\" from \"somewhere in the U-bend\"; now and then, any day, sounds only; a small record on arrival; checked against the text, 15 October 2026"
+    }
+  ]
+}
