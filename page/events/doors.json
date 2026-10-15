@@ -315,7 +315,8 @@
           "as": "gasp",
           "role": "voice",
           "name": "first years",
-          "mark": "in the small chamber"
+          "mark": "in the small chamber",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the PS 7 Sorting-chamber framing (the first years' gasp, the ghosts' words from that night); the ghosts now talk of their own affairs"
         },
         {
           "as": "friar",
@@ -336,7 +337,8 @@
           "medium": "heard",
           "key": "doors.chamber-gasp",
           "sound": "a gasp behind the door, then ghostly chatter, as if a crowd of ghosts had just come through the back wall arguing",
-          "canon": "PS 7, the first years gasp as about twenty ghosts stream through the back wall of the small chamber, arguing; Godric's t1 on events-shut-doors-265, once in a long while; checked against the text, 13 October 2026"
+          "canon": "PS 7, the first years gasp as about twenty ghosts stream through the back wall of the small chamber, arguing; Godric's t1 on events-shut-doors-265, once in a long while; checked against the text, 13 October 2026",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the PS 7 Sorting-chamber framing (the first years' gasp, the ghosts' words from that night); the ghosts now talk of their own affairs"
         },
         {
           "speaker": "friar",
@@ -345,7 +347,8 @@
           "text": [
             "Forgive and forget, I say, we ought to give him a second chance."
           ],
-          "canon": "PS 7, the Fat Friar on Peeves, as the ghosts come through the wall; checked against the text, 13 October 2026"
+          "canon": "PS 7, the Fat Friar on Peeves, as the ghosts come through the wall; checked against the text, 13 October 2026",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the PS 7 Sorting-chamber framing (the first years' gasp, the ghosts' words from that night); the ghosts now talk of their own affairs"
         },
         {
           "speaker": "ruff",
@@ -354,7 +357,27 @@
           "text": [
             "My dear Friar, haven't we given Peeves all the chances he deserves?"
           ],
-          "canon": "PS 7, the ghost in a ruff and tights answers him; checked against the text, 13 October 2026"
+          "canon": "PS 7, the ghost in a ruff and tights answers him; checked against the text, 13 October 2026",
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the PS 7 Sorting-chamber framing (the first years' gasp, the ghosts' words from that night); the ghosts now talk of their own affairs"
+        },
+        {
+          "speaker": "friar",
+          "medium": "heard",
+          "key": "doors.chamber-friar-pudding",
+          "text": [
+            "I still say Hufflepuff's table had the better pudding."
+          ],
+          "sound": "a chill through the keyhole, then ghostly chatter, as if a few ghosts had just come through the back wall mid-argument",
+          "canon": "ours: the castle's ghosts pass through walls on their own affairs (the Fat Friar, Hufflepuff's ghost, PS 7; ghosts do not eat, Nick at the feast, PS 7); no words of the Sorting night (Rework 21; the touch review, req 420), 15 October 2026"
+        },
+        {
+          "speaker": "ruff",
+          "medium": "heard",
+          "key": "doors.chamber-ruff-pudding",
+          "text": [
+            "My dear Friar, you have not tasted a pudding for centuries."
+          ],
+          "canon": "ours, the same"
         }
       ],
       "starts": [

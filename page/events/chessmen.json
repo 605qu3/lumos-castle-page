@@ -718,11 +718,46 @@
           "medium": "said",
           "key": "chessmen.bishop.picked-trusting",
           "text": [
-            "Harry Potter was a bishop once, you know. Under the trapdoor.",
             "Onward, at a respectable angle!",
             "Bless you, general. Off I slant."
           ],
-          "canon": "PS 16, Harry takes the bishop's place on the giant board; checked against the text, 9 October 2026"
+          "canon": "ours"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.bishop-picked-trusting-trapdoor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = bishop",
+        "games >= 4",
+        "year >= 1"
+      ],
+      "one_of": "chess-picked",
+      "weight": 0.333,
+      "who": [
+        {
+          "as": "bishop",
+          "role": "trace",
+          "what": "his bishops",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "bishop",
+          "medium": "said",
+          "key": "chessmen.bishop.picked-trapdoor",
+          "text": [
+            "Harry Potter was a bishop once, you know. Under the trapdoor."
+          ],
+          "canon": "PS 16, Harry takes the bishop's place on the giant board; checked against the text, 9 October 2026; from the Stone finished (Rework 31)"
         }
       ]
     },
@@ -1001,11 +1036,46 @@
           "key": "chessmen.rook.picked-trusting",
           "text": [
             "Hogwarts is a castle. I'm a castle. We're practically family.",
-            "Hermione Granger was a castle once. Very clever castle.",
             "Steady as a rock. Well, a rook.",
             "Straight at them!"
           ],
-          "canon": "PS 16, Hermione takes the castle's place on the giant board; checked against the text, 9 October 2026"
+          "canon": "ours"
+        }
+      ]
+    },
+    {
+      "id": "chessmen.rook-picked-trusting-trapdoor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [
+        "switching"
+      ],
+      "moment": "chess picked",
+      "when": [
+        "game = on",
+        "piece = rook",
+        "games >= 4",
+        "year >= 1"
+      ],
+      "one_of": "chess-picked",
+      "weight": 0.25,
+      "who": [
+        {
+          "as": "rook",
+          "role": "trace",
+          "what": "his rooks",
+          "mark": "round table"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "rook",
+          "medium": "said",
+          "key": "chessmen.rook.picked-trapdoor",
+          "text": [
+            "Hermione Granger was a castle once. Very clever castle."
+          ],
+          "canon": "PS 16, Hermione takes the castle's place on the giant board; checked against the text, 9 October 2026; from the Stone finished (Rework 31)"
         }
       ]
     },

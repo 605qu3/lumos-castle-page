@@ -534,7 +534,8 @@
       ],
       "show": [
         "Houdini's padlock hanging open on its hasp, the chain loose"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Houdini, a real person of the photograph era, recognisable (FDP-35); his padlock goes with his card"
     },
     {
       "when": [
@@ -1168,7 +1169,8 @@
         "set card_side = front",
         "set card_face = leaving",
         "add card_turns 1"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Houdini, a real person of the photograph era, recognisable (FDP-35); his padlock goes with his card"
     },
     {
       "id": "sofa.card-front-leaving-carroll",
@@ -1214,7 +1216,8 @@
       ],
       "starts": [
         "set houdini_lock = open"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Houdini, a real person of the photograph era, recognisable (FDP-35); his padlock goes with his card"
     },
     {
       "id": "sofa.card-pocket",
@@ -1225,7 +1228,6 @@
       "when": [
         "holding = yes",
         "find = card",
-        "card != houdini",
         "card_side = front",
         "card_turns >= 2",
         "card_again != yes"
@@ -1257,7 +1259,8 @@
       ],
       "starts": [
         "set holding = no"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Houdini, a real person of the photograph era, recognisable (FDP-35); his padlock goes with his card"
     },
     {
       "id": "sofa.card-spare",
@@ -1268,7 +1271,6 @@
       "when": [
         "holding = yes",
         "find = card",
-        "card != houdini",
         "card_side = front",
         "card_turns >= 2",
         "card_again = yes"
@@ -1344,7 +1346,8 @@
           ],
           "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Ron's voice on a repeat card, a trio line; the swap pile stays"
         }
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Houdini, a real person of the photograph era, recognisable (FDP-35); his padlock goes with his card"
     },
     {
       "id": "sofa.card-kept",
@@ -3132,23 +3135,35 @@
       },
       {
         "item": "agrippa",
-        "weight": 1,
+        "weight": 2,
         "when": [
           "drawn card-agrippa = yes",
-          "cards_found >= 1",
-          "cards_found >= 12"
+          "cards_found >= 1"
         ],
-        "say": "Agrippa"
+        "say": "Agrippa",
+        "rarity": {
+          "weight": 1,
+          "when": [
+            "cards_found >= 12"
+          ],
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the rare card held back till twelve finds (Ron never got Agrippa, PS 6); the joke moves to Clementine's pencilled wish on the doorframe"
+        }
       },
       {
         "item": "ptolemy",
-        "weight": 1,
+        "weight": 2,
         "when": [
           "drawn card-ptolemy = yes",
-          "cards_found >= 1",
-          "cards_found >= 12"
+          "cards_found >= 1"
         ],
-        "say": "Ptolemy"
+        "say": "Ptolemy",
+        "rarity": {
+          "weight": 1,
+          "when": [
+            "cards_found >= 12"
+          ],
+          "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): the rare card held back till twelve finds (Ron never got Agrippa, PS 6); the joke moves to Clementine's pencilled wish on the doorframe"
+        }
       },
       {
         "item": "flamel",
@@ -3717,7 +3732,8 @@
           "drawn card-houdini = yes",
           "cards_found >= 1"
         ],
-        "say": "Houdini"
+        "say": "Houdini",
+        "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): Houdini, a real person of the photograph era, recognisable (FDP-35); his padlock goes with his card"
       },
       {
         "item": "robert-houdin",

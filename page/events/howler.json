@@ -4,7 +4,8 @@
     {
       "when": [
         "days since howler_lifted = 0",
-        "days since howler_opened >= 1"
+        "days since howler_opened >= 1",
+        "home howler = written"
       ],
       "show": [
         "the Howler smoking at the corners"

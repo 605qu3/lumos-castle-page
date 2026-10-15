@@ -25,7 +25,8 @@
       "show": [
         "halfway up the staircase to the third floor the carpet loosened, its brass rods pulled from the treads, the runner rucked so people will trip"
       ],
-      "canon": "the Curator's req 356, item 9: PS 16 L5718, the night of the trapdoor (the exams' last day, about 06-05 here, as the wing's toilet seat), Peeves halfway up loosening the carpet; the runner's rods are Interiors' (docs/interiors/stair-hall.md, thing 5); checked against the text, 14 October 2026"
+      "canon": "the Curator's req 356, item 9: PS 16 L5718, the night of the trapdoor (the exams' last day, about 06-05 here, as the wing's toilet seat), Peeves halfway up loosening the carpet; the runner's rods are Interiors' (docs/interiors/stair-hall.md, thing 5); checked against the text, 14 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; Rework 15): the carpet loosened on the trapdoor night, staged on PS 16's date; the loose rod is its trace"
     },
     {
       "when": [
@@ -38,7 +39,25 @@
       "show": [
         "halfway up the staircase to the third floor the carpet loosened, its brass rods pulled from the treads, the runner rucked so people will trip"
       ],
-      "canon": "as above, the small hours after midnight"
+      "canon": "as above, the small hours after midnight",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; Rework 15): the carpet loosened on the trapdoor night, staged on PS 16's date; the loose rod is its trace"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "castle date >= 1 06-06"
+      ],
+      "show": [
+        "halfway up the staircase to the third floor one brass stair rod lies loose, its tread's runner rucked"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "the map of Argyllshire on the wall, its lochs and hills in faded inks"
+      ]
     },
     {
       "when": [

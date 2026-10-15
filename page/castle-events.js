@@ -98,8 +98,9 @@
    the waiting ones (built-in `owl waited`: yes when a copy waited out of signal on either iPad, and the owl is
    Errol, CoS 6), then the page is told each slip as its own are. With no pairing, nothing is sent. The best-year
    slip (Magic's *Against the year*): the moment `points grow` after any slip lands, the built-in `best year` yes
-   when this school year's heap, both boys', passes last year's (from the second year, once a year), `year` the
-   school year now; a `year` slip is never posted, since each castle reads the same heap and gives its own (v=25).
+   when this school year's heap, both boys', passes last year's (from the second year, once a year); a `year` slip
+   is never posted (since 15 October 2026 the built-in `year` is the castle's year, the last book he has finished, 0
+   to 7, `castle date` its date as `N mm-dd`, and `reading` a deprecated alias of `year`: Rework 2, req 431), since each castle reads the same heap and gives its own (v=25).
    Then a point taken back (Design's req 237, Godric's Q22 t2): only a grown-up takes one back, a slip given in
    error (`back(slip)`); it stays, marked `back: true` and `backOn` (yyyy-mm-dd), out of every heap and total, the
    page told by `opts.back(slip)`, and the owl carries it to the other castle, which marks its copy the same (v=25).
@@ -543,7 +544,8 @@
         case 'house points': return (state.points || []).reduce(function (t, p) { return t + (p.back ? 0 : p.points); }, 0);   /* req 216; a slip taken back is out (req 237) */
         case 'owl waited': return owlWaited ? 'yes' : 'no';           /* the owl's copies waited out of signal: Errol (req 216, t1) */
         case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
-        case 'year': return schoolYear(isoDay(now));                   /* the school year now, named by its feast's year */
+        case 'year': return castleYear();                              /* the last book he finished, 0 to 7 (Rework 2) */
+        case 'castle date': return castleDateKey();                    /* compared with `N mm-dd` (docs/room-states.md) */
         case 'who plays': return playersNow().ask ? 'ask' : (owl.players || []).length >= 2 ? 'chosen' : 'one';   /* one castle: his name to tap */
         case 'parcel': var pc = parcelFor(me()); return pc && playerOf(owl.playing) ? (pc.landed ? 'sill' : 'coming') : 'none';   /* B26 */
         case 'parcel thing': var pt = parcelFor(me()); return pt ? pt.name : parcelOpened || 'none';
@@ -569,9 +571,26 @@
 
     /* The page he is on as the castle model's room, for his own dot; the den is the page's to say (`map here`). */
     var PAGE_ROOM = { 'common room': 'common-room', corridor: 'corridor', dormitory: 'dormitory', 'entrance hall': 'entrance-hall' };
-    function readingBook() {
-      var r = Math.floor(+(params.get('reading') || settings.reading || 0));
+    function readingBook() { return castleYear(); }   /* `reading` is deprecated: it reads the castle's year (Rework 2) */
+    /* The castle's year (the world rules, Time; the Ministry's Rework 2, req 431): the last book he has finished, 0 to
+       7, a grown-up's setting (settings.finished), ?year=N or ?finished=N for a test; 0 till set, the Stone's year
+       with no book's traces. The old ?reading= and settings.reading still count, read as the same year, until every
+       chain has moved to `year`. One clock: every chain and page reads this. A shared trip's lower year waits on the
+       shared trip itself, not built yet. */
+    function castleYear() {
+      var r = Math.floor(+(params.get('year') || params.get('finished') || params.get('reading') || settings.finished || settings.reading || 0));
       return r >= 1 && r <= 7 ? r : 0;
+    }
+    /* The castle's date as a school-year key (docs/room-states.md): the year, then the day from 1 September, so a
+       trace of book N from its own date reads `castle date >= N mm-dd` and holds in every later year too (the world
+       rules, traces keep their dates). Months September to August, each given 31 days. */
+    function schoolKey(n, md) {
+      var m = /^(\d\d)-(\d\d)$/.exec(md || '');
+      return m ? n * 1000 + ((+m[1] + 3) % 12) * 31 + +m[2] : null;
+    }
+    function castleDateKey() {
+      var now = nowDate();
+      return schoolKey(castleYear(), ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2));
     }
     function clockMin(t) { var m = /^(\d\d):(\d\d)$/.exec(t || ''); return m ? +m[1] * 60 + +m[2] : null; }
     function inHours(from, to, mins) {
@@ -711,6 +730,7 @@
       if (!m) { note('condition does not parse: ' + cond); return false; }
       var lhs = value(m[1]), op = m[2], raw = m[3].trim();
       var rhs = /^-?\d+$/.test(raw) ? +raw : (raw === 'today' || stampNames[raw]) ? value(raw) : raw;
+      if (m[1] === 'castle date') { var dm = /^([0-7]) (\d\d-\d\d)$/.exec(raw); rhs = dm ? schoolKey(+dm[1], dm[2]) : null; if (rhs == null) { note('castle date needs N mm-dd: ' + cond); return false; } }
       if (lhs === undefined) {
         if (typeof rhs === 'number' || op === '<' || op === '>' || op === '<=' || op === '>=') lhs = 0;   /* a count never added to reads as 0 */
         else return op === '!=';                                                                         /* a flag never set equals nothing */
@@ -2153,6 +2173,8 @@
                                                    .map(function (u) { return u.place; }) };
       },
       reading: readingBook,
+      /* The castle's year, the last book he has finished, 0 to 7 (Rework 2, req 431): pages read this, never ?finished=. */
+      year: castleYear,
       /* The castle's secrets he has found, in the order found, each once (req 180; for the Map, B10). */
       secrets: function () { return (state.secrets || []).slice(); },
       /* The house points earned on this iPad, a slip each in the order earned: { kind, thing, points, on (yyyy-mm-dd),

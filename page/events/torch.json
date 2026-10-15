@@ -123,6 +123,42 @@
       ]
     },
     {
+      "id": "torch.candle-stub",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap candle stub",
+      "when": [
+        "place = corridor",
+        "castle date >= 2 10-31",
+        "days since candle_stub_told >= 1"
+      ],
+      "who": [
+        {
+          "as": "nick",
+          "role": "voice",
+          "name": "nearly headless nick",
+          "mark": "passing",
+          "pose": "drifting past"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "said",
+          "then": "drifts on along the corridor",
+          "key": "torch.candle-stub",
+          "text": [
+            "Ah, one of my deathday candles. My five hundredth, you know. The Headless Hunt turned up and played Head Hockey right through it. Don't ask."
+          ],
+          "canon": "ours, after CoS 8: his five hundredth deathday (L9125), the black candles, the Headless Hunt's Head Hockey (L9287); old news, no invitation (EV-48; the Corridor's req 430); checked against the text, 15 October 2026"
+        }
+      ],
+      "starts": [
+        "stamp candle_stub_told"
+      ]
+    },
+    {
       "id": "torch.deathday",
       "tier": "fixed",
       "source": "device",

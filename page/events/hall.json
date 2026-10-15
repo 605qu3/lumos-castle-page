@@ -14,10 +14,21 @@
     {
       "when": [
         "place = entrance hall",
-        "hall_cupboard = open"
+        "hall_cupboard = open",
+        "castle date < 3 06-07"
       ],
       "show": [
-        "the broom cupboard standing open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones"
+        "the broom cupboard standing open on buckets and mops, one bucket upturned"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open",
+        "castle date >= 3 06-07"
+      ],
+      "show": [
+        "the broom cupboard standing open on buckets and mops, one bucket upturned, and a thin line of fine gold grains in a crack between two flagstones"
       ]
     }
   ],
@@ -30,16 +41,37 @@
       "moment": "tap hall-cupboard-door",
       "when": [
         "place = entrance hall",
-        "hall_cupboard != open"
+        "hall_cupboard != open",
+        "castle date < 3 06-07"
       ],
       "show": [
-        "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones"
+        "the broom cupboard's door swings open on buckets and mops, one bucket upturned"
       ],
       "starts": [
         "set hall_cupboard = open",
         "log \"Opened the broom cupboard in the Entrance Hall {day}\""
       ],
-      "canon": "Magic's B21 (Godric's 1 with t1, 6.51 pm; the Architect's ledger line 3, drawn in model v15, hall-cupboard-door): not locked, as Hermione opened it and pushed him inside amongst the buckets and mops, PoA 21; the upturned bucket, Godric's t1 on the place (14.1); checked against the text, 13 October 2026"
+      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains are a trace of that night, shown from 7 June of the Azkaban year and in every later year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read 15 October 2026), never sparkling (GL-07), the uphill run on a tap the magic (Rework 17)"
+    },
+    {
+      "id": "hall.cupboard-opens-grains",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-door",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard != open",
+        "castle date >= 3 06-07"
+      ],
+      "show": [
+        "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of fine gold grains in a crack between two flagstones"
+      ],
+      "starts": [
+        "set hall_cupboard = open",
+        "log \"Opened the broom cupboard in the Entrance Hall {day}\""
+      ],
+      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains are a trace of that night, shown from 7 June of the Azkaban year and in every later year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read 15 October 2026), never sparkling (GL-07), the uphill run on a tap the magic (Rework 17)"
     },
     {
       "id": "hall.cupboard-shuts",
@@ -76,7 +108,8 @@
         "set grains_taps = 1",
         "stamp grains_day"
       ],
-      "canon": "Magic's B21 with t1 (Godric, 6.51 pm): an hourglass's sand, never named; three taps a day, as Hermione turned the hourglass over three times, PoA 21; checked against the text, 13 October 2026"
+      "canon": "Magic's B21 with t1 (Godric, 6.51 pm): an hourglass's sand, never named; three taps a day, as Hermione turned the hourglass over three times, PoA 21; checked against the text, 13 October 2026",
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): three taps a day, as Hermione turned the hourglass (PoA 21), and no year gate; the run is now hall.grains-run"
     },
     {
       "id": "hall.grains-again",
@@ -95,7 +128,24 @@
       ],
       "starts": [
         "add grains_taps 1"
-      ]
+      ],
+      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): three taps a day, as Hermione turned the hourglass (PoA 21), and no year gate; the run is now hall.grains-run"
+    },
+    {
+      "id": "hall.grains-run",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-grains",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open",
+        "castle date >= 3 06-07"
+      ],
+      "show": [
+        "the gold grains in the crack run a little way uphill with a faint trickle, and settle back"
+      ],
+      "canon": "an hourglass's sand, never named; a trace of PoA 21 (see hall.cupboard-opens); every tap runs it, no count (Rework 17; the touch review, req 420)"
     },
     {
       "id": "hall.leave",

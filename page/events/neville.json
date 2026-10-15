@@ -18,7 +18,10 @@
       "moment": "outside",
       "when": [
         "portrait = shut",
-        "trouble != fresh"
+        "trouble != fresh",
+        "time != night",
+        "time != morning",
+        "neville_let_in != yes"
       ],
       "who": [
         {
@@ -38,9 +41,10 @@
             "Oh, thank goodness. I've forgotten it again.",
             "I had it this morning, I know I did.",
             "Do you know it? She won't let me in.",
-            "My Remembrall went red at breakfast. I think this is what I forgot."
+            "My Remembrall went red at breakfast. I think this is what I forgot.",
+            "Oh, hello. You don't know the password, do you? I wrote it on my hand. Then I washed my hands."
           ],
-          "canon": "PS 9, the Remembrall turns red, Neville locked out without the new password; checked against the text, 9 October 2026"
+          "canon": "PS 9, the Remembrall turns red, Neville locked out without the new password; checked against the text, 9 October 2026; the last line ours (the Corridor's req 430, 15 October 2026)"
         }
       ],
       "starts": [
@@ -51,7 +55,8 @@
         {
           "on": "password",
           "do": [
-            "set neville_out = no"
+            "set neville_out = no",
+            "set neville_let_in = yes"
           ],
           "lines": [
             {
@@ -63,14 +68,99 @@
               "text": [
                 "Thanks! I'd forget my own head. I'd end up like Nearly Headless Nick.",
                 "Brilliant! My Remembrall's been red all day. I think that was it.",
-                "You're a lifesaver. I'll write it on my hand next time."
+                "You're a lifesaver. I'll write it on my hand next time.",
+                "Brilliant. I'd have been out here till Christmas."
               ],
-              "canon": "PS 7, Nearly Headless Nick; PS 9, the Remembrall; checked against the text, 9 October 2026"
+              "canon": "PS 7, Nearly Headless Nick; PS 9, the Remembrall; checked against the text, 9 October 2026; the last line ours (req 430)"
             },
             {
               "speaker": "neville",
               "medium": "heard",
               "key": "neville.locked-out.stair",
+              "sound": "running up the stair"
+            }
+          ]
+        },
+        {
+          "on": "leave",
+          "do": [
+            "set neville_out = no"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "neville.locked-out-again",
+      "tier": "big",
+      "source": "device",
+      "leans": [
+        "neville"
+      ],
+      "weight": 1,
+      "boost": {
+        "when": [
+          "returns this week = 0"
+        ],
+        "times": 3
+      },
+      "moment": "outside",
+      "when": [
+        "portrait = shut",
+        "trouble != fresh",
+        "time != night",
+        "time != morning",
+        "neville_let_in = yes"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "canon",
+          "name": "neville",
+          "mark": "frame-foot",
+          "pose": "hunched, knees up"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "said",
+          "key": "neville.locked-out.again",
+          "text": [
+            "Oh good, it's you."
+          ],
+          "canon": "ours: a later visit, once he has let Neville in (the Corridor's req 430, 15 October 2026)"
+        }
+      ],
+      "starts": [
+        "log \"Let Neville in {day}\"",
+        "set neville_out = yes"
+      ],
+      "ends": [
+        {
+          "on": "password",
+          "do": [
+            "set neville_out = no",
+            "set neville_let_in = yes"
+          ],
+          "lines": [
+            {
+              "speaker": "neville",
+              "medium": "said",
+              "pose": "standing, relieved",
+              "then": "goes in ahead by the hole",
+              "key": "neville.locked-out.thanks-again",
+              "text": [
+                "Thanks! I'd forget my own head. I'd end up like Nearly Headless Nick.",
+                "Brilliant! My Remembrall's been red all day. I think that was it.",
+                "You're a lifesaver. I'll write it on my hand next time.",
+                "Brilliant. I'd have been out here till Christmas."
+              ],
+              "canon": "PS 7, Nearly Headless Nick; PS 9, the Remembrall; checked against the text, 9 October 2026; the last line ours (req 430)"
+            },
+            {
+              "speaker": "neville",
+              "medium": "heard",
+              "key": "neville.locked-out.stair-again",
               "sound": "running up the stair"
             }
           ]
