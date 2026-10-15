@@ -178,7 +178,8 @@ scene.add(shell.group);
 var P = function (x, y, z) { return shell.toLocal(x, y, (z || 0)); };
 
 /* the clock (docs/room-states.md §1): one runtime, every chain, this room's place */
-var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () {}, cues: {}, showLines: function () {} }) : null;
+var READY = false;   /* the runtime may call drawRoom before the room below is built */
+var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () { if (READY) draw(); }, cues: {}, showLines: function () {} }) : null;
 function drivers() {
   var e = events;
   var occ = e ? String(e.occasion()).replace(/-/g, ' ') : 'none';
@@ -477,12 +478,30 @@ var stars = (function () {   /* the ceiling's stars at night, a stand-in for Mag
 
 /* ================= the room's state: what the clock gives, drawn (docs/room-states.md §2) */
 var STATE = null;
+/* every page loads every chain (the runtime's rule), and some rooms' rules name no place, so the hall keeps only its own
+   chain's cues: those of page/events/great-hall.json, read once */
+var HALL = {};
+fetch('events/great-hall.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+  (j.room || []).forEach(function (r) { (r.show || []).forEach(function (c) { HALL[c] = true; }); });
+  if (READY) draw();
+}).catch(function () {});
+/* the chain's cues this page draws in grey, by their opening words; the rest are listed in the state as not drawn */
+var DRAWN = ['the high windows', 'the floating candles burning', 'the floating candles out', 'the floating candles hanging',
+  'the enchanted ceiling', 'the four house tables crowded', 'the few who stay for Christmas', 'a few pupils at the tables',
+  'one or two pupils', 'the hall empty', 'the house ghosts', 'the first years in one line', 'breakfast set at every place',
+  'the golden plates and goblets set', 'the places laid for the feast', 'the golden goblets stacked', 'twelve Christmas trees',
+  'about one floating candle in five', "Hagrid's four vast pumpkins", "the winner's hangings"];
 function draw() {
   var d = drivers(), feast = d.meal === 'dinner' && /^(start of term|halloween|christmas day|leaving feast)$/.test(d.occasion);
   var xmas = d.occasion === 'christmas' || d.occasion === 'christmas day';
   var st = { time: d.time, meal: d.meal, occasion: d.occasion, lessons: d.lessons, year: d.year, sun: !!d.sun.up, sky: d.weather.sky, feast: feast };
-  /* the candles: pale by day, gold from dusk, out at night (lookup-q1-lit-1013, Magic's) */
-  var lit = d.time === 'evening' ? 'gold' : d.time === 'night' ? 'out' : 'pale';
+  /* every layer's state is the hall's chain's (page/events/great-hall.json, Events' req 480): the cues it shows now, each
+     read by its opening words; with no chain loaded (opened as a file) nothing is shown and the room stands bare */
+  var shows = (events ? events.cues() : []).filter(function (c) { return HALL[c]; });
+  function cue(words) { for (var i = 0; i < shows.length; i++) if (shows[i].indexOf(words) === 0) return true; return false; }
+  st.cues = shows.length;
+  /* the candles: pale by day, gold from dusk and at a meal after dark, out at night (lookup-q1-lit-1013, Magic's) */
+  var lit = cue('the floating candles burning gold') ? 'gold' : cue('the floating candles out') ? 'out' : 'pale';
   st.candles = lit;
   flames.visible = lit !== 'out';
   flameMat.color.set(lit === 'gold' ? 0xffc35a : 0xfff4dc);
@@ -506,36 +525,44 @@ function draw() {
   var club = (Q.get('club') || '') === 'duelling' && d.time === 'evening' && d.meal === 'none';
   st.club = club;
   furniture.forEach(function (m) { m.visible = !club; }); clubG.visible = club;
-  /* Christmas: the few who stay at their own table's middle, about one place in ten; nobody between meals (Interiors, req 473) */
-  var mid = (S.tx0 + S.tx1) / 2;
+  /* Christmas: the few who stay at their own table's middle, about one place in ten (Interiors, req 473) */
+  var mid = (S.tx0 + S.tx1) / 2, staffIn = false;
+  var EAST = [[59.6, 66.8 + 0.725], [60.2, 62.6 - 0.725], [58.4, 62.6 + 0.725], [60.8, 58.4 + 0.725], [59.0, 54.2 - 0.725]];
   if (club) {
     who = 'the Duelling Club, about thirty in pairs';
     pupils.forEach(function (p) { list.push({ x: p[0], y: p[1], z: 0, k: [1, 1.5] }); });
     list.push({ x: S.club.teacher[0], y: S.club.teacher[1], z: 0, k: [1.1, 1.75] });
-  } else if (d.meal !== 'none') {
-    who = xmas ? 'a meal, thin over Christmas' : 'a meal, crowded';
-    seats.forEach(function (s) { if (xmas ? (Math.abs(s.x - mid) < 6 && s.r < 0.18) : s.r < s.p) list.push({ x: s.x, y: s.y, z: S.bench.seat - 0.15 }); });
-    chairYs.forEach(function (y, i) { if (i % 3 !== 1 || Math.abs(y - S.gold[1]) < 0.4) list.push({ x: S.staff.chairX, y: y, z: S.dais.h }); });
-  } else if (d.time === 'night' || (d.time === 'morning' && d.hour < 7) || xmas || d.lessons === 'on') {   /* lessons on: most days nobody (Interiors, req 473) */
-    who = 'empty';
-  } else {
+  } else if (cue('the four house tables crowded')) {
+    who = 'a meal, crowded'; staffIn = true;
+    seats.forEach(function (s) { if (s.r < s.p) list.push({ x: s.x, y: s.y, z: S.bench.seat - 0.15 }); });
+  } else if (cue('the few who stay for Christmas')) {
+    who = 'a meal, thin over Christmas'; staffIn = true;
+    seats.forEach(function (s) { if (Math.abs(s.x - mid) < 6 && s.r < 0.18) list.push({ x: s.x, y: s.y, z: S.bench.seat - 0.15 }); });
+  } else if (cue('a few pupils at the tables')) {
     who = 'a few at the east ends';
-    [[59.6, 66.8 + 0.725], [60.2, 62.6 - 0.725], [58.4, 62.6 + 0.725], [60.8, 58.4 + 0.725], [59.0, 54.2 - 0.725]].forEach(function (p) { list.push({ x: p[0], y: p[1], z: S.bench.seat - 0.15 }); });
+    EAST.forEach(function (p) { list.push({ x: p[0], y: p[1], z: S.bench.seat - 0.15 }); });
+  } else if (cue('one or two pupils')) {
+    who = 'one or two in a free period';
+    EAST.slice(0, 2).forEach(function (p) { list.push({ x: p[0], y: p[1], z: S.bench.seat - 0.15 }); });
   }
+  if (staffIn) chairYs.forEach(function (y, i) { if (i % 3 !== 1 || Math.abs(y - S.gold[1]) < 0.4) list.push({ x: S.staff.chairX, y: y, z: S.dais.h }); });
   setFigures(list); st.figures = who; st.count = list.length;
-  ghosts.visible = feast; lineUp.visible = feast && d.occasion === 'start of term';
-  stool.visible = d.occasion === 'start of term';
-  /* props: the places at meals, the goblet towers between them */
-  plates.visible = d.meal !== 'none'; towers.visible = d.meal === 'none' && who !== 'empty' && !club;
+  ghosts.visible = cue('the house ghosts'); lineUp.visible = stool.visible = cue('the first years in one line');
+  /* props: the places at meals and laid for a feast, the goblet towers between meals (Interiors' items 6 and 18) */
+  plates.visible = !club && (cue('breakfast set at every place') || cue('the golden plates and goblets set') || cue('the places laid for the feast'));
+  towers.visible = !club && cue('the golden goblets stacked');
   st.props = plates.visible ? 'the places set' : towers.visible ? 'the goblet towers' : 'bare';
   /* the occasions, every year on their day (never a book's night) */
-  occ.christmas.visible = xmas;
-  occ.halloween.visible = d.occasion === 'halloween';
-  occ.lanterns.visible = d.occasion === 'halloween' && d.year === 2;
-  occ.feastEnd.visible = d.occasion === 'leaving feast';
+  occ.christmas.visible = cue('twelve Christmas trees');
+  occ.halloween.visible = cue('about one floating candle in five');
+  occ.lanterns.visible = cue("Hagrid's four vast pumpkins");
+  occ.feastEnd.visible = cue("the winner's hangings");
+  /* the chain's cues not yet drawn here, each its owner's to give (the lane file, The layers) */
+  st.notDrawn = shows.filter(function (s) { return !DRAWN.some(function (w) { return s.indexOf(w) === 0; }); }).map(function (s) { return s.slice(0, 48); });
   st.occasions = ['christmas', 'halloween', 'lanterns', 'feastEnd'].filter(function (k) { return occ[k].visible; });
   STATE = st;
 }
+READY = true;
 draw();
 
 /* ================= standing and looking (the shell's way; the stands are the model's) */
