@@ -189,7 +189,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=12"></script>
+<script src="castle.js?v=13"></script>
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=32"></script>
 <script src="castle-map.js?v=2"></script>
@@ -247,7 +247,11 @@ if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent
 var helpEl = kit.helpEl, canvas = kit.canvas, btns = kit.btns;
 var clamp = kit.clamp, lerp = kit.lerp, easeInOut = kit.easeInOut, col = kit.col;
 var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
-var makeCanvas = kit.makeCanvas, tex = kit.tex, rr = kit.rr, arch = kit.arch, cutoutTexture = kit.cutoutTexture, flameTexture = kit.flameTexture;
+var makeCanvas = kit.makeCanvas, tex = kit.tex, rr = kit.rr, arch = kit.arch, flameTexture = kit.flameTexture;
+/* a stand-in's name written on it is a test aid, never for the boy (the Stone's year walk, 15 October 2026): shown only
+   with ?labels */
+var SHOW_LABELS = new URLSearchParams(location.search).has('labels');
+function cutoutTexture(w, h, fill, draw, text) { return kit.cutoutTexture(w, h, fill, draw, SHOW_LABELS ? text : null); }
 var layered = kit.layered, register = kit.register, solid = kit.solid, box = kit.box, cutoutMesh = kit.cutoutMesh;
 var setTint = kit.setTint, CORRIDOR = kit.CORRIDOR;
 
