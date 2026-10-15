@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>The Great Hall, greybox</title>
+<style>
+  :root {
+    --bg: #0b0a09;
+    --hud-bg: rgba(24, 21, 18, 0.78);
+    --hud-fg: #d9d2c6;
+    --hud-dim: #8e877c;
+    --hud-on: #e9b86a;
+    --hud-line: rgba(255, 255, 255, 0.16);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0a09; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0a09; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+  }
+  #c { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+  #hud {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #stats {
+    font-size: 12px;
+    line-height: 1.35;
+    background: var(--hud-bg);
+    padding: 6px 9px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--hud-dim);
+    white-space: pre;
+  }
+  #btns { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; pointer-events: auto; }
+  button {
+    font: 500 13px/1 -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-line);
+    border-radius: 6px;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  button.on { color: var(--hud-on); border-color: var(--hud-on); }
+  button:focus-visible { outline: 2px solid var(--hud-on); outline-offset: 2px; }
+  #back {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+  #help {
+    position: fixed;
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    max-width: min(420px, calc(100vw - 20px));
+    background: var(--hud-bg);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    pointer-events: none;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!--
+The Great Hall in grey (the Great Hall lane's page, first session, 15 October 2026; docs/handoff/great-hall.md). The
+room at real size to the plan assets/review/great-hall-plan-1015-1731.jpg, confirmed by Godric at 5.44 pm (greathall-grey-build-1015, 1).
+Nothing here is a drawing: every piece is a grey placeholder at its real size, so the room can be walked and
+shot before anything is spent.
+- The building is the Architect's: page/castle-shell.js builds the walls, the fourteen windows, the doors' passage
+  and the two stands (the doors' start and the staff table's, the model's look.stands, req 315) straight from
+  page/castle-model.js, so a model change re-shapes this room. Nothing that changes the building is drawn here.
+- What stands where is Interiors' schedule, docs/interiors/great-hall.md (The schedule, Occupancy, The occasions, The
+  look up), its numbers in the block marked SCHEDULE below; a move past what it allows goes back to Interiors by row.
+- The room shows what the clock says and nothing else decides (docs/room-states.md): the page reads the runtime's
+  drivers (page/castle-events.js: time, meal, occasion, lessons, sun, weather, moon, year), each with its link
+  (?time=, ?meal=, ?occasion=, ?lessons=, ?sun=, ?weather=, ?moon=, ?year=, ?date=), and draws only that. Which layer
+  reads which driver is the lane file's table, The layers; each owner gives its part by row. Placeholders here:
+  the candles' light (lookup-q1-lit-1013: pale by day, gold from dusk, out at night), the figures (Interiors'
+  occupancy; People draws them), the places and goblet towers, the occasions (Godric's 1, interiors-hall-occasions-1015).
+- He stands and looks, as in the shell: a drag turns his head within the stand's limits; the view never rises by
+  itself (the charter, 15 October 2026). A tap on the platform or the staff table walks him up the middle aisle to the
+  staff table's stand; a tap on nothing there, or Back, walks him back to the doors; the doors' mouth from its stand
+  goes through to the Entrance Hall's shell. Every tap answers (castle.js's kit.tapped).
+- Nothing announces itself: no glow or glint marks a thing to tap (docs/ministry/readers/GL.md); the only light drawn
+  is the candles' own flames and the sky's.
+-->
+<canvas id="c" tabindex="0" aria-label="The Great Hall, greybox"></canvas>
+<div id="hud">
+  <div id="stats">starting</div>
+  <div id="btns">
+    <button type="button" data-act="layers">Layers</button>
+    <button type="button" data-act="res">Res</button>
+    <button type="button" data-act="exp">Exp</button>
+    <button type="button" data-act="reset">Reset</button>
+    <button type="button" data-act="help">?</button>
+  </div>
+</div>
+<button id="back" type="button" hidden>Back</button>
+<div id="help">Drag to look around.</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="castle.js?v=11"></script>
+<script src="castle-model.js?v=25"></script>
+<script src="castle-shell.js?v=7"></script>
+<script src="castle-events.js?v=31"></script>
+<script>
+(function () {
+'use strict';
+
+var Q = new URLSearchParams(location.search);
+var PLACE = 'great-hall';
+/* the model as it stands in the Stone's year unless ?book= names another (the shell's rule) */
+var BOOKS = ['PS', 'CoS', 'PoA', 'GoF', 'OotP', 'HBP', 'DH'];
+var BOOK = (function () {
+  var q = Q.get('book') || 'PS', n = BOOKS.indexOf(q);
+  return n >= 0 ? n : (+q >= 1 && +q <= 7 ? +q - 1 : 0);
+})();
+function stands(it) {
+  var f = BOOKS.indexOf(it.first || 'PS'), l = it.last ? BOOKS.indexOf(it.last) : BOOKS.length - 1;
+  return it.state !== 'set aside' && f <= BOOK && BOOK <= l;
+}
+var MODEL = window.CASTLE_MODEL ? (function (M) {
+  var out = JSON.parse(JSON.stringify(M)), gone = {};
+  ['grounds', 'rooms', 'features'].forEach(function (k) {
+    out[k] = (out[k] || []).filter(function (it) { if (stands(it)) return true; gone[it.id] = true; return false; });
+  });
+  out.openings = (out.openings || []).filter(function (o) {
+    return stands(o) && !gone[o.room] && !(o.between || []).some(function (r) { return gone[r]; });
+  });
+  return out;
+})(window.CASTLE_MODEL) : null;
+
+var kit = window.castleFrame ? castleFrame({
+  background: 0x0b0a09, fog: 0.004,
+  zoom: { max: 3 },
+  onAct: function (act) { if (act === 'reset') goBack(); }
+}) : null;
+if (!kit) { if (!window.castleFrame) document.getElementById('help').textContent = 'castle.js did not load. Check the connection and reload.'; return; }
+var canvas = kit.canvas, backBtn = kit.backBtn, clamp = kit.clamp, lerp = kit.lerp, easeInOut = kit.easeInOut, col = kit.col;
+var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
+camera.far = 220; camera.updateProjectionMatrix();
+
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from }) : null;
+if (!shell) { kit.helpEl.textContent = 'The Great Hall is not in the castle model.'; return; }
+scene.add(shell.group);
+var P = function (x, y, z) { return shell.toLocal(x, y, (z || 0)); };
+
+/* the clock (docs/room-states.md §1): one runtime, every chain, this room's place */
+var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () {}, cues: {}, showLines: function () {} }) : null;
+function drivers() {
+  var e = events;
+  var occ = e ? String(e.occasion()).replace(/-/g, ' ') : 'none';
+  return {
+    time: e ? e.time() : 'day', meal: e ? e.meal() : 'none', occasion: occ, lessons: e ? e.lessons() : 'off',
+    sun: e ? e.sun() : { up: true, altitude: 30, bearing: 180, height: 0.4 }, weather: e ? e.weather() : { sky: 'clear' },
+    moon: e ? e.moon() : { up: false, light: 0 }, year: e ? e.year() : 0, hour: new Date().getHours()
+  };
+}
+
+/* ================= SCHEDULE: Interiors' numbers (docs/interiors/great-hall.md), cited, never settled here */
+var S = {
+  tables: [['gryffindor', 66.8], ['ravenclaw', 62.6], ['hufflepuff', 58.4], ['slytherin', 54.2]],
+  tx0: 23.0, tx1: 61.0, top: 0.75, tw: 1.0,
+  bench: { off: 0.05, deep: 0.35, seat: 0.45 },
+  dais: { x0: 15.0, x1: 19.5, h: 0.45, steps: 3, rise: 0.15 },
+  staff: { x0: 17.0, x1: 18.0, y0: 53.5, y1: 67.5, top: 1.20, chairs: 20, chairX: 16.6 },
+  gold: [16.6, 60.5], stool: [21.6, 60.5],      /* the stool before the first years' line (Interiors, req 473, 5.46 pm) */
+  firstYears: { x: 20.1, y0: 52.5, y1: 68.5, gap: 0.4, n: 40 },
+  place: 0.6,
+  candles: { lo: 5.0, hi: 6.0, dense: 0.9, edge: 0.3, rho: 6.0, x0: 22.5, x1: 61.5, staffX: 17.5,
+             strays: [[63.8, 65.6], [55.4, 57.2], [68.0, 69.5], [51.5, 53.0]], strayLo: 6.2, strayHi: 7.0, bob: 0.06, sway: 0.03 },
+  trees: { xs: [26, 32, 38, 44, 50, 56], ys: [69.0, 52.0], tub: 0.8, from: 1.6, spread: 2.4, h: 7.0 },
+  lanterns: { x: 63.0, d: 2.0 },
+  festoon: { hi: 4.4, lo: 3.6 },
+  banner: { foot: 6.5, top: 14.5, w: 6.0 }
+};
+var HOUSE = { gryffindor: 0x8a4a40, ravenclaw: 0x46566e, hufflepuff: 0x8a7a44, slytherin: 0x46684e };
+
+function mat(hex, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: col(hex), roughness: 0.9, metalness: 0 }, o || {})); }
+var M = { oak: mat(0x7a5c40), bench: mat(0x6a4e36), dais: mat(0x8a8276), gold: mat(0xb8932e, { roughness: 0.45, metalness: 0.6 }),
+          wax: mat(0xe8dcc0), tub: mat(0x5a4632), tree: mat(0x3c5a40), holly: mat(0x3d5a3a), lantern: mat(0xc06a20, { roughness: 0.7 }),
+          pumpkin: mat(0xc87428, { roughness: 0.7 }), banner: mat(0x8a2a26), stool: mat(0x6a5440) };
+var room = new THREE.Group(); room.name = 'great-hall-grey'; scene.add(room);
+function boxAt(w, h, d, x, y, z, m, name) {   /* w along x (east), d along y (north), z its foot; in the model's frame */
+  var b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+  b.position.copy(P(x, y, z + h / 2)); b.name = name || ''; room.add(b); return b;
+}
+
+/* the platform, its steps, the staff table and its chairs, the gold chair */
+var tapTop = [];
+tapTop.push(boxAt(S.dais.x1 - S.dais.x0, S.dais.h, 18, (S.dais.x0 + S.dais.x1) / 2, 60.5, 0, M.dais, 'platform'));
+for (var k = 0; k < S.dais.steps; k++) {
+  var sx0 = S.dais.x1 + k * 0.3;
+  tapTop.push(boxAt(0.3, S.dais.h - (k + 1) * S.dais.rise, 18, sx0 + 0.15, 60.5, 0, M.dais, 'platform-step'));
+}
+tapTop.push(boxAt(S.staff.x1 - S.staff.x0, 0.06, S.staff.y1 - S.staff.y0, (S.staff.x0 + S.staff.x1) / 2, (S.staff.y0 + S.staff.y1) / 2, S.staff.top - 0.06, M.oak, 'staff-table'));
+tapTop.push(boxAt(S.staff.x1 - S.staff.x0 - 0.1, S.staff.top - 0.06 - S.dais.h, S.staff.y1 - S.staff.y0 - 0.1, (S.staff.x0 + S.staff.x1) / 2, (S.staff.y0 + S.staff.y1) / 2, S.dais.h, M.oak, 'staff-table'));
+var chairYs = [];
+for (var c = 0; c < S.staff.chairs; c++) chairYs.push(S.staff.y0 + 0.35 + c * 0.7);
+chairYs.forEach(function (y) {
+  if (Math.abs(y - S.gold[1]) < 0.4) return;
+  boxAt(0.45, 1.0, 0.45, S.staff.chairX, y, S.dais.h, M.bench, 'staff-chair');
+});
+tapTop.push(boxAt(0.7, 1.7, 0.8, S.gold[0], S.gold[1], S.dais.h, M.gold, 'gold-chair'));
+var stool = boxAt(0.35, 0.45, 0.35, S.stool[0], S.stool[1], 0, M.stool, 'stool');
+
+/* the four long tables and their benches, the worn band in code later (Interiors' item 20) */
+S.tables.forEach(function (t) {
+  var yc = t[1], L = S.tx1 - S.tx0, xm = (S.tx0 + S.tx1) / 2;
+  boxAt(L, 0.06, S.tw, xm, yc, S.top - 0.06, M.oak, 'table-' + t[0]);
+  [-1, 1].forEach(function (s) {
+    boxAt(0.12, S.top - 0.06, S.tw - 0.2, S.tx0 + 0.4, yc, 0, M.oak, 'table-leg');
+    boxAt(0.12, S.top - 0.06, S.tw - 0.2, S.tx1 - 0.4, yc, 0, M.oak, 'table-leg');
+    var by = yc + s * (S.tw / 2 + S.bench.off + S.bench.deep / 2);
+    boxAt(L, 0.05, S.bench.deep, xm, by, S.bench.seat - 0.05, M.bench, 'bench-' + t[0]);
+    boxAt(0.08, S.bench.seat - 0.05, S.bench.deep - 0.05, S.tx0 + 0.3, by, 0, M.bench, 'bench-leg');
+    boxAt(0.08, S.bench.seat - 0.05, S.bench.deep - 0.05, S.tx1 - 0.3, by, 0, M.bench, 'bench-leg');
+  });
+});
+
+/* ================= the candles (Interiors' field, The look up; what they do is Magic's: req 311) */
+var rnd = (function (seed) { return function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }; })(1013);
+function U(a, b) { return a + (b - a) * rnd(); }
+var C = [];
+function band(x0, x1, yc, along) {
+  var L = x1 - x0, cs = S.candles, n = Math.round(L * 2 * cs.dense * cs.rho), ne = Math.round(L * cs.edge * (cs.rho + 0.5) / 2);
+  function put(a, b, z) { C.push(along ? [a, b, z] : [b, a, z]); }
+  for (var i = 0; i < n; i++) put(U(x0, x1), yc + U(-cs.dense, cs.dense), U(cs.lo, cs.hi));
+  [-1, 1].forEach(function (s) {
+    for (var j = 0; j < ne; j++) { var t = 1 - Math.sqrt(rnd()); put(U(x0, x1), yc + s * (cs.dense + t * cs.edge), U(cs.lo, cs.hi + 0.2 * t)); }
+  });
+}
+/* a scatter over a rectangle of the model's frame, rho a square metre, its flames between z0 and z1 */
+function scatter(x0, x1, y0, y1, rho, z0, z1) {
+  var n = Math.round((x1 - x0) * (y1 - y0) * rho);
+  for (var i = 0; i < n; i++) C.push([U(x0, x1), U(y0, y1), U(z0, z1)]);
+}
+/* Which field: ?field=a is Interiors' field as it stands (*The look up*); b and c are this lane's proofs of Godric's note
+   of 5.44 pm, 15 October 2026 ("many more candles scattered across the ceiling", PS 7 "thousands and thousands"), for
+   his eye, numbers to Interiors once he picks (req 482). Every field begins 3.5 m inside the mouth (trick 2). */
+var FIELD = (Q.get('field') || 'a').toLowerCase();
+if (FIELD === 'b') {          /* the bands three times as thick, the aisles scattered, a thinner lane kept up the middle */
+  S.candles.rho *= 3;
+  S.tables.forEach(function (t) { band(S.candles.x0, S.candles.x1, t[1], true); });
+  band(S.staff.y0, S.staff.y1, S.candles.staffX, false);
+  S.candles.strays.forEach(function (r) { scatter(S.candles.x0, S.candles.x1, r[0], r[1], 4, 5.2, 6.6); });
+  scatter(S.candles.x0, S.candles.x1, 59.6, 61.4, 1.5, 5.6, 6.8);
+} else if (FIELD === 'c') {   /* the whole span evenly, a little thicker over the tables, no lane */
+  scatter(16.3, S.candles.x1, 51.8, 69.2, 9, 5.0, 6.8);
+  S.tables.forEach(function (t) { scatter(S.candles.x0, S.candles.x1, t[1] - 0.9, t[1] + 0.9, 4, 5.0, 6.0); });
+} else {
+  S.tables.forEach(function (t) { band(S.candles.x0, S.candles.x1, t[1], true); });
+  band(S.staff.y0, S.staff.y1, S.candles.staffX, false);
+  S.candles.strays.forEach(function (r) {
+    for (var k2 = 0; k2 < 13; k2++) C.push([S.candles.x0 + 3 * k2 + U(0, 3), U(r[0] + 0.2, r[1] - 0.2), U(S.candles.strayLo, S.candles.strayHi)]);
+  });
+}
+var NC = C.length;
+/* light forms, since the field may run to thousands: a five-sided taper and an eight-faced flame */
+var waxGeo = new THREE.CylinderGeometry(0.018, 0.02, 0.25, 5, 1, true); waxGeo.translate(0, -0.14, 0);
+var flameMat = new THREE.MeshBasicMaterial({ color: 0xffd27a });
+var flameGeo = new THREE.OctahedronGeometry(0.02, 0); flameGeo.scale(1, 1.8, 1);
+var waxes = new THREE.InstancedMesh(waxGeo, M.wax, NC), flames = new THREE.InstancedMesh(flameGeo, flameMat, NC);
+waxes.name = 'candles'; flames.name = 'flames'; room.add(waxes); room.add(flames);
+var phase = C.map(function () { return [U(0, Math.PI * 2), U(4, 7), U(0, Math.PI * 2)]; });
+var tmpM = new THREE.Matrix4(), tmpV = new THREE.Vector3();
+function placeCandles(t) {
+  for (var i = 0; i < NC; i++) {
+    var c = C[i], ph = phase[i];
+    var dz = S.candles.bob * Math.sin(t * 2 * Math.PI / ph[1] + ph[0]), dx = S.candles.sway * Math.sin(t * 0.7 + ph[2]);
+    tmpV.copy(P(c[0] + dx, c[1], c[2] + dz));
+    tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z); waxes.setMatrixAt(i, tmpM); flames.setMatrixAt(i, tmpM);
+  }
+  waxes.instanceMatrix.needsUpdate = true; flames.instanceMatrix.needsUpdate = true;
+}
+placeCandles(0);
+
+/* ================= the occasions (Interiors' The occasions, Godric's 1): grey stand-ins, out by the clock */
+var occ = { christmas: new THREE.Group(), halloween: new THREE.Group(), lanterns: new THREE.Group(), feastEnd: new THREE.Group() };
+for (var o in occ) { occ[o].name = 'occasion-' + o; occ[o].visible = false; room.add(occ[o]); }
+S.trees.xs.forEach(function (x) {
+  S.trees.ys.forEach(function (y) {
+    var tub = new THREE.Mesh(new THREE.CylinderGeometry(S.trees.tub / 2, S.trees.tub / 2 * 0.85, 0.6, 12), M.tub);
+    tub.position.copy(P(x, y, 0.3)); occ.christmas.add(tub);
+    var trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, S.trees.from - 0.6, 6), M.tub);
+    trunk.position.copy(P(x, y, 0.6 + (S.trees.from - 0.6) / 2)); occ.christmas.add(trunk);
+    var h = S.trees.h - S.trees.from, cone = new THREE.Mesh(new THREE.ConeGeometry(S.trees.spread / 2, h, 10), M.tree);
+    cone.position.copy(P(x, y, S.trees.from + h / 2)); occ.christmas.add(cone);
+  });
+});
+/* the holly and mistletoe festoons, one swag a bay at the trees' lines, each end at hi, dipping to lo */
+function swag(x0, y0, x1, y1) {
+  var pts = [];
+  for (var i = 0; i <= 16; i++) {
+    var t = i / 16, z = S.festoon.hi - (S.festoon.hi - S.festoon.lo) * 4 * t * (1 - t);
+    pts.push(P(x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, z));
+  }
+  var m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, 0.15, 6, false), M.holly);
+  occ.christmas.add(m);
+}
+[69.35, 51.65].forEach(function (y) {
+  var xs = [15.3, 20.65, 26].concat(S.trees.xs.slice(1)).concat([60.5, 64.7]);
+  for (var i = 0; i < xs.length - 1; i++) swag(xs[i], y, xs[i + 1], y);
+});
+[[51.8, 56.0], [56.0, 58.7], [62.3, 65.0], [65.0, 69.2]].forEach(function (r) { swag(64.85, r[0], 64.85, r[1]); });
+[[51.8, 56.4], [56.4, 60.5], [60.5, 64.6], [64.6, 69.2]].forEach(function (r) { swag(15.15, r[0], 15.15, r[1]); });
+/* the carved pumpkins: about one floating candle in five, at that candle's own home point (they move with it) */
+var pumpIdx = []; for (var pi = 0; pi < NC; pi += 5) pumpIdx.push(pi);
+var pumps = new THREE.InstancedMesh(new THREE.SphereGeometry(0.15, 10, 8), M.pumpkin, pumpIdx.length);
+pumps.name = 'pumpkins'; occ.halloween.add(pumps);
+/* Hagrid's great lanterns, in the Chamber's year only, before the four tables' east ends */
+S.tables.forEach(function (t) {
+  var l = new THREE.Mesh(new THREE.SphereGeometry(S.lanterns.d / 2, 16, 12), M.lantern);
+  l.scale.set(1, 0.85, 1); l.position.copy(P(S.lanterns.x, t[1], S.lanterns.d / 2 * 0.85)); occ.lanterns.add(l);
+});
+/* the winner's banner on the west wall at the leaving feast (Interiors' item 5); the long walls' hangings wait on the
+   windows (the lane file's flag) */
+var ban = new THREE.Mesh(new THREE.PlaneGeometry(S.banner.w, S.banner.top - S.banner.foot), M.banner);
+ban.position.copy(P(15.05, 60.5, (S.banner.foot + S.banner.top) / 2)); ban.rotation.y = Math.PI / 2; occ.feastEnd.add(ban);
+
+/* ================= the figures, empty to crowded (Interiors' Occupancy; the figures are People's): grey stand-ins */
+var seats = [];
+S.tables.forEach(function (t) {
+  [-1, 1].forEach(function (s) {
+    var by = t[1] + s * (S.tw / 2 + S.bench.off + S.bench.deep / 2) + s * 0.02;
+    for (var x = S.tx0 + 0.3; x <= S.tx1 - 0.3; x += S.place) seats.push({ house: t[0], x: x, y: by, side: s });
+  });
+});
+/* fullest along the middle 25 m, thinning toward both ends; the east ends keep a few empty places (Interiors) */
+seats.forEach(function (s) { var mid = (S.tx0 + S.tx1) / 2, d = Math.abs(s.x - mid); s.p = d < 12.5 ? 0.92 : Math.max(0.15, 0.92 - (d - 12.5) * 0.12); if (s.x > S.tx1 - 2.2) s.p = 0.1; s.r = rnd(); });
+var bodyGeo = new THREE.CylinderGeometry(0.17, 0.2, 0.8, 8); bodyGeo.translate(0, 0.4, 0);
+var headGeo = new THREE.SphereGeometry(0.11, 8, 6); headGeo.translate(0, 0.93, 0);
+var figMat = mat(0x8c857a), ghostMat = new THREE.MeshStandardMaterial({ color: col(0xd8dde4), transparent: true, opacity: 0.35, roughness: 1 });
+var MAXF = seats.length + 64;
+var bodies = new THREE.InstancedMesh(bodyGeo, figMat, MAXF), heads = new THREE.InstancedMesh(headGeo, figMat, MAXF);
+bodies.name = 'figures'; heads.name = 'figures'; room.add(bodies); room.add(heads);
+bodies.instanceColor = null;
+var ghosts = new THREE.Group(); ghosts.name = 'ghosts'; room.add(ghosts);
+S.tables.forEach(function (t, i) {
+  var g = new THREE.Mesh(bodyGeo, ghostMat); g.position.copy(P(44 + i * 2.3, t[1] + 0.725, S.bench.seat)); ghosts.add(g);
+  var h = new THREE.Mesh(headGeo, ghostMat); h.position.copy(g.position); ghosts.add(h);
+});
+var lineUp = new THREE.Group(); lineUp.name = 'first-years'; room.add(lineUp);   /* the start-of-term feast's line before the stool */
+for (var fy = 0; fy < S.firstYears.n; fy++) {
+  var b = new THREE.Mesh(bodyGeo, figMat); b.scale.set(0.85, 1.45, 0.85); b.position.copy(P(S.firstYears.x, S.firstYears.y0 + (fy + 0.5) * S.firstYears.gap, 0)); lineUp.add(b);
+}
+function setFigures(list) {
+  var n = 0;
+  list.forEach(function (f) {
+    tmpV.copy(P(f.x, f.y, f.z)); tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z);
+    if (f.k) tmpM.scale(new THREE.Vector3(f.k[0], f.k[1], f.k[0]));
+    bodies.setMatrixAt(n, tmpM); heads.setMatrixAt(n, tmpM); n++;
+  });
+  bodies.count = heads.count = n;
+  bodies.instanceMatrix.needsUpdate = true; heads.instanceMatrix.needsUpdate = true;
+}
+
+/* ================= props: the places set at meals, the goblet towers between them (Interiors' items 6 and 18) */
+var plateGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.02, 12);
+var plates = new THREE.InstancedMesh(plateGeo, M.gold, seats.length); plates.name = 'places'; room.add(plates);
+seats.forEach(function (s, i) {
+  tmpV.copy(P(s.x, s.y - s.side * (S.bench.deep / 2 + S.bench.off + 0.02) - s.side * 0.17, S.top + 0.01));
+  tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z); plates.setMatrixAt(i, tmpM);
+});
+var towers = new THREE.Group(); towers.name = 'goblet-towers'; room.add(towers);
+S.tables.forEach(function (t) {
+  for (var x = S.tx1 - 1.2; x > S.tx0; x -= 2.4) {
+    var tw = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 8), M.gold); tw.position.copy(P(x, t[1], S.top + 0.5)); towers.add(tw);
+  }
+});
+
+/* ================= light (Design's; the windows the Architect's): grey stand-ins read from the clock */
+var hemi = new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, 0.6); scene.add(hemi);
+var amb = new THREE.AmbientLight(0xffffff, 0.08); scene.add(amb);
+var sunL = new THREE.DirectionalLight(0xfff1dc, 0.0); scene.add(sunL); scene.add(sunL.target);
+var candleL = [];
+S.tables.forEach(function (t) {
+  [30, 42, 54].forEach(function (x) { var l = new THREE.PointLight(0xffc27a, 0, 16, 1.6); l.position.copy(P(x, t[1], 5.0)); scene.add(l); candleL.push(l); });
+});
+var staffL = new THREE.PointLight(0xffc27a, 0, 14, 1.6); staffL.position.copy(P(17.5, 60.5, 5.0)); scene.add(staffL); candleL.push(staffL);
+var ceiling = shell.group.getObjectByName(PLACE + '-ceiling');
+var skyMat = new THREE.MeshBasicMaterial({ color: 0x223050, side: THREE.DoubleSide });
+if (ceiling) ceiling.material = skyMat;
+var stars = (function () {   /* the ceiling's stars at night, a stand-in for Magic's sky at infinity */
+  var g = new THREE.BufferGeometry(), a = [];
+  for (var i = 0; i < 900; i++) { var v = P(U(15.2, 64.8), U(51.7, 69.3), 14.85); a.push(v.x, v.y, v.z); }
+  g.setAttribute('position', new THREE.Float32BufferAttribute(a, 3));
+  var p = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xe8ecff, size: 1.6, sizeAttenuation: false }));
+  p.name = 'stars'; room.add(p); return p;
+})();
+
+/* ================= the room's state: what the clock gives, drawn (docs/room-states.md §2) */
+var STATE = null;
+function draw() {
+  var d = drivers(), feast = d.meal === 'dinner' && /^(start of term|halloween|christmas day|leaving feast)$/.test(d.occasion);
+  var xmas = d.occasion === 'christmas' || d.occasion === 'christmas day';
+  var st = { time: d.time, meal: d.meal, occasion: d.occasion, lessons: d.lessons, year: d.year, sun: !!d.sun.up, sky: d.weather.sky, feast: feast };
+  /* the candles: pale by day, gold from dusk, out at night (lookup-q1-lit-1013, Magic's) */
+  var lit = d.time === 'evening' ? 'gold' : d.time === 'night' ? 'out' : 'pale';
+  st.candles = lit;
+  flames.visible = lit !== 'out';
+  flameMat.color.set(lit === 'gold' ? 0xffc35a : 0xfff4dc);
+  candleL.forEach(function (l) { l.intensity = lit === 'gold' ? 1.6 : lit === 'pale' ? 0.25 : 0; });
+  /* the sky through the windows and on the ceiling (the Architect's windows; Magic's ceiling; Design's light) */
+  var sh = d.sun.up ? clamp((d.sun.height || 0.3) * 1.6, 0.15, 1) : 0, wet = /rain|snow|fog|cloud/.test(d.weather.sky || '');
+  hemi.intensity = 0.12 + sh * (wet ? 0.35 : 0.55) + (lit === 'gold' ? 0.12 : 0);
+  if (d.sun.up) {
+    var az = (d.sun.bearing || 180) * Math.PI / 180, al = Math.max(3, d.sun.altitude || 20) * Math.PI / 180;
+    var from = P(40 + Math.sin(az) * Math.cos(al) * 40, 60.5 + Math.cos(az) * Math.cos(al) * 40, Math.sin(al) * 40);
+    sunL.position.copy(from); sunL.target.position.copy(P(40, 60.5, 0)); sunL.intensity = wet ? 0.15 : 0.55 * sh;
+  } else sunL.intensity = 0;
+  var skyHex = d.sun.up ? (wet ? 0x7c828a : 0x6f93c4) : (d.moon && d.moon.light > 0.3 ? 0x1c2440 : 0x0d1222);
+  if (d.sun.up && sh < 0.3) skyHex = wet ? 0x5a5f68 : 0x8a7e86;
+  skyMat.color.set(skyHex);
+  stars.visible = !d.sun.up && !wet;
+  /* the figures (Interiors' occupancy; People's to draw) */
+  var list = [], who = 'empty';
+  /* Christmas: the few who stay at their own table's middle, about one place in ten; nobody between meals (Interiors, req 473) */
+  var mid = (S.tx0 + S.tx1) / 2;
+  if (d.meal !== 'none') {
+    who = xmas ? 'a meal, thin over Christmas' : 'a meal, crowded';
+    seats.forEach(function (s) { if (xmas ? (Math.abs(s.x - mid) < 6 && s.r < 0.18) : s.r < s.p) list.push({ x: s.x, y: s.y, z: S.bench.seat - 0.15 }); });
+    chairYs.forEach(function (y, i) { if (i % 3 !== 1 || Math.abs(y - S.gold[1]) < 0.4) list.push({ x: S.staff.chairX, y: y, z: S.dais.h }); });
+  } else if (d.time === 'night' || (d.time === 'morning' && d.hour < 7) || xmas || d.lessons === 'on') {   /* lessons on: most days nobody (Interiors, req 473) */
+    who = 'empty';
+  } else {
+    who = 'a few at the east ends';
+    [[59.6, 66.8 + 0.725], [60.2, 62.6 - 0.725], [58.4, 62.6 + 0.725], [60.8, 58.4 + 0.725], [59.0, 54.2 - 0.725]].forEach(function (p) { list.push({ x: p[0], y: p[1], z: S.bench.seat - 0.15 }); });
+  }
+  setFigures(list); st.figures = who; st.count = list.length;
+  ghosts.visible = feast; lineUp.visible = feast && d.occasion === 'start of term';
+  stool.visible = d.occasion === 'start of term';
+  /* props: the places at meals, the goblet towers between them */
+  plates.visible = d.meal !== 'none'; towers.visible = d.meal === 'none' && who !== 'empty';
+  st.props = plates.visible ? 'the places set' : towers.visible ? 'the goblet towers' : 'bare';
+  /* the occasions, every year on their day (never a book's night) */
+  occ.christmas.visible = xmas;
+  occ.halloween.visible = d.occasion === 'halloween';
+  occ.lanterns.visible = d.occasion === 'halloween' && d.year === 2;
+  occ.feastEnd.visible = d.occasion === 'leaving feast';
+  st.occasions = ['christmas', 'halloween', 'lanterns', 'feastEnd'].filter(function (k) { return occ[k].visible; });
+  STATE = st;
+}
+draw();
+
+/* ================= standing and looking (the shell's way; the stands are the model's) */
+var D2R = Math.PI / 180;
+function limits(s) {
+  var L = s.lim || { down: -14, up: 14, turn: 60 }, d = s.look.clone().sub(s.pos), el0 = Math.atan2(d.y, Math.hypot(d.x, d.z));
+  return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
+}
+var START = shell.stands.filter(function (s) { return s.name === 'start'; })[0] || shell.stands[0];
+var STAFF_STAND = shell.stands.filter(function (s) { return s.name === 'staff table'; })[0];
+var here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
+var ways = shell.ways.concat(shell.doors), wayMeshes = ways.map(function (d) { return d.mesh; });
+function headPose(pos, look) {
+  pos.copy(here.pos);
+  var d = here.look.clone().sub(here.pos), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
+  look.set(pos.x + Math.sin(a) * Math.cos(el) * 10, pos.y + Math.sin(el) * 10, pos.z + Math.cos(a) * Math.cos(el) * 10);
+}
+function startLeg() {
+  var to = legs.shift(), from = { pos: camera.position.clone(), look: lookTmp.clone() }, dist = from.pos.distanceTo(to.pos);
+  tween = { t: 0, dur: clamp(0.8 + dist * 0.08, 0.8, 4.5), from: from, to: to };
+}
+/* up the middle aisle, looking ahead along it at the walk's own height (Interaction: no stand mid-hall) */
+function walkTo(s) {
+  if (!s || s === here) return false;
+  legs = []; here = s; hy = hyT = hp = hpT = 0;
+  var fp = new THREE.Vector3(), fl = new THREE.Vector3(); headPose(fp, fl);
+  legs.push({ pos: fp, look: fl });
+  backBtn.hidden = s === START;
+  startLeg();
+  return true;
+}
+function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(START); }
+function through(d) {
+  kit.travel((d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE));
+}
+var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+function tap(cx, cy) {
+  if (tween) return;
+  var r = canvas.getBoundingClientRect();
+  pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  var hits = raycaster.intersectObjects(shell.group.children.concat(tapTop), false).filter(function (h) { return h.object.visible || h.object.userData.way; });
+  var hit = hits.length ? hits[0].object : null, acted = false;
+  var wi = hit ? wayMeshes.indexOf(hit) : -1;
+  if (wi >= 0) {
+    var d = ways[wi];
+    if (here === d.stand || here === START) { if (d.mesh.userData.way && d.built) { through(d); acted = true; } }
+  } else if (hit && tapTop.indexOf(hit) >= 0 && here === START) acted = walkTo(STAFF_STAND);
+  else if (here !== START) { goBack(); acted = true; }
+  kit.tapped(acted);
+}
+function updateCamera(dt) {
+  if (tween) {
+    tween.t += dt;
+    var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
+    camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
+    lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
+    if (tween.t >= tween.dur) { tween = null; if (legs.length) startLeg(); }
+  } else {
+    var s = Math.min(1, dt * 7);
+    hy = lerp(hy, hyT, s); hp = lerp(hp, hpT, s);
+    headPose(camera.position, lookTmp);
+  }
+  camera.lookAt(lookTmp);
+}
+var dragging = false, moved = false, sx = 0, sy = 0, px = 0, py = 0;
+canvas.addEventListener('pointerdown', function (e) {
+  dragging = true; moved = false; sx = px = e.clientX; sy = py = e.clientY;
+  try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+  e.preventDefault();
+});
+canvas.addEventListener('pointermove', function (e) {
+  if (!dragging) return;
+  var dx = e.clientX - px, dy = e.clientY - py;
+  px = e.clientX; py = e.clientY;
+  if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) > 8) moved = true;
+  if (!tween) { var lm = limits(here); hyT = lm.yaw == null ? hyT - dx * 0.003 : clamp(hyT - dx * 0.003, -lm.yaw, lm.yaw); hpT = clamp(hpT - dy * 0.003, lm.lo, lm.hi); }
+});
+function endDrag(e) { if (!dragging) return; dragging = false; if (!moved && e.type === 'pointerup') tap(e.clientX, e.clientY); }
+canvas.addEventListener('pointerup', endDrag);
+canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+backBtn.addEventListener('click', goBack);
+headPose(camera.position, lookTmp); camera.lookAt(lookTmp);
+kit.reveal();
+
+var clock = new THREE.Clock(), T = 0, redraw = 0;
+function frame() {
+  var dt = Math.min(0.05, clock.getDelta());
+  T += dt * (kit.zoom && kit.zoom.slow ? kit.zoom.slow() : 1);
+  updateCamera(dt);
+  placeCandles(T);
+  if (pumps.parent.visible) {
+    for (var i = 0; i < pumpIdx.length; i++) { waxes.getMatrixAt(pumpIdx[i], tmpM); pumps.setMatrixAt(i, tmpM); }
+    pumps.instanceMatrix.needsUpdate = true;
+  }
+  redraw += dt; if (redraw > 30) { redraw = 0; draw(); }   /* the clock moves on while he stays: dusk comes, a meal begins */
+  renderer.render(scene, camera);
+  kit.stats(dt);
+}
+renderer.setAnimationLoop(frame);
+
+/* hooks for automated checks; harmless in normal use */
+window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
+  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC,
+  stand: function () { return here.name; }, stands: shell.stands.map(function (s) { return s.name; }),
+  standNamed: function (n) {
+    var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
+    tween = null; legs = []; here = s; hy = hyT = hp = hpT = 0; backBtn.hidden = s === START; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
+  },
+  look: function (y, p) { var lm = limits(here); hy = hyT = lm.yaw == null ? y : clamp(y, -lm.yaw, lm.yaw); hp = hpT = clamp(p, lm.lo, lm.hi); return { yaw: hy, pitch: hp }; },
+  head: function () { var lm = limits(here); return { yaw: hy, pitch: hp, lo: lm.lo, hi: lm.hi, lim: here.lim }; } };
+})();
+</script>
+</body>
+</html>
