@@ -163,6 +163,35 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 
 var Q = new URLSearchParams(location.search);
 var PLACE = Q.get('place') || 'entrance-hall';
+/* a room's old id (its "alias" in the model) opens it under its own; a room the model marks "shell": "never" is
+   model data only and is never built (the forbidden corridor behind its locked door: the Ministry's list, Rework 1) */
+/* the boy's castle year by its book: each ground, room, opening and feature stands from its "first" book (to its
+   "last", where given), so a place past his year is not built and a door into it is plain wall (the Ministry's list,
+   Rework 4; the world rules, Spoilers). ?book=PS (CoS, PoA, GoF, OotP, HBP, DH, or 1 to 7) sets it for a check; else
+   window.lumosCastleBook when the room states' castle-year driver gives it (req 414, Events'); else the Stone's year,
+   so nothing later shows. A place set aside stands in no year. */
+var BOOKS = ['PS', 'CoS', 'PoA', 'GoF', 'OotP', 'HBP', 'DH'];
+var BOOK = (function () {
+  var q = Q.get('book') || window.lumosCastleBook || 'PS', n = BOOKS.indexOf(q);
+  return n >= 0 ? n : (+q >= 1 && +q <= 7 ? +q - 1 : 0);
+})();
+function stands(it) {
+  var f = BOOKS.indexOf(it.first || 'PS'), l = it.last ? BOOKS.indexOf(it.last) : BOOKS.length - 1;
+  return it.state !== 'set aside' && f <= BOOK && BOOK <= l;
+}
+var MODEL = window.CASTLE_MODEL ? (function (M) {
+  var out = JSON.parse(JSON.stringify(M)), gone = {};
+  ['grounds', 'rooms', 'features'].forEach(function (k) {
+    out[k] = (out[k] || []).filter(function (it) { if (stands(it)) return true; gone[it.id] = true; return false; });
+  });
+  out.openings = (out.openings || []).filter(function (o) {
+    return stands(o) && !gone[o.room] && !(o.between || []).some(function (r) { return gone[r]; });
+  });
+  return out;
+})(window.CASTLE_MODEL) : null;
+var MROOMS = (MODEL && MODEL.rooms) || [];
+MROOMS.forEach(function (r) { if ((r.alias || []).indexOf(PLACE) >= 0) PLACE = r.id; });
+var NEVER = MROOMS.some(function (r) { return r.id === PLACE && r.shell === 'never'; });
 /* each place's start on a plain load: the way he first comes in by */
 var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth' };
 
@@ -176,7 +205,8 @@ var canvas = kit.canvas, backBtn = kit.backBtn, clamp = kit.clamp, lerp = kit.le
 var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
 camera.far = 220; camera.updateProjectionMatrix();
 
-var shell = window.CastleShell && window.CASTLE_MODEL ? CastleShell.build(kit, CASTLE_MODEL, PLACE, { from: kit.from, start: STARTS[PLACE] }) : null;
+if (NEVER) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'This door stays shut.'; return; }
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE] }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
 document.title = shell.place.name + ', a shell';
@@ -425,7 +455,7 @@ function updateFades(dt) {
    the events left it (events/hall.json: hall_cupboard, a leave shuts it). Inside, from the model's hall-cupboard,
    buckets and mops, one bucket always upturned where the model puts it (upturned-bucket, Godric's t1: "Hermione sat
    down on an upturned bucket", PoA 21), and across the floor a crack between two flagstones holding a thin line of
-   sparkling gold grains, light in the grey shell until the hall is drawn. A tap on the grains while it stands open runs
+   fine gold grains, matte and still in the grey shell (GL-07: nothing glints to say tap me; the uphill run is the magic). A tap on the grains while it stands open runs
    them a little way uphill: they climb out of the crack and up the back flag's lip toward the back wall, a hand's
    length, against their fall, then trickle back and settle (Magic's words, "run a little way uphill and settle back");
    how many runs a day is the events' (three, then they lie still till the next day). The shell's walls are 0.8 m
@@ -433,7 +463,7 @@ function updateFades(dt) {
    opens it on load and ?grains=run runs the grains with the events absent, for checks. */
 var CUP = (function () {
   var d = shell.doors.filter(function (x) { return x.id === 'hall-cupboard-door'; })[0];
-  var room = (CASTLE_MODEL.rooms || []).filter(function (r) { return r.id === 'hall-cupboard'; })[0];
+  var room = (MODEL.rooms || []).filter(function (r) { return r.id === 'hall-cupboard'; })[0];
   if (!d || !room) return null;
   var r = room.shape.rect, H = room.ceiling || 2.4, g = new THREE.Group(), z0 = shell.place.floor;
   var P = function (x, y, z) { return shell.toLocal(x, y, z0 + (z || 0)); };
@@ -457,8 +487,9 @@ var CUP = (function () {
     if (!up) { var rim = new THREE.Mesh(new THREE.TorusGeometry(0.15 * s, 0.008, 6, 20), tin); rim.rotation.x = Math.PI / 2; rim.position.set(p.x, p.y + 0.15 * s, p.z); g.add(rim); }
     return b;
   }
-  var ub = (CASTLE_MODEL.features || []).filter(function (f) { return f.id === 'upturned-bucket'; })[0];
-  bucket(ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, true, 1.15);
+  /* upturned from PoA's year on, the trace of PoA 21 (its first); before it, standing like the others */
+  var ub = (MODEL.features || []).filter(function (f) { return f.id === 'upturned-bucket'; })[0];
+  bucket(ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, !!ub, 1.15);
   bucket(r[0] + 0.22, r[3] - 0.25, false, 1);
   bucket(r[0] + 0.24, r[3] - 0.58, false, 0.9);
   function mop(x, y, lean, turn) {
@@ -471,11 +502,11 @@ var CUP = (function () {
   var yaw = Math.atan2(bx.x, bx.z);   /* the back wall's run in the local frame */
   mop(r[0] + 0.14, r[1] + 0.22, -0.16, yaw);
   mop(r[0] + 0.12, r[1] + 0.42, -0.2, yaw + 0.2);
-  /* the grains: points along the crack, gold, additive; one hit strip over them for the tap */
+  /* the grains: points along the crack, dull gold and matte, no additive blend; one hit strip over them for the tap */
   var N = 110, pos = new Float32Array(N * 3), home = [], gtex = (function () {
     var c = document.createElement('canvas'); c.width = c.height = 32;
     var x = c.getContext('2d'), gr = x.createRadialGradient(16, 16, 0, 16, 16, 16);
-    gr.addColorStop(0, 'rgba(255,240,190,1)'); gr.addColorStop(0.4, 'rgba(255,200,90,0.7)'); gr.addColorStop(1, 'rgba(255,180,60,0)');
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.55, 'rgba(255,255,255,1)'); gr.addColorStop(0.7, 'rgba(255,255,255,0)');
     x.fillStyle = gr; x.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c);
   })();
   for (var i = 0; i < N; i++) {
@@ -483,7 +514,7 @@ var CUP = (function () {
     home.push(q); pos[i * 3] = q.x; pos[i * 3 + 1] = q.y; pos[i * 3 + 2] = q.z;
   }
   var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  var pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.04, map: gtex, color: 0xffc04a, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  var pts = new THREE.Points(geo, new THREE.PointsMaterial({ size: 0.03, map: gtex, color: 0x8a6d3b, alphaTest: 0.5 }));
   pts.name = 'cupboard-grains'; pts.raycast = function () {}; g.add(pts);
   var up = new THREE.Vector3().subVectors(P(r[0], r[1], 0), P(r[2], r[1], 0)).setLength(1);   /* toward the back wall */
   var hit = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.06, 1), new THREE.MeshBasicMaterial({ visible: false }));
@@ -511,8 +542,8 @@ function updateCupboard(dt) {
     m.rotation.y = d.rest.rot + a;
   }
   if (c.open === 0 && c.target === 0 && c.g.visible) { c.g.visible = c.hit.visible = false; m.rotation.y = d.rest.rot; m.position.copy(d.rest.pos); }
-  /* the grains: a twinkle always; a run climbs each a hand's length up toward the back wall and back, staggered */
-  var t = performance.now() / 1000, arr = c.pts.geometry.attributes.position.array, k = 0;
+  /* the grains: still until a run, which climbs each a hand's length up toward the back wall and back, staggered */
+  var arr = c.pts.geometry.attributes.position.array, k = 0;
   if (c.run >= 0) { c.run += dt; if (c.run > 3.2) c.run = -1; }
   for (var i = 0; i < c.home.length; i++) {
     var p = c.home[i], s = c.seeds[i], lift = 0;
@@ -522,17 +553,19 @@ function updateCupboard(dt) {
     arr[k++] = p.z + c.up.z * lift * (0.12 + 0.06 * s);
   }
   c.pts.geometry.attributes.position.needsUpdate = true;
-  c.pts.material.opacity = 0.75 + 0.25 * Math.sin(t * 3.1);
 }
+/* both spellings answer while Events' hall.json drops "sparkling" (its list, Rework 17; the Architect's row) */
 var cupCues = {
+  "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of fine gold grains in a crack between two flagstones": function () { turnDone = 'cupboard'; cupSet(true); },
   "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones": function () { turnDone = 'cupboard'; cupSet(true); },
   "the broom cupboard's door swings shut": function () { turnDone = 'cupboard'; cupSet(false); },
   "the gold grains in the crack run a little way uphill and settle back": function () { cupRun(); }
 };
 var CUP_OPEN_SHOW = "the broom cupboard standing open on buckets and mops, one bucket upturned, and a thin line of sparkling gold grains in a crack between two flagstones";
+var CUP_OPEN_SHOWS = [CUP_OPEN_SHOW, CUP_OPEN_SHOW.replace('sparkling gold', 'fine gold')];
 function cupDrawRoom(shown) {
   if (!CUP || Q.get('cupboard') === 'open') return;
-  var open = shown.indexOf(CUP_OPEN_SHOW) >= 0;
+  var open = CUP_OPEN_SHOWS.some(function (x) { return shown.indexOf(x) >= 0; });
   cupSet(open, CUP.first); CUP.first = false;
 }
 if (Q.get('cupboard') === 'open') cupSet(true, true);
@@ -612,7 +645,7 @@ var noteEl = document.getElementById('roomnote');
 /* the note lists only this room's own states, from its own chain (every one names its place, `place = staff room`):
    the older chains' room rules name none and would show their common room's things everywhere */
 var ROOM_CHAIN = { 'staff-room': 'staff', 'charms-classroom': 'charms', 'trophy-room': 'trophy', 'library': 'library',
-                   'hospital-wing': 'wing', 'mirror-classroom': 'mirror' };
+                   'hospital-wing': 'wing', 'forgotten-classroom': 'mirror' };
 var ownShows = {}, lastShown = [];
 if (ROOM_CHAIN[PLACE]) fetch('events/' + ROOM_CHAIN[PLACE] + '.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
   (j.room || []).forEach(function (rule) { (rule.show || []).forEach(function (s) { ownShows[s] = true; }); });
@@ -626,7 +659,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  drawn[CUP_OPEN_SHOW] = true;
+  CUP_OPEN_SHOWS.forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return ownShows[s] && !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';

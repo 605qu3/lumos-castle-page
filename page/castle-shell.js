@@ -379,6 +379,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var all = out.doors.concat(out.ways), mine = all.filter(function (d) { return d.place === P.id; });
   var entry = mine.filter(function (d) { return o.from && d.to === o.from; })[0] || mine.filter(function (d) { return o.start && d.id === o.start; })[0] || mine[0];
   if (entry) out.stands.push(facingIn(entry, 'start'));
+  else {
+    /* a place with no door or way of its own in this year (the Room's corridor, a room past a shut door): he starts
+       at its middle, looking along its long side */
+    var xs = P.poly.map(function (p) { return p[0]; }), ys = P.poly.map(function (p) { return p[1]; });
+    var mx = (Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2, my = (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2;
+    var wide = Math.max.apply(null, xs) - Math.min.apply(null, xs) >= Math.max.apply(null, ys) - Math.min.apply(null, ys);
+    out.stands.push({ name: 'start', pos: toLocal(mx, my, P.floor + EYE), thing: null, level: P.floor,
+                      look: toLocal(mx + (wide ? 20 : 0), my + (wide ? 0 : 20), P.floor + EYE) });
+  }
   all.forEach(function (d) { var s = standAt(d, d.id); d.stand = s; out.stands.push(s); });
 
   /* a flight's two stands: a step off each end onto the floor it joins (straight on, or to the side onto a gallery),
