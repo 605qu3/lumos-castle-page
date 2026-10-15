@@ -1,0 +1,245 @@
+{
+  "chain": "hidden-ways",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = none",
+        "meal != none"
+      ],
+      "show": [
+        "the staff table's murmur coming up through the grille, a chair scraped back, now and then a laugh"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = easter",
+        "meal != none"
+      ],
+      "show": [
+        "the staff table's murmur coming up through the grille, a chair scraped back, now and then a laugh"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = christmas",
+        "meal != none"
+      ],
+      "show": [
+        "the staff table's murmur coming up through the grille, a chair scraped back, now and then a laugh"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = start of term",
+        "meal != none",
+        "meal != dinner"
+      ],
+      "show": [
+        "the staff table's murmur coming up through the grille, a chair scraped back, now and then a laugh"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = halloween",
+        "meal != none",
+        "meal != dinner"
+      ],
+      "show": [
+        "the staff table's murmur coming up through the grille, a chair scraped back, now and then a laugh"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = leaving feast",
+        "meal != none",
+        "meal != dinner"
+      ],
+      "show": [
+        "the staff table's murmur coming up through the grille, a chair scraped back, now and then a laugh"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = christmas day",
+        "meal != none",
+        "meal != dinner"
+      ],
+      "show": [
+        "the staff table's murmur coming up through the grille, a chair scraped back, now and then a laugh"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = start of term",
+        "meal = dinner"
+      ],
+      "show": [
+        "the feast's roar coming up through the grille, no one voice to be made out"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = halloween",
+        "meal = dinner"
+      ],
+      "show": [
+        "the feast's roar coming up through the grille, no one voice to be made out"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = leaving feast",
+        "meal = dinner"
+      ],
+      "show": [
+        "the feast's roar coming up through the grille, no one voice to be made out"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = christmas day",
+        "meal = dinner"
+      ],
+      "show": [
+        "laughter and the bang of wizard crackers coming up through the grille"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "club = duelling"
+      ],
+      "show": [
+        "a crowd's noise from the hall below, now and then a sharp crack, no one voice"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "meal = none",
+        "club = none",
+        "time != night"
+      ],
+      "show": [
+        "the empty hall's echo far below the grille, a candle's faint hiss"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "meal = none",
+        "club = none",
+        "time = night"
+      ],
+      "show": [
+        "the hall below the grille silent"
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = none",
+        "weekday = monday",
+        "meal = dinner"
+      ],
+      "show": [
+        "a voice at the staff table, too faint to say whose: \"Every one of those essays late. Every one.\""
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = none",
+        "weekday = tuesday",
+        "meal = lunch"
+      ],
+      "show": [
+        "a voice at the staff table, too faint to say whose: \"Pass the gravy, would you?\""
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "occasion = none",
+        "weekday = thursday",
+        "meal = dinner",
+        "cold = yes"
+      ],
+      "show": [
+        "a voice at the staff table, too faint to say whose: \"Frost again tonight, I'd say.\""
+      ]
+    },
+    {
+      "when": [
+        "place = hall lug",
+        "match = yes",
+        "meal = breakfast",
+        "windy = yes"
+      ],
+      "show": [
+        "a voice at the staff table, too faint to say whose: \"If this wind holds, it'll be a long match.\""
+      ]
+    },
+    {
+      "when": [
+        "place = gun room",
+        "time != night"
+      ],
+      "show": [
+        "the lawn's air coming in through the gratings, a little grey daylight on the flags"
+      ]
+    },
+    {
+      "when": [
+        "place = gun room",
+        "time != night",
+        "weekday = wednesday"
+      ],
+      "show": [
+        "one pair of feet on the steps overhead, going down to the lawn"
+      ]
+    },
+    {
+      "when": [
+        "place = gun room",
+        "match = yes",
+        "time = morning"
+      ],
+      "show": [
+        "many feet going down the steps overhead and voices heading for the pitch"
+      ]
+    },
+    {
+      "when": [
+        "place = gun room",
+        "occasion = start of term",
+        "hour = 18",
+        "meal = none"
+      ],
+      "show": [
+        "a crowd's feet climbing the steps overhead, then the great doors' boom"
+      ]
+    },
+    {
+      "when": [
+        "place = gun room",
+        "time = night"
+      ],
+      "show": [
+        "nothing overhead, only the wind through the gratings"
+      ]
+    }
+  ]
+}
