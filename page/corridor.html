@@ -191,7 +191,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=14"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=32"></script>
+<script src="castle-events.js?v=34"></script>
 <script src="castle-map.js?v=2"></script>
 <script src="charms/guide.js?v=5"></script>
 <script src="charms/spells.js?v=27"></script>
@@ -659,14 +659,147 @@ nookCeil.rotation.x = Math.PI / 2; nookCeil.position.set(NOOK_MID, NOOK_H, HER_Z
 nookCeil.name = 'nook-ceiling'; nook.add(nookCeil); register(nookCeil, 0);
 var SETTLE = { len: 2.0, d: 0.6, seat: 0.45, back: 1.5 };
 var settleMat = solid(0x7d6a55), settles = [];
+/* both settles are box settles, three seats a side, each seat its own lid, so nothing marks the one that opens. The
+   middle lid of the study-side settle lifts, and behind it the wall's lower panel is open into the hide beside the
+   flue (req 492; the Architect's secret-s4a and its way in at the model's site, the nook's west cheek; the box settle
+   taken at 6.34 pm, 15 October 2026, provisional, Godric to confirm): grey, a stand-in; HIDE below */
+var HIDE = { z0: 0.06, z1: 0.72, lidT: 0.04, open: 0, want: 0, lid: null, hole: null, inside: [] };
 [NOOK_X0, NOOK_X1].forEach(function (wx, i) {
-  var dir = i === 0 ? -1 : 1, zc = NOOK_BACK - BREAST * 0 - SETTLE.len / 2;
-  var seat = box(nook, SETTLE.d, SETTLE.seat, SETTLE.len, wx + dir * SETTLE.d / 2, SETTLE.seat / 2, zc, settleMat, 1);
-  var back = box(nook, 0.08, SETTLE.back, SETTLE.len, wx + dir * 0.04, SETTLE.back / 2, zc, settleMat, 1);
-  var arm = box(nook, SETTLE.d, 0.75, 0.06, wx + dir * SETTLE.d / 2, 0.375, zc - SETTLE.len / 2 + 0.03, settleMat, 1);
-  seat.name = back.name = arm.name = 'settle-' + (i ? 'stair' : 'study');
-  settles.push(seat, back, arm);
+  var dir = i === 0 ? -1 : 1, zc = NOOK_BACK - BREAST * 0 - SETTLE.len / 2, z0 = zc - SETTLE.len / 2;
+  var name = 'settle-' + (i ? 'stair' : 'study'), third = SETTLE.len / 3, sx = wx + dir * SETTLE.d / 2;
+  for (var k = 0; k < 3; k++) {
+    var a = z0 + k * third + 0.004, b = z0 + (k + 1) * third - 0.004;   /* a hair's gap between the seats, the lids' joints */
+    if (i === 0 && k === 1) {
+      /* the box under the lifting lid: its front, its floor and a dark inside; its ends are the seats either side */
+      var inner = solid(0x4e4238), bh = SETTLE.seat - HIDE.lidT;
+      HIDE.inside.push(box(nook, 0.03, bh, b - a, wx + dir * (SETTLE.d - 0.015), bh / 2, (a + b) / 2, settleMat, 1));
+      HIDE.inside.push(box(nook, SETTLE.d - 0.11, 0.03, b - a, wx + dir * (0.08 + (SETTLE.d - 0.11) / 2), 0.015, (a + b) / 2, inner, 1));
+      [a + 0.01, b - 0.01].forEach(function (zz) { HIDE.inside.push(box(nook, SETTLE.d - 0.08, bh, 0.02, wx + dir * (0.08 + (SETTLE.d - 0.08) / 2), bh / 2, zz, inner, 1)); });
+      HIDE.inside.forEach(function (m) { m.name = name; settles.push(m); });
+      /* the lid, hinged along its back edge against the settle's back */
+      var pivot = new THREE.Group(); pivot.position.set(wx + dir * 0.08, SETTLE.seat, (a + b) / 2); nook.add(pivot);
+      var lid = box(pivot, SETTLE.d - 0.08, HIDE.lidT, b - a, dir * (SETTLE.d - 0.08) / 2, -HIDE.lidT / 2, 0, settleMat, 1);
+      lid.name = name; lid.userData.hideLid = true; settles.push(lid);
+      HIDE.lid = pivot; HIDE.dir = dir; HIDE.a = a; HIDE.b = b;
+      continue;
+    }
+    var seat = box(nook, SETTLE.d, SETTLE.seat, b - a, sx, SETTLE.seat / 2, (a + b) / 2, settleMat, 1);
+    seat.name = name; settles.push(seat);
+  }
+  /* the high back: whole above the seat; below it, on the study side, open behind the middle box */
+  var up = SETTLE.back - SETTLE.seat;
+  var back = box(nook, 0.08, up, SETTLE.len, wx + dir * 0.04, SETTLE.seat + up / 2, zc, settleMat, 1);
+  back.name = name; settles.push(back);
+  (i === 0 ? [[z0, HIDE.z0], [HIDE.z1, z0 + SETTLE.len]] : [[z0, z0 + SETTLE.len]]).forEach(function (r) {
+    var lo = box(nook, 0.08, SETTLE.seat, r[1] - r[0], wx + dir * 0.04, SETTLE.seat / 2, (r[0] + r[1]) / 2, settleMat, 1);
+    lo.name = name; settles.push(lo);
+  });
+  var arm = box(nook, SETTLE.d, 0.75, 0.06, sx, 0.375, z0 + 0.03, settleMat, 1);
+  arm.name = name; settles.push(arm);
 });
+/* the way in behind the box: the wall's lower panel open into the hide, dark, with a little of the nook's light falling
+   in from the lifted lid (the dark is never deep); shown only while the lid is up */
+HIDE.hole = (function () {
+  var c = makeCanvas(128, 96), g = c.getContext('2d');
+  g.fillStyle = '#8a857e'; g.fillRect(0, 0, 128, 96);                       /* the stone round the opening, the wall's own */
+  var grd = g.createLinearGradient(0, 8, 0, 96);                            /* the opening: lit a little at its head from the lid, */
+  grd.addColorStop(0, '#6e5e4c'); grd.addColorStop(0.3, '#3a3029'); grd.addColorStop(1, '#221c18');   /* fading into the hide */
+  g.fillStyle = grd; g.fillRect(10, 8, 108, 88);
+  g.fillStyle = 'rgba(20,16,12,0.5)'; g.fillRect(10, 8, 108, 5); g.fillRect(10, 8, 5, 88); g.fillRect(113, 8, 5, 88);   /* its reveal in shadow */
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(HIDE.z1 - HIDE.z0 - 0.06, SETTLE.seat - HIDE.lidT - 0.05), new THREE.MeshBasicMaterial({ map: tex(c) }));
+  m.rotation.y = -Math.PI / 2; m.position.set(NOOK_X0 - 0.0005, (SETTLE.seat - HIDE.lidT) / 2 + 0.02, (HIDE.z0 + HIDE.z1) / 2);
+  m.name = 'nook-hide-way'; m.visible = false; nook.add(m);
+  return m;
+})();
+/* the landing's lifting flag (req 492; the Architect's secret-s4b, the store for the common room's fire under the
+   landing, 2.9 m clear, and its way in secret-s4b-flag, a flag that lifts with iron rungs down, its place on the landing
+   the Corridor's to say): in the landing's far corner by the outer wall, under the window, in view from the landing's
+   stop. Closed it is the landing's own flag drawing in its own place, told from its neighbours only by an iron ring
+   let flush into it; lifted, it stands on its hinge along the far end's side, facing him over the open hole, and below it a shaft with iron rungs
+   goes down, the landing's light on its first rungs and the ends of stacked logs dim at its foot (the dark is never
+   deep). Grey, a stand-in; found once, it stays up to him */
+var STORE = { s: 0.7, x0: FAR_END_X + 0.1, z0: FAR_Z + 0.1, deep: 2.9, open: 0, want: 0, pivot: null, slab: null, shaft: null };
+STORE.x1 = STORE.x0 + STORE.s; STORE.z1 = STORE.z0 + STORE.s;
+(function () {
+  var S = STORE, cx = (S.x0 + S.x1) / 2, cz = (S.z0 + S.z1) / 2;
+  /* the landing's flags, cut round the flag, the drawing's uv kept: u from its far end, v from her wall */
+  var hw = LANDING_D / 2, hh = WIDTH / 2, mx = (FOOT_X + FAR_END_X) / 2;
+  function lx(x) { return x - mx; } function ly(z) { return MID_Z - z; }   /* the plane's own frame before its turn */
+  var sh = new THREE.Shape(); sh.moveTo(-hw, -hh); sh.lineTo(hw, -hh); sh.lineTo(hw, hh); sh.lineTo(-hw, hh); sh.lineTo(-hw, -hh);
+  var hole = new THREE.Path(); hole.moveTo(lx(S.x0), ly(S.z0)); hole.lineTo(lx(S.x1), ly(S.z0)); hole.lineTo(lx(S.x1), ly(S.z1)); hole.lineTo(lx(S.x0), ly(S.z1)); hole.lineTo(lx(S.x0), ly(S.z0));
+  sh.holes.push(hole);
+  var g = new THREE.ShapeGeometry(sh), pos = g.attributes.position, uv = [];
+  for (var i = 0; i < pos.count; i++) uv.push((pos.getX(i) + hw) / LANDING_D, (pos.getY(i) + hh) / WIDTH);
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  landing.geometry.dispose(); landing.geometry = g;
+  /* the flag itself, its uv the same piece of the drawing, hinged along the far end's side (x0) */
+  S.pivot = new THREE.Group(); S.pivot.position.set(S.x0, FOOT_Y + 0.001, cz); scene.add(S.pivot);
+  var fg = new THREE.PlaneGeometry(S.s, S.s), fp = fg.attributes.position, fuv = [];
+  for (var j = 0; j < fp.count; j++) {
+    var wx = S.x0 + S.s / 2 + fp.getX(j), wz = cz - fp.getY(j);   /* laid flat, its own +y runs toward -z */
+    fuv.push((wx - FAR_END_X) / LANDING_D, (C.HER_Z - wz) / WIDTH);
+  }
+  fg.setAttribute('uv', new THREE.Float32BufferAttribute(fuv, 2));
+  S.slab = new THREE.Mesh(fg, landing.material);
+  S.slab.rotation.x = -Math.PI / 2; S.slab.position.set(S.s / 2, 0, 0); S.slab.name = 'landing-flag';
+  S.pivot.add(S.slab); register(S.slab, 1);
+  /* its body, 8 cm of stone under the drawn face: the underside and edges he sees once it stands up */
+  S.body = new THREE.Mesh(new THREE.BoxGeometry(S.s - 0.004, 0.08, S.s - 0.004), solid(0x6a655e));
+  S.body.position.set(S.s / 2, -0.041, 0); S.body.name = 'landing-flag-body'; S.body.userData.store = true; S.pivot.add(S.body);
+  /* the ring, let flush into the flag near its free edge: dark iron, its own look, no light of its own */
+  var rc = makeCanvas(64, 64), rg = rc.getContext('2d');
+  rg.strokeStyle = '#2a2622'; rg.lineWidth = 7; rg.beginPath(); rg.arc(32, 32, 22, 0, 7); rg.stroke();
+  rg.strokeStyle = 'rgba(120,112,100,0.6)'; rg.lineWidth = 2; rg.beginPath(); rg.arc(32, 32, 24, Math.PI * 1.1, Math.PI * 1.6); rg.stroke();
+  var ring = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.12), new THREE.MeshBasicMaterial({ map: tex(rc), transparent: true, depthWrite: false, color: col(0x9a948a) }));
+  ring.rotation.x = -Math.PI / 2; ring.position.set(S.s - 0.14, 0.002, 0); ring.name = 'landing-flag-ring'; S.pivot.add(ring);
+  S.ring = ring;
+  /* the shaft under it: stone sides darkening downward, four iron rungs on the outer wall's side, the logs' ends at its foot */
+  S.shaft = new THREE.Group(); S.shaft.name = 'landing-store'; S.shaft.visible = false; scene.add(S.shaft);
+  var wc = makeCanvas(32, 128), wg = wc.getContext('2d'), grd = wg.createLinearGradient(0, 0, 0, 128);
+  grd.addColorStop(0, '#6f6a63'); grd.addColorStop(0.35, '#3c3833'); grd.addColorStop(1, '#1d1b19');
+  wg.fillStyle = grd; wg.fillRect(0, 0, 32, 128);
+  var wm = new THREE.MeshBasicMaterial({ map: tex(wc), side: THREE.DoubleSide });
+  [[cx, S.z0, 0], [cx, S.z1, Math.PI], [S.x0, cz, Math.PI / 2], [S.x1, cz, -Math.PI / 2]].forEach(function (w) {
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(S.s, S.deep), wm);
+    m.position.set(w[0], FOOT_Y - S.deep / 2, w[1]); m.rotation.y = w[2]; m.userData.store = true; S.shaft.add(m);
+  });
+  var iron = new THREE.MeshBasicMaterial({ color: col(0x3a3631) });
+  for (var k = 0; k < 4; k++) {
+    var r = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.36, 6), iron);
+    r.rotation.z = Math.PI / 2; r.position.set(cx, FOOT_Y - 0.25 - k * 0.3, S.z0 + 0.06); S.shaft.add(r);
+  }
+  var logM = new THREE.MeshBasicMaterial({ color: col(0x3b2c20) }), endM = new THREE.MeshBasicMaterial({ color: col(0x6a5640) });
+  for (var n = 0; n < 5; n++) {
+    var lg = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, S.s - 0.02, 10), [logM, endM, endM]);
+    lg.rotation.z = Math.PI / 2; lg.position.set(cx, FOOT_Y - S.deep + 0.08 + (n > 2 ? 0.13 : 0), S.z0 + 0.12 + (n % 3) * 0.16 + (n > 2 ? 0.08 : 0)); S.shaft.add(lg);
+  }
+})();
+function storeFound() { return groundsQ.get('flag') === 'open' || !!(castle && castle.secrets && castle.secrets().indexOf('landing-store') >= 0); }
+function liftStoreFlag() {
+  STORE.want = 1;
+  if (castle && castle.moment) castle.moment('lifted the landing flag');   /* Events' record keeps it found: secret landing-store (req to Events) */
+}
+function updateStore(dt) {
+  if (!STORE.pivot) return;
+  if (STORE.slab.material !== landing.material) STORE.slab.material = landing.material;   /* the flags' drawing, once loaded */
+  if (!STORE.want && storeFound()) STORE.want = 1;
+  STORE.open += clamp(STORE.want - STORE.open, -dt / 1.1, dt / 1.1);
+  STORE.pivot.rotation.z = easeInOut(STORE.open) * 1.62;   /* up on its hinge, a little past upright, leaning toward the far end */
+  STORE.shaft.visible = STORE.open > 0.02;
+}
+function hideFound() { return groundsQ.get('hide') === 'open' || !!(castle && castle.secrets && castle.secrets().indexOf('nook-hide') >= 0); }
+function liftHideLid() {
+  HIDE.want = 1;
+  if (castle && castle.moment) castle.moment('lifted the nook settle');   /* Events' record keeps it found: secret nook-hide (req to Events) */
+}
+function updateHide(dt) {
+  if (!HIDE.lid) return;
+  if (!HIDE.want && hideFound()) HIDE.want = 1;   /* found once, it stays open to him */
+  HIDE.open += clamp(HIDE.want - HIDE.open, -dt / 0.9, dt / 0.9);
+  var e = easeInOut(HIDE.open);
+  HIDE.lid.rotation.z = HIDE.dir * e * 1.5;   /* up, just short of upright, leaning toward the settle's high back */
+  HIDE.hole.visible = HIDE.open > 0.05;
+}
 /* the hearth: the common room's fireplace drawing, drawn at 2.6 m wide (2.17 tall) so it clears the low ceiling, on
    the breast's face; grey until it loads */
 var hearth = onWallZ(cutoutTexture(150, 125, '#6a5a4c', drawRect, 'hearth'), HEARTH_DRAW_W, HEARTH_DRAW_W / 1.2, NOOK_MID, 1.25, NOOK_BACK - BREAST - 0.01, -1, 2, 'hearth');
@@ -1943,6 +2076,8 @@ function updateGrounds(dt) {
   updateSky(dt);
   updateNight(dt);
   mirrorWindow2();
+  updateHide(dt);
+  updateStore(dt);
   updateNorris(dt);
   updateNorrisDoor(dt);
   if (!grounds.canvas) return;
@@ -3372,6 +3507,16 @@ var STOPS = [
         fov: FOV_MAX }; } },   /* the widest a stop opens: the plinth stands 0.4 m nearer than her card, so its foot needs it */
   /* the settle's scarf (7.05 pm): bent over it at the seat's edge, his eye a metre up, looking down at its end by the arm,
      where its name tape turns up on arrival */
+  /* the lifted flag (req 492): standing at its edge, looking down the rungs */
+  { name: 'landing-flag', meshes: [], stop: function () {
+      var cx = (STORE.x0 + STORE.x1) / 2, cz = (STORE.z0 + STORE.z1) / 2;
+      return { pos: new THREE.Vector3(cx + 0.45, FOOT_Y + 1.3, cz + 0.45), look: new THREE.Vector3(cx - 0.05, FOOT_Y - 2.2, cz - 0.1), fov: 50 }; },
+    turn: 0.3 },
+  /* the box settle's open lid (req 492): bent over the seat beside it, looking down into the box and at the way in */
+  { name: 'nook-hide', meshes: [], stop: function () {
+      var zc = (HIDE.z0 + HIDE.z1) / 2;
+      return { pos: new THREE.Vector3(NOOK_X0 - SETTLE.d - 0.55, 1.1, zc), look: new THREE.Vector3(NOOK_X0, 0.22, zc), fov: 40 }; },   /* square to the wall over the open box */
+    turn: 0.3 },
   { name: 'settle-scarf', meshes: [settleScarf], stop: function () {
       var t = worldOf(scarfTape);
       return { pos: new THREE.Vector3(NOOK_X0 - SETTLE.d - 0.12, 1.0, t.z), look: t, fov: 30 }; },
@@ -3729,6 +3874,26 @@ function tap(cx, cy) {
   /* the sleeping shepherd (t2): at the tapestry's stop a tap on him and he pulls his cap lower */
   if (hits[0].object === tapestry && atStop && atStop.name === 'tapestry' && shepherdAt(hits[0].uv)) {
     tell('tapestry'); shepherdStirs(); said(true); return;
+  }
+  /* the landing's flag (req 492): from afar a tap walks him to the landing; there a tap on it lifts it, and once up a tap
+     stands him at its edge looking down */
+  if (hits[0].object === STORE.slab || hits[0].object.userData.store) {
+    tell('landing flag');
+    if (atStop !== landingStop && atStop !== flagStop) goTo(landingStop);
+    else if (STORE.want < 1) liftStoreFlag();
+    else if (atStop !== flagStop) goTo(flagStop);
+    said(true); return;
+  }
+  /* the box settle (req 492): at the inglenook's stop, or bent over it, a tap on the study-side settle's middle seat lifts
+     its lid; once up it stays up, and a tap on it again bends him over the open box */
+  if (atStop && (atStop.name === 'nook' || atStop.name === 'nook-hide') && hits[0].object.name === 'settle-study') {
+    var pz = hits[0].point.z;
+    if (pz > HIDE.a - 0.02 && pz < HIDE.b + 0.02 && hits[0].point.y < SETTLE.seat + 0.6) {
+      tell('nook settle');
+      if (HIDE.want < 1) liftHideLid();
+      else if (atStop.name !== 'nook-hide') goTo(hideStop);
+      said(true); return;
+    }
   }
   /* Neville (req 297): from afar the walk up to him, told to the runtime only at his stop, since his records answer
      any tap on him */
@@ -4288,6 +4453,11 @@ function updateLines(dt) {
    (req 68) until each is drawn (this lane's choice, which req 59 and req 68 leave to it), and the page notes which
    place the state names. */
 var landingStop = STOPS.filter(function (s) { return s.name === 'landing'; })[0];
+var hideStop = STOPS.filter(function (s) { return s.name === 'nook-hide'; })[0];
+var flagStop = STOPS.filter(function (s) { return s.name === 'landing-flag'; })[0];
+tappables.push(STORE.slab); STORE.slab.userData.stop = landingStop;
+STORE.shaft.children.forEach(function (m) { if (m.userData.store) tappables.push(m); });
+tappables.push(STORE.body);
 /* the landing's far end as a tap target only (req 286, downToBay): unseen, the corridor's section, a hand off the end */
 var wayDown = new THREE.Mesh(new THREE.PlaneGeometry(WIDTH, C.CEIL), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
 wayDown.rotation.y = Math.PI / 2;
