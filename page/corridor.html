@@ -1477,6 +1477,43 @@ placeArmourShadow();
    runtime's armour chain gives each */
 var ARMOUR_BOUNCE = 0.35;   /* the torches' warmth on the suit at full night (updateNight), a stand-in look, in grey */
 var ARMOUR_TURN = 30 * Math.PI / 180;   /* the most its card turns toward the eye, either way (the camera's update) */
+/* its side views (Godric's note, "side views of the knights or they will look like they are following the boys"): seen
+   from her side past about 30 degrees off its front, the card shows her side's drawing (Godric's 1 on
+   corridor-armour-sides-r3-1015, 7.47 pm: corridor-armour-her round 2 Try 2, mirrored here so the halberd is in its own
+   right hand, on the far side) and turns to the eye; nearer its front, the front drawing. A hard swap, entered at
+   `enter` and left at `leave` so it does not flicker on the line. The stair side's view waits on its own drawing
+   (round 3); till then that side keeps the cap. 1090 x 2499 px, the suit 141 to 2495 px, 1.70 m, so 1385 px a metre;
+   its feet centred 525 px from the left, so `dx` sets them where the front's stand. Trevor's eyes and the visor's
+   patch belong to the front drawing's slit, so they show only on the front */
+var ARMOUR_SIDE = { enter: 32 * Math.PI / 180, leave: 28 * Math.PI / 180, on: false, her: null };
+var ARMOUR_HER = { w: 1090 / 1385, h: 2499 / 1385, dx: (650 - 539) / 1369 - (525 - 545) / 1385 };
+ARMOUR_HER.dy = (-ARMOUR.h / 2 + 5 / 1369) - (-ARMOUR_HER.h / 2 + 4 / 1385);
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+    var g = c.getContext('2d'); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(im, 0, 0);
+    var m = cutoutMesh(tex(c), ARMOUR_HER.w, ARMOUR_HER.h);
+    m.position.set(ARMOUR_HER.dx, ARMOUR_HER.dy, 0.002); m.visible = false; m.name = 'armour-her';
+    m.material.emissiveMap = m.material.map;
+    armour.add(m); ARMOUR_SIDE.her = m;
+  };
+  im.src = '../assets/layers/corridor-armour-her.png';
+})();
+function updateArmourSide(a) {
+  var S = ARMOUR_SIDE;
+  if (S.her) { if (!S.on && a > S.enter) S.on = true; else if (S.on && a < S.leave) S.on = false; }
+  armour.rotation.y = S.on ? a : Math.max(-ARMOUR_TURN, Math.min(ARMOUR_TURN, a));
+  armour.material.visible = !S.on;
+  if (S.her) {
+    S.her.visible = S.on;
+    S.her.material.color.copy(armour.material.color); S.her.material.emissive.copy(armour.material.emissive);
+  }
+  if (visorPatch && helmetEyes) {
+    visorPatch.visible = !!visorPatch.userData.want && !S.on;
+    helmetEyes.visible = !!helmetEyes.userData.want && !S.on;
+  }
+}
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
 /* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
    her, 1.8 to 2.7 m up, a card turned to the eye as the armour is; hidden until the sticks chain hangs it */
@@ -3967,9 +4004,10 @@ function updateCamera(dt) {
      stairs are (placeCard); a card flat to the wall shows as a sliver from the corner. Turned to the eye only within
      ARMOUR_TURN of its own front (0, across the corridor), so the suit stops following him past it: Godric's note
      ("they will look like they are following the boys"), a stopgap till the side views are drawn (Fawkes, 7.32 pm,
-     15 October 2026, provisional, Godric to confirm; corridor-armour-sides-r2-1015) */
+     15 October 2026, provisional, Godric to confirm; corridor-armour-sides-r2-1015); from her side, her side's own
+     drawing instead (updateArmourSide) */
   var turnToEye = Math.atan2(camera.position.x - armour.position.x, camera.position.z - armour.position.z);
-  armour.rotation.y = Math.max(-ARMOUR_TURN, Math.min(ARMOUR_TURN, turnToEye));
+  updateArmourSide(turnToEye);
 }
 function setFov(f) {
   var want = camera.aspect < 1 ? f * 58 / 42 : f;
@@ -4058,7 +4096,7 @@ function corridorDrawRoom(shown) {
   armour.position.x = mark.x; armour.position.z = mark.z;
   placeArmourShadow();
   var back = has(CUE.back);
-  visorPatch.visible = false;   /* the drawn visor is shut already; its open state waits for an edit of the drawing */
+  visorPatch.visible = false; visorPatch.userData.want = false;   /* the drawn visor is shut already; its open state waits for an edit of the drawing */
   armour.material.color.copy(armour.userData.base).multiplyScalar(back ? 0.6 : 1);
   var pose = 'straight';
   for (var p in POSES) if (has(p)) pose = POSES[p];
@@ -4190,8 +4228,10 @@ function trevorHopTo(to, from) {
 /* from the cues on every draw, idempotently: where he is, and whether he is in the helmet */
 function drawTrevor(has, back) {
   var day = has(TCUE.day), night = has(TCUE.night), inHelmet = day || night;
-  if (night && !back) visorPatch.visible = true;
-  helmetEyes.visible = inHelmet && !back;
+  if (night && !back) visorPatch.userData.want = true;
+  helmetEyes.userData.want = inHelmet && !back;
+  visorPatch.visible = visorPatch.userData.want && !ARMOUR_SIDE.on;   /* the front drawing's slit only */
+  helmetEyes.visible = helmetEyes.userData.want && !ARMOUR_SIDE.on;
   helmetEyes.userData.night = night;
   var spot = has(TCUE.at) && castle ? castle.state().vars.spot : null;
   var mark = spot && TREVOR_MARKS[spot];
