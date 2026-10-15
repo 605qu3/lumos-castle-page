@@ -219,6 +219,10 @@
      (PS 11 L3715 to L3717), six a year for four houses, clear of Christmas and of Easter's fortnight, never a book's own
      match day. Each is [month, which Saturday of it], 1 the first and -1 the last. */
   var MATCHES = [[11, 2], [11, -1], [2, 1], [2, -1], [3, 2], [5, 3]];
+  /* The Duelling Club's evenings, ours (req 499; the charter's 15 October entry: a club of their own, an ordinary
+     practice evening any pupil could join, run by a teacher): Fridays from eight (CoS 11 L10298's hour) to nine on an
+     ordinary term day, from the spring term of the Chamber's castle, after its one canon night, in every castle after. */
+  var CLUB = { day: 5, hour: 20, from: [2, '01-08'] };
 
   var COND = /^([a-z_\- ]+?)\s*(>=|<=|!=|=|<|>)\s*([A-Za-z0-9_\- ]+)$/;
   var WAIT = /^(wait|quiet) (\d+)-(\d+) s$/;
@@ -432,6 +436,7 @@
     var lastMealOverride = /^(breakfast|lunch|dinner|none)$/.test(params.get('last-meal') || '') ? params.get('last-meal') : null;
     var matchOverride = /^(yes|no)$/.test(params.get('match') || '') ? params.get('match') : null;
     var summerOverride = /^(yes|no)$/.test(params.get('summer') || '') ? params.get('summer') : null;
+    var clubOverride = /^(duelling|none)$/.test(params.get('club') || '') ? params.get('club') : null;   /* ?club=duelling (req 499) */
     var sunOverride = /^(up|down)$/.test(params.get('sun') || '') ? params.get('sun') : null;   /* ?sun=up or down */
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
     /* No castle on this iPad at all, neither a state nor a boy's satchel: the backup's restore may come down (v=30). */
@@ -627,6 +632,7 @@
         case 'last meal': return lastMealNow();        /* the meal last ended today, none from midnight till breakfast's end (req 480) */
         case 'match': return matchNow();               /* yes on a Quidditch Saturday of ours (req 480) */
         case 'summer': return summerNow();             /* yes while the summer holds the castle in the feast week (req 480) */
+        case 'club': return clubNow();                 /* duelling on a club evening, else none (req 499) */
         case 'slot': return state.slot ? 'taken' : 'free';
         /* off as a parent sets it, or where the browser cannot hear at all, so a spoken thing waits for a tap (the ear's promise) */
         case 'speech': return ear && ear.available && ear.available() ? settings.speech || 'on' : 'off';
@@ -772,6 +778,15 @@
     function summerNow() {
       if (summerOverride) return summerOverride;
       return dayNumber(castleDay()) !== dayNumber(nowDate()) ? 'yes' : 'no';
+    }
+    /* The club now (req 499): `duelling` from eight to nine on a club Friday (CLUB), else none; with ?time= alone none,
+       as the meal; ?club=duelling for a look. */
+    function clubNow() {
+      if (clubOverride) return clubOverride;
+      if (timeOverride) return 'none';
+      var d = castleDay();
+      if (d.getDay() !== CLUB.day || nowDate().getHours() !== CLUB.hour || occasionNow() !== 'none') return 'none';
+      return castleDateKey() >= schoolKey(CLUB.from[0], CLUB.from[1]) ? 'duelling' : 'none';
     }
     /* Each dot's place now: the first of its rounds whose hours and `when` hold, its places taken in turn every so
        many minutes (10 unless named) counted from the date and clock alone, so both castles' Maps agree. A figure
@@ -2428,6 +2443,8 @@
       lastMeal: lastMealNow,
       match: matchNow,
       summer: summerNow,
+      /* The Duelling Club's evening (req 499): duelling or none, `?club=` honoured. */
+      club: clubNow,
       /* The day's weather (req 113): { sky (clear, cloudy, rain, snow, fog), wind (0 to 1), windy, ground (dry, wet,
          frost, snow), wet, frozen, warmth (C), cold, season (spring, summer, autumn, winter), date (mm-dd) }, one a day for
          the whole castle, `?weather=`, `?wind=`, `?season=` and `?date=` honoured, so every window shows one sky. */

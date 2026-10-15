@@ -87,7 +87,8 @@
       "when": [
         "place = great hall",
         "time = night",
-        "meal = none"
+        "meal = none",
+        "club = none"
       ],
       "show": [
         "the floating candles out, only the ceiling's night sky above"
@@ -212,7 +213,8 @@
     {
       "when": [
         "place = great hall",
-        "meal = none"
+        "meal = none",
+        "club = none"
       ],
       "show": [
         "the hall quiet, his own steps echoing off the stone walls"
@@ -223,7 +225,8 @@
         "place = great hall",
         "occasion = start of term",
         "meal != none",
-        "meal != dinner"
+        "meal != dinner",
+        "club = none"
       ],
       "show": [
         "the hall quiet, his own steps echoing off the stone walls"
@@ -345,7 +348,8 @@
       "when": [
         "place = great hall",
         "meal = none",
-        "time = night"
+        "time = night",
+        "club = none"
       ],
       "show": [
         "the hall empty, nobody at the four tables"
@@ -356,7 +360,8 @@
         "place = great hall",
         "meal = none",
         "time != night",
-        "last meal = none"
+        "last meal = none",
+        "club = none"
       ],
       "show": [
         "the hall empty, nobody at the four tables"
@@ -369,7 +374,8 @@
         "time != night",
         "last meal != none",
         "lessons = on",
-        "weekday != wednesday"
+        "weekday != wednesday",
+        "club = none"
       ],
       "show": [
         "the hall empty, nobody at the four tables"
@@ -382,7 +388,8 @@
         "time != night",
         "last meal != none",
         "lessons = off",
-        "occasion = christmas"
+        "occasion = christmas",
+        "club = none"
       ],
       "show": [
         "the hall empty, nobody at the four tables"
@@ -395,7 +402,8 @@
         "time != night",
         "last meal != none",
         "lessons = off",
-        "occasion = christmas day"
+        "occasion = christmas day",
+        "club = none"
       ],
       "show": [
         "the hall empty, nobody at the four tables"
@@ -408,7 +416,8 @@
         "time != night",
         "last meal != none",
         "lessons = off",
-        "occasion = start of term"
+        "occasion = start of term",
+        "club = none"
       ],
       "show": [
         "the hall empty, nobody at the four tables"
@@ -419,7 +428,8 @@
         "place = great hall",
         "occasion = start of term",
         "meal != none",
-        "meal != dinner"
+        "meal != dinner",
+        "club = none"
       ],
       "show": [
         "the hall empty, nobody at the four tables"
@@ -434,7 +444,8 @@
         "lessons = off",
         "occasion != christmas",
         "occasion != christmas day",
-        "occasion != start of term"
+        "occasion != start of term",
+        "club = none"
       ],
       "show": [
         "a few pupils at the tables' east ends with a book or a game, the rest of the hall empty"
@@ -447,7 +458,8 @@
         "time != night",
         "last meal != none",
         "lessons = on",
-        "weekday = wednesday"
+        "weekday = wednesday",
+        "club = none"
       ],
       "show": [
         "one or two pupils at a table's east end in a free period, the rest of the hall empty"
@@ -763,7 +775,8 @@
       "when": [
         "place = great hall",
         "meal = none",
-        "last meal != lunch"
+        "last meal != lunch",
+        "club = none"
       ],
       "show": [
         "the golden goblets stacked upside down in towers down the tables' middle lines, one tower leaning, one goblet left upright with juice in it, the plates gone"
@@ -774,7 +787,8 @@
         "place = great hall",
         "meal = none",
         "last meal = lunch",
-        "occasion = none"
+        "occasion = none",
+        "club = none"
       ],
       "show": [
         "the golden goblets stacked upside down in towers down the tables' middle lines, one tower leaning, one goblet left upright with juice in it, the plates gone"
@@ -785,7 +799,8 @@
         "place = great hall",
         "meal = none",
         "last meal = lunch",
-        "occasion = christmas"
+        "occasion = christmas",
+        "club = none"
       ],
       "show": [
         "the golden goblets stacked upside down in towers down the tables' middle lines, one tower leaning, one goblet left upright with juice in it, the plates gone"
@@ -796,7 +811,8 @@
         "place = great hall",
         "meal = none",
         "last meal = lunch",
-        "occasion = easter"
+        "occasion = easter",
+        "club = none"
       ],
       "show": [
         "the golden goblets stacked upside down in towers down the tables' middle lines, one tower leaning, one goblet left upright with juice in it, the plates gone"
@@ -806,7 +822,8 @@
       "when": [
         "place = great hall",
         "meal = none",
-        "last meal = dinner"
+        "last meal = dinner",
+        "club = none"
       ],
       "show": [
         "what a meal leaves: a fork on the flags under a bench, a knife on a bench, a goblet on its side with juice spilt, napkins crumpled and dropped"
@@ -817,7 +834,8 @@
         "place = great hall",
         "meal = none",
         "last meal = breakfast",
-        "occasion != start of term"
+        "occasion != start of term",
+        "club = none"
       ],
       "show": [
         "what a meal leaves: a fork on the flags under a bench, a knife on a bench, a goblet on its side with juice spilt, napkins crumpled and dropped"
@@ -828,7 +846,8 @@
         "place = great hall",
         "meal = none",
         "last meal = lunch",
-        "occasion != start of term"
+        "occasion != start of term",
+        "club = none"
       ],
       "show": [
         "what a meal leaves: a fork on the flags under a bench, a knife on a bench, a goblet on its side with juice spilt, napkins crumpled and dropped"
@@ -870,7 +889,8 @@
     },
     {
       "when": [
-        "place = great hall"
+        "place = great hall",
+        "club = none"
       ],
       "show": [
         "a satchel standing upright on a bench and a house scarf over a bench end"
@@ -984,6 +1004,53 @@
       ],
       "show": [
         "a few brooms leaning along the wall by the front doors, the morning of a match"
+      ]
+    },
+    {
+      "when": [
+        "place = great hall",
+        "club = duelling"
+      ],
+      "show": [
+        "the Duelling Club's evening: the four tables and their benches vanished, a plain practice floor, pairs of pupils spread down the hall facing their partners, the teacher at the front before the platform"
+      ]
+    },
+    {
+      "when": [
+        "place = great hall",
+        "club = duelling"
+      ],
+      "show": [
+        "two straw dummies on wooden stands side by side at the front, two chalk crosses facing them for the boys"
+      ]
+    },
+    {
+      "when": [
+        "place = great hall",
+        "club = duelling"
+      ],
+      "show": [
+        "pairs muttering spells across the hall, the odd bang, a thump as someone sits down hard, a burst of laughter"
+      ]
+    },
+    {
+      "when": [
+        "place = great hall",
+        "club = duelling",
+        "time = night",
+        "meal = none"
+      ],
+      "show": [
+        "the floating candles burning gold"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "castle date >= 2 12-15"
+      ],
+      "show": [
+        "inside the small chamber off the hall, the golden stage's panels stacked on edge against the wall, the gilt flaking, one panel's edge scorched black"
       ]
     }
   ],
