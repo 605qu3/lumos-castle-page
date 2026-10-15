@@ -410,7 +410,7 @@ window.CASTLE_MODEL = {
   "features": [
     { "id": "hearth", "first": "PS", "room": "common-room", "kind": "fireplace", "bearing": 48.7, "w": 3.0, "h": 2.5, "proud": 0.6, "state": "built" },
     { "id": "fat-lady", "first": "PS", "room": "corridor", "kind": "portrait", "at": [0, 6.41], "w": 1.4, "h": 1.7, "state": "built", "cite": "PS 7" },
-    { "id": "blank-stretch", "first": "PS", "kind": "blank wall", "between": ["room-corridor", "room-of-requirement"], "about": "a plain wall in every year, unexplained; the Room's door only once OotP is finished (its walks past and the trolls dropped, the touch review, req 426), the Room's first (the Ministry's list, Rework 5)",
+    { "id": "blank-stretch", "first": "PS", "kind": "blank wall", "between": ["room-corridor", "room-of-requirement"], "about": "a plain wall in every year, unexplained; the Room's door only once OotP is finished [set aside, the touch review, req 426, kept until Godric's yes: the three walks past, the trolls peering], the Room's first (the Ministry's list, Rework 5)",
       "span": [[29.65, 50.6], [34.35, 50.6]], "state": "designed", "cite": "OotP 18" },
     { "id": "barnabas", "first": "PS", "room": "room-corridor", "kind": "tapestry, Barnabas the Barmy teaching trolls ballet, opposite the blank stretch",
       "span": [[30.0, 53.6], [34.0, 53.6]], "w": 4.0, "h": 1.8, "state": "designed", "cite": "OotP 18, HBP 20, HBP 21" },
@@ -580,7 +580,7 @@ window.CASTLE_MODEL = {
       { "kind": "hidden", "at": [60, 12], "name": "the tapestry stair to Gryffindor", "count": 1, "cite": "GoF 12" },
       { "kind": "hidden", "at": [91, 8], "name": "in the keep's east wall", "count": 2, "cite": "ours" },
       { "kind": "hidden", "at": [79, -1], "name": "in the keep's south wall", "count": 1, "cite": "ours" },
-      { "kind": "odd", "at": [67, 8], "name": "the vanishing step", "count": 2, "cite": "GoF 25, HBP 28" },
+      { "kind": "odd", "at": [67, 8], "name": "the vanishing step", "count": 2, "cite": "PS 8; GoF 25, HBP 28" },
       { "kind": "down", "at": [72, 60], "name": "to the dungeons", "count": 2, "cite": "CoS 5" },
       { "kind": "down", "at": [62, 66], "name": "to the kitchens and Hufflepuff", "count": 2, "cite": "GoF 21, OotP 18" },
       { "kind": "down", "at": [80, 92], "name": "the stone steps", "count": 1, "cite": "PS 6" },
