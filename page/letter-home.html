@@ -58,10 +58,12 @@
     <label for="ps">P.S. (leave it empty and a new one is chosen each week)</label>
     <input id="ps" autocomplete="off" placeholder="Do not let Fred and George near your homework.">
 
+    <div id="howler-set-aside" hidden>
     <label for="howler">A Howler (a short line, shouted)</label>
     <input id="howler" autocomplete="off" maxlength="120" placeholder="YOUR TRUNK IS A DISGRACE!">
     <div class="hint">Once in a long while a Howler stands on the desk before your letter. Opened, it shouts this in
       capitals and burns to ash. Leave it empty and a Howler meant for someone else turns up instead.</div>
+    </div>
 
     <label for="sign">Signed off (a line before your names)</label>
     <input id="sign" autocomplete="off" placeholder="Love,">
@@ -82,6 +84,8 @@
 (function () {
   var KEY = 'lumos.letterHome';
   var $ = function (id) { return document.getElementById(id); };
+  /* the parents' Howler, set aside (docs/ministry/set-aside.md): hidden unless ?setaside */
+  if (/[?&]setaside(=|&|$)/.test(location.search)) document.getElementById('howler-set-aside').hidden = false;
   var fields = ['name', 'note', 'ps', 'howler', 'sign'];   /* howler: req 200, read by the runtime as home howler */
   /* the signatures (Godric's Q11 touch, 11 October 2026): strokes, not a picture, so the link stays short; points on
      a 1000-wide grid, the height in proportion, each stroke a flat list x, y, x, y ... */

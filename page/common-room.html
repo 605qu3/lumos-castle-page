@@ -746,6 +746,13 @@ var TILES = {
 (function () {
 'use strict';
 
+/* the set-asides (the Ministry's sweep, 14 and 15 October 2026; docs/ministry/set-aside.md, the Common room's lines;
+   docs/ministry/changes/common-room.md, Set aside and Rework 4, 5 and 11): bedtime and the waking, the Weasleys'
+   Howler on the desk, Hermione's three spoken lines, the clasp's, the Knut's and the den card's glints, the History's
+   motes, the stair glow's breathing, the bubble's own glow and the Omnioculars' shimmer are off, kept in the code
+   until Godric's yes to remove them; ?setaside shows them as they were (the lane paused, 15 October 2026) */
+var SET_ASIDE = /[?&]setaside(=|&|$)/.test(location.search);
+
 /* ---------- the shared frame (castle.js): renderer, scene, camera, helpers, the apply functions, HUD ---------- */
 
 var kit = window.castleFrame ? castleFrame({
@@ -2732,7 +2739,7 @@ function updateStairGlow(dt, t) {
   stairGlowLevel += Math.max(-dt / 2, Math.min(dt / 2, (stairGlowOn ? 1 : 0) - stairGlowLevel));
   if (!stairGlow) { if (stairGlowLevel <= 0) return; stairGlow = stairGlowBuild(); if (!stairGlow) return; }
   if (stairGlow.geometry !== stairs.geometry) stairGlow.geometry = stairs.geometry;   /* placeCard swapped it */
-  var breathe = 0.86 + 0.09 * Math.sin(t * 0.9) + 0.05 * Math.sin(t * 2.3 + 1.7);
+  var breathe = SET_ASIDE ? 0.86 + 0.09 * Math.sin(t * 0.9) + 0.05 * Math.sin(t * 2.3 + 1.7) : 0.86;
   stairGlow.material.opacity = STAIR_GLOW.peak * stairGlowLevel * breathe;
   stairGlow.visible = stairGlowLevel > 0;
 }
@@ -2941,7 +2948,7 @@ function updateSign(dt) {
 }
 function signScrapTap() {
   LINE_PLACES['sign-corner'] = gallonsScrap.mesh.getWorldPosition(new THREE.Vector3());
-  showLines([{ medium: 'said', speaker: 'hermione', at: 'sign-corner', text: '“They are the limit,” said Hermione grimly.' }]);
+  if (SET_ASIDE) showLines([{ medium: 'said', speaker: 'hermione', at: 'sign-corner', text: '“They are the limit,” said Hermione grimly.' }]);
 }
 /* the letter from home (Godric's Q10, 11 October 2026, 8.13 am: a family letter, propped against the books' near face
    on the desk; Q11, provisional: his parents write it on letter-home.html). Its words are never in this file: the
@@ -3168,6 +3175,7 @@ var howlerImg = new Image();
 howlerImg.onload = function () { var c = makeCanvas(1080, 744); c.getContext('2d').drawImage(howlerImg, 0, 0, 1080, 744); homeSet(howler, tex(c)); };
 howlerImg.src = HOWLER.url;
 function howlerToday() {
+  if (!SET_ASIDE) return false;                  /* the Weasleys' Howler, set aside; the brothers' own lands here later */
   if (/[?&]howler(&|=|$)/.test(location.search)) return true;
   return ((homeDay(homeNow()) * 2246822519) >>> 0) % HOWLER.every === 7;
 }
@@ -3947,7 +3955,7 @@ function booksPageAway() {
 function booksTap() {
   LINE_PLACES['books-row'] = books.mesh.getWorldPosition(new THREE.Vector3());
   if (books.out) {
-    showLines([{ medium: 'said', speaker: 'hermione', at: 'books-row', text: '“All the copies of Hogwarts, A History have been taken out,” said Hermione. “And there’s a two-week waiting list.”' }]);
+    if (SET_ASIDE) showLines([{ medium: 'said', speaker: 'hermione', at: 'books-row', text: '“All the copies of Hogwarts, A History have been taken out,” said Hermione. “And there’s a two-week waiting list.”' }]);
     return;
   }
   if (books.slide >= 0 || bookPageEl.classList.contains('on')) return;
@@ -3967,7 +3975,7 @@ function booksPage() {
   var pg = first ? HISTORY_PAGES[0] : HISTORY_PAGES[1 + bookPage.n++ % (HISTORY_PAGES.length - 1)];
   booksPageShow(pg, first ? function () {
     localStorage.setItem(BOOKS.DAY, day);
-    showLines([{ medium: 'said', speaker: 'hermione', at: 'books-row', text: '“Honestly am I the only person who’s ever bothered to read Hogwarts, A History?” said Hermione crossly.' }]);
+    if (SET_ASIDE) showLines([{ medium: 'said', speaker: 'hermione', at: 'books-row', text: '“Honestly am I the only person who’s ever bothered to read Hogwarts, A History?” said Hermione crossly.' }]);
   } : null);
 }
 /* the History out by s (0 home, 1 an inch out): an inch straight toward his eye is under a pixel from the room, so it
@@ -4030,7 +4038,7 @@ function updateBooks(dt) {
     books.dustMat.opacity = 0.55 * smooth01(0, 0.15, d) * (1 - smooth01(0.8, 2, d));
     if (d > 2) { books.dust = null; books.dustMat.opacity = 0; }
   }
-  var want = books.ajar && !books.out && books.hist.visible ? 1 : 0;
+  var want = SET_ASIDE && books.ajar && !books.out && books.hist.visible ? 1 : 0;
   books.hangOn += clamp(want - books.hangOn, -dt, dt * 0.5);   /* in over two seconds, out over one */
   if (books.hangOn > 0) {
     var top = books.hist.localToWorld(new THREE.Vector3(0, (BOOKS.HIST[3] - BOOKS.HIST[1]) * BOOKS.h / 2, 0.01)), ha = books.hangGeo.attributes.position.array,
@@ -4175,7 +4183,7 @@ function updateCloak(dt) {
     glintT += dt;
     if (glintT > 0.7) glintT = -1;
   }
-  cloakGlint.material.opacity = glintT < 0 ? 0 : Math.sin(Math.PI * glintT / 0.7) * (0.55 + 0.45 * fireStoke) * (0.35 + 0.65 * fireLevel);
+  cloakGlint.material.opacity = (!SET_ASIDE || glintT < 0) ? 0 : Math.sin(Math.PI * glintT / 0.7) * (0.55 + 0.45 * fireStoke) * (0.35 + 0.65 * fireLevel);
 }
 var wingback = cutout(cutoutTexture(416, 384, '#6c6a66', drawWingback), 2.6, 2.4, WINGBACK_AT.x, WINGBACK_AT.z, 2);
 wingback.rotation.y = WINGBACK_AT.yaw;
@@ -4855,8 +4863,8 @@ var VISITOR_CUES = {
   /* the six cues of a sitter in the painting opposite seen through the hole are gone (req 120, Events, 11 October 2026:
      since the switch the hole no longer faces it, her visits there are met in the corridor, req 105) */
   /* the bedtime (bedtime.json; board req 38) */
-  'the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair': function () { fireLevelT = Math.min(fireLevelT, 0.7); },
-  'the room dims, the fire low, the view turns to the stair, and he goes up to the dormitory for lights out (dormitory.html?from=room&bedtime)': function () { lightsOut(); }
+  'the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair': function () { if (SET_ASIDE) fireLevelT = Math.min(fireLevelT, 0.7); },
+  'the room dims, the fire low, the view turns to the stair, and he goes up to the dormitory for lights out (dormitory.html?from=room&bedtime)': function () { if (SET_ASIDE) lightsOut(); }
 };
 
 /* ---------- Trevor's room half (board req 55, the events lane's req 9; 9 October 2026) ----------
@@ -6338,7 +6346,7 @@ function updateFindHand(dt, t) {
    above every view of his, so it floats at 4.6 m, near the frame's top at rest (about 120 px down on the wide screen,
    90 on the iPad), where a boy looking up finds it */
 var bubble = new THREE.Mesh(new THREE.SphereGeometry(0.12, 20, 14), new THREE.MeshStandardMaterial({ color: col(0x8c9be8),
-  emissive: col(0x2a3170), roughness: 0.15, metalness: 0, transparent: true, opacity: 0.55 }));
+  emissive: col(SET_ASIDE ? 0x2a3170 : 0x000000), roughness: 0.15, metalness: 0, transparent: true, opacity: 0.55 }));
 bubble.position.set(onSofa(0.2, 0.3)[0], 4.6, onSofa(0.2, 0.3)[1]);
 bubble.name = 'drooble-bubble'; bubble.visible = false; bubble.want = false;
 scene.add(bubble);
@@ -7056,7 +7064,7 @@ function denGlint() {                                  /* the newest card's slot
   var seen = 0;
   try { seen = +(localStorage.getItem(DEN.SEEN) || 0); } catch (e) {}
   var n = denState.order.length;
-  if (n > seen) {
+  if (n > seen && SET_ASIDE) {
     var i = denState.slots.indexOf(denState.order[n - 1]);
     if (i >= 0) {
       denGlintM.position.copy(denSlotWorld(i)).sub(DEN.at);
@@ -7618,7 +7626,7 @@ function updateArmchair(dt, t) {
   A.grid = A.gridTo ? Math.min(1, A.grid + dt / M.fadeIn) : Math.max(0, A.grid - dt / M.fadeOut);
   armGrid.visible = A.grid > 0; armGrid.material.opacity = M.chalk * A.grid;
   armFind.visible = trevor.key !== 'floor-d' && Math.hypot(A.x - CHAIR_L_AT.x, A.z - CHAIR_L_AT.z) > 0.15;
-  if (armFind.visible) { var g = (t % 4.5) / 4.5; armFind.userData.glint.material.opacity = g < 0.12 ? 0.8 * Math.sin(Math.PI * g / 0.12) : 0; }
+  if (armFind.visible && SET_ASIDE) { var g = (t % 4.5) / 4.5; armFind.userData.glint.material.opacity = g < 0.12 ? 0.8 * Math.sin(Math.PI * g / 0.12) : 0; }
   updateArmKnut(dt);
   chairL.userData.lift = A.up / M.lift;
   if (scarf) scarf.userData.lift = chairL.userData.lift;
@@ -8772,7 +8780,7 @@ if (kit.from === 'dormitory') arriveFromStair();
    waking, he goes straight up to wake in his bed, ?from=sleep; the place is set to the dormitory as he goes, so the
    next opening is an ordinary one. Read here, not in the shared frame, since the common room is the page the castle is
    opened on. */
-if (!kit.from) {
+if (!kit.from && SET_ASIDE) {
   var saved = kit.readPlace();
   if (saved && saved.room === 'dormitory' && saved.stop === 'waking') kit.travel('dormitory.html?from=sleep', { place: { room: 'dormitory' } });
 }
@@ -8904,7 +8912,7 @@ kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
 /* the Omnioculars once his pair is held (req 158): the frame shows its knobs only then, a hidden thing (req 145, 157)
    only shimmers, and the gold line names what is held still at the middle: the look names above are already plain
    words, capitalised by the frame; only the books' own names are spelled here */
-kit.zoom.held(function () { return !!(castle && castle.state().vars.omni === 'held'); });
+kit.zoom.held(function () { return !!(SET_ASIDE && castle && castle.state().vars.omni === 'held'); });
 kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hidden(name)); });
 kit.zoom.shown({ 'a history of magic': 'A History of Magic', 'nearly headless nick': 'Nearly Headless Nick',
   'the snitch scratched in the desk': 'The Snitch scratched in the desk',
