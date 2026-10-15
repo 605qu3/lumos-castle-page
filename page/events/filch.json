@@ -69,6 +69,356 @@
           "canon": "ours, in his voice (the Corridor's req 454: where Mrs Norris sits before the cupboard he mutters at her for staring at it; the page's built-in norris, 73bc09a0); his \"my sweet\" to her, CoS 8 L9091, checked against the text, 15 October 2026; comic, he never sees him (the world rules)"
         }
       ]
+    },
+    {
+      "id": "filch.miss-history",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = history of magic classroom",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light in the doorway, swinging up the aisle to the front row and back, never past the press, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-history",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Dust and dates, my sweet. Nothing in here but dust and dates.",
+            "Not a soul. They all sleep through this one anyway, my sweet."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-charms",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = charms classroom",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light in the doorway over the door's open leaf, down the empty aisle to the desks and the pile of books, then the door pulled to"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-charms",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Books left out again, my sweet. Untidy lot.",
+            "Nothing here but chalk and ink, my sweet. Come along."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-transfiguration",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = transfiguration classroom",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light in the doorway over the door's open leaf, across the empty desks, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-transfiguration",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Not a desk out of place, my sweet. She'd have my hide if there were.",
+            "Nothing here. Come along, my sweet."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-defence",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = defence classroom",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light in the doorway over the door's open leaf, across the empty desks, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-defence",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Nothing, my sweet. Just the draught.",
+            "Who knows what they keep in here, my sweet. Come away."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-potions",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = potions dungeon",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light in the doorway over the door's open leaf, along the cold cauldron stands, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-potions",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Nothing here but cold cauldrons, my sweet.",
+            "Something spilt on my flags again. Mess and muck everywhere!"
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules); \"Mess and muck everywhere!\", CoS 8 L9027, read 15 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-trophy",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = trophy room",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light in the doorway over the door's open leaf, along the cases' glass, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-trophy",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Fingerprints on the glass again, my sweet.",
+            "All this silver to polish, my sweet, and who thanks me?"
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-library",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = library",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light coming down the aisle past the bay, the small door at its back shut, then on toward the rope"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-library",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Quiet as the grave in here, my sweet.",
+            "Not a book out of place. Shame, really, my sweet."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-stairhall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = stair hall",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light along the fifth floor's east gallery past the tapestry, which hangs flat and still, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-stairhall",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Draughts, my sweet. Nothing but draughts.",
+            "Up and down, up and down. Come along, my sweet."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-entrance",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = entrance hall",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light crossing the hall past the small chamber's shut door, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-entrance",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Mess and muck everywhere! Mud from the grounds all over my floor, my sweet.",
+            "Nothing here, my sweet. Nothing here."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules); \"Mess and muck everywhere!\", CoS 8 L9027, read 15 October 2026"
+        }
+      ]
+    },
+    {
+      "id": "filch.miss-myrtle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = myrtles bathroom",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "the bathroom door opening a hand's width on Filch's lamp light across the wet floor, then shut again"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-myrtle",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Flooded again. I'm not setting foot in there, my sweet.",
+            "Wet floor, wet walls, wet ghost. Come away, my sweet."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
     }
   ]
 }
