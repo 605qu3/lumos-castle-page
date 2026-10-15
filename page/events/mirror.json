@@ -17,35 +17,25 @@
     },
     {
       "when": [
-        "place = mirror classroom",
-        "reading = 1",
-        "date >= 12-28"
+        "place = forgotten classroom",
+        "castle date >= 1 12-28"
       ],
       "show": [
-        "the far wall bare, two pale scrapes on the floor where a heavy thing on two feet once stood"
+        "two pale scrapes on the floor where a heavy thing on two feet once stood, and a cleaner oblong on the wall above them"
       ],
-      "canon": "Interiors' req 384: PS 12 L4424, \"The Mirror will be moved to a new home tomorrow\", so from 12-28 the far wall is bare; the scrapes ours, a lasting trace kept in every later book's year; checked against the text, 14 October 2026"
+      "canon": "the change list's Rework 5 under the 15 October rulings (traces keep their dates): PS 12 L4388 and L4424, \"The Mirror will be moved to a new home tomorrow\" after the third night, so from 28 December of the Stone's castle and in every later year; the scrapes and the cleaner patch ours (Interiors' schedule, docs/interiors/mirror-classroom.md, where the Mirror stood; the Curator's item 7); the bare far wall, the stacks and the worn walk are placed, undated, the page's, never a state; checked against the text, 14 October 2026"
     },
     {
       "when": [
-        "place = mirror classroom",
-        "reading = 1",
-        "date <= 06-30"
+        "place = forgotten classroom",
+        "time = night",
+        "moon up = yes",
+        "weather = clear"
       ],
       "show": [
-        "the far wall bare, two pale scrapes on the floor where a heavy thing on two feet once stood"
+        "a pale patch of moonlight on the floor just inside the door"
       ],
-      "canon": "as above, the spring after"
-    },
-    {
-      "when": [
-        "place = mirror classroom",
-        "reading >= 2"
-      ],
-      "show": [
-        "the far wall bare, two pale scrapes on the floor where a heavy thing on two feet once stood"
-      ],
-      "canon": "as above, in every later book's year"
+      "canon": "the touch review's ADJUST of architect-q20-mirror-room-1014 t1 (docs/ministry/touch-review.md, approved 15 October 2026): ordinary moonlight on any clear night while the moon is up, never the three nights, no glass to catch it; the window north-facing (model v24's mirror-window), so the moon's sky light, never its beam (Interiors' schedule, The window's light); ours, the books give no window (PS 12 L4260)"
     },
     {
       "when": [

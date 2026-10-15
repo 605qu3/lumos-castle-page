@@ -64,20 +64,6 @@
       "lost-things",
       "fat-lady"
     ],
-    "meals": [
-      {
-        "from": "07:30",
-        "to": "08:30"
-      },
-      {
-        "from": "12:30",
-        "to": "13:30"
-      },
-      {
-        "from": "18:30",
-        "to": "19:30"
-      }
-    ],
     "crowd": {
       "place": "great-hall",
       "at": "meals",

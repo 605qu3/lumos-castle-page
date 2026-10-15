@@ -192,6 +192,20 @@
      before tea). */
   var DUSK = [17.0, 17.75, 18.75, 20.0, 20.5, 21.0, 21.0, 20.25, 19.25, 18.5, 17.0, 16.75];
   var DAWN = [7.25, 6.75, 7.0, 6.25, 5.5, 5.25, 5.5, 6.0, 6.5, 7.0, 6.75, 7.25];
+  /* The castle's day by the clock (docs/room-states.md §7 2 to 4, req 414), one table each, every chain and page
+     reading the built-ins `meal`, `occasion` and `lessons`, never a copy. The meals' hours are the Map's of req 242,
+     moved here as the one table (map.json keeps none of its own). Lessons from nine (PoA 6 L15206: "Nine o'clock,
+     Divination"); the rest of the hours ours. The Great Hall lane may ask other hours by row. */
+  var MEALS = [{ meal: 'breakfast', from: '07:30', to: '08:30' }, { meal: 'lunch', from: '12:30', to: '13:30' },
+               { meal: 'dinner', from: '18:30', to: '19:30' }];
+  var LESSON_HOURS = [{ from: '09:00', to: '12:30' }, { from: '13:30', to: '16:30' }];
+  /* The occasions any pupil sees every year, never a book's own night (the charter, 15 October 2026, holidays): the
+     start of term on 1 September, Hallowe'en on 31 October, Christmas from the hall's decorating in the last days of
+     term (PS 12 L4054 to L4056, a day before the holidays; the date ours) to 2 January with Christmas Day its own,
+     Easter's fortnight (the `easter` built-in's), and the leaving feast on its day (`feast`). The feast of a day is
+     the occasion with `meal = dinner`. */
+  var OCCASIONS = ['start of term', 'halloween', 'christmas', 'christmas day', 'easter', 'leaving feast', 'none'];
+  var CHRISTMAS = { from: '12-18', to: '01-02' };
 
   var COND = /^([a-z_\- ]+?)\s*(>=|<=|!=|=|<|>)\s*([A-Za-z0-9_\- ]+)$/;
   var WAIT = /^(wait|quiet) (\d+)-(\d+) s$/;
@@ -208,13 +222,14 @@
   ];
 
   /* The real moon (req 95, Magic's "The real moon, how real", Godric's pick of 10 October 2026, 5.16 pm), from the
-     date and clock alone, for the same northern mid-latitude home as dusk (latitude 42), no stored place. The moon's
+     date and clock alone, in the castle's sky at 57 degrees north (req 439, the Architect's windows layer; Fawkes's
+     3.00 pm on Events' Q1, option 1, provisional, Godric to confirm; until then 42, the home's), no stored place. The moon's
      and sun's longitudes by the almanac's short series (within a few hours of the true new and full moons) give its
      phase and how much is lit; its height comes from its hour angle (the sun's, less the elongation, from a solar noon
      of twelve o'clock, one o'clock in summer time) and its declination from its longitude, so it rises about fifty
      minutes later each day, is up all night at full and only by day near new, and stands high on a winter's full
      moon and low on a summer's. */
-  var RAD = Math.PI / 180, MOON_LAT = 42;
+  var RAD = Math.PI / 180, MOON_LAT = 57;
   var PHASES = [[12, 'new'], [78, 'waxing-crescent'], [102, 'first-quarter'], [168, 'waxing-gibbous'], [192, 'full'],
                 [258, 'waning-gibbous'], [282, 'last-quarter'], [348, 'waning-crescent'], [360, 'new']];
   var PHASE_AT = { 'new': 0, 'waxing-crescent': 45, 'first-quarter': 90, 'waxing-gibbous': 135, 'full': 180,
@@ -238,6 +253,24 @@
     var alt = Math.asin(Math.sin(MOON_LAT * RAD) * Math.sin(dec) + Math.cos(MOON_LAT * RAD) * Math.cos(dec) * Math.cos(ha)) / RAD;
     return { phase: phase, age: Math.round(e / 360 * 29.53 * 10) / 10, lit: Math.round(lit * 100) / 100,
              waxing: e < 180, up: alt > 0, altitude: Math.round(Math.max(0, alt)), height: Math.round(Math.max(0, alt) / 90 * 100) / 100 };
+  }
+
+  /* The castle's sun (req 439; Fawkes's 3.00 pm on Events' Q1, option 1, provisional, Godric to confirm), at 57
+     degrees north like the moon, for the light through the windows: the time of day keeps the boy's own clock (the
+     world rules, Time: an after-school visit is afternoon at Hogwarts too), and the sky is the castle's, so a
+     December four o'clock is `time = day` with the sun down. Its height and its bearing (degrees from north, east 90)
+     by the same short series, the clock hour read as solar time, summer time an hour ahead. */
+  function sunAt(d) {
+    var t = (d.getTime() - 946728000000) / DAY_MS;
+    var g = (357.528 + 0.9856003 * t) * RAD;
+    var ls = 280.46 + 0.9856474 * t + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g);
+    var dec = Math.asin(Math.sin(23.44 * RAD) * Math.sin(ls * RAD));
+    var noon = 12 + (summerTime(d) ? 1 : 0);
+    var ha = 15 * (d.getHours() + d.getMinutes() / 60 - noon) * RAD;
+    var lat = MOON_LAT * RAD;
+    var alt = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(ha)) / RAD;
+    var az = (Math.atan2(Math.sin(ha), Math.cos(ha) * Math.sin(lat) - Math.tan(dec) * Math.cos(lat)) / RAD + 180) % 360;
+    return { up: alt > 0, altitude: Math.round(alt), bearing: Math.round(az), height: Math.round(Math.max(0, alt) / 90 * 100) / 100 };
   }
 
   /* The castle's weather (board req 113, the Corridor, Godric's wish of 10 October 2026, 6.52 pm): one weather a day for
@@ -330,8 +363,9 @@
     try { var s = localStorage.getItem(key); return s ? JSON.parse(s) : null; } catch (e) { return null; }
   }
   var packed = false;            /* his satchel packed for his brother's turn: nothing more is saved before the reload */
+  var dated = false;             /* a look on another day (?date=): it keeps nothing and posts nothing (req 414) */
   function save(key, v) {
-    if (packed) return;
+    if (packed || dated) return;
     try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) { /* private mode: the castle forgets, kindly */ }
   }
 
@@ -351,11 +385,28 @@
     var timeOverride = /^(morning|day|evening|night)$/.test(params.get('time') || '') ? params.get('time') : null;
     var moonOverride = PHASE_AT.hasOwnProperty(params.get('moon')) || params.get('moon') === 'down' ? params.get('moon') : null;   /* a test link: ?moon=full, ?moon=down */
     /* a test link for the weather: ?weather=clear, cloudy, rain, snow, fog, windy, frost or wet (puddles), ?wind=0.8,
-       ?season=spring, and ?date=2026-12-20 for the day's own weather (the date for the weather only, as the corridor's
-       pumpkins read it; the records' clock is unchanged) */
+       ?season=spring. ?date=2026-12-20 moves the whole clock to that day at the real time of day (docs/room-states.md
+       §7 1, req 414): `date`, `weekday`, `week`, `castle date`, `easter`, the weather, the moon and every stamp read
+       from it, as if he had come that day; a dated look keeps nothing and posts nothing, so his own castle is as it
+       was once the link is closed. */
     var weatherOverride = /^(clear|cloudy|rain|snow|fog|windy|frost|wet)$/.test(params.get('weather') || '') ? params.get('weather') : null;
     var seasonOverride = /^(spring|summer|autumn|winter)$/.test(params.get('season') || '') ? params.get('season') : null;
     var weatherDate = /^\d{4}-\d\d-\d\d$/.test(params.get('date') || '') ? params.get('date') : null;
+    var dateShift = 0;        /* how far ?date= moves the clock, in ms, the real time of day kept */
+    if (weatherDate) {
+      var dn = new Date(), dt = new Date(+weatherDate.slice(0, 4), +weatherDate.slice(5, 7) - 1, +weatherDate.slice(8, 10),
+                                         dn.getHours(), dn.getMinutes(), dn.getSeconds(), dn.getMilliseconds());
+      if (isNaN(dt.getTime()) || dt.getDate() !== +weatherDate.slice(8, 10)) weatherDate = null;   /* 2027-02-30 is no day */
+      else dateShift = dt.getTime() - dn.getTime();
+    }
+    dated = !!weatherDate;
+    /* a test link for the day's drivers (docs/room-states.md §1): ?meal=breakfast, lunch, dinner or none;
+       ?occasion=halloween, christmas-day and the rest (hyphens for spaces); ?lessons=on or off. With ?time= alone the
+       meal reads none and lessons off, so a link shows only what it names. */
+    var mealOverride = /^(breakfast|lunch|dinner|none)$/.test(params.get('meal') || '') ? params.get('meal') : null;
+    var occasionOverride = (function (o) { return OCCASIONS.indexOf(o) >= 0 ? o : null; })(String(params.get('occasion') || '').replace(/[-_+]/g, ' ').trim());
+    var lessonsOverride = /^(on|off)$/.test(params.get('lessons') || '') ? params.get('lessons') : null;
+    var sunOverride = /^(up|down)$/.test(params.get('sun') || '') ? params.get('sun') : null;   /* ?sun=up or down */
     if (params.has('fresh')) { try { localStorage.removeItem(STATE_KEY); } catch (e) {} }
     /* No castle on this iPad at all, neither a state nor a boy's satchel: the backup's restore may come down (v=30). */
     var bare = !params.has('fresh') && (function () {
@@ -412,7 +463,7 @@
     var blank = freshState();
     for (var bk in blank) if (state[bk] === undefined || state[bk] === null && blank[bk] !== null) state[bk] = blank[bk];
     var settings = load(SETTINGS_KEY) || { leans: [], speech: 'on' };
-    if (!state.firstDay) state.firstDay = isoDay(new Date());   /* his first visit, for his year (req 263); saved with the state */
+    if (!state.firstDay) state.firstDay = isoDay(nowDate());   /* his first visit, for his year (req 263); saved with the state */
     /* A parent's bedtime: a visit length in minutes, or off (settings.bedtime); ?bedtime=N sets it for a test. A bare
        &bedtime is the lights-out trip's own flag, not a length, so it leaves the parent's setting as it is (until
        9 October 2026 it read as 0 and turned the bedtime off on the page it opened); ?bedtime=off turns it off. */
@@ -467,7 +518,7 @@
        `time` and its stamps are those of the leaving, not of the next arrival. */
     /* the Howler line a grown-up wrote at the letter page (page/letter-home.html keeps the letter in its own key), or '' */
     function homeHowler() { var o = load('lumos.letterHome'); return (o && typeof o.howler === 'string' && o.howler.trim()) || ''; }
-    function nowDate() { return clock != null ? new Date(clock) : new Date(); }
+    function nowDate() { return new Date((clock != null ? clock : Date.now()) + dateShift); }
     function today() { return dayNumber(nowDate()); }
     /* the night as one count, a night belonging to the evening it began, so 10 pm and 2 am are one night */
     function tonight() { return dayNumber(new Date(nowDate().getTime() - 12 * 3600000)); }
@@ -489,6 +540,19 @@
       return m;
     }
 
+    /* The castle's sun now (req 439): { up, altitude, bearing, height }. With ?time= it is the sun of that time's own
+       hour on this day (morning nine, day one, evening six, night midnight), so a link's sky matches the time it
+       names; ?sun=up or down forces it, a little up in the south, or set. */
+    var TIME_HOUR = { morning: 9, day: 13, evening: 18, night: 0 };
+    function sunNow() {
+      var d = nowDate();
+      if (timeOverride) d = new Date(d.getFullYear(), d.getMonth(), d.getDate(), TIME_HOUR[timeOverride], 0);
+      var sn = sunAt(d);
+      if (sunOverride === 'up' && !sn.up) { sn.up = true; sn.altitude = 10; sn.bearing = 180; sn.height = 0.11; }
+      if (sunOverride === 'down') { sn.up = false; sn.altitude = Math.min(sn.altitude, -6); sn.height = 0; }
+      return sn;
+    }
+
     /* The day's weather where the castle stands (req 113): { sky, wind, windy, ground, wet, frozen, warmth, cold, season,
        date }, the same all day, `?weather=` and its kin honoured. */
     var FORCED = {
@@ -498,7 +562,7 @@
       frost: { sky: 'clear', wind: 0.1, ground: 'frost', warmth: 1 }, wet: { sky: 'cloudy', wind: 0.3, ground: 'wet' }
     };
     function weatherNow() {
-      var w = weatherAt(weatherDate ? new Date(weatherDate + 'T12:00:00') : nowDate()), f = FORCED[weatherOverride];
+      var w = weatherAt(nowDate()), f = FORCED[weatherOverride];
       if (f) {
         w.sky = f.sky; w.wind = f.wind; w.ground = f.ground;
         if (f.warmth != null) w.warmth = Math.min(w.warmth, f.warmth);
@@ -519,6 +583,7 @@
         case 'time': return timeOfDay();
         case 'moon': return moonNow().phase;          /* new, waxing-crescent, ... full, ... waning-crescent */
         case 'moon up': return moonNow().up ? 'yes' : 'no';
+        case 'sun': return sunNow().up ? 'up' : 'down';        /* the castle's sun at 57 degrees (req 439) */
         case 'weather': return weatherNow().sky;      /* clear, cloudy, rain, snow or fog */
         case 'windy': return weatherNow().windy ? 'yes' : 'no';
         case 'ground': return weatherNow().ground;    /* dry, wet, frost or snow */
@@ -527,11 +592,14 @@
         case 'place': return (leaving && state.visitPlace) || place;
         case 'at': return 'none';                 /* a page with stops answers this itself */
         case 'hour': return now.getHours();
-        case 'weekday': return WEEKDAYS[now.getDay()];
+        case 'weekday': return WEEKDAYS[castleDay().getDay()];
         case 'week': return weekNumber(now);
-        case 'day of week': return (now.getDay() + 6) % 7 + 1;      /* Monday 1 to Sunday 7, so `day of week >= 4` is Thursday on */
-        case 'date': return ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2);
-        case 'easter': return Math.abs(dayNumber(now) - dayNumber(easterSunday(now.getFullYear()))) <= 7 ? 'yes' : 'no';
+        case 'day of week': return (castleDay().getDay() + 6) % 7 + 1;      /* Monday 1 to Sunday 7, so `day of week >= 4` is Thursday on */
+        case 'date': return monthDay(castleDay());
+        case 'easter': return easterNear(castleDay()) ? 'yes' : 'no';
+        case 'meal': return mealNow();                 /* breakfast, lunch, dinner or none (§7 2) */
+        case 'occasion': return occasionNow();         /* start of term, halloween, christmas, christmas day, easter, leaving feast, none (§7 3) */
+        case 'lessons': return lessonsNow();           /* on in a school day's teaching hours, off otherwise (§7 4) */
         case 'slot': return state.slot ? 'taken' : 'free';
         /* off as a parent sets it, or where the browser cannot hear at all, so a spoken thing waits for a tap (the ear's promise) */
         case 'speech': return ear && ear.available && ear.available() ? settings.speech || 'on' : 'off';
@@ -588,9 +656,25 @@
       var m = /^(\d\d)-(\d\d)$/.exec(md || '');
       return m ? n * 1000 + ((+m[1] + 3) % 12) * 31 + +m[2] : null;
     }
-    function castleDateKey() {
-      var now = nowDate();
-      return schoolKey(castleYear(), ('0' + (now.getMonth() + 1)).slice(-2) + '-' + ('0' + now.getDate()).slice(-2));
+    function castleDateKey() { return schoolKey(castleYear(), monthDay(castleDay())); }
+    /* The castle's calendar day (docs/room-states.md §7 6; the change list's Rework 3; the world rules, Time): the real
+       day, except in the summer holidays, from the day after the leaving feast to 31 August, when the castle holds in
+       the feast week of the term just finished, repeating, each day on the same weekday (a summer Tuesday is the feast
+       week's Tuesday). `date`, `weekday`, `day of week`, `easter`, `castle date`, `occasion` and `lessons` read it; the
+       hour, the weather, the moon, the week and every stamp stay real. */
+    var heldBack = {};        /* days the summer holds each day back, by its day number, worked once a day */
+    function castleDay() {
+      var now = nowDate(), k = dayNumber(now), off = heldBack[k];
+      if (off === undefined) {
+        var feast = feastDay(now.getFullYear());
+        off = 0;
+        if (isoDay(now) > feast && now.getMonth() < 8) {
+          var f = new Date(+feast.slice(0, 4), +feast.slice(5, 7) - 1, +feast.slice(8, 10), 12);
+          off = 7 * Math.ceil((k - dayNumber(f)) / 7);
+        }
+        heldBack[k] = off;
+      }
+      return off ? new Date(now.getFullYear(), now.getMonth(), now.getDate() - off, now.getHours(), now.getMinutes(), now.getSeconds()) : now;
     }
     function clockMin(t) { var m = /^(\d\d):(\d\d)$/.exec(t || ''); return m ? +m[1] * 60 + +m[2] : null; }
     function inHours(from, to, mins) {
@@ -599,7 +683,42 @@
       return a <= b ? mins >= a && mins < b : mins >= a || mins < b;      /* a span may run past midnight */
     }
     function atMeals(mins) {
-      return ((dotDefs && dotDefs.meals) || []).some(function (m) { return inHours(m.from, m.to, mins); });
+      return MEALS.some(function (m) { return inHours(m.from, m.to, mins); });
+    }
+    function minsNow() { var now = nowDate(); return now.getHours() * 60 + now.getMinutes(); }
+    function monthDay(d) { return ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+    function easterNear(d) { return Math.abs(dayNumber(d) - dayNumber(easterSunday(d.getFullYear()))) <= 7; }
+    /* The meal now (§7 2): by the one table of hours, every day of the year. */
+    function mealNow() {
+      if (mealOverride) return mealOverride;
+      if (timeOverride) return 'none';
+      var mins = minsNow();
+      for (var i = 0; i < MEALS.length; i++) if (inHours(MEALS[i].from, MEALS[i].to, mins)) return MEALS[i].meal;
+      return 'none';
+    }
+    /* The occasion today (§7 3): the whole day, every year alike, never gated on `year`. */
+    function occasionNow() {
+      if (occasionOverride) return occasionOverride;
+      var now = castleDay(), md = monthDay(now);
+      if (md === '12-25') return 'christmas day';
+      if (md >= CHRISTMAS.from || md <= CHRISTMAS.to) return 'christmas';
+      if (md === '10-31') return 'halloween';
+      if (md === '09-01') return 'start of term';
+      if (isoDay(now) === feastDay(now.getFullYear())) return 'leaving feast';
+      if (easterNear(now)) return 'easter';
+      return 'none';
+    }
+    /* Lessons (§7 4): on in the teaching hours of a weekday in term; off at weekends, over Christmas and Easter, and
+       on the start-of-term and leaving-feast days. The summer holds in the feast week (§7 6), so its weekdays but the
+       feast's have lessons, the last week of term. */
+    function lessonsNow() {
+      if (lessonsOverride) return lessonsOverride;
+      if (timeOverride) return 'off';
+      var dow = castleDay().getDay(), occ = occasionNow();
+      if (dow === 0 || dow === 6) return 'off';
+      if (/^(christmas|christmas day|easter|start of term|leaving feast)$/.test(occ)) return 'off';
+      var mins = minsNow();
+      return LESSON_HOURS.some(function (h) { return inHours(h.from, h.to, mins); }) ? 'on' : 'off';
     }
     /* Each dot's place now: the first of its rounds whose hours and `when` hold, its places taken in turn every so
        many minutes (10 unless named) counted from the date and clock alone, so both castles' Maps agree. A figure
@@ -1062,7 +1181,7 @@
     function owlSync() {
       var near = owl.players ? landFromSatchels() : 0;
       var w = noteWhere();
-      if (!owl.store || !owl.key) {
+      if (dated || !owl.store || !owl.key) {
         if (near) { save(STATE_KEY, state); owlDeliver(); }
         return Promise.resolve(near > 0);
       }
@@ -2228,9 +2347,20 @@
          reads now, ready or not; only inside a deferred leave does it read the time he went, and nothing is drawn
          then. A page that wants to follow dusk while he plays asks again from its frame loop. */
       time: timeOfDay,
+      /* The castle's day as yyyy-mm-dd, `?date=` honoured (docs/room-states.md §7 1) and the summer held in the feast
+         week (§7 6), so a page that dates a thing reads the one clock the records read, never its own copy of the link. */
+      date: function () { return isoDay(castleDay()); },
       /* The real moon now (req 95): { phase, age (days since new), lit (0 to 1), waxing, up, altitude (degrees), height
          (0 to 1, of the way overhead), light (lit while up, else 0) }, `?moon=` honoured, so every room shows one moon. */
       moon: moonNow,
+      /* The castle's sun now (req 439): { up, altitude (degrees, below 0 when set), bearing (degrees from north, east
+         90), height (0 to 1) }, `?time=`, `?date=` and `?sun=` honoured, for the light through each face's windows. */
+      sun: sunNow,
+      /* The day's drivers for a page that draws before its chains ask (docs/room-states.md §7 2 to 4): the meal now,
+         the occasion today, lessons on or off, each with its `?meal=`, `?occasion=`, `?lessons=` honoured. */
+      meal: mealNow,
+      occasion: occasionNow,
+      lessons: lessonsNow,
       /* The day's weather (req 113): { sky (clear, cloudy, rain, snow, fog), wind (0 to 1), windy, ground (dry, wet,
          frost, snow), wet, frozen, warmth (C), cold, season (spring, summer, autumn, winter), date (mm-dd) }, one a day for
          the whole castle, `?weather=`, `?wind=`, `?season=` and `?date=` honoured, so every window shows one sky. */

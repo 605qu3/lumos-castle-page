@@ -126,9 +126,13 @@
           "medium": "said",
           "key": "neville.locked-out.again",
           "text": [
-            "Oh good, it's you."
+            "Oh good, it's you.",
+            "Me again. She changed it on Monday, didn't she? Nobody tells me anything.",
+            "I had it on a bit of parchment. Then I used the parchment for my Herbology notes.",
+            "Is it still last week's? I'd only just got that one right.",
+            "I've said please twice. She just looks at me."
           ],
-          "canon": "ours: a later visit, once he has let Neville in (the Corridor's req 430, 15 October 2026)"
+          "canon": "ours: a later visit, once he has let Neville in (the Corridor's req 430, 15 October 2026); awake every time, the password lines varied (desk corridor-neville-awake-1015, option 1, Fawkes 2.45 pm, provisional, Godric to confirm)"
         }
       ],
       "starts": [
