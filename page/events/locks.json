@@ -481,6 +481,38 @@
       "starts": [
         "set parchment_george = added"
       ]
+    },
+    {
+      "id": "locks.nook-hide",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "lifted the nook settle",
+      "when": [
+        "place = corridor",
+        "nook_hide != found"
+      ],
+      "starts": [
+        "set nook_hide = found",
+        "log \"Found the hide behind the nook's settle {day}\"",
+        "secret nook-hide"
+      ]
+    },
+    {
+      "id": "locks.landing-store",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "lifted the landing flag",
+      "when": [
+        "place = corridor",
+        "landing_store != found"
+      ],
+      "starts": [
+        "set landing_store = found",
+        "log \"Lifted the landing's flag {day}\"",
+        "secret landing-store"
+      ]
     }
   ]
 }
