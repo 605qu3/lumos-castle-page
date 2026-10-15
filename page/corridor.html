@@ -662,7 +662,8 @@ var settleMat = solid(0x7d6a55), settles = [];
 /* both settles are box settles, three seats a side, each seat its own lid, so nothing marks the one that opens. The
    middle lid of the study-side settle lifts, and behind it the wall's lower panel is open into the hide beside the
    flue (req 492; the Architect's secret-s4a and its way in at the model's site, the nook's west cheek; the box settle
-   taken at 6.34 pm, 15 October 2026, provisional, Godric to confirm): grey, a stand-in; HIDE below */
+   taken at 6.34 pm, 15 October 2026, confirmed by Godric's 1 on corridor-hide-settle-1015, 7.17 pm): grey, a
+   stand-in; HIDE below */
 var HIDE = { z0: 0.06, z1: 0.72, lidT: 0.04, open: 0, want: 0, lid: null, hole: null, inside: [] };
 [NOOK_X0, NOOK_X1].forEach(function (wx, i) {
   var dir = i === 0 ? -1 : 1, zc = NOOK_BACK - BREAST * 0 - SETTLE.len / 2, z0 = zc - SETTLE.len / 2;
@@ -1474,6 +1475,7 @@ function placeArmourShadow() { armourShadow.position.set(armour.position.x + 0.0
 placeArmourShadow();
 /* its three marks (The corridor, "The armour's three marks"): where the card's foot stands, by the name the events
    runtime's armour chain gives each */
+var ARMOUR_TURN = 30 * Math.PI / 180;   /* the most its card turns toward the eye, either way (the camera's update) */
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
 /* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
    her, 1.8 to 2.7 m up, a card turned to the eye as the armour is; hidden until the sticks chain hangs it */
@@ -3954,8 +3956,12 @@ function updateCamera(dt) {
   }
   camera.lookAt(lookTmp);
   /* a standing piece seen down the length would be drawn from the eye and stood as a card turned to it, as the
-     stairs are (placeCard); a card flat to the wall shows as a sliver from the corner */
-  armour.rotation.y = Math.atan2(camera.position.x - armour.position.x, camera.position.z - armour.position.z);
+     stairs are (placeCard); a card flat to the wall shows as a sliver from the corner. Turned to the eye only within
+     ARMOUR_TURN of its own front (0, across the corridor), so the suit stops following him past it: Godric's note
+     ("they will look like they are following the boys"), a stopgap till the side views are drawn (Fawkes, 7.32 pm,
+     15 October 2026, provisional, Godric to confirm; corridor-armour-sides-r2-1015) */
+  var turnToEye = Math.atan2(camera.position.x - armour.position.x, camera.position.z - armour.position.z);
+  armour.rotation.y = Math.max(-ARMOUR_TURN, Math.min(ARMOUR_TURN, turnToEye));
 }
 function setFov(f) {
   var want = camera.aspect < 1 ? f * 58 / 42 : f;
