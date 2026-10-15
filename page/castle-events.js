@@ -223,7 +223,7 @@
 
   /* The real moon (req 95, Magic's "The real moon, how real", Godric's pick of 10 October 2026, 5.16 pm), from the
      date and clock alone, in the castle's sky at 57 degrees north (req 439, the Architect's windows layer; Fawkes's
-     3.00 pm on Events' Q1, option 1, provisional, Godric to confirm; until then 42, the home's), no stored place. The moon's
+     3.00 pm on Events' Q1, option 1, confirmed by Godric, 15 October 2026, 3.28 pm; until then 42, the home's), no stored place. The moon's
      and sun's longitudes by the almanac's short series (within a few hours of the true new and full moons) give its
      phase and how much is lit; its height comes from its hour angle (the sun's, less the elongation, from a solar noon
      of twelve o'clock, one o'clock in summer time) and its declination from its longitude, so it rises about fifty
@@ -255,7 +255,7 @@
              waxing: e < 180, up: alt > 0, altitude: Math.round(Math.max(0, alt)), height: Math.round(Math.max(0, alt) / 90 * 100) / 100 };
   }
 
-  /* The castle's sun (req 439; Fawkes's 3.00 pm on Events' Q1, option 1, provisional, Godric to confirm), at 57
+  /* The castle's sun (req 439; Fawkes's 3.00 pm on Events' Q1, option 1, confirmed by Godric at 3.28 pm), at 57
      degrees north like the moon, for the light through the windows: the time of day keeps the boy's own clock (the
      world rules, Time: an after-school visit is afternoon at Hogwarts too), and the sky is the castle's, so a
      December four o'clock is `time = day` with the sun down. Its height and its bearing (degrees from north, east 90)
