@@ -715,7 +715,11 @@ var HER_PATCHES = { doze: [543, 396, 664, 526], listen: [540, 384, 666, 526], pl
   /* her cake (req 106, Magic's design, Godric's pick 6.26 pm): two edits of her front cut into five patches, laid over
      her arms so a gesture never hides them (each checked clear of every arm pose) */
   'cake-half': [860, 750, 953, 833], 'fan-open': [729, 823, 953, 917], 'collar-crumb': [586, 616, 619, 646],
-  'cake-crumbs': [860, 750, 953, 833], christmas: [637, 793, 953, 903] };
+  'cake-crumbs': [860, 750, 953, 833], christmas: [637, 793, 953, 903],
+  /* the mended seam (Rework 1; Godric's 1 on corridor-seam-spend-1015, 4.00 pm: "more subtle than a bright red line"):
+     one edit of her front, n 1, its fine stitched mend cut as a thin band down the drape and across her skirt's left,
+     clear of every face, arm and cake patch; shown by `seamShown` */
+  seam: [291, 159, 417, 1108] };
 var CAKE_PATCHES = ['cake-half', 'cake-crumbs', 'fan-open', 'christmas', 'collar-crumb'];
 var herPatch = {};
 Object.keys(HER_PATCHES).forEach(function (id, i) {
@@ -773,7 +777,20 @@ function setHerFrame(state) {   /* set aside (Rework 1): her front is her only s
 function setHerArm(state) {   /* 'lap', 'reach', 'ear', 'wave' or 'waggle', as the test page's setArm */
   ['reach', 'ear', 'wave', 'waggle'].forEach(function (id) { herPatch[id].userData.on = id === state ? 1 : 0; });
 }
+/* the mended seam, a trace (PoA 8, slashed; PoA 14, B3 L18706, "expertly restored" when she is back, "next day" after
+   the second break-in, the Sunday after the first Saturday of February as Events reckons it): in the Azkaban castle
+   from 8 February, the latest that Sunday falls, and in every later castle; ?seam for a look. A tap on it at her stop
+   gets one line from a small pool, ours, not canon: she will not discuss it, and it explains nothing */
+var SEAM_LINES = ["A little restoration, dear. We don't talk about it.", 'Never you mind that.'];
+var seamLook = /[?&]seam\b/.test(location.search), seamNext = 0;
+function seamShown() { return seamLook || traceFrom(3, 2, 8); }
+function seamAt(uv) {
+  if (!uv) return false;
+  var b = HER_PATCHES.seam, x = uv.x * HER_PX.w, y = (1 - uv.y) * HER_PX.h;
+  return x > b[0] - 12 && x < b[2] + 12 && y > b[1] && y < b[3];
+}
 function updateHerPatches(dt) {
+  if (t >= seamNext) { seamNext = t + 1; herPatch.seam.userData.on = seamShown() ? 1 : 0; }
   for (var id in herPatch) {
     var m = herPatch[id], o = m.material.opacity, to = m.userData.on;
     o = to > o ? Math.min(to, o + dt * m.userData.rate) : Math.max(to, o - dt * m.userData.rate);
@@ -3528,6 +3545,12 @@ function tap(cx, cy) {
   /* her (req 79): from afar a tap on her is her walk-up; at her stop it wakes her for the password, raised here inside
      the tap's own handler, since the runtime opens the ear in it and iOS lets a page listen only from a touch */
   if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { tell('her'); said(true); goTo(hit.stop); return; }
+  /* the mended seam, at her stop: she will not discuss it */
+  if (hits[0].object === her && atStop && atStop.name === 'her' && herPatch.seam.visible && seamAt(hits[0].uv)) {
+    tell('her seam');
+    showLines([{ medium: 'said', speaker: 'fat-lady', text: SEAM_LINES[Math.floor(Math.random() * SEAM_LINES.length)] }]);
+    said(true); return;
+  }
   /* her hump (req 215): at her stop, once he holds the twins' note, a tap on it offers Dissendium */
   if (hits[0].object === witchCard && atStop && atStop.name === 'witch' && humpAt(hits[0].uv)
       && window.LumosSpells && LumosSpells.openHump && noteHeld()) { tell('witch'); humpOffered(); said(true); return; }
