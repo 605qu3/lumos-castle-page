@@ -1761,7 +1761,7 @@ function snowballFly() {
 /* the bewitched snowball's trace (Rework 8, 15 October 2026; PS 12 L4014, the twins' bewitched snowballs, from
    mid-December): in the Stone's year from 15 December, and in every later year, on days while snow lies, a
    lump of snow stuck high on the outside of the glass, far higher than any throw from the lawn rises (the snowball
-   peaks at half the glass at most); it was bounced off something up there. Drawn in code, about 13 cm across, with a
+   peaks at half the glass at most); it was bounced off something up there. Drawn in code, about 17 cm across, with a
    short slide mark under it. ?snowLump shows it whatever the year or the weather */
 var snowLump = { mesh: null, look: groundsQ.has('snowLump'), next: 0 };
 function updateSnowLump() {
@@ -1773,7 +1773,7 @@ function updateSnowLump() {
     g.fillStyle = 'rgba(226,232,240,0.6)';                                               /* where it slid a little, tapering */
     g.beginPath(); g.moveTo(17, 26); g.lineTo(31, 26); g.lineTo(26, 58); g.lineTo(22, 58); g.closePath(); g.fill();
     var grd = g.createRadialGradient(19, 15, 2, 24, 22, 17);
-    grd.addColorStop(0, '#fdfeff'); grd.addColorStop(0.55, '#e8ecf2'); grd.addColorStop(1, '#a9b3c2');
+    grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.6, '#f6f8fb'); grd.addColorStop(1, '#c4ccd8');   /* whiter, so it stands off the snowy branches (2.34 pm) */
     g.fillStyle = grd; g.beginPath();                                                    /* the packed lump, flattened where it hit */
     for (var i = 0; i <= 28; i++) {
       var a = i / 28 * Math.PI * 2, k = 15 * (0.78 + 0.13 * Math.sin(i * 1.7) + 0.09 * Math.sin(i * 4.1));
@@ -1785,7 +1785,7 @@ function updateSnowLump() {
       g.beginPath(); g.arc(s[0], s[1], s[2], 0, Math.PI * 2); g.fill();
     });
     var sky = groundsWin.sky, h = GROUNDS.h;   /* the sky takes the drawing's height once it loads */
-    snowLump.mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.17), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
+    snowLump.mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.17, 0.22), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));   /* about 17 cm, a size up from 13 (2.34 pm) */
     snowLump.mesh.position.set(-GROUNDS.w * 0.19, h * 0.04, 0.0045);   /* over the dark of the trees, where it reads as snow on the glass, not a cloud (until 2.45 pm at 0.15, against the
        sky; provisional, Godric to confirm); still above the throw's peak at mid-glass */
     snowLump.mesh.renderOrder = 6; snowLump.mesh.name = 'grounds-snow-lump';
