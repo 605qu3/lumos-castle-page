@@ -191,7 +191,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=12"></script>
 <script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=27"></script>
+<script src="castle-events.js?v=32"></script>
 <script src="castle-map.js?v=2"></script>
 <script src="charms/guide.js?v=5"></script>
 <script src="charms/spells.js?v=27"></script>
@@ -202,15 +202,22 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 /* What the Ministry's sweep sets aside (docs/ministry/changes/corridor.md, Set aside; docs/ministry/set-aside.md) is
    off by default, its code kept until Godric's yes to remove it; ?setaside shows each as it was (15 October 2026) */
 var SET_ASIDE = /[?&]setaside(=|&|$)/.test(location.search);
-/* The last book he has finished, 0 to 7: his castle's year (the world rules, Time). Until Events' clock gives it as a
-   driver (docs/room-states.md, asked by row) the page reads ?finished=N, and 0 meanwhile: the Stone's year, no traces */
-var FINISHED = Math.max(0, Math.min(7, +(location.search.match(/[?&]finished=(\d)/) || [])[1] || 0));
+/* The last book he has finished, 0 to 7: his castle's year (the world rules, Time), read from Events' one clock
+   (`castle.year()`, req 431, 822f1eab), which honours ?finished= and ?year= as the look switch; before the runtime has
+   started, or without it, the page reads ?finished=N itself, and 0: the Stone's year, no traces */
+function FINISHED() {
+  if (typeof castle !== 'undefined' && castle && castle.year) return castle.year();
+  return Math.max(0, Math.min(7, +(location.search.match(/[?&]finished=(\d)/) || [])[1] || 0));
+}
 /* A trace keeps its date (the world rules, Time): in the visited year, the year of its own book, it shows from the day
-   its event happened and stays; in every later year it is always there. The school year counts from 1 September; ?date=
-   as the grounds' look switch */
+   its event happened and stays; in every later year it is always there. The day is the runtime's castle day
+   (`castle.date()`, which holds the summer in the feast week and takes ?date=), else today or ?date=; the school year
+   counts from 1 September, as Events' `castle date >= N mm-dd` reckons it */
 function traceFrom(book, month, day) {
-  if (FINISHED !== book) return FINISHED > book;
-  var q = (location.search.match(/[?&]date=(\d{4}-\d\d-\d\d)/) || [])[1], d = q ? new Date(q + 'T12:00:00') : new Date();
+  var y = FINISHED();
+  if (y !== book) return y > book;
+  var iso = typeof castle !== 'undefined' && castle && castle.date ? castle.date() : (location.search.match(/[?&]date=(\d{4}-\d\d-\d\d)/) || [])[1];
+  var d = iso ? new Date(iso + 'T12:00:00') : new Date();
   function k(m, dd) { return (m >= 9 ? m - 9 : m + 3) * 32 + dd; }
   return k(d.getMonth() + 1, d.getDate()) >= k(month, day);
 }
@@ -860,8 +867,16 @@ var candleStub = onWallZ(cutoutTexture(24, 64, '#151318', function (g, w, h) {
 /* flat on the wall as the torch's own drawing is, its foot stood on the bracket's arm (0.33 m under the head, between
    the wall plate and the ring) and its drips down over the iron; until 15 October 2026 it hung in the air beside the
    torch, turned down the corridor; since 2.40 pm at the torch nearest her frame and Nick's spot, as the Ministry's Rework 7
-   words it, not the strip's, which the armour hides from the length view (provisional, Godric to confirm) */
-candleStub.visible = traceFrom(2, 10, 31) ||/[?&]candleStub\b/.test(location.search);   /* ?candleStub for a look */
+   words it, not the strip's, which the armour hides from the length view (settled: Godric's 1 on
+   corridor-provisional-four-1015, 15 October 2026, 3.27 pm). Asked of the runtime's clock once a second, since the
+   runtime starts after this line */
+var candleStubLook = /[?&]candleStub\b/.test(location.search), candleStubNext = 0;   /* ?candleStub for a look */
+function updateCandleStub() {
+  if (t < candleStubNext) return;
+  candleStubNext = t + 1;
+  candleStub.visible = candleStubLook || traceFrom(2, 10, 31);
+}
+candleStub.visible = false;
 candleStub.userData.thing = 'candle stub';   /* tappable from where the tappables are gathered */
 doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = false; torches.push(tc); });
 /* the turn's torch, on the end wall to the left of the arch as he faces it, its flame leaning toward the arch as if a
@@ -890,7 +905,7 @@ torches.push(turnTorch);
    sees it edge on; she stands free of every wall, so no surface gives the turn away. Along it,
    u metres from the end wall's place; the plan is castle-plan-1545-suite.jpg's third-floor panel */
 var WITCH = { len: 8.0, ceil: 4.5, wallTo: 6.8, turn: 1.0, doorway: [5.5, 6.5], at: 4.0, classroom: 2.5, out: 0.5,
-  plinth: { w: 0.8, h: 0.4 }, card: { w: 1.0, h: 1.9 } };
+  plinth: { w: 1.0, h: 0.4 }, card: { w: 1.0, h: 1.9 }, near: 0.3 };   /* plinth 1.0 m since her drawn slab is 0.86 m (0.8 till 15 October 2026); near: her card's foot toward him from the plinth's middle (the placement check, 15 October 2026) */
 WITCH.z = HER_Z - WITCH.out - WITCH.plinth.w / 2;
 function witchX(u) { return FAR_END_X - u; }
 function drawWitch(g, w, h) {
@@ -940,6 +955,13 @@ witchLanding.name = 'witch-landing'; witchLanding.visible = false; scene.add(wit
   witchCard = cutoutMesh(cutoutTexture(100, 190, '#9a9690', drawWitch, 'witch'), W.card.w, W.card.h);
   witchCard.position.set(x, FOOT_Y + W.plinth.h + W.card.h / 2, W.z); witchCard.rotation.y = Math.PI; witchCard.name = 'witch';
   G.add(witchCard); register(witchCard, 1);
+  /* her drawing (req 178; Godric's Try 3 on corridor-witch-pick-1015, 15 October 2026, 3.44 pm; round 1, n 3 on his
+     3.27 pm yes): weathered limestone, side on facing the stair, her own stone slab under her feet stood on the page's
+     plinth, the eye we see her one eye (PoA 10, "humpbacked, one-eyed"); 1.0 m across the drawing, as the piece has it */
+  hangDrawing(witchCard, '../assets/layers/corridor-witch.png', W.card.w, function (im) {
+    W.card.h = W.card.w * im.height / im.width;
+    witchCard.position.y = FOOT_Y + W.plinth.h + W.card.h / 2;
+  });
   softShadow(W.card.w * 0.75, W.plinth.w * 0.55, x, FOOT_Y + W.plinth.h, W.z, G);
   /* two torches, hers past her toward the corner and one across nearer the stair; in the group, so out of `torches`
      and the leaning-torch cues stay the corridor's */
@@ -1106,7 +1128,8 @@ function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
    REWORKED (Rework 5, GL-20, 15 October 2026: nothing announces itself): no light without its source. The empty glow
    on the wall is set aside (?setaside shows it); on his first walk to her by night Nick comes out of the wall in his
    own pearly light (GL-35, fine), and on the nights after, Nick himself waits by her frame, in his own light, and
-   fades into the wall as the hole opens or he walks away */
+   fades into the wall as the hole opens or he walks away; his waiting place clear of her frame in the end wall's strip
+   by the corner (waitX, waitZ) settled by Godric's 1 on corridor-provisional-four-1015, 15 October 2026, 3.27 pm */
 var HOME = { glowZ: MID_Z + PORTRAIT_W / 2 + 0.42, glowY: 1.35, glowW: 0.95, glowH: 1.7, up: 1.6, down: 1.5,
   spotX: END_X - 0.4, spotZ: MID_Z + 0.9, waitX: END_X - 0.35, waitZ: HER_Z - 0.2, look: 0.5, wide: 1.18, bow: { deep: 1.0, tip: 1.5 }, meet: 2.0, speed: 0.9, glide: 5.5 };
 var home = { kind: null, k: 0, t: 0, nick: null, ending: false, q: new URLSearchParams(location.search).get('nickHome') };
@@ -1773,7 +1796,7 @@ function snowballFly() {
 /* the bewitched snowball's trace (Rework 8, 15 October 2026; PS 12 L4014, the twins' bewitched snowballs, from
    mid-December): in the Stone's year from 15 December, and in every later year, on days while snow lies, a
    lump of snow stuck high on the outside of the glass, far higher than any throw from the lawn rises (the snowball
-   peaks at half the glass at most); it was bounced off something up there. Drawn in code, about 17 cm across, with a
+   peaks at half the glass at most); it was bounced off something up there. Drawn in code, about 21 cm across, with a
    short slide mark under it. ?snowLump shows it whatever the year or the weather */
 var snowLump = { mesh: null, look: groundsQ.has('snowLump'), next: 0 };
 function updateSnowLump() {
@@ -1785,21 +1808,22 @@ function updateSnowLump() {
     g.fillStyle = 'rgba(226,232,240,0.6)';                                               /* where it slid a little, tapering */
     g.beginPath(); g.moveTo(17, 26); g.lineTo(31, 26); g.lineTo(26, 58); g.lineTo(22, 58); g.closePath(); g.fill();
     var grd = g.createRadialGradient(19, 15, 2, 24, 22, 17);
-    grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.6, '#f6f8fb'); grd.addColorStop(1, '#c4ccd8');   /* whiter, so it stands off the snowy branches (2.34 pm) */
+    grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.75, '#fbfcfe'); grd.addColorStop(1, '#dde3ec');   /* whiter again, so it stands off the snowy branches (Godric, 3.27 pm) */
     g.fillStyle = grd; g.beginPath();                                                    /* the packed lump, flattened where it hit */
     for (var i = 0; i <= 28; i++) {
       var a = i / 28 * Math.PI * 2, k = 15 * (0.78 + 0.13 * Math.sin(i * 1.7) + 0.09 * Math.sin(i * 4.1));
       if (i) g.lineTo(24 + k * Math.cos(a) * 1.1, 21 + k * 0.85 * Math.sin(a)); else g.moveTo(24 + k * 1.1, 21);
     }
-    g.fill(); g.strokeStyle = 'rgba(94,104,122,0.7)'; g.lineWidth = 1; g.stroke();
+    g.fill(); g.strokeStyle = 'rgba(70,80,98,0.85)'; g.lineWidth = 1.3; g.stroke();   /* a firmer edge against the white trees */
     g.fillStyle = '#eef1f6';                                                             /* the burst of crumbs round it */
     [[5, 12, 2.2], [43, 16, 1.8], [8, 30, 1.5], [41, 31, 2], [24, 3, 1.6], [36, 5, 1.2]].forEach(function (s) {
       g.beginPath(); g.arc(s[0], s[1], s[2], 0, Math.PI * 2); g.fill();
     });
     var sky = groundsWin.sky, h = GROUNDS.h;   /* the sky takes the drawing's height once it loads */
-    snowLump.mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.17, 0.22), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));   /* about 17 cm, a size up from 13 (2.34 pm) */
+    snowLump.mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.21, 0.28), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));   /* about 21 cm: 13, then 17 (2.34 pm), then a touch bigger (Godric's 1 on corridor-provisional-four-1015, 3.27 pm) */
     snowLump.mesh.position.set(-GROUNDS.w * 0.19, h * 0.04, 0.0045);   /* over the dark of the trees, where it reads as snow on the glass, not a cloud (until 2.45 pm at 0.15, against the
-       sky; provisional, Godric to confirm); still above the throw's peak at mid-glass */
+       sky; settled by Godric's 1 on corridor-provisional-four-1015, 15 October 2026, 3.27 pm); still above the throw's
+       peak at mid-glass */
     snowLump.mesh.renderOrder = 6; snowLump.mesh.name = 'grounds-snow-lump';
     sky.add(snowLump.mesh);
   }
@@ -1945,13 +1969,14 @@ function meshTapestry() {
 }
 meshTapestry();
 /* the woven sheep's cells (req 108 and 129; Godric, 13 October 2026, 1.51 pm: Tries 1, 3 and 4 hang now, Try 2 waits
-   for its one-sheep edit, so until it hangs `third` shows the second places): each cell is a whole edit of the hung
+   for its one-sheep edit; the edit hung on Godric's 1, corridor-sheep-hang-1015, 15 October 2026, 3.44 pm: round 7's
+   new sheep laid onto Try 2's drawing, round 4, since the edit came back scaled up): each cell is a whole edit of the hung
    drawing (rounds 3, 5 and 6, scaled as it was), with the shepherd's cap patch cut again against it. Which one hangs is
    chosen when the runtime first draws the room (or after 1.5 s without it), and afterwards a cell swaps whole only while
    the tapestry is out of his view, so a sheep never moves under his eye. The lit window (round 6) is the sheep as drawn,
    by night; on a night the sheep stand elsewhere or one has strayed, that cell holds and the window is dark. The look
    switch ?sheep= (first, second, third, missing, lit) holds whatever it names */
-var TAPESTRY_CELLS = { first: '', second: '-second', third: '-second', missing: '-missing', lit: '-lit' };
+var TAPESTRY_CELLS = { first: '', second: '-second', third: '-third', missing: '-missing', lit: '-lit' };
 var tapestryCell = { shown: null, drawn: false, loading: null, held: {} };
 function tapestryCellWanted() {
   var q = groundsQ.get('sheep');
@@ -2114,6 +2139,124 @@ var cupboardDark = new THREE.Mesh(new THREE.PlaneGeometry(CUPBOARD.w, CUPBOARD.h
 cupboardDark.position.set(CUPBOARD.x, CUPBOARD.h / 2, HER_FACE - 0.001); cupboardDark.rotation.y = Math.PI;
 cupboardDark.name = 'cupboard-dark'; cupboardDark.visible = false; scene.add(cupboardDark);
 var cupboard = { ang: 0, target: 0, rattle: 0, shut: 0 };
+/* What it holds (Magic's B18, req 281; Godric's picks: the broom round 1 Try 1, held answer relayed 15 October 2026,
+   1.47 pm; the tag round 1 Try 3, drawn blank, lettered here): one ancient school broom, a Shooting Star, "very slow and
+   jerky" (PoA 10, B3 L17116), that "always flew slightly to the left" (PS 9, B1 L2951), leaning hard left in the dark
+   as he faces it, its twigs on the floor by the right jamb, flat on the opening as the dark is. On its handle an old
+   luggage tag in the crossed-out Weasleys' joke (Godric's 1 on corridor-tag-words-1015, 3.27 pm: "Fred and George: do
+   NOT use", her capitals kept, the sentence finished), Ron's "it pulls left" under it. Dim, in the cupboard's own dark.
+   At its stop, with the door open: a tap on the broom stands it up straight, and after a moment it gives a slow, jerky
+   lurch and leans left again (Magic's B18 with Fawkes's t1, Godric's yes 13 October 2026, 5.20 pm); a tap on the tag
+   reads it, the next turns it over (the touch review's KEEP, corridor-broom-tag-pick-1013 t1: in a twins' scrawl, "it
+   doesn't pull left, you do."), and the next turns it back. Either keeps the door open while he looks */
+var BROOM = { w: 0.3, h: 1.57, footX: -0.2, lean: 0.3, shaftU: 0.415, tieV: 0.18, dim: 0x9a948c,
+  tag: { w: 0.12, h: 0.072, holeU: 0.09, holeV: 0.5 } };
+var broomGroup = new THREE.Group(), broomPivot = new THREE.Group();
+broomGroup.position.set(CUPBOARD.x + BROOM.footX, 0, HER_FACE - 0.0015);   /* the page's -x is his right as he faces her wall */
+broomGroup.rotation.y = Math.PI; broomGroup.visible = false; broomGroup.name = 'cupboard-broom';
+broomGroup.add(broomPivot); scene.add(broomGroup);
+function broomMaterial() {
+  return new THREE.MeshBasicMaterial({ color: col(BROOM.dim), transparent: true, alphaTest: 0.4, depthWrite: false,
+    polygonOffset: true, polygonOffsetFactor: -0.5, polygonOffsetUnits: -2 });
+}
+var broomCard = new THREE.Mesh(new THREE.PlaneGeometry(BROOM.w, BROOM.h), broomMaterial());
+broomCard.position.set(0, BROOM.h / 2, 0); broomCard.name = 'broom';
+broomPivot.add(broomCard);
+hangDrawing(broomCard, '../assets/layers/corridor-broom.png', BROOM.w, function (im) {
+  BROOM.h = BROOM.w * im.height / im.width;
+  broomCard.position.y = BROOM.h / 2;
+  broomCard.material.color.set(col(BROOM.dim));   /* in the cupboard's dark, not the corridor's light */
+  broomTag.position.set((BROOM.shaftU - 0.5) * BROOM.w, BROOM.h * (1 - BROOM.tieV), 0.0004);
+});
+/* the tag: tied at its hole on the shaft, hanging plumb whatever the broom does, front and back back to back */
+var broomTag = new THREE.Group(), broomTagSwing = new THREE.Group();
+broomPivot.add(broomTag); broomTag.add(broomTagSwing);
+var tagSide = { front: null, back: null, read: false, flip: 0, target: 0, swing: 0 };
+function tagFace(back) {
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(BROOM.tag.w, BROOM.tag.h), broomMaterial());
+  m.material.side = THREE.FrontSide;
+  /* hung by its hole: the hole at the group's origin, its long side down */
+  var holder = new THREE.Group(); holder.rotation.z = Math.PI / 2 * (back ? 1 : -1);
+  m.position.set((0.5 - BROOM.tag.holeU) * BROOM.tag.w * (back ? -1 : 1), 0, 0);
+  if (back) holder.rotation.y = Math.PI;
+  holder.add(m); broomTagSwing.add(holder);
+  m.name = back ? 'broom-tag-back' : 'broom-tag';
+  return m;
+}
+tagSide.front = tagFace(false); tagSide.back = tagFace(true);
+var TAG_WORDS = {
+  front: [{ t: 'Bill Weasley', s: 1 }, { t: 'Charlie Weasley', s: 1 }, { t: 'Fred and George: do NOT use', s: 1 }, { t: 'Ron' }, { t: 'it pulls left', ron: 1 }],
+  back: "it doesn't pull left, you do."
+};
+function letterTag(im) {
+  function face(back) {
+    var c = makeCanvas(im.width, im.height), g = c.getContext('2d'), W = im.width, H = im.height;
+    if (back) { g.translate(W, 0); g.scale(-1, 1); }
+    g.drawImage(im, 0, 0);
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    var x0 = back ? W * 0.08 : W * 0.24, x1 = back ? W * 0.76 : W * 0.93;
+    if (back) {   /* the twins' scrawl, big and slanting */
+      g.save(); g.translate(W * 0.42, H * 0.52); g.rotate(-0.12);
+      g.fillStyle = '#2a2a52'; g.font = 'bold ' + Math.round(H * 0.15) + 'px "Short Stack", cursive'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText("it doesn't pull left,", 0, -H * 0.1); g.fillText('you do.', W * 0.08, H * 0.12);
+      g.restore();
+      return c;
+    }
+    var rows = TAG_WORDS.front, y = H * 0.2, step = H * 0.135;
+    rows.forEach(function (r) {
+      g.save();
+      if (r.ron) { g.font = Math.round(H * 0.12) + 'px "Short Stack", cursive'; g.fillStyle = '#3b2a1e'; g.translate(x0 + W * 0.06, y + step * 0.25); g.rotate(-0.06); g.fillText(r.t, 0, 0); g.restore(); return; }
+      g.font = 'italic ' + Math.round(H * 0.105) + 'px "EB Garamond", Georgia, serif'; g.fillStyle = '#2b2620'; g.textBaseline = 'middle';
+      var wd = Math.min(g.measureText(r.t).width, x1 - x0);
+      g.fillText(r.t, x0, y, x1 - x0);
+      if (r.s) { g.strokeStyle = '#2b2620'; g.lineWidth = H * 0.012; g.beginPath(); g.moveTo(x0 - 4, y + 1); g.lineTo(x0 + wd + 4, y - 2); g.stroke(); }
+      g.restore();
+      y += step;
+    });
+    return c;
+  }
+  [['front', false], ['back', true]].forEach(function (f) {
+    var m = tagSide[f[0]], t = tex(face(f[1]));
+    m.material.map = t; m.material.color.set(col(BROOM.dim)); m.material.needsUpdate = true;
+  });
+}
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var fonts = document.fonts && document.fonts.load ? Promise.all(['italic 20px "EB Garamond"', '20px "Short Stack"', 'bold 20px "Short Stack"'].map(function (f) { return document.fonts.load(f); })) : Promise.resolve();
+    fonts.catch(function () {}).then(function () { letterTag(im); });
+  };
+  im.src = '../assets/layers/corridor-broom-tag.png';
+})();
+var broom = { ang: BROOM.lean, phase: 'lean', t: 0 };
+function broomStandUp() { if (broom.phase === 'lean') { broom.phase = 'up'; broom.t = 0; } }
+function broomTagTapped() {
+  if (!tagSide.read) { tagSide.read = true; showLines([{ medium: 'written', speaker: 'cupboard', text: TAG_WORDS.front.map(function (r) { return r.t; }).join('\n'), struck: [0, 1, 2] }]); }
+  else {
+    tagSide.target = tagSide.target ? 0 : Math.PI;
+    showLines([tagSide.target ? { medium: 'written', speaker: 'cupboard', text: TAG_WORDS.back }
+                               : { medium: 'written', speaker: 'cupboard', text: TAG_WORDS.front.map(function (r) { return r.t; }).join('\n'), struck: [0, 1, 2] }]);
+  }
+  tagSide.swing = 1;
+}
+function updateBroom(dt) {
+  broomGroup.visible = cupboardDark.visible;
+  if (broom.phase !== 'lean') {
+    broom.t += dt;
+    if (broom.phase === 'up') { broom.ang = BROOM.lean * (1 - ease(broom.t / 0.4)); if (broom.t >= 0.4) { broom.phase = 'hold'; broom.t = 0; } }
+    else if (broom.phase === 'hold') { broom.ang = 0; if (broom.t >= 0.9) { broom.phase = 'lurch'; broom.t = 0; } }
+    else {   /* slow and jerky: four lurches, each quick then a pause */
+      var k = Math.min(1, broom.t / 2.4), i = Math.min(3, Math.floor(k * 4)), f = k * 4 - i;
+      broom.ang = BROOM.lean * (i + ease(f * 3)) / 4;
+      if (k >= 1) { broom.ang = BROOM.lean; broom.phase = 'lean'; }
+    }
+  }
+  broomPivot.rotation.z = broom.ang;
+  tagSide.flip += (tagSide.target - tagSide.flip) * Math.min(1, dt * 5);
+  tagSide.swing = Math.max(0, tagSide.swing - dt * 0.6);
+  broomTag.rotation.z = -broom.ang + 0.25 * tagSide.swing * Math.sin(tagSide.swing * 14);   /* plumb, swinging a little when touched */
+  broomTagSwing.rotation.y = tagSide.flip;
+}
 /* locked: the handle rattles, the leaf shivers in its frame, and it stays shut */
 function cupboardRattle(why) {   /* why: openLock's kind words on a turn that missed, [what he sees, what to try] */
   cupboard.rattle = 0.6;
@@ -2155,6 +2298,7 @@ function updateCupboard(dt) {
   if (cupboard.rattle > 0) { cupboard.rattle = Math.max(0, cupboard.rattle - dt); shiver = 0.012 * Math.sin(cupboard.rattle * 60) * (cupboard.rattle / 0.6); }
   cupboardHinge.rotation.y = cupboard.ang + shiver;   /* opens out into the corridor, about its nook-side edge */
   cupboardDark.visible = cupboard.ang > 0.02;
+  updateBroom(dt);
   updateButterfly(dt);
 }
 /* The butterfly (Godric's t1 on corridor-broom-spend-1013, 9.54 pm: "often outstripped by passing butterflies", CoS 4):
@@ -2969,7 +3113,7 @@ var STOPS = [
   /* the polite door, on the long wall since the switch: from the far side, as for any thing on her wall */
   { name: 'door', meshes: [door], stop: function () { return stopFor({ position: new THREE.Vector3(DOOR.x, 0, HER_Z) }, DOOR.h, 1.2); } },
   /* the broom cupboard (ledger line 2): square to it from across the corridor, as the polite door */
-  { name: 'cupboard', meshes: [cupboardDoor], stop: function () { return stopFor({ position: new THREE.Vector3(CUPBOARD.x, 0, HER_Z) }, CUPBOARD.h, norrisSits() ? 1.05 : 1.15); } },   /* lower while Mrs Norris sits before it, so she shows */
+  { name: 'cupboard', meshes: [cupboardDoor, broomCard, tagSide.front, tagSide.back], stop: function () { return stopFor({ position: new THREE.Vector3(CUPBOARD.x, 0, HER_Z) }, CUPBOARD.h, norrisSits() ? 1.05 : 1.15); } },   /* lower while Mrs Norris sits before it, so she shows */
   /* the inglenook: from a hand off the far wall, square to the hearth, the settles either side */
   { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } },
   /* the landing at the flight's foot (req 59): reached by a tap on the flight, standing at its edge square to the end
@@ -3077,12 +3221,12 @@ function witchHump() {
    dark passage going down. The offer stays up until Back: nothing times out. The twins' note addressed to him and
    HUMP_WAIT_S are set aside, shown only with ?setaside */
 var NOTE_CUE = "the twins' note folded small in his pocket", HUMP_WAIT_S = 12, FRED_NOTE_CUE = null;
-var HUMP = { u: 0.6, v: 0.34, r: 0.3, hinge: { u: 0.82, v: 0.38 }, edge: { u: 0.4, v: 0.3 } };
+var HUMP = { u: 0.66, v: 0.12, r: 0.24, hinge: { u: 0.86, v: 0.2 }, edge: { u: 0.47, v: 0.06 } };   /* on Try 3's drawing (15 October 2026): the dome over her hood, measured from its outline; was 0.6, 0.34 on the grey card */
 var humpOffer = null, humpV = new THREE.Vector3();
 function noteHeld() {
   if (!castle) return false;
   if (SET_ASIDE) return castle.cues().indexOf(NOTE_CUE) >= 0;
-  return FINISHED >= 3 && !!FRED_NOTE_CUE && castle.cues().indexOf(FRED_NOTE_CUE) >= 0;
+  return FINISHED() >= 3 && !!FRED_NOTE_CUE && castle.cues().indexOf(FRED_NOTE_CUE) >= 0;
 }
 function humpAt(uv) { return uv && Math.hypot((uv.x - HUMP.u) * WITCH.card.w, (1 - uv.y - HUMP.v) * WITCH.card.h) < HUMP.r; }
 function onWitch(u, v) {
@@ -3325,6 +3469,14 @@ function tap(cx, cy) {
   }
   /* the broom cupboard (ledger line 2): at its stop a tap tries the handle, locked; from afar the walk up */
   if (hit.stop && hit.stop.name === 'cupboard' && atStop === hit.stop) {
+    /* inside, the door open: the broom stands up and lurches left again; the tag is read, then turned over */
+    if (broomGroup.visible && (hits[0].object === broomCard || hits[0].object === tagSide.front || hits[0].object === tagSide.back)) {
+      var onTag = hits[0].object !== broomCard;
+      tell(onTag ? 'broom tag' : 'broom');
+      if (onTag) broomTagTapped(); else broomStandUp();
+      cupboardSwing(true);   /* already open: only keeps it so a while longer */
+      said(true); return;
+    }
     tell('broom cupboard');
     if (cupboard.ang < 0.1 && cupboardLockAt(hits[0].uv) && window.LumosSpells && LumosSpells.learned('alohomora')) cupboardLockOffered();
     else if (cupboard.ang < 0.1) cupboardRattle();
@@ -3679,7 +3831,9 @@ function croak(text) { return function () { console.info('[corridor] ' + text + 
    REWORKED by the Ministry's sweep (Rework 2, 15 October 2026): he is awake, never curled asleep under her frame, and
    sits in the window corner (Try 1); PS 9's wake line and the jolt, his seat under her frame (Try 3) and his patting
    for the lost password list (PoA 12) are set aside, shown only with ?setaside. His words are Events' records
-   (neville.json; the fresh first line and the help line asked of Events by row) */
+   (neville.json; the fresh first line and the help line asked of Events by row). Settled by Godric, 15 October 2026,
+   3.27 pm: the window corner (corridor-provisional-four-1015 1) and always awake, the touch only as varied lines
+   about the forgotten password, said awake (corridor-neville-awake-1015 1) */
 var NEVILLE_SEATS = { 1: { x: END_X - 0.32, z: FAR_Z + 0.34 }, 3: { x: END_X - 0.32, z: MID_Z } };   /* the sheet's tries; 3: under her frame, as PS 9 */
 var NEVILLE_SEAT = NEVILLE_SEATS[groundsQ.get('nevilleSeat')] ? +groundsQ.get('nevilleSeat') : SET_ASIDE ? 3 : 1;   /* Try 1, the window corner (Rework 2); Try 3 set aside */
 var NEVILLE = { x: NEVILLE_SEATS[NEVILLE_SEAT].x, z: NEVILLE_SEATS[NEVILLE_SEAT].z, w: 0.5, h: 0.78, glowAt: [0.04, 0.4], glowR: 0.05 };
@@ -3825,6 +3979,12 @@ function lineElement(l) {
     if (l.sound) { var i = document.createElement('i'); i.textContent = l.sound.charAt(0).toUpperCase() + l.sound.slice(1); el.appendChild(i); }
     if (l.sound && l.text) el.appendChild(document.createElement('br'));
     if (l.text) el.appendChild(document.createTextNode('“' + l.text + '”'));
+  } else if (l.struck) {   /* rows crossed out, as on the broom's tag */
+    l.text.split('\n').forEach(function (row, i, all) {
+      var e = document.createElement(l.struck.indexOf(i) >= 0 ? 's' : 'span'); e.textContent = row; el.appendChild(e);
+      if (i < all.length - 1) el.appendChild(document.createElement('br'));
+    });
+    el.dataset.rot = ' rotate(' + ((Math.random() - 0.5) * 3).toFixed(1) + 'deg)';
   } else {
     el.textContent = l.text;
     if (l.medium === 'written') el.dataset.rot = ' rotate(' + ((Math.random() - 0.5) * 3).toFixed(1) + 'deg)';
@@ -4148,7 +4308,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
   },
   showLines: function (list) { list = nevilleLines(list); showLines(mapPlay ? mapPlay.lines(list) : list); },
   /* the one figure this page draws (req 297): Neville locked out, at her frame's foot */
-  figures: [{ role: 'canon', name: 'neville', pose: 'hunched, knees up', mark: 'frame-foot' }],
+  figures: [{ role: 'canon', name: 'neville', pose: 'sitting in the window corner', mark: 'frame-foot' }],   /* the pose Events' records match (0da8070c) */
   drawFigures: drawNeville,
   builtins: { at: function () { return atStop ? atStop.name : 'none'; },
     portrait: function () { return herDoor.ang > 0.05 ? 'open' : 'shut'; },   /* as the common room answers it (req 297: Neville's record asks) */
@@ -4232,7 +4392,11 @@ function frame() {
   updateTurnRise(wdt);
   updateDoorsKnock(wdt);
   updateMap(dt);
-  if (witchLanding.visible) witchCard.rotation.y = Math.atan2(camera.position.x - witchCard.position.x, camera.position.z - witchCard.position.z);
+  if (witchLanding.visible) {   /* she turns to his eye, her slab on the plinth's near half so it never reads as floating over its top */
+    var wr = Math.atan2(camera.position.x - witchX(WITCH.at), camera.position.z - WITCH.z);
+    witchCard.rotation.y = wr;
+    witchCard.position.x = witchX(WITCH.at) + Math.sin(wr) * WITCH.near; witchCard.position.z = WITCH.z + Math.cos(wr) * WITCH.near;
+  }
   updateHerDoze(wdt);
   updateHerPatches(wdt);
   updateGrounds(wdt);
@@ -4240,6 +4404,7 @@ function frame() {
   updateNick(wdt);
   updateNickHome(wdt);
   updateCupboard(wdt);
+  updateCandleStub();
   updateBewitched(wdt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, wdt * 4));
   hinge.rotation.y = -herDoor.ang;
