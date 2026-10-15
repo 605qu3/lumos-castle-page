@@ -167,7 +167,7 @@ Decisions, 7 and 8 October 2026, each Godric's; the handoff's The corridor is th
 - Hand-over: through the hole under a fade. Going in, the view glides into the tunnel, fades to black where it is
   darkest, and the common room loads and fades in at its default view with her swinging shut; coming out, the reverse,
   arriving at her stop as she closes. The address carries where he came from; the place is saved on the device. The
-  room's half is the password session's code, agreed through the handoff. Lost: a plain cut (no passing through), one
+  room's half is this page's, agreed through the handoff. Lost: a plain cut (no passing through), one
   page for both rooms (the budgets add). The room is always night, so day here meets night there until it has a day.
 Every grey shape is at its real size. Nothing is drawn yet but the torch, which the room already has.
 -->
@@ -667,8 +667,8 @@ scene.add(hearthLight);
    switch", PS 7: "at the very end of the corridor hung a portrait of a very fat woman") she hangs on the end wall facing
    straight down the corridor: the hole's frame is mounted there (holeMount, castle.js), so her hinge, the room's glow
    and their numbers are as they were, the hinge now on the window side. Her drawing (portrait-hole-front, The portrait
-   hole) hangs here since 10 October 2026, 6.40 pm (the orchestrator's Q23, the password session no longer running), grey
-   until it loads */
+   hole) hangs here since 10 October 2026, 6.40 pm (the orchestrator's Q23), grey until it loads. Her frame is the
+   Corridor's; the password's words and B24 are Magic's (the lanes table; the Ministry's Rework 12, 15 October 2026) */
 var PORTRAIT_W = C.PORTRAIT.w, PORTRAIT_H = C.PORTRAIT.h, HOLE_Y = C.HOLE.y;
 var holeMount = kit.mountInHole(new THREE.Group()); holeMount.name = 'hole-mount'; scene.add(holeMount);
 var hinge = new THREE.Group();
@@ -821,7 +821,8 @@ function addTorch(head, facing, name) {
   scene.add(light);
   return { mesh: m, flame: f, light: light };
 }
-var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(new THREE.Vector3(PAINTING_OPP.x + 0.6, 1.3, FAR_FACE), 1, 'corridor-torch-2')];
+var TORCH2_HEAD = new THREE.Vector3(PAINTING_OPP.x + 0.6, 1.3, FAR_FACE);   /* the torch nearest her frame, and Nick's spot */
+var torches = [addTorch(TORCH_HEAD, 1, 'corridor-torch'), addTorch(TORCH2_HEAD, 1, 'corridor-torch-2')];
 /* the front doors' torches, one on each side wall of the landing a little before the doors, 2.3 m up: shown with the
    doors (showFoot), the entrance hall "lit with flaming torches" (PS 7) */
 var doorTorches = [addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, HER_FACE), -1, 'doors-torch-her'),
@@ -832,7 +833,7 @@ var doorTorches = [addTorch(new THREE.Vector3(FAR_END_X + 0.45, FOOT_Y + 2.3, HE
 var STRIP_TORCH = CORRIDOR.places.torches[2];
 torches.push(addTorch(new THREE.Vector3(STRIP_TORCH.x, STRIP_TORCH.y, FAR_FACE), 1, 'corridor-torch-3'));
 /* the deathday's trace (Rework 7, 15 October 2026; CoS 8, L9125 his five hundredth deathday this Halloween, L9159 the
-   long, thin, jet-black tapers burning blue): in the Chamber's year from 31 October, and in every later year, on any day, a stub of black candle wedged at the bracket of the strip's torch, the one Nick
+   long, thin, jet-black tapers burning blue): in the Chamber's year from 31 October, and in every later year, on any day, a stub of black candle wedged at the bracket of the torch by her frame, near where Nick
    passes, blue-black drips run down the iron. A tap goes to the runtime as `candle stub`: Nick, passing, mentions his
    deathday as old news (Events' lines, EV-48, asked by row), and gives no invitation. Drawn in code, 4 by 9 cm */
 var candleStub = onWallZ(cutoutTexture(24, 64, '#151318', function (g, w, h) {
@@ -843,10 +844,11 @@ var candleStub = onWallZ(cutoutTexture(24, 64, '#151318', function (g, w, h) {
     g.lineTo(w * (d[0] + 0.03), h * d[1]); g.arc(w * d[0], h * d[1], w * 0.04, 0, Math.PI); g.closePath(); g.fill();
   });
   g.fillStyle = '#3a3a3a'; g.fillRect(w * 0.48, 0, w * 0.04, h * 0.1);                /* the burnt wick */
-}), 0.04, 0.106, STRIP_TORCH.x - 0.19, STRIP_TORCH.y - 0.341, FAR_FACE + 0.014, 1, 1, 'deathday-candle-stub');
+}), 0.04, 0.106, TORCH2_HEAD.x - 0.19, TORCH2_HEAD.y - 0.341, FAR_FACE + 0.014, 1, 1, 'deathday-candle-stub');
 /* flat on the wall as the torch's own drawing is, its foot stood on the bracket's arm (0.33 m under the head, between
    the wall plate and the ring) and its drips down over the iron; until 15 October 2026 it hung in the air beside the
-   torch, turned down the corridor */
+   torch, turned down the corridor; since 2.40 pm at the torch nearest her frame and Nick's spot, as the Ministry's Rework 7
+   words it, not the strip's, which the armour hides from the length view (provisional, Godric to confirm) */
 candleStub.visible = traceFrom(2, 10, 31) ||/[?&]candleStub\b/.test(location.search);   /* ?candleStub for a look */
 candleStub.userData.thing = 'candle stub';   /* tappable from where the tappables are gathered */
 doorTorches.forEach(function (tc) { tc.mesh.visible = tc.flame.visible = tc.light.visible = false; torches.push(tc); });
@@ -1081,7 +1083,7 @@ function nickHeadTip(k) {
 }
 function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
 /* Nick lights him home (Magic's B22, Godric's 1, 13 October 2026, 6.56 pm; "Nearly Headless Nick was always happy to
-   point new Gryffindors in the right direction", PS 8): the first night he walks up to her along the dark corridor, a
+   point new Gryffindors in the right direction", PS 8): on his first walk to her by night, along the dark corridor, a
    pearly glow is already waiting on the end wall beside her frame (the side away from her hinge, so she never swings
    through him) before anyone is seen; Nick drifts out of it, comes a little way to meet him, turns and goes along
    beside him to the frame, bows (a little too deep), says his line and waits, a second lamp, and fades into the wall
@@ -1094,7 +1096,7 @@ function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
    own pearly light (GL-35, fine), and on the nights after, Nick himself waits by her frame, in his own light, and
    fades into the wall as the hole opens or he walks away */
 var HOME = { glowZ: MID_Z + PORTRAIT_W / 2 + 0.42, glowY: 1.35, glowW: 0.95, glowH: 1.7, up: 1.6, down: 1.5,
-  spotX: END_X - 0.4, spotZ: MID_Z + 0.9, look: 0.5, wide: 1.18, bow: { deep: 1.0, tip: 1.5 }, meet: 2.0, speed: 0.9, glide: 5.5 };
+  spotX: END_X - 0.4, spotZ: MID_Z + 0.9, waitX: END_X - 0.35, waitZ: HER_Z - 0.2, look: 0.5, wide: 1.18, bow: { deep: 1.0, tip: 1.5 }, meet: 2.0, speed: 0.9, glide: 5.5 };
 var home = { kind: null, k: 0, t: 0, nick: null, ending: false, q: new URLSearchParams(location.search).get('nickHome') };
 function pearlGlow(w, h) {
   var c = makeCanvas(64, 64), g = c.getContext('2d'), grd = g.createRadialGradient(32, 32, 1, 32, 32, 32);
@@ -1110,10 +1112,10 @@ var nickLamp = pearlGlow(1.7, 2.2);                 /* his own light round him a
 nickLamp.name = 'nick-lamp'; nickLamp.visible = false; nickLamp.renderOrder = 1; scene.add(nickLamp);
 /* while he walks home with Nick, her stop looks a little toward Nick's side, so both show on a phone held upright */
 function nickHomeShift() {
-  if (home.kind === 'glow') return camera.aspect < 1 ? 0.3 : 0;   /* the light left on, at the phone's edge */
-  return home.kind === 'walk' && home.nick !== 'gone' ? HOME.look * (camera.aspect < 1 ? 1 : 0.5) : 0;
+  if (home.kind === 'glow' && !home.waits) return camera.aspect < 1 ? 0.3 : 0;   /* the light left on, at the phone's edge (set aside) */
+  return (home.kind === 'walk' || home.waits) && home.nick !== 'gone' ? HOME.look * (camera.aspect < 1 ? 1 : 0.5) : 0;
 }
-/* the cue's answer, as he sets off toward her: 'walk' the first night, 'glow' every night after */
+/* the cue's answer, as he sets off toward her: 'walk' on his first walk to her by night, 'glow' every night after */
 function nickHome(kind) {
   if (home.kind || leaving) return;
   home.kind = kind; home.t = 0; home.k = 0; home.ending = false; home.cough = false; home.nick = kind === 'walk' ? 'waiting' : null;
@@ -1157,7 +1159,7 @@ function updateNickHome(dt) {
       if (nick.d >= nick.len) { home.nick = 'bow'; nick.held = 0; }
     } else if (home.nick === 'bow' || home.nick === 'by-her') {
       nick.held += dt;
-      _nk.set(HOME.spotX, NICK.h / 2, HOME.spotZ);
+      if (home.waits) _nk.set(HOME.waitX, NICK.h / 2, HOME.waitZ); else _nk.set(HOME.spotX, NICK.h / 2, HOME.spotZ);
       if (home.waits) nickMesh.material.opacity = 0.55 * home.k;   /* there already, fading up as he sets off */
       /* turned to him, the hat swept out; then the bow goes a little too deep and his head tips off on its hinge,
          slowly, and back up with a small cough; then his line */
@@ -1784,7 +1786,9 @@ function updateSnowLump() {
     });
     var sky = groundsWin.sky, h = GROUNDS.h;   /* the sky takes the drawing's height once it loads */
     snowLump.mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.17), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
-    snowLump.mesh.position.set(-GROUNDS.w * 0.19, h * 0.15, 0.0045); snowLump.mesh.renderOrder = 6; snowLump.mesh.name = 'grounds-snow-lump';
+    snowLump.mesh.position.set(-GROUNDS.w * 0.19, h * 0.04, 0.0045);   /* over the dark of the trees, where it reads as snow on the glass, not a cloud (until 2.45 pm at 0.15, against the
+       sky; provisional, Godric to confirm); still above the throw's peak at mid-glass */
+    snowLump.mesh.renderOrder = 6; snowLump.mesh.name = 'grounds-snow-lump';
     sky.add(snowLump.mesh);
   }
   if (snowLump.mesh) snowLump.mesh.visible = on;
@@ -4051,7 +4055,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "every corridor torch burns bright blue for a minute, for Nick's deathday": function () { if (SET_ASIDE) torchCtl.deathday(); },
     'nick drifts out of the wall a little beyond the torch that leaned and on along the corridor, out of sight': function () { nickAfterLean(false); },
     'nick drifts out of the wall a little beyond the torch that leaned, pauses to look at him, and drifts on along the corridor, out of sight': function () { nickAfterLean(true); },
-    /* Nick lights him home (B22): the first night, then his light left on every night after (Events' record, nick_home) */
+    /* Nick lights him home (B22): his first walk to her by night, then Nick waiting by her frame every night after (Events' record, nick_home) */
     "a pearly glow waits on the wall beside the Fat Lady's frame; nick drifts out of it, walks the last stretch beside him, bows a little too deep, and fades into the wall as the hole opens": function () { nickHome('walk'); },
     "a pearly glow waits on the wall beside the Fat Lady's frame, nick's light left on for him, and fades as the hole opens": function () { nickHome('glow'); },
     /* the painting opposite, met as he steps out (req 119): watching, caught slipping out, or paying him no mind */
