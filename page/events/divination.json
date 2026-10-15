@@ -1,0 +1,52 @@
+{
+  "chain": "divination",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3"
+      ],
+      "show": [
+        "a lesson under way: Professor Trelawney in her winged armchair or drifting between the little tables, a class in the chintz armchairs and pouffes"
+      ],
+      "canon": "Interiors' req 444 (docs/interiors/divination-classroom.md, Occupancy; its Rework 9) and the change list's New work: his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock; Fawkes, 3.29 pm, on Events' Q1), so 444's \"by day in term\" reads for the other pupils only; Divination an elective, open from the Azkaban castle on (world rules, Classes); her chair PoA 6 L15290, PoA 15 L19305; the lesson's content the Timetable's; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3",
+        "date >= 09-01"
+      ],
+      "show": [
+        "a teacup on its saucer at each place on every little table",
+        "the largest silver teapot on her table"
+      ],
+      "canon": "Interiors' req 444 (the tables' things; her table): PoA 6 L15300, \"This first term will be devoted to reading the tea leaves\"; the teapot L15308 to L15310, the cups L15316; so the tea-leaf lesson from September to Christmas (ours, by the book's terms); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3",
+        "date >= 05-01",
+        "date <= 08-31"
+      ],
+      "show": [
+        "a crystal ball full of pearly white mist on every little table"
+      ],
+      "canon": "Interiors' req 444: PoA 6 L15304, \"In the summer term ... we shall progress to the crystal ball\"; PoA 15 L19297 to L19305, a crystal ball \"full of pearly white mist\" on every table, mist only, never a glow (the Ministry's rework of req 395; world rules, nothing announces itself); from May, after the Easter holidays (ours), to the leaving feast and the summer hold's feast week; between, the palmistry term, the tables bare of things (PoA 6 L15300); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3"
+      ],
+      "show": [
+        "a few chipped and mended cups pushed to the back of the teacups' middle shelf, behind the blue patterned ones",
+        "a dustpan and brush on the floor at the foot of the teacups' shelf"
+      ],
+      "canon": "Interiors' req 444 (a few chipped and mended cups; the dustpan and brush; undated, from the Azkaban castle on): PoA 6 L15318, \"a tinkle of breaking china\", \"a dustpan and brush\", \"One of the blue ones\"; no cup named as anyone's, the pink cup set aside; checked against the text, 15 October 2026"
+    }
+  ],
+  "records": []
+}
