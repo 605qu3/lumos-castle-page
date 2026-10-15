@@ -586,7 +586,7 @@ if (Q.get('cupboard') === 'open') cupSet(true, true);
    the room's state shows it (the exam week). Every other state the room shows, which the grey shell does not draw (the
    fairies, the scorch, the bandages, a notice), is written in a note at the foot until the room is built.
    ?pineapple=on stands the pineapple with the events absent, for checks. */
-var PINE_SHOW = "a pineapple sitting on the front row's desk on the aisle's left, waiting for the next one called in";
+var PINE_SHOW = "a pineapple sitting on a front-row desk";   /* Events' Rework words (req 446) */
 /* Events' words, req 441 (mirror.json, Rework 5): where the Mirror stood, from 28 December of the Stone's castle on, and
    the window's moonlit sky on the floor by the door (sky light, never a beam: the window faces north; no glass, req 443).
    ?scrape=on, ?oblong=on, ?moonpatch=on stand them with the events absent, for checks. */
@@ -660,19 +660,17 @@ function updateHops(dt) {
 var thingCues = {
   "the old wardrobe at the far end gives a sudden wobble, banging off the wall": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 0.9, 38, 0.05); },
   "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 1.1, 44, 0.06); },
-  "the pineapple on the front desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 2.4, 9, 0.45); },
+  "the pineapple on the front-row desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 2.4, 9, 0.45); },
   "the pineapple tapdances a few quick steps on the spot and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 1.0, 4, 0); }
 };
 var noteEl = document.getElementById('roomnote');
-/* the note lists only this room's own states, from its own chain (every one names its place, `place = staff room`):
-   the older chains' room rules name none and would show their common room's things everywhere */
-var ROOM_CHAIN = { 'staff-room': 'staff', 'charms-classroom': 'charms', 'trophy-room': 'trophy', 'library': 'library',
-                   'hospital-wing': 'wing', 'forgotten-classroom': 'mirror' };
-var ownShows = {}, lastShown = [];
-if (ROOM_CHAIN[PLACE]) fetch('events/' + ROOM_CHAIN[PLACE] + '.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
-  (j.room || []).forEach(function (rule) { (rule.show || []).forEach(function (s) { ownShows[s] = true; }); });
-  thingsDrawRoom(lastShown);
-}).catch(function () {});
+/* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
+   for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
+   rule naming no place holds only on the first three pages, so every string the runtime gives here is this room's own,
+   whichever chain holds it, and the old per-room chain list is gone. A record's cue with nothing to move (the trophy
+   case's cup, the hospital wing's sweets, Flitwick's topple) shows a moment as a seen line (FALLBACK below) */
+var lastShown = [];
+var DRAWN_ELSE = ["the broom cupboard's door in the west wall beside the Great Hall's doors, shut"];   /* the cupboard's shut leaf */
 function thingsDrawRoom(shown) {
   lastShown = shown;
   var drawn = {};
@@ -681,8 +679,8 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.forEach(function (x) { drawn[x] = true; });
-  var rest = shown.filter(function (s) { return ownShows[s] && !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : []).forEach(function (x) { drawn[x] = true; });
+  var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
 }
@@ -863,8 +861,13 @@ function updateLines(dt) {
   }
 }
 var allCues = Object.assign({}, turnCues, cupCues, thingCues);   /* one object, so Filch's cues can join it once filch.json is read */
+/* FALLBACK (req 446): a record's cue this shell has no motion for is shown a moment as a seen line, word for word */
+var cueTable = window.Proxy ? new Proxy(allCues, { get: function (o, k) {
+  if (typeof k !== 'string' || k in o) return o[k];
+  return function () { showLines([{ medium: 'seen', sound: k }]); };
+} }) : allCues;
 var events = window.CastleEvents ? CastleEvents.start({
-  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: roomDraw, cues: allCues, showLines: showLines,
+  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: roomDraw, cues: cueTable, showLines: showLines,
   builtins: Object.assign({ tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; } },
     TURN ? { doors: function () { return TURN; } } : {})
 }) : null;
