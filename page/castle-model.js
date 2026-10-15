@@ -142,7 +142,7 @@ window.CASTLE_MODEL = {
       "state": "designed", "cite": ""
     },
     {
-      "id": "study", "first": "PS", "name": "Clementine's study, a turret corbelled out from the tower", "group": "gryffindor-suite", "level": "7",
+      "id": "study", "first": "PS", "name": "Clementine's study, a half-round room off the tower inside the south range", "about": "one place, as every page and sheet has it (the Ministry's list, Rework 13, 15 October 2026): a D 4.4 across and 2.25 deep on the tower's face, inside the south range under its lead flat at floor 7 (site x 45.5 to 49.9, y 3.0 to 7.4), so no turret shows from outside; the older name, a turret corbelled out, is overtaken. Godric's Q18, 1 (14 October 2026, taken 1.28 am, provisional, Godric to confirm; req 332): the Corridor's Q33 t1 and t2 kept as ideas for later. No page shows the study yet; the room is the Clementine lane's", "group": "gryffindor-suite", "level": "7",
       "look": {"rest": -10, "down": -55, "up": 40, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
       "shape": { "circle": [-3.27, 5.55], "r": 2.2, "clip": { "x_max": -1.8 } }, "wall": 0.35, "floor": 0, "ceiling": 3.0,
       "state": "designed", "cite": ""
@@ -315,7 +315,7 @@ window.CASTLE_MODEL = {
       "w": 4.0, "h": 6.0, "state": "books", "about": "at the top of a flight of stone steps, facing the marble staircase; their size ours",
       "cite": "PS 6, PS 7, CoS 15, GoF 12" },
     { "id": "great-hall-doors", "first": "PS", "kind": "double doors", "between": ["entrance-hall", "great-hall"], "at": [68, 60.5], "w": 3.2, "h": 5.0,
-      "depth": 3.0, "state": "books", "about": "to the right on entering, on the hall's axis; their size ours. Godric's Q16, 1 (14 October 2026, taken 12.25 am, provisional, Godric to confirm; desk architect-q16-doors-1014; ledger line 14): the 3 m of wall between the halls (x 65 to 68, the broom cupboard in it, his 14.1) stays, and the doors open into a vaulted passage 3.2 wide through it, the leaves where they hang at its Entrance Hall face, swinging in; the hall's own mouth at x 65 an open arch the same size", "cite": "PS 7, OotP 33" },
+      "depth": 3.0, "state": "books", "about": "to the right on entering, on the hall's axis; their size ours. Godric's Q16, 1 (taken 14 October 2026, 12.25 am; confirmed by Godric, relayed 15 October 2026; desk architect-q16-doors-1014; ledger line 14): the 3 m of wall between the halls (x 65 to 68, the broom cupboard in it, his 14.1) stays, and the doors open into a vaulted passage 3.2 wide through it, the leaves where they hang at its Entrance Hall face, swinging in; the hall's own mouth at x 65 an open arch the same size", "cite": "PS 7, OotP 33" },
     { "id": "hall-cupboard-door", "first": "PS", "kind": "door, narrow and plain, unlocked", "between": ["entrance-hall", "hall-cupboard"], "at": [68, 64.0], "w": 0.8, "h": 2.0,
       "state": "designed", "about": "on the Entrance Hall's west wall, 1.5 m clear of the Great Hall's doors to the south; Godric's 14.1 on architect-q14-batch1-1013 (13 October 2026, 7.40 pm; ledger line 3)",
       "cite": "PoA 21" },
