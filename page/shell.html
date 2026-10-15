@@ -487,7 +487,8 @@ var CUP = (function () {
     if (!up) { var rim = new THREE.Mesh(new THREE.TorusGeometry(0.15 * s, 0.008, 6, 20), tin); rim.rotation.x = Math.PI / 2; rim.position.set(p.x, p.y + 0.15 * s, p.z); g.add(rim); }
     return b;
   }
-  /* upturned from PoA's year on, the trace of PoA 21 (its first); before it, standing like the others */
+  /* upturned in every year (the touch review's KEEP, 15 October 2026: an ordinary bucket, just right to sit on); its
+     PoA 21 cite is told only from PoA's year (the model's cite_from) */
   var ub = (MODEL.features || []).filter(function (f) { return f.id === 'upturned-bucket'; })[0];
   bucket(ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, !!ub, 1.15);
   bucket(r[0] + 0.22, r[3] - 0.25, false, 1);
