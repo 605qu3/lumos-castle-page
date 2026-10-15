@@ -1057,7 +1057,7 @@ bayRoom.name = 'bay'; bayRoom.visible = false; scene.add(bayRoom);
   /* lit stone, never a black hole (the Keep: the dark is never deep; the Stone's year walk, 15 October 2026, finding 1,
      provisional, Godric to confirm): the hall's far side a shade darker than the corridor's stone, two torches on it
      burning as the corridor's own do, a stand-in until the bay is drawn (the light Design's to review, by row) */
-  box(G, 0.1, hgt + 30, WIDTH + 16, far, ym - 15, MID_Z, solid(0x5c5852), 0);
+  box(G, 0.1, hgt + 60, WIDTH + 16, far, ym, MID_Z, solid(0x5c5852), 0);                             /* down the well and up past the bay's ceiling, the hall being tall */
   box(G, 0.12, 0.35, WIDTH + 16, far + 0.1, y0 + 0.4, MID_Z, solid(0x47423b), 0);                     /* a gallery's edge over there, faint */
   [-2.4, 2.4].forEach(function (dz, i) {
     var head = new THREE.Vector3(far + 0.12, FOOT_Y + 2.2, MID_Z + dz);
