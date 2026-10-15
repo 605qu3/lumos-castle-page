@@ -4364,8 +4364,8 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'nick drifts out of the wall a little beyond the torch that leaned and on along the corridor, out of sight': function () { nickAfterLean(false); },
     'nick drifts out of the wall a little beyond the torch that leaned, pauses to look at him, and drifts on along the corridor, out of sight': function () { nickAfterLean(true); },
     /* Nick lights him home (B22): his first walk to her by night, then Nick waiting by her frame every night after (Events' record, nick_home) */
-    "a pearly glow waits on the wall beside the Fat Lady's frame; nick drifts out of it, walks the last stretch beside him, bows a little too deep, and fades into the wall as the hole opens": function () { nickHome('walk'); },
-    "a pearly glow waits on the wall beside the Fat Lady's frame, nick's light left on for him, and fades as the hole opens": function () { nickHome('glow'); },
+    "nick drifts out of the wall beside the Fat Lady's frame in his own pearly light, walks the last stretch beside him, bows a little too deep, and fades into the wall as the hole opens": function () { nickHome('walk'); },
+    "nick waits by the Fat Lady's frame in his own pearly light, bows, and fades into the wall as the hole opens": function () { nickHome('glow'); },
     /* the painting opposite, met as he steps out (req 119): watching, caught slipping out, or paying him no mind */
     "the mantel painting's sitter standing in the painting opposite the hole, turned to watch him as he steps out and walks up to the Fat Lady": function () { oppMoment('watch', 'mantel'); },
     "the mantel painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'mantel'); },
