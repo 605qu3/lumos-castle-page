@@ -1,6 +1,7 @@
 {
   "chains": [
     "armour",
+    "astronomy-tower",
     "bedtime",
     "booklist",
     "cake",
@@ -16,8 +17,10 @@
     "doors",
     "filch",
     "fire",
+    "flying-lawn",
     "fog",
     "great-hall",
+    "greenhouses",
     "griffin",
     "grounds",
     "hall",

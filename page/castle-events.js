@@ -412,7 +412,15 @@
       if (isNaN(dt.getTime()) || dt.getDate() !== +weatherDate.slice(8, 10)) weatherDate = null;   /* 2027-02-30 is no day */
       else dateShift = dt.getTime() - dn.getTime();
     }
-    dated = !!weatherDate;
+    /* ?hour=23 or ?hour=23:30 moves the clock to that hour of the day (req 488: the tower's lesson at midnight has a
+       link): `hour`, `time`, `meal`, `last meal`, `lessons` and the sun follow it, as if he had come then; like ?date=
+       it keeps nothing and posts nothing, and the two together name a day and an hour. */
+    var hourLook = /^([01]?\d|2[0-3])(?::([0-5]\d))?$/.exec(params.get('hour') || '');
+    if (hourLook) {
+      var hn = new Date(Date.now() + dateShift), ht = new Date(hn.getFullYear(), hn.getMonth(), hn.getDate(), +hourLook[1], +(hourLook[2] || 0), 0, 0);
+      dateShift += ht.getTime() - hn.getTime();
+    }
+    dated = !!weatherDate || !!hourLook;
     /* a test link for the day's drivers (docs/room-states.md §1): ?meal=breakfast, lunch, dinner or none;
        ?occasion=halloween, christmas-day and the rest (hyphens for spaces); ?lessons=on or off. With ?time= alone the
        meal reads none and lessons off, so a link shows only what it names. */

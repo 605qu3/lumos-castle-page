@@ -386,6 +386,41 @@
       ]
     },
     {
+      "id": "filch.miss-greenhouses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch passes",
+      "when": [
+        "place = greenhouses",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Filch's lamp light swinging along the glass of the houses' west ends, a sniff at the compost heap, then away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.miss-greenhouses",
+          "sound": "Filch's slow, shuffling steps and the creak of his lamp, his muttering to Mrs Norris, then going",
+          "text": [
+            "Dragon dung. Lovely, my sweet. Come away.",
+            "All locked up tight, my sweet. Nothing here."
+          ],
+          "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
+        }
+      ]
+    },
+    {
       "id": "filch.miss-myrtle",
       "tier": "fixed",
       "source": "device",

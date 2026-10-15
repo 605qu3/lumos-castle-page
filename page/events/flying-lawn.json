@@ -1,0 +1,100 @@
+{
+  "chain": "flying-lawn",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = flying lawn",
+        "lessons = on",
+        "weekday = thursday",
+        "hour = 14"
+      ],
+      "show": [
+        "twenty school brooms lying in two neat lines on the grass, nobody there yet"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "lessons = on",
+        "weekday = thursday",
+        "hour = 15"
+      ],
+      "show": [
+        "the first years' flying lesson: twenty school brooms in two neat lines on the grass, a class standing by them, the teacher at the front; two free brooms at the south end of the first line"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "lessons = on",
+        "weekday = thursday",
+        "hour = 16"
+      ],
+      "show": [
+        "the first years' flying lesson: twenty school brooms in two neat lines on the grass, a class standing by them, the teacher at the front; two free brooms at the south end of the first line"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "lessons = off"
+      ],
+      "show": [
+        "the lawn bare, smooth flat grass, nobody on it"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "lessons = on",
+        "weekday != thursday"
+      ],
+      "show": [
+        "the lawn bare, smooth flat grass, nobody on it"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "lessons = on",
+        "weekday = thursday",
+        "hour < 14"
+      ],
+      "show": [
+        "the lawn bare, smooth flat grass, nobody on it"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "weekday = thursday",
+        "hour = 16",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "the grass still flattened in two lines where the brooms lay"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "weekday = thursday",
+        "hour = 17",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "the grass still flattened in two lines where the brooms lay"
+      ]
+    }
+  ],
+  "records": []
+}

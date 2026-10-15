@@ -1,0 +1,401 @@
+{
+  "chain": "greenhouses",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "weekday = monday",
+        "hour < 13",
+        "year <= 1"
+      ],
+      "show": [
+        "a Herbology lesson in greenhouse one: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "weekday = monday",
+        "hour < 13",
+        "year >= 2"
+      ],
+      "show": [
+        "a Herbology lesson in greenhouse three: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = monday",
+        "occasion = none",
+        "hour = 8",
+        "meal = none",
+        "year <= 1"
+      ],
+      "show": [
+        "the class waiting outside greenhouse one's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = monday",
+        "occasion = none",
+        "hour = 8",
+        "meal = none",
+        "year >= 2"
+      ],
+      "show": [
+        "the class waiting outside greenhouse three's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = monday",
+        "occasion = none",
+        "hour >= 13",
+        "time != night"
+      ],
+      "show": [
+        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = monday",
+        "occasion = halloween",
+        "hour = 8",
+        "meal = none",
+        "year <= 1"
+      ],
+      "show": [
+        "the class waiting outside greenhouse one's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = monday",
+        "occasion = halloween",
+        "hour = 8",
+        "meal = none",
+        "year >= 2"
+      ],
+      "show": [
+        "the class waiting outside greenhouse three's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = monday",
+        "occasion = halloween",
+        "hour >= 13",
+        "time != night"
+      ],
+      "show": [
+        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "weekday = wednesday",
+        "hour < 13",
+        "year <= 1"
+      ],
+      "show": [
+        "a Herbology lesson in greenhouse one: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "weekday = wednesday",
+        "hour < 13",
+        "year >= 2"
+      ],
+      "show": [
+        "a Herbology lesson in greenhouse three: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = wednesday",
+        "occasion = none",
+        "hour = 8",
+        "meal = none",
+        "year <= 1"
+      ],
+      "show": [
+        "the class waiting outside greenhouse one's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = wednesday",
+        "occasion = none",
+        "hour = 8",
+        "meal = none",
+        "year >= 2"
+      ],
+      "show": [
+        "the class waiting outside greenhouse three's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = wednesday",
+        "occasion = none",
+        "hour >= 13",
+        "time != night"
+      ],
+      "show": [
+        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = wednesday",
+        "occasion = halloween",
+        "hour = 8",
+        "meal = none",
+        "year <= 1"
+      ],
+      "show": [
+        "the class waiting outside greenhouse one's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = wednesday",
+        "occasion = halloween",
+        "hour = 8",
+        "meal = none",
+        "year >= 2"
+      ],
+      "show": [
+        "the class waiting outside greenhouse three's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = wednesday",
+        "occasion = halloween",
+        "hour >= 13",
+        "time != night"
+      ],
+      "show": [
+        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "weekday = friday",
+        "hour < 13",
+        "year <= 1"
+      ],
+      "show": [
+        "a Herbology lesson in greenhouse one: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "weekday = friday",
+        "hour < 13",
+        "year >= 2"
+      ],
+      "show": [
+        "a Herbology lesson in greenhouse three: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = friday",
+        "occasion = none",
+        "hour = 8",
+        "meal = none",
+        "year <= 1"
+      ],
+      "show": [
+        "the class waiting outside greenhouse one's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = friday",
+        "occasion = none",
+        "hour = 8",
+        "meal = none",
+        "year >= 2"
+      ],
+      "show": [
+        "the class waiting outside greenhouse three's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = friday",
+        "occasion = none",
+        "hour >= 13",
+        "time != night"
+      ],
+      "show": [
+        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = friday",
+        "occasion = halloween",
+        "hour = 8",
+        "meal = none",
+        "year <= 1"
+      ],
+      "show": [
+        "the class waiting outside greenhouse one's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = friday",
+        "occasion = halloween",
+        "hour = 8",
+        "meal = none",
+        "year >= 2"
+      ],
+      "show": [
+        "the class waiting outside greenhouse three's door, still locked"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weekday = friday",
+        "occasion = halloween",
+        "hour >= 13",
+        "time != night"
+      ],
+      "show": [
+        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "weekday = monday",
+        "hour < 13",
+        "year = 2",
+        "castle date < 2 05-30"
+      ],
+      "show": [
+        "earmuffs in different colours on the trestle bench, a pink fluffy pair at the teacher's end"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "time = night"
+      ],
+      "show": [
+        "the greenhouses dark and locked, the giant flowers' heavy scent through the glass"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "year = 2",
+        "castle date < 2 05-30"
+      ],
+      "show": [
+        "five deep trays of young Mandrakes on greenhouse three's south staging, tufty and purplish green"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "year = 2",
+        "castle date >= 2 12-15",
+        "castle date < 2 03-01"
+      ],
+      "show": [
+        "the Mandrakes in their trays wearing tiny socks and scarves against the cold"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "castle date >= 2 05-30"
+      ],
+      "show": [
+        "five empty Mandrake trays, washed and stacked under greenhouse three's south staging"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "castle date >= 3 10-24"
+      ],
+      "show": [
+        "a few small flowers grown up between the path's bricks near greenhouse three's bench, where beans were once scattered"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "greenhouses.mandrake-party",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = greenhouses",
+        "year = 2",
+        "castle date >= 2 03-01",
+        "castle date < 2 05-30",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "mandrakes",
+          "role": "voice",
+          "name": "the mandrakes",
+          "mark": "greenhouse three"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "mandrakes",
+          "medium": "heard",
+          "key": "greenhouses.mandrake-party",
+          "sound": "a loud, raucous racket from greenhouse three, the grown Mandrakes throwing a party behind the glass"
+        }
+      ],
+      "canon": "Godric's t1 on interiors-mandrakes-1015 (6.08 pm): CoS 14 L11531, \"in March several of the Mandrakes threw a loud and raucous party in greenhouse three\", read 15 October 2026; in the Chamber's castle from March to their cutting, now and then, heard by anyone passing; never their cry, which is fatal (CoS 6), nothing glows"
+    }
+  ]
+}
