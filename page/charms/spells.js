@@ -1537,6 +1537,26 @@ function inkWhy(j) {
   })[j.reason] || 'Keep an even beat: tap ... tap ... tap, like a clock ticking.'];
 }
 
+/* A thing's own small sound, in place of a glow that cued the next move (the Ministry's rule, nothing announces
+   itself; Charms' change list, Rework 1, GL-10 and GL-11, 16 October 2026): 'click', a lock's tumbler giving under
+   the tap; 'grate', stone dragging on stone as the witch's lid shifts a hair. A short burst of filtered noise, made
+   only on a tap (the browser's rule for sound), silent where there is no audio. opts.quiet on a callable skips it,
+   for a room that plays its own. */
+var noiseCtx = null;
+function thingSound(kind) {
+  try {
+    var AC = root.AudioContext || root.webkitAudioContext; if (!AC) return;
+    if (!noiseCtx) noiseCtx = new AC();
+    var ac = noiseCtx, t = ac.currentTime, len = kind === 'grate' ? 0.32 : 0.05;
+    var buf = ac.createBuffer(1, Math.ceil(ac.sampleRate * len), ac.sampleRate), d = buf.getChannelData(0), i;
+    for (i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (kind === 'grate' ? 0.6 + 0.4 * Math.sin(i / 90) : 1);
+    var src = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = kind === 'grate' ? 380 : 2600; f.Q.value = kind === 'grate' ? 0.9 : 4;
+    g.gain.setValueAtTime(kind === 'grate' ? 0.22 : 0.3, t); g.gain.exponentialRampToValueAtTime(0.001, t + len);
+    src.connect(f); f.connect(g); g.connect(ac.destination); src.start(t); src.stop(t + len);
+  } catch (e) { /* no sound is never a fault */ }
+}
+
 /* The word's card a room callable shows (Aligned with Magic, point 2: the word comes from the syllable card until the
    ear, castle-ear.js, is probed): its syllables, each lighting in turn over 0.8 s once it is tapped, as he says it.
    c: { x, y, w, h, fs } in CSS px; said: when it was tapped (performance.now()), or 0. */
@@ -1712,6 +1732,7 @@ function layer(hooks, opts) {
            turn: 0.25 (default), 0.5 or 0.75; dir: 1 clockwise (default) or -1; stuck: false (default) or true,
            ease: 'kind' (default), 'fair' or 'strict' (TURN_EASES), guide: 'auto' (default), 'always' or 'off',
            face: true (default) or false, for a room that draws its own lock face,
+           quiet: true for a room that plays its own tumbler click (thingSound),
            onTap: optional, called once the tap lands, for the room's "now turn it" }
    Returns { done: a promise of { verdict, judge, traced, first, why (lockWhy, for every answer but 'opened') },
              cancel(), tap(), judge(points) }. */
@@ -1764,13 +1785,9 @@ function openLock(opts) {
       cx.fillStyle = '#f3d27a'; cx.shadowColor = '#000'; cx.shadowBlur = 6;
       cx.fillText(Math.round(Math.abs(sw.s) * 180 / Math.PI) + '°', c.x, c.y + r * 1.55); cx.restore();
     }
-    if (stage === 'turn') {
-      var gl = cx.createRadialGradient(c.x, c.y, 0, c.x, c.y, r * 0.3);
-      gl.addColorStop(0, 'rgba(255,240,200,' + (0.55 + 0.2 * Math.sin(now / 200)) + ')'); gl.addColorStop(1, 'rgba(255,220,150,0)');
-      cx.fillStyle = gl; cx.beginPath(); cx.arc(c.x, c.y, r * 0.3, 0, 7); cx.fill();
-    }
+    /* no pulse after the tap (GL-11): the tumbler's click says it gave, and the face stays drawn still */
   }
-  function tapped() { stage = 'turn'; if (opts.onTap) opts.onTap(); }
+  function tapped() { stage = 'turn'; if (!opts.quiet) thingSound('click'); if (opts.onTap) opts.onTap(); }
   function judge(pts) {   /* also the way in for checks */
     var j = judgeTurn(pts, c, r, want, L.W, L.H, ease);
     if (j.reason === 'tap') { if (guide) guide.clear(); return null; }
@@ -2245,7 +2262,7 @@ function measureSpan(opts) {
            lid: the lid's length in cm (45), width: his shoulders in cm (34), max: the protractor's reach (110),
            hold: seconds the sum stays drawn after the stop before the answer (3),
            onTap(n): each tap on the hump that does not open it (n counts them: 1 is the book's "nothing"),
-           onWord(): the card tapped, the word said, onSwing(degrees, gapCm): each frame of the swing,
+           onWord(): the card tapped, the word said (her lid shifts a hair with a stone grate; quiet: true skips the grate), onSwing(degrees, gapCm): each frame of the swing,
            onStop(out): at the stop, with the answer to come,
            exits, wait: as every room callable (EXITS) }
    Returns { done: a promise of { verdict: 'opened' | 'cancelled', degrees, gap, width, need, first }, cancel(),
@@ -2277,7 +2294,7 @@ function openHump(opts) {
     if (!said) { taps++; if (opts.onTap) opts.onTap(taps); return; }
     stage = 'swing'; swingAt = root.performance.now();
   }
-  function say() { if (stage !== 'tap' || !taps || said) return; said = root.performance.now(); if (opts.onWord) opts.onWord(); }
+  function say() { if (stage !== 'tap' || !taps || said) return; said = root.performance.now(); if (!opts.quiet) thingSound('grate'); if (opts.onWord) opts.onWord(); }
   function stop() {
     stage = 'stopped'; deg = NEED;
     var first = !learned('dissendium'); learn('dissendium'); firstCast('dissendium');
@@ -2334,10 +2351,11 @@ function openHump(opts) {
         if (u >= 1) stop();
       }
       if (stage === 'tap' && taps) drawCard(L.cx, now);
-      if (stage === 'tap' && said) {   /* the word said: the hump glows for the second tap */
-        var gl = L.cx.createRadialGradient(h.x, h.y, 0, h.x, h.y, r);
-        gl.addColorStop(0, 'rgba(255,240,200,' + (0.3 + 0.15 * Math.sin(now / 200)) + ')'); gl.addColorStop(1, 'rgba(255,220,150,0)');
-        L.cx.fillStyle = gl; L.cx.beginPath(); L.cx.arc(h.x, h.y, r, 0, 7); L.cx.fill();
+      if (stage === 'tap' && said) {   /* the word said: her lid has shifted a hair, a dark seam along its edge, drawn
+                                          still (no glow, GL-10, req 433); the word card stays up */
+        var e2 = rot(ed, hi, 1.6);
+        L.cx.save(); L.cx.strokeStyle = 'rgba(12,9,6,0.85)'; L.cx.lineWidth = Math.max(2, r * 0.03); L.cx.lineCap = 'round';
+        L.cx.beginPath(); L.cx.moveTo(ed.x, ed.y); L.cx.lineTo(e2.x, e2.y); L.cx.lineTo(hi.x, hi.y); L.cx.stroke(); L.cx.restore();
       }
       if (stage === 'swing' || stage === 'stopped') drawMeasure(L.cx);
     },
