@@ -2552,6 +2552,469 @@
       "show": [
         "the port a grey square in the dark"
       ]
+    },
+    {
+      "when": [
+        "place = powder room"
+      ],
+      "show": [
+        "a dry quiet, the air dry as a biscuit, the floor boarded and pinned with copper"
+      ]
+    },
+    {
+      "when": [
+        "place = powder room"
+      ],
+      "show": [
+        "empty powder barrels on their sides, wooden shovels and scoops, and a row of felt slippers on pegs under a painted board: NO SHOES, NO IRON, NO FLAME"
+      ]
+    },
+    {
+      "when": [
+        "place = powder room"
+      ],
+      "show": [
+        "a plain lamp behind the thick glass in the south wall, set there so no flame ever came inside"
+      ]
+    },
+    {
+      "when": [
+        "place = powder room",
+        "windy = yes"
+      ],
+      "show": [
+        "now and then a dull thud through the wall, where the lake slaps at the casemate"
+      ]
+    },
+    {
+      "when": [
+        "place = powder room",
+        "cold = yes"
+      ],
+      "show": [
+        "cold, but never damp: nothing in here has ever rusted"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room"
+      ],
+      "show": [
+        "a great circle painted on the floor, crossed by lines and lettered where they meet, footprints painted where the feet go"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room"
+      ],
+      "show": [
+        "footsteps ringing back off the round walls on the painted circle"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room"
+      ],
+      "show": [
+        "a figure painted on the wall with a target over its heart, foils with buttoned tips chained in their rack, wire masks on pegs"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "a bar of morning sun from the slot high in the east wall, lying across the circle"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the slot high in the wall a strip of white"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room",
+        "time = night"
+      ],
+      "show": [
+        "the slot high in the wall a dark line"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind whistling thin across the slot"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room",
+        "weather = rain"
+      ],
+      "show": [
+        "rain spattering on the gun platform's deck outside the slot"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery"
+      ],
+      "show": [
+        "a smell of old paste and leather"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery"
+      ],
+      "show": [
+        "a half-sewn book still on its cords in the sewing frame, the standing press's great wooden screw pinned, drawers of marbled papers, every sheet different"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery"
+      ],
+      "show": [
+        "finishing tools racked by the cold stove, and a book of gold leaf between its tissues"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "morning sun through the east loop on the sewing frame"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery",
+        "time = day",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "sun through the south loop across the marbled papers"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery",
+        "weather = rain"
+      ],
+      "show": [
+        "rain ticking at the loops, the paste smell stronger in the damp"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the loops white with fog"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery",
+        "time = night"
+      ],
+      "show": [
+        "the loops black"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery",
+        "cold = yes"
+      ],
+      "show": [
+        "the iron stove cold, and the room colder"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room"
+      ],
+      "show": [
+        "a glazing bench, a full-size drawing of a window pinned on a board, lead cames hung in bundles, coloured glass in sheets racked high behind a bar"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room"
+      ],
+      "show": [
+        "a box of small pieces of glass, ruby, blue, amber and green, their edges ground smooth"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "time = day",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "colours laid across the floor from the south loop, ruby and blue and amber, creeping round as the sun goes"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "morning sun through the east loop catching the edges of the racked sheets"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "time != night",
+        "weather = cloudy"
+      ],
+      "show": [
+        "the glass dull in its racks, waiting for the sun"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the loops white with fog, every colour gone flat"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "time != night",
+        "weather = snow"
+      ],
+      "show": [
+        "snow-light through the loops, cold and blue on the bench"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "weather = rain"
+      ],
+      "show": [
+        "rain at the loops"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "time = night"
+      ],
+      "show": [
+        "the loops black, the coloured sheets dark in their rack"
+      ]
+    },
+    {
+      "when": [
+        "place = glass room",
+        "windy = yes"
+      ],
+      "show": [
+        "a faint chink from the racks as the draught stirs the sheets"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room"
+      ],
+      "show": [
+        "a great brass orrery on a round table behind a low rail, the sun a gilt ball, the planets still on their arms, a crank at its side"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room"
+      ],
+      "show": [
+        "past Saturn, two more planets on bent wires, added by a later hand, a little wobbly"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room",
+        "time = day",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "sun through the south loop on the gilt sun at the orrery's heart"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "morning sun through the east loop along the brass arms"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the loops white with fog"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room",
+        "time = night"
+      ],
+      "show": [
+        "the brass gone dim, the gilt sun a dull gold"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room",
+        "time = night",
+        "moon up = yes",
+        "weather = clear"
+      ],
+      "show": [
+        "moonlight through a loop silvering the brass moon on its arm"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind moaning at the loops"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote"
+      ],
+      "show": [
+        "from floor to ceiling the wall all nest holes, row on row, hundreds, each with its little ledge"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote"
+      ],
+      "show": [
+        "the potence in the middle, a post with arms that turns at a push, its ladder laid flat along the wall on brackets; feathers at the wall's foot"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "time != night"
+      ],
+      "show": [
+        "a pair of doves cooing somewhere up in the holes"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "time = night"
+      ],
+      "show": [
+        "a soft rustle up in the nest holes as a dove shifts in its sleep, the flight holes dark"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "sun through the flight holes high in the south wall, in round spots on the floor"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind piping in the flight holes"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "time != night",
+        "weather = rain"
+      ],
+      "show": [
+        "rain blowing in at the flight holes, the doves tucked away out of it"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "fog drifting in at the flight holes"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "time != night",
+        "season = spring"
+      ],
+      "show": [
+        "a dove carrying a twig into its hole"
+      ]
+    },
+    {
+      "when": [
+        "place = dovecote",
+        "time != night",
+        "cold = yes"
+      ],
+      "show": [
+        "the doves fluffed up round as balls on their ledges"
+      ]
     }
   ],
   "records": [
@@ -2798,6 +3261,124 @@
       "when": [],
       "show": [
         "a draught from the low arch, cold and earthy"
+      ]
+    },
+    {
+      "id": "hidden-ways.powder-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap powder-door",
+      "when": [],
+      "show": [
+        "a pair of felt slippers on a peg just inside a low oak door with no iron in it"
+      ]
+    },
+    {
+      "id": "hidden-ways.fencing-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap fencing-door",
+      "when": [],
+      "show": [
+        "a painted footprint running out under the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.bindery-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bindery-door",
+      "when": [],
+      "show": [
+        "a smell of old paste and leather at the crack of the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.glass-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap glass-door",
+      "when": [
+        "time = day",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "a stripe of coloured light under the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.glass-door-chink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap glass-door",
+      "when": [
+        "windy = yes"
+      ],
+      "show": [
+        "a faint chink of glass behind the door in the draught"
+      ]
+    },
+    {
+      "id": "hidden-ways.orrery-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap orrery-door",
+      "when": [],
+      "show": [
+        "a small brass sun for a knocker, the only one in the castle"
+      ]
+    },
+    {
+      "id": "hidden-ways.orrery-crank",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap orrery-crank",
+      "when": [],
+      "show": [
+        "the crank turns slow and every planet moves together, the moon round the earth, Jupiter's little moons round Jupiter, the two wobbly ones last of all, and all of it stops when the crank does"
+      ]
+    },
+    {
+      "id": "hidden-ways.orrery-stair-arch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap orrery-stair-arch",
+      "when": [],
+      "show": [
+        "a grey feather on the first step of a stair curling up inside the wall"
+      ]
+    },
+    {
+      "id": "hidden-ways.orrery-stair-coo",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap orrery-stair-arch",
+      "when": [
+        "time != night"
+      ],
+      "show": [
+        "a soft cooing somewhere above"
+      ]
+    },
+    {
+      "id": "hidden-ways.dovecote-stair-arch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap dovecote-stair-arch",
+      "when": [],
+      "show": [
+        "the narrow stair curling away down inside the wall, a feather or two on its steps"
       ]
     }
   ]
