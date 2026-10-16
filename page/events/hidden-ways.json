@@ -266,6 +266,95 @@
     },
     {
       "when": [
+        "place = cliff vault",
+        "time != night"
+      ],
+      "show": [
+        "through the vault's arched mouth, the ledge garden in the light off the lake: rosemary leaning over the west bed, sage and rue below it, fennel tall against the cliff at the east bed's back, thyme in the paving's cracks"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time != night",
+        "season = spring"
+      ],
+      "show": [
+        "new green coming up in both beds, the nettles fresh at their backs, the lavender putting out grey-green shoots"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time != night",
+        "season = summer"
+      ],
+      "show": [
+        "the lavender in flower and loud with bees, the fennel's flat yellow heads nodding against the cliff"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time != night",
+        "season = autumn"
+      ],
+      "show": [
+        "the fennel gone to brown seed heads, the lavender grey and leggy, the rosemary still green"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time != night",
+        "season = winter",
+        "ground != snow"
+      ],
+      "show": [
+        "the beds cut back by the cold, only the rosemary and the sage still green"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time != night",
+        "ground = frost"
+      ],
+      "show": [
+        "frost white on the paving and along the parapet's top"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time != night",
+        "ground = snow"
+      ],
+      "show": [
+        "snow over the beds and along the parapet, the rosemary's green tips showing through"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time != night",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind off the lake hissing in the rosemary and swaying the fennel"
+      ]
+    },
+    {
+      "when": [
+        "place = cliff vault",
+        "time = night"
+      ],
+      "show": [
+        "the mouth a grey arch of night over the lake, the garden only a smell of herbs in the dark"
+      ]
+    },
+    {
+      "when": [
         "place = library gallery",
         "time != night",
         "summer = no",
