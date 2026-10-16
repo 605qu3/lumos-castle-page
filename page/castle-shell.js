@@ -252,6 +252,35 @@ window.CastleShell = { build: function (F, M, placeId, o) {
 
   function quad(w, h, mat, layer) { return F.register(new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat), LAYER[layer]); }
   function slab(w, h, d, mat, layer) { return F.register(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat), LAYER[layer]); }
+  /* v21 (the Found list): a curving stair in a round wall (a stair's `arc`) is built a short way in past each of its
+     arches, so the arch shows its steps turning away round the wall, not a dark recess: a landing in the arch's near
+     half, ten treads on from its middle (up from the foot, down from the head), the wall's outer face and the ceiling stepping with them,
+     closed past sight by the curve. The way still takes him to the room at its other end (v13) */
+  function arcStub(s, Q, w, id) {
+    var A = s.arc, c = A.c, ri = A.r_in, ro = A.r_out, b0 = A.bearings[0], b1 = A.bearings[1];
+    var sweep = ((b1 - b0) % 360 + 360) % 360, n = s.treads || 20, db = sweep / n, rise = s.rise || (s.to - s.from) / n;
+    var foot = Math.abs(Q.floor - s.from) <= Math.abs(Q.floor - s.to), dir = foot ? 1 : -1, bA = foot ? b0 : b1;
+    var half = (w / 2 + 0.1) / ri * 180 / Math.PI, HEAD = 2.0, N = Math.min(10, n);
+    function seg(bS, bE, zLo, zHi, rIn, rOut, mat, layer, nm) {
+      var bm = (bS + bE) / 2, a = bm * Math.PI / 180, rm = (rIn + rOut) / 2;
+      var p = toLocal(c[0] + rm * Math.sin(a), c[1] + rm * Math.cos(a), zLo);
+      var m = slab(rOut - rIn, zHi - zLo, Math.abs(bE - bS) * Math.PI / 180 * rm + 0.02, mat, layer);
+      m.position.set(p.x, p.y + (zHi - zLo) / 2, p.z); m.rotation.y = (90 - bm) * Math.PI / 180;
+      m.name = Q.id + '-stub-' + id + '-' + nm; group.add(m);
+    }
+    var fz = Q.floor, lo = foot ? fz : fz - N * rise;
+    seg(bA - dir * half, bA, fz - 0.3, fz, ri - 0.02, ro, mats.floor, 'floor', 'landing');
+    seg(bA - dir * half, bA, fz + HEAD, fz + HEAD + 0.2, ri - 0.02, ro, mats.ceil, 'ceiling', 'landing-ceil');
+    seg(bA - dir * half, bA, lo - 0.6, fz + HEAD + 0.2, ro, ro + 0.1, mats.wall, 'wall', 'landing-wall');
+    for (var k = 1; k <= N; k++) {
+      var bS = bA + dir * (k - 1) * db, bE = bS + dir * db, top = fz + dir * k * rise;
+      seg(bS, bE, foot ? fz - 0.3 : top - 0.4, top, ri - 0.02, ro, mats.stair, 'stair', 'tread-' + k);
+      seg(bS, bE, Math.max(top, fz) + HEAD, Math.max(top, fz) + HEAD + 0.2, ri - 0.02, ro, mats.ceil, 'ceiling', 'ceil-' + k);
+      seg(bS, bE, lo - 0.6, Math.max(top, fz) + HEAD + 0.2, ro, ro + 0.1, mats.wall, 'wall', 'wall-' + k);
+    }
+    var bZ = bA + dir * N * db;
+    seg(bZ, bZ + dir * 1.5, lo - 0.6, fz + N * rise + HEAD + 0.2, ri - 0.02, ro + 0.1, mats.wall, 'wall', 'end');
+  }
   /* v10: a floor or ceiling the shape of a place's area (a round room's, a ring's with its hole), at height z */
   function areaMesh(Q, z, mat, layer) {
     function trace(path, pts) { path.moveTo(pts[0][0], pts[0][1]); for (var k = 1; k < pts.length; k++) path.lineTo(pts[k][0], pts[k][1]); }
@@ -460,7 +489,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           return;
         }
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
-        if (via) to = via;
+        if (via) {
+          var sv = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
+          if (sv && sv.arc) arcStub(sv, Q, w, g.op.id);
+          to = via;
+        }
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
         var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;
         if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
