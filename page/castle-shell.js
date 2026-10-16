@@ -34,6 +34,8 @@
    v18 (model v45): the start turns all the way round where its way out would lie past the head's turn; up a stair in a
    wall he starts a step inside the room.
    v19 (model v46): a rail round a hatch or a stair's opening is drawn; a way off the next place's far side leads on.
+   v23 (model v53): a room's `heads` raise its ceiling in strips across it; an arch's `soffit` gives its head at each
+   face, raked through the wall where they differ; a way's `sills` its sill at a face whose floor lies lower.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -350,6 +352,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     var H = (Q.ceiling != null ? Q.ceiling : Q.floor + 12) - Q.floor;
     if (Q.sky) H = Q.sky.breast;                                         /* v10: the leads' walls are their breast */
+    var HD = (Q.rec && !Q.rec.group && !Q.area && Q.rec.heads || []).map(function (k) { return { a: k.rect[0], b: k.rect[2], h: k.z - Q.floor }; });
+    function headAt(x) { var z = H; HD.forEach(function (k) { if (x > k.a - 0.01 && x < k.b + 0.01) z = Math.max(z, k.h); }); return z; }
     var c = toLocal((x0 + x1) / 2, (y0 + y1) / 2, Q.floor);
     if (Q.area) { var fa = areaMesh(Q, Q.floor, mats.floorD, 'floor'); fa.name = Q.id + '-floor'; group.add(fa); }
     else {
@@ -359,8 +363,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (Q.roof) buildRoof(Q);
     else if (Q.ceiling != null && Q.area) { var ca = areaMesh(Q, Q.ceiling, mats.ceilD, 'ceiling'); ca.name = Q.id + '-ceiling'; group.add(ca); }
     else if (Q.ceiling != null) {
-      var ceil = quad(x1 - x0, y1 - y0, mats.ceil, 'ceiling');
-      ceil.rotation.x = Math.PI / 2; ceil.position.set(c.x, c.y + H, c.z); ceil.name = Q.id + '-ceiling'; group.add(ceil);
+      /* v23 (the Found list): a room's `heads`, strips right across it where its ceiling stands higher (the listeners'
+         gallery over its two flights, model v53), the ceiling drawn strip by strip at its height, a riser between */
+      var cuts = [x0, x1];
+      HD.forEach(function (k) { cuts.push(Math.max(x0, Math.min(x1, k.a)), Math.max(x0, Math.min(x1, k.b))); });
+      cuts.sort(function (p, q) { return p - q; });
+      for (var ci = 0, prev = null; ci < cuts.length - 1; ci++) {
+        var xa = cuts[ci], xb = cuts[ci + 1];
+        if (xb - xa < 0.01) continue;
+        var hz = headAt((xa + xb) / 2), cp = toLocal((xa + xb) / 2, (y0 + y1) / 2, Q.floor);
+        var ceil = quad(xb - xa, y1 - y0, mats.ceil, 'ceiling');
+        ceil.rotation.x = Math.PI / 2; ceil.position.set(cp.x, cp.y + hz, cp.z); ceil.name = Q.id + '-ceiling' + (ci ? '-' + ci : ''); group.add(ceil);
+        if (prev != null && Math.abs(prev - hz) > 0.01) {
+          var rs = slab(0.02, Math.abs(prev - hz), y1 - y0, mats.ceil, 'ceiling'), rp = toLocal(xa, (y0 + y1) / 2, Q.floor);
+          rs.position.set(rp.x, rp.y + (prev + hz) / 2, rp.z); rs.name = Q.id + '-head-riser-' + ci; group.add(rs);
+        }
+        prev = hz;
+      }
     }
     /* v10: the lamplighters' gallery has no ceiling: over its drum the lantern's glass and its cap */
     if (Q.lantern) {
@@ -409,9 +428,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }
       s0 = Math.max(0, s0); s1 = Math.min(e.L, s1);
       var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0;
+      if (op.sills && op.sills[Q.id] != null) sill = op.sills[Q.id];      /* v23: a way's sill at a face whose floor lies lower */
       if (Q.shaft && op.z != null) sill += op.z - Q.floor;                /* v17: in a stair's well, at its own height */
       var h = Q.sky ? (op.h || 2.2) + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, (op.h || 2.2) + sill);
-      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid });
+      /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
+      var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
+      if (near != null) h = near - Q.floor;
+      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
+        soffit: near != null ? [h, far != null ? far - Q.floor : h] : null });
       spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
@@ -469,6 +493,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
+        /* v23 (the Found list): an arch's soffit through the wall from its head at this face to its head at the far
+           face, raked where they differ (the flanker's arch over the listeners' gallery's west flight, 1.8 over every
+           nosing), its jambs carried up to it */
+        if (g.soffit) {
+          var hA = g.soffit[0], hB = g.soffit[1], top = Math.max(hA, hB) + 0.1, run = Math.hypot(t, hB - hA);
+          piece(Math.max(0, g.s0 - 0.3), g.s0, HE, top, Q.id + '-jamb-a-' + g.op.id);
+          piece(g.s1, Math.min(L, g.s1 + 0.3), HE, top, Q.id + '-jamb-b-' + g.op.id);
+          var so = slab(w, 0.1, run, mats.wall, 'wall'), sp2 = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
+          so.rotation.order = 'YXZ'; so.rotation.y = ang; so.rotation.x = -Math.atan2(hB - hA, t);
+          so.position.set(sp2.x, sp2.y + (hA + hB) / 2 + 0.05, sp2.z); so.name = Q.id + '-soffit-' + g.op.id; group.add(so);
+        }
         /* v10: a door taller than the leads' breast stands in its own wall, the cap house's, half a metre each side */
         if (Q.sky && g.h > HE) {
           piece(Math.max(0, g.s0 - 0.5), g.s0, HE, g.h + 0.4, Q.id + '-jamb-a-' + g.op.id);
@@ -519,6 +554,21 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
       });
       piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
+      /* v23: under a raised head the wall goes up to it, over an opening from its own head */
+      HD.forEach(function (k, ki) {
+        if (k.h <= HE + 0.01) return;
+        var sa, sb;
+        if (Math.abs(ux) < 1e-6) { if (a[0] < k.a - 0.01 || a[0] > k.b + 0.01) return; sa = 0; sb = L; }
+        else { var p1 = (k.a - a[0]) / ux, p2 = (k.b - a[0]) / ux; sa = Math.max(0, Math.min(p1, p2)); sb = Math.min(L, Math.max(p1, p2)); }
+        if (sb - sa < 0.01) return;
+        var cuts2 = [sa, sb];
+        gs.forEach(function (g) { if (g.s1 > sa && g.s0 < sb) cuts2.push(Math.max(sa, g.s0), Math.min(sb, g.s1)); });
+        cuts2.sort(function (p, q) { return p - q; });
+        for (var j2 = 0; j2 < cuts2.length - 1; j2++) {
+          var m2 = (cuts2[j2] + cuts2[j2 + 1]) / 2, gg = gs.filter(function (g) { return g.s0 < m2 && g.s1 > m2; })[0];
+          piece(cuts2[j2], cuts2[j2 + 1], gg ? Math.max(HE, gg.h) : HE, k.h, Q.id + '-raised-' + i + '-' + ki + '-' + j2);
+        }
+      });
       /* v10: the leads' merlons on the breast, 1.5 long every 3.0, clear of its doors; each crenel between barred */
       if (Q.sky && MER > HE) {
         var clear = function (s0, s1) { return !gs.some(function (g) { return s1 > g.s0 - 0.6 && s0 < g.s1 + 0.6; }); };
