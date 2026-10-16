@@ -33,6 +33,7 @@
    curved face is cut on into the next side (the casemate's powder-door).
    v18 (model v45): the start turns all the way round where its way out would lie past the head's turn; up a stair in a
    wall he starts a step inside the room.
+   v19 (model v46): a rail round a hatch or a stair's opening is drawn; a way off the next place's far side leads on.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -572,7 +573,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* one step on: the ways joined to this one by an open mouth, built in the same frame */
   /* (only a place whose wall the mouth is in; a way to a place not yet in the model, or not beside it, shows a dark
      recess beyond the mouth for now) */
-  out.ways.slice().forEach(function (w) {
+  var firstWays = out.ways.slice();
+  firstWays.forEach(function (w) {
     if (out.places.some(function (q) { return q.id === w.to; })) return;
     /* a way out of a hidden place (v8): its far side is its own shell, a tap away, never built here, since the two
        share a wall line the model draws without its thickness */
@@ -585,11 +587,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
     if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; }
     /* v13: a deep way (the flanker's arch through the spur's 1.2) finds its far room at its far face, as its gap does */
-    else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 || Q.shaft ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
-    var depth = 3.0, rec = slab(w.w + 0.4, w.h + 0.2, depth, F.solid(0x141210), 'way');
+    else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 || Q.shaft ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }    var depth = 3.0, rec = slab(w.w + 0.4, w.h + 0.2, depth, F.solid(0x141210), 'way');
     rec.position.set(w.mid.x - w.inward.x * (depth / 2 + 0.9), w.mid.y + w.sill + w.h / 2, w.mid.z - w.inward.z * (depth / 2 + 0.9));
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
     group.add(rec);
+  });
+  /* v19 (the Found list): a way off the far side of the next place, added as that place was built (lake-passage-b-north
+     seen from the lake-face corridor), leads on to the place there, a tap away past the dark, as a way up a stair in a
+     wall does (v13); to a built room, its page */
+  out.ways.forEach(function (w) {
+    if (firstWays.indexOf(w) >= 0 || w.back || w.place === P.id) return;
+    var Q = findPlace(M, w.to);
+    if (!Q || Q.id === P.id) return;
+    w.built = true; if (Q.rec && Q.rec.page) w.page = Q.rec.page;
   });
 
   /* v14: a ladder or trapdoor through a floor (a stair with `rooms` and a `rect`, no span or arc: the gate loft's, the
@@ -614,6 +624,25 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     out.ways.push({ id: s.id, to: to, mesh: sq, w: Math.min(wx, wy), h: 0.8, mid: mid, foot: toLocal(mx, my, P.floor), inward: new THREE.Vector3(ix / il, 0, -iy / il),
       place: P.id, at: [mx, my], half: Math.max(wx, wy) / 2, sill: 0, lift: 0, level: P.floor, back: false, via: false, depth: 0,
       hatch: down ? 'down' : 'up', built: !!findPlace(M, to) });
+  });
+  /* v19 (the Found list): a rail round a hatch or a stair's opening in the boards (a feature with `rect`, `z`, `h` and
+     `sides`, a side's span by its own name where it stops short: the feast loft's, ledger line 89 a; the drying
+     loft's, line 82): a top rail and posts about a metre apart, stair grey; nothing to tap */
+  (M.features || []).forEach(function (ft) {
+    if (!ft.rect || !ft.sides || !ft.h || ft.z == null || slug(ft.room || '') !== P.id) return;
+    var R = ft.rect, T = 0.06;
+    ft.sides.forEach(function (sd) {
+      var ns = sd === 'north' || sd === 'south', sp = ft[sd] || (ns ? [R[0], R[2]] : [R[1], R[3]]);
+      var fix = sd === 'west' ? R[0] : sd === 'east' ? R[2] : sd === 'south' ? R[1] : R[3], L = sp[1] - sp[0];
+      if (L <= 0) return;
+      var at = function (u) { return ns ? toLocal(u, fix, ft.z) : toLocal(fix, u, ft.z); }, c = at((sp[0] + sp[1]) / 2);
+      var bar = slab(ns ? L + T : T, T, ns ? T : L + T, mats.stair, 'stair');
+      bar.position.set(c.x, c.y + ft.h - T / 2, c.z); bar.name = P.id + '-rail-' + ft.id + '-' + sd; group.add(bar);
+      for (var n = Math.max(1, Math.round(L)), i = 0; i <= n; i++) {
+        var p = at(sp[0] + L * i / n), post = slab(T, ft.h, T, mats.stair, 'stair');
+        post.position.set(p.x, p.y + ft.h / 2, p.z); post.name = P.id + '-rail-post-' + ft.id + '-' + sd + '-' + i; group.add(post);
+      }
+    });
   });
 
   /* the stairs in the places built: a straight flight's treads along its rise, from its span's foot to its head; a
