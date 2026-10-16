@@ -887,13 +887,23 @@
     /* The week's word from a chain's `words` (the password, board req 72): the nth of its list in the nth week since
        its `first_monday`, so the story starts where Harry's did and both castles agree; the list is only ever added
        to at its end, so no week's word moves. Past the end it starts again at `again_from` (the first invented
-       word). Before the first Monday it is the first word; `last` before the first week is `none`. */
+       word). Before the first Monday it is the first word; `last` before the first week is `none`.
+       A list `by_year` (the password, Magic's req 596, the change list's Rework 19) gives each visited castle year its
+       own list, its book's words alternating with the invented ones (`later` for a year not yet listed), and
+       `first_monday: "term"` counts from the term's first Monday of the visited school year, the first Monday on or
+       after 1 September, on the castle's calendar day, so both boys' castles of one year agree. */
+    function termMonday(d) {
+      var y = d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1, s = new Date(y, 8, 1, 12);
+      return new Date(y, 8, 1 + (8 - s.getDay()) % 7, 12);
+    }
     function weekWord(name, off) {
       var d = wordDefs[name], list = d.list || [];
+      if (d.by_year) list = d.by_year[String(castleYear())] || d.by_year.later || list;
+      var term = d.first_monday === 'term', day = term ? castleDay() : nowDate();
       var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(d.first_monday || '');
-      if (!m) note('words ' + name + ': no first_monday, so this week is its first');
-      var first = m ? weekNumber(new Date(+m[1], +m[2] - 1, +m[3])) : weekNumber(nowDate());
-      var n = Math.max(0, weekNumber(nowDate()) - first) + off;
+      if (!m && !term) note('words ' + name + ': no first_monday, so this week is its first');
+      var first = term ? weekNumber(termMonday(day)) : m ? weekNumber(new Date(+m[1], +m[2] - 1, +m[3])) : weekNumber(day);
+      var n = Math.max(0, weekNumber(day) - first) + off;
       if (n < 0 || !list.length) return 'none';
       var from = Math.min(Math.max(0, d.again_from || 0), list.length - 1);
       if (n >= list.length) n = from + (n - from) % (list.length - from);
