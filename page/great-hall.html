@@ -928,6 +928,11 @@ function limits(s) {
 }
 var START = shell.stands.filter(function (s) { return s.name === 'start'; })[0] || shell.stands[0];
 var STAFF_STAND = shell.stands.filter(function (s) { return s.name === 'staff table'; })[0];
+/* the false panel (the Architect's hall-panel, ledger 43; how it opens Magic's req 516, its moments Events'): wall to the
+   eye, with the shell's unseen tap over its face. Nothing marks it: from the staff table a tap on it walks him the few
+   steps to its stand, as to any thing near (the shells' way, Events' req 534); there a tap is told as "hall panel", for
+   the records to answer; Back from it is the staff table's. Anywhere else it is wall */
+var PANEL = (shell.hidden || []).filter(function (h) { return h.id === 'hall-panel'; })[0] || null;
 var here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
 var ways = shell.ways.concat(shell.doors), wayMeshes = ways.map(function (d) { return d.mesh; });
 function headPose(pos, look) {
@@ -949,7 +954,7 @@ function walkTo(s) {
   startLeg();
   return true;
 }
-function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(START); }
+function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(PANEL && here === PANEL.stand ? STAFF_STAND : START); }
 var DRY = Q.get('travel') === 'dry', wentTo = '';   /* ?travel=dry: the veil falls and lifts, nothing loads, for a check */
 function through(d) {
   wentTo = (d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE);
@@ -1013,20 +1018,22 @@ function tap(cx, cy) {
   /* a candle or the sky answers where it is, told and given the mote, never taking him back (req 608, break 3); only
      the floor, the walls and the benches are nothing at a stop */
   var high = candleOnRay(raycaster.ray, hits.length ? hits[0].distance : 1e9) ? 'candle' : hit && hit === ceiling ? 'sky' : '';
-  var isDoors = hit && DOOR && (hit === doorway || hit === DOOR.mesh);
+  var isDoors = hit && DOOR && (hit === doorway || hit === DOOR.mesh), isPanel = !!(hit && PANEL && hit === PANEL.mesh);
   var wi = hit && !isDoors ? wayMeshes.indexOf(hit) : -1;
   if (high) { /* the mote, nothing else, until Magic's answer */ }
+  else if (isPanel && here === PANEL.stand) acted = true;
+  else if (isPanel && here === STAFF_STAND) acted = walkTo(PANEL.stand);
   else if (isDoors) {   /* the great doors: through from their stand, back to it from the staff table (§2) */
     if (here === START || here === DOOR.stand) { goThroughDoors(); acted = true; } else { goBack(); acted = true; }
   } else if (wi >= 0) {
     var d = ways[wi];
     if (here === d.stand || here === START) { if (d.mesh.userData.way && d.built) { through(d); acted = true; } }
   } else if (hit && tapTop.indexOf(hit) >= 0) {   /* the platform, the staff table, the gold chair: walk up to them, or at */
-    if (here === START) acted = walkTo(STAFF_STAND);   /* their stop answer where they are (req 608, break 2) */
+    if (here === START || (PANEL && here === PANEL.stand)) acted = walkTo(STAFF_STAND);   /* their stop answer where they are (req 608, break 2) */
   } else if (here !== START) { goBack(); acted = true; }
   /* every tap on a thing is told to the runtime (Interaction's §10, req 479): the platform, the staff table, the gold
      chair, the doors' way, the sky and a candle, by their names with spaces, so a record waiting on one can fire */
-  var told = high || (isDoors ? DOOR.id : wi >= 0 ? ways[wi].id : hit && tapTop.indexOf(hit) >= 0 ? hit.name : '');
+  var told = high || (isPanel && here === PANEL.stand && !tween ? PANEL.id : '') || (isDoors ? DOOR.id : wi >= 0 ? ways[wi].id : hit && tapTop.indexOf(hit) >= 0 ? hit.name : '');
   if (told) { lastTold = told.replace(/-/g, ' '); if (events && events.tap) events.tap(lastTold); }
   kit.tapped(acted);
 }
