@@ -48,7 +48,13 @@
     { name: 'Note', kind: 'note', start: 'A scrap of parchment, left on the table. Blank? It might be invisible ink. Tap it three times.' },
     { name: 'Library', kind: 'book', start: 'A library book, one page left blank in the middle of a chapter. Tap it three times.' },
     { name: 'Diary', kind: 'diary', start: 'An old diary, every page blank. It might be invisible ink. Tap it three times.' } ];
-  var page = Math.max(0, Math.min(2, (Number(qs.get('page')) || 1) - 1)), P = PAGES[page];
+  /* Rework 17 of the Ministry's list (16 October 2026): Riddle's diary, the Revealer and Ron's line are the charter's
+     own plot object (CoS 13), set aside: the Diary page shows only with ?setaside, kept until Godric's yes to remove it
+     (docs/ministry/set-aside.md). The blank notice and the library page stay. The gesture, three taps on the sheet, is
+     every pupil's, from the CoS castle (the touch review's KEEP of magic-aparecium-notice t1). */
+  var SET_ASIDE = /[?&]setaside(=|&|$)/.test(location.search);
+  if (!SET_ASIDE) PAGES.pop();
+  var page = Math.max(0, Math.min(PAGES.length - 1, (Number(qs.get('page')) || 1) - 1)), P = PAGES[page];
   var taps = [], reveal = null, shown = null, rubbing = null, stage = 'tap', last = null, guide = null, nothing = 0;
 
   function resize() {

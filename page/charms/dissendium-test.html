@@ -45,7 +45,16 @@
    word's card and the swing with its protractor and chord are LumosSpells.openHump, the call the witch's landing makes
    (the card says the word for him while the ear waits on its probe; here the map's bubble gives the word, as in the
    book, where the castle has the twins' note); the page draws her, and the lid where the swing puts it. Down in the
-   burrow, the twins' chalk line, seen only by wand light (req 178). */
+   burrow, the twins' chalk line, seen only by wand light (req 178).
+   Rework 18 of the Ministry's list (16 October 2026): the Marauder's Map is a wink only, so its corner, his dot, the
+   speech bubble and the voice down the slide (the touch review's DROP of charms-q5-dissendium-hump t2) are set aside,
+   shown only with ?setaside until Godric's yes to remove them. The word comes instead from a scrap dropped by her
+   plinth, one twin to the other, never written to him (Magic's req 597; its words as Events' fred-note.json has
+   them). Nothing waits at the passage's far end: it twists on into the dark until the village opens (B17). The
+   chalk scrawl stays, from the PoA castle, leading nowhere yet (the touch review's ADJUST of magic-b8-witch-place
+   t2, Magic's req 595). The page itself opens only once PoA is finished. */
+  var SET_ASIDE = /[?&]setaside(=|&|$)/.test(location.search);
+  var NOTE = 'George: her hump, Dissendium. Don\u2019t let Percy see. F.';
 (function () {
   'use strict';
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
@@ -106,9 +115,11 @@
       onTap: function (n) {
         noise(0.05, 2600, 0.5); taps = n; thud = performance.now();
         if (n === 1) {
-          say('Nothing happened. Look at the map: by your dot, a tiny speech bubble...');
+          if (SET_ASIDE) say('Nothing happened. Look at the map: by your dot, a tiny speech bubble...');
+          else say('Nothing happened. By her plinth, a scrap of parchment someone dropped...');
           bubble = performance.now() + 700;
-          setTimeout(function () { if (stage === 'tap' && taps === 1) say('The map says <b><i>Dissendium</i></b>. Tap the word to whisper it, then tap her hump again.'); }, 1500);
+          setTimeout(function () { if (stage === 'tap' && taps === 1) say(SET_ASIDE ? 'The map says <b><i>Dissendium</i></b>. Tap the word to whisper it, then tap her hump again.'
+            : 'In a hurried scrawl, one twin to the other: <i>&ldquo;' + NOTE + '&rdquo;</i> Tap the word to whisper it, then tap her hump again.'); }, 1500);
         } else say('Nothing again. Whisper the word first: tap <b><i>Dis-sen-di-um</i></b>, then her hump.');
       },
       onWord: function () { noise(0.5, 3200, 0.12); say('<i>Dissendium...</i> you whisper. Now tap her hump again.'); },
@@ -134,7 +145,8 @@
     var g = geo(), m = { x: (g.hinge.x + g.edge.x) / 2, y: (g.hinge.y + g.edge.y) / 2 };
     if (p && Math.hypot(p.x - m.x, p.y - m.y) > g.L * 0.8) { say('Tap the hole in her hump to climb in.'); return; }
     stage = 'slide'; slideAt = performance.now(); noise(1.4, 500, 0.25);
-    say('Headfirst into the hump, and down a long stone slide... From the map in your pocket, a faint voice: <i>Messrs Moony, Wormtail, Padfoot and Prongs remind you that Lumos is needed at the bottom.</i>');
+    say(SET_ASIDE ? 'Headfirst into the hump, and down a long stone slide... From the map in your pocket, a faint voice: <i>Messrs Moony, Wormtail, Padfoot and Prongs remind you that Lumos is needed at the bottom.</i>'
+      : 'Headfirst into the hump, and down a long stone slide...');
     setTimeout(function () { if (stage !== 'slide') return; stage = 'dark'; noise(0.25, 120, 0.6);
       say('Cold, damp earth underfoot, and pitch dark. Light your wand: flick up, <b><i>Lumos</i></b>.'); }, SLIDE);
   }
@@ -144,7 +156,7 @@
     var j = LumosSpells.judgeFlick(pts, W, H, ease);
     if (j.verdict === 'lumos') {
       stage = 'lit'; litAt = performance.now(); noise(0.4, 900, 0.2);
-      say('<b><i>Lumos!</i></b> A narrow, low, earthy passage, twisting away like a giant rabbit\'s burrow. Honeydukes is at the far end (Book 3).');
+      say('<b><i>Lumos!</i></b> A narrow, low, earthy passage, twisting away like a giant rabbit\'s burrow, on into the dark.');
     } else if (j.reason !== 'tap') say(DARK[j.verdict === 'nox' ? 'nox' : j.reason] || DARK.aside);
     return j;
   }
@@ -201,7 +213,21 @@
   }
   /* the angle at the hinge and the gap at its edge: drawn by LumosSpells.openHump's layer */
   /* a corner of the map, his dot, and the tiny speech bubble (PoA 10) */
+  function drawNote(now) {   /* the twins' dropped scrap by her plinth: folded, then open on the scrawl once he has tapped */
+    var g = geo(), w = Math.min(W * 0.3, S * 0.36), x = 12, y = H - w * 0.5 - Math.max(64, H * 0.1), open = bubble && now > bubble;
+    cx.save();
+    if (!open) { cx.translate(x + w * 0.2, y + w * 0.3); cx.rotate(-0.2); cx.fillStyle = '#d9c79a'; cx.fillRect(0, 0, w * 0.22, w * 0.14);
+      cx.strokeStyle = 'rgba(90,64,30,0.6)'; cx.beginPath(); cx.moveTo(0, w * 0.07); cx.lineTo(w * 0.22, w * 0.07); cx.stroke(); }
+    else { var k = Math.min(1, (now - bubble) / 500), hh = w * 0.42; cx.globalAlpha = k;
+      cx.translate(x, y); cx.rotate(-0.04); cx.fillStyle = '#e2d3a8'; cx.fillRect(0, 0, w, hh);
+      cx.strokeStyle = 'rgba(90,64,30,0.4)'; cx.beginPath(); cx.moveTo(w / 2, 0); cx.lineTo(w / 2, hh); cx.stroke();
+      cx.fillStyle = '#3a2a1a'; cx.textAlign = 'left'; cx.textBaseline = 'top'; var fs = Math.round(Math.max(10, w * 0.065));
+      cx.font = 'italic ' + fs + 'px Georgia, serif';
+      ['George: her hump,', 'Dissendium.', 'Don\u2019t let Percy see. F.'].forEach(function (t, i) { cx.fillText(t, w * 0.08, hh * 0.16 + i * fs * 1.35); }); }
+    cx.restore();
+  }
   function drawMap(now) {
+    if (!SET_ASIDE) { drawNote(now); return; }
     var w = Math.min(W * 0.34, S * 0.42), h = w * 0.62, x = 12, y = H - h - Math.max(64, H * 0.1);
     cx.save(); cx.fillStyle = '#d9c79a'; cx.fillRect(x, y, w, h);
     cx.strokeStyle = 'rgba(90,64,30,0.75)'; cx.lineWidth = 1.2;
@@ -230,7 +256,7 @@
       cx.beginPath(); cx.moveTo(sx, H - sy); cx.lineTo(sx, H - sy - 80); cx.stroke(); }
     /* t2: a faint voice from the map, its words in the map's ink, coming and going */
     var v = Math.max(0, Math.min(1, (now - slideAt - 500) / 600, (slideAt + SLIDE - now) / 500)), fs = Math.round(Math.max(13, S * 0.034));
-    if (v > 0) {
+    if (v > 0 && SET_ASIDE) {
       var words = ['Messrs Moony, Wormtail, Padfoot and Prongs', 'remind you that Lumos', 'is needed at the bottom.'];
       cx.save(); cx.globalAlpha = v * 0.75; cx.fillStyle = '#d9c79a'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
       cx.font = 'italic ' + fs + 'px Georgia, serif';
