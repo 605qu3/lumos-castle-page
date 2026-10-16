@@ -144,7 +144,8 @@
         "item": "screaming-yoyo",
         "when": [
           "drawn screaming-yoyo = yes",
-          "sofa_finds >= 12"
+          "sofa_finds >= 12",
+          "year >= 4"
         ]
       },
       {
@@ -232,7 +233,8 @@
       {
         "item": "quiz-sheet",
         "when": [
-          "drawn quiz-sheet = yes"
+          "drawn quiz-sheet = yes",
+          "year >= 2"
         ],
         "states": [
           "blank",
@@ -450,7 +452,7 @@
         "item": "confetti",
         "when": [
           "drawn confetti = yes",
-          "date = 02-14"
+          "castle date >= 2 02-14"
         ]
       },
       {

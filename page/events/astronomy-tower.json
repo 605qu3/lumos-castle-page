@@ -5,8 +5,7 @@
     {
       "when": [
         "place = astronomy tower top",
-        "weekday = wednesday",
-        "hour >= 23",
+        "time = night",
         "occasion != christmas",
         "occasion != christmas day",
         "occasion != easter"
@@ -18,21 +17,7 @@
     {
       "when": [
         "place = astronomy tower top",
-        "weekday = thursday",
-        "hour < 1",
-        "occasion != christmas",
-        "occasion != christmas day",
-        "occasion != easter"
-      ],
-      "show": [
-        "a class at the ring, a brass telescope on each stand pointed at the sky, the teacher at the round table with the night's star chart and the shaded lantern turned low; two free places side by side at the north of the ring, a telescope each and the night's chart on a board between them"
-      ]
-    },
-    {
-      "when": [
-        "place = astronomy tower top",
-        "weekday = wednesday",
-        "hour >= 23",
+        "time = night",
         "date >= 06-01",
         "date <= 06-07"
       ],
@@ -43,20 +28,7 @@
     {
       "when": [
         "place = astronomy tower top",
-        "weekday = thursday",
-        "hour < 1",
-        "date >= 06-02",
-        "date <= 06-08"
-      ],
-      "show": [
-        "an exam night: a sheet of parchment and a quill at every place on the ring, nobody speaking"
-      ]
-    },
-    {
-      "when": [
-        "place = astronomy tower top",
-        "hour >= 1",
-        "hour < 23"
+        "time != night"
       ],
       "show": [
         "the top empty and out of bounds, nobody at the ring, the round table bare but for its chart weighted flat with four stones"
@@ -65,28 +37,7 @@
     {
       "when": [
         "place = astronomy tower top",
-        "hour >= 23",
-        "weekday != wednesday"
-      ],
-      "show": [
-        "the top empty and out of bounds, nobody at the ring, the round table bare but for its chart weighted flat with four stones"
-      ]
-    },
-    {
-      "when": [
-        "place = astronomy tower top",
-        "hour < 1",
-        "weekday != thursday"
-      ],
-      "show": [
-        "the top empty and out of bounds, nobody at the ring, the round table bare but for its chart weighted flat with four stones"
-      ]
-    },
-    {
-      "when": [
-        "place = astronomy tower top",
-        "hour >= 23",
-        "weekday = wednesday",
+        "time = night",
         "occasion = christmas"
       ],
       "show": [
@@ -96,19 +47,7 @@
     {
       "when": [
         "place = astronomy tower top",
-        "hour < 1",
-        "weekday = thursday",
-        "occasion = christmas"
-      ],
-      "show": [
-        "the top empty and out of bounds, nobody at the ring, the round table bare but for its chart weighted flat with four stones"
-      ]
-    },
-    {
-      "when": [
-        "place = astronomy tower top",
-        "hour >= 23",
-        "weekday = wednesday",
+        "time = night",
         "occasion = christmas day"
       ],
       "show": [
@@ -118,30 +57,7 @@
     {
       "when": [
         "place = astronomy tower top",
-        "hour < 1",
-        "weekday = thursday",
-        "occasion = christmas day"
-      ],
-      "show": [
-        "the top empty and out of bounds, nobody at the ring, the round table bare but for its chart weighted flat with four stones"
-      ]
-    },
-    {
-      "when": [
-        "place = astronomy tower top",
-        "hour >= 23",
-        "weekday = wednesday",
-        "occasion = easter"
-      ],
-      "show": [
-        "the top empty and out of bounds, nobody at the ring, the round table bare but for its chart weighted flat with four stones"
-      ]
-    },
-    {
-      "when": [
-        "place = astronomy tower top",
-        "hour < 1",
-        "weekday = thursday",
+        "time = night",
         "occasion = easter"
       ],
       "show": [

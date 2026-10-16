@@ -305,9 +305,7 @@
     {
       "when": [
         "place = greenhouses",
-        "lessons = on",
-        "weekday = monday",
-        "hour < 13",
+        "time != night",
         "year = 2",
         "castle date < 2 05-30"
       ],
