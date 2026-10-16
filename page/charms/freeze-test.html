@@ -189,7 +189,7 @@
       frozen.cage = performance.now();
       if (round < 2) { say('Into the cage they go, as Hermione stuffed hers back.'); wait = setTimeout(function () { wait = null; choose(round + 1); }, 3200); }
       else if (round === 2) { say('Hermione managed two at once; you caught three. Into the cage, and here come <b>four</b>.'); wait = setTimeout(function () { wait = null; choose(3); }, 3600); }
-      else { done = true; say('<b>Full marks.</b> Hermione managed two at once; you caught four. Two points fix a line, and every point on it is caught too. Lockhart, under his desk, is very impressed.'); }
+      else { done = true; say('Hermione managed two at once; you caught four. Two points fix a line, and every point on it is caught too. Lockhart, under his desk, is very impressed.'); }
     }, 3600);
     return j;
   }

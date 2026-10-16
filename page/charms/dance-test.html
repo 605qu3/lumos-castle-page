@@ -216,13 +216,13 @@
         say(PARTS[part].end((j.time / 1000).toFixed(1)));
         if (part < PARTS.length - 1) wait = setTimeout(function () { wait = null; startPart(part + 1); }, 7000);
         else { done = true;
-          wait = setTimeout(function () { wait = null; say('<b>Full marks.</b> Speed is how far over how long. Slow ticks and big steps, or quick ticks and steps half as long: a third of the desk a second, the same. Big steps on the quick ticks: two thirds a second, twice as fast.'); }, 6000); }
+          wait = setTimeout(function () { wait = null; say('Speed is how far over how long. Slow ticks and big steps, or quick ticks and steps half as long: a third of the desk a second, the same. Big steps on the quick ticks: two thirds a second, twice as fast.'); }, 6000); }
         return;
       }
       say('The desk split into <b>' + (WORD[n2] || n2) + ' equal steps</b>: each one is <b>' + SHARE[n2] + '</b> of the desk, 1/' + n2 + '.' +
         (j.spread >= 0.05 ? ' Under yours, dashed, the exactly equal steps; your step furthest out is ringed.' : '') + wob);
       if (round === 2) { done = true;
-        wait = setTimeout(function () { wait = null; say('<b>Full marks.</b> Flitwick called them in one by one to make a pineapple tap-dance across a desk, and yours did, in ' + WORD[n2] + ' equal steps.');
+        wait = setTimeout(function () { wait = null; say('Flitwick called them in one by one to make a pineapple tap-dance across a desk, and yours did, in ' + WORD[n2] + ' equal steps.');
           wait = setTimeout(function () { wait = null; choose(3); }, 6000); }, 4200); }
       else wait = setTimeout(function () { wait = null; choose(round + 1); }, 6500);
     }, total);

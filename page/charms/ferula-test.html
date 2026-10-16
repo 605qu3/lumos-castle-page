@@ -131,18 +131,15 @@
     /* bound or gaps: the bandage spins up along his own turns */
     spun = { pts: pts.slice(), at: performance.now(), j: j }; trail = null; stage = 'spun';
     noise(0.7, 1400, 0.18);
-    var sum = ' The leg is ' + R.cm + ' cm and the bandage ' + R.band + ' cm wide: ' + R.cm + ' ÷ ' + R.band + ' = ' + need() + ' turns at least. You made ' + j.turns + '.';
-    if (R.thin) sum = sum.replace('The leg is', 'The wand is');
     if (j.verdict === 'bound') {
       if (guide) guide.hit(lv > 0);
       LumosSpells.learn('ferula');
-      if (j.turns < need()) sum = sum.replace(/You made \d+\.$/, 'You made ' + j.turns + ': pulled tight, it just covers.');
-      say('<b>Ferula!</b> The bandage spins up and pulls tight.' + sum);
+      say('<b>Ferula!</b> The bandage spins up and pulls tight' + (j.turns < need() ? ', and only just covers.' : '.'));
       if (round < 2) wait = setTimeout(function () { wait = null; choose(round + 1); }, 6800);
       else { done = true; setTimeout(function () { if (done) say('All three strapped. Madam Pomfrey could not have done it better. (She would say she could.)'); }, 5200); }
     } else {
       if (guide) guide.miss();
-      say('The bandage spins up, but ' + R.the + ' shows through, widest where it is ringed: ' + gapWords(j) + '.' + sum);
+      say('The bandage spins up, but ' + R.the + ' shows through, widest where it is ringed: ' + gapWords(j) + '.');
       wait = setTimeout(function () { wait = null; stage = 'coil'; spun = null; say('Unwind it and try again: <b>more turns, closer together</b>.'); }, 5200);
     }
     return j;
@@ -230,9 +227,18 @@
     cx.font = 'italic ' + fs + 'px Georgia, serif'; cx.fillStyle = '#141b23'; cx.textAlign = 'right';
     cx.fillText(R.cm + ' cm', bx - 6, (leg.a.y + leg.b.y) / 2);
     cx.textAlign = 'left'; var tx = a.x + r * 1.5 + Math.max(5, r * 0.32) + 8;
-    cx.fillText(R.band + ' cm wide', tx, leg.a.y - leg.L * 0.15);
-    cx.fillText('needs ' + need(), tx, leg.a.y - leg.L * 0.15 + fs * 1.3);
-    cx.fillText('yours ' + spun.j.turns, tx, leg.a.y - leg.L * 0.15 + fs * 2.6);
+    /* in the scene's own hand, never the page's voice (Charms' change list, Rework 4): the bandage's width, the sum,
+       and his own turns as tally marks, with no word on them */
+    cx.fillText(R.band + ' cm', tx, leg.a.y - leg.L * 0.15);
+    cx.fillText(R.cm + ' ÷ ' + R.band + ' = ' + need(), tx, leg.a.y - leg.L * 0.15 + fs * 1.3);
+    var ty = leg.a.y - leg.L * 0.15 + fs * 2.1, k;
+    cx.lineWidth = 2; cx.beginPath();
+    for (k = 0; k < spun.j.turns; k++) {
+      var gx = tx + (k % 5) * fs * 0.32 + Math.floor(k / 5) * fs * 2;
+      if (k % 5 === 4) { cx.moveTo(gx - fs * 1.4, ty + fs * 0.75); cx.lineTo(gx + fs * 0.1, ty + fs * 0.05); }
+      else { cx.moveTo(gx, ty); cx.lineTo(gx, ty + fs * 0.8); }
+    }
+    cx.stroke();
     cx.restore();
   }
   function frame(now) {

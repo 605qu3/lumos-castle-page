@@ -201,8 +201,8 @@
     else say('<b>Warm!</b> Backs to the fire, all three the same distance from it.');
     later(3800, function () {
       if (round < 2) { choose(round + 1); return; }
-      if (round === 3) { done = true; say('<b>Full marks.</b> Three in a row: no ring at all. One step out of line: exactly one.'); later(4500, function () { choose(4); }); return; }
-      if (four) { done = true; say('<b>Full marks.</b> Three friends fix one ring, and a fourth is on it only now and then: you caught him there.'); return; }
+      if (round === 3) { done = true; say('Three in a row: no ring at all. One step out of line: exactly one.'); later(4500, function () { choose(4); }); return; }
+      if (four) { done = true; say('Three friends fix one ring, and a fourth is on it only now and then: you caught him there.'); return; }
       var c = warm.c, a = 30 * Math.PI / 180, to = { x: c.x + (c.r + 2.6 * R) * Math.cos(a), y: c.y + (c.r + 2.6 * R) * Math.sin(a) };
       nev = { shown: true, since: performance.now(), dur: 1400, from: { x: W + R * 2, y: to.y }, to: to, warm: false, tries: 0 };
       say('<b>Neville</b> comes over, shivering. <b>Tap where he should stand</b> to be as warm as the others.');
@@ -227,7 +227,7 @@
       closing = performance.now();
       say('Snape crosses the yard, limping. Quick, <b>close up</b> to hide the fire: they are sure it is not allowed.');
       later(2600, function () { done = true;
-        say('<b>Full marks.</b> A smaller ring, and still all the same distance from the jar. Snape takes Harry\'s library book instead. Five points from Gryffindor.');
+        say('A smaller ring, and still all the same distance from the jar. Snape takes Harry\'s library book instead. Five points from Gryffindor.');
         later(4500, function () { choose(3); }); });
     });
   }
