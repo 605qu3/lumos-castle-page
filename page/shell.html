@@ -156,7 +156,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle.js?v=11"></script>
 <script src="castle-model.js?v=375"></script>
 <script src="castle-shell.js?v=25"></script>
-<script src="castle-events.js?v=36"></script>
+<script src="castle-events.js?v=37"></script>
 <script>
 (function () {
 'use strict';
@@ -618,12 +618,12 @@ var ROOM_THINGS = {
      desk x' 7.6 to 8.4, y' 1.0 to 3.0, 0.85 high, the signed note on its aisle half while the room shows it, its stand
      in the aisle 1.4 m off; the Restricted Section's back press (y' 31.4 to 32.0) by its bottom shelf only, the black
      and silver volume standing on it at x' 5.0, spine out, 0.45 by 0.32, 0.1 thick (the Curator's item 7), its stand
-     past the rope at y' 30.0. ?signed=on stands the note with the events absent, for checks */
+     past the rope at y' 30.0. Held (Events' req 630; Godric's 2 on events-library-note-1016, 16 October 2026: the book
+     waits until its earning is designed): the tap things `signed-note` (rect [62.88, 69.1, 63.1, 69.25], z 0.85 to
+     0.87, stand [63.0, 67.7]) and `screaming-book` (rect [33.18, 66.35, 33.5, 66.45], z 0.08 to 0.53, stand
+     [35.0, 66.4]) are taken out for now, their ids kept for when they come back */
   'library': [{ id: 'pince-desk', rect: [62.0, 69.0, 64.0, 69.8], z: [0, 0.85], col: 0x5a4c3e, still: true },
-              { id: 'signed-note', rect: [62.88, 69.1, 63.1, 69.25], z: [0.85, 0.87], col: 0xd8ccb0, stand: [63.0, 67.7], look: 0.86,
-                show: "a teacher's signed note on Madam Pince's desk, a slip of parchment folded once, the signature with a flourish" },
-              { id: 'restricted-shelf', rect: [33.0, 61.4, 33.6, 71.4], z: [0, 0.08], col: 0x4a3e32, still: true },
-              { id: 'screaming-book', rect: [33.18, 66.35, 33.5, 66.45], z: [0.08, 0.53], col: 0x2a2a2e, stand: [35.0, 66.4], look: 0.3 }],
+              { id: 'restricted-shelf', rect: [33.0, 61.4, 33.6, 71.4], z: [0, 0.08], col: 0x4a3e32, still: true }],
   'orrery-room': [{ id: 'orrery-table', circle: [160.0, 0.0], r: 0.9, z: [0, 0.75], col: 0x6a5a48, still: true },
                   { id: 'orrery-rail', ring: [160.0, 0.0], r: 1.3, gap: [200, 0.6], z: [0, 0.9], col: 0x5a4c3e, still: true },
                   { id: 'orrery-crank', at: [159.675, -0.893], bearing: 200, z: [0.75, 0.95], col: 0x9a7a3a, crank: true,
@@ -725,7 +725,7 @@ var thingCues = {
   "the crank turns slow and every planet moves together, the moon round the earth, Jupiter's little moons round Jupiter, the two wobbly ones last of all, and all of it stops when the crank does": function (k) { turnDone = 'thing'; crankTurn(roomThing('orrery-crank'), 4.5, 2); showLines([{ medium: 'seen', sound: "the crank turns slow and every planet moves together, the moon round the earth, Jupiter's little moons round Jupiter, the two wobbly ones last of all, and all of it stops when the crank does" }]); },
   /* the screaming book (Events' req 604, library.json's library.screaming-open), word for word: the cover shivers on
      the shelf as he lifts the clasp, and the line is seen, the note itself the sound's */
-  "the cover shivers and the whispering along the shelf rises as he lifts the clasp; then one high, unbroken note swells out of the pages over a breath, and goes on and on": function () { turnDone = 'thing'; shake(roomThing('screaming-book'), 1.2, 60, 0.008); showLines([{ medium: 'seen', sound: "the cover shivers and the whispering along the shelf rises as he lifts the clasp; then one high, unbroken note swells out of the pages over a breath, and goes on and on" }]); },
+  "the cover shivers and the whispering along the shelf rises as he lifts the clasp; then one high, unbroken note swells out of the pages over a breath, and goes on and on": function () { turnDone = 'thing'; var b = roomThing('screaming-book'); if (b) shake(b, 1.2, 60, 0.008);showLines([{ medium: 'seen', sound: "the cover shivers and the whispering along the shelf rises as he lifts the clasp; then one high, unbroken note swells out of the pages over a breath, and goes on and on" }]); },
   /* H11's trick step (Events' req 602, page/events/hidden-ways.json's hidden-ways.trick-step, Kingsley's 8d: PS 8's
      vanishing step), word for word */
   "the step is not there: his foot drops through to the tread below with a lurch, his hand catches the rail, and he laughs and goes on": function () { trickSink(); }
