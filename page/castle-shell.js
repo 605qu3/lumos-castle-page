@@ -39,6 +39,8 @@
    v24 (model v54): an open side over another place's air (an opening's `over`) builds that place too; a rail is drawn
    wherever its room is built or in the place whose air it stands in; openings that overlap along one wall are cut
    together, the wall drawn round both; a wall two places share in plan is left to the other only at one height.
+   v25 (model v57): a stair walked as a place takes `from` and `to` from its `floors` where not given; a door into it
+   with no `z` stands at its other room's floor; the walk's radius and the step in from a door scale with the well's.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -102,8 +104,10 @@ function findPlace(M, id) {
     var sn = Math.max(8, Math.min(SIDES, Math.floor(Math.PI / Math.atan((wide + 0.1) / (2 * srr)))));
     var soff = sops[0] ? angle(scc, toSite(M, sops[0].group || null, sops[0].at)) : 0, sh = 180 / sn;
     var scp = arcPts(scc, srr / Math.cos(sh * Math.PI / 180), soff + sh, soff + 360 + sh, sn).slice(0, sn);
+    /* v25 (model v57, the West Tower's): `from` and `to`, where not given, its first and last `floors` */
+    var sfrom = st.from != null ? st.from : levelZ(M, st.floors[0]), sto = st.to != null ? st.to : levelZ(M, st.floors[st.floors.length - 1]);
     return { id: slug(st.id), name: st.name || st.id.replace(/-/g, ' '), kind: 'room', poly: scp, area: { outer: scp, holes: [] },
-      round: { c: scc, r: srr }, floor: st.from, ceiling: st.to + 2.4, wall: 0.5, walls: null, rec: st, shaft: true };
+      round: { c: scc, r: srr }, floor: sfrom, ceiling: sto + 2.4, wall: 0.5, walls: null, rec: st, shaft: true };
   }
   /* v10: a ring (the lamplighters' gallery, the old wall-walk): whole, or where two of its openings stand across it (the
      turret's landing on the wall-walk) an arc the long way round between them; its shutters and loops by bearing */
@@ -433,6 +437,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0;
       if (op.sills && op.sills[Q.id] != null) sill = op.sills[Q.id];      /* v23: a way's sill at a face whose floor lies lower */
       if (Q.shaft && op.z != null) sill += op.z - Q.floor;                /* v17: in a stair's well, at its own height */
+      else if (Q.shaft) { var oQ = findPlace(M, other(op, Q.id)); if (oQ) sill += oQ.floor - Q.floor; }   /* v25: with no z, at its other room's floor */
       var h = Q.sky ? (op.h || 2.2) + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, (op.h || 2.2) + sill);
       /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
       var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
@@ -615,7 +620,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      along its own treads */
   var shaftFlights = [], shaftStepped = {};
   function buildShaft(Q, gaps) {
-    var S = Q.rec, c = Q.round.c, R = Q.round.r, NR = 0.15, rise = S.rise || 0.2, PR = 0.95, GO = 0.25, doors = [];
+    var S = Q.rec, c = Q.round.c, R = Q.round.r, NR = 0.15, rise = S.rise || 0.2, PR = 0.95 * R / 1.7, GO = 0.25, doors = [];   /* v25: the walk's radius scaled to the well's (0.95 at r 1.7) */
     gaps.forEach(function (gs) { gs.forEach(function (g) {
       if (g.spill || g.niche || !g.op.at) return;
       doors.push({ id: g.op.id, a: angle(c, toSite(M, g.op.group || null, g.op.at)), z: Q.floor + g.sill, top: Q.floor + g.h,
@@ -870,7 +875,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      ways, facing in. A raised way (the bay's mouth) is stood at on its own floor, a step inside it */
   function standAt(d, name) {
     if (d.hatch) return hatchStand(d, name, false);
-    var off = d.back ? 0.5 : P.shaft && d.place === P.id ? (shaftStepped[d.id] ? 0.35 : 1.0) : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
+    var off = d.back ? 0.5 : P.shaft && d.place === P.id ? (shaftStepped[d.id] ? 0.35 : Math.min(1.0, 0.6 * P.round.r)) : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
     /* v8: never off the floor (a small room, the commentator's box): nearer the door until he stands on it */
     while (off > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
@@ -922,7 +927,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        fifths of the way to its middle, where the orrery room's door, deep in the drum's wall at a slant, comes into
        sight (Events' ninety-first, 3.19 am, 16 October: from the arch's mouth the reveal hid it at the head's full turn) */
     var viaIn = P.round ? P.round.r * 0.8 : 1.0;
-    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.via ? viaIn : d.page || !d.built ? -0.3 : -1.0) : P.shaft ? (shaftStepped[d.id] ? 0.35 : 1.0) : STAND_OFF;
+    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.via ? viaIn : d.page || !d.built ? -0.3 : -1.0) : P.shaft ? (shaftStepped[d.id] ? 0.35 : Math.min(1.0, 0.6 * P.round.r)) : STAND_OFF;   /* v25: a narrower well, a shorter step in, clear of its newel */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
     /* v10: never off the floor (a ring 0.9 wide): nearer the door until he stands on it */
     while (back > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { back -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE; }
