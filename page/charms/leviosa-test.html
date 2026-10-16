@@ -243,9 +243,11 @@ var EASES = LumosSpells.SWISH_EASES, judgeSwishFlick = LumosSpells.judgeSwishFli
 
   /* Baruffio's buffalo (Godric, 11 October 2026, 9.23 pm, on the desk: yes). Flitwick, PS 10: "never forget Wizard
      Baruffio, who said 's' instead of 'f' and found himself on the floor with a buffalo on his chest." A wildly wrong
-     stroke (Ron's windmill), at most once a day, brings a cartoon buffalo down on the table beside the feather; it
-     sits there looking puzzled, then gets up and wanders off. After it, a tap on the word card answers in Hermione's
-     words (PS 10): "It's Wing-gar-dium Levi-o-sa, make the 'gar' nice and long." ?buffalo=always to try it on every
+     stroke (a windmill), at most once a day, brings a cartoon buffalo down on the table beside the feather; it
+     sits there looking puzzled, then gets up and wanders off. After it, a tap on the word card answers in Flitwick's
+     words to every class (PS 10, B1 ch10 L3506): "Swish and flick, remember, swish and flick. And saying the magic
+     words properly is very important, too." Hermione's line is never said to him (the touch review's ADJUST of
+     fawkes-buffalo-leviosa t1, 15 October 2026; Charms' change list, Rework 5). ?buffalo=always to try it on every
      windmill, ?buffalo=off never. */
   var BKEY = 'lumos.charms.buffaloDay', B = null, afterBuffalo = false;
   function today() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
@@ -376,10 +378,10 @@ var EASES = LumosSpells.SWISH_EASES, judgeSwishFlick = LumosSpells.judgeSwishFli
       (tr ? ' guide ' + lv + ' cov ' + tr.cov.toFixed(2) + ' dist ' + tr.dist.toFixed(3) + (traced ? ' traced' : '') : '');
     if (j.reason !== 'tap') { logLines.unshift(line); if (logLines.length > 200) logLines.pop(); document.getElementById('logText').textContent = logLines.join('\n'); }
     if (j.reason === 'tap') {
-      /* a tap on the feather prods it, as Seamus did: it smokes; a second tap pats it out */
+      /* a jab at his own feather makes it smoulder (Rework 5: his own lesson, no Seamus, no hat); a second tap pats it out */
       if (inFeather(pts[0]) && F.mode === 'rest') {
-        if (F.smoke > 0) { F.smoke = 0; sayEl.textContent = 'Pat, pat'; whyEl.textContent = 'Out. Harry used his hat.'; }
-        else { F.smoke = 1; sayEl.textContent = 'You prodded it!'; whyEl.textContent = 'Seamus prodded his feather and set fire to it. Tap again to pat it out.'; }
+        if (F.smoke > 0) { F.smoke = 0; sayEl.textContent = 'Pat, pat'; whyEl.textContent = 'Out, with a curl of smoke.'; }
+        else { F.smoke = 1; sayEl.textContent = 'A jab, and it smoulders!'; whyEl.textContent = 'Tap again to pat it out.'; }
       }
       guide.clear();
       return j;
@@ -478,15 +480,15 @@ var EASES = LumosSpells.SWISH_EASES, judgeSwishFlick = LumosSpells.judgeSwishFli
 
   /* The word, read aloud for him by the device's own voice, slowly, the "gar" nice and long (PS 10). */
   document.getElementById('word').addEventListener('click', function () {
-    var hermione = afterBuffalo; afterBuffalo = false;
-    if (hermione) { sayEl.textContent = 'It\u2019s Wing-gar-dium Levi-o-sa,'; whyEl.textContent = 'make the \u2018gar\u2019 nice and long. (Hermione)'; }
-    if (!window.speechSynthesis) { if (!hermione) whyEl.textContent = 'This device cannot read it aloud.'; return; }
-    var u = new SpeechSynthesisUtterance(hermione ? 'It\'s Wing-gaaar-dium Levi-oh-sa. Make the gaaar nice and long.' : 'Wing-gaaar-dium Levi-oh-sa');
+    var warned = afterBuffalo; afterBuffalo = false;
+    if (warned) { sayEl.textContent = 'Swish and flick, remember, swish and flick.'; whyEl.textContent = 'And saying the magic words properly is very important, too. (Professor Flitwick)'; }
+    if (!window.speechSynthesis) { if (!warned) whyEl.textContent = 'This device cannot read it aloud.'; return; }
+    var u = new SpeechSynthesisUtterance(warned ? 'Swish and flick. Wing-gaaar-dium Levi-oh-sa.' : 'Wing-gaaar-dium Levi-oh-sa');
     u.lang = 'en-GB'; u.rate = 0.75;
     var v = speechSynthesis.getVoices().filter(function (x) { return /en-GB/i.test(x.lang); })[0]; if (v) u.voice = v;
     speechSynthesis.cancel(); speechSynthesis.speak(u);
-    if (hermione) return;
-    sayEl.textContent = 'Wing-gar-dium Levi-o-sa'; whyEl.textContent = 'Make the "gar" nice and long.';
+    if (warned) return;
+    sayEl.textContent = 'Wing-gar-dium Levi-o-sa'; whyEl.textContent = 'Slowly, every syllable.';
   });
 
   document.getElementById('guideBtn').addEventListener('click', function () {
