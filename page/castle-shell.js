@@ -902,7 +902,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      turn round when a way of this place, the one he came by included, cannot be reached by any chain of taps from it
      (the dovecote, its one arch behind him; the orrery room's arch, 108 degrees left of the door's start), unless the
      model names the start's own turn. A thing is in reach of a stand within its turn and 10 degrees of the narrowest
-     frame; a tap on it walks him to its stand, and from there on. */
+     frame; a tap on it walks him to its stand, and from there on. v20 (Events' ninety-second, 4.01 am): its doors
+     count as its ways do (the stair feet and the lake-face corridors on 1 and 6, their one door 100 degrees off the
+     start's look, nothing else to tap). */
   var st0 = out.stands[0];
   if (st0 && st0.name === 'start' && st0.lim.turn < 180 && !(named.start && named.start.turn != null)) {
     var here_ = all.filter(function (d) { return d.place === P.id && d.mid; });
@@ -918,7 +920,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var s_ = q.shift();
       here_.forEach(function (d) { if (seen.indexOf(d) < 0 && inReach(s_, d)) { seen.push(d); if (d.stand) q.push(d.stand); } });
     }
-    var lost = here_.filter(function (d) { return out.ways.indexOf(d) >= 0 && seen.indexOf(d) < 0; });
+    var lost = here_.filter(function (d) { return seen.indexOf(d) < 0; });
     if (lost.length) { st0.lim.turn = 180; st0.wide = lost.map(function (d) { return d.id; }).join(' '); }
   }
   out.look = LK;

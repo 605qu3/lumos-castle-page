@@ -155,7 +155,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
 <script src="castle-model.js?v=361"></script>
-<script src="castle-shell.js?v=19"></script>
+<script src="castle-shell.js?v=20"></script>
 <script src="castle-events.js?v=36"></script>
 <script>
 (function () {
@@ -804,6 +804,11 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
+  /* v20 (Events' ninety-second, 4.01 am): a tap through an open way at a way or door beyond it is a tap on that one
+     (lake-passage-b-north seen through lake-passage-b-south's mouth, its plane always first on the ray); the near way
+     keeps the tap where the ray meets wall or floor beyond it */
+  while (hits.length > 1 && hits[0].object.userData.way && tappables.indexOf(hits[0].object) >= 0 &&
+         tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
   if (hit && hit.userData.grains && CUP) {   /* B21's grains, from the cupboard's stand while it stands open */
     if (here !== CUP.d.stand) acted = goTo(CUP.d);
