@@ -1,0 +1,4 @@
+{
+  "about": "The castle's one sound table, read by page/castle-sound.js (board req 518): each entry a cue's opening words, its file under page/sounds/, loop (a room's bed) or once (a heard line), and its level 0 to 1 under the player's caps. Empty until Godric says where the sounds come from (the Great Hall's Sound, for every room, 6); a cue with no entry stays silent and is noted.",
+  "sounds": []
+}
