@@ -29,7 +29,8 @@
 <script src="guide.js?v=6"></script>
 <script>
 /* The pineapple's tap dance, a test page for the Charms lane (13 October 2026, nineteenth session; the owner is Godric).
-   Drawn in code. The book (PS 16, checked in the text): in the practical exams "Professor Flitwick called them one by
+   Drawn in code (Rework 16, 16 October 2026: no exam sat; the third round is a practice before a chalked "Practical,
+   Thursday", Flitwick on his pile of books, PS 8; the book below is the source only). The book (PS 16, checked in the text): in the practical exams "Professor Flitwick called them one by
    one into his class to see if they could make a pineapple tapdance across a desk." No word and no motion in the book;
    the taps are ours, for the geometry: equal steps across a length, the desk split into equal parts. The pineapple
    stands at one end of a long Charms desk; he taps where it lands, step by step, to the far end, judged after every
@@ -64,7 +65,7 @@
       start: 'Flitwick: "A pineapple, a desk, and a little rhythm!" <b>Tap where it lands</b>, step by step, across to the far end: <b>four equal steps</b>.' },
     { name: 'Your own count', want: 0,
       start: '<b>No guide.</b> Any number of steps from three to eight, but every step the same length, all the way to the far end.' },
-    { name: 'The exam', want: 0,
+    { name: 'Practical, Thursday', want: 0,
       start: '' },
     { name: "Flitwick's beat", want: 0,
       start: '' } ];
@@ -144,7 +145,7 @@
     if (i === 2) { var pick = [3, 5, 6]; examWant = wantQ >= 3 && wantQ <= 8 ? wantQ : pick[Math.floor(Math.random() * pick.length)]; }
     place(); makeGuide(); menu();
     if (i === 3) { runs = []; startPart(0); return; }
-    say(i === 2 ? 'The exam. Flitwick calls you in, one by one, as in the book. Your pineapple must cross the desk in <b>' + WORD[examWant] + ' equal steps</b>.' : ROUNDS[i].start);
+    say(i === 2 ? 'A pineapple left on a Charms desk, and a chalked note: <i>Practical, Thursday</i>. Flitwick, on his pile of books, calls a number: <b>' + WORD[examWant] + ' equal steps</b> across the desk.' : ROUNDS[i].start);
   }
   function again(after) {   /* the pineapple trots back to its end and the taps clear */
     wait = setTimeout(function () { var now = performance.now(); wait = null; taps = []; show = null; fall = null; hopTo(0, now, 420);
@@ -222,7 +223,7 @@
       say('The desk split into <b>' + (WORD[n2] || n2) + ' equal steps</b>: each one is <b>' + SHARE[n2] + '</b> of the desk, 1/' + n2 + '.' +
         (j.spread >= 0.05 ? ' Under yours, dashed, the exactly equal steps; your step furthest out is ringed.' : '') + wob);
       if (round === 2) { done = true;
-        wait = setTimeout(function () { wait = null; say('Flitwick called them in one by one to make a pineapple tap-dance across a desk, and yours did, in ' + WORD[n2] + ' equal steps.');
+        wait = setTimeout(function () { wait = null; say('Flitwick peers over the edge of his books and nods: ' + WORD[n2] + ' equal steps, all the way across.');
           wait = setTimeout(function () { wait = null; choose(3); }, 6000); }, 4200); }
       else wait = setTimeout(function () { wait = null; choose(round + 1); }, 6500);
     }, total);

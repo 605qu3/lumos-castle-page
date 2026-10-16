@@ -56,8 +56,8 @@
       start: 'Flitwick: "Wands out, we\'re experimenting with Cheering Charms today." This old wizard has been glum in his frame for a century. <b>Draw his frown the other way up</b>: from corner to corner of his mouth, curving down.' },
     { name: 'The wide frown', bg: '#3b2c2a', robe: '#27424f', skin: '#d9b28c', hat: 'bun',
       start: 'A witch with a wide, sad mouth. <b>No guide</b>: the same curve as her frown, flipped over, corner to corner.' },
-    { name: 'The exam', bg: '#2a2f3d', robe: '#5c2a2a', skin: '#e6c6a4', hat: 'cap',
-      start: 'The exam, and Flitwick is watching. In the book Harry was so nervous he overdid it. <b>Not too much</b>: just as deep as the frown, flipped.' } ];
+    { name: 'Not too much', bg: '#2a2f3d', robe: '#5c2a2a', skin: '#e6c6a4', hat: 'cap',
+      start: 'A grumpy old wizard who has not smiled in two hundred years. <b>Not too much</b>: just as deep as the frown, flipped.' } ];
   var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
   var mouth = null, ph = 0, wait = null, done = false, last = null, shown = null, misses = 0, cheer = null, fits = null;
   var stroke = null, active = null, trail = null, guides = [];
@@ -133,13 +133,13 @@
        tilted, narrow or crooked smile can still cover it */
     if (sc && sc.traced && j.verdict === 'miss' && j.reason === 'wiggly') { j.verdict = 'cheered'; j.reason = 'cheered'; }
     last = j;
-    if (j.reason === 'fits') {   /* the exam's overdoing: in fits, then glum again, and again */
+    if (j.reason === 'fits') {   /* overdone: he giggles helplessly, then settles glum again (Rework 15: no exam, no Ron) */
       guides.forEach(function (g) { g.miss(); }); misses++;
       fits = { at: now }; shown = { pts: pts, at: now + 3200, j: j };
       for (var k = 0; k < 6; k++) setTimeout(function () { noise(0.12, 1400 + Math.random() * 900, 0.25); }, k * 330);
-      say('<b>Too much!</b> In fits, like Ron in the exam when Harry overdid it out of nerves.');
+      say('<b>Too much!</b> He giggles helplessly into his collar.');
       wait = setTimeout(function () { wait = null; fits = null;
-        say('In the book Ron had to be led away to a quiet room for an hour. Yours was ' + (Math.round(j.ratio * 10) / 10) + ' times as deep as the frown: <b>just as deep</b>, flipped.'); }, 3200);
+        say('Then he settles, glum again. Yours was ' + (Math.round(j.ratio * 10) / 10) + ' times as deep as the frown: <b>just as deep</b>, flipped.'); }, 3200);
       return j;
     }
     if (j.verdict !== 'cheered') {
@@ -175,7 +175,7 @@
       say('<b>Cheered!</b> A wider mouth, the same depth: <b>a flatter curve</b>. It is part of a bigger circle; the dashed one is all of it.');
       wait = setTimeout(function () { wait = null; choose(2); }, 7800);
     } else {
-      say('Nobody led away to a quiet room. As Ron said of Hermione, "She could\'ve done with a Cheering Charm on her, too."');
+      say('He smiles, just enough, and straightens his collar. Not a giggle out of place.');
       done = true;
     }
     return j;
