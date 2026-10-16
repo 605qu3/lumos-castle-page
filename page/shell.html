@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=349"></script>
+<script src="castle-model.js?v=350"></script>
 <script src="castle-shell.js?v=13"></script>
 <script src="castle-events.js?v=36"></script>
 <script>
@@ -763,7 +763,11 @@ function tap(cx, cy) {
   }
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d, hits[0].point); acted = true; }
-  else if (d) acted = goTo(d);
+  else if (d) {
+    acted = goTo(d);
+    /* req 550: walking up to an open way is its tap to the events (gun-room-arch's draught), since a second tap takes him through */
+    if (acted && d.mesh.userData.way && events) { lineDoor = d; events.tap(d.id); }
+  }
   else if (f) acted = useFlight(f);
   else { goBack(); acted = wasStand; }
   kit.tapped(acted);
