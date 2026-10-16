@@ -678,6 +678,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     });
   });
 
+  /* v22 (the Found list): masonry of another work standing in a place (a feature with `circle`, `r`, `z` and `top`, no
+     arc or ring: the south-west drum in the drying loft's corner, drying-loft-drum): a stone drum from z to top, wall
+     grey, its curved face toward the room; what stands outside the room hides behind its walls; nothing to tap */
+  (M.features || []).forEach(function (ft) {
+    if (!ft.circle || !ft.r || ft.top == null || ft.z == null || ft.arc || ft.ring || slug(ft.room || '') !== P.id) return;
+    var cyl = slab(1, 1, 1, mats.wall, 'wall');
+    cyl.geometry.dispose(); cyl.geometry = new THREE.CylinderGeometry(ft.r, ft.r, ft.top - ft.z, 48);
+    var p = toLocal(ft.circle[0], ft.circle[1], ft.z);
+    cyl.position.set(p.x, p.y + (ft.top - ft.z) / 2, p.z); cyl.name = P.id + '-masonry-' + ft.id; group.add(cyl);
+  });
+
   /* the stairs in the places built: a straight flight's treads along its rise, from its span's foot to its head; a
      landing, gallery or bay ({ shape: { rect }, z }) as a floor's vault, SLAB deep under its top (Godric's 12.1) */
   var slabs = [], raw = [];
