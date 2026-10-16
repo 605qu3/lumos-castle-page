@@ -1,0 +1,50 @@
+{
+  "chain": "fred-note",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = corridor",
+        "year >= 3",
+        "fred_note != read"
+      ],
+      "show": [
+        "a scrap of parchment on the flagstones a few steps from the one-eyed witch, folded once, as if it fell from a pocket in a hurry"
+      ],
+      "canon": "Magic's req 597 (docs/handoff/magic.md, Rework 6; the Corridor's req 432): from the PoA castle on, never written to him, found; the world rules, The secret passage: the witch opens only after PoA, from a note Fred dropped for George; ours, after PoA 10 and 16"
+    },
+    {
+      "when": [
+        "place = corridor",
+        "year >= 3",
+        "fred_note = read"
+      ],
+      "show": [
+        "Fred's note to George, read"
+      ],
+      "canon": "the kept cue the Corridor's FRED_NOTE_CUE reads (Magic's Rework 6, word for word): his to keep in his pocket once read; nothing counts it as a secret"
+    }
+  ],
+  "records": [
+    {
+      "id": "fred-note.read",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap fred-note",
+      "when": [
+        "place = corridor",
+        "year >= 3",
+        "fred_note != read"
+      ],
+      "show": [
+        "he unfolds the scrap: in a hurried scrawl, \"George: her hump, Dissendium. Don't let Percy see. F.\""
+      ],
+      "starts": [
+        "set fred_note = read",
+        "log \"Found a note Fred dropped for George by the one-eyed witch {day}\""
+      ],
+      "canon": "Magic's req 597 (Rework 6): the note's words ours, after PoA 10 (the hump and Dissendium) and PoA 16; read once, kept after; not written to him, and he learns the word from it alone"
+    }
+  ]
+}
