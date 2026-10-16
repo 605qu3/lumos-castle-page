@@ -9,6 +9,13 @@
 // hand was writing upon it" (L19080). The three hands differing is ours (Magic's B13, B14), Wormtail only in the
 // title (B13 t2). The den in Clementine's older brown ink and her letters' hand (B15, with its t1).
 //
+// After the Ministry's sweep (Design's change list, Rework 7; Godric, 14 October 2026: the Map stays a wink, Percy's
+// "suspicious blank parchment"): the Marauders' parts (the title, the three hands' notes, the spread from his own
+// dot, the dots of people, mount()'s oath and wipe) are set aside, kept in code and off unless passed; den, denNew and
+// denNote are retired as Map options, their drawing code the seed of Clementine's own plan, which waits as game
+// (docs/game-notes.md). The plain parchment is svg(model, { title: 0 }). Events' play (page/castle-map.js) still
+// passes them, its own set-aside (docs/ministry/set-aside.md).
+//
 // LumosMap.svg(model, opts) returns one <svg> string. opts:
 //   look     'raised', the default (Godric's Q24, 13 October 2026, answered 24.1): the Marauders' quill plan, its
 //            towers stood up as little drums and cones on the whole parchment and flat at a phone's zoom (k 2 and

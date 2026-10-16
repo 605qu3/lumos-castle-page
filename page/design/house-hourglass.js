@@ -1,6 +1,11 @@
-// The house points' hourglass (Q21 answered 2, Godric, 12 October 2026, 9.38 pm, with his t1: both boys' points fill
-// the one hourglass of whatever houses they choose, the cup won together, never brother against brother; Magic's B11,
-// req 213: points for learning, never lost, once each, each reason dropping as a slip into the base, t1 there).
+// The house points' hourglass (Q21 answered 2, Godric, 12 October 2026, 9.38 pm; Magic's B11, req 213: points for
+// learning, once each, each reason dropping as a slip into the base). Reworked after the Ministry's sweep (Design's
+// change list, Rework 1, 2 and 9; Godric's rulings of 14 and 15 October 2026): no cup race. Points go as in the books:
+// all four glasses move with the school's own points through the year (`level`, `levels`, Events' to set), and the
+// boys, both Gryffindor, add a gem now and then, one more among the school's in Gryffindor's glass. Nothing is won
+// against the year or between the brothers. back(slip) is only a grown-up's undo of a slip given by mistake, never a
+// penalty to a boy: nothing a boy earned is lost. A drop in any house's level (the school's points, never the boys')
+// flies its stones up with the cross little clink (the touch review's q22 t2, ADJUST, Godric's yes of 15 October).
 // Canon, the canon tool: "the giant hourglasses that recorded the house points" (PS 15, B1 L5089), "set in niches
 // along the wall" (OotP 28, B5 L49050); "a shower of rubies fell down into the bottom bulb of Gryffindor's
 // hour-glass ... a number of sapphires fell into Ravenclaw's glass" (OotP 38, B5 L53906); Slytherin's "spilled its
@@ -13,51 +18,58 @@
 // cartouche above, so 'brass' is the default frame. His t1: the brass glass stands in a niche along a wall (OotP 28)
 // once the Architect places the entrance hall, the brass frame inside (niche: true; the placing is the Architect's).
 // His t2: if a point is ever taken back, its stone flies up into the top bulb ("Even as they watched, stones flew
-// upwards", OotP 28, B5 L49050) with a cross little clink (rising, clink()). Magic's against the year (Godric, 8.11 am,
-// 1): no rival but their own best year, the top bulb the house's store, magically never lower, so 'store' is the
-// default top.
+// upwards", OotP 28, B5 L49050) with a cross little clink (rising, clink()). Magic's against the year (req 233: the
+// top bulb the house's store, never lower) is set aside with the cup race (docs/ministry/set-aside.md), so the top
+// bulb is 'clear' by default, its 'store' kept in code, off.
 // Q25 answered 25.1 (Godric, 13 October 2026, 1.55 pm): four glasses in four niches along the entrance hall's wall,
 // one a house, as the books draw them ("the giant hourglasses", PS 15; "set in niches along the wall", OotP 28): each
-// boy's stones fall in his own house's glass, the two filling together, the other two still, their stones all kept
-// above. His t1: the morning after a big night his house's glass has jumped ("passing the giant hourglasses ... the
-// next day thought there'd been a mistake", PS 15, B1 L5089), and only ever upward (seen, below).
+// glass holds its house's points, all four moving through the year, the boys' gems landing in Gryffindor's. His t1:
+// the morning after a big night the glass has jumped ("passing the giant hourglasses ... the next day thought there'd
+// been a mistake", PS 15, B1 L5089) (seen, below).
 //
 // LumosHourglass.svg({ slips, houses, frame, niche, full, falling, rising, top, id })
 //   slips    the year's awards in the order earned, as Events' record keeps them ({ kind, thing, points, on, record },
 //            castle.points()), each with a house ('lion', 'snake', 'badger', 'eagle'): the house of the boy who earned
 //            it. A slip without one takes houses[0], this castle's own. Both boys' stones lie in the one bottom bulb,
-//            in bands as they were earned, so the year can be read in the glass. A slip with `back` (taken back)
-//            leaves the heap and the base.
-//   houses   the boys' houses, one or two (both the same if they choose one); their quarters light on the crest
+//            in bands as they were earned, so the year can be read in the glass. A slip with `back` (a grown-up's
+//            undo of a slip given by mistake) leaves the heap and the base.
+//   level    the house's own points this year, in points like `full` and a slip's `points` (Events' to set from the
+//            school's year): drawn first, in the house's stones, the boys' slips heaped on it. 0 or absent: none.
+//   houses   the boys' house, ['lion'] (Gryffindor) by default, both boys sorted there (15 October 2026); its quarter
+//            takes its colours on the crest
 //   frame    'brass' (default, Godric's 22.1), 'oak' (plain pillars) or 'niche' (the stone niche alone, Q22's 22.3)
 //   niche    true: the brass glass stands in a stone niche, its wall round it (his t1); the viewBox grows to
 //            -24 -22 168 274 so the glass keeps its own coordinates
-//   full     the points that fill the bottom bulb (their own best year is the mark, Magic's 1; 1000 till one is set)
+//   full     the points that fill the bottom bulb (1000 till Events sets the school's own)
 //   falling  { house, n, slow, at } a shower in the air between the neck and the heap (OotP 38): n stones; slow, a
 //            brother taught (Magic's t2) or a thing given him (req 298), the stones fewer and spaced, as if
 //            drifting; at 0..1, the moment in a live
 //            fall (mount() drives it), absent for a still
 //   rising   { house, n, at } a stone taken back, flying up from the heap through the neck (his t2)
-//   top      the top bulb: 'store' (default, the house's store, never lower), 'clear', or a fraction 0..1
-// LumosHourglass.cup({ houses, year, gems, id, metal, cover, age, yearsAgo, letter }) the year's cup (req 306): Objects'
-//   trophies sheet's rank 1 drawn in code, silver, the crest on its cartouche, the year on its plinth; gems, the
-//   year's slips, poured into its mouth at the leaving feast (Magic's against the year, req 233), the cover lifted;
-//   age 0..1 fades an old year's cup (req 279), or yearsAgo (age = yearsAgo / 8). form: 'stand-in' draws Q22's
-//   stand-in, for its sheets.
-// LumosHourglass.mount(el, { slips, houses, full, niche, audio }) draws the glass into el and gives { set(slips),
-//   point(slip), back(slip) }: point is the runtime's opts.point (req 222), its stones falling as it lands, slower
-//   for a brother taught (kind 'taught') and for a thing given, which passed between the brothers (kind 'given',
-//   Magic's req 298, Events' req 385); back flies its stones up and clinks. audio: an AudioContext, else none.
+//   top      the top bulb: 'clear' (default), a fraction 0..1, or 'store' (req 233's store, set aside, kept off)
+// LumosHourglass.cup({ houses, year, gems, id, metal, cover, age, yearsAgo, letter }) the House Cup (req 306; the
+//   low-stakes answers of 14 October 2026: the House Cup as one object, in the trophy room): Objects' trophies
+//   sheet's rank 1 drawn in code, silver (Q26 answered 1, 16 October 2026), the crest on its cartouche, the year on
+//   its plinth; houses, the year's winner as its book names it, shown only once that book is finished. cover 'on' by
+//   default. gems (the year's slips poured into its mouth, req 233's against the year) is set aside with the cup race,
+//   kept in code, off unless passed. age 0..1 fades an old year's cup (req 279), or yearsAgo (age = yearsAgo / 8).
+//   form: 'stand-in' draws Q22's stand-in, for its sheets.
+// LumosHourglass.mount(el, { slips, houses, level, full, niche, audio }) draws the glass into el and gives
+//   { set(slips), point(slip), back(slip), level(points), jump(n) }: point is the runtime's opts.point (req 222), its
+//   stones falling as it lands, slower for a brother taught (kind 'taught') and for a thing given, which passed
+//   between the brothers (kind 'given', Magic's req 298, Events' req 385); back (a grown-up's undo only) flies its
+//   stones up and clinks; level(points) sets the house's own points, a rise falling as a shower and a drop flying up
+//   with the clink (any house's loss, never the boys'). audio: an AudioContext, else none.
 //   seen: how many slips the glass showed when he last looked (the room keeps it, and passes it at the first look
 //   of a new day); the slips after it land at once a beat after the glass is drawn, one heavy shower a house, so the
-//   glass has jumped (his t1). A slip taken back meanwhile is simply gone: nothing falls in the morning. Also jump(n).
-// LumosHourglass.hall({ slips, houses, full, order, top, falling, id }) the entrance hall's wall: the four houses'
-//   glasses, each in its niche (25.1), in `order` (default HALL: the Sorting Hat's, PS 7, as the crest lights).
-//   A glass takes the slips of its own house (a slip without one, houses[0]'s) and lights only its own quarter;
-//   the boys' houses are the ones that fill. Each niche is PITCH wide in the glass's units; viewBox
-//   -24 -22 PITCH*4 274, the wall continuous behind the four.
-// LumosHourglass.hallMount(el, { slips, houses, full, order, audio, seen }) the hall live, as mount(): set, point,
-//   back and jump, each slip's stones falling in its own house's glass.
+//   glass has jumped (his t1). A slip undone meanwhile is simply gone: nothing falls in the morning.
+// LumosHourglass.hall({ slips, houses, levels, full, order, top, falling, id }) the entrance hall's wall: the four
+//   houses' glasses, each in its niche (25.1), in `order` (default HALL: the Sorting Hat's, PS 7). Each glass holds
+//   levels[house] (the house's own points, as `level`) and the boys' slips of its house (a slip without one,
+//   houses[0]'s, Gryffindor), and its own quarter takes its colours. Each niche is PITCH wide in the glass's units;
+//   viewBox -24 -22 PITCH*4 274, the wall continuous behind the four.
+// LumosHourglass.hallMount(el, { slips, houses, levels, full, order, audio, seen }) the hall live, as mount(): set,
+//   point, back, jump and levels(next), each glass moving on its own.
 // LumosHourglass.clink(audio) the cross little clink, glass on glass, a little sharp.
 (function () {
   const STONE = {  // the stone, its lit facet, its dark edge
@@ -113,10 +125,11 @@
     }
     return P.sort((a, b) => a[2] - b[2]);
   }
-  function heap(id, slips, houses, full) {
-    const total = slips.reduce((s, x) => s + x.points, 0); if (!total) return { svg: '', topY: BOT };
+  // level: the house's own points (the school's, Rework 1), heaped first under the boys' slips, in houses[0]'s stones
+  function heap(id, slips, houses, full, level) {
+    const base = Math.max(0, +level || 0), total = base + slips.reduce((s, x) => s + x.points, 0); if (!total) return { svg: '', topY: BOT };
     const P = places(1.8), count = Math.round(P.length * Math.min(1, total / full)), R = rnd(11);
-    const cum = []; let c = 0; for (const s of slips) { cum.push([c, c + s.points, s.house || houses[0]]); c += s.points; }
+    const cum = base ? [[0, base, houses[0]]] : []; let c = base; for (const s of slips) { cum.push([c, c + s.points, s.house || houses[0]]); c += s.points; }
     let out = '', topY = BOT, j = 0;
     for (let i = 0; i < count; i++) {
       const v = (i + 0.5) / count * total; while (j < cum.length - 1 && v >= cum[j][1]) j++;
@@ -153,7 +166,7 @@
     return s;
   }
   function topBulb(top, houses) {
-    if (top === undefined || top === 'store') top = 0.86;   // the house's store, never lower (Magic's 1)
+    if (top === 'store') top = 0.86;   // req 233's store, never lower: set aside with the cup race, only if passed
     if (typeof top !== 'number' || top <= 0) return '';
     const R = rnd(5); let s = '';
     // packed loosely, row on row offset, each stone a little out of line, so it reads as a heap and not a grid
@@ -179,7 +192,7 @@
     });
     return s;
   }
-  // the crest as built (Q14 to Q20), the boys' houses' quarters lit in their colours, the other two at rest
+  // the crest as built (Q14 to Q20), the glass's own house's quarter in its colours, the other three at rest
   function crestAt(id, x, y, size, houses, colour) {
     const I = window.LumosIcon, tint = { lion: 0, snake: 0, badger: 0, eagle: 0 };
     houses.forEach(h => { tint[h] = 1; });
@@ -263,7 +276,7 @@
   }
   // the glass in its frame, in the glass's own units: the bulbs, their stones and the frame round them
   function glassBody(id, o, houses, slips, fr) {
-    const full = o.full || 1000, h = heap(id, slips, houses, full), path = bulbPath();
+    const full = o.full || 1000, h = heap(id, slips, houses, full, o.level), path = bulbPath();
     const inner = `<path d="${path}" fill="#2a2016" opacity="0.35"/>
       <g clip-path="url(#bulb${id})">${topBulb(o.top, houses)}${h.svg}${shower(o.falling, h.topY)}${rise(o.rising, h.topY)}</g>
       <path d="${path}" fill="url(#glass${id})"/>
@@ -280,7 +293,7 @@
     const id = o.id || 'w' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'];
     const order = o.order || HALL, own = ownOf(houses), slips = (o.slips || []).filter(x => !x.back);
     const glasses = order.map((h, i) => {
-      const mine = { full: o.full, top: o.top, falling: o.falling && o.falling.house === h ? o.falling : null };
+      const mine = { full: o.full, top: o.top, level: (o.levels || {})[h], falling: o.falling && o.falling.house === h ? o.falling : null };
       return `<g transform="translate(${i * PITCH} 0)">${archOf(id)}${glassBody(id, mine, [h], slips.filter(s => own(s) === h), frameBrass)}</g>`;
     }).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-24 -22 ${PITCH * order.length} 274">${defs(id)}<g filter="url(#wc${id})">${wallOf(id, PITCH * order.length)}${glasses}</g></svg>`;
@@ -297,8 +310,8 @@
   // 1.jpg`, its words out); under the lip a row of the castle's own marks (`castle/hallmark-1.jpg`, as marks only):
   // a tower, the H, the year's letter, a star. Silver, as the precedent and the trophy room's cups (PS 9, "winked
   // silver and gold"); metal 'gold' or 'parcel' (silver, the rims, beads, cartouche and flame gilt) for the question.
-  // cover: 'on' (the cup as it stands on the shelf), 'lifted' (at the leaving feast, while the gems pour into its
-  // mouth) or 'off'; by default lifted when gems are given, else on. age 0..1: faded means old (req 279, the Curator's
+  // cover: 'on' (default, the cup as it stands in the trophy room), 'lifted' or 'off' (Rework 9: the gems' pour at the
+  // leaving feast is set aside with the cup race). age 0..1: faded means old (req 279, the Curator's
   // advisory; Magic's req 280): the oldest year's cup the dullest, its silver greyed and warm with tarnish. yearsAgo
   // sets it for the den's row (req 234: eight cups a shelf): age = yearsAgo / 8, this year's cup bright, the one eight
   // years back and older at their dullest.
@@ -306,7 +319,7 @@
     if (o.form === 'stand-in') return standIn(o);
     const id = o.id || 'c' + (++n), houses = o.houses && o.houses.length ? o.houses : ['lion'], plain = o.plain;
     const metal = o.metal || 'silver', age = Math.max(0, Math.min(1, typeof o.yearsAgo === 'number' ? o.yearsAgo / 8 : o.age || 0));
-    const cover = o.cover || (o.gems && o.gems.length ? 'lifted' : 'on');
+    const cover = o.cover || 'on';
     const year = o.year || '2026 – 2027', letter = o.letter || 'a';
     const SIL = ['#5d6267', '#c9ced3', '#ffffff', '#aab0b6', '#71767c', '#c4c9ce', '#53575c'];
     const GLD = ['#6e4f1c', '#d8b25c', '#fff1c2', '#c49a48', '#7a5a22', '#d4ad5e', '#5a3f14'];
@@ -405,21 +418,21 @@
   // the glass, live: the still glass drawn once, and the stones in flight on a light layer above it, so a fall
   // redraws only a few stones a frame (the wash filter is drawn once)
   function mount(el, o = {}) {
-    let slips = (o.slips || []).slice(), busy = Promise.resolve();
+    let slips = (o.slips || []).slice(), busy = Promise.resolve(), lev = Math.max(0, +o.level || 0);
     const houses = o.houses && o.houses.length ? o.houses : ['lion'], full = o.full || 1000, id = 'm' + (++n);
     const box = o.niche ? '-24 -22 168 274' : '0 0 120 240';
     el.style.position = el.style.position || 'relative';
     el.innerHTML = `<div></div><svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none">
       <defs><clipPath id="fly${id}"><path d="${bulbPath()}"/></clipPath></defs><g clip-path="url(#fly${id})"></g></svg>`;
     const still = el.firstChild, fly = el.lastChild.lastChild, own = ownOf(houses);
-    const draw = () => { still.innerHTML = svg({ slips, houses, full, niche: o.niche, id }); const v = still.firstChild; v.style.width = '100%'; v.style.height = 'auto'; v.style.display = 'block'; };
+    const draw = () => { still.innerHTML = svg({ slips, houses, full, level: lev, niche: o.niche, id }); const v = still.firstChild; v.style.width = '100%'; v.style.height = 'auto'; v.style.display = 'block'; };
     const stones = (pts, most) => Math.max(3, Math.min(most || 24, Math.round(places(1.8).length * pts / full)));
     const play = (ms, frame) => new Promise(done => {
       const t0 = performance.now();
       const step = now => { const at = Math.min(1, Math.max(0, (now - t0) / ms)); fly.innerHTML = frame(at); if (at < 1) requestAnimationFrame(step); else { fly.innerHTML = ''; done(); } };
       requestAnimationFrame(step);
     });
-    const topY = () => heap(id, slips.filter(x => !x.back), houses, full).topY;
+    const topY = () => heap(id, slips.filter(x => !x.back), houses, full, lev).topY;
     // his t1: the slips after the first `seen` land at once, a beat after the glass is drawn, one heavy shower a house
     const jump = seen => {
       let all, by;
@@ -455,6 +468,18 @@
         }).then(() => clink(o.audio));
         return busy;
       },
+      // the house's own points move (the school's, Events' to set): a rise falls as a shower onto the heap, a drop
+      // flies up with the cross little clink (the touch review's q22 t2: any house's loss, never the boys')
+      level(pts) {
+        const to = Math.max(0, +pts || 0), house = houses[0];
+        busy = busy.then(() => {
+          const d = to - lev, from = topY(); if (!d) return;
+          if (d > 0) return play(1700, at => shower({ house, n: stones(d), at }, from)).then(() => { lev = to; draw(); });
+          lev = to; draw();
+          return play(1300, at => rise({ house, n: Math.min(4, stones(-d)), at }, from)).then(() => clink(o.audio));
+        });
+        return busy;
+      },
       jump,
     };
   }
@@ -470,7 +495,8 @@
     const mine = (list, h) => list.filter(s => own(s) === h);
     const seenOf = h => typeof o.seen === 'number' ? mine(all.slice(0, o.seen), h).length : undefined;
     const glass = {};
-    order.forEach((h, i) => { glass[h] = mount(el.children[i + 1], { slips: mine(all, h), houses: [h], full: o.full, audio: o.audio, seen: seenOf(h) }); });
+    const lv = o.levels || {};
+    order.forEach((h, i) => { glass[h] = mount(el.children[i + 1], { slips: mine(all, h), houses: [h], level: lv[h], full: o.full, audio: o.audio, seen: seenOf(h) }); });
     const to = sl => glass[own(sl)] || glass[order[0]];
     return {
       glass,
@@ -478,11 +504,12 @@
       point(sl) { all.push(sl); return to(sl).point(Object.assign({ house: own(sl) }, sl)); },
       back(sl) { return to(sl).back(Object.assign({ house: own(sl) }, sl)); },
       jump(seen) { return Promise.all(order.map(h => glass[h].jump(mine(all.slice(0, seen), h).length))); },
+      levels(next) { return Promise.all(order.filter(h => next && typeof next[h] === 'number').map(h => glass[h].level(next[h]))); },
     };
   }
 
-  // the year's gems poured into the cup at the leaving feast (Magic's against the year, req 233), heaped in its mouth,
-  // each in its earner's house, as many as the year's points give, up to a brimming mound
+  // set aside with the cup race (req 233's against the year; docs/ministry/set-aside.md), kept in code, off unless
+  // gems are passed: the year's gems heaped in the cup's mouth, each in its earner's house, up to a brimming mound
   function pour(gems, houses, y = 20, hw = 27) {
     if (!gems || !gems.length) return '';
     const total = gems.reduce((t, x) => t + (x.back ? 0 : x.points), 0), k = Math.max(12, Math.min(140, Math.round(total / 6)));

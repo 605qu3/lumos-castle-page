@@ -5,19 +5,21 @@
 <script src="lumos-icon.js"></script>
 <script src="house-hourglass.js"></script>
 <script>
-// LumosHourglass.hallMount as the entrance hall would use it (Q25 answered 25.1): the four glasses in their niches,
-// Gryffindor and Ravenclaw the boys' houses. It plays: the morning's jump (seen 6 of the 8 slips, so last night's
-// two land at once, his t1), then a spell's point falling in Ravenclaw's glass, a brother taught falling slower in
-// Gryffindor's, then the first taken back, flying up with its clink. window.hallPlayed counts the steps done.
-const HOUSES = ['lion', 'eagle'];
-const slips = [10, 5, 20, 10, 50, 10, 40, 60].map((p, i) => ({ kind: 'spell', thing: 's' + i, points: p, house: HOUSES[i % 2 ? 1 : 0], on: i < 6 ? '2026-10-12' : '2026-10-13' }));
+// LumosHourglass.hallMount as the entrance hall would use it (Q25 answered 25.1; Rework 1 of Design's change list):
+// the four glasses in their niches, each holding its house's own points (levels, the school's, Events' to set), the
+// boys' gems landing in Gryffindor's. It plays: the morning's jump (seen 4 of the 6 slips, so last night's two land
+// at once, his t1), then a spell's point and a brother taught (slower) in Gryffindor's glass, then Slytherin's own
+// points dropping (the school's, never the boys'), its stones flying up with the clink, while Ravenclaw's rise.
+// window.hallPlayed counts the steps done.
+const HOUSES = ['lion'];
+const slips = [10, 5, 20, 10, 25, 15].map((p, i) => ({ kind: 'spell', thing: 's' + i, points: p, house: 'lion', on: i < 4 ? '2026-10-12' : '2026-10-13' }));
 const audio = window.AudioContext ? new AudioContext() : null;
-const hall = LumosHourglass.hallMount(document.getElementById('g'), { slips, houses: HOUSES, full: 400, audio });
+const levels = { lion: 150, badger: 170, eagle: 190, snake: 230 };
+const hall = LumosHourglass.hallMount(document.getElementById('g'), { slips, houses: HOUSES, levels, full: 400, audio });
 window.hallPlayed = 0;
-const one = { kind: 'card', thing: 'dumbledore', points: 30, house: 'eagle' };
-hall.jump(6).then(() => window.hallPlayed++);
-setTimeout(() => hall.point(one).then(() => window.hallPlayed++), 800);
+hall.jump(4).then(() => window.hallPlayed++);
+setTimeout(() => hall.point({ kind: 'card', thing: 'dumbledore', points: 30, house: 'lion' }).then(() => window.hallPlayed++), 800);
 setTimeout(() => hall.point({ kind: 'taught', thing: 'lumos', points: 20, house: 'lion' }).then(() => window.hallPlayed++), 900);
-setTimeout(() => hall.back(one).then(() => window.hallPlayed++), 1000);
+setTimeout(() => hall.levels({ snake: 200, eagle: 215 }).then(() => window.hallPlayed++), 1000);
 </script>
 </body></html>

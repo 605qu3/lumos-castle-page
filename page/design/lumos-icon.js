@@ -341,8 +341,8 @@
   // with its moving part cut at a joint. Each quarter takes its house's banner: "red with a gold lion for Gryffindor,
   // blue with a bronze eagle for Ravenclaw, yellow with a black badger for Hufflepuff, and green with a silver serpent
   // for Slytherin", the coat of arms "lion, eagle, badger, and snake united around a large letter H" (B4 ch15, the
-  // canon tool; Godric's t1 on Q16). At rest the crest is one tint, as a watermark is; the colours come only with the
-  // hold's peak and go with it (tint 0..1), so at rest and on the purple seal nothing changes but the beasts.
+  // canon tool; Godric's t1 on Q16). At rest the crest is one tint, as a watermark is; the hold's colours (tint 0..1) are
+  // off since the touch review (HOLD.lights), so on the icon and the purple seal nothing changes but the beasts.
   // Places as LAYOUT's, each [x, y, height] in the 64-unit tile; X, Y the cross between the quarters. The shield is
   // the rounder one of Q18's answer (Godric, 5.29 pm, 12 October 2026: 3), its sides straight down to 40 before the
   // point, so the badger and eagle clear its line and the H; on the crest the H a touch smaller and the cross raised
@@ -539,14 +539,17 @@
   // breath, the crest shows clearly, then all fades back to rest. Never explained. The timeline is HOLD; at(t) gives
   // the crest's strength and the flare at t ms, so a sheet can draw any moment of it.
   // stirGain: the stir's size at its peak (1 as first built; Q11's 3 would make it 1.5)
-  // order, tintStep: the quarters light one after another, tintStep ms apart, in the order the Sorting Hat sings the
-  // houses, Gryffindor, Hufflepuff, Ravenclaw, Slytherin (PS 7; Fawkes's t1 on Q17, taken by Godric 2.51 pm)
-  const HOLD = { press: 400, up: 350, breath: 1200, down: 1500, peak: 0.32, flare: 0.5, stirAt: 150, stirMs: 800, stirGain: 1, tintMs: 1100,
+  // order, tintStep: the quarters' colours one after another, tintStep ms apart, in the order the Sorting Hat sings the
+  // houses, Gryffindor, Hufflepuff, Ravenclaw, Slytherin (PS 7; Fawkes's t1 on Q17, taken by Godric 2.51 pm).
+  // lights: false since the touch review (docs/ministry/touch-review.md, Godric's yes of 15 October 2026: q15 and q17
+  // ADJUST, a colour flash reads as a glow cue, so the beasts move and nothing lights): the hold's colours are kept in
+  // code, off; true brings back Godric's Q17 flash and the first hold's quarters lighting.
+  const HOLD = { lights: false, press: 400, up: 350, breath: 1200, down: 1500, peak: 0.32, flare: 0.5, stirAt: 150, stirMs: 800, stirGain: 1, tintMs: 1100,
     order: ['lion', 'badger', 'eagle', 'snake'], tintStep: 150,
     first: { gap: 750, soloMs: 800, light: 350, together: 3300, breath: 4550 }, glint: { at: 250, ms: 700 } };
   // The first hold ever (Godric's touch on Q19, woven, 12 October 2026, 7.41 pm): the beasts stir one after another in
-  // the Sorting Hat's order, Gryffindor, Hufflepuff, Ravenclaw, Slytherin, each quarter lighting with its beast and
-  // staying lit, so the boys learn each one; then all four stir together, and all fades as on every hold. HOLD.first:
+  // the Sorting Hat's order, Gryffindor, Hufflepuff, Ravenclaw, Slytherin (each quarter lighting with its beast only
+  // while HOLD.lights, off since the touch review), so the boys learn each one; then all four stir together, and all fades as on every hold. HOLD.first:
   // gap ms between the solo stirs, each soloMs long; light ms for a quarter to come up; together ms after the first
   // stir, all four; breath, the longer breath this hold needs. holdAt(t, true) gives stirs, each beast its own.
   const glintMark = p => `<g class="lumos-glint" ${glintAttrs(p)}><path d="${H_SHAPE}" fill="none" stroke="#ffe9a8" stroke-width="1.5" stroke-opacity="0.3" stroke-linecap="round" stroke-dasharray="7 ${(H_RUN - 7).toFixed(1)}" stroke-dashoffset="${glintOff(p)}"/><path d="${H_SHAPE}" fill="none" stroke="#fff4cc" stroke-width="0.7" stroke-linecap="round" stroke-dasharray="5 ${(H_RUN - 5).toFixed(1)}" stroke-dashoffset="${glintOff(p) - 1}"/></g>`;
@@ -560,13 +563,13 @@
     if (first) {
       const t0 = t - H.up - H.stirAt, all = bump((t0 - F.together) / H.stirMs);
       const stirs = Object.fromEntries(H.order.map((name, i) => [name, Math.max(bump((t0 - i * F.gap) / F.soloMs), all)]));
-      const tints = Object.fromEntries(H.order.map((name, i) => [name, ease(c((t0 - i * F.gap) / F.light)) * (t < H.up + breath ? 1 : u)]));
+      const tints = Object.fromEntries(H.order.map((name, i) => [name, H.lights ? ease(c((t0 - i * F.gap) / F.light)) * (t < H.up + breath ? 1 : u) : 0]));
       return { crest: CREST + (H.peak - CREST) * u, flare: H.flare * u, stir: stirs, stirs, tint: tints, tints, first: true, glint: (t - H.glint.at) / H.glint.ms };
     }
     const st = (t - H.up - H.stirAt) / H.stirMs;
     // the house colours flash once, a little longer than the stir, each quarter tintStep ms after the one before
     const flash = i => { const tt = (t - H.up - H.stirAt - i * H.tintStep) / H.tintMs; return tt > 0 && tt < 1 ? Math.sin(Math.PI * tt) : 0; };
-    const tints = Object.fromEntries(H.order.map((name, i) => [name, flash(i)]));
+    const tints = Object.fromEntries(H.order.map((name, i) => [name, H.lights ? flash(i) : 0]));
     return { crest: CREST + (H.peak - CREST) * u, flare: H.flare * u, stir: st > 0 && st < 1 ? H.stirGain * Math.sin(Math.PI * st) : 0, tint: tints, tints, glint: (t - H.glint.at) / H.glint.ms };
   }
   // the first hold ever is remembered on the device (FIRST_KEY); hold(el, true) plays it again, for a sheet or a try
