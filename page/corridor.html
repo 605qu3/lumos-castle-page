@@ -194,7 +194,8 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="castle-events.js?v=34"></script>
 <script src="castle-map.js?v=2"></script>
 <script src="charms/guide.js?v=6"></script>
-<script src="charms/spells.js?v=40"></script>
+<script src="charms/spells.js?v=41"></script>
+<script src="design/castle-light.js?v=1"></script>
 <script>
 (function () {
 'use strict';
@@ -3342,9 +3343,13 @@ function updateNorrisDoor(dt) {
    she stares at it while he walks straight past. The light is his lamp's own (no sprite, nothing glowing to say tap
    me), a shade below the torches; it stays in the scene at 0 so a pass never recompiles a material. Design's later
    look is req 452, his figure req 451 (People). ?filch makes him pass at the next hiding stop whatever the day */
-var FILCH = { chance: 0.5, linger: 4, reach: 4.5, speed: 0.75, y: 0.85, peak: 1.15, stops: ['tapestry', 'nook', 'cupboard', 'armour'] };
+/* his lamp's numbers are Design's CastleLight.LAMP (page/design/castle-light.js, req 452 by req 627), so any room's
+   carried lamp matches: its colour, intensity, reach and decay, its height, its sway and bob at his step; its flame's
+   unsteadiness is CastleLight.flicker at 0.06, a lamp's */
+var LAMP = CastleLight.LAMP;
+var FILCH = { chance: 0.5, linger: 4, reach: 4.5, speed: 0.75, seed: 23, stops: ['tapestry', 'nook', 'cupboard', 'armour'] };
 var filch = { q: groundsQ.has('filch'), done: false, wait: 0, t: -1, from: null, dir: 1,
-  light: new THREE.PointLight(col(0xf2a860), 0, 4.5, 1.6) };
+  light: new THREE.PointLight(col(LAMP.colour), 0, LAMP.reach, LAMP.decay) };
 filch.light.name = 'filch-lamp'; filch.light.position.set(0, -10, MID_Z); scene.add(filch.light);
 function filchHides() {   /* is he at a hiding place now */
   if (!atStop || FILCH.stops.indexOf(atStop.name) < 0) return false;
@@ -3365,9 +3370,9 @@ function updateFilch(dt) {
   if (filch.t >= 0) {
     filch.t += dt;
     var d = filch.t * FILCH.speed, span = FILCH.reach * 2, k = d / span;
-    var x = filch.from + filch.dir * d + 0.04 * Math.sin(filch.t * 5.5);   /* his shuffle sways the lamp a little */
-    filch.light.position.set(x, FILCH.y + 0.03 * Math.sin(filch.t * 11), MID_Z);
-    filch.light.intensity = FILCH.peak * Math.sin(Math.PI * Math.min(1, k));
+    var x = filch.from + filch.dir * d + LAMP.sway * Math.sin(filch.t * LAMP.step);   /* his shuffle sways the lamp a little */
+    filch.light.position.set(x, LAMP.height + LAMP.bob * Math.sin(filch.t * LAMP.step * 2), MID_Z);
+    filch.light.intensity = LAMP.intensity * Math.sin(Math.PI * Math.min(1, k)) * CastleLight.flicker(filch.t, FILCH.seed, 0.06);
     if (k >= 1) { filch.t = -1; filch.light.intensity = 0; filch.light.position.y = -10; }
     return;
   }
@@ -4139,7 +4144,7 @@ visorPatch.position.set(ARMOUR.slitX, ARMOUR.slitY, 0.005); visorPatch.visible =
    eyes are. Never a mark on a thing to tap. ?occasion=christmas for a look (the runtime's) */
 var XMAS_CUE = { streamers: 'thick streamers of holly and mistletoe strung along the corridor',
   armour: 'a soft light shining from inside the suit of armour, out through the slits of its visor' };
-var XMAS = { x0: STAIR_X + 0.3, x1: END_X - 0.3, hi: CEIL - 0.25, lo: CEIL - 0.6, swag: 2.2, r: 0.02, off: 0.035, leaves: 72 };
+var XMAS = { x0: STAIR_X + 0.3, x1: END_X - 0.3, hi: CEIL - 0.25, lo: CEIL - 0.6, swag: 2.2, r: 0.02, off: 0.035, leaves: 110, depth: 0.14, berries: 12 };   /* fuller, Design's req 613 (by req 627) */
 function drawHollyLeaf(g, w, h) {
   /* a holly leaf, its spiny edge in five points a side, dark glossy green, the midrib lighter, an ink line round it */
   g.beginPath(); g.moveTo(w * 0.5, h * 0.02);
@@ -4168,11 +4173,11 @@ var xmasStreamers = (function () {
       G.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 20, XMAS.r, 5, false), cord));
       for (var l = 0; l < XMAS.leaves; l++) {
         var p = curve.getPoint((l + rnd()) / XMAS.leaves);
-        leaves.push({ p: new THREE.Vector3(p.x + (rnd() - 0.5) * 0.06, p.y + (rnd() - 0.5) * 0.1, z + out * (0.02 + rnd() * 0.07)),
+        leaves.push({ p: new THREE.Vector3(p.x + (rnd() - 0.5) * 0.06, p.y + (rnd() - 0.5) * XMAS.depth, z + out * (0.02 + rnd() * 0.07)),
           r: new THREE.Euler((rnd() - 0.5) * 1.6, (rnd() - 0.5) * 2.4, rnd() * Math.PI * 2), s: 0.9 + rnd() * 0.5 });
       }
-      for (var b = 0; b < 9; b++) {
-        var q = curve.getPoint((b + 0.2 + rnd() * 0.6) / 9);
+      for (var b = 0; b < XMAS.berries; b++) {
+        var q = curve.getPoint((b + 0.2 + rnd() * 0.6) / XMAS.berries);
         for (var c = 0; c < 3; c++) berries.push(new THREE.Vector3(q.x + (rnd() - 0.5) * 0.05, q.y - 0.03 + (rnd() - 0.5) * 0.04, z + out * (0.08 + rnd() * 0.03)));
       }
       sprigs.push(new THREE.Vector3(a, XMAS.hi - 0.16, z + out * 0.06));
@@ -4197,18 +4202,29 @@ var xmasStreamers = (function () {
 })();
 var visorLight = (function () {
   var c = makeCanvas(128, 32), g = c.getContext('2d'), grd = g.createLinearGradient(0, 0, 0, 32);
-  grd.addColorStop(0, 'rgba(255,190,90,0)'); grd.addColorStop(0.35, 'rgba(255,205,120,0.9)');
-  grd.addColorStop(0.5, 'rgba(255,222,150,1)'); grd.addColorStop(0.65, 'rgba(255,205,120,0.9)'); grd.addColorStop(1, 'rgba(255,190,90,0)');
-  g.fillStyle = grd; g.fillRect(6, 0, 116, 32);
-  g.globalCompositeOperation = 'destination-in';                                       /* the bar's ends fade too */
+  /* Design's look (req 613, by req 627): warm, its core near CastleLight.LAMP's colour, deeper at its edges; brightest
+     at the middle of the slit and falling to its ends, one flame behind it */
+  grd.addColorStop(0, 'rgba(226,128,52,0)'); grd.addColorStop(0.3, 'rgba(226,128,52,0.85)');
+  grd.addColorStop(0.5, 'rgba(255,196,112,1)'); grd.addColorStop(0.7, 'rgba(226,128,52,0.85)'); grd.addColorStop(1, 'rgba(226,128,52,0)');
+  g.fillStyle = grd; g.fillRect(0, 0, 128, 32);
+  g.globalCompositeOperation = 'destination-in';                                       /* 1 mid-slit, 0.55 a sixth from each end, 0 at the ends */
   var gx = g.createLinearGradient(0, 0, 128, 0);
-  gx.addColorStop(0, 'rgba(0,0,0,0)'); gx.addColorStop(0.1, 'rgba(0,0,0,1)'); gx.addColorStop(0.9, 'rgba(0,0,0,1)'); gx.addColorStop(1, 'rgba(0,0,0,0)');
+  gx.addColorStop(0, 'rgba(0,0,0,0)'); gx.addColorStop(1 / 6, 'rgba(0,0,0,0.55)'); gx.addColorStop(0.5, 'rgba(0,0,0,1)'); gx.addColorStop(5 / 6, 'rgba(0,0,0,0.55)'); gx.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = gx; g.fillRect(0, 0, 128, 32);
   var m = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.03), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
   m.position.set((597 - 539) / 1369, (2473 / 2 - 327) / 1369, 0.006); m.visible = false; m.name = 'armour-visor-light';
   armour.add(m);
   return m;
 })();
+/* the flame's breath: the bar's opacity times CastleLight.flicker at a lamp's 0.06, the suit's own seed; half while the
+   sun is up (the runtime's sun().up, read once a second), full from dusk: by day a quiet warm line, by night the
+   "mysterious lights" */
+var VISOR = { seed: 7, day: 0.5, up: null, next: 0 };
+function updateVisorLight() {
+  if (!visorLight.visible) return;
+  if (t >= VISOR.next) { VISOR.next = t + 1; VISOR.up = castle && castle.sun ? !!castle.sun().up : lightTime() === 'day'; }
+  visorLight.material.opacity = Math.min(1, (VISOR.up ? VISOR.day : 1) * CastleLight.flicker(t, VISOR.seed, 0.06));
+}
 var CUE = {
   step: 'the armour a short step out from its pier into the corridor, on its second mark; its stop follows it',
   window: 'the armour half in front of the window toward her end, as if looking out, on its third mark; its stop follows it',
@@ -5008,6 +5024,7 @@ function frame() {
   updateNickHome(wdt);
   updateCupboard(wdt);
   updateFilch(wdt);
+  updateVisorLight();
   updateCandleStub();
   updateFredScrap();
   updateNookFire(t);

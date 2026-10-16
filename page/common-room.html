@@ -6481,31 +6481,43 @@ var DOOR_LIST = [
   { t: 'A crowbar, from home. 1965. Bent.', h: 'casual', ink: 'ink', tie: true },
   { t: 'Pushing instead of pulling. Then pulling. 1971.', h: 'casual', ink: 'pencil' },
   { t: 'A Bludger. 1974. Do not try a Bludger.', h: 'casual', ink: 'ink' },
-  { t: 'Not on our map either, which we take personally.', h: 'printSC', ink: 'ink', sub: 'Messrs Moony, Wormtail, Padfoot and Prongs.' },
+  { t: 'Not on our map either, which we take personally.' + (SET_ASIDE ? '' : ' 1976.'), h: 'printSC', ink: 'ink', sub: SET_ASIDE ? 'Messrs Moony, Wormtail, Padfoot and Prongs.' : null },
+  { t: 'Asking Peeves. 1977. Do not ask Peeves.', h: 'casual', ink: 'pencil', tie: true },
+  { t: 'Forty-seven keys. None of them. 1980.', h: 'small', ink: 'ink' },
   { t: 'A Dungbomb. 1983. The door was fine. We moved out for a week.', h: 'casual', ink: 'ink' },
+  { t: 'Accio key! A spoon came. Then all the spoons came. 1985.', h: 'casual', ink: 'ink' },
   { t: 'Every Flavour Beans posted under it one at a time, in case it fancied one.', h: 'casual', ink: 'pencil', sub: 'It sent back the earwax one. 1986.' },
+  { t: 'Shouting the password at it. It is not a portrait. 1989.', h: 'casual', ink: 'pencil' },
   { t: "A Dungbomb, a Filibuster firework and Lee's tarantula. Door 1, Weasleys 0. F.W., G.W.", h: 'casual', ink: 'ink', caps: true, tie: true },
   { t: 'Set fire to it. By accident. I was meant to be making a feather fly. S.F.', h: 'casual', ink: 'pencil' },
-  { t: "Hermione says it's in Hogwarts, A History. Hermione says everything is. R.W.", h: 'casual', ink: 'ink' },
-  { t: 'It is NOT in Hogwarts, A History. Not in any edition, and I have read them all. H.G.', h: 'small', ink: 'ink' },
+  { t: "Hermione says it's in Hogwarts, A History. Hermione says everything is. R.W.", h: 'casual', ink: 'ink', aside: true },
+  { t: 'It is NOT in Hogwarts, A History. Not in any edition, and I have read them all. H.G.', h: 'small', ink: 'ink', aside: true },
   { t: "Took its photograph to see if it would move in the picture. It didn't. Neither did the door. C.C.", h: 'casual', ink: 'ink' },
   { t: 'STOP TRYING. It is all in Hogwarts, A History. P. Weasley, Prefect.', h: 'percy', ink: 'ink' },
   { t: 'No. F.W.', h: 'casual', ink: 'ink', caps: true },
   { t: 'No. G.W.', h: 'casual', ink: 'ink', caps: true },
-  { t: 'It is NOT. H.G.', h: 'small', ink: 'ink' },
+  { t: 'It is NOT. H.G.', h: 'small', ink: 'ink', aside: true },
   { t: 'Sir Cadogan challenged it to a duel. It would not draw. "Get back, you scurvy braggart!"', h: 'printSC', ink: 'ink' },
-  { t: 'Every password Sir Cadogan ever set us. I wrote them all down, then lost the list. N.L.', h: 'child', ink: 'pencil' },
-  { t: 'Ton-Tongue Toffee under the door. The door did not eat it. F.W., G.W.', h: 'casual', ink: 'ink', caps: true },
-  { t: 'Read its tea leaves. It will open "when the time is right". Very helpful. L.B., P.P.', h: 'fellI', ink: 'pencil' },
-  { t: 'A Mimbulus mimbletonia. Stinksap everywhere. Door still shut, now also sticky. Sorry. N.L.', h: 'child', ink: 'ink' },
-  { t: "Weasleys' Wildfire Whiz-bangs. Door 2, Weasleys 0.", h: 'casual', ink: 'ink', caps: true },
+  { t: 'Every password Sir Cadogan ever set us. I wrote them all down, then lost the list. N.L.', h: 'child', ink: 'pencil', aside: true },
+  { t: 'Ton-Tongue Toffee under the door. The door did not eat it. F.W., G.W.', h: 'casual', ink: 'ink', caps: true, from: 4 },
+  { t: 'Read its tea leaves. It will open "when the time is right". Very helpful. L.B., P.P.', h: 'fellI', ink: 'pencil', from: 3 },
+  { t: 'A Mimbulus mimbletonia. Stinksap everywhere. Door still shut, now also sticky. Sorry. N.L.', h: 'child', ink: 'ink', from: 5 },
+  { t: "Weasleys' Wildfire Whiz-bangs. Door 2, Weasleys 0.", h: 'casual', ink: 'ink', caps: true, from: 5 },
   { t: 'I tried walking through it. I could not. I have not been refused by a door since 1492.', h: 'clerk', ink: 'faded', sub: 'Sir Nicholas de Mimsy-Porpington' },
-  { t: 'I have tried it myself, and I advise you all to go to bed. M. McGonagall', h: 'fellI', ink: 'ink' },
-  { t: 'Asking Peeves. 2003. Do not ask Peeves.', h: 'casual', ink: 'pencil', tie: true },
-  { t: 'Forty-seven keys. None of them. 2011.', h: 'small', ink: 'ink' },
-  { t: 'Accio key! A spoon came. Then all the spoons came. 2017.', h: 'casual', ink: 'ink' },
-  { t: 'Shouting the password at it. It is not a portrait. 2022.', h: 'casual', ink: 'pencil' }
+  { t: 'I have tried it myself, and I advise you all to go to bed. M. McGonagall', h: 'fellI', ink: 'ink' }
 ];
+/* Magic's Rework 20 (req 598; Godric's 1 on fawkes-door-list-1016, 16 October 2026, written by the Corridor while
+   this lane is paused): the lines marked aside are set aside, off unless ?setaside, kept until his yes to remove them;
+   a line marked from N is written from that castle year on (the last book he has finished, Events' castle.year(), or
+   ?finished=N without the runtime); the four lines once dated 2003 to 2022 are dated inside the castle's past */
+function listYear() {
+  if (typeof castle !== 'undefined' && castle && castle.year) return castle.year();
+  return Math.max(0, Math.min(7, +(location.search.match(/[?&]finished=(\d)/) || [])[1] || 0));
+}
+function listLines() {
+  var yr = listYear();
+  return DOOR_LIST.filter(function (e) { return (!e.aside || SET_ASIDE) && (!e.from || yr >= e.from); });
+}
 var LIST_FACE = { clerk: F.clerk, casual: F.casual, small: F.small, printSC: F.printSC, child: F.child, percy: F.percy, his: F.child };
 var LIST_INK = { ink: '#2a2520', pencil: '#6f6b64', brown: '#4f3f2e', faded: '#7a6e60' };
 var LIST = { w: 0.13, h: 0.2, x: -0.14, top: 0.80, turn: 0.22, cw: 600, size: 25, margin: 60, lead: 1.22, gap: 8, scroll: 0, scrollT: 0, max: 0,
@@ -6622,7 +6634,7 @@ function listLayout() {
   var bands = [0, 1, 2].map(function (i) { return [(listCellTop(i) + LIST_ART.text) * m, (listCellTop(i) + LIST_ART.ends[i]) * m]; });
   var b = 0, y = bands[0][0], his = -1;
   function room(h) { while (b < bands.length - 1 && y + h > bands[b][1]) { b++; y = bands[b][0]; } }   /* past a band's end, on to the next piece */
-  var mine = listMine(), all = DOOR_LIST.concat(mine.map(function (m) { return { t: listDated(m), h: 'his', ink: 'pencil', his: true }; }));
+  var mine = listMine(), all = listLines().concat(mine.map(function (m) { return { t: listDated(m), h: 'his', ink: 'pencil', his: true }; }));
   if (!mine.length) all = all.concat([{ blank: true, his: true }]);
   all.forEach(function (e) {
     if (e.his && his < 0) his = out.length;
