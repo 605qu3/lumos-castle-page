@@ -25,7 +25,7 @@
 <canvas id="c"></canvas>
 <div id="line"></div>
 <div id="panel"></div>
-<script src="spells.js?v=40"></script>
+<script src="spells.js?v=41"></script>
 <script>
 /* Dissendium, a test page for the Charms lane (12 October 2026, seventh session; the owner is Godric). Drawn in code.
    The books (PoA 10, checked in the text): behind a statue of a humpbacked, one-eyed witch on the third floor, Harry
@@ -36,8 +36,9 @@
    Dissendium" (PoA 16). Godric's Q5 (12 October 2026, 1.58 pm): 2, the tap and the word open the hump by itself, "at
    once", as the book has it, with his two touches. t1: as it swings, the protractor at the hinge traces the angle, a
    tick at every ten degrees, and stops it at just wide enough to admit a fairly thin person, the gap at its edge (the
-   chord) measured against him: a lid 45 cm long, a boy 34 cm across the shoulders, so it stops at 44 degrees, and the
-   book's line becomes the sum, gap 34 cm, you 34 cm. t2: as he slides down, a faint voice from the map in his pocket
+   chord) measured against him: a lid 18 in long, a boy 13½ in across the shoulders, so it stops at 44 degrees, and the
+   book's line becomes the sum, gap 13½ in, you 13½ in (in inches since 16 October 2026: Godric's ruling of 14 October,
+   Units, imperial in the wizard world). t2: as he slides down, a faint voice from the map in his pocket
    reminds him that Lumos is needed at the bottom. The lift he drew round the hinge (the seventh session's first
    pass) is gone from the page; its judge, LumosSpells.judgeHinge, stays in spells.js and its tally for a later level.
    The dark at the bottom is lit with Lumos's flick (judgeFlick). ?ease= (the flick's), ?width= (his shoulders, cm)
@@ -60,9 +61,9 @@
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
   var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
-  /* the sum: the lid's length and his width in cm; the angle where the gap at the edge (2 x 45 x sin(half the angle))
-     first equals his width */
-  var LID = 45, WIDTH = Math.max(24, Math.min(44, Number(qs.get('width')) || 34)), MAX = 110;
+  /* the sum: the lid's length and his width in inches; the angle where the gap at the edge (2 x 18 x sin(half the
+     angle)) first equals his width */
+  var LID = 18, WIDTH = Math.max(9.5, Math.min(17.5, Number(qs.get('width')) || 13.5)), MAX = 110;
   var NEED = LumosSpells.humpNeed(LID, WIDTH), SLIDE = 3600;
   var stage = 'tap', taps = 0, bubble = null, lid = 0, stroke = null, active = null, trail = null, last = null, asking = null;
   var thud = null, slideAt = 0, litAt = 0;
@@ -133,12 +134,12 @@
       },
       onStop: function (o) {   /* it stops where the gap equals his width */
         lid = NEED; noise(0.2, 400, 0.5); last = { degrees: o.degrees, gap: o.gap, width: o.width, first: o.first };
-        say('It stops at <b>' + o.degrees + '°</b>. The gap at its edge is <b>' + o.gap + ' cm</b>, and you are <b>' + o.width + ' cm</b> across the shoulders: just wide enough to admit a fairly thin person.');
+        say('It stops at <b>' + o.degrees + '°</b>. The gap at its edge is <b>' + LumosSpells.halfIn(o.gap) + ' in</b>, and you are <b>' + LumosSpells.halfIn(o.width) + ' in</b> across the shoulders: just wide enough to admit a fairly thin person.');
       } });
     mine.done.then(function (o) {
       if (asking !== mine) return;
       asking = null;
-      if (o.verdict === 'opened') { stage = 'open'; say('It stops at <b>' + o.degrees + '°</b>, a gap of <b>' + o.gap + ' cm</b>: just wide enough for you. Tap the hole to climb in, headfirst.'); }
+      if (o.verdict === 'opened') { stage = 'open'; say('It stops at <b>' + o.degrees + '°</b>, a gap of <b>' + LumosSpells.halfIn(o.gap) + ' in</b>: just wide enough for you. Tap the hole to climb in, headfirst.'); }
     });
   }
   function climb(p) {

@@ -2255,8 +2255,9 @@ function measureSpan(opts) {
    says the word for him (Magic, 12 October 2026, 9.53 pm). Then the next tap on the hump opens it by itself, at once.
    As it swings (2.8 s, easing to its stop) the layer draws the protractor at the hinge, a tick at every ten degrees
    (30, 60 and 90 numbered), the gold wedge and its degrees, and the chord: the gap at the lid's edge as a gold line in
-   cm, toward his own mark, "you, 34 cm". It stops where the gap equals his width: a lid 45 cm long and a boy 34 cm
-   across the shoulders, 44 degrees (humpNeed). The room draws the lid where onSwing puts it each frame. A touch
+   inches, toward his own mark, "you, 13½ in". It stops where the gap equals his width: a lid 18 in long and a boy 13½ in
+   across the shoulders, 44 degrees (humpNeed). Inches, as the wizard world measures (Godric's ruling of 14 October 2026,
+   Units: imperial in the castle, metric only on the boys' own things); lengths shown to the half inch (halfIn). The room draws the lid where onSwing puts it each frame. A touch
    anywhere else costs nothing. The answer is 'opened' (a few seconds after the stop, so the sum can be read; onStop
    comes at the stop itself) or 'cancelled'. Who may be offered it is the room's: Magic's answer has the hump offered
    once he holds the twins' note (req 179), with no learned flag; the first open sets learned('dissendium'). No map
@@ -2266,18 +2267,19 @@ function measureSpan(opts) {
            hinge, edge: {x, y} or functions: the lid's hinge and its closed edge on the screen, for the protractor
                   and the chord (by default a lid laid out from hump, its hinge right and below, its edge left),
            dir: 1 if the lid opens clockwise on the screen (default) or -1,
-           lid: the lid's length in cm (45), width: his shoulders in cm (34), max: the protractor's reach (110),
+           lid: the lid's length in inches (18), width: his shoulders in inches (13.5), max: the protractor's reach (110),
            hold: seconds the sum stays drawn after the stop before the answer (3),
            onTap(n): each tap on the hump that does not open it (n counts them: 1 is the book's "nothing"),
-           onWord(): the card tapped, the word said (her lid shifts a hair with a stone grate; quiet: true skips the grate), onSwing(degrees, gapCm): each frame of the swing,
+           onWord(): the card tapped, the word said (her lid shifts a hair with a stone grate; quiet: true skips the grate), onSwing(degrees, gapInches): each frame of the swing,
            onStop(out): at the stop, with the answer to come,
            exits, wait: as every room callable (EXITS) }
    Returns { done: a promise of { verdict: 'opened' | 'cancelled', degrees, gap, width, need, first }, cancel(),
              tap() (a tap on the hump), say() (a tap on the card), state() }. */
 function humpNeed(lid, width) { return 2 * Math.asin(Math.min(1, width / (2 * lid))) * 180 / Math.PI; }
+function halfIn(x) { var h = Math.round(x * 2) / 2, n = Math.floor(h); return (n ? String(n) : (h ? '' : '0')) + (h - n ? '½' : ''); }   /* 13.5 -> "13½" */
 function openHump(opts) {
   opts = opts || {};
-  var LID = opts.lid || 45, WIDTH = opts.width || 34, MAX = opts.max || 110, NEED = humpNeed(LID, WIDTH);
+  var LID = opts.lid || 18, WIDTH = opts.width || 13.5, MAX = opts.max || 110, NEED = humpNeed(LID, WIDTH);
   var DIR = opts.dir === -1 ? -1 : 1, SWING = 2800, HOLD = (opts.hold == null ? 3 : opts.hold) * 1000;
   var stage = 'tap', taps = 0, said = 0, deg = 0, swingAt = 0, out = null, L;
   var h = null, r = 0, hi = null, ed = null, card = null;
@@ -2305,7 +2307,7 @@ function openHump(opts) {
   function stop() {
     stage = 'stopped'; deg = NEED;
     var first = !learned('dissendium'); learn('dissendium'); firstCast('dissendium');
-    out = { verdict: 'opened', degrees: Math.round(NEED), gap: Math.round(gapAt(NEED)), width: WIDTH, need: Math.round(NEED * 10) / 10, first: first };
+    out = { verdict: 'opened', degrees: Math.round(NEED), gap: Math.round(gapAt(NEED) * 2) / 2, width: WIDTH, need: Math.round(NEED * 10) / 10, first: first };
     if (opts.onStop) opts.onStop(out);
     L.later(out, HOLD);
   }
@@ -2338,10 +2340,10 @@ function openHump(opts) {
       cx.strokeStyle = '#9fb6c9'; cx.lineWidth = 3;
       cx.beginPath(); cx.moveTo(m.x - uy * 12, m.y + ux * 12); cx.lineTo(m.x + uy * 12, m.y - ux * 12); cx.stroke();
       cx.fillStyle = '#9fb6c9'; cx.shadowColor = '#000'; cx.shadowBlur = 4;
-      cx.fillText('you, ' + WIDTH + ' cm', m.x + side * uy * fs * 1.6 + ux * fs * 1.4, m.y - side * ux * fs * 1.6 + uy * fs * 1.4);   /* outside the lid, past his mark */
+      cx.fillText('you, ' + halfIn(WIDTH) + ' in', m.x + side * uy * fs * 1.6 + ux * fs * 1.4, m.y - side * ux * fs * 1.6 + uy * fs * 1.4);   /* outside the lid, past his mark */
       var mid = { x: (ed.x + e1.x) / 2, y: (ed.y + e1.y) / 2 };
       cx.fillStyle = fits ? '#f3d27a' : 'rgba(243,210,122,0.8)'; cx.font = '600 ' + fs + 'px Georgia, serif';
-      cx.fillText('gap ' + Math.round(gapAt(deg)) + ' cm', mid.x + side * uy * fs * 2.6, mid.y - side * ux * fs * 2.6);
+      cx.fillText('gap ' + halfIn(gapAt(deg)) + ' in', mid.x + side * uy * fs * 2.6, mid.y - side * ux * fs * 2.6);
     }
     var big = Math.round(Math.max(16, S * 0.05));
     cx.font = '600 ' + big + 'px Georgia, serif'; cx.fillStyle = '#f3d27a'; cx.shadowColor = '#000'; cx.shadowBlur = 6;
@@ -2375,7 +2377,7 @@ function openHump(opts) {
     off: function (p) { return stage === 'tap' && !onHump(p) && !(taps && onCard(p)); }
   }, opts);
   place();
-  return { done: L.done, cancel: L.leave = function () { L.finish({ verdict: 'cancelled', degrees: Math.round(deg), gap: Math.round(gapAt(deg)), width: WIDTH, need: Math.round(NEED * 10) / 10, first: false }); },
+  return { done: L.done, cancel: L.leave = function () { L.finish({ verdict: 'cancelled', degrees: Math.round(deg), gap: Math.round(gapAt(deg) * 2) / 2, width: WIDTH, need: Math.round(NEED * 10) / 10, first: false }); },
     tap: tap, say: say,
     state: function () { return { stage: stage, taps: taps, said: !!said, degrees: Math.round(deg * 10) / 10, need: Math.round(NEED * 10) / 10, card: card, hump: h }; } };
 }
@@ -2591,6 +2593,6 @@ function moveThing(opts) {
 root.LumosSpells = { FLICK_EASES: FLICK_EASES, judgeFlick: judgeFlick, judgeSwishDown: judgeSwishDown, TURN_EASES: TURN_EASES, judgeTurn: judgeTurn,
   TAP_EASES: TAP_EASES, judgeTaps: judgeTaps, SWISH_EASES: SWISH_EASES, judgeSwishFlick: judgeSwishFlick, learned: learned, learn: learn, castOver: castOver, openLock: openLock, revealInk: revealInk,
   SWISH_WHY: SWISH_WHY, FLICK_WHY: FLICK_WHY, lockWhy: lockWhy, inkWhy: inkWhy, levitate: levitate, ppi: ppi, SPAN_WHY: SPAN_WHY, measureSpan: measureSpan,
-  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
+  HINGE_EASES: HINGE_EASES, judgeHinge: judgeHinge, humpNeed: humpNeed, halfIn: halfIn, openHump: openHump, moveThing: moveThing, SLIDE_WHY: SLIDE_WHY, slideWords: slideWords, drawWordCard: drawWordCard,
   SLIDE_EASES: SLIDE_EASES, judgeSlide: judgeSlide, slideFromPiece: slideFromPiece, addMoves: addMoves, AIM_EASES: AIM_EASES, judgeAim: judgeAim, DISARM_EASES: DISARM_EASES, judgeDisarm: judgeDisarm, joinStrokes: joinStrokes, TOP_EASES: TOP_EASES, judgeTop: judgeTop, COIL_EASES: COIL_EASES, judgeCoil: judgeCoil, smallestCircle: smallestCircle, RING_EASES: RING_EASES, judgeRing: judgeRing, FINITE_EASES: FINITE_EASES, judgeFinite: judgeFinite, BIND_EASES: BIND_EASES, judgeBind: judgeBind, CHEER_EASES: CHEER_EASES, judgeCheer: judgeCheer, judgeSmile: judgeSmile, DANCE_EASES: DANCE_EASES, judgePineapple: judgePineapple, judgeSteps: judgeSteps, BRICK_EASES: BRICK_EASES, brickAt: brickAt, brickRect: brickRect, judgeBrick: judgeBrick, FREEZE_EASES: FREEZE_EASES, judgeFreeze: judgeFreeze, FLAMES_EASES: FLAMES_EASES, judgeFlames: judgeFlames, judgeLoop: judgeLoop, offLine: offLine, MIRROR_EASES: MIRROR_EASES, judgeMirror: judgeMirror, judgeTwoMirrors: judgeTwoMirrors, reflectOver: reflectOver, stepOut: stepOut, circleThrough: circleThrough, fitCircle: fitCircle, windAround: windAround, crossings: crossings };
 })(typeof window !== 'undefined' ? window : globalThis);
