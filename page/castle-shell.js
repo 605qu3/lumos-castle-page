@@ -31,6 +31,8 @@
    first; a ladder or trapdoor through a floor (a stair with `rooms` and `rect`) is a way down or up, a dark square.
    v15 (model v43): a short room entered from its side is stood in at its middle; an opening wider than a short side of a
    curved face is cut on into the next side (the casemate's powder-door).
+   v18 (model v45): the start turns all the way round where its way out would lie past the head's turn; up a stair in a
+   wall he starts a step inside the room.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -754,7 +756,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      depth where the far side is a room's page, short of the dark beyond); through a door, a step inside it */
   function facingIn(d, name) {
     if (d.hatch) return hatchStand(d, name, true);
-    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built || d.via ? -0.3 : -1.0) : P.shaft ? (shaftStepped[d.id] ? 0.35 : 1.0) : STAND_OFF;
+    /* v18: up a stair in a wall (d.via) a step inside the room, clear of the arch's own wall ends; in a round room four
+       fifths of the way to its middle, where the orrery room's door, deep in the drum's wall at a slant, comes into
+       sight (Events' ninety-first, 3.19 am, 16 October: from the arch's mouth the reveal hid it at the head's full turn) */
+    var viaIn = P.round ? P.round.r * 0.8 : 1.0;
+    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.via ? viaIn : d.page || !d.built ? -0.3 : -1.0) : P.shaft ? (shaftStepped[d.id] ? 0.35 : 1.0) : STAND_OFF;
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
     /* v10: never off the floor (a ring 0.9 wide): nearer the door until he stands on it */
     while (back > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { back -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE; }
@@ -863,6 +869,29 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       st.look = st.pos.clone().add(new THREE.Vector3(d.x * k, Math.tan(st.lim.rest * Math.PI / 180) * 10, d.z * k));
     }
   });
+  /* v18 (Events' ninety-first, 3.19 am, 16 October; the world rules: a way out always open): the start takes the whole
+     turn round when a way of this place, the one he came by included, cannot be reached by any chain of taps from it
+     (the dovecote, its one arch behind him; the orrery room's arch, 108 degrees left of the door's start), unless the
+     model names the start's own turn. A thing is in reach of a stand within its turn and 10 degrees of the narrowest
+     frame; a tap on it walks him to its stand, and from there on. */
+  var st0 = out.stands[0];
+  if (st0 && st0.name === 'start' && st0.lim.turn < 180 && !(named.start && named.start.turn != null)) {
+    var here_ = all.filter(function (d) { return d.place === P.id && d.mid; });
+    var inReach = function (s, d) {
+      if (!s.lim || s.lim.turn >= 180) return true;
+      var dl = s.look.clone().sub(s.pos), v = d.mid.clone().sub(s.pos);
+      if (Math.hypot(v.x, v.z) < 0.3) return true;
+      var a = Math.atan2(v.x, v.z) - Math.atan2(dl.x, dl.z);
+      return Math.abs(Math.atan2(Math.sin(a), Math.cos(a))) * 180 / Math.PI <= s.lim.turn + 10;
+    };
+    var seen = [], q = [st0];
+    while (q.length) {
+      var s_ = q.shift();
+      here_.forEach(function (d) { if (seen.indexOf(d) < 0 && inReach(s_, d)) { seen.push(d); if (d.stand) q.push(d.stand); } });
+    }
+    var lost = here_.filter(function (d) { return out.ways.indexOf(d) >= 0 && seen.indexOf(d) < 0; });
+    if (lost.length) { st0.lim.turn = 180; st0.wide = lost.map(function (d) { return d.id; }).join(' '); }
+  }
   out.look = LK;
   return out;
 } };
