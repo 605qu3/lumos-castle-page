@@ -73,7 +73,7 @@
   var cv = document.getElementById('c'), cx = cv.getContext('2d'), lineEl = document.getElementById('line'), panel = document.getElementById('panel');
   var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind', guideOn = qs.get('guide') !== 'off';
-  var ROUNDS = [
+  var ROUNDS = [   /* the canon rounds, set aside (below) */
     { name: 'Snape', want: 'down', start: 'The old wardrobe in the staff room wobbles and bangs off the wall. First the word, without your wand, as Lupin\'s class did: <b>tap the word and say it aloud</b>.',
       cast: 'Out steps Professor Snape, the Boggart\'s idea of him. Raise your wand and draw <b>one straight line down through him</b>, top to bottom.' },
     { name: 'Spider', want: 'across', start: 'The wardrobe shakes again: it is Ron\'s turn. <b>Tap the word and say it aloud</b> first.',
@@ -82,6 +82,24 @@
       cast: 'A bandaged mummy walks out, very slowly. This mirror is slanted: draw <b>one straight line through it, leaning halfway between up and across</b>. It will tip over twice as far as your line leans.' },
     { name: 'Banshee', want: 0, two: true, start: 'The wardrobe shakes a fourth time: it is Seamus\'s turn. <b>Tap the word and say it aloud</b> first.',
       cast: 'A banshee, her black hair to the floor, opens her mouth and wails. Two mirrors this time, side by side: draw <b>one straight line down through her</b>, then <b>a second beside it, to her right</b>, standing the same way.' } ];
+  /* Rework 10 of the Ministry's list (16 October 2026): the four canon boggarts (Neville's Snape in the dress, Ron's
+     spider, Parvati's mummy, Seamus's banshee) are each pupil's turn in PoA 7, so they are set aside, kept here behind
+     ?setaside until Godric's yes to remove them (docs/ministry/set-aside.md; the touch review's DROP of
+     charms-q7-boggart-1013 t2). What the Boggart becomes for each boy is a gentle fear a grown-up chooses for him (the
+     charter, 14 October 2026), still to come; until then every round uses a stand-in, a wobbly grey shape trying hard
+     to be frightening, bursting out of an ordinary old cupboard. The four mirror rounds, their judges and sums are
+     unchanged; the stand-in's outline runs through each round's three marked points. Practising the word without a
+     wand first stays (PoA 7, every class does it). */
+  var SET_ASIDE = /[?&]setaside(=|&|$)/.test(location.search);
+  if (!SET_ASIDE) ROUNDS = [
+    { name: 'Down', want: 'down', start: 'An old cupboard wobbles and bangs against the wall. First the word, without your wand: <b>tap the word and say it aloud</b>.',
+      cast: 'Out it comes, a wobbly grey shape trying very hard to be frightening. Raise your wand and draw <b>one straight line down through it</b>, top to bottom.' },
+    { name: 'Across', want: 'across', start: 'The cupboard shakes again. <b>Tap the word and say it aloud</b> first.',
+      cast: 'A low grey lump this time, rumbling. Draw <b>one straight line across it</b>, side to side.' },
+    { name: 'Slant', want: 45, start: 'The cupboard shakes a third time. <b>Tap the word and say it aloud</b> first.',
+      cast: 'A tall grey shape sways out, very slowly. This mirror is slanted: draw <b>one straight line through it, leaning halfway between up and across</b>. It will tip over twice as far as your line leans.' },
+    { name: 'Two mirrors', want: 0, two: true, start: 'The cupboard shakes a fourth time. <b>Tap the word and say it aloud</b> first.',
+      cast: 'A grey shape that moans, long and low. Two mirrors this time, side by side: draw <b>one straight line down through it</b>, then <b>a second beside it, to its right</b>, standing the same way.' } ];
   var round = Math.max(0, Math.min(3, (Number(qs.get('round')) || 1) - 1));
   var stage = 'word', saidAt = 0, castAt = 0, flip = null, marks = null, laughAt = 0, doneAt = 0, last = null, wobbleAt = 0, chain = null;
   var stroke = null, active = null, trail = null, guide = null, missAt = 0, mirror1 = null;   /* mirror1: the fourth round's first line, kept */
@@ -221,7 +239,7 @@
         w = WHY[j.reason]; say(typeof w === 'function' ? w(j) : w); return j;
       }
       mirror1 = { pts: pts, j: j }; noise(0.06, 1800, 0.25);
-      say('That is the first mirror. Now <b>the second, beside it to her right</b>: one more straight line down, standing the same way, a little apart.');
+      say('That is the first mirror. Now <b>the second, beside it to ' + (SET_ASIDE ? 'her' : 'its') + ' right</b>: one more straight line down, standing the same way, a little apart.');
       return j;
     }
     j = LumosSpells.judgeTwoMirrors(mirror1.pts, pts, b, 0, ease, stageBox()); last = j;
@@ -393,14 +411,15 @@
       var m = cx.getTransform(), hp = P(b, 0, 0.1), q = m.transformPoint(new DOMPoint(hp[0], hp[1]));
       flip.head = { x: q.x / DPR, y: q.y / DPR }; noise(0.14, 160, 0.7);   /* the thump */
     }
-    drawMummy(b, now, !off);
+    if (SET_ASIDE) drawMummy(b, now, !off); else drawStandIn(b, now, 2, k >= 0.5, 0, !off);
     if (off && flip.head) {
       cx.setTransform(DPR, 0, 0, DPR, 0, 0);
       if (laughAt) cx.globalAlpha = Math.max(0, 1 - (now - laughAt) / 500);
       var r = b.w * 0.17, v = Math.min(1, (t - 4200) / 1200), ev = 1 - Math.pow(1 - v, 3), room = flip.sg > 0 ? W - r * 1.6 - flip.head.x : flip.head.x - r * 1.6;
       var d = flip.sg * ev * Math.max(0, Math.min(S * 0.22, room));   /* rolls away, short of the screen's edge */
       var hy = flip.head.y + (floorY - r - flip.head.y) * Math.min(1, v * 3);
-      drawMummyHead([flip.head.x + d, hy], r, d / r);
+      if (SET_ASIDE) drawMummyHead([flip.head.x + d, hy], r, d / r);
+      else { cx.fillStyle = '#6f6f7a'; cx.beginPath(); cx.arc(flip.head.x + d, hy, r * 0.6, 0, 7); cx.fill(); }   /* its top knob, rolling */
     }
   }
   /* Seamus's banshee, kept gentle (the fourth round's points: her raised right hand, the tip of her hair on the floor,
@@ -449,6 +468,23 @@
     return flip && flip.axis === 'two' ? Math.max(0, Math.min(1, (now - flip.at - 3600) / 800)) : 0;
   }
   /* the boggart: before, in the flip (scaled through zero about the mirror line), after, rolling, laughing, smoke */
+  /* the stand-in (Rework 10): one grey outline through the round's three marked points (points(), above), two eyes,
+     and once flipped a silly look, eyes crossed and a tongue out; kind 1 rolls (roll), kind 2 can lose its top knob */
+  var STAND = [
+    [[-0.12, 0.02], [0.1, 0.0], [0.17, 0.21], [0.24, 0.36], [0.42, 0.5], [0.26, 0.56], [0.32, 0.98], [-0.47, 0.97], [-0.3, 0.6], [-0.22, 0.25]],
+    [[-0.33, 0.1], [-0.05, 0.0], [0.2, 0.15], [0.27, 0.42], [0.4, 0.6], [0.47, 0.96], [-0.4, 0.98], [-0.46, 0.5]],
+    [[-0.1, 0.06], [0.13, 0.04], [0.2, 0.2], [0.46, 0.34], [0.25, 0.45], [0.3, 0.99], [-0.48, 0.99], [-0.25, 0.5], [-0.2, 0.2]],
+    [[-0.15, 0.05], [0.1, 0.0], [0.36, 0.08], [0.2, 0.2], [0.25, 0.6], [0.2, 0.97], [-0.42, 0.98], [-0.3, 0.5], [-0.25, 0.2]] ];
+  function drawStandIn(b, now, kind, silly, roll, knob) {
+    var wob = silly ? 0 : Math.sin(now / 300) * 0.012;
+    if (roll) { var c = P(b, 0, 0.55); cx.translate(c[0], c[1]); cx.rotate(roll); cx.translate(-c[0], -c[1]); }
+    poly(b, STAND[kind].map(function (q, i) { return [q[0] + (i % 2 ? wob : -wob), q[1]]; }), silly ? '#9a9aa6' : '#6f6f7a', '#3e3e46');
+    if (knob !== false && kind === 2) blob(b, 0.0, 0.03, 0.1, 0.05, '#6f6f7a');
+    var ey = kind === 1 ? 0.35 : 0.2, ex = kind === 1 ? 0.06 : 0.07;
+    blob(b, -ex, ey, 0.05, kind === 1 ? 0.09 : 0.03, '#f2f0e8'); blob(b, ex, ey, 0.05, kind === 1 ? 0.09 : 0.03, '#f2f0e8');
+    blob(b, -ex + (silly ? 0.02 : 0), ey, 0.022, kind === 1 ? 0.04 : 0.014, '#1a1a1e'); blob(b, ex - (silly ? 0.02 : 0), ey, 0.022, kind === 1 ? 0.04 : 0.014, '#1a1a1e');
+    if (silly) blob(b, 0.0, ey + (kind === 1 ? 0.22 : 0.09), 0.04, kind === 1 ? 0.08 : 0.03, '#d86a7a');
+  }
   function drawBoggart(now) {
     var b = box(), appear = castAt ? Math.min(1, (now - castAt) / 400) : 0;
     if (stage === 'word' || stage === 'saying') return;
@@ -462,13 +498,13 @@
       if (laughAt) { cx.globalAlpha = appear * Math.max(0, 1 - (now - laughAt) / 500); }
       cx.translate(miss, 0);
       if (flip) twoFlips(now);
-      drawBanshee(b, now, hushOf(now));
+      if (SET_ASIDE) drawBanshee(b, now, hushOf(now)); else drawStandIn(b, now, 3, flip && now - flip.at > 1700, 0);
       cx.restore(); return;
     }
     if (round === 2) {
       if (laughAt) { cx.globalAlpha = appear * Math.max(0, 1 - (now - laughAt) / 500); }
       cx.translate(miss, 0);
-      if (flip) drawMummyFlip(b, now); else drawMummy(b, now, true);
+      if (flip) drawMummyFlip(b, now); else if (SET_ASIDE) drawMummy(b, now, true); else drawStandIn(b, now, 2, false, 0, true);
       cx.restore(); return;
     }
     if (flip) {
@@ -477,14 +513,14 @@
     }
     if (laughAt) { var lk = Math.min(1, (now - laughAt) / 500); cx.globalAlpha = appear * (1 - lk); }
     cx.translate(miss, 0);
-    if (round === 0) drawSnape(b, silly, now);
+    if (round === 0) { if (SET_ASIDE) drawSnape(b, silly, now); else drawStandIn(b, now, 0, silly, 0); }
     else {
       var t = flip ? (now - flip.at) / 1000 : 0, legs = !flip || t < 2.6 ? 1 : Math.max(0, 1 - (t - 2.6) / 0.5), roll = 0;
       if (flip && t > 3.1) {   /* it rolled over and over, and came to a halt */
         var u = Math.min(1, (t - 3.1) / 1.6), e = 1 - Math.pow(1 - u, 3); roll = e * Math.PI * 4;
         cx.translate(e * S * 0.18, 0);
       }
-      drawSpider(b, now, legs, roll);
+      if (SET_ASIDE) drawSpider(b, now, legs, roll); else drawStandIn(b, now, 1, !!flip && k >= 0.5, roll);
     }
     cx.restore();
   }
@@ -677,14 +713,15 @@
     if (flip && stage === 'flip') {
       var t = now - flip.at, end = round === 0 ? 2400 : round === 1 ? 4900 : round === 2 ? 5600 : 5000;
       if (round === 3 && t > 1800 && !flip.said) { flip.said = true; say('Over the first mirror she turned round; over the second, <b>back the right way round</b>, and slid along: each point <b>twice the gap</b> between the mirrors, straight across them.'); }
-      if (round === 3 && t > 3600 && !flip.hushed) { flip.hushed = true; noise(0.3, 240, 0.35); say('She makes a rasping noise and clutches her throat: <b>her voice is gone</b>.'); }
+      if (round === 3 && t > 3600 && !flip.hushed) { flip.hushed = true; noise(0.3, 240, 0.35); say(SET_ASIDE ? 'She makes a rasping noise and clutches her throat: <b>her voice is gone</b>.' : 'It gives a squeak where the moan was: <b>its moan is gone</b>.'); }
       if (round === 2 && t > 800 && !flip.said) { flip.said = true; say('Your line leans <b>' + Math.abs(Math.round(flip.lean)) + ' degrees</b>, so it tipped <b>' + Math.abs(Math.round(flip.turn)) + '</b>: twice as far. Each point as far beyond the line as it was before it, square to it.'); }
       if (t > end) {
         stage = 'laugh';
-        say(round === 0 ? (Math.abs(last.share) > 0.15 ? 'Your line was to one side, so he landed <b>as far on the other side</b>: each point the same distance either side, straight across. Now <b>tap him and laugh</b>!' : 'Each point lands <b>the same distance on the other side</b> of your line, straight across: a reflection. Now <b>tap him and laugh</b>!')
-          : round === 1 ? 'Upside down, each point as far below your line as it was above. Its legs have vanished and it rolled to a halt. <b>Tap it and laugh</b>!'
-          : round === 2 ? 'It tipped over <b>twice as far as your line leans</b>, ' + Math.abs(Math.round(flip.turn)) + ' degrees, then fell flat on its face, and its head rolled off. <b>Tap it and laugh</b>!'
-          : 'Two mirrors side by side, and she <b>slid along twice the gap</b>, the right way round. And her voice is gone. <b>Tap her and laugh</b>!');
+        say(round === 0 ? (Math.abs(last.share) > 0.15 ? 'Your line was to one side, so ' + (SET_ASIDE ? 'he' : 'it') + ' landed <b>as far on the other side</b>: each point the same distance either side, straight across. Now <b>tap ' + (SET_ASIDE ? 'him' : 'it') + ' and laugh</b>!' : 'Each point lands <b>the same distance on the other side</b> of your line, straight across: a reflection. Now <b>tap ' + (SET_ASIDE ? 'him' : 'it') + ' and laugh</b>!')
+          : round === 1 ? 'Upside down, each point as far below your line as it was above. ' + (SET_ASIDE ? 'Its legs have vanished and it rolled to a halt.' : 'It rolled over and over, and came to a halt.') + ' <b>Tap it and laugh</b>!'
+          : round === 2 ? 'It tipped over <b>twice as far as your line leans</b>, ' + Math.abs(Math.round(flip.turn)) + ' degrees, then fell flat on its face, and its ' + (SET_ASIDE ? 'head' : 'top') + ' rolled off. <b>Tap it and laugh</b>!'
+          : SET_ASIDE ? 'Two mirrors side by side, and she <b>slid along twice the gap</b>, the right way round. And her voice is gone. <b>Tap her and laugh</b>!'
+          : 'Two mirrors side by side, and it <b>slid along twice the gap</b>, the right way round. And its moan is gone. <b>Tap it and laugh</b>!');
       }
     }
     drawBoggart(now);
