@@ -29,6 +29,8 @@
    v13 (model v39): a way into a stair joining two rooms (the dovecote's, in the drum's wall) leads on to the room at its far end.
    v14 (model v42, the Found starts): the start looks the way this place's floor runs longest, a step inside a short room
    first; a ladder or trapdoor through a floor (a stair with `rooms` and `rect`) is a way down or up, a dark square.
+   v15 (model v43): a short room entered from its side is stood in at its middle; an opening wider than a short side of a
+   curved face is cut on into the next side (the casemate's powder-door).
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -345,10 +347,25 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       else { s0 = e.s - (op.w || 1) / 2; s1 = e.s + (op.w || 1) / 2; }
       /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
       if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
+      /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut
+         on into the next side too, where that side turns less than 30 degrees; no second leaf (powder-door, Events 1.44 am) */
+      var spill = [];
+      if (!Q.area && !hid) {
+        var dirOf = function (k) { var ed = E[k]; return [ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]]; };
+        var gentle = function (k) { var u = dirOf(e.i), v = dirOf(k), lu = Math.hypot(u[0], u[1]), lv = Math.hypot(v[0], v[1]);
+          return lu > 1e-6 && lv > 1e-6 && (u[0] * v[0] + u[1] * v[1]) / (lu * lv) > Math.cos(Math.PI / 6); };
+        var len = function (k) { var d = dirOf(k); return Math.hypot(d[0], d[1]); };
+        var nk = (e.i + 1) % E.length, pk = (e.i - 1 + E.length) % E.length;
+        for (var sk = 0; sk < 3 && len(nk) < 1e-3; sk++) nk = (nk + 1) % E.length;          /* past a repeated corner */
+        for (sk = 0; sk < 3 && len(pk) < 1e-3; sk++) pk = (pk - 1 + E.length) % E.length;
+        if (s1 > e.L + 0.02 && gentle(nk)) spill.push({ k: nk, s0: 0, s1: s1 - e.L });
+        if (s0 < -0.02 && gentle(pk)) { var PL = Math.hypot(dirOf(pk)[0], dirOf(pk)[1]); spill.push({ k: pk, s0: Math.max(0, PL + s0), s1: PL }); }
+      }
       s0 = Math.max(0, s0); s1 = Math.min(e.L, s1);
       var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0;
       var h = Q.sky ? (op.h || 2.2) + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, (op.h || 2.2) + sill);
       gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid });
+      spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
        part, its head round */
@@ -401,6 +418,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         piece(g.s0, g.s1, g.h, HE, Q.id + '-head-' + g.op.id);
         piece(g.s0, g.s1, 0, g.sill, Q.id + '-sill-' + g.op.id);
         at = g.s1;
+        if (g.spill) return;                                            /* v15: the rest of an opening cut over a corner */
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
@@ -659,7 +677,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (!inP(pos)) {
         var u = 0, q = pos.clone();
         while (u < 3 && !inP(q)) { u += 0.1; q = pos.clone().add(d.inward.clone().multiplyScalar(u)); }
-        if (inP(q) && !inP(q.clone().add(d.inward.clone().multiplyScalar(6)))) pos = q.add(d.inward.clone().multiplyScalar(0.6));
+        if (inP(q) && !inP(q.clone().add(d.inward.clone().multiplyScalar(6)))) {
+          var dep = 0; while (dep < 6 && inP(q.clone().add(d.inward.clone().multiplyScalar(dep + 0.1)))) dep += 0.1;
+          pos = q.add(d.inward.clone().multiplyScalar(Math.min(1.5, dep / 2)));    /* to its middle, a corridor entered from its side */
+        }
       }
       look = openLook(pos, d.inward, d.level, look.y);
     }
