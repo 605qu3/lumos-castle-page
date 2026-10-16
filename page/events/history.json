@@ -1,0 +1,21 @@
+{
+  "chain": "history",
+  "first_visit": [],
+  "room": [],
+  "records": [
+    {
+      "id": "history.binns-enters",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 2-4 s",
+      "when": [
+        "place = history of magic classroom"
+      ],
+      "show": [
+        "the lesson begins: Professor Binns comes in through the blackboard, drifts to his desk, opens his notes and begins to read"
+      ],
+      "canon": "Magic's req 601 (docs/handoff/magic.md, By room, the Stone's castle): CoS 9 L9556, \"the most exciting thing that ever happened in his classes was his entering the room through the blackboard\"; L9558, \"Professor Binns opened his notes and began to read\"; every year, each lesson's start, his own lesson under way whenever he walks in (Interiors' schedule, Occupancy, on the charter's rulings of 14 and 15 October 2026), so a moment after he comes in; the blackboard Interiors' (docs/interiors/history-of-magic-classroom.md, item 2); the lesson's content the Timetable's; checked against the text, 16 October 2026"
+    }
+  ]
+}
