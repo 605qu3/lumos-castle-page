@@ -240,6 +240,125 @@
       "show": [
         "nothing overhead, only the wind through the gratings"
       ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "summer = no",
+        "occasion != christmas",
+        "occasion != easter",
+        "date <= 05-31"
+      ],
+      "show": [
+        "through the slits, the reading floor far below, a few pupils bent over books at the tables, now and then a quill's scratch"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "summer = no",
+        "occasion != christmas",
+        "occasion != easter",
+        "date >= 06-09"
+      ],
+      "show": [
+        "through the slits, the reading floor far below, a few pupils bent over books at the tables, now and then a quill's scratch"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "summer = no",
+        "date >= 06-01",
+        "date <= 06-08"
+      ],
+      "show": [
+        "through the slits, every table on the reading floor full and silent, heads bent, only the quills scratching"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "occasion = christmas"
+      ],
+      "show": [
+        "through the slits, the reading floor far below nearly empty, one head bent over a book by a window"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "occasion = easter"
+      ],
+      "show": [
+        "through the slits, the reading floor far below nearly empty, one head bent over a book by a window"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "summer = yes"
+      ],
+      "show": [
+        "through the slits, the reading floor far below empty, the chairs pushed in under the tables"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "summer = no",
+        "weekday = tuesday"
+      ],
+      "show": [
+        "through a slit, Madam Pince stalking away between the lofty shelves far below"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time != night",
+        "summer = no",
+        "weekday = thursday"
+      ],
+      "show": [
+        "through a slit, Madam Pince at her desk far below, polishing the gilded cover of a large spellbook"
+      ]
+    },
+    {
+      "when": [
+        "place = library gallery",
+        "time = night"
+      ],
+      "show": [
+        "the reading floor dark below the slits, one lamp at Madam Pince's desk turned low"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "hidden-ways.trick-step",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "stepped on tapestry stair trick step",
+      "when": [
+        "trick_step != found"
+      ],
+      "show": [
+        "his foot sinks into the step to the shin with a soft gulp and holds; a moment, then the step lets go of him, and from now on it shows a shade paler than the rest"
+      ],
+      "starts": [
+        "set trick_step = found",
+        "log \"Found the trick step on the tapestry stair {day}\"",
+        "secret trick-step"
+      ]
     }
   ]
 }
