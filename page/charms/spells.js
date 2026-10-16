@@ -1481,6 +1481,13 @@ function firstCast(name) {
    finger lifted; never for a way out, a second finger or a drag. Nothing else changes: the stroke is not judged, the
    offer stays up and the touch counts for `wait` as any other. Nothing is drawn here; the room passes its spark
    (the frame's F.spark, req 229). */
+/* A room shows the consequence, never the correction (Timetable rule 3; FDP-13; Charms' change list, Rework 3, 16
+   October 2026). Every room callable's answer still carries `why`, [what he sees, what to try], for the test pages,
+   where Godric tries a judge; a room never shows or says those words. It shows only what the thing does: the lock
+   tightens with a clunk, the cupboard rattles, the feather twitches or flops, the bandage leaves a gap, the chair
+   bumps and lands back. Words come only when a boy asks, in the teacher's voice or a portrait's. Repeated misses
+   loosen the judge quietly, with no word: each callable judges on the kind ease unless a page passes another, and
+   the traced guide comes back after two misses in a row (guide.js), its close tracing counted as a cast. */
 var EXITS = '#back, [data-spell-exit]';
 function reach(W, H) { return Math.max(28, Math.min(W, H) * 0.12); }   /* a spot's tap reach, as measureSpan's ends */
 function exitAt(cv, ev, sel) {

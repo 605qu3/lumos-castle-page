@@ -86,6 +86,9 @@
   var GEORGE = 'Mr George agrees with Mr Fred, and would like to add that Percy\u2019s badge is on upside down.';
   /* the armchair's room, seen from above: whole squares of floor, the wall along the top with the fireplace in it */
   var chair = null, drift = null;
+  /* a room shows the consequence, never the correction (Charms' change list, Rework 3): what the feather does on a miss */
+  var MISS_SEEN = { spin: 'The feather spins round on the table.', scoot: 'The feather scoots off sideways.', hop: 'The feather hops, and settles.',
+    flop: 'The feather flops back down.', smoke: 'The feather smoulders. A wisp of smoke.', twitch: 'The feather twitches and lies still.' };
   function room() {
     var c = Math.round(S * 0.1), i0 = 1, i1 = Math.floor(W / c) - 1, j0 = Math.ceil(H * 0.2 / c), j1 = Math.floor(H * 0.64 / c);
     return { c: c, i0: i0, i1: i1, j0: j0, j1: j1, fire: [i1 - 3, i1 - 2], start: { i: i0 + 1, j: j0 + 1 } };
@@ -218,7 +221,7 @@
       if (T.id === 'feather') {
         if (r.verdict === 'lifted') { say('<b>Wingardium Leviosa!</b> It rises. Drag a finger anywhere to steer it.'); panel.innerHTML = ''; panel.appendChild(btn('Step back', function () { if (cur) cur.cancel(); })); return; }
         if (r.verdict === 'missed') { var c = r.cause; feather.mode = c === 'windmill' ? 'spin' : c === 'flickaside' ? 'scoot' : (c === 'slow' || c === 'flicklong') ? 'hop' : (c === 'wave' || c === 'line') ? 'flop' : c === 'prod' ? 'smoke' : 'twitch';
-          feather.dir = r.judge && r.judge.flickAngle < 0 ? -1 : 1; feather.t0 = performance.now(); say('<b>' + r.why[0] + '.</b> ' + r.why[1]); }
+          feather.dir = r.judge && r.judge.flickAngle < 0 ? -1 : 1; feather.t0 = performance.now(); say(MISS_SEEN[feather.mode] || 'The feather twitches and lies still.'); }
         else say('You step back; it stays where it lies.');
         menu(); return;
       }
@@ -227,7 +230,7 @@
         if (r.verdict === 'right') say('<b>About ' + inch + ' inches.</b> Eleven inches, just as Ollivander wrote on the box.');
         else if (r.verdict === 'short' || r.verdict === 'long') say('About ' + inch + ' inches: a little ' + r.verdict + '. The gold mark is eleven inches. One finger at each very end.');
         else if (r.verdict === 'measured') say('<b>About ' + inch + ' inches</b> from thumb to little finger.');
-        else if (r.verdict === 'missed') say('<b>' + r.why[0] + '.</b> ' + r.why[1]);
+        else if (r.verdict === 'missed') say('The tape curls back into its roll.');
         else say('You step back; the tape rolls itself up.');
         menu(); return;
       }
@@ -236,7 +239,7 @@
         var R0 = room().start, gone = chair.i !== R0.i || chair.j !== R0.j;
         if (r.verdict === 'moved') say('<b>Mobiliarbus!</b> It rises a few inches, drifts ' + LumosSpells.slideWords(r.dx, r.dy) + (r.shape === 'L' ? ' (an L)' : '') + ' and lands with a soft thump.'
           + (r.right === false ? ' Not quite the 3 right the room wanted.' : '') + (gone ? ' Something glints where it stood: a silver Sickle.' : ''));
-        else if (r.verdict === 'blocked' || r.verdict === 'missed') { shake = performance.now(); say('<b>' + r.why[0] + '.</b> ' + r.why[1]); }
+        else if (r.verdict === 'blocked' || r.verdict === 'missed') { shake = performance.now(); say(r.verdict === 'blocked' ? 'It bumps, and lands back where it was.' : 'It shivers, and stays where it is.'); }
         else say('You step back; it stays where it is.');
         menu(); return;
       }
@@ -250,9 +253,9 @@
       else if (r.verdict === 'nothing' && T.id === 'polite') { shake = performance.now(); say('<i>A sniff, and a creak of offended wood.</i> &ldquo;Well! Not so much as a <b>please</b>.&rdquo;'); }
       else if (r.verdict === 'revealed' && T.id === 'parchment') { parch.ink = 0.01; parch.lines = 1; parch.at = performance.now(); say('<b>Aparecium!</b> Ink rises out of the blank sheet, in a hand you know. Tap the parchment.'); }
       else if (r.verdict === 'nothing') { shake = performance.now(); say('You tapped it, you whispered <i>Alohomora</i>... but nothing happened. This one wants its own key.'); }
-      else if (r.verdict === 'tight') { shake = performance.now(); say('Click: the lock tightened. That way locks it. Clockwise, twelve to three.'); }
+      else if (r.verdict === 'tight') { shake = performance.now(); say(T.id === 'cupboard' ? 'Clunk. The handle rattles.' : 'Clunk. The lock tightens.'); }
       else if (r.verdict === 'revealed') { opened.notice = 0.01; say('<b>Aparecium!</b> The ink comes back.'); }
-      else if (r.verdict === 'missed') say(T.id === 'notice' ? 'The ink stays hidden. Three taps in a line, the middle one halfway, tap ... tap ... tap.' : 'Not quite. Round the keyhole, a quarter turn, twelve to three.');
+      else if (r.verdict === 'missed') { if (T.id !== 'notice' && T.id !== 'parchment') shake = performance.now(); say(T.id === 'notice' || T.id === 'parchment' ? 'The sheet stays blank.' : T.id === 'cupboard' ? 'The handle rattles.' : 'The lock holds.'); }
       else say('You step back; it stays as it was.');
       menu();
     });
