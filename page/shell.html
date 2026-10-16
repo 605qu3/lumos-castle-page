@@ -607,7 +607,14 @@ var ROOM_THINGS = {
   /* docs/interiors/charms-classroom.md: the front row's desk on the aisle's left, x' 2.3 to 3.6 (y = 71.4 - x'),
      y' 6.0 to 6.6 (x = 139.6 + y'), 0.72 high; the stand in the aisle short of it */
   'charms-classroom': [{ id: 'pineapple-desk', rect: [145.6, 67.8, 146.2, 69.1], z: [0, 0.72], col: 0x6a5a48, show: PINE_SHOW, still: true },
-                       { id: 'pineapple', at: [145.9, 68.45], z: [0.72, 0.9], col: 0xb08a3a, show: PINE_SHOW, stand: [144.6, 66.7], look: 0.8 }]
+                       { id: 'pineapple', at: [145.9, 68.45], z: [0.72, 0.9], col: 0xb08a3a, show: PINE_SHOW, stand: [144.6, 66.7], look: 0.8 }],
+  /* docs/interiors/hidden-ways-batch-8.md, H47 (Events' req 557): the round table centred (160, 0), 1.8 across, its top
+     0.75; the rail a ring at r 1.3, 0.9 high, open 0.6 at bearing 200; the crank's geared box at the table's edge there
+     (r 0.95), its handle out at r 1.05; the stand before the rail's gap at r 2.5. The orrery itself stays the note's words */
+  'orrery-room': [{ id: 'orrery-table', circle: [160.0, 0.0], r: 0.9, z: [0, 0.75], col: 0x6a5a48, still: true },
+                  { id: 'orrery-rail', ring: [160.0, 0.0], r: 1.3, gap: [200, 0.6], z: [0, 0.9], col: 0x5a4c3e, still: true },
+                  { id: 'orrery-crank', at: [159.675, -0.893], bearing: 200, z: [0.75, 0.95], col: 0x9a7a3a, crank: true,
+                    stand: [159.145, -2.349], look: 0.85 }]
 };
 var roomThings = (function () {
   var list = ROOM_THINGS[PLACE] || [], out = [], z0 = shell.place.floor;
@@ -618,6 +625,28 @@ var roomThings = (function () {
       var a = P(t.rect[0], t.rect[1], t.z[0]), b = P(t.rect[2], t.rect[3], t.z[1]);
       m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), kit.solid(t.col));
       m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+    } else if (t.circle) {   /* a round table */
+      m = new THREE.Mesh(new THREE.CylinderGeometry(t.r, t.r, t.z[1] - t.z[0], 32), kit.solid(t.col));
+      m.position.copy(P(t.circle[0], t.circle[1], (t.z[0] + t.z[1]) / 2));
+    } else if (t.ring) {     /* a rail round it at its top, open at the gap's bearing; bearing b lies at the torus's b - 90 */
+      var half = t.gap[1] / 2 / t.r, rg = new THREE.TorusGeometry(t.r, 0.03, 6, 48, Math.PI * 2 - 2 * half);
+      rg.rotateZ((t.gap[0] - 90) * Math.PI / 180 + half); rg.rotateX(Math.PI / 2);
+      m = new THREE.Mesh(rg, kit.solid(t.col));
+      m.position.copy(P(t.ring[0], t.ring[1], t.z[1]));
+      for (var ub = t.gap[0] + 15; ub < t.gap[0] + 345; ub += 30) {   /* its iron uprights, each 30 degrees, none in the gap */
+        var up = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, t.z[1] - t.z[0], 6), kit.solid(0x3c3833)), ur = ub * Math.PI / 180;
+        up.position.set(t.r * Math.sin(ur), -(t.z[1] - t.z[0]) / 2, -t.r * Math.cos(ur)); m.add(up);
+      }
+    } else if (t.crank) {    /* the geared box, its shaft out along the bearing, the handle on it turning (crankTurn) */
+      var bx = t.bearing * Math.PI / 180;
+      m = new THREE.Mesh(new THREE.BoxGeometry(0.12, t.z[1] - t.z[0], 0.16), kit.solid(t.col));
+      m.position.copy(P(t.at[0], t.at[1], (t.z[0] + t.z[1]) / 2));
+      m.rotation.y = Math.atan2(Math.cos(bx), Math.sin(bx));   /* its x out along the bearing: local (sin b, 0, -cos b) */
+      var hub = new THREE.Object3D(); hub.position.x = 0.1; m.add(hub);
+      var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.08, 8), kit.solid(t.col)); shaft.rotation.z = Math.PI / 2; shaft.position.x = -0.04; hub.add(shaft);
+      var arm = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.12, 0.02), kit.solid(t.col)); arm.position.y = 0.06; hub.add(arm);
+      var knob = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.06, 8), kit.solid(0x4a3a2c)); knob.rotation.z = Math.PI / 2; knob.position.set(0.03, 0.12, 0); hub.add(knob);
+      m.userData.hub = hub;
     } else {
       /* one mesh, so the shell's tap (its direct children only) finds it: the fruit, its crown a child */
       var fg = new THREE.SphereGeometry(0.075, 14, 10); fg.scale(1, 1.35, 1); fg.translate(0, 0.1, 0);
@@ -626,7 +655,7 @@ var roomThings = (function () {
       m.position.copy(P(t.at[0], t.at[1], t.z[0]));
     }
     m.name = 'thing-' + t.id; shell.group.add(m);
-    var base = t.rect ? P((t.rect[0] + t.rect[2]) / 2, (t.rect[1] + t.rect[3]) / 2, t.z[0]) : P(t.at[0], t.at[1], t.z[0]);
+    var base = t.rect ? P((t.rect[0] + t.rect[2]) / 2, (t.rect[1] + t.rect[3]) / 2, t.z[0]) : P((t.at || t.circle || t.ring)[0], (t.at || t.circle || t.ring)[1], t.z[0]);
     var d = { id: t.id, mesh: m, t: t, rest: { pos: m.position.clone() }, inward: new THREE.Vector3(1, 0, 0), place: PLACE,
               mid: base, sill: 0, h: t.z[1] - t.z[0] };   /* mid, sill and h place a heard line over it, as over a door */
     if (t.stand) {
@@ -659,11 +688,28 @@ function updateHops(dt) {
     return u < 1;
   });
 }
+var cranks = [];
+function crankTurn(d, s, n) {   /* n slow turns of the handle in s seconds, easing in and out */
+  if (!d || !d.mesh.userData.hub) return;
+  cranks = cranks.filter(function (c) { return c.d !== d; });
+  cranks.push({ d: d, t: 0, s: s, n: n });
+}
+function updateCranks(dt) {
+  cranks = cranks.filter(function (c) {
+    c.t += dt;
+    var u = Math.min(1, c.t / c.s);
+    c.d.mesh.userData.hub.rotation.x = -easeInOut(u) * c.n * Math.PI * 2;
+    return u < 1;
+  });
+}
 var thingCues = {
   "the old wardrobe at the far end gives a sudden wobble, banging off the wall": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 0.9, 38, 0.05); },
   "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 1.1, 44, 0.06); },
   "the pineapple on the front-row desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 2.4, 9, 0.45); },
   "the pineapple tapdances a few quick steps on the spot and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 1.0, 4, 0); },
+  /* H47's crank (Events' req 557, hidden-ways.orrery-crank), word for word: the handle turns slow, and the line is seen,
+     since the grey shell draws no planets to move */
+  "the crank turns slow and every planet moves together, the moon round the earth, Jupiter's little moons round Jupiter, the two wobbly ones last of all, and all of it stops when the crank does": function (k) { turnDone = 'thing'; crankTurn(roomThing('orrery-crank'), 4.5, 2); showLines([{ medium: 'seen', sound: "the crank turns slow and every planet moves together, the moon round the earth, Jupiter's little moons round Jupiter, the two wobbly ones last of all, and all of it stops when the crank does" }]); },
   /* H11's trick step (Events' req 520, page/events/hidden-ways.json's hidden-ways.trick-step), word for word */
   "his foot sinks into the step to the shin with a soft gulp and holds; a moment, then the step lets go of him, and from now on it shows a shade paler than the rest": function () { trickSink(); }
 };
@@ -820,6 +866,7 @@ function frame() {
   updateFades(dt);
   updateCupboard(dt);
   updateHops(dt);
+  updateCranks(dt);
   updateLines(dt);
   updateFilch(dt);
   updateTrick(dt);
