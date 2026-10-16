@@ -26,7 +26,7 @@
 <div id="line"></div>
 <div id="panel"></div>
 <script src="spells.js?v=37"></script>
-<script src="guide.js?v=5"></script>
+<script src="guide.js?v=6"></script>
 <script>
 /* The Cheering Charm, a test page for the Charms lane (13 October 2026, eighteenth session; the owner is Godric).
    Drawn in code. The book (PoA 15 and 16, checked in the text): Flitwick, "we're experimenting with Cheering Charms
@@ -42,7 +42,7 @@
    the flipped arc), The wide frown (no guide: a wider mouth, the same depth, so a flatter curve from a bigger circle)
    and The exam (not too much). ?round=1..3, ?ease= for trying; window.lumosCheer for checks.
    Q9's fix 5 (thirty-eighth session, 13 October 2026; "as deep and as wide" by eye was too hard): corner to corner, the
-   mirror does the depth. The mouth's two corners glow; LumosSpells.judgeSmile reads a stroke begun at one and ended at
+   mirror does the depth. The mouth's two corners carry two small chalk dots (they glowed until 16 October 2026, GL-16); LumosSpells.judgeSmile reads a stroke begun at one and ended at
    the other, any bow downward from a third of the frown's depth to the exam's overdoing, deepest in the middle half;
    then his line slides into the true smile, the frown mirrored over the line through the corners, exactly as deep. */
 (function () {
@@ -148,7 +148,7 @@
       shown = ['glum', 'flat', 'corners', 'lopsided'].indexOf(j.reason) >= 0 ? { pts: pts, at: now, j: j } : null;
       var words = {
         tap: 'Draw a smile: from one corner of the mouth to the other, curving down.',
-        corners: 'Start on one <b>glowing corner</b> of the mouth and end on the other: the corners hold the smile in place.',
+        corners: 'Start on one <b>chalk dot</b> at a corner of the mouth and end on the other: the corners hold the smile in place.',
         wiggly: 'Smoother: one curve, like the frown, only the other way up.',
         off: 'On the mouth: start at one corner and end at the other.',
         narrow: 'Wider: right out to both corners of the mouth.',
@@ -257,14 +257,12 @@
     label(m.x, m.y + m.depth + S * 0.05, 'the frown, flipped', '#f3d27a');
     cx.restore();
   }
-  function corners(now) {   /* the two corners, glowing: begin at one, end at the other */
+  function corners(now) {   /* the two corners, two small steady chalk dots: begin at one, end at the other (GL-16) */
     if (cheer || fits || done) return;
-    var m = mouth, p = 0.5 + 0.5 * Math.sin(now / 380), rr = Math.max(7, m.w * 0.3);
+    var m = mouth;
     [-1, 1].forEach(function (sd) {
-      var x = m.x + sd * m.w, g = cx.createRadialGradient(x, m.y, 0, x, m.y, rr);
-      g.addColorStop(0, 'rgba(243,210,122,' + (0.55 + 0.3 * p) + ')'); g.addColorStop(1, 'rgba(243,210,122,0)');
-      cx.fillStyle = g; cx.beginPath(); cx.arc(x, m.y, rr, 0, 7); cx.fill();
-      cx.fillStyle = '#f3d27a'; cx.beginPath(); cx.arc(x, m.y, 3.5, 0, 7); cx.fill();
+      var x = m.x + sd * m.w;
+      cx.fillStyle = 'rgba(236,228,206,0.95)'; cx.beginPath(); cx.arc(x, m.y, 4.5, 0, 7); cx.fill();
     });
   }
   function slide(now) {   /* once cheered, his line slides into the true smile from the corners */

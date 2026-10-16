@@ -36,13 +36,13 @@
 <body>
 <canvas id="c"></canvas>
 <div id="say">Swish and flick</div>
-<div id="why">Start at the glowing dot and follow the gold path, in one stroke.</div>
+<div id="why">Start at the chalk dot and follow the gold path, in one stroke.</div>
 <button class="btn" id="ease">Ease: kind</button>
 <button class="btn" id="guideBtn">Guide</button>
 <button id="word">Wing-<b>gar</b>-dium Levi-o-sa</button>
 <button class="btn" id="logBtn">Log</button>
 <div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
-<script src="guide.js?v=3"></script>
+<script src="guide.js?v=6"></script>
 <script src="spells.js?v=7"></script>
 <script>
 /* Wingardium Leviosa, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code; the
@@ -491,7 +491,7 @@ var EASES = LumosSpells.SWISH_EASES, judgeSwishFlick = LumosSpells.judgeSwishFli
 
   document.getElementById('guideBtn').addEventListener('click', function () {
     guide.reset();
-    sayEl.textContent = 'Swish and flick'; whyEl.textContent = 'Start at the glowing dot and follow the gold path.';
+    sayEl.textContent = 'Swish and flick'; whyEl.textContent = 'Start at the chalk dot and follow the gold path.';
   });
   var easeBtn = document.getElementById('ease'), order = ['kind', 'fair', 'strict'];
   easeBtn.addEventListener('click', function () { ease = order[(order.indexOf(ease) + 1) % 3]; easeBtn.textContent = 'Ease: ' + ease; });

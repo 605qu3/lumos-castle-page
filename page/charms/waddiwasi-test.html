@@ -26,7 +26,7 @@
 <div id="line"></div>
 <div id="panel"></div>
 <script src="spells.js?v=14"></script>
-<script src="guide.js?v=5"></script>
+<script src="guide.js?v=6"></script>
 <script>
 /* Waddiwasi, a test page for the Charms lane (13 October 2026, thirteenth session; the owner is Godric). Drawn in code.
    The book (PoA 7, checked in the text): round a corner of a deserted corridor, Peeves "floating upside-down in mid-air
@@ -306,9 +306,9 @@
       } else if (stage === 'fly') landed(now);
     }
     if (stage === 'aim' || (stage === 'miss' && !fly)) drawGum(gum.x + S * 0.006, gum.y - S * 0.004, 1);
-    if (stage === 'aim' && !wait) {   /* the gum glows faintly: start here */
-      var gk = 0.5 + 0.5 * Math.sin(now / 420), gg = cx.createRadialGradient(gum.x, gum.y, 0, gum.x, gum.y, gum.r * 1.1);
-      gg.addColorStop(0, 'rgba(255,220,235,' + (0.22 * gk) + ')'); gg.addColorStop(1, 'rgba(255,200,220,0)'); cx.fillStyle = gg; cx.beginPath(); cx.arc(gum.x, gum.y, gum.r * 1.1, 0, 7); cx.fill();
+    if (stage === 'aim' && !wait) {   /* a steady chalk ring round the gum: start here (GL-17, no pulse) */
+      cx.strokeStyle = 'rgba(236,228,206,0.8)'; cx.lineWidth = 2; cx.setLineDash([5, 5]);
+      cx.beginPath(); cx.arc(gum.x, gum.y, gum.r * 1.05, 0, 7); cx.stroke(); cx.setLineDash([]);
       if (guide) guide.draw(cx, now, !!stroke);
     }
     if (!razz || now - razz > 5200) { if (stage === 'aim' && Math.random() < 0.004) razz = now; }

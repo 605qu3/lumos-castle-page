@@ -26,7 +26,7 @@
 <div id="line"></div>
 <div id="panel"></div>
 <script src="spells.js?v=36"></script>
-<script src="guide.js?v=5"></script>
+<script src="guide.js?v=6"></script>
 <script>
 /* Hermione's bluebell flames, a test page for the Charms lane (13 October 2026, twentieth session; the owner is Godric).
    Drawn in code. The book (PS 11, checked in the text): in "the freezing courtyard" Hermione "had conjured them up a
@@ -46,7 +46,7 @@
    (27th session: Harry, Ron and Hermione stand still and fix one ring, and Neville stamps to and fro along the line
    out from its middle, on it only now and then; LumosSpells.judgeFlames with fix, its 'apart' when the ring goes
    through the three while he is off it, the gap drawn along that line; on kind the three's ring shows faint and he
-   glows while on it). Q9's fix (13 October 2026, Godric tried it: a freehand ring judged for roundness was too hard):
+   is ringed in chalk while on it). Q9's fix (13 October 2026, Godric tried it: a freehand ring judged for roundness was too hard):
    any closed loop through all three is warm, judged by LumosSpells.judgeLoop, and the true circle is drawn from
    where they stand, his loop drawn into it as the jar goes down at its middle. Seen from above:
    "jet-black hair" (PS 1), the Weasleys' "red hair" (PS 6), "lots of bushy brown hair" (PS 6); the fourth in a
@@ -326,13 +326,12 @@
     j.cold.concat(j.close).forEach(function (k) { circ(fr[k], fr[k].r * 1.5, 'rgba(240,150,140,0.95)', 2.5); });
     cx.restore();
   }
-  function drawStep(now) {   /* Three in a row: Harry glows to be dragged; while he moves, the one ring through them, faint */
+  function drawStep(now) {   /* Three in a row: the middle one ringed in steady chalk to be dragged (GL-17, no pulse); while he moves, the one ring through them, faint */
     if (!step.on || warm) return;
     var h = spots()[1];
     if (!step.placed && !step.drag) {
-      var a = 0.5 + 0.4 * Math.sin(now / 260);
-      circ(h, R * 1.55, 'rgba(243,210,122,' + a.toFixed(2) + ')', 2.5);
-      cx.save(); cx.strokeStyle = 'rgba(243,210,122,' + a.toFixed(2) + ')'; cx.lineWidth = 2.5;   /* up and down, the ways he can step */
+      circ(h, R * 1.55, 'rgba(236,228,206,0.8)', 2.5, [5, 5]);
+      cx.save(); cx.strokeStyle = 'rgba(236,228,206,0.8)'; cx.lineWidth = 2.5;   /* up and down, the ways he can step, chalk arrows */
       [-1, 1].forEach(function (sg) { var y = h.y + sg * R * 2.1; cx.beginPath(); cx.moveTo(h.x - R * 0.45, y - sg * R * 0.3); cx.lineTo(h.x, y); cx.lineTo(h.x + R * 0.45, y - sg * R * 0.3); cx.stroke(); });
       cx.restore();
     }
@@ -344,11 +343,11 @@
     cx.fillStyle = col; cx.beginPath(); cx.arc(z.through.x, z.through.y, 4, 0, 7); cx.fill();
     label(m.x, Math.min(H - 70, m.y + R * 2.6), z.fits ? (z.smallest ? 'one ring, the smallest' : 'one ring, and it fits') : 'one ring, too big for the courtyard', z.fits ? '#dce8f4' : '#f0968c');
   }
-  function drawFour(now) {   /* Four friends, on kind: the ring the three fix, faint, and Neville ringed gold while he is on it */
+  function drawFour(now) {   /* Four friends, on kind: the ring the three fix, faint, and Neville ringed in chalk while he is on it */
     if (!ROUNDS[round].four || warm || ease !== 'kind' || (shown && now - shown.at <= 2600)) return;
     var c = ring(), w = walker(), e = LumosSpells.FLAMES_EASES.kind;
     circ(c, c.r, 'rgba(243,210,122,0.3)', 2, [6, 8]);
-    if (Math.abs(w.off) <= e.near) circ(w, R * 1.55, 'rgba(243,210,122,0.85)', 2.5);
+    if (Math.abs(w.off) <= e.near) circ(w, R * 1.55, 'rgba(236,228,206,0.85)', 2.5);   /* a steady chalk ring, the Ease tool's (test page only) */
   }
   function frame(now) {
     drawYard();

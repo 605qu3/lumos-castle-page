@@ -34,7 +34,7 @@
 <button class="btn" id="logBtn">Log</button>
 <div id="log"><button id="copy">Copy log</button><button id="close">Close</button><div id="logText"></div></div>
 <script src="spells.js?v=1"></script>
-<script src="guide.js?v=3"></script>
+<script src="guide.js?v=6"></script>
 <script>
 /* Lumos, a test page for the Charms lane (11 October 2026; the owner is Godric). Drawn in code, nothing painted.
    A flick drawn on the screen lights the wand's tip; a miss fizzles, harmlessly, and says why.
@@ -366,7 +366,7 @@ var EASES = LumosSpells.FLICK_EASES, judgeFlick = LumosSpells.judgeFlick;
   document.getElementById('guideBtn').addEventListener('click', function () {
     var gd = guideNow(); gd.reset();
     sayEl.textContent = gd === lumosGuide ? 'Flick the wand up to light it' : 'A stroke down puts it out';
-    whyEl.textContent = 'Start at the glowing dot and follow the gold path.';
+    whyEl.textContent = 'Start at the chalk dot and follow the gold path.';
   });
   var easeBtn = document.getElementById('ease'), order = ['kind', 'fair', 'strict'];
   easeBtn.addEventListener('click', function () {

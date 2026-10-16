@@ -3,7 +3,7 @@
    the first few times and at a larger scale"; 9.30 pm: "The guide that charms came up with should go to all spells
    cast." So it is built once, here, and each spell gives only its path.
 
-   A large path in gold dots with a glowing start and an arrow at the end; a spark runs along it at the spell's own
+   A large path in gold dots with a steady chalk start and an arrow at the end; a spark runs along it at the spell's own
    timing, then rests, so it shows the timing as well as the shape; the dots light where his finger passes. Full for
    the first three good casts, faint for the next two, then gone; back faint after two misses in a row; reset()
    (the Guide button) brings it back full. A cast that follows it closely counts, even where the judging alone would
@@ -107,10 +107,10 @@
       cx.beginPath(); cx.moveTo(e.x + Math.cos(ang) * 14, e.y + Math.sin(ang) * 14);
       cx.lineTo(e.x + Math.cos(ang + 2.5) * 12, e.y + Math.sin(ang + 2.5) * 12);
       cx.lineTo(e.x + Math.cos(ang - 2.5) * 12, e.y + Math.sin(ang - 2.5) * 12); cx.closePath(); cx.fill();
-      var s0 = pts[0], pulse = 1 + 0.25 * Math.sin(now / 250);
-      var sg = cx.createRadialGradient(s0.x, s0.y, 0, s0.x, s0.y, 18 * pulse);
-      sg.addColorStop(0, 'rgba(255,245,210,' + lv + ')'); sg.addColorStop(1, 'rgba(255,220,140,0)');
-      cx.fillStyle = sg; cx.beginPath(); cx.arc(s0.x, s0.y, 18 * pulse, 0, 7); cx.fill();
+      var s0 = pts[0];   /* the start: a steady chalk dot in a ring, no pulse (GL-18; Charms' change list, Rework 2) */
+      cx.fillStyle = 'rgba(236,228,206,' + (0.9 * lv) + ')'; cx.beginPath(); cx.arc(s0.x, s0.y, 7, 0, 7); cx.fill();
+      cx.strokeStyle = 'rgba(236,228,206,' + (0.7 * lv) + ')'; cx.lineWidth = 2;
+      cx.beginPath(); cx.arc(s0.x, s0.y, 15, 0, 7); cx.stroke();
       var fs = Math.round(Math.max(16, S * 0.04));
       cx.font = 'italic 600 ' + fs + 'px Georgia, serif'; cx.textAlign = 'center';
       cx.shadowColor = 'rgba(0,0,0,0.9)'; cx.shadowBlur = 6;

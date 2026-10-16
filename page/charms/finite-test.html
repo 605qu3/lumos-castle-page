@@ -26,7 +26,7 @@
 <div id="line"></div>
 <div id="panel"></div>
 <script src="spells.js?v=17"></script>
-<script src="guide.js?v=5"></script>
+<script src="guide.js?v=6"></script>
 <script>
 /* Finite Incantatem, a test page for the Charms lane (13 October 2026, sixteenth session; the owner is Godric). Drawn
    in code. The book (CoS 11, checked in the text): at the Duelling Club, with Harry's feet dancing and Malfoy laughing,
@@ -38,7 +38,7 @@
    stool sliding (Mobiliarbus), a teddy's bandage winding (Ferula), a key turning (Alohomora). His own lantern, lit
    by Lumos, is the thing to keep: Finite ends every spell inside the ring, his light too. Three rounds: all of it (the
    guide a ring), keep the light (four on an arch over the lantern: the ring must bend in), and the horseshoe (five all
-   round the lantern, open at the bottom: the older boy's edge, a hint after a miss). After a cast the inside glows,
+   round the lantern, open at the bottom: the older boy's edge, a hint after a miss). After a cast the inside is shaded,
    and in the last two rounds a dashed line runs from each thing out to the right, its crossings with the ring ticked
    and counted: odd inside, even out. A ring that holds only some stops those; the rest go on for another ring.
    ?round=1..3, ?ease= for trying; window.lumosFinite for checks. */
@@ -187,11 +187,7 @@
   function shadow(x, y, rx) { cx.fillStyle = 'rgba(0,0,0,0.35)'; cx.beginPath(); cx.ellipse(x, y, rx, rx * 0.6, 0, 0, 7); cx.fill(); }
   function drawThing(t, now) {
     var n = at(t, now) / 1000, r = t.r, x = t.x, y = t.y;
-    if (t.going && !t.keep) {   /* the spell on it: a faint violet shimmer going round */
-      cx.save(); cx.fillStyle = 'rgba(190,160,255,0.55)';
-      for (var k = 0; k < 7; k++) { var a = k / 7 * 6.283 + now / 900 + t.ph; cx.beginPath(); cx.arc(x + Math.cos(a) * r * 0.95, y + Math.sin(a) * r * 0.95, Math.max(1.5, S * 0.004), 0, 7); cx.fill(); }
-      cx.restore();
-    }
+    /* no shimmer marks the spell on it (GL-13): its enchanted motion alone shows it */
     cx.save(); cx.translate(x, y);
     if (t.kind === 'feather') {
       var lift = t.going ? 0.18 + Math.sin(n * 2.2 + t.ph) * 0.1 : 0;

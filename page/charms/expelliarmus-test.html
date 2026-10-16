@@ -26,7 +26,7 @@
 <div id="line"></div>
 <div id="panel"></div>
 <script src="spells.js?v=35"></script>
-<script src="guide.js?v=5"></script>
+<script src="guide.js?v=6"></script>
 <script>
 /* Expelliarmus, a test page for the Charms lane (13 October 2026, fifteenth session; the owner is Godric). Drawn in code.
    The book (CoS 11, checked in the text): "The long dining tables had vanished and a golden stage had appeared along
@@ -148,7 +148,7 @@
       if (guide) guide.miss();
       trail = { pts: pts, at: performance.now() };
       var peak = pts[0].y - Math.min.apply(null, pts.map(function (q) { return q.y; }));
-      say({ off: 'Start at your wand hand, down by your side, where it glows.',
+      say({ off: 'Start at your wand hand, down by your side, in the chalk ring.',
             flat: j.top && Math.abs(j.top.x - hand.x) > hand.r * 2 ? 'You pointed, then swung: <b>swing up first</b>, above your head, then point from the top.' :
                   j.top ? 'Higher! Swing it right up above your head first, then point.' :
                   peak >= hand.r ? 'A rainbow! Swing straight up, then turn sharply at the top and point straight from there: a corner, not a curve.' :
@@ -319,9 +319,9 @@
     cx.strokeStyle = '#151214'; cx.lineWidth = S * 0.07; cx.beginPath(); cx.moveTo(hand.x - S * 0.22, H + S * 0.05); cx.lineTo(hand.x - S * 0.02, hand.y + S * 0.04); cx.stroke();
     cx.fillStyle = '#e8c9a8'; cx.beginPath(); cx.arc(hand.x, hand.y, S * 0.028, 0, 7); cx.fill();
     if (stage === 'cast' && !stroke) drawWand(hand.x + S * 0.03, hand.y - S * 0.03, -0.8, 0.9);
-    if (stage === 'cast' && !wait) {   /* the hand glows faintly: start here */
-      var gk = 0.5 + 0.5 * Math.sin(now / 420), gg = cx.createRadialGradient(hand.x, hand.y, 0, hand.x, hand.y, hand.r * 1.2);
-      gg.addColorStop(0, 'rgba(255,230,190,' + (0.3 * gk) + ')'); gg.addColorStop(1, 'rgba(255,220,180,0)'); cx.fillStyle = gg; cx.beginPath(); cx.arc(hand.x, hand.y, hand.r * 1.2, 0, 7); cx.fill();
+    if (stage === 'cast' && !wait) {   /* a steady chalk ring round the hand: start here (GL-17, no pulse) */
+      cx.strokeStyle = 'rgba(236,228,206,0.8)'; cx.lineWidth = 2; cx.setLineDash([5, 5]);
+      cx.beginPath(); cx.arc(hand.x, hand.y, hand.r * 1.1, 0, 7); cx.stroke(); cx.setLineDash([]);
     }
     cx.restore();
   }
@@ -410,9 +410,7 @@
       drawSum(now);
       if (fly.caught) { drawWand(fly.tap.x, fly.tap.y - S * 0.01, 0.15, 1); }
       else { var tt = stage === 'missed' ? fly.floorAt : t; p = wandAt(tt); drawWand(p.x, Math.min(p.y, floorY() - S * 0.006), stage === 'missed' ? 0.05 : (now - fly.at) / 1000 * 9, 1);
-        if (fly.hang && stage === 'catch' && t === fly.topAt) {   /* hanging at its top: a soft gold glow, still turning */
-          var hg = cx.createRadialGradient(p.x, p.y, 0, p.x, p.y, S * 0.07); hg.addColorStop(0, 'rgba(255,215,130,0.35)'); hg.addColorStop(1, 'rgba(255,215,130,0)');
-          cx.fillStyle = hg; cx.fillRect(p.x - S * 0.07, p.y - S * 0.07, S * 0.14, S * 0.14); } }
+        /* hanging at its top it only turns, with no glow (GL-24) */ }
       if (stage === 'catch' && !fly.tap && t <= fly.lateAt && round !== 3) {   /* his hand's level, faint, while he may still call it */
         cx.save(); cx.strokeStyle = 'rgba(232,201,168,0.28)'; cx.setLineDash([3, 8]); cx.lineWidth = 2; cx.beginPath(); cx.moveTo(W * 0.03, fly.catchY); cx.lineTo(dummy.x - S * 0.04, fly.catchY); cx.stroke(); cx.restore();
       }
