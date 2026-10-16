@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 55,
+  "version": 56,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -1013,7 +1013,7 @@ window.CASTLE_MODEL = {
     "The 142 staircases (PS 8): the places' tally predates 235.1, which gives Gryffindor's dormitories fourteen (seven a stair, were 4) and Ravenclaw's two stair turrets seven each (were 9 in one); the tally to be settled with Godric (the Architect); the short-cut stair (v27, two floors, 5 to 7), the back stair K (v29, nine floors) and PS 7's two mural stairs (v29) not yet in it.",
     "The well as built under 12.1 holds fifteen flights (the marble staircase's first flight, its two divided flights and six more; six moving flights) where the tally's two well places say seven and six; for the tally, with the rest.",
     "Batch 5 left for later (the PS 9 tapestry passage placed in v29, tapestry-passage-3): the third floor's west corridor has no mouth to the stair hall yet; the staff room's flue stack and the classrooms' north windows are not in the massing tool.",
-    "v30's stairs (the hall's way down to the kitchens, the old gate's mural stair and the gun room's stair) are not in the 142's tally either; the void over the Entrance Hall on 5, 6 and 7 (x 72 to 82, y 59 to 69) waits for the layout's fill (3 is H15's loft, v32); the West Tower's own stair is drawn from v32 (west-tower-spiral), its doors onto the tower's rooms and the layout's a, floor by floor, not yet.",
+    "v30's stairs (the hall's way down to the kitchens, the old gate's mural stair and the gun room's stair) are not in the 142's tally either; the void over the Entrance Hall on 5, 6 and 7 (x 72 to 82, y 59 to 69) is the layout's fill from 1016-0545 (3 is H15's loft, v32); the West Tower's own stair is drawn from v32 (west-tower-spiral), its doors onto the tower's rooms and the layout's a, floor by floor, not yet.",
     "v31's stairs (the library gallery's stair, the tapestry stair from 1 to 3, the vault's stair and the Astronomy Tower's spiral, now drawn) are not in the 142's tally either; the ledge garden under the vault is not walked in the shells, nor the Astronomy Tower's top (a room under the sky needs the shells to draw no ceiling and a parapet for walls; crenellated from v32).",
     "v32's round rooms (the ice house, the West Tower's armoury, the masons' tracing floor) and the wall-walk's ring are walked in the shells (their v10); the ice house's steps, the West Tower's spiral and the gate loft's ladder are not in the 142's tally either; the lake-face corridors on B have ids (v32) but their rooms' doors are the layout's, not yet the model's.",
     "v33's Quidditch stands are grounds data the shells do not walk, but for the commentator's box (the shells' v8), which looks out on dark, no pitch drawn; the changing rooms on the pitch's edge (CoS 7, PoA 8) are not placed yet.",
