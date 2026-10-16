@@ -699,6 +699,70 @@ var HIDE = { z0: 0.06, z1: 0.72, lidT: 0.04, open: 0, want: 0, lid: null, hole: 
   var arm = box(nook, SETTLE.d, 0.75, 0.06, sx, 0.375, z0 + 0.03, settleMat, 1);
   arm.name = name; settles.push(arm);
 });
+/* The settle's drawing laid on its boxes (Godric's pick on corridor-settle-r1-1016; req 569's Yorkshire settle its
+   precedent): one square-on front, both settles sharing it. Four parts of it dress the boxes, each a hair off the face
+   it covers: the seat's front below SETTLE.seat, the whole length; the back's face above it; the arm's front from the
+   seat to its top; the lids' band (drawn from a little above) over the seat tops, the lifting lid's third riding on its
+   hinge. The drawing's arm end is its left, so u runs from the mouth end (z0) inward on both sides: the study settle
+   shows it as drawn, the stair side mirrored, each arm at the nook's mouth. The arm's side and the ends keep the box
+   colour, set darker to sit with the drawn oak. Parts of the drawing, as fractions of it (u from the left, v from the
+   top), measured on the pick */
+var SETTLE_DRAW = { url: null, oak: 0x4a3626,   /* the layer's url set once Godric picks (corridor-settle-r1-1016); measured on Try 3 */
+  back: { u0: 0.041, u1: 0.955, v0: 0.003, v1: 0.5625 },   /* the back's outer stiles, its top rail to the rail behind the lids */
+  front: { u0: 0.009, u1: 0.986, v0: 0.631, v1: 0.994 },   /* the arm post's outer edge to the right stile, the chest's top rail to the foot */
+  arm: { u0: 0.009, u1: 0.041, v0: 0.35, v1: 0.631 },      /* the arm post from its rest down to the seat */
+  lids: { u0: 0.041, u1: 0.986, v0: 0.5625, v1: 0.631 },   /* the three lids, their back edge to their front */
+  end: { u0: 0.041, u1: 0.33, v0: 0.2, v1: 0.5625 } };     /* the arm's end: two tall panels of the back's lower tier */
+/* a quad from four corners [x, y, z, k], k 0 at the part's v0 and 1 at its v1; u by world z (z + zw) from z0 */
+function settleQuad(m, parent, corners, z0, part, zw) {
+  var p = SETTLE_DRAW[part], pos = [], uv = [];
+  corners.forEach(function (c) {
+    pos.push(c[0], c[1], c[2]);
+    uv.push(p.u0 + (p.u1 - p.u0) * (c[2] + (zw || 0) - z0) / SETTLE.len, 1 - (c[3] ? p.v1 : p.v0));
+  });
+  var g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex([0, 1, 2, 0, 2, 3]); g.computeVertexNormals();
+  var q = new THREE.Mesh(g, m);
+  q.receiveShadow = true;
+  parent.add(q);
+  return q;
+}
+function settleFace(m, x, ya, yb, za, zb, z0, part) {   /* upright, facing across the nook */
+  return settleQuad(m, nook, [[x, ya, za, 1], [x, ya, zb, 1], [x, yb, zb, 0], [x, yb, za, 0]], z0, part);
+}
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var t = tex(im), m = new THREE.MeshStandardMaterial({ map: t, roughness: 0.92, metalness: 0, side: THREE.DoubleSide });
+    [NOOK_X0, NOOK_X1].forEach(function (wx, i) {
+      var dir = i === 0 ? -1 : 1, z0 = NOOK_BACK - SETTLE.len, z1 = NOOK_BACK, f = wx + dir * (SETTLE.d + 0.002);
+      var xb = wx + dir * 0.08, xf = wx + dir * SETTLE.d, y = SETTLE.seat + 0.002;
+      settleFace(m, f, 0, SETTLE.seat, z0, z1, z0, 'front');
+      settleFace(m, wx + dir * 0.082, SETTLE.seat, SETTLE.back, z0, z1, z0, 'back');
+      settleFace(m, f, SETTLE.seat, 0.75, z0, z0 + 0.06, z0, 'arm');
+      /* the arm's end, toward the corridor and lit by it: a panelled end, the back's lower tier's first two panels */
+      var e = SETTLE_DRAW.end, ze = z0 - 0.002, ge = new THREE.BufferGeometry();
+      ge.setAttribute('position', new THREE.Float32BufferAttribute([wx, 0, ze, xf, 0, ze, xf, 0.75, ze, wx, 0.75, ze], 3));
+      ge.setAttribute('uv', new THREE.Float32BufferAttribute([e.u0, 1 - e.v1, e.u1, 1 - e.v1, e.u1, 1 - e.v0, e.u0, 1 - e.v0], 2));
+      ge.setIndex([0, 1, 2, 0, 2, 3]); ge.computeVertexNormals();
+      var qe = new THREE.Mesh(ge, m); qe.receiveShadow = true; nook.add(qe);
+      /* the lids' tops: on the study side the middle third is the lid that lifts, so its part rides on the hinge */
+      var spans = i === 0 ? [[z0 + 0.06, HIDE.a], [HIDE.b, z1]] : [[z0 + 0.06, z1]];
+      spans.forEach(function (s) { settleQuad(m, nook, [[xb, y, s[0], 0], [xb, y, s[1], 0], [xf, y, s[1], 1], [xf, y, s[0], 1]], z0, 'lids'); });
+      if (i === 0 && HIDE.lid) {
+        var zm = (HIDE.a + HIDE.b) / 2, w = SETTLE.d - 0.08, ha = HIDE.a - zm, hb = HIDE.b - zm;
+        settleQuad(m, HIDE.lid, [[0, 0.002, ha, 0], [0, 0.002, hb, 0], [dir * w, 0.002, hb, 1], [dir * w, 0.002, ha, 1]], z0, 'lids', zm);
+        var yu = -HIDE.lidT - 0.002;   /* its underside, seen once it lifts */
+        settleQuad(m, HIDE.lid, [[0, yu, ha, 0], [0, yu, hb, 0], [dir * w, yu, hb, 1], [dir * w, yu, ha, 1]], z0, 'lids', zm);
+      }
+    });
+    settleMat.color.set(SETTLE_DRAW.oak);
+    settles.forEach(function (s) { if (s.material === settleMat) s.userData.base = settleMat.color.clone(); });
+  };
+  if (SETTLE_DRAW.url) im.src = SETTLE_DRAW.url;   /* till then the grey stand-ins */
+})();
 /* the way in behind the box: the wall's lower panel open into the hide, dark, with a little of the nook's light falling
    in from the lifted lid (the dark is never deep); shown only while the lid is up */
 HIDE.hole = (function () {
@@ -2577,6 +2641,42 @@ hangDrawing(cupboardDoor, '../assets/layers/corridor-cupboard-door.png', CUPBOAR
 var cupboardDark = new THREE.Mesh(new THREE.PlaneGeometry(CUPBOARD.w, CUPBOARD.h), new THREE.MeshBasicMaterial({ color: col(0x0d0b09) }));
 cupboardDark.position.set(CUPBOARD.x, CUPBOARD.h / 2, HER_FACE - 0.001); cupboardDark.rotation.y = Math.PI;
 cupboardDark.name = 'cupboard-dark'; cupboardDark.visible = false; scene.add(cupboardDark);
+/* Every door set back in its reveal under a surround of its wall's age (Godric's rule, 16 October 2026, 3.22 pm, on
+   architect-closet-1016; the Architect's materials schedule, req 636, model v64: this corridor and its cupboard
+   houses-sandstone, the pointed surround; taken at 3.23 pm on the lead's agreement, provisional, Godric to confirm).
+   A plain coded stone frame stands proud of her wall by SURROUND.d, so each leaf sits that far back in its reveal: two
+   jambs to the leaf's head and a two-centred pointed arch over it, rising SURROUND.rise of the span; the arch's head over
+   the square-headed leaf a plain stone tympanum, so the leaves he picked are kept. A stand-in until the castle's shared
+   pointed surround is drawn (the schedule's six, req 643), and in the wall's own grey till its sandstone picture comes.
+   The jambs are SURROUND.t wide: the cupboard's 0.25 m clear of portrait-b and of the nook's mouth either side */
+var SURROUND = { t: 0.12, d: 0.08, rise: 0.8, mat: solid(0x8a8174), tymp: solid(0x7e766a) };
+function pointedSurround(cx, w, h) {
+  var t = SURROUND.t, r = SURROUND.rise * w, xc = (r * r - w * w / 4) / w, R = xc + w / 2, N = 14;
+  function arc(rad, from) {   /* the left half from its springing to the apex; the right half mirrored */
+    var a0 = Math.PI, a1 = Math.acos(-xc / rad), pts = [];
+    for (var i = 0; i <= N; i++) { var a = a0 + (a1 - a0) * i / N; pts.push([xc + rad * Math.cos(a), h + rad * Math.sin(a)]); }
+    return pts;
+  }
+  var outL = arc(R + t), inL = arc(R), s = new THREE.Shape(), ty = new THREE.Shape();
+  s.moveTo(-w / 2 - t, 0);
+  outL.forEach(function (p) { s.lineTo(p[0], p[1]); });
+  outL.slice(0, -1).reverse().forEach(function (p) { s.lineTo(-p[0], p[1]); });
+  s.lineTo(w / 2 + t, 0); s.lineTo(w / 2, 0);
+  inL.forEach(function (p) { s.lineTo(-p[0], p[1]); });
+  inL.slice(0, -1).reverse().forEach(function (p) { s.lineTo(p[0], p[1]); });
+  s.lineTo(-w / 2, 0);
+  ty.moveTo(-w / 2, h);
+  inL.forEach(function (p) { ty.lineTo(p[0], p[1]); });
+  inL.slice(0, -1).reverse().forEach(function (p) { ty.lineTo(-p[0], p[1]); });
+  var frame = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: SURROUND.d, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 1, curveSegments: 1 }), SURROUND.mat);
+  frame.position.set(cx, 0, HER_FACE); frame.rotation.y = Math.PI;   /* out from her wall into the corridor */
+  var tymp = new THREE.Mesh(new THREE.ShapeGeometry(ty), SURROUND.tymp);
+  tymp.position.set(cx, 0, HER_FACE - 0.003); tymp.rotation.y = Math.PI;
+  [frame, tymp].forEach(function (m) { m.receiveShadow = true; m.castShadow = true; scene.add(m); register(m, 1); });
+  return { frame: frame, tymp: tymp };
+}
+var cupboardSurround = pointedSurround(CUPBOARD.x, CUPBOARD.w, CUPBOARD.h);
+var doorSurround = pointedSurround(DOOR.x, DOOR.w, DOOR.h);
 var cupboard = { ang: 0, target: 0, rattle: 0, shut: 0 };
 /* What it holds (Magic's B18, req 281; Godric's picks: the broom round 1 Try 1, held answer relayed 15 October 2026,
    1.47 pm; the tag round 1 Try 3, drawn blank, lettered here): one ancient school broom, a Shooting Star, "very slow and
