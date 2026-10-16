@@ -748,14 +748,16 @@
       if (easterNear(now)) return 'easter';
       return 'none';
     }
-    /* Lessons (§7 4): on in the teaching hours of a weekday in term; off at weekends, over Christmas and Easter, and
-       on the start-of-term and leaving-feast days. The summer holds in the feast week (§7 6), so its weekdays but the
-       feast's have lessons, the last week of term. */
+    /* Lessons (§7 4): on in the teaching hours (LESSON_HOURS, the one value) of every day in term, weekends included
+       (the charter, 15 October 2026: "Lessons run whenever they visit, weekends included"; Fawkes's 1, 16 October
+       2026, 9.48 am); off on a match day, the school at the pitch, over Christmas and Easter, and on the
+       start-of-term and leaving-feast days. The summer holds in the feast week (§7 6), so its days but the feast's
+       have lessons, the last week of term. */
     function lessonsNow() {
       if (lessonsOverride) return lessonsOverride;
       if (timeOverride) return 'off';
-      var dow = castleDay().getDay(), occ = occasionNow();
-      if (dow === 0 || dow === 6) return 'off';
+      var occ = occasionNow();
+      if (matchNow() === 'yes') return 'off';
       if (/^(christmas|christmas day|easter|start of term|leaving feast)$/.test(occ)) return 'off';
       var mins = minsNow();
       return LESSON_HOURS.some(function (h) { return inHours(h.from, h.to, mins); }) ? 'on' : 'off';

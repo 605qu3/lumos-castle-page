@@ -6,7 +6,6 @@
       "when": [
         "place = greenhouses",
         "lessons = on",
-        "weekday = monday",
         "hour < 13",
         "year <= 1"
       ],
@@ -18,7 +17,6 @@
       "when": [
         "place = greenhouses",
         "lessons = on",
-        "weekday = monday",
         "hour < 13",
         "year >= 2"
       ],
@@ -29,11 +27,11 @@
     {
       "when": [
         "place = greenhouses",
-        "weekday = monday",
         "occasion = none",
         "hour = 8",
         "meal = none",
-        "year <= 1"
+        "year <= 1",
+        "match = no"
       ],
       "show": [
         "the class waiting outside greenhouse one's door, still locked"
@@ -42,11 +40,11 @@
     {
       "when": [
         "place = greenhouses",
-        "weekday = monday",
         "occasion = none",
         "hour = 8",
         "meal = none",
-        "year >= 2"
+        "year >= 2",
+        "match = no"
       ],
       "show": [
         "the class waiting outside greenhouse three's door, still locked"
@@ -55,10 +53,10 @@
     {
       "when": [
         "place = greenhouses",
-        "weekday = monday",
         "occasion = none",
         "hour >= 13",
-        "time != night"
+        "time != night",
+        "match = no"
       ],
       "show": [
         "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
@@ -67,11 +65,11 @@
     {
       "when": [
         "place = greenhouses",
-        "weekday = monday",
         "occasion = halloween",
         "hour = 8",
         "meal = none",
-        "year <= 1"
+        "year <= 1",
+        "match = no"
       ],
       "show": [
         "the class waiting outside greenhouse one's door, still locked"
@@ -80,11 +78,11 @@
     {
       "when": [
         "place = greenhouses",
-        "weekday = monday",
         "occasion = halloween",
         "hour = 8",
         "meal = none",
-        "year >= 2"
+        "year >= 2",
+        "match = no"
       ],
       "show": [
         "the class waiting outside greenhouse three's door, still locked"
@@ -93,210 +91,10 @@
     {
       "when": [
         "place = greenhouses",
-        "weekday = monday",
         "occasion = halloween",
         "hour >= 13",
-        "time != night"
-      ],
-      "show": [
-        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "lessons = on",
-        "weekday = wednesday",
-        "hour < 13",
-        "year <= 1"
-      ],
-      "show": [
-        "a Herbology lesson in greenhouse one: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "lessons = on",
-        "weekday = wednesday",
-        "hour < 13",
-        "year >= 2"
-      ],
-      "show": [
-        "a Herbology lesson in greenhouse three: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = wednesday",
-        "occasion = none",
-        "hour = 8",
-        "meal = none",
-        "year <= 1"
-      ],
-      "show": [
-        "the class waiting outside greenhouse one's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = wednesday",
-        "occasion = none",
-        "hour = 8",
-        "meal = none",
-        "year >= 2"
-      ],
-      "show": [
-        "the class waiting outside greenhouse three's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = wednesday",
-        "occasion = none",
-        "hour >= 13",
-        "time != night"
-      ],
-      "show": [
-        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = wednesday",
-        "occasion = halloween",
-        "hour = 8",
-        "meal = none",
-        "year <= 1"
-      ],
-      "show": [
-        "the class waiting outside greenhouse one's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = wednesday",
-        "occasion = halloween",
-        "hour = 8",
-        "meal = none",
-        "year >= 2"
-      ],
-      "show": [
-        "the class waiting outside greenhouse three's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = wednesday",
-        "occasion = halloween",
-        "hour >= 13",
-        "time != night"
-      ],
-      "show": [
-        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "lessons = on",
-        "weekday = friday",
-        "hour < 13",
-        "year <= 1"
-      ],
-      "show": [
-        "a Herbology lesson in greenhouse one: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "lessons = on",
-        "weekday = friday",
-        "hour < 13",
-        "year >= 2"
-      ],
-      "show": [
-        "a Herbology lesson in greenhouse three: the class at the trays four to a tray, the teacher at the trestle bench; at the boys' tray two free places, a pot each, a trowel and a labelled plant"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = friday",
-        "occasion = none",
-        "hour = 8",
-        "meal = none",
-        "year <= 1"
-      ],
-      "show": [
-        "the class waiting outside greenhouse one's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = friday",
-        "occasion = none",
-        "hour = 8",
-        "meal = none",
-        "year >= 2"
-      ],
-      "show": [
-        "the class waiting outside greenhouse three's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = friday",
-        "occasion = none",
-        "hour >= 13",
-        "time != night"
-      ],
-      "show": [
-        "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = friday",
-        "occasion = halloween",
-        "hour = 8",
-        "meal = none",
-        "year <= 1"
-      ],
-      "show": [
-        "the class waiting outside greenhouse one's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = friday",
-        "occasion = halloween",
-        "hour = 8",
-        "meal = none",
-        "year >= 2"
-      ],
-      "show": [
-        "the class waiting outside greenhouse three's door, still locked"
-      ]
-    },
-    {
-      "when": [
-        "place = greenhouses",
-        "weekday = friday",
-        "occasion = halloween",
-        "hour >= 13",
-        "time != night"
+        "time != night",
+        "match = no"
       ],
       "show": [
         "compost spilt at the trays' edges and a pot or two left on the path from the morning's lesson"

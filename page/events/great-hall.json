@@ -373,20 +373,6 @@
         "meal = none",
         "time != night",
         "last meal != none",
-        "lessons = on",
-        "weekday != wednesday",
-        "club = none"
-      ],
-      "show": [
-        "the hall empty, nobody at the four tables"
-      ]
-    },
-    {
-      "when": [
-        "place = great hall",
-        "meal = none",
-        "time != night",
-        "last meal != none",
         "lessons = off",
         "occasion = christmas",
         "club = none"
@@ -458,7 +444,6 @@
         "time != night",
         "last meal != none",
         "lessons = on",
-        "weekday = wednesday",
         "club = none"
       ],
       "show": [
