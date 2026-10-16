@@ -116,6 +116,28 @@
       "show": [
         "the armour turned with its back to the corridor"
       ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "occasion = christmas"
+      ],
+      "show": [
+        "thick streamers of holly and mistletoe strung along the corridor",
+        "a soft light shining from inside the suit of armour, out through the slits of its visor"
+      ],
+      "canon": "Magic's req 599 (docs/handoff/magic.md, The seventh-floor corridor): PoA 11 L17727, \"Thick streamers of holly and mistletoe were strung along the corridors, mysterious lights shone from inside every suit of armour\"; the castle's usual Christmas decorations, every year, the season's dress of every suit and never a mark on one thing to tap; the Corridor draws them (req 600) from these cue strings word for word; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = corridor",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "thick streamers of holly and mistletoe strung along the corridor",
+        "a soft light shining from inside the suit of armour, out through the slits of its visor"
+      ],
+      "canon": "Magic's req 599 (docs/handoff/magic.md, The seventh-floor corridor): PoA 11 L17727, \"Thick streamers of holly and mistletoe were strung along the corridors, mysterious lights shone from inside every suit of armour\"; the castle's usual Christmas decorations, every year, the season's dress of every suit and never a mark on one thing to tap; the Corridor draws them (req 600) from these cue strings word for word; checked against the text, 16 October 2026"
     }
   ],
   "records": [
