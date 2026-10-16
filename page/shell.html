@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=33"></script>
-<script src="castle-shell.js?v=7"></script>
+<script src="castle-model.js?v=34"></script>
+<script src="castle-shell.js?v=8"></script>
 <script src="castle-events.js?v=33"></script>
 <script>
 (function () {
@@ -193,7 +193,7 @@ var MROOMS = (MODEL && MODEL.rooms) || [];
 MROOMS.forEach(function (r) { if ((r.alias || []).indexOf(PLACE) >= 0) PLACE = r.id; });
 var NEVER = MROOMS.some(function (r) { return r.id === PLACE && r.shell === 'never'; });
 /* each place's start on a plain load: the way he first comes in by */
-var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth' };
+var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth', 'tapestry-stairwell': 'tapestry-stair-1' };
 
 var kit = window.castleFrame ? castleFrame({
   background: 0x0b0a09, fog: 0.012,
@@ -661,7 +661,9 @@ var thingCues = {
   "the old wardrobe at the far end gives a sudden wobble, banging off the wall": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 0.9, 38, 0.05); },
   "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again": function () { turnDone = 'thing'; shake(roomThing('wardrobe'), 1.1, 44, 0.06); },
   "the pineapple on the front-row desk tapdances from one end of the desk to the other, its leaves bobbing, and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 2.4, 9, 0.45); },
-  "the pineapple tapdances a few quick steps on the spot and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 1.0, 4, 0); }
+  "the pineapple tapdances a few quick steps on the spot and stops still": function () { turnDone = 'thing'; hop(roomThing('pineapple'), 1.0, 4, 0); },
+  /* H11's trick step (Events' req 520, page/events/hidden-ways.json's hidden-ways.trick-step), word for word */
+  "his foot sinks into the step to the shin with a soft gulp and holds; a moment, then the step lets go of him, and from now on it shows a shade paler than the rest": function () { trickSink(); }
 };
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
@@ -767,7 +769,7 @@ function tap(cx, cy) {
 
 function updateCamera(dt) {
   if (tween) {
-    tween.t += dt;
+    if (!trickHold()) tween.t += dt;                                /* the trick step holds him a moment (req 520) */
     var k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
     camera.position.lerpVectors(tween.from.pos, tween.to.pos, k);
     lookTmp.lerpVectors(tween.from.look, tween.to.look, k);
@@ -777,6 +779,7 @@ function updateCamera(dt) {
     hy = lerp(hy, hyT, s); hp = lerp(hp, hpT, s);
     headPose(camera.position, lookTmp);
   }
+  var dip = trickDip(); camera.position.y -= dip; lookTmp.y -= dip * 1.6;   /* to the shin, and his eye drops to it */
   camera.lookAt(lookTmp);
 }
 
@@ -813,6 +816,7 @@ function frame() {
   updateHops(dt);
   updateLines(dt);
   updateFilch(dt);
+  updateTrick(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
 }
@@ -872,6 +876,58 @@ var events = window.CastleEvents ? CastleEvents.start({
     TURN ? { doors: function () { return TURN; } } : {})
 }) : null;
 if (events && events.ready) events.ready.then(readTurnDoors); else readTurnDoors();
+
+/* the trick steps (Events' req 520, the shells' half of req 503; model v34): a feature whose kind says trick step, in a
+   place built here (the tapestry stair's third flight, tapestry-stair-trick-step). As his walk crosses it, either way,
+   the runtime hears `stepped on <its id in words>`; its record's cue (above) sinks his eye to the shin and holds, a
+   moment, then lets him go, and the tread shows a shade paler from then on. Once `trick-step` is among his secrets the
+   tread is paler from the start and his walk steps over it: no moment, no sink. */
+var TRICK = (function () {
+  var o = shell.toLocal(0, 0, null), z0 = shell.place.floor;
+  var list = ((MODEL && MODEL.features) || []).filter(function (ft) { return /trick step/.test(ft.kind || '') && ft.rect && ft.z != null; });
+  list = list.filter(function (ft) {
+    var mx = (ft.rect[0] + ft.rect[2]) / 2, my = (ft.rect[1] + ft.rect[3]) / 2;
+    return shell.places.some(function (p) {
+      var xs = p.poly.map(function (q) { return q[0]; }), ys = p.poly.map(function (q) { return q[1]; });
+      return mx >= Math.min.apply(null, xs) && mx <= Math.max.apply(null, xs) && my >= Math.min.apply(null, ys) && my <= Math.max.apply(null, ys);
+    });
+  });
+  var box = new THREE.Box3();
+  list.forEach(function (ft) {
+    var c = shell.toLocal((ft.rect[0] + ft.rect[2]) / 2, (ft.rect[1] + ft.rect[3]) / 2, ft.z);
+    ft.tread = shell.group.children.filter(function (m) {
+      if (!m.userData.stair) return false;
+      box.setFromObject(m);
+      return c.x >= box.min.x - 0.01 && c.x <= box.max.x + 0.01 && c.z >= box.min.z - 0.01 && c.z <= box.max.z + 0.01 && Math.abs(box.max.y - c.y) < 0.15;
+    })[0] || null;
+  });
+  return { list: list, o: o, z0: z0, inside: {}, sink: null, pale: {} };
+})();
+function trickFound() { return !!(events && events.secrets && events.secrets().indexOf('trick-step') >= 0); }
+function trickPale(ft) {
+  if (!ft.tread || TRICK.pale[ft.id]) return;
+  TRICK.pale[ft.id] = true;
+  var m = ft.tread.material.clone(); m.color.offsetHSL(0, 0, 0.14); ft.tread.material = m;
+}
+function trickSink() { TRICK.sink = { t: 0 }; TRICK.list.forEach(trickPale); }
+var TRICK_SINK = { down: 0.2, hold: 1.1, up: 1.5, depth: 0.35 };
+function trickHold() { return !!TRICK.sink; }
+function trickDip() {
+  var s = TRICK.sink; if (!s) return 0;
+  var t = s.t, k = t < TRICK_SINK.down ? t / TRICK_SINK.down : t < TRICK_SINK.hold ? 1 : Math.max(0, 1 - (t - TRICK_SINK.hold) / (TRICK_SINK.up - TRICK_SINK.hold));
+  return TRICK_SINK.depth * easeInOut(k);
+}
+function updateTrick(dt) {
+  if (TRICK.sink && (TRICK.sink.t += dt) >= TRICK_SINK.up) TRICK.sink = null;
+  if (!TRICK.list.length) return;
+  var sx = camera.position.x - TRICK.o.x, sy = TRICK.o.z - camera.position.z, feet = camera.position.y + TRICK.z0 - 1.35;
+  TRICK.list.forEach(function (ft) {
+    var r = ft.rect, on = sx >= r[0] - 0.02 && sx <= r[2] + 0.02 && sy >= r[1] - 0.02 && sy <= r[3] + 0.02 && Math.abs(feet - ft.z) < 0.45;
+    if (on && !TRICK.inside[ft.id] && tween && !trickFound() && events && events.moment) events.moment('stepped on ' + ft.id.replace(/-/g, ' '));
+    TRICK.inside[ft.id] = on;
+  });
+}
+if (events && events.ready) events.ready.then(function () { if (trickFound()) TRICK.list.forEach(trickPale); });
 
 /* Filch's near misses (Events' req 498, the shells' half of Interiors' req 471; page/events/filch.json's
    `filch.miss-<room>`): on about one day in two, by day or evening, the first time in a visit he stands still a few
@@ -949,6 +1005,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return !!d;
   },
   turn: function () { return turnNow(); }, turnDone: function () { return turnDone; },
+  /* req 520: the trick steps here, whether each found its tread, whether he is held, which show paler, and the secret */
+  trick: function () { return { steps: TRICK.list.map(function (f) { return f.id; }), treads: TRICK.list.map(function (f) { return !!f.tread; }),
+    sink: !!TRICK.sink, pale: Object.keys(TRICK.pale), found: trickFound() }; },
   /* B21: the cupboard's state, and a tap on its grains as from its stand (true if they run) */
   cupboard: function () { return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run } : null; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },

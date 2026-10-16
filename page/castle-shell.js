@@ -65,7 +65,7 @@ function findPlace(M, id) {
   return null;
 }
 function matches(M, op, id) {
-  var ids = (op.between || []).concat(op.room ? [op.room] : []);
+  var ids = (op.between || []).concat(op.room ? [op.room] : [], op.inside ? [op.inside] : []);
   for (var i = 0; i < ids.length; i++) if (ids[i] === id || slug(ids[i]) === id) return true;
   return false;
 }
@@ -178,7 +178,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var gaps = Q.poly.map(function () { return []; });
     (M.openings || []).forEach(function (op) {
       if (!matches(M, op, Q.id)) return;
-      if (/hidden/.test(op.kind || '')) return;                       /* a doorway behind a panel or a tapestry reads as wall */
+      /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
+         `inside`, the tapestry stair's well), a way out, its sill there `inside_sill` */
+      var back = !!op.inside && (op.inside === Q.id || slug(op.inside) === Q.id);
+      if (/hidden/.test(op.kind || '') && !back) return;
       var gid = op.group || null;
       var pts = op.span ? op.span.map(function (p) { return toSite(M, gid, p); }) : op.at ? [toSite(M, gid, op.at)] : null;
       if (!pts) return;
@@ -190,8 +193,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          found on the next wall, its sill and head then running the length of this one */
       if (pts.length > 1) { var s2 = alongEdge(Q.poly, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
       else { s0 = e.s - (op.w || 1) / 2; s1 = e.s + (op.w || 1) / 2; }
-      var sill = op.sill || 0, h = Math.min(H, (op.h || 2.2) + sill);
-      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0 });
+      var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0, h = Math.min(H, (op.h || 2.2) + sill);
+      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back });
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
        part, its head round */
@@ -241,7 +244,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var to = other(g.op, Q.id);
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
         var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;
-        if (isDoor(g.op.kind) && !out.doors.some(function (d) { return d.id === g.op.id; })) {
+        if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
           var leaf = slab(w - 0.08, hh - 0.02, 0.12, mats.door, 'door');
           var lo = g.far ? g.far - 0.1 : t * 0.5;                        /* a passage's leaves hang at its far face */
           leaf.position.set(mid.x + nx * lo, mid.y + g.sill + (hh - 0.02) / 2, mid.z - ny * lo);
@@ -250,12 +253,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var sl = slab(w, 0.02, t, mats.floor, 'floor'), sp = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
           sl.position.set(sp.x, sp.y + g.sill + 0.01, sp.z); sl.rotation.y = ang; sl.name = Q.id + '-threshold-' + g.op.id; group.add(sl);
           out.doors.push({ id: g.op.id, to: to, mesh: leaf, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: g.sill, lift: lift, level: level });
-        } else if (isWay(g.op.kind) && !out.ways.some(function (d) { return d.id === g.op.id; })) {
-          var fill = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false }));
+        } else if ((g.back || isWay(g.op.kind)) && !out.ways.some(function (d) { return d.id === g.op.id; })) {
+          /* a way out from a hidden place hangs its tapestry's back in the mouth, a dark grey hanging, not a void */
+          var fill = g.back ? F.register(new THREE.Mesh(new THREE.PlaneGeometry(w, hh), F.solid(0x3b3632)), LAYER.way)
+                            : new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false }));
+          if (g.back) fill.material.side = THREE.DoubleSide;
           fill.position.set(mid.x, mid.y + g.sill + hh / 2, mid.z); fill.rotation.y = ang; fill.name = 'way-' + g.op.id; fill.userData.way = g.op.id;
           group.add(fill);
           out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm],
-            sill: g.sill, lift: lift, level: level });
+            sill: g.sill, lift: lift, level: level, back: g.back });
         }
       });
       piece(at, L, 0, H, Q.id + '-wall-' + i + '-end');
@@ -267,6 +273,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      recess beyond the mouth for now) */
   out.ways.slice().forEach(function (w) {
     if (out.places.some(function (q) { return q.id === w.to; })) return;
+    /* a way out of a hidden place (v8): its far side is its own shell, a tap away, never built here, since the two
+       share a wall line the model draws without its thickness */
+    if (w.back) { w.built = true; return; }
     var Q = findPlace(M, w.to);
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
     if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; }
@@ -363,7 +372,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      inside the way he arrives by (o.from), or else inside the first door of this place that leads out of the castle's
      ways, facing in. A raised way (the bay's mouth) is stood at on its own floor, a step inside it */
   function standAt(d, name) {
-    var off = d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole */
+    var off = d.back ? 0.5 : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
     var look = d.mid.clone(); look.y = d.mid.y + d.lift + (d.lift ? EYE : Math.max(EYE, d.h * 0.45));
     return { name: name, pos: pos, look: look, thing: d.mesh, level: d.level };
@@ -371,7 +380,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* he arrives through a mouth standing in it, a step back on the side he came from, looking in (only into the wall's
      depth where the far side is a room's page, short of the dark beyond); through a door, a step inside it */
   function facingIn(d, name) {
-    var back = d.mesh.userData.way ? (d.page || !d.built ? -0.3 : -1.0) : STAND_OFF;
+    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built ? -0.3 : -1.0) : STAND_OFF;
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
     var look = d.mid.clone().add(d.inward.clone().multiplyScalar(STAND_OFF + 20)); look.y = d.mid.y + d.lift + EYE + 0.3;
     return { name: name, pos: pos, look: look, thing: null, level: d.level };
@@ -393,8 +402,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* a flight's two stands: a step off each end onto the floor it joins (straight on, or to the side onto a gallery),
      the foot's looking up the flight, the head's on along it */
   function endStand(F0, z, back, name, lookAt) {
-    var e = F0.u, sd = F0.side, P0 = back ? F0.foot : F0.head, sg = back ? -1 : 1, off = F0.half + STEP_OFF;
-    var tries = [[P0[0] + sg * e[0] * STEP_OFF, P0[1] + sg * e[1] * STEP_OFF]];
+    var so = F0.s.step || STEP_OFF;                                     /* v8: a flight's own step off (the tapestry stair's 0.5) */
+    var e = F0.u, sd = F0.side, P0 = back ? F0.foot : F0.head, sg = back ? -1 : 1, off = F0.half + so;
+    var tries = [[P0[0] + sg * e[0] * so, P0[1] + sg * e[1] * so]];
     [-1, 1].forEach(function (k) { tries.push([P0[0] - sg * e[0] * 1.5 + k * sd[0] * off, P0[1] - sg * e[1] * 1.5 + k * sd[1] * off]); });
     var at = tries.filter(function (p) { return onLevel(p[0], p[1], z); })[0] || tries[0];
     var pos = toLocal(at[0], at[1], z + EYE);
