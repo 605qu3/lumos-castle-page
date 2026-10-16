@@ -83,6 +83,20 @@ function findPlace(M, id) {
     return { id: r.id, name: r.name, kind: 'room', poly: cp, area: { outer: cp, holes: [] }, round: { c: cc, r: rr }, floor: cb + (r.floor || 0),
       ceiling: cb + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7), wall: r.wall || deep || WALL_T, walls: null, rec: r };
   }
+  /* v17 (model v44): a newel stair made a place (`place: "shaft"`, the south-west turret's): its round well from `from`
+     to `to` and a turn's head room over, its wall the turret's 0.5, its sides long enough for its widest door (twelve at
+     r 1.7), one side's middle on its first door; its doors cut at their own heights (z) */
+  var st = (M.stairs || []).filter(function (x) { return slug(x.id) === id && x.place === 'shaft' && x.rect; })[0];
+  if (st) {
+    var sr = st.rect, scc = [(sr[0] + sr[2]) / 2, (sr[1] + sr[3]) / 2], srr = (sr[2] - sr[0]) / 2;
+    var sops = (M.openings || []).filter(function (op) { return op.at && (op.between || []).indexOf(st.id) >= 0; });
+    var wide = Math.max.apply(null, sops.map(function (op) { return op.w || 1; }).concat([0.8]));
+    var sn = Math.max(8, Math.min(SIDES, Math.floor(Math.PI / Math.atan((wide + 0.1) / (2 * srr)))));
+    var soff = sops[0] ? angle(scc, toSite(M, sops[0].group || null, sops[0].at)) : 0, sh = 180 / sn;
+    var scp = arcPts(scc, srr / Math.cos(sh * Math.PI / 180), soff + sh, soff + 360 + sh, sn).slice(0, sn);
+    return { id: slug(st.id), name: st.name || st.id.replace(/-/g, ' '), kind: 'room', poly: scp, area: { outer: scp, holes: [] },
+      round: { c: scc, r: srr }, floor: st.from, ceiling: st.to + 2.4, wall: 0.5, walls: null, rec: st, shaft: true };
+  }
   /* v10: a ring (the lamplighters' gallery, the old wall-walk): whole, or where two of its openings stand across it (the
      turret's landing on the wall-walk) an arc the long way round between them; its shutters and loops by bearing */
   var ft = (M.features || []).filter(function (x) { return x.id === id && x.ring; })[0];
@@ -161,7 +175,7 @@ function other(op, id) {
 /* v13 (model v39, the dovecote's stair): a way into a stair joining two rooms leads on to the room at its other end */
 function viaStair(M, to, id) {
   var s = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
-  if (!s || !s.rooms || s.rooms.length < 2) return null;
+  if (!s || !s.rooms || s.rooms.length < 2 || s.place === 'shaft') return null;   /* v17: a stair that is a place is gone into */
   var r = s.rooms.filter(function (x) { return slug(x) !== id; })[0];
   return r ? slug(r) : null;
 }
@@ -363,6 +377,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }
       s0 = Math.max(0, s0); s1 = Math.min(e.L, s1);
       var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0;
+      if (Q.shaft && op.z != null) sill += op.z - Q.floor;                /* v17: in a stair's well, at its own height */
       var h = Q.sky ? (op.h || 2.2) + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, (op.h || 2.2) + sill);
       gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid });
       spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
@@ -479,7 +494,78 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
       }
     });
+    if (Q.shaft) buildShaft(Q, gaps);
   }
+  /* v17: a newel stair made a place: its newel; a landing at each door's sill, doors a few risers apart sharing the
+     lowest (the old wall-walk's two at +30 and the wind-dial room's, six risers above them up straight steps in its own
+     width, as the model has it); between the foot and each landing a flight of treads winding up clockwise, one riser
+     apart and about 30 degrees, phased to meet its ends, so a turn's head room is 2.4 and each turn closes the view above
+     and below (enclosed, no open drop: Fawkes, 2.27 am); a tread across a door's opening left out. Each flight is walked
+     along its own treads */
+  var shaftFlights = [], shaftStepped = {};
+  function buildShaft(Q, gaps) {
+    var S = Q.rec, c = Q.round.c, R = Q.round.r, NR = 0.15, rise = S.rise || 0.2, PR = 0.95, GO = 0.25, doors = [];
+    gaps.forEach(function (gs) { gs.forEach(function (g) {
+      if (g.spill || g.niche || !g.op.at) return;
+      doors.push({ id: g.op.id, a: angle(c, toSite(M, g.op.group || null, g.op.at)), z: Q.floor + g.sill, top: Q.floor + g.h,
+        w: g.s1 - g.s0, half: Math.atan2(g.s1 - g.s0, 2 * R) * 180 / Math.PI });
+    }); });
+    var newel = F.register(new THREE.Mesh(new THREE.CylinderGeometry(NR, NR, Q.ceiling - Q.floor, 12), mats.wall), LAYER.wall);
+    newel.position.copy(toLocal(c[0], c[1], (Q.floor + Q.ceiling) / 2)); newel.name = Q.id + '-newel'; group.add(newel);
+    function wedge(a0, a1, top, thick, mat, name) {
+      var r0 = a0 * Math.PI / 180, r1 = a1 * Math.PI / 180, s = new THREE.Shape();
+      s.moveTo(NR * Math.cos(r0), NR * Math.sin(r0)); s.lineTo(R * Math.cos(r0), R * Math.sin(r0));
+      s.absarc(0, 0, R, r0, r1, false); s.lineTo(NR * Math.cos(r1), NR * Math.sin(r1));
+      var m = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: thick, bevelEnabled: false, curveSegments: 4 }), mat), LAYER.wall);
+      m.rotation.x = -Math.PI / 2; m.position.copy(toLocal(c[0], c[1], top - thick)); m.name = name; group.add(m);
+      return m;
+    }
+    var norm = function (x) { return ((x % 360) + 360) % 360; };
+    var off = function (a, b) { return Math.abs(norm(a - b + 180) - 180); };
+    var at = function (a, r) { return [c[0] + r * Math.cos(a * Math.PI / 180), c[1] + r * Math.sin(a * Math.PI / 180)]; };
+    var end = function (a, r, z, la, lr, up) { var p = at(a, r), l = at(la, lr); return { x: p[0], y: p[1], z: z, lx: l[0], ly: l[1], up: up || 0 }; };
+    /* the landings, each spanning its doors the short way round */
+    var foot = doors.filter(function (d) { return d.z <= Q.floor + 0.05; })[0], lands = [];
+    doors.filter(function (d) { return d.z > Q.floor + 0.05; }).sort(function (p, q) { return p.z - q.z; }).forEach(function (d) {
+      var L = lands[lands.length - 1];
+      if (L && d.z - L.z < 1.6) L.doors.push(d); else lands.push({ z: d.z, doors: [d] });
+    });
+    lands.forEach(function (L) {
+      var ref = L.doors[0].a, lo = Infinity, hi = -Infinity;
+      L.doors.forEach(function (d) { var x = ref + norm(d.a - ref + 180) - 180; lo = Math.min(lo, x - d.half - 8); hi = Math.max(hi, x + d.half + 8); });
+      L.lo = lo; L.hi = hi; L.mid = (lo + hi) / 2;
+      wedge(lo, hi, L.z, rise, mats.floor, Q.id + '-landing-' + Math.round(L.z * 10));
+      shaftFloors.push({ c: c, r: R, z: L.z });
+      /* a door a few risers over its landing: straight steps up in its own width, the newel's side to its sill */
+      L.doors.filter(function (d) { return d.z > L.z + 0.05; }).forEach(function (d) {
+        var n = Math.round((d.z - L.z) / rise), id = Q.id + '-steps-' + d.id, u = at(d.a, 1), ux = u[0] - c[0], uy = u[1] - c[1];
+        for (var i = 1; i <= n; i++) {
+          var r0 = R - (n - i + 1) * GO, hgt = i * rise, p = at(d.a, r0 + GO / 2);
+          var st = slab(d.w, hgt, GO, mats.floor, 'floor'); st.position.copy(toLocal(p[0], p[1], L.z + hgt / 2));
+          st.rotation.y = Math.atan2(ux, -uy); st.name = id + '-' + i; st.userData.stair = id; group.add(st);
+        }
+        shaftStepped[d.id] = true; shaftFloors.push({ c: c, r: R, z: d.z });
+        shaftFlights.push({ id: id, foot: end(d.a, R - n * GO - 0.35, L.z, d.a, R), head: end(d.a, R - 0.35, d.z, d.a, R + 1),
+          path: [[at(d.a, R - n * GO - 0.35), L.z], [at(d.a, R - 0.35), d.z]].map(function (q) { return [q[0][0], q[0][1], q[1]]; }) });
+      });
+    });
+    /* the flights: from the foot to the first landing, and from each landing's clockwise end to the next one's other end */
+    var stops = [{ z: Q.floor, out: foot ? foot.a - foot.half - 4 : 0 }].concat(lands.map(function (L) { return { z: L.z, in: L.hi, out: L.lo, mid: L.mid }; }));
+    for (var j = 0; j + 1 < stops.length; j++) {
+      var A = stops[j], B = stops[j + 1], n = Math.round((B.z - A.z) / rise), D = norm(A.out - B.in), best = D;
+      for (var m = 0; m < 12; m++) { var Dm = D + 360 * m; if (Dm / n >= 12 && (Math.abs(Dm / n - 30) < Math.abs(best / n - 30) || best / n < 12)) best = Dm; }
+      var t = best / n, fid = Q.id + '-flight-' + j, path = [];
+      for (var k = 1; k <= n; k++) {
+        var a1 = A.out - (k - 1) * t, a2 = A.out - k * t, mid = (a1 + a2) / 2, top = A.z + k * rise;   /* clockwise: the site's angle falling */
+        if (k % 3 === 1 || k === n) { var pp = at(mid, PR); path.push([pp[0], pp[1], top]); }
+        if (doors.some(function (d) { return top > d.z + 0.05 && top < d.top + 0.2 && off(mid, d.a) < d.half + 2 + t / 2; })) continue;
+        wedge(a2 - 0.5, a1, top, rise, mats.floor, fid + '-' + k).userData.stair = fid;
+      }
+      shaftFlights.push({ id: fid, foot: end(A.out + 6, PR, A.z, A.out - 3 * t, PR, 0.9), head: end(B.in - 6, PR, B.z, B.mid != null ? B.mid : B.in, R),
+        path: path, lamp: [c[0], c[1], B.z + 2.0] });
+    }
+  }
+  var shaftFloors = [];
   buildPlace(P);
   /* one step on: the ways joined to this one by an open mouth, built in the same frame */
   /* (only a place whose wall the mouth is in; a way to a place not yet in the model, or not beside it, shows a dark
@@ -497,7 +583,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
     if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; }
     /* v13: a deep way (the flanker's arch through the spur's 1.2) finds its far room at its far face, as its gap does */
-    else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
+    else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 || Q.shaft ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
     var depth = 3.0, rec = slab(w.w + 0.4, w.h + 0.2, depth, F.solid(0x141210), 'way');
     rec.position.set(w.mid.x - w.inward.x * (depth / 2 + 0.9), w.mid.y + w.sill + w.h / 2, w.mid.z - w.inward.z * (depth / 2 + 0.9));
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
@@ -582,6 +668,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var r = slabs[i].rect;
       if (Math.abs(slabs[i].z - z) < 0.02 && x >= r[0] - 0.01 && x <= r[2] + 0.01 && y >= r[1] - 0.01 && y <= r[3] + 0.01) return true;
     }
+    if (shaftFloors.some(function (f) { return Math.abs(f.z - z) < 0.02 && Math.hypot(x - f.c[0], y - f.c[1]) <= f.r; })) return true;
     return out.places.some(function (q) { return Math.abs(q.floor - z) <= 0.02 && inArea(q, x, y); });
   }
   function siteOf(v) { return [v.x + cx, cy - v.z]; }
@@ -619,7 +706,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      ways, facing in. A raised way (the bay's mouth) is stood at on its own floor, a step inside it */
   function standAt(d, name) {
     if (d.hatch) return hatchStand(d, name, false);
-    var off = d.back ? 0.5 : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
+    var off = d.back ? 0.5 : P.shaft && d.place === P.id ? (shaftStepped[d.id] ? 0.35 : 1.0) : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
     /* v8: never off the floor (a small room, the commentator's box): nearer the door until he stands on it */
     while (off > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
@@ -667,12 +754,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      depth where the far side is a room's page, short of the dark beyond); through a door, a step inside it */
   function facingIn(d, name) {
     if (d.hatch) return hatchStand(d, name, true);
-    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built || d.via ? -0.3 : -1.0) : STAND_OFF;
+    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built || d.via ? -0.3 : -1.0) : P.shaft ? (shaftStepped[d.id] ? 0.35 : 1.0) : STAND_OFF;
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
     /* v10: never off the floor (a ring 0.9 wide): nearer the door until he stands on it */
     while (back > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { back -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE; }
     var look = d.mid.clone().add(d.inward.clone().multiplyScalar(STAND_OFF + 20)); look.y = d.mid.y + d.lift + EYE + 0.3;
-    if (!P.ring) {
+    if (!P.ring && !P.shaft) {
       /* v14: arriving from outside a short room (under 6 m straight in: the flanker through its deep arch, the vault from
          its ledge), a step inside it first, so the look round is not cut by the mouth's sides */
       var inP = function (v) { var s_ = siteOf(v); return inArea(P, s_[0], s_[1]); };
@@ -697,7 +784,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     return { name: name, pos: pos, look: look, thing: null, level: d.level };
   }
   var all = out.doors.concat(out.ways), mine = all.filter(function (d) { return d.place === P.id; });
-  var entry = mine.filter(function (d) { return o.from && d.to === o.from; })[0] || mine.filter(function (d) { return o.start && d.id === o.start; })[0] || mine[0];
+  var entry = mine.filter(function (d) { return o.from && d.to === o.from; })[0] ||
+    (P.shaft ? out.hidden.filter(function (d) { return d.place === P.id && o.from && d.to === o.from; })[0] : null) ||   /* v17: in by a hidden door, beside it */ mine.filter(function (d) { return o.start && d.id === o.start; })[0] ||
+    (P.shaft ? mine.filter(function (d) { return d.level <= P.floor + 0.05; })[0] : null) || mine[0];   /* v17: a stair's well, at its foot */
   all = all.concat(out.hidden);
   if (entry) out.stands.push(facingIn(entry, 'start'));
   else {
@@ -710,6 +799,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
                       look: toLocal(mx + (wide ? 20 : 0), my + (wide ? 0 : 20), P.floor + EYE) });
   }
   all.forEach(function (d) { var s = standAt(d, d.id); d.stand = s; out.stands.push(s); });
+  /* v17: a stair's well, its flights: a stand at each end, walked along its treads */
+  shaftFlights.forEach(function (f) {
+    var mk = function (e, name) { return { name: name, pos: toLocal(e.x, e.y, e.z + EYE), look: toLocal(e.lx, e.ly, e.z + EYE + e.up), thing: null, level: e.z }; };
+    var fs = mk(f.foot, f.id + ' foot'), hs = mk(f.head, f.id + ' head');
+    out.flights.push({ id: f.id, foot: fs, head: hs, footPt: fs.pos.clone(), headPt: hs.pos.clone(), lamp: f.lamp || null,
+      path: f.path.map(function (p) { return toLocal(p[0], p[1], p[2] + EYE); }).concat([hs.pos.clone()]) });
+    out.stands.push(fs, hs);
+  });
 
   /* a flight's two stands: a step off each end onto the floor it joins (straight on, or to the side onto a gallery),
      the foot's looking up the flight, the head's on along it */

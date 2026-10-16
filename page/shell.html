@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=355"></script>
-<script src="castle-shell.js?v=16"></script>
+<script src="castle-model.js?v=356"></script>
+<script src="castle-shell.js?v=17"></script>
 <script src="castle-events.js?v=36"></script>
 <script>
 (function () {
@@ -229,6 +229,8 @@ shell.places.forEach(function (p, pi) {
 /* a well's floors above the ground: one more at the middle of each, 3.2 m over it, or the upper galleries go dark */
 var lit = {};
 shell.flights.forEach(function (f) {
+  /* v17: a turret's landing, a lamp over it */
+  if (f.lamp) { var lp = new THREE.PointLight(0xffc98a, 0.8, 10, 1.6); lp.position.copy(shell.toLocal(f.lamp[0], f.lamp[1], f.lamp[2])); scene.add(lp); return; }
   var st = shell.stairs.filter(function (s) { return s.id === f.id; })[0], p = st && shell.places.filter(function (q) { return q.id === st.place; })[0];
   if (!p || f.head.level - p.floor < 4 || lit[p.id + f.head.level]) return;
   lit[p.id + f.head.level] = true;
@@ -292,8 +294,9 @@ function goStand(s) {
 }
 /* a flight: at one end, a tap takes him to the other; on the floor of an end, to that end first (two taps, §6) */
 function useFlight(f) {
-  if (near(f.foot)) { walkTo([f.footPt, f.headPt], f.head); return true; }
-  if (near(f.head)) { walkTo([f.headPt, f.footPt], f.foot); return true; }
+  /* v17: a turret's flight is walked along its own treads, round the newel */
+  if (near(f.foot)) { if (f.path) walkTo(f.path, f.head, true); else walkTo([f.footPt, f.headPt], f.head); return true; }
+  if (near(f.head)) { if (f.path) walkTo(f.path.slice().reverse().concat([f.footPt]), f.foot, true); else walkTo([f.headPt, f.footPt], f.foot); return true; }
   return goStand(f.foot) || goStand(f.head);
 }
 function goTo(d) { return goStand(d.stand); }
