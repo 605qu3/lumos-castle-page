@@ -35,8 +35,8 @@
    for the geometry: a ring drawn right round the thing, and is all of it inside? Then the smallest circle that holds
    it is drawn beside his, in silver dashes with its centre and radius (a rectangle's has its diagonal for a diameter;
    the pennant's runs through its three corners), and nothing is graded: how snug his ring is, is only said. The
-   Quidditch stands in the storm from the front, rain slanting; three rounds, each a thing on the bench: Harry's
-   glasses (the book's), a sheet of parchment and a Gryffindor pennant (both ours). Dry: the rain beads on his ring
+   Quidditch stands in the storm from the front, rain slanting; three rounds, each a thing on the bench: somebody's
+   spectacles (Rework 12, 16 October 2026: no longer Harry's), a sheet of parchment and a Gryffindor pennant (both ours). Dry: the rain beads on his ring
    and runs off round it, and the thing clears. Too small: the points his ring left out drip where it missed. Judged
    by LumosSpells.judgeRing round the very outlines drawn here (checks/impervius-tally.js tallies the same ones); the
    traced guide from guide.js, a circle round the thing. ?thing=1..3, ?ease=, ?guide= for trying;
@@ -56,7 +56,7 @@
         out.push({ x: 0, y: -0.12 * u });
         [-1, 1].forEach(function (s) { out.push({ x: s * 1.1 * u, y: -0.08 * u }); });
         return out; },
-      start: 'Harry\'s glasses on the bench, streaming with rain. <b>Tap them</b> with your wand.',
+      start: 'Somebody\'s spectacles, left on the bench on a wet match morning, streaming with rain. <b>Tap them</b> with your wand.',
       why: 'The smallest ring runs from hinge to hinge: that line is its diameter.' },
     { name: 'Parchment', the: 'the parchment', it: 'it', self: 'itself', outline: function (u) {
         var out = [], i, n = 6, w = 1.6, h = 1.1;
@@ -374,7 +374,7 @@
     active = null; stroke.push(pt(ev)); var pts = stroke; stroke = null;
     if (stage === 'tap') {
       var len = 0; for (var i = 1; i < pts.length; i++) len += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
-      if (len > S * 0.06) say('Tap it first, as Hermione tapped Harry\'s glasses. Then the ring.');
+      if (len > S * 0.06) say('Tap it first, then the ring.');
       else tapThing(pts[0]);
       return;
     }

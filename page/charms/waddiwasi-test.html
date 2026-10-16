@@ -33,7 +33,9 @@
    and stuffing the nearest keyhole with chewing gum", singing "Loony loopy Lupin"; he blows "a loud wet raspberry";
    Lupin "raised the wand to shoulder height, said 'Waddiwasi!' and pointed it at Peeves", and "With the force of a
    bullet, the wad of chewing gum shot out of the keyhole and straight down Peeves's left nostril; he whirled right way
-   up and zoomed away, cursing." "Cool, sir!" said Dean Thomas. Peeves (PS 7): a little man with wicked, dark eyes and a
+   up and zoomed away, cursing." "Cool, sir!" said Dean Thomas. (Rework 13, 16 October 2026: the page keeps Peeves
+   gumming Filch's keyhole as his everyday habit, with no song, no Lupin and no "Cool, sir!"; the book is the stroke's
+   source only.) Peeves (PS 7): a little man with wicked, dark eyes and a
    wide mouth; curly-toed feet (PoA 7). The book's is the point at the target and the straight flight; the stroke is
    ours, for the geometry: one straight line drawn from the gum toward his nose, and the gum flies along it. A hit is
    the line passing within the nose's size, so the same angle off misses more the further away he is: a degree at the
@@ -51,7 +53,7 @@
   var W = 0, H = 0, S = 1, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
   var ROUNDS = [
-    { name: 'Near', start: 'Peeves, upside down by Filch\'s cupboard, gum in the keyhole: <i>"Loony loopy Lupin!"</i> Whisper <i>Waddiwasi</i> and draw <b>one straight line from the gum to his nose</b>.' },
+    { name: 'Near', start: 'Peeves, upside down by Filch\'s cupboard, gumming up the keyhole again and blowing a loud wet raspberry. Whisper <i>Waddiwasi</i> and draw <b>one straight line from the gum to his nose</b>.' },
     { name: 'Far', start: 'Back again, up by the ceiling this time, and a fresh wad in the keyhole. <b>The same small slip misses further away</b>: aim with care.' },
     { name: 'Drifting', start: 'Now he drifts along the corridor, blowing raspberries. <b>Aim at where he is</b> when you draw.' } ];
   var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1));
@@ -162,7 +164,7 @@
     var j = sum.j, off = Math.abs(j.off), allow = j.allow;
     if (fly.hit) {
       stage = 'hit'; zoom = { at: now, x: nose.x, y: nose.y }; noise(0.5, 900, 0.3, 14);
-      say('<b>Straight down his left nostril!</b> He whirls right way up and zooms off, cursing. <i>"Cool, sir!"</i> You were ' + deg(off) + ' off; from here, anything under ' + deg(allow) + ' hits.');
+      say('<b>Straight down his left nostril!</b> He whirls right way up and zooms off, cursing. You were ' + deg(off) + ' off; from here, anything under ' + deg(allow) + ' hits.');
       if (round < 2) wait = setTimeout(function () { wait = null; choose(round + 1); }, 6400);
       else { done = true; setTimeout(function () { if (done) say('All three. Peeves won\'t be back in a hurry, and Filch can get in to his brooms.'); }, 4200); }
     } else {

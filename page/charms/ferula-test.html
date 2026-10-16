@@ -36,7 +36,7 @@
    turns; where a turn climbs further than the bandage is wide, the leg shows through, ringed. The turns needed are the
    leg's length over the bandage's width, so a narrower bandage needs more: the sum is drawn every time, nothing graded.
    The hospital wing, a bed; three rounds: a teddy's leg with a wide bandage, the same leg with a narrow one (the pair:
-   the same turns now leave gaps), and Ron's snapped wand on a splint (better than Spellotape, CoS 6). Q9's fix (Godric,
+   the same turns now leave gaps), and a school broom's cracked handle (Rework 14, 16 October 2026; it was Ron's snapped wand, CoS 6, set aside). Q9's fix (Godric,
    13 October 2026): a bigger leg, wider bandages (4, 6 and 5 turns), and only the widest gap ringed. Judged by
    LumosSpells.judgeCoil (checks/ferula-tally.js tallies it); the traced guide, a zigzag up the leg, in the first round
    only, since after it the count is the lesson. ?round=1..3, ?ease=, ?guide= for trying; window.lumosFerula for checks. */
@@ -48,11 +48,11 @@
   /* cm: the real lengths for the sum; per: turns needed = cm / band */
   var ROUNDS = [
     { name: 'Teddy', the: 'the teddy\'s leg', cm: 24, band: 6, thin: false,
-      start: 'A teddy on the end of the bed, one leg broken. <b>Tap the leg</b> with your wand, as Lupin tapped Ron\'s.' },
+      start: 'A teddy on the end of the bed, one leg broken. <b>Tap the leg</b> with your wand.' },
     { name: 'Narrow', the: 'the teddy\'s leg', cm: 24, band: 4, thin: false,
       start: 'Madam Pomfrey has only a narrow bandage left. <b>Tap the leg</b>, and count your turns.' },
-    { name: 'Ron\'s wand', the: 'the wand', cm: 30, band: 6, thin: true,
-      start: 'Ron\'s wand, snapped and patched with Spellotape. A splint will do better. <b>Tap it.</b>' } ];
+    { name: 'Broom', the: 'the broom handle', cm: 30, band: 6, thin: true,
+      start: 'A school broom, its handle cracked after practice. A splint will hold it till Madam Hooch sees it. <b>Tap it.</b>' } ];
   var round = Math.max(0, Math.min(2, (Number(qs.get('round')) || 1) - 1)), R = ROUNDS[round];
   var leg = null, stage = 'tap', wait = null, done = false, last = null, glint = null, spun = null, stroke = null, active = null, trail = null, guide = null;
 
@@ -186,12 +186,10 @@
       cx.fillStyle = '#9b6a3c'; cx.beginPath(); cx.roundRect ? cx.roundRect(a.x - r, b.y, r * 2, leg.L, r) : cx.rect(a.x - r, b.y, r * 2, leg.L); cx.fill();   /* the broken leg */
       cx.fillStyle = '#c99a62'; cx.beginPath(); cx.ellipse(a.x, a.y - r * 0.6, r * 0.8, r * 0.55, 0, 0, 7); cx.fill();   /* its paw pad */
       cx.strokeStyle = 'rgba(40,20,10,0.5)'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(a.x - r, b.y + leg.L * 0.48); cx.lineTo(a.x + r * 0.2, b.y + leg.L * 0.55); cx.lineTo(a.x + r, b.y + leg.L * 0.5); cx.stroke();   /* the break */
-    } else {   /* Ron's wand, snapped in the middle, Spellotape round the break */
-      cx.fillStyle = '#5a3a20'; cx.beginPath(); cx.roundRect ? cx.roundRect(a.x - r, b.y, r * 2, leg.L, r * 0.6) : cx.rect(a.x - r, b.y, r * 2, leg.L); cx.fill();
+    } else {   /* a school broom's handle, cracked across after practice (Rework 14: no longer Ron's wand) */
+      cx.fillStyle = '#7a5530'; cx.beginPath(); cx.roundRect ? cx.roundRect(a.x - r, b.y, r * 2, leg.L, r * 0.6) : cx.rect(a.x - r, b.y, r * 2, leg.L); cx.fill();
       cx.fillStyle = '#3e2714'; cx.fillRect(a.x - r * 1.15, a.y - leg.L * 0.22, r * 2.3, leg.L * 0.22);   /* the handle */
-      cx.fillStyle = 'rgba(235,225,170,0.85)'; cx.fillRect(a.x - r * 1.2, b.y + leg.L * 0.4, r * 2.4, leg.L * 0.09);   /* the Spellotape */
       cx.strokeStyle = 'rgba(0,0,0,0.5)'; cx.lineWidth = 1.5; cx.beginPath(); cx.moveTo(a.x - r, b.y + leg.L * 0.45); cx.lineTo(a.x + r, b.y + leg.L * 0.43); cx.stroke();
-      if (Math.sin(now / 230) > 0.92) { cx.fillStyle = '#ffe9a0'; cx.beginPath(); cx.arc(b.x + r * 1.5, b.y + 4, 3, 0, 7); cx.fill(); }   /* it sparks, as it did in CoS 6 */
     }
     if (glint && now - glint < 700) {
       var k = 1 - (now - glint) / 700, gg = cx.createRadialGradient(a.x, (a.y + b.y) / 2, 0, a.x, (a.y + b.y) / 2, leg.L * 0.5);
