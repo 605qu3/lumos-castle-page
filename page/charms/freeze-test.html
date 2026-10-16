@@ -29,6 +29,10 @@
 <script src="guide.js?v=6"></script>
 <script>
 /* The Freezing Charm, a test page for the Charms lane (13 October 2026, nineteenth session; the owner is Godric).
+   Rework 8 of the Ministry's list (16 October 2026): no Lockhart, no pixies, no Hermione; paper darts flit across
+   Flitwick's room, passed from desk to desk, and frozen ones float down into the box on his desk. The pixies' wreck is
+   Defence's trace, not built here. In the code the darts keep the pixies' names (pixies(), drawPixie) for the checks.
+   What follows is the page as first built.
    Drawn in code. The book (CoS 6, checked in the text): Lockhart's Cornish pixies, "electric blue and about eight
    inches high, with pointed faces"; his "Peskipiksi Pesternomi!" has "absolutely no effect"; Hermione, "immobilizing
    two pixies at once with a clever Freezing Charm and stuffing them back into their cage." No word and no motion in the
@@ -53,8 +57,8 @@
   var W = 0, H = 0, S = 1, R = 10, DPR = 1, audio = null, qs = new URLSearchParams(location.search);
   var EASES = ['kind', 'fair', 'strict'], ease = EASES.indexOf(qs.get('ease')) >= 0 ? qs.get('ease') : 'kind';
   var ROUNDS = [
-    { name: "Lockhart's pixies",
-      start: 'Lockhart bellows "Peskipiksi Pesternomi!" It has absolutely no effect. Do what Hermione did: freeze <b>two at once</b>, with <b>one straight line through both</b>.' },
+    { name: 'Two darts',
+      start: 'Paper darts flit across Flitwick\'s room, passed from desk to desk. Freeze <b>two at once</b>, with <b>one straight line through both</b>.' },
     { name: 'Flitting',
       start: '<b>No guide</b>, and these two will not sit still, but while your wand is down they <b>slow almost to a stop</b>. One straight line through both, caught where they are when you lift.' },
     { name: 'Three in a row',
@@ -164,15 +168,15 @@
       var k = j.missed, far = k >= 0 ? Math.round(j.off[k] * 10) / 10 : 0, fx = ROUNDS[round].fix;
       var gap = j.apart >= 0 ? Math.round(j.fixOff[j.apart] * 10) / 10 : 0;
       var words = {
-        tap: 'A line, not a dot: <b>one straight stroke</b> through both pixies.',
+        tap: 'A line, not a dot: <b>one straight stroke</b> through both darts.',
         curved: '<b>Straight!</b> A curve that bends round to each of them is not the charm: one straight line.',
-        none: 'Missed them both: the line went beside them. <b>Through their middles</b>, and it is a giggling, shrieking mess.',
+        none: 'Missed them both: the line went beside them. <b>Through their middles</b>. On they swoop, desk to desk.',
         missed: fx && fx.indexOf(k) >= 0 ? 'One of the still two got away! <b>Through both their middles</b>: those two fix the line.'
           : fx ? 'One got away! It was on the line, but your stroke stopped short of it: <b>run the line on</b> past all four.'
           : px0.length > 2 && j.bend > 1.6 ? 'One got away! They were <b>not in a row</b> just then: three only fit one straight line when they line up. Wait for it.'
-          : 'One got away, cackling! The line passed ' + far + ' pixie-widths from it. <b>Through both middles</b>.',
-        apart: j.onFix === px0.length - 1 ? 'Three in a row, but the fourth was <b>' + gap + ' pixie-widths off</b> the line the still two fix. Wait till <b>both</b> are on it.'
-          : 'Not yet! The still two fix the line, and the other two were off it, one by <b>' + gap + ' pixie-widths</b>. Wait till they fly onto it.'
+          : 'One got away, swooping! The line passed ' + far + ' dart-lengths from it. <b>Through both middles</b>.',
+        apart: j.onFix === px0.length - 1 ? 'Three in a row, but the fourth was <b>' + gap + ' dart-lengths off</b> the line the still two fix. Wait till <b>both</b> are on it.'
+          : 'Not yet! The still two fix the line, and the other two were off it, one by <b>' + gap + ' dart-lengths</b>. Wait till they fly onto it.'
       };
       say(words[j.reason] || 'Try again: one straight line through them all.');
       return j;
@@ -181,15 +185,15 @@
     guides.forEach(function (g) { g.hit(lv > 0); });
     var a = pts[0], b = pts[pts.length - 1];
     frozen = { at: now, ms: ms, px: px0, a: a, b: b }; freezeSound(); LumosSpells.learn('freezing');
-    if (round === 0) say('<b>Frozen!</b> Both stopped dead in mid-air. Two points always make <b>exactly one straight line</b>, so two pixies can always be caught at once.');
+    if (round === 0) say('<b>Frozen!</b> Both stopped dead in mid-air. Two points always make <b>exactly one straight line</b>, so two darts can always be caught at once.');
     else if (round === 1) say('<b>Frozen</b> mid-flight! The dotted lines are where they were going. However they fly, <b>two points, one line</b>.');
     else if (round === 2) say('<b>All three!</b> Three points only sit on one straight line now and then, and you caught them <b>in a row</b>.');
     else say('<b>All four!</b> The still two fixed the line, and the other two were <b>on it</b> just then: one line through four points.');
     wait = setTimeout(function () { wait = null;
       frozen.cage = performance.now();
-      if (round < 2) { say('Into the cage they go, as Hermione stuffed hers back.'); wait = setTimeout(function () { wait = null; choose(round + 1); }, 3200); }
-      else if (round === 2) { say('Hermione managed two at once; you caught three. Into the cage, and here come <b>four</b>.'); wait = setTimeout(function () { wait = null; choose(3); }, 3600); }
-      else { done = true; say('Hermione managed two at once; you caught four. Two points fix a line, and every point on it is caught too. Lockhart, under his desk, is very impressed.'); }
+      if (round < 2) { say('Down they float into the box on Flitwick\'s desk.'); wait = setTimeout(function () { wait = null; choose(round + 1); }, 3200); }
+      else if (round === 2) { say('Three at once, caught. Into the box, and here come <b>four</b>.'); wait = setTimeout(function () { wait = null; choose(3); }, 3600); }
+      else { done = true; say('All four caught. Two points fix a line, and every point on it is caught too. Flitwick, on his pile of books, claps.'); }
     }, 3600);
     return j;
   }
@@ -201,33 +205,22 @@
     cx.fillStyle = g; cx.fillRect(0, 0, W, H);
     cx.strokeStyle = 'rgba(255,255,255,0.03)'; cx.lineWidth = 1;
     for (var y = H * 0.12; y < H * 0.86; y += S * 0.08) { cx.beginPath(); cx.moveTo(0, y); cx.lineTo(W, y); cx.stroke(); }
-    var c = cageAt(), w = c.w, h = w * 1.25;   /* the cage, hung up, its door open */
-    cx.save(); cx.strokeStyle = '#b8955a'; cx.lineWidth = 2;
-    cx.beginPath(); cx.moveTo(c.x, c.y - h * 0.62); cx.lineTo(c.x, c.y - h * 0.5 - S); cx.stroke();
-    cx.beginPath(); cx.ellipse(c.x, c.y - h * 0.15, w / 2, h * 0.38, 0, Math.PI, 2 * Math.PI); cx.stroke();
-    for (var k = 0; k <= 6; k++) { var x = c.x - w / 2 + w * k / 6; cx.beginPath(); cx.moveTo(x, c.y - h * 0.15 - (k === 0 || k === 6 ? 0 : h * 0.38 * Math.sqrt(1 - Math.pow((x - c.x) / (w / 2), 2)))); cx.lineTo(x, c.y + h * 0.42); cx.stroke(); }
-    cx.beginPath(); cx.moveTo(c.x - w / 2, c.y + h * 0.42); cx.lineTo(c.x + w / 2, c.y + h * 0.42); cx.stroke();
-    cx.beginPath(); cx.arc(c.x, c.y - h * 0.53 - 6, 6, 0, 7); cx.stroke();
+    var c = cageAt(), w = c.w, h = w * 0.45;   /* the box on Flitwick's desk, open (it was Lockhart's cage) */
+    cx.save(); cx.fillStyle = '#5a3d24'; cx.fillRect(c.x - w / 2, c.y + h * 0.1, w, h);
+    cx.fillStyle = '#3e2a18'; cx.fillRect(c.x - w / 2, c.y + h * 0.1, w, h * 0.18);
+    cx.strokeStyle = '#7a5634'; cx.lineWidth = 2; cx.strokeRect(c.x - w / 2, c.y + h * 0.1, w, h);
+    cx.fillStyle = '#4a3220'; cx.fillRect(c.x - w * 0.8, c.y + h * 1.1, w * 1.6, S * 0.012);   /* the desk's edge */
     cx.restore();
   }
-  function drawPixie(p, now, ice, k) {
-    var flap = ice ? 0.5 : 0.5 + 0.5 * Math.sin(now / 38 + k * 2), r = p.r;
-    cx.save(); cx.translate(p.x, p.y);
-    cx.fillStyle = ice ? 'rgba(220,240,255,0.55)' : 'rgba(180,220,255,0.35)';   /* wings */
-    cx.beginPath(); cx.ellipse(-r * 0.75, -r * 0.35, r * 0.75, r * 0.32 * (0.4 + flap), -0.6, 0, 7); cx.ellipse(r * 0.75, -r * 0.35, r * 0.75, r * 0.32 * (0.4 + flap), 0.6, 0, 7); cx.fill();
-    var body = ice ? '#bfe6ff' : '#2b9bff', dark = ice ? '#7fb6d6' : '#145fae';
-    cx.fillStyle = body; cx.beginPath(); cx.ellipse(0, r * 0.35, r * 0.38, r * 0.55, 0, 0, 7); cx.fill();   /* body */
-    cx.beginPath(); cx.moveTo(-r * 0.5, -r * 0.45); cx.quadraticCurveTo(0, -r * 1.05, r * 0.5, -r * 0.45); cx.lineTo(0, r * 0.1); cx.closePath(); cx.fill();   /* the pointed face */
-    cx.beginPath(); cx.moveTo(-r * 0.42, -r * 0.6); cx.lineTo(-r * 0.95, -r * 0.95); cx.lineTo(-r * 0.3, -r * 0.42); cx.moveTo(r * 0.42, -r * 0.6); cx.lineTo(r * 0.95, -r * 0.95); cx.lineTo(r * 0.3, -r * 0.42); cx.fill();   /* ears */
-    cx.strokeStyle = dark; cx.lineWidth = Math.max(1.5, r * 0.12); cx.lineCap = 'round';
-    var kick = ice ? 0 : Math.sin(now / 90 + k) * r * 0.25;
-    cx.beginPath(); cx.moveTo(-r * 0.15, r * 0.8); cx.lineTo(-r * 0.3 - kick, r * 1.2); cx.moveTo(r * 0.15, r * 0.8); cx.lineTo(r * 0.3 + kick, r * 1.2);
-    cx.moveTo(-r * 0.35, r * 0.25); cx.lineTo(-r * 0.75, r * 0.05 - kick); cx.moveTo(r * 0.35, r * 0.25); cx.lineTo(r * 0.75, r * 0.05 + kick); cx.stroke();
-    cx.fillStyle = ice ? '#ffffff' : '#ffef6a'; cx.beginPath(); cx.arc(-r * 0.17, -r * 0.42, r * 0.09, 0, 7); cx.arc(r * 0.17, -r * 0.42, r * 0.09, 0, 7); cx.fill();
-    cx.strokeStyle = '#0b2a4a'; cx.lineWidth = Math.max(1, r * 0.06); cx.beginPath();
-    if (ice) { cx.moveTo(-r * 0.12, -r * 0.2); cx.lineTo(r * 0.12, -r * 0.2); } else cx.arc(0, -r * 0.24, r * 0.13, 0.2, Math.PI - 0.2);
-    cx.stroke();
-    if (ice) { cx.strokeStyle = 'rgba(255,255,255,0.85)'; cx.lineWidth = 1.5; for (var s = 0; s < 3; s++) { var a = s * 2.1 + 0.4, sx = Math.cos(a) * r * 0.9, sy = Math.sin(a) * r * 0.7, l = r * 0.18;
+  function drawPixie(p, now, ice, k) {   /* a folded paper dart (Rework 8), nose along its way; frozen, rimed white */
+    var r = p.r, a = ice ? -0.25 + k * 0.5 : Math.sin(now / 700 + k * 1.9) * 0.5 + (k % 2 ? Math.PI : 0);
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(a);
+    cx.fillStyle = ice ? '#e4f2fb' : '#efe6d2'; cx.strokeStyle = ice ? '#9fc3d8' : '#8a7a5c'; cx.lineWidth = Math.max(1, r * 0.08); cx.lineJoin = 'round';
+    cx.beginPath(); cx.moveTo(r * 1.3, 0); cx.lineTo(-r * 0.9, -r * 0.75); cx.lineTo(-r * 0.55, 0); cx.closePath(); cx.fill(); cx.stroke();
+    cx.fillStyle = ice ? '#cfe4f2' : '#ddd1b8';
+    cx.beginPath(); cx.moveTo(r * 1.3, 0); cx.lineTo(-r * 0.9, r * 0.55); cx.lineTo(-r * 0.55, 0); cx.closePath(); cx.fill(); cx.stroke();
+    cx.beginPath(); cx.moveTo(r * 1.3, 0); cx.lineTo(-r * 0.55, 0); cx.stroke();   /* the fold */
+    if (ice) { cx.strokeStyle = 'rgba(255,255,255,0.85)'; cx.lineWidth = 1.5; for (var s = 0; s < 3; s++) { var b = s * 2.1 + 0.4, sx = Math.cos(b) * r * 0.9, sy = Math.sin(b) * r * 0.7, l = r * 0.18;
       cx.beginPath(); cx.moveTo(sx - l, sy); cx.lineTo(sx + l, sy); cx.moveTo(sx, sy - l); cx.lineTo(sx, sy + l); cx.stroke(); } }
     cx.restore();
   }
