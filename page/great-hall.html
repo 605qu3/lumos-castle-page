@@ -132,7 +132,7 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=371"></script>
+<script src="castle-model.js?v=372"></script>
 <script src="castle-shell.js?v=25"></script>
 <script src="castle-events.js?v=36"></script>
 <script src="castle-sound.js?v=1"></script>
@@ -806,7 +806,7 @@ var DRAWN = ['the high windows', 'the floating candles burning', 'the floating c
   'the golden plates and goblets set', 'the places laid for the feast', 'the golden goblets stacked', 'twelve Christmas trees',
   'about one floating candle in five', "Hagrid's four vast pumpkins", "the winner's hangings", "the Duelling Club's evening",
   'two straw dummies', 'as he comes in through the doors', 'the floating candles swaying a little more', "at the meal's end",
-  'the candles in the pumpkins stuttering', 'a faint whisper runs'];
+  'the candles in the pumpkins stuttering', 'a faint whisper runs', 'the panel sounds hollow', 'pushed at its edge, the panel swings'];
 /* the edges the room's state can't hold by itself (req 593): the breath runs once, the first time the chain's cue is in
    after he comes in; the meal's fade runs when a laid meal ends while he is here, holding the room as it was for its
    seconds, and the plates stay clean until the next meal */
@@ -947,6 +947,7 @@ function startLeg() {
 /* up the middle aisle, looking ahead along it at the walk's own height (Interaction: no stand mid-hall) */
 function walkTo(s) {
   if (!s || s === here) return false;
+  if (PANEL && here === PANEL.stand && panelOpen) panelShow(false);   /* it shuts behind him (provisional) */
   legs = []; here = s; hy = hyT = hp = hpT = 0;
   var fp = new THREE.Vector3(), fl = new THREE.Vector3(); headPose(fp, fl);
   legs.push({ pos: fp, look: fl });
@@ -994,6 +995,88 @@ function swingDoors(dt) {
   LEAVES.forEach(function (L) { leafAt(L, k); });
   if (doorSwing.t >= doorSwing.dur) { doorSwing = null; through(DOOR); }
 }
+/* the false panel's swing (Events' req 614, on Magic's 516; the pin, the ring and the lamp the Architect's v59, ledger
+   112): the shell draws the west wall whole over the panel, so here the wall it stands in is cut round the opening only
+   once it swings, the cut and the leaf built once and hidden, the room's draws unchanged until then. The leaf is the
+   wall's own face, so shut it is wall; pushed at its south edge it turns a quarter in on the pin at its north edge
+   (15.0, 69.3) and rests along the stair's north side, x 14.2 to 15.0. Beyond, a grey stand-in until the stair is
+   drawn: the landing at the platform's height, the first flight's top step paler where the stair's lamp falls, the
+   lamp's iron bracket (nothing glows). No way through yet: hall-kitchens-stair reads designed in the model, so he goes
+   through only once ledger 112 reads drawn. The knock is a once sound for the castle's player; the meal's warmth and
+   the smell of baking are not drawn. It shuts when he leaves its stand (provisional, Godric to confirm) */
+var PSWING = 'pushed at its edge, the panel swings in on a pin', panelSwing = null, panelOpen = false, PCUT = null;
+var KNOCK = 'the panel sounds hollow under his knock';
+function panelCut() {
+  if (PCUT || !PANEL) return PCUT;
+  var gq = new THREE.Quaternion(); shell.group.getWorldQuaternion(gq);
+  var o = PANEL.mesh.getWorldPosition(new THREE.Vector3()), dir = PANEL.inward.clone().applyQuaternion(gq).normalize();
+  var rc = new THREE.Raycaster(o.clone().addScaledVector(dir, 0.3), dir.clone().negate(), 0, 2);
+  var wh = rc.intersectObjects(shell.group.children.filter(function (m) { return m.isMesh && /-wall-/.test(m.name); }), false)[0];
+  if (!wh) return null;
+  var w = wh.object, g = w.geometry.parameters; w.updateMatrix();
+  var c = PANEL.mid.clone().applyMatrix4(new THREE.Matrix4().copy(w.matrix).invert());
+  var x0 = c.x - PANEL.w / 2, x1 = c.x + PANEL.w / 2, y0 = PANEL.mid.y + PANEL.sill - w.position.y, y1 = y0 + PANEL.h;
+  var cut = new THREE.Group(); cut.name = 'hall-panel-cut'; cut.position.copy(w.position); cut.rotation.copy(w.rotation); cut.visible = false;
+  function bit(a, b, lo, hi) {
+    if (b - a < 0.01 || hi - lo < 0.01) return;
+    var m = new THREE.Mesh(new THREE.BoxGeometry(b - a, hi - lo, g.depth), w.material); m.position.set((a + b) / 2, (lo + hi) / 2, 0); cut.add(m);
+  }
+  bit(-g.width / 2, x0, -g.height / 2, g.height / 2); bit(x1, g.width / 2, -g.height / 2, g.height / 2);
+  bit(x0, x1, y1, g.height / 2); bit(x0, x1, -g.height / 2, y0);
+  w.parent.add(cut);
+  /* the leaf, the wall's face 0.06 deep, its centre half its width from the pin */
+  var leaf = new THREE.Mesh(new THREE.BoxGeometry(0.8, PANEL.h, 0.06), w.material); leaf.name = 'hall-panel-leaf'; leaf.visible = false; room.add(leaf);
+  /* the plain iron ring on its inner face, 0.1 in from the free edge, 1.0 over the sill: the way back from the landing */
+  var ring = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.008, 6, 14), dark); ring.position.set(0.3, 1.0 - PANEL.h / 2, 0); leaf.add(ring);
+  var beyond = new THREE.Group(); beyond.name = 'hall-panel-beyond'; beyond.visible = false; room.add(beyond);
+  function blk(x0b, x1b, y0b, y1b, z0, z1, m) {
+    var a = P(x0b, y0b, z0), b = P(x1b, y1b, z1), k = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), m);
+    k.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); k.scale.set(Math.abs(b.x - a.x) || 0.02, Math.abs(b.y - a.y) || 0.02, Math.abs(b.z - a.z) || 0.02);
+    beyond.add(k);
+  }
+  var lit = mat(0x8a8276);
+  blk(13.6, 14.2, 68.4, 69.4, 0.37, 0.45, grey);          /* the landing at the platform's height, past the wall's 0.8 */
+  blk(13.6, 14.6, 68.15, 68.4, 0.17, 0.25, lit);         /* the first flight's top step, where the lamp falls */
+  blk(12.4, 12.6, 63.8, 69.6, -1.5, 3.2, dark);          /* the stair's dark: its far side, its north and south, its head */
+  blk(12.4, 14.2, 69.4, 69.6, -1.5, 3.2, dark);
+  blk(12.4, 14.2, 63.8, 64.0, -1.5, 3.2, dark);
+  blk(12.4, 14.2, 63.8, 69.6, 3.0, 3.2, dark);
+  blk(12.6, 13.6, 63.8, 69.4, -1.6, -1.5, dark);
+  blk(13.75, 13.85, 69.3, 69.4, 2.6, 2.7, dark);          /* the lamp's iron bracket on the north wall, 13.8, 2.65 */
+  PCUT = { wall: w, cut: cut, leaf: leaf, beyond: beyond };
+  return PCUT;
+}
+function panelAt(a) {   /* 0 shut, 1 open: shut along the wall south from the pin, open into the stair west */
+  var t = a * Math.PI / 2, dx = -Math.sin(t), dy = -Math.cos(t), zc = PANEL.mid.y + PANEL.sill + PANEL.h / 2;
+  var h = P(15.0, 69.3, 0), e = P(15.0 + dx * 0.8, 69.3 + dy * 0.8, 0), c = P(15.0 + dx * 0.4 + dy * 0.03, 69.3 + dy * 0.4 - dx * 0.03, 0);
+  PCUT.leaf.position.set(c.x, zc, c.z); PCUT.leaf.rotation.set(0, Math.atan2(-(e.z - h.z), e.x - h.x), 0);
+}
+function panelShow(open) {
+  if (!panelCut()) return false;
+  PCUT.wall.visible = !open; PCUT.cut.visible = PCUT.leaf.visible = PCUT.beyond.visible = open;
+  panelOpen = open; if (open) panelAt(0); else panelSwing = null;
+  if (open) {   /* the ring on the stair's side of the leaf, whichever way the frame turns its depth */
+    var lz = new THREE.Vector3(0, 0, 1).applyQuaternion(PCUT.leaf.quaternion);
+    PCUT.leaf.children[0].position.z = lz.dot(PANEL.inward) > 0 ? -0.04 : 0.04;
+  }
+  return true;
+}
+function panelCue(s) {
+  if (s.indexOf(KNOCK) === 0) { heardLast = s; if (window.CastleSound) CastleSound.once(s); return; }
+  if (panelOpen || panelSwing || !panelShow(true)) return;
+  panelSwing = { t: 0, dur: 0.9 };
+}
+function swingPanel(dt) {
+  if (!panelSwing) return;
+  panelSwing.t += dt;
+  panelAt(easeInOut(clamp(panelSwing.t / panelSwing.dur, 0, 1)));
+  if (panelSwing.t >= panelSwing.dur) panelSwing = null;
+}
+fetch('events/great-hall.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
+  (j.records || []).forEach(function (rec) { (rec.show || []).forEach(function (s) {
+    if (s.indexOf(PSWING) === 0 || s.indexOf(KNOCK) === 0) CUES[s] = function () { panelCue(s); };
+  }); });
+}).catch(function () {});
 /* a candle on the tap's ray (req 608, break 3): its taper's middle within 0.12 m of the ray, nearer than anything else
    the ray meets; the field's home points, so a tap finds the candle he sees to within its bob */
 var candleMid = C.map(function (c) { return P(c[0], c[1], c[2] - 0.14); });
@@ -1009,7 +1092,7 @@ function candleOnRay(ray, before) {
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 var lastTold = '';
 function tap(cx, cy) {
-  if (tween || doorSwing) return;
+  if (tween || doorSwing || panelSwing) return;
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
@@ -1106,6 +1189,7 @@ function frame() {
   T += dt * (kit.zoom && kit.zoom.slow ? kit.zoom.slow() : 1);
   updateCamera(dt);
   swingDoors(dt);
+  swingPanel(dt);
   bobClock.value = T;
   swayClock.value += dt * 0.7 * swayRate;
   breathAt.value = breathT0 !== null && T - breathT0 < 20 ? T - breathT0 : -1000;
@@ -1123,7 +1207,8 @@ if (Q.has('fade')) setTimeout(startFade, 6000);
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
   state: function () { return STATE; }, events: events, drivers: drivers, redraw: draw, candles: NC, field: function () { return FIELD_CHECK; }, scorches: function () { return SCORCHES; },
-  howler: function () { for (var c in CUES) CUES[c](); return Object.keys(CUES).length; }, heard: function () { return heardLast; },
+  howler: function () { var n = 0; for (var c in CUES) if (c.indexOf(PSWING) !== 0 && c.indexOf(KNOCK) !== 0) { CUES[c](); n++; } return n; }, heard: function () { return heardLast; },
+  panel: function () { return { open: panelOpen, swinging: !!panelSwing, cut: !!PCUT, cues: Object.keys(CUES).filter(function (c) { return c.indexOf(PSWING) === 0 || c.indexOf(KNOCK) === 0; }).length }; },
   breathe: breathe, fade: startFade, stutter: function () { var n = 0; for (var i = 0; i < NC; i++) if (stut[i] > 0.5) n++; return n; }, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
   stand: function () { return here.name; }, wentTo: function () { return wentTo; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
