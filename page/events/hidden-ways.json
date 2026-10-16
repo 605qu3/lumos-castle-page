@@ -1686,6 +1686,426 @@
       "show": [
         "the grating a grey square of night sky, and overhead nothing at all"
       ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "date >= 09-15",
+        "date <= 10-31"
+      ],
+      "show": [
+        "the racks filling: new apples laid out in rows, not touching, red and russet, and a sharp sweet smell of them"
+      ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "date >= 11-01"
+      ],
+      "show": [
+        "every rack full, the apples in their rows not touching, the cold air sweet with them"
+      ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "date <= 02-29"
+      ],
+      "show": [
+        "every rack full, the apples in their rows not touching, the cold air sweet with them"
+      ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "date >= 03-01",
+        "date <= 05-31"
+      ],
+      "show": [
+        "the racks half empty, the apples left wrinkled and sweeter, gaps in the rows where the kitchens have taken them"
+      ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "date >= 06-01",
+        "date <= 09-14"
+      ],
+      "show": [
+        "the racks bare and swept, only a faint smell of apples left in the wood"
+      ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "occasion = halloween"
+      ],
+      "show": [
+        "a gap along one rack where a whole basketful has gone up to the kitchens for the feast"
+      ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "time != night",
+        "sun = up",
+        "weather != fog"
+      ],
+      "show": [
+        "grey light from the two loops lying along the racks"
+      ]
+    },
+    {
+      "when": [
+        "place = apple store",
+        "time = night"
+      ],
+      "show": [
+        "the racks dark rows, the smell of apples stronger for the dark"
+      ]
+    },
+    {
+      "when": [
+        "place = arras room"
+      ],
+      "show": [
+        "a smell of wool and old dust; the half-woven hanging on its loom, the shuttle resting in the threads"
+      ]
+    },
+    {
+      "when": [
+        "place = arras room",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "light from the loops across the mending frame, the old tapestry brighter where it has been mended"
+      ]
+    },
+    {
+      "when": [
+        "place = arras room",
+        "weekday = thursday"
+      ],
+      "show": [
+        "a few rows more woven on the loom since last time, though nobody is ever here"
+      ]
+    },
+    {
+      "when": [
+        "place = arras room",
+        "windy = yes"
+      ],
+      "show": [
+        "a draught from the stair lifting the edge of the tapestry over the door"
+      ]
+    },
+    {
+      "when": [
+        "place = arras room",
+        "time = night"
+      ],
+      "show": [
+        "the loom a dark frame against a loop, the wools only shapes in their baskets"
+      ]
+    },
+    {
+      "when": [
+        "place = herbarium"
+      ],
+      "show": [
+        "a dry smell of old paper and hay, and cabinets of shallow drawers all round, every sheet in them labelled in faded ink"
+      ]
+    },
+    {
+      "when": [
+        "place = herbarium",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "the lens on its stand catching the sun from a loop and throwing a bright spot on the table"
+      ]
+    },
+    {
+      "when": [
+        "place = herbarium",
+        "weather = rain"
+      ],
+      "show": [
+        "rain on the loops, and the room as dry inside as the paper in its drawers"
+      ]
+    },
+    {
+      "when": [
+        "place = herbarium",
+        "time = night"
+      ],
+      "show": [
+        "the cabinets dark rows, the smell of hay in the dark"
+      ]
+    },
+    {
+      "when": [
+        "place = wind harp room",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind off the lake in the four harps, the whole room singing, the notes swelling and falling with every gust"
+      ]
+    },
+    {
+      "when": [
+        "place = wind harp room",
+        "windy = yes",
+        "weather = rain"
+      ],
+      "show": [
+        "the storm loud in the harps, deep notes humming under the high ones"
+      ]
+    },
+    {
+      "when": [
+        "place = wind harp room",
+        "windy = yes",
+        "weather = snow"
+      ],
+      "show": [
+        "the storm loud in the harps, deep notes humming under the high ones"
+      ]
+    },
+    {
+      "when": [
+        "place = wind harp room",
+        "windy = no",
+        "weather != fog"
+      ],
+      "show": [
+        "now and then a breath of air through a loop and one harp giving a low note, then quiet again"
+      ]
+    },
+    {
+      "when": [
+        "place = wind harp room",
+        "weather = fog"
+      ],
+      "show": [
+        "the harps silent, not a string stirring in the still grey air"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay"
+      ],
+      "show": [
+        "a round bay of small leaded panes, a cushioned seat round it, and the lake beyond"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "heights = eased",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "the lake spread out beyond the panes to the hills, the drop below hidden under the sill"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "heights = open",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "the lake straight below the panes, a long way down, and out to the hills"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "the water glittering, the light off it trembling on the bay's ceiling"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "weather = rain"
+      ],
+      "show": [
+        "rain running down the small panes, the lake grey and pocked"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "weather = snow"
+      ],
+      "show": [
+        "snow drifting past the panes, the lake dark under it"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "weather = fog"
+      ],
+      "show": [
+        "nothing beyond the panes but white"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "time = night",
+        "moon up = yes",
+        "weather != fog"
+      ],
+      "show": [
+        "the moon on the lake, a long silver road across the water"
+      ]
+    },
+    {
+      "when": [
+        "place = oriel bay",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "the panes black, the lamp's glow in each of them"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft"
+      ],
+      "show": [
+        "a long narrow loft under the roof, boarded down the middle, smelling of dust, candle wax and pine"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "date >= 01-03",
+        "date <= 12-17"
+      ],
+      "show": [
+        "the iron stands for the Great Hall's twelve trees stacked along the boards, crates of glass icicles in straw, boxes of candles, holly hooks in a bucket"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "date >= 12-18"
+      ],
+      "show": [
+        "the tree stands gone and the icicle crates empty, straw scattered where they stood"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "date <= 01-02"
+      ],
+      "show": [
+        "the tree stands gone and the icicle crates empty, straw scattered where they stood"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "occasion != halloween"
+      ],
+      "show": [
+        "a box of tin candle cups for the Halloween pumpkins"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "occasion = halloween"
+      ],
+      "show": [
+        "the pumpkins' candle cups gone from their box, only a ring in the dust where it stood"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "date >= 11-01",
+        "date <= 11-07"
+      ],
+      "show": [
+        "the candle cups back in their box, still smelling of pumpkin"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "date >= 01-03",
+        "date <= 01-10"
+      ],
+      "show": [
+        "the tree stands back, pine needles caught in the straw and a strand of tinsel trailing from a crate"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "heights = eased",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through the round window in the gable, the sky, the hills and the far end of the drive"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "heights = open",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through the round window in the gable, straight down to the front lawn and the drive"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "weather = rain"
+      ],
+      "show": [
+        "rain loud on the slates just over his head"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind fingering the slates and whistling at the round window"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "time = night"
+      ],
+      "show": [
+        "the round window a disc of dark sky, the crates only shapes"
+      ]
     }
   ],
   "records": [
@@ -1767,6 +2187,103 @@
       "when": [],
       "show": [
         "cold breathing out under the heavy door, and frost furred on its iron latch"
+      ]
+    },
+    {
+      "id": "hidden-ways.apple-store-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap apple-store-door",
+      "when": [
+        "date >= 09-15"
+      ],
+      "show": [
+        "a smell of apples at the crack of the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.apple-store-door-spring",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap apple-store-door",
+      "when": [
+        "date <= 05-31"
+      ],
+      "show": [
+        "a smell of apples at the crack of the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.apple-store-door-summer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap apple-store-door",
+      "when": [
+        "date >= 06-01",
+        "date <= 09-14"
+      ],
+      "show": [
+        "a faint old smell of apples at the crack of the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.arras-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap arras-door",
+      "when": [],
+      "show": [
+        "the tapestry on the stair's wall stirring a little, as if a draught came from behind it"
+      ]
+    },
+    {
+      "id": "hidden-ways.herbarium-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap herbarium-door",
+      "when": [],
+      "show": [
+        "a pressed leaf, brown and flat as paper, slipped out under the door onto the stair"
+      ]
+    },
+    {
+      "id": "hidden-ways.wind-harp-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wind-harp-door",
+      "when": [
+        "windy = yes"
+      ],
+      "show": [
+        "music coming through the door, high and wavering, and nobody playing it"
+      ]
+    },
+    {
+      "id": "hidden-ways.oriel-panel",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap oriel-panel",
+      "when": [],
+      "show": [
+        "the panelling sounding hollow under his knock, just here"
+      ]
+    },
+    {
+      "id": "hidden-ways.feast-press",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap feast-press",
+      "when": [],
+      "show": [
+        "a strand of tinsel caught in the press's door"
       ]
     }
   ]
