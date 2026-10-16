@@ -458,7 +458,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* a way out from a hidden place hangs its tapestry's back in the mouth, a dark grey hanging, not a void */
           var fill = g.back ? F.register(new THREE.Mesh(new THREE.PlaneGeometry(w, hh), F.solid(0x3b3632)), LAYER.way)
                             : new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false }));
-          if (g.back) fill.material.side = THREE.DoubleSide;
+          /* v16: both sides take the tap; one-sided, its face turned out, a tap from its own room passed through to the
+             dark or the room beyond (Events' orrery-stair-arch, 1.56 am, 16 October; every open way alike) */
+          fill.material.side = THREE.DoubleSide;
           fill.position.set(mid.x, mid.y + g.sill + hh / 2, mid.z); fill.rotation.y = ang; fill.name = 'way-' + g.op.id; fill.userData.way = g.op.id;
           group.add(fill);
           out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm],
