@@ -27,6 +27,8 @@
    way round) and the leads (a feature with `rect`, `z` and `parapet`: a court in the sky, its breast and merlons, the
    crenels barred) are places too. v12: a room by its plan's corners ({ poly }) too.
    v13 (model v39): a way into a stair joining two rooms (the dovecote's, in the drum's wall) leads on to the room at its far end.
+   v14 (model v42, the Found starts): the start looks the way this place's floor runs longest, a step inside a short room
+   first; a ladder or trapdoor through a floor (a stair with `rooms` and `rect`) is a way down or up, a dark square.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -482,6 +484,30 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     group.add(rec);
   });
 
+  /* v14: a ladder or trapdoor through a floor (a stair with `rooms` and a `rect`, no span or arc: the gate loft's, the
+     feast loft's) is a way: a dark square in this place's floor where it goes down, in its ceiling where it goes up,
+     the room at its other end a tap away; its stand beside it, looking at it */
+  (M.stairs || []).forEach(function (s) {
+    if (!s.rect || s.span || s.arc || !s.rooms || s.rooms.length < 2 || !/ladder|trapdoor|hatch/.test(s.kind || '')) return;
+    if (!s.rooms.some(function (r) { return slug(r) === P.id; })) return;
+    var down = Math.abs(s.to - P.floor) < 0.05, up = Math.abs(s.from - P.floor) < 0.05;
+    if (!down && !up) return;
+    var to = slug(s.rooms.filter(function (r) { return slug(r) !== P.id; })[0]);
+    var R = s.rect, mx = (R[0] + R[2]) / 2, my = (R[1] + R[3]) / 2, wx = R[2] - R[0], wy = R[3] - R[1];
+    var y = down ? 0.012 : Math.min(s.to - 0.7, P.ceiling) - P.floor - 0.012;
+    var sq = new THREE.Mesh(new THREE.PlaneGeometry(wx, wy), F.solid(0x141210));
+    sq.rotation.x = down ? -Math.PI / 2 : Math.PI / 2; sq.position.copy(toLocal(mx, my, P.floor)); sq.position.y = y;
+    sq.name = 'way-' + s.id; sq.userData.way = s.id; sq.userData.hatch = down ? 'down' : 'up'; group.add(sq);
+    var xs = P.poly.map(function (p) { return p[0]; }), ys = P.poly.map(function (p) { return p[1]; });
+    var pcx = (Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2, pcy = (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2;
+    var ix = pcx - mx, iy = pcy - my, il = Math.hypot(ix, iy);
+    if (il < 0.3) { ix = 0; iy = -1; il = 1; }
+    var mid = toLocal(mx, my, P.floor); mid.y = y;
+    out.ways.push({ id: s.id, to: to, mesh: sq, w: Math.min(wx, wy), h: 0.8, mid: mid, foot: toLocal(mx, my, P.floor), inward: new THREE.Vector3(ix / il, 0, -iy / il),
+      place: P.id, at: [mx, my], half: Math.max(wx, wy) / 2, sill: 0, lift: 0, level: P.floor, back: false, via: false, depth: 0,
+      hatch: down ? 'down' : 'up', built: !!findPlace(M, to) });
+  });
+
   /* the stairs in the places built: a straight flight's treads along its rise, from its span's foot to its head; a
      landing, gallery or bay ({ shape: { rect }, z }) as a floor's vault, SLAB deep under its top (Godric's 12.1) */
   var slabs = [], raw = [];
@@ -572,6 +598,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      inside the way he arrives by (o.from), or else inside the first door of this place that leads out of the castle's
      ways, facing in. A raised way (the bay's mouth) is stood at on its own floor, a step inside it */
   function standAt(d, name) {
+    if (d.hatch) return hatchStand(d, name, false);
     var off = d.back ? 0.5 : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
     /* v8: never off the floor (a small room, the commentator's box): nearer the door until he stands on it */
@@ -579,6 +606,36 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (P.ring && d.place === P.id) pos = midRing(pos);
     var look = d.mid.clone(); look.y = d.mid.y + d.lift + (d.lift ? EYE : Math.max(EYE, d.h * 0.45));
     return { name: name, pos: pos, look: look, thing: d.mesh, level: d.level };
+  }
+  /* v14: beside a ladder's square in the floor or ceiling, on the room's side of it; at the start, looking into the room
+     the way he came up or down, else at the square */
+  function hatchStand(d, name, start) {
+    var off = d.half + 0.9, p = d.foot.clone().add(d.inward.clone().multiplyScalar(off));
+    while (off > 0.5 && !onLevel(p.x + cx, cy - p.z, d.level)) { off -= 0.2; p = d.foot.clone().add(d.inward.clone().multiplyScalar(off)); }
+    p.y = d.foot.y + EYE;
+    var look = start ? openLook(p, d.inward, d.level, p.y) : d.mid.clone();
+    return { name: name, pos: p, look: look, thing: start ? null : d.mesh, level: d.level };
+  }
+  /* v14: the start looks the way the floor runs longest within a right angle either side of straight in, so a room
+     entered across its short side (the guard room, the library's gallery, the flanker) opens along its length; a run
+     of 6 m or more straight in is kept */
+  function openLook(pos, inw, level, ly) {
+    var run = function (a) {
+      var c = Math.cos(a), s = Math.sin(a), dx = inw.x * c + inw.z * s, dz = -inw.x * s + inw.z * c, t = 0.3;
+      var on = function (u) { return inArea(P, pos.x + dx * u + cx, cy - (pos.z + dz * u)); };   /* this place's own floor */
+      while (t < 2.6 && !on(t)) t += 0.25;              /* from a mouth or a step outside it, in onto the floor first */
+      var t0 = t;
+      while (t < 20 && on(t)) t += 0.25;
+      t -= t0;
+      return { t: t, dx: dx, dz: dz };
+    };
+    var best = run(0), score = best.t;
+    if (best.t < 6) for (var k = -8; k <= 8; k++) {
+      if (!k) continue;
+      var r = run(k * 10 * Math.PI / 180), sc = r.t - Math.abs(k) * 0.05;
+      if (sc > score + 0.5) { best = r; score = sc; }
+    }
+    return new THREE.Vector3(pos.x + best.dx * 20, ly, pos.z + best.dz * 20);
   }
   /* v10: a point in a ring moved out or in to the ring's middle, at the same height */
   function midRing(v) {
@@ -589,11 +646,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* he arrives through a mouth standing in it, a step back on the side he came from, looking in (only into the wall's
      depth where the far side is a room's page, short of the dark beyond); through a door, a step inside it */
   function facingIn(d, name) {
+    if (d.hatch) return hatchStand(d, name, true);
     var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built || d.via ? -0.3 : -1.0) : STAND_OFF;
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
     /* v10: never off the floor (a ring 0.9 wide): nearer the door until he stands on it */
     while (back > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { back -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE; }
     var look = d.mid.clone().add(d.inward.clone().multiplyScalar(STAND_OFF + 20)); look.y = d.mid.y + d.lift + EYE + 0.3;
+    if (!P.ring) {
+      /* v14: arriving from outside a short room (under 6 m straight in: the flanker through its deep arch, the vault from
+         its ledge), a step inside it first, so the look round is not cut by the mouth's sides */
+      var inP = function (v) { var s_ = siteOf(v); return inArea(P, s_[0], s_[1]); };
+      if (!inP(pos)) {
+        var u = 0, q = pos.clone();
+        while (u < 3 && !inP(q)) { u += 0.1; q = pos.clone().add(d.inward.clone().multiplyScalar(u)); }
+        if (inP(q) && !inP(q.clone().add(d.inward.clone().multiplyScalar(6)))) pos = q.add(d.inward.clone().multiplyScalar(0.6));
+      }
+      look = openLook(pos, d.inward, d.level, look.y);
+    }
     /* v10: in a ring he stands in its middle and looks along it, not across its void */
     if (P.ring) {
       pos = midRing(pos);
