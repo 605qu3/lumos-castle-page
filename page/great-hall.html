@@ -132,9 +132,9 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=31"></script>
-<script src="castle-shell.js?v=7"></script>
-<script src="castle-events.js?v=35"></script>
+<script src="castle-model.js?v=371"></script>
+<script src="castle-shell.js?v=25"></script>
+<script src="castle-events.js?v=36"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -180,7 +180,8 @@ var P = function (x, y, z) { return shell.toLocal(x, y, (z || 0)); };
 
 /* the clock (docs/room-states.md §1): one runtime, every chain, this room's place */
 var READY = false;   /* the runtime may call drawRoom before the room below is built */
-var CUES = {};       /* a record's cues, by its show string, filled once the room is built (the Howler) */
+var CUES = {};       /* a record's cues, by its show string, filled once the room is built (the Howler, the whisper) */
+var heardLast = '';  /* the last heard cue handed to the player, for the checks */
 var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () { if (READY) draw(); }, cues: CUES, showLines: function (list) { if (window.CastleSound) CastleSound.lines(list); } }) : null;
 function drivers() {
   var e = events;
@@ -368,18 +369,38 @@ waxes.name = 'candles'; flames.name = 'flames'; room.add(waxes); room.add(flames
    ride with it as aPhase, and one clock uniform moves them all */
 var phase = new Float32Array(NC * 3);
 for (var ph = 0; ph < NC; ph++) { phase[ph * 3] = U(0, Math.PI * 2); phase[ph * 3 + 1] = U(4, 7); phase[ph * 3 + 2] = U(0, Math.PI * 2); }
-var bobClock = { value: 0 };
-function bobbing(mat) {
+/* Magic's ambient states on the field (req 593, Events' cues of req 592), all inside Interiors' envelope (sway up to 0.03):
+   the doors' breath as he comes in runs up the hall from the doors at 15 m a second, each candle carried 0.03 m up the
+   hall as it passes, its sway giving way for those seconds, so sway and breath together never pass 0.03, and its flame
+   leaning further, which moves no candle; a windy day sways them faster, never wider (the sway's own clock, uSway);
+   at Hallowe'en the pumpkins' candles stutter as a bat swoops past (aStut, set each frame) */
+var bobClock = { value: 0 }, swayClock = { value: 0 }, breathAt = { value: -1000 };
+var UPHALL = (function () { var a = P(40, 60.5, 6), b = P(39, 60.5, 6); return { value: b.sub(a).normalize() }; })();
+var doorDist = new Float32Array(NC), stut = new Float32Array(NC);
+for (var dd = 0; dd < NC; dd++) doorDist[dd] = Math.max(0, 67.1 - C[dd][0]);
+function bobbing(mat, flame) {
+  var sw = S.candles.sway.toFixed(3);
   mat.onBeforeCompile = function (sh) {
-    sh.uniforms.uBob = bobClock;
-    sh.vertexShader = 'uniform float uBob;\nattribute vec3 aPhase;\n' + sh.vertexShader.replace('#include <begin_vertex>',
-      '#include <begin_vertex>\n  transformed.x += ' + S.candles.sway.toFixed(3) + ' * sin(uBob * 0.7 + aPhase.z);\n' +
+    sh.uniforms.uBob = bobClock; sh.uniforms.uSway = swayClock; sh.uniforms.uBreath = breathAt; sh.uniforms.uUp = UPHALL;
+    sh.vertexShader = 'uniform float uBob, uSway, uBreath;\nuniform vec3 uUp;\nattribute vec3 aPhase;\nattribute float aDoor;\n' +
+      (flame ? 'attribute float aStut;\n' : '') + sh.vertexShader.replace('#include <begin_vertex>',
+      '#include <begin_vertex>\n  float bt = uBreath - aDoor / 15.0;\n' +
+      '  float br = bt > 0.0 ? clamp(bt / 0.5, 0.0, 1.0) * exp(-max(bt - 0.5, 0.0) / 0.9) : 0.0;\n' +
+      (flame ? '  float st = aStut * (0.5 + 0.5 * sin(uBob * 31.0 + aPhase.x * 7.0));\n' +
+               '  transformed *= vec3(1.0 - 0.45 * st, 1.0 - 0.7 * st, 1.0 - 0.45 * st);\n' +
+               '  transformed.xz += uUp.xz * br * 0.025 * (position.y + 0.036) / 0.072;\n' : '') +
+      '  transformed.x += ' + sw + ' * (1.0 - br) * sin(uSway + aPhase.z);\n' +
+      '  transformed.xz += uUp.xz * ' + sw + ' * br;\n' +
       '  transformed.y += ' + S.candles.bob.toFixed(3) + ' * sin(uBob * 6.2831853 / aPhase.y + aPhase.x);');
   };
 }
 waxGeo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phase, 3));
 flameGeo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phase, 3));
-bobbing(M.wax); bobbing(flameMat);
+waxGeo.setAttribute('aDoor', new THREE.InstancedBufferAttribute(doorDist, 1));
+flameGeo.setAttribute('aDoor', new THREE.InstancedBufferAttribute(doorDist, 1));
+var stutAttr = new THREE.InstancedBufferAttribute(stut, 1); stutAttr.setUsage(THREE.DynamicDrawUsage);
+flameGeo.setAttribute('aStut', stutAttr);
+bobbing(M.wax); bobbing(flameMat, true);
 waxes.frustumCulled = flames.frustumCulled = false;   /* the field fills the room; never culled by the base taper's bounds */
 var tmpM = new THREE.Matrix4(), tmpV = new THREE.Vector3();
 for (var ci = 0; ci < NC; ci++) {
@@ -419,9 +440,10 @@ function swag(x0, y0, x1, y1) {
 [[51.8, 56.4], [56.4, 60.5], [60.5, 64.6], [64.6, 69.2]].forEach(function (r) { swag(15.15, r[0], 15.15, r[1]); });
 /* the carved pumpkins: about one floating candle in five, at that candle's own home point (they move with it) */
 var pumpIdx = []; for (var pi = 0; pi < NC; pi += 5) pumpIdx.push(pi);
-var pumpGeo = new THREE.SphereGeometry(0.15, 8, 5), pumpPhase = new Float32Array(pumpIdx.length * 3);
-pumpIdx.forEach(function (ci, i) { for (var k = 0; k < 3; k++) pumpPhase[i * 3 + k] = phase[ci * 3 + k]; });
+var pumpGeo = new THREE.SphereGeometry(0.15, 8, 5), pumpPhase = new Float32Array(pumpIdx.length * 3), pumpDoor = new Float32Array(pumpIdx.length);
+pumpIdx.forEach(function (ci, i) { for (var k = 0; k < 3; k++) pumpPhase[i * 3 + k] = phase[ci * 3 + k]; pumpDoor[i] = doorDist[ci]; });
 pumpGeo.setAttribute('aPhase', new THREE.InstancedBufferAttribute(pumpPhase, 3));
+pumpGeo.setAttribute('aDoor', new THREE.InstancedBufferAttribute(pumpDoor, 1));   /* the breath carries a pumpkin with its candle */
 bobbing(M.pumpkin);
 var pumps = new THREE.InstancedMesh(pumpGeo, M.pumpkin, pumpIdx.length);
 pumps.name = 'pumpkins'; pumps.frustumCulled = false; occ.halloween.add(pumps);
@@ -506,6 +528,12 @@ seats.forEach(function (s, i) {
   tmpV.copy(P(s.x, s.y - s.side * (S.bench.deep / 2 + S.bench.off + 0.02) - s.side * 0.17, S.top + 0.01));
   tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z); plates.setMatrixAt(i, tmpM);
 });
+/* what is on the plates at a meal, a grey stand-in for Objects' food, one draw; at the meal's end it fades from the
+   plates, leaving them clean (Magic's 3.5, PS 7 L2561; Events' cue for req 593), so a meal never leaves food behind */
+var foodMat = mat(0x8a6e4e, { transparent: true, opacity: 1 });
+var food = new THREE.InstancedMesh(new THREE.SphereGeometry(0.075, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2), foodMat, seats.length);
+food.name = 'food'; food.frustumCulled = false; food.visible = false; room.add(food);
+seats.forEach(function (s, i) { plates.getMatrixAt(i, tmpM); tmpM.scale(new THREE.Vector3(1, 0.5, 1)); tmpM.elements[13] += 0.01; food.setMatrixAt(i, tmpM); });
 var towers = new THREE.Group(); towers.name = 'goblet-towers'; room.add(towers);
 S.tables.forEach(function (t) {
   for (var x = S.tx1 - 1.2; x > S.tx0; x -= 2.4) {
@@ -515,7 +543,8 @@ S.tables.forEach(function (t) {
 
 /* ================= the chain's other cues in grey, each a stand-in for its owner's part (Interiors and Objects the
    things, People the owls and bats, Magic the streamers and snow), one group a cue, shown when the chain shows it */
-var EXTRA = {}, SCORCHES = [];
+var EXTRA = {}, SCORCHES = [], dishMat = M.gold.clone();   /* the feast's dishes their own gold, so they fade at its end while the plates stay */
+dishMat.transparent = true;
 function extra(words) { var g = new THREE.Group(); g.name = 'cue: ' + words; g.visible = false; room.add(g); EXTRA[words] = g; return g; }
 function bit(g, geo, m, x, y, z, ry) { var b = new THREE.Mesh(geo, m); b.position.copy(P(x, y, z)); if (ry) b.rotation.y = ry; g.add(b); return b; }
 var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat(0x2a2622);
@@ -524,7 +553,7 @@ var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat
   /* a feast's dishes heaped down the tables' middle lines */
   var dish = new THREE.CylinderGeometry(0.16, 0.12, 0.12, 10), g = extra("a feast's dishes heaped"), dishAt = [];
   S.tables.forEach(function (t) { for (var x = S.tx0 + 0.8; x < S.tx1 - 0.4; x += 1.1) dishAt.push(P(x, t[1], S.top + 0.06)); });
-  var dishes = new THREE.InstancedMesh(dish, M.gold, dishAt.length); dishes.frustumCulled = false; g.add(dishes);   /* one draw for the iPad */
+  var dishes = new THREE.InstancedMesh(dish, dishMat, dishAt.length); dishes.frustumCulled = false; g.add(dishes);   /* one draw for the iPad */
   dishAt.forEach(function (v, j) { tmpM.makeTranslation(v.x, v.y, v.z); dishes.setMatrixAt(j, tmpM); });
   /* what a meal leaves: a fork under a bench, a knife on a bench, a goblet on its side, napkins dropped */
   var small = new THREE.BoxGeometry(0.2, 0.02, 0.03), cup = new THREE.CylinderGeometry(0.04, 0.03, 0.12, 8), nap = new THREE.BoxGeometry(0.22, 0.03, 0.18);
@@ -614,6 +643,9 @@ var howler = new THREE.Group(); howler.name = 'cue: the Howler'; howler.visible 
   var ash = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.004, 10), mat(0x3a3430)); ash.name = 'ash';
   ash.position.copy(P(46.0, 62.6, S.top + 0.003)); ash.visible = false; howler.add(ash);
   var line = "at another house's table an owl drops a scarlet envelope";
+  /* the whisper at night (Events' great-hall.night-whisper, Magic's t1 for req 593): heard, never seen, a once sound for
+     the castle's player; when it comes is the record's (one night visit in three, never Hallowe'en night) */
+  var whisper = 'a faint whisper runs through the dark hall';
   fetch('events/great-hall.json', { cache: 'no-cache' }).then(function (r) { return r.json(); }).then(function (j) {
     (j.records || []).forEach(function (rec) { (rec.show || []).forEach(function (s) {
       if (s.indexOf(line) === 0) CUES[s] = function () {
@@ -621,6 +653,7 @@ var howler = new THREE.Group(); howler.name = 'cue: the Howler'; howler.visible 
         setTimeout(function () { env.visible = false; ash.visible = true; }, 6000);
         setTimeout(function () { howler.visible = false; }, 20000);
       };
+      if (s.indexOf(whisper) === 0) CUES[s] = function () { heardLast = s; if (window.CastleSound) CastleSound.once(s); };
     }); });
   }).catch(function () {});
 }());
@@ -633,22 +666,53 @@ for (var ow = 0; ow < 24; ow++) owlBits.push({ r: 3 + (ow % 6) * 1.6, c: 26 + (o
 for (var bt = 0; bt < 60; bt++) batBits.push({ r: 2 + (bt % 7) * 1.1, c: 24 + (bt % 9) * 4.4, h: 3.2 + (bt % 6) * 0.6, w: 0.6 + (bt % 4) * 0.15, a: bt * 0.7 });
 var flyQ = new THREE.Quaternion(), flyS = new THREE.Vector3(1, 1, 1), flyUp = new THREE.Vector3(0, 1, 0);
 var snowGeo = new THREE.BufferGeometry(), snowA = [];
-for (var sn = 0; sn < 1500; sn++) { var sv = P(16 + Math.random() * 48, 52 + Math.random() * 17, Math.random() * 14.5); snowA.push(sv.x, sv.y, sv.z); }
+/* the warm dry snow falls from the ceiling and melts away above the candles, never reaching the tables (Magic's 4, req
+   593): each flake shrinks over its last 1.2 m and is gone at 7.3, clear of the highest candle's flame (the strays' 7.0) */
+var SNOW_TOP = P(0, 0, 14.5).y, SNOW_MELT = P(0, 0, 7.3).y, SNOW_SPAN = P(0, 0, 8.5).y - SNOW_MELT;
+for (var sn = 0; sn < 1500; sn++) { var sv = P(16 + Math.random() * 48, 52 + Math.random() * 17, 7.3 + Math.random() * 7.2); snowA.push(sv.x, sv.y, sv.z); }
 snowGeo.setAttribute('position', new THREE.Float32BufferAttribute(snowA, 3));
-var snowPts = new THREE.Points(snowGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.06 })); flyers.snow.add(snowPts);
-var SNOW_TOP = P(0, 0, 14.5).y, SNOW_FOOT = P(0, 0, 0).y;
-function fly(t) {
+var snowMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.06 });
+snowMat.onBeforeCompile = function (sh) {
+  sh.vertexShader = sh.vertexShader.replace('gl_PointSize = size;',
+    'gl_PointSize = size * clamp((position.y - ' + SNOW_MELT.toFixed(3) + ') / ' + SNOW_SPAN.toFixed(3) + ', 0.0, 1.0);');
+};
+var snowPts = new THREE.Points(snowGeo, snowMat); flyers.snow.add(snowPts);
+/* the bats near a pumpkin, for its candle's stutter: binned by 2 m in plan so the check stays small */
+var batAt = batBits.map(function () { return [0, 0, 0]; }), STUT_NEAR = 0.7;
+var pumpSet = pumpIdx;
+/* the pumpkins' candles stutter as a bat swoops past (Magic's 4, PS 10 L3536; Events' cue for req 593): a candle with a
+   bat within 0.7 m flickers low, then steadies over about a second once it has gone */
+var stutOn = false;
+function stutter(dt) {
+  var bins = {}, keep = Math.exp(-dt * 3);
+  batAt.forEach(function (h) { var k = Math.floor(h[0] / 2) + ',' + Math.floor(h[1] / 2); (bins[k] = bins[k] || []).push(h); });
+  for (var i = 0; i < pumpSet.length; i++) {
+    var ci = pumpSet[i], p = C[ci], bx = Math.floor(p[0] / 2), by = Math.floor(p[1] / 2), near = false;
+    for (var dx = -1; dx <= 1 && !near; dx++) for (var dy = -1; dy <= 1 && !near; dy++) {
+      var l = bins[(bx + dx) + ',' + (by + dy)]; if (!l) continue;
+      for (var j = 0; j < l.length; j++) { var h = l[j]; if (Math.hypot(h[0] - p[0], h[1] - p[1], h[2] - p[2]) < STUT_NEAR) { near = true; break; } }
+    }
+    stut[ci] = near ? 1 : stut[ci] * keep;
+  }
+  stutAttr.needsUpdate = true; stutOn = true;
+}
+function fly(t, dt) {
   if (flyers.owls.visible) {
     owlBits.forEach(function (o, j) { var a = o.a + t * o.w; tmpV.copy(P(o.c + Math.cos(a) * o.r, 60.5 + Math.sin(a) * o.r * 1.4, o.h + Math.sin(a * 2) * 0.4)); tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z); owlsI.setMatrixAt(j, tmpM); });
     owlsI.instanceMatrix.needsUpdate = true;
   }
   if (flyers.bats.visible) {
-    batBits.forEach(function (b, j) { var a = b.a + t * b.w * 2; tmpV.copy(P(b.c + Math.cos(a) * b.r, 60.5 + Math.sin(a * 1.3) * 7, b.h + Math.sin(a * 3) * 0.5)); flyQ.setFromAxisAngle(flyUp, -a); tmpM.compose(tmpV, flyQ, flyS); batsI.setMatrixAt(j, tmpM); });
+    batBits.forEach(function (b, j) {
+      var a = b.a + t * b.w * 2, h = batAt[j];
+      h[0] = b.c + Math.cos(a) * b.r; h[1] = 60.5 + Math.sin(a * 1.3) * 7; h[2] = b.h + Math.sin(a * 3) * 0.5;
+      tmpV.copy(P(h[0], h[1], h[2])); flyQ.setFromAxisAngle(flyUp, -a); tmpM.compose(tmpV, flyQ, flyS); batsI.setMatrixAt(j, tmpM);
+    });
     batsI.instanceMatrix.needsUpdate = true;
+    if (occ.halloween.visible && flames.visible) stutter(dt);
   }
   if (flyers.snow.visible) {
     var pa = snowGeo.attributes.position.array;
-    for (var i = 1; i < pa.length; i += 3) { pa[i] -= 0.006; if (pa[i] < SNOW_FOOT + 0.05) pa[i] = SNOW_TOP; }   /* it never lies: warm, dry, gone at the floor */
+    for (var i = 1; i < pa.length; i += 3) { pa[i] -= 0.006; if (pa[i] < SNOW_MELT) pa[i] = SNOW_TOP; }   /* it never lies: warm, dry, gone above the candles */
     snowGeo.attributes.position.needsUpdate = true;
   }
 }
@@ -741,9 +805,24 @@ var DRAWN = ['the high windows', 'the floating candles burning', 'the floating c
   'one or two pupils', 'the hall empty', 'the house ghosts', 'the first years in one line', 'breakfast set at every place',
   'the golden plates and goblets set', 'the places laid for the feast', 'the golden goblets stacked', 'twelve Christmas trees',
   'about one floating candle in five', "Hagrid's four vast pumpkins", "the winner's hangings", "the Duelling Club's evening",
-  'two straw dummies'];
+  'two straw dummies', 'as he comes in through the doors', 'the floating candles swaying a little more', "at the meal's end",
+  'the candles in the pumpkins stuttering', 'a faint whisper runs'];
+/* the edges the room's state can't hold by itself (req 593): the breath runs once, the first time the chain's cue is in
+   after he comes in; the meal's fade runs when a laid meal ends while he is here, holding the room as it was for its
+   seconds, and the plates stay clean until the next meal */
+var breathT0 = null, swayRate = 1, lastMeal = null, fade = null, cleared = null;
+function breathe() { breathT0 = (T || 0) + 0.4; }
+function startFade() {
+  fade = { t0: T || 0, end: (T || 0) + 8.5 }; cleared = drivers().meal;
+  food.visible = true; foodMat.opacity = 1; dishMat.opacity = 1;
+}
 function draw() {
-  var d = drivers(), feast = d.meal === 'dinner' && /^(start of term|halloween|christmas day|leaving feast)$/.test(d.occasion);
+  var d = drivers();
+  if (fade) { if (T < fade.end) return; fade = null; foodMat.opacity = 1; dishMat.opacity = 1; }
+  if (lastMeal && lastMeal !== 'none' && d.meal !== lastMeal && food.visible) { lastMeal = d.meal; startFade(); return; }
+  lastMeal = d.meal;
+  if (cleared !== null && d.meal !== cleared) cleared = null;
+  var feast = d.meal === 'dinner' && /^(start of term|halloween|christmas day|leaving feast)$/.test(d.occasion);
   var xmas = d.occasion === 'christmas' || d.occasion === 'christmas day';
   var st = { time: d.time, meal: d.meal, occasion: d.occasion, lessons: d.lessons, year: d.year, sun: !!d.sun.up, sky: d.weather.sky, feast: feast };
   /* every layer's state is the hall's chain's (page/events/great-hall.json, Events' req 480): the cues it shows now, each
@@ -751,6 +830,9 @@ function draw() {
   var shows = (events ? events.cues() : []).filter(function (c) { return HALL[c]; });
   function cue(words) { for (var i = 0; i < shows.length; i++) if (shows[i].indexOf(words) === 0) return true; return false; }
   st.cues = shows.length;
+  if (breathT0 === null && cue('as he comes in through the doors')) breathe();
+  swayRate = cue('the floating candles swaying a little more') ? 2.2 : 1;
+  st.windy = swayRate > 1;
   /* the candles: pale by day, gold from dusk and at a meal after dark, out at night (lookup-q1-lit-1013, Magic's) */
   var lit = cue('the floating candles burning gold') ? 'gold' : cue('the floating candles out') ? 'out' : 'pale';
   st.candles = lit;
@@ -814,6 +896,8 @@ function draw() {
   /* props: the places at meals and laid for a feast, the goblet towers between meals (Interiors' items 6 and 18) */
   plates.visible = !club && (cue('breakfast set at every place') || cue('the golden plates and goblets set') || cue('the places laid for the feast'));
   towers.visible = !club && cue('the golden goblets stacked');
+  food.visible = plates.visible && d.meal !== 'none' && cleared === null && cue("at the meal's end");
+  st.food = food.visible ? 'on the plates' : cleared !== null ? 'faded, the plates clean' : 'none';
   st.props = plates.visible ? 'the places set' : towers.visible ? 'the goblet towers' : 'bare';
   /* the occasions, every year on their day (never a book's night) */
   occ.christmas.visible = cue('twelve Christmas trees');
@@ -828,7 +912,7 @@ function draw() {
   st.sound = heard.map(function (s) { return s.split(',')[0]; }).join('; ') || 'none';
   st.playing = window.CastleSound ? CastleSound.playing().length : 0;
   /* the chain's cues not yet drawn here, each its owner's to give (the lane file, The layers) */
-  for (var ex in EXTRA) EXTRA[ex].visible = !club && cue(ex);
+  for (var ex in EXTRA) EXTRA[ex].visible = !club && cue(ex) && !(cleared !== null && ex === "a feast's dishes heaped");
   st.notDrawn = shows.filter(function (s) { return !DRAWN.some(function (w) { return s.indexOf(w) === 0; }) && !Object.keys(EXTRA).some(function (w) { return s.indexOf(w) === 0; }); }).map(function (s) { return s.slice(0, 48); });
   st.occasions = ['christmas', 'halloween', 'lanterns', 'feastEnd'].filter(function (k) { return occ[k].visible; });
   STATE = st;
@@ -959,17 +1043,24 @@ function frame() {
   T += dt * (kit.zoom && kit.zoom.slow ? kit.zoom.slow() : 1);
   updateCamera(dt);
   bobClock.value = T;
-  fly(T);
+  swayClock.value += dt * 0.7 * swayRate;
+  breathAt.value = breathT0 !== null && T - breathT0 < 20 ? T - breathT0 : -1000;
+  if (fade) { var fk = clamp((T - fade.t0 - 0.5) / 2.5, 0, 1); foodMat.opacity = dishMat.opacity = 1 - fk; if (fk >= 1) food.visible = false; if (T >= fade.end) draw(); }
+  if (stutOn && !occ.halloween.visible) { stut.fill(0); stutAttr.needsUpdate = true; stutOn = false; }
+  fly(T, dt);
   redraw += dt; if (redraw > 30) { redraw = 0; draw(); }   /* the clock moves on while he stays: dusk comes, a meal begins */
   renderer.render(scene, camera);
   kit.stats(dt);
 }
 renderer.setAnimationLoop(frame);
+/* ?fade: the meal's end played six seconds after he comes in, for a look at a laid meal (with ?time= and ?meal=) */
+if (Q.has('fade')) setTimeout(startFade, 6000);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
   state: function () { return STATE; }, events: events, drivers: drivers, redraw: draw, candles: NC, field: function () { return FIELD_CHECK; }, scorches: function () { return SCORCHES; },
-  howler: function () { for (var c in CUES) CUES[c](); return Object.keys(CUES).length; }, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
+  howler: function () { for (var c in CUES) CUES[c](); return Object.keys(CUES).length; }, heard: function () { return heardLast; },
+  breathe: breathe, fade: startFade, stutter: function () { var n = 0; for (var i = 0; i < NC; i++) if (stut[i] > 0.5) n++; return n; }, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
   stand: function () { return here.name; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
