@@ -1543,6 +1543,7 @@ function updateArmourSide(a) {
     S.her.visible = S.on;
     S.her.material.color.copy(armour.material.color); S.her.material.emissive.copy(armour.material.emissive);
   }
+  if (visorLight) visorLight.visible = !!visorLight.userData.want && !S.on;
   if (visorPatch && helmetEyes) {
     visorPatch.visible = !!visorPatch.userData.want && !S.on;
     helmetEyes.visible = !!helmetEyes.userData.want && !S.on;
@@ -4126,6 +4127,86 @@ else if (kit.from === 'stair-hall') arriveFromBay();
    console note; the lines are shown (req 66, below), and a sound is a heard line's words until it is recorded. */
 var visorPatch = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.1), new THREE.MeshBasicMaterial({ color: col(0x2e2c2a) }));
 visorPatch.position.set(ARMOUR.slitX, ARMOUR.slitY, 0.005); visorPatch.visible = false; armour.add(visorPatch);
+/* the corridor's Christmas (req 600, the drawing of Events' req 599, page/events/armour.json; Magic's The seventh-floor
+   corridor; PoA 11 L17727, "Thick streamers of holly and mistletoe were strung along the corridors, mysterious lights
+   shone from inside every suit of armour", checked 16 October 2026): every year, on `occasion = christmas` and
+   `christmas day`, the cue strings word for word. The streamers: swags of holly along both walls just under the
+   ceiling, above the windows, frames and doors, red berries in them and a pale sprig of mistletoe hung at each join.
+   The armour's light: the visor's slit lit warm from inside, its own light only, a bar on the slit (the drawing's,
+   505 to 690 px across, 320 to 335 down) and no light cast on anything else; on the front drawing only, as Trevor's
+   eyes are. Never a mark on a thing to tap. ?occasion=christmas for a look (the runtime's) */
+var XMAS_CUE = { streamers: 'thick streamers of holly and mistletoe strung along the corridor',
+  armour: 'a soft light shining from inside the suit of armour, out through the slits of its visor' };
+var XMAS = { x0: STAIR_X + 0.3, x1: END_X - 0.3, hi: CEIL - 0.25, lo: CEIL - 0.6, swag: 2.2, r: 0.02, off: 0.035, leaves: 72 };
+function drawHollyLeaf(g, w, h) {
+  /* a holly leaf, its spiny edge in five points a side, dark glossy green, the midrib lighter, an ink line round it */
+  g.beginPath(); g.moveTo(w * 0.5, h * 0.02);
+  for (var i = 1; i <= 5; i++) { g.lineTo(w * (i % 2 ? 0.94 : 0.72), h * (0.02 + i * 0.19)); }
+  g.lineTo(w * 0.5, h * 0.98);
+  for (var j = 5; j >= 1; j--) { g.lineTo(w * (j % 2 ? 0.06 : 0.28), h * (0.02 + j * 0.19)); }
+  g.closePath(); g.fillStyle = '#28452b'; g.fill(); g.lineWidth = w * 0.05; g.strokeStyle = '#121a12'; g.stroke();
+  g.strokeStyle = '#5d7d55'; g.lineWidth = w * 0.04; g.beginPath(); g.moveTo(w * 0.5, h * 0.06); g.lineTo(w * 0.5, h * 0.94); g.stroke();
+}
+var xmasStreamers = (function () {
+  var G = new THREE.Group(), cord = solid(0x203222), berry = solid(0xa31c22, { roughness: 0.5 }), mist = solid(0xc9d3a6);
+  var leafTex = cutoutTexture(32, 64, '#28452b', drawHollyLeaf);
+  var leafMat = new THREE.MeshStandardMaterial({ map: leafTex, transparent: true, alphaTest: 0.4, side: THREE.DoubleSide, roughness: 0.6 });
+  var n = Math.max(1, Math.round((XMAS.x1 - XMAS.x0) / XMAS.swag)), step = (XMAS.x1 - XMAS.x0) / n;
+  var leaves = [], berries = [], sprigs = [], seed = 1;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  [HER_FACE - XMAS.off, FAR_FACE + XMAS.off].forEach(function (z, side) {
+    var out = side ? 1 : -1;   /* toward the corridor's middle */
+    for (var i = 0; i < n; i++) {
+      var a = XMAS.x0 + i * step, pts = [];
+      for (var k = 0; k <= 16; k++) {
+        var u = k / 16;
+        pts.push(new THREE.Vector3(a + step * u, XMAS.hi - (XMAS.hi - XMAS.lo) * 4 * u * (1 - u), z));
+      }
+      var curve = new THREE.CatmullRomCurve3(pts);
+      G.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 20, XMAS.r, 5, false), cord));
+      for (var l = 0; l < XMAS.leaves; l++) {
+        var p = curve.getPoint((l + rnd()) / XMAS.leaves);
+        leaves.push({ p: new THREE.Vector3(p.x + (rnd() - 0.5) * 0.06, p.y + (rnd() - 0.5) * 0.1, z + out * (0.02 + rnd() * 0.07)),
+          r: new THREE.Euler((rnd() - 0.5) * 1.6, (rnd() - 0.5) * 2.4, rnd() * Math.PI * 2), s: 0.9 + rnd() * 0.5 });
+      }
+      for (var b = 0; b < 9; b++) {
+        var q = curve.getPoint((b + 0.2 + rnd() * 0.6) / 9);
+        for (var c = 0; c < 3; c++) berries.push(new THREE.Vector3(q.x + (rnd() - 0.5) * 0.05, q.y - 0.03 + (rnd() - 0.5) * 0.04, z + out * (0.08 + rnd() * 0.03)));
+      }
+      sprigs.push(new THREE.Vector3(a, XMAS.hi - 0.16, z + out * 0.06));
+    }
+    sprigs.push(new THREE.Vector3(XMAS.x1, XMAS.hi - 0.16, z + out * 0.06));
+  });
+  var lm = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.07, 0.13), leafMat, leaves.length), o = new THREE.Object3D();
+  leaves.forEach(function (f, i) { o.position.copy(f.p); o.rotation.copy(f.r); o.scale.setScalar(f.s); o.updateMatrix(); lm.setMatrixAt(i, o.matrix); });
+  var bm = new THREE.InstancedMesh(new THREE.SphereGeometry(0.014, 6, 4), berry, berries.length);
+  o.rotation.set(0, 0, 0); o.scale.setScalar(1);
+  berries.forEach(function (p, i) { o.position.copy(p); o.updateMatrix(); bm.setMatrixAt(i, o.matrix); });
+  /* each join's mistletoe: a small hanging bunch, pale green-white, its berries in a cluster under it */
+  var sm = new THREE.InstancedMesh(new THREE.SphereGeometry(0.018, 6, 4), mist, sprigs.length * 9);
+  sprigs.forEach(function (p, i) {
+    for (var m = 0; m < 9; m++) {
+      o.position.set(p.x + (rnd() - 0.5) * 0.08, p.y - rnd() * 0.12, p.z + (rnd() - 0.5) * 0.04); o.updateMatrix(); sm.setMatrixAt(i * 9 + m, o.matrix);
+    }
+  });
+  G.add(lm); G.add(bm); G.add(sm);
+  G.name = 'christmas-streamers'; G.visible = false; scene.add(G);
+  return G;
+})();
+var visorLight = (function () {
+  var c = makeCanvas(128, 32), g = c.getContext('2d'), grd = g.createLinearGradient(0, 0, 0, 32);
+  grd.addColorStop(0, 'rgba(255,190,90,0)'); grd.addColorStop(0.35, 'rgba(255,205,120,0.9)');
+  grd.addColorStop(0.5, 'rgba(255,222,150,1)'); grd.addColorStop(0.65, 'rgba(255,205,120,0.9)'); grd.addColorStop(1, 'rgba(255,190,90,0)');
+  g.fillStyle = grd; g.fillRect(6, 0, 116, 32);
+  g.globalCompositeOperation = 'destination-in';                                       /* the bar's ends fade too */
+  var gx = g.createLinearGradient(0, 0, 128, 0);
+  gx.addColorStop(0, 'rgba(0,0,0,0)'); gx.addColorStop(0.1, 'rgba(0,0,0,1)'); gx.addColorStop(0.9, 'rgba(0,0,0,1)'); gx.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gx; g.fillRect(0, 0, 128, 32);
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.03), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true, depthWrite: false }));
+  m.position.set((597 - 539) / 1369, (2473 / 2 - 327) / 1369, 0.006); m.visible = false; m.name = 'armour-visor-light';
+  armour.add(m);
+  return m;
+})();
 var CUE = {
   step: 'the armour a short step out from its pier into the corridor, on its second mark; its stop follows it',
   window: 'the armour half in front of the window toward her end, as if looking out, on its third mark; its stop follows it',
@@ -4153,6 +4234,8 @@ function corridorDrawRoom(shown) {
   var pose = 'straight';
   for (var p in POSES) if (has(p)) pose = POSES[p];
   if (pose !== armourPose) { armourPose = pose; console.info('[corridor] the armour stands ' + pose + (back ? ', its back turned' : '') + ' (its pose waits for the sheet)'); }
+  xmasStreamers.visible = has(XMAS_CUE.streamers);
+  visorLight.userData.want = has(XMAS_CUE.armour); visorLight.visible = visorLight.userData.want && !ARMOUR_SIDE.on;
   sticksShown = has(CUE.up) ? 'up' : has(CUE.fallen) || has(CUE.boo) ? 'fallen' : 'gone';
   boo.visible = has(CUE.boo) && !sticksQueue.length;
   drawTrevor(has, back);
