@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 62,
+  "version": 63,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -55,6 +55,186 @@ window.CASTLE_MODEL = {
     { "key": "P7", "name": "the last additions", "years": "1800 to 1900" }
   ],
   "ages_about": "The history's seven ages (docs/architect/hogwarts-history-2026-10-12.md), proposed under Godric's 6.1 (13 October 2026, 7.13 am): each mass and tower lists the ages that built or raised it, the first the oldest (tools/architect-accreted-castle.py's pieces by footprint).",
+  "materials": {
+    "state": "proposed",
+    "about": "The castle's materials schedule (req 636; Godric's Talk of 16 October 2026, 2.49 pm), proposed: one palette every room reads instead of choosing its own. A room's stone is the age that built its walls at its height (tools/architect-materials.py resolves every room from tools/architect-accreted-castle.py's pieces), dressed by the room's rank; its doors' surround follows its wall's age; its ceiling its kind, span and age, a vault only where the storey lets it rise; its floor flags or boards by what is under it. The real quarry stones, vaults and mouldings are Precedents' to find; docs/architect/materials.md is the schedule in words.",
+    "stones": [
+      {
+        "id": "founders-rubble",
+        "ages": [
+          "P1",
+          "P2"
+        ],
+        "colour": [
+          150,
+          146,
+          128
+        ],
+        "say": "the founders' and first walls' stone: dark olive-grey to near black, the darkest and roughest in the castle",
+        "dress": "unsquared rubble with deep joints, dressed only at the corners and round openings"
+      },
+      {
+        "id": "houses-sandstone",
+        "ages": [
+          "P3"
+        ],
+        "colour": [
+          208,
+          188,
+          150
+        ],
+        "say": "the houses' age: sand-coloured",
+        "dress": "squared stone in even courses"
+      },
+      {
+        "id": "high-grey",
+        "ages": [
+          "P4"
+        ],
+        "colour": [
+          176,
+          184,
+          190
+        ],
+        "say": "the high towers' age: cool grey",
+        "dress": "ashlar, fine joints, moulded openings"
+      },
+      {
+        "id": "tudor-pink",
+        "ages": [
+          "P5"
+        ],
+        "colour": [
+          214,
+          176,
+          160
+        ],
+        "say": "Tudor: a warm pinkish stone",
+        "dress": "ashlar, with oak beams, boards and panelling"
+      },
+      {
+        "id": "late-pale",
+        "ages": [
+          "P6",
+          "P7"
+        ],
+        "colour": [
+          232,
+          222,
+          186
+        ],
+        "say": "the turret builders' pale yellow and the restorers' palest",
+        "dress": "crisp ashlar at openings and corners, the walls limewashed inside"
+      }
+    ],
+    "dressing": {
+      "rubble": "below ground, the hidden ways and the stores: the stone left rough, whatever its age",
+      "coursed": "corridors, stairs, classrooms, common rooms and dormitories: squared and coursed",
+      "ashlar": "the halls (the Entrance Hall, the Great Hall, the stair hall, the library): dressed smooth",
+      "panelled": "oak panels to a cornice over the stone: the staff room (PoA 7 L15893, CoS 16 L12351) and the teachers' studies in P5 work and later",
+      "limewash": "P6 and P7 rooms: the stone limewashed, its dressings left bare"
+    },
+    "floors": [
+      {
+        "id": "flags",
+        "say": "stone flags of the wall's own stone (the Entrance Hall's flagged stone floor, PS 7 L2319)",
+        "where": "the ground floor and the cellars, every corridor, hall, stair and hidden way, and any room over a vault"
+      },
+      {
+        "id": "marble",
+        "say": "marble",
+        "where": "the marble staircase (PS 7 L2317) and the prefects' bathroom (GoF 25 L30368) only"
+      },
+      {
+        "id": "boards",
+        "say": "broad oak boards on the beams of the room below",
+        "where": "rooms over a beamed ceiling: classrooms, offices, studies and dormitories above the ground"
+      }
+    ],
+    "surrounds": [
+      {
+        "id": "round",
+        "ages": [
+          "P1",
+          "P2"
+        ],
+        "say": "a round head of plain voussoirs, square-edged jambs, a flat sill stone (the common room's key door as drawn)"
+      },
+      {
+        "id": "pointed",
+        "ages": [
+          "P3"
+        ],
+        "say": "a two-centred pointed head, chamfered jambs with stops; a hood mould over a main door"
+      },
+      {
+        "id": "four-centred",
+        "ages": [
+          "P4",
+          "P5"
+        ],
+        "say": "a four-centred head, hollow-moulded, under a square hood (the common room's fireplace is of this family)"
+      },
+      {
+        "id": "lugged",
+        "ages": [
+          "P6",
+          "P7"
+        ],
+        "say": "a square head in a lugged stone architrave with a keystone"
+      },
+      {
+        "id": "oak",
+        "ages": [],
+        "say": "a moulded oak architrave, where the wall is panelled or a timber partition"
+      },
+      {
+        "id": "none",
+        "ages": [],
+        "say": "a hidden opening's: no surround, its panel, stone or tapestry the wall's own (a trim would say tap me)"
+      }
+    ],
+    "surround_rule": "every door stands in a reveal the depth of its wall, its leaf set back from the face it is seen from, its surround on that face: never a leaf laid flat on a plain wall",
+    "ceilings": [
+      {
+        "id": "barrel",
+        "say": "a round or pointed barrel vault in rubble (cellars, dungeons, passages, hidden ways; Slytherin's rough stone ceiling, CoS 12 L10915)"
+      },
+      {
+        "id": "groin",
+        "say": "groin vaults on squat round piers, bay by bay (the wide undercrofts: the kitchens, high-ceilinged, GoF 21 L28838)"
+      },
+      {
+        "id": "rib",
+        "say": "rib vaults bay by bay with carved bosses (P3 and P4 halls, corridors and rooms where the storey lets a vault rise; the Entrance Hall's ceiling too high to make out, PS 7 L2317)"
+      },
+      {
+        "id": "umbrella",
+        "say": "a round room's ribs radiating from the wall to one boss, or to a central pillar where it is wide"
+      },
+      {
+        "id": "beams",
+        "say": "oak beams across on carved stone corbels, boards over (the floored-over ranges, P4 and P5 rooms too wide for a vault)"
+      },
+      {
+        "id": "open-roof",
+        "say": "the roof's own timbers open to the ridge or the cone (the top storeys; the Divination classroom like an attic, PoA 6 L15276)"
+      },
+      {
+        "id": "plaster",
+        "say": "a flat plaster ceiling with a cornice (P6 and P7 rooms)"
+      },
+      {
+        "id": "dome",
+        "say": "a dome painted with stars (Ravenclaw's common room, DH 29 L76208)"
+      },
+      {
+        "id": "sky",
+        "say": "the Great Hall's, bewitched to look like the sky outside (PS 7 L2365)"
+      }
+    ],
+    "vault_rule": "a vault only where the room's height reaches its springing (2.4 over the floor) and half its span again; wider rooms take beams"
+  },
   "masses": [
     { "id": "north range", "rect": [0, 50, 160, 72], "floors": "G-7", "state": "designed", "ages": ["P2", "P3", "P4", "P5"] },
     { "id": "south range, west", "rect": [0, 0, 68, 18], "floors": "G-7", "state": "designed", "ages": ["P3", "P5"], "roof": 41.6, "parapet": 42.6, "about": "rises to the seventh floor for the Gryffindor corridor; a lead flat behind battlements, low enough that the dormitory's east windows (sills at 44.9) see over it" },
