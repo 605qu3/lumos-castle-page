@@ -36,6 +36,9 @@
    v19 (model v46): a rail round a hatch or a stair's opening is drawn; a way off the next place's far side leads on.
    v23 (model v53): a room's `heads` raise its ceiling in strips across it; an arch's `soffit` gives its head at each
    face, raked through the wall where they differ; a way's `sills` its sill at a face whose floor lies lower.
+   v24 (model v54): an open side over another place's air (an opening's `over`) builds that place too; a rail is drawn
+   wherever its room is built or in the place whose air it stands in; openings that overlap along one wall are cut
+   together, the wall drawn round both; a wall two places share in plan is left to the other only at one height.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -454,7 +457,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (L < 1e-6) return;
       /* a wall already built from the other side (the place one step on shares it) is not built twice */
       var midE = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-      if (Q !== P && out.places.some(function (R) { var e = R !== Q && onEdge(R.poly, midE); return e && e.d < 0.05; })) return;
+      /* v24: only where the two stand at one height (the Charms corridor over the first floor's, the same plan two
+         storeys up, kept its walls) */
+      if (Q !== P && out.places.some(function (R) { var e = R !== Q && onEdge(R.poly, midE);
+        return e && e.d < 0.05 && R.floor < (Q.ceiling == null ? Infinity : Q.ceiling) - 0.05 && (R.ceiling == null ? Infinity : R.ceiling) > Q.floor + 0.05; })) return;
       var ux = dx / L, uy = dy / L, nx = uy, ny = -ux;                 /* outward, the polygon counter-clockwise */
       var t = ed.T || (Q.walls ? (Q.walls[['south', 'east', 'north', 'west'][i]] || Q.wall) : Q.wall);
       var ext = Q.area ? 0 : t;                                          /* a round wall's sides meet at their faces */
@@ -484,10 +490,29 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           lift: lift, level: Q.floor + lift, hidden: true });
       });
       var gs = gaps[i].filter(function (g) { return !g.hidden; }).sort(function (g, h) { return g.s0 - h.s0; }), at = 0;
+      /* v24 (model v54): openings that overlap along the wall (the dungeon stair's arch under the first floor's mouth
+         over the landing, the Entrance Hall's south wall) are cut together: the wall drawn in columns between their
+         ends, each column solid where no opening crosses it */
+      var reach = -1, col = gs.some(function (g) { var o = g.s0 < reach - 0.02; reach = Math.max(reach, g.s1); return o; });
+      if (col) {
+        var bp = [0, L];
+        gs.forEach(function (g) { bp.push(Math.max(0, Math.min(L, g.s0)), Math.max(0, Math.min(L, g.s1))); });
+        bp.sort(function (p, q) { return p - q; });
+        for (var c = 0; c + 1 < bp.length; c++) {
+          var c0 = bp[c], c1 = bp[c + 1], cm = (c0 + c1) / 2, y = 0;
+          if (c1 - c0 < 0.02) continue;
+          gs.filter(function (g) { return g.s0 < cm && g.s1 > cm; }).sort(function (g, h) { return g.sill - h.sill; }).forEach(function (g, k) {
+            piece(c0, c1, y, g.sill, Q.id + '-wall-' + i + '-c' + c + '-' + k); y = Math.max(y, g.h);
+          });
+          piece(c0, c1, y, HE, Q.id + '-wall-' + i + '-c' + c + '-top');
+        }
+      }
       gs.forEach(function (g, j) {
-        piece(at, g.s0, 0, HE, Q.id + '-wall-' + i + '-' + j);
-        piece(g.s0, g.s1, g.h, HE, Q.id + '-head-' + g.op.id);
-        piece(g.s0, g.s1, 0, g.sill, Q.id + '-sill-' + g.op.id);
+        if (!col) {
+          piece(at, g.s0, 0, HE, Q.id + '-wall-' + i + '-' + j);
+          piece(g.s0, g.s1, g.h, HE, Q.id + '-head-' + g.op.id);
+          piece(g.s0, g.s1, 0, g.sill, Q.id + '-sill-' + g.op.id);
+        }
         at = g.s1;
         if (g.spill) return;                                            /* v15: the rest of an opening cut over a corner */
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
@@ -553,7 +578,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             sill: g.sill, lift: lift, level: level, back: g.back, via: !!via, depth: g.op.depth || 0 });
         }
       });
-      piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
+      if (!col) piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
       /* v23: under a raised head the wall goes up to it, over an opening from its own head */
       HD.forEach(function (k, ki) {
         if (k.h <= HE + 0.01) return;
@@ -675,6 +700,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
     group.add(rec);
   });
+  /* v24 (model v54): an open side of this place over another's air (an opening with `over`: the first-floor corridor's
+     landing over the Entrance Hall) builds that place in the same frame, as a mouth does; nothing to walk through */
+  (M.openings || []).forEach(function (op) {
+    if (!op.over || !matches(M, op, P.id)) return;
+    var to = slug(op.over), Q = findPlace(M, to);
+    if (!Q || (Q.rec && Q.rec.page) || out.places.some(function (q) { return q.id === to; })) return;
+    out.places.push(Q); buildPlace(Q);
+  });
   /* v19 (the Found list): a way off the far side of the next place, added as that place was built (lake-passage-b-north
      seen from the lake-face corridor), leads on to the place there, a tap away past the dark, as a way up a stair in a
      wall does (v13); to a built room, its page */
@@ -710,9 +743,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   });
   /* v19 (the Found list): a rail round a hatch or a stair's opening in the boards (a feature with `rect`, `z`, `h` and
      `sides`, a side's span by its own name where it stops short: the feast loft's, ledger line 89 a; the drying
-     loft's, line 82): a top rail and posts about a metre apart, stair grey; nothing to tap */
+     loft's, line 82): a top rail and posts about a metre apart, stair grey; nothing to tap. v24: drawn wherever its room
+     is built, or in this place where it stands in its air (the first-floor landing's over the Entrance Hall) */
   (M.features || []).forEach(function (ft) {
-    if (!ft.rect || !ft.sides || !ft.h || ft.z == null || slug(ft.room || '') !== P.id) return;
+    if (!ft.rect || !ft.sides || !ft.h || ft.z == null) return;
+    var px = P.poly.map(function (p) { return p[0]; }), py = P.poly.map(function (p) { return p[1]; });
+    var inAir = ft.z > P.floor + 0.05 && (P.ceiling == null || ft.z < P.ceiling) && inPoly(P.poly, (ft.rect[0] + ft.rect[2]) / 2, (ft.rect[1] + ft.rect[3]) / 2) &&
+      ft.rect[0] >= Math.min.apply(null, px) - 0.01 && ft.rect[2] <= Math.max.apply(null, px) + 0.01 &&
+      ft.rect[1] >= Math.min.apply(null, py) - 0.01 && ft.rect[3] <= Math.max.apply(null, py) + 0.01;
+    if (!inAir && !out.places.some(function (q) { return q.id === slug(ft.room || ''); })) return;
     var R = ft.rect, T = 0.06;
     ft.sides.forEach(function (sd) {
       var ns = sd === 'north' || sd === 'south', sp = ft[sd] || (ns ? [R[0], R[2]] : [R[1], R[3]]);
