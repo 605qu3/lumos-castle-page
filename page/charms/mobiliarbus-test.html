@@ -27,6 +27,10 @@
 <script src="spells.js?v=34"></script>
 <script>
 /* Mobiliarbus, a test page for the Charms lane (12 October 2026, ninth session; the owner is Godric). Drawn in code.
+   Rework 11 of the Ministry's list (16 October 2026): the common room's own Christmas tree, not the Three Broomsticks;
+   no Minister, no teachers coming in, no four pairs of feet. The last round is hide-and-seek: his brother counting by
+   the portrait hole, the tree slid in front of his table to hide him, and the whisper praised, "Quietly done." (the
+   touch review's ADJUST of charms-q6-mobiliarbus-1013 t2). The book below is the stroke's source only.
    The book (PoA 10, checked in the text): in the Three Broomsticks, with the teachers and the Minister coming in out of
    the snow, Hermione whispers "Mobiliarbus!" and the Christmas tree beside their table "rose a few inches off the
    ground, drifted sideways and landed with a soft thump right in front of their table, hiding them from view". The
@@ -40,7 +44,7 @@
    Both ways (Q6, 6.3, Godric, 13 October 2026, 7.11 am): one slanted line, or an L along the squares, across then
    up or down, whose two legs join into one arrow; his legs are drawn in his order. The lift and the thump frame the
    arrow (his t1): it grows from the tree as it rises a few inches and is whole at the soft thump. Hermione whispered
-   it (his t2), so the hiding round asks for a whisper and praises one: "Quietly done. Fudge never noticed."
+   it (his t2), so the hiding round asks for a whisper and praises one: "Quietly done."
    Two moves add up (8.1, thirty-first session, 13 October 2026): a round before the hiding tells two moves, each its
    own slide; landed, his arrows stay end to end, numbered, and the one arrow from where the round began is their sum
    (LumosSpells.addMoves: the rights and lefts added with their signs, the ups and downs the same); the other order,
@@ -113,10 +117,10 @@
       say('Two moves this time: first ' + told(R.two[0]) + ', then ' + told(R.two[1]) + '. Each its own slide. Watch what they add up to. <i>Mobiliarbus!</i>');
     } else if (R.hide) {
       target = [Lo.table[0], Lo.table[1] - 1]; doorOpen = performance.now();
-      say('The door swings open: in come Professor McGonagall, Professor Flitwick, Hagrid and the Minister for Magic! Quick, and quietly: <b>slide the tree right in front of your table</b>, between it and the door. Whisper it: <i>Mobiliarbus!</i>');
+      say('Hide-and-seek: your brother is counting by the portrait hole. Quick, and quietly: <b>slide the tree right in front of your table</b>, between it and the door. Whisper it: <i>Mobiliarbus!</i>');
     } else {
       target = [pos[0] + R.move[0], pos[1] + R.move[1]];
-      say((round ? 'Now slide it ' : 'The Christmas tree in the Three Broomsticks. Touch it and draw one straight line to where it should go. Slide it ') + told(R.move) + '.' +
+      say((round ? 'Now slide it ' : 'The common room\'s Christmas tree. Touch it and draw one straight line to where it should go. Slide it ') + told(R.move) + '.' +
         (R.move[0] && R.move[1] ? ' One slanted line, or two legs along the squares: across, then up or down.' : '') + ' <i>Mobiliarbus!</i>');
     }
   }
@@ -160,7 +164,7 @@
       if (R.hide) {
         done = true; kept = []; ghost = null; var tot = [pos[0] - startPos[0], pos[1] - startPos[1]];
         arrow = { from: startPos, to: pos.slice(), at: performance.now(), total: true };
-        say('Hidden! Quietly done. Fudge never noticed. The tree landed with a soft thump right in front of your table; through its branches, four pairs of feet go by. ' +
+        say('Hidden! Quietly done. The tree landed with a soft thump right in front of your table; through its branches you watch him look the other way. ' +
           'All its moves together: from where it began, <b>' + words(tot[0], tot[1]) + '</b>.');
         return;
       }
