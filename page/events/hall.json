@@ -1,6 +1,13 @@
 {
   "chain": "hall",
   "first_visit": [],
+  "marks": {
+    "ball": [
+      "wall",
+      "stair",
+      "doorway"
+    ]
+  },
   "room": [
     {
       "when": [
@@ -30,6 +37,62 @@
       "show": [
         "the broom cupboard standing open on buckets and mops, one bucket upturned, and a thin line of fine gold grains in a crack between two flagstones"
       ]
+    },
+    {
+      "when": [
+        "place = entrance hall"
+      ],
+      "show": [
+        "the four house hourglasses in their niches along the west wall, each house's stones heaped to the school's own points for the day (the page reads schoolLevels()), the top bulbs clear"
+      ],
+      "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), the hourglasses at rest: PS 15 B1 L5089, \"the giant hourglasses that recorded the house points\"; the school's own points by the castle's year and day, `schoolLevels()` in page/castle-events.js (Design's req 606, its levels half), close, the lead changing week to week, nothing naming it; the boys' own gems heap on Gryffindor's (Design's `LumosHourglass.hall`); Interiors' niches, docs/interiors/entrance-hall.md; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "hall_ball = wall"
+      ],
+      "show": [
+        "Peeves's tennis ball lying on the flags at the foot of the east wall, under the grey ball marks"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "hall_ball = stair"
+      ],
+      "show": [
+        "Peeves's tennis ball lying on the flags under the marble staircase's bottom step"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "hall_ball = doorway"
+      ],
+      "show": [
+        "Peeves's tennis ball lying on the flags in the Great Hall's doorway"
+      ],
+      "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), Peeves's ball: PS 14 L4992, Peeves \"playing tennis against the wall\" of the entrance hall; the marks stay (Interiors' item 6) and the ball lies somewhere new each visit (`set hall_ball = mark ball, not last` on arriving); he is never seen at it; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "occasion = christmas"
+      ],
+      "show": [
+        "thick streamers of holly and mistletoe strung along the hall's walls between the torches, clear of the flames"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "thick streamers of holly and mistletoe strung along the hall's walls between the torches, clear of the flames"
+      ],
+      "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), Christmas: PoA 11 L17727, \"Thick streamers of holly and mistletoe were strung along the corridors\", the castle's usual decorations, every year, as the corridor's (armour.json, req 599); clear of the flames; checked against the text, 16 October 2026"
     }
   ],
   "records": [
@@ -158,6 +221,251 @@
       ],
       "starts": [
         "set hall_cupboard = shut"
+      ]
+    },
+    {
+      "id": "hall.glass-shower-lion",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "show": [
+        "a shower of rubies falls into the bottom bulb of Gryffindor's hourglass with a small clink: points given somewhere in the castle"
+      ],
+      "starts": [
+        "set hall_glass = moved"
+      ],
+      "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), a shower or a lift: OotP 38 L53906, \"a shower of rubies fell down into the bottom bulb of Gryffindor's hour-glass\", L53908, \"A few rubies retreated into the upper bulb\": points given or taken somewhere in the castle by no one he sees, in teaching hours, at most once a visit, about one visit in three, never the boys' own stones (Design's house-hourglass.js: nothing a boy earned is lost), so no lift from Gryffindor's; Hufflepuff's stones unnamed in the books, the films' yellow; the next day's level is the school's own (schoolLevels()); checked against the text, 16 October 2026"
+    },
+    {
+      "id": "hall.glass-shower-badger",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "show": [
+        "a shower of yellow stones falls into the bottom bulb of Hufflepuff's hourglass with a small clink: points given somewhere in the castle"
+      ],
+      "starts": [
+        "set hall_glass = moved"
+      ]
+    },
+    {
+      "id": "hall.glass-shower-eagle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "show": [
+        "a shower of sapphires falls into the bottom bulb of Ravenclaw's hourglass with a small clink: points given somewhere in the castle"
+      ],
+      "starts": [
+        "set hall_glass = moved"
+      ]
+    },
+    {
+      "id": "hall.glass-shower-snake",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "show": [
+        "a shower of emeralds falls into the bottom bulb of Slytherin's hourglass with a small clink: points given somewhere in the castle"
+      ],
+      "starts": [
+        "set hall_glass = moved"
+      ]
+    },
+    {
+      "id": "hall.glass-lift-badger",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "show": [
+        "a few yellow stones fly back up into the top bulb of Hufflepuff's hourglass with a cross little clink: points taken somewhere in the castle"
+      ],
+      "starts": [
+        "set hall_glass = moved"
+      ]
+    },
+    {
+      "id": "hall.glass-lift-eagle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "show": [
+        "a few sapphires fly back up into the top bulb of Ravenclaw's hourglass with a cross little clink: points taken somewhere in the castle"
+      ],
+      "starts": [
+        "set hall_glass = moved"
+      ]
+    },
+    {
+      "id": "hall.glass-lift-snake",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "show": [
+        "a few emeralds fly back up into the top bulb of Slytherin's hourglass with a cross little clink: points taken somewhere in the castle"
+      ],
+      "starts": [
+        "set hall_glass = moved"
+      ]
+    },
+    {
+      "id": "hall.glass-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-glass",
+      "weight": 14,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = entrance hall",
+        "lessons = on",
+        "hall_glass != moved"
+      ],
+      "starts": []
+    },
+    {
+      "id": "hall.torches-bow",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-draught",
+      "weight": 1,
+      "moment": "wait 15-90 s",
+      "when": [
+        "place = entrance hall",
+        "windy = yes"
+      ],
+      "show": [
+        "one of the front doors opens a little way on the wind and swings to again; a cold breath crosses the hall, and the nearest torches' flames bow away from it and stand again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), the torches: PoA 5 L15039, the hall \"lit with flaming torches\"; on a windy day the front doors' breath bows the nearest flames, as the Great Hall's candles take its doors' breath (2.2); one visit in two on a windy day; checked against the text, 16 October 2026"
+    },
+    {
+      "id": "hall.torches-bow-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-draught",
+      "weight": 1,
+      "moment": "wait 15-90 s",
+      "when": [
+        "place = entrance hall",
+        "windy = yes"
+      ],
+      "starts": []
+    },
+    {
+      "id": "hall.ghost-crosses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-ghost",
+      "weight": 1,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = entrance hall"
+      ],
+      "show": [
+        "a pearly-white, slightly transparent ghost glides in through one wall, across the hall and out through the other, in its own pale light"
+      ],
+      "starts": [],
+      "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), a ghost crossing: PS 7 L2343, \"Pearly-white and slightly transparent, they glided across the room\", PS 8 L2724, ghosts gliding \"suddenly through a door\"; now and then, about one visit in four, any time; which ghost unnamed (the figures People's), no figure drawn, never a plot night; checked against the text, 16 October 2026"
+    },
+    {
+      "id": "hall.ghost-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-ghost",
+      "weight": 3,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = entrance hall"
+      ],
+      "starts": []
+    },
+    {
+      "id": "hall.ball-moves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = entrance hall"
+      ],
+      "starts": [
+        "set hall_ball = mark ball, not last"
+      ],
+      "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), Peeves's ball somewhere new each visit (the room rules on `hall_ball`); the marks' places Interiors' (item 6's wall foot the first, the other two asked)"
+    },
+    {
+      "id": "hall.glass-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "hall_glass = moved"
+      ],
+      "starts": [
+        "set hall_glass = still"
       ]
     }
   ]

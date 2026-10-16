@@ -1,6 +1,18 @@
 {
   "chain": "stairhall",
   "first_visit": [],
+  "marks": {
+    "suits": [
+      "home",
+      "left",
+      "right"
+    ],
+    "tapestry": [
+      "first",
+      "second",
+      "third"
+    ]
+  },
   "room": [
     {
       "when": [
@@ -289,6 +301,124 @@
         "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
       ],
       "canon": "as above"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "weekday = friday"
+      ],
+      "show": [
+        "the Friday staircase standing one floor off its weekday landing, a way round along the gallery open"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the Friday flight: PS 8 L2722, staircases \"that led somewhere different on a Friday\"; the model's Friday staircase (page/castle-model.js, staircases, \"the Friday staircase\", PS 8); a way round always open (1.1); the corridor's own Friday stair is stair.friday; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "time != night"
+      ],
+      "show": [
+        "the portraits' sitters awake in their frames, whispering and pointing as he passes, some visiting in each other's frames"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the portraits: PS 7 L2651, \"the people in the portraits along the corridors whispered and pointed as they passed\", PS 8 L2722, \"The people in the portraits kept going to visit each other\"; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "time = night"
+      ],
+      "show": [
+        "most of the portraits' sitters asleep in their frames, a soft snore here and there"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the portraits by night (1.3): most asleep, as Interiors' occupancy has it (docs/interiors/stair-hall.md, the sitters dozing)"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "stair_frame = empty",
+        "time != night"
+      ],
+      "show": [
+        "one frame in a cluster showing only its painted background, its sitter standing in the frame two along beside that one's own"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), Interiors' item 8 (docs/interiors/stair-hall.md): now and then an empty frame, its sitter two frames along, PS 8 L2722; about one visit in three, by day; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "stair_armour = home"
+      ],
+      "show": [
+        "the suits of armour on the galleries each standing on its own place against the wall"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "stair_armour = left"
+      ],
+      "show": [
+        "the suits of armour on the galleries each standing a step to its own left of its place, as if it had shifted since he last came"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "stair_armour = right"
+      ],
+      "show": [
+        "the suits of armour on the galleries each standing a step to its own right of its place, as if it had shifted since he last came"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the armour (1.5): PS 8 L2722, \"Harry was sure the coats of armor could walk\"; each suit a step from where it stood last visit (`set stair_armour = mark suits, not last` on arriving), its left and right its own as it faces across the well, none ever walking in his sight; Interiors' item 2 places them; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "stair_tapestry = first"
+      ],
+      "show": [
+        "the tapestry on the fifth floor's east gallery, its woven figures as they stood in its first scene"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "stair_tapestry = second"
+      ],
+      "show": [
+        "the tapestry on the fifth floor's east gallery, its woven figures moved into a second scene since he last looked"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "stair_tapestry = third"
+      ],
+      "show": [
+        "the tapestry on the fifth floor's east gallery, its woven figures moved into a third scene since he last looked"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the tapestry (1.4): its woven figures changed between his looks, never seen moving; a new scene each visit (`set stair_tapestry = mark tapestry, not last`); the scenes Magic's, Interiors' item 3 places it"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "occasion = christmas"
+      ],
+      "show": [
+        "thick streamers of holly and mistletoe strung along the galleries",
+        "a soft light shining from inside every suit of armour, out through the slits of its visor"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "thick streamers of holly and mistletoe strung along the galleries",
+        "a soft light shining from inside every suit of armour, out through the slits of its visor"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), Christmas: PoA 11 L17727, \"Thick streamers of holly and mistletoe were strung along the corridors, mysterious lights shone from inside every suit of armour\", every year, the light through the visors only, never on anything else, as the corridor's (armour.json, req 599); checked against the text, 16 October 2026"
     }
   ],
   "records": [
@@ -377,6 +507,188 @@
         "halfway up the staircase to the third floor a brass stair rod or two lie loose, the runner rucked over their treads"
       ],
       "canon": "Interiors' Rework 14 (docs/interiors/stair-hall.md, the carpet: a rod or two come loose now and then, any day, Peeves's doing, set right and loosened again), Events' Q2, Godric's answer, 15 October 2026, 3.44 pm (events-stair-rod-1015, 1, the habit only): PS 16 L5718, \"Peeves was bobbing halfway up, loosening the carpet so that people would trip\", read as his everyday mischief; any day and any castle, a small record on arrival, so never two visits running; no Peeves seen; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "stairhall.flights-grind",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-grind",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "a grinding of stone from far above as a flight somewhere swings to another landing"
+      ],
+      "starts": [],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the flights far off (1.1, ours): now and then a grinding of stone from above or below, a flight swinging elsewhere, seldom seen; the flight he stands on never moves under him; about one visit in two"
+    },
+    {
+      "id": "stairhall.flights-grind-below",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-grind",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "a grinding of stone from far below as a flight somewhere swings to another landing"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stairhall.flights-grind-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-grind",
+      "weight": 2,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stairhall.visor-creak",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-creak",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "a visor creaks on a suit of armour as he passes it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the armour (1.5): a visor creaking as he passes, none walking in his sight; one visit in three"
+    },
+    {
+      "id": "stairhall.visor-creak-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-creak",
+      "weight": 2,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stairhall.armour-rattle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-peeves",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "a rattle of armour from another floor, as if something unseen had gone zooming past it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), Peeves (1.7): PS 7 L2669, \"They heard him zooming away, rattling coats of armor as he passed\"; heard from another floor, never seen; one visit in four; checked against the text, 16 October 2026"
+    },
+    {
+      "id": "stairhall.armour-rattle-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-peeves",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stairhall.ghost-crosses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-ghost",
+      "weight": 1,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "a pearly-white, slightly transparent ghost drifts across the well from one gallery to the other, in its own pale light, and is gone through the far wall"
+      ],
+      "starts": [],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), a ghost (1.6): PS 7 L2343, \"Pearly-white and slightly transparent\"; now and then across the well or up through a flight, about one visit in four; which ghost unnamed, no figure drawn; checked against the text, 16 October 2026"
+    },
+    {
+      "id": "stairhall.ghost-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-ghost",
+      "weight": 3,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = stair hall"
+      ],
+      "starts": []
+    },
+    {
+      "id": "stairhall.frame-empty",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-frame",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = stair hall"
+      ],
+      "starts": [
+        "set stair_frame = empty"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), Interiors' item 8: the empty frame, about one visit in three"
+    },
+    {
+      "id": "stairhall.frame-full",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "stair-frame",
+      "weight": 2,
+      "moment": "arrive",
+      "when": [
+        "place = stair hall"
+      ],
+      "starts": [
+        "set stair_frame = full"
+      ]
+    },
+    {
+      "id": "stairhall.armour-shifts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = stair hall"
+      ],
+      "starts": [
+        "set stair_armour = mark suits, not last",
+        "set stair_tapestry = mark tapestry, not last"
+      ],
+      "canon": "Magic's req 634 (docs/handoff/magic.md, The stair hall), the armour and the tapestry, each new each visit (the room rules on `stair_armour` and `stair_tapestry`)"
     }
   ]
 }

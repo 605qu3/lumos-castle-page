@@ -172,6 +172,8 @@
    Then the heights (Hidden Ways' req 528, 15 October 2026): `heights`, a grown-up's per-boy limit (settings.heights),
    `eased` till one is set, `open` once it is; ?heights=open or eased for a test. A high place's rule reads it, so
    the lantern's shutters stay shut, the drop heard and not looked down, until a grown-up opens them.
+   Then the Entrance Hall's glasses (Magic's req 632, Design's req 606, 16 October 2026): `schoolLevels()`, the school's
+   own points in each house's glass by the castle's year and day, close, the lead changing week to week, never kept.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -528,6 +530,45 @@
       return isoDay(d);
     }
     function schoolYear(day) { var y = +day.slice(0, 4); return day <= feastDay(y) ? y : y + 1; }
+    /* The school's own points in the Entrance Hall's four glasses (Magic's req 632, *The Entrance Hall*, the hourglasses
+       at rest; Design's req 606, its levels half), worked from the castle's year and day alone and kept nowhere, so both
+       boys' castles of one year show the same glasses. Each glass is empty on 1 September and fills toward the leaving
+       feast, low in September and fuller by June, about 400 at the feast against a full bulb's 600 (the Stone's year's
+       feast stood at 312 to 472, PS 17 L6481): the school's points grow with its days in term, slowly over Christmas and
+       Easter with the school mostly away, and each house stands a little above or below that, by up to about an eighth,
+       drawn fresh each week and eased from one week's to the next, so the four stay close, which one leads changes from
+       week to week, nothing in the hall naming it, and a glass now and then gives a little back. The summer holds the
+       feast week's. In the castles of the first three books Gryffindor's ends the year ahead, as the winner's hangings
+       at the feast say (great-hall.json); later years end as their weeks fall, held with the hangings (Godric's 2). In
+       points, as a slip's, for `LumosHourglass.hall({ levels, full })`; the boys' own slips heap on Gryffindor's. */
+    var LEVEL_FULL = 600, LEVEL_FEAST = 400, LEVEL_HOUSES = ['lion', 'badger', 'eagle', 'snake'], levelYears = {};
+    function levelRun(y, fy) {
+      var key = y + ':' + fy + ':' + feastDay(fy);
+      if (levelYears[key]) return levelYears[key];
+      var start = new Date(fy - 1, 8, 1, 12), f = feastDay(fy), end = new Date(+f.slice(0, 4), +f.slice(5, 7) - 1, +f.slice(8, 10), 12);
+      var days = Math.max(1, dayNumber(end) - dayNumber(start)), seed = (fy - 2000) * 8 + y, grown = [0], out = [], i;
+      for (i = 1; i <= days; i++) {                      /* the school's days in term so far, a holiday's a sixth */
+        var md = monthDay(new Date(fy - 1, 8, 1 + i, 12));
+        grown.push(grown[i - 1] + (md >= CHRISTMAS.from || md <= CHRISTMAS.to || easterNear(new Date(fy - 1, 8, 1 + i, 12)) ? 1 / 6 : 1));
+      }
+      function lean(week, k) {                           /* a house's lean that week, -0.12 to 0.12; Gryffindor's last fortnight ahead */
+        var w = (wxRand(seed * 400 + week, 40 + k) - 0.5) * 0.24;
+        if (y >= 1 && y <= 3 && week * 7 >= days - 14) w = k === 0 ? 0.1 : Math.min(w, 0.05);
+        return w;
+      }
+      for (i = 0; i <= days; i++) {
+        var wk = Math.floor(i / 7), f7 = (i % 7) / 7, base = LEVEL_FEAST * grown[i] / grown[days], o = {};
+        LEVEL_HOUSES.forEach(function (h, k) { o[h] = Math.max(0, base * (1 + lean(wk, k) * (1 - f7) + lean(wk + 1, k) * f7)); });
+        out.push(o);
+      }
+      return (levelYears[key] = out);
+    }
+    function schoolLevels() {
+      var d = castleDay(), fy = schoolYear(isoDay(d)), run = levelRun(castleYear(), fy);
+      var i = Math.max(0, Math.min(run.length - 1, dayNumber(d) - dayNumber(new Date(fy - 1, 8, 1, 12)))), at = run[i], levels = {};
+      LEVEL_HOUSES.forEach(function (h) { levels[h] = Math.round(at[h]); });
+      return { levels: levels, full: LEVEL_FULL };
+    }
     /* The dormitory's year (req 263) on the one clock (Rework 35): the castle's year, the Stone's before any book. */
     function yearIn() {
       var t = +params.get('yearin');
@@ -2489,6 +2530,10 @@
       /* The dormitory door's year, 1 to 7, the castle's year on the one clock (req 263; Rework 35). */
       yearIn: yearIn,
       feast: function (y) { return feastDay(+y || schoolYear(isoDay(nowDate()))); },
+      /* The school's own points in the Entrance Hall's four glasses today (req 632, Design's req 606): { levels: { lion,
+         badger, eagle, snake }, full }, from the castle's year and day alone, `?date=` and `?year=` honoured, the same in
+         both boys' castles of one year, for `LumosHourglass.hall({ levels, full })`. */
+      schoolLevels: schoolLevels,
       visit: function () { return visit; },
       heard: heard,                                   /* guesses a page heard itself, as strings or { text } */
       listening: function () { return value('listening'); },
