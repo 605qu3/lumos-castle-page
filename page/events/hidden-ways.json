@@ -1286,7 +1286,8 @@
         "weather = clear"
       ],
       "show": [
-        "on the round white table, the grounds in colour and moving: the lake glittering, the forest's dark edge, the greenhouses' glass flashing"
+        "on the round white table, the grounds in colour and moving: the lake glittering, the forest's dark edge, the greenhouses' glass flashing",
+        "at the picture's edge, where the lens looks east along the castle's own lake face, a round window jutting from the wall where no room seems to be"
       ]
     },
     {
@@ -1761,7 +1762,7 @@
         "time = night"
       ],
       "show": [
-        "the racks dark rows, the smell of apples stronger for the dark"
+        "the dark close round the racks, the smell of apples stronger for it"
       ]
     },
     {
@@ -1957,7 +1958,8 @@
     {
       "when": [
         "place = oriel bay",
-        "weather = fog"
+        "weather = fog",
+        "time != night"
       ],
       "show": [
         "nothing beyond the panes but white"
@@ -1978,7 +1980,8 @@
       "when": [
         "place = oriel bay",
         "time = night",
-        "moon up = no"
+        "moon up = no",
+        "weather != fog"
       ],
       "show": [
         "the panes black, the lamp's glow in each of them"
@@ -2105,6 +2108,449 @@
       ],
       "show": [
         "the round window a disc of dark sky, the crates only shapes"
+      ]
+    },
+    {
+      "when": [
+        "place = chandlery"
+      ],
+      "show": [
+        "a smell of beeswax and honey, half-dipped candles still hanging from their rods"
+      ]
+    },
+    {
+      "when": [
+        "place = chandlery",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "light from the two loops on the wax-scarred table, the tin moulds glinting in rows"
+      ]
+    },
+    {
+      "when": [
+        "place = chandlery",
+        "cold = yes"
+      ],
+      "show": [
+        "the old wax hard and pale in the cold"
+      ]
+    },
+    {
+      "when": [
+        "place = chandlery",
+        "time != night",
+        "season = summer"
+      ],
+      "show": [
+        "the room warm, the honey smell thick in it"
+      ]
+    },
+    {
+      "when": [
+        "place = chandlery",
+        "time = night"
+      ],
+      "show": [
+        "the candles on the rods pale shapes in the dark"
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "windy = yes"
+      ],
+      "show": [
+        "the dial's hand swinging and ticking round as the wind backs and veers"
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "windy = no",
+        "weather != fog"
+      ],
+      "show": [
+        "the dial's hand still, now and then trembling, pointing where the wind last blew"
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "weather = fog"
+      ],
+      "show": [
+        "the dial's hand dead still"
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "weather = clear",
+        "match = no"
+      ],
+      "show": [
+        "the weather book open at today's date in a year long gone, in a neat brown hand: \"Fair. Wind light. A good day for the lake.\""
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "weather = cloudy",
+        "match = no"
+      ],
+      "show": [
+        "the weather book open at today's date in a year long gone, in a neat brown hand: \"Overcast. Nothing to report, so reported nothing.\""
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "weather = rain",
+        "match = no"
+      ],
+      "show": [
+        "the weather book open at today's date in a year long gone, in a neat brown hand: \"Rain all day. Gauge full by noon. Nobody went out who had any sense.\""
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "weather = snow",
+        "match = no"
+      ],
+      "show": [
+        "the weather book open at today's date in a year long gone, in a neat brown hand: \"Snow. The lake path lost. Snowballs observed from the window.\""
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "weather = fog",
+        "match = no"
+      ],
+      "show": [
+        "the weather book open at today's date in a year long gone, in a neat brown hand: \"Fog. Could not see the lake. Assume it is still there.\""
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "match = yes"
+      ],
+      "show": [
+        "the weather book open at today's date in a year long gone, in a neat brown hand: \"Gusting over the pitch. Hold on to your brooms.\""
+      ]
+    },
+    {
+      "when": [
+        "place = wind dial room",
+        "time = night"
+      ],
+      "show": [
+        "the dial a pale round in the dark"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan"
+      ],
+      "show": [
+        "a round stone seat with a nine men's morris board cut into it, its holes worn smooth by bored watchmen"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "heights = eased",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through the three narrow slits, the lake and the hills beyond it"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "heights = open",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through the three narrow slits, the lake and the hills, and far below the lawns and the greenhouses' glass"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "the lake bright in every slit"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "weather = rain"
+      ],
+      "show": [
+        "rain driving past the slits, the lake grey"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "weather = snow"
+      ],
+      "show": [
+        "snow blowing in at the slits, the hills white"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "weather = fog",
+        "time != night"
+      ],
+      "show": [
+        "nothing in the slits but white"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind whistling in the slits"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "time = night",
+        "moon up = yes",
+        "weather != fog"
+      ],
+      "show": [
+        "the moon on the lake through the south slit"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "time = night",
+        "moon up = no",
+        "weather != fog"
+      ],
+      "show": [
+        "the slits dark, the wind in them"
+      ]
+    },
+    {
+      "when": [
+        "place = model room"
+      ],
+      "show": [
+        "the plaster castle on its round table, every tower and roof painted, the glass lake round it, and very quiet",
+        "no porch over the model's front doors, and no tower in its lake"
+      ]
+    },
+    {
+      "when": [
+        "place = model room",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "light from a loop across the model, the little towers throwing little shadows"
+      ]
+    },
+    {
+      "when": [
+        "place = model room",
+        "time = night"
+      ],
+      "show": [
+        "the model a pale shape in the dark, its glass lake catching the lamp"
+      ]
+    },
+    {
+      "when": [
+        "place = gun casemate"
+      ],
+      "show": [
+        "a cold sea-smell of the lake, and the two old cannon at their barred embrasures"
+      ]
+    },
+    {
+      "when": [
+        "place = gun casemate",
+        "windy = yes"
+      ],
+      "show": [
+        "the lake slapping hard below the embrasures, spray now and then on the bars"
+      ]
+    },
+    {
+      "when": [
+        "place = gun casemate",
+        "windy = no",
+        "weather != fog"
+      ],
+      "show": [
+        "the lake lapping below the embrasures"
+      ]
+    },
+    {
+      "when": [
+        "place = gun casemate",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "the lake bright through the bars"
+      ]
+    },
+    {
+      "when": [
+        "place = gun casemate",
+        "weather = fog"
+      ],
+      "show": [
+        "the lake lost in fog beyond the bars, only heard"
+      ]
+    },
+    {
+      "when": [
+        "place = gun casemate",
+        "cold = yes"
+      ],
+      "show": [
+        "rime on the iron bars"
+      ]
+    },
+    {
+      "when": [
+        "place = gun casemate",
+        "time = night"
+      ],
+      "show": [
+        "the embrasures grey, the lake heard and not seen"
+      ]
+    },
+    {
+      "when": [
+        "place = listeners gallery"
+      ],
+      "show": [
+        "halfway along, a drum on the floor with dried peas on its skin"
+      ]
+    },
+    {
+      "when": [
+        "place = listeners gallery",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "occasion != start of term",
+        "weather != rain"
+      ],
+      "show": [
+        "the peas dancing on the drum's skin as feet go over the terrace overhead"
+      ]
+    },
+    {
+      "when": [
+        "place = listeners gallery",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "weather = rain"
+      ],
+      "show": [
+        "the peas hardly stirring, nobody on the terrace in the rain"
+      ]
+    },
+    {
+      "when": [
+        "place = listeners gallery",
+        "lessons = on",
+        "summer = no"
+      ],
+      "show": [
+        "the peas still, then jittering once as a pair of late feet hurries overhead"
+      ]
+    },
+    {
+      "when": [
+        "place = listeners gallery",
+        "summer = yes"
+      ],
+      "show": [
+        "the peas still, the terrace quiet in the holidays"
+      ]
+    },
+    {
+      "when": [
+        "place = listeners gallery",
+        "time = night"
+      ],
+      "show": [
+        "the peas still on the drum's skin"
+      ]
+    },
+    {
+      "when": [
+        "place = bastion flanker"
+      ],
+      "show": [
+        "a small vaulted room at the gallery's end, one barred gun port"
+      ]
+    },
+    {
+      "when": [
+        "place = bastion flanker",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through the barred port, the castle's north wall running away east"
+      ]
+    },
+    {
+      "when": [
+        "place = bastion flanker",
+        "weather = fog"
+      ],
+      "show": [
+        "nothing through the port but fog"
+      ]
+    },
+    {
+      "when": [
+        "place = bastion flanker",
+        "ground = snow"
+      ],
+      "show": [
+        "snow lying along the foot of the wall outside the port"
+      ]
+    },
+    {
+      "when": [
+        "place = bastion flanker",
+        "time = night"
+      ],
+      "show": [
+        "the port a grey square in the dark"
       ]
     }
   ],
@@ -2284,6 +2730,74 @@
       "when": [],
       "show": [
         "a strand of tinsel caught in the press's door"
+      ]
+    },
+    {
+      "id": "hidden-ways.chandlery-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chandlery-door",
+      "when": [],
+      "show": [
+        "a drip of old wax on the step outside the door, and a smell of honey"
+      ]
+    },
+    {
+      "id": "hidden-ways.wind-dial-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap wind-dial-door",
+      "when": [
+        "windy = yes"
+      ],
+      "show": [
+        "a tick and a whirr behind the door as something swings round in a gust"
+      ]
+    },
+    {
+      "id": "hidden-ways.watch-bartizan-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap watch-bartizan-door",
+      "when": [],
+      "show": [
+        "a low door in the parapet's corner, its sill worn hollow"
+      ]
+    },
+    {
+      "id": "hidden-ways.model-room-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap model-room-door",
+      "when": [],
+      "show": [
+        "a patch of stone at the corridor's end worn shiny by fingers"
+      ]
+    },
+    {
+      "id": "hidden-ways.casemate-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap casemate-door",
+      "when": [],
+      "show": [
+        "a cold smell of the lake at the crack of the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.gun-room-arch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap gun-room-arch",
+      "when": [],
+      "show": [
+        "a draught from the low arch, cold and earthy"
       ]
     }
   ]
