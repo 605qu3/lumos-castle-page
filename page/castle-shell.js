@@ -112,7 +112,8 @@ function findPlace(M, id) {
   if (lf) {
     var lb = lf.rect;
     return { id: id, name: lf.name || id.replace(/-/g, ' '), kind: 'leads', poly: [[lb[0], lb[1]], [lb[2], lb[1]], [lb[2], lb[3]], [lb[0], lb[3]]],
-      floor: lf.z, ceiling: null, wall: WALL_T, walls: null, rec: lf, sky: { breast: lf.parapet.breast || 1.1, merlons: lf.parapet.merlons || 0 } };
+      floor: lf.z, ceiling: null, wall: WALL_T, walls: null, rec: lf,
+      sky: { breast: lf.parapet.breast || 1.1, merlons: lf.parapet.merlons || 0, sides: lf.parapet } };
   }
   /* v8 (Events' req 526): a place nested in a ground (the commentator's box in the Quidditch pitch's teachers' stand),
      its floor and eaves from its own numbers, its door and its open front over its ledge made its openings */
@@ -342,6 +343,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     });
     E.forEach(function (ed, i) {
       var a = ed.a, b = ed.b, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), HE = ed.H != null ? ed.H : H;
+      /* v11 (model v37, ledger 82 f): a side of the leads with its own parapet (the old keep's line on the north, plain) */
+      var own = Q.sky && Q.sky.sides && Q.sky.sides[['south', 'east', 'north', 'west'][i]], MER = Q.sky ? Q.sky.merlons : 0;
+      if (own && typeof own === 'object') { if (own.breast != null) HE = own.breast; if (own.merlons != null) MER = own.merlons; }
       if (L < 1e-6) return;
       /* a wall already built from the other side (the place one step on shares it) is not built twice */
       var midE = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
@@ -427,13 +431,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       });
       piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
       /* v10: the leads' merlons on the breast, 1.5 long every 3.0, clear of its doors; each crenel between barred */
-      if (Q.sky && Q.sky.merlons > HE) {
+      if (Q.sky && MER > HE) {
         var clear = function (s0, s1) { return !gs.some(function (g) { return s1 > g.s0 - 0.6 && s0 < g.s1 + 0.6; }); };
         for (var m0 = 0.3; m0 < L - 0.3; m0 += 3.0) {
           var m1 = Math.min(L, m0 + 1.5);
-          if (clear(m0, m1)) piece(m0, m1, HE, Q.sky.merlons, Q.id + '-merlon-' + i + '-' + Math.round(m0 * 10));
+          if (clear(m0, m1)) piece(m0, m1, HE, MER, Q.id + '-merlon-' + i + '-' + Math.round(m0 * 10));
           for (var cb = m1 + 0.3; cb < Math.min(L, m0 + 3.0) - 0.1; cb += 0.3)
-            if (clear(cb, cb)) bar(cb, HE, Q.sky.merlons, t / 2, Q.id + '-bar-' + i + '-' + Math.round(cb * 10));
+            if (clear(cb, cb)) bar(cb, HE, MER, t / 2, Q.id + '-bar-' + i + '-' + Math.round(cb * 10));
         }
       }
     });
