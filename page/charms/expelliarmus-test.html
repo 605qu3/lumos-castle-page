@@ -32,7 +32,7 @@
    The book (CoS 11, checked in the text): "The long dining tables had vanished and a golden stage had appeared along
    one wall, lit by thousands of candles floating overhead"; Lockhart and Snape "swung their wands above their heads and
    pointed them at their opponent; Snape cried: 'Expelliarmus!' There was a dazzling flash of scarlet light". And the
-   catch (CoS 16): Harry bellowed "Expelliarmus!" at Lockhart, whose "wand flew high into the air; Ron caught it". The
+   catch (CoS 16): Harry bellowed "Expelliarmus!" at Lockhart, whose "wand flew high into the air; Ron caught it". The stroke's source only: the page stages neither scene (Rework 6). The
    stroke is the book's: one stroke from the wand hand, swung up above it, then pointed at the straw dummy's wand hand,
    judged by LumosSpells.judgeDisarm on the tally's own sizes (checks/expelliarmus-tally.js: the hand at 0.3 of the
    short side left of the middle and 0.72 down, its reach 0.06; the dummy's hand 0.55 across, its size 0.05). The rest
@@ -40,7 +40,7 @@
    will come down, called while it is still high. A throw comes down as it went up, its top halfway along, so it lands
    as far past its top as it started before it (symmetry); after each throw the arc is drawn, its top marked, the line
    through the top dashed, and the two halves on the start's level ticked as equal. Three rounds: a short throw, a long
-   one, and the dummy up on the stage, where the wand starts higher than his hand and so lands further on than the
+   one, and the dummy up on a bench, where the wand starts higher than his hand and so lands further on than the
    mirror of its start (the older boy's edge). Each throw varies a little, so the rise has to be read, not remembered.
    A fourth round, the top (8.1, thirty-second session): he calls the very top itself while the wand still rises,
    from the rise alone, judged by LumosSpells.judgeTop; the line down through his call is his mirror, the rise turned
@@ -60,11 +60,11 @@
   var CATCH = { kind: { tol: 0.075, late: 0.5, hang: 0.7 }, fair: { tol: 0.055, late: 0.25, hang: 0.5 }, strict: { tol: 0.04, late: 0.05, hang: 0.3 } };
   var ROUNDS = [
     { name: 'Short', up: 0, span: 0.28, rise: 0.30,
-      start: 'The Duelling Club, in the Great Hall. A straw dummy holds up its wand. <b>Swing your wand up above your head, then point it at the dummy\'s wand hand</b>: one stroke, or lift at the top and point from there. <i>Expelliarmus!</i>' },
+      start: 'Duelling Club practice, an ordinary evening. A straw dummy holds up its wand. <b>Swing your wand up above your head, then point it at the dummy\'s wand hand</b>: one stroke, or lift at the top and point from there. <i>Expelliarmus!</i>' },
     { name: 'Long', up: 0, span: 0.48, rise: 0.42,
       start: 'A harder flash this time: its wand will fly higher and further. Disarm it, then <b>tap where it will come down</b> while it is still high.' },
-    { name: 'Stage', up: 0.2, span: 0.36, rise: 0.22,
-      start: 'Now the dummy is up on the golden stage, higher than your hand. Disarm it: <b>where will its wand come down to you?</b>' },
+    { name: 'Bench', up: 0.2, span: 0.36, rise: 0.22,
+      start: 'Now the dummy stands up on a bench, higher than your hand. Disarm it: <b>where will its wand come down to you?</b>' },
     { name: 'Top', up: 0, span: 0.42, rise: 0.36,
       start: 'For the older boy: <b>catch it at its very top</b>, the moment it stops rising. Disarm it, watch it rise, and <b>tap where the top will be</b> before it gets there.' } ];
   var round = Math.max(0, Math.min(3, (Number(qs.get('round')) || 1) - 1));
@@ -219,7 +219,7 @@
     if (fly.caught) {
       stage = 'caught'; noise(0.12, 1200, 0.3);
       var tail = round === 2 ? ' Level with its start it was as far past its top as it began before it, then it fell on down to your hand.' : ' It came down as far past its top as it started before it.';
-      say('<b>Caught it!</b> As Ron caught Lockhart\'s wand (Book 2).' + tail);
+      say('<b>Caught it!</b>' + tail);
       wait = setTimeout(function () { wait = null; choose(round + 1); }, 7000);
     } else stage = 'falling';
   }
@@ -229,7 +229,7 @@
     if (!fly.caught) { stage = 'falling'; return; }
     stage = 'caught'; noise(0.12, 1200, 0.3); done = true;
     say('<b>Caught at the very top</b>, where it stopped rising! Dashed through your hand: its fall, the rise turned over in your line.');
-    setTimeout(function () { if (done) say('All four caught. <i>"That was a Disarming Charm, as you see, I\'ve lost my wand,"</i> as Lockhart said (Book 2).'); }, 5200);
+    setTimeout(function () { if (done) say('All four caught. The dummy looks rather put out.'); }, 5200);
   }
   function clatter(now) {
     stage = 'missed'; noise(0.25, 700, 0.35, 30);
@@ -272,13 +272,10 @@
       cx.fillStyle = '#efe4c8'; cx.fillRect(k.x - s * 0.35, y - s, s * 0.7, s * 2.6);
       cx.fillStyle = '#ffd27a'; cx.beginPath(); cx.ellipse(k.x, y - s * 1.6, s * 0.3 * fl, s * 0.7 * fl, 0, 0, 7); cx.fill();
     });
-    if (ROUNDS[round].up) {   /* the golden stage along the wall, under the dummy */
-      var st = stageTop(), sx = dummy.x - S * 0.12;
-      var sg = cx.createLinearGradient(0, st, 0, fy); sg.addColorStop(0, '#c99a3c'); sg.addColorStop(1, '#7a5520');
-      cx.fillStyle = '#e2bb62'; cx.fillRect(sx, st - 5, W - sx, 7);
-      cx.fillStyle = sg; cx.fillRect(sx, st + 2, W - sx, fy - st - 2);
-      cx.strokeStyle = 'rgba(255,230,160,0.35)'; cx.lineWidth = 1.5;
-      for (var p = sx + S * 0.08; p < W; p += S * 0.14) { cx.strokeRect(p, st + (fy - st) * 0.2, S * 0.1, (fy - st) * 0.6); }
+    if (ROUNDS[round].up) {   /* a plain wooden bench under the dummy (never CoS 11's golden stage: Charms' change list, Rework 6) */
+      var st = stageTop(), sx = dummy.x - S * 0.12, sw = S * 0.24;
+      cx.fillStyle = '#6b4a2b'; cx.fillRect(sx, st - 5, sw, 9);
+      cx.fillStyle = '#4e3520'; cx.fillRect(sx + S * 0.015, st + 4, S * 0.025, fy - st - 4); cx.fillRect(sx + sw - S * 0.04, st + 4, S * 0.025, fy - st - 4);
     }
     var vg = cx.createRadialGradient(W / 2, H * 0.5, S * 0.3, W / 2, H * 0.5, Math.max(W, H) * 0.75);
     vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.5)'); cx.fillStyle = vg; cx.fillRect(0, 0, W, H);
@@ -351,7 +348,7 @@
       cx.beginPath(); cx.moveTo(q - 3, y0 + 7); cx.lineTo(q + 3, y0 - 7); cx.stroke();
       cx.fillStyle = '#c9d8e6'; cx.fillText(ft(f.span / 2), q, y0 - fs * 1.05);
     });
-    if (round === 2) {   /* the stage: level with its start at the mirror, then on down to his hand's level */
+    if (round === 2) {   /* the bench: level with its start at the mirror, then on down to his hand's level */
       cx.fillStyle = '#f3e6c8'; cx.beginPath(); cx.arc(f.mirror, y0, 4, 0, 7); cx.fill();
       cx.strokeStyle = 'rgba(240,226,198,0.8)'; cx.setLineDash([4, 5]); cx.beginPath(); cx.moveTo(f.mirror, y0); cx.lineTo(f.mirror, f.catchY); cx.stroke(); cx.setLineDash([]);
       cx.strokeStyle = '#f0e2c6'; cx.lineWidth = 2.5; cx.beginPath(); cx.moveTo(f.mirror, f.catchY); cx.lineTo(f.land, f.catchY); cx.stroke();
