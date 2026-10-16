@@ -778,7 +778,7 @@ STORE.x1 = STORE.x0 + STORE.s; STORE.z1 = STORE.z0 + STORE.s;
 function storeFound() { return groundsQ.get('flag') === 'open' || !!(castle && castle.secrets && castle.secrets().indexOf('landing-store') >= 0); }
 function liftStoreFlag() {
   STORE.want = 1;
-  if (castle && castle.moment) castle.moment('lifted the landing flag');   /* Events' record keeps it found: secret landing-store (req to Events) */
+  if (castle && castle.moment) castle.moment('lifted the landing flag');   /* Events' record keeps it found: secret landing-store (req 500, locks.landing-store) */
 }
 function updateStore(dt) {
   if (!STORE.pivot) return;
@@ -791,7 +791,7 @@ function updateStore(dt) {
 function hideFound() { return groundsQ.get('hide') === 'open' || !!(castle && castle.secrets && castle.secrets().indexOf('nook-hide') >= 0); }
 function liftHideLid() {
   HIDE.want = 1;
-  if (castle && castle.moment) castle.moment('lifted the nook settle');   /* Events' record keeps it found: secret nook-hide (req to Events) */
+  if (castle && castle.moment) castle.moment('lifted the nook settle');   /* Events' record keeps it found: secret nook-hide (req 500, locks.nook-hide) */
 }
 function updateHide(dt) {
   if (!HIDE.lid) return;
