@@ -1,0 +1,172 @@
+{
+  "chain": "quidditch",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour < 11"
+      ],
+      "show": [
+        "the box made ready for the match: the megaphone laid on the ledge before the commentator's chair, the two slates wiped clean and propped against the batten, a new stub of chalk in each groove, nobody here yet"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 10",
+        "hour < 11"
+      ],
+      "show": [
+        "the stands filling below and all round the field, scarves along the rows and binoculars passed from hand to hand"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none"
+      ],
+      "show": [
+        "the match under way: the commentator up at the ledge with the megaphone, a teacher in the chair beside, the two places at the ledge kept free for the boys, a slate and chalk at each"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none"
+      ],
+      "show": [
+        "the commentator calling each goal through the megaphone, ten points at a time, and the stands roaring under the box"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind tearing the commentary away over the pitch, so the far stands hear only half of it"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none",
+        "weather = rain"
+      ],
+      "show": [
+        "the canvas blind let down against the rain to a hand above the ledge, the stands below all hoods and umbrellas"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none",
+        "weather = snow"
+      ],
+      "show": [
+        "the canvas blind let down against the snow to a hand above the ledge, snow settling on the hoods along the stands below"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 13"
+      ],
+      "show": [
+        "chalk dust on the ledge under the slates and the final score still chalked up, the megaphone carried away, the two chairs pushed back"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour = 12",
+        "meal = lunch"
+      ],
+      "show": [
+        "chalk dust on the ledge under the slates and the final score still chalked up, the megaphone carried away, the two chairs pushed back"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour >= 13",
+        "time != night"
+      ],
+      "show": [
+        "a programme and a sweet wrapper left on the rows below the box"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = yes",
+        "hour = 12",
+        "meal = lunch"
+      ],
+      "show": [
+        "a programme and a sweet wrapper left on the rows below the box"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = no"
+      ],
+      "show": [
+        "the box empty, the two chairs square to the ledge, the slates wiped and propped against the batten, the last score still ghosting faintly through the wipe"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = no",
+        "weather = rain"
+      ],
+      "show": [
+        "the blind rolled under the eaves and the rain blowing in over the ledge, darkening the boards"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = no",
+        "weather = snow"
+      ],
+      "show": [
+        "the blind rolled under the eaves and a little snow blown in over the ledge onto the boards"
+      ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "match = no",
+        "time = night"
+      ],
+      "show": [
+        "the pitch dark and empty below, the hoops' rings black against the sky"
+      ]
+    }
+  ]
+}

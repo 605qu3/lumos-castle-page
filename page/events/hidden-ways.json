@@ -243,6 +243,29 @@
     },
     {
       "when": [
+        "place = lake corridor b east",
+        "time != evening",
+        "time != night",
+        "weather != snow"
+      ],
+      "show": [
+        "a smell of sage and thyme and a cool breath of lake air at one stretch of the corridor's south wall, though the stone there looks like all the rest"
+      ]
+    },
+    {
+      "when": [
+        "place = lake corridor b east",
+        "time != evening",
+        "time != night",
+        "weather != snow",
+        "windy = yes"
+      ],
+      "show": [
+        "the herb smell coming stronger on the draught at that stretch of wall, rosemary in it too"
+      ]
+    },
+    {
+      "when": [
         "place = library gallery",
         "time != night",
         "summer = no",
