@@ -693,7 +693,8 @@
         "weather != fog"
       ],
       "show": [
-        "moonlight on the lead, the parapet's shadow sharp across it"
+        "moonlight on the lead, the parapet's shadow sharp across it",
+        "over the breast, moonlight lying on the lake far below"
       ]
     },
     {
@@ -1430,6 +1431,261 @@
       "show": [
         "through a loop, the grounds far below the tower"
       ]
+    },
+    {
+      "when": [
+        "place = ice house"
+      ],
+      "show": [
+        "a deep, still cold, his breath smoking in it, and a clean smell of straw and lake water",
+        "meltwater ticking down into the drain in the floor, one drop at a time"
+      ]
+    },
+    {
+      "when": [
+        "place = ice house",
+        "season = summer"
+      ],
+      "show": [
+        "frost on the bricks though it is summer outside, the cold like stepping into January"
+      ]
+    },
+    {
+      "when": [
+        "place = ice house",
+        "season != summer"
+      ],
+      "show": [
+        "frost furred white on the bricks of the dome"
+      ]
+    },
+    {
+      "when": [
+        "place = ice house",
+        "occasion = start of term"
+      ],
+      "show": [
+        "the ice stack lower than it was, fresh-cut steps in it where blocks have gone up for the feast's puddings"
+      ]
+    },
+    {
+      "when": [
+        "place = ice house",
+        "occasion = halloween"
+      ],
+      "show": [
+        "the ice stack lower than it was, fresh-cut steps in it where blocks have gone up for the feast's puddings"
+      ]
+    },
+    {
+      "when": [
+        "place = ice house",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "the ice stack lower than it was, fresh-cut steps in it where blocks have gone up for the feast's puddings"
+      ]
+    },
+    {
+      "when": [
+        "place = ice house",
+        "occasion = leaving feast"
+      ],
+      "show": [
+        "the ice stack lower than it was, fresh-cut steps in it where blocks have gone up for the feast's puddings"
+      ]
+    },
+    {
+      "when": [
+        "place = ice house",
+        "season = winter",
+        "ground != dry",
+        "occasion = none"
+      ],
+      "show": [
+        "new blocks of lake ice stacked on the old, still wet, packed round with fresh straw"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "meal != none"
+      ],
+      "show": [
+        "through the boards, a muffled hum from far below, everyone at a meal"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "time != night",
+        "meal = none",
+        "lessons = off",
+        "summer = no",
+        "match = no"
+      ],
+      "show": [
+        "now and then the boom of the front doors below, and feet and voices crossing the hall"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "time != night",
+        "lessons = on"
+      ],
+      "show": [
+        "the hall below quiet, now and then one pair of feet hurrying across it, late"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "occasion = start of term",
+        "hour = 18",
+        "meal = none"
+      ],
+      "show": [
+        "a crowd's feet and voices below, then the great doors' boom"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "match = yes",
+        "time = morning"
+      ],
+      "show": [
+        "the front doors standing open below, and feet streaming out toward the pitch"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "time = night"
+      ],
+      "show": [
+        "the hall below silent, and the timbers creaking now and then as the castle settles"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "through the small window, the grounds before the front doors in the sun"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "weather = rain"
+      ],
+      "show": [
+        "rain running down the small window"
+      ]
+    },
+    {
+      "when": [
+        "place = gate loft",
+        "weather = snow"
+      ],
+      "show": [
+        "snow piled in the corner of the small window"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "a square of daylight barred by the grating lying on the flags at the passage's end"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "time != night",
+        "weather != clear",
+        "weather != rain",
+        "weather != snow"
+      ],
+      "show": [
+        "a grey light coming down through the grating at the passage's end"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "weather = rain"
+      ],
+      "show": [
+        "rain coming down through the grating in a fine grey curtain and running away along a gutter in the floor"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "weather = snow"
+      ],
+      "show": [
+        "snow sifting down through the grating and melting on the flags"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "meal = none"
+      ],
+      "show": [
+        "feet crossing the courtyard overhead, shadows passing over the grating, and voices talking about homework"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "time != night",
+        "lessons = on"
+      ],
+      "show": [
+        "the courtyard quiet overhead, now and then one pair of feet hurrying across it, late"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "meal != none"
+      ],
+      "show": [
+        "the courtyard empty overhead, everyone at a meal"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "time != night",
+        "summer = yes"
+      ],
+      "show": [
+        "the courtyard overhead silent, a bird hopping on the grating"
+      ]
+    },
+    {
+      "when": [
+        "place = old cells passage",
+        "time = night"
+      ],
+      "show": [
+        "the grating a grey square of night sky, and overhead nothing at all"
+      ]
     }
   ],
   "records": [
@@ -1500,6 +1756,17 @@
       "when": [],
       "show": [
         "his own footsteps on the stair coming back to him through the wall as whispers"
+      ]
+    },
+    {
+      "id": "hidden-ways.ice-house-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap ice-house-door",
+      "when": [],
+      "show": [
+        "cold breathing out under the heavy door, and frost furred on its iron latch"
       ]
     }
   ]
