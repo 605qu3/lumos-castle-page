@@ -3686,10 +3686,27 @@
       "source": "device",
       "leans": [],
       "moment": "tap masquers-cloth",
-      "when": [],
+      "when": [
+        "place != masquers wardrobe"
+      ],
       "show": [
         "the painted cloth stirs in the draught from behind it, and under it the doorway is open"
       ]
+    },
+    {
+      "id": "hidden-ways.masquers-cloth-inside",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap masquers-cloth",
+      "when": [
+        "place = masquers wardrobe"
+      ],
+      "show": [
+        "the painted cloth lifts aside from this side, and the back stair's cold air comes in under it"
+      ],
+      "starts": [],
+      "canon": "the way back out from inside (model v62, the Architect: the hidden side's tap is the way back), so the crocodile and the draught are not said as beyond him (Events, the ninety-seventh's walk)"
     },
     {
       "id": "hidden-ways.shell-case",
@@ -3697,10 +3714,27 @@
       "source": "device",
       "leans": [],
       "moment": "tap shell-case",
-      "when": [],
+      "when": [
+        "place != curiosities cabinet"
+      ],
       "show": [
         "the whole case swings on its pin with a soft rattle of shells, and beyond it the crocodile sways a little on its chains"
       ]
+    },
+    {
+      "id": "hidden-ways.shell-case-inside",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap shell-case",
+      "when": [
+        "place = curiosities cabinet"
+      ],
+      "show": [
+        "the whole case swings back on its pin with a soft rattle of shells, and the back stair's cold air comes through"
+      ],
+      "starts": [],
+      "canon": "the way back out from inside (model v62, the Architect: the hidden side's tap is the way back), so the crocodile and the draught are not said as beyond him (Events, the ninety-seventh's walk)"
     }
   ]
 }
