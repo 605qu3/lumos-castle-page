@@ -135,6 +135,7 @@ shot before anything is spent.
 <script src="castle-model.js?v=31"></script>
 <script src="castle-shell.js?v=7"></script>
 <script src="castle-events.js?v=35"></script>
+<script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
 'use strict';
@@ -180,7 +181,7 @@ var P = function (x, y, z) { return shell.toLocal(x, y, (z || 0)); };
 /* the clock (docs/room-states.md §1): one runtime, every chain, this room's place */
 var READY = false;   /* the runtime may call drawRoom before the room below is built */
 var CUES = {};       /* a record's cues, by its show string, filled once the room is built (the Howler) */
-var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () { if (READY) draw(); }, cues: CUES, showLines: function () {} }) : null;
+var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'great hall', drawRoom: function () { if (READY) draw(); }, cues: CUES, showLines: function (list) { if (window.CastleSound) CastleSound.lines(list); } }) : null;
 function drivers() {
   var e = events;
   var occ = e ? String(e.occasion()).replace(/-/g, ' ') : 'none';
@@ -604,7 +605,8 @@ var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat
 
 /* the Howler (Events' great-hall.howler, Godric's t1 on fawkes-howler-scorches-1015, 7.17 pm): now and then on a post
    morning, at another house's table, an older pupil's scarlet envelope; a grey stand-in for People's owl and pupil and
-   Magic's burning, shown while the runtime's cue lasts its few seconds, then the ash. The voice is sound's, not yet */
+   Magic's burning, shown while the runtime's cue lasts its few seconds, then the ash. Its voice is the record's heard
+   line, which showLines hands to the castle's sound player (req 518), silent until the table gives it a sound */
 var howler = new THREE.Group(); howler.name = 'cue: the Howler'; howler.visible = false; room.add(howler);
 (function () {
   var env = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.18, 0.28), mat(0xc8201c, { emissive: col(0x5a0806) }));
@@ -818,9 +820,13 @@ function draw() {
   occ.halloween.visible = cue('about one floating candle in five');
   occ.lanterns.visible = cue("Hagrid's four vast pumpkins");
   occ.feastEnd.visible = cue("the winner's hangings");
-  /* sound: no room plays any yet, so the hall names the chain's sound cue in its state until the castle's sound comes */
-  st.sound = (shows.filter(function (s) { return /^(the hall quiet|a meal's murmur|a feast's roar|a few voices|the few at Christmas dinner|rain drumming|pairs muttering spells)/.test(s); })
-    .map(function (s) { return s.split(',')[0]; })).join('; ') || 'none';
+  /* sound: the chain's sound cues are the room's bed, handed to the castle's one player at every draw (req 518; the
+     lane file, Sound, for every room); it fades across a change, stays quiet until his first tap, and notes each cue the
+     table has no sound for, so ?sound=log lists what plays or would */
+  var heard = shows.filter(function (s) { return /^(the hall quiet|a meal's murmur|a feast's roar|a few voices|the few at Christmas dinner|rain drumming|pairs muttering spells)/.test(s); });
+  if (window.CastleSound) CastleSound.bed(heard);
+  st.sound = heard.map(function (s) { return s.split(',')[0]; }).join('; ') || 'none';
+  st.playing = window.CastleSound ? CastleSound.playing().length : 0;
   /* the chain's cues not yet drawn here, each its owner's to give (the lane file, The layers) */
   for (var ex in EXTRA) EXTRA[ex].visible = !club && cue(ex);
   st.notDrawn = shows.filter(function (s) { return !DRAWN.some(function (w) { return s.indexOf(w) === 0; }) && !Object.keys(EXTRA).some(function (w) { return s.indexOf(w) === 0; }); }).map(function (s) { return s.slice(0, 48); });
@@ -962,7 +968,7 @@ renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
-  state: function () { return STATE; }, drivers: drivers, redraw: draw, candles: NC, field: function () { return FIELD_CHECK; }, scorches: function () { return SCORCHES; },
+  state: function () { return STATE; }, events: events, drivers: drivers, redraw: draw, candles: NC, field: function () { return FIELD_CHECK; }, scorches: function () { return SCORCHES; },
   howler: function () { for (var c in CUES) CUES[c](); return Object.keys(CUES).length; }, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
   stand: function () { return here.name; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
