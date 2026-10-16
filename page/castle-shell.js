@@ -25,7 +25,7 @@
    v10 (Events' req 534): a round room ({ circle, r }, 24 sides, a side square to its first door, its walls as deep as
    its deepest loop), a ring (a feature's `ring`: whole, or an arc where two of its openings stand across it, the long
    way round) and the leads (a feature with `rect`, `z` and `parapet`: a court in the sky, its breast and merlons, the
-   crenels barred) are places too.
+   crenels barred) are places too. v12: a room by its plan's corners ({ poly }) too.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -58,6 +58,13 @@ function findPlace(M, id) {
     var floor = base + (r.floor || 0);
     return { id: r.id, name: r.name, kind: 'room', poly: pts, floor: floor, ceiling: base + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7),
       wall: r.wall || WALL_T, walls: r.walls || null, rec: r };
+  }
+  /* v12: a room drawn by its plan's corners ({ poly }, counter-clockwise: the gunners' casemate between two drums' faces,
+     ledger line 94), floor and ceiling as a rect room's */
+  if (r && r.shape && r.shape.poly) {
+    var pb = levelZ(M, r.level), pp = r.shape.poly.map(function (p) { return toSite(M, r.group, p); });
+    return { id: r.id, name: r.name, kind: 'room', poly: pp, floor: pb + (r.floor || 0), ceiling: pb + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7),
+      wall: r.wall || WALL_T, walls: null, rec: r };
   }
   /* v10: a round room, SIDES sides about the circle, one side's middle on its first door, its wall as deep as its
      deepest loop (the West Tower's drum, 3.2) */
