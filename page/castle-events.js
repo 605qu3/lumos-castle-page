@@ -169,6 +169,9 @@
    At the opening his brother's copy (`from` the sender, the sender's house from his satchel's settings) goes
    straight to the page, so its gems fly from the sill where the parcel stood, with no second owl; the sender's own
    waits in the iPad's owl (`owl.given`) and is his from the start of his next turn, posted as his own (v=33).
+   Then the heights (Hidden Ways' req 528, 15 October 2026): `heights`, a grown-up's per-boy limit (settings.heights),
+   `eased` till one is set, `open` once it is; ?heights=open or eased for a test. A high place's rule reads it, so
+   the lantern's shutters stay shut, the drop heard and not looked down, until a grown-up opens them.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -636,6 +639,10 @@
         case 'slot': return state.slot ? 'taken' : 'free';
         /* off as a parent sets it, or where the browser cannot hear at all, so a spoken thing waits for a tap (the ear's promise) */
         case 'speech': return ear && ear.available && ear.available() ? settings.speech || 'on' : 'off';
+        /* a grown-up's per-boy limit on high places, eased till set (req 528); ?heights=open or eased for a test */
+        case 'heights':
+          var hp = params.get('heights');
+          return hp === 'open' || hp === 'eased' ? hp : settings.heights === 'open' ? 'open' : 'eased';
         case 'listening':                    /* the thing tapped, while the ear its tap opened listens, and a beat after */
           var ls = visit && visit.listen;
           return ls && (ls.open || Date.now() < ls.until) ? ls.name : 'none';

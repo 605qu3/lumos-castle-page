@@ -451,6 +451,505 @@
       "show": [
         "the reading floor dark below the slits, one lamp at Madam Pince's desk turned low"
       ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through the loops, the lake far below and the hills beyond it, a cold draught coming in at each"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "through the loops, only white fog, the lake lost somewhere below it"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "weather = rain"
+      ],
+      "show": [
+        "rain spitting in at the loops, the sills dark with it"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "weather = snow"
+      ],
+      "show": [
+        "snow blowing in at the loops and settling in a little drift on each sill"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind moaning in the loops, now high, now low"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time = night",
+        "moon up = yes"
+      ],
+      "show": [
+        "through a loop, moonlight lying on the lake far below"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "the loops five slits of dark, the lake only a breath of cold air"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "lessons = on"
+      ],
+      "show": [
+        "kneeling at the grille, the moving stairs far below with hardly anyone on them, now and then one swinging slowly round to a new landing"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "occasion = none"
+      ],
+      "show": [
+        "kneeling at the grille, heads going up and down the flights far below, feet and voices coming up, a staircase swinging round with people still on it"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "lessons = off",
+        "occasion = christmas"
+      ],
+      "show": [
+        "kneeling at the grille, the flights far below nearly empty, one staircase swinging round with nobody on it"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "lessons = off",
+        "occasion = easter"
+      ],
+      "show": [
+        "kneeling at the grille, the flights far below nearly empty, one staircase swinging round with nobody on it"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "summer = yes"
+      ],
+      "show": [
+        "kneeling at the grille, the flights far below empty and still"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "occasion = none",
+        "weekday = friday"
+      ],
+      "show": [
+        "kneeling at the grille, a staircase far below swinging off to the landing it only goes to on a Friday, and a voice on it groaning, \"Not again!\""
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "time = night"
+      ],
+      "show": [
+        "through the grille, the well dark far below, and a staircase grinding slowly round in the dark with no one on it"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "open sky all round over the breast, the stair hall's great roof rising to the north and the lantern on its ridge catching the light"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "time != night",
+        "weather = cloudy"
+      ],
+      "show": [
+        "grey cloud close over the breast, the lantern on the stair hall's ridge dull against it"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "weather = rain"
+      ],
+      "show": [
+        "rain drumming on the lead and gurgling away down the spouts"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "weather = snow"
+      ],
+      "show": [
+        "snow whirling in over the parapet and lying on the lead"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "weather = fog"
+      ],
+      "show": [
+        "fog over the leads so thick the far parapet is a grey shape"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind roaring over the parapet and whistling through the barred crenels"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "match = no"
+      ],
+      "show": [
+        "far below and far off, now and then a shout from the grounds"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none"
+      ],
+      "show": [
+        "far off, a crowd's roar from the pitch, rising and falling and rising again"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "time = night",
+        "weather = clear"
+      ],
+      "show": [
+        "stars thick overhead, the lantern a dark shape on the ridge, and now and then an owl going over"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "time = night",
+        "moon up = yes",
+        "weather != fog"
+      ],
+      "show": [
+        "moonlight on the lead, the parapet's shadow sharp across it"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "time != night",
+        "weather = clear",
+        "sun = up"
+      ],
+      "show": [
+        "daylight pouring down through the lantern's glass overhead and lying warm on the boards"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "time != night",
+        "weather != clear",
+        "ground != snow"
+      ],
+      "show": [
+        "a grey light coming down through the lantern's glass overhead"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "weather = rain"
+      ],
+      "show": [
+        "rain pattering on the glass overhead and running down it in streams"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "ground = snow",
+        "time != night"
+      ],
+      "show": [
+        "snow on the glass overhead, the light through it white and dim"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "time = night",
+        "moon up = yes",
+        "weather != fog"
+      ],
+      "show": [
+        "moonlight through the glass overhead, pale on the shutters' painted faces"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "the glass overhead dark, a few stars in it"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "heights = eased",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "occasion = none"
+      ],
+      "show": [
+        "the painted shutters shut in the breast, and through them, from far below, feet and voices on the moving stairs and now and then the long stone grinding of a staircase swinging round"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "heights = eased",
+        "time != night",
+        "lessons = on",
+        "occasion = none"
+      ],
+      "show": [
+        "the painted shutters shut in the breast, and through them, far below, only now and then the long stone grinding of a staircase swinging round"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "heights = open",
+        "time != night",
+        "lessons = off",
+        "summer = no",
+        "occasion = none"
+      ],
+      "show": [
+        "the painted shutters open on their iron grilles, and up through them, clear now, feet and voices on the moving stairs far below and a staircase grinding round to a new landing"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "heights = open",
+        "time != night",
+        "lessons = on",
+        "occasion = none"
+      ],
+      "show": [
+        "the painted shutters open on their iron grilles, and up through them the well's hush far below, broken now and then by a staircase grinding round"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "time = night",
+        "occasion = none"
+      ],
+      "show": [
+        "far below the shutters, a staircase grinding slowly round in the dark"
+      ]
+    },
+    {
+      "when": [
+        "place = falconers room",
+        "meal = breakfast"
+      ],
+      "show": [
+        "a rush of wings going out overhead, many of them, and a few feathers turning slowly down the stair after"
+      ]
+    },
+    {
+      "when": [
+        "place = falconers room",
+        "meal != breakfast",
+        "time != night"
+      ],
+      "show": [
+        "now and then a feather turning slowly down the stair from above, and a shuffle and a sleepy hoot overhead"
+      ]
+    },
+    {
+      "when": [
+        "place = falconers room",
+        "time = night"
+      ],
+      "show": [
+        "soft hoots overhead, and now and then wings going out into the dark"
+      ]
+    },
+    {
+      "when": [
+        "place = falconers room",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "blue sky in the two loops"
+      ]
+    },
+    {
+      "when": [
+        "place = falconers room",
+        "time != night",
+        "weather != clear"
+      ],
+      "show": [
+        "grey sky in the two loops"
+      ]
+    },
+    {
+      "when": [
+        "place = falconers room",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind piping in the loops"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto"
+      ],
+      "show": [
+        "the spring dripping into the shell basin, each drop ringing softly round the dome"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "sunlight off the lake coming in at the cleft, green and wavering over the shells"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto",
+        "time != night",
+        "weather != clear"
+      ],
+      "show": [
+        "a grey-green light at the cleft, the shells dim and glimmering"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto",
+        "time != night",
+        "sun = down",
+        "weather = clear"
+      ],
+      "show": [
+        "a grey glimmer at the cleft, the shells dim"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto",
+        "windy = no"
+      ],
+      "show": [
+        "the lake lapping just beyond the cleft"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto",
+        "windy = yes"
+      ],
+      "show": [
+        "waves slapping at the rock outside the cleft, the sound booming softly round the dome"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto",
+        "ground = frost"
+      ],
+      "show": [
+        "a fringe of ice along the cleft's lip"
+      ]
+    },
+    {
+      "when": [
+        "place = shell grotto",
+        "time = night"
+      ],
+      "show": [
+        "the cleft a black slit, only the lake's lapping and the drip in the dark"
+      ]
     }
   ],
   "records": [
