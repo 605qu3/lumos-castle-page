@@ -1172,6 +1172,40 @@ witchLanding.name = 'witch-landing'; witchLanding.visible = false; scene.add(wit
     addTorch(new THREE.Vector3(witchX(1.4), FOOT_Y + 2.0, FAR_FACE), 1, 'witch-torch-far')];
   witchTorches.forEach(function (tc) { G.add(tc.mesh); G.add(tc.flame); G.add(tc.light); });
 })();
+/* Fred's dropped note (req 605, the page half of Events' req 597, page/events/fred-note.json; Magic's Rework 6): from
+   the PoA castle on, while the runtime shows its cue, a scrap of parchment lies on the flags a few steps from her toward
+   the stair, folded once, as if it fell from a pocket in a hurry. Found, never written to him; a tap goes to the
+   runtime as `fred-note`, whose record reads it to him and keeps it read (FRED_NOTE_CUE), and then the scrap is gone,
+   in his pocket. Drawn in code, 16 by 11 cm, flat on the flags with its own contact shadow; its tap area a little wider
+   than the scrap, since it is small from where he stands. Asked of the runtime once a second, as the candle stub is */
+var FRED_SCRAP_CUE = 'a scrap of parchment on the flagstones a few steps from the one-eyed witch, folded once, as if it fell from a pocket in a hurry';
+var fredScrap = (function () {
+  var c = makeCanvas(96, 66), g = c.getContext('2d');
+  g.fillStyle = '#d8c79f'; g.fillRect(0, 0, 96, 66);                                  /* the parchment */
+  g.fillStyle = 'rgba(70,50,25,0.22)'; g.fillRect(48, 0, 48, 66);                      /* the far half, lifted a little at the fold */
+  g.strokeStyle = 'rgba(70,50,25,0.55)'; g.lineWidth = 1.5;
+  g.beginPath(); g.moveTo(48, 0); g.lineTo(48, 66); g.stroke();                        /* the fold */
+  g.strokeStyle = 'rgba(40,28,18,0.45)'; g.lineWidth = 1;
+  [14, 24, 34, 44].forEach(function (y) { g.beginPath(); g.moveTo(8, y); g.lineTo(40 - (y % 3) * 4, y + 1); g.stroke(); });   /* a hurried scrawl showing through */
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.11), new THREE.MeshBasicMaterial({ map: tex(c), transparent: true }));
+  m.rotation.x = -Math.PI / 2; m.rotation.z = 0.5;
+  var hit = new THREE.Mesh(new THREE.PlaneGeometry(0.45, 0.45), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+  hit.rotation.x = -Math.PI / 2; hit.name = 'fred-note';
+  var x = witchX(WITCH.at - 1.3), z = WITCH.z - 0.85;
+  hit.position.set(x, FOOT_Y + 0.004, z); m.position.set(x, FOOT_Y + 0.003, z);
+  softShadow(0.2, 0.15, x, FOOT_Y, z, witchLanding);
+  witchLanding.add(m); witchLanding.add(hit);
+  hit.userData.thing = 'fred-note'; hit.userData.scrap = m;
+  hit.visible = m.visible = false;
+  return hit;
+})();
+var fredScrapLook = /[?&]fredNote\b/.test(location.search), fredScrapNext = 0;   /* ?fredNote&foot=witch for a look */
+function updateFredScrap() {
+  if (t < fredScrapNext) return;
+  fredScrapNext = t + 1;
+  var on = footShown === 'witch' && (fredScrapLook || (!!castle && castle.cues().indexOf(FRED_SCRAP_CUE) >= 0));
+  fredScrap.visible = fredScrap.userData.scrap.visible = on;
+}
 /* the landing's far end open to the stair hall's bay (Godric's 1 on corridor-landing-end-1013, 6.55 pm; the Architect's
    ledger line 1, drawn in model v14): on the days the stair comes to its own landing the end wall is not there, and the
    landing runs on level into the bay, a tall stone room the corridor's width and full height, 8 m long, at its end a
@@ -3586,7 +3620,7 @@ var STOPS = [
       return { pos: new THREE.Vector3(NOOK_X0 - SETTLE.d - 0.12, 1.0, t.z), look: t, fov: 30 }; },
     arrive: function () { scarfTape.visible = true; }, turn: 0.35 }   /* bent over the seat, a small turn only */
 ];
-var tappables = [candleStub];   /* the deathday's candle stub (Rework 7) answers by name */
+var tappables = [candleStub, fredScrap];   /* the deathday's candle stub (Rework 7) and Fred's scrap (req 605) answer by name */
 STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s; tappables.push(m); }); });
 /* things the events runtime answers by name rather than a stop of their own: a tap on the armour goes to the runtime
    first, whose record walks him up or knocks (the built-in `at` must read where he stood when he tapped); the sticks
@@ -3658,10 +3692,11 @@ function witchHump() {
    about 45 cm, Charms' default. The offer covers the page, so Back lets it go, and so does HUMP_WAIT_S untouched */
 /* REWORKED (Rework 4, 15 October 2026; the charter's Dissendium ruling): the hump opens only once PoA is finished
    (PoA 10 explains the passage), learned from a note Fred dropped for George, found, never written to him: its cue is
-   Magic's (MC-06, asked by row), FRED_NOTE_CUE, and until Magic gives it the hump stays shut. Behind the lid only the
+   Magic's (MC-06, asked by row), FRED_NOTE_CUE, given 16 October 2026 (req 605: the scrap by her, fredScrap, read once
+   and kept); before it is read the hump stays shut. Behind the lid only the
    dark passage going down. The offer stays up until Back: nothing times out. The twins' note addressed to him and
    HUMP_WAIT_S are set aside, shown only with ?setaside */
-var NOTE_CUE = "the twins' note folded small in his pocket", HUMP_WAIT_S = 12, FRED_NOTE_CUE = null;
+var NOTE_CUE = "the twins' note folded small in his pocket", HUMP_WAIT_S = 12, FRED_NOTE_CUE = "Fred's note to George, read";   /* Magic's Rework 6, word for word (req 605; page/events/fred-note.json) */
 var HUMP = { u: 0.66, v: 0.12, r: 0.24, hinge: { u: 0.86, v: 0.2 }, edge: { u: 0.47, v: 0.06 } };   /* on Try 3's drawing (15 October 2026): the dome over her hood, measured from its outline; was 0.6, 0.34 on the grey card */
 var humpOffer = null, humpV = new THREE.Vector3();
 function noteHeld() {
@@ -4889,6 +4924,7 @@ function frame() {
   updateCupboard(wdt);
   updateFilch(wdt);
   updateCandleStub();
+  updateFredScrap();
   updateNookFire(t);
   updateBewitched(wdt);
   herDoor.ang = lerp(herDoor.ang, herDoor.target, Math.min(1, wdt * 4));
