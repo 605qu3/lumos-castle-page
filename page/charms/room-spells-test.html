@@ -49,8 +49,8 @@
    Since 13 October 2026 (twenty-sixth session, Q6's room callable): LumosSpells.moveThing on an armchair in a room seen
    from above, its floor in squares: a tap on the chair, the word's card (Mo-bi-li-ar-bus), then one stroke to its new
    square, a line or an L along the squares; the wall and the fireplace are in the way (it bumps and lands back), and
-   once it has moved a silver Sickle glints where it stood (the spellbook's idea: slide the armchair and find what fell
-   behind it). The room asks for 3 squares right; the traced guide draws that while he is new to it.
+   once it has moved a silver Sickle lies where it stood, drawn plain and found by looking (the spellbook's idea: slide
+   the armchair and find what fell behind it; the Ministry's Rework 24, nothing announces itself). The room asks for 3 squares right; the traced guide draws that while he is new to it.
    Since 13 October 2026 (forty-first session, req 282, Magic for the boys' B18 to B20, Godric's picks of 5.20 pm):
    the broom cupboard, LumosSpells.openLock as Percy's drawer has it, swinging the door open on buckets, a mop and an
    old school broom leaning hard to the left with a luggage tag on its handle (the tag's words are Magic's, drawn
@@ -238,7 +238,7 @@
         drift = null;
         var R0 = room().start, gone = chair.i !== R0.i || chair.j !== R0.j;
         if (r.verdict === 'moved') say('<b>Mobiliarbus!</b> It rises a few inches, drifts ' + LumosSpells.slideWords(r.dx, r.dy) + (r.shape === 'L' ? ' (an L)' : '') + ' and lands with a soft thump.'
-          + (r.right === false ? ' Not quite the 3 right the room wanted.' : '') + (gone ? ' Something glints where it stood: a silver Sickle.' : ''));
+          + (gone ? ' A silver Sickle lies where it stood.' : ''));   /* a room never says what it wanted (Rework 3) */
         else if (r.verdict === 'blocked' || r.verdict === 'missed') { shake = performance.now(); say(r.verdict === 'blocked' ? 'It bumps, and lands back where it was.' : 'It shivers, and stays where it is.'); }
         else say('You step back; it stays where it is.');
         menu(); return;
