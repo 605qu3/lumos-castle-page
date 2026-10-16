@@ -26,6 +26,7 @@
    its deepest loop), a ring (a feature's `ring`: whole, or an arc where two of its openings stand across it, the long
    way round) and the leads (a feature with `rect`, `z` and `parapet`: a court in the sky, its breast and merlons, the
    crenels barred) are places too. v12: a room by its plan's corners ({ poly }) too.
+   v13 (model v39): a way into a stair joining two rooms (the dovecote's, in the drum's wall) leads on to the room at its far end.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -152,6 +153,13 @@ function matches(M, op, id) {
 function other(op, id) {
   var b = op.between || [];
   return slug(b[0]) === id ? slug(b[1]) : slug(b[0]);
+}
+/* v13 (model v39, the dovecote's stair): a way into a stair joining two rooms leads on to the room at its other end */
+function viaStair(M, to, id) {
+  var s = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
+  if (!s || !s.rooms || s.rooms.length < 2) return null;
+  var r = s.rooms.filter(function (x) { return slug(x) !== id; })[0];
+  return r ? slug(r) : null;
 }
 function isWay(kind) { return /open mouth|archway|arch\b/.test(kind || ''); }
 function isDoor(kind) { return /door/.test(kind || '') && !isWay(kind); }
@@ -413,7 +421,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           fl.position.set(fp.x, fp.y + g.sill + 0.01, fp.z); fl.rotation.y = ang; fl.name = Q.id + '-niche-floor-' + g.op.id; group.add(fl);
           return;
         }
-        var to = other(g.op, Q.id);
+        var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
+        if (via) to = via;
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
         var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;
         if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
@@ -433,7 +442,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           fill.position.set(mid.x, mid.y + g.sill + hh / 2, mid.z); fill.rotation.y = ang; fill.name = 'way-' + g.op.id; fill.userData.way = g.op.id;
           group.add(fill);
           out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm],
-            sill: g.sill, lift: lift, level: level, back: g.back });
+            sill: g.sill, lift: lift, level: level, back: g.back, via: !!via, depth: g.op.depth || 0 });
         }
       });
       piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
@@ -461,9 +470,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        answer as a shut door, so the events hear the tap) */
     if (w.back) { w.built = !!findPlace(M, w.to); return; }
     var Q = findPlace(M, w.to);
+    /* v13: a way on through a stair in the wall shows the stair's dark beyond its mouth, the room at its far end a tap away */
+    if (w.via) { w.built = !!Q; Q = null; }
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
     if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; }
-    else if (Q && onEdge(Q.poly, w.at)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
+    /* v13: a deep way (the flanker's arch through the spur's 1.2) finds its far room at its far face, as its gap does */
+    else if (Q && onEdge(Q.poly, w.at, w.depth > 1.0 ? w.depth + 0.2 : null)) { out.places.push(Q); buildPlace(Q); w.built = true; return; }
     var depth = 3.0, rec = slab(w.w + 0.4, w.h + 0.2, depth, F.solid(0x141210), 'way');
     rec.position.set(w.mid.x - w.inward.x * (depth / 2 + 0.9), w.mid.y + w.sill + w.h / 2, w.mid.z - w.inward.z * (depth / 2 + 0.9));
     rec.rotation.y = Math.atan2(w.inward.x, w.inward.z); rec.material.side = THREE.BackSide; rec.name = 'beyond-' + w.id;
@@ -577,7 +589,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* he arrives through a mouth standing in it, a step back on the side he came from, looking in (only into the wall's
      depth where the far side is a room's page, short of the dark beyond); through a door, a step inside it */
   function facingIn(d, name) {
-    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built ? -0.3 : -1.0) : STAND_OFF;
+    var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built || d.via ? -0.3 : -1.0) : STAND_OFF;
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
     /* v10: never off the floor (a ring 0.9 wide): nearer the door until he stands on it */
     while (back > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { back -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE; }
