@@ -193,8 +193,8 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="castle-ear.js?v=1"></script>
 <script src="castle-events.js?v=34"></script>
 <script src="castle-map.js?v=2"></script>
-<script src="charms/guide.js?v=5"></script>
-<script src="charms/spells.js?v=27"></script>
+<script src="charms/guide.js?v=6"></script>
+<script src="charms/spells.js?v=40"></script>
 <script>
 (function () {
 'use strict';
@@ -2670,14 +2670,16 @@ function updateBroom(dt) {
   broomTag.rotation.z = -broom.ang + 0.25 * tagSide.swing * Math.sin(tagSide.swing * 14);   /* plumb, swinging a little when touched */
   broomTagSwing.rotation.y = tagSide.flip;
 }
-/* locked: the handle rattles, the leaf shivers in its frame, and it stays shut */
-function cupboardRattle(why) {   /* why: openLock's kind words on a turn that missed, [what he sees, what to try] */
+/* locked: the handle rattles, the leaf shivers in its frame, and it stays shut. A missed or tight turn says only what
+   it does, never openLock's words of what to try: a room shows the consequence, never the correction (req 610, Charms'
+   Rework 3 of req 405; Timetable rule 3, FDP-13) */
+function cupboardRattle() {
   cupboard.rattle = 0.6;
-  showLines([{ medium: 'heard', speaker: 'cupboard', sound: why ? 'the handle rattles; ' + why[0].toLowerCase() + '. ' + why[1] : 'the handle rattles; locked' }]);
+  showLines([{ medium: 'heard', speaker: 'cupboard', sound: 'the handle rattles; locked' }]);
 }
 /* Alohomora on it (req 282; Charms' *Req 282, delivered*; Magic's B18): once he has the spell, a tap on its ring handle
-   offers Charms' turn, his tap the book's tap; opened, it swings open on the dark; a turn that misses rattles it with
-   the turn's own words; stepping back leaves it be. Anywhere else on the leaf, or before he has the spell, the rattle */
+   offers Charms' turn, his tap the book's tap; opened, it swings open on the dark; a turn that misses rattles it, locked
+   (req 610); stepping back leaves it be. Anywhere else on the leaf, or before he has the spell, the rattle */
 var CUPBOARD_LOCK_R = 0.2, cupLockV = new THREE.Vector3();
 function cupboardLockAt(uv) { return uv && Math.hypot((uv.x - CUPBOARD.lock.u) * CUPBOARD.w, (uv.y - CUPBOARD.lock.v) * CUPBOARD.h) < CUPBOARD_LOCK_R; }
 function cupboardLockOnScreen() {
@@ -2695,7 +2697,7 @@ function cupboardLockOffered() {
     if (lockOffer === mine) lockOffer = null;
     if (!out) return;
     if (out.verdict === 'opened') { cupboardSwing(true); firstCast(out, 'alohomora'); }
-    else if (out.verdict === 'tight' || out.verdict === 'missed') cupboardRattle(out.why);
+    else if (out.verdict === 'tight' || out.verdict === 'missed') cupboardRattle();
   });
 }
 /* Charms' openLock (req 282): it swings open on the dark, and shuts itself after a few seconds unless held */
