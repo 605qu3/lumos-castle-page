@@ -88,6 +88,16 @@
         "a third-row desk with one leg newer and paler than the other three"
       ],
       "canon": "Interiors' schedule (docs/interiors/transfiguration-classroom.md, a desk with one newer leg; its Rework 7): CoS 16 L12163, a wand slips and vanishes a desk's leg and she restores it, the lesson the week before the exams, 25 May (the reckoning of the set-aside rabbits' rule, CoS 16 L12159 to L12171); so from 25 May of the Chamber's castle and in every later year; the newer leg ours; no name on it; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "castle date >= 1 06-05"
+      ],
+      "show": [
+        "a row of six snuffboxes along the front edge of her desk, lids up, the last one with whiskers"
+      ],
+      "canon": "the Curator's req 564 and req 567 (docs/curator/transfiguration-classroom.md, item 7; Godric's pick of 16 October 2026 with Kingsley's review, docs/ministry/reviews/2026-10-16-desk-answers.md): PS 16 L5460, the practical exam, \"Professor McGonagall watched them turn a mouse into a snuffbox\", points \"taken away if it had whiskers\"; the last exam History of Magic (L5466), the night of the trapdoor that same day (about 5 June, the set-aside rule's reckoning), so from 5 June of the Stone's castle, after the latest the practical can fall, and in every later year; never the exam itself; moved from her study (mcgonagall.json room[4], aside); checked against the text, 16 October 2026"
     }
   ],
   "records": [

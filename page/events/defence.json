@@ -125,12 +125,13 @@
     {
       "when": [
         "place = defence classroom",
-        "year = 3"
+        "year = 3",
+        "castle date < 3 06-08"
       ],
       "show": [
         "a lesson under way: Professor Lupin at the front, the class in the rows"
       ],
-      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PoA 7 L15857 on, Lupin's year; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026"
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PoA 7 L15857 on, Lupin's year; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; bounded before 8 June of the Azkaban castle, when his office stands emptied (the Curator's req 565, item 26; 16 October 2026)"
     },
     {
       "when": [
@@ -217,24 +218,37 @@
     {
       "when": [
         "place = defence office",
-        "year = 3"
+        "year = 3",
+        "castle date < 3 06-08"
       ],
       "show": [
         "the grindylow's tank on its stand in the far right corner, a sickly green creature in it pressing its face to the glass"
       ],
-      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the grindylow's tank, Lupin's year): PoA 8 L16354, L16358, any day of the Azkaban castle; checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the grindylow's tank, Lupin's year): PoA 8 L16354, L16358, any day of the Azkaban castle; checked against the text, 15 October 2026; bounded before 8 June of the Azkaban castle, when his office stands emptied (the Curator's req 565, item 26; 16 October 2026)"
     },
     {
       "when": [
         "place = defence office",
         "year = 3",
+        "castle date < 3 06-08",
         "moon = waxing-gibbous",
         "time != night"
       ],
       "show": [
         "a goblet on the desk, smoking faintly"
       ],
-      "canon": "the change list's Rework 8 (room[5] to [7] merged, no date bounds): PoA 18 L20452, he takes the potion \"in the week preceding the full moon\", so in Lupin's year whenever the real moon is waxing gibbous, by day; never Halloween's handing over (PoA 8 L16414 to L16418, a plot moment); checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 8 (room[5] to [7] merged, no date bounds): PoA 18 L20452, he takes the potion \"in the week preceding the full moon\", so in Lupin's year whenever the real moon is waxing gibbous, by day; never Halloween's handing over (PoA 8 L16414 to L16418, a plot moment); checked against the text, 15 October 2026; bounded before 8 June of the Azkaban castle, when his office stands emptied (the Curator's req 565, item 26; 16 October 2026)"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "year = 3",
+        "castle date >= 3 06-08"
+      ],
+      "show": [
+        "the office emptied: the grindylow's tank gone from its corner, the desk bare, nothing under it"
+      ],
+      "canon": "the Curator's req 565, item 26 (docs/curator/defence-classroom.md; Godric's pick of 16 October 2026 with Kingsley's review, docs/ministry/reviews/2026-10-16-desk-answers.md): PoA 22 L21932, he \"resigned firs' thing this mornin'\", the morning after the Shack (6 June, the set-aside rule's reckoning), and packed that day (L21946, the empty tank beside the suitcase; L21978, his last books into his case and the drawers closed); so from 8 June of the Azkaban castle, after the latest he can be gone, to the year's end; never his farewell, no Map, no one in it; Lupin's things the PoA year only; checked against the text, 16 October 2026"
     }
   ],
   "records": [

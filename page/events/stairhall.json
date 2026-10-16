@@ -179,6 +179,116 @@
       ],
       "canon": "as above",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): the Fat Lady hiding, PoA 9 on the plot calendar (EV-34)"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date = 10-31",
+        "time = night"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "the Curator's req 566, item 10 (docs/curator/stair-hall.md; Godric's pick of 16 October 2026 with Kingsley's review, docs/ministry/reviews/2026-10-16-desk-answers.md): PoA 9 L16605, \"Hiding in a map of Argyllshire on the second floor\", from Hallowe'en night; in the PoA year only, until she is back in her frame the day after the Ravenclaw match (PoA 14 L18706, Sir Cadogan sacked; the match the first Saturday of February here, the book giving no day): the old rule's reckoning, room[5] to room[13] (aside); gentle, hiding, never shown attacked, no tears; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date >= 11-01"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above: still there while Sir Cadogan keeps her frame, until the Sunday after the Ravenclaw match, when he is sacked and she is back (PoA 14 L18706; the match the first Saturday of February here, the book giving no day)"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date <= 02-01"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above, January to the first of February"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date = 02-02",
+        "day of week <= 6"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above: from 02-02 to 02-08 she stays until the first Sunday on or after 02-02, the day after the first Saturday of February"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date = 02-03",
+        "day of week >= 2",
+        "day of week <= 6"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date = 02-04",
+        "day of week >= 3",
+        "day of week <= 6"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date = 02-05",
+        "day of week >= 4",
+        "day of week <= 6"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date = 02-06",
+        "day of week >= 5",
+        "day of week <= 6"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "year = 3",
+        "date = 02-07",
+        "day of week = 6"
+      ],
+      "show": [
+        "in the map of Argyllshire a fat lady's pink skirts among the lochs, where she has tucked herself away behind a painted hill"
+      ],
+      "canon": "as above"
     }
   ],
   "records": [

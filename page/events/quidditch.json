@@ -5,12 +5,14 @@
     {
       "when": [
         "place = commentators box",
+        "year >= 3",
         "match = yes",
         "hour < 11"
       ],
       "show": [
         "the box made ready for the match: the megaphone laid on the ledge before the commentator's chair, the two slates wiped clean and propped against the batten, a new stub of chalk in each groove, nobody here yet"
-      ]
+      ],
+      "canon": "the Curator's req 576, item 4: the magical megaphone (PoA 15 L19525), from the Azkaban castle on; checked against the text, 16 October 2026"
     },
     {
       "when": [
@@ -26,6 +28,7 @@
     {
       "when": [
         "place = commentators box",
+        "year >= 3",
         "match = yes",
         "hour >= 11",
         "hour < 13",
@@ -33,11 +36,13 @@
       ],
       "show": [
         "the match under way: the commentator up at the ledge with the megaphone, a teacher in the chair beside, the two places at the ledge kept free for the boys, a slate and chalk at each"
-      ]
+      ],
+      "canon": "the Curator's req 576, item 4: the magical megaphone (PoA 15 L19525), from the Azkaban castle on; checked against the text, 16 October 2026"
     },
     {
       "when": [
         "place = commentators box",
+        "year >= 3",
         "match = yes",
         "hour >= 11",
         "hour < 13",
@@ -45,7 +50,8 @@
       ],
       "show": [
         "the commentator calling each goal through the megaphone, ten points at a time, and the stands roaring under the box"
-      ]
+      ],
+      "canon": "the Curator's req 576, item 4: the magical megaphone (PoA 15 L19525), from the Azkaban castle on; checked against the text, 16 October 2026"
     },
     {
       "when": [
@@ -89,23 +95,27 @@
     {
       "when": [
         "place = commentators box",
+        "year >= 3",
         "match = yes",
         "hour >= 13"
       ],
       "show": [
         "chalk dust on the ledge under the slates and the final score still chalked up, the megaphone carried away, the two chairs pushed back"
-      ]
+      ],
+      "canon": "the Curator's req 576, item 4: the magical megaphone (PoA 15 L19525), from the Azkaban castle on; checked against the text, 16 October 2026"
     },
     {
       "when": [
         "place = commentators box",
+        "year >= 3",
         "match = yes",
         "hour = 12",
         "meal = lunch"
       ],
       "show": [
         "chalk dust on the ledge under the slates and the final score still chalked up, the megaphone carried away, the two chairs pushed back"
-      ]
+      ],
+      "canon": "the Curator's req 576, item 4: the magical megaphone (PoA 15 L19525), from the Azkaban castle on; checked against the text, 16 October 2026"
     },
     {
       "when": [
@@ -167,6 +177,71 @@
       "show": [
         "the pitch dark and empty below, the hoops' rings black against the sky"
       ]
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "year <= 2",
+        "match = yes",
+        "hour < 11"
+      ],
+      "show": [
+        "the box made ready for the match: the two slates wiped clean and propped against the batten, a new stub of chalk in each groove, nobody here yet"
+      ],
+      "canon": "the Curator's req 576, item 4 (docs/curator/commentators-box.md): the magical megaphone is named only from PoA 15 (L19525), so the PS and CoS castles' box holds none, how the commentator is heard left unexplained as the books leave it; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "year <= 2",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none"
+      ],
+      "show": [
+        "the match under way: the commentator up at the ledge, a teacher in the chair beside, the two places at the ledge kept free for the boys, a slate and chalk at each"
+      ],
+      "canon": "the Curator's req 576, item 4 (docs/curator/commentators-box.md): the magical megaphone is named only from PoA 15 (L19525), so the PS and CoS castles' box holds none, how the commentator is heard left unexplained as the books leave it; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "year <= 2",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none"
+      ],
+      "show": [
+        "the commentator calling each goal, ten points at a time, and the stands roaring under the box"
+      ],
+      "canon": "the Curator's req 576, item 4 (docs/curator/commentators-box.md): the magical megaphone is named only from PoA 15 (L19525), so the PS and CoS castles' box holds none, how the commentator is heard left unexplained as the books leave it; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "year <= 2",
+        "match = yes",
+        "hour >= 13"
+      ],
+      "show": [
+        "chalk dust on the ledge under the slates and the final score still chalked up, the two chairs pushed back"
+      ],
+      "canon": "the Curator's req 576, item 4 (docs/curator/commentators-box.md): the magical megaphone is named only from PoA 15 (L19525), so the PS and CoS castles' box holds none, how the commentator is heard left unexplained as the books leave it; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = commentators box",
+        "year <= 2",
+        "match = yes",
+        "hour = 12",
+        "meal = lunch"
+      ],
+      "show": [
+        "chalk dust on the ledge under the slates and the final score still chalked up, the two chairs pushed back"
+      ],
+      "canon": "the Curator's req 576, item 4 (docs/curator/commentators-box.md): the magical megaphone is named only from PoA 15 (L19525), so the PS and CoS castles' box holds none, how the commentator is heard left unexplained as the books leave it; checked against the text, 16 October 2026"
     }
   ]
 }
