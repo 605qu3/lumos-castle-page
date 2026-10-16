@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 63,
+  "version": 64,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -56,7 +56,8 @@ window.CASTLE_MODEL = {
   ],
   "ages_about": "The history's seven ages (docs/architect/hogwarts-history-2026-10-12.md), proposed under Godric's 6.1 (13 October 2026, 7.13 am): each mass and tower lists the ages that built or raised it, the first the oldest (tools/architect-accreted-castle.py's pieces by footprint).",
   "materials": {
-    "state": "proposed",
+    "state": "designed",
+    "state_about": "five stones by age (architect-materials-1016, 1) taken 3.24 pm, 16 October 2026, on Fawkes's agreement, provisional, Godric to confirm",
     "about": "The castle's materials schedule (req 636; Godric's Talk of 16 October 2026, 2.49 pm), proposed: one palette every room reads instead of choosing its own. A room's stone is the age that built its walls at its height (tools/architect-materials.py resolves every room from tools/architect-accreted-castle.py's pieces), dressed by the room's rank; its doors' surround follows its wall's age; its ceiling its kind, span and age, a vault only where the storey lets it rise; its floor flags or boards by what is under it. The real quarry stones, vaults and mouldings are Precedents' to find; docs/architect/materials.md is the schedule in words.",
     "stones": [
       {
@@ -158,7 +159,7 @@ window.CASTLE_MODEL = {
           "P1",
           "P2"
         ],
-        "say": "a round head of plain voussoirs, square-edged jambs, a flat sill stone (the common room's key door as drawn)"
+        "say": "a round head of plain voussoirs, square-edged jambs, a flat sill stone"
       },
       {
         "id": "pointed",
