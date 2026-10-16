@@ -2529,7 +2529,8 @@
     {
       "when": [
         "place = bastion flanker",
-        "weather = fog"
+        "weather = fog",
+        "time != night"
       ],
       "show": [
         "nothing through the port but fog"
@@ -2538,7 +2539,9 @@
     {
       "when": [
         "place = bastion flanker",
-        "ground = snow"
+        "ground = snow",
+        "weather != fog",
+        "time != night"
       ],
       "show": [
         "snow lying along the foot of the wall outside the port"
