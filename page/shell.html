@@ -155,8 +155,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
 <script src="castle-model.js?v=344"></script>
-<script src="castle-shell.js?v=9"></script>
-<script src="castle-events.js?v=33"></script>
+<script src="castle-shell.js?v=10"></script>
+<script src="castle-events.js?v=36"></script>
 <script>
 (function () {
 'use strict';
@@ -249,7 +249,9 @@ function limits(s) {
   return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
 }
 var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
-var things = shell.doors.concat(shell.ways), tappables = things.map(function (d) { return d.mesh; });
+/* v10 of the shells: a hidden opening seen from its outer side is wall with an unseen tap over it (Events' req 534:
+   `tap keep-east-stair-panel-3` from the stair hall); a tap there walks him to it, a second is its id to the events */
+var things = shell.doors.concat(shell.ways, shell.hidden || []), tappables = things.map(function (d) { return d.mesh; });
 var trail = [START.pos.clone()];
 function thingOf(mesh) { return things.filter(function (d) { return d.mesh === mesh; })[0]; }
 function flightOf(mesh) { var id = mesh.userData.stair; return id ? shell.flights.filter(function (f) { return f.id === id; })[0] : null; }
@@ -306,7 +308,7 @@ function answer(d, point) {
   if (events) events.tap(d.id);   /* a turn's cue fires inside the tap (Events, 6.17 pm), so the shake is decided after */
   else if (CUP && d === CUP.d) { turnDone = 'cupboard'; cupSet(CUP.target < 1); }   /* B21 with the events absent */
   if (turnDone === 'giggle') shake(d, 0.85, 45, 0.012 + 0.03 * (lastTickle ? lastTickle.near : 0.5));
-  else if (!turnDone) shake(d, 0.45, 70, 0.025);
+  else if (!turnDone && d.rest) shake(d, 0.45, 70, 0.025);   /* a wall or a way out stays still (v10) */
   if (hooks.onDoorTap) hooks.onDoorTap({ id: d.id, to: d.to, place: d.place });
 }
 function shake(d, s, f, a) {

@@ -20,6 +20,12 @@
              round at each are Interaction's to set (docs/interaction-vocabulary.md §2, req 208), by passing their
              own list to the page.
      route   route(a, b, level): the turns between two stands on one floor that keep him on the floor (null if none).
+     hidden  v10: a hidden opening seen from its outer side, a wall, and over it an unseen tap: { id, to, mesh, stand,
+             level, hidden } (the tap is its id to the events, as a door's: Events' `tap keep-east-stair-panel-3`)
+   v10 (Events' req 534): a round room ({ circle, r }, 24 sides, a side square to its first door, its walls as deep as
+   its deepest loop), a ring (a feature's `ring`: whole, or an arc where two of its openings stand across it, the long
+   way round) and the leads (a feature with `rect`, `z` and `parapet`: a court in the sky, its breast and merlons, the
+   crenels barred) are places too.
    Reads only the model and castle.js's helpers (F.solid, F.register); edits nothing of the shared frame. */
 (function () {
 'use strict';
@@ -52,6 +58,61 @@ function findPlace(M, id) {
     var floor = base + (r.floor || 0);
     return { id: r.id, name: r.name, kind: 'room', poly: pts, floor: floor, ceiling: base + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7),
       wall: r.wall || WALL_T, walls: r.walls || null, rec: r };
+  }
+  /* v10: a round room, SIDES sides about the circle, one side's middle on its first door, its wall as deep as its
+     deepest loop (the West Tower's drum, 3.2) */
+  if (r && r.shape && r.shape.circle) {
+    var cb = levelZ(M, r.level) + (r.group ? M.groups.filter(function (g) { return g.id === r.group; })[0].place.z - levelZ(M, r.level) : 0);
+    var cc = toSite(M, r.group, r.shape.circle), rr = r.shape.r, deep = 0;
+    var first = (M.openings || []).filter(function (op) { return op.at && (op.between || []).indexOf(r.id) >= 0; })[0];
+    var off = first ? angle(cc, toSite(M, first.group || null, first.at)) : 0, half = 180 / SIDES;
+    var cp = arcPts(cc, rr / Math.cos(half * Math.PI / 180), off + half, off + 360 + half, SIDES).slice(0, SIDES);
+    (M.openings || []).forEach(function (op) { if (op.room === r.id && op.depth) deep = Math.max(deep, op.depth); });
+    return { id: r.id, name: r.name, kind: 'room', poly: cp, area: { outer: cp, holes: [] }, round: { c: cc, r: rr }, floor: cb + (r.floor || 0),
+      ceiling: cb + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7), wall: r.wall || deep || WALL_T, walls: null, rec: r };
+  }
+  /* v10: a ring (the lamplighters' gallery, the old wall-walk): whole, or where two of its openings stand across it (the
+     turret's landing on the wall-walk) an arc the long way round between them; its shutters and loops by bearing */
+  var ft = (M.features || []).filter(function (x) { return x.id === id && x.ring; })[0];
+  if (ft) {
+    var R = ft.ring, c = R.c, ri = R.inner_r, ro = R.outer_r, hh = ft.h || 2.2, loops, loopH = null, loopT = null, ops = [];
+    var its = (M.openings || []).filter(function (op) { return op.at && matches(M, op, id); });
+    var ends = its.filter(function (op) { var d = Math.hypot(op.at[0] - c[0], op.at[1] - c[1]); return d > ri + 0.05 && d < ro - 0.05; })
+                  .map(function (op) { return angle(c, op.at); });
+    var lan = (M.features || []).filter(function (x) { return x.centre && x.ridge && Math.hypot(x.centre[0] - c[0], x.centre[1] - c[1]) < 0.1; })[0] || null;
+    if (ends.length >= 2) {
+      var p = ends[0], q = ends[1], d = ((q - p) % 360 + 360) % 360, a0 = d < 180 ? q : p, a1 = d < 180 ? p : q;
+      while (a1 <= a0) a1 += 360;
+      var n = Math.max(8, Math.ceil((a1 - a0) / 7.5));
+      loops = [arcPts(c, ro, a0, a1, n).concat(arcPts(c, ri, a1, a0, n))];
+    } else {
+      /* each side's middle on the first door (outside) and on bearings 15 degrees apart (inside), so a shutter is never
+         split by a corner; the inner sides long enough for one (0.6 at 2.3) */
+      var f0 = its[0] ? angle(c, its[0].at) : 0, n2 = 48, h2 = 180 / n2, n3 = SIDES, h3 = 180 / n3, b0 = 90 - Math.round((90 - f0) / 15) * 15;
+      loops = [arcPts(c, ro / Math.cos(h2 * Math.PI / 180), f0 + h2, f0 + 360 + h2, n2).slice(0, n2),
+               arcPts(c, ri / Math.cos(h3 * Math.PI / 180), b0 + 360 + h3, b0 + h3, n3).slice(0, n3)];
+      /* the breast toward the void stands a little over its shutters (their heads at 1.7), boarded, 0.3; the drum's own
+         wall to its glass */
+      var sh = ft.shutters;
+      loopH = [lan ? lan.z - ft.z : hh, sh ? sh.sill + sh.h + 0.2 : hh];
+      if (sh) loopT = [null, 0.3];
+    }
+    if (ft.shutters) ft.shutters.bearings.forEach(function (b) {
+      ops.push({ id: id + '-shutter-' + b, kind: 'shutter behind a fixed grille', room: id, at: atBearing(c, ri, b), w: ft.shutters.w, h: ft.shutters.h, sill: ft.shutters.sill, grille: true });
+    });
+    if (ft.loops) ft.loops.bearings.forEach(function (b) {
+      ops.push({ id: id + '-loop-' + b, kind: 'loop', room: id, at: atBearing(c, ro, b), w: ft.loops.w_in || 0.3, h: ft.loops.h, sill: ft.loops.sill });
+    });
+    return { id: id, name: ft.name || id.replace(/-/g, ' '), kind: 'ring', poly: loops[0], loops: loops, loopH: loopH, loopT: loopT,
+      area: { outer: loops[0], holes: loops.slice(1) }, ring: { c: c, ri: ri, ro: ro }, floor: ft.z, ceiling: lan ? null : ft.z + hh,
+      wall: WALL_T, walls: null, rec: ft, ops: ops, lantern: lan };
+  }
+  /* v10: the leads (the keep's), a court in the sky: its floor at z, its parapet's breast and merlons, no ceiling */
+  var lf = (M.features || []).filter(function (x) { return x.id === id && x.rect && x.z != null && x.parapet; })[0];
+  if (lf) {
+    var lb = lf.rect;
+    return { id: id, name: lf.name || id.replace(/-/g, ' '), kind: 'leads', poly: [[lb[0], lb[1]], [lb[2], lb[1]], [lb[2], lb[3]], [lb[0], lb[3]]],
+      floor: lf.z, ceiling: null, wall: WALL_T, walls: null, rec: lf, sky: { breast: lf.parapet.breast || 1.1, merlons: lf.parapet.merlons || 0 } };
   }
   /* v8 (Events' req 526): a place nested in a ground (the commentator's box in the Quidditch pitch's teachers' stand),
      its floor and eaves from its own numbers, its door and its open front over its ledge made its openings */
@@ -87,11 +148,38 @@ function other(op, id) {
 function isWay(kind) { return /open mouth|archway|arch\b/.test(kind || ''); }
 function isDoor(kind) { return /door/.test(kind || '') && !isWay(kind); }
 
-/* the edge of a polygon a site point lies on (within a wall's thickness), and how far along it */
-function onEdge(poly, p, tol) {
+/* v10: circles. A site angle in degrees counter-clockwise from x; the model's bearing clockwise from y */
+var SIDES = 24;
+function angle(c, p) { return Math.atan2(p[1] - c[1], p[0] - c[0]) * 180 / Math.PI; }
+function arcPts(c, r, a0, a1, n) {
+  var p = [];
+  for (var k = 0; k <= n; k++) { var a = (a0 + (a1 - a0) * k / n) * Math.PI / 180; p.push([c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]); }
+  return p;
+}
+function atBearing(c, r, b) { return arcPts(c, r, 90 - b, 90 - b, 1)[0]; }
+function inPoly(pts, x, y) {
+  var inside = false;
+  for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    var a = pts[i], b = pts[j];
+    if ((a[1] > y) !== (b[1] > y) && x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]) inside = !inside;
+  }
+  return inside;
+}
+/* a place's walls as edges, loop by loop (a ring has two), each with its own height where the place gives one */
+function edgesOf(loops, hs, ts) {
+  var E = [];
+  loops.forEach(function (pts, j) { pts.forEach(function (a, i) { E.push({ a: a, b: pts[(i + 1) % pts.length], H: hs ? hs[j] : null, T: ts ? ts[j] : null }); }); });
+  return E;
+}
+
+/* the edge of a polygon (or of a list of edges, v10) a site point lies on (within a wall's thickness), and how far
+   along it */
+function onEdge(poly, p, tol) { return onEdgeE(edgesOf([poly]), p, tol); }
+function onEdgeE(E, p, tol) {
   var best = null;
-  for (var i = 0; i < poly.length; i++) {
-    var a = poly[i], b = poly[(i + 1) % poly.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+  for (var i = 0; i < E.length; i++) {
+    var a = E[i].a, b = E[i].b, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+    if (L < 1e-6) continue;
     var s = ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L, d = Math.abs((p[0] - a[0]) * dy - (p[1] - a[1]) * dx) / L;
     if (s < -0.01 || s > L + 0.01) continue;
     if (!best || d < best.d) best = { i: i, s: s, d: d, L: L };
@@ -100,8 +188,8 @@ function onEdge(poly, p, tol) {
 }
 
 /* how far along edge i a point lies, held to the edge */
-function alongEdge(poly, i, p) {
-  var a = poly[i], b = poly[(i + 1) % poly.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+function alongEdge(E, i, p) {
+  var a = E[i].a, b = E[i].b, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
   return Math.max(0, Math.min(L, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L));
 }
 
@@ -120,10 +208,28 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   mats.wall.side = THREE.DoubleSide;
   mats.roof = F.solid(GREY.ceil); mats.roof.side = THREE.DoubleSide;
   mats.glass = F.solid(0xc9d2d8); mats.glass.side = THREE.DoubleSide;     /* the lantern's lights, the palest grey */
-  var out = { group: group, place: P, places: [P], doors: [], ways: [], stairs: [], flights: [], stands: [], toLocal: toLocal };
+  mats.floorD = F.solid(GREY.floor); mats.floorD.side = THREE.DoubleSide;
+  mats.ceilD = F.solid(GREY.ceil); mats.ceilD.side = THREE.DoubleSide;
+  mats.grille = F.solid(0x3b3632);
+  var out = { group: group, place: P, places: [P], doors: [], ways: [], hidden: [], stairs: [], flights: [], stands: [], toLocal: toLocal };
 
   function quad(w, h, mat, layer) { return F.register(new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat), LAYER[layer]); }
   function slab(w, h, d, mat, layer) { return F.register(new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat), LAYER[layer]); }
+  /* v10: a floor or ceiling the shape of a place's area (a round room's, a ring's with its hole), at height z */
+  function areaMesh(Q, z, mat, layer) {
+    function trace(path, pts) { path.moveTo(pts[0][0], pts[0][1]); for (var k = 1; k < pts.length; k++) path.lineTo(pts[k][0], pts[k][1]); }
+    var sh = new THREE.Shape(); trace(sh, Q.area.outer);
+    Q.area.holes.forEach(function (hp) { var p = new THREE.Path(); trace(p, hp); sh.holes.push(p); });
+    var geo = new THREE.ShapeGeometry(sh), pos = geo.attributes.position;
+    for (var k = 0; k < pos.count; k++) { var v = toLocal(pos.getX(k), pos.getY(k), z); pos.setXYZ(k, v.x, v.y, v.z); }
+    geo.computeVertexNormals();
+    return F.register(new THREE.Mesh(geo, mat), LAYER[layer]);
+  }
+  function inArea(q, x, y) {
+    if (q.area) return inPoly(q.area.outer, x, y) && !q.area.holes.some(function (h) { return inPoly(h, x, y); });
+    var xs = q.poly.map(function (p) { return p[0]; }), ys = q.poly.map(function (p) { return p[1]; });
+    return x >= Math.min.apply(null, xs) - 0.01 && x <= Math.max.apply(null, xs) + 0.01 && y >= Math.min.apply(null, ys) - 0.01 && y <= Math.max.apply(null, ys) + 0.01;
+  }
 
   /* a roof seen from below (v6, ledger line 15): its flat part a ceiling; its hip over roof.rect open beneath, the
      planes cut round each lantern on the ridge (a feature in this place with a centre, r and ridge: well-lantern), whose
@@ -177,69 +283,113 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var xs = Q.poly.map(function (p) { return p[0]; }), ys = Q.poly.map(function (p) { return p[1]; });
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     var H = (Q.ceiling != null ? Q.ceiling : Q.floor + 12) - Q.floor;
+    if (Q.sky) H = Q.sky.breast;                                         /* v10: the leads' walls are their breast */
     var c = toLocal((x0 + x1) / 2, (y0 + y1) / 2, Q.floor);
-    var floor = quad(x1 - x0, y1 - y0, mats.floor, 'floor');
-    floor.rotation.x = -Math.PI / 2; floor.position.copy(c); floor.name = Q.id + '-floor'; group.add(floor);
+    if (Q.area) { var fa = areaMesh(Q, Q.floor, mats.floorD, 'floor'); fa.name = Q.id + '-floor'; group.add(fa); }
+    else {
+      var floor = quad(x1 - x0, y1 - y0, mats.floor, 'floor');
+      floor.rotation.x = -Math.PI / 2; floor.position.copy(c); floor.name = Q.id + '-floor'; group.add(floor);
+    }
     if (Q.roof) buildRoof(Q);
+    else if (Q.ceiling != null && Q.area) { var ca = areaMesh(Q, Q.ceiling, mats.ceilD, 'ceiling'); ca.name = Q.id + '-ceiling'; group.add(ca); }
     else if (Q.ceiling != null) {
       var ceil = quad(x1 - x0, y1 - y0, mats.ceil, 'ceiling');
       ceil.rotation.x = Math.PI / 2; ceil.position.set(c.x, c.y + H, c.z); ceil.name = Q.id + '-ceiling'; group.add(ceil);
     }
+    /* v10: the lamplighters' gallery has no ceiling: over its drum the lantern's glass and its cap */
+    if (Q.lantern) {
+      var Ln = Q.lantern;
+      var gl = F.register(new THREE.Mesh(new THREE.CylinderGeometry(Ln.r, Ln.r, Ln.top - Ln.z, 40, 1, true), mats.glass), LAYER.wall);
+      gl.position.copy(toLocal(Ln.centre[0], Ln.centre[1], (Ln.z + Ln.top) / 2)); gl.name = Ln.id + '-glass'; group.add(gl);
+      var cap = F.register(new THREE.Mesh(new THREE.ConeGeometry(Ln.r + 0.2, Ln.ridge - Ln.top, 40, 1, true), mats.roof), LAYER.ceiling);
+      cap.position.copy(toLocal(Ln.centre[0], Ln.centre[1], (Ln.top + Ln.ridge) / 2)); cap.name = Ln.id + '-cap'; group.add(cap);
+    }
+    var E = edgesOf(Q.loops || [Q.poly], Q.loopH, Q.loopT);
     /* the openings on each edge: a gap [s0, s1] up to its head h */
-    var gaps = Q.poly.map(function () { return []; });
+    var gaps = E.map(function () { return []; });
     (M.openings || []).concat(Q.ops || []).forEach(function (op) {
       if (!matches(M, op, Q.id)) return;
       /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
-         `inside`, the tapestry stair's well), a way out, its sill there `inside_sill` */
+         `inside`, the tapestry stair's well), a way out, its sill there `inside_sill`; v10: from its outer side the
+         wall takes a tap there, unseen (the events' `tap <id>`) */
       var back = !!op.inside && (op.inside === Q.id || slug(op.inside) === Q.id);
-      if (/hidden/.test(op.kind || '') && !back) return;
+      var hid = /hidden/.test(op.kind || '') && !back;
       var gid = op.group || null;
       var pts = op.span ? op.span.map(function (p) { return toSite(M, gid, p); }) : op.at ? [toSite(M, gid, op.at)] : null;
       if (!pts) return;
       /* a doorway with a depth (v6: the Great Hall's doors, a 3 m passage, Godric's Q16) is found from the far face too */
-      var e = onEdge(Q.poly, pts[0], op.depth ? op.depth + 0.2 : null);
+      var e = onEdgeE(E, pts[0], op.depth ? op.depth + 0.2 : null);
       if (!e) return;
       var s0, s1;
       /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
          found on the next wall, its sill and head then running the length of this one */
-      if (pts.length > 1) { var s2 = alongEdge(Q.poly, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
+      if (pts.length > 1) { var s2 = alongEdge(E, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
       else { s0 = e.s - (op.w || 1) / 2; s1 = e.s + (op.w || 1) / 2; }
-      var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0, h = Math.min(H, (op.h || 2.2) + sill);
-      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back });
+      /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
+      if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
+      s0 = Math.max(0, s0); s1 = Math.min(e.L, s1);
+      var sill = (back && op.inside_sill != null ? op.inside_sill : op.sill) || 0;
+      var h = Q.sky ? (op.h || 2.2) + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, (op.h || 2.2) + sill);
+      gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid });
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
        part, its head round */
     (M.features || []).forEach(function (ft) {
       if (!ft.depth || !ft.at || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
-      var e = onEdge(Q.poly, toSite(M, ft.group || null, ft.at));
+      var e = onEdgeE(E, toSite(M, ft.group || null, ft.at));
       if (!e) return;
       gaps[e.i].push({ s0: e.s - ft.w / 2, s1: e.s + ft.w / 2, sill: ft.sill || 0, h: Math.min(H, (ft.h || 2.2) + (ft.sill || 0)), op: ft, niche: true });
     });
-    Q.poly.forEach(function (a, i) {
-      var b = Q.poly[(i + 1) % Q.poly.length], dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+    E.forEach(function (ed, i) {
+      var a = ed.a, b = ed.b, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), HE = ed.H != null ? ed.H : H;
+      if (L < 1e-6) return;
       /* a wall already built from the other side (the place one step on shares it) is not built twice */
       var midE = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
       if (Q !== P && out.places.some(function (R) { var e = R !== Q && onEdge(R.poly, midE); return e && e.d < 0.05; })) return;
       var ux = dx / L, uy = dy / L, nx = uy, ny = -ux;                 /* outward, the polygon counter-clockwise */
-      var t = Q.walls ? (Q.walls[['south', 'east', 'north', 'west'][i]] || Q.wall) : Q.wall;
+      var t = ed.T || (Q.walls ? (Q.walls[['south', 'east', 'north', 'west'][i]] || Q.wall) : Q.wall);
+      var ext = Q.area ? 0 : t;                                          /* a round wall's sides meet at their faces */
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
         var sm = (s0 + s1) / 2, p = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
-        var m = slab(s1 - s0 + (s0 <= 0.01 ? t : 0) + (s1 >= L - 0.01 ? t : 0), yb - ya, t, mats.wall, 'wall');
-        var shift = ((s1 >= L - 0.01 ? t : 0) - (s0 <= 0.01 ? t : 0)) / 2;
+        var m = slab(s1 - s0 + (s0 <= 0.01 ? ext : 0) + (s1 >= L - 0.01 ? ext : 0), yb - ya, t, mats.wall, 'wall');
+        var shift = ((s1 >= L - 0.01 ? ext : 0) - (s0 <= 0.01 ? ext : 0)) / 2;
         m.position.set(p.x + ux * shift, p.y + (ya + yb) / 2, p.z - uy * shift);
         m.rotation.y = ang; m.name = name; group.add(m);
       }
-      var gs = gaps[i].sort(function (g, h) { return g.s0 - h.s0; }), at = 0;
+      /* v10: an iron bar standing in the wall's line, `off` out from its face (a grille's, a crenel's) */
+      function bar(s, ya, yb, off, name) {
+        var p = toLocal(a[0] + ux * s + nx * off, a[1] + uy * s + ny * off, Q.floor), m = slab(0.04, yb - ya, 0.04, mats.grille, 'wall');
+        m.position.set(p.x, p.y + (ya + yb) / 2, p.z); m.rotation.y = ang; m.name = name; group.add(m);
+      }
+      /* v10: a hidden opening seen from its outer side stays wall, with an unseen tap over its face */
+      gaps[i].filter(function (g) { return g.hidden; }).forEach(function (g) {
+        if (out.hidden.some(function (d) { return d.id === g.op.id; })) return;
+        var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill, mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
+        var inward = new THREE.Vector3(-nx, 0, ny), lift = g.sill > RAISED ? g.sill : 0;
+        var hit = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
+        hit.position.set(mid.x - nx * 0.02, mid.y + g.sill + hh / 2, mid.z + ny * 0.02); hit.rotation.y = ang;
+        hit.name = 'hidden-' + g.op.id; hit.userData.hidden = g.op.id; group.add(hit);
+        out.hidden.push({ id: g.op.id, to: other(g.op, Q.id), mesh: hit, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: g.sill,
+          lift: lift, level: Q.floor + lift, hidden: true });
+      });
+      var gs = gaps[i].filter(function (g) { return !g.hidden; }).sort(function (g, h) { return g.s0 - h.s0; }), at = 0;
       gs.forEach(function (g, j) {
-        piece(at, g.s0, 0, H, Q.id + '-wall-' + i + '-' + j);
-        piece(g.s0, g.s1, g.h, H, Q.id + '-head-' + g.op.id);
+        piece(at, g.s0, 0, HE, Q.id + '-wall-' + i + '-' + j);
+        piece(g.s0, g.s1, g.h, HE, Q.id + '-head-' + g.op.id);
         piece(g.s0, g.s1, 0, g.sill, Q.id + '-sill-' + g.op.id);
         at = g.s1;
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
+        /* v10: a door taller than the leads' breast stands in its own wall, the cap house's, half a metre each side */
+        if (Q.sky && g.h > HE) {
+          piece(Math.max(0, g.s0 - 0.5), g.s0, HE, g.h + 0.4, Q.id + '-jamb-a-' + g.op.id);
+          piece(g.s1, Math.min(L, g.s1 + 0.5), HE, g.h + 0.4, Q.id + '-jamb-b-' + g.op.id);
+          piece(g.s0, g.s1, g.h, g.h + 0.4, Q.id + '-over-' + g.op.id);
+        }
+        if (g.op.grille) for (var gb = 1; gb <= 3; gb++) bar(g.s0 + w * gb / 4, g.sill, g.h, 0.1, Q.id + '-grille-' + g.op.id + '-' + gb);
         if (g.niche) {
           var dp = Math.min(g.op.depth, t - 0.05), back = slab(w, hh, t - dp, mats.wall, 'wall');
           var bp = toLocal(a[0] + ux * sm + nx * (dp + (t - dp) / 2), a[1] + uy * sm + ny * (dp + (t - dp) / 2), Q.floor);
@@ -275,7 +425,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             sill: g.sill, lift: lift, level: level, back: g.back });
         }
       });
-      piece(at, L, 0, H, Q.id + '-wall-' + i + '-end');
+      piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
+      /* v10: the leads' merlons on the breast, 1.5 long every 3.0, clear of its doors; each crenel between barred */
+      if (Q.sky && Q.sky.merlons > HE) {
+        var clear = function (s0, s1) { return !gs.some(function (g) { return s1 > g.s0 - 0.6 && s0 < g.s1 + 0.6; }); };
+        for (var m0 = 0.3; m0 < L - 0.3; m0 += 3.0) {
+          var m1 = Math.min(L, m0 + 1.5);
+          if (clear(m0, m1)) piece(m0, m1, HE, Q.sky.merlons, Q.id + '-merlon-' + i + '-' + Math.round(m0 * 10));
+          for (var cb = m1 + 0.3; cb < Math.min(L, m0 + 3.0) - 0.1; cb += 0.3)
+            if (clear(cb, cb)) bar(cb, HE, Q.sky.merlons, t / 2, Q.id + '-bar-' + i + '-' + Math.round(cb * 10));
+        }
+      }
     });
   }
   buildPlace(P);
@@ -286,7 +446,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (out.places.some(function (q) { return q.id === w.to; })) return;
     /* a way out of a hidden place (v8): its far side is its own shell, a tap away, never built here, since the two
        share a wall line the model draws without its thickness */
-    if (w.back) { w.built = true; return; }
+    /* v10: only where that side is a place the shells build (the West Tower's spiral is none yet: its rooms' ways out
+       answer as a shut door, so the events hear the tap) */
+    if (w.back) { w.built = !!findPlace(M, w.to); return; }
     var Q = findPlace(M, w.to);
     /* a built room (one with its own page) is never shelled: the way takes him to its page (line 5's rule) */
     if (Q && Q.rec && Q.rec.page) { w.built = true; w.page = Q.rec.page; }
@@ -351,11 +513,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var r = slabs[i].rect;
       if (Math.abs(slabs[i].z - z) < 0.02 && x >= r[0] - 0.01 && x <= r[2] + 0.01 && y >= r[1] - 0.01 && y <= r[3] + 0.01) return true;
     }
-    return out.places.some(function (q) {
-      if (Math.abs(q.floor - z) > 0.02) return false;
-      var xs = q.poly.map(function (p) { return p[0]; }), ys = q.poly.map(function (p) { return p[1]; });
-      return x >= Math.min.apply(null, xs) - 0.01 && x <= Math.max.apply(null, xs) + 0.01 && y >= Math.min.apply(null, ys) - 0.01 && y <= Math.max.apply(null, ys) + 0.01;
-    });
+    return out.places.some(function (q) { return Math.abs(q.floor - z) <= 0.02 && inArea(q, x, y); });
   }
   function siteOf(v) { return [v.x + cx, cy - v.z]; }
   function clearRun(a, b, z) {
@@ -366,6 +524,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* the turns between two stands on one floor: straight, one turn, or along a landing of that floor */
   out.route = function (from, to, z) {
     var a = siteOf(from), b = siteOf(to), tries = [[], [[a[0], b[1]]], [[b[0], a[1]]]];
+    /* v10: round a ring by its middle, either way */
+    if (P.ring) {
+      var rc = P.ring.c, rm = (P.ring.ri + P.ring.ro) / 2, aa = angle(rc, a), ab = angle(rc, b);
+      [1, -1].forEach(function (dir) {
+        var d = (((ab - aa) * dir) % 360 + 360) % 360, n = Math.max(1, Math.ceil(d / 10));
+        tries.push(arcPts(rc, rm, aa, aa + dir * d, n));
+      });
+    }
     slabs.forEach(function (sl) {
       if (Math.abs(sl.z - z) > 0.02 || !/landing/.test(sl.kind)) return;
       var ly = (sl.rect[1] + sl.rect[3]) / 2, lx = (sl.rect[0] + sl.rect[2]) / 2;
@@ -387,19 +553,37 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
     /* v8: never off the floor (a small room, the commentator's box): nearer the door until he stands on it */
     while (off > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
+    if (P.ring && d.place === P.id) pos = midRing(pos);
     var look = d.mid.clone(); look.y = d.mid.y + d.lift + (d.lift ? EYE : Math.max(EYE, d.h * 0.45));
     return { name: name, pos: pos, look: look, thing: d.mesh, level: d.level };
+  }
+  /* v10: a point in a ring moved out or in to the ring's middle, at the same height */
+  function midRing(v) {
+    var sp = siteOf(v), c = P.ring.c, rx = sp[0] - c[0], ry = sp[1] - c[1], rl = Math.hypot(rx, ry) || 1, rm = (P.ring.ri + P.ring.ro) / 2;
+    var w = toLocal(c[0] + rx / rl * rm, c[1] + ry / rl * rm, null); w.y = v.y;
+    return w;
   }
   /* he arrives through a mouth standing in it, a step back on the side he came from, looking in (only into the wall's
      depth where the far side is a room's page, short of the dark beyond); through a door, a step inside it */
   function facingIn(d, name) {
     var back = d.back ? 0.5 : d.mesh.userData.way ? (d.page || !d.built ? -0.3 : -1.0) : STAND_OFF;
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE;
+    /* v10: never off the floor (a ring 0.9 wide): nearer the door until he stands on it */
+    while (back > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { back -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(back)); pos.y = d.mid.y + d.lift + EYE; }
     var look = d.mid.clone().add(d.inward.clone().multiplyScalar(STAND_OFF + 20)); look.y = d.mid.y + d.lift + EYE + 0.3;
+    /* v10: in a ring he stands in its middle and looks along it, not across its void */
+    if (P.ring) {
+      pos = midRing(pos);
+      var sp = siteOf(pos), rx = sp[0] - P.ring.c[0], ry = sp[1] - P.ring.c[1], rl = Math.hypot(rx, ry) || 1, k = P.loopH ? 1 : -1;
+      var tx = -ry / rl * k, ty = rx / rl * k, q2 = [sp[0] + tx * 1.5, sp[1] + ty * 1.5];
+      if (!onLevel(q2[0], q2[1], d.level)) { tx = -tx; ty = -ty; }
+      look = toLocal(sp[0] + tx * 6, sp[1] + ty * 6, d.level + EYE);
+    }
     return { name: name, pos: pos, look: look, thing: null, level: d.level };
   }
   var all = out.doors.concat(out.ways), mine = all.filter(function (d) { return d.place === P.id; });
   var entry = mine.filter(function (d) { return o.from && d.to === o.from; })[0] || mine.filter(function (d) { return o.start && d.id === o.start; })[0] || mine[0];
+  all = all.concat(out.hidden);
   if (entry) out.stands.push(facingIn(entry, 'start'));
   else {
     /* a place with no door or way of its own in this year (the Room's corridor, a room past a shut door): he starts
