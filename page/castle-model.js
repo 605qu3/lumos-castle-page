@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 50,
+  "version": 51,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -437,7 +437,7 @@ window.CASTLE_MODEL = {
       "state": "built", "about": "the dormitory's door at the stair head (Godric's 1 on dormitory-sign-door-1013, 13 October 2026, 1.51 to 1.55 pm, req 260's t1; the Architect's ledger line 5, req 296): in the kerb's gap of the screen round the newel (dorm-stair-screen), across the gap's 1.30 m chord, 0.65 m from the newel's centre toward the room's (bearing 122.1), its face to the room, the year's sign on its stair side; the dormitory page's newel (4.67, -1.4) through the room's frame is the stair's newel here. His t1: on Christmas morning the twins fling it open and bound in (PS 12)",
       "cite": "CoS 5, PS 12" },
     { "id": "front-doors", "first": "PS", "kind": "the great oak front doors, two leaves", "between": ["entrance-hall", "gate-passage"], "at": [80, 70],
-      "w": 4.0, "h": 6.0, "state": "books", "about": "at the top of a flight of stone steps, facing the marble staircase; their size ours. On the grounds' side, the old gate passage through the Astronomy Tower's foot is their porch (gate-passage, its arch gate-arch at the top of the steps; ledger line 47, v30, proposed; from v45 they open between the hall and the passage, so its shell has its inner door; the grounds through gate-arch)",
+      "w": 4.0, "h": 4.2, "state": "books", "about": "at the top of a flight of stone steps, facing the marble staircase; their size ours: 4.2 high under the gate passage's 4.5 vault, as the Corridor page draws them (from v51, 6.0 before; architect-front-doors-1016, taken 16 October 2026, 4.28 am, provisional, Godric to confirm). On the grounds' side, the old gate passage through the Astronomy Tower's foot is their porch (gate-passage, its arch gate-arch at the top of the steps; ledger line 47, v30, proposed; from v45 they open between the hall and the passage, so its shell has its inner door; the grounds through gate-arch)",
       "cite": "PS 6, PS 7, CoS 15, GoF 12" },
     { "id": "great-hall-doors", "first": "PS", "kind": "double doors", "between": ["entrance-hall", "great-hall"], "at": [68, 60.5], "w": 3.2, "h": 5.0,
       "depth": 3.0, "state": "books", "about": "to the right on entering, on the hall's axis; their size ours. Godric's Q16, 1 (taken 14 October 2026, 12.25 am; confirmed by Godric, relayed 15 October 2026; desk architect-q16-doors-1014; ledger line 14): the 3 m of wall between the halls (x 65 to 68, the broom cupboard in it, his 14.1) stays, and the doors open into a vaulted passage 3.2 wide through it, the leaves where they hang at its Entrance Hall face, swinging in; the hall's own mouth at x 65 an open arch the same size", "cite": "PS 7, OotP 33" },
