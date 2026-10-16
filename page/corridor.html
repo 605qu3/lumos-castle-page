@@ -2450,7 +2450,13 @@ var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'
    in a Queen Anne frame, head down (her looking up and her whisper, as the PS 7 portraits whisper at any newcomer, are
    later edits of this drawing) */
 hangDrawing(portraitA, '../assets/layers/corridor-portrait-a.png', 1.0);
-hangDrawing(portraitB, '../assets/layers/corridor-portrait-b.png', 1.0);
+/* portrait-b drawn turned to the left like most of the corridor's paintings, so shown mirrored, turned to the right
+   (Godric's 1, corridor-witch-mirror-1016, 16 October 2026, 8.23 am: "we need to have a healthy mix throughout the
+   castle"): its texture flipped across, the mesh and its winding unchanged, its shadow flipped with it */
+hangDrawing(portraitB, '../assets/layers/corridor-portrait-b.png', 1.0, function () {
+  var t = portraitB.material.map;
+  t.wrapS = THREE.RepeatWrapping; t.repeat.x = -1; t.offset.x = 1; t.needsUpdate = true;
+});
 
 /* the polite door (8 October 2026): 1.0 by 2.2 m; since 10 October 2026, 5.35 pm (Godric's switch) in her old place on
    the long wall, x 0, facing across the corridor. What waits behind it is Magic for the boys' */
