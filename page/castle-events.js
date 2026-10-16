@@ -207,10 +207,11 @@
   /* The castle's day by the clock (docs/room-states.md §7 2 to 4, req 414), one table each, every chain and page
      reading the built-ins `meal`, `occasion` and `lessons`, never a copy. The meals' hours are the Map's of req 242,
      moved here as the one table (map.json keeps none of its own). Lessons from nine (PoA 6 L15206: "Nine o'clock,
-     Divination"); the rest of the hours ours. The Great Hall lane may ask other hours by row. */
+     Divination"), until six (Godric, events-lesson-hours-1016, 16 October 2026); the rest of the hours ours. The
+     Great Hall lane may ask other hours by row. */
   var MEALS = [{ meal: 'breakfast', from: '07:30', to: '08:30' }, { meal: 'lunch', from: '12:30', to: '13:30' },
                { meal: 'dinner', from: '18:30', to: '19:30' }];
-  var LESSON_HOURS = [{ from: '09:00', to: '12:30' }, { from: '13:30', to: '16:30' }];
+  var LESSON_HOURS = [{ from: '09:00', to: '12:30' }, { from: '13:30', to: '18:00' }];
   /* The occasions any pupil sees every year, never a book's own night (the charter, 15 October 2026, holidays): the
      start of term on 1 September, Hallowe'en on 31 October, Christmas from the hall's decorating in the last days of
      term (PS 12 L4054 to L4056, a day before the holidays; the date ours) to 2 January with Christmas Day its own,

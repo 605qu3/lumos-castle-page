@@ -87,7 +87,8 @@
       "show": [
         "a faint whispering from the Restricted Section's books, as though they knew someone was there who shouldn't be"
       ],
-      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026"
+      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026",
+      "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
     },
     {
       "when": [
@@ -97,7 +98,8 @@
       "show": [
         "the screaming book open in his hands, one high, unbroken note pouring out of it"
       ],
-      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026"
+      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026",
+      "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
     },
     {
       "when": [
@@ -107,7 +109,8 @@
       "show": [
         "a teacher's signed note on Madam Pince's desk, a slip of parchment folded once, the signature with a flourish"
       ],
-      "canon": "the Curator's library item 5 (\"A specially signed note from one of the teachers\", PS 12 L4078, read in the text 16 October 2026): any teacher's, unnamed, lying on Madam Pince's desk as the form he is handed; the world rules, Their things: the Restricted Section opens with a teacher's signed note; Events' Q2 option 1, taken by Fawkes at 10.18 am on 16 October 2026, provisional, Godric to confirm: handed once ever, every year, kept after; how it is earned is the Timetable's later (docs/game-notes.md)"
+      "canon": "the Curator's library item 5 (\"A specially signed note from one of the teachers\", PS 12 L4078, read in the text 16 October 2026): any teacher's, unnamed, lying on Madam Pince's desk as the form he is handed; the world rules, Their things: the Restricted Section opens with a teacher's signed note; Events' Q2 option 1, taken by Fawkes at 10.18 am on 16 October 2026, provisional, Godric to confirm: handed once ever, every year, kept after; how it is earned is the Timetable's later (docs/game-notes.md)",
+      "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
     }
   ],
   "records": [
@@ -128,7 +131,8 @@
         "set restricted_note = yes",
         "log \"Given a teacher's signed note for the Restricted Section {day}\""
       ],
-      "canon": "the Curator's library item 5 (\"A specially signed note from one of the teachers\", PS 12 L4078, read in the text 16 October 2026): any teacher's, unnamed, lying on Madam Pince's desk as the form he is handed; the world rules, Their things: the Restricted Section opens with a teacher's signed note; Events' Q2 option 1, taken by Fawkes at 10.18 am on 16 October 2026, provisional, Godric to confirm: handed once ever, every year, kept after; how it is earned is the Timetable's later (docs/game-notes.md)"
+      "canon": "the Curator's library item 5 (\"A specially signed note from one of the teachers\", PS 12 L4078, read in the text 16 October 2026): any teacher's, unnamed, lying on Madam Pince's desk as the form he is handed; the world rules, Their things: the Restricted Section opens with a teacher's signed note; Events' Q2 option 1, taken by Fawkes at 10.18 am on 16 October 2026, provisional, Godric to confirm: handed once ever, every year, kept after; how it is earned is the Timetable's later (docs/game-notes.md)",
+      "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
     },
     {
       "id": "library.screaming-open",
@@ -149,7 +153,8 @@
         "log \"Opened the screaming book in the Restricted Section {day}\"",
         "secret screaming-book"
       ],
-      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026"
+      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026",
+      "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
     },
     {
       "id": "library.screaming-shelved",
@@ -167,7 +172,8 @@
       "starts": [
         "set screaming = off"
       ],
-      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026"
+      "canon": "Magic's req 594 (docs/handoff/magic.md, Rows answered, req 568; 3.4): the Curator's item 7, ordinary Restricted stock every year, Godric's 1 on curator-screaming-book-1016, 7.33 am; PS 12 L4244 (\"A faint whispering was coming from the books, as though they knew someone was there who shouldn't be\"), L4248 (\"the shriek went on and on, one high, unbroken, earsplitting note\", on after it is shut); opened only by a boy with a teacher's signed note (the Curator's item 5; the world rules, Their things: the Restricted Section opens with a teacher's signed note), never words, never a sudden scare (the 15 October ruling): the cover shivers and the whisper rises first, the note swells over a breath, and stops once the book is back in its place; never the black and silver volume (set aside), never Harry's night; checked against the text, 16 October 2026",
+      "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
     },
     {
       "id": "library.screaming-leave",
@@ -181,7 +187,8 @@
       "starts": [
         "set screaming = off"
       ],
-      "canon": "the book is back on its shelf by his next visit, quiet (req 594)"
+      "canon": "the book is back on its shelf by his next visit, quiet (req 594)",
+      "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
     }
   ]
 }

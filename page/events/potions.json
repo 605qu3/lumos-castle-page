@@ -96,7 +96,7 @@
         "castle date >= 1 09-09"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "the change list's Rework 11 under the 15 October rulings (traces keep their dates), with Interiors' schedule (docs/interiors/potions-dungeon.md, the blob by the basin and the pitted patch, touch t1 woven by Godric, 15 October 2026, 3.17 pm): PS 8 L2822 to L2824, a cauldron melted \"into a twisted blob\", the potion \"burning holes in people's shoes\", in the first Friday morning's double Potions of term (L2746); Snape clears only the spill, so the blob stays by the basin; from that Friday's afternoon in the Stone's castle and in every later year; no desk named; checked against the text, 15 October 2026"
@@ -111,7 +111,7 @@
         "time != morning"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "as above, the Stone's castle's first week: that first Friday, after the lesson (the first Friday of lessons falls from 2 to 8 September)"
@@ -125,7 +125,7 @@
         "date <= 09-08"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "as above, the Stone's castle's first week: the days after it, before 9 September (the first Friday of lessons falls from 2 to 8 September)"
@@ -139,7 +139,7 @@
         "date <= 09-08"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "as above, the Stone's castle's first week: as above (the first Friday of lessons falls from 2 to 8 September)"
@@ -153,7 +153,7 @@
         "date <= 09-08"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "as above, the Stone's castle's first week: as above (the first Friday of lessons falls from 2 to 8 September)"
@@ -167,7 +167,7 @@
         "date <= 09-08"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "as above, the Stone's castle's first week: as above (the first Friday of lessons falls from 2 to 8 September)"
@@ -181,7 +181,7 @@
         "date <= 09-08"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "as above, the Stone's castle's first week: as above (the first Friday of lessons falls from 2 to 8 September)"
@@ -194,7 +194,7 @@
         "date = 09-08"
       ],
       "show": [
-        "a cauldron melted into a twisted blob, left on the floor beside the stone basin in the corner",
+        "a cauldron melted into a twisted blob, left on the jars' lowest shelf just right of the stone basin in the corner",
         "a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk"
       ],
       "canon": "as above, the Stone's castle's first week: as above (the first Friday of lessons falls from 2 to 8 September)"
