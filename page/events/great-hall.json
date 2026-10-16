@@ -593,7 +593,8 @@
         "place = great hall"
       ],
       "show": [
-        "the floating candles hanging in midair over the tables, each bobbing a little about its home point"
+        "the floating candles hanging in midair over the tables, each bobbing a little about its home point",
+        "as he comes in through the doors, a soft breath runs up the hall, the nearest candles leaning first, all back at their home points within seconds"
       ]
     },
     {
@@ -612,7 +613,8 @@
         "meal = dinner"
       ],
       "show": [
-        "live bats fluttering from the walls and ceiling and swooping over the tables in low black clouds"
+        "live bats fluttering from the walls and ceiling and swooping over the tables in low black clouds",
+        "the candles in the pumpkins stuttering as the bats swoop past"
       ]
     },
     {
@@ -1046,6 +1048,26 @@
         "old scorch marks worn into the oak of all four house tables here and there, where Howlers have burst over the years"
       ],
       "canon": "Godric's 1 on fawkes-howler-scorches-1015 (7.17 pm): many old scorches worn into every house table, every year, none of them Ron's; the marks placed by Interiors (great-hall.md item 24, req 497); a Howler bursts into flames, CoS 6 L8345"
+    },
+    {
+      "when": [
+        "place = great hall",
+        "windy = yes"
+      ],
+      "show": [
+        "the floating candles swaying a little more than usual about their home points"
+      ],
+      "canon": "Magic's req 592 (docs/handoff/magic.md, The Great Hall, a windy day): a little more sway, inside Interiors' envelope; ours"
+    },
+    {
+      "when": [
+        "place = great hall",
+        "meal != none"
+      ],
+      "show": [
+        "at the meal's end, what is left of the food fades from the plates, leaving them sparkling clean"
+      ],
+      "canon": "Magic's req 592 (3.5): PS 7 L2561, \"the remains of the food faded from the plates, leaving them sparkling clean as before\"; every meal, the Great Hall's page drawing the fade at the meal's end (req 593); checked against the text, 16 October 2026"
     }
   ],
   "records": [
@@ -1105,6 +1127,43 @@
         "meal = breakfast",
         "occasion = none",
         "days since hall_howler >= 14"
+      ],
+      "starts": []
+    },
+    {
+      "id": "great-hall.night-whisper",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-whisper",
+      "weight": 1,
+      "moment": "wait 10-40 s",
+      "when": [
+        "place = great hall",
+        "time = night",
+        "meal = none",
+        "club = none",
+        "occasion != halloween"
+      ],
+      "show": [
+        "a faint whisper runs through the dark hall like a light wind, and is gone"
+      ],
+      "canon": "Magic's req 592 (2.2, t1): the touch relay's lookup-q1-lit-1013 t1 (docs/notes/touch-relay-2026-10-15.md), \"Once the candles are out, on any night, a faint whisper runs through the Hall like a light wind\", every year, anyone in the hall at night could hear it; never PoA 9's night in the Hall (no Halloween night); now and then, one visit in three"
+    },
+    {
+      "id": "great-hall.night-whisper-none",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-whisper",
+      "weight": 2,
+      "moment": "wait 10-40 s",
+      "when": [
+        "place = great hall",
+        "time = night",
+        "meal = none",
+        "club = none",
+        "occasion != halloween"
       ],
       "starts": []
     }
