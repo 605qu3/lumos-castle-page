@@ -29,7 +29,7 @@
 <script src="guide.js?v=6"></script>
 <script>
 /* Finite Incantatem, a test page for the Charms lane (13 October 2026, sixteenth session; the owner is Godric). Drawn
-   in code. The book (CoS 11, checked in the text): at the Duelling Club, with Harry's feet dancing and Malfoy laughing,
+   in code (Rework 6 and 7, 16 October 2026: Flitwick's room after the lesson, the club night only told). The book (CoS 11, checked in the text): at the Duelling Club, with Harry's feet dancing and Malfoy laughing,
    "Snape took charge. 'Finite Incantatem!' he shouted; Harry's feet stopped dancing, Malfoy stopped laughing"; and
    "Hermione and Millicent Bulstrode were still moving", wrestling: no spell had started that. The stroke is ours, for
    the geometry: one ring round every spell still going, judged by LumosSpells.judgeFinite on the tally's own layout
@@ -50,7 +50,7 @@
   var ARC = function (a) { return [0.28 * Math.cos(a * Math.PI / 180), 0.28 * Math.sin(a * Math.PI / 180)]; };
   var ROUNDS = [
     { name: 'All of it', things: [['feather', -0.2, -0.14], ['wand', 0.18, -0.16], ['teddy', -0.16, 0.14], ['stool', 0.2, 0.13]],
-      start: 'The Duelling Club, after the duels: spells still going everywhere. A feather floats, a wand spins, a stool slides, a teddy\'s bandage winds on and on. <b>Draw one ring round all of them</b>: <i>Finite Incantatem!</i>' },
+      start: 'Flitwick\'s classroom, after the lesson: the spells his class left going. A feather still afloat, a wand spinning, a stool sliding, a teddy\'s bandage winding on and on. <b>Draw one ring round all of them</b>: <i>Finite Incantatem!</i>' },
     { name: 'Keep the light', things: [['stool', -0.3, 0.06], ['feather', -0.16, -0.16], ['wand', 0.16, -0.16], ['teddy', 0.3, 0.06], ['lantern', 0, 0.02]],
       start: 'Your own lantern is lit, <i>Lumos</i>, right among them. Finite ends every spell inside the ring, your light too. <b>Ring the four and leave the lantern out</b>: a ring can bend.' },
     { name: 'Horseshoe', things: [['key'].concat(ARC(150)), ['feather'].concat(ARC(210)), ['wand'].concat(ARC(270)), ['teddy'].concat(ARC(330)), ['stool'].concat(ARC(30)), ['lantern', 0, 0]],
@@ -149,7 +149,7 @@
     if (guide) guide.hit(lv > 0);
     LumosSpells.learn('finite');
     if (round === 0) {
-      say('<b>Finite Incantatem!</b> Everything stopped at once, as Harry\'s feet did when Snape shouted it. In the book two were still moving: Hermione and Millicent Bulstrode, wrestling. No spell had started that, so no spell could stop it.');
+      say('<b>Finite Incantatem!</b> Everything stopped at once. Only what a spell started can stop: in Book 2 two pupils at a club night went on wrestling after it, Hermione and Millicent Bulstrode, since no spell had started that.');
       wait = setTimeout(function () { wait = null; choose(1); }, 7800);
     } else {
       var ins = [], outs = [];
@@ -169,7 +169,7 @@
   /* ---- drawing ---- */
   function drawFloor(now) {
     cx.fillStyle = '#2a231c'; cx.fillRect(0, 0, W, H);
-    var bw = Math.max(56, S * 0.17), r, c;   /* the Great Hall's flagstones, from above */
+    var bw = Math.max(56, S * 0.17), r, c;   /* the classroom's flagstones, from above */
     for (r = -1; r * bw < H; r++) for (c = -1; c * bw < W; c++) {
       var x = c * bw + (r % 2 ? bw / 2 : 0), y = r * bw, t = (((r * 7 + c * 13) % 5) + 5) % 5 / 5;
       cx.fillStyle = 'rgb(' + Math.round(58 + t * 14) + ',' + Math.round(50 + t * 12) + ',' + Math.round(42 + t * 10) + ')';
