@@ -3220,6 +3220,32 @@
       ]
     },
     {
+      "id": "hidden-ways.turret-head-door-wind",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sw-turret-head-door",
+      "when": [
+        "windy = yes"
+      ],
+      "show": [
+        "the wind whistling under the door, cold round his ankles"
+      ]
+    },
+    {
+      "id": "hidden-ways.turret-head-door-rain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sw-turret-head-door",
+      "when": [
+        "weather = rain"
+      ],
+      "show": [
+        "rain drumming on the leads outside the door"
+      ]
+    },
+    {
       "id": "hidden-ways.watch-bartizan-door",
       "tier": "fixed",
       "source": "device",
