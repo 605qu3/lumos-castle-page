@@ -1068,6 +1068,15 @@
         "at the meal's end, what is left of the food fades from the plates, leaving them sparkling clean"
       ],
       "canon": "Magic's req 592 (3.5): PS 7 L2561, \"the remains of the food faded from the plates, leaving them sparkling clean as before\"; every meal, the Great Hall's page drawing the fade at the meal's end (req 593); checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = great hall",
+        "castle date >= 2 02-14"
+      ],
+      "show": [
+        "one small pink paper heart wedged in the crack of a bench end, faded pinker-grey"
+      ]
     }
   ],
   "records": [
@@ -1166,6 +1175,71 @@
         "occasion != halloween"
       ],
       "starts": []
+    },
+    {
+      "id": "great-hall.panel-knock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall panel",
+      "when": [
+        "hall_panel != knocked",
+        "hall_panel != found"
+      ],
+      "show": [
+        "the panel sounds hollow under his knock, where the oak either side of it sounds solid"
+      ],
+      "starts": [
+        "set hall_panel = knocked"
+      ],
+      "canon": "Magic's req 516 (docs/handoff/magic.md, Rows answered; the Great Hall's req 614): a wall that is really a door, ours; nothing named beyond it, no elves, no kitchens (Kingsley's 8e); when and in which year he comes to find it the game's"
+    },
+    {
+      "id": "great-hall.panel-warmth",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall panel",
+      "when": [
+        "meal != none"
+      ],
+      "show": [
+        "a faint warmth at the panel's joint and the smell of baking, as if from somewhere below"
+      ],
+      "canon": "Magic's req 516 (docs/handoff/magic.md, Rows answered; the Great Hall's req 614): a wall that is really a door, ours; nothing named beyond it, no elves, no kitchens (Kingsley's 8e); when and in which year he comes to find it the game's"
+    },
+    {
+      "id": "great-hall.panel-opens",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall panel",
+      "when": [
+        "hall_panel = knocked"
+      ],
+      "show": [
+        "pushed at its edge, the panel swings in on a pin, and beyond it the top step of a narrow stair, lit by the stair's own lamp"
+      ],
+      "starts": [
+        "set hall_panel = found",
+        "log \"Found the hollow panel behind the staff table {day}\"",
+        "secret hall-panel"
+      ],
+      "canon": "Magic's req 516 (docs/handoff/magic.md, Rows answered; the Great Hall's req 614): a wall that is really a door, ours; nothing named beyond it, no elves, no kitchens (Kingsley's 8e); when and in which year he comes to find it the game's"
+    },
+    {
+      "id": "great-hall.panel-open-to-him",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall panel",
+      "when": [
+        "hall_panel = found"
+      ],
+      "show": [
+        "pushed at its edge, the panel swings in on a pin, and beyond it the top step of a narrow stair, lit by the stair's own lamp"
+      ],
+      "canon": "Magic's req 516 (docs/handoff/magic.md, Rows answered; the Great Hall's req 614): a wall that is really a door, ours; nothing named beyond it, no elves, no kitchens (Kingsley's 8e); when and in which year he comes to find it the game's"
     }
   ]
 }
