@@ -793,7 +793,7 @@
         "occasion = none"
       ],
       "show": [
-        "the painted shutters open on their iron grilles, and up through them, clear now, feet and voices on the moving stairs far below and a staircase grinding round to a new landing"
+        "the painted shutters open on their iron grilles, and through them, far below, the moving stairs: heads going up and down the flights, voices coming up clear, a staircase grinding round to a new landing"
       ]
     },
     {
@@ -805,7 +805,7 @@
         "occasion = none"
       ],
       "show": [
-        "the painted shutters open on their iron grilles, and up through them the well's hush far below, broken now and then by a staircase grinding round"
+        "the painted shutters open on their iron grilles, and through them, far below, the moving stairs nearly empty, one swinging slowly round to a new landing"
       ]
     },
     {
@@ -853,7 +853,7 @@
         "weather = clear"
       ],
       "show": [
-        "blue sky in the two loops"
+        "through the two loops, the lawns far below running out toward the pitch, under a blue sky"
       ]
     },
     {
@@ -863,7 +863,7 @@
         "weather != clear"
       ],
       "show": [
-        "grey sky in the two loops"
+        "through the two loops, the lawns far below running out toward the pitch, under a grey sky"
       ]
     },
     {
@@ -950,6 +950,486 @@
       "show": [
         "the cleft a black slit, only the lake's lapping and the drip in the dark"
       ]
+    },
+    {
+      "when": [
+        "place = keep east stairwell",
+        "time != night",
+        "weekday != friday"
+      ],
+      "show": [
+        "through the wall, the moving staircases grinding round to new landings, and this stair, as ever, staying where it is"
+      ]
+    },
+    {
+      "when": [
+        "place = keep east stairwell",
+        "time != night",
+        "weekday = friday"
+      ],
+      "show": [
+        "through the wall, the staircases swinging off to their Friday landings, and this one, as ever, exactly where it was"
+      ]
+    },
+    {
+      "when": [
+        "place = keep east stairwell",
+        "time != night",
+        "lessons = off",
+        "summer = no"
+      ],
+      "show": [
+        "now and then other feet on the treads somewhere above, someone else who knows the way"
+      ]
+    },
+    {
+      "when": [
+        "place = keep east stairwell",
+        "time = night"
+      ],
+      "show": [
+        "the stair silent, the wall's stone cold under his hand, and through it a staircase grinding round in the dark"
+      ]
+    },
+    {
+      "when": [
+        "place = still room"
+      ],
+      "show": [
+        "a faint smell of rosewater and lavender, old and sweet, though the furnace has been cold for centuries"
+      ]
+    },
+    {
+      "when": [
+        "place = still room",
+        "time != night",
+        "season = summer"
+      ],
+      "show": [
+        "the room warm under the tower's stone, and the smell of roses stronger for it"
+      ]
+    },
+    {
+      "when": [
+        "place = still room",
+        "cold = yes"
+      ],
+      "show": [
+        "the air chill, the smell of lavender faint in it"
+      ]
+    },
+    {
+      "when": [
+        "place = still room",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "two bars of sunlight from the loops lying across the long table, dust turning slowly in them"
+      ]
+    },
+    {
+      "when": [
+        "place = still room",
+        "time = night"
+      ],
+      "show": [
+        "the bottles on the shelves only glints in the dark, the smell of roses still there"
+      ]
+    },
+    {
+      "when": [
+        "place = whispering room"
+      ],
+      "show": [
+        "his footsteps and his breathing coming back to him clearly from the far wall, as if someone stood over there"
+      ]
+    },
+    {
+      "when": [
+        "place = whispering room",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind at the loops running round the dome like a long whisper and dying away"
+      ]
+    },
+    {
+      "when": [
+        "place = whispering room",
+        "time != night",
+        "lessons = off",
+        "summer = no"
+      ],
+      "show": [
+        "far below, voices on the tower's stair, every word of them carried round the dome and gone"
+      ]
+    },
+    {
+      "when": [
+        "place = whispering room",
+        "time = night"
+      ],
+      "show": [
+        "the room so quiet that the drip of something far off in the tower runs round the wall"
+      ]
+    },
+    {
+      "when": [
+        "place = drying loft"
+      ],
+      "show": [
+        "row behind row of white sheets on the lines, stirring in the warm air off the chimney stacks"
+      ]
+    },
+    {
+      "when": [
+        "place = drying loft",
+        "weekday = monday"
+      ],
+      "show": [
+        "a new row of sheets hung since last time, still damp, smelling of soap, and nobody about"
+      ]
+    },
+    {
+      "when": [
+        "place = drying loft",
+        "weekday != monday"
+      ],
+      "show": [
+        "the baskets and pegs moved since last time, though nobody is ever here"
+      ]
+    },
+    {
+      "when": [
+        "place = drying loft",
+        "weather = rain"
+      ],
+      "show": [
+        "rain drumming on the roof over the sheets"
+      ]
+    },
+    {
+      "when": [
+        "place = drying loft",
+        "cold = yes"
+      ],
+      "show": [
+        "the loft snug, the stacks warm, the cold kept out under the slates"
+      ]
+    },
+    {
+      "when": [
+        "place = drying loft",
+        "time != night",
+        "season = summer",
+        "weather = clear"
+      ],
+      "show": [
+        "hot under the roof, the dormers bright, the sheets dry and stiff"
+      ]
+    },
+    {
+      "when": [
+        "place = drying loft",
+        "time = night"
+      ],
+      "show": [
+        "the sheets pale shapes in the dark, stirring"
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night"
+      ],
+      "show": [
+        "the sitters waking as he comes in, yawning and straightening their collars, one or two hurrying back to their own frames"
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weekday = monday"
+      ],
+      "show": [
+        "a faded wizard, only his spectacles still bright: \"Is someone there? Speak up, I'm a little faint these days.\" He chuckles. \"Faint. A painter's joke.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weekday = tuesday"
+      ],
+      "show": [
+        "a witch in a towering hat bellowing \"WELCOME!\", then, much quieter: \"Sorry. That's why they took me down.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weekday = wednesday"
+      ],
+      "show": [
+        "an old wizard screwing in his monocle: \"Mud on your shoes. In my day pupils had... well. Mud on their shoes as well, I suppose.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weekday = thursday"
+      ],
+      "show": [
+        "a lady in an enormous ruff: \"Good morrow! They tell me nobody says good morrow any more. A great pity.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weekday = friday"
+      ],
+      "show": [
+        "two sitters squeezed into one frame over a painted chessboard, one of them hiding a bishop up his sleeve"
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weekday = saturday"
+      ],
+      "show": [
+        "a wizard jerking awake: \"Wasn't asleep. Resting my eyes.\" A pause. \"Two hundred years, resting my eyes.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weekday = sunday"
+      ],
+      "show": [
+        "a witch bustling back into her own frame, out of breath: \"She's repainted her sky again. Third time this century.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "weather = rain"
+      ],
+      "show": [
+        "rain streaming down the long windows, and a sitter saying to nobody, \"Wet-walk weather. That's what this gallery was built for, you know.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "cold = yes"
+      ],
+      "show": [
+        "the old wizard with the monocle grumbling, \"Draught! Shut the door!\", though the door is shut"
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "occasion = christmas"
+      ],
+      "show": [
+        "a sitter wearing a paper hat borrowed from a cracker in somebody else's painting"
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "a sitter wearing a paper hat borrowed from a cracker in somebody else's painting"
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time != night",
+        "summer = yes"
+      ],
+      "show": [
+        "a sitter yawning: \"Holidays, is it? Lovely and quiet. Don't tell anyone I said so.\""
+      ]
+    },
+    {
+      "when": [
+        "place = long gallery",
+        "time = night"
+      ],
+      "show": [
+        "the sitters asleep in their frames, snoring softly in a dozen different keys, one of them muttering about the price of quills"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "on the round white table, the grounds in colour and moving: the lake glittering, the forest's dark edge, the greenhouses' glass flashing"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "sun = up",
+        "weather = cloudy"
+      ],
+      "show": [
+        "on the round white table, the grounds dim and grey but moving: the lake, the forest's edge, the greenhouses"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "weather = rain"
+      ],
+      "show": [
+        "on the round white table, the grounds blurred by rain, the lake grey"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "nothing on the round white table but a pale blur of fog"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "sun = down",
+        "weather != fog"
+      ],
+      "show": [
+        "the picture on the round white table dim and fading, the lake a dull sheet"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "sun = up",
+        "lessons = on",
+        "weather != fog"
+      ],
+      "show": [
+        "the lawns on the table empty, the lake's ripples sliding slowly across it"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "sun = up",
+        "lessons = off",
+        "summer = no",
+        "match = no",
+        "weather != fog",
+        "weather != rain"
+      ],
+      "show": [
+        "pupils small as ants crossing the lawns on the table, and one tiny figure running after a blown-away hat"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "match = yes",
+        "hour >= 11",
+        "hour < 13",
+        "meal = none",
+        "weather != fog"
+      ],
+      "show": [
+        "on the table, the Quidditch pitch, the stands full and tiny figures streaking about above it"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time != night",
+        "ground = snow",
+        "weather != fog"
+      ],
+      "show": [
+        "the grounds on the table white with snow, the lake dark in it"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time = night"
+      ],
+      "show": [
+        "the round white table dark; the mirror has nothing to show at night"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "heights = open",
+        "time = night",
+        "occasion = none"
+      ],
+      "show": [
+        "through the grilles, the well dark far below, one lamp burning on a landing"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "over the breast, the lake far below beyond the cliff's foot, and the hills on its far side"
+      ]
+    },
+    {
+      "when": [
+        "place = still room",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through a loop, the grass at the tower's foot and a path across it"
+      ]
+    },
+    {
+      "when": [
+        "place = whispering room",
+        "time != night",
+        "weather != fog"
+      ],
+      "show": [
+        "through a loop, the grounds far below the tower"
+      ]
     }
   ],
   "records": [
@@ -969,6 +1449,57 @@
         "set trick_step = found",
         "log \"Found the trick step on the tapestry stair {day}\"",
         "secret trick-step"
+      ]
+    },
+    {
+      "id": "hidden-ways.keep-east-stair-draught",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap keep-east-stair-panel-3",
+      "when": [
+        "place = stair hall"
+      ],
+      "show": [
+        "a cold draught at the foot of the gallery's wall, from a crack no wider than a knife"
+      ]
+    },
+    {
+      "id": "hidden-ways.keep-east-stair-feet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap keep-east-stair-panel-3",
+      "when": [
+        "place = stair hall",
+        "time != night",
+        "lessons = off",
+        "summer = no"
+      ],
+      "show": [
+        "footsteps going up inside the wall behind the panel, where no stair should be"
+      ]
+    },
+    {
+      "id": "hidden-ways.still-room-keyhole",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap still-room-door",
+      "when": [],
+      "show": [
+        "a smell of rosewater and lavender breathing from the keyhole"
+      ]
+    },
+    {
+      "id": "hidden-ways.whispering-wall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap whispering-wall",
+      "when": [],
+      "show": [
+        "his own footsteps on the stair coming back to him through the wall as whispers"
       ]
     }
   ]
