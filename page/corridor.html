@@ -2444,6 +2444,13 @@ function updateShepherd(dt) {
 /* her wall: two portraits on the study's stretch, symmetric about the bay axis; portrait-a is the one nearest her */
 var portraitA = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[0], 1.9, HER_FACE, -1, 1, 'portrait-a');
 var portraitB = onWallZ(cutoutTexture(200, 240, '#b9a98c', drawFrame, 'portrait'), 1.0, 1.2, PORTRAIT_XS[1], 1.9, HER_FACE, -1, 1, 'portrait-b');
+/* their drawings (Godric's picks, 16 October 2026, 8.04 am, corridor-portrait-a-r1-1016 and -b-: round 1's Try 3 of
+   each, keyed at 400 by 480, so 1.0 by 1.2 m as the stand-ins were): portrait-a an empty panelled room by firelight in a
+   carved Restoration frame, where the visitors come and go by its painted door; portrait-b an old witch at her knitting
+   in a Queen Anne frame, head down (her looking up and her whisper, as the PS 7 portraits whisper at any newcomer, are
+   later edits of this drawing) */
+hangDrawing(portraitA, '../assets/layers/corridor-portrait-a.png', 1.0);
+hangDrawing(portraitB, '../assets/layers/corridor-portrait-b.png', 1.0);
 
 /* the polite door (8 October 2026): 1.0 by 2.2 m; since 10 October 2026, 5.35 pm (Godric's switch) in her old place on
    the long wall, x 0, facing across the corridor. What waits behind it is Magic for the boys' */
@@ -2455,8 +2462,10 @@ doorHinge.position.set(DOOR.x + DOOR.w / 2, 0, HER_Z - 0.001);   /* the leaf in 
 scene.add(doorHinge);
 /* its lock (req 154): on the latch side, about 1.0 m up, as fractions of the leaf's picture like the tickle's spot;
    a tap within LOCK.r of it, once he has Alohomora, is his spell on it. The placeholder shows it as a keyhole on a
-   brass plate, for the door's drawing to keep in the same place */
-var LOCK = { u: 0.85, v: 0.45, r: 0.12 };
+   brass plate, for the door's drawing to keep in the same place. Since the drawing hung (Godric's pick, 16 October
+   2026, 8.04 am, corridor-polite-door-r1-1016, round 1's Try 3) the fractions are its plate's, measured on the layer:
+   centre u 0.896, v 0.437 (u 0.85, v 0.45 before) */
+var LOCK = { u: 0.90, v: 0.44, r: 0.12 };
 function drawDoor(g, w, h) {
   g.fillRect(0, 0, w, h);
   var x = w * LOCK.u, y = h * (1 - LOCK.v);
@@ -2470,6 +2479,7 @@ door.rotation.y = Math.PI;
 door.name = 'polite-door';
 door.material.polygonOffset = true; door.material.polygonOffsetFactor = -1; door.material.polygonOffsetUnits = -4;
 doorHinge.add(door); register(door, 1);
+hangDrawing(door, '../assets/layers/corridor-polite-door.png', DOOR.w);   /* the leaf drawn: oak boards, no handle, the keyhole plate where LOCK sits */
 var doorLeaf = { ang: 0, target: 0 }, DOOR_LEAF_OPEN = Math.PI / 2;
 function openDoor(open) { doorLeaf.target = open === false ? 0 : DOOR_LEAF_OPEN; }
 /* the broom cupboard (Magic's B18, req 281; Godric's 1 on corridor-cupboard-place-1013, 6.53 pm; the Architect's ledger
@@ -2478,7 +2488,7 @@ function openDoor(open) { doorLeaf.target = open === false ? 0 : DOOR_LEAF_OPEN;
    its door at its nook end. Grey, a stand-in until it is drawn. Locked: at its stop a tap rattles the handle and it
    stays shut. Charms' openLock swings it (req 282, cupboardSwing); Events keeps it locked again by the next visit (req
    283). Lying flat on her wall's face, hinged on its nook side; open, a dark opening shows behind the leaf */
-var CUPBOARD = { x: -5.75, w: 0.8, h: 2.0, lock: { u: 0.18, v: 0.48 } };
+var CUPBOARD = { x: -5.75, w: 0.8, h: 2.0, lock: { u: 0.13, v: 0.55 } };   /* the ring's centre on the drawing (Godric's pick, 16 October 2026, 8.04 am, corridor-cupboard-door-r1-1016, round 1's Try 2), measured on the layer; its keyhole 0.18 m below, inside the tap's reach (u 0.18, v 0.48 before) */
 function drawCupboardDoor(g, w, h) {
   g.fillRect(0, 0, w, h);
   g.strokeStyle = 'rgba(40,36,32,0.35)'; g.lineWidth = w * 0.012;
@@ -2496,6 +2506,7 @@ cupboardDoor.rotation.y = Math.PI;
 cupboardDoor.name = 'cupboard-door';
 cupboardDoor.material.polygonOffset = true; cupboardDoor.material.polygonOffsetFactor = -1; cupboardDoor.material.polygonOffsetUnits = -4;
 cupboardHinge.add(cupboardDoor); register(cupboardDoor, 1);
+hangDrawing(cupboardDoor, '../assets/layers/corridor-cupboard-door.png', CUPBOARD.w);   /* the leaf drawn: four plain boards, hinges on the nook side, the ring and keyhole where CUPBOARD.lock sits, the foot scuffed */
 var cupboardDark = new THREE.Mesh(new THREE.PlaneGeometry(CUPBOARD.w, CUPBOARD.h), new THREE.MeshBasicMaterial({ color: col(0x0d0b09) }));
 cupboardDark.position.set(CUPBOARD.x, CUPBOARD.h / 2, HER_FACE - 0.001); cupboardDark.rotation.y = Math.PI;
 cupboardDark.name = 'cupboard-dark'; cupboardDark.visible = false; scene.add(cupboardDark);
