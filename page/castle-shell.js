@@ -53,6 +53,17 @@ function findPlace(M, id) {
     return { id: r.id, name: r.name, kind: 'room', poly: pts, floor: floor, ceiling: base + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7),
       wall: r.wall || WALL_T, walls: r.walls || null, rec: r };
   }
+  /* v8 (Events' req 526): a place nested in a ground (the commentator's box in the Quidditch pitch's teachers' stand),
+     its floor and eaves from its own numbers, its door and its open front over its ledge made its openings */
+  var nest = null;
+  (M.grounds || []).forEach(function (g) { Object.keys(g).forEach(function (k) { var v = g[k]; if (v && typeof v === 'object' && v.id === id && v.rect) nest = v; }); });
+  if (nest) {
+    var nb = nest.rect, nf = nest.floor || 0, ops = [];
+    if (nest.door) ops.push({ id: id + '-door', kind: nest.door.kind || 'door', between: [id, id + '-outside'], at: nest.door.at, w: nest.door.w, h: nest.door.h, sill: 0 });
+    if (nest.ledge != null) ops.push({ id: id + '-front', kind: 'open front over the ledge', room: id, span: [[nb[0], nb[1] + 0.1], [nb[0], nb[3] - 0.1]], sill: nest.ledge, h: (nest.eaves || 2.6) - nest.ledge });
+    return { id: id, name: nest.name || id.replace(/-/g, ' '), kind: 'room', poly: [[nb[0], nb[1]], [nb[2], nb[1]], [nb[2], nb[3]], [nb[0], nb[3]]],
+      floor: nf, ceiling: nf + (nest.eaves || 2.6), wall: nest.wall || WALL_T, walls: null, rec: nest, ops: ops };
+  }
   var all = (M.masses || []).concat(M.courts || []);
   var m = all.filter(function (x) { return slug(x.id) === id; })[0];
   if (m && m.rect) {
@@ -176,7 +187,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     }
     /* the openings on each edge: a gap [s0, s1] up to its head h */
     var gaps = Q.poly.map(function () { return []; });
-    (M.openings || []).forEach(function (op) {
+    (M.openings || []).concat(Q.ops || []).forEach(function (op) {
       if (!matches(M, op, Q.id)) return;
       /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
          `inside`, the tapestry stair's well), a way out, its sill there `inside_sill` */
@@ -374,6 +385,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function standAt(d, name) {
     var off = d.back ? 0.5 : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
+    /* v8: never off the floor (a small room, the commentator's box): nearer the door until he stands on it */
+    while (off > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
     var look = d.mid.clone(); look.y = d.mid.y + d.lift + (d.lift ? EYE : Math.max(EYE, d.h * 0.45));
     return { name: name, pos: pos, look: look, thing: d.mesh, level: d.level };
   }
