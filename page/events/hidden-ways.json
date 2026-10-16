@@ -3018,6 +3018,243 @@
       "show": [
         "the doves fluffed up round as balls on their ledges"
       ]
+    },
+    {
+      "when": [
+        "place = winter store"
+      ],
+      "show": [
+        "cold, dry air and the smell of old straw",
+        "bone skates hanging on pegs by their thongs, wooden sledges lying flat along the wall, and a row of curling stones on the floor, the oldest a rough boulder with a hollow for the fingers and a date cut in it, 1511"
+      ]
+    },
+    {
+      "when": [
+        "place = winter store",
+        "season = winter"
+      ],
+      "show": [
+        "a gap on the pegs where a pair of skates has gone out"
+      ]
+    },
+    {
+      "when": [
+        "place = winter store",
+        "time != night",
+        "weather = snow"
+      ],
+      "show": [
+        "snow sifting past the loops"
+      ]
+    },
+    {
+      "when": [
+        "place = winter store",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind fingering the straw on the floor"
+      ]
+    },
+    {
+      "when": [
+        "place = winter store",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "morning sun through the east loop along the sledges' runners"
+      ]
+    },
+    {
+      "when": [
+        "place = winter store",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the loops white with fog"
+      ]
+    },
+    {
+      "when": [
+        "place = winter store",
+        "time = night"
+      ],
+      "show": [
+        "the loops black"
+      ]
+    },
+    {
+      "when": [
+        "place = lost property"
+      ],
+      "show": [
+        "dust, and the smell of old wool",
+        "shelves round the whole wall to the ceiling: odd gloves and odd socks by the hundred, scarves faded to no house at all, hats of every century, a cauldron with a hole in it, a toy broom, each thing with a brown card tied to it",
+        "the ladder on its rail chained at its foot, and a counter with a ledger lying open, its last entries in the same hand as the cards",
+        "a brown card on an odd red mitten: \"Under a bench in the Great Hall, 14 November 1923\"",
+        "a brown card on a hat with a broken brim: \"On the stairs by the library, 2 May 1887\"",
+        "a cloak with \"Agnes Thorley\" stitched in its collar in an old hand, and its card: \"Left on a peg, never asked for, 1742\""
+      ]
+    },
+    {
+      "when": [
+        "place = lost property",
+        "time != night"
+      ],
+      "show": [
+        "now and then feet going past on the back stair outside the hatch, and away"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom"
+      ],
+      "show": [
+        "a hush, as though a lesson had only just stopped",
+        "the stone bench round the wall worn smooth, carved all over with names and dates in the hands of every age: ALWYN, HUGH OF BRAMLEY 1214, T. PENNICK 1610",
+        "a master's oak chair, a lectern, and on a shelf a stack of wax tablets in wooden frames, the top one still scratched with its last lesson: a row of letters copied over and over, the last line trailing off"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind breathing at the loops"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "morning sun through the east loop across the carved bench"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the loops white with fog"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "time = night"
+      ],
+      "show": [
+        "the loops black"
+      ]
+    },
+    {
+      "when": [
+        "place = masquers wardrobe"
+      ],
+      "show": [
+        "the smell of old cloth and paint",
+        "chests of costumes with their lids held up on stays: a crown of gilt paper, a lion's head of painted canvas big enough to wear, wings of painted cloth and feathers, cloaks painted with stars and waves",
+        "masks on pegs along the wall, and a backcloth rolled up, painted as a forest"
+      ]
+    },
+    {
+      "when": [
+        "place = masquers wardrobe",
+        "windy = yes"
+      ],
+      "show": [
+        "the old chests creaking as the tower takes the wind, and the painted cloth over the doorway stirring in the draught"
+      ]
+    },
+    {
+      "when": [
+        "place = masquers wardrobe",
+        "windy = no"
+      ],
+      "show": [
+        "now and then an old chest creaking in the quiet"
+      ]
+    },
+    {
+      "when": [
+        "place = masquers wardrobe",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "morning sun through the east loop on the gilt paper crown"
+      ]
+    },
+    {
+      "when": [
+        "place = masquers wardrobe",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the loops white with fog"
+      ]
+    },
+    {
+      "when": [
+        "place = masquers wardrobe",
+        "time = night"
+      ],
+      "show": [
+        "the loops black"
+      ]
+    },
+    {
+      "when": [
+        "place = curiosities cabinet"
+      ],
+      "show": [
+        "a smell of dust and old varnish",
+        "glass-fronted cases round the wall: ammonites and sea-lilies, corals and shells, an ostrich egg, a coconut cup on a silver foot",
+        "a narwhal's tusk labelled \"unicorn's horn\" in an old hand, the words crossed through, and \"narwhal\" written under them in a later one",
+        "a stuffed crocodile hanging from the ceiling on its chains"
+      ]
+    },
+    {
+      "when": [
+        "place = curiosities cabinet",
+        "time = morning",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "morning sun through the east window, bright on the cases' glass"
+      ]
+    },
+    {
+      "when": [
+        "place = curiosities cabinet",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "the loops white with fog"
+      ]
+    },
+    {
+      "when": [
+        "place = curiosities cabinet",
+        "time = night"
+      ],
+      "show": [
+        "the loops black"
+      ]
     }
   ],
   "records": [
@@ -3408,6 +3645,61 @@
       "when": [],
       "show": [
         "the narrow stair curling away down inside the wall, a feather or two on its steps"
+      ]
+    },
+    {
+      "id": "hidden-ways.winter-store-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap winter-store-door",
+      "when": [],
+      "show": [
+        "a wisp of old straw caught under the door, and cold, dry air at its crack"
+      ]
+    },
+    {
+      "id": "hidden-ways.lost-property-hatch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost-property-hatch",
+      "when": [],
+      "show": [
+        "the counter under the hatch lifts on its hinge, and a smell of dust and old wool comes from the shelves beyond"
+      ]
+    },
+    {
+      "id": "hidden-ways.schoolroom-door",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap schoolroom-door",
+      "when": [],
+      "show": [
+        "the step worn hollow in the middle by feet, and a hush beyond the door"
+      ]
+    },
+    {
+      "id": "hidden-ways.masquers-cloth",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap masquers-cloth",
+      "when": [],
+      "show": [
+        "the painted cloth stirs in the draught from behind it, and under it the doorway is open"
+      ]
+    },
+    {
+      "id": "hidden-ways.shell-case",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap shell-case",
+      "when": [],
+      "show": [
+        "the whole case swings on its pin with a soft rattle of shells, and beyond it the crocodile sways a little on its chains"
       ]
     }
   ]
