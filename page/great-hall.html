@@ -950,27 +950,83 @@ function walkTo(s) {
   return true;
 }
 function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(START); }
+var DRY = Q.get('travel') === 'dry', wentTo = '';   /* ?travel=dry: the veil falls and lifts, nothing loads, for a check */
 function through(d) {
-  kit.travel((d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE));
+  wentTo = (d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE);
+  kit.travel(wentTo, { dry: DRY });
+}
+/* the great doors as a way out (Interaction's req 608, break 4; §6, every space has a way out): open, a tap in the
+   doorway from the doors' stand goes through to the Entrance Hall; shut, that first tap swings both leaves into the hall
+   and he goes through, two taps never needed. The doorway is a plane he never sees, tapped like the shell's open mouths */
+var doorway = null, doorSwing = null, LEAVES = [];
+if (DOOR) {
+  doorway = new THREE.Mesh(new THREE.PlaneGeometry(3.12, 4.98), new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
+  doorway.position.copy(DOOR.mesh.position); doorway.rotation.y = DOOR.mesh.rotation.y; doorway.name = 'way-great-hall-doors';
+  doorway.userData.way = DOOR.id; room.add(doorway);
+  /* each leaf hangs on its jamb (the opening 3.2 wide on the hall's middle line, 60.5) and swings a quarter turn into the
+     hall, ending folded against the passage's side as the open doors stand by day */
+  doorsOpen.children.forEach(function (lf, i) {
+    var hy0 = i === 0 ? 58.9 : 62.1, toward = i === 0 ? 1 : -1;
+    LEAVES.push({ m: lf, hinge: [67.88, hy0], shut: [0, toward], open: [-1, 0] });
+  });
+}
+function leafAt(L, a) {   /* a 0 shut to 1 open */
+  var t = a * Math.PI / 2, dx = L.shut[0] * Math.cos(t) + L.open[0] * Math.sin(t), dy = L.shut[1] * Math.cos(t) + L.open[1] * Math.sin(t);
+  var c = P(L.hinge[0] + dx * 0.78, L.hinge[1] + dy * 0.78, 2.49), e = P(L.hinge[0] + dx * 1.56, L.hinge[1] + dy * 1.56, 2.49);
+  var h = P(L.hinge[0], L.hinge[1], 2.49);
+  L.m.position.copy(c); L.m.rotation.set(0, Math.atan2(-(e.z - h.z), e.x - h.x), 0);
+}
+function goThroughDoors() {
+  if (doorsOpen.visible) { through(DOOR); return; }
+  DOOR.mesh.visible = false; doorsOpen.visible = true;
+  LEAVES.forEach(function (L) { leafAt(L, 0); });
+  doorSwing = { t: 0, dur: 0.9 };
+}
+function swingDoors(dt) {
+  if (!doorSwing) return;
+  doorSwing.t += dt;
+  var k = easeInOut(clamp(doorSwing.t / doorSwing.dur, 0, 1));
+  LEAVES.forEach(function (L) { leafAt(L, k); });
+  if (doorSwing.t >= doorSwing.dur) { doorSwing = null; through(DOOR); }
+}
+/* a candle on the tap's ray (req 608, break 3): its taper's middle within 0.12 m of the ray, nearer than anything else
+   the ray meets; the field's home points, so a tap finds the candle he sees to within its bob */
+var candleMid = C.map(function (c) { return P(c[0], c[1], c[2] - 0.14); });
+function candleOnRay(ray, before) {
+  var best = before, found = false, v = new THREE.Vector3();
+  for (var i = 0; i < candleMid.length; i++) {
+    var t = v.copy(candleMid[i]).sub(ray.origin).dot(ray.direction);
+    if (t <= 0 || t >= best) continue;
+    if (ray.distanceSqToPoint(candleMid[i]) < 0.0144) { best = t; found = true; }
+  }
+  return found;
 }
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 var lastTold = '';
 function tap(cx, cy) {
-  if (tween) return;
+  if (tween || doorSwing) return;
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
-  var hits = raycaster.intersectObjects(shell.group.children.concat(tapTop), false).filter(function (h) { return h.object.visible || h.object.userData.way; });
+  var hits = raycaster.intersectObjects(shell.group.children.concat(tapTop, doorway ? [doorway] : []), false).filter(function (h) { return h.object.visible || h.object.userData.way; });
   var hit = hits.length ? hits[0].object : null, acted = false;
-  var wi = hit ? wayMeshes.indexOf(hit) : -1;
-  if (wi >= 0) {
+  /* a candle or the sky answers where it is, told and given the mote, never taking him back (req 608, break 3); only
+     the floor, the walls and the benches are nothing at a stop */
+  var high = candleOnRay(raycaster.ray, hits.length ? hits[0].distance : 1e9) ? 'candle' : hit && hit === ceiling ? 'sky' : '';
+  var isDoors = hit && DOOR && (hit === doorway || hit === DOOR.mesh);
+  var wi = hit && !isDoors ? wayMeshes.indexOf(hit) : -1;
+  if (high) { /* the mote, nothing else, until Magic's answer */ }
+  else if (isDoors) {   /* the great doors: through from their stand, back to it from the staff table (§2) */
+    if (here === START || here === DOOR.stand) { goThroughDoors(); acted = true; } else { goBack(); acted = true; }
+  } else if (wi >= 0) {
     var d = ways[wi];
     if (here === d.stand || here === START) { if (d.mesh.userData.way && d.built) { through(d); acted = true; } }
-  } else if (hit && tapTop.indexOf(hit) >= 0 && here === START) acted = walkTo(STAFF_STAND);
-  else if (here !== START) { goBack(); acted = true; }
+  } else if (hit && tapTop.indexOf(hit) >= 0) {   /* the platform, the staff table, the gold chair: walk up to them, or at */
+    if (here === START) acted = walkTo(STAFF_STAND);   /* their stop answer where they are (req 608, break 2) */
+  } else if (here !== START) { goBack(); acted = true; }
   /* every tap on a thing is told to the runtime (Interaction's §10, req 479): the platform, the staff table, the gold
-     chair and the doors' way, by their names with spaces, so a record waiting on one can fire */
-  var told = wi >= 0 ? ways[wi].id : hit && tapTop.indexOf(hit) >= 0 ? hit.name : '';
+     chair, the doors' way, the sky and a candle, by their names with spaces, so a record waiting on one can fire */
+  var told = high || (isDoors ? DOOR.id : wi >= 0 ? ways[wi].id : hit && tapTop.indexOf(hit) >= 0 ? hit.name : '');
   if (told) { lastTold = told.replace(/-/g, ' '); if (events && events.tap) events.tap(lastTold); }
   kit.tapped(acted);
 }
@@ -1042,6 +1098,7 @@ function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   T += dt * (kit.zoom && kit.zoom.slow ? kit.zoom.slow() : 1);
   updateCamera(dt);
+  swingDoors(dt);
   bobClock.value = T;
   swayClock.value += dt * 0.7 * swayRate;
   breathAt.value = breathT0 !== null && T - breathT0 < 20 ? T - breathT0 : -1000;
@@ -1061,7 +1118,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   state: function () { return STATE; }, events: events, drivers: drivers, redraw: draw, candles: NC, field: function () { return FIELD_CHECK; }, scorches: function () { return SCORCHES; },
   howler: function () { for (var c in CUES) CUES[c](); return Object.keys(CUES).length; }, heard: function () { return heardLast; },
   breathe: breathe, fade: startFade, stutter: function () { var n = 0; for (var i = 0; i < NC; i++) if (stut[i] > 0.5) n++; return n; }, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
-  stand: function () { return here.name; }, stands: shell.stands.map(function (s) { return s.name; }),
+  stand: function () { return here.name; }, wentTo: function () { return wentTo; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
     tween = null; legs = []; here = s; hy = hyT = hp = hpT = 0; backBtn.hidden = s === START; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
