@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 65,
+  "version": 66,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -57,7 +57,7 @@ window.CASTLE_MODEL = {
   "ages_about": "The history's seven ages (docs/architect/hogwarts-history-2026-10-12.md), proposed under Godric's 6.1 (13 October 2026, 7.13 am): each mass and tower lists the ages that built or raised it, the first the oldest (tools/architect-accreted-castle.py's pieces by footprint).",
   "materials": {
     "state": "designed",
-    "state_about": "five stones by age (architect-materials-1016, 1), confirmed by Godric on the desk at 3.50 pm, 16 October 2026 (relayed 19 October, 2.27 pm), with his note to check canon first: the books never name the stone's colour in any room, and what they say (stone walls and torches, PS 7 L2317; flagged floors, PS 7 L2319; rough stone below, CoS 12 L10915, OotP 7 L38247; the panelled staff room, CoS 16 L12351) agrees; the windows (v65) proposed, for his yes",
+    "state_about": "five stones by age (architect-materials-1016, 1), confirmed by Godric on the desk at 3.50 pm, 16 October 2026 (relayed 19 October, 2.27 pm), with his note to check canon first: the books never name the stone's colour in any room, and what they say (stone walls and torches, PS 7 L2317; flagged floors, PS 7 L2319; rough stone below, CoS 12 L10915, OotP 7 L38247; the panelled staff room, CoS 16 L12351) agrees; the windows (v65) and the condition and the surround rule (v66) proposed, for his yes",
     "about": "The castle's materials schedule (req 636; Godric's Talk of 16 October 2026, 2.49 pm), proposed: one palette every room reads instead of choosing its own. A room's stone is the age that built its walls at its height (tools/architect-materials.py resolves every room from tools/architect-accreted-castle.py's pieces), dressed by the room's rank; its doors' surround follows its wall's age; its ceiling its kind, span and age, a vault only where the storey lets it rise; its floor flags or boards by what is under it. The real quarry stones, vaults and mouldings are Precedents' to find; docs/architect/materials.md is the schedule in words.",
     "stones": [
       {
@@ -195,7 +195,7 @@ window.CASTLE_MODEL = {
         "say": "a hidden opening's: no surround, its panel, stone or tapestry the wall's own (a trim would say tap me)"
       }
     ],
-    "surround_rule": "every door stands in a reveal the depth of its wall, its leaf set back from the face it is seen from, its surround on that face: never a leaf laid flat on a plain wall",
+    "surround_rule": "every door stands in a reveal the depth of its wall, its leaf set back from the face it is seen from, its surround on that face: never a leaf laid flat on a plain wall. The surround follows the leaf (Godric, 19 October 2026, 2.46 pm): a door already drawn keeps its own head, its surround hugging it in the moulding of the wall's age, no stone filling above; the heads by age are for doors drawn new to fit them",
     "ceilings": [
       {
         "id": "barrel",
@@ -235,7 +235,8 @@ window.CASTLE_MODEL = {
       }
     ],
     "vault_rule": "a vault only where the room's height reaches its springing (2.4 over the floor) and half its span again; wider rooms take beams",
-    "windows_state": "proposed (v65, Godric's Talk of 16 October 2026, 3.53 pm: windows by canon and accretion), for his yes",
+    "condition": "proposed (Godric, 19 October 2026, 2.46 pm: the books give the stone's condition): canon where the books say it (drafty and icy in winter, PS 12 L4016, GoF 21 L28706; the Owlery open to the weather, GoF 15 L26270; damp below ground, CoS 12 L10907; the neglected bathroom's cracked mirror and chipped sinks, CoS 9 L9704; dust, CoS 6 L8333, PoA 12 L18124; the vanishing step, PS 8 L2722); the accretion elsewhere: wear follows feet (dished treads deepest in the oldest stairs, a worn path down a corridor's flags), damp follows depth and the lake, cold follows age, soot over every torch and fire, dust where nobody goes, repairs show, and nothing crumbles where a boy walks (docs/architect/materials.md, The stone's condition)",
+    "windows_state":"proposed (v65, Godric's Talk of 16 October 2026, 3.53 pm: windows by canon and accretion), for his yes",
     "windows": [
       {"id": "slit", "ages": ["P1"], "say": "a narrow slit splayed inside, unglazed: light, never a window a body could pass (the history's founders)"},
       {"id": "round-paired", "ages": ["P2"], "say": "two round-headed lights under one arch, a shaft between, cross loops in the walls"},
