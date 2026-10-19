@@ -707,7 +707,7 @@ var HIDE = { z0: 0.06, z1: 0.72, lidT: 0.04, open: 0, want: 0, lid: null, hole: 
    shows it as drawn, the stair side mirrored, each arm at the nook's mouth. The arm's side and the ends keep the box
    colour, set darker to sit with the drawn oak. Parts of the drawing, as fractions of it (u from the left, v from the
    top), measured on the pick */
-var SETTLE_DRAW = { url: null, oak: 0x4a3626,   /* the layer's url set once Godric picks (corridor-settle-r1-1016); measured on Try 3 */
+var SETTLE_DRAW = { url: '../assets/layers/corridor-settle.png', oak: 0x4a3626,   /* Godric's pick, Try 3 (corridor-settle-r1-1016, relayed 19 October 2026, 2.27 pm); measured on it */
   back: { u0: 0.041, u1: 0.955, v0: 0.003, v1: 0.5625 },   /* the back's outer stiles, its top rail to the rail behind the lids */
   front: { u0: 0.009, u1: 0.986, v0: 0.631, v1: 0.994 },   /* the arm post's outer edge to the right stile, the chest's top rail to the foot */
   arm: { u0: 0.009, u1: 0.041, v0: 0.35, v1: 0.631 },      /* the arm post from its rest down to the seat */
@@ -2648,7 +2648,11 @@ cupboardDark.name = 'cupboard-dark'; cupboardDark.visible = false; scene.add(cup
    jambs to the leaf's head and a two-centred pointed arch over it, rising SURROUND.rise of the span; the arch's head over
    the square-headed leaf a plain stone tympanum, so the leaves he picked are kept. A stand-in until the castle's shared
    pointed surround is drawn (the schedule's six, req 643), and in the wall's own grey till its sandstone picture comes.
-   The jambs are SURROUND.t wide: the cupboard's 0.25 m clear of portrait-b and of the nook's mouth either side */
+   The jambs are SURROUND.t wide: the cupboard's 0.25 m clear of portrait-b and of the nook's mouth either side.
+   The surround follows the leaf (Godric, 19 October 2026, 2.46 pm, through Fawkes; the Architect's materials.md 2,
+   model v66): a door already drawn keeps its own head and its surround hugs it, so both square-headed leaves here
+   stand in squareSurround(), two jambs and a head SURROUND.t deep close round the leaf, no stone filling above.
+   pointedSurround() stays for a door drawn new with a pointed head to fit it */
 var SURROUND = { t: 0.12, d: 0.08, rise: 0.8, mat: solid(0x8a8174), tymp: solid(0x7e766a) };
 function pointedSurround(cx, w, h) {
   var t = SURROUND.t, r = SURROUND.rise * w, xc = (r * r - w * w / 4) / w, R = xc + w / 2, N = 14;
@@ -2675,8 +2679,17 @@ function pointedSurround(cx, w, h) {
   [frame, tymp].forEach(function (m) { m.receiveShadow = true; m.castShadow = true; scene.add(m); register(m, 1); });
   return { frame: frame, tymp: tymp };
 }
-var cupboardSurround = pointedSurround(CUPBOARD.x, CUPBOARD.w, CUPBOARD.h);
-var doorSurround = pointedSurround(DOOR.x, DOOR.w, DOOR.h);
+function squareSurround(cx, w, h) {
+  var t = SURROUND.t, s = new THREE.Shape();
+  s.moveTo(-w / 2 - t, 0); s.lineTo(-w / 2 - t, h + t); s.lineTo(w / 2 + t, h + t); s.lineTo(w / 2 + t, 0);
+  s.lineTo(w / 2, 0); s.lineTo(w / 2, h); s.lineTo(-w / 2, h); s.lineTo(-w / 2, 0); s.lineTo(-w / 2 - t, 0);
+  var frame = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: SURROUND.d, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 1, curveSegments: 1 }), SURROUND.mat);
+  frame.position.set(cx, 0, HER_FACE); frame.rotation.y = Math.PI;   /* out from her wall into the corridor */
+  frame.receiveShadow = true; frame.castShadow = true; scene.add(frame); register(frame, 1);
+  return { frame: frame };
+}
+var cupboardSurround = squareSurround(CUPBOARD.x, CUPBOARD.w, CUPBOARD.h);
+var doorSurround = squareSurround(DOOR.x, DOOR.w, DOOR.h);
 var cupboard = { ang: 0, target: 0, rattle: 0, shut: 0 };
 /* What it holds (Magic's B18, req 281; Godric's picks: the broom round 1 Try 1, held answer relayed 15 October 2026,
    1.47 pm; the tag round 1 Try 3, drawn blank, lettered here): one ancient school broom, a Shooting Star, "very slow and
