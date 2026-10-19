@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 64,
+  "version": 65,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -57,7 +57,7 @@ window.CASTLE_MODEL = {
   "ages_about": "The history's seven ages (docs/architect/hogwarts-history-2026-10-12.md), proposed under Godric's 6.1 (13 October 2026, 7.13 am): each mass and tower lists the ages that built or raised it, the first the oldest (tools/architect-accreted-castle.py's pieces by footprint).",
   "materials": {
     "state": "designed",
-    "state_about": "five stones by age (architect-materials-1016, 1) taken 3.24 pm, 16 October 2026, on Fawkes's agreement, provisional, Godric to confirm",
+    "state_about": "five stones by age (architect-materials-1016, 1), confirmed by Godric on the desk at 3.50 pm, 16 October 2026 (relayed 19 October, 2.27 pm), with his note to check canon first: the books never name the stone's colour in any room, and what they say (stone walls and torches, PS 7 L2317; flagged floors, PS 7 L2319; rough stone below, CoS 12 L10915, OotP 7 L38247; the panelled staff room, CoS 16 L12351) agrees; the windows (v65) proposed, for his yes",
     "about": "The castle's materials schedule (req 636; Godric's Talk of 16 October 2026, 2.49 pm), proposed: one palette every room reads instead of choosing its own. A room's stone is the age that built its walls at its height (tools/architect-materials.py resolves every room from tools/architect-accreted-castle.py's pieces), dressed by the room's rank; its doors' surround follows its wall's age; its ceiling its kind, span and age, a vault only where the storey lets it rise; its floor flags or boards by what is under it. The real quarry stones, vaults and mouldings are Precedents' to find; docs/architect/materials.md is the schedule in words.",
     "stones": [
       {
@@ -234,7 +234,29 @@ window.CASTLE_MODEL = {
         "say": "the Great Hall's, bewitched to look like the sky outside (PS 7 L2365)"
       }
     ],
-    "vault_rule": "a vault only where the room's height reaches its springing (2.4 over the floor) and half its span again; wider rooms take beams"
+    "vault_rule": "a vault only where the room's height reaches its springing (2.4 over the floor) and half its span again; wider rooms take beams",
+    "windows_state": "proposed (v65, Godric's Talk of 16 October 2026, 3.53 pm: windows by canon and accretion), for his yes",
+    "windows": [
+      {"id": "slit", "ages": ["P1"], "say": "a narrow slit splayed inside, unglazed: light, never a window a body could pass (the history's founders)"},
+      {"id": "round-paired", "ages": ["P2"], "say": "two round-headed lights under one arch, a shaft between, cross loops in the walls"},
+      {"id": "lancet", "ages": ["P3"], "say": "pointed lancets in pairs, high and narrow, a hood mould over (the dormitory's high, narrow windows, CoS 5 L8268)"},
+      {"id": "traceried", "ages": ["P4"], "say": "tall pointed windows cut high, mullions rising into tracery in the head (the Great Hall's high windows, OotP 11 L39817; high mullioned, HBP 9 L57568)"},
+      {"id": "mullioned", "ages": ["P5"], "say": "square-headed, mullioned and transomed under a hood mould (the castle's mullioned windows, CoS 15 L11825); dormers in the slate roofs"},
+      {"id": "sash", "ages": ["P6"], "say": "small windows of sash proportions in lugged surrounds; leaded lights in the timber gallery's frame"},
+      {"id": "restored", "ages": ["P7"], "say": "tall pointed windows prettier than any medieval one, the restorers' Middle Ages"},
+      {"id": "loop", "ages": [], "say": "a loop of whatever age cut it (cross loop, gun loop, squint), kept as drawn, unglazed, hand-narrow where a boy could reach"}
+    ],
+    "window_rule": "a wall keeps its own age's openings where nobody lives (stairs, passages, stores, cellars, hidden ways, wall-walks: the corridors' high windows, PS 9 L3229, GoF 29 L32516); where a room in P1 to P3 walls wanted light (a classroom, study, office, common room, the hospital wing; the high towers' P4 windows were already tall), the Tudors cut their mullioned windows into it and blocked the old loops beside them (the history, P5); canon overrides both",
+    "window_canon": [
+      {"where": "great-hall", "id": "traceried", "cite": "high windows, OotP 11 L39817; high mullioned windows, HBP 9 L57568"},
+      {"where": "dorm", "id": "lancet", "cite": "high, narrow windows, CoS 5 L8268: the dormitories keep their lancets, never widened"},
+      {"where": "ravenclaw-common", "id": "lancet", "cite": "graceful arched windows, hung with blue-and-bronze silks, DH 29 L76208"},
+      {"where": "owlery", "id": "loop", "cite": "glassless windows, OotP 14 L41652"},
+      {"where": "history-of-magic-classroom", "id": "mullioned", "cite": "a narrow window ledge, thick glass, OotP 17 L43335"},
+      {"where": "study", "id": "enchanted", "cite": "Clementine's window, her own (req 255): Magic's"},
+      {"where": "filchs-office", "id": "none", "cite": "dingy and windowless, CoS 8 L9029"}
+    ],
+    "glazing": "thick glass (OotP 17 L43335) in small leaded panes, in every glazed window from P2 on; the loops and the Owlery's windows open; curtains only where the books hang them (the hospital wing, HBP 19 L61664; the Divination classroom, PoA 6 L15276; the prefects' bathroom's long white linen, GoF 25 L30368) or by a room's own schedule; a deep reveal in thick old wall a stone seat"
   },
   "masses": [
     { "id": "north range", "rect": [0, 50, 160, 72], "floors": "G-7", "state": "designed", "ages": ["P2", "P3", "P4", "P5"] },
