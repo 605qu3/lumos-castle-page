@@ -157,6 +157,9 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-model.js?v=380"></script>
 <script src="castle-shell.js?v=25"></script>
 <script src="castle-events.js?v=37"></script>
+<script src="design/drawn.js?v=1"></script>
+<script src="design/lumos-icon.js?v=1"></script>
+<script src="design/house-hourglass.js?v=1"></script>
 <script>
 (function () {
 'use strict';
@@ -730,6 +733,102 @@ var thingCues = {
      vanishing step), word for word */
   "the step is not there: his foot drops through to the tread below with a lurch, his hand catches the rail, and he laughs and goes on": function () { trickSink(); }
 };
+/* the Entrance Hall's four glasses (Magic's req 633; Events' req 632, page/events/hall.json): Design's
+   LumosHourglass.mount drawn off screen and painted onto a card in each hourglass niche (Godric's 13.1 and 25.1), each
+   house's stones heaped to the school's own points for the day (events.schoolLevels()), the boys' own gems among
+   Gryffindor's (events.points()), the top bulbs clear. A shower or a lift the records show plays once a visit in its
+   own glass, the stones falling or flying up, and the heap stays where it lands. Peeves's ball lies where the record
+   puts it once Interiors has placed that spot (the wall's foot, docs/interiors/entrance-hall.md item 6), under his
+   marks, which stay. ?glass=off leaves the niches empty. */
+var GLASS = (function () {
+  var out = { list: [], ready: false, pending: null, played: {}, ball: null };
+  if (PLACE !== 'entrance-hall') return out;
+  var z0 = shell.place.floor, P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  /* the ball (0.065 across) at the east wall's foot, x 91.5, y 54.5; its marks about thirty, 0.06 across, grey, on
+     the wall from y 53.2 to 55.4 and 1.0 to 3.2 high, seeded so they are the same every visit */
+  out.ball = new THREE.Mesh(new THREE.SphereGeometry(0.0325, 12, 8), kit.solid(0xc8c27a));
+  out.ball.position.copy(P(91.5, 54.5, 0.0325)); out.ball.visible = false; shell.group.add(out.ball);
+  var markMat = new THREE.MeshBasicMaterial({ color: 0x8a857c, transparent: true, opacity: 0.55 });
+  for (var i = 0; i < 30; i++) {
+    var r1 = Math.sin(i * 12.9898 + 4.1) * 43758.5453, r2 = Math.sin(i * 78.233 + 1.7) * 43758.5453;
+    r1 -= Math.floor(r1); r2 -= Math.floor(r2);
+    var mk = new THREE.Mesh(new THREE.CircleGeometry(0.03, 10), markMat);
+    mk.position.copy(P(91.99, 53.2 + r1 * 2.2, 1.0 + r2 * 2.2)); mk.rotation.y = -Math.PI / 2; shell.group.add(mk);
+  }
+  if (!window.LumosHourglass || Q.get('glass') === 'off') return out;
+  var HOUSE = { gryffindor: 'lion', hufflepuff: 'badger', ravenclaw: 'eagle', slytherin: 'snake' };
+  var host = document.createElement('div');
+  host.style.cssText = 'position:absolute;left:-4000px;top:0;width:240px;height:480px;overflow:hidden';
+  document.body.appendChild(host);
+  ((MODEL && MODEL.features) || []).forEach(function (ft) {
+    var m = /^hourglass-niche-(\w+)$/.exec(ft.id);
+    if (!m || !HOUSE[m[1]] || !ft.at) return;
+    var el = document.createElement('div'); el.style.cssText = 'position:absolute;left:0;top:0;width:240px;height:480px';
+    host.appendChild(el);
+    var cv = document.createElement('canvas'); cv.width = 240; cv.height = 480;
+    var tex = new THREE.CanvasTexture(cv), h = Math.min(2.3, (ft.h || 2.45) - 0.1);
+    /* the niche is cut west into the hall's west wall (x 68) by its depth; the card stands just off its back */
+    var mesh = new THREE.Mesh(new THREE.PlaneGeometry(h / 2, h), new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: 0xe4dccf }));
+    mesh.position.copy(P(ft.at[0] - (ft.depth || 0.5) + 0.06, ft.at[1], (ft.sill || 0) + h / 2 + 0.02));
+    mesh.rotation.y = Math.PI / 2; mesh.name = 'glass-' + m[1]; shell.group.add(mesh);
+    out.list.push({ house: HOUSE[m[1]], name: m[1], el: el, cv: cv, tex: tex, mesh: mesh, glass: null, level: 0, busy: 0, t: 0 });
+  });
+  return out;
+})();
+function glassPaint(g) {   /* the glass's two layers (its still heap, then the stones in the air) onto its card */
+  if (g.painting) { g.again = true; return; }
+  g.painting = true;
+  var srcs = Array.prototype.map.call(g.el.querySelectorAll('svg'), function (s) {
+    var c = s.cloneNode(true); c.removeAttribute('style'); c.setAttribute('width', 240); c.setAttribute('height', 480);
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(c));
+  });
+  Promise.all(srcs.map(function (u) { return new Promise(function (ok) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = u; }); }))
+    .then(function (ims) {
+      var ctx = g.cv.getContext('2d'); ctx.clearRect(0, 0, 240, 480);
+      ims.forEach(function (im) { if (im) ctx.drawImage(im, 0, 0, 240, 480); });
+      g.tex.needsUpdate = true; g.painting = false;
+      if (g.again) { g.again = false; glassPaint(g); }
+    });
+}
+function glassInit() {
+  if (GLASS.ready || !GLASS.list.length || !events || !events.schoolLevels) return;
+  GLASS.ready = true;
+  var sl = events.schoolLevels(), pts = events.points ? events.points() : [];
+  GLASS.list.forEach(function (g) {
+    g.level = sl.levels[g.house] || 0;
+    g.glass = LumosHourglass.mount(g.el, { slips: g.house === 'lion' ? pts : [], houses: [g.house], level: g.level, full: sl.full });
+    glassPaint(g);
+  });
+  if (GLASS.pending) { var p = GLASS.pending; GLASS.pending = null; glassShown(p); }
+}
+var GLASS_REST = /^the four house hourglasses in their niches/, GLASS_FALL = /^a shower of .* falls into the bottom bulb of (\w+)'s hourglass/,
+    GLASS_LIFT = /^a few .* fly back up into the top bulb of (\w+)'s hourglass/, BALL_WALL = /^Peeves's tennis ball lying on the flags at the foot of the east wall/;
+function glassShown(shown) {   /* which of the shown strings the hall draws; a shower or a lift plays once a visit */
+  var drawn = [];
+  if (PLACE !== 'entrance-hall') return drawn;
+  shown.forEach(function (s) {
+    if (BALL_WALL.test(s)) drawn.push(s);
+    if (!GLASS.list.length) return;
+    if (GLASS_REST.test(s)) drawn.push(s);
+    var m = GLASS_FALL.exec(s) || GLASS_LIFT.exec(s);
+    if (!m) return;
+    drawn.push(s);
+    if (!GLASS.ready) { GLASS.pending = shown; return; }
+    if (GLASS.played[s]) return;
+    GLASS.played[s] = true;
+    var g = GLASS.list.filter(function (x) { return x.name === m[1].toLowerCase(); })[0];
+    if (!g) return;
+    g.level = Math.max(0, g.level + (GLASS_FALL.test(s) ? 12 : -6)); g.busy++;
+    g.glass.level(g.level).then(function () { g.busy--; glassPaint(g); });
+  });
+  if (GLASS.ball) GLASS.ball.visible = shown.some(function (s) { return BALL_WALL.test(s); });
+  return drawn;
+}
+function updateGlass(dt) {
+  if (!GLASS.list.length) return;
+  if (!GLASS.ready) glassInit();
+  GLASS.list.forEach(function (g) { if (g.busy && (g.t += dt) > 0.08) { g.t = 0; glassPaint(g); } });
+}
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -746,7 +845,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : []).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -889,6 +988,7 @@ function frame() {
   updateCupboard(dt);
   updateHops(dt);
   updateCranks(dt);
+  updateGlass(dt);
   updateLines(dt);
   updateFilch(dt);
   updateTrick(dt);
@@ -1078,6 +1178,11 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     sink: !!TRICK.sink, found: trickFound() }; },
   /* B21: the cupboard's state, and a tap on its grains as from its stand (true if they run) */
   cupboard: function () { return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run } : null; },
+  /* req 633: the hall's glasses (their levels and whether one is moving) and the ball; shown strings passed in are
+     drawn as the records would show them */
+  glass: function (shown) { var d = shown ? glassShown(shown) : [];
+    return { ready: GLASS.ready, levels: GLASS.list.map(function (g) { return g.name + ' ' + g.level + (g.busy ? ' moving' : ''); }),
+      ball: !!(GLASS.ball && GLASS.ball.visible), drawn: d.length }; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
