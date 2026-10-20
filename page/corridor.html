@@ -2790,8 +2790,11 @@ vaultGroup.name = 'rib-vault'; vaultGroup.visible = VAULT.on; scene.add(vaultGro
 /* The nook's beams (its own row in materials-by-room.md: beams; materials.md's beams, oak on carved stone corbels, boards
    over; req 640): joists across its 2.2 m depth from the lintel over its mouth to the back wall, the middle ones to the
    chimney breast's face, a corbel in the surround's stone under each back end, plain till the corbels' faces are drawn
-   (req 645); the flat ceiling over them becomes the boards. Behind ?beams till Godric has seen it */
-var BEAMS = { on: /[?&]beams(=|&|$)/.test(location.search), n: 8, w: 0.16, h: 0.2, oak: 0x4a3626, boards: 0x6a5440,
+   (req 645); the flat ceiling over them becomes the boards. Live on Godric's 1 (corridor-nook-beams-1019, 20 October
+   2026), the boards a shade lighter than first drawn so they read between the beams by day: a flat ceiling facing down
+   takes almost no light, so they also take back a little of the day off the flags (bounce, gone by night, as the
+   suit's ARMOUR_BOUNCE); ?beams=0 shows the flat ceiling */
+var BEAMS = { on: !/[?&]beams=0(&|$)/.test(location.search), n: 8, w: 0.16, h: 0.2, oak: 0x4a3626, boards: 0x7e6650, bounce: 0.22, mat: null,
   corbel: { w: 0.22, h: 0.18, d: 0.14 } };
 var nookBeams = new THREE.Group();
 nookBeams.name = 'nook-beams'; nookBeams.visible = BEAMS.on; nook.add(nookBeams);
@@ -2803,7 +2806,7 @@ nookBeams.name = 'nook-beams'; nookBeams.visible = BEAMS.on; nook.add(nookBeams)
     box(nookBeams, BEAMS.w, BEAMS.h, len, x, NOOK_H - BEAMS.h / 2 - 0.002, HER_Z + len / 2, oak, 0);
     box(nookBeams, c.w, c.h, c.d, x, NOOK_H - BEAMS.h - c.h / 2, back - c.d / 2, SURROUND.mat, 0);
   }
-  if (BEAMS.on) nookCeil.material = solid(BEAMS.boards);
+  if (BEAMS.on) nookCeil.material = BEAMS.mat = solid(BEAMS.boards);
 })();
 var cupboard = { ang: 0, target: 0, rattle: 0, shut: 0 };
 /* What it holds (Magic's B18, req 281; Godric's picks: the broom round 1 Try 1, held answer relayed 15 October 2026,
@@ -3748,6 +3751,7 @@ function updateNight(dt) {
   hemi.color.copy(col(0xbfc8d2)).lerp(col(0x6a7898), k);
   dayLights.forEach(function (l) { l.intensity = 1.6 * (1 - 0.85 * k) + 0.25 * moonlight * k; l.color.copy(col(0xdfe6ee)).lerp(col(0x9aaccc), k); });
   scene.fog.color.copy(NIGHT.fog0).lerp(NIGHT.dark, k); scene.background.copy(NIGHT.bg0).lerp(NIGHT.dark, k);
+  if (BEAMS.mat) BEAMS.mat.emissive.copy(col(BEAMS.boards)).multiplyScalar(BEAMS.bounce * (1 - k));   /* the nook's boards by day */
   NIGHT.torchBoost = 1 + 0.35 * k;
   /* the suit's torchlight: every torch near it hangs on its own wall, in line with its card, so their light grazes it
      edge on and by night it went near black; the steel takes their warmth back off the walls instead (ARMOUR_BOUNCE
