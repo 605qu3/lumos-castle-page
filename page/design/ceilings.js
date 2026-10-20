@@ -150,14 +150,16 @@
   }
 
   /* a rib: a tube along points, as thick as r0 where it springs (y0) and r1 at the crown (y1), so it thins as it rises */
-  function rib(THREE, pts, y0, y1, r0, r1, mat, name) {
-    var curve = new THREE.CatmullRomCurve3(pts), ts = Math.max(8, pts.length * 2), rs = 6;
+  function rib(THREE, pts, y0, y1, r0, r1, mat, name, spin) {
+    var curve = new THREE.CatmullRomCurve3(pts), ts = Math.max(8, pts.length * 2), rs = 6, q = new THREE.Quaternion(), d = new THREE.Vector3();
     var g = new THREE.TubeGeometry(curve, ts, 1, rs, false), p = g.attributes.position;
     for (var i = 0; i <= ts; i++) {
       var c = curve.getPointAt(i / ts), f = Math.max(0, Math.min(1, (c.y - y0) / Math.max(0.01, y1 - y0))), r = r0 + (r1 - r0) * f;
+      if (spin) q.setFromAxisAngle(curve.getTangentAt(i / ts), spin);   /* turned about its length (the star's ribs, req 714) */
       for (var j = 0; j <= rs; j++) {
         var k = i * (rs + 1) + j;
-        p.setXYZ(k, c.x + (p.getX(k) - c.x) * r, c.y + (p.getY(k) - c.y) * r, c.z + (p.getZ(k) - c.z) * r);
+        d.set(p.getX(k) - c.x, p.getY(k) - c.y, p.getZ(k) - c.z); if (spin) d.applyQuaternion(q);
+        p.setXYZ(k, c.x + d.x * r, c.y + d.y * r, c.z + d.z * r);
       }
     }
     g.computeVertexNormals();
@@ -237,10 +239,34 @@
     var P = function (u, v) { return alongX ? [u, v] : [v, u]; };
     var h = function (x, z) { return pointed(half, rise, (alongX ? z : x) - mid); };
     var R0 = 0.24, R1 = 0.06, beasts = (window.LumosCarving || {}).BEASTS || ['lion', 'eagle', 'badger', 'snake'], k = 0;
-    var add = function (a, b, nm, r0) { G.add(rib(THREE, line(THREE, P(a[0], a[1]), P(b[0], b[1]), y, h, 18), y, top, r0 || R0, R1, mats.stone, Q.id + '-' + nm)); };
+    /* req 714 (the Architect, 10.23 am: the ribs tied where they cross): up to seven ribs leave one springer in one
+       bundle, near upright and alike, so their faces lay in one plane. One owner each: the cross arch runs through at
+       full thickness (at an end wall the diagonal), and each other rib yields inside it a step thinner, w in YIELD,
+       and turned 8 degrees a step about its length, so no two six-sided ribs lay a face in one plane */
+    var add = function (a, b, nm, r0, w) {
+      w = w || 1; var A = P(a[0], a[1]), Bp = P(b[0], b[1]), t0 = 0;
+      /* a rib from a springer begins inside its springer stone (below), never at the bare springing */
+      if (Math.abs(a[1] - c0) < 1e-6 || Math.abs(a[1] - c1) < 1e-6) {
+        var lo = 0, hi = 0.5;
+        for (var it = 0; it < 30; it++) { var m = (lo + hi) / 2; if (h(A[0] + (Bp[0] - A[0]) * m, A[1] + (Bp[1] - A[1]) * m) < SPRING_H - 0.08) lo = m; else hi = m; }
+        t0 = lo; A = [A[0] + (Bp[0] - A[0]) * t0, A[1] + (Bp[1] - A[1]) * t0];
+      }
+      G.add(rib(THREE, line(THREE, A, Bp, y, h, 18), y, top, (r0 || R0) * w, R1 * w, mats.stone, Q.id + '-' + nm, (1 - w) / 0.03 * 8 * Math.PI / 180));
+    };
+    /* the springer stone (tas-de-charge) at each springing: one block that owns the bundle where the ribs leave the
+       wall together, bearing 2 cm into the wall, SPRING_H tall; every rib from it starts inside it */
+    var SPRING_H = Math.min(1.2, rise * 0.3), SPRING_W = 0.8, SPRING_D = 0.55;
+    var springer = function (u, side, nm) {
+      var dir = side ? -1 : 1, v0 = (side ? c1 : c0) - dir * 0.02, d = SPRING_D + 0.02;
+      var g = new THREE.BoxGeometry(alongX ? SPRING_W : d, SPRING_H, alongX ? d : SPRING_W), m = new THREE.Mesh(g, mats.stone);
+      var p = P(Math.min(Math.max(u, lines[0] + SPRING_W / 2 - 0.02), lines[lines.length - 1] - SPRING_W / 2 + 0.02), v0 + dir * d / 2);
+      m.position.set(p[0], y + SPRING_H / 2 - 0.1, p[1]); m.name = Q.id + '-springer-' + nm; G.add(m);
+    };
+    var YIELD = { diagonal: [0.97, 0.94], a: [0.91, 0.88], b: [0.85, 0.82] };
     var knob = function (u, v, beast, r, nm) { var p = P(u, v); G.add(boss(THREE, beast, p[0], y + h(p[0], p[1]), p[1], r, mats.stone, Q.id + '-boss-' + nm)); };
     add([lines[0], mid], [lines[lines.length - 1], mid], 'ridge', R1 * 1.6);
     lines.forEach(function (u, i) {
+      springer(u, 0, i + 'a'); springer(u, 1, i + 'b');
       if (i && i < lines.length - 1) { add([u, c0], [u, mid], 'cross-' + i + 'a'); add([u, c1], [u, mid], 'cross-' + i + 'b'); knob(u, mid, null, 0.2, 'cross-' + i); }
     });
     for (var i = 1; i < lines.length; i++) {
@@ -248,7 +274,8 @@
       var C = [um, mid], R1p = [um - q, mid], R2p = [um + q, mid], T1 = [um, mid - t], T2 = [um, mid + t];
       [[ua, c0, R1p, T1], [ub, c0, R2p, T1], [ua, c1, R1p, T2], [ub, c1, R2p, T2]].forEach(function (s, j) {
         var S = [s[0], s[1]];
-        add(S, C, 'bay-' + i + '-diagonal-' + j); add(S, s[2], 'bay-' + i + '-tierceron-' + j + 'a'); add(S, s[3], 'bay-' + i + '-tierceron-' + j + 'b');
+        var e = j % 2;   /* the bay's two ends: a pier's springer serves two bays, so each end yields by its own step */
+        add(S, C, 'bay-' + i + '-diagonal-' + j, 0, YIELD.diagonal[e]); add(S, s[2], 'bay-' + i + '-tierceron-' + j + 'a', 0, YIELD.a[e]); add(S, s[3], 'bay-' + i + '-tierceron-' + j + 'b', 0, YIELD.b[e]);
       });
       add(T1, T2, 'bay-' + i + '-cross-ridge', R1 * 1.6);
       [[R1p, T1], [T1, R2p], [R2p, T2], [T2, R1p]].forEach(function (l, j) { add(l[0], l[1], 'bay-' + i + '-lierne-' + j, R1 * 1.4); });
