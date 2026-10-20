@@ -132,12 +132,12 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=390"></script>
-<script src="castle-paint.js?v=3"></script>
+<script src="castle-model.js?v=392"></script>
+<script src="castle-paint.js?v=4"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=2"></script>
 <script src="castle-shell.js?v=33"></script>
-<script src="castle-events.js?v=38"></script>
+<script src="castle-events.js?v=39"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -741,17 +741,18 @@ var staffL = new THREE.PointLight(0xffc27a, 0, 14, 1.6); staffL.position.copy(P(
    architect-fires-1020, 20 October 2026, 11.55 am; the Architect's req 746), drawn as shell.html's FIRES draws them: a
    four-centred head under a frieze in the hall's stone, the mantel shelf, the opening dark, the hearth stone into the
    hall. Cold and swept; the fire's light is Design's and the hour's, asked first. The great one behind the staff table
-   (great-hall-fire-w) waits on Godric's word on the dais (great-hall-dais-fire-1020). One group, no tap lands on it. */
+   (great-hall-fire-w) stands on the platform, its foot the model's sill (Godric's 1 on great-hall-dais-fire-1020,
+   12.51 pm; model v74). A tap on a fire walks him to its place (req 720); out.meshes are the pieces a tap finds. */
 var FIRES = (function () {
-  var out = { n: 0 };
-  var fs = MODEL.features.filter(function (f) { return f.room === PLACE && /^great-hall-fire-[ns]-/.test(f.id); });
+  var out = { n: 0, meshes: [] };
+  var fs = MODEL.features.filter(function (f) { return f.room === PLACE && /^great-hall-fire-/.test(f.id); });
   var g = new THREE.Group(); g.name = 'hall-fires'; scene.add(g);
   var T = window.CASTLE_TONES && CASTLE_TONES.surfaces && CASTLE_TONES.surfaces['high-grey'];
   var stone = kit.solid(T ? parseInt(T.hex.slice(1), 16) : 0xb9b4aa), dark = kit.solid(0x15130f), z0 = shell.place.floor;
   var up = new THREE.Vector3(0, 1, 0);
   fs.forEach(function (f) {
     var c = { 0: [0, -1], 180: [0, 1], 270: [1, 0], 90: [-1, 0] }[f.compass], w = f.w, ow = f.opening[0] / 2, oh = f.opening[1];
-    var o = shell.toLocal(f.at[0], f.at[1], z0), inn = shell.toLocal(f.at[0] + c[0], f.at[1] + c[1], z0).sub(o).normalize();
+    var o = shell.toLocal(f.at[0], f.at[1], z0 + (f.sill || 0)), inn = shell.toLocal(f.at[0] + c[0], f.at[1] + c[1], z0).sub(o).normalize();
     var along = new THREE.Vector3().crossVectors(up, inn);
     var q = new THREE.Group(); q.matrixAutoUpdate = false;
     q.matrix.makeBasis(along, up, inn).setPosition(o); g.add(q);
@@ -760,7 +761,7 @@ var FIRES = (function () {
     sh.quadraticCurveTo(-ow * 0.97, oh * 0.92, -sp, oh * 0.96); sh.lineTo(0, oh); sh.lineTo(sp, oh * 0.96);
     sh.quadraticCurveTo(ow * 0.97, oh * 0.92, ow, oh * 0.72); sh.lineTo(ow, -0.01); sh.lineTo(hw, -0.01);
     sh.lineTo(hw, f.mantel); sh.lineTo(-hw, f.mantel); sh.lineTo(-hw, -0.01);
-    function piece(geo, mt, x, y, z) { var m = new THREE.Mesh(geo, mt); m.position.set(x, y, z); m.userData.owner = PLACE; q.add(m); out.n++; return m; }
+    function piece(geo, mt, x, y, z) { var m = new THREE.Mesh(geo, mt); m.position.set(x, y, z); m.userData.owner = PLACE; m.userData.fire = f.id; q.add(m); out.meshes.push(m); out.n++; return m; }
     piece(new THREE.ExtrudeGeometry(sh, { depth: 0.2, bevelEnabled: false, curveSegments: 8 }), stone, 0, 0, -0.02);
     piece(new THREE.BoxGeometry(w + 0.3, 0.1, 0.36), stone, 0, f.mantel + 0.05, 0.16);                 /* the mantel shelf */
     piece(new THREE.BoxGeometry(w, f.h - f.mantel - 0.1, 0.12), stone, 0, (f.mantel + 0.1 + f.h) / 2, 0.04);   /* the frieze */
@@ -990,18 +991,100 @@ function startLeg() {
   var to = legs.shift(), from = { pos: camera.position.clone(), look: lookTmp.clone() }, dist = from.pos.distanceTo(to.pos);
   tween = { t: 0, dur: clamp(0.8 + dist * 0.08, 0.8, 4.5), from: from, to: to };
 }
-/* up the middle aisle, looking ahead along it at the walk's own height (Interaction: no stand mid-hall) */
+/* ================= walking freely (req 720; docs/interaction-vocabulary.md §2; Godric's 1 on greathall-places-1020,
+   12.54 pm, and his every-bay rule of the same minute): a place at every thing he can tap, square to it, and one in
+   every bay on every aisle (the bays' middles, x 23 to 59, the model's vault piers every 6 m between them), the floor
+   before the platform and the doors' end; the plan is tools/greathall-places.py, its numbers drawn from S here. A tap on
+   a thing walks him to its place; a tap on the floor to the nearest place, by the aisles and round the tables' ends,
+   arriving facing the way he walked; a tap on a wall or the air keeps him where he is. Every place turns all the way
+   round. Only Back takes him to the start. Nothing marks a place. */
+var O0 = shell.toLocal(0, 0, 0), EX = shell.toLocal(1, 0, 0).sub(O0), EY = shell.toLocal(0, 1, 0).sub(O0);
+function toModel(v) {   /* the shell's local point back to the model's x, y (the frame is a plane turn and a shift) */
+  var a = v.x - O0.x, b = v.z - O0.z, det = EX.x * EY.z - EY.x * EX.z;
+  return [(a * EY.z - EY.x * b) / det, (EX.x * b - a * EX.z) / det];
+}
+var EYE = START.pos.y - P(0, 0, shell.place.floor).y, DAIS_TOP = S.dais.h, ROUND = { down: -30, up: 80, turn: 180 };
+var AISLE = [], SIDE_N = 68.3, SIDE_S = 52.7, FRONT_X = 21.5, BACK_X = 62.6;
+for (var ai = 0; ai < S.tables.length - 1; ai++) AISLE.push((S.tables[ai][1] + S.tables[ai + 1][1]) / 2);
+AISLE = [SIDE_N].concat(AISLE, [SIDE_S]);   /* 68.3, 64.7, 60.5, 56.3, 52.7: between the outer benches and the hearths */
+function onDais(x) { return x < S.dais.x1; }
+function eyeAt(x, y) { return P(x, y, shell.place.floor + (onDais(x) ? DAIS_TOP : 0) + EYE); }
+function place(name, x, y, face) {
+  var pos = eyeAt(x, y);
+  return { name: name, xy: [x, y], pos: pos, look: face ? eyeAt(x + face[0] * 10, y + face[1] * 10) : pos.clone(), lim: ROUND, floor: !face };
+}
+[START, STAFF_STAND, PANEL && PANEL.stand].forEach(function (s) { if (s) { s.xy = toModel(s.pos); s.lim = Object.assign({}, s.lim, { turn: 180 }); } });
+var PLACES = [START, STAFF_STAND].concat(PANEL ? [PANEL.stand] : []), FIRE_PLACE = {};
+MODEL.features.filter(function (f) { return f.room === PLACE && /^great-hall-fire-/.test(f.id); }).forEach(function (f) {
+  var c = { 0: [0, 1], 180: [0, -1], 270: [-1, 0], 90: [1, 0] }[f.compass];
+  /* the great one's place is the staff table's, square to it over the gold chair 4.6 m off: behind the chairs the
+     platform leaves 1 m to its hearth, where its dark opening fills the whole view */
+  if (f.compass === 270) { FIRE_PLACE[f.id] = STAFF_STAND; return; }
+  /* a long-wall fire's place stands in the next aisle in, 4.8 m off across the house table, the fire whole in view:
+     from the side aisle, 1.2 m off, its dark opening fills the view (provisional, Godric to confirm: greathall-fire-place-1020) */
+  var p = place(f.id, f.at[0], f.compass === 0 ? AISLE[1] : AISLE[3], c);
+  FIRE_PLACE[f.id] = p; PLACES.push(p);
+});
+var FLOOR = [];
+AISLE.forEach(function (y) { [23, 29, 35, 41, 47, 53, 59].forEach(function (x) { FLOOR.push(place('floor ' + (FLOOR.length + 1), x, y)); }); });
+[[FRONT_X, 54.0], [FRONT_X, 67.0], [BACK_X, 54.5], [BACK_X, 66.5]].forEach(function (q) { FLOOR.push(place('floor ' + (FLOOR.length + 1), q[0], q[1])); });
+PLACES = PLACES.concat(FLOOR);
+/* the way between two points of the plan: along an aisle, round the tables' nearer end, up the platform's steps by its
+   north end (clear of the staff table and its chairs) */
+function zone(p) { return onDais(p[0]) ? 'dais' : p[0] < S.tx0 - 0.1 ? 'front' : p[0] > S.tx1 + 0.1 ? 'back' : 'aisle'; }
+function aisleOf(p) { return AISLE.reduce(function (b, y) { return Math.abs(y - p[1]) < Math.abs(b - p[1]) ? y : b; }, AISLE[0]); }
+function route(a, b) {
+  var za = zone(a), zb = zone(b), pts = [];
+  if (za === 'dais' || zb === 'dais') {
+    if (za === 'dais' && zb === 'dais') return [b];
+    var up = [[S.dais.x1 - 0.7, 68.6], [S.dais.x1 + 0.4, 68.6]];
+    if (za === 'dais') return [[16.0, 68.6], up[0], up[1]].concat(route(up[1], b));
+    return route(a, up[1]).concat([up[0], [16.0, 68.6], b]);
+  }
+  if (za === 'aisle' && zb === 'aisle' && aisleOf(a) === aisleOf(b)) return [b];
+  if (za !== 'aisle' && zb !== 'aisle') {
+    if (za === zb) return [b];
+    var ex0 = za === 'front' ? FRONT_X : BACK_X, ex1 = zb === 'front' ? FRONT_X : BACK_X;
+    return [[ex0, 60.5], [ex1, 60.5], b];
+  }
+  var ex;
+  if (za !== 'aisle') ex = za === 'front' ? FRONT_X : BACK_X;
+  else if (zb !== 'aisle') ex = zb === 'front' ? FRONT_X : BACK_X;
+  else ex = (Math.abs(a[0] - FRONT_X) + Math.abs(b[0] - FRONT_X)) <= (Math.abs(a[0] - BACK_X) + Math.abs(b[0] - BACK_X)) ? FRONT_X : BACK_X;
+  if (za === 'aisle') pts.push([ex, aisleOf(a)]);
+  if (zb === 'aisle') pts.push([ex, aisleOf(b)]);
+  pts.push(b);
+  return pts;
+}
 function walkTo(s) {
   if (!s || s === here) return false;
   if (PANEL && here === PANEL.stand && panelOpen) panelShow(false);   /* it shuts behind him (provisional) */
+  var from = here.xy || toModel(here.pos), pts = route(from, s.xy || toModel(s.pos)), prev = from;
   legs = []; here = s; hy = hyT = hp = hpT = 0;
-  var fp = new THREE.Vector3(), fl = new THREE.Vector3(); headPose(fp, fl);
-  legs.push({ pos: fp, look: fl });
+  pts.forEach(function (q, i) {
+    var pos = eyeAt(q[0], q[1]), last = i === pts.length - 1;
+    var dir = pos.clone().sub(eyeAt(prev[0], prev[1])); dir.y = 0;
+    if (last && s.floor && dir.lengthSq() > 1e-4) s.look = pos.clone().add(dir.setLength(10));   /* facing the way he walked */
+    if (last) { var fp = new THREE.Vector3(), fl = new THREE.Vector3(); headPose(fp, fl); legs.push({ pos: fp, look: fl }); }
+    else {
+      var nx = pts[i + 1], ahead = eyeAt(nx[0], nx[1]);
+      legs.push({ pos: pos, look: ahead.clone().sub(pos).setLength(10).add(pos) });
+    }
+    prev = q;
+  });
   backBtn.hidden = s === START;
   startLeg();
   return true;
 }
-function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(PANEL && here === PANEL.stand ? STAFF_STAND : START); }
+function nearestPlace(pt) {   /* a floor tap: the nearest place on the hall's floor to where his finger lifted */
+  var xy = toModel(pt), best = null, bd = 1e9;
+  PLACES.forEach(function (s) {
+    if (!s.xy || onDais(s.xy[0])) return;
+    var d = Math.hypot(s.xy[0] - xy[0], s.xy[1] - xy[1]); if (d < bd) { bd = d; best = s; }
+  });
+  return best;
+}
+function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(START); }
 var DRY = Q.get('travel') === 'dry', wentTo = '';   /* ?travel=dry: the veil falls and lifts, nothing loads, for a check */
 function through(d) {
   wentTo = (d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE);
@@ -1142,27 +1225,32 @@ function tap(cx, cy) {
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
-  var hits = raycaster.intersectObjects(shell.group.children.concat(tapTop, doorway ? [doorway] : []), false).filter(function (h) { return h.object.visible || h.object.userData.way; });
+  var hits = raycaster.intersectObjects(shell.group.children.concat(tapTop, FIRES.meshes, doorway ? [doorway] : []), false).filter(function (h) { return h.object.visible || h.object.userData.way; });
   var hit = hits.length ? hits[0].object : null, acted = false;
-  /* a candle or the sky answers where it is, told and given the mote, never taking him back (req 608, break 3); only
-     the floor, the walls and the benches are nothing at a stop */
+  /* a candle or the sky answers where it is, told and given the mote, never taking him back (req 608, break 3); the
+     floor walks him to its nearest place (req 720), a wall keeps him where he is */
   var high = candleOnRay(raycaster.ray, hits.length ? hits[0].distance : 1e9) ? 'candle' : hit && hit === ceiling ? 'sky' : '';
   var isDoors = hit && DOOR && (hit === doorway || hit === DOOR.mesh), isPanel = !!(hit && PANEL && hit === PANEL.mesh);
   var wi = hit && !isDoors ? wayMeshes.indexOf(hit) : -1;
   if (high) { /* the mote, nothing else, until Magic's answer */ }
   else if (isPanel && here === PANEL.stand) acted = true;
-  else if (isPanel && here === STAFF_STAND) acted = walkTo(PANEL.stand);
-  else if (isDoors) {   /* the great doors: through from their stand, back to it from the staff table (§2) */
-    if (here === START || here === DOOR.stand) { goThroughDoors(); acted = true; } else { goBack(); acted = true; }
+  else if (isPanel) acted = walkTo(PANEL.stand);
+  else if (isDoors) {   /* the great doors: through from their place (the start), walked to it from anywhere else (§2) */
+    if (here === START || here === DOOR.stand) { goThroughDoors(); acted = true; } else acted = walkTo(START);
   } else if (wi >= 0) {
     var d = ways[wi];
     if (here === d.stand || here === START) { if (d.mesh.userData.way && d.built) { through(d); acted = true; } }
+    else acted = walkTo(d.stand && PLACES.indexOf(d.stand) >= 0 ? d.stand : START);
+  } else if (hit && hit.userData.fire) {   /* a fire: walk to its place, square to it; at it, told where he is */
+    acted = here === FIRE_PLACE[hit.userData.fire] || walkTo(FIRE_PLACE[hit.userData.fire]);
   } else if (hit && tapTop.indexOf(hit) >= 0) {   /* the platform, the staff table, the gold chair: walk up to them, or at */
-    if (here === START || (PANEL && here === PANEL.stand)) acted = walkTo(STAFF_STAND);   /* their stop answer where they are (req 608, break 2) */
-  } else if (here !== START) { goBack(); acted = true; }
+    if (here !== STAFF_STAND) acted = walkTo(STAFF_STAND);   /* their place answer where they are (req 608, break 2) */
+  } else if (hit && hits[0].face && hits[0].face.normal.clone().transformDirection(hit.matrixWorld).y > 0.7) {
+    acted = walkTo(nearestPlace(hits[0].point));   /* the floor: the nearest place, by the aisles */
+  }   /* a wall or the air: he stays, with the mote */
   /* every tap on a thing is told to the runtime (Interaction's §10, req 479): the platform, the staff table, the gold
      chair, the doors' way, the sky and a candle, by their names with spaces, so a record waiting on one can fire */
-  var told = high || (isPanel && here === PANEL.stand && !tween ? PANEL.id : '') || (isDoors ? DOOR.id : wi >= 0 ? ways[wi].id : hit && tapTop.indexOf(hit) >= 0 ? hit.name : '');
+  var told = high || (isPanel && here === PANEL.stand && !tween ? PANEL.id : '') || (isDoors ? DOOR.id : wi >= 0 ? ways[wi].id : hit && hit.userData.fire ? hit.userData.fire : hit && tapTop.indexOf(hit) >= 0 ? hit.name : '');
   if (told) { lastTold = told.replace(/-/g, ' '); if (events && events.tap) events.tap(lastTold); }
   kit.tapped(acted);
 }
@@ -1256,9 +1344,10 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   howler: function () { var n = 0; for (var c in CUES) if (c.indexOf(PSWING) !== 0 && c.indexOf(KNOCK) !== 0) { CUES[c](); n++; } return n; }, heard: function () { return heardLast; },
   panel: function () { return { open: panelOpen, swinging: !!panelSwing, cut: !!PCUT, cues: Object.keys(CUES).filter(function (c) { return c.indexOf(PSWING) === 0 || c.indexOf(KNOCK) === 0; }).length }; },
   breathe: breathe, fade: startFade, stutter: function () { var n = 0; for (var i = 0; i < NC; i++) if (stut[i] > 0.5) n++; return n; }, measure: function () { return MEASURE && MEASURE.result; }, told: function () { return lastTold; },
-  stand: function () { return here.name; }, wentTo: function () { return wentTo; }, stands: shell.stands.map(function (s) { return s.name; }),
+  stand: function () { return here.name; }, places: function () { return PLACES.map(function (s) { return s.name + ' ' + (s.xy || []).map(function (v) { return v.toFixed(1); }).join(','); }); },
+  walk: function (n) { return walkTo(PLACES.filter(function (x) { return x.name === n; })[0]); }, legs: function () { return legs.length + (tween ? 1 : 0); }, wentTo: function () { return wentTo; }, stands: shell.stands.map(function (s) { return s.name; }),
   standNamed: function (n) {
-    var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
+    var s = shell.stands.concat(PLACES).filter(function (x) { return x.name === n; })[0]; if (!s) return false;
     tween = null; legs = []; here = s; hy = hyT = hp = hpT = 0; backBtn.hidden = s === START; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
   },
   look: function (y, p) { var lm = limits(here); hy = hyT = lm.yaw == null ? y : clamp(y, -lm.yaw, lm.yaw); hp = hpT = clamp(p, lm.lo, lm.hi); return { yaw: hy, pitch: hp }; },
