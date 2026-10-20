@@ -155,7 +155,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
 <script src="castle-model.js?v=420"></script>
-<script src="castle-paint.js?v=19"></script>
+<script src="castle-paint.js?v=20"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="castle-shell.js?v=42"></script>
@@ -350,6 +350,18 @@ var HALL_LIGHT = (function () {
       var sky = HOUR >= 7 && HOUR < 19 ? 'sky-day' : 'sky-night', sh = TONE && TONE.surfaces[sky] ? parseInt(TONE.surfaces[sky].hex.replace('#', ''), 16) : (sky === 'sky-day' ? 0xb8cde6 : 0x10141f);
       shell.group.traverse(function (o) { if (o.isMesh && /^great-hall-ceiling/.test(o.name)) { o.material = new THREE.MeshBasicMaterial({ color: new THREE.Color(sh).convertSRGBToLinear(), side: THREE.DoubleSide }); } });
       out.candles = { state: state, sky: sky, n: spots.length };
+    }
+    if (p.id === 'filchs-office') {
+      /* ledger 139 (6), req 816: "lit by a single oil lamp dangling from the low ceiling" (CoS 8 L9029), the room's only
+         light, hung over the desk's middle where Interiors' schedule puts it (docs/interiors/filchs-office.md, the single
+         oil lamp, cited: x' 4.0, y' 6.0, its foot at 1.85 under the 2.5 ceiling); one lamp's pool, the corners dim */
+      LIT_BY[p.id] = true;
+      var brass = kit.solid(0x6a5432), glow = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
+      var parts = [[new THREE.CylinderGeometry(0.008, 0.008, 0.35, 4), brass, 2.325], [new THREE.CylinderGeometry(0.1, 0.07, 0.08, 10), brass, 2.11],
+                   [new THREE.CylinderGeometry(0.07, 0.07, 0.18, 10), glow, 1.98], [new THREE.CylinderGeometry(0.09, 0.09, 0.03, 10), brass, 1.865]];
+      parts.forEach(function (q) { var m = new THREE.Mesh(q[0], q[1]); m.position.copy(P(108.0, 68.0, q[2])); m.name = 'filchs-office-lamp';
+        m.userData.owner = 'filchs-office'; m.raycast = function () {}; g.add(m); });
+      var fl = new THREE.PointLight(TORCH.hex, 0.9 * TORCH.gain, 7, 1.8); fl.position.copy(P(108.0, 68.0, 1.95)); scene.add(fl);
     }
   });
   return out;
