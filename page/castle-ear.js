@@ -82,11 +82,43 @@
     return best;
   }
 
+  /* The microphone first, inside the tap (20 October 2026, Godric's iPhone in Safari: the recognition alone brought no
+     prompt and heard nothing for its 8 s; the prompt came only from asking for the microphone itself). Until the page
+     holds it, `listen()` asks for it and starts hearing once it is lent; refused, the ear goes deaf as before. */
+  var micOk = false;
+  try {
+    navigator.permissions.query({ name: 'microphone' }).then(function (p) { if (p.state === 'granted') micOk = true; }, function () {});
+  } catch (e) {}
+  function trace(text) { try { if (ear.trace) ear.trace(text); } catch (e) {} }
+
   /* Listen once, until he stops speaking or `seconds` pass. opts: onHeard(guesses, final), onEnd(why), seconds. */
   function listen(opts) {
     opts = opts || {};
-    var onHeard = opts.onHeard || function () {}, onEnd = opts.onEnd || function () {};
+    var onEnd = opts.onEnd || function () {};
     if (!SR) { onEnd('error not-available'); return { stop: function () {} }; }
+    var md = navigator.mediaDevices;
+    if (micOk || !md || !md.getUserMedia) return hear(opts);
+    var handle = null, over = false;
+    trace('asking for the microphone first');
+    md.getUserMedia({ audio: true }).then(function (s) {
+      s.getTracks().forEach(function (t) { t.stop(); });
+      micOk = true;
+      trace('the microphone lent');
+      if (!over) handle = hear(opts, true);
+    }, function (e) {
+      var why = e && e.name === 'NotAllowedError' ? 'not-allowed' : e && e.name === 'NotFoundError' ? 'audio-capture' : null;
+      trace('the microphone ' + (e && e.name || 'refused'));
+      if (over) return;
+      if (!why) { handle = hear(opts); return; }
+      over = true; goDeaf(why); onEnd('error ' + why);
+    });
+    return { stop: function () { if (handle) handle.stop(); else if (!over) { over = true; onEnd('stopped'); } } };
+  }
+
+  /* `late`: started after the prompt, outside the tap; a refusal then may be only the spent gesture, so the ear stays
+     open for the next tap rather than going deaf. */
+  function hear(opts, late) {
+    var onHeard = opts.onHeard || function () {}, onEnd = opts.onEnd || function () {};
     var rec = new SR(), ended = false, why = null;
     rec.lang = ear.LANG;
     rec.interimResults = true;
@@ -105,10 +137,10 @@
        (20 October 2026: on the iPad she asked for ever). */
     var GRACE_MS = 1500;
     function closeSoon() { setTimeout(function () { try { rec.abort(); } catch (e) {} finish(why || 'end'); }, GRACE_MS); }
-    rec.onerror = function (e) { why = 'error ' + e.error; if (DEAF.test(e.error)) goDeaf(e.error); closeSoon(); };
+    rec.onerror = function (e) { why = 'error ' + e.error; if (DEAF.test(e.error) && !late) goDeaf(e.error); closeSoon(); };
     rec.onend = function () { finish(why || 'end'); };
     var timer = setTimeout(function () { why = why || 'timeout'; try { rec.stop(); } catch (e) { finish(why); } closeSoon(); }, (opts.seconds || ear.SECONDS) * 1000);
-    try { rec.start(); } catch (e) { if (e.name !== 'InvalidStateError') goDeaf(e.name || 'start'); finish('error ' + (e.name || 'start')); }
+    try { rec.start(); } catch (e) { if (e.name !== 'InvalidStateError' && !late) goDeaf(e.name || 'start'); finish('error ' + (e.name || 'start')); }
     return { stop: function () { why = why || 'stopped'; try { rec.stop(); } catch (e) { finish(why); } closeSoon(); } };
   }
 
@@ -121,6 +153,7 @@
     browser: browser,
     thirdParty: thirdParty,
     ADVICE: ADVICE,
+    trace: null,         /* a test page's log of the microphone's steps */
     near: near,
     match: match,
     listen: listen
