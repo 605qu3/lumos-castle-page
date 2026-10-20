@@ -191,7 +191,8 @@ function viaStair(M, to, id) {
   var r = s.rooms.filter(function (x) { return slug(x) !== id; })[0];
   return r ? slug(r) : null;
 }
-function isWay(kind) { return /open mouth|archway|arch\b/.test(kind || ''); }
+/* v38: a door rusted fixed open (the old cells' eight, H16) is a way, its leaf not drawn, till a detail pass draws its bars */
+function isWay(kind) { return /open mouth|archway|arch\b|fixed open/.test(kind || ''); }
 function isDoor(kind) { return /door/.test(kind || '') && !isWay(kind); }
 
 /* v10: circles. A site angle in degrees counter-clockwise from x; the model's bearing clockwise from y */
@@ -735,6 +736,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v16: both sides take the tap; one-sided, its face turned out, a tap from its own room passed through to the
              dark or the room beyond (Events' orrery-stair-arch, 1.56 am, 16 October; every open way alike) */
           fill.material.side = THREE.DoubleSide;
+          if (/fixed open/.test(g.op.kind || '') && !group.getObjectByName(Q.id + '-threshold-' + g.op.id)) {   /* v38: its threshold, as a door's */
+            var tl = slab(w, 0.02, t, mats.floor, 'floor'), tp = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
+            tl.position.set(tp.x, tp.y + g.sill + 0.01, tp.z); tl.rotation.y = ang; tl.name = Q.id + '-threshold-' + g.op.id; group.add(tl);
+          }
           fill.position.set(mid.x, mid.y + g.sill + hh / 2, mid.z); fill.rotation.y = ang; fill.name = 'way-' + g.op.id; fill.userData.way = g.op.id;
           group.add(fill);
           out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm],
