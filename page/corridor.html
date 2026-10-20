@@ -2755,6 +2755,24 @@ vaultGroup.name = 'rib-vault'; vaultGroup.visible = VAULT.on; scene.add(vaultGro
     corbel(x, FAR_Z, 1); corbel(x, HER_Z, -1);
   });
 })();
+/* The nook's beams (its own row in materials-by-room.md: beams; materials.md's beams, oak on carved stone corbels, boards
+   over; req 640): joists across its 2.2 m depth from the lintel over its mouth to the back wall, the middle ones to the
+   chimney breast's face, a corbel in the surround's stone under each back end, plain till the corbels' faces are drawn
+   (req 645); the flat ceiling over them becomes the boards. Behind ?beams till Godric has seen it */
+var BEAMS = { on: /[?&]beams(=|&|$)/.test(location.search), n: 8, w: 0.16, h: 0.2, oak: 0x4a3626, boards: 0x6a5440,
+  corbel: { w: 0.22, h: 0.18, d: 0.14 } };
+var nookBeams = new THREE.Group();
+nookBeams.name = 'nook-beams'; nookBeams.visible = BEAMS.on; nook.add(nookBeams);
+(function () {
+  var oak = solid(BEAMS.oak), c = BEAMS.corbel;
+  for (var i = 0; i < BEAMS.n; i++) {
+    var x = NOOK_X0 - NOOK_W * (i + 0.5) / BEAMS.n;
+    var back = Math.abs(x - NOOK_MID) < HEARTH_W / 2 ? NOOK_BACK - BREAST : NOOK_BACK, len = back - HER_Z;
+    box(nookBeams, BEAMS.w, BEAMS.h, len, x, NOOK_H - BEAMS.h / 2 - 0.002, HER_Z + len / 2, oak, 0);
+    box(nookBeams, c.w, c.h, c.d, x, NOOK_H - BEAMS.h - c.h / 2, back - c.d / 2, SURROUND.mat, 0);
+  }
+  if (BEAMS.on) nookCeil.material = solid(BEAMS.boards);
+})();
 var cupboard = { ang: 0, target: 0, rattle: 0, shut: 0 };
 /* What it holds (Magic's B18, req 281; Godric's picks: the broom round 1 Try 1, held answer relayed 15 October 2026,
    1.47 pm; the tag round 1 Try 3, drawn blank, lettered here): one ancient school broom, a Shooting Star, "very slow and
