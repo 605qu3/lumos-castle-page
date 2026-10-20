@@ -627,6 +627,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       /* v35: no wrap round a corner whose next side is the other place's wall (the North Tower passage's sides ran
          0.8 into the seventh floor's east run past their mouth's end, and a tap there met them) */
       var ext0 = sharedE(E[(i + E.length - 1) % E.length]) ? 0 : ext, ext1 = sharedE(E[(i + 1) % E.length]) ? 0 : ext;
+      /* v42: each corner block is drawn once, by the wall before it (its far end); this wall takes its near corner too
+         only where the wall before it is lower or not drawn (the West Tower's ways showed two 5.44 m2 corner faces
+         fighting, seen from outside, from the spiral built with them) */
+      var pe = E[(i + E.length - 1) % E.length], pL = Math.hypot(pe.b[0] - pe.a[0], pe.b[1] - pe.a[1]);
+      var pi = (i + E.length - 1) % E.length, pEnd = !(gaps[pi] || []).some(function (g) { return g.s1 >= pL - 0.01; });
+      if (ext0 && pL >= 1e-6 && pEnd && (pe.H != null ? pe.H : H) >= HE && !(Q.sky && Q.sky.sides)) ext0 = 0;
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
