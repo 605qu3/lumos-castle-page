@@ -426,7 +426,7 @@ var spillLight = new THREE.PointLight(0xffb56a, 0, 7, 1.6); scene.add(spillLight
 var turnFx = new THREE.Group(); scene.add(turnFx);
 shell.doors.forEach(function (d) {
   var back = new THREE.Mesh(new THREE.PlaneGeometry(d.w, d.h), new THREE.MeshBasicMaterial({ color: 0xffc27a, transparent: true, opacity: 0, side: THREE.DoubleSide }));
-  back.position.copy(d.rest.pos).addScaledVector(d.inward, -0.35); back.rotation.y = d.rest.rot + (d.face > 0 ? 0 : Math.PI);
+  back.position.copy(d.pairMid || d.rest.pos).addScaledVector(d.inward, -0.35); back.rotation.y = d.rest.rot + (d.face > 0 ? 0 : Math.PI);   /* a pair's at its seam */
   var spill = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 2.6), new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, opacity: 0,
     depthWrite: false, blending: THREE.AdditiveBlending }));
   var free = d.hinge.at.clone().addScaledVector(d.hinge.along, d.hinge.half * 2);
