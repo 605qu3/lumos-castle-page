@@ -117,8 +117,10 @@
         "time = night"
       ],
       "show": [
-        "the greenhouses dark and locked, the giant flowers' heavy scent through the glass"
-      ]
+        "the greenhouses dark and locked, the giant flowers' heavy scent through the glass",
+        "greenhouse three's glass misted by its warmth"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the evening and the night, nobody and no lamp (\"the dark greenhouses\", CoS 5 L8066, read in the canon tool, 20 October 2026), three's glass misted by its warmth"
     },
     {
       "when": [
@@ -158,6 +160,165 @@
       "show": [
         "a few small flowers grown up between the path's bricks near greenhouse three's bench, where beans were once scattered"
       ]
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "time != night"
+      ],
+      "show": [
+        "the real sky through the glass walls and roof, its light falling on the whole house"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the glass under the real sky (2.4), the light on the whole house; \"the greenhouses, where the magical plants were kept\" (CoS 6 L8357, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "time = evening"
+      ],
+      "show": [
+        "nobody in the greenhouses, no lamp lit, the doors locked, the plants' shapes against the glass",
+        "greenhouse three's glass misted by its warmth"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the evening, nobody, no lamp (\"the dark greenhouses\", CoS 5 L8066, read in the canon tool, 20 October 2026); from outside the plants' shapes against the glass, three's glass misted by its warmth; the houses locked (Interiors' Occupancy)"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "time = night",
+        "moon up = yes",
+        "moon != new",
+        "weather = clear"
+      ],
+      "show": [
+        "moonlight through the glass roof on the staging, the plants' shapes against the glass, as much as the moon's phase gives"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: by night the moon through the roof on the staging (2.4), on a clear night while it is up; on a foggy or moonless night only the dark and the scent (room[9])"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "weather = rain"
+      ],
+      "show": [
+        "rain drumming on the glass roof and running down the glass"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: rain drums on the roof and runs down the glass"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "cold = yes",
+        "time != night",
+        "year <= 1"
+      ],
+      "show": [
+        "greenhouse one's glass misted on the inside, a drip now and then from a glazing bar"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: on a cold day the glass mists inside, a drip now and then from a glazing bar; the boys' house one in the Stone's castle (Interiors' Occupancy)"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "cold = yes",
+        "time != night",
+        "year >= 2"
+      ],
+      "show": [
+        "greenhouse three's glass misted thick on the inside by its stokehole's warmth, a drip now and then from a glazing bar"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: on a cold day the glass mists inside, three's most (its stokehole's warmth); the boys' house three from the Chamber's castle on (Interiors' Occupancy)"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "ground = snow",
+        "time != night"
+      ],
+      "show": [
+        "snow lying on the glass roof, the light coming grey through it"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: snow lies on the roof and the light comes grey through it"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "date >= 06-01",
+        "date <= 06-30",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "a baking hot sun on the glass, the house close and warm"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: in June \"Herbology in the greenhouses under a baking hot sun\" (PoA 16 L19682, everyday, read in the canon tool, 20 October 2026), the house close and warm"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "year <= 1"
+      ],
+      "show": [
+        "in the dark under the staging's slats, pale caps of fungi",
+        "monkshood, asphodel, wormwood and dittany in their pots at the growing length's head, still as any garden plant"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: greenhouse one's fungi under the slats, \"all the strange plants and fungi\" (PS 8 L2732, read in the canon tool, 20 October 2026); the books' real plants (Interiors' 17), the only plants in the house that never move; the boys' house one in the Stone's castle"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "year >= 2"
+      ],
+      "show": [
+        "giant, umbrella-sized flowers dangling from the ridge, swaying a little on the warm air from the stokehole's grilles"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: \"the heavy perfume of some giant, umbrella-sized flowers dangling from the ceiling\" (CoS 6 L8367, read in the canon tool, 20 October 2026), swaying on the stokehole's warm air, slower than the plants below; the boys' house three from the Chamber's castle on"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "petal = down"
+      ],
+      "show": [
+        "a fallen petal lying on the path"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: a petal lies on the path till the next lesson's sweeping (Interiors' aftermath); swept by greenhouses.petal-swept"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "toadstool = out"
+      ],
+      "show": [
+        "a leaping toadstool sitting on the path by its bucket"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: once in a while one hops out onto the path and sits there; a tap and it hops back (greenhouses.toadstool-back)"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "date >= 05-25",
+        "date < 05-29",
+        "time != night"
+      ],
+      "show": [
+        "the first flower heads, large as cabbages, opening down the growing length"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the summer bloom from late May, over a few days, \"flowers large as cabbages burst into bloom in the greenhouses\" (CoS 15 L11819, everyday, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "date >= 05-29",
+        "date <= 07-31",
+        "time != night"
+      ],
+      "show": [
+        "flowers large as cabbages in bloom down the growing length, nodding on their stalks as he passes"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the summer bloom, \"flowers large as cabbages burst into bloom in the greenhouses\" (CoS 15 L11819, everyday, read in the canon tool, 20 October 2026), nodding as he passes, every house"
     }
   ],
   "records": [
@@ -192,6 +353,251 @@
         }
       ],
       "canon": "Godric's t1 on interiors-mandrakes-1015 (6.08 pm): CoS 14 L11531, \"in March several of the Mandrakes threw a loud and raucous party in greenhouse three\", read 15 October 2026; in the Chamber's castle from March to their cutting, now and then, heard by anyone passing; never their cry, which is fatal (CoS 6), nothing glows"
+    },
+    {
+      "id": "greenhouses.plants-stir",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-plants",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "time != night"
+      ],
+      "show": [
+        "on the staging down the growing length a leaf turns a little toward the light, a frond uncurls and curls back, a pod twitches"
+      ],
+      "starts": [],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: \"the greenhouses, where the magical plants were kept\" (CoS 6 L8357, read in the canon tool, 20 October 2026): a leaf, a frond, a pod, slow, never toward him or the boys' tray; nothing glows; about one visit in three"
+    },
+    {
+      "id": "greenhouses.plants-stir-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-plants",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "greenhouses.spores",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-spores",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "year <= 1",
+        "time != night"
+      ],
+      "show": [
+        "under the staging's slats a pale cap puffs a little dust of spores that drifts in the light and settles"
+      ],
+      "starts": [],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: greenhouse one's fungi, \"all the strange plants and fungi\" (PS 8 L2732, read in the canon tool, 20 October 2026); about one visit in three"
+    },
+    {
+      "id": "greenhouses.spores-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-spores",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "year <= 1",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "greenhouses.petal",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-petal",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "time != night",
+        "petal != down"
+      ],
+      "show": [
+        "a petal falls from a giant flower overhead and lies on the path"
+      ],
+      "starts": [
+        "set petal = down"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: three's flowers (CoS 6 L8367, read in the canon tool, 20 October 2026), now and then a petal falls and lies on the path till the next lesson's sweeping (Interiors' aftermath); about one visit in three"
+    },
+    {
+      "id": "greenhouses.petal-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-petal",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "time != night",
+        "petal != down"
+      ],
+      "starts": []
+    },
+    {
+      "id": "greenhouses.petal-swept",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = greenhouses",
+        "lessons = on",
+        "hour < 13",
+        "petal = down"
+      ],
+      "starts": [
+        "set petal = none"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the petal swept by the next lesson (Interiors' aftermath), its hours room[1]'s"
+    },
+    {
+      "id": "greenhouses.tentacula",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-tentacula",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "lessons = on",
+        "hour < 13"
+      ],
+      "show": [
+        "the Venomous Tentacula's long feelers inch sneakily toward the teacher's shoulder; she gives it a sharp slap without looking up, and they draw in"
+      ],
+      "starts": [],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: \"She gave a sharp slap to a spiky, dark red plant as she spoke, making it draw in the long feelers that had been inching sneakily over her shoulder\" (CoS 6 L8425, read in the canon tool, 20 October 2026); in a lesson, room[1]'s hours; never toward the boys' tray (Interiors' checks, 3.8 m off); her hand People's; about one lesson in three"
+    },
+    {
+      "id": "greenhouses.tentacula-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-tentacula",
+      "weight": 2,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "lessons = on",
+        "hour < 13"
+      ],
+      "starts": []
+    },
+    {
+      "id": "greenhouses.toadstool-hop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-toadstool",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "time != night",
+        "toadstool != out"
+      ],
+      "show": [
+        "in the bucket under the north staging a leaping toadstool hops, and the rim rattles"
+      ],
+      "starts": [],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: \"a bucket of leaping toadstools\" (CoS 14 L11531, read in the canon tool, 20 October 2026), the house's stock from the Chamber's castle on (Interiors' 6); now and then one hops in the bucket"
+    },
+    {
+      "id": "greenhouses.toadstool-out",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-toadstool",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "time != night",
+        "toadstool != out"
+      ],
+      "show": [
+        "a leaping toadstool hops out of its bucket onto the path and sits there"
+      ],
+      "starts": [
+        "set toadstool = out"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: \"a bucket of leaping toadstools\" (CoS 14 L11531, read in the canon tool, 20 October 2026); once in a while one hops out onto the path and sits there"
+    },
+    {
+      "id": "greenhouses.toadstool-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "greenhouse-toadstool",
+      "weight": 4,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = greenhouses",
+        "year >= 2",
+        "time != night",
+        "toadstool != out"
+      ],
+      "starts": []
+    },
+    {
+      "id": "greenhouses.toadstool-back",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap toadstool",
+      "when": [
+        "place = greenhouses",
+        "toadstool = out"
+      ],
+      "show": [
+        "the toadstool hops back into its bucket"
+      ],
+      "starts": [
+        "set toadstool = in"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: a tap and it hops back in; nothing glows"
+    },
+    {
+      "id": "greenhouses.forget",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set toadstool = none"
+      ],
+      "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the toadstool back in its bucket between visits; the petal keeps till the next lesson"
     }
   ]
 }
