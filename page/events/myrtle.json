@@ -3,12 +3,14 @@
   "room": [
     {
       "when": [
-        "place = myrtles bathroom"
+        "place = myrtles bathroom",
+        "year >= 2"
       ],
       "show": [
-        "the stone flags damp and dull-shining, a thin film of water near the end stall and under the sinks"
+        "the stone flags damp and dull-shining, a thin film of water near the end stall and under the sinks",
+        "the candle flames doubled in the wet flags, trembling and settling again when a tap drips"
       ],
-      "canon": "Interiors' req 463 (docs/interiors/myrtles-bathroom.md, the damp floor, a habit any day; its depth Events'): CoS 9 L9704, \"The floor was damp and reflected the dull light\"; CoS 8 L9181, out of order all year for her flooding; every castle, any day; checked against the text, 15 October 2026"
+      "canon": "Interiors' req 463 (docs/interiors/myrtles-bathroom.md, the damp floor, a habit any day; its depth Events'): CoS 9 L9704, \"The floor was damp and reflected the dull light\"; CoS 8 L9181, out of order all year for her flooding; every castle, any day; checked against the text, 15 October 2026; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the floor's shine, \"The floor was damp and reflected the dull light given off by the stubs of a few candles, burning low in their holders\" (CoS 9 L9704, read in the canon tool, 20 October 2026); the room from the Chamber's September (year 2) on, a shut door in the Stone's castle"
     },
     {
       "when": [
@@ -18,7 +20,27 @@
       "show": [
         "a sooty scorch under the rim of one toilet in a nameless stall, where a little fire once crackled"
       ],
-      "canon": "Interiors' req 463 (a sooty scorch under one toilet's rim in a nameless stall; its place Interiors'): CoS 11 L10216, \"An old cauldron was perched on the toilet, and a crackling from under the rim\"; the book gives that stall's fire no date (the day after the season's first match), so from 15 December of the Chamber's castle, the splash stain's reckoning in the same chapter, never before, and in every later year; no stall or name given; checked against the text, 15 October 2026"
+      "canon": "Interiors' req 463 (a sooty scorch under one toilet's rim in a nameless stall; its place Interiors'): CoS 11 L10216, \"An old cauldron was perched on the toilet, and a crackling from under the rim\"; the book gives that stall's fire no date (the day after the season's first match), so from 15 December of the Chamber's castle, the splash stain's reckoning in the same chapter, never before, and in every later year; no stall or name given; checked against the text, 15 October 2026; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the room from the Chamber's September on, so this date's gate already holds it"
+    },
+    {
+      "when": [
+        "place = second floor east corridor",
+        "myrtle_water = fresh"
+      ],
+      "show": [
+        "water seeping out under the bathroom door and spreading over the flags, across half the corridor's width at most, the light caught in it"
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle: \"A great flood of water stretched over half the corridor, and it looked as though it was still seeping from under the door\" (CoS 13 L11090, read in the canon tool, 20 October 2026), as her floods' habit (\"It's been out-of-order all year because she keeps having tantrums and flooding the place\", CoS 8 L9181, read in the canon tool, 20 October 2026), never that night's Filch; set by myrtle.water here or myrtle.flooded inside"
+    },
+    {
+      "when": [
+        "place = second floor east corridor",
+        "myrtle_water = drying"
+      ],
+      "show": [
+        "the flags before the bathroom door dark where water lay"
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle: the water gone by his next visit, the flags dark where it lay (ours, after CoS 13 L11090, read in the canon tool, 20 October 2026)"
     }
   ],
   "records": [
@@ -30,12 +52,33 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
-        "place = myrtles bathroom"
+        "place = myrtles bathroom",
+        "year >= 2"
       ],
       "show": [
-        "the floor awash from wall to wall, water still seeping out under the door into the corridor"
+        "the end stall's toilet brimming over, the floor awash from wall to wall, the candles' doubles swimming in it, water still seeping out under the door into the corridor"
       ],
-      "canon": "Interiors' req 463 (the water seeping under the door, as the floor's wet habit): CoS 13 L11090, water \"still seeping from under the door\", and CoS 8 L9181, her tantrums flooding the place, so now and then, any day and any castle, never that CoS night; a small record on arrival, so one habit a visit at most and never two visits running; checked against the text, 15 October 2026"
+      "canon": "Interiors' req 463 (the water seeping under the door, as the floor's wet habit): CoS 13 L11090, water \"still seeping from under the door\", and CoS 8 L9181, her tantrums flooding the place, so now and then, any day and any castle, never that CoS night; a small record on arrival, so one habit a visit at most and never two visits running; checked against the text, 15 October 2026; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the room from the Chamber's September on; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the flood runs down the room and out under the door, \"her wails echoing off the bathroom walls\" (CoS 13 L11090, read in the canon tool, 20 October 2026); the corridor's water follows it (myrtle_water)",
+      "starts": [
+        "set myrtle_water = fresh",
+        "stamp myrtle_flood"
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.flooded",
+          "sound": "her wails echoing off the bathroom walls"
+        }
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "moaning myrtle",
+          "mark": "her stall"
+        }
+      ]
     },
     {
       "id": "myrtle.sobs",
@@ -45,7 +88,8 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
-        "place = myrtles bathroom"
+        "place = myrtles bathroom",
+        "year >= 2"
       ],
       "who": [
         {
@@ -63,7 +107,7 @@
           "sound": "long, wet sobs from behind the end stall's door, then a loud sniff"
         }
       ],
-      "canon": "Interiors' req 463 (her moods and when she is in; her figure People's and Magic's): she haunts her own stall, her own business, never a scene's figure (Interiors' schedule, Under the rulings); CoS 9 L9736, \"a tragic sob\"; sounds only, no words said to him; a small record on arrival; checked against the text, 15 October 2026"
+      "canon": "Interiors' req 463 (her moods and when she is in; her figure People's and Magic's): she haunts her own stall, her own business, never a scene's figure (Interiors' schedule, Under the rulings); CoS 9 L9736, \"a tragic sob\"; sounds only, no words said to him; a small record on arrival; checked against the text, 15 October 2026; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the room from the Chamber's September on"
     },
     {
       "id": "myrtle.u-bend",
@@ -73,7 +117,8 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
-        "place = myrtles bathroom"
+        "place = myrtles bathroom",
+        "year >= 2"
       ],
       "who": [
         {
@@ -88,10 +133,332 @@
           "speaker": "myrtle",
           "medium": "heard",
           "key": "myrtle.u-bend",
-          "sound": "a splash in the end stall's toilet, then muffled sobbing from somewhere down in the U-bend, fading"
+          "sound": "a splash in the end stall's toilet slopping over the rim onto the flags, the candles' doubles in the wet floor shaking, then muffled sobbing from somewhere down in the U-bend, fading"
         }
       ],
-      "canon": "Interiors' req 463 (her moods): CoS 9 L9736, she dives headfirst into the toilet, \"her muffled sobs\" from \"somewhere in the U-bend\"; now and then, any day, sounds only; a small record on arrival; checked against the text, 15 October 2026"
+      "canon": "Interiors' req 463 (her moods): CoS 9 L9736, she dives headfirst into the toilet, \"her muffled sobs\" from \"somewhere in the U-bend\"; now and then, any day, sounds only; a small record on arrival; checked against the text, 15 October 2026; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the room from the Chamber's September on; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the dive, she \"rose up in the air, turned over, and dived headfirst into the toilet, splashing water\" (CoS 9 L9736, read in the canon tool, 20 October 2026), never at him"
+    },
+    {
+      "id": "myrtle.crying",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-corridor",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = second floor east corridor",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "a girl ghost",
+          "mark": "behind the bathroom door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.crying",
+          "sound": "a girl crying behind the bathroom door, muffled; a sniff, quiet, then the crying again"
+        }
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle: the crying behind the door, never words, no light, no mark on the door; unnamed before 31 October of the Chamber's castle (CoS 8 L9173, read in the canon tool, 20 October 2026), and no line here names her after; \"crying noisily in her stall\" (CoS 10 L9881, read in the canon tool, 20 October 2026); \"Myrtle's gurgling sobs\" heard as the door shut on them (CoS 9 L9740, read in the canon tool, 20 October 2026); now and then, about one visit in three (the shell has no near-the-door built-in yet, so anywhere on the corridor, the line drawn at her door)"
+    },
+    {
+      "id": "myrtle.gurgling",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-corridor",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = second floor east corridor",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "a girl ghost",
+          "mark": "behind the bathroom door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.gurgling",
+          "sound": "a girl crying behind the bathroom door, then the sobs go gurgling away, as if down a drain, and are gone"
+        }
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle: the crying behind the door, never words, no light, no mark on the door; unnamed before 31 October of the Chamber's castle (CoS 8 L9173, read in the canon tool, 20 October 2026), and no line here names her after; \"crying noisily in her stall\" (CoS 10 L9881, read in the canon tool, 20 October 2026); \"Myrtle's gurgling sobs\" heard as the door shut on them (CoS 9 L9740, read in the canon tool, 20 October 2026); now and then, about one visit in three (the shell has no near-the-door built-in yet, so anywhere on the corridor, the line drawn at her door)"
+    },
+    {
+      "id": "myrtle.corridor-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-corridor",
+      "weight": 4,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = second floor east corridor",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "myrtle.crying-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-corridor-night",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = second floor east corridor",
+        "time = night"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "a girl ghost",
+          "mark": "behind the bathroom door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.crying-night",
+          "sound": "a girl crying behind the bathroom door, muffled, carrying down the quiet passage; a sniff, then the crying again"
+        }
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle: the crying behind the door, never words, no light, no mark on the door; unnamed before 31 October of the Chamber's castle (CoS 8 L9173, read in the canon tool, 20 October 2026), and no line here names her after; \"crying noisily in her stall\" (CoS 10 L9881, read in the canon tool, 20 October 2026); \"Myrtle's gurgling sobs\" heard as the door shut on them (CoS 9 L9740, read in the canon tool, 20 October 2026); by night it carries further down the quiet passage (\"the last, deserted passage\", CoS 8 L9329, read in the canon tool, 20 October 2026); now and then, about one visit in three (the shell has no near-the-door built-in yet, so anywhere on the corridor, the line drawn at her door)"
+    },
+    {
+      "id": "myrtle.corridor-night-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-corridor-night",
+      "weight": 2,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = second floor east corridor",
+        "time = night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "myrtle.door-crying",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-door",
+      "weight": 2,
+      "moment": "tap myrtle-door",
+      "when": [
+        "place = second floor east corridor",
+        "year <= 1"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "a girl ghost",
+          "mark": "behind the bathroom door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.door-crying",
+          "sound": "the brass doorknob will not turn; behind the door a girl is crying, muffled, and does not stop"
+        }
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): in the Stone's castle the door never opens and nothing says why (Godric's 7.03); \"He reached for the brass doorknob\" (CoS 9 L9694, read in the canon tool, 20 October 2026); a shut door's answer, never silence (req 265); Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle: the crying behind the door, never words, no light, no mark on the door; unnamed before 31 October of the Chamber's castle (CoS 8 L9173, read in the canon tool, 20 October 2026), and no line here names her after; \"crying noisily in her stall\" (CoS 10 L9881, read in the canon tool, 20 October 2026); \"Myrtle's gurgling sobs\" heard as the door shut on them (CoS 9 L9740, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "id": "myrtle.door-gurgling",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-door",
+      "weight": 1,
+      "moment": "tap myrtle-door",
+      "when": [
+        "place = second floor east corridor",
+        "year <= 1"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "a girl ghost",
+          "mark": "behind the bathroom door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.door-gurgling",
+          "sound": "the brass doorknob will not turn; behind the door the crying goes gurgling away, as if down a drain"
+        }
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): as myrtle.door-crying; Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle: the crying behind the door, never words, no light, no mark on the door; unnamed before 31 October of the Chamber's castle (CoS 8 L9173, read in the canon tool, 20 October 2026), and no line here names her after; \"crying noisily in her stall\" (CoS 10 L9881, read in the canon tool, 20 October 2026); \"Myrtle's gurgling sobs\" heard as the door shut on them (CoS 9 L9740, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "id": "myrtle.door-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-door",
+      "weight": 2,
+      "moment": "tap myrtle-door",
+      "when": [
+        "place = second floor east corridor",
+        "year <= 1"
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): as myrtle.door-crying, the door shut and unexplained (Godric's 7.03); the drip, the room's taps (the table's sinks and the tap row)",
+      "show": [
+        "the brass doorknob will not turn, and somewhere behind the door water drips"
+      ]
+    },
+    {
+      "id": "myrtle.water",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = second floor east corridor",
+        "days since myrtle_flood >= 5"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "a girl ghost",
+          "mark": "behind the bathroom door"
+        }
+      ],
+      "starts": [
+        "set myrtle_water = fresh",
+        "stamp myrtle_flood"
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.water",
+          "sound": "wails echoing off the bathroom walls behind the door"
+        }
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e), every castle, now and then: the water under the door (the room rule on myrtle_water), \"her wails echoing off the bathroom walls\" behind it (CoS 13 L11090, read in the canon tool, 20 October 2026); a small record on arrival, so a visit now and then, never two running; never that CoS 13 night; at most once in five days, a flood inside counted too (her floods a habit, never every visit)"
+    },
+    {
+      "id": "myrtle.water-gone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "myrtle_water = drying"
+      ],
+      "starts": [
+        "set myrtle_water = none"
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the dark flags last one visit, then dry; listed before myrtle.water-dries so one leave never takes both steps"
+    },
+    {
+      "id": "myrtle.water-dries",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "myrtle_water = fresh"
+      ],
+      "starts": [
+        "set myrtle_water = drying"
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the water gone by his next visit, the flags dark where it lay"
+    },
+    {
+      "id": "myrtle.first-look",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = myrtles bathroom",
+        "year >= 2",
+        "myrtle_met != yes"
+      ],
+      "who": [
+        {
+          "as": "myrtle",
+          "role": "voice",
+          "name": "moaning myrtle",
+          "mark": "over the end stall's tank"
+        }
+      ],
+      "starts": [
+        "set myrtle_met = yes"
+      ],
+      "lines": [
+        {
+          "speaker": "myrtle",
+          "medium": "heard",
+          "key": "myrtle.first-look",
+          "sound": "the girl ghost over the end stall's tank eyes him suspiciously, then goes back to picking a spot on her chin",
+          "text": [
+            "This is a girls' bathroom. They're not girls."
+          ]
+        }
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): her first look at him, once, his first time through the door from the Chamber's September: \"This is a girls' bathroom,\" she said, eyeing Ron and Harry suspiciously. \"They're not girls.\" (CoS 9 L9710, read in the canon tool, 20 October 2026); \"picking a spot on her chin\" (CoS 9 L9708, read in the canon tool, 20 October 2026); said to the room, nothing asked of him after; no name in the line, so it holds before 31 October too"
+    },
+    {
+      "id": "myrtle.drip",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-room",
+      "weight": 1,
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = myrtles bathroom",
+        "year >= 2"
+      ],
+      "show": [
+        "a copper tap drips into its chipped basin, and the candles' doubles in the wet floor tremble and settle"
+      ],
+      "canon": "Magic's req 698 (docs/handoff/magic.md, Moaning Myrtle's bathroom and its door; Kingsley's ruling 1e35cb8f with his corrections 0fc3ea59; Godric's 7.03 am answer, 75abe50e): the sinks and the tap, still as any old sink, a tap dripping now and then (\"a row of chipped sinks\", CoS 9 L9704, read in the canon tool, 20 October 2026); the snake on the last sink's tap Interiors' fixture and does nothing"
+    },
+    {
+      "id": "myrtle.drip-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "myrtle-room",
+      "weight": 2,
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = myrtles bathroom",
+        "year >= 2"
+      ],
+      "starts": []
     }
   ]
 }
