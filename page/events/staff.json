@@ -216,29 +216,44 @@
         "time = night"
       ],
       "show": [
-        "the torches only, every classroom door shut"
+        "the torches only, every classroom door shut",
+        "Filch's door shut, dark under it"
       ],
-      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: by night"
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: by night; Filch's door shut and locked by night, dark under it, he on his rounds (Magic's req 749)"
     },
     {
       "when": [
         "place = classroom corridor",
-        "time = morning"
+        "time != evening",
+        "time != night",
+        "filch_door != ajar"
       ],
       "show": [
         "Filch's door shut, a lamp's light under it"
       ],
-      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: Filch in, \"a single oil lamp\" (CoS 8 L9029, read in the canon tool, 20 October 2026); by day and evening on his rounds, by night his round People's; provisional, to follow Interiors' Occupancy (req 729) when it lands"
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: by day Filch in between his jobs, the lamp lit and the door shut (Interiors' Occupancy, docs/interiors/filchs-office.md); \"a single oil lamp\" (CoS 8 L9029, read in the canon tool, 20 October 2026)"
     },
     {
       "when": [
         "place = classroom corridor",
-        "time != morning"
+        "time != evening",
+        "time != night",
+        "filch_door = ajar"
       ],
       "show": [
-        "Filch's door shut, dark under it"
+        "Filch's door left a hand's width ajar, the lamp inside turned low"
       ],
-      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: Filch out on his rounds; provisional, to follow Interiors' Occupancy (req 729)"
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: by day now and then he is out on a job, the door left ajar and the lamp turned low, and a boy may slip in (filch.json's door draw)"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "time = evening"
+      ],
+      "show": [
+        "Filch's door left a hand's width ajar, the lamp inside turned low"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: on his evening round the door left ajar, the lamp turned low; Interiors' Occupancy has the lamp out and the door shut by evening, Magic's walk-in table followed (asked of Interiors, req 757)"
     },
     {
       "when": [

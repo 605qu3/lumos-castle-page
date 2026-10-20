@@ -1,6 +1,133 @@
 {
   "chain": "filch",
-  "room": [],
+  "places": {
+    "filch door": [
+      "classroom corridor",
+      "filchs office"
+    ]
+  },
+  "bags": {
+    "confiscations": [
+      {
+        "item": "snap-cards"
+      },
+      {
+        "item": "filibuster"
+      },
+      {
+        "item": "folded-note"
+      },
+      {
+        "item": "frisbee"
+      },
+      {
+        "item": "dungbomb"
+      },
+      {
+        "item": "teacup",
+        "when": [
+          "year >= 3"
+        ]
+      },
+      {
+        "item": "hiccough-sweets",
+        "when": [
+          "year >= 3"
+        ]
+      }
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = filchs office"
+      ],
+      "show": [
+        "a single oil lamp dangling from the low ceiling over the desk, turned low, the room's only light",
+        "a highly polished collection of chains and manacles on the wall behind the desk, catching the lamp",
+        "one drawer of the filing cabinets standing a finger's width open, too full to shut, a crumpled form's corner showing",
+        "a box of things confiscated from pupils, heaped anyhow"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: \"lit by a single oil lamp dangling from the low ceiling\", \"A highly polished collection of chains and manacles hung on the wall behind Filch's desk\", \"Fred and George Weasley had an entire drawer to themselves\" (CoS 8 L9029, read in the canon tool, 20 October 2026); the lamp low while he is out, the drawer's gap and the form ours, comic, never opening further; the box's place Interiors' (req 757); nothing here moves by magic of its own"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "took_box = yes",
+        "box_thing = snap-cards"
+      ],
+      "show": [
+        "in his hand, out of Filch's box: a pack of Exploding Snap cards, the edges singed"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, Exploding Snap (CoS 12 L10703, read in the canon tool, 20 October 2026), the singed edges ours"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "took_box = yes",
+        "box_thing = filibuster"
+      ],
+      "show": [
+        "in his hand, out of Filch's box: an unlit Filibuster firework"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, Dr Filibuster's fireworks (CoS 4 L7761, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "took_box = yes",
+        "box_thing = folded-note"
+      ],
+      "show": [
+        "in his hand, out of Filch's box: a note passed in class, folded very small"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, ours"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "took_box = yes",
+        "box_thing = frisbee"
+      ],
+      "show": [
+        "in his hand, out of Filch's box: a Fanged Frisbee in a tied sack, still trying to bite"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, Fanged Frisbees (GoF 12 L25403, read in the canon tool, 20 October 2026), an everyday thing a later book names first (Kingsley's rule of 16 October)"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "took_box = yes",
+        "box_thing = dungbomb"
+      ],
+      "show": [
+        "in his hand, out of Filch's box: a Dungbomb wrapped in a rag"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, Dungbombs (PoA 11 L17511, read in the canon tool, 20 October 2026), the same rule"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "took_box = yes",
+        "box_thing = teacup"
+      ],
+      "show": [
+        "in his hand, out of Filch's box: a Nose-Biting Teacup from Zonko's"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, \"a Nose-Biting Teacup\" (PoA 14 L18888, read in the canon tool, 20 October 2026), from the Azkaban castle's Hogsmeade Saturdays"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "took_box = yes",
+        "box_thing = hiccough-sweets"
+      ],
+      "show": [
+        "in his hand, out of Filch's box: a bag of Hiccough Sweets from Zonko's"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, \"Hiccough Sweets\" (PoA 14 L18888, read in the canon tool, 20 October 2026), from the Azkaban castle's Hogsmeade Saturdays"
+    }
+  ],
   "records": [
     {
       "id": "filch.grumble",
@@ -461,6 +588,196 @@
           "canon": "ours, in his voice (Interiors' req 471: each schedule's *Filch's near miss*, the hiding place and its sight lines Interiors', cited never copied; the page sends him by day or evening, as the corridor's pass, Godric's 1 on corridor-filch-pass-1015); his \"my sweet\" to Mrs Norris, CoS 8 L9091, checked 15 October 2026; comic, he looks and never finds him (the world rules)"
         }
       ]
+    },
+    {
+      "id": "filch.door-out",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-door",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = filch door",
+        "time != evening",
+        "time != night",
+        "filch_drawn != yes"
+      ],
+      "starts": [
+        "set filch_door = ajar",
+        "set filch_drawn = yes"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: by day, now and then when he is out on a job, the door left ajar with the lamp low (Interiors' Occupancy: in and out between his jobs); drawn once a visit, about one in three"
+    },
+    {
+      "id": "filch.door-in",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-door",
+      "weight": 2,
+      "moment": "arrive",
+      "when": [
+        "place = filch door",
+        "time != evening",
+        "time != night",
+        "filch_drawn != yes"
+      ],
+      "starts": [
+        "set filch_door = shut",
+        "set filch_drawn = yes"
+      ]
+    },
+    {
+      "id": "filch.office-in",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = filchs office"
+      ],
+      "show": [
+        "a faint smell of fried fish lingering about the place",
+        "the lamp swaying a little on its chain as the door moves, the cabinets' shadows swaying with it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: \"A faint smell of fried fish lingered about the place\" (CoS 8 L9029, read in the canon tool, 20 October 2026), never drawn; the lamp's sway and the shadows ours"
+    },
+    {
+      "id": "filch.office-norris",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-office-norris",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = filchs office"
+      ],
+      "show": [
+        "Mrs Norris watching him from her place, bulging, lamp-like eyes just like Filch's"
+      ],
+      "starts": [
+        "set office_norris = here"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: \"bulging, lamp like eyes just like Filch's\" (PS 8 L2728, read in the canon tool, 20 October 2026); her place the Curator's list (req 748) and the shell's; about one visit in four"
+    },
+    {
+      "id": "filch.office-norris-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-office-norris",
+      "weight": 3,
+      "moment": "arrive",
+      "when": [
+        "place = filchs office"
+      ],
+      "starts": []
+    },
+    {
+      "id": "filch.office-norris-gone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 30-90 s",
+      "when": [
+        "place = filchs office",
+        "office_norris = here"
+      ],
+      "show": [
+        "Mrs Norris gone from her place"
+      ],
+      "starts": [
+        "set office_norris = gone"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: she watches, and the next time he looks she is gone (ours)"
+    },
+    {
+      "id": "filch.office-near-miss",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-office-near-miss",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = filchs office"
+      ],
+      "show": [
+        "Filch's shuffle and his muttering coming along the corridor, stopping outside the door",
+        "a rag taken off the hook by the door with a grumble",
+        "the shuffle going away again down the corridor"
+      ],
+      "starts": [],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: the near miss, ours, comic: he never looks in, never sees a boy, the door open again the moment he has gone; the store's door and the cabinets' shadow always there; about one visit in three"
+    },
+    {
+      "id": "filch.office-near-miss-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-office-near-miss",
+      "weight": 2,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = filchs office"
+      ],
+      "starts": []
+    },
+    {
+      "id": "filch.office-box",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap confiscations",
+      "when": [
+        "place = filchs office",
+        "took_box != yes"
+      ],
+      "starts": [
+        "set box_thing = from bag confiscations",
+        "set took_box = yes",
+        "log \"Took a {box_thing} back out of Filch's box {day}\""
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, never the same twice till every one has come; what becomes of it the game's (docs/game-notes.md, Magic's line of 20 October)"
+    },
+    {
+      "id": "filch.office-box-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap confiscations",
+      "when": [
+        "place = filchs office",
+        "took_box = yes"
+      ],
+      "show": [
+        "the heap in the box settling, a paper tag rustling"
+      ],
+      "starts": [],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: a second tap the same visit answers, ours"
+    },
+    {
+      "id": "filch.office-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set took_box = no",
+        "set office_norris = gone",
+        "set filch_drawn = no",
+        "set filch_door = shut"
+      ],
+      "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: the visit's draws cleared at leave"
     }
   ]
 }
