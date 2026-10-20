@@ -2760,7 +2760,7 @@ var doorSurround = squareSurround(DOOR.x, DOOR.w, DOOR.h);
    1, 19 October 2026, 9.33 pm); the bosses (materials.md: a different face in each bay) a drawing for later */
 var VAULT = { on: true, spring: 2.9, rib: 0.07, seg: 24,
   web: solid(0x6c6861, { side: THREE.DoubleSide }), corbel: { w: 0.24, h: 0.26, d: 0.16 } };
-VAULT.rise = CEIL - VAULT.spring;
+VAULT.rise = CEIL - 0.01 - VAULT.spring;   /* the crown a centimetre under the flat ceiling, never in its plane (the seams check, req 722's run) */
 VAULT.cuts = (function () {
   var b = WINDOW.xs[0] - WINDOW.xs[1], cuts = [END_X];
   for (var x = WINDOW.xs[0] + 1.5 * b; x > FOOT_X + 1; x -= b) if (x < END_X - 0.5) cuts.push(x);
@@ -3836,11 +3836,16 @@ function setView(v) {
    corner. The corridor is 3 m wide (WIDTH, req 207), so a stop stands as far back as the corridor allows (a hand short
    of the facing
    wall) and opens its field of view until the thing fits with a margin, between the room's 42 degrees and 70; the
-   password session's walk-up to her was projected the same way. look is the height the eye turns to. */
-var STOP_BACK = 0.15, STOP_MARGIN = 1.12, FOV_REST = 42, FOV_MAX = 70;
-function stopFor(mesh, h, lookY) {
+   password session's walk-up to her was projected the same way. look is the height the eye turns to.
+   Walking freely (req 722; Interaction's plan, Godric's 1 on interaction-places-fatlady-1020, 20 October 2026, 3.32 pm;
+   docs/interaction-places/corridor-1.json): a thing's place on a side wall stands 0.4 m off the wall behind him
+   (PLACE_OFF), the portraits' 0.9 (PORTRAIT_OFF), clear of the armour on its window mark; her place and the witch's keep
+   STOP_BACK. */
+var STOP_BACK = 0.15, PLACE_OFF = 0.4, PORTRAIT_OFF = 0.9, STOP_MARGIN = 1.12, FOV_REST = 42, FOV_MAX = 70;
+function stopFor(mesh, h, lookY, off) {
   var onHerWall = mesh.position.z > MID_Z;
-  var z = onHerWall ? FAR_Z + STOP_BACK : HER_Z - STOP_BACK;
+  if (off === undefined) off = PLACE_OFF;
+  var z = onHerWall ? FAR_Z + off : HER_Z - off;
   var d = Math.abs(mesh.position.z - z);
   var fov = clamp(2 * Math.atan(h * STOP_MARGIN / 2 / d) * 180 / Math.PI, FOV_REST, FOV_MAX);
   return { pos: new THREE.Vector3(mesh.position.x, EYE, z), look: new THREE.Vector3(mesh.position.x, lookY, mesh.position.z), fov: fov };
@@ -3863,8 +3868,8 @@ var STOPS = [
       var d = WIDTH - STOP_BACK, fov = clamp(2 * Math.atan(PORTRAIT_H * STOP_MARGIN / 2 / d) * 180 / Math.PI, FOV_REST, FOV_MAX);
       if (home.kind === 'walk' && nickHomeShift()) fov = Math.min(FOV_MAX, fov * HOME.wide);
       return withTrevor({ pos: new THREE.Vector3(END_X - d, EYE, MID_Z), look: new THREE.Vector3(END_X, HOLE_Y, MID_Z + nickHomeShift()), fov: fov }, ['by-her']); } },
-  { name: 'portrait-a', meshes: [portraitA], stop: function () { return withTrevor(stopFor(portraitA, 1.2, 1.75), ['halfway']); } },
-  { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75); } },
+  { name: 'portrait-a', meshes: [portraitA], stop: function () { return withTrevor(stopFor(portraitA, 1.2, 1.75, PORTRAIT_OFF), ['halfway']); } },
+  { name: 'portrait-b', meshes: [portraitB], stop: function () { return stopFor(portraitB, 1.2, 1.75, PORTRAIT_OFF); } },
   { name: 'armour', meshes: [armour], stop: function () { return withTrevor(stopFor(armour, ARMOUR.h, 1.3), ['suit-feet', 'suit-flags']); } },
   /* each window frames its sill, where the Remembrall will sit, and the lower lights */
   { name: 'window', meshes: [windows[1].frame, windows[1].sky, windows[1].sill], stop: function () { return stopFor(windows[1].frame, 1.9, 1.55); } },
@@ -4029,8 +4034,10 @@ function humpDrop() { if (humpOffer) { var o = humpOffer; humpOffer = null; o.ca
 var mode = 'rest', atStop = null, tween = null, footShown = 'window';
 /* looking round at a stop (req 208; Godric, Q3, 12 October 2026, 7.56 pm: "I definitely want to be able to look around
    when I arrive at a spot"): the drag turns his head from where he stands, about 60 degrees each way, or a stop's own
-   `turn` where it needs less; the turn is about stopPose, where the glide set him down, never re-asked of the stop */
-var HEAD_TURN = 1.05, headYaw = 0, headYawT = 0, headPitch = 0, headPitchT = 0, stopPose = null;
+   `turn` where it needs less; the turn is about stopPose, where the glide set him down, never re-asked of the stop.
+   Walking freely (req 722, the vocabulary's §2) turns him all the way round at every place, so HEAD_TURN is a half
+   turn each way and the drag runs on past it unclamped; the close looks (the settle, the flag, the hide) keep their own */
+var HEAD_TURN = Math.PI, headYaw = 0, headYawT = 0, headPitch = 0, headPitchT = 0, stopPose = null;
 var UP = new THREE.Vector3(0, 1, 0), headDir = new THREE.Vector3();
 function headLimit() {
   var t = atStop && atStop.turn;
@@ -4042,8 +4049,9 @@ var backBtn = document.getElementById('back');
    either way round, until he looks straight down the flight at yaw pi; as he comes round the view tilts down and opens to
    FOV_MAX together, one movement, so the treads, the landing and its window come into view. turnBlend is 0 facing the
    corridor and 1 facing the flight. */
+function wrapYaw(y) { return Math.atan2(Math.sin(y), Math.cos(y)); }
 function turnBlend(y) {
-  var L = VIEWS.length, k = clamp((Math.abs(y) - L.yawMax) / (Math.PI - L.turnBand - L.yawMax), 0, 1);
+  var L = VIEWS.length, k = clamp((Math.abs(wrapYaw(y)) - L.yawMax) / (Math.PI - L.turnBand - L.yawMax), 0, 1);
   return k * k * (3 - 2 * k);
 }
 function restPose(out) {
@@ -4053,12 +4061,12 @@ function restPose(out) {
   out.fov = lerp(FOV_REST, FOV_MAX, b);
   return out;
 }
-/* On letting go: short of a right angle he eases back to the corridor's limit; past it he settles facing the flight,
-   free to look about within turnBand either side of it */
+/* On letting go he stays turned where he let go (req 722, walking freely: the start turns all the way round, as every
+   place; until then he eased back to the corridor's limit or settled facing the flight); the turn is only brought back
+   within a half turn either way, yaw with it, so nothing moves */
 function settleTurn() {
-  var L = VIEWS.length, a = Math.abs(yawT), s = yawT < 0 ? -1 : 1;
-  if (a <= L.yawMax) return;
-  yawT = a < Math.PI / 2 ? s * L.yawMax : s * clamp(a, Math.PI - L.turnBand, Math.PI + L.turnBand);
+  var w = wrapYaw(yawT) - yawT;
+  yawT += w; yaw += w;
 }
 var poseNow = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: FOV_REST };
 /* A glide runs down the corridor's middle and turns square onto a stop at its end, a cubic through a corner at the
@@ -4200,6 +4208,25 @@ function downToBay() {
 }
 var STAIR_AWAY_CHANCE = 1 / 6, stairAway = null;   /* about one trip down in six */
 
+/* Walking freely (req 722; the vocabulary's §2; Interaction's plan, docs/interaction-places/corridor-1.json, Godric's 1
+   on interaction-places-fatlady-1020, 20 October 2026, 3.32 pm): eleven places, the start and the ten things' stops, no
+   floor place (none of the floor is farther than 2.6 m from one). A tap on the corridor's flags or the nook's walks him
+   to the place nearest where his finger lifted, down the corridor as any glide; a thing's place sets him down square to
+   it, the start facing her, as Back does. Only from the corridor's own floor: from the landing below, the flags above
+   are nothing */
+var FLOORS = [floor, nookFloor], BLOCKERS = [herWall, farWall, shell.endWall, ceiling];
+var PLACES = ['her', 'door', 'portrait-a', 'window-2', 'armour', 'portrait-b', 'window', 'cupboard', 'nook', 'tapestry'].map(function (n) {
+  return STOPS.filter(function (s) { return s.name === n; })[0];
+});
+function onCorridorFloor() { return mode === 'rest' || PLACES.indexOf(atStop) >= 0 || atStop === hideStop || (atStop && atStop.name === 'settle-scarf') || atStop === nevilleStop; }
+function floorWalk(p) {
+  var best = null, bd = Math.hypot(p.x - VIEWS.length.pos.x, p.z - VIEWS.length.pos.z);   /* the start */
+  PLACES.forEach(function (s) { var q = s.stop().pos, d = Math.hypot(p.x - q.x, p.z - q.z); if (d < bd) { bd = d; best = s; } });
+  if (best === atStop || (!best && mode === 'rest')) return false;   /* already there: he stays, with the mote */
+  if (!best) { goBack(); return true; }
+  goTo(best);
+  return true;
+}
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
   /* each tap tells the frame whether it did anything (req 149 and 150): one that found nothing gets the frame's mote
@@ -4212,8 +4239,13 @@ function tap(cx, cy) {
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables.filter(function (m) {
     return m.visible && (m !== wayDown || (atStop === landingStop && footShown === 'window'));   /* only when the end is open */
-  }), false);
-  if (!hits.length) { said(mode === 'stop'); goBack(); return; }   /* at a stop, nothing takes him back */
+  }).concat(onCorridorFloor() ? FLOORS.concat(BLOCKERS) : []), false);
+  /* walking freely (req 722): the floor walks him to its nearest place; nothing else keeps him where he is, with the
+     mote, a wall's tap stopped at the wall so the nook's flags behind her wall never take it. Below the corridor (the
+     landing, the witch, the flag, up from the bay) nothing still takes him back up */
+  if (hits.length && FLOORS.indexOf(hits[0].object) >= 0) { said(floorWalk(hits[0].point)); return; }
+  if (hits.length && BLOCKERS.indexOf(hits[0].object) >= 0) hits = [];
+  if (!hits.length) { var below = !onCorridorFloor(); said(below && mode === 'stop'); if (below) goBack(); return; }
   if (hits[0].object === wayDown) { said(true); downToBay(); return; }   /* down into the stair hall (req 286) */
   var hit = hits[0].object.userData;
   /* come up from the stair hall, a tap on the flight walks him on up it (req 286) */
@@ -4387,13 +4419,13 @@ canvas.addEventListener('pointermove', function (e) {
     /* past the corridor's limit the turn goes faster, so turning round is about half a screen's drag, not a whole one;
        a right drag turns him right, more of the right coming into view, as in the common room (the vocabulary's §1,
        req 150; it turned the other way until 12 October 2026) */
-    var L = VIEWS.length, step = dx * 0.003 * (Math.abs(yawT) > L.yawMax ? L.turnGain : 1);
-    yawT = clamp(yawT + step, -Math.PI - L.turnBand, Math.PI + L.turnBand);
+    var L = VIEWS.length, step = dx * 0.003 * (Math.abs(wrapYaw(yawT)) > L.yawMax ? L.turnGain : 1);
+    yawT += step;   /* all the way round (req 722) */
     pitchT = lookDrag(pitchT, dy, -VIEWS.length.pitchMax, VIEWS.length.pitchMax);
   } else if (mode === 'stop' && !tween && stopPose && !leaving && !herOpening) {
     /* at a stop the same drag turns his head from where he stands (req 208), the same way and feel as at rest */
     var lim = headLimit();
-    headYawT = clamp(headYawT + dx * 0.003, -lim, lim);
+    headYawT = lim >= Math.PI ? headYawT + dx * 0.003 : clamp(headYawT + dx * 0.003, -lim, lim);
     /* up and down about the stop's own look, its slope added to the head's, held within the stand's limits */
     var base = (stopPose.look.y - stopPose.pos.y) / Math.max(0.1, Math.hypot(stopPose.look.x - stopPose.pos.x, stopPose.look.z - stopPose.pos.z)), pl = pitchLimit();
     headPitchT = lookDrag(base + headPitchT, dy, -pl.down, pl.up) - base;
@@ -5356,6 +5388,9 @@ window.lumosGreybox = { knit: function () { return { now: PORTRAIT_B.now, hold: 
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
+  /* req 722: the eleven places where the page stands him (x, z in the corridor's frame), and the scene for the seams check */
+  places: function () { return [{ name: 'start', at: [VIEWS.length.pos.x, VIEWS.length.pos.z] }].concat(PLACES.map(function (s) { var q = s.stop().pos; return { name: s.name, at: [+q.x.toFixed(2), +q.z.toFixed(2)] }; })); },
+  scene: scene, camera: camera, eye: function () { return camera.position.clone(); },
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing, hut: +hutK().toFixed(2) }; } }, events: castle, mapPlay: mapPlay, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; }, offerLock: lockOffered, firstCast: firstCast,
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
