@@ -154,9 +154,9 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=383"></script>
-<script src="castle-shell.js?v=26"></script>
-<script src="castle-events.js?v=37"></script>
+<script src="castle-model.js?v=384"></script>
+<script src="castle-shell.js?v=27"></script>
+<script src="castle-events.js?v=38"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
 <script src="design/house-hourglass.js?v=1"></script>
@@ -1204,6 +1204,114 @@ function potShown(shown) {   /* the fires as the lesson rule shows them; the str
   return [];
 }
 if (POT.on) potSet(Q.get('fires') === 'all');
+/* a glazed lantern 0.3 high and 0.3 across, its foot at `at` (the History lamps' kind, Interiors' schedules): an iron
+   foot and cap, a glass chimney, the flame its own light only. Returns the flame, unlit; one of two sizes, lit or low */
+function lantern(g, at, iron, glass) {
+  var foot = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.03, 12), iron); foot.position.copy(at).y += 0.015; g.add(foot);
+  var chim = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.21, 12, 1, true), glass); chim.position.copy(at).y += 0.135; g.add(chim);
+  var cap = new THREE.Mesh(new THREE.ConeGeometry(0.15, 0.06, 12), iron); cap.position.copy(at).y += 0.27; g.add(cap);
+  var f = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 6), LAMP_FLAME); f.scale.y = 2.2; f.position.copy(at).y += 0.11; f.visible = false; g.add(f);
+  return f;
+}
+var LAMP_FLAME = new THREE.MeshBasicMaterial({ color: 0xffc46a }), LAMP_LOW = new THREE.MeshBasicMaterial({ color: 0xb0743a }),
+    LAMP_GLASS = new THREE.MeshStandardMaterial({ color: 0xd8dccf, transparent: true, opacity: 0.28, roughness: 0.1, metalness: 0, depthWrite: false });
+function thingBox(g, P, a0, a1, mat) {   /* an upright box between two corners of a schedule's frame */
+  var a = P(a0[0], a0[1], a0[2]), b = P(a1[0], a1[1], a1[2]);
+  var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mat);
+  m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); g.add(m); return m;
+}
+/* the Transfiguration classroom's lamps (Magic's req 672; Events' req 679, page/events/transfiguration.json, word for
+   word), where Interiors' docs/interiors/transfiguration-classroom.md puts them (req 673, cited; x = 139.6 + y',
+   y = 71.4 - x'): six lanterns on iron wall brackets 0.3 out, two on each long wall at y' 4.5 and 7.5, two on the
+   front wall flanking the board at x' 1.5 and 6.5, each foot at 2.0. Lit while a lamp rule shows (evening, night, a
+   dark wet day), their own flame. The night line and the wet day's stay in the note, since each names more than the
+   lamps. One group, no tap lands on it. ?lamps=lit|out for checks. */
+var TRANS_ALWAYS = 'the classroom lamps along the walls', TRANS_LIT = 'the classroom lamps lit, their own flame',
+    TRANS_MORE = ['a dark wet day: the classroom lamps lit by day too, their own flame',
+      "the classroom lamps lit, their own flame, the dark eased by them along the front, and the windows' sky"];
+var TRANS = (function () {
+  var out = { on: false, flames: [], lit: false };
+  if (PLACE !== 'transfiguration-classroom') return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'transfiguration-things'; shell.group.add(g);
+  var P = function (xp, yp, z) { return shell.toLocal(139.6 + yp, 71.4 - xp, z0 + z); }, iron = kit.solid(0x2e2b28);
+  [[0.3, 4.5, 0, 4.5], [0.3, 7.5, 0, 7.5], [7.7, 4.5, 8, 4.5], [7.7, 7.5, 8, 7.5], [1.5, 11.7, 1.5, 12], [6.5, 11.7, 6.5, 12]].forEach(function (l) {
+    out.flames.push(lantern(g, P(l[0], l[1], 2.0), iron, LAMP_GLASS));
+    thingBox(g, P, [Math.min(l[0], l[2]) - 0.015, Math.min(l[1], l[3]) - 0.015, 2.27], [Math.max(l[0], l[2]) + 0.015, Math.max(l[1], l[3]) + 0.015, 2.3], iron);   /* the bracket */
+  });
+  return out;
+})();
+function transSet(lit) { if (!TRANS.on) return; TRANS.lit = lit; TRANS.flames.forEach(function (f) { f.visible = lit; }); }
+function transShown(shown) {   /* the lamps as the rules show them; the two longer lines stay the note's */
+  var drawn = [], q = Q.get('lamps');
+  if (!TRANS.on) return drawn;
+  if (shown.indexOf(TRANS_ALWAYS) >= 0) drawn.push(TRANS_ALWAYS);
+  var lit = shown.indexOf(TRANS_LIT) >= 0;
+  if (lit) drawn.push(TRANS_LIT);
+  TRANS_MORE.forEach(function (s) { if (shown.indexOf(s) >= 0) lit = true; });
+  transSet(q ? q === 'lit' : lit);
+  return drawn;
+}
+if (TRANS.on) transSet(Q.get('lamps') === 'lit');
+/* the Defence classroom's six plates (Magic's req 675; Events' req 680, page/events/defence.json), where Interiors'
+   docs/interiors/defence-classroom.md hangs them (req 675's centres, cited; x = 48 - y', y = 71.4 - x'): three a side
+   at y' 3.2, 4.8 and 8.0, the window wall (x' 0) and the left wall (x' 8), each 0.5 wide by 0.6 high, centred at 1.8.
+   Drawn as plain frames: the creatures in them are a picture each, a spend, never before Godric's yes; so the plates'
+   moving lines and the vampire's garlic line stay seen lines and the note's, and only the line naming the six is
+   drawn. One group, no tap lands on it. */
+var DEF_SIX = 'six plates on the walls, each a dark creature drawn as a natural-history plate: a vampire, a hag, a Red Cap, a grindylow, a banshee and a ghoul';
+var DEF = (function () {
+  var out = { on: false, plates: [] };
+  if (PLACE !== 'defence-classroom') return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'defence-things'; shell.group.add(g);
+  var P = function (xp, yp, z) { return shell.toLocal(48 - yp, 71.4 - xp, z0 + z); };
+  var frame = kit.solid(0x3b2f25), paper = kit.solid(0xcfc4a8);
+  [[0, 1], [8, -1]].forEach(function (w) {
+    [3.2, 4.8, 8.0].forEach(function (yc) {
+      var x0 = w[0], s = w[1];   /* the wall's face and which way the room lies */
+      out.plates.push(thingBox(g, P, [x0, yc - 0.25, 1.5], [x0 + s * 0.03, yc + 0.25, 2.1], frame));
+      thingBox(g, P, [x0 + s * 0.03, yc - 0.21, 1.54], [x0 + s * 0.036, yc + 0.21, 2.06], paper);
+    });
+  });
+  return out;
+})();
+function defShown(shown) { return DEF.on && shown.indexOf(DEF_SIX) >= 0 ? [DEF_SIX] : []; }
+/* the hospital wing's lamps (Magic's req 677; Events' req 681, page/events/wing.json), where Interiors'
+   docs/interiors/hospital-wing.md hangs them (req 678, cited; x = 151.4 + x', y = 25 + y'): six lanterns on chains
+   over the aisle's middle, x' 4.0, at y' 1.75 to 16.75 every 3.0, each foot at 2.5, the chain to the ceiling. Lit
+   from dusk, dimmed low (never out) from ten, the flame smaller and duller, its own light only. The dimmed lines stay
+   in the note (they name her door and the dark). The curtains round an occupied bed wait on a bed and its figure
+   (People's), so the shell draws no frames: the ten o'clock moment is its seen line, the lamps going low with the
+   hour's rule. One group, no tap lands on it. ?lamps=lit|low|out for checks. */
+var WING_LIT = "the ward's lamps lit, their own flame",
+    WING_LOW = ["the ward's lamps dimmed low, never out, their own flame, her office door shut", 'the ward dark, eased by the dimmed lamps, a light always near'];
+var WING = (function () {
+  var out = { on: false, flames: [], state: 'out' };
+  if (PLACE !== 'hospital-wing') return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'wing-things'; shell.group.add(g);
+  var P = function (xp, yp, z) { return shell.toLocal(151.4 + xp, 25 + yp, z0 + z); }, iron = kit.solid(0x2e2b28), top = shell.place.ceiling - z0;
+  [1.75, 4.75, 7.75, 10.75, 13.75, 16.75].forEach(function (yp) {
+    out.flames.push(lantern(g, P(4.0, yp, 2.5), iron, LAMP_GLASS));
+    thingBox(g, P, [3.995, yp - 0.005, 2.8], [4.005, yp + 0.005, top], iron);   /* the chain */
+  });
+  return out;
+})();
+function wingSet(state) {
+  if (!WING.on) return; WING.state = state;
+  WING.flames.forEach(function (f) { f.visible = state !== 'out'; f.material = state === 'low' ? LAMP_LOW : LAMP_FLAME; f.scale.set(state === 'low' ? 0.6 : 1, state === 'low' ? 1.2 : 2.2, state === 'low' ? 0.6 : 1); });
+}
+function wingShown(shown) {   /* the lamps as the hour's rule shows them; the dimmed lines stay the note's */
+  var drawn = [], q = Q.get('lamps');
+  if (!WING.on) return drawn;
+  var state = 'out';
+  if (shown.indexOf(WING_LIT) >= 0) { drawn.push(WING_LIT); state = 'lit'; }
+  WING_LOW.forEach(function (s) { if (shown.indexOf(s) >= 0) state = 'low'; });
+  wingSet(q || state);
+  return drawn;
+}
+if (WING.on) wingSet(Q.get('lamps') || 'out');
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -1220,7 +1328,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -1574,6 +1682,12 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   sway: function () { charmsSway(); return CHARMS.on; },
   potions: function (shown) { if (shown) potShown(shown);
     return POT.on ? { stands: POT.places.length, lit: POT.places.filter(function (q) { return q.fire.visible; }).length, all: POT.all } : null; },
+  /* reqs 672, 675 and 677: the Transfiguration lamps, the Defence plates and the ward's lamps as they stand */
+  trans: function (shown) { var d = shown ? transShown(shown) : [];
+    return TRANS.on ? { lamps: TRANS.flames.length, lit: TRANS.lit, drawn: d.length } : null; },
+  plates: function () { return DEF.on ? { plates: DEF.plates.length } : null; },
+  wing: function (shown) { var d = shown ? wingShown(shown) : [];
+    return WING.on ? { lamps: WING.flames.length, state: WING.state, drawn: d.length } : null; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
