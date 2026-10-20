@@ -439,9 +439,24 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var CV = null;
     if (row && !Q.roof && !Q.area && !HD.length && Q.ceiling != null && window.CastleCeilings && (Q.poly.length === 4 || (Q.rec && Q.rec.vault)) &&
         ((Q.rec && Q.rec.vault && Q.rec.vault.kind) || row.ceiling) !== 'star') {   /* the star's ribs tie where they cross: Design's, to come */
-      var vst = stoneAt(row, mx, my);
-      CV = window.CastleCeilings.forPlace(THREE, Q, { toLocal: toLocal, kind: row.ceiling,
-        mats: { vault: mats.ceil, stone: paintMat(tone(vst + '/ashlar', vst), true), beam: paintMat(tone('oak-beams'), true) } });
+      var vst = stoneAt(row, mx, my), VB = Q.rec && Q.rec.vault, QC = Q, stoneM = paintMat(tone(vst + '/ashlar', vst), true);
+      /* v32 (model v71, ledger line 116): a groin with no free pier springs from corbels on its walls; the bays are laid
+         out as if the corbels were piers, then each pier gives way to a corbel bearing 2 cm into its wall */
+      if (VB && VB.corbels && !(VB.piers || []).length)
+        QC = Object.assign({}, Q, { rec: Object.assign({}, Q.rec, { vault: Object.assign({}, VB, { piers: VB.corbels }) }) });
+      CV = window.CastleCeilings.forPlace(THREE, QC, { toLocal: toLocal, kind: row.ceiling,
+        mats: { vault: mats.ceil, stone: stoneM, beam: paintMat(tone('oak-beams'), true) } });
+      if (CV && QC !== Q) {
+        CV.group.children.filter(function (o) { return o.name.indexOf(Q.id + '-pier-') === 0; }).forEach(function (o) { CV.group.remove(o); });
+        VB.corbels.forEach(function (p, k) {
+          var onX = Math.abs(p[0] - x0) < 0.05 || Math.abs(p[0] - x1) < 0.05, n = onX ? Math.sign(mx - p[0]) : Math.sign(my - p[1]);
+          var cxs = onX ? p[0] + n * 0.165 : Math.max(x0 + 0.18, Math.min(x1 - 0.18, p[0])), cys = onX ? Math.max(y0 + 0.18, Math.min(y1 - 0.18, p[1])) : p[1] + n * 0.165;
+          var a = toLocal(cxs, cys, Q.floor + VB.springs - 0.125), b = toLocal(cxs + (onX ? 1 : 0), cys + (onX ? 0 : 1), Q.floor);
+          var cb = slab(0.37, 0.25, 0.4, stoneM, 'wall');
+          cb.position.copy(a); cb.rotation.y = Math.atan2(b.z - toLocal(cxs, cys, Q.floor).z, b.x - toLocal(cxs, cys, Q.floor).x) * -1;
+          cb.name = Q.id + '-corbel-' + k; CV.group.add(cb);
+        });
+      }
       if (CV) {
         if (CV.flat) CV.group.position.y += 0.02;   /* beams under a flat ceiling bear 2 cm into it, never flush (the seams rule) */
         CV.group.traverse(function (o) { o.userData.owner = Q.id; }); group.add(CV.group);
