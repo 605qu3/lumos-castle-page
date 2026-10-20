@@ -2,7 +2,8 @@
 // Curator's, docs/curator/astronomy-tower-top.md items 6 and 7; Design draws it, req 623). Pure functions of a date
 // and a place: the stars, the five planets of the eye, the moon in its real phase and place, the sun for whether it
 // is dark. Nothing here keeps a clock, stores a place or draws; the page passes the runtime's date and hour and the
-// place Godric's answer names (events-home-sky-1016, waiting), and asks again as the night turns.
+// runtime's home() (Godric's 2 on events-home-sky-1016: the town a grown-up sets once, else 42 north at the clock
+// zone's meridian), and asks again as the night turns.
 //
 // CastleSky.at(date, place) date: a Date; place: { lat, lon } in degrees, north and east positive.
 // Returns { lst, sun, moon, planets, star } where every body has { ra, dec } (degrees, the J2000 frame) and

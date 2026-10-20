@@ -174,6 +174,10 @@
    the lantern's shutters stay shut, the drop heard and not looked down, until a grown-up opens them.
    Then the Entrance Hall's glasses (Magic's req 632, Design's req 606, 16 October 2026): `schoolLevels()`, the school's
    own points in each house's glass by the castle's year and day, close, the lead changing week to week, never kept.
+   Then the home's sky (the Curator's req 622; Godric's 2 on events-home-sky-1016, 16 October 2026): `home()`, the place
+   the Astronomy top's telescopes show the sky over, for `CastleSky.at(date, home())` (page/castle-sky.js): the boys'
+   town as a grown-up sets it once in the guarded setup (settings.home, { lat, lon, town }, kept on this iPad and
+   never sent), else 42 north at the clock zone's own meridian; ?home=lat,lon for a test. `{ lat, lon, town, set }`.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -2523,6 +2527,22 @@
       height: function () {
         var h = +params.get('height') || +settings.height;
         return h >= 0.6 && h <= 2 ? h : null;
+      },
+      /* The home the telescopes' sky stands over (req 622; Godric's 2 on events-home-sky-1016): the town a grown-up
+         sets once in the guarded setup (settings.home: lat and lon in degrees, north and east positive, and the
+         town's name for the setup to show), kept on this iPad only; ?home=51.5,-0.1 for a test. Till one is set,
+         42 north (the latitude the page kept before 15 October) at the meridian of the clock's zone in standard time,
+         so the sky is the home's season and hour, a few degrees off at most. `set` says which. */
+      home: function () {
+        function ok(lat, lon) { return isFinite(lat) && isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180; }
+        var q = /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/.exec(params.get('home') || '');
+        if (q && ok(+q[1], +q[2])) return { lat: +q[1], lon: +q[2], town: null, set: true };
+        var s = settings.home;
+        if (s && s.lat !== '' && s.lon !== '' && s.lat != null && s.lon != null && ok(+s.lat, +s.lon))
+          return { lat: +s.lat, lon: +s.lon, town: s.town ? String(s.town) : null, set: true };
+        var y = new Date().getFullYear();
+        var std = Math.max(new Date(y, 0, 1).getTimezoneOffset(), new Date(y, 6, 1).getTimezoneOffset());
+        return { lat: 42, lon: -std / 4, town: null, set: false };
       },
       /* The school year now, named by the year its leaving feast falls in, and a year's feast day (yyyy-mm-dd; this
          year's if none is named): the boys' own last school day as a grown-up sets it, the last Friday of June till
