@@ -132,7 +132,7 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=395"></script>
+<script src="castle-model.js?v=396"></script>
 <script src="castle-paint.js?v=4"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=2"></script>
@@ -1021,7 +1021,7 @@ MODEL.features.filter(function (f) { return f.room === PLACE && /^great-hall-fir
      platform leaves 1 m to its hearth, where its dark opening fills the whole view */
   if (f.compass === 270) { FIRE_PLACE[f.id] = STAFF_STAND; return; }
   /* a long-wall fire's place stands in the next aisle in, 4.8 m off across the house table, the fire whole in view:
-     from the side aisle, 1.2 m off, its dark opening fills the view (provisional, Godric to confirm: greathall-fire-place-1020) */
+     from the side aisle, 1.2 m off, its dark opening fills the view (Godric's 1 on greathall-fire-place-1020, 2.22 pm, 20 October) */
   var p = place(f.id, f.at[0], f.compass === 0 ? AISLE[1] : AISLE[3], c);
   FIRE_PLACE[f.id] = p; PLACES.push(p);
 });
