@@ -111,6 +111,81 @@
       ],
       "canon": "the Curator's library item 5 (\"A specially signed note from one of the teachers\", PS 12 L4078, read in the text 16 October 2026): any teacher's, unnamed, lying on Madam Pince's desk as the form he is handed; the world rules, Their things: the Restricted Section opens with a teacher's signed note; Events' Q2 option 1, taken by Fawkes at 10.18 am on 16 October 2026, provisional, Godric to confirm: handed once ever, every year, kept after; how it is earned is the Timetable's later (docs/game-notes.md)",
       "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
+    },
+    {
+      "when": [
+        "place = library"
+      ],
+      "show": [
+        "sounds damped: his steps softer than in the corridor"
+      ],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the stillness, always; CoS 10 L9871, \"the muffled stillness of the library\" (read in the canon tool)"
+    },
+    {
+      "when": [
+        "place = library",
+        "time != night",
+        "hour < 20"
+      ],
+      "show": [
+        "the lamps unlit by day, the windows' light"
+      ],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the lamps; Interiors' docs/interiors/library.md, a lamp on each table's far corner by the window, unlit by day; the north windows"
+    },
+    {
+      "when": [
+        "place = library",
+        "time = night",
+        "hour >= 12",
+        "hour < 20"
+      ],
+      "show": [
+        "the lamps lit on the tables from dusk, their own flame"
+      ],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the lamps lit from dusk till eight"
+    },
+    {
+      "when": [
+        "place = library",
+        "hour >= 20"
+      ],
+      "show": [
+        "the lamps out: \"Madam Pince had extinguished all the lamps\""
+      ],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: GoF 26 L30889, \"By eight o'clock. Madam Pince had extinguished all the lamps\" (read in the canon tool; an everyday thing), from eight, out"
+    },
+    {
+      "when": [
+        "place = library",
+        "time = night",
+        "hour < 12"
+      ],
+      "show": [
+        "the lamps out: \"Madam Pince had extinguished all the lamps\""
+      ],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the lamps out through the small hours, till day"
+    },
+    {
+      "when": [
+        "place = library",
+        "time = night",
+        "hour >= 20"
+      ],
+      "show": [
+        "\"pitch-black and very eerie\", eased: the windows' sky the only light; nothing moves"
+      ],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: by night; PS 12 L4240, \"The library was pitch-black and very eerie\" (read in the canon tool), eased to the castle's light's floor; the lamps' hours rule the dark between dusk and eight"
+    },
+    {
+      "when": [
+        "place = library",
+        "time = night",
+        "hour < 12"
+      ],
+      "show": [
+        "\"pitch-black and very eerie\", eased: the windows' sky the only light; nothing moves"
+      ],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: by night, the small hours"
     }
   ],
   "records": [
@@ -189,6 +264,140 @@
       ],
       "canon": "the book is back on its shelf by his next visit, quiet (req 594)",
       "aside": "held 16 October 2026 (docs/ministry/set-aside.md; Godric's 2 on events-library-note-1016, 1.22 pm: hold the book; the note on Madam Pince's desk undone, the screaming book and the Restricted whispers unbuilt until the earning is designed, a game note)"
+    },
+    {
+      "id": "library.page-turned",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-page",
+      "weight": 1,
+      "moment": "wait 15-60 s",
+      "when": [
+        "place = library",
+        "time != night"
+      ],
+      "show": [
+        "now and then, out of sight, a page turned"
+      ],
+      "starts": [],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the stillness, a page turned out of sight; about one visit in two; never while the lamps are out by night, when nothing moves"
+    },
+    {
+      "id": "library.page-turned-lamplit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-page",
+      "weight": 1,
+      "moment": "wait 15-60 s",
+      "when": [
+        "place = library",
+        "time = night",
+        "hour >= 12",
+        "hour < 20"
+      ],
+      "show": [
+        "now and then, out of sight, a page turned"
+      ],
+      "starts": [],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the same between dusk and eight"
+    },
+    {
+      "id": "library.page-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-page",
+      "weight": 1,
+      "moment": "wait 15-60 s",
+      "when": [
+        "place = library"
+      ],
+      "starts": []
+    },
+    {
+      "id": "library.chair-scraped",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-chair",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = library",
+        "time != night"
+      ],
+      "show": [
+        "now and then, out of sight, a chair scraped and stilled"
+      ],
+      "starts": [],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the stillness, a chair scraped and stilled out of sight; about one visit in three"
+    },
+    {
+      "id": "library.chair-scraped-lamplit",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-chair",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = library",
+        "time = night",
+        "hour >= 12",
+        "hour < 20"
+      ],
+      "show": [
+        "now and then, out of sight, a chair scraped and stilled"
+      ],
+      "starts": [],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: the same between dusk and eight"
+    },
+    {
+      "id": "library.chair-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-chair",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = library"
+      ],
+      "starts": []
+    },
+    {
+      "id": "library.pince-heard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-pince",
+      "weight": 1,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = library",
+        "time != night"
+      ],
+      "show": [
+        "from an aisle he is not in, \"the slight squeaking of one of Madam Pince's shoes, as the librarian prowled the aisles\", nearer, then away"
+      ],
+      "starts": [],
+      "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: Madam Pince heard, never seen here (People's figure when seen); OotP 24 L47276, \"the slight squeaking of one of Madam Pince's shoes, as the librarian prowled the aisles\" (read in the canon tool; an everyday thing a later book names first); about one visit in three"
+    },
+    {
+      "id": "library.pince-quiet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-pince",
+      "weight": 2,
+      "moment": "wait 20-150 s",
+      "when": [
+        "place = library",
+        "time != night"
+      ],
+      "starts": []
     }
   ]
 }

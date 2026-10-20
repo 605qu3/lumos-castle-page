@@ -1,7 +1,65 @@
 {
   "chain": "history",
   "first_visit": [],
-  "room": [],
+  "room": [
+    {
+      "when": [
+        "place = history of magic classroom"
+      ],
+      "show": [
+        "he reads from his notes \"in a flat drone like an old vacuum cleaner\""
+      ],
+      "canon": "Magic's req 659 (docs/handoff/magic.md, The History of Magic classroom), every year: the drone, at his lesson, under way whenever he walks in (Interiors' Occupancy, on the charter's rulings); CoS 9 L9558 (read in the canon tool); the table's \"floating an inch or so above his chair\" (OotP 17 L43331) waits on Interiors' req 661, since the schedule gives him no chair"
+    },
+    {
+      "when": [
+        "place = history of magic classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "the other pupils sink one by one, a head on folded arms, a mouth hanging open at the window, an elbow slipping off a desk"
+      ],
+      "canon": "Magic's req 659 (docs/handoff/magic.md, The History of Magic classroom), every year: the drowse, with the class by day in term (Interiors' Occupancy); CoS 9 L9566 (read in the canon tool); People's figures; the corbels' faces held for Godric"
+    },
+    {
+      "when": [
+        "place = history of magic classroom",
+        "lessons = off"
+      ],
+      "show": [
+        "the other desks empty and still"
+      ],
+      "canon": "Magic's req 659 (docs/handoff/magic.md, The History of Magic classroom), every year: between lessons, the other pupils' desks only, since his own lesson is under way whenever he walks in (Interiors' Occupancy); the table's \"Binns only at his lessons\" and his notes left open are asked of Magic"
+    },
+    {
+      "when": [
+        "place = history of magic classroom"
+      ],
+      "show": [
+        "the window's real sky, the one thing in the room that changes while he drones"
+      ],
+      "canon": "Magic's req 659 (docs/handoff/magic.md, The History of Magic classroom), every year: the windows (2.4), the three on the left wall"
+    },
+    {
+      "when": [
+        "place = history of magic classroom"
+      ],
+      "show": [
+        "the cold hearth, never lit"
+      ],
+      "canon": "Magic's req 659 (docs/handoff/magic.md, The History of Magic classroom), every year: the cold hearth, always; its fireback req 493"
+    },
+    {
+      "when": [
+        "place = history of magic classroom",
+        "time = night"
+      ],
+      "show": [
+        "dark, the lamps unlit; eased by the windows' sky"
+      ],
+      "canon": "Magic's req 659 (docs/handoff/magic.md, The History of Magic classroom), every year: by night; the six hung lamps (Interiors' schedule) unlit"
+    }
+  ],
   "records": [
     {
       "id": "history.binns-enters",
@@ -16,6 +74,36 @@
         "the lesson begins: Professor Binns comes in through the blackboard, drifts to his desk, opens his notes and begins to read"
       ],
       "canon": "Magic's req 601 (docs/handoff/magic.md, By room, the Stone's castle): CoS 9 L9556, \"the most exciting thing that ever happened in his classes was his entering the room through the blackboard\"; L9558, \"Professor Binns opened his notes and began to read\"; every year, each lesson's start, his own lesson under way whenever he walks in (Interiors' schedule, Occupancy, on the charter's rulings of 14 and 15 October 2026), so a moment after he comes in; the blackboard Interiors' (docs/interiors/history-of-magic-classroom.md, item 2); the lesson's content the Timetable's; checked against the text, 16 October 2026"
+    },
+    {
+      "id": "history.throat-chalk",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "history-throat",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = history of magic classroom"
+      ],
+      "show": [
+        "now and then he clears his throat \"with a small noise like chalk slipping\""
+      ],
+      "starts": [],
+      "canon": "Magic's req 659 (docs/handoff/magic.md, The History of Magic classroom), every year: the drone; CoS 9 L9570, \"He cleared his throat with a small noise like chalk slipping\" (read in the canon tool); about one visit in two"
+    },
+    {
+      "id": "history.throat-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "history-throat",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = history of magic classroom"
+      ],
+      "starts": []
     }
   ]
 }
