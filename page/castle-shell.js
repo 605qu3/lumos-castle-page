@@ -432,7 +432,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var floor = quad(x1 - x0, y1 - y0, mats.floor, 'floor');
       floor.rotation.x = -Math.PI / 2; floor.position.copy(c); floor.name = Q.id + '-floor'; group.add(floor);
     }
+    /* v31 (req 643's second half, Design's ceilings.js; the build sequence's wave 1): a painted room's vault, barrel,
+       groin, beams, ribs or star as its row names it (the model's vault block wins), its pieces the room's own; where
+       it replaces the flat ceiling (flat false) the quad is not drawn. A room with heads, an area or a plan not four
+       square keeps its flat ceiling till ceilings.js draws it */
+    var CV = null;
+    if (row && !Q.roof && !Q.area && !HD.length && Q.ceiling != null && window.CastleCeilings && (Q.poly.length === 4 || (Q.rec && Q.rec.vault)) &&
+        ((Q.rec && Q.rec.vault && Q.rec.vault.kind) || row.ceiling) !== 'star') {   /* the star's ribs tie where they cross: Design's, to come */
+      var vst = stoneAt(row, mx, my);
+      CV = window.CastleCeilings.forPlace(THREE, Q, { toLocal: toLocal, kind: row.ceiling,
+        mats: { vault: mats.ceil, stone: paintMat(tone(vst + '/ashlar', vst), true), beam: paintMat(tone('oak-beams'), true) } });
+      if (CV) {
+        if (CV.flat) CV.group.position.y += 0.02;   /* beams under a flat ceiling bear 2 cm into it, never flush (the seams rule) */
+        CV.group.traverse(function (o) { o.userData.owner = Q.id; }); group.add(CV.group);
+      }
+    }
     if (Q.roof) buildRoof(Q);
+    else if (CV && !CV.flat) { /* the vault is the ceiling */ }
     else if (Q.ceiling != null && Q.area) { var ca = areaMesh(Q, Q.ceiling, mats.ceilD, 'ceiling'); ca.name = Q.id + '-ceiling'; group.add(ca); }
     else if (Q.ceiling != null) {
       /* v23 (the Found list): a room's `heads`, strips right across it where its ceiling stands higher (the listeners'
