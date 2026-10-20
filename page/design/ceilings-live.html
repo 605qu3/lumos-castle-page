@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ceilings probe</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; color: #d8cfbf; font: 14px/1.4 Georgia, serif; overflow: hidden; }
+  canvas { display: block; touch-action: none; }
+  #say { position: fixed; left: 12px; bottom: 10px; right: 12px; text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="say"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="tones.js?v=2"></script>
+<script src="drawn.js?v=1"></script>
+<script src="carving.js?v=1"></script>
+<script src="ceilings.js?v=1"></script>
+<script>
+/* ceilings-live.html: Design's probe for ceilings.js (req 643's second half, wave 1), each kind in a plain room of the
+   model's own plan and height (page/castle-model.js, page/castle-paint.js, 20 October 2026), tones from tones.js,
+   torches as the light. ?room=potions (default), snape, corridor, cupboard, kitchens, staff, landing, entrance, hall,
+   winter; ?up=<degrees> tilts the eye; drag to look round. Not the shell: the shell calls CastleCeilings.forPlace. */
+(function () {
+  'use strict';
+  var T = window.CASTLE_TONES, R = T.resolved;
+  var ROOMS = {
+    potions:  { id: 'potions-dungeon', rect: [16, 15.4, 26, 31.4], h: 4.0, stone: 'founders-rubble', dress: 'rubble', kind: 'groin', say: 'the Potions dungeon, 10 x 16 m, groin bays on squat round piers (by the rule; the Architect places the piers in v71)' },
+    snape:    { id: 'snape-office', rect: [24, 7.6, 29, 11.6], h: 4.5, stone: 'houses-sandstone', dress: 'rubble', kind: 'barrel', say: 'Snape’s office, 5 x 4 m, a barrel vault' },
+    corridor: { id: 'dungeon-corridor', rect: [16, 12, 40, 15], h: 4.5, stone: 'founders-rubble', dress: 'rubble', kind: 'barrel', say: 'the dungeon corridor, 3 m wide (24 m of its 104), a barrel vault' },
+    cupboard: { id: 'hall-cupboard', rect: [66.4, 63.2, 67.6, 64.8], h: 2.4, stone: 'founders-rubble', dress: 'rubble', kind: 'barrel', say: 'the hall cupboard, 1.2 x 1.6 m, a low segmental barrel' },
+    kitchens: { id: 'kitchens', rect: [15, 51.5, 65, 69.5], h: 4.5, stone: 'founders-rubble', dress: 'rubble', kind: 'groin', say: 'the kitchens, 50 x 18 m, three aisles of groin bays (by the rule)' },
+    staff:    { id: 'staff-room', rect: [128, 50.6, 142, 56.6], h: 4.5, stone: 'tudor-pink', dress: 'coursed', kind: 'beams', say: 'the staff room, 14 x 6 m, oak beams on stone corbels' },
+    landing:  { id: 'witch-landing', rect: [60, 31, 68, 34], h: 4.5, stone: 'high-grey', dress: 'ashlar', kind: 'rib', say: 'the witch’s landing, 8 x 3 m, a rib vault, the beasts’ bosses in turn' },
+    entrance: { id: 'entrance-hall', rect: [68, 50, 92, 70], h: 9.7, stone: 'founders-rubble', dress: 'coursed', kind: 'rib', say: 'the Entrance Hall, 24 x 20 m, a rib vault' },
+    hall:     { id: 'great-hall', rect: [15, 51.5, 65, 69.5], h: 14.9, stone: 'high-grey', dress: 'ashlar', kind: 'star', sky: true,
+                vault: { kind: 'star', springs: 8.5, crown: 14.9, piers: [20, 26, 32, 38, 44, 50, 56, 62] }, say: 'the Great Hall, a star vault of ribs only, the sky between (a plain night blue here; the sky is Magic’s)' },
+    winter:   { id: 'winter-store', circle: [160, 72], r: 6, h: 4.5, stone: 'houses-sandstone', dress: 'rubble', kind: 'umbrella',
+                vault: { kind: 'umbrella', springs: 2.4, crown: 4.4, pillar: 'winter-store-pillar' }, say: 'the winter store, a round room 12 m across, an umbrella vault on its pillar' }
+  };
+  var q = new URLSearchParams(location.search), key = q.get('room') || 'potions', C = ROOMS[key] || ROOMS.potions;
+  var hex = function (s) { return new THREE.Color(s); };
+  var lam = function (s) { var m = new THREE.MeshLambertMaterial({ color: hex(s) }); m.side = THREE.DoubleSide; return m; };
+  var mats = { vault: lam(R['vault-' + C.stone]), stone: lam(R[C.stone + '/ashlar']), beam: lam(T.surfaces['oak-beams'] ? T.surfaces['oak-beams'].hex : '#5a3d26'),
+    wall: lam(R[C.stone + '/' + C.dress]), floor: lam(R['flags-' + C.stone]), flat: lam(T.surfaces['oak-boards'] ? T.surfaces['oak-boards'].hex : '#7d5937'),
+    dark: lam('#0e0c0a'), sky: new THREE.MeshBasicMaterial({ color: hex(T.lights.sky.hex), side: THREE.DoubleSide }) };
+
+  var W = innerWidth, H = innerHeight, renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(W, H); document.body.appendChild(renderer.domElement);
+  var scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(70, W / H, 0.05, 300);
+  function box(w, h, d, m, x, y, z) { var b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); scene.add(b); return b; }
+
+  /* the room in its own frame: the plan's centre at the origin, x east, z south (the shell's), the site's y as z */
+  var WT = 0.8, Q, w, d, long;
+  if (C.circle) {
+    var cx = C.circle[0], cy = C.circle[1], poly = [];
+    for (var i = 0; i < 24; i++) { var a = -i / 24 * Math.PI * 2; poly.push([cx + C.r * Math.cos(a), cy + C.r * Math.sin(a)]); }
+    var toLocal = function (x, y, z) { return new THREE.Vector3(x - cx, z, y - cy); };
+    Q = { id: C.id, poly: poly, floor: 0, ceiling: C.h, rec: { vault: C.vault } };
+    w = d = 2 * C.r; long = true;
+    var fl = new THREE.Mesh(new THREE.CircleGeometry(C.r, 48), mats.floor); fl.rotation.x = -Math.PI / 2; scene.add(fl);
+    var wl = new THREE.Mesh(new THREE.CylinderGeometry(C.r, C.r, C.h, 48, 1, true), mats.wall); wl.position.y = C.h / 2; scene.add(wl);
+  } else {
+    var r = C.rect, ccx = (r[0] + r[2]) / 2, ccy = (r[1] + r[3]) / 2;
+    toLocal = function (x, y, z) { return new THREE.Vector3(x - ccx, z, y - ccy); };
+    Q = { id: C.id, poly: [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]], floor: 0, ceiling: C.h, rec: C.vault ? { vault: C.vault } : {} };
+    w = r[2] - r[0]; d = r[3] - r[1]; long = w >= d;
+    var x0 = -w / 2, x1 = w / 2, z0 = -d / 2, z1 = d / 2;
+    box(w, 0.1, d, mats.floor, 0, -0.05, 0);
+    var dw = Math.min(1.2, w - 0.4), dh = Math.min(2.6, C.h - 0.3), sideW = (w - dw) / 2;   /* a door in the north wall */
+    box(sideW, C.h, WT, mats.wall, x0 + sideW / 2, C.h / 2, z0 - WT / 2);
+    box(sideW, C.h, WT, mats.wall, x1 - sideW / 2, C.h / 2, z0 - WT / 2);
+    box(dw, C.h - dh, WT, mats.wall, 0, dh + (C.h - dh) / 2, z0 - WT / 2);
+    box(dw, dh, 0.05, mats.dark, 0, dh / 2, z0 - WT - 0.03);
+    box(w + 2 * WT, C.h, WT, mats.wall, 0, C.h / 2, z1 + WT / 2);
+    box(WT, C.h, d, mats.wall, x0 - WT / 2, C.h / 2, 0);
+    box(WT, C.h, d, mats.wall, x1 + WT / 2, C.h / 2, 0);
+    var sr = CastleCeilings.surround(THREE, { w: dw, h: dh, d: WT, kind: 'round' }, mats);
+    sr.position.set(0, 0, z0 - WT / 2); scene.add(sr);
+  }
+
+  var got = CastleCeilings.forPlace(THREE, Q, { toLocal: toLocal, kind: C.kind, mats: mats });
+  scene.add(got.group);
+  if (got.flat) box(w, 0.06, d, C.sky ? mats.sky : mats.flat, 0, C.h + 0.03, 0);
+
+  /* torches on the long walls every 5 m, about 2.2 m up (the Hall's candles at 7.0 instead), warm; a little fill */
+  var L = T.lights, len = long ? w : d, n = Math.max(1, Math.round(len / 5)), across = (long ? d : w) / 2 - 0.35;
+  scene.add(new THREE.HemisphereLight(0x8a8478, 0x2a2622, C.sky || C.h > 6 ? 0.35 : 0.22));
+  for (var k = 0; k < n; k++) {
+    var t = -len / 2 + (k + 0.5) * len / n;
+    [-1, 1].forEach(function (s) {
+      var p = C.sky ? new THREE.PointLight(hex(L.candle.hex), 0.7, 22, 1.2) : new THREE.PointLight(hex(L.torch.hex), 0.9, 9, 1.6);
+      var y = C.sky ? 7.0 : Math.min(2.2, C.h - 0.4), off = C.sky ? s * across * 0.4 : s * across;
+      if (C.circle) { var a = (k * 2 + (s > 0)) / (2 * n) * Math.PI * 2; p.position.set(Math.cos(a) * (C.r - 0.4), y, Math.sin(a) * (C.r - 0.4)); }
+      else p.position.set(long ? t : off, y, long ? off : t);
+      scene.add(p);
+    });
+  }
+
+  /* the eye at 1.35 m by the south wall looking north at the door, or down the long way in the long rooms */
+  var yaw = 0, pitch = +(q.get('up') || (C.sky ? 32 : C.circle ? 24 : C.kind === 'rib' ? 34 : 14)) * Math.PI / 180, ex = 0, ez = d / 2 - Math.min(1.2, d * 0.3);
+  if (long && w > 12 && !C.circle) { ex = w / 2 - 2.4; ez = 0; yaw = Math.PI / 2; }
+  if (C.circle) { ex = 0; ez = C.r - 1.2; }
+  cam.position.set(ex, 1.35, ez);
+  var drag = null;
+  renderer.domElement.addEventListener('pointerdown', function (e) { drag = [e.clientX, e.clientY, yaw, pitch]; });
+  addEventListener('pointerup', function () { drag = null; });
+  addEventListener('pointermove', function (e) { if (!drag) return; yaw = drag[2] + (e.clientX - drag[0]) * 0.006; pitch = Math.max(-1, Math.min(1.3, drag[3] + (e.clientY - drag[1]) * 0.004)); });
+  addEventListener('resize', function () { W = innerWidth; H = innerHeight; cam.aspect = W / H; cam.updateProjectionMatrix(); renderer.setSize(W, H); });
+  document.getElementById('say').textContent = C.say + (got.springs != null ? ' · springs ' + got.springs.toFixed(2) + ' m, crown ' + got.crown.toFixed(2) + ' m' : '');
+  var frames = 0;
+  cam.rotation.order = 'YXZ';
+  (function tick() {
+    cam.rotation.y = yaw; cam.rotation.x = pitch;
+    renderer.render(scene, cam); frames++;
+    window.ceilingsReady = { room: key, kind: got.kind, springs: got.springs, crown: got.crown, piers: got.piers, beams: got.beams, bays: got.bays, provisional: got.provisional, meshes: got.group.children.length, frames: frames };
+    requestAnimationFrame(tick);
+  })();
+})();
+</script>
+</body>
+</html>
