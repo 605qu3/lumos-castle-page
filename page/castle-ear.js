@@ -14,6 +14,19 @@
 
   var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+  /* An ear that can never hear on this device (20 October 2026, Godric's iPhone: no microphone prompt at all, so the
+     password never worked): the microphone refused, Siri and Dictation off, no microphone, the accent not offered,
+     or a start Safari will not make. Then `available()` is false for the rest of this browsing session, so the
+     castle's spoken things wait for a tap, as with no recognition at all. */
+  var DEAF = /^(not-allowed|service-not-allowed|audio-capture|language-not-supported)$/;
+  var DEAF_KEY = 'lumos.castle.ear.deaf';
+  var deaf = null;
+  try { deaf = window.sessionStorage.getItem(DEAF_KEY); } catch (e) {}
+  function goDeaf(why) {
+    deaf = why;
+    try { window.sessionStorage.setItem(DEAF_KEY, why); } catch (e) {}
+  }
+
   function norm(s) { return String(s || '').toLowerCase().replace(/[^a-z]/g, ''); }
   /* the probe's nearness, kept word for word so its measurements calibrate this one */
   function near(a, b) {
@@ -62,10 +75,10 @@
        (20 October 2026: on the iPad she asked for ever). */
     var GRACE_MS = 1500;
     function closeSoon() { setTimeout(function () { try { rec.abort(); } catch (e) {} finish(why || 'end'); }, GRACE_MS); }
-    rec.onerror = function (e) { why = 'error ' + e.error; closeSoon(); };
+    rec.onerror = function (e) { why = 'error ' + e.error; if (DEAF.test(e.error)) goDeaf(e.error); closeSoon(); };
     rec.onend = function () { finish(why || 'end'); };
     var timer = setTimeout(function () { why = why || 'timeout'; try { rec.stop(); } catch (e) { finish(why); } closeSoon(); }, (opts.seconds || ear.SECONDS) * 1000);
-    try { rec.start(); } catch (e) { finish('error ' + (e.name || 'start')); }
+    try { rec.start(); } catch (e) { if (e.name !== 'InvalidStateError') goDeaf(e.name || 'start'); finish('error ' + (e.name || 'start')); }
     return { stop: function () { why = why || 'stopped'; try { rec.stop(); } catch (e) { finish(why); } closeSoon(); } };
   }
 
@@ -73,7 +86,8 @@
     LOOSE: 0.6,          /* provisional: the probe sets it */
     LANG: 'en-GB',       /* provisional: the probe sets it */
     SECONDS: 8,          /* how long one tap's listening lasts at most */
-    available: function () { return !!SR; },
+    available: function () { return !!SR && !deaf; },
+    deaf: function () { return deaf; },
     near: near,
     match: match,
     listen: listen
