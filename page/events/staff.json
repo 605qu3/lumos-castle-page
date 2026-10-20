@@ -20,9 +20,10 @@
         "castle date >= 2 04-24"
       ],
       "show": [
-        "a fresh sheet pinned over the older notices on the staff notice board: every lesson of the week and the teacher who walks each class to it"
+        "a fresh sheet pinned over the older notices on the staff notice board: every lesson of the week and the teacher who walks each class to it",
+        "at its head ESCORTS TO LESSONS, then \"You will be escorted to each lesson by a teacher.\", Sprout's \"Herbology to Defence\" in her own hand among the rest, signed M. McG."
       ],
-      "canon": "the change list's Rework 12 with Interiors' schedule (docs/interiors/staff-room.md, the notice board; its Rework 10): CoS 14 L11537, L11559, L11669, \"You will be escorted to each lesson by a teacher\", from the Saturday of the Hufflepuff match after the Easter holidays (about 24 April, the set-aside rule's reckoning); fresh in the Chamber's castle from then to the year's end; its words Magic's; checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 12 with Interiors' schedule (docs/interiors/staff-room.md, the notice board; its Rework 10): CoS 14 L11537, L11559, L11669, \"You will be escorted to each lesson by a teacher\", from the Saturday of the Hufflepuff match after the Easter holidays (about 24 April, the set-aside rule's reckoning); fresh in the Chamber's castle from then to the year's end; its words Magic's; checked against the text, 15 October 2026; Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am): the rota's words, \"You will be escorted to each lesson by a teacher.\" (CoS 14 L11669, read in the canon tool, 20 October 2026), \"Professor Sprout escorted the class to their Defense Against the Dark Arts lesson\" (CoS 15 L11887, read in the canon tool, 20 October 2026); signed M. McG. (ours)"
     },
     {
       "when": [
@@ -30,9 +31,10 @@
         "year >= 3"
       ],
       "show": [
-        "an old curling sheet half hidden under newer notices on the staff notice board: every lesson of the week and the teacher who walks each class to it"
+        "an old curling sheet half hidden under newer notices on the staff notice board: every lesson of the week and the teacher who walks each class to it",
+        "ESCORTS TO LESSONS still showing at its head, the rest under newer notices"
       ],
-      "canon": "as above: in every later castle the rota stays, old and curling, half under newer notices (Interiors' schedule; the change list's Rework 12)"
+      "canon": "as above: in every later castle the rota stays, old and curling, half under newer notices (Interiors' schedule; the change list's Rework 12); Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am): the rota's head still showing (CoS 14 L11669, read in the canon tool, 20 October 2026)"
     },
     {
       "when": [
@@ -43,6 +45,150 @@
         "the wardrobe's left door standing an inch ajar, a dark fold of cloak showing in the gap"
       ],
       "canon": "Interiors' req 445 (Godric's answer, 15 October 2026, 3.18 pm, interiors-staff-room-1014 t1 woven; docs/interiors/staff-room.md, the wardrobe): its left leaf an inch ajar, a still trace from 29 May of the Chamber's castle, \"Three days before their first exam\" (CoS 16 L12179), when two boys hid in the wardrobe full of the teachers' cloaks (L12361 to L12363), and in every later year; no figure in it; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time = morning"
+      ],
+      "show": [
+        "the fire's own light on the panelling and the armchairs"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the fire, its own light (2.3); a teacher or two by it is Interiors' Occupancy and People's figures"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time != night",
+        "time != morning",
+        "season != winter"
+      ],
+      "show": [
+        "the fire's own light on the panelling and the armchairs"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the fire, its own light (2.3)"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time != night",
+        "time != morning",
+        "season = winter"
+      ],
+      "show": [
+        "the fire banked up high against the winter cold, its light on the panelling and the armchairs"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: banked up on a winter evening with a teacher or two by it (Interiors' Occupancy; the figures People's); dusk comes before five from November to February, so the winter fire is banked from noon until dark (ours, the clock as built)"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time = night"
+      ],
+      "show": [
+        "the fire low and red, the panelling dark, nobody in the room",
+        "the two portraits asleep in their frames"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: by night nobody (Interiors' Occupancy): the fire low and red, the portraits asleep, the Prophet left on the arm; the holidays' low fire waits for a holidays driver"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time != night"
+      ],
+      "show": [
+        "over the mantel an old wizard in a black skullcap dozing, his chin on his chest; on the window wall a stout witch in a lace cap dozing, a teacup in her lap"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the two portraits, Interiors' sitters, nameless, kin to \"the sleeping portraits\" (CoS 13 L11348, read in the canon tool, 20 October 2026); neither speaks to him (1.3)"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "year <= 2"
+      ],
+      "show": [
+        "the Daily Prophet on the third armchair's arm, its front-page photograph a Keeper diving the wrong way, again and again"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: \"As always in the wizarding world, the photograph was moving\" (CoS 3 L7330, read in the canon tool, 20 October 2026); the Stone's and the Chamber's castles an ordinary day's paper, a Quidditch league report, nothing named of the plot (Kingsley's condition, Interiors' row); its drawing Precedents' (run 32)"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "year = 3"
+      ],
+      "show": [
+        "the Daily Prophet on the third armchair's arm, BLACK STILL AT LARGE across its front page, the gaunt face in the photograph only blinking"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the Azkaban castle's page, \"BLACK STILL AT LARGE\" (PoA 3 L13965, read in the canon tool, 20 October 2026); his photograph blinks, never at him; from the Goblet's castle on held for that castle's own table"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time != night"
+      ],
+      "show": [
+        "the real sky in the three court windows"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the windows, the real sky (2.4)"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time = night",
+        "weather = clear",
+        "moon up = yes",
+        "moon != new"
+      ],
+      "show": [
+        "moonlight through the three court windows across the wooden chairs"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: by night the moon across the wooden chairs"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time = night",
+        "weather != clear"
+      ],
+      "show": [
+        "the three court windows dark"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: a cloudy, wet, snowy or foggy night: no moon in the windows"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time = night",
+        "weather = clear",
+        "moon up = no"
+      ],
+      "show": [
+        "the three court windows dark"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the moon down: dark"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "time = night",
+        "weather = clear",
+        "moon up = yes",
+        "moon = new"
+      ],
+      "show": [
+        "the three court windows dark"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the new moon: dark"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "castle date >= 1 11-07"
+      ],
+      "show": [
+        "a roll of bandage lying on the wardrobe's floor under the robes' hems, its loose end trailing a hand's breadth"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the bandage moved into the wardrobe, never over a chair's arm, never the scene of Snape's leg (Kingsley's condition, docs/interiors/staff-room.md, The things: on the wardrobe's floor under the right leaf); seen only when a state opens its doors (the Curator's req 563); room[0], set aside, is kept till Godric's yes to delete; from 7 November of the Stone's castle as before (PS 11 L3749 to L3751)"
     }
   ],
   "records": [
@@ -306,6 +452,143 @@
         "the wardrobe's doorknob rattles, and the whole wardrobe bangs off the wall again"
       ],
       "canon": "PoA 7 L15907, the now rattling doorknob; on his tap, so the thing he touches answers and nothing opens; the same days as the wobble (req 445); checked against the text, 15 October 2026"
+    },
+    {
+      "id": "staff.coals",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "staff-fire",
+      "weight": 1,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = staff room"
+      ],
+      "show": [
+        "the coals in the grate settle with a soft fall"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: now and then the coals settle; about one visit in three"
+    },
+    {
+      "id": "staff.coals-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "staff-fire",
+      "weight": 2,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = staff room"
+      ],
+      "starts": []
+    },
+    {
+      "id": "staff.binns-cushion",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "staff-binns",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = staff room"
+      ],
+      "show": [
+        "the seat cushion of the armchair square to the fire holds a faint hollow, as if someone had only that moment got up, and slowly fills out again"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: Binns's armchair, never taken (Interiors' t1); ours, the Stone's own joke: he fell asleep in front of the staff room fire and got up next morning to teach, \"leaving his body behind him\" (PS 8 L2732, read in the canon tool, 20 October 2026); no figure, no chill, nothing glows; about one visit in four"
+    },
+    {
+      "id": "staff.binns-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "staff-binns",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = staff room"
+      ],
+      "starts": []
+    },
+    {
+      "id": "staff.portrait-stirs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "staff-portraits",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = staff room",
+        "time != night"
+      ],
+      "show": [
+        "one of the dozing portraits stirs, mutters, and sleeps on"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the two portraits doze, kin to \"the sleeping portraits\" (CoS 13 L11348, read in the canon tool, 20 October 2026); now and then one stirs"
+    },
+    {
+      "id": "staff.door-bangs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "staff-portraits",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = staff room",
+        "time != night"
+      ],
+      "show": [
+        "the staff room door bangs open and both portraits start awake, blink, and settle again"
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: \"the staff room door banging open\" (CoS 16 L12363, read in the canon tool, 20 October 2026); both start awake and settle"
+    },
+    {
+      "id": "staff.portraits-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "staff-portraits",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = staff room",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "staff.gargoyle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = staff passage",
+        "lessons = on"
+      ],
+      "who": [
+        {
+          "as": "gargoyle",
+          "role": "voice",
+          "name": "a stone gargoyle",
+          "mark": "beside the staff room door"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "gargoyle",
+          "medium": "heard",
+          "key": "staff.gargoyle",
+          "sound": "one of the stone gargoyles by the staff room door works its jaw and croaks, and is stone again",
+          "text": [
+            "You should be in class, Sonny Jim."
+          ]
+        }
+      ],
+      "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year, lesson time, as he passes: \"Two stone gargoyles flanked the staff-room door. As Harry approached, one of them croaked, 'You should be in class, Sonny Jim.'\" (OotP 17 L43363, read in the canon tool, 20 October 2026), an everyday thing a later book names first (Kingsley's rule of 16 October), never as said to Harry; stone that wakes (\"the gargoyle sprang suddenly to life\", CoS 11 L10580, read in the canon tool, 20 October 2026), only the jaw; once a visit (arrive, once a page a visit); outside lesson time still"
     }
   ]
 }
