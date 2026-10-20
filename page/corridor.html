@@ -2690,6 +2690,71 @@ function squareSurround(cx, w, h) {
 }
 var cupboardSurround = squareSurround(CUPBOARD.x, CUPBOARD.w, CUPBOARD.h);
 var doorSurround = squareSurround(DOOR.x, DOOR.w, DOOR.h);
+/* The rib vault (the Architect's materials schedule, model v65, confirmed by Godric; materials.md 3 and this corridor's
+   row in materials-by-room.md: houses-sandstone, a rib vault; req 640): quadripartite bay by bay, its crown at CEIL, its
+   springing VAULT.spring up both long walls (the schedule's 2.4 m at least, so the vault rises its half span and a
+   little more, pointed). The bays are the windows' spacing, centred on the two windows so each wall rib rises over its
+   light and the transverse ribs land on the piers between, the armour's among them (BAY_X); a short bay at the end wall,
+   one over the flight and one over the landing centred on its tall window, the flight's foot its boundary. Each web is
+   the higher of two pointed barrels, across and along the bay (a groin), so its wall cells rise to the wall ribs over
+   the lights and the diagonal ribs run on the groins; the ribs and a corbel under each springing in the surround's
+   stone. A coded stand-in until Design draws the castle's vaults (req 643), behind ?vault till Godric has seen it; the
+   bosses (materials.md: a different face in each bay) a drawing for later */
+var VAULT = { on: /[?&]vault(=|&|$)/.test(location.search), spring: 2.9, rib: 0.07, seg: 24,
+  web: solid(0x6c6861, { side: THREE.DoubleSide }), corbel: { w: 0.24, h: 0.26, d: 0.16 } };
+VAULT.rise = CEIL - VAULT.spring;
+VAULT.cuts = (function () {
+  var b = WINDOW.xs[0] - WINDOW.xs[1], cuts = [END_X];
+  for (var x = WINDOW.xs[0] + 1.5 * b; x > FOOT_X + 1; x -= b) if (x < END_X - 0.5) cuts.push(x);
+  return cuts.concat([FOOT_X, FAR_END_X]);
+})();
+function pointedRise(u, span) {   /* a two-centred arch's height over its springing, u from its centre */
+  var r = VAULT.rise, xc = (r * r - span * span / 4) / span, R = xc + span / 2, d = Math.min(Math.abs(u), span / 2) + xc;
+  return Math.sqrt(Math.max(0, R * R - d * d));
+}
+var vaultGroup = new THREE.Group();
+vaultGroup.name = 'rib-vault'; vaultGroup.visible = VAULT.on; scene.add(vaultGroup);
+(function () {
+  var N = VAULT.seg, G = vaultGroup;
+  function vy(x, z, xm, L) { return VAULT.spring + Math.max(pointedRise(z - MID_Z, WIDTH), pointedRise(x - xm, L)); }
+  function rib(pts) {
+    var m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, VAULT.rib, 5, false), SURROUND.mat);
+    m.castShadow = true; m.receiveShadow = true; G.add(m); register(m, 0);
+  }
+  function corbel(x, z, out) {
+    var c = VAULT.corbel; box(G, c.w, c.h, c.d, x, VAULT.spring - c.h / 2, z + out * c.d / 2, SURROUND.mat, 0);
+  }
+  for (var b = 0; b < VAULT.cuts.length - 1; b++) {
+    var xa = VAULT.cuts[b], xb = VAULT.cuts[b + 1], L = xa - xb, xm = (xa + xb) / 2;
+    var pos = [], idx = [];
+    for (var i = 0; i <= N; i++) for (var j = 0; j <= N; j++) {
+      var x = xa - L * i / N, z = FAR_Z + WIDTH * j / N;
+      pos.push(x, vy(x, z, xm, L), z);
+    }
+    for (i = 0; i < N; i++) for (j = 0; j < N; j++) {
+      var a = i * (N + 1) + j, c = a + N + 1;
+      idx.push(a, c, a + 1, a + 1, c, c + 1);
+    }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+    var web = new THREE.Mesh(g, VAULT.web); web.receiveShadow = true; G.add(web); register(web, 0);
+    var diag1 = [], diag2 = [], wallF = [], wallH = [];
+    for (i = 0; i <= N; i++) {
+      var t = i / N, xd = xa - L * t, zf = FAR_Z + WIDTH * t, zh = HER_Z - WIDTH * t;
+      diag1.push(new THREE.Vector3(xd, vy(xd, zf, xm, L) - VAULT.rib, zf));
+      diag2.push(new THREE.Vector3(xd, vy(xd, zh, xm, L) - VAULT.rib, zh));
+      wallF.push(new THREE.Vector3(xd, VAULT.spring + pointedRise(xd - xm, L) - VAULT.rib, FAR_Z + VAULT.rib));
+      wallH.push(new THREE.Vector3(xd, VAULT.spring + pointedRise(xd - xm, L) - VAULT.rib, HER_Z - VAULT.rib));
+    }
+    [diag1, diag2, wallF, wallH].forEach(rib);
+  }
+  VAULT.cuts.forEach(function (xc, k) {   /* the transverse ribs, the end walls' own at their faces */
+    var x = k === 0 ? xc - VAULT.rib : k === VAULT.cuts.length - 1 ? xc + VAULT.rib : xc, pts = [];
+    for (var j = 0; j <= N; j++) { var z = FAR_Z + WIDTH * j / N; pts.push(new THREE.Vector3(x, VAULT.spring + pointedRise(z - MID_Z, WIDTH) - VAULT.rib, z)); }
+    rib(pts);
+    corbel(x, FAR_Z, 1); corbel(x, HER_Z, -1);
+  });
+})();
 var cupboard = { ang: 0, target: 0, rattle: 0, shut: 0 };
 /* What it holds (Magic's B18, req 281; Godric's picks: the broom round 1 Try 1, held answer relayed 15 October 2026,
    1.47 pm; the tag round 1 Try 3, drawn blank, lettered here): one ancient school broom, a Shooting Star, "very slow and
