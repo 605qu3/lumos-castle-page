@@ -132,9 +132,9 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=372"></script>
+<script src="castle-model.js?v=381"></script>
 <script src="castle-shell.js?v=25"></script>
-<script src="castle-events.js?v=36"></script>
+<script src="castle-events.js?v=38"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
 (function () {
@@ -717,7 +717,9 @@ function fly(t, dt) {
   }
 }
 
-/* ================= light (Design's; the windows the Architect's): grey stand-ins read from the clock */
+/* ================= light (Design's; the windows the Architect's): grey stand-ins read from the clock
+   This block, unchanged since 15 October 2026, stays the default on Godric's direction of 19 October 2026, 9.42 pm
+   ("much brighter and warmer"); Design's darker castle-light.js (req 612) is not taken in until he says. */
 var hemi = new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, 0.6); scene.add(hemi);
 var amb = new THREE.AmbientLight(0xffffff, 0.08); scene.add(amb);
 var sunL = new THREE.DirectionalLight(0xfff1dc, 0.0); scene.add(sunL); scene.add(sunL.target);
