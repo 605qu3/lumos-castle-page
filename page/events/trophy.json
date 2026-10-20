@@ -121,6 +121,151 @@
         "two new Special Awards for Services to the School, bright and unscratched, beside T. M. Riddle's"
       ],
       "canon": "the change list's Rework 13 (room[2] and [3] merged) with Interiors' schedule (docs/interiors/trophy-room.md, the two awards on the cabinet's east panel): CoS 18 L13097, two Special Awards for Services to the School given on the Chamber's night, 29 May (CoS 16 L12159, L12179); from 29 May of the Chamber's castle and in every later year; no names on the cue; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = night",
+        "weather = clear",
+        "moon up = yes",
+        "moon != new"
+      ],
+      "show": [
+        "moonlight through the west windows across the floor and onto the east run of cases, the crystal glass glimmering where it catches, cups, shields, plates and statues winking silver and gold in the darkness"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the cases by night, \"The crystal trophy cases glimmered where the moonlight caught them. Cups, shields, plates, and statues winked silver and gold in the darkness\" (PS 9 L3231, read in the canon tool, 20 October 2026, the room as it is any clear night; nothing of that walk staged); the light the moon's alone, at its phase, nothing of their own"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = night",
+        "weather != clear"
+      ],
+      "show": [
+        "the room dark, the cases only shapes along the walls"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: a cloudy night, dark; the windows' moon (2.4) hidden"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = night",
+        "weather = clear",
+        "moon up = no"
+      ],
+      "show": [
+        "the room dark, the cases only shapes along the walls"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: a clear night with the moon down, dark"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = night",
+        "weather = clear",
+        "moon = new"
+      ],
+      "show": [
+        "the room dark, the cases only shapes along the walls"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the new moon, dark"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time != night",
+        "time != evening"
+      ],
+      "show": [
+        "the real sky in the west windows"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the cases by day, the real sky in the west windows (2.4; the model's trophy-window-1 to -4 on the west wall)"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = day",
+        "hour >= 15",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "in the afternoon the sun low through the west windows, up the east run's glass, the silver bright"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the afternoon sun through the west windows onto the east run (Interiors' east wall, facing the windows)"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = evening",
+        "weather = clear"
+      ],
+      "show": [
+        "the evening sun through the west windows, long across the floor to the east run's glass"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the evening, the windows' last light on the cases (west, the castle's face)"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time != night",
+        "weather != clear"
+      ],
+      "show": [
+        "the room grey, the cases dim"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: on a dull day the room grey and the cases dim"
+    },
+    {
+      "when": [
+        "place = trophy room"
+      ],
+      "show": [
+        "the Head Boys' board, gilt names down it with their years, most of them strangers, among them T. M. Riddle, J. Potter and W. Weasley"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: \"a list of old Head Boys\" (CoS 13 L11196), \"Prefect, Head Boy\" (L11198), James \"Head boy an' girl at Hogwarts in their day\" (PS 4 L998), \"Bill was head boy\" (PS 6 L2008), each read in the canon tool, 20 October 2026; the board Interiors', its names Magic's, nothing explains a name"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "year >= 3"
+      ],
+      "show": [
+        "P. Weasley freshly gilt at the board's foot"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: from the Azkaban castle, \"PS: Percy's Head Boy. He got the letter last week.\" (PoA 1 L13449, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = morning",
+        "weekday = wednesday"
+      ],
+      "show": [
+        "the cases Filch polished last night brighter than the rest, a smell of polish in the air"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the polish the morning after, no magic (\"elbow grease\", CoS 7 L8902); ours: Filch polishes on some evenings by his own business (Interiors' Occupancy; \"polishing the silver in the trophy room\", CoS 7 L8902, everyday, read in the canon tool, 20 October 2026), Tuesday and Friday, provisional, Magic to confirm"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = morning",
+        "weekday = saturday"
+      ],
+      "show": [
+        "the cases Filch polished last night brighter than the rest, a smell of polish in the air"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the polish the morning after; ours: Filch polishes on some evenings by his own business (Interiors' Occupancy; \"polishing the silver in the trophy room\", CoS 7 L8902, everyday, read in the canon tool, 20 October 2026), Tuesday and Friday, provisional, Magic to confirm"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "trophy_polish = yes"
+      ],
+      "show": [
+        "Filch at a case with his tin and cloth, polishing the silver, his back to the room"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the evening, now and then Filch at his polishing (People's figure); ours: Filch polishes on some evenings by his own business (Interiors' Occupancy; \"polishing the silver in the trophy room\", CoS 7 L8902, everyday, read in the canon tool, 20 October 2026), Tuesday and Friday, provisional, Magic to confirm"
     }
   ],
   "records": [
@@ -138,6 +283,138 @@
         "a small silver cup lying on its side in one case, that case's glass door left ajar"
       ],
       "canon": "the change list's Rework 13 with Interiors' schedule (docs/interiors/trophy-room.md, a small cup on its side): Peeves \"bouncing around the trophy room\", PoA 10 L17186, his mischief now and then, any day and any castle, set right and knocked again, never the Hogsmeade Saturday and no Map; a small record on arrival, so never two visits running; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "trophy.statuette-rider",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "trophy-statuette",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = trophy room",
+        "time != night"
+      ],
+      "show": [
+        "inside a case a small gilt broom rider on an old cup's lid leans into a turn, and is still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the statuettes, among the \"statues\" (PS 9 L3231, read in the canon tool, 20 October 2026): inside its case, never toward him, no sound (ours, the castle's pictures' way, 1.3, in silver); rarely, about one visit in four"
+    },
+    {
+      "id": "trophy.statuette-wizard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "trophy-statuette",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = trophy room",
+        "time != night"
+      ],
+      "show": [
+        "inside a case a small gilt wizard on an old cup's lid lifts his wand an inch, and is still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the statuettes, among the \"statues\" (PS 9 L3231, read in the canon tool, 20 October 2026): inside its case, never toward him, no sound (ours, the castle's pictures' way, 1.3, in silver); rarely, about one visit in four"
+    },
+    {
+      "id": "trophy.statuette-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "trophy-statuette",
+      "weight": 6,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = trophy room",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "trophy.statuette-moon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "trophy-statuette-moon",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = trophy room",
+        "time = night",
+        "weather = clear",
+        "moon up = yes",
+        "moon != new"
+      ],
+      "show": [
+        "in the moonlight a small gilt broom rider on an old cup's lid leans into a turn, and is still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the statuettes, among the \"statues\" (PS 9 L3231, read in the canon tool, 20 October 2026): inside its case, never toward him, no sound (ours, the castle's pictures' way, 1.3, in silver); rarely, about one visit in four; by night only where the moon lights the cases"
+    },
+    {
+      "id": "trophy.statuette-moon-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "trophy-statuette-moon",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = trophy room",
+        "time = night",
+        "weather = clear",
+        "moon up = yes",
+        "moon != new"
+      ],
+      "starts": []
+    },
+    {
+      "id": "trophy.filch-polishing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = trophy room",
+        "time = evening",
+        "weekday = tuesday"
+      ],
+      "starts": [
+        "set trophy_polish = yes"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the evening, nobody but now and then Filch at his polishing (People's figure); ours: Filch polishes on some evenings by his own business (Interiors' Occupancy; \"polishing the silver in the trophy room\", CoS 7 L8902, everyday, read in the canon tool, 20 October 2026), Tuesday and Friday, provisional, Magic to confirm; filch.miss-trophy keeps away while he is here"
+    },
+    {
+      "id": "trophy.filch-polishing-friday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = trophy room",
+        "time = evening",
+        "weekday = friday"
+      ],
+      "starts": [
+        "set trophy_polish = yes"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: as the Tuesday; ours: Filch polishes on some evenings by his own business (Interiors' Occupancy; \"polishing the silver in the trophy room\", CoS 7 L8902, everyday, read in the canon tool, 20 October 2026), Tuesday and Friday, provisional, Magic to confirm"
+    },
+    {
+      "id": "trophy.forget",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set trophy_polish = no"
+      ],
+      "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: his polishing that evening's alone"
     }
   ]
 }

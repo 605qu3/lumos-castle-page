@@ -258,7 +258,8 @@
       "moment": "filch passes",
       "when": [
         "place = trophy room",
-        "time != night"
+        "time != night",
+        "trophy_polish != yes"
       ],
       "who": [
         {
