@@ -522,8 +522,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var ceil = quad(xb - xa, y1 - y0, mats.ceil, 'ceiling');
         ceil.rotation.x = Math.PI / 2; ceil.position.set(cp.x, cp.y + hz, cp.z); ceil.name = Q.id + '-ceiling' + (ci ? '-' + ci : ''); group.add(ceil);
         if (prev != null && Math.abs(prev - hz) > 0.01) {
-          var rs = slab(0.02, Math.abs(prev - hz), y1 - y0, mats.ceil, 'ceiling'), rp = toLocal(xa, (y0 + y1) / 2, Q.floor);
-          rs.position.set(rp.x, rp.y + (prev + hz) / 2, rp.z); rs.name = Q.id + '-head-riser-' + ci; group.add(rs);
+          /* v39: the riser stands under the higher strip, 2 cm up into it, its foot on the lower strip's edge, no face flush */
+          var hi = Math.max(prev, hz), lo = Math.min(prev, hz), sd = hz > prev ? 0.01 : -0.01;
+          var rs = slab(0.02, hi - lo + 0.02, y1 - y0, mats.ceil, 'ceiling'), rp = toLocal(xa + sd, (y0 + y1) / 2, Q.floor);
+          rs.position.set(rp.x, rp.y + (lo + hi + 0.02) / 2, rp.z); rs.name = Q.id + '-head-riser-' + ci; group.add(rs);
         }
         prev = hz;
       }
@@ -671,7 +673,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       gs.forEach(function (g, j) {
         if (!col) {
           piece(at, g.s0, 0, HE, Q.id + '-wall-' + i + '-' + j);
-          piece(g.s0, g.s1, g.h, HE, Q.id + '-head-' + g.op.id);
+          piece(g.s0, g.s1, g.soffit ? g.h + 0.05 : g.h, HE, Q.id + '-head-' + g.op.id);   /* v39: over a soffit it bears 5 cm into it, never flush */
           piece(g.s0, g.s1, 0, g.sill, Q.id + '-sill-' + g.op.id);
         }
         at = g.s1;
@@ -756,10 +758,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         if (sb - sa < 0.01) return;
         var cuts2 = [sa, sb];
         gs.forEach(function (g) { if (g.s1 > sa && g.s0 < sb) cuts2.push(Math.max(sa, g.s0), Math.min(sb, g.s1)); });
+        /* v39: a soffit's jambs (v23) already stand to its top; the raised wall starts above them there (the listeners'
+           gallery's two arches, their jambs face to face with it) */
+        var jb = [];
+        gs.forEach(function (g) {
+          if (!g.soffit || g.spill) return;
+          var tp = Math.max(g.soffit[0], g.soffit[1]) + 0.1;
+          jb.push([Math.max(0, g.s0 - 0.3), g.s0, tp], [g.s1, Math.min(L, g.s1 + 0.3), tp]);
+        });
+        jb.forEach(function (j) { if (j[1] > sa && j[0] < sb) cuts2.push(Math.max(sa, j[0]), Math.min(sb, j[1])); });
         cuts2.sort(function (p, q) { return p - q; });
         for (var j2 = 0; j2 < cuts2.length - 1; j2++) {
           var m2 = (cuts2[j2] + cuts2[j2 + 1]) / 2, gg = gs.filter(function (g) { return g.s0 < m2 && g.s1 > m2; })[0];
-          piece(cuts2[j2], cuts2[j2 + 1], gg ? Math.max(HE, gg.h) : HE, k.h, Q.id + '-raised-' + i + '-' + ki + '-' + j2);
+          var jj = jb.filter(function (j) { return j[0] < m2 && j[1] > m2; })[0];
+          var lo2 = gg ? Math.max(HE, gg.h) : HE;
+          if (jj) lo2 = Math.max(lo2, jj[2]);
+          if (k.h - lo2 < 0.01 || cuts2[j2 + 1] - cuts2[j2] < 0.001) continue;
+          piece(cuts2[j2], cuts2[j2 + 1], lo2, k.h, Q.id + '-raised-' + i + '-' + ki + '-' + j2);
         }
       });
       /* v10: the leads' merlons on the breast, 1.5 long every 3.0, clear of its doors; each crenel between barred */
@@ -840,7 +855,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var a1 = A.out - (k - 1) * t, a2 = A.out - k * t, mid = (a1 + a2) / 2, top = A.z + k * rise;   /* clockwise: the site's angle falling */
         if (k % 3 === 1 || k === n) { var pp = at(mid, PR); path.push([pp[0], pp[1], top]); }
         if (doors.some(function (d) { return top > d.z + 0.05 && top < d.top + 0.2 && off(mid, d.a) < d.half + 2 + t / 2; })) continue;
-        wedge(a2 - 0.5, a1, top, rise, mats.floor, fid + '-' + k).userData.stair = fid;
+        wedge(k === n ? a2 : a2 - 0.5, a1, top, rise, mats.floor, fid + '-' + k).userData.stair = fid;   /* v39: the top tread meets its landing edge to edge, not lapped flush on it */
       }
       shaftFlights.push({ id: fid, foot: end(A.out + 6, PR, A.z, A.out - 3 * t, PR, 0.9), head: end(B.in - 6, PR, B.z, B.mid != null ? B.mid : B.in, R),
         path: path, lamp: [c[0], c[1], B.z + 2.0] });
