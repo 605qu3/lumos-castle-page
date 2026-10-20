@@ -230,7 +230,15 @@ var HOUR = Q.get('hour') != null ? +Q.get('hour') : new Date().getHours();
 var PAINT_ON = PAINTED.indexOf(PLACE) >= 0, DAY = HOUR >= 7 && HOUR < 17;
 var FILL = !PAINT_ON ? 0.85 : DAY ? 0.5 : HOUR >= 17 && HOUR < 22 ? 0.2 : 0.06;
 if (PLACE === 'entrance-hall') FILL = Math.min(FILL, 0.15);
-scene.add(new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, FILL));
+/* the Great Hall by night: the enchanted ceiling lights it a little, 0.12 in the night sky's tint (Design, 8.22 am) */
+var NIGHT_HALL = PLACE === 'great-hall' && PAINT_ON && FILL < 0.1;
+if (NIGHT_HALL) FILL = 0.12;
+var fillCol = new THREE.Color(0xcfd4dc);
+if (NIGHT_HALL) {   /* the night sky's hue at full strength, so 0.12 is a fill and not black: its tint's channels scaled to the brightest */
+  fillCol = new THREE.Color(window.CASTLE_TONES && CASTLE_TONES.lights.sky ? CASTLE_TONES.lights.sky.hex : '#27314f');
+  var top = Math.max(fillCol.r, fillCol.g, fillCol.b); fillCol.multiplyScalar(1 / top);
+}
+scene.add(new THREE.HemisphereLight(fillCol, 0x3a332c, FILL));
 var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && PLACE !== 'entrance-hall' ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
 scene.add(new THREE.AmbientLight(0xffffff, PAINT_ON ? 0.02 : 0.12));
 /* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
@@ -289,7 +297,7 @@ var HALL_LIGHT = (function () {
         m4.makeScale(1, 1.8, 1).setPosition(at.x, at.y + 0.15, at.z); fl.setMatrixAt(k, m4);
       });
       wax.raycast = fl.raycast = function () {}; fl.visible = state !== 'out'; g.add(wax); g.add(fl);
-      var k = state === 'gold' ? 2.0 : state === 'pale' ? 0.7 : 0;
+      var k = state === 'gold' ? 1.27 : state === 'pale' ? 0.7 : 0;   /* gold 0.7 a light, so dusk is never brighter than day (Design, 8.22 am) */
       [26, 36, 46, 56].forEach(function (x) { [55.5, 65.5].forEach(function (y) {
         var l = new THREE.PointLight(CANDLE.hex, k * CANDLE.gain, 24, 1.4); l.position.copy(P(x, y, 5.3)); scene.add(l);
       }); });
