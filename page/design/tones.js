@@ -36,15 +36,15 @@ window.CASTLE_TONES = {
    "say": "the marble staircase's treads and banisters (PS 7 L2317), a warm white"
   },
   "oak": {
-   "hex": "#6e4c30",
+   "hex": "#684e38",
    "say": "old oak: doors, panelling, rails from P5"
   },
   "oak-boards": {
-   "hex": "#7d5937",
+   "hex": "#765a40",
    "say": "broad oak boards, a step paler where feet wear them"
   },
   "oak-beams": {
-   "hex": "#5a3d26",
+   "hex": "#55402e",
    "say": "the beams and the roofs' open timbers, darker with age and smoke"
   },
   "iron": {
