@@ -537,10 +537,12 @@
        feast stood at 312 to 472, PS 17 L6481): the school's points grow with its days in term, slowly over Christmas and
        Easter with the school mostly away, and each house stands a little above or below that, by up to about an eighth,
        drawn fresh each week and eased from one week's to the next, so the four stay close, which one leads changes from
-       week to week, nothing in the hall naming it, and a glass now and then gives a little back. The summer holds the
-       feast week's. In the castles of the first three books Gryffindor's ends the year ahead, as the winner's hangings
-       at the feast say (great-hall.json); later years end as their weeks fall, held with the hangings (Godric's 2). In
-       points, as a slip's, for `LumosHourglass.hall({ levels, full })`; the boys' own slips heap on Gryffindor's. */
+       week to week, nothing in the hall naming it, and a glass now and then gives a little back. In the castles of the
+       first three books Gryffindor's ends the year ahead, as the winner's hangings at the feast say (great-hall.json),
+       its lead built over the last fortnight in ordinary weeks, never a swing; later years end as their weeks fall, held
+       with the hangings (Godric's 2). From the feast's day through the summer the glasses stand still at the year's
+       result, though the summer holds the feast week's earlier days (Kingsley's item 19, 19 October 2026: a trace
+       keeping its date, never the feast replayed; hall.json's shower and lift wait for term). In points, as a slip's, for `LumosHourglass.hall({ levels, full })`; the boys' own slips heap on Gryffindor's. */
     var LEVEL_FULL = 600, LEVEL_FEAST = 400, LEVEL_HOUSES = ['lion', 'badger', 'eagle', 'snake'], levelYears = {};
     function levelRun(y, fy) {
       var key = y + ':' + fy + ':' + feastDay(fy);
@@ -565,7 +567,8 @@
     }
     function schoolLevels() {
       var d = castleDay(), fy = schoolYear(isoDay(d)), run = levelRun(castleYear(), fy);
-      var i = Math.max(0, Math.min(run.length - 1, dayNumber(d) - dayNumber(new Date(fy - 1, 8, 1, 12)))), at = run[i], levels = {};
+      var i = summerNow() === 'yes' ? run.length - 1 : Math.max(0, Math.min(run.length - 1, dayNumber(d) - dayNumber(new Date(fy - 1, 8, 1, 12))));
+      var at = run[i], levels = {};
       LEVEL_HOUSES.forEach(function (h) { levels[h] = Math.round(at[h]); });
       return { levels: levels, full: LEVEL_FULL };
     }
