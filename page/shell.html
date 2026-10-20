@@ -2144,7 +2144,21 @@ function thingsDrawRoom(shown) {
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
 }
-function roomDraw(shown) { cupDrawRoom(shown); thingsDrawRoom(shown); }
+/* req 771 (Events' cues for Magic's 750, filch.json and staff.json, 059df40a; Godric's 2 on interiors-filch-inside-1020):
+   Filch's door. On the classroom corridor it stands a hand's width ajar, its way open into filchs-office, only while the
+   runtime shows the ajar string; otherwise shut, a shut door's shake (by night locked). From inside the office it stands
+   ajar and the way out is always open. The string stays in the note: the lamp turned low is not drawn */
+var FILCH_AJAR = "Filch's door left a hand's width ajar, the lamp inside turned low";
+var FDOOR = shell.doors.filter(function (d) { return d.id === 'filchs-office-door'; })[0] || null, filchOpen = false;
+function filchSet(open) {
+  if (!FDOOR || open === filchOpen) return;
+  filchOpen = open;
+  var h = FDOOR.hinge, a = open ? h.th : 0, m = FDOOR.mesh;
+  m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half); m.rotation.y = FDOOR.rest.rot + a;
+}
+if (PLACE === 'filchs-office') filchSet(true);
+function filchShown(shown) { if (PLACE === 'classroom-corridor') filchSet(shown.indexOf(FILCH_AJAR) >= 0); }
+function roomDraw(shown) { cupDrawRoom(shown); filchShown(shown); thingsDrawRoom(shown); }
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
    its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
 function knotSpots(d) {
@@ -2232,7 +2246,7 @@ function tap(cx, cy) {
     if (ch.length && (!hits.length || ch[0].distance <= hits[0].distance + 0.05)) { events.tap('corbel'); kit.tapped(true); return; }
   }
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
-  if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d, hits[0].point); acted = true; }
+  if (d && here === d.stand) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) {
     acted = goTo(d);
     /* req 550: walking up to an open way is its tap to the events (gun-room-arch's draught), since a second tap takes him through */
@@ -2497,6 +2511,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },
   stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
+  filch: function () { return { found: !!FDOOR, open: filchOpen }; },
   head: function () { var lm = limits(here); return { yaw: hy, pitch: hp, limit: lm.yaw, lo: lm.lo, hi: lm.hi, lim: here.lim }; },
   /* a stand by name at once, and the head set and held within its limits (the shots at both limits) */
   standNamed: function (n) {
