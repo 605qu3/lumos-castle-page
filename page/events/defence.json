@@ -1,6 +1,19 @@
 {
   "chain": "defence",
   "first_visit": [],
+  "places": {
+    "third floor ways": [
+      "third floor north corridor",
+      "defence passage"
+    ]
+  },
+  "marks": {
+    "thirdsuits": [
+      "home",
+      "left",
+      "right"
+    ]
+  },
   "room": [
     {
       "when": [
@@ -388,6 +401,201 @@
         "countless framed photographs of Lockhart shining on the walls, each moving: they beam, preen and wink at one another, a few signed"
       ],
       "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the office's photographs by day, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): nothing of the CoS 7 detention (no voice, no envelopes); CoS 7 L8924 (\"countless framed photographs of Lockhart. He had even signed a few of them\"), each moving (CoS 3 L7330, \"As always in the wizarding world, the photograph was moving\"), both read in the canon tool; they leave the office with him after the Chamber's date (29 May, the set-aside trunks' date), so to 29 May; by night `defence.rollers`"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets between the windows",
+        "the people in the portraits along the corridor awake, whispering and pointing as he passes"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: torches (Magic's 2.3; PS 7 L2317), \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651), both read in the canon tool, 20 October 2026; \"the windows\", not high, till Interiors' schedule says (req 769; Fawkes 12:49, 1.37 pm)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "the court's sky bright in the windows"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time != night",
+        "weather = cloudy"
+      ],
+      "show": [
+        "grey cloud passing in the windows"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time != night",
+        "weather = rain"
+      ],
+      "show": [
+        "rain streaming down the windows"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time != night",
+        "weather = snow"
+      ],
+      "show": [
+        "snow drifting past the windows"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "fog pressing white against the windows"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon != new"
+      ],
+      "show": [
+        "the corridor striped with bars of moonlight from the windows"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the real moon up on a clear night (as PS 9 L3229's corridors, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "the windows dark"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: by night, no moon up"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time = night",
+        "moon up = yes",
+        "weather != clear"
+      ],
+      "show": [
+        "the windows dark"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: by night, the moon behind cloud, rain, snow or fog"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon = new"
+      ],
+      "show": [
+        "the windows dark"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: by night, the new moon"
+    },
+    {
+      "when": [
+        "place = defence passage",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the passage has no windows or armour of its own, the torches alone (Interiors' docs/interiors/wave-3-ways.md, The words for Events, 6b9521be, cited)"
+    },
+    {
+      "when": [
+        "place = third floor ways",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, nobody about"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: by night the passage empty (Magic's 2.3)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "time = night"
+      ],
+      "show": [
+        "the people in the portraits asleep in their frames, a soft snore here and there"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: by night the portraits asleep (Magic's 1.3)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "third_suits = home"
+      ],
+      "show": [
+        "the suits of armour along the corridor's wall, each on its own place"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the armour as in every corridor (Magic's 1.5; \"Harry was sure the coats of armor could walk\" (PS 8 L2722, read in the canon tool, 20 October 2026)); how many and where Interiors' (req 769)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "third_suits = left"
+      ],
+      "show": [
+        "the suits of armour along the corridor's wall, each a step to its own left of its place, as if it had shifted since he last came"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the armour as in every corridor (Magic's 1.5; \"Harry was sure the coats of armor could walk\" (PS 8 L2722, read in the canon tool, 20 October 2026)); how many and where Interiors' (req 769)"
+    },
+    {
+      "when": [
+        "place = third floor north corridor",
+        "third_suits = right"
+      ],
+      "show": [
+        "the suits of armour along the corridor's wall, each a step to its own right of its place, as if it had shifted since he last came"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the armour as in every corridor (Magic's 1.5; \"Harry was sure the coats of armor could walk\" (PS 8 L2722, read in the canon tool, 20 October 2026)); how many and where Interiors' (req 769)"
+    },
+    {
+      "when": [
+        "place = defence passage",
+        "year <= 1"
+      ],
+      "show": [
+        "a strong smell of garlic reaching the passage's mouth, growing stronger towards the classroom door"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the Stone's castle only, \"His classroom smelled strongly of garlic\" (PS 8 L2742, read in the canon tool, 20 October 2026; defence.json's year <= 1 room, on Kingsley's conditions); nothing of the turban or what it hid"
+    },
+    {
+      "when": [
+        "place = defence passage",
+        "year >= 2"
+      ],
+      "show": [
+        "the Defence passage quiet and plain"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: from the Chamber's castle on, the room kept by the year's teacher (defence.json's rows)"
     }
   ],
   "records": [
@@ -615,6 +823,233 @@
         "place = defence classroom",
         "year = 2",
         "castle date < 2 05-30"
+      ],
+      "starts": []
+    },
+    {
+      "id": "defence.third-shift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = third floor north corridor"
+      ],
+      "starts": [
+        "set third_suits = mark thirdsuits, not last"
+      ],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the suits a step from where they stood last visit"
+    },
+    {
+      "id": "defence.third-bell-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 09:00",
+      "when": [
+        "place = third floor north corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons; the last pupils hurry up the Defence passage, and the corridor empties and goes quiet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "defence.third-bell-noon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 12:30",
+      "when": [
+        "place = third floor north corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings and the Defence passage spills pupils into the corridor, heading for the stair"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "defence.third-bell-afternoon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 13:30",
+      "when": [
+        "place = third floor north corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons; the last pupils hurry up the Defence passage, and the corridor empties and goes quiet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "defence.third-bell-evening",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 18:00",
+      "when": [
+        "place = third floor north corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings and the Defence passage spills pupils into the corridor, heading for the stair"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "defence.third-stairs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "third-stairs",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = third floor north corridor"
+      ],
+      "show": [
+        "behind him where the corridor leaves the stair hall, the grinding of a moving stair swinging to another landing, and settling"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the moving stairs heard (Magic's 1.1); about one visit in two"
+    },
+    {
+      "id": "defence.third-stairs-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "third-stairs",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = third floor north corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "defence.garlic-noses",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-garlic-noses",
+      "weight": 1,
+      "moment": "wait 20-120 s",
+      "when": [
+        "place = defence passage",
+        "year <= 1",
+        "time != night"
+      ],
+      "show": [
+        "two pupils holding their noses as they go in at the classroom door"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: pupils hold their noses going in, ours, comic; the Stone's castle only; about one visit in three"
+    },
+    {
+      "id": "defence.garlic-noses-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-garlic-noses",
+      "weight": 2,
+      "moment": "wait 20-120 s",
+      "when": [
+        "place = defence passage",
+        "year <= 1",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "defence.third-ghost",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "third-ghost",
+      "weight": 1,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = third floor north corridor"
+      ],
+      "show": [
+        "a pearly-white, slightly transparent ghost glides along the corridor in its own pale light and through the wall"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: the ghosts now and then (Magic's 1.6; \"Pearly-white and slightly transparent\", PS 7 L2343, read in the canon tool, 20 October 2026); about one visit in four"
+    },
+    {
+      "id": "defence.third-ghost-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "third-ghost",
+      "weight": 3,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = third floor north corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "defence.third-peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "third-peeves",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = third floor north corridor"
+      ],
+      "show": [
+        "a rattle of armour from round a corner, as if something unseen had gone zooming past it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 767 (docs/magic/rooms.md, The third floor's corridor and the Defence passage), every year: Peeves now and then, unseen (Magic's 1.7; \"rattling coats of armor as he passed\", PS 7 L2669, read in the canon tool, 20 October 2026); about one visit in four"
+    },
+    {
+      "id": "defence.third-peeves-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "third-peeves",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = third floor north corridor"
       ],
       "starts": []
     }

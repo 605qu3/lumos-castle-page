@@ -186,6 +186,36 @@
         "\"pitch-black and very eerie\", eased: the windows' sky the only light; nothing moves"
       ],
       "canon": "Magic's req 657 (docs/handoff/magic.md, The library), every year: by night, the small hours"
+    },
+    {
+      "when": [
+        "place = library corridor",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets",
+        "the library door shut; pupils going in with bags and coming out with armfuls of books, quiet before they reach it"
+      ],
+      "canon": "Magic's req 764 (docs/magic/rooms.md, The library's corridor), every year: the library's door in its hours (Magic's 2.3 for the torches); the pupils People's; no windows, the torches alone (Interiors' docs/interiors/wave-3-ways.md, The words for Events, 6b9521be, cited)"
+    },
+    {
+      "when": [
+        "place = library corridor"
+      ],
+      "show": [
+        "the unused classroom's door shut, plain"
+      ],
+      "canon": "Magic's req 764 (docs/magic/rooms.md, The library's corridor), every year: the unused classroom's door (Interiors' docs/interiors/mirror-classroom.md and mirror.json, cited); nothing of PS 12's night"
+    },
+    {
+      "when": [
+        "place = library corridor",
+        "time = night"
+      ],
+      "show": [
+        "the torches only; the library door shut, dark under it"
+      ],
+      "canon": "Magic's req 764 (docs/magic/rooms.md, The library's corridor), every year: by night"
     }
   ],
   "records": [
@@ -396,6 +426,100 @@
       "when": [
         "place = library",
         "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "library.corridor-hush",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-corridor-hush",
+      "weight": 1,
+      "moment": "wait 20-120 s",
+      "when": [
+        "place = library corridor",
+        "time != night"
+      ],
+      "show": [
+        "the library door opens for a pupil and lets out the library's own hush, and shuts"
+      ],
+      "starts": [],
+      "canon": "Magic's req 764 (docs/magic/rooms.md, The library's corridor), every year: now and then the library's own hush through its door (the library's table); about one visit in three"
+    },
+    {
+      "id": "library.corridor-hush-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-corridor-hush",
+      "weight": 2,
+      "moment": "wait 20-120 s",
+      "when": [
+        "place = library corridor",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "library.corridor-armour",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-corridor-armour",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = library corridor",
+        "time != night"
+      ],
+      "show": [
+        "a visor creaks on the tall suit of armour after he has passed"
+      ],
+      "starts": [],
+      "canon": "Magic's req 764 (docs/magic/rooms.md, The library's corridor), every year: the tall armour (the model, ledger line 24) as Magic's 1.5, a creak after he has passed, never more; about one visit in two"
+    },
+    {
+      "id": "library.corridor-armour-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-corridor-armour",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = library corridor",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "library.corridor-stairs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-corridor-stairs",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = library corridor"
+      ],
+      "show": [
+        "behind him at the landing, the grinding of a moving stair swinging to another landing, and settling"
+      ],
+      "starts": [],
+      "canon": "Magic's req 764 (docs/magic/rooms.md, The library's corridor), every year: the stair hall's moving stairs heard at the landing (Magic's 1.1); about one visit in two"
+    },
+    {
+      "id": "library.corridor-stairs-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "library-corridor-stairs",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = library corridor"
       ],
       "starts": []
     }

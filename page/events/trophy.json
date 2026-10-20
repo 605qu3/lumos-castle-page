@@ -1,6 +1,13 @@
 {
   "chain": "trophy",
   "first_visit": [],
+  "marks": {
+    "gallerysuits": [
+      "two",
+      "gauntlet",
+      "helmet"
+    ]
+  },
   "room": [
     {
       "when": [
@@ -266,6 +273,107 @@
         "Filch at a case with his tin and cloth, polishing the silver, his back to the room"
       ],
       "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: the evening, now and then Filch at his polishing (People's figure); ours: Filch polishes on some evenings by his own business (Interiors' Occupancy; \"polishing the silver in the trophy room\", CoS 7 L8902, everyday, read in the canon tool, 20 October 2026), Tuesday and Friday, provisional, Magic to confirm"
+    },
+    {
+      "when": [
+        "place = armour gallery"
+      ],
+      "show": [
+        "the suits of armour along the gallery's walls, standing still on their plinths while he looks",
+        "the gallery giving back his footsteps from far down its length"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: both long walls lined with suits, fifteen on plinths (Interiors), still while he looks (Magic's 1.5; \"Harry was sure the coats of armor could walk\" (PS 8 L2722, read in the canon tool, 20 October 2026)); the echo ours"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "time != night",
+        "time != evening"
+      ],
+      "show": [
+        "torches burning in their brackets between the suits"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: no windows, the torches carry it (Interiors)"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "time = evening"
+      ],
+      "show": [
+        "torches burning low in their brackets between the suits"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: by evening the torches low (Interiors' Occupancy)"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, burning low between the suits, the suits' shapes black against them"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: by night (Magic's 2.3); no creak at all by night"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "gallery_suits = two"
+      ],
+      "show": [
+        "two of the suits standing a step from where they stood last visit"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: on each visit one or two moved (Magic's 1.5, ours); none walks in his sight"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "gallery_suits = gauntlet"
+      ],
+      "show": [
+        "a gauntlet shifted on its halberd since he last came"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: on each visit one or two moved (Magic's 1.5, ours); none walks in his sight"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "gallery_suits = helmet"
+      ],
+      "show": [
+        "a helmet turned a little towards the trophy room's door since he last came"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: on each visit one or two moved (Magic's 1.5, ours); none walks in his sight"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "castle date >= 1 09-15"
+      ],
+      "show": [
+        "the west wall's suit standing a little out of true on its plinth, its breastplate dented low on the left, its left gauntlet wired back on at the wrist with a twist of iron wire"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: the trace (\"toppled right into a suit of armor\", PS 9 L3243, Interiors' cite), from the day after the latest the PS 9 Thursday can fall (the flying lesson's Thursday, \"Flying lessons would be starting on Thursday\", PS 9 L2915, read in the canon tool, 20 October 2026, after the first week, so the second Thursday of September, the 14th at the latest), every later year; Filch's wire ours; nothing tells how, it never falls"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "occasion = christmas"
+      ],
+      "show": [
+        "mysterious lights shining from inside every suit of armour, the whole gallery lit from inside its visors"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: \"mysterious lights shone from inside every suit of armour\" (PoA 11 L17727, read in the canon tool, 20 October 2026), every year, their light their own"
+    },
+    {
+      "when": [
+        "place = armour gallery",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "mysterious lights shining from inside every suit of armour, the whole gallery lit from inside its visors"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: \"mysterious lights shone from inside every suit of armour\" (PoA 11 L17727, read in the canon tool, 20 October 2026), every year, their light their own"
     }
   ],
   "records": [
@@ -415,6 +523,115 @@
         "set trophy_polish = no"
       ],
       "canon": "Magic's req 692 (docs/handoff/magic.md, The trophy room; Fawkes's 1, 6.43 am), every year: his polishing that evening's alone"
+    },
+    {
+      "id": "trophy.gallery-shift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = armour gallery"
+      ],
+      "starts": [
+        "set gallery_suits = mark gallerysuits, not last"
+      ],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: one or two moved each visit"
+    },
+    {
+      "id": "trophy.gallery-creak",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-creak",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = armour gallery",
+        "time != night"
+      ],
+      "show": [
+        "a visor creaks somewhere behind him after he has passed"
+      ],
+      "starts": [],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: a visor creak behind him (Magic's 1.5); never by night; about one visit in two"
+    },
+    {
+      "id": "trophy.gallery-creak-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-creak",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = armour gallery",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "trophy.gallery-clink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-clink",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = armour gallery",
+        "time != night"
+      ],
+      "show": [
+        "a clink from far down the gallery, as if a suit had settled"
+      ],
+      "starts": [],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: the echo's clink in answer, ours; about one visit in three"
+    },
+    {
+      "id": "trophy.gallery-clink-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-clink",
+      "weight": 2,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = armour gallery",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "trophy.gallery-peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-peeves",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = armour gallery"
+      ],
+      "show": [
+        "a run of clanks down one wall as something unseen rattles the suits, a cackle, then quiet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 761 (docs/magic/rooms.md, The armour gallery; Interiors' docs/interiors/armour-gallery.md, req 763, 8085ec63, cited), every year: Peeves rattling the suits (Magic's 1.7; PS 7 L2669, read in the canon tool, 20 October 2026), never at him; about one visit in four"
+    },
+    {
+      "id": "trophy.gallery-peeves-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gallery-peeves",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = armour gallery"
+      ],
+      "starts": []
     }
   ]
 }

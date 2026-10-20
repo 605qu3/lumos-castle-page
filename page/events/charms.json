@@ -1,6 +1,19 @@
 {
   "chain": "charms",
   "first_visit": [],
+  "places": {
+    "charms ways": [
+      "charms corridor",
+      "charms passage"
+    ]
+  },
+  "marks": {
+    "charmssuits": [
+      "home",
+      "left",
+      "right"
+    ]
+  },
   "room": [
     {
       "when": [
@@ -111,6 +124,210 @@
         "the fairies asleep along the cornice, their light low"
       ],
       "canon": "as above, through the holidays to Twelfth Night"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets between the windows",
+        "the people in the portraits along the corridor awake, whispering and pointing as he passes"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: torches (Magic's 2.3; PS 7 L2317), \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651), both read in the canon tool, 20 October 2026; \"the windows\", not high, till Interiors' schedule says (Fawkes 12:49, 1.37 pm), Interiors' schedule to come (req 760)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "the court's sky bright in the windows"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time != night",
+        "weather = cloudy"
+      ],
+      "show": [
+        "grey cloud passing in the windows"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time != night",
+        "weather = rain"
+      ],
+      "show": [
+        "rain streaming down the windows"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time != night",
+        "weather = snow"
+      ],
+      "show": [
+        "snow drifting past the windows"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "fog pressing white against the windows"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon != new"
+      ],
+      "show": [
+        "the corridor striped with bars of moonlight from the windows"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: \"corridors striped with bars of moonlight from the high windows\" (PS 9 L3229, read in the canon tool, 20 October 2026), the real moon up on a clear night"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "the windows dark"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night, no moon up"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time = night",
+        "moon up = yes",
+        "weather != clear"
+      ],
+      "show": [
+        "the windows dark"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night, the moon behind cloud, rain, snow or fog"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon = new"
+      ],
+      "show": [
+        "the windows dark"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night, the new moon"
+    },
+    {
+      "when": [
+        "place = charms passage",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the passage has no windows or armour of its own, the torches alone (Interiors' docs/interiors/wave-3-ways.md, The words for Events, 6b9521be, cited)"
+    },
+    {
+      "when": [
+        "place = charms ways",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, nobody about"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night the passage empty (Magic's 2.3)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time = night"
+      ],
+      "show": [
+        "the people in the portraits asleep in their frames, a soft snore here and there"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night the portraits asleep (Magic's 1.3)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "charms_suits = home"
+      ],
+      "show": [
+        "the suits of armour along the corridor's wall, each on its own place"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the armour as in every corridor (Magic's 1.5; \"Harry was sure the coats of armor could walk\", PS 8 L2722, read in the canon tool, 20 October 2026); how many and where Interiors' (req 760)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "charms_suits = left"
+      ],
+      "show": [
+        "the suits of armour along the corridor's wall, each a step to its own left of its place, as if it had shifted since he last came"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the armour as in every corridor (Magic's 1.5; \"Harry was sure the coats of armor could walk\", PS 8 L2722, read in the canon tool, 20 October 2026); how many and where Interiors' (req 760)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "charms_suits = right"
+      ],
+      "show": [
+        "the suits of armour along the corridor's wall, each a step to its own right of its place, as if it had shifted since he last came"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the armour as in every corridor (Magic's 1.5; \"Harry was sure the coats of armor could walk\", PS 8 L2722, read in the canon tool, 20 October 2026); how many and where Interiors' (req 760)"
+    },
+    {
+      "when": [
+        "place = charms corridor"
+      ],
+      "show": [
+        "the oak door shut across the corridor's end, locked"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the end door (the model's forbidden-door; its tap Interaction's §6); behind it nothing, in any year, no sound from it"
+    },
+    {
+      "when": [
+        "place = charms passage",
+        "lessons = on"
+      ],
+      "show": [
+        "through the Charms classroom's door a laugh, a squeak, a small clatter"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: in lesson time, the Charms table's busy air"
+    },
+    {
+      "when": [
+        "place = charms passage",
+        "lessons = off"
+      ],
+      "show": [
+        "the Charms door shut, the passage quiet"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: out of lesson time"
     }
   ],
   "records": [
@@ -348,6 +565,265 @@
         "place = charms classroom",
         "date <= 01-06",
         "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.corridor-suits",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = charms corridor"
+      ],
+      "starts": [
+        "set charms_suits = mark charmssuits, not last"
+      ],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the suits a step from where they stood last visit"
+    },
+    {
+      "id": "charms.corridor-bell-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 09:00",
+      "when": [
+        "place = charms corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons; the last pupils hurry up the Charms passage, and the corridor empties and goes quiet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "charms.corridor-bell-noon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 12:30",
+      "when": [
+        "place = charms corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings and the Charms passage spills pupils into the corridor, heading for the stair"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "charms.corridor-bell-afternoon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 13:30",
+      "when": [
+        "place = charms corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons; the last pupils hurry up the Charms passage, and the corridor empties and goes quiet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "charms.corridor-bell-evening",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 18:00",
+      "when": [
+        "place = charms corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings and the Charms passage spills pupils into the corridor, heading for the stair"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the bells' spilling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "charms.corridor-stairs",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-stairs",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = charms corridor"
+      ],
+      "show": [
+        "behind him at the gallery's mouth, the grinding of a moving stair swinging to another landing, and settling"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the stairs heard at the gallery's mouth (Magic's 1.1; the stair hall's table); about one visit in two"
+    },
+    {
+      "id": "charms.corridor-stairs-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-stairs",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = charms corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.corridor-turn-back",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-turn",
+      "weight": 1,
+      "moment": "wait 20-120 s",
+      "when": [
+        "place = charms corridor",
+        "year <= 1",
+        "time != night"
+      ],
+      "show": [
+        "two pupils coming along the corridor glance at the end door and turn back well short of it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: in the Stone's castle the corridor beyond \"out of bounds to everyone who does not wish to die a very painful death\" (PS 7 L2605, read in the canon tool, 20 October 2026), said to the whole school; pupils turn back short of it; about one visit in three"
+    },
+    {
+      "id": "charms.corridor-turn-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-turn",
+      "weight": 2,
+      "moment": "wait 20-120 s",
+      "when": [
+        "place = charms corridor",
+        "year <= 1",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.passage-button",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-passage-button",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = charms passage",
+        "lessons = on"
+      ],
+      "show": [
+        "a button that skidded too far rolls out of the Charms door, along the passage, and stops by his foot"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: now and then in lesson time, ours, comic; it never flies at him; about one visit in three"
+    },
+    {
+      "id": "charms.passage-button-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-passage-button",
+      "weight": 2,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = charms passage",
+        "lessons = on"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.corridor-ghost",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-ghost",
+      "weight": 1,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = charms corridor"
+      ],
+      "show": [
+        "a pearly-white, slightly transparent ghost glides along the corridor in its own pale light and through the wall"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the ghosts now and then (Magic's 1.6; PS 7 L2343, read in the canon tool, 20 October 2026); about one visit in four"
+    },
+    {
+      "id": "charms.corridor-ghost-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-ghost",
+      "weight": 3,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = charms corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.corridor-peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-peeves",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = charms corridor"
+      ],
+      "show": [
+        "a rattle of armour from round a corner, as if something unseen had gone zooming past it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: Peeves now and then, unseen (Magic's 1.7; PS 7 L2669, read in the canon tool, 20 October 2026); about one visit in four"
+    },
+    {
+      "id": "charms.corridor-peeves-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-corridor-peeves",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = charms corridor"
       ],
       "starts": []
     }
