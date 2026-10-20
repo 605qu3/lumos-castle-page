@@ -8,9 +8,37 @@
         "year >= 3"
       ],
       "show": [
-        "a lesson under way: Professor Trelawney in her winged armchair or drifting between the little tables, a class in the chintz armchairs and pouffes"
+        "a lesson under way: Professor Trelawney in her winged armchair or drifting between the little tables, the boys' own little table theirs",
+        "a few chipped and mended cups pushed to the back of the teacups' middle shelf, behind the blue patterned ones",
+        "a dustpan and brush on the floor at the foot of the teacups' shelf",
+        "stiflingly warm, the fire under the crowded mantelpiece giving off a heavy, sickly sort of perfume as it heats a large, copper kettle",
+        "a faint perfumed haze hanging in the room",
+        "everything lit with a dim, crimson light, the curtains at the windows all closed and the many lamps draped with dark red scarves, stirring a little in the warm air",
+        "countless silvery crystal balls among the feathers, candle stubs, tattered playing cards and teacups on the shelves, glinting in the firelight"
       ],
-      "canon": "Interiors' req 444 (docs/interiors/divination-classroom.md, Occupancy; its Rework 9) and the change list's New work: his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock; Fawkes, 3.29 pm, on Events' Q1), so 444's \"by day in term\" reads for the other pupils only; Divination an elective, open from the Azkaban castle on (world rules, Classes); her chair PoA 6 L15290, PoA 15 L19305; the lesson's content the Timetable's; checked against the text, 15 October 2026"
+      "canon": "Interiors' req 444 (docs/interiors/divination-classroom.md, Occupancy; its Rework 9) and the change list's New work: his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock; Fawkes, 3.29 pm, on Events' Q1), so 444's \"by day in term\" reads for the other pupils only; Divination an elective, open from the Azkaban castle on (world rules, Classes); her chair PoA 6 L15290, PoA 15 L19305; the lesson's content the Timetable's; checked against the text, 15 October 2026; split as electives.json (req 799, the opening's rule): his own lesson whenever he walks in (Interiors' Occupancy), the class only while lessons are on; Interiors' req 444 (a few chipped and mended cups; the dustpan and brush; undated, from the Azkaban castle on): PoA 6 L15318, \"a tinkle of breaking china\", \"a dustpan and brush\", \"One of the blue ones\"; no cup named as anyone's, the pink cup's pieces a trace of their own (the rule after this); checked against the text, 15 October 2026; Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: \"stiflingly warm\", the fire \"under the crowded mantelpiece\" giving off \"a heavy, sickly sort of perfume as it heated a large, copper kettle\", \"a dim, crimson light; the curtains at the windows were all closed, and the many lamps were draped with dark red scarves\", the shelves' \"countless silvery crystal balls\" (PoA 6 L15276), \"The heavily perfumed smoke\" (L15324), read in the canon tool, 20 October 2026; the haze, the scarves stirring and the glint ours; the fire at every hour (Magic's 2.3); the windows never show the sky (Magic's 2.4 kept out)"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3",
+        "lessons = on"
+      ],
+      "show": [
+        "a class in the chintz armchairs and pouffes at the other tables"
+      ],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: the other pupils by day in term (Interiors' Occupancy, cited); \"little chintz armchairs and fat little pouffes\" (PoA 6 L15276, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3",
+        "lessons = off"
+      ],
+      "show": [
+        "the other tables bare, the crystal balls dim on their shelves, the room still warm"
+      ],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on, out of lessons: evening, night and holidays the other tables bare (Interiors' Occupancy, cited); the balls dim, the room still warm (ours, Magic's row)"
     },
     {
       "when": [
@@ -19,7 +47,6 @@
         "date >= 09-01"
       ],
       "show": [
-        "a teacup on its saucer at each place on every little table",
         "the largest silver teapot on her table"
       ],
       "canon": "Interiors' req 444 (the tables' things; her table): PoA 6 L15300, \"This first term will be devoted to reading the tea leaves\"; the teapot L15308 to L15310, the cups L15316; so the tea-leaf lesson from September to Christmas (ours, by the book's terms); checked against the text, 15 October 2026"
@@ -28,24 +55,53 @@
       "when": [
         "place = divination classroom",
         "year >= 3",
-        "date >= 05-01",
-        "date <= 08-31"
+        "date >= 09-01",
+        "lessons = on"
       ],
       "show": [
-        "a crystal ball full of pearly white mist on every little table"
+        "a teacup on its saucer at each place on every little table"
       ],
-      "canon": "Interiors' req 444: PoA 6 L15304, \"In the summer term ... we shall progress to the crystal ball\"; PoA 15 L19297 to L19305, a crystal ball \"full of pearly white mist\" on every table, mist only, never a glow (the Ministry's rework of req 395; world rules, nothing announces itself); from May, after the Easter holidays (ours), to the leaving feast and the summer hold's feast week; between, the palmistry term, the tables bare of things (PoA 6 L15300); checked against the text, 15 October 2026"
+      "canon": "Interiors' req 444 (the tables' things; her table): PoA 6 L15300, \"This first term will be devoted to reading the tea leaves\"; the teapot L15308 to L15310, the cups L15316; so the tea-leaf lesson from September to Christmas (ours, by the book's terms); checked against the text, 15 October 2026; the class's places while lessons are on (req 799)"
     },
     {
       "when": [
         "place = divination classroom",
-        "year >= 3"
+        "year >= 3",
+        "date >= 09-01",
+        "lessons = off"
       ],
       "show": [
-        "a few chipped and mended cups pushed to the back of the teacups' middle shelf, behind the blue patterned ones",
-        "a dustpan and brush on the floor at the foot of the teacups' shelf"
+        "a teacup on its saucer at each of the boys' own places"
       ],
-      "canon": "Interiors' req 444 (a few chipped and mended cups; the dustpan and brush; undated, from the Azkaban castle on): PoA 6 L15318, \"a tinkle of breaking china\", \"a dustpan and brush\", \"One of the blue ones\"; no cup named as anyone's, the pink cup's pieces a trace of their own (the rule after this); checked against the text, 15 October 2026"
+      "canon": "Interiors' req 444 (the tables' things; her table): PoA 6 L15300, \"This first term will be devoted to reading the tea leaves\"; the teapot L15308 to L15310, the cups L15316; so the tea-leaf lesson from September to Christmas (ours, by the book's terms); checked against the text, 15 October 2026; out of lessons only the boys' own (req 799, Interiors' Occupancy)"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3",
+        "date >= 05-01",
+        "date <= 08-31",
+        "lessons = on"
+      ],
+      "show": [
+        "a crystal ball full of pearly white mist on every little table",
+        "the mist turning slowly in each crystal ball, lighting the faces bent over it, showing nothing to anyone"
+      ],
+      "canon": "Interiors' req 444: PoA 6 L15304, \"In the summer term ... we shall progress to the crystal ball\"; PoA 15 L19297 to L19305, a crystal ball \"full of pearly white mist\" on every table, mist only, never a glow (the Ministry's rework of req 395; world rules, nothing announces itself); from May, after the Easter holidays (ours), to the leaving feast and the summer hold's feast week; between, the palmistry term, the tables bare of things (PoA 6 L15300); checked against the text, 15 October 2026; Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: \"Glowing on every little table was a crystal ball full of pearly white mist\" (PoA 15 L19297), faces lit by it (L19303), read in the canon tool, 20 October 2026; it shows nothing to anyone, a boy's included (nothing foretold)"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3",
+        "date >= 05-01",
+        "date <= 08-31",
+        "lessons = off"
+      ],
+      "show": [
+        "a crystal ball full of pearly white mist on the boys' own little table",
+        "the mist turning slowly in the crystal ball, showing nothing"
+      ],
+      "canon": "Interiors' req 444: PoA 6 L15304, \"In the summer term ... we shall progress to the crystal ball\"; PoA 15 L19297 to L19305, a crystal ball \"full of pearly white mist\" on every table, mist only, never a glow (the Ministry's rework of req 395; world rules, nothing announces itself); from May, after the Easter holidays (ours), to the leaving feast and the summer hold's feast week; between, the palmistry term, the tables bare of things (PoA 6 L15300); checked against the text, 15 October 2026; out of lessons only the boys' own (req 799, Interiors' Occupancy); nothing foretold"
     },
     {
       "when": [
@@ -56,7 +112,77 @@
         "the broken pieces of a pink teacup on the saucer at one place of a little table"
       ],
       "canon": "Interiors' req 444, its line of 15 October 2026, 4.09 pm (Godric's t1 on interiors-divination-tables-1014): PoA 6 L15316, after a first cup is broken, \"one of the blue patterned ones? I'm rather attached to the pink\", and L15362, a cup smashed in that lesson; its table nameless and never Neville's place (Interiors' place, docs/interiors/divination-classroom.md); a trace from 2 September of the Azkaban castle, the first lesson, and every later year; checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = north tower landing"
+      ],
+      "show": [
+        "overhead, a circular trapdoor in the ceiling with a brass plaque on it: Sybill Trelawney, Divination teacher",
+        "no doors off this tiny landing"
+      ],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: \"a tiny landing\", \"no doors off this landing\", \"a circular trap door with a brass plaque on it\", \"Sybill Trelawney, Divination teacher\" (PoA 6 L15268, L15270, read in the canon tool, 20 October 2026); in every year, an everyday thing a later book names first (Kingsley's rule of 16 October)"
+    },
+    {
+      "when": [
+        "place = north tower landing",
+        "year <= 2"
+      ],
+      "show": [
+        "the trapdoor shut, and nothing comes down"
+      ],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: before the PoA castle the trapdoor stays shut and nothing here plays (Magic's table)"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "divination.trapdoor",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = north tower landing",
+        "year >= 3"
+      ],
+      "show": [
+        "the trapdoor suddenly opens, and a silvery ladder descends right at his feet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: \"As though in answer to his question, the trap door suddenly opened, and a silvery ladder descended right at Harry's feet\" (PoA 6 L15272, read in the canon tool, 20 October 2026); as he arrives, no one seen above (Magic's 1.2); every visit, in lessons or out"
+    },
+    {
+      "id": "divination.kettle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "divination-kettle",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = divination classroom",
+        "year >= 3"
+      ],
+      "show": [
+        "the copper kettle's lid lifts and rattles on the fire, and a puff of perfumed steam drifts into the crimson light"
+      ],
+      "starts": [],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: the kettle's lid lifting now and then (ours, Magic's row; the kettle PoA 6 L15276); about one visit in three"
+    },
+    {
+      "id": "divination.kettle-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "divination-kettle",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = divination classroom",
+        "year >= 3"
+      ],
+      "starts": []
+    }
+  ]
 }
