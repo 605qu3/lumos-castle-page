@@ -155,7 +155,9 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
 <script src="castle-model.js?v=385"></script>
-<script src="castle-shell.js?v=27"></script>
+<script src="castle-paint.js?v=1"></script>
+<script src="design/tones.js?v=1"></script>
+<script src="castle-shell.js?v=28"></script>
 <script src="castle-events.js?v=38"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -165,6 +167,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 'use strict';
 
 var Q = new URLSearchParams(location.search);
+/* ?clean: the review shots' frame, the panels and buttons hidden so the room fills the phone (Design's ask, req 643) */
+if (Q.has('clean')) { var cs = document.createElement('style'); cs.textContent = '#hud, #help, #lines, #roomnote, #back { visibility: hidden !important; }'; document.head.appendChild(cs); }
 var PLACE = Q.get('place') || 'entrance-hall';
 /* a room's old id (its "alias" in the model) opens it under its own; a room the model marks "shell": "never" is
    model data only and is never built (the forbidden corridor behind its locked door: the Ministry's list, Rework 1) */
@@ -209,22 +213,95 @@ var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
 camera.far = 220; camera.updateProjectionMatrix();
 
 if (NEVER) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'This door stays shut.'; return; }
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE] }) : null;
+/* the places painted in plain tones (fawkes-materials-rollout-1020, 1: Godric's 7.37 am direction, 20 October 2026; the
+   first batch), each surface its row's in docs/architect/materials-by-room.md through page/castle-paint.js, the
+   colours Design's page/design/tones.js (req 643), provisional; the next batches join this list */
+var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall'];
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
 document.title = shell.place.name + ', a shell';
 
 /* grey light */
-scene.add(new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, 0.85));
-var sun = new THREE.DirectionalLight(0xfff1dc, 0.45); sun.position.set(-6, 14, 9); scene.add(sun);
+/* a painted place's flags took the grey sky light as near white: the sky light lower there, the torches and candles carrying the room */
+scene.add(new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, PAINTED.indexOf(PLACE) >= 0 ? 0.5 : 0.85));
+var sun = new THREE.DirectionalLight(0xfff1dc, PAINTED.indexOf(PLACE) >= 0 ? 0.15 : 0.45); sun.position.set(-6, 14, 9); scene.add(sun);
 scene.add(new THREE.AmbientLight(0xffffff, 0.12));
 /* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
    3.2 m, a quarter of the way in from each corner, so the walls take light and fall off */
+/* the real lights of the painted places (their rows' light in docs/architect/materials-by-room.md; Design's colours and
+   gains, page/design/tones.js, req 643): the Entrance Hall's torches in brackets where Interiors' schedule puts them
+   (docs/interiors/entrance-hall.md, The schedule, cited), a soot fan over each (docs/architect/materials.md, the stone's
+   condition); the Great Hall's floating candles as a plain field in Interiors' band (docs/interiors/great-hall.md, the
+   floating candles), pale by day, gold from dusk, out at night (lookup-q1-lit-1013), the sky's tone by the hour; the
+   stair hall keeps its plain lights in the torch's colour until Interiors places its torches. ?hour=0..23 for checks. */
+var TONE = window.CASTLE_TONES || null;
+function lightTone(k, fb) { var l = TONE && TONE.lights && TONE.lights[k]; return l ? { hex: parseInt(String(l.hex).replace('#', ''), 16), gain: l.gain } : fb; }
+var TORCH = lightTone('torch', { hex: 0xffc28a, gain: 1.0 }), CANDLE = lightTone('candle', { hex: 0xffb466, gain: 0.55 });
+var HOUR = Q.get('hour') != null ? +Q.get('hour') : new Date().getHours();
+var LIT_BY = {};   /* a place whose own lights replace the plain four */
+var HALL_LIGHT = (function () {
+  var out = { torches: [], candles: null };
+  shell.places.forEach(function (p) {
+    if (PAINTED.indexOf(p.id) < 0) return;
+    var g = new THREE.Group(); g.name = p.id + '-lights'; shell.group.add(g);
+    var P = function (x, y, z) { return shell.toLocal(x, y, p.floor + z); };
+    if (p.id === 'entrance-hall') {
+      LIT_BY[p.id] = true;
+      var iron = kit.solid(0x34312e), flame = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
+      var soot = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, depthWrite: false, alphaMap: (function () {   /* the fan: black, grey for its opacity, so it only darkens */
+        var c = document.createElement('canvas'); c.width = 64; c.height = 128; var x = c.getContext('2d');
+        x.fillStyle = '#000'; x.fillRect(0, 0, 64, 128); x.scale(1, 2);
+        var gr = x.createRadialGradient(32, 62, 1, 32, 62, 30); gr.addColorStop(0, 'rgb(190,190,190)'); gr.addColorStop(1, 'rgb(0,0,0)');
+        x.fillStyle = gr; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })() });
+      /* [x, y, the wall's inward normal]: west wall x 68, east x 92, north y 70 */
+      [[68, 66.5, [1, 0]], [68, 68.6, [1, 0]], [92, 52.5, [-1, 0]], [92, 56.0, [-1, 0]], [92, 62.5, [-1, 0]], [92, 68.6, [-1, 0]],
+       [74, 70, [0, -1]], [86, 70, [0, -1]]].forEach(function (t) {
+        var n = t[2], b = P(t[0] + n[0] * 0.15, t[1] + n[1] * 0.15, 2.45);
+        var arm = new THREE.Mesh(new THREE.BoxGeometry(n[0] ? 0.3 : 0.05, 0.05, n[1] ? 0.3 : 0.05), iron); arm.position.copy(b); g.add(arm);
+        var cup = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.04, 0.12, 10), iron); var cp = P(t[0] + n[0] * 0.3, t[1] + n[1] * 0.3, 2.55); cup.position.copy(cp); g.add(cup);
+        var head = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.45, 8), kit.solid(0x4a3a2a)); head.position.copy(cp); head.position.y -= 0.2; g.add(head);
+        var f = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), flame); f.scale.y = 2.0; f.position.copy(cp); f.position.y += 0.14; g.add(f);
+        var sp = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 1.2), soot), sw = P(t[0] + n[0] * 0.01, t[1] + n[1] * 0.01, 3.2);
+        sp.position.copy(sw); sp.rotation.y = n[0] ? (n[0] > 0 ? Math.PI / 2 : -Math.PI / 2) : (n[1] > 0 ? Math.PI : 0); g.add(sp);
+        var l = new THREE.PointLight(TORCH.hex, 1.1 * TORCH.gain, 16, 1.6); l.position.copy(cp); l.position.y += 0.3;
+        l.position.x += n[0] * 0.3; l.position.z -= n[1] * 0.3; scene.add(l);
+        out.torches.push({ flame: f, light: l });
+      });
+    }
+    if (p.id === 'great-hall') {
+      LIT_BY[p.id] = true;
+      var state = HOUR >= 22 || HOUR < 7 ? 'out' : HOUR >= 17 ? 'gold' : 'pale';
+      var seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+      var spots = [];
+      for (var i = 0; i < 420; i++) spots.push([22.5 + rnd() * 39, 52.5 + rnd() * 16, 5.0 + rnd() * 0.75]);   /* over the long tables */
+      for (var j = 0; j < 40; j++) spots.push([16.0 + rnd() * 4.5, 53.5 + rnd() * 14, 5.0 + rnd() * 0.75]);   /* over the staff table */
+      var wax = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.018, 0.018, 0.22, 6), kit.solid(0xefe6d2), spots.length);
+      var fl = new THREE.InstancedMesh(new THREE.SphereGeometry(0.03, 6, 5), new THREE.MeshBasicMaterial({ color: new THREE.Color(state === 'pale' ? 0xffe2b8 : 0xffc46a).convertSRGBToLinear() }), spots.length);
+      var m4 = new THREE.Matrix4();
+      spots.forEach(function (s, k) {
+        var at = P(s[0], s[1], s[2]); m4.makeTranslation(at.x, at.y, at.z); wax.setMatrixAt(k, m4);
+        m4.makeScale(1, 1.8, 1).setPosition(at.x, at.y + 0.15, at.z); fl.setMatrixAt(k, m4);
+      });
+      wax.raycast = fl.raycast = function () {}; fl.visible = state !== 'out'; g.add(wax); g.add(fl);
+      var k = state === 'gold' ? 2.0 : state === 'pale' ? 0.7 : 0;
+      [26, 36, 46, 56].forEach(function (x) { [55.5, 65.5].forEach(function (y) {
+        var l = new THREE.PointLight(CANDLE.hex, k * CANDLE.gain, 24, 1.4); l.position.copy(P(x, y, 5.3)); scene.add(l);
+      }); });
+      var sl = new THREE.PointLight(CANDLE.hex, k * CANDLE.gain, 14, 1.4); sl.position.copy(P(18.2, 60.5, 5.3)); scene.add(sl);
+      var sky = HOUR >= 7 && HOUR < 19 ? 'sky-day' : 'sky-night', sh = TONE && TONE.surfaces[sky] ? parseInt(TONE.surfaces[sky].hex.replace('#', ''), 16) : (sky === 'sky-day' ? 0xb8cde6 : 0x10141f);
+      shell.group.traverse(function (o) { if (o.isMesh && /^great-hall-ceiling/.test(o.name)) { o.material = new THREE.MeshBasicMaterial({ color: new THREE.Color(sh).convertSRGBToLinear(), side: THREE.DoubleSide }); } });
+      out.candles = { state: state, sky: sky, n: spots.length };
+    }
+  });
+  return out;
+})();
 shell.places.forEach(function (p, pi) {
+  if (LIT_BY[p.id]) return;
   var xs = p.poly.map(function (q) { return q[0]; }), ys = p.poly.map(function (q) { return q[1]; });
   var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
   [[0.25, 0.25], [0.75, 0.25], [0.75, 0.75], [0.25, 0.75]].forEach(function (f) {
-    var l = new THREE.PointLight(0xffc98a, pi ? 0.7 : 1.0, 26, 1.6);
+    var l = new THREE.PointLight(PAINTED.indexOf(p.id) >= 0 ? TORCH.hex : 0xffc98a, pi ? 0.7 : 1.0, 26, 1.6);
     l.position.copy(shell.toLocal(x0 + (x1 - x0) * f[0], y0 + (y1 - y0) * f[1], p.floor + 3.2));
     scene.add(l);
   });
