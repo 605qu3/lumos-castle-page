@@ -502,6 +502,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         });
       }
       if (CV) {
+        /* v40 (wave 5, floor B's places): ceilings.js lays a groin's piers over the plan's bounding box; in a plan not four
+           square (the gun casemate's ring) a pier stands only where its abacus is wholly inside the room, so none stands
+           in the drum's wall or the powder room beyond it */
+        if (Q.poly.length !== 4) {
+          var po = toLocal(0, 0, Q.floor);
+          CV.group.children.filter(function (o) { return o.name.indexOf(Q.id + '-pier-') === 0; }).forEach(function (o) {
+            var b = new THREE.Box3().setFromObject(o), px = (b.min.x + b.max.x) / 2 - po.x, py = po.z - (b.min.z + b.max.z) / 2, R = 0.6;
+            var ok = [[0, 0], [R, 0], [-R, 0], [0, R], [0, -R], [R, R], [R, -R], [-R, R], [-R, -R]].every(function (d) { return inPoly(Q.poly, px + d[0], py + d[1]); });
+            if (!ok) CV.group.remove(o);
+          });
+        }
         if (CV.flat) CV.group.position.y += 0.02;   /* beams under a flat ceiling bear 2 cm into it, never flush (the seams rule) */
         CV.group.traverse(function (o) { o.userData.owner = Q.id; }); group.add(CV.group);
       }
