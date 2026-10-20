@@ -130,7 +130,7 @@
      a cell the image's width over six, 1963 px a metre; a face's cell is chosen by its plane's UVs, so a state is one
      material and a swap is one assignment. In an awake place one or two of its faces (fixed by the place) doze */
   var FACES = { awake: 'corbels-faces.png', dozing: 'corbels-faces-dozing.png', sleeping: 'corbels-faces-sleeping.png' };
-  var FACE_ASPECT = 0.351 / 0.393, facesBase = '../assets/layers/', faceMats = {}, faceSets = {}, T3 = null;
+  var FACE_TILT = 0.35, FACE_ASPECT = 0.351 / 0.393, facesBase = '../assets/layers/', faceMats = {}, faceSets = {}, T3 = null;
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function faceMat(THREE, state) {
     T3 = THREE;
@@ -148,6 +148,14 @@
     (faceSets[id] = faceSets[id] || []).push(m);
     return m;
   }
+  /* the stone behind a bowed face, from its plane back to the corbel's upright face: a wedge, thin at the chin */
+  function wedge(THREE, w, h, tilt, mat) {
+    var sh = new THREE.Shape();
+    sh.moveTo(0, -h / 2); sh.lineTo(0.004, h / 2); sh.lineTo(h * Math.tan(tilt), h / 2); sh.lineTo(0, -h / 2);
+    var g = new THREE.ExtrudeGeometry(sh, { depth: w * 0.96, bevelEnabled: false });
+    g.translate(0, 0, -w * 0.48); g.rotateY(Math.PI / 2); g.translate(0, 0, -0.002);   /* the shape's x to the face's back (-z), its depth across the face */
+    return new THREE.Mesh(g, mat);
+  }
   /* CastleCeilings.corbels(id, state): a place's faces to 'awake', 'dozing' or 'sleeping'; returns how many it set */
   function corbels(id, state) {
     var F = faceSets[id] || [], n = F.length, h = hash(id), doze = n ? [h % n] : [];
@@ -161,7 +169,7 @@
   function beams(THREE, Q, B, mats) {
     var G = new THREE.Group(), alongX = B.x1 - B.x0 >= B.z1 - B.z0, L = alongX ? B.x1 - B.x0 : B.z1 - B.z0;
     var span = alongX ? B.z1 - B.z0 : B.x1 - B.x0, top = B.y + Q.ceiling - Q.floor, n = Math.max(1, Math.round(L / BEAM_STEP));
-    var bw = 0.28, bd = 0.36, cl = 0.42, ch = 0.32;
+    var bw = 0.28, bd = 0.36, cl = 0.42, ch = 0.42;
     faceSets[Q.id] = [];
     for (var i = 0; i < n; i++) {
       var t = (alongX ? B.x0 : B.z0) + (i + 0.5) * L / n, mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
@@ -171,8 +179,12 @@
         var c = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw + 0.08, ch, cl) : new THREE.BoxGeometry(cl, ch, bw + 0.08), mats.stone);
         var e = mid + s * (span / 2 - cl / 2);
         c.position.set(alongX ? t : e, top - bd - ch / 2, alongX ? e : t); c.name = Q.id + '-corbel-' + i + (s < 0 ? 'a' : 'b'); G.add(c);
-        var f = face(THREE, Q.id, 2 * i + (s < 0 ? 0 : 1), ch), o = e - s * (cl / 2 + 0.01);   /* 1 cm proud of its face to the room */
-        f.position.set(alongX ? t : o, top - bd - ch / 2, alongX ? o : t); f.rotation.y = alongX ? (s < 0 ? 0 : Math.PI) : -s * Math.PI / 2; G.add(f);
+        /* the head bows to the floor below, FACE_TILT, its chin 1 cm proud of its corbel's face to the room (Design's look at the
+           Architect's corridor shot, 20 October 2026: square to the room, a face under the beams read edge-on from below) */
+        var fh = ch - 0.02, f = face(THREE, Q.id, 2 * i + (s < 0 ? 0 : 1), fh), o = e - s * (cl / 2 + 0.01 + fh / 2 * Math.sin(FACE_TILT));
+        f.position.set(alongX ? t : o, top - bd - ch / 2, alongX ? o : t); f.rotation.order = 'YXZ'; f.rotation.x = FACE_TILT;
+        f.rotation.y = alongX ? (s < 0 ? 0 : Math.PI) : -s * Math.PI / 2; G.add(f);
+        var w = wedge(THREE, fh * FACE_ASPECT, fh, FACE_TILT, mats.stone); w.position.copy(f.position); w.rotation.copy(f.rotation); G.add(w);
       });
     }
     corbels(Q.id, 'awake');
