@@ -51,10 +51,64 @@
         "place = charms classroom"
       ],
       "show": [
-        "a lesson under way: Professor Flitwick perched on his pile of books behind his desk, the pupils in pairs at their desks",
-        "a pineapple sitting on a front-row desk"
+        "a lesson under way: Professor Flitwick perched on his pile of books behind his desk, the boys' desk theirs with the lesson's things out",
+        "a pineapple sitting on a front-row desk",
+        "the windows on his left, their light over the desks, the real sky",
+        "the chandelier's plain iron ring of candles hanging over the clear floor before the desks"
       ],
-      "canon": "the change list's Rework 9 and New work (a lesson under way in every open classroom): his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock: \"Lessons run whenever they visit, weekends included\"; Fawkes, 3.29 pm, on Events' Q1); `lessons` stays the castle's own timetable for the other pupils; the Charms classroom open in every castle; Flitwick on his pile of books, PS 10 L3506 (\"perched on top of his pile of books as usual\"); the pineapple a lesson consequence (the touch review's KEEP of charms-q11-pineapple-1013 t1), from PS 16 L5460's exam, never the exam itself and on no named desk (the exam's desk set aside, docs/ministry/set-aside.md); the lesson's content the Timetable's; checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 9 and New work (a lesson under way in every open classroom): his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock: \"Lessons run whenever they visit, weekends included\"; Fawkes, 3.29 pm, on Events' Q1); `lessons` stays the castle's own timetable for the other pupils; the Charms classroom open in every castle; Flitwick on his pile of books, PS 10 L3506 (\"perched on top of his pile of books as usual\"); the pineapple a lesson consequence (the touch review's KEEP of charms-q11-pineapple-1013 t1), from PS 16 L5460's exam, never the exam itself and on no named desk (the exam's desk set aside, docs/ministry/set-aside.md); the lesson's content the Timetable's; checked against the text, 15 October 2026; split 19 October 2026 as electives.json is: his desk always, the class by the clock (Interiors' docs/interiors/charms-classroom.md, Occupancy and aftermath: Flitwick on his pile behind the desk, the boys' desk theirs, the lesson's things out at it). Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the windows, always (the model's three north windows, Interiors' read of v22; 2.4); the chandelier, always (GoF 26 L30767, \"ricocheting off the chandelier\", an everyday thing a later book names first, read in the canon tool), placed by Interiors (req 668, 13a456b0: a dull wrought-iron ring of twelve candles over the clear floor, 1.0 short of his desk)"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "the pupils in pairs at their desks"
+      ],
+      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the pairs at their desks); the figures People's"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "lessons = off"
+      ],
+      "show": [
+        "the other desks bare and still"
+      ],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the evening and the night, out of the class's lessons; Interiors' Occupancy: evening, night and holidays none, their desks bare; his own lesson's things out at his desk (the rule above)"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "time = night"
+      ],
+      "show": [
+        "the chandelier's candles lit, their own flame, easing the dark over his end of the room, and the windows' sky"
+      ],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the chandelier's candles lit from dusk, their own flame; by night the dark eased by them and the windows' sky (2.4); Interiors' row: its candles' state the clock's"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "date >= 12-05",
+        "time = night"
+      ],
+      "show": [
+        "the fairies asleep along the cornice, their light low"
+      ],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the fairies by night (PoA 10 L17110, read in the canon tool; Interiors' habit, Events' req 361), their light their own"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "date <= 01-06",
+        "time = night"
+      ],
+      "show": [
+        "the fairies asleep along the cornice, their light low"
+      ],
+      "canon": "as above, through the holidays to Twelfth Night"
     }
   ],
   "records": [
@@ -126,6 +180,174 @@
       ],
       "canon": "the orchestrator's t1 on interiors-charms-desks-1014 (provisional, Godric to confirm): PS 8 L2734, at the start of their first class; once ever, his first visit in the first week of lessons in the year he reads the Stone; checked against the text, 14 October 2026",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): PS 8 re-enacted (EV-24)"
+    },
+    {
+      "id": "charms.busy-quill",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-busy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another pair's desk a quill lifts a hand's width and drops, with a squeak"
+      ],
+      "starts": [],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the busy air at the other pairs' desks with the class; GoF 26 L30757, \"objects kept flying across the room\" (a Charms room's way a later book names first, never that lesson; read in the canon tool); the things and the squeak or laugh ours; nothing comes near the boys' desk or flies at him; something about one lesson visit in two"
+    },
+    {
+      "id": "charms.busy-button",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-busy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another pair's desk a button skids along the top, with a laugh"
+      ],
+      "starts": [],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the busy air at the other pairs' desks with the class; GoF 26 L30757, \"objects kept flying across the room\" (a Charms room's way a later book names first, never that lesson; read in the canon tool); the things and the squeak or laugh ours; nothing comes near the boys' desk or flies at him; something about one lesson visit in two"
+    },
+    {
+      "id": "charms.busy-pencil",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-busy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another pair's desk a pencil spins once on its end, with a laugh"
+      ],
+      "starts": [],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the busy air at the other pairs' desks with the class; GoF 26 L30757, \"objects kept flying across the room\" (a Charms room's way a later book names first, never that lesson; read in the canon tool); the things and the squeak or laugh ours; nothing comes near the boys' desk or flies at him; something about one lesson visit in two"
+    },
+    {
+      "id": "charms.busy-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-busy",
+      "weight": 3,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.chandelier-sway",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-chandelier",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "something from another pair's desk knocks the chandelier; it sways a little on its chain and settles"
+      ],
+      "starts": [],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the chandelier, knocked; GoF 26 L30767, \"ricocheting off the chandelier\" (read in the canon tool); the sway ours; with the class, about one lesson visit in four"
+    },
+    {
+      "id": "charms.chandelier-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-chandelier",
+      "weight": 3,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.fairy-cross",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-fairy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "date >= 12-05",
+        "time != night"
+      ],
+      "show": [
+        "now and then one of the fairies leaves the cornice, crosses to a window head and settles"
+      ],
+      "starts": [],
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the fairies, now and then (ours), by day and evening; PoA 10 L17110, \"shimmering lights that turned out to be real, fluttering fairies\" (read in the canon tool); about one visit in two"
+    },
+    {
+      "id": "charms.fairy-cross-january",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-fairy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "date <= 01-06",
+        "time != night"
+      ],
+      "show": [
+        "now and then one of the fairies leaves the cornice, crosses to a window head and settles"
+      ],
+      "starts": [],
+      "canon": "as above, through the holidays to Twelfth Night"
+    },
+    {
+      "id": "charms.fairy-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-fairy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "date >= 12-05",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "charms.fairy-still-january",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-fairy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "date <= 01-06",
+        "time != night"
+      ],
+      "starts": []
     }
   ]
 }
