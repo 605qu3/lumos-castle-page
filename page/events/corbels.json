@@ -1,10 +1,9 @@
 {
   "chain": "corbels",
-  "about": "The corbels' faces (Magic's req 687, 1.8): every stone corbel carved as a head under the beams of the Tudor rooms the Architect's schedule gives (docs/architect/materials-by-room.md, tudor-pink stone with a beams ceiling), each a different face, the masons' joke on one another. Every year. Only lids, brows and jaw move; no head turns, no face speaks. The places are the model's ids, hyphens as spaces; the drawing Design's (req 688).",
+  "about": "The corbels' faces (Magic's req 687, 1.8): every stone corbel carved as a head under the beams of the Tudor rooms the Architect's schedule gives (docs/architect/materials-by-room.md, tudor-pink stone with a beams ceiling), each a different face, the masons' joke on one another. Every year. Only lids, brows and jaw move; no head turns, no face speaks. The places are the model's ids, hyphens as spaces; the drawing Design's (req 688). Filch's office is left out (provisional, Magic to confirm; Fawkes 12:49's 1, 20 October 2026): Magic's walk-in table says nothing in that room moves by magic, so its faces, if carved, stay still.",
   "places": {
     "corbelled": [
       "classroom corridor",
-      "filchs office",
       "north stair foot g",
       "staff passage",
       "staff room",
@@ -39,7 +38,6 @@
     ],
     "corbelled halls": [
       "classroom corridor",
-      "filchs office",
       "north stair foot g",
       "staff passage",
       "staff room",
