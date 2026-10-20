@@ -159,7 +159,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=2"></script>
 <script src="castle-shell.js?v=33"></script>
-<script src="castle-events.js?v=38"></script>
+<script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
 <script src="design/house-hourglass.js?v=1"></script>
@@ -221,7 +221,7 @@ if (NEVER) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'This door stay
    below, volume and materials only, the plain four lights in the torch's colour till Interiors places its own */
 var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall',
   'dungeon-corridor', 'potions-dungeon', 'snape-office', 'founders-undercroft', 'staff-passage', 'staff-room',
-  'classroom-corridor', 'gate-passage', 'hall-cupboard'];
+  'classroom-corridor', 'gate-passage', 'hall-cupboard', 'filchs-office', 'filchs-store'];
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
@@ -2203,6 +2203,8 @@ function through(d) {
 }
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+var CORBELS = [];
+shell.group.traverse(function (o) { if (o.isMesh && /-corbel-\d+[ab]?$/.test(o.name || '')) CORBELS.push(o); });
 function tap(cx, cy) {
   if (tween) return;
   var r = canvas.getBoundingClientRect();
@@ -2219,6 +2221,13 @@ function tap(cx, cy) {
     if (here !== CUP.d.stand) acted = goTo(CUP.d);
     else { lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else if (Q.get('grains') === 'run') cupRun(); acted = true; }
     kit.tapped(acted); return;
+  }
+  /* req 716 (Events' corbels.json, req 687): a tap on a stone corbel's face, the beams' (ceilings.js) or a vault's
+     (castle-shell.js v32), nearer than whatever else the ray meets, is the tap `corbel`; he stays where he stands. The
+     faces' lids and jaws are Design's drawing (req 688); the lines are the runtime's */
+  if (events && CORBELS.length) {
+    var ch = raycaster.intersectObjects(CORBELS, false);
+    if (ch.length && (!hits.length || ch[0].distance <= hits[0].distance + 0.05)) { events.tap('corbel'); kit.tapped(true); return; }
   }
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   if (d && here === d.stand) { if (d.mesh.userData.way && d.built) through(d); else answer(d, hits[0].point); acted = true; }
