@@ -2179,6 +2179,31 @@ var FBOX = (function () {
   m.name = 'filch-box'; m.userData.owner = 'filchs-office'; m.userData.confiscations = true;
   shell.group.add(m); return m;
 })();
+/* req 802 (Events' cues for Magic's 794, seventh-floor.json, 426c8b6b): Sir Cadogan's painting where Interiors hangs it
+   (docs/interiors/seventh-floor-corridor.md, *Sir Cadogan's painting*, cited: the north landing on 7, its east wall at
+   x 92, y 46.9 to 49.3, foot 0.9, about 2.4 by 1.6, the heavy worn gilt frame; Godric's 1 on interiors-cadogan-1020).
+   Drawn as a plain frame on a grass-green ground: the pony and the knight are a picture, a spend, never before Godric's
+   yes, so every line stays the note's. A tap on it is the tap `cadogan` and he stays where he stands. While the runtime
+   shows the bare wall (his months on her door, PoA 9 to 14) the frame is gone and a paler patch its size stands in its
+   place. The frame and the patch bear 1 cm into the wall, never flush */
+var CADOGAN_BARE = "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame";
+var CADOGAN = (function () {
+  if (shell.places.map(function (p) { return p.id; }).indexOf('stair-hall') < 0) return null;
+  var P = function (x, y, z) { return shell.toLocal(x, y, z); }, z0 = 36.4 + 0.9, z1 = z0 + 1.6;
+  var box = function (a, b, col, name) {
+    var m = thingBox(shell.group, P, a, b, new THREE.MeshStandardMaterial({ color: kit.col(col), roughness: 0.85, metalness: 0 }));
+    m.name = name; m.userData.owner = 'stair-hall'; return m;
+  };
+  var out = {
+    frame: box([91.93, 46.9, z0], [92.01, 49.3, z1], 0x8a7240, 'cadogan-frame'),
+    ground: box([91.92, 47.0, z0 + 0.1], [91.94, 49.2, z1 - 0.1], 0x6f7a4a, 'cadogan-ground'),
+    patch: box([91.995, 46.9, z0], [92.01, 49.3, z1], 0xd9d0bf, 'cadogan-patch')
+  };
+  out.patch.visible = false; out.taps = 0;
+  out.bare =function (b) { out.frame.visible = out.ground.visible = !b; out.patch.visible = b; };
+  return out;
+})();
+function cadoganShown(shown) { if (CADOGAN) CADOGAN.bare(shown.indexOf(CADOGAN_BARE) >= 0); }
 function filchShown(shown) { if (PLACE === 'classroom-corridor') filchSet(shown.indexOf(FILCH_AJAR) >= 0); }
 /* req 716 (Events' corbels.json, Design's 756): the room's corbel line sets the carved faces' state, asleep, drowsy
    or nodding off, or awake (castle-shell.js v34's out.corbels); a moment's line swaps nothing, the state's next line does */
@@ -2189,7 +2214,7 @@ function corbelsShown(shown) {
   if (l && /asleep/.test(l)) st = 'sleeping'; else if (l && /drowsy|nodding off/.test(l)) st = 'dozing';
   if (st !== corbelState) { corbelState = st; shell.corbels(st); }
 }
-function roomDraw(shown) { cupDrawRoom(shown); filchShown(shown); thingsDrawRoom(shown); corbelsShown(shown); }
+function roomDraw(shown) { cupDrawRoom(shown); filchShown(shown); cadoganShown(shown); thingsDrawRoom(shown); corbelsShown(shown); }
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
    its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
 function knotSpots(d) {
@@ -2276,6 +2301,7 @@ function tap(cx, cy) {
     var ch = raycaster.intersectObjects(CORBELS, false);
     if (ch.length && (!hits.length || ch[0].distance <= hits[0].distance + 0.05)) { events.tap('corbel'); kit.tapped(true); return; }
   }
+  if (events && hit && CADOGAN && (hit === CADOGAN.frame || hit === CADOGAN.ground)) { CADOGAN.taps++; events.tap('cadogan'); kit.tapped(true); return; }   /* req 802 */
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   if (d && here === d.stand) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
@@ -2543,6 +2569,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },
   stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
+  cadogan: function () { return CADOGAN ? { taps: CADOGAN.taps, bare: CADOGAN.patch.visible } : null; },
   filch: function () { return { found: !!FDOOR, open: filchOpen, box: FBOX ? FBOX.getWorldPosition(new THREE.Vector3()) : null, boxTaps: FBOX ? FBOX.userData.taps || 0 : 0 }; },
   head: function () { var lm = limits(here); return { yaw: hy, pitch: hp, limit: lm.yaw, lo: lm.lo, hi: lm.hi, lim: here.lim }; },
   /* a stand by name at once, and the head set and held within its limits (the shots at both limits) */
