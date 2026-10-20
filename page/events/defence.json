@@ -108,9 +108,9 @@
         "year <= 1"
       ],
       "show": [
-        "a lesson under way: Professor Quirrell at the front, the class in the rows, the room smelling strongly of garlic"
+        "a lesson under way: Professor Quirrell at the front, the boys' desk theirs, the room smelling strongly of garlic"
       ],
-      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PS 8 L2742, \"His classroom smelled strongly of garlic\", Quirrell's; the Stone's castle and the castle before any book is finished; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026"
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PS 8 L2742, \"His classroom smelled strongly of garlic\", Quirrell's; the Stone's castle and the castle before any book is finished; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs)"
     },
     {
       "when": [
@@ -118,9 +118,9 @@
         "year = 2"
       ],
       "show": [
-        "a lesson under way: Professor Lockhart on the clear floor before his desk, reading a passage from one of his books to the class in the rows"
+        "a lesson under way: Professor Lockhart on the clear floor before his desk, reading a passage from one of his books, the boys' desk theirs"
       ],
-      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); CoS 10 L9831, Lockhart \"read passages from his books to them\" (Interiors' canon 7, the floor where he tells his tales); the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026"
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); CoS 10 L9831, Lockhart \"read passages from his books to them\" (Interiors' canon 7, the floor where he tells his tales); the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs)"
     },
     {
       "when": [
@@ -129,9 +129,9 @@
         "castle date < 3 06-08"
       ],
       "show": [
-        "a lesson under way: Professor Lupin at the front, the class in the rows"
+        "a lesson under way: Professor Lupin at the front, the boys' desk theirs"
       ],
-      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PoA 7 L15857 on, Lupin's year; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; bounded before 8 June of the Azkaban castle, when his office stands emptied (the Curator's req 565, item 26; 16 October 2026)"
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PoA 7 L15857 on, Lupin's year; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; bounded before 8 June of the Azkaban castle, when his office stands emptied (the Curator's req 565, item 26; 16 October 2026); split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs)"
     },
     {
       "when": [
@@ -219,12 +219,14 @@
       "when": [
         "place = defence office",
         "year = 3",
-        "castle date < 3 06-08"
+        "castle date >= 3 10-31",
+        "castle date < 3 11-05"
       ],
       "show": [
-        "the grindylow's tank on its stand in the far right corner, a sickly green creature in it pressing its face to the glass"
+        "the grindylow's tank on its stand in the far right corner, a sickly green creature in it pressing its face to the glass, pulling faces and flexing its long, spindly fingers",
+        "as he comes close it bares its green teeth and buries itself in a tangle of weed in a corner, and comes out again once he steps back"
       ],
-      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the grindylow's tank, Lupin's year): PoA 8 L16354, L16358, any day of the Azkaban castle; checked against the text, 15 October 2026; bounded before 8 June of the Azkaban castle, when his office stands emptied (the Curator's req 565, item 26; 16 October 2026)"
+      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the grindylow's tank, Lupin's year): PoA 8 L16354, L16358, any day of the Azkaban castle; checked against the text, 15 October 2026; bounded before 8 June of the Azkaban castle, when his office stands emptied (the Curator's req 565, item 26; 16 October 2026); Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the grindylow, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): a creature's own habit that pushes away, never pulls; PoA 8 L16354 (\"pulling faces and flexing its long, spindly fingers\"), L16358 (\"bared its green teeth and then buried itself in a tangle of weed in a corner\"), its coming out again ours; its weeks moved 20 October 2026 as req 674 asks: from Hallowe'en, when Lupin has \"just taken delivery of a Grindylow for our next lesson\" (PoA 8 L16298, L16350), till the third years' lesson on it is done, which it is by the lesson the day before the first match (PoA 9 L16697, L16729, \"we've done ... Grindylows\"), that match on the Saturday after Hallowe'en week (L16661, L16669): gone from 5 November (ours, the latest that week's Friday leaves room for the lesson); the tank never the packing scene (PoA 22 L21946); every line read in the canon tool"
     },
     {
       "when": [
@@ -249,6 +251,98 @@
         "the office emptied: the grindylow's tank gone from its corner, the desk bare, nothing under it"
       ],
       "canon": "the Curator's req 565, item 26 (docs/curator/defence-classroom.md; Godric's pick of 16 October 2026 with Kingsley's review, docs/ministry/reviews/2026-10-16-desk-answers.md): PoA 22 L21932, he \"resigned firs' thing this mornin'\", the morning after the Shack (6 June, the set-aside rule's reckoning), and packed that day (L21946, the empty tank beside the suitcase; L21978, his last books into his case and the drawers closed); so from 8 June of the Azkaban castle, after the latest he can be gone, to the year's end; never his farewell, no Map, no one in it; Lupin's things the PoA year only; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = defence classroom"
+      ],
+      "show": [
+        "six plates on the walls, each a dark creature drawn as a natural-history plate: a vampire, a hag, a Red Cap, a grindylow, a banshee and a ghoul",
+        "the windows on his right as he comes in, the real sky",
+        "the iron chandelier's ring of candles hanging over the clear floor"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year, every line read in the canon tool, 20 October 2026: the six plates, one set every year, as pupils saw \"pictures of them in his Defence Against the Dark Arts classes\" (PoA 3 L13979): a vampire (PoA 3 L13979), a hag (PoA 4 L14224; CoS 4 L7477), a Red Cap and a grindylow (PoA 8 L16094; PoA 9 L16735, everyday), a banshee (CoS 4 L7473) and a ghoul (CoS 3 L7196); no troll and no werewolf in any year (Kingsley, 668d704d: a werewolf would give Lupin away); their places Interiors' (the Curator's 4, the window wall's piers and the left wall); the windows on his right as he comes in (Interiors' frame; 2.4); the chandelier over the clear floor (CoS 6 L8587, L8593), still, nothing knocks it; its crooked hang from the CoS castle on is the trace below; the lesson's air: the plates and the windows the only things that change while he works"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "the class in the rows"
+      ],
+      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the class in the rows); the figures People's"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "lessons = off"
+      ],
+      "show": [
+        "the other desks bare but for their ink bottles"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the evening and the night, out of the class's lessons; Interiors' Occupancy: evening, night and holidays none, their desks bare but for the ink bottles; his own lesson as ever"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year = 2"
+      ],
+      "show": [
+        "a pile of Lockhart's books on every desk, the boys' seven too, his own winking portrait on each front cover"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the CoS castle, his books on every desk (Interiors' Occupancy: \"in the CoS castle, Lockhart's books\"); CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool)"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "year <= 1"
+      ],
+      "show": [
+        "the vampire in its plate keeps to the far edge of its frame, away from the garlic by the door, a hand over its nose"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the vampire and the garlic, the PS castle only, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): nothing of the turban or what it hid; PS 8 L2742, \"His classroom smelled strongly of garlic, which everyone said was to ward off a vampire\" (read in the canon tool); the story everyone told, ours; the garlic by the door Interiors' (the back wall, x' 5.2)"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "time = evening"
+      ],
+      "show": [
+        "the chandelier's candles lit, their own flame"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the chandelier's candles lit from dusk, their own flame"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "time = night"
+      ],
+      "show": [
+        "the chandelier's candles lit, their own flame, easing the dark over the clear floor, and the windows' sky"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: by night the dark eased by the chandelier's candles over the clear floor and the windows' sky (2.4)"
+    },
+    {
+      "when": [
+        "place = defence office"
+      ],
+      "show": [
+        "the wall sconces and the branch on the desk lit, their own flames"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the office's candles whenever he is there, no window: \"by the light of many candles\" (CoS 7 L8924, read in the canon tool); Interiors' candles (the sconces and the desk's branch, every year); in the PS castle nothing the books show, the candles only"
+    },
+    {
+      "when": [
+        "place = defence office",
+        "year = 2",
+        "time != night",
+        "castle date < 2 05-30"
+      ],
+      "show": [
+        "countless framed photographs of Lockhart shining on the walls, each moving: they beam, preen and wink at one another, a few signed"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the office's photographs by day, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): nothing of the CoS 7 detention (no voice, no envelopes); CoS 7 L8924 (\"countless framed photographs of Lockhart. He had even signed a few of them\"), each moving (CoS 3 L7330, \"As always in the wizarding world, the photograph was moving\"), both read in the canon tool; they leave the office with him after the Chamber's date (29 May, the set-aside trunks' date), so to 29 May; by night `defence.rollers`"
     }
   ],
   "records": [
@@ -362,6 +456,119 @@
         "as he comes into the dark office, a flurry across the walls: the Lockharts in the pictures dodge out of sight, their hair in rollers"
       ],
       "canon": "the change list's Rework 8 (the two rollers records merged, the date split dropped), Fawkes's t1 on req 353: CoS 9 L9412, widened to every night of Lockhart's year, a habit as the fairies are (Interiors' schedule, docs/interiors/defence-classroom.md, The office, the photographs: on any visit after dark the Lockharts dodge out of sight in their rollers, Interiors' Rework 4c); checked against the text, 14 October 2026"
+    },
+    {
+      "id": "defence.plate-vampire",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-plates",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = defence classroom"
+      ],
+      "show": [
+        "in its plate the vampire draws its cloak closer, and is still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the plates move, as the castle's pictures (1.3): \"As always in the wizarding world, the photograph was moving\" (CoS 3 L7330, read in the canon tool); each stays in its own picture, never toward the room or at him, no sound; the motions ours; something about one visit in two"
+    },
+    {
+      "id": "defence.plate-hag",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-plates",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = defence classroom"
+      ],
+      "show": [
+        "in its plate the hag stirs her pot, and is still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the plates move, as the castle's pictures (1.3): \"As always in the wizarding world, the photograph was moving\" (CoS 3 L7330, read in the canon tool); each stays in its own picture, never toward the room or at him, no sound; the motions ours; something about one visit in two"
+    },
+    {
+      "id": "defence.plate-grindylow",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-plates",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = defence classroom"
+      ],
+      "show": [
+        "in its plate the grindylow flexes its long fingers, and is still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the plates move, as the castle's pictures (1.3): \"As always in the wizarding world, the photograph was moving\" (CoS 3 L7330, read in the canon tool); each stays in its own picture, never toward the room or at him, no sound; the motions ours; something about one visit in two"
+    },
+    {
+      "id": "defence.plate-banshee",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-plates",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = defence classroom"
+      ],
+      "show": [
+        "in its plate the banshee's hair lifts, and settles"
+      ],
+      "starts": [],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the plates move, as the castle's pictures (1.3): \"As always in the wizarding world, the photograph was moving\" (CoS 3 L7330, read in the canon tool); each stays in its own picture, never toward the room or at him, no sound; the motions ours; something about one visit in two"
+    },
+    {
+      "id": "defence.plate-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-plates",
+      "weight": 4,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = defence classroom"
+      ],
+      "starts": []
+    },
+    {
+      "id": "defence.cover-wink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-covers",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = defence classroom",
+        "year = 2"
+      ],
+      "show": [
+        "on the cover of a book in one of the piles, a small Lockhart winks and flashes his teeth"
+      ],
+      "starts": [],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: Lockhart's covers, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): now and then, never all at once, never as he arrives; CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool); the teeth CoS 4 L7791's; one cover at a time, about one visit in two"
+    },
+    {
+      "id": "defence.cover-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "defence-covers",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = defence classroom",
+        "year = 2"
+      ],
+      "starts": []
     }
   ]
 }
