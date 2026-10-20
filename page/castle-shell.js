@@ -910,14 +910,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var fix = sd === 'west' ? R[0] : sd === 'east' ? R[2] : sd === 'south' ? R[1] : R[3], L = sp[1] - sp[0];
       if (L <= 0) return;
       var at = function (u) { return ns ? toLocal(u, fix, ft.z) : toLocal(fix, u, ft.z); }, c = at((sp[0] + sp[1]) / 2);
-      var bar = slab(ns ? L + T - 0.004 : T, T, ns ? T : L + T - 0.004, rmat, 'stair');   /* v30: its ends 2 mm inside the end posts */
+      /* v35 (the seams rule): an east or west bar 12 mm thinner, so at a corner its end bears inside the north or south
+         bar's, no face within the seams tool's 4 mm; the posts 26 mm thinner, inside both */
+      var tw = ns ? T : T - 0.012;
+      var bar = slab(ns ? L + T : tw, tw, ns ? T : L + T - 0.024, rmat, 'stair');   /* v35: a north or south bar's ends 6 mm past an east or west bar's face, an east or west bar's 12 mm inside theirs */
       bar.position.set(c.x, c.y + ft.h - T / 2, c.z); bar.name = P.id + '-rail-' + ft.id + '-' + sd; group.add(bar);
       for (var n = Math.max(1, Math.round(L)), i = 0; i <= n; i++) {
         /* v30: one post where two sides meet, its top in the rail's depth, not flush with it */
         var p = at(sp[0] + L * i / n), pk = ft.id + ':' + p.x.toFixed(2) + ',' + p.z.toFixed(2);
         if (railPosts[pk]) continue;
         railPosts[pk] = 1;
-        var post = slab(T, ft.h - T / 2, T, rmat, 'stair');
+        var post = slab(T - 0.026, ft.h - T / 2, T - 0.026, rmat, 'stair');
         post.position.set(p.x, p.y + (ft.h - T / 2) / 2, p.z); post.name = P.id + '-rail-post-' + ft.id + '-' + sd + '-' + i; group.add(post);
       }
     });

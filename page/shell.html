@@ -154,11 +154,11 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=401"></script>
+<script src="castle-model.js?v=402"></script>
 <script src="castle-paint.js?v=6"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=3"></script>
-<script src="castle-shell.js?v=34"></script>
+<script src="castle-shell.js?v=35"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -226,7 +226,8 @@ var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall',
   'first-floor-corridor', 'east-first-floor-corridor', 'hospital-wing', 'hospital-passage', 'transfiguration-classroom',
   'transfiguration-passage', 'mcgonagalls-office', 'history-of-magic-classroom', 'history-of-magic-passage', 'history-hearth-way',
   'charms-corridor', 'charms-passage', 'charms-classroom', 'defence-classroom', 'defence-passage', 'defence-office',
-  'trophy-room', 'armour-gallery', 'library', 'library-corridor'];
+  'trophy-room', 'armour-gallery', 'library', 'library-corridor',
+  'north-tower-passage', 'drying-loft', 'long-gallery', 'camera-obscura'];
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
