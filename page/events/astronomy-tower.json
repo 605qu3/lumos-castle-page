@@ -237,7 +237,8 @@
       "starts": [
         "stamp baron_night by night"
       ],
-      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the Bloody Baron, heard; HBP 23 L63282, \"groaning and clanking up on the Astronomy Tower, it's a, favorite pastime of his\" (Nick's; a ghost's habit a later book names first; read in the canon tool). Kingsley's 1, keep, with conditions (10.05 pm, 19 October 2026, docs/ministry/reviews/2026-10-19-queue-13-to-19.md, the night addendum): heard only, never seen; now and then on a lesson night, never on his arrival (a long wait); never a lure, nothing to follow and no tap; soft, for gentle suspense; nothing of HBP 27. The draw is once a lesson night, about one in four (the silent partner stamps the night too, so a second visit that night draws nothing). \"Under his own dark settings\": no per-boy dark setting exists (the clock's drivers have only `heights`), so it is ungated, the gap named in req 662's row; the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the Bloody Baron, heard; HBP 23 L63282, \"groaning and clanking up on the Astronomy Tower, it's a, favorite pastime of his\" (Nick's; a ghost's habit a later book names first; read in the canon tool). Kingsley's 1, keep, with conditions (10.05 pm, 19 October 2026, docs/ministry/reviews/2026-10-19-queue-13-to-19.md, the night addendum): heard only, never seen; now and then on a lesson night, never on his arrival (a long wait); never a lure, nothing to follow and no tap; soft, for gentle suspense; nothing of HBP 27. The draw is once a lesson night, about one in four (the silent partner stamps the night too, so a second visit that night draws nothing). \"Under his own dark settings\": no per-boy dark setting exists (the clock's drivers have only `heights`), so the pair is held `aside` until one exists, the gap named in req 662's row; the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)",
+      "aside": "held 20 October 2026 (docs/ministry/set-aside.md; Kingsley's condition of 10.05 pm, 19 October 2026, confirmed 11.27 pm, 243d783f; Fawkes's order): off until a per-boy dark setting exists, then gated on it; nothing is heard on the top meanwhile"
     },
     {
       "id": "astronomy-tower.baron-quiet",
@@ -257,7 +258,8 @@
       ],
       "starts": [
         "stamp baron_night by night"
-      ]
+      ],
+      "aside": "held with its partner, astronomy-tower.baron-heard, until a per-boy dark setting exists"
     }
   ]
 }
