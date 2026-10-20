@@ -11,6 +11,12 @@
        centre and radius in px), maxMag (default 5), title, sub (the cartouche's two lines; omitted, none) }.
        Returns { stars, figures, moon: { x, y } or null, planets: [{ name, x, y }] }.
    LumosChart.place(alt, az, x, y, r)  a height and bearing to px on the chart, or null below the horizon.
+   LumosChart.nightOf(day)  a day as 'YYYY-MM-DD' to eleven at night on that day by the iPad's own clock, the hour a
+       July night is dark at the boys' latitude; null for a day it cannot read. The chart at a boy's place is a fixed
+       chart, the sky of the night he was born (the charter's Rulings log, 20 October 2026, the night skies): the page
+       passes CastleSky.at(nightOf(the boy's day), home()), the day from the grown-up's setup, never from a page file;
+       the telescope and every live view keep tonight's sky.
+   LumosChart.caption(day, lat)  the cartouche's two lines for that night, { title, sub }, naming no one.
    LumosChart.PAPER, LumosChart.INK  the colours, the Map's engraved look's (marauders-map.js). */
 (function () {
   'use strict';
@@ -204,5 +210,22 @@
     return out;
   }
 
-  window.LumosChart = { draw: draw, place: place, PAPER: PAPER, INK: INK, FIGURES: FIGURES };
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  var ORD = ['', 'first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh',
+    'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'seventeenth', 'eighteenth', 'nineteenth', 'twentieth',
+    'twenty-first', 'twenty-second', 'twenty-third', 'twenty-fourth', 'twenty-fifth', 'twenty-sixth', 'twenty-seventh',
+    'twenty-eighth', 'twenty-ninth', 'thirtieth', 'thirty-first'];
+  function readDay(day) {
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(String(day || '').trim());
+    return m && +m[2] >= 1 && +m[2] <= 12 && +m[3] >= 1 && +m[3] <= 31 ? [+m[1], +m[2], +m[3]] : null;
+  }
+  function nightOf(day) { var d = readDay(day); return d ? new Date(d[0], d[1] - 1, d[2], 23, 0, 0) : null; }
+  function caption(day, lat) {
+    var d = readDay(day);
+    if (!d) return { title: 'The Heavens', sub: '' };
+    return { title: 'The Heavens on the night you were born',
+      sub: 'eleven o’clock, the ' + ORD[d[2]] + ' of ' + MONTHS[d[1] - 1] + ', ' + d[0] + '; ' + Math.round(Math.abs(lat)) + '° ' + (lat < 0 ? 'south' : 'north') };
+  }
+
+  window.LumosChart = { draw: draw, place: place, nightOf: nightOf, caption: caption, PAPER: PAPER, INK: INK, FIGURES: FIGURES };
 })();

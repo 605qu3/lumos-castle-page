@@ -13,26 +13,29 @@
 <body>
 <canvas id="c"></canvas>
 <script src="../castle-sky.js?v=1"></script>
-<script src="chart.js?v=2"></script>
+<script src="chart.js?v=3"></script>
 <script>
 /* chart-live.html: Design's probe for chart.js (req 623's second half). The sky is CastleSky.at (Events', req 622) for
    ?at= (an ISO time, default 10 pm Eastern on 20 October 2026) at ?lat= and ?lon= (default 42 north, 75 west, the
    runtime's fallback home for that clock zone), the same night as telescope-live.html's sheet. ?mag= the faintest star
-   drawn (default 5). */
+   drawn (default 5). ?born=YYYY-MM-DD draws the fixed chart at a boy's place instead, the sky at eleven that night
+   (LumosChart.nightOf); a test date only, since the boy's own day comes from the grown-up's setup on his iPad and
+   never from a page file (the charter, 20 October 2026, the night skies). 2000-01-01 is the neutral placeholder. */
 (function () {
   'use strict';
   var q = new URLSearchParams(location.search), cv = document.getElementById('c'), ctx = cv.getContext('2d');
   var dpr = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight;
   cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.scale(dpr, dpr);
-  var when = new Date(q.get('at') || '2026-10-21T02:00:00Z'), home = { lat: +(q.get('lat') || 42), lon: +(q.get('lon') || -75) };
+  var born = q.get('born'), when = born ? LumosChart.nightOf(born) : new Date(q.get('at') || '2026-10-21T02:00:00Z'), home = { lat: +(q.get('lat') || 42), lon: +(q.get('lon') || -75) };
   var sky = CastleSky.at(when, home);
   Promise.all([fetch('../sky/stars.json').then(function (r) { return r.json(); }),
                document.fonts.load('20px "IM Fell English"'), document.fonts.load('italic 20px "IM Fell English"')]).then(function (v) {
     var r = Math.min(W * 0.4, H * 0.36), y = H * 0.44;
     ctx.fillStyle = LumosChart.PAPER; ctx.fillRect(0, 0, W, H);
     var got = LumosChart.draw(ctx, { sky: sky, catalogue: v[0], x: W / 2, y: y, r: r, maxMag: +(q.get('mag') || 5),
-      title: 'The Heavens tonight', sub: 'ten o’clock, the twentieth of October, 2026; 42° north' });
-    window.chartReady = { stars: got.stars, figures: got.figures, moon: !!got.moon, planets: got.planets.map(function (p) { return p.name; }), phase: sky.moon.phase, lit: sky.moon.lit };
+      title: born ? LumosChart.caption(born, home.lat).title : 'The Heavens tonight',
+      sub: born ? LumosChart.caption(born, home.lat).sub : 'ten o’clock, the twentieth of October, 2026; 42° north' });
+    window.chartReady = { when: when.toISOString(), dark: sky.sun.dark, stars: got.stars, figures: got.figures, moon: !!got.moon, planets: got.planets.map(function (p) { return p.name; }), phase: sky.moon.phase, lit: sky.moon.lit };
   });
 })();
 </script>
