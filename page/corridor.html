@@ -2582,6 +2582,38 @@ hangDrawing(portraitB, '../assets/layers/' + PORTRAIT_B.rest, 1.0, function () {
     im.src = '../assets/layers/' + PORTRAIT_B[key];
   });
 });
+/* when she looks up and whispers (req 656; Magic's *The knitting witch, portrait-b*, req 637 answered; the moments are
+   Events' `page/events/knitting-witch.json`, req 655, whose three show strings are the cues below). Never by night,
+   by those records; the timings here are the page's: back to rest a second and a half after he leaves her stop, the
+   pass look held three seconds from when his walk comes within 2.5 m of drawing level with her frame, while she is still in view, the whisper a look of two seconds then
+   the whisper three, starting a second and a half after he arrives so it is seen */
+var KNIT = { hold: false, release: -1, pass: null, passUntil: -1, whisper: -1, heard: false,
+             LEAVE_S: 1.5, PASS_S: 3, LEAD: 2.5, ARRIVE_S: 1.5, LOOK_S: 2, WHISPER_S: 3 };
+function knitWalkUp() { KNIT.hold = true; KNIT.release = -1; KNIT.pass = null; }
+function knitPass() {   /* drawn on any walk up elsewhere; played only where this walk passes her frame */
+  if (!tween) return;
+  var px = PORTRAIT_XS[1], a = tween.from.pos.x - px, b = tween.to.pos.x - px;
+  if (a * b < 0) KNIT.pass = { side: Math.sign(a) };
+}
+function knitWhisper() { KNIT.whisper = t + KNIT.ARRIVE_S; KNIT.heard = false; }
+function updateKnit() {
+  if (KNIT.hold && !(atStop && atStop.name === 'portrait-b')) { KNIT.hold = false; KNIT.release = t + KNIT.LEAVE_S; }
+  if (KNIT.pass && (!tween || (camera.position.x - PORTRAIT_XS[1]) * KNIT.pass.side < KNIT.LEAD)) {
+    if (tween) KNIT.passUntil = t + KNIT.PASS_S;   /* nearly level with her, still in view: she looks up; a walk that ended short of her, nothing */
+    KNIT.pass = null;
+  }
+  var key = 'rest', w = t - KNIT.whisper;
+  if (KNIT.whisper >= 0 && w >= 0 && w < KNIT.LOOK_S + KNIT.WHISPER_S) {
+    key = w < KNIT.LOOK_S ? 'look' : 'whisper';
+    if (key === 'whisper' && !KNIT.heard) {
+      KNIT.heard = true;
+      showLines([{ medium: 'heard', speaker: 'knitting-witch', sound: 'a soft whisper, no words made out' }]);
+    }
+  } else if (KNIT.hold || t < KNIT.release || t < KNIT.passUntil) key = 'look';
+  if (lightTime() === 'night') key = 'rest';   /* she nods off over her knitting */
+  if (PORTRAIT_B.q) key = PORTRAIT_B.q;           /* ?portraitB=, for a look */
+  if (key !== PORTRAIT_B.now) portraitBCell(key);
+}
 
 /* the polite door (8 October 2026): 1.0 by 2.2 m; since 10 October 2026, 5.35 pm (Godric's switch) in her old place on
    the long wall, x 0, facing across the corridor. What waits behind it is Magic for the boys' */
@@ -4790,7 +4822,8 @@ var SPEAKER_AT = {
   stair: function () { return new THREE.Vector3(STAIR_X, 0.6, MID_Z); }, /* the moving stair's grind, at its head */
   bay: function () { return new THREE.Vector3(FAR_END_X - 0.3, FOOT_Y + 1.3, MID_Z); }, /* the stair below the landing's far end */
   nick: nickHead,                                                      /* above his head, beyond the torch that leaned (req 140) */
-  neville: function () { return nevilleHead(); }                     /* locked out at her frame's foot (req 297) */
+  neville: function () { return nevilleHead(); },                    /* locked out at her frame's foot (req 297) */
+  'knitting-witch': function () { return worldOf(portraitB, 0.75); }   /* portrait-b, behind her hand (req 656) */
 };
 var linesEl = document.getElementById('lines');
 var lineQ = [], lineCur = null;
@@ -5057,6 +5090,10 @@ var castle = window.CastleEvents ? CastleEvents.start({
   cues: Object.assign({
     "the view walks down the middle and turns square onto the armour's stop, as every corridor stop does": function () { goTo(STOPS.filter(function (s) { return s.name === 'armour'; })[0]); },
     'the open visor drops shut': function () { armourJiggle = 0.4; },
+    /* the knitting witch in portrait-b (req 656; Events' knitting-witch.json, req 655) */
+    'the knitting witch lifts her head and looks at him over her spectacles while he stands at her stop, and goes back to her knitting a second or two after he goes': knitWalkUp,
+    'as he passes along her wall, the knitting witch looks up at him over her spectacles for about three seconds, then goes back to her knitting': knitPass,
+    'the knitting witch looks up at him over her spectacles, then whispers behind one hand with a knitting needle pointed his way, a soft whisper with no words made out, and goes back to her knitting': knitWhisper,
     /* the polite door's tickle and please (req 150; Events' door.json): the giggle's strength is the page's, from the tap */
     "the door's wood shivers and gives a creaky giggle, louder the nearer the tap to its ticklish spot": function () { doorGiggle(); },
     'the door laughs and swings open on what is behind it, then shuts itself after a few seconds': function () { doorSwings('the door laughs'); },
@@ -5239,6 +5276,7 @@ function frame() {
   }
   updateHerDoze(wdt);
   updateHerPatches(wdt);
+  updateKnit();
   updateGrounds(wdt);
   updateSnowball(wdt);
   updateNick(wdt);
@@ -5280,7 +5318,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { knit: function () { return { now: PORTRAIT_B.now, hold: KNIT.hold, release: +KNIT.release.toFixed(1), pass: !!KNIT.pass, passUntil: +KNIT.passUntil.toFixed(1), whisper: +KNIT.whisper.toFixed(1), t: +t.toFixed(1) }; }, herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
