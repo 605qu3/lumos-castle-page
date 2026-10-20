@@ -735,7 +735,10 @@ var thingCues = {
   "the step is not there: his foot drops through to the tread below with a lurch, his hand catches the rail, and he laughs and goes on": function () { trickSink(); },
   /* the stair hall's loose rods (Events' req 634, stairhall.rods-loose, on arrival), word for word: drawn on well-M3
      (STAIR below) and the line seen, the flight two floors over his head */
-  "halfway up the staircase to the third floor a brass stair rod or two lie loose, the runner rucked over their treads": function () { stairSet({ loose: true }); showLines([{ medium: 'seen', sound: STAIR_RODS }]); }
+  "halfway up the staircase to the third floor a brass stair rod or two lie loose, the runner rucked over their treads": function () { stairSet({ loose: true }); showLines([{ medium: 'seen', sound: STAIR_RODS }]); },
+  /* the Charms chandelier knocked (Events' req 666, charms.chandelier-sway), word for word: it sways and settles
+     (CHARMS below), and the line is seen, since the shell draws no pair at the desk */
+  "something from another pair's desk knocks the chandelier; it sways a little on its chain and settles": function () { charmsSway(); showLines([{ medium: 'seen', sound: CHARMS_SWAY }]); }
 };
 /* the Entrance Hall's four glasses (Magic's req 633; Events' req 632, page/events/hall.json): Design's
    LumosHourglass.mount drawn off screen and painted onto a card in each hourglass niche (Godric's 13.1 and 25.1), each
@@ -1106,6 +1109,101 @@ function libShown(shown) {   /* which of the shown strings the library draws, an
   return drawn;
 }
 if (LIB.on) libSet(Q.get('lamps') === 'lit');
+/* the Charms classroom's chandelier (Magic's req 667; Events' req 666, page/events/charms.json, word for word), where
+   Interiors' docs/interiors/charms-classroom.md puts it (req 668, cited; x = 139.6 + y', y = 71.4 - x'): a plain
+   wrought-iron ring 1.0 across centred x' 4.5, y' 7.9 over the clear floor, its foot at 3.0, twelve candles to 3.3,
+   three short chains to one chain and one hook in the ceiling at 4.5; the iron dull and dark. Its candles lit while
+   the night rule shows, their own flame; charms.chandelier-sway swings it a little on its chain and it settles. One
+   group of its own, so no tap lands on it. ?candles=lit stands them lit with the events absent, for checks. */
+var CHARMS_RING = "the chandelier's plain iron ring of candles hanging over the clear floor before the desks",
+    CHARMS_LIT = "the chandelier's candles lit, their own flame, easing the dark over his end of the room, and the windows' sky",
+    CHARMS_SWAY = "something from another pair's desk knocks the chandelier; it sways a little on its chain and settles";
+var CHARMS = (function () {
+  var out = { on: false, flames: [], lit: false, sway: null };
+  if (PLACE !== 'charms-classroom') return out;
+  out.on = true;
+  var z0 = shell.place.floor, iron = kit.solid(0x2e2b28), wax = kit.solid(0xd8d0bc), flame = new THREE.MeshBasicMaterial({ color: 0xffc46a });
+  var hook = new THREE.Group(); hook.name = 'charms-chandelier'; shell.group.add(hook);
+  hook.position.copy(shell.toLocal(139.6 + 7.9, 71.4 - 4.5, z0 + 4.5));   /* the hook; everything hangs from it */
+  var drop = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 1.0, 6), iron); drop.position.y = -0.5; hook.add(drop);
+  var ring = new THREE.Group(); ring.position.y = -1.45; hook.add(ring);   /* the ring's foot at 3.0 */
+  var hoop = new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.02, 6, 40), iron); hoop.rotation.x = Math.PI / 2; ring.add(hoop);
+  for (var c = 0; c < 3; c++) {   /* the three short chains, from the ring to the one chain's end */
+    var a = c * Math.PI * 2 / 3, ch = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.006, 0.71, 5), iron);
+    ch.position.set(Math.cos(a) * 0.25, 0.25, Math.sin(a) * 0.25);   /* leaning in at 45 degrees to meet over the middle */
+    ch.rotation.z = Math.cos(a) * 0.79; ch.rotation.x = -Math.sin(a) * 0.79; ring.add(ch);
+  }
+  for (var k = 0; k < 12; k++) {   /* twelve candles, 0.25 tall on their cups */
+    var b = k * Math.PI / 6, x = Math.cos(b) * 0.5, z = Math.sin(b) * 0.5;
+    var cup = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.025, 0.03, 8), iron); cup.position.set(x, 0.035, z); ring.add(cup);
+    var cd = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.22, 8), wax); cd.position.set(x, 0.16, z); ring.add(cd);
+    var f = new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 6), flame); f.scale.y = 2.2; f.position.set(x, 0.3, z); f.visible = false; ring.add(f);
+    out.flames.push(f);
+  }
+  out.hook = hook;
+  return out;
+})();
+function charmsSet(lit) { if (!CHARMS.on) return; CHARMS.lit = lit; CHARMS.flames.forEach(function (f) { f.visible = lit; }); }
+function charmsShown(shown) {   /* which of the shown strings the classroom draws, and drawn so */
+  var drawn = [];
+  if (!CHARMS.on) return drawn;
+  if (shown.indexOf(CHARMS_RING) >= 0) drawn.push(CHARMS_RING);
+  var lit = shown.indexOf(CHARMS_LIT) >= 0;
+  if (lit) drawn.push(CHARMS_LIT);
+  charmsSet(Q.get('candles') === 'lit' || lit);
+  return drawn;
+}
+function charmsSway() { if (CHARMS.on) CHARMS.sway = { t: 0 }; }
+function updateSway(dt) {   /* a small swing on its chain, dying away over about four seconds */
+  if (!CHARMS.sway) return;
+  var s = CHARMS.sway, u = (s.t += dt) / 4;
+  CHARMS.hook.rotation.x = u < 1 ? 0.06 * Math.sin(s.t * 3.1) * (1 - u) * (1 - u) : 0;
+  CHARMS.hook.rotation.z = u < 1 ? 0.03 * Math.sin(s.t * 3.1 + 1.2) * (1 - u) * (1 - u) : 0;
+  if (u >= 1) CHARMS.sway = null;
+}
+if (CHARMS.on) charmsSet(Q.get('candles') === 'lit');
+/* the Potions dungeon's cauldrons on their fires (Magic's req 665; Events' req 664, page/events/potions.json, word for
+   word), where Interiors' docs/interiors/potions-dungeon.md puts them (cited; x = 16 + x', y = 15.4 + y'): twenty
+   iron stands at the five rows' desk ends (x' 1.75, 3.85, 6.15, 8.25; y' 2.4 to 10.4), fixed; on each in a lesson a
+   cauldron 0.5 across, its rim 0.8, over a small fire 0.25 high. Which lesson rule shows sets them: with the class all
+   twenty, between lessons only the boys' desk's two (the front row right of the aisle, x' 6.15 and 8.25, y' 10.4),
+   the other stands cold. The fires are their own light only. The strings stay in the note, since each names more
+   than the fires (the pupils, the steam, the dark). One group, no tap lands on it. ?fires=all|boys for checks. */
+var POT_ALL = "the pupils in pairs at their cauldrons, the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, knives on boards, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair",
+    POT_BOYS = "his own desk's fire lit for his lesson, the rest of the room dark past its glow, the jars at the light's edge, the passage's \"torches in brackets\" through the door: the dark eased, a light near";
+var POT = (function () {
+  var out = { on: false, places: [], all: false };
+  if (PLACE !== 'potions-dungeon') return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'potions-things'; shell.group.add(g);
+  var iron = kit.solid(0x2e2b28), pot = kit.solid(0x3a3631), flame = new THREE.MeshBasicMaterial({ color: 0xe0702a });
+  [1.75, 3.85, 6.15, 8.25].forEach(function (xp) {
+    [2.4, 4.4, 6.4, 8.4, 10.4].forEach(function (yp) {
+      var at = shell.toLocal(16 + xp, 15.4 + yp, z0), p = new THREE.Group(); p.position.copy(at); g.add(p);
+      for (var l = 0; l < 3; l++) {   /* the stand's three legs and its ring at 0.62, the bowl resting in it */
+        var a = l * Math.PI * 2 / 3 + 0.5, leg = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.64, 5), iron);
+        leg.position.set(Math.cos(a) * 0.2, 0.31, Math.sin(a) * 0.2); p.add(leg);
+      }
+      var hoop = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.012, 5, 24), iron); hoop.rotation.x = Math.PI / 2; hoop.position.y = 0.62; p.add(hoop);
+      var c = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), pot);
+      c.position.y = 0.8; p.add(c);   /* its rim at 0.8, the bowl down to 0.55 */
+      var f = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.25, 8), flame); f.position.y = 0.125; p.add(f);
+      out.places.push({ boys: yp === 10.4 && xp > 5, pot: c, fire: f });
+    });
+  });
+  return out;
+})();
+function potSet(all) {
+  if (!POT.on) return; POT.all = all;
+  POT.places.forEach(function (q) { q.pot.visible = q.fire.visible = all || q.boys; });
+}
+function potShown(shown) {   /* the fires as the lesson rule shows them; the strings stay the note's */
+  if (!POT.on) return [];
+  var q = Q.get('fires');
+  potSet(q ? q === 'all' : shown.indexOf(POT_ALL) >= 0);
+  return [];
+}
+if (POT.on) potSet(Q.get('fires') === 'all');
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -1122,7 +1220,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -1265,6 +1363,7 @@ function frame() {
   updateCupboard(dt);
   updateHops(dt);
   updateCranks(dt);
+  updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt);
@@ -1468,6 +1567,12 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   /* req 658: the library's lamps as they stand (lit or not); shown strings passed in are drawn as the room rules would show them */
   lib: function (shown) { var d = shown ? libShown(shown) : [];
     return LIB.on ? { lamps: LIB.lamps.length, lit: LIB.lit, drawn: d.length } : null; },
+  /* reqs 667 and 665: the Charms candles and the Potions fires as they stand; sway() knocks the chandelier */
+  charms: function (shown) { var d = shown ? charmsShown(shown) : [];
+    return CHARMS.on ? { candles: CHARMS.flames.length, lit: CHARMS.lit, swaying: !!CHARMS.sway, drawn: d.length } : null; },
+  sway: function () { charmsSway(); return CHARMS.on; },
+  potions: function (shown) { if (shown) potShown(shown);
+    return POT.on ? { stands: POT.places.length, lit: POT.places.filter(function (q) { return q.fire.visible; }).length, all: POT.all } : null; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
