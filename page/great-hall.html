@@ -131,9 +131,12 @@ shot before anything is spent.
 <button id="back" type="button" hidden>Back</button>
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=381"></script>
-<script src="castle-shell.js?v=25"></script>
+<script src="castle.js?v=15"></script>
+<script src="castle-model.js?v=387"></script>
+<script src="castle-paint.js?v=2"></script>
+<script src="design/tones.js?v=2"></script>
+<script src="design/ceilings.js?v=2"></script>
+<script src="castle-shell.js?v=33"></script>
 <script src="castle-events.js?v=38"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
@@ -173,7 +176,9 @@ var canvas = kit.canvas, backBtn = kit.backBtn, clamp = kit.clamp, lerp = kit.le
 var renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
 camera.far = 220; camera.updateProjectionMatrix();
 
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from }) : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, paint: [PLACE] }) : null;
+/* req 707: the hall painted as shell.html paints it, so the star vault (Design's 2c3ebaab, the Architect's bd81623e) and
+   the materials schedule's tones come with the shell; the sky still shows through all that is not rib */
 if (!shell) { kit.helpEl.textContent = 'The Great Hall is not in the castle model.'; return; }
 scene.add(shell.group);
 var P = function (x, y, z) { return shell.toLocal(x, y, (z || 0)); };
