@@ -1,0 +1,644 @@
+{
+  "chain": "first-floor",
+  "about": "The first floor's corridors and passages (Magic's req 751): the long corridor from the marble stair's head east to McGonagall's door, the east corridor, the hospital passage, the Transfiguration and History of Magic passages and the way behind the History hearth; the things Interiors' (req 753), the figures People's. Every year. McGonagall's door has its own row in her study's table; nothing of it here. Nothing glows.",
+  "first_visit": [],
+  "places": {
+    "first floor ways": [
+      "first floor corridor",
+      "east first floor corridor",
+      "hospital passage",
+      "transfiguration passage",
+      "history of magic passage"
+    ],
+    "first floor long": [
+      "first floor corridor",
+      "east first floor corridor"
+    ]
+  },
+  "marks": {
+    "floorsuits": [
+      "home",
+      "left",
+      "right"
+    ],
+    "floortapestry": [
+      "first",
+      "moved"
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = first floor corridor"
+      ],
+      "show": [
+        "at the stair's head the rail over the Entrance Hall's air, the hall's sounds coming up to him: the front doors, feet on the flags, and below the house hourglasses catching the torchlight"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the landing (Magic's 2.2 and the Entrance Hall's table, cited); the landing bare for the start (Interiors' docs/interiors/first-floor-corridors.md (req 753), cited)"
+    },
+    {
+      "when": [
+        "place = first floor corridor",
+        "meal != none"
+      ],
+      "show": [
+        "the noise of a meal coming up from the Great Hall's doors below"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: at meal times the Great Hall's noise through its doors"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets between the high windows",
+        "the people in the portraits along the corridor awake, whispering and pointing as he passes"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: walls \"lit with flaming torches\" (PS 7 L2317), \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651), both read in the canon tool, 20 October 2026; the windows high, over a boy's head (Interiors' docs/interiors/first-floor-corridors.md (req 753), cited; the Architect's req 754)"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "the court's sky bright in the high windows"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time != night",
+        "weather = cloudy"
+      ],
+      "show": [
+        "grey cloud passing in the high windows"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time != night",
+        "weather = rain"
+      ],
+      "show": [
+        "rain streaming down the high windows"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time != night",
+        "weather = snow"
+      ],
+      "show": [
+        "snow drifting past the high windows"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "fog pressing white against the high windows"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the court's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon != new"
+      ],
+      "show": [
+        "the corridor striped with bars of moonlight from the high windows"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: \"corridors striped with bars of moonlight from the high windows\" (PS 9 L3229, read in the canon tool, 20 October 2026), the real moon up on a clear night"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "the high windows dark"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: by night, no moon up"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time = night",
+        "moon up = yes",
+        "weather != clear"
+      ],
+      "show": [
+        "the high windows dark"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: by night, the moon behind cloud, rain, snow or fog"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon = new"
+      ],
+      "show": [
+        "the high windows dark"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: by night, the new moon"
+    },
+    {
+      "when": [
+        "place = first floor ways",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, nobody about"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: by night the passages empty (Magic's 2.3)"
+    },
+    {
+      "when": [
+        "place = first floor long",
+        "time = night"
+      ],
+      "show": [
+        "the people in the portraits asleep in their frames, a soft snore here and there"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: by night the portraits asleep (Magic's 1.3)"
+    },
+    {
+      "when": [
+        "place = first floor corridor",
+        "first_floor_suits = home"
+      ],
+      "show": [
+        "the two suits of armour on their plinths against the north wall, each on its own place"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: Interiors' two suits (Interiors' docs/interiors/first-floor-corridors.md (req 753), cited), a step from where they stood last visit (Magic's 1.5; \"Harry was sure the coats of armor could walk\", PS 8 L2722, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = first floor corridor",
+        "first_floor_suits = left"
+      ],
+      "show": [
+        "the two suits of armour on their plinths against the north wall, each a step to its own left of its place, as if it had shifted since he last came"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: Interiors' two suits (Interiors' docs/interiors/first-floor-corridors.md (req 753), cited), a step from where they stood last visit (Magic's 1.5; \"Harry was sure the coats of armor could walk\", PS 8 L2722, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = first floor corridor",
+        "first_floor_suits = right"
+      ],
+      "show": [
+        "the two suits of armour on their plinths against the north wall, each a step to its own right of its place, as if it had shifted since he last came"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: Interiors' two suits (Interiors' docs/interiors/first-floor-corridors.md (req 753), cited), a step from where they stood last visit (Magic's 1.5; \"Harry was sure the coats of armor could walk\", PS 8 L2722, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = transfiguration passage",
+        "first_floor_tapestry = first"
+      ],
+      "show": [
+        "the tapestry on the passage's east wall, its woven figures standing as he saw them first"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the hanging over the tapestry stair's foot (Hidden Ways' H11, cited), a woven figure changed between his looks (Magic's 1.4)"
+    },
+    {
+      "when": [
+        "place = transfiguration passage",
+        "first_floor_tapestry = moved"
+      ],
+      "show": [
+        "the tapestry on the passage's east wall, one woven figure moved to another place in the scene since he last looked"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the hanging over the tapestry stair's foot (Hidden Ways' H11, cited), a woven figure changed between his looks (Magic's 1.4)"
+    },
+    {
+      "when": [
+        "place = transfiguration passage",
+        "hour = 8",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "a class lining up along the passage's west wall outside the Transfiguration door, quiet, nobody pushing"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: before her morning lesson, \"joined the queue outside the classroom\" (PoA 8 L16210, read in the canon tool, 20 October 2026); from eight to the bell; People's figures, the queue's place Interiors'"
+    },
+    {
+      "when": [
+        "place = transfiguration passage",
+        "hour = 13",
+        "lessons = off",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "a class lining up along the passage's west wall outside the Transfiguration door, quiet, nobody pushing"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: before her afternoon lesson, from one to the bell at half past"
+    },
+    {
+      "when": [
+        "place = history of magic passage",
+        "lessons = on"
+      ],
+      "show": [
+        "through the History of Magic door one dry voice droning on and on, and the scratch of quills"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: \"Binns droned on and on\" (PS 8 L2732, read in the canon tool, 20 October 2026), in lesson time; nothing of the jib door shows (a find; nothing glows)"
+    },
+    {
+      "when": [
+        "place = history of magic passage",
+        "lessons = off"
+      ],
+      "show": [
+        "the History of Magic door shut, the passage quiet"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: out of lesson time"
+    },
+    {
+      "when": [
+        "place = history hearth way"
+      ],
+      "show": [
+        "the way behind the hearth narrow, dark and cold, the classroom's cold coming through the hearth's back, dust on the flags, the jib door at its end"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the way behind the hearth, once found (the History table's cold hearth, archived); its jib door always opens from inside (the shell's)"
+    },
+    {
+      "when": [
+        "place = hospital passage"
+      ],
+      "show": [
+        "the hospital passage quieter than the corridor, the oak bench against its wall"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the bench Interiors' (Interiors' docs/interiors/first-floor-corridors.md (req 753), cited)"
+    }
+  ],
+  "records": [
+    {
+      "id": "first-floor.shift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = first floor corridor"
+      ],
+      "starts": [
+        "set first_floor_suits = mark floorsuits, not last"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the suits a step from where they stood last visit"
+    },
+    {
+      "id": "first-floor.tapestry-shift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = transfiguration passage"
+      ],
+      "starts": [
+        "set first_floor_tapestry = mark floortapestry, not last"
+      ],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: a woven figure changed between his looks"
+    },
+    {
+      "id": "first-floor.bell-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 09:00",
+      "when": [
+        "place = first floor long",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons; the last pupils hurry into the passages, and the corridor empties and goes quiet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the bells' filling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "first-floor.bell-noon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 12:30",
+      "when": [
+        "place = first floor long",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings, the passages' doors open and the corridor fills, pupils streaming to and from the marble stair"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the bells' filling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "first-floor.bell-afternoon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 13:30",
+      "when": [
+        "place = first floor long",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons; the last pupils hurry into the passages, and the corridor empties and goes quiet"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the bells' filling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "first-floor.bell-evening",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 18:00",
+      "when": [
+        "place = first floor long",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings, the passages' doors open and the corridor fills, pupils streaming to and from the marble stair"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the bells' filling and emptying, as the classroom corridor's (staff.json)"
+    },
+    {
+      "id": "first-floor.queue-in-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 09:00",
+      "when": [
+        "place = transfiguration passage",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the Transfiguration door opens and the queue files in; the passage is empty"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: it files in when her door opens, and the passage is empty"
+    },
+    {
+      "id": "first-floor.queue-in-afternoon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "clock 13:30",
+      "when": [
+        "place = transfiguration passage",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the Transfiguration door opens and the queue files in; the passage is empty"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: it files in when her door opens, and the passage is empty"
+    },
+    {
+      "id": "first-floor.tapestry-stir",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-tapestry",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = transfiguration passage"
+      ],
+      "show": [
+        "the tapestry stirs in a draught from behind, as if a door had shut somewhere above, and hangs still"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: now and then (Magic's 1.4; H11 behind it); about one visit in three"
+    },
+    {
+      "id": "first-floor.tapestry-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-tapestry",
+      "weight": 2,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = transfiguration passage"
+      ],
+      "starts": []
+    },
+    {
+      "id": "first-floor.ghost",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-ghost",
+      "weight": 1,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = first floor long"
+      ],
+      "show": [
+        "a pearly-white, slightly transparent ghost glides along the corridor in its own pale light and through the wall"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: the ghosts now and then (Magic's 1.6; \"Pearly-white and slightly transparent\", PS 7 L2343, read in the canon tool, 20 October 2026); about one visit in four"
+    },
+    {
+      "id": "first-floor.ghost-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-ghost",
+      "weight": 3,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = first floor long"
+      ],
+      "starts": []
+    },
+    {
+      "id": "first-floor.peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-peeves",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = first floor long"
+      ],
+      "show": [
+        "a rattle of armour from round a corner, as if something unseen had gone zooming past it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: Peeves now and then, unseen (Magic's 1.7; \"rattling coats of armor as he passed\", PS 7 L2669, read in the canon tool, 20 October 2026); about one visit in four"
+    },
+    {
+      "id": "first-floor.peeves-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-peeves",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = first floor long"
+      ],
+      "starts": []
+    },
+    {
+      "id": "first-floor.bench",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-ward",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital passage",
+        "time != night"
+      ],
+      "show": [
+        "a pupil waiting on the bench outside the hospital wing"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: now and then a pupil waiting on Interiors' bench (ours, everyday, nothing shames); People's figures"
+    },
+    {
+      "id": "first-floor.friend",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-ward",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital passage",
+        "time != night"
+      ],
+      "show": [
+        "a pupil going along to the hospital wing with a friend, a hand wrapped in a handkerchief"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: or going along to the wing with a friend (ours, everyday, nothing shames)"
+    },
+    {
+      "id": "first-floor.ward-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-ward",
+      "weight": 2,
+      "moment": "arrive",
+      "when": [
+        "place = hospital passage",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "first-floor.pepperup",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-pepperup",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = hospital passage",
+        "time != night",
+        "cold = yes"
+      ],
+      "show": [
+        "a pupil coming away from the hospital wing smoking at the ears"
+      ],
+      "starts": [],
+      "canon": "Magic's req 751 (docs/magic/rooms.md, The first floor's corridors and passages), every year: in the cold weeks Pepperup's after-effect, \"smoking at the ears for several hours afterward\" (CoS 8 L8985, read in the canon tool, 20 October 2026; the wing's wing.pepperup, cold = yes); about one cold visit in three"
+    },
+    {
+      "id": "first-floor.pepperup-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "first-floor-pepperup",
+      "weight": 2,
+      "moment": "arrive",
+      "when": [
+        "place = hospital passage",
+        "time != night",
+        "cold = yes"
+      ],
+      "starts": []
+    }
+  ]
+}
