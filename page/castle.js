@@ -1161,7 +1161,9 @@ window.castleFrame = function (opts) {
     /* the long wall, the door's opening at x 0 and the inglenook's mouth under its lintel */
     var herShape = rect(C.FAR_END_X, y0, C.END_X, y1);
     herShape.holes.push(holeOf([new THREE.Vector2(C.DOOR.x - C.DOOR.w / 2, 0), new THREE.Vector2(C.DOOR.x + C.DOOR.w / 2, 0), new THREE.Vector2(C.DOOR.x + C.DOOR.w / 2, C.DOOR.h), new THREE.Vector2(C.DOOR.x - C.DOOR.w / 2, C.DOOR.h)]));
-    herShape.holes.push(holeOf([new THREE.Vector2(C.NOOK_X1, 0), new THREE.Vector2(C.NOOK_X0, 0), new THREE.Vector2(C.NOOK_X0, C.NOOK_H), new THREE.Vector2(C.NOOK_X1, C.NOOK_H)]));
+    /* the mouth cut from a little below the floor, so the wall's own sill face lies under the nook's flags instead of in
+       their plane, where the two flickered on the phone (Godric's shot, 20 October 2026, 7.23 am) */
+    herShape.holes.push(holeOf([new THREE.Vector2(C.NOOK_X1, -0.05), new THREE.Vector2(C.NOOK_X0, -0.05), new THREE.Vector2(C.NOOK_X0, C.NOOK_H), new THREE.Vector2(C.NOOK_X1, C.NOOK_H)]));
     var herG = new THREE.ExtrudeGeometry(herShape, { depth: C.T, bevelEnabled: false });
     herG.translate(0, 0, C.HER_Z);
     out.herWall = add(new THREE.Mesh(herG, wallMat), 'her-wall');

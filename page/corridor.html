@@ -189,9 +189,9 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <div id="lines" aria-live="polite"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=14"></script>
-<script src="castle-ear.js?v=1"></script>
-<script src="castle-events.js?v=34"></script>
+<script src="castle.js?v=15"></script>
+<script src="castle-ear.js?v=2"></script>
+<script src="castle-events.js?v=38"></script>
 <script src="castle-map.js?v=2"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/spells.js?v=41"></script>
@@ -655,8 +655,11 @@ var CORRIDOR_WEAR = [WEAR_PATH, NOOK_PATH];
   };
   im.src = FLAGS.url;
 })();
-var nookCeil = new THREE.Mesh(new THREE.PlaneGeometry(NOOK_W, NOOK_D), ceilMat);
-nookCeil.rotation.x = Math.PI / 2; nookCeil.position.set(NOOK_MID, NOOK_H, HER_Z + NOOK_D / 2);
+/* the nook's ceiling starts behind the lintel, at her wall's back face: laid from the corridor's face it shared the
+   lintel's soffit plane over the mouth, and the two flickered against each other on the phone (Godric's shot, 20 October
+   2026, 7.23 am) */
+var nookCeil = new THREE.Mesh(new THREE.PlaneGeometry(NOOK_W, NOOK_D - T), ceilMat);
+nookCeil.rotation.x = Math.PI / 2; nookCeil.position.set(NOOK_MID, NOOK_H, HER_Z + T + (NOOK_D - T) / 2);
 nookCeil.name = 'nook-ceiling'; nook.add(nookCeil); register(nookCeil, 0);
 var SETTLE = { len: 2.0, d: 0.6, seat: 0.45, back: 1.5 };
 var settleMat = solid(0x7d6a55), settles = [];
@@ -949,10 +952,33 @@ her.position.set(-PORTRAIT_W / 2, HOLE_Y, 0);
 her.rotation.y = Math.PI;
 her.name = 'portrait-hole-front';
 hinge.add(her); register(her, 2);
+/* her back (Godric's shot, 20 October 2026, 7.23 am: swung open, her painted face showed on the inside of the door): she
+   is drawn on her front only, and behind her a back in her frame's own outline, the frame's plain oak back round a
+   canvas back with its stretcher bars, lit as she is */
+her.material.side = THREE.FrontSide;
+var HER_BACK = { oak: '#3b2c20', canvas: '#7d705c', bar: '#55432f', inset: { u: 0.14, v: 0.12 }, bar_w: 0.035 };
+var herBack = null;
+function drawHerBack(im) {
+  var B = HER_BACK, w = 280, h = 340, c = makeCanvas(w, h), g = c.getContext('2d');
+  g.drawImage(im, 0, 0, w, h);
+  g.globalCompositeOperation = 'source-in'; g.fillStyle = B.oak; g.fillRect(0, 0, w, h);
+  g.globalCompositeOperation = 'source-over';
+  var x0 = w * B.inset.u, y0 = h * B.inset.v, cw = w - 2 * x0, ch = h - 2 * y0, bw = w * B.bar_w;
+  g.fillStyle = B.canvas; g.fillRect(x0, y0, cw, ch);
+  g.fillStyle = B.bar; g.fillRect(x0, y0 + ch / 2 - bw / 2, cw, bw); g.fillRect(x0 + cw / 2 - bw / 2, y0, bw, ch);
+  g.strokeStyle = B.bar; g.lineWidth = bw; g.strokeRect(x0 + bw / 2, y0 + bw / 2, cw - bw, ch - bw);
+  /* seen from behind, so drawn mirrored to sit in her outline */
+  var m = makeCanvas(w, h), mg = m.getContext('2d'); mg.translate(w, 0); mg.scale(-1, 1); mg.drawImage(c, 0, 0);
+  herBack = new THREE.Mesh(new THREE.PlaneGeometry(PORTRAIT_W, PORTRAIT_H),
+    new THREE.MeshStandardMaterial({ map: tex(m), color: 0xffffff, roughness: 0.95, metalness: 0, alphaTest: 0.5 }));
+  herBack.rotation.y = Math.PI; herBack.position.set(0, 0, -0.004);
+  herBack.name = 'portrait-hole-back'; her.add(herBack); register(herBack, 2);
+}
 (function () {
   var im = new Image();
   im.onload = function () {
     her.material.map = tex(im); her.material.color.set(0xffffff); her.userData.base = her.material.color.clone(); her.material.needsUpdate = true;
+    drawHerBack(im);
   };
   im.src = '../assets/layers/portrait-hole-front.png?v=3';
 })();
@@ -2793,17 +2819,21 @@ vaultGroup.name = 'rib-vault'; vaultGroup.visible = VAULT.on; scene.add(vaultGro
    (req 645); the flat ceiling over them becomes the boards. Live on Godric's 1 (corridor-nook-beams-1019, 20 October
    2026), the boards a shade lighter than first drawn so they read between the beams by day: a flat ceiling facing down
    takes almost no light, so they also take back a little of the day off the flags (bounce, gone by night, as the
-   suit's ARMOUR_BOUNCE); ?beams=0 shows the flat ceiling */
+   suit's ARMOUR_BOUNCE); ?beams=0 shows the flat ceiling. Across the mouth an oak bressummer under the stone lintel,
+   the wall's thickness deep, its face on the corridor's wall line, so the joists' front ends bear on it behind the
+   lintel instead of standing cut off in the opening (Godric's shot, 20 October 2026, 7.23 am: the beams' ends broke at
+   the opening, the end one past the wall line) */
 var BEAMS = { on: !/[?&]beams=0(&|$)/.test(location.search), n: 8, w: 0.16, h: 0.2, oak: 0x4a3626, boards: 0x7e6650, bounce: 0.22, mat: null,
-  corbel: { w: 0.22, h: 0.18, d: 0.14 } };
+  corbel: { w: 0.22, h: 0.18, d: 0.14 }, bress: { h: 0.24 } };
 var nookBeams = new THREE.Group();
 nookBeams.name = 'nook-beams'; nookBeams.visible = BEAMS.on; nook.add(nookBeams);
 (function () {
-  var oak = solid(BEAMS.oak), c = BEAMS.corbel;
+  var oak = solid(BEAMS.oak), c = BEAMS.corbel, front = HER_Z + T;
+  box(nookBeams, NOOK_W - 0.002, BEAMS.bress.h, T, NOOK_MID, NOOK_H - BEAMS.bress.h / 2 - 0.002, HER_Z + T / 2 - 0.003, oak, 0).name = 'nook-bressummer';
   for (var i = 0; i < BEAMS.n; i++) {
     var x = NOOK_X0 - NOOK_W * (i + 0.5) / BEAMS.n;
-    var back = Math.abs(x - NOOK_MID) < HEARTH_W / 2 ? NOOK_BACK - BREAST : NOOK_BACK, len = back - HER_Z;
-    box(nookBeams, BEAMS.w, BEAMS.h, len, x, NOOK_H - BEAMS.h / 2 - 0.002, HER_Z + len / 2, oak, 0);
+    var back = Math.abs(x - NOOK_MID) < HEARTH_W / 2 ? NOOK_BACK - BREAST : NOOK_BACK, len = back - front;
+    box(nookBeams, BEAMS.w, BEAMS.h, len, x, NOOK_H - BEAMS.h / 2 - 0.002, front + len / 2, oak, 0);
     box(nookBeams, c.w, c.h, c.d, x, NOOK_H - BEAMS.h - c.h / 2, back - c.d / 2, SURROUND.mat, 0);
   }
   if (BEAMS.on) nookCeil.material = BEAMS.mat = solid(BEAMS.boards);
