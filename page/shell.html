@@ -731,7 +731,10 @@ var thingCues = {
   "the cover shivers and the whispering along the shelf rises as he lifts the clasp; then one high, unbroken note swells out of the pages over a breath, and goes on and on": function () { turnDone = 'thing'; var b = roomThing('screaming-book'); if (b) shake(b, 1.2, 60, 0.008);showLines([{ medium: 'seen', sound: "the cover shivers and the whispering along the shelf rises as he lifts the clasp; then one high, unbroken note swells out of the pages over a breath, and goes on and on" }]); },
   /* H11's trick step (Events' req 602, page/events/hidden-ways.json's hidden-ways.trick-step, Kingsley's 8d: PS 8's
      vanishing step), word for word */
-  "the step is not there: his foot drops through to the tread below with a lurch, his hand catches the rail, and he laughs and goes on": function () { trickSink(); }
+  "the step is not there: his foot drops through to the tread below with a lurch, his hand catches the rail, and he laughs and goes on": function () { trickSink(); },
+  /* the stair hall's loose rods (Events' req 634, stairhall.rods-loose, on arrival), word for word: drawn on well-M3
+     (STAIR below) and the line seen, the flight two floors over his head */
+  "halfway up the staircase to the third floor a brass stair rod or two lie loose, the runner rucked over their treads": function () { stairSet({ loose: true }); showLines([{ medium: 'seen', sound: STAIR_RODS }]); }
 };
 /* the Entrance Hall's four glasses (Magic's req 633; Events' req 632, page/events/hall.json): Design's
    LumosHourglass.mount drawn off screen and painted onto a card in each hourglass niche (Godric's 13.1 and 25.1), each
@@ -829,6 +832,218 @@ function updateGlass(dt) {
   if (!GLASS.ready) glassInit();
   GLASS.list.forEach(function (g) { if (g.busy && (g.t += dt) > 0.08) { g.t = 0; glassPaint(g); } });
 }
+/* the stair hall's things (Magic's req 635; Events' req 634, page/events/stairhall.json), where Interiors'
+   docs/interiors/stair-hall.md, The things, puts them (provisional, cited): the map of Argyllshire (item 7) on the
+   west gallery's wall on 2; the coats of armour (item 2), two a floor 1 to 7, at home or a step to their own left or
+   right as `stair_armour` shows (a west suit faces east, so its left is north); the tapestry over the fifth floor's
+   hidden doorway (item 3), its woven figures in the scene `stair_tapestry` shows (plain figures until Magic's scene
+   is drawn); the runner on well-M3 (item 5, 1.37 wide, a brass rod at each riser), a rod or two loose and the runner
+   rucked halfway up when stairhall.rods-loose plays. At Christmas the streamers hang along each gallery's open edge,
+   clear of the flights' ends (Interiors' surfaces keep that edge clear: these are the season's only, below the rail's
+   top) and the light shows through the visors' slits, falling on nothing else (PoA 11). All of it hangs in one group
+   of its own, so no tap ever lands on it (the hidden doorway behind the tapestry and the flight under the runner keep
+   theirs). The portraits, the empty frame, the Friday staircase and the far sounds stay the note's words.
+   ?armour=home|left|right, ?tapestry=first|second|third, ?christmas=on and ?rods=loose stand them with the events
+   absent, for checks. */
+var STAIR_MAP = 'the map of Argyllshire on the wall, its lochs and hills in faded inks';
+var STAIR_ARMOUR = { home: 'the suits of armour on the galleries each standing on its own place against the wall',
+  left: 'the suits of armour on the galleries each standing a step to its own left of its place, as if it had shifted since he last came',
+  right: 'the suits of armour on the galleries each standing a step to its own right of its place, as if it had shifted since he last came' };
+var STAIR_TAPESTRY = { first: "the tapestry on the fifth floor's east gallery, its woven figures as they stood in its first scene",
+  second: "the tapestry on the fifth floor's east gallery, its woven figures moved into a second scene since he last looked",
+  third: "the tapestry on the fifth floor's east gallery, its woven figures moved into a third scene since he last looked" };
+var STAIR_XMAS = ['thick streamers of holly and mistletoe strung along the galleries',
+  'a soft light shining from inside every suit of armour, out through the slits of its visor'];
+var STAIR_RODS = 'halfway up the staircase to the third floor a brass stair rod or two lie loose, the runner rucked over their treads';
+var STAIR = (function () {
+  var out = { on: false, suits: [], armour: 'home', scene: 'first', xmas: false, loose: false };
+  if (PLACE !== 'stair-hall') return out;
+  out.on = true;
+  var S = 5.2, g = new THREE.Group(); g.name = 'stair-things'; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z); };   /* the well's floor is 0: every height absolute */
+  var srgb = function (t) { if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding; return t; };
+  function box(x0, y0, z0, x1, y1, z1, mat, parent) {   /* a box between two corners in the castle's frame */
+    var a = P(x0, y0, z0), b = P(x1, y1, z1), m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mat);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); (parent || g).add(m); return m;
+  }
+  function merged(meshes, mat) {   /* many small pieces drawn as one */
+    var pos = [], nor = [];
+    meshes.forEach(function (m) {
+      m.updateMatrixWorld(true);
+      var geo = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+      geo.applyMatrix4(m.matrixWorld);
+      Array.prototype.push.apply(pos, geo.attributes.position.array); Array.prototype.push.apply(nor, geo.attributes.normal.array);
+    });
+    var bg = new THREE.BufferGeometry();
+    bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    var m = new THREE.Mesh(bg, mat); g.add(m); return m;
+  }
+  function canvasPlane(w, h, px, py, paint) {
+    var cv = document.createElement('canvas'); cv.width = px; cv.height = py; paint(cv.getContext('2d'), px, py);
+    var tex = srgb(new THREE.CanvasTexture(cv));
+    return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, metalness: 0 }));
+  }
+  function seeded(k) { var s = Math.sin(k * 12.9898 + 4.1) * 43758.5453; return s - Math.floor(s); }
+
+  /* the map (item 7): 0.9 by 0.7, y 23.15 to 24.05, 1.25 to 1.95 over floor 2, 0.02 off the west wall, in a thin frame */
+  box(68.0, 23.1, 2 * S + 1.2, 68.025, 24.1, 2 * S + 2.0, kit.solid(0x3e3128));
+  var map = canvasPlane(0.9, 0.7, 360, 280, function (c, w, h) {
+    c.fillStyle = '#d6c69f'; c.fillRect(0, 0, w, h);
+    var gr = c.createRadialGradient(w / 2, h / 2, h * 0.3, w / 2, h / 2, w * 0.7);
+    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(90,66,30,0.35)'); c.fillStyle = gr; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(70,82,96,0.55)'; c.fillStyle = 'rgba(120,140,150,0.22)'; c.lineWidth = 1.6;
+    c.beginPath(); c.moveTo(0, 30); for (var i = 0; i <= 14; i++) c.lineTo(70 + 30 * Math.sin(i * 1.7) + i * 4, 20 + i * 18); c.lineTo(0, h); c.closePath(); c.fill(); c.stroke();
+    [[96, 250, 250, 40, 9], [130, 230, 230, 70, 7], [150, 180, 300, 30, 5], [180, 260, 268, 120, 6]].forEach(function (L) {   /* the long lochs, south-west to north-east */
+      c.beginPath(); c.moveTo(L[0], L[1]); c.quadraticCurveTo((L[0] + L[2]) / 2 + 18, (L[1] + L[3]) / 2, L[2], L[3]);
+      c.lineWidth = L[4]; c.strokeStyle = 'rgba(120,140,150,0.4)'; c.stroke(); c.lineWidth = 1; c.strokeStyle = 'rgba(70,82,96,0.5)'; c.stroke();
+    });
+    c.strokeStyle = 'rgba(110,80,46,0.55)'; c.lineWidth = 1.3;
+    for (var k = 0; k < 34; k++) { var hx = 110 + seeded(k) * 230, hy = 30 + seeded(k + 50) * 230; c.beginPath(); c.arc(hx, hy, 6 + seeded(k + 9) * 5, Math.PI * 1.1, Math.PI * 1.9); c.stroke(); }
+    c.fillStyle = 'rgba(80,58,34,0.6)'; c.font = 'italic 18px Georgia, serif'; c.fillText('Argyll', 250, 32);
+    c.strokeStyle = 'rgba(80,58,34,0.5)'; c.lineWidth = 2; c.strokeRect(6, 6, w - 12, h - 12);
+  });
+  map.position.copy(P(68.03, 23.6, 2 * S + 1.6)); map.rotation.y = Math.PI / 2; map.name = 'stair-map'; g.add(map);
+
+  /* the armour (item 2): 1.70 high on a plinth 0.8 along the wall, 0.7 deep, 0.15 high, facing across the well. A step
+     is 0.35: the most the tightest suits have (the east wall on 2 and 5 at y 27.2, between the hidden doorway's kept
+     zone to 26.45 and the portraits from 28.0), so every suit steps alike */
+  var steel = kit.solid(0x8b8e92, { metalness: 0.55, roughness: 0.45 }), stone = kit.solid(0x7d7973), dark = kit.solid(0x1c1b1a);
+  var warm = new THREE.MeshBasicMaterial({ color: 0xffc46e });
+  function suit(wallX, face, y, z) {
+    var s = new THREE.Group(), add = function (w, h, d, x, yy, zz, mat) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat || steel); m.position.set(x, yy, zz); s.add(m); return m; };
+    add(0.7, 0.15, 0.8, 0, 0.075, 0, stone);                                          /* the plinth; x across the well, z along the wall */
+    add(0.16, 0.78, 0.15, 0.02, 0.54, -0.1); add(0.16, 0.78, 0.15, 0.02, 0.54, 0.1);  /* the legs */
+    add(0.24, 0.07, 0.17, 0.06, 0.18, -0.1); add(0.24, 0.07, 0.17, 0.06, 0.18, 0.1);   /* the sabatons */
+    add(0.28, 0.2, 0.42, 0, 1.02, 0); add(0.3, 0.42, 0.44, 0, 1.33, 0);                /* the tassets, the breastplate */
+    add(0.2, 0.14, 0.15, 0, 1.49, -0.3); add(0.2, 0.14, 0.15, 0, 1.49, 0.3);          /* the pauldrons */
+    add(0.12, 0.52, 0.11, 0.02, 1.18, -0.3); add(0.12, 0.52, 0.11, 0.02, 1.18, 0.3);  /* the arms */
+    add(0.18, 0.06, 0.2, 0, 1.57, 0); add(0.25, 0.25, 0.22, 0.01, 1.725, 0);         /* the gorget, the helm */
+    add(0.005, 0.025, 0.15, 0.137, 1.75, 0, dark);                                     /* the visor's slit */
+    var lit = add(0.006, 0.025, 0.15, 0.139, 1.75, 0, warm); lit.visible = false;
+    var home = P(wallX + face * 0.35, y, z);
+    s.position.copy(home); s.rotation.y = face > 0 ? 0 : Math.PI; g.add(s);
+    /* its own left: a west suit faces east (+x), its left north (+y); an east suit faces west, its left south */
+    out.suits.push({ g: s, home: home, left: P(wallX + face * 0.35, y + face * 0.35, z).sub(home), lit: lit });
+  }
+  for (var fl = 1; fl <= 7; fl++) {
+    suit(68, 1, fl === 2 ? 26.6 : 25.0, fl * S);
+    suit(92, -1, fl === 2 || fl === 5 ? 27.2 : 25.0, fl * S);
+  }
+
+  /* the tapestry (item 3): y 22.6 to 25.4, 0.02 to 4.0 over floor 5, 0.02 off the east wall over the hidden doorway */
+  function weave(scene) {
+    return function (c, w, h) {
+      c.fillStyle = '#5a3328'; c.fillRect(0, 0, w, h);
+      c.fillStyle = '#41503d'; c.fillRect(18, 18, w - 36, h - 36);
+      c.fillStyle = 'rgba(214,196,150,0.55)'; for (var b = 26; b < h - 18; b += 22) { c.fillRect(6, b, 6, 8); c.fillRect(w - 12, b, 6, 8); }
+      c.fillStyle = '#566a4e'; c.fillRect(18, h * 0.72, w - 36, h * 0.28 - 18);
+      c.fillStyle = '#2f3d2e'; [[60, 0.68], [222, 0.64]].forEach(function (t) { c.beginPath(); c.arc(t[0], h * t[1] - 52, 34, 0, Math.PI * 2); c.fill(); c.fillRect(t[0] - 5, h * t[1] - 22, 10, 40); });
+      var spots = { first: [[86, 1], [120, 1], [158, 1], [196, 1]], second: [[52, 1], [104, 0.8], [176, 1], [232, 1]],
+                    third: [[70, 1], [140, 0.8], [150, 1], [214, 0.8]] }[scene];
+      ['#8c2f2a', '#3a4f7a', '#b08a3a', '#d8d0bc'].forEach(function (col, i) {
+        var x = spots[i][0], s = spots[i][1], foot = h * 0.8 + (i % 2) * 8, top = foot - 96 * s;
+        c.fillStyle = col; c.beginPath(); c.moveTo(x - 14 * s, foot); c.lineTo(x + 14 * s, foot); c.lineTo(x + 7 * s, top + 22 * s); c.lineTo(x - 7 * s, top + 22 * s); c.closePath(); c.fill();
+        c.fillStyle = '#c8a888'; c.beginPath(); c.arc(x, top + 12 * s, 10 * s, 0, Math.PI * 2); c.fill();
+      });
+      c.fillStyle = 'rgba(0,0,0,0.06)'; for (var r = 0; r < h; r += 3) c.fillRect(0, r, w, 1);   /* the weft */
+    };
+  }
+  var tap = canvasPlane(2.8, 3.98, 280, 398, weave('first'));
+  out.scenes = {};
+  ['first', 'second', 'third'].forEach(function (sc) {
+    var cv = document.createElement('canvas'); cv.width = 280; cv.height = 398; weave(sc)(cv.getContext('2d'), 280, 398);
+    out.scenes[sc] = srgb(new THREE.CanvasTexture(cv));
+  });
+  tap.material.map = out.scenes.first;
+  tap.position.copy(P(91.98, 24.0, 5 * S + 2.01)); tap.rotation.y = -Math.PI / 2; tap.name = 'stair-tapestry'; g.add(tap);
+  out.tapestry = tap;
+
+  /* the runner on well-M3 (item 5): its treads as the shells build them (the model's span, treads and rise); a red
+     runner 1.37 wide on the 3.0 flight with a cream guard stripe down each edge, a brass rod at each riser's foot */
+  var M3 = ((MODEL && MODEL.stairs) || []).filter(function (s) { return s.id === 'well-M3'; })[0];
+  if (M3) {
+    var x0 = Math.min(M3.span[0][0], M3.span[1][0]), x1 = Math.max(M3.span[0][0], M3.span[1][0]), y0 = Math.min(M3.span[0][1], M3.span[1][1]);
+    var n = M3.treads, go = (Math.max(M3.span[0][1], M3.span[1][1]) - y0) / n, rise = (M3.to - M3.from) / n;
+    var cx = (x0 + x1) / 2, hw = 1.37 / 2, T = 0.012, red = kit.solid(0x7a2926), cream = kit.solid(0xcdbf98);
+    var brass = kit.solid(0xb38f3e, { metalness: 0.6, roughness: 0.4 }), tidyR = [], tidyC = [], keep = [], keepC = [], rods = [];
+    var LOOSE = { 13: true, 14: true };   /* treads 14 and 15 (from 0), halfway up: rucked when the rods are loose */
+    var tmp = new THREE.Group();
+    for (var i = 0; i < n; i++) {
+      var top = M3.from + rise * (i + 1), fy = y0 + i * go, list = LOOSE[i] ? keep : tidyR, listC = LOOSE[i] ? keepC : tidyC;
+      list.push(box(cx - hw, fy, top, cx + hw, fy + go, top + T, red, tmp));              /* on the tread */
+      list.push(box(cx - hw, fy - T, top - rise, cx + hw, fy, top + T, red, tmp));        /* down its riser */
+      [-1, 1].forEach(function (sd) {
+        var e = cx + sd * (hw - 0.09);
+        listC.push(box(e - 0.03, fy, top + T, e + 0.03, fy + go, top + T + 0.002, cream, tmp));
+        listC.push(box(e - 0.03, fy - T - 0.002, top - rise, e + 0.03, fy - T, top + T, cream, tmp));
+      });
+      var rod = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 1.47, 8), brass);
+      rod.rotation.z = Math.PI / 2; rod.position.copy(P(cx, fy - T - 0.012, top - rise + T + 0.008)); g.add(rod); rods.push(rod);
+    }
+    merged(tidyR, red); merged(tidyC, cream);
+    var tidyLoose = [merged(keep, red), merged(keepC, cream)];
+    /* loose: the rods at treads 15 and 16's risers (14 and 15 from 0) out of their eyes and askew, the runner over
+       tread 14 rucked into a fold against the next riser and pulled off its riser */
+    var loose = new THREE.Group(); loose.visible = false; g.add(loose);
+    [[13, 0.35, 0.16], [14, -0.12, 0.05]].forEach(function (k) {
+      var i = k[0], top = M3.from + rise * (i + 1), r = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 1.47, 8), brass);
+      r.rotation.set(0, k[1], Math.PI / 2); r.position.copy(P(cx + 0.12, y0 + i * go - k[2], top - rise + T + 0.009)); loose.add(r);
+    });
+    [13, 14].forEach(function (i) {
+      var top = M3.from + rise * (i + 1), fy = y0 + i * go;
+      var flat = new THREE.Mesh(new THREE.BoxGeometry(1.37, T, go * 0.55), red); flat.position.copy(P(cx, fy + go * 0.275, top + T / 2)); loose.add(flat);
+      var fold = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 1.37, 12, 1, false, 0, Math.PI), red);
+      fold.rotation.set(0, 0, Math.PI / 2); fold.position.copy(P(cx, fy + go * 0.75, top + T)); loose.add(fold);
+      var hang = new THREE.Mesh(new THREE.BoxGeometry(1.37, rise * 0.9, T), red);   /* its riser's cloth pulled off it */
+      hang.position.copy(P(cx, fy - T - 0.025, top - rise * 0.5)); hang.rotation.x = 0.22; loose.add(hang);
+    });
+    out.rods = rods; out.tidyLoose = tidyLoose; out.looseGroup = loose;
+  }
+
+  /* the streamers: along each gallery's open edge on 1 to 7 (x 70.4 west, 89.6 east), swags from 1.0 sagging to 0.72,
+     in the three bays between the flights' kept ends (y 3.6 to 10.6, 14.6 to 35.4, 40.2 to 46.4), holly's berries and
+     mistletoe's pale ones along them */
+  var green = [], berries = [], mist = [];
+  for (var f2 = 1; f2 <= 7; f2++) [70.45, 89.55].forEach(function (ex) {
+    [[3.6, 10.6], [14.6, 35.4], [40.2, 46.4]].forEach(function (run, ri) {
+      var k = Math.max(1, Math.round((run[1] - run[0]) / 2.4)), len = (run[1] - run[0]) / k;
+      for (var j = 0; j < k; j++) {
+        var ya = run[0] + j * len, yb = ya + len, z = f2 * S;
+        var curve = new THREE.QuadraticBezierCurve3(P(ex, ya, z + 1.0), P(ex, (ya + yb) / 2, z + 0.44), P(ex, yb, z + 1.0));
+        green.push(new THREE.Mesh(new THREE.TubeGeometry(curve, 10, 0.055, 5, false)));
+        for (var b = 1; b < 4; b++) { var bp = curve.getPoint(b / 4 + (seeded(f2 * 31 + ri * 7 + j + b) - 0.5) * 0.08), bm = new THREE.Mesh(new THREE.SphereGeometry(0.022, 5, 4)); bm.position.copy(bp); bm.position.y -= 0.04; berries.push(bm); }
+        var mt = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 5)); mt.position.copy(P(ex, ya, z + 0.95)); mist.push(mt);
+      }
+    });
+  });
+  out.xmasMeshes = [merged(green, kit.solid(0x2c4628)), merged(berries, kit.solid(0x9a2222)), merged(mist, kit.solid(0xd9dcc2))];
+  out.xmasMeshes.forEach(function (m) { m.visible = false; });
+  return out;
+})();
+function stairSet(o) {   /* the armour where it stands this visit, the tapestry's scene, Christmas, the rods */
+  if (!STAIR.on) return;
+  if (o.armour) { STAIR.armour = o.armour; STAIR.suits.forEach(function (s) {
+    var off = o.armour === 'left' ? s.left : o.armour === 'right' ? s.left.clone().negate() : new THREE.Vector3();
+    s.g.position.copy(s.home).add(off); }); }
+  if (o.scene && STAIR.scenes[o.scene]) { STAIR.scene = o.scene; STAIR.tapestry.material.map = STAIR.scenes[o.scene]; STAIR.tapestry.material.needsUpdate = true; }
+  if (o.xmas != null) { STAIR.xmas = o.xmas; STAIR.xmasMeshes.forEach(function (m) { m.visible = o.xmas; }); STAIR.suits.forEach(function (s) { s.lit.visible = o.xmas; }); }
+  if (o.loose != null && STAIR.rods) {
+    STAIR.loose = o.loose; STAIR.looseGroup.visible = o.loose; STAIR.tidyLoose.forEach(function (m) { m.visible = !o.loose; });
+    STAIR.rods[13].visible = STAIR.rods[14].visible = !o.loose;
+  }
+}
+function stairShown(shown) {   /* which of the shown strings the stair hall draws, and drawn so */
+  var drawn = [];
+  if (!STAIR.on) return drawn;
+  var o = { armour: Q.get('armour') || 'home', scene: Q.get('tapestry') || 'first', xmas: Q.get('christmas') === 'on' };
+  if (shown.indexOf(STAIR_MAP) >= 0) drawn.push(STAIR_MAP);
+  ['home', 'left', 'right'].forEach(function (k) { if (shown.indexOf(STAIR_ARMOUR[k]) >= 0) { drawn.push(STAIR_ARMOUR[k]); if (!Q.get('armour')) o.armour = k; } });
+  ['first', 'second', 'third'].forEach(function (k) { if (shown.indexOf(STAIR_TAPESTRY[k]) >= 0) { drawn.push(STAIR_TAPESTRY[k]); if (!Q.get('tapestry')) o.scene = k; } });
+  STAIR_XMAS.forEach(function (s) { if (shown.indexOf(s) >= 0) { drawn.push(s); o.xmas = true; } });
+  stairSet(o);
+  return drawn;
+}
+if (STAIR.on) stairSet({ armour: Q.get('armour') || 'home', scene: Q.get('tapestry') || 'first', xmas: Q.get('christmas') === 'on', loose: Q.get('rods') === 'loose' });
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -845,7 +1060,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -1183,6 +1398,11 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   glass: function (shown) { var d = shown ? glassShown(shown) : [];
     return { ready: GLASS.ready, levels: GLASS.list.map(function (g) { return g.name + ' ' + g.level + (g.busy ? ' moving' : ''); }),
       ball: !!(GLASS.ball && GLASS.ball.visible), drawn: d.length }; },
+  /* req 635: the stair hall's things as they stand (the armour, the tapestry's scene, Christmas, the rods); shown
+     strings passed in are drawn as the room rules would show them */
+  stair: function (shown) { var d = shown ? stairShown(shown) : [];
+    return STAIR.on ? { suits: STAIR.suits.length, armour: STAIR.armour, scene: STAIR.scene, xmas: STAIR.xmas, loose: STAIR.loose,
+      rods: STAIR.rods ? STAIR.rods.length : 0, drawn: d.length } : null; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
