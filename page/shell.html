@@ -1908,6 +1908,173 @@ function w0Shown(shown) {   /* the match morning's besoms as the string shows th
   return on && W0.brooms ? [W0_BROOMS] : [];
 }
 if (W0.brooms) W0.brooms.visible = Q.get('brooms') === 'on';
+/* Moaning Myrtle's bathroom and her corridor (Magic's req 699; Events' req 726, page/events/myrtle.json, word for word),
+   each thing where Interiors' docs/interiors/myrtles-bathroom.md puts it (req 700, cited; x = 148 + y', y = 25 - x'):
+   the six stalls down his left (partitions 0.15 to 2.0, the doors 0.7 in their fronts, the third hanging by its lower
+   hinge, its top 0.1 out into the way), a pan and a high tank in each; the six sinks on pedestals down his right, two
+   copper taps each, the long cracked mirror over them; four iron candle holders at 2.0, a stub in each, its flame its
+   own light only (the stubs never burn down); the mop in its bucket in the near right corner. room[0]'s strings draw
+   the wet film near the end stall and under the sinks and the candles' doubles in it (a dim flame where the floor
+   mirrors each, moved with his eye); myrtle.flooded's cue lays the water wall to wall, the end pan brimming; myrtle.drip's
+   drips the last sink's left tap and trembles the doubles. In the corridor the water out under her door (myrtle_water
+   fresh), half the corridor's width at most, and the dark flags after (drying); her heard lines there are placed at her
+   door. The door is the shell's own shut door (its tap is `tap myrtle-door`; the knob's seen line the FALLBACK's). One
+   group off shell.group's children, so no tap lands on it; owner the place. The tide marks wait on the walls' wear.
+   ?wet=fresh|drying (the corridor) or film|flood (the room) for checks. */
+var MY_FILM = 'the stone flags damp and dull-shining, a thin film of water near the end stall and under the sinks',
+    MY_DOUBLES = 'the candle flames doubled in the wet flags, trembling and settling again when a tap drips',
+    MY_FRESH = "water seeping out under the bathroom door and spreading over the flags, across half the corridor's width at most, the light caught in it",
+    MY_DRYING = 'the flags before the bathroom door dark where water lay',
+    MY_FLOOD = "the end stall's toilet brimming over, the floor awash from wall to wall, the candles' doubles swimming in it, water still seeping out under the door into the corridor",
+    MY_DRIP = "a copper tap drips into its chipped basin, and the candles' doubles in the wet floor tremble and settle";
+var MYRTLE = (function () {
+  var out = { on: false, room: PLACE === 'myrtles-bathroom', pieces: 0, flames: [], doubles: [], wet: {}, drop: null, drip: null, tremble: null, door: null };
+  if (PLACE !== 'myrtles-bathroom' && PLACE !== 'second-floor-east-corridor') return out;
+  out.on = true;
+  out.door = shell.doors.filter(function (d) { return d.id === 'myrtle-door'; })[0] || null;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'myrtle-things'; shell.group.add(g);
+  var WET = new THREE.MeshStandardMaterial({ color: 0x5e5c58, roughness: 0.12, metalness: 0, transparent: true, opacity: 0.4, depthWrite: false }),
+      DRY = new THREE.MeshStandardMaterial({ color: 0x2c2a27, roughness: 0.9, metalness: 0, transparent: true, opacity: 0.5, depthWrite: false });
+  function sheet(pts, z, mt, name) {   /* a flat fan over the floor from castle points [x, y], the first its centre, face up */
+    var v = pts.map(function (p) { return shell.toLocal(p[0], p[1], z0 + z); }), pos = [];
+    for (var i = 1; i < v.length - 1; i++) [v[0], v[i + 1], v[i]].forEach(function (q) { pos.push(q.x, q.y, q.z); });
+    var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.computeVertexNormals();
+    if (bg.attributes.normal.getY(0) < 0) { for (var j = 0; j < pos.length; j += 9) for (var k = 0; k < 3; k++) { var t = pos[j + 3 + k]; pos[j + 3 + k] = pos[j + 6 + k]; pos[j + 6 + k] = t; }
+      bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.computeVertexNormals(); }
+    var m = new THREE.Mesh(bg, mt); m.name = name; m.userData.owner = PLACE; m.visible = false; g.add(m); return m;
+  }
+  function blob(cx, cy, rx, ry, a0, a1, seed) {   /* a ragged half-pool on the castle's plan, from angle a0 to a1 */
+    var pts = [[cx, cy]];
+    for (var a = a0; a <= a1 + 1e-6; a += 5) {
+      var r = a * Math.PI / 180, j = 0.84 + 0.09 * Math.sin(3 * r + seed) + 0.07 * Math.sin(7 * r + 2 * seed);
+      pts.push([cx + rx * Math.cos(r) * j, cy + ry * Math.sin(r) * j]);
+    }
+    return pts;
+  }
+  if (!out.room) {   /* the corridor: her door in its east wall at x 147.6, y 22.5; the water spreads west, 1.5 of its 3.0 */
+    out.wet.fresh = sheet(blob(147.6, 22.5, 1.45, 1.7, 90, 270, 726), 0.006, WET, 'myrtle-water');
+    out.wet.drying = sheet(blob(147.6, 22.5, 1.3, 1.55, 90, 270, 727), 0.006, DRY, 'myrtle-damp');
+    return out;
+  }
+  var root = new THREE.Group(), byMat = new Map(), mats = {};
+  function mat(k, hex) { return mats[k] || (mats[k] = kit.solid(hex)); }
+  function C(xp, yp) { return [148 + yp, 25 - xp]; }
+  function P(xp, yp, z) { var c = C(xp, yp); return shell.toLocal(c[0], c[1], z0 + z); }
+  function add(m, parent) { (parent || root).add(m); var l = byMat.get(m.material) || []; l.push(m); byMat.set(m.material, l); return m; }
+  function box(x0, y0, za, x1, y1, zb, mt, parent) {   /* an upright box between two corners of the schedule's frame */
+    var a = P(x0, y0, za), b = P(x1, y1, zb);
+    var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mt);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); return add(m, parent);
+  }
+  function cyl(xp, yp, za, zb, r, mt) { var m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, zb - za, 12), mt); m.position.copy(P(xp, yp, (za + zb) / 2)); return add(m); }
+  var wood = mat('stall-wood', 0x6b6a5c), pan = mat('pan', 0xd9d6cc), iron = mat('iron', 0x2e2b28), copper = mat('copper', 0x8a5a3a),
+      basin = mat('basin', 0xcfccc2), stub = mat('stub', 0xe6dcc4), mop = mat('mop', 0x8c7b5e), pail = mat('pail', 0x4a4844),
+      glass = new THREE.MeshStandardMaterial({ color: 0x9aa3a6, roughness: 0.12, metalness: 0.3 }), crack = mat('crack', 0x2a2a2a);
+  /* the stalls: partitions at y' 2.6 to 7.1 every 0.9, 2 cm into the left wall; fronts at x' 1.5, posts 0.1 a side */
+  var Y = [2.6, 3.5, 4.4, 5.3, 6.2, 7.1, 8.0];
+  for (var i = 0; i < 6; i++) box(-0.02, Y[i] - 0.015, 0.15, 1.52, Y[i] + 0.015, 2.0, wood);
+  for (i = 0; i < 6; i++) {
+    var y0 = Y[i], y1 = Y[i + 1];
+    box(1.485, y0 + (i ? 0.015 : -0.015), 0.15, 1.515, y0 + 0.1, 2.0, wood);
+    box(1.485, y1 - 0.1, 0.15, 1.515, y1 - (i < 5 ? 0.015 : -0.02), 2.0, wood);
+    if (i !== 2) box(1.49, y0 + 0.1, 0.15, 1.51, y1 - 0.1, 1.95, wood);
+    var cy = (y0 + y1) / 2;   /* the pan against the left wall, a high tank over it and its pipe */
+    box(0.05, cy - 0.2, 0, 0.6, cy + 0.2, 0.36, pan); box(0.03, cy - 0.21, 0.36, 0.6, cy + 0.21, 0.4, wood);
+    box(-0.02, cy - 0.25, 1.8, 0.2, cy + 0.25, 2.15, iron); cyl(0.12, cy, 0.4, 1.8, 0.02, iron);
+  }
+  /* the third stall's door, hung by its lower hinge at y' 4.5: its free end sagged 10 degrees, its top 0.1 into the way */
+  var hinge = new THREE.Group(); hinge.position.copy(P(1.5, 4.5, 0.15)); root.add(hinge);
+  hinge.rotation.order = 'XYZ'; hinge.rotation.x = 0.055; hinge.rotation.z = -0.175;
+  var dl = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.8, 0.02), wood); dl.position.set(0.35, 0.9, 0); add(dl, hinge);
+  /* the sinks: six on pedestals down the right wall, rims 0.8, 2 cm into the wall; two copper taps each */
+  [3.05, 3.95, 4.85, 5.75, 6.65, 7.55].forEach(function (c) {
+    box(4.5, c - 0.3, 0.62, 5.02, c + 0.3, 0.8, basin); box(4.66, c - 0.09, 0, 4.84, c + 0.09, 0.62, basin);
+    [-0.15, 0.15].forEach(function (d) { cyl(4.9, c + d, 0.8, 0.93, 0.015, copper); box(4.8, c + d - 0.012, 0.9, 4.9, c + d + 0.012, 0.925, copper); });
+  });
+  /* the mirror, one long glass 5.2 by 1.0 over them, its back 2 cm into the wall; cracked across near its middle */
+  box(4.98, 2.7, 1.2, 5.02, 7.9, 2.2, glass);
+  var ck = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.006, 0.004), crack); ck.position.copy(P(4.977, 5.2, 1.7)); ck.rotation.z = 0.7; add(ck);
+  /* the candle holders at 2.0: an iron arm 0.12 off the wall (2 cm into it), a cup, a stub, its flame */
+  var FL = new THREE.MeshBasicMaterial({ color: 0xffbf66 }), DBL = new THREE.MeshBasicMaterial({ color: 0xb08448, transparent: true, opacity: 0.7, depthWrite: false });
+  [[1.0, 0, 1], [4.4, 0, 1], [1.9, 8, -1], [3.9, 8, -1]].forEach(function (h) {
+    var x = h[0], w = h[1], s = h[2];
+    box(x - 0.015, w - 0.02 * s, 1.97, x + 0.015, w + 0.12 * s, 2.0, iron);
+    cyl(x, w + 0.1 * s, 2.0, 2.03, 0.035, iron); cyl(x, w + 0.1 * s, 2.03, 2.08, 0.012, stub);
+    var f = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), FL); f.scale.y = 2.2; f.position.copy(P(x, w + 0.1 * s, 2.105)); g.add(f); out.flames.push(f);
+    var d = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), DBL); d.scale.set(2, 0.4, 4); d.visible = false; g.add(d); out.doubles.push(d);
+  });
+  /* the mop in its bucket in the near right corner, the handle leaning into the corner, its top at 1.3 */
+  var bk = new THREE.Mesh(new THREE.CylinderGeometry(0.175, 0.15, 0.3, 14), pail); bk.position.copy(P(4.575, 0.375, 0.15)); add(bk);
+  var a = P(4.575, 0.375, 0.12), b = P(4.95, 0.05, 1.3), hd = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, a.distanceTo(b), 8), mop);
+  hd.position.copy(a).add(b).multiplyScalar(0.5); hd.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize()); add(hd);
+  byMat.forEach(function (list, mt) {
+    out.pieces += list.length;
+    root.updateMatrixWorld(true);
+    var pos = [], nor = [];
+    list.forEach(function (m) {
+      var geo = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); geo.applyMatrix4(m.matrixWorld);
+      Array.prototype.push.apply(pos, geo.attributes.position.array); Array.prototype.push.apply(nor, geo.attributes.normal.array);
+    });
+    var bg = new THREE.BufferGeometry();
+    bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    var m = new THREE.Mesh(bg, mt); m.userData.owner = PLACE; g.add(m);
+  });
+  /* the wet: the film by the end stall and under the sinks; the flood wall to wall, 4 mm over it; the end pan's brim */
+  function rect(x0, y0, x1, y1) { var c = C((x0 + x1) / 2, (y0 + y1) / 2); return [c, C(x0, y0), C(x1, y0), C(x1, y1), C(x0, y1), C(x0, y0)]; }
+  out.wet.film = [sheet(rect(0.05, 6.5, 2.6, 7.98), 0.006, WET, 'myrtle-film-stall'),
+                  sheet(rect(4.1, 2.6, 4.98, 7.98), 0.006, WET, 'myrtle-film-sinks')];
+  out.wet.flood = [sheet(rect(0.02, 0.02, 4.98, 7.98), 0.01, WET, 'myrtle-flood'), sheet(rect(0.08, 7.37, 0.57, 7.73), 0.405, WET, 'myrtle-brim')];
+  out.bounds = { film: [[0.05, 6.5, 2.6, 7.98], [4.1, 2.6, 4.98, 7.98]], flood: [[0.02, 0.02, 4.98, 7.98]] };
+  out.floorY = P(0, 0, 0).y;
+  out.toFrame = function (v) { var o = P(0, 0, 0); return [v.z - o.z, v.x - o.x]; };   /* the shell's local to (x', y') */
+  out.drop = new THREE.Mesh(new THREE.SphereGeometry(0.006, 6, 4), WET); out.drop.visible = false; g.add(out.drop);
+  out.dropFrom = P(4.8, 7.4, 0.9); out.dropTo = P(4.8, 7.4, 0.64);
+  return out;
+})();
+function myrtleSet(st) {   /* st: {fresh, drying, film, flood}, each true or false */
+  if (!MYRTLE.on) return;
+  MYRTLE.state = st;
+  if (MYRTLE.wet.fresh) { MYRTLE.wet.fresh.visible = !!st.fresh; MYRTLE.wet.drying.visible = !st.fresh && !!st.drying; }
+  (MYRTLE.wet.film || []).forEach(function (m) { m.visible = !!st.film && !st.flood; });
+  (MYRTLE.wet.flood || []).forEach(function (m) { m.visible = !!st.flood; });
+}
+function myrtleShown(shown) {   /* the wet as the room's strings show it; the flood stays once its cue has laid it */
+  var drawn = [], q = Q.get('wet'), st = MYRTLE.state || {};
+  if (!MYRTLE.on) return drawn;
+  [MY_FILM, MY_DOUBLES, MY_FRESH, MY_DRYING].forEach(function (s) { if (shown.indexOf(s) >= 0) drawn.push(s); });
+  myrtleSet({ fresh: shown.indexOf(MY_FRESH) >= 0 || q === 'fresh', drying: shown.indexOf(MY_DRYING) >= 0 || q === 'drying',
+              film: shown.indexOf(MY_FILM) >= 0 || q === 'film', flood: st.flood || q === 'flood' });
+  return drawn;
+}
+function myrtleFlood() { if (!MYRTLE.room) return; myrtleSet(Object.assign({}, MYRTLE.state || {}, { flood: true })); showLines([{ medium: 'seen', sound: MY_FLOOD }]); }
+function myrtleDrip() { if (!MYRTLE.room) return; MYRTLE.drip = { t: 0 }; showLines([{ medium: 'seen', sound: MY_DRIP }]); }
+function updateMyrtle(dt) {
+  if (!MYRTLE.room) return;
+  var M = MYRTLE, st = M.state || {};
+  if (M.drip) {   /* three drops over about two seconds, then the doubles tremble */
+    var t = (M.drip.t += dt), k = t % 0.7, u = k / 0.24;
+    M.drop.visible = t < 2.1 && u < 1;
+    if (M.drop.visible) M.drop.position.copy(M.dropFrom).lerp(M.dropTo, u * u);
+    if (t > 0.24 && !M.tremble) M.tremble = { t: 0 };
+    if (t > 2.1) M.drip = null;
+  }
+  var tr = 0;
+  if (M.tremble) { var s = (M.tremble.t += dt) / 2.5; tr = s < 1 ? (1 - s) * (1 - s) : 0; if (s >= 1) M.tremble = null; }
+  var wet = st.flood ? M.bounds.flood : st.film ? M.bounds.film : null, c = camera.position, fy = M.floorY;
+  M.flames.forEach(function (f, i) {
+    var d = M.doubles[i];
+    d.visible = false;
+    if (!wet || c.y <= fy) return;
+    var h = f.position.y - fy, my = fy - h, t = (c.y - fy) / (c.y - my);   /* where the eye sees the flame's mirror on the floor */
+    var px = c.x + t * (f.position.x - c.x), pz = c.z + t * (f.position.z - c.z), fr = M.toFrame({ x: px, z: pz });
+    if (!wet.some(function (r) { return fr[0] > r[0] && fr[0] < r[2] && fr[1] > r[1] && fr[1] < r[3]; })) return;
+    var w = tr ? Math.sin(clock.elapsedTime * 23 + i) * 0.05 * tr : 0;
+    d.position.set(px + w, fy + (st.flood ? 0.012 : 0.008), pz); d.scale.x = 1 + 3 * tr * Math.abs(Math.sin(clock.elapsedTime * 17 + i)); d.visible = true;
+  });
+}
+thingCues[MY_FLOOD] = function () { myrtleFlood(); };
+thingCues[MY_DRIP] = function () { myrtleDrip(); };
+if (MYRTLE.on) myrtleSet({ fresh: Q.get('wet') === 'fresh', drying: Q.get('wet') === 'drying', film: Q.get('wet') === 'film', flood: Q.get('wet') === 'flood' });
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -1924,7 +2091,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown), w0Shown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -2102,6 +2269,7 @@ function frame() {
   updateLines(dt);
   updateFilch(dt);
   updateTrick(dt);
+  updateMyrtle(dt);
   if (events && events.tick) events.tick(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -2113,7 +2281,9 @@ renderer.setAnimationLoop(frame);
    one visit; a shut door's tap is its id, and page/events/doors.json answers with a sound and, most times, a line from
    the books by the time of day (?time=night and so on), shown a moment by the door; a tap on the words puts them away */
 var lineDoor = null, linesEl = document.getElementById('lines'), lineQ = [], lineCur = null, lineV = new THREE.Vector3();
-function showLines(list) { for (var i = 0; i < list.length; i++) lineQ.push(list[i]); }
+function showLines(list) {   /* Myrtle's heard lines in her corridor placed at her door (req 726) */
+  for (var i = 0; i < list.length; i++) { var l = list[i]; if (MYRTLE && MYRTLE.door && !MYRTLE.room && /^myrtle\./.test(l.key || '')) l.door = MYRTLE.door; lineQ.push(l); }
+}
 function lineSeconds(l) { var n = (l.text || '').length + (l.sound || '').length * 0.6; return clamp(2.2 + 0.075 * n, 4, 14); }
 function lineElement(l) {
   var el = document.createElement('div');
@@ -2145,7 +2315,7 @@ function updateLines(dt) {
     var l = lineQ.shift();
     if (!l.text && !l.sound) continue;
     var el = lineElement(l);
-    lineCur = { line: l, t: lineSeconds(l), el: el, door: lineDoor };
+    lineCur = { line: l, t: lineSeconds(l), el: el, door: l.door || lineDoor };
     placeLine(lineCur);
     requestAnimationFrame(function () { el.classList.add('on'); });
   }
@@ -2320,6 +2490,11 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
       lit: HALL_LIGHT.torches.filter(function (t) { return t.light; }).length, ball: GLASS.ball ? GLASS.ball.visible : null, drawn: d.length }; },
   wave1: function (shown) { var d = shown ? w1Shown(shown) : [];
     return W1.on ? { pieces: W1.pieces, robes: W1.robes, stain: !!(W1.stain && W1.stain[0].visible), pits: !!(W1.pits && W1.pits[0].visible), drawn: d.length } : null; },
+  myrtle: function (shown) { var d = shown ? myrtleShown(shown) : [];
+    return MYRTLE.on ? { pieces: MYRTLE.pieces, flames: MYRTLE.flames.length, doubles: MYRTLE.doubles.filter(function (m) { return m.visible; }).length,
+      state: MYRTLE.state, door: !!MYRTLE.door, drawn: d.length } : null; },
+  flood: function () { myrtleFlood(); return !!(MYRTLE.wet.flood && MYRTLE.wet.flood[0].visible); },
+  drip: function () { myrtleDrip(); return !!MYRTLE.drip; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
