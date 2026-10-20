@@ -255,7 +255,7 @@ scene.add(new THREE.AmbientLight(0xffffff, PAINT_ON ? 0.02 : 0.12));
    (docs/interiors/entrance-hall.md, The schedule, cited), a soot fan over each (docs/architect/materials.md, the stone's
    condition); the Great Hall's floating candles as a plain field in Interiors' band (docs/interiors/great-hall.md, the
    floating candles), pale by day, gold from dusk, out at night (lookup-q1-lit-1013), the sky's tone by the hour; the
-   stair hall keeps its plain lights in the torch's colour until Interiors places its torches. ?hour=0..23 for checks. */
+   stair hall's torches at Interiors' spots (req 710 (1), below). ?hour=0..23 for checks. */
 var TONE = window.CASTLE_TONES || null;
 function lightTone(k, fb) { var l = TONE && TONE.lights && TONE.lights[k]; return l ? { hex: parseInt(String(l.hex).replace('#', ''), 16), gain: l.gain } : fb; }
 var TORCH = lightTone('torch', { hex: 0xffc28a, gain: 1.0 }), CANDLE = lightTone('candle', { hex: 0xffb466, gain: 0.55 });
@@ -266,27 +266,47 @@ var HALL_LIGHT = (function () {
     if (PAINTED.indexOf(p.id) < 0) return;
     var g = new THREE.Group(); g.name = p.id + '-lights'; shell.group.add(g);
     var P = function (x, y, z) { return shell.toLocal(x, y, p.floor + z); };
-    if (p.id === 'entrance-hall') {
-      LIT_BY[p.id] = true;
+    if (p.id === 'entrance-hall' || p.id === 'stair-hall') {
       var iron = kit.solid(0x34312e), flame = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
       var soot = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, depthWrite: false, alphaMap: (function () {   /* the fan: black, grey for its opacity, so it only darkens */
         var c = document.createElement('canvas'); c.width = 64; c.height = 128; var x = c.getContext('2d');
         x.fillStyle = '#000'; x.fillRect(0, 0, 64, 128); x.scale(1, 2);
         var gr = x.createRadialGradient(32, 62, 1, 32, 62, 30); gr.addColorStop(0, 'rgb(190,190,190)'); gr.addColorStop(1, 'rgb(0,0,0)');
         x.fillStyle = gr; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })() });
-      /* [x, y, the wall's inward normal]: west wall x 68, east x 92, north y 70 */
-      [[68, 66.5, [1, 0]], [68, 68.6, [1, 0]], [92, 52.5, [-1, 0]], [92, 56.0, [-1, 0]], [92, 62.5, [-1, 0]], [92, 68.6, [-1, 0]],
-       [74, 70, [0, -1]], [86, 70, [0, -1]]].forEach(function (t) {
-        var n = t[2], b = P(t[0] + n[0] * 0.15, t[1] + n[1] * 0.15, 2.45);
+      /* a bracket on the wall at (x, y), n the wall's inward normal, its arm at z; lit with a real light, or its flame alone */
+      var torch = function (t, z, lit) {
+        var n = t[2], b = P(t[0] + n[0] * 0.15, t[1] + n[1] * 0.15, z);
         var arm = new THREE.Mesh(new THREE.BoxGeometry(n[0] ? 0.3 : 0.05, 0.05, n[1] ? 0.3 : 0.05), iron); arm.position.copy(b); g.add(arm);
-        var cup = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.04, 0.12, 10), iron); var cp = P(t[0] + n[0] * 0.3, t[1] + n[1] * 0.3, 2.55); cup.position.copy(cp); g.add(cup);
+        var cup = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.04, 0.12, 10), iron); var cp = P(t[0] + n[0] * 0.3, t[1] + n[1] * 0.3, z + 0.1); cup.position.copy(cp); g.add(cup);
         var head = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.45, 8), kit.solid(0x4a3a2a)); head.position.copy(cp); head.position.y -= 0.2; g.add(head);
         var f = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), flame); f.scale.y = 2.0; f.position.copy(cp); f.position.y += 0.14; g.add(f);
-        var sp = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 1.2), soot), sw = P(t[0] + n[0] * 0.01, t[1] + n[1] * 0.01, 3.2);
+        var sp = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 1.2), soot), sw = P(t[0] + n[0] * 0.01, t[1] + n[1] * 0.01, z + 0.75);
         sp.position.copy(sw); sp.rotation.y = n[0] ? (n[0] > 0 ? Math.PI / 2 : -Math.PI / 2) : (n[1] > 0 ? Math.PI : 0); g.add(sp);
-        var l = new THREE.PointLight(TORCH.hex, 1.1 * TORCH.gain, 16, 1.6); l.position.copy(cp); l.position.y += 0.3;
-        l.position.x += n[0] * 0.3; l.position.z -= n[1] * 0.3; scene.add(l);
+        var l = null;
+        if (lit) { l = new THREE.PointLight(TORCH.hex, 1.1 * TORCH.gain, lit, 1.6); l.position.copy(cp); l.position.y += 0.3;
+          l.position.x += n[0] * 0.3; l.position.z -= n[1] * 0.3; scene.add(l); }
         out.torches.push({ flame: f, light: l });
+      };
+    }
+    if (p.id === 'entrance-hall') {
+      LIT_BY[p.id] = true;
+      /* [x, y, the wall's inward normal]: west wall x 68, east x 92, north y 70 */
+      [[68, 66.5, [1, 0]], [68, 68.6, [1, 0]], [92, 52.5, [-1, 0]], [92, 56.0, [-1, 0]], [92, 62.5, [-1, 0]], [92, 68.6, [-1, 0]],
+       [74, 70, [0, -1]], [86, 70, [0, -1]]].forEach(function (t) { torch(t, 2.45, 16); });
+    }
+    if (p.id === 'stair-hall') {
+      /* req 710 (1) (docs/interiors/stair-hall.md, The things, item 4, cited): brackets as the Entrance Hall's at 2.4
+         above each gallery floor, floors 1 to 7, on both gallery walls (x 68 and 92) either side of each flight's kept
+         zone, y 10.4, 14.8, 35.2 and 40.4; 56 flames. Seen from the well itself, fourteen of them carry a real light
+         (one a wall a floor, the south pair's and the north pair's in turn), since 56 lights would choke a phone; seen
+         from a neighbour the well keeps the plain four, as before */
+      var home = PLACE === 'stair-hall';
+      if (home) LIT_BY[p.id] = true;
+      for (var fl = 1; fl <= 7; fl++) [[68, [1, 0]], [92, [-1, 0]]].forEach(function (w, wi) {
+        [10.4, 14.8, 35.2, 40.4].forEach(function (y, k) {
+          var lit = home && (k === 0 || k === 2) && ((k === 0) === ((fl + wi) % 2 === 1));
+          torch([w[0], y, w[1]], 5.2 * fl + 2.4, lit ? 18 : 0);
+        });
       });
     }
     if (p.id === 'great-hall') {
@@ -606,6 +626,18 @@ function updateFades(dt) {
    the events absent the grains lie there, for checks. The shell's walls are 0.8 m
    thick where the model gives this wall 0.4, so the box's first 0.4 m sits hidden in the wall's slab. ?cupboard=open
    opens it on load and ?grains=run runs the grains with the events absent, for checks. */
+/* a school besom (the Great Hall's item 23's form, never a racing broom): 1.8 long, the handle 0.035 across, the
+   tail 0.30 across and 0.5 long; its tail's foot on the flags at foot [x, y], its handle's top against a wall at
+   top [x, y] (z from the length), P the place's frame */
+function besom(foot, top, P, wood, straw) {
+  var L = 1.8, dx = top[0] - foot[0], dy = top[1] - foot[1], run = Math.sqrt(dx * dx + dy * dy), up = Math.sqrt(L * L - run * run);
+  var a = P(foot[0], foot[1], 0), b = P(top[0], top[1], up), dir = new THREE.Vector3().subVectors(b, a).normalize();
+  var q = new THREE.Group(); q.position.copy(a); q.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); q.name = 'besom';
+  var tail = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.15, 0.5, 14), straw); tail.position.y = 0.25 - 0.01; q.add(tail);
+  var band = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.05, 14), wood); band.position.y = 0.49; q.add(band);
+  var stick = new THREE.Mesh(new THREE.CylinderGeometry(0.0175, 0.0175, L - 0.44, 8), wood); stick.position.y = 0.44 + (L - 0.44) / 2 - 0.02; q.add(stick);
+  return q;
+}
 var CUP = (function () {
   var d = shell.doors.filter(function (x) { return x.id === 'hall-cupboard-door'; })[0];
   var room = (MODEL.rooms || []).filter(function (r) { return r.id === 'hall-cupboard'; })[0];
@@ -648,6 +680,16 @@ var CUP = (function () {
   var yaw = Math.atan2(bx.x, bx.z);   /* the back wall's run in the local frame */
   mop(r[0] + 0.14, r[1] + 0.22, -0.16, yaw);
   mop(r[0] + 0.12, r[1] + 0.42, -0.2, yaw + 0.2);
+  /* req 710 (9) (docs/interiors/hall-cupboard.md, The detail pass, cited): a plain shelf on the back wall, y 63.9 to
+     64.7, its top 1.6 up and 0.22 deep, 2 cm into the wall on two iron brackets; two school besoms leaning in the
+     north-east corner, their tails on the flags at x 67.1 and 67.42, y 64.62, their handles' tops on the north wall.
+     The leaf (8) stays hung on the north jamb and swings in, as built: open it lies along y 64.3 to 64.4 from x 67.6 to
+     66.9, 0.11 clear of the upturned bucket's rim and 0.2 short of the besoms' tails; on the south jamb its sweep
+     would strike the bucket, 0.6 from that hinge */
+  var ironC = kit.solid(0x34312e);
+  box(r[0] - 0.02, 63.9, r[0] + 0.22, 64.7, 1.57, 1.6, wood, 'cupboard-shelf');
+  [64.0, 64.6].forEach(function (y) { box(r[0] - 0.02, y - 0.01, r[0] + 0.18, y + 0.01, 1.4, 1.57, ironC, 'cupboard-shelf-bracket'); });
+  [67.1, 67.42].forEach(function (x) { g.add(besom([x, 64.62], [x, r[3] - 0.01], P, wood, kit.solid(0x7a6a48))); });
   /* the grains: points along the crack, dull gold and matte, no additive blend; one hit strip over them for the tap */
   var N = 110, pos = new Float32Array(N * 3), home = [], gtex = (function () {
     var c = document.createElement('canvas'); c.width = c.height = 32;
@@ -944,11 +986,16 @@ function glassInit() {
 }
 var GLASS_REST = /^the four house hourglasses in their niches/, GLASS_FALL = /^a shower of .* falls into the bottom bulb of (\w+)'s hourglass/,
     GLASS_LIFT = /^a few .* fly back up into the top bulb of (\w+)'s hourglass/, BALL_WALL = /^Peeves's tennis ball lying on the flags at the foot of the east wall/;
+/* the ball's three spots (req 710 (4); docs/interiors/entrance-hall.md items 6 and 6a, cited): the east wall's foot,
+   against the marble staircase's bottom riser, and just outside the Great Hall's doors by the north jamb */
+var BALL_SPOTS = [[BALL_WALL, [91.5, 54.5]], [/^Peeves's tennis ball lying on the flags under the marble staircase's bottom step/, [86.4, 50.04]],
+                  [/^Peeves's tennis ball lying on the flags in the Great Hall's doorway/, [68.3, 61.85]]];
+function ballSpot(s) { var b = BALL_SPOTS.filter(function (x) { return x[0].test(s); })[0]; return b ? b[1] : null; }
 function glassShown(shown) {   /* which of the shown strings the hall draws; a shower or a lift plays once a visit */
   var drawn = [];
   if (PLACE !== 'entrance-hall') return drawn;
   shown.forEach(function (s) {
-    if (BALL_WALL.test(s)) drawn.push(s);
+    if (ballSpot(s)) drawn.push(s);
     if (!GLASS.list.length) return;
     if (GLASS_REST.test(s)) drawn.push(s);
     var m = GLASS_FALL.exec(s) || GLASS_LIFT.exec(s);
@@ -962,7 +1009,11 @@ function glassShown(shown) {   /* which of the shown strings the hall draws; a s
     g.level = Math.max(0, g.level + (GLASS_FALL.test(s) ? 12 : -6)); g.busy++;
     g.glass.level(g.level).then(function () { g.busy--; glassPaint(g); });
   });
-  if (GLASS.ball) GLASS.ball.visible = shown.some(function (s) { return BALL_WALL.test(s); });
+  if (GLASS.ball) {
+    var at = shown.map(ballSpot).filter(Boolean)[0];
+    GLASS.ball.visible = !!at;
+    if (at) GLASS.ball.position.copy(shell.toLocal(at[0], at[1], shell.place.floor + 0.0325));
+  }
   return drawn;
 }
 function updateGlass(dt) {
@@ -1700,6 +1751,163 @@ function w1Shown(shown) {   /* the stain and the pits as the room's strings show
   return drawn;
 }
 if (W1.on) w1Set(Q.get('stain') === 'on', Q.get('pits') === 'on');
+/* req 710, wave 0's detail pass (Interiors, 20 October 2026, 8.56 am; docs/interiors/entrance-hall.md and stair-hall.md,
+   each's Wave 0's detail pass, cited there): plain pieces, one group, no tap lands on them, the place their owner.
+   The Entrance Hall: (3) the notice board on the east wall, centred y 63.9, foot 1.0, 1.2 by 0.9 (item 1; the
+   parchment's form req 279's); (5) the match morning's four besoms along the north wall west of the front doors,
+   their heads on the wall at x 77.3, 76.8, 76.2 and 75.6, their tails 0.55 out (item 11), drawn when great-hall.json's
+   string shows them (?brooms=on for checks); (6) the front doors' sill dished 0.03 down its middle 1.6 m, paler
+   where worn, grit in the hollow (item 8), drawn wherever the sill is built. The stair hall: (2) the portrait
+   clusters as plain frames, almost touching, two and three high in the hung band 0.9 to 4.4 above each gallery
+   floor, item 1's extents, frames of three kinds and many sizes (the frames' forms the frames sheet's later, the
+   sitters Magic's); no frame over a hidden way's panel (the mural stairs' heads on 3 and 6 at y 30, the keep's
+   panel on 3 at y 4.1), 0.15 kept clear round each */
+var W0_BROOMS = "a few brooms leaning along the wall by the front doors, the morning of a match";
+var W0 = (function () {
+  var out = { frames: 0, board: false, sill: false, brooms: null, grit: 0 };
+  var g = new THREE.Group(); g.name = 'wave0-things'; shell.group.add(g);
+  var byMat = new Map(), mats = {};
+  function mat(k, hex) { return mats[k] || (mats[k] = kit.solid(hex)); }
+  function box(x0, y0, z0, x1, y1, z1, mt) {   /* a box between two corners in the castle's frame, heights absolute */
+    var a = shell.toLocal(x0, y0, z0), b = shell.toLocal(x1, y1, z1);
+    var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mt);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+    var l = byMat.get(mt) || []; l.push(m); byMat.set(mt, l); return m;
+  }
+  function merge(list, mt, owner) {   /* many pieces drawn as one, in g */
+    var pos = [], nor = [];
+    list.forEach(function (m) {
+      m.updateMatrixWorld(true);
+      var geo = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); geo.applyMatrix4(m.matrixWorld);
+      Array.prototype.push.apply(pos, geo.attributes.position.array); Array.prototype.push.apply(nor, geo.attributes.normal.array);
+    });
+    var bg = new THREE.BufferGeometry();
+    bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    var m = new THREE.Mesh(bg, mt); m.userData.owner = owner; m.raycast = function () {}; g.add(m); return m;
+  }
+  var rnd = (function () { var s = 710; return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })();
+  var placeOf = function (id) { return shell.places.filter(function (p) { return p.id === id; })[0]; };
+
+  /* (6) the dished sill: the threshold slab (castle-shell.js, through the wall, x 78 to 82, y 70 to 70.8) swapped for
+     one piece of the same stone whose top dips 0.03 at the middle, paler down the hollow, its old flat slab hidden */
+  var sill = null;
+  shell.group.traverse(function (o) { if (!sill && o.isMesh && /-threshold-front-doors$/.test(o.name)) sill = o; });
+  var eh = placeOf('entrance-hall');
+  if (sill && eh) {
+    var zf = eh.floor, X0 = 78, X1 = 82, Y0 = 70, Y1 = 70.8, ZT = zf + 0.021, ZB = zf - 0.03, D0 = 79.2, D1 = 80.8;
+    var dip = function (x) { var u = (x - D0) / (D1 - D0); return u <= 0 || u >= 1 ? 0 : (1 - Math.cos(2 * Math.PI * u)) / 2; };
+    var top = function (x) { return ZT - 0.03 * dip(x); };
+    var xs = [X0, D0]; for (var i = 1; i < 32; i++) xs.push(D0 + (D1 - D0) * i / 32); xs.push(D1, X1);
+    var base = sill.material.color.clone(), worn = new THREE.Color(0x8a837b).convertSRGBToLinear();
+    var pos = [], col = [], tri = function (A, B, C, out, cs) {   /* a triangle in castle points, wound to face out */
+      var a = shell.toLocal(A[0], A[1], A[2]), b = shell.toLocal(B[0], B[1], B[2]), c = shell.toLocal(C[0], C[1], C[2]);
+      var n = new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a));
+      var o0 = shell.toLocal(A[0], A[1], A[2]), o1 = shell.toLocal(A[0] + out[0], A[1] + out[1], A[2] + out[2]);
+      var vs = n.dot(o1.sub(o0)) < 0 ? [[a, cs[0]], [c, cs[2]], [b, cs[1]]] : [[a, cs[0]], [b, cs[1]], [c, cs[2]]];
+      vs.forEach(function (v) { pos.push(v[0].x, v[0].y, v[0].z); col.push(v[1].r, v[1].g, v[1].b); });
+    };
+    var tone = function (x) { return base.clone().lerp(worn, 0.45 * Math.min(1, dip(x) * 1.6 + (x > D0 - 0.4 && x < D1 + 0.4 ? 0.25 : 0))); };
+    var quad = function (A, B, C, D, out, cs) { tri(A, B, C, out, [cs[0], cs[1], cs[2]]); tri(A, C, D, out, [cs[0], cs[2], cs[3]]); };
+    for (var k = 0; k < xs.length - 1; k++) {
+      var xa = xs[k], xb = xs[k + 1], ta = top(xa), tb = top(xb), ca = tone(xa), cb = tone(xb);
+      quad([xa, Y0, ta], [xb, Y0, tb], [xb, Y1, tb], [xa, Y1, ta], [0, 0, 1], [ca, cb, cb, ca]);
+      quad([xa, Y0, ZB], [xb, Y0, ZB], [xb, Y0, tb], [xa, Y0, ta], [0, -1, 0], [base, base, cb, ca]);
+      quad([xa, Y1, ZB], [xb, Y1, ZB], [xb, Y1, tb], [xa, Y1, ta], [0, 1, 0], [base, base, cb, ca]);
+      quad([xa, Y0, ZB], [xb, Y0, ZB], [xb, Y1, ZB], [xa, Y1, ZB], [0, 0, -1], [base, base, base, base]);
+    }
+    var bg = new THREE.BufferGeometry();
+    bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    bg.computeVertexNormals();
+    var sm = sill.material.clone(); sm.vertexColors = true; sm.color.set(0xffffff);
+    var dish = new THREE.Mesh(bg, sm);
+    dish.name = sill.name; dish.userData = Object.assign({}, sill.userData);
+    if (sill.onBeforeRender) { dish.onBeforeRender = sill.onBeforeRender; dish.onAfterRender = sill.onAfterRender; }
+    sill.name += '-flat'; sill.visible = false; sill.parent.add(dish);
+    /* the grit: a few score grains in the hollow's lowest half metre, each sitting on the dip */
+    var gm = mat('grit', 0x3e3a35), grit = [];
+    for (var n = 0; n < 70; n++) {
+      var gx = 80 + (rnd() - 0.5) * (0.4 + 0.6 * rnd()), gy = Y0 + 0.06 + rnd() * (Y1 - Y0 - 0.12), s = 0.004 + rnd() * 0.008, gz = top(gx);
+      grit.push(box(gx - s / 2, gy - s / 2, gz - 0.002, gx + s / 2, gy + s / 2, gz + s * 0.7, gm));
+    }
+    byMat.delete(gm); var gr = merge(grit, gm, dish.userData.owner || 'entrance-hall'); gr.name = 'front-doors-grit';
+    if (dish.userData.rank) { gr.userData.rank = dish.userData.rank; gr.onBeforeRender = dish.onBeforeRender; gr.onAfterRender = dish.onAfterRender; }
+    out.sill = true; out.grit = grit.length;
+  }
+
+  if (PLACE === 'entrance-hall') {
+    var z0 = eh ? eh.floor : 0, wood = mat('wood', 0x5a4c3e), dark = mat('dark-wood', 0x3e342a);
+    /* (3) the notice board: a plain board in a dark frame, 2 cm into the east wall (x 92), its face 4 cm out */
+    var bm = mat('board', 0x6e5d48), yA = 63.3, yB = 64.5, zA = z0 + 1.0, zB = z0 + 1.9, fw = 0.05;
+    box(92.02, yA, zB - fw, 91.94, yB, zB, dark); box(92.02, yA, zA, 91.94, yB, zA + fw, dark);
+    box(92.02, yA, zA + fw, 91.94, yA + fw, zB - fw, dark); box(92.02, yB - fw, zA + fw, 91.94, yB, zB - fw, dark);
+    box(92.02, yA + fw, zA + fw, 91.96, yB - fw, zB - fw, bm);
+    out.board = true;
+    /* (5) the match morning's besoms: tails on the flags 0.55 out from the north wall (y 70), heads against it */
+    var bg2 = new THREE.Group(); bg2.name = 'wave0-brooms'; bg2.visible = false; g.add(bg2);
+    var Pz = function (x, y, z) { return shell.toLocal(x, y, z0 + z); }, straw = mat('straw', 0x7a6a48);
+    [77.3, 76.8, 76.2, 75.6].forEach(function (x, i) {
+      var b = besom([x + [0.04, -0.03, 0.02, -0.05][i], 69.45], [x, 69.99], Pz, wood, straw); b.userData.owner = PLACE; bg2.add(b);
+    });
+    bg2.traverse(function (o) { if (o.isMesh) { o.userData.owner = PLACE; o.raycast = function () {}; } });
+    out.brooms = bg2;
+  }
+
+  if (PLACE === 'stair-hall') {
+    /* (2) the clusters: [wall axis, the wall's line, the room's side, from, to, floors] */
+    var C = [];
+    [[68, 1], [92, -1]].forEach(function (w) {
+      for (var f = 1; f <= 7; f++) {
+        var east = w[0] === 92 && (f === 2 || f === 5);
+        [[4.0, 10.2], [15.0, east ? 21.2 : 22.0], [28.0, 35.0], [40.6, 46.0]].forEach(function (r) { C.push(['x', w[0], w[1], r[0], r[1], f]); });
+      }
+    });
+    for (var f2 = 2; f2 <= 7; f2++) C.push(['y', 50, -1, 74.0, 86.0, f2]);
+    var keep = (MODEL.openings || []).filter(function (o) {   /* the hidden ways' panels in the gallery walls */
+      return o.at && o.sill != null && o.at[1] > 0 && o.at[1] < 50 && (Math.abs(o.at[0] - 68) < 0.3 || Math.abs(o.at[0] - 92) < 0.3);
+    });
+    var kinds = [mat('frame-gilt', 0x7d6a45), mat('frame-dark', 0x3e342a), mat('frame-black', 0x24211e)], canvas = mat('canvas', 0x2a2620);
+    var at = function (c, u, d, z) { return c[0] === 'x' ? [c[1] + c[2] * d, u] : [u, c[1] + c[2] * d]; };
+    var fbox = function (c, u0, u1, d0, d1, z0b, z1b, mt) { var a = at(c, u0, d0), b = at(c, u1, d1); return box(a[0], a[1], z0b, b[0], b[1], z1b, mt); };
+    var clear = function (c, u0, u1, z0b, z1b) {
+      return !keep.some(function (o) {
+        if (c[0] !== 'x' || Math.abs(o.at[0] - c[1]) > 0.3) return false;
+        var h = (o.w || 0.9) / 2 + 0.15;
+        return u1 > o.at[1] - h && u0 < o.at[1] + h && z1b > o.sill - 0.1 && z0b < o.sill + (o.h || 2.1) + 0.15;
+      });
+    };
+    C.forEach(function (c) {
+      var zf = 5.2 * c[5], u = c[3];
+      while (u < c[4] - 0.3) {
+        var cw = Math.min(c[4] - u, 0.5 + rnd() * 0.9); if (c[4] - u - cw < 0.45) cw = c[4] - u;
+        var r0 = rnd(), n = r0 < 0.12 ? 1 : r0 < 0.55 ? 2 : 3, ws = [], sum = 0;
+        for (var i = 0; i < n; i++) { ws.push(0.6 + rnd() * 0.8); sum += ws[i]; }
+        var z = zf + 0.9, span = 3.5 - 0.06 * (n - 1);
+        ws.forEach(function (wt) {
+          var h = span * wt / sum, fw = cw * (0.72 + 0.28 * rnd()), off = (cw - fw) * (rnd() - 0.5) * 0.6;
+          var a = u + (cw - fw) / 2 + off, b = a + fw, za = z + rnd() * 0.04, zb = z + h - rnd() * 0.04;
+          var m = 0.04 + rnd() * 0.07, dep = 0.04 + rnd() * 0.05, k = kinds[Math.floor(rnd() * 3)];
+          if (b - a > 2 * m + 0.12 && zb - za > 2 * m + 0.12 && clear(c, a, b, za, zb)) {
+            fbox(c, a, b, -0.02, dep, zb - m, zb, k); fbox(c, a, b, -0.02, dep, za, za + m, k);
+            fbox(c, a, a + m, -0.02, dep, za + m, zb - m, k); fbox(c, b - m, b, -0.02, dep, za + m, zb - m, k);
+            fbox(c, a + m, b - m, -0.02, dep - 0.02, za + m, zb - m, canvas);
+            out.frames++;
+          }
+          z += h + 0.06;
+        });
+        u += cw + 0.06;
+      }
+    });
+  }
+
+  byMat.forEach(function (list, mt) { merge(list, mt, PLACE); });
+  return out;
+})();
+function w0Shown(shown) {   /* the match morning's besoms as the string shows them */
+  var on = shown.indexOf(W0_BROOMS) >= 0;
+  if (W0.brooms) W0.brooms.visible = on || Q.get('brooms') === 'on';
+  return on && W0.brooms ? [W0_BROOMS] : [];
+}
+if (W0.brooms) W0.brooms.visible = Q.get('brooms') === 'on';
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -1716,7 +1924,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown), w0Shown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -2057,7 +2265,7 @@ var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
   ways: shell.ways.map(function (d) { return { id: d.id, to: d.to, built: !!d.built }; }),
   stands: shell.stands.map(function (s) { return s.name; }) };
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; },
+window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; }, toLocal: shell.toLocal,
   goTo: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; return d ? goTo(d) : false; },
   flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },
@@ -2107,6 +2315,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   wing: function (shown) { var d = shown ? wingShown(shown) : [];
     return WING.on ? { lamps: WING.flames.length, state: WING.state, drawn: d.length } : null; },
   /* req 715: wave 1's plain pieces as they stand; shown strings passed in set the stain and the pits */
+  wave0: function (shown) { var d = shown ? w0Shown(shown) : [];
+    return { frames: W0.frames, board: W0.board, sill: W0.sill, grit: W0.grit, brooms: !!(W0.brooms && W0.brooms.visible), torches: HALL_LIGHT.torches.length,
+      lit: HALL_LIGHT.torches.filter(function (t) { return t.light; }).length, ball: GLASS.ball ? GLASS.ball.visible : null, drawn: d.length }; },
   wave1: function (shown) { var d = shown ? w1Shown(shown) : [];
     return W1.on ? { pieces: W1.pieces, robes: W1.robes, stain: !!(W1.stain && W1.stain[0].visible), pits: !!(W1.pits && W1.pits[0].visible), drawn: d.length } : null; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
