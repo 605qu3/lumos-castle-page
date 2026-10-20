@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=384"></script>
+<script src="castle-model.js?v=385"></script>
 <script src="castle-shell.js?v=27"></script>
 <script src="castle-events.js?v=38"></script>
 <script src="design/drawn.js?v=1"></script>
@@ -258,7 +258,7 @@ var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, twe
    `tap keep-east-stair-panel-3` from the stair hall); a tap there walks him to it, a second is its id to the events */
 var things = shell.doors.concat(shell.ways, shell.hidden || []), tappables = things.map(function (d) { return d.mesh; });
 var trail = [START.pos.clone()];
-function thingOf(mesh) { return things.filter(function (d) { return d.mesh === mesh; })[0]; }
+function thingOf(mesh) { return things.filter(function (d) { return d.mesh === mesh || d.mate === mesh; })[0]; }
 function flightOf(mesh) { var id = mesh.userData.stair; return id ? shell.flights.filter(function (f) { return f.id === id; })[0] : null; }
 function headPose(pos, look) {
   pos.copy(here.pos);
@@ -383,6 +383,29 @@ shell.doors.forEach(function (d) {
     dish.name = 'wear-sill-' + d.id; sill.add(dish);
   }
 });
+/* a pair of leaves (the model's `leaves: 2`; ledger line 115, the hospital wing's double doors, OotP 32 L51266): the
+   one leaf halved on its own hinge, and its mate on the far jamb, mirrored each frame (updatePairs), so every swing,
+   shake, fade and turn moves both; the seam, the crack's light and the spill at the middle; a tap on either is the door's */
+var pairs = shell.doors.filter(function (d) {
+  var op = (MODEL.openings || []).filter(function (o) { return o.id === d.id; })[0];
+  if (!op || op.leaves !== 2) return false;
+  var m = d.mesh, h = d.hinge, W = h.half * 2;
+  d.pairMid = h.at.clone().addScaledVector(h.along, W / 2);
+  m.scale.x = 0.49; h.half = W / 4;   /* a hair under half, so the seam between them shows */
+  d.rest.pos = h.at.clone().addScaledVector(h.along, W / 4); m.position.copy(d.rest.pos);
+  d.mate = m.clone(); d.mate.name = m.name + '-mate'; m.parent.add(d.mate); tappables.push(d.mate);
+  return true;
+});
+var pairV = new THREE.Vector3();
+function updatePairs() {
+  pairs.forEach(function (d) {
+    var m = d.mesh, k = d.mate, al = d.hinge.along;
+    pairV.subVectors(m.position, d.pairMid);
+    k.position.copy(m.position).addScaledVector(al, -2 * pairV.dot(al));
+    k.rotation.y = 2 * d.rest.rot - m.rotation.y + Math.PI;
+    k.material = m.material; k.visible = m.visible;
+  });
+}
 /* the warm light beyond: one glow behind each shut leaf and a spill on the floor before it, shown only while it stands
    open; one shared light, set at its door when it swings, so the scene's lights never change in number */
 var glowTex = (function () {
@@ -1469,6 +1492,7 @@ function frame() {
   updateSwings(dt);
   updateFades(dt);
   updateCupboard(dt);
+  updatePairs();
   updateHops(dt);
   updateCranks(dt);
   updateSway(dt);
