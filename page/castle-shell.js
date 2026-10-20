@@ -298,7 +298,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var v = row.mass.axis === 'y' ? sy : sx, r = row.mass.runs.filter(function (q) { return v >= q[0] && v <= q[1]; })[0];
     return r ? r[2] : row.stone;
   }
-  function wallMat(row, sx, sy, z) { var st = stoneAt(row, sx, sy, z); return paintMat(tone(st + '/' + row.dress, st), true); }
+  function wallMat(row, sx, sy, z) {
+    var st = stoneAt(row, sx, sy, z), R = TONES && TONES.resolved;
+    /* a panelled room's walls Design's oak, a limewashed room's its plaster, till tones.js gives "<stone>/panelled" its own */
+    if (!(R && R[st + '/' + row.dress]) && (row.dress === 'panelled' || row.dress === 'limewash'))
+      return paintMat(tone(row.dress === 'panelled' ? 'oak' : 'plaster'), true);
+    return paintMat(tone(st + '/' + row.dress, st), true);
+  }
   function floorMat(row, sx, sy, two) { var st = stoneAt(row, sx, sy); return paintMat(row.floor === 'boards' ? tone('oak-boards') : row.floor === 'marble' ? tone('marble') : tone('flags-' + st, st, 0.86), two); }
   function ceilMat(row, sx, sy) {
     var c = row.ceiling, st = stoneAt(row, sx, sy);

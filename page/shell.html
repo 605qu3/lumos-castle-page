@@ -153,11 +153,11 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="lines"></div>
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="castle.js?v=11"></script>
+<script src="castle.js?v=15"></script>
 <script src="castle-model.js?v=385"></script>
 <script src="castle-paint.js?v=1"></script>
 <script src="design/tones.js?v=2"></script>
-<script src="castle-shell.js?v=28"></script>
+<script src="castle-shell.js?v=29"></script>
 <script src="castle-events.js?v=38"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -215,8 +215,12 @@ camera.far = 220; camera.updateProjectionMatrix();
 if (NEVER) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'This door stays shut.'; return; }
 /* the places painted in plain tones (fawkes-materials-rollout-1020, 1: Godric's 7.37 am direction, 20 October 2026; the
    first batch), each surface its row's in docs/architect/materials-by-room.md through page/castle-paint.js, the
-   colours Design's page/design/tones.js (req 643), provisional; the next batches join this list */
-var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall'];
+   colours Design's page/design/tones.js (req 643), provisional; the next batches join this list. Wave 1 (the build
+   sequence, docs/ministry/reviews/2026-10-20-build-sequence.md, f5cbc12b; rough first, 641723c6): the ground floor and
+   below, volume and materials only, the plain four lights in the torch's colour till Interiors places its own */
+var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall',
+  'dungeon-corridor', 'potions-dungeon', 'snape-office', 'founders-undercroft', 'staff-passage', 'staff-room',
+  'classroom-corridor', 'gate-passage', 'hall-cupboard'];
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
@@ -229,7 +233,9 @@ document.title = shell.place.name + ', a shell';
 var HOUR = Q.get('hour') != null ? +Q.get('hour') : new Date().getHours();
 var PAINT_ON = PAINTED.indexOf(PLACE) >= 0, DAY = HOUR >= 7 && HOUR < 17;
 var FILL = !PAINT_ON ? 0.85 : DAY ? 0.5 : HOUR >= 17 && HOUR < 22 ? 0.2 : 0.06;
-if (PLACE === 'entrance-hall') FILL = Math.min(FILL, 0.15);
+/* a painted place with no window of its own (the dungeons, the cupboard, the passages) as the Entrance Hall: a weak fill, no sun */
+var WINDOWLESS = PLACE === 'entrance-hall' || !MODEL.openings.some(function (o) { return o.room === PLACE && /window/.test(o.kind || ''); });
+if (PAINT_ON && WINDOWLESS) FILL = Math.min(FILL, 0.15);
 /* the Great Hall by night: the enchanted ceiling lights it a little, 0.12 in the night sky's tint (Design, 8.22 am) */
 var NIGHT_HALL = PLACE === 'great-hall' && PAINT_ON && FILL < 0.1;
 if (NIGHT_HALL) FILL = 0.12;
@@ -239,7 +245,7 @@ if (NIGHT_HALL) {   /* the night sky's hue at full strength, so 0.12 is a fill a
   var top = Math.max(fillCol.r, fillCol.g, fillCol.b); fillCol.multiplyScalar(1 / top);
 }
 scene.add(new THREE.HemisphereLight(fillCol, 0x3a332c, FILL));
-var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && PLACE !== 'entrance-hall' ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
+var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && !WINDOWLESS ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
 scene.add(new THREE.AmbientLight(0xffffff, PAINT_ON ? 0.02 : 0.12));
 /* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
    3.2 m, a quarter of the way in from each corner, so the walls take light and fall off */
@@ -313,9 +319,12 @@ shell.places.forEach(function (p, pi) {
   if (LIT_BY[p.id]) return;
   var xs = p.poly.map(function (q) { return q[0]; }), ys = p.poly.map(function (q) { return q[1]; });
   var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+  /* a painted room's plain four scaled to its size, so a small office is not lit as the Potions dungeon (about 12 m across the full strength) */
+  var painted = PAINTED.indexOf(p.id) >= 0, k = painted ? Math.max(0.3, Math.min(1, Math.sqrt((x1 - x0) * (y1 - y0)) / 12)) : 1;
   [[0.25, 0.25], [0.75, 0.25], [0.75, 0.75], [0.25, 0.75]].forEach(function (f) {
-    var l = new THREE.PointLight(PAINTED.indexOf(p.id) >= 0 ? TORCH.hex : 0xffc98a, pi ? 0.7 : 1.0, 26, 1.6);
-    l.position.copy(shell.toLocal(x0 + (x1 - x0) * f[0], y0 + (y1 - y0) * f[1], p.floor + 3.2));
+    var l = new THREE.PointLight(painted ? TORCH.hex : 0xffc98a, (pi ? 0.7 : 1.0) * k, 26, 1.6);
+    var lz = PAINTED.indexOf(p.id) >= 0 && p.ceiling != null ? Math.min(p.floor + 3.2, p.ceiling - 0.4) : p.floor + 3.2;   /* under a low ceiling */
+    l.position.copy(shell.toLocal(x0 + (x1 - x0) * f[0], y0 + (y1 - y0) * f[1], lz));
     scene.add(l);
   });
 });
@@ -393,7 +402,13 @@ function useFlight(f) {
   return goStand(f.foot) || goStand(f.head);
 }
 function goTo(d) { return goStand(d.stand); }
-function goBack() { if (here === START) { hyT = hpT = 0; return; } walkTo(trail.slice(1, -1).reverse(), START, true); }
+/* Reset: back to the start, the head level and any pinch let go (Godric, 20 October 2026, 8.41 am: a zoom survived it, so
+   Reset seemed to do nothing) */
+function goBack() {
+  if (kit.zoom && kit.zoom.reset) kit.zoom.reset(0.4);
+  if (here === START) { hyT = hpT = 0; return; }
+  walkTo(trail.slice(1, -1).reverse(), START, true);
+}
 
 /* a shut door answers: it shakes on its latch, and the hooks hear of it (the events' lines, t1's polite doors) */
 var shakes = [];
