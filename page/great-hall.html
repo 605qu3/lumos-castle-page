@@ -132,8 +132,8 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=387"></script>
-<script src="castle-paint.js?v=2"></script>
+<script src="castle-model.js?v=390"></script>
+<script src="castle-paint.js?v=3"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=2"></script>
 <script src="castle-shell.js?v=33"></script>
@@ -737,6 +737,39 @@ S.tables.forEach(function (t) {
   [30, 42, 54].forEach(function (x) { var l = new THREE.PointLight(0xffc27a, 0, 16, 1.6); l.position.copy(P(x, t[1], 5.0)); scene.add(l); candleL.push(l); });
 });
 var staffL = new THREE.PointLight(0xffc27a, 0, 14, 1.6); staffL.position.copy(P(17.5, 60.5, 5.0)); scene.add(staffL); candleL.push(staffL);
+/* the four fireplaces on the long walls' piers (model v72, the great-hall-fire-n-* and -s-* features; Godric's 4 on
+   architect-fires-1020, 20 October 2026, 11.55 am; the Architect's req 746), drawn as shell.html's FIRES draws them: a
+   four-centred head under a frieze in the hall's stone, the mantel shelf, the opening dark, the hearth stone into the
+   hall. Cold and swept; the fire's light is Design's and the hour's, asked first. The great one behind the staff table
+   (great-hall-fire-w) waits on Godric's word on the dais (great-hall-dais-fire-1020). One group, no tap lands on it. */
+var FIRES = (function () {
+  var out = { n: 0 };
+  var fs = MODEL.features.filter(function (f) { return f.room === PLACE && /^great-hall-fire-[ns]-/.test(f.id); });
+  var g = new THREE.Group(); g.name = 'hall-fires'; scene.add(g);
+  var T = window.CASTLE_TONES && CASTLE_TONES.surfaces && CASTLE_TONES.surfaces['high-grey'];
+  var stone = kit.solid(T ? parseInt(T.hex.slice(1), 16) : 0xb9b4aa), dark = kit.solid(0x15130f), z0 = shell.place.floor;
+  var up = new THREE.Vector3(0, 1, 0);
+  fs.forEach(function (f) {
+    var c = { 0: [0, -1], 180: [0, 1], 270: [1, 0], 90: [-1, 0] }[f.compass], w = f.w, ow = f.opening[0] / 2, oh = f.opening[1];
+    var o = shell.toLocal(f.at[0], f.at[1], z0), inn = shell.toLocal(f.at[0] + c[0], f.at[1] + c[1], z0).sub(o).normalize();
+    var along = new THREE.Vector3().crossVectors(up, inn);
+    var q = new THREE.Group(); q.matrixAutoUpdate = false;
+    q.matrix.makeBasis(along, up, inn).setPosition(o); g.add(q);
+    var hw = w / 2, sp = ow * 0.42, sh = new THREE.Shape();
+    sh.moveTo(-hw, -0.01); sh.lineTo(-ow, -0.01); sh.lineTo(-ow, oh * 0.72);
+    sh.quadraticCurveTo(-ow * 0.97, oh * 0.92, -sp, oh * 0.96); sh.lineTo(0, oh); sh.lineTo(sp, oh * 0.96);
+    sh.quadraticCurveTo(ow * 0.97, oh * 0.92, ow, oh * 0.72); sh.lineTo(ow, -0.01); sh.lineTo(hw, -0.01);
+    sh.lineTo(hw, f.mantel); sh.lineTo(-hw, f.mantel); sh.lineTo(-hw, -0.01);
+    function piece(geo, mt, x, y, z) { var m = new THREE.Mesh(geo, mt); m.position.set(x, y, z); m.userData.owner = PLACE; q.add(m); out.n++; return m; }
+    piece(new THREE.ExtrudeGeometry(sh, { depth: 0.2, bevelEnabled: false, curveSegments: 8 }), stone, 0, 0, -0.02);
+    piece(new THREE.BoxGeometry(w + 0.3, 0.1, 0.36), stone, 0, f.mantel + 0.05, 0.16);                 /* the mantel shelf */
+    piece(new THREE.BoxGeometry(w, f.h - f.mantel - 0.1, 0.12), stone, 0, (f.mantel + 0.1 + f.h) / 2, 0.04);   /* the frieze */
+    piece(new THREE.BoxGeometry(ow * 2, oh, 0.008), dark, 0, oh / 2, 0.012);                              /* the opening, dark, 8 mm off */
+    piece(new THREE.BoxGeometry(ow * 2 + 0.6, 0.04, f.hearth + 0.02), stone, 0, 0.01, (f.hearth - 0.02) / 2);   /* the hearth */
+  });
+  out.ids = fs.map(function (f) { return f.id; });
+  return out;
+})();
 var ceiling = shell.group.getObjectByName(PLACE + '-ceiling');
 var skyMat = new THREE.MeshBasicMaterial({ color: 0x223050, side: THREE.DoubleSide });
 if (ceiling) ceiling.material = skyMat;
@@ -849,7 +882,9 @@ function draw() {
   st.candles = lit;
   flames.visible = lit !== 'out';
   flameMat.color.set(lit === 'gold' ? 0xffc35a : 0xfff4dc);
-  candleL.forEach(function (l) { l.intensity = lit === 'gold' ? 1.6 : lit === 'pale' ? 0.25 : 0; });
+  /* gold at 0.8, half the old 1.6, so the painted floor and walls no longer wash out at 7 pm (Design's word on req 740;
+     Godric's 1 on design-hall-candles-1020, 20 October 2026, 12.15 pm) */
+  candleL.forEach(function (l) { l.intensity = lit === 'gold' ? 0.8 : lit === 'pale' ? 0.25 : 0; });
   /* the sky through the windows and on the ceiling (the Architect's windows; Magic's ceiling; Design's light) */
   var sh = d.sun.up ? clamp((d.sun.height || 0.3) * 1.6, 0.15, 1) : 0, wet = /rain|snow|fog|cloud/.test(d.weather.sky || '');
   hemi.intensity = 0.12 + sh * (wet ? 0.35 : 0.55) + (lit === 'gold' ? 0.12 : 0);
