@@ -32,6 +32,17 @@
       "when": [
         "place = entrance hall",
         "hall_cupboard = open",
+        "year >= 4"
+      ],
+      "show": [
+        "the broom cupboard standing open on buckets and mops, one bucket upturned"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open",
+        "year = 3",
         "castle date >= 3 06-07"
       ],
       "show": [
@@ -114,7 +125,26 @@
         "set hall_cupboard = open",
         "log \"Opened the broom cupboard in the Entrance Hall {day}\""
       ],
-      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains are a trace of that night, shown from 7 June of the Azkaban year and in every later year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read 15 October 2026), never sparkling (GL-07), the uphill run on a tap the magic (Rework 17)"
+      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains from 7 June of the Azkaban year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read again 19 October 2026), never sparkling (GL-07). Godric's 1 on magic-hall-grains-1016 (16 October 2026, 1.12 pm; Magic's req 631): the grains lie in the crack in the Azkaban castle only (`year = 3`), from 7 June to that year's end, and in no other castle year; the cupboard and its upturned bucket stand every year. His own word against the world rules' \"earlier books' traces are always there\" (Time), logged as his exception in the charter's Rulings log (Kingsley's item 17, docs/ministry/reviews/2026-10-19-queue-13-to-19.md), so no lane later puts them back in later years"
+    },
+    {
+      "id": "hall.cupboard-opens-later",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-door",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard != open",
+        "year >= 4"
+      ],
+      "show": [
+        "the broom cupboard's door swings open on buckets and mops, one bucket upturned"
+      ],
+      "starts": [
+        "set hall_cupboard = open",
+        "log \"Opened the broom cupboard in the Entrance Hall {day}\""
+      ]
     },
     {
       "id": "hall.cupboard-opens-grains",
@@ -125,6 +155,7 @@
       "when": [
         "place = entrance hall",
         "hall_cupboard != open",
+        "year = 3",
         "castle date >= 3 06-07"
       ],
       "show": [
@@ -134,7 +165,7 @@
         "set hall_cupboard = open",
         "log \"Opened the broom cupboard in the Entrance Hall {day}\""
       ],
-      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains are a trace of that night, shown from 7 June of the Azkaban year and in every later year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read 15 October 2026), never sparkling (GL-07), the uphill run on a tap the magic (Rework 17)"
+      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains from 7 June of the Azkaban year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read again 19 October 2026), never sparkling (GL-07). Godric's 1 on magic-hall-grains-1016 (16 October 2026, 1.12 pm; Magic's req 631): the grains lie in the crack in the Azkaban castle only (`year = 3`), from 7 June to that year's end, and in no other castle year; the cupboard and its upturned bucket stand every year. His own word against the world rules' \"earlier books' traces are always there\" (Time), logged as his exception in the charter's Rulings log (Kingsley's item 17, docs/ministry/reviews/2026-10-19-queue-13-to-19.md), so no lane later puts them back in later years"
     },
     {
       "id": "hall.cupboard-shuts",
@@ -162,6 +193,8 @@
       "when": [
         "place = entrance hall",
         "hall_cupboard = open",
+        "year = 3",
+        "castle date >= 3 06-07",
         "days since grains_day >= 1"
       ],
       "show": [
@@ -171,8 +204,7 @@
         "set grains_taps = 1",
         "stamp grains_day"
       ],
-      "canon": "Magic's B21 with t1 (Godric, 6.51 pm): an hourglass's sand, never named; three taps a day, as Hermione turned the hourglass over three times, PoA 21; checked against the text, 13 October 2026",
-      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): three taps a day, as Hermione turned the hourglass (PoA 21), and no year gate; the run is now hall.grains-run"
+      "canon": "Magic's B21 with t1 and req 631: an hourglass's sand, never named; three taps a visit day, as Hermione turned the hourglass over three times (B3 ch21 L21279, read 19 October 2026), then still till the next day, a tap answering nothing; no sparkle, nothing counted on screen. Godric's 1 on magic-hall-grains-1016 (16 October 2026, 1.12 pm; Magic's req 631): the grains lie in the crack in the Azkaban castle only (`year = 3`), from 7 June to that year's end, and in no other castle year; the cupboard and its upturned bucket stand every year. His own word against the world rules' \"earlier books' traces are always there\" (Time), logged as his exception in the charter's Rulings log (Kingsley's item 17, docs/ministry/reviews/2026-10-19-queue-13-to-19.md), so no lane later puts them back in later years"
     },
     {
       "id": "hall.grains-again",
@@ -183,6 +215,8 @@
       "when": [
         "place = entrance hall",
         "hall_cupboard = open",
+        "year = 3",
+        "castle date >= 3 06-07",
         "days since grains_day < 1",
         "grains_taps < 3"
       ],
@@ -191,24 +225,7 @@
       ],
       "starts": [
         "add grains_taps 1"
-      ],
-      "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md; the touch review, req 420): three taps a day, as Hermione turned the hourglass (PoA 21), and no year gate; the run is now hall.grains-run"
-    },
-    {
-      "id": "hall.grains-run",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap hall-cupboard-grains",
-      "when": [
-        "place = entrance hall",
-        "hall_cupboard = open",
-        "castle date >= 3 06-07"
-      ],
-      "show": [
-        "the gold grains in the crack run a little way uphill with a faint trickle, and settle back"
-      ],
-      "canon": "an hourglass's sand, never named; a trace of PoA 21 (see hall.cupboard-opens); every tap runs it, no count (Rework 17; the touch review, req 420)"
+      ]
     },
     {
       "id": "hall.leave",
