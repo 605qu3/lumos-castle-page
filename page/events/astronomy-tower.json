@@ -145,12 +145,12 @@
         "occasion != christmas",
         "occasion != christmas day",
         "occasion != easter",
-        "hour <= 5"
+        "hour < 12"
       ],
       "show": [
         "over the parapet, the \"little squares of reflected gold light\" on the ground below going out one by one \"as lights in the castle windows were extinguished\""
       ],
-      "canon": "as above, past midnight"
+      "canon": "as above, past midnight to a winter dawn"
     },
     {
       "when": [

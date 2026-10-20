@@ -5,22 +5,24 @@
     {
       "when": [
         "place = charms classroom",
-        "date >= 12-05"
+        "date >= 12-05",
+        "time != night"
       ],
       "show": [
         "shimmering lights along the cornice and across the window heads that turn out to be real, fluttering fairies"
       ],
-      "canon": "Interiors' req 361: PoA 10 L17110, two weeks before the end of term Flitwick had already decorated his classroom with real fluttering fairies; every year, as a teacher's Christmas habit, from two weeks before term ends through the holidays; checked against the text, 14 October 2026"
+      "canon": "Interiors' req 361: PoA 10 L17110, two weeks before the end of term Flitwick had already decorated his classroom with real fluttering fairies; every year, as a teacher's Christmas habit, from two weeks before term ends through the holidays; checked against the text, 14 October 2026; not by night, when they sleep (Magic's req 666, its own rule below), 19 October 2026"
     },
     {
       "when": [
         "place = charms classroom",
-        "date <= 01-06"
+        "date <= 01-06",
+        "time != night"
       ],
       "show": [
         "shimmering lights along the cornice and across the window heads that turn out to be real, fluttering fairies"
       ],
-      "canon": "as above: the fairies stay through the holidays, down after Twelfth Night"
+      "canon": "as above: the fairies stay through the holidays, down after Twelfth Night; not by night, when they sleep (Magic's req 666, its own rule below), 19 October 2026"
     },
     {
       "when": [
