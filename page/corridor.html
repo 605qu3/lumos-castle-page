@@ -3896,13 +3896,13 @@ var STOPS = [
     /* the landing is the corridor's width, so a full turn meets a blank side wall a metre off: on the bay's days the full
        turn, to the lion window on the landing's south wall and back up the flight; on doors, gallery and torch days as far as the
        side wall's torch; on witch days the full turn, down her stretch and back up the flight */
-    turn: function () { return footShown === 'window' || footShown === 'witch' ? HEAD_TURN : 0.5; } },
+    turn: function () { return footShown === 'window' || footShown === 'witch' ? STAND_TURN : 0.5; } },
   /* the one-eyed witch (req 178): from across her stretch, a hand off the far wall as at any stop, about 1.9 m from her,
      square to her, the plinth's foot on the flags and her head in view */
   { name: 'witch', meshes: [witchCard, witchPlinth], stop: function () {
       var x = witchX(WITCH.at), d = WITCH.z - FAR_Z - STOP_BACK;
       return { pos: new THREE.Vector3(x, FOOT_Y + EYE, WITCH.z - d), look: new THREE.Vector3(x, FOOT_Y + 1.0, WITCH.z),
-        fov: FOV_MAX }; } },   /* the widest a stop opens: the plinth stands 0.4 m nearer than her card, so its foot needs it */
+        fov: FOV_MAX }; }, turn: function () { return STAND_TURN; } },   /* the widest a stop opens: the plinth stands 0.4 m nearer than her card, so its foot needs it */
   /* the settle's scarf (7.05 pm): bent over it at the seat's edge, his eye a metre up, looking down at its end by the arm,
      where its name tape turns up on arrival */
   /* the lifted flag (req 492): standing at its edge, looking down the rungs */
@@ -4036,8 +4036,10 @@ var mode = 'rest', atStop = null, tween = null, footShown = 'window';
    when I arrive at a spot"): the drag turns his head from where he stands, about 60 degrees each way, or a stop's own
    `turn` where it needs less; the turn is about stopPose, where the glide set him down, never re-asked of the stop.
    Walking freely (req 722, the vocabulary's §2) turns him all the way round at every place, so HEAD_TURN is a half
-   turn each way and the drag runs on past it unclamped; the close looks (the settle, the flag, the hide) keep their own */
-var HEAD_TURN = Math.PI, headYaw = 0, headYawT = 0, headPitch = 0, headPitchT = 0, stopPose = null;
+   turn each way and the drag runs on past it unclamped; the close looks (the settle, the flag, the hide) keep their own,
+   and the stands that are not this plan's places (the landing and the witch, the stair hall's ground, and Neville, a
+   figure) keep req 208's 60 degrees, STAND_TURN, till their own places are drawn */
+var STAND_TURN = 1.05, HEAD_TURN = Math.PI, headYaw = 0, headYawT = 0, headPitch = 0, headPitchT = 0, stopPose = null;
 var UP = new THREE.Vector3(0, 1, 0), headDir = new THREE.Vector3();
 function headLimit() {
   var t = atStop && atStop.turn;
@@ -4794,7 +4796,7 @@ nevilleGlass.position.set(NEVILLE.glowAt[0], NEVILLE.glowAt[1] - NEVILLE.h / 2, 
 nevilleCard.add(nevilleGlass);
 nevilleCard.userData.thing = 'neville';
 var nevilleStop = { name: 'neville', meshes: [nevilleCard], stop: function () {
-  return { pos: new THREE.Vector3(END_X - 3.3, EYE, NEVILLE.z + 1.1), look: new THREE.Vector3(NEVILLE.x, 0.7, NEVILLE.z + 0.35), fov: 44 }; } };
+  return { pos: new THREE.Vector3(END_X - 3.3, EYE, NEVILLE.z + 1.1), look: new THREE.Vector3(NEVILLE.x, 0.7, NEVILLE.z + 0.35), fov: 44 }; }, turn: function () { return STAND_TURN; } };
 STOPS.push(nevilleStop); nevilleCard.userData.stop = nevilleStop; tappables.push(nevilleCard);
 var neville = { out: false, glass: 0, glassT: 0, clearAt: -1, patAt: -1, goIn: -1, look: groundsQ.get('neville'),
   asleep: false, nearT: 0, wokeAt: -1 };   /* ?neville=out, or glass, for a look */
