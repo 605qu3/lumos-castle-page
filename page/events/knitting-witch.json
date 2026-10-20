@@ -1,0 +1,99 @@
+{
+  "chain": "knitting-witch",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "knitting-witch.walk-up",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "walk up",
+      "when": [
+        "place = corridor",
+        "at = portrait-b",
+        "time != night"
+      ],
+      "show": [
+        "the knitting witch lifts her head and looks at him over her spectacles while he stands at her stop, and goes back to her knitting a second or two after he goes"
+      ],
+      "starts": [],
+      "canon": "Magic's req 655 (docs/handoff/magic.md, The seventh-floor corridor, The knitting witch, portrait-b; Godric's cells of 16 October 2026, 2.37 pm): her look cell when he walks up to her stop, held while he stands there; every year; by night she rests, nodding off over her knitting, no look"
+    },
+    {
+      "id": "knitting-witch.pass-look",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "knitting-witch-pass",
+      "weight": 1,
+      "moment": "walk up",
+      "when": [
+        "place = corridor",
+        "at != portrait-b",
+        "time != night"
+      ],
+      "show": [
+        "as he passes along her wall, the knitting witch looks up at him over her spectacles for about three seconds, then goes back to her knitting"
+      ],
+      "starts": [],
+      "canon": "Magic's req 655: as he passes along her wall by day or evening, about one pass in three (one in three of the walks, the page playing it only where his walk passes her frame), her look held about three seconds; never by night"
+    },
+    {
+      "id": "knitting-witch.pass-knits",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "knitting-witch-pass",
+      "weight": 2,
+      "moment": "walk up",
+      "when": [
+        "place = corridor",
+        "at != portrait-b",
+        "time != night"
+      ],
+      "starts": [],
+      "canon": "Magic's req 655: the other two passes in three, she keeps on at her knitting (rest)"
+    },
+    {
+      "id": "knitting-witch.whisper-first-days",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "witch_whisper_days < 7",
+        "days since witch_whisper_on >= 1"
+      ],
+      "show": [
+        "the knitting witch looks up at him over her spectacles, then whispers behind one hand with a knitting needle pointed his way, a soft whisper with no words made out, and goes back to her knitting"
+      ],
+      "starts": [
+        "stamp witch_whisper_on",
+        "add witch_whisper_days 1"
+      ],
+      "canon": "PS 7 L2651 (read in the canon tool): \"the people in the portraits along the corridors whispered and pointed as they passed\"; Magic's req 655: at a newcomer, never about fame (Kingsley); on his first arrival in the corridor each visit day for his first seven visit days, a look of about two seconds, the whisper about three, then back to her knitting; heard, no words; never by night"
+    },
+    {
+      "id": "knitting-witch.whisper-weekly",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "time != night",
+        "witch_whisper_days >= 7",
+        "days since witch_whisper_on >= 7"
+      ],
+      "show": [
+        "the knitting witch looks up at him over her spectacles, then whispers behind one hand with a knitting needle pointed his way, a soft whisper with no words made out, and goes back to her knitting"
+      ],
+      "starts": [
+        "stamp witch_whisper_on"
+      ],
+      "canon": "PS 7 L2651; Magic's req 655: after his first seven visit days, on his first arrival of each week (seven days on from her last whisper), the same look and whisper; never by night"
+    }
+  ]
+}
