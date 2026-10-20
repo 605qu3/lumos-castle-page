@@ -583,21 +583,26 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (!e) return;
       gaps[e.i].push({ s0: e.s - ft.w / 2, s1: e.s + ft.w / 2, sill: ft.sill || 0, h: Math.min(H, (ft.h || 2.2) + (ft.sill || 0)), op: ft, niche: true });
     });
+    /* a wall already built from the other side (the place one step on shares it) is not built twice; v24: only where
+       the two stand at one height (the Charms corridor over the first floor's, the same plan two storeys up, kept its walls) */
+    function sharedE(ed) {
+      var midE = [(ed.a[0] + ed.b[0]) / 2, (ed.a[1] + ed.b[1]) / 2];
+      return Q !== P && Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]) >= 1e-6 && out.places.some(function (R) { var e = R !== Q && onEdge(R.poly, midE);
+        return e && e.d < 0.05 && R.floor < (Q.ceiling == null ? Infinity : Q.ceiling) - 0.05 && (R.ceiling == null ? Infinity : R.ceiling) > Q.floor + 0.05; });
+    }
     E.forEach(function (ed, i) {
       var a = ed.a, b = ed.b, dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy), HE = ed.H != null ? ed.H : H;
       /* v11 (model v37, ledger 82 f): a side of the leads with its own parapet (the old keep's line on the north, plain) */
       var own = Q.sky && Q.sky.sides && Q.sky.sides[['south', 'east', 'north', 'west'][i]], MER = Q.sky ? Q.sky.merlons : 0;
       if (own && typeof own === 'object') { if (own.breast != null) HE = own.breast; if (own.merlons != null) MER = own.merlons; }
       if (L < 1e-6) return;
-      /* a wall already built from the other side (the place one step on shares it) is not built twice */
-      var midE = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-      /* v24: only where the two stand at one height (the Charms corridor over the first floor's, the same plan two
-         storeys up, kept its walls) */
-      if (Q !== P && out.places.some(function (R) { var e = R !== Q && onEdge(R.poly, midE);
-        return e && e.d < 0.05 && R.floor < (Q.ceiling == null ? Infinity : Q.ceiling) - 0.05 && (R.ceiling == null ? Infinity : R.ceiling) > Q.floor + 0.05; })) return;
+      if (sharedE(ed)) return;
       var ux = dx / L, uy = dy / L, nx = uy, ny = -ux;                 /* outward, the polygon counter-clockwise */
       var t = ed.T || (Q.walls ? (Q.walls[['south', 'east', 'north', 'west'][i]] || Q.wall) : Q.wall);
       var ext = Q.area ? 0 : t;                                          /* a round wall's sides meet at their faces */
+      /* v35: no wrap round a corner whose next side is the other place's wall (the North Tower passage's sides ran
+         0.8 into the seventh floor's east run past their mouth's end, and a tap there met them) */
+      var ext0 = sharedE(E[(i + E.length - 1) % E.length]) ? 0 : ext, ext1 = sharedE(E[(i + 1) % E.length]) ? 0 : ext;
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
@@ -613,8 +618,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
         var sm = (s0 + s1) / 2, p = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
         var wm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, (ya + yb) / 2) : mats.wall;   /* the band's top is over the floor */
-        var m = slab(s1 - s0 + (s0 <= 0.01 ? ext : 0) + (s1 >= L - 0.01 ? ext : 0), yb - ya, t, wm, 'wall');
-        var shift = ((s1 >= L - 0.01 ? ext : 0) - (s0 <= 0.01 ? ext : 0)) / 2;
+        var m = slab(s1 - s0 + (s0 <= 0.01 ? ext0 : 0) + (s1 >= L - 0.01 ? ext1 : 0), yb - ya, t, wm, 'wall');
+        var shift = ((s1 >= L - 0.01 ? ext1 : 0) - (s0 <= 0.01 ? ext0 : 0)) / 2;
         m.position.set(p.x + ux * shift, p.y + (ya + yb) / 2, p.z - uy * shift);
         m.rotation.y = ang; m.name = name; group.add(m);
       }
