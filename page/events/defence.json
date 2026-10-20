@@ -108,9 +108,10 @@
         "year <= 1"
       ],
       "show": [
-        "a lesson under way: Professor Quirrell at the front, the boys' desk theirs, the room smelling strongly of garlic"
+        "a lesson under way: Professor Quirrell at the front, the boys' desk theirs, the room smelling strongly of garlic",
+        "the vampire in its plate keeps to the far edge of its frame, away from the garlic by the door, a hand over its nose"
       ],
-      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PS 8 L2742, \"His classroom smelled strongly of garlic\", Quirrell's; the Stone's castle and the castle before any book is finished; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs)"
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); PS 8 L2742, \"His classroom smelled strongly of garlic\", Quirrell's; the Stone's castle and the castle before any book is finished; the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs). Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the vampire and the garlic, the PS castle only, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): nothing of the turban or what it hid; PS 8 L2742, \"His classroom smelled strongly of garlic, which everyone said was to ward off a vampire\" (read in the canon tool); the story everyone told, ours; the garlic by the door Interiors' (the back wall, x' 5.2)"
     },
     {
       "when": [
@@ -118,9 +119,10 @@
         "year = 2"
       ],
       "show": [
-        "a lesson under way: Professor Lockhart on the clear floor before his desk, reading a passage from one of his books, the boys' desk theirs"
+        "a lesson under way: Professor Lockhart on the clear floor before his desk, reading a passage from one of his books, the boys' desk theirs",
+        "a pile of Lockhart's books on every desk, the boys' seven too, his own winking portrait on each front cover"
       ],
-      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); CoS 10 L9831, Lockhart \"read passages from his books to them\" (Interiors' canon 7, the floor where he tells his tales); the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs)"
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); CoS 10 L9831, Lockhart \"read passages from his books to them\" (Interiors' canon 7, the floor where he tells his tales); the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs). Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the CoS castle, his books on every desk (Interiors' Occupancy: \"in the CoS castle, Lockhart's books\"); CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool)"
     },
     {
       "when": [
@@ -282,26 +284,6 @@
         "the other desks bare but for their ink bottles"
       ],
       "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the evening and the night, out of the class's lessons; Interiors' Occupancy: evening, night and holidays none, their desks bare but for the ink bottles; his own lesson as ever"
-    },
-    {
-      "when": [
-        "place = defence classroom",
-        "year = 2"
-      ],
-      "show": [
-        "a pile of Lockhart's books on every desk, the boys' seven too, his own winking portrait on each front cover"
-      ],
-      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the CoS castle, his books on every desk (Interiors' Occupancy: \"in the CoS castle, Lockhart's books\"); CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool)"
-    },
-    {
-      "when": [
-        "place = defence classroom",
-        "year <= 1"
-      ],
-      "show": [
-        "the vampire in its plate keeps to the far edge of its frame, away from the garlic by the door, a hand over its nose"
-      ],
-      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the vampire and the garlic, the PS castle only, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): nothing of the turban or what it hid; PS 8 L2742, \"His classroom smelled strongly of garlic, which everyone said was to ward off a vampire\" (read in the canon tool); the story everyone told, ours; the garlic by the door Interiors' (the back wall, x' 5.2)"
     },
     {
       "when": [
