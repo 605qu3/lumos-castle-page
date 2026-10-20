@@ -20,6 +20,10 @@
          star    the Great Hall's (its vault block's piers as site positions along the hall): ribs only, flat true
                  so the shell keeps the sky above; tiercerons and liernes, a beast's boss at each bay's middle
          umbrella a round room's ribs from a squat round pillar (where the vault names one, r 0.5) or to a boss
+   CastleCeilings.corbels(id, state)  the beam corbels' carved faces in place id to 'awake' (one or two of them dozing,
+       fixed by the place), 'dozing' or 'sleeping' (req 756); 0 where the place has none. Each face a plane 1 cm proud
+       of its corbel's face to the room, named <id>-corbel-face-<k>; faces.cell(id, k) the vault corbels' cell by the
+       same rule; faces.base(path) sets where the atlases load from (default ../assets/layers/)
    CastleCeilings.surround(THREE, op, mats)  an opening's surround in its reveal: op { w, h, d, kind } (width, the head
        of the shell's cut over the sill, the wall's depth; kind 'round'); a group whose origin is the opening's foot at
        the wall's middle, x along the wall, z through it; the stone that turns the cut's square head round. */
@@ -122,11 +126,43 @@
     return P;
   }
 
+  /* the corbels' faces (req 756, the Architect's 716; Godric's picks, ccca86c1): one atlas a state, six faces in a row,
+     a cell the image's width over six, 1963 px a metre; a face's cell is chosen by its plane's UVs, so a state is one
+     material and a swap is one assignment. In an awake place one or two of its faces (fixed by the place) doze */
+  var FACES = { awake: 'corbels-faces.png', dozing: 'corbels-faces-dozing.png', sleeping: 'corbels-faces-sleeping.png' };
+  var FACE_ASPECT = 0.351 / 0.393, facesBase = '../assets/layers/', faceMats = {}, faceSets = {}, T3 = null;
+  function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function faceMat(THREE, state) {
+    T3 = THREE;
+    if (!faceMats[state]) {
+      var t = new THREE.TextureLoader().load(facesBase + FACES[state]);
+      if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding;
+      faceMats[state] = new THREE.MeshLambertMaterial({ map: t, alphaTest: 0.5 });
+    }
+    return faceMats[state];
+  }
+  function face(THREE, id, k, h) {
+    var g = new THREE.PlaneGeometry(h * FACE_ASPECT, h), uv = g.attributes.uv, cell = (hash(id) + k) % 6;
+    for (var i = 0; i < uv.count; i++) uv.setX(i, (cell + uv.getX(i)) / 6);
+    var m = new THREE.Mesh(g, faceMat(THREE, 'awake')); m.name = id + '-corbel-face-' + k;
+    (faceSets[id] = faceSets[id] || []).push(m);
+    return m;
+  }
+  /* CastleCeilings.corbels(id, state): a place's faces to 'awake', 'dozing' or 'sleeping'; returns how many it set */
+  function corbels(id, state) {
+    var F = faceSets[id] || [], n = F.length, h = hash(id), doze = n ? [h % n] : [];
+    if (!FACES[state] || !n) return 0;
+    if (n > 2 && (h >>> 8) % 2) doze.push((doze[0] + 1 + (h >>> 9) % (n - 1)) % n);
+    F.forEach(function (m, k) { m.material = faceMat(T3, state === 'awake' && doze.indexOf(k) >= 0 ? 'dozing' : state); });
+    return n;
+  }
+
   /* oak beams across the short span on stone corbels, under the flat ceiling the shell keeps */
   function beams(THREE, Q, B, mats) {
     var G = new THREE.Group(), alongX = B.x1 - B.x0 >= B.z1 - B.z0, L = alongX ? B.x1 - B.x0 : B.z1 - B.z0;
     var span = alongX ? B.z1 - B.z0 : B.x1 - B.x0, top = B.y + Q.ceiling - Q.floor, n = Math.max(1, Math.round(L / BEAM_STEP));
     var bw = 0.28, bd = 0.36, cl = 0.42, ch = 0.32;
+    faceSets[Q.id] = [];
     for (var i = 0; i < n; i++) {
       var t = (alongX ? B.x0 : B.z0) + (i + 0.5) * L / n, mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
       var b = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw, bd, span) : new THREE.BoxGeometry(span, bd, bw), mats.beam);
@@ -135,8 +171,11 @@
         var c = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw + 0.08, ch, cl) : new THREE.BoxGeometry(cl, ch, bw + 0.08), mats.stone);
         var e = mid + s * (span / 2 - cl / 2);
         c.position.set(alongX ? t : e, top - bd - ch / 2, alongX ? e : t); c.name = Q.id + '-corbel-' + i + (s < 0 ? 'a' : 'b'); G.add(c);
+        var f = face(THREE, Q.id, 2 * i + (s < 0 ? 0 : 1), ch), o = e - s * (cl / 2 + 0.01);   /* 1 cm proud of its face to the room */
+        f.position.set(alongX ? t : o, top - bd - ch / 2, alongX ? o : t); f.rotation.y = alongX ? (s < 0 ? 0 : Math.PI) : -s * Math.PI / 2; G.add(f);
       });
     }
+    corbels(Q.id, 'awake');
     return { group: G, flat: true, beams: n };
   }
 
@@ -336,5 +375,5 @@
     return G;
   }
 
-  window.CastleCeilings = { forPlace: forPlace, surround: surround, arch: arch, rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
+  window.CastleCeilings = { forPlace: forPlace, surround: surround, corbels: corbels, faces: { files: FACES, cell: function (id, k) { return (hash(id) + k) % 6; }, base: function (b) { if (b) facesBase = b; return facesBase; } }, arch: arch, rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
 })();
