@@ -1,6 +1,12 @@
 {
   "chain": "seventh-floor",
-  "about": "The seventh floor's north corridor (Magic's req 779): the model's room-corridor from the stair hall's north landing west to the west range, Barnabas's tapestry as background in every year; the things Interiors' (req 780). Nothing of the wall opposite the tapestry is spoken in any year.",
+  "about": "The seventh floor's north corridor (Magic's req 779): the model's room-corridor from the stair hall's north landing west to the west range, Barnabas's tapestry as background in every year; and its east run to the North Tower's passage (Magic's req 792, model v78's seventh-floor-north-corridor-east); the things Interiors' (reqs 780, 790, 793). Nothing of the wall opposite the tapestry is spoken in any year.",
+  "places": {
+    "seventh north": [
+      "room corridor",
+      "seventh floor north corridor east"
+    ]
+  },
   "first_visit": [],
   "marks": {
     "barnabas": [
@@ -22,119 +28,140 @@
     },
     {
       "when": [
-        "place = room corridor",
-        "time != night"
+        "place = seventh floor north corridor east"
       ],
       "show": [
-        "torches burning in their brackets between the courtyard windows",
-        "the people in the portraits along the corridor awake, whispering and pointing as he passes",
-        "the corridor quiet, the castle's top floor; few pupils come up this far"
+        "at the landing's mouth, the moving stairs behind him grinding and settling as they swing",
+        "at the far end of the run, the open mouth of the passage to the North Tower"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: torches (Magic's 2.3) between the courtyard's windows, seven on the court wall, and the portraits in two runs on the north wall (Interiors' docs/interiors/seventh-floor-corridor.md (req 780, 18e5a0e1)); \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651, read in the canon tool, 20 October 2026); quiet, few pupils pass (\"a seventh-floor corridor that was deserted\", HBP 20 L62089, read in the canon tool, 20 October 2026); the windows the Architect's (ledger 123, req 782), one word for them: the courtyard windows"
+      "canon": "Magic's req 792 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage), every year: the landing's mouth at north-tower-way, the moving stairs heard behind him (Magic's 1.1), and at the run's east end the passage's open mouth (north-tower-passage-mouth; model v78, the Architect's ledger 124, cited); Godric's 1 on architect-north-run-1020 (20 October 2026, 3.35 pm); in years before the PoA castle no one goes that way"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets between the high windows",
+        "the people in the portraits along the corridor awake, whispering and pointing as he passes",
+        "the corridor quiet, the castle's top floor; few pupils come up this far"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: torches (Magic's 2.3) between the courtyard's windows, seven on the court wall, and the portraits in two runs on the north wall (Interiors' docs/interiors/seventh-floor-corridor.md (req 780, 18e5a0e1)); \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651, read in the canon tool, 20 October 2026); quiet, few pupils pass (\"a seventh-floor corridor that was deserted\", HBP 20 L62089, read in the canon tool, 20 October 2026); the windows the Architect's (ledger 123, req 782), one word for them: the high windows (sill 1.8 m, model v77, Godric's 1 on architect-seventh-windows-1020, 20 October 2026); the east run's windows and torches Interiors' req 793, not yet scheduled: these lines follow it if it differs"
+    },
+    {
+      "when": [
+        "place = seventh north",
         "time != night",
         "weather = clear"
       ],
       "show": [
-        "the sky bright in the courtyard windows"
+        "the sky bright in the high windows"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: the castle's sky and weather in the windows (Magic's 2.4)"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time != night",
         "weather = cloudy"
       ],
       "show": [
-        "grey cloud passing in the courtyard windows"
+        "grey cloud passing in the high windows"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: the castle's sky and weather in the windows (Magic's 2.4)"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time != night",
         "weather = rain"
       ],
       "show": [
-        "rain streaming down the courtyard windows"
+        "rain streaming down the high windows"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: the castle's sky and weather in the windows (Magic's 2.4)"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time != night",
         "weather = snow"
       ],
       "show": [
-        "snow drifting past the courtyard windows"
+        "snow drifting past the high windows"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: the castle's sky and weather in the windows (Magic's 2.4)"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time != night",
         "weather = fog"
       ],
       "show": [
-        "fog pressing white against the courtyard windows"
+        "fog pressing white against the high windows"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: the castle's sky and weather in the windows (Magic's 2.4)"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time = night",
         "moon up = yes",
         "weather = clear",
         "moon != new"
       ],
       "show": [
-        "the corridor striped with bars of moonlight from the courtyard windows"
+        "the corridor striped with bars of moonlight from the high windows"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows moonlit, the real moon up on a clear night (as PS 9 L3229's corridors)"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: by night the windows moonlit, the real moon up on a clear night (as PS 9 L3229's corridors)"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time = night",
         "moon up = no"
       ],
       "show": [
-        "the courtyard windows dark"
+        "the high windows dark"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows dark, no moon up"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: by night the windows dark, no moon up"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time = night",
         "moon up = yes",
         "weather != clear"
       ],
       "show": [
-        "the courtyard windows dark"
+        "the high windows dark"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows dark, the moon behind cloud, rain, snow or fog"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: by night the windows dark, the moon behind cloud, rain, snow or fog"
     },
     {
       "when": [
-        "place = room corridor",
+        "place = seventh north",
         "time = night",
         "moon up = yes",
         "weather = clear",
         "moon = new"
       ],
       "show": [
-        "the courtyard windows dark"
+        "the high windows dark"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows dark, the new moon"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: by night the windows dark, the new moon"
+    },
+    {
+      "when": [
+        "place = seventh north",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, nobody about",
+        "the people in the portraits asleep in their frames, a soft snore here and there"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry) and req 792 (the east run, docs/magic/rooms.md, The east run, to the North Tower's passage: as the long corridor above, cited), every year: by night the torches only (Magic's 2.3), the portraits asleep (Magic's 1.3)"
     },
     {
       "when": [
@@ -142,11 +169,9 @@
         "time = night"
       ],
       "show": [
-        "the torches only, nobody about",
-        "the people in the portraits asleep in their frames, a soft snore here and there",
         "the tapestry across from the windows gone to dim shapes in the torchlight, its colours lost"
       ],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the torches only (Magic's 2.3), the portraits asleep (Magic's 1.3), the tapestry's colours gone to shapes in the torchlight"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the tapestry's colours gone to shapes in the torchlight"
     },
     {
       "when": [
@@ -222,10 +247,10 @@
         "time != night"
       ],
       "show": [
-        "a small troll in a tutu woven into the corner of another hanging along this floor, out of place, as if it had wandered off from Barnabas's tapestry"
+        "a small troll in a tutu woven into the lower corner of the faded old woodland hanging further along this floor, among its trees and birds, out of place, as if it had wandered off from Barnabas's tapestry"
       ],
       "starts": [],
-      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: now and then a troll stray in another hanging on 7, back in Barnabas's tapestry next visit (the touch review's corridor-barnabas-r1 t1; one entry with the woven sheep, Magic's 1.4, reqs 108, 109); about one visit in five"
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: now and then a troll stray in the verdure (Interiors' req 790, docs/interiors/seventh-floor-corridor.md, The things: the north wall, x 50.8 to 53.2, a small old woodland hanging, faded; the troll in its lower west corner at about 1.0; Magic's req 791), back in Barnabas's tapestry next visit (the touch review's corridor-barnabas-r1 t1; one entry with the woven sheep, Magic's 1.4, reqs 108, 109); about one visit in five"
     },
     {
       "id": "seventh-floor.stray-none",
@@ -332,6 +357,40 @@
       "moment": "wait 40-200 s",
       "when": [
         "place = room corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "seventh-floor.north-tower-class",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-north-tower",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = seventh floor north corridor east",
+        "year >= 3",
+        "lessons = on"
+      ],
+      "show": [
+        "a few pupils hurrying past him along the run and into the passage to the North Tower, puffing already at the thought of the spiral stair"
+      ],
+      "starts": [],
+      "canon": "Magic's req 792 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, the North Tower's mouth), from the PoA castle: a class going \"along the corridor\" (PoA 6 L15258) to the spiral, \"Puffing loudly\" up \"the tightly spiralling steps\" (PoA 6 L15262), both read in the canon tool, 20 October 2026; electives from Book 3 (the world rules); in lesson hours, about one visit in three; in earlier years no one goes that way"
+    },
+    {
+      "id": "seventh-floor.north-tower-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-north-tower",
+      "weight": 2,
+      "moment": "arrive",
+      "when": [
+        "place = seventh floor north corridor east",
+        "year >= 3",
+        "lessons = on"
       ],
       "starts": []
     }
