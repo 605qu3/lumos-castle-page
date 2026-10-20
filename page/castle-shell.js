@@ -474,18 +474,28 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         VB.corbels.forEach(function (p, k) {
           var onX = Math.abs(p[0] - x0) < 0.05 || Math.abs(p[0] - x1) < 0.05, n = onX ? Math.sign(mx - p[0]) : Math.sign(my - p[1]);
           var cxs = onX ? p[0] + n * 0.165 : Math.max(x0 + 0.18, Math.min(x1 - 0.18, p[0])), cys = onX ? Math.max(y0 + 0.18, Math.min(y1 - 0.18, p[1])) : p[1] + n * 0.165;
-          var a = toLocal(cxs, cys, Q.floor + VB.springs - 0.125), b = toLocal(cxs + (onX ? 1 : 0), cys + (onX ? 0 : 1), Q.floor);
-          var cb = slab(0.37, 0.25, 0.4, stoneM, 'wall');
+          /* v37 (Godric's 1 on design-corbels-bow-1020): as Design's beam corbels in ceilings.js, the face filling it and bowed;
+             0.28 high, not their 0.42, since the Potions shelves' tops stand 0.30 under the springing */
+          var CH = 0.28, a = toLocal(cxs, cys, Q.floor + VB.springs - CH / 2), b = toLocal(cxs + (onX ? 1 : 0), cys + (onX ? 0 : 1), Q.floor);
+          var cb = slab(0.37, CH, 0.4, stoneM, 'wall');
           cb.position.copy(a); cb.rotation.y = Math.atan2(b.z - toLocal(cxs, cys, Q.floor).z, b.x - toLocal(cxs, cys, Q.floor).x) * -1;
           cb.name = Q.id + '-corbel-' + k; CV.group.add(cb);
           /* v34 (req 716, Design's 756): its carved face, the atlas cell CastleCeilings.faces.cell(id, k), on a plane
              1 cm proud of its face to the room, the face's 0.25 m high; out.corbels(state) swaps the atlas */
           var FC = window.CastleCeilings.faces;
           if (FC && FC.cell) {
-            var fg = new THREE.PlaneGeometry(0.25 * 0.351 / 0.393, 0.25), fuv = fg.attributes.uv, cell = FC.cell(Q.id, k);
+            /* v37: the head bows to the floor, tipped TILT (Design's FACE_TILT), its chin 1 cm proud; a stone wedge behind it
+               back to the corbel's face, bearing 4 mm into it (the seams rule) */
+            var TILT = FC.tilt || 0.35, fh = CH - 0.02, fw = fh * 0.351 / 0.393, st = Math.sin(TILT), ct = Math.cos(TILT);
+            var fg = new THREE.PlaneGeometry(fw, fh), fuv = fg.attributes.uv, cell = FC.cell(Q.id, k);
             for (var u = 0; u < fuv.count; u++) fuv.setX(u, (cell + fuv.getX(u)) / 6);
             var fm = new THREE.Mesh(fg, vaultFaceMat('awake')); fm.name = Q.id + '-corbel-face-' + k;
-            fm.position.set(n * (0.185 + 0.01), 0, 0); fm.rotation.y = n * Math.PI / 2; cb.add(fm);
+            fm.position.set(n * (0.185 + 0.01 + fh / 2 * st), 0, 0); fm.rotation.order = 'YXZ'; fm.rotation.y = n * Math.PI / 2; fm.rotation.x = TILT; cb.add(fm);
+            var ws = new THREE.Shape(), d0 = 0.01 / ct + 0.004, d1 = (0.01 + fh * st) / ct + 0.004;
+            ws.moveTo(0, -fh / 2); ws.lineTo(0.004, fh / 2); ws.lineTo(d1, fh / 2); ws.lineTo(d0, -fh / 2); ws.lineTo(0, -fh / 2);
+            var wg = new THREE.ExtrudeGeometry(ws, { depth: fw * 0.96, bevelEnabled: false });
+            wg.translate(0, 0, -fw * 0.48); wg.rotateY(Math.PI / 2); wg.translate(0, 0, -0.002);
+            var wm = new THREE.Mesh(wg, stoneM); wm.name = Q.id + '-corbel-wedge-' + k; wm.position.copy(fm.position); wm.rotation.copy(fm.rotation); cb.add(wm);
             (vaultFaces[Q.id] = vaultFaces[Q.id] || []).push(fm);
           }
         });
