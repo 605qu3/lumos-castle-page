@@ -156,7 +156,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle.js?v=11"></script>
 <script src="castle-model.js?v=385"></script>
 <script src="castle-paint.js?v=1"></script>
-<script src="design/tones.js?v=1"></script>
+<script src="design/tones.js?v=2"></script>
 <script src="castle-shell.js?v=28"></script>
 <script src="castle-events.js?v=38"></script>
 <script src="design/drawn.js?v=1"></script>
@@ -223,10 +223,16 @@ scene.add(shell.group);
 document.title = shell.place.name + ', a shell';
 
 /* grey light */
-/* a painted place's flags took the grey sky light as near white: the sky light lower there, the torches and candles carrying the room */
-scene.add(new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, PAINTED.indexOf(PLACE) >= 0 ? 0.5 : 0.85));
-var sun = new THREE.DirectionalLight(0xfff1dc, PAINTED.indexOf(PLACE) >= 0 ? 0.15 : 0.45); sun.position.set(-6, 14, 9); scene.add(sun);
-scene.add(new THREE.AmbientLight(0xffffff, 0.12));
+/* a painted place (Design's ask on req 643, 8.18 am): the fill by the hour, 0.5 by day, 0.2 from dusk, 0.06 at night, so
+   the torches and candles carry the evening; the windowless Entrance Hall a weak fill, 0.15 at most, its stone dark with
+   warm pools; the sun only by day. The unpainted shells keep the grey light. ?hour=0..23 for checks */
+var HOUR = Q.get('hour') != null ? +Q.get('hour') : new Date().getHours();
+var PAINT_ON = PAINTED.indexOf(PLACE) >= 0, DAY = HOUR >= 7 && HOUR < 17;
+var FILL = !PAINT_ON ? 0.85 : DAY ? 0.5 : HOUR >= 17 && HOUR < 22 ? 0.2 : 0.06;
+if (PLACE === 'entrance-hall') FILL = Math.min(FILL, 0.15);
+scene.add(new THREE.HemisphereLight(0xcfd4dc, 0x3a332c, FILL));
+var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && PLACE !== 'entrance-hall' ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
+scene.add(new THREE.AmbientLight(0xffffff, PAINT_ON ? 0.02 : 0.12));
 /* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
    3.2 m, a quarter of the way in from each corner, so the walls take light and fall off */
 /* the real lights of the painted places (their rows' light in docs/architect/materials-by-room.md; Design's colours and
@@ -238,7 +244,6 @@ scene.add(new THREE.AmbientLight(0xffffff, 0.12));
 var TONE = window.CASTLE_TONES || null;
 function lightTone(k, fb) { var l = TONE && TONE.lights && TONE.lights[k]; return l ? { hex: parseInt(String(l.hex).replace('#', ''), 16), gain: l.gain } : fb; }
 var TORCH = lightTone('torch', { hex: 0xffc28a, gain: 1.0 }), CANDLE = lightTone('candle', { hex: 0xffb466, gain: 0.55 });
-var HOUR = Q.get('hour') != null ? +Q.get('hour') : new Date().getHours();
 var LIT_BY = {};   /* a place whose own lights replace the plain four */
 var HALL_LIGHT = (function () {
   var out = { torches: [], candles: null };
