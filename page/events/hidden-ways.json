@@ -3064,7 +3064,7 @@
         "weather = clear"
       ],
       "show": [
-        "morning sun through the east loop along the sledges' runners"
+        "morning sun through the east loop, across the floor to the curling stones by the far wall"
       ]
     },
     {
@@ -3092,7 +3092,7 @@
       ],
       "show": [
         "dust, and the smell of old wool",
-        "shelves round the whole wall to the ceiling: odd gloves and odd socks by the hundred, scarves faded to no house at all, hats of every century, a cauldron with a hole in it, a toy broom, each thing with a brown card tied to it",
+        "shelves built to the curve of the wall, five boards high, broken only at the loops and the hatch: odd gloves and odd socks by the hundred, scarves faded to no house at all, hats of every century, a cauldron with a hole in it, a toy broom, each thing with a brown card tied to it",
         "the ladder on its rail chained at its foot, and a counter with a ledger lying open, its last entries in the same hand as the cards",
         "a brown card on an odd red mitten: \"Under a bench in the Great Hall, 14 November 1923\"",
         "a brown card on a hat with a broken brim: \"On the stairs by the library, 2 May 1887\"",
@@ -3115,7 +3115,7 @@
       "show": [
         "a hush, as though a lesson had only just stopped",
         "the stone bench round the wall worn smooth, carved all over with names and dates in the hands of every age: ALWYN, HUGH OF BRAMLEY 1214, T. PENNICK 1610",
-        "a master's oak chair, a lectern, and on a shelf a stack of wax tablets in wooden frames, the top one still scratched with its last lesson: a row of letters copied over and over, the last line trailing off"
+        "a master's oak chair, a lectern, and on a shelf a stack of wax tablets in wooden frames; one lies on the bench below it, still scratched with its last lesson: a row of letters copied over and over, the last line trailing off"
       ]
     },
     {
@@ -3163,7 +3163,7 @@
       ],
       "show": [
         "the smell of old cloth and paint",
-        "chests of costumes with their lids held up on stays: a crown of gilt paper, a lion's head of painted canvas big enough to wear, wings of painted cloth and feathers, cloaks painted with stars and waves",
+        "chests of costumes with their lids held up on stays, a crown of gilt paper and a sea-king's crown of shells on the folded clothes in one; beside them on the floor a lion's head of painted canvas big enough to wear, its jaw open; wings of painted cloth and feathers on pegs, and cloaks painted with stars and waves",
         "masks on pegs along the wall, and a backcloth rolled up, painted as a forest"
       ]
     },
@@ -3193,7 +3193,7 @@
         "weather = clear"
       ],
       "show": [
-        "morning sun through the east loop on the gilt paper crown"
+        "morning sun through the east loop on the lion's painted head"
       ]
     },
     {
@@ -3244,7 +3244,7 @@
         "weather = fog"
       ],
       "show": [
-        "the loops white with fog"
+        "the windows white with fog"
       ]
     },
     {
@@ -3253,7 +3253,7 @@
         "time = night"
       ],
       "show": [
-        "the loops black"
+        "the windows black"
       ]
     }
   ],
