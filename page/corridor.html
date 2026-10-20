@@ -2698,9 +2698,9 @@ var doorSurround = squareSurround(DOOR.x, DOOR.w, DOOR.h);
    one over the flight and one over the landing centred on its tall window, the flight's foot its boundary. Each web is
    the higher of two pointed barrels, across and along the bay (a groin), so its wall cells rise to the wall ribs over
    the lights and the diagonal ribs run on the groins; the ribs and a corbel under each springing in the surround's
-   stone. A coded stand-in until Design draws the castle's vaults (req 643), behind ?vault till Godric has seen it; the
-   bosses (materials.md: a different face in each bay) a drawing for later */
-var VAULT = { on: /[?&]vault(=|&|$)/.test(location.search), spring: 2.9, rib: 0.07, seg: 24,
+   stone. A coded stand-in until Design draws the castle's vaults (req 643), laid live on Godric's tap (corridor-vault-1019,
+   1, 19 October 2026, 9.33 pm); the bosses (materials.md: a different face in each bay) a drawing for later */
+var VAULT = { on: true, spring: 2.9, rib: 0.07, seg: 24,
   web: solid(0x6c6861, { side: THREE.DoubleSide }), corbel: { w: 0.24, h: 0.26, d: 0.16 } };
 VAULT.rise = CEIL - VAULT.spring;
 VAULT.cuts = (function () {
