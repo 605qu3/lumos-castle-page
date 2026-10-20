@@ -157,8 +157,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-model.js?v=399"></script>
 <script src="castle-paint.js?v=5"></script>
 <script src="design/tones.js?v=2"></script>
-<script src="design/ceilings.js?v=2"></script>
-<script src="castle-shell.js?v=33"></script>
+<script src="design/ceilings.js?v=3"></script>
+<script src="castle-shell.js?v=34"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -2179,7 +2179,16 @@ var FBOX = (function () {
   shell.group.add(m); return m;
 })();
 function filchShown(shown) { if (PLACE === 'classroom-corridor') filchSet(shown.indexOf(FILCH_AJAR) >= 0); }
-function roomDraw(shown) { cupDrawRoom(shown); filchShown(shown); thingsDrawRoom(shown); }
+/* req 716 (Events' corbels.json, Design's 756): the room's corbel line sets the carved faces' state, asleep, drowsy
+   or nodding off, or awake (castle-shell.js v34's out.corbels); a moment's line swaps nothing, the state's next line does */
+var corbelState = null;
+function corbelsShown(shown) {
+  if (!shell.corbels) return;
+  var l = shown.filter(function (t) { return /stone faces? carved on the corbels/.test(t); })[0], st = 'awake';
+  if (l && /asleep/.test(l)) st = 'sleeping'; else if (l && /drowsy|nodding off/.test(l)) st = 'dozing';
+  if (st !== corbelState) { corbelState = st; shell.corbels(st); }
+}
+function roomDraw(shown) { cupDrawRoom(shown); filchShown(shown); thingsDrawRoom(shown); corbelsShown(shown); }
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
    its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
 function knotSpots(d) {
