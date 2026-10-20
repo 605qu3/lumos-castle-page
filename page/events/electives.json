@@ -1,0 +1,174 @@
+{
+  "chain": "electives",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = arithmancy classroom",
+        "year >= 3"
+      ],
+      "show": [
+        "a lesson under way: the teacher at the board or her desk, the boys' desk theirs with its things out"
+      ],
+      "canon": "Interiors' req 515 (docs/interiors/arithmancy-classroom.md, Occupancy and aftermath; the room in model v58's place, 7c39e83b): his own lesson is under way whenever he walks in, any day and hour, as in Divination (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock); an elective, open from the Azkaban castle on (world rules, Classes; PoA 4 L14340, PoA 6 L15206); the teacher a witch, PoA 12 L18194, \"Professor Vector, that Arithmancy witch\", never named in a line; the figures People's (req 652); checked against the text, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = arithmancy classroom",
+        "year >= 3",
+        "lessons = on"
+      ],
+      "show": [
+        "the class at its desks over their number charts"
+      ],
+      "canon": "Interiors' req 515: by day in term the class at its desks, evening, night and holidays bare (the clock's `lessons`, docs/room-states.md section 1); the charts PoA 12 L18188, \"Arithmancy charts\", and L18332, \"a very complicated-looking number chart\"; the figures People's (req 652); checked against the text, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = arithmancy classroom",
+        "year >= 3",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "the board's last sum half rubbed out, chalk dust on its ledge"
+      ],
+      "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term, the summer hold's last week of term included, never in the holidays nor on the term's first day (ours); no sum anyone's; Interiors' words, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = ancient runes classroom",
+        "year >= 3"
+      ],
+      "show": [
+        "a lesson under way: the teacher at the board or the desk, the boys' desk theirs"
+      ],
+      "canon": "Interiors' req 515 (docs/interiors/ancient-runes-classroom.md, Occupancy and aftermath; the room in model v58's place, 1500fa82): his own lesson whenever he walks in, any day and hour, as in Divination; an elective from the Azkaban castle on (PoA 4 L14340, \"the Study of Ancient Runes\"; PoA 16 L19634, \"1 o'clock, Ancient Runes\"); no teacher named; the figures People's (req 652); checked against the text, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = ancient runes classroom",
+        "year >= 3",
+        "lessons = on"
+      ],
+      "show": [
+        "the class at its desks, rune dictionaries open"
+      ],
+      "canon": "Interiors' req 515: by day in term the class at its desks, bare otherwise (the clock's `lessons`); the dictionaries PoA 12 L18188, \"Rune dictionaries\"; the figures People's (req 652); checked against the text, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = ancient runes classroom",
+        "year >= 3",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "a few rune stones left out on a desk, a dictionary not put back"
+      ],
+      "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term only, the summer hold's week included (ours); Interiors' words, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = muggle studies classroom",
+        "year >= 3"
+      ],
+      "show": [
+        "a lesson under way: the teacher at the demonstration table holding up a thing to ask about, the boys' desk theirs"
+      ],
+      "canon": "Interiors' req 515 (docs/interiors/muggle-studies-classroom.md, Occupancy and aftermath; the room in model v58's place, 1de78434): his own lesson whenever he walks in, any day and hour, as in Divination; an elective from the Azkaban castle on (PoA 4 L14340; PoA 6 L15206, \"nine o'clock, Muggle Studies\"); no teacher named; the figures People's (req 652); checked against the text, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = muggle studies classroom",
+        "year >= 3",
+        "lessons = on"
+      ],
+      "show": [
+        "the class at its desks, turned to the demonstration table"
+      ],
+      "canon": "Interiors' req 515: by day in term the class at its desks (the clock's `lessons`); the figures People's (req 652); Interiors' words, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = muggle studies classroom",
+        "year >= 3",
+        "lessons = off"
+      ],
+      "show": [
+        "the demonstration table's other things left out under a cloth"
+      ],
+      "canon": "Interiors' req 515: evening, night and holidays the table's things left out under a cloth; since his own lesson runs whenever he walks in, the teacher holds up one thing and the rest stay under the cloth (ours, asked of Interiors in req 653); 19 October 2026"
+    },
+    {
+      "when": [
+        "place = muggle studies classroom",
+        "year >= 3",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "one thing off the table and set on a desk where someone was trying it",
+        "a label turned over and corrected in another hand"
+      ],
+      "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term only, the summer hold's week included (ours); nobody's hand named; Interiors' words, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = creatures paddock",
+        "year >= 3",
+        "lessons = on"
+      ],
+      "show": [
+        "a lesson under way: the teacher inside the fence with the lesson's creature, the class along the near fence, the boys at their place"
+      ],
+      "canon": "Interiors' req 515 (docs/interiors/creatures-paddock.md, Occupancy and aftermath; the paddock in model v58's place, 7d0fff8a): by day in term, whenever a boy comes, a lesson is under way (the clock's `lessons`, every day in term, weekends included, the charter of 15 October 2026, so a Saturday has its lesson too; asked of Interiors in req 653); an elective from the Azkaban castle on; the class at the fence PoA 6 L15472, \"Everyone gather round the fence here!\"; the lesson's creature Magic's, the figures People's (req 652); no teacher named; checked against the text, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = creatures paddock",
+        "year >= 3",
+        "lessons = off"
+      ],
+      "show": [
+        "the paddock empty, the gate shut"
+      ],
+      "canon": "Interiors' req 515: evening, night and holidays the paddock empty, the gate shut (PoA 6 L15470, \"There was nothing in there\"); checked against the text, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = creatures paddock",
+        "year >= 3",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "trampled grass along the near fence, a few lettuce shreds by the trestle, the trough's water clouded"
+      ],
+      "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term only, the summer hold's week included (ours); Interiors' words, 19 October 2026"
+    },
+    {
+      "when": [
+        "place = creatures paddock",
+        "castle date >= 3 09-02"
+      ],
+      "show": [
+        "a few iron tether rings on the fence posts, worn smooth and dull where chains ran through them"
+      ],
+      "canon": "Interiors' req 515, its one trace (creatures-paddock.md, A trace; a trace, the orchestrator, 15 October 2026, 7.42 pm): PoA 6 L15508 and L15510, the creatures led in on chains and \"tethered the creatures to the fence\", the first Care of Magical Creatures lesson after lunch on the first day of lessons (L15462, \"their first ever Care of Magical Creatures class\"; the same day as Divination's first, so 2 September, as the pink cup's), in the Azkaban castle and every later one; worn smooth and dull, never bright (the Ministry's no-glint ruling of 16 October); no creature, no feather, nothing anyone's; which posts, Interiors' far posts by the gap or the fence where the class stood (L15510), asked of Interiors in req 653, so the line names neither; checked against the text, 19 October 2026"
+    }
+  ],
+  "records": []
+}
