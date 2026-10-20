@@ -1,0 +1,520 @@
+{
+  "chain": "corbels",
+  "about": "The corbels' faces (Magic's req 687, 1.8): every stone corbel carved as a head under the beams of the Tudor rooms the Architect's schedule gives (docs/architect/materials-by-room.md, tudor-pink stone with a beams ceiling), each a different face, the masons' joke on one another. Every year. Only lids, brows and jaw move; no head turns, no face speaks. The places are the model's ids, hyphens as spaces; the drawing Design's (req 688).",
+  "places": {
+    "corbelled": [
+      "classroom corridor",
+      "filchs office",
+      "north stair foot g",
+      "staff passage",
+      "staff room",
+      "first floor corridor",
+      "history hearth way",
+      "history of magic classroom",
+      "history of magic passage",
+      "mcgonagalls office",
+      "tapestry stairwell",
+      "transfiguration classroom",
+      "transfiguration passage",
+      "north stair foot 2",
+      "charms classroom",
+      "charms corridor",
+      "charms passage",
+      "forbidden corridor",
+      "elves passage 4",
+      "north stair foot 4",
+      "elves passage 5",
+      "lake corridor 5 west",
+      "north stair foot 5",
+      "sw stair foot 5",
+      "arithmancy classroom",
+      "arithmancy passage",
+      "lake corridor 6 west",
+      "astronomy warming room",
+      "den",
+      "feast ladder well",
+      "feast loft",
+      "north tower passage",
+      "sw stair foot 7"
+    ],
+    "corbelled halls": [
+      "classroom corridor",
+      "filchs office",
+      "north stair foot g",
+      "staff passage",
+      "staff room",
+      "first floor corridor",
+      "history hearth way",
+      "history of magic passage",
+      "mcgonagalls office",
+      "tapestry stairwell",
+      "transfiguration passage",
+      "north stair foot 2",
+      "charms corridor",
+      "charms passage",
+      "forbidden corridor",
+      "elves passage 4",
+      "north stair foot 4",
+      "elves passage 5",
+      "lake corridor 5 west",
+      "north stair foot 5",
+      "sw stair foot 5",
+      "arithmancy passage",
+      "lake corridor 6 west",
+      "astronomy warming room",
+      "den",
+      "feast ladder well",
+      "feast loft",
+      "north tower passage",
+      "sw stair foot 7"
+    ],
+    "corbelled classrooms": [
+      "transfiguration classroom",
+      "charms classroom"
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = corbelled",
+        "time = night"
+      ],
+      "show": [
+        "the stone faces carved on the corbels under the beams asleep, lids down, jaws slack"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: by night asleep, no lid opening in the dark, in a classroom too; kin to the portraits' doze (\"the sleeping portraits\", CoS 13 L11348) and stone that wakes (\"the gargoyle sprang suddenly to life\", CoS 11 L10580), read in the canon tool, 20 October 2026"
+    },
+    {
+      "when": [
+        "place = corbelled halls",
+        "time = evening"
+      ],
+      "show": [
+        "the stone faces carved on the corbels drowsy, lids half down"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: the evening, drowsy"
+    },
+    {
+      "when": [
+        "place = arithmancy classroom",
+        "year < 3",
+        "time = evening"
+      ],
+      "show": [
+        "the stone faces carved on the corbels drowsy, lids half down"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: the evening, drowsy; the Arithmancy classroom before the Azkaban castle is a room with no lesson (electives.json binds the lesson to year >= 3), so its faces are the corridors'"
+    },
+    {
+      "when": [
+        "place = corbelled halls",
+        "time != night",
+        "time != evening"
+      ],
+      "show": [
+        "the stone faces carved on the corbels under the beams awake, each a different face, one or two dozing"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: by day out of lessons awake, one or two dozing as the portraits by day (1.3); mornings as the day, provisional, Magic to confirm"
+    },
+    {
+      "when": [
+        "place = arithmancy classroom",
+        "year < 3",
+        "time != night",
+        "time != evening"
+      ],
+      "show": [
+        "the stone faces carved on the corbels under the beams awake, each a different face, one or two dozing"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: by day out of lessons; the Arithmancy classroom before the Azkaban castle is a room with no lesson (electives.json binds the lesson to year >= 3), so its faces are the corridors'"
+    },
+    {
+      "when": [
+        "place = corbelled classrooms",
+        "time != night"
+      ],
+      "show": [
+        "the stone faces carved on the corbels awake, eyes on the teacher's desk"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: in lessons, his own lesson under way whenever he walks in (Interiors' Occupancy), eyes on the teacher's desk; the evening as the day there, the lesson winning over the hour, provisional, Magic to confirm; Transfiguration: \"she wasn't a teacher to cross. Strict and clever\" (PS 8 L2736), read in the canon tool, 20 October 2026: none dozes in her lesson"
+    },
+    {
+      "when": [
+        "place = arithmancy classroom",
+        "year >= 3",
+        "time != night"
+      ],
+      "show": [
+        "the stone faces carved on the corbels awake, eyes on the teacher's desk"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: in lessons, the Arithmancy lesson from the Azkaban castle on (electives.json); the evening as the day, provisional, Magic to confirm"
+    },
+    {
+      "when": [
+        "place = history of magic classroom",
+        "time != night",
+        "corbel_doze != nodding",
+        "corbel_doze != asleep"
+      ],
+      "show": [
+        "the stone faces carved on the corbels awake, eyes on the teacher's desk"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: in History of Magic, awake as Binns comes in, and again once woken at the lesson's end"
+    },
+    {
+      "when": [
+        "place = history of magic classroom",
+        "time != night",
+        "corbel_doze = nodding"
+      ],
+      "show": [
+        "the stone faces carved on the corbels nodding off one by one, lids drooping, jaws slackening"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: in History of Magic they nod off one by one from Binns's coming in; Binns's voice \"almost guaranteed to cause severe drowsiness within ten minutes, five in w[arm weather]\" (OotP 12 L40516, everyday) and \"a deep stupor\" (CoS 9 L9558), read in the canon tool, 20 October 2026"
+    },
+    {
+      "when": [
+        "place = history of magic classroom",
+        "time != night",
+        "corbel_doze = asleep"
+      ],
+      "show": [
+        "every stone face carved on the corbels asleep, jaws slack"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: all asleep by about ten minutes, five in summer; Binns's voice \"almost guaranteed to cause severe drowsiness within ten minutes, five in w[arm weather]\" (OotP 12 L40516, everyday) and \"a deep stupor\" (CoS 9 L9558), read in the canon tool, 20 October 2026"
+    }
+  ],
+  "records": [
+    {
+      "id": "corbels.snore",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-snore",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = corbelled",
+        "time = night"
+      ],
+      "show": [
+        "from a corbel under the beams, a soft stony snore, and quiet again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: by night now and then a soft stony snore, kin to the armour's tinny one (armour.json's line armour.snore, \"a soft tinny snore from inside the helmet\"); heard only; about one visit in three"
+    },
+    {
+      "id": "corbels.snore-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-snore",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = corbelled",
+        "time = night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "corbels.yawn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-yawn",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = corbelled halls",
+        "time = evening"
+      ],
+      "show": [
+        "on a corbel a stone face opens its jaw in a slow stone yawn, and its lids sink again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: the evening, now and then a slow stone yawn; about one visit in three"
+    },
+    {
+      "id": "corbels.yawn-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-yawn",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = corbelled halls",
+        "time = evening"
+      ],
+      "starts": []
+    },
+    {
+      "id": "corbels.yawn-arithmancy",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-yawn-arithmancy",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = arithmancy classroom",
+        "year < 3",
+        "time = evening"
+      ],
+      "show": [
+        "on a corbel a stone face opens its jaw in a slow stone yawn, and its lids sink again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: the evening's yawn; the Arithmancy classroom before the Azkaban castle is a room with no lesson (electives.json binds the lesson to year >= 3), so its faces are the corridors'"
+    },
+    {
+      "id": "corbels.yawn-arithmancy-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-yawn-arithmancy",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = arithmancy classroom",
+        "year < 3",
+        "time = evening"
+      ],
+      "starts": []
+    },
+    {
+      "id": "corbels.eyes",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-eyes",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = corbelled halls",
+        "time != night",
+        "time != evening"
+      ],
+      "show": [
+        "as he walks under a corbel, its stone eyes follow him a little way, and go back"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: by day out of lessons, as he walks under one its eyes follow him a little way and go back; about one visit in three"
+    },
+    {
+      "id": "corbels.eyes-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-eyes",
+      "weight": 2,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = corbelled halls",
+        "time != night",
+        "time != evening"
+      ],
+      "starts": []
+    },
+    {
+      "id": "corbels.eyes-arithmancy",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-eyes-arithmancy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = arithmancy classroom",
+        "year < 3",
+        "time != night",
+        "time != evening"
+      ],
+      "show": [
+        "as he walks under a corbel, its stone eyes follow him a little way, and go back"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: the eyes following; the Arithmancy classroom before the Azkaban castle is a room with no lesson (electives.json binds the lesson to year >= 3), so its faces are the corridors'"
+    },
+    {
+      "id": "corbels.eyes-arithmancy-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "corbel-eyes-arithmancy",
+      "weight": 2,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = arithmancy classroom",
+        "year < 3",
+        "time != night",
+        "time != evening"
+      ],
+      "starts": []
+    },
+    {
+      "id": "corbels.history-nods",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 60-120 s",
+      "when": [
+        "place = history of magic classroom",
+        "binns = in",
+        "time != night",
+        "season != summer"
+      ],
+      "show": [
+        "on one corbel the stone face's lids droop, its jaw slackens, and it nods off"
+      ],
+      "starts": [
+        "set corbel_doze = nodding"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: the first within a minute or two of Binns's coming in (history.binns-enters sets binns = in); Binns's voice \"almost guaranteed to cause severe drowsiness within ten minutes, five in w[arm weather]\" (OotP 12 L40516, everyday) and \"a deep stupor\" (CoS 9 L9558), read in the canon tool, 20 October 2026"
+    },
+    {
+      "id": "corbels.history-nods-summer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 30-60 s",
+      "when": [
+        "place = history of magic classroom",
+        "binns = in",
+        "time != night",
+        "season = summer"
+      ],
+      "show": [
+        "on one corbel the stone face's lids droop, its jaw slackens, and it nods off"
+      ],
+      "starts": [
+        "set corbel_doze = nodding"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: half that in summer, \"five in warm weather\"; Binns's voice \"almost guaranteed to cause severe drowsiness within ten minutes, five in w[arm weather]\" (OotP 12 L40516, everyday) and \"a deep stupor\" (CoS 9 L9558), read in the canon tool, 20 October 2026"
+    },
+    {
+      "id": "corbels.history-asleep",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 540-600 s",
+      "when": [
+        "place = history of magic classroom",
+        "binns = in",
+        "time != night",
+        "season != summer",
+        "corbel_doze = nodding"
+      ],
+      "show": [
+        "the last stone face on the corbels closes its lids; every one under the beams asleep"
+      ],
+      "starts": [
+        "set corbel_doze = asleep"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: all asleep by about ten minutes; Binns's voice \"almost guaranteed to cause severe drowsiness within ten minutes, five in w[arm weather]\" (OotP 12 L40516, everyday) and \"a deep stupor\" (CoS 9 L9558), read in the canon tool, 20 October 2026"
+    },
+    {
+      "id": "corbels.history-asleep-summer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 270-300 s",
+      "when": [
+        "place = history of magic classroom",
+        "binns = in",
+        "time != night",
+        "season = summer",
+        "corbel_doze = nodding"
+      ],
+      "show": [
+        "the last stone face on the corbels closes its lids; every one under the beams asleep"
+      ],
+      "starts": [
+        "set corbel_doze = asleep"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: all asleep by about five in summer; Binns's voice \"almost guaranteed to cause severe drowsiness within ten minutes, five in w[arm weather]\" (OotP 12 L40516, everyday) and \"a deep stupor\" (CoS 9 L9558), read in the canon tool, 20 October 2026"
+    },
+    {
+      "id": "corbels.history-wake",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 840-900 s",
+      "when": [
+        "place = history of magic classroom",
+        "binns = in",
+        "time != night",
+        "corbel_doze = asleep"
+      ],
+      "show": [
+        "the stone faces on the corbels wake with a start, lids snapping up, as the lesson draws to its end"
+      ],
+      "starts": [
+        "set corbel_doze = woken"
+      ],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: they wake with a start at the lesson's end; no lesson-end moment, so near it as transfiguration.homework's line comes, after his fourteen minutes or so of drone"
+    },
+    {
+      "id": "corbels.tap-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap corbel",
+      "when": [
+        "place = corbelled",
+        "time != night",
+        "corbel_doze != asleep"
+      ],
+      "show": [
+        "the stone face lifts its stone brows at him, and settles"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: a tap on a face by day, it lifts its stone brows at him and settles; only lids, brows and jaw move, no head turns, no face speaks"
+    },
+    {
+      "id": "corbels.tap-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap corbel",
+      "when": [
+        "place = corbelled",
+        "time = night"
+      ],
+      "show": [
+        "the stone face gives a soft stony snore, and sleeps on"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: a tap by night, the snore, and it sleeps on; Lumos wakes none of them, nothing glows"
+    },
+    {
+      "id": "corbels.tap-asleep",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap corbel",
+      "when": [
+        "place = history of magic classroom",
+        "time != night",
+        "corbel_doze = asleep"
+      ],
+      "show": [
+        "the stone face gives a soft stony snore, and sleeps on"
+      ],
+      "starts": [],
+      "canon": "Magic's req 687 (docs/handoff/magic.md, 1.8, The corbels' faces; Godric's 1 on magic-corbels-1019), every year: a face asleep in Binns's lesson sleeps on as by night"
+    },
+    {
+      "id": "corbels.forget",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set corbel_doze = none"
+      ]
+    }
+  ]
+}

@@ -181,6 +181,9 @@
    Then the clock's moment (Magic's req 676, the hospital wing's curtains at ten; Kingsley's 92293727: only if he is
    there, never calling him): `clock HH:MM` comes when the boys' own clock passes that minute while a page of the
    visit ticks, never at arriving, so a boy who comes at five past sees what it left; ?hour=21:59 a minute before.
+   Then a chain's `places` (Magic's req 687, the corbels' faces in the 33 Tudor rooms under beams): named lists of
+   places, `"places": {"corbelled": ["staff room", ...]}`, and `place = <list>` (or `!=`) holds when the page's place
+   is (or is not) in it, so one rule names many rooms and still counts as naming its place off the first pages.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -488,6 +491,7 @@
        `{ 'floor-a': ['floor-b'], 'floor-b': ['floor-a', 'floor-c'] }`. Nearness is the page's, which places them. */
     var neighbours = opts.neighbours || {};
     var bagDefs = {};                            /* each chain's bags, by name */
+    var placeDefs = {};                          /* each chain's named lists of places (req 687) */
     var deckDefs = {};                           /* each chain's decks, by name (the Chocolate Frog cards, req 165) */
     /* The things this page has drawings for (req 169): `opts.drawn`, a list of names or a function giving one, so a
        find joins the sofa's bag, or a card the deck, only once its drawing has landed in the page. */
@@ -988,6 +992,10 @@
       var m = COND.exec(cond);
       if (!m) { note('condition does not parse: ' + cond); return false; }
       var lhs = value(m[1]), op = m[2], raw = m[3].trim();
+      if (m[1] === 'place' && placeDefs[raw]) {
+        if (op !== '=' && op !== '!=') { note('a list of places reads = or !=: ' + cond); return false; }
+        return (placeDefs[raw].indexOf(lhs) >= 0) === (op === '=');
+      }
       var rhs = /^-?\d+$/.test(raw) ? +raw : (raw === 'today' || stampNames[raw]) ? value(raw) : raw;
       if (m[1] === 'castle date') { var dm = /^([0-7]) (\d\d-\d\d)$/.exec(raw); rhs = dm ? schoolKey(+dm[1], dm[2]) : null; if (rhs == null) { note('castle date needs N mm-dd: ' + cond); return false; } }
       if (lhs === undefined) {
@@ -2383,6 +2391,8 @@
         for (var t in tg) targets[t] = tg[t];
         var bg = files[f].bags || {};
         for (var b in bg) bagDefs[b] = bg[b];
+        var pl = files[f].places || {};
+        for (var pn in pl) placeDefs[pn] = pl[pn];
         var dk = files[f].decks || {};
         for (var d in dk) deckDefs[d] = dk[d];
         var wd = files[f].words || {};
