@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=385"></script>
+<script src="castle-model.js?v=386"></script>
 <script src="castle-paint.js?v=1"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="castle-shell.js?v=30"></script>
@@ -357,6 +357,8 @@ var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, twe
    `tap keep-east-stair-panel-3` from the stair hall); a tap there walks him to it, a second is its id to the events */
 var things = shell.doors.concat(shell.ways, shell.hidden || []), tappables = things.map(function (d) { return d.mesh; });
 var trail = [START.pos.clone()];
+var EYE = 1.35;   /* castle-shell.js's eye over the floor */
+var FREE = shell.look && shell.look.free ? shell.stands.filter(function (s) { return (shell.look.stands || {})[s.name]; }) : null;
 function thingOf(mesh) { return things.filter(function (d) { return d.mesh === mesh || d.mate === mesh; })[0]; }
 function flightOf(mesh) { var id = mesh.userData.stair; return id ? shell.flights.filter(function (f) { return f.id === id; })[0] : null; }
 function headPose(pos, look) {
@@ -407,6 +409,8 @@ function goTo(d) { return goStand(d.stand); }
 function goBack() {
   if (kit.zoom && kit.zoom.reset) kit.zoom.reset(0.4);
   if (here === START) { hyT = hpT = 0; return; }
+  /* req 713: on a free floor, straight back across it to the start, not along every place he walked */
+  if (FREE && sameLevel(here.level, START.level)) { trail = [START.pos.clone()]; walkTo(shell.route(here.pos, START.pos, START.level) || [], START, true); trail = [START.pos.clone()]; return; }
   walkTo(trail.slice(1, -1).reverse(), START, true);
 }
 
@@ -1547,8 +1551,37 @@ function tap(cx, cy) {
     if (acted && d.mesh.userData.way && events) { lineDoor = d; events.tap(d.id); }
   }
   else if (f) acted = useFlight(f);
+  else if (FREE) acted = freeTap(hits[0]);
   else { goBack(); acted = wasStand; }
   kit.tapped(acted);
+}
+/* req 713 (Interaction; the charter's walking freely; Godric's 1, 20 October 2026, 9.09 am): where the model gives the
+   place `look.free`, its named stands are places to stand (the Entrance Hall's every 4 m). A tap on a thing the model
+   names a place for walks to it; a tap on the floor walks to the nearest place on his floor, arriving facing the way he
+   walked where the place has no face of its own; a tap on a wall or the air leaves him where he is (the mote). Only
+   Back takes him to the start. */
+function freeTap(h) {
+  if (!h) return false;
+  var named = shell.look.stands || {}, o = h.object, s = null;
+  if (o.name && named[o.name]) s = shell.stands.filter(function (x) { return x.name === o.name; })[0];
+  else {
+    var n = h.face ? h.face.normal.clone().transformDirection(o.matrixWorld) : null, fy = here.pos.y - EYE;
+    if (!n || n.y < 0.7 || Math.abs(h.point.y - fy) > 0.3) return false;
+    var best = 1e9;
+    FREE.forEach(function (x) {
+      if (!sameLevel(x.level, here.level)) return;
+      var dd = Math.hypot(x.pos.x - h.point.x, x.pos.z - h.point.z);
+      if (dd < best) { best = dd; s = x; }
+    });
+  }
+  if (!s || s === here || !sameLevel(s.level, here.level)) return false;
+  var pts = shell.route(here.pos, s.pos, s.level) || [];
+  if (named[s.name] && !named[s.name].face) {
+    var dir = s.pos.clone().sub(pts.length ? pts[pts.length - 1] : here.pos); dir.y = 0;
+    if (dir.lengthSq() > 1e-4) s.look = s.pos.clone().add(dir.setLength(10));
+  }
+  walkTo(pts, s);
+  return true;
 }
 
 function updateCamera(dt) {
