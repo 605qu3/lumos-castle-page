@@ -236,11 +236,11 @@ var FILL = !PAINT_ON ? 0.85 : DAY ? 0.5 : HOUR >= 17 && HOUR < 22 ? 0.2 : 0.06;
 /* a painted place with no window of its own (the dungeons, the cupboard, the passages) as the Entrance Hall: a weak fill, no sun */
 var WINDOWLESS = PLACE === 'entrance-hall' || !MODEL.openings.some(function (o) { return o.room === PLACE && /window/.test(o.kind || ''); });
 if (PAINT_ON && WINDOWLESS) FILL = Math.min(FILL, 0.15);
-/* the Great Hall by night: the enchanted ceiling lights it a little, 0.12 in the night sky's tint (Design, 8.22 am) */
+/* the Great Hall by night: the enchanted ceiling lights it a little, 0.3 in the night sky's tint (Design, 8.22 am; 0.3 at 10.10 am: the founders' band low on the walls reads 11 of 255, the floor moonlit, the upper walls still under the candles) */
 var NIGHT_HALL = PLACE === 'great-hall' && PAINT_ON && FILL < 0.1;
-if (NIGHT_HALL) FILL = 0.12;
+if (NIGHT_HALL) FILL = 0.3;
 var fillCol = new THREE.Color(0xcfd4dc);
-if (NIGHT_HALL) {   /* the night sky's hue at full strength, so 0.12 is a fill and not black: its tint's channels scaled to the brightest */
+if (NIGHT_HALL) {   /* the night sky's hue at full strength, so the fill is a fill and not black: its tint's channels scaled to the brightest */
   fillCol = new THREE.Color(window.CASTLE_TONES && CASTLE_TONES.lights.sky ? CASTLE_TONES.lights.sky.hex : '#27314f');
   var top = Math.max(fillCol.r, fillCol.g, fillCol.b); fillCol.multiplyScalar(1 / top);
 }
