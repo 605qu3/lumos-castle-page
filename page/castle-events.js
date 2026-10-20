@@ -178,6 +178,9 @@
    the Astronomy top's telescopes show the sky over, for `CastleSky.at(date, home())` (page/castle-sky.js): the boys'
    town as a grown-up sets it once in the guarded setup (settings.home, { lat, lon, town }, kept on this iPad and
    never sent), else 42 north at the clock zone's own meridian; ?home=lat,lon for a test. `{ lat, lon, town, set }`.
+   Then the clock's moment (Magic's req 676, the hospital wing's curtains at ten; Kingsley's 92293727: only if he is
+   there, never calling him): `clock HH:MM` comes when the boys' own clock passes that minute while a page of the
+   visit ticks, never at arriving, so a boy who comes at five past sees what it left; ?hour=21:59 a minute before.
 
    Test links: ?event=<id> loads only that record's chain and lets the record skip the draw, so it fires whenever
    it holds and the rest of its chain follows it (in a one_of group it wins the group); ?wait=N sets every wait
@@ -236,6 +239,7 @@
 
   var COND = /^([a-z_\- ]+?)\s*(>=|<=|!=|=|<|>)\s*([A-Za-z0-9_\- ]+)$/;
   var WAIT = /^(wait|quiet) (\d+)-(\d+) s$/;
+  var CLOCK = /^clock ([01]\d|2[0-3]):([0-5]\d)$/;
   var EFFECTS = [
     ['set', /^set ([a-z_]+) = (mark [a-z ,]+|from bag [a-z]+|from deck [a-z]+|\d+-\d+|-?\d+|[a-z\-]+)$/],
     ['add', /^add ([a-z_]+) (-?\d+)$/],
@@ -2264,6 +2268,7 @@
         w.left -= dt;
         if (w.left <= 0) { w.left = null; moment(w.name); if (!visit) return; }
       }
+      clockTick(); if (!visit) return;
       visit.idle += dt;
       for (var q in visit.quiet) {
         if (visit.quietDone[q] || visit.idle < visit.quiet[q]) continue;
@@ -2272,6 +2277,29 @@
         if (!visit) return;
       }
       bedtimeTick(dt);
+    }
+
+    /* `clock HH:MM` (req 676): the clock passed that minute since this page's last tick, he here all the while; the
+       first tick on a page only starts the count, so arriving, or crossing from another page, never brings it. */
+    var clockMoments = [], clockFor = -1;
+    function clockTick() {
+      var t = nowDate().getTime(), was = visit.clockAt;
+      visit.clockAt = t;
+      if (clockFor !== records.length) {          /* the records' clock moments, found again only when a chain loads */
+        clockMoments = []; clockFor = records.length;
+        for (var i = 0; i < records.length; i++) {
+          var name = records[i].moment || '', m = CLOCK.exec(name);
+          if (m && !clockMoments.some(function (c) { return c.name === name; })) clockMoments.push({ name: name, h: +m[1], min: +m[2] });
+        }
+      }
+      if (was == null || t <= was) return;
+      for (var j = 0; j < clockMoments.length; j++) {
+        var c = clockMoments[j];
+        for (var back = 0; back < 2; back++) {        /* today's minute, or yesterday's when the span crossed midnight */
+          var d = new Date(t - back * 86400000), at = new Date(d.getFullYear(), d.getMonth(), d.getDate(), c.h, c.min, 0, 0).getTime();
+          if (at > was && at <= t) { moment(c.name); if (!visit) return; break; }
+        }
+      }
     }
 
     /* The bedtime counts the visit's own time, on every page it reaches and only while a page is drawn: `bedtime

@@ -345,6 +345,36 @@
         "cold = yes"
       ],
       "starts": []
+    },
+    {
+      "id": "wing.curtains",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "wing-curtains",
+      "weight": 1,
+      "moment": "clock 22:00",
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "at Madam Pomfrey's wave the curtains round an occupied bed draw themselves closed, and the lamps dim in the same moment"
+      ],
+      "starts": [],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing, the curtains at night), every year: \"all the curtains closing themselves as she waved her wand. The lamps dimmed\" (HBP 19 L62008, the ward's everyday night, read in the canon tool); Kingsley's 1, keep, with conditions (docs/ministry/reviews/2026-10-20-rulings.md, 92293727): at ten by the boys' own clock and only if he is already in the ward, never calling him there; whoever is in the bed a nameless shape; the lamps' dimming the same line, nothing else of HBP 19; a pupil in a bed now and then, about one night in two"
+    },
+    {
+      "id": "wing.curtains-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "wing-curtains",
+      "weight": 1,
+      "moment": "clock 22:00",
+      "when": [
+        "place = hospital wing"
+      ],
+      "starts": []
     }
   ]
 }

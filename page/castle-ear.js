@@ -57,11 +57,16 @@
         onHeard(guesses, !!r.isFinal);
       }
     };
-    rec.onerror = function (e) { why = 'error ' + e.error; };
+    /* iOS Safari does not always fire onend (after an error, a stop, or from a home-screen icon): each way out ends
+       the listening itself a beat later, so the thing listening always hears its end and the Fat Lady can give in
+       (20 October 2026: on the iPad she asked for ever). */
+    var GRACE_MS = 1500;
+    function closeSoon() { setTimeout(function () { try { rec.abort(); } catch (e) {} finish(why || 'end'); }, GRACE_MS); }
+    rec.onerror = function (e) { why = 'error ' + e.error; closeSoon(); };
     rec.onend = function () { finish(why || 'end'); };
-    var timer = setTimeout(function () { why = why || 'timeout'; try { rec.stop(); } catch (e) { finish(why); } }, (opts.seconds || ear.SECONDS) * 1000);
+    var timer = setTimeout(function () { why = why || 'timeout'; try { rec.stop(); } catch (e) { finish(why); } closeSoon(); }, (opts.seconds || ear.SECONDS) * 1000);
     try { rec.start(); } catch (e) { finish('error ' + (e.name || 'start')); }
-    return { stop: function () { why = why || 'stopped'; try { rec.stop(); } catch (e) { finish(why); } } };
+    return { stop: function () { why = why || 'stopped'; try { rec.stop(); } catch (e) { finish(why); } closeSoon(); } };
   }
 
   var ear = {
