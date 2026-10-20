@@ -918,12 +918,29 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      feast loft's) is a way: a dark square in this place's floor where it goes down, in its ceiling where it goes up,
      the room at its other end a tap away; its stand beside it, looking at it */
   (M.stairs || []).forEach(function (s) {
-    if (!s.rect || s.span || s.arc || !s.rooms || s.rooms.length < 2 || !/ladder|trapdoor|hatch/.test(s.kind || '')) return;
+    if (!s.rect || s.span || s.arc || !s.rooms || s.rooms.length < 2 || !/ladder|trapdoor|hatch|steep flight/.test(s.kind || '')) return;
     if (!s.rooms.some(function (r) { return slug(r) === P.id; })) return;
     var down = Math.abs(s.to - P.floor) < 0.05, up = Math.abs(s.from - P.floor) < 0.05;
     if (!down && !up) return;
     var to = slug(s.rooms.filter(function (r) { return slug(r) !== P.id; })[0]);
     var R = s.rect, mx = (R[0] + R[2]) / 2, my = (R[1] + R[3]) / 2, wx = R[2] - R[0], wy = R[3] - R[1];
+    /* v41 (W5B's find, the drying loft's stair, H28): a steep flight in a room, behind a door of its own, is a closed box
+       over its rect from the room's floor to its ceiling (2 cm into it) with the door at its foot, the door leading up to
+       the stair's other room; from above it is a hatch in the boards, as a ladder's */
+    var sdoor = up && /steep flight/.test(s.kind || '') ? (M.openings || []).filter(function (o) {
+      return o.at && o.between && o.between.indexOf(s.id) >= 0 && o.between.some(function (b) { return slug(b) === P.id; }); })[0] : null;
+    if (sdoor) {
+      var BH = (P.ceiling == null ? P.floor + 4.5 : P.ceiling) - P.floor + 0.02, bx = slab(wx, BH, wy, mats.wall, 'wall'), bc = toLocal(mx, my, P.floor);
+      bx.position.set(bc.x, bc.y + BH / 2, bc.z); bx.name = P.id + '-box-' + s.id; bx.userData.owner = P.id; group.add(bx);
+      var alongX = wx >= wy, ix = alongX ? Math.sign(sdoor.at[0] - mx) || -1 : 0, iy = alongX ? 0 : Math.sign(sdoor.at[1] - my) || -1;
+      var dw = sdoor.w || 0.8, dh = sdoor.h || 1.9, fx = sdoor.at[0] + ix * 0.07, fy = sdoor.at[1] + iy * 0.07, fp = toLocal(fx, fy, P.floor);
+      var dl = slab(dw - 0.08, dh - 0.02, 0.12, mats.door, 'door');
+      dl.position.set(fp.x, fp.y + (dh - 0.02) / 2, fp.z); dl.rotation.y = alongX ? Math.PI / 2 : 0;
+      dl.name = 'door-' + sdoor.id; dl.userData.door = sdoor.id; dl.userData.owner = P.id; group.add(dl);
+      out.doors.push({ id: sdoor.id, to: to, mesh: dl, w: dw, h: dh, mid: toLocal(sdoor.at[0], sdoor.at[1], P.floor), inward: new THREE.Vector3(ix, 0, -iy),
+        place: P.id, sill: 0, lift: 0, level: P.floor });
+      return;
+    }
     var y = down ? 0.012 : Math.min(s.to - 0.7, P.ceiling) - P.floor - 0.012;
     var sq = new THREE.Mesh(new THREE.PlaneGeometry(wx, wy), F.solid(0x141210));
     sq.rotation.x = down ? -Math.PI / 2 : Math.PI / 2; sq.position.copy(toLocal(mx, my, P.floor)); sq.position.y = y;
