@@ -1046,6 +1046,66 @@ function stairShown(shown) {   /* which of the shown strings the stair hall draw
   return drawn;
 }
 if (STAIR.on) stairSet({ armour: Q.get('armour') || 'home', scene: Q.get('tapestry') || 'first', xmas: Q.get('christmas') === 'on', loose: Q.get('rods') === 'loose' });
+/* the library's lamps (Magic's req 658; Events' req 657, page/events/library.json's three lamp rules, word for word),
+   where Interiors' docs/interiors/library.md, The things, puts them (provisional, cited; x = 65 - y', y = 61.4 + x'): a
+   reading table in each bay against its wall, thirteen (the left seventh bay kept clear for the small door), the left
+   at x' 0.4 to 1.2, the right at 8.8 to 9.6, 1.6 along the wall, 0.75 high, centred on the bays at y' 5.9 to 25.1; a
+   lamp on each at its far corner against the wall, 0.5 high on a 0.15 base. Which rule the room shows sets the
+   flames: lit from dusk, unlit by day and out from eight; the lamp's own flame only, lighting nothing else. The
+   tables and lamps hang in one group of their own, so no tap lands on them. The dark, the sounds and Madam Pince stay
+   the note's words or a moment's line. ?lamps=lit|out stands them with the events absent, for checks. */
+var LIB_LAMPS = { out: ["the lamps unlit by day, the windows' light", 'the lamps out: "Madam Pince had extinguished all the lamps"'],
+  lit: ['the lamps lit on the tables from dusk, their own flame'] };
+var LIB = (function () {
+  var out = { on: false, lamps: [], flames: [], lit: false };
+  if (PLACE !== 'library') return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'library-things'; shell.group.add(g);
+  var P = function (xp, yp, z) { return shell.toLocal(65 - yp, 61.4 + xp, z0 + z); };   /* the schedule's frame */
+  function box(x0, y0, z0_, x1, y1, z1, mat) {
+    var a = P(x0, y0, z0_), b = P(x1, y1, z1), m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mat);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); parts.push(m); return m;
+  }
+  var parts = [];   /* the tables' pieces, drawn as one mesh below */
+  var wood = kit.solid(0x5a4c3e), brass = kit.solid(0x8a7340),
+      glass = new THREE.MeshStandardMaterial({ color: 0xd8dccf, transparent: true, opacity: 0.28, roughness: 0.1, metalness: 0, depthWrite: false }),
+      flame = new THREE.MeshBasicMaterial({ color: 0xffc46a });
+  [5.9, 9.1, 12.3, 15.5, 18.7, 21.9, 25.1].forEach(function (yc) {
+    [[0.4, 1.2, 0.55], [8.8, 9.6, 9.45]].forEach(function (s, side) {
+      if (side === 0 && yc === 25.1) return;   /* the small door's bay: no table */
+      box(s[0], yc - 0.8, 0.70, s[1], yc + 0.8, 0.75, wood);                  /* the top */
+      [[s[0] + 0.05, yc - 0.75], [s[1] - 0.05, yc - 0.75], [s[0] + 0.05, yc + 0.75], [s[1] - 0.05, yc + 0.75]].forEach(function (q) {
+        box(q[0] - 0.03, q[1] - 0.03, 0, q[0] + 0.03, q[1] + 0.03, 0.70, wood);   /* its legs */
+      });
+      var at = P(s[2], yc + 0.6, 0.75);   /* the far corner, against the wall */
+      var base = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.075, 0.15, 12), brass); base.position.copy(at).y += 0.075; g.add(base);
+      var chim = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.065, 0.3, 12, 1, true), glass); chim.position.copy(at).y += 0.3; g.add(chim);
+      var cap = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.05, 0.05, 12), brass); cap.position.copy(at).y += 0.475; g.add(cap);
+      var f = new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 6), flame); f.scale.y = 2.2; f.position.copy(at).y += 0.22; f.visible = false; g.add(f);
+      out.lamps.push(base); out.flames.push(f);
+    });
+  });
+  var pos = [], nor = [];
+  parts.forEach(function (m) {
+    m.updateMatrix(); var geo = m.geometry.toNonIndexed(); geo.applyMatrix4(m.matrix);
+    Array.prototype.push.apply(pos, geo.attributes.position.array); Array.prototype.push.apply(nor, geo.attributes.normal.array);
+  });
+  var bg = new THREE.BufferGeometry();
+  bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  g.add(new THREE.Mesh(bg, wood));
+  return out;
+})();
+function libSet(lit) { if (!LIB.on) return; LIB.lit = lit; LIB.flames.forEach(function (f) { f.visible = lit; }); }
+function libShown(shown) {   /* which of the shown strings the library draws, and drawn so */
+  var drawn = [], q = Q.get('lamps');
+  if (!LIB.on) return drawn;
+  var lit = q ? q === 'lit' : LIB.lit;
+  LIB_LAMPS.out.forEach(function (s) { if (shown.indexOf(s) >= 0) { drawn.push(s); if (!q) lit = false; } });
+  LIB_LAMPS.lit.forEach(function (s) { if (shown.indexOf(s) >= 0) { drawn.push(s); if (!q) lit = true; } });
+  libSet(lit);
+  return drawn;
+}
+if (LIB.on) libSet(Q.get('lamps') === 'lit');
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -1062,7 +1122,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -1405,6 +1465,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   stair: function (shown) { var d = shown ? stairShown(shown) : [];
     return STAIR.on ? { suits: STAIR.suits.length, armour: STAIR.armour, scene: STAIR.scene, xmas: STAIR.xmas, loose: STAIR.loose,
       rods: STAIR.rods ? STAIR.rods.length : 0, drawn: d.length } : null; },
+  /* req 658: the library's lamps as they stand (lit or not); shown strings passed in are drawn as the room rules would show them */
+  lib: function (shown) { var d = shown ? libShown(shown) : [];
+    return LIB.on ? { lamps: LIB.lamps.length, lit: LIB.lit, drawn: d.length } : null; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
