@@ -159,6 +159,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="castle-shell.js?v=37"></script>
+<script src="shell-w5b.js?v=1"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -228,6 +229,10 @@ var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall',
   'charms-corridor', 'charms-passage', 'charms-classroom', 'defence-classroom', 'defence-passage', 'defence-office',
   'trophy-room', 'armour-gallery', 'library', 'library-corridor',
   'north-tower-passage', 'drying-loft', 'long-gallery', 'camera-obscura', 'seventh-floor-north-corridor-east'];
+/* W5B (wave 5, the split, docs/handoff/architect.md): page/shell-w5b.js is the second Architect's alone, its floors'
+   painted places, starts and things; this file reads it and is the lead's */
+var W5B = window.SHELL_W5B || {};
+PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
@@ -379,6 +384,7 @@ function limits(s) {
   var L = s.lim || { down: -14, up: 14, turn: 60 }, d = s.look.clone().sub(s.pos), el0 = Math.atan2(d.y, Math.hypot(d.x, d.z));
   return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
 }
+if (W5B.build) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE });   /* W5B's things */
 var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
 /* wave 1's Apparate shots (20 October 2026, the Architect's forty-seventh, Fawkes's yes): a room whose one door leaves
    the start facing a near wall turns it into the room (degrees, as a head turn), only when he comes by no door (?place= alone) */
