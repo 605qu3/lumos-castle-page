@@ -1445,6 +1445,261 @@ function wingShown(shown) {   /* the lamps as the hour's rule shows them; the di
   return drawn;
 }
 if (WING.on) wingSet(Q.get('lamps') || 'out');
+/* wave 1's detail pass (Interiors' req 715; plain pieces in the shell's terms, no spend), each thing where Interiors'
+   schedules put it (docs/interiors/potions-dungeon.md, The things and The office; docs/interiors/staff-room.md, The
+   things; cited, never copied): the dungeon's desks, stools, Snape's desk and chair, the jar shelves (five boards, the
+   top at 2.35 under v71's corbels, Godric's 1 of 10.41 am), the stone basin and its gargoyle's head, the student
+   store-cupboard, the scorch rings; the office's hooded fireplace from snape-fireplace, its shelves, desk, chair and
+   locked stores; the staff room's four-centred fireplace and mantel from staff-fireplace, three armchairs and nineteen
+   wooden chairs in four forms (no two neighbours alike), the notice board, two plain frames, the robes on the
+   wardrobe's rail (inside its box, moving with it), and the two gargoyles on the passage either side of its door. The
+   blackboard's spot is kept bare; the jars, scales, clock, candlesticks, sitters and the melted blob are Objects',
+   Magic's and Precedents'. The seams rule: a piece on the floor starts 1 cm under it, one against a wall bears 2 cm
+   into it, a mark lies 8 mm off its face; each room's pieces one mesh a material, owner the place, in one group of
+   their own so no tap lands on them. The splash stain (Events' req 447, from 15 December of the Chamber's castle) and
+   the pitted patch (from the first Friday of the Stone's) stand while the room shows their strings; ?stain=on and
+   ?pits=on stand them with the events absent, for checks. */
+var W1_STAIN = 'a dried, swollen splash stain up one wall',
+    W1_PITS = 'a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk';
+var W1 = (function () {
+  var out = { on: false, pieces: 0, stain: null, pits: null, robes: 0 };
+  /* the schedule's frame to the castle's: [x0, y0, sx, sy, swap]; x = x0 + sx * (swap ? y' : x'), y = y0 + sy * (swap ? x' : y') */
+  var F = { 'potions-dungeon': [16, 15.4, 1, 1, false], 'snape-office': [29, 11.6, -1, -1, false],
+            'staff-room': [128, 50.6, 1, 1, true], 'staff-passage': [128, 50.6, 1, 1, true] }[PLACE];
+  if (!F) return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'wave1-things'; shell.group.add(g);
+  var root = new THREE.Group(), byMat = new Map(), mats = {};
+  function tone(k, hex) { var t = window.CASTLE_TONES && CASTLE_TONES.surfaces && CASTLE_TONES.surfaces[k]; return t ? parseInt(t.hex.slice(1), 16) : hex; }
+  function mat(k, hex) { return mats[k] || (mats[k] = kit.solid(hex)); }
+  function C(xp, yp) { return F[4] ? [F[0] + F[2] * yp, F[1] + F[3] * xp] : [F[0] + F[2] * xp, F[1] + F[3] * yp]; }
+  function P(xp, yp, z) { var c = C(xp, yp); return shell.toLocal(c[0], c[1], z0 + z); }
+  function add(m, parent) { (parent || root).add(m); var l = byMat.get(m.material) || []; l.push(m); byMat.set(m.material, l); return m; }
+  function box(x0, y0, za, x1, y1, zb, mt) {   /* an upright box between two corners of the schedule's frame */
+    var a = P(x0, y0, za), b = P(x1, y1, zb);
+    var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mt);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); return add(m);
+  }
+  function at(xp, yp, deg, z) {   /* a frame standing at (x', y'), its +x facing deg from +x' toward +y', its +z on its right */
+    var q = new THREE.Group(), c = C(xp, yp), a = deg * Math.PI / 180, d = [Math.cos(a), Math.sin(a)];
+    var dx = F[4] ? F[2] * d[1] : F[2] * d[0], dy = F[4] ? F[3] * d[0] : F[3] * d[1];
+    q.position.copy(shell.toLocal(c[0], c[1], z0 + (z || 0))); q.rotation.y = Math.atan2(dy, dx); root.add(q); return q;
+  }
+  function lb(q, a, b, mt) {   /* a box in such a frame: [forward, right, up] to [forward, right, up] */
+    var m = new THREE.Mesh(new THREE.BoxGeometry(b[0] - a[0], b[2] - a[2], b[1] - a[1]), mt);
+    m.position.set((a[0] + b[0]) / 2, (a[2] + b[2]) / 2, (a[1] + b[1]) / 2); return add(m, q);
+  }
+  function merge(list, mt, owner) {   /* many pieces drawn as one, in g */
+    var pos = [], nor = [];
+    root.updateMatrixWorld(true);
+    list.forEach(function (m) {
+      var geo = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone(); geo.applyMatrix4(m.matrixWorld);
+      Array.prototype.push.apply(pos, geo.attributes.position.array); Array.prototype.push.apply(nor, geo.attributes.normal.array);
+    });
+    var bg = new THREE.BufferGeometry();
+    bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    var m = new THREE.Mesh(bg, mt); m.userData.owner = owner; g.add(m); return m;
+  }
+  var wood = mat('wood', 0x5a4c3e), dark = mat('dark-wood', 0x3e342a), iron = mat('iron', 0x2e2b28), soot = mat('soot', 0x141312);
+  var rnd = (function () { var s = 715; return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })();
+
+  /* shelves along a wall: from (a) to (b) along it, the wall at w, the room on side s (+1 or -1), on the x' axis or the y' */
+  function shelves(alongX, w, s, a, b, depth, hs) {
+    function q(u0, u1, v0, v1, za, zb) { return alongX ? box(u0, w + s * v0, za, u1, w + s * v1, zb, wood) : box(w + s * v0, u0, za, w + s * v1, u1, zb, wood); }
+    var top = hs[hs.length - 1], n = Math.max(1, Math.ceil((b - a) / 1.6));
+    hs.forEach(function (h) { q(a + 0.01, b - 0.01, -0.02, depth, h - 0.03, h); });                    /* the boards, 2 cm into the wall */
+    for (var i = 0; i <= n; i++) { var u = a + (b - a - 0.03) * i / n; q(u, u + 0.03, -0.02, depth - 0.02, -0.01, top - 0.03); }   /* the uprights */
+  }
+  function desk(x0, y0, x1, y1, h, mt) {   /* a plain desk: its top and four legs */
+    box(x0, y0, h - 0.04, x1, y1, h, mt);
+    [[x0 + 0.03, y0 + 0.03], [x1 - 0.08, y0 + 0.03], [x0 + 0.03, y1 - 0.08], [x1 - 0.08, y1 - 0.08]].forEach(function (p) { box(p[0], p[1], -0.01, p[0] + 0.05, p[1] + 0.05, h - 0.04, mt); });
+  }
+  function pedestalDesk(x0, y0, x1, y1, h) {   /* a master's desk: its top on two pedestals, a panel at its front (y0) */
+    box(x0, y0, h - 0.04, x1, y1, h, dark);
+    box(x0 + 0.02, y0 + 0.02, -0.01, x0 + 0.47, y1 - 0.02, h - 0.04, dark); box(x1 - 0.47, y0 + 0.02, -0.01, x1 - 0.02, y1 - 0.02, h - 0.04, dark);
+    box(x0 + 0.47, y0 + 0.03, 0.3, x1 - 0.47, y0 + 0.05, h - 0.04, dark);
+  }
+  function stool(xp, yp) {
+    var q = at(xp, yp, 0), seat = new THREE.Mesh(new THREE.CylinderGeometry(0.175, 0.175, 0.04, 16), wood); seat.position.y = 0.58; add(seat, q);
+    for (var l = 0; l < 3; l++) { var a = l * Math.PI * 2 / 3, leg = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.57, 6), wood);
+      leg.position.set(Math.cos(a) * 0.12, 0.275, Math.sin(a) * 0.12); add(leg, q); }
+  }
+  function chair(xp, yp, deg, form, mt, half) {   /* a wooden chair facing deg, its seat square; four forms (the Curator's list, 1) */
+    var q = at(xp, yp, deg), s = half || 0.225, seat = [0.45, 0.44, 0.46, 0.45][form], back = [1.1, 0.85, 0.95, 0.9][form], r = s - 0.05;
+    [[-s + 0.01, -s + 0.01], [s - 0.05, -s + 0.01], [-s + 0.01, s - 0.05], [s - 0.05, s - 0.05]].forEach(function (p) {
+      lb(q, [p[0], p[1], -0.01], [p[0] + 0.04, p[1] + 0.04, p[0] < 0 ? back : seat - 0.03], mt);    /* the back legs run up as its posts */
+    });
+    lb(q, [-s, -s, seat - 0.03], [s, s, seat], mt);
+    var bx = [-s + 0.015, -s + 0.035];
+    if (form === 0) [0.2, 0.38, 0.56].forEach(function (h) { lb(q, [bx[0], -r, seat + h], [bx[1], r, seat + h + 0.06], mt); });   /* a ladder back */
+    if (form === 1) lb(q, [bx[0], -r, seat + 0.12], [bx[1], r, back - 0.02], mt);                                                  /* a board back */
+    if (form === 2) { for (var k = 1; k <= 4; k++) { var z = -r + 2 * r * k / 5; lb(q, [bx[0] + 0.003, z - 0.01, seat], [bx[1] - 0.003, z + 0.01, back - 0.06], mt); }
+      lb(q, [bx[0], -r, back - 0.06], [bx[1], r, back - 0.01], mt); }                                                                /* spindles under a top rail */
+    if (form === 3) { lb(q, [bx[0], -r, back - 0.12], [bx[1], r, back - 0.02], mt); lb(q, [bx[0], -r, seat + 0.18], [bx[1], r, seat + 0.24], mt);
+      [-1, 1].forEach(function (u) { var z = u < 0 ? -s + 0.005 : s - 0.045;
+        lb(q, [-s + 0.05, z, seat + 0.2], [s + 0.02, z + 0.04, seat + 0.24], mt); lb(q, [s - 0.045, z + 0.005, seat], [s - 0.015, z + 0.035, seat + 0.2], mt); }); }   /* arms */
+  }
+  function armchair(xp, yp, deg, d, seat, back, mt, wings) {   /* an upholstered chair, d square, facing deg */
+    var q = at(xp, yp, deg), h = d / 2;
+    lb(q, [-h, -h, -0.01], [h, h, seat - 0.1], mt);                         /* the base */
+    lb(q, [-h + 0.16, -h + 0.13, seat - 0.1], [h - 0.02, h - 0.13, seat], mt);   /* the cushion */
+    lb(q, [-h, -h, seat - 0.1], [-h + 0.16, h, back], mt);                  /* the back */
+    [-1, 1].forEach(function (u) {
+      lb(q, [-h + 0.16, u < 0 ? -h : h - 0.13, seat - 0.1], [h, u < 0 ? -h + 0.13 : h, seat + 0.2], mt);     /* the arms */
+      if (wings) lb(q, [-h + 0.16, u < 0 ? -h : h - 0.09, seat + 0.2], [-h + 0.42, u < 0 ? -h + 0.09 : h, back - 0.06], mt);
+    });
+  }
+  function frame(q, w, h, foot, mt) {   /* a plain picture frame on a wall frame's face (its +x the room), its canvas dark */
+    var fw = 0.06, c = mat('canvas', 0x2a2620);
+    lb(q, [-0.02, -w / 2, foot], [0.05, w / 2, foot + fw], mt); lb(q, [-0.02, -w / 2, foot + h - fw], [0.05, w / 2, foot + h], mt);
+    lb(q, [-0.02, -w / 2, foot + fw], [0.05, -w / 2 + fw, foot + h - fw], mt); lb(q, [-0.02, w / 2 - fw, foot + fw], [0.05, w / 2, foot + h - fw], mt);
+    lb(q, [-0.02, -w / 2 + fw, foot + fw], [0.03, w / 2 - fw, foot + h - fw], c);
+  }
+  function mark(q, list, mt) {   /* flat marks on a frame's face, 8 mm off it: [right, up, rx, ry] ellipses */
+    var geo = new THREE.CircleGeometry(1, 20);
+    list.forEach(function (e) { var m = new THREE.Mesh(geo, mt); m.rotation.y = Math.PI / 2; m.scale.set(e[2], e[3], 1); m.position.set(0.008, e[1], e[0]); add(m, q); });
+  }
+  var hidden = [];   /* the dated marks, drawn apart so they can be shown and hidden */
+
+  if (PLACE === 'potions-dungeon') {
+    var stone = mat('stone', tone('founders-rubble', 0x5e5b4f));
+    [2.1, 4.1, 6.1, 8.1, 10.1].forEach(function (yp) {
+      desk(2.1, yp, 3.5, yp + 0.6, 0.8, wood); desk(6.5, yp, 7.9, yp + 0.6, 0.8, wood);
+      [2.45, 3.15, 6.85, 7.55].forEach(function (xp) { stool(xp, yp - 0.35); });
+    });
+    pedestalDesk(4.0, 13.3, 6.0, 14.2, 0.8);
+    chair(5.0, 14.7, -90, 3, dark, 0.275);
+    var H = [0.4, 0.885, 1.37, 1.855, 2.35];
+    shelves(false, 0, 1, 0, 16, 0.4, H); shelves(false, 10, -1, 0, 16, 0.4, H);
+    shelves(true, 0, 1, 0.4, 4.4, 0.4, H); shelves(true, 0, 1, 5.6, 9.6, 0.4, H);
+    shelves(true, 16, -1, 1.6, 4.0, 0.4, H); shelves(true, 16, -1, 6.0, 8.4, 0.4, H);
+    /* the stone basin in the front left corner, its rim 0.8; the gargoyle's head over it, its mouth at 1.3 */
+    box(0.41, 15.3, -0.01, 1.4, 16.02, 0.6, stone);
+    box(0.41, 15.3, 0.6, 1.4, 15.38, 0.8, stone); box(0.41, 15.94, 0.6, 1.4, 16.02, 0.8, stone);
+    box(0.41, 15.38, 0.6, 0.49, 15.94, 0.8, stone); box(1.32, 15.38, 0.6, 1.4, 15.94, 0.8, stone);
+    box(0.78, 15.74, 1.32, 1.02, 16.02, 1.6, stone); box(0.82, 15.62, 1.3, 0.98, 15.74, 1.44, stone);
+    /* the student store-cupboard, its two leaves to the room */
+    box(8.6, 15.4, -0.01, 9.59, 16.02, 2.2, dark);
+    box(8.62, 15.385, 0.08, 9.085, 15.401, 2.12, wood); box(9.105, 15.385, 0.08, 9.57, 15.401, 2.12, wood);
+    box(9.055, 15.37, 1.05, 9.075, 15.386, 1.1, iron); box(9.115, 15.37, 1.05, 9.135, 15.386, 1.1, iron);
+    /* a blackened ring on the flags under each of the twenty fires */
+    var ring = new THREE.RingGeometry(0.12, 0.3, 24), scorch = mat('scorch', 0x1e1c19);
+    [1.75, 3.85, 6.15, 8.25].forEach(function (xp) { [2.4, 4.4, 6.4, 8.4, 10.4].forEach(function (yp) {
+      var q = at(xp, yp, 0, 0.008), m = new THREE.Mesh(ring, scorch); m.rotation.x = -Math.PI / 2; add(m, q); }); });
+    /* the pitted patch (a trace) and the splash stain (a trace), each its own mesh */
+    var pitsMat = mat('pits', 0x8c877a), burn = mat('burn', 0x2a2723), disc = new THREE.CircleGeometry(1, 12);
+    var pb = new THREE.Mesh(disc, burn); pb.rotation.x = -Math.PI / 2; pb.scale.set(1.15, 0.75, 1); add(pb, at(7.2, 6.4, 0, 0.016));
+    for (var k = 0; k < 46; k++) {
+      var u = rnd(), v = rnd(), a = rnd() * Math.PI * 2, rr = Math.sqrt(u), xp = 7.2 + Math.cos(a) * rr * 1.1, yp = 6.4 + Math.sin(a) * rr * 0.72, c = C(xp, yp);
+      var sp = new THREE.Mesh(disc, pitsMat); sp.rotation.x = -Math.PI / 2; var s = 0.015 + v * 0.035; sp.scale.set(s, s, 1);
+      sp.position.copy(shell.toLocal(c[0], c[1], z0 + 0.024)); add(sp);
+    }
+    var stainMat = mat('stain', 0x3e4234), sq = at(0, 8.0, 0);   /* the left wall, y' 7.0 to 9.0, 2.4 to 3.6, its runs below */
+    var blobs = [[0, 3.0, 0.95, 0.5], [-0.55, 2.75, 0.45, 0.32], [0.6, 3.25, 0.4, 0.28], [0.1, 3.4, 0.5, 0.18], [-0.2, 2.6, 0.35, 0.2]];
+    [-0.7, -0.35, 0.05, 0.4, 0.75].forEach(function (r0, i) { blobs.push([r0, 2.4 - 0.25 - i % 3 * 0.12, 0.012, 0.25 + i % 3 * 0.12]); });
+    mark(sq, blobs, stainMat);
+    hidden.push(['stain', stainMat, 'stain'], ['pits', pitsMat, 'pits'], ['pits', burn, 'pits']);
+  }
+
+  if (PLACE === 'snape-office') {
+    var sand = mat('stone', tone('houses-sandstone', 0xc4aa82));
+    /* the fireplace, dark and empty (snape-fireplace: 1.2 wide, 1.1 high, 0.4 proud, x' 1.9 to 3.1 on the far wall): a
+       hooded stone fireplace (P3, the materials schedule); swept cold, a black hearth */
+    box(1.9, 3.6, -0.01, 2.1, 4.02, 0.85, sand); box(2.9, 3.6, -0.01, 3.1, 4.02, 0.85, sand);
+    box(1.9, 3.6, 0.85, 3.1, 4.02, 1.1, sand); box(1.95, 3.74, 1.1, 3.05, 4.02, 1.6, sand); box(2.05, 3.86, 1.6, 2.95, 4.02, 2.1, sand);
+    box(2.1, 3.98, -0.01, 2.9, 4.02, 0.85, soot); box(2.1, 3.6, -0.01, 2.9, 3.98, 0.005, soot);
+    var SH = [0.3, 0.875, 1.45, 2.025, 2.6];
+    shelves(false, 0, 1, 0, 4, 0.4, SH); shelves(false, 5, -1, 0, 1.0, 0.4, SH); shelves(false, 5, -1, 2.0, 4, 0.4, SH);
+    shelves(true, 4, -1, 0.4, 1.6, 0.4, SH); shelves(true, 4, -1, 3.4, 4.6, 0.4, SH);
+    pedestalDesk(1.7, 1.9, 3.3, 2.7, 0.78);
+    chair(2.5, 2.925, -90, 3, dark, 0.275);
+    /* his private stores, locked: the cupboard on the right wall, its leaves to the room */
+    box(4.55, 1.0, -0.01, 5.02, 2.0, 2.0, dark);
+    box(4.535, 1.02, 0.08, 4.551, 1.49, 1.92, wood); box(4.535, 1.51, 0.08, 4.551, 1.98, 1.92, wood);
+    box(4.52, 1.46, 1.0, 4.536, 1.54, 1.1, iron);
+  }
+
+  if (PLACE === 'staff-room') {
+    var pink = mat('stone', tone('tudor-pink', 0xc49a87));
+    /* the fireplace (staff-fireplace: the opening 1.5 wide and 1.3 high, 0.5 proud) on the fire wall, centred y' 3.5: a
+       four-centred stone head under a frieze (P5, the materials schedule), the mantel shelf at 1.4, the hearth its floor */
+    var fq = at(6, 3.5, 180), sh = new THREE.Shape();
+    sh.moveTo(-0.95, -0.01); sh.lineTo(-0.75, -0.01); sh.lineTo(-0.75, 1.0);
+    sh.quadraticCurveTo(-0.73, 1.2, -0.42, 1.25); sh.lineTo(0, 1.3); sh.lineTo(0.42, 1.25); sh.quadraticCurveTo(0.73, 1.2, 0.75, 1.0);
+    sh.lineTo(0.75, -0.01); sh.lineTo(0.95, -0.01); sh.lineTo(0.95, 1.36); sh.lineTo(-0.95, 1.36); sh.lineTo(-0.95, -0.01);
+    var fm = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.52, bevelEnabled: false, curveSegments: 8 }), pink);
+    fm.rotation.y = Math.PI / 2; fm.position.x = -0.02; add(fm, fq);
+    lb(fq, [-0.02, -0.95, 1.36], [0.55, 0.95, 1.4], pink);
+    lb(fq, [-0.02, -0.75, -0.01], [0.02, 0.75, 1.3], soot); lb(fq, [0.02, -0.75, -0.01], [0.5, 0.75, 0.02], soot);
+    /* the armchairs: Binns's square to the fire, Snape's low one turned toward the door, the third toward the fire */
+    armchair(4.6, 3.5, 0, 0.8, 0.42, 1.0, mat('cloth-binns', 0x5b3a30), true);
+    armchair(4.4, 2.2, -30, 0.85, 0.35, 0.85, mat('cloth-low', 0x2f3530), false);
+    armchair(4.4, 4.9, -40, 0.8, 0.42, 0.95, mat('leather', 0x4e3424), false);
+    /* the nineteen wooden chairs, a little askew, no two neighbours of one form */
+    var oaks = [mat('wood', 0x5a4c3e), dark, mat('wood-3', 0x4b3b2c)], n = 0;
+    function wc(xp, yp, deg, form) { chair(xp, yp, deg + (rnd() - 0.5) * 14, form, oaks[n++ % 3]); }
+    [2.0, 3.2, 4.4, 5.6, 6.8, 8.0, 9.2].forEach(function (yp, i) { wc(0.325, yp, 0, i % 4); });
+    [[4.6, 1], [7.8, 3]].forEach(function (c) {
+      wc(1.2, c[0], 0, c[1]); wc(1.9, c[0] + 0.7, -90, (c[1] + 1) % 4); wc(2.6, c[0], 180, (c[1] + 2) % 4); wc(1.9, c[0] - 0.7, 90, (c[1] + 3) % 4);
+    });
+    [2.0, 6.9, 8.1, 9.3].forEach(function (yp, i) { wc(5.675, yp, 180, (i + 2) % 4); });
+    /* the notice board by the door on the window wall, its frame proud of the cork; the two plain frames */
+    box(-0.02, 0.5, 1.1, 0.03, 1.4, 1.7, mat('cork', 0x8a6a48));
+    [[0.5, 0.54], [1.36, 1.4]].forEach(function (y) { box(0.02, y[0], 1.1, 0.04, y[1], 1.7, dark); });
+    box(0.02, 0.54, 1.1, 0.04, 1.36, 1.14, dark); box(0.02, 0.54, 1.66, 0.04, 1.36, 1.7, dark);
+    var gilt = mat('gilt', 0x6a5630);
+    frame(at(6, 3.5, 180), 0.7, 0.6, 1.75, gilt); frame(at(0, 6.25, 0), 0.6, 0.75, 1.4, gilt);
+    /* the spare robes and cloaks on a rail at 1.9 inside the wardrobe (x' 2.25 to 3.75, y' 13.3 to 14), black, two faded */
+    var wd = roomThing('wardrobe');
+    if (wd) {
+      var rq = new THREE.Group(), cloth = [mat('robe', 0x1a1a1c), mat('robe-faded', 0x2c2520)];
+      var rail = P(3.0, 13.65, 1.9), ra = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 1.4), iron);
+      rq.add(ra); ra.position.copy(rail);   /* along y', the castle's y */
+      for (var r = 0; r < 6; r++) {
+        var xr = 2.45 + r * 0.22, rb = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), cloth[r === 1 || r === 4 ? 1 : 0]);
+        var a3 = P(xr - 0.08, 13.42, 0.5), b3 = P(xr + 0.08, 13.88, 1.88);
+        rb.scale.set(Math.abs(b3.x - a3.x), Math.abs(b3.y - a3.y), Math.abs(b3.z - a3.z)); rb.position.set((a3.x + b3.x) / 2, (a3.y + b3.y) / 2, (a3.z + b3.z) / 2);
+        rq.add(rb); out.robes++;
+      }
+      rq.position.sub(wd.mesh.position); rq.userData.owner = PLACE; wd.mesh.add(rq);
+    }
+  }
+
+  if (PLACE === 'staff-room' || PLACE === 'staff-passage') {
+    /* the two gargoyles on the passage either side of the door (x' 2.4 to 3.6), on the door wall's passage face
+       (staff-passage ends at x 127.6, y' -0.4): a plinth, a crouched body, a head to the passage; their form the
+       Architect's and the Corridor's, plain until it is drawn */
+    var gs = mat('gargoyle', tone('tudor-pink', 0xc49a87));
+    [2.0, 4.0].forEach(function (xp) {
+      var q = at(xp, -0.4, -90);
+      lb(q, [-0.02, -0.25, -0.01], [0.45, 0.25, 0.7], gs); lb(q, [0.04, -0.18, 0.7], [0.38, 0.18, 1.12], gs);
+      lb(q, [0.18, -0.12, 1.02], [0.44, 0.12, 1.32], gs); lb(q, [0.2, -0.11, 1.32], [0.28, -0.05, 1.42], gs); lb(q, [0.2, 0.05, 1.32], [0.28, 0.11, 1.42], gs);
+      lb(q, [0.0, -0.24, 0.8], [0.18, -0.18, 1.25], gs); lb(q, [0.0, 0.18, 0.8], [0.18, 0.24, 1.25], gs);   /* the folded wings */
+    });
+  }
+
+  var owner = PLACE === 'staff-passage' ? 'staff-passage' : PLACE;
+  byMat.forEach(function (list, mt) {
+    out.pieces += list.length;
+    var held = hidden.filter(function (h) { return h[1] === mt; })[0];
+    var m = merge(list, mt, owner);
+    if (held) { m.name = 'wave1-' + held[0]; m.visible = false; out[held[2]] = (out[held[2]] || []).concat([m]); }
+  });
+  return out;
+})();
+function w1Set(stain, pits) {
+  if (!W1.on) return;
+  (W1.stain || []).forEach(function (m) { m.visible = stain; }); (W1.pits || []).forEach(function (m) { m.visible = pits; });
+}
+function w1Shown(shown) {   /* the stain and the pits as the room's strings show them; the other strings stay the note's */
+  var drawn = [];
+  if (!W1.on) return drawn;
+  var st = shown.indexOf(W1_STAIN) >= 0, pi = shown.indexOf(W1_PITS) >= 0;
+  if (st) drawn.push(W1_STAIN); if (pi) drawn.push(W1_PITS);
+  w1Set(st || Q.get('stain') === 'on', pi || Q.get('pits') === 'on');
+  return drawn;
+}
+if (W1.on) w1Set(Q.get('stain') === 'on', Q.get('pits') === 'on');
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -1461,7 +1716,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -1851,6 +2106,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   plates: function () { return DEF.on ? { plates: DEF.plates.length } : null; },
   wing: function (shown) { var d = shown ? wingShown(shown) : [];
     return WING.on ? { lamps: WING.flames.length, state: WING.state, drawn: d.length } : null; },
+  /* req 715: wave 1's plain pieces as they stand; shown strings passed in set the stain and the pits */
+  wave1: function (shown) { var d = shown ? w1Shown(shown) : [];
+    return W1.on ? { pieces: W1.pieces, robes: W1.robes, stain: !!(W1.stain && W1.stain[0].visible), pits: !!(W1.pits && W1.pits[0].visible), drawn: d.length } : null; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
