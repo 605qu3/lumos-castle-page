@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=393"></script>
+<script src="castle-model.js?v=394"></script>
 <script src="castle-paint.js?v=4"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=2"></script>
@@ -221,7 +221,9 @@ if (NEVER) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'This door stay
    below, volume and materials only, the plain four lights in the torch's colour till Interiors places its own */
 var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall',
   'dungeon-corridor', 'potions-dungeon', 'snape-office', 'founders-undercroft', 'staff-passage', 'staff-room',
-  'classroom-corridor', 'gate-passage', 'hall-cupboard', 'filchs-office', 'filchs-store'];
+  'classroom-corridor', 'gate-passage', 'hall-cupboard', 'filchs-office', 'filchs-store',
+  'first-floor-corridor', 'east-first-floor-corridor', 'hospital-wing', 'hospital-passage', 'transfiguration-classroom',
+  'transfiguration-passage', 'mcgonagalls-office', 'history-of-magic-classroom', 'history-of-magic-passage', 'history-hearth-way'];
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
