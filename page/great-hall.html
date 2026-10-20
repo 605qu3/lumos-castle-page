@@ -588,6 +588,10 @@ var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat
   g = extra('a school broom laid along');
   var stick = bit(g, new THREE.CylinderGeometry(0.02, 0.02, 1.6, 6), M.bench, 44.0, 66.8 - 0.725, S.bench.seat + 0.03); stick.rotation.z = Math.PI / 2;
   var head = bit(g, new THREE.ConeGeometry(0.12, 0.5, 8), mat(0x9a8050), 45.0, 66.8 - 0.725, S.bench.seat + 0.08); head.rotation.z = Math.PI / 2;
+  /* the paper heart from 14 February of the CoS year on (Events' room rule, req 616): wedged edge-on in the split of
+     Gryffindor's south bench's east end, a third of it showing (Interiors' item, req 617); found only up close */
+  g = extra('one small pink paper heart');
+  bit(g, new THREE.BoxGeometry(0.02, 0.02, 0.001), mat(0xc4a2a4), S.tx1 - 0.26 + 0.02 / 3 - 0.01, 66.10, 0.32);   /* the end board's face, 0.26 in from the seat's end on this page (Interiors' 61.0 is the seat's end) */
   /* stacks of wizard crackers along the tables; pulled crackers and a paper hat after */
   var crk = new THREE.CylinderGeometry(0.03, 0.03, 0.25, 8);
   g = extra('stacks of wizard crackers');
