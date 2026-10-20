@@ -2157,6 +2157,18 @@ function filchSet(open) {
   m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half); m.rotation.y = FDOOR.rest.rot + a;
 }
 if (PLACE === 'filchs-office') filchSet(true);
+/* req 750 (Interiors' 757, docs/interiors/filchs-office.md, the box of confiscations; Events' filch.json): the open deal box
+   on the floor at the desk's west end, its long side to the desk; a tap on it is the tap `confiscations` (one thing taken
+   back a visit, the heap settling after), and he stays where he stands. What is in it is the runtime's, never drawn */
+var FBOX = (function () {
+  if (PLACE !== 'filchs-office') return null;
+  var z0 = shell.place.floor, P = function (x, y, z) { return shell.toLocal(x, y, z0 + (z || 0)); };
+  var v = new THREE.Vector3().subVectors(P(107.2, 67.8, 0), P(106.6, 67.8, 0));
+  var m = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.35, 0.4), new THREE.MeshStandardMaterial({ color: kit.col(0x9a8466), roughness: 0.9, metalness: 0 }));
+  m.position.copy(P(106.9, 67.8, 0.165));   /* 1 cm into the flags, never flush */ m.rotation.y = Math.atan2(-v.z, v.x);
+  m.name = 'filch-box'; m.userData.owner = 'filchs-office'; m.userData.confiscations = true;
+  shell.group.add(m); return m;
+})();
 function filchShown(shown) { if (PLACE === 'classroom-corridor') filchSet(shown.indexOf(FILCH_AJAR) >= 0); }
 function roomDraw(shown) { cupDrawRoom(shown); filchShown(shown); thingsDrawRoom(shown); }
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
@@ -2245,6 +2257,7 @@ function tap(cx, cy) {
     var ch = raycaster.intersectObjects(CORBELS, false);
     if (ch.length && (!hits.length || ch[0].distance <= hits[0].distance + 0.05)) { events.tap('corbel'); kit.tapped(true); return; }
   }
+  if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   if (d && here === d.stand) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) {
@@ -2511,7 +2524,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },
   stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
-  filch: function () { return { found: !!FDOOR, open: filchOpen }; },
+  filch: function () { return { found: !!FDOOR, open: filchOpen, box: FBOX ? FBOX.getWorldPosition(new THREE.Vector3()) : null, boxTaps: FBOX ? FBOX.userData.taps || 0 : 0 }; },
   head: function () { var lm = limits(here); return { yaw: hy, pitch: hp, limit: lm.yaw, lo: lm.lo, hi: lm.hi, lim: here.lim }; },
   /* a stand by name at once, and the head set and held within its limits (the shots at both limits) */
   standNamed: function (n) {
