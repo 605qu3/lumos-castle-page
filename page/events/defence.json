@@ -116,13 +116,14 @@
     {
       "when": [
         "place = defence classroom",
-        "year = 2"
+        "year = 2",
+        "castle date < 2 05-30"
       ],
       "show": [
         "a lesson under way: Professor Lockhart on the clear floor before his desk, reading a passage from one of his books, the boys' desk theirs",
         "a pile of Lockhart's books on every desk, the boys' seven too, his own winking portrait on each front cover"
       ],
-      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); CoS 10 L9831, Lockhart \"read passages from his books to them\" (Interiors' canon 7, the floor where he tells his tales); the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs). Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the CoS castle, his books on every desk (Interiors' Occupancy: \"in the CoS castle, Lockhart's books\"); CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool)"
+      "canon": "the change list's New work (a lesson under way in every open classroom; each year's Defence teacher carries that year's version): his own lesson whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Fawkes, 3.29 pm, on Events' Q1); CoS 10 L9831, Lockhart \"read passages from his books to them\" (Interiors' canon 7, the floor where he tells his tales); the teacher at the desk or on the clear floor, the class in the rows (Interiors' schedule, docs/interiors/defence-classroom.md, Occupancy); later castles' teachers wait on their books (the parent ceiling, books 1 to 3); checked against the text, 15 October 2026; split 20 October 2026 as electives.json is (Magic's req 674): his desk always, the class by the clock (Interiors' docs/interiors/defence-classroom.md, Occupancy and aftermath: the teacher at the desk or on the clear floor, the boys' desk theirs). Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the CoS castle, his books on every desk (Interiors' Occupancy: \"in the CoS castle, Lockhart's books\"); CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool); ended 20 October 2026 with his frames after the Chamber's date on Kingsley's follow-up ruling (docs/ministry/reviews/2026-10-20-rulings.md, 0509a632): nothing of his stays once he has gone; from 30 May no Defence lesson to the year's end, no stand-in teacher"
     },
     {
       "when": [
@@ -165,12 +166,13 @@
       "when": [
         "place = defence classroom",
         "year = 2",
-        "castle date >= 2 09-03"
+        "castle date >= 2 09-03",
+        "castle date < 2 05-30"
       ],
       "show": [
         "Lockhart's cage on the floor under his desk, covered and empty, one bar bent outward"
       ],
-      "canon": "the change list's Rework 7 with Interiors' schedule, docs/interiors/defence-classroom.md (Lockhart's cage, a trace of the Chamber's castle, gone with him): CoS 6 L8563, L8571 to L8583; the crumpled quiz CoS 6 L8527 to L8551 (the change list's, room[0] reduced to it), the waste basket emptied by the month's end (ours); checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 7 with Interiors' schedule, docs/interiors/defence-classroom.md (Lockhart's cage, a trace of the Chamber's castle, gone with him): CoS 6 L8563, L8571 to L8583; the crumpled quiz CoS 6 L8527 to L8551 (the change list's, room[0] reduced to it), the waste basket emptied by the month's end (ours); checked against the text, 15 October 2026; ended 20 October 2026 with his frames after the Chamber's date on Kingsley's follow-up ruling (docs/ministry/reviews/2026-10-20-rulings.md, 0509a632): nothing of his stays once he has gone; from 30 May no Defence lesson to the year's end, no stand-in teacher"
     },
     {
       "when": [
@@ -200,12 +202,13 @@
     {
       "when": [
         "place = defence office",
-        "year = 2"
+        "year = 2",
+        "castle date < 2 05-30"
       ],
       "show": [
         "a heap of fan mail on the desk, letters in many hands"
       ],
-      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the fan mail, the Chamber's castle): CoS 7 L8926, L8932, any day of Lockhart's year (replaces the detention's envelopes, set aside); checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the fan mail, the Chamber's castle): CoS 7 L8926, L8932, any day of Lockhart's year (replaces the detention's envelopes, set aside); checked against the text, 15 October 2026; ended 20 October 2026 with his frames after the Chamber's date on Kingsley's follow-up ruling (docs/ministry/reviews/2026-10-20-rulings.md, 0509a632): nothing of his stays once he has gone; from 30 May no Defence lesson to the year's end, no stand-in teacher"
     },
     {
       "when": [
@@ -268,12 +271,72 @@
     {
       "when": [
         "place = defence classroom",
-        "lessons = on"
+        "lessons = on",
+        "year <= 1"
       ],
       "show": [
         "the class in the rows"
       ],
-      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the class in the rows); the figures People's"
+      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the class in the rows); the figures People's; bounded 20 October 2026 to the years and weeks a teacher's lesson runs (Quirrell's, Lockhart's to 29 May, Lupin's to 7 June), so no class sits in the rows with no teacher"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "lessons = on",
+        "year = 2",
+        "castle date < 2 05-30"
+      ],
+      "show": [
+        "the class in the rows"
+      ],
+      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the class in the rows); the figures People's; bounded 20 October 2026 to the years and weeks a teacher's lesson runs (Quirrell's, Lockhart's to 29 May, Lupin's to 7 June), so no class sits in the rows with no teacher"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "lessons = on",
+        "year = 3",
+        "castle date < 3 06-08"
+      ],
+      "show": [
+        "the class in the rows"
+      ],
+      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the class in the rows); the figures People's; bounded 20 October 2026 to the years and weeks a teacher's lesson runs (Quirrell's, Lockhart's to 29 May, Lupin's to 7 June), so no class sits in the rows with no teacher"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "lessons = on",
+        "year = 2",
+        "castle date >= 2 05-30"
+      ],
+      "show": [
+        "the other desks bare but for their ink bottles"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the evening and the night, out of the class's lessons; Interiors' Occupancy: evening, night and holidays none, their desks bare but for the ink bottles; his own lesson as ever; and while the clock's lessons run but no teacher's does (Kingsley's 0509a632 for his year; Lupin gone from 8 June; a later year's teacher waits on its book)"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "lessons = on",
+        "year = 3",
+        "castle date >= 3 06-08"
+      ],
+      "show": [
+        "the other desks bare but for their ink bottles"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the evening and the night, out of the class's lessons; Interiors' Occupancy: evening, night and holidays none, their desks bare but for the ink bottles; his own lesson as ever; and while the clock's lessons run but no teacher's does (Kingsley's 0509a632 for his year; Lupin gone from 8 June; a later year's teacher waits on its book)"
+    },
+    {
+      "when": [
+        "place = defence classroom",
+        "lessons = on",
+        "year >= 4"
+      ],
+      "show": [
+        "the other desks bare but for their ink bottles"
+      ],
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: the evening and the night, out of the class's lessons; Interiors' Occupancy: evening, night and holidays none, their desks bare but for the ink bottles; his own lesson as ever; and while the clock's lessons run but no teacher's does (Kingsley's 0509a632 for his year; Lupin gone from 8 June; a later year's teacher waits on its book)"
     },
     {
       "when": [
@@ -432,12 +495,13 @@
       "when": [
         "place = defence office",
         "year = 2",
-        "time = night"
+        "time = night",
+        "castle date < 2 05-30"
       ],
       "show": [
         "as he comes into the dark office, a flurry across the walls: the Lockharts in the pictures dodge out of sight, their hair in rollers"
       ],
-      "canon": "the change list's Rework 8 (the two rollers records merged, the date split dropped), Fawkes's t1 on req 353: CoS 9 L9412, widened to every night of Lockhart's year, a habit as the fairies are (Interiors' schedule, docs/interiors/defence-classroom.md, The office, the photographs: on any visit after dark the Lockharts dodge out of sight in their rollers, Interiors' Rework 4c); checked against the text, 14 October 2026"
+      "canon": "the change list's Rework 8 (the two rollers records merged, the date split dropped), Fawkes's t1 on req 353: CoS 9 L9412, widened to every night of Lockhart's year, a habit as the fairies are (Interiors' schedule, docs/interiors/defence-classroom.md, The office, the photographs: on any visit after dark the Lockharts dodge out of sight in their rollers, Interiors' Rework 4c); checked against the text, 14 October 2026; ended 20 October 2026 with his frames after the Chamber's date on Kingsley's follow-up ruling (docs/ministry/reviews/2026-10-20-rulings.md, 0509a632): nothing of his stays once he has gone; from 30 May no Defence lesson to the year's end, no stand-in teacher"
     },
     {
       "id": "defence.plate-vampire",
@@ -530,13 +594,14 @@
       "moment": "wait 20-90 s",
       "when": [
         "place = defence classroom",
-        "year = 2"
+        "year = 2",
+        "castle date < 2 05-30"
       ],
       "show": [
         "on the cover of a book in one of the piles, a small Lockhart winks and flashes his teeth"
       ],
       "starts": [],
-      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: Lockhart's covers, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): now and then, never all at once, never as he arrives; CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool); the teeth CoS 4 L7791's; one cover at a time, about one visit in two"
+      "canon": "Magic's req 674 (docs/handoff/magic.md, The Defence classroom and its office), every year: Lockhart's covers, Kingsley's 1, keep, with conditions (5.47 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, 668d704d): now and then, never all at once, never as he arrives; CoS 6 L8521, \"his own, winking portrait on the front\" (read in the canon tool); the teeth CoS 4 L7791's; one cover at a time, about one visit in two; ended 20 October 2026 with his frames after the Chamber's date on Kingsley's follow-up ruling (docs/ministry/reviews/2026-10-20-rulings.md, 0509a632): nothing of his stays once he has gone; from 30 May no Defence lesson to the year's end, no stand-in teacher"
     },
     {
       "id": "defence.cover-still",
@@ -548,7 +613,8 @@
       "moment": "wait 20-90 s",
       "when": [
         "place = defence classroom",
-        "year = 2"
+        "year = 2",
+        "castle date < 2 05-30"
       ],
       "starts": []
     }
