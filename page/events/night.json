@@ -92,6 +92,7 @@
       "weight": 3,
       "moment": "wait 20-90 s",
       "when": [
+        "place = dormitory",
         "time = night",
         "moon = full",
         "moon up = yes",

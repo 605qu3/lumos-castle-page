@@ -769,6 +769,7 @@
       "leans": [],
       "moment": "wait 1-2 s",
       "when": [
+        "place = common room",
         "time != night",
         "letter_new = yes"
       ],
