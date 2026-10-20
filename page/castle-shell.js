@@ -437,8 +437,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        it replaces the flat ceiling (flat false) the quad is not drawn. A room with heads, an area or a plan not four
        square keeps its flat ceiling till ceilings.js draws it */
     var CV = null;
-    if (row && !Q.roof && !Q.area && !HD.length && Q.ceiling != null && window.CastleCeilings && (Q.poly.length === 4 || (Q.rec && Q.rec.vault)) &&
-        ((Q.rec && Q.rec.vault && Q.rec.vault.kind) || row.ceiling) !== 'star') {   /* the star's ribs tie where they cross: Design's, to come */
+    /* v33 (req 714, Design's 2c3ebaab): the star drawn too, its crossings each one owner (a springer at each springing) */
+    if (row && !Q.roof && !Q.area && !HD.length && Q.ceiling != null && window.CastleCeilings && (Q.poly.length === 4 || (Q.rec && Q.rec.vault))) {
       var vst = stoneAt(row, mx, my), VB = Q.rec && Q.rec.vault, QC = Q, stoneM = paintMat(tone(vst + '/ashlar', vst), true);
       /* v32 (model v71, ledger line 116): a groin with no free pier springs from corbels on its walls; the bays are laid
          out as if the corbels were piers, then each pier gives way to a corbel bearing 2 cm into its wall */
