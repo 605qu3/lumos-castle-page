@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=388"></script>
-<script src="castle-paint.js?v=2"></script>
+<script src="castle-model.js?v=389"></script>
+<script src="castle-paint.js?v=3"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=2"></script>
 <script src="castle-shell.js?v=33"></script>
@@ -1735,6 +1735,40 @@ var W1 = (function () {
     var held = hidden.filter(function (h) { return h[1] === mt; })[0];
     var m = merge(list, mt, owner);
     if (held) { m.name = 'wave1-' + held[0]; m.visible = false; out[held[2]] = (out[held[2]] || []).concat([m]); }
+  });
+  return out;
+})();
+/* the Great Hall's five fireplaces (model v72, the great-hall-fire-* features; Godric's 4 on architect-fires-1020, 20
+   October 2026): four on the long walls' piers and the great one behind the staff table, each a four-centred head under
+   a frieze in the hall's stone (P4, the materials schedule), the mantel shelf, the opening dark, the hearth stone into
+   the hall. Cold and swept; the fire's light is Design's and the hour's, asked first. The wall is not cut: the recess
+   reads as the dark opening, its depth for later. One group off shell.group's children, so no tap lands on it; each
+   piece bears 2 cm into the wall, the hearth starts 1 cm under the floor, owner the hall. */
+var FIRES = (function () {
+  var out = { n: 0 };
+  if (PLACE !== 'great-hall') return out;
+  var fs = MODEL.features.filter(function (f) { return f.room === 'great-hall' && /^great-hall-fire-/.test(f.id); });
+  var g = new THREE.Group(); g.name = 'hall-fires'; shell.group.add(g);
+  var T = window.CASTLE_TONES && CASTLE_TONES.surfaces && CASTLE_TONES.surfaces['high-grey'];
+  var stone = kit.solid(T ? parseInt(T.hex.slice(1), 16) : 0xb9b4aa), dark = kit.solid(0x15130f), z0 = shell.place.floor;
+  var up = new THREE.Vector3(0, 1, 0);
+  fs.forEach(function (f) {
+    var c = { 0: [0, -1], 180: [0, 1], 270: [1, 0], 90: [-1, 0] }[f.compass], w = f.w, ow = f.opening[0] / 2, oh = f.opening[1];
+    var o = shell.toLocal(f.at[0], f.at[1], z0), inn = shell.toLocal(f.at[0] + c[0], f.at[1] + c[1], z0).sub(o).normalize();
+    var along = new THREE.Vector3().crossVectors(up, inn);
+    var q = new THREE.Group(); q.matrixAutoUpdate = false;
+    q.matrix.makeBasis(along, up, inn).setPosition(o); g.add(q);
+    var hw = w / 2, sp = ow * 0.42, sh = new THREE.Shape();
+    sh.moveTo(-hw, -0.01); sh.lineTo(-ow, -0.01); sh.lineTo(-ow, oh * 0.72);
+    sh.quadraticCurveTo(-ow * 0.97, oh * 0.92, -sp, oh * 0.96); sh.lineTo(0, oh); sh.lineTo(sp, oh * 0.96);
+    sh.quadraticCurveTo(ow * 0.97, oh * 0.92, ow, oh * 0.72); sh.lineTo(ow, -0.01); sh.lineTo(hw, -0.01);
+    sh.lineTo(hw, f.mantel); sh.lineTo(-hw, f.mantel); sh.lineTo(-hw, -0.01);
+    function piece(geo, mt, x, y, z) { var m = new THREE.Mesh(geo, mt); m.position.set(x, y, z); m.userData.owner = 'great-hall'; q.add(m); out.n++; return m; }
+    piece(new THREE.ExtrudeGeometry(sh, { depth: 0.2, bevelEnabled: false, curveSegments: 8 }), stone, 0, 0, -0.02);
+    piece(new THREE.BoxGeometry(w + 0.3, 0.1, 0.36), stone, 0, f.mantel + 0.05, 0.16);                 /* the mantel shelf */
+    piece(new THREE.BoxGeometry(w, f.h - f.mantel - 0.1, 0.12), stone, 0, (f.mantel + 0.1 + f.h) / 2, 0.04);   /* the frieze */
+    piece(new THREE.BoxGeometry(ow * 2, oh, 0.008), dark, 0, oh / 2, 0.012);                              /* the opening, dark, 8 mm off */
+    piece(new THREE.BoxGeometry(ow * 2 + 0.6, 0.04, f.hearth + 0.02), stone, 0, 0.01, (f.hearth - 0.02) / 2);   /* the hearth */
   });
   return out;
 })();
