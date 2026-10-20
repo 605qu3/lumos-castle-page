@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 72,
+  "version": 73,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -428,9 +428,16 @@ window.CASTLE_MODEL = {
     {
       "id": "filchs-office", "first": "PS", "name": "Filch's office", "level": "G",
       "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
-      "shape": { "rect": [104, 62, 118, 70] }, "map": "his rounds start and end here",
-      "about": "Harry follows him \"back downstairs\" (CoS 8); the ground floor and the north range ours",
-      "state": "inferred", "cite": "CoS 8"
+      "shape": { "rect": [104, 62, 112, 70] }, "map": "his rounds start and end here", "ceiling": 2.5,
+      "about": "Harry follows him \"back downstairs\" (CoS 8); the ground floor and the north range ours. \"dingy and windowless, lit by a single oil lamp dangling from the low ceiling\" (CoS 8 L9029): 8 by 8 inside, no window, no fireplace, the lamp its only light; a beamed ceiling of its own at 2.5 under G's 5.2 storey, a floor still over it (the BANG on the office's ceiling, L9045); its door off the classroom corridor (filchs-office-door), its store behind the east wall (filchs-store). Ledger line 119 (req 747, Interiors' schedule docs/interiors/filchs-office.md, req 729); v73, provisional, Godric to confirm",
+      "state": "proposed", "cite": "CoS 8"
+    },
+    {
+      "id": "filchs-store", "first": "PS", "name": "Filch's store, behind his office", "level": "G",
+      "look": {"rest": -3, "down": -45, "up": 45, "about": "degrees about the eye at 1.35, positive up (docs/architect/vertical-views.md)"},
+      "shape": { "rect": [112.3, 62, 118, 70] }, "ceiling": 2.5,
+      "about": "the east 5.7 of the office's old 14 m, behind a partition 0.3 thick: a store the room logically hides (Godric's note of 15 October 2026, 5.42 pm), unlit (a lamp carried in), what stands in it Interiors'. Ours; books 1 to 3 silent. Ledger line 119 (req 747, Interiors' schedule docs/interiors/filchs-office.md, req 729); v73, provisional, Godric to confirm",
+      "state": "proposed", "cite": ""
     },
     {
       "id": "mcgonagalls-office", "first": "PS", "name": "Professor McGonagall's study", "level": "1",
@@ -754,6 +761,8 @@ window.CASTLE_MODEL = {
     {"id": "potions-door", "first": "PS", "kind": "door, oak, opening in", "between": ["dungeon-corridor", "potions-dungeon"], "at": [21, 15.4], "w": 1.2, "h": 2.4, "state": "proposed", "about": "centred in the dungeon's back (south) wall on the dungeon passage. Ledger line 18 (req 341, Interiors' schedule docs/interiors/potions-dungeon.md); the place ours, in batch 4, proposed", "cite": "CoS 5"},
     {"id": "snape-office-door", "first": "PS", "kind": "door", "between": ["dungeon-corridor", "snape-office"], "at": [26.5, 11.6], "w": 1.0, "h": 2.2, "state": "proposed", "about": "on the dungeon passage's south side, 5.5 m east of the dungeon's door, so Hermione is there and back within the lesson (CoS 11). Ledger line 18 (req 341, Interiors' schedule docs/interiors/potions-dungeon.md); the place ours, in batch 4, proposed", "cite": "CoS 5, CoS 11"},
     {"id": "staff-passage-mouth", "first": "PS", "kind": "open mouth", "between": ["classroom-corridor", "staff-passage"], "at": [126.1, 57.5], "w": 3.0, "h": 3.6, "about": "Ledger line 19 (req 350, Interiors' schedule docs/interiors/staff-room.md); the place ours, in batch 5; Godric's Try 1, confirmed 15 October 2026, 3.24 pm (desk architect-q19-staff-1014)", "cite": "", "state": "designed"},
+    {"id": "filchs-office-door", "first": "PS", "kind": "door, oak, opening in", "between": ["classroom-corridor", "filchs-office"], "at": [106.55, 60.5], "sill": 0.0, "w": 1.1, "h": 2.1, "depth": 1.5, "state": "proposed", "about": "in the classroom corridor's north wall (Interiors' x' 2.0 to 3.1), through the range's 1.5 of spine wall, opening in, hinged at its west jamb; low, with the room (CoS 8 L9029, L9049). Ledger line 119 (req 747, Interiors' schedule docs/interiors/filchs-office.md, req 729); v73, provisional, Godric to confirm", "cite": "CoS 8"},
+    {"id": "filchs-store-door", "first": "PS", "kind": "door, plain, opening in", "between": ["filchs-office", "filchs-store"], "at": [112.0, 66.25], "sill": 0.0, "w": 0.9, "h": 2.0, "depth": 0.3, "state": "proposed", "about": "in the office's east wall where Interiors' cabinets break (y' 3.2 to 5.3), into his store; never locked, the way back. Ledger line 119 (req 747, Interiors' schedule docs/interiors/filchs-office.md, req 729); v73, provisional, Godric to confirm", "cite": ""},
     {"id": "courtyard-arch", "first": "PS", "kind": "archway out into the courtyard", "between": ["staff-passage", "east courtyard"], "at": [126.1, 50], "w": 3.0, "h": 3.6, "about": "the passage sweeps out into the courtyard (OotP 17, the sweep's row 6, held). Ledger line 19 (req 350, Interiors' schedule docs/interiors/staff-room.md); the place ours, in batch 5; Godric's Try 1, confirmed 15 October 2026, 3.24 pm (desk architect-q19-staff-1014)", "cite": "OotP 17", "state": "designed"},
     {"id": "staff-room-door", "first": "PS", "kind": "door, oak, panelled, opening in", "between": ["staff-passage", "staff-room"], "at": [128.0, 53.6], "w": 1.2, "h": 2.4, "about": "centred in the west end wall (PoA 7 L15889 to L15893; CoS 16 L12363 \"banging open\"); the gargoyles either side on the passage. Ledger line 19 (req 350, Interiors' schedule docs/interiors/staff-room.md); the place ours, in batch 5; Godric's Try 1, confirmed 15 October 2026, 3.24 pm (desk architect-q19-staff-1014)", "cite": "PoA 7, CoS 16", "state": "designed"},
     {"id": "staff-window-1", "first": "PS", "kind": "window", "room": "staff-room", "at": [132.5, 50], "w": 1.2, "h": 2.6, "sill": 1.2, "view": "the courtyard", "about": "on the court face (ours; the books name none). Ledger line 19 (req 350, Interiors' schedule docs/interiors/staff-room.md); the place ours, in batch 5; Godric's Try 1, confirmed 15 October 2026, 3.24 pm (desk architect-q19-staff-1014)", "cite": "", "state": "designed"},
