@@ -4,6 +4,73 @@
   "room": [
     {
       "when": [
+        "place = transfiguration classroom"
+      ],
+      "show": [
+        "a lesson under way: Professor McGonagall at her desk or before it, the boys' two single desks side by side theirs, the lesson's things out",
+        "the room quiet but for quills scratching and now and then a wand tapped on a desk; nobody dozes",
+        "her notes on the board, there at a flick of her wand, never a hand seen writing",
+        "the windows on his left, their light over the desks, the real sky",
+        "the classroom lamps along the walls",
+        "the clear floor before her desk still: nothing changes there but what she means to",
+        "on her desk the top page of the stack a pupil's written work, unsigned, her small ticks down its margin and her initials at its foot"
+      ],
+      "canon": "the change list's New work (a lesson under way in every open classroom): his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 and 15 October; Events' Q1); split as electives.json is: his desk always, the class by the clock (Interiors' docs/interiors/transfiguration-classroom.md, Occupancy and aftermath: McGonagall at her desk or before it, the boys' two singles side by side theirs). Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year, every line read in the canon tool, 20 October 2026: the lesson's quiet, PS 8 L2736 (\"she wasn't a teacher to cross. Strict and clever\"), the quills and the wand tapped ours, her voice People's; the board, OotP 12 L40594 (\"(they appeared there)\" at a flick of the wand, a teacher's way a later book names first), the words his own lesson's from the Timetable, never named; the windows on his left (Interiors' three north windows, model v22; 2.4); the lamps, PoA 12 L18086 (\"The classroom lamps\", everyday), placed by Interiors (req 673); the clear floor still (the pig and her cat set aside, Rework 7, never staged); her papers' top page (Interiors' \"the page's words Magic's\")"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "the pupils at their desks"
+      ],
+      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the class at its desks); the figures People's"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = off"
+      ],
+      "show": [
+        "the other desks bare and still"
+      ],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the evening and the night, out of the class's lessons; Interiors' Occupancy: evening, night and holidays none, their desks bare; his own lesson as ever (the rule above)"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "weather = rain",
+        "time != evening",
+        "time != night"
+      ],
+      "show": [
+        "a dark wet day: the classroom lamps lit by day too, their own flame"
+      ],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: PoA 9 L16697, \"so dark inside the corridors and classrooms that extra torches and lanterns were lit\" (everyday, read in the canon tool); the lamps placed by Interiors (req 673)"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "time = evening"
+      ],
+      "show": [
+        "the classroom lamps lit, their own flame"
+      ],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the lamps lit from dusk, their own flame (PoA 12 L18086, read in the canon tool); placed by Interiors (req 673)"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "time = night"
+      ],
+      "show": [
+        "the classroom lamps lit, their own flame, the dark eased by them along the front, and the windows' sky"
+      ],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: by night the dark eased by the lamps along the front and the windows' sky (2.4)"
+    },
+    {
+      "when": [
         "place = transfiguration classroom",
         "reading = 1",
         "date >= 09-01",
@@ -169,6 +236,171 @@
       ],
       "canon": "Interiors' req 369, Neville's desk the back row's on the aisle's left: CoS 16 L12163, his wand slips, vanishing a leg of his desk, and she restores it; that lesson, 05-25; checked against the text, 14 October 2026",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson replayed (EV-27)"
+    },
+    {
+      "id": "transfiguration.homework",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 240-360 s",
+      "when": [
+        "place = transfiguration classroom"
+      ],
+      "show": [
+        "near the lesson's end a line of homework comes onto the board at a flick of her wand, for copying down"
+      ],
+      "starts": [],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: GoF 22 L29025, \"they had copied down their homework from the blackboard\" (everyday, read in the canon tool), the line coming as her notes do (OotP 12 L40594); the words his own lesson's, never named"
+    },
+    {
+      "id": "transfiguration.desk-teacup",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-desks",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another pupil's desk a teacup comes out still with a mouse's tail; a muttered try, and it is right"
+      ],
+      "starts": [],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the other desks with the class; the kind as evidence only (PoA 16 L19668, \"still had a spout for a tail\"; GoF 22 L29025, \"still had feathers\"; both read in the canon tool); the things, the try and the sigh ours; nothing comes near the boys' desks and no pupil there is named; something about one lesson visit in two"
+    },
+    {
+      "id": "transfiguration.desk-matchbox",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-desks",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another pupil's desk a matchbox comes out still with a snail's horns; a muttered try, and it is right"
+      ],
+      "starts": [],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the other desks with the class; the kind as evidence only (PoA 16 L19668, \"still had a spout for a tail\"; GoF 22 L29025, \"still had feathers\"; both read in the canon tool); the things, the try and the sigh ours; nothing comes near the boys' desks and no pupil there is named; something about one lesson visit in two"
+    },
+    {
+      "id": "transfiguration.desk-sugarbowl",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-desks",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another pupil's desk a sugar bowl comes out still with a frog's legs, and a sigh"
+      ],
+      "starts": [],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the other desks with the class; the kind as evidence only (PoA 16 L19668, \"still had a spout for a tail\"; GoF 22 L29025, \"still had feathers\"; both read in the canon tool); the things, the try and the sigh ours; nothing comes near the boys' desks and no pupil there is named; something about one lesson visit in two"
+    },
+    {
+      "id": "transfiguration.desk-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-desks",
+      "weight": 3,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "starts": []
+    },
+    {
+      "id": "transfiguration.tortoise-shift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-tortoise",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = transfiguration classroom",
+        "castle date >= 3 06-06"
+      ],
+      "show": [
+        "in its box by her desk the tortoise shifts, and is still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the tortoise, alive, from its exam's date (this chain's rule, 6 June of the Azkaban castle); Kingsley's 1, keep, with conditions (5.43 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, edfd46aa): small, now and then at the room's ambient pace, never on arrival or as he walks up; never tapped for, never a lure, no sound that calls him over; no name or label ties it to the trio or Neville; its shifting ours; about one visit in four"
+    },
+    {
+      "id": "transfiguration.tortoise-steam",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-tortoise",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = transfiguration classroom",
+        "castle date >= 3 06-06"
+      ],
+      "show": [
+        "a thin wisp of steam from the tortoise's nostrils, gone at once"
+      ],
+      "starts": [],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the tortoise, alive, from its exam's date; Kingsley's 1, keep, with conditions (5.43 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, edfd46aa): small, now and then at the room's ambient pace, never on arrival or as he walks up; never tapped for, never a lure, no sound that calls him over; no name or label ties it to the trio or Neville; PoA 16 L19670, \"Were the tortoises supposed to breathe steam?\" (read in the canon tool); about one visit in four"
+    },
+    {
+      "id": "transfiguration.tortoise-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-tortoise",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = transfiguration classroom",
+        "castle date >= 3 06-06"
+      ],
+      "starts": []
+    },
+    {
+      "id": "transfiguration.snuffbox-twitch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-snuffbox",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = transfiguration classroom",
+        "castle date >= 1 06-05"
+      ],
+      "show": [
+        "the last snuffbox's whiskers twitch, as a mouse's do, and are still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 671 (docs/handoff/magic.md, The Transfiguration classroom), every year: the whiskered snuffbox, from its exam's date (this chain's rule, 5 June of the Stone's castle); Kingsley's 1, keep, with conditions (5.43 am, 20 October 2026, docs/ministry/reviews/2026-10-20-rulings.md, edfd46aa): small, now and then at the room's ambient pace, never on arrival or as he walks up; never tapped for, never a lure, no sound that calls him over; no name or label ties it to the trio or Neville; PS 16 L5460, points \"taken away if it had whiskers\" (read in the canon tool); about one visit in three"
+    },
+    {
+      "id": "transfiguration.snuffbox-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-snuffbox",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = transfiguration classroom",
+        "castle date >= 1 06-05"
+      ],
+      "starts": []
     }
   ]
 }
