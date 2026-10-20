@@ -1135,7 +1135,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var all = out.doors.concat(out.ways), mine = all.filter(function (d) { return d.place === P.id; });
   var entry = mine.filter(function (d) { return o.from && d.to === o.from; })[0] ||
     (P.shaft ? out.hidden.filter(function (d) { return d.place === P.id && o.from && d.to === o.from; })[0] : null) ||   /* v17: in by a hidden door, beside it */ mine.filter(function (d) { return o.start && d.id === o.start; })[0] ||
-    (P.shaft ? mine.filter(function (d) { return d.level <= P.floor + 0.05; })[0] : null) || mine[0];   /* v17: a stair's well, at its foot */
+    (P.shaft ? mine.filter(function (d) { return d.level <= P.floor + 0.05; })[0] : null) || mine[0] ||   /* v17: a stair's well, at its foot */
+    /* v38: a place whose ways in are all hidden (the kitchens' jibs, a corridor's pretending wall) starts beside one, facing
+       in, not at its middle (the kitchens' middle is a pier) */
+    out.hidden.filter(function (d) { return d.place === P.id && o.from && d.to === o.from; })[0] || out.hidden.filter(function (d) { return d.place === P.id; })[0];
   all = all.concat(out.hidden);
   if (entry) out.stands.push(facingIn(entry, 'start'));
   else {
