@@ -85,10 +85,54 @@
         "place = potions dungeon"
       ],
       "show": [
-        "a lesson under way: Professor Snape at his desk or prowling the rows, the pupils in pairs at their cauldrons",
-        "the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+        "a lesson under way: Professor Snape at his desk or prowling the rows, the boys' desk theirs, its fire lit and its things out",
+        "colder than the corridors above",
+        "the pickled things float still in their glass jars all around the walls",
+        "a small flame under each lit cauldron, its own light and the room's warmth; steam over it, its colour by what is in it, and a soft bubbling"
       ],
-      "canon": "the change list's Rework 11 and New work (a lesson under way in every open classroom): his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock; Fawkes, 3.29 pm, on Events' Q1), never his class's day and no desk named as anyone's (EV-31); `lessons` stays the castle's own timetable for the other pupils; the pupils' own cauldrons, scales and jars (PS 5 L1275, L1281) set out and the fires lit (Interiors' req 381; docs/interiors/potions-dungeon.md, Occupancy: Snape at his desk or prowling the rows); the dungeon open in every castle; the lesson's content the Timetable's; Snape cold but fair (the 15 October ruling)"
+      "canon": "the change list's Rework 11 and New work (a lesson under way in every open classroom): his own lesson is under way whenever he walks in, any day and hour (Godric's rulings of 14 October, joining a lesson, and 15 October, the castle's clock; Fawkes, 3.29 pm, on Events' Q1), never his class's day and no desk named as anyone's (EV-31); split 19 October 2026 as electives.json is: his desk always, the class by the clock (Interiors' docs/interiors/potions-dungeon.md, Occupancy and aftermath: Snape at his desk or prowling the rows, the boys' desk theirs, its fire lit, its things out); the lesson's content the Timetable's; Snape cold but fair (the 15 October ruling). Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the cold, always (PS 8 L2776, \"It was colder here than up in the main castle\"); the jars, always (PS 8 L2776, \"the pickled animals floating in glass jars all around the walls\"); the fires and the steam at his lesson, each cauldron its own colour (ours), its own light; all read in the canon tool. The store-cupboard has no cue: nothing in it moves, and it is where Snape sends a boy for what he asked (Interiors' row; the world rules)"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "lessons = on"
+      ],
+      "show": [
+        "the pupils in pairs at their cauldrons, the fires lit under all twenty cauldrons on their iron stands, steam rising over every row, knives on boards, and at every place a brass scale, a row of ingredient jars, a board with its knife and a mortar and pestle, a ladle between each pair"
+      ],
+      "canon": "the class by the clock's `lessons` (docs/room-states.md section 1; Interiors' Occupancy: by day in term the pairs at their desks); CoS 11 L10260, \"Twenty cauldrons stood steaming between the wooden desks, on which stood brass scales and jars of ingredients\"; the pupils' own cauldrons, scales and jars (PS 5 L1275, L1281; Interiors' req 381); Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the steam over the rows and the knives on boards (ours); the figures People's"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "lessons = off"
+      ],
+      "show": [
+        "the other places at rest, their stands cold",
+        "his own desk's fire lit for his lesson, the rest of the room dark past its glow, the jars at the light's edge, the passage's \"torches in brackets\" through the door: the dark eased, a light near"
+      ],
+      "canon": "Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the evening and the night, out of the class's lessons (any hour, since the dungeon has no windows, Interiors' schedule, the side walls); Interiors' Occupancy: evening, night and holidays the other desks bare, their stands cold; OotP 7 L38247, the dungeon passage's \"rough stone walls and torches in brackets\" (read in the canon tool); the glow the fire's own light"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "season = winter"
+      ],
+      "show": [
+        "his breath rising in a mist before him"
+      ],
+      "canon": "Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the cold in winter; PS 12 L4016, \"their breath rose in a mist before them and they kept as close as possible to their hot cauldrons\" (read in the canon tool)"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "season = winter",
+        "lessons = on"
+      ],
+      "show": [
+        "the class's breath rising in a mist too, the pupils keeping as close as possible to their hot cauldrons"
+      ],
+      "canon": "Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the cold in winter, with the class; PS 12 L4016 (read in the canon tool)"
     },
     {
       "when": [
@@ -258,6 +302,84 @@
       ],
       "canon": "CoS 11 L10264 to L10266, read; once ever, his first visit that Thursday afternoon in the year he reads the Chamber; checked against the text, 14 October 2026",
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon scene staged (EV-29)"
+    },
+    {
+      "id": "potions.steam-haze",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 90-180 s",
+      "when": [
+        "place = potions dungeon",
+        "lessons = on"
+      ],
+      "show": [
+        "the steam over the rows thickens as the lesson goes on to \"a haze of multi-coloured steam\", each cauldron's its own colour"
+      ],
+      "starts": [],
+      "canon": "Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the fires and the steam, thickening as the lesson goes on; OotP 12 L40618, \"the haze of multi-coloured steam now filling the dungeon\" (a lesson's sight a later book names first; read in the canon tool); with the class, so twenty cauldrons"
+    },
+    {
+      "id": "potions.jar-drift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "potions-jar",
+      "weight": 1,
+      "moment": "wait 1-2 s",
+      "when": [
+        "place = potions dungeon"
+      ],
+      "show": [
+        "as the door opens, one of the pickled things drifts a finger's width in its liquid on the draught and hangs still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the jars, now and then as the door opens (ours); never a face turning to him, nothing that looks back; about one visit in three"
+    },
+    {
+      "id": "potions.jar-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "potions-jar",
+      "weight": 2,
+      "moment": "wait 1-2 s",
+      "when": [
+        "place = potions dungeon"
+      ],
+      "starts": []
+    },
+    {
+      "id": "potions.basin-wash",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "potions-basin",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = potions dungeon",
+        "lessons = on"
+      ],
+      "show": [
+        "in the corner \"the icy jet that poured from a gargoyle's mouth\" runs as someone rinses a ladle in the stone basin, and stops as they come away"
+      ],
+      "starts": [],
+      "canon": "Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the gargoyle's basin; PoA 7 L15801, \"the icy jet that poured from a gargoyle's mouth\", and L15799, hands and ladles washed \"in the stone basin in the corner\" (everyday; read in the canon tool); the jet stopping ours; the head stays stone; with the class, about one visit in two"
+    },
+    {
+      "id": "potions.basin-quiet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "potions-basin",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = potions dungeon",
+        "lessons = on"
+      ],
+      "starts": []
     }
   ]
 }
