@@ -11,8 +11,11 @@
         "occasion != easter"
       ],
       "show": [
-        "a class at the ring, a brass telescope on each stand pointed at the sky, the teacher at the round table with the night's star chart and the shaded lantern turned low; two free places side by side at the north of the ring, a telescope each and the night's chart on a board between them"
-      ]
+        "a class at the ring, a brass telescope on each stand pointed at the sky, the teacher at the round table with the night's star chart and the shaded lantern turned low; two free places side by side at the north of the ring, a telescope each and the night's chart on a board between them",
+        "open to \"the cold night air\", the castle's sky everywhere above",
+        "all quiet but \"the rustle of parchment, the occasional creak of a telescope as it was adjusted on its stand, and the scribbling of many quills\""
+      ],
+      "canon": "Events' req 488, the lesson nights (Kingsley's 8a: any dark night, never by day; not over Christmas or Easter). Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the open top (PS 14 L5014, \"the cold night air\", evidence for the top only, never its night); the sky Events' req 622, the telescopes' field Design's req 623; the lesson's quiet (OotP 31 L51071, a lesson's sound a later book names first; never that night or what it saw); the teacher's voice People's; all read in the canon tool; the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
     },
     {
       "when": [
@@ -63,7 +66,198 @@
       "show": [
         "the top empty and out of bounds, nobody at the ring, the round table bare but for its chart weighted flat with four stones"
       ]
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind stronger up here than in the courtyards: robes stir, the night's chart's free corners lift under its four stones and settle, the lantern's short flame leans in its glass"
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the wind, at the lesson on a windy night; the lantern's flame its own light (ours); the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "cold = yes"
+      ],
+      "show": [
+        "his breath shows, and the class's"
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the cold, at the lesson on a cold night (ours); the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "cold = no"
+      ],
+      "show": [
+        "\"a slight chill in the air\""
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the cold's other side; OotP 31 L51069, \"a slight chill in the air\" on a still June night (everyday; read in the canon tool); the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "hour >= 12",
+        "hour < 22"
+      ],
+      "show": [
+        "over the parapet, the castle's lit windows throwing \"the little squares of reflected gold light flickering on the ground below\""
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the castle below; OotP 31 L51071 (everyday; read in the canon tool); the windows the Architect's (docs/room-states.md section 4, the room seen from outside); the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "hour >= 22"
+      ],
+      "show": [
+        "over the parapet, the \"little squares of reflected gold light\" on the ground below going out one by one \"as lights in the castle windows were extinguished\""
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the castle below as the night goes on; OotP 31 L51071, \"the little squares of reflected gold light flickering on the ground below started to vanish as lights in the castle windows were extinguished\" (everyday; read in the canon tool); the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "hour <= 5"
+      ],
+      "show": [
+        "over the parapet, the \"little squares of reflected gold light\" on the ground below going out one by one \"as lights in the castle windows were extinguished\""
+      ],
+      "canon": "as above, past midnight"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "weather = cloudy"
+      ],
+      "show": [
+        "the stars coming and going in the castle's own cloud, through the glass as by eye"
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: a clouded night (2.4, req 622); whether the class meets in rain or snow is Events' rows, canon silent: it meets, as the lesson rule stands; the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time != night",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind at the chart's corners, lifting them under the four stones and letting them settle"
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: by day, empty and out of bounds, only the wind at the chart's corners under its stones; the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion = christmas",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind at the chart's corners, lifting them under the four stones and letting them settle"
+      ],
+      "canon": "as above, the holidays by night"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion = christmas day",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind at the chart's corners, lifting them under the four stones and letting them settle"
+      ],
+      "canon": "as above, the holidays by night"
+    },
+    {
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion = easter",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind at the chart's corners, lifting them under the four stones and letting them settle"
+      ],
+      "canon": "as above, the holidays by night"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "astronomy-tower.baron-heard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "astronomy-baron",
+      "weight": 1,
+      "moment": "wait 120-420 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "nights since baron_night >= 1"
+      ],
+      "show": [
+        "from round the turret's far side, a low groan and a clank, then quiet; nobody at the ring looks up"
+      ],
+      "starts": [
+        "stamp baron_night by night"
+      ],
+      "canon": "Magic's req 662 (docs/handoff/magic.md, The Astronomy Tower's top), every year: the Bloody Baron, heard; HBP 23 L63282, \"groaning and clanking up on the Astronomy Tower, it's a, favorite pastime of his\" (Nick's; a ghost's habit a later book names first; read in the canon tool). Kingsley's 1, keep, with conditions (10.05 pm, 19 October 2026, docs/ministry/reviews/2026-10-19-queue-13-to-19.md, the night addendum): heard only, never seen; now and then on a lesson night, never on his arrival (a long wait); never a lure, nothing to follow and no tap; soft, for gentle suspense; nothing of HBP 27. The draw is once a lesson night, about one in four (the silent partner stamps the night too, so a second visit that night draws nothing). \"Under his own dark settings\": no per-boy dark setting exists (the clock's drivers have only `heights`), so it is ungated, the gap named in req 662's row; the place id `astronomy tower top` is Interiors' name till the Architect's (ledger line 42; req 488)"
+    },
+    {
+      "id": "astronomy-tower.baron-quiet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "astronomy-baron",
+      "weight": 3,
+      "moment": "wait 120-420 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "nights since baron_night >= 1"
+      ],
+      "starts": [
+        "stamp baron_night by night"
+      ]
+    }
+  ]
 }
