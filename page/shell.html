@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=391"></script>
+<script src="castle-model.js?v=392"></script>
 <script src="castle-paint.js?v=4"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=2"></script>
@@ -1754,7 +1754,8 @@ var FIRES = (function () {
   var up = new THREE.Vector3(0, 1, 0);
   fs.forEach(function (f) {
     var c = { 0: [0, -1], 180: [0, 1], 270: [1, 0], 90: [-1, 0] }[f.compass], w = f.w, ow = f.opening[0] / 2, oh = f.opening[1];
-    var o = shell.toLocal(f.at[0], f.at[1], z0), inn = shell.toLocal(f.at[0] + c[0], f.at[1] + c[1], z0).sub(o).normalize();
+    var zf = z0 + (f.sill || 0);                                   /* v74: the great one's hearth on the dais */
+    var o = shell.toLocal(f.at[0], f.at[1], zf), inn = shell.toLocal(f.at[0] + c[0], f.at[1] + c[1], zf).sub(o).normalize();
     var along = new THREE.Vector3().crossVectors(up, inn);
     var q = new THREE.Group(); q.matrixAutoUpdate = false;
     q.matrix.makeBasis(along, up, inn).setPosition(o); g.add(q);
@@ -1769,6 +1770,17 @@ var FIRES = (function () {
     piece(new THREE.BoxGeometry(w, f.h - f.mantel - 0.1, 0.12), stone, 0, (f.mantel + 0.1 + f.h) / 2, 0.04);   /* the frieze */
     piece(new THREE.BoxGeometry(ow * 2, oh, 0.008), dark, 0, oh / 2, 0.012);                              /* the opening, dark, 8 mm off */
     piece(new THREE.BoxGeometry(ow * 2 + 0.6, 0.04, f.hearth + 0.02), stone, 0, 0.01, (f.hearth - 0.02) / 2);   /* the hearth */
+  });
+  /* the dais (model v74, great-hall-dais; Godric's 1 on great-hall-dais-fire-1020): the platform the hall's width, its
+     risers stepping down east outside its rect; each block bears 0.02 into the floor and the walls, never flush */
+  MODEL.features.filter(function (f) { return f.id === 'great-hall-dais'; }).forEach(function (f) {
+    var r = f.rect, s = f.steps || { risers: 1, rise: f.h, going: 0 }, e = 0.02;
+    function block(x0, x1, y0, y1, top) {
+      var m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, top + e, y1 - y0), stone);
+      m.position.copy(shell.toLocal((x0 + x1) / 2, (y0 + y1) / 2, z0 + (top - e) / 2)); m.userData.owner = 'great-hall'; g.add(m); out.n++;
+    }
+    block(r[0] - e, r[2], r[1] - e, r[3] + e, f.h);
+    for (var k = 1; k < s.risers; k++) block(r[2] + (k - 1) * s.going - 0.01, r[2] + k * s.going, r[1] - e, r[3] + e, f.h - k * s.rise);
   });
   return out;
 })();
