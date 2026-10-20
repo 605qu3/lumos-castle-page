@@ -622,12 +622,13 @@
       if (t < OPEN.end) requestAnimationFrame(step); else if (done) done(box.querySelector('svg'));
     })(t0);
   }
-  // Godric's touch on Q23 (t2): the first time the icon shows a wand of their own, a brief shower of red and gold
-  // sparks at its tip, "throwing dancing spots of light" on the tile (PS 5), once only for that wand (SPARK_KEY keeps
-  // which wands have sparked, by wizard and build, so a wand built again sparks again, as a new wand chooses).
-  // sparksAt(wands, t) the shower at t ms of SPARK_MS for those wand indices; sparkle(el, wands, done) plays it
-  // into an icon drawn by svg(), on a layer of its own, so the hold stays armed.
-  const SPARK_MS = 1500, SPARK_KEY = 'lumos.icon.sparked';
+  // The day's sparks (Kingsley's item 14, Godric's 1, 19 October 2026, 8.20 pm; the touch review's
+  // design-q23-wand-woods-1013 t2 ADJUST): on the day's first opening, as the wordmark writes in, a brief shower of
+  // red and gold sparks at the four wand tips, PS 5's colours ("a stream of red and gold sparks", B1 ch5), never
+  // tied to a first wand: nothing is kept of which wand has sparked. sparksAt(wands, t) the shower at t ms of
+  // SPARK_MS for those wand indices (WANDS, all four); sparkle(el, wands, done) plays it into an icon drawn by svg(),
+  // on a layer of its own, so the hold stays armed.
+  const SPARK_MS = 1500, WANDS = [0, 1, 2, 3];
   function sparksAt(ws, t) {
     const u = t / SPARK_MS; if (u <= 0 || u >= 1) return '';
     let s = '';
@@ -659,15 +660,7 @@
       if (t < SPARK_MS) requestAnimationFrame(step); else { g.remove(); if (done) done(); }
     })(t0);
   }
-  // which of these builds' wands have not sparked yet; marks them sparked
-  function firstShown(builds) {
-    let seen = {}; try { seen = JSON.parse(localStorage.getItem(SPARK_KEY) || '{}') || {}; } catch (e) {}
-    const ws = [];
-    (builds || []).forEach((b, i) => { if (!b) return; const sig = b.wood + ' ' + b.len; if (seen[i + 1] !== sig) { ws.push(i); seen[i + 1] = sig; } });
-    try { localStorage.setItem(SPARK_KEY, JSON.stringify(seen)); } catch (e) {}
-    return ws;
-  }
-  const api = { svg, FRAMES, WOODS, LOOK, fromBuilds, fromStore, BENCH_KEY, sparksAt, sparkle, firstShown, SPARK_MS, CREST, ORB: [OX, OY], HOLD, holdAt, hold, armHold, STIR, OPEN, openAt, open, crest, LAYOUT, LEAN_ICON, LEAN_LAYOUT, DRAWN_LAYOUT, HOUSE };
+  const api = { svg, FRAMES, WOODS, LOOK, fromBuilds, fromStore, BENCH_KEY, sparksAt, sparkle, WANDS, SPARK_MS, CREST, ORB: [OX, OY], HOLD, holdAt, hold, armHold, STIR, OPEN, openAt, open, crest, LAYOUT, LEAN_ICON, LEAN_LAYOUT, DRAWN_LAYOUT, HOUSE };
   if (typeof window !== 'undefined') window.LumosIcon = api;
   if (typeof module !== 'undefined') module.exports = api;
 })();
