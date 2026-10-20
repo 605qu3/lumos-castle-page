@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=11"></script>
-<script src="castle-model.js?v=382"></script>
-<script src="castle-shell.js?v=25"></script>
+<script src="castle-model.js?v=383"></script>
+<script src="castle-shell.js?v=26"></script>
 <script src="castle-events.js?v=37"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -1368,6 +1368,7 @@ function frame() {
   updateLines(dt);
   updateFilch(dt);
   updateTrick(dt);
+  if (events && events.tick) events.tick(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
 }
