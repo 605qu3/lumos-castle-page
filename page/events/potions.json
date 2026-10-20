@@ -252,6 +252,103 @@
         "a dried, swollen splash stain up one wall"
       ],
       "canon": "the change list's Rework 11: CoS 11 L10260 to L10272, the Swelling Solution splashed over the class from one burst cauldron, Thursday afternoon's double Potions in the second week of December (L10250, L10254; the set-aside rule's reckoning, 8 to 14 December); from 15 December of the Chamber's castle, after the latest that Thursday can fall, and in every later year; no cauldron or desk named; its place on the wall Interiors' to set (asked by row); checked against the text, 15 October 2026"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "time != night"
+      ],
+      "show": [
+        "the air cold at the narrow stair's foot, the walls close and low, torchlit, the flames' light on wet stone"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: \"down a narrow stone staircase that led into the dungeons\" (CoS 5 L8142, read in the canon tool, 20 October 2026); \"colder here than up in the main castle\" (PS 8 L2776, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, burning lower; the passage quieter, the drips louder"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: by night"
+    },
+    {
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "show": [
+        "a sheen on the bare, damp stone of the walls in the torchlight"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: the walls \"bare, damp stone\" (CoS 12 L10907, read in the canon tool, 20 October 2026), as any day"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "season = winter"
+      ],
+      "show": [
+        "his breath rising in a mist before him"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: \"their breath rose in a mist before them\" (PS 12 L4016, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "show": [
+        "the low passage giving his steps back to him, a little late, from both ends at once"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: ours; nothing else answers"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "lessons = on"
+      ],
+      "show": [
+        "the Potions door shut, a thin curl of the dungeon's steam and its smell coming from under it, a cauldron's hiss"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: the Potions door in lesson time (the Potions table's steam, archived)"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "lessons = off"
+      ],
+      "show": [
+        "the Potions door shut and silent"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: out of lesson time"
+    },
+    {
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "show": [
+        "Snape's office door shut and plain, no light under it, no sound"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: ours, the one door in the castle that keeps quite still; its opening Interiors' and Events'"
+    },
+    {
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "show": [
+        "a cold breath along the flags at the foot of one stretch of wall that looks like the rest"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: the undercroft's low door's draught (H7's finding, Hidden Ways'), unmarked, nothing glows; the shell has no near-the-door built-in, so it holds along the corridor"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "under a store's door that no class uses, a thin line of daylight from the courtyard's grating"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: the old cells' door (H16, Hidden Ways'), on a bright day, unmarked, nothing glows"
     }
   ],
   "records": [
@@ -378,6 +475,157 @@
       "when": [
         "place = potions dungeon",
         "lessons = on"
+      ],
+      "starts": []
+    },
+    {
+      "id": "potions.corridor-drip",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-drip",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "show": [
+        "a drop runs down a joint in the wall and falls"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: now and then a drop running down a joint; about one visit in two"
+    },
+    {
+      "id": "potions.corridor-drip-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-drip",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "potions.corridor-snape-voice",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-voice",
+      "weight": 1,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = dungeon corridor",
+        "lessons = on"
+      ],
+      "show": [
+        "from behind the Potions door, Snape's voice, too low to make out"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: now and then in lesson time; about one visit in three"
+    },
+    {
+      "id": "potions.corridor-snape-voice-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-voice",
+      "weight": 2,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = dungeon corridor",
+        "lessons = on"
+      ],
+      "starts": []
+    },
+    {
+      "id": "potions.corridor-baron",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-baron",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "show": [
+        "the Bloody Baron drifts along the passage, gaunt and staring, his silver bloodstains catching the torchlight; he stares past him and goes through the wall, and the torches gutter a little as he goes"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: \"a gaunt, staring Slytherin ghost covered in silver bloodstains\" (CoS 8 L9171, read in the canon tool, 20 October 2026); he never stops for the boys, never speaks to them; Peeves suddenly elsewhere if about (\"The Bloody Baron's the only one who can control him\", PS 7 L2671, read in the canon tool, 20 October 2026), Peeves's own chain's; the figure People's; about one visit in five"
+    },
+    {
+      "id": "potions.corridor-baron-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-baron",
+      "weight": 4,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = dungeon corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "potions.corridor-filch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-filch-evening",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = dungeon corridor",
+        "time = evening"
+      ],
+      "show": [
+        "a lamp's light coming round the far end, a pair of lamp-like eyes low down first, then Filch's muttering; it turns away down another passage and is gone"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: Filch's round (People's), his lamp ours, Mrs Norris's \"lamp like eyes\" (PS 8 L2728, read in the canon tool, 20 October 2026); a near miss, never caught; about one visit in four"
+    },
+    {
+      "id": "potions.corridor-filch-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-filch-evening",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = dungeon corridor",
+        "time = evening"
+      ],
+      "starts": []
+    },
+    {
+      "id": "potions.corridor-filch-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-filch-night",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = dungeon corridor",
+        "time = night"
+      ],
+      "show": [
+        "a lamp's light coming round the far end, a pair of lamp-like eyes low down first, then Filch's muttering; it turns away down another passage and is gone"
+      ],
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: Filch's round by night, as by evening"
+    },
+    {
+      "id": "potions.corridor-filch-night-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "dungeon-corridor-filch-night",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = dungeon corridor",
+        "time = night"
       ],
       "starts": []
     }

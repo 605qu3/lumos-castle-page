@@ -65,7 +65,162 @@
       ],
       "canon": "Interiors' schedule (docs/interiors/mcgonagalls-study.md, the first years' snuffboxes, list 7): a habit of every year's end, from the first years' exam to the end of term, Events' to time; PS 16 L5460, the exam's mice into snuffboxes, points taken away for whiskers; the exams from 1 June (the old exam-week reckoning), to the leaving feast and the summer hold's feast week; every castle, an ordinary year's end; moved from the classroom (the change list's Rework 10 put one on her shelf, which the room does not have); checked against the text, 15 October 2026",
       "aside": "set aside 16 October 2026 (docs/ministry/set-aside.md; the Curator's req 564, Godric's pick of 16 October 2026 with Kingsley's review, docs/ministry/reviews/2026-10-16-desk-answers.md): the snuffboxes are the Transfiguration classroom's trace from the PS 16 exam's date (docs/curator/transfiguration-classroom.md, item 7), moved to transfiguration.json"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "time != night",
+        "cold = no"
+      ],
+      "show": [
+        "the large, welcoming fire, its light on the two armchairs and the desk"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: \"a small room with a large, welcoming fire\" (PoA 5 L15049, read in the canon tool, 20 October 2026), its own light (2.3)"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "time != night",
+        "cold = yes"
+      ],
+      "show": [
+        "the large, welcoming fire burning higher against the cold, its light on the two armchairs and the desk"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: on a cold day it burns higher (ours: the room is kept warm)"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "time = night"
+      ],
+      "show": [
+        "the fire low and red, the armchairs empty"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: by night, never out while the castle is awake"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office"
+      ],
+      "show": [
+        "the tartan tin square on the desk's corner, its lid on"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: \"her tartan tin\" (OotP 19 L44595, read in the canon tool, 20 October 2026); its contents unsaid until OotP is finished (\"a Ginger Newt\", OotP 12 L40940, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "lessons = on"
+      ],
+      "show": [
+        "her quill upright in its stand, the papers on the desk squared to the edge"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: when she is away (at her lessons), the room tidies to her taste, ours"
+    },
+    {
+      "when": [
+        "place = mcgonagalls office",
+        "time = night"
+      ],
+      "show": [
+        "her quill upright in its stand, the papers on the desk squared to the edge"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: by night, she away"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "mcgonagall.cat",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "mcgonagall-cat",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = mcgonagalls office",
+        "lessons = on"
+      ],
+      "show": [
+        "a tabby cat curled in the armchair nearer the fire, markings round its eyes like square spectacles; it opens one eye at him, considers him, and shuts it"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: the tabby cat, only when she is not in the room (Interiors' Occupancy: away at her lessons and by night), \"the same markings around its eyes\" (PS 1 L39, read in the canon tool, 20 October 2026); never explained, never named, never both she and the cat at once; Godric's yes of 11.56 (magic-mcgonagall-cat-1020); about one visit in four"
+    },
+    {
+      "id": "mcgonagall.cat-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "mcgonagall-cat",
+      "weight": 3,
+      "moment": "arrive",
+      "when": [
+        "place = mcgonagalls office",
+        "lessons = on"
+      ],
+      "starts": []
+    },
+    {
+      "id": "mcgonagall.cat-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "mcgonagall-cat-night",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = mcgonagalls office",
+        "time = night"
+      ],
+      "show": [
+        "a tabby cat asleep, curled in the armchair nearer the fire, markings round its eyes like square spectacles"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: the tabby cat, only when she is not in the room (Interiors' Occupancy: away at her lessons and by night), \"the same markings around its eyes\" (PS 1 L39, read in the canon tool, 20 October 2026); never explained, never named, never both she and the cat at once; Godric's yes of 11.56 (magic-mcgonagall-cat-1020); by night asleep; about one visit in four"
+    },
+    {
+      "id": "mcgonagall.cat-night-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "mcgonagall-cat-night",
+      "weight": 3,
+      "moment": "arrive",
+      "when": [
+        "place = mcgonagalls office",
+        "time = night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "mcgonagall.tin",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "mcgonagall-tin",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = mcgonagalls office",
+        "lessons = on"
+      ],
+      "show": [
+        "the tartan tin's lid lifts a quarter inch by itself and settles back with a small tin click"
+      ],
+      "canon": "Magic's req 738 (docs/magic/rooms.md, Professor McGonagall's study; Fawkes 11:51's 1 of 11.53), every year: when she is away, as if checking the biscuits are still there, ours; never opens to him; about one visit in four"
+    },
+    {
+      "id": "mcgonagall.tin-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "mcgonagall-tin",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = mcgonagalls office",
+        "lessons = on"
+      ],
+      "starts": []
+    }
+  ]
 }

@@ -125,6 +125,117 @@
         "fir needles trailed across the flags from the front doors to the Great Hall's doors, thickest at the front doors"
       ],
       "canon": "Interiors' req 711 (docs/interiors/entrance-hall.md, Wave 0's detail pass, items 2 and 7), item 7, every year, an everyday habit: the Christmas trees dragged in through the front doors (\"a large fir tree blocking the corridor ahead\", Hagrid behind it, PS 12 L4024, read in the canon tool, 20 October 2026; the needles ours), from a few days before the trees stand in the Great Hall (great-hall.json, `occasion = christmas` from 12-18) to the year's end, December only; the band's place Interiors'"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "time != night"
+      ],
+      "show": [
+        "the real sky framed in the open arch"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the open arch (2.4), \"a flight of stone steps\" to \"the huge, oak front door\" (PS 6 L2286, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "time = night",
+        "weather = clear",
+        "moon up = yes",
+        "moon != new"
+      ],
+      "show": [
+        "the open arch a frame of night sky over the moonlit lawn"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: by night (2.4)"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "time = night",
+        "weather != clear"
+      ],
+      "show": [
+        "the open arch a frame of dark night"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: a cloudy, wet, snowy or foggy night: no moon in the arch"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "time = night",
+        "weather = clear",
+        "moon up = no"
+      ],
+      "show": [
+        "the open arch a frame of dark night"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the moon down"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "time = night",
+        "weather = clear",
+        "moon up = yes",
+        "moon = new"
+      ],
+      "show": [
+        "the open arch a frame of dark night"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the new moon"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "time = night"
+      ],
+      "show": [
+        "the front doors shut and locked, the torches either side of them the only light"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: by night, the doors locked ours, the torches (2.3)"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "weather = rain"
+      ],
+      "show": [
+        "rain blown wet across the open arch's first flags"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the weather comes a little way in, never past the doors"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "weather = snow"
+      ],
+      "show": [
+        "snow drifted in a curve against the open arch's jamb"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the weather comes a little way in, never past the doors"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "season = autumn",
+        "weather != rain",
+        "weather != snow"
+      ],
+      "show": [
+        "autumn leaves skittering in at the open arch and round the boot scraper"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the weather comes a little way in; the boot scraper Interiors' (confirmed, by the doors)"
+    },
+    {
+      "when": [
+        "place = gate passage",
+        "windy = yes"
+      ],
+      "show": [
+        "a low note blowing through the three murder holes in the vault, now one, now another, like someone trying a flute and giving up"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: ours"
     }
   ],
   "records": [
@@ -513,6 +624,86 @@
       "starts": [
         "set hall_glass = still"
       ]
+    },
+    {
+      "id": "hall.gate-doors",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gate-doors",
+      "weight": 1,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = gate passage",
+        "time != night"
+      ],
+      "show": [
+        "the front doors open on their old hinges with a long creak, a breath through the passage, and shut again"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the doors opening as pupils come and go (People's); the hall's torches bowing are the Entrance Hall's table's; about one visit in three"
+    },
+    {
+      "id": "hall.gate-doors-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gate-doors",
+      "weight": 2,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = gate passage",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "hall.gate-glove",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gate-glove",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = gate passage",
+        "time != night",
+        "season = winter"
+      ],
+      "show": [
+        "a dropped glove lying on the flags"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the crowd's leavings, now and then, gone by his next visit (arrive, so it lasts this visit only); about one visit in five"
+    },
+    {
+      "id": "hall.gate-scarf",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gate-glove",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = gate passage",
+        "time != night",
+        "season = autumn"
+      ],
+      "show": [
+        "a house scarf left on the flags"
+      ],
+      "canon": "Magic's req 736 (docs/magic/rooms.md, The gate passage), every year: the crowd's leavings, now and then, gone by his next visit; about one visit in five"
+    },
+    {
+      "id": "hall.gate-glove-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "gate-glove",
+      "weight": 4,
+      "moment": "arrive",
+      "when": [
+        "place = gate passage"
+      ],
+      "starts": []
     }
   ]
 }

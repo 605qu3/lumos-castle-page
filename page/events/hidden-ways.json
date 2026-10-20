@@ -3255,6 +3255,62 @@
       "show": [
         "the windows black"
       ]
+    },
+    {
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "the two torches in their brackets either side of the low door burning, the room's only light, the far corners dim"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: the torches burn as every castle torch (\"lit with flaming torches\", PS 7 L2317, read in the canon tool, 20 October 2026), the same at noon and midnight, no window; they never go out"
+    },
+    {
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "a fine grey dust on the flags, the bins' lids and the crocks' slates, motes turning slowly in the torchlight; the air cold, still and silent"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: \"colder here than up in the main castle\" (PS 8 L2776, read in the canon tool, 20 October 2026), kin to Ollivander's \"very dust and silence\" (PS 5 L1591, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = founders undercroft",
+        "season = winter"
+      ],
+      "show": [
+        "his breath rising in a mist before him"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: \"their breath rose in a mist before them\" (PS 12 L4016, read in the canon tool, 20 October 2026)"
+    },
+    {
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "the dust taking his footprints where he walks, the only fresh marks on the floor"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: his footprints, ours, a find that stays; nobody else's, ever"
+    },
+    {
+      "when": [
+        "place = founders undercroft",
+        "undercroft_steps = kept"
+      ],
+      "show": [
+        "his footprints from his last visit still there in the dust, fainter under the new"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: next visit they are still there (undercroft_steps, set as a visit that reached the undercroft ends); his brother's beside them waits for a driver of the two playing together, as the holidays' fire waits for a holidays driver"
+    },
+    {
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "the well's lid shut on its curb, the windlass still, the rope dry on its drum"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: the lid shut, heavy, never open water (Godric's safeguard, the model's record; Interiors' docs/interiors/hidden-ways-batch-2.md, H7)"
     }
   ],
   "records": [
@@ -3735,6 +3791,121 @@
       ],
       "starts": [],
       "canon": "the way back out from inside (model v62, the Architect: the hidden side's tap is the way back), so the crocodile and the draught are not said as beyond him (Events, the ninety-seventh's walk)"
+    },
+    {
+      "id": "hidden-ways.undercroft-steps",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "been founders undercroft = yes"
+      ],
+      "starts": [
+        "set undercroft_steps = kept"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: a visit that reached the undercroft leaves his footprints in the dust for the next"
+    },
+    {
+      "id": "hidden-ways.undercroft-well-drop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "undercroft-well",
+      "weight": 1,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "from under the well's lid, one drop falling a long way, and its small echo coming back up the shaft; a cold breath through the gaps in the planks stirs the dust on the curb"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: the well's one drop and its echo, ours; about one visit in three"
+    },
+    {
+      "id": "hidden-ways.undercroft-well-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "undercroft-well",
+      "weight": 2,
+      "moment": "wait 40-180 s",
+      "when": [
+        "place = founders undercroft"
+      ],
+      "starts": []
+    },
+    {
+      "id": "hidden-ways.undercroft-draught",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "undercroft-draught",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "a cold draught smelling of the lake comes through the walled arch's crumbling mortar, and far below it the faint lap of water; both torch flames lean the one way and stand up again, and the four iron hooks in the vault's crown turn a little on their staples, one creak, and are still"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: the walled arch's draught (H7's \"a cold draught\"), where the founders' stair went down to \"a kind of underground harbor\" (PS 6 L2280, read in the canon tool, 20 October 2026, the place only); the torches lean as the leaning torch (torch.lean, req 131); the hooks, ours; nothing opens, nothing calls him to it; about one visit in three"
+    },
+    {
+      "id": "hidden-ways.undercroft-draught-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "undercroft-draught",
+      "weight": 2,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = founders undercroft"
+      ],
+      "starts": []
+    },
+    {
+      "id": "hidden-ways.undercroft-ghost",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "undercroft-ghost",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "a house ghost glides in through one wall and out through the other, unhurried, lighting only itself, with a nod to him and nothing said"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: a house ghost passing (\"glided suddenly through a door\", PS 8 L2724, read in the canon tool, 20 October 2026); the figure People's; about one visit in five"
+    },
+    {
+      "id": "hidden-ways.undercroft-ghost-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "undercroft-ghost",
+      "weight": 4,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = founders undercroft"
+      ],
+      "starts": []
+    },
+    {
+      "id": "hidden-ways.undercroft-well-lid",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap founders-well",
+      "when": [
+        "place = founders undercroft"
+      ],
+      "show": [
+        "a heavy thud; the hasp does not move"
+      ],
+      "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: a tap on the lid, as any shut thing; nothing invites him to open it"
     }
   ]
 }

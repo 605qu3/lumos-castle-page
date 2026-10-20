@@ -189,6 +189,76 @@
         "a roll of bandage lying on the wardrobe's floor under the robes' hems, its loose end trailing a hand's breadth"
       ],
       "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year: the bandage moved into the wardrobe, never over a chair's arm, never the scene of Snape's leg (Kingsley's condition, docs/interiors/staff-room.md, The things: on the wardrobe's floor under the right leaf); seen only when a state opens its doors (the Curator's req 563); room[0], set aside, is kept till Godric's yes to delete; from 7 November of the Stone's castle as before (PS 11 L3749 to L3751)"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "lessons = on"
+      ],
+      "show": [
+        "the classroom doors shut on their lessons, the corridor quiet"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: lesson time"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "time != night"
+      ],
+      "show": [
+        "one unused classroom's door standing ajar on desks stacked against the wall and dust in the window's light, the others mostly shut"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: classrooms \"never used regularly\" (OotP 27 L48483, read in the canon tool, 20 October 2026, an everyday thing a later book names first, Kingsley's rule of 16 October)"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, every classroom door shut"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: by night"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "time = morning"
+      ],
+      "show": [
+        "Filch's door shut, a lamp's light under it"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: Filch in, \"a single oil lamp\" (CoS 8 L9029, read in the canon tool, 20 October 2026); by day and evening on his rounds, by night his round People's; provisional, to follow Interiors' Occupancy (req 729) when it lands"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "time != morning"
+      ],
+      "show": [
+        "Filch's door shut, dark under it"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: Filch out on his rounds; provisional, to follow Interiors' Occupancy (req 729)"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "weather = rain"
+      ],
+      "show": [
+        "muddy footprints coming in from the grounds along the corridor's far end, stopping dead a yard short of Filch's door, where the flags are scrubbed pale"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: \"muddy footprints\" (CoS 8 L9029, read in the canon tool, 20 October 2026), Filch's war on them, ours, comic; never the boys' fault"
+    },
+    {
+      "when": [
+        "place = classroom corridor",
+        "weather = snow"
+      ],
+      "show": [
+        "muddy footprints coming in from the grounds along the corridor's far end, stopping dead a yard short of Filch's door, where the flags are scrubbed pale"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: the mud on a snowy day, as on a wet one"
     }
   ],
   "records": [
@@ -589,6 +659,148 @@
         }
       ],
       "canon": "Magic's req 701 (docs/handoff/magic.md, The staff room; Fawkes's 1, 7.24 am), every year, lesson time, as he passes: \"Two stone gargoyles flanked the staff-room door. As Harry approached, one of them croaked, 'You should be in class, Sonny Jim.'\" (OotP 17 L43363, read in the canon tool, 20 October 2026), an everyday thing a later book names first (Kingsley's rule of 16 October), never as said to Harry; stone that wakes (\"the gargoyle sprang suddenly to life\", CoS 11 L10580, read in the canon tool, 20 October 2026), only the jaw; once a visit (arrive, once a page a visit); outside lesson time still"
+    },
+    {
+      "id": "staff.bell-morning",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 09:00",
+      "when": [
+        "place = classroom corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons, loud in the classrooms' own corridor; the last pupils hurry in, the doors shut, and the corridor empties and goes quiet"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: \"the bell rang ... signaling the start of afternoon classes\" (CoS 6 L8503, read in the canon tool, 20 October 2026); loud here, the classrooms' own corridor; on every day with lessons (castle-events.js's lessonsNow), the clock passing the bell with him there, nine o'clock"
+    },
+    {
+      "id": "staff.bell-noon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 12:30",
+      "when": [
+        "place = classroom corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings, the doors along the far end bang open, and pupils spill past him and thin away"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: \"the bell rang ... signaling the start of afternoon classes\" (CoS 6 L8503, read in the canon tool, 20 October 2026); loud here, the classrooms' own corridor; on every day with lessons (castle-events.js's lessonsNow), the clock passing the bell with him there, half past twelve"
+    },
+    {
+      "id": "staff.bell-afternoon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 13:30",
+      "when": [
+        "place = classroom corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings for lessons, loud in the classrooms' own corridor; the last pupils hurry in, the doors shut, and the corridor empties and goes quiet"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: \"the bell rang ... signaling the start of afternoon classes\" (CoS 6 L8503, read in the canon tool, 20 October 2026); loud here, the classrooms' own corridor; on every day with lessons (castle-events.js's lessonsNow), the clock passing the bell with him there, half past one"
+    },
+    {
+      "id": "staff.bell-evening",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 18:00",
+      "when": [
+        "place = classroom corridor",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the bell rings, the doors along the far end bang open, and pupils spill past him and thin away"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: \"the bell rang ... signaling the start of afternoon classes\" (CoS 6 L8503, read in the canon tool, 20 October 2026); loud here, the classrooms' own corridor; on every day with lessons (castle-events.js's lessonsNow), the clock passing the bell with him there, six o'clock"
+    },
+    {
+      "id": "staff.chalk",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "classroom-chalk",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = classroom corridor",
+        "time != night"
+      ],
+      "show": [
+        "in the classroom standing ajar, a forgotten stick of chalk on the blackboard's ledge writes one more word under a half-wiped lesson in an old-fashioned hand, and lies still"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: ours, the castle's leftovers; never words to him, never a clue; about one visit in four"
+    },
+    {
+      "id": "staff.chalk-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "classroom-chalk",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = classroom corridor",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "staff.teacher-step",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "classroom-teacher",
+      "weight": 1,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = classroom corridor",
+        "lessons = on"
+      ],
+      "show": [
+        "a teacher's quick step round the corner from the staff passage and away into a classroom; a door shuts"
+      ],
+      "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: the staff passage's end in lesson time; the teachers People's; about one visit in three"
+    },
+    {
+      "id": "staff.teacher-step-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "classroom-teacher",
+      "weight": 2,
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = classroom corridor",
+        "lessons = on"
+      ],
+      "starts": []
     }
   ]
 }
