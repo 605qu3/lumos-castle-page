@@ -1,0 +1,339 @@
+{
+  "chain": "seventh-floor",
+  "about": "The seventh floor's north corridor (Magic's req 779): the model's room-corridor from the stair hall's north landing west to the west range, Barnabas's tapestry as background in every year; the things Interiors' (req 780). Nothing of the wall opposite the tapestry is spoken in any year.",
+  "first_visit": [],
+  "marks": {
+    "barnabas": [
+      "club",
+      "tutu",
+      "ducked",
+      "clubbed"
+    ]
+  },
+  "room": [
+    {
+      "when": [
+        "place = room corridor"
+      ],
+      "show": [
+        "at the landing's end, the moving stairs below him grinding and settling as they swing"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the landing's end, the moving stairs heard below him (Magic's 1.1)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night"
+      ],
+      "show": [
+        "torches burning in their brackets between the courtyard windows",
+        "the people in the portraits along the corridor awake, whispering and pointing as he passes",
+        "the corridor quiet, the castle's top floor; few pupils come up this far"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: torches (Magic's 2.3) between the courtyard's windows, seven on the court wall, and the portraits in two runs on the north wall (Interiors' docs/interiors/seventh-floor-corridor.md (req 780, 18e5a0e1)); \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651, read in the canon tool, 20 October 2026); quiet, few pupils pass (\"a seventh-floor corridor that was deserted\", HBP 20 L62089, read in the canon tool, 20 October 2026); the windows the Architect's (ledger 123, req 782), one word for them: the courtyard windows"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "the sky bright in the courtyard windows"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "weather = cloudy"
+      ],
+      "show": [
+        "grey cloud passing in the courtyard windows"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "weather = rain"
+      ],
+      "show": [
+        "rain streaming down the courtyard windows"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "weather = snow"
+      ],
+      "show": [
+        "snow drifting past the courtyard windows"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "weather = fog"
+      ],
+      "show": [
+        "fog pressing white against the courtyard windows"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the castle's sky and weather in the windows (Magic's 2.4)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon != new"
+      ],
+      "show": [
+        "the corridor striped with bars of moonlight from the courtyard windows"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows moonlit, the real moon up on a clear night (as PS 9 L3229's corridors)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "the courtyard windows dark"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows dark, no moon up"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time = night",
+        "moon up = yes",
+        "weather != clear"
+      ],
+      "show": [
+        "the courtyard windows dark"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows dark, the moon behind cloud, rain, snow or fog"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time = night",
+        "moon up = yes",
+        "weather = clear",
+        "moon = new"
+      ],
+      "show": [
+        "the courtyard windows dark"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the windows dark, the new moon"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time = night"
+      ],
+      "show": [
+        "the torches only, nobody about",
+        "the people in the portraits asleep in their frames, a soft snore here and there",
+        "the tapestry across from the windows gone to dim shapes in the torchlight, its colours lost"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: by night the torches only (Magic's 2.3), the portraits asleep (Magic's 1.3), the tapestry's colours gone to shapes in the torchlight"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "seventh_tapestry = club"
+      ],
+      "show": [
+        "an enormous tapestry of Barnabas the Barmy trying to train trolls for the ballet, the trolls in tutus, one troll's club raised high over Barnabas's head"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the tapestry as background (the charter's spoilers ruling, 14 October; Kingsley's rule of 16 October, an everyday thing a later book names first): \"an enormous tapestry depicting Barnabas the Barmy's foolish attempt to train trolls for the ballet\" (OotP 18 L44126), \"Barnabas the Barmy being clubbed by those trolls\" (OotP 18 L44094), \"a tapestry of trolls in tutus\" (HBP 20 L62089), all read in the canon tool, 20 October 2026; as Magic's 1.4, changed between his looks, never seen moving; nothing of the wall opposite is spoken in any year (the table's blank stretch: nothing marks it)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "seventh_tapestry = tutu"
+      ],
+      "show": [
+        "an enormous tapestry of Barnabas the Barmy trying to train trolls for the ballet, the trolls in tutus, one troll's tutu slipped down round its knees"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the tapestry as background (the charter's spoilers ruling, 14 October; Kingsley's rule of 16 October, an everyday thing a later book names first): \"an enormous tapestry depicting Barnabas the Barmy's foolish attempt to train trolls for the ballet\" (OotP 18 L44126), \"Barnabas the Barmy being clubbed by those trolls\" (OotP 18 L44094), \"a tapestry of trolls in tutus\" (HBP 20 L62089), all read in the canon tool, 20 October 2026; as Magic's 1.4, changed between his looks, never seen moving; nothing of the wall opposite is spoken in any year (the table's blank stretch: nothing marks it)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "seventh_tapestry = ducked"
+      ],
+      "show": [
+        "an enormous tapestry of Barnabas the Barmy trying to train trolls for the ballet, the trolls in tutus, Barnabas ducking as a troll's club swings at him"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the tapestry as background (the charter's spoilers ruling, 14 October; Kingsley's rule of 16 October, an everyday thing a later book names first): \"an enormous tapestry depicting Barnabas the Barmy's foolish attempt to train trolls for the ballet\" (OotP 18 L44126), \"Barnabas the Barmy being clubbed by those trolls\" (OotP 18 L44094), \"a tapestry of trolls in tutus\" (HBP 20 L62089), all read in the canon tool, 20 October 2026; as Magic's 1.4, changed between his looks, never seen moving; nothing of the wall opposite is spoken in any year (the table's blank stretch: nothing marks it)"
+    },
+    {
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "seventh_tapestry = clubbed"
+      ],
+      "show": [
+        "an enormous tapestry of Barnabas the Barmy trying to train trolls for the ballet, the trolls in tutus, Barnabas being clubbed by the trolls"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the tapestry as background (the charter's spoilers ruling, 14 October; Kingsley's rule of 16 October, an everyday thing a later book names first): \"an enormous tapestry depicting Barnabas the Barmy's foolish attempt to train trolls for the ballet\" (OotP 18 L44126), \"Barnabas the Barmy being clubbed by those trolls\" (OotP 18 L44094), \"a tapestry of trolls in tutus\" (HBP 20 L62089), all read in the canon tool, 20 October 2026; as Magic's 1.4, changed between his looks, never seen moving; nothing of the wall opposite is spoken in any year (the table's blank stretch: nothing marks it)"
+    }
+  ],
+  "records": [
+    {
+      "id": "seventh-floor.tapestry-shift",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = room corridor"
+      ],
+      "starts": [
+        "set seventh_tapestry = mark barnabas, not last"
+      ],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the tapestry changed between his looks (Magic's 1.4), never twice the same running"
+    },
+    {
+      "id": "seventh-floor.stray",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-stray",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = room corridor",
+        "time != night"
+      ],
+      "show": [
+        "a small troll in a tutu woven into the corner of another hanging along this floor, out of place, as if it had wandered off from Barnabas's tapestry"
+      ],
+      "starts": [],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: now and then a troll stray in another hanging on 7, back in Barnabas's tapestry next visit (the touch review's corridor-barnabas-r1 t1; one entry with the woven sheep, Magic's 1.4, reqs 108, 109); about one visit in five"
+    },
+    {
+      "id": "seventh-floor.stray-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-stray",
+      "weight": 4,
+      "moment": "arrive",
+      "when": [
+        "place = room corridor",
+        "time != night"
+      ],
+      "starts": []
+    },
+    {
+      "id": "seventh-floor.pupil",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-pupil",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "lessons = off"
+      ],
+      "show": [
+        "a pupil passing stops under the tapestry, grins up at the trolls' tutus and goes on"
+      ],
+      "starts": [],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: now and then, by day, outside lesson hours (ours, everyday; \"a very small girl who had been examining a tapestry of trolls in tutus\", HBP 20 L62089); never at the wall opposite; about one visit in four"
+    },
+    {
+      "id": "seventh-floor.pupil-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-pupil",
+      "weight": 3,
+      "moment": "arrive",
+      "when": [
+        "place = room corridor",
+        "time != night",
+        "lessons = off"
+      ],
+      "starts": []
+    },
+    {
+      "id": "seventh-floor.ghost",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-ghost",
+      "weight": 1,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = room corridor"
+      ],
+      "show": [
+        "a pearly-white, slightly transparent ghost glides along the corridor in its own pale light and through the wall"
+      ],
+      "starts": [],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: the ghosts now and then (Magic's 1.6; \"Pearly-white and slightly transparent\", PS 7 L2343); about one visit in four"
+    },
+    {
+      "id": "seventh-floor.ghost-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-ghost",
+      "weight": 3,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = room corridor"
+      ],
+      "starts": []
+    },
+    {
+      "id": "seventh-floor.peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-peeves",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = room corridor"
+      ],
+      "show": [
+        "a cackle and a bang from somewhere down the corridor, then quiet, nobody to be seen"
+      ],
+      "starts": [],
+      "canon": "Magic's req 779 (docs/magic/rooms.md, The seventh floor's north corridor, Barnabas's tapestry), every year: Peeves now and then, unseen (Magic's 1.7; ours: the corridor has no armour to rattle, Interiors' schedule); about one visit in four"
+    },
+    {
+      "id": "seventh-floor.peeves-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "seventh-floor-peeves",
+      "weight": 3,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = room corridor"
+      ],
+      "starts": []
+    }
+  ]
+}
