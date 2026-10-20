@@ -120,6 +120,88 @@
       ],
       "canon": "the change list's Rework 14: PoA 9 L16979, a broom smashed in the first match of the season, a Saturday early in November (the set-aside rule's reckoning, 1 to 7 November), its pieces brought to the wing; from 8 November of the Azkaban castle, after the latest that Saturday can fall, and in every later year; under no bed named; its bed Interiors' to set (asked by row); checked against the text, 15 October 2026",
       "aside": "set aside 16 October 2026 (docs/ministry/set-aside.md; the Curator's req 561, Godric's pick of 16 October 2026 with Kingsley's review, docs/ministry/reviews/2026-10-16-desk-answers.md): the broom-twig splinter under a bed, Harry's broken Nimbus (PoA 9; item 12 withdrawn)"
+    },
+    {
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "still and quiet, his steps loud on the floor",
+        "the six windows along the right wall, one by each bed's head, the real sky"
+      ],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year, every line read in the canon tool, 20 October 2026: the hush; the six windows on the right (Interiors' schedule, the right wall, one beside each bed's head; 2.4)"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "time = evening",
+        "hour < 22"
+      ],
+      "show": [
+        "the ward's lamps lit, their own flame"
+      ],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: the ward's lamps lit from dusk, their own flame (HBP 19 L62008, read in the canon tool); placed by Interiors (req 678)"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "time = night",
+        "hour >= 12",
+        "hour < 22"
+      ],
+      "show": [
+        "the ward's lamps lit, their own flame"
+      ],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: as the evening's, after dusk and before her bedtime"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "time = evening",
+        "hour >= 22"
+      ],
+      "show": [
+        "the ward's lamps dimmed low, never out, their own flame, her office door shut",
+        "the ward dark, eased by the dimmed lamps, a light always near"
+      ],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: \"The lamps dimmed, and she returned to her office; he heard the door click behind her\" (HBP 19 L62008, the ward's night, everyday, read in the canon tool): dimmed, never out, from Madam Pomfrey's bedtime (ours, ten) till morning; by night the dark eased, the ward always has a light near (2.4); placed by Interiors (req 678)"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "time = night",
+        "hour >= 22"
+      ],
+      "show": [
+        "the ward's lamps dimmed low, never out, their own flame, her office door shut",
+        "the ward dark, eased by the dimmed lamps, a light always near"
+      ],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: \"The lamps dimmed, and she returned to her office; he heard the door click behind her\" (HBP 19 L62008, the ward's night, everyday, read in the canon tool): dimmed, never out, from Madam Pomfrey's bedtime (ours, ten) till morning; by night the dark eased, the ward always has a light near (2.4); placed by Interiors (req 678)"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "time = night",
+        "hour < 12"
+      ],
+      "show": [
+        "the ward's lamps dimmed low, never out, their own flame, her office door shut",
+        "the ward dark, eased by the dimmed lamps, a light always near"
+      ],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: \"The lamps dimmed, and she returned to her office; he heard the door click behind her\" (HBP 19 L62008, the ward's night, everyday, read in the canon tool): dimmed, never out, from Madam Pomfrey's bedtime (ours, ten) till morning; by night the dark eased, the ward always has a light near (2.4); placed by Interiors (req 678); the small hours and before dawn"
+    },
+    {
+      "when": [
+        "place = hospital wing",
+        "time = night",
+        "moon up = yes",
+        "moon != new",
+        "weather = clear"
+      ],
+      "show": [
+        "moonlight through the windows falling across the right row's beds, as much as the moon's phase gives"
+      ],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: \"Moonlight was falling across her bed\" (PoA 21 L21133, read in the canon tool; the light only, never that night): the moon at its phase laid across the right row's beds, on a clear night while it is up"
     }
   ],
   "records": [
@@ -149,9 +231,10 @@
         "place = hospital wing"
       ],
       "show": [
-        "a large bottle labelled Skele-Gro and a beaker on the left row's second bedside table"
+        "a large bottle labelled Skele-Gro and a beaker on the left row's second bedside table",
+        "now and then a thin steam rising from the beaker by the bottle, and gone"
       ],
-      "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; CoS 10 L10059, CoS 13 L11224; checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; CoS 10 L10059, CoS 13 L11224; checked against the text, 15 October 2026; Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: the beaker's steam with this habit, \"pouring out a steaming beakerful\" (CoS 10 L10061, read in the canon tool), now and then, played by the page"
     },
     {
       "id": "wing.books",
@@ -198,6 +281,70 @@
         "a visitor's chair drawn up close to the right row's third bed and turned toward its head, as a visitor left it"
       ],
       "canon": "the change list's Rework 14 as Interiors' list's Rework 8 reworks it (Interiors' schedule, docs/interiors/hospital-wing.md, the list's things: each a habit, now and then, any day, on no named bed; when, Events'): a small record on arrival, so one habit a visit at most and never two visits running; any castle; PS 17 L6449; checked against the text, 15 October 2026"
+    },
+    {
+      "id": "wing.snore",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "wing-snore",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = hospital wing"
+      ],
+      "show": [
+        "from a bed, a low, rumbling snore, a sleeper's, and quiet again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: the hush and a sleeper's snore now and then, \"a low, rumbling snore\" (HBP 19 L62008, everyday, read in the canon tool), never named; heard only; about one visit in three"
+    },
+    {
+      "id": "wing.snore-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "wing-snore",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = hospital wing"
+      ],
+      "starts": []
+    },
+    {
+      "id": "wing.pepperup",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "wing-pepperup",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = hospital wing",
+        "weather = rain",
+        "cold = yes"
+      ],
+      "show": [
+        "a pupil sitting up in a bed, steam curling from both ears"
+      ],
+      "starts": [],
+      "canon": "Magic's req 676 (docs/handoff/magic.md, The hospital wing), every year: the Pepperup steam in the wet and cold weeks, \"Her Pepperup potion worked instantly, though it left the drinker smoking at the ears for several hours afterward\" (CoS 8 L8985, everyday, the spate of colds; read in the canon tool); the pupil People's figure, no name; about one such visit in three"
+    },
+    {
+      "id": "wing.pepperup-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "wing-pepperup",
+      "weight": 2,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = hospital wing",
+        "weather = rain",
+        "cold = yes"
+      ],
+      "starts": []
     }
   ]
 }
