@@ -12,7 +12,7 @@
        Returns { stars, figures, moon: { x, y } or null, planets: [{ name, x, y }] }.
    LumosChart.place(alt, az, x, y, r)  a height and bearing to px on the chart, or null below the horizon.
    LumosChart.nightOf(day)  a day as 'YYYY-MM-DD' to eleven at night on that day by the iPad's own clock, the hour a
-       July night is dark at the boys' latitude; null for a day it cannot read. The chart at a boy's place is a fixed
+       July night is dark at the boys' latitude (Godric's 1 on design-chart-hour-1020, 20 October 2026, 12.01 pm); null for a day it cannot read. The chart at a boy's place is a fixed
        chart, the sky of the night he was born (the charter's Rulings log, 20 October 2026, the night skies): the page
        passes CastleSky.at(nightOf(the boy's day), home()), the day from the grown-up's setup, never from a page file;
        the telescope and every live view keep tonight's sky.
