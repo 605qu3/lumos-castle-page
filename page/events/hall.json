@@ -104,6 +104,27 @@
         "thick streamers of holly and mistletoe strung along the hall's walls between the torches, clear of the flames"
       ],
       "canon": "Magic's req 632 (docs/handoff/magic.md, The Entrance Hall), Christmas: PoA 11 L17727, \"Thick streamers of holly and mistletoe were strung along the corridors\", the castle's usual decorations, every year, as the corridor's (armour.json, req 599); clear of the flames; checked against the text, 16 October 2026"
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "ground = wet"
+      ],
+      "show": [
+        "a muddy puddle on the flags just inside the front doors, muddy footprints trailing from it toward the Great Hall's doors and fading out"
+      ],
+      "canon": "Interiors' req 711 (docs/interiors/entrance-hall.md, Wave 0's detail pass, items 2 and 7), item 2, every year, an everyday habit, no book's night: mud in from the grounds on wet days, \"the muddy puddle that had dripped from Harry's Quidditch robes\" (CoS 8 L9027, read in the canon tool, 20 October 2026) and \"doubling the number of muddy footprints on the floor\" (CoS 8 L9029, read in the canon tool, 20 October 2026); while the grounds are wet (the weather's `ground`); the puddle's place and the prints' line Interiors'"
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "date >= 12-14",
+        "date <= 12-31"
+      ],
+      "show": [
+        "fir needles trailed across the flags from the front doors to the Great Hall's doors, thickest at the front doors"
+      ],
+      "canon": "Interiors' req 711 (docs/interiors/entrance-hall.md, Wave 0's detail pass, items 2 and 7), item 7, every year, an everyday habit: the Christmas trees dragged in through the front doors (\"a large fir tree blocking the corridor ahead\", Hagrid behind it, PS 12 L4024, read in the canon tool, 20 October 2026; the needles ours), from a few days before the trees stand in the Great Hall (great-hall.json, `occasion = christmas` from 12-18) to the year's end, December only; the band's place Interiors'"
     }
   ],
   "records": [
