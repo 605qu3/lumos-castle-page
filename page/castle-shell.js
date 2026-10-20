@@ -416,6 +416,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
 
   /* one place: floor, ceiling and its walls with their openings */
   function buildPlace(Q) {
+    var n0 = group.children.length;                                     /* v30: what this place builds is its own */
     var xs = Q.poly.map(function (p) { return p[0]; }), ys = Q.poly.map(function (p) { return p[1]; });
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
     var H = (Q.ceiling != null ? Q.ceiling : Q.floor + 12) - Q.floor;
@@ -620,10 +621,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var dp = Math.min(g.op.depth, t - 0.05), back = slab(w, hh, t - dp, mats.wall, 'wall');
           var bp = toLocal(a[0] + ux * sm + nx * (dp + (t - dp) / 2), a[1] + uy * sm + ny * (dp + (t - dp) / 2), Q.floor);
           back.position.set(bp.x, bp.y + g.sill + hh / 2, bp.z); back.rotation.y = ang; back.name = Q.id + '-niche-' + g.op.id; group.add(back);
-          var r = w / 2, sh = new THREE.Shape();
-          sh.moveTo(-r, 0); sh.lineTo(-r, r); sh.lineTo(r, r); sh.lineTo(r, 0); sh.absarc(0, 0, r, 0, Math.PI, false);
+          /* v30 (one owner per face): the head bears 2 cm into the wall over it and either side, its face 2 mm back of the
+             wall's, so no face of it lies in a plane of the pieces round it (the hourglass niches' crowns and springings) */
+          var r = w / 2, sh = new THREE.Shape(), BR = 0.02;
+          sh.moveTo(-r, 0); sh.lineTo(-r - BR, 0); sh.lineTo(-r - BR, r + BR); sh.lineTo(r + BR, r + BR); sh.lineTo(r + BR, 0); sh.lineTo(r, 0);
+          sh.absarc(0, 0, r, 0, Math.PI, false);
           var head = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: dp, bevelEnabled: false, curveSegments: 16 }), mats.wall), LAYER.wall);
-          head.position.set(mid.x, mid.y + g.h - r, mid.z); head.rotation.y = ang; head.name = Q.id + '-niche-head-' + g.op.id; group.add(head);
+          head.position.set(mid.x + Math.sin(ang) * 0.002, mid.y + g.h - r, mid.z + Math.cos(ang) * 0.002); head.rotation.y = ang; head.name = Q.id + '-niche-head-' + g.op.id; group.add(head);
           var fl = slab(w, 0.02, dp, mats.floor, 'floor'), fp = toLocal(a[0] + ux * sm + nx * dp / 2, a[1] + uy * sm + ny * dp / 2, Q.floor);
           fl.position.set(fp.x, fp.y + g.sill + 0.01, fp.z); fl.rotation.y = ang; fl.name = Q.id + '-niche-floor-' + g.op.id; group.add(fl);
           return;
@@ -687,6 +691,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     });
     if (Q.shaft) buildShaft(Q, gaps);
     for (var kk in keep) mats[kk] = keep[kk];
+    for (var kn = n0; kn < group.children.length; kn++) group.children[kn].userData.owner = Q.id;
   }
   /* v17: a newel stair made a place: its newel; a landing at each door's sill, doors a few risers apart sharing the
      lowest (the old wall-walk's two at +30 and the wind-dial room's, six risers above them up straight steps in its own
@@ -833,7 +838,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       ft.rect[0] >= Math.min.apply(null, px) - 0.01 && ft.rect[2] <= Math.max.apply(null, px) + 0.01 &&
       ft.rect[1] >= Math.min.apply(null, py) - 0.01 && ft.rect[3] <= Math.max.apply(null, py) + 0.01;
     if (!inAir && !out.places.some(function (q) { return q.id === slug(ft.room || ''); })) return;
-    var R = ft.rect, T = 0.06;
+    var R = ft.rect, T = 0.06, railPosts = {};
     var rrow = rowOf(P.id === slug(ft.room || '') ? P : out.places.filter(function (q) { return q.id === slug(ft.room || ''); })[0] || P);
     var rmat = rrow ? paintMat(/marble/.test(ft.id) ? tone('marble') : tone('iron')) : mats.stair;   /* v28: banisters marble, rails iron */
     ft.sides.forEach(function (sd) {
@@ -841,11 +846,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var fix = sd === 'west' ? R[0] : sd === 'east' ? R[2] : sd === 'south' ? R[1] : R[3], L = sp[1] - sp[0];
       if (L <= 0) return;
       var at = function (u) { return ns ? toLocal(u, fix, ft.z) : toLocal(fix, u, ft.z); }, c = at((sp[0] + sp[1]) / 2);
-      var bar = slab(ns ? L + T : T, T, ns ? T : L + T, rmat, 'stair');
+      var bar = slab(ns ? L + T - 0.004 : T, T, ns ? T : L + T - 0.004, rmat, 'stair');   /* v30: its ends 2 mm inside the end posts */
       bar.position.set(c.x, c.y + ft.h - T / 2, c.z); bar.name = P.id + '-rail-' + ft.id + '-' + sd; group.add(bar);
       for (var n = Math.max(1, Math.round(L)), i = 0; i <= n; i++) {
-        var p = at(sp[0] + L * i / n), post = slab(T, ft.h, T, rmat, 'stair');
-        post.position.set(p.x, p.y + ft.h / 2, p.z); post.name = P.id + '-rail-post-' + ft.id + '-' + sd + '-' + i; group.add(post);
+        /* v30: one post where two sides meet, its top in the rail's depth, not flush with it */
+        var p = at(sp[0] + L * i / n), pk = ft.id + ':' + p.x.toFixed(2) + ',' + p.z.toFixed(2);
+        if (railPosts[pk]) continue;
+        railPosts[pk] = 1;
+        var post = slab(T, ft.h - T / 2, T, rmat, 'stair');
+        post.position.set(p.x, p.y + (ft.h - T / 2) / 2, p.z); post.name = P.id + '-rail-post-' + ft.id + '-' + sd + '-' + i; group.add(post);
       }
     });
   });
@@ -875,7 +884,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var R = siteRect(s.group, s.shape.rect), top = inIt.floor + s.z, c = toLocal((R[0] + R[2]) / 2, (R[1] + R[3]) / 2, top - SLAB / 2);
       var srow = rowOf(inIt);
       var sl = slab(R[2] - R[0], SLAB, R[3] - R[1], srow ? floorMat(srow, (R[0] + R[2]) / 2, (R[1] + R[3]) / 2) : mats.floor, 'floor');
-      sl.position.copy(c); sl.name = s.id; sl.userData.landing = s.id; group.add(sl);
+      sl.position.copy(c); sl.name = s.id; sl.userData.landing = s.id; sl.userData.owner = inIt.id; group.add(sl);
       slabs.push({ id: s.id, rect: R, z: top, kind: s.kind || '' });
       return;
     }
@@ -893,13 +902,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var base = s.from > 0.01 ? top - rise - WAIST : inIt.floor;
       var hgt = top - base, p = toLocal(sx, sy, base);
       var tr = slab(alongY ? across : go, Math.max(0.05, hgt), alongY ? go : across, tmat, 'stair');
-      tr.position.set(p.x, p.y + hgt / 2, p.z); tr.name = s.id + '-' + (i + 1); tr.userData.stair = s.id; group.add(tr);
+      tr.position.set(p.x, p.y + hgt / 2, p.z); tr.name = s.id + '-' + (i + 1); tr.userData.stair = s.id; tr.userData.owner = inIt.id; group.add(tr);
     }
     if (s.landing) {
       var L = siteRect(s.group, s.landing), lt = s.to;
       var lp = toLocal((L[0] + L[2]) / 2, (L[1] + L[3]) / 2, inIt.floor);
       var land = slab(L[2] - L[0], lt, L[3] - L[1], tmat, 'stair');
-      land.position.set(lp.x, lp.y + lt / 2, lp.z); land.name = s.id + '-landing'; land.userData.stair = s.id; group.add(land);
+      land.position.set(lp.x, lp.y + lt / 2, lp.z); land.name = s.id + '-landing'; land.userData.stair = s.id; land.userData.owner = inIt.id; group.add(land);
       slabs.push({ id: s.id + '-landing', rect: L, z: inIt.floor + lt, kind: 'landing' });
     }
     var ux = alongY ? 0 : s.up[0], uy = alongY ? s.up[1] : 0, mx = (bx0 + bx1) / 2, my = (by0 + by1) / 2;
@@ -1142,6 +1151,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (lost.length) { st0.lim.turn = 180; st0.wide = lost.map(function (d) { return d.id; }).join(' '); }
   }
   out.look = LK;
+  /* v30 (Godric, 20 October 2026, 8.56 am: the glitches at thresholds and corners): one owner per face. The places
+     built in one frame meet on shared lines (a wall's body lies in its neighbour's plan, a landing ends on a wall's
+     face, two rooms' floors at one storey), drawn to the exact plane of what they meet, so the depth test tied pixel
+     by pixel: the combed stripes. Each place's pieces, its stairs and landings with them, are drawn at its own depth
+     rank, this place first (rank 0) and each next place one further back, so where two places' faces share a plane
+     the nearer-ranked one shows whole. tools/architect-seams.mjs counts the faces still tied */
+  var RANK = {};
+  out.places.forEach(function (q, i) { RANK[q.id] = i ? 1 + (i - 1) % 6 : 0; });
+  function rankOn(r, s, c, g, mt) { if (!mt || !mt.isMaterial) return; mt.__po = [mt.polygonOffset, mt.polygonOffsetFactor, mt.polygonOffsetUnits];
+    mt.polygonOffset = true; mt.polygonOffsetFactor = this.userData.rank; mt.polygonOffsetUnits = this.userData.rank; }
+  function rankOff(r, s, c, g, mt) { if (!mt || !mt.__po) return; mt.polygonOffset = mt.__po[0]; mt.polygonOffsetFactor = mt.__po[1]; mt.polygonOffsetUnits = mt.__po[2]; mt.__po = null; }
+  group.traverse(function (o) {
+    var rk = o.isMesh ? RANK[o.userData.owner] : 0;
+    if (!rk) return;
+    o.userData.rank = rk; o.onBeforeRender = rankOn; o.onAfterRender = rankOff;
+  });
   return out;
 } };
 })();
