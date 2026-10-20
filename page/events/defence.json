@@ -213,12 +213,12 @@
     {
       "when": [
         "place = defence office",
-        "year >= 3"
+        "castle date >= 2 05-30"
       ],
       "show": [
         "about forty pale squares on the walls where frames once hung, a nail or two left"
       ],
-      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the pale squares, a trace from the Azkaban castle on, the list's year = 3 widened to Interiors' every later castle): CoS 7 L8924, the countless framed photographs that hung there; checked against the text, 15 October 2026"
+      "canon": "the change list's Rework 8 with Interiors' schedule, docs/interiors/defence-classroom.md, The office (the pale squares, a trace from 30 May of the Chamber's castle on, the day after Lockhart's frames end, and every later castle: Interiors' req 694, the world rules' Traces keep their dates): CoS 7 L8924, the countless framed photographs that hung there; CoS 16 L12447, \"The photographs that had covered the walls were now crammed into boxes on the desk\" (the Chamber's castle, not the Azkaban castle's; read in the canon tool, 20 October 2026)"
     },
     {
       "when": [
