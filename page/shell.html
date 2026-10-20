@@ -201,7 +201,8 @@ var MROOMS = (MODEL && MODEL.rooms) || [];
 MROOMS.forEach(function (r) { if ((r.alias || []).indexOf(PLACE) >= 0) PLACE = r.id; });
 var NEVER = MROOMS.some(function (r) { return r.id === PLACE && r.shell === 'never'; });
 /* each place's start on a plain load: the way he first comes in by */
-var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth', 'tapestry-stairwell': 'tapestry-stair-1' };
+var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth', 'tapestry-stairwell': 'tapestry-stair-1',
+  'staff-passage': 'staff-passage-mouth' };   /* at the passage's mouth looking along it, not at the staff room's door across it */
 
 var kit = window.castleFrame ? castleFrame({
   background: 0x0b0a09, fog: 0.012,
@@ -376,6 +377,12 @@ function limits(s) {
   return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
 }
 var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
+/* wave 1's Apparate shots (20 October 2026, the Architect's forty-seventh, Fawkes's yes): a room whose one door leaves
+   the start facing a near wall turns it into the room (degrees, as a head turn), only when he comes by no door (?place= alone) */
+var START_TURN = { 'snape-office': -45 };   /* his private stores' cupboard between the shelves */
+if (!kit.from && START_TURN[PLACE]) {
+  START.look = START.pos.clone().add(START.look.clone().sub(START.pos).applyAxisAngle(new THREE.Vector3(0, 1, 0), START_TURN[PLACE] * Math.PI / 180));
+}
 /* v10 of the shells: a hidden opening seen from its outer side is wall with an unseen tap over it (Events' req 534:
    `tap keep-east-stair-panel-3` from the stair hall); a tap there walks him to it, a second is its id to the events */
 var things = shell.doors.concat(shell.ways, shell.hidden || []), tappables = things.map(function (d) { return d.mesh; });
