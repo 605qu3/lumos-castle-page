@@ -25,6 +25,36 @@
   function goDeaf(why) {
     deaf = why;
     try { window.sessionStorage.setItem(DEAF_KEY, why); } catch (e) {}
+    if (why === 'not-allowed' && thirdParty()) tell(ADVICE);
+  }
+
+  /* Which browser, by its own mark in the user agent (20 October 2026: Godric's iPhone was the DuckDuckGo browser,
+     not Safari). On iOS every browser is Safari's web view underneath, and one that is not Safari is never lent the
+     microphone unless iOS has given that app the microphone, so its refusal comes as not-allowed with no prompt. */
+  var UA = navigator.userAgent || '';
+  var IOS = /iPhone|iPad|iPod/.test(UA) || (/Macintosh/.test(UA) && navigator.maxTouchPoints > 1);
+  function browser() {
+    var marks = [[/Ddg\//, 'DuckDuckGo'], [/CriOS\//, 'Chrome'], [/FxiOS\//, 'Firefox'], [/EdgiOS\//, 'Edge'],
+      [/OPT\//, 'Opera'], [/GSA\//, 'the Google app'], [/FBAN|FBAV|Instagram/, 'an app\'s own browser']];
+    for (var i = 0; i < marks.length; i++) if (marks[i][0].test(UA)) return marks[i][1];
+    if (IOS) return /Safari\//.test(UA) ? 'Safari' : (navigator.standalone ? 'Safari, from a home-screen icon' : 'an app\'s own browser');
+    return /Edg\//.test(UA) ? 'Edge' : /Chrome\//.test(UA) ? 'Chrome' : /Firefox\//.test(UA) ? 'Firefox' : /Safari\//.test(UA) ? 'Safari' : 'a browser';
+  }
+  function thirdParty() { return IOS && !/^Safari/.test(browser()); }
+  var ADVICE = 'This browser will not lend the microphone. Open the castle in Safari, or allow the microphone for this browser in Settings.';
+  /* One plain line at the foot of the page, a few seconds, once (the deaf mark keeps it from coming again). */
+  function tell(text) {
+    try {
+      var d = document.createElement('div');
+      d.className = 'castle-ear-note';
+      d.textContent = text;
+      d.style.cssText = 'position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;padding:10px 14px;' +
+        'background:rgba(20,16,12,.9);color:#f3ead8;font:15px/1.4 Georgia,serif;border-radius:8px;text-align:center;' +
+        'transition:opacity .8s';
+      document.body.appendChild(d);
+      setTimeout(function () { d.style.opacity = '0'; }, 9000);
+      setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 10000);
+    } catch (e) {}
   }
 
   function norm(s) { return String(s || '').toLowerCase().replace(/[^a-z]/g, ''); }
@@ -88,6 +118,9 @@
     SECONDS: 8,          /* how long one tap's listening lasts at most */
     available: function () { return !!SR && !deaf; },
     deaf: function () { return deaf; },
+    browser: browser,
+    thirdParty: thirdParty,
+    ADVICE: ADVICE,
     near: near,
     match: match,
     listen: listen
