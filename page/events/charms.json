@@ -131,10 +131,10 @@
         "time != night"
       ],
       "show": [
-        "torches burning in their brackets between the windows",
+        "torches burning in their brackets between the high windows",
         "the people in the portraits along the corridor awake, whispering and pointing as he passes"
       ],
-      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: torches (Magic's 2.3; PS 7 L2317), \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651), both read in the canon tool, 20 October 2026; \"the windows\", not high, till Interiors' schedule says (Fawkes 12:49, 1.37 pm), Interiors' schedule to come (req 760)"
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: torches (Magic's 2.3; PS 7 L2317), \"the people in the portraits along the corridors whispered and pointed as they passed\" (PS 7 L2651), both read in the canon tool, 20 October 2026; the high windows, the Architect's req 773 (model v76, 72d1deb3, sills 2.0); Interiors' docs/interiors/wave-3-ways.md (req 760, 6b9521be)"
     },
     {
       "when": [
@@ -143,7 +143,7 @@
         "weather = clear"
       ],
       "show": [
-        "the court's sky bright in the windows"
+        "the court's sky bright in the high windows"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
     },
@@ -154,7 +154,7 @@
         "weather = cloudy"
       ],
       "show": [
-        "grey cloud passing in the windows"
+        "grey cloud passing in the high windows"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
     },
@@ -165,7 +165,7 @@
         "weather = rain"
       ],
       "show": [
-        "rain streaming down the windows"
+        "rain streaming down the high windows"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
     },
@@ -176,7 +176,7 @@
         "weather = snow"
       ],
       "show": [
-        "snow drifting past the windows"
+        "snow drifting past the high windows"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
     },
@@ -187,7 +187,7 @@
         "weather = fog"
       ],
       "show": [
-        "fog pressing white against the windows"
+        "fog pressing white against the high windows"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the court's sky and weather in the windows (Magic's 2.4)"
     },
@@ -200,7 +200,7 @@
         "moon != new"
       ],
       "show": [
-        "the corridor striped with bars of moonlight from the windows"
+        "the corridor striped with bars of moonlight from the high windows"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: \"corridors striped with bars of moonlight from the high windows\" (PS 9 L3229, read in the canon tool, 20 October 2026), the real moon up on a clear night"
     },
@@ -211,7 +211,7 @@
         "moon up = no"
       ],
       "show": [
-        "the windows dark"
+        "the high windows dark"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night, no moon up"
     },
@@ -223,7 +223,7 @@
         "weather != clear"
       ],
       "show": [
-        "the windows dark"
+        "the high windows dark"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night, the moon behind cloud, rain, snow or fog"
     },
@@ -236,7 +236,7 @@
         "moon = new"
       ],
       "show": [
-        "the windows dark"
+        "the high windows dark"
       ],
       "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: by night, the new moon"
     },
