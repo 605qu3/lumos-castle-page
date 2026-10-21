@@ -339,9 +339,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* a panelled room's walls Design's oak, a limewashed room's its plaster, till tones.js gives "<stone>/panelled" its own */
     if (!(R && R[st + '/' + row.dress]) && (row.dress === 'panelled' || row.dress === 'limewash'))
       return paintMat(tone(row.dress === 'panelled' ? 'oak' : 'plaster'), true);
-    return paintMat(tone(st + '/' + row.dress, st), true);
+    return faced(st, window.CastleStoneFace && CastleStoneFace.kind(row.dress), tone(st + '/' + row.dress, st), true);
   }
-  function floorMat(row, sx, sy, two) { var st = stoneAt(row, sx, sy); return paintMat(row.floor === 'boards' ? tone('oak-boards') : row.floor === 'marble' ? tone('marble') : tone('flags-' + st, st, 0.86), two); }
+  function floorMat(row, sx, sy, two) {
+    var st = stoneAt(row, sx, sy);
+    if (row.floor === 'boards' || row.floor === 'marble') return paintMat(tone(row.floor === 'boards' ? 'oak-boards' : 'marble'), two);
+    return faced(st, 'flags', tone('flags-' + st, st, 0.86), two);
+  }
+  /* v53 (req 858, Design's stone-face.js on Godric's 1 on design-bright-rooms-1021): a stone the kit faces (late-pale
+     first) is laid with its courses, rubble, limewash or flags, mapped in world space; its own material, cached apart
+     from the flat paint so a tone shared by hex with an unfaced stone stays flat */
+  function faced(st, kind, hex, two) {
+    var CSF = window.CastleStoneFace;
+    if (!CSF || !kind || !CSF.FACED[st]) return paintMat(hex, two);
+    var k = hex + (two ? 'd' : '') + 'f' + kind;
+    if (!paintMats[k]) { paintMats[k] = F.solid(hex); if (two) paintMats[k].side = THREE.DoubleSide; CSF.dress(THREE, paintMats[k], kind); }
+    return paintMats[k];
+  }
   function ceilMat(row, sx, sy) {
     var c = row.ceiling, st = stoneAt(row, sx, sy);
     if (row.ctone === 'black') return paintMat(0x0b0a09, true);   /* v43: a ceiling painted dead black (the camera obscura's hip, W5B-36) */
