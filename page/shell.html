@@ -154,15 +154,16 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=430"></script>
-<script src="castle-paint.js?v=29"></script>
+<script src="castle-model.js?v=431"></script>
+<script src="castle-paint.js?v=30"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=49"></script>
+<script src="castle-shell.js?v=50"></script>
 <script src="shell-w5b.js?v=13"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
+<script src="design/carving.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
 <script src="design/house-hourglass.js?v=1"></script>
 <script>
@@ -244,6 +245,8 @@ var W5B = window.SHELL_W5B || {};
 PAINTED = PAINTED.concat(['drum-bend-5-west', 'drum-bend-5', 'drum-bend-5-east', 'drum-bend-6-west', 'drum-bend-6', 'drum-bend-6-east', 'lake-corridor-6-middle', 'lake-corridor-6-turn']);
 /* v97, W5B-39 and -40 (Godric's 1 on architect-w5b-voids-1020, 8.44 pm): the bend's four pockets, the lavatories on 6, the ink room and lamp store on 5 */
 PAINTED = PAINTED.concat(['gryffindor-lav-witches-6', 'gryffindor-lav-wizards-6', 'ink-room', 'lamp-store-5']);
+/* v103, the cores' landings' ways off (Godric's 1s on architect-landings-b3-1021 and -b1-1021, 21 October 2026) */
+PAINTED = PAINTED.concat(['charms-landing-passage-3', 'mcgonagall-landing-passage-1']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }

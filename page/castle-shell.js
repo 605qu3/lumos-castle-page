@@ -241,8 +241,15 @@ function alongEdge(E, i, p) {
 }
 
 /* each panelled room's grade on Design's ladder (CastlePanelling.GRADES, 0 plain to 3 rich), one line a room when Godric
-   grades them (design-panelling-grades-1021); a room not named takes grade 2, his 1 on design-panelling-staff-1021 */
-var PANEL_GRADE = {};
+   grades them (design-panelling-grades-1021); a room not named takes grade 2, his 1 on design-panelling-staff-1021.
+   Graded by rank, his 1 on design-panelling-grades-1021 (21 October 2026, 7.10 am; Design's req 844): the teachers'
+   offices 1, the staff room 2, the library and the Headmaster's study 3; the study 1 provisional, Godric to confirm */
+var PANEL_GRADE = {
+  'snape-office': 1, 'mcgonagalls-office': 1, 'pomfrey-office': 1, 'defence-office': 1,
+  'muggle-studies-study': 1, 'pince-office': 1, 'study': 1,
+  'staff-room': 2,
+  'library': 3, 'library-reading-room': 3, 'library-map-room': 3, 'dumbledores-office': 3
+};
 
 window.CastleShell = { build: function (F, M, placeId, o) {
   o = o || {};
