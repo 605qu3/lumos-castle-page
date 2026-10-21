@@ -8,16 +8,19 @@ window.CASTLE_TONES = {
    "say": "P1 and P2: dark olive-grey, the darkest and roughest"
   },
   "houses-sandstone": {
-   "hex": "#c4aa82",
-   "say": "P3: sand"
+   "hex": "#726551",
+   "say": "P3: sand",
+   "schedule": "#c4aa82"
   },
   "high-grey": {
-   "hex": "#a7aeb2",
-   "say": "P4: cool grey"
+   "hex": "#646769",
+   "say": "P4: cool grey",
+   "schedule": "#a7aeb2"
   },
   "tudor-pink": {
-   "hex": "#c49a87",
-   "say": "P5: warm pinkish"
+   "hex": "#766157",
+   "say": "P5: warm pinkish",
+   "schedule": "#c49a87"
   },
   "late-pale": {
    "hex": "#dcd2b0",
@@ -104,29 +107,72 @@ window.CASTLE_TONES = {
   "flags-founders-rubble": "#575549",
   "flags-founders-rubble/worn": "#59564b",
   "vault-founders-rubble": "#5a574c",
-  "houses-sandstone/rubble": "#b9a07b",
-  "houses-sandstone/coursed": "#c4aa82",
-  "houses-sandstone/ashlar": "#c8ae85",
-  "flags-houses-sandstone": "#b79f79",
-  "flags-houses-sandstone/worn": "#baa27b",
-  "vault-houses-sandstone": "#bda47d",
-  "high-grey/rubble": "#9ea4a8",
-  "high-grey/coursed": "#a7aeb2",
-  "high-grey/ashlar": "#abb2b6",
-  "flags-high-grey": "#9ca3a6",
-  "flags-high-grey/worn": "#9fa5a9",
-  "vault-high-grey": "#a1a8ab",
-  "tudor-pink/rubble": "#b9917f",
-  "tudor-pink/coursed": "#c49a87",
-  "tudor-pink/ashlar": "#c89d8a",
-  "flags-tudor-pink": "#b7907e",
-  "flags-tudor-pink/worn": "#ba9280",
-  "vault-tudor-pink": "#bd9482",
+  "founders-rubble/rubble/below": "#4a483e",
+  "founders-rubble/coursed/below": "#4f4d42",
+  "founders-rubble/ashlar/below": "#514f44",
+  "flags-founders-rubble/below": "#49473d",
+  "flags-founders-rubble/worn/below": "#4b493e",
+  "vault-founders-rubble/below": "#4c4a3f",
+  "houses-sandstone/rubble": "#6b5f4c",
+  "houses-sandstone/coursed": "#726551",
+  "houses-sandstone/ashlar": "#756753",
+  "flags-houses-sandstone": "#6a5e4b",
+  "flags-houses-sandstone/worn": "#6c604d",
+  "vault-houses-sandstone": "#6e614e",
+  "houses-sandstone/rubble/below": "#5c5241",
+  "houses-sandstone/coursed/below": "#625745",
+  "houses-sandstone/ashlar/below": "#645947",
+  "flags-houses-sandstone/below": "#5b5140",
+  "flags-houses-sandstone/worn/below": "#5d5241",
+  "vault-houses-sandstone/below": "#5e5442",
+  "high-grey/rubble": "#5e6163",
+  "high-grey/coursed": "#646769",
+  "high-grey/ashlar": "#66696b",
+  "flags-high-grey": "#5d6062",
+  "flags-high-grey/worn": "#5f6264",
+  "vault-high-grey": "#606365",
+  "high-grey/rubble/below": "#515355",
+  "high-grey/coursed/below": "#56585a",
+  "high-grey/ashlar/below": "#585a5c",
+  "flags-high-grey/below": "#505254",
+  "flags-high-grey/worn/below": "#515355",
+  "vault-high-grey/below": "#535556",
+  "tudor-pink/rubble": "#6f5b52",
+  "tudor-pink/coursed": "#766157",
+  "tudor-pink/ashlar": "#796359",
+  "flags-tudor-pink": "#6e5a51",
+  "flags-tudor-pink/worn": "#705c52",
+  "vault-tudor-pink": "#715d54",
+  "tudor-pink/rubble/below": "#5f4e45",
+  "tudor-pink/coursed/below": "#65534a",
+  "tudor-pink/ashlar/below": "#67554c",
+  "flags-tudor-pink/below": "#5e4d45",
+  "flags-tudor-pink/worn/below": "#604f46",
+  "vault-tudor-pink/below": "#615047",
   "late-pale/rubble": "#d0c6a6",
   "late-pale/coursed": "#dcd2b0",
   "late-pale/ashlar": "#e1d7b4",
   "flags-late-pale": "#cec4a4",
   "flags-late-pale/worn": "#d1c8a7",
-  "vault-late-pale": "#d4caaa"
+  "vault-late-pale": "#d4caaa",
+  "late-pale/rubble/below": "#bfb69a",
+  "late-pale/coursed/below": "#cac1a3",
+  "late-pale/ashlar/below": "#cec5a7",
+  "flags-late-pale/below": "#bdb498",
+  "flags-late-pale/worn/below": "#c0b89b",
+  "vault-late-pale/below": "#c3ba9d"
+ },
+ "toward": {
+  "stones": [
+   "houses-sandstone",
+   "high-grey",
+   "tudor-pink"
+  ],
+  "kept": 0.15,
+  "chroma": 0.55,
+  "below": {
+   "L": -6.0,
+   "chroma": 0.9
+  }
  }
 };
