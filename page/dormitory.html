@@ -609,7 +609,7 @@ wellTap.rotation.x = -Math.PI / 2; wellTap.position.y = 0.01; wellTap.visible = 
    stands across the kerb's gap on the chord, jambs either side and a lintel over, its panels toward the room and the
    year's sign on its stair side (CoS 5). The door is hung on the jamb away from the bed at 53 and swings into the
    room, as the plan's arc draws it; it is shut at rest, opens at the top of the climb and on the way down. */
-var SCREEN = { r: WELL_R + 0.12, h: 2.15, door: 0.8, doorH: 2.0, OPEN: 1.75 };   /* ledger line 5; OPEN about 100 degrees */
+var SCREEN = { r: WELL_R + 0.12, h: CEIL + 0.02, door: 0.8, doorH: 2.0, OPEN: 1.75 };   /* ledger lines 5 and 153: up to the ceiling, bearing 2 cm into it; OPEN about 100 degrees */
 function panelTex() {
   var c = document.createElement('canvas'); c.width = 128; c.height = 256;
   var g = c.getContext('2d');
@@ -631,12 +631,10 @@ var screenParts = [];
     if (Math.hypot(p.x, p.z) < WALL_R + 0.04) { if (!run) runs.push(run = [th, th]); else run[1] = th; } else run = null;
   }
   runs.forEach(function (r, i) {
-    var len = r[1] - r[0], tex = screenMat.map.clone(); tex.needsUpdate = true; tex.repeat.x = len * SCREEN.r / 0.55;
+    var len = r[1] - r[0], tex = screenMat.map.clone(); tex.needsUpdate = true; tex.repeat.x = len * SCREEN.r / 0.55; tex.repeat.y = SCREEN.h / 2.15;
     var m = new THREE.Mesh(new THREE.CylinderGeometry(SCREEN.r, SCREEN.r, SCREEN.h, 24, 1, true, r[0], len),
       solid(0xffffff, { map: tex, side: THREE.DoubleSide }));
     m.position.y = SCREEN.h / 2; m.name = 'screen-' + i; well.add(m); register(m, 1); screenParts.push(m);
-    var cap = new THREE.Mesh(new THREE.CylinderGeometry(SCREEN.r + 0.03, SCREEN.r + 0.03, 0.05, 24, 1, false, r[0], len), screenWood);
-    cap.position.y = SCREEN.h + 0.02; cap.name = 'screen-cap'; well.add(cap); register(cap, 1); screenParts.push(cap);
   });
 })();
 var doorFrame = new THREE.Group();   /* on the chord, local +z into the room, +x along the chord away from the bed at 53 */
@@ -647,11 +645,14 @@ doorFrame.rotation.y = Math.atan2(inward.x, inward.z); well.add(doorFrame);
   var side = (CHORD - SCREEN.door) / 2;
   [-1, 1].forEach(function (s) {
     var j = box(doorFrame, side, SCREEN.h, 0.08, s * (SCREEN.door / 2 + side / 2), SCREEN.h / 2, 0, screenMat.clone(), 1);
-    j.material.map = screenMat.map.clone(); j.material.map.repeat.x = side / 0.55; j.material.map.needsUpdate = true;
+    j.material.map = screenMat.map.clone(); j.material.map.repeat.set(side / 0.55, SCREEN.h / 2.15); j.material.map.needsUpdate = true;
     j.name = 'jamb'; screenParts.push(j);
   });
-  var lin = box(doorFrame, SCREEN.door, SCREEN.h - SCREEN.doorH, 0.08, 0, SCREEN.doorH + (SCREEN.h - SCREEN.doorH) / 2, 0, screenWood, 1);
+  var lin = box(doorFrame, SCREEN.door, 0.15, 0.08, 0, SCREEN.doorH + 0.075, 0, screenWood, 1);
   lin.name = 'lintel'; screenParts.push(lin);
+  var over = SCREEN.h - SCREEN.doorH - 0.15, ov = box(doorFrame, SCREEN.door, over, 0.08, 0, SCREEN.h - over / 2, 0, screenMat.clone(), 1);   /* the panelling over the door, up to the ceiling */
+  ov.material.map = screenMat.map.clone(); ov.material.map.repeat.set(SCREEN.door / 0.55, over / 2.15); ov.material.map.needsUpdate = true;
+  ov.name = 'over-door'; screenParts.push(ov);
 })();
 var doorHinge = new THREE.Group(); doorHinge.position.set(SCREEN.door / 2, 0, 0); doorFrame.add(doorHinge);
 var doorLeaf = box(doorHinge, SCREEN.door, SCREEN.doorH, 0.05, -SCREEN.door / 2, SCREEN.doorH / 2, 0, solid(0x5a3f2c), 1);
@@ -663,7 +664,7 @@ doorLeaf.name = 'door'; screenParts.push(doorLeaf);
   var kn = new THREE.Mesh(new THREE.SphereGeometry(0.03, 10, 8), solid(0x8a7448)); kn.position.set(-SCREEN.door + 0.08, 1.0, z);
   kn.name = 'door'; doorHinge.add(kn); register(kn, 1);
 });
-/* the room's firelight falling over the screen's top onto the last turn of the stair, so the climb is dim, not black,
+/* the room's firelight at the stair head, on the last turn of the stair inside the screen, so the climb is dim, not black,
    and the sign is read on the way up; it follows the fire and lights out (per frame) */
 var stairSpill = new THREE.PointLight(col(0xff9a3c), 1.2, 3.2, 1.2);
 stairSpill.position.set(0, 1.9, 0); well.add(stairSpill);
