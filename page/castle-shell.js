@@ -634,6 +634,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var pe = E[(i + E.length - 1) % E.length], pL = Math.hypot(pe.b[0] - pe.a[0], pe.b[1] - pe.a[1]);
       var pi = (i + E.length - 1) % E.length, pEnd = !(gaps[pi] || []).some(function (g) { return g.s1 >= pL - 0.01; });
       if (ext0 && pL >= 1e-6 && pEnd && (pe.H != null ? pe.H : H) >= HE && !(Q.sky && Q.sky.sides)) ext0 = 0;
+      /* v44 (the sixtieth, the near-faces sweep): where an opening runs to this wall's far end, the next wall keeps its near
+         corner (above), so this wall's head and sill there stop at the corner, not drawing it twice (the fifth-floor
+         corridor's head over the bend's east mouth lay on the wall's end, 2.08 m2, seen from the stair over it) */
+      var ne = E[(i + 1) % E.length], nHE = ne.H != null ? ne.H : H;
+      if (ext1 && (gaps[i] || []).some(function (g) { return g.s1 >= L - 0.01; }) && nHE >= HE && !(Q.sky && Q.sky.sides)) ext1 = 0;
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
@@ -692,7 +697,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         if (!col) {
           piece(at, g.s0, 0, HE, Q.id + '-wall-' + i + '-' + j);
           piece(g.s0, g.s1, g.soffit ? g.h + 0.05 : g.h, HE, Q.id + '-head-' + g.op.id);   /* v39: over a soffit it bears 5 cm into it, never flush */
-          piece(g.s0, g.s1, 0, g.sill, Q.id + '-sill-' + g.op.id);
+          /* v44: under a door's threshold the sill stops 5 mm short of it, hidden, so a floor or platform bearing into the
+             wall at the sill's height (the Great Hall's dais at the hall chamber's door, req 833) shares no plane with it */
+          piece(g.s0, g.s1, 0, g.sill > 0.02 && isDoor(g.op.kind) && !g.back ? g.sill - 0.005 : g.sill, Q.id + '-sill-' + g.op.id);
         }
         at = g.s1;
         if (g.spill) return;                                            /* v15: the rest of an opening cut over a corner */
@@ -741,9 +748,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
         var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;
         if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
-          var leaf = slab(w - 0.08, hh - 0.02, 0.12, mats.door, 'door');
+          var leaf = slab(w - 0.08, hh - 0.04, 0.12, mats.door, 'door');   /* v44: on its threshold (0.02), its foot not the threshold's */
           var lo = g.far ? g.far - 0.1 : t * 0.5;                        /* a passage's leaves hang at its far face */
-          leaf.position.set(mid.x + nx * lo, mid.y + g.sill + (hh - 0.02) / 2, mid.z - ny * lo);
+          leaf.position.set(mid.x + nx * lo, mid.y + g.sill + 0.02 + (hh - 0.04) / 2, mid.z - ny * lo);
           leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
           /* its threshold through the wall (v4, req 284): the floor under a leaf that swings, else the void shows */
           var sl = slab(w, 0.02, t, mats.floor, 'floor'), sp = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
