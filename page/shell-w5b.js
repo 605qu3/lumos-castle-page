@@ -417,7 +417,8 @@ var W5B_THINGS = {
     ['b', 113.9, 67.34, -0.015, 114.6, 67.74, 0.3, 'wood'], ['b', 113.9, 67.78, -0.015, 114.6, 68.18, 0.3, 'wood'], ['b', 113.9, 68.22, -0.015, 114.6, 68.62, 0.3, 'wood'],
     ['b', 113.9, 68.66, -0.015, 114.6, 69.06, 0.3, 'wood'], ['b', 113.9, 69.1, -0.015, 114.6, 69.5, 0.08, 'wood'], ['b', 113.95, 69.15, 0.065, 114.55, 69.45, 0.1, 'iron'],
     ['b', 113.9, 69.8, -0.015, 114.6, 70.6, 0.4, 'wicker'], ['b', 113.96, 69.86, 0.36, 114.54, 70.54, 0.42, 'iron'], ['b', 113.9, 70.8, -0.015, 114.6, 71.5, 0.3, 'wood'],
-    ['y', 113, 65, 0.08, 2.6, 3, 'iron'], ['b', 112.99, 64.99, 2.985, 113.01, 65.01, 3.82, 'iron']] },
+    ['y', 113, 65, 0.08, 2.6, 3, 'iron'], ['b', 112.99, 64.99, 2.985, 113.01, 65.01, 3.82, 'iron'],
+    ['sl', 111.3, 0.7, 113.0, 3.8, 60, 72.6, 0.12, 'pine'], ['sl', 114.7, 0.7, 113.0, 3.8, 60, 72.6, 0.12, 'pine']] },   /* W5B-29 drawn here: the roof's two boarded slopes from the knee walls' tops to the ridge, 3.8 clear (the shell's flat ceiling at 9 left above them) */
   /* hidden-ways-batch-7.md, H39: the round stone seat (the model's watch-seat, drawn nowhere else), the nine men's morris board on it at bearing 135 (three squares and the cross lines), the men at 115, the scratched tally, ship and sun by the south-west slit */
   'watch-bartizan': { c: [66.4, -2.4], items: [
     ['a', 90, 360, 0.95, 1.42, 0, 0.45, 'stone'], ['p', 135, 1.18, 0.4, 0.4, 0.4, 0.456, 'slate'], ['p', 135, 1.18, 0.37, 0.37, 0.406, 0.462, 'stone'],
@@ -659,6 +660,16 @@ window.SHELL_W5B.build = function (ctx) {
     hs.forEach(function (h) { arc(b0, b1, r0, r1, h - 0.03, h, m); });
     for (var i = 0; i <= n; i++) { var b = b0 + (b1 - b0) * i / n + (i === 0 ? 0.3 : i === n ? -0.3 : 0); pbox(b, rm, 0.03, r1 - r0 - 0.02, -0.01, top - 0.03, m); }
   }
+  function slope(xa, za, xb, zb, y0, y1, t, m) {   /* W5B-29: a roof slab, its underside the line (xa, za) to (xb, zb) across x, run along y, t thick above; each face wound outward */
+    var P = [[xa, y0, za], [xb, y0, zb], [xb, y1, zb], [xa, y1, za], [xa, y0, za + t], [xb, y0, zb + t], [xb, y1, zb + t], [xa, y1, za + t]].map(function (p) { return L(p[0], p[1], p[2]); });
+    var mid = P.reduce(function (s, p) { return s.add(p.clone().multiplyScalar(1 / 8)); }, new THREE.Vector3()), pos = [];
+    [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [3, 2, 6, 7], [0, 3, 7, 4], [1, 2, 6, 5]].forEach(function (q) {
+      var A = P[q[0]], B = P[q[1]], Cc = P[q[2]], D = P[q[3]], n = B.clone().sub(A).cross(Cc.clone().sub(A));
+      if (n.dot(A.clone().add(Cc).multiplyScalar(0.5).sub(mid)) < 0) { var s = B; B = D; D = s; }
+      [A, B, Cc, A, Cc, D].forEach(function (v) { pos.push(v.x, v.y, v.z); });
+    });
+    var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.computeVertexNormals(); put(geo, m);
+  }
   var BOOKS = ['PS', 'CoS', 'PoA', 'GoF', 'OotP', 'HBP', 'DH'], bk = BOOKS.indexOf(ctx.BOOK);
   R.items.forEach(function (t) {
     var last = t[t.length - 1], gate = last && typeof last === 'object' && !Array.isArray(last) ? last : null;
@@ -666,7 +677,7 @@ window.SHELL_W5B.build = function (ctx) {
     var k = t[0], a = t.slice(1, gate ? -1 : undefined);
     if (k === 'b') box.apply(null, a); else if (k === 'y') cyl.apply(null, a); else if (k === 'a') arc.apply(null, a);
     else if (k === 'p') pbox.apply(null, a); else if (k === 't') table.apply(null, a); else if (k === 's') shelves.apply(null, a);
-    else if (k === 'as') arcShelves.apply(null, a);
+    else if (k === 'as') arcShelves.apply(null, a); else if (k === 'sl') slope.apply(null, a);
   });
   Object.keys(byMat).forEach(function (m) {   /* one mesh a material, as the lead's merge */
     var pos = [], nor = [];
