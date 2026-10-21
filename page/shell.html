@@ -154,12 +154,12 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=421"></script>
-<script src="castle-paint.js?v=21"></script>
+<script src="castle-model.js?v=422"></script>
+<script src="castle-paint.js?v=22"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=4"></script>
-<script src="castle-shell.js?v=42"></script>
-<script src="shell-w5b.js?v=9"></script>
+<script src="castle-shell.js?v=43"></script>
+<script src="shell-w5b.js?v=11"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -239,6 +239,8 @@ var PAINTED = ['entrance-hall', 'stair-hall', 'great-hall',
 /* W5B (wave 5, the split, docs/handoff/architect.md): page/shell-w5b.js is the second Architect's alone, its floors'
    painted places, starts and things; this file reads it and is the lead's */
 var W5B = window.SHELL_W5B || {};
+/* v95, W5B-37 and -38 (the bend round the Gryffindor drum on 5 and 6, provisional): the lead's, since the model is */
+PAINTED = PAINTED.concat(['drum-bend-5-west', 'drum-bend-5', 'drum-bend-5-east', 'drum-bend-6-west', 'drum-bend-6', 'drum-bend-6-east', 'lake-corridor-6-middle', 'lake-corridor-6-turn']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }

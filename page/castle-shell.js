@@ -332,6 +332,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function floorMat(row, sx, sy, two) { var st = stoneAt(row, sx, sy); return paintMat(row.floor === 'boards' ? tone('oak-boards') : row.floor === 'marble' ? tone('marble') : tone('flags-' + st, st, 0.86), two); }
   function ceilMat(row, sx, sy) {
     var c = row.ceiling, st = stoneAt(row, sx, sy);
+    if (row.ctone === 'black') return paintMat(0x0b0a09, true);   /* v43: a ceiling painted dead black (the camera obscura's hip, W5B-36) */
     if (c === 'sky') return paintMat(tone('sky-day'), true);
     if (c === 'beams' || c === 'open-roof') return paintMat(tone('oak-beams'), true);
     if (c === 'plaster') return paintMat(tone('plaster'), true);
