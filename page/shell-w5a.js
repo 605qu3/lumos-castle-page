@@ -832,3 +832,94 @@ window.SHELL_W5A = {
       ['b', 87.485, 41.83, 0.301, 87.615, 41.87, 0.318, 'iron']] }
   }
 };
+
+/* docs/interiors/hidden-ways-batch-10.md, *H66* and *H68* (req 894, Interiors' ledger 207, for Hidden Ways' req 891 on
+   Godric's 1s): marks too many to list, so drawn here in the builder's own items from a fixed hash (the same every load).
+   A mark is a thin dark stroke standing 6 mm off the face it is cut in (past the seams rule's 4 mm), bearing 2.4 cm into
+   it; a card 1.3 cm off, its stamp 2 cm; no stroke longer than 0.1 on the round wall, so none leaves its face. */
+(function (T, MT) {
+  MT.cut = 0x2a2018; MT.tallow = 0xcfc2a0; MT.ink = 0x5a4038;
+  function h(n) { var s = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return s - Math.floor(s); }
+  /* the tally room: round, 24 sides about (20.0, -1.4), each side's middle at r 1.6 on a bearing that is a multiple of 15 */
+  var R = 1.6, tally = [], seed = 1;
+  function face(b) { var d = b - 15 * Math.round(b / 15); return R / Math.cos(d * Math.PI / 180); }
+  function mark(b, off, len, z0, z1, m) {   /* off metres along the wall from bearing b, len along it, z0 to z1 */
+    var n = Math.max(1, Math.ceil(len / 0.1)), l = len / n;
+    for (var i = 0; i < n; i++) {
+      var bb = b + (off + l * (i + 0.5) - len / 2) / R * 180 / Math.PI, lift = m === 'paper' ? 0.013 : m === 'ink' ? 0.02 : 0.006;
+      tally.push(['p', +bb.toFixed(3), +(face(bb) - lift + 0.015).toFixed(4), +l.toFixed(4), 0.03, +z0.toFixed(3), +z1.toFixed(3), m]);
+    }
+  }
+  function group(b, z, big, miscount) {   /* four strokes and one across; a child's bigger, once miscounted and mended */
+    var sp = big ? 0.03 : 0.015, ht = big ? 0.1 : 0.06, w = big ? 0.006 : 0.004, k = miscount ? 5 : 4;
+    for (var i = 0; i < k; i++) { var j = (h(seed++) - 0.5) * (big ? 0.02 : 0.008); mark(b, i * sp, w, z + j, z + ht + j, 'cut'); }
+    var lx = (k - 1) * sp + (big ? 0.04 : 0.02), zm = z + ht * (0.4 + h(seed++) * 0.2);
+    mark(b, (k - 1) * sp / 2, lx, zm, zm + w, 'cut');
+    if (miscount) mark(b, (k - 1) * sp / 2, lx + 0.02, z + ht * 0.8, z + ht * 0.8 + w, 'cut');
+  }
+  function field(b0, b1, za, zb, dense) {   /* tallies between the stiles (every 0.42, as the panelling's module), notches down them */
+    var L = (b1 - b0) * Math.PI / 180 * R, cols = [], u;
+    for (u = 0.05; u + 0.09 < L; u += 0.105) { var sm = (u + 0.04) % 0.42; if (sm < 0.06 || sm > 0.38) continue; cols.push(u); }
+    cols.forEach(function (u) {
+      for (var z = za; z + 0.06 <= zb; z += 0.1) {
+        var p = dense && z >= 1.0 && z <= 1.6 ? 0.9 : 0.5;
+        if (z >= 0.6 && z <= 0.8 && b0 + u / R * 180 / Math.PI > 258 && b0 + u / R * 180 / Math.PI < 292) continue;   /* the child's row's own */
+        if (h(seed++) < p) group(b0 + (u + (h(seed++) - 0.5) * 0.024) / R * 180 / Math.PI, z + (h(seed++) - 0.5) * 0.02, false, false);
+      }
+    });
+    for (u = 0.42; u < L - 0.02; u += 0.42) {   /* notches, short V cuts in runs down a stile */
+      var bs = b0 + u / R * 180 / Math.PI, top = za + 0.4 + h(seed++) * (zb - za - 0.4), run = 0.3 + h(seed++) * 0.6;
+      for (var z2 = top; z2 > top - run && z2 > za; z2 -= 0.03) mark(bs, 0, 0.02, z2, z2 + 0.004, 'cut');
+    }
+    return L;
+  }
+  field(20, 121, 0.3, 2.0, true); field(239, 340, 0.3, 2.0, true);
+  field(149, 166, 0.3, 2.0, false); field(194, 211, 0.3, 2.0, false);
+  [126, 171, 216].forEach(function (b) { field(b, b + 18, 0.3, 0.75, false); });   /* under each light's sill */
+  [[40, 1.2], [70, 1.42], [100, 1.3], [255, 1.12], [300, 1.48], [320, 1.25]].forEach(function (c) {   /* rows crossed out, begun again beside */
+    mark(c[0], 0, 0.4 + h(seed++) * 0.5, c[1] + 0.03, c[1] + 0.034, 'cut');
+  });
+  for (var b = 262, n = 0; b < 288; b += 0.17 / R * 180 / Math.PI, n++) group(b, 0.65 + (h(seed++) - 0.5) * 0.06, true, n === 2);
+  for (var i = 0; i < 12; i++) {   /* the stamped cards in the east field, a worn round stamp on each */
+    var bc = 24 + h(seed++) * 92, zc = 1.2 + h(seed++) * 0.52;
+    mark(bc, 0, 0.05, zc, zc + 0.08, 'paper'); mark(bc, 0.004, 0.025, zc + 0.03, zc + 0.055, 'ink');
+  }
+  T['tally-room'] = { c: [20.0, -1.4], items: tally };
+
+  /* the strong room: x 16.6 to 21.6, y 9.5 to 14.0; the panel at x 18.7 to 19.5 in the north wall */
+  var st = [
+    ['b', 18.71, 13.2, 0.01, 18.81, 13.99, 1.9, 'oak'],                                     /* the panel's back, open square */
+    ['b', 18.67, 13.26, 0.28, 18.715, 13.56, 0.32, 'iron'], ['b', 18.67, 13.26, 0.93, 18.715, 13.56, 0.97, 'iron'],
+    ['b', 18.67, 13.26, 1.58, 18.715, 13.56, 1.62, 'iron'],                                  /* three on its edge, drawn back */
+    ['b', 18.67, 13.43, 1.5, 18.715, 13.47, 1.85, 'iron'], ['b', 18.67, 13.73, 1.5, 18.715, 13.77, 1.85, 'iron'],
+    ['b', 18.67, 13.43, 0.06, 18.715, 13.47, 0.36, 'iron'], ['b', 18.67, 13.73, 0.06, 18.715, 13.77, 0.36, 'iron'],
+    ['b', 16.58, 9.48, -0.01, 17.0, 14.02, 0.45, 'stone'], ['b', 17.0, 9.48, -0.01, 21.62, 9.9, 0.45, 'stone'],   /* the bench */
+    ['b', 21.2, 9.9, -0.01, 21.62, 12.95, 0.45, 'stone'], ['b', 17.0, 13.6, -0.01, 18.3, 14.02, 0.45, 'stone'],
+    ['b', 19.9, 13.6, -0.01, 20.8, 14.02, 0.45, 'stone'],
+    ['b', 21.0, 13.45, -0.01, 21.5, 13.53, 0.1, 'oak'], ['b', 21.0, 13.67, -0.01, 21.5, 13.75, 0.1, 'oak'],          /* the cask */
+    ['y', 21.25, 13.6, 0.275, 0.1, 0.85, 'wood'], ['y', 21.25, 13.6, 0.282, 0.16, 0.19, 'iron'],
+    ['y', 21.25, 13.6, 0.282, 0.46, 0.49, 'iron'], ['y', 21.25, 13.6, 0.282, 0.76, 0.79, 'iron'],
+    ['y', 21.25, 13.6, 0.25, 0.845, 0.87, 'dark'], ['b', 21.0, 13.585, 0.87, 21.45, 13.615, 0.89, 'wood'],
+    ['y', 21.38, 13.6, 0.045, 0.869, 0.92, 'wood'],
+    ['b', 16.58, 11.0, 1.5, 16.82, 12.4, 1.58, 'stone'],                                     /* the shelf on its corbels */
+    ['b', 16.58, 11.15, 1.3, 16.78, 11.3, 1.505, 'stone'], ['b', 16.58, 12.1, 1.3, 16.78, 12.25, 1.505, 'stone'],
+    ['b', 16.815, 11.6, 1.53, 16.826, 11.64, 1.58, 'tallow'], ['b', 16.815, 12.02, 1.55, 16.826, 12.05, 1.58, 'tallow']
+  ];
+  for (i = 0; i < 13; i++) {   /* the candle ends standing in their drips; two more fallen */
+    var cy = 11.06 + i * 0.1 + (h(seed++) - 0.5) * 0.04, cx = 16.68 + h(seed++) * 0.09, r = 0.01 + h(seed++) * 0.005;
+    st.push(['y', +cx.toFixed(3), +cy.toFixed(3), 0.022, 1.579, 1.584, 'tallow'], ['y', +cx.toFixed(3), +cy.toFixed(3), +r.toFixed(4), 1.579, +(1.6 + h(seed++) * 0.06).toFixed(3), 'tallow']);
+  }
+  st.push(['b', 16.7, 11.52, 1.579, 16.75, 11.54, 1.6, 'tallow'], ['b', 16.72, 12.27, 1.579, 16.74, 12.33, 1.598, 'tallow']);
+  function name(x, z, k) {   /* invented, in old hands: each letter two or three strokes, 0.04 high, cut in the north wall */
+    for (var j = 0; j < k; j++) {
+      var lx = x + j * 0.037, sl = (h(seed++) - 0.5) * 0.01, shapes = [[0, 0, 0.004, 0.04], [0.021, 0, 0.025, 0.04], [0, 0.036, 0.025, 0.04], [0, 0.018, 0.025, 0.022], [0, 0, 0.025, 0.004]];
+      for (var q = 0, used = 0; q < 5 && used < 3; q++) if (q === 0 || h(seed++) < 0.45) {
+        var s = shapes[q]; used++;
+        st.push(['b', +(lx + s[0]).toFixed(3), 13.994, +(z + s[1] + sl).toFixed(3), +(lx + s[2]).toFixed(3), 14.02, +(z + s[3] + sl).toFixed(3), 'cut']);
+      }
+    }
+  }
+  [[17.62, 1.6, 6], [17.7, 1.42, 8], [17.66, 1.25, 5], [17.9, 1.05, 7], [19.74, 1.62, 7], [19.8, 1.4, 5], [19.72, 1.2, 8], [19.95, 1.02, 6]]
+    .forEach(function (n) { name(n[0], n[1], n[2]); });
+  T['strong-room'] = { items: st };
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);
