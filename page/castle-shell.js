@@ -362,6 +362,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (c === 'sky') return paintMat(tone('sky-day'), true);
     if (c === 'beams' || c === 'open-roof') return paintMat(tone('oak-beams'), true);
     if (c === 'plaster') return paintMat(tone('plaster'), true);
+    if (c === 'boards') return paintMat(tone('oak-boards'), true);    /* v55: the late rooms' oak boards (design-ceilings-1021, Try 1) */
     return paintMat(tone('vault-' + st, st, 0.92), true);
   }
   function stairMat(id) {
@@ -567,6 +568,28 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           rs.position.set(rp.x, rp.y + (lo + hi + 0.02) / 2, rp.z); rs.name = Q.id + '-head-riser-' + ci; group.add(rs);
         }
         prev = hz;
+      }
+    }
+    /* v55 (Godric's Try 1 on design-ceilings-1021, 11.57 am, 21 October 2026): the late rooms' oak boards on joists, the
+       floor above's; light joists across the short span, no corbels, so a corridor reads boarded, not stacked with beams;
+       a round room (the oriel) close moulded joists, a bead under each, cut to its circle. Each bears 2 cm up into the
+       boards and 2 cm into its walls (the seams rule) */
+    if (row && row.ceiling === 'boards' && Q.ceiling != null && !Q.roof && !HD.length && (Q.round || Q.poly.length === 4)) {
+      var jm = paintMat(tone('oak-beams'), true), JR = !!Q.round, JW = JR ? 0.12 : 0.16, JD = JR ? 0.16 : 0.2, JS = JR ? 0.6 : 1.8;
+      var jx = JR ? Q.round.c[0] : mx, jy = JR ? Q.round.c[1] : my, along = JR || (y1 - y0) <= (x1 - x0);
+      var jlen = JR ? 2 * Q.round.r : along ? y1 - y0 : x1 - x0, jrun = JR ? 2 * Q.round.r : along ? x1 - x0 : y1 - y0;
+      var jn = Math.max(1, Math.round(jrun / JS));
+      for (var jk = 0; jk < jn; jk++) {
+        var jo = -jrun / 2 + (jk + 0.5) * jrun / jn, jl = JR ? 2 * Math.sqrt(Math.max(Q.round.r * Q.round.r - jo * jo, 0)) : jlen;
+        if (jl < 0.3) continue;
+        jl += 0.04;
+        var jpx = along ? jx + jo : jx, jpy = along ? jy : jy + jo, jp = toLocal(jpx, jpy, Q.ceiling + 0.02 - JD / 2);
+        var jb = along ? slab(JW, JD, jl, jm, 'ceiling') : slab(jl, JD, JW, jm, 'ceiling');
+        jb.position.copy(jp); jb.name = Q.id + '-joist-' + jk; jb.userData.owner = Q.id; group.add(jb);
+        if (JR) {
+          var bd_ = along ? slab(0.06, 0.04, jl - 0.08, jm, 'ceiling') : slab(jl - 0.08, 0.04, 0.06, jm, 'ceiling');
+          bd_.position.copy(toLocal(jpx, jpy, Q.ceiling + 0.02 - JD - 0.01)); bd_.name = Q.id + '-joist-bead-' + jk; bd_.userData.owner = Q.id; group.add(bd_);
+        }
       }
     }
     /* v10: the lamplighters' gallery has no ceiling: over its drum the lantern's glass and its cap */

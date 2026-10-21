@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 119,
+  "version": 120,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -222,8 +222,8 @@ window.CASTLE_MODEL = {
         "say": "the roof's own timbers open to the ridge or the cone (the top storeys; the Divination classroom like an attic, PoA 6 L15276)"
       },
       {
-        "id": "plaster",
-        "say": "a flat plaster ceiling with a cornice (P6 and P7 rooms)"
+        "id": "boards",
+        "say": "oak boards on light joists, the floor above's, no corbels; in a round room close moulded joists (P6 and P7 rooms; Godric's Try 1 on design-ceilings-1021, 11.57 am, 21 October 2026, for the plaster ceilings' glare: the lake corridors, the oriel bay, the post and treatment rooms; ledger 178)"
       },
       {
         "id": "dome",
