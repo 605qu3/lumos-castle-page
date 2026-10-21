@@ -652,7 +652,7 @@ var W5B_THINGS = {
     ['s', 44.78, 7.95, 48.62, 8.37, [0.3, 0.8, 1.3, 1.8], 'pine'], ['s', 48.2, 4.98, 48.62, 6.54, [0.3, 0.8, 1.3, 1.8], 'pine'], ['y', 45.4, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 45.9, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 46.4, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 46.9, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 47.4, 8.16, 0.06, 1.295, 1.55, 'brass'], ['y', 47.9, 8.16, 0.06, 1.295, 1.55, 'brass'], ['y', 48.4, 5.4, 0.06, 0.795, 1.05, 'brass'], ['y', 48.4, 5.9, 0.06, 0.795, 1.05, 'brass'], ['b', 45.3, 8.0, 0.295, 46.3, 8.3, 0.5, 'wicker'], ['y', 46.6, 7.3, 0.28, -0.01, 0.75, 'oak']] }
 };
 var W5B_MATS = { wood: 0x5a4c3e, dark: 0x3e342a, oak: 0x6a5a48, pine: 0x8a7456, iron: 0x2e2b28, brass: 0x9a7a3a, plaster: 0xe8e2d4,
-  stone: 0x8c867c, slate: 0x3c4046, cloth: 0x6b3b34, linen: 0xc8c0ae, wicker: 0x9a8460, paper: 0xd9cfb4, books: 0x5b4636,
+  stone: 0x8c867c, slate: 0x3c4046, cloth: 0x6b3b34, linen: 0xc8c0ae, wicker: 0x9a8460, paper: 0xd9cfb4, books: 0x5b4636, books2: 0x6b2e26, books3: 0x2f4636, books4: 0x2e3850, books5: 0x7a6448, books6: 0x4a2a36,
   leather: 0x5a3a28, glass: 0x9fb0b8, green: 0x4c6a3a, soot: 0x141312, pencil: 0x8e877c, rope: 0x8a7a5a, straw: 0xb8a468, brick: 0x6e4434, black: 0x0c0b0b, white: 0xeeeae0,
   gilt: 0xa8873e, ebony: 0x1c1916, canvas: 0x3a2e22, canvasb: 0x2b2924, canvasr: 0x4a3024, canvasl: 0x363a2a, rush: 0x9c8a5c, rushw: 0xb4a272 };
 window.SHELL_W5B.build = function (ctx) {
@@ -664,7 +664,34 @@ window.SHELL_W5B.build = function (ctx) {
   function C(x, y) { return !f ? [x, y] : f[4] ? [f[0] + f[2] * y, f[1] + f[3] * x] : [f[0] + f[2] * x, f[1] + f[3] * y]; }
   function L(x, y, z) { var p = C(x, y); return shell.toLocal(p[0], p[1], z0 + z); }
   function put(geo, m) { (byMat[m] = byMat[m] || []).push(geo); }
+  var bookN = 0, BINDINGS = ['books', 'books', 'books2', 'books3', 'books4', 'books5', 'books6'];
+  function bookRuns(len, H, emit) {   /* a block of books as rows (one under 0.5 high, else rows 0.38 apart, the wood between showing as
+                                          the shelves) of sets in one binding, 0.08 to 0.4 long, their heights varied, 4 mm apart */
+    var n = H > 0.5 ? Math.max(1, Math.round(H / 0.38)) : 1, pitch = H / n;
+    for (var r = 0; r < n; r++) {
+      var p = 0;
+      while (len - p > 0.02) {
+        var k = ++bookN * 7.13, w = Math.min(len - p, 0.08 + hash(k) * 0.32);
+        if (len - p - w < 0.08) w = len - p;
+        var h = n > 1 ? pitch * (0.62 + 0.3 * hash(k + 0.41)) : H * (0.72 + 0.28 * hash(k + 0.41));
+        emit(p, p + w - (len - p - w > 0.001 ? 0.004 : 0), r * pitch, r * pitch + h, BINDINGS[Math.floor(hash(k + 0.67) * 7)]);
+        p += w;
+      }
+    }
+  }
   function box(x0, y0, za, x1, y1, zb, m) {
+    if (m === 'books' && zb - za >= 0.2) {   /* the study's flat books (the ninth's note): standing ones as runs of volumes, not one board; a lying layer stays one */
+      var alongX = Math.abs(x1 - x0) >= Math.abs(y1 - y0), len = alongX ? Math.abs(x1 - x0) : Math.abs(y1 - y0);
+      var sx = x1 > x0 ? 1 : -1, sy = y1 > y0 ? 1 : -1;
+      bookRuns(len, zb - za, function (u0, u1, h0, h1, bm) {
+        if (alongX) boxRaw(x0 + sx * u0, y0, za + h0, x0 + sx * u1, y1, za + h1, bm);
+        else boxRaw(x0, y0 + sy * u0, za + h0, x1, y0 + sy * u1, za + h1, bm);
+      });
+      return;
+    }
+    boxRaw(x0, y0, za, x1, y1, zb, m);
+  }
+  function boxRaw(x0, y0, za, x1, y1, zb, m) {
     var a = L(x0, y0, za), b = L(x1, y1, zb), geo = new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z));
     geo.translate((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); put(geo, m);
   }
@@ -673,7 +700,11 @@ window.SHELL_W5B.build = function (ctx) {
   }
   function polar(b, r) { var a = b * Math.PI / 180; return [c[0] + r * Math.sin(a), c[1] + r * Math.cos(a)]; }
   function pbox(b, r, len, dep, za, zb, m) {   /* a box at bearing b, its long side along the wall */
-    var a = b * Math.PI / 180, geo = new THREE.BoxGeometry(len, zb - za, dep), p = polar(b, r), q = shell.toLocal(p[0], p[1], z0 + (za + zb) / 2);
+    if (m === 'books' && zb - za >= 0.2) { bookRuns(len, zb - za, function (u0, u1, h0, h1, bm) { pboxAt(b, r, u0 + (u1 - u0) / 2 - len / 2, u1 - u0, dep, za + h0, za + h1, bm); }); return; }
+    pboxAt(b, r, 0, len, dep, za, zb, m);
+  }
+  function pboxAt(b, r, off, len, dep, za, zb, m) {   /* as pbox, its middle moved off along the wall (clockwise) */
+    var a = b * Math.PI / 180, geo = new THREE.BoxGeometry(len, zb - za, dep), p = polar(b, r), q = shell.toLocal(p[0] + off * Math.cos(a), p[1] - off * Math.sin(a), z0 + (za + zb) / 2);
     geo.rotateY(Math.atan2(Math.cos(a), Math.sin(a)) + Math.PI / 2); geo.translate(q.x, q.y, q.z); put(geo, m);
   }
   function arc(b0, b1, r0, r1, za, zb, m) {   /* in pieces of 5 degrees or less, each a little long so they close */
