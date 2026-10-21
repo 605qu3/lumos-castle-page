@@ -970,6 +970,69 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       place: P.id, at: [mx, my], half: Math.max(wx, wy) / 2, sill: 0, lift: 0, level: P.floor, back: false, via: false, depth: 0,
       hatch: down ? 'down' : 'up', built: !!findPlace(M, to) });
   });
+  /* v46 (model v100, the cores): a core stair (a stair with `core`, a `rect` and `rooms` on several floors: two flights a
+     storey about a half-landing) in each of its rooms: the flight up from this floor along `up` on its `first` half to the
+     half-landing at the far end, the return flight over the other half cut under the ceiling, that half open in the floor
+     where the flight from below comes up; a way up to its room on the next floor above, a way down to the next below,
+     each stood at beside its foot. A piece on the room's edge bears 2 cm into the wall (the seams rule) */
+  (M.stairs || []).forEach(function (s) {
+    if (!s.core || !s.rect || !s.up || !s.rooms || !s.rooms.some(function (r) { return slug(r) === P.id; })) return;
+    var zOf = function (rid) {
+      var rr = (M.rooms || []).filter(function (x) { return x.id === rid; })[0], lv = rr && (M.levels || []).filter(function (l) { return l.id === rr.level; })[0];
+      return lv ? lv.z + (rr.floor || 0) : null;
+    };
+    var above = null, below = null;
+    s.rooms.forEach(function (rid) {
+      var z = zOf(rid);
+      if (z == null || slug(rid) === P.id) return;
+      if (z > P.floor + 0.05 && (!above || z < above.z)) above = { id: slug(rid), z: z };
+      if (z < P.floor - 0.05 && (!below || z > below.z)) below = { id: slug(rid), z: z };
+    });
+    var R = s.rect, alongX = s.up[0] !== 0, dir = alongX ? Math.sign(s.up[0]) : Math.sign(s.up[1]);
+    var lo = alongX ? R[0] : R[1], hi = alongX ? R[2] : R[3], c0 = alongX ? R[1] : R[0], c1 = alongX ? R[3] : R[2], cm = (c0 + c1) / 2;
+    var firstLow = s.first === 'south' || s.first === 'west', A = firstLow ? [c0, cm] : [cm, c1], B = firstLow ? [cm, c1] : [c0, cm];
+    var n = Math.round((s.treads || 26) / 2), go = s.going || 0.25, rise = s.rise || 0.2, run = n * go, u0 = dir > 0 ? lo : hi;
+    var pxs = P.poly.map(function (p) { return p[0]; }), pys = P.poly.map(function (p) { return p[1]; });
+    var bx0 = Math.min.apply(null, pxs), bx1 = Math.max.apply(null, pxs), by0 = Math.min.apply(null, pys), by1 = Math.max.apply(null, pys);
+    var tmat = (rowOf(P) && stairMat(s.id)) || mats.stair, ceil = P.ceiling == null ? P.floor + 4.5 : P.ceiling;
+    function piece(ua, ub, ca, cb, zb, zt, name) {   /* a box from along ua to ub, across ca to cb, z zb to zt (site) */
+      var x0 = alongX ? Math.min(ua, ub) : ca, x1 = alongX ? Math.max(ua, ub) : cb, y0 = alongX ? ca : Math.min(ua, ub), y1 = alongX ? cb : Math.max(ua, ub);
+      if (Math.abs(x0 - bx0) < 0.005) x0 -= 0.02; if (Math.abs(x1 - bx1) < 0.005) x1 += 0.02;
+      if (Math.abs(y0 - by0) < 0.005) y0 -= 0.02; if (Math.abs(y1 - by1) < 0.005) y1 += 0.02;
+      var b = slab(x1 - x0, zt - zb, y1 - y0, tmat, 'stair'), p = toLocal((x0 + x1) / 2, (y0 + y1) / 2, zb);
+      b.position.set(p.x, p.y + (zt - zb) / 2, p.z); b.name = name; b.userData.stair = s.id; b.userData.owner = P.id; group.add(b);
+      return b;
+    }
+    function site(u, c) { return alongX ? [u, c] : [c, u]; }
+    var inw = alongX ? new THREE.Vector3(-dir, 0, 0) : new THREE.Vector3(0, 0, dir);   /* out of the stair at its foot end */
+    if (above) {
+      for (var i = 0; i < n; i++) piece(u0 + dir * i * go, u0 + dir * (i + 1) * go, A[0], A[1], P.floor, P.floor + rise * (i + 1), s.id + '-up-' + (i + 1));
+      piece(u0 + dir * run, dir > 0 ? hi : lo, c0, c1, P.floor, P.floor + rise * n, s.id + '-half-landing');
+      for (var k = 0; k < n; k++) {
+        var top = P.floor + rise * (n + k + 1);
+        if (top > ceil - 0.05) break;
+        piece(u0 + dir * (run - k * go), u0 + dir * (run - (k + 1) * go), B[0], B[1], top - rise - WAIST, top, s.id + '-return-' + (k + 1));
+      }
+      /* the way up: a plane 2 cm over the first flight's nosings, unseen, so a tap anywhere on the flight takes it */
+      var f0 = site(u0, A[0]), f1 = site(u0, A[1]), g0 = site(u0 + dir * run, A[0]), g1 = site(u0 + dir * run, A[1]), zt0 = P.floor + rise + 0.02, zt1 = P.floor + rise * n + 0.02;
+      var pg = new THREE.BufferGeometry().setFromPoints([toLocal(f0[0], f0[1], zt0), toLocal(f1[0], f1[1], zt0), toLocal(g1[0], g1[1], zt1),
+        toLocal(f0[0], f0[1], zt0), toLocal(g1[0], g1[1], zt1), toLocal(g0[0], g0[1], zt1)]);
+      var upm = new THREE.Mesh(pg, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+      upm.visible = false; upm.name = 'way-' + s.id + '-up'; upm.userData.way = s.id + '-up'; upm.userData.owner = P.id; group.add(upm);
+      var fu = site(u0, (A[0] + A[1]) / 2), fm = toLocal(fu[0], fu[1], P.floor), mu = site(u0 + dir * run / 2, (A[0] + A[1]) / 2), mm = toLocal(mu[0], mu[1], P.floor + rise * n / 2);
+      out.ways.push({ id: s.id + '-up', to: above.id, mesh: upm, w: A[1] - A[0], h: 2.0, mid: mm, foot: fm, inward: inw.clone(), place: P.id, at: fu,
+        half: 0, sill: 0, lift: 0, level: P.floor, back: false, via: false, depth: 0, hatch: 'up', built: !!findPlace(M, above.id) });
+    }
+    if (below) {
+      var w0 = site(u0, B[0]), w1 = site(u0 + dir * run, B[1]), wc = toLocal((w0[0] + w1[0]) / 2, (w0[1] + w1[1]) / 2, P.floor);
+      var wq = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(w1[0] - w0[0]), Math.abs(w1[1] - w0[1])), F.solid(0x141210));
+      wq.rotation.x = -Math.PI / 2; wq.position.copy(wc); wq.position.y = 0.012;
+      wq.name = 'way-' + s.id + '-down'; wq.userData.way = s.id + '-down'; wq.userData.hatch = 'down'; wq.userData.owner = P.id; group.add(wq);
+      var fd = site(u0, (B[0] + B[1]) / 2), fdm = toLocal(fd[0], fd[1], P.floor), wm = wc.clone(); wm.y = 0.012;
+      out.ways.push({ id: s.id + '-down', to: below.id, mesh: wq, w: B[1] - B[0], h: 0.8, mid: wm, foot: fdm, inward: inw.clone(), place: P.id, at: fd,
+        half: 0, sill: 0, lift: 0, level: P.floor, back: false, via: false, depth: 0, hatch: 'down', built: !!findPlace(M, below.id) });
+    }
+  });
   /* v19 (the Found list): a rail round a hatch or a stair's opening in the boards (a feature with `rect`, `z`, `h` and
      `sides`, a side's span by its own name where it stops short: the feast loft's, ledger line 89 a; the drying
      loft's, line 82): a top rail and posts about a metre apart, stair grey; nothing to tap. v24: drawn wherever its room
