@@ -17,18 +17,6 @@ window.SHELL_W5B = {
     /* floors 7 and T, rough; the warming room, its ladder well and the feast loft reached by warming-room-passage (v86), the Room of Requirement on
        req 426 (the blank stretch), S1, the landing and Divination on PoA's North Tower spiral */
     'astronomy-warming-room', 'corridor-cupboard', 'elves-passage-7', 'elves-passage-7-west', 'feast-ladder-well', 'feast-loft',
-    'lost-things', 'room-of-requirement', 'secret-s4a', 'sw-stair-foot-7', 'wind-dial-room', 'sw-stair-foot-6', 'sw-corner-lobby-6',
-    /* floors 7 and T, rough; the warming room, its ladder well and the feast loft reached by warming-room-passage (v86), the Room of Requirement on
-       req 426 (the blank stretch), S1, the landing and Divination on PoA's North Tower spiral */
-    'astronomy-warming-room', 'corridor-cupboard', 'elves-passage-7', 'elves-passage-7-west', 'feast-ladder-well', 'feast-loft',
-    'lost-things', 'room-of-requirement', 'secret-s4a', 'sw-stair-foot-7', 'wind-dial-room', 'sw-stair-foot-6', 'sw-corner-lobby-6',
-    /* floors 7 and T, rough; the warming room, its ladder well and the feast loft reached by warming-room-passage (v86), the Room of Requirement on
-       req 426 (the blank stretch), S1, the landing and Divination on PoA's North Tower spiral */
-    'astronomy-warming-room', 'corridor-cupboard', 'elves-passage-7', 'elves-passage-7-west', 'feast-ladder-well', 'feast-loft',
-    'lost-things', 'room-of-requirement', 'secret-s4a', 'sw-stair-foot-7', 'wind-dial-room', 'sw-stair-foot-6', 'sw-corner-lobby-6',
-    /* floors 7 and T, rough; the warming room, its ladder well and the feast loft reached by warming-room-passage (v86), the Room of Requirement on
-       req 426 (the blank stretch), S1, the landing and Divination on PoA's North Tower spiral */
-    'astronomy-warming-room', 'corridor-cupboard', 'elves-passage-7', 'elves-passage-7-west', 'feast-ladder-well', 'feast-loft',
     'lost-things', 'room-of-requirement', 'secret-s4a', 'sw-stair-foot-7', 'watch-bartizan', 'west-stair-foot-7', 'west-tower-way-7',
     'wind-harp-room', 'secret-s1', 'north-tower-landing', 'divination-classroom', 'warming-room-passage', 'elves-passage-7-east'],
   starts: {}, build: null,
@@ -48,6 +36,10 @@ window.SHELL_W5B = {
    ['t', x0, y0, x1, y1, h, m]         a table or desk: its top 4 cm and four legs
    ['s', x0, y0, x1, y1, [h...], m]    open shelves on that footprint: a board at each height, uprights every 1.6 m
    ['as', b0, b1, r0, r1, [h...], m]   shelves on an arc: a board at each height, an upright every 30 degrees and at the ends
+   ['fr', ax, w, dir, a0, a1, z0, z1, seed, wmax]   frames hung close along a wall (ax 'x': the wall at y = w, 'y': at x = w;
+                                       dir the room's side, +1 or -1), a0 to a1, feet at z0 or over, heads at z1 or under, 0.3 to wmax
+                                       wide, gilt, black or oak round a dark canvas, picked by a hash of seed (the same every load)
+   ['ln', x0, x1, y, dir, out, len, m] a frame leaning face to the wall at y (the room at dir): its foot out from it, len long
    A last element { from: 'PoA' } draws the item only from that book's castle on (?book=).
    A room's lights: [[x, y, z, hex, intensity, distance], ...] in its frame, point lights in its group (the place in `lit`).
    The house rules (the lead, 6.56 pm): a thing bears 2 cm into the wall behind it, stops 1 cm short of a jamb or a face
@@ -611,6 +603,39 @@ var W5B_THINGS = {
     ['b', -1.75, -0.55, -0.015, -1.6, -0.25, 0.4, 'oak'], ['b', 0.2, -0.55, -0.015, 0.35, -0.25, 0.4, 'oak'], ['y', 0, 1.5, 0.7, 0.76, 0.8, 'white'], ['y', 0, 1.5, 0.12, -0.015, 0.76, 'wood'],
     ['y', 0, 1.5, 0.35, -0.015, 0.03, 'wood'], ['b', 0.7, 1.47, 0.6, 0.76, 1.53, 0.66, 'iron'], ['y', 0.82, 1.5, 0.14, 0.62, 0.65, 'iron'], ['b', 0.81, 1.49, 0.65, 0.83, 1.51, 0.78, 'iron'],
     ['y', 0, 1.5, 0.3, 7.42, 7.48, 'brass'], ['y', 0, 1.5, 0.26, 7.41, 7.43, 'glass']] },
+  /* hidden-ways-batch-5.md, H29 (req 857): the retired portraits hung close in two tiers on every run (the eye tier 0.9 to 2.2, raised over the
+     chairs, the settle and the leaning frames; the upper 2.3 to 3.4), small frames over the windows and the door, the three full-lengths at the
+     north end, four frames leaning face to the wall on S2, the rush matting worn at the south end, the four chairs and the settle; frames only,
+     the sitters Magic's (req 531); 0.1 kept from each corner so two walls' frames never meet */
+  'long-gallery': { items: [
+    ['fr', 'y', 15.0, -1, 18.5, 23.49, 0.9, 2.2, 1], ['fr', 'y', 15.0, -1, 18.5, 23.49, 2.3, 3.4, 2], ['fr', 'y', 15.0, -1, 23.52, 24.48, 2.85, 3.45, 3, 0.5],
+    ['fr', 'y', 15.0, -1, 24.51, 28.4, 0.9, 2.2, 4], ['fr', 'y', 15.0, -1, 28.4, 29.6, 1.25, 2.2, 5], ['fr', 'y', 15.0, -1, 29.6, 33.49, 0.9, 2.2, 6],
+    ['fr', 'y', 15.0, -1, 24.51, 33.49, 2.3, 3.4, 7], ['fr', 'y', 15.0, -1, 33.52, 34.48, 2.85, 3.45, 8, 0.5],
+    ['fr', 'y', 15.0, -1, 34.51, 38.4, 0.9, 2.2, 9], ['fr', 'y', 15.0, -1, 38.4, 39.6, 1.25, 2.2, 10], ['fr', 'y', 15.0, -1, 39.6, 43.49, 0.9, 2.2, 11],
+    ['fr', 'y', 15.0, -1, 34.51, 43.49, 2.3, 3.4, 12], ['fr', 'y', 15.0, -1, 43.52, 44.48, 2.85, 3.45, 13, 0.5],
+    ['fr', 'y', 15.0, -1, 44.51, 49.5, 0.9, 2.2, 14], ['fr', 'y', 15.0, -1, 44.51, 49.5, 2.3, 3.4, 15],
+    ['fr', 'y', 1.0, 1, 18.5, 21.49, 0.9, 2.2, 21], ['fr', 'y', 1.0, 1, 18.5, 21.49, 2.3, 3.4, 22], ['fr', 'y', 1.0, 1, 21.52, 22.48, 2.85, 3.45, 23, 0.5],
+    ['fr', 'y', 1.0, 1, 22.51, 29.9, 0.9, 2.2, 24], ['fr', 'y', 1.0, 1, 29.9, 32.1, 1.3, 2.2, 25], ['fr', 'y', 1.0, 1, 32.1, 45.49, 0.9, 2.2, 26],
+    ['fr', 'y', 1.0, 1, 22.51, 45.49, 2.3, 3.4, 27], ['fr', 'y', 1.0, 1, 45.52, 46.48, 2.85, 3.45, 28, 0.5],
+    ['fr', 'y', 1.0, 1, 46.51, 49.5, 0.9, 2.2, 29], ['fr', 'y', 1.0, 1, 46.51, 49.5, 2.3, 3.4, 30],
+    ['fr', 'x', 18.4, 1, 1.1, 4.09, 0.9, 2.2, 41], ['fr', 'x', 18.4, 1, 1.1, 4.09, 2.3, 3.4, 42], ['fr', 'x', 18.4, 1, 4.11, 4.89, 2.0, 3.4, 43, 0.78],
+    ['fr', 'x', 18.4, 1, 4.91, 9.9, 0.9, 2.2, 44], ['fr', 'x', 18.4, 1, 9.9, 13.1, 1.1, 2.2, 45], ['fr', 'x', 18.4, 1, 13.1, 14.9, 0.9, 2.2, 46],
+    ['fr', 'x', 18.4, 1, 4.91, 14.9, 2.3, 3.4, 47],
+    ['ln', 10.0, 10.7, 18.4, 1, 0.3, 0.9, 'pine'], ['ln', 10.75, 11.55, 18.4, 1, 0.3, 0.7, 'pine'], ['ln', 11.6, 12.3, 18.4, 1, 0.3, 1.0, 'pine'], ['ln', 12.35, 13.0, 18.4, 1, 0.3, 0.6, 'pine'],
+    ['b', 3.5, 49.54, 0.5, 4.5, 49.62, 0.6, 'gilt'], ['b', 3.5, 49.54, 2.6, 4.5, 49.62, 2.7, 'gilt'], ['b', 3.5, 49.54, 0.6, 3.6, 49.62, 2.6, 'gilt'],
+    ['b', 4.4, 49.54, 0.6, 4.5, 49.62, 2.6, 'gilt'], ['b', 3.6, 49.56, 0.6, 4.4, 49.61, 2.6, 'canvas'],
+    ['b', 7.5, 49.54, 0.5, 8.5, 49.62, 0.6, 'ebony'], ['b', 7.5, 49.54, 2.6, 8.5, 49.62, 2.7, 'ebony'], ['b', 7.5, 49.54, 0.6, 7.6, 49.62, 2.6, 'ebony'],
+    ['b', 8.4, 49.54, 0.6, 8.5, 49.62, 2.6, 'ebony'], ['b', 7.6, 49.56, 0.6, 8.4, 49.61, 2.6, 'canvasr'],
+    ['b', 11.5, 49.54, 0.5, 12.5, 49.62, 0.6, 'gilt'], ['b', 11.5, 49.54, 2.6, 12.5, 49.62, 2.7, 'gilt'], ['b', 11.5, 49.54, 0.6, 11.6, 49.62, 2.6, 'gilt'],
+    ['b', 12.4, 49.54, 0.6, 12.5, 49.62, 2.6, 'gilt'], ['b', 11.6, 49.56, 0.6, 12.4, 49.61, 2.6, 'canvasb'],
+    ['fr', 'x', 49.6, -1, 1.1, 3.4, 0.9, 2.2, 51], ['fr', 'x', 49.6, -1, 4.6, 7.4, 0.9, 2.2, 52], ['fr', 'x', 49.6, -1, 8.6, 11.4, 0.9, 2.2, 53], ['fr', 'x', 49.6, -1, 12.6, 14.9, 0.9, 2.2, 54],
+    ['fr', 'x', 49.6, -1, 1.1, 3.4, 2.3, 3.4, 55], ['fr', 'x', 49.6, -1, 4.6, 7.4, 2.3, 3.4, 56], ['fr', 'x', 49.6, -1, 8.6, 11.4, 2.3, 3.4, 57], ['fr', 'x', 49.6, -1, 12.6, 14.9, 2.3, 3.4, 58],
+    ['fr', 'x', 49.6, -1, 3.5, 4.5, 2.8, 3.4, 59, 0.5], ['fr', 'x', 49.6, -1, 7.5, 8.5, 2.8, 3.4, 60, 0.5], ['fr', 'x', 49.6, -1, 11.5, 12.5, 2.8, 3.4, 61, 0.5],
+    ['b', 6.5, 21.4, -0.005, 9.5, 48.6, 0.012, 'rush'], ['b', 6.5, 19.4, -0.005, 9.5, 21.4, 0.012, 'rushw'],
+    ['t', 14.5, 28.5, 15.02, 28.99, 0.45, 'oak'], ['b', 14.95, 28.5, 0.45, 15.02, 28.99, 1.15, 'oak'], ['t', 14.5, 29.01, 15.02, 29.5, 0.45, 'oak'], ['b', 14.95, 29.01, 0.45, 15.02, 29.5, 1.15, 'oak'],
+    ['t', 14.5, 38.5, 15.02, 38.99, 0.45, 'oak'], ['b', 14.95, 38.5, 0.45, 15.02, 38.99, 1.15, 'oak'], ['t', 14.5, 39.01, 15.02, 39.5, 0.45, 'oak'], ['b', 14.95, 39.01, 0.45, 15.02, 39.5, 1.15, 'oak'],
+    ['b', 0.98, 30.05, 0.4, 1.6, 31.95, 0.45, 'oak'], ['b', 1.55, 30.05, -0.01, 1.6, 31.95, 0.4, 'oak'], ['b', 0.98, 30.0, -0.01, 1.6, 30.05, 0.7, 'oak'],
+    ['b', 0.98, 31.95, -0.01, 1.6, 32.0, 0.7, 'oak'], ['b', 0.98, 30.05, 0.45, 1.05, 31.95, 1.2, 'oak']] },
   /* W5B-39 (Godric's 1 on architect-w5b-voids-1020, 8.44 pm, 20 October 2026; v97): the witches' lavatory in the pocket west of the
      Gryffindor drum on 6, two closets with seats along the north wall, a stone basin on the west wall, a vent up the drum's wall */
   'gryffindor-lav-witches-6': { c: [42.19, 1.95], items: [
@@ -628,7 +653,8 @@ var W5B_THINGS = {
 };
 var W5B_MATS = { wood: 0x5a4c3e, dark: 0x3e342a, oak: 0x6a5a48, pine: 0x8a7456, iron: 0x2e2b28, brass: 0x9a7a3a, plaster: 0xe8e2d4,
   stone: 0x8c867c, slate: 0x3c4046, cloth: 0x6b3b34, linen: 0xc8c0ae, wicker: 0x9a8460, paper: 0xd9cfb4, books: 0x5b4636,
-  leather: 0x5a3a28, glass: 0x9fb0b8, green: 0x4c6a3a, soot: 0x141312, pencil: 0x8e877c, rope: 0x8a7a5a, straw: 0xb8a468, brick: 0x6e4434, black: 0x0c0b0b, white: 0xeeeae0 };
+  leather: 0x5a3a28, glass: 0x9fb0b8, green: 0x4c6a3a, soot: 0x141312, pencil: 0x8e877c, rope: 0x8a7a5a, straw: 0xb8a468, brick: 0x6e4434, black: 0x0c0b0b, white: 0xeeeae0,
+  gilt: 0xa8873e, ebony: 0x1c1916, canvas: 0x3a2e22, canvasb: 0x2b2924, canvasr: 0x4a3024, canvasl: 0x363a2a, rush: 0x9c8a5c, rushw: 0xb4a272 };
 window.SHELL_W5B.build = function (ctx) {
   var R = (ctx.THINGS || W5B_THINGS)[ctx.PLACE]; if (!R) return;   /* req 828: the lead's shell-w5a.js passes its own THINGS and MATS */
   var MATS = W5B_MATS; if (ctx.MATS) { MATS = {}; Object.keys(W5B_MATS).forEach(function (k) { MATS[k] = W5B_MATS[k]; }); Object.keys(ctx.MATS).forEach(function (k) { MATS[k] = ctx.MATS[k]; }); }
@@ -684,6 +710,33 @@ window.SHELL_W5B.build = function (ctx) {
     });
     var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.computeVertexNormals(); put(geo, m);
   }
+  function hash(n) { var s = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return s - Math.floor(s); }
+  function frames(ax, w, dir, a0, a1, z0, z1, seed, wmax) {   /* req 857: hung close, a gap of 0.05 to 0.15 between, the last one fitted to the run's end */
+    var FR = ['gilt', 'gilt', 'ebony', 'oak'], CV = ['canvas', 'canvas', 'canvasb', 'canvasr', 'canvasl'], p = a0, i = 0, hmax = Math.min(1.2, z1 - z0);
+    function at(a, d, z) { return ax === 'x' ? [a, w + dir * d, z] : [w + dir * d, a, z]; }
+    function slab(aa, ab, za, zb, da, db, m) { var P = at(aa, da, za), Q = at(ab, db, zb); box(P[0], P[1], P[2], Q[0], Q[1], Q[2], m); }
+    while (a1 - p >= 0.3) {
+      var k = seed * 101 + i++, fw = Math.min(wmax || 1.2, 0.3 + hash(k) * 0.9);
+      if (a1 - p - fw < 0.4) fw = Math.min(a1 - p, wmax || 1.2);
+      var fh = 0.3 + hash(k + 0.31) * (hmax - 0.3), zb = z0 + hash(k + 0.57) * (z1 - z0 - fh), rw = 0.04 + 0.04 * Math.min(fw, fh);
+      var fm = FR[Math.floor(hash(k + 0.73) * 4)];   /* four rails 0.06 out, the canvas 2 cm back inside them */
+      slab(p, p + fw, zb, zb + rw, -0.02, 0.06, fm); slab(p, p + fw, zb + fh - rw, zb + fh, -0.02, 0.06, fm);
+      slab(p, p + rw, zb + rw, zb + fh - rw, -0.02, 0.06, fm); slab(p + fw - rw, p + fw, zb + rw, zb + fh - rw, -0.02, 0.06, fm);
+      slab(p + rw, p + fw - rw, zb + rw, zb + fh - rw, -0.01, 0.04, CV[Math.floor(hash(k + 0.89) * 5)]);
+      p += fw + 0.05 + hash(k + 0.13) * 0.1;
+    }
+  }
+  function lean(x0, x1, y, dir, out, len, m) {   /* req 857: a board leaning on the wall, its back to the room, 0.05 thick */
+    var zt = Math.sqrt(len * len - out * out), nx = zt / len * 0.05, nz = out / len * 0.05, yf = y + dir * out;
+    var P = [[x0, yf, 0], [x1, yf, 0], [x1, y, zt], [x0, y, zt], [x0, yf + dir * nx, nz], [x1, yf + dir * nx, nz], [x1, y + dir * nx, zt + nz], [x0, y + dir * nx, zt + nz]].map(function (q) { return L(q[0], q[1], q[2]); });
+    var mid = P.reduce(function (s, q) { return s.add(q.clone().multiplyScalar(1 / 8)); }, new THREE.Vector3()), pos = [];
+    [[0, 1, 2, 3], [4, 5, 6, 7], [0, 1, 5, 4], [3, 2, 6, 7], [0, 3, 7, 4], [1, 2, 6, 5]].forEach(function (q) {
+      var A = P[q[0]], B = P[q[1]], Cc = P[q[2]], D = P[q[3]], n = B.clone().sub(A).cross(Cc.clone().sub(A));
+      if (n.dot(A.clone().add(Cc).multiplyScalar(0.5).sub(mid)) < 0) { var s = B; B = D; D = s; }
+      [A, B, Cc, A, Cc, D].forEach(function (v) { pos.push(v.x, v.y, v.z); });
+    });
+    var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.computeVertexNormals(); put(geo, m);
+  }
   var BOOKS = ['PS', 'CoS', 'PoA', 'GoF', 'OotP', 'HBP', 'DH'], bk = BOOKS.indexOf(ctx.BOOK);
   R.items.forEach(function (t) {
     var last = t[t.length - 1], gate = last && typeof last === 'object' && !Array.isArray(last) ? last : null;
@@ -692,6 +745,7 @@ window.SHELL_W5B.build = function (ctx) {
     if (k === 'b') box.apply(null, a); else if (k === 'y') cyl.apply(null, a); else if (k === 'a') arc.apply(null, a);
     else if (k === 'p') pbox.apply(null, a); else if (k === 't') table.apply(null, a); else if (k === 's') shelves.apply(null, a);
     else if (k === 'as') arcShelves.apply(null, a); else if (k === 'sl') slope.apply(null, a);
+    else if (k === 'fr') frames.apply(null, a); else if (k === 'ln') lean.apply(null, a);
   });
   Object.keys(byMat).forEach(function (m) {   /* one mesh a material, as the lead's merge */
     var pos = [], nor = [];
