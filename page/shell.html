@@ -160,7 +160,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=53"></script>
+<script src="castle-shell.js?v=54"></script>
 <script src="shell-w5b.js?v=14"></script>
 <script src="shell-w5a.js?v=4"></script>
 <script src="castle-events.js?v=39"></script>
@@ -270,6 +270,8 @@ document.title = shell.place.name + ', a shell';
    warm pools; the sun only by day. The unpainted shells keep the grey light. ?hour=0..23 for checks */
 var HOUR = Q.get('hour') != null ? +Q.get('hour') : new Date().getHours();
 var PAINT_ON = PAINTED.indexOf(PLACE) >= 0, DAY = HOUR >= 7 && HOUR < 17;
+/* castle-shell.js v54: the windows' panes of sky take the night's colour out of the day's hours */
+if (shell && !DAY && shell.panes.length) shell.panes[0].material.color.set((window.CASTLE_TONES && CASTLE_TONES.surfaces['sky-night'] || {}).hex || '#10141f').convertSRGBToLinear();
 var FILL = !PAINT_ON ? 0.85 : DAY ? 0.5 : HOUR >= 17 && HOUR < 22 ? 0.2 : 0.06;
 /* a painted place with no window of its own (the dungeons, the cupboard, the passages) as the Entrance Hall: a weak fill, no sun */
 var WINDOWLESS = PLACE === 'entrance-hall' || !MODEL.openings.some(function (o) { return o.room === PLACE && /window/.test(o.kind || ''); });

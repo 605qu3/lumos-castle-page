@@ -269,7 +269,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   mats.floorD = F.solid(GREY.floor); mats.floorD.side = THREE.DoubleSide;
   mats.ceilD = F.solid(GREY.ceil); mats.ceilD.side = THREE.DoubleSide;
   mats.grille = F.solid(0x3b3632);
-  var out = { group: group, place: P, places: [P], doors: [], ways: [], hidden: [], stairs: [], flights: [], stands: [], toLocal: toLocal };
+  var out = { group: group, place: P, places: [P], doors: [], ways: [], hidden: [], stairs: [], flights: [], stands: [], panes: [], toLocal: toLocal };
 
   /* v34 (req 716, Events' corbels.json on Design's 756): out.corbels(state) sets every built place's carved faces to
      'awake', 'dozing' or 'sleeping', the beams' through CastleCeilings.corbels and the vaults' here; in an awake place
@@ -847,6 +847,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           group.add(fill);
           out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm],
             sill: g.sill, lift: lift, level: level, back: g.back, via: !!via, depth: g.op.depth || 0 });
+        } else if (!g.back && /window|loop|lancet|oriel|dormer/.test(g.op.kind || '')) {
+          /* v54 (Design's find, 21 October 2026, 11.23 am: the oriel's lights black at noon): nothing is drawn beyond a
+             shell's window, so each takes a pane of sky 3 cm inside its outer face, the day's colour (shell.html turns it
+             to the night's), unlit and untappable: daylight in the opening, not a lamp */
+          if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
+          var pn_ = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), mats.pane), pd = Math.max(0.02, t - 0.03);
+          var pp = toLocal(a[0] + ux * sm + nx * pd, a[1] + uy * sm + ny * pd, Q.floor);
+          pn_.position.set(pp.x, pp.y + g.sill + hh / 2, pp.z); pn_.rotation.y = ang; pn_.raycast = function () {};
+          pn_.name = Q.id + '-pane-' + g.op.id; pn_.userData.owner = Q.id; group.add(pn_);
+          out.panes.push(pn_);
         }
       });
       if (!col) piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
