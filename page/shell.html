@@ -160,8 +160,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=55"></script>
-<script src="shell-w5b.js?v=14"></script>
+<script src="castle-shell.js?v=56"></script>
+<script src="shell-w5b.js?v=15"></script>
 <script src="shell-w5a.js?v=4"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
@@ -887,6 +887,9 @@ var PINE_SHOW = "a pineapple sitting on a front-row desk";   /* Events' Rework w
    ?scrape=on, ?oblong=on, ?moonpatch=on stand them with the events absent, for checks. */
 var MIRROR_GONE = "two pale scrapes on the floor where a heavy thing on two feet once stood, and a cleaner oblong on the wall above them";
 var MOON_PATCH = "a pale patch of moonlight on the floor just inside the door";
+/* Events' words, req 849 (divination.json, Magic's req 799, provisional, Godric to confirm): while Trelawney is out among
+   the tables her shawl hangs over her winged armchair's back; gone when she sits in it (W5B-48). ?shawl=on, for checks */
+var SHAWL = "her thin shawl over the back of her winged armchair, its spangles dull";
 var ROOM_THINGS = {
   /* docs/interiors/mirror-classroom.md (x = 71.4 + y', y = 68.6 - x'): the scrapes x' 2.95 to 3.35 and 4.65 to 5.05,
      y' 9.65 to 9.95; the cleaner oblong on the far wall x' 2.85 to 5.15, 3.95 to 4.5 high; the patch y' 0.3 to 2.5, from
@@ -901,6 +904,10 @@ var ROOM_THINGS = {
      y' 6.0 to 6.6 (x = 139.6 + y'), 0.72 high; the stand in the aisle short of it */
   'charms-classroom': [{ id: 'pineapple-desk', rect: [145.6, 67.8, 146.2, 69.1], z: [0, 0.72], col: 0x6a5a48, show: PINE_SHOW, still: true },
                        { id: 'pineapple', at: [145.9, 68.45], z: [0.72, 0.9], col: 0xb08a3a, show: PINE_SHOW, stand: [144.6, 66.7], look: 0.8 }],
+  /* docs/interiors/divination-classroom.md, her shawl over the chair's back at (0, 4.8) toward the fire (W5B-48, its two
+     pieces moved here from W5B_THINGS so the string shows it) */
+  'divination-classroom': [{ id: 'shawl-top', rect: [159.7, 76.99, 160.3, 77.215], z: [1.185, 1.205], col: 0xc8c0ae, show: SHAWL, still: true },
+                           { id: 'shawl-back', rect: [159.7, 77.195, 160.3, 77.215], z: [0.5, 1.185], col: 0xc8c0ae, show: SHAWL, still: true }],
   /* docs/interiors/hidden-ways-batch-8.md, H47 (Events' req 557): the round table centred (160, 0), 1.8 across, its top
      0.75; the rail a ring at r 1.3, 0.9 high, open 0.6 at bearing 200; the crank's geared box at the table's edge there
      (r 0.95), its handle out at r 1.05; the stand before the rail's gap at r 2.5. The orrery itself stays the note's words */

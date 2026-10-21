@@ -573,9 +573,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* v55 (Godric's Try 1 on design-ceilings-1021, 11.57 am, 21 October 2026): the late rooms' oak boards on joists, the
        floor above's; light joists across the short span, no corbels, so a corridor reads boarded, not stacked with beams;
        a round room (the oriel) close moulded joists, a bead under each, cut to its circle. Each bears 2 cm up into the
-       boards and 2 cm into its walls (the seams rule) */
+       boards and 2 cm into its walls (the seams rule); their own fill, an eighth of their colour, so a face turned from the
+       torches reads dark oak, never black (Fawkes's look at the corridor on 5, 12.17 pm) */
     if (row && row.ceiling === 'boards' && Q.ceiling != null && !Q.roof && !HD.length && (Q.round || Q.poly.length === 4)) {
-      var jm = paintMat(tone('oak-beams'), true), JR = !!Q.round, JW = JR ? 0.12 : 0.16, JD = JR ? 0.16 : 0.2, JS = JR ? 0.6 : 1.8;
+      var jh = tone('oak-beams'), jm = paintMats[jh + 'j'] || (paintMats[jh + 'j'] = F.solid(jh, { side: THREE.DoubleSide, emissive: new THREE.Color(jh).multiplyScalar(0.12) })), JR = !!Q.round, JW = JR ? 0.12 : 0.16, JD = JR ? 0.16 : 0.2, JS = JR ? 0.6 : 1.8;
       var jx = JR ? Q.round.c[0] : mx, jy = JR ? Q.round.c[1] : my, along = JR || (y1 - y0) <= (x1 - x0);
       var jlen = JR ? 2 * Q.round.r : along ? y1 - y0 : x1 - x0, jrun = JR ? 2 * Q.round.r : along ? x1 - x0 : y1 - y0;
       var jn = Math.max(1, Math.round(jrun / JS));
