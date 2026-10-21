@@ -23,8 +23,9 @@ window.CASTLE_TONES = {
    "schedule": "#c49a87"
   },
   "late-pale": {
-   "hex": "#dcd2b0",
-   "say": "P6 and P7: pale yellow to palest"
+   "hex": "#a29a81",
+   "say": "P6 and P7: pale yellow to palest",
+   "schedule": "#dcd2b0"
   },
   "limewash": {
    "hex": "#e6e0d0",
@@ -149,18 +150,18 @@ window.CASTLE_TONES = {
   "flags-tudor-pink/below": "#5e4d45",
   "flags-tudor-pink/worn/below": "#604f46",
   "vault-tudor-pink/below": "#615047",
-  "late-pale/rubble": "#d0c6a6",
-  "late-pale/coursed": "#dcd2b0",
-  "late-pale/ashlar": "#e1d7b4",
-  "flags-late-pale": "#cec4a4",
-  "flags-late-pale/worn": "#d1c8a7",
-  "vault-late-pale": "#d4caaa",
-  "late-pale/rubble/below": "#bfb69a",
-  "late-pale/coursed/below": "#cac1a3",
-  "late-pale/ashlar/below": "#cec5a7",
-  "flags-late-pale/below": "#bdb498",
-  "flags-late-pale/worn/below": "#c0b89b",
-  "vault-late-pale/below": "#c3ba9d"
+  "late-pale/rubble": "#99917a",
+  "late-pale/coursed": "#a29a81",
+  "late-pale/ashlar": "#a69d84",
+  "flags-late-pale": "#979078",
+  "flags-late-pale/worn": "#9a927b",
+  "vault-late-pale": "#9c947c",
+  "late-pale/rubble/below": "#89826d",
+  "late-pale/coursed/below": "#918a74",
+  "late-pale/ashlar/below": "#948d77",
+  "flags-late-pale/below": "#87816c",
+  "flags-late-pale/worn/below": "#8a836e",
+  "vault-late-pale/below": "#8c8570"
  },
  "toward": {
   "stones": [
@@ -173,6 +174,10 @@ window.CASTLE_TONES = {
   "below": {
    "L": -6.0,
    "chroma": 0.9
+  },
+  "late-pale": {
+   "kept": 0.55,
+   "chroma": 0.8
   }
  }
 };
