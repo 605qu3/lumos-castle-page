@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=458"></script>
-<script src="castle-paint.js?v=54"></script>
+<script src="castle-model.js?v=459"></script>
+<script src="castle-paint.js?v=55"></script>
 <script src="design/tones.js?v=5"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -264,6 +264,8 @@ PAINTED = PAINTED.concat(['study-void']);
 PAINTED = PAINTED.concat(['lake-corridor-g-west', 'drum-bend-g-west', 'drum-bend-g', 'drum-bend-g-east', 'lake-corridor-g-mid', 'sw-corner-lobby-g', 'washrooms-g', 'duelling-practice-room', 'quidditch-kit-room', 'kit-broom-cupboard', 'boys-toilets-g', 'girls-toilets-g', 'south-store-g1', 'peeves-lumber-room']);
 /* v127, req 869 B on Godric's yes (2.57 pm, 21 October 2026): the small chamber off the hall where the first years wait */
 PAINTED = PAINTED.concat(['waiting-chamber']);
+/* v129, req 872 on Godric's 1 (3.13 pm, 21 October 2026): the porter's squint (H55) and the hide in K's north wall (H56) */
+PAINTED = PAINTED.concat(['porters-squint', 'k-hide']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
