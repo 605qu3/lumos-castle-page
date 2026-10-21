@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=439"></script>
-<script src="castle-paint.js?v=38"></script>
+<script src="castle-model.js?v=440"></script>
+<script src="castle-paint.js?v=39"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
@@ -253,6 +253,8 @@ PAINTED = PAINTED.concat(['charms-landing-passage-3', 'mcgonagall-landing-passag
 PAINTED = PAINTED.concat(['elves-tunnel', 'elves-linen-room']);
 /* v110, G's paper rooms, the first batch: the south-east range off the lake-face corridor (the layout's e, i, l, o, r) */
 PAINTED = PAINTED.concat(['free-classroom-g', 'visitors-parlour', 'post-room', 'treatment-room', 'registers-archive']);
+/* v112, req 803 (c)'s 1: the stone steps down from the Entrance Hall and the kitchens' corridor (GoF 21) */
+PAINTED = PAINTED.concat(['kitchens-steps', 'kitchens-corridor']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
