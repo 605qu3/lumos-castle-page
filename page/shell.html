@@ -154,12 +154,12 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=420"></script>
-<script src="castle-paint.js?v=20"></script>
+<script src="castle-model.js?v=421"></script>
+<script src="castle-paint.js?v=21"></script>
 <script src="design/tones.js?v=2"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="castle-shell.js?v=42"></script>
-<script src="shell-w5b.js?v=8"></script>
+<script src="shell-w5b.js?v=9"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -255,6 +255,9 @@ var FILL = !PAINT_ON ? 0.85 : DAY ? 0.5 : HOUR >= 17 && HOUR < 22 ? 0.2 : 0.06;
 /* a painted place with no window of its own (the dungeons, the cupboard, the passages) as the Entrance Hall: a weak fill, no sun */
 var WINDOWLESS = PLACE === 'entrance-hall' || !MODEL.openings.some(function (o) { return o.room === PLACE && /window/.test(o.kind || ''); });
 if (PAINT_ON && WINDOWLESS) FILL = Math.min(FILL, 0.15);
+/* a place W5B lights with its own things (window.SHELL_W5B.lit, W5B-30: Divination's draped lamps, PoA 6 L15276): the curtains drawn, a windowless fill or lower, no sun */
+var W5B_LIT = (W5B.lit || []).indexOf(PLACE) >= 0;
+if (PAINT_ON && W5B_LIT) FILL = Math.min(FILL, 0.06);
 /* the Great Hall by night: the enchanted ceiling lights it a little, 0.3 in the night sky's tint (Design, 8.22 am; 0.3 at 10.10 am: the founders' band low on the walls reads 11 of 255, the floor moonlit, the upper walls still under the candles) */
 var NIGHT_HALL = PLACE === 'great-hall' && PAINT_ON && FILL < 0.1;
 if (NIGHT_HALL) FILL = 0.3;
@@ -264,7 +267,7 @@ if (NIGHT_HALL) {   /* the night sky's hue at full strength, so the fill is a fi
   var top = Math.max(fillCol.r, fillCol.g, fillCol.b); fillCol.multiplyScalar(1 / top);
 }
 scene.add(new THREE.HemisphereLight(fillCol, 0x3a332c, FILL));
-var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && !WINDOWLESS ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
+var sun = new THREE.DirectionalLight(0xfff1dc, !PAINT_ON ? 0.45 : DAY && !WINDOWLESS && !W5B_LIT ? 0.15 : 0); sun.position.set(-6, 14, 9); scene.add(sun);
 scene.add(new THREE.AmbientLight(0xffffff, PAINT_ON ? 0.02 : 0.12));
 /* the torches' light without the torches (PS 7: "stone walls lit with flaming torches"): four warm lights a place at
    3.2 m, a quarter of the way in from each corner, so the walls take light and fall off */
@@ -278,6 +281,7 @@ var TONE = window.CASTLE_TONES || null;
 function lightTone(k, fb) { var l = TONE && TONE.lights && TONE.lights[k]; return l ? { hex: parseInt(String(l.hex).replace('#', ''), 16), gain: l.gain } : fb; }
 var TORCH = lightTone('torch', { hex: 0xffc28a, gain: 1.0 }), CANDLE = lightTone('candle', { hex: 0xffb466, gain: 0.55 });
 var LIT_BY = {};   /* a place whose own lights replace the plain four */
+(W5B.lit || []).forEach(function (id) { LIT_BY[id] = true; });   /* W5B-30: its lights are W5B_THINGS' own */
 var HALL_LIGHT = (function () {
   var out = { torches: [], candles: null };
   shell.places.forEach(function (p) {
