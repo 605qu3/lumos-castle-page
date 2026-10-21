@@ -132,11 +132,11 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=396"></script>
-<script src="castle-paint.js?v=4"></script>
+<script src="castle-model.js?v=424"></script>
+<script src="castle-paint.js?v=24"></script>
 <script src="design/tones.js?v=2"></script>
-<script src="design/ceilings.js?v=2"></script>
-<script src="castle-shell.js?v=33"></script>
+<script src="design/ceilings.js?v=4"></script>
+<script src="castle-shell.js?v=43"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
@@ -234,12 +234,15 @@ function boxAt(w, h, d, x, y, z, m, name) {   /* w along x (east), d along y (no
   b.position.copy(P(x, y, z + h / 2)); b.name = name || ''; room.add(b); return b;
 }
 
-/* the platform, its steps, the staff table and its chairs, the gold chair */
-var tapTop = [];
-tapTop.push(boxAt(S.dais.x1 - S.dais.x0, S.dais.h, 18, (S.dais.x0 + S.dais.x1) / 2, 60.5, 0, M.dais, 'platform'));
-for (var k = 0; k < S.dais.steps; k++) {
-  var sx0 = S.dais.x1 + k * 0.3;
-  tapTop.push(boxAt(0.3, S.dais.h - (k + 1) * S.dais.rise, 18, sx0 + 0.15, 60.5, 0, M.dais, 'platform-step'));
+/* the platform, its steps, the staff table and its chairs, the gold chair. The platform is the top riser, two steps
+   below it (as shell.html's dais draws them); each block bears into the floor (the step 0.02, the next 0.03, the
+   platform 0.04, so no two feet share a plane, and as far into the walls) and 0.01 into the one above, never flush (Godric's glitch of 8.42 pm, 20 October 2026, req 833: a third step 0 high lay in the floor's own plane) */
+var tapTop = [], DE = 0.02;
+var deep = function (k) { return DE + (S.dais.steps - 1 - k) * 0.01; };
+tapTop.push(boxAt(S.dais.x1 - S.dais.x0 + deep(0), S.dais.h + deep(0), 18 + 2 * deep(0), (S.dais.x0 - deep(0) + S.dais.x1) / 2, 60.5, -deep(0), M.dais, 'platform'));
+for (var k = 1; k < S.dais.steps; k++) {
+  var sx0 = S.dais.x1 + (k - 1) * 0.3 - 0.01;
+  tapTop.push(boxAt(0.31, S.dais.h - k * S.dais.rise + deep(k), 18 + 2 * deep(k), sx0 + 0.155, 60.5, -deep(k), M.dais, 'platform-step'));
 }
 tapTop.push(boxAt(S.staff.x1 - S.staff.x0, 0.06, S.staff.y1 - S.staff.y0, (S.staff.x0 + S.staff.x1) / 2, (S.staff.y0 + S.staff.y1) / 2, S.staff.top - 0.06, M.oak, 'staff-table'));
 tapTop.push(boxAt(S.staff.x1 - S.staff.x0 - 0.1, S.staff.top - 0.06 - S.dais.h, S.staff.y1 - S.staff.y0 - 0.1, (S.staff.x0 + S.staff.x1) / 2, (S.staff.y0 + S.staff.y1) / 2, S.dais.h, M.oak, 'staff-table'));
@@ -256,9 +259,9 @@ var stool = boxAt(0.35, 0.45, 0.35, S.stool[0], S.stool[1], 0, M.stool, 'stool')
 S.tables.forEach(function (t) {
   var yc = t[1], L = S.tx1 - S.tx0, xm = (S.tx0 + S.tx1) / 2;
   boxAt(L, 0.06, S.tw, xm, yc, S.top - 0.06, M.oak, 'table-' + t[0]);
+  boxAt(0.12, S.top - 0.06, S.tw - 0.2, S.tx0 + 0.4, yc, 0, M.oak, 'table-leg');   /* once a table, not once a side (req 833) */
+  boxAt(0.12, S.top - 0.06, S.tw - 0.2, S.tx1 - 0.4, yc, 0, M.oak, 'table-leg');
   [-1, 1].forEach(function (s) {
-    boxAt(0.12, S.top - 0.06, S.tw - 0.2, S.tx0 + 0.4, yc, 0, M.oak, 'table-leg');
-    boxAt(0.12, S.top - 0.06, S.tw - 0.2, S.tx1 - 0.4, yc, 0, M.oak, 'table-leg');
     var by = yc + s * (S.tw / 2 + S.bench.off + S.bench.deep / 2);
     boxAt(L, 0.05, S.bench.deep, xm, by, S.bench.seat - 0.05, M.bench, 'bench-' + t[0]);
     boxAt(0.08, S.bench.seat - 0.05, S.bench.deep - 0.05, S.tx0 + 0.3, by, 0, M.bench, 'bench-leg');
@@ -563,8 +566,11 @@ var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat
   /* what a meal leaves: a fork under a bench, a knife on a bench, a goblet on its side, napkins dropped */
   var small = new THREE.BoxGeometry(0.2, 0.02, 0.03), cup = new THREE.CylinderGeometry(0.04, 0.03, 0.12, 8), nap = new THREE.BoxGeometry(0.22, 0.03, 0.18);
   g = extra('what a meal leaves');
+  var took = {}, meal = g, spare = new THREE.Group();   /* one thing a seat, so no two land in one place (req 833's check);
+                                                          a second goes unshown, the draws kept so the later cues stay put */
   for (var i = 0; i < 40; i++) {
-    var s0 = seats[Math.floor(r2() * seats.length)], k = r2();
+    var si = Math.floor(r2() * seats.length), s0 = seats[si], k = r2();
+    g = took[si] ? spare : meal; took[si] = 1;
     if (k < 0.3) bit(g, small, M.gold, s0.x, s0.y + s0.side * 0.3, 0.01, r2() * 3);
     else if (k < 0.5) bit(g, small, M.gold, s0.x, s0.y, S.bench.seat + 0.01, r2() * 3);
     else if (k < 0.7) { var c = bit(g, cup, M.gold, s0.x, s0.y - s0.side * 0.6, S.top + 0.04); c.rotation.z = Math.PI / 2; }
@@ -583,7 +589,7 @@ var grey = mat(0x9a948a), paper = mat(0xece6d8), red = mat(0xa8322c), dark = mat
   /* a satchel on a bench, a house scarf over a bench end */
   g = extra('a satchel standing upright');
   bit(g, new THREE.BoxGeometry(0.35, 0.3, 0.12), brown, 58.0, 62.6 + 0.725, S.bench.seat + 0.15);
-  bit(g, new THREE.BoxGeometry(0.06, 0.5, 0.2), red, S.tx1 - 0.25, 58.4 + 0.725, S.bench.seat - 0.2);
+  bit(g, new THREE.BoxGeometry(0.06, 0.5, 0.2), red, S.tx1 - 0.2, 58.4 + 0.725, S.bench.seat - 0.2);
   /* a school broom along Gryffindor's south bench, its head toward the doors */
   g = extra('a school broom laid along');
   var stick = bit(g, new THREE.CylinderGeometry(0.02, 0.02, 1.6, 6), M.bench, 44.0, 66.8 - 0.725, S.bench.seat + 0.03); stick.rotation.z = Math.PI / 2;
@@ -766,7 +772,7 @@ var FIRES = (function () {
     piece(new THREE.BoxGeometry(w + 0.3, 0.1, 0.36), stone, 0, f.mantel + 0.05, 0.16);                 /* the mantel shelf */
     piece(new THREE.BoxGeometry(w, f.h - f.mantel - 0.1, 0.12), stone, 0, (f.mantel + 0.1 + f.h) / 2, 0.04);   /* the frieze */
     piece(new THREE.BoxGeometry(ow * 2, oh, 0.008), dark, 0, oh / 2, 0.012);                              /* the opening, dark, 8 mm off */
-    piece(new THREE.BoxGeometry(ow * 2 + 0.6, 0.04, f.hearth + 0.02), stone, 0, 0.01, (f.hearth - 0.02) / 2);   /* the hearth */
+    piece(new THREE.BoxGeometry(ow * 2 + 0.6, 0.05, f.hearth + 0.01), stone, 0, 0.005, (f.hearth - 0.01) / 2);   /* the hearth, its foot 0.02 down and its back 0.01 in, neither in the surround's planes (req 833) */
   });
   out.ids = fs.map(function (f) { return f.id; });
   return out;
@@ -823,8 +829,8 @@ function lightPatches(bearing, altitude, which) {
 var DOOR = shell.doors.filter(function (x) { return x.id === 'great-hall-doors'; })[0];
 var doorsOpen = new THREE.Group(); doorsOpen.name = 'doors-open'; room.add(doorsOpen);
 [58.98, 62.02].forEach(function (y) {
-  var lf = new THREE.Mesh(new THREE.BoxGeometry(1.56, 4.98, 0.12), DOOR ? DOOR.mesh.material : M.oak);
-  lf.position.copy(P(67.1, y, 2.49)); lf.rotation.y = DOOR ? DOOR.mesh.rotation.y + Math.PI / 2 : 0; doorsOpen.add(lf);
+  var lf = new THREE.Mesh(new THREE.BoxGeometry(1.56, 4.96, 0.12), DOOR ? DOOR.mesh.material : M.oak);   /* standing on the threshold's 0.02, not in it (req 833) */
+  lf.position.copy(P(67.1, y, 2.50)); lf.rotation.y = DOOR ? DOOR.mesh.rotation.y + Math.PI / 2 : 0; doorsOpen.add(lf);
 });
 var stars = (function () {   /* the ceiling's stars at night, a stand-in for Magic's sky at infinity */
   var g = new THREE.BufferGeometry(), a = [];
