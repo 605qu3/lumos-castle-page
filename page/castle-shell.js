@@ -791,11 +791,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           back.position.set(bp.x, bp.y + g.sill + hh / 2, bp.z); back.rotation.y = ang; back.name = Q.id + '-niche-' + g.op.id; group.add(back);
           /* v30 (one owner per face): the head bears 2 cm into the wall over it and either side, its face 2 mm back of the
              wall's, so no face of it lies in a plane of the pieces round it (the hourglass niches' crowns and springings) */
+          /* v51 (req 850, the linen room's lamp niche): its face 5 mm back, past the seams test's 4 mm plane, and 2 cm into the niche's back, so neither face lies in a plane of the wall's (4 fights in a niche with a sill) */
           var r = w / 2, sh = new THREE.Shape(), BR = 0.02;
           sh.moveTo(-r, 0); sh.lineTo(-r - BR, 0); sh.lineTo(-r - BR, r + BR); sh.lineTo(r + BR, r + BR); sh.lineTo(r + BR, 0); sh.lineTo(r, 0);
           sh.absarc(0, 0, r, 0, Math.PI, false);
-          var head = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: dp, bevelEnabled: false, curveSegments: 16 }), mats.wall), LAYER.wall);
-          head.position.set(mid.x + Math.sin(ang) * 0.002, mid.y + g.h - r, mid.z + Math.cos(ang) * 0.002); head.rotation.y = ang; head.name = Q.id + '-niche-head-' + g.op.id; group.add(head);
+          var head = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: dp + 0.015, bevelEnabled: false, curveSegments: 16 }), mats.wall), LAYER.wall);
+          head.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - r, mid.z + Math.cos(ang) * 0.005); head.rotation.y = ang; head.name = Q.id + '-niche-head-' + g.op.id; group.add(head);
           var fl = slab(w, 0.02, dp, mats.floor, 'floor'), fp = toLocal(a[0] + ux * sm + nx * dp / 2, a[1] + uy * sm + ny * dp / 2, Q.floor);
           fl.position.set(fp.x, fp.y + g.sill + 0.01, fp.z); fl.rotation.y = ang; fl.name = Q.id + '-niche-floor-' + g.op.id; group.add(fl);
           return;

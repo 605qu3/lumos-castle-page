@@ -154,13 +154,14 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=436"></script>
-<script src="castle-paint.js?v=35"></script>
+<script src="castle-model.js?v=437"></script>
+<script src="castle-paint.js?v=36"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=50"></script>
+<script src="castle-shell.js?v=51"></script>
 <script src="shell-w5b.js?v=13"></script>
+<script src="shell-w5a.js?v=1"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/carving.js?v=1"></script>
@@ -419,6 +420,7 @@ function limits(s) {
   return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
 }
 if (W5B.build) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE });   /* W5B's things */
+if (W5B.build && window.SHELL_W5A) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE, THINGS: SHELL_W5A.things, MATS: SHELL_W5A.mats });   /* the lead's things (page/shell-w5a.js), W5B's builder (req 828) */
 var START = shell.stands[0], here = START, hy = 0, hp = 0, hyT = 0, hpT = 0, tween = null, legs = [], lookTmp = new THREE.Vector3();
 /* wave 1's Apparate shots (20 October 2026, the Architect's forty-seventh, Fawkes's yes): a room whose one door leaves
    the start facing a near wall turns it into the room (degrees, as a head turn), only when he comes by no door (?place= alone) */
