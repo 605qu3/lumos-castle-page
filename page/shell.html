@@ -2439,6 +2439,12 @@ function updateMyrtle(dt) {
 thingCues[MY_FLOOD] = function () { myrtleFlood(); };
 thingCues[MY_DRIP] = function () { myrtleDrip(); };
 if (MYRTLE.on) myrtleSet({ fresh: Q.get('wet') === 'fresh', drying: Q.get('wet') === 'drying', film: Q.get('wet') === 'film', flood: Q.get('wet') === 'flood' });
+/* H62, the stair that only goes up (Events' req 883, page/events/hidden-ways.json, place `up only stair`, word for word):
+   the stair round its newel and the panel at its head are the shell's own (model v134), so their strings are drawn; the
+   way down lost below him stays the note's; his own footsteps above him, a `wait` record's cue, the FALLBACK's seen line */
+var UP_ONLY_DRAWN = PLACE === 'up-only-stair' ? ["a narrow stone stair winding up round its newel, the treads worn hollow, the air cool and still",
+  "at the top, a plain panel in the wall, which opens outward onto the seventh floor's landing"] : [];
+function upOnlyShown(shown) { return UP_ONLY_DRAWN.filter(function (s) { return shown.indexOf(s) >= 0; }); }
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
    for word, that the shell does not draw as a thing. Since Events' fix of 15 October 2026 (castle-events.js v33) a room
@@ -2455,7 +2461,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
