@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stone face probe</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; color: #d8cfbf; font: 14px/1.4 Georgia, serif; overflow: hidden; }
+  canvas { display: block; touch-action: none; }
+  #say { position: fixed; left: 12px; bottom: 10px; right: 12px; text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="say"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="tones.js?v=5"></script>
+<script src="stone-face.js?v=1"></script>
+<script>
+/* stone-face-live.html: Design's probe for stone-face.js (Godric's 1 on design-bright-rooms-1021, 11.30 am, 21 October
+   2026): a plain room 12 x 5 x 3.6 m at noon, its walls ?stone (default late-pale) in ?dress (rubble, coursed, ashlar,
+   limewash; default rubble), its floor that stone's flags, the colours from tones.js; ?flat leaves them flat colour,
+   to compare. Drag to look round. Not the shell: the shell calls CastleStoneFace.dress on its own materials. */
+(function () {
+  'use strict';
+  var T = window.CASTLE_TONES, R = T.resolved, q = new URLSearchParams(location.search), SF = window.CastleStoneFace;
+  var stone = q.get('stone') || 'late-pale', dress = q.get('dress') || 'rubble', flat = q.has('flat');
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(innerWidth, innerHeight);
+  document.body.appendChild(renderer.domElement);
+  var scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.05, 100);
+  function mat(hex) {
+    var m = new THREE.MeshStandardMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), roughness: 0.92, metalness: 0, side: THREE.DoubleSide });
+    return m;
+  }
+  var wallHex = R[stone + '/' + dress] || T.surfaces[dress === 'limewash' ? 'limewash' : stone].hex;
+  var wall = mat(wallHex), floor = mat(R['flags-' + stone]), ceil = mat(T.surfaces['oak-beams'] ? T.surfaces['oak-beams'].hex : '#55402e');
+  if (!flat) { SF.dress(THREE, wall, SF.kind(dress)); SF.dress(THREE, floor, 'flags'); }
+  var L = 12, W = 5, H = 3.6;
+  function plane(w, h, m, x, y, z, rx, ry) { var p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); p.position.set(x, y, z); p.rotation.set(rx || 0, ry || 0, 0); scene.add(p); }
+  plane(L, W, floor, 0, 0, 0, -Math.PI / 2); plane(L, W, ceil, 0, H, 0, Math.PI / 2);
+  plane(L, H, wall, 0, H / 2, -W / 2); plane(L, H, wall, 0, H / 2, W / 2, 0, Math.PI);
+  plane(W, H, wall, -L / 2, H / 2, 0, 0, Math.PI / 2); plane(W, H, wall, L / 2, H / 2, 0, 0, -Math.PI / 2);
+  /* noon: the day's fill and a sun through the south windows' side, as the shell's day at 0.80 against a torch */
+  scene.add(new THREE.HemisphereLight(0xfff6e8, 0x6b5f4e, 0.9));
+  var sun = new THREE.PointLight(0xfff1dc, 1.4, 30, 1.2); sun.position.set(0, H - 0.4, W / 2 - 0.6); scene.add(sun);
+  var yaw = 0, drag = null;
+  renderer.domElement.addEventListener('pointerdown', function (e) { drag = e.clientX; });
+  addEventListener('pointerup', function () { drag = null; });
+  addEventListener('pointermove', function (e) { if (drag != null) { yaw += (e.clientX - drag) * 0.005; drag = e.clientX; } });
+  addEventListener('resize', function () { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+  document.getElementById('say').textContent = stone + ', ' + dress + (flat ? ', flat colour' : ', its face drawn') + ' (' + wallHex + ')';
+  var frames = 0;
+  (function loop() {
+    camera.position.set(-L / 2 + 1.2, 1.5, 0); camera.lookAt(-L / 2 + 1.2 + Math.cos(yaw), 1.35, Math.sin(yaw));
+    renderer.render(scene, camera);
+    if (++frames === 3) window.stoneFaceReady = { kind: SF.kind(dress), faced: !!wall.userData.faced, maps: Object.keys(SF.maps) };
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>

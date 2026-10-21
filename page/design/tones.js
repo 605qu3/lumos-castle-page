@@ -161,7 +161,8 @@ window.CASTLE_TONES = {
   "late-pale/ashlar/below": "#948d77",
   "flags-late-pale/below": "#87816c",
   "flags-late-pale/worn/below": "#8a836e",
-  "vault-late-pale/below": "#8c8570"
+  "vault-late-pale/below": "#8c8570",
+  "late-pale/limewash": "#d7c9a3"
  },
  "toward": {
   "stones": [
