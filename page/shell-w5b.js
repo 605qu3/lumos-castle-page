@@ -34,7 +34,7 @@ window.SHELL_W5B = {
   starts: {}, build: null,
   /* places whose lights W5B's things carry (W5B_THINGS' lights): shell.html to skip their plain four and keep the fill low
      (row W5B-30); Divination's draped lamps and fire, the curtains drawn (PoA 6 L15276; ledger 145, req 822) */
-  lit: ['divination-classroom'] };
+  lit: ['divination-classroom', 'camera-obscura'] };
 
 /* the named rooms' things (req 809, Interiors' docs/interiors/wave-5-upper-floors.md, the detail pass after each floor's
    rough), plain shapes at each schedule's own coordinates, nothing tappable, lamps unlit; each room's list cites its
@@ -599,11 +599,21 @@ var W5B_THINGS = {
     ['p', 80, 4.649, 0.9, 0.3, 0.885, 1.07, 'oak'], ['p', 80, 4.349, 0.9, 0.3, 0.885, 1, 'oak'], ['p', 74.356, 4.25, 0.05, 0.05, -0.015, 0.9, 'oak'],
     ['p', 85.644, 4.25, 0.05, 0.05, -0.015, 0.9, 'oak'], ['p', 74.947, 4.75, 0.05, 0.05, -0.015, 0.9, 'oak'], ['p', 85.053, 4.75, 0.05, 0.05, -0.015, 0.9, 'oak'],
     ['p', 80, 4.349, 0.45, 0.28, 0.985, 1.03, 'paper'], ['p', 76, 4.679, 0.1, 0.08, 1.055, 1.13, 'brass'], ['p', 120, 4.655, 0.15, 0.15, 1.45, 1.765, 'iron'],
-    ['p', 120, 4.73, 0.03, 0.18, 1.75, 1.8, 'iron']] }
+    ['p', 120, 4.73, 0.03, 0.18, 1.75, 1.8, 'iron']] },
+/* hidden-ways-batch-5.md, H30 (req 829): the walls dead black (the hip's paint the lead's), the shutters the model's, the light-lock's rail and curtain parted on its west side, the bench on the south wall, the round white table on its pedestal with the wheel at its east edge, the lens's ring at the hip's top; dark but for the grounds on the table by day (its light); the rim's gilt names too small to draw */
+  'camera-obscura': { lights: [[0, 1.5, 1.7, 0xe8efe0, 0.5, 1.6, { day: true }]], items: [
+    ['b', -2.595, -0.6, 0, -2.585, 1.0, 4.0, 'black'], ['b', -2.595, 2.0, 0, -2.585, 3.6, 4.0, 'black'], ['b', -2.595, 1.0, 0, -2.585, 2.0, 1.0, 'black'], ['b', -2.595, 1.0, 2.2, -2.585, 2.0, 4.0, 'black'],
+    ['b', -2.6, 3.585, 0, -0.5, 3.595, 4.0, 'black'], ['b', 0.5, 3.585, 0, 2.6, 3.595, 4.0, 'black'], ['b', -0.5, 3.585, 0, 0.5, 3.595, 1.0, 'black'], ['b', -0.5, 3.585, 2.2, 0.5, 3.595, 4.0, 'black'],
+    ['b', 2.585, -0.6, 0, 2.595, 1.0, 4.0, 'black'], ['b', 2.585, 2.0, 0, 2.595, 3.6, 4.0, 'black'], ['b', 1.585, 1.0, 0, 1.595, 2.0, 4.0, 'black'], ['b', 1.6, 0.985, 0, 2.6, 0.995, 4.0, 'black'],
+    ['b', 1.6, 2.005, 0, 2.6, 2.015, 4.0, 'black'], ['b', -2.6, -0.595, 0, 1.8, -0.585, 4.0, 'black'], ['b', 1.8, -0.595, 1.9, 2.6, -0.585, 4.0, 'black'], ['b', 1.385, -0.585, 2.2, 1.415, 0.415, 2.23, 'iron'],
+    ['b', 1.415, 0.385, 2.2, 2.585, 0.415, 2.23, 'iron'], ['b', 1.385, -0.585, 0.02, 1.415, -0.2, 2.2, 'black'], ['b', 1.415, 0.385, 0.02, 2.585, 0.415, 2.2, 'black'], ['b', -1.8, -0.58, 0.4, 0.4, -0.2, 0.45, 'oak'],
+    ['b', -1.75, -0.55, -0.015, -1.6, -0.25, 0.4, 'oak'], ['b', 0.2, -0.55, -0.015, 0.35, -0.25, 0.4, 'oak'], ['y', 0, 1.5, 0.7, 0.76, 0.8, 'white'], ['y', 0, 1.5, 0.12, -0.015, 0.76, 'wood'],
+    ['y', 0, 1.5, 0.35, -0.015, 0.03, 'wood'], ['b', 0.7, 1.47, 0.6, 0.76, 1.53, 0.66, 'iron'], ['y', 0.82, 1.5, 0.14, 0.62, 0.65, 'iron'], ['b', 0.81, 1.49, 0.65, 0.83, 1.51, 0.78, 'iron'],
+    ['y', 0, 1.5, 0.3, 7.42, 7.48, 'brass'], ['y', 0, 1.5, 0.26, 7.41, 7.43, 'glass']] }
 };
 var W5B_MATS = { wood: 0x5a4c3e, dark: 0x3e342a, oak: 0x6a5a48, pine: 0x8a7456, iron: 0x2e2b28, brass: 0x9a7a3a, plaster: 0xe8e2d4,
   stone: 0x8c867c, slate: 0x3c4046, cloth: 0x6b3b34, linen: 0xc8c0ae, wicker: 0x9a8460, paper: 0xd9cfb4, books: 0x5b4636,
-  leather: 0x5a3a28, glass: 0x9fb0b8, green: 0x4c6a3a, soot: 0x141312, pencil: 0x8e877c, rope: 0x8a7a5a, straw: 0xb8a468, brick: 0x6e4434 };
+  leather: 0x5a3a28, glass: 0x9fb0b8, green: 0x4c6a3a, soot: 0x141312, pencil: 0x8e877c, rope: 0x8a7a5a, straw: 0xb8a468, brick: 0x6e4434, black: 0x0c0b0b, white: 0xeeeae0 };
 window.SHELL_W5B.build = function (ctx) {
   var R = (ctx.THINGS || W5B_THINGS)[ctx.PLACE]; if (!R) return;   /* req 828: the lead's shell-w5a.js passes its own THINGS and MATS */
   var MATS = W5B_MATS; if (ctx.MATS) { MATS = {}; Object.keys(W5B_MATS).forEach(function (k) { MATS[k] = W5B_MATS[k]; }); Object.keys(ctx.MATS).forEach(function (k) { MATS[k] = ctx.MATS[k]; }); }
@@ -665,7 +675,8 @@ window.SHELL_W5B.build = function (ctx) {
     bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
     var mesh = new THREE.Mesh(bg, ctx.kit.solid(MATS[m] != null ? MATS[m] : 0x5a4c3e)); mesh.userData.owner = ctx.PLACE; mesh.name = 'w5b-' + m; g.add(mesh);
   });
-  (R.lights || []).forEach(function (l, i) {   /* a room W5B lights (window.SHELL_W5B.lit): [x, y, z, hex, intensity, distance] in its frame */
+  (R.lights || []).forEach(function (l, i) {   /* a room W5B lights (window.SHELL_W5B.lit): [x, y, z, hex, intensity, distance] in its frame, { day: true } lit 7 am to 6 pm only */
+    if (l[6] && l[6].day && !(ctx.HOUR >= 7 && ctx.HOUR < 18)) return;
     var pl = new THREE.PointLight(l[3], l[4], l[5], 1.6); pl.position.copy(L(l[0], l[1], l[2])); pl.name = 'w5b-light-' + i; g.add(pl);
   });
 };
