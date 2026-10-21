@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=451"></script>
-<script src="castle-paint.js?v=48"></script>
+<script src="castle-model.js?v=452"></script>
+<script src="castle-paint.js?v=49"></script>
 <script src="design/tones.js?v=5"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -260,6 +260,8 @@ PAINTED = PAINTED.concat(['kitchens-steps', 'kitchens-corridor']);
 PAINTED = PAINTED.concat(['teachers-study-g']);
 /* v118, the study a hidden room: the passage round the south-east drum's shoulder behind the archive's turning shelf (Godric's Try 1 on architect-study-hidden-1021) */
 PAINTED = PAINTED.concat(['study-void']);
+/* v123, G's south range west on Godric's 1 on architect-south-west-g-1021c: the corridors round the Gryffindor drum's foot, the lobby, the washrooms, the rooms off them and G2, Peeves's lumber room behind the tapestry */
+PAINTED = PAINTED.concat(['lake-corridor-g-west', 'drum-bend-g-west', 'drum-bend-g', 'drum-bend-g-east', 'lake-corridor-g-mid', 'sw-corner-lobby-g', 'washrooms-g', 'duelling-practice-room', 'quidditch-kit-room', 'kit-broom-cupboard', 'boys-toilets-g', 'girls-toilets-g', 'south-store-g1', 'peeves-lumber-room']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
