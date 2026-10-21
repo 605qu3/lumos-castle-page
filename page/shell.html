@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=434"></script>
-<script src="castle-paint.js?v=33"></script>
+<script src="castle-model.js?v=435"></script>
+<script src="castle-paint.js?v=34"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
@@ -205,7 +205,8 @@ MROOMS.forEach(function (r) { if ((r.alias || []).indexOf(PLACE) >= 0) PLACE = r
 var NEVER = MROOMS.some(function (r) { return r.id === PLACE && r.shell === 'never'; });
 /* each place's start on a plain load: the way he first comes in by */
 var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth', 'tapestry-stairwell': 'tapestry-stair-1',
-  'staff-passage': 'staff-passage-mouth' };   /* at the passage's mouth looking along it, not at the staff room's door across it */
+  'staff-passage': 'staff-passage-mouth',
+  'elves-tunnel': 'tunnel-west-door' };   /* v107: at the West Tower's end looking east along it; K's jib not drawn yet */   /* at the passage's mouth looking along it, not at the staff room's door across it */
 
 var kit = window.castleFrame ? castleFrame({
   background: 0x0b0a09, fog: 0.012,
@@ -247,6 +248,8 @@ PAINTED = PAINTED.concat(['drum-bend-5-west', 'drum-bend-5', 'drum-bend-5-east',
 PAINTED = PAINTED.concat(['gryffindor-lav-witches-6', 'gryffindor-lav-wizards-6', 'ink-room', 'lamp-store-5']);
 /* v103, the cores' landings' ways off (Godric's 1s on architect-landings-b3-1021 and -b1-1021, 21 October 2026) */
 PAINTED = PAINTED.concat(['charms-landing-passage-3', 'mcgonagall-landing-passage-1']);
+/* v107, the elves' tunnel at +2.6 and the linen room off it (Godric's 1 on architect-elves-1021, 7.40 am; Interiors' req 847) */
+PAINTED = PAINTED.concat(['elves-tunnel', 'elves-linen-room']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
