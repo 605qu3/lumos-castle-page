@@ -494,7 +494,9 @@ function useFlight(f) {
 var doorPlaces = {};
 function doorPt(d) { return d.mesh.getWorldPosition(new THREE.Vector3()); }
 function placeOf(d) {
-  if (!FREE || /^thing-/.test(d.mesh.name || '')) return { s: d.stand };
+  /* a way keeps its own stand (Interaction's rewalk of 853: a wall or air tap from a start in a mouth met the way's
+     unseen plane, and the start, its nearest place, took him through) */
+  if (!FREE || /^thing-/.test(d.mesh.name || '') || d.mesh.userData.way) return { s: d.stand };
   if (doorPlaces[d.id]) return doorPlaces[d.id];
   var named = shell.look.stands || {}, p = doorPt(d), lv = d.stand.level, s = null, look = null, best;
   s = FREE.filter(function (x) { return x.name === d.id && sameLevel(x.level, lv); })[0] || null;
