@@ -3311,6 +3311,17 @@
         "the well's lid shut on its curb, the windlass still, the rope dry on its drum"
       ],
       "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: the lid shut, heavy, never open water (Godric's safeguard, the model's record; Interiors' docs/interiors/hidden-ways-batch-2.md, H7)"
+    },
+    {
+      "when": [
+        "place = up only stair"
+      ],
+      "show": [
+        "a narrow stone stair winding up round its newel, the treads worn hollow, the air cool and still",
+        "the way he came in lost below him: turn to go down and every tread still climbs",
+        "at the top, a plain panel in the wall, which opens outward onto the seventh floor's landing"
+      ],
+      "canon": "Hidden Ways' H62 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-sw-tower-1021, 3.33 pm, 21 October 2026; req 876, the Architect's v134, ledger 193: its `magic`, the only-up, Events' to tell): the stair that only goes up, the castle's own humour, as its stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the top; the stair is in the south-west corner's wall stack with no window, so no sky, no weather and no hour show in it"
     }
   ],
   "records": [
@@ -3906,6 +3917,37 @@
         "a heavy thud; the hasp does not move"
       ],
       "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: a tap on the lid, as any shut thing; nothing invites him to open it"
+    },
+    {
+      "id": "hidden-ways.up-only-stair-echo",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "up-only-stair-echo",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = up only stair"
+      ],
+      "show": [
+        "his own footsteps going on up the stair above him, a beat after he has stopped"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H62 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-sw-tower-1021, 3.33 pm, 21 October 2026; req 876, the Architect's v134, ledger 193: its `magic`, the only-up, Events' to tell): the stair that only goes up, the castle's own humour, as its stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the top; now and then, ours: his own steps heard on above him a beat after he has stopped"
+    },
+    {
+      "id": "hidden-ways.up-only-stair-echo-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "up-only-stair-echo",
+      "weight": 2,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = up only stair"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H62 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-sw-tower-1021, 3.33 pm, 21 October 2026; req 876, the Architect's v134, ledger 193: its `magic`, the only-up, Events' to tell): the stair that only goes up, the castle's own humour, as its stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the top; the silent partner, about two waits in three"
     }
   ]
 }
