@@ -22,7 +22,7 @@
      route   route(a, b, level): the turns between two stands on one floor that keep him on the floor (null if none).
      hidden  v10: a hidden opening seen from its outer side, a wall, and over it an unseen tap: { id, to, mesh, stand,
              level, hidden } (the tap is its id to the events, as a door's: Events' `tap keep-east-stair-panel-3`);
-             none for a `oneway` opening, which opens from its inside only (v58)
+             none for a `oneway` opening, which opens from its inside only (v58); on a hung room's box too (v59)
    v10 (Events' req 534): a round room ({ circle, r }, 24 sides, a side square to its first door, its walls as deep as
    its deepest loop), a ring (a feature's `ring`: whole, or an arc where two of its openings stand across it, the long
    way round) and the leads (a feature with `rect`, `z` and `parapet`: a court in the sky, its breast and merlons, the
@@ -924,6 +924,39 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             if (clear(cb, cb)) bar(cb, HE, MER, t / 2, Q.id + '-bar-' + i + '-' + Math.round(cb * 10));
         }
       }
+    });
+    /* v59 (model v138, H65): a room hung in this place's air (its `hung` names this place: the hollow under the vanishing
+       step, in the stair hall's well under well-M4) is a stone box from here, its walls `wall` thick round its plan, a
+       slab under its floor and a roof 0.1 over its ceiling, kept under the flight's waist; its hidden door, which stands
+       in no wall of this place, a tap on the box's face as a wall's (v10), never a `oneway` one */
+    (M.rooms || []).forEach(function (R) {
+      if (!R.hung || slug(R.hung) !== Q.id || !R.shape || !R.shape.rect) return;
+      var t = R.wall != null ? R.wall : 0.2, r = R.shape.rect, bx0 = r[0] - t, by0 = r[1] - t, bx1 = r[2] + t, by1 = r[3] + t;
+      var z0 = levelZ(M, R.level) + (R.floor || 0), z1 = z0 + (R.ceiling != null ? R.ceiling : 2.2) + 0.1;
+      function block(ax, ay, bx, by, za, zb, name) {
+        var m = slab(bx - ax, zb - za, by - ay, mats.wall, 'wall'), p = toLocal((ax + bx) / 2, (ay + by) / 2, za);
+        m.position.set(p.x, p.y + (zb - za) / 2, p.z); m.name = Q.id + '-hung-' + R.id + '-' + name; group.add(m);
+      }
+      block(bx0, by0, bx1, by1, z0 - 0.2, z0, 'under');
+      block(bx0, by0, bx1, by1, z1 - 0.1, z1, 'roof');
+      block(bx0, by0, r[0], by1, z0, z1 - 0.1, 'west');
+      block(r[2], by0, bx1, by1, z0, z1 - 0.1, 'east');
+      block(r[0], by0, r[2], r[1], z0, z1 - 0.1, 'south');
+      block(r[0], r[3], r[2], by1, z0, z1 - 0.1, 'north');
+      (M.openings || []).forEach(function (op) {
+        if (!op.at || op.oneway || !/hidden/.test(op.kind || '') || (op.between || []).indexOf(R.id) < 0) return;
+        if (out.hidden.some(function (d) { return d.id === op.id; })) return;
+        var dW = Math.abs(op.at[0] - r[0]), dE = Math.abs(op.at[0] - r[2]), dS = Math.abs(op.at[1] - r[1]), dN = Math.abs(op.at[1] - r[3]);
+        var dm = Math.min(dW, dE, dS, dN), sx = dm === dW ? -1 : dm === dE ? 1 : 0, sy = sx ? 0 : dm === dS ? -1 : 1;
+        var fx = sx < 0 ? bx0 : sx > 0 ? bx1 : op.at[0], fy = sy < 0 ? by0 : sy > 0 ? by1 : op.at[1];
+        var w = op.w || 0.9, hh = op.h || 2.0, sill = z0 - Q.floor, lift = sill > RAISED ? sill : 0;
+        var mid = toLocal(fx, fy, Q.floor), inward = new THREE.Vector3(sx, 0, -sy);
+        var hit = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
+        hit.position.set(mid.x + sx * 0.02, mid.y + sill + hh / 2, mid.z - sy * 0.02); hit.rotation.y = sx ? Math.PI / 2 : 0;
+        hit.name = 'hidden-' + op.id; hit.userData.hidden = op.id; group.add(hit);
+        out.hidden.push({ id: op.id, to: R.id, mesh: hit, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: sill,
+          lift: lift, level: Q.floor + lift, hidden: true });
+      });
     });
     if (Q.shaft) buildShaft(Q, gaps);
     for (var kk in keep) mats[kk] = keep[kk];
