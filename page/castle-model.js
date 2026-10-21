@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 98,
+  "version": 99,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -132,7 +132,7 @@ window.CASTLE_MODEL = {
       "rubble": "below ground, the hidden ways and the stores: the stone left rough, whatever its age",
       "coursed": "corridors, stairs, classrooms, common rooms and dormitories: squared and coursed",
       "ashlar": "the halls (the Entrance Hall, the Great Hall, the stair hall, the library): dressed smooth",
-      "panelled": "oak panels to a cornice over the stone: the staff room (PoA 7 L15893, CoS 16 L12351) and the teachers' studies in P5 work and later",
+      "panelled": "oak panels to a cornice over the stone: the staff room (PoA 7 L15893, CoS 16 L12351); from v99 every lived-in room (Godric's 1 on fawkes-panelling-1020, 9.34 pm, 20 October 2026, ledger 154): the teachers' offices and studies of any age, the Headmaster's study, Pomfrey's office and the library; halls, corridors and classrooms stay stone",
       "limewash": "P6 and P7 rooms: the stone limewashed, its dressings left bare"
     },
     "floors": [

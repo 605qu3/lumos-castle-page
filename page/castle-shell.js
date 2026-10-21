@@ -289,7 +289,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      along it and a hall's older band below; page/design/tones.js (Design's, req 643) the colours, the model's
      materials.stones the fallback. Provisional until Design's tones are settled; nothing drawn, nothing generated. */
   var PAINT = window.CASTLE_PAINT || null, TONES = window.CASTLE_TONES || null, painted = o.paint || [];
-  var paintMats = {};
+  var paintMats = {}, damp = false;   /* v45: a place below ground reads Design's damp keys first (req 824) */
   function hexOf(v) { return typeof v === 'string' ? parseInt(v.replace('#', ''), 16) : v; }
   function shade(h, k) { return (Math.min(255, Math.round((h >> 16 & 255) * k)) << 16) | (Math.min(255, Math.round((h >> 8 & 255) * k)) << 8) | Math.min(255, Math.round((h & 255) * k)); }
   function stoneHex(stone) {
@@ -298,6 +298,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
   function tone(key, stone, step) {   /* key: "<stone>/<dress>", "flags-<stone>", "vault-<stone>", or a surface's name */
     var R = TONES && TONES.resolved, S = TONES && TONES.surfaces;
+    if (damp && R && R[key + '/below']) return hexOf(R[key + '/below']);
     if (R && R[key]) return hexOf(R[key]);
     if (S && S[key]) return hexOf(S[key].hex);
     var FALL = { marble: 0xe2ded6, oak: 0x6e4c30, 'oak-boards': 0x7d5937, 'oak-beams': 0x5a3d26, iron: 0x34312e, plaster: 0xe8e2d4, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
@@ -450,6 +451,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     function headAt(x) { var z = H; HD.forEach(function (k) { if (x > k.a - 0.01 && x < k.b + 0.01) z = Math.max(z, k.h); }); return z; }
     var c = toLocal((x0 + x1) / 2, (y0 + y1) / 2, Q.floor);
     var row = rowOf(Q), mx = (x0 + x1) / 2, my = (y0 + y1) / 2;      /* v28: a painted place's own tones, kept to this place */
+    damp = Q.floor < -0.5;
     var keep = { floor: mats.floor, floorD: mats.floorD, ceil: mats.ceil, ceilD: mats.ceilD, door: mats.door };
     if (row) { mats.door = paintMat(tone('oak')); mats.floor = floorMat(row, mx, my); mats.floorD = floorMat(row, mx, my, true); mats.ceil = mats.ceilD = ceilMat(row, mx, my); }
     if (Q.area) { var fa = areaMesh(Q, Q.floor, mats.floorD, 'floor'); fa.name = Q.id + '-floor'; group.add(fa); }
