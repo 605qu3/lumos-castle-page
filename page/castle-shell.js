@@ -610,6 +610,66 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (!e) return;
       gaps[e.i].push({ s0: e.s - ft.w / 2, s1: e.s + ft.w / 2, sill: ft.sill || 0, h: Math.min(H, (ft.h || 2.2) + (ft.sill || 0)), op: ft, niche: true });
     });
+    /* v47 (Godric's 1 on design-panelling-staff-1021, 20 October 2026, 10.07 pm, "carved, to the cornice"): a panelled
+       room's oak panelling, Design's kit (page/design/panelling.js) at grade 2, tudor or, in a late-pale room, fielded;
+       it stops under the vault's springing, else at the ceiling. It stops at every opening this wall cut (doors, windows,
+       niches, the hidden ways too, so a jib's tap is not covered) and round each fireplace (w + 0.4, from the floor to
+       0.15 over its head: the surround stands on the wall face); every piece the room's own */
+    if (row && row.dress === 'panelled' && !Q.area && !Q.loops && Q.ceiling != null && window.CastlePanelling) {
+      var pops = [];
+      gaps.forEach(function (gs, i) { gs.forEach(function (g) {
+        if (g.spill) return;
+        /* 1 cm into the reveal each side and under the head, so its ends bear on the jambs, never flush with them */
+        pops.push({ wall: i, at: (g.s0 + g.s1) / 2, w: Math.max(0.1, g.s1 - g.s0 - 0.02), sill: g.sill > 0.05 ? g.sill + 0.01 : g.sill,
+          h: g.h - g.sill - (g.sill > 0.05 ? 0.02 : 0.01), door: g.sill < 0.05 && !g.niche });
+      }); });
+      (M.features || []).forEach(function (ft) {
+        if (!ft.at || !ft.w || !/fireplace/.test(ft.kind || '') || !ft.room || (ft.room !== Q.id && slug(ft.room) !== Q.id)) return;
+        var e = onEdgeE(E, toSite(M, ft.group || null, ft.at));
+        if (!e) return;
+        var fh = ft.h || (ft.opening ? ft.opening[1] : 1.2);
+        pops.push({ wall: e.i, at: e.s, w: ft.w + 0.4, sill: 0, h: Math.max(fh, ft.mantel || 0) + 0.15, door: false });
+      });
+      /* forPlace's wall frame (x along, z into the room, y = z cross x) stands upright only on a wall run clockwise; on
+         the shell's counter-clockwise plans it hung under the floor (the sixty-fourth's probe), so the plan goes in
+         clockwise, each opening's wall and distance read from the far end */
+      var PP = Q.poly, pn = PP.length, ar = 0;
+      PP.forEach(function (p, i) { var q = PP[(i + 1) % pn]; ar += p[0] * q[1] - q[0] * p[1]; });
+      var QP = Q;
+      if (ar > 0) {
+        QP = Object.assign({}, Q, { poly: PP.slice().reverse() });
+        pops = pops.map(function (op) { var a = PP[op.wall], b = PP[(op.wall + 1) % pn], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+          return Object.assign({}, op, { wall: ((pn - 2 - op.wall) % pn + pn) % pn, at: L - op.at }); });
+      }
+      var oak = tone('oak');
+      var PG = window.CastlePanelling.forPlace(THREE, QP, { toLocal: toLocal, style: row.stone === 'late-pale' ? 'fielded' : 'tudor',
+        grade: 2, to: CV && !CV.flat ? CV.springs : undefined, openings: pops,
+        mats: { oak: paintMat(oak), deep: paintMat(shade(oak, 0.78)), carve: oak } });
+      if (PG) {
+        /* the carved frieze's relief stood 2 mm off its frieze's face, inside the seams rule's 4 mm (a combed band seen
+           from across the room): 4 mm more here till Design's kit sets it (asked of Design); and its canvas read as sRGB,
+           as the shell's other canvases (it washed out pale cream on the oak) */
+        PG.traverse(function (o) {
+          o.userData.owner = Q.id;
+          if (/^panelling-(frieze-carved|overdoor)/.test(o.name)) {
+            if (/frieze/.test(o.name)) o.position.z += 0.004;
+            var tm = o.material && o.material.map;
+            if (tm) { if (THREE.SRGBColorSpace) tm.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) tm.encoding = THREE.sRGBEncoding; tm.needsUpdate = true; }
+          }
+        }); group.add(PG);
+        /* for the rooms' things (shell.html): each wall's face in the group's frame and its normal into the room, and how
+           far the panelling stands off it, so a thing hung on the wall is brought out onto the panelling, not buried */
+        var SP = window.CastlePanelling.SPEC[row.stone === 'late-pale' ? 'fielded' : 'tudor'], m0 = toLocal(mx, my, Q.floor);
+        PG.userData.proud = SP.proud;
+        PG.userData.walls = QP.poly.map(function (a, i) {
+          var b = QP.poly[(i + 1) % pn], A = toLocal(a[0], a[1], Q.floor), B = toLocal(b[0], b[1], Q.floor);
+          var ux = B.x - A.x, uz = B.z - A.z, L = Math.hypot(ux, uz) || 1, nx = -uz / L, nz = ux / L;
+          if ((m0.x - A.x) * nx + (m0.z - A.z) * nz < 0) { nx = -nx; nz = -nz; }
+          var gp = pops.filter(function (op) { return op.wall === i; }).map(function (op) { return [op.at - op.w / 2, op.at + op.w / 2, op.sill, op.sill + op.h]; });
+          return { ax: A.x, az: A.z, y0: A.y, ux: ux / L, uz: uz / L, len: L, nx: nx, nz: nz, gaps: gp };
+        });
+      }
+    }
     /* a wall already built from the other side (the place one step on shares it) is not built twice; v24: only where
        the two stand at one height (the Charms corridor over the first floor's, the same plan two storeys up, kept its walls) */
     function sharedE(ed) {

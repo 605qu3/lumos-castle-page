@@ -158,7 +158,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-paint.js?v=28"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
-<script src="castle-shell.js?v=46"></script>
+<script src="design/panelling.js?v=1"></script>
+<script src="castle-shell.js?v=47"></script>
 <script src="shell-w5b.js?v=13"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
@@ -2233,6 +2234,52 @@ var MYRTLE = (function () {
   out.drop = new THREE.Mesh(new THREE.SphereGeometry(0.006, 6, 4), WET); out.drop.visible = false; g.add(out.drop);
   out.dropFrom = P(4.8, 7.4, 0.9); out.dropTo = P(4.8, 7.4, 0.64);
   return out;
+})();
+/* castle-shell.js v47 (the panelling kit, Godric's 1 on design-panelling-staff-1021): in a panelled room what the
+   rooms' things hang on a wall stands out on the panelling, not buried behind its stiles. The things are merged a mesh a
+   material, so the pass moves their points: every point within 0.1 of a panelled wall's face and over 0.3 from the floor
+   comes out by the panelling's depth and 1.5 cm, a piece's back then bearing 5 mm into the stiles' face; a point in a
+   gap the panelling leaves (the fireplace's surround, a door, a window) stays. A geometry another mesh shares is moved
+   whole instead, so nothing else moves with it. W5B's things too (told W5B) */
+(function () {
+  if (!shell) return;
+  var PG = shell.group.getObjectByName(shell.place.id + '-panelling');
+  if (!PG || !PG.userData.walls) return;
+  var push = PG.userData.proud + 0.015, W = PG.userData.walls, moved = 0, uses = new Map();
+  scene.traverse(function (o) { if (o.isMesh) uses.set(o.geometry, (uses.get(o.geometry) || 0) + 1); });
+  var G2W = shell.group.matrixWorld, W2G = new THREE.Matrix4().copy(G2W).invert();
+  function offset(x, y, z) {   /* a point in the shell's frame: how far to bring it out, as [dx, dz], or null */
+    for (var i = 0; i < W.length; i++) {
+      var w = W[i], dn = (x - w.ax) * w.nx + (z - w.az) * w.nz, s = (x - w.ax) * w.ux + (z - w.az) * w.uz, h = y - w.y0;
+      if (dn < -0.1 || dn > 0.1 || h < 0.3 || s < 0 || s > w.len) continue;
+      if (w.gaps.some(function (q) { return s > q[0] && s < q[1] && h > q[2] && h < q[3]; })) continue;
+      return [w.nx * push, w.nz * push];
+    }
+    return null;
+  }
+  shell.group.children.filter(function (g) { return /-things$/.test(g.name); }).forEach(function (g) {
+    g.updateMatrixWorld(true);
+    g.traverse(function (m) {
+      if (!m.isMesh || m.isInstancedMesh) return;
+      var M = new THREE.Matrix4().multiplyMatrices(W2G, m.matrixWorld), Mi = new THREE.Matrix4().copy(M).invert(), v = new THREE.Vector3();
+      if (uses.get(m.geometry) > 1) {   /* shared: the mesh whole, by its middle */
+        var b = new THREE.Box3().setFromObject(m); if (b.isEmpty()) return;
+        b.applyMatrix4(W2G); var c = b.getCenter(new THREE.Vector3()), o = offset(c.x, b.min.y, c.z);
+        if (!o) return;
+        var p = m.getWorldPosition(new THREE.Vector3()).applyMatrix4(W2G); p.x += o[0]; p.z += o[1];
+        m.position.copy(m.parent.worldToLocal(p.applyMatrix4(G2W))); m.updateMatrixWorld(true); moved++;
+        return;
+      }
+      var pos = m.geometry.attributes.position, n = 0;
+      for (var k = 0; k < pos.count; k++) {
+        v.fromBufferAttribute(pos, k).applyMatrix4(M);
+        var o2 = offset(v.x, v.y, v.z); if (!o2) continue;
+        v.x += o2[0]; v.z += o2[1]; v.applyMatrix4(Mi); pos.setXYZ(k, v.x, v.y, v.z); n++;
+      }
+      if (n) { pos.needsUpdate = true; m.geometry.computeBoundingBox(); m.geometry.computeBoundingSphere(); moved += n; }
+    });
+  });
+  PG.userData.moved = moved;
 })();
 function myrtleSet(st) {   /* st: {fresh, drying, film, flood}, each true or false */
   if (!MYRTLE.on) return;
