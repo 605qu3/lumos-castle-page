@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=470"></script>
-<script src="castle-paint.js?v=67"></script>
+<script src="castle-model.js?v=471"></script>
+<script src="castle-paint.js?v=68"></script>
 <script src="design/tones.js?v=5"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -278,6 +278,8 @@ PAINTED = PAINTED.concat(['down-only-stair-way-6', 'down-only-stair-way-1']);
 PAINTED = PAINTED.concat(['vanishing-step-hollow']);
 /* v140, req 890 on Godric's 1s (6.24 and 6.28 pm, 21 October 2026): the strong room on 2 (H68) and the tally room on 6 (H66) */
 PAINTED = PAINTED.concat(['strong-room', 'tally-room']);
+/* v141, Godric's 1 on architect-south-east-tower-1021 (6.36 pm, 21 October 2026): the south-east drum's round room on 1 */
+PAINTED = PAINTED.concat(['se-round-room-1']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
