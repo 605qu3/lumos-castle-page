@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=437"></script>
-<script src="castle-paint.js?v=36"></script>
+<script src="castle-model.js?v=438"></script>
+<script src="castle-paint.js?v=37"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
@@ -251,6 +251,8 @@ PAINTED = PAINTED.concat(['gryffindor-lav-witches-6', 'gryffindor-lav-wizards-6'
 PAINTED = PAINTED.concat(['charms-landing-passage-3', 'mcgonagall-landing-passage-1']);
 /* v107, the elves' tunnel at +2.6 and the linen room off it (Godric's 1 on architect-elves-1021, 7.40 am; Interiors' req 847) */
 PAINTED = PAINTED.concat(['elves-tunnel', 'elves-linen-room']);
+/* v110, G's paper rooms, the first batch: the south-east range off the lake-face corridor (the layout's e, i, l, o, r) */
+PAINTED = PAINTED.concat(['free-classroom-g', 'visitors-parlour', 'post-room', 'treatment-room', 'registers-archive']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
