@@ -778,6 +778,380 @@
         "set filch_door = shut"
       ],
       "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: the visit's draws cleared at leave"
+    },
+    {
+      "id": "filch.chase-stone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "year = 2",
+        "castle date >= 2 10-31",
+        "castle date <= 2 06-30"
+      ],
+      "starts": [
+        "set norris_stone = yes"
+      ],
+      "canon": "the Chamber's year, 31 October to the end of term: Mrs Norris is the first petrified (CoS 13 to 18), so she does not whisk off for Filch and the chase is not drawn; her return at the term's end is not shown; a state for the chase's records, ours"
+    },
+    {
+      "id": "filch.chase-stone-off-a",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "year != 2",
+        "norris_stone = yes"
+      ],
+      "starts": [
+        "set norris_stone = no"
+      ],
+      "canon": "out of the Chamber's year she is free again: the chase may be drawn (see filch.chase-stone)"
+    },
+    {
+      "id": "filch.chase-stone-off-b",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "year = 2",
+        "castle date <= 2 10-30",
+        "norris_stone = yes"
+      ],
+      "starts": [
+        "set norris_stone = no"
+      ],
+      "canon": "before 31 October of the Chamber's year she is free: the chase may be drawn (see filch.chase-stone)"
+    },
+    {
+      "id": "filch.chase-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-chase",
+      "weight": 1,
+      "moment": "wait 150-420 s",
+      "when": [
+        "place = corridor",
+        "time = night",
+        "chase != on",
+        "norris_stone != yes",
+        "nights since chase_night >= 1"
+      ],
+      "show": [
+        "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
+      ],
+      "starts": [
+        "set chase = on",
+        "stamp chase_night by night"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; on its own, now and then after dark and never more than once a night, with a silent partner at weight 2 (about one wait in three)"
+    },
+    {
+      "id": "filch.chase-night-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-chase",
+      "weight": 2,
+      "moment": "wait 150-420 s",
+      "when": [
+        "place = corridor",
+        "time = night",
+        "chase != on",
+        "norris_stone != yes",
+        "nights since chase_night >= 1"
+      ],
+      "starts": [],
+      "canon": "the silent partner of filch.chase-night"
+    },
+    {
+      "id": "filch.chase-toe-cupboard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap broom cupboard",
+      "when": [
+        "place = corridor",
+        "at = cupboard",
+        "norris != none",
+        "chase != on",
+        "norris_stone != yes"
+      ],
+      "show": [
+        "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
+      ],
+      "starts": [
+        "set chase = on",
+        "stamp chase_night by night"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a toe out of line in front of her: the cupboard's handle tried while she is in view, always"
+    },
+    {
+      "id": "filch.chase-toe-armour",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "norris != none",
+        "chase != on",
+        "norris_stone != yes"
+      ],
+      "show": [
+        "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
+      ],
+      "starts": [
+        "set chase = on",
+        "stamp chase_night by night"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a toe out of line in front of her: a knock on the armour while she is in view, always"
+    },
+    {
+      "id": "filch.chase-wheeze",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch wheezes",
+      "when": [
+        "place = corridor",
+        "chase = on"
+      ],
+      "show": [
+        "a wheeze coming up the stairs from the stair hall, still out of sight"
+      ],
+      "starts": [],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the page raises it two seconds after her whisk, as the book has it"
+    },
+    {
+      "id": "filch.chase-lamp",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch lamp",
+      "when": [
+        "place = corridor",
+        "chase = on"
+      ],
+      "show": [
+        "lamplight climbing the steps, the wheezing nearer"
+      ],
+      "starts": [],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the page raises it five seconds after her whisk; his lamp's own light, nothing glowing to say tap me"
+    },
+    {
+      "id": "filch.chase-top-open",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch stopped at the top of the stairs with his lamp held up, wheezing and getting his breath"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-top-open",
+          "sound": "Filch at the top of the stairs, wheezing, talking to Mrs Norris",
+          "text": [
+            "My knees, my sweet. My poor old knees.",
+            "Give me a moment, my sweet. Just a moment."
+          ],
+          "canon": "ours, in his voice (the design card events-filch-chase-1021: in the open he stops at the top wheezing until the boy hides or runs; his \"my sweet\" to her, CoS 8 L9091, checked against the text, 15 October 2026); comic, he never sees him (the world rules)"
+        }
+      ],
+      "starts": [],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; in the open he stops at the top; the page waits there, never nearer, and raises `filch at top` again if the boy hides, `filch grumbles off` if he reaches home, `filch gone` if Back takes him down the stairs"
+    },
+    {
+      "id": "filch.chase-hidden",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        },
+        {
+          "as": "fat-lady",
+          "role": "voice",
+          "name": "the fat lady",
+          "mark": "her frame"
+        }
+      ],
+      "show": [
+        "Filch's lamp swinging slowly along the corridor, never turning, on to the Fat Lady's end and back to the stairs"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-mutter",
+          "sound": "Filch muttering as he shuffles past, never turning",
+          "text": [
+            "They're in here somewhere... probably hiding."
+          ],
+          "canon": "PS 9 L3241 (\"They're in here somewhere,\" they heard him mutter, \"probably hiding.\"), checked against the text, 21 October 2026; the one line of that night kept, on Godric's pick of 3.42 pm (the card), overtaking filch.grumble's rule of none; it says nothing of anyone, and he never sees a boy (the world rules)"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-asks",
+          "sound": "Filch at the Fat Lady's portrait, asking her",
+          "text": [
+            "Seen anyone, my lady? Anyone out of their beds?",
+            "You've not seen anyone come by, have you, my lady?"
+          ],
+          "canon": "ours, in his voice (the design card events-filch-chase-1021: he asks the Fat Lady if she has seen anyone); comic"
+        },
+        {
+          "speaker": "fat-lady",
+          "medium": "heard",
+          "key": "filch.chase-lady-answers",
+          "sound": "the Fat Lady answering him from her frame",
+          "text": [
+            "Not a soul, Mr Filch. Not a soul.",
+            "Not a living soul, Mr Filch, and I would know."
+          ],
+          "canon": "ours, in her voice (her dignity and her loyalty to the house, PS 7 and PS 8; the card: she answers him and does not give a boy away); comic"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; hidden, he shuffles past, asks the Fat Lady and goes down: the page walks his lamp along the corridor to her end and back to the stairs, never turning"
+    },
+    {
+      "id": "filch.chase-home",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch grumbles off",
+      "when": [
+        "place = corridor",
+        "chase = on"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-home",
+          "sound": "Filch's grumble fading away behind the portrait",
+          "text": [
+            "Gone to ground, my sweet. Gone to ground.",
+            "Nothing up here, my sweet. Down we go.",
+            "Next time, my sweet. Next time."
+          ],
+          "canon": "ours, in his voice (the design card events-filch-chase-1021: home, the portrait shuts and his grumble fades through it); comic, nothing lost, nothing in the common room changes (the orchestrator's word of 3.55 pm)"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the chase ends at the portrait shutting; the page raises it then"
+    },
+    {
+      "id": "filch.chase-gone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch gone",
+      "when": [
+        "place = corridor",
+        "chase = on"
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the page raises it when the chase ends any other way (Back slipping past him, or a start the page declined), so no chase hangs on"
+    },
+    {
+      "id": "filch.chase-lady",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "unheard her",
+      "when": [
+        "place = corridor",
+        "speech = on",
+        "lady = asking",
+        "chase = on"
+      ],
+      "who": [
+        {
+          "as": "fat-lady",
+          "role": "voice",
+          "name": "the fat lady",
+          "mark": "her frame"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "fat-lady",
+          "medium": "said",
+          "key": "filch.chase-lady",
+          "text": [
+            "Oh, quickly, dear, quickly. In you come.",
+            "Is that someone coming? In, in, quickly."
+          ],
+          "canon": "ours, in her voice (the orchestrator's word of 3.55 pm: the password's fallback is Events' to design, a chase never hangs on a password unheard): with Filch's lamp on the steps she lets him in the first time the ear hears nothing near enough, never asking again"
+        }
+      ],
+      "starts": [
+        "set lady = shut"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the password's fallback during a chase"
+    },
+    {
+      "id": "filch.chase-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a chase never outlives the visit"
     }
   ]
 }
