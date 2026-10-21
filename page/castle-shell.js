@@ -21,7 +21,8 @@
              own list to the page.
      route   route(a, b, level): the turns between two stands on one floor that keep him on the floor (null if none).
      hidden  v10: a hidden opening seen from its outer side, a wall, and over it an unseen tap: { id, to, mesh, stand,
-             level, hidden } (the tap is its id to the events, as a door's: Events' `tap keep-east-stair-panel-3`)
+             level, hidden } (the tap is its id to the events, as a door's: Events' `tap keep-east-stair-panel-3`);
+             none for a `oneway` opening, which opens from its inside only (v58)
    v10 (Events' req 534): a round room ({ circle, r }, 24 sides, a side square to its first door, its walls as deep as
    its deepest loop), a ring (a feature's `ring`: whole, or an arc where two of its openings stand across it, the long
    way round) and the leads (a feature with `rect`, `z` and `parapet`: a court in the sky, its breast and merlons, the
@@ -763,8 +764,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var p = toLocal(a[0] + ux * s + nx * off, a[1] + uy * s + ny * off, Q.floor), m = slab(0.04, yb - ya, 0.04, mats.grille, 'wall');
         m.position.set(p.x, p.y + (ya + yb) / 2, p.z); m.rotation.y = ang; m.name = name; group.add(m);
       }
-      /* v10: a hidden opening seen from its outer side stays wall, with an unseen tap over its face */
-      gaps[i].filter(function (g) { return g.hidden; }).forEach(function (g) {
+      /* v10: a hidden opening seen from its outer side stays wall, with an unseen tap over its face; v58 (model v134,
+         H62's head door): a `oneway` opening opens from its inside only, so from its outer side it is wall, no tap */
+      gaps[i].filter(function (g) { return g.hidden && !g.op.oneway; }).forEach(function (g) {
         if (out.hidden.some(function (d) { return d.id === g.op.id; })) return;
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill, mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny), lift = g.sill > RAISED ? g.sill : 0;
