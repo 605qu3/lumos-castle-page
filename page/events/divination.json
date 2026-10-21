@@ -33,6 +33,17 @@
       "when": [
         "place = divination classroom",
         "year >= 3",
+        "trelawney = tables"
+      ],
+      "show": [
+        "her thin shawl over the back of her winged armchair, its spangles dull"
+      ],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top, her shawl; Godric's pick of 16 October 2026, curator-divination-list-1016, \"add her shawl on her chair\"; Interiors' req 783, docs/interiors/divination-classroom.md, cited), the PoA castle on: the shawl PoA 6 L15286 (Interiors' item); Interiors' Occupancy has her in the room whenever he is, so \"when she is out of the room\" never holds: the shawl lies on her chair while she drifts between the tables (the hundred-fifteenth's question of 20 October 2026, 4.22 pm, option 1, unanswered past 30 minutes, provisional, Godric to confirm); it never moves (Magic's row)"
+    },
+    {
+      "when": [
+        "place = divination classroom",
+        "year >= 3",
         "lessons = off"
       ],
       "show": [
@@ -183,6 +194,40 @@
         "year >= 3"
       ],
       "starts": []
+    },
+    {
+      "id": "divination.trelawney-chair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "divination-trelawney",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = divination classroom",
+        "year >= 3"
+      ],
+      "starts": [
+        "set trelawney = chair"
+      ],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top, her shawl; Godric's pick of 16 October 2026, curator-divination-list-1016, \"add her shawl on her chair\"; Interiors' req 783, docs/interiors/divination-classroom.md, cited), the PoA castle on: where she is as he comes in, drawn at arriving, her winged armchair (PoA 6 L15290) or among the little tables (the lesson rule's own line); provisional, Godric to confirm"
+    },
+    {
+      "id": "divination.trelawney-tables",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "divination-trelawney",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = divination classroom",
+        "year >= 3"
+      ],
+      "starts": [
+        "set trelawney = tables"
+      ],
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top, her shawl; Godric's pick of 16 October 2026, curator-divination-list-1016, \"add her shawl on her chair\"; Interiors' req 783, docs/interiors/divination-classroom.md, cited), the PoA castle on: where she is as he comes in, drawn at arriving, her winged armchair (PoA 6 L15290) or among the little tables (the lesson rule's own line); provisional, Godric to confirm"
     }
   ]
 }
