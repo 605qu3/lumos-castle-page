@@ -16,7 +16,8 @@
        y, z), style, grade, to, mats, openings: [{ at: [x, y], w, sill, h, door }] in site metres (a fire is an opening
        with its sill 0 and h its mantel) }; returns the group, named <id>-panelling, or null. Each wall stands on the
        shell's own face, its back bearing 1 cm into the wall, the plinth into the floor and the cornice into the
-       ceiling; every mesh carries userData.owner, <id>-panelling. An opening is either in site metres, { at: [x, y],
+       ceiling; every mesh carries userData.owner, <id>-panelling. The plan may wind either way, and the cornices
+       mitre at the corners (req 843). An opening is either in site metres, { at: [x, y],
        w, sill, h, door }, or in the room's own frame, { wall (the poly's edge i, from poly[i] to poly[i + 1]), at
        (metres along it), w, sill, h, door }.
    CastlePanelling.GRADES  the ladder, plain to rich, each rung named:
@@ -29,6 +30,7 @@
 
   var GRADES = ['plain', 'moulded', 'carved', 'rich'];
   var BEAR = 0.01;   /* every piece bears 1 cm into what it meets, the wall, the floor, the ceiling, never flush (the seams rule; the Architect, 9.55 pm) */
+  var LIFT = 0.006;  /* a relief canvas stands this far off its board's face, past the seams rule's 4 mm (req 843) */
   /* the heights, metres from the floor (precedents to confirm: docs/curator/panelling.md, req 835's open slots).
      The chair rail at 0.9, where the staff room's chair backs (0.85 to 1.1) rest on it (Interiors, 9.55 pm). */
   var SPEC = {
@@ -83,6 +85,12 @@
     return out;
   }
 
+  /* a canvas drawn in sRGB, read so (as ceilings.js's faces), else it washes out pale on the oak (the Architect, req 843) */
+  function srgb(THREE, t) {
+    if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding;
+    return t;
+  }
+
   /* a canvas relief run along the frieze: tudor a round-arched arcade, fielded a run of stiff leaves */
   function friezeTexture(THREE, style, base, hpx) {
     var c = document.createElement('canvas'), w = hpx * 2; c.width = w; c.height = hpx;
@@ -106,7 +114,7 @@
       }
     }
     cut(p);
-    var t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; t.anisotropy = 4;
+    var t = srgb(THREE, new THREE.CanvasTexture(c)); t.wrapS = THREE.RepeatWrapping; t.anisotropy = 4;
     return t;
   }
 
@@ -120,7 +128,7 @@
         window.LumosCarving.boss(x, b, wpx / 8 + i * wpx / 4, hpx / 2, hpx * 0.42, { stone: hex, light: -Math.PI / 2, form: 'bare' });
       });
     }
-    return new THREE.CanvasTexture(c);
+    return srgb(THREE, new THREE.CanvasTexture(c));
   }
 
   function wall(THREE, o, mats) {
@@ -164,7 +172,7 @@
         var tex = friezeTexture(THREE, o.style, mats.carve != null ? mats.carve : 0x684e38, 128);
         tex.repeat.set(ul / (S.frieze * 2), 1);
         var fm = new THREE.Mesh(new THREE.PlaneGeometry(ul, S.frieze * 0.9), new THREE.MeshLambertMaterial({ map: tex }));
-        fm.position.set((u[0] + u[1]) / 2, top + S.frieze / 2, S.proud + 0.002); fm.name = 'panelling-frieze-carved-' + k; G.add(fm);
+        fm.position.set((u[0] + u[1]) / 2, top + S.frieze / 2, S.proud + LIFT); fm.name = 'panelling-frieze-carved-' + k; G.add(fm);
       }
     });
     var cs = new THREE.Shape(), C = S.cornice;   // the cornice in section: a fillet, a cove and a projecting top
@@ -172,7 +180,19 @@
     cs.moveTo(-BEAR, 0); cs.lineTo(S.proud + 0.01, 0); cs.lineTo(S.proud + 0.01, C * 0.18);
     cs.quadraticCurveTo(S.proud + 0.02, C * 0.75, S.proud + C * 0.7, C * 0.8); cs.lineTo(S.proud + C * 0.7, C); cs.lineTo(S.proud + C * 0.7, cTop); cs.lineTo(-BEAR, cTop); cs.closePath();
     tops.forEach(function (u, k) {
-      var cg = new THREE.ExtrudeGeometry(cs, { depth: u[1] - u[0], bevelEnabled: false, curveSegments: 6 });
+      var L = u[1] - u[0], cg = new THREE.ExtrudeGeometry(cs, { depth: L, bevelEnabled: false, curveSegments: 6 });
+      /* mitred where the run meets the next wall's cornice at a corner (o.mitre: [start, end], the cot of half the
+         corner's angle; 1 a square inside corner, below 0 an outside one), so the two never lie in one plane. Before the
+         turn below, a vertex's x is its depth into the room and its z runs back from the run's end (0 at u[1], L at u[0]) */
+      var m0 = u[0] < 1e-3 && o.mitre ? o.mitre[0] : 0, m1 = u[1] > len - 1e-3 && o.mitre ? o.mitre[1] : 0;
+      if ((m0 || m1) && L > 2.2 * (S.proud + C * 0.7) * Math.max(1, Math.abs(m0), Math.abs(m1))) {
+        var pa = cg.attributes.position;
+        for (var v = 0; v < pa.count; v++) {
+          var vz = pa.getZ(v), vd = pa.getX(v);
+          if (m0 && vz > L - 1e-4) pa.setZ(v, L - vd * m0); else if (m1 && vz < 1e-4) pa.setZ(v, vd * m1);
+        }
+        pa.needsUpdate = true; cg.computeVertexNormals();
+      }
       var cm = new THREE.Mesh(cg, mats.oak); cm.rotation.y = -Math.PI / 2; cm.position.set(u[1], top + S.frieze, 0);   // the profile out into the room, run back along the wall
       cm.name = 'panelling-cornice-' + k; G.add(cm);
     });
@@ -181,7 +201,7 @@
       var ow = Math.min(2.4, Math.max(1.2, (g.x1 - g.x0) + 0.6)), oh = ow / 4;
       var ot = overdoorTexture(THREE, mats.carve != null ? mats.carve : 0x684e38, 512);
       var om = new THREE.Mesh(new THREE.PlaneGeometry(ow, oh), new THREE.MeshLambertMaterial({ map: ot }));
-      om.position.set((g.x0 + g.x1) / 2, Math.min(top - oh / 2 - 0.05, g.y1 + 0.12 + oh / 2), S.proud + 0.012);
+      om.position.set((g.x0 + g.x1) / 2, Math.min(top - oh / 2 - 0.05, g.y1 + 0.12 + oh / 2), S.proud + 0.008 + LIFT);
       om.name = 'panelling-overdoor-' + k; G.add(om);
       box((g.x0 + g.x1) / 2 - ow / 2 - 0.04, (g.x0 + g.x1) / 2 + ow / 2 + 0.04, om.position.y - oh / 2 - 0.04, om.position.y + oh / 2 + 0.04, S.proud + 0.008);
     });
@@ -207,29 +227,44 @@
     return G;
   }
 
-  /* every wall of a place: the poly's edges, each wall's frame turned to face into the room */
+  /* every wall of a place: the poly's edges, each wall's frame turned to face into the room and stand upright whichever
+     way the plan winds (req 843: the first build stood upright only on a clockwise plan, the shell's run counter-clockwise) */
   function forPlace(THREE, Q, o) {
     if (!Q || !Q.poly || Q.ceiling == null) return null;
-    var G = new THREE.Group(), h = Q.ceiling - Q.floor, P = Q.poly, n = P.length, cx = 0, cy = 0;
-    P.forEach(function (p) { cx += p[0] / n; cy += p[1] / n; });
-    for (var i = 0; i < n; i++) {
-      var a = P[i], b = P[(i + 1) % n], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy);
+    var G = new THREE.Group(), h = Q.ceiling - Q.floor, P = Q.poly, n = P.length, ar = 0, i;
+    for (i = 0; i < n; i++) ar += P[i][0] * P[(i + 1) % n][1] - P[(i + 1) % n][0] * P[i][1];
+    var side = ar > 0 ? 1 : -1;   // the room lies left of each edge on a counter-clockwise plan, right on a clockwise one
+    var edge = function (j) { var a = P[j], b = P[(j + 1) % n], L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1; return [(b[0] - a[0]) / L, (b[1] - a[1]) / L, L]; };
+    /* each corner's mitre, the cot of half the room's angle there (1 square, below 0 an outside corner), 0 by a skipped edge */
+    var mit = P.map(function (p, j) {
+      var ei = edge((j - 1 + n) % n), eo = edge(j);
+      if (ei[2] < 0.3 || eo[2] < 0.3) return 0;
+      var t = Math.tan((Math.PI - Math.atan2(side * (ei[0] * eo[1] - ei[1] * eo[0]), ei[0] * eo[0] + ei[1] * eo[1])) / 2);
+      return Math.abs(t) < 0.05 ? 0 : 1 / t;
+    });
+    var up = new THREE.Vector3().subVectors(o.toLocal(P[0][0], P[0][1], Q.floor + 1), o.toLocal(P[0][0], P[0][1], Q.floor));
+    for (i = 0; i < n; i++) {
+      var a = P[i], b = P[(i + 1) % n], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
       if (len < 0.3) continue;
-      var ux = dx / len, uy = dy / len, nx = -uy, ny = ux;   // the normal toward the room's middle
-      if ((cx - a[0]) * nx + (cy - a[1]) * ny < 0) { nx = -nx; ny = -ny; }
-      var local = (o.openings || []).filter(function (op) { return op.wall === i && typeof op.at === 'number'; })
-        .map(function (op) { return { x0: op.at - op.w / 2, x1: op.at + op.w / 2, y0: op.sill || 0, y1: (op.sill || 0) + op.h, door: !!op.door }; });
-      var gaps = (o.openings || []).filter(function (op) {
-        if (typeof op.at === 'number') return false;
-        var t = (op.at[0] - a[0]) * ux + (op.at[1] - a[1]) * uy, dn = (op.at[0] - a[0]) * nx + (op.at[1] - a[1]) * ny;
-        return t > -0.1 && t < len + 0.1 && Math.abs(dn) < 0.6;
-      }).map(function (op) {
-        var t = (op.at[0] - a[0]) * ux + (op.at[1] - a[1]) * uy;
-        return { x0: t - op.w / 2, x1: t + op.w / 2, y0: op.sill || 0, y1: (op.sill || 0) + op.h, door: !!op.door };
-      }).concat(local);
-      var W = wall(THREE, { len: len, h: h, to: o.to, style: o.style, grade: o.grade, gaps: gaps, owner: Q.id + '-panelling' }, o.mats);
+      var nx = -side * (b[1] - a[1]) / len, ny = side * (b[0] - a[0]) / len;   // the normal into the room
+      /* the frame (x along, z into the room, y = z cross x) is upright when x runs one way: run the wall from b when not */
       var A = o.toLocal(a[0], a[1], Q.floor), B = o.toLocal(b[0], b[1], Q.floor), N = o.toLocal(a[0] + nx, a[1] + ny, Q.floor);
       var ex = new THREE.Vector3().subVectors(B, A).normalize(), ez = new THREE.Vector3().subVectors(N, A).normalize();
+      var rev = new THREE.Vector3().crossVectors(ez, ex).dot(up) < 0;
+      var s0 = rev ? b : a, ux = ((rev ? a : b)[0] - s0[0]) / len, uy = ((rev ? a : b)[1] - s0[1]) / len;
+      var local = (o.openings || []).filter(function (op) { return op.wall === i && typeof op.at === 'number'; })
+        .map(function (op) { var t = rev ? len - op.at : op.at; return { x0: t - op.w / 2, x1: t + op.w / 2, y0: op.sill || 0, y1: (op.sill || 0) + op.h, door: !!op.door }; });
+      var gaps = (o.openings || []).filter(function (op) {
+        if (typeof op.at === 'number') return false;
+        var t = (op.at[0] - s0[0]) * ux + (op.at[1] - s0[1]) * uy, dn = (op.at[0] - s0[0]) * nx + (op.at[1] - s0[1]) * ny;
+        return t > -0.1 && t < len + 0.1 && Math.abs(dn) < 0.6;
+      }).map(function (op) {
+        var t = (op.at[0] - s0[0]) * ux + (op.at[1] - s0[1]) * uy;
+        return { x0: t - op.w / 2, x1: t + op.w / 2, y0: op.sill || 0, y1: (op.sill || 0) + op.h, door: !!op.door };
+      }).concat(local);
+      var mi = rev ? [mit[(i + 1) % n], mit[i]] : [mit[i], mit[(i + 1) % n]];
+      var W = wall(THREE, { len: len, h: h, to: o.to, style: o.style, grade: o.grade, gaps: gaps, owner: Q.id + '-panelling', mitre: mi }, o.mats);
+      if (rev) { var T = A; A = B; B = T; ex.negate(); }
       var ey = new THREE.Vector3().crossVectors(ez, ex);
       W.matrixAutoUpdate = false;
       W.matrix.makeBasis(ex, ey, ez).setPosition(A);

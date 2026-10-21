@@ -17,7 +17,7 @@
 <script src="drawn.js?v=1"></script>
 <script src="carving.js?v=1"></script>
 <script src="ceilings.js?v=1"></script>
-<script src="panelling.js?v=1"></script>
+<script src="panelling.js?v=2"></script>
 <script>
 /* panelling-live.html: Design's probe for panelling.js (Godric's 1 on fawkes-panelling-1020, 20 October 2026), the staff
    room at the model's plan and height (page/castle-model.js: 14 x 6 x 4.5, its door centred in the west wall, the fire
@@ -49,6 +49,7 @@
   var r = C.rect, ccx = (r[0] + r[2]) / 2, ccy = (r[1] + r[3]) / 2, w = r[2] - r[0], d = r[3] - r[1], WT = 0.8;
   var toLocal = function (x, y, z) { return new THREE.Vector3(x - ccx, z, y - ccy); };
   var Q = { id: C.id, poly: [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]], floor: 0, ceiling: C.h, rec: {} };
+  if (q.get('wind') === 'cw') Q.poly.reverse();   /* ?wind=cw: the plan wound the other way, the kit upright either way (req 843) */
   var x0 = -w / 2, x1 = w / 2, z0 = -d / 2, z1 = d / 2;
   box(w, 0.1, d, mats.floor, 0, -0.05, 0);
   box(w + 2 * WT, C.h, WT, mats.wall, 0, C.h / 2, z0 - WT / 2);                     // north, the fire wall
@@ -106,7 +107,8 @@
   (function tick() {
     if (cam.isPerspectiveCamera) { cam.rotation.y = -yaw; cam.rotation.x = pitch; }
     renderer.render(scene, cam);
-    if (++frames === 30) window.panellingReady = { meshes: P.children.reduce(function (n, g) { return n + g.children.length; }, 0), walls: P.children.length };
+    if (++frames === 30) window.panellingReady = { meshes: P.children.reduce(function (n, g) { return n + g.children.length; }, 0), walls: P.children.length,
+      upright: P.children.filter(function (g) { return g.matrix.elements[5] > 0.99; }).length };
     requestAnimationFrame(tick);
   })();
 })();
