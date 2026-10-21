@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=440"></script>
-<script src="castle-paint.js?v=39"></script>
+<script src="castle-model.js?v=441"></script>
+<script src="castle-paint.js?v=40"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
@@ -255,6 +255,8 @@ PAINTED = PAINTED.concat(['elves-tunnel', 'elves-linen-room']);
 PAINTED = PAINTED.concat(['free-classroom-g', 'visitors-parlour', 'post-room', 'treatment-room', 'registers-archive']);
 /* v112, req 803 (c)'s 1: the stone steps down from the Entrance Hall and the kitchens' corridor (GoF 21) */
 PAINTED = PAINTED.concat(['kitchens-steps', 'kitchens-corridor']);
+/* v113, G's ad, the teacher's study off the registers' archive (architect-study-door-1021's 1) */
+PAINTED = PAINTED.concat(['teachers-study-g']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
