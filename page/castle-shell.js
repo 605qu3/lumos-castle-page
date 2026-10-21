@@ -739,6 +739,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var turn = function (e0, e1) { return (e0.b[0] - e0.a[0]) * (e1.b[1] - e1.a[1]) - (e0.b[1] - e0.a[1]) * (e1.b[0] - e1.a[0]); };
       if (ext0 && pL >= 1e-6 && turn(pe, ed) < -1e-9) ext0 = 0;
       if (ext1 && turn(ed, ne) < -1e-9) ext1 = 0;
+      /* v60 (model v143, req 895: the casemate's west embrasure stood uncut, Interiors' shots of 7.27 and 7.29 pm): on a
+         gentle turn (a curved face drawn in short sides) this wall's corner block runs on along the next side's line and
+         stood in an opening near its start; held short of that opening, still past the t sin(turn) that closes the corner */
+      var nL = Math.hypot(ne.b[0] - ne.a[0], ne.b[1] - ne.a[1]), s0n = (gaps[(i + 1) % E.length] || []).reduce(function (m, g) { return g.hidden ? m : Math.min(m, g.s0); }, Infinity);
+      if (ext1 && nL >= 1e-6 && s0n < Infinity) {
+        var cT = (ux * (ne.b[0] - ne.a[0]) + uy * (ne.b[1] - ne.a[1])) / nL, sT = turn(ed, ne) / (L * nL);
+        if (cT > 1e-6 && ext1 * cT - t * sT > s0n - 0.02) ext1 = Math.max(0, (s0n - 0.02 + t * sT) / cT);
+      }
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
