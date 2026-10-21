@@ -154,12 +154,12 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=444"></script>
-<script src="castle-paint.js?v=42"></script>
+<script src="castle-model.js?v=445"></script>
+<script src="castle-paint.js?v=43"></script>
 <script src="design/tones.js?v=4"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=51"></script>
+<script src="castle-shell.js?v=52"></script>
 <script src="shell-w5b.js?v=13"></script>
 <script src="shell-w5a.js?v=4"></script>
 <script src="castle-events.js?v=39"></script>
@@ -2535,6 +2535,13 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(shell.group.children, false).filter(function (h) { return h.object.visible || h.object.userData.way; });
+  /* req 856 (Interaction; Godric's stair fault, 21 October 2026, 11.10 am): arrived by a way, he stands a step outside
+     its plane, so at the start the way he came by yields to what lies behind it (the stair hall's marble flights,
+     not well-mouth and back); from any place inside it is in front of him and takes him out as before */
+  if (here === START && kit.from && hits.length && hits[0].object.userData.way) {
+    var came = thingOf(hits[0].object);
+    if (came && came.to === kit.from) hits.shift();
+  }
   /* v20 (Events' ninety-second, 4.01 am): a tap through an open way at a way or door beyond it is a tap on that one
      (lake-passage-b-north seen through lake-passage-b-south's mouth, its plane always first on the ray); the near way
      keeps the tap where the ray meets wall or floor beyond it */

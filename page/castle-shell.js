@@ -1337,6 +1337,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   shaftFlights.forEach(function (f) {
     var mk = function (e, name) { return { name: name, pos: toLocal(e.x, e.y, e.z + EYE), look: toLocal(e.lx, e.ly, e.z + EYE + e.up), thing: null, level: e.z }; };
     var fs = mk(f.foot, f.id + ' foot'), hs = mk(f.head, f.id + ' head');
+    fs.flight = hs.flight = true;   /* req 856 */
     out.flights.push({ id: f.id, foot: fs, head: hs, footPt: fs.pos.clone(), headPt: hs.pos.clone(), lamp: f.lamp || null,
       path: f.path.map(function (p) { return toLocal(p[0], p[1], p[2] + EYE); }).concat([hs.pos.clone()]) });
     out.stands.push(fs, hs);
@@ -1372,6 +1373,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var headPt = toLocal(F0.head[0], F0.head[1], F0.zh + EYE), footPt = toLocal(F0.foot[0], F0.foot[1], F0.zf + EYE);
     var fs = endStand(F0, F0.zf, true, F0.s.id + ' foot', headPt.clone());
     var hs = endStand(F0, F0.zh, false, F0.s.id + ' head', onward(F0));
+    fs.flight = hs.flight = true;   /* req 856: a flight's end, for the look below */
     out.flights.push({ id: F0.s.id, foot: fs, head: hs, footPt: footPt, headPt: headPt });
     out.stands.push(fs, hs);
   });
@@ -1391,8 +1393,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function pick(L, k, d) { return L[k] != null ? L[k] : LK[k] != null ? LK[k] : d; }
   out.stands.forEach(function (st) {
     var L = named[st.name] || {};
-    st.lim = { rest: pick(L, 'rest', null), down: pick(L, 'down', -14), up: pick(L, 'up', 14), turn: pick(L, 'turn', 60) };
-    if (st.lim.rest != null && (st.name === 'start' || named[st.name])) {
+    /* req 856 (Interaction; Godric's stair faults, 21 October 2026, 11.10 am; the charter's walking freely, section 2):
+       in a look.free room a flight's end the model does not name is a place like any drawn one, all round and its
+       rest about the level, not the default 60 and a look up the flight's slope */
+    var fl = LK.free && st.flight && !named[st.name];
+    st.lim = { rest: pick(L, 'rest', null), down: pick(L, 'down', -14), up: pick(L, 'up', 14), turn: pick(L, 'turn', fl ? 180 : 60) };
+    if (st.lim.rest != null && (st.name === 'start' || named[st.name] || fl)) {
       var d = st.look.clone().sub(st.pos), hz = Math.hypot(d.x, d.z) || 1, k = 10 / hz;
       st.look = st.pos.clone().add(new THREE.Vector3(d.x * k, Math.tan(st.lim.rest * Math.PI / 180) * 10, d.z * k));
     }
