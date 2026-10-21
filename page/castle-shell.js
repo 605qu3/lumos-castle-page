@@ -976,7 +976,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           st.rotation.y = Math.atan2(ux, -uy); st.name = id + '-' + i; st.userData.stair = id; group.add(st);
         }
         shaftStepped[d.id] = true; shaftFloors.push({ c: c, r: R, z: d.z });
-        shaftFlights.push({ id: id, foot: end(d.a, R - n * GO - 0.35, L.z, d.a, R), head: end(d.a, R - 0.35, d.z, d.a, R + 1),
+        /* v57 (req 861 (3)): steps that run in past the newel leave their foot beside them on the landing, the side
+           nearer its middle, never across the well on the next flight's treads */
+        var fa = d.a, fr = R - n * GO - 0.35;
+        if (fr < NR + 0.3) {
+          var side = Math.atan2(d.w / 2, PR) * 180 / Math.PI + 10;
+          fa = off(d.a + side, L.mid) <= off(d.a - side, L.mid) ? d.a + side : d.a - side; fr = PR;
+        }
+        shaftFlights.push({ id: id, foot: end(fa, fr, L.z, d.a, R), head: end(d.a, R - 0.35, d.z, d.a, R + 1),
           path: [[at(d.a, R - n * GO - 0.35), L.z], [at(d.a, R - 0.35), d.z]].map(function (q) { return [q[0][0], q[0][1], q[1]]; }) });
       });
     });
@@ -992,7 +999,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         if (doors.some(function (d) { return top > d.z + 0.05 && top < d.top + 0.2 && off(mid, d.a) < d.half + 2 + t / 2; })) continue;
         wedge(k === n ? a2 : a2 - 0.5, a1, top, rise, mats.floor, fid + '-' + k).userData.stair = fid;   /* v39: the top tread meets its landing edge to edge, not lapped flush on it */
       }
-      shaftFlights.push({ id: fid, foot: end(A.out + 6, PR, A.z, A.out - 3 * t, PR, 0.9), head: end(B.in - 6, PR, B.z, B.mid != null ? B.mid : B.in, R),
+      /* v57 (req 861 (1)): a head under the next landing (less than 2.45 above, so under 0.9 over his eye) stands at
+         its landing's middle instead (the West Tower's +5.2 under the wall passage's +7.2) */
+      var ha = B.in - 6;
+      if (lands.some(function (U) { return U.z > B.z && U.z - B.z < 2.45 && off(ha, U.mid) < (U.hi - U.lo) / 2 + 4; })) ha = B.mid;
+      shaftFlights.push({ id: fid, foot: end(A.out + 6, PR, A.z, A.out - 3 * t, PR, 0.9), head: end(ha, PR, B.z, B.mid != null ? B.mid : B.in, R),
         path: path, lamp: [c[0], c[1], B.z + 2.0] });
     }
   }
