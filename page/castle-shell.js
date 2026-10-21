@@ -687,6 +687,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          corridor's head over the bend's east mouth lay on the wall's end, 2.08 m2, seen from the stair over it) */
       var ne = E[(i + 1) % E.length], nHE = ne.H != null ? ne.H : H;
       if (ext1 && (gaps[i] || []).some(function (g) { return g.s1 >= L - 0.01; }) && nHE >= HE && !(Q.sky && Q.sky.sides)) ext1 = 0;
+      /* v49 (model v102, the four rooms round the Gryffindor drum on 5 and 6 turned counter-clockwise): at a corner that
+         turns into the room (a drum's face bulging in), the walls meet behind their faces, so neither runs on past it
+         (run on, they stood in the room and in each other, 4 m2) */
+      var turn = function (e0, e1) { return (e0.b[0] - e0.a[0]) * (e1.b[1] - e1.a[1]) - (e0.b[1] - e0.a[1]) * (e1.b[0] - e1.a[0]); };
+      if (ext0 && pL >= 1e-6 && turn(pe, ed) < -1e-9) ext0 = 0;
+      if (ext1 && turn(ed, ne) < -1e-9) ext1 = 0;
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
