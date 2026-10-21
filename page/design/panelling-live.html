@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panelling probe</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; color: #d8cfbf; font: 14px/1.4 Georgia, serif; overflow: hidden; }
+  canvas { display: block; touch-action: none; }
+  #say { position: fixed; left: 12px; bottom: 10px; right: 12px; text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="say"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="tones.js?v=3"></script>
+<script src="drawn.js?v=1"></script>
+<script src="carving.js?v=1"></script>
+<script src="ceilings.js?v=1"></script>
+<script src="panelling.js?v=1"></script>
+<script>
+/* panelling-live.html: Design's probe for panelling.js (Godric's 1 on fawkes-panelling-1020, 20 October 2026), the staff
+   room at the model's plan and height (page/castle-model.js: 14 x 6 x 4.5, its door centred in the west wall, the fire
+   in the north wall, three windows in the south wall on the court), beams on corbels above (ceilings.js), tones from
+   tones.js, candles and lamps as the light. ?grade=0 to 3 (default 1), ?style=tudor or fielded, ?to=<metres> where the
+   panelling stops (default the ceiling); ?view=room (default), north, east (an elevation of that wall from inside,
+   square on), plan. Drag to look round. Not the shell: the shell calls CastlePanelling.forPlace. */
+(function () {
+  'use strict';
+  var T = window.CASTLE_TONES, R = T.resolved, q = new URLSearchParams(location.search);
+  var grade = q.get('grade') != null ? +q.get('grade') : 1, style = q.get('style') || 'tudor', to = q.get('to') ? +q.get('to') : null, view = q.get('view') || 'room';
+  var C = { id: 'staff-room', rect: [128, 50.6, 142, 56.6], h: 4.5, stone: 'tudor-pink', dress: 'coursed' };
+  var OPEN = [
+    { at: [128, 53.6], w: 1.2, sill: 0, h: 2.4, door: true },                 // staff-room-door, the west wall
+    { at: [131.5, 50.6], w: 1.9, sill: 0, h: 1.5 },                            // the fire and its surround to the mantel (1.4)
+    { at: [132.5, 56.6], w: 1.2, sill: 1.2, h: 2.6 }, { at: [136.0, 56.6], w: 1.2, sill: 1.2, h: 2.6 }, { at: [139.5, 56.6], w: 1.2, sill: 1.2, h: 2.6 }
+  ];
+  var hex = function (s) { return new THREE.Color(s); };
+  var lam = function (s) { var m = new THREE.MeshLambertMaterial({ color: hex(s) }); m.side = THREE.DoubleSide; return m; };
+  var oak = T.surfaces.oak.hex, deep = '#' + new THREE.Color(oak).multiplyScalar(0.78).getHexString();
+  var mats = { vault: lam(R['vault-' + C.stone]), stone: lam(R[C.stone + '/ashlar']), beam: lam(T.surfaces['oak-beams'].hex),
+    wall: lam(R[C.stone + '/' + C.dress]), floor: lam(R['flags-' + C.stone]), flat: lam(T.surfaces.plaster.hex), dark: lam('#0e0c0a'),
+    glass: new THREE.MeshBasicMaterial({ color: hex('#9fb0bd'), side: THREE.DoubleSide }), fire: lam('#1a1512'), surround: lam(R[C.stone + '/ashlar']) };
+  var pmats = { oak: lam(oak), deep: lam(deep), carve: parseInt(oak.slice(1), 16) };
+  var W = innerWidth, H = innerHeight, renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(W, H); document.body.appendChild(renderer.domElement);
+  var scene = new THREE.Scene();
+  function box(w, h, d, m, x, y, z) { var b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); scene.add(b); return b; }
+  var r = C.rect, ccx = (r[0] + r[2]) / 2, ccy = (r[1] + r[3]) / 2, w = r[2] - r[0], d = r[3] - r[1], WT = 0.8;
+  var toLocal = function (x, y, z) { return new THREE.Vector3(x - ccx, z, y - ccy); };
+  var Q = { id: C.id, poly: [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]], floor: 0, ceiling: C.h, rec: {} };
+  var x0 = -w / 2, x1 = w / 2, z0 = -d / 2, z1 = d / 2;
+  box(w, 0.1, d, mats.floor, 0, -0.05, 0);
+  box(w + 2 * WT, C.h, WT, mats.wall, 0, C.h / 2, z0 - WT / 2);                     // north, the fire wall
+  box(WT, C.h, d, mats.wall, x1 + WT / 2, C.h / 2, 0);                                // east, the far end
+  /* south, the window wall: piers between the three windows, glass in each */
+  var sx = OPEN.slice(2).map(function (o) { return o.at[0] - ccx; }), cuts = [x0];
+  sx.forEach(function (c) { cuts.push(c - 0.6, c + 0.6); }); cuts.push(x1);
+  for (var i = 0; i < cuts.length; i += 2) box(cuts[i + 1] - cuts[i], C.h, WT, mats.wall, (cuts[i] + cuts[i + 1]) / 2, C.h / 2, z1 + WT / 2);
+  sx.forEach(function (c) { box(1.2, 1.2, WT, mats.wall, c, 0.6, z1 + WT / 2); box(1.2, C.h - 3.8, WT, mats.wall, c, 3.8 + (C.h - 3.8) / 2, z1 + WT / 2); box(1.2, 2.6, 0.04, mats.glass, c, 2.5, z1 + WT * 0.6); });
+  /* west, the door wall: the door centred */
+  var dz = 53.6 - ccy;
+  box(WT, C.h, dz - 0.6 - z0, mats.wall, x0 - WT / 2, C.h / 2, (z0 + dz - 0.6) / 2);
+  box(WT, C.h, z1 - dz - 0.6, mats.wall, x0 - WT / 2, C.h / 2, (z1 + dz + 0.6) / 2);
+  box(WT, C.h - 2.4, 1.2, mats.wall, x0 - WT / 2, 2.4 + (C.h - 2.4) / 2, dz);
+  box(0.05, 2.4, 1.2, lam(T.surfaces.oak.hex), x0 - 0.3, 1.2, dz);
+  /* the fire: a plain stone surround, its mantel at 1.4 (the Architect's fireplace kit draws the real one) */
+  var fx = 131.5 - ccx;
+  box(1.9, 0.1, 0.32, mats.surround, fx, 1.4, z0 + 0.16); box(0.2, 1.35, 0.25, mats.surround, fx - 0.85, 0.675, z0 + 0.125);
+  box(0.2, 1.35, 0.25, mats.surround, fx + 0.85, 0.675, z0 + 0.125); box(1.5, 0.25, 0.25, mats.surround, fx, 1.225, z0 + 0.125);
+  box(1.5, 1.1, 0.05, mats.fire, fx, 0.55, z0 + 0.02);
+  CastleCeilings.faces.base('../../assets/layers/');   /* the probe sits in page/design/ */
+  var cl = CastleCeilings.forPlace(THREE, Q, { toLocal: toLocal, kind: 'beams', mats: mats });
+  if (cl) scene.add(cl.group);
+  box(w, 0.06, d, mats.flat, 0, C.h + 0.03, 0);
+  var P = CastlePanelling.forPlace(THREE, Q, { toLocal: toLocal, style: style, grade: grade, to: to, mats: pmats, openings: OPEN });
+  scene.add(P);
+  /* the light: candles and lamps, warm pools along the long walls, a cool fill from the court windows, the fire low */
+  var L = T.lights;
+  scene.add(new THREE.HemisphereLight(0x9a948a, 0x2a2622, 0.42));
+  [-4.5, 0, 4.5].forEach(function (t) { [-1, 1].forEach(function (s) { var p = new THREE.PointLight(hex(L.candle.hex), 0.75, 9, 1.4); p.position.set(t, 2.1, s * (d / 2 - 0.6)); scene.add(p); }); });
+  var fire = new THREE.PointLight(0xff9a50, 0.8, 6, 1.6); fire.position.set(fx, 0.6, z0 + 0.6); scene.add(fire);
+  var day = new THREE.DirectionalLight(hex(L.day.hex), 0.25); day.position.set(0, 4, 10); scene.add(day);
+  var cam, say = document.getElementById('say');
+  if (view === 'room') {
+    cam = new THREE.PerspectiveCamera(70, W / H, 0.05, 100); cam.position.set(x0 + 1.2, 1.4, 0.4);
+    if (q.get('at')) { var e = q.get('at').split(',').map(Number); cam.position.set(e[0], e[1], e[2]); }   /* ?at=x,y,z in the room's frame, the plan's middle at 0 */
+  } else {
+    var A = W / H, span = view === 'north' ? w + 0.4 : view === 'east' ? d + 0.4 : w + 1.2, hh = view === 'plan' ? (d + 1.2) : C.h + 0.4;
+    var half = Math.max(span / 2, hh / 2 * A);
+    cam = new THREE.OrthographicCamera(-half, half, half / A, -half / A, 0.05, 100);
+    if (view === 'north') { cam.position.set(0, C.h / 2, z1 - 0.05); cam.lookAt(0, C.h / 2, z0); box(w + 4, C.h + 4, 0.02, mats.dark, 0, C.h / 2, z1 + 0.5); }
+    if (view === 'east') { cam.position.set(x0 + 0.05, C.h / 2, 0); cam.lookAt(x1, C.h / 2, 0); }
+    if (view === 'plan') { cam.position.set(0, 2.3, 0); cam.up.set(0, 0, -1); cam.lookAt(0, 0, 0); cam.near = 0.01; cam.far = 2.4; cam.updateProjectionMatrix(); }
+  }
+  var yaw = Math.PI / 2 + 0.05 + (+(q.get('yaw') || 0)) * Math.PI / 180, pitch = (+(q.get('up') || 6)) * Math.PI / 180, drag = null;
+  renderer.domElement.addEventListener('pointerdown', function (e) { drag = [e.clientX, e.clientY, yaw, pitch]; });
+  addEventListener('pointerup', function () { drag = null; });
+  addEventListener('pointermove', function (e) { if (!drag) return; yaw = drag[2] - (e.clientX - drag[0]) * 0.006; pitch = Math.max(-1, Math.min(1.3, drag[3] - (e.clientY - drag[1]) * 0.004)); });
+  if (q.has('clean')) say.style.display = 'none';   /* the sheets' sections */
+  var U = P.children[0] && P.children[0].userData;
+  say.textContent = 'The staff room, 14 x 6 x 4.5 m: ' + style + ', grade ' + grade + ' (' + CastlePanelling.GRADES[grade] + ')' +
+    (U ? ', chair rail ' + U.rail + ' m, frieze from ' + U.top.toFixed(2) + ' m' : '') + (to ? ', stopping at ' + to + ' m' : ', to the cornice');
+  var frames = 0;
+  if (cam.isPerspectiveCamera) cam.rotation.order = 'YXZ';
+  (function tick() {
+    if (cam.isPerspectiveCamera) { cam.rotation.y = -yaw; cam.rotation.x = pitch; }
+    renderer.render(scene, cam);
+    if (++frames === 30) window.panellingReady = { meshes: P.children.reduce(function (n, g) { return n + g.children.length; }, 0), walls: P.children.length };
+    requestAnimationFrame(tick);
+  })();
+})();
+</script>
+</body>
+</html>
