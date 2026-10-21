@@ -226,7 +226,7 @@ var floor = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 64), floorMat)
 floor.rotation.x = -Math.PI / 2;
 floor.name = 'floor'; scene.add(floor); register(floor, 1);
 /* the ground beyond the room's circle toward the eye, as the room's, so a wide drag never shows the void */
-var floorBeyond = new THREE.Mesh(new THREE.RingGeometry(WALL_R + 0.05, 14, 64), solid(0x2e2a27, { roughness: 1 }));
+var floorBeyond = new THREE.Mesh(new THREE.RingGeometry(WALL_R + 0.1, 14, 64), solid(0x2e2a27, { roughness: 1 }));
 floorBeyond.rotation.x = -Math.PI / 2; floorBeyond.position.y = -0.002;
 floorBeyond.name = 'floor-beyond'; scene.add(floorBeyond); register(floorBeyond, 1);
 var ceiling = new THREE.Mesh(new THREE.CircleGeometry(WALL_R + 0.1, 64), solid(0x2b2927));
@@ -598,7 +598,7 @@ for (var k = 0; k < 8; k++) {
   tr.name = 'tread-' + k; well.add(tr); register(tr, 1); treads.push(tr);
 }
 var kerbStart = Math.PI - roomSide * Math.PI / 180 + Math.PI / 4;   /* three.js measures its arc from +z; the gap faces the room */
-var kerb = new THREE.Mesh(new THREE.CylinderGeometry(WELL_R + 0.12, WELL_R + 0.12, 0.14, 32, 1, true, kerbStart, Math.PI * 1.5), solid(0x807b75, { side: THREE.DoubleSide }));
+var kerb = new THREE.Mesh(new THREE.CylinderGeometry(WELL_R + 0.11, WELL_R + 0.11, 0.14, 32, 1, true, kerbStart, Math.PI * 1.5), solid(0x807b75, { side: THREE.DoubleSide }));   /* 1 cm inside the screen, so the two never share a face (the sixty-first) */
 kerb.position.y = 0.07; kerb.name = 'kerb'; well.add(kerb); register(kerb, 1);
 var wellTap = new THREE.Mesh(new THREE.CircleGeometry(WELL_R + 0.15, 32), new THREE.MeshBasicMaterial());
 wellTap.rotation.x = -Math.PI / 2; wellTap.position.y = 0.01; wellTap.visible = false; well.add(wellTap);
