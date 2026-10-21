@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=433"></script>
-<script src="castle-paint.js?v=32"></script>
+<script src="castle-model.js?v=434"></script>
+<script src="castle-paint.js?v=33"></script>
 <script src="design/tones.js?v=3"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
@@ -412,7 +412,7 @@ var D2R = Math.PI / 180;
 /* how far his head goes at a stand (the model's look, version 19): the turn each way (all round at 180), the pitch
    between the stand's down and up, measured about the level, whatever the stand looks at */
 function limits(s) {
-  var L = s.lim || { down: -14, up: 14, turn: 60 }, d = s.look.clone().sub(s.pos), el0 = Math.atan2(d.y, Math.hypot(d.x, d.z));
+  var L = s.lim || { down: -14, up: 14, turn: 60 }, d = lookOf(s).clone().sub(s.pos), el0 = Math.atan2(d.y, Math.hypot(d.x, d.z));
   return { yaw: L.turn >= 180 ? null : L.turn * D2R, lo: Math.min(0, L.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, L.up * D2R) - el0) };
 }
 if (W5B.build) W5B.build({ THREE: THREE, kit: kit, shell: shell, PLACE: PLACE, MODEL: MODEL, BOOK: BOOK, HOUR: HOUR, TORCH: TORCH, CANDLE: CANDLE });   /* W5B's things */
@@ -431,9 +431,12 @@ var EYE = 1.35;   /* castle-shell.js's eye over the floor */
 var FREE = shell.look && shell.look.free ? shell.stands.filter(function (s) { return (shell.look.stands || {})[s.name]; }) : null;
 function thingOf(mesh) { return things.filter(function (d) { return d.mesh === mesh || d.mate === mesh; })[0]; }
 function flightOf(mesh) { var id = mesh.userData.stair; return id ? shell.flights.filter(function (f) { return f.id === id; })[0] : null; }
+/* req 848: the look he arrived with by a floor tap (the way he walked), for this stand only; null, the stand's own */
+var hereLook = null;
+function lookOf(s) { return s === here && hereLook ? hereLook : s.look; }
 function headPose(pos, look) {
   pos.copy(here.pos);
-  var d = here.look.clone().sub(here.pos), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
+  var d = lookOf(here).clone().sub(here.pos), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
   look.set(pos.x + Math.sin(a) * Math.cos(el) * 10, pos.y + Math.sin(el) * 10, pos.z + Math.cos(a) * Math.cos(el) * 10);
 }
 function sameLevel(a, b) { return Math.abs(a - b) < 0.02; }
@@ -443,7 +446,7 @@ function startLeg() {
   tween = { t: 0, dur: to.fast ? clamp(0.3 + dist * 0.04, 0.3, 1.2) : clamp(0.8 + dist * 0.08, 0.8, 2.6), from: from, to: to };
 }
 /* through eye points to a stand, each leg looking on along itself, the last as the stand looks */
-function walkTo(points, s, fast) {
+function walkTo(points, s, fast, look) {
   legs = [];
   var prev = camera.position.clone();
   points.forEach(function (p, i) {
@@ -451,7 +454,7 @@ function walkTo(points, s, fast) {
     if (dir.lengthSq() < 1e-4) dir = p.clone().sub(prev);
     legs.push({ pos: p.clone(), look: p.clone().add(dir.setLength(10)), fast: fast }); prev = p;
   });
-  here = s; hy = hyT = hp = hpT = 0;
+  here = s; hereLook = look || null; hy = hyT = hp = hpT = 0;
   var fp = new THREE.Vector3(), fl = new THREE.Vector3(); headPose(fp, fl);
   legs.push({ pos: fp, look: fl, fast: fast });
   trail = trail.concat(points.map(function (p) { return p.clone(); }), [s.pos.clone()]);
@@ -2514,11 +2517,13 @@ function tap(cx, cy) {
    place `look.free`, its named stands are places to stand (the Entrance Hall's every 4 m). A tap on a thing the model
    names a place for walks to it; a tap on the floor walks to the nearest place on his floor, arriving facing the way he
    walked where the place has no face of its own; a tap on a wall or the air leaves him where he is (the mote). Only
-   Back takes him to the start. */
+   Back takes him to the start. Req 848 (Godric's fault, 21 October 2026, 7.30 am: a floor tap turned him to a thing or
+   a wall): a floor tap arrives facing the way he walked at any place, a thing's too; the place's own face only when he
+   taps its thing. The walk's look rides walkTo and is never written onto the stand. */
 function freeTap(h) {
   if (!h) return false;
-  var named = shell.look.stands || {}, o = h.object, s = null;
-  if (o.name && named[o.name]) s = shell.stands.filter(function (x) { return x.name === o.name; })[0];
+  var named = shell.look.stands || {}, o = h.object, s = null, byThing = false;
+  if (o.name && named[o.name]) { s = shell.stands.filter(function (x) { return x.name === o.name; })[0]; byThing = true; }
   else {
     var n = h.face ? h.face.normal.clone().transformDirection(o.matrixWorld) : null, fy = here.pos.y - EYE;
     if (!n || n.y < 0.7 || Math.abs(h.point.y - fy) > 0.3) return false;
@@ -2531,12 +2536,12 @@ function freeTap(h) {
     });
   }
   if (!s || s === here || !sameLevel(s.level, here.level)) return false;
-  var pts = shell.route(here.pos, s.pos, s.level) || [];
-  if (named[s.name] && !named[s.name].face) {
+  var pts = shell.route(here.pos, s.pos, s.level) || [], walkLook = null;
+  if (!byThing || !(named[s.name] && named[s.name].face)) {
     var dir = s.pos.clone().sub(pts.length ? pts[pts.length - 1] : here.pos); dir.y = 0;
-    if (dir.lengthSq() > 1e-4) s.look = s.pos.clone().add(dir.setLength(10));
+    if (dir.lengthSq() > 1e-4) walkLook = s.pos.clone().add(dir.setLength(10));
   }
-  walkTo(pts, s);
+  walkTo(pts, s, false, walkLook);
   return true;
 }
 
