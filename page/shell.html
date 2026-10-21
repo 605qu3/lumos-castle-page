@@ -481,7 +481,48 @@ function useFlight(f) {
   if (near(f.head)) { if (f.path) walkTo(f.path.slice().reverse().concat([f.footPt]), f.foot, true); else walkTo([f.headPt, f.footPt], f.foot); return true; }
   return goStand(f.foot) || goStand(f.head);
 }
-function goTo(d) { return goStand(d.stand); }
+/* req 853 (Interaction, 21 October 2026, 9.00 am: 29 of 39 door taps in a free room went to the shell's own stand, off
+   every drawn place): in a `look.free` room a door's place is the drawn place named for it (the corridors' door places),
+   else the nearest drawn place on its floor that faces the door (within 45 degrees, 5 m), and he arrives with that
+   place's own face, as a thing's tap; else the nearest drawn place within 3 m (never a thing's tap-only place), and he
+   arrives facing the door; the shell's own stand only where no drawn place is near, and in rooms still stand to stand.
+   A model thing keeps its own stand */
+var doorPlaces = {};
+function doorPt(d) { return d.mesh.getWorldPosition(new THREE.Vector3()); }
+function placeOf(d) {
+  if (!FREE || /^thing-/.test(d.mesh.name || '')) return { s: d.stand };
+  if (doorPlaces[d.id]) return doorPlaces[d.id];
+  var named = shell.look.stands || {}, p = doorPt(d), lv = d.stand.level, s = null, look = null, best;
+  s = FREE.filter(function (x) { return x.name === d.id && sameLevel(x.level, lv); })[0] || null;
+  if (!s) {
+    best = 5;
+    FREE.forEach(function (x) {
+      var n = named[x.name];
+      if (!sameLevel(x.level, lv) || !n || !n.face || n.tapOnly) return;
+      var to = p.clone().sub(x.pos), f = x.look.clone().sub(x.pos), dd;
+      to.y = 0; f.y = 0; dd = to.length();
+      if (dd < 1e-3 || f.lengthSq() < 1e-6 || to.normalize().dot(f.normalize()) < Math.SQRT1_2) return;
+      if (dd < best) { best = dd; s = x; }
+    });
+  }
+  if (!s) {
+    best = 3;
+    FREE.forEach(function (x) {
+      if (!sameLevel(x.level, lv) || (named[x.name] && named[x.name].tapOnly)) return;
+      var dd = Math.hypot(x.pos.x - p.x, x.pos.z - p.z);
+      if (dd < best) { best = dd; s = x; }
+    });
+    if (s) { var dir = p.clone().sub(s.pos); dir.y = 0; if (dir.lengthSq() > 1e-4) look = s.pos.clone().add(dir.setLength(10)); }
+  }
+  return (doorPlaces[d.id] = s ? { s: s, look: look } : { s: d.stand });
+}
+function goTo(d) {
+  var q = placeOf(d);
+  if (!q.look || here === q.s) return goStand(q.s);
+  if (!sameLevel(here.level, q.s.level)) return false;
+  walkTo(shell.route(here.pos, q.s.pos, q.s.level) || [], q.s, false, q.look);
+  return true;
+}
 /* Reset: back to the start, the head level and any pinch let go (Godric, 20 October 2026, 8.41 am: a zoom survived it, so
    Reset seemed to do nothing) */
 function goBack() {
@@ -2493,7 +2534,7 @@ function tap(cx, cy) {
          tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
   if (hit && hit.userData.grains && CUP) {   /* B21's grains, from the cupboard's stand while it stands open */
-    if (here !== CUP.d.stand) acted = goTo(CUP.d);
+    if (here !== CUP.d.stand && here !== placeOf(CUP.d).s) acted = goTo(CUP.d);
     else { lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else if (Q.get('grains') === 'run') cupRun(); acted = true; }
     kit.tapped(acted); return;
   }
@@ -2507,7 +2548,7 @@ function tap(cx, cy) {
   if (events && hit && CADOGAN && (hit === CADOGAN.frame || hit === CADOGAN.ground)) { CADOGAN.taps++; events.tap('cadogan'); kit.tapped(true); return; }   /* req 802 */
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
-  if (d && here === d.stand) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
+  if (d && (here === d.stand || here === placeOf(d).s)) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) {
     acted = goTo(d);
     /* req 550: walking up to an open way is its tap to the events (gun-room-arch's draught), since a second tap takes him through */
