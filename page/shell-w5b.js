@@ -556,9 +556,10 @@ var W5B_THINGS = {
     ['y', 62.35, 60.1, 0.07, 0.785, 0.85, 'brass'], ['y', 62.35, 60.1, 0.04, 0.835, 1.2, 'glass'], ['b', 64.15, 57.7, -0.015, 64.87, 58.3, 1.5, 'oak'],
     ['b', 58.18, 57.775, -0.015, 58.8, 58.225, 0.35, 'pine'], ['b', 58.25, 57.82, 0.2, 58.75, 58.18, 0.36, 'books'],
     ['b', 58.3, 57.9, 0.345, 58.7, 58.1, 0.45, 'paper']] },
-/* wave-5-upper-floors.md, The four placed, secret-s4a (v92): the worn plank seat on two blocks across the north end, its top at 0.45 (HD1); the soot on the flue's side north of the panel, darkest high (HD2) */
+/* wave-5-upper-floors.md, The four placed, secret-s4a (v92): the worn plank seat on two blocks across the north end, its top at 0.45 (HD1); the soot on the flue's side north of the panel, darkest high (HD2); the east side the flue's brick */
   'secret-s4a': { items: [
-    ['b', 55.86, 6.7, 0.4, 57.29, 7.02, 0.45, 'oak'], ['b', 56.05, 6.73, -0.015, 56.25, 7.015, 0.415, 'stone'], ['b', 56.9, 6.73, -0.015, 57.1, 7.015, 0.415, 'stone'], ['b', 57.29, 5.61, 1, 57.32, 6.99, 2.19, 'soot']] },
+    ['b', 55.86, 6.7, 0.4, 57.29, 7.02, 0.45, 'oak'], ['b', 56.05, 6.73, -0.015, 56.25, 7.015, 0.415, 'stone'], ['b', 56.9, 6.73, -0.015, 57.1, 7.015, 0.415, 'stone'], ['b', 57.255, 5.62, 1, 57.265, 6.99, 2.19, 'soot'],
+    ['b', 57.27, 5.62, -0.015, 57.295, 6.99, 2.19, 'brick'], ['b', 57.27, 4.96, 1.62, 57.295, 5.62, 2.19, 'brick']] },   /* W5B-33 held by the lead (the shell paints one stone a room): the flue's brick on the east side, beside and over the panel */
 /* wave-5-upper-floors.md, The four placed, secret-s1: the two stacks of Divination's tables and poufs under their sheets (RN1), the broken crystal-ball stand on its side (RN2), the old fire screen by the east wall (RN3); the PoA castle on */
   'secret-s1': { items: [
     ['b', 155.95, 74.65, -0.015, 157.35, 76.05, 1.2, 'linen', { from: 'PoA' }], ['y', 156.65, 75.35, 0.5, 1.185, 1.45, 'linen', { from: 'PoA' }], ['b', 156.31, 75.01, 1.435, 156.39, 75.09, 1.6, 'linen', { from: 'PoA' }], ['b', 156.91, 75.01, 1.435, 156.99, 75.09, 1.6, 'linen', { from: 'PoA' }],
@@ -602,9 +603,10 @@ var W5B_THINGS = {
 };
 var W5B_MATS = { wood: 0x5a4c3e, dark: 0x3e342a, oak: 0x6a5a48, pine: 0x8a7456, iron: 0x2e2b28, brass: 0x9a7a3a, plaster: 0xe8e2d4,
   stone: 0x8c867c, slate: 0x3c4046, cloth: 0x6b3b34, linen: 0xc8c0ae, wicker: 0x9a8460, paper: 0xd9cfb4, books: 0x5b4636,
-  leather: 0x5a3a28, glass: 0x9fb0b8, green: 0x4c6a3a, soot: 0x141312, pencil: 0x8e877c, rope: 0x8a7a5a, straw: 0xb8a468 };
+  leather: 0x5a3a28, glass: 0x9fb0b8, green: 0x4c6a3a, soot: 0x141312, pencil: 0x8e877c, rope: 0x8a7a5a, straw: 0xb8a468, brick: 0x6e4434 };
 window.SHELL_W5B.build = function (ctx) {
-  var R = W5B_THINGS[ctx.PLACE]; if (!R) return;
+  var R = (ctx.THINGS || W5B_THINGS)[ctx.PLACE]; if (!R) return;   /* req 828: the lead's shell-w5a.js passes its own THINGS and MATS */
+  var MATS = W5B_MATS; if (ctx.MATS) { MATS = {}; Object.keys(W5B_MATS).forEach(function (k) { MATS[k] = W5B_MATS[k]; }); Object.keys(ctx.MATS).forEach(function (k) { MATS[k] = ctx.MATS[k]; }); }
   var THREE = ctx.THREE, shell = ctx.shell, z0 = shell.place.floor, f = R.f, c = R.c || [0, 0];
   var g = new THREE.Group(); g.name = 'w5b-things'; shell.group.add(g);
   var byMat = {};
@@ -661,7 +663,7 @@ window.SHELL_W5B.build = function (ctx) {
     byMat[m].forEach(function (geo) { var gg = geo.index ? geo.toNonIndexed() : geo; Array.prototype.push.apply(pos, gg.attributes.position.array); Array.prototype.push.apply(nor, gg.attributes.normal.array); });
     var bg = new THREE.BufferGeometry();
     bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
-    var mesh = new THREE.Mesh(bg, ctx.kit.solid(W5B_MATS[m] != null ? W5B_MATS[m] : 0x5a4c3e)); mesh.userData.owner = ctx.PLACE; mesh.name = 'w5b-' + m; g.add(mesh);
+    var mesh = new THREE.Mesh(bg, ctx.kit.solid(MATS[m] != null ? MATS[m] : 0x5a4c3e)); mesh.userData.owner = ctx.PLACE; mesh.name = 'w5b-' + m; g.add(mesh);
   });
   (R.lights || []).forEach(function (l, i) {   /* a room W5B lights (window.SHELL_W5B.lit): [x, y, z, hex, intensity, distance] in its frame */
     var pl = new THREE.PointLight(l[3], l[4], l[5], 1.6); pl.position.copy(L(l[0], l[1], l[2])); pl.name = 'w5b-light-' + i; g.add(pl);
