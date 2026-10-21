@@ -207,7 +207,7 @@
               "filchs-office",
               "second-floor-corridor",
               "trophy-room",
-              "witch-landing",
+              "third-floor-north-corridor",
               "stair hall"
             ],
             "every": 12
@@ -233,7 +233,7 @@
             "places": [
               "second-floor-corridor",
               "trophy-room",
-              "witch-landing",
+              "third-floor-north-corridor",
               "stair hall",
               "filchs-office"
             ],
@@ -253,7 +253,7 @@
           {
             "places": [
               "trophy-room",
-              "witch-landing",
+              "third-floor-north-corridor",
               "second-floor-corridor",
               "stair hall",
               "dungeon-corridor",
@@ -282,7 +282,7 @@
             "places": [
               "stair hall",
               "second-floor-corridor",
-              "witch-landing",
+              "third-floor-north-corridor",
               "trophy-room"
             ],
             "every": 15
