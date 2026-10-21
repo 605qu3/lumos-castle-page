@@ -240,6 +240,10 @@ function alongEdge(E, i, p) {
   return Math.max(0, Math.min(L, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L));
 }
 
+/* each panelled room's grade on Design's ladder (CastlePanelling.GRADES, 0 plain to 3 rich), one line a room when Godric
+   grades them (design-panelling-grades-1021); a room not named takes grade 2, his 1 on design-panelling-staff-1021 */
+var PANEL_GRADE = {};
+
 window.CastleShell = { build: function (F, M, placeId, o) {
   o = o || {};
   var P = findPlace(M, placeId);
@@ -630,33 +634,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var fh = ft.h || (ft.opening ? ft.opening[1] : 1.2);
         pops.push({ wall: e.i, at: e.s, w: ft.w + 0.4, sill: 0, h: Math.max(fh, ft.mantel || 0) + 0.15, door: false });
       });
-      /* forPlace's wall frame (x along, z into the room, y = z cross x) stands upright only on a wall run clockwise; on
-         the shell's counter-clockwise plans it hung under the floor (the sixty-fourth's probe), so the plan goes in
-         clockwise, each opening's wall and distance read from the far end */
-      var PP = Q.poly, pn = PP.length, ar = 0;
-      PP.forEach(function (p, i) { var q = PP[(i + 1) % pn]; ar += p[0] * q[1] - q[0] * p[1]; });
-      var QP = Q;
-      if (ar > 0) {
-        QP = Object.assign({}, Q, { poly: PP.slice().reverse() });
-        pops = pops.map(function (op) { var a = PP[op.wall], b = PP[(op.wall + 1) % pn], L = Math.hypot(b[0] - a[0], b[1] - a[1]);
-          return Object.assign({}, op, { wall: ((pn - 2 - op.wall) % pn + pn) % pn, at: L - op.at }); });
-      }
+      /* v48 (req 843, Design's panelling.js v2): forPlace stands each wall upright on either winding, so the plan goes in
+         as it is; the grade is the room's own (PANEL_GRADE, grade 2 till Godric grades them) */
+      var QP = Q, pn = Q.poly.length;
       var oak = tone('oak');
       var PG = window.CastlePanelling.forPlace(THREE, QP, { toLocal: toLocal, style: row.stone === 'late-pale' ? 'fielded' : 'tudor',
-        grade: 2, to: CV && !CV.flat ? CV.springs : undefined, openings: pops,
+        grade: PANEL_GRADE[Q.id] || 2, to: CV && !CV.flat ? CV.springs : undefined, openings: pops,
         mats: { oak: paintMat(oak), deep: paintMat(shade(oak, 0.78)), carve: oak } });
       if (PG) {
-        /* the carved frieze's relief stood 2 mm off its frieze's face, inside the seams rule's 4 mm (a combed band seen
-           from across the room): 4 mm more here till Design's kit sets it (asked of Design); and its canvas read as sRGB,
-           as the shell's other canvases (it washed out pale cream on the oak) */
-        PG.traverse(function (o) {
-          o.userData.owner = Q.id;
-          if (/^panelling-(frieze-carved|overdoor)/.test(o.name)) {
-            if (/frieze/.test(o.name)) o.position.z += 0.004;
-            var tm = o.material && o.material.map;
-            if (tm) { if (THREE.SRGBColorSpace) tm.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) tm.encoding = THREE.sRGBEncoding; tm.needsUpdate = true; }
-          }
-        }); group.add(PG);
+        PG.traverse(function (o) { o.userData.owner = Q.id; }); group.add(PG);
         /* for the rooms' things (shell.html): each wall's face in the group's frame and its normal into the room, and how
            far the panelling stands off it, so a thing hung on the wall is brought out onto the panelling, not buried */
         var SP = window.CastlePanelling.SPEC[row.stone === 'late-pale' ? 'fielded' : 'tudor'], m0 = toLocal(mx, my, Q.floor);
