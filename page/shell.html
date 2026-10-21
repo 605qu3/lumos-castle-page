@@ -492,7 +492,37 @@ function useFlight(f) {
   /* v17: a turret's flight is walked along its own treads, round the newel */
   if (near(f.foot)) { if (f.path) walkTo(f.path, f.head, true); else walkTo([f.footPt, f.headPt], f.head); return true; }
   if (near(f.head)) { if (f.path) walkTo(f.path.slice().reverse().concat([f.footPt]), f.foot, true); else walkTo([f.headPt, f.footPt], f.foot); return true; }
-  return goStand(f.foot) || goStand(f.head);
+  return goStand(f.foot) || goStand(f.head) || flightChain(f);
+}
+/* req 862 (Interaction, 21 October 2026: in kitchens-steps a tap on the second flight from the head landing did
+   nothing): a flight whose ends are both off his floor is reached by the flights between, fewest first, and he
+   arrives at its nearer end as if walked there */
+function flightLeg(g, up) {
+  if (g.path) return up ? g.path.slice() : g.path.slice().reverse().concat([g.footPt]);
+  return up ? [g.footPt, g.headPt] : [g.headPt, g.footPt];
+}
+function flightChain(f) {
+  var queue = [{ s: here, pts: [] }], seen = [here], k, node, to, i, g, ends, e, pts;
+  for (k = 0; k < 64 && queue.length; k++) {
+    node = queue.shift();
+    to = [f.foot, f.head].filter(function (x) { return sameLevel(node.s.level, x.level); })[0];
+    if (to && node.s !== here) {
+      pts = node.pts.concat(shell.route(node.s.pos, to.pos, to.level) || []);
+      walkTo(pts, to, true);
+      return true;
+    }
+    for (i = 0; i < shell.flights.length; i++) {
+      g = shell.flights[i];
+      ends = [[g.foot, g.head, true], [g.head, g.foot, false]];
+      for (e = 0; e < 2; e++) {
+        if (g === f || !sameLevel(node.s.level, ends[e][0].level) || seen.indexOf(ends[e][1]) >= 0) continue;
+        seen.push(ends[e][1]);
+        queue.push({ s: ends[e][1], pts: node.pts.concat(shell.route(node.s.pos, ends[e][0].pos, ends[e][0].level) || [],
+          [ends[e][0].pos], flightLeg(g, ends[e][2]), [ends[e][1].pos]) });
+      }
+    }
+  }
+  return false;
 }
 /* req 853 (Interaction, 21 October 2026, 9.00 am: 29 of 39 door taps in a free room went to the shell's own stand, off
    every drawn place): in a `look.free` room a door's place is the drawn place named for it (the corridors' door places),
