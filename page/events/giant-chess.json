@@ -79,6 +79,23 @@
       "canon": "Magic's req 911 (docs/game-notes.md, the common room's chess line, *the giant chessboard*, req 904; Godric's 1 on magic-chessboard-stance-1022, on the board as pieces; set-aside row 48 lifted; the Architect's v150 map, req 900), from the Chamber's castle on, played and never Ron's game (the `giant` replay stays set aside): waiting: leaving mid-game (the hourglass, or walking out) keeps the position for his return, as the common room's `waiting`; the giant set never plays on alone"
     },
     {
+      "id": "giant-chess.resume-stale",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap black piece",
+      "when": [
+        "place = stone chess chamber",
+        "year >= 2",
+        "giant = on"
+      ],
+      "show": [
+        "the black pieces turning toward him, the boys on their squares again, and the white side waiting for his move"
+      ],
+      "starts": [],
+      "canon": "Magic's req 911 (docs/game-notes.md, the common room's chess line, *the giant chessboard*, req 904; Godric's 1 on magic-chessboard-stance-1022, on the board as pieces; set-aside row 48 lifted; the Architect's v150 map, req 900), from the Chamber's castle on, played and never Ron's game (the `giant` replay stays set aside): a visit that ended without its leave (the page closed, or reloaded in place) left `giant = on`; the page raises the tap `black piece` only while it holds no game of its own, so `on` at that tap is a game the page no longer has, and it is answered as `waiting` is (req 954 b); the var stays on, the page restoring the position from `kept_giant`"
+    },
+    {
       "id": "giant-chess.danger",
       "tier": "fixed",
       "source": "device",
@@ -145,6 +162,7 @@
       ],
       "starts": [
         "set giant = none",
+        "set kept_giant = none",
         "log \"Won on the giant board {day}\""
       ],
       "canon": "Magic's req 911 (docs/game-notes.md, the common room's chess line, *the giant chessboard*, req 904; Godric's 1 on magic-chessboard-stance-1022, on the board as pieces; set-aside row 48 lifted; the Architect's v150 map, req 900), from the Chamber's castle on, played and never Ron's game (the `giant` replay stays set aside): ended, their checkmate: the white king takes off his crown and lays it at their feet, the chessmen part and bow, the door on stands clear (PS 16 L5960, read in the canon tool, 22 October 2026; the way on is the passage up); no house points, nothing scored between the brothers (PS 17 L6495's fifty points stay Ron's)"
@@ -164,7 +182,8 @@
         "the black king laying his crown down, both sides bowing, and the pieces walking back to their squares, the game offered again"
       ],
       "starts": [
-        "set giant = none"
+        "set giant = none",
+        "set kept_giant = none"
       ],
       "canon": "Magic's req 911 (docs/game-notes.md, the common room's chess line, *the giant chessboard*, req 904; Godric's 1 on magic-chessboard-stance-1022, on the board as pieces; set-aside row 48 lifted; the Architect's v150 map, req 900), from the Chamber's castle on, played and never Ron's game (the `giant` replay stays set aside): ended, white's checkmate: the black king lays his crown down, both sides bow, the pieces walk back to their squares and the game is offered again; nothing declares failure (FDP-11)"
     },
@@ -183,7 +202,8 @@
         "both kings bowing to each other across the board"
       ],
       "starts": [
-        "set giant = none"
+        "set giant = none",
+        "set kept_giant = none"
       ],
       "canon": "Magic's req 911 (docs/game-notes.md, the common room's chess line, *the giant chessboard*, req 904; Godric's 1 on magic-chessboard-stance-1022, on the board as pieces; set-aside row 48 lifted; the Architect's v150 map, req 900), from the Chamber's castle on, played and never Ron's game (the `giant` replay stays set aside): ended, a draw: both kings bow"
     },

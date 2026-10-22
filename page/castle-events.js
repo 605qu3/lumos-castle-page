@@ -2453,6 +2453,24 @@
         moment('look close');
         if (visit) changed();
       },
+      /* A var as the records read it (req 954, the giant board's kept position): `read('giant')` is on, waiting, none
+         or undefined; any var, a built-in's name too, so the page asks the one clock and never keeps a copy. */
+      read: function (name) { return value(String(name || '').trim()); },
+      /* A short string of the page's own, kept with the chain's vars on this iPad and so in this boy's satchel (req 954:
+         the giant board's squares, to come back to). Only a name beginning `kept_`, the text 600 characters or fewer of
+         letters, digits, spaces and . , : ; | / _ - ; `keep(name)` or `keep(name, '')` clears it. Read back by
+         `read(name)`; a record may also end it (`set kept_giant = none`, which the page reads as no position).
+         Returns true if it was written or cleared. */
+      keep: function (name, text) {
+        name = String(name || '').trim();
+        if (!/^kept_[a-z][a-z0-9_]{0,30}$/.test(name)) return false;
+        if (text == null || text === '') { delete state.vars[name]; save(STATE_KEY, state); return true; }
+        text = String(text);
+        if (text.length > 600 || !/^[A-Za-z0-9 .,:;|\/_\-]*$/.test(text)) return false;
+        state.vars[name] = text;
+        save(STATE_KEY, state);
+        return true;
+      },
       /* The cards of a deck he has found, in the order found, repeats and all (the Chocolate Frog cards for the den
          behind the brass key's door, req 165): `found('frogs')`. */
       found: function (name) { return ((state.deckFound || {})[name] || []).slice(); },
