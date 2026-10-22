@@ -1565,7 +1565,7 @@ function farView(F, M, toLocal, panes, paneMat) {
   var LAWN = -1.2, LAKE = -46.0, BASE = -20.0;      /* tools/architect-sections-pdf.py's lawn and lake; the castle's foot */
   var FALL = { 'far-lawn': 0x7d8a5c, 'far-pitch': 0x8d9a64, 'far-water-day': 0x6f8797, 'far-water-night': 0x141b24,
     'far-forest': 0x3a4630, 'far-hills': 0x7c8794, 'far-stone': 0xa9a194, 'far-rock': 0x8b8478, 'far-roof': 0x5f6670,
-    'far-glass': 0xc9d2d8, 'far-timber': 0x6e4c30, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
+    'far-glass': 0xc9d2d8, 'far-timber': 0x6e4c30, 'far-window': 0x2b2f36, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
   var S = window.CASTLE_TONES && CASTLE_TONES.surfaces;
   function hex(k) { return S && S[k] && S[k].hex ? new THREE.Color(S[k].hex) : new THREE.Color(FALL[k]); }
   var scene = new THREE.Scene(), mats = {};
@@ -1685,6 +1685,42 @@ function farView(F, M, toLocal, panes, paneMat) {
     if (t.lantern) { prism(circ(t.lantern.c, t.lantern.r, 16), t.lantern.z, t.lantern.top, 'far-stone'); cone(t.lantern.c, t.lantern.r, t.lantern.top, t.lantern.ridge); }
     if (t.cap_house) { prism(rect(t.cap_house.rect), top, t.cap_house.eaves, 'far-stone'); roof(t.cap_house.rect, t.cap_house.eaves, t.cap_house.ridge, t.cap_house.kind); }
     if (t.turret) { prism(circ(t.turret.c, t.turret.r, 12), BASE, t.turret.cap || top, 'far-stone'); }
+  });
+
+  /* the castle's own windows, dark marks on its faces, so a court's far side reads as a wall of rooms, not a blank:
+     each opening with a room and a sill on the nearest mass or tower face within 2.5 m, none on the place's own mass */
+  var faces = [];
+  (M.masses || []).forEach(function (m) {
+    var r = m.roof; if (r == null) return;
+    var top = typeof r === 'number' ? r : r.eaves || 40;
+    [m.rect].concat(r.parts ? r.parts.map(function (p) { return p.rect; }) : []).forEach(function (q) {
+      if (holds(rect(q), BASE, top)) return;
+      [[q[0], q[1], q[2], q[1], 0, -1], [q[2], q[1], q[2], q[3], 1, 0], [q[2], q[3], q[0], q[3], 0, 1], [q[0], q[3], q[0], q[1], -1, 0]]
+        .forEach(function (e) { faces.push({ a: [e[0], e[1]], b: [e[2], e[3]], n: [e[4], e[5]] }); });
+    });
+  });
+  var drums = (M.towers || []).filter(function (t) { return t.c && t.r && !holds(circ(t.c, t.r, 24), BASE, t.top || t.eaves || 40); });
+  (M.openings || []).forEach(function (o) {
+    if (!o.room || o.sill == null || !o.at || !o.w || !o.h) return;
+    var R0 = (M.rooms || []).filter(function (x) { return x.id === o.room; })[0], P;
+    try { P = findPlace(M, o.room); } catch (e) { P = null; }
+    if (!R0 || !P) return;
+    var s = toSite(M, R0.group, o.at), best = null;
+    faces.forEach(function (f) {
+      var dx = f.b[0] - f.a[0], dy = f.b[1] - f.a[1], L = Math.hypot(dx, dy), t = ((s[0] - f.a[0]) * dx + (s[1] - f.a[1]) * dy) / (L * L);
+      if (t < 0 || t > 1) return;
+      var px = f.a[0] + dx * t, py = f.a[1] + dy * t, d = Math.hypot(s[0] - px, s[1] - py);
+      if (d < 2.5 && (!best || d < best.d)) best = { d: d, p: [px, py], n: f.n };
+    });
+    drums.forEach(function (t) {
+      var dx = s[0] - t.c[0], dy = s[1] - t.c[1], L = Math.hypot(dx, dy) || 1, d = Math.abs(L - t.r);
+      if (d < 2.5 && (!best || d < best.d)) best = { d: d, p: [t.c[0] + dx / L * t.r, t.c[1] + dy / L * t.r], n: [dx / L, dy / L] };
+    });
+    if (!best) return;
+    var cx0 = best.p[0] + best.n[0] * 0.06, cy0 = best.p[1] + best.n[1] * 0.06, ux = -best.n[1] * o.w / 2, uy = best.n[0] * o.w / 2;
+    var z0 = P.floor + o.sill, z1 = z0 + o.h, a = V(cx0 - ux, cy0 - uy, z0), b = V(cx0 + ux, cy0 + uy, z0), c = V(cx0 + ux, cy0 + uy, z1), d = V(cx0 - ux, cy0 - uy, z1);
+    var g = new THREE.BufferGeometry().setFromPoints([a, b, c, a, c, d]); g.computeVertexNormals();
+    add(g, 'far-window').material.side = THREE.DoubleSide;
   });
 
   /* far hills, a ring of rounded silhouettes past the grounds, fixed by a sine (no random) */
