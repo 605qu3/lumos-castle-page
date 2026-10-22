@@ -4016,6 +4016,77 @@ function sittersShown(shown) {
   if (events && !Q.get('sitters')) SITTERS.set(shown.indexOf(SIT_EVENING) >= 0 ? 'evening' : shown.indexOf(SIT_HER) >= 0 ? 'night' : 'out');
   return [SIT_EVENING, SIT_HER, SIT_HIM].filter(function (s) { return shown.indexOf(s) >= 0; });
 }
+/* req 961 (People's, on req 652 and Godric's 1 on people-electives-teachers-r3-1022 and people-class-desks-r1-1022;
+   Events' electives.json strings, req 654): the Book 3 electives' teachers and the third-years' class in their rooms.
+   assets/layers/electives-teachers.png, six cells 505 by 1177 at 631 px a metre (0.80 by 1.865), feet on the cell's
+   foot: 0 and 1 the Arithmancy witch, 2 and 3 the Ancient Runes wizard, 4 and 5 the Muggle Studies wizard, the even
+   cell at the board from behind, the odd facing the room. assets/layers/class-at-desks.png, eight seated cells 431 by
+   1170 at 775 px a metre (0.556 by 1.51), feet on the floor, each on the room's own chair (shell-w5b.js, the desks as
+   History's) at the desks behind the boys' front desk: the reader and the whisperer at one desk, he on her right as
+   he turns to her. Each room's frame as shell-w5b.js's: Arithmancy x = 18.4 + y', y = 17.4 - x'; Ancient Runes
+   x = 21.9 + y', y = 71.4 - x'; Muggle Studies x = 19.1 - y', y = 63.4 + x'. Every figure turned to the boys' desk,
+   both faces drawn. The teacher with the room's "lesson under way" line: one of the two cells a visit where the line
+   says "the board or her desk"; Muggle Studies' says the demonstration table and a thing held up, so cell 5, the bulb.
+   The class with the "class at its desks" line (lessons on). The strings stay the note's, since each names more than
+   the figures. With no runtime, the teacher stands and the class sits 9 to 17. ?teacher=board|room|off, ?class=on|off
+   for checks. Nothing glows: lit as the room */
+var EL_TEACHER = {
+  'arithmancy-classroom': "a lesson under way: the teacher at the board or her desk, the boys' desk theirs with its things out",
+  'ancient-runes-classroom': "a lesson under way: the teacher at the board or the desk, the boys' desk theirs",
+  'muggle-studies-classroom': "a lesson under way: the teacher at the demonstration table holding up a thing to ask about, the boys' desk theirs"
+}, EL_CLASS = {
+  'arithmancy-classroom': 'the class at its desks over their number charts',
+  'ancient-runes-classroom': 'the class at its desks, rune dictionaries open',
+  'muggle-studies-classroom': 'the class at its desks, turned to the demonstration table'
+};
+var ELECT = (function () {
+  var R = {   /* the frame; the boys' chairs' middle; the teacher's two stands (x', y'), at the board and facing the room */
+    'arithmancy-classroom': { w: function (a, b) { return [18.4 + b, 17.4 - a]; }, boys: [2.6, 4.62], cells: [0, 1], board: [3.7, 10.5], room: [5.3, 8.7] },
+    'ancient-runes-classroom': { w: function (a, b) { return [21.9 + b, 71.4 - a]; }, boys: [2.6, 4.62], cells: [2, 3], board: [3.7, 10.2], room: [5.3, 8.6] },
+    'muggle-studies-classroom': { w: function (a, b) { return [19.1 - b, 63.4 + a]; }, boys: [5.4, 4.62], cells: [4, 5], board: [2.8, 10.3], room: [4.0, 7.65] }
+  }[PLACE];
+  if (!R) return null;
+  var z0 = shell.place.floor, out = { teacher: null, which: '', cls: [], tShown: false, cShown: false };
+  function tex(f) {
+    var t = new THREE.TextureLoader().load('../assets/layers/' + f);
+    t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t;
+  }
+  var tT = tex('electives-teachers.png'), tC = tex('class-at-desks.png');
+  function figure(t, cell, n, w, h, xy, name) {   /* a cell of an atlas standing at (x', y'), its foot on the floor, turned to the boys' desk */
+    var g = new THREE.PlaneGeometry(w, h), uv = g.attributes.uv;
+    for (var i = 0; i < uv.count; i++) uv.setX(i, (cell + uv.getX(i)) / n);
+    var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide }));
+    var p = R.w(xy[0], xy[1]), b = R.w(R.boys[0], R.boys[1]);
+    m.position.copy(shell.toLocal(p[0], p[1], z0 + h / 2)); m.lookAt(shell.toLocal(b[0], b[1], z0 + h / 2));
+    m.userData.owner = PLACE; m.raycast = function () {}; m.name = name; m.visible = false; scene.add(m); return m;
+  }
+  out.board = figure(tT, R.cells[0], 6, 0.80, 1.865, R.board, 'elective-teacher-board');
+  out.room = figure(tT, R.cells[1], 6, 0.80, 1.865, R.room, 'elective-teacher-room');
+  /* the seats (x' the chair's middle, y' 3.21 the middle row's chairs, 1.81 the back row's), cells in People's order:
+     0 a Gryffindor girl writing, 1 a Hufflepuff boy's hand up, 2 a Ravenclaw girl reading, 3 a Slytherin boy whispering,
+     4 a Gryffindor boy's arms folded, 5 a Hufflepuff girl writing, 6 a Ravenclaw boy's chin on his hand, 7 a Slytherin
+     girl looking up. From the boys' desk his left is the higher x' in all three frames, so the whisperer sits at the
+     lower x' of the reader's desk, turned toward her */
+  [[2.303, 3.21, 3], [2.903, 3.21, 2], [5.098, 3.21, 0], [5.698, 3.21, 1],
+   [1.698, 1.81, 4], [2.903, 1.81, 5], [5.098, 1.81, 6], [6.903, 1.81, 7]].forEach(function (s) {
+    out.cls.push(figure(tC, s[2], 8, 0.556, 1.51, [s[0], s[1]], 'elective-pupil-' + s[2]));
+  });
+  out.which = PLACE === 'muggle-studies-classroom' ? 'room' : Math.random() < 0.5 ? 'board' : 'room';
+  out.set = function (teacher, cls) {
+    out.tShown = teacher; out.cShown = cls;
+    var q = Q.get('teacher'), w = q === 'board' || q === 'room' ? q : out.which;
+    out.board.visible = q !== 'off' && (teacher || !!q) && w === 'board';
+    out.room.visible = q !== 'off' && (teacher || !!q) && w === 'room';
+    var c = Q.get('class');
+    out.cls.forEach(function (m) { m.visible = c ? c === 'on' : cls; });
+  };
+  out.set(true, HOUR >= 9 && HOUR < 17);
+  return out;
+})();
+function electShown(shown) {
+  if (!ELECT || !events) return;
+  ELECT.set(shown.indexOf(EL_TEACHER[PLACE]) >= 0, shown.indexOf(EL_CLASS[PLACE]) >= 0);
+}
 /* req 802 (Events' cues for Magic's 794, seventh-floor.json, 426c8b6b): Sir Cadogan's painting where Interiors hangs it
    (docs/interiors/seventh-floor-corridor.md, *Sir Cadogan's painting*, cited: the north landing on 7, its east wall at
    x 92, y 46.9 to 49.3, foot 0.9, about 2.4 by 1.6, the heavy worn gilt frame; Godric's 1 on interiors-cadogan-1020).
@@ -4051,7 +4122,7 @@ function corbelsShown(shown) {
   if (l && /asleep/.test(l)) st = 'sleeping'; else if (l && /drowsy|nodding off/.test(l)) st = 'dozing';
   if (st !== corbelState) { corbelState = st; shell.corbels(st); }
 }
-function roomDraw(shown) { kitchensShown(shown); cupDrawRoom(shown); filchShown(shown); cadoganShown(shown); thingsDrawRoom(shown); corbelsShown(shown); }
+function roomDraw(shown) { electShown(shown); kitchensShown(shown); cupDrawRoom(shown); filchShown(shown); cadoganShown(shown); thingsDrawRoom(shown); corbelsShown(shown); }
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
    its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
 function knotSpots(d) {
