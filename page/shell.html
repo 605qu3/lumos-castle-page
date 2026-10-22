@@ -162,7 +162,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/panelling.js?v=2"></script>
 <script src="castle-shell.js?v=69"></script>
 <script src="shell-w5b.js?v=16"></script>
-<script src="shell-w5a.js?v=17"></script>
+<script src="shell-w5a.js?v=18"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="castle-sky.js?v=1"></script>
 <script src="design/drawn.js?v=1"></script>
@@ -3093,7 +3093,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), foShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), foShown(shown), sittersShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -3210,6 +3210,54 @@ function updateFilchOffice(dt) {
     [FOFFICE.drawer].concat(FOFFICE.face).forEach(function (m) { var r = m.userData.rest; m.position.set(r.x + w.x * du, r.y + dz, r.z + w.z * du); });
     if (s >= FOFFICE.dur) FOFFICE.shake = -1;
   }
+}
+/* req 927 (People's, on req 897 and Godric's 1 on people-painters-sitters-r1-1022; Events' req 928 strings,
+   page/events/painters-room.json, word for word): the painters' room's two sitters drawn into their canvases
+   (page/shell-w5a.js, the easels at (162.5, -1.4), the tea witch's with the cup, and (162.5, 1.1), the young wizard's).
+   assets/layers/painters-sitters.png, four cells 200 by 347: 1 her awake with the cup, 2 her asleep, 3 him awake,
+   4 him asleep. Each figure scaled to the canvas's height (0.63, so 0.36 wide), its feet on the canvas's foot, centred
+   on the painted chair and 2 mm before it, so it sits on it. Morning and day both out, the chair empty and her cup on
+   its arm; evening cell 1, the cup off the arm (she holds it); night cells 2 and 4, the cup back. With no runtime, by
+   the clock (evening 17 to 20, night 21 to 5); ?sitters=out|evening|night for checks. Nothing glows: lit as the room */
+var SIT_EVENING = "the tea witch back in her portrait's carved chair, awake, her cup in her hand and the chair's arm bare",
+    SIT_HER = "the tea witch asleep in her portrait's carved chair, her chin on her shawl and her cup back on the chair's arm",
+    SIT_HIM = "the young wizard asleep in his portrait's carved chair, his soft hat tipped over his brow, the sketchbook on his knee";
+var SITTERS = (function () {
+  if (PLACE !== 'se-round-room-1') return null;
+  var C = [160.0, 0.0], z0 = shell.place.floor, out = { state: '' };
+  var tex = new THREE.TextureLoader().load('../assets/layers/painters-sitters.png');
+  if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace; else tex.encoding = THREE.sRGBEncoding;
+  tex.anisotropy = 4;
+  function at(b, r, z) { return shell.toLocal(C[0] + r * Math.sin(b * Math.PI / 180), C[1] + r * Math.cos(b * Math.PI / 180), z0 + z); }
+  function along(b, r, u) { return b + u / r * 180 / Math.PI; }
+  function own(m) { m.userData.owner = 'se-round-room-1'; m.raycast = function () {}; scene.add(m); return m; }
+  function easel(x, y) { var dx = x - C[0], dy = y - C[1]; return { r: Math.sqrt(dx * dx + dy * dy), b: Math.atan2(dx, dy) * 180 / Math.PI }; }
+  function figure(e, cell) {   /* a cell of the atlas, upright on the canvas, facing the room's middle */
+    var h = 0.63, w = h * 200 / 347, bb = along(e.b, e.r, -0.04), g = new THREE.PlaneGeometry(w, h), uv = g.attributes.uv;
+    for (var i = 0; i < uv.count; i++) uv.setX(i, (cell - 1 + uv.getX(i)) / 4);   /* the cell's quarter of the atlas */
+    var m = own(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: tex, transparent: true, alphaTest: 0.5, roughness: 0.9 })));
+    m.position.copy(at(bb, e.r - 0.039, 1.06 + h / 2)); m.lookAt(at(bb, 0, 1.06 + h / 2));
+    m.name = 'painters-sitter-' + cell; m.visible = false; return m;
+  }
+  var her = easel(162.5, -1.4), him = easel(162.5, 1.1);
+  out.cells = [null, figure(her, 1), figure(her, 2), figure(him, 3), figure(him, 4)];
+  /* her cup set down on the chair's arm (moved here from shell-w5a.js, so it can go when she holds it) */
+  var cb = along(her.b, her.r, 0.09);
+  out.cup = own(new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.05), new THREE.MeshStandardMaterial({ color: kit.col(0xe8e4da), roughness: 0.5 })));
+  out.cup.position.copy(at(cb, her.r - 0.017, 1.255)); out.cup.lookAt(at(cb, 0, 1.255)); out.cup.name = 'painters-cup';
+  out.set = function (s) {
+    out.state = s;
+    out.cells[1].visible = s === 'evening'; out.cells[2].visible = out.cells[4].visible = s === 'night';
+    out.cup.visible = s !== 'evening';
+  };
+  var q = Q.get('sitters');
+  out.set(/^(out|evening|night)$/.test(q || '') ? q : HOUR >= 21 || HOUR < 6 ? 'night' : HOUR >= 17 ? 'evening' : 'out');
+  return out;
+})();
+function sittersShown(shown) {
+  if (!SITTERS) return [];
+  if (events && !Q.get('sitters')) SITTERS.set(shown.indexOf(SIT_EVENING) >= 0 ? 'evening' : shown.indexOf(SIT_HER) >= 0 ? 'night' : 'out');
+  return [SIT_EVENING, SIT_HER, SIT_HIM].filter(function (s) { return shown.indexOf(s) >= 0; });
 }
 /* req 802 (Events' cues for Magic's 794, seventh-floor.json, 426c8b6b): Sir Cadogan's painting where Interiors hangs it
    (docs/interiors/seventh-floor-corridor.md, *Sir Cadogan's painting*, cited: the north landing on 7, its east wall at

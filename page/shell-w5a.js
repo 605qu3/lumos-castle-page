@@ -949,7 +949,7 @@ window.SHELL_W5A = {
     it.push(['y', s[0], s[1], 0.03, z, z + 0.012, s[2]]);                                /* paint spots under the easels */
   });
   /* the two portrait easels, each a gilt frame 0.6 by 0.75, foot at 1.0, on the same carved chair and a curtain, the
-     sitter gone visiting; a cup on the arm of one */
+     sitter gone visiting; the cup on the arm of one is shell.html's SITTERS (req 927), so it goes when she holds it */
   [[162.5, -1.4, true], [162.5, 1.1, false]].forEach(function (e) {
     var dx = e[0] - C[0], dy = e[1] - C[1], r = Math.sqrt(dx * dx + dy * dy), b = Math.atan2(dx, dy) * 180 / Math.PI, f, l;
     it.push(['p', b, r, 0.6, 0.05, 1.0, 1.75, 'gilt'], ['p', b, r - 0.007, 0.5, 0.05, 1.06, 1.69, 'canvasb'],
@@ -957,7 +957,6 @@ window.SHELL_W5A = {
             ['p', along(b, r, -0.04), r - 0.012, 0.18, 0.05, 1.08, 1.4, 'oak'],           /* the chair, its back */
             ['p', along(b, r, -0.04), r - 0.012, 0.24, 0.05, 1.2, 1.24, 'oak'],           /* its arms */
             ['p', b, r - 0.04, 0.66, 0.06, 0.94, 1.0, 'oak']);                             /* the easel's ledge */
-    if (e[2]) it.push(['p', along(b, r, 0.09), r - 0.017, 0.03, 0.05, 1.24, 1.27, 'white']);   /* the cup set down */
     f = at(along(b, r, -0.27), r - 0.085); l = at(along(b, r, 0.27), r - 0.085);
     it.push(['y', f[0], f[1], 0.02, 0, 1.85, 'oak'], ['y', l[0], l[1], 0.02, 0, 1.85, 'oak']);
     f = at(b, r + 0.04); l = at(b, r + 0.42);
