@@ -945,6 +945,93 @@
       ],
       "starts": [],
       "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; idea 2, her moods (the note's step 3): the partner of filch.chase-hidden, more often as she warms"
+    },
+    {
+      "id": "norris.lets-pass-armour",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "toe-armour",
+      "weight": 300,
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "norris != none",
+        "chase != on",
+        "norris_trust < 3",
+        "brother norris_trust >= 3",
+        "norris_bored != yes"
+      ],
+      "show": [
+        "Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing"
+      ],
+      "starts": [],
+      "canon": "PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; the brother's part is ours: Godric's 1 on events-norris-lets-pass-1022 (#28, 5.50 pm, 22 October 2026), a boy she does not yet trust, whose brother she trusts, gets the lamp-like eyes and she does nothing, no fetching Filch; read through `brother norris_trust` (the other boy's satchel, castle-events.js brotherVar); weighted far above the chase start of its group so that it almost always wins (about nineteen times in twenty)"
+    },
+    {
+      "id": "norris.lets-pass-cupboard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "toe-cupboard",
+      "weight": 300,
+      "moment": "tap broom cupboard",
+      "when": [
+        "place = corridor",
+        "at = cupboard",
+        "norris != none",
+        "chase != on",
+        "norris_trust < 3",
+        "brother norris_trust >= 3"
+      ],
+      "show": [
+        "Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing"
+      ],
+      "starts": [],
+      "canon": "PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; the brother's part is ours: Godric's 1 on events-norris-lets-pass-1022 (#28, 5.50 pm, 22 October 2026), a boy she does not yet trust, whose brother she trusts, gets the lamp-like eyes and she does nothing, no fetching Filch; read through `brother norris_trust` (the other boy's satchel, castle-events.js brotherVar); weighted far above the chase start of its group so that it almost always wins (about nineteen times in twenty)"
+    },
+    {
+      "id": "norris.lets-pass-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-chase",
+      "weight": 40,
+      "moment": "wait 150-420 s",
+      "when": [
+        "place = corridor",
+        "time = night",
+        "chase != on",
+        "nights since chase_night >= 1",
+        "norris_trust < 3",
+        "brother norris_trust >= 3"
+      ],
+      "show": [
+        "Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing"
+      ],
+      "starts": [
+        "stamp chase_night by night"
+      ],
+      "canon": "PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; the brother's part is ours: Godric's 1 on events-norris-lets-pass-1022 (#28, 5.50 pm, 22 October 2026), a boy she does not yet trust, whose brother she trusts, gets the lamp-like eyes and she does nothing, no fetching Filch; read through `brother norris_trust` (the other boy's satchel, castle-events.js brotherVar); weighted far above the chase start of its group so that it almost always wins (about nineteen times in twenty)"
+    },
+    {
+      "id": "norris.head-start",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "norris_head != yes",
+        "norris_trust < 3",
+        "brother norris_trust >= 3"
+      ],
+      "starts": [
+        "set norris_head = yes",
+        "add norris_trust 1"
+      ],
+      "canon": "Godric's 1 on events-norris-trust-shared-1022 (#27, 22 October 2026): each boy earns his own trust, but she warms faster to the brother of a boy she already knows; ours; once, a head start of one step, for a boy she does not yet trust whose brother she does (`brother norris_trust >= 3`)"
     }
   ]
 }

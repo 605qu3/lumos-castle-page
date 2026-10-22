@@ -763,6 +763,63 @@
         "place = gate passage"
       ],
       "starts": []
+    },
+    {
+      "id": "hall.norris-follows-hagrid",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-hagrid",
+      "weight": 1,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = entrance hall",
+        "time != night",
+        "year >= 1"
+      ],
+      "who": [
+        {
+          "as": "hagrid",
+          "role": "voice",
+          "name": "hagrid",
+          "mark": "doorway"
+        }
+      ],
+      "show": [
+        "Hagrid's great boots crossing the hall to the stairs, and a few paces behind them Mrs Norris, tail high, trailing him all the way"
+      ],
+      "lines": [
+        {
+          "speaker": "hagrid",
+          "medium": "heard",
+          "key": "hall.norris-follows-hagrid",
+          "sound": "Hagrid's great boots on the flags, a small pad of paws behind them, his grumbling over his shoulder",
+          "text": [
+            "Yeh needn't think I don't know who sent yeh.",
+            "Go on, off with yeh, back ter Filch. I'm only bringin' a message.",
+            "Every single time. Every single time, an' not a word of thanks."
+          ],
+          "canon": "PS 8 L2862 (Hagrid: \"every time I go up ter the school, she follows me everywhere? Can't get rid of her — Filch puts her up to it\"), checked against the text in the canon tool, 22 October 2026; Godric's touch norris-follows-hagrid (22 October 2026, relayed 5.50 pm): now and then Mrs Norris trails Hagrid in a few paces behind and he grumbles at her, year 1 on, by day; the lines are ours, in his voice"
+        }
+      ],
+      "starts": [],
+      "canon": "PS 8 L2862 (Hagrid: \"every time I go up ter the school, she follows me everywhere? Can't get rid of her — Filch puts her up to it\"), checked against the text in the canon tool, 22 October 2026; Godric's touch norris-follows-hagrid (22 October 2026, relayed 5.50 pm): now and then Mrs Norris trails Hagrid in a few paces behind and he grumbles at her, year 1 on, by day; the lines are ours, in his voice"
+    },
+    {
+      "id": "hall.norris-follows-hagrid-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-hagrid",
+      "weight": 5,
+      "moment": "wait 30-180 s",
+      "when": [
+        "place = entrance hall",
+        "time != night",
+        "year >= 1"
+      ],
+      "starts": [],
+      "canon": "the silent partner of hall.norris-follows-hagrid; about one wait in six"
     }
   ]
 }

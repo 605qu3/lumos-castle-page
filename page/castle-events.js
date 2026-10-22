@@ -131,7 +131,9 @@
    October 2026 the brothers share one iPad (the charter): the player selection and the satchels hold, the owl post
    between two paired iPads is set aside (req 420) and the brother's dot with it (BROTHER_DOT_ASIDE); each visit ends
    with a turn of the hourglass home, at the edge of the woods, and the first night, going home and the plan wait for
-   the change list's rows 18, 24, 25 and 34 (the world rules; the Ministry's set-aside).
+   the change list's rows 18, 24, 25 and 34 (the world rules; the Ministry's set-aside). `brother X` in a `when` reads
+   the var X of the boy who is not playing, from his satchel (Godric's events-norris-lets-pass-1022: Mrs Norris
+   trusts a boy a little for his brother's sake); unset, or with no brother in the link, a count reads 0.
 
    The dormitory door's year (board req 263, CoS 5): `yearIn()` reads the one clock, the castle's year (the change
    list's Rework 35, RM-24: the boys sleep at home, so they have no year of their own in the castle): the dormitory is
@@ -967,6 +969,13 @@
       return list[n];
     }
 
+    /* `brother X` reads the var X of the boy who is not playing, from his satchel (`lumos.player.<id>`, one iPad, two
+       boys); undefined when there is no brother or he has never set it, so a count reads 0 and a flag reads unset. */
+    function brotherVar(n) {
+      var bro = brotherOf(me()), bag = bro ? load(SATCHEL + bro.id) : null, st = null;
+      try { st = bag && bag[STATE_KEY] ? JSON.parse(bag[STATE_KEY]) : null; } catch (e) { st = null; }
+      return st && st.vars ? st.vars[n] : undefined;
+    }
     function value(name) {
       name = name.trim();
       if (name.indexOf('days since ') === 0) {
@@ -981,6 +990,7 @@
       if (name.indexOf('been ') === 0) return visit && visit.pages.indexOf(name.slice(5)) >= 0 ? 'yes' : 'no';   /* did this visit reach that page */
       if (name.indexOf('drawn ') === 0) return drawnList().indexOf(name.slice(6)) >= 0 ? 'yes' : 'no';         /* has the page a drawing of it */
       if (name.indexOf('learned ') === 0) return learnedSpell(name.slice(8)) ? 'yes' : 'no';                  /* has he cast it on the Charms page (req 125, 179) */
+      if (name.indexOf('brother ') === 0) return brotherVar(name.slice(8));                                   /* his brother's var, from the satchel (events-norris-lets-pass-1022) */
       var b = builtin(name);
       if (b !== undefined) return b;
       if (stampNames[name]) return name in state.stamps ? state.stamps[name] : -Infinity;   /* never stamped: long past */

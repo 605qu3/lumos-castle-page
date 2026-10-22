@@ -795,6 +795,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 5,
           "mark": "desk"
         }
       ],
@@ -835,6 +836,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 6,
           "mark": "desk"
         }
       ],
@@ -1218,6 +1220,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 0,
           "mark": "corridor"
         },
         {
@@ -1289,6 +1292,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 0,
           "mark": "corridor"
         },
         {
@@ -1349,6 +1353,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 2,
           "mark": "corridor"
         }
       ],
@@ -1475,6 +1480,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 2,
           "mark": "corridor"
         }
       ],
@@ -1515,6 +1521,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 0,
           "mark": "corridor"
         },
         {
@@ -1585,6 +1592,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 0,
           "mark": "corridor"
         },
         {
@@ -1677,6 +1685,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 3,
           "mark": "corridor"
         }
       ],
@@ -1740,6 +1749,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 3,
           "mark": "corridor"
         }
       ],
@@ -1804,6 +1814,7 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "cell": 4,
           "mark": "corridor"
         }
       ],
@@ -1945,6 +1956,51 @@
         "set drawer_gag = no"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a chase never outlives the visit"
+    },
+    {
+      "id": "filch.chase-hidden-norris",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "chase_by = norris",
+        "norris_trust >= 9"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Mrs Norris pausing at the top of the stairs, looking past the hiding place, then padding off down the far flight with her tail high, and Filch's lamp going after her"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-norris-astray",
+          "sound": "Filch at the top of the stairs, his lamp turning after Mrs Norris",
+          "text": [
+            "What is it, my sweet? This way?",
+            "What have you got, my sweet? Down here, is it? Lead on, then."
+          ],
+          "canon": "req 933 (the friends of the chase, Godric's pick on corridor-chase-ideas-1022, befriending Mrs Norris over time): once she trusts him fully (norris_trust 9 and over) and she is the one who started the chase, she leads Filch astray from a hidden boy, a fourth partner of the hidden pass; B2 ch8 L9025 (Filch is \"drawn to the spot by the mysterious power that seemed to connect him with his foul cat\", Mrs Norris's accusing stare at the boy), checked against the text in the canon tool, 22 October 2026; the lines are ours, in his voice (\"my sweet\", CoS 8 L9091); comic, nobody hurt, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 933 (the friends of the chase, Godric's pick on corridor-chase-ideas-1022, befriending Mrs Norris over time): once she trusts him fully (norris_trust 9 and over) and she is the one who started the chase, she leads Filch astray from a hidden boy, a fourth partner of the hidden pass; B2 ch8 L9025 (Filch is \"drawn to the spot by the mysterious power that seemed to connect him with his foul cat\", Mrs Norris's accusing stare at the boy), checked against the text in the canon tool, 22 October 2026; the lines are ours, in his voice (\"my sweet\", CoS 8 L9091); comic, nobody hurt, nothing punished"
     }
   ]
 }

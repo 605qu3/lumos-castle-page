@@ -401,6 +401,41 @@
         "castle date >= 1 06-05"
       ],
       "starts": []
+    },
+    {
+      "id": "transfiguration.trevor-hop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "tf-trevor",
+      "weight": 1,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on",
+        "year = 1"
+      ],
+      "show": [
+        "a toad hopping out from under a first-year's desk, and a boy scrambling after it on hands and knees, hissing for it to come back"
+      ],
+      "starts": [],
+      "canon": "PS 6 L2284 and PS 7 (Neville forever losing Trevor the toad: on the train, in the boat, at the sorting), PS 16 L5660 (\"Trevor the toad, who looked as though he'd been making another bid for freedom\"), checked against the text in the canon tool, 22 October 2026; Godric's touch trevor-in-class (22 October 2026, relayed 5.55 pm): now and then a toad hops out from under a first-year desk in a lesson and someone scrambles after it; the lesson is ours, McGonagall's room; year 1 only, while the lesson runs"
+    },
+    {
+      "id": "transfiguration.trevor-hop-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "tf-trevor",
+      "weight": 5,
+      "moment": "wait 40-200 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on",
+        "year = 1"
+      ],
+      "starts": [],
+      "canon": "the silent partner of transfiguration.trevor-hop; about one wait in six"
     }
   ]
 }

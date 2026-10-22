@@ -1240,6 +1240,47 @@
         "pushed at its edge, the panel swings in on a pin, and beyond it the top step of a narrow stair, lit by the stair's own lamp"
       ],
       "canon": "Magic's req 516 (docs/handoff/magic.md, Rows answered; the Great Hall's req 614): a wall that is really a door, ours; nothing named beyond it, no elves, no kitchens (Kingsley's 8e); when and in which year he comes to find it the game's"
+    },
+    {
+      "id": "great-hall.christmas-mice",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-mice",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = great hall",
+        "occasion = christmas day",
+        "meal = dinner",
+        "year >= 1",
+        "days since hall_mice >= 1"
+      ],
+      "show": [
+        "white mice from the wizard crackers scurrying off under the long tables, and Mrs Norris sitting in the doorway, her lamp-like eyes following them"
+      ],
+      "starts": [
+        "stamp hall_mice"
+      ],
+      "canon": "PS 12 L4210 (several live white mice in a rear admiral's hat out of the crackers) and L4214 (\"The white mice had disappeared and Harry had a nasty feeling they were going to end up as Mrs Norris's Christmas dinner\"), checked against the text in the canon tool, 22 October 2026; Godric's touch christmas-mice-norris (22 October 2026, relayed 5.52 pm): on Christmas Day, at dinner, white mice from the wizard crackers scurry off under the tables and Mrs Norris sits in the doorway watching them, year 1 on; the staging is ours; now and then, never more than once a day"
+    },
+    {
+      "id": "great-hall.christmas-mice-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-mice",
+      "weight": 3,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = great hall",
+        "occasion = christmas day",
+        "meal = dinner",
+        "year >= 1",
+        "days since hall_mice >= 1"
+      ],
+      "starts": [],
+      "canon": "the silent partner of great-hall.christmas-mice"
     }
   ]
 }

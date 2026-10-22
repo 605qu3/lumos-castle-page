@@ -319,6 +319,19 @@
         "flowers large as cabbages in bloom down the growing length, nodding on their stalks as he passes"
       ],
       "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the summer bloom, \"flowers large as cabbages burst into bloom in the greenhouses\" (CoS 15 L11819, everyday, read in the canon tool, 20 October 2026), nodding as he passes, every house"
+    },
+    {
+      "when": [
+        "place = greenhouses",
+        "year = 1",
+        "lessons = on",
+        "hour < 13",
+        "time != night"
+      ],
+      "show": [
+        "a small Snare in a lidded wooden tray on the teacher's trestle bench, a chalk slate propped against it"
+      ],
+      "canon": "Magic's req 952 (docs/magic/year-1-wins.md, *13, the keep-still lesson*; Godric's 1 on magic-keep-still-year1-1022, confirmed 22 October 2026, 5.26 pm): the Stone's year only, in his own Herbology lesson, a small Snare in a lidded wooden tray on the teacher's trestle bench, out only in the lesson and never left standing in the house (Godric's item 20 holds); Devil's Snare, PS 16 L5812 (\"the more they strained against it, the tighter and faster the plant wound around them\") and L5814 (\"Stop moving!\"), L5820 (Sprout: it likes the dark and the damp), read in the canon tool, 22 October 2026; the lesson is ours: stillness and it lets go of its own accord, the tendril gentle, nothing hurts, the hand always comes out, never the trapdoor's night"
     }
   ],
   "records": [
@@ -598,6 +611,124 @@
         "set toadstool = none"
       ],
       "canon": "Magic's req 689 (docs/handoff/magic.md, The greenhouses; Fawkes's 1, 6.43 am), every year: the toadstool back in its bucket between visits; the petal keeps till the next lesson"
+    },
+    {
+      "id": "greenhouses.snare-lid",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap snare",
+      "when": [
+        "place = greenhouses",
+        "year = 1",
+        "lessons = on",
+        "hour < 13",
+        "time != night",
+        "snare != asked",
+        "snare != round"
+      ],
+      "show": [
+        "Professor Sprout lifts the lid of the small wooden tray on her trestle bench and holds out her hand, asking for his; something thin and green shifts in the dark of the tray"
+      ],
+      "starts": [
+        "set snare = asked"
+      ],
+      "canon": "Magic's req 952 (docs/magic/year-1-wins.md, *13, the keep-still lesson*; Godric's 1 on magic-keep-still-year1-1022, confirmed 22 October 2026, 5.26 pm): the Stone's year only, in his own Herbology lesson, a small Snare in a lidded wooden tray on the teacher's trestle bench, out only in the lesson and never left standing in the house (Godric's item 20 holds); Devil's Snare, PS 16 L5812 (\"the more they strained against it, the tighter and faster the plant wound around them\") and L5814 (\"Stop moving!\"), L5820 (Sprout: it likes the dark and the damp), read in the canon tool, 22 October 2026; the lesson is ours: stillness and it lets go of its own accord, the tendril gentle, nothing hurts, the hand always comes out, never the trapdoor's night"
+    },
+    {
+      "id": "greenhouses.snare-hand",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap snare",
+      "when": [
+        "place = greenhouses",
+        "year = 1",
+        "lessons = on",
+        "hour < 13",
+        "time != night",
+        "snare = asked"
+      ],
+      "show": [
+        "his hand goes into the tray; a slender tendril curls softly round his wrist, cool and damp"
+      ],
+      "starts": [
+        "set snare = round"
+      ],
+      "canon": "Magic's req 952 (docs/magic/year-1-wins.md, *13, the keep-still lesson*; Godric's 1 on magic-keep-still-year1-1022, confirmed 22 October 2026, 5.26 pm): the Stone's year only, in his own Herbology lesson, a small Snare in a lidded wooden tray on the teacher's trestle bench, out only in the lesson and never left standing in the house (Godric's item 20 holds); Devil's Snare, PS 16 L5812 (\"the more they strained against it, the tighter and faster the plant wound around them\") and L5814 (\"Stop moving!\"), L5820 (Sprout: it likes the dark and the damp), read in the canon tool, 22 October 2026; the lesson is ours: stillness and it lets go of its own accord, the tendril gentle, nothing hurts, the hand always comes out, never the trapdoor's night"
+    },
+    {
+      "id": "greenhouses.snare-tug",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap snare",
+      "when": [
+        "place = greenhouses",
+        "year = 1",
+        "lessons = on",
+        "hour < 13",
+        "time != night",
+        "snare = round"
+      ],
+      "show": [
+        "he tugs, and the tendril winds a little tighter and faster round his wrist, snug and gentle, nothing hurting"
+      ],
+      "starts": [],
+      "canon": "Magic's req 952 (docs/magic/year-1-wins.md, *13, the keep-still lesson*; Godric's 1 on magic-keep-still-year1-1022, confirmed 22 October 2026, 5.26 pm): the Stone's year only, in his own Herbology lesson, a small Snare in a lidded wooden tray on the teacher's trestle bench, out only in the lesson and never left standing in the house (Godric's item 20 holds); Devil's Snare, PS 16 L5812 (\"the more they strained against it, the tighter and faster the plant wound around them\") and L5814 (\"Stop moving!\"), L5820 (Sprout: it likes the dark and the damp), read in the canon tool, 22 October 2026; the lesson is ours: stillness and it lets go of its own accord, the tendril gentle, nothing hurts, the hand always comes out, never the trapdoor's night"
+    },
+    {
+      "id": "greenhouses.snare-free",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "quiet 4-8 s",
+      "when": [
+        "place = greenhouses",
+        "year = 1",
+        "lessons = on",
+        "hour < 13",
+        "time != night",
+        "snare = round"
+      ],
+      "show": [
+        "held still a moment, the tendril loosens and slides off his wrist of its own accord, and Professor Sprout puts the lid back on the tray"
+      ],
+      "starts": [
+        "set snare = none"
+      ],
+      "canon": "Magic's req 952 (docs/magic/year-1-wins.md, *13, the keep-still lesson*; Godric's 1 on magic-keep-still-year1-1022, confirmed 22 October 2026, 5.26 pm): the Stone's year only, in his own Herbology lesson, a small Snare in a lidded wooden tray on the teacher's trestle bench, out only in the lesson and never left standing in the house (Godric's item 20 holds); Devil's Snare, PS 16 L5812 (\"the more they strained against it, the tighter and faster the plant wound around them\") and L5814 (\"Stop moving!\"), L5820 (Sprout: it likes the dark and the damp), read in the canon tool, 22 October 2026; the lesson is ours: stillness and it lets go of its own accord, the tendril gentle, nothing hurts, the hand always comes out, never the trapdoor's night"
+    },
+    {
+      "id": "greenhouses.snare-slate",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap slate",
+      "when": [
+        "place = greenhouses",
+        "year = 1",
+        "lessons = on",
+        "hour < 13",
+        "time != night"
+      ],
+      "show": [
+        "the chalk slate propped against the tray reads, in Professor Sprout's round hand: Keep still. It gets bored."
+      ],
+      "starts": [],
+      "canon": "Magic's req 952 (docs/magic/year-1-wins.md, *13, the keep-still lesson*; Godric's 1 on magic-keep-still-year1-1022, confirmed 22 October 2026, 5.26 pm): the Stone's year only, in his own Herbology lesson, a small Snare in a lidded wooden tray on the teacher's trestle bench, out only in the lesson and never left standing in the house (Godric's item 20 holds); Devil's Snare, PS 16 L5812 (\"the more they strained against it, the tighter and faster the plant wound around them\") and L5814 (\"Stop moving!\"), L5820 (Sprout: it likes the dark and the damp), read in the canon tool, 22 October 2026; the lesson is ours: stillness and it lets go of its own accord, the tendril gentle, nothing hurts, the hand always comes out, never the trapdoor's night"
+    },
+    {
+      "id": "greenhouses.snare-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set snare = none"
+      ],
+      "canon": "clears the keep-still lesson's step at leave, as the toadstool's `forget`"
     }
   ]
 }
