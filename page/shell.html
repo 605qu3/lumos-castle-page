@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=482"></script>
-<script src="castle-paint.js?v=79"></script>
+<script src="castle-model.js?v=484"></script>
+<script src="castle-paint.js?v=80"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -204,7 +204,8 @@ var MODEL = window.CASTLE_MODEL ? (function (M) {
 })(window.CASTLE_MODEL) : null;
 var MROOMS = (MODEL && MODEL.rooms) || [];
 MROOMS.forEach(function (r) { if ((r.alias || []).indexOf(PLACE) >= 0) PLACE = r.id; });
-var NEVER = MROOMS.some(function (r) { return r.id === PLACE && r.shell === 'never'; });
+/* "opens": a room standing from its first book but walked only from this one (v153, the Stone's chambers from CoS) */
+var NEVER = MROOMS.some(function (r) { return r.id === PLACE && (r.shell === 'never' || (r.opens && BOOKS.indexOf(r.opens) > BOOK)); });
 /* each place's start on a plain load: the way he first comes in by */
 var STARTS = { 'entrance-hall': 'front-doors', 'stair-hall': 'well-mouth', 'tapestry-stairwell': 'tapestry-stair-1',
   'staff-passage': 'staff-passage-mouth',
@@ -280,6 +281,8 @@ PAINTED = PAINTED.concat(['vanishing-step-hollow']);
 PAINTED = PAINTED.concat(['strong-room', 'tally-room']);
 /* v141, Godric's 1 on architect-south-east-tower-1021 (6.36 pm, 21 October 2026): the south-east drum's round room on 1 */
 PAINTED = PAINTED.concat(['se-round-room-1']);
+/* v153: the Stone's chambers built for play from the Chamber's year (Godric's ruling, 8.07 am, 22 October 2026); the two passages wait for their slopes */
+PAINTED = PAINTED.concat(['forbidden-corridor', 'stone-bay', 'stone-pit', 'stone-keys-chamber', 'stone-chess-chamber', 'stone-troll-room', 'stone-potions-room', 'stone-last-chamber']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
@@ -3025,6 +3028,20 @@ function updateFilch(dt) {
   if (!filch.on || filch.done || tween) { filch.wait = 0; return; }
   if ((filch.wait += dt) >= FILCH.linger) { filch.done = true; if (filchDay() && events && events.moment) events.moment('filch passes'); }
 }
+
+/* v153: the giant chessboard's floor, "a huge chessboard" (PS 16 L5890): eight squares of 2.0 each way from x 93 and
+   y 47 (the model's stone-chess-chamber), dark and pale stone, each 2 cm proud of the floor and bearing 1 cm into it;
+   the pieces and the game are Magic's (reqs 904, 912) */
+var BOARD = PLACE !== 'stone-chess-chamber' ? null : (function () {
+  var g = new THREE.Group(), z0 = shell.place.floor, dark = kit.solid(0x2e2b29), pale = kit.solid(0xc9c1b3);
+  for (var i = 0; i < 8; i++) for (var j = 0; j < 8; j++) {
+    var a = shell.toLocal(93 + i * 2, 47 + j * 2, z0 - 0.01), b = shell.toLocal(95 + i * 2, 49 + j * 2, z0 + 0.02);
+    var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), (i + j) % 2 ? pale : dark);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
+    m.name = 'stone-chess-square-' + 'abcdefgh'[i] + (j + 1); m.userData.owner = PLACE; g.add(m);
+  }
+  scene.add(g); return g;
+})();
 
 /* the hooks: the events and magic set these (a shut door's tap, a way taken); harmless when unset */
 var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
