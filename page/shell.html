@@ -163,7 +163,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-shell.js?v=70"></script>
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=19"></script>
-<script src="castle-events.js?v=39"></script>
+<script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=1"></script>
 <script src="castle-sky.js?v=1"></script>
 <script src="design/drawn.js?v=1"></script>
@@ -1590,8 +1590,15 @@ var POT = (function () {
       var hoop = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.012, 5, 24), iron); hoop.rotation.x = Math.PI / 2; hoop.position.y = 0.62; p.add(hoop);
       var c = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 8, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), pot);
       c.position.y = 0.8; p.add(c);   /* its rim at 0.8, the bowl down to 0.55 */
+      var liq = null;
+      if (yp === 10.4 && xp > 5) {   /* req 951 (a): the boys' pair take the tap `cauldron`, each its own mesh, and a potion 6 cm under the rim */
+        c.position.copy(at).y += 0.8; c.userData.tap = 'cauldron'; c.userData.owner = PLACE; c.material = pot.clone(); c.material.side = THREE.DoubleSide;   /* a tap into the bowl lands too */
+        c.name = 'potions-boys-cauldron'; shell.group.add(c);
+        liq = new THREE.Mesh(new THREE.CircleGeometry(0.242, 24), new THREE.MeshStandardMaterial({ color: 0x4a3a26, roughness: 0.35 }));
+        liq.rotation.x = -Math.PI / 2; liq.position.y = 0.74; liq.visible = false; liq.raycast = function () {}; liq.name = 'potions-boys-potion'; p.add(liq);
+      }
       var f = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.25, 8), flame); f.position.y = 0.125; p.add(f);
-      out.places.push({ boys: yp === 10.4 && xp > 5, pot: c, fire: f });
+      out.places.push({ boys: yp === 10.4 && xp > 5, pot: c, fire: f, liq: liq });
     });
   });
   return out;
@@ -1607,6 +1614,23 @@ function potShown(shown) {   /* the fires as the lesson rule shows them; the str
   return [];
 }
 if (POT.on) potSet(Q.get('fires') === 'all');
+/* req 951 (a), Magic's 942 (Events' potions.cure-miss and cure-right, page/events/potions.json, word for word): the
+   Cure for Boils in the cauldron he tapped, the Stone's year only (the runtime's `year = 1`). The miss a thin murky
+   brown, emptied with Snape's wave and begun again clear; the right pot a clear grass green. Nothing glows, no boil,
+   no smoke, no hiss; the colour lit by the room. With no runtime the taps alternate here */
+var CURE_MISS = ['too few fangs and the potion stays a thin, murky brown with a smell of wet socks',
+      'Snape looks in it, says "Again." and empties it with a wave of his wand', 'the boy begins a fresh pot'],
+    CURE_RIGHT = 'the right weight and it turns a clear grass green and smells of nettle tea';
+POT.cur = null; POT.miss = false;
+function potLiquid(hex, op) {
+  var q = POT.cur || POT.places.filter(function (x) { return x.boys; })[0];
+  if (!q || !q.liq) return;
+  q.liq.visible = hex != null; if (hex != null) { q.liq.material.color.copy(kit.col(hex)); q.liq.material.transparent = op < 1; q.liq.material.opacity = op; }
+}
+thingCues[CURE_MISS[0]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[0], on: function () { potLiquid(0x4a3a26, 0.92); } }]); };
+thingCues[CURE_MISS[1]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[1], on: function () { potLiquid(null); } }]); };
+thingCues[CURE_MISS[2]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[2], on: function () { potLiquid(0x8a9a92, 0.45); } }]); };
+thingCues[CURE_RIGHT] = function () { showLines([{ medium: 'seen', sound: CURE_RIGHT, on: function () { potLiquid(0x4f8f3a, 0.85); } }]); };
 /* a glazed lantern 0.3 high and 0.3 across, its foot at `at` (the History lamps' kind, Interiors' schedules): an iron
    foot and cap, a glass chimney, the flame its own light only. Returns the flame, unlit; one of two sizes, lit or low */
 function lantern(g, at, iron, glass) {
@@ -3749,6 +3773,12 @@ function tap(cx, cy) {
   if (hit && hit.userData.tap === 'stores cupboard') {   /* req 930, Snape's stores: nothing moves, the string answers */
     if (events) events.tap('stores cupboard'); else showLines([{ medium: 'seen', sound: SO_CUP }]); kit.tapped(true); return;
   }
+  if (hit && hit.userData.tap === 'cauldron' && POT.on) {   /* req 951 (a), the Cure for Boils in the pot he tapped */
+    POT.cur = POT.places.filter(function (x) { return x.pot === hit; })[0] || null;
+    if (events) events.tap('cauldron');
+    else { POT.miss = !POT.miss; (POT.miss ? CURE_MISS : [CURE_RIGHT]).forEach(function (l) { thingCues[l](); }); }
+    kit.tapped(true); return;
+  }
   if (hit && hit.userData.tap === 'paper') {   /* req 941, the roll's verse */
     if (events) events.tap('paper'); else showLines(STONE_VERSE.map(function (l) { return { medium: 'seen', sound: l }; })); kit.tapped(true); return;
   }
@@ -3913,6 +3943,7 @@ function updateLines(dt) {
     if (!l.text && !l.sound) continue;
     var el = lineElement(l);
     lineCur = { line: l, t: lineSeconds(l), el: el, door: l.door || lineDoor };
+    if (l.on) l.on();   /* req 951: a thing that changes as its line shows, not when it is queued */
     placeLine(lineCur);
     requestAnimationFrame(function () { el.classList.add('on'); });
   }
