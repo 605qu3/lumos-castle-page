@@ -679,7 +679,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var e = onEdgeE(E, toSite(M, ft.group || null, ft.at));
         if (!e) return;
         var fh = ft.h || (ft.opening ? ft.opening[1] : 1.2);
-        pops.push({ wall: e.i, at: e.s, w: ft.w + 0.4, sill: 0, h: Math.max(fh, ft.mantel || 0) + 0.15, door: false });
+        /* v65 (req 908): a fireplace with its own surround's width stops the panelling 1 cm onto that surround */
+        pops.push({ wall: e.i, at: e.s, w: ft.surround ? ft.surround - 0.02 : ft.w + 0.4, sill: 0, h: Math.max(fh, ft.mantel || 0) + 0.15, door: false });
       });
       /* v48 (req 843, Design's panelling.js v2): forPlace stands each wall upright on either winding, so the plan goes in
          as it is; the grade is the room's own (PANEL_GRADE, grade 2 till Godric grades them) */

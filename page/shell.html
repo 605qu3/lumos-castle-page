@@ -154,15 +154,15 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=480"></script>
-<script src="castle-paint.js?v=77"></script>
+<script src="castle-model.js?v=481"></script>
+<script src="castle-paint.js?v=78"></script>
 <script src="design/tones.js?v=5"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=64"></script>
+<script src="castle-shell.js?v=65"></script>
 <script src="shell-w5b.js?v=16"></script>
-<script src="shell-w5a.js?v=14"></script>
+<script src="shell-w5a.js?v=15"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/carving.js?v=1"></script>
@@ -1577,7 +1577,8 @@ function thingBox(g, P, a0, a1, mat) {   /* an upright box between two corners o
 /* the Transfiguration classroom's lamps (Magic's req 672; Events' req 679, page/events/transfiguration.json, word for
    word), where Interiors' docs/interiors/transfiguration-classroom.md puts them (req 673, cited; x = 139.6 + y',
    y = 71.4 - x'): six lanterns on iron wall brackets 0.3 out, two on each long wall at y' 4.5 and 7.5, two on the
-   front wall flanking the board at x' 1.5 and 6.5, each foot at 2.0. Lit while a lamp rule shows (evening, night, a
+   front wall flanking the board at x' 1.5 and 6.5, each foot at 2.0 (the front pair's at 2.5 from v151, req 908, clear
+   of her study's door head). Lit while a lamp rule shows (evening, night, a
    dark wet day), their own flame. The night line and the wet day's stay in the note, since each names more than the
    lamps. One group, no tap lands on it. ?lamps=lit|out for checks. */
 var TRANS_ALWAYS = 'the classroom lamps along the walls', TRANS_LIT = 'the classroom lamps lit, their own flame',
@@ -1589,9 +1590,9 @@ var TRANS = (function () {
   out.on = true;
   var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'transfiguration-things'; shell.group.add(g);
   var P = function (xp, yp, z) { return shell.toLocal(139.6 + yp, 71.4 - xp, z0 + z); }, iron = kit.solid(0x2e2b28);
-  [[0.3, 4.5, 0, 4.5], [0.3, 7.5, 0, 7.5], [7.7, 4.5, 8, 4.5], [7.7, 7.5, 8, 7.5], [1.5, 11.7, 1.5, 12], [6.5, 11.7, 6.5, 12]].forEach(function (l) {
-    out.flames.push(lantern(g, P(l[0], l[1], 2.0), iron, LAMP_GLASS));
-    thingBox(g, P, [Math.min(l[0], l[2]) - 0.015, Math.min(l[1], l[3]) - 0.015, 2.27], [Math.max(l[0], l[2]) + 0.015, Math.max(l[1], l[3]) + 0.015, 2.3], iron);   /* the bracket */
+  [[0.3, 4.5, 0, 4.5, 2.0], [0.3, 7.5, 0, 7.5, 2.0], [7.7, 4.5, 8, 4.5, 2.0], [7.7, 7.5, 8, 7.5, 2.0], [1.5, 11.7, 1.5, 12, 2.5], [6.5, 11.7, 6.5, 12, 2.5]].forEach(function (l) {
+    out.flames.push(lantern(g, P(l[0], l[1], l[4]), iron, LAMP_GLASS));
+    thingBox(g, P, [Math.min(l[0], l[2]) - 0.015, Math.min(l[1], l[3]) - 0.015, l[4] + 0.27], [Math.max(l[0], l[2]) + 0.015, Math.max(l[1], l[3]) + 0.015, l[4] + 0.3], iron);   /* the bracket */
   });
   return out;
 })();

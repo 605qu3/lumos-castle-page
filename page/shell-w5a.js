@@ -1082,6 +1082,47 @@ window.SHELL_W5A = {
   T['hall-chamber'] = { items: it };
 })(window.SHELL_W5A.things, window.SHELL_W5A.mats);
 
+/* docs/interiors/mcgonagalls-study.md, *From v146: the study off her classroom* (req 908, Interiors' ledger 217, the
+   things Godric's 2 on curator-mcgonagall-list-1014): the fire's surround narrowed to 2.0 round the model's 1.8 opening
+   (mcgonagalls-fireplace, its surround field, so the panelling stops on it) and its hearth stone, the two armchairs
+   before the fire each turned 20 degrees in, her desk up the arm and her chair behind it facing south, the two
+   visitors' chairs, the tartan tin and the blotter. The armchairs' facing lines meet at the fire wall's middle, so the
+   room's centre for 'p' is there and each chair stands on its bearing. Nothing against the outer curved wall. The ink
+   stain in the blotter is Events' trace (req 564), not drawn here. Unlit, nothing tappable. */
+(function (T, MT) {
+  MT.tartan = 0x7a2a2a; MT.blotter = 0x3d4a3a; MT.pink = 0xb08a78;
+  var C = [154.2, 66.54], it = [];
+  function along(b, r, u) { return b + u / r * 180 / Math.PI; }
+  /* the surround: two jambs, the head and the mantel shelf, a frieze behind the shelf to 1.66 so the panelling's cut
+     (castle-shell.js, to 1.65) bears on stone; the firebox's back and floor sooted; the hearth stone before it */
+  it.push(['b', 153.2, 66.48, -0.01, 153.3, 67.1, 1.4, 'pink'], ['b', 155.1, 66.48, -0.01, 155.2, 67.1, 1.4, 'pink'],
+          ['b', 153.2, 66.48, 1.4, 155.2, 67.1, 1.5, 'pink'], ['b', 153.2, 66.48, 1.5, 155.2, 67.16, 1.56, 'pink'],
+          ['b', 153.2, 66.48, 1.56, 155.2, 66.56, 1.66, 'pink'],
+          ['b', 153.29, 66.48, -0.01, 155.11, 66.52, 1.41, 'soot'], ['b', 153.29, 66.52, -0.01, 155.11, 67.1, 0.01, 'soot'],
+          ['b', 153.2, 67.1, -0.01, 155.2, 67.6, 0.04, 'stone']);
+  /* the two armchairs, 0.8 square, seat 0.45, back 1.1, low arms; each on its bearing from C, facing the fire */
+  [[-20, 'leather'], [20, 'cloth']].forEach(function (a) {
+    var b = a[0], r = 2.192;
+    it.push(['p', b, r, 0.8, 0.8, -0.01, 0.45, a[1]], ['p', b, r + 0.34, 0.8, 0.12, 0.45, 1.1, a[1]],
+            ['p', along(b, r, 0.34), r - 0.06, 0.12, 0.68, 0.45, 0.65, a[1]], ['p', along(b, r, -0.34), r - 0.06, 0.12, 0.68, 0.45, 0.65, a[1]]);
+  });
+  /* her desk, 1.5 by 0.8, 0.75 high, its long side east to west; the tin on its near corner, the blotter at her place */
+  it.push(['t', 154.85, 71.9, 156.35, 72.7, 0.75, 'oak'],
+          ['y', 155.05, 72.05, 0.075, 0.75, 0.83, 'tartan'], ['y', 155.05, 72.05, 0.077, 0.81, 0.83, 'tartan'],
+          ['b', 155.375, 72.24, 0.75, 155.825, 72.56, 0.756, 'blotter']);
+  /* her chair behind it facing south (seat 0.45, back 1.2), the two visitors' chairs before it facing north */
+  function chair(x0, y0, x1, y1, by0, by1, top) {
+    it.push(['b', x0, y0, 0.41, x1, y1, 0.45, 'dark'], ['b', x0, by0, 0.45, x1, by1, top, 'dark']);
+    [[x0, y0], [x1 - 0.04, y0], [x0, y1 - 0.04], [x1 - 0.04, y1 - 0.04]].forEach(function (p) {
+      it.push(['b', p[0], p[1], -0.01, p[0] + 0.04, p[1] + 0.04, 0.41, 'dark']);
+    });
+  }
+  chair(155.3, 72.85, 155.9, 73.45, 73.39, 73.45, 1.2);
+  chair(154.9, 71.05, 155.4, 71.55, 71.05, 71.09, 0.95);
+  chair(155.8, 71.05, 156.3, 71.55, 71.05, 71.09, 0.95);
+  T['mcgonagalls-office'] = { c: C, items: it };
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+
 /* docs/interiors/hidden-ways-batch-4.md, *H24* (req 805 (2), the table on Godric's pick and its wave 5 detail pass): the
    shell grotto about (0, 0), r 4.0, 24 sides (their middles at 4.0, the corners at 4.03), the top flat at 4.2. The
    scallop basin on the model's rect with a shell fan on the wall behind it, under the cleft (bearing 190, from 1.0) and
