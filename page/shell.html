@@ -4241,12 +4241,13 @@ var BOARD = PLACE !== 'stone-chess-chamber' ? null : (function () {
    foot 1 cm into its square; no face or feature on any piece. Each a group named for its square
    (`giant-<side>-<piece>-<square>`, userData.giant), so the game can move it (req 922). Nothing glows */
 /* the hundred-seventeenth, on Godric's answer to architect-chess-pieces-1022b ("more like a scaled up wizards chess
-   set. No faces still"): the figures, behind ?chess=figures till he picks on the sheet. Each a figure, not a turned
+   set. No faces still"): the figures, the default since his 1 on architect-chess-figures-1022 (6.40 pm; ?chess=turned
+   for the turned set). Each a figure, not a turned
    shape, every head smooth and blank (PS 16: the queen's "blank face" and "stone arm", L5936, L5956; the king's crown
    taken off, L5960): the king and queen robed and crowned, the king's crown its own piece (userData.crown, for G_WON),
    the bishop robed and mitred with a crook, the rook a tower, the pawn a foot soldier in a plain helmet with a shield
    and spear; the knight as built. Heights as the turned set's; +x the way it faces, -z its left */
-var FIGURES = Q.get('chess') === 'figures';
+var FIGURES = Q.get('chess') !== 'turned';
 function chessFigure(kind, mat) {
   var g = new THREE.Group(), UP = new THREE.Vector3(0, 1, 0);
   function lathe(pts, sx, to) {
