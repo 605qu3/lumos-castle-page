@@ -3322,6 +3322,27 @@
         "at the top, a plain panel in the wall, which opens outward onto the seventh floor's landing"
       ],
       "canon": "Hidden Ways' H62 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-sw-tower-1021, 3.33 pm, 21 October 2026; req 876, the Architect's v134, ledger 193: its `magic`, the only-up, Events' to tell): the stair that only goes up, the castle's own humour, as its stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the top; the stair is in the south-west corner's wall stack with no window, so no sky, no weather and no hour show in it"
+    },
+    {
+      "when": [
+        "place = down only stair"
+      ],
+      "show": [
+        "a narrow stone stair winding down round its newel, the treads worn hollow, the air cool and still",
+        "the way he came in lost above him: turn to climb and every tread still goes down",
+        "at the foot, a plain panel in the wall, which opens outward onto the first floor's corridor along the lake"
+      ],
+      "canon": "Hidden Ways' H64 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-se-stair-1021, 4.45 pm, 21 October 2026; req 886, the Architect's v136, ledger 197: its `magic`, the only-down, Events' to tell): the stair that only goes down, H62's mirror, as the stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the foot; the stair is in the south-east corner's wall stack with no window, so no sky, no weather and no hour show in it"
+    },
+    {
+      "when": [
+        "place = vanishing step hollow"
+      ],
+      "show": [
+        "the underside of the stair low over his head, the dust of years on the floor",
+        "a heap along the north wall of everything ever dropped through the step: quills, odd shoes and socks, Chocolate Frog cards, spectacles grey with dust, a few dull Gobstones rolled away along the far wall"
+      ],
+      "canon": "Hidden Ways' H65 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-se-stair-1021, 4.45 pm, 21 October 2026; req 886, the Architect's v137, ledger 198; the things Interiors', docs/interiors/hidden-ways-batch-10.md, H65, req 887): the hollow under the vanishing step (PS 8 L2722, \"a vanishing step halfway up that you had to remember to jump\", checked against the text, 21 October 2026); never plot, nothing dated; Interiors left a thing dropping through the step while he is inside to Events"
     }
   ],
   "records": [
@@ -3948,6 +3969,152 @@
       ],
       "starts": [],
       "canon": "Hidden Ways' H62 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-sw-tower-1021, 3.33 pm, 21 October 2026; req 876, the Architect's v134, ledger 193: its `magic`, the only-up, Events' to tell): the stair that only goes up, the castle's own humour, as its stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the top; the silent partner, about two waits in three"
+    },
+    {
+      "id": "hidden-ways.down-only-stair-echo",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "down-only-stair-echo",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = down only stair"
+      ],
+      "show": [
+        "his own footsteps going on down the stair below him, a beat after he has stopped"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H64 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-se-stair-1021, 4.45 pm, 21 October 2026; req 886, the Architect's v136, ledger 197: its `magic`, the only-down, Events' to tell): the stair that only goes down, H62's mirror, as the stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the foot; the stair is in the south-east corner's wall stack with no window, so no sky, no weather and no hour show in it; now and then, ours: H62's echo turned over, his own steps heard on below him a beat after he has stopped"
+    },
+    {
+      "id": "hidden-ways.down-only-stair-echo-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "down-only-stair-echo",
+      "weight": 2,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = down only stair"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H64 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-se-stair-1021, 4.45 pm, 21 October 2026; req 886, the Architect's v136, ledger 197: its `magic`, the only-down, Events' to tell): the stair that only goes down, H62's mirror, as the stairs that \"led somewhere different on a Friday\" (PS 8 L2722, checked against the text, 21 October 2026); invented; the way out always open, at the foot; the stair is in the south-east corner's wall stack with no window, so no sky, no weather and no hour show in it; the silent partner, about two waits in three"
+    },
+    {
+      "id": "hidden-ways.hollow-drop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hollow-drop",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = vanishing step hollow",
+        "time != night"
+      ],
+      "show": [
+        "overhead, a pupil's footsteps on the flight, a stumble on the one step that is not there, and a small thing patters down into the heap"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H65 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-se-stair-1021, 4.45 pm, 21 October 2026; req 886, the Architect's v137, ledger 198; the things Interiors', docs/interiors/hidden-ways-batch-10.md, H65, req 887): the hollow under the vanishing step (PS 8 L2722, \"a vanishing step halfway up that you had to remember to jump\", checked against the text, 21 October 2026); never plot, nothing dated; Interiors left a thing dropping through the step while he is inside to Events; now and then, by day when the stair is used, ours: someone forgets to jump and what was in a pocket lands on the heap, which is why the newest is a shade cleaner"
+    },
+    {
+      "id": "hidden-ways.hollow-drop-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hollow-drop",
+      "weight": 2,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = vanishing step hollow",
+        "time != night"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H65 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-se-stair-1021, 4.45 pm, 21 October 2026; req 886, the Architect's v137, ledger 198; the things Interiors', docs/interiors/hidden-ways-batch-10.md, H65, req 887): the hollow under the vanishing step (PS 8 L2722, \"a vanishing step halfway up that you had to remember to jump\", checked against the text, 21 October 2026); never plot, nothing dated; Interiors left a thing dropping through the step while he is inside to Events; the silent partner, about two waits in three"
+    },
+    {
+      "id": "hidden-ways.garderobe-drop",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap garderobe-door-6",
+      "when": [
+        "place = north stair foot 6",
+        "glove_down != yes"
+      ],
+      "show": [
+        "he lets his glove fall down the dark of the shaft: a pat on one ledge, a scuff past the slots in the wall, a long breath of nothing, and a soft knock far below"
+      ],
+      "starts": [
+        "set glove_down = yes"
+      ],
+      "canon": "Hidden Ways' H67 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-outside-1021, 6.24 pm, 21 October 2026; req 893, the Architect's v140, ledger 203): the old garderobe shaft, G to 6, its little doors a find; a thing dropped through the door on 6 lies by the door on G a breath later, with its sound down the shaft; never plot, nothing dated; the thing is his own glove, my choice, provisional, Hidden Ways and Godric to confirm; nothing lost for good: the glove is in his hand again when he opens the door on G, and a visit that ends first clears it"
+    },
+    {
+      "id": "hidden-ways.garderobe-quiet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap garderobe-door-6",
+      "when": [
+        "place = north stair foot 6",
+        "glove_down = yes"
+      ],
+      "show": [
+        "the shaft dark and still below him, a thread of cold air coming up it"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H67 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-outside-1021, 6.24 pm, 21 October 2026; req 893, the Architect's v140, ledger 203): the old garderobe shaft, G to 6, its little doors a find; a thing dropped through the door on 6 lies by the door on G a breath later, with its sound down the shaft; never plot, nothing dated; the thing is his own glove, my choice, provisional, Hidden Ways and Godric to confirm; nothing lost for good: the glove is in his hand again when he opens the door on G, and a visit that ends first clears it; a second tap on the door on 6 while the glove is down, never silence"
+    },
+    {
+      "id": "hidden-ways.garderobe-glove",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap garderobe-door-g",
+      "when": [
+        "place = north stair foot g",
+        "glove_down = yes"
+      ],
+      "show": [
+        "his glove lies on the stone by the little door, dusty, as if put there for him; he takes it back"
+      ],
+      "starts": [
+        "set glove_down = no"
+      ],
+      "canon": "Hidden Ways' H67 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-outside-1021, 6.24 pm, 21 October 2026; req 893, the Architect's v140, ledger 203): the old garderobe shaft, G to 6, its little doors a find; a thing dropped through the door on 6 lies by the door on G a breath later, with its sound down the shaft; never plot, nothing dated; the thing is his own glove, my choice, provisional, Hidden Ways and Godric to confirm; nothing lost for good: the glove is in his hand again when he opens the door on G, and a visit that ends first clears it"
+    },
+    {
+      "id": "hidden-ways.garderobe-foot",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap garderobe-door-g",
+      "when": [
+        "place = north stair foot g",
+        "glove_down != yes"
+      ],
+      "show": [
+        "a dry stone shaft climbing out of sight above the little door, the slots of its long-gone seats in the wall, a thread of cold air coming down it"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H67 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-outside-1021, 6.24 pm, 21 October 2026; req 893, the Architect's v140, ledger 203): the old garderobe shaft, G to 6, its little doors a find; a thing dropped through the door on 6 lies by the door on G a breath later, with its sound down the shaft; never plot, nothing dated; the thing is his own glove, my choice, provisional, Hidden Ways and Godric to confirm; nothing lost for good: the glove is in his hand again when he opens the door on G, and a visit that ends first clears it; the door on G with nothing dropped, never silence"
+    },
+    {
+      "id": "hidden-ways.garderobe-clear",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "glove_down = yes"
+      ],
+      "starts": [
+        "set glove_down = no"
+      ],
+      "canon": "Hidden Ways' H67 (docs/hidden-ways/busts-870.md, kept by Godric on hidden-ways-busts-outside-1021, 6.24 pm, 21 October 2026; req 893, the Architect's v140, ledger 203): the old garderobe shaft, G to 6, its little doors a find; a thing dropped through the door on 6 lies by the door on G a breath later, with its sound down the shaft; never plot, nothing dated; the thing is his own glove, my choice, provisional, Hidden Ways and Godric to confirm; nothing lost for good: the glove is in his hand again when he opens the door on G, and a visit that ends first clears it; a visit that ends with the glove down clears it, so nothing is lost for good"
     }
   ]
 }

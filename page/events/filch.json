@@ -780,56 +780,6 @@
       "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: the visit's draws cleared at leave"
     },
     {
-      "id": "filch.chase-stone",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "arrive",
-      "when": [
-        "place = corridor",
-        "year = 2",
-        "castle date >= 2 10-31",
-        "castle date <= 2 06-30"
-      ],
-      "starts": [
-        "set norris_stone = yes"
-      ],
-      "canon": "the Chamber's year, 31 October to the end of term: Mrs Norris is petrified from Halloween night (CoS; the chapters are not yet read through the canon gate, verify), so she does not whisk off for Filch and the chase is not drawn; her return at the term's end is not shown; a state for the chase's records, ours"
-    },
-    {
-      "id": "filch.chase-stone-off-a",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "arrive",
-      "when": [
-        "place = corridor",
-        "year != 2",
-        "norris_stone = yes"
-      ],
-      "starts": [
-        "set norris_stone = no"
-      ],
-      "canon": "out of the Chamber's year she is free again: the chase may be drawn (see filch.chase-stone)"
-    },
-    {
-      "id": "filch.chase-stone-off-b",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "arrive",
-      "when": [
-        "place = corridor",
-        "year = 2",
-        "castle date <= 2 10-30",
-        "norris_stone = yes"
-      ],
-      "starts": [
-        "set norris_stone = no"
-      ],
-      "canon": "before 31 October of the Chamber's year she is free: the chase may be drawn (see filch.chase-stone)"
-    },
-    {
       "id": "filch.chase-night",
       "tier": "fixed",
       "source": "device",
@@ -841,7 +791,6 @@
         "place = corridor",
         "time = night",
         "chase != on",
-        "norris_stone != yes",
         "nights since chase_night >= 1"
       ],
       "show": [
@@ -865,7 +814,6 @@
         "place = corridor",
         "time = night",
         "chase != on",
-        "norris_stone != yes",
         "nights since chase_night >= 1"
       ],
       "starts": [],
@@ -881,8 +829,7 @@
         "place = corridor",
         "at = cupboard",
         "norris != none",
-        "chase != on",
-        "norris_stone != yes"
+        "chase != on"
       ],
       "show": [
         "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
@@ -903,8 +850,7 @@
         "place = corridor",
         "at = armour",
         "norris != none",
-        "chase != on",
-        "norris_stone != yes"
+        "chase != on"
       ],
       "show": [
         "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
