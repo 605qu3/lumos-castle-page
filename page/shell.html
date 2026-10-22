@@ -1932,6 +1932,8 @@ var W1 = (function () {
     shelves(true, 4, -1, 0.4, 1.6, 0.4, SH); shelves(true, 4, -1, 3.4, 4.6, 0.4, SH);
     pedestalDesk(1.7, 1.9, 3.3, 2.7, 0.78);
     chair(2.5, 2.925, -90, 3, dark, 0.275);
+    /* req 930: the hard chair set opposite his desk, a plain board back, pushed in to 2 cm off the desk's front panel */
+    chair(2.5, 1.71, 90, 1, dark, 0.2);
     /* his private stores, locked: the cupboard on the right wall, its leaves to the room */
     box(4.55, 1.0, -0.01, 5.02, 2.0, 2.0, dark);
     box(4.535, 1.02, 0.08, 4.551, 1.49, 1.92, wood); box(4.535, 1.51, 0.08, 4.551, 1.98, 1.92, wood);
@@ -3109,7 +3111,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), foShown(shown), sittersShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), foShown(shown), sittersShown(shown), soShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -3226,6 +3228,86 @@ function updateFilchOffice(dt) {
     [FOFFICE.drawer].concat(FOFFICE.face).forEach(function (m) { var r = m.userData.rest; m.position.set(r.x + w.x * du, r.y + dz, r.z + w.z * du); });
     if (s >= FOFFICE.dur) FOFFICE.shake = -1;
   }
+}
+/* req 930 (Magic's, on its 929; Events' strings, page/events/snape-office.json, tally snapeoffice, word for word, req
+   935): Snape's office, in Interiors' frame for it (x = 29 - x', y = 11.6 - y'; docs/interiors/potions-dungeon.md, The
+   office). The fire in the grate wave 1's pass draws from snape-fireplace (x' 2.1 to 2.9 at the far wall) while the
+   winter line shows, its own light on the jars' shelves behind the desk; dark with no line. The rack of the class's
+   flagons set down on the desk on its string (the errand's wait), eight corked flagons, each with its label. The
+   locked cupboard of his stores (wave 1's, on the right wall) is the tap `stores cupboard`: an unseen face 2 mm before
+   its leaves, a direct child of the shell's group; nothing moves, its string the answer. The office door: on the
+   dungeon corridor shut, a hand's breadth ajar and walked through only while the errand's ajar line shows (as Filch's,
+   req 771); inside, shut behind him as the line says, its way out always open. The jars are Objects' (req 376) and
+   stay the note's, with the cold and his breath; Snape's handing over in the dungeon is People's, a note line.
+   ?fire=lit, ?rack=on for checks; lumosGreybox.snapeOffice */
+var SO_FIRE = 'a fire burning in the grate, the jars behind the desk catching its light',
+    SO_DARK = 'the fireplace dark and empty',
+    SO_RACK = 'the rack of corked, labelled flagons set down on the desk, a name on every label, and nothing else on the desk touched',
+    SO_CUP = "the cupboard's door held fast, locked, its handle will not turn, and nothing more",
+    SO_ROOM = ['in a corner the cupboard of ingredients, shut and locked', 'his desk tidy, a hard chair set opposite it, nothing on the desk that tells anything',
+      "the door pushed shut behind him, the passage's sounds gone"],
+    SO_AJAR = "Snape's office door unlocked and standing a hand's breadth ajar on the cold, shadowy room",
+    SO_SHUT = "Snape's office door pulled to behind him and shut again, plain and still, no light under it";
+var SDOOR = PLACE === 'dungeon-corridor' || PLACE === 'snape-office' ? shell.doors.filter(function (d) { return d.id === 'snape-office-door'; })[0] || null : null, snapeOpen = false;
+function snapeSet(open) {
+  if (!SDOOR || PLACE !== 'dungeon-corridor' || open === snapeOpen) return;
+  snapeOpen = open;
+  var h = SDOOR.hinge, a = open ? h.th : 0, m = SDOOR.mesh;
+  m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half); m.rotation.y = SDOOR.rest.rot + a;
+}
+var SOFFICE = (function () {
+  if (PLACE !== 'snape-office') return null;
+  var z0 = shell.place.floor, P = function (xp, yp, z) { return shell.toLocal(29 - xp, 11.6 - yp, z0 + z); };
+  var out = { fire: false, flames: [], logs: [], light: null, rack: null, t: 0 };
+  var g = new THREE.Group(); g.name = 'snape-office-things'; scene.add(g);
+  function own(m) { m.userData.owner = 'snape-office'; m.raycast = function () {}; return m; }
+  function solid(hex, r) { return new THREE.MeshStandardMaterial({ color: kit.col(hex), roughness: r || 0.85, metalness: 0 }); }
+  /* the fire: two logs on the hearth, 1 cm into it, and five flames over them */
+  var logM = solid(0x3a2a1e, 0.95), flameM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xe8782a).convertSRGBToLinear() });
+  [[2.2, 3.72, 2.8, 3.82], [2.25, 3.84, 2.75, 3.93]].forEach(function (l) { var m = own(thingBox(g, P, [l[0], l[1], -0.005], [l[2], l[3], 0.09], logM)); out.logs.push(m); });
+  [2.28, 2.39, 2.5, 2.61, 2.72].forEach(function (xp, i) {
+    var f = own(new THREE.Mesh(new THREE.ConeGeometry(0.07, 1, 8), flameM)); f.userData.h = 0.32 + ((i * 3) % 5) * 0.05;
+    f.position.copy(P(xp, 3.8 + (i % 2) * 0.05, 0)); f.userData.base = f.position.y + 0.08; g.add(f); out.flames.push(f);
+  });
+  out.light = new THREE.PointLight(0xff9a50, 0, 6, 1.6); out.light.position.copy(P(2.5, 3.3, 0.6)); scene.add(out.light);
+  /* the rack on the desk's near half, its base 1 cm into the top (0.78): a base board, two ends, a front and a back
+     rail at the flagons' shoulders, eight flagons of dark glass, corked, a paper label on each one's face to the door */
+  var rack = new THREE.Group(); rack.name = 'snape-rack'; g.add(rack); out.rack = rack;
+  var oak = solid(0x6b5236), glass = solid(0x3d3426, 0.35), cork = solid(0x9a7b55, 0.95), paper = solid(0xd8cba6, 0.95);
+  [[[2.2, 2.0, 0.77], [2.8, 2.2, 0.79], oak], [[2.2, 2.0, 0.79], [2.22, 2.2, 0.96], oak], [[2.78, 2.0, 0.79], [2.8, 2.2, 0.96], oak],
+   [[2.22, 2.04, 0.9], [2.78, 2.055, 0.92], oak], [[2.22, 2.145, 0.9], [2.78, 2.16, 0.92], oak]].forEach(function (p) { rack.add(own(thingBox(rack, P, p[0], p[1], p[2]))); });
+  for (var i = 0; i < 8; i++) {
+    var xp = 2.26 + i * 0.068, b = own(new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.15, 12), glass));
+    b.position.copy(P(xp, 2.1, 0.79 + 0.075 - 0.005)); rack.add(b);
+    var c = own(new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.014, 0.03, 10), cork)); c.position.copy(P(xp, 2.1, 0.94 + 0.015 - 0.005)); rack.add(c);
+    rack.add(own(thingBox(rack, P, [xp - 0.018, 2.073, 0.81], [xp + 0.018, 2.0765, 0.86], paper)));
+  }
+  rack.visible = Q.get('rack') === 'on';
+  /* the stores cupboard's tap: an unseen face before its leaves (wave 1's at x' 4.535, y' 1.02 to 1.98) */
+  var cup = thingBox(shell.group, P, [4.52, 1.02, 0.08], [4.533, 1.98, 1.92], new THREE.MeshBasicMaterial({ visible: false }));
+  cup.name = 'snape-stores-tap'; cup.userData.tap = 'stores cupboard'; cup.userData.owner = 'snape-office';
+  out.set = function (lit) {
+    out.fire = lit; out.flames.concat(out.logs).forEach(function (m) { m.visible = lit; }); out.light.intensity = lit ? 1.4 : 0;
+  };
+  out.set(Q.get('fire') === 'lit');
+  return out;
+})();
+thingCues[SO_RACK] = function () { if (SOFFICE) SOFFICE.rack.visible = true; showLines([{ medium: 'seen', sound: SO_RACK }]); };
+function soShown(shown) {
+  if (PLACE === 'dungeon-corridor') { snapeSet(shown.indexOf(SO_AJAR) >= 0); return [SO_AJAR, SO_SHUT].filter(function (s) { return shown.indexOf(s) >= 0; }); }
+  if (!SOFFICE) return [];
+  var lit = shown.indexOf(SO_FIRE) >= 0;
+  if (!Q.get('fire') && lit !== SOFFICE.fire) SOFFICE.set(lit);
+  if (shown.indexOf(SO_RACK) >= 0) SOFFICE.rack.visible = true;
+  return SO_ROOM.concat([SO_FIRE, SO_DARK, SO_RACK]).filter(function (s) { return shown.indexOf(s) >= 0; });
+}
+function updateSnapeOffice(dt) {   /* the flames' slow stir */
+  if (!SOFFICE || !SOFFICE.fire) return;
+  SOFFICE.t += dt;
+  SOFFICE.flames.forEach(function (f, i) {
+    var h = f.userData.h * (0.9 + 0.1 * Math.sin(SOFFICE.t * (5 + i) + i * 1.7)); f.scale.set(1, h, 1); f.position.y = f.userData.base + h / 2;
+  });
+  SOFFICE.light.intensity = 1.4 + 0.12 * Math.sin(SOFFICE.t * 7.3);
 }
 /* req 927 (People's, on req 897 and Godric's 1 on people-painters-sitters-r1-1022; Events' req 928 strings,
    page/events/painters-room.json, word for word): the painters' room's two sitters drawn into their canvases
@@ -3409,6 +3491,9 @@ function tap(cx, cy) {
     if (events) events.tap('night-log'); else { ASTRO.page = { moons: 'planet', planet: 'eclipse', eclipse: 'moons' }[ASTRO.page]; ASTRO.turn = 0.6; ASTRO.t = 0; }
     kit.tapped(true); return;
   }
+  if (hit && hit.userData.tap === 'stores cupboard') {   /* req 930, Snape's stores: nothing moves, the string answers */
+    if (events) events.tap('stores cupboard'); else showLines([{ medium: 'seen', sound: SO_CUP }]); kit.tapped(true); return;
+  }
   if (events && hit && hit.userData.bottle) { events.tap(hit.userData.bottle); kit.tapped(true); return; }   /* req 920, the seven bottles */
   if (hit && PLACE === 'stone-potions-room' && STONE.on2 && hit === STONE.on2.mesh) {   /* req 935, the black flames: never through */
     if (events) events.tap('black flames'); else thingCues[STONE_BLACK](); kit.tapped(true); return;
@@ -3418,7 +3503,7 @@ function tap(cx, cy) {
   }
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
-  if (d && (here === d.stand || here === placeOf(d).s)) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
+  if (d && (here === d.stand || here === placeOf(d).s)) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen) || (d === SDOOR && (snapeOpen || PLACE === 'snape-office'))) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) {
     acted = goTo(d);
     /* req 550: walking up to an open way is its tap to the events (gun-room-arch's draught), since a second tap takes him through */
@@ -3513,7 +3598,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateSnapeOffice(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -3707,6 +3792,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
   cadogan: function () { return CADOGAN ? { taps: CADOGAN.taps, bare: CADOGAN.patch.visible } : null; },
   filch: function () { return { found: !!FDOOR, open: filchOpen, box: FBOX ? FBOX.getWorldPosition(new THREE.Vector3()) : null, boxTaps: FBOX ? FBOX.userData.taps || 0 : 0 }; },
+  snapeOffice: function (shown) {   /* req 930: shown a list of strings, as the runtime's room rules */
+    if (shown) thingsDrawRoom(shown);
+    return { door: !!SDOOR, open: snapeOpen, fire: SOFFICE ? SOFFICE.fire : null, rack: SOFFICE ? SOFFICE.rack.visible : null, note: noteEl.textContent }; },
   office: function (cue) { if (!FOFFICE) return null; if (cue) cueTable[cue](); var L = FOFFICE.lamp;   /* req 916 */
     return { state: FOFFICE.state, roll: FOFFICE.lines.filter(function (m) { return m.visible; }).length, lamp: L ? +(L.light.intensity / L.low).toFixed(2) : null,
       rattling: FOFFICE.rattle >= 0, shaking: FOFFICE.shake >= 0, drawer: FOFFICE.drawer.getWorldPosition(new THREE.Vector3()), taps: FOFFICE.taps || 0 }; },
