@@ -164,7 +164,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=19"></script>
 <script src="castle-events.js?v=40"></script>
-<script src="chess-core.js?v=1"></script>
+<script src="chess-core.js?v=2"></script>
 <script src="castle-sky.js?v=1"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/carving.js?v=1"></script>
@@ -4402,7 +4402,7 @@ var GIANT = !BOARD ? null : (function () {
 
 /* req 922 (Events' giant-chess.json, 12a2fc44; Magic's 911; game-notes' *the giant chessboard*; the hundred-fourteenth):
    the giant board played. The boys play black against the castle's white, white first (PS 16 L5920); the moves are
-   window.lumosChess's (page/chess-core.js, a stand-in till Godric's Rookery core; Fawkes 15:10's word), white's level
+   window.lumosChess's (page/chess-core.js, Godric's Rookery core since the hundred-seventeenth, white thinking in a worker), white's level
    ?giantlevel=1..4 (2 till Godric sets it per boy). A tap on a black piece is the tap `black piece` while no game is
    on; a second black piece tapped within 3 s of the first is the built-in `together` (Fawkes 15:10; Events may take it
    as its own). Then a tap on a black piece turns it toward him, a tap on a square it can reach and it strides there;
@@ -4695,12 +4695,16 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     walkEye(o.boys[0].sq);
     white(true, resume);
   }
-  function white(opening, instant) {   /* the castle's move; the first a pawn two squares forward, as the canon's (L5922) */
+  function white(opening, instant, chosen) {   /* the castle's move; the first a pawn two squares forward, as the canon's (L5922) */
     var m;
     if (opening) {
       var two = ['e2', 'd2', 'c2', 'f2'].filter(function (s) { return o.game.moves(s).length; });
       var from = two[Math.floor(Math.random() * two.length)]; m = o.game.move(from, from[0] + '4');
-    } else { var b = o.game.best(o.level); m = b && o.game.move(b.from, b.to); }
+    } else if (!chosen && o.game.bestAsync) {   /* the Rookery core thinks in a worker; the board waits, taps held */
+      var g0 = o.game; o.thinking = true;
+      g0.bestAsync(o.level).then(function (b) { o.thinking = false; if (o.on && o.game === g0 && b) white(false, instant, b); });
+      return;
+    } else { var b = chosen || o.game.best(o.level); m = b && o.game.move(b.from, b.to); }
     if (!m) return;
     o.log.push(m.from + m.to); keepIt();
     var p = o.at[m.from]; o.at[m.from] = null;
@@ -4840,7 +4844,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
 
   /* his tap: true when the board took it */
   function tapBoard(ray, nearest) {
-    if (o.on && (o.cur || o.q.length || tween)) return true;
+    if (o.on && (o.cur || o.q.length || tween || o.thinking)) return true;
     var hits = ray.intersectObjects([GIANT.group, BOARD], true);
     if (!hits.length || (nearest != null && hits[0].distance > nearest + 0.05)) return false;
     var obj = hits[0].object, piece = null;
@@ -4889,7 +4893,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   }
   var api = {
     state: function () { return { on: o.on, turn: o.game ? o.game.turn() : null, status: o.game ? o.game.status() : null, sel: o.sel,
-      boys: o.boys.map(function (b) { return b.sq + (b.off ? ' (at the wall)' : ''); }), busy: !!(o.cur || o.q.length),
+      boys: o.boys.map(function (b) { return b.sq + (b.off ? ' (at the wall)' : ''); }), busy: !!(o.cur || o.q.length || o.thinking),
       pieces: o.game ? o.game.pieces().length : 32 }; },
     start: function (together) { o.together = !!together; o.first = GIANT.pieces[0]; raise(); },
     play: function (from, to) { if (o.on && o.game.turn() === 'black') tryMove(from, to); return api.state(); },
