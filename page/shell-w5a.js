@@ -1081,3 +1081,83 @@ window.SHELL_W5A = {
   });
   T['hall-chamber'] = { items: it };
 })(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+
+/* docs/interiors/hidden-ways-batch-4.md, *H24* (req 805 (2), the table on Godric's pick and its wave 5 detail pass): the
+   shell grotto about (0, 0), r 4.0, 24 sides (their middles at 4.0, the corners at 4.03), the top flat at 4.2. The
+   scallop basin on the model's rect with a shell fan on the wall behind it, under the cleft (bearing 190, from 1.0) and
+   beside the spout (199, 1.6); the bench 220 to 300, its front at r 3.6; the niche at 320, foot 1.0, drawn standing
+   out of the wall as a shell-lined frame 0.3 deep (no shell piece cuts a niche here), the stone pike on its sill;
+   mussel fans on the wall over 1.3, a band of snail shells and the quartz at the springing (2.3, 2.4), a ring of
+   shells about the crown; the pebble waves set in the floor. The arch's mouth (130 to 150) and the middle bare. A shell
+   bears 1 to 4 cm into the face it is set in; nothing glows. */
+(function (T, MT) {
+  MT.nacre = 0xc9c3b6; MT.mussel = 0x3a3e48; MT.quartz = 0xe6e2da; MT.pebble = 0x6e6a62; MT.water = 0x2c3638;
+  var it = [], R = 4.0;
+  function bu(b, r, u) { return b + u / r * 180 / Math.PI; }   /* the bearing u metres along the circle at r from b */
+  function shell(b, r, u, z, w, h, m) { it.push(['p', bu(b, r, u), r, w, 0.075, z - h / 2, z + h / 2, m]); }   /* r 3.985 to 4.06 on the wall */
+  /* the basin: the rim 0.08 wide and 0.1 high on the model's rect, the water standing 0.06 in it, mussels set in its
+     face to the room; the scallop's fan on the wall behind, nine ribs rising from its back to 0.6 (under the cleft) */
+  var X0 = -1.2, Y0 = -3.8, X1 = 0.0, Y1 = -2.8, W = 0.08;
+  it.push(['b', X0, Y1 - W, 0, X1, Y1, 0.1, 'stone'], ['b', X0, Y0, 0, X0 + W, Y1 - W, 0.1, 'stone'],
+          ['b', X1 - W, Y0, 0, X1, Y1 - W, 0.1, 'stone'], ['b', X0 + W, Y0 - 0.15, 0, X1 - W, Y0 + W, 0.1, 'stone'],
+          ['b', X0 + W, Y0 + W, -0.01, X1 - W, Y1 - W, 0.06, 'water']);
+  for (var x = X0 + 0.1; x < X1 - 0.05; x += 0.11) it.push(['b', x, Y1 + 0.013, 0.025, x + 0.05, Y1 - 0.01, 0.075, 'mussel']);
+  var BB = 188.6;   /* the basin's middle (-0.6) on the wall: the scallop a half round r 0.55 standing on the rim's back */
+  for (var i = 0; i < 6; i++) {
+    var hw = 0.55 * Math.sqrt(1 - Math.pow((i + 0.5) / 6, 2));
+    it.push(['p', BB, 4.02, 2 * hw, 0.075, 0.1 + i * 0.09, 0.19 + i * 0.09, 'nacre']);
+  }
+  for (var k = -3; k <= 3; k++) {
+    var ur = k * 0.14, rt = 0.1 + 0.5 * Math.sqrt(1 - Math.pow(ur / 0.55, 2));
+    it.push(['p', bu(BB, 4.0, ur), 4.0, 0.025, 0.08, 0.1, rt, 'mussel']);
+  }
+  /* the spout: a shell lip out of the rock over the basin's west end, a fan of three shells over it */
+  it.push(['p', 199, 3.93, 0.1, 0.22, 1.56, 1.63, 'nacre']);
+  [-0.07, 0, 0.07].forEach(function (u, k) { shell(199, 4.02, u, 1.72 + (k === 1 ? 0.04 : 0), 0.06, 0.07, 'mussel'); });
+  /* the bench: seat 0.4 deep (r 3.6, into the wall to 4.06), 0.45 high, its back 0.12 thick to 0.95, the seat's top
+     plain stone (smooth where people sat), shells set in its front and in the back's face */
+  it.push(['a', 220, 300, 3.6, 4.06, 0, 0.45, 'stone'], ['a', 220, 300, 3.94, 4.06, 0.45, 0.95, 'stone']);
+  for (var b2 = 222; b2 <= 298; b2 += 3) {
+    it.push(['p', b2, 3.6, 0.05, 0.03, 0.18, 0.27, (b2 / 3) % 2 ? 'nacre' : 'mussel']);
+    it.push(['p', b2 + 1.5, 3.94, 0.06, 0.03, 0.62, 0.72, (b2 / 3) % 2 ? 'mussel' : 'nacre']);
+  }
+  /* the niche at 320: sill (foot 1.0), jambs and head 0.1 thick about an opening 0.6 by 0.8, 0.3 out of the wall, its
+     back lined in nacre; the stone pike on the sill, 0.5 long, its belly on the stone, its scales picked out in mussel */
+  it.push(['p', 320, 3.86, 0.8, 0.4, 0.9, 1.0, 'stone'], ['p', 320, 3.86, 0.8, 0.4, 1.8, 1.9, 'stone'],
+          ['p', bu(320, 3.86, -0.35), 3.86, 0.1, 0.4, 1.0, 1.8, 'stone'], ['p', bu(320, 3.86, 0.35), 3.86, 0.1, 0.4, 1.0, 1.8, 'stone'],
+          ['p', 320, 4.02, 0.6, 0.1, 1.0, 1.8, 'nacre']);
+  for (var s = 0; s < 10; s++) {
+    var u = -0.25 + s * 0.05, h = 0.035 + 0.11 * Math.sin((s + 0.5) / 10 * Math.PI);
+    it.push(['p', bu(320, 3.85, u), 3.85, 0.052, 0.07, 1.0, 1.0 + h, 'stone']);
+    if (s > 1 && s < 9) it.push(['p', bu(320, 3.81, u), 3.81, 0.045, 0.012, 1.0 + h * 0.3, 1.0 + h * 0.8, 'mussel']);
+  }
+  it.push(['p', bu(320, 3.85, -0.29), 3.85, 0.03, 0.02, 1.0, 1.14, 'stone']);   /* the tail fin */
+  /* the mussel fans on the wall: three rows about a foot at 1.35, opening upward, nacre and mussel by row */
+  [0, 20, 40, 60, 80, 100, 120, 160, 172, 215, 232, 250, 268, 286, 302, 340].forEach(function (bf) {
+    [[0.12, 3], [0.22, 5], [0.32, 7]].forEach(function (row, k) {
+      for (var j = 0; j < row[1]; j++) {
+        var th = (-75 + 150 * j / (row[1] - 1)) * Math.PI / 180;
+        shell(bf, 4.02, row[0] * Math.sin(th), 1.35 + row[0] * Math.cos(th), 0.06, 0.045, k % 2 ? 'mussel' : 'nacre');
+      }
+    });
+    shell(bf, 4.02, 0, 1.35, 0.05, 0.05, 'quartz');
+  });
+  /* the springing: a band of small snail shells at 2.3 and the quartz at 2.4, all round but over the cleft */
+  for (var b3 = 0; b3 < 360; b3 += 4) if (b3 < 187 || b3 > 193) shell(b3, 4.02, 0, 2.3, 0.04, 0.04, 'pebble');
+  for (var b4 = 2.5; b4 < 360; b4 += 5) if (b4 < 187 || b4 > 193) shell(b4, 4.02, 0, 2.4, 0.08, 0.03, 'quartz');
+  /* the ring of shells about the crown, set in the top (4.2) */
+  for (var c = 0; c < 12; c++) {
+    var a = c * 30 * Math.PI / 180;
+    it.push(['b', 0.5 * Math.sin(a) - 0.04, 0.5 * Math.cos(a) - 0.04, 4.185, 0.5 * Math.sin(a) + 0.04, 0.5 * Math.cos(a) + 0.04, 4.215, c % 2 ? 'mussel' : 'nacre']);
+  }
+  it.push(['b', -0.06, -0.06, 4.185, 0.06, 0.06, 4.215, 'quartz']);
+  /* the pebble waves: five rings out from the middle, each a wave of 6 crests, set 5 mm proud, none under the basin */
+  [0.9, 1.5, 2.1, 2.7, 3.3].forEach(function (r0) {
+    for (var b5 = 2.5; b5 < 360; b5 += 5) {
+      var r = r0 + 0.08 * Math.sin(b5 * 6 * Math.PI / 180), a = b5 * Math.PI / 180, px = r * Math.sin(a), py = r * Math.cos(a);
+      if (px > X0 - 0.1 && px < X1 + 0.1 && py > Y0 - 0.1 && py < Y1 + 0.1) continue;
+      it.push(['p', b5, r, 2 * r * Math.tan(2.5 * Math.PI / 180) + 0.01, 0.06, -0.01, 0.005, 'pebble']);
+    }
+  });
+  T['shell-grotto'] = { c: [0, 0], items: it };
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);
