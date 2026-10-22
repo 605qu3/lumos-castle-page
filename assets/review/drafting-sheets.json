@@ -150,5 +150,37 @@
   "version": 146,
   "model_date": "21 October 2026, 22.17",
   "drawn": "21 October 2026, 22.54"
+ },
+ "D-301": {
+  "name": "drafting-d301",
+  "title": "The north face, the front, seen from the lawn",
+  "group": "Elevations, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.57"
+ },
+ "D-302": {
+  "name": "drafting-d302",
+  "title": "The south face, over the lake, seen from the water",
+  "group": "Elevations, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.57"
+ },
+ "D-303": {
+  "name": "drafting-d303",
+  "title": "The east face, seen from the east",
+  "group": "Elevations, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.57"
+ },
+ "D-304": {
+  "name": "drafting-d304",
+  "title": "The west face, seen from the west",
+  "group": "Elevations, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.57"
  }
 }
