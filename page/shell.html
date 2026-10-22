@@ -414,9 +414,11 @@ var HALL_LIGHT = (function () {
       var brass = kit.solid(0x6a5432), glow = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
       var parts = [[new THREE.CylinderGeometry(0.008, 0.008, 0.35, 4), brass, 2.325], [new THREE.CylinderGeometry(0.1, 0.07, 0.08, 10), brass, 2.11],
                    [new THREE.CylinderGeometry(0.07, 0.07, 0.18, 10), glow, 1.98], [new THREE.CylinderGeometry(0.09, 0.09, 0.03, 10), brass, 1.865]];
+      var lamp = { parts: [], top: P(108.0, 68.0, 2.5) };
       parts.forEach(function (q) { var m = new THREE.Mesh(q[0], q[1]); m.position.copy(P(108.0, 68.0, q[2])); m.name = 'filchs-office-lamp';
-        m.userData.owner = 'filchs-office'; m.raycast = function () {}; g.add(m); });
+        m.userData.owner = 'filchs-office'; m.userData.rest = m.position.clone(); m.raycast = function () {}; g.add(m); lamp.parts.push(m); });
       var fl = new THREE.PointLight(TORCH.hex, 0.9 * TORCH.gain, 7, 1.8); fl.position.copy(P(108.0, 68.0, 1.95)); scene.add(fl);
+      fl.userData.rest = fl.position.clone(); lamp.light = fl; lamp.low = fl.intensity; out.filchLamp = lamp;   /* req 916 turns it up and rattles it */
     }
   });
   return out;
@@ -1780,7 +1782,8 @@ var W1 = (function () {
   /* the schedule's frame to the castle's: [x0, y0, sx, sy, swap]; x = x0 + sx * (swap ? y' : x'), y = y0 + sy * (swap ? x' : y') */
   var F = { 'potions-dungeon': [16, 15.4, 1, 1, false], 'snape-office': [29, 11.6, -1, -1, false],
             'staff-room': [128, 50.6, 1, 1, true], 'staff-passage': [128, 50.6, 1, 1, true],
-            'kitchens': [0, 0, 1, 1, false], 'secret-s3': [0, 0, 1, 1, false], 'hall-chamber': [0, 0, 1, 1, false] }[PLACE];
+            'kitchens': [0, 0, 1, 1, false], 'secret-s3': [0, 0, 1, 1, false], 'hall-chamber': [0, 0, 1, 1, false],
+            'filchs-office': [104, 62, 1, 1, false] }[PLACE];
   if (!F) return out;
   out.on = true;
   var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'wave1-things'; shell.group.add(g);
@@ -2113,6 +2116,58 @@ var W1 = (function () {
     [0.3, 0.65, 1.0, 1.35, 1.7].forEach(function (z) { box(11.84, 63.52, z - 0.02, 13.36, 64.02, z, tray); box(11.9, 63.56, z, 13.3, 63.96, z + 0.06, linen); });
     /* W3: the dough crocks by the chimney's back, a cloth tied over each */
     [61.5, 62.1].forEach(function (y) { cyl(14.6, y, -0.01, 0.45, 0.175, crock3, 0.15); cyl(14.6, y, 0.45, 0.47, 0.165, linen); });
+  }
+  if (PLACE === 'filchs-office') {
+    /* req 916's ground, the office built rough (docs/interiors/filchs-office.md, The things, cited: x = 104 + x',
+       y = 62 + y', the schedule's origin the v73 wall, as the lamp, the box and Interaction's stands). The door wall
+       stands at y 61 since v127, so its run backs onto the wall as built, y' -1.0. The filing cabinets in runs, four
+       drawers each with a brass pull, a dark line between drawers and between cabinets; the desk, his chair facing the
+       door, the moth-eaten chair turned to the desk's end, the chains and manacles on the north wall from five hooks,
+       highly polished; the quill pot and the ink pot on the desk; Mrs Norris's cushion on the north cabinet, her dish
+       under the desk. The quill, the roll, the open drawer and the locked one are FOFFICE's, below */
+    var oak = mat('oak', 0x6b5236), pull = mat('brass', 0x8a7240), line = mat('soot', 0x141312);
+    var shine = mats.shine || (mats.shine = new THREE.MeshStandardMaterial({ color: kit.col(0xc9c4ba), roughness: 0.22, metalness: 0.9 }));
+    var DR = [0.03, 0.36, 0.69, 1.02, 1.35];   /* the four drawers' edges */
+    /* a run of n cabinets from a to b along the wall at w (x' if alongX, else y'), the room on side s; skip: drawers drawn apart */
+    function cabinets(alongX, w, s, a, b, n, skip) {
+      function q(u0, u1, v0, v1, za, zb, mt) { return alongX ? box(u0, w + s * v0, za, u1, w + s * v1, zb, mt) : box(w + s * v0, u0, za, w + s * v1, u1, zb, mt); }
+      q(a, b, -0.02, 0.7, -0.01, 1.35, oak);
+      DR.slice(0, 4).forEach(function (z) { q(a + 0.005, b - 0.005, 0.7, 0.703, z - 0.004, z + 0.004, line); });
+      for (var i = 1; i < n; i++) { var u = a + (b - a) * i / n; q(u - 0.004, u + 0.004, 0.7, 0.703, 0.03, 1.35, line); }
+      for (i = 0; i < n; i++) for (var k = 0; k < 4; k++) {
+        var c = a + (b - a) * (i + 0.5) / n, zc = (DR[k] + DR[k + 1]) / 2;
+        if (!(skip && skip(c, k))) q(c - 0.04, c + 0.04, 0.7, 0.716, zc - 0.008, zc + 0.008, pull);
+      }
+    }
+    cabinets(false, 0, 1, 1.3, 7.3, 12, function (c, k) { return Math.abs(c - 2.05) < 0.01 && k === 2; });   /* the west run; the drawer a finger open */
+    cabinets(true, 8, -1, 0.7, 2.7, 4); cabinets(true, 8, -1, 5.3, 7.3, 4);                                   /* the north wall's, either side of the chains */
+    cabinets(false, 8, -1, 0.7, 3.2, 5); cabinets(false, 8, -1, 5.3, 7.3, 4, function (c, k) { return Math.abs(c - 6.55) < 0.01 && k === 3; });   /* the east, the locked drawer drawn apart */
+    cabinets(true, -1.0, 1, 0.8, 1.8, 2); cabinets(true, -1.0, 1, 3.7, 7.2, 7);                               /* the door wall's, clear of the leaf */
+    /* the desk across the back half, facing the door, its one drawer at his side; his chair behind it */
+    desk(3.3, 5.6, 4.7, 6.4, 0.76, dark); box(3.6, 6.02, 0.6, 4.4, 6.37, 0.73, dark); box(3.95, 6.37, 0.64, 4.05, 6.385, 0.66, pull);
+    chair(4.0, 6.85, -90, 1, dark);
+    chair(5.15, 5.75, 195, 3, mat('moth', 0x6e6250));   /* the moth-eaten chair, a visitor's, nobody's */
+    /* the quill pot and the ink pot, right front */
+    cyl(4.4, 5.8, 0.75, 0.86, 0.04, mat('stoneware', 0x8c8478)); cyl(4.2, 5.75, 0.75, 0.81, 0.03, line);
+    /* the chains and manacles, x' 3.0 to 5.0 on hooks at 2.0, hanging to about 1.1: loops between the hooks, and from
+       three of them a length ending in a pair of manacles */
+    var hooks = [3.1, 3.55, 4.0, 4.45, 4.9];
+    hooks.forEach(function (x) { box(x - 0.015, 7.93, 1.99, x + 0.015, 8.02, 2.03, iron); });
+    function chain(pts) { var m = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, 0.007, 5, false), shine); return add(m); }
+    for (var hi = 0; hi < hooks.length - 1; hi++) {
+      var xa = hooks[hi], xb = hooks[hi + 1], sag = hi % 2 ? 0.32 : 0.22, cp = [];
+      for (var k = 0; k <= 8; k++) { var u = k / 8; cp.push(P(xa + (xb - xa) * u, 7.955, 1.99 - sag * 4 * u * (1 - u))); }
+      chain(cp);
+    }
+    [[3.1, 1.25], [4.0, 1.1], [4.9, 1.3]].forEach(function (h, hj) {
+      chain([P(h[0], 7.955, 1.99), P(h[0] + 0.01, 7.95, (1.99 + h[1]) / 2), P(h[0], 7.945, h[1] + 0.09)]);
+      [-0.05, 0.05].forEach(function (dx) {
+        var r = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.009, 6, 16), shine); r.position.copy(P(h[0] + dx, 7.94, h[1] + 0.045)); add(r);
+      });
+    });
+    /* Mrs Norris's cushion on the north cabinet nearest the desk, flattened; her dish under the desk's west end */
+    box(5.3, 7.35, 1.34, 5.8, 7.75, 1.4, mat('cushion', 0x6a4c44)); box(5.45, 7.48, 1.395, 5.65, 7.62, 1.402, mat('cushion-dent', 0x553c36));
+    cyl(3.5, 6.1, -0.005, 0.015, 0.075, mat('saucer', 0xcfc6b2), 0.06);
   }
   if (PLACE === 'hall-chamber') {
     /* hall-chamber-fireplace (GoF 17 L27044; the room's P3, a hooded fireplace in the materials schedule): on the west
@@ -3038,7 +3093,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), foShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -3068,6 +3123,94 @@ var FBOX = (function () {
   m.name = 'filch-box'; m.userData.owner = 'filchs-office'; m.userData.confiscations = true;
   shell.group.add(m); return m;
 })();
+/* req 916 (Events' strings for the caught branch, page/events/filch.json, tally filchcatch, word for word; req 879,
+   Godric's "Alternates between 1-3"): the office's moving things, where Interiors' schedule puts them (x = 104 + x',
+   y = 62 + y'). On the arrival string the lamp turned up and a long roll of parchment open on the desk, his quill
+   dipping into the ink pot; Filch and Mrs Norris stay the note's, no figure. On the crash string the lamp rattles on
+   its chain. The room rule's form: the roll left half written, the quill thrown across it. The drawer marked
+   Confiscated and Highly Dangerous (the east cabinet at y' 6.3 to 6.8, its top drawer) is the tap `dangerous drawer`,
+   a direct child of the shell's group: its first string shakes it hard, the later one snaps it once, small; it never
+   moves out of its cabinet. The drawer a finger's width open (the room rule) on the west run, a form's corner showing.
+   ?office=held|left for checks; lumosGreybox.office */
+var FO_FORM = 'Filch behind his desk, the lamp turned up over a long roll of parchment, his quill dipping into the ink pot',
+    FO_CRASH = 'a crash of armour somewhere far off, a cackle after it, the lamp rattling on its chain',
+    FO_LEFT = 'the form left half written on the desk, the quill thrown across it',
+    FO_DRAWER = 'the drawer marked Confiscated and Highly Dangerous rattling hard in its cabinet, something inside snapping at the lock, then the whole drawer going still; it stays shut and locked',
+    FO_DRAWER2 = 'one small snap from inside the drawer marked Confiscated and Highly Dangerous, which stays shut and locked',
+    FO_ROOM = ["a single oil lamp dangling from the low ceiling over the desk, turned low, the room's only light",
+      'a highly polished collection of chains and manacles on the wall behind the desk, catching the lamp',
+      "one drawer of the filing cabinets standing a finger's width open, too full to shut, a crumpled form's corner showing"];
+var FOFFICE = (function () {
+  if (PLACE !== 'filchs-office') return null;
+  var z0 = shell.place.floor, P = function (xp, yp, z) { return shell.toLocal(104 + xp, 62 + yp, z0 + z); };
+  var out = { state: '', lines: [], rattle: -1, shake: -1, amp: 0, dur: 0, lamp: HALL_LIGHT.filchLamp || null };
+  var g = new THREE.Group(); g.name = 'filch-office-things'; scene.add(g);
+  function own(m) { m.userData.owner = 'filchs-office'; m.raycast = function () {}; return m; }
+  function solid(hex, r, mt) { return new THREE.MeshStandardMaterial({ color: kit.col(hex), roughness: r || 0.85, metalness: mt || 0 }); }
+  function boxAt(a, b, mat) { return own(thingBox(g, P, a, b, mat)); }
+  function along(m, a, b) {   /* a piece made along +y, its foot at a, laid to point at b */
+    var A = P(a[0], a[1], a[2]), B = P(b[0], b[1], b[2]); m.position.copy(A);
+    m.quaternion.setFromUnitVectors(Y_AXIS, B.clone().sub(A).normalize()); return m;
+  }
+  /* the drawer a finger's width open: its front 2 cm proud of the west run, a crumpled form's corner at its top */
+  var oak = solid(0x6b5236), brass = solid(0x8a7240, 0.5, 0.4), paper = solid(0xd8cba6, 0.95);
+  boxAt([0.698, 1.81, 0.695], [0.72, 2.29, 1.015], oak); boxAt([0.716, 2.01, 0.847], [0.734, 2.09, 0.863], brass);
+  boxAt([0.703, 2.12, 1.012], [0.712, 2.21, 1.055], paper);
+  /* the roll: the open length across the desk, its rolled end at the right; the ink lines run across it, eight to half its length */
+  var roll = new THREE.Group(); roll.name = 'filch-roll'; g.add(roll);
+  roll.add(own(thingBox(roll, P, [3.4, 5.8, 0.758], [4.25, 6.2, 0.762], paper)));
+  var rc = own(new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.028, 0.4, 12), paper)); along(rc, [4.27, 6.2, 0.786], [4.27, 5.8, 0.786]);
+  rc.position.copy(P(4.27, 6.0, 0.786)); roll.add(rc);
+  var ink = solid(0x1c1a22, 0.6);
+  for (var i = 0; i < 8; i++) { var len = 0.22 + 0.1 * Math.abs(Math.sin(i * 2.3)); out.lines.push(own(thingBox(roll, P, [3.465 + 0.045 * i, 5.84, 0.762], [3.471 + 0.045 * i, 5.84 + len, 0.7635], ink))); }
+  /* the quill: his long black one, its shaft and its feather, made along +y from the nib */
+  var quill = new THREE.Group(), qm = solid(0x1a1a1a, 0.7);
+  var shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.0012, 0.32, 6), qm); shaft.position.y = 0.16;
+  var vane = new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.009, 0.18, 8), qm); vane.position.y = 0.22;
+  [shaft, vane].forEach(function (m) { quill.add(own(m)); }); quill.name = 'filch-quill'; own(quill); g.add(quill);
+  var POSE = { pot: [[4.4, 5.8, 0.78], [4.47, 5.93, 1.08]], ink: [[4.2, 5.75, 0.785], [4.1, 5.88, 1.07]], thrown: [[3.62, 6.12, 0.772], [3.95, 5.86, 0.772]] };
+  /* the drawer marked Confiscated and Highly Dangerous: its front 2 mm into the cabinet, its pull, its label, its lock */
+  var dr = thingBox(shell.group, P, [7.288, 6.31, 1.025], [7.302, 6.79, 1.345], oak); dr.name = 'filch-dangerous-drawer';
+  dr.userData.owner = 'filchs-office'; dr.userData.rest = dr.position.clone();
+  [[[7.272, 6.51, 1.177], [7.29, 6.59, 1.193], brass], [[7.282, 6.5, 1.24], [7.29, 6.6, 1.29], paper], [[7.284, 6.54, 1.205], [7.29, 6.56, 1.225], solid(0x2e2b28)]].forEach(function (p) {
+    var m = own(thingBox(g, P, p[0], p[1], p[2])); m.name = 'filch-dangerous-drawer-face'; m.userData.rest = m.position.clone(); (out.face = out.face || []).push(m);
+  });
+  out.drawer = dr; out.alongWall = P(7.3, 1, 1).sub(P(7.3, 0, 1)).normalize();
+  out.set = function (s) {
+    out.state = s;
+    roll.visible = s === 'held' || s === 'left';
+    out.lines.forEach(function (m, k) { m.visible = k < (s === 'left' ? 8 : 3); });
+    var p = POSE[s === 'held' ? 'ink' : s === 'left' ? 'thrown' : 'pot']; along(quill, p[0], p[1]);
+    if (out.lamp) out.lamp.light.intensity = out.lamp.low * (s ? 1.8 : 1);
+  };
+  out.set(Q.get('office') === 'held' || Q.get('office') === 'left' ? Q.get('office') : '');
+  return out;
+})();
+function foShake(hard) { if (!FOFFICE) return; FOFFICE.shake = 0; FOFFICE.dur = hard ? 1.6 : 0.25; FOFFICE.amp = hard ? 0.005 : 0.003; }
+thingCues[FO_FORM] = function () { if (FOFFICE) FOFFICE.set('held'); showLines([{ medium: 'seen', sound: FO_FORM }]); };
+thingCues[FO_CRASH] = function () { if (FOFFICE) FOFFICE.rattle = 0; showLines([{ medium: 'seen', sound: FO_CRASH }]); };
+thingCues[FO_DRAWER] = function () { foShake(true); showLines([{ medium: 'seen', sound: FO_DRAWER }]); };
+thingCues[FO_DRAWER2] = function () { foShake(false); showLines([{ medium: 'seen', sound: FO_DRAWER2 }]); };
+function foShown(shown) {
+  if (!FOFFICE) return [];
+  if (shown.indexOf(FO_LEFT) >= 0 && FOFFICE.state !== 'left') FOFFICE.set('left');
+  return FO_ROOM.concat([FO_LEFT]).filter(function (s) { return shown.indexOf(s) >= 0; });
+}
+function updateFilchOffice(dt) {
+  if (!FOFFICE) return;
+  var L = FOFFICE.lamp;
+  if (FOFFICE.rattle >= 0 && L) {   /* the lamp swinging and rattling on its chain, about its top, for 2.5 s */
+    var t = (FOFFICE.rattle += dt), th = t < 2.5 ? 0.14 * Math.exp(-t / 0.9) * Math.sin(t * 13) + 0.01 * Math.sin(t * 61) * Math.exp(-t) : 0;
+    L.parts.concat([L.light]).forEach(function (m) { var r = m.userData.rest, d = th * (L.top.y - r.y); m.position.set(r.x + d * 0.894, r.y, r.z + d * 0.447); });
+    if (t >= 2.5) FOFFICE.rattle = -1;
+  }
+  if (FOFFICE.shake >= 0) {   /* the drawer shaking in its cabinet, along the wall and up and down, never out */
+    var s = (FOFFICE.shake += dt), a = s < FOFFICE.dur ? FOFFICE.amp * (1 - s / FOFFICE.dur) : 0, w = FOFFICE.alongWall;
+    var du = a * Math.sin(s * 240), dz = a * 0.6 * Math.sin(s * 173 + 1);
+    [FOFFICE.drawer].concat(FOFFICE.face).forEach(function (m) { var r = m.userData.rest; m.position.set(r.x + w.x * du, r.y + dz, r.z + w.z * du); });
+    if (s >= FOFFICE.dur) FOFFICE.shake = -1;
+  }
+}
 /* req 802 (Events' cues for Magic's 794, seventh-floor.json, 426c8b6b): Sir Cadogan's painting where Interiors hangs it
    (docs/interiors/seventh-floor-corridor.md, *Sir Cadogan's painting*, cited: the north landing on 7, its east wall at
    x 92, y 46.9 to 49.3, foot 0.9, about 2.4 by 1.6, the heavy worn gilt frame; Godric's 1 on interiors-cadogan-1020).
@@ -3203,6 +3346,9 @@ function tap(cx, cy) {
     kit.tapped(true); return;
   }
   if (events && hit && hit.userData.bottle) { events.tap(hit.userData.bottle); kit.tapped(true); return; }   /* req 920, the seven bottles */
+  if (hit && FOFFICE && hit === FOFFICE.drawer) {   /* req 916, the drawer marked Confiscated and Highly Dangerous */
+    FOFFICE.taps = (FOFFICE.taps || 0) + 1; if (events) events.tap('dangerous drawer'); else foShake(FOFFICE.taps === 1); kit.tapped(true); return;
+  }
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   if (d && (here === d.stand || here === placeOf(d).s)) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
@@ -3300,7 +3446,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt);
+  updateFilch(dt); updateFilchOffice(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -3319,7 +3465,8 @@ renderer.setAnimationLoop(frame);
    the books by the time of day (?time=night and so on), shown a moment by the door; a tap on the words puts them away */
 var lineDoor = null, linesEl = document.getElementById('lines'), lineQ = [], lineCur = null, lineV = new THREE.Vector3();
 function showLines(list) {   /* Myrtle's heard lines in her corridor placed at her door (req 726) */
-  for (var i = 0; i < list.length; i++) { var l = list[i]; if (MYRTLE && MYRTLE.door && !MYRTLE.room && /^myrtle\./.test(l.key || '')) l.door = MYRTLE.door; if (l.key === 'staff.gargoyle') staffJaw(); lineQ.push(l); }
+  for (var i = 0; i < list.length; i++) { var l = list[i]; if (MYRTLE && MYRTLE.door && !MYRTLE.room && /^myrtle\./.test(l.key || '')) l.door = MYRTLE.door; if (l.key === 'staff.gargoyle') staffJaw(); lineQ.push(l);
+    if (l.then) lineQ.push({ medium: 'seen', sound: l.then }); }   /* a line's `then` (req 916: Filch running out) seen after it */
 }
 function lineSeconds(l) { var n = (l.text || '').length + (l.sound || '').length * 0.6; return clamp(2.2 + 0.075 * n, 4, 14); }
 function lineElement(l) {
@@ -3493,6 +3640,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   stand: function () { return here.name; }, level: function () { return here.level; }, eye: function () { return camera.position.clone(); },
   cadogan: function () { return CADOGAN ? { taps: CADOGAN.taps, bare: CADOGAN.patch.visible } : null; },
   filch: function () { return { found: !!FDOOR, open: filchOpen, box: FBOX ? FBOX.getWorldPosition(new THREE.Vector3()) : null, boxTaps: FBOX ? FBOX.userData.taps || 0 : 0 }; },
+  office: function (cue) { if (!FOFFICE) return null; if (cue) cueTable[cue](); var L = FOFFICE.lamp;   /* req 916 */
+    return { state: FOFFICE.state, roll: FOFFICE.lines.filter(function (m) { return m.visible; }).length, lamp: L ? +(L.light.intensity / L.low).toFixed(2) : null,
+      rattling: FOFFICE.rattle >= 0, shaking: FOFFICE.shake >= 0, drawer: FOFFICE.drawer.getWorldPosition(new THREE.Vector3()), taps: FOFFICE.taps || 0 }; },
   head: function () { var lm = limits(here); return { yaw: hy, pitch: hp, limit: lm.yaw, lo: lm.lo, hi: lm.hi, lim: here.lim }; },
   /* a stand by name at once, and the head set and held within its limits (the shots at both limits) */
   standNamed: function (n) {
