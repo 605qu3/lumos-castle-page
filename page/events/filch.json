@@ -862,6 +862,115 @@
       "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; endings 1 and 2: Peeves's crash calls him away, the boy is left with the box"
     },
     {
+      "id": "filch.kwikspell-desk",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = filchs office",
+        "office_catch = held",
+        "year >= 2",
+        "kwik_away != yes"
+      ],
+      "show": [
+        "a long envelope marked Kwikspell lying on the desk beside the form"
+      ],
+      "starts": [],
+      "canon": "req 933's sister touch (Godric's of 5.22 pm 22 October 2026, through the orchestrator); CoS 8 L9087 to L9099 (the Kwikspell envelope on his desk; he snatches it up and throws it into a drawer, L9095), read in the canon tool, 22 October 2026; only in the Chamber's castle on, the year the book has it, and only while a boy is kept for his form"
+    },
+    {
+      "id": "filch.kwikspell-snatch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap kwikspell",
+      "when": [
+        "place = filchs office",
+        "office_catch = held",
+        "year >= 2",
+        "kwik_away != yes"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "desk"
+        }
+      ],
+      "show": [
+        "Filch snatching the Kwikspell envelope off the desk and throwing it into a drawer"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.kwik-snatch",
+          "sound": "Filch at the desk, snatching something up",
+          "text": [
+            "Hands off that. That's mine.",
+            "That is none of your business."
+          ],
+          "canon": "ours, in his voice; CoS 8 L9095 (Filch hobbled across to his desk, snatched up the envelope, and threw it into a drawer), read in the canon tool, 22 October 2026"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.kwik-sputter",
+          "sound": "Filch, sputtering",
+          "text": [
+            "Have you — did you read —?",
+            "Did you look at that? Did you?"
+          ],
+          "canon": "the first CoS 8 L9097 (\"Have you — did you read —?\" he sputtered), the second ours; he is told nothing and nobody mocks him"
+        }
+      ],
+      "starts": [
+        "set kwik_away = yes"
+      ],
+      "canon": "req 933's sister touch (Godric's of 5.22 pm 22 October 2026, through the orchestrator); CoS 8 L9087 to L9099 (the Kwikspell envelope on his desk; he snatches it up and throws it into a drawer, L9095), read in the canon tool, 22 October 2026; only in the Chamber's castle on, the year the book has it, and only while a boy is kept for his form"
+    },
+    {
+      "id": "filch.kwikspell-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap kwikspell",
+      "when": [
+        "place = filchs office",
+        "office_catch = held",
+        "year >= 2",
+        "kwik_away = yes"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "desk"
+        }
+      ],
+      "show": [
+        "Filch's hand flat on the drawer he threw it into"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.kwik-again",
+          "sound": "Filch, over the drawer",
+          "text": [
+            "It's put away. Leave it.",
+            "Nothing in that drawer for you."
+          ],
+          "canon": "ours, in his voice; CoS 8 L9095 (the drawer)"
+        }
+      ],
+      "starts": [],
+      "canon": "req 933's sister touch (Godric's of 5.22 pm 22 October 2026, through the orchestrator); CoS 8 L9087 to L9099 (the Kwikspell envelope on his desk; he snatches it up and throws it into a drawer, L9095), read in the canon tool, 22 October 2026; only in the Chamber's castle on, the year the book has it, and only while a boy is kept for his form"
+    },
+    {
       "id": "filch.catch-drawer",
       "tier": "fixed",
       "source": "device",
@@ -916,7 +1025,8 @@
         "set filch_door = shut",
         "set office_catch = none",
         "set drawer_gag = no",
-        "set drawer_tried = no"
+        "set drawer_tried = no",
+        "set kwik_away = no"
       ],
       "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: the visit's draws cleared at leave"
     },
@@ -1050,6 +1160,234 @@
         "set chase_by = norris"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a toe out of line in front of her: a knock on the armour while she is in view, always"
+    },
+    {
+      "id": "filch.chase-hidden-nick",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 2,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "year != 2"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        },
+        {
+          "as": "nick",
+          "role": "voice",
+          "name": "nearly headless nick",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Nearly Headless Nick gliding out of the wall at the top of the stairs, one hand sweeping toward the far flight, and Filch's lamp going off down it"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "heard",
+          "key": "filch.chase-nick-points",
+          "sound": "Nearly Headless Nick, gliding out of the wall at the top of the stairs",
+          "text": [
+            "Mr Filch! Forgive me, but if it is a pupil you are after, I rather think I saw one go down the far flight, in a great hurry.",
+            "Why, Mr Filch. Looking for someone? I believe whoever it was went down the far stair."
+          ],
+          "canon": "ours, in his voice (B1 ch8 L2724: Nearly Headless Nick was always happy to point new Gryffindors in the right direction, here pointing Filch the wrong way for them, kindly and with perfect courtesy), read in the canon tool, 22 October 2026; comic, nobody hurt, Filch shamed by nothing; not in the Chamber's year, when he is petrified"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-nick-filch",
+          "sound": "Filch at the top of the stairs, turning his lamp",
+          "text": [
+            "The far flight. Hm. Come along, my sweet.",
+            "Down the far flight, was it. Come, my sweet."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091, checked against the text, 15 October 2026); he takes a ghost's word and goes"
+        },
+        {
+          "speaker": "nick",
+          "medium": "heard",
+          "key": "filch.chase-nick-soft",
+          "sound": "Nick, very low, once the lamp has gone",
+          "text": [
+            "Off you go, then. Mind the stairs.",
+            "All quite safe now. I shall keep a look out."
+          ],
+          "canon": "ours, in his voice (B1 ch8 L2724); he knows where the boy is and says nothing to Filch"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 933 (c), the friends (Godric's pick on corridor-chase-ideas-1022, all four): Nick points Filch down the wrong flight, a third partner of the hidden pass beside the Fat Lady's and Peeves's; B1 ch8 L2724; not in the Chamber's year"
+    },
+    {
+      "id": "filch.chase-hidden-neville",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "neville_out = yes"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        },
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "frame-foot"
+        }
+      ],
+      "show": [
+        "Neville at the foot of the frame, squeaking and shrinking against the wall as Filch's lamp swings over him, and the lamp going back down the stairs"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "filch.chase-neville-squeak",
+          "sound": "Neville, shut out, as the lamp comes round the corner",
+          "text": [
+            "Eep!",
+            "Oh! Oh no, I haven't done anything, I'm only locked out!"
+          ],
+          "canon": "B1 ch9 L3243 (Neville suddenly let out a frightened squeak), the first for the squeak alone and the second ours; he is the locked-out Neville of neville.json, sitting at the frame's foot, and he runs nowhere"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-neville-filch",
+          "sound": "Filch, holding his lamp over him",
+          "text": [
+            "Longbottom. Locked out again, are you? Well, you are no use to me.",
+            "Longbottom! Hm. Nothing but a boy sitting in the draught. Come along, my sweet."
+          ],
+          "canon": "ours, in his voice (he names pupils by their surnames, CoS 8 L9037, \"Name...Harry Potter\"); the chase ends on a boy he does not mind, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 933 (c), the friends: Neville's squeak (B1 ch9 L3243) draws the lamp to the locked-out Neville, not to the hidden boy; only while neville_out = yes; the running is not drawn (a cell would be People's, a spend put to Godric)"
+    },
+    {
+      "id": "filch.chase-hidden-cupboard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 4,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "at = cupboard"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch's lamp stopping at the broom cupboard, its door rattling on its latch and staying shut, and the lamp turning away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-cupboard-open",
+          "sound": "Filch at the broom cupboard, rattling the handle",
+          "text": [
+            "Open up, you. Open!",
+            "Come on, open. Open up, blast you."
+          ],
+          "canon": "ours, in his voice; B1 ch8 L2722 (doors that wouldn't open unless you asked politely), read in the canon tool, 22 October 2026"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-cupboard-please",
+          "sound": "Filch giving it up",
+          "text": [
+            "I'll not say please to a cupboard. Come along, my sweet.",
+            "Not saying please to a cupboard. Not in this life."
+          ],
+          "canon": "ours, in his voice; B1 ch9 L3295 and L3297 (he will not say please to Peeves, and does at last), carried to the cupboard, which stays shut"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 933 (d), the polite cupboard (B1 ch8 L2722): the boy in the broom cupboard, Filch cannot open its door and will not ask politely; a partner of the hidden pass at the cupboard's stop"
+    },
+    {
+      "id": "filch.chase-armour-wobble",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "armour-wobble",
+      "weight": 1,
+      "moment": "wait 120-360 s",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "time = night",
+        "chase != on",
+        "nights since chase_night >= 1"
+      ],
+      "show": [
+        "the suit of armour rocking on its stand with a long clank and settling again, never falling"
+      ],
+      "starts": [
+        "set chase = on",
+        "stamp chase_night by night",
+        "set chase_by = armour"
+      ],
+      "canon": "req 933 (d), the armour's wobble as a start (B1 ch9 L3243: the clanging and crashing as the armour toppled; here it only rocks and settles, and never falls on anyone); a boy waiting by the armour at night, now and then"
+    },
+    {
+      "id": "filch.chase-armour-wobble-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "armour-wobble",
+      "weight": 3,
+      "moment": "wait 120-360 s",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "time = night",
+        "chase != on",
+        "nights since chase_night >= 1"
+      ],
+      "starts": [],
+      "canon": "req 933 (d), the silent partner of the armour's wobble"
     },
     {
       "id": "filch.chase-wheeze",

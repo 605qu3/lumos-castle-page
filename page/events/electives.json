@@ -34,7 +34,8 @@
         "occasion != start of term"
       ],
       "show": [
-        "the board's last sum half rubbed out, chalk dust on its ledge"
+        "the board's last sum half rubbed out, chalk dust on its ledge",
+        "a copy of Numerology and Grammatica left open on a desk, a name inked inside its cover"
       ],
       "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term, the summer hold's last week of term included, never in the holidays nor on the term's first day (ours); no sum anyone's; Interiors' words, 19 October 2026"
     },
@@ -170,5 +171,39 @@
       "canon": "Interiors' req 515, its one trace (creatures-paddock.md, A trace; a trace, the orchestrator, 15 October 2026, 7.42 pm): the near fence's seven middle posts, x' 12.5 to 27.5, Interiors' req 653 (ecd9b648); PoA 6 L15508 and L15510, the creatures led in on chains and \"tethered the creatures to the fence\", the first Care of Magical Creatures lesson after lunch on the first day of lessons (L15462, \"their first ever Care of Magical Creatures class\"; the same day as Divination's first, so 2 September, as the pink cup's), in the Azkaban castle and every later one; worn smooth and dull, never bright (the Ministry's no-glint ruling of 16 October); no creature, no feather, nothing anyone's; which posts, Interiors' far posts by the gap or the fence where the class stood (L15510), asked of Interiors in req 653, so the line names neither; checked against the text, 19 October 2026"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "electives.arithmancy-flyleaf",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap numerology",
+      "when": [
+        "place = arithmancy classroom",
+        "year >= 3",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "the copy of Numerology and Grammatica lying open at its flyleaf, a name inked in a neat hand"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hermione",
+          "at": "numerology",
+          "key": "electives.flyleaf",
+          "canon": "ours: the flyleaf's name is ours; B3 ch16 L19644 (Hermione: Has either of you seen my copy of Numerology and Grammatica?) and L19646 (Ron has it), read in the canon tool, 22 October 2026; Godric's touch of 5.22 pm 22 October 2026, through the orchestrator",
+          "text": [
+            "H. Granger"
+          ]
+        }
+      ],
+      "starts": [],
+      "canon": "Godric's touch of 5.22 pm 22 October 2026 (through the orchestrator): a copy left on a desk in the Arithmancy room, tapped, its flyleaf reads H. Granger; B3 ch16 L19644; the room's bare state only (lessons off, term days), the Azkaban castle on as the room"
+    }
+  ]
 }
