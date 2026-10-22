@@ -1,6 +1,6 @@
 {
   "chain": "astronomy-rooms",
-  "about": "The Astronomy drum's six rooms off the spiral, floors 2 to 7 (Interiors' req 919, Godric's 1 on interiors-astronomy-rooms-1022): their doors locked but on class nights, the cloak room's pegs and the lantern room's stand thinned while the class is up and filled again after. The class's nights are the top's (astronomy-tower.json). The other four rooms (telescope store, instrument room, chart room, night books) change by nothing the clock makes, so they say nothing here; the chart room's sky and the night books' moving page are Magic's (req 918).",
+  "about": "The Astronomy drum's six rooms off the spiral, floors 2 to 7 (Interiors' req 919, Godric's 1 on interiors-astronomy-rooms-1022): their doors locked but on class nights, the cloak room's pegs and the lantern room's stand thinned while the class is up and filled again after. The class's nights are the top's (astronomy-tower.json). The telescope store and the instrument room change by nothing the clock makes, so they say nothing here. The chart room's ceiling sky and the night books' moving log are Magic's (req 918, Events' req 925), both always while the room is open.",
   "first_visit": [],
   "room": [
     {
@@ -158,7 +158,195 @@
       "show": [
         "the lantern stand's rail of hooks hung full, every lantern ready for the stair"
       ]
+    },
+    {
+      "when": [
+        "place = astronomy chart room",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter"
+      ],
+      "show": [
+        "the ceiling bewitched to look like the sky outside, the stars and the moon where they really stand tonight, the beams crossing it with the sky between them",
+        "the sky's dim light, the stars' and the moon's own, faint on the long table's charts"
+      ],
+      "canon": "Magic's req 925 (req 918; docs/magic/rooms.md, The Astronomy drum's chart room and night books, caaf74bb), every year, every line read in the canon tool; the room is open only on the top's class nights (above), so no by-day rule: it is locked by day, and were it ever opened by day it would show tonight's sky, which the page draws from CastleSky.at(date, home()), never a second sky (req 622); nothing glows, the sky's light is the stars' own; PS 7 L2365"
+    },
+    {
+      "when": [
+        "place = astronomy chart room",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "weather = cloudy"
+      ],
+      "show": [
+        "the stars coming and going in the castle's own cloud across the ceiling"
+      ],
+      "canon": "Magic's req 925, its cloud row: as the Great Hall's ceiling (CoS 6 L8303, PoA 5 L15041, PoA 9 L16591) and the top's clouded night (astronomy-tower.json); on a cloudy night only, as the top's rule stands"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page != planet",
+        "log_page != eclipse"
+      ],
+      "show": [
+        "the open log on the sloped desk, its drawn moon going through the phases the class logged, a slow round of about half a minute with a breath's pause at the full",
+        "once a round a small comet crossing the page's corner, its tail an inked stroke, and gone"
+      ],
+      "canon": "Magic's req 925, the log's moving page: wizard pictures move (PS 6 L2088, OotP 23 L46499), the class's own sky log (PS 8 L2732); no name on the page, the year on its spine, nothing more"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = planet"
+      ],
+      "show": [
+        "the open log's page turned to a planet's slow loop against the stars, drawn over weeks and creeping through its ink and wash, doubling back and going on"
+      ],
+      "canon": "Magic's req 925, another night's page (ours): three pages, round again; the log never closes and nothing is taken from it"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = eclipse"
+      ],
+      "show": [
+        "the open log's page turned to an eclipse of the moon, the drawn moon darkening and clearing in ink and wash"
+      ],
+      "canon": "Magic's req 925, another night's page (ours): the third of the three pages"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter"
+      ],
+      "show": [
+        "the open log's spine marked with its year, no name on the page"
+      ],
+      "canon": "Magic's req 925: the year on its spine, nothing more"
+    },
+    {
+      "when": [
+        "place = astronomy night books"
+      ],
+      "show": [
+        "the shelved logs in their rows, shut and still, each spine a year; only the open one moves"
+      ],
+      "canon": "Magic's req 925, the shelves' logs; Interiors' row (docs/interiors/astronomy-rooms.md, floor 3): a log pulled is Interaction's and stays shut"
     }
   ],
-  "records": []
+  "records": [
+    {
+      "id": "astronomy-rooms.log-planet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night-log",
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page != planet",
+        "log_page != eclipse"
+      ],
+      "show": [
+        "the log's page turning to a planet's slow loop against the stars, inked over weeks"
+      ],
+      "starts": [
+        "set log_page = planet"
+      ],
+      "canon": "Magic's req 925, his tap on the log (ours): the page turns to another night the class drew, three pages, round again; the log never closes"
+    },
+    {
+      "id": "astronomy-rooms.log-eclipse",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night-log",
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = planet"
+      ],
+      "show": [
+        "the log's page turning to an eclipse of the moon, the drawn moon darkening and clearing"
+      ],
+      "starts": [
+        "set log_page = eclipse"
+      ],
+      "canon": "Magic's req 925, his tap on the log (ours): the page turns to another night the class drew, three pages, round again; the log never closes"
+    },
+    {
+      "id": "astronomy-rooms.log-moons",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night-log",
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = eclipse"
+      ],
+      "show": [
+        "the log's page turning back to the class's month of moons"
+      ],
+      "starts": [
+        "set log_page = moons"
+      ],
+      "canon": "Magic's req 925, his tap on the log (ours): the page turns to another night the class drew, three pages, round again; the log never closes"
+    },
+    {
+      "id": "astronomy-rooms.log-planet-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "log_page = planet"
+      ],
+      "starts": [
+        "set log_page = moons"
+      ]
+    },
+    {
+      "id": "astronomy-rooms.log-eclipse-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "log_page = eclipse"
+      ],
+      "starts": [
+        "set log_page = moons"
+      ]
+    }
+  ]
 }
