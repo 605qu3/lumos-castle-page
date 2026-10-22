@@ -251,13 +251,16 @@
         "castle date < 3 06-07"
       ],
       "show": [
-        "the broom cupboard's door swings open on buckets and mops, one bucket upturned"
+        "the broom cupboard's door swings open on buckets and mops, one bucket upturned",
+        "a cupboard with no lamp: inside, only what the hall's torches throw through the open door, or his own light; a smell of wet mop and soap; the Entrance Hall's sounds muffled once he steps in",
+        "the door opening with a dry creak of its hinges, swinging in on its north jamb",
+        "two sweeping besoms worn short, standing still"
       ],
       "starts": [
         "set hall_cupboard = open",
         "log \"Opened the broom cupboard in the Entrance Hall {day}\""
       ],
-      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains from 7 June of the Azkaban year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read again 19 October 2026), never sparkling (GL-07). Godric's 1 on magic-hall-grains-1016 (16 October 2026, 1.12 pm; Magic's req 631): the grains lie in the crack in the Azkaban castle only (`year = 3`), from 7 June to that year's end, and in no other castle year; the cupboard and its upturned bucket stand every year. His own word against the world rules' \"earlier books' traces are always there\" (Time), logged as his exception in the charter's Rulings log (Kingsley's item 17, docs/ministry/reviews/2026-10-19-queue-13-to-19.md), so no lane later puts them back in later years"
+      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains from 7 June of the Azkaban year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read again 19 October 2026), never sparkling (GL-07). Godric's 1 on magic-hall-grains-1016 (16 October 2026, 1.12 pm; Magic's req 631): the grains lie in the crack in the Azkaban castle only (`year = 3`), from 7 June to that year's end, and in no other castle year; the cupboard and its upturned bucket stand every year. His own word against the world rules' \"earlier books' traces are always there\" (Time), logged as his exception in the charter's Rulings log (Kingsley's item 17, docs/ministry/reviews/2026-10-19-queue-13-to-19.md), so no lane later puts them back in later years; Magic's req 946 (docs/magic/rooms.md, *The hall cupboard*; Interiors' docs/interiors/hall-cupboard.md, cited), 22 October 2026: the dark and the smell, the door, the besoms, with the opening (every year)"
     },
     {
       "id": "hall.cupboard-opens-later",
@@ -271,12 +274,16 @@
         "year >= 4"
       ],
       "show": [
-        "the broom cupboard's door swings open on buckets and mops, one bucket upturned"
+        "the broom cupboard's door swings open on buckets and mops, one bucket upturned",
+        "a cupboard with no lamp: inside, only what the hall's torches throw through the open door, or his own light; a smell of wet mop and soap; the Entrance Hall's sounds muffled once he steps in",
+        "the door opening with a dry creak of its hinges, swinging in on its north jamb",
+        "two sweeping besoms worn short, standing still"
       ],
       "starts": [
         "set hall_cupboard = open",
         "log \"Opened the broom cupboard in the Entrance Hall {day}\""
-      ]
+      ],
+      "canon": "the opening; Magic's req 946 (docs/magic/rooms.md, *The hall cupboard*; Interiors' docs/interiors/hall-cupboard.md, cited), 22 October 2026: the dark and the smell, the door, the besoms, with the opening (every year)"
     },
     {
       "id": "hall.cupboard-opens-grains",
@@ -291,13 +298,16 @@
         "castle date >= 3 06-07"
       ],
       "show": [
-        "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of fine gold grains in a crack between two flagstones"
+        "the broom cupboard's door swings open on buckets and mops, one bucket upturned, and a thin line of fine gold grains in a crack between two flagstones",
+        "a cupboard with no lamp: inside, only what the hall's torches throw through the open door, or his own light; a smell of wet mop and soap; the Entrance Hall's sounds muffled once he steps in",
+        "the door opening with a dry creak of its hinges, swinging in on its north jamb",
+        "two sweeping besoms worn short, standing still"
       ],
       "starts": [
         "set hall_cupboard = open",
         "log \"Opened the broom cupboard in the Entrance Hall {day}\""
       ],
-      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains from 7 June of the Azkaban year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read again 19 October 2026), never sparkling (GL-07). Godric's 1 on magic-hall-grains-1016 (16 October 2026, 1.12 pm; Magic's req 631): the grains lie in the crack in the Azkaban castle only (`year = 3`), from 7 June to that year's end, and in no other castle year; the cupboard and its upturned bucket stand every year. His own word against the world rules' \"earlier books' traces are always there\" (Time), logged as his exception in the charter's Rulings log (Kingsley's item 17, docs/ministry/reviews/2026-10-19-queue-13-to-19.md), so no lane later puts them back in later years"
+      "canon": "PoA 21: the broom cupboard off the Entrance Hall, buckets and mops, not locked; the cupboard and its upturned bucket stand in every year (the Architect's relay KEEP, 1ec43dd2); the gold grains from 7 June of the Azkaban year (the execution set for the sixth of June at sundown, B3 ch21 L21433, read again 19 October 2026), never sparkling (GL-07). Godric's 1 on magic-hall-grains-1016 (16 October 2026, 1.12 pm; Magic's req 631): the grains lie in the crack in the Azkaban castle only (`year = 3`), from 7 June to that year's end, and in no other castle year; the cupboard and its upturned bucket stand every year. His own word against the world rules' \"earlier books' traces are always there\" (Time), logged as his exception in the charter's Rulings log (Kingsley's item 17, docs/ministry/reviews/2026-10-19-queue-13-to-19.md), so no lane later puts them back in later years; Magic's req 946 (docs/magic/rooms.md, *The hall cupboard*; Interiors' docs/interiors/hall-cupboard.md, cited), 22 October 2026: the dark and the smell, the door, the besoms, with the opening (every year)"
     },
     {
       "id": "hall.cupboard-shuts",
@@ -315,6 +325,55 @@
       "starts": [
         "set hall_cupboard = shut"
       ]
+    },
+    {
+      "id": "hall.cupboard-bucket",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-bucket",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open"
+      ],
+      "show": [
+        "the upturned bucket giving a hollow knock under his knuckles"
+      ],
+      "starts": [],
+      "canon": "Magic's req 946 (docs/magic/rooms.md, *The hall cupboard*; Interiors' docs/interiors/hall-cupboard.md, cited), 22 October 2026: the upturned bucket, an ordinary bucket upturned as one was \"amongst the buckets and mops\" (PoA 21 L21289, canon tool): a seat; a tap and it gives a hollow knock; upturned again at every visit, whoever turned it the right way up (the opening's cue says so)"
+    },
+    {
+      "id": "hall.cupboard-bottle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-bottle",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open"
+      ],
+      "show": [
+        "a bottle of Mrs. Skower's All-Purpose Magical Mess Remover on the shelf, its label faded",
+        "the small print on the label: \"Removes: mud, ink, owl droppings, Dungbomb, most things. Does not remove: Peeves.\""
+      ],
+      "starts": [],
+      "canon": "Magic's req 946 (docs/magic/rooms.md, *The hall cupboard*; Interiors' docs/interiors/hall-cupboard.md, cited), 22 October 2026: Filch's bottle, \"Mrs. Skower's All-Purpose Magical Mess Remover\" (CoS 9 L9514, canon tool; an everyday thing every year), the small print ours in the twins' humour, never Filch's own (Dungbombs an everyday thing, PoA 10 L17152 first)"
+    },
+    {
+      "id": "hall.cupboard-tin",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap hall-cupboard-tin",
+      "when": [
+        "place = entrance hall",
+        "hall_cupboard = open"
+      ],
+      "show": [
+        "the chamois lifted off the polish tin: nearly empty, smelling of beeswax"
+      ],
+      "starts": [],
+      "canon": "Magic's req 946 (docs/magic/rooms.md, *The hall cupboard*; Interiors' docs/interiors/hall-cupboard.md, cited), 22 October 2026: the polish tin with its chamois over the lid (Interiors' shelf): a tap lifts the chamois, the tin nearly empty and smelling of beeswax; nothing more"
     },
     {
       "id": "hall.grains-first",

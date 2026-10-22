@@ -1,0 +1,626 @@
+{
+  "chain": "kitchens",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = kitchens corridor"
+      ],
+      "show": [
+        "a broad stone corridor, brightly lit with torches, the brightest of the castle's low passages, warm-coloured, no gloom"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the corridor's torches; GoF 21 L28818 \"a broad stone corridor, brightly lit with torches\" (read in the canon tool, 22 October 2026), unlike the dungeon's way; every year"
+    },
+    {
+      "when": [
+        "place = kitchens corridor"
+      ],
+      "show": [
+        "cheerful paintings that were mainly of food: pies, cheeses, game pies, a ham on a board"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the paintings of food; GoF 21 L28818 \"cheerful paintings that were mainly of food\" (canon tool); pies, cheeses, game pies and a ham on a board ours; every year"
+    },
+    {
+      "when": [
+        "place = kitchens corridor"
+      ],
+      "show": [
+        "the corridor warmer than the stairs above it"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the warmth, the kitchens' fire behind the wall (ours); every year, every hour"
+    },
+    {
+      "when": [
+        "place = kitchens corridor"
+      ],
+      "show": [
+        "the painting of a gigantic silver fruit bowl, the huge green pear among its fruit"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the fruit bowl, GoF 21 L28826 \"a gigantic silver fruit bowl\" (canon tool); before the GoF castle an ordinary still life"
+    },
+    {
+      "when": [
+        "place = kitchens corridor",
+        "meal = none",
+        "hour >= 6",
+        "hour < 8",
+        "occasion != halloween",
+        "occasion != christmas day"
+      ],
+      "show": [
+        "a smell of baking bread drifting along the corridor"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: in the hour before breakfast a smell of baking bread drifts along it (ours); the hours the nearest whole hours to the meal's (MEALS in castle-events.js), the meal itself excluded; at night only the warmth"
+    },
+    {
+      "when": [
+        "place = kitchens corridor",
+        "meal = none",
+        "hour >= 11",
+        "hour < 13",
+        "occasion != halloween",
+        "occasion != christmas day"
+      ],
+      "show": [
+        "a smell of baking bread drifting along the corridor"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: in the hour before lunch a smell of baking bread drifts along it (ours); the hours the nearest whole hours to the meal's (MEALS in castle-events.js), the meal itself excluded; at night only the warmth"
+    },
+    {
+      "when": [
+        "place = kitchens corridor",
+        "meal = none",
+        "hour >= 17",
+        "hour < 19",
+        "occasion != halloween",
+        "occasion != christmas day"
+      ],
+      "show": [
+        "a smell of baking bread drifting along the corridor"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: in the hour before dinner a smell of baking bread drifts along it (ours); the hours the nearest whole hours to the meal's (MEALS in castle-events.js), the meal itself excluded; at night only the warmth"
+    },
+    {
+      "when": [
+        "place = kitchens corridor",
+        "occasion = halloween",
+        "time != night"
+      ],
+      "show": [
+        "the delicious smell of baking pumpkin wafting through the corridors, strongest here"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: on Halloween \"the delicious smell of baking pumpkin wafting through the corridors\" (PS 10 L3504, canon tool) is strongest here; at night only the warmth"
+    },
+    {
+      "when": [
+        "place = kitchens corridor",
+        "occasion = christmas day",
+        "time != night"
+      ],
+      "show": [
+        "the smell of a roast drifting along the corridor, richer than on other days"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, roast at Christmas (ours); at night only the warmth"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "time != night"
+      ],
+      "show": [
+        "a great brick fireplace at the other end, lit, a low roar and the firebasket's iron ticking as it warms"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the kitchens' fire by day and evening (GoF 21 L28838 \"a great brick fireplace at the other end\", canon tool); the fire its own light"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "time = night"
+      ],
+      "show": [
+        "the great brick fireplace banked to embers, the room dark but for their red and his own light"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the kitchens' fire banked to embers at night; the fire its own light"
+    },
+    {
+      "when": [
+        "place = kitchens"
+      ],
+      "show": [
+        "mounds of brass pots and pans heaped around the stone walls, dull, polished but unlit, and still"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the brass, GoF 21 L28838 \"mounds of glittering brass pots and pans heaped around the stone walls\" (canon tool) kept dull and unlit (the Ministry, 16 October 2026; nothing glints); nothing in them moves; nobody is seen at work at any hour (the Ministry's 8e)"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 6",
+        "hour < 8"
+      ],
+      "show": [
+        "the four long tables, positioned exactly beneath the four House tables above, laden with covered dishes, the steam rising, the smell of the meal"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the tables laden before breakfast (GoF 21 L28856, canon tool); on a feast day the heavier laying below"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 11",
+        "hour < 13"
+      ],
+      "show": [
+        "the four long tables, positioned exactly beneath the four House tables above, laden with covered dishes, the steam rising, the smell of the meal"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the tables laden before lunch (GoF 21 L28856, canon tool); on a feast day the heavier laying below"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 17",
+        "hour < 19",
+        "occasion != halloween",
+        "occasion != christmas day",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the four long tables, positioned exactly beneath the four House tables above, laden with covered dishes, the steam rising, the smell of the meal"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the tables laden before dinner (GoF 21 L28856, canon tool); on a feast day the heavier laying below"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 17",
+        "hour < 19",
+        "occasion = halloween"
+      ],
+      "show": [
+        "the four long tables laden more heavily than on other days with covered dishes, the steam rising, the smells richer, pumpkin above all"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the tables laden more before the feast, the smells richer (pumpkin at Halloween, roast at Christmas, ours); the occasion halloween at dinner (room-states.md section 1)"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 17",
+        "hour < 19",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "the four long tables laden more heavily than on other days with covered dishes, the steam rising, the smells richer, roast above all"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the tables laden more before the feast, the smells richer (pumpkin at Halloween, roast at Christmas, ours); the occasion christmas day at dinner (room-states.md section 1)"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 17",
+        "hour < 19",
+        "occasion = start of term"
+      ],
+      "show": [
+        "the four long tables laden more heavily than on other days with covered dishes, the steam rising, the smells richer"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the tables laden more before the feast, the smells richer (pumpkin at Halloween, roast at Christmas, ours); the occasion start of term at dinner (room-states.md section 1)"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 17",
+        "hour < 19",
+        "occasion = leaving feast"
+      ],
+      "show": [
+        "the four long tables laden more heavily than on other days with covered dishes, the steam rising, the smells richer"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the tables laden more before the feast, the smells richer (pumpkin at Halloween, roast at Christmas, ours); the occasion leaving feast at dinner (room-states.md section 1)"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 8",
+        "hour < 11"
+      ],
+      "show": [
+        "the four long tables clear of food, the meal over"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: after a meal the tables stay clear and bare (GoF 21 L28856 \"clear of food, dinner having finished\", canon tool); the small hours the same, the tables bare between meals"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 13",
+        "hour < 17"
+      ],
+      "show": [
+        "the four long tables clear of food, the meal over"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: after a meal the tables stay clear and bare (GoF 21 L28856 \"clear of food, dinner having finished\", canon tool); the small hours the same, the tables bare between meals"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour >= 19"
+      ],
+      "show": [
+        "the four long tables clear of food, the meal over"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: after a meal the tables stay clear and bare (GoF 21 L28856 \"clear of food, dinner having finished\", canon tool); the small hours the same, the tables bare between meals"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal = none",
+        "hour < 6"
+      ],
+      "show": [
+        "the four long tables clear of food, the meal over"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: after a meal the tables stay clear and bare (GoF 21 L28856 \"clear of food, dinner having finished\", canon tool); the small hours the same, the tables bare between meals"
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "meal != none"
+      ],
+      "show": [
+        "the four long tables clear, the dishes already sent up through the ceiling"
+      ],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: during a meal the dishes have gone up (GoF 21 L28856 \"sent up through the ceiling to their counterparts above\", canon tool)"
+    }
+  ],
+  "records": [
+    {
+      "id": "kitchens.paint-grape",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-paint",
+      "weight": 1,
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = kitchens corridor"
+      ],
+      "show": [
+        "a painted grape drops from its bunch and rolls to the frame's edge; when he looks again all is as it was"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the paintings' small moves, painted things moving as the castle's paintings do (PS 8 L2722, \"the people in the portraits kept going to visit each other\"); ours; nothing is lost, all as it was"
+    },
+    {
+      "id": "kitchens.paint-steam",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-paint",
+      "weight": 1,
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = kitchens corridor"
+      ],
+      "show": [
+        "a painted pie's steam curls; when he looks again all is as it was"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the paintings' small moves (ours)"
+    },
+    {
+      "id": "kitchens.paint-still",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-paint",
+      "weight": 2,
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = kitchens corridor"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the silent partner, so the paintings move now and then, not at every wait"
+    },
+    {
+      "id": "kitchens.pear-tickled",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap pear",
+      "when": [
+        "place = kitchens corridor",
+        "year >= 4"
+      ],
+      "show": [
+        "the pear beginning to squirm, chuckling, and suddenly turning into a large green door handle"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: from the GoF castle on (the Architect's row 171, architect-fruit-1021), tickled, the pear \"began to squirm, chuckling, and suddenly turned into a large green door handle\" (GoF 21 L28836, canon tool), and the door opens into the kitchens; before the GoF castle a tap on the pear does nothing (no record); the tap target `pear` is the shell's to raise, a row to the Architect"
+    },
+    {
+      "id": "kitchens.dishes-up-breakfast",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 07:30",
+      "when": [
+        "place = kitchens",
+        "meal = breakfast"
+      ],
+      "show": [
+        "the dishes sent up through the ceiling to their counterparts above: between one look and the next the tables are bare, and through the vault the Great Hall's sound swells, a sudden gladder murmur as the food appears above"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the dishes go up at each meal's hour (GoF 21 L28856; PS 7 L2535 \"The dishes in front of him were now piled with food\", heard from below, canon tool); the moment `clock 07:30` comes when the boys' own clock passes the meal's start with him on the page"
+    },
+    {
+      "id": "kitchens.hall-stops-breakfast",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 08:30",
+      "when": [
+        "place = kitchens",
+        "meal = none"
+      ],
+      "show": [
+        "the Great Hall's noise overhead thinning, and stopping"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the Hall overhead at the meal's end it thins and stops (ours); the tables stay clear and bare after"
+    },
+    {
+      "id": "kitchens.dishes-up-lunch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 12:30",
+      "when": [
+        "place = kitchens",
+        "meal = lunch"
+      ],
+      "show": [
+        "the dishes sent up through the ceiling to their counterparts above: between one look and the next the tables are bare, and through the vault the Great Hall's sound swells, a sudden gladder murmur as the food appears above"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the dishes go up at each meal's hour (GoF 21 L28856; PS 7 L2535 \"The dishes in front of him were now piled with food\", heard from below, canon tool); the moment `clock 12:30` comes when the boys' own clock passes the meal's start with him on the page"
+    },
+    {
+      "id": "kitchens.hall-stops-lunch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 13:30",
+      "when": [
+        "place = kitchens",
+        "meal = none"
+      ],
+      "show": [
+        "the Great Hall's noise overhead thinning, and stopping"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the Hall overhead at the meal's end it thins and stops (ours); the tables stay clear and bare after"
+    },
+    {
+      "id": "kitchens.dishes-up-dinner",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 18:30",
+      "when": [
+        "place = kitchens",
+        "meal = dinner"
+      ],
+      "show": [
+        "the dishes sent up through the ceiling to their counterparts above: between one look and the next the tables are bare, and through the vault the Great Hall's sound swells, a sudden gladder murmur as the food appears above"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the dishes go up at each meal's hour (GoF 21 L28856; PS 7 L2535 \"The dishes in front of him were now piled with food\", heard from below, canon tool); the moment `clock 18:30` comes when the boys' own clock passes the meal's start with him on the page"
+    },
+    {
+      "id": "kitchens.hall-stops-dinner",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "clock 19:30",
+      "when": [
+        "place = kitchens",
+        "meal = none"
+      ],
+      "show": [
+        "the Great Hall's noise overhead thinning, and stopping"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the Hall overhead at the meal's end it thins and stops (ours); the tables stay clear and bare after"
+    },
+    {
+      "id": "kitchens.hall-overhead",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion != halloween",
+        "occasion != christmas day",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "show": [
+        "the Great Hall's noise heard faintly through the vault: the murmur of voices, benches scraping, a laugh, cutlery"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the Hall overhead during meals (ours: the kitchens are under it); the Hall's sound at a meal from the Architect's shell; louder at a feast below"
+    },
+    {
+      "id": "kitchens.hall-overhead-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion != halloween",
+        "occasion != christmas day",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the silent partner, so the sound comes now and then"
+    },
+    {
+      "id": "kitchens.hall-feast-halloween",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-halloween",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = halloween"
+      ],
+      "show": [
+        "the Great Hall's noise heard through the vault, louder and longer than at other meals: the roar of voices, benches scraping, laughter, cutlery"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the Hall overhead louder and longer (halloween, at its meals)"
+    },
+    {
+      "id": "kitchens.hall-feast-halloween-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-halloween",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = halloween"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the silent partner"
+    },
+    {
+      "id": "kitchens.hall-feast-christmas-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-christmas-day",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "the Great Hall's noise heard through the vault, louder and longer than at other meals: the roar of voices, benches scraping, laughter, cutlery"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the Hall overhead louder and longer (christmas day, at its meals)"
+    },
+    {
+      "id": "kitchens.hall-feast-christmas-day-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-christmas-day",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = christmas day"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the silent partner"
+    },
+    {
+      "id": "kitchens.hall-feast-start-of-term",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-start-of-term",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = start of term"
+      ],
+      "show": [
+        "the Great Hall's noise heard through the vault, louder and longer than at other meals: the roar of voices, benches scraping, laughter, cutlery"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the Hall overhead louder and longer (start of term, at its meals)"
+    },
+    {
+      "id": "kitchens.hall-feast-start-of-term-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-start-of-term",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = start of term"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the silent partner"
+    },
+    {
+      "id": "kitchens.hall-feast-leaving-feast",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-leaving-feast",
+      "weight": 2,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = leaving feast"
+      ],
+      "show": [
+        "the Great Hall's noise heard through the vault, louder and longer than at other meals: the roar of voices, benches scraping, laughter, cutlery"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the feasts, the Hall overhead louder and longer (leaving feast, at its meals)"
+    },
+    {
+      "id": "kitchens.hall-feast-leaving-feast-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "kitchens-hall-leaving-feast",
+      "weight": 1,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = kitchens",
+        "meal != none",
+        "occasion = leaving feast"
+      ],
+      "starts": [],
+      "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: the silent partner"
+    }
+  ]
+}

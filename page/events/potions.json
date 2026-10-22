@@ -419,6 +419,61 @@
       "canon": "Magic's req 664 (docs/handoff/magic.md, The Potions dungeon), every year: the fires and the steam, thickening as the lesson goes on; OotP 12 L40618, \"the haze of multi-coloured steam now filling the dungeon\" (a lesson's sight a later book names first; read in the canon tool); with the class, so twenty cauldrons"
     },
     {
+      "id": "potions.cure-miss",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap cauldron",
+      "when": [
+        "place = potions dungeon",
+        "year = 1",
+        "cure_pot != again"
+      ],
+      "show": [
+        "too few fangs and the potion stays a thin, murky brown with a smell of wet socks",
+        "Snape looks in it, says \"Again.\" and empties it with a wave of his wand",
+        "the boy begins a fresh pot"
+      ],
+      "starts": [
+        "set cure_pot = again"
+      ],
+      "canon": "Magic's req 942 (docs/magic/year-1-wins.md, *9, a Cure for Boils*; Story's req 937, item 9), his own Year 1 Potions lesson, any week, the boys' desk's cauldron: \"a simple potion to cure boils\" with \"dried nettles\" and \"snake fangs\" (PS 8 L2822, read in the canon tool, 22 October 2026), the colours and the smell ours, the books silent; the miss is in the crushing and the weighing, never named as measuring, never scored; a wrong pot does nothing to anyone, no boils, no smoke, no hiss (Neville's PS 8 cauldron is a canon scene, never restaged); Snape's \"Again.\" ours, terse, never mocking; provisional, the tap `cauldron` is the Architect's to raise (a row), the pairing of miss and right pot ours"
+    },
+    {
+      "id": "potions.cure-right",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap cauldron",
+      "when": [
+        "place = potions dungeon",
+        "year = 1",
+        "cure_pot = again"
+      ],
+      "show": [
+        "the right weight and it turns a clear grass green and smells of nettle tea"
+      ],
+      "starts": [
+        "set cure_pot = none"
+      ],
+      "canon": "Magic's req 942 (docs/magic/year-1-wins.md, *9, a Cure for Boils*), the fresh pot after the miss: the colours and the smell ours; a pot as often as he likes, the next tap begins a fresh one, never scored"
+    },
+    {
+      "id": "potions.cure-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "been potions dungeon = yes",
+        "cure_pot = again"
+      ],
+      "starts": [
+        "set cure_pot = none"
+      ],
+      "canon": "Magic's req 942: the fresh pot he began is not carried to the next visit; each visit's first pot is the first miss again"
+    },
+    {
       "id": "potions.jar-drift",
       "tier": "fixed",
       "source": "device",

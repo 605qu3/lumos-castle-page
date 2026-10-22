@@ -1,0 +1,394 @@
+{
+  "chain": "owlery",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = owlery"
+      ],
+      "show": [
+        "a circular stone room, rather cold and drafty, because none of the windows had glass in them: the wind coming through, louder on the windward side"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the cold and the wind, GoF 15 L26270 \"a circular stone room, rather cold and drafty, because none of the windows had glass in them\" (canon tool)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "weather = rain"
+      ],
+      "show": [
+        "rain blowing in through the loops and darkening the sills"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the weather in, rain on a wet day (ours)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "weather = snow"
+      ],
+      "show": [
+        "snow blowing in through the loops onto the sills"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the weather in, snow on a snowy day (ours)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "season = winter"
+      ],
+      "show": [
+        "a little snow lying on the sills"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): in winter a little snow lies on the sills (ours)"
+    },
+    {
+      "when": [
+        "place = owlery"
+      ],
+      "show": [
+        "the floor entirely covered in straw, crunching a little under his steps, owl droppings here and there and a boy minding where he steps"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the straw, GoF 15 L26270 \"The floor was entirely covered in straw\" and OotP 14 L41652 \"crunched a little as he stepped\" (canon tool); the droppings kept comic; the skeletons and bones of both lines stay out (the death rule, world-rules.md)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "time != night",
+        "time != evening",
+        "meal != breakfast"
+      ],
+      "show": [
+        "hundreds upon hundreds of owls of every breed imaginable nestled on perches that rose right up to the top of the tower, nearly all of them asleep, though here and there a round amber eye glared"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the owls by day, GoF 15 L26270 (canon tool); the eyes amber in the light, never lit"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "meal = breakfast"
+      ],
+      "show": [
+        "the perches half empty while the post is out"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the morning post, \"about a hundred owls had suddenly streamed into the Great Hall during breakfast\" (PS 8 L2754, canon tool), Events' clock"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "meal = none",
+        "time = morning",
+        "hour >= 9",
+        "hour < 11"
+      ],
+      "show": [
+        "the owls back from the Great Hall, settling and preening"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the owls back by mid-morning (ours)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "time = morning",
+        "hour < 7"
+      ],
+      "show": [
+        "the owls coming back in through the glassless windows, settling on their perches"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): at dawn they come back in (ours: owls keep night hours; what they do out there unsaid)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "time = night",
+        "hour >= 5",
+        "hour < 8"
+      ],
+      "show": [
+        "the owls coming back in through the glassless windows, settling on their perches"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): at dawn they come back in (ours: owls keep night hours; what they do out there unsaid)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "time = evening"
+      ],
+      "show": [
+        "the owls waking and stretching on their perches"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): at dusk the owls wake and stretch (ours)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "time = night",
+        "sun = down",
+        "hour >= 15",
+        "hour < 19"
+      ],
+      "show": [
+        "the owls waking and stretching on their perches"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): at dusk the owls wake and stretch (ours)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "time = night",
+        "hour >= 19"
+      ],
+      "show": [
+        "the perches nearly bare, the room quiet but for the wind"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): by night the perches are nearly bare and the room quiet but for the wind (ours; where the owls go is unsaid)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "time = night",
+        "hour < 5"
+      ],
+      "show": [
+        "the perches nearly bare, the room quiet but for the wind"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): by night the perches are nearly bare and the room quiet but for the wind (ours; where the owls go is unsaid)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "thick silvery beams of sunlight crisscrossing the circular room through the glassless windows"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the sun through the loops, OotP 14 L41652 \"thick silvery beams of sunlight crisscrossed the circular room\" (canon tool)"
+    },
+    {
+      "when": [
+        "place = owlery",
+        "sun = up",
+        "weather != clear"
+      ],
+      "show": [
+        "an even cold light through the loops"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): a grey day an even cold light (ours)"
+    },
+    {
+      "when": [
+        "place = owlery"
+      ],
+      "show": [
+        "from each loop the grounds below: the lake, the Forest's edge, the Quidditch pitch, nothing in the view moving"
+      ],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the view, as far as the Architect's grounds draw them (cited when modelled); nothing in the view moves for him"
+    }
+  ],
+  "records": [
+    {
+      "id": "owlery.small-feather",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-small",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = owlery",
+        "time != night",
+        "time != evening",
+        "meal != breakfast"
+      ],
+      "show": [
+        "a feather drifting down and settling in the straw"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): a feather settling (ours, from GoF 15 L26270's sleeping owls)"
+    },
+    {
+      "id": "owlery.small-shuffle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-small",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = owlery",
+        "time != night",
+        "time != evening",
+        "meal != breakfast"
+      ],
+      "show": [
+        "a shuffle of claws along a perch"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): a shuffle along a perch (ours, from GoF 15 L26270's sleeping owls)"
+    },
+    {
+      "id": "owlery.small-back",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-small",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = owlery",
+        "time != night",
+        "time != evening",
+        "meal != breakfast"
+      ],
+      "show": [
+        "one owl turning its back on him with a ruffle"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): one turning its back on him (ours, from GoF 15 L26270's sleeping owls)"
+    },
+    {
+      "id": "owlery.small-hoot",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-small",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = owlery",
+        "time != night",
+        "time != evening",
+        "meal != breakfast"
+      ],
+      "show": [
+        "a sleepy hoot from somewhere high up the tower"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): now and then a sleepy hoot (ours, from GoF 15 L26270's sleeping owls)"
+    },
+    {
+      "id": "owlery.small-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-small",
+      "weight": 3,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = owlery",
+        "time != night",
+        "time != evening",
+        "meal != breakfast"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the silent partner, so the small moves come now and then"
+    },
+    {
+      "id": "owlery.leaving0",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-leaving0",
+      "weight": 2,
+      "moment": "wait 25-100 s",
+      "when": [
+        "place = owlery",
+        "time = evening"
+      ],
+      "show": [
+        "an owl stretching its wings, hopping to a loop and going out into the dark"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): at dusk the owls go out through the windows by ones and twos (ours)"
+    },
+    {
+      "id": "owlery.leaving0-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-leaving0",
+      "weight": 1,
+      "moment": "wait 25-100 s",
+      "when": [
+        "place = owlery",
+        "time = evening"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the silent partner"
+    },
+    {
+      "id": "owlery.leaving1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-leaving1",
+      "weight": 2,
+      "moment": "wait 25-100 s",
+      "when": [
+        "place = owlery",
+        "time = night",
+        "sun = down",
+        "hour >= 15",
+        "hour < 19"
+      ],
+      "show": [
+        "an owl stretching its wings, hopping to a loop and going out into the dark"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): at dusk the owls go out through the windows by ones and twos (ours)"
+    },
+    {
+      "id": "owlery.leaving1-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-leaving1",
+      "weight": 1,
+      "moment": "wait 25-100 s",
+      "when": [
+        "place = owlery",
+        "time = night",
+        "sun = down",
+        "hour >= 15",
+        "hour < 19"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the silent partner"
+    },
+    {
+      "id": "owlery.beams-move",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-beams",
+      "weight": 1,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = owlery",
+        "sun = up",
+        "weather = clear"
+      ],
+      "show": [
+        "the beams of sunlight a little further round the walls than before"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the sun's beams moving round the walls with the hour (OotP 14 L41652's beams; ours)"
+    },
+    {
+      "id": "owlery.beams-move-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "owlery-beams",
+      "weight": 1,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = owlery",
+        "sun = up",
+        "weather = clear"
+      ],
+      "starts": [],
+      "canon": "Magic's req 948 (docs/magic/rooms.md, *The Owlery*), 22 October 2026, every year; the Owlery's look GoF 15's and OotP 14's, an everyday thing a later book names first (Kingsley's 16 October ruling): the silent partner"
+    }
+  ]
+}
