@@ -162,7 +162,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/panelling.js?v=2"></script>
 <script src="castle-shell.js?v=70"></script>
 <script src="shell-w5b.js?v=16"></script>
-<script src="shell-w5a.js?v=18"></script>
+<script src="shell-w5a.js?v=19"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="castle-sky.js?v=1"></script>
 <script src="design/drawn.js?v=1"></script>
@@ -2722,6 +2722,27 @@ function astroShown(shown) {
   }
   return drawn.filter(function (s) { return shown.indexOf(s) >= 0; });
 }
+/* req 924 (Events' page/events/astronomy-rooms.json, word for word): on the class nights the cloak room's pegs and the
+   lantern stand are thinned, what went up the stair drawn under materials ending -up (shell-w5a.js) and hidden while
+   the line shows; full otherwise. The spiral's two door lines wait for the spiral to be a place (it is a stair only).
+   ?class=up for checks */
+var ASTRO_UP = {
+  'astronomy-cloak-room': ["the cloak stands' pegs thinned, most of the spare cloaks, scarves and mittens gone up with the class, a few left hanging",
+    "the cloak stands' pegs full of spare black cloaks, scarves in the four houses' colours and mittens pinned in pairs"],
+  'astronomy-lantern-room': ["the lantern stand's rail of hooks half bare, the lanterns gone up with the class, a few left hanging",
+    "the lantern stand's rail of hooks hung full, every lantern ready for the stair"]
+}[PLACE] || null, astroUpOn = null;
+function astroUpSet(on) {
+  if (!ASTRO_UP || on === astroUpOn) return;
+  astroUpOn = on;
+  shell.group.traverse(function (m) { if (m.isMesh && /^w5b-.*-up$/.test(m.name)) m.visible = !on; });
+}
+astroUpSet(Q.get('class') === 'up');
+function astroUpShown(shown) {
+  if (!ASTRO_UP) return [];
+  if (!Q.get('class')) astroUpSet(shown.indexOf(ASTRO_UP[0]) >= 0);
+  return ASTRO_UP.filter(function (s) { return shown.indexOf(s) >= 0; });
+}
 Object.keys(ASTRO_TO).forEach(function (line) {
   thingCues[line] = function () { if (ASTRO.log) { ASTRO.page = ASTRO_TO[line]; ASTRO.turn = 0.6; ASTRO.t = 0; } showLines([{ medium: 'seen', sound: line }]); };
 });
@@ -3165,7 +3186,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), foShown(shown), sittersShown(shown), soShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';

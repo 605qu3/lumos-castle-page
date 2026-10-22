@@ -1336,6 +1336,9 @@ window.SHELL_W5A = {
   MT.blanket = 0x6e6a64; MT.blanket2 = 0x85807a; MT.scarlet = 0x7a1c1c; MT.gold = 0xa8862e; MT.emerald = 0x2a5a34;
   MT.sapphire = 0x2a3a6a; MT.globe = 0xa9b9c6; MT.redglass = 0x6e1a14; MT.tallow = 0xcfc2a0;
   var C = [80.0, 77.0];
+  /* req 924 (Events' astronomy-rooms.json): what goes up the stair with the class takes its own material, the same colour
+     under a name ending -up, so the page hides that one mesh while the class is up (shell.html, ASTRO_UP) */
+  function up(m) { if (MT[m + '-up'] == null) MT[m + '-up'] = MT[m] != null ? MT[m] : (window.W5B_MATS || {})[m]; return m + '-up'; }
   function cb(cx, cy, lx, ly, za, zb, m) { return ['b', cx - lx / 2, cy - ly / 2, za, cx + lx / 2, cy + ly / 2, zb, m]; }
   function lamp(it, x, y) {        /* an iron lamp on a tall stand, the lamp at 1.6, unlit */
     it.push(['y', x, y, 0.15, 0, 0.03, 'iron'], ['y', x, y, 0.015, 0.03, 1.55, 'iron'], ['y', x, y, 0.07, 1.55, 1.58, 'iron'],
@@ -1375,16 +1378,16 @@ window.SHELL_W5A = {
   /* 7, the cloak room: two stands of pegs, the cloaks and scarves on both faces, mittens pinned in pairs; the bench of
      blankets; the boot rack; the lamp */
   (function () {
-    var it = [], SCARF = ['scarlet', 'gold', 'emerald', 'sapphire'];
+    var it = [], SCARF = ['scarlet', 'gold', 'emerald', 'sapphire'], pegN = 0;
     function stand(cx, cy, alongX) {
       frame(it, cx, cy, alongX, 2.4, 0.5, 1.8, [[-0.12, 1.62], [0.12, 1.62]], 'oak');
       it = it.concat(along(cx, cy, alongX, 2.4, 0.42, function (x, y, s, i) {
-        var o = s * 0.17, w = 0.34, q = [];
+        var o = s * 0.17, w = 0.34, q = [], gone = pegN++ % 4 !== 1, m_ = function (m) { return gone ? up(m) : m; };   /* a quarter stay while the class is up */
         if ((i + (s > 0 ? 1 : 0)) % 3 === 2) {   /* a scarf and a pair of mittens at every third peg */
-          q.push(alongX ? cb(x, y + o, 0.12, 0.03, 0.75, 1.58, SCARF[i % 4]) : cb(x + o, y, 0.03, 0.12, 0.75, 1.58, SCARF[i % 4]));
-          [-0.08, 0.08].forEach(function (m) { q.push(alongX ? cb(x + m + 0.14, y + o, 0.07, 0.04, 1.38, 1.5, 'cloth') : cb(x + o, y + m + 0.14, 0.04, 0.07, 1.38, 1.5, 'cloth')); });
+          q.push(alongX ? cb(x, y + o, 0.12, 0.03, 0.75, 1.58, m_(SCARF[i % 4])) : cb(x + o, y, 0.03, 0.12, 0.75, 1.58, m_(SCARF[i % 4])));
+          [-0.08, 0.08].forEach(function (m) { q.push(alongX ? cb(x + m + 0.14, y + o, 0.07, 0.04, 1.38, 1.5, m_('cloth')) : cb(x + o, y + m + 0.14, 0.04, 0.07, 1.38, 1.5, m_('cloth'))); });
         } else {                                  /* a spare black cloak hanging from its peg */
-          q.push(alongX ? cb(x, y + o, w, 0.06, 0.45, 1.58, 'ebony') : cb(x + o, y, 0.06, w, 0.45, 1.58, 'ebony'));
+          q.push(alongX ? cb(x, y + o, w, 0.06, 0.45, 1.58, m_('ebony')) : cb(x + o, y, 0.06, w, 0.45, 1.58, m_('ebony')));
         }
         q.push(alongX ? cb(x, y + s * 0.15, 0.03, 0.06, 1.56, 1.6, 'iron') : cb(x + s * 0.15, y, 0.06, 0.03, 1.56, 1.6, 'iron'));   /* its peg */
         return q;
@@ -1526,9 +1529,10 @@ window.SHELL_W5A = {
      chest of candles; the stand of lanterns hung ready for the stair. No lamp: its light a lantern, if a state lights one */
   (function () {
     var it = [];
-    function lantern(x, y, z) {    /* a dark lantern, 0.13 square, its shutter closed over the red glass but a strip */
-      return [['b', x - 0.065, y - 0.065, z, x + 0.065, y + 0.065, z + 0.2, 'iron'], ['b', x - 0.067, y - 0.04, z + 0.05, x + 0.067, y + 0.04, z + 0.08, 'redglass'],
-              ['y', x, y, 0.05, z + 0.2, z + 0.24, 'iron'], ['b', x - 0.005, y - 0.04, z + 0.24, x + 0.005, y + 0.04, z + 0.29, 'iron']];
+    function lantern(x, y, z, gone) {    /* a dark lantern, 0.13 square, its shutter closed over the red glass but a strip */
+      var ir = gone ? up('iron') : 'iron', rg = gone ? up('redglass') : 'redglass';
+      return [['b', x - 0.065, y - 0.065, z, x + 0.065, y + 0.065, z + 0.2, ir], ['b', x - 0.067, y - 0.04, z + 0.05, x + 0.067, y + 0.04, z + 0.08, rg],
+              ['y', x, y, 0.05, z + 0.2, z + 0.24, ir], ['b', x - 0.005, y - 0.04, z + 0.24, x + 0.005, y + 0.04, z + 0.29, ir]];
     }
     it.push(['t', 77.2, 75.25, 79.6, 75.95, 0.85, 'oak']);
     for (var k = 0; k < 10; k++) [75.45, 75.75].forEach(function (y) { it = it.concat(lantern(77.36 + k * 0.232, y, 0.85)); });
@@ -1537,9 +1541,9 @@ window.SHELL_W5A = {
     it.push(cb(81.7, 74.8, 0.16, 0.02, 0.85, 0.86, 'steel'), ['y', 82.0, 74.9, 0.06, 0.85, 0.92, 'tin']);
     chest(it, 77.5, 78.5, 0.9, 0.5, 0.6);
     frame(it, 79.6, 79.7, true, 1.6, 0.4, 1.7, [[0, 1.6]], 'oak');
-    [79.05, 79.33, 79.6, 79.87, 80.15].forEach(function (x) {
+    [79.05, 79.33, 79.6, 79.87, 80.15].forEach(function (x, i) {   /* req 924: three go up with the class, two left hanging */
       it.push(cb(x, 79.7, 0.012, 0.012, 1.4, 1.59, 'iron'));
-      it = it.concat(lantern(x, 79.7, 1.1));
+      it = it.concat(lantern(x, 79.7, 1.1, i !== 1 && i !== 4));
     });
     T['astronomy-lantern-room'] = { c: C, items: it };
   })();
