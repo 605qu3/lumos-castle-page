@@ -124,7 +124,7 @@
         "a table with seven differently shaped bottles standing on it in a line",
         "a roll of paper lying beside them"
       ],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the bottles' room: \"a table with seven differently shaped bottles standing on it in a line\" (PS 16 L5980), \"a roll of paper lying next to the bottles\" (L5986), read in the canon tool, 22 October 2026; the paper's words are held for Godric (magic-stone-paper-words-1022, unanswered)"
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the bottles' room: \"a table with seven differently shaped bottles standing on it in a line\" (PS 16 L5980), \"a roll of paper lying next to the bottles\" (L5986), read in the canon tool, 22 October 2026; the paper's words are the verse of Magic's req 940 (Godric's 3 on magic-stone-bottles-silly-1022), read on a tap on the paper (stone-chambers.paper)"
     },
     {
       "when": [
@@ -374,7 +374,7 @@
         "a sip from the bottle: foul water, a grimace and nothing more"
       ],
       "starts": [],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: every other bottle: foul water only, a sip, a grimace, nothing more (PS 16 L6030, three \"poison\" in the book, here none: the world rules); each bottle full again at his next visit, nothing kept or carried out"
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: a bridge until the shell raises the numbered bottles (Magic's req 940, bottle 1, 2, 4, 5, 6: stone-chambers.bottle-N), when the Architect's req 941 lands this record goes: any bottle not numbered, foul water only, a sip, a grimace, nothing more (PS 16 L6030, three \"poison\" in the book, here none: the world rules); each bottle full again at his next visit, nothing kept or carried out"
     },
     {
       "id": "stone-chambers.potions-smallest",
@@ -389,8 +389,10 @@
       "show": [
         "the smallest bottle's one swallow, ice flooding his body; he walks forward through the black flames, feeling nothing, to the other side"
       ],
-      "starts": [],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the smallest bottle: \"The smallest bottle will get us through the black fire\" (PS 16 L6038), \"as though ice was flooding his body\" (L6088), the black flames felt as nothing, into the last chamber, read in the canon tool, 22 October 2026; the bottle full again at his next visit"
+      "starts": [
+        "set stone_silly = none"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the smallest bottle: \"The smallest bottle will get us through the black fire\" (PS 16 L6038), \"as though ice was flooding his body\" (L6088), the black flames felt as nothing, into the last chamber, read in the canon tool, 22 October 2026; the bottle full again at his next visit; Magic's req 940: the ice sends any silly still running off, as a second sip does"
     },
     {
       "id": "stone-chambers.potions-round",
@@ -405,8 +407,231 @@
       "show": [
         "a sip from the rounded bottle at the right end, cold as ice, and the purple fire parting round him as he walks back"
       ],
+      "starts": [
+        "set stone_silly = none"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the rounded bottle at the right end: \"a rounded bottle at the right end of the line\" (PS 16 L6050), \"it's like ice\" (L6074), read in the canon tool, 22 October 2026; a wink, and the purple parts for him; Magic's req 940: the ice sends any silly still running off, as a second sip does"
+    },
+    {
+      "id": "stone-chambers.paper",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap paper",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "Black fire lies before you, while purple lies behind,",
+        "Two of us will help you, whichever you would find,",
+        "One among us seven will let you move ahead,",
+        "Another will transport the drinker back instead,",
+        "Two among our number will turn your nose to snout,",
+        "Three of us are mischief, but harmless, have no doubt.",
+        "Choose, unless you'd rather stand puzzling by the door,",
+        "To help you in your choice, we give you these clues four:",
+        "First, however slyly the mischief tries to hide,",
+        "You will always find some on a dog-snout's left side;",
+        "Second, different are those who stand at either end,",
+        "But if you would move onward, neither is your friend;",
+        "Third, as you see clearly, all are different size,",
+        "Neither dwarf nor giant holds mischief in their insides;",
+        "Fourth, the second left and the second on the right",
+        "Are twins once you taste them, though different at first sight."
+      ],
       "starts": [],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the rounded bottle at the right end: \"a rounded bottle at the right end of the line\" (PS 16 L6050), \"it's like ice\" (L6074), read in the canon tool, 22 October 2026; a wink, and the purple parts for him"
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: the roll of paper beside the bottles, read when he taps it: the book's verse (PS 16 L5990 to L6020, read in the canon tool, 22 October 2026) with its form, metre and four clues kept and only what the bottles hold changed (the nettle wine is the dog's snout, the poison the mischief, death nothing), so the logic still has the one answer; the sixteen lines word for word from the room table, one cue each, in order"
+    },
+    {
+      "id": "stone-chambers.bottle-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bottle 1",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a swallow from the first bottle in the line: it tastes of tea made from toenails, and a pulled face",
+        "smoke puffing from his ears for about a minute"
+      ],
+      "starts": [
+        "set stone_silly = smoke"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: bottle 1, a trick: smoke puffs from his ears as Madam Pomfrey's Pepperup \"left the drinker smoking at the ears\" (CoS 8 L8985, read in the canon tool, 22 October 2026), for a minute, not hours; the toenail tea is Godric's own; harmless, gone in about a minute, nothing kept or carried out, the bottle full again at his next visit (the world rules: nothing harms, nothing stays); a second sip sends the first off"
+    },
+    {
+      "id": "stone-chambers.bottle-1-over",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap bottle 1 55-65 s",
+      "when": [
+        "place = stone potions room",
+        "year >= 2",
+        "stone_silly = smoke"
+      ],
+      "show": [
+        "the smoke from his ears thinning to a last wisp and stopping"
+      ],
+      "starts": [
+        "set stone_silly = none"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: the minute's end for bottle 1: it goes of itself, and a later sip of another bottle has already sent it off (stone_silly is no longer smoke)"
+    },
+    {
+      "id": "stone-chambers.bottle-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bottle 2",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a swallow from the second bottle in the line: it tastes of hot, bubbly fish oil, and a pulled face",
+        "his nose a dog's black, wet snout for about a minute, sniffing about on its own"
+      ],
+      "starts": [
+        "set stone_silly = snout"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: bottle 2, a dog's snout (the verse's \"snout\" lines): his nose becomes a dog's black, wet snout for a minute, sniffing about on its own (ours); the hot, bubbly fish oil is Godric's own, and the clue calls 2 and 6 twins because they taste the same; harmless, gone in about a minute, nothing kept or carried out, the bottle full again at his next visit (the world rules: nothing harms, nothing stays); a second sip sends the first off"
+    },
+    {
+      "id": "stone-chambers.bottle-2-over",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap bottle 2 55-65 s",
+      "when": [
+        "place = stone potions room",
+        "year >= 2",
+        "stone_silly = snout"
+      ],
+      "show": [
+        "the dog's snout shrinking back into his own nose"
+      ],
+      "starts": [
+        "set stone_silly = none"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: the minute's end for bottle 2: it goes of itself, and a later sip of another bottle has already sent it off (stone_silly is no longer snout)"
+    },
+    {
+      "id": "stone-chambers.bottle-4",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bottle 4",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a swallow from the fourth bottle in the line: it tastes of cold tripe gravy, and a pulled face",
+        "his teeth chattering and every word coming out a squeak, for about a minute"
+      ],
+      "starts": [
+        "set stone_silly = squeak"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: bottle 4, a trick: his teeth chatter and every word comes out a squeak, as Ice Mice (\"hear your teeth chatter and squeak!\", PoA 10 L17248, an everyday sweet a later book names first, read in the canon tool, 22 October 2026); tripe is one of Bertie Bott's (PS 6 L2094, read in the canon tool, 22 October 2026); harmless, gone in about a minute, nothing kept or carried out, the bottle full again at his next visit (the world rules: nothing harms, nothing stays); a second sip sends the first off"
+    },
+    {
+      "id": "stone-chambers.bottle-4-over",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap bottle 4 55-65 s",
+      "when": [
+        "place = stone potions room",
+        "year >= 2",
+        "stone_silly = squeak"
+      ],
+      "show": [
+        "his teeth going quiet and his voice coming back to its own"
+      ],
+      "starts": [
+        "set stone_silly = none"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: the minute's end for bottle 4: it goes of itself, and a later sip of another bottle has already sent it off (stone_silly is no longer squeak)"
+    },
+    {
+      "id": "stone-chambers.bottle-5",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bottle 5",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a swallow from the fifth bottle in the line: it tastes of Brussels sprouts boiled for a week, and a pulled face",
+        "a hiccup of bluebell-coloured bubbles rising from his mouth, every one popping, for about a minute"
+      ],
+      "starts": [
+        "set stone_silly = bubbles"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: bottle 5, a trick: he hiccups bluebell-coloured bubbles, Drooble's (PS 6 L2036; \"bluebell-coloured bubbles that refused to pop for days\", PoA 10 L17248, read in the canon tool, 22 October 2026), except these pop; the sprouts are Ron's bean (\"Bleaaargh, see? Sprouts.\", PS 6 L2098, read in the canon tool, 22 October 2026); harmless, gone in about a minute, nothing kept or carried out, the bottle full again at his next visit (the world rules: nothing harms, nothing stays); a second sip sends the first off"
+    },
+    {
+      "id": "stone-chambers.bottle-5-over",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap bottle 5 55-65 s",
+      "when": [
+        "place = stone potions room",
+        "year >= 2",
+        "stone_silly = bubbles"
+      ],
+      "show": [
+        "the last bluebell bubble popping and the hiccups stopping"
+      ],
+      "starts": [
+        "set stone_silly = none"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: the minute's end for bottle 5: it goes of itself, and a later sip of another bottle has already sent it off (stone_silly is no longer bubbles)"
+    },
+    {
+      "id": "stone-chambers.bottle-6",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bottle 6",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a swallow from the sixth bottle in the line: it tastes of hot, bubbly fish oil, and a pulled face",
+        "his nose a dog's black, wet snout for about a minute, sniffing about on its own"
+      ],
+      "starts": [
+        "set stone_silly = snout"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: bottle 6, a dog's snout, the largest (the verse's \"snout\" lines): as bottle 2; the same fish oil, the clue's twins; harmless, gone in about a minute, nothing kept or carried out, the bottle full again at his next visit (the world rules: nothing harms, nothing stays); a second sip sends the first off"
+    },
+    {
+      "id": "stone-chambers.bottle-6-over",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "after tap bottle 6 55-65 s",
+      "when": [
+        "place = stone potions room",
+        "year >= 2",
+        "stone_silly = snout"
+      ],
+      "show": [
+        "the dog's snout shrinking back into his own nose"
+      ],
+      "starts": [
+        "set stone_silly = none"
+      ],
+      "canon": "Magic's req 940 (docs/magic/rooms.md, *The Stone's chambers*, the row *the bottles' room*, and *The bottles and the paper*; Godric's 3 on magic-stone-bottles-silly-1022, 2.55 pm, 22 October 2026, his own changes: the dog's snout, each wrong bottle a specific disgusting taste, the one answer kept), from the Chamber's castle on, every year after the Stone's: the minute's end for bottle 6: it goes of itself, and a later sip of another bottle has already sent it off (stone_silly is no longer snout)"
     },
     {
       "id": "stone-chambers.potions-flames",
@@ -432,9 +657,10 @@
       "moment": "leave",
       "when": [],
       "starts": [
-        "set potions_in = no"
+        "set potions_in = no",
+        "set stone_silly = none"
       ],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the fires belong to the visit"
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the fires belong to the visit; Magic's req 940: no silly effect stays past the visit"
     }
   ]
 }
