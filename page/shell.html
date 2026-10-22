@@ -2290,7 +2290,7 @@ thingCues[STONE_CHESS_DARK] = function () { stoneFlood(false); showLines([{ medi
    doorways ways, no leaf). From the bottles' room the black way takes no tap: only the smallest bottle carries him
    through; the rounded one walks him back. Every thing bears 1 cm into what it stands on; owner the place.
    ?fires=on for checks; lumosGreybox.stone. */
-var STONE = { on: /^stone-(pit|keys-chamber|troll-room|potions-room|last-chamber)$/.test(PLACE), keys: [], flames: [], curls: null, slack: 0 };
+var STONE = { on: /^stone-(pit|keys-chamber|troll-room|potions-room|last-chamber)$/.test(PLACE), keys: [], flames: [], curls: null, slack: 0, lean: -1 };
 var STONE_DRAWN = {
   'stone-keys-chamber': ['small, jewel-bright birds that are keys, fluttering and tumbling all round the room, glittering, a whirl of rainbow feathers, none of them swooping at him',
     'among the flock, one large silver key with bright blue wings, the feathers crumpled on one side, flying a little lopsided and lower than the rest, very battered',
@@ -2305,6 +2305,7 @@ var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its
     STONE_SNARE_GO = 'the tendrils loosening of their own accord and sliding off his ankles, the plant lying slack on the floor',
     STONE_FIRES_IN = 'purple fire springing up in the doorway behind him and black flames in the doorway on',
     STONE_FIRES_STAND = 'the purple fire standing in the doorway behind him, and the black flames in the doorway on; neither burns, and the purple parts for him whenever he walks back',
+    STONE_BLACK = 'the black flames leaning toward his reaching hand, cold on his fingertips, then standing tall again as he draws it back, not in the least moved',
     STONE_SMALLEST = "the smallest bottle's one swallow, ice flooding his body; he walks forward through the black flames, feeling nothing, to the other side",
     STONE_ROUND = 'a sip from the rounded bottle at the right end, cold as ice, and the purple fire parting round him as he walks back';
 (function () {
@@ -2403,10 +2404,11 @@ var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its
   if (PLACE === 'stone-last-chamber') fire(106.5, -1, 0x0c0b12, false);   /* in the doorway's west half, behind him as he arrives */
   /* the fires stand at once in the last chamber, and in the bottles' room as he steps in (or with no runtime) */
   STONE.rise = PLACE === 'stone-last-chamber' || !events || Q.get('fires') === 'on' ? 1 : 0; STONE.riseT = STONE.rise;
-  /* the black way from the bottles' room takes no tap: only the smallest bottle carries him through */
+  /* the black way from the bottles' room never walks him through: only the smallest bottle carries him; a tap on it is
+     the tap `black flames` (Events' req 935), the flames leaning to his hand and standing tall again */
   STONE.on2 = shell.ways.filter(function (d) { return d.id === 'stone-potions-door-on'; })[0] || null;
   STONE.back = shell.ways.filter(function (d) { return d.id === 'stone-troll-door-out'; })[0] || null;
-  if (PLACE === 'stone-potions-room' && STONE.on2) { var ti = tappables.indexOf(STONE.on2.mesh); if (ti >= 0) tappables.splice(ti, 1); }
+  if (PLACE === 'stone-potions-room') STONE.leanDir = P(105.5, 33.9, 0).sub(P(106.5, 33.9, 0)).normalize();
 })();
 function stoneShown(shown) {
   if (!STONE.on) return [];
@@ -2428,6 +2430,7 @@ function stoneSnareOff(s) { if (STONE.curls) STONE.slack = s; }
 thingCues[STONE_SNARE_IN] = function () { stoneCurls(true); showLines([{ medium: 'seen', sound: STONE_SNARE_IN }]); };
 thingCues[STONE_SNARE_LIGHT] = function () { stoneSnareOff(1.2); showLines([{ medium: 'seen', sound: STONE_SNARE_LIGHT }]); };
 thingCues[STONE_SNARE_GO] = function () { stoneSnareOff(3.0); showLines([{ medium: 'seen', sound: STONE_SNARE_GO }]); };
+thingCues[STONE_BLACK] = function () { STONE.lean = 0; showLines([{ medium: 'seen', sound: STONE_BLACK }]); };
 thingCues[STONE_FIRES_IN] = function () { STONE.riseT = 1; showLines([{ medium: 'seen', sound: STONE_FIRES_IN }]); };
 function stoneCarry(d, line) {   /* the line seen, then the walk through the way */
   var l = { medium: 'seen', sound: line }; showLines([l]);
@@ -2448,7 +2451,9 @@ function updateStoneThings(dt, t) {
   STONE.flames.forEach(function (f) {
     var fl = 0.8 + 0.2 * Math.sin(t * 9 + f.userData.ph) + 0.08 * Math.sin(t * 23 + f.userData.ph * 2), h = Math.max(0.001, f.userData.h * fl * STONE.rise);
     f.scale.set(f.userData.w, h, f.userData.w); f.position.copy(f.userData.base); f.position.y += h / 2 - 0.06; f.visible = STONE.rise > 0.02;
+    if (STONE.lean >= 0 && STONE.leanDir && f.name === 'stone-fire-black') f.position.addScaledVector(STONE.leanDir, 0.22 * Math.sin(Math.PI * STONE.lean / 1.6) * (f.position.y - f.userData.base.y + 0.06) / 1.2);
   });
+  if (STONE.lean >= 0 && (STONE.lean += dt) > 1.6) STONE.lean = -1;   /* leaning to his hand and tall again, 1.6 s */
   if (PLACE === 'stone-potions-room' && STONE_LIGHT.purple) { STONE_LIGHT.purple.intensity = 1.1 * STONE.rise; STONE_LIGHT.black.intensity = 0.25 * STONE.rise; }
   if (STONE.curls && STONE.slack > 0) {
     var s = STONE.curls.scale.y - dt / STONE.slack;
@@ -3394,6 +3399,9 @@ function tap(cx, cy) {
     kit.tapped(true); return;
   }
   if (events && hit && hit.userData.bottle) { events.tap(hit.userData.bottle); kit.tapped(true); return; }   /* req 920, the seven bottles */
+  if (hit && PLACE === 'stone-potions-room' && STONE.on2 && hit === STONE.on2.mesh) {   /* req 935, the black flames: never through */
+    if (events) events.tap('black flames'); else thingCues[STONE_BLACK](); kit.tapped(true); return;
+  }
   if (hit && FOFFICE && hit === FOFFICE.drawer) {   /* req 916, the drawer marked Confiscated and Highly Dangerous */
     FOFFICE.taps = (FOFFICE.taps || 0) + 1; if (events) events.tap('dangerous drawer'); else foShake(FOFFICE.taps === 1); kit.tapped(true); return;
   }
