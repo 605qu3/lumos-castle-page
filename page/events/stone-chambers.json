@@ -248,13 +248,14 @@
       "moment": "tap black knight",
       "when": [
         "place = stone chess chamber",
-        "year >= 2"
+        "year >= 2",
+        "giant != on"
       ],
       "show": [
         "the black knight's horse pawing the ground, the knight turning his helmeted head to look down at him, then standing still again"
       ],
       "starts": [],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: a black knight touched: \"He walked up to a black knight and put his hand out to touch the knight's horse. At once, the stone sprang to life. The horse pawed the ground and the knight turned his helmeted head to look down at Ron\" (PS 16 L5902, read in the canon tool, 22 October 2026), then stands still again unless a game is begun (req 911, which adds that condition)"
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: a black knight touched: \"He walked up to a black knight and put his hand out to touch the knight's horse. At once, the stone sprang to life. The horse pawed the ground and the knight turned his helmeted head to look down at Ron\" (PS 16 L5902, read in the canon tool, 22 October 2026), then stands still again unless a game is on (req 911: giant != on)"
     },
     {
       "id": "stone-chambers.potions-in",
