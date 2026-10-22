@@ -302,12 +302,23 @@
     },
     {
       "when": [
-        "place = charms corridor"
+        "place = charms corridor",
+        "year < 2"
       ],
       "show": [
         "the oak door shut across the corridor's end, locked"
       ],
-      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), every year: the end door (the model's forbidden-door; its tap Interaction's §6); behind it nothing, in any year, no sound from it"
+      "canon": "Magic's req 758 (docs/magic/rooms.md, The Charms corridor), the Stone's year and before: the end door (the model's forbidden-door; its tap Interaction's §6); behind it nothing, no sound from it. From the Chamber's castle on it stands open (the next rule)"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "year >= 2"
+      ],
+      "show": [
+        "the oak door across the corridor's end standing open on the forbidden corridor beyond"
+      ],
+      "canon": "The Architect's req 921 (model v153, ledger 219): the forbidden door (`forbidden-door`, between `charms-corridor` and `forbidden-corridor`) stays locked in the Stone's year and opens from the Chamber's castle on (`year >= 2`, as the Stone's chambers, stone-chambers.json), on Godric's ruling of 8.07 am, 22 October 2026 (world-rules.md, What the line guards; set-aside row 48 lifted): the boys may walk the chambers, nothing of Harry's night staged. The door's unlocking is the page's drawing of this rule, not a night's event; the chambers' own lines are Magic's req 913"
     },
     {
       "when": [
