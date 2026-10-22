@@ -3186,7 +3186,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -3383,6 +3383,59 @@ function updateSnapeOffice(dt) {   /* the flames' slow stir */
     var h = f.userData.h * (0.9 + 0.1 * Math.sin(SOFFICE.t * (5 + i) + i * 1.7)); f.scale.set(1, h, 1); f.position.y = f.userData.base + h / 2;
   });
   SOFFICE.light.intensity = 1.4 + 0.12 * Math.sin(SOFFICE.t * 7.3);
+}
+/* req 728 (Events' page/events/hall.json, Interiors' 711, word for word; docs/interiors/entrance-hall.md, items 2 and 7):
+   the Entrance Hall's flags. While the grounds are wet, the muddy puddle just inside the front doors (x 79.2 to 80.8,
+   y 68.6 to 69.6, an uneven round 1.6 by 1.0) and a boy's prints from it toward the Great Hall's doors (68, 60.5), 0.24
+   long, a stride 0.6, fading out over 6 m. From 14 to 31 December, a band 0.8 wide of fir needles from the front doors
+   (80, 69.7) to the Great Hall's doors, thickest at the front doors: four hundred, 3.5 cm long. All 6 mm over the
+   flags (the needles 5 mm, past the seams test's plane), unlit, untappable. ?mud=on, ?needles=on for checks */
+var EH_MUD = "a muddy puddle on the flags just inside the front doors, muddy footprints trailing from it toward the Great Hall's doors and fading out",
+    EH_NEEDLES = "fir needles trailed across the flags from the front doors to the Great Hall's doors, thickest at the front doors";
+var EHALL = (function () {
+  if (PLACE !== 'entrance-hall' || !shell) return null;
+  var z0 = shell.place.floor, L = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  var out = { mud: new THREE.Group(), needles: null };
+  out.mud.name = 'entrance-hall-mud'; scene.add(out.mud);
+  function flat(geo, mat, x, y, z, vx, vy, name) {   /* lying on the flags, its x along the site direction (vx, vy) */
+    var m = new THREE.Mesh(geo, mat), p = L(x, y, z), q = L(x + vx, y + vy, z);
+    m.position.copy(p); m.rotation.set(-Math.PI / 2, 0, Math.atan2(-(q.z - p.z), q.x - p.x));
+    m.name = name; m.userData.owner = 'entrance-hall'; m.raycast = function () {}; return m;
+  }
+  var seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+  /* the puddle: an uneven round, its rim wobbling a little */
+  var sh = new THREE.Shape();
+  for (var k = 0; k <= 32; k++) {
+    var a = k / 32 * Math.PI * 2, w = 1 + 0.08 * Math.sin(3 * a + 0.7) + 0.05 * Math.sin(5 * a + 2.1);
+    if (k === 0) sh.moveTo(0.8 * w * Math.cos(a), 0.5 * w * Math.sin(a)); else sh.lineTo(0.8 * w * Math.cos(a), 0.5 * w * Math.sin(a));
+  }
+  var mudM = new THREE.MeshStandardMaterial({ color: kit.col(0x4a3a28), roughness: 0.25, metalness: 0 });
+  out.mud.add(flat(new THREE.ShapeGeometry(sh), mudM, 80.0, 69.1, 0.006, 1, 0, 'entrance-hall-puddle'));
+  /* the prints: from the puddle's south-west rim toward the Great Hall's doors, left and right, fading */
+  var dx = 68 - 79.4, dy = 60.5 - 68.75, dl = Math.hypot(dx, dy); dx /= dl; dy /= dl;
+  var foot = new THREE.CircleGeometry(0.5, 14);
+  for (var s = 0; s < 10; s++) {
+    var side = s % 2 ? 1 : -1, along = 0.35 + s * 0.6, px = 79.4 + dx * along - dy * side * 0.09, py = 68.75 + dy * along + dx * side * 0.09;
+    var pm = new THREE.MeshStandardMaterial({ color: kit.col(0x4a3a28), roughness: 0.6, metalness: 0, transparent: true, opacity: 0.8 * (1 - s / 10), depthWrite: false });
+    var f = flat(foot, pm, px, py, 0.006, dx, dy, 'entrance-hall-print-' + s); f.scale.set(0.24, 0.09, 1); out.mud.add(f);
+  }
+  /* the needles: thickest at the front doors, thinning toward the Great Hall's doors */
+  var nx = 68 - 80, ny = 60.5 - 69.7, nl = Math.hypot(nx, ny), N = 400, mat4 = new THREE.Matrix4(), e = new THREE.Euler(), qq = new THREE.Quaternion();
+  var nd = new THREE.InstancedMesh(new THREE.BoxGeometry(0.035, 0.003, 0.003), kit.solid(0x2f4a2a), N);
+  for (var i = 0; i < N; i++) {
+    var t = Math.pow(rnd(), 1.8) * 0.97 + 0.01, c = (rnd() - 0.5) * 0.8 * (0.6 + 0.4 * rnd());
+    var p = L(80 + nx * t - (ny / nl) * c, 69.7 + ny * t + (nx / nl) * c, 0.0065);
+    qq.setFromEuler(e.set(0, rnd() * Math.PI, 0)); mat4.compose(p, qq, new THREE.Vector3(1, 1, 1)); nd.setMatrixAt(i, mat4);
+  }
+  nd.name = 'entrance-hall-needles'; nd.userData.owner = 'entrance-hall'; nd.raycast = function () {}; scene.add(nd); out.needles = nd;
+  out.set = function (mud, needles) { out.mud.visible = mud; out.needles.visible = needles; };
+  out.set(Q.get('mud') === 'on', Q.get('needles') === 'on');
+  return out;
+})();
+function ehallShown(shown) {
+  if (!EHALL) return [];
+  EHALL.set(Q.get('mud') === 'on' || shown.indexOf(EH_MUD) >= 0, Q.get('needles') === 'on' || shown.indexOf(EH_NEEDLES) >= 0);
+  return [EH_MUD, EH_NEEDLES].filter(function (s) { return shown.indexOf(s) >= 0; });
 }
 /* req 927 (People's, on req 897 and Godric's 1 on people-painters-sitters-r1-1022; Events' req 928 strings,
    page/events/painters-room.json, word for word): the painters' room's two sitters drawn into their canvases
