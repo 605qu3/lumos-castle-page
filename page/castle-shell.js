@@ -618,6 +618,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (!pts) return;
       /* a doorway with a depth (v6: the Great Hall's doors, a 3 m passage, Godric's Q16) is found from the far face too */
       var e = onEdgeE(E, pts[0], op.depth ? op.depth + 0.2 : null);
+      /* v68 (the shell grotto's cleft, found by the ninety-seventh, req 908's note): on a round room an opening set on the
+         drum's outer face far out (the cleft 3.0 out of the grotto's wall) lands square on no side from there, so,
+         found on none, it is carried in along its bearing onto the circle and cut where it meets the wall; a cleft takes a
+         pane as a window does, its slit of lake light */
+      if (!e && Q.round && pts.length === 1) {
+        var rdx = pts[0][0] - Q.round.c[0], rdy = pts[0][1] - Q.round.c[1], rD = Math.hypot(rdx, rdy);
+        if (rD > Q.round.r && (!op.depth || rD - Q.round.r <= op.depth + 0.2)) e = onEdgeE(E, [Q.round.c[0] + rdx / rD * Q.round.r, Q.round.c[1] + rdy / rD * Q.round.r]);
+      }
       if (!e) return;
       var s0, s1;
       /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
@@ -829,7 +837,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         /* v15: the rest of an opening cut over a corner; v67 (Fawkes's look at architect-window-views-1022b: McGonagall's
            and Dumbledore's windows black either side of the glass): a window's rest takes its own pane on its own side,
            else that part of the cut stood open on the dark */
-        if (g.spill) { if (!g.back && /window|loop|lancet|oriel|dormer/.test(g.op.kind || '')) pane(g, '-' + i); return; }
+        if (g.spill) { if (!g.back && /window|loop|lancet|oriel|dormer|cleft/.test(g.op.kind || '')) pane(g, '-' + i); return; }
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
@@ -899,7 +907,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           group.add(fill);
           out.ways.push({ id: g.op.id, to: to, mesh: fill, w: w, h: hh, mid: mid, inward: inward, place: Q.id, at: [a[0] + ux * sm, a[1] + uy * sm],
             sill: g.sill, lift: lift, level: level, back: g.back, via: !!via, depth: g.op.depth || 0 });
-        } else if (!g.back && /window|loop|lancet|oriel|dormer/.test(g.op.kind || '')) {
+        } else if (!g.back && /window|loop|lancet|oriel|dormer|cleft/.test(g.op.kind || '')) {
           /* v54 (Design's find, 21 October 2026, 11.23 am: the oriel's lights black at noon): nothing is drawn beyond a
              shell's window, so each takes a pane of sky 3 cm inside its outer face, the day's colour (shell.html turns it
              to the night's), unlit and untappable: daylight in the opening, not a lamp */
