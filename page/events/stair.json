@@ -755,6 +755,88 @@
       "starts": []
     },
     {
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "after tap stair 3-6 s",
+      "id": "stair.hint-other-days",
+      "one_of": "stair-hint",
+      "weight": 1,
+      "when": [
+        "place = corridor",
+        "time != night",
+        "weekday != friday",
+        "days since stair_hint_on >= 7"
+      ],
+      "who": [
+        {
+          "as": "pupil",
+          "role": "voice",
+          "name": "a first-year on the flight above",
+          "mark": "up the flight"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pupil",
+          "medium": "heard",
+          "key": "stair.hint-other-days",
+          "sound": "a first-year's voice from the flight above, cheerful and not stopping",
+          "text": [
+            "Mind that flight on a Friday. It goes somewhere different.",
+            "It's only odd on a Friday. Other days it behaves. Mostly.",
+            "My cousin says it never ends up in the same place on a Friday. I'm not testing it.",
+            "Don't count on that flight on a Friday, that's all I'm saying."
+          ],
+          "canon": "PS 8, \"some that led somewhere different on a Friday\", the staircases (B1 ch8 L2722 in the canon tool; the Orchestrator cites it as hp1 L2437); checked against the text, 22 October 2026; the pupil's words ours (req 936, Story's Year 1 small wins, item 2: a pupil nearby gives the hint, Godric's all-kept of 22 October 2026, 2.13 pm; the day is Friday, never Thursday)"
+        }
+      ],
+      "starts": [
+        "stamp stair_hint_on"
+      ]
+    },
+    {
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "after tap stair 3-6 s",
+      "id": "stair.hint-friday",
+      "one_of": "stair-hint",
+      "weight": 1,
+      "when": [
+        "place = corridor",
+        "time != night",
+        "weekday = friday",
+        "days since stair_hint_on >= 7"
+      ],
+      "who": [
+        {
+          "as": "pupil",
+          "role": "voice",
+          "name": "a first-year on the flight above",
+          "mark": "up the flight"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pupil",
+          "medium": "heard",
+          "key": "stair.hint-friday",
+          "sound": "a first-year's voice from the flight above, cheerful and not stopping",
+          "text": [
+            "It's Friday. That flight goes somewhere different on a Friday.",
+            "Different on a Friday, that flight. Ask anyone.",
+            "Don't be cross with it. It can't help it, it's Friday.",
+            "Told you. Fridays it takes you somewhere else."
+          ],
+          "canon": "PS 8, \"some that led somewhere different on a Friday\", the staircases (B1 ch8 L2722 in the canon tool; the Orchestrator cites it as hp1 L2437); checked against the text, 22 October 2026; the pupil's words ours (req 936, Story's Year 1 small wins, item 2: a pupil nearby gives the hint, Godric's all-kept of 22 October 2026, 2.13 pm; the day is Friday, never Thursday)"
+        }
+      ],
+      "starts": [
+        "stamp stair_hint_on"
+      ]
+    },
+    {
       "id": "stair.torch-rise",
       "tier": "fixed",
       "source": "device",
