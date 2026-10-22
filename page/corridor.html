@@ -3969,6 +3969,9 @@ function updateFilchFigure(dt) {
 /* the catch (req 915): 'march', he follows the lamp down the flight and Filch opens his own door for him this once
    (shell.html's office, the records carrying office_catch = held); 'off', waved on, the lamp goes back down and he stays.
    The walk down is not his to steer (Interaction's, asked); for now one glide to the landing under the lamp */
+function mcgonagallPasses(cue) {   /* the cue's own handler, its words told */
+  return function () { showLines([{ medium: 'heard', speaker: 'mcgonagall', sound: cue }]); caught('mcgonagall'); };
+}
 function caught(how) {
   if (!chase.on) return;
   chase.on = false;
@@ -3978,7 +3981,7 @@ function caught(how) {
   var since = Date.now();
   setTimeout(function wait() {
     if ((lineCur || lineQ.length) && Date.now() - since < CHASE.linesMax * 1000) { setTimeout(wait, 100); return; }
-    if (how === 'off') { chase.lamp = 'down'; return; }
+    if (how === 'off' || how === 'mcgonagall') { chase.lamp = 'down'; return; }
     chase.lamp = 'down';
     headReset(); atStop = landingStop; mode = 'stop';
     glideTo(landingStop.stop(), function () {
@@ -5522,6 +5525,10 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the knitting witch looks up at him over her spectacles, then whispers behind one hand with a knitting needle pointed his way, a soft whisper with no words made out, and goes back to her knitting': knitWhisper,
     /* the polite door's tickle and please (req 150; Events' door.json): the giggle's strength is the page's, from the tap */
     "the door's wood shivers and gives a creaky giggle, louder the nearer the tap to its ticklish spot": function () { doorGiggle(); },
+    /* the first miss after his rumour (req 966 (3); Events' door.json): no giggle, the wood quite still */
+    'he pushes at the door with a flat hand and it does not give, not a creak, as if it were waiting for something': function () {
+      showLines([{ medium: 'heard', speaker: 'door', sound: 'he pushes at the door with a flat hand and it does not give, not a creak, as if it were waiting for something' }]);
+    },
     'the door laughs and swings open on what is behind it, then shuts itself after a few seconds': function () { doorSwings('the door laughs'); },
     'the door swings open with a dignified creak on what is behind it, then shuts itself after a few seconds': function () { doorSwings('a dignified creak'); },
     /* the grounds (req 115, Events' grounds.json): the snowball; the field and the lake are not in this window's view */
@@ -5561,6 +5568,12 @@ var castle = window.CastleEvents ? CastleEvents.start({
        heard, then the march (endings 1 and 2) or the let-off (3). The records have set chase off, so no end is raised */
     'Filch lifts his lamp over the boy, peers at him and jerks his head at the stairs; the boy follows him down, Mrs Norris padding behind': function () { caught('march'); },
     'Filch lifts his lamp over the boy, looks him up and down, sniffs and waves him on; the lamp goes back down the stairs, Mrs Norris with it': function () { caught('off'); },
+    /* McGonagall passing, the rare fourth ending (req 966 (1); Events' filch.catch-mcgonagall, -night, -late; Godric's 1
+       on events-catch-fourth-ending-1022): his lamp over the boy as at the others (his cell 3), then away down the
+       stairs as at the let-off; she is not drawn yet (People's req 967), so she is told; no office, the turn kept */
+    'Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it': mcgonagallPasses('Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it'),
+    'Professor McGonagall coming along the corridor on her rounds in a tartan bathrobe and a hair net, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it': mcgonagallPasses('Professor McGonagall coming along the corridor on her rounds in a tartan bathrobe and a hair net, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it'),
+    'Professor McGonagall coming along the corridor late on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it': mcgonagallPasses('Professor McGonagall coming along the corridor late on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it'),
     /* befriending Mrs Norris (req 933 (a); Events' norris.json, its hundred-twenty-fifth paragraph's cues word for word) */
     "he crouches and sets a bit of his breakfast on the flags; Mrs Norris's lamp-like eyes watch it and hold off while he is near": function () {
       norrisScrapDown(); norrisLine("he crouches and sets a bit of his breakfast on the flags; Mrs Norris's lamp-like eyes watch it and hold off while he is near");
