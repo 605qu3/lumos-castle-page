@@ -4319,7 +4319,9 @@ var GIANT = !BOARD ? null : (function () {
    `giant lost`, `giant drawn`; each cue below is Events' string word for word and does the moving, and where no
    record fires the page moves the pieces itself, without a line. A taken piece walks to the chamber's wall (black's
    along the north, white's along the south) and stands there; nothing is smashed, dragged or lying still, and nothing
-   glows. The kept position lives for the page only (a var the page can write is asked of Events) */
+   glows. The kept position (req 954, Events' aaea0025): after every move the page keeps `kept_giant`, the boys' count
+   and the moves so far, four characters a move ("2|e2e4g8f6..."); the resume cue rebuilds the board from it at once,
+   every piece on its square and the taken at the wall, and the game goes on from there (no position: a fresh one) */
 var G_TOGETHER = 'a black knight and a black bishop turning their backs on the white pieces and walking off the board, leaving two empty squares that the boys take',
     G_ALONE = 'a black knight turning his back on the white pieces and walking off the board, leaving an empty square that the boy takes',
     G_PAWN = 'the white pawn moving forward two squares',
@@ -4428,13 +4430,44 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   });
   reset(true);
 
-  function begin(together, resume) {
-    o.game = lumosChess.create(); o.on = true;
+  function keepIt() {   /* req 954: the position kept with the chain's vars, so a visit cut short comes back to it */
+    if (!events || !events.keep) return;
+    var t = (o.boys.length > 1 ? '2' : '1') + '|' + o.log.join('');
+    if (t.length <= 600) events.keep('kept_giant', t);
+  }
+  function kept() {   /* the kept position read back: null when none (undefined, 'none' or not ours) */
+    var t = events && events.read ? events.read('kept_giant') : null;
+    var m = typeof t === 'string' ? /^([12])\|((?:[a-h][1-8][a-h][1-8])*)$/.exec(t) : null;
+    return m ? { together: m[1] === '2', moves: m[2].match(/.{4}/g) || [] } : null;
+  }
+  function replay(moves) {   /* the kept moves played at once, each piece straight to its square, the taken to the wall */
+    moves.forEach(function (mv) {
+      var from = mv.slice(0, 2), to = mv.slice(2), boy = boyAt(from), p = o.at[from], m = o.game.move(from, to);
+      if (!m) return;
+      o.log.push(mv); o.at[from] = null;
+      if (m.taken) {
+        var tb = boyAt(m.taken.sq), v = o.at[m.taken.sq]; o.at[m.taken.sq] = null;
+        if (tb) tb.off = true;
+        else if (v) { var w = wallSpot(v.userData.giant.side); v.position.copy(w); v.rotation.y = yawTo(w, shell.toLocal(101, 55, z0)); }
+      }
+      if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; r.position.copy(sqPos(m.rook.to)); }
+      if (boy) boy.sq = to;
+      else { p.position.copy(sqPos(to)); o.at[to] = p; if (m.queen) swapKind(p, 'q'); }
+    });
+  }
+  function begin(together, resume, moves) {
+    o.game = lumosChess.create(); o.on = true; o.log = [];
     o.boys = [{ sq: 'g8', kind: 'n' }].concat(together ? [{ sq: 'f8', kind: 'b' }] : []);
     reset(resume);
     var off = o.boys.map(function (b) { var p = o.at[b.sq]; o.at[b.sq] = null; return p; });
     if (resume) off.forEach(function (p) { var to = wallSpot('black'); p.position.copy(to); p.rotation.y = yawTo(to, shell.toLocal(101, 55, z0)); });
     else off.forEach(function (p) { toWall(p); });
+    if (moves && moves.length) {
+      replay(moves);
+      walkEye(o.boys[0].off ? null : o.boys[0].sq, o.boys[0].off ? wallSpot('black') : null);
+      if (o.game.turn() === 'white') call(function () { if (!ended()) white(false); });
+      return;
+    }
     walkEye(o.boys[0].sq);
     white(true, resume);
   }
@@ -4445,6 +4478,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
       var from = two[Math.floor(Math.random() * two.length)]; m = o.game.move(from, from[0] + '4');
     } else { var b = o.game.best(o.level); m = b && o.game.move(b.from, b.to); }
     if (!m) return;
+    o.log.push(m.from + m.to); keepIt();
     var p = o.at[m.from]; o.at[m.from] = null;
     if (m.taken) {
       var boy = boyAt(m.taken.sq);
@@ -4472,6 +4506,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   function blackMove(from, to) {
     var boy = boyAt(from), p = o.at[from], m = o.game.move(from, to);
     if (!m) return;
+    o.log.push(from + to); keepIt();
     o.at[from] = null; o.sel = o.pending = null;
     if (m.taken) { var v = o.at[m.taken.sq]; o.at[m.taken.sq] = null; if (v) toWall(v); }
     if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; walkers([{ p: r, to: sqPos(m.rook.to) }]); }
@@ -4535,7 +4570,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   allCues[G_ALONE] = function () { begin(false, false); line(G_ALONE); };
   allCues[G_PAWN] = function () { line(G_PAWN); };   /* the pawn's stride is begin's, queued after the walk off */
   allCues[G_RESUME] = function () {
-    if (!o.on) begin(o.together, true);
+    if (!o.on) { var k = kept(); if (k) { o.together = k.together; begin(k.together, true, k.moves); } else begin(o.together, true); }
     var bl = []; for (var s in o.at) { var p = o.at[s]; if (p && p.userData.giant.side === 'black') bl.push(p); }
     bl.forEach(function (p) { turnHead(p, camera.position); });
     line(G_RESUME);
@@ -4629,6 +4664,8 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     start: function (together) { o.together = !!together; o.first = GIANT.pieces[0]; raise(); },
     play: function (from, to) { if (o.on && o.game.turn() === 'black') tryMove(from, to); return api.state(); },
     square: function (sq) { return sqPos(sq); },
+    kept: function () { return events && events.read ? events.read('kept_giant') : null; },   /* req 954, for checks */
+    log: function () { return (o.log || []).join(' '); },
     ending: function (n) { if (o.on) finish('giant ' + n); return api.state(); },   /* won, lost or drawn, for checks */
     legal: function () {   /* black's moves now, for checks */
       if (!o.game || o.game.turn() !== 'black') return [];
