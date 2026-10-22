@@ -190,8 +190,8 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-ear.js?v=2"></script>
-<script src="castle-events.js?v=38"></script>
+<script src="castle-ear.js?v=5"></script>
+<script src="castle-events.js?v=39"></script>
 <script src="castle-map.js?v=2"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/spells.js?v=41"></script>
@@ -3535,7 +3535,7 @@ function updateNorris(dt) {
     if (k > NORRIS.hold + 0.2) { norris.t = -1; norris.group.visible = false; }
     return;
   }
-  if ((nightK() < 1 && !norris.look) || norrisSits()) { norris.next = 0; return; }   /* not two of her at once */
+  if ((nightK() < 1 && !norris.look) || norrisSits() || chase.on || chase.whisk) { norris.next = 0; return; }   /* not two of her at once */
   if (!norris.next) {
     if (norris.tried && !norris.look) return;            /* once a visit */
     norris.tried = true;
@@ -3662,9 +3662,107 @@ function updateFilch(dt) {
     if (k >= 1) { filch.t = -1; filch.light.intensity = 0; filch.light.position.y = -10; }
     return;
   }
-  if (filch.done || !filchHides() || tween) { filch.wait = 0; return; }
+  if (filch.done || chase.on || !filchHides() || tween) { filch.wait = 0; return; }   /* never during a chase (req 881 (6)) */
   if ((filch.wait += dt) >= FILCH.linger && filchDay()) filchPass();
 }
+/* The chase (req 881, the page half of Events' req 879; the records are page/events/filch.json's filch.chase-*; Godric's
+   1 on events-filch-chase-1021, both triggers; the world rules: he never catches them, and nothing is harmed). Mrs Norris
+   stares, then whisks off down the stairs: at a toe out of line in front of her (the cupboard's handle tried while she
+   sits before it, a knock on the armour while her eyes show) or on her own after dark, the records' to draw. The chase's
+   clock starts at her whisk: at 2 s his wheeze comes up the stairs, at 5 s his lamp climbs the steps, at 8 s he is at the
+   top. Hidden (filchHides), his lamp swings slowly along the corridor to her end and back down, never turning; in the
+   open he stops at the top getting his breath, never nearer, and the moment the boy hides the records hear `filch at
+   top` again and he shuffles past. Home through her frame ends it with his grumble fading through it; Back ends it too,
+   the boy slipping down past him as his lamp goes back down the flight (Interaction's flag 1 on req 882), and so does a
+   whisk while his day pass is still walking (that start declined), each `filch gone`. One lamp, the pass's own. Three
+   calls the row leaves to the page are provisional, Godric to confirm: the declined start, Back as an end, and the
+   hidden pass ending in `filch gone` once his lamp is down the flight. The caught-in-the-open branch is not built
+   (the catch is on Godric's desk). For a look: ?event=filch.chase-night&wait=0&time=night */
+var CHASE = { wheeze: 2, lamp: 5, top: 8, climb: 3, topX: STAIR_X - 0.45, endX: END_X - 0.6, stare: 1.2, run: 4.5, fade: 1.5 };
+var chase = { on: false, t: 0, wheezed: false, lamped: false, topped: false, again: false, lamp: 'none', lk: 0, x: 0, y: 0, back: false,
+  whisk: null, passT: 0 };
+var WHISK_CUE = 'Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs';
+function chaseHides() { return filchHides() && !tween; }   /* only once he is there, not on the way */
+function stairY(x) { return x >= STAIR_X ? 0 : Math.max(FOOT_Y, (x - STAIR_X) / STEP_RUN * STEP_RISE); }
+function chaseWhisk() {
+  if (chase.on) return;
+  if (filch.t >= 0 || leaving || view !== 'length') { castle.moment('filch gone'); return; }   /* a start declined: his pass is walking */
+  chase.on = true; chase.t = 0; chase.wheezed = chase.lamped = chase.topped = chase.again = chase.back = false; chase.lamp = 'none'; chase.lk = 0;
+  /* where she stares from: before the cupboard, at the end's glints, or a little ahead of him on the flags */
+  var from;
+  if (norrisDoor.group.visible && norrisDoor.a > 0.05) from = norrisDoor.group.position.clone();
+  else if (norris.t >= 0) from = norris.group.position.clone();
+  else {
+    var d = new THREE.Vector3(); camera.getWorldDirection(d); d.y = 0; d.normalize();
+    from = camera.position.clone().addScaledVector(d, 2.6);
+    from.x = clamp(from.x, STAIR_X + 0.6, END_X - 0.5); from.z = clamp(from.z, FAR_Z + 0.4, HER_Z - 0.4);
+  }
+  from.y = NORRIS.y;
+  norris.t = -1; norris.group.visible = false;
+  norrisDoor.state = 'whisk'; norrisDoor.a = 1;   /* her cupboard watch ends here; updateNorrisDoor leaves her to the whisk */
+  var head = new THREE.Vector3(STAIR_X + 0.2, NORRIS.y, MID_Z), foot = new THREE.Vector3(FOOT_X + 0.4, NORRIS.y + FOOT_Y, MID_Z);
+  chase.whisk = { k: 0, path: [from, head, foot], len: from.distanceTo(head) + head.distanceTo(foot) };
+}
+function updateWhisk(dt) {
+  var w = chase.whisk;
+  if (!w) return;
+  w.k += dt;
+  var g = norrisDoor.group, d = Math.max(0, w.k - CHASE.stare) * CHASE.run, p = w.path, l0 = p[0].distanceTo(p[1]), a = 1;
+  if (d < l0) g.position.lerpVectors(p[0], p[1], d / l0);
+  else g.position.lerpVectors(p[1], p[2], Math.min(1, (d - l0) / Math.max(0.01, w.len - l0)));
+  if (d > l0) g.position.y = NORRIS.y + stairY(g.position.x);
+  if (d >= w.len) a = Math.max(0, 1 - (d - w.len) / (CHASE.run * 0.3));
+  var shut = w.k > 0.6 && w.k < 0.73;   /* one blink while she stares */
+  g.lookAt(camera.position); g.visible = a > 0;
+  g.children.forEach(function (e) {
+    var cat = e.name === 'norris-door-cat';
+    e.material.opacity = (shut && !cat ? 0 : a) * e.userData.peak;
+  });
+  if (a <= 0) { chase.whisk = null; g.visible = false; norrisDoor.state = 'gone'; }
+}
+function chaseLampAt(x, y, k) {
+  chase.x = x; chase.y = y; chase.lk = k;
+  filch.light.position.set(x + LAMP.sway * Math.sin(t * LAMP.step), y + LAMP.height + LAMP.bob * Math.sin(t * LAMP.step * 2), MID_Z);
+  filch.light.intensity = LAMP.intensity * k * CastleLight.flicker(t, FILCH.seed, 0.06);
+}
+function chaseEnd(how) {   /* 'home' through her frame, or 'gone' */
+  if (!chase.on) return;
+  chase.on = false;
+  if (chase.lamp !== 'none') chase.lamp = 'down';
+  /* his lines still waiting go unheard, and one he is saying ends, so his grumble home is heard next, through her frame */
+  var his = function (l) { return l.speaker === 'filch' || /^filch\.chase/.test(l.key || ''); };
+  lineQ = lineQ.filter(function (l) { return !his(l); });
+  if (lineCur && his(lineCur.line)) lineCur.t = Math.min(lineCur.t, 0.35);
+  if (castle && castle.moment) castle.moment(how === 'home' ? 'filch grumbles off' : 'filch gone');
+}
+function updateChase(dt) {
+  updateWhisk(dt);
+  if (chase.on) {
+    chase.t += dt;
+    if (!chase.wheezed && chase.t >= CHASE.wheeze) { chase.wheezed = true; castle.moment('filch wheezes'); }
+    if (chase.on && !chase.lamped && chase.t >= CHASE.lamp) { chase.lamped = true; castle.moment('filch lamp'); }
+    if (chase.on && !chase.topped && chase.t >= CHASE.top) { chase.topped = true; castle.moment('filch at top'); }
+    /* in the open he waits at the top; the moment the boy hides the records hear him again, and he shuffles past */
+    if (chase.on && chase.lamp === 'top' && !chase.again && chaseHides()) { chase.again = true; castle.moment('filch at top'); }
+  }
+  var L = chase.lamp;
+  if (L === 'climb') {   /* up the flight from the stair hall's side, the light growing */
+    var u = Math.min(1, (chase.t - CHASE.lamp) / CHASE.climb), x = FOOT_X - 0.6 + (CHASE.topX - FOOT_X + 0.6) * u;
+    chaseLampAt(x, stairY(x), u);
+    if (u >= 1) chase.lamp = 'top';
+  } else if (L === 'top') chaseLampAt(CHASE.topX, stairY(CHASE.topX), 1);
+  else if (L === 'pass') {   /* along to her end and back, never turning, then down the flight */
+    var s = (chase.passT += dt) * FILCH.speed, run = CHASE.endX - CHASE.topX, px;
+    if (s < run) px = CHASE.topX + s; else if (s < 2 * run) px = CHASE.endX - (s - run); else px = CHASE.topX - (s - 2 * run);
+    chaseLampAt(px, stairY(px), px > FOOT_X ? 1 : Math.max(0, 1 - (FOOT_X - px) / 0.8));
+    if (px <= FOOT_X - 0.8) { chase.lamp = 'none'; chaseOff(); chaseEnd('gone'); }
+  } else if (L === 'down') {   /* gone: back down the flight, fading */
+    var dx = chase.x - FILCH.speed * dt, k = Math.max(0, chase.lk - dt / CHASE.fade);
+    chaseLampAt(dx, stairY(dx), k);
+    if (k <= 0) { chase.lamp = 'none'; chaseOff(); }
+  }
+}
+function chaseOff() { filch.light.intensity = 0; filch.light.position.y = -10; }
 /* REWORKED (Rework 10, req 418, req 249's carried item; 15 October 2026): one rule, the Architect's ledger line 6 as
    reworded: the hut's window is lit by its own fire on evenings by the real clock, never as a plot beat. So every dark
    visit his window is already lit when the view is first seen, and nothing comes on. The dark nights and the light
@@ -4109,6 +4207,7 @@ function goTo(s) {
 function goBack() {
   lockDrop(); humpDrop();
   if (mode !== 'stop') return;
+  chaseEnd('gone');   /* he slips down past Filch, whose lamp goes back down the flight (req 881 (4)) */
   /* from her, back to the landing she stands beyond, not up the flight through the walls */
   if (atStop && atStop.name === 'witch') { headReset(); atStop = landingStop; glideTo(landingStop.stop()); return; }
   /* up from the landing (req 59) he turns round as he climbs, the drag's turn in reverse, rather than the look
@@ -4145,9 +4244,13 @@ function enter(dry, url, room) {
   }
   function swing() {
     herDoor.target = DOOR_OPEN;
+    /* home with the chase running (req 881 (4)): his grumble fades through her frame, heard before the room comes up */
+    var chased = chase.on, since = Date.now();
+    chaseEnd('home');
     setTimeout(function () {
       glideTo({ pos: C.holeToCorridor(0, HOLE_Y, -0.3), look: C.holeToCorridor(0, HOLE_Y, 6), fov: FOV_REST });
-      setTimeout(function () {
+      setTimeout(function go() {
+        if (chased && (lineCur || lineQ.length) && Date.now() - since < 5000) { setTimeout(go, 100); return; }
         kit.travel(url, { place: { room: room }, dry: dry, done: function () {
           leaving = false; herDoor.target = 0; atStop = null; mode = 'stop'; goTo(herStop);
         } });
@@ -5185,6 +5288,20 @@ var castle = window.CastleEvents ? CastleEvents.start({
     "the right painting's sitter in the painting opposite the hole, caught, turns and slips out through its painted door as he steps out": function () { oppMoment('slip', 'right'); },
     "the right painting's sitter standing in the painting opposite the hole, paying him no mind": function () { oppMoment('stays', 'right'); },
     'it turns its back on him, annoyed, and stays so until he has been out': function () { armourJiggle = 0.6; },
+    /* the chase (req 881; Events' filch.json, req 879): her whisk starts its clock; the wheeze and the lamp are heard
+       and lit, never a figure */
+    [WHISK_CUE]: chaseWhisk,
+    'a wheeze coming up the stairs from the stair hall, still out of sight': function () {
+      showLines([{ medium: 'heard', speaker: 'filch', sound: 'a wheeze coming up the stairs from the stair hall, still out of sight' }]);
+    },
+    'lamplight climbing the steps, the wheezing nearer': function () {
+      if (chase.on) chase.lamp = 'climb';
+      showLines([{ medium: 'heard', speaker: 'filch', sound: 'lamplight climbing the steps, the wheezing nearer' }]);
+    },
+    'Filch stopped at the top of the stairs with his lamp held up, wheezing and getting his breath': function () { if (chase.on) chase.lamp = 'top'; },
+    "Filch's lamp swinging slowly along the corridor, never turning, on to the Fat Lady's end and back to the stairs": function () {
+      if (chase.on) { chase.lamp = 'pass'; chase.passT = 0; }
+    },
     /* Neville locked out (req 297): his quill given back, and the night he pats his pockets */
     [NEV_CUE.quill]: function () { neville.clearAt = t; },
     [NEV_CUE.pockets]: function () { if (SET_ASIDE) neville.patAt = t; },   /* PoA 12's lost list, set aside */
@@ -5260,7 +5377,12 @@ var castle = window.CastleEvents ? CastleEvents.start({
        so the record never sets owl_landed for the night with nothing shown (Fawkes, Q28, 11 October 2026) */
     'moon in view': function () { return 'no'; },
     /* Mrs Norris sat before the broom cupboard (Events' ask on req 454, 5.16 pm: Filch's cupboard mutter) */
-    norris: function () { return norrisSits() ? 'cupboard' : 'none'; },
+    norris: function () {
+      if (norrisSits()) return 'cupboard';
+      /* her eyes in view in the dark, any time they show (req 881 (1)): the end's glints, or slinking off from the cupboard */
+      return norris.t >= 0 || (norrisDoor.state === 'slinks' && norrisDoor.group.visible) ? 'watching' : 'none';
+    },
+    hiding: function () { return chaseHides() ? 'yes' : 'no'; },   /* at a hiding place, arrived (req 881 (1)) */
     spell: function () { return castSpell; } }
 }) : null;
 
@@ -5351,6 +5473,7 @@ function frame() {
   updateNickHome(wdt);
   updateCupboard(wdt);
   updateFilch(wdt);
+  updateChase(wdt);
   updateVisorLight();
   updateCandleStub();
   updateFredScrap();
@@ -5386,7 +5509,7 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { knit: function () { return { now: PORTRAIT_B.now, hold: KNIT.hold, release: +KNIT.release.toFixed(1), pass: !!KNIT.pass, passUntil: +KNIT.passUntil.toFixed(1), whisper: +KNIT.whisper.toFixed(1), t: +t.toFixed(1) }; }, herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { runtime: function () { return castle; }, chase: function () { return { on: chase.on, t: +chase.t.toFixed(1), lamp: chase.lamp, x: +chase.x.toFixed(2), k: +chase.lk.toFixed(2), whisk: !!chase.whisk, hiding: chaseHides() }; }, knit: function () { return { now: PORTRAIT_B.now, hold: KNIT.hold, release: +KNIT.release.toFixed(1), pass: !!KNIT.pass, passUntil: +KNIT.passUntil.toFixed(1), whisper: +KNIT.whisper.toFixed(1), t: +t.toFixed(1) }; }, herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
