@@ -1548,6 +1548,164 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (!rk) return;
     o.userData.rank = rk; o.onBeforeRender = rankOn; o.onAfterRender = rankOff;
   });
+  if (out.panes.length && F.renderer && o.far) out.far = farView(F, M, toLocal, out.panes, mats.pane);
   return out;
 } };
+
+/* v62 (Godric's 1 on the window views, 22 October 2026; docs/architect/window-views.md): what a window looks out on,
+   drawn from the model in plain tones. The grounds (the lake under its crag, the lawns, the forest, the pitch, the
+   greenhouses, the cabin), the castle's masses with their roofs and its towers, and far hills, are built once into a
+   scene of their own in the place's frame, unfogged, and rendered into a cube from the place's middle at the eye
+   (+1.35); every pane samples that cube along the line of sight (refraction at ratio 1), so the glass shows what lies
+   that way. One cube for the place: no parallax as he walks (the pitch at 300 m holds; a court's far side at 30 m does
+   not slide), a cube per window the step up. far.night(true) redraws it by night. The tones are Design's when its
+   tones.js names them (far-lawn, far-water-day, far-water-night, far-forest, far-hills, far-stone, far-rock,
+   far-roof), else these, provisional. */
+function farView(F, M, toLocal, panes, paneMat) {
+  var LAWN = -1.2, LAKE = -46.0, BASE = -20.0;      /* tools/architect-sections-pdf.py's lawn and lake; the castle's foot */
+  var FALL = { 'far-lawn': 0x7d8a5c, 'far-pitch': 0x8d9a64, 'far-water-day': 0x6f8797, 'far-water-night': 0x141b24,
+    'far-forest': 0x3a4630, 'far-hills': 0x7c8794, 'far-stone': 0xa9a194, 'far-rock': 0x8b8478, 'far-roof': 0x5f6670,
+    'far-glass': 0xc9d2d8, 'far-timber': 0x6e4c30, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
+  var S = window.CASTLE_TONES && CASTLE_TONES.surfaces;
+  function hex(k) { return S && S[k] && S[k].hex ? new THREE.Color(S[k].hex) : new THREE.Color(FALL[k]); }
+  var scene = new THREE.Scene(), mats = {};
+  function mat(k) { if (!mats[k]) mats[k] = new THREE.MeshLambertMaterial({ color: hex(k).convertSRGBToLinear() }); return mats[k]; }
+  function V(x, y, z) { return toLocal(x, y, z); }
+  function add(geo, k) { var m = new THREE.Mesh(geo, mat(k)); scene.add(m); return m; }
+  function shape(pts) { return new THREE.Shape(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); })); }
+  /* a flat shape at z, in the castle's plan (x east, y north), laid into the place's frame */
+  function flat(sh, z, k) {
+    var g = new THREE.ShapeGeometry(sh, 24), a = g.attributes.position;
+    for (var i = 0; i < a.count; i++) { var v = V(a.getX(i), a.getY(i), z); a.setXYZ(i, v.x, v.y, v.z); }
+    g.computeVertexNormals(); var m = add(g, k); m.material.side = THREE.DoubleSide; return m;
+  }
+  /* a solid from a plan outline, z0 to z1 */
+  function prism(pts, z0, z1, k) {
+    var pos = [], n = pts.length;
+    for (var i = 0; i < n; i++) {
+      var p = pts[i], q = pts[(i + 1) % n], a = V(p[0], p[1], z0), b = V(q[0], q[1], z0), c = V(q[0], q[1], z1), d = V(p[0], p[1], z1);
+      pos.push(a, b, c, a, c, d);
+    }
+    var g = new THREE.BufferGeometry().setFromPoints(pos); g.computeVertexNormals();
+    var m = add(g, k); m.material.side = THREE.DoubleSide; flat(shape(pts), z1, k); return m;
+  }
+  function rect(r) { return [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]]; }
+  function circ(c, r, n) { var o = []; for (var i = 0; i < n; i++) { var t = i / n * Math.PI * 2; o.push([c[0] + r * Math.cos(t), c[1] + r * Math.sin(t)]); } return o; }
+  /* a pitched roof over a rect: hip (ridge short of the ends by half the span), gable or crow (to the ends) */
+  function roof(r, e, h, kind) {
+    if (!(h > e + 0.05) || kind === 'flat') return;
+    var x0 = r[0], y0 = r[1], x1 = r[2], y1 = r[3], alongX = (x1 - x0) >= (y1 - y0), half = (alongX ? y1 - y0 : x1 - x0) / 2;
+    var inset = kind === 'hip' ? Math.min(half, (alongX ? x1 - x0 : y1 - y0) / 2 - 0.01) : 0, pos = [];
+    var A = V(x0, y0, e), B = V(x1, y0, e), C = V(x1, y1, e), D = V(x0, y1, e), R0, R1;
+    if (alongX) { R0 = V(x0 + inset, (y0 + y1) / 2, h); R1 = V(x1 - inset, (y0 + y1) / 2, h); pos.push(A, B, R1, A, R1, R0, C, D, R0, C, R0, R1, D, A, R0, B, C, R1); }
+    else { R0 = V((x0 + x1) / 2, y0 + inset, h); R1 = V((x0 + x1) / 2, y1 - inset, h); pos.push(B, C, R1, B, R1, R0, D, A, R0, D, R0, R1, A, B, R0, C, D, R1); }
+    var g = new THREE.BufferGeometry().setFromPoints(pos); g.computeVertexNormals();
+    var m = add(g, 'far-roof'); m.material.side = THREE.DoubleSide;
+  }
+  function cone(c, r, z0, z1) {
+    var g = new THREE.ConeGeometry(r * 1.08, z1 - z0, 24, 1, true), m = add(g, 'far-roof'), p = V(c[0], c[1], (z0 + z1) / 2);
+    m.position.copy(p); m.material.side = THREE.DoubleSide;
+  }
+
+  /* the ground: the lawns at their level round the lake's hole; the lake's water, its banks sloping up to the lawns
+     (steep where the model's shore is cliff or rock, long where it is grass, glen, shrub, forest, pebble or bay) */
+  var lake = (M.grounds || []).filter(function (g) { return g.id === 'lake'; })[0], ring = null;
+  if (lake && lake.shape && lake.shape.poly) {
+    var lp = lake.shape.poly, sh = lake.shores || [], lc = [0, 0];
+    lp.forEach(function (p) { lc[0] += p[0] / lp.length; lc[1] += p[1] / lp.length; });
+    function kindAt(i) { var k = 'grass'; sh.forEach(function (s) { if (i >= s[1]) k = s[0]; }); return k; }
+    ring = lp.map(function (p, i) {
+      var dx = p[0] - lc[0], dy = p[1] - lc[1], d = Math.hypot(dx, dy) || 1, k = kindAt(i), w = /cliff|rock/.test(k) ? 6 : 40;
+      return [p[0] + dx / d * w, p[1] + dy / d * w];
+    });
+    var ground = shape([[-4000, -4000], [4000, -4000], [4000, 4000], [-4000, 4000]]);
+    ground.holes.push(new THREE.Path(ring.map(function (p) { return new THREE.Vector2(p[0], p[1]); })));
+    flat(ground, LAWN, 'far-lawn');
+    var water = flat(shape(lp), LAKE + 0.5, 'far-water-day'); water.name = 'far-water';
+    var pos = [], n = lp.length;
+    for (var i = 0; i < n; i++) {
+      var j = (i + 1) % n, a = V(lp[i][0], lp[i][1], LAKE), b = V(lp[j][0], lp[j][1], LAKE), c = V(ring[j][0], ring[j][1], LAWN), d = V(ring[i][0], ring[i][1], LAWN);
+      pos.push(a, b, c, a, c, d);
+    }
+    var bank = new THREE.BufferGeometry().setFromPoints(pos); bank.computeVertexNormals();
+    add(bank, 'far-rock').material.side = THREE.DoubleSide;
+  } else flat(shape([[-4000, -4000], [4000, -4000], [4000, 4000], [-4000, 4000]]), LAWN, 'far-lawn');
+
+  /* the grounds' things, by their shapes */
+  (M.grounds || []).forEach(function (g) {
+    var s = g.shape || {};
+    if (g.state === 'set aside' || g.last) return;                   /* the tomb, and the Triwizard visitors */
+    if (g.id === 'forbidden-forest' && s.poly) prism(s.poly, LAWN, LAWN + 16, 'far-forest');
+    else if (g.id === 'quidditch-pitch' && s.ellipse) {
+      var e = s.ellipse, oval = [];
+      for (var i = 0; i < 48; i++) { var t = i / 48 * Math.PI * 2; oval.push([e[0] + e[2] * Math.cos(t), e[1] + e[3] * Math.sin(t)]); }
+      flat(shape(oval), LAWN + 0.05, 'far-pitch');
+      var outer = oval.map(function (p) { return [e[0] + (p[0] - e[0]) * (e[2] + 11) / e[2], e[1] + (p[1] - e[1]) * (e[3] + 11) / e[3]]; });
+      var st = prism(outer, LAWN, LAWN + 7, 'far-timber'); st.name = 'far-stands';
+      [-1, 1].forEach(function (end) {
+        [-6, 0, 6].forEach(function (dx, h) {
+          var top = LAWN + (h === 1 ? 16 : 12), ft = [e[0] + dx, e[1] + end * (e[3] - 4)];
+          prism(circ(ft, 0.25, 6), LAWN, top, 'far-stone');
+          var hoop = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.12, 6, 16), mat('far-stone')), hp = V(ft[0], ft[1], top + 1.2);
+          hoop.position.copy(hp); scene.add(hoop);
+        });
+      });
+    }
+    else if (g.id === 'greenhouses' && s.rects) s.rects.forEach(function (r) { prism(rect(r), LAWN, LAWN + 3.2, 'far-glass'); roof(r, LAWN + 3.2, LAWN + 5.0, 'gable'); });
+    else if (g.id === 'hagrids-cabin' && s.point) { prism(circ(s.point, 3.5, 12), LAWN, LAWN + 3.5, 'far-timber'); cone(s.point, 3.6, LAWN + 3.5, LAWN + 7); }
+    else if (g.id === 'vegetable-patch' && s.rect) flat(shape(rect(s.rect)), LAWN + 0.04, 'far-forest');
+  });
+
+  /* the castle: each mass by its roof's parts (a box to the eaves, the roof over it), the towers as drums and cones */
+  (M.masses || []).forEach(function (m) {
+    var r = m.roof;
+    if (r == null) return;                                          /* the cellars */
+    if (typeof r === 'number') { prism(rect(m.rect), BASE, r, 'far-stone'); return; }
+    var parts = r.parts && r.parts.length ? r.parts : [r];
+    if (!r.parts) prism(rect(m.rect), BASE, r.eaves, 'far-stone');
+    parts.forEach(function (p) { prism(rect(p.rect), BASE, p.eaves, 'far-stone'); roof(p.rect, p.eaves, p.ridge, p.kind); });
+    if (r.flat) prism(rect(r.flat.rect), BASE, r.flat.lead || r.flat.z, 'far-stone');
+  });
+  (M.towers || []).forEach(function (t) {
+    if (!t.c || !t.r) return;
+    var top = t.top || t.eaves || 40, low = /^7/.test(t.floors || '') ? 36.4 : BASE;
+    prism(circ(t.c, t.r, 24), low, top, 'far-stone');
+    if (t.ridge) cone(t.c, t.r, t.eaves, t.ridge);
+    if (t.lantern) { prism(circ(t.lantern.c, t.lantern.r, 16), t.lantern.z, t.lantern.top, 'far-stone'); cone(t.lantern.c, t.lantern.r, t.lantern.top, t.lantern.ridge); }
+    if (t.cap_house) { prism(rect(t.cap_house.rect), top, t.cap_house.eaves, 'far-stone'); roof(t.cap_house.rect, t.cap_house.eaves, t.cap_house.ridge, t.cap_house.kind); }
+    if (t.turret) { prism(circ(t.turret.c, t.turret.r, 12), BASE, t.turret.cap || top, 'far-stone'); }
+  });
+
+  /* far hills, a ring of rounded silhouettes past the grounds, fixed by a sine (no random) */
+  var hills = [], HN = 96;
+  for (var i = 0; i <= HN; i++) {
+    var t = i / HN * Math.PI * 2, h = 60 + 45 * Math.sin(t * 3 + 1) + 30 * Math.sin(t * 7 + 2) + 15 * Math.sin(t * 13);
+    var a = V(60 + 1800 * Math.cos(t), 36 + 1800 * Math.sin(t), LAWN - 10), b = V(60 + 1800 * Math.cos(t), 36 + 1800 * Math.sin(t), LAWN + h);
+    hills.push(a, b);
+  }
+  var hp = [];
+  for (var i = 0; i < HN; i++) hp.push(hills[2 * i], hills[2 * i + 2], hills[2 * i + 3], hills[2 * i], hills[2 * i + 3], hills[2 * i + 1]);
+  var hg = new THREE.BufferGeometry().setFromPoints(hp); hg.computeVertexNormals();
+  add(hg, 'far-hills').material.side = THREE.DoubleSide;
+
+  /* light: the day's sun from the south-west and its sky; the night's moon, low */
+  var hemi = new THREE.HemisphereLight(0xffffff, 0x666655, 0.85), sun = new THREE.DirectionalLight(0xffffff, 0.75);
+  sun.position.copy(V(-400, -500, 600)); scene.add(hemi); scene.add(sun);
+  var rt = new THREE.WebGLCubeRenderTarget(512, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
+  rt.texture.mapping = THREE.CubeRefractionMapping;
+  var cam = new THREE.CubeCamera(0.5, 5000, rt);
+  cam.position.set(0, 1.35, 0); scene.add(cam);
+  var glass = new THREE.MeshBasicMaterial({ envMap: rt.texture, refractionRatio: 1.0, side: THREE.DoubleSide });
+  panes.forEach(function (p) { p.material = glass; });
+  function draw(night) {
+    scene.background = hex(night ? 'sky-night' : 'sky-day').convertSRGBToLinear();
+    hemi.intensity = night ? 0.12 : 0.85; sun.intensity = night ? 0.08 : 0.75;
+    var w = scene.getObjectByName('far-water'); if (w) w.material.color.copy(hex(night ? 'far-water-night' : 'far-water-day').convertSRGBToLinear());
+    var tm = F.renderer.toneMapping; F.renderer.toneMapping = THREE.NoToneMapping;
+    cam.update(F.renderer, scene);
+    F.renderer.toneMapping = tm;
+  }
+  draw(false);
+  return { scene: scene, cube: rt, glass: glass, night: draw };
+}
 })();

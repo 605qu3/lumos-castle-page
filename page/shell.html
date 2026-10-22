@@ -160,7 +160,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=61"></script>
+<script src="castle-shell.js?v=62"></script>
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=14"></script>
 <script src="castle-events.js?v=39"></script>
@@ -281,7 +281,7 @@ PAINTED = PAINTED.concat(['strong-room', 'tally-room']);
 /* v141, Godric's 1 on architect-south-east-tower-1021 (6.36 pm, 21 October 2026): the south-east drum's round room on 1 */
 PAINTED = PAINTED.concat(['se-round-room-1']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED }) : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: Q.has('far') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
 document.title = shell.place.name + ', a shell';
@@ -292,8 +292,10 @@ document.title = shell.place.name + ', a shell';
    warm pools; the sun only by day. The unpainted shells keep the grey light. ?hour=0..23 for checks */
 var HOUR = Q.get('hour') != null ? +Q.get('hour') : new Date().getHours();
 var PAINT_ON = PAINTED.indexOf(PLACE) >= 0, DAY = HOUR >= 7 && HOUR < 17;
-/* castle-shell.js v54: the windows' panes of sky take the night's colour out of the day's hours */
-if (shell && !DAY && shell.panes.length) shell.panes[0].material.color.set((window.CASTLE_TONES && CASTLE_TONES.surfaces['sky-night'] || {}).hex || '#10141f').convertSRGBToLinear();
+/* castle-shell.js v54: the windows' panes of sky take the night's colour out of the day's hours; v62: the view drawn
+   from the model (shell.far) is redrawn by night instead */
+if (shell && !DAY && shell.far) shell.far.night(true);
+else if (shell && !DAY && shell.panes.length) shell.panes[0].material.color.set((window.CASTLE_TONES && CASTLE_TONES.surfaces['sky-night'] || {}).hex || '#10141f').convertSRGBToLinear();
 var FILL = !PAINT_ON ? 0.85 : DAY ? 0.5 : HOUR >= 17 && HOUR < 22 ? 0.2 : 0.06;
 /* a painted place with no window of its own (the dungeons, the cupboard, the passages) as the Entrance Hall: a weak fill, no sun */
 var WINDOWLESS = PLACE === 'entrance-hall' || !MODEL.openings.some(function (o) { return o.room === PLACE && /window/.test(o.kind || ''); });
