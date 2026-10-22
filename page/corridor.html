@@ -519,10 +519,11 @@ function updateSpoon(dt) {
 var steamCanvas = makeCanvas(64, 128), steamTex = tex(steamCanvas);
 var cupSteam = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.2), new THREE.MeshBasicMaterial({ map: steamTex, transparent: true, depthWrite: false }));
 cupSteam.name = 'cup-steam'; stairGallery.add(cupSteam);
-var steamLean = 0, steamLeanT = 0, steamOut = false;
+var steamLean = 0, steamLeanT = 0, steamOut = false, steamStraight = -1, STEAM_STRAIGHT = 9;   /* the cup set straight: seconds upright */
 function updateSteam() {
   if (!stairGallery.visible) return;
-  steamLean += (steamLeanT - steamLean) * 0.03;
+  var straight = steamStraight > t, jolt = straight && steamStraight - t > STEAM_STRAIGHT - 0.6;
+  steamLean += ((straight ? 0 : steamLeanT) - steamLean) * (jolt ? 0.2 : 0.03);
   var g = steamCanvas.getContext('2d'), W = 64, H = 128;
   g.clearRect(0, 0, W, H);
   g.lineCap = 'round';
@@ -530,7 +531,7 @@ function updateSteam() {
     g.beginPath();
     for (var i = 0; i <= 24; i++) {
       var f = i / 24, y = H - f * H * (0.9 - k * 0.12);
-      var x = W / 2 + Math.sin(t * 1.6 + f * 7 + k * 2.1) * (3 + f * 7) + steamLean * f * f * 26 + (steamOut ? Math.sin(t * 0.9 + k) * f * 10 : 0);
+      var x = W / 2 + Math.sin(t * 1.6 + f * 7 + k * 2.1) * (3 + f * 7) + steamLean * f * f * 26 + (steamOut && !straight ? Math.sin(t * 0.9 + k) * f * 10 : 0);
       if (i) g.lineTo(x, y); else g.moveTo(x, y);
     }
     g.strokeStyle = 'rgba(235,230,215,' + (0.32 - k * 0.08) + ')';
@@ -3751,15 +3752,60 @@ function chasePeeves(list) {
    at the top through the quarrel, and on Peeves's NOTHING the armour rattles as he zooms past and the lamp goes back
    down after him. No end is raised, as at the catch */
 function peevesSaves() {
-  if (!chase.on) return;
+  if (!chaseSaved()) return;
+  afterLines('filch.chase-peeves-nothing', function () { armourJiggle = 0.6; if (chase.lamp !== 'none') chase.lamp = 'down'; });
+}
+/* the other saves of a hidden boy (req 933 (c) and (d); Events' filch.chase-hidden-nick, -neville and -cupboard, each in
+   place of the hidden pass and each setting chase off, so no end is raised): the page's clock stops with the record's */
+function chaseSaved() {
+  if (!chase.on) return false;
   chase.on = false;
+  return true;
+}
+/* then() once the lines queued are said (or the line keyed `key` has begun), never later than CHASE.linesMax */
+function afterLines(key, then) {
   var since = Date.now();
   setTimeout(function wait() {
-    var off = lineCur && lineCur.line.key === 'filch.chase-peeves-nothing';
+    var off = key && lineCur && lineCur.line.key === key;
     if (!off && (lineCur || lineQ.length) && Date.now() - since < CHASE.linesMax * 1000) { setTimeout(wait, 100); return; }
-    armourJiggle = 0.6;
-    if (chase.lamp !== 'none') chase.lamp = 'down';
+    then();
   }, 300);
+}
+/* Nick (933 (c), every year but the Chamber's): he glides out of the far wall just past the stair head, turns to the
+   lamp with his hat swept out while his lines and Filch's are said, and drifts on back into the wall; the lamp, held at
+   the top through them, goes off down the flight. His drift is the leaning torch's (nickAfterLean), its own path here */
+function nickPoints() {
+  if (!chaseSaved()) return;
+  if (nick.state === 'away' && !home.kind) {
+    var x0 = CHASE.topX + 1.1;
+    var pts = [[x0, FAR_Z + 0.05], [x0 - 0.2, FAR_Z + 0.9], [x0 + 0.3, MID_Z - 0.2], [x0 + 1.6, FAR_Z + 0.9], [x0 + 3.2, FAR_Z + 0.05]];
+    nick.path = new THREE.CatmullRomCurve3(pts.map(function (p) { return new THREE.Vector3(p[0], 0, p[1]); }), false, 'catmullrom', 0.5);
+    nick.len = nick.path.getLength(); nick.d = 0; nick.state = 'drift'; nick.pauseAt = 1.0; nick.held = 0; nickMesh.visible = true;
+  }
+  afterLines('filch.chase-nick-filch', function () { if (chase.lamp !== 'none') chase.lamp = 'down'; });   /* off as he answers Nick */
+}
+/* Neville locked out (933 (c)): the lamp swings along to her end over him as the hidden pass does; as it comes over
+   him he shrinks against the wall (updateNeville), runs nowhere, and the lamp goes back down the stairs */
+function nevilleUnderLamp() {
+  if (!chaseSaved()) return;
+  neville.cower = true;
+  if (chase.lamp !== 'none') { chase.lamp = 'pass'; chase.passT = 0; }
+}
+/* the polite cupboard (933 (d)): the lamp comes along to the broom cupboard and stops; its door rattles on its latch and
+   stays shut; a while on the lamp turns away, back to the top and down the flight */
+var CUPBOARD_VISIT = { hold: 3.5, rattleAgain: 1.4 };
+function cupboardRefuses() {
+  if (!chaseSaved()) return;
+  if (chase.lamp === 'none') return;
+  chase.lamp = 'visit'; chase.visitX = CUPBOARD.x; chase.visitT = -1; chase.visitGo = false;
+  afterLines('filch.chase-cupboard-please', function () { chase.visitGo = true; });   /* he turns away as he gives it up */
+}
+/* the armour's wobble (933 (d), a start; the record sets chase_by armour): it rocks on its stand with a long clank and
+   settles, never falling, and the chase's clock starts with no whisk, her eyes left where they are */
+function armourWobbles() {
+  armourRock = ARMOUR_ROCK.time;
+  showLines([{ medium: 'heard', speaker: 'armour', sound: 'a long clank, the suit of armour rocking on its stand and settling again' }]);
+  chaseStart();
 }
 function chaseWhisk() {
   if (!chaseStart()) return;
@@ -3837,6 +3883,21 @@ function updateChase(dt) {
     if (s < run) px = CHASE.topX + s; else if (s < 2 * run) px = CHASE.endX - (s - run); else px = CHASE.topX - (s - 2 * run);
     chaseLampAt(px, stairY(px), px > FOOT_X ? 1 : Math.max(0, 1 - (FOOT_X - px) / 0.8));
     if (px <= FOOT_X - 0.8) { chase.lamp = 'none'; chaseOff(); chaseEnd('gone'); }
+  } else if (L === 'visit') {   /* along to a thing and stopped there (the polite cupboard), then back to the top */
+    if (chase.visitT < 0) {
+      var vx = chase.x < chase.visitX ? Math.min(chase.visitX, chase.x + FILCH.speed * dt) : Math.max(chase.visitX, chase.x - FILCH.speed * dt);
+      chaseLampAt(vx, stairY(vx), 1);
+      if (vx === chase.visitX) { chase.visitT = 0; cupboard.rattle = 0.6; }
+    } else {
+      chaseLampAt(chase.visitX, stairY(chase.visitX), 1);
+      var v0 = chase.visitT; chase.visitT += dt;
+      if (v0 < CUPBOARD_VISIT.rattleAgain && chase.visitT >= CUPBOARD_VISIT.rattleAgain) cupboard.rattle = 0.6;
+      if (chase.visitT >= CUPBOARD_VISIT.hold && chase.visitGo) chase.lamp = 'back';
+    }
+  } else if (L === 'back') {   /* back along to the top of the stairs, then down */
+    var bx = Math.max(CHASE.topX, chase.x - FILCH.speed * dt);
+    chaseLampAt(bx, stairY(bx), 1);
+    if (bx === CHASE.topX) chase.lamp = 'down';
   } else if (L === 'near') {   /* caught: the last steps to the boy, the lamp lifted over him */
     var nx = chase.x < chase.nearX ? Math.min(chase.nearX, chase.x + FILCH.speed * dt) : Math.max(chase.nearX, chase.x - FILCH.speed * dt);
     chaseLampAt(nx, stairY(nx) + CHASE.lift * (nx === chase.nearX ? 1 : 0.4), 1);
@@ -4783,6 +4844,7 @@ var POSES = {
   'the armour with a hand raised, scratching its helmet': 'scratching'
 };
 var armourPose = null, armourJiggle = 0, sticksShown = 'gone', sticksQueue = [];
+var ARMOUR_ROCK = { time: 2.6, lean: 0.07, swings: 3 }, armourRock = 0;   /* the wobble's seconds, its first lean, its rocks */
 function corridorDrawRoom(shown) {
   function has(s) { return shown.indexOf(s) >= 0; }
   var mark = ARMOUR_MARKS[has(CUE.step) ? 'step' : has(CUE.window) ? 'window' : 'home'];
@@ -4864,7 +4926,11 @@ function updateSticks(dt) {
     if (a.kind === 'march') sticks.position.x = STICKS.x - 5 * k;
     if (k >= 1) { sticksQueue.shift(); if (!sticksQueue.length) boo.visible = castle && castle.cues().indexOf(CUE.boo) >= 0; }
   }
-  if (armourJiggle > 0) { armourJiggle = Math.max(0, armourJiggle - dt); armour.rotation.z = 0.04 * Math.sin(armourJiggle * 40); }
+  if (armourRock > 0) {   /* the wobble (req 933 (d)): a slow rock on its stand, dying away, never falling */
+    armourRock = Math.max(0, armourRock - dt);
+    var rk = 1 - armourRock / ARMOUR_ROCK.time;
+    armour.rotation.z = ARMOUR_ROCK.lean * Math.sin(rk * ARMOUR_ROCK.swings * 2 * Math.PI) * (1 - rk);
+  } else if (armourJiggle > 0) { armourJiggle = Math.max(0, armourJiggle - dt); armour.rotation.z = 0.04 * Math.sin(armourJiggle * 40); }
   else armour.rotation.z = 0;
 }
 function note(text) { return function () { console.info('[corridor] ' + text + ' (drawn later)'); }; }
@@ -5024,7 +5090,8 @@ var nevilleStop = { name: 'neville', meshes: [nevilleCard], stop: function () {
   return { pos: new THREE.Vector3(END_X - 3.3, EYE, NEVILLE.z + 1.1), look: new THREE.Vector3(NEVILLE.x, 0.7, NEVILLE.z + 0.35), fov: 44 }; }, turn: function () { return STAND_TURN; } };
 STOPS.push(nevilleStop); nevilleCard.userData.stop = nevilleStop; tappables.push(nevilleCard);
 var neville = { out: false, glass: 0, glassT: 0, clearAt: -1, patAt: -1, goIn: -1, look: groundsQ.get('neville'),
-  asleep: false, nearT: 0, wokeAt: -1 };   /* ?neville=out, or glass, for a look */
+  asleep: false, nearT: 0, wokeAt: -1, cower: false, cowerAt: -1 };   /* ?neville=out, or glass, for a look */
+var NEVILLE_COWER = { near: 1.6, low: 0.9, back: 0.06, hold: 2.2, up: 1.2 };   /* the lamp's reach, his height and shrink back, seconds */
 function drawNeville(cast) {
   var out = !!neville.look || cast.some(function (f) { return f.name === 'neville' && f.mark === 'frame-foot'; });
   if (out === neville.out) return;
@@ -5079,6 +5146,14 @@ function updateNeville(dt) {
     var j = (t - neville.wokeAt) / NEVILLE_WAKE.jolt;
     if (j < 1) { sy = NEVILLE_WAKE.slump + (1 - NEVILLE_WAKE.slump) * Math.min(1, j * 2); up = 0.06 * Math.sin(j * Math.PI); }
     else neville.wokeAt = -1;
+  }
+  /* under Filch's lamp (req 933 (c)): he shrinks against the wall as it comes over him, and sits up again once it has gone */
+  if (neville.cower && Math.abs(chase.x - NEVILLE.x) < NEVILLE_COWER.near && chase.lamp === 'pass') { neville.cower = false; neville.cowerAt = t; }
+  if (neville.cowerAt >= 0) {
+    var c = t - neville.cowerAt, ck = c < 0.25 ? c / 0.25 : c < NEVILLE_COWER.hold ? 1 : Math.max(0, 1 - (c - NEVILLE_COWER.hold) / NEVILLE_COWER.up);
+    sy *= 1 - (1 - NEVILLE_COWER.low) * ck;
+    nevilleCard.position.z = NEVILLE.z - NEVILLE_COWER.back * ck + pat;
+    if (c >= NEVILLE_COWER.hold + NEVILLE_COWER.up) neville.cowerAt = -1;
   }
   nevilleCard.scale.y = sy;
   nevilleCard.position.y = NEVILLE.h * sy / 2 + up;
@@ -5449,6 +5524,11 @@ var castle = window.CastleEvents ? CastleEvents.start({
     },
     /* Peeves saves a hidden boy (req 933 (b)) */
     "Peeves whooshing away down the stairs with a cackle, the suit of armour rattling as he passes, and Filch's lamp going back down after him": peevesSaves,
+    /* the friends and the corridor's own things (req 933 (c) and (d), req 959; Events' filch.json, c7d198e2) */
+    "Nearly Headless Nick gliding out of the wall at the top of the stairs, one hand sweeping toward the far flight, and Filch's lamp going off down it": nickPoints,
+    "Neville at the foot of the frame, squeaking and shrinking against the wall as Filch's lamp swings over him, and the lamp going back down the stairs": nevilleUnderLamp,
+    "Filch's lamp stopping at the broom cupboard, its door rattling on its latch and staying shut, and the lamp turning away": cupboardRefuses,
+    'the suit of armour rocking on its stand with a long clank and settling again, never falling': armourWobbles,
     'Mrs Norris watches him from where she sits, quite still, and lets him be': function () { norrisLine('Mrs Norris watches him from where she sits, quite still, and lets him be'); },
     'Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing': function () {
       norrisLooks(); norrisLine('Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing');
@@ -5477,6 +5557,11 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* the gentleman next to the empty frame (req 950 (c); Events' painting.message-delivered) */
     'the gentleman in the frame next to the empty one hears it with his head on one side, snorts, and says "Safe? It has been safe since Whitsun. Tell her I only asked to be asked."': function () {
       showLines([{ medium: 'heard', speaker: 'gallery', sound: 'the gentleman in the frame next to the empty one hears it with his head on one side, snorts, and says', text: 'Safe? It has been safe since Whitsun. Tell her I only asked to be asked.' }]);
+      /* and then (gallery-answerer-teacup, Godric's touch, confirmed 5.35 pm, 22 October 2026): he hums, pleased to have
+         been asked, and reaches into the empty frame to straighten its teacup; the cup's steam gives a little start and
+         rises straight a while before it leans again */
+      showLines([{ medium: 'heard', speaker: 'gallery', sound: 'he hums to himself, pleased to have been asked, and reaches into the empty frame beside him to straighten its teacup' }]);
+      afterLines(null, function () { steamStraight = t + STEAM_STRAIGHT; });
     },
     /* Peeves's round found (req 950 (d); Events' peeves.round-found, Story's req 936 item 11) */
     'a cackle from somewhere above that stops short, as if Peeves had been caught doing the first trick over again': function () {
