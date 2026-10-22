@@ -2450,8 +2450,19 @@ if (MYRTLE.on) myrtleSet({ fresh: Q.get('wet') === 'fresh', drying: Q.get('wet')
 /* H62, the stair that only goes up (Events' req 883, page/events/hidden-ways.json, place `up only stair`, word for word):
    the stair round its newel and the panel at its head are the shell's own (model v134), so their strings are drawn; the
    way down lost below him stays the note's; his own footsteps above him, a `wait` record's cue, the FALLBACK's seen line */
-var UP_ONLY_DRAWN = PLACE === 'up-only-stair' ? ["a narrow stone stair winding up round its newel, the treads worn hollow, the air cool and still",
-  "at the top, a plain panel in the wall, which opens outward onto the seventh floor's landing"] : [];
+/* H64 and H65 (Events' req 898, the same file, places `down only stair` and `vanishing step hollow`, word for word): H64
+   as H62 turned over (model v136), the stair and the panel at its foot drawn, the way up lost above him the note's; H65's
+   hollow is v138's hung box under the flight with 889's dust and heap, so both its strings are drawn; each one's `wait`
+   cue (his steps below him, a pupil's stumble overhead) the FALLBACK's seen line. H67's taps wait for the shaft's hatches */
+var HW_DRAWN = {
+  'up-only-stair': ["a narrow stone stair winding up round its newel, the treads worn hollow, the air cool and still",
+    "at the top, a plain panel in the wall, which opens outward onto the seventh floor's landing"],
+  'down-only-stair': ["a narrow stone stair winding down round its newel, the treads worn hollow, the air cool and still",
+    "at the foot, a plain panel in the wall, which opens outward onto the first floor's corridor along the lake"],
+  'vanishing-step-hollow': ["the underside of the stair low over his head, the dust of years on the floor",
+    "a heap along the north wall of everything ever dropped through the step: quills, odd shoes and socks, Chocolate Frog cards, spectacles grey with dust, a few dull Gobstones rolled away along the far wall"]
+};
+var UP_ONLY_DRAWN = HW_DRAWN[PLACE] || [];
 function upOnlyShown(shown) { return UP_ONLY_DRAWN.filter(function (s) { return shown.indexOf(s) >= 0; }); }
 var noteEl = document.getElementById('roomnote');
 /* the note (req 446, Events' docs/events/rework-cues-2026-10-15.md): every state the runtime shows for this place, word
