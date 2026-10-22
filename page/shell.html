@@ -1698,7 +1698,7 @@ function staffSet(state) {
   STAFF.flameM.color.copy(new THREE.Color(state === 'low' ? 0x6a1e0c : 0xe8782a).convertSRGBToLinear());
   STAFF.flames.forEach(function (f) {
     var h = Math.max(0.08, f.userData.h * (state === 'low' ? 0.15 : k * 0.55)), w = state === 'low' ? 1.5 : k;
-    f.visible = !!k; f.scale.set(w, h, w); f.position.y = shell.toLocal(0, 0, shell.place.floor).y + 0.02 + h / 2;
+    f.visible = !!k; f.scale.set(w, h, w); f.userData.sy = h; f.position.y = shell.toLocal(0, 0, shell.place.floor).y + 0.02 + h / 2;
   });
   STAFF.light.intensity = { high: 2.2, lit: 1.5, low: 0.3 }[state] || 0; STAFF.light.distance = state === 'low' ? 4 : 9;
 }
@@ -1730,7 +1730,7 @@ if (STAFF.on) staffSet(Q.get('fire') || (HOUR >= 22 || HOUR < 6 ? 'low' : 'lit')
 var W1_STAIN = 'a dried, swollen splash stain up one wall',
     W1_PITS = 'a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk';
 var W1 = (function () {
-  var out = { on: false, pieces: 0, stain: null, pits: null, robes: 0 };
+  var out = { on: false, pieces: 0, stain: null, pits: null, robes: 0, jaws: [], dent: null };
   /* the schedule's frame to the castle's: [x0, y0, sx, sy, swap]; x = x0 + sx * (swap ? y' : x'), y = y0 + sy * (swap ? x' : y') */
   var F = { 'potions-dungeon': [16, 15.4, 1, 1, false], 'snape-office': [29, 11.6, -1, -1, false],
             'staff-room': [128, 50.6, 1, 1, true], 'staff-passage': [128, 50.6, 1, 1, true],
@@ -1817,6 +1817,7 @@ var W1 = (function () {
       lb(q, [-h + 0.16, u < 0 ? -h : h - 0.13, seat - 0.1], [h, u < 0 ? -h + 0.13 : h, seat + 0.2], mt);     /* the arms */
       if (wings) lb(q, [-h + 0.16, u < 0 ? -h : h - 0.09, seat + 0.2], [-h + 0.42, u < 0 ? -h + 0.09 : h, back - 0.06], mt);
     });
+    return q;
   }
   function frame(q, w, h, foot, mt) {   /* a plain picture frame on a wall frame's face (its +x the room), its canvas dark */
     var fw = 0.06, c = mat('canvas', 0x2a2620);
@@ -1901,9 +1902,20 @@ var W1 = (function () {
     lb(fq, [-0.02, -0.95, 1.36], [0.55, 0.95, 1.4], pink);
     lb(fq, [-0.02, -0.75, -0.01], [0.02, 0.75, 1.3], soot); lb(fq, [0.02, -0.75, -0.01], [0.5, 0.75, 0.02], soot);
     /* the armchairs: Binns's square to the fire, Snape's low one turned toward the door, the third toward the fire */
-    armchair(4.6, 3.5, 0, 0.8, 0.42, 1.0, mat('cloth-binns', 0x5b3a30), true);
+    var bq = armchair(4.6, 3.5, 0, 0.8, 0.42, 1.0, mat('cloth-binns', 0x5b3a30), true);
     armchair(4.4, 2.2, -30, 0.85, 0.35, 0.85, mat('cloth-low', 0x2f3530), false);
-    armchair(4.4, 4.9, -40, 0.8, 0.42, 0.95, mat('leather', 0x4e3424), false);
+    var tq = armchair(4.4, 4.9, -40, 0.8, 0.42, 0.95, mat('leather', 0x4e3424), false);
+    /* req 702's rest (Events' req 727, staff.json, word for word; docs/interiors/staff-room.md, The things, cited): the
+       Prophet folded over the third armchair's arm nearer the way, its front page up, a dark patch its photograph (what
+       moves in it a picture, so both lines stay the note's); shown while either year's line shows */
+    var news = mat('prophet', 0xcfc8b4), photo = mat('prophet-photo', 0x4a463e);
+    lb(tq, [-0.12, -0.405, 0.621], [0.2, -0.25, 0.628], news); lb(tq, [-0.115, -0.41, 0.45], [0.195, -0.402, 0.625], news);
+    lb(tq, [0.0, -0.37, 0.627], [0.13, -0.29, 0.636], photo);
+    hidden.push(['prophet', news, 'prophet'], ['prophet', photo, 'prophet']);
+    /* Binns's cushion: the hollow, a darker dip on its top 5 mm up that fills out over six seconds when the line comes */
+    var dent = new THREE.Mesh(new THREE.CircleGeometry(1, 24), kit.solid(0x3a241d));
+    dent.rotation.x = -Math.PI / 2; dent.scale.set(0.2, 0.15, 1); dent.position.set(0.08, 0.425, 0); bq.add(dent);
+    out.dent = dent;
     /* the nineteen wooden chairs, a little askew, no two neighbours of one form */
     var oaks = [mat('wood', 0x5a4c3e), dark, mat('wood-3', 0x4b3b2c)], n = 0;
     function wc(xp, yp, deg, form) { chair(xp, yp, deg + (rnd() - 0.5) * 14, form, oaks[n++ % 3]); }
@@ -1916,6 +1928,12 @@ var W1 = (function () {
     box(-0.02, 0.5, 1.1, 0.03, 1.4, 1.7, mat('cork', 0x8a6a48));
     [[0.5, 0.54], [1.36, 1.4]].forEach(function (y) { box(0.02, y[0], 1.1, 0.04, y[1], 1.7, dark); });
     box(0.02, 0.54, 1.1, 0.04, 1.36, 1.14, dark); box(0.02, 0.54, 1.66, 0.04, 1.36, 1.7, dark);
+    /* the rota (CoS 14), pinned inside the board's frame: in the Chamber's castle from 24 April a fresh sheet over two
+       older notices; from the Azkaban castle on, the old sheet yellowed with newer notices over all but its head */
+    var rf = mat('rota-fresh', 0xe6e0d0), ro = mat('notice-old', 0xcdbf9e), rc = mat('rota-curl', 0xc2ad80), rn = mat('notice-new', 0xe2dccb);
+    box(0.03, 0.6, 1.2, 0.034, 0.85, 1.5, ro); box(0.03, 1.05, 1.3, 0.034, 1.3, 1.6, ro); box(0.034, 0.75, 1.18, 0.038, 1.12, 1.62, rf);
+    box(0.03, 0.75, 1.18, 0.034, 1.12, 1.62, rc); box(0.034, 0.62, 1.18, 0.038, 0.98, 1.45, rn); box(0.038, 0.95, 1.2, 0.042, 1.3, 1.5, rn);
+    hidden.push(['rota2', rf, 'rota2'], ['rota2', ro, 'rota2'], ['rota3', rc, 'rota3'], ['rota3', rn, 'rota3']);
     var gilt = mat('gilt', 0x6a5630);
     frame(at(6, 3.5, 180), 0.7, 0.6, 1.75, gilt); frame(at(0, 6.25, 0), 0.6, 0.75, 1.4, gilt);
     /* the spare robes and cloaks on a rail at 1.9 inside the wardrobe (x' 2.25 to 3.75, y' 13.3 to 14), black, two faded */
@@ -1944,6 +1962,10 @@ var W1 = (function () {
       lb(q, [-0.02, -0.25, -0.01], [0.45, 0.25, 0.7], gs); lb(q, [0.04, -0.18, 0.7], [0.38, 0.18, 1.12], gs);
       lb(q, [0.18, -0.12, 1.02], [0.44, 0.12, 1.32], gs); lb(q, [0.2, -0.11, 1.32], [0.28, -0.05, 1.42], gs); lb(q, [0.2, 0.05, 1.32], [0.28, 0.11, 1.42], gs);
       lb(q, [0.0, -0.24, 0.8], [0.18, -0.18, 1.25], gs); lb(q, [0.0, 0.18, 0.8], [0.18, 0.24, 1.25], gs);   /* the folded wings */
+      /* req 702: the jaw apart, hinged at its back under the head, so the croak in lesson time (staff.gargoyle) moves it */
+      var hinge = new THREE.Group(), jaw = new THREE.Mesh(new THREE.BoxGeometry(0.23, 0.06, 0.2), gs);
+      hinge.position.set(0.22, 1.03, 0); jaw.position.set(0.115, -0.03, 0); hinge.add(jaw); q.add(hinge);
+      jaw.userData.owner = PLACE; out.jaws.push(hinge);
     });
   }
 
@@ -2065,6 +2087,11 @@ var W1 = (function () {
     var m = merge(list, mt, owner);
     if (held) { m.name = 'wave1-' + held[0]; m.visible = false; out[held[2]] = (out[held[2]] || []).concat([m]); }
   });
+  /* the pieces that move (the cushion's hollow, the gargoyles' jaws) leave the merge's frames for g, where they stand */
+  out.jaws.concat(out.dent ? [out.dent] : []).forEach(function (m) {
+    m.matrixWorld.decompose(m.position, m.quaternion, m.scale); m.userData.rest = m.quaternion.clone(); g.add(m);
+  });
+  if (out.dent) { out.dent.userData.owner = PLACE; out.dent.visible = false; }
   return out;
 })();
 /* the Great Hall's five fireplaces (model v72, the great-hall-fire-* features; Godric's 4 on architect-fires-1020, 20
@@ -2126,6 +2153,54 @@ function w1Shown(shown) {   /* the stain and the pits as the room's strings show
   return drawn;
 }
 if (W1.on) w1Set(Q.get('stain') === 'on', Q.get('pits') === 'on');
+/* req 702's rest (Events' req 727, page/events/staff.json, word for word): the Prophet while either year's line shows
+   (both stay the note's, the photograph a picture); the rota's sheet as its castle's first line says, drawn (the words
+   at its head stay the note's); the coals' fall dips the flames a moment and is heard; Binns's cushion holds its hollow
+   and fills out, the line seen with it; the gargoyle's croak (staff.gargoyle, a heard line) works one jaw.
+   ?prophet=on, ?rota=2|3 for checks; lumosGreybox.staffThings. */
+var STAFF_PROPHET = /^the Daily Prophet on the third armchair's arm/,
+    STAFF_ROTA2 = 'a fresh sheet pinned over the older notices on the staff notice board: every lesson of the week and the teacher who walks each class to it',
+    STAFF_ROTA3 = 'an old curling sheet half hidden under newer notices on the staff notice board: every lesson of the week and the teacher who walks each class to it',
+    STAFF_COALS = 'the coals in the grate settle with a soft fall',
+    STAFF_CUSHION = 'the seat cushion of the armchair square to the fire holds a faint hollow, as if someone had only that moment got up, and slowly fills out again';
+var staffMove = { dip: 0, dent: 0, jaw: 0 };
+function staffThingsSet(prophet, rota) {
+  if (!W1.on || PLACE !== 'staff-room') return;
+  (W1.prophet || []).forEach(function (m) { m.visible = prophet; });
+  (W1.rota2 || []).forEach(function (m) { m.visible = rota === 2; }); (W1.rota3 || []).forEach(function (m) { m.visible = rota === 3; });
+}
+function staffThingsShown(shown) {
+  var drawn = [], q = Q.get('rota'), rota = shown.indexOf(STAFF_ROTA3) >= 0 ? 3 : shown.indexOf(STAFF_ROTA2) >= 0 ? 2 : 0;
+  if (!W1.on || PLACE !== 'staff-room') return drawn;
+  if (rota) drawn.push(rota === 3 ? STAFF_ROTA3 : STAFF_ROTA2);
+  staffThingsSet(shown.some(function (s) { return STAFF_PROPHET.test(s); }) || Q.get('prophet') === 'on', q ? +q : rota);
+  return drawn;
+}
+if (W1.on) staffThingsSet(Q.get('prophet') === 'on', +(Q.get('rota') || 0));
+thingCues[STAFF_COALS] = function () { if (!STAFF.on) return; staffMove.dip = 1.4; showLines([{ medium: 'heard', sound: STAFF_COALS }]); };
+thingCues[STAFF_CUSHION] = function () {
+  if (!W1.dent) return; staffMove.dent = 6; showLines([{ medium: 'seen', sound: STAFF_CUSHION }]);
+};
+function staffJaw() { if (W1.jaws && W1.jaws.length) staffMove.jaw = 1.6; }
+var JAW_Q = new THREE.Quaternion();
+function updateStaff(dt) {
+  if (staffMove.dip > 0) {
+    staffMove.dip = Math.max(0, staffMove.dip - dt);
+    var k = 1 - 0.45 * Math.sin(Math.PI * staffMove.dip / 1.4);
+    STAFF.flames.forEach(function (f) { f.scale.y = f.userData.sy * k; });
+    if (!staffMove.dip) staffSet(STAFF.state);
+  }
+  if (W1.dent && staffMove.dent > 0) {
+    staffMove.dent = Math.max(0, staffMove.dent - dt);
+    var u = staffMove.dent / 6; W1.dent.visible = u > 0; W1.dent.scale.set(0.2 * (0.4 + 0.6 * u), 0.15 * (0.4 + 0.6 * u), 1);
+    W1.dent.material.opacity = u; W1.dent.material.transparent = true;
+  }
+  if (W1.jaws && W1.jaws.length && staffMove.jaw > 0) {
+    staffMove.jaw = Math.max(0, staffMove.jaw - dt);
+    var h = W1.jaws[0], a = Math.abs(Math.sin(Math.PI * 3 * (1 - staffMove.jaw / 1.6))) * 0.4;
+    h.quaternion.copy(h.userData.rest).multiply(JAW_Q.setFromAxisAngle(new THREE.Vector3(0, 0, 1), -a));
+  }
+}
 /* req 710, wave 0's detail pass (Interiors, 20 October 2026, 8.56 am; docs/interiors/entrance-hall.md and stair-hall.md,
    each's Wave 0's detail pass, cited there): plain pieces, one group, no tap lands on them, the place their owner.
    The Entrance Hall: (3) the notice board on the east wall, centred y 63.9, foot 1.0, 1.2 by 0.9 (item 1; the
@@ -2532,7 +2607,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -2792,6 +2867,7 @@ function frame() {
   updateFilch(dt);
   updateTrick(dt);
   updateMyrtle(dt);
+  updateStaff(dt);
   if (events && events.tick) events.tick(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -2804,7 +2880,7 @@ renderer.setAnimationLoop(frame);
    the books by the time of day (?time=night and so on), shown a moment by the door; a tap on the words puts them away */
 var lineDoor = null, linesEl = document.getElementById('lines'), lineQ = [], lineCur = null, lineV = new THREE.Vector3();
 function showLines(list) {   /* Myrtle's heard lines in her corridor placed at her door (req 726) */
-  for (var i = 0; i < list.length; i++) { var l = list[i]; if (MYRTLE && MYRTLE.door && !MYRTLE.room && /^myrtle\./.test(l.key || '')) l.door = MYRTLE.door; lineQ.push(l); }
+  for (var i = 0; i < list.length; i++) { var l = list[i]; if (MYRTLE && MYRTLE.door && !MYRTLE.room && /^myrtle\./.test(l.key || '')) l.door = MYRTLE.door; if (l.key === 'staff.gargoyle') staffJaw(); lineQ.push(l); }
 }
 function lineSeconds(l) { var n = (l.text || '').length + (l.sound || '').length * 0.6; return clamp(2.2 + 0.075 * n, 4, 14); }
 function lineElement(l) {
@@ -3011,6 +3087,12 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   /* req 702: the staff room's fire as it stands */
   staffFire: function (shown) { var d = shown ? staffShown(shown) : [];
     return STAFF.on ? { flames: STAFF.flames.length, state: STAFF.state, light: STAFF.light.intensity, drawn: d.length } : null; },
+  /* req 702's rest: the Prophet, the rota, the cushion, the coals and the jaws; a cue's line passed in plays it */
+  staffThings: function (shown, cue) { var d = shown ? staffThingsShown(shown) : [];
+    if (cue === 'gargoyle') staffJaw(); else if (cue) cueTable[cue]();
+    var vis = function (l) { return !!(l && l.length && l[0].visible); };
+    return W1.on ? { prophet: vis(W1.prophet), rota2: vis(W1.rota2), rota3: vis(W1.rota3), jaws: W1.jaws.length,
+      dent: !!(W1.dent && W1.dent.visible), move: Object.assign({}, staffMove), drawn: d.length } : null; },
   /* req 715: wave 1's plain pieces as they stand; shown strings passed in set the stain and the pits */
   wave0: function (shown) { var d = shown ? w0Shown(shown) : [];
     return { frames: W0.frames, board: W0.board, sill: W0.sill, grit: W0.grit, brooms: !!(W0.brooms && W0.brooms.visible), torches: HALL_LIGHT.torches.length,
