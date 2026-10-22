@@ -4240,7 +4240,97 @@ var BOARD = PLACE !== 'stone-chess-chamber' ? null : (function () {
    and with no faces (PS 16 L5890). Pawns 2.0 high, rooks 2.3, knights 2.5, bishops 2.7, queens 3.0, kings 3.2, each
    foot 1 cm into its square; no face or feature on any piece. Each a group named for its square
    (`giant-<side>-<piece>-<square>`, userData.giant), so the game can move it (req 922). Nothing glows */
+/* the hundred-seventeenth, on Godric's answer to architect-chess-pieces-1022b ("more like a scaled up wizards chess
+   set. No faces still"): the figures, behind ?chess=figures till he picks on the sheet. Each a figure, not a turned
+   shape, every head smooth and blank (PS 16: the queen's "blank face" and "stone arm", L5936, L5956; the king's crown
+   taken off, L5960): the king and queen robed and crowned, the king's crown its own piece (userData.crown, for G_WON),
+   the bishop robed and mitred with a crook, the rook a tower, the pawn a foot soldier in a plain helmet with a shield
+   and spear; the knight as built. Heights as the turned set's; +x the way it faces, -z its left */
+var FIGURES = Q.get('chess') === 'figures';
+function chessFigure(kind, mat) {
+  var g = new THREE.Group(), UP = new THREE.Vector3(0, 1, 0);
+  function lathe(pts, sx, to) {
+    var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 28), mat);
+    if (sx) m.scale.x = sx; (to || g).add(m); return m;
+  }
+  function part(geo, x, y, z, to) { var m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); (to || g).add(m); return m; }
+  function limb(a, b, r0, r1) {   /* a cylinder from a to b, r0 at a */
+    var A = new THREE.Vector3(a[0], a[1], a[2]), B = new THREE.Vector3(b[0], b[1], b[2]), v = B.clone().sub(A);
+    var m = part(new THREE.CylinderGeometry(r1, r0, v.length(), 12), (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2);
+    m.quaternion.setFromUnitVectors(UP, v.normalize()); return m;
+  }
+  function head(r, y) { part(new THREE.SphereGeometry(r, 22, 16), 0, y, 0); }   /* smooth and blank */
+  function ring(r, tube, y, to) { var m = part(new THREE.TorusGeometry(r, tube, 8, 28), 0, y, 0, to); m.rotation.x = Math.PI / 2; return m; }
+  function crown(y, r, points, top) {   /* a band with points round it, as its own group */
+    var c = new THREE.Group(); c.position.y = y; g.add(c);
+    part(new THREE.CylinderGeometry(r, r * 0.94, 0.14, 24), 0, 0, 0, c);
+    for (var i = 0; i < points; i++) {
+      var a = i / points * Math.PI * 2;
+      part(new THREE.ConeGeometry(0.035, 0.13, 8), Math.cos(a) * r * 0.92, 0.13, Math.sin(a) * r * 0.92, c);
+    }
+    part(new THREE.SphereGeometry(r * 0.8, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0, 0.03, 0, c);
+    top(c); return c;
+  }
+  if (kind === 'p') {   /* a foot soldier, 2.0 to his spear's tip */
+    lathe([[0, 0], [0.6, 0], [0.6, 0.1], [0.5, 0.16], [0, 0.16]]);
+    [1, -1].forEach(function (s) { limb([0, 0.14, s * 0.13], [0, 0.86, s * 0.12], 0.11, 0.1); });
+    lathe([[0, 0.7], [0.34, 0.72], [0.29, 0.98], [0.25, 1.12], [0.31, 1.42], [0.28, 1.54], [0.1, 1.6], [0, 1.6]]);
+    ring(0.26, 0.035, 1.12);                                                   /* his belt */
+    [1, -1].forEach(function (s) { part(new THREE.SphereGeometry(0.11, 14, 10), 0, 1.5, s * 0.3); });
+    limb([0, 1.5, 0.33], [0.1, 1.17, 0.37], 0.075, 0.065); limb([0.1, 1.17, 0.37], [0.3, 1.24, 0.34], 0.065, 0.055);
+    limb([0.3, 0.17, 0.34], [0.3, 1.86, 0.34], 0.028, 0.025);                  /* his spear, upright in his right hand */
+    part(new THREE.ConeGeometry(0.045, 0.14, 10), 0.3, 1.93, 0.34);
+    limb([0, 1.5, -0.33], [0.08, 1.22, -0.38], 0.075, 0.065);
+    part(new THREE.CylinderGeometry(0.3, 0.3, 0.05, 24), 0.08, 1.2, -0.43).rotation.x = Math.PI / 2;   /* his round shield */
+    head(0.15, 1.74);
+    part(new THREE.SphereGeometry(0.168, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2), 0, 1.77, 0);   /* a plain helmet */
+    part(new THREE.CylinderGeometry(0.21, 0.21, 0.025, 24), 0, 1.77, 0);
+  } else if (kind === 'r') {   /* a tower, 2.3 to its merlons */
+    lathe([[0, 0], [0.66, 0], [0.66, 0.12], [0.56, 0.18], [0.52, 0.2], [0.46, 1.86], [0.56, 1.98], [0.56, 2.12], [0.44, 2.12], [0.44, 2.04], [0, 2.04]]);
+    ring(0.5, 0.025, 1.0);                                                     /* a string course */
+    for (var k = 0; k < 6; k++) {
+      var a = k / 6 * Math.PI * 2, c = part(new THREE.BoxGeometry(0.12, 0.2, 0.22), Math.cos(a) * 0.5, 2.21, Math.sin(a) * 0.5);
+      c.rotation.y = -a;
+    }
+    part(new THREE.BoxGeometry(0.04, 0.5, 0.3), 0.475, 0.45, 0);              /* the door, a plain leaf proud of the wall */
+  } else if (kind === 'b') {   /* robed and mitred, a crook in his hands, 2.7 to the mitre's point */
+    lathe([[0, 0], [0.66, 0], [0.66, 0.12], [0.56, 0.18], [0, 0.18]]);
+    lathe([[0, 0.16], [0.52, 0.16], [0.5, 0.3], [0.42, 0.9], [0.34, 1.4], [0.32, 1.6], [0.37, 1.8], [0.36, 1.92], [0.14, 2.0], [0, 2.0]]);
+    lathe([[0, 1.58], [0.45, 1.58], [0.43, 1.8], [0.17, 1.98], [0, 1.99]]);    /* the short cape */
+    limb([0, 1.85, 0.36], [0.2, 1.45, 0.3], 0.09, 0.12); limb([0, 1.85, -0.36], [0.22, 1.45, -0.12], 0.09, 0.12);
+    limb([0.3, 0.18, 0.28], [0.3, 2.4, 0.28], 0.03, 0.03);
+    part(new THREE.TorusGeometry(0.1, 0.028, 8, 16, Math.PI * 1.3), 0.2, 2.4, 0.28);   /* the crook's curl */
+    head(0.17, 2.13);
+    lathe([[0, 2.2], [0.17, 2.2], [0.19, 2.4], [0.14, 2.58], [0.04, 2.68], [0, 2.7]], 0.62);   /* the mitre, broad across */
+  } else if (kind === 'q') {   /* gowned, a ruff, her crown, 3.0 */
+    lathe([[0, 0], [0.78, 0], [0.78, 0.13], [0.66, 0.2], [0, 0.2]]);
+    lathe([[0, 0.18], [0.66, 0.18], [0.6, 0.4], [0.46, 1.1], [0.32, 1.75], [0.3, 1.95], [0.36, 2.15], [0.34, 2.28], [0.12, 2.36], [0, 2.36]]);
+    [1, -1].forEach(function (s) {
+      limb([0, 2.22, s * 0.36], [0.1, 1.85, s * 0.42], 0.08, 0.07); limb([0.1, 1.85, s * 0.42], [0.32, 1.8, s * 0.12], 0.07, 0.06);
+    });
+    ring(0.17, 0.055, 2.37);
+    head(0.18, 2.55);
+    crown(2.75, 0.165, 6, function (c) { part(new THREE.SphereGeometry(0.045, 12, 8), 0, 0.2, 0, c); });
+  } else {   /* the king: robed, an ermine collar, his hands on a sword point down, his crown with its cross, 3.2 */
+    lathe([[0, 0], [0.78, 0], [0.78, 0.13], [0.66, 0.2], [0, 0.2]]);
+    lathe([[0, 0.18], [0.7, 0.18], [0.66, 0.4], [0.52, 1.1], [0.4, 1.8], [0.4, 2.1], [0.44, 2.32], [0.4, 2.44], [0.14, 2.5], [0, 2.5]]);
+    ring(0.25, 0.075, 2.46);
+    part(new THREE.BoxGeometry(0.03, 1.36, 0.12), 0.7, 0.92, 0);             /* the blade, its point on the base */
+    part(new THREE.BoxGeometry(0.06, 0.06, 0.4), 0.7, 1.63, 0);
+    limb([0.7, 1.66, 0], [0.7, 1.8, 0], 0.035, 0.035); part(new THREE.SphereGeometry(0.055, 12, 8), 0.7, 1.84, 0);
+    [1, -1].forEach(function (s) {
+      limb([0, 2.3, s * 0.42], [0.25, 1.98, s * 0.42], 0.09, 0.08); limb([0.25, 1.98, s * 0.42], [0.66, 1.78, s * 0.07], 0.08, 0.065);
+    });
+    head(0.2, 2.69);
+    var cr = crown(2.88, 0.185, 5, function (c) {
+      part(new THREE.BoxGeometry(0.07, 0.2, 0.07), 0, 0.22, 0, c); part(new THREE.BoxGeometry(0.055, 0.06, 0.18), 0, 0.25, 0, c);
+    });
+    cr.userData.crown = true; cr.userData.lay = { x: 1.05, y: 0.06, rz: 0 };   /* laid down upright, clear of his base */
+  }
+  return g;
+}
 function chessPiece(kind, mat) {
+  if (FIGURES && kind !== 'n') return chessFigure(kind, mat);
   var g = new THREE.Group(), lathe = function (pts) {
     var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 28), mat); g.add(m); return m;
   }, box = function (w, h, d, y) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.y = y; g.add(m); return m; };
@@ -4402,7 +4492,10 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   }
   function boyAt(sq) { for (var i = 0; i < o.boys.length; i++) if (o.boys[i].sq === sq && !o.boys[i].off) return o.boys[i]; return null; }
   function pieceSq(p) { for (var s in o.at) if (o.at[s] === p) return s; return null; }
-  function crownOf(k) { return k.children.slice(-2); }   /* the king's cross, two blocks over his head */
+  function crownOf(k) {   /* the figure king's crown, its own group; the turned king's cross, two blocks over his head */
+    var c = k.children.filter(function (m) { return m.userData.crown; }); return c.length ? c : k.children.slice(-2);
+  }
+  function layOf(c, i) { var l = c.userData.lay || { x: 0.9, y: 0.07, rz: -Math.PI / 2 }; return { x: l.x, y: l.y + (i ? 0.01 : 0), rz: l.rz }; }
   function line(s) { showLines([{ medium: 'seen', sound: s }]); }
 
   /* the board as the game stands: every piece home, the boys' pieces off; then the game's own squares */
@@ -4421,7 +4514,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   function swapKind(p, kind) {   /* a pawn crowned a queen on the far rank; back to a pawn when the board is reset */
     var side = p.userData.giant.side, fresh = chessPiece(kind, p.children[0].material);
     while (p.children.length) p.remove(p.children[0]);
-    while (fresh.children.length) { var c = fresh.children[0]; c.userData.owner = PLACE; c.name = p.name; p.add(c); }
+    while (fresh.children.length) { var c = fresh.children[0]; c.traverse(function (m) { m.userData.owner = PLACE; m.name = p.name; }); p.add(c); }
     p.userData.giant.kind = kind;
     if (kind === 'k') crownOf(p).forEach(function (c) { c.userData.y0 = c.position.y; });
     void side;
@@ -4545,7 +4638,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     if (part.length) walkers(part, 1.0);
     walkers([{ p: k, to: lay, face: yawTo(lay, feet) }]);
     step({ dur: 1.4, run: function (u) {   /* the cross from his head to the floor before them, lying flat */
-      cr.forEach(function (c, i) { c.position.set(0.9 * u, (c0[i].y + 0.35) * (1 - u) + 0.07 * u + (i ? 0.01 : 0), 0); c.rotation.z = -Math.PI / 2 * u; });
+      cr.forEach(function (c, i) { var l = layOf(c, i); c.position.set(l.x * u, (c0[i].y + 0.35) * (1 - u) + l.y * u, 0); c.rotation.z = l.rz * u; });
     } });
     bow(all.concat([k]));
   }
@@ -4553,7 +4646,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     o.on = false;
     var k = kingOf('black'), cr = crownOf(k), c0 = [];
     step({ dur: 1.8, begin: function () { cr.forEach(function (c) { c0.push(c.position.clone()); }); }, run: function (u) {
-      cr.forEach(function (c, i) { c.position.set(0.9 * u, (c0[i].y) * (1 - u) + 0.07 * u + (i ? 0.01 : 0), 0); c.rotation.z = -Math.PI / 2 * u; });
+      cr.forEach(function (c, i) { var l = layOf(c, i); c.position.set(l.x * u, (c0[i].y) * (1 - u) + l.y * u, 0); c.rotation.z = l.rz * u; });
     } });
     var all = []; for (var s in o.at) if (o.at[s]) all.push(o.at[s]);
     bow(all);
