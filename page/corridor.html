@@ -2983,16 +2983,34 @@ function cupboardLockOffered() {
   mine.done.then(function (out) {
     if (lockOffer === mine) lockOffer = null;
     if (!out) return;
-    if (out.verdict === 'opened') { cupboardSwing(true); firstCast(out, 'alohomora'); }
+    if (out.verdict === 'opened') { cupboardOpened(); firstCast(out, 'alohomora'); }
     else if (out.verdict === 'tight' || out.verdict === 'missed') cupboardRattle();
   });
 }
-/* Charms' openLock (req 282): it swings open on the dark, and shuts itself after a few seconds unless held */
+/* the lock that needs two turns (req 950 (a); Events' locks.cupboard-half and locks.cupboard-opens, Story's req 936
+   item 1, Godric's 1 on events-year1-wins-1022): his Alohomora is told to the runtime, whose records answer half over
+   (the door a finger's width ajar, an older bolt holding it, and so it stays, visit after visit, till the second cast)
+   or open. Once it stands open no record fires, so a later cast swings it as before. The ajar angle stays under the
+   lock's offer (cupboard.ang < 0.1), so the second cast can be made */
+var CUPBOARD_AJAR = 0.03;   /* 2.4 cm at the leaf's 0.8 m */
+var CUPBOARD_HALF_CUE = "the broom cupboard's door standing a finger's width ajar, an older bolt still holding it from the inside";
+function cupboardOpened() {
+  cupboard.answered = false;
+  if (castle && castle.visit()) castle.moment('opened broom cupboard');
+  if (!cupboard.answered) cupboardSwing(true);
+}
+function cupboardHalf() {
+  cupboard.answered = true; cupboard.held = true; cupboard.rattle = 0.3;
+  clearTimeout(cupboard.shut); cupboard.target = CUPBOARD_AJAR;
+  showLines([{ medium: 'heard', speaker: 'cupboard', sound: 'the lock turning half over with a click and sticking, the door giving a finger\'s width and no more, an older bolt still holding it from the inside' }]);
+}
+/* Charms' openLock (req 282): it swings open on the dark, and shuts itself after a few seconds unless held; held a
+   finger's width ajar it shuts back to that */
 function cupboardSwing(open, hold) {
-  if (open !== false && cupboard.target === 0) cupboardButterfly();
+  if (open !== false && cupboard.target <= CUPBOARD_AJAR) cupboardButterfly();
   cupboard.target = open === false ? 0 : 1.35;
   clearTimeout(cupboard.shut);
-  if (open !== false && !hold) cupboard.shut = setTimeout(function () { cupboard.target = 0; }, 6000);
+  if (open !== false && !hold) cupboard.shut = setTimeout(function () { cupboard.target = cupboard.held ? CUPBOARD_AJAR : 0; }, 6000);
 }
 function updateCupboard(dt) {
   cupboard.ang += (cupboard.target - cupboard.ang) * Math.min(1, dt * 3);
@@ -3582,6 +3600,36 @@ if (norrisDoor.q) norris.look = false;   /* the forced look is hers alone, not t
   }
   norrisDoor.group.visible = false; norrisDoor.group.name = 'mrs-norris-cupboard'; scene.add(norrisDoor.group);
 })();
+/* befriending her (req 933 (a); Events' norris.json; the design docs/notes/2026-10-22-corridor-norris-befriending.md,
+   Godric's 1 on corridor-norris-befriending-1022, 3.11 pm, a bit of breakfast from his pocket): a tap on her, sat before
+   the cupboard or her eyes at the end, is told as `mrs norris`; the scrap is set on the flags a little way toward her,
+   and gone when the runtime says so, her eyes with it. She is not drawn yet (People's cells, later), so what she does
+   with his hand is a line */
+function norrisTappable() { return norrisSits() || norris.t >= 0; }
+var norrisScrap = new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.045), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false,
+  map: cutoutTexture(28, 18, '#b89a6a', function (g, w, h) {
+    g.beginPath(); g.ellipse(w * 0.5, h * 0.5, w * 0.46, h * 0.4, 0.2, 0, 2 * Math.PI); g.fill();
+    g.fillStyle = '#8a6a44'; g.beginPath(); g.ellipse(w * 0.6, h * 0.45, w * 0.18, h * 0.14, 0, 0, 2 * Math.PI); g.fill();
+  }) }));
+norrisScrap.rotation.x = -Math.PI / 2; norrisScrap.visible = false; norrisScrap.name = 'norris-scrap'; scene.add(norrisScrap);
+function norrisAt() { return norrisSits() ? norrisDoor.group.position.clone() : norris.t >= 0 ? norris.group.position.clone() : null; }
+function norrisScrapDown() {
+  var at = norrisAt(), p = camera.position.clone();
+  if (at) p.set(at.x + 0.18, 0, at.z + 0.15);   /* beside her, toward her wall, where the stop's view meets the flags */
+  else { var d = new THREE.Vector3(); camera.getWorldDirection(d); d.y = 0; p.addScaledVector(d.normalize(), 1.2); }
+  norrisScrap.position.set(p.x, 0.012, p.z); norrisScrap.rotation.z = Math.random() * 3; norrisScrap.visible = true;
+}
+function norrisGoes(after) {   /* she slips away: from the cupboard along her path, or her glints fade */
+  setTimeout(function () {
+    if (norrisSits()) { norrisDoor.state = 'slinks'; norrisDoor.k = -0.3; }
+    if (norris.t >= 0 && norris.t < NORRIS.hold) norris.t = NORRIS.hold;
+  }, (after || 0) * 1000);
+}
+function norrisLooks() {   /* her eyes on him a long moment: sat before the cupboard she already is; else her glints at the end */
+  if (norrisSits() || norris.t >= 0) return;
+  var p = norrisSpot(); norris.group.position.copy(p); norris.group.lookAt(camera.position); norris.group.visible = true; norris.t = 0;
+}
+function norrisLine(text) { showLines([{ medium: 'heard', speaker: 'norris', sound: text }]); }
 function norrisDoorEvening() {
   if (norrisDoor.q) return true;
   return nightK() > 0 && dayRand(9) < NORRIS_DOOR.chance;
@@ -4057,6 +4105,9 @@ STOPS.forEach(function (s) { s.meshes.forEach(function (m) { m.userData.stop = s
 armour.userData.thing = 'armour';
 her.userData.thing = 'her';   /* at her stop the runtime's `tap her` wakes her for the password (req 79) */
 sticks.userData.thing = 'sticks'; tappables.push(sticks);
+tappables.push(stairGallery);   /* only the gentleman beside the empty frame answers (req 950 (c)); see tap() */
+/* Mrs Norris (req 933 (a), Events' norris.json): her eyes at the end and her shape before the cupboard, while shown */
+norris.group.children.concat(norrisDoor.group.children).forEach(function (m) { m.userData.thing = 'mrs norris'; tappables.push(m); });
 treads.forEach(function (m) { m.userData.thing = 'stair'; });   /* the flight: the runtime's `tap stair` takes him down */
 
 /* the Marauder's Map's grant (req 188, the page half of Events' req 180; page/events/map.json), in grey: once six of
@@ -4374,7 +4425,8 @@ function tap(cx, cy) {
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables.filter(function (m) {
-    return m.visible && (m !== wayDown || (atStop === landingStop && footShown === 'window'));   /* only when the end is open */
+    return m.visible && (m !== wayDown || (atStop === landingStop && footShown === 'window'))   /* only when the end is open */
+      && (m.userData.thing !== 'mrs norris' || (m.parent.visible && norrisTappable()));
   }).concat(onCorridorFloor() ? FLOORS.concat(BLOCKERS) : []), false);
   /* walking freely (req 722): the floor walks him to its nearest place; nothing else keeps him where he is, with the
      mote, a wall's tap stopped at the wall so the nook's flags behind her wall never take it. Below the corridor (the
@@ -4383,6 +4435,16 @@ function tap(cx, cy) {
   if (hits.length && BLOCKERS.indexOf(hits[0].object) >= 0) hits = [];
   if (!hits.length) { var below = !onCorridorFloor(); said(below && mode === 'stop'); if (below) goBack(); return; }
   if (hits[0].object === wayDown) { said(true); downToBay(); return; }   /* down into the stair hall (req 286) */
+  /* the gallery (req 950 (c); Events' painting.message-delivered, Story's req 936 item 6): a tap on the white-bearded
+     gentleman at the bottom right, frame 5, next to the empty frame on its table's side, is told as `gallery portrait`
+     (provisional, Godric to confirm: frame 2, the long-haired gentleman above him, is next to it too); elsewhere on the
+     gallery a tap does what a tap on nothing does there, as before it was tappable */
+  if (hits[0].object === stairGallery) {
+    var gb = galleryVisit.base, f5 = GALLERY_FRAMES[5], gu = hits[0].uv;
+    var gx = gu && gb ? gu.x * gb.width : -1, gy = gu && gb ? (1 - gu.y) * gb.height : -1;
+    if (gx >= f5.x0 && gx <= f5.x1 && gy >= f5.y0 && gy <= f5.y1 && castle && castle.visit()) { castle.tap('gallery portrait'); said(true); return; }
+    var under = !onCorridorFloor(); said(under && mode === 'stop'); if (under) goBack(); return;
+  }
   var hit = hits[0].object.userData;
   /* come up from the stair hall, a tap on the flight walks him on up it (req 286) */
   if (atStop === bayStop && hit.thing === 'stair') { said(true); goBack(); return; }
@@ -4709,6 +4771,10 @@ function corridorDrawRoom(shown) {
   if (pose !== armourPose) { armourPose = pose; console.info('[corridor] the armour stands ' + pose + (back ? ', its back turned' : '') + ' (its pose waits for the sheet)'); }
   xmasStreamers.visible = has(XMAS_CUE.streamers);
   visorLight.userData.want = has(XMAS_CUE.armour); visorLight.visible = visorLight.userData.want && !ARMOUR_SIDE.on;
+  /* the broom cupboard held a finger's width ajar while the lock stands half over (req 950 (a)) */
+  cupboard.held = has(CUPBOARD_HALF_CUE);
+  if (cupboard.held && cupboard.target === 0) cupboard.target = CUPBOARD_AJAR;
+  else if (!cupboard.held && cupboard.target === CUPBOARD_AJAR) cupboard.target = 0;
   sticksShown = has(CUE.up) ? 'up' : has(CUE.fallen) || has(CUE.boo) ? 'fallen' : 'gone';
   boo.visible = has(CUE.boo) && !sticksQueue.length;
   drawTrevor(has, back);
@@ -5337,6 +5403,50 @@ var castle = window.CastleEvents ? CastleEvents.start({
        heard, then the march (endings 1 and 2) or the let-off (3). The records have set chase off, so no end is raised */
     'Filch lifts his lamp over the boy, peers at him and jerks his head at the stairs; the boy follows him down, Mrs Norris padding behind': function () { caught('march'); },
     'Filch lifts his lamp over the boy, looks him up and down, sniffs and waves him on; the lamp goes back down the stairs, Mrs Norris with it': function () { caught('off'); },
+    /* befriending Mrs Norris (req 933 (a); Events' norris.json, its hundred-twenty-fifth paragraph's cues word for word) */
+    "he crouches and sets a bit of his breakfast on the flags; Mrs Norris's lamp-like eyes watch it and hold off while he is near": function () {
+      norrisScrapDown(); norrisLine("he crouches and sets a bit of his breakfast on the flags; Mrs Norris's lamp-like eyes watch it and hold off while he is near");
+    },
+    'the bit of breakfast is gone from the flags, and her eyes with it': function () { norrisScrap.visible = false; norrisGoes(0); },
+    'he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone': function () {
+      norrisLine('he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone'); norrisGoes(2.5);
+    },
+    'he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, arching under it': function () {
+      norrisLine('he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, arching under it'); norrisGoes(5);
+    },
+    'Mrs Norris watches him from where she sits, quite still, and lets him be': function () { norrisLine('Mrs Norris watches him from where she sits, quite still, and lets him be'); },
+    'Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing': function () {
+      norrisLooks(); norrisLine('Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing');
+    },
+    /* in place of filch.chase-hidden (one group): his lamp passes all the same */
+    "Mrs Norris sits down by the boy's hiding place and washes a paw, her back to it; Filch's lamp goes on along the corridor without turning": function () {
+      if (chase.on) { chase.lamp = 'pass'; chase.passT = 0; }
+      norrisLine("Mrs Norris sits down by the boy's hiding place and washes a paw, her back to it; Filch's lamp goes on along the corridor without turning");
+    },
+    /* the lock's half turn (req 950 (a)); the open swing as ever, raised now by the runtime */
+    "the lock turning half over with a click and sticking, the door giving a finger's width and no more, an older bolt still holding it from the inside": cupboardHalf,
+    'the cupboard door swings open on buckets and mops, and one ancient school broom leaning hard to the left': function () {
+      cupboard.answered = true; cupboard.held = false; cupboardSwing(true);
+    },
+    /* the first-year who has forgotten the word (req 950 (b); Events' password.first-year-lost and -helped, Story's req 936
+       item 3): not drawn (People's), so seen as lines */
+    "a first-year at the Fat Lady's frame with a hand in his hair, trying one half-remembered word after another and getting each of them wrong": function () {
+      showLines([{ medium: 'heard', speaker: 'fat-lady', sound: "a first-year at the Fat Lady's frame with a hand in his hair, trying one half-remembered word after another and getting each of them wrong" }]);
+    },
+    'the Fat Lady, her arms folded: "No word, no door, dear. It is this week\'s word, the very one your prefect read out by the fire."': function () {
+      showLines([{ medium: 'heard', speaker: 'fat-lady', sound: 'the Fat Lady, her arms folded', text: "No word, no door, dear. It is this week's word, the very one your prefect read out by the fire." }]);
+    },
+    'the first-year behind him mouthing the word after him, then a breathless "That\'s it! That\'s the one! Thanks!" as he scoots in under the boy\'s arm': function () {
+      showLines([{ medium: 'heard', speaker: 'fat-lady', sound: "the first-year behind him mouthing the word after him, then a breathless", text: "That's it! That's the one! Thanks!" }]);
+    },
+    /* the gentleman next to the empty frame (req 950 (c); Events' painting.message-delivered) */
+    'the gentleman in the frame next to the empty one hears it with his head on one side, snorts, and says "Safe? It has been safe since Whitsun. Tell her I only asked to be asked."': function () {
+      showLines([{ medium: 'heard', speaker: 'gallery', sound: 'the gentleman in the frame next to the empty one hears it with his head on one side, snorts, and says', text: 'Safe? It has been safe since Whitsun. Tell her I only asked to be asked.' }]);
+    },
+    /* Peeves's round found (req 950 (d); Events' peeves.round-found, Story's req 936 item 11) */
+    'a cackle from somewhere above that stops short, as if Peeves had been caught doing the first trick over again': function () {
+      showLines([{ medium: 'heard', speaker: 'peeves', sound: 'a cackle from somewhere above that stops short, as if Peeves had been caught doing the first trick over again' }]);
+    },
     /* Neville locked out (req 297): his quill given back, and the night he pats his pockets */
     [NEV_CUE.quill]: function () { neville.clearAt = t; },
     [NEV_CUE.pockets]: function () { if (SET_ASIDE) neville.patAt = t; },   /* PoA 12's lost list, set aside */
