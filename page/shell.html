@@ -164,6 +164,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=19"></script>
 <script src="castle-events.js?v=39"></script>
+<script src="chess-core.js?v=1"></script>
 <script src="castle-sky.js?v=1"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/carving.js?v=1"></script>
@@ -3727,6 +3728,7 @@ function tap(cx, cy) {
   while (hits.length > 1 && hits[0].object.userData.way && tappables.indexOf(hits[0].object) >= 0 &&
          tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
+  if (GPLAY && GPLAY.tap(raycaster, hits.length ? hits[0].distance : null)) { kit.tapped(true); return; }   /* req 922, the giant board */
   if (hit && hit.userData.grains && CUP) {   /* B21's grains, from the cupboard's stand while it stands open */
     if (here !== CUP.d.stand && here !== placeOf(CUP.d).s) acted = goTo(CUP.d);
     else { lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else if (Q.get('grains') === 'run') cupRun(); acted = true; }
@@ -3857,7 +3859,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateSnapeOffice(dt); updateSilly(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -3924,6 +3926,7 @@ var cueTable = window.Proxy ? new Proxy(allCues, { get: function (o, k) {
 var events = window.CastleEvents ? CastleEvents.start({
   chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: roomDraw, cues: cueTable, showLines: showLines,
   builtins: Object.assign({ tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; } },
+    { together: function () { return Q.get('together') === 'yes' || (GPLAY && GPLAY.together) ? 'yes' : 'no'; } },   /* req 922 */
     TURN ? { doors: function () { return TURN; } } : {})
 }) : null;
 if (events && events.ready) events.ready.then(readTurnDoors); else readTurnDoors();
@@ -4112,8 +4115,342 @@ var GIANT = !BOARD ? null : (function () {
       g.add(p); out.pieces.push(p);
     }
   });
-  return out;
+  out.group = g; return out;
 })();
+
+/* req 922 (Events' giant-chess.json, 12a2fc44; Magic's 911; game-notes' *the giant chessboard*; the hundred-fourteenth):
+   the giant board played. The boys play black against the castle's white, white first (PS 16 L5920); the moves are
+   window.lumosChess's (page/chess-core.js, a stand-in till Godric's Rookery core; Fawkes 15:10's word), white's level
+   ?giantlevel=1..4 (2 till Godric sets it per boy). A tap on a black piece is the tap `black piece` while no game is
+   on; a second black piece tapped within 3 s of the first is the built-in `together` (Fawkes 15:10; Events may take it
+   as its own). Then a tap on a black piece turns it toward him, a tap on a square it can reach and it strides there;
+   with nothing chosen, a square his own piece can reach walks him there (the boys stand on their squares as the
+   knight and the bishop, L5918). The page raises `giant danger` (the piece would be taken there: it stops short and
+   turns its head once toward the danger, and a second tap sends it on), `giant taken`, `giant boy taken`, `giant won`,
+   `giant lost`, `giant drawn`; each cue below is Events' string word for word and does the moving, and where no
+   record fires the page moves the pieces itself, without a line. A taken piece walks to the chamber's wall (black's
+   along the north, white's along the south) and stands there; nothing is smashed, dragged or lying still, and nothing
+   glows. The kept position lives for the page only (a var the page can write is asked of Events) */
+var G_TOGETHER = 'a black knight and a black bishop turning their backs on the white pieces and walking off the board, leaving two empty squares that the boys take',
+    G_ALONE = 'a black knight turning his back on the white pieces and walking off the board, leaving an empty square that the boy takes',
+    G_PAWN = 'the white pawn moving forward two squares',
+    G_RESUME = 'the black pieces turning toward him, the boys on their squares again, and the white side waiting for his move',
+    G_DANGER = 'the piece stopping short and turning its head once toward the danger, and going on if he taps again',
+    G_TAKEN = 'the white piece that took it bowing, and the black piece walking off the board to stand against the wall',
+    G_BOY = 'the white piece that took him bowing to him, and the boy walking off the board to stand at the wall, still giving his orders from there',
+    G_WON = 'the white king taking off his crown and laying it at their feet, the chessmen parting and bowing, the door on standing clear',
+    G_LOST = 'the black king laying his crown down, both sides bowing, and the pieces walking back to their squares, the game offered again',
+    G_DRAWN = 'both kings bowing to each other across the board';
+var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
+  var o = { game: null, on: false, at: {}, boys: [], wall: { white: 0, black: 0 }, sel: null, pending: null, q: [], cur: null,
+            first: null, firstT: 0, together: false, cap: null, level: Math.max(1, Math.min(4, +Q.get('giantlevel') || 2)) };
+  var z0 = shell.place.floor, O = shell.toLocal(0, 0, z0), FILES = 'abcdefgh';
+  function model(v) { return { x: v.x - O.x, y: O.z - v.z }; }
+  function sqPos(sq) { return shell.toLocal(94 + (+sq[1] - 1) * 2, 62 - FILES.indexOf(sq[0]) * 2, z0 + 0.01); }
+  function sqOf(v) {
+    var m = model(v), r = Math.floor((m.x - 93) / 2), f = 7 - Math.floor((m.y - 47) / 2);
+    return r >= 0 && r < 8 && f >= 0 && f < 8 ? FILES[f] + (r + 1) : null;
+  }
+  function yawTo(from, to) { return Math.atan2(-(to.z - from.z), to.x - from.x); }
+  function homeYaw(p) { return p.userData.giant.side === 'white' ? 0 : Math.PI; }
+  function ease(u) { return u * u * (3 - 2 * u); }
+  function lerpYaw(a, b, u) { var d = Math.atan2(Math.sin(b - a), Math.cos(b - a)); return a + d * u; }
+  /* the queue: each step { dur, begin, run(u), wait } played in turn; `wait` holds till the walker has arrived */
+  function step(s) { o.q.push(s); }
+  function call(fn) { step({ dur: 0, begin: fn }); }
+  function pause(t) { step({ dur: t }); }
+  function walkers(list, speed) {   /* pieces striding, each { p, to (a Vector3), face (a yaw, or null for home) } */
+    var st = { dur: 0.6, begin: function () {
+      st.dur = 0.6;
+      list.forEach(function (w) {
+        w.from = w.p.position.clone(); w.y0 = w.p.rotation.y; w.dist = w.from.distanceTo(w.to);
+        w.go = w.dist > 0.01 ? yawTo(w.from, w.to) : w.y0; w.end = w.face == null ? homeYaw(w.p) : w.face;
+        st.dur = Math.max(st.dur, 0.6 + w.dist / (speed || 1.4));
+      });
+    }, run: function (u) {
+      list.forEach(function (w) {
+        var t = st.dur, a = 0.3 / t, b = 1 - 0.3 / t, k = u < a ? 0 : u > b ? 1 : ease((u - a) / (b - a));
+        w.p.position.lerpVectors(w.from, w.to, k);
+        w.p.position.y = w.from.y + (k > 0 && k < 1 ? 0.05 * Math.abs(Math.sin(k * w.dist * 2.2)) : 0);
+        w.p.rotation.y = u < a ? lerpYaw(w.y0, w.go, u / a) : u <= b ? w.go : lerpYaw(w.go, w.end, (u - b) / (1 - b));
+      });
+    } };
+    step(st);
+  }
+  function bow(list, t) {   /* a slow bow, the top toward the way each faces */
+    step({ dur: t || 1.6, run: function (u) { list.forEach(function (p) { p.rotation.z = -0.32 * Math.sin(Math.PI * u); }); } });
+  }
+  function turnHead(p, to) {   /* turning once toward a point and back */
+    var y0;
+    step({ dur: 1.4, begin: function () { y0 = p.rotation.y; }, run: function (u) {
+      p.rotation.y = lerpYaw(y0, yawTo(p.position, to), Math.sin(Math.PI * Math.min(1, u * 1.25)));
+    } });
+  }
+  function walkEye(sq, wallAt) {   /* the boy onto his square, or to his place at the wall, by the board's east edge */
+    step({ dur: 0, wait: true, begin: function () {
+      var e = EYE + 0.02, m = model(camera.position), pts = [], at, look;
+      if (wallAt) { at = wallAt.clone(); at.y = O.y + e; look = shell.toLocal(101, 55, z0 + e); }
+      else {
+        var c = model(sqPos(sq));
+        at = shell.toLocal(c.x, c.y, z0 + e); look = shell.toLocal(c.x - 10, c.y, z0 + e);
+        if (m.x > 109.2) pts.push(shell.toLocal(110.4, c.y, z0 + e));
+      }
+      walkTo(pts, { name: 'giant-' + (sq || 'wall'), pos: at, look: look, level: here.level, lim: here.lim });
+    } });
+  }
+  function wallSpot(side) {   /* black's along the north wall, white's along the south, a piece's breadth apart */
+    var n = o.wall[side]++, x = 109.5 - (n % 13) * 1.5, y = side === 'black' ? 64.25 - Math.floor(n / 13) * 0 : 45.75;
+    if (n >= 13) { x = side === 'black' ? 110.9 : 91.1; y = [62.5, 60.5, 58.5, 51.5, 49.5, 47.5][(n - 13) % 6]; }
+    return shell.toLocal(x, y, z0 + 0.01);
+  }
+  function toWall(p) {
+    var to = wallSpot(p.userData.giant.side), c = shell.toLocal(101, 55, z0 + 0.01);
+    walkers([{ p: p, to: to, face: yawTo(to, c) }]);
+  }
+  function boyAt(sq) { for (var i = 0; i < o.boys.length; i++) if (o.boys[i].sq === sq && !o.boys[i].off) return o.boys[i]; return null; }
+  function pieceSq(p) { for (var s in o.at) if (o.at[s] === p) return s; return null; }
+  function crownOf(k) { return k.children.slice(-2); }   /* the king's cross, two blocks over his head */
+  function line(s) { showLines([{ medium: 'seen', sound: s }]); }
+
+  /* the board as the game stands: every piece home, the boys' pieces off; then the game's own squares */
+  function reset(instant) {
+    o.at = {}; o.wall = { white: 0, black: 0 }; o.sel = o.pending = null;
+    var list = [];
+    GIANT.pieces.forEach(function (p) {
+      var g = p.userData.giant; if (g.kind !== g.home) swapKind(p, g.home);
+      o.at[g.sq0] = p; p.visible = true; p.rotation.z = 0;
+      crownOf(p).forEach(function (c) { if (c.userData.y0 != null) { c.position.set(0, c.userData.y0, 0); c.rotation.set(0, 0, 0); } });
+      if (instant) { p.position.copy(sqPos(g.sq0)); p.rotation.y = homeYaw(p); }
+      else list.push({ p: p, to: sqPos(g.sq0) });
+    });
+    if (list.length) walkers(list, 2.2);
+  }
+  function swapKind(p, kind) {   /* a pawn crowned a queen on the far rank; back to a pawn when the board is reset */
+    var side = p.userData.giant.side, fresh = chessPiece(kind, p.children[0].material);
+    while (p.children.length) p.remove(p.children[0]);
+    while (fresh.children.length) { var c = fresh.children[0]; c.userData.owner = PLACE; c.name = p.name; p.add(c); }
+    p.userData.giant.kind = kind;
+    if (kind === 'k') crownOf(p).forEach(function (c) { c.userData.y0 = c.position.y; });
+    void side;
+  }
+  GIANT.pieces.forEach(function (p) {
+    var g = p.userData.giant; g.sq0 = g.square; g.home = g.kind;
+    if (g.kind === 'k') crownOf(p).forEach(function (c) { c.userData.y0 = c.position.y; });
+  });
+  reset(true);
+
+  function begin(together, resume) {
+    o.game = lumosChess.create(); o.on = true;
+    o.boys = [{ sq: 'g8', kind: 'n' }].concat(together ? [{ sq: 'f8', kind: 'b' }] : []);
+    reset(resume);
+    var off = o.boys.map(function (b) { var p = o.at[b.sq]; o.at[b.sq] = null; return p; });
+    if (resume) off.forEach(function (p) { var to = wallSpot('black'); p.position.copy(to); p.rotation.y = yawTo(to, shell.toLocal(101, 55, z0)); });
+    else off.forEach(function (p) { toWall(p); });
+    walkEye(o.boys[0].sq);
+    white(true, resume);
+  }
+  function white(opening, instant) {   /* the castle's move; the first a pawn two squares forward, as the canon's (L5922) */
+    var m;
+    if (opening) {
+      var two = ['e2', 'd2', 'c2', 'f2'].filter(function (s) { return o.game.moves(s).length; });
+      var from = two[Math.floor(Math.random() * two.length)]; m = o.game.move(from, from[0] + '4');
+    } else { var b = o.game.best(o.level); m = b && o.game.move(b.from, b.to); }
+    if (!m) return;
+    var p = o.at[m.from]; o.at[m.from] = null;
+    if (m.taken) {
+      var boy = boyAt(m.taken.sq);
+      o.cap = { m: m, p: p, boy: boy, victim: boy ? null : o.at[m.taken.sq] }; o.at[m.taken.sq] = null;
+      if (events && events.moment) events.moment(boy ? 'giant boy taken' : 'giant taken');
+      if (o.cap) playCapture(false);
+    } else if (instant) { p.position.copy(sqPos(m.to)); }
+    else walkers([{ p: p, to: sqPos(m.to) }]);
+    o.at[m.to] = p;
+    if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; walkers([{ p: r, to: sqPos(m.rook.to) }]); }
+    if (m.queen) call(function () { swapKind(p, 'q'); });
+    call(ended);
+  }
+  /* the capture by white: the piece comes up short, bows, the taken walks to the wall, it steps on */
+  function playCapture(withLine) {
+    var c = o.cap; o.cap = null;
+    var to = sqPos(c.m.to), from = c.p.position.clone(), short = to.clone().add(from.clone().sub(to).setLength(Math.min(1.3, from.distanceTo(to))));
+    walkers([{ p: c.p, to: short, face: yawTo(short, to) }]);
+    bow([c.p]);
+    if (c.boy) { c.boy.off = true; if (c.boy === o.boys[0]) walkEye(null, wallSpot('black')); }
+    else if (c.victim) toWall(c.victim);
+    walkers([{ p: c.p, to: to }]);
+    if (withLine) line(c.boy ? G_BOY : G_TAKEN);
+  }
+  function blackMove(from, to) {
+    var boy = boyAt(from), p = o.at[from], m = o.game.move(from, to);
+    if (!m) return;
+    o.at[from] = null; o.sel = o.pending = null;
+    if (m.taken) { var v = o.at[m.taken.sq]; o.at[m.taken.sq] = null; if (v) toWall(v); }
+    if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; walkers([{ p: r, to: sqPos(m.rook.to) }]); }
+    if (boy) { boy.sq = to; if (boy === o.boys[0] && !boy.off) walkEye(to); }
+    else { walkers([{ p: p, to: sqPos(to) }]); o.at[to] = p; if (m.queen) call(function () { swapKind(p, 'q'); }); }
+    call(function () { if (!ended()) { pause(0.5); call(function () { white(false); }); } });
+  }
+  /* the end, by the core's word: their mate a win, white's a loss; stalemate and the rest a draw */
+  function ended() {
+    var s = o.game.status();
+    if (s === 'play') return false;
+    finish(s === 'checkmate' ? (o.game.turn() === 'white' ? 'giant won' : 'giant lost') : 'giant drawn');
+    return true;
+  }
+  function finish(name) {
+    o.endCue = name;
+    if (events && events.moment) events.moment(name);
+    if (o.endCue) { var f = { 'giant won': won, 'giant lost': lost, 'giant drawn': drawn }[o.endCue]; o.endCue = null; f(); }
+  }
+  function kingOf(side) { for (var s in o.at) { var p = o.at[s]; if (p && p.userData.giant.side === side && p.userData.giant.kind === 'k') return p; } return null; }
+  function won() {
+    o.on = false;
+    var k = kingOf('white'), cr = crownOf(k), feet = camera.position.clone(), eye = camera.position.clone();
+    feet.y = O.y + 0.01; feet.add(shell.toLocal(99, 55, z0).sub(eye).setY(0).setLength(0.9));
+    var kp = k.position.clone(), lay = kp.clone().add(feet.clone().sub(kp).setY(0).setLength(Math.min(2.2, feet.distanceTo(kp))));
+    var c0 = [];
+    step({ dur: 1.4, begin: function () { cr.forEach(function (c) { c0.push(c.position.clone()); }); }, run: function (u) {
+      cr.forEach(function (c, i) { c.position.y = c0[i].y + 0.35 * Math.sin(Math.PI * 0.5 * u); });
+    } });
+    /* the chessmen part from the way to the arch (y 54 and 56 move north and south a metre) first, so the king comes through, and all bow at the end */
+    var part = [], all = [];
+    for (var s in o.at) { var p = o.at[s]; if (!p || p === k) continue; all.push(p);
+      if (s[0] === 'd' || s[0] === 'e') { var q = p.position.clone(), d = shell.toLocal(0, s[0] === 'd' ? 1 : -1, z0).sub(O); q.add(d); part.push({ p: p, to: q, face: p.rotation.y }); } }
+    if (part.length) walkers(part, 1.0);
+    walkers([{ p: k, to: lay, face: yawTo(lay, feet) }]);
+    step({ dur: 1.4, run: function (u) {   /* the cross from his head to the floor before them, lying flat */
+      cr.forEach(function (c, i) { c.position.set(0.9 * u, (c0[i].y + 0.35) * (1 - u) + 0.07 * u + (i ? 0.01 : 0), 0); c.rotation.z = -Math.PI / 2 * u; });
+    } });
+    bow(all.concat([k]));
+  }
+  function lost() {
+    o.on = false;
+    var k = kingOf('black'), cr = crownOf(k), c0 = [];
+    step({ dur: 1.8, begin: function () { cr.forEach(function (c) { c0.push(c.position.clone()); }); }, run: function (u) {
+      cr.forEach(function (c, i) { c.position.set(0.9 * u, (c0[i].y) * (1 - u) + 0.07 * u + (i ? 0.01 : 0), 0); c.rotation.z = -Math.PI / 2 * u; });
+    } });
+    var all = []; for (var s in o.at) if (o.at[s]) all.push(o.at[s]);
+    bow(all);
+    pause(0.6);
+    call(function () { o.boys.forEach(function (b) { b.off = true; }); walkEye(null, shell.toLocal(110.4, 50, z0)); reset(false); });
+  }
+  function drawn() {
+    o.on = false;
+    var w = kingOf('white'), b = kingOf('black');
+    walkers([{ p: w, to: w.position.clone(), face: yawTo(w.position, b.position) }, { p: b, to: b.position.clone(), face: yawTo(b.position, w.position) }]);
+    bow([w, b], 2.0);
+  }
+
+  /* the cues, word for word: each moves and shows its own line */
+  allCues[G_TOGETHER] = function () { begin(true, false); line(G_TOGETHER); };
+  allCues[G_ALONE] = function () { begin(false, false); line(G_ALONE); };
+  allCues[G_PAWN] = function () { line(G_PAWN); };   /* the pawn's stride is begin's, queued after the walk off */
+  allCues[G_RESUME] = function () {
+    if (!o.on) begin(o.together, true);
+    var bl = []; for (var s in o.at) { var p = o.at[s]; if (p && p.userData.giant.side === 'black') bl.push(p); }
+    bl.forEach(function (p) { turnHead(p, camera.position); });
+    line(G_RESUME);
+  };
+  allCues[G_DANGER] = function () { danger(); line(G_DANGER); };
+  allCues[G_TAKEN] = function () { if (o.cap) playCapture(true); else line(G_TAKEN); };
+  allCues[G_BOY] = function () { if (o.cap) playCapture(true); else line(G_BOY); };
+  allCues[G_WON] = function () { if (o.endCue) { o.endCue = null; won(); } line(G_WON); };
+  allCues[G_LOST] = function () { if (o.endCue) { o.endCue = null; lost(); } line(G_LOST); };
+  allCues[G_DRAWN] = function () { if (o.endCue) { o.endCue = null; drawn(); } line(G_DRAWN); };
+
+  function danger() {   /* the piece comes 40 per cent of the way and turns its head once toward the nearest white */
+    var d = o.pending; if (!d || d.shown) return; d.shown = true;
+    var to = sqPos(d.to), near = null, best = 1e9;
+    for (var s in o.at) { var p = o.at[s]; if (p && p.userData.giant.side === 'white') { var k = p.position.distanceTo(to); if (k < best) { best = k; near = p; } } }
+    if (d.p) {
+      var mid = d.p.position.clone().lerp(to, 0.4);
+      walkers([{ p: d.p, to: mid, face: yawTo(mid, to) }], 1.0);
+      if (near) turnHead(d.p, near.position);
+    }
+  }
+  function tryMove(from, to) {
+    var key = from + to, p = o.at[from];
+    if (o.pending && o.pending.key === key) { blackMove(from, to); return; }
+    if (o.game.danger(from, to)) {
+      o.pending = { key: key, from: from, to: to, p: p };
+      if (events && events.moment) events.moment('giant danger');
+      danger();
+      return;
+    }
+    blackMove(from, to);
+  }
+  function reach(from) { return o.game.moves(from).map(function (m) { return m.to; }); }
+  function back() {   /* a stopped piece goes back to its square when he chooses otherwise */
+    var d = o.pending; o.pending = null;
+    if (d && d.p && d.shown) walkers([{ p: d.p, to: sqPos(d.from) }], 1.4);
+  }
+
+  /* his tap: true when the board took it */
+  function tapBoard(ray, nearest) {
+    if (o.on && (o.cur || o.q.length || tween)) return true;
+    var hits = ray.intersectObjects([GIANT.group, BOARD], true);
+    if (!hits.length || (nearest != null && hits[0].distance > nearest + 0.05)) return false;
+    var obj = hits[0].object, piece = null;
+    while (obj && !piece) { if (obj.userData && obj.userData.giant) piece = obj; obj = obj.parent; }
+    var sq = piece ? pieceSq(piece) : sqOf(hits[0].point);
+    if (!o.on) {
+      if (!piece || piece.userData.giant.side !== 'black' || pieceSq(piece) == null) return false;
+      var now = performance.now() / 1000;
+      if (o.first && o.first !== piece && now - o.firstT < 3) { o.together = true; raise(); return true; }
+      if (o.first) return true;
+      o.first = piece; o.firstT = now; o.together = false;
+      turnHead(piece, camera.position);
+      setTimeout(function () { if (o.first) raise(); }, 3000);
+      return true;
+    }
+    if (o.game.turn() !== 'black' || !sq) return true;
+    if (o.pending && o.pending.to !== sq) back();
+    if (o.pending) { tryMove(o.pending.from, sq); return true; }
+    var mine = o.at[sq] && o.at[sq].userData.giant.side === 'black' ? o.at[sq] : null;
+    if (mine) {
+      if (o.sel === sq) { o.sel = null; walkers([{ p: mine, to: mine.position.clone() }], 2); return true; }
+      o.sel = sq; walkers([{ p: mine, to: mine.position.clone(), face: yawTo(mine.position, camera.position) }], 2); return true;
+    }
+    if (o.sel && reach(o.sel).indexOf(sq) >= 0) { tryMove(o.sel, sq); return true; }
+    if (boyAt(sq)) { o.sel = sq; return true; }   /* his brother's square: he is chosen */
+    var by = o.boys.filter(function (b) { return !b.off && reach(b.sq).indexOf(sq) >= 0; })[0];
+    if (by) { o.sel = null; tryMove(by.sq, sq); return true; }
+    return true;
+  }
+  function raise() {
+    var p = o.first; o.first = null;
+    if (events) events.tap('black piece');
+    else allCues[o.together ? G_TOGETHER : G_ALONE]();
+    void p;
+  }
+  function update(dt) {
+    if (!o.cur && o.q.length) { o.cur = o.q.shift(); o.cur.t = 0; if (o.cur.begin) o.cur.begin(); }
+    while (o.cur) {
+      var c = o.cur;
+      if (c.wait) { if (tween) return; }
+      else { c.t += dt; if (c.run) c.run(c.dur ? Math.min(1, c.t / c.dur) : 1); if (c.t < c.dur) return; }
+      o.cur = o.q.length ? o.q.shift() : null;
+      if (o.cur) { o.cur.t = 0; if (o.cur.begin) o.cur.begin(); dt = 0; }
+    }
+  }
+  var api = {
+    state: function () { return { on: o.on, turn: o.game ? o.game.turn() : null, status: o.game ? o.game.status() : null, sel: o.sel,
+      boys: o.boys.map(function (b) { return b.sq + (b.off ? ' (at the wall)' : ''); }), busy: !!(o.cur || o.q.length),
+      pieces: o.game ? o.game.pieces().length : 32 }; },
+    start: function (together) { o.together = !!together; o.first = GIANT.pieces[0]; raise(); },
+    play: function (from, to) { if (o.on && o.game.turn() === 'black') tryMove(from, to); return api.state(); },
+    square: function (sq) { return sqPos(sq); },
+    ending: function (n) { if (o.on) finish('giant ' + n); return api.state(); },   /* won, lost or drawn, for checks */
+    legal: function () {   /* black's moves now, for checks */
+      if (!o.game || o.game.turn() !== 'black') return [];
+      var out = []; o.game.pieces().forEach(function (q) { if (q.side === 'black') o.game.moves(q.sq).forEach(function (m) { out.push(m.from + m.to); }); });
+      return out;
+    }
+  };
+  setTimeout(function () { if (window.lumosGreybox) window.lumosGreybox.giant = api; }, 0);
+  return { tap: tapBoard, update: update, api: api, get together() { return o.together; } };
+})();
+function updateGiant(dt) { if (GPLAY) GPLAY.update(dt); }
 
 /* the hooks: the events and magic set these (a shut door's tap, a way taken); harmless when unset */
 var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
