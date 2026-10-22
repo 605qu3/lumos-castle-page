@@ -1667,6 +1667,52 @@ function wingShown(shown) {   /* the lamps as the hour's rule shows them; the di
   return drawn;
 }
 if (WING.on) wingSet(Q.get('lamps') || 'out');
+/* the staff room's fire (Magic's req 702; Events' req 727, page/events/staff.json, word for word), in the fireplace
+   wave 1's pass draws from staff-fireplace (the opening 1.5 wide on the fire wall, x' 6, centred y' 3.5; the frame
+   x = 128 + y', y = 50.6 + x'): flames in the grate and their own light on the panelling and the armchairs. Lit while
+   the plain line shows, built up high while the winter one does (both drawn, so neither stays in the note), low and
+   red while the night's shows (that line names the panelling and the empty room, so it stays the note's). With no line,
+   lit by day and low from ten. Nothing else glows. One group, no tap lands on it. ?fire=lit|high|low|out for checks. */
+var STAFF_LIT = "the fire's own light on the panelling and the armchairs",
+    STAFF_HIGH = 'the fire banked up high against the winter cold, its light on the panelling and the armchairs',
+    STAFF_LOW = 'the fire low and red, the panelling dark, nobody in the room';
+var STAFF = (function () {
+  var out = { on: false, flames: [], state: 'out', light: null };
+  if (PLACE !== 'staff-room') return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'staff-things'; shell.group.add(g);
+  var P = function (xp, yp, z) { return shell.toLocal(128 + yp, 50.6 + xp, z0 + z); };
+  var flameM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xe8782a).convertSRGBToLinear() });
+  [3.0, 3.25, 3.5, 3.75, 4.0].forEach(function (yp, i) {
+    var f = new THREE.Mesh(new THREE.ConeGeometry(0.1, 1, 8), flameM);
+    f.position.copy(P(5.72 - (i % 2) * 0.08, yp, 0)); f.userData.owner = PLACE; f.userData.h = 0.75 + ((i * 3) % 5) * 0.08;
+    g.add(f); out.flames.push(f);
+  });
+  out.light = new THREE.PointLight(0xff9a50, 0, 9, 1.6); out.light.position.copy(P(5.3, 3.5, 0.7)); scene.add(out.light);
+  out.flameM = flameM;
+  return out;
+})();
+function staffSet(state) {
+  if (!STAFF.on) return; STAFF.state = state;
+  var k = { high: 1.35, lit: 1, low: 0.3 }[state] || 0;
+  STAFF.flameM.color.copy(new THREE.Color(state === 'low' ? 0x6a1e0c : 0xe8782a).convertSRGBToLinear());
+  STAFF.flames.forEach(function (f) {
+    var h = Math.max(0.08, f.userData.h * (state === 'low' ? 0.15 : k * 0.55)), w = state === 'low' ? 1.5 : k;
+    f.visible = !!k; f.scale.set(w, h, w); f.position.y = shell.toLocal(0, 0, shell.place.floor).y + 0.02 + h / 2;
+  });
+  STAFF.light.intensity = { high: 2.2, lit: 1.5, low: 0.3 }[state] || 0; STAFF.light.distance = state === 'low' ? 4 : 9;
+}
+function staffShown(shown) {   /* the fire as the strings show it; the night's line stays the note's */
+  var drawn = [], q = Q.get('fire');
+  if (!STAFF.on) return drawn;
+  var state = HOUR >= 22 || HOUR < 6 ? 'low' : 'lit';
+  if (shown.indexOf(STAFF_LIT) >= 0) { drawn.push(STAFF_LIT); state = 'lit'; }
+  if (shown.indexOf(STAFF_HIGH) >= 0) { drawn.push(STAFF_HIGH); state = 'high'; }
+  if (shown.indexOf(STAFF_LOW) >= 0) state = 'low';
+  staffSet(q || state);
+  return drawn;
+}
+if (STAFF.on) staffSet(Q.get('fire') || (HOUR >= 22 || HOUR < 6 ? 'low' : 'lit'));
 /* wave 1's detail pass (Interiors' req 715; plain pieces in the shell's terms, no spend), each thing where Interiors'
    schedules put it (docs/interiors/potions-dungeon.md, The things and The office; docs/interiors/staff-room.md, The
    things; cited, never copied): the dungeon's desks, stools, Snape's desk and chair, the jar shelves (five boards, the
@@ -2486,7 +2532,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -2962,6 +3008,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   plates: function () { return DEF.on ? { plates: DEF.plates.length } : null; },
   wing: function (shown) { var d = shown ? wingShown(shown) : [];
     return WING.on ? { lamps: WING.flames.length, state: WING.state, drawn: d.length } : null; },
+  /* req 702: the staff room's fire as it stands */
+  staffFire: function (shown) { var d = shown ? staffShown(shown) : [];
+    return STAFF.on ? { flames: STAFF.flames.length, state: STAFF.state, light: STAFF.light.intensity, drawn: d.length } : null; },
   /* req 715: wave 1's plain pieces as they stand; shown strings passed in set the stain and the pits */
   wave0: function (shown) { var d = shown ? w0Shown(shown) : [];
     return { frames: W0.frames, board: W0.board, sill: W0.sill, grit: W0.grit, brooms: !!(W0.brooms && W0.brooms.visible), torches: HALL_LIGHT.torches.length,
