@@ -1672,6 +1672,8 @@
       "tier": "fixed",
       "source": "device",
       "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 40,
       "moment": "filch catches",
       "when": [
         "place = corridor",
@@ -1737,6 +1739,8 @@
       "tier": "fixed",
       "source": "device",
       "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 40,
       "moment": "filch catches",
       "when": [
         "place = corridor",
@@ -1802,6 +1806,8 @@
       "tier": "fixed",
       "source": "device",
       "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 40,
       "moment": "filch catches",
       "when": [
         "place = corridor",
@@ -2001,6 +2007,230 @@
         "set chase = off"
       ],
       "canon": "req 933 (the friends of the chase, Godric's pick on corridor-chase-ideas-1022, befriending Mrs Norris over time): once she trusts him fully (norris_trust 9 and over) and she is the one who started the chase, she leads Filch astray from a hidden boy, a fourth partner of the hidden pass; B2 ch8 L9025 (Filch is \"drawn to the spot by the mysterious power that seemed to connect him with his foul cat\", Mrs Norris's accusing stare at the boy), checked against the text in the canon tool, 22 October 2026; the lines are ours, in his voice (\"my sweet\", CoS 8 L9091); comic, nobody hurt, nothing punished"
+    },
+    {
+      "id": "filch.catch-mcgonagall",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 1,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "days since mcg_round >= 14",
+        "time != night"
+      ],
+      "who": [
+        {
+          "as": "mcgonagall",
+          "role": "voice",
+          "name": "mcgonagall",
+          "mark": "corridor"
+        },
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 3,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch's lamp turns away down the stairs, Mrs Norris with it"
+      ],
+      "lines": [
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-says",
+          "sound": "Professor McGonagall, stopping at the top of the stairs",
+          "text": [
+            "That will do, Mr Filch. I shall see him back myself.",
+            "Thank you, Mr Filch. I will deal with this."
+          ],
+          "canon": "ours, in her voice (the dry courtesy of PS 8 L2726's teacher, swapped); comic, nothing punished"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-filch",
+          "sound": "Filch, his lamp lowered, his jaw working",
+          "text": [
+            "But, Professor, he was— Yes, Professor.",
+            "Professor. As you say, Professor. Come, my sweet."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); he gives way, grumbling"
+        },
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-walk",
+          "sound": "Professor McGonagall, walking beside the boy",
+          "text": [
+            "Back to your house. We shall say no more about it.",
+            "Come along. And watch where you put your feet in future."
+          ],
+          "canon": "ours, in her voice (the dry courtesy of PS 8 L2726's teacher, swapped); comic, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "stamp mcg_round"
+      ],
+      "canon": "Godric's 1 on events-catch-fourth-ending-1022 (22 October 2026, 6.38 pm, relayed by Fawkes): a rare fourth way a catch ends, now and then and at most a few times a year, the three in turn staying the usual: Professor McGonagall passing on her rounds sees the boy back to his house, one look over her glasses, nothing punished and nothing written; ours after PS 8 L2726 (Professor Quirrell, who was passing, takes the boys' part when Filch has them), the teacher swapped, read in the canon tool, 22 October 2026; a group of its own with the three endings (about one catch in forty), at least fourteen days apart; it does not spend the turn"
+    },
+    {
+      "id": "filch.catch-mcgonagall-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 1,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "days since mcg_round >= 14",
+        "time = night",
+        "year = 1"
+      ],
+      "who": [
+        {
+          "as": "mcgonagall",
+          "role": "voice",
+          "name": "mcgonagall",
+          "mark": "corridor"
+        },
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 3,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Professor McGonagall coming along the corridor on her rounds in a tartan bathrobe and a hair net, one long look at the boy over her glasses; she sees him back toward his house while Filch's lamp turns away down the stairs, Mrs Norris with it"
+      ],
+      "lines": [
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-night-says",
+          "sound": "Professor McGonagall, stopping at the top of the stairs",
+          "text": [
+            "That will do, Mr Filch. I shall see him back myself.",
+            "Thank you, Mr Filch. I will deal with this."
+          ],
+          "canon": "ours, in her voice (the dry courtesy of PS 8 L2726's teacher, swapped); comic, nothing punished"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-night-filch",
+          "sound": "Filch, his lamp lowered, his jaw working",
+          "text": [
+            "But, Professor, he was— Yes, Professor.",
+            "Professor. As you say, Professor. Come, my sweet."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); he gives way, grumbling"
+        },
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-night-walk",
+          "sound": "Professor McGonagall, walking beside the boy",
+          "text": [
+            "Back to your house. We shall say no more about it.",
+            "Come along. And watch where you put your feet in future."
+          ],
+          "canon": "ours, in her voice (the dry courtesy of PS 8 L2726's teacher, swapped); comic, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "stamp mcg_round"
+      ],
+      "canon": "Godric's 1 on events-catch-fourth-ending-1022 (22 October 2026, 6.38 pm, relayed by Fawkes): a rare fourth way a catch ends, now and then and at most a few times a year, the three in turn staying the usual: Professor McGonagall passing on her rounds sees the boy back to his house, one look over her glasses, nothing punished and nothing written; ours after PS 8 L2726 (Professor Quirrell, who was passing, takes the boys' part when Filch has them), the teacher swapped, read in the canon tool, 22 October 2026; a group of its own with the three endings (about one catch in forty), at least fourteen days apart; it does not spend the turn; Godric's woven touch mcgonagall-tartan-night (22 October 2026, 6.38 pm): late at night she is in a tartan bathrobe and a hair net, year 1, PS 14 L5006 (\"Professor McGonagall, in a tartan bathrobe and a hair net, had Malfoy by the ear\"), read in the canon tool, 22 October 2026"
+    },
+    {
+      "id": "filch.catch-mcgonagall-late",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 1,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "days since mcg_round >= 14",
+        "time = night",
+        "year != 1"
+      ],
+      "who": [
+        {
+          "as": "mcgonagall",
+          "role": "voice",
+          "name": "mcgonagall",
+          "mark": "corridor"
+        },
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 3,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Professor McGonagall coming along the corridor late on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch's lamp turns away down the stairs, Mrs Norris with it"
+      ],
+      "lines": [
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-late-says",
+          "sound": "Professor McGonagall, stopping at the top of the stairs",
+          "text": [
+            "That will do, Mr Filch. I shall see him back myself.",
+            "Thank you, Mr Filch. I will deal with this."
+          ],
+          "canon": "ours, in her voice (the dry courtesy of PS 8 L2726's teacher, swapped); comic, nothing punished"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-late-filch",
+          "sound": "Filch, his lamp lowered, his jaw working",
+          "text": [
+            "But, Professor, he was— Yes, Professor.",
+            "Professor. As you say, Professor. Come, my sweet."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); he gives way, grumbling"
+        },
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "filch.catch-mcgonagall-late-walk",
+          "sound": "Professor McGonagall, walking beside the boy",
+          "text": [
+            "Back to your house. We shall say no more about it.",
+            "Come along. And watch where you put your feet in future."
+          ],
+          "canon": "ours, in her voice (the dry courtesy of PS 8 L2726's teacher, swapped); comic, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "stamp mcg_round"
+      ],
+      "canon": "Godric's 1 on events-catch-fourth-ending-1022 (22 October 2026, 6.38 pm, relayed by Fawkes): a rare fourth way a catch ends, now and then and at most a few times a year, the three in turn staying the usual: Professor McGonagall passing on her rounds sees the boy back to his house, one look over her glasses, nothing punished and nothing written; ours after PS 8 L2726 (Professor Quirrell, who was passing, takes the boys' part when Filch has them), the teacher swapped, read in the canon tool, 22 October 2026; a group of its own with the three endings (about one catch in forty), at least fourteen days apart; it does not spend the turn"
     }
   ]
 }

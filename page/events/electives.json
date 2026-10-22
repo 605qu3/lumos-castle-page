@@ -71,7 +71,8 @@
         "occasion != start of term"
       ],
       "show": [
-        "a few rune stones left out on a desk, a dictionary not put back"
+        "a few rune stones left out on a desk, a dictionary not put back",
+        "a translation left on a desk, one rune circled in red ink"
       ],
       "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term only, the summer hold's week included (ours); Interiors' words, 19 October 2026"
     },
@@ -233,6 +234,39 @@
       ],
       "starts": [],
       "canon": "Godric's woven touch muggle-studies-electricity-essay (5.38 pm 22 October 2026, people-electives-teachers-r3-1022, candidate 2): the essay title in chalk on the Muggle Studies board, the bulb in the teacher's hand flickering once when the boy reads it; the teacher is in the room whenever he walks in (his own lesson rule), so the bulb is always at hand"
+    },
+    {
+      "id": "electives.runes-ehwaz-slip",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap translation",
+      "when": [
+        "place = ancient runes classroom",
+        "year >= 3",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
+        "the translation lying flat, the rune Ehwaz circled in red ink and the word \"defence\" struck out above it, \"partnership\" written in its place"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "hermione",
+          "at": "translation",
+          "key": "electives.ehwaz",
+          "canon": "ours after OotP ch31 (Hermione corrects \"defence\" to \"partnership\" for Ehwaz), Fawkes's cite, not in the canon tool (books 1 to 3 only); the page is ours; Godric's touch runes-ehwaz-slip (22 October 2026, 6.40 pm, relayed by Fawkes)",
+          "text": [
+            "Ehwaz: defence, struck out. Partnership."
+          ]
+        }
+      ],
+      "starts": [],
+      "canon": "Godric's touch runes-ehwaz-slip (22 October 2026, 6.40 pm, relayed by Fawkes): an Ancient Runes desk, a marked translation with ehwaz circled, \"defence\" corrected to \"partnership\" (OotP ch31, not in the canon tool); the room's bare state only (lessons off, term days), year 3 on"
     }
   ]
 }

@@ -2040,6 +2040,44 @@
           ]
         }
       ]
+    },
+    {
+      "id": "chessmen.borrowed-advice",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap borrowed chessmen",
+      "when": [
+        "place = common room",
+        "year = 1",
+        "games < 2"
+      ],
+      "who": [
+        {
+          "as": "borrowed",
+          "role": "trace",
+          "what": "borrowed chessmen",
+          "mark": "round table"
+        }
+      ],
+      "show": [
+        "a small, scuffed chess set lent by a dormitory-mate on the round table, its pieces murmuring over the board at a new player"
+      ],
+      "lines": [
+        {
+          "speaker": "borrowed",
+          "medium": "said",
+          "key": "chessmen.borrowed.advice",
+          "text": [
+            "Don't send me there, can't you see his knight? Send him, we can afford to lose him.",
+            "Not that one! Look at his bishop! Oh, do look.",
+            "You're not going to leave me there, are you? Move the pawn. The PAWN."
+          ],
+          "canon": "PS 12 L4106 (the chessmen Seamus lent him didn't trust him at all and kept shouting different bits of advice; \"Don't send me there, can't you see his knight? Send him, we can afford to lose him.\"), read in the canon tool, 22 October 2026; the other two are ours"
+        }
+      ],
+      "starts": [],
+      "canon": "Godric's touch borrowed-chessmen-advice (22 October 2026, 6.40 pm, relayed by Fawkes): a small borrowed chess set in the common room whose pieces shout advice at a new player, year 1, a new player being fewer than two games; the common room is paused, so the record is written and the cue held for the Common room's page"
     }
   ]
 }
