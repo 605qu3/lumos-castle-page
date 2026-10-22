@@ -57,7 +57,8 @@
         "castle date >= 1 10-31"
       ],
       "show": [
-        "a small black scorch on a middle-row desk top, near its aisle end, where a feather burned"
+        "a small black scorch on a middle-row desk top, near its aisle end, where a feather burned",
+        "a feather lying under a back desk, scorched black at one end"
       ],
       "canon": "the change list's Rework 9 under the 15 October rulings (traces keep their dates): the orchestrator's t1 on req 366 (provisional, Godric to confirm), PS 10 L3504 to L3508, the feather set on fire in the Halloween lesson; so from 31 October of the Stone's castle and in every later year (Interiors' schedule, docs/interiors/charms-classroom.md, the scorch: a middle-row desk on the aisle's left, near its aisle end, no names); no desk named as anyone's; checked against the text, 15 October 2026"
     },
@@ -837,6 +838,124 @@
         "place = charms corridor"
       ],
       "starts": []
+    },
+    {
+      "id": "charms.feather-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap singed feather",
+      "when": [
+        "place = charms classroom",
+        "castle date >= 1 10-31"
+      ],
+      "show": [
+        "the feather lifted from under the desk and held up to the light, its tip burnt black and curled, the rest of it still white"
+      ],
+      "canon": "req 936 item 12 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm) and People's touch charms-feather-fire on people-first-years-class-1022 (Godric wove it 7.03 pm), one moment; PS 10 (B1 ch10 L3508, read in the canon tool, 22 October 2026: \"Seamus got so impatient that he prodded it with his wand and set fire to it\"); from 31 October of the Stone's castle and in every later year, like the scorch on the middle-row desk; nobody's name on it"
+    },
+    {
+      "id": "charms.flitwick-no-prodding",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 20-60 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on",
+        "castle date >= 1 10-31",
+        "days since flitwick_wink_on >= 7"
+      ],
+      "who": [
+        {
+          "as": "flitwick",
+          "role": "voice",
+          "name": "flitwick",
+          "mark": "his pile of books"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "flitwick",
+          "medium": "heard",
+          "key": "charms.flitwick-no-prodding",
+          "sound": "Professor Flitwick squeaking from his pile of books",
+          "text": [
+            "Swish and flick! And no prodding, please. We have had quite enough singed feathers this term."
+          ],
+          "canon": "req 936 item 12 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm) and People's touch charms-feather-fire on people-first-years-class-1022 (Godric wove it 7.03 pm), one moment; PS 10 (B1 ch10 L3508, read in the canon tool, 22 October 2026: \"Seamus got so impatient that he prodded it with his wand and set fire to it\"); his words Story's: \"Swish and flick, remember, swish and flick\" is PS 10 L3506 (read in the canon tool), the wink about the singed feathers is ours"
+        }
+      ],
+      "starts": [
+        "stamp flitwick_wink_on"
+      ],
+      "canon": "req 936 item 12 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm) and People's touch charms-feather-fire on people-first-years-class-1022 (Godric wove it 7.03 pm), one moment; PS 10 (B1 ch10 L3508, read in the canon tool, 22 October 2026: \"Seamus got so impatient that he prodded it with his wand and set fire to it\"); Flitwick's wink in a lesson hour, at most once a week, from the lesson that burned the feather on"
+    },
+    {
+      "id": "charms.feather-first-miss",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap my feather",
+      "when": [
+        "place = charms classroom",
+        "lessons = on",
+        "castle date >= 1 10-31",
+        "feather_tries < 1"
+      ],
+      "show": [
+        "his feather twitches on the desk, shivers once and settles flat again"
+      ],
+      "starts": [
+        "add feather_tries 1"
+      ],
+      "canon": "req 936 item 12 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm) and People's touch charms-feather-fire on people-first-years-class-1022 (Godric wove it 7.03 pm), one moment; PS 10 (B1 ch10 L3508, read in the canon tool, 22 October 2026: \"Seamus got so impatient that he prodded it with his wand and set fire to it\"); his first try always misses, never staged against a boy who did it right (settled.md points 13 and 14)"
+    },
+    {
+      "id": "charms.feather-twitches",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap my feather",
+      "one_of": "feather-try",
+      "weight": 1,
+      "when": [
+        "place = charms classroom",
+        "lessons = on",
+        "castle date >= 1 10-31",
+        "feather_tries >= 1"
+      ],
+      "show": [
+        "his feather twitches on the desk, shivers once and settles flat again"
+      ],
+      "starts": [
+        "add feather_tries 1"
+      ],
+      "canon": "req 936 item 12 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm) and People's touch charms-feather-fire on people-first-years-class-1022 (Godric wove it 7.03 pm), one moment; PS 10 (B1 ch10 L3508, read in the canon tool, 22 October 2026: \"Seamus got so impatient that he prodded it with his wand and set fire to it\"); the miss: it twitches and settles; a steady swish and flick lifts it, never guaranteed (Godric's first miss, settled.md point 13)"
+    },
+    {
+      "id": "charms.feather-lifts",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap my feather",
+      "one_of": "feather-try",
+      "weight": 2,
+      "when": [
+        "place = charms classroom",
+        "lessons = on",
+        "castle date >= 1 10-31",
+        "feather_tries >= 1"
+      ],
+      "show": [
+        "his feather rises off the desk, wavers and floats up to the height of his nose, turning slowly"
+      ],
+      "starts": [
+        "add feather_tries 1",
+        "set feather_lifted = yes",
+        "log \"Made his own feather rise in Charms {day}\""
+      ],
+      "canon": "req 936 item 12 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm) and People's touch charms-feather-fire on people-first-years-class-1022 (Godric wove it 7.03 pm), one moment; PS 10 (B1 ch10 L3508, read in the canon tool, 22 October 2026: \"Seamus got so impatient that he prodded it with his wand and set fire to it\"); the win is his: a steady swish and flick lifts it, about two tries in three once the first has missed"
     }
   ]
 }

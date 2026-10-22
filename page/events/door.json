@@ -211,7 +211,8 @@
       "moment": "tap polite door",
       "when": [
         "place = corridor",
-        "tickle = miss"
+        "tickle = miss",
+        "door_push != due"
       ],
       "show": [
         "the door's wood shivers and gives a creaky giggle, louder the nearer the tap to its ticklish spot"
@@ -235,7 +236,8 @@
         "set opened_visit = yes",
         "add opened_visits 1",
         "log \"Tickled the door open {day}\"",
-        "secret polite-door"
+        "secret polite-door",
+        "set door_push = done"
       ]
     },
     {
@@ -918,8 +920,181 @@
         "set opened_visit = no",
         "set door_drawn = no",
         "set door_gap = no",
-        "set door_holding = no"
+        "set door_holding = no",
+        "set lost_first_year = no"
       ]
+    },
+    {
+      "id": "door.lost-ask",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "castle date >= 1 09-08",
+        "lessons = on",
+        "time != night",
+        "opened_visits < 1",
+        "lost_rumour != told",
+        "days since lost_on >= 7"
+      ],
+      "who": [
+        {
+          "as": "lost",
+          "role": "voice",
+          "name": "a lost first-year",
+          "mark": "landing"
+        }
+      ],
+      "show": [
+        "a first-year on the landing, turning his timetable one way and then the other, looking up and down the stair"
+      ],
+      "lines": [
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-ask",
+          "text": [
+            "Is this the way to Transfiguration? I've been up this stair three times and it keeps taking me somewhere else."
+          ],
+          "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): his question, any pupil's day after the first week; the stair that takes him elsewhere is PS 8 L2722 (\"some that led somewhere different on a Friday\"), read in the canon tool, 22 October 2026"
+        }
+      ],
+      "starts": [
+        "set lost_first_year = asking",
+        "stamp lost_on"
+      ],
+      "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): a lost first-year asks the way; once he has been walked to his door and has told his rumour he does not come again, and he does not come to a boy who has already opened the polite door; at most a week apart"
+    },
+    {
+      "id": "door.lost-lead",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost first-year",
+      "when": [
+        "place = corridor",
+        "lost_first_year = asking",
+        "weekday != friday"
+      ],
+      "who": [
+        {
+          "as": "lost",
+          "role": "voice",
+          "name": "a lost first-year",
+          "mark": "landing"
+        }
+      ],
+      "show": [
+        "he walks the first-year along the corridor and down the stair by the plan, the boy trotting beside him with his timetable"
+      ],
+      "lines": [
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-lead-thanks",
+          "text": [
+            "That's it! I'd still be going round. Thanks."
+          ],
+          "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): ours, in his voice; earned, not lucky (the boy leads him by the plan)"
+        },
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-lead-rumour",
+          "text": [
+            "A prefect told me there's a door on this floor that won't open unless you ask it nicely. I think he was having me on."
+          ],
+          "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): the rumour, Story's words, pointing at the corridor's polite door; PS 8, \"doors that wouldn't open unless you asked politely, or tickled them in exactly the right place\" (B1 ch8 L2722, read in the canon tool, 22 October 2026); the boy and his words are Story's, invented and unnamed in canon"
+        }
+      ],
+      "starts": [
+        "set lost_first_year = no",
+        "set lost_rumour = told",
+        "set door_push = due",
+        "log \"Walked a lost first-year to his door {day}\""
+      ],
+      "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): tapped, the boy walks him to the classroom by the plan; his rumour sets the polite door's first push to do nothing, and asking politely is the way in"
+    },
+    {
+      "id": "door.lost-lead-friday",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost first-year",
+      "when": [
+        "place = corridor",
+        "lost_first_year = asking",
+        "weekday = friday"
+      ],
+      "who": [
+        {
+          "as": "lost",
+          "role": "voice",
+          "name": "a lost first-year",
+          "mark": "landing"
+        }
+      ],
+      "show": [
+        "he walks the first-year the long way round by the plan, as the stair goes on a Friday, the boy trotting beside him with his timetable"
+      ],
+      "lines": [
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-lead-friday-oh",
+          "text": [
+            "Oh. It's Friday. That's why."
+          ],
+          "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): ours, in his voice; the stair's Friday habit (item 2, stair.json) as the plan has it, PS 8 L2722 (B1 ch8, read in the canon tool, 22 October 2026)"
+        },
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-lead-friday-thanks",
+          "text": [
+            "That's it! I'd still be going round. Thanks."
+          ],
+          "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): ours, in his voice; earned, not lucky (the boy leads him by the plan)"
+        },
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-lead-friday-rumour",
+          "text": [
+            "A prefect told me there's a door on this floor that won't open unless you ask it nicely. I think he was having me on."
+          ],
+          "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): the rumour, Story's words, pointing at the corridor's polite door; PS 8, \"doors that wouldn't open unless you asked politely, or tickled them in exactly the right place\" (B1 ch8 L2722, read in the canon tool, 22 October 2026); the boy and his words are Story's, invented and unnamed in canon"
+        }
+      ],
+      "starts": [
+        "set lost_first_year = no",
+        "set lost_rumour = told",
+        "set door_push = due",
+        "log \"Walked a lost first-year to his door {day}\""
+      ],
+      "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): tapped, the boy walks him to the classroom by the plan; his rumour sets the polite door's first push to do nothing, and asking politely is the way in"
+    },
+    {
+      "id": "door.push-miss",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap polite door",
+      "when": [
+        "place = corridor",
+        "door_push = due",
+        "tickle = miss",
+        "opened_visits < 1"
+      ],
+      "show": [
+        "he pushes at the door with a flat hand and it does not give, not a creak, as if it were waiting for something"
+      ],
+      "starts": [
+        "set door_push = done"
+      ],
+      "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): the first miss: pushing does nothing, asking politely does (the existing 'say please', door.please); PS 8, \"doors that wouldn't open unless you asked politely, or tickled them in exactly the right place\" (B1 ch8 L2722, read in the canon tool, 22 October 2026); the boy and his words are Story's, invented and unnamed in canon"
     }
   ]
 }
