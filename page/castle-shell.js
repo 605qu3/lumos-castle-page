@@ -1561,12 +1561,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
    that way. One cube for the place: no parallax as he walks (the pitch at 300 m holds; a court's far side at 30 m does
    not slide), a cube per window the step up. far.night(true) redraws it by night. The tones are Design's when its
    tones.js names them (far-lawn, far-water-day, far-water-night, far-forest, far-hills, far-stone, far-rock,
-   far-roof), else these, provisional. */
+   far-roof), else these, provisional. v66 (req 906, Design's thirteen far tones, f0bdf4ab): by night the castle's own
+   windows on the far walls take far-window-night, lit from within (PS 6, "windows sparkling"), their own light. */
 function farView(F, M, toLocal, panes, paneMat) {
   var LAWN = -1.2, LAKE = -46.0, BASE = -20.0;      /* tools/architect-sections-pdf.py's lawn and lake; the castle's foot */
   var FALL = { 'far-lawn': 0x7d8a5c, 'far-pitch': 0x8d9a64, 'far-water-day': 0x6f8797, 'far-water-night': 0x141b24,
     'far-forest': 0x3a4630, 'far-hills': 0x7c8794, 'far-stone': 0xa9a194, 'far-rock': 0x8b8478, 'far-roof': 0x5f6670,
-    'far-glass': 0xc9d2d8, 'far-timber': 0x6e4c30, 'far-window': 0x2b2f36, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
+    'far-glass': 0xc9d2d8, 'far-timber': 0x6e4c30, 'far-window': 0x2b2f36, 'far-window-night': 0xd9a65a, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
   var S = window.CASTLE_TONES && CASTLE_TONES.surfaces;
   function hex(k) { return S && S[k] && S[k].hex ? new THREE.Color(S[k].hex) : new THREE.Color(FALL[k]); }
   var scene = new THREE.Scene(), mats = {};
@@ -1760,7 +1761,14 @@ function farView(F, M, toLocal, panes, paneMat) {
     mode = !!night;
     scene.background = hex(night ? 'sky-night' : 'sky-day').convertSRGBToLinear();
     hemi.intensity = night ? 0.12 : 0.85; sun.intensity = night ? 0.08 : 0.75;
-    var w = scene.getObjectByName('far-water'); if (w) w.material.color.copy(hex(night ? 'far-water-night' : 'far-water-day').convertSRGBToLinear());
+    var w = scene.getObjectByName('far-water'); if (w) {   /* by night at Design's tone as it is seen, not dimmed to black by the night's light */
+      w.material.color.copy(hex(night ? 'far-water-night' : 'far-water-day').convertSRGBToLinear());
+      w.material.emissive.copy(night ? hex('far-water-night').convertSRGBToLinear() : new THREE.Color(0));
+    }
+    if (mats['far-window']) {   /* by night lit from within: the gold as its own light, so the dark around it cannot dim it */
+      mats['far-window'].color.copy(hex(night ? 'far-window-night' : 'far-window').convertSRGBToLinear());
+      mats['far-window'].emissive.copy(night ? hex('far-window-night').convertSRGBToLinear() : new THREE.Color(0));
+    }
     var tm = F.renderer.toneMapping; F.renderer.toneMapping = THREE.NoToneMapping;
     cam.update(F.renderer, scene);
     F.renderer.toneMapping = tm;
