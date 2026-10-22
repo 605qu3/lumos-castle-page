@@ -361,22 +361,6 @@
       "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the bottles' room, stepping in: the fires spring up (PS 16 L5984, read in the canon tool, 22 October 2026), harmless, a way out always open"
     },
     {
-      "id": "stone-chambers.potions-other",
-      "tier": "fixed",
-      "source": "device",
-      "leans": [],
-      "moment": "tap bottle",
-      "when": [
-        "place = stone potions room",
-        "year >= 2"
-      ],
-      "show": [
-        "a sip from the bottle: foul water, a grimace and nothing more"
-      ],
-      "starts": [],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: a bridge until the shell raises the numbered bottles (Magic's req 940, bottle 1, 2, 4, 5, 6: stone-chambers.bottle-N), when the Architect's req 941 lands this record goes: any bottle not numbered, foul water only, a sip, a grimace, nothing more (PS 16 L6030, three \"poison\" in the book, here none: the world rules); each bottle full again at his next visit, nothing kept or carried out"
-    },
-    {
       "id": "stone-chambers.potions-smallest",
       "tier": "fixed",
       "source": "device",
