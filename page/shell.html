@@ -2309,7 +2309,15 @@ var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its
     STONE_FIRES_STAND = 'the purple fire standing in the doorway behind him, and the black flames in the doorway on; neither burns, and the purple parts for him whenever he walks back',
     STONE_BLACK = 'the black flames leaning toward his reaching hand, cold on his fingertips, then standing tall again as he draws it back, not in the least moved',
     STONE_SMALLEST = "the smallest bottle's one swallow, ice flooding his body; he walks forward through the black flames, feeling nothing, to the other side",
-    STONE_ROUND = 'a sip from the rounded bottle at the right end, cold as ice, and the purple fire parting round him as he walks back';
+    STONE_ROUND = 'a sip from the rounded bottle at the right end, cold as ice, and the purple fire parting round him as he walks back',
+    STONE_VERSE = ['Black fire lies before you, while purple lies behind,', 'Two of us will help you, whichever you would find,',   /* Events' `paper`, word for word */
+      'One among us seven will let you move ahead,', 'Another will transport the drinker back instead,',
+      'Two among our number will turn your nose to snout,', 'Three of us are mischief, but harmless, have no doubt.',
+      "Choose, unless you'd rather stand puzzling by the door,", 'To help you in your choice, we give you these clues four:',
+      'First, however slyly the mischief tries to hide,', "You will always find some on a dog-snout's left side;",
+      'Second, different are those who stand at either end,', 'But if you would move onward, neither is your friend;',
+      'Third, as you see clearly, all are different size,', 'Neither dwarf nor giant holds mischief in their insides;',
+      'Fourth, the second left and the second on the right', 'Are twins once you taste them, though different at first sight.'];
 (function () {
   if (!STONE.on) return;
   var z0 = shell.place.floor, P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
@@ -2396,11 +2404,26 @@ var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its
     [[103.08, 35.46], [105.52, 35.46], [103.08, 35.94], [105.52, 35.94]].forEach(function (l) {
       var m = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.77, 0.06), tw); m.position.copy(P(l[0], l[1], 0.375)); m.name = 'stone-bottle-table-leg'; g.add(own(m));
     });
-    var paper = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.24, 10), kit.solid(0xd9ccaa));
-    paper.position.copy(P(103.22, 35.66, 0.8 + 0.014)); paper.rotation.x = Math.PI / 2; paper.name = 'stone-paper'; g.add(own(paper));
-    /* the seven, west to east as he faces them from the door strip: [tap, radius, body height, neck, shape, tint] */
-    [['bottle', 0.034, 0.28, 0.07, 'cyl', 0x3f6a3c], ['bottle', 0.06, 0.12, 0.04, 'cyl', 0x6b4a2a], ['smallest bottle', 0.018, 0.06, 0.025, 'cyl', 0x8fa7b5],
-     ['bottle', 0.045, 0.18, 0.06, 'box', 0x44506e], ['bottle', 0.055, 0.16, 0.08, 'cone', 0x7a3f45], ['bottle', 0.04, 0.22, 0.05, 'cyl', 0x5f6a2e],
+    /* req 941: the roll unrolled at the table's west end, 0.40 by 0.52, its top to the north, away from him as he reads
+       from the door strip, its two ends still curled; the sixteen lines Events' `paper` record shows, in ink, legible
+       close to; a direct child of the shell's group, the tap `paper` (Events' 940) */
+    var pc = document.createElement('canvas'); pc.width = 1200; pc.height = 1560;
+    var px = pc.getContext('2d'); px.fillStyle = '#d9ccaa'; px.fillRect(0, 0, 1200, 1560);
+    px.fillStyle = 'rgba(120,96,60,0.06)'; for (var pi = 0; pi < 60; pi++) { px.beginPath(); px.arc(Math.random() * 1200, Math.random() * 1560, 20 + Math.random() * 90, 0, 6.283); px.fill(); }
+    px.fillStyle = '#2a2018'; px.font = 'italic 37px Georgia, serif'; px.textBaseline = 'alphabetic';
+    STONE_VERSE.forEach(function (l, li) { px.fillText(l, 60, 150 + li * 80 + (li >= 8 ? 40 : 0)); });
+    var ptex = new THREE.CanvasTexture(pc); ptex.encoding = THREE.sRGBEncoding; ptex.anisotropy = 8;
+    var paper = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.52), new THREE.MeshStandardMaterial({ map: ptex, roughness: 0.92, metalness: 0 }));
+    paper.position.copy(P(103.25, 35.69, 0.8 + 0.006));   /* 6 mm over the top, clear of its plane; the curls bear into it */ paper.rotation.x = -Math.PI / 2;
+    paper.name = 'stone-paper'; paper.userData.owner = PLACE; paper.userData.tap = 'paper'; shell.group.add(paper);
+    [35.43, 35.95].forEach(function (y) {   /* the curled ends, each bearing 1 cm into the top */
+      var cu = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.4, 10), kit.solid(0xd2c4a0)); cu.rotation.z = Math.PI / 2;
+      cu.position.copy(P(103.25, y, 0.8 + 0.006)); cu.name = 'stone-paper-curl'; g.add(own(cu));
+    });
+    /* the seven, west to east as he faces them from the door strip: [tap, radius, body height, neck, shape, tint]; req 941
+       numbers the five wrong ones by their place in the line (Events' 940: `bottle 1`, 2, 4, 5, 6) */
+    [['bottle 1', 0.034, 0.28, 0.07, 'cyl', 0x3f6a3c], ['bottle 2', 0.06, 0.12, 0.04, 'cyl', 0x6b4a2a], ['smallest bottle', 0.018, 0.06, 0.025, 'cyl', 0x8fa7b5],
+     ['bottle 4', 0.045, 0.18, 0.06, 'box', 0x44506e], ['bottle 5', 0.055, 0.16, 0.08, 'cone', 0x7a3f45], ['bottle 6', 0.04, 0.22, 0.05, 'cyl', 0x5f6a2e],
      ['rounded bottle', 0.075, 0.15, 0.06, 'ball', 0x9ab0a8]].forEach(function (b, bi) {
       var mat = new THREE.MeshStandardMaterial({ color: kit.col(b[5]), roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.82 });
       var geo = b[4] === 'box' ? new THREE.BoxGeometry(b[1] * 1.6, b[2], b[1] * 1.6) : b[4] === 'cone' ? new THREE.CylinderGeometry(b[1] * 0.35, b[1], b[2], 12)
@@ -2505,6 +2528,108 @@ function stoneCarry(d, line) {   /* the line seen, then the walk through the way
 }
 thingCues[STONE_SMALLEST] = function () { stoneCarry(STONE.on2, STONE_SMALLEST); };
 thingCues[STONE_ROUND] = function () { stoneCarry(STONE.back, STONE_ROUND); };
+/* req 941 (Magic's, docs/magic/rooms.md, *The bottles and the paper*; Events' 940 strings, page/events/stone-chambers.json,
+   word for word): what a wrong bottle does to him, drawn as his own at the edges of his own view and following it every
+   frame: smoke puffing at both edges, his ears (bottle 1); a dog's black wet snout at the foot of the view, sniffing about
+   on its own (2 and 6); bluebell bubbles rising from the foot of the view, his mouth, every one popping (5). Each from its
+   effect line, gone on its end line (Events' "after 55 to 65 s"); bottle 4's chattering squeak is a line only. Nothing
+   glows (lit by the room); owner the place. With no runtime a bottle's tap plays its own minute; ?silly=smoke|snout|bubbles
+   for checks, lumosGreybox.silly(kind) */
+var SILLY_ON = { 'smoke puffing from his ears for about a minute': 'smoke',
+      "his nose a dog's black, wet snout for about a minute, sniffing about on its own": 'snout',
+      'a hiccup of bluebell-coloured bubbles rising from his mouth, every one popping, for about a minute': 'bubbles' },
+    SILLY_OFF = { 'the smoke from his ears thinning to a last wisp and stopping': 'smoke',
+      "the dog's snout shrinking back into his own nose": 'snout',
+      'the last bluebell bubble popping and the hiccups stopping': 'bubbles' },
+    SILLY_TAP = { 'bottle 1': 'smoke', 'bottle 2': 'snout', 'bottle 5': 'bubbles', 'bottle 6': 'snout' };
+var SILLY = PLACE !== 'stone-potions-room' ? null : (function () {
+  var g = new THREE.Group(), o = { g: g, kind: null, on: false, t: 0, snoutK: 0, puffs: [], bubbles: [], next: 0 };
+  g.name = 'stone-silly'; scene.add(g);
+  function own(m) { m.userData.owner = PLACE; m.raycast = function () {}; m.visible = false; return m; }
+  for (var i = 0; i < 18; i++) {   /* the smoke: soft grey puffs, nine an ear, flat grey (unlit, the room too dark to show it; it does not glow) */
+    var p = own(new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshBasicMaterial({ color: kit.col(0x6a666c), transparent: true, opacity: 0, depthWrite: false })));
+    p.userData.side = i % 2 ? 1 : -1; p.userData.age = -(i >> 1) * 0.27; p.name = 'stone-silly-smoke'; g.add(p); o.puffs.push(p);
+  }
+  /* the snout as he sees his own: the top of a wet black nose, its nostrils forward and down, at the end of a short
+     dark-furred muzzle running back down out of the view */
+  var sn = new THREE.Group(), wet = new THREE.MeshPhysicalMaterial({ color: kit.col(0x141213), roughness: 0.18, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.05 });
+  var nose = new THREE.Mesh(new THREE.SphereGeometry(1, 22, 16), wet); nose.scale.set(0.046, 0.032, 0.04); sn.add(nose);
+  [-1, 1].forEach(function (s) {
+    var h = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 8), kit.solid(0x050405)); h.scale.set(0.015, 0.009, 0.008);
+    h.position.set(s * 0.017, -0.012, -0.034); h.rotation.z = s * 0.45; sn.add(h);
+  });
+  var muz = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.05, 0.22, 16), new THREE.MeshStandardMaterial({ color: kit.col(0x4a3c30), roughness: 0.9, metalness: 0 }));
+  muz.rotation.x = Math.PI / 2 + 0.35; muz.position.set(0, -0.05, 0.1); sn.add(muz);
+  sn.traverse(function (m) { m.userData.owner = PLACE; m.raycast = function () {}; });
+  sn.name = 'stone-silly-snout'; sn.visible = false; g.add(sn); o.snout = sn;
+  for (var j = 0; j < 20; j++) {   /* the bubbles: bluebell, clear as soap, each popping */
+    var b = own(new THREE.Mesh(new THREE.SphereGeometry(1, 14, 10), new THREE.MeshStandardMaterial({ color: kit.col(0x8e9ff2), roughness: 0.05, metalness: 0, transparent: true, opacity: 0.5, depthWrite: false })));
+    b.userData.age = -1; b.name = 'stone-silly-bubble'; g.add(b); o.bubbles.push(b);
+  }
+  return o;
+})();
+function sillyStart(kind) {
+  if (!SILLY) return;
+  if (SILLY.kind && SILLY.kind !== kind) sillyStop(SILLY.kind, true);
+  SILLY.kind = kind; SILLY.on = true; SILLY.t = 0; SILLY.next = 0;
+  if (kind === 'smoke') SILLY.puffs.forEach(function (p) { p.userData.age = -Math.random() * 1.2; });
+}
+function sillyStop(kind, now) {
+  if (!SILLY || SILLY.kind !== kind) return;
+  SILLY.on = false;
+  if (now) { SILLY.kind = null; SILLY.snoutK = 0; SILLY.snout.visible = false; SILLY.puffs.concat(SILLY.bubbles).forEach(function (m) { m.visible = false; m.userData.age = -1; m.userData.live = false; }); }
+}
+if (SILLY && /^(smoke|snout|bubbles)$/.test(Q.get('silly') || '')) sillyStart(Q.get('silly'));
+Object.keys(SILLY_ON).forEach(function (line) { thingCues[line] = function () { sillyStart(SILLY_ON[line]); showLines([{ medium: 'seen', sound: line }]); }; });
+Object.keys(SILLY_OFF).forEach(function (line) { thingCues[line] = function () { sillyStop(SILLY_OFF[line]); showLines([{ medium: 'seen', sound: line }]); }; });
+function updateSilly(dt) {
+  if (!SILLY || !SILLY.kind) return;
+  var o = SILLY, D = 0.32, hh = D * Math.tan(camera.fov * Math.PI / 360), hw = hh * camera.aspect;
+  camera.getWorldPosition(o.g.position); camera.getWorldQuaternion(o.g.quaternion);
+  o.t += dt;
+  var live = false;
+  if (o.kind === 'smoke') o.puffs.forEach(function (p) {   /* each puff 2.2 s: out from the ear at the view's edge, up and wide, fading */
+    var u = p.userData;
+    if (!o.on && u.age < 0) { p.visible = false; return; }   /* stopping: no new puff, the last ones thin away */
+    u.age += dt;
+    if (u.age >= 2.2) u.age = o.on ? u.age - 2.2 : -1;
+    if (u.age < 0) { p.visible = false; live = live || o.on; return; }
+    var s = u.age / 2.2; live = true; p.visible = true;
+    p.position.set(u.side * (hw * 0.94 - 0.02 * s), -hh * 0.25 + 0.1 * s, -D);
+    p.scale.setScalar(0.01 + 0.032 * s); p.material.opacity = 0.42 * (1 - s) * Math.min(1, u.age * 6);
+  });
+  if (o.kind === 'snout') {   /* growing out over 0.6 s, shrinking back over 1.4 s; nosing about, left and right, up and down */
+    o.snoutK = Math.min(1, Math.max(0, o.snoutK + (o.on ? dt / 0.6 : -dt / 1.4)));
+    live = o.snoutK > 0; o.snout.visible = live;
+    var sniff = Math.sin(o.t * 15) * (Math.sin(o.t * 1.7) > 0.2 ? 1 : 0);
+    o.snout.position.set(0.03 * Math.sin(o.t * 1.1), -hh * 0.8 + 0.008 * Math.sin(o.t * 0.8), -D);
+    o.snout.rotation.set(0.12 * Math.sin(o.t * 0.9), 0.3 * Math.sin(o.t * 1.1 + 0.6), 0);
+    var sk = 0.75 * o.snoutK; o.snout.scale.set(sk, sk * (1 + 0.05 * sniff), sk * (1 - 0.04 * sniff));
+  }
+  if (o.kind === 'bubbles') {   /* a hiccup every 1.6 s, three to five bubbles; each rises, wobbles, swells and pops */
+    if (o.on) live = true;
+    if (o.on && (o.next -= dt) <= 0) {
+      o.next = 1.6; var n = 3 + Math.floor(Math.random() * 3);
+      o.bubbles.filter(function (b) { return !b.userData.live; }).slice(0, n).forEach(function (b, k) {
+        var u = b.userData; u.live = true; u.wait = k * 0.12; u.age = 0; u.x = (Math.random() - 0.5) * 0.05; u.vy = 0.05 + Math.random() * 0.04;
+        u.r = 0.007 + Math.random() * 0.008; u.pop = 0.9 + Math.random() * 1.4; u.ph = Math.random() * 6.283;
+      });
+    }
+    o.bubbles.forEach(function (b) {
+      var u = b.userData;
+      if (!u.live) { b.visible = false; return; }
+      live = true;
+      if (u.wait > 0) { u.wait -= dt; b.visible = false; return; }
+      u.age += dt;
+      var popping = u.age > u.pop, s = popping ? 1 + (u.age - u.pop) / 0.08 * 0.4 : 1;
+      if (u.age > u.pop + 0.08) { b.visible = false; u.live = false; return; }
+      b.visible = true;
+      b.position.set(u.x + 0.008 * Math.sin(u.age * 6 + u.ph), -hh * 1.05 + u.vy * u.age, -D);
+      b.scale.setScalar(u.r * (0.6 + 0.4 * Math.min(1, u.age / 0.4)) * s); b.material.opacity = popping ? 0.5 * (1 - (u.age - u.pop) / 0.08) : 0.5;
+    });
+  }
+  if (!live && !o.on) sillyStop(o.kind, true);
+}
 function updateStoneThings(dt, t) {
   if (!STONE.on) return;
   STONE.keys.forEach(function (k) {
@@ -3622,6 +3747,12 @@ function tap(cx, cy) {
   if (hit && hit.userData.tap === 'stores cupboard') {   /* req 930, Snape's stores: nothing moves, the string answers */
     if (events) events.tap('stores cupboard'); else showLines([{ medium: 'seen', sound: SO_CUP }]); kit.tapped(true); return;
   }
+  if (hit && hit.userData.tap === 'paper') {   /* req 941, the roll's verse */
+    if (events) events.tap('paper'); else showLines(STONE_VERSE.map(function (l) { return { medium: 'seen', sound: l }; })); kit.tapped(true); return;
+  }
+  if (hit && hit.userData.bottle && !events && SILLY_TAP[hit.userData.bottle]) {   /* req 941 with no runtime: the bottle's own minute */
+    var sk = SILLY_TAP[hit.userData.bottle]; sillyStart(sk); setTimeout(function () { sillyStop(sk); }, 60000); kit.tapped(true); return;
+  }
   if (events && hit && hit.userData.bottle) { events.tap(hit.userData.bottle); kit.tapped(true); return; }   /* req 920, the seven bottles */
   if (hit && PLACE === 'stone-potions-room' && STONE.on2 && hit === STONE.on2.mesh) {   /* req 935, the black flames: never through */
     if (events) events.tap('black flames'); else thingCues[STONE_BLACK](); kit.tapped(true); return;
@@ -3726,7 +3857,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateSnapeOffice(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateSnapeOffice(dt); updateSilly(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -4074,6 +4205,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return STONE.on ? { keys: STONE.keys.length, battered: !!STONE.battered, flames: STONE.flames.length, rise: STONE.rise,
       curls: !!STONE.curls, bottles: shell.group.children.filter(function (m) { return m.userData.bottle; }).length / 2,
       blackTappable: !!(STONE.on2 && tappables.indexOf(STONE.on2.mesh) >= 0), drawn: d.length } : null; },
+  /* req 941: start a wrong bottle's effect ('smoke', 'snout', 'bubbles'), or stop it (null), as its lines would */
+  silly: function (kind) { if (!SILLY) return null; if (kind) sillyStart(kind); else if (SILLY.kind) sillyStop(SILLY.kind);
+    return { kind: SILLY.kind, on: SILLY.on, taps: shell.group.children.filter(function (m) { return m.userData.bottle || m.userData.tap === 'paper'; }).map(function (m) { return m.userData.bottle || m.userData.tap; }) }; },
   /* req 926: the chart room's sky and the night log as they stand; a cue's line passed in plays it */
   astro: function (shown, cue) { var d = shown ? astroShown(shown) : []; if (cue) cueTable[cue]();
     return ASTRO.on ? { sky: !!(ASTRO.sky && ASTRO.sky.mesh.visible), stars: !!(ASTRO.sky && ASTRO.sky.cat), cloud: !!(ASTRO.cloud && ASTRO.cloud.visible),
