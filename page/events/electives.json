@@ -81,7 +81,8 @@
         "year >= 3"
       ],
       "show": [
-        "a lesson under way: the teacher at the demonstration table holding up a thing to ask about, the boys' desk theirs"
+        "a lesson under way: the teacher at the demonstration table holding up a thing to ask about, the boys' desk theirs",
+        "the board with an essay title chalked across it"
       ],
       "canon": "Interiors' req 515 (docs/interiors/muggle-studies-classroom.md, Occupancy and aftermath; the room in model v58's place, 1de78434): his own lesson whenever he walks in, any day and hour, as in Divination; an elective from the Azkaban castle on (PoA 4 L14340; PoA 6 L15206, \"nine o'clock, Muggle Studies\"); no teacher named; the figures People's (req 652); checked against the text, 19 October 2026"
     },
@@ -204,6 +205,34 @@
       ],
       "starts": [],
       "canon": "Godric's touch of 5.22 pm 22 October 2026 (through the orchestrator): a copy left on a desk in the Arithmancy room, tapped, its flyleaf reads H. Granger; B3 ch16 L19644; the room's bare state only (lessons off, term days), the Azkaban castle on as the room"
+    },
+    {
+      "id": "electives.muggle-board",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap muggle board",
+      "when": [
+        "place = muggle studies classroom",
+        "year >= 3"
+      ],
+      "show": [
+        "the bulb in the teacher's hand flickering once as the title is read"
+      ],
+      "lines": [
+        {
+          "medium": "written",
+          "hand": "chalk",
+          "at": "muggle board",
+          "key": "electives.muggle-essay",
+          "canon": "B3 ch12 L18322 (the long Muggle Studies essay, 'Explain why Muggles Need Electricity'), the title word for word, read in the canon tool, 22 October 2026; the chalk on a board and the bulb in the teacher's hand are ours (Godric's woven touch muggle-studies-electricity-essay, 5.38 pm 22 October 2026, through the orchestrator)",
+          "text": [
+            "Explain why Muggles Need Electricity"
+          ]
+        }
+      ],
+      "starts": [],
+      "canon": "Godric's woven touch muggle-studies-electricity-essay (5.38 pm 22 October 2026, people-electives-teachers-r3-1022, candidate 2): the essay title in chalk on the Muggle Studies board, the bulb in the teacher's hand flickering once when the boy reads it; the teacher is in the room whenever he walks in (his own lesson rule), so the bulb is always at hand"
     }
   ]
 }
