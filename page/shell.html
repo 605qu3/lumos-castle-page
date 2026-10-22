@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=486"></script>
-<script src="castle-paint.js?v=82"></script>
+<script src="castle-model.js?v=487"></script>
+<script src="castle-paint.js?v=83"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -2294,7 +2294,7 @@ var STONE = { on: /^stone-(pit|keys-chamber|troll-room|potions-room|last-chamber
 var STONE_DRAWN = {
   'stone-keys-chamber': ['small, jewel-bright birds that are keys, fluttering and tumbling all round the room, glittering, a whirl of rainbow feathers, none of them swooping at him',
     'among the flock, one large silver key with bright blue wings, the feathers crumpled on one side, flying a little lopsided and lower than the rest, very battered',
-    'old school brooms leaning against the wall', 'a heavy wooden door on the far side, shut'],
+    'old school brooms leaning against the wall', 'a heavy wooden door on the far side, standing open on the dark beyond'],
   'stone-troll-room': ['one long scrape across the flagstones toward the far door'],
   'stone-potions-room': ['a table with seven differently shaped bottles standing on it in a line', 'a roll of paper lying beside them',
     'the purple fire standing in the doorway behind him, and the black flames in the doorway on; neither burns, and the purple parts for him whenever he walks back'],
@@ -2409,6 +2409,17 @@ var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its
   STONE.on2 = shell.ways.filter(function (d) { return d.id === 'stone-potions-door-on'; })[0] || null;
   STONE.back = shell.ways.filter(function (d) { return d.id === 'stone-troll-door-out'; })[0] || null;
   if (PLACE === 'stone-potions-room') STONE.leanDir = P(105.5, 33.9, 0).sub(P(106.5, 33.9, 0)).normalize();
+})();
+/* req 935, the keys' door (Godric's 1 on events-keys-door-1022): unlocked and standing open till flying is built (model
+   v156, a way). Its leaf swung back flat along the passage's north reveal, hinged at the great chamber's end where the
+   shut leaf hung, so from the vault it stands open on the dark beyond; drawn from both rooms, foot on the threshold,
+   bearing 1 cm into the reveal; owner the place */
+(function () {
+  if (PLACE !== 'stone-keys-chamber' && PLACE !== 'stone-chess-chamber') return;
+  var z0 = shell.place.floor, A = shell.toLocal(112.1, 55.55, z0 + 0.01), B = shell.toLocal(113.22, 55.55, z0 + 0.01);
+  var leaf = new THREE.Mesh(new THREE.BoxGeometry(1.12, 2.36, 0.12), kit.solid(0x5a4430));
+  leaf.position.copy(A).add(B).multiplyScalar(0.5); leaf.position.y += 1.18; leaf.rotation.y = Math.atan2(-(B.z - A.z), B.x - A.x);
+  leaf.name = 'stone-keys-door-open'; leaf.userData.owner = PLACE; leaf.raycast = function () {}; scene.add(leaf);
 })();
 function stoneShown(shown) {
   if (!STONE.on) return [];
