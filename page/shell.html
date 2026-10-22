@@ -420,6 +420,46 @@ var HALL_LIGHT = (function () {
   });
   return out;
 })();
+/* req 914 (Magic's; docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*), with Events' req 920 strings
+   (page/events/stone-chambers.json): the chambers' own light, from the Chamber's castle on, no torch of the castle's.
+   The pit dim (his own light is Interaction's, the `light on` moment); the keys' chamber brilliantly lit, pale, under its
+   vault; the chess chamber dark till he steps in, then flooding (the arrival's string, or of itself a moment after);
+   the troll's room and the last chamber low and plain; the bottles' room lit by its two fires only, the purple behind
+   him and the black ahead. The passages wait on their slopes (`never`). ?flood=dark|lit for checks. */
+var STONE_LIGHT = (function () {
+  var out = { chess: [], flood: -1 }, P = function (p, x, y, h) { return shell.toLocal(x, y, p.floor + h); };
+  function add(p, hex, i, d, x, y, h) { var l = new THREE.PointLight(hex, i, d, 1.6); l.position.copy(P(p, x, y, h)); scene.add(l); return l; }
+  shell.places.forEach(function (p) {
+    if (!/^stone-(pit|keys-chamber|chess-chamber|troll-room|potions-room|last-chamber)$/.test(p.id)) return;
+    LIT_BY[p.id] = true;
+    if (p.id === 'stone-pit') add(p, 0x8a94a8, 0.3, 7, 151.0, 55.2, 2.2);
+    if (p.id === 'stone-keys-chamber') {
+      [[117, 53], [123, 53], [117, 57], [123, 57]].forEach(function (q) { add(p, 0xf2f0ff, 1.6, 22, q[0], q[1], 4.2); });
+      add(p, 0xffffff, 1.0, 16, 120, 55, 6.8);
+    }
+    if (p.id === 'stone-chess-chamber') {
+      [[95, 50], [101, 50], [107, 50], [95, 60], [101, 60], [107, 60]].forEach(function (q) { out.chess.push(add(p, 0xfff2dc, 0, 24, q[0], q[1], 3.6)); });
+      out.flood = 0;
+    }
+    if (p.id === 'stone-troll-room') { add(p, 0xd8c8a8, 0.45, 10, 94.5, 34.4, 2.6); add(p, 0xd8c8a8, 0.45, 10, 97.5, 34.4, 2.6); }
+    if (p.id === 'stone-potions-room') { out.purple = add(p, 0x9a4cff, 1.1, 7, 102.4, 34.4, 1.0); out.black = add(p, 0x50506a, 0.25, 5, 106.1, 34.4, 1.0); }
+    if (p.id === 'stone-last-chamber') { add(p, 0xc8c4bc, 0.4, 12, 113.25, 34.5, 2.8); add(p, 0x50506a, 0.2, 5, 108.9, 34.4, 1.0); }
+  });
+  return out;
+})();
+function stoneFlood(now) {   /* the chess chamber's light up over 0.5 s, after 0.4 s dark */
+  if (!STONE_LIGHT.chess.length || STONE_LIGHT.flood > 0) return;
+  STONE_LIGHT.flood = now ? 0.9 : 0.001;
+}
+function updateStone(dt) {
+  if (!STONE_LIGHT.chess.length) return;
+  var q = Q.get('flood');
+  if (q === 'dark') { STONE_LIGHT.chess.forEach(function (l) { l.intensity = 0; }); return; }
+  if (STONE_LIGHT.flood === 0) { STONE_LIGHT.wait = (STONE_LIGHT.wait || 0) + dt; if (q === 'lit' || STONE_LIGHT.wait > 1.5) stoneFlood(q === 'lit'); return; }
+  if (STONE_LIGHT.flood > 0 && STONE_LIGHT.flood < 0.9) STONE_LIGHT.flood = Math.min(0.9, STONE_LIGHT.flood + dt);
+  var k = Math.max(0, Math.min(1, (STONE_LIGHT.flood - 0.4) / 0.5));
+  STONE_LIGHT.chess.forEach(function (l) { l.intensity = 1.3 * k; });
+}
 shell.places.forEach(function (p, pi) {
   if (LIT_BY[p.id]) return;
   var xs = p.poly.map(function (q) { return q[0]; }), ys = p.poly.map(function (q) { return q[1]; });
@@ -2182,6 +2222,9 @@ function staffThingsShown(shown) {
   return drawn;
 }
 if (W1.on) staffThingsSet(Q.get('prophet') === 'on', +(Q.get('rota') || 0));
+/* req 914: the chess chamber's arrival (Events' stone-chambers.chess-dark), word for word: dark, then light flooding */
+var STONE_CHESS_DARK = 'the chamber dark until he steps in, then light flooding the room, the board and every piece in it at once in full light';
+thingCues[STONE_CHESS_DARK] = function () { stoneFlood(false); showLines([{ medium: 'seen', sound: STONE_CHESS_DARK }]); };
 thingCues[STAFF_COALS] = function () { if (!STAFF.on) return; staffMove.dip = 1.4; showLines([{ medium: 'heard', sound: STAFF_COALS }]); };
 thingCues[STAFF_CUSHION] = function () {
   if (!W1.dent) return; staffMove.dent = 6; showLines([{ medium: 'seen', sound: STAFF_CUSHION }]);
@@ -2873,6 +2916,7 @@ function frame() {
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
+  updateStone(dt);
   if (events && events.tick) events.tick(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
