@@ -171,8 +171,9 @@ function findPlace(M, id) {
     var fl = String(m.floors || 'G').split('-'), lo = levelZ(M, fl[0]), hi = levelZ(M, fl[fl.length - 1]) + (M.site.storey || 5.2);
     var b = m.rect;
     /* a mass with its roof in the model (v20, the stair hall's: ledger line 15) rises to it, its flat part the ceiling */
+    /* req 899 (v61): only a roof with its lead flat is built as the stair hall's is; a range's roof without one (or a bare number) leaves the mass its top storey */
     return { id: slug(m.id), name: m.id, kind: 'mass', poly: [[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]]], floor: lo,
-      ceiling: m.court ? null : m.roof ? m.roof.flat.z : hi, wall: WALL_T, walls: null, rec: m, roof: m.roof || null };
+      ceiling: m.court ? null : (m.roof && m.roof.flat) ? m.roof.flat.z : hi, wall: WALL_T, walls: null, rec: m, roof: (m.roof && m.roof.flat) ? m.roof : null };
   }
   return null;
 }
