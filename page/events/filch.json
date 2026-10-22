@@ -126,6 +126,16 @@
         "in his hand, out of Filch's box: a bag of Hiccough Sweets from Zonko's"
       ],
       "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: one thing a visit taken back out of the box, \"Hiccough Sweets\" (PoA 14 L18888, read in the canon tool, 20 October 2026), from the Azkaban castle's Hogsmeade Saturdays"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "office_catch = left"
+      ],
+      "show": [
+        "the form left half written on the desk, the quill thrown across it"
+      ],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; endings 1 and 2: what Filch leaves when Peeves calls him away (ours)"
     }
   ],
   "records": [
@@ -654,7 +664,8 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
-        "place = filchs office"
+        "place = filchs office",
+        "office_catch != held"
       ],
       "show": [
         "Mrs Norris watching him from her place, bulging, lamp-like eyes just like Filch's"
@@ -673,7 +684,8 @@
       "weight": 3,
       "moment": "arrive",
       "when": [
-        "place = filchs office"
+        "place = filchs office",
+        "office_catch != held"
       ],
       "starts": []
     },
@@ -686,7 +698,8 @@
       "moment": "wait 30-90 s",
       "when": [
         "place = filchs office",
-        "office_norris = here"
+        "office_norris = here",
+        "office_catch != held"
       ],
       "show": [
         "Mrs Norris gone from her place"
@@ -705,7 +718,8 @@
       "weight": 1,
       "moment": "wait 60-240 s",
       "when": [
-        "place = filchs office"
+        "place = filchs office",
+        "office_catch != held"
       ],
       "show": [
         "Filch's shuffle and his muttering coming along the corridor, stopping outside the door",
@@ -724,7 +738,8 @@
       "weight": 2,
       "moment": "wait 60-240 s",
       "when": [
-        "place = filchs office"
+        "place = filchs office",
+        "office_catch != held"
       ],
       "starts": []
     },
@@ -737,7 +752,8 @@
       "moment": "tap confiscations",
       "when": [
         "place = filchs office",
-        "took_box != yes"
+        "took_box != yes",
+        "office_catch != held"
       ],
       "starts": [
         "set box_thing = from bag confiscations",
@@ -755,13 +771,135 @@
       "moment": "tap confiscations",
       "when": [
         "place = filchs office",
-        "took_box = yes"
+        "took_box = yes",
+        "office_catch != held"
       ],
       "show": [
         "the heap in the box settling, a paper tag rustling"
       ],
       "starts": [],
       "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: a second tap the same visit answers, ours"
+    },
+    {
+      "id": "filch.catch-office-form",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = filchs office",
+        "office_catch = held"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "desk"
+        }
+      ],
+      "show": [
+        "Filch behind his desk, the lamp turned up over a long roll of parchment, his quill dipping into the ink pot",
+        "Mrs Norris watching him from her place, bulging, lamp-like eyes just like Filch's"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-form",
+          "sound": "Filch at his desk, writing out a form",
+          "text": [
+            "Name... hm. Crime... being underfoot, with intent. Suggested...",
+            "Name... hm. Crime... loitering about the castle, with intent. Suggested..."
+          ],
+          "canon": "ours, in his voice; CoS 8 L9037 to L9041 (\"Name…Harry Potter. Crime…\" and \"Crime…befouling the castle…suggested sentence…\"), read in the canon tool, 22 October 2026, a wink: he knows no name, the crime is a comic one, and the line stops before any sentence"
+        }
+      ],
+      "starts": [
+        "set office_norris = here"
+      ],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; endings 1 and 2, the office: he has marched the boy in and begins the form (the hook is the Peeves record, filch.catch-office-crash)"
+    },
+    {
+      "id": "filch.catch-office-crash",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 12-18 s",
+      "when": [
+        "place = filchs office",
+        "office_catch = held"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "desk"
+        }
+      ],
+      "show": [
+        "a crash of armour somewhere far off, a cackle after it, the lamp rattling on its chain"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-peeves",
+          "sound": "Filch roaring, flinging down his quill",
+          "text": [
+            "PEEVES! I'll have you this time!",
+            "PEEVES! This time, this time, I'll have you!"
+          ],
+          "canon": "CoS 8 L9045 to L9049 (\"PEEVES!\" Filch roared... \"I'll have you this time, I'll have you!\" and he ran flat-footed from the office, Mrs. Norris streaking alongside him), read in the canon tool, 22 October 2026, a wink, the words ours",
+          "then": "flings down his quill and runs from the office without a backward glance, Mrs Norris streaking after him, the door left open"
+        }
+      ],
+      "starts": [
+        "set office_catch = left",
+        "set office_norris = gone"
+      ],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; endings 1 and 2: Peeves's crash calls him away, the boy is left with the box"
+    },
+    {
+      "id": "filch.catch-drawer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap dangerous drawer",
+      "when": [
+        "place = filchs office",
+        "office_catch = left",
+        "drawer_gag = yes",
+        "year >= 3",
+        "drawer_tried != yes"
+      ],
+      "show": [
+        "the drawer marked Confiscated and Highly Dangerous rattling hard in its cabinet, something inside snapping at the lock, then the whole drawer going still; it stays shut and locked"
+      ],
+      "starts": [
+        "set drawer_tried = yes"
+      ],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 2 only: PoA 10 L17160 (\"a drawer in one of his filing cabinets marked Confiscated and Highly Dangerous\"), read in the canon tool, 22 October 2026; a gag, nothing comes out, the drawer never opens (Interiors' row 92, `docs/interiors/filchs-office.md`); nothing in it is harmed or shown"
+    },
+    {
+      "id": "filch.catch-drawer-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap dangerous drawer",
+      "when": [
+        "place = filchs office",
+        "office_catch = left",
+        "drawer_gag = yes",
+        "year >= 3",
+        "drawer_tried = yes"
+      ],
+      "show": [
+        "one small snap from inside the drawer marked Confiscated and Highly Dangerous, which stays shut and locked"
+      ],
+      "starts": [],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 2 only: a second tap the same visit answers, ours"
     },
     {
       "id": "filch.office-leave",
@@ -775,7 +913,10 @@
         "set took_box = no",
         "set office_norris = gone",
         "set filch_drawn = no",
-        "set filch_door = shut"
+        "set filch_door = shut",
+        "set office_catch = none",
+        "set drawer_gag = no",
+        "set drawer_tried = no"
       ],
       "canon": "Magic's req 749 (docs/magic/rooms.md, Filch's office, rewritten for the walk-in; Godric's 2 on interiors-filch-inside-1020, 12.52 pm), every year: the visit's draws cleared at leave"
     },
@@ -929,7 +1070,7 @@
         }
       ],
       "starts": [],
-      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; in the open he stops at the top; the page waits there, never nearer, and raises `filch at top` again if the boy hides, `filch grumbles off` if he reaches home, `filch gone` if Back takes him down the stairs"
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; in the open he stops at the top; the page waits there, never nearer, and, if the boy stands in the open a while, raises `filch catches` (the three endings, filch.catch-*), else raises `filch at top` again if the boy hides, `filch grumbles off` if he reaches home, `filch gone` if Back takes him down the stairs"
     },
     {
       "id": "filch.chase-hidden",
@@ -997,6 +1138,187 @@
         "set chase = off"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; hidden, he shuffles past, asks the Fat Lady and goes down: the page walks his lamp along the corridor to her end and back to the stairs, never turning"
+    },
+    {
+      "id": "filch.catch-one",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "catch_turn != two",
+        "catch_turn != three"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch lifts his lamp over the boy, peers at him and jerks his head at the stairs; the boy follows him down, Mrs Norris padding behind"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-aha-one",
+          "sound": "Filch at the top of the stairs, lamp raised over the boy",
+          "text": [
+            "Aha. You."
+          ],
+          "canon": "ours, in his voice; CoS 8 L9037 (Filch at his desk with the roll of parchment, \"Name…Harry Potter. Crime…\"), read in the canon tool, 22 October 2026, a wink only"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-follow-one",
+          "sound": "Filch leading the way down the stairs",
+          "text": [
+            "Follow me, and no dawdling."
+          ],
+          "canon": "ours, in his voice; comic, no hand on the boy"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-usual-one",
+          "sound": "Filch on the stairs, grumbling to Mrs Norris",
+          "text": [
+            "The usual, my sweet. A form, and a long one.",
+            "A form for this, my sweet. A long one."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091, checked against the text); PoA 10 L17154 (\"hauled us off to his office and started threatening us with the usual\"), read in the canon tool, 22 October 2026, the threats left out: nothing is a punishment or a detention"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "set office_catch = held",
+        "set catch_turn = two"
+      ],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 1 (a boy stood in the open at the top of the stairs; the page raises `filch catches` after he has stood there a while, hiding no): marched to his office and the form begun, then called off by Peeves; the office records carry the rest (`office_catch = held`)"
+    },
+    {
+      "id": "filch.catch-two",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "catch_turn = two"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch lifts his lamp over the boy, peers at him and jerks his head at the stairs; the boy follows him down, Mrs Norris padding behind"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-aha-two",
+          "sound": "Filch at the top of the stairs, lamp raised over the boy",
+          "text": [
+            "Aha. There you are."
+          ],
+          "canon": "ours, in his voice; CoS 8 L9037, a wink only"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-follow-two",
+          "sound": "Filch leading the way down the stairs",
+          "text": [
+            "This way. Mind the steps, I'll not be carrying you."
+          ],
+          "canon": "ours, in his voice; comic, no hand on the boy"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-usual-two",
+          "sound": "Filch on the stairs, grumbling to Mrs Norris",
+          "text": [
+            "Straight to the office, my sweet. Forms all round.",
+            "Straight down, my sweet. Forms all round."
+          ],
+          "canon": "ours, in his voice; PoA 10 L17154, as filch.catch-one"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "set office_catch = held",
+        "set drawer_gag = yes",
+        "set catch_turn = three"
+      ],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 2: the same march, and the office's drawer marked Confiscated and Highly Dangerous (PoA 10 L17160, read in the canon tool, 22 October 2026) rattles when he tries it once Filch has gone, in the years the drawer stands (year 3 on, Interiors' row 92); before then it is ending 1 again"
+    },
+    {
+      "id": "filch.catch-three",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "catch_turn = three"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch lifts his lamp over the boy, looks him up and down, sniffs and waves him on; the lamp goes back down the stairs, Mrs Norris with it"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-paperwork",
+          "sound": "Filch at the top of the stairs, looking the boy over",
+          "text": [
+            "Hm. Not worth the paperwork. Off with you.",
+            "Hm. Not worth the ink. Off with you."
+          ],
+          "canon": "ours, in his voice (Godric's own words in the ruling, \"Not worth the paperwork\"); comic, a let-off, nothing written"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-all-that",
+          "sound": "Filch going down the stairs, grumbling to Mrs Norris",
+          "text": [
+            "All those stairs, my sweet, for nothing. Nothing at all.",
+            "All that wheezing, my sweet, and for what?"
+          ],
+          "canon": "ours, in his voice (his knees and his wheezing, the chase's own joke, filch.chase-top-open)"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "set catch_turn = one"
+      ],
+      "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 3: a short let-off in the corridor, no office"
     },
     {
       "id": "filch.chase-home",
@@ -1070,6 +1392,9 @@
           "mark": "her frame"
         }
       ],
+      "show": [
+        "the Fat Lady swings open and he climbs through"
+      ],
       "lines": [
         {
           "speaker": "fat-lady",
@@ -1085,7 +1410,7 @@
       "starts": [
         "set lady = shut"
       ],
-      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the password's fallback during a chase"
+      "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the password's fallback during a chase; and, req 910 (the Corridor, 22 October 2026, 9.35 am), the opening every way in ends with: she lets him in, so the cue is shown word for word as `password.give-in` carries it"
     },
     {
       "id": "filch.chase-leave",
@@ -1095,7 +1420,9 @@
       "moment": "leave",
       "when": [],
       "starts": [
-        "set chase = off"
+        "set chase = off",
+        "set office_catch = none",
+        "set drawer_gag = no"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a chase never outlives the visit"
     }
