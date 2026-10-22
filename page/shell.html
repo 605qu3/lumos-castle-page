@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=487"></script>
-<script src="castle-paint.js?v=83"></script>
+<script src="castle-model.js?v=488"></script>
+<script src="castle-paint.js?v=84"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -2330,6 +2330,28 @@ var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its
       var t = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, 0.025 + rnd() * 0.02, 6, false), vine); t.name = 'stone-snare'; g.add(own(t));
     }
     STONE.curlMat = vine;
+    /* the ladder (model v157, `stone-ladder`; option 1 on architect-stone-ladder-1022, provisional, Godric to confirm):
+       two iron stiles from the shaft's lip down the pit's height on the shaft's east side, x 151.52, y 54.88 and 55.52,
+       a rung every 0.3 between them, a foot plate pinned to the flags; the stiles' heads 1 cm into the roof, the plate
+       1 cm into the floor. The rungs above the roof are in the shaft, past the hatch's dark square, never drawn */
+    var iron = kit.solid(0x3c3c44), RH = shell.place.ceiling - shell.place.floor;
+    [54.88, 55.52].forEach(function (y) { g.add(own(thingBox(g, P, [151.5, y - 0.02, -0.01], [151.54, y + 0.02, RH + 0.01], iron))); });
+    for (var rz = 0.3; rz < RH - 0.1; rz += 0.3) {
+      var rg = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.62, 8), iron); rg.rotation.x = Math.PI / 2;
+      rg.position.copy(P(151.52, 55.2, rz)); rg.name = 'stone-rung'; g.add(own(rg));
+    }
+    g.add(own(thingBox(g, P, [151.38, 54.8, -0.01], [151.66, 55.6, 0.05], iron)));
+    /* the Snare grown thick up the stiles and over the rungs to the roof: tendrils winding up the ladder's face, each its
+       own band of height, so the torch can part one band for a moment and a lit wand draw them all down bit by bit */
+    STONE.climb = [];
+    for (var j = 0; j < 14; j++) {
+      var cp = [], z = j * RH / 14 - 0.1, side = j % 2 ? 54.88 : 55.52, ph = rnd() * 6.283;
+      for (var q = 0; q < 8; q++) { var zz = Math.min(RH - 0.05, Math.max(0.03, z + q * 0.06)); cp.push(P(151.45 - 0.03 * Math.sin(ph + q), side + (55.2 - side) * (q / 7) + 0.05 * Math.cos(ph + q * 1.3), zz)); }
+      var ct = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(cp), 20, 0.022 + rnd() * 0.012, 6, false), vine);
+      var c0 = cp[0].clone(); ct.geometry.translate(-c0.x, -c0.y, -c0.z); ct.position.copy(c0);   /* its origin at its foot */
+      ct.name = 'stone-snare-climb'; ct.userData.z = z; ct.userData.k = 1; g.add(own(ct)); STONE.climb.push(ct);
+    }
+    STONE.climbT = Q.get('rungs') === 'clear' ? 0 : 1; STONE.climbK = STONE.climbT; STONE.climbRate = 0; STONE.flinch = -1;
   }
   if (PLACE === 'stone-keys-chamber') {
     var shaftM = [0xc9a64a, 0xb8bcc4, 0xa87a46].map(function (c) { return new THREE.MeshStandardMaterial({ color: kit.col(c), roughness: 0.35, metalness: 0.8 }); });
@@ -2426,7 +2448,39 @@ var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its
 function stoneShown(shown) {
   if (!STONE.on) return [];
   if (PLACE === 'stone-potions-room' && STONE_FIRES_STAND && shown.indexOf(STONE_FIRES_STAND) >= 0) STONE.riseT = 1;
-  return STONE_DRAWN.filter(function (s) { return shown.indexOf(s) >= 0; });
+  if (PLACE === 'stone-pit' && shown.indexOf(STONE_RUNGS_CLEAR) >= 0 && !Q.get('rungs')) stoneClimb(0, 2.0);
+  return STONE_DRAWN.concat(PLACE === 'stone-pit' ? [STONE_RUNGS_WALL, STONE_RUNGS_CLEAR] : []).filter(function (s) { return shown.indexOf(s) >= 0; });
+}
+/* req 935, the rungs (Events' strings for Magic's 931, word for word): the Snare over the ladder, parted a moment where
+   his torch falls (`light on`: one band of it, 1.2 s, then creeping back), drawn down off it bit by bit from his raised
+   wand (`wand light on`, from the floor up over 2 s, clear while it is lit) and creeping back slowly at Nox (6 s), never
+   over him. The page raising the two wand moments is Interaction's; ?rungs=clear for checks. The way up the ladder
+   stays open whether the Snare is on it or not: the passage west is not walked yet, so it is the pit's one way out */
+var STONE_RUNGS_WALL = 'the Snare grown thick and still up the walls of the shaft and over the iron rungs set in them, all the way up to the trapdoor',
+    STONE_RUNGS_TORCH = "where his torch's beam falls the tendrils on the walls flinching back, an iron rung showing for a moment, and the tendrils creeping back over it as the beam moves on",
+    STONE_RUNGS_CLEAR = "the Snare drawing back from the walls of the shaft bit by bit from his raised wand's light, the iron rungs showing from the floor to the trapdoor and staying clear while it is lit",
+    STONE_RUNGS_BACK = 'the wand put out, the Snare creeping back over the rungs a little at a time, slowly, and never over him';
+function stoneClimb(to, secs) { if (!STONE.climb) return; STONE.climbT = to; STONE.climbRate = 1 / secs; }
+thingCues[STONE_RUNGS_TORCH] = function () {
+  if (STONE.climb) { STONE.flinch = 0; STONE.flinchBand = Math.floor(Math.random() * STONE.climb.length); }
+  showLines([{ medium: 'seen', sound: STONE_RUNGS_TORCH }]);
+};
+thingCues[STONE_RUNGS_CLEAR] = function () { stoneClimb(0, 2.0); showLines([{ medium: 'seen', sound: STONE_RUNGS_CLEAR }]); };
+thingCues[STONE_RUNGS_BACK] = function () { stoneClimb(1, 6.0); showLines([{ medium: 'seen', sound: STONE_RUNGS_BACK }]); };
+function updateStoneClimb(dt) {   /* each tendril shrinks to nothing about its own foot */
+  if (!STONE.climb) return;
+  if (STONE.climbK !== STONE.climbT) {
+    var d = STONE.climbT - STONE.climbK, s = dt * STONE.climbRate;
+    STONE.climbK = Math.abs(d) <= s ? STONE.climbT : STONE.climbK + Math.sign(d) * s;
+  }
+  var n = STONE.climb.length, f = STONE.flinch >= 0 ? (STONE.flinch += dt) : -1;
+  if (f > 1.2) STONE.flinch = -1;
+  STONE.climb.forEach(function (c, i) {
+    var u = i / n;   /* the high ones go first and come back last: it creeps back up from the floor */
+    var k = Math.min(1, Math.max(0, STONE.climbK * 1.5 - u * 0.5));
+    if (f >= 0 && Math.abs(i - STONE.flinchBand) <= 1) k *= f < 0.25 ? 1 - f / 0.25 * 0.85 : 0.15 + 0.85 * Math.max(0, (f - 0.5) / 0.7);
+    c.visible = k > 0.02; c.scale.setScalar(Math.max(0.02, k));
+  });
 }
 function stoneCurls(on) {   /* six tendrils round his ankles where he stands, never above them */
   if (STONE.curls) { STONE.curls.parent.remove(STONE.curls); STONE.curls = null; }
@@ -3602,7 +3656,7 @@ function frame() {
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
-  updateStone(dt);
+  updateStone(dt); updateStoneClimb(dt);
   updateStoneThings(dt, clock.elapsedTime);
   updateAstro(dt);
   if (events && events.tick) events.tick(dt);
