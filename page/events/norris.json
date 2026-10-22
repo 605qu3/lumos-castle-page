@@ -154,12 +154,33 @@
       "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; a visit's kindness is counted once, and the scrap never outlives the visit"
     },
     {
+      "id": "norris.toe-cupboard-calm-0",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "toe-cupboard",
+      "weight": 4,
+      "moment": "tap broom cupboard",
+      "when": [
+        "place = corridor",
+        "at = cupboard",
+        "norris != none",
+        "chase != on",
+        "norris_trust < 3"
+      ],
+      "show": [
+        "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
+      ],
+      "starts": [],
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-cupboard; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: middling, wary: her whisk about 2 in 3 (trust 0 to 2)"
+    },
+    {
       "id": "norris.toe-cupboard-calm-1",
       "tier": "fixed",
       "source": "device",
       "leans": [],
       "one_of": "toe-cupboard",
-      "weight": 2,
+      "weight": 6,
       "moment": "tap broom cupboard",
       "when": [
         "place = corridor",
@@ -173,7 +194,7 @@
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
       "starts": [],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-cupboard"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-cupboard; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: middling, her whisk about 4 in 7 (trust 3 to 5)"
     },
     {
       "id": "norris.toe-cupboard-calm-2",
@@ -181,7 +202,7 @@
       "source": "device",
       "leans": [],
       "one_of": "toe-cupboard",
-      "weight": 5,
+      "weight": 12,
       "moment": "tap broom cupboard",
       "when": [
         "place = corridor",
@@ -195,7 +216,7 @@
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
       "starts": [],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-cupboard"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-cupboard; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: middling, her whisk about 2 in 5 (trust 6 to 8)"
     },
     {
       "id": "norris.toe-cupboard-calm-3",
@@ -203,7 +224,7 @@
       "source": "device",
       "leans": [],
       "one_of": "toe-cupboard",
-      "weight": 10,
+      "weight": 24,
       "moment": "tap broom cupboard",
       "when": [
         "place = corridor",
@@ -216,7 +237,28 @@
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
       "starts": [],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-cupboard"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-cupboard; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: middling, her whisk about 1 in 4 at full trust (9 and up)"
+    },
+    {
+      "id": "norris.toe-armour-calm-0",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "toe-armour",
+      "weight": 8,
+      "moment": "tap armour",
+      "when": [
+        "place = corridor",
+        "at = armour",
+        "norris != none",
+        "chase != on",
+        "norris_trust < 3"
+      ],
+      "show": [
+        "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
+      ],
+      "starts": [],
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-armour; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: slight, wary: her whisk about 1 in 2 (trust 0 to 2)"
     },
     {
       "id": "norris.toe-armour-calm-1",
@@ -224,7 +266,7 @@
       "source": "device",
       "leans": [],
       "one_of": "toe-armour",
-      "weight": 2,
+      "weight": 12,
       "moment": "tap armour",
       "when": [
         "place = corridor",
@@ -238,7 +280,7 @@
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
       "starts": [],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-armour"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-armour; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: slight, her whisk about 2 in 5 (trust 3 to 5)"
     },
     {
       "id": "norris.toe-armour-calm-2",
@@ -246,7 +288,7 @@
       "source": "device",
       "leans": [],
       "one_of": "toe-armour",
-      "weight": 5,
+      "weight": 24,
       "moment": "tap armour",
       "when": [
         "place = corridor",
@@ -260,7 +302,7 @@
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
       "starts": [],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-armour"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-armour; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: slight, her whisk about 1 in 4 (trust 6 to 8)"
     },
     {
       "id": "norris.toe-armour-calm-3",
@@ -268,7 +310,7 @@
       "source": "device",
       "leans": [],
       "one_of": "toe-armour",
-      "weight": 10,
+      "weight": 72,
       "moment": "tap armour",
       "when": [
         "place = corridor",
@@ -281,7 +323,7 @@
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
       "starts": [],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-armour"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; her whisk at a toe out of line falls (about 4 in 5, then 3 in 5, then 2 in 5), never to none: the partners of filch.chase-toe-armour; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: slight, her whisk about 1 in 10 at full trust (9 and up)"
     },
     {
       "id": "norris.night-calm-1",
@@ -289,7 +331,7 @@
       "source": "device",
       "leans": [],
       "one_of": "filch-chase",
-      "weight": 3,
+      "weight": 2,
       "moment": "wait 150-420 s",
       "when": [
         "place = corridor",
@@ -305,7 +347,7 @@
       "starts": [
         "stamp chase_night by night"
       ],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; the night's own whisk (filch.chase-night, weight 1, silent partner 2) given a calm partner as she warms; once a night"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; the night's own whisk (filch.chase-night, weight 1, silent partner 2) given a calm partner as she warms; once a night; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: middling, the night's whisk to about three fifths of the wary odds (trust 3 to 5)"
     },
     {
       "id": "norris.night-calm-2",
@@ -313,7 +355,7 @@
       "source": "device",
       "leans": [],
       "one_of": "filch-chase",
-      "weight": 6,
+      "weight": 4,
       "moment": "wait 150-420 s",
       "when": [
         "place = corridor",
@@ -329,7 +371,7 @@
       "starts": [
         "stamp chase_night by night"
       ],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; the night's own whisk (filch.chase-night, weight 1, silent partner 2) given a calm partner as she warms; once a night"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; the night's own whisk (filch.chase-night, weight 1, silent partner 2) given a calm partner as she warms; once a night; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: middling, to about two fifths (trust 6 to 8)"
     },
     {
       "id": "norris.night-calm-3",
@@ -337,7 +379,7 @@
       "source": "device",
       "leans": [],
       "one_of": "filch-chase",
-      "weight": 12,
+      "weight": 7,
       "moment": "wait 150-420 s",
       "when": [
         "place = corridor",
@@ -352,7 +394,7 @@
       "starts": [
         "stamp chase_night by night"
       ],
-      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; the night's own whisk (filch.chase-night, weight 1, silent partner 2) given a calm partner as she warms; once a night"
+      "canon": "PS 8 L2728 (Mrs Norris runs for Filch at a toe out of line) and PS 16 L5716 (she turned her lamp-like eyes on them but did not do anything), checked against the text in the canon tool, 22 October 2026; Godric's pick on corridor-chase-ideas-1022 (all four ideas and befriending Mrs Norris over time, 22 October 2026, relayed 1.50 pm), his treat on corridor-norris-befriending-1022 taken by the away rule at 2.40 pm on the orchestrator's word, option 1, a bit of breakfast from his pocket, PROVISIONAL, Godric to confirm; the design is docs/notes/2026-10-22-corridor-norris-befriending.md (req 933); befriending her is ours, a departure for Kingsley, she is never punished and nobody is told a thing; the night's own whisk (filch.chase-night, weight 1, silent partner 2) given a calm partner as she warms; once a night; Godric's rule of 3.11 pm 22 October 2026 (corridor-norris-befriending-1022, the note's *Cats are chaos wrapped in fur*): her alert odds scale with how bad the deed is and befriending lowers them, never to none: middling, to about three tenths at full trust (9 and up)"
     },
     {
       "id": "norris.sniff-around-1",
