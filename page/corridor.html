@@ -3921,13 +3921,58 @@ function updateChase(dt) {
   }
 }
 function chaseOff() { filch.light.intensity = 0; filch.light.position.y = -10; }
+/* Filch drawn (req 963 (2), the page half of req 962; People's assets/layers/filch-figure.png, Godric's 1 on
+   people-filch-r1-1022: seven cells of 521 by 1124 px at 651 px a metre, 0.8 by 1.73 m, each facing screen right).
+   Only behind ?filchFigure until Godric picks it: built heard and lit by his 1s of 15 and 21 October, so whether he is
+   seen is his. One Filch on the lamp's way, day pass and chase alike: cells 0 and 1 in turn at his step while he
+   shuffles (mirrored when he goes left on the screen), 2 stopped at the top getting his breath, 3 lifting the lantern
+   over the boy, 4 waving him on; 5 and 6 are his office's (shell.html). His lamp's light sits at the drawn lantern,
+   a hand's breadth toward the eye so it lights him, measured once on the atlas (x from his middle, y from his feet) */
+var FILCH_FIG = { on: groundsQ.has('filchFigure'), w: 0.8, h: 1.726, n: 7, toEye: 0.12,
+  lantern: [[0.19, 0.50], [0.20, 0.53], [-0.21, 1.14], [0.29, 1.40], [-0.26, 0.49]] };
+var filchSheet = FILCH_FIG.on ? new THREE.TextureLoader().load('../assets/layers/filch-figure.png') : new THREE.Texture();
+filchSheet.encoding = THREE.sRGBEncoding;
+var filchFig = new THREE.Mesh(new THREE.PlaneGeometry(FILCH_FIG.w, FILCH_FIG.h), new THREE.MeshStandardMaterial({ map: filchSheet,
+  roughness: 0.95, metalness: 0, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide }));
+filchFig.name = 'filch'; filchFig.visible = false; scene.add(filchFig);
+var filchWas = { x: null, flip: false, cell: 0 };
+function filchShow(cell, flip) { filchSheet.repeat.x = (flip ? -1 : 1) / FILCH_FIG.n; filchSheet.offset.x = (cell + (flip ? 1 : 0)) / FILCH_FIG.n; }
+function updateFilchFigure(dt) {
+  if (!FILCH_FIG.on) return;
+  var x, y, a, still, cell;
+  if (filch.t >= 0) {   /* the day pass, its lamp's own way */
+    var d = filch.t * FILCH.speed, k = d / (FILCH.reach * 2);
+    x = filch.from + filch.dir * d; y = 0; a = Math.min(1, 3 * Math.sin(Math.PI * Math.min(1, k)));
+    still = false;
+  } else if (chase.lamp !== 'none') {
+    x = chase.x; y = chase.y; a = Math.min(1, chase.lk * 1.5);
+    still = chase.lamp === 'top' || (chase.lamp === 'visit' && chase.visitT >= 0) || (chase.lamp === 'near' && chase.x === chase.nearX);
+  } else { filchFig.visible = false; filchWas.x = null; return; }
+  var moved = filchWas.x === null ? 0 : x - filchWas.x;
+  if (!still && Math.abs(moved) > 1e-5) {
+    var right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
+    filchWas.flip = moved * right.x < 0;
+  }
+  filchWas.x = x;
+  if (still) cell = chase.lamp === 'near' ? (chase.how === 'off' ? 4 : 3) : 2;
+  else cell = Math.sin(t * LAMP.step) > 0 ? 0 : 1;
+  var flip = cell < 2 && filchWas.flip;
+  filchShow(cell, flip);
+  filchFig.position.set(x, y + FILCH_FIG.h / 2, MID_Z);
+  filchFig.rotation.y = Math.atan2(camera.position.x - x, camera.position.z - MID_Z);   /* square to the eye */
+  filchFig.material.opacity = a; filchFig.visible = a > 0.02;
+  /* the lamp's light at the drawn lantern, along the card's own right and toward the eye */
+  var L = FILCH_FIG.lantern[cell], sx = Math.cos(filchFig.rotation.y), sz = -Math.sin(filchFig.rotation.y), ex = Math.sin(filchFig.rotation.y), ez = Math.cos(filchFig.rotation.y);
+  var lx = (flip ? -1 : 1) * L[0];
+  filch.light.position.set(x + sx * lx + ex * FILCH_FIG.toEye, y + L[1], MID_Z + sz * lx + ez * FILCH_FIG.toEye);
+}
 /* the catch (req 915): 'march', he follows the lamp down the flight and Filch opens his own door for him this once
    (shell.html's office, the records carrying office_catch = held); 'off', waved on, the lamp goes back down and he stays.
    The walk down is not his to steer (Interaction's, asked); for now one glide to the landing under the lamp */
 function caught(how) {
   if (!chase.on) return;
   chase.on = false;
-  leaving = how === 'march';
+  leaving = how === 'march'; chase.how = how;
   chase.nearX = camera.position.x > CHASE.topX ? Math.max(CHASE.topX, camera.position.x - CHASE.near) : CHASE.topX;
   chase.lamp = 'near';
   var since = Date.now();
@@ -5762,6 +5807,7 @@ function frame() {
   updateCupboard(wdt);
   updateFilch(wdt);
   updateChase(wdt);
+  updateFilchFigure(wdt);
   updateVisorLight();
   updateCandleStub();
   updateFredScrap();
