@@ -124,10 +124,10 @@
         "giant = on"
       ],
       "show": [
-        "the white piece that took it bowing, and the black piece walking off the board to stand against the wall"
+        "the white piece that took it bowing, and the black piece walking off the board to stand against the wall and slump there, limp"
       ],
       "starts": [],
-      "canon": "Magic's req 911 (docs/game-notes.md, the common room's chess line, *the giant chessboard*, req 904; Godric's 1 on magic-chessboard-stance-1022, on the board as pieces; set-aside row 48 lifted; the Architect's v150 map, req 900), from the Chamber's castle on, played and never Ron's game (the `giant` replay stays set aside): taken, one of the black pieces: bowed off by the piece that took it and walks to the wall (L5928 and L5932 left out: nothing smashed, dragged or lying still, the world rules)"
+      "canon": "Magic's req 911 (docs/game-notes.md, the common room's chess line, *the giant chessboard*, req 904; Godric's 1 on magic-chessboard-stance-1022, on the board as pieces; set-aside row 48 lifted; the Architect's v150 map, req 900), from the Chamber's castle on, played and never Ron's game (the `giant` replay stays set aside): taken, one of the black pieces: bowed off by the piece that took it and walks to the wall (L5928 left out: nothing smashed or dragged; L5932's huddle of limp black players slumped along the wall is the taken piece's slump, Godric's weave rookery-fallen-rise of 22 October 2026, 5.39 pm, req 958, and at every end the slumped pieces get up; the boy's own pupil never lies still)"
     },
     {
       "id": "giant-chess.boy-taken",
@@ -158,7 +158,8 @@
         "giant = on"
       ],
       "show": [
-        "the white king taking off his crown and laying it at their feet, the chessmen parting and bowing, the door on standing clear"
+        "the white king taking off his crown and laying it at their feet, the chessmen parting and bowing, the door on standing clear",
+        "the slumped pieces along the wall getting up, dusting themselves off and walking back to their squares"
       ],
       "starts": [
         "set giant = none",
@@ -179,7 +180,8 @@
         "giant = on"
       ],
       "show": [
-        "the black king laying his crown down, both sides bowing, and the pieces walking back to their squares, the game offered again"
+        "the black king laying his crown down, both sides bowing, and the pieces walking back to their squares, the game offered again",
+        "the slumped pieces along the wall getting up and dusting themselves off"
       ],
       "starts": [
         "set giant = none",
@@ -199,7 +201,8 @@
         "giant = on"
       ],
       "show": [
-        "both kings bowing to each other across the board"
+        "both kings bowing to each other across the board",
+        "the slumped pieces along the wall getting up, dusting themselves off and walking back to their squares"
       ],
       "starts": [
         "set giant = none",

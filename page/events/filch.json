@@ -971,6 +971,44 @@
       "canon": "req 933's sister touch (Godric's of 5.22 pm 22 October 2026, through the orchestrator); CoS 8 L9087 to L9099 (the Kwikspell envelope on his desk; he snatches it up and throws it into a drawer, L9095), read in the canon tool, 22 October 2026; only in the Chamber's castle on, the year the book has it, and only while a boy is kept for his form"
     },
     {
+      "id": "filch.chains-wipe",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap chains",
+      "when": [
+        "place = filchs office",
+        "office_catch = held",
+        "year >= 2"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "desk"
+        }
+      ],
+      "show": [
+        "Filch giving the polished chains on the wall behind his desk a fond rub with his sleeve"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chains-pity",
+          "sound": "Filch at the wall, rubbing a chain with his sleeve",
+          "text": [
+            "It's just a pity they let the old punishments die out.",
+            "Keep 'em well oiled, I do. In case they're ever needed."
+          ],
+          "canon": "B1 ch15 L5165, the first and the second word for word from the same speech (keep 'em well oiled in case they're ever needed), the hanging left out"
+        }
+      ],
+      "starts": [],
+      "canon": "Godric's woven touch filch-chains-wipe (5.40 pm 22 October 2026, through the orchestrator); CoS 8 L9029 (a highly polished collection of chains and manacles hung on the wall behind Filch's desk) and B1 ch15 L5165 (It's just a pity they let the old punishments die out ... I've got the chains still in my office, keep 'em well oiled in case they're ever needed), read in the canon tool, 22 October 2026; only the pity and the oil are used, nothing is said of what they were for, and nothing ever comes of it; the Chamber's castle on, and only while a boy is kept for his form, when Filch is at his desk"
+    },
+    {
       "id": "filch.catch-drawer",
       "tier": "fixed",
       "source": "device",
