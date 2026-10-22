@@ -132,11 +132,13 @@ shot before anything is spent.
 <div id="help">Drag to look around.</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=424"></script>
-<script src="castle-paint.js?v=24"></script>
-<script src="design/tones.js?v=2"></script>
+<script src="castle-model.js?v=488"></script>
+<script src="castle-paint.js?v=84"></script>
+<script src="design/tones.js?v=6"></script>
+<script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
-<script src="castle-shell.js?v=44"></script>
+<script src="design/panelling.js?v=2"></script>
+<script src="castle-shell.js?v=70"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="castle-sound.js?v=1"></script>
 <script>
@@ -518,8 +520,66 @@ S.club.dummies.forEach(function (d) {
   var body = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.22, S.club.dummyH - 0.6, 8), straw);
   body.position.copy(P(d[0], d[1], 0.6 + (S.club.dummyH - 0.6) / 2)); clubG.add(body);
 });
+/* People's Gryffindor diners (req 474; People's fourteenth, f4790039, mended by hand on Godric's 1, 2.52 pm, 22 October
+   2026): eight cells of 429 by 1029 px, 0 to 3 seen from the front (as from across the table), 4 to 7 from behind (as
+   from the aisle behind the bench), facings as the piece file (pipeline/pieces/hall-diners-gryffindor.json). Sized by
+   height, about 750 px a metre (People's own caveat: the manifest's width figure is not the scale), so a seated diner
+   stands 1.25 m from shoe to crown, his shoes on the floor at his place. Each card turns to the eye about the upright;
+   across the table he sees the front cell, from his own side of it the back one, and the pair along the bench turn
+   toward each other whichever side he looks from. The other houses keep their grey until their sheets come. The sheet
+   loads when a Gryffindor first sits (about 3.7 MB). */
+var DINERS = { url: '../assets/layers/hall-diners-gryffindor.png', cells: 8, pxPerM: 750, cw: 429, ch: 1029,
+               native: [1, -1, 1, -1, 1, -1, 1, -1], table: 66.8 };
+DINERS.w = DINERS.cw / DINERS.pxPerM; DINERS.h = DINERS.ch / DINERS.pxPerM;
+/* one instanced draw for the whole table (People's The form): each card's cell and its mirror ride in cellAt, read in
+   place of the plane's own u */
+var DMAX = 160, dinerCards = {}, dinersOn = [];
+var dinerGeo = new THREE.PlaneGeometry(DINERS.w, DINERS.h); dinerGeo.translate(0, DINERS.h / 2, 0);
+var cellAt = new THREE.InstancedBufferAttribute(new Float32Array(DMAX * 2), 2); cellAt.setUsage(THREE.DynamicDrawUsage);
+dinerGeo.setAttribute('cellAt', cellAt);
+var dinerTex = null, dinerMat = new THREE.MeshStandardMaterial({ alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.95, metalness: 0 });
+dinerMat.onBeforeCompile = function (sh) {
+  sh.vertexShader = 'attribute vec2 cellAt;\n' + sh.vertexShader.replace('#include <uv_vertex>',
+    'vUv = vec2((cellAt.x + mix(uv.x, 1.0 - uv.x, cellAt.y)) / ' + DINERS.cells.toFixed(1) + ', uv.y);');
+};
+var diners = new THREE.InstancedMesh(dinerGeo, dinerMat, DMAX); diners.name = 'diners'; diners.count = 0;
+diners.frustumCulled = false; diners.visible = false; room.add(diners);
+function isDiner(f) { return f.x > S.tx0 && f.z > 0 && Math.abs(Math.abs(f.y - DINERS.table) - (S.tw / 2 + S.bench.off + S.bench.deep / 2 + 0.02)) < 0.01; }
+function dinerCard(f) {
+  var key = f.x.toFixed(2) + ',' + f.y.toFixed(2);
+  if (dinerCards[key]) return dinerCards[key];
+  if (!dinerTex) {
+    dinerTex = new THREE.TextureLoader().load(DINERS.url, function () { DINERS.ready = true; if (READY) draw(); });
+    dinerTex.encoding = THREE.sRGBEncoding; dinerMat.map = dinerTex; dinerMat.needsUpdate = true;
+  }
+  var k = Math.round((f.x - S.tx0 - 0.3) / S.place), side = f.y > DINERS.table ? 1 : -1;
+  var pr = (Math.floor(k / 2) * 7 + (side > 0 ? 3 : 0)) % 5 < 2 ? 2 : 0;   /* which pair sits here, so the four faces do not run in a strict round */
+  return (dinerCards[key] = { at: P(f.x, f.y, 0), cell: pr + (k % 2), partner: k % 2 === 0 ? 1 : -1,
+    out: P(f.x, f.y, 0).sub(P(f.x, DINERS.table, 0)).setY(0), along: P(f.x + 1, f.y, 0).sub(P(f.x, f.y, 0)).setY(0) });
+}
+var eyeL = new THREE.Vector3(), eyeR = new THREE.Vector3(), roomInv = new THREE.Matrix4(), dQ = new THREE.Quaternion(), dUp = new THREE.Vector3(0, 1, 0), dOne = new THREE.Vector3(1, 1, 1), dM = new THREE.Matrix4();
+function turnDiners() {
+  if (!dinersOn.length) return;
+  eyeL.copy(camera.position); room.worldToLocal(eyeL);
+  roomInv.copy(room.matrixWorld).invert(); eyeR.setFromMatrixColumn(camera.matrixWorld, 0).transformDirection(roomInv);
+  dinersOn.forEach(function (u, i) {
+    var dx = eyeL.x - u.at.x, dz = eyeL.z - u.at.z;
+    dQ.setFromAxisAngle(dUp, Math.atan2(dx, dz)); dM.compose(u.at, dQ, dOne); diners.setMatrixAt(i, dM);
+    var cell = u.cell + (dx * u.out.x + dz * u.out.z > 0 ? 4 : 0);
+    var want = (u.along.x * eyeR.x + u.along.z * eyeR.z) * u.partner > 0 ? 1 : -1;
+    cellAt.setXY(i, cell, DINERS.native[cell] !== want ? 1 : 0);
+  });
+  diners.instanceMatrix.needsUpdate = true; cellAt.needsUpdate = true;
+}
 function setFigures(list) {
   var n = 0;
+  dinersOn = [];
+  list = list.filter(function (f) {
+    if (!isDiner(f)) return true;
+    var u = dinerCard(f); if (!DINERS.ready || dinersOn.length >= DMAX) return true;
+    dinersOn.push(u); return false;
+  });
+  diners.count = dinersOn.length; diners.visible = dinersOn.length > 0;
   list.forEach(function (f) {
     tmpV.copy(P(f.x, f.y, f.z)); tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z);
     if (f.k) tmpM.scale(new THREE.Vector3(f.k[0], f.k[1], f.k[0]));
@@ -1336,6 +1396,7 @@ function frame() {
   if (fade) { var fk = clamp((T - fade.t0 - 0.5) / 2.5, 0, 1); foodMat.opacity = dishMat.opacity = 1 - fk; if (fk >= 1) food.visible = false; if (T >= fade.end) draw(); }
   if (stutOn && !occ.halloween.visible) { stut.fill(0); stutAttr.needsUpdate = true; stutOn = false; }
   fly(T, dt);
+  turnDiners();
   redraw += dt; if (redraw > 30) { redraw = 0; draw(); }   /* the clock moves on while he stays: dusk comes, a meal begins */
   renderer.render(scene, camera);
   kit.stats(dt);
