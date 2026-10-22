@@ -3733,11 +3733,36 @@ var chase = { on: false, t: 0, wheezed: false, lamped: false, topped: false, aga
 var WHISK_CUE = 'Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs';
 function chaseHides() { return filchHides() && !tween; }   /* only once he is there, not on the way */
 function stairY(x) { return x >= STAIR_X ? 0 : Math.max(FOOT_Y, (x - STAIR_X) / STEP_RUN * STEP_RISE); }
-function chaseWhisk() {
-  if (chase.on) return;
-  if (filch.t >= 0 || leaving || view !== 'length') { castle.moment('filch gone'); return; }   /* a start declined: his pass is walking */
+function chaseStart() {   /* the clock from a start, hers or Peeves's; false when declined */
+  if (chase.on) return false;
+  if (filch.t >= 0 || leaving || view !== 'length') { castle.moment('filch gone'); return false; }   /* a start declined: his pass is walking */
   chase.on = true; chase.t = 0; chase.wheezed = chase.lamped = chase.topped = chase.again = chase.back = false; chase.lamp = 'none'; chase.lk = 0;
   chase.openT = 0; chase.caught = false;
+  return true;
+}
+/* Peeves joins (req 933 (b); Events' filch.chase-peeves): his bellow from over the stairs starts the chase with no
+   whisk, so her eyes stay where they are; it is heard only, the key its sign */
+var PEEVES_BELLOW = 'filch.chase-peeves-bellow';
+function chasePeeves(list) {
+  if (list.some(function (l) { return l.key === PEEVES_BELLOW; })) chaseStart();
+  return list;
+}
+/* a hidden boy saved when Peeves started it (Events' filch.chase-hidden-peeves, which sets chase off): his lamp waits
+   at the top through the quarrel, and on Peeves's NOTHING the armour rattles as he zooms past and the lamp goes back
+   down after him. No end is raised, as at the catch */
+function peevesSaves() {
+  if (!chase.on) return;
+  chase.on = false;
+  var since = Date.now();
+  setTimeout(function wait() {
+    var off = lineCur && lineCur.line.key === 'filch.chase-peeves-nothing';
+    if (!off && (lineCur || lineQ.length) && Date.now() - since < CHASE.linesMax * 1000) { setTimeout(wait, 100); return; }
+    armourJiggle = 0.6;
+    if (chase.lamp !== 'none') chase.lamp = 'down';
+  }, 300);
+}
+function chaseWhisk() {
+  if (!chaseStart()) return;
   /* where she stares from: before the cupboard, at the end's glints, or a little ahead of him on the flags */
   var from;
   if (norrisDoor.group.visible && norrisDoor.a > 0.05) from = norrisDoor.group.position.clone();
@@ -5414,6 +5439,16 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, arching under it': function () {
       norrisLine('he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, arching under it'); norrisGoes(5);
     },
+    /* her boredom (req 955; Events' norris.hand-bored, -stroke-bored and the second taps' bored kin): the same kindness
+       alone wears thin, her eyes already on the stairs; no purr on the stroke */
+    'he holds a bit of breakfast out on his flat hand; Mrs Norris looks at it, sniffs, and takes it with no great interest, her eyes already on the stairs': function () {
+      norrisLine('he holds a bit of breakfast out on his flat hand; Mrs Norris looks at it, sniffs, and takes it with no great interest, her eyes already on the stairs'); norrisGoes(2.5);
+    },
+    'he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, her eyes already on the stairs': function () {
+      norrisLine('he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, her eyes already on the stairs'); norrisGoes(5);
+    },
+    /* Peeves saves a hidden boy (req 933 (b)) */
+    "Peeves whooshing away down the stairs with a cackle, the suit of armour rattling as he passes, and Filch's lamp going back down after him": peevesSaves,
     'Mrs Norris watches him from where she sits, quite still, and lets him be': function () { norrisLine('Mrs Norris watches him from where she sits, quite still, and lets him be'); },
     'Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing': function () {
       norrisLooks(); norrisLine('Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing');
@@ -5511,7 +5546,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* the folded parchment sits at the foot of the screen on the left, where the help is: the help rises above it */
     document.getElementById('help').style.bottom = mapPlay.state().pocket ? 'calc(env(safe-area-inset-bottom, 0px) + 66px)' : '';
   },
-  showLines: function (list) { list = nevilleLines(list); showLines(mapPlay ? mapPlay.lines(list) : list); },
+  showLines: function (list) { list = chasePeeves(nevilleLines(list)); showLines(mapPlay ? mapPlay.lines(list) : list); },
   /* the one figure this page draws (req 297): Neville locked out, at her frame's foot */
   figures: [{ role: 'canon', name: 'neville', pose: 'sitting in the window corner', mark: 'frame-foot' }],   /* the pose Events' records match (0da8070c) */
   drawFigures: drawNeville,
