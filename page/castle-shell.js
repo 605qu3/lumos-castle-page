@@ -769,6 +769,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         m.position.set(p.x + ux * shift, p.y + (ya + yb) / 2, p.z - uy * shift);
         m.rotation.y = ang; m.name = name; group.add(m);
       }
+      /* v54: a window's pane of sky 3 cm inside the wall's outer face (below, where the gaps are drawn) */
+      function pane(g, suf) {
+        if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
+        /* v67: an end on the side's corner runs on past it (tan 15 degrees of the depth, the most a cut turns), so the panes
+           of a window cut over a corner meet behind it, set back as they are on two lines */
+        var pd = Math.max(0.02, t - 0.03), run = 0.27 * pd + 0.02, e0 = g.s0 <= 0.01 ? run : 0, e1 = g.s1 >= L - 0.01 ? run : 0;
+        var sm = (g.s0 - e0 + g.s1 + e1) / 2, w = g.s1 + e1 - g.s0 + e0, hh = g.h - g.sill;
+        var pn_ = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), mats.pane);
+        var pp = toLocal(a[0] + ux * sm + nx * pd, a[1] + uy * sm + ny * pd, Q.floor);
+        pn_.position.set(pp.x, pp.y + g.sill + hh / 2, pp.z); pn_.rotation.y = ang; pn_.raycast = function () {};
+        pn_.name = Q.id + '-pane-' + g.op.id + suf; pn_.userData.owner = Q.id; group.add(pn_);
+        out.panes.push(pn_);
+      }
       /* v10: an iron bar standing in the wall's line, `off` out from its face (a grille's, a crenel's) */
       function bar(s, ya, yb, off, name) {
         var p = toLocal(a[0] + ux * s + nx * off, a[1] + uy * s + ny * off, Q.floor), m = slab(0.04, yb - ya, 0.04, mats.grille, 'wall');
@@ -813,7 +826,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           piece(g.s0, g.s1, 0, g.sill > 0.02 && isDoor(g.op.kind) && !g.back ? g.sill - 0.005 : g.sill, Q.id + '-sill-' + g.op.id);
         }
         at = g.s1;
-        if (g.spill) return;                                            /* v15: the rest of an opening cut over a corner */
+        /* v15: the rest of an opening cut over a corner; v67 (Fawkes's look at architect-window-views-1022b: McGonagall's
+           and Dumbledore's windows black either side of the glass): a window's rest takes its own pane on its own side,
+           else that part of the cut stood open on the dark */
+        if (g.spill) { if (!g.back && /window|loop|lancet|oriel|dormer/.test(g.op.kind || '')) pane(g, '-' + i); return; }
         var sm = (g.s0 + g.s1) / 2, w = g.s1 - g.s0, hh = g.h - g.sill;
         var mid = toLocal(a[0] + ux * sm, a[1] + uy * sm, Q.floor);
         var inward = new THREE.Vector3(-nx, 0, ny);                     /* site (-nx, -ny) into the local frame */
@@ -887,12 +903,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v54 (Design's find, 21 October 2026, 11.23 am: the oriel's lights black at noon): nothing is drawn beyond a
              shell's window, so each takes a pane of sky 3 cm inside its outer face, the day's colour (shell.html turns it
              to the night's), unlit and untappable: daylight in the opening, not a lamp */
-          if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
-          var pn_ = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), mats.pane), pd = Math.max(0.02, t - 0.03);
-          var pp = toLocal(a[0] + ux * sm + nx * pd, a[1] + uy * sm + ny * pd, Q.floor);
-          pn_.position.set(pp.x, pp.y + g.sill + hh / 2, pp.z); pn_.rotation.y = ang; pn_.raycast = function () {};
-          pn_.name = Q.id + '-pane-' + g.op.id; pn_.userData.owner = Q.id; group.add(pn_);
-          out.panes.push(pn_);
+          pane(g, '');
         }
       });
       if (!col) piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
