@@ -1,0 +1,164 @@
+{
+  "chain": "astronomy-rooms",
+  "about": "The Astronomy drum's six rooms off the spiral, floors 2 to 7 (Interiors' req 919, Godric's 1 on interiors-astronomy-rooms-1022): their doors locked but on class nights, the cloak room's pegs and the lantern room's stand thinned while the class is up and filled again after. The class's nights are the top's (astronomy-tower.json). The other four rooms (telescope store, instrument room, chart room, night books) change by nothing the clock makes, so they say nothing here; the chart room's sky and the night books' moving page are Magic's (req 918).",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = astronomy spiral",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter"
+      ],
+      "show": [
+        "a plain oak door off the stair at every storey, each unlocked and standing ajar"
+      ],
+      "canon": "Interiors' req 919 (docs/interiors/astronomy-rooms.md, Occupancy and aftermath): the six rooms' doors off the spiral, locked but on class nights (PS 15 L5055, \"out-of-bounds except for classes\"); unlocked from before the class till after it, which here is the top's own night (astronomy-tower.json, Kingsley's 8a: any dark night, never by day, not over Christmas or Easter), so no door stands open under an empty top; the class's hour PS 8 L2732; both lines read in the canon tool, 22 October 2026"
+    },
+    {
+      "when": [
+        "place = astronomy spiral",
+        "time != night"
+      ],
+      "show": [
+        "a plain oak door off the stair at every storey, each shut and locked"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy spiral",
+        "time = night",
+        "occasion = christmas"
+      ],
+      "show": [
+        "a plain oak door off the stair at every storey, each shut and locked"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy spiral",
+        "time = night",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "a plain oak door off the stair at every storey, each shut and locked"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy spiral",
+        "time = night",
+        "occasion = easter"
+      ],
+      "show": [
+        "a plain oak door off the stair at every storey, each shut and locked"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy cloak room",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter"
+      ],
+      "show": [
+        "the cloak stands' pegs thinned, most of the spare cloaks, scarves and mittens gone up with the class, a few left hanging"
+      ],
+      "canon": "Interiors' req 919 (docs/interiors/astronomy-rooms.md, The things, floor 7, and Occupancy and aftermath): the cloak room's pegs, thinned while the class is up and filled again after; the class's nights are the top's (astronomy-tower.json, Kingsley's 8a, any dark night, not over Christmas or Easter); PS 8 L2732 and PS 14 L5014, read in the canon tool"
+    },
+    {
+      "when": [
+        "place = astronomy cloak room",
+        "time != night"
+      ],
+      "show": [
+        "the cloak stands' pegs full of spare black cloaks, scarves in the four houses' colours and mittens pinned in pairs"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy cloak room",
+        "time = night",
+        "occasion = christmas"
+      ],
+      "show": [
+        "the cloak stands' pegs full of spare black cloaks, scarves in the four houses' colours and mittens pinned in pairs"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy cloak room",
+        "time = night",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "the cloak stands' pegs full of spare black cloaks, scarves in the four houses' colours and mittens pinned in pairs"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy cloak room",
+        "time = night",
+        "occasion = easter"
+      ],
+      "show": [
+        "the cloak stands' pegs full of spare black cloaks, scarves in the four houses' colours and mittens pinned in pairs"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy lantern room",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter"
+      ],
+      "show": [
+        "the lantern stand's rail of hooks half bare, the lanterns gone up with the class, a few left hanging"
+      ],
+      "canon": "Interiors' req 919 (docs/interiors/astronomy-rooms.md, The things, floor 2, and Occupancy and aftermath): the lantern stand, thinned while the class is up and filled again after; every lantern stays unlit and the long bench's twenty stay on it (nothing glows); the class's nights are the top's (astronomy-tower.json, Kingsley's 8a); PS 8 L2732, read in the canon tool"
+    },
+    {
+      "when": [
+        "place = astronomy lantern room",
+        "time != night"
+      ],
+      "show": [
+        "the lantern stand's rail of hooks hung full, every lantern ready for the stair"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy lantern room",
+        "time = night",
+        "occasion = christmas"
+      ],
+      "show": [
+        "the lantern stand's rail of hooks hung full, every lantern ready for the stair"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy lantern room",
+        "time = night",
+        "occasion = christmas day"
+      ],
+      "show": [
+        "the lantern stand's rail of hooks hung full, every lantern ready for the stair"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy lantern room",
+        "time = night",
+        "occasion = easter"
+      ],
+      "show": [
+        "the lantern stand's rail of hooks hung full, every lantern ready for the stair"
+      ]
+    }
+  ],
+  "records": []
+}
