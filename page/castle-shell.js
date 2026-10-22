@@ -1652,15 +1652,20 @@ function farView(F, M, toLocal, panes, paneMat) {
     });
     var ground = shape([[-4000, -4000], [4000, -4000], [4000, 4000], [-4000, 4000]]);
     ground.holes.push(new THREE.Path(ring.map(function (p) { return new THREE.Vector2(p[0], p[1]); })));
-    flat(ground, LAWN, 'far-lawn');
+    /* v69 (the shell grotto's cleft, its top black): an eye below the lawn (the grotto's, 8 m down in the crag) saw the
+       lawn's and the banks' undersides through its slit; the ground is drawn from above only, so an eye in the rock
+       looks through the rock it stands in, onto the lake and the sky as the cleft's own words have it */
+    flat(ground, LAWN, 'far-lawn').material.side = THREE.FrontSide;
     var water = flat(shape(lp), LAKE + 0.5, 'far-water-day'); water.name = 'far-water';
     var pos = [], n = lp.length;
     for (var i = 0; i < n; i++) {
       var j = (i + 1) % n, a = V(lp[i][0], lp[i][1], LAKE), b = V(lp[j][0], lp[j][1], LAKE), c = V(ring[j][0], ring[j][1], LAWN), d = V(ring[i][0], ring[i][1], LAWN);
-      pos.push(a, b, c, a, c, d);
+      /* each face wound to face up, the bank's open side */
+      if (new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).y >= 0) pos.push(a, b, c, a, c, d);
+      else pos.push(a, c, b, a, d, c);
     }
     var bank = new THREE.BufferGeometry().setFromPoints(pos); bank.computeVertexNormals();
-    add(bank, 'far-rock').material.side = THREE.DoubleSide;
+    add(bank, 'far-rock');
   } else flat(shape([[-4000, -4000], [4000, -4000], [4000, 4000], [-4000, 4000]]), LAWN, 'far-lawn');
 
   /* the grounds' things, by their shapes */
