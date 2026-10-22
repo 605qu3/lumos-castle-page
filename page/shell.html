@@ -1656,6 +1656,115 @@ thingCues[CURE_MISS[0]] = function () { showLines([{ medium: 'seen', sound: CURE
 thingCues[CURE_MISS[1]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[1], on: function () { potLiquid(null); } }]); };
 thingCues[CURE_MISS[2]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[2], on: function () { potLiquid(0x8a9a92, 0.45); } }]); };
 thingCues[CURE_RIGHT] = function () { showLines([{ medium: 'seen', sound: CURE_RIGHT, on: function () { potLiquid(0x4f8f3a, 0.85); } }]); };
+/* req 951 (b), Magic's 944 (Events' kitchens.json, word for word): the kitchens' fire by its room line */
+var KFIRE = null, KIT_LIT = "a great brick fireplace at the other end, lit, a low roar and the firebasket's iron ticking as it warms",
+    KIT_BANKED = 'the great brick fireplace banked to embers, the room dark but for their red and his own light';
+function kitchensFire(night) {
+  if (!KFIRE) return;
+  KFIRE.lit.forEach(function (m) { m.visible = !night; }); KFIRE.banked.forEach(function (m) { m.visible = night; });
+  KFIRE.light.intensity = night ? 0.25 : 1.6; KFIRE.light.distance = night ? 5 : 12;
+}
+function kitchensShown(shown) {
+  if (shown.indexOf(KIT_LIT) >= 0) kitchensFire(false); else if (shown.indexOf(KIT_BANKED) >= 0) kitchensFire(true);
+}
+/* req 951 (b): the fruit-bowl painting (the model's fruit-bowl-painting, GoF 21 L28826 to L28836) in the corridor's
+   north wall, every year: a gilt frame on the wall's face at the model's place and width, the canvas a silver bowl of
+   fruit on dark ground, the huge green pear its own flat piece a hair proud. From the GoF castle on a tap on the pear,
+   from the painting's stand, is the runtime's `pear`; Events' line squirms it and turns it into a large green door
+   handle, and the painting swings open toward him on its west edge: the find's opening is then a way, and a tap on it
+   takes him into the kitchens. Before the Goblet's year the pear does nothing (an ordinary still life). Once found it
+   stays open: when the runtime lists the secret `fruit-bowl-painting` (asked of Events) the handle stands from the
+   start and a tap on it swings the painting. Nothing glows; owner kitchens-corridor. ?pear=open for checks */
+var PEAR_LINE = 'the pear beginning to squirm, chuckling, and suddenly turning into a large green door handle';
+var PEAR = PLACE !== 'kitchens-corridor' ? null : (function () {
+  var ft = (MODEL.features || []).concat(MODEL.openings || []).filter(function (f) { return f.id === 'fruit-bowl-painting'; })[0];
+  var z0 = shell.place.floor, P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
+  var at = ft && ft.at ? ft.at : [60.5, 51.5], W = ft && ft.w ? ft.w : 1.0, H = ft && ft.h ? ft.h : 2.0;
+  /* the wall's face: a level ray from the corridor north at the painting's middle */
+  shell.group.updateMatrixWorld(true);
+  var rc = new THREE.Raycaster(P(at[0], at[1] - 2.5, 1.2), P(at[0], at[1] + 1, 1.2).sub(P(at[0], at[1] - 2.5, 1.2)).normalize(), 0, 4);
+  var hit = rc.intersectObjects(shell.group.children, false).filter(function (h) { return !h.object.userData.way && !h.object.userData.hidden && h.face; })[0];
+  if (!hit) return null;
+  var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld); n.y = 0; n.normalize();
+  var face = hit.point.clone(); face.y = P(0, 0, 0).y;
+  var along = new THREE.Vector3(0, 1, 0).cross(n).normalize();   /* along the wall; the hinge at the painting's west end */
+  var west = P(at[0] - 1, at[1], 0).sub(P(at[0], at[1], 0)).normalize(); if (along.dot(west) < 0) along.negate();
+  var pivot = new THREE.Group(); pivot.position.copy(face).addScaledVector(along, W / 2).addScaledVector(n, 0.01);
+  pivot.rotation.y = Math.atan2(n.x, n.z); pivot.name = 'fruit-bowl-painting-hinge'; shell.group.add(pivot);
+  var side = along.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), -pivot.rotation.y).x > 0 ? -1 : 1;   /* from the hinge toward the free edge, in the pivot's frame */
+  var g = new THREE.Group(); g.position.x = side * W / 2; pivot.add(g);
+  function own(m, nm) { m.name = nm; m.userData.owner = 'kitchens-corridor'; m.raycast = function () {}; g.add(m); return m; }
+  var c = document.createElement('canvas'); c.width = 256; c.height = 512;
+  var x = c.getContext('2d');
+  x.fillStyle = '#2b2219'; x.fillRect(0, 0, 256, 512);
+  x.fillStyle = '#3a2d20'; x.fillRect(0, 330, 256, 182);                   /* the table's top running back */
+  x.fillStyle = '#4a3a29'; x.fillRect(0, 330, 256, 6);
+  function blob(cx, cy, r, col) { x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fill(); }
+  [[88, 238, 26, '#7e2a22'], [120, 226, 24, '#a1572a'], [176, 236, 25, '#8a3225'], [146, 246, 22, '#9b6a2a'], [70, 256, 20, '#6e7a2e']].forEach(function (b) { blob(b[0], b[1], b[2], b[3]); });
+  for (var i = 0; i < 14; i++) blob(196 + (i % 3) * 11 - (i > 8 ? 6 : 0), 228 + Math.floor(i / 3) * 10, 7, '#4b2f4a');   /* a bunch of grapes */
+  var gr = x.createLinearGradient(40, 0, 216, 0); gr.addColorStop(0, '#6d6c68'); gr.addColorStop(0.45, '#b9b7b0'); gr.addColorStop(1, '#5f5e5a');
+  x.fillStyle = gr; x.beginPath(); x.ellipse(128, 262, 96, 18, 0, 0, Math.PI * 2); x.fill();
+  x.beginPath(); x.moveTo(32, 262); x.quadraticCurveTo(128, 372, 224, 262); x.closePath(); x.fill();   /* the gigantic silver bowl */
+  x.fillStyle = '#56544f'; x.fillRect(112, 318, 32, 14); x.fillRect(96, 330, 64, 6);                  /* its foot */
+  var tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  var cw = W - 0.12, ch = H - 0.16;
+  var canv = own(new THREE.Mesh(new THREE.PlaneGeometry(cw, ch), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8 })), 'fruit-bowl-canvas');
+  canv.position.set(0, 0.08 + ch / 2 + 0.02, 0.012);
+  own(new THREE.Mesh(new THREE.BoxGeometry(W - 0.1, H - 0.1, 0.012), kit.solid(0x5a4632)), 'fruit-bowl-back').position.set(0, H / 2, 0.0);   /* the stretcher's plain board, seen when it stands open */
+  var gilt = kit.solid(0x8a7340, { roughness: 0.45, metalness: 0.5 });
+  [[W, 0.08, 0.09, 0, H - 0.04], [W, 0.08, 0.09, 0, 0.04], [0.08, H, 0.09, -(W / 2 - 0.04), H / 2], [0.08, H, 0.09, W / 2 - 0.04, H / 2]].forEach(function (b, k) {
+    var m = own(new THREE.Mesh(new THREE.BoxGeometry(b[0], b[1], b[2]), gilt), 'fruit-bowl-frame-' + k); m.position.set(b[3], b[4], 0.035);
+  });
+  /* the pear: its own flat piece on the canvas, about 0.24 high in the bowl's heap at hand height */
+  var pc = document.createElement('canvas'); pc.width = 64; pc.height = 96;
+  var px = pc.getContext('2d'), pg = px.createRadialGradient(26, 62, 4, 32, 60, 34); pg.addColorStop(0, '#9cc04a'); pg.addColorStop(1, '#4d7322');
+  px.fillStyle = pg; px.beginPath(); px.arc(32, 66, 26, 0, Math.PI * 2); px.fill(); px.beginPath(); px.ellipse(32, 34, 14, 22, 0, 0, Math.PI * 2); px.fill();
+  px.fillStyle = '#4a3420'; px.fillRect(30, 4, 4, 14);
+  var ptex = new THREE.CanvasTexture(pc); ptex.colorSpace = THREE.SRGBColorSpace;
+  var pear = own(new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.24), new THREE.MeshStandardMaterial({ map: ptex, transparent: true, alphaTest: 0.4, roughness: 0.7 })), 'fruit-bowl-pear');
+  var pearAt = new THREE.Vector3(side * -0.05, 0.08 + 0.02 + ch * (1 - 236 / 512), 0.016); pear.position.copy(pearAt);
+  /* the handle: a large green pull, upright, standing off the canvas on two feet */
+  var hg = new THREE.Group(), green = kit.solid(0x3f6a2c, { roughness: 0.35, metalness: 0.3 });
+  var bow = new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.018, 8, 20, Math.PI), green); bow.rotation.z = -Math.PI / 2; bow.position.z = 0.02; hg.add(bow);
+  [-1, 1].forEach(function (k) { var f = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.024, 0.03, 10), green); f.rotation.x = Math.PI / 2; f.position.set(0, k * 0.1, 0.008); hg.add(f); });
+  hg.scale.x = side; hg.position.copy(pearAt); hg.visible = false; hg.name = 'fruit-bowl-handle'; hg.traverse(function (o) { o.userData.owner = 'kitchens-corridor'; o.raycast = function () {}; }); g.add(hg);
+  /* the tap: a box over the pear (and the handle after), in shell.group so the tap's ray meets it */
+  var hb = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.32, 0.08), new THREE.MeshBasicMaterial({ visible: false }));
+  hb.position.copy(pearAt); hb.position.z = 0.05; g.add(hb); hb.updateWorldMatrix(true, false);
+  var hbw = hb.getWorldPosition(new THREE.Vector3()); g.remove(hb);
+  shell.group.worldToLocal(hbw); hb.position.copy(hbw); hb.rotation.y = pivot.rotation.y; hb.name = 'fruit-bowl-pear-hit'; hb.userData.pearTap = true; hb.userData.owner = 'kitchens-corridor';
+  shell.group.add(hb);
+  /* the way's mouth once open: the shell keeps a find's opening wall from its outer side, so a dark doorway 4 mm proud
+     of it stands for the opening till the shell cuts found openings (a look for later) */
+  var mouth = new THREE.Mesh(new THREE.PlaneGeometry(W - 0.1, H - 0.05), kit.solid(0x1e1610, { roughness: 1 }));
+  mouth.position.copy(face).addScaledVector(n, 0.004); mouth.position.y += (H - 0.05) / 2; mouth.rotation.y = pivot.rotation.y;
+  mouth.name = 'fruit-bowl-mouth'; mouth.userData.owner = 'kitchens-corridor'; mouth.raycast = function () {}; mouth.visible = false; shell.group.add(mouth);
+  var d = shell.hidden.filter(function (h) { return h.id === 'fruit-bowl-painting'; })[0] || null;
+  return { mouth: mouth, pivot: pivot, g: g, pear: pear, handle: hg, hit: hb, d: d, side: side, state: 'pear', t: 0, swing: 0, swingT: 0, at: pearAt.clone() };
+})();
+function pearFound() { return !!(events && events.secrets && events.secrets().indexOf('fruit-bowl-painting') >= 0); }
+function pearHandle() { if (!PEAR) return; PEAR.state = 'handle'; PEAR.pear.visible = false; PEAR.handle.visible = true; PEAR.pear.position.copy(PEAR.at); PEAR.pear.rotation.z = 0; }
+function pearOpen() { if (!PEAR || !PEAR.d) return; pearHandle(); PEAR.swingT = 1; PEAR.mouth.visible = true; PEAR.d.mesh.userData.way = true; PEAR.d.built = true; }
+thingCues[PEAR_LINE] = function () {
+  showLines([{ medium: 'seen', sound: PEAR_LINE, on: function () { if (PEAR && PEAR.state === 'pear') { PEAR.state = 'squirm'; PEAR.t = 0; } } }]);
+};
+function updatePear(dt) {
+  if (!PEAR) return;
+  if (PEAR.state === 'pear' && pearFound()) pearHandle();   /* found before: the handle stands from the start */
+  if (PEAR.state === 'squirm') {   /* a second and a half of wriggling, chuckling, then the handle, and the painting swings */
+    PEAR.t += dt;
+    PEAR.pear.rotation.z = Math.sin(PEAR.t * 19) * 0.22 * (1 - PEAR.t / 1.6); PEAR.pear.position.x = PEAR.at.x + Math.sin(PEAR.t * 13) * 0.008;
+    if (PEAR.t >= 1.6) { pearHandle(); PEAR.t = 0; PEAR.state = 'turned'; }
+  } else if (PEAR.state === 'turned') { PEAR.t += dt; if (PEAR.t > 0.7) pearOpen(); }
+  if (PEAR.swing !== PEAR.swingT) {
+    PEAR.swing = PEAR.swingT > PEAR.swing ? Math.min(PEAR.swingT, PEAR.swing + dt / 1.4) : Math.max(PEAR.swingT, PEAR.swing - dt / 1.4);
+    PEAR.pivot.rotation.y = PEAR.pivot.userData.rest + PEAR.side * -easeInOut(PEAR.swing) * 1.75;
+  }
+}
+if (PEAR) {
+  PEAR.pivot.userData.rest = PEAR.pivot.rotation.y;
+  if (Q.get('pear') === 'open') pearOpen();
+}
 /* req 951 (c): the cupboard's bucket and tin (CUP_LINES above, by the cupboard) */
 thingCues[CUP_BUCKET] = function () { showLines([{ medium: 'heard', sound: CUP_BUCKET }]); };
 thingCues[CUP_TIN] = function () {   /* the chamois laid back on the shelf, folded, as the line shows */
@@ -2097,12 +2206,18 @@ var W1 = (function () {
     /* K3: the firebasket on two dogs, its front at 15.9; the fire in it, lit by day and evening, banked to embers at night */
     box(15.4, 59.1, 0.32, 15.9, 61.9, 0.36, iron); box(15.86, 59.1, 0.36, 15.9, 61.9, 0.5, iron);
     box(15.84, 59.12, 0.0, 15.895, 59.2, 0.5, iron); box(15.84, 61.8, 0.0, 15.895, 61.88, 0.5, iron);
-    var flameM = new THREE.MeshBasicMaterial({ color: new THREE.Color(NIGHT_FIRE ? 0x6a1e0c : 0xe8782a).convertSRGBToLinear() });
-    for (var fy = 59.4; fy < 61.7; fy += 0.46) {
-      var fz = NIGHT_FIRE ? 0.1 : 0.55 + ((fy * 7) % 1) * 0.25, fc = new THREE.Mesh(new THREE.ConeGeometry(NIGHT_FIRE ? 0.16 : 0.13, fz, 8), flameM);
-      var fp = P(15.65, fy, 0.36 + fz / 2); fc.position.copy(fp); add(fc);
-    }
-    var kf = new THREE.PointLight(0xff9a50, NIGHT_FIRE ? 0.25 : 1.6, NIGHT_FIRE ? 5 : 12, 1.6); kf.position.copy(P(16.2, 60.5, 0.9)); scene.add(kf);
+    /* req 951 (b): both the fire and the embers built, shown by Events' room line (lit, or banked at night, which the
+       runtime reads from dusk and dawn); till a line comes, by the hour as before */
+    KFIRE = { lit: [], banked: [] };
+    [false, true].forEach(function (night) {
+      var flameM = new THREE.MeshBasicMaterial({ color: new THREE.Color(night ? 0x6a1e0c : 0xe8782a).convertSRGBToLinear() });
+      for (var fy = 59.4; fy < 61.7; fy += 0.46) {
+        var fz = night ? 0.1 : 0.55 + ((fy * 7) % 1) * 0.25, fc = new THREE.Mesh(new THREE.ConeGeometry(night ? 0.16 : 0.13, fz, 8), flameM);
+        var fp = P(15.65, fy, 0.36 + fz / 2); fc.position.copy(fp); fc.userData.owner = 'kitchens'; scene.add(fc); KFIRE[night ? 'banked' : 'lit'].push(fc);   /* unmerged, so it can change */
+      }
+    });
+    var kf = new THREE.PointLight(0xff9a50, 1.6, 12, 1.6); kf.position.copy(P(16.2, 60.5, 0.9)); scene.add(kf); KFIRE.light = kf;
+    kitchensFire(NIGHT_FIRE);
     /* the fire irons' stand on the hearth's north end; the bellows on the breast north of the opening; K7 the salt box south */
     box(16.075, 62.275, 0.01, 16.325, 62.525, 0.04, iron);
     [[16.14, 62.35], [16.2, 62.45], [16.26, 62.35]].forEach(function (c) { box(c[0] - 0.012, c[1] - 0.012, 0.04, c[0] + 0.012, c[1] + 0.012, 0.8, iron); });
@@ -3700,7 +3815,7 @@ function corbelsShown(shown) {
   if (l && /asleep/.test(l)) st = 'sleeping'; else if (l && /drowsy|nodding off/.test(l)) st = 'dozing';
   if (st !== corbelState) { corbelState = st; shell.corbels(st); }
 }
-function roomDraw(shown) { cupDrawRoom(shown); filchShown(shown); cadoganShown(shown); thingsDrawRoom(shown); corbelsShown(shown); }
+function roomDraw(shown) { kitchensShown(shown); cupDrawRoom(shown); filchShown(shown); cadoganShown(shown); thingsDrawRoom(shown); corbelsShown(shown); }
 /* the knots: seeded by the week and the door, as the corridor door's ticklish spot (req 150), across and up the leaf in
    its own frame (x from the middle, y from the middle up), set apart; the first is the right one */
 function knotSpots(d) {
@@ -3783,6 +3898,14 @@ function tap(cx, cy) {
          tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
   if (GPLAY && GPLAY.tap(raycaster, hits.length ? hits[0].distance : null)) { kit.tapped(true); return; }   /* req 922, the giant board */
+  if (hit && hit.userData.pearTap && PEAR) {   /* req 951 (b), the pear (and, once found, the handle) */
+    var pd = PEAR.d, ps = pd ? placeOf(pd).s : null;
+    if (ps && here !== ps) acted = goTo(pd);
+    else if (PEAR.state === 'handle' && PEAR.swingT === 1 && pd) { through(pd); acted = true; }
+    else if (PEAR.state === 'handle' || (PEAR.state === 'pear' && pearFound())) { pearOpen(); acted = true; }
+    else if (PEAR.state === 'pear') { if (events) events.tap('pear'); else if (pd) thingCues[PEAR_LINE](); acted = true; }
+    kit.tapped(acted); return;
+  }
   if (hit && hit.userData.cupTap && CUP) {   /* req 951 (c), the bucket, the bottle and the tin, from the cupboard's stand */
     if (here !== CUP.d.stand && here !== placeOf(CUP.d).s) acted = goTo(CUP.d);
     else { lineDoor = CUP.d; if (events) events.tap(hit.userData.cupTap); else { var cl = CUP_LINES[hit.userData.cupTap]; if (thingCues[cl]) thingCues[cl](); else showLines([{ medium: 'seen', sound: cl }]); } acted = true; }
@@ -3914,7 +4037,7 @@ var clock = new THREE.Clock();
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   updateCamera(dt);
-  updateShakes(dt);
+  updateShakes(dt); updatePear(dt);
   updateSwings(dt);
   updateFades(dt);
   updateCupboard(dt);
