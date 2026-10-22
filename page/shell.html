@@ -3934,12 +3934,27 @@ function chessPiece(kind, mat) {
       [0.38, 2.5], [0.46, 2.72], [0.18, 2.78], [0.18, 2.84], [0, 2.84]]);
     box(0.13, 0.4, 0.13, 3.0); box(0.34, 0.12, 0.13, 3.04);
   } else if (kind === 'n') {
-    lathe(BASE.concat([[0.4, 0.8], [0.52, 0.86], [0.52, 0.94], [0, 0.94]]));
-    var sh = new THREE.Shape(), P = [[-0.42, 0.9], [0.42, 0.9], [0.32, 1.3], [0.7, 1.68], [0.76, 1.92], [0.52, 2.04], [0.22, 2.3], [0.06, 2.5],
-      [-0.12, 2.36], [-0.42, 1.92], [-0.5, 1.3]];
-    P.forEach(function (p, i) { if (i) sh.lineTo(p[0], p[1]); else sh.moveTo(p[0], p[1]); });
-    var head = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.44, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 2 }), mat);
-    head.position.z = -0.22; g.add(head);   /* its muzzle to +x, the way it faces */
+    /* a helmeted rider on a stone horse (PS 16 L5902: "The horse pawed the ground and the knight turned his helmeted
+       head"), on a low round base; the horse's head to +x, the way it faces; the rider's helm plain, no face */
+    lathe([[0, 0], [0.72, 0], [0.72, 0.12], [0.62, 0.2], [0.64, 0.27], [0.56, 0.3], [0, 0.3]]);
+    var part = function (geo, x, y, z, rz, sx, sy, sz) {
+      var m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.z = rz || 0; m.scale.set(sx || 1, sy || 1, sz || 1); g.add(m); return m;
+    };
+    var cyl = function (r0, r1, h) { return new THREE.CylinderGeometry(r0, r1, h, 12); }, ball = new THREE.SphereGeometry(0.5, 20, 14);
+    [[0.34, 0.15], [0.34, -0.15], [-0.36, 0.15], [-0.36, -0.15]].forEach(function (l) { part(cyl(0.07, 0.06, 0.66), l[0], 0.6, l[1]); });   /* legs, 2 cm into the base */
+    part(ball, 0, 1.0, 0, 0, 1.3, 0.56, 0.5);                       /* the body */
+    part(cyl(0.14, 0.2, 0.6), 0.5, 1.3, 0, -0.62);                /* the neck, up and forward */
+    part(new THREE.BoxGeometry(0.42, 0.18, 0.17), 0.72, 1.52, 0, -0.5);   /* the head, muzzle down */
+    [0.07, -0.07].forEach(function (z) { part(new THREE.ConeGeometry(0.035, 0.12, 8), 0.6, 1.68, z, 0.3); });   /* the ears */
+    part(cyl(0.05, 0.03, 0.5), -0.66, 0.9, 0, -0.5);                 /* the tail */
+    part(cyl(0.15, 0.17, 0.46), -0.06, 1.46, 0);                      /* the rider: his body, seated */
+    part(new THREE.BoxGeometry(0.2, 0.14, 0.48), -0.06, 1.66, 0);     /* his shoulders */
+    [0.2, -0.2].forEach(function (z) { part(new THREE.BoxGeometry(0.16, 0.5, 0.11), 0.02, 1.08, z); });   /* his legs down the flanks */
+    part(new THREE.BoxGeometry(0.1, 0.4, 0.1), 0.06, 1.5, 0.27, -0.6);   /* his sword arm, forward */
+    part(cyl(0.22, 0.22, 0.05), -0.02, 1.42, -0.3, 0, 1, 1, 1).rotation.x = Math.PI / 2;   /* his shield, on the left */
+    part(cyl(0.13, 0.13, 0.26), -0.06, 1.85, 0);                      /* his helm, a plain great helm */
+    part(new THREE.SphereGeometry(0.13, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), -0.06, 1.97, 0);   /* its crown */
+    g.scale.setScalar(1.18);                                         /* about 2.5 high, as the knights */
   }
   return g;
 }
