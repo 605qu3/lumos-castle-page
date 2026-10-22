@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=488"></script>
-<script src="castle-paint.js?v=84"></script>
+<script src="castle-model.js?v=489"></script>
+<script src="castle-paint.js?v=85"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -287,6 +287,8 @@ PAINTED = PAINTED.concat(['se-round-room-1']);
 PAINTED = PAINTED.concat(['forbidden-corridor', 'stone-bay', 'stone-pit', 'stone-keys-chamber', 'stone-chess-chamber', 'stone-troll-room', 'stone-potions-room', 'stone-last-chamber']);
 /* v154, req 917 on Godric's 1 on interiors-astronomy-rooms-1022 (ledger 218): the Astronomy drum's six class rooms off the spiral, 2 to 7 */
 PAINTED = PAINTED.concat(['astronomy-lantern-room', 'astronomy-night-books', 'astronomy-chart-room', 'astronomy-instrument-room', 'astronomy-telescope-store', 'astronomy-cloak-room']);
+/* v158, req 877 (H63, ledger 223): the room of the stopped clocks, the south-west drum on 4, a rough build; its clocks Interiors' */
+PAINTED = PAINTED.concat(['stopped-clocks']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
