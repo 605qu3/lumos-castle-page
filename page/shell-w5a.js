@@ -1327,3 +1327,221 @@ window.SHELL_W5A = {
   }
   T['secret-s2'] = { items: it };
 })(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+
+/* docs/interiors/astronomy-rooms.md, *The things, floor by floor* (req 917, Interiors' ledger 218, Godric's 1 on
+   interiors-astronomy-rooms-1022): the six class rooms in the Astronomy drum's hollow, centre (80, 77), each thing at the
+   schedule's own place, all inside r 4.0 while the outer walls are held, the strip 0.6 either side of bearing 53 from
+   r 1.0 out kept clear for the door. Lamps unlit, lanterns shuttered. The chart room's sky and the open log's moving
+   page are Magic's (req 918), drawn when cast; here the room's ceiling is the beams and the log lies open, still. */
+(function (T, MT) {
+  MT.blanket = 0x6e6a64; MT.blanket2 = 0x85807a; MT.scarlet = 0x7a1c1c; MT.gold = 0xa8862e; MT.emerald = 0x2a5a34;
+  MT.sapphire = 0x2a3a6a; MT.globe = 0x24324a; MT.redglass = 0x6e1a14; MT.tallow = 0xcfc2a0;
+  var C = [80.0, 77.0];
+  function cb(cx, cy, lx, ly, za, zb, m) { return ['b', cx - lx / 2, cy - ly / 2, za, cx + lx / 2, cy + ly / 2, zb, m]; }
+  function lamp(it, x, y) {        /* an iron lamp on a tall stand, the lamp at 1.6, unlit */
+    it.push(['y', x, y, 0.15, 0, 0.03, 'iron'], ['y', x, y, 0.015, 0.03, 1.55, 'iron'], ['y', x, y, 0.07, 1.55, 1.58, 'iron'],
+            ['y', x, y, 0.06, 1.58, 1.72, 'glass'], ['y', x, y, 0.07, 1.72, 1.75, 'iron']);
+  }
+  function stool(it, x, y, h) {    /* a round stool, three legs */
+    it.push(['y', x, y, 0.175, h - 0.04, h, 'wood']);
+    [[0, 0.12], [0.104, -0.06], [-0.104, -0.06]].forEach(function (d) { it.push(['y', x + d[0], y + d[1], 0.018, 0, h - 0.04, 'wood']); });
+  }
+  function chest(it, cx, cy, lx, ly, h) {   /* a chest, its lid shut, two iron bands */
+    it.push(cb(cx, cy, lx, ly, 0, h - 0.04, 'oak'), cb(cx, cy, lx + 0.02, ly + 0.02, h - 0.04, h, 'dark'));
+    var alongX = lx >= ly, u = (alongX ? lx : ly) * 0.3;
+    [-u, u].forEach(function (o) {
+      it.push(alongX ? cb(cx + o, cy, 0.04, ly + 0.03, 0.02, h + 0.005, 'iron') : cb(cx, cy + o, lx + 0.03, 0.04, 0.02, h + 0.005, 'iron'));
+    });
+  }
+  /* a frame on two end posts with feet, its long side along x or y: len long, dep deep, rails at the heights given */
+  function frame(it, cx, cy, alongX, len, dep, top, rails, m) {
+    [-1, 1].forEach(function (s) {
+      var px = alongX ? cx + s * (len / 2 - 0.03) : cx, py = alongX ? cy : cy + s * (len / 2 - 0.03);
+      it.push(cb(px, py, 0.06, 0.06, 0.05, top, m), alongX ? cb(px, py, 0.06, dep, 0, 0.05, m) : cb(px, py, dep, 0.06, 0, 0.05, m));
+    });
+    rails.forEach(function (r) {   /* [offset across, height] */
+      it.push(alongX ? cb(cx, cy + r[0], len - 0.12, 0.03, r[1] - 0.03, r[1], m) : cb(cx + r[0], cy, 0.03, len - 0.12, r[1] - 0.03, r[1], m));
+    });
+  }
+  /* things hung or stood along a frame's faces: f(along, side) returns the item at that place */
+  function along(cx, cy, alongX, len, step, f) {
+    var out = [], n = Math.floor((len - 0.6) / step);
+    for (var i = 0; i <= n; i++) {
+      var u = -((n * step) / 2) + i * step;
+      [-1, 1].forEach(function (s) { var q = f(alongX ? cx + u : cx, alongX ? cy : cy + u, s, i); if (q) out = out.concat(q); });
+    }
+    return out;
+  }
+
+  /* 7, the cloak room: two stands of pegs, the cloaks and scarves on both faces, mittens pinned in pairs; the bench of
+     blankets; the boot rack; the lamp */
+  (function () {
+    var it = [], SCARF = ['scarlet', 'gold', 'emerald', 'sapphire'];
+    function stand(cx, cy, alongX) {
+      frame(it, cx, cy, alongX, 2.4, 0.5, 1.8, [[-0.12, 1.62], [0.12, 1.62]], 'oak');
+      it = it.concat(along(cx, cy, alongX, 2.4, 0.42, function (x, y, s, i) {
+        var o = s * 0.17, w = 0.34, q = [];
+        if ((i + (s > 0 ? 1 : 0)) % 3 === 2) {   /* a scarf and a pair of mittens at every third peg */
+          q.push(alongX ? cb(x, y + o, 0.12, 0.03, 0.75, 1.58, SCARF[i % 4]) : cb(x + o, y, 0.03, 0.12, 0.75, 1.58, SCARF[i % 4]));
+          [-0.08, 0.08].forEach(function (m) { q.push(alongX ? cb(x + m + 0.14, y + o, 0.07, 0.04, 1.38, 1.5, 'cloth') : cb(x + o, y + m + 0.14, 0.04, 0.07, 1.38, 1.5, 'cloth')); });
+        } else {                                  /* a spare black cloak hanging from its peg */
+          q.push(alongX ? cb(x, y + o, w, 0.06, 0.45, 1.58, 'ebony') : cb(x + o, y, 0.06, w, 0.45, 1.58, 'ebony'));
+        }
+        q.push(alongX ? cb(x, y + s * 0.15, 0.03, 0.06, 1.56, 1.6, 'iron') : cb(x + s * 0.15, y, 0.06, 0.03, 1.56, 1.6, 'iron'));   /* its peg */
+        return q;
+      }));
+    }
+    stand(77.4, 77.0, false);
+    stand(79.4, 74.6, true);
+    it.push(['t', 81.2, 75.575, 82.8, 76.025, 0.45, 'oak']);                              /* the bench */
+    for (var k = 0; k < 6; k++) it.push(cb(81.6, 75.8, 0.62, 0.4, 0.45 + k * 0.06, 0.51 + k * 0.06, k % 2 ? 'blanket2' : 'blanket'));
+    it.push(cb(82.35, 75.8, 0.5, 0.38, 0.45, 0.57, 'blanket2'));                            /* two more, half unfolded */
+    it.push(cb(78.8, 79.4, 1.2, 0.35, 0.0, 0.04, 'oak'), cb(78.8, 79.4, 1.2, 0.04, 0.36, 0.4, 'oak'));     /* the boot rack */
+    [78.22, 79.38].forEach(function (x) { it.push(cb(x, 79.4, 0.04, 0.35, 0.04, 0.4, 'oak')); });
+    [[78.4, 'leather'], [78.75, 'dark'], [79.1, 'leather']].forEach(function (b) {
+      it.push(cb(b[0] - 0.06, 79.4, 0.1, 0.27, 0.04, 0.34, b[1]), cb(b[0] + 0.06, 79.4, 0.1, 0.27, 0.04, 0.34, b[1]));
+    });
+    it.push(cb(79.32, 79.4, 0.1, 0.27, 0.04, 0.3, 'leather'));                               /* an odd one */
+    lamp(it, 80.6, 78.9);
+    T['astronomy-cloak-room'] = { c: C, items: it };
+  })();
+
+  /* 6, the telescope store: two double racks of telescopes upright in slots, their caps on, a label tied to each; the
+     tub of tripods; the shelf of cases; the mending bench and its stool; the lamp */
+  (function () {
+    var it = [];
+    function rack(cx, cy, alongX) {
+      it.push(alongX ? cb(cx, cy, 1.86, 0.5, 0, 0.1, 'oak') : cb(cx, cy, 0.5, 1.86, 0, 0.1, 'oak'));
+      frame(it, cx, cy, alongX, 2.0, 0.6, 1.6, [[-0.15, 1.0], [0.15, 1.0], [0, 1.6]], 'oak');
+      it = it.concat(along(cx, cy, alongX, 2.0, 0.21, function (x, y, s, i) {
+        var o = s * 0.15, px = alongX ? x : x + o, py = alongX ? y + o : y, r = (i + (s > 0 ? 1 : 0)) % 3 ? 0.04 : 0.05;
+        var h = 1.25 + 0.08 * ((i * 7 + (s > 0 ? 3 : 0)) % 4), m = (i + (s > 0 ? 1 : 0)) % 2 ? 'brass' : 'wood';
+        return [['y', px, py, r, 0.1, h, m], ['y', px, py, r + 0.006, h, h + 0.04, 'dark'],
+                alongX ? cb(px, py + s * (r + 0.01), 0.04, 0.005, 1.05, 1.11, 'paper') : cb(px + s * (r + 0.01), py, 0.005, 0.04, 1.05, 1.11, 'paper')];
+      }));
+    }
+    rack(77.4, 77.2, false);
+    rack(79.2, 74.4, true);
+    it.push(['y', 77.7, 79.3, 0.3, 0, 0.4, 'wood'], ['y', 77.7, 79.3, 0.31, 0.33, 0.37, 'iron']);    /* the tub */
+    for (var k = 0; k < 7; k++) {
+      var a = k * 51.4 * Math.PI / 180;
+      it.push(['y', 77.7 + 0.15 * Math.sin(a), 79.3 + 0.15 * Math.cos(a), 0.015, 0.4, 1.3 - 0.05 * (k % 3), k % 2 ? 'wood' : 'brass']);
+    }
+    it.push(['s', 81.2, 74.8, 82.4, 75.2, [0.05, 0.42, 0.8], 'oak']);                          /* the low shelf */
+    [[81.35, 0.05, 0.22], [81.75, 0.05, 0.2], [82.15, 0.05, 0.24], [81.4, 0.42, 0.2], [81.85, 0.42, 0.26], [81.55, 0.27, 0.12]].forEach(function (c) {
+      it.push(cb(c[0], 75.0, 0.34, 0.3, c[1], c[1] + c[2] - 0.01, 'leather'), cb(c[0] - 0.16, 75.0, 0.03, 0.31, c[1] + c[2] - 0.05, c[1] + c[2] - 0.005, 'brass'));
+    });
+    it.push(['t', 79.1, 79.4, 80.5, 80.0, 0.85, 'oak']);                                       /* the mending bench */
+    it.push(cb(80.3, 79.9, 0.12, 0.14, 0.85, 0.97, 'iron'), cb(79.7, 79.7, 0.7, 0.4, 0.85, 0.853, 'linen'),
+            cb(79.55, 79.7, 0.32, 0.07, 0.853, 0.92, 'brass'), cb(79.85, 79.68, 0.18, 0.06, 0.853, 0.91, 'brass'),
+            ['y', 80.0, 79.75, 0.035, 0.853, 0.87, 'brass'], ['y', 79.45, 79.9, 0.05, 0.853, 0.88, 'linen'],   /* the lens, wrapped */
+            cb(79.98, 79.55, 0.15, 0.015, 0.853, 0.865, 'steel'), ['y', 79.3, 79.55, 0.035, 0.853, 0.92, 'tin']);
+    stool(it, 79.8, 79.0, 0.6);
+    lamp(it, 81.4, 76.4);
+    T['astronomy-telescope-store'] = { c: C, items: it };
+  })();
+
+  /* 5, the instrument room: the round table with an astrolabe on its stand, a quadrant, a nocturnal and a slate of sums;
+     the glazed case, its doors shut; the plumb-line stand, six bobs hanging still; the basket of chain; the long chest */
+  (function () {
+    var it = [];
+    it.push(['y', 79.6, 76.6, 0.7, 0.76, 0.8, 'oak'], ['y', 79.6, 76.6, 0.08, 0.05, 0.76, 'oak'], ['y', 79.6, 76.6, 0.35, 0, 0.05, 'oak']);
+    it.push(['y', 79.4, 76.75, 0.07, 0.8, 0.83, 'brass'], ['y', 79.4, 76.75, 0.012, 0.83, 0.98, 'brass'],
+            cb(79.4, 76.75, 0.26, 0.012, 0.98, 1.24, 'brass'),                                        /* the astrolabe, upright */
+            cb(79.85, 76.5, 0.22, 0.16, 0.8, 0.808, 'brass'), cb(79.55, 76.25, 0.08, 0.1, 0.8, 0.82, 'wood'),
+            cb(79.95, 76.95, 0.3, 0.22, 0.8, 0.812, 'slate'), cb(79.95, 76.95, 0.32, 0.24, 0.8, 0.806, 'wood'));
+    it.push(cb(77.3, 76.4, 0.5, 1.8, 0, 0.08, 'oak'), cb(77.3, 76.4, 0.5, 1.8, 1.84, 1.9, 'oak'),       /* the glazed case */
+            cb(77.3, 76.4, 0.04, 1.76, 0.08, 1.84, 'oak'));
+    [75.53, 77.27].forEach(function (y) { it.push(cb(77.3, y, 0.5, 0.04, 0.08, 1.84, 'oak')); });
+    [0.7, 1.25].forEach(function (h) { it.push(cb(77.3, 76.4, 0.44, 1.7, h - 0.02, h, 'oak')); });
+    [77.07, 77.53].forEach(function (x, s) {
+      it.push(cb(x, 76.4, 0.01, 1.7, 0.1, 1.82, 'glass'));
+      [[75.9, 0.1], [76.3, 0.1], [76.7, 0.7], [77.0, 1.25], [75.85, 1.25]].forEach(function (p, i) {
+        var d = s ? 0.1 : -0.1;
+        it.push(i < 2 ? cb(x - d, p[0], 0.01, 0.2, 0.9, 1.15, 'brass') : cb(x - d, p[0], 0.08, 0.16, p[1], p[1] + 0.14, 'brass'));
+      });
+    });
+    frame(it, 79.0, 74.1, true, 1.0, 0.4, 1.8, [[0, 1.8]], 'wood');                                  /* the plumb-line stand */
+    for (var k = 0; k < 6; k++) {
+      var x = 78.65 + k * 0.14, lo = 0.5 + 0.06 * (k % 3);
+      it.push(cb(x, 74.1, 0.004, 0.004, lo + 0.08, 1.77, 'linen'), ['y', x, 74.1, 0.03, lo, lo + 0.08, 'brass']);
+    }
+    it.push(['y', 81.8, 74.7, 0.25, 0, 0.4, 'wicker'], ['y', 81.8, 74.7, 0.2, 0.3, 0.36, 'iron']);    /* the chain's basket */
+    chest(it, 78.8, 79.8, 1.6, 0.5, 0.6);
+    lamp(it, 81.7, 76.1);
+    T['astronomy-instrument-room'] = { c: C, items: it };
+  })();
+
+  /* 4, the chart room: the long drawing table, charts weighted flat, dividers, a ruler, an inkpot; two tall stools; the
+     plan press, one drawer a hand open; the celestial globe; the tray of charts handed in; the lamp. Its ceiling bewitched
+     to tonight's sky is Magic's to cast (req 918) */
+  (function () {
+    var it = [];
+    it.push(['t', 77.2, 75.1, 79.6, 76.1, 0.85, 'oak']);
+    it.push(cb(77.9, 75.65, 0.7, 0.5, 0.85, 0.853, 'paper'), cb(78.75, 75.55, 0.6, 0.45, 0.85, 0.852, 'paper'));
+    [[77.58, 75.43], [78.22, 75.43], [77.58, 75.87], [78.22, 75.87], [78.48, 75.36], [79.02, 75.74]].forEach(function (p) { it.push(['y', p[0], p[1], 0.025, 0.853, 0.885, 'brass']); });
+    it.push(cb(79.2, 75.3, 0.012, 0.16, 0.853, 0.86, 'brass'), cb(79.25, 75.32, 0.012, 0.16, 0.853, 0.86, 'brass'),   /* the dividers, open */
+            cb(78.6, 75.95, 0.6, 0.035, 0.853, 0.862, 'wood'), ['y', 79.35, 75.85, 0.03, 0.853, 0.91, 'black']);
+    stool(it, 77.8, 74.7, 0.75);
+    stool(it, 79.0, 74.7, 0.75);
+    it.push(cb(82.2, 75.2, 1.4, 0.9, 0.02, 0.9, 'oak'), cb(82.2, 75.2, 1.42, 0.92, 0, 0.04, 'dark'));            /* the plan press */
+    [0.2, 0.36, 0.52, 0.68].forEach(function (h) { it.push(cb(82.2, 75.652, 1.3, 0.024, h, h + 0.012, 'dark')); });
+    it.push(cb(82.2, 75.675, 1.2, 0.15, 0.72, 0.84, 'oak'), cb(82.2, 75.68, 1.1, 0.04, 0.83, 0.833, 'paper'));     /* the drawer a hand open */
+    it.push(['y', 77.5, 78.4, 0.2, 0, 0.04, 'wood'], ['y', 77.5, 78.4, 0.03, 0.04, 0.9, 'wood']);              /* the globe on its stand */
+    [[0.9, 0.95, 0.17], [0.95, 1.02, 0.25], [1.02, 1.1, 0.3], [1.1, 1.17, 0.25], [1.17, 1.2, 0.15]].forEach(function (g) { it.push(['y', 77.5, 78.4, g[2], g[0], g[1], 'globe']); });
+    it.push(cb(77.5, 78.4, 0.66, 0.02, 1.04, 1.06, 'brass'));                                                       /* its meridian */
+    it.push(['t', 80.0, 73.9, 80.6, 74.3, 0.7, 'oak']);                                                             /* the tray */
+    for (var k = 0; k < 6; k++) it.push(cb(80.3, 73.97 + k * 0.055, 0.5, 0.045, 0.7 + (k % 2) * 0.04, 0.745 + (k % 2) * 0.04, 'paper'));
+    lamp(it, 79.4, 79.3);
+    T['astronomy-chart-room'] = { c: C, items: it };
+  })();
+
+  /* 3, the night books: three double-faced presses of sky logs, a spine a year; the sloped reading desk with one log
+     open on it (its moving page Magic's, req 918); its stool; the lamp */
+  (function () {
+    var it = [], HS = [0.05, 0.45, 0.85, 1.25, 1.65, 2.0];
+    function press(cx, cy, alongX) {
+      var x0 = alongX ? cx - 1.0 : cx - 0.25, x1 = alongX ? cx + 1.0 : cx + 0.25, y0 = alongX ? cy - 0.25 : cy - 1.0, y1 = alongX ? cy + 0.25 : cy + 1.0;
+      it.push(['s', x0, y0, x1, y1, HS, 'oak'], alongX ? cb(cx, cy, 1.98, 0.03, 0.05, 1.97, 'oak') : cb(cx, cy, 0.03, 1.98, 0.05, 1.97, 'oak'));
+      HS.slice(0, -1).forEach(function (h, i) {
+        var top = HS[i + 1] - 0.07;
+        [-1, 1].forEach(function (s) {
+          it.push(alongX ? ['b', x0 + 0.04, cy + s * 0.02, h, x1 - 0.04, cy + s * 0.22, top, 'books'] : ['b', cx + s * 0.02, y0 + 0.04, h, cx + s * 0.22, y1 - 0.04, top, 'books']);
+        });
+      });
+    }
+    press(77.3, 77.0, false);
+    press(79.2, 74.3, true);
+    press(78.4, 79.5, true);
+    [[80.89, 75.13], [81.71, 75.13], [80.89, 75.67], [81.71, 75.67]].forEach(function (p) { it.push(cb(p[0], p[1], 0.05, 0.05, 0, 0.95, 'oak')); });
+    for (var k = 0; k < 3; k++) it.push(['b', 80.85, 75.1 + k * 0.2, 0.95 + k * 0.03, 81.75, 75.7, 0.98 + k * 0.03, 'oak']);   /* the slope in three steps, low edge south */
+    it.push(['b', 80.88, 75.12, 0.98, 81.72, 75.16, 1.0, 'oak']);                                                     /* its lip */
+    it.push(['b', 80.98, 75.5, 1.04, 81.62, 75.69, 1.045, 'leather'], ['b', 81.0, 75.51, 1.045, 81.29, 75.68, 1.06, 'paper'],
+            ['b', 81.31, 75.51, 1.045, 81.6, 75.68, 1.06, 'paper']);                                               /* the log, open */
+    stool(it, 81.3, 74.7, 0.6);
+    lamp(it, 82.5, 76.6);
+    T['astronomy-night-books'] = { c: C, items: it };
+  })();
+
+  /* 2, the lantern room: the long bench of about twenty dark lanterns, red glass, shutters closed; the wick bench; the
+     chest of candles; the stand of lanterns hung ready for the stair. No lamp: its light a lantern, if a state lights one */
+  (function () {
+    var it = [];
+    function lantern(x, y, z) {    /* a dark lantern, 0.13 square, its shutter closed over the red glass but a strip */
+      return [['b', x - 0.065, y - 0.065, z, x + 0.065, y + 0.065, z + 0.2, 'iron'], ['b', x - 0.067, y - 0.04, z + 0.05, x + 0.067, y + 0.04, z + 0.08, 'redglass'],
+              ['y', x, y, 0.05, z + 0.2, z + 0.24, 'iron'], ['b', x - 0.005, y - 0.04, z + 0.24, x + 0.005, y + 0.04, z + 0.29, 'iron']];
+    }
+    it.push(['t', 77.2, 75.25, 79.6, 75.95, 0.85, 'oak']);
+    for (var k = 0; k < 10; k++) [75.45, 75.75].forEach(function (y) { it = it.concat(lantern(77.36 + k * 0.232, y, 0.85)); });
+    it.push(['t', 81.0, 74.5, 82.2, 75.1, 0.85, 'oak']);
+    [[81.15, 74.65], [81.25, 74.62], [81.2, 74.78], [81.35, 74.7], [81.3, 74.86]].forEach(function (p, i) { it.push(['y', p[0], p[1], 0.012, 0.85, 0.9 + 0.02 * (i % 3), 'tallow']); });
+    it.push(cb(81.7, 74.8, 0.16, 0.02, 0.85, 0.86, 'steel'), ['y', 82.0, 74.9, 0.06, 0.85, 0.92, 'tin']);
+    chest(it, 77.5, 78.5, 0.9, 0.5, 0.6);
+    frame(it, 79.6, 79.7, true, 1.6, 0.4, 1.7, [[0, 1.6]], 'oak');
+    [79.05, 79.33, 79.6, 79.87, 80.15].forEach(function (x) {
+      it.push(cb(x, 79.7, 0.012, 0.012, 1.4, 1.59, 'iron'));
+      it = it.concat(lantern(x, 79.7, 1.1));
+    });
+    T['astronomy-lantern-room'] = { c: C, items: it };
+  })();
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);
