@@ -553,9 +553,24 @@ function dinerCard(f) {
     dinerTex.encoding = THREE.sRGBEncoding; dinerMat.map = dinerTex; dinerMat.needsUpdate = true;
   }
   var k = Math.round((f.x - S.tx0 - 0.3) / S.place), side = f.y > DINERS.table ? 1 : -1;
-  var pr = (Math.floor(k / 2) * 7 + (side > 0 ? 3 : 0)) % 5 < 2 ? 2 : 0;   /* which pair sits here, so the four faces do not run in a strict round */
-  return (dinerCards[key] = { at: P(f.x, f.y, 0), cell: pr + (k % 2), partner: k % 2 === 0 ? 1 : -1,
+  return (dinerCards[key] = { at: P(f.x, f.y, 0), k: k, side: side, cell: 0, partner: k % 2 === 0 ? 1 : -1,
     out: P(f.x, f.y, 0).sub(P(f.x, DINERS.table, 0)).setY(0), along: P(f.x + 1, f.y, 0).sub(P(f.x, f.y, 0)).setY(0) });
+}
+/* Godric's answer on greathall-diners-474-1022 (5.30 pm, 22 October 2026): his boys would know a face seen twice, so no
+   face repeats in a view and only the drawn population sits; standard characters made unique come later. The four
+   faces (cells 0 to 3) sit once each, a pair on either bench facing each other across the table nearest the doors' end;
+   the table's other Gryffindor places stay empty until there are faces for them (the other houses keep their grey). */
+function pickDiners(cands) {
+  var out = [], at = { '-1': {}, '1': {} };
+  cands.forEach(function (u) { at[u.side][u.k] = u; });
+  var across = cands.filter(function (u) { return u.side < 0 && u.k % 2 === 0 && at[-1][u.k + 1] && at[1][u.k] && at[1][u.k + 1]; })
+    .sort(function (a, b) { return b.k - a.k; })[0];   /* the two pairs face each other across the table where they can */
+  [-1, 1].forEach(function (side, si) {
+    var mine = cands.filter(function (u) { return u.side === side; }).sort(function (a, b) { return b.k - a.k; });
+    var pair = across ? at[side][across.k] : mine.filter(function (u) { return u.k % 2 === 0 && at[side][u.k + 1]; })[0];
+    (pair ? [pair, at[side][pair.k + 1]] : mine.slice(0, 2)).forEach(function (u, j) { u.cell = si * 2 + j; out.push(u); });
+  });
+  return out;
 }
 var eyeL = new THREE.Vector3(), eyeR = new THREE.Vector3(), roomInv = new THREE.Matrix4(), dQ = new THREE.Quaternion(), dUp = new THREE.Vector3(0, 1, 0), dOne = new THREE.Vector3(1, 1, 1), dM = new THREE.Matrix4();
 function turnDiners() {
@@ -574,11 +589,9 @@ function turnDiners() {
 function setFigures(list) {
   var n = 0;
   dinersOn = [];
-  list = list.filter(function (f) {
-    if (!isDiner(f)) return true;
-    var u = dinerCard(f); if (!DINERS.ready || dinersOn.length >= DMAX) return true;
-    dinersOn.push(u); return false;
-  });
+  var cands = list.filter(isDiner).map(dinerCard);
+  if (DINERS.ready) dinersOn = pickDiners(cands);
+  if (DINERS.ready) list = list.filter(function (f) { return !isDiner(f); });
   diners.count = dinersOn.length; diners.visible = dinersOn.length > 0;
   list.forEach(function (f) {
     tmpV.copy(P(f.x, f.y, f.z)); tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z);
