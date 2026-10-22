@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=485"></script>
-<script src="castle-paint.js?v=81"></script>
+<script src="castle-model.js?v=486"></script>
+<script src="castle-paint.js?v=82"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -2225,6 +2225,180 @@ if (W1.on) staffThingsSet(Q.get('prophet') === 'on', +(Q.get('rota') || 0));
 /* req 914: the chess chamber's arrival (Events' stone-chambers.chess-dark), word for word: dark, then light flooding */
 var STONE_CHESS_DARK = 'the chamber dark until he steps in, then light flooding the room, the board and every piece in it at once in full light';
 thingCues[STONE_CHESS_DARK] = function () { stoneFlood(false); showLines([{ medium: 'seen', sound: STONE_CHESS_DARK }]); };
+/* req 920's rest (Events' strings, page/events/stone-chambers.json, word for word; Magic's 913): the chambers' things,
+   from the Chamber's castle on. The pit's Snare lying over its floor, curling round his ankles on arriving, cringing
+   from his light or letting go of itself; the keys' flock and the battered silver key, kept above his head and never
+   at him; three old school brooms against the vault's south wall; the troll's one long scrape toward the far door; the
+   bottles' table on the north wall, the seven in a line (the rounded one at the right end as he faces it), the paper
+   at the left; the purple fire behind him and the black flames on, springing up as he steps in (model v155: both
+   doorways ways, no leaf). From the bottles' room the black way takes no tap: only the smallest bottle carries him
+   through; the rounded one walks him back. Every thing bears 1 cm into what it stands on; owner the place.
+   ?fires=on for checks; lumosGreybox.stone. */
+var STONE = { on: /^stone-(pit|keys-chamber|troll-room|potions-room|last-chamber)$/.test(PLACE), keys: [], flames: [], curls: null, slack: 0 };
+var STONE_DRAWN = {
+  'stone-keys-chamber': ['small, jewel-bright birds that are keys, fluttering and tumbling all round the room, glittering, a whirl of rainbow feathers, none of them swooping at him',
+    'among the flock, one large silver key with bright blue wings, the feathers crumpled on one side, flying a little lopsided and lower than the rest, very battered',
+    'old school brooms leaning against the wall', 'a heavy wooden door on the far side, shut'],
+  'stone-troll-room': ['one long scrape across the flagstones toward the far door'],
+  'stone-potions-room': ['a table with seven differently shaped bottles standing on it in a line', 'a roll of paper lying beside them',
+    'the purple fire standing in the doorway behind him, and the black flames in the doorway on; neither burns, and the purple parts for him whenever he walks back'],
+  'stone-last-chamber': ['black flames at the doorway behind him, which let him back through']
+}[PLACE] || [];
+var STONE_SNARE_IN = "a soft landing: Devil's Snare filling the pit's floor, its tendrils curling gently round his ankles, no higher",
+    STONE_SNARE_LIGHT = 'the tendrils cringing back from his light and warmth, the plant shrinking from his feet, and he stands free',
+    STONE_SNARE_GO = 'the tendrils loosening of their own accord and sliding off his ankles, the plant lying slack on the floor',
+    STONE_FIRES_IN = 'purple fire springing up in the doorway behind him and black flames in the doorway on',
+    STONE_FIRES_STAND = 'the purple fire standing in the doorway behind him, and the black flames in the doorway on; neither burns, and the purple parts for him whenever he walks back',
+    STONE_SMALLEST = "the smallest bottle's one swallow, ice flooding his body; he walks forward through the black flames, feeling nothing, to the other side",
+    STONE_ROUND = 'a sip from the rounded bottle at the right end, cold as ice, and the purple fire parting round him as he walks back';
+(function () {
+  if (!STONE.on) return;
+  var z0 = shell.place.floor, P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
+  STONE.fy = P(0, 0, 0).y;
+  var g = new THREE.Group(); g.name = 'stone-things'; scene.add(g);
+  var seed = 11, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  function own(m) { m.userData.owner = PLACE; m.raycast = function () {}; m.traverse && m.traverse(function (o) { o.userData.owner = PLACE; o.raycast = function () {}; }); return m; }
+  function bar(a, b, w, h, mat, name) {   /* a flat strip from plan point a to b, h thick, its top h above the floor less 1 cm */
+    var A = P(a[0], a[1], 0), B = P(b[0], b[1], 0), m = new THREE.Mesh(new THREE.BoxGeometry(A.distanceTo(B), h, w), mat);
+    m.position.copy(A).add(B).multiplyScalar(0.5); m.position.y += h / 2 - 0.01; m.rotation.y = Math.atan2(-(B.z - A.z), B.x - A.x); m.name = name; return m;
+  }
+  if (PLACE === 'stone-pit') {
+    /* the Snare: dark tendrils lying over the whole floor, each 1 cm into the flags */
+    var vine = new THREE.MeshStandardMaterial({ color: kit.col(0x2c3624), roughness: 0.85, metalness: 0 });
+    for (var i = 0; i < 46; i++) {
+      var pts = [], x = 148.3 + rnd() * 5.4, y = 52.5 + rnd() * 5.4, a = rnd() * 6.283;
+      for (var k = 0; k < 7; k++) { pts.push(P(Math.min(153.8, Math.max(148.2, x)), Math.min(58.0, Math.max(52.4, y)), 0.025 + 0.03 * rnd())); a += (rnd() - 0.5) * 1.6; x += Math.cos(a) * 0.45; y += Math.sin(a) * 0.45; }
+      var t = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, 0.025 + rnd() * 0.02, 6, false), vine); t.name = 'stone-snare'; g.add(own(t));
+    }
+    STONE.curlMat = vine;
+  }
+  if (PLACE === 'stone-keys-chamber') {
+    var shaftM = [0xc9a64a, 0xb8bcc4, 0xa87a46].map(function (c) { return new THREE.MeshStandardMaterial({ color: kit.col(c), roughness: 0.35, metalness: 0.8 }); });
+    function key(len, wingHex, mat) {
+      var q = new THREE.Group();
+      var s = new THREE.Mesh(new THREE.CylinderGeometry(len * 0.06, len * 0.06, len, 6), mat); s.rotation.z = Math.PI / 2; q.add(s);
+      var bow = new THREE.Mesh(new THREE.TorusGeometry(len * 0.16, len * 0.04, 5, 10), mat); bow.position.x = -len * 0.6; bow.rotation.y = Math.PI / 2; q.add(bow);
+      var bit = new THREE.Mesh(new THREE.BoxGeometry(len * 0.1, len * 0.22, len * 0.04), mat); bit.position.set(len * 0.42, -len * 0.12, 0); q.add(bit);
+      var wm = new THREE.MeshBasicMaterial({ color: new THREE.Color(wingHex).convertSRGBToLinear(), side: THREE.DoubleSide });
+      var wings = [1, -1].map(function (sd) {
+        var hinge = new THREE.Group(), w = new THREE.Mesh(new THREE.PlaneGeometry(len * 0.5, len * 0.32), wm);
+        w.rotation.x = Math.PI / 2; w.position.z = sd * len * 0.17; hinge.add(w); hinge.position.x = -len * 0.15; q.add(hinge); return { h: hinge, sd: sd, w: w };
+      });
+      return { g: q, wings: wings };
+    }
+    for (var n = 0; n < 44; n++) {
+      var c = new THREE.Color().setHSL(rnd(), 0.75, 0.55), kk = key(0.2 + rnd() * 0.07, c.getHex(), shaftM[n % 3]);
+      kk.cx = 120 + (rnd() - 0.5) * 6; kk.cy = 55 + (rnd() - 0.5) * 5; kk.rx = 1.2 + rnd() * 3; kk.ry = 1 + rnd() * 2.6;
+      kk.h = 3.0 + rnd() * 3.6; kk.dh = 0.3 + rnd() * 0.6; kk.sp = 0.25 + rnd() * 0.35; kk.ph = rnd() * 6.283; kk.fl = 11 + rnd() * 6;
+      kk.g.name = 'stone-key'; g.add(own(kk.g)); STONE.keys.push(kk);
+    }
+    /* the battered one: large and silver, bright blue wings, one crumpled and short, flying lopsided and lower */
+    var bk = key(0.42, 0x2f6dff, new THREE.MeshStandardMaterial({ color: kit.col(0xd4d8de), roughness: 0.4, metalness: 0.85 }));
+    bk.wings[1].w.scale.set(0.62, 0.7, 1); bk.wings[1].w.rotation.y = 0.5;
+    bk.cx = 121.6; bk.cy = 55; bk.rx = 2.4; bk.ry = 2.0; bk.h = 2.3; bk.dh = 0.25; bk.sp = 0.22; bk.ph = 1.0; bk.fl = 8; bk.lop = 0.38;
+    bk.g.name = 'stone-key-battered'; g.add(own(bk.g)); STONE.keys.push(bk); STONE.battered = bk;
+    /* three old school brooms leaning against the south wall, their tails on the flags */
+    var wood = kit.solid(0x5e4a36), straw = kit.solid(0x8f7b4e);
+    [[119.0, 50.55, 118.9], [119.45, 50.6, 119.5], [120.1, 50.5, 120.25]].forEach(function (b, bi) {
+      var m = besom([b[0], b[1]], [b[2], 49.99], P, wood, straw); m.name = 'stone-broom-' + bi; g.add(own(m));
+    });
+  }
+  if (PLACE === 'stone-troll-room') {
+    /* one long scrape across the flags toward the far (east) door: pale, 2 mm proud, 1 cm into the flags */
+    var scr = kit.solid(0x8e8a80);
+    [[[93.4, 37.2], [96.6, 35.9]], [[96.55, 35.92], [99.7, 34.7]]].forEach(function (s, si) { g.add(own(bar(s[0], s[1], 0.05 - si * 0.012, 0.016, scr, 'stone-troll-scrape'))); });
+  }
+  if (PLACE === 'stone-potions-room') {
+    /* the table on the north wall, clear of the strip between the doorways (y 33.8 to 35.0) */
+    var tw = kit.solid(0x4f3e2e);
+    var top = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.05, 0.6), tw); top.position.copy(P(104.3, 35.7, 0.775)); top.name = 'stone-bottle-table'; g.add(own(top));
+    [[103.08, 35.46], [105.52, 35.46], [103.08, 35.94], [105.52, 35.94]].forEach(function (l) {
+      var m = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.77, 0.06), tw); m.position.copy(P(l[0], l[1], 0.375)); m.name = 'stone-bottle-table-leg'; g.add(own(m));
+    });
+    var paper = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.24, 10), kit.solid(0xd9ccaa));
+    paper.position.copy(P(103.22, 35.66, 0.8 + 0.014)); paper.rotation.x = Math.PI / 2; paper.name = 'stone-paper'; g.add(own(paper));
+    /* the seven, west to east as he faces them from the door strip: [tap, radius, body height, neck, shape, tint] */
+    [['bottle', 0.034, 0.28, 0.07, 'cyl', 0x3f6a3c], ['bottle', 0.06, 0.12, 0.04, 'cyl', 0x6b4a2a], ['smallest bottle', 0.018, 0.06, 0.025, 'cyl', 0x8fa7b5],
+     ['bottle', 0.045, 0.18, 0.06, 'box', 0x44506e], ['bottle', 0.055, 0.16, 0.08, 'cone', 0x7a3f45], ['bottle', 0.04, 0.22, 0.05, 'cyl', 0x5f6a2e],
+     ['rounded bottle', 0.075, 0.15, 0.06, 'ball', 0x9ab0a8]].forEach(function (b, bi) {
+      var mat = new THREE.MeshStandardMaterial({ color: kit.col(b[5]), roughness: 0.15, metalness: 0.1, transparent: true, opacity: 0.82 });
+      var geo = b[4] === 'box' ? new THREE.BoxGeometry(b[1] * 1.6, b[2], b[1] * 1.6) : b[4] === 'cone' ? new THREE.CylinderGeometry(b[1] * 0.35, b[1], b[2], 12)
+              : b[4] === 'ball' ? new THREE.SphereGeometry(b[1], 16, 12) : new THREE.CylinderGeometry(b[1], b[1], b[2], 12);
+      var x = 103.55 + bi * 0.3, h = b[4] === 'ball' ? b[1] * 2 : b[2];
+      var body = new THREE.Mesh(geo, mat); body.position.copy(P(x, 35.68, 0.8 - 0.01 + h / 2));
+      var neck = new THREE.Mesh(new THREE.CylinderGeometry(Math.max(0.008, b[1] * 0.3), Math.max(0.008, b[1] * 0.3), b[3], 8), mat);
+      neck.position.copy(P(x, 35.68, 0.8 - 0.01 + h + b[3] / 2 - 0.005));
+      /* each part a direct child of the shell's group, so the tap's ray finds it; it draws no shadow of its own */
+      [body, neck].forEach(function (m) { m.name = 'stone-bottle-' + bi; m.userData.owner = PLACE; m.userData.bottle = b[0]; shell.group.add(m); });
+    });
+  }
+  /* the fires: [x of the doorway's face, which way into the room (+1 east), tint, additive] */
+  function fire(xf, into, hex, glow) {
+    var mat = glow ? new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), transparent: true, opacity: 0.42, blending: THREE.AdditiveBlending, depthWrite: false })
+                   : new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).convertSRGBToLinear(), transparent: true, opacity: 0.9, depthWrite: false });
+    for (var i = 0; i < 14; i++) {   /* soft tongues: each a sphere drawn tall, overlapping */
+      var f = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 10), mat), y = 33.9 + (i % 7 + 0.5) * (1.0 / 7);
+      f.userData.w = 0.2 + rnd() * 0.14;
+      f.userData.base = P(xf - into * (0.15 + rnd() * 0.25), y, 0); f.userData.h = (i < 7 ? 1.1 : 0.6) + rnd() * 0.8; f.userData.ph = rnd() * 6.283;
+      f.position.copy(f.userData.base); f.name = glow ? 'stone-fire-purple' : 'stone-fire-black'; g.add(own(f)); STONE.flames.push(f);
+    }
+  }
+  if (PLACE === 'stone-potions-room') { fire(102.0, 1, 0x9a4cff, true); fire(106.5, -1, 0x0c0b12, false); }
+  if (PLACE === 'stone-last-chamber') fire(106.5, -1, 0x0c0b12, false);   /* in the doorway's west half, behind him as he arrives */
+  /* the fires stand at once in the last chamber, and in the bottles' room as he steps in (or with no runtime) */
+  STONE.rise = PLACE === 'stone-last-chamber' || !events || Q.get('fires') === 'on' ? 1 : 0; STONE.riseT = STONE.rise;
+  /* the black way from the bottles' room takes no tap: only the smallest bottle carries him through */
+  STONE.on2 = shell.ways.filter(function (d) { return d.id === 'stone-potions-door-on'; })[0] || null;
+  STONE.back = shell.ways.filter(function (d) { return d.id === 'stone-troll-door-out'; })[0] || null;
+  if (PLACE === 'stone-potions-room' && STONE.on2) { var ti = tappables.indexOf(STONE.on2.mesh); if (ti >= 0) tappables.splice(ti, 1); }
+})();
+function stoneShown(shown) {
+  if (!STONE.on) return [];
+  if (PLACE === 'stone-potions-room' && STONE_FIRES_STAND && shown.indexOf(STONE_FIRES_STAND) >= 0) STONE.riseT = 1;
+  return STONE_DRAWN.filter(function (s) { return shown.indexOf(s) >= 0; });
+}
+function stoneCurls(on) {   /* six tendrils round his ankles where he stands, never above them */
+  if (STONE.curls) { STONE.curls.parent.remove(STONE.curls); STONE.curls = null; }
+  if (!on || PLACE !== 'stone-pit') return;
+  var g = new THREE.Group(), c = here.pos, fy = STONE.fy;
+  for (var i = 0; i < 6; i++) {
+    var pts = [], a0 = i * 1.047;
+    for (var k = 0; k <= 10; k++) { var u = k / 10, a = a0 + u * 3.6, r = 0.32 - 0.16 * u; pts.push(new THREE.Vector3(c.x + Math.cos(a) * r, fy + 0.02 + 0.16 * u, c.z + Math.sin(a) * r)); }
+    var t = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 20, 0.018, 5, false), STONE.curlMat); t.name = 'stone-snare-curl'; t.userData.owner = PLACE; t.raycast = function () {}; g.add(t);
+  }
+  g.name = 'stone-snare-curls'; scene.add(g); STONE.curls = g; STONE.slack = 0;
+}
+function stoneSnareOff(s) { if (STONE.curls) STONE.slack = s; }
+thingCues[STONE_SNARE_IN] = function () { stoneCurls(true); showLines([{ medium: 'seen', sound: STONE_SNARE_IN }]); };
+thingCues[STONE_SNARE_LIGHT] = function () { stoneSnareOff(1.2); showLines([{ medium: 'seen', sound: STONE_SNARE_LIGHT }]); };
+thingCues[STONE_SNARE_GO] = function () { stoneSnareOff(3.0); showLines([{ medium: 'seen', sound: STONE_SNARE_GO }]); };
+thingCues[STONE_FIRES_IN] = function () { STONE.riseT = 1; showLines([{ medium: 'seen', sound: STONE_FIRES_IN }]); };
+function stoneCarry(d, line) {   /* the line seen, then the walk through the way */
+  var l = { medium: 'seen', sound: line }; showLines([l]);
+  if (d) setTimeout(function () { through(d); }, lineSeconds(l) * 1000);
+}
+thingCues[STONE_SMALLEST] = function () { stoneCarry(STONE.on2, STONE_SMALLEST); };
+thingCues[STONE_ROUND] = function () { stoneCarry(STONE.back, STONE_ROUND); };
+function updateStoneThings(dt, t) {
+  if (!STONE.on) return;
+  STONE.keys.forEach(function (k) {
+    var a = t * k.sp + k.ph, x = k.cx + Math.cos(a) * k.rx, y = k.cy + Math.sin(a * 1.3) * k.ry;
+    x = Math.min(125.3, Math.max(114.7, x)); y = Math.min(59.3, Math.max(50.7, y));
+    k.g.position.copy(shell.toLocal(x, y, shell.place.floor + k.h + Math.sin(a * 2.1) * k.dh));
+    k.g.rotation.set(k.lop || Math.sin(a * 3) * 0.2, Math.atan2(Math.cos(a * 1.3) * 1.3 * k.ry, Math.sin(a) * k.rx) + Math.PI, 0);
+    k.wings.forEach(function (w) { w.h.rotation.x = w.sd * (0.2 + Math.sin(t * k.fl) * 0.7) * (k.lop && w.sd < 0 ? 0.6 : 1); });
+  });
+  STONE.rise += (STONE.riseT - STONE.rise) * Math.min(1, dt * 3);
+  STONE.flames.forEach(function (f) {
+    var fl = 0.8 + 0.2 * Math.sin(t * 9 + f.userData.ph) + 0.08 * Math.sin(t * 23 + f.userData.ph * 2), h = Math.max(0.001, f.userData.h * fl * STONE.rise);
+    f.scale.set(f.userData.w, h, f.userData.w); f.position.copy(f.userData.base); f.position.y += h / 2 - 0.06; f.visible = STONE.rise > 0.02;
+  });
+  if (PLACE === 'stone-potions-room' && STONE_LIGHT.purple) { STONE_LIGHT.purple.intensity = 1.1 * STONE.rise; STONE_LIGHT.black.intensity = 0.25 * STONE.rise; }
+  if (STONE.curls && STONE.slack > 0) {
+    var s = STONE.curls.scale.y - dt / STONE.slack;
+    if (s <= 0.02) stoneCurls(false); else { STONE.curls.scale.set(1, s, 1); STONE.curls.position.set(0, (1 - s) * STONE.fy, 0); }
+  }
+}
 thingCues[STAFF_COALS] = function () { if (!STAFF.on) return; staffMove.dip = 1.4; showLines([{ medium: 'heard', sound: STAFF_COALS }]); };
 thingCues[STAFF_CUSHION] = function () {
   if (!W1.dent) return; staffMove.dent = 6; showLines([{ medium: 'seen', sound: STAFF_CUSHION }]);
@@ -2655,7 +2829,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -2815,6 +2989,7 @@ function tap(cx, cy) {
     if (ch.length && (!hits.length || ch[0].distance <= hits[0].distance + 0.05)) { events.tap('corbel'); kit.tapped(true); return; }
   }
   if (events && hit && CADOGAN && (hit === CADOGAN.frame || hit === CADOGAN.ground)) { CADOGAN.taps++; events.tap('cadogan'); kit.tapped(true); return; }   /* req 802 */
+  if (events && hit && hit.userData.bottle) { events.tap(hit.userData.bottle); kit.tapped(true); return; }   /* req 920, the seven bottles */
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   if (d && (here === d.stand || here === placeOf(d).s)) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen)) through(d); else answer(d, hits[0].point); acted = true; }
@@ -2917,6 +3092,7 @@ function frame() {
   updateMyrtle(dt);
   updateStaff(dt);
   updateStone(dt);
+  updateStoneThings(dt, clock.elapsedTime);
   if (events && events.tick) events.tick(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -3168,6 +3344,11 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   flood: function () { myrtleFlood(); return !!(MYRTLE.wet.flood && MYRTLE.wet.flood[0].visible); },
   drip: function () { myrtleDrip(); return !!MYRTLE.drip; },
   grains: function () { if (!CUP) return null; lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else cupRun(); return CUP.run >= 0; },
+  /* req 920: the chambers' things as they stand; a cue's line passed in plays it */
+  stone: function (shown, cue) { var d = shown ? stoneShown(shown) : []; if (cue) cueTable[cue]();
+    return STONE.on ? { keys: STONE.keys.length, battered: !!STONE.battered, flames: STONE.flames.length, rise: STONE.rise,
+      curls: !!STONE.curls, bottles: shell.group.children.filter(function (m) { return m.userData.bottle; }).length / 2,
+      blackTappable: !!(STONE.on2 && tappables.indexOf(STONE.on2.mesh) >= 0), drawn: d.length } : null; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
 </script>
