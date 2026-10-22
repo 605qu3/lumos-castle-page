@@ -1294,7 +1294,7 @@ var STAIR = (function () {
   out.on = true;
   var S = 5.2, g = new THREE.Group(); g.name = 'stair-things'; shell.group.add(g);
   var P = function (x, y, z) { return shell.toLocal(x, y, z); };   /* the well's floor is 0: every height absolute */
-  var srgb = function (t) { if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding; return t; };
+  var srgb = function (t) { if (THREE.SRGBColorSpace) t.encoding = THREE.sRGBEncoding; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding; return t; };
   function box(x0, y0, z0, x1, y1, z1, mat, parent) {   /* a box between two corners in the castle's frame */
     var a = P(x0, y0, z0), b = P(x1, y1, z1), m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mat);
     m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); (parent || g).add(m); return m;
@@ -1666,6 +1666,10 @@ function kitchensFire(night) {
 }
 function kitchensShown(shown) {
   if (shown.indexOf(KIT_LIT) >= 0) kitchensFire(false); else if (shown.indexOf(KIT_BANKED) >= 0) kitchensFire(true);
+  if (!KDISH || KDISH.fixed) return;   /* req 945: the tables by their room line */
+  if (shown.indexOf(KIT_LADEN) >= 0) kitchensDishes('laden');
+  else if (shown.some(function (s) { return s.indexOf(KIT_HEAVY) === 0; })) kitchensDishes('heavy');
+  else if (KIT_CLEAR.some(function (s) { return shown.indexOf(s) >= 0; })) kitchensDishes('clear');
 }
 /* req 951 (b): the fruit-bowl painting (the model's fruit-bowl-painting, GoF 21 L28826 to L28836) in the corridor's
    north wall, every year: a gilt frame on the wall's face at the model's place and width, the canvas a silver bowl of
@@ -1706,7 +1710,7 @@ var PEAR = PLACE !== 'kitchens-corridor' ? null : (function () {
   x.fillStyle = gr; x.beginPath(); x.ellipse(128, 262, 96, 18, 0, 0, Math.PI * 2); x.fill();
   x.beginPath(); x.moveTo(32, 262); x.quadraticCurveTo(128, 372, 224, 262); x.closePath(); x.fill();   /* the gigantic silver bowl */
   x.fillStyle = '#56544f'; x.fillRect(112, 318, 32, 14); x.fillRect(96, 330, 64, 6);                  /* its foot */
-  var tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  var tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding;
   var cw = W - 0.12, ch = H - 0.16;
   var canv = own(new THREE.Mesh(new THREE.PlaneGeometry(cw, ch), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8 })), 'fruit-bowl-canvas');
   canv.position.set(0, 0.08 + ch / 2 + 0.02, 0.012);
@@ -1720,7 +1724,7 @@ var PEAR = PLACE !== 'kitchens-corridor' ? null : (function () {
   var px = pc.getContext('2d'), pg = px.createRadialGradient(26, 62, 4, 32, 60, 34); pg.addColorStop(0, '#9cc04a'); pg.addColorStop(1, '#4d7322');
   px.fillStyle = pg; px.beginPath(); px.arc(32, 66, 26, 0, Math.PI * 2); px.fill(); px.beginPath(); px.ellipse(32, 34, 14, 22, 0, 0, Math.PI * 2); px.fill();
   px.fillStyle = '#4a3420'; px.fillRect(30, 4, 4, 14);
-  var ptex = new THREE.CanvasTexture(pc); ptex.colorSpace = THREE.SRGBColorSpace;
+  var ptex = new THREE.CanvasTexture(pc); ptex.encoding = THREE.sRGBEncoding;
   var pear = own(new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.24), new THREE.MeshStandardMaterial({ map: ptex, transparent: true, alphaTest: 0.4, roughness: 0.7 })), 'fruit-bowl-pear');
   var pearAt = new THREE.Vector3(side * -0.05, 0.08 + 0.02 + ch * (1 - 236 / 512), 0.016); pear.position.copy(pearAt);
   /* the handle: a large green pull, upright, standing off the canvas on two feet */
@@ -1767,6 +1771,197 @@ if (PEAR) {
     pearOpen(); PEAR.swing = 1; PEAR.pivot.rotation.y = PEAR.pivot.userData.rest + PEAR.side * -1.75;
   }
 }
+/* req 945 (Magic's 944; Events' kitchens.json, word for word): the four tables' covered dishes, laden in the hour
+   before each meal and more heavily on a feast's evening, gone between one look and the next as the dishes go up, the
+   tables bare after; steam rising off the covers while they stand. Nobody is seen at work (the Ministry's 8e): the
+   dishes are there or not, never carried. Pewter, dull, no glint. Instanced (seams does not read instances, as the hall's
+   needles), the plates 3 mm over the tops at 0.80. Till a line comes, by the clock. ?dishes=laden|heavy|clear */
+var KIT_LADEN = 'the four long tables, positioned exactly beneath the four House tables above, laden with covered dishes, the steam rising, the smell of the meal',
+    KIT_HEAVY = 'the four long tables laden more heavily than on other days',
+    KIT_CLEAR = ['the four long tables clear of food, the meal over', 'the four long tables clear, the dishes already sent up through the ceiling'],
+    KIT_UP = "the dishes sent up through the ceiling to their counterparts above: between one look and the next the tables are bare, and through the vault the Great Hall's sound swells, a sudden gladder murmur as the food appears above";
+function softTex(r, g, b) {   /* a soft round puff, white at its heart, for steam */
+  var c = document.createElement('canvas'); c.width = c.height = 64; var x = c.getContext('2d'), gr = x.createRadialGradient(32, 32, 2, 32, 32, 30);
+  gr.addColorStop(0, 'rgba(' + r + ',' + g + ',' + b + ',1)'); gr.addColorStop(1, 'rgba(' + r + ',' + g + ',' + b + ',0)');
+  x.fillStyle = gr; x.fillRect(0, 0, 64, 64); var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t;
+}
+var KDISH = PLACE !== 'kitchens' ? null : (function () {
+  var z0 = shell.place.floor, P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
+  var sets = [[], []];   /* every meal's dishes, and the feasts' more between them */
+  [54.2, 58.4, 62.6, 66.8].forEach(function (ty) {   /* the tables' middles (K2), x 23 to 61, 1.0 broad */
+    for (var x = 23.5, k = 0; x + 0.75 < 61; x += 1.15, k++) {
+      sets[0].push([x, ty - 0.24, 0.16 + (k % 3) * 0.01], [x + 0.55, ty + 0.24, 0.15]);
+      sets[1].push([x + 0.55, ty - 0.24, 0.12], [x, ty + 0.24, 0.13 - (k % 2) * 0.01]);
+    }
+  });
+  var plateM = kit.solid(0x7f7c75, { roughness: 0.75, metalness: 0.25 }), coverM = kit.solid(0x928f86, { roughness: 0.7, metalness: 0.3 });
+  var plateG = new THREE.CylinderGeometry(1.18, 1.12, 0.012, 14), coverG = new THREE.SphereGeometry(1, 14, 6, 0, Math.PI * 2, 0, Math.PI / 2),
+      knobG = new THREE.SphereGeometry(0.018, 8, 6), dm = new THREE.Object3D();
+  var meshes = sets.map(function (s, i) {
+    var pl = new THREE.InstancedMesh(plateG, plateM, s.length), cv = new THREE.InstancedMesh(coverG, coverM, s.length), kn = new THREE.InstancedMesh(knobG, coverM, s.length);
+    s.forEach(function (d, j) {
+      dm.position.copy(P(d[0], d[1], 0.803 + 0.006)); dm.scale.set(d[2], 1, d[2]); dm.updateMatrix(); pl.setMatrixAt(j, dm.matrix);
+      dm.position.copy(P(d[0], d[1], 0.815)); dm.scale.set(d[2], d[2] * 0.72, d[2]); dm.updateMatrix(); cv.setMatrixAt(j, dm.matrix);
+      dm.position.copy(P(d[0], d[1], 0.815 + d[2] * 0.72 + 0.01)); dm.scale.set(1, 1, 1); dm.updateMatrix(); kn.setMatrixAt(j, dm.matrix);
+    });
+    [pl, cv, kn].forEach(function (m, k) { m.name = 'kitchens-dishes-' + i + '-' + k; m.userData.owner = 'kitchens'; m.raycast = function () {}; scene.add(m); });
+    return [pl, cv, kn];
+  });
+  /* the steam: soft grey-white puffs off the covers' knobs, each rising 0.5 over four seconds and gone, unlit */
+  var sm = new THREE.SpriteMaterial({ map: softTex(236, 232, 224), color: 0xd8d4cc, transparent: true, depthWrite: false, opacity: 0.0 });
+  var puffs = [];
+  for (var i = 0; i < 40; i++) {
+    var sp = new THREE.Sprite(sm.clone()); sp.name = 'kitchens-steam-' + i; sp.userData.owner = 'kitchens'; sp.raycast = function () {};
+    sp.visible = false; scene.add(sp); puffs.push({ s: sp, t: -Math.random() * 4, d: null });
+  }
+  return { sets: sets, meshes: meshes, puffs: puffs, P: P, state: null, fixed: false };
+})();
+function kitchensDishes(state) {
+  if (!KDISH) return;
+  KDISH.state = state;
+  KDISH.meshes[0].forEach(function (m) { m.visible = state !== 'clear'; });
+  KDISH.meshes[1].forEach(function (m) { m.visible = state === 'heavy'; });
+  if (state === 'clear') KDISH.puffs.forEach(function (p) { p.s.visible = false; p.d = null; p.t = -Math.random() * 4; });
+}
+if (KDISH) {
+  var dq = Q.get('dishes'), dmin = (Q.get('hour') != null ? 0 : new Date().getMinutes()) / 60 + HOUR;
+  if (dq) { KDISH.fixed = true; kitchensDishes(dq); }
+  else kitchensDishes((dmin >= 6 && dmin < 7.5) || (dmin >= 11 && dmin < 12.5) || (dmin >= 17 && dmin < 18.5) ? 'laden' : 'clear');
+}
+thingCues[KIT_UP] = function () { showLines([{ medium: 'seen', sound: KIT_UP, on: function () { kitchensDishes('clear'); } }]); };
+function updateKitchens(dt) {
+  if (KDISH && KDISH.state !== 'clear') KDISH.puffs.forEach(function (p) {
+    p.t += dt;
+    if (p.t < 0) return;
+    if (!p.d) { var s = KDISH.state === 'heavy' && Math.random() < 0.5 ? KDISH.sets[1] : KDISH.sets[0], d = s[Math.floor(Math.random() * s.length)]; p.d = d; p.base = KDISH.P(d[0], d[1], 0.815 + d[2] * 0.72 + 0.03); p.life = 3.5 + Math.random() * 1.5; p.ph = Math.random() * 6; }
+    var f = p.t / p.life;
+    if (f >= 1) { p.d = null; p.t = -Math.random() * 2; p.s.visible = false; return; }
+    p.s.visible = true; p.s.position.set(p.base.x + Math.sin(p.ph + f * 5) * 0.04, p.base.y + f * 0.5, p.base.z + Math.cos(p.ph + f * 4) * 0.03);
+    var sz = 0.08 + f * 0.22; p.s.scale.set(sz, sz, 1); p.s.material.opacity = 0.45 * Math.sin(Math.PI * f);
+  });
+  if (KCORR) updateCorridor(dt);
+}
+/* req 945: the corridor's torches and its cheerful paintings, mainly of food (GoF 21 L28818: pies, cheeses, game pies,
+   a ham on a board), hung on both long walls where the ray finds their faces, clear of the fruit bowl (x 60 to 61) and
+   the steps' mouth; the torches between them at 2.2 in iron brackets, their flames their own and three warm lights down
+   the middle, so it reads the brightest of the low passages. Painted things move as the castle's paintings do: on
+   Events' lines a grape drops from its bunch and rolls to the frame's edge, a pie's steam curls; once he has looked
+   away, all is as it was. Nothing glows; owner kitchens-corridor. ?paint=grape|steam plays one for checks */
+var KC_GRAPE = "a painted grape drops from its bunch and rolls to the frame's edge; when he looks again all is as it was",
+    KC_STEAM = "a painted pie's steam curls; when he looks again all is as it was";
+var KCORR = PLACE !== 'kitchens-corridor' ? null : (function () {
+  var z0 = shell.place.floor, P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
+  shell.group.updateMatrixWorld(true);
+  function wall(x, wy, h) {   /* the wall's face and its normal into the corridor, by a level ray from its middle (y 50) */
+    var o = P(x, 50, h), rc = new THREE.Raycaster(o, P(x, wy, h).sub(o).normalize(), 0, 3);
+    var hit = rc.intersectObjects(shell.group.children, false).filter(function (k) { return !k.object.userData.way && !k.object.userData.hidden && k.face; })[0];
+    if (!hit) return null;
+    var n = hit.face.normal.clone().transformDirection(hit.object.matrixWorld); n.y = 0; n.normalize();
+    if (n.dot(o.clone().sub(hit.point)) < 0) n.negate();
+    return { p: hit.point.clone(), n: n };
+  }
+  function own(m, nm, g) { m.name = nm; m.userData.owner = 'kitchens-corridor'; m.raycast = function () {}; (g || shell.group).add(m); return m; }
+  var gilt = kit.solid(0x8a7340, { roughness: 0.45, metalness: 0.5 }), iron = kit.solid(0x2e2c2a, { roughness: 0.8 }), head = kit.solid(0x4a3a2a, { roughness: 0.9 });
+  var flameM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
+  var CW = 0.8, CH = 0.62, PX = 256, PY = 198;
+  function L(cx, cy) { return [(cx / PX - 0.5) * CW, (0.5 - cy / PY) * CH]; }   /* the canvas's pixels to the painting's metres */
+  function blob(x, cx, cy, rx, ry, col) { x.fillStyle = col; x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); x.fill(); }
+  function pie(x, cx, cy, r) { blob(x, cx, cy + 6, r, r * 0.42, '#6e4a26'); blob(x, cx, cy, r, r * 0.4, '#c08a46'); blob(x, cx, cy - 2, r * 0.8, r * 0.3, '#d49d55');
+    x.strokeStyle = '#8a5c2c'; x.lineWidth = 2; for (var k = -2; k <= 2; k++) { x.beginPath(); x.moveTo(cx + k * r * 0.25 - 6, cy - 6); x.lineTo(cx + k * r * 0.25 + 6, cy + 4); x.stroke(); } }
+  var PAINT = {
+    ham: function (x) { blob(x, 128, 150, 92, 14, '#5b3d22'); blob(x, 120, 120, 66, 40, '#8f4a3a'); blob(x, 112, 116, 50, 28, '#c98a78'); x.fillStyle = '#e8dcc4'; x.fillRect(180, 108, 34, 10); blob(x, 214, 113, 8, 9, '#e8dcc4'); },
+    cheeses: function (x) { blob(x, 96, 132, 58, 22, '#a88a3a'); x.fillStyle = '#d8b85a'; x.fillRect(38, 106, 116, 26); blob(x, 96, 106, 58, 20, '#e6c86a');
+      x.fillStyle = '#e8cf7a'; x.beginPath(); x.moveTo(160, 150); x.lineTo(226, 150); x.lineTo(206, 108); x.closePath(); x.fill(); blob(x, 190, 134, 5, 4, '#c8a850'); blob(x, 204, 126, 4, 3, '#c8a850'); },
+    gamepie: function (x) { x.fillStyle = '#9a6a32'; x.fillRect(66, 72, 124, 80); blob(x, 128, 152, 62, 12, '#7a5228'); blob(x, 128, 72, 62, 14, '#c79050');
+      [[100, 68], [128, 64], [156, 68]].forEach(function (l) { blob(x, l[0], l[1], 14, 6, '#d9a45e'); }); x.strokeStyle = '#7a5228'; x.lineWidth = 3; for (var k = 0; k < 6; k++) { x.beginPath(); x.moveTo(72 + k * 22, 92); x.lineTo(80 + k * 22, 140); x.stroke(); } },
+    loaf: function (x) { blob(x, 92, 124, 56, 30, '#a8743a'); blob(x, 88, 116, 46, 20, '#c48a48'); blob(x, 176, 136, 36, 18, '#b07c40'); x.fillStyle = '#e6d488'; x.fillRect(150, 150, 40, 16); },
+    grapes: function (x) { blob(x, 128, 150, 96, 14, '#7d7a74'); blob(x, 80, 128, 24, 22, '#8a3225'); blob(x, 112, 132, 20, 18, '#6e7a2e');
+      for (var k = 0; k < 15; k++) if (k !== 13) blob(x, 160 + (k % 4) * 11 - Math.floor(k / 4) * 3, 98 + Math.floor(k / 4) * 11, 7, 7, '#4b2f4a'); x.fillStyle = '#5a4020'; x.fillRect(172, 84, 3, 12); },
+    fowl: function (x) { blob(x, 128, 152, 92, 14, '#7d7a74'); blob(x, 128, 122, 64, 34, '#9a5a28'); blob(x, 118, 112, 44, 20, '#b87038'); blob(x, 72, 132, 16, 10, '#8a4e22'); blob(x, 184, 132, 16, 10, '#8a4e22'); },
+    pies: function (x) { pie(x, 64, 132, 40); pie(x, 136, 114, 36); pie(x, 196, 140, 40); },
+    steampie: function (x) { blob(x, 128, 152, 96, 14, '#7d7a74'); pie(x, 128, 124, 64); x.fillStyle = '#5a2e1e'; x.beginPath(); x.moveTo(128, 124); x.lineTo(190, 118); x.lineTo(186, 134); x.closePath(); x.fill(); },
+    tarts: function (x) { [[58, 140, '#8a2a3a'], [128, 140, '#c8a040'], [198, 140, '#6a2a4a'], [92, 104, '#a83a30'], [164, 104, '#c89040']].forEach(function (t) { blob(x, t[0], t[1], 30, 11, '#b8844a'); blob(x, t[0], t[1] - 2, 24, 8, t[2]); }); },
+    birds: function (x) { x.fillStyle = '#4a3420'; x.fillRect(40, 30, 176, 6); [[80, '#6a5a3a'], [128, '#7a4e2e'], [176, '#5e5040']].forEach(function (b) { x.fillRect(b[0] - 1, 36, 2, 24); blob(x, b[0], 92, 20, 36, b[1]); blob(x, b[0], 132, 8, 10, b[1]); }); }
+  };
+  function hang(x, wy, kind) {
+    var w = wall(x, wy, 1.45); if (!w) return null;
+    var g = new THREE.Group(); g.position.copy(w.p).addScaledVector(w.n, 0.012); g.rotation.y = Math.atan2(w.n.x, w.n.z); g.name = 'kc-painting-' + kind; shell.group.add(g);
+    var c = document.createElement('canvas'); c.width = PX; c.height = PY; var cx = c.getContext('2d');
+    cx.fillStyle = '#2b2219'; cx.fillRect(0, 0, PX, PY); cx.fillStyle = '#3a2d20'; cx.fillRect(0, 150, PX, PY - 150); cx.fillStyle = '#4a3a29'; cx.fillRect(0, 150, PX, 4);
+    PAINT[kind](cx);
+    var tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding;
+    own(new THREE.Mesh(new THREE.PlaneGeometry(CW, CH), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8 })), 'kc-canvas-' + kind, g).position.z = 0.012;
+    var FW = CW + 0.14, FH = CH + 0.14;
+    [[FW, 0.07, 0, FH / 2 - 0.035], [FW, 0.07, 0, -FH / 2 + 0.035], [0.07, FH, -FW / 2 + 0.035, 0], [0.07, FH, FW / 2 - 0.035, 0]].forEach(function (b, k) {
+      own(new THREE.Mesh(new THREE.BoxGeometry(b[0], b[1], 0.06), gilt), 'kc-frame-' + kind + '-' + k, g).position.set(b[2], b[3], 0.03);
+    });
+    own(new THREE.Mesh(new THREE.BoxGeometry(CW, CH, 0.008), kit.solid(0x5a4632)), 'kc-back-' + kind, g).position.z = 0.004;
+    return g;
+  }
+  function torch(x, wy) {
+    var w = wall(x, wy, 2.2); if (!w) return null;
+    var g = new THREE.Group(); g.position.copy(w.p); g.rotation.y = Math.atan2(w.n.x, w.n.z); g.name = 'kc-torch'; shell.group.add(g);
+    own(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.05, 0.34), iron), 'kc-bracket', g).position.set(0, -0.02, 0.15);   /* bears 2 cm into the wall */
+    var st = own(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.32, 10), head), 'kc-torch-head', g); st.position.set(0, 0.1, 0.3);
+    var fl = own(new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), flameM), 'kc-flame', g); fl.scale.y = 2.0; fl.position.set(0, 0.36, 0.3);
+    return g;
+  }
+  var out = { paintings: {}, torches: 0, lights: [] };
+  [[46.5, 51.5, 'ham'], [50.5, 51.5, 'loaf'], [54.5, 51.5, 'gamepie'], [57.8, 51.5, 'grapes'], [64.0, 51.5, 'cheeses'],
+   [47.0, 48.5, 'fowl'], [51.0, 48.5, 'pies'], [55.0, 48.5, 'steampie'], [59.0, 48.5, 'tarts'], [63.0, 48.5, 'birds']].forEach(function (p) {
+    var g = hang(p[0], p[1], p[2]); if (g) out.paintings[p[2]] = g;
+  });
+  [[48.5, 51.5], [52.5, 51.5], [62.4, 51.5], [49.0, 48.5], [53.0, 48.5], [57.0, 48.5], [61.0, 48.5], [65.2, 48.5]].forEach(function (t) { if (torch(t[0], t[1])) out.torches++; });
+  [48, 55, 62].forEach(function (lx) { var l = new THREE.PointLight(0xffa860, 0.9, 8, 1.6); l.position.copy(P(lx, 50, 2.6)); scene.add(l); out.lights.push(l); });
+  /* the loose grape: the bunch's fourteenth, its own small disc; and three wisps of the pie's steam */
+  var gp = out.paintings.grapes, sp = out.paintings.steampie;
+  if (gp) {
+    var gc = document.createElement('canvas'); gc.width = gc.height = 32; var gx = gc.getContext('2d'), gg = gx.createRadialGradient(13, 13, 2, 16, 16, 14);
+    gg.addColorStop(0, '#6b4a6a'); gg.addColorStop(1, '#3e2640'); gx.fillStyle = gg; gx.beginPath(); gx.arc(16, 16, 14, 0, Math.PI * 2); gx.fill();
+    var gt = new THREE.CanvasTexture(gc); gt.encoding = THREE.sRGBEncoding;
+    var r = 7 / PX * CW, home = L(160 + 1 * 11 - 3 * 3, 98 + 3 * 11);
+    out.grape = own(new THREE.Mesh(new THREE.PlaneGeometry(r * 2, r * 2), new THREE.MeshStandardMaterial({ map: gt, transparent: true, alphaTest: 0.4, roughness: 0.7 })), 'kc-grape', gp);
+    out.grapeHome = new THREE.Vector3(home[0], home[1], 0.015); out.grape.position.copy(out.grapeHome);
+    out.grapeFloor = L(0, 150 - 7)[1]; out.grapeEdge = CW / 2 - r - 0.004; out.grapeR = r;
+  }
+  if (sp) {
+    var wm = new THREE.MeshBasicMaterial({ map: softTex(232, 228, 220), transparent: true, depthWrite: false, opacity: 0 });
+    out.wisps = [0, 1, 2].map(function (k) {
+      var m = own(new THREE.Mesh(new THREE.PlaneGeometry(0.07, 0.07), wm.clone()), 'kc-steam-' + k, sp); var a = L(110 + k * 18, 96);
+      m.userData.home = new THREE.Vector3(a[0], a[1], 0.016 + k * 0.001); m.position.copy(m.userData.home); m.visible = false; return m;
+    });
+  }
+  out.grapeT = -1; out.steamT = -1; out.away = 0;
+  return out;
+})();
+function corridorSeen(g) {   /* the painting in his view: its middle before the camera and inside the frame */
+  var v = g.getWorldPosition(new THREE.Vector3()).project(camera); return v.z < 1 && Math.abs(v.x) < 1 && Math.abs(v.y) < 1;
+}
+function updateCorridor(dt) {
+  var K = KCORR;
+  if (K.grape && K.grapeT >= 0) {
+    K.grapeT += dt; var g = K.grape, t = K.grapeT;
+    if (t < 0.45) { var f = t / 0.45; g.position.set(K.grapeHome.x, K.grapeHome.y + (K.grapeFloor - K.grapeHome.y) * f * f, K.grapeHome.z); }
+    else if (t < 2.2) { var e = easeInOut((t - 0.45) / 1.75); g.position.x = K.grapeHome.x + (K.grapeEdge - K.grapeHome.x) * e; g.position.y = K.grapeFloor; g.rotation.z = -(g.position.x - K.grapeHome.x) / K.grapeR; }
+    else {   /* at the frame's edge till he has looked away a moment, or half a minute has gone */
+      K.away = corridorSeen(K.paintings.grapes) ? 0 : K.away + dt;
+      if (K.away > 0.6 || t > 30) { g.position.copy(K.grapeHome); g.rotation.z = 0; K.grapeT = -1; K.away = 0; }
+    }
+  }
+  if (K.wisps && K.steamT >= 0) {
+    K.steamT += dt;
+    K.wisps.forEach(function (m, k) {
+      var f = (K.steamT - k * 0.7) / 3.2;
+      if (f < 0 || f > 1) { m.visible = false; return; }
+      m.visible = true; m.position.set(m.userData.home.x + Math.sin(f * 7 + k * 2) * 0.03 * f, m.userData.home.y + f * 0.17, m.userData.home.z);
+      var s = 1 + f * 1.6; m.scale.set(s, s, 1); m.material.opacity = 0.55 * Math.sin(Math.PI * f);
+    });
+    if (K.steamT > 3.2 + 1.4) { K.steamT = -1; K.wisps.forEach(function (m) { m.visible = false; m.position.copy(m.userData.home); }); }
+  }
+}
+thingCues[KC_GRAPE] = function () { showLines([{ medium: 'seen', sound: KC_GRAPE, on: function () { if (KCORR && KCORR.grape && KCORR.grapeT < 0) KCORR.grapeT = 0; } }]); };
+thingCues[KC_STEAM] = function () { showLines([{ medium: 'seen', sound: KC_STEAM, on: function () { if (KCORR && KCORR.wisps && KCORR.steamT < 0) KCORR.steamT = 0; } }]); };
+if (KCORR && Q.get('paint')) setTimeout(function () { cueTable[Q.get('paint') === 'steam' ? KC_STEAM : KC_GRAPE](); }, 2000);
 /* req 951 (c): the cupboard's bucket and tin (CUP_LINES above, by the cupboard) */
 thingCues[CUP_BUCKET] = function () { showLines([{ medium: 'heard', sound: CUP_BUCKET }]); };
 thingCues[CUP_TIN] = function () {   /* the chamois laid back on the shelf, folded, as the line shows */
@@ -3749,7 +3944,7 @@ var SITTERS = (function () {
   if (PLACE !== 'se-round-room-1') return null;
   var C = [160.0, 0.0], z0 = shell.place.floor, out = { state: '' };
   var tex = new THREE.TextureLoader().load('../assets/layers/painters-sitters.png');
-  if (THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace; else tex.encoding = THREE.sRGBEncoding;
+  if (THREE.SRGBColorSpace) tex.encoding = THREE.sRGBEncoding; else tex.encoding = THREE.sRGBEncoding;
   tex.anisotropy = 4;
   function at(b, r, z) { return shell.toLocal(C[0] + r * Math.sin(b * Math.PI / 180), C[1] + r * Math.cos(b * Math.PI / 180), z0 + z); }
   function along(b, r, u) { return b + u / r * 180 / Math.PI; }
@@ -4039,7 +4234,7 @@ var clock = new THREE.Clock();
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   updateCamera(dt);
-  updateShakes(dt); updatePear(dt);
+  updateShakes(dt); updatePear(dt); updateKitchens(dt);
   updateSwings(dt);
   updateFades(dt);
   updateCupboard(dt);
@@ -4954,6 +5149,11 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     sink: !!TRICK.sink, found: trickFound() }; },
   /* B21: the cupboard's state, and a tap on its grains as from its stand (true if they run) */
   cupboard: function () { return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run } : null; },
+  /* req 945: the tables' dishes and steam, the corridor's paintings and torches; a cue string passed in plays it */
+  kitchens: function (cue) { if (cue) cueTable[cue]();
+    return { dishes: KDISH ? KDISH.state : null, puffs: KDISH ? KDISH.puffs.filter(function (p) { return p.s.visible; }).length : null,
+      paintings: KCORR ? Object.keys(KCORR.paintings) : null, torches: KCORR ? KCORR.torches : null, grape: KCORR && KCORR.grape ? [KCORR.grapeT, KCORR.grape.position.x, KCORR.grape.position.y] : null,
+      steam: KCORR ? KCORR.steamT : null }; },
   /* req 951 (b): the painting's state, and where on the screen its pear's tap lands (x, y from 0 to 1) */
   pear: function () { if (!PEAR) return null; var s = scene.getObjectByName('fruit-bowl-pear-hit'), v = s ? s.getWorldPosition(new THREE.Vector3()).project(camera) : null;
     return { state: PEAR.state, swing: PEAR.swing, door: !!PEAR.d, found: pearFound(), stand: here.name, at: v ? [(v.x + 1) / 2, (1 - v.y) / 2] : null }; },
