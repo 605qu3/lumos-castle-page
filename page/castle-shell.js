@@ -883,6 +883,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
         /* a way above RAISED (the landing bay's mouth at +34.42) is reached on its own floor, its sill */
         var lift = g.sill > RAISED ? g.sill : 0, level = Q.floor + lift;
+        /* v70 (the hundred-twelfth: a black strip on the floor and head at the far end of the keys' door's 2 m passage and
+           the troll room's way): each room draws its own wall t deep, so through rock deeper than that the middle stood
+           open on the void; the passage is lined once, by whichever room builds it first, from 1 cm inside this face to
+           1 cm inside the far one, its floor 5 mm under a threshold's top, its head 5 mm over the opening's, its sides 5 mm
+           back of the jambs, so every face it shares a plane with lies inside a wall */
+        out.lined = out.lined || {};
+        if (g.op.depth > t + 0.05 && !g.soffit && !g.back && !out.lined[g.op.id] && !/window|loop|lancet|oriel|dormer|cleft/.test(g.op.kind || '')) {
+          out.lined[g.op.id] = Q.id;
+          var D = g.op.depth, dm = D / 2, ln = D - 0.02, lp = function (s, y, wd, hg, mat, kind, nm) {
+            var m = slab(wd, hg, ln, mat, kind), q = toLocal(a[0] + ux * s + nx * dm, a[1] + uy * s + ny * dm, Q.floor);
+            m.position.set(q.x, q.y + y, q.z); m.rotation.y = ang; m.name = Q.id + '-lining-' + nm + '-' + g.op.id; m.userData.owner = Q.id; group.add(m);
+          };
+          lp(sm, g.sill + 0.015 - 0.05, w + 0.02, 0.1, mats.floor, 'floor', 'floor');
+          lp(sm, g.h + 0.005 + 0.15, w + 0.02, 0.3, mats.wall, 'wall', 'head');
+          lp(g.s0 - 0.155, g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', 'a');
+          lp(g.s1 + 0.155, g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', 'b');
+        }
         if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
           var leaf = slab(w - 0.08, hh - 0.04, 0.12, mats.door, 'door');   /* v44: on its threshold (0.02), its foot not the threshold's */
           var lo = g.far ? g.far - 0.1 : t * 0.5;                        /* a passage's leaves hang at its far face */
