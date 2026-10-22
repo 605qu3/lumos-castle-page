@@ -1742,7 +1742,7 @@ var PEAR = PLACE !== 'kitchens-corridor' ? null : (function () {
   var d = shell.hidden.filter(function (h) { return h.id === 'fruit-bowl-painting'; })[0] || null;
   return { mouth: mouth, pivot: pivot, g: g, pear: pear, handle: hg, hit: hb, d: d, side: side, state: 'pear', t: 0, swing: 0, swingT: 0, at: pearAt.clone() };
 })();
-function pearFound() { return !!(events && events.secrets && events.secrets().indexOf('fruit-bowl-painting') >= 0); }
+function pearFound() { return !!(PEAR && PEAR.d && events && events.secrets && events.secrets().indexOf('fruit-bowl-painting') >= 0); }   /* no door before the Goblet's year */
 function pearHandle() { if (!PEAR) return; PEAR.state = 'handle'; PEAR.pear.visible = false; PEAR.handle.visible = true; PEAR.pear.position.copy(PEAR.at); PEAR.pear.rotation.z = 0; }
 function pearOpen() { if (!PEAR || !PEAR.d) return; pearHandle(); PEAR.swingT = 1; PEAR.mouth.visible = true; PEAR.d.mesh.userData.way = true; PEAR.d.built = true; }
 thingCues[PEAR_LINE] = function () {
@@ -1750,7 +1750,7 @@ thingCues[PEAR_LINE] = function () {
 };
 function updatePear(dt) {
   if (!PEAR) return;
-  if (PEAR.state === 'pear' && pearFound()) pearHandle();   /* found before: the handle stands from the start */
+  if (PEAR.state === 'pear' && !PEAR.tickled && pearFound()) pearHandle();   /* found before: the handle stands from the start (not this visit's tickle, whose line squirms it) */
   if (PEAR.state === 'squirm') {   /* a second and a half of wriggling, chuckling, then the handle, and the painting swings */
     PEAR.t += dt;
     PEAR.pear.rotation.z = Math.sin(PEAR.t * 19) * 0.22 * (1 - PEAR.t / 1.6); PEAR.pear.position.x = PEAR.at.x + Math.sin(PEAR.t * 13) * 0.008;
@@ -1763,7 +1763,9 @@ function updatePear(dt) {
 }
 if (PEAR) {
   PEAR.pivot.userData.rest = PEAR.pivot.rotation.y;
-  if (Q.get('pear') === 'open') pearOpen();
+  if (Q.get('pear') === 'open' || (kit.from === 'kitchens' && PEAR.d)) {   /* back from the kitchens: he came through it, so it stands open, no swing */
+    pearOpen(); PEAR.swing = 1; PEAR.pivot.rotation.y = PEAR.pivot.userData.rest + PEAR.side * -1.75;
+  }
 }
 /* req 951 (c): the cupboard's bucket and tin (CUP_LINES above, by the cupboard) */
 thingCues[CUP_BUCKET] = function () { showLines([{ medium: 'heard', sound: CUP_BUCKET }]); };
@@ -3903,7 +3905,7 @@ function tap(cx, cy) {
     if (ps && here !== ps) acted = goTo(pd);
     else if (PEAR.state === 'handle' && PEAR.swingT === 1 && pd) { through(pd); acted = true; }
     else if (PEAR.state === 'handle' || (PEAR.state === 'pear' && pearFound())) { pearOpen(); acted = true; }
-    else if (PEAR.state === 'pear') { if (events) events.tap('pear'); else if (pd) thingCues[PEAR_LINE](); acted = true; }
+    else if (PEAR.state === 'pear') { PEAR.tickled = true; if (events) events.tap('pear'); else if (pd) thingCues[PEAR_LINE](); acted = true; }
     kit.tapped(acted); return;
   }
   if (hit && hit.userData.cupTap && CUP) {   /* req 951 (c), the bucket, the bottle and the tin, from the cupboard's stand */
@@ -4433,7 +4435,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   function keepIt() {   /* req 954: the position kept with the chain's vars, so a visit cut short comes back to it */
     if (!events || !events.keep) return;
     var t = (o.boys.length > 1 ? '2' : '1') + '|' + o.log.join('');
-    if (t.length <= 600) events.keep('kept_giant', t);
+    events.keep('kept_giant', t.length <= 600 ? t : '');   /* past 600 the kept position is cleared, never left stale */
   }
   function kept() {   /* the kept position read back: null when none (undefined, 'none' or not ours) */
     var t = events && events.read ? events.read('kept_giant') : null;
@@ -4717,6 +4719,9 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     sink: !!TRICK.sink, found: trickFound() }; },
   /* B21: the cupboard's state, and a tap on its grains as from its stand (true if they run) */
   cupboard: function () { return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run } : null; },
+  /* req 951 (b): the painting's state, and where on the screen its pear's tap lands (x, y from 0 to 1) */
+  pear: function () { if (!PEAR) return null; var s = scene.getObjectByName('fruit-bowl-pear-hit'), v = s ? s.getWorldPosition(new THREE.Vector3()).project(camera) : null;
+    return { state: PEAR.state, swing: PEAR.swing, door: !!PEAR.d, found: pearFound(), stand: here.name, at: v ? [(v.x + 1) / 2, (1 - v.y) / 2] : null }; },
   /* req 633: the hall's glasses (their levels and whether one is moving) and the ball; shown strings passed in are
      drawn as the records would show them */
   glass: function (shown) { var d = shown ? glassShown(shown) : [];
