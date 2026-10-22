@@ -1161,3 +1161,128 @@ window.SHELL_W5A = {
   });
   T['shell-grotto'] = { c: [0, 0], items: it };
 })(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+
+/* docs/interiors/hidden-ways-batch-8.md, *H44* (req 805 (3), the table on Godric's pick and its wave 5 detail pass): the
+   fencing room about (160, 0), r 5.0, 24 sides. Thibault's circle painted on the floor (r 1.2: the ring, four
+   diameters, the inscribed square, footprints at its eight points worn pale, a letter beside each), the ring to r 2.2
+   bare; the fencer painted on the wall at 135, on guard, the ringed target over his heart at 1.3; the rack of foils at
+   30, tips down in its tray, a chain through the guards to a padlock; five wire masks under their pegs at 55 (2.0);
+   the plain bench at 220, straight, 0.1 off the wall; the iron lamps on hooks at 250 and 340 (1.8), unlit. The door's
+   mouth (283 to 293) and the slot (90, sill 4.05) clear. Paint is set 2 to 9 mm proud, never flush. */
+(function (T, MT) {
+  MT.paint = 0xd8cfb8; MT.worn = 0xb59a72; MT.letter = 0x4a3a30; MT.fig = 0x3f3a3c; MT.target = 0x8a2a22; MT.mesh = 0x4a4c50;
+  var C = [160.0, 0.0], it = [];
+  function at(b, r) { return [C[0] + r * Math.sin(b * Math.PI / 180), C[1] + r * Math.cos(b * Math.PI / 180)]; }
+  function bu(b, r, u) { return b + u / r * 180 / Math.PI; }
+  function line(b, r, len, za, zb, m, u) {   /* a straight piece tangent at bearing b, r out, its middle u along it */
+    var rr = Math.sqrt(r * r + (u || 0) * (u || 0)), bb = b + Math.atan2(u || 0, r) * 180 / Math.PI;
+    return ['p', bb, rr, len, za[0], za[1], zb, m];
+  }
+  /* the circle: the ring, four diameters, the inscribed square, all 0.025 wide and 3 mm proud */
+  it.push(['a', 0, 360, 1.1875, 1.2125, -0.002, 0.003, 'paint']);
+  [0, 45, 90, 135].forEach(function (b) { it.push(['p', b, 0, 2.4, 0.025, -0.002, 0.003, 'paint']); });
+  [45, 135, 225, 315].forEach(function (b) { it.push(['p', b, 1.2 * Math.SQRT1_2, 2.4 * Math.SQRT1_2, 0.025, -0.002, 0.003, 'paint']); });
+  /* the footprints at the eight points, toes in, worn pale; a letter outside each */
+  for (var b = 0; b < 360; b += 45) {
+    it.push(['p', b, 1.05, 0.1, 0.24, -0.002, 0.009, 'worn']);
+    it.push(['p', b, 1.38, 0.07, 0.07, -0.002, 0.009, 'letter']);
+  }
+  /* the fencer at 135: painted 7 mm off the side's middle (the face at 4.99 to 5.04), feet apart on guard, the sword
+     arm out toward the door's side, the target 0.2 across over his heart at 1.3, 15 mm proud of him */
+  var F = 135, fig = function (u0, u1, z0, z1, m, d) { it.push(['p', bu(F, 5.03, (u0 + u1) / 2), 5.03, u1 - u0, d || 0.075, z0, z1, m]); };
+  fig(-0.34, -0.2, 0, 0.12, 'fig'); fig(-0.3, -0.18, 0.1, 0.95, 'fig'); fig(0.12, 0.26, 0, 0.12, 'fig'); fig(0.08, 0.2, 0.1, 0.95, 'fig');
+  fig(-0.2, 0.14, 0.9, 1.55, 'fig'); fig(-0.08, 0.06, 1.55, 1.6, 'fig'); fig(-0.11, 0.09, 1.6, 1.82, 'fig');
+  fig(0.14, 0.62, 1.38, 1.46, 'fig'); fig(0.62, 1.4, 1.41, 1.43, 'fig'); fig(-0.5, -0.2, 1.5, 1.56, 'fig'); fig(-0.56, -0.5, 1.56, 1.76, 'fig');
+  fig(-0.1, 0.1, 1.2, 1.4, 'target', 0.105); fig(-0.06, 0.06, 1.24, 1.36, 'paint', 0.135); fig(-0.025, 0.025, 1.275, 1.325, 'target', 0.165);
+  /* the rack at 30: its tray (r 4.7 to the wall), two end posts, the top rail 1.05 to 1.1; six foils, tips down in the
+     tray, guards at 0.85, pommels to 1.2; the chain through the guards at 0.9, a padlock on the right-hand post */
+  var RB = 30, RR = 4.88;
+  it.push(line(RB, RR, 1.0, [0.36, 0], 0.1, 'oak'), line(RB, RR, 0.05, [0.36, 0.1], 1.12, 'oak', -0.475),
+          line(RB, RR, 0.05, [0.36, 0.1], 1.12, 'oak', 0.475), line(RB, RR, 0.92, [0.36, 1.05], 1.1, 'oak'));
+  [-0.375, -0.225, -0.075, 0.075, 0.225, 0.375].forEach(function (u) {
+    var p = at(bu(RB, RR, u), Math.sqrt(RR * RR + u * u));
+    it.push(['y', p[0], p[1], 0.006, 0.1, 0.85, 'steel'], ['y', p[0], p[1], 0.012, 0.08, 0.1, 'leather'],
+            ['y', p[0], p[1], 0.045, 0.85, 0.875, 'steel'], ['y', p[0], p[1], 0.014, 0.875, 1.12, 'leather'], ['y', p[0], p[1], 0.022, 1.12, 1.2, 'steel']);
+  });
+  it.push(line(RB, RR, 0.94, [0.012, 0.857], 0.869, 'iron'), line(RB, 4.69, 0.05, [0.05, 0.83], 0.9, 'brass', 0.475));
+  /* the masks at 55: the peg board at 2.0 into the wall, five pegs, a mask under each (0.25 across, 0.3 high), its bib */
+  var MB = 55;
+  it.push(['p', MB, 5.0, 1.6, 0.1, 1.95, 2.05, 'oak']);
+  [-0.6, -0.3, 0, 0.3, 0.6].forEach(function (u) {
+    it.push(line(MB, 4.9, 0.03, [0.12, 1.99], 2.02, 'oak', u), line(MB, 4.86, 0.25, [0.16, 1.68], 1.995, 'mesh', u),
+            line(MB, 4.88, 0.22, [0.1, 1.58], 1.7, 'linen', u));
+  });
+  /* the bench at 220: its seat 1.8 by 0.4 at 0.4 to 0.45, the back face 0.1 off the wall's middle, two board ends */
+  it.push(['p', 220, 4.7, 1.8, 0.4, 0.4, 0.45, 'oak']);
+  [-0.75, 0.75].forEach(function (u) { it.push(line(220, 4.7, 0.05, [0.36, 0], 0.41, 'oak', u)); });
+  /* the lamps at 250 and 340: the hook out of the wall at 1.8, the bail, the lamp 1.4 to 1.72, unlit */
+  [250, 340].forEach(function (b) {
+    var p = at(b, 4.84);
+    it.push(['p', b, 4.94, 0.03, 0.24, 1.78, 1.82, 'iron'], ['y', p[0], p[1], 0.008, 1.72, 1.8, 'iron'],
+            ['y', p[0], p[1], 0.03, 1.66, 1.72, 'iron'], ['y', p[0], p[1], 0.07, 1.46, 1.66, 'glass'], ['y', p[0], p[1], 0.075, 1.4, 1.46, 'iron'],
+            ['y', p[0], p[1], 0.02, 1.33, 1.4, 'iron']);
+  });
+  T['fencing-room'] = { c: C, items: it };
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+
+/* docs/interiors/half-landing-room.md, *The things* (req 805, H1 to H5 on Godric's pick, curator-floor-g-list-1020):
+   `secret-s2`, x 70.4 to 89.6, y 43.0 to 45.2, under the 2.3 soffit. The stores against the south wall, none past
+   y 43.9: the candle crates (74.0 to 74.6, the top one's lid slid east, ajar on its candles and clips), the torch box
+   (74.8 to 75.5, open, four torches in it), the twelve tree stands two high in six stacks (76 to 81.4), the trestles
+   and benches (83 to 89, to 1.4). Dust on the floor, thick on the stores' tops, scuffed along the walk (y 44.3 to 45.2)
+   its edges drifting. Nothing west of x 72.4, where the flight's treads bring the soffit down; the panel's mouth bare. */
+(function (T, MT) {
+  MT.deal = 0xb39a74; MT.dusty = 0x8f877c;
+  var it = [], W = 42.98;   /* the stores' backs 2 cm into the south wall */
+  function h(n) { var s = Math.sin(n * 12.9898 + 78.233) * 43758.5453; return s - Math.floor(s); }
+  function dust(x0, y0, x1, y1, z) { it.push(['b', x0 + 0.01, Math.max(y0, 43.0) + 0.01, z, x1 - 0.01, y1 - 0.01, z + 0.005, 'dust']); }
+  /* H3: two deal crates, the lower shut, the upper open with its lid slid 0.12 east; short candles stood in it, tin clips */
+  it.push(['b', 74.0, W, 0, 74.6, 43.4, 0.3, 'deal'], ['b', 74.0, W, 0.3, 74.6, 43.4, 0.32, 'deal'],
+          ['b', 74.0, W, 0.32, 74.02, 43.4, 0.6, 'deal'], ['b', 74.58, W, 0.32, 74.6, 43.4, 0.6, 'deal'],
+          ['b', 74.02, W, 0.32, 74.58, 43.0, 0.6, 'deal'], ['b', 74.02, 43.38, 0.32, 74.58, 43.4, 0.6, 'deal'],
+          ['b', 74.12, 42.995, 0.6, 74.72, 43.395, 0.62, 'deal']);
+  for (var i = 0; i < 3; i++) for (var j = 0; j < 6; j++) {
+    var cx = 74.06 + i * 0.05, cy = 43.06 + j * 0.055;
+    it.push(['y', cx, cy, 0.009, 0.32, 0.44, 'tallow']);
+  }
+  [[74.2, 43.1], [74.3, 43.22], [74.42, 43.12], [74.5, 43.28]].forEach(function (p) { it.push(['b', p[0], p[1], 0.32, p[0] + 0.03, p[1] + 0.02, 0.36, 'tin']); });
+  dust(74.12, 42.995, 74.72, 43.395, 0.62);
+  /* H4: the torch box, open, its four torches lying in it east to west, their pitched heads at the west end */
+  it.push(['b', 74.8, W, 0, 75.5, 43.4, 0.02, 'deal'], ['b', 74.8, W, 0.02, 74.82, 43.4, 0.3, 'deal'], ['b', 75.48, W, 0.02, 75.5, 43.4, 0.3, 'deal'],
+          ['b', 74.82, W, 0.02, 75.48, 43.0, 0.3, 'deal'], ['b', 74.82, 43.38, 0.02, 75.48, 43.4, 0.3, 'deal']);
+  [43.08, 43.16, 43.24, 43.32].forEach(function (y, k) {
+    it.push(['b', 74.96, y - 0.018, 0.02 + (k % 2) * 0.04, 75.46, y + 0.018, 0.056 + (k % 2) * 0.04, 'wood'],
+            ['b', 74.84, y - 0.03, 0.02 + (k % 2) * 0.04, 74.97, y + 0.03, 0.08 + (k % 2) * 0.04, 'dark']);
+  });
+  /* H1: twelve stands, six stacks of two: each a socket 0.34 high on cross feet 0.86 across, 0.06 high */
+  for (var s = 0; s < 6; s++) {
+    var x = 76.45 + s * 0.9, y = 43.45;
+    [0, 0.395].forEach(function (z) {
+      it.push(['b', x - 0.43, y - 0.03, z, x + 0.43, y + 0.03, z + 0.06, 'iron'], ['b', x - 0.03, W, z, x + 0.03, 43.88, z + 0.06, 'iron'],
+              ['y', x, y, 0.07, z + 0.06, z + 0.4, 'iron']);
+    });
+    it.push(['y', x, y, 0.06, 0.795, 0.8, 'dust']);
+  }
+  /* H2: three piles of 2.0: folded trestles (a top 0.5 deep, its legs folded flat on it) east and west, benches between */
+  [83.0, 87.0].forEach(function (x0) {
+    for (var k = 0; k < 7; k++) {
+      var z = k * 0.2;
+      it.push(['b', x0, W, z, x0 + 1.98, 43.5, z + 0.05, 'oak'], ['b', x0 + 0.15, 43.05, z + 0.045, x0 + 0.25, 43.45, z + 0.2, 'wood'],
+              ['b', x0 + 1.73, 43.05, z + 0.045, x0 + 1.83, 43.45, z + 0.2, 'wood']);
+    }
+    dust(x0, W, x0 + 1.98, 43.5, 1.4 - 0.15);
+  });
+  for (var k2 = 0; k2 < 6; k2++) {
+    var zb = k2 * 0.2;
+    it.push(['b', 85.0, W, zb + 0.15, 86.98, 43.3, zb + 0.2, 'oak'], ['b', 85.1, 43.0, zb, 85.16, 43.28, zb + 0.15, 'oak'],
+            ['b', 86.82, 43.0, zb, 86.88, 43.28, zb + 0.15, 'oak']);
+  }
+  dust(85.0, W, 86.98, 43.3, 1.2);
+  /* H5: the floor's dust, the stores' strip whole (to 44.3) and the walk scuffed: patches between the feet's way */
+  it.push(['b', 72.4, W, -0.01, 89.62, 44.3, 0.006, 'dust']);
+  for (var x2 = 72.4; x2 < 89.6; x2 += 0.6) {   /* the strip's edge drifting out 2 to 8 cm, a fringe 5 to 9 cm on the north wall */
+    var a = h(x2 * 3.1), b = h(x2 * 7.7), x3 = Math.min(89.62, x2 + 0.6);
+    it.push(['b', x2, 44.3, -0.01, x3, 44.32 + 0.06 * a, 0.006, 'dust'], ['b', x2, 45.13 - 0.04 * b, -0.01, x3, 45.22, 0.006, 'dust']);
+  }
+  T['secret-s2'] = { items: it };
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);

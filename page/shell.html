@@ -162,7 +162,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/panelling.js?v=2"></script>
 <script src="castle-shell.js?v=60"></script>
 <script src="shell-w5b.js?v=16"></script>
-<script src="shell-w5a.js?v=12"></script>
+<script src="shell-w5a.js?v=14"></script>
 <script src="castle-events.js?v=39"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/carving.js?v=1"></script>
@@ -2460,7 +2460,10 @@ var HW_DRAWN = {
   'down-only-stair': ["a narrow stone stair winding down round its newel, the treads worn hollow, the air cool and still",
     "at the foot, a plain panel in the wall, which opens outward onto the first floor's corridor along the lake"],
   'vanishing-step-hollow': ["the underside of the stair low over his head, the dust of years on the floor",
-    "a heap along the north wall of everything ever dropped through the step: quills, odd shoes and socks, Chocolate Frog cards, spectacles grey with dust, a few dull Gobstones rolled away along the far wall"]
+    "a heap along the north wall of everything ever dropped through the step: quills, odd shoes and socks, Chocolate Frog cards, spectacles grey with dust, a few dull Gobstones rolled away along the far wall"],
+  /* req 805 (3): H44's circle, figure, rack and masks drawn in shell-w5a.js v13, so their strings leave the note */
+  'fencing-room': ["a great circle painted on the floor, crossed by lines and lettered where they meet, footprints painted where the feet go",
+    "a figure painted on the wall with a target over its heart, foils with buttoned tips chained in their rack, wire masks on pegs"]
 };
 var UP_ONLY_DRAWN = HW_DRAWN[PLACE] || [];
 function upOnlyShown(shown) { return UP_ONLY_DRAWN.filter(function (s) { return shown.indexOf(s) >= 0; }); }
