@@ -9,7 +9,8 @@
       "moment": "tap mantel portrait",
       "when": [
         "mantel sitter = seated",
-        "looked != yes"
+        "looked != yes",
+        "portrait_msg != answered"
       ],
       "show": [
         "the camera glides up to the painting, as the board's walk-up does",
@@ -27,7 +28,8 @@
       "moment": "tap mantel portrait",
       "when": [
         "mantel sitter = seated",
-        "looked = yes"
+        "looked = yes",
+        "portrait_msg != answered"
       ],
       "one_of": "mantel-look",
       "weight": 1,
@@ -44,7 +46,8 @@
       "moment": "tap mantel portrait",
       "when": [
         "mantel sitter = seated",
-        "looked = yes"
+        "looked = yes",
+        "portrait_msg != answered"
       ],
       "one_of": "mantel-look",
       "weight": 1,
@@ -52,6 +55,71 @@
         "the camera glides up to the painting",
         "she carries on with what she was doing: her window, her hands, her hat"
       ]
+    },
+    {
+      "id": "painting.message-ask",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap mantel portrait",
+      "when": [
+        "mantel sitter = seated",
+        "looked = yes",
+        "portrait_msg != carrying",
+        "portrait_msg != answered",
+        "days since portrait_msg_asked >= 3"
+      ],
+      "show": [
+        "the camera glides up to the painting",
+        "she leans out of her frame: \"Would you do something for me, dear? On a Friday, when the stair swings round to the gallery, tell the gentleman in the frame next to the empty one that his teapot is perfectly safe and he is not to ask again.\""
+      ],
+      "starts": [
+        "set portrait_msg = carrying",
+        "stamp portrait_msg_asked"
+      ],
+      "canon": "item 6, a portrait that cannot reach its friend (Godric's 1 on events-year1-wins-1022, 2.57 pm, 22 October 2026 (all five picks), Story's req 936 (docs/story/year-1-wins.md); a first miss built into the task's structure, never staged against a boy who did it right, no clock and no score, the find its own result (docs/story/settled.md, points 13 and 14); ours): the mantel sitter, seated, asks the boy to carry a message down to the frame next to the empty one in the short gallery at the flight's foot on a Friday (stair.json's gallery, the moving stair); his answer is carried home on a later tap on her painting; nothing timed, the message waits in his satchel until he has done it; a borrowed teapot, nothing a later book names",
+      "one_of": "mantel-look",
+      "weight": 1
+    },
+    {
+      "id": "painting.message-delivered",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap gallery portrait",
+      "when": [
+        "place = corridor",
+        "stair_to = gallery",
+        "portrait_msg = carrying"
+      ],
+      "show": [
+        "the gentleman in the frame next to the empty one hears it with his head on one side, snorts, and says \"Safe? It has been safe since Whitsun. Tell her I only asked to be asked.\""
+      ],
+      "starts": [
+        "set portrait_msg = answered"
+      ],
+      "canon": "item 6, a portrait that cannot reach its friend (Godric's 1 on events-year1-wins-1022, 2.57 pm, 22 October 2026 (all five picks), Story's req 936 (docs/story/year-1-wins.md); a first miss built into the task's structure, never staged against a boy who did it right, no clock and no score, the find its own result (docs/story/settled.md, points 13 and 14); ours): the mantel sitter, seated, asks the boy to carry a message down to the frame next to the empty one in the short gallery at the flight's foot on a Friday (stair.json's gallery, the moving stair); his answer is carried home on a later tap on her painting; nothing timed, the message waits in his satchel until he has done it; a borrowed teapot, nothing a later book names"
+    },
+    {
+      "id": "painting.message-answer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap mantel portrait",
+      "when": [
+        "mantel sitter = seated",
+        "portrait_msg = answered"
+      ],
+      "show": [
+        "the camera glides up to the painting",
+        "she hears his answer with her lips pressed together, then laughs behind her hand: \"Only asked to be asked! The old rascal. Thank you, dear.\""
+      ],
+      "starts": [
+        "set portrait_msg = none",
+        "log \"Carried a message from the mantel portrait to the gallery and back {day}\"",
+        "stamp portrait_msg_done"
+      ],
+      "canon": "item 6, a portrait that cannot reach its friend (Godric's 1 on events-year1-wins-1022, 2.57 pm, 22 October 2026 (all five picks), Story's req 936 (docs/story/year-1-wins.md); a first miss built into the task's structure, never staged against a boy who did it right, no clock and no score, the find its own result (docs/story/settled.md, points 13 and 14); ours): the mantel sitter, seated, asks the boy to carry a message down to the frame next to the empty one in the short gallery at the flight's foot on a Friday (stair.json's gallery, the moving stair); his answer is carried home on a later tap on her painting; nothing timed, the message waits in his satchel until he has done it; a borrowed teapot, nothing a later book names; the result is her laugh and a line in his log"
     },
     {
       "id": "painting.not-seated",

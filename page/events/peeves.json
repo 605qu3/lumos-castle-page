@@ -3,25 +3,46 @@
   "bags": {
     "endings": [
       {
-        "item": "clatter"
+        "item": "clatter",
+        "when": [
+          "sticks_n = 1"
+        ]
       },
       {
-        "item": "scatter"
+        "item": "boo",
+        "when": [
+          "sticks_n = 2"
+        ]
       },
       {
-        "item": "march"
+        "item": "drum",
+        "when": [
+          "sticks_n = 3"
+        ]
       },
       {
-        "item": "boo"
+        "item": "jig",
+        "when": [
+          "sticks_n = 4"
+        ]
       },
       {
-        "item": "drum"
+        "item": "march",
+        "when": [
+          "sticks_n = 5"
+        ]
       },
       {
-        "item": "stilts"
+        "item": "stilts",
+        "when": [
+          "sticks_n = 6"
+        ]
       },
       {
-        "item": "jig"
+        "item": "scatter",
+        "when": [
+          "sticks_n = 7"
+        ]
       }
     ]
   },
@@ -89,6 +110,8 @@
       "starts": [
         "set sticks = up",
         "set dodges = 1-2",
+        "add sticks_n 1",
+        "add sticks_total 1",
         "set sticks_end = from bag endings",
         "set peeked = no",
         "set sticks_this = yes",
@@ -114,6 +137,8 @@
       "starts": [
         "set sticks = up",
         "set dodges = 1-2",
+        "add sticks_n 1",
+        "add sticks_total 1",
         "set sticks_end = from bag endings",
         "set peeked = no",
         "set sticks_this = yes",
@@ -355,6 +380,44 @@
       "starts": [
         "set sticks = fallen"
       ]
+    },
+    {
+      "id": "peeves.round-found",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sticks",
+      "when": [
+        "place = corridor",
+        "sticks = up",
+        "dodges = 0",
+        "sticks_n = 1",
+        "sticks_total >= 8",
+        "round_found != yes"
+      ],
+      "show": [
+        "a cackle from somewhere above that stops short, as if Peeves had been caught doing the first trick over again"
+      ],
+      "starts": [
+        "set round_found = yes",
+        "log \"Worked out Peeves's seven tricks with the sticks, and that they come round in the same order {day}\"",
+        "secret peeves-round"
+      ],
+      "canon": "Story's req 936 item 11 (docs/story/year-1-wins.md, *Peeves's sticks*; Godric's 1 on events-year1-wins-1022, 2.57 pm, 22 October 2026, the sticks in a fixed order): Peeves's seven tricks with the sticks (peeves.json's own, the bag of endings) now come round in a fixed order, one a day he hangs them, so the boys can find the pattern; nothing timed or scored, the find is its own result (docs/story/settled.md, point 14); ours"
+    },
+    {
+      "id": "peeves.round-turns",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "sticks_n >= 7"
+      ],
+      "starts": [
+        "set sticks_n = 0"
+      ],
+      "canon": "Story's req 936 item 11 (docs/story/year-1-wins.md, *Peeves's sticks*; Godric's 1 on events-year1-wins-1022, 2.57 pm, 22 October 2026, the sticks in a fixed order): Peeves's seven tricks with the sticks (peeves.json's own, the bag of endings) now come round in a fixed order, one a day he hangs them, so the boys can find the pattern; nothing timed or scored, the find is its own result (docs/story/settled.md, point 14); ours; the seventh trick done, the round begins again at the first"
     },
     {
       "id": "peeves.drop",

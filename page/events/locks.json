@@ -61,11 +61,23 @@
     {
       "when": [
         "place = corridor",
-        "cupboard != open"
+        "cupboard != open",
+        "cupboard_bolt != half"
       ],
       "show": [
         "the broom cupboard's narrow door, shut and locked"
       ]
+    },
+    {
+      "when": [
+        "place = corridor",
+        "cupboard != open",
+        "cupboard_bolt = half"
+      ],
+      "show": [
+        "the broom cupboard's door standing a finger's width ajar, an older bolt still holding it from the inside"
+      ],
+      "canon": "Story's req 936 item 1 (docs/story/year-1-wins.md, *The lock that needs two turns*; Godric's 1 on events-year1-wins-1022, 2.57 pm, 22 October 2026, all five picks, the corridor's broom cupboard for the lock): the first Alohomora turns the lock half over, the second finishes it; the first attempt gently falls short and the cost is nothing, and nothing is staged against a boy who did it right (the first miss is in the task's structure: docs/story/settled.md, point 14); ours"
     },
     {
       "when": [
@@ -343,6 +355,27 @@
       ]
     },
     {
+      "id": "locks.cupboard-half",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "cupboard-bolt",
+      "weight": 1,
+      "moment": "opened broom cupboard",
+      "when": [
+        "place = corridor",
+        "cupboard != open",
+        "cupboard_bolt != half"
+      ],
+      "show": [
+        "the lock turning half over with a click and sticking, the door giving a finger's width and no more, an older bolt still holding it from the inside"
+      ],
+      "starts": [
+        "set cupboard_bolt = half"
+      ],
+      "canon": "Story's req 936 item 1 (docs/story/year-1-wins.md, *The lock that needs two turns*; Godric's 1 on events-year1-wins-1022, 2.57 pm, 22 October 2026, all five picks, the corridor's broom cupboard for the lock): the first Alohomora turns the lock half over, the second finishes it; the first attempt gently falls short and the cost is nothing, and nothing is staged against a boy who did it right (the first miss is in the task's structure: docs/story/settled.md, point 14); ours"
+    },
+    {
       "id": "locks.cupboard-opens",
       "tier": "fixed",
       "source": "device",
@@ -350,17 +383,21 @@
       "moment": "opened broom cupboard",
       "when": [
         "place = corridor",
-        "cupboard != open"
+        "cupboard != open",
+        "cupboard_bolt = half"
       ],
       "show": [
         "the cupboard door swings open on buckets and mops, and one ancient school broom leaning hard to the left"
       ],
       "starts": [
         "set cupboard = open",
+        "set cupboard_bolt = none",
         "log \"Opened the broom cupboard {day}\"",
         "secret broom-cupboard"
       ],
-      "canon": "Magic's B18 (Godric, 5.20 pm): a broom cupboard of buckets and mops; the school brooms that always flew slightly to the left, PS 9, among them an ancient Shooting Star, PoA 10 L17116; checked against the text, 13 and 15 October 2026 (Rework 36: PoA 21 is the Entrance Hall's cupboard's alone)"
+      "canon": "Magic's B18 (Godric, 5.20 pm): a broom cupboard of buckets and mops; the school brooms that always flew slightly to the left, PS 9, among them an ancient Shooting Star, PoA 10 L17116; checked against the text, 13 and 15 October 2026 (Rework 36: PoA 21 is the Entrance Hall's cupboard's alone); Story's req 936 item 1: the second Alohomora, after the first turned the lock half over (locks.cupboard-half)",
+      "one_of": "cupboard-bolt",
+      "weight": 1
     },
     {
       "id": "locks.broom-stood",
@@ -390,6 +427,20 @@
         "set cupboard = locked"
       ],
       "canon": "B18: shut, the cupboard locks itself again by the next visit, so the spell has a reason to be cast again"
+    },
+    {
+      "id": "locks.cupboard-bolt-resets",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "cupboard_bolt = half"
+      ],
+      "starts": [
+        "set cupboard_bolt = none"
+      ],
+      "canon": "Story's req 936 item 1: the half-turned lock is shut again by the next visit, as the cupboard locks itself (B18); nothing kept"
     },
     {
       "id": "locks.parchment-in",
