@@ -1,0 +1,263 @@
+{
+  "chain": "snape-office",
+  "about": "Snape's office, the model's snape-office, off the dungeon corridor (Magic's req 929, docs/magic/rooms.md, *Snape's office*; Godric's 1 on magic-snape-office-way-in-1022, 22 October 2026, 1.34 pm; Interiors' schedule docs/interiors/potions-dungeon.md). Every year. The room is always the same (the cold, the jars, a few more each castle year, the fire by season, the stores' cupboard locked, his desk and chair, the door shut behind him); the way in is an errand: now and then, at the bell that ends a lesson in the Potions dungeon, Snape hands him the class's flagons in a rack, \"On my desk. Touch nothing.\", the office door is unlocked for that errand only, and the door shuts and is plain again once he leaves. The var errand runs none, on (the rack in his hands, the door unlocked), done (the rack set down), and is cleared at leave. The dungeon corridor's plain-door line in potions.json takes errand != on and errand != done. Snape is cold but fair, terse, never mocking, never unfair (the world rules, Classes); nothing on the shelves moves for him and nothing is taken.",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = snape office"
+      ],
+      "show": [
+        "the office colder than the cold passage outside it, the air in it still",
+        "the shadowy walls lined with shelves of large glass jars, slimy things floating in their coloured liquids, still as the glass, the most of them on the shelves behind his desk"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*; Godric's 1 on magic-snape-office-way-in-1022), every year: the cold and the jars: \"They entered Snape's office, shivering. The shadowy walls were lined with shelves of large glass jars, in which floated all manner of revolting things\" (CoS 5 L8146), \"all standing on shelves behind his desk\" (PoA 14 L18968), read in the canon tool, 22 October 2026; the things in the jars are old ingredients like any other, none named, nothing in them moving, never made sad (the world rules: Nothing dies on the boys' watch, what is already gone is furniture)"
+    },
+    {
+      "when": [
+        "place = snape office",
+        "season = winter"
+      ],
+      "show": [
+        "his breath rising in a mist before him"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, the cold: a boy's breath shows in winter, as in the Potions dungeon, potions.json), every year; the chain's own line, as the dungeon's"
+    },
+    {
+      "when": [
+        "place = snape office",
+        "year >= 2"
+      ],
+      "show": [
+        "a few more jars than when he was last here on the shelves behind the desk, the newest still bright in their liquid"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, more jars each year): \"Snape had aquired a few more horrible slimy things in jars since last time, all standing on shelves behind his desk\" (PoA 14 L18968, read in the canon tool, 22 October 2026, the book's own misspelling not copied), from the second castle on, unexplained, nothing in them named"
+    },
+    {
+      "when": [
+        "place = snape office",
+        "season = winter"
+      ],
+      "show": [
+        "a fire burning in the grate, the jars behind the desk catching its light"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, the fire): lit in winter, the jars \"glinting in the firelight\" (PoA 14 L18968, read in the canon tool, 22 October 2026), the fire its own light and nothing else lit (the world rules: Nothing announces itself; the word is not copied into the cue, so the glow check stands); every year"
+    },
+    {
+      "when": [
+        "place = snape office",
+        "season != winter"
+      ],
+      "show": [
+        "the fireplace dark and empty"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, the fire): \"The fireplace was dark and empty\" (CoS 5 L8146, read in the canon tool, 22 October 2026). Magic's row says the warm months and September dark and winter lit and is silent on October and November; read literally here (winter, December to February, lit; every other season dark), a one-word change to `season` if Magic or Godric wants November lit"
+    },
+    {
+      "when": [
+        "place = snape office"
+      ],
+      "show": [
+        "in a corner the cupboard of ingredients, shut and locked",
+        "his desk tidy, a hard chair set opposite it, nothing on the desk that tells anything",
+        "the door pushed shut behind him, the passage's sounds gone"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, the stores' cupboard, his desk and the chair, the door shut), every year: the stores are Snape's private ones, \"Snape's private stores\" (CoS 10 L9897, read in the canon tool, 22 October 2026), never opened and never taken (the charter); the cupboard \"full of ingredients\" and the hard chair opposite the desk are Magic's cites from OotP 24 (L47062, L47066), outside the canon tool's books 1 to 3 and so not re-read here; the door shut behind him after \"Snape closed the door\" (CoS 5 L8146), the quiet; the desk tidy, ours"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "errand = on"
+      ],
+      "show": [
+        "Snape's office door unlocked and standing a hand's breadth ajar on the cold, shadowy room"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, how he comes in): the office door, shut and plain otherwise (potions.json, the corridor's line), unlocked for the errand only; ours"
+    },
+    {
+      "when": [
+        "place = dungeon corridor",
+        "errand = done"
+      ],
+      "show": [
+        "Snape's office door pulled to behind him and shut again, plain and still, no light under it"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, how he comes in): the door closes behind him as he leaves, and stays shut and plain until the next errand; a room rule, since `arrive` comes once a page a visit and the corridor is already reached; the var errand stays done until the visit ends or the next bell hands him a rack"
+    }
+  ],
+  "records": [
+    {
+      "id": "snape-office.errand-noon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "snape-errand-noon",
+      "weight": 1,
+      "moment": "clock 12:30",
+      "when": [
+        "place = potions dungeon",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "who": [
+        {
+          "as": "snape",
+          "role": "voice",
+          "name": "snape",
+          "mark": "at his desk"
+        }
+      ],
+      "show": [
+        "the lesson over, Snape handing him a wooden rack of the class's flagons, each corked and labelled with a name"
+      ],
+      "lines": [
+        {
+          "speaker": "snape",
+          "medium": "heard",
+          "key": "snape-office.errand-noon",
+          "sound": "Snape, cold and terse, handing over the rack",
+          "text": [
+            "On my desk. Touch nothing."
+          ],
+          "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, how he comes in; Godric's 1 on magic-snape-office-way-in-1022): ours, in Snape's voice (People's), terse and demanding, never mocking (the world rules, Classes); the labelled flagons are Magic's cite from OotP 12 L40636, outside the canon tool's books 1 to 3 and not re-read here"
+        }
+      ],
+      "starts": [
+        "set errand = on"
+      ],
+      "canon": "Magic's req 929 (Godric's 1 on magic-snape-office-way-in-1022, 22 October 2026, 1.34 pm): at the end of his own Potions lesson, now and then (about one lesson in three), an errand; the lesson's end is the bell at 12.30, and the afternoon's at 18.00 (record snape-office.errand-evening), the clock moments of the corridors' bells (charms.json), the same conditions as theirs"
+    },
+    {
+      "id": "snape-office.errand-noon-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "snape-errand-noon",
+      "weight": 2,
+      "moment": "clock 12:30",
+      "when": [
+        "place = potions dungeon",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "starts": []
+    },
+    {
+      "id": "snape-office.errand-evening",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "snape-errand-evening",
+      "weight": 1,
+      "moment": "clock 18:00",
+      "when": [
+        "place = potions dungeon",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "who": [
+        {
+          "as": "snape",
+          "role": "voice",
+          "name": "snape",
+          "mark": "at his desk"
+        }
+      ],
+      "show": [
+        "the lesson over, Snape handing him a wooden rack of the class's flagons, each corked and labelled with a name"
+      ],
+      "lines": [
+        {
+          "speaker": "snape",
+          "medium": "heard",
+          "key": "snape-office.errand-evening",
+          "sound": "Snape, cold and terse, handing over the rack",
+          "text": [
+            "On my desk. Touch nothing."
+          ],
+          "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, how he comes in; Godric's 1 on magic-snape-office-way-in-1022): ours, in Snape's voice (People's), terse and demanding, never mocking (the world rules, Classes)"
+        }
+      ],
+      "starts": [
+        "set errand = on"
+      ],
+      "canon": "Magic's req 929 (Godric's 1 on magic-snape-office-way-in-1022, 22 October 2026, 1.34 pm): the afternoon lesson's end, the bell at 18.00; see snape-office.errand-noon"
+    },
+    {
+      "id": "snape-office.errand-evening-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "snape-errand-evening",
+      "weight": 2,
+      "moment": "clock 18:00",
+      "when": [
+        "place = potions dungeon",
+        "match = no",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term",
+        "occasion != leaving feast"
+      ],
+      "starts": []
+    },
+    {
+      "id": "snape-office.rack",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 2-3 s",
+      "when": [
+        "place = snape office",
+        "errand = on"
+      ],
+      "show": [
+        "the rack of corked, labelled flagons set down on the desk, a name on every label, and nothing else on the desk touched"
+      ],
+      "starts": [
+        "set errand = done"
+      ],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, how he comes in): he sets the rack on the desk; the office is empty, Snape still in the dungeon; nothing on the shelves moves for him and nothing is taken"
+    },
+    {
+      "id": "snape-office.cupboard-tap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap stores cupboard",
+      "when": [
+        "place = snape office"
+      ],
+      "show": [
+        "the cupboard's door held fast, locked, its handle will not turn, and nothing more"
+      ],
+      "starts": [],
+      "canon": "Magic's req 929 (docs/magic/rooms.md, *Snape's office*, the stores' cupboard): locked and still, a tap finds it will not open, nothing more; his stores are never taken (the charter)"
+    },
+    {
+      "id": "snape-office.leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set errand = none"
+      ],
+      "canon": "the errand is the visit's: a visit that ends clears it, so the next visit's door is shut and plain unless the next bell brings an errand"
+    }
+  ]
+}

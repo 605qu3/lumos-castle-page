@@ -1,0 +1,29 @@
+{
+  "chain": "painters-room",
+  "about": "The painters' room on the first floor (the model's se-round-room-1; Interiors' docs/interiors/se-round-room-1.md): its two finished portraits and who sits in them by the clock. People's req 897, Godric's 1 on people-painters-sitters-r1-1022 (22 October 2026), the table in docs/handoff/people.md, *The painters' room's sitters*, *When home*. Every year, no occasion changing it. Morning and day both sitters are out and the room says nothing (the chair empty, the cup left, as Interiors built it); at evening the tea witch is home; at night both are home asleep. The drawing is the Architect's, req 927, cells 1 (the tea witch awake), 2 (her asleep) and 4 (the young wizard asleep) on these strings; the young wizard awake (cell 3) shows in no state.",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = se round room 1",
+        "time = evening"
+      ],
+      "show": [
+        "the tea witch back in her portrait's carved chair, awake, her cup in her hand and the chair's arm bare"
+      ],
+      "canon": "People's req 897 and Events' req 928 (docs/handoff/people.md, *The painters' room's sitters*, *When home*; Godric's 1 on people-painters-sitters-r1-1022), every year, no occasion changing it: at evening the tea witch is home, awake, her cup in her hand (the arm bare); the young wizard is out, so no line for him. The Architect draws cell 1 of painters-sitters.png on this string (req 927). Two ordinary sitters of the castle's past, unnamed, nobody of canon (the world rules: Canon, traces never re-creations)"
+    },
+    {
+      "when": [
+        "place = se round room 1",
+        "time = night"
+      ],
+      "show": [
+        "the tea witch asleep in her portrait's carved chair, her chin on her shawl and her cup back on the chair's arm",
+        "the young wizard asleep in his portrait's carved chair, his soft hat tipped over his brow, the sketchbook on his knee"
+      ],
+      "canon": "People's req 897 and Events' req 928 (docs/handoff/people.md, *The painters' room's sitters*, *When home*; Godric's 1 on people-painters-sitters-r1-1022), every year, no occasion changing it: at night both sitters are home and asleep, \"snoozing gently in their frames\" (CoS 12 L10607, found with the canon tool's search, 22 October 2026; the line is truncated in its lines mode), as req 35's sitters. The Architect draws cells 2 and 4 of painters-sitters.png on these strings (req 927). Both in one rule, since a rule's when is its key"
+    }
+  ],
+  "records": []
+}

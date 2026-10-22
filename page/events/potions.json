@@ -323,12 +323,14 @@
     },
     {
       "when": [
-        "place = dungeon corridor"
+        "place = dungeon corridor",
+        "errand != on",
+        "errand != done"
       ],
       "show": [
         "Snape's office door shut and plain, no light under it, no sound"
       ],
-      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: ours, the one door in the castle that keeps quite still; its opening Interiors' and Events'"
+      "canon": "Magic's req 732 (docs/magic/rooms.md, The dungeon corridor; Fawkes's 1 of 11.48), every year: ours, the one door in the castle that keeps quite still; its opening Interiors' and Events': snape-office.json (req 929) unlocks it for the Potions errand only, while errand is on, and has it click shut once he is out again, while errand is done"
     },
     {
       "when": [

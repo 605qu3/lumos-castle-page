@@ -25,7 +25,8 @@
         "year >= 2"
       ],
       "show": [
-        "a damp wall of dark stone beside the soft floor of the pit"
+        "a damp wall of dark stone beside the soft floor of the pit",
+        "the Snare grown thick and still up the walls of the shaft and over the iron rungs set in them, all the way up to the trapdoor"
       ],
       "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's \"damp wall\" (PS 16 L5810, read in the canon tool, 22 October 2026), the floor Devil's Snare (L5800, \"it's here to break the fall\")"
     },
@@ -57,10 +58,19 @@
       "show": [
         "a brilliantly lit vault, its ceiling arching high above",
         "small, jewel-bright birds that are keys, fluttering and tumbling all round the room, glittering, a whirl of rainbow feathers, none of them swooping at him",
-        "a heavy wooden door on the far side, shut",
         "old school brooms leaning against the wall"
       ],
-      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the keys' chamber: \"a brilliantly lit chamber, its ceiling arching high above them\", \"small, jewel-bright birds, fluttering and tumbling all around the room\" (PS 16 L5848), \"glittering\" (L5862), \"the whirl of rainbow feathers\" (L5874), he crosses and \"nothing happened\" (L5854), the door on the far side locked (L5854), brooms (L5864), all read in the canon tool, 22 October 2026; the catch is Events' req 905, waiting on flying (Godric's 2); the door's state follows it"
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the keys' chamber: \"a brilliantly lit chamber, its ceiling arching high above them\", \"small, jewel-bright birds, fluttering and tumbling all around the room\" (PS 16 L5848), \"glittering\" (L5862), \"the whirl of rainbow feathers\" (L5874), brooms (L5864), all read in the canon tool, 22 October 2026; the catch is Events' req 905, waiting on flying (Godric's 2); the door has its own rule below"
+    },
+    {
+      "when": [
+        "place = stone keys chamber",
+        "year >= 2"
+      ],
+      "show": [
+        "a heavy wooden door on the far side, standing open on the dark beyond"
+      ],
+      "canon": "Godric's 1 on events-keys-door-1022 (22 October 2026, 1.50 pm, in Fawkes's chat): the keys' door (the model's stone-keys-door, between stone-keys-chamber and stone-chess-chamber) stands unlocked until flying is built, so the chessboard can be played now; the book's door, locked till the key is caught (PS 16 L5854), is the later state. WHEN FLYING IS BUILT: this rule gains the broom catch's var (shut and locked until the catch, open after, and open for good once caught that visit) and its string goes back to \"a heavy wooden door on the far side, shut\"; the model's door stays `locked` in the Architect's file till then (its shell reads this rule). The chess chamber beyond is dark until he steps in (stone-chambers.chess-dark)"
     },
     {
       "when": [
@@ -154,7 +164,8 @@
         "a soft landing: Devil's Snare filling the pit's floor, its tendrils curling gently round his ankles, no higher"
       ],
       "starts": [
-        "set snare = held"
+        "set snare = held",
+        "set rungs = hidden"
       ],
       "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's plant: a soft landing, the Devil's Snare filling the pit's floor, \"it's here to break the fall\" (PS 16 L5800), \"it likes the dark and the damp\" (L5820), its tendrils curling round the ankles (L5810), read in the canon tool, 22 October 2026; ours: only round his ankles, gently, never higher; he lies still, it holds, and it only shrinks back, never burnt, cut or harmed (the world rules, Nothing dies on the boys' watch)"
     },
@@ -197,6 +208,79 @@
       "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's plant with no light out: it lets go of its own accord after a few breaths (ours: a way out is always open), nothing burnt or harmed"
     },
     {
+      "id": "stone-chambers.rungs-torch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "light on",
+      "when": [
+        "place = stone pit",
+        "year >= 2"
+      ],
+      "show": [
+        "where his torch's beam falls the tendrils on the walls flinching back, an iron rung showing for a moment, and the tendrils creeping back over it as the beam moves on"
+      ],
+      "starts": [],
+      "canon": "Magic's req 931 (docs/magic/rooms.md, *The Stone's chambers*, the rungs under the Snare; Godric's own answer on architect-stone-rungs-1022, 22 October 2026, 1.50 pm), from the Chamber's castle on: the hint is the plant's own manners, nothing written and nothing glowing: his torch's beam makes the tendrils it falls on flinch back (\"cringed away from the light and warmth\", PS 16 L5828, read in the canon tool, 22 October 2026), a rung shows for a moment and the tendrils creep back as the beam moves on; a torch's light is too small and too cold to hold them. Repeats at every light; the pit's own cringe at his feet is stone-chambers.pit-snare-light"
+    },
+    {
+      "id": "stone-chambers.pit-snare-light-wand",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wand light on",
+      "when": [
+        "place = stone pit",
+        "year >= 2",
+        "snare = held"
+      ],
+      "show": [
+        "the tendrils cringing back from his light and warmth, the plant shrinking from his feet, and he stands free"
+      ],
+      "starts": [
+        "set snare = free"
+      ],
+      "canon": "Magic's req 913 and 931: the same cringe at his feet as pit-snare-light, for a lit wand (`wand light on` comes in place of `light on` when the light is his wand lit with Lumos); the same words, so the pit's shell draws it once; \"cringed away from the light and warmth\" (PS 16 L5828, read in the canon tool, 22 October 2026)"
+    },
+    {
+      "id": "stone-chambers.rungs-clear",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wand light on",
+      "when": [
+        "place = stone pit",
+        "year >= 2",
+        "learned lumos = yes"
+      ],
+      "show": [
+        "the Snare drawing back from the walls of the shaft bit by bit from his raised wand's light, the iron rungs showing from the floor to the trapdoor and staying clear while it is lit"
+      ],
+      "starts": [
+        "set rungs = clear"
+      ],
+      "canon": "Magic's req 931 (docs/magic/rooms.md, *The Stone's chambers*, the rungs under the Snare; Godric's own answer on architect-stone-rungs-1022, 22 October 2026, 1.50 pm), from the Chamber's castle on: the spell's rule: Lumos, his wand lit (once Charms has given it him: `learned lumos = yes`), held up in the pit is light enough; the Snare draws back from the walls bit by bit and the rungs show from floor to trapdoor and stay clear while his wand is lit (\"it likes the dark and the damp\", PS 16 L5820, read in the canon tool, 22 October 2026). Before he has Lumos the hourglass home is his way, as always. The film's rhyme is not in the book and is not used. The Snare only draws back, never burnt, cut or harmed (the world rules: Nothing dies on the boys' watch)"
+    },
+    {
+      "id": "stone-chambers.rungs-creep",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wand light off",
+      "when": [
+        "place = stone pit",
+        "year >= 2",
+        "rungs = clear"
+      ],
+      "show": [
+        "the wand put out, the Snare creeping back over the rungs a little at a time, slowly, and never over him"
+      ],
+      "starts": [
+        "set rungs = hidden"
+      ],
+      "canon": "Magic's req 931 (docs/magic/rooms.md, *The Stone's chambers*, the rungs under the Snare): at Nox, or once he has climbed out (the page raises `wand light off` then), the Snare creeps back over the rungs slowly, never over him; a way out always open (the world rules)"
+    },
+    {
       "id": "stone-chambers.pit-leave",
       "tier": "fixed",
       "source": "device",
@@ -204,7 +288,8 @@
       "moment": "leave",
       "when": [],
       "starts": [
-        "set snare = free"
+        "set snare = free",
+        "set rungs = hidden"
       ],
       "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's plant held only while he is in the pit"
     },
@@ -322,6 +407,22 @@
       ],
       "starts": [],
       "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the rounded bottle at the right end: \"a rounded bottle at the right end of the line\" (PS 16 L6050), \"it's like ice\" (L6074), read in the canon tool, 22 October 2026; a wink, and the purple parts for him"
+    },
+    {
+      "id": "stone-chambers.potions-flames",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap black flames",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "the black flames leaning toward his reaching hand, cold on his fingertips, then standing tall again as he draws it back, not in the least moved"
+      ],
+      "starts": [],
+      "canon": "The Architect's req 920 gap (docs/handoff/architect.md, the hundred-seventh; held for Events by Fawkes, 1.15 pm, 22 October 2026): a tap on the black flames before a drink had no string, and the shell fell back to Reset. Magic's req 913 (the bottles' room, gentle leftovers; the Architect's v150 map): the flames neither burn nor let him through but at the smallest bottle (potions-smallest); comic, nothing harmed, nothing dead, no heat (the world rules: Nothing dies on the boys' watch; the fires belong to the visit); the way on is the smallest bottle's, so nothing here points at it. Ours"
     },
     {
       "id": "stone-chambers.potions-leave",
