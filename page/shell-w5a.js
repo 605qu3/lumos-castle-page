@@ -923,3 +923,70 @@ window.SHELL_W5A = {
     .forEach(function (n) { name(n[0], n[1], n[2]); });
   T['strong-room'] = { items: st };
 })(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+
+/* docs/interiors/se-round-room-1.md, *The painters' room: the things* (req 896, Interiors' ledger 211, Godric's 1 on
+   interiors-se-room-1-1021b): every thing inside r 4.0 about (160, 0) while the outer walls are held, the door's way
+   clear. An easel is a 'p' about the room's middle, so its canvas faces the middle: the landscape's north into the
+   room, the two portraits west-north-west and west-south-west, on the dais and its empty chair. Nothing faces north out
+   of the rack. */
+(function (T, MT) {
+  MT.ground = 0xcdbf9e; MT.lake = 0x4c6376; MT.shore = 0x56604a; MT.glaze = 0x5c3a24;
+  var C = [160.0, 0.0], it = [];
+  function at(b, r) { return [C[0] + r * Math.sin(b * Math.PI / 180), C[1] + r * Math.cos(b * Math.PI / 180)]; }
+  function along(b, r, u) { return b + u / r * 180 / Math.PI; }   /* the bearing u metres along the circle at r from b */
+  /* the landscape easel, its back to the lake loop: the canvas 0.9 by 0.6, top at 1.8; the lake painted on its lower
+     half, the far shore a strip, the sky still bare ground; two front legs, the mast, the back leg to r 3.22 */
+  it.push(['p', 180, 2.95, 0.9, 0.03, 1.2, 1.5, 'lake'], ['p', 180, 2.95, 0.9, 0.03, 1.5, 1.56, 'shore'],
+          ['p', 180, 2.95, 0.9, 0.03, 1.56, 1.8, 'ground'], ['p', 180, 2.92, 0.96, 0.06, 1.14, 1.2, 'oak'],
+          ['y', 159.68, -2.88, 0.02, 0, 1.9, 'oak'], ['y', 160.32, -2.88, 0.02, 0, 1.9, 'oak'],
+          ['y', 160.0, -2.99, 0.022, 0, 2.0, 'oak'], ['y', 160.0, -3.2, 0.02, 0, 1.5, 'oak'],
+          ['b', 159.4, -3.3, 0.002, 160.6, -2.3, 0.012, 'linen'],                         /* the drop cloth, paint-stiff */
+          ['y', 160.0, -2.0, 0.175, 0.56, 0.6, 'wood'], ['y', 159.9, -2.0, 0.018, 0, 0.56, 'wood'],   /* the stool */
+          ['y', 160.1, -1.94, 0.018, 0, 0.56, 'wood'], ['y', 160.0, -2.1, 0.018, 0, 0.56, 'wood']);
+  [[159.6, -2.6, 'amber'], [159.75, -2.45, 'blue'], [160.35, -2.7, 'ruby'], [160.2, -2.4, 'lake'], [159.5, -2.9, 'ground'],
+   [160.45, -3.0, 'blue'], [162.1, -0.8, 'amber'], [162.3, 0.5, 'ruby'], [162.0, 1.5, 'lavender']].forEach(function (s) {
+    var z = s[0] < 161 ? 0.006 : -0.006;   /* bearing into the cloth, or the flags */
+    it.push(['y', s[0], s[1], 0.03, z, z + 0.012, s[2]]);                                /* paint spots under the easels */
+  });
+  /* the two portrait easels, each a gilt frame 0.6 by 0.75, foot at 1.0, on the same carved chair and a curtain, the
+     sitter gone visiting; a cup on the arm of one */
+  [[162.5, -1.4, true], [162.5, 1.1, false]].forEach(function (e) {
+    var dx = e[0] - C[0], dy = e[1] - C[1], r = Math.sqrt(dx * dx + dy * dy), b = Math.atan2(dx, dy) * 180 / Math.PI, f, l;
+    it.push(['p', b, r, 0.6, 0.05, 1.0, 1.75, 'gilt'], ['p', b, r - 0.007, 0.5, 0.05, 1.06, 1.69, 'canvasb'],
+            ['p', along(b, r, 0.17), r - 0.012, 0.1, 0.05, 1.08, 1.67, 'cloth'],          /* the curtain */
+            ['p', along(b, r, -0.04), r - 0.012, 0.18, 0.05, 1.08, 1.4, 'oak'],           /* the chair, its back */
+            ['p', along(b, r, -0.04), r - 0.012, 0.24, 0.05, 1.2, 1.24, 'oak'],           /* its arms */
+            ['p', b, r - 0.04, 0.66, 0.06, 0.94, 1.0, 'oak']);                             /* the easel's ledge */
+    if (e[2]) it.push(['p', along(b, r, 0.09), r - 0.017, 0.03, 0.05, 1.24, 1.27, 'white']);   /* the cup set down */
+    f = at(along(b, r, -0.27), r - 0.085); l = at(along(b, r, 0.27), r - 0.085);
+    it.push(['y', f[0], f[1], 0.02, 0, 1.85, 'oak'], ['y', l[0], l[1], 0.02, 0, 1.85, 'oak']);
+    f = at(b, r + 0.04); l = at(b, r + 0.42);
+    it.push(['y', f[0], f[1], 0.022, 0, 1.95, 'oak'], ['y', l[0], l[1], 0.02, 0, 1.4, 'oak']);
+  });
+  /* the sitters' dais, 1.2 square, 0.15 high, and on it the very chair, empty, turned east to the portraits */
+  it.push(['b', 159.3, -0.4, 0, 160.5, 0.8, 0.15, 'oak'],
+          ['b', 159.68, -0.075, 0.57, 160.18, 0.475, 0.62, 'oak'], ['b', 159.66, -0.075, 0.62, 159.71, 0.475, 1.3, 'oak'],
+          ['b', 159.68, -0.095, 0.62, 160.18, -0.075, 0.82, 'oak'], ['b', 159.68, 0.475, 0.62, 160.18, 0.495, 0.82, 'oak']);
+  [[159.69, -0.065], [160.13, -0.065], [159.69, 0.425], [160.13, 0.425]].forEach(function (p) {
+    it.push(['b', p[0], p[1], 0.15, p[0] + 0.04, p[1] + 0.04, 0.57, 'oak']);
+  });
+  /* the rack of empty frames on edge, its long side east to west, 1.6 by 0.6, 1.2 high: nothing faces north out of it */
+  it.push(['p', 0, 2.75, 1.6, 0.6, 0, 0.08, 'oak'], ['p', along(0, 2.75, -0.78), 2.75, 0.04, 0.6, 0.08, 1.2, 'oak'],
+          ['p', along(0, 2.75, 0.78), 2.75, 0.04, 0.6, 0.08, 1.2, 'oak'], ['p', 0, 2.75, 1.6, 0.04, 1.16, 1.2, 'oak']);
+  [[-0.6, 0.5, 0.9, 'gilt'], [-0.38, 0.4, 0.55, 'ebony'], [-0.12, 0.7, 1.05, 'gilt'], [0.1, 0.45, 0.7, 'oak'],
+   [0.32, 0.6, 0.85, 'gilt'], [0.52, 0.35, 0.5, 'gilt'], [0.66, 0.5, 0.8, 'ebony']].forEach(function (k, i) {
+    it.push(['p', along(0, 2.75, k[0]), 2.75, 0.035, k[1], 0.08, 0.08 + k[2], k[3]]);   /* each on edge, east-west */
+  });
+  /* the colour table: slab and muller, stoppered jars, brushes in a pot, a dried palette; the lamp on its stand */
+  it.push(['t', 156.9, -2.0, 157.5, -0.8, 0.85, 'oak'], ['b', 156.95, -1.95, 0.85, 157.35, -1.55, 0.88, 'stone'],
+          ['y', 157.1, -1.7, 0.04, 0.88, 0.96, 'stone'], ['y', 157.35, -1.0, 0.05, 0.85, 1.05, 'glaze'],
+          ['b', 157.34, -0.995, 1.05, 157.36, -0.985, 1.22, 'wood'], ['b', 157.33, -1.01, 1.05, 157.35, -1.0, 1.2, 'wood'],
+          ['b', 156.95, -1.3, 0.85, 157.3, -1.05, 0.86, 'wood'], ['y', 157.05, -1.2, 0.02, 0.86, 0.865, 'ruby'],
+          ['y', 157.15, -1.15, 0.02, 0.86, 0.865, 'amber'], ['y', 157.2, -1.25, 0.015, 0.86, 0.865, 'blue']);
+  [[157.42, -1.9, 'glaze'], [157.42, -1.75, 'glass'], [157.42, -1.6, 'glaze'], [157.42, -1.45, 'glass'], [157.42, -1.3, 'glaze'], [157.42, -1.15, 'glass']]
+    .forEach(function (j) { it.push(['y', j[0], j[1], 0.04, 0.85, 0.97, j[2]], ['y', j[0], j[1], 0.025, 0.97, 1.0, 'wood']); });
+  it.push(['y', 156.9, -0.4, 0.15, 0, 0.03, 'iron'], ['y', 156.9, -0.4, 0.015, 0.03, 1.55, 'iron'],
+          ['y', 156.9, -0.4, 0.07, 1.55, 1.58, 'iron'], ['y', 156.9, -0.4, 0.06, 1.58, 1.72, 'glass'],
+          ['y', 156.9, -0.4, 0.07, 1.72, 1.75, 'iron']);
+  T['se-round-room-1'] = { c: C, items: it };
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);
