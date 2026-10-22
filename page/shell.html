@@ -4392,6 +4392,7 @@ var GIANT = !BOARD ? null : (function () {
       var at = shell.toLocal(94 + row[1] * 2, 62 - f * 2, z0 + 0.01), ahead = shell.toLocal(94 + row[1] * 2 + (row[0] === 'white' ? 1 : -1), 62 - f * 2, z0 + 0.01);
       var p = chessPiece(kind, mats[row[0]]); p.position.copy(at); p.rotation.y = Math.atan2(-(ahead.z - at.z), ahead.x - at.x);
       p.name = 'giant-' + row[0] + '-' + NAME[kind] + '-' + sq; p.userData = { giant: { side: row[0], kind: kind, square: sq }, owner: PLACE };
+      p.rotation.order = 'YXZ';   /* the turn, then the tip: a slumped piece lies on its side whichever way it faces */
       p.traverse(function (m) { if (m.isMesh) { m.userData.owner = PLACE; m.name = p.name; } });
       g.add(p); out.pieces.push(p);
     }
@@ -4410,8 +4411,8 @@ var GIANT = !BOARD ? null : (function () {
    turns its head once toward the danger, and a second tap sends it on), `giant taken`, `giant boy taken`, `giant won`,
    `giant lost`, `giant drawn`; each cue below is Events' string word for word and does the moving, and where no
    record fires the page moves the pieces itself, without a line. A taken piece walks to the chamber's wall (black's
-   along the north, white's along the south) and stands there; nothing is smashed, dragged or lying still, and nothing
-   glows. The kept position (req 954, Events' aaea0025): after every move the page keeps `kept_giant`, the boys' count
+   along the north, white's along the south) and slumps there on its side, getting up at every end (the hundred-
+   seventeenth, req 958, overtaking "lying still"); nothing is smashed or dragged, and nothing glows. The kept position (req 954, Events' aaea0025): after every move the page keeps `kept_giant`, the boys' count
    and the moves so far, four characters a move ("2|e2e4g8f6..."); the resume cue rebuilds the board from it at once,
    every piece on its square and the taken at the wall, and the game goes on from there (no position: a fresh one) */
 var G_TOGETHER = 'a black knight and a black bishop turning their backs on the white pieces and walking off the board, leaving two empty squares that the boys take',
@@ -4419,14 +4420,16 @@ var G_TOGETHER = 'a black knight and a black bishop turning their backs on the w
     G_PAWN = 'the white pawn moving forward two squares',
     G_RESUME = 'the black pieces turning toward him, the boys on their squares again, and the white side waiting for his move',
     G_DANGER = 'the piece stopping short and turning its head once toward the danger, and going on if he taps again',
-    G_TAKEN = 'the white piece that took it bowing, and the black piece walking off the board to stand against the wall',
+    G_TAKEN = 'the white piece that took it bowing, and the black piece walking off the board to stand against the wall and slump there, limp',
     G_BOY = 'the white piece that took him bowing to him, and the boy walking off the board to stand at the wall, still giving his orders from there',
     G_WON = 'the white king taking off his crown and laying it at their feet, the chessmen parting and bowing, the door on standing clear',
     G_LOST = 'the black king laying his crown down, both sides bowing, and the pieces walking back to their squares, the game offered again',
-    G_DRAWN = 'both kings bowing to each other across the board';
+    G_DRAWN = 'both kings bowing to each other across the board',
+    G_UP_HOME = 'the slumped pieces along the wall getting up, dusting themselves off and walking back to their squares',   /* req 958: won and drawn */
+    G_UP = 'the slumped pieces along the wall getting up and dusting themselves off';   /* lost */
 var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   var o = { game: null, on: false, at: {}, boys: [], wall: { white: 0, black: 0 }, sel: null, pending: null, q: [], cur: null,
-            first: null, firstT: 0, together: false, cap: null, level: Math.max(1, Math.min(4, +Q.get('giantlevel') || 2)) };
+            first: null, firstT: 0, together: false, cap: null, lie: { white: 0, black: 0 }, fallen: [], riseLine: null, level: Math.max(1, Math.min(4, +Q.get('giantlevel') || 2)) };
   var z0 = shell.place.floor, O = shell.toLocal(0, 0, z0), FILES = 'abcdefgh';
   function model(v) { return { x: v.x - O.x, y: O.z - v.z }; }
   function sqPos(sq) { return shell.toLocal(94 + (+sq[1] - 1) * 2, 62 - FILES.indexOf(sq[0]) * 2, z0 + 0.01); }
@@ -4486,10 +4489,136 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     if (n >= 13) { x = side === 'black' ? 110.9 : 91.1; y = [62.5, 60.5, 58.5, 51.5, 49.5, 47.5][(n - 13) % 6]; }
     return shell.toLocal(x, y, z0 + 0.01);
   }
-  function toWall(p) {
+  function toWall(p, slump) {
+    var lie = slump && lieSpot(p);
+    if (lie) { walkers([{ p: p, to: lie.at, face: lie.yaw }]); slumpIt(p, lie, false); return; }
     var to = wallSpot(p.userData.giant.side), c = shell.toLocal(101, 55, z0 + 0.01);
     walkers([{ p: p, to: to, face: yawTo(to, c) }]);
   }
+  /* the hundred-seventeenth, Godric's weave rookery-fallen-rise (PS 16 L5932, "a huddle of limp black players slumped
+     along the wall"; Events' req 958): a taken piece, of either side, walks to its own wall and lies slumped there on
+     its side, its foot at its place and its head along the wall, facing the room, the head drooping to the floor. Black's
+     lie along the north wall from its west end (the standing places, the boys' own pieces and a boy taken, keep its east
+     end), then down the east strip either side of the keys' door; white's along the south wall from its east end, then
+     up the west strip either side of the arch; past those a piece stands at the wall as before. At every end they rise,
+     shake the dust off and walk back (`rise`) */
+  var LIE = { black: [[90.8, 64.15, 1, 0, 14.6], [110.9, 62.8, 0, -1, 5.6], [110.9, 53.8, 0, -1, 6.6]],
+              white: [[111.2, 45.85, -1, 0, 20.4], [91.1, 47.2, 0, 1, 6.6], [91.1, 57.2, 0, 1, 5.6]] },
+      TALL = { p: 2.0, r: 2.3, n: 2.5, b: 2.7, q: 3.0, k: 3.2 };
+  function lieSpot(p) {
+    var g = p.userData.giant, len = TALL[g.kind] + 0.25, at = o.lie[g.side];
+    for (var i = 0, s = 0; i < LIE[g.side].length; s += LIE[g.side][i][4], i++) {
+      var seg = LIE[g.side][i], u = at - s;
+      if (u < 0) { at = s; u = 0; o.lie[g.side] = s; }   /* a piece too long for the run before starts the next */
+      if (u + len > seg[4]) continue;
+      o.lie[g.side] = s + u + len;
+      var fx = seg[0] + seg[2] * (u + 0.1), fy = seg[1] + seg[3] * (u + 0.1);
+      var foot = shell.toLocal(fx, fy, z0 + 0.01), D = shell.toLocal(fx + seg[2], fy + seg[3], z0 + 0.01).sub(foot);
+      return { at: foot, yaw: Math.atan2(-D.x, -D.z) };
+    }
+    return null;
+  }
+  function lowest(p) {   /* the piece's lowest point as it now stands, vertex by vertex */
+    p.updateMatrixWorld(true);
+    var lo = 1e9, v = new THREE.Vector3();
+    p.traverse(function (m) {
+      if (!m.isMesh) return;
+      var a = m.geometry.attributes.position;
+      for (var i = 0; i < a.count; i++) { v.fromBufferAttribute(a, i).applyMatrix4(m.matrixWorld); if (v.y < lo) lo = v.y; }
+    });
+    return lo;
+  }
+  function liePose(p, lie) {   /* on its left side, the head drooped till it nears the floor; the lift that keeps it on the floor */
+    var y0 = lie.at.y, keep = [p.position.clone(), p.rotation.clone()], tall = TALL[p.userData.giant.kind];
+    p.position.copy(lie.at); p.rotation.set(-Math.PI / 2, lie.yaw, 0);
+    var lift = y0 - lowest(p), droop = Math.min(0.3, Math.max(0, Math.atan((lift - 0.2) / tall)));
+    p.rotation.x = -Math.PI / 2 - droop;
+    lift = y0 - lowest(p);
+    p.position.copy(keep[0]); p.rotation.copy(keep[1]);
+    return { x: -Math.PI / 2 - droop, y: y0 + lift };
+  }
+  function slumpIt(p, lie, instant) {
+    o.fallen.push(p);
+    if (instant) { var f = liePose(p, lie); p.position.copy(lie.at); p.position.y = f.y; p.rotation.set(f.x, lie.yaw, 0); return; }
+    var pose, y0;
+    step({ dur: 1.1, begin: function () { pose = liePose(p, lie); y0 = p.position.y; }, run: function (u) {
+      var k = u * u;   /* going limp, faster as it goes */
+      p.rotation.x = pose.x * k; p.position.y = y0 + (pose.y - y0) * Math.sin(Math.PI / 2 * u);
+    } });
+  }
+  function rise(walkHome) {   /* every slumped piece gets up, shakes off the dust, and (won and drawn) walks to its square */
+    var list = o.fallen.slice(); o.fallen = [];
+    if (!list.length) return;
+    var x0 = [], y0 = [], r0 = [];
+    step({ dur: 1.3, begin: function () {
+      if (o.riseLine) line(o.riseLine); o.riseLine = null;
+      list.forEach(function (p, i) { x0[i] = p.rotation.x; y0[i] = p.position.y; });
+    }, run: function (u) {
+      var k = ease(u);
+      list.forEach(function (p, i) { p.rotation.x = x0[i] * (1 - k); p.position.y = y0[i] + (O.y + 0.01 - y0[i]) * k; });
+    } });
+    step({ dur: 0.9, begin: function () { list.forEach(function (p, i) { r0[i] = p.rotation.y; }); }, run: function (u) {
+      list.forEach(function (p, i) {   /* the shake for the dust, side to side and a little back and forth */
+        p.rotation.y = r0[i] + 0.09 * Math.sin(u * Math.PI * 6) * (1 - u); p.rotation.z = 0.035 * Math.sin(u * Math.PI * 4 + i) * (1 - u);
+      });
+    } });
+    if (!walkHome) return;
+    var home = list.map(function (p) {
+      var g = p.userData.giant, sq = g.sq0, free = function (s) { return !o.at[s] && !boyAt(s); };
+      if (!free(sq)) {
+        var ranks = g.side === 'white' ? '12345678' : '87654321', best = null, bd = 1e9;
+        for (var r = 0; r < 8 && !best; r++) for (var f = 0; f < 8; f++) {
+          var s = FILES[f] + ranks[r], d = Math.abs(f - FILES.indexOf(sq[0]));
+          if (free(s) && d < bd) { bd = d; best = s; }
+          if (f === 7 && best) break;
+        }
+        sq = best || sq;
+      }
+      o.at[sq] = p; return { p: p, to: sqPos(sq) };
+    });
+    walkers(home, 1.4);
+  }
+  /* the hundred-seventeenth, Godric's twist on his weave chess-horses-breathe: right after a piece moves, a few soft
+     puffs of cold mist at its head (the knight's at his horse's nostrils, the rook's at its top), flat grey and unlit
+     like the bottles' smoke (941), in the room at the piece; nothing glows */
+  var MOUTH = { figures: { p: [0.17, 1.72, 0], r: [0, 2.2, 0], b: [0.18, 2.1, 0], q: [0.2, 2.52, 0], k: [0.22, 2.66, 0] },
+                turned: { p: [0.3, 1.82, 0], r: [0, 2.2, 0], b: [0.3, 2.25, 0], q: [0.32, 2.6, 0], k: [0.34, 2.62, 0] },
+                n: [1.14, 1.9, 0.05] };
+  var puffs = [], soft = document.createElement('canvas');
+  soft.width = soft.height = 64;
+  (function (c) {   /* a soft round edge, so a puff reads as mist and not a ball */
+    var gr = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.55)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = gr; c.fillRect(0, 0, 64, 64);
+  })(soft.getContext('2d'));
+  var softMap = new THREE.CanvasTexture(soft);
+  for (var pi = 0; pi < 24; pi++) {
+    var pm = new THREE.Sprite(new THREE.SpriteMaterial({ map: softMap, color: kit.col(0x6a666c), transparent: true, opacity: 0, depthWrite: false }));
+    pm.visible = false; pm.raycast = function () {}; pm.userData = { owner: PLACE, busy: false }; pm.name = 'giant-breath'; scene.add(pm); puffs.push(pm);
+  }
+  function breathe(p) {
+    var g = p.userData.giant, m = g.kind === 'n' ? MOUTH.n : MOUTH[FIGURES ? 'figures' : 'turned'][g.kind];
+    p.updateMatrixWorld(true);
+    for (var i = 0; i < 3; i++) {
+      var pm = puffs.filter(function (q) { return !q.userData.busy; })[0]; if (!pm) return;
+      var at = p.localToWorld(new THREE.Vector3(m[0], m[1], g.kind === 'n' ? (i % 2 ? m[2] : -m[2]) : 0));
+      var on = p.localToWorld(new THREE.Vector3(m[0] + 1, m[1], 0)).sub(p.localToWorld(new THREE.Vector3(m[0], m[1], 0)));
+      if (g.kind === 'r') on.set(0, 0, 0);   /* the rook's rises straight from its top */
+      pm.userData.busy = true; pm.userData.wait = i * 0.5; pm.userData.age = 0; pm.userData.at = at; pm.userData.on = on.setY(0).multiplyScalar(0.28);
+    }
+  }
+  function updateBreath(dt) {
+    puffs.forEach(function (pm) {
+      var d = pm.userData; if (!d.busy) return;
+      if (d.wait > 0) { d.wait -= dt; return; }
+      d.age += dt;
+      var t = d.age / 2.2;
+      if (t >= 1) { d.busy = false; pm.visible = false; return; }
+      pm.visible = true; pm.position.copy(d.at).addScaledVector(d.on, d.age); pm.position.y += 0.12 * d.age;
+      pm.scale.setScalar(0.12 + 0.5 * Math.sqrt(t)); pm.material.opacity = 0.62 * Math.sin(Math.PI * t) * (1 - 0.4 * t);
+    });
+  }
+  function breatheAfter(p) { call(function () { breathe(p); }); }
   function boyAt(sq) { for (var i = 0; i < o.boys.length; i++) if (o.boys[i].sq === sq && !o.boys[i].off) return o.boys[i]; return null; }
   function pieceSq(p) { for (var s in o.at) if (o.at[s] === p) return s; return null; }
   function crownOf(k) {   /* the figure king's crown, its own group; the turned king's cross, two blocks over his head */
@@ -4500,11 +4629,11 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
 
   /* the board as the game stands: every piece home, the boys' pieces off; then the game's own squares */
   function reset(instant) {
-    o.at = {}; o.wall = { white: 0, black: 0 }; o.sel = o.pending = null;
+    o.at = {}; o.wall = { white: 0, black: 0 }; o.lie = { white: 0, black: 0 }; o.fallen = []; o.sel = o.pending = null;
     var list = [];
     GIANT.pieces.forEach(function (p) {
       var g = p.userData.giant; if (g.kind !== g.home) swapKind(p, g.home);
-      o.at[g.sq0] = p; p.visible = true; p.rotation.z = 0;
+      o.at[g.sq0] = p; p.visible = true; p.rotation.x = p.rotation.z = 0;
       crownOf(p).forEach(function (c) { if (c.userData.y0 != null) { c.position.set(0, c.userData.y0, 0); c.rotation.set(0, 0, 0); } });
       if (instant) { p.position.copy(sqPos(g.sq0)); p.rotation.y = homeYaw(p); }
       else list.push({ p: p, to: sqPos(g.sq0) });
@@ -4543,7 +4672,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
       if (m.taken) {
         var tb = boyAt(m.taken.sq), v = o.at[m.taken.sq]; o.at[m.taken.sq] = null;
         if (tb) tb.off = true;
-        else if (v) { var w = wallSpot(v.userData.giant.side); v.position.copy(w); v.rotation.y = yawTo(w, shell.toLocal(101, 55, z0)); }
+        else if (v) { var lie = lieSpot(v); if (lie) slumpIt(v, lie, true); else { var w = wallSpot(v.userData.giant.side); v.position.copy(w); v.rotation.y = yawTo(w, shell.toLocal(101, 55, z0)); } }
       }
       if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; r.position.copy(sqPos(m.rook.to)); }
       if (boy) boy.sq = to;
@@ -4581,9 +4710,9 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
       if (events && events.moment) events.moment(boy ? 'giant boy taken' : 'giant taken');
       if (o.cap) playCapture(false);
     } else if (instant) { p.position.copy(sqPos(m.to)); }
-    else walkers([{ p: p, to: sqPos(m.to) }]);
+    else { walkers([{ p: p, to: sqPos(m.to) }]); breatheAfter(p); }
     o.at[m.to] = p;
-    if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; walkers([{ p: r, to: sqPos(m.rook.to) }]); }
+    if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; walkers([{ p: r, to: sqPos(m.rook.to) }]); breatheAfter(r); }
     if (m.queen) call(function () { swapKind(p, 'q'); });
     call(ended);
   }
@@ -4594,8 +4723,8 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     walkers([{ p: c.p, to: short, face: yawTo(short, to) }]);
     bow([c.p]);
     if (c.boy) { c.boy.off = true; if (c.boy === o.boys[0]) walkEye(null, wallSpot('black')); }
-    else if (c.victim) toWall(c.victim);
-    walkers([{ p: c.p, to: to }]);
+    else if (c.victim) toWall(c.victim, true);
+    walkers([{ p: c.p, to: to }]); breatheAfter(c.p);
     if (withLine) line(c.boy ? G_BOY : G_TAKEN);
   }
   function blackMove(from, to) {
@@ -4603,10 +4732,10 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     if (!m) return;
     o.log.push(from + to); keepIt();
     o.at[from] = null; o.sel = o.pending = null;
-    if (m.taken) { var v = o.at[m.taken.sq]; o.at[m.taken.sq] = null; if (v) toWall(v); }
-    if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; walkers([{ p: r, to: sqPos(m.rook.to) }]); }
+    if (m.taken) { var v = o.at[m.taken.sq]; o.at[m.taken.sq] = null; if (v) toWall(v, true); }
+    if (m.rook) { var r = o.at[m.rook.from]; o.at[m.rook.from] = null; o.at[m.rook.to] = r; walkers([{ p: r, to: sqPos(m.rook.to) }]); breatheAfter(r); }
     if (boy) { boy.sq = to; if (boy === o.boys[0] && !boy.off) walkEye(to); }
-    else { walkers([{ p: p, to: sqPos(to) }]); o.at[to] = p; if (m.queen) call(function () { swapKind(p, 'q'); }); }
+    else { walkers([{ p: p, to: sqPos(to) }]); breatheAfter(p); o.at[to] = p; if (m.queen) call(function () { swapKind(p, 'q'); }); }
     call(function () { if (!ended()) { pause(0.5); call(function () { white(false); }); } });
   }
   /* the end, by the core's word: their mate a win, white's a loss; stalemate and the rest a draw */
@@ -4641,6 +4770,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
       cr.forEach(function (c, i) { var l = layOf(c, i); c.position.set(l.x * u, (c0[i].y + 0.35) * (1 - u) + l.y * u, 0); c.rotation.z = l.rz * u; });
     } });
     bow(all.concat([k]));
+    rise(true);
   }
   function lost() {
     o.on = false;
@@ -4651,6 +4781,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     var all = []; for (var s in o.at) if (o.at[s]) all.push(o.at[s]);
     bow(all);
     pause(0.6);
+    rise(false);
     call(function () { o.boys.forEach(function (b) { b.off = true; }); walkEye(null, shell.toLocal(110.4, 50, z0)); reset(false); });
   }
   function drawn() {
@@ -4658,6 +4789,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     var w = kingOf('white'), b = kingOf('black');
     walkers([{ p: w, to: w.position.clone(), face: yawTo(w.position, b.position) }, { p: b, to: b.position.clone(), face: yawTo(b.position, w.position) }]);
     bow([w, b], 2.0);
+    rise(true);
   }
 
   /* the cues, word for word: each moves and shows its own line */
@@ -4676,6 +4808,8 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
   allCues[G_WON] = function () { if (o.endCue) { o.endCue = null; won(); } line(G_WON); };
   allCues[G_LOST] = function () { if (o.endCue) { o.endCue = null; lost(); } line(G_LOST); };
   allCues[G_DRAWN] = function () { if (o.endCue) { o.endCue = null; drawn(); } line(G_DRAWN); };
+  allCues[G_UP_HOME] = function () { o.riseLine = G_UP_HOME; };   /* shown as they get up (`rise`) */
+  allCues[G_UP] = function () { o.riseLine = G_UP; };
 
   function danger() {   /* the piece comes 40 per cent of the way and turns its head once toward the nearest white */
     var d = o.pending; if (!d || d.shown) return; d.shown = true;
@@ -4743,6 +4877,7 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     void p;
   }
   function update(dt) {
+    updateBreath(dt);
     if (!o.cur && o.q.length) { o.cur = o.q.shift(); o.cur.t = 0; if (o.cur.begin) o.cur.begin(); }
     while (o.cur) {
       var c = o.cur;
@@ -4761,6 +4896,8 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
     square: function (sq) { return sqPos(sq); },
     kept: function () { return events && events.read ? events.read('kept_giant') : null; },   /* req 954, for checks */
     log: function () { return (o.log || []).join(' '); },
+    fallen: function () { return o.fallen.map(function (p) { return p.name + ' ' + p.rotation.x.toFixed(2) + ' ' + p.position.y.toFixed(2); }); },   /* the slumped, for checks */
+    breath: function () { return puffs.filter(function (q) { return q.visible; }).length; },
     ending: function (n) { if (o.on) finish('giant ' + n); return api.state(); },   /* won, lost or drawn, for checks */
     legal: function () {   /* black's moves now, for checks */
       if (!o.game || o.game.turn() !== 'black') return [];
