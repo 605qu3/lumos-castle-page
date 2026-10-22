@@ -66,6 +66,58 @@ window.CASTLE_TONES = {
   "sky-night": {
    "hex": "#10141f",
    "say": "the Great Hall's ceiling by night: castle-light.js's night sky"
+  },
+  "far-stone": {
+   "hex": "#82888b",
+   "say": "the castle's own walls across a court or a lawn: high-grey as scheduled, taken toward founders-rubble as late-pale was (req 852), since daylight lifts it where a torch did not"
+  },
+  "far-rock": {
+   "hex": "#6c695b",
+   "say": "the crag under the castle: the founders' rubble is its own stone, the open face weathered paler"
+  },
+  "far-roof": {
+   "hex": "#58606a",
+   "say": "slate cones and roofs (P5) and lead flats (P1 to P4), one tone at that distance: a blue-grey slate"
+  },
+  "far-timber": {
+   "hex": "#6f6455",
+   "say": "outdoor oak, Hagrid's hut and the stands: oak-beams' wood weathered silver-brown in the rain"
+  },
+  "far-glass": {
+   "hex": "#a7b5c6",
+   "say": "the greenhouses' glass: the day's sky in it, greyed by the panes and the plants behind"
+  },
+  "far-window": {
+   "hex": "#2b2f36",
+   "say": "the castle's windows by day from across a court: dark glass, never black"
+  },
+  "far-window-night": {
+   "hex": "#d9a65a",
+   "say": "the same by night, lit from within ('windows sparkling', PS 6): the candle's gold; for farView to use if it takes it"
+  },
+  "far-water-day": {
+   "hex": "#626c78",
+   "say": "the lake by day: 'a great black lake' (PS 6), a dark peaty loch with the pale sky in it"
+  },
+  "far-water-night": {
+   "hex": "#161b26",
+   "say": "the lake by night: the night sky's own blue, a touch lighter so the shore line reads"
+  },
+  "far-lawn": {
+   "hex": "#7d8a5c",
+   "say": "the lawns, a Highland grass in autumn (invented; farView's provisional, kept)"
+  },
+  "far-pitch": {
+   "hex": "#8d9a64",
+   "say": "the pitch, mown: the lawn a step paler and greener (invented; farView's provisional, kept)"
+  },
+  "far-forest": {
+   "hex": "#36412d",
+   "say": "the Forbidden Forest: dark conifer and oak, a step below the lawn's green (invented)"
+  },
+  "far-hills": {
+   "hex": "#7c8592",
+   "say": "the far hills: heather and bracken gone blue-grey with distance (invented; near farView's provisional)"
   }
  },
  "dressing": {
