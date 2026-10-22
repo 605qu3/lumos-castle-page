@@ -1,0 +1,338 @@
+{
+  "chain": "stone-chambers",
+  "places": {
+    "stone dark": [
+      "stone pit",
+      "stone passage down",
+      "stone passage up"
+    ]
+  },
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = stone dark",
+        "year >= 2"
+      ],
+      "show": [
+        "all that can be heard his own footsteps and the gentle drip of water trickling down the walls"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the drip and the damp: \"All they could hear apart from their footsteps was the gentle drip of water trickling down the walls\" (PS 16 L5836, read in the canon tool, 22 October 2026)"
+    },
+    {
+      "when": [
+        "place = stone pit",
+        "year >= 2"
+      ],
+      "show": [
+        "a damp wall of dark stone beside the soft floor of the pit"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's \"damp wall\" (PS 16 L5810, read in the canon tool, 22 October 2026), the floor Devil's Snare (L5800, \"it's here to break the fall\")"
+    },
+    {
+      "when": [
+        "place = stone passage down",
+        "year >= 2"
+      ],
+      "show": [
+        "the passage sloping downward, cold and narrow"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the passage down sloping and cold (PS 16 L5836, \"The passageway sloped downward\", read in the canon tool, 22 October 2026; the cold ours)"
+    },
+    {
+      "when": [
+        "place = stone dark",
+        "year >= 2"
+      ],
+      "show": [
+        "no torch in any bracket, only the dark and whatever light he carries"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: his own light: no torch of the castle's in the pit and the passages, the dark lit only by what he carries, its own light (the world rules, Nothing announces itself)"
+    },
+    {
+      "when": [
+        "place = stone keys chamber",
+        "year >= 2"
+      ],
+      "show": [
+        "a brilliantly lit vault, its ceiling arching high above",
+        "small, jewel-bright birds that are keys, fluttering and tumbling all round the room, glittering, a whirl of rainbow feathers, none of them swooping at him",
+        "a heavy wooden door on the far side, shut",
+        "old school brooms leaning against the wall"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the keys' chamber: \"a brilliantly lit chamber, its ceiling arching high above them\", \"small, jewel-bright birds, fluttering and tumbling all around the room\" (PS 16 L5848), \"glittering\" (L5862), \"the whirl of rainbow feathers\" (L5874), he crosses and \"nothing happened\" (L5854), the door on the far side locked (L5854), brooms (L5864), all read in the canon tool, 22 October 2026; the catch is Events' req 905, waiting on flying (Godric's 2); the door's state follows it"
+    },
+    {
+      "when": [
+        "place = stone keys chamber",
+        "year >= 2"
+      ],
+      "show": [
+        "among the flock, one large silver key with bright blue wings, the feathers crumpled on one side, flying a little lopsided and lower than the rest, very battered"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the battered key (req 905, Magic's 8.10 am note, 65050f23): \"a large silver key that had a bent wing\" (PS 16 L5874), \"with bright blue wings — the feathers are all crumpled on one side\" (L5876), \"very battered now that it had been caught twice\" (L5884), read in the canon tool, 22 October 2026; the lasting trace of the chapter, unexplained; the catch is that key, which flies lower"
+    },
+    {
+      "when": [
+        "place = stone chess chamber",
+        "year >= 2"
+      ],
+      "show": [
+        "the black pieces, taller than he is and carved from what looks like black stone, still on their squares",
+        "the white pieces across the board, towering and faceless, the white king crowned",
+        "a doorway behind the white pieces, on into a dark, dry passage that rises"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pieces at rest: \"behind the black chessmen, which were all taller than they were and carved from what looked like black stone\", \"the towering white chessmen had no faces\" (PS 16 L5890), \"another door\" behind the white pieces (L5896), the white king's crown (L5960; ours that it sits on him at rest), read in the canon tool, 22 October 2026; the game is req 911's"
+    },
+    {
+      "when": [
+        "place = stone passage up",
+        "year >= 2"
+      ],
+      "show": [
+        "a dark, dry passage rising"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the passage up from behind the white pieces (PS 16 L5896 and L5960, \"up the next passageway\", read in the canon tool, 22 October 2026), dark and dry ours"
+    },
+    {
+      "when": [
+        "place = stone troll room",
+        "year >= 2"
+      ],
+      "show": [
+        "a faint smell hanging in the room, enough to wrinkle a nose",
+        "one long scrape across the flagstones toward the far door"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the troll's room: the troll long gone, only a faint \"disgusting smell\" (PS 16 L5976, read in the canon tool, 22 October 2026), weaker than the book's, and one scrape toward the door, unexplained; nothing else, no one hurt or found (the world rules: Nothing dies on the boys' watch)"
+    },
+    {
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a table with seven differently shaped bottles standing on it in a line",
+        "a roll of paper lying beside them"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the bottles' room: \"a table with seven differently shaped bottles standing on it in a line\" (PS 16 L5980), \"a roll of paper lying next to the bottles\" (L5986), read in the canon tool, 22 October 2026; the paper's words are held for Godric (magic-stone-paper-words-1022, unanswered)"
+    },
+    {
+      "when": [
+        "place = stone last chamber",
+        "year >= 2"
+      ],
+      "show": [
+        "an empty stone chamber, bare, still and quiet",
+        "black flames at the doorway behind him, which let him back through"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the last chamber: bare, no Mirror and nothing where anything stood (ours; PS 16 L6088 \"in the last chamber\", read in the canon tool, 22 October 2026), the flame door that lets him back at once from this side (PS 17 L6253 names \"the flame door\", read in the canon tool)"
+    },
+    {
+      "when": [
+        "place = stone potions room",
+        "year >= 2",
+        "potions_in = yes"
+      ],
+      "show": [
+        "the purple fire standing in the doorway behind him, and the black flames in the doorway on; neither burns, and the purple parts for him whenever he walks back"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the flames: \"a fire sprang up behind them in the doorway... purple. At the same instant, black flames shot up in the doorway leading onward\" (PS 16 L5984, read in the canon tool, 22 October 2026), both harmless and the purple always letting him back (a way out is always open)"
+    }
+  ],
+  "records": [
+    {
+      "id": "stone-chambers.pit-snare-in",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = stone pit",
+        "year >= 2"
+      ],
+      "show": [
+        "a soft landing: Devil's Snare filling the pit's floor, its tendrils curling gently round his ankles, no higher"
+      ],
+      "starts": [
+        "set snare = held"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's plant: a soft landing, the Devil's Snare filling the pit's floor, \"it's here to break the fall\" (PS 16 L5800), \"it likes the dark and the damp\" (L5820), its tendrils curling round the ankles (L5810), read in the canon tool, 22 October 2026; ours: only round his ankles, gently, never higher; he lies still, it holds, and it only shrinks back, never burnt, cut or harmed (the world rules, Nothing dies on the boys' watch)"
+    },
+    {
+      "id": "stone-chambers.pit-snare-light",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "light on",
+      "when": [
+        "place = stone pit",
+        "year >= 2",
+        "snare = held"
+      ],
+      "show": [
+        "the tendrils cringing back from his light and warmth, the plant shrinking from his feet, and he stands free"
+      ],
+      "starts": [
+        "set snare = free"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's plant, his light: at light and warmth the Snare \"cringed away from the light and warmth\" (PS 16 L5828, read in the canon tool, 22 October 2026), here a boy's torch or lit wand, the page raising `light on` as he lights it; it only shrinks back, never burnt or harmed"
+    },
+    {
+      "id": "stone-chambers.pit-snare-lets-go",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 8-14 s",
+      "when": [
+        "place = stone pit",
+        "year >= 2",
+        "snare = held"
+      ],
+      "show": [
+        "the tendrils loosening of their own accord and sliding off his ankles, the plant lying slack on the floor"
+      ],
+      "starts": [
+        "set snare = free"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's plant with no light out: it lets go of its own accord after a few breaths (ours: a way out is always open), nothing burnt or harmed"
+    },
+    {
+      "id": "stone-chambers.pit-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set snare = free"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the pit's plant held only while he is in the pit"
+    },
+    {
+      "id": "stone-chambers.passage-wings",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 6-12 s",
+      "when": [
+        "place = stone passage down",
+        "year >= 2"
+      ],
+      "show": [
+        "a soft rustling and clinking from up ahead, like wings, and a bright light beyond the end of the passage"
+      ],
+      "starts": [],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the wings ahead, near the end of the passage down: \"A soft rustling and clinking seemed to be coming from up ahead\" (PS 16 L5840), \"sounds like wings to me\" (L5844), \"There's light ahead\" (L5846), read in the canon tool, 22 October 2026; a wait stands for \"near its end\""
+    },
+    {
+      "id": "stone-chambers.chess-dark",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = stone chess chamber",
+        "year >= 2"
+      ],
+      "show": [
+        "the chamber dark until he steps in, then light flooding the room, the board and every piece in it at once in full light"
+      ],
+      "starts": [],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the board in the dark: \"The next chamber was so dark they couldn't see anything at all. But as they stepped into it, light suddenly flooded the room\" (PS 16 L5888, read in the canon tool, 22 October 2026), the room answering him as he enters, the board and its pieces at once in full light; that it falls dark behind him when he leaves is the shell's, not seen from inside"
+    },
+    {
+      "id": "stone-chambers.knight",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap black knight",
+      "when": [
+        "place = stone chess chamber",
+        "year >= 2"
+      ],
+      "show": [
+        "the black knight's horse pawing the ground, the knight turning his helmeted head to look down at him, then standing still again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: a black knight touched: \"He walked up to a black knight and put his hand out to touch the knight's horse. At once, the stone sprang to life. The horse pawed the ground and the knight turned his helmeted head to look down at Ron\" (PS 16 L5902, read in the canon tool, 22 October 2026), then stands still again unless a game is begun (req 911, which adds that condition)"
+    },
+    {
+      "id": "stone-chambers.potions-in",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "purple fire springing up in the doorway behind him and black flames in the doorway on"
+      ],
+      "starts": [
+        "set potions_in = yes"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the bottles' room, stepping in: the fires spring up (PS 16 L5984, read in the canon tool, 22 October 2026), harmless, a way out always open"
+    },
+    {
+      "id": "stone-chambers.potions-other",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bottle",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a sip from the bottle: foul water, a grimace and nothing more"
+      ],
+      "starts": [],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: every other bottle: foul water only, a sip, a grimace, nothing more (PS 16 L6030, three \"poison\" in the book, here none: the world rules); each bottle full again at his next visit, nothing kept or carried out"
+    },
+    {
+      "id": "stone-chambers.potions-smallest",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap smallest bottle",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "the smallest bottle's one swallow, ice flooding his body; he walks forward through the black flames, feeling nothing, to the other side"
+      ],
+      "starts": [],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the smallest bottle: \"The smallest bottle will get us through the black fire\" (PS 16 L6038), \"as though ice was flooding his body\" (L6088), the black flames felt as nothing, into the last chamber, read in the canon tool, 22 October 2026; the bottle full again at his next visit"
+    },
+    {
+      "id": "stone-chambers.potions-round",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap rounded bottle",
+      "when": [
+        "place = stone potions room",
+        "year >= 2"
+      ],
+      "show": [
+        "a sip from the rounded bottle at the right end, cold as ice, and the purple fire parting round him as he walks back"
+      ],
+      "starts": [],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the rounded bottle at the right end: \"a rounded bottle at the right end of the line\" (PS 16 L6050), \"it's like ice\" (L6074), read in the canon tool, 22 October 2026; a wink, and the purple parts for him"
+    },
+    {
+      "id": "stone-chambers.potions-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [],
+      "starts": [
+        "set potions_in = no"
+      ],
+      "canon": "Magic's req 913 (docs/magic/rooms.md, *The Stone's chambers, after the Stone's year*; Godric's 1 on magic-stone-chambers-leftovers-1022, gentle leftovers; the Architect's v150 map, req 900), from the Chamber's castle on, every year after the Stone's: the fires belong to the visit"
+    }
+  ]
+}
