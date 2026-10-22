@@ -939,7 +939,8 @@
       ],
       "starts": [
         "set chase = on",
-        "stamp chase_night by night"
+        "stamp chase_night by night",
+        "set chase_by = norris"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; on its own, now and then after dark and never more than once a night, with a silent partner at weight 2 (about one wait in three)"
     },
@@ -949,7 +950,7 @@
       "source": "device",
       "leans": [],
       "one_of": "filch-chase",
-      "weight": 2,
+      "weight": 4,
       "moment": "wait 150-420 s",
       "when": [
         "place = corridor",
@@ -959,6 +960,48 @@
       ],
       "starts": [],
       "canon": "the silent partner of filch.chase-night"
+    },
+    {
+      "id": "filch.chase-peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-chase",
+      "weight": 1,
+      "moment": "wait 150-420 s",
+      "when": [
+        "place = corridor",
+        "time = night",
+        "chase != on",
+        "nights since chase_night >= 1"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "voice",
+          "name": "peeves",
+          "mark": "corridor"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "filch.chase-peeves-bellow",
+          "sound": "Peeves bellowing from somewhere over the stairs",
+          "text": [
+            "STUDENTS OUT OF BED! STUDENTS OUT OF BED ON THE SEVENTH FLOOR!",
+            "STUDENTS OUT OF BED! STUDENTS OUT OF BED BY THE FAT LADY, FILCH, FILCH, FILCH!"
+          ],
+          "canon": "B1 ch9 L3277 (“STUDENTS OUT OF BED!” Peeves bellowed), the bellow alone and ours after it, his own floor and Fat Lady for the Charms corridor; said at no one, a poltergeist's mischief, never at the boy by name"
+        }
+      ],
+      "starts": [
+        "set chase = on",
+        "set chase_by = peeves",
+        "stamp chase_night by night"
+      ],
+      "canon": "req 933 (b), Peeves joins the chase (Godric's pick on corridor-chase-ideas-1022, all four ideas, relayed 1.50 pm 22 October 2026; the design is docs/notes/2026-10-22-corridor-chase-ideas.md, idea 1); canon read in the canon tool, 22 October 2026: B1 ch9 L3277 and L3289 (Peeves bellows “STUDENTS OUT OF BED” and Filch comes running to his shouts); Peeves alerts Filch of his own accord, with no cat in it, the second start beside Mrs Norris's whisk (the partner of filch.chase-night in the group filch-chase); he is the same at any trust of hers, so her friendship does not lower this one; nobody is caught by it, the chase stays the chase"
     },
     {
       "id": "filch.chase-toe-cupboard",
@@ -979,7 +1022,8 @@
       ],
       "starts": [
         "set chase = on",
-        "stamp chase_night by night"
+        "stamp chase_night by night",
+        "set chase_by = norris"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a toe out of line in front of her: the cupboard's handle tried while she is in view, always"
     },
@@ -1002,7 +1046,8 @@
       ],
       "starts": [
         "set chase = on",
-        "stamp chase_night by night"
+        "stamp chase_night by night",
+        "set chase_by = norris"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; a toe out of line in front of her: a knock on the armour while she is in view, always"
     },
@@ -1144,6 +1189,99 @@
         "set chase = off"
       ],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; hidden, he shuffles past, asks the Fat Lady and goes down: the page walks his lamp along the corridor to her end and back to the stairs, never turning"
+    },
+    {
+      "id": "filch.chase-hidden-peeves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "chase_by = peeves"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        },
+        {
+          "as": "peeves",
+          "role": "voice",
+          "name": "peeves",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Peeves whooshing away down the stairs with a cackle, the suit of armour rattling as he passes, and Filch's lamp going back down after him"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-asks-peeves",
+          "sound": "Filch at the top of the stairs, asking Peeves",
+          "text": [
+            "Which way did they go, Peeves? Quick, tell me.",
+            "Where did they get to, Peeves? Come on, which way?"
+          ],
+          "canon": "B1 ch9 L3289 (“Which way did they go, Peeves?” Filch was saying. “Quick, tell me.”), the first word for word and the second ours; he asks Peeves, never the boy, who is hidden"
+        },
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "filch.chase-peeves-please",
+          "sound": "Peeves, somewhere above the lamp, in his singsong",
+          "text": [
+            "Say please.",
+            "Shan't say nothing if you don't say please."
+          ],
+          "canon": "B1 ch9 L3291 and L3295 (“Say ‘please.’”; “Shan’t say nothing if you don’t say please,” said Peeves in his annoying singsong voice), word for word"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-pleads",
+          "sound": "Filch, through his teeth",
+          "text": [
+            "All right — please.",
+            "Please. Please, you pest."
+          ],
+          "canon": "B1 ch9 L3297 (“All right — please.”), the first word for word and the second ours"
+        },
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "filch.chase-peeves-nothing",
+          "sound": "Peeves, whooshing away, cackling",
+          "text": [
+            "NOTHING! Ha haaa! Told you I wouldn't say nothing if you didn't say please! Ha ha! Haaaaaa!",
+            "Nothing! Nothing at all! Ha ha haaaaa!"
+          ],
+          "canon": "B1 ch9 L3299 (“NOTHING! Ha haaa! Told you I wouldn’t say nothing if you didn’t say please! Ha ha! Haaaaaa!” And they heard the sound of Peeves whooshing away and Filch cursing in rage), the first word for word and the second ours; B1 ch7 L2669 (zooming away, rattling coats of armor as he passed) for the armour in the cue"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-curses-peeves",
+          "sound": "Filch's curses going away down the stairs after him",
+          "text": [
+            "Peeves! PEEVES! I'll see the Headmaster hears of this!",
+            "That wretched poltergeist! One of these days, my sweet. One of these days."
+          ],
+          "canon": "ours, in his voice; he curses Peeves, never the boy (B1 ch9 L3299, Filch cursing in rage); comic"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "req 933 (b), Peeves joins the chase (Godric's pick on corridor-chase-ideas-1022, all four ideas, relayed 1.50 pm 22 October 2026; the design is docs/notes/2026-10-22-corridor-chase-ideas.md, idea 1); canon read in the canon tool, 22 October 2026: B1 ch9 L3289 to L3299 (Filch asks Peeves which way they went, Peeves will say nothing without “please” and then says nothing at all; the hidden students are saved) and B1 ch7 L2669 (Peeves zooms away, rattling armour as he passes); the hidden pass when Peeves started the chase, the partner of filch.chase-hidden, ours in the wording and never the Charms corridor's night, a poltergeist and a caretaker at their old quarrel; Filch is never cross with the boy"
     },
     {
       "id": "filch.catch-one",

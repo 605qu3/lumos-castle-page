@@ -852,7 +852,8 @@
         "chase = on",
         "hiding = yes",
         "norris_trust >= 3",
-        "norris_trust < 6"
+        "norris_trust < 6",
+        "chase_by != peeves"
       ],
       "who": [
         {
@@ -904,7 +905,8 @@
         "place = corridor",
         "chase = on",
         "hiding = yes",
-        "norris_trust >= 6"
+        "norris_trust >= 6",
+        "chase_by != peeves"
       ],
       "who": [
         {
