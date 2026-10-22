@@ -885,6 +885,62 @@
       "one_of": "stair-look-back",
       "weight": 7,
       "starts": []
+    },
+    {
+      "id": "stair.lee-tarantula-box",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = corridor",
+        "year = 1",
+        "time != night",
+        "days since lee_box_on >= 3"
+      ],
+      "who": [
+        {
+          "as": "knot",
+          "role": "voice",
+          "name": "a pupil in the crowd",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "a boy with dreadlocks among the older students, a box in his arms, a small knot of pupils crowding round him"
+      ],
+      "lines": [
+        {
+          "speaker": "knot",
+          "medium": "heard",
+          "key": "stair.lee-give-us-a-look",
+          "sound": "a pupil in the knot of older students, over the others' heads",
+          "text": [
+            "Give us a look, Lee, go on."
+          ],
+          "canon": "Godric's woven touch lee-tarantula-box on people-student-stock-1022 (22 October 2026, 7.23 pm, relayed by Fawkes): among the older students a boy with dreadlocks keeps a box a long hairy leg pokes out of, a small knot of pupils crowding round it; PS 6 (B1 ch6 L1826 to L1830, read in the canon tool, 22 October 2026: \"A boy with dreadlocks was surrounded by a small crowd.\" \"Give us a look, Lee, go on.\" \"The boy lifted the lid of a box in his arms, and the people around him shrieked and yelled as something inside poked out a long, hairy leg.\"; the tarantula is Lee Jordan's, L1968); year 1, in a corridor in plain view; PS 6 L1828, word for word"
+        }
+      ],
+      "starts": [
+        "stamp lee_box_on",
+        "set lee_box = on"
+      ],
+      "canon": "Godric's woven touch lee-tarantula-box on people-student-stock-1022 (22 October 2026, 7.23 pm, relayed by Fawkes): among the older students a boy with dreadlocks keeps a box a long hairy leg pokes out of, a small knot of pupils crowding round it; PS 6 (B1 ch6 L1826 to L1830, read in the canon tool, 22 October 2026: \"A boy with dreadlocks was surrounded by a small crowd.\" \"Give us a look, Lee, go on.\" \"The boy lifted the lid of a box in his arms, and the people around him shrieked and yelled as something inside poked out a long, hairy leg.\"; the tarantula is Lee Jordan's, L1968); year 1, in a corridor in plain view; now and then, by day, at most one visit in three days apart; the crowd is nobody's by name but Lee's"
+    },
+    {
+      "id": "stair.lee-lid",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap tarantula box",
+      "when": [
+        "place = corridor",
+        "lee_box = on"
+      ],
+      "show": [
+        "the boy lifts the lid of the box in his arms and a long, hairy leg pokes out; the pupils round him shriek and yell"
+      ],
+      "canon": "Godric's woven touch lee-tarantula-box on people-student-stock-1022 (22 October 2026, 7.23 pm, relayed by Fawkes): among the older students a boy with dreadlocks keeps a box a long hairy leg pokes out of, a small knot of pupils crowding round it; PS 6 (B1 ch6 L1826 to L1830, read in the canon tool, 22 October 2026: \"A boy with dreadlocks was surrounded by a small crowd.\" \"Give us a look, Lee, go on.\" \"The boy lifted the lid of a box in his arms, and the people around him shrieked and yelled as something inside poked out a long, hairy leg.\"; the tarantula is Lee Jordan's, L1968); year 1, in a corridor in plain view; tapped, the lid lifts and the leg pokes out (PS 6 L1830); a leg only, never the whole spider, nothing frightens the boy who taps"
     }
   ]
 }

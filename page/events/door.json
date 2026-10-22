@@ -921,7 +921,8 @@
         "set door_drawn = no",
         "set door_gap = no",
         "set door_holding = no",
-        "set lost_first_year = no"
+        "set lost_first_year = no",
+        "set lee_box = no"
       ]
     },
     {
