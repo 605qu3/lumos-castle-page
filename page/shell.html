@@ -160,7 +160,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=62"></script>
+<script src="castle-shell.js?v=63"></script>
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=14"></script>
 <script src="castle-events.js?v=39"></script>
@@ -2910,7 +2910,7 @@ var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
   ways: shell.ways.map(function (d) { return { id: d.id, to: d.to, built: !!d.built }; }),
   stands: shell.stands.map(function (s) { return s.name; }) };
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; }, toLocal: shell.toLocal,
+window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; }, toLocal: shell.toLocal, far: shell.far, renderer: renderer, panes: shell.panes,
   goTo: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; return d ? goTo(d) : false; },
   flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },

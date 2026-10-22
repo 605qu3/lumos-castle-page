@@ -1582,12 +1582,23 @@ function farView(F, M, toLocal, panes, paneMat) {
   /* a solid from a plan outline, z0 to z1 */
   function prism(pts, z0, z1, k) {
     var pos = [], n = pts.length;
+    if (holds(pts, z0, z1)) return null;                  /* the place's own mass: from inside it hides every view */
     for (var i = 0; i < n; i++) {
       var p = pts[i], q = pts[(i + 1) % n], a = V(p[0], p[1], z0), b = V(q[0], q[1], z0), c = V(q[0], q[1], z1), d = V(p[0], p[1], z1);
       pos.push(a, b, c, a, c, d);
     }
     var g = new THREE.BufferGeometry().setFromPoints(pos); g.computeVertexNormals();
     var m = add(g, k); m.material.side = THREE.DoubleSide; flat(shape(pts), z1, k); return m;
+  }
+  /* whether the eye (the place's middle at +1.35, the frame's 0, 1.35, 0) stands inside a solid's outline and height */
+  function holds(pts, z0, z1) {
+    var y0 = V(0, 0, z0).y, y1 = V(0, 0, z1).y, inside = false;
+    if (!(EYE > y0 && EYE < y1)) return false;
+    for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      var a = V(pts[i][0], pts[i][1], z0), b = V(pts[j][0], pts[j][1], z0);
+      if ((a.z > 0) !== (b.z > 0) && 0 < (b.x - a.x) * (0 - a.z) / (b.z - a.z) + a.x) inside = !inside;
+    }
+    return inside;
   }
   function rect(r) { return [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]]; }
   function circ(c, r, n) { var o = []; for (var i = 0; i < n; i++) { var t = i / n * Math.PI * 2; o.push([c[0] + r * Math.cos(t), c[1] + r * Math.sin(t)]); } return o; }
@@ -1641,7 +1652,7 @@ function farView(F, M, toLocal, panes, paneMat) {
       for (var i = 0; i < 48; i++) { var t = i / 48 * Math.PI * 2; oval.push([e[0] + e[2] * Math.cos(t), e[1] + e[3] * Math.sin(t)]); }
       flat(shape(oval), LAWN + 0.05, 'far-pitch');
       var outer = oval.map(function (p) { return [e[0] + (p[0] - e[0]) * (e[2] + 11) / e[2], e[1] + (p[1] - e[1]) * (e[3] + 11) / e[3]]; });
-      var st = prism(outer, LAWN, LAWN + 7, 'far-timber'); st.name = 'far-stands';
+      var st = prism(outer, LAWN, LAWN + 7, 'far-timber'); if (st) st.name = 'far-stands';
       [-1, 1].forEach(function (end) {
         [-6, 0, 6].forEach(function (dx, h) {
           var top = LAWN + (h === 1 ? 16 : 12), ft = [e[0] + dx, e[1] + end * (e[3] - 4)];
@@ -1691,13 +1702,25 @@ function farView(F, M, toLocal, panes, paneMat) {
   /* light: the day's sun from the south-west and its sky; the night's moon, low */
   var hemi = new THREE.HemisphereLight(0xffffff, 0x666655, 0.85), sun = new THREE.DirectionalLight(0xffffff, 0.75);
   sun.position.copy(V(-400, -500, 600)); scene.add(hemi); scene.add(sun);
-  var rt = new THREE.WebGLCubeRenderTarget(512, { generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
+  var rt = new THREE.WebGLCubeRenderTarget(512, { format: THREE.RGBAFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
   rt.texture.mapping = THREE.CubeRefractionMapping;
   var cam = new THREE.CubeCamera(0.5, 5000, rt);
-  cam.position.set(0, 1.35, 0); scene.add(cam);
+  cam.position.set(0, EYE, 0); scene.add(cam);
   var glass = new THREE.MeshBasicMaterial({ envMap: rt.texture, refractionRatio: 1.0, side: THREE.DoubleSide });
-  panes.forEach(function (p) { p.material = glass; });
+  /* refract() at ratio 1 passes the line of sight straight on only when the normal faces him; a pane whose normal
+     faces out (the shader does not turn it for a back face) would mirror the room's side instead, so turn each in */
+  panes.forEach(function (p) {
+    p.material = glass; p.updateMatrixWorld();
+    var w = new THREE.Vector3(), n = new THREE.Vector3(0, 0, 1);
+    p.getWorldPosition(w); n.transformDirection(p.matrixWorld);
+    if (n.x * w.x + n.z * w.z > 0) {
+      p.geometry = p.geometry.clone(); var a = p.geometry.attributes.normal;
+      for (var i = 0; i < a.count; i++) a.setXYZ(i, -a.getX(i), -a.getY(i), -a.getZ(i));
+    }
+  });
+  var mode = false;
   function draw(night) {
+    mode = !!night;
     scene.background = hex(night ? 'sky-night' : 'sky-day').convertSRGBToLinear();
     hemi.intensity = night ? 0.12 : 0.85; sun.intensity = night ? 0.08 : 0.75;
     var w = scene.getObjectByName('far-water'); if (w) w.material.color.copy(hex(night ? 'far-water-night' : 'far-water-day').convertSRGBToLinear());
@@ -1705,7 +1728,10 @@ function farView(F, M, toLocal, panes, paneMat) {
     cam.update(F.renderer, scene);
     F.renderer.toneMapping = tm;
   }
+  /* drawn at build the cube leaves parts of some faces unwritten (the sky above the hills read black); drawn again on
+     the first frame, by day or by night as the page has asked by then, it comes whole */
   draw(false);
+  requestAnimationFrame(function () { draw(mode); });
   return { scene: scene, cube: rt, glass: glass, night: draw };
 }
 })();
