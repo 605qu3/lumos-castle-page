@@ -902,6 +902,27 @@ var CUP = (function () {
   box(r[0] - 0.02, 63.9, r[0] + 0.22, 64.7, 1.57, 1.6, wood, 'cupboard-shelf');
   [64.0, 64.6].forEach(function (y) { box(r[0] - 0.02, y - 0.01, r[0] + 0.18, y + 0.01, 1.4, 1.57, ironC, 'cupboard-shelf-bracket'); });
   [67.1, 67.42].forEach(function (x) { g.add(besom([x, 64.62], [x, r[3] - 0.01], P, wood, kit.solid(0x7a6a48))); });
+  /* req 951 (c), Magic's 946 (Events' hall.cupboard-bucket, -bottle, -tin, page/events/hall.json, word for word): on the
+     shelf where Interiors' schedule puts them (docs/interiors/hall-cupboard.md, the shelf's row, cited), Mrs Skower's
+     bottle at y 64.3, its label a paler band, and the polish tin with the chamois over its lid, each 1 cm into the shelf;
+     the tin at y 64.08, in the brush and pan's place (not drawn), since at the schedule's 64.55 the open leaf hides it
+     from the stand (provisional, Interiors to confirm); a tap on the upturned bucket, the bottle or the tin, from the cupboard's stand while it stands open,
+     is the runtime's `hall-cupboard-bucket`, `-bottle`, `-tin`; the tin's line lifts the chamois back onto the shelf */
+  var sx = r[0] + 0.1, own = function (m, nm) { m.name = nm; m.userData.owner = 'hall-cupboard'; m.raycast = function () {}; g.add(m); return m; };
+  var bot = own(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.15, 14), kit.solid(0x5b6650, { roughness: 0.3 })), 'cupboard-skower-bottle');
+  bot.position.copy(P(sx, 64.3, 1.59 + 0.075));
+  own(new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.03, 0.06, 12), bot.material), 'cupboard-skower-neck').position.copy(P(sx, 64.3, 1.74 + 0.03));
+  own(new THREE.Mesh(new THREE.CylinderGeometry(0.0365, 0.0365, 0.07, 14), kit.solid(0xb7ad94)), 'cupboard-skower-label').position.copy(P(sx, 64.3, 1.59 + 0.07));
+  var tinP = own(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.045, 18), tin), 'cupboard-polish-tin');
+  tinP.position.copy(P(sx, 64.08, 1.59 + 0.0225));
+  var cham = own(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.008, 0.13), kit.solid(0xb59a62, { roughness: 0.95 })), 'cupboard-chamois');
+  cham.position.copy(P(sx, 64.08, 1.59 + 0.049)); cham.rotation.y = 0.3;
+  var taps = [['hall-cupboard-bucket', ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, 0.17, 0.36], ['hall-cupboard-bottle', sx, 64.3, 0.1, 0.24],
+              ['hall-cupboard-tin', sx, 64.08, 0.08, 0.09]].map(function (t) {
+    var m = new THREE.Mesh(new THREE.BoxGeometry(t[3] * 2, t[4], t[3] * 2), new THREE.MeshBasicMaterial({ visible: false }));
+    m.position.copy(P(t[1], t[2], (t[0] === 'hall-cupboard-bucket' ? 0 : 1.59) + t[4] / 2)); m.name = t[0] + '-hit'; m.userData.cupTap = t[0];
+    m.userData.owner = 'hall-cupboard'; m.visible = false; shell.group.add(m); return m;
+  });
   /* the grains: points along the crack, dull gold and matte, no additive blend; one hit strip over them for the tap */
   var N = 110, pos = new Float32Array(N * 3), home = [], gtex = (function () {
     var c = document.createElement('canvas'); c.width = c.height = 32;
@@ -922,15 +943,19 @@ var CUP = (function () {
   hit.name = 'grains-hit'; hit.userData.grains = true;
   g.visible = false; shell.group.add(g); shell.group.add(hit); hit.visible = false;
   var seeds = home.map(function () { return Math.random(); });
-  return { d: d, g: g, hit: hit, pts: pts, home: home, seeds: seeds, up: up, open: 0, target: 0, run: -1, first: true, grains: true,
+  return { d: d, g: g, hit: hit, pts: pts, home: home, seeds: seeds, up: up, open: 0, target: 0, run: -1, first: true, grains: true, taps: taps, cham: cham, chamAt: P(sx + 0.03, 63.96, 1.59 + 0.0085),
            angle: Math.sign(d.hinge.th || 1) * 1.55 };
 })();
+var CUP_BUCKET = 'the upturned bucket giving a hollow knock under his knuckles',
+    CUP_TIN = 'the chamois lifted off the polish tin: nearly empty, smelling of beeswax',
+    CUP_LINES = { 'hall-cupboard-bucket': CUP_BUCKET, 'hall-cupboard-bottle': "a bottle of Mrs. Skower's All-Purpose Magical Mess Remover on the shelf, its label faded", 'hall-cupboard-tin': CUP_TIN };
 function cupSet(open, now, grains) {
   if (!CUP) return;
   CUP.target = open ? 1 : 0;
   if (now) CUP.open = CUP.target;
   if (grains !== undefined) CUP.grains = grains;
   CUP.pts.visible = CUP.grains;
+  CUP.taps.forEach(function (m) { m.visible = !!open; });   /* req 951 (c): the shelf's things answer only with the door open */
   if (open) { CUP.g.visible = true; CUP.hit.visible = CUP.grains; shakes = shakes.filter(function (x) { return x.m !== CUP.d.mesh; }); }
 }
 function cupRun() { if (CUP && CUP.grains && CUP.open > 0.9) CUP.run = 0; }
@@ -1631,6 +1656,11 @@ thingCues[CURE_MISS[0]] = function () { showLines([{ medium: 'seen', sound: CURE
 thingCues[CURE_MISS[1]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[1], on: function () { potLiquid(null); } }]); };
 thingCues[CURE_MISS[2]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[2], on: function () { potLiquid(0x8a9a92, 0.45); } }]); };
 thingCues[CURE_RIGHT] = function () { showLines([{ medium: 'seen', sound: CURE_RIGHT, on: function () { potLiquid(0x4f8f3a, 0.85); } }]); };
+/* req 951 (c): the cupboard's bucket and tin (CUP_LINES above, by the cupboard) */
+thingCues[CUP_BUCKET] = function () { showLines([{ medium: 'heard', sound: CUP_BUCKET }]); };
+thingCues[CUP_TIN] = function () {   /* the chamois laid back on the shelf, folded, as the line shows */
+  showLines([{ medium: 'seen', sound: CUP_TIN, on: function () { if (CUP) { CUP.cham.position.copy(CUP.chamAt); CUP.cham.rotation.y = 0; CUP.cham.scale.set(0.45, 2, 0.6); } } }]);
+};
 /* a glazed lantern 0.3 high and 0.3 across, its foot at `at` (the History lamps' kind, Interiors' schedules): an iron
    foot and cap, a glass chimney, the flame its own light only. Returns the flame, unlit; one of two sizes, lit or low */
 function lantern(g, at, iron, glass) {
@@ -3753,6 +3783,11 @@ function tap(cx, cy) {
          tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
   if (GPLAY && GPLAY.tap(raycaster, hits.length ? hits[0].distance : null)) { kit.tapped(true); return; }   /* req 922, the giant board */
+  if (hit && hit.userData.cupTap && CUP) {   /* req 951 (c), the bucket, the bottle and the tin, from the cupboard's stand */
+    if (here !== CUP.d.stand && here !== placeOf(CUP.d).s) acted = goTo(CUP.d);
+    else { lineDoor = CUP.d; if (events) events.tap(hit.userData.cupTap); else { var cl = CUP_LINES[hit.userData.cupTap]; if (thingCues[cl]) thingCues[cl](); else showLines([{ medium: 'seen', sound: cl }]); } acted = true; }
+    kit.tapped(acted); return;
+  }
   if (hit && hit.userData.grains && CUP) {   /* B21's grains, from the cupboard's stand while it stands open */
     if (here !== CUP.d.stand && here !== placeOf(CUP.d).s) acted = goTo(CUP.d);
     else { lineDoor = CUP.d; if (events) events.tap('hall-cupboard-grains'); else if (Q.get('grains') === 'run') cupRun(); acted = true; }
