@@ -162,8 +162,9 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/panelling.js?v=2"></script>
 <script src="castle-shell.js?v=69"></script>
 <script src="shell-w5b.js?v=16"></script>
-<script src="shell-w5a.js?v=16"></script>
+<script src="shell-w5a.js?v=17"></script>
 <script src="castle-events.js?v=39"></script>
+<script src="castle-sky.js?v=1"></script>
 <script src="design/drawn.js?v=1"></script>
 <script src="design/carving.js?v=1"></script>
 <script src="design/lumos-icon.js?v=1"></script>
@@ -2399,6 +2400,214 @@ function updateStoneThings(dt, t) {
     if (s <= 0.02) stoneCurls(false); else { STONE.curls.scale.set(1, s, 1); STONE.curls.position.set(0, (1 - s) * STONE.fy, 0); }
   }
 }
+/* req 926 (Magic's 918, docs/magic/rooms.md, *The Astronomy drum's chart room and night books*; Events' strings in
+   page/events/astronomy-rooms.json, req 924 widened by 925, word for word). The chart room on 4: five oak beams across
+   the round room every 2.4 m on stone corbels, and between them the ceiling bewitched to the real sky over his home at
+   this hour, the same call as the top's telescopes, CastleSky.at(date, home()) (req 622): the stars to magnitude 5.5,
+   the five planets, the moon in its phase, the zenith over the room's middle and the horizon at the wall, each star
+   over the part of the room it stands over outside. Asked again every five minutes; by day (a test) tonight's sky at
+   eleven. Unlit and dim: it lights nothing. On a cloudy night the castle's cloud drifts across it. The night books on 3:
+   the open log's two pages in ink and wash, moving as the table says: the month of moons (a round of about half a
+   minute, a breath's pause at the full, a comet crossing the corner once a round), a planet's loop, an eclipse; the
+   tap `night-log` turns it. Still while the room is shut. ?sky=on for checks; lumosGreybox.astro. */
+var ASTRO = { on: PLACE === 'astronomy-chart-room' || PLACE === 'astronomy-night-books', page: 'moons', turn: 0, live: !events, t: 0, sky: null, cloud: null, cloudOn: false, log: null, at: 0 };
+var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars and the moon where they really stand tonight, the beams crossing it with the sky between them',
+    ASTRO_SKY_DIM = "the sky's dim light, the stars' and the moon's own, faint on the long table's charts",
+    ASTRO_CLOUD = "the stars coming and going in the castle's own cloud across the ceiling",
+    ASTRO_MOONS = "the open log on the sloped desk, its drawn moon going through the phases the class logged, a slow round of about half a minute with a breath's pause at the full",
+    ASTRO_COMET = "once a round a small comet crossing the page's corner, its tail an inked stroke, and gone",
+    ASTRO_PLANET = "the open log's page turned to a planet's slow loop against the stars, drawn over weeks and creeping through its ink and wash, doubling back and going on",
+    ASTRO_ECLIPSE = "the open log's page turned to an eclipse of the moon, the drawn moon darkening and clearing in ink and wash",
+    ASTRO_TO = { "the log's page turning to a planet's slow loop against the stars, inked over weeks": 'planet',
+      "the log's page turning to an eclipse of the moon, the drawn moon darkening and clearing": 'eclipse',
+      "the log's page turning back to the class's month of moons": 'moons' };
+(function () {
+  if (!ASTRO.on) return;
+  var z0 = shell.place.floor, P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
+  function own(m, tapName) { m.userData.owner = PLACE; if (tapName) m.userData.tap = tapName; else m.raycast = function () {}; return m; }
+  function fan(cx, cy, R, h, n, mat, name) {   /* a disc in the site's plan at height h, facing down, its uv the plan's */
+    var pos = [], uv = [];
+    for (var i = 0; i < n; i++) {
+      var a0 = i / n * 6.2832, a1 = (i + 1) / n * 6.2832;
+      [[0, 0], [Math.cos(a1), Math.sin(a1)], [Math.cos(a0), Math.sin(a0)]].forEach(function (p) {
+        var v = P(cx + p[0] * R, cy + p[1] * R, h); pos.push(v.x, v.y, v.z); uv.push(0.5 + p[0] / 2, 0.5 + p[1] / 2);
+      });
+    }
+    var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    var m = new THREE.Mesh(g, mat); m.name = name; return m;
+  }
+  if (PLACE === 'astronomy-chart-room') {
+    var C = [80.0, 77.0], R = 6.7, CEIL = shell.place.ceiling != null ? shell.place.ceiling - z0 : 4.5;
+    /* the beams, east to west, 0.22 by 0.28, each 1 cm into the flat ceiling and 6 cm into the wall at both ends, on
+       stone corbels 0.3 by 0.3 by 0.36 bearing 1 cm into the beam above and 6 cm into the wall */
+    var oak = kit.solid(0x55402e), stone = kit.solid(0x605d51), gb = new THREE.Group(); gb.name = 'astronomy-chart-beams'; scene.add(gb);
+    [-4.8, -2.4, 0, 2.4, 4.8].forEach(function (dy, i) {
+      var half = Math.sqrt(R * R - dy * dy) + 0.06, y = C[1] + dy;
+      var b = new THREE.Mesh(new THREE.BoxGeometry(2 * half, 0.28, 0.22), oak); b.position.copy(P(C[0], y, CEIL + 0.01 - 0.14)); b.name = 'astronomy-chart-beam-' + i; gb.add(own(b));
+      [-1, 1].forEach(function (s) {
+        var c = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.36, 0.3), stone); c.position.copy(P(C[0] + s * (half - 0.15), y, CEIL - 0.28 + 0.01 - 0.18)); c.name = 'astronomy-chart-corbel-' + i + (s < 0 ? 'w' : 'e'); gb.add(own(c));
+      });
+    });
+    /* the celestial globe on its stand (shell-w5a.js; Interiors' look note): a round 0.5 across, pale blue paper with
+       its stars in faded gilt and the ecliptic, centre at 1.14 so its foot is 1 cm into the stand's top at 0.9; the
+       brass meridian ring upright north to south and the horizon ring level, each bearing 5 mm into the globe's skin */
+    var gc = document.createElement('canvas'); gc.width = 512; gc.height = 256;
+    var gx = gc.getContext('2d'), gs = 5, grnd = function () { gs = (gs * 16807) % 2147483647; return gs / 2147483647; };
+    gx.fillStyle = '#93a7bc'; gx.fillRect(0, 0, 512, 256);
+    gx.fillStyle = 'rgba(200,170,96,0.9)'; for (var gk = 0; gk < 140; gk++) { gx.beginPath(); gx.arc(grnd() * 512, 20 + grnd() * 216, 1 + grnd() * 2.2, 0, 6.2832); gx.fill(); }
+    gx.strokeStyle = 'rgba(70,60,40,0.45)'; gx.lineWidth = 2; gx.beginPath(); for (var gu = 0; gu <= 512; gu += 8) gx[gu ? 'lineTo' : 'moveTo'](gu, 128 - 52 * Math.sin(gu / 512 * 6.2832)); gx.stroke();
+    var gtex = new THREE.CanvasTexture(gc); gtex.encoding = THREE.sRGBEncoding;
+    var globe = new THREE.Mesh(new THREE.SphereGeometry(0.25, 32, 20), new THREE.MeshStandardMaterial({ map: gtex, roughness: 0.7, metalness: 0 }));
+    globe.position.copy(P(77.5, 78.4, 1.14)); globe.rotation.z = 0.41; globe.name = 'astronomy-chart-globe'; gb.add(own(globe));
+    var brass = new THREE.MeshStandardMaterial({ color: kit.col(0xa8862e), roughness: 0.4, metalness: 0.7 });
+    var mer = new THREE.Mesh(new THREE.TorusGeometry(0.265, 0.012, 8, 48), brass); mer.position.copy(globe.position); mer.rotation.y = Math.PI / 2; mer.name = 'astronomy-chart-globe-meridian'; gb.add(own(mer));
+    var hor = new THREE.Mesh(new THREE.TorusGeometry(0.29, 0.014, 8, 48), brass); hor.position.copy(globe.position); hor.rotation.x = Math.PI / 2; hor.name = 'astronomy-chart-globe-horizon'; gb.add(own(hor));
+    [-1, 1].forEach(function (s) {   /* the horizon ring's two posts down to the stand's foot ring at 0.9 */
+      var post = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.26, 6), brass); post.position.copy(P(77.5 + s * 0.29, 78.4, 1.02)); post.name = 'astronomy-chart-globe-post'; gb.add(own(post));
+    });
+    var foot = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.02, 0.03), brass); foot.position.copy(P(77.5, 78.4, 0.905)); foot.name = 'astronomy-chart-globe-foot'; gb.add(own(foot));
+    /* the sky: a canvas the plan's way up (north at its top), on a disc 5 mm under the flat ceiling, 5 cm into the wall */
+    var cv = document.createElement('canvas'); cv.width = cv.height = 2048;
+    var tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4;
+    var disc = fan(C[0], C[1], R + 0.05, CEIL - 0.005, 96, new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }), 'astronomy-chart-sky');
+    scene.add(own(disc)); ASTRO.sky = { cv: cv, tex: tex, mesh: disc, R: R, cat: null };
+    /* the castle's cloud: soft grey drifts on a second disc a centimetre under, turning slowly */
+    var cc = document.createElement('canvas'); cc.width = cc.height = 512;
+    var cx2 = cc.getContext('2d'), seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    for (var k = 0; k < 70; k++) {
+      var x = rnd() * 512, y = rnd() * 512, r = 30 + rnd() * 70, gr = cx2.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, 'rgba(58,62,74,0.55)'); gr.addColorStop(1, 'rgba(58,62,74,0)'); cx2.fillStyle = gr;
+      [-512, 0, 512].forEach(function (ox) { [-512, 0, 512].forEach(function (oy) {   /* drawn wrapped, so the tile repeats with no seam */
+        cx2.save(); cx2.translate(ox, oy); cx2.fillRect(x - r, y - r, 2 * r, 2 * r); cx2.restore();
+      }); });
+    }
+    var ctex = new THREE.CanvasTexture(cc); ctex.encoding = THREE.sRGBEncoding; ctex.wrapS = ctex.wrapT = THREE.RepeatWrapping; ctex.repeat.set(2, 2);
+    var cloud = fan(C[0], C[1], R + 0.05, CEIL - 0.015, 96, new THREE.MeshBasicMaterial({ map: ctex, transparent: true, depthWrite: false, side: THREE.DoubleSide }), 'astronomy-chart-cloud');
+    cloud.visible = false; scene.add(own(cloud)); ASTRO.cloud = cloud;
+    fetch('sky/stars.json').then(function (r) { return r.json(); }).then(function (cat) { ASTRO.sky.cat = cat; astroSky(); }).catch(function () { astroSky(); });
+    astroSky();
+    cloudShow(false); disc.visible = ASTRO.live || Q.get('sky') === 'on';
+    if (Q.get('weather') === 'cloudy' && !events) cloudShow(true);
+  }
+  if (PLACE === 'astronomy-night-books') {
+    /* the open log's two pages, a millimetre over the paper (Interiors' place, shell-w5a.js), its tap `night-log` */
+    var lc = document.createElement('canvas'); lc.width = 1024; lc.height = 300;
+    var ltex = new THREE.CanvasTexture(lc); ltex.encoding = THREE.sRGBEncoding; ltex.anisotropy = 4;
+    var A = P(81.0, 75.51, 1.061), B = P(81.6, 75.68, 1.061);
+    var pg = new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(B.x - A.x), Math.abs(B.z - A.z)), new THREE.MeshStandardMaterial({ map: ltex, roughness: 0.95, metalness: 0 }));
+    pg.rotation.x = -Math.PI / 2; pg.position.copy(A).add(B).multiplyScalar(0.5); pg.name = 'astronomy-night-log';
+    shell.group.add(own(pg, 'night-log'));
+    ASTRO.log = { cv: lc, tex: ltex, mesh: pg };
+    astroLog(0);
+  }
+})();
+function cloudShow(on) { ASTRO.cloudOn = on; if (ASTRO.cloud) ASTRO.cloud.visible = on && (!ASTRO.sky || ASTRO.sky.mesh.visible); return false; }
+function astroSky() {   /* the real sky over home() now; by day tonight's at eleven */
+  var S = ASTRO.sky; if (!S || !window.CastleSky) return;
+  var home = events && events.home ? events.home() : { lat: 42, lon: -75 }, when = new Date(), sky = CastleSky.at(when, home);
+  if (!sky.sun.dark) { when = new Date(when.getFullYear(), when.getMonth(), when.getDate(), 23, 0, 0); sky = CastleSky.at(when, home); }
+  var c = S.cv.getContext('2d'), W = S.cv.width, h = W / 2;
+  function at(alt, az) { var r = (90 - alt) / 90 * h, a = az * Math.PI / 180; return [h + Math.sin(a) * r, h - Math.cos(a) * r]; }
+  var base = (window.CASTLE_TONES && CASTLE_TONES.surfaces['sky-night'] || {}).hex || '#10141f';
+  c.fillStyle = base; c.fillRect(0, 0, W, W);
+  var gr = c.createRadialGradient(h, h, 0, h, h, h); gr.addColorStop(0, 'rgba(0,0,0,0.25)'); gr.addColorStop(1, 'rgba(40,46,64,0.35)'); c.fillStyle = gr; c.fillRect(0, 0, W, W);
+  (S.cat ? CastleSky.stars(sky, S.cat, 5.5) : []).forEach(function (s) {
+    var p = at(s.alt, s.az), r = Math.max(1.2, 5.2 - s.mag * 0.75), a = Math.max(0.28, Math.min(0.85, 0.95 - s.mag * 0.11));
+    var tint = s.bv > 1 ? '255,214,170' : s.bv > 0.4 ? '255,240,215' : '215,226,255';
+    c.fillStyle = 'rgba(' + tint + ',' + a + ')'; c.beginPath(); c.arc(p[0], p[1], r, 0, 6.2832); c.fill();
+  });
+  sky.planets.forEach(function (pl) {
+    if (pl.alt <= 0) return;
+    var p = at(pl.alt, pl.az); c.fillStyle = 'rgba(255,236,196,0.85)'; c.beginPath(); c.arc(p[0], p[1], Math.max(3, 6 - pl.mag), 0, 6.2832); c.fill();
+  });
+  if (sky.moon.alt > 0) {   /* the moon a little larger than true, its bright side toward the sun */
+    var m = at(sky.moon.alt, sky.moon.az), su = at(Math.max(-60, sky.sun.alt), sky.sun.az), dir = Math.atan2(su[1] - m[1], su[0] - m[0]);
+    inkMoon(c, m[0], m[1], 26, sky.moon.lit, dir, 'rgba(232,228,212,0.9)', 'rgba(40,44,58,0.85)');
+  }
+  S.tex.needsUpdate = true; ASTRO.at = 0; ASTRO.when = when; ASTRO.moon = sky.moon;
+}
+function inkMoon(c, x, y, r, lit, dir, light, dark) {   /* a moon lit `lit` (0 to 1), its bright limb toward `dir` */
+  c.save(); c.translate(x, y); c.rotate(dir);
+  c.fillStyle = dark; c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.fill();
+  var e = Math.abs(1 - 2 * lit) * r;
+  c.fillStyle = light; c.beginPath(); c.arc(0, 0, r, -Math.PI / 2, Math.PI / 2, false);
+  c.ellipse(0, 0, e, r, 0, Math.PI / 2, -Math.PI / 2, lit < 0.5); c.fill();
+  c.restore();
+}
+function astroLog(t) {   /* the open log's spread: left page and right, in ink and wash, at time t of its round */
+  var L = ASTRO.log; if (!L) return;
+  var c = L.cv.getContext('2d'), W = 1024, H = 300, INK = '#2a2119', WASH = 'rgba(64,84,112,0.28)';
+  c.fillStyle = '#d6c9a4'; c.fillRect(0, 0, W, H);
+  var gg = c.createLinearGradient(482, 0, 542, 0); gg.addColorStop(0, 'rgba(90,70,40,0)'); gg.addColorStop(0.5, 'rgba(90,70,40,0.3)'); gg.addColorStop(1, 'rgba(90,70,40,0)'); c.fillStyle = gg; c.fillRect(482, 0, 60, H);
+  c.strokeStyle = 'rgba(120,96,60,0.25)'; c.lineWidth = 1;
+  for (var ln = 40; ln < H - 20; ln += 22) { c.beginPath(); c.moveTo(30, ln); c.lineTo(482, ln); c.moveTo(542, ln); c.lineTo(994, ln); c.stroke(); }
+  c.strokeStyle = INK; c.fillStyle = INK; c.lineWidth = 1.5;
+  var pg = ASTRO.page, seed = 3, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  if (pg === 'moons') {
+    for (var i = 0; i < 28; i++) {   /* the month the class logged, night by night, still */
+      var x = 62 + (i % 7) * 62, y = 62 + Math.floor(i / 7) * 62, lit = (1 - Math.cos(i / 28 * 6.2832)) / 2;
+      c.beginPath(); c.arc(x, y, 18, 0, 6.2832); c.stroke();
+      inkMoon(c, x, y, 17, lit, i < 14 ? 0 : Math.PI, 'rgba(214,201,164,1)', 'rgba(52,70,98,0.5)');
+    }
+    var R0 = 30, u = (t % R0) / R0, q = u < 0.45 ? u / 0.45 * 0.5 : u < 0.55 ? 0.5 : 0.5 + (u - 0.55) / 0.45 * 0.5;   /* the pause at the full */
+    var lt = (1 - Math.cos(q * 6.2832)) / 2;
+    c.beginPath(); c.arc(768, 150, 92, 0, 6.2832); c.stroke();
+    inkMoon(c, 768, 150, 90, lt, q < 0.5 ? 0 : Math.PI, 'rgba(226,214,180,1)', 'rgba(52,70,98,0.55)');
+    if (u > 0.68 && u < 0.86) {   /* the comet across the top right corner, its tail an inked stroke */
+      var v = (u - 0.68) / 0.18, cx = 990 - v * 200, cy = 18 + v * 60;
+      c.lineWidth = 1; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + 46, cy - 14); c.stroke();
+      c.lineWidth = 0.6; c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + 38, cy - 20); c.stroke();
+      c.beginPath(); c.arc(cx, cy, 3, 0, 6.2832); c.fill();
+    }
+  } else if (pg === 'planet') {
+    for (var s0 = 0; s0 < 60; s0++) { c.beginPath(); c.arc(40 + rnd() * 944, 30 + rnd() * 240, 1 + rnd() * 2, 0, 6.2832); c.fill(); }
+    var P0 = 24, up = Math.min(1, (t % P0) / (P0 * 0.85));   /* the loop inked night by night, creeping, then held */
+    function loop(s) { return [110 + 800 * s - 210 * Math.sin(6.2832 * (s - 0.5)), 170 - 60 * Math.cos(6.2832 * (s - 0.5))]; }
+    c.fillStyle = WASH; c.beginPath(); for (var k = 0; k <= 80; k++) { var lp = loop(k / 80); c[k ? 'lineTo' : 'moveTo'](lp[0], lp[1] + 6); } c.lineWidth = 10; c.strokeStyle = WASH; c.stroke();
+    c.fillStyle = INK; for (var n = 0; n <= 40 * up; n++) { var d = loop(n / 40); c.beginPath(); c.arc(d[0], d[1], 3.2, 0, 6.2832); c.fill(); }
+    var e2 = loop(up); c.beginPath(); c.arc(e2[0], e2[1], 7, 0, 6.2832); c.fill();
+  } else {
+    for (var j = 0; j < 7; j++) { var ex = 70 + j * 62; c.strokeStyle = INK; c.beginPath(); c.arc(ex, 150, 22, 0, 6.2832); c.stroke(); eclipseInk(c, ex, 150, 21, j / 6); }
+    var E0 = 24, w = (t % E0) / E0, f = w < 0.1 ? 0 : w < 0.45 ? (w - 0.1) / 0.35 * 0.5 : w < 0.55 ? 0.5 : w < 0.9 ? 0.5 + (w - 0.55) / 0.35 * 0.5 : 1;
+    c.strokeStyle = INK; c.beginPath(); c.arc(768, 150, 92, 0, 6.2832); c.stroke(); eclipseInk(c, 768, 150, 90, f);
+  }
+  if (ASTRO.turn > 0) { c.fillStyle = 'rgba(214,201,164,' + Math.min(1, ASTRO.turn * 2) + ')'; c.fillRect(0, 0, W, H); }
+  L.tex.needsUpdate = true;
+}
+function eclipseInk(c, x, y, r, f) {   /* the full moon with the earth's shadow across it, f 0 to 1 */
+  c.save(); c.beginPath(); c.arc(x, y, r, 0, 6.2832); c.clip();
+  c.fillStyle = 'rgba(226,214,180,1)'; c.fillRect(x - r, y - r, 2 * r, 2 * r);
+  c.fillStyle = 'rgba(110,52,36,0.55)'; c.beginPath(); c.arc(x + (1 - 2 * f) * r * 2.4, y - r * 0.15, r * 1.3, 0, 6.2832); c.fill();
+  c.restore();
+}
+function astroShown(shown) {
+  if (!ASTRO.on) return [];
+  var drawn = [];
+  if (ASTRO.sky) {
+    ASTRO.live = shown.indexOf(ASTRO_SKY) >= 0 || !events || Q.get('sky') === 'on';
+    ASTRO.sky.mesh.visible = ASTRO.live; cloudShow(shown.indexOf(ASTRO_CLOUD) >= 0 || (!events && Q.get('weather') === 'cloudy'));
+    drawn = [ASTRO_SKY, ASTRO_SKY_DIM, ASTRO_CLOUD];
+  }
+  if (ASTRO.log) {
+    var pg = shown.indexOf(ASTRO_PLANET) >= 0 ? 'planet' : shown.indexOf(ASTRO_ECLIPSE) >= 0 ? 'eclipse' : shown.indexOf(ASTRO_MOONS) >= 0 ? 'moons' : null;
+    ASTRO.live = !!pg || !events; if (pg && pg !== ASTRO.page) { ASTRO.page = pg; ASTRO.t = 0; }
+    drawn = [ASTRO_MOONS, ASTRO_COMET, ASTRO_PLANET, ASTRO_ECLIPSE];
+  }
+  return drawn.filter(function (s) { return shown.indexOf(s) >= 0; });
+}
+Object.keys(ASTRO_TO).forEach(function (line) {
+  thingCues[line] = function () { if (ASTRO.log) { ASTRO.page = ASTRO_TO[line]; ASTRO.turn = 0.6; ASTRO.t = 0; } showLines([{ medium: 'seen', sound: line }]); };
+});
+function updateAstro(dt) {
+  if (!ASTRO.on) return;
+  if (ASTRO.sky && (ASTRO.at += dt) > 300) astroSky();
+  if (ASTRO.cloud && ASTRO.cloud.visible) { ASTRO.cloud.material.map.offset.x += dt * 0.004; ASTRO.cloud.material.map.offset.y += dt * 0.0015; }
+  if (ASTRO.log) {
+    if (ASTRO.live) ASTRO.t += dt;
+    if (ASTRO.turn > 0) ASTRO.turn = Math.max(0, ASTRO.turn - dt);
+    if ((ASTRO.frame = (ASTRO.frame || 0) + dt) > 1 / 12) { ASTRO.frame = 0; astroLog(ASTRO.live ? ASTRO.t : 15); }
+  }
+}
 thingCues[STAFF_COALS] = function () { if (!STAFF.on) return; staffMove.dip = 1.4; showLines([{ medium: 'heard', sound: STAFF_COALS }]); };
 thingCues[STAFF_CUSHION] = function () {
   if (!W1.dent) return; staffMove.dent = 6; showLines([{ medium: 'seen', sound: STAFF_CUSHION }]);
@@ -2829,7 +3038,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -2989,6 +3198,10 @@ function tap(cx, cy) {
     if (ch.length && (!hits.length || ch[0].distance <= hits[0].distance + 0.05)) { events.tap('corbel'); kit.tapped(true); return; }
   }
   if (events && hit && CADOGAN && (hit === CADOGAN.frame || hit === CADOGAN.ground)) { CADOGAN.taps++; events.tap('cadogan'); kit.tapped(true); return; }   /* req 802 */
+  if (hit && hit.userData.tap === 'night-log') {   /* req 926, the open log; with no runtime it turns by itself */
+    if (events) events.tap('night-log'); else { ASTRO.page = { moons: 'planet', planet: 'eclipse', eclipse: 'moons' }[ASTRO.page]; ASTRO.turn = 0.6; ASTRO.t = 0; }
+    kit.tapped(true); return;
+  }
   if (events && hit && hit.userData.bottle) { events.tap(hit.userData.bottle); kit.tapped(true); return; }   /* req 920, the seven bottles */
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
@@ -3093,6 +3306,7 @@ function frame() {
   updateStaff(dt);
   updateStone(dt);
   updateStoneThings(dt, clock.elapsedTime);
+  updateAstro(dt);
   if (events && events.tick) events.tick(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
@@ -3349,6 +3563,10 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return STONE.on ? { keys: STONE.keys.length, battered: !!STONE.battered, flames: STONE.flames.length, rise: STONE.rise,
       curls: !!STONE.curls, bottles: shell.group.children.filter(function (m) { return m.userData.bottle; }).length / 2,
       blackTappable: !!(STONE.on2 && tappables.indexOf(STONE.on2.mesh) >= 0), drawn: d.length } : null; },
+  /* req 926: the chart room's sky and the night log as they stand; a cue's line passed in plays it */
+  astro: function (shown, cue) { var d = shown ? astroShown(shown) : []; if (cue) cueTable[cue]();
+    return ASTRO.on ? { sky: !!(ASTRO.sky && ASTRO.sky.mesh.visible), stars: !!(ASTRO.sky && ASTRO.sky.cat), cloud: !!(ASTRO.cloud && ASTRO.cloud.visible),
+      when: ASTRO.when ? ASTRO.when.toString() : null, moon: ASTRO.moon || null, page: ASTRO.page, live: ASTRO.live, log: !!ASTRO.log, drawn: d.length } : null; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 })();
 </script>

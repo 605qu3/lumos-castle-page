@@ -1335,7 +1335,7 @@ window.SHELL_W5A = {
    page are Magic's (req 918), drawn when cast; here the room's ceiling is the beams and the log lies open, still. */
 (function (T, MT) {
   MT.blanket = 0x6e6a64; MT.blanket2 = 0x85807a; MT.scarlet = 0x7a1c1c; MT.gold = 0xa8862e; MT.emerald = 0x2a5a34;
-  MT.sapphire = 0x2a3a6a; MT.globe = 0x24324a; MT.redglass = 0x6e1a14; MT.tallow = 0xcfc2a0;
+  MT.sapphire = 0x2a3a6a; MT.globe = 0xa9b9c6; MT.redglass = 0x6e1a14; MT.tallow = 0xcfc2a0;
   var C = [80.0, 77.0];
   function cb(cx, cy, lx, ly, za, zb, m) { return ['b', cx - lx / 2, cy - ly / 2, za, cx + lx / 2, cy + ly / 2, zb, m]; }
   function lamp(it, x, y) {        /* an iron lamp on a tall stand, the lamp at 1.6, unlit */
@@ -1488,8 +1488,8 @@ window.SHELL_W5A = {
     [0.2, 0.36, 0.52, 0.68].forEach(function (h) { it.push(cb(82.2, 75.652, 1.3, 0.024, h, h + 0.012, 'dark')); });
     it.push(cb(82.2, 75.675, 1.2, 0.15, 0.72, 0.84, 'oak'), cb(82.2, 75.68, 1.1, 0.04, 0.83, 0.833, 'paper'));     /* the drawer a hand open */
     it.push(['y', 77.5, 78.4, 0.2, 0, 0.04, 'wood'], ['y', 77.5, 78.4, 0.03, 0.04, 0.9, 'wood']);              /* the globe on its stand */
-    [[0.9, 0.95, 0.17], [0.95, 1.02, 0.25], [1.02, 1.1, 0.3], [1.1, 1.17, 0.25], [1.17, 1.2, 0.15]].forEach(function (g) { it.push(['y', 77.5, 78.4, g[2], g[0], g[1], 'globe']); });
-    it.push(cb(77.5, 78.4, 0.66, 0.02, 1.04, 1.06, 'brass'));                                                       /* its meridian */
+    /* req 926 (Interiors' look note, 12.49 pm: the flat dark rings read as a shaded lamp): the globe itself, a true round
+       0.5 across in its brass meridian and horizon rings, is drawn in shell.html (req 926's block), its foot on this stand */
     it.push(['t', 80.0, 73.9, 80.6, 74.3, 0.7, 'oak']);                                                             /* the tray */
     for (var k = 0; k < 6; k++) it.push(cb(80.3, 73.97 + k * 0.055, 0.5, 0.045, 0.7 + (k % 2) * 0.04, 0.745 + (k % 2) * 0.04, 'paper'));
     lamp(it, 79.4, 79.3);
