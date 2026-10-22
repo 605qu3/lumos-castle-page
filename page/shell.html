@@ -3894,16 +3894,71 @@ function updateFilch(dt) {
 
 /* v153: the giant chessboard's floor, "a huge chessboard" (PS 16 L5890): eight squares of 2.0 each way from x 93 and
    y 47 (the model's stone-chess-chamber), dark and pale stone, each 2 cm proud of the floor and bearing 1 cm into it;
-   the pieces and the game are Magic's (reqs 904, 912) */
+   the pieces and the game are Magic's (reqs 904, 912).
+   The hundred-twelfth: play runs east to west, as the chamber's doors say (the boys come in by the keys' door on the
+   east "behind the black chessmen", L5890; the way on is the arch on the west "behind the white side"), so the ranks
+   run north to south, white's first rank at x 93 to 95, black's eighth at x 107 to 109, the a-file on the north (white's
+   left), and each side has a pale square at its right-hand corner (h1 at x 93, y 47; a8 at x 107, y 61). Laid first the
+   other way (v153), the colours were one square out for this play */
 var BOARD = PLACE !== 'stone-chess-chamber' ? null : (function () {
   var g = new THREE.Group(), z0 = shell.place.floor, dark = kit.solid(0x2e2b29), pale = kit.solid(0xc9c1b3);
   for (var i = 0; i < 8; i++) for (var j = 0; j < 8; j++) {
     var a = shell.toLocal(93 + i * 2, 47 + j * 2, z0 - 0.01), b = shell.toLocal(95 + i * 2, 49 + j * 2, z0 + 0.02);
-    var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), (i + j) % 2 ? pale : dark);
+    var m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), (i + j) % 2 ? dark : pale);
     m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2);
-    m.name = 'stone-chess-square-' + 'abcdefgh'[i] + (j + 1); m.userData.owner = PLACE; g.add(m);
+    m.name = 'stone-chess-square-' + 'abcdefgh'[7 - j] + (i + 1); m.userData.owner = PLACE; g.add(m);
   }
   scene.add(g); return g;
+})();
+/* req 912 (Magic's, the hundred-twelfth's rough build): the thirty-two giant pieces on their home squares, turned
+   in code: the black "all taller than they were and carved from what looked like black stone", the white "towering"
+   and with no faces (PS 16 L5890). Pawns 2.0 high, rooks 2.3, knights 2.5, bishops 2.7, queens 3.0, kings 3.2, each
+   foot 1 cm into its square; no face or feature on any piece. Each a group named for its square
+   (`giant-<side>-<piece>-<square>`, userData.giant), so the game can move it (req 922). Nothing glows */
+function chessPiece(kind, mat) {
+  var g = new THREE.Group(), lathe = function (pts) {
+    var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 28), mat); g.add(m); return m;
+  }, box = function (w, h, d, y) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.y = y; g.add(m); return m; };
+  var BASE = [[0, 0], [0.7, 0], [0.7, 0.12], [0.58, 0.2], [0.61, 0.28], [0.42, 0.38]];
+  if (kind === 'p') lathe([[0, 0], [0.62, 0], [0.62, 0.12], [0.52, 0.2], [0.55, 0.28], [0.36, 0.36], [0.24, 0.9], [0.21, 1.12], [0.4, 1.2],
+    [0.4, 1.27], [0.22, 1.32], [0.36, 1.45], [0.42, 1.62], [0.38, 1.8], [0.24, 1.94], [0, 2.0]]);
+  else if (kind === 'r') {
+    lathe(BASE.concat([[0.38, 1.55], [0.5, 1.8], [0.54, 1.98], [0.54, 2.1], [0.4, 2.1], [0.4, 2.0], [0, 2.0]]));
+    for (var k = 0; k < 4; k++) { var c = box(0.26, 0.21, 0.2, 2.2); c.position.x = Math.cos(k * Math.PI / 2) * 0.43; c.position.z = Math.sin(k * Math.PI / 2) * 0.43; c.rotation.y = -k * Math.PI / 2; }
+  } else if (kind === 'b') lathe(BASE.concat([[0.26, 1.55], [0.46, 1.65], [0.46, 1.72], [0.28, 1.76], [0.36, 1.95], [0.36, 2.15], [0.26, 2.38],
+    [0.1, 2.52], [0.12, 2.56], [0.12, 2.64], [0.06, 2.7], [0, 2.7]]));
+  else if (kind === 'q') lathe([[0, 0], [0.78, 0], [0.78, 0.13], [0.64, 0.22], [0.67, 0.31], [0.46, 0.42], [0.27, 1.9], [0.52, 2.02], [0.52, 2.1],
+    [0.3, 2.16], [0.36, 2.4], [0.5, 2.72], [0.4, 2.76], [0.16, 2.82], [0.13, 2.9], [0.1, 2.98], [0, 3.0]]);
+  else if (kind === 'k') {
+    lathe([[0, 0], [0.78, 0], [0.78, 0.13], [0.64, 0.22], [0.67, 0.31], [0.46, 0.42], [0.28, 1.95], [0.52, 2.06], [0.52, 2.14], [0.3, 2.2],
+      [0.38, 2.5], [0.46, 2.72], [0.18, 2.78], [0.18, 2.84], [0, 2.84]]);
+    box(0.13, 0.4, 0.13, 3.0); box(0.34, 0.12, 0.13, 3.04);
+  } else if (kind === 'n') {
+    lathe(BASE.concat([[0.4, 0.8], [0.52, 0.86], [0.52, 0.94], [0, 0.94]]));
+    var sh = new THREE.Shape(), P = [[-0.42, 0.9], [0.42, 0.9], [0.32, 1.3], [0.7, 1.68], [0.76, 1.92], [0.52, 2.04], [0.22, 2.3], [0.06, 2.5],
+      [-0.12, 2.36], [-0.42, 1.92], [-0.5, 1.3]];
+    P.forEach(function (p, i) { if (i) sh.lineTo(p[0], p[1]); else sh.moveTo(p[0], p[1]); });
+    var head = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.44, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 2 }), mat);
+    head.position.z = -0.22; g.add(head);   /* its muzzle to +x, the way it faces */
+  }
+  return g;
+}
+var GIANT = !BOARD ? null : (function () {
+  var out = { pieces: [] }, z0 = shell.place.floor, g = new THREE.Group(); g.name = 'giant-pieces'; scene.add(g);
+  var mats = { black: new THREE.MeshStandardMaterial({ color: kit.col(0x24221f), roughness: 0.55, metalness: 0 }),
+               white: new THREE.MeshStandardMaterial({ color: kit.col(0xe4ddd0), roughness: 0.75, metalness: 0 }) };
+  var BACK = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'], NAME = { p: 'pawn', r: 'rook', n: 'knight', b: 'bishop', q: 'queen', k: 'king' };
+  [['white', 0, 1], ['white', 1, 2], ['black', 7, 8], ['black', 6, 7]].forEach(function (row) {
+    for (var f = 0; f < 8; f++) {
+      var kind = row[1] === 1 || row[1] === 6 ? 'p' : BACK[f], sq = 'abcdefgh'[f] + row[2];
+      var at = shell.toLocal(94 + row[1] * 2, 62 - f * 2, z0 + 0.01), ahead = shell.toLocal(94 + row[1] * 2 + (row[0] === 'white' ? 1 : -1), 62 - f * 2, z0 + 0.01);
+      var p = chessPiece(kind, mats[row[0]]); p.position.copy(at); p.rotation.y = Math.atan2(-(ahead.z - at.z), ahead.x - at.x);
+      p.name = 'giant-' + row[0] + '-' + NAME[kind] + '-' + sq; p.userData = { giant: { side: row[0], kind: kind, square: sq }, owner: PLACE };
+      p.traverse(function (m) { if (m.isMesh) { m.userData.owner = PLACE; m.name = p.name; } });
+      g.add(p); out.pieces.push(p);
+    }
+  });
+  return out;
 })();
 
 /* the hooks: the events and magic set these (a shut door's tap, a way taken); harmless when unset */
