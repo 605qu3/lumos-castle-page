@@ -4523,7 +4523,7 @@ function tap(cx, cy) {
   if (hits[0].object === wayDown) { said(true); downToBay(); return; }   /* down into the stair hall (req 286) */
   /* the gallery (req 950 (c); Events' painting.message-delivered, Story's req 936 item 6): a tap on the white-bearded
      gentleman at the bottom right, frame 5, next to the empty frame on its table's side, is told as `gallery portrait`
-     (provisional, Godric to confirm: frame 2, the long-haired gentleman above him, is next to it too); elsewhere on the
+     (Godric's 1 on corridor-gallery-answerer-1022, confirmed 5.35 pm, 22 October 2026); elsewhere on the
      gallery a tap does what a tap on nothing does there, as before it was tappable */
   if (hits[0].object === stairGallery) {
     var gb = galleryVisit.base, f5 = GALLERY_FRAMES[5], gu = hits[0].uv;
