@@ -1,0 +1,90 @@
+{
+ "D-101": {
+  "name": "drafting-d101",
+  "title": "Below ground: the cellars and dungeons",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-102": {
+  "name": "drafting-d102",
+  "title": "The ground floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-103": {
+  "name": "drafting-d103",
+  "title": "The first floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-104": {
+  "name": "drafting-d104",
+  "title": "The second floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-105": {
+  "name": "drafting-d105",
+  "title": "The third floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-106": {
+  "name": "drafting-d106",
+  "title": "The fourth floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-107": {
+  "name": "drafting-d107",
+  "title": "The fifth floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-108": {
+  "name": "drafting-d108",
+  "title": "The sixth floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-109": {
+  "name": "drafting-d109",
+  "title": "The seventh floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-110": {
+  "name": "drafting-d110",
+  "title": "The tower levels, above the seventh floor",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ },
+ "D-111": {
+  "name": "drafting-d111",
+  "title": "The roofs",
+  "group": "Plans, 1:250 at A1",
+  "version": 146,
+  "model_date": "21 October 2026, 22.17",
+  "drawn": "21 October 2026, 22.49"
+ }
+}
