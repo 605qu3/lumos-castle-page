@@ -990,3 +990,94 @@ window.SHELL_W5A = {
           ['y', 156.9, -0.4, 0.07, 1.72, 1.75, 'iron']);
   T['se-round-room-1'] = { c: C, items: it };
 })(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+
+/* docs/interiors/hall-chamber.md, *The things* (req 805 (1), C1 to C11 on Godric's pick, curator-floor-g-list-1020): the
+   portraits hung close in two rows on every wall but the breast, the doors and the hall fire's back (the lower's feet
+   from 1.1, the upper's heads to 3.6), the wizened witch and the walrus-moustached wizard side by side on the south
+   wall (GoF 17), the overmantel's portrait, the fire laid (cold till a line of Events' or Magic's lights it), the
+   mantel's lamps and clock, a candle sconce pair on the south and north walls between the rows, the round table and
+   its three chairs, the two armchairs at the hearth, the sideboard, the rug, the fire irons and log basket, the hat
+   stand. Two choices against the drawn fireplace (shell.html's hall-chamber block): the overmantel's frame stands on
+   the hood's first step (its foot 2.12, not 1.8, its back board on the second step's face), and the rug starts at x
+   5.31, just off the hearth's stone (to 5.3), not 5.1. Unlit, nothing tappable. */
+(function (T, MT) {
+  MT.mahog = 0x4a2a1e; MT.tallow = 0xcfc2a0; MT.flag = 0x7a3a30;
+  var it = [];
+  /* the two rows: [ax, wall, dir, a0, a1] runs, each hung twice (lower 1.1 to 2.25, upper 2.55 to 3.6) */
+  [['x', 52.0, 1, 4.1, 8.9, 'lo'], ['x', 52.0, 1, 11.3, 14.9, 'lo'], ['x', 52.0, 1, 4.1, 14.9, 'up'],
+   ['x', 63.0, -1, 7.8, 14.9, 'both'], ['y', 4.0, 1, 52.1, 55.95, 'both'], ['y', 4.0, 1, 58.05, 62.9, 'both'],
+   ['y', 15.0, -1, 52.1, 56.2, 'both']].forEach(function (r, i) {
+    if (r[5] !== 'up') it.push(['fr', r[0], r[1], r[2], r[3], r[4], 1.1, 2.25, 40 + i, 1.2]);
+    if (r[5] !== 'lo') it.push(['fr', r[0], r[1], r[2], r[3], r[4], 2.55, 3.6, 60 + i, 1.2]);
+  });
+  /* the witch (0.7 by 0.9) and the wizard (0.8 by 1.0), feet at 1.1, gilt; the rails 0.06 out, the canvas back inside */
+  [[9.15, 9.85, 2.0, 'canvasr'], [10.3, 11.1, 2.1, 'canvasb']].forEach(function (f) {
+    var a = f[0], b = f[1], zt = f[2], w = 0.07;
+    it.push(['b', a, 51.98, 1.1, b, 52.06, 1.1 + w, 'gilt'], ['b', a, 51.98, zt - w, b, 52.06, zt, 'gilt'],
+            ['b', a, 51.98, 1.1 + w, a + w, 52.06, zt - w, 'gilt'], ['b', b - w, 51.98, 1.1 + w, b, 52.06, zt - w, 'gilt'],
+            ['b', a + w, 51.99, 1.1 + w, b - w, 52.04, zt - w, f[3]]);
+  });
+  /* the overmantel's portrait (C9), 1.1 by 1.3, the room's oldest: a back board from the hood's upper face (x 4.25) to
+     4.41, then heavy worn gilt 0.06 proud and the canvas back inside it */
+  it.push(['b', 4.23, 56.45, 2.12, 4.41, 57.55, 3.42, 'dark'],
+          ['b', 4.41, 56.45, 2.12, 4.47, 57.55, 2.21, 'gilt'], ['b', 4.41, 56.45, 3.33, 4.47, 57.55, 3.42, 'gilt'],
+          ['b', 4.41, 56.45, 2.21, 4.47, 56.54, 3.33, 'gilt'], ['b', 4.41, 57.46, 2.21, 4.47, 57.55, 3.33, 'gilt'],
+          ['b', 4.41, 56.54, 2.21, 4.45, 57.46, 3.33, 'canvasl']);
+  /* the mantel (to x 4.55 at 1.5, the hood's face at 4.45 above it): a lamp at each end beyond the hood, the clock in
+     the middle on the shelf's front 0.1 */
+  [56.08, 57.92].forEach(function (y) {
+    it.push(['y', 4.3, y, 0.05, 1.5, 1.53, 'brass'], ['y', 4.3, y, 0.015, 1.53, 1.68, 'brass'], ['y', 4.3, y, 0.045, 1.68, 1.83, 'glass']);
+  });
+  it.push(['b', 4.43, 56.85, 1.5, 4.54, 57.15, 1.84, 'mahog'], ['b', 4.43, 56.9, 1.84, 4.53, 57.1, 1.9, 'mahog'],
+          ['b', 4.54, 56.92, 1.6, 4.545, 57.08, 1.76, 'white']);
+  /* the fire laid in the opening (x 4.016 to 4.5, y 56.35 to 57.65): two firedogs, three logs along it, unlit */
+  [56.65, 57.35].forEach(function (y) {
+    it.push(['b', 4.12, y - 0.02, 0.02, 4.45, y + 0.02, 0.06, 'iron'], ['b', 4.4, y - 0.02, 0.06, 4.44, y + 0.02, 0.32, 'iron']);
+  });
+  it.push(['b', 4.14, 56.55, 0.06, 4.24, 57.45, 0.16, 'wood'], ['b', 4.26, 56.5, 0.06, 4.36, 57.4, 0.16, 'oak'],
+          ['b', 4.2, 56.6, 0.16, 4.3, 57.5, 0.26, 'dark']);
+  /* C3: the fire irons' stand on the hearth (top 0.02) at (4.8, 56.3), and the log basket south of the breast */
+  it.push(['y', 4.8, 56.3, 0.12, 0.02, 0.05, 'iron'], ['y', 4.8, 56.3, 0.012, 0.05, 0.8, 'iron'], ['y', 4.8, 56.3, 0.03, 0.78, 0.82, 'brass']);
+  [[4.86, 56.3, 0.62], [4.77, 56.36, 0.7], [4.77, 56.24, 0.66]].forEach(function (p) { it.push(['y', p[0], p[1], 0.008, 0.06, p[2], 'iron']); });
+  it.push(['b', 4.5, 55.4, 0, 5.0, 55.8, 0.35, 'wicker'], ['b', 4.56, 55.45, 0.35, 4.94, 55.53, 0.43, 'wood'],
+          ['b', 4.56, 55.56, 0.35, 4.94, 55.64, 0.42, 'oak'], ['b', 4.6, 55.68, 0.35, 4.92, 55.76, 0.44, 'wood']);
+  /* C10: the worn Turkey rug before the hearth, 1.2 by 1.8, its field and border */
+  it.push(['b', 5.31, 56.1, 0, 6.51, 57.9, 0.006, 'cloth'], ['b', 5.46, 56.25, 0.004, 6.36, 57.75, 0.014, 'flag']);
+  /* C6: the two leather armchairs facing each other across the hearth, buttoned, the back to 1.0 */
+  [[54.8, 54.95], [59.05, 59.2]].forEach(function (c, i) {
+    var y0 = i ? 58.4 : 54.8, y1 = i ? 59.2 : 55.6;
+    it.push(['b', 5.6, y0, 0, 6.4, y1, 0.42, 'leather'], ['b', 5.6, c[0], 0.42, 6.4, c[1], 1.0, 'leather'],
+            ['b', 5.6, y0, 0.42, 5.72, y1, 0.64, 'leather'], ['b', 6.28, y0, 0.42, 6.4, y1, 0.64, 'leather']);
+  });
+  /* C5: the round table on one pedestal at (10.0, 59.8), 1.2 across, 0.72 high; the folded cloth on it */
+  it.push(['y', 10.0, 59.8, 0.3, 0, 0.08, 'mahog'], ['y', 10.0, 59.8, 0.08, 0.08, 0.68, 'mahog'],
+          ['y', 10.0, 59.8, 0.6, 0.68, 0.72, 'mahog'], ['b', 9.85, 59.68, 0.72, 10.15, 59.92, 0.735, 'linen']);
+  /* C6: three hall chairs at its west, south and east, the seats' fronts 0.15 off its edge, their backs away from it */
+  function chair(x0, y0, x1, y1, bx0, by0, bx1, by1) {
+    it.push(['b', x0, y0, 0.42, x1, y1, 0.46, 'oak'], ['b', bx0, by0, 0.46, bx1, by1, 1.0, 'oak']);
+    [[x0, y0], [x1 - 0.04, y0], [x0, y1 - 0.04], [x1 - 0.04, y1 - 0.04]].forEach(function (p) {
+      it.push(['b', p[0], p[1], 0, p[0] + 0.04, p[1] + 0.04, 0.42, 'oak']);
+    });
+  }
+  chair(8.8, 59.575, 9.25, 60.025, 8.8, 59.575, 8.84, 60.025);
+  chair(9.775, 58.6, 10.225, 59.05, 9.775, 58.6, 10.225, 58.64);
+  chair(10.75, 59.575, 11.2, 60.025, 11.16, 59.575, 11.2, 60.025);
+  /* C7: the sideboard at the south wall's east end, 2.0 by 0.55, 0.9 high, on four short legs, bare */
+  it.push(['b', 12.0, 51.98, 0.15, 14.0, 52.55, 0.86, 'mahog'], ['b', 11.98, 51.98, 0.86, 14.02, 52.58, 0.9, 'mahog'],
+          ['b', 12.0, 52.0, 0, 12.06, 52.06, 0.15, 'mahog'], ['b', 13.94, 52.0, 0, 14.0, 52.06, 0.15, 'mahog'],
+          ['b', 12.0, 52.49, 0, 12.06, 52.55, 0.15, 'mahog'], ['b', 13.94, 52.49, 0, 14.0, 52.55, 0.15, 'mahog'],
+          ['b', 12.97, 52.55, 0.2, 13.03, 52.56, 0.8, 'dark']);
+  /* C11: the hat and cloak stand in the north-west corner at (4.6, 62.4), bare: three feet, the post, four pegs */
+  it.push(['b', 4.35, 62.38, 0, 4.85, 62.42, 0.05, 'dark'], ['b', 4.58, 62.15, 0, 4.62, 62.65, 0.05, 'dark'],
+          ['y', 4.6, 62.4, 0.025, 0.05, 1.9, 'dark'], ['y', 4.6, 62.4, 0.04, 1.9, 1.95, 'dark'],
+          ['b', 4.62, 62.39, 1.72, 4.78, 62.41, 1.74, 'dark'], ['b', 4.42, 62.39, 1.72, 4.58, 62.41, 1.74, 'dark'],
+          ['b', 4.59, 62.42, 1.66, 4.61, 62.58, 1.68, 'dark'], ['b', 4.59, 62.22, 1.66, 4.61, 62.38, 1.68, 'dark']);
+  /* the candle sconces between the rows, two on the south wall and two on the north: a backplate, a cup, a candle */
+  [[6.3, 52.0, 1], [12.6, 52.0, 1], [9.5, 63.0, -1], [12.9, 63.0, -1]].forEach(function (s) {
+    var y = s[1], d = s[2];
+    it.push(['b', s[0] - 0.06, y - d * 0.02, 2.3, s[0] + 0.06, y + d * 0.015, 2.5, 'brass'],
+            ['y', s[0], y + d * 0.1, 0.04, 2.36, 2.39, 'brass'], ['y', s[0], y + d * 0.1, 0.012, 2.39, 2.55, 'tallow']);
+    it.push(['b', s[0] - 0.01, Math.min(y + d * 0.015, y + d * 0.08), 2.36, s[0] + 0.01, Math.max(y + d * 0.015, y + d * 0.08), 2.38, 'brass']);
+  });
+  T['hall-chamber'] = { items: it };
+})(window.SHELL_W5A.things, window.SHELL_W5A.mats);
