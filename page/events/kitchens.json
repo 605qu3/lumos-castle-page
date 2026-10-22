@@ -342,7 +342,9 @@
       "show": [
         "the pear beginning to squirm, chuckling, and suddenly turning into a large green door handle"
       ],
-      "starts": [],
+      "starts": [
+        "secret fruit-bowl-painting"
+      ],
       "canon": "Magic's req 944 (docs/magic/rooms.md, *The kitchens' corridor and the kitchens*; Interiors' docs/interiors/kitchens.md, *Occupancy and aftermath*, cited), 22 October 2026: from the GoF castle on (the Architect's row 171, architect-fruit-1021), tickled, the pear \"began to squirm, chuckling, and suddenly turned into a large green door handle\" (GoF 21 L28836, canon tool), and the door opens into the kitchens; before the GoF castle a tap on the pear does nothing (no record); the tap target `pear` is the shell's to raise, a row to the Architect"
     },
     {
