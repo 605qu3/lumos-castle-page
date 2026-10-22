@@ -3822,17 +3822,30 @@ function chaseWhisk() {
   norris.t = -1; norris.group.visible = false;
   norrisDoor.state = 'whisk'; norrisDoor.a = 1;   /* her cupboard watch ends here; updateNorrisDoor leaves her to the whisk */
   var head = new THREE.Vector3(STAIR_X + 0.2, NORRIS.y, MID_Z), foot = new THREE.Vector3(FOOT_X + 0.4, NORRIS.y + FOOT_Y, MID_Z);
-  chase.whisk = { k: 0, path: [from, head, foot], len: from.distanceTo(head) + head.distanceTo(foot) };
+  chase.whisk = { k: 0, path: [from, head, foot], len: from.distanceTo(head) + head.distanceTo(foot), stare: CHASE.stare, run: CHASE.run, fadeIn: 0 };
+}
+/* she leads him astray (req 963 (3)): she comes into the lamp's light at the top of the stairs, pauses there looking past
+   the hiding place, then pads off down the flight, tail high, at a walk; his lamp turns after her as she reaches the
+   foot. Her whisk's path and look, slower */
+var ASTRAY = { pause: 2.2, pad: 1.1, fadeIn: 0.5 };
+function norrisAstray() {
+  if (!chaseSaved()) return;
+  norris.t = -1; norris.group.visible = false;
+  norrisDoor.state = 'whisk'; norrisDoor.a = 1;
+  var from = new THREE.Vector3(CHASE.topX + 0.9, NORRIS.y, MID_Z + 0.35), head = new THREE.Vector3(STAIR_X + 0.2, NORRIS.y, MID_Z),
+    foot = new THREE.Vector3(FOOT_X + 0.4, NORRIS.y + FOOT_Y, MID_Z);
+  chase.whisk = { k: 0, path: [from, head, foot], len: from.distanceTo(head) + head.distanceTo(foot), stare: ASTRAY.pause, run: ASTRAY.pad, fadeIn: ASTRAY.fadeIn };
+  chase.whisk.then = function () { if (chase.lamp !== 'none') chase.lamp = 'down'; };   /* at the foot of the flight */
 }
 function updateWhisk(dt) {
   var w = chase.whisk;
   if (!w) return;
   w.k += dt;
-  var g = norrisDoor.group, d = Math.max(0, w.k - CHASE.stare) * CHASE.run, p = w.path, l0 = p[0].distanceTo(p[1]), a = 1;
+  var g = norrisDoor.group, d = Math.max(0, w.k - w.stare) * w.run, p = w.path, l0 = p[0].distanceTo(p[1]), a = w.fadeIn ? Math.min(1, w.k / w.fadeIn) : 1;
   if (d < l0) g.position.lerpVectors(p[0], p[1], d / l0);
   else g.position.lerpVectors(p[1], p[2], Math.min(1, (d - l0) / Math.max(0.01, w.len - l0)));
   if (d > l0) g.position.y = NORRIS.y + stairY(g.position.x);
-  if (d >= w.len) a = Math.max(0, 1 - (d - w.len) / (CHASE.run * 0.3));
+  if (d >= w.len) { a = Math.max(0, 1 - (d - w.len) / (w.run * 0.3)); if (w.then) { w.then(); w.then = null; } }
   var shut = w.k > 0.6 && w.k < 0.73;   /* one blink while she stares */
   g.lookAt(camera.position); g.visible = a > 0;
   g.children.forEach(function (e) {
@@ -5532,6 +5545,16 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'Mrs Norris watches him from where she sits, quite still, and lets him be': function () { norrisLine('Mrs Norris watches him from where she sits, quite still, and lets him be'); },
     'Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing': function () {
       norrisLooks(); norrisLine('Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing');
+    },
+    /* lets-pass (req 963 (1); Godric's 1 on events-norris-lets-pass-1022): a boy whose brother she trusts gets the same
+       calm look; the runtime reads the brother's trust itself */
+    'Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing': function () {
+      norrisLooks(); norrisLine('Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing');
+    },
+    /* she leads Filch astray (req 963 (3), req 933; Events' filch.chase-norris-astray, which sets chase off) */
+    "Mrs Norris pausing at the top of the stairs, looking past the hiding place, then padding off down the far flight with her tail high, and Filch's lamp going after her": function () {
+      norrisAstray();   /* told too, since from most hiding stops the stair head is behind him */
+      norrisLine("Mrs Norris pausing at the top of the stairs, looking past the hiding place, then padding off down the far flight with her tail high, and Filch's lamp going after her");
     },
     /* in place of filch.chase-hidden (one group): his lamp passes all the same */
     "Mrs Norris sits down by the boy's hiding place and washes a paw, her back to it; Filch's lamp goes on along the corridor without turning": function () {
