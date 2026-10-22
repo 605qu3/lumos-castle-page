@@ -965,6 +965,8 @@
       "tier": "fixed",
       "source": "device",
       "leans": [],
+      "one_of": "toe-cupboard",
+      "weight": 8,
       "moment": "tap broom cupboard",
       "when": [
         "place = corridor",
@@ -986,6 +988,8 @@
       "tier": "fixed",
       "source": "device",
       "leans": [],
+      "one_of": "toe-armour",
+      "weight": 8,
       "moment": "tap armour",
       "when": [
         "place = corridor",
@@ -1077,6 +1081,8 @@
       "tier": "fixed",
       "source": "device",
       "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
       "moment": "filch at top",
       "when": [
         "place = corridor",
