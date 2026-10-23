@@ -1324,6 +1324,46 @@
         "stamp hall_remembrall"
       ],
       "canon": "Godric's woven touch remembrall-smoke (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): at breakfast a first-year at the next table shakes a marble-sized glass ball that fills with smoke and groans he has forgotten something (PS 9 L2931 and L2933, read in the canon tool, 22 October 2026); the card says red smoke, the text has white smoke that glows scarlet, so the cue is built to the text; year 1, now and then (a fortnight apart at the least), at breakfast on a day with no occasion; the pupil is unnamed, the Remembrall being Neville's in the book (Neville is met elsewhere)"
+    },
+    {
+      "id": "great-hall.owl-toast",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-owl-toast",
+      "weight": 1,
+      "moment": "wait 10-45 s",
+      "when": [
+        "place = great hall",
+        "meal = breakfast",
+        "year = 1",
+        "occasion != start of term",
+        "days since owl_toast_on >= 3"
+      ],
+      "show": [
+        "the boys' owl glides down to their place, nibbles a bit of toast and the nearer boy's ear, then flies up through the high windows to sleep in the Owlery with the other school owls"
+      ],
+      "starts": [
+        "stamp owl_toast_on"
+      ],
+      "canon": "Godric's woven touch owl-toast-breakfast (22 October 2026, relayed by Fawkes): the boys' owl takes a bit of toast at breakfast, then flies off to sleep in the Owlery (PS 8 L2756, read in the canon tool, 22 October 2026: \"She sometimes flew in to nibble his ear and have a bit of toast before going off to sleep in the owlery with the other school owls\"); year 1, at breakfast, three days apart at the least, with a silent partner; the owl is the boys' own and carries no name in the cue"
+    },
+    {
+      "id": "great-hall.owl-toast-none",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-owl-toast",
+      "weight": 2,
+      "moment": "wait 10-45 s",
+      "when": [
+        "place = great hall",
+        "meal = breakfast",
+        "year = 1",
+        "occasion != start of term",
+        "days since owl_toast_on >= 3"
+      ],
+      "starts": []
     }
   ]
 }

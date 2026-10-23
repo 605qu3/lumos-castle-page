@@ -78,10 +78,28 @@
       "starts": [
         "stamp turban_snow_on"
       ],
-      "canon": "Godric's woven touch snowballs-turban (22 October 2026, 7.50 pm, relayed by Fawkes): in winter bewitched snowballs follow a professor across the courtyard, bouncing off the back of his turban (PS 12 L4014, \"bewitching several snowballs so that they followed Quirrell around, bouncing off the back of his turban\", read in the canon tool, 22 October 2026; the twins' work, the cue names nobody); year 1, by day while snow lies, a week apart at the least; seen from any window as grounds.snowball-splat is",
+      "canon": "Godric's woven touch snowballs-turban (22 October 2026, 7.50 pm, relayed by Fawkes): in winter bewitched snowballs follow a professor across the courtyard, bouncing off the back of his turban (PS 12 L4014, \"bewitching several snowballs so that they followed Quirrell around, bouncing off the back of his turban\", read in the canon tool, 22 October 2026; the twins' work, the cue names nobody); year 1, by day while snow lies, a week apart at the least; seen from any window as grounds.snowball-splat is; the odds lowered (Godric, 22 October 2026, 9.28 pm: the twins had better things to do than harass the professor every snowy day): a silent partner at three to one, so about one snowy day in four, the week's gap kept",
       "show": [
         "out in the snowy courtyard, snowballs follow a professor in a purple turban across the flagstones, bouncing off the back of his turban"
-      ]
+      ],
+      "one_of": "turban-snow"
+    },
+    {
+      "id": "grounds.snowballs-turban-none",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "one_of": "turban-snow",
+      "weight": 3,
+      "moment": "wait 30-120 s",
+      "when": [
+        "place != entrance hall",
+        "year = 1",
+        "ground = snow",
+        "time != night",
+        "days since turban_snow_on >= 7"
+      ],
+      "starts": []
     }
   ]
 }

@@ -695,6 +695,69 @@
         "stamp armour_lights_on"
       ],
       "canon": "Godric's woven touch armour-christmas-lights (corridor-armour-3d-1022, 22 October 2026, 8.03 pm, relayed by Fawkes): at Christmas a light glows inside the corridor's suit through its visor (PoA 11 L17727, \"mysterious lights shone from inside every suit of armour\", read in the canon tool, 22 October 2026); year 3, in the Christmas days (18 December to 2 January), by day and night, once a day; the suit is the corridor's own"
+    },
+    {
+      "id": "armour.feet-repacking",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "one_of": "armour-sitter",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = corridor",
+        "year = 3",
+        "lessons = on",
+        "time != night",
+        "days since armour_feet_on >= 4"
+      ],
+      "show": [
+        "a pupil sits on the floor at the suit of armour's feet, repacking a bag too full of books to close"
+      ],
+      "starts": [
+        "stamp armour_feet_on"
+      ],
+      "canon": "Godric's woven touch armour-feet-repacking (22 October 2026, relayed by Fawkes): a pupil sits at the corridor armour's feet repacking a bag too full of books to close (PoA 12 L18010, read in the canon tool, 22 October 2026: \"sitting at the feet of a suit of armour, repacking her bag, which was so full of books it wouldn't close\"); year 3, by day in a lesson hour, four days apart at the least, one of the armour's sitters (a silent partner, so now and then); the pupil unnamed and no one we know, the suit the corridor's own wherever its marks have put it"
+    },
+    {
+      "id": "armour.plinth-chocolate",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "one_of": "armour-sitter",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = corridor",
+        "year = 3",
+        "lessons = on",
+        "time != night",
+        "days since armour_choc_on >= 6"
+      ],
+      "show": [
+        "a boy slips round behind the suit of armour and sits down on the floor in its shadow, finishing a bar of chocolate"
+      ],
+      "starts": [
+        "stamp armour_choc_on"
+      ],
+      "canon": "Godric's woven touch armour-plinth-chocolate (22 October 2026, relayed by Fawkes): a boy slips behind the suit and sits on its plinth to finish a bar of chocolate (PoA 12 L18178, read in the canon tool, 22 October 2026: \"took a detour behind a suit of armour and sank down on its plinth to finish his chocolate\"); year 3, by day in a lesson hour, six days apart at the least, one of the armour's sitters; Interiors' corridor schedule (docs/interiors/corridor.md) stands the suit on the floor with no plinth, so the cue says the floor in its shadow and not a plinth; the boy is unnamed and cheerful, nothing sad in it"
+    },
+    {
+      "id": "armour.sitter-none",
+      "tier": "small",
+      "source": "date",
+      "leans": [],
+      "one_of": "armour-sitter",
+      "weight": 4,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = corridor",
+        "year = 3",
+        "lessons = on",
+        "time != night",
+        "days since armour_feet_on >= 4"
+      ],
+      "starts": []
     }
   ]
 }

@@ -964,6 +964,24 @@
       "canon": "Godric's woven touch mcgonagall-tabby-cat (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): early one morning a tabby cat with markings round its eyes sits very still on a corridor windowsill watching him, gone when he looks again (PS 1 L39, \"the same markings around its eyes\", and L95, \"square glasses exactly the shape of the markings the cat had had around its eyes\"; L95 also \"he turned to smile at the tabby, but it had gone\", read in the canon tool, 22 October 2026); year 1, between six and nine in the morning, a fortnight apart at the least; the cue names no Professor, it is only the cat (the same markings as transfiguration.cat's)"
     },
     {
+      "id": "stair.tabby-stern-look",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap tabby",
+      "when": [
+        "place = corridor",
+        "year = 1",
+        "hour >= 6",
+        "hour < 9",
+        "days since tabby_on < 1"
+      ],
+      "show": [
+        "the tabby on the sill does not move; she only gives him a stern look"
+      ],
+      "canon": "Godric's woven touch tabby-stern-look (22 October 2026, relayed by Fawkes): if he stops and stares at the tabby on the corridor sill she does not move, only gives him a stern look (PS 1 L43, read in the canon tool, 22 October 2026: \"The cat didn't move. It just gave him a stern look.\"); a tap on the cat, the sill record's own morning (stair.tabby-cat, six to nine, year 1; the stamp tabby_on today); the tap id is `tabby`, asked of the Corridor; the cue names no Professor, only the cat"
+    },
+    {
       "id": "stair.gobstones-squirt",
       "tier": "fixed",
       "source": "date",

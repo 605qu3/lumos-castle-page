@@ -516,6 +516,46 @@
         "stamp forms_on"
       ],
       "canon": "Godric's woven touch hogsmeade-forms-halloween (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): before Hallowe'en the third-years hand McGonagall their signed Hogsmeade forms, one hunting through a bag for a form that is not there (PoA 8 L16250, read in the canon tool, 22 October 2026: \"you should hand Hogsmeade permission forms to me before Hallowe'en. No form, no visiting the village\"); year 3, in a lesson hour in her classroom, from 1 to 30 October, five days apart at the least; the pupil unnamed"
+    },
+    {
+      "id": "transfiguration.animagus-lesson",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "one_of": "mcg-animagus",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = transfiguration classroom",
+        "year = 3",
+        "lessons = on",
+        "time != night",
+        "days since animagus_on >= 14"
+      ],
+      "show": [
+        "in the middle of telling the class about Animagi, Professor McGonagall is a tabby cat with square markings round her eyes on her desk; with a faint pop she is herself again, and looks round as if waiting for applause"
+      ],
+      "starts": [
+        "stamp animagus_on"
+      ],
+      "canon": "Godric's woven touch mcgonagall-animagus-lesson (22 October 2026, relayed by Fawkes): in the third-years' Transfiguration lesson on Animagi she turns into a tabby cat with spectacle markings in front of the class and back (PoA 6 L15398, read in the canon tool, 22 October 2026: \"Professor McGonagall was telling them about Animagi (wizards who could transform at will into animals) ... transformed herself in front of their eyes into a tabby cat with spectacle markings around her eyes\"; L15400, \"turning back into herself with a faint pop\"; the waiting for applause is L15400's, \"the first time my transformation's not got applause from a class\"); year 3, in a lesson hour in her classroom, a fortnight apart at the least, with a silent partner so it comes now and then; a new record and not the set-aside transfiguration.cat (that one was Interiors' first-week-of-September arrival replay, set aside 15 October 2026 as a canon lesson replayed, EV-27; this is the ordinary lesson an ordinary third-year sits through, the same cue words for the cat); nothing is said, and the boys sit in their own lesson"
+    },
+    {
+      "id": "transfiguration.animagus-lesson-none",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "one_of": "mcg-animagus",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = transfiguration classroom",
+        "year = 3",
+        "lessons = on",
+        "time != night",
+        "days since animagus_on >= 14"
+      ],
+      "starts": []
     }
   ]
 }
