@@ -3155,6 +3155,25 @@ function stoneVaultAt(x, y) {
     var r = Math.min(rise, a), Rd = (a * a + r * r) / (2 * r), v = Rd * Rd - s * s; return v > 0 ? Math.sqrt(v) - (Rd - r) : 0; };
   return V.s + Math.max(arc((R[2] - R[0]) / 2, x - (R[0] + R[2]) / 2), arc((R[3] - R[1]) / 2, y - (R[1] + R[3]) / 2));
 }
+/* the bay's trapdoor (stone-trapdoor, 1.2 square over the shaft's rect, PS 16 L5770, the ring pulled and the leaf "swung up and open"): its
+   oak leaf lies open flat on the flags east of the hole, hinged at the hole's east edge (the bay clear 1.4 m there),
+   its underside up with two strap hinges and the iron ring; 1 cm into the floor, no tap (the hole stays the way) */
+(function () {
+  if (PLACE !== 'stone-bay' || !MODEL) return;
+  var s = (MODEL.openings || []).filter(function (q) { return q.id === 'stone-trapdoor'; })[0];
+  if (!s || !s.at || !s.d) return;
+  var R = [s.at[0] - s.d / 2, s.at[1] - s.d / 2, s.at[0] + s.d / 2, s.at[1] + s.d / 2], z0 = shell.place.floor, oak = kit.solid(0x5a4632), iron = kit.solid(0x34312d);
+  var lb = function (x0, y0, za, x1, y1, zb, m) {
+    var a = shell.toLocal(x0, y0, z0 + za), b = shell.toLocal(x1, y1, z0 + zb);
+    var me = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), m);
+    me.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); me.name = 'stone-trapdoor-leaf'; me.userData.owner = PLACE;
+    me.raycast = function () {}; shell.group.add(me);
+  };
+  var x0 = R[2] + 0.02, x1 = x0 + (R[2] - R[0]);
+  lb(x0, R[1], -0.01, x1, R[3], 0.05, oak);
+  [R[1] + 0.2, R[3] - 0.25].forEach(function (y) { lb(x0 - 0.02, y, 0.05, x0 + 0.75, y + 0.05, 0.058, iron); });   /* the straps */
+  lb(x1 - 0.3, (R[1] + R[3]) / 2 - 0.08, 0.05, x1 - 0.22, (R[1] + R[3]) / 2 + 0.08, 0.065, iron);                    /* the ring, lying */
+})();
 function updateStoneThings(dt, t) {
   if (!STONE.on) return;
   STONE.keys.forEach(function (k) {
