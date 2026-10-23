@@ -1652,75 +1652,169 @@ function updateArmourSide(a) {
 var ARMOUR_3D = (function () {
   var q = new URLSearchParams(location.search).get('armour3d');   /* groundsQ comes later in the page */
   if (q === null) return null;
-  var only = q === 'only', g = new THREE.Group(), UP = new THREE.Vector3(0, 1, 0);
-  var steel = new THREE.MeshStandardMaterial({ color: 0xaeb2b8, metalness: 0.5, roughness: 0.4 });
+  var only = q === 'only', g = new THREE.Group(), UP = new THREE.Vector3(0, 1, 0), FWD = new THREE.Vector3(0, 0, 1);
+  /* Godric's 2 on corridor-armour-3d-1022 (8.03 pm): worked further, in code. The steel's own surface drawn once on a
+     canvas, its u round each turned piece (u 0 the front) and its v down it: a brushed grain, scratches, a little
+     pitting and grime, and an incised line just inside each plate's edges; on the breastplate, tassets and cuisses
+     the etched bands too, blackened strips down the front and either side with a running scroll in them, as the
+     drawing's. The same canvas is the bump, so the lines catch the light. Rivets along the edges (one instanced
+     mesh), lames at the elbows, knees and feet, cuffs at the wrists, straps on the tassets */
+  function steelCanvas(etched) {
+    var c = makeCanvas(512, 512), x = c.getContext('2d'), i, rnd = (function (s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(etched ? 71 : 37);
+    x.fillStyle = '#c3c7cc'; x.fillRect(0, 0, 512, 512);
+    for (i = 0; i < 1600; i++) {   /* the brushed grain, round the piece */
+      var y = rnd() * 512, x0 = rnd() * 512, l = 20 + rnd() * 120, k = rnd() < 0.5;
+      x.strokeStyle = k ? 'rgba(255,255,255,' + (0.04 + rnd() * 0.06) + ')' : 'rgba(40,44,50,' + (0.03 + rnd() * 0.05) + ')';
+      x.lineWidth = 1; x.beginPath(); x.moveTo(x0, y); x.lineTo(x0 + l, y + (rnd() - 0.5) * 2); x.stroke();
+    }
+    for (i = 0; i < 26; i++) {   /* grime, darker toward the lower edges */
+      var gx = rnd() * 512, gy = 200 + rnd() * 312, gr = 20 + rnd() * 60, gd = x.createRadialGradient(gx, gy, 0, gx, gy, gr);
+      gd.addColorStop(0, 'rgba(60,50,40,0.16)'); gd.addColorStop(1, 'rgba(60,50,40,0)'); x.fillStyle = gd; x.fillRect(gx - gr, gy - gr, gr * 2, gr * 2);
+    }
+    for (i = 0; i < 320; i++) { x.fillStyle = 'rgba(50,45,40,' + (0.2 + rnd() * 0.3) + ')'; x.beginPath(); x.arc(rnd() * 512, rnd() * 512, 0.5 + rnd(), 0, 7); x.fill(); }   /* pitting */
+    for (i = 0; i < 45; i++) {   /* scratches */
+      var sx = rnd() * 512, sy = rnd() * 512, a = rnd() * Math.PI, sl = 8 + rnd() * 40;
+      x.strokeStyle = 'rgba(245,247,250,0.35)'; x.lineWidth = 0.8; x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + Math.cos(a) * sl, sy + Math.sin(a) * sl); x.stroke();
+    }
+    x.strokeStyle = 'rgba(30,32,36,0.75)'; x.lineWidth = 2.5;   /* the incised line inside each edge */
+    [12, 500].forEach(function (yy) { x.beginPath(); x.moveTo(0, yy); x.lineTo(512, yy); x.stroke(); });
+    if (etched) {
+      function band(cx, w) {   /* a blackened strip, its two borders and a running scroll */
+        [cx - 512, cx, cx + 512].forEach(function (c0) {
+          x.fillStyle = 'rgba(55,55,58,0.55)'; x.fillRect(c0 - w / 2, 0, w, 512);
+          x.strokeStyle = 'rgba(20,20,24,0.9)'; x.lineWidth = 2;
+          [c0 - w / 2, c0 + w / 2].forEach(function (bx) { x.beginPath(); x.moveTo(bx, 0); x.lineTo(bx, 512); x.stroke(); });
+          x.strokeStyle = 'rgba(205,208,212,0.8)'; x.lineWidth = 1.6;
+          for (var yy = 0; yy < 512; yy += 28) {
+            x.beginPath(); x.moveTo(c0, yy); x.bezierCurveTo(c0 + w * 0.4, yy + 7, c0 + w * 0.4, yy + 21, c0, yy + 28); x.stroke();
+            x.beginPath(); x.arc(c0 + (yy % 56 ? -1 : 1) * w * 0.22, yy + 14, w * 0.13, 0, Math.PI * 1.5); x.stroke();
+          }
+        });
+      }
+      band(0, 34); band(110, 22); band(512 - 110, 22);
+    }
+    return c;
+  }
+  function steelMat(etched) {
+    var c = steelCanvas(etched), t = tex(c), b = new THREE.CanvasTexture(c);
+    t.wrapS = b.wrapS = THREE.RepeatWrapping;
+    return new THREE.MeshStandardMaterial({ color: 0xc8ccd2, map: t, bumpMap: b, bumpScale: 0.0015, metalness: 0.5, roughness: 0.42 });
+  }
+  var steel = steelMat(false), etched = steelMat(true);
   var dark = new THREE.MeshStandardMaterial({ color: 0x55585c, metalness: 0.3, roughness: 0.7 });   /* the mail, the slit */
   var leather = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: 0.8 });
   var wood = new THREE.MeshStandardMaterial({ color: 0x4a3626, roughness: 0.75 });
+  var brass = new THREE.MeshStandardMaterial({ color: 0xb59a5a, metalness: 0.6, roughness: 0.4 });
+  var rivets = [];   /* each [x, y, z], one instanced mesh at the end */
   function lathe(pts, mat, sx, sz) {
-    var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 32), mat || steel);
+    var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 40), mat || steel);
     m.scale.set(sx || 1, 1, sz || 1); g.add(m); return m;
   }
   function part(geo, x, y, z, mat) { var m = new THREE.Mesh(geo, mat || steel); m.position.set(x, y, z); g.add(m); return m; }
   function limb(a, b, r0, r1, mat) {   /* a cylinder from a to b, r0 at a */
     var A = new THREE.Vector3(a[0], a[1], a[2]), B = new THREE.Vector3(b[0], b[1], b[2]), v = B.clone().sub(A);
-    var m = part(new THREE.CylinderGeometry(r1, r0, v.length(), 16), (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2, mat);
+    var m = part(new THREE.CylinderGeometry(r1, r0, v.length(), 20), (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2, mat);
     m.quaternion.setFromUnitVectors(UP, v.normalize()); return m;
   }
-  function ball(r, x, y, z, sx, sy, sz, mat) { var m = part(new THREE.SphereGeometry(r, 20, 14), x, y, z, mat); m.scale.set(sx || 1, sy || 1, sz || 1); return m; }
-  function ring(r, tube, y, sz, mat) { var m = part(new THREE.TorusGeometry(r, tube, 8, 32), 0, y, 0, mat); m.rotation.x = Math.PI / 2; m.scale.y = sz || 1; return m; }
+  function lame(a, b, f, r) {   /* a short plate round a limb, f of the way from a to b, flaring toward b: a joint's overlap */
+    var A = new THREE.Vector3(a[0], a[1], a[2]), B = new THREE.Vector3(b[0], b[1], b[2]), p = A.clone().lerp(B, f);
+    var m = part(new THREE.CylinderGeometry(r * 0.96, r * 1.06, 0.03, 24), p.x, p.y, p.z);
+    m.quaternion.setFromUnitVectors(UP, A.sub(B).normalize()); return m;
+  }
+  function legLame(x, y, r) { part(new THREE.CylinderGeometry(r * 0.97, r * 1.05, 0.028, 24), x, y, 0); }
+  function ball(r, x, y, z, sx, sy, sz, mat) { var m = part(new THREE.SphereGeometry(r, 24, 16), x, y, z, mat); m.scale.set(sx || 1, sy || 1, sz || 1); return m; }
+  function ring(r, tube, y, sz, mat) { var m = part(new THREE.TorusGeometry(r, tube, 8, 36), 0, y, 0, mat); m.rotation.x = Math.PI / 2; m.scale.y = sz || 1; return m; }
+  function rivetRow(r, y, sz, phis, cx) {   /* rivets on a turned piece's edge: x r sin phi, z r cos phi (phi 0 the front) */
+    phis.forEach(function (ph) { rivets.push([(cx || 0) + (r + 0.003) * Math.sin(ph), y, (r + 0.003) * Math.cos(ph) * sz]); });
+  }
+  function span(a, b, n) { var o = []; for (var i = 0; i < n; i++) o.push(a + (b - a) * i / (n - 1)); return o; }
   [1, -1].forEach(function (s) {   /* s 1 its left (+x), -1 its right */
     var x = s * 0.105;
     ball(0.06, x, 0.045, 0.05, 1, 0.75, 2.4);                                   /* the sabaton, pointed forward */
+    [0.03, 0.07, 0.11].forEach(function (z, i) {                                /* its lames over the instep */
+      var m = part(new THREE.TorusGeometry(0.052 - i * 0.008, 0.007, 6, 18, Math.PI), x, 0.04, z); m.scale.y = 0.85;
+    });
     lathe([[0, 0.06], [0.05, 0.07], [0.058, 0.2], [0.066, 0.32], [0.06, 0.42], [0.058, 0.46], [0, 0.46]]).position.x = x;   /* the greave */
+    legLame(x, 0.448, 0.062); legLame(x, 0.565, 0.07); legLame(x, 0.595, 0.075);   /* the knee's lames, below and above */
     ball(0.068, x, 0.5, 0.015, 1, 1.05, 1);                                     /* the knee cop */
-    var fan = part(new THREE.CylinderGeometry(0.05, 0.05, 0.012, 20), x + s * 0.06, 0.5, 0.0); fan.rotation.z = Math.PI / 2;   /* its wing */
-    lathe([[0, 0.53], [0.066, 0.54], [0.082, 0.7], [0.09, 0.86], [0, 0.86]]).position.x = x;   /* the cuisse */
+    var fan = part(new THREE.CylinderGeometry(0.05, 0.05, 0.012, 24), x + s * 0.06, 0.5, 0.0); fan.rotation.z = Math.PI / 2;   /* its wing */
+    rivets.push([x, 0.565, 0.078], [x, 0.445, 0.065], [x + s * 0.068, 0.5, 0.0]);
+    lathe([[0, 0.53], [0.066, 0.54], [0.082, 0.7], [0.09, 0.86], [0, 0.86]], etched).position.x = x;   /* the cuisse */
   });
   lathe([[0, 0.8], [0.2, 0.8], [0.19, 0.9], [0, 0.9]], dark, 1, 0.8);         /* the mail skirt */
   [[0.86, 0.215], [0.9, 0.205], [0.94, 0.195], [0.98, 0.185]].forEach(function (b, i) {   /* the tassets' four lames */
-    lathe([[0, b[0] + 0.05], [b[1] - 0.012, b[0] + 0.05], [b[1], b[0]], [b[1] - 0.004, b[0] - 0.004]], steel, 1, 0.78);
+    lathe([[0, b[0] + 0.05], [b[1] - 0.012, b[0] + 0.05], [b[1], b[0]], [b[1] - 0.004, b[0] - 0.004]], etched, 1, 0.78);
+    rivetRow(b[1] - 0.002, b[0] + 0.012, 0.78, [-1.1, -0.45, 0.45, 1.1]);
+  });
+  [1, -1].forEach(function (s) {                                                /* the tassets' straps and buckles */
+    var ph = s * 0.45, r = 0.2;
+    var st = part(new THREE.BoxGeometry(0.026, 0.13, 0.008), r * Math.sin(ph), 0.95, r * Math.cos(ph) * 0.78 + 0.006, leather); st.rotation.y = ph;
+    part(new THREE.BoxGeometry(0.03, 0.022, 0.01), r * Math.sin(ph) * 1.02, 0.975, r * Math.cos(ph) * 0.78 + 0.01, brass).rotation.y = ph;
   });
   ring(0.165, 0.016, 1.02, 0.78, leather);                                     /* the belt */
-  lathe([[0, 1.0], [0.165, 1.0], [0.178, 1.1], [0.2, 1.24], [0.2, 1.36], [0.165, 1.43], [0.09, 1.46], [0, 1.46]], steel, 1, 0.72);   /* the breastplate */
+  part(new THREE.BoxGeometry(0.04, 0.03, 0.012), 0, 1.02, 0.135, brass);      /* its buckle */
+  lathe([[0, 1.0], [0.16, 1.0], [0.172, 1.1], [0.198, 1.24], [0.2, 1.36], [0.165, 1.43], [0.09, 1.46], [0, 1.46]], etched, 1, 0.72);   /* the breastplate */
   part(new THREE.BoxGeometry(0.012, 0.32, 0.02), 0, 1.2, 0.143);               /* its ridge down the middle */
+  rivetRow(0.165, 1.425, 0.72, span(-1.0, 1.0, 7));                             /* round the neck */
+  rivetRow(0.162, 1.012, 0.72, span(-1.3, 1.3, 9));                             /* along the waist */
   lathe([[0, 1.43], [0.11, 1.43], [0.085, 1.5], [0, 1.5]]);                    /* the gorget */
+  rivetRow(0.1, 1.462, 1, span(-0.9, 0.9, 5));
   [1, -1].forEach(function (s) {
     ball(0.105, s * 0.205, 1.38, 0, 1.05, 0.85, 1.0);                          /* the shoulder plate */
-    [1.32, 1.28].forEach(function (y, i) { ball(0.09 - i * 0.008, s * 0.235, y, 0, 1, 0.45, 0.95); });   /* its lames */
+    [1.32, 1.28, 1.245].forEach(function (y, i) { ball(0.09 - i * 0.008, s * 0.235, y, 0, 1, 0.45, 0.95); });   /* its lames */
+    [-0.05, 0, 0.05].forEach(function (dz) { rivets.push([s * 0.24, 1.33, 0.07 + dz * 0.2 + 0.0]); });
+    rivets.push([s * 0.205, 1.43, 0.06], [s * 0.26, 1.29, 0.07]);
   });
-  limb([0.24, 1.33, 0], [0.27, 1.1, 0.0], 0.05, 0.047);                       /* its left arm hangs */
-  ball(0.054, 0.27, 1.08, 0.01);
-  limb([0.27, 1.07, 0.01], [0.27, 0.87, 0.05], 0.046, 0.04);
-  ball(0.045, 0.27, 0.81, 0.06, 0.85, 1.5, 1.05);                              /* its gauntlet */
-  limb([-0.24, 1.33, 0], [-0.3, 1.1, 0.04], 0.05, 0.047);                     /* its right arm, up to the shaft */
-  ball(0.054, -0.3, 1.08, 0.05);
-  limb([-0.3, 1.07, 0.05], [-0.39, 1.15, 0.11], 0.046, 0.04);
-  ball(0.05, -0.405, 1.16, 0.12, 1, 1.2, 1);                                   /* its fist round the shaft */
+  var LA = [[0.24, 1.33, 0], [0.27, 1.1, 0.0], [0.27, 0.87, 0.05]], RA = [[-0.24, 1.33, 0], [-0.3, 1.1, 0.04], [-0.39, 1.15, 0.11]];
+  [LA, RA].forEach(function (A, k) {
+    var s = k ? -1 : 1;
+    limb(A[0], A[1], 0.05, 0.047);                                             /* the upper arm */
+    lame(A[0], A[1], 0.32, 0.053); lame(A[0], A[1], 0.78, 0.051); lame(A[0], A[1], 0.9, 0.052);
+    ball(0.054, A[1][0], A[1][1] - 0.02, A[1][2] + 0.01);                      /* the elbow cop */
+    var fan = part(new THREE.CylinderGeometry(0.045, 0.045, 0.01, 24), A[1][0] + s * 0.04, A[1][1] - 0.02, A[1][2] + 0.03); fan.rotation.z = Math.PI / 2; fan.rotation.y = s * 0.5;
+    rivets.push([A[1][0], A[1][1] - 0.02, A[1][2] + 0.066]);
+    limb([A[1][0], A[1][1] - 0.03, A[1][2]], A[2], 0.046, 0.04);              /* the forearm */
+    lame([A[1][0], A[1][1] - 0.03, A[1][2]], A[2], 0.12, 0.049); lame([A[1][0], A[1][1] - 0.03, A[1][2]], A[2], 0.24, 0.048);
+    var cuff = new THREE.Vector3(A[2][0], A[2][1], A[2][2]), dir = cuff.clone().sub(new THREE.Vector3(A[1][0], A[1][1], A[1][2])).normalize();
+    var cm = part(new THREE.CylinderGeometry(0.058, 0.043, 0.06, 20, 1, true), cuff.x, cuff.y, cuff.z); cm.quaternion.setFromUnitVectors(UP, dir.clone().negate());   /* the gauntlet's flared cuff */
+    cm.material = steel; cm.material.side = THREE.DoubleSide;
+  });
+  ball(0.045, 0.27, 0.8, 0.06, 0.85, 1.5, 1.05);                               /* its left gauntlet, hanging */
+  [-0.02, -0.005, 0.01, 0.025].forEach(function (dx, i) { ball(0.012, 0.27 + dx * 0.8, 0.74, 0.07 + i * 0.004, 1, 2.2, 1); });   /* its fingers */
+  ball(0.05, -0.405, 1.16, 0.12, 1, 1.2, 1);                                   /* its right fist round the shaft */
+  [1.19, 1.165, 1.14].forEach(function (y) { ball(0.014, -0.39, y, 0.165, 1.4, 0.8, 1); });   /* its knuckles */
   /* the helmet, its top at 1.70 */
   ball(0.112, 0, 1.586, -0.005, 1, 1.02, 1.12);
   part(new THREE.BoxGeometry(0.01, 0.05, 0.2), 0, 1.69, -0.01);                /* its comb */
-  var visor = ball(0.115, 0, 1.56, 0.01, 0.96, 0.8, 1.14); visor.scale.z = 1.2;   /* the visor, shut */
-  part(new THREE.BoxGeometry(0.12, 0.012, 0.03), 0, 1.6, 0.14, dark);         /* its one slit */
+  var visor = ball(0.115, 0, 1.56, 0.01, 0.96, 0.8, 1.2);                       /* the visor, shut */
+  part(new THREE.BoxGeometry(0.085, 0.011, 0.012), 0, 1.6, 0.143, dark);      /* its one slit, set in the visor's face */
+  [1, -1].forEach(function (s) { ball(0.014, s * 0.108, 1.585, 0.0, 0.6, 1, 1, brass); });   /* the visor's pivots */
   lathe([[0, 1.47], [0.1, 1.48], [0.115, 1.52], [0, 1.52]]);                   /* the bevor's foot */
+  rivetRow(0.112, 1.5, 1, span(-0.8, 0.8, 5));
   /* the halberd, upright in its right hand, its butt on the flags */
   var hx = -0.405, hz = 0.12;
   limb([hx, 0.01, hz], [hx, 1.98, hz], 0.016, 0.014, wood);
+  part(new THREE.CylinderGeometry(0.019, 0.019, 0.03, 12), hx, 0.03, hz);      /* its iron shoe */
   part(new THREE.ConeGeometry(0.018, 0.22, 10), hx, 2.09, hz);                 /* the spike */
+  limb([hx, 1.72, hz], [hx, 1.98, hz], 0.02, 0.02);                            /* the langets down the shaft */
   function blade(pts, dir) {
     var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]);
     pts.slice(1).forEach(function (p) { sh.lineTo(p[0], p[1]); });
-    var m = part(new THREE.ExtrudeGeometry(sh, { depth: 0.008, bevelEnabled: false }), hx, 0, hz - 0.004);
+    var m = part(new THREE.ExtrudeGeometry(sh, { depth: 0.008, bevelEnabled: true, bevelThickness: 0.002, bevelSize: 0.003, bevelSegments: 1 }), hx, 0, hz - 0.004);
     m.scale.x = dir; return m;
   }
   blade([[0, 1.8], [0.08, 1.82], [0.15, 1.74], [0.19, 1.86], [0.2, 1.96], [0.19, 2.04], [0.15, 2.0], [0.08, 1.92], [0, 1.94]], -1);   /* the axe, outward */
   blade([[0, 1.85], [0.05, 1.86], [0.11, 1.95], [0.06, 1.91], [0, 1.9]], 1);   /* the fluke behind */
+  var rv = new THREE.InstancedMesh(new THREE.SphereGeometry(0.0065, 8, 6), new THREE.MeshStandardMaterial({ color: 0xd8dce0, metalness: 0.6, roughness: 0.3 }), rivets.length);
+  var mt = new THREE.Matrix4();
+  rivets.forEach(function (p, i) { mt.makeTranslation(p[0], p[1], p[2]); rv.setMatrixAt(i, mt); });
+  g.add(rv);
   var shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.4), armourShadow.material);
-  shadow.rotation.x = -Math.PI / 2; shadow.position.set(0, 0.003 - 0, 0.03); g.add(shadow);
+  shadow.rotation.x = -Math.PI / 2; shadow.position.set(0, 0.003, 0.03); g.add(shadow);
   g.position.set(only ? BAY_X : BAY_X + 0.9, 0, FAR_Z + 0.4);
   g.name = 'armour-3d'; scene.add(g);
   if (only) { armour.visible = false; armourShadow.visible = false; }
-  return { group: g, only: only, mats: [steel, dark] };
+  return { group: g, only: only, mats: [steel, etched, dark, rv.material] };
 })();
 function updateArmour3d() {   /* the torches' warmth by night, as the card's */
   if (!ARMOUR_3D) return;
