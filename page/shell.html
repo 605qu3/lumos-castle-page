@@ -911,8 +911,8 @@ var CUP = (function () {
   /* req 951 (c), Magic's 946 (Events' hall.cupboard-bucket, -bottle, -tin, page/events/hall.json, word for word): on the
      shelf where Interiors' schedule puts them (docs/interiors/hall-cupboard.md, the shelf's row, cited), Mrs Skower's
      bottle at y 64.3, its label a paler band, and the polish tin with the chamois over its lid, each 1 cm into the shelf;
-     the tin at y 64.08, in the brush and pan's place (not drawn), since at the schedule's 64.55 the open leaf hides it
-     from the stand (provisional, Interiors to confirm); a tap on the upturned bucket, the bottle or the tin, from the cupboard's stand while it stands open,
+     the tin at y 64.08, in the brush and pan's old place, since at the schedule's first 64.55 the open leaf hides it
+     from the stand (Interiors confirmed it, req 957 (a)); a tap on the upturned bucket, the bottle or the tin, from the cupboard's stand while it stands open,
      is the runtime's `hall-cupboard-bucket`, `-bottle`, `-tin`; the tin's line lifts the chamois back onto the shelf */
   var sx = r[0] + 0.1, own = function (m, nm) { m.name = nm; m.userData.owner = 'hall-cupboard'; m.raycast = function () {}; g.add(m); return m; };
   /* req 947: the bottle one group, so the small print's line can bring it to his eye (`CUP.bot`); its label printed,
@@ -934,6 +934,18 @@ var CUP = (function () {
   tinP.position.copy(P(sx, 64.08, 1.59 + 0.0225));
   var cham = own(new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.008, 0.13), kit.solid(0xb59a62, { roughness: 0.95 })), 'cupboard-chamois');
   cham.position.copy(P(sx, 64.08, 1.59 + 0.049)); cham.rotation.y = 0.3;
+  /* req 957 (a), Interiors' answer (docs/interiors/hall-cupboard.md, the brush and pan's row, cited): moved off the shelf
+     for the tin, the dustpan hung flat to the back wall from a nail under the shelf's south bracket, its lip at the
+     foot, the hand brush standing in it, bristles to the wall; the nail 2 cm into the stone */
+  var pan = [63.83, 64.07, 0.95, 1.25], bw = r[0], panG = function (x0, y0, x1, y1, za, zb, mt, nm) { own(box(x0, y0, x1, y1, za, zb, mt, nm), nm); };
+  panG(bw - 0.004, pan[0], bw + 0.006, pan[1], pan[2], pan[3], tin, 'cupboard-pan');
+  panG(bw - 0.004, pan[0], bw + 0.05, pan[1], pan[2], pan[2] + 0.012, tin, 'cupboard-pan-lip');
+  [pan[0], pan[1] - 0.004].forEach(function (y) { panG(bw - 0.004, y, bw + 0.05, y + 0.004, pan[2], pan[2] + 0.06, tin, 'cupboard-pan-side'); });
+  panG(bw + 0.001, 63.94, bw + 0.007, 63.96, pan[3], pan[3] + 0.045, tin, 'cupboard-pan-handle');
+  panG(bw - 0.02, 63.946, bw + 0.02, 63.954, pan[3] + 0.035, pan[3] + 0.043, ironC, 'cupboard-pan-nail');
+  panG(bw + 0.008, 63.88, bw + 0.02, 64.02, pan[2] + 0.012, pan[2] + 0.17, kit.solid(0x3a332b, { roughness: 1 }), 'cupboard-brush-bristles');
+  panG(bw + 0.02, 63.885, bw + 0.04, 64.015, pan[2] + 0.012, pan[2] + 0.17, wood, 'cupboard-brush-back');
+  panG(bw + 0.024, 63.935, bw + 0.036, 63.965, pan[2] + 0.17, pan[2] + 0.27, wood, 'cupboard-brush-handle');
   var taps = [['hall-cupboard-bucket', ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, 0.17, 0.36], ['hall-cupboard-bottle', sx, 64.3, 0.1, 0.24],
               ['hall-cupboard-tin', sx, 64.08, 0.08, 0.09]].map(function (t) {
     var m = new THREE.Mesh(new THREE.BoxGeometry(t[3] * 2, t[4], t[3] * 2), new THREE.MeshBasicMaterial({ visible: false }));
