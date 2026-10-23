@@ -4261,6 +4261,16 @@ thingCues[STAFF_BANG] = function () { showLines([{ medium: 'seen', sound: STAFF_
 if (BANG && PLACE === 'staff-room' && Q.get('touch') === 'staffdoor') setTimeout(function () { thingCues[STAFF_BANG](); }, 1500);
 thingCues[PV_WASTE] = function () { showLines([{ medium: 'seen', sound: PV_WASTE, on: function () { if (BANG && BANG.t < 0 && !(BORROW && BORROW.t >= 0)) BANG.t = 0; } }]); };
 if (BANG && Q.get('touch') === 'wastepaper') setTimeout(function () { thingCues[PV_WASTE](); }, 1500);
+/* req 996, peeves.json's peeves.basket-stair, word for word (Godric's woven touch, PS 8 L2724): in lake-corridor-b-west
+   and -g-west, on the line the turret door at the corridor's east end (gry-turret-door-B, -G, model v163) knocks on its
+   latch three times, 0.35 s apart and fainter each time, as the basket bounces past it inside; the basket stays the
+   line's (behind the shut door, no figure), Peeves's cackle the runtime's heard line. ?touch=basketstair */
+var PV_BASKET = 'a wastepaper basket comes bouncing down the newel stair inside the turret, past the door and away below';
+var BASKET_DOOR = (shell && shell.doors.filter(function (x) { return x.id === 'gry-turret-door-B' || x.id === 'gry-turret-door-G'; })[0]) || null;
+thingCues[PV_BASKET] = function () { showLines([{ medium: 'seen', sound: PV_BASKET, on: function () {
+  if (BASKET_DOOR && BASKET_DOOR.rest) [0, 0.35, 0.7].forEach(function (t, i) { setTimeout(function () { shake(BASKET_DOOR, 0.3, 60, 0.03 - 0.008 * i); }, t * 1000); });
+} }]); };
+if (BASKET_DOOR && Q.get('touch') === 'basketstair') setTimeout(function () { thingCues[PV_BASKET](); }, 1500);
 function updateBang(dt) {
   if (!BANG || BANG.t < 0) return;
   var B = BANG, s = (B.t += dt), h = B.d.hinge, m = B.d.mesh, e = function (u) { return u * u * (3 - 2 * u); };
@@ -6880,6 +6890,8 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return OWLTOAST ? { t: OWLTOAST.t < 0 ? null : +OWLTOAST.t.toFixed(2), owl: OWLTOAST.w.g.visible, at: OWLTOAST.w.g.position.toArray().map(function (v) { return +v.toFixed(2); }), toast: OWLTOAST.toast.visible, bitten: +(1 - OWLTOAST.toast.scale.x).toFixed(2) } : null; },
   turban: function (go) { if (go) thingCues[GR_TURBAN]();   /* req 975 (c) */
     return TURBAN ? { t: TURBAN.t < 0 ? null : +TURBAN.t.toFixed(2), shown: TURBAN.man.visible, white: TURBAN.white, st: TURBAN.st ? { a: TURBAN.st.a.map(function (v) { return +v.toFixed(1); }), d: TURBAN.st.d.map(function (v) { return +v.toFixed(2); }), side: TURBAN.st.side, D: TURBAN.st.D } : null, at: TURBAN.man.position.toArray().map(function (v) { return +v.toFixed(2); }) } : null; },
+  basketstair: function (go) { if (go) thingCues[PV_BASKET]();   /* req 996 */
+    return BASKET_DOOR ? { door: BASKET_DOOR.id, shaking: shakes.some(function (s) { return s.m === BASKET_DOOR.mesh; }) } : null; },
   banner: function (go) { if (go && BANNER && BANNER.t < 0) thingCues[SR_TAP]();   /* req 993 */
     return BANNER ? { t: BANNER.t < 0 ? null : +BANNER.t.toFixed(2), roll: BANNER.roll.visible, sheet: BANNER.sheet.visible, paint: BANNER.letters.material.color.getHexString() } : null; },
   elect: function () { return ELECT ? { board: ELECT.board.visible, room: ELECT.room.visible, cls: ELECT.cls.filter(function (m) { return m.visible; }).length } : null; },
