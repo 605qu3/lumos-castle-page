@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=490"></script>
-<script src="castle-paint.js?v=86"></script>
+<script src="castle-model.js?v=491"></script>
+<script src="castle-paint.js?v=87"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -5881,7 +5881,7 @@ function owlShown(shown) {
   owleryWeather(on(OWL_RAIN) ? 'rain' : on(OWL_SNOW) ? 'snow' : null);
   if (on(OWL_BEAMS)) { if (!OWL.beams.length) OWL.layBeams(); } else { OWL.beams.forEach(function (m) { shell.group.remove(m); }); OWL.beams = []; }
   [OWL_RAIN, OWL_SNOW, OWL_SNOWSILL, OWL_BEAMS].forEach(function (s) { if (on(s)) d.push(s); });
-  return d;
+  return d.concat(owlCrowd(shown));
 }
 if (OWL) {
   thingCues[OWL_FEATHER] = function () { showLines([{ medium: 'seen', sound: OWL_FEATHER, on: function () { OWL.drop(); } }]); };
@@ -5891,7 +5891,227 @@ if (OWL) {
   if (oq === 'sun') { OWL.fixed = [OWL_STRAW, OWL_VIEW]; OWL.layBeams(); }
   if (oq === 'feather') setTimeout(function () { thingCues[OWL_FEATHER](); }, 1200);
 }
+/* the perches and the owls (Godric's 1 on architect-owlery-owls-1022, 9.27 pm, 22 October 2026: perches and owls in
+   code; his note, "the owls need shelter and an easy way in and out of the owlery"). The way in and out is the six
+   glassless windows, 0.8 wide since model v160 (GoF 28 L31685, an owl flying out of sight through the Owlery window).
+   The shelter: the roosts are set back from the weather, which blows in at the windows' 1.0 to 2.4 and lands on the sills
+   and the straw at the wall's foot: four oak rails round the wall on iron brackets above the window heads (2.75 to 4.4;
+   GoF 15 L26270, "perches that rose right up to the top of the tower"), two rafters crossing over the room (4.85; OotP 14
+   L41652, "owls nestled on rafters"), and one long free-standing line of perches in the south-east, away from every
+   window and clear of the arch's way and the stands (GoF 18 L27387, "the long lines of perches"). The owls of every breed
+   (barn, tawny, snowy, eagle, little, grey, brown) sit on them in one instanced crowd, facing the room; how many and how
+   awake by the room's strings (owlery.json, word for word): the day's hundreds nearly all asleep with here and there a
+   round amber eye (never lit), half at breakfast, coming back in through the windows at dawn, waking at dusk, nearly bare
+   by night. A few owls the cues move are drawn whole with wings: the shuffle, the one that turns its back, the hoot high
+   up, and the one that stretches, hops to a window and goes out. Untappable, owner owlery. ?owlery=day|breakfast|back|
+   dawn|dusk|night holds a crowd for checks; lumosGreybox.owlery() reports it */
+var OWL_CROWD = 'hundreds upon hundreds of owls of every breed imaginable nestled on perches that rose right up to the top of the tower, nearly all of them asleep, though here and there a round amber eye glared',
+    OWL_HALF = 'the perches half empty while the post is out',
+    OWL_BACKHALL = 'the owls back from the Great Hall, settling and preening',
+    OWL_COMING = 'the owls coming back in through the glassless windows, settling on their perches',
+    OWL_WAKING = 'the owls waking and stretching on their perches',
+    OWL_BARE = 'the perches nearly bare, the room quiet but for the wind',
+    OWL_SHUFFLE = 'a shuffle of claws along a perch',
+    OWL_BACK = 'one owl turning its back on him with a ruffle',
+    OWL_HOOT = 'a sleepy hoot from somewhere high up the tower',
+    OWL_LEAVE = 'an owl stretching its wings, hopping to a loop and going out into the dark';
+var OWLS = !OWL ? null : (function () {
+  var rm = OWL_ROOM_REC(), C = rm.shape.circle, RR = rm.shape.r, z0 = shell.place.floor;
+  var P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
+  var rnd = (function () { var s = 949; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; })();   /* the same crowd each visit */
+  var g = new THREE.Group(); g.name = 'owlery-perches'; g.userData.owner = 'owlery'; shell.group.add(g);
+  var oak = new THREE.MeshStandardMaterial({ color: kit.col(0x5a4632), roughness: 0.9 }), iron = new THREE.MeshStandardMaterial({ color: kit.col(0x2c2a28), roughness: 0.7, metalness: 0.3 });
+  var add = function (m, nm) { m.name = nm; m.userData.owner = 'owlery'; m.raycast = function () {}; g.add(m); return m; };
+  var yawOf = function (fx, fy) { return Math.atan2(fy, fx); };   /* a plan direction to the page's turn about y (+x faces east) */
+  var slots = [];
+  /* the wall rails: a ring 0.22 off the wall, brackets every 24 degrees bearing 0.1 into the stone */
+  var RAILS = [2.75, 3.3, 3.85, 4.4], ri = RR - 0.22;
+  RAILS.forEach(function (h, k) {
+    var t = add(new THREE.Mesh(new THREE.TorusGeometry(ri, 0.032, 6, 96), oak), 'owlery-rail-' + k);
+    t.rotation.x = -Math.PI / 2; t.position.copy(P(C[0], C[1], h));
+    for (var a = 0; a < 15; a++) {
+      var b = (a + (k % 2) * 0.5) / 15 * Math.PI * 2, sx = Math.sin(b), sy = Math.cos(b);
+      var br = add(new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.04, 0.04), iron), 'owlery-bracket-' + k + '-' + a);
+      br.position.copy(P(C[0] + sx * (RR - 0.07), C[1] + sy * (RR - 0.07), h - 0.03)); br.rotation.y = yawOf(sx, sy);
+    }
+    var n = Math.floor(2 * Math.PI * ri / 0.36);
+    for (var i = 0; i < n; i++) {
+      var b2 = (i + rnd() * 0.3) / n * Math.PI * 2, sx2 = Math.sin(b2), sy2 = Math.cos(b2);
+      slots.push({ pos: P(C[0] + sx2 * ri, C[1] + sy2 * ri, h + 0.03), yaw: yawOf(-sx2, -sy2) + (rnd() - 0.5) * 0.7, h: h, kind: 'rail', b: b2, k: k });
+    }
+  });
+  /* the rafters: two oak beams crossing over the middle, their ends 0.2 into the wall */
+  [20, 110].forEach(function (deg, k) {
+    var b = deg * Math.PI / 180, sx = Math.sin(b), sy = Math.cos(b), L = 2 * RR + 0.4;
+    var m = add(new THREE.Mesh(new THREE.BoxGeometry(L, 0.2, 0.16), oak), 'owlery-rafter-' + k);
+    m.position.copy(P(C[0], C[1], 4.75)); m.rotation.y = yawOf(sx, sy);
+    for (var d = -RR + 0.5; d <= RR - 0.5; d += 0.42) {
+      if (Math.abs(d) < 0.3) continue;   /* the crossing */
+      var side = rnd() < 0.5 ? 1 : -1;
+      slots.push({ pos: P(C[0] + sx * d, C[1] + sy * d, 4.85), yaw: yawOf(sy * side, -sx * side) + (rnd() - 0.5) * 0.5, h: 4.85, kind: 'rafter' });
+    }
+  });
+  /* the long line of perches: three rails on four posts, 2.6 long, tangent at bearing 150, r 3.0 */
+  (function () {
+    var b = 150 * Math.PI / 180, cx = C[0] + Math.sin(b) * 3.0, cy = C[1] + Math.cos(b) * 3.0, tx = Math.cos(b), ty = -Math.sin(b), L = 2.6;
+    [-1.3, -0.43, 0.43, 1.3].forEach(function (u, i) {
+      var post = add(new THREE.Mesh(new THREE.BoxGeometry(0.09, 2.35, 0.09), oak), 'owlery-line-post-' + i);
+      post.position.copy(P(cx + tx * u, cy + ty * u, 1.175));
+      var foot = add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.06, 0.12), oak), 'owlery-line-foot-' + i);
+      foot.position.copy(P(cx + tx * u, cy + ty * u, 0.06)); foot.rotation.y = yawOf(Math.sin(b), Math.cos(b));
+    });
+    [1.2, 1.7, 2.2].forEach(function (h, k) {
+      var r = add(new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, L + 0.1, 8), oak), 'owlery-line-rail-' + k);
+      r.rotation.z = Math.PI / 2; r.rotation.y = yawOf(tx, ty); r.position.copy(P(cx, cy, h));
+      for (var u = -L / 2 + 0.15; u <= L / 2 - 0.15; u += 0.34) {
+        var side = rnd() < 0.5 ? 1 : -1;
+        slots.push({ pos: P(cx + tx * u, cy + ty * u, h + 0.03), yaw: yawOf(Math.sin(b) * side, Math.cos(b) * side) + (rnd() - 0.5) * 0.5, h: h, kind: 'line' });
+      }
+    });
+  })();
+  /* the owls: one crowd, instanced (body, face, head, eyes); facing +x, standing on y 0 */
+  var BREEDS = [[0xc9a26b, 0xf1e8d8, 1.0], [0x7a5636, 0xa58360, 1.0], [0xeceae4, 0xf4f2ee, 1.1], [0x6b5034, 0x8e7150, 1.35],
+    [0x8b7656, 0xb9a688, 0.62], [0x8a8580, 0xa8a39c, 0.85], [0x5e4630, 0x7d644a, 0.95]];
+  var PARTS = {
+    body: new THREE.Matrix4().compose(new THREE.Vector3(0, 0.12, 0), new THREE.Quaternion(), new THREE.Vector3(0.1, 0.13, 0.105)),
+    head: new THREE.Matrix4().compose(new THREE.Vector3(0.008, 0.245, 0), new THREE.Quaternion(), new THREE.Vector3(0.08, 0.075, 0.088)),
+    face: new THREE.Matrix4().compose(new THREE.Vector3(0.058, 0.243, 0), new THREE.Quaternion(), new THREE.Vector3(0.03, 0.06, 0.07)),
+    beak: new THREE.Matrix4().compose(new THREE.Vector3(0.088, 0.228, 0), new THREE.Quaternion(), new THREE.Vector3(0.012, 0.02, 0.01)),
+    eyeL: new THREE.Matrix4().compose(new THREE.Vector3(0.084, 0.255, 0.03), new THREE.Quaternion(), new THREE.Vector3(0.015, 0.015, 0.015)),
+    eyeR: new THREE.Matrix4().compose(new THREE.Vector3(0.084, 0.255, -0.03), new THREE.Quaternion(), new THREE.Vector3(0.015, 0.015, 0.015))
+  };
+  var ball = new THREE.SphereGeometry(1, 12, 9), N = slots.length;
+  var feathers = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 }), amber = new THREE.MeshStandardMaterial({ color: kit.col(0xd4901c), roughness: 0.25 });
+  var inst = {};
+  ['body', 'head', 'face'].forEach(function (k) { inst[k] = new THREE.InstancedMesh(ball, feathers, N); });
+  inst.eye = new THREE.InstancedMesh(ball, amber, N * 2);
+  inst.beak = new THREE.InstancedMesh(ball, new THREE.MeshStandardMaterial({ color: kit.col(0x3a3128), roughness: 0.6 }), N);
+  Object.keys(inst).forEach(function (k) { var m = inst[k]; m.name = 'owlery-owls-' + k; m.userData.owner = 'owlery'; m.raycast = function () {}; m.frustumCulled = false; g.add(m); });
+  var owls = slots.map(function (s, i) {
+    var br = BREEDS[Math.floor(rnd() * BREEDS.length)], sz = br[2] * (0.88 + rnd() * 0.24);
+    inst.body.setColorAt(i, kit.col(br[0])); inst.head.setColorAt(i, kit.col(br[0])); inst.face.setColorAt(i, kit.col(br[1]));
+    return { s: s, br: br, size: sz, rank: rnd(), wake: rnd(), shown: false, open: false, actor: null };
+  });
+  var ZERO = new THREE.Matrix4().makeScale(0, 0, 0), M = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), U = new THREE.Vector3(0, 1, 0);
+  var place = function (i) {
+    var o = owls[i], on = o.shown && !o.actor;
+    var base = on ? new THREE.Matrix4().compose(o.s.pos, Q4.setFromAxisAngle(U, o.s.yaw), new THREE.Vector3(o.size, o.size, o.size)) : null;
+    ['body', 'head', 'face', 'beak'].forEach(function (k) { inst[k].setMatrixAt(i, on ? M.multiplyMatrices(base, PARTS[k]) : ZERO); });
+    inst.eye.setMatrixAt(2 * i, on && o.open ? M.multiplyMatrices(base, PARTS.eyeL) : ZERO);
+    inst.eye.setMatrixAt(2 * i + 1, on && o.open ? M.multiplyMatrices(base, PARTS.eyeR) : ZERO);
+  };
+  var dirty = function () { Object.keys(inst).forEach(function (k) { inst[k].instanceMatrix.needsUpdate = true; if (inst[k].instanceColor) inst[k].instanceColor.needsUpdate = true; }); };
+  /* the crowd's states: how many of the perches are taken, how many eyes open */
+  var STATES = { day: [0.9, 0.05], breakfast: [0.45, 0.12], back: [0.9, 0.45], dawn: [0.35, 0.4], dusk: [0.85, 0.85], night: [0.06, 0.6] };
+  var out = { owls: owls, slots: slots, state: null, actors: [], comeT: 0 };
+  out.set = function (st) {
+    if (st === out.state) return; out.state = st;
+    var q = STATES[st] || STATES.day;
+    owls.forEach(function (o, i) { o.shown = o.rank < q[0]; o.open = o.wake < q[1]; place(i); });
+    dirty();
+  };
+  /* an owl drawn whole, wings and all, for the cues; its crowd twin hidden while it moves */
+  var whole = function (o) {
+    var G = new THREE.Group(), mk = function (col, mat, k) { var m = new THREE.Mesh(ball, mat || new THREE.MeshStandardMaterial({ color: kit.col(col), roughness: 0.95 })); m.applyMatrix4(PARTS[k]); m.raycast = function () {}; G.add(m); return m; };
+    mk(o.br[0], null, 'body'); var head = new THREE.Group(); G.add(head);
+    [['head', o.br[0]], ['face', o.br[1]], ['beak', 0x3a3128]].forEach(function (p) { var m = new THREE.Mesh(ball, new THREE.MeshStandardMaterial({ color: kit.col(p[1]), roughness: 0.95 })); m.applyMatrix4(PARTS[p[0]]); m.raycast = function () {}; head.add(m); });
+    var eyes = ['eyeL', 'eyeR'].map(function (k) { var m = new THREE.Mesh(ball, amber); m.applyMatrix4(PARTS[k]); m.raycast = function () {}; head.add(m); return m; });
+    var wm = new THREE.MeshStandardMaterial({ color: kit.col(o.br[0]), roughness: 0.95 });
+    var wings = [1, -1].map(function (sd) {
+      var piv = new THREE.Group(); piv.position.set(-0.01, 0.2, 0.07 * sd);
+      var w = new THREE.Mesh(ball, wm); w.scale.set(0.09, 0.012, 0.16); w.position.set(-0.01, 0, 0.13 * sd); w.raycast = function () {};
+      piv.add(w); piv.rotation.x = sd * 1.35; G.add(piv); return { p: piv, sd: sd };   /* folded down against the body */
+    });
+    G.scale.setScalar(o.size); G.position.copy(o.s.pos); G.rotation.y = o.s.yaw;
+    G.name = 'owlery-owl-whole'; G.userData.owner = 'owlery'; g.add(G);
+    return { g: G, head: head, eyes: eyes, wings: wings };
+  };
+  var take = function (o, kind, extra) {
+    var i = owls.indexOf(o), a = Object.assign({ o: o, i: i, kind: kind, t: 0, w: whole(o) }, extra || {});
+    a.w.eyes.forEach(function (e) { e.visible = o.open || kind !== 'shuffle'; });
+    o.actor = a; place(i); dirty(); out.actors.push(a); return a;
+  };
+  var free = function (a, gone) {
+    g.remove(a.w.g); a.o.actor = null; if (gone) a.o.shown = false; place(a.i); dirty();
+    out.actors = out.actors.filter(function (x) { return x !== a; });
+  };
+  var pick = function (test) { var c = owls.filter(function (o) { return o.shown && !o.actor && (!test || test(o)); }); return c.length ? c[Math.floor(Math.random() * c.length)] : null; };
+  /* the windows' inner and outer mouths, for the flights */
+  var mouths = OWL.sills.map(function (sl) {
+    return { inn: P(C[0] + sl.ux * (RR + 0.2), C[1] + sl.uy * (RR + 0.2), sl.sill + 0.55), sill: P(C[0] + sl.ux * (RR + 0.35), C[1] + sl.uy * (RR + 0.35), sl.sill),
+      far: P(C[0] + sl.ux * (RR + 4.2), C[1] + sl.uy * (RR + 4.2), sl.sill + 0.9), yawOut: yawOf(sl.ux, sl.uy) };
+  });
+  out.cue = function (what) {
+    var o;
+    if (what === 'shuffle') { o = pick(function (x) { return x.s.kind === 'rail'; }); if (o) take(o, 'shuffle', { d: (Math.random() < 0.5 ? 1 : -1) * 0.3 }); }
+    if (what === 'back') { o = pick(function (x) { return x.s.h < 3.5; }); if (o) take(o, 'back'); }
+    if (what === 'hoot') { o = pick(function (x) { return x.s.h > 4; }); if (o) take(o, 'hoot'); }
+    if (what === 'leave') { o = pick(function (x) { return x.s.kind === 'rail' && x.s.h < 3.4; }); if (o) take(o, 'leave', { m: mouths[Math.floor(Math.random() * mouths.length)] }); }
+    if (what === 'come') { o = owls.filter(function (x) { return !x.shown && !x.actor && x.s.kind !== 'line'; })[0]; if (o) { o.shown = true; o.open = true; take(o, 'come', { m: mouths[Math.floor(Math.random() * mouths.length)] }); } }
+    return o ? owls.indexOf(o) : null;
+  };
+  var bez = function (a, c, b, u) { return a.clone().multiplyScalar((1 - u) * (1 - u)).add(c.clone().multiplyScalar(2 * u * (1 - u))).add(b.clone().multiplyScalar(u * u)); };
+  var flap = function (a, s, on) { a.w.wings.forEach(function (w) { w.p.rotation.x = on ? w.sd * (0.2 + 0.9 * (0.5 + 0.5 * Math.sin(s * 22))) : w.sd * 1.35; }); };
+  var face = function (G, from, to) { var dx = to.x - from.x, dz = to.z - from.z; if (dx * dx + dz * dz > 1e-6) G.rotation.y = Math.atan2(-dz, dx); };
+  out.update = function (dt) {
+    out.actors.slice().forEach(function (a) {
+      var s = (a.t += dt), G = a.w.g, o = a.o;
+      if (a.kind === 'shuffle') {   /* a sideways shuffle along the rail and back to rest there */
+        var u = Math.min(1, s / 1.4), bb = o.s.b + a.d / ri * u;
+        G.position.copy(P(C[0] + Math.sin(bb) * ri, C[1] + Math.cos(bb) * ri, o.s.h + 0.03 + 0.015 * Math.abs(Math.sin(s * 14))));
+        if (u >= 1) { o.s.b = bb; o.s.pos.copy(G.position); free(a); }
+      } else if (a.kind === 'back') {   /* a ruffle, then round on the perch, its back to the room */
+        var r = Math.min(1, Math.max(0, (s - 0.4) / 0.7)); G.rotation.y = o.s.yaw + Math.PI * r * r * (3 - 2 * r);
+        G.scale.setScalar(o.size * (1 + 0.12 * Math.max(0, Math.sin(Math.min(s, 0.4) / 0.4 * Math.PI))));
+        if (s > 1.2) { o.s.yaw += Math.PI; o.open = false; free(a); }
+      } else if (a.kind === 'hoot') {   /* eyes open, the head dipping twice, then asleep again */
+        a.w.head.position.y = -0.02 * Math.max(0, Math.sin(s * 6)); a.w.head.rotation.z = -0.25 * Math.max(0, Math.sin(s * 6));
+        if (s > 2.2) free(a);
+      } else if (a.kind === 'leave') {   /* wings stretched, a hop down to the sill, out along the window and gone */
+        var m = a.m;
+        if (s < 1.2) { flap(a, s, false); a.w.wings.forEach(function (w) { w.p.rotation.x = w.sd * (1.35 - 1.1 * Math.sin(Math.min(1, s / 1.2) * Math.PI)); }); }
+        else {
+          if (!a.from) { a.from = G.position.clone(); a.ctl = a.from.clone().lerp(m.inn, 0.5); a.ctl.y += 0.4; }
+          var f = s - 1.2, d1 = 1.3, d2 = 1.4;
+          flap(a, s, true);
+          if (f < d1) { var p1 = bez(a.from, a.ctl, m.inn, f / d1); face(G, G.position, p1); G.position.copy(p1); }
+          else if (f < d1 + d2) { var p2 = m.inn.clone().lerp(m.far, (f - d1) / d2); face(G, G.position, p2); G.position.copy(p2); }
+          else free(a, true);
+        }
+      } else if (a.kind === 'come') {   /* in along a window, then up to its perch, wings folded as it lands */
+        var mm = a.m, e1 = 1.2, e2 = 1.5;
+        if (!a.ctl) { a.ctl = mm.inn.clone().lerp(o.s.pos, 0.5); a.ctl.y += 0.5; G.position.copy(mm.far); }
+        flap(a, s, s < e1 + e2 - 0.1);
+        if (s < e1) { var q1 = mm.far.clone().lerp(mm.inn, s / e1); face(G, G.position, q1); G.position.copy(q1); }
+        else if (s < e1 + e2) { var q2 = bez(mm.inn, a.ctl, o.s.pos, (s - e1) / e2); face(G, G.position, q2); G.position.copy(q2); }
+        else { G.rotation.y = o.s.yaw; if (s > e1 + e2 + 0.6) { o.open = Math.random() < 0.4; free(a); } }
+      }
+    });
+    if (out.state === 'dawn') {   /* a stream in by ones and twos */
+      out.comeT -= dt;
+      if (out.comeT <= 0) { out.comeT = 1.2 + Math.random() * 2; if (out.actors.length < 6) out.cue('come'); }
+    }
+  };
+  out.set('day');
+  return out;
+})();
+function OWL_ROOM_REC() { return MODEL.rooms.filter(function (r) { return r.id === 'owlery'; })[0]; }
+function owlCrowd(shown) {
+  if (!OWLS || OWLS.fixedState) return [];
+  var on = function (s) { return shown.indexOf(s) >= 0; };
+  var st = on(OWL_BARE) ? 'night' : on(OWL_WAKING) ? 'dusk' : on(OWL_COMING) ? 'dawn' : on(OWL_HALF) ? 'breakfast' : on(OWL_BACKHALL) ? 'back' : 'day';
+  OWLS.set(st);
+  return [OWL_CROWD, OWL_HALF, OWL_BACKHALL, OWL_COMING, OWL_WAKING, OWL_BARE].filter(on);
+}
+if (OWLS) {
+  [[OWL_SHUFFLE, 'shuffle'], [OWL_BACK, 'back'], [OWL_HOOT, 'hoot'], [OWL_LEAVE, 'leave']].forEach(function (c) {
+    thingCues[c[0]] = function () { showLines([{ medium: c[1] === 'hoot' ? 'heard' : 'seen', sound: c[0], on: function () { OWLS.cue(c[1]); } }]); };
+  });
+  var oc = { day: 'day', breakfast: 'breakfast', back: 'back', dawn: 'dawn', dusk: 'dusk', night: 'night' }[Q.get('owlery')];
+  if (oc) { OWLS.set(oc); OWLS.fixedState = oc; }
+}
 function updateOwlery(dt) {
+  if (OWLS) OWLS.update(dt);
   if (!OWL) return;
   var C = 0, z0 = shell.place.floor;
   if (OWL.weather) OWL.motes.forEach(function (p) {
@@ -5953,7 +6173,8 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   cupboard: function (cue) { if (cue) cueTable[cue === 'small' ? CUP_SMALL : cue]();   /* req 947: a cue string, or 'small' for the bottle's small print */
     return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run, lift: CUP.lift } : null; },
   /* req 945: the tables' dishes and steam, the corridor's paintings and torches; a cue string passed in plays it */
-  owlery: function (cue) { if (cue && thingCues[cue]) thingCues[cue](); return OWL ? { sills: OWL.sills.length, wet: OWL.sills.filter(function (s) { return s.wet.visible; }).length, snow: OWL.sills.filter(function (s) { return s.snow.visible; }).length, beams: OWL.beams.map(function (m) { return m.name; }), weather: OWL.weather, feather: OWL.feather ? { h: +OWL.feather.h.toFixed(2), down: OWL.feather.down } : null, widths: OWL.sills.map(function (s) { return +s.w.toFixed(2); }) } : null; },
+  owlery: function (cue) { if (cue && OWLS && /^(shuffle|back|hoot|leave|come)$/.test(cue)) OWLS.cue(cue); else if (cue && thingCues[cue]) thingCues[cue](); return OWL ? { sills: OWL.sills.length, wet: OWL.sills.filter(function (s) { return s.wet.visible; }).length, snow: OWL.sills.filter(function (s) { return s.snow.visible; }).length, beams: OWL.beams.map(function (m) { return m.name; }), weather: OWL.weather, feather: OWL.feather ? { h: +OWL.feather.h.toFixed(2), down: OWL.feather.down } : null, widths: OWL.sills.map(function (s) { return +s.w.toFixed(2); }),
+    owls: OWLS ? { state: OWLS.state, slots: OWLS.slots.length, shown: OWLS.owls.filter(function (o) { return o.shown; }).length, open: OWLS.owls.filter(function (o) { return o.shown && o.open; }).length, actors: OWLS.actors.map(function (a) { return a.kind + ' ' + a.t.toFixed(1); }) } : null } : null; },
   woven: function (cue) { if (cue) cueTable[cue]();   /* req 960: a cue string; the things' state */
     return WOVEN ? { env: WOVEN.env ? WOVEN.env[0].visible : null, book: WOVEN.book ? WOVEN.book[0].visible : null, title: WOVEN.title ? WOVEN.title.visible : null,
       lift: Object.keys(WOVEN.lifts).map(function (k) { return k + ' ' + WOVEN.lifts[k].t.toFixed(2); }).join(', '), flick: WOVEN.flick,
