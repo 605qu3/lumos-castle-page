@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=489"></script>
-<script src="castle-paint.js?v=85"></script>
+<script src="castle-model.js?v=490"></script>
+<script src="castle-paint.js?v=86"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -289,6 +289,8 @@ PAINTED = PAINTED.concat(['forbidden-corridor', 'stone-bay', 'stone-pit', 'stone
 PAINTED = PAINTED.concat(['astronomy-lantern-room', 'astronomy-night-books', 'astronomy-chart-room', 'astronomy-instrument-room', 'astronomy-telescope-store', 'astronomy-cloak-room']);
 /* v158, req 877 (H63, ledger 223): the room of the stopped clocks, the south-west drum on 4, a rough build; its clocks Interiors' */
 PAINTED = PAINTED.concat(['stopped-clocks']);
+/* v159, req 949 (ledger 224): the Owlery at the top of the West Tower, a rough build; straw on its floor (STRAW) and nothing else */
+PAINTED = PAINTED.concat(['owlery']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
@@ -5633,6 +5635,38 @@ var GPLAY = !GIANT || !window.lumosChess ? null : (function () {
 function updateGiant(dt) { if (GPLAY) GPLAY.update(dt); }
 
 /* the hooks: the events and magic set these (a shut door's tap, a way taken); harmless when unset */
+/* req 949, the Owlery's rough build (model v159, ledger 224): "the floor was entirely covered in straw" (GoF 15 L26270),
+   and nothing else (docs/magic/rooms.md, The Owlery, its death rule): a layer of loose straw over the flags, drawn here
+   in code, a little heaped at the wall's foot; no perches, owls or droppings yet. Untappable, lit as the room, owner
+   owlery. The cues are 951 (d)'s, next */
+var STRAW = PLACE !== 'owlery' || !shell ? null : (function () {
+  var c = document.createElement('canvas'); c.width = c.height = 256;
+  var x = c.getContext('2d'), R = function (a, b) { return a + Math.random() * (b - a); };
+  x.fillStyle = '#6b5735'; x.fillRect(0, 0, 256, 256);
+  for (var i = 0; i < 1400; i++) {   /* stalks every way, pale and dark */
+    var px = R(0, 256), py = R(0, 256), a = R(0, Math.PI), l = R(8, 34), t = R(0, 1);
+    x.strokeStyle = t < 0.55 ? 'rgba(172,150,100,0.8)' : t < 0.85 ? 'rgba(138,116,72,0.85)' : 'rgba(82,66,40,0.8)';
+    x.lineWidth = R(0.8, 2.2); x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke();
+  }
+  var tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding; tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(4, 4); tex.anisotropy = 4;
+  var mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 1, metalness: 0 });
+  var rm = MODEL.rooms.filter(function (r) { return r.id === 'owlery'; })[0], C = rm.shape.circle, r = rm.shape.r, z0 = shell.place.floor;
+  var g = new THREE.Group(); g.name = 'owlery-straw'; g.userData.owner = 'owlery';
+  var disc = new THREE.Mesh(new THREE.CircleGeometry(r - 0.01, 48), mat);
+  disc.rotation.x = -Math.PI / 2; disc.position.copy(shell.toLocal(C[0], C[1], z0 + 0.03));
+  disc.name = 'owlery-straw-floor'; disc.userData.owner = 'owlery'; disc.raycast = function () {}; g.add(disc);
+  /* the heap at the wall's foot: low drifts, flattened half-spheres, clear of the arch on the east */
+  for (var k = 0; k < 36; k++) {
+    var b = k / 36 * Math.PI * 2 + R(-0.05, 0.05), sx = Math.sin(b), sy = Math.cos(b);
+    if (sx > 0.93) continue;   /* the stair's arch */
+    var h = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), mat);
+    h.scale.set(R(0.5, 0.8), R(0.06, 0.14), R(0.35, 0.5)); h.rotation.y = -b;
+    h.position.copy(shell.toLocal(C[0] + sx * (r - 0.3), C[1] + sy * (r - 0.3), z0 + 0.02));
+    h.name = 'owlery-straw-drift-' + k; h.userData.owner = 'owlery'; h.raycast = function () {}; g.add(h);
+  }
+  shell.group.add(g);
+  return g;
+})();
 var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
   place: shell.place.id, places: shell.places.map(function (p) { return p.id; }),
   doors: shell.doors.map(function (d) { return { id: d.id, to: d.to }; }),
