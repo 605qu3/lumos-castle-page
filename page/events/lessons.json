@@ -1,0 +1,78 @@
+{
+  "chain": "lessons",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "lessons.exam-quills",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = seated lessons",
+        "year = 1",
+        "lessons = on",
+        "time != night",
+        "date >= 06-01",
+        "days since exam_quills_on >= 3"
+      ],
+      "show": [
+        "pupils bent over their desks write their papers in the heat with the new quills the school has given them for the exams, bewitched with an Anticheating spell"
+      ],
+      "starts": [
+        "stamp exam_quills_on"
+      ],
+      "canon": "Godric's woven touch exam-quills (22 October 2026, 9.45 pm, relayed by Fawkes): in exam week seated pupils write with new quills bewitched against cheating (PS 16 L5458, read in the canon tool, 22 October 2026: \"It was sweltering hot, especially in the large classroom where they did their written papers. They had been given special, new quills for the exams, which had been bewitched with an Anticheating spell.\"); year 1, in a lesson hour of the exam month (from the first of June, CoS 16; the leaving feast, a setting, ends the term), in each of four classrooms, three days apart at the least; the touch is year 1's and the record is gated so, widening it a later choice; the Anticheating spell is the book's name, no line"
+    },
+    {
+      "id": "lessons.sugar-quill",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = seated lessons",
+        "year = 3",
+        "lessons = on",
+        "time != night",
+        "days since sugar_quill_on >= 4"
+      ],
+      "show": [
+        "at a desk a third-year sucks a sugar quill with a faraway look, exactly like a boy thinking what to write next"
+      ],
+      "starts": [
+        "stamp sugar_quill_on"
+      ],
+      "canon": "Godric's woven touch sugar-quill-class (22 October 2026, 9.45 pm, relayed by Fawkes): now and then a seated third-year sucks a sugar quill in class, looking as if he is thinking (PoA 5 L14771, Ron on Honeydukes, read in the canon tool, 22 October 2026: \"really excellent sugar quills, which you can suck in class and just look like you're thinking what to write next\"); year 3, in a lesson hour in each of four classrooms, four days apart at the least; the pupil is nobody by name"
+    },
+    {
+      "id": "lessons.fingers-crossed",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = seated lessons",
+        "year = 1",
+        "lessons = on",
+        "time != night",
+        "days since fingers_crossed_on >= 4"
+      ],
+      "show": [
+        "a pupil at a desk waits for his marked work to come back with his fingers crossed under the desk"
+      ],
+      "starts": [
+        "stamp fingers_crossed_on"
+      ],
+      "canon": "Godric's woven touch fingers-crossed-desk (22 October 2026, 9.45 pm, relayed by Fawkes): a seated pupil waiting for marked work crosses his fingers under the desk (PS 7 L2515, read in the canon tool, 22 October 2026: \"Harry crossed his fingers under the table\", at his Sorting; Godric's touch moves the gesture to a lesson's waiting, and the page to a desk); year 1, in a lesson hour in each of four classrooms, four days apart at the least; the pupil is nobody by name"
+    }
+  ],
+  "places": {
+    "seated lessons": [
+      "charms classroom",
+      "defence classroom",
+      "history of magic classroom",
+      "transfiguration classroom"
+    ]
+  }
+}

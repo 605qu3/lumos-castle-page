@@ -1002,6 +1002,68 @@
         "stamp gobstones_on"
       ],
       "canon": "Godric's woven touch gobstones-squirt (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): two older pupils play Gobstones on a window ledge and one is squirted when he loses a point (PoA 4 L14230, read in the canon tool, 22 October 2026: \"a wizarding game rather like marbles, in which the stones squirted a nasty-smelling liquid into the other player's face when they lost a point\"); year 3, in the corridor by day, now and then, three days apart at the least; the pupils unnamed"
+    },
+    {
+      "id": "stair.whizzbees-hover",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = corridor",
+        "year = 3",
+        "weekday = monday",
+        "time != night",
+        "castle date >= 3 11-01",
+        "days since whizzbees_on >= 7"
+      ],
+      "show": [
+        "a few third-years drift down the corridor a few inches off the floor, each sucking a Fizzing Whizzbee"
+      ],
+      "starts": [
+        "stamp whizzbees_on"
+      ],
+      "canon": "Godric's woven touch whizzbees-hover (22 October 2026, 9.45 pm, relayed by Fawkes): after a Hogsmeade weekend a few third-years drift down a corridor off the floor, sucking Fizzing Whizzbees (PoA 10 L17248, \"Fizzing Whizzbees, the levitating sherbert balls that Ron had mentioned\", and PoA 5 L14775, \"sherbert balls that make you levitate a few inches off the ground while you're sucking them\", read in the canon tool, 22 October 2026); year 3, in the corridor by day; PROVISIONAL, there being no Hogsmeade dates driver yet: the Mondays from November of year 3 stand in for the day after a weekend in the village, a week apart at the least, and the record takes the driver when it comes; the pupils are nobody by name"
+    },
+    {
+      "id": "stair.beans-bad-flavour",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = corridor",
+        "year = 1",
+        "time != night",
+        "days since beans_on >= 4"
+      ],
+      "who": [
+        {
+          "as": "friend",
+          "role": "voice",
+          "name": "a first-year with the beans",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "a first-year holds out a bag of Bertie Bott's Every Flavour Beans to his friends; one takes a bean, bites it and pulls a dreadful face"
+      ],
+      "lines": [
+        {
+          "speaker": "friend",
+          "medium": "heard",
+          "key": "stair.beans-pepper",
+          "sound": "a first-year spluttering over a bean, his friends laughing",
+          "text": [
+            "Pepper! That was pepper!"
+          ],
+          "canon": "ours, in a first-year's voice; the bean after the book's own bad one, PS 6 L2100 (\"a funny gray one Ron wouldn't touch, which turned out to be pepper\", read in the canon tool, 22 October 2026)"
+        }
+      ],
+      "starts": [
+        "stamp beans_on"
+      ],
+      "canon": "Godric's woven touch beans-bad-flavour (22 October 2026, 9.45 pm, relayed by Fawkes): a pupil offers round a bag of Every Flavour Beans and a friend pulls a face at a bad flavour (PS 6 L2100, read in the canon tool, 22 October 2026: \"They had a good time eating the Every Flavor Beans\"); year 1, in the corridor by day, four days apart at the least; the pupils are nobody by name"
     }
   ]
 }

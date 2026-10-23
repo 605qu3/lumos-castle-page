@@ -908,6 +908,26 @@
         "stamp hourglass_watch_on"
       ],
       "canon": "Godric's woven touch house-hourglasses (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): the groan side of hall.hourglass-cheer, the emeralds' fall, the pair sharing one_of hall-hourglass-watch so one fires a visit; the school's own level, never the boys' stones"
+    },
+    {
+      "id": "hall.new-broom",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 30-150 s",
+      "when": [
+        "place = entrance hall",
+        "year = 2",
+        "time != night",
+        "days since new_broom_on >= 10"
+      ],
+      "show": [
+        "a player of one of the house teams crosses the hall with a brand-new broom held out before him, showing it off to everyone he passes"
+      ],
+      "starts": [
+        "stamp new_broom_on"
+      ],
+      "canon": "Godric's woven touch new-brooms-shown-off (22 October 2026, 9.45 pm, relayed by Fawkes): a team player crosses the hall with a brand-new broom, showing it off (CoS 7 L8796, read in the canon tool, 22 October 2026: Flint \"hanging onto his new broomstick for support\", the Slytherin team's new brooms of that autumn); year 2, in the entrance hall by day, ten days apart at the least; the player is nobody by name and of no house the cue names"
     }
   ]
 }
