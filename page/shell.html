@@ -161,6 +161,9 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=1"></script>
+<script src="charms/spells.js?v=41"></script>
+<script src="charms/guide.js?v=6"></script>
+<script src="charms/desks.js?v=1"></script>
 <script src="castle-shell.js?v=75"></script>
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=20"></script>
@@ -2172,6 +2175,28 @@ var H71 = (function () {
   }
   return out;
 })();
+/* Mobiliarbus on H71's desks (Charms' req 1052; page/charms/desks.js's head comment the spec): once he has learned the
+   spell (?learned for a check), a tap on a desk lifts it a few inches and drifts it to the square he names; his head
+   turns toward the desk and the wall square beside it, no further than a quarter turn or the stand's own limit */
+if (H71.on && window.CharmsDesks) {
+  H71.spell = CharmsDesks.forHall(THREE, { desks: H71.desks,
+    P: function (x, y, z) { return shell.toLocal(146.0 + x, 25.4 + y, shell.place.floor + z); },
+    camera: camera, canvas: renderer.domElement,
+    stands: (function () { var r = MROOMS.filter(function (m) { return m.id === 'old-exam-hall'; })[0], s = (r && r.look && r.look.stands) || {};
+      return Object.keys(s).map(function (k) { return [s[k].at[0] - 146.0, s[k].at[1] - 25.4]; }); })(),
+    known: function () { return Q.has('learned') || !!(window.LumosSpells && LumosSpells.learned('mobiliarbus')); },
+    onLook: function (t) {
+      var q = shell.group.localToWorld(shell.toLocal(146.0 + t.x, 25.4 + t.y, shell.place.floor)), d = lookOf(here).clone().sub(here.pos);
+      var a = Math.atan2(q.x - here.pos.x, q.z - here.pos.z) - Math.atan2(d.x, d.z), lm = limits(here);
+      a -= hyT; a = hyT + clamp(Math.atan2(Math.sin(a), Math.cos(a)), -Math.PI / 2, Math.PI / 2);   /* a quarter turn at most from where he looks */
+      hyT = lm.yaw == null ? a : clamp(a, -lm.yaw, lm.yaw);
+    },
+    onCast: function (r, n) {   /* the probe's words until Events gives the room's line */
+      if (!r) return;
+      if (r.verdict === 'moved') showLines([{ medium: 'seen', sound: 'Mobiliarbus! Desk ' + n + ' rises a few inches, drifts ' + LumosSpells.slideWords(r.dx, r.dy) + ' and lands with a soft thump.' }]);
+      else if (r.why) showLines([{ medium: 'seen', sound: r.why[0] + '. ' + r.why[1] }]);
+    } });
+}
 /* the lake rooms' seats (ledger 258; Godric's 1 at 4.03 pm on architect-lake-rooms-windows-1023, 23 October 2026): in
    each window the model gives a `recess` (castle-shell.js v75 draws the recess), its seat, in the recess's frame (u
    along the wall from the window's middle, v out from the corridor's face): in the hall range's embrasures two stone
@@ -5989,6 +6014,7 @@ function tap(cx, cy) {
          tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
   if (GPLAY && GPLAY.tap(raycaster, hits.length ? hits[0].distance : null)) { kit.tapped(true); return; }   /* req 922, the giant board */
+  if (H71.spell && H71.spell.tap(raycaster, hits.length ? hits[0].distance : null)) { kit.tapped(true); return; }   /* req 1052, Mobiliarbus */
   if (hit && hit.userData.pearTap && PEAR) {   /* req 951 (b), the pear (and, once found, the handle) */
     var pd = PEAR.d, ps = pd ? placeOf(pd).s : null;
     if (ps && here !== ps) acted = goTo(pd);
@@ -6135,6 +6161,7 @@ function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   updateCamera(dt);
   updateShakes(dt); updatePear(dt); updateKitchens(dt);
+  if (H71.spell) H71.spell.frame(dt);
   updateSwings(dt);
   updateFades(dt);
   updateCupboard(dt);
@@ -7498,6 +7525,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return { state: FOFFICE.state, roll: FOFFICE.lines.filter(function (m) { return m.visible; }).length, lamp: L ? +(L.light.intensity / L.low).toFixed(2) : null,
       rattling: FOFFICE.rattle >= 0, shaking: FOFFICE.shake >= 0, drawer: FOFFICE.drawer.getWorldPosition(new THREE.Vector3()), taps: FOFFICE.taps || 0 }; },
   head: function () { var lm = limits(here); return { yaw: hy, pitch: hp, limit: lm.yaw, lo: lm.lo, hi: lm.hi, lim: here.lim }; },
+  desks: function () { return H71.spell || null; },   /* req 1052: Mobiliarbus on H71's desks, for checks */
   /* a stand by name at once, and the head set and held within its limits (the shots at both limits) */
   standNamed: function (n) {
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
