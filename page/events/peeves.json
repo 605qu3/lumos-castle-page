@@ -542,9 +542,48 @@
         "stamp armour_rattle_on"
       ],
       "canon": "Godric's woven touch peeves-rattles-armour (22 October 2026, 9.45 pm, relayed by Fawkes): Peeves zooms down a corridor and the suits of armour rattle as he passes (PS 7 L2669, read in the canon tool, 22 October 2026: \"They heard him zooming away, rattling coats of armor as he passed.\"); year 1, in the corridor by day, five days apart at the least; he is not seen, only heard and the armour shaken; no line, the cue being the rattle"
+    },
+    {
+      "id": "peeves.basket-stair",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 40-160 s",
+      "when": [
+        "place = gryffindor turret doors",
+        "time != night",
+        "days since basket_stair_on >= 3"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "voice",
+          "name": "peeves",
+          "mark": "the stair door"
+        }
+      ],
+      "show": [
+        "a wastepaper basket comes bouncing down the newel stair inside the turret, past the door and away below"
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "peeves.basket-stair-cackle",
+          "sound": "a cackle fading away up the turret stair"
+        }
+      ],
+      "starts": [
+        "stamp basket_stair_on"
+      ],
+      "canon": "Godric's woven touch peeves-basket-stair (Godric's 2 on architect-south-range-west-busts-1023, 8.18 am, 23 October 2026, relayed by Fawkes; the Architect's req 996): a wastepaper basket bounces down the newel stair in the turret by the Gryffindor Tower's foot, a cackle fading above (PS 8, B1 ch8 L2724, read in the canon tool, 23 October 2026: \"He would drop wastepaper baskets on your head\"; Peeves's habit, no page of the book, so it passes the replay test, and it lands on nobody); at either lake corridor's turret door, by day, three days apart at the least; seen and heard at the door, the stair itself being no place"
     }
   ],
   "places": {
+    "gryffindor turret doors": [
+      "lake corridor b west",
+      "lake corridor g west"
+    ],
     "first-year lessons": [
       "charms classroom",
       "defence classroom",
