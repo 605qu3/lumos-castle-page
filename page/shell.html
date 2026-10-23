@@ -2183,7 +2183,8 @@ var W1 = (function () {
   var F = { 'potions-dungeon': [16, 15.4, 1, 1, false], 'snape-office': [29, 11.6, -1, -1, false],
             'staff-room': [128, 50.6, 1, 1, true], 'staff-passage': [128, 50.6, 1, 1, true],
             'kitchens': [0, 0, 1, 1, false], 'secret-s3': [0, 0, 1, 1, false], 'hall-chamber': [0, 0, 1, 1, false],
-            'filchs-office': [104, 62, 1, 1, false], 'charms-classroom': [139.6, 71.4, 1, -1, true] }[PLACE];
+            'filchs-office': [104, 62, 1, 1, false], 'charms-classroom': [139.6, 71.4, 1, -1, true],
+            'transfiguration-classroom': [139.6, 71.4, 1, -1, true] }[PLACE];
   if (!F) return out;
   out.on = true;
   var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'wave1-things'; shell.group.add(g);
@@ -2599,6 +2600,19 @@ var W1 = (function () {
     }); });
   }
 
+  if (PLACE === 'transfiguration-classroom') {
+    /* req 964: docs/interiors/transfiguration-classroom.md, The things (x = 139.6 + y', y = 71.4 - x'): the pupils' single
+       desks, four rows of four, two each side of the aisle, centred x' 1.1, 2.4, 5.6 and 6.9, 0.75 by 0.55 and 0.72 high,
+       a chair behind each (0.42 square, the board-back form); her desk at the front, x' 3.2 to 4.8, y' 9.8 to 10.6, 0.75,
+       its panel to the class, and her chair behind it at (4.0, 11.05), facing the class. The toad is TOUCH's */
+    [2.2, 3.6, 5.0, 6.4].forEach(function (yp) { [1.1, 2.4, 5.6, 6.9].forEach(function (xc) {
+      desk(xc - 0.375, yp, xc + 0.375, yp + 0.55, 0.72, wood);
+      chair(xc, yp - 0.29, 90, 1, wood, 0.21);
+    }); });
+    pedestalDesk(3.2, 9.8, 4.8, 10.6, 0.75);
+    chair(4.0, 11.05, 270, 0, dark, 0.3);
+  }
+
   var owner = PLACE === 'staff-passage' ? 'staff-passage' : PLACE;
   byMat.forEach(function (list, mt) {
     out.pieces += list.length;
@@ -2656,6 +2670,32 @@ var FIRES = (function () {
     }
     block(r[0] - e, r[2], r[1] - e, r[3] + e, f.h);
     for (var k = 1; k < s.risers; k++) block(r[2] + (k - 1) * s.going - 0.01, r[2] + k * s.going, r[1] - e, r[3] + e, f.h - k * s.rise);
+  });
+  /* req 964: the four house tables and their benches, as page/great-hall.html's schedule reads Interiors' numbers
+     (docs/interiors/great-hall.md; the Great Hall lane's S): x 23 to 61, centred y 66.8, 62.6, 58.4 and 54.2, 1.0 wide,
+     the top 0.75 on a trestle at each end (req 833), a bench either side 0.05 off, 0.35 deep, its seat 0.45. Legs
+     and trestles 1 cm into the flags, never flush; one merged mesh a material, untappable */
+  var oak = kit.solid(0x5e4630), bench = kit.solid(0x4e3a28), parts = { oak: [], bench: [] };
+  function slab(list, x0, x1, y0, y1, za, zb) {
+    var gm = new THREE.BoxGeometry(x1 - x0, zb - za, y1 - y0); gm.applyMatrix4(new THREE.Matrix4().makeTranslation(0, (za + zb) / 2, 0));
+    var c = shell.toLocal((x0 + x1) / 2, (y0 + y1) / 2, z0), b = shell.toLocal((x0 + x1) / 2 + 1, (y0 + y1) / 2, z0).sub(c);
+    gm.applyMatrix4(new THREE.Matrix4().makeRotationY(Math.atan2(-b.z, b.x))); gm.applyMatrix4(new THREE.Matrix4().makeTranslation(c.x, c.y, c.z));
+    list.push(gm.toNonIndexed());
+  }
+  [66.8, 62.6, 58.4, 54.2].forEach(function (yc) {
+    slab(parts.oak, 23.0, 61.0, yc - 0.5, yc + 0.5, 0.69, 0.75);
+    [23.34, 60.54].forEach(function (x) { slab(parts.oak, x, x + 0.12, yc - 0.4, yc + 0.4, -0.01, 0.69); });
+    [-1, 1].forEach(function (s) {
+      var a = yc + s * 0.55, b = yc + s * 0.9, y0 = Math.min(a, b), y1 = Math.max(a, b);
+      slab(parts.bench, 23.0, 61.0, y0, y1, 0.40, 0.45);
+      [23.26, 60.66].forEach(function (x) { slab(parts.bench, x, x + 0.08, y0 + 0.025, y1 - 0.025, -0.01, 0.40); });
+    });
+  });
+  [[parts.oak, oak, 'hall-tables'], [parts.bench, bench, 'hall-benches']].forEach(function (p) {
+    var pos = [], nor = [];
+    p[0].forEach(function (gm) { Array.prototype.push.apply(pos, gm.attributes.position.array); Array.prototype.push.apply(nor, gm.attributes.normal.array); });
+    var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    var m = new THREE.Mesh(bg, p[1]); m.name = p[2]; m.userData.owner = 'great-hall'; m.raycast = function () {}; g.add(m); out.n++;
   });
   return out;
 })();
@@ -3978,6 +4018,125 @@ function ehallShown(shown) {
   EHALL.set(Q.get('mud') === 'on' || shown.indexOf(EH_MUD) >= 0, Q.get('needles') === 'on' || shown.indexOf(EH_NEEDLES) >= 0);
   return [EH_MUD, EH_NEEDLES].filter(function (s) { return shown.indexOf(s) >= 0; });
 }
+/* req 964 (Events' strings for Godric's woven touches of 22 October 2026, word for word; hall.json's
+   hall.norris-follows-hagrid). The Entrance Hall, on the line: Mrs Norris (People's assets/layers/norris-figure.png, six
+   cells of 0.6 by 0.7 m in its order, 0 trotting, 1 sitting) comes in just inside the front doors, east of the puddle,
+   trots across the flags to the marble staircase's foot (x 82.3, clear of the front-doors stand by 1.9 m) and up its
+   first flight tread by tread to the half-landing (2.6 at y 45.2), and is gone; Hagrid, a few paces ahead, stays the
+   line's, no figure of him yet. She turns to his eye about the upright, mirrored to her heading on the screen, lit as
+   the room, untappable. ?touch=hagrid plays it; lumosGreybox.touch(cue) */
+var EH_HAGRID = "Hagrid's great boots crossing the hall to the stairs, and a few paces behind them Mrs Norris, tail high, trailing him all the way";
+var TOUCH = (function () {
+  if (PLACE !== 'entrance-hall' || !shell) return null;
+  var z0 = shell.place.floor, out = { walk: null, cat: null };
+  var t = new THREE.TextureLoader().load('../assets/layers/norris-figure.png'); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+  var g = new THREE.PlaneGeometry(0.6, 0.7), uv = g.attributes.uv;
+  for (var i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) / 6);   /* cell 0, trotting */
+  var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide }));
+  m.name = 'entrance-hall-norris'; m.userData.owner = PLACE; m.raycast = function () {}; m.visible = false; scene.add(m); out.cat = m;
+  /* the way: [x, y, z, metres a second to the next point]; the flight's fifteen treads of 0.32 rising 0.173 */
+  out.way = [[81.3, 69.3, 0, 1.15], [82.3, 50.3, 0, 0.8], [82.3, 45.5, 2.6, 0]];
+  out.go = function () { out.walk = { t: -1.4, k: 0, u: 0 }; };   /* she is in a few paces after his boots */
+  return out;
+})();
+thingCues[EH_HAGRID] = function () { showLines([{ medium: 'seen', sound: EH_HAGRID, on: function () { if (TOUCH) TOUCH.go(); } }]); };
+if (TOUCH && Q.get('touch') === 'hagrid') setTimeout(function () { thingCues[EH_HAGRID](); }, 1500);
+function updateTouch(dt) {
+  if (!TOUCH || !TOUCH.walk) return;
+  var w = TOUCH.walk, m = TOUCH.cat, W = TOUCH.way;
+  w.t += dt; if (w.t < 0) return;
+  var a = W[w.k], b = W[w.k + 1], len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  w.u += dt * a[3] / len;
+  if (w.u >= 1) { w.k++; w.u = 0; if (w.k >= W.length - 1) { m.visible = false; TOUCH.walk = null; return; } a = W[w.k]; b = W[w.k + 1]; }
+  var x = a[0] + (b[0] - a[0]) * w.u, y = a[1] + (b[1] - a[1]) * w.u;
+  var z = b[2] > a[2] ? a[2] + Math.min(15, Math.floor(w.u * 15 + 0.5)) * (b[2] - a[2]) / 15 : a[2];   /* tread by tread */
+  m.position.copy(shell.toLocal(x, y, shell.place.floor + z + 0.35)); m.visible = true;
+  var c = camera.position; m.rotation.set(0, Math.atan2(c.x - m.position.x, c.z - m.position.z), 0);
+  var h = shell.toLocal(b[0], b[1], 0).sub(shell.toLocal(a[0], a[1], 0)), side = new THREE.Vector3(Math.cos(m.rotation.y), 0, -Math.sin(m.rotation.y));
+  m.scale.x = h.dot(side) < 0 ? -1 : 1;   /* her nose to her heading on the screen */
+}
+/* req 964, transfiguration.json's transfiguration.trevor-hop, word for word: on the line a toad (a common toad's 9 cm,
+   squat, warty olive-brown, drawn here) hops out from under the third row's desk left of the aisle (x' 2.4, y' 5.0 to
+   5.55) into the aisle toward the front in four hops, sits a moment, and hops under the front-row desk beside it and is
+   gone; the boy scrambling after it stays the line's (no first-years' figure yet). On the floor, untappable, lit as
+   the room. ?touch=toad plays it */
+var TF_TOAD = "a toad hopping out from under a first-year's desk, and a boy scrambling after it on hands and knees, hissing for it to come back";
+var TOAD = (function () {
+  if (PLACE !== 'transfiguration-classroom' || !shell) return null;
+  var z0 = shell.place.floor, P = function (xp, yp) { return shell.toLocal(139.6 + yp, 71.4 - xp, z0); };
+  var g = new THREE.Group(), skin = new THREE.MeshStandardMaterial({ color: kit.col(0x5e5a3a), roughness: 0.85 }), eye = kit.solid(0x2a2416);
+  var body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 14, 10), skin); body.scale.set(0.09, 0.042, 0.068); body.position.set(0, 0.024, 0); g.add(body);
+  var head = new THREE.Mesh(new THREE.SphereGeometry(0.5, 12, 8), skin); head.scale.set(0.04, 0.03, 0.05); head.position.set(0.04, 0.03, 0); g.add(head);
+  [-1, 1].forEach(function (u) {
+    var e = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 6), eye); e.position.set(0.048, 0.044, u * 0.016); g.add(e);
+    var leg = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.014, 0.02), skin); leg.position.set(-0.03, 0.008, u * 0.036); leg.rotation.y = u * 0.5; g.add(leg);
+  });
+  g.traverse(function (o) { o.userData.owner = PLACE; o.raycast = function () {}; });
+  g.name = 'transfiguration-toad'; g.visible = false; scene.add(g);
+  /* the hops (x', y'): out from under the desk, along the aisle toward her desk, then under the front-row desk */
+  var way = [[2.4, 5.3], [2.85, 5.6], [3.35, 5.95], [3.8, 6.4], [4.05, 6.85], [3.6, 6.9], [3.05, 6.8], [2.55, 6.7]];
+  return { g: g, way: way.map(function (w) { return P(w[0], w[1]); }), t: -1, k: 0, sit: 4, hop: 0.42, high: 0.11,
+    go: function () { this.t = 0; this.k = 0; } };
+})();
+thingCues[TF_TOAD] = function () { showLines([{ medium: 'seen', sound: TF_TOAD, on: function () { if (TOAD) TOAD.go(); } }]); };
+if (TOAD && Q.get('touch') === 'toad') setTimeout(function () { thingCues[TF_TOAD](); }, 1500);
+function updateToad(dt) {
+  if (!TOAD || TOAD.t < 0) return;
+  var T = TOAD, n = T.way.length - 1, pause = T.k === 4 ? T.sit : 0.5;   /* a beat between hops, a longer sit in the aisle */
+  T.t += dt;
+  if (T.t > T.hop + pause) { T.t = 0; T.k++; }
+  if (T.k >= n) { T.g.visible = false; T.t = -1; return; }
+  var a = T.way[T.k], b = T.way[T.k + 1], u = Math.min(1, T.t / T.hop);
+  T.g.visible = true;
+  T.g.position.lerpVectors(a, b, u); T.g.position.y += T.high * 4 * u * (1 - u);
+  T.g.rotation.set(0, Math.atan2(-(b.z - a.z), b.x - a.x), 0);
+  T.g.children[0].scale.y = 0.042 * (u > 0 && u < 1 ? 1.25 : 1);   /* stretched in the air */
+}
+/* req 964, great-hall.json's great-hall.christmas-mice, word for word: on the line six white mice (drawn here, 7 cm and
+   a pink tail) drop from the benches' aisle edges 4 to 8 m before the start's eye and scurry off, zigzagging, under the
+   two tables either side of the middle aisle, and are gone under them; Mrs Norris (People's norris-figure, cell 1,
+   sitting) sits in the doorway's mouth at the passage's north side, turned to his eye, and stays 40 s. Untappable,
+   lit as the room. ?touch=mice plays it */
+var GH_MICE = "white mice from the wizard crackers scurrying off under the long tables, and Mrs Norris sitting in the doorway, her lamp-like eyes following them";
+var MICE = (function () {
+  if (PLACE !== 'great-hall' || !shell) return null;
+  var z0 = shell.place.floor, L = function (x, y, z) { return shell.toLocal(x, y, z0 + (z || 0)); };
+  var fur = kit.solid(0xe8e4dc), pink = kit.solid(0xc89a98), out = { mice: [], t: -1, sit: 40 };
+  /* [from x, from y, to y (under a table's middle), the start's delay] */
+  [[58.4, 59.4, 58.5, 0], [57.0, 59.4, 58.3, 0.4], [55.6, 59.5, 58.6, 0.9], [57.9, 61.6, 62.5, 0.2], [56.4, 61.6, 62.7, 0.7], [55.0, 61.5, 62.5, 1.2]].forEach(function (d, i) {
+    var g = new THREE.Group(), b = new THREE.Mesh(new THREE.SphereGeometry(0.5, 10, 8), fur); b.scale.set(0.07, 0.03, 0.035); b.position.y = 0.017; g.add(b);
+    var tail = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.004, 0.004), pink); tail.position.set(-0.068, 0.008, 0); g.add(tail);
+    [-1, 1].forEach(function (u) { var e = new THREE.Mesh(new THREE.SphereGeometry(0.007, 6, 4), pink); e.position.set(0.024, 0.032, u * 0.009); g.add(e); });
+    g.traverse(function (o) { o.userData.owner = PLACE; o.raycast = function () {}; });
+    g.name = 'great-hall-mouse-' + i; g.visible = false; scene.add(g);
+    var ex = d[0] - 1.2 - (i % 3) * 0.5;   /* each runs west a little as it goes under */
+    out.mice.push({ g: g, a: [d[0], d[1]], b: [ex, d[2]], wait: d[3], run: 2.0 + (i % 2) * 0.4, seed: i * 1.7 });
+  });
+  var t = new THREE.TextureLoader().load('../assets/layers/norris-figure.png'); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+  var gm = new THREE.PlaneGeometry(0.6, 0.7), uv = gm.attributes.uv;
+  for (var i = 0; i < uv.count; i++) uv.setX(i, (1 + uv.getX(i)) / 6);   /* cell 1, sitting */
+  out.cat = new THREE.Mesh(gm, new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide }));
+  out.cat.position.copy(L(65.5, 61.7, 0.35)); out.cat.name = 'great-hall-norris'; out.cat.userData.owner = PLACE; out.cat.raycast = function () {}; out.cat.visible = false; scene.add(out.cat);
+  out.L = L; out.go = function () { out.t = 0; };
+  return out;
+})();
+thingCues[GH_MICE] = function () { showLines([{ medium: 'seen', sound: GH_MICE, on: function () { if (MICE) MICE.go(); } }]); };
+if (MICE && Q.get('touch') === 'mice') setTimeout(function () { thingCues[GH_MICE](); }, 1500);
+function updateMice(dt) {
+  if (!MICE || MICE.t < 0) return;
+  var M = MICE; M.t += dt;
+  M.mice.forEach(function (m) {
+    var s = (M.t - m.wait) / m.run;
+    if (s < 0 || s > 1.4) { m.g.visible = false; return; }   /* a moment still under the table, then gone */
+    var u = Math.min(1, s), w = Math.sin(u * Math.PI * 3 + m.seed) * 0.25 * (1 - u);   /* the zigzag, dying out under the table */
+    var x = m.a[0] + (m.b[0] - m.a[0]) * u + w, y = m.a[1] + (m.b[1] - m.a[1]) * u;
+    var p = M.L(x, y, 0.001), q = M.L(x + (m.b[0] - m.a[0]) * 0.01 + Math.cos(u * Math.PI * 3 + m.seed) * 0.02, y + (m.b[1] - m.a[1]) * 0.01, 0.001);
+    m.g.position.copy(p); m.g.rotation.set(0, Math.atan2(-(q.z - p.z), q.x - p.x), 0); m.g.visible = true;
+  });
+  M.cat.visible = M.t < M.sit;
+  if (M.cat.visible) { var c = camera.position; M.cat.rotation.set(0, Math.atan2(c.x - M.cat.position.x, c.z - M.cat.position.z), 0); }
+  if (M.t > M.sit) M.t = -1;
+}
 /* req 927 (People's, on req 897 and Godric's 1 on people-painters-sitters-r1-1022; Events' req 928 strings,
    page/events/painters-room.json, word for word): the painters' room's two sitters drawn into their canvases
    (page/shell-w5a.js, the easels at (162.5, -1.4), the tea witch's with the cup, and (162.5, 1.1), the young wizard's).
@@ -4607,7 +4766,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateToad(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -5519,6 +5678,10 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
       lift: Object.keys(WOVEN.lifts).map(function (k) { return k + ' ' + WOVEN.lifts[k].t.toFixed(2); }).join(', '), flick: WOVEN.flick,
       sheet: WOVEN.sheet ? WOVEN.sheet.visible : null, singed: WOVEN.singed ? WOVEN.singed.visible : null, scorch: WOVEN.scorch ? WOVEN.scorch.visible : null,
       mine: WOVEN.mine ? WOVEN.mine[0].visible : null, fx: WOVEN.fx ? WOVEN.fx.kind + ' ' + WOVEN.fx.t.toFixed(2) : null, tries: WOVEN.tries } : null; },
+  touch: function (cue) { if (cue) cueTable[{ hagrid: EH_HAGRID, toad: TF_TOAD, mice: GH_MICE }[cue] || cue]();   /* req 964 */
+    if (MICE) return { t: +MICE.t.toFixed(2), mice: MICE.mice.filter(function (m) { return m.g.visible; }).length, cat: MICE.cat.visible };
+    if (TOAD) return { hop: TOAD.t < 0 ? null : [TOAD.k, +TOAD.t.toFixed(2)], toad: TOAD.g.visible, at: TOAD.g.position.toArray().map(function (v) { return +v.toFixed(2); }) };
+    return TOUCH ? { walk: TOUCH.walk ? [TOUCH.walk.k, +TOUCH.walk.u.toFixed(2)] : null, cat: TOUCH.cat.visible, at: TOUCH.cat.visible ? TOUCH.cat.position.toArray().map(function (v) { return +v.toFixed(2); }) : null } : null; },
   elect: function () { return ELECT ? { board: ELECT.board.visible, room: ELECT.room.visible, cls: ELECT.cls.filter(function (m) { return m.visible; }).length } : null; },
   kitchens: function (cue) { if (cue) cueTable[cue]();
     return { dishes: KDISH ? KDISH.state : null, puffs: KDISH ? KDISH.puffs.filter(function (p) { return p.s.visible; }).length : null,
