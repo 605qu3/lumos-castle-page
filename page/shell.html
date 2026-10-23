@@ -2884,6 +2884,19 @@ var W1 = (function () {
     box(6.95, 11.5, 0.75, 7.25, 11.68, 0.81, RT.deal);                                              /* the box of buttons, its lid slid half back */
     box(7.1, 11.5, 0.81, 7.4, 11.68, 0.818, RT.deal);
   }
+  if (PLACE === 'charms-classroom') {
+    /* ledger 244 and 238: docs/interiors/charms-classroom.md, The real things (x = 139.6 + y', y = 71.4 - x'; the back
+       wall y' 0, an inner wall, the window wall x' 0). Its 1, what Flitwick's cupboard holds, is Charms' and Magic's with
+       the cupboard's doors, as the schedule says */
+    stove(5.95, 0.45, { z: 2.6, to: [5.95, -0.05] });                                                /* 2, its flue into the back wall */
+    scuttle(6.55, 0.3);
+    pegs(6.8, 8.0, 0.0, 1.6, 6, 1);                                                                  /* 3, a cloak and a scarf left */
+    cloak(7.1, 0.0, 1.6, 1); scarf(7.7, 0.0, 1.6, 1);
+    clock(4.5, 0.0, 2.8, 1);                                                                         /* 4, over the door */
+    pole([0.25, 4.0, 0.0], [0.04, 4.0, 2.3]);                                                        /* 5, at the pier after the first window */
+    shelves(false, 9.0, -1, 6.6, 8.6, 0.3, [0.6, 1.05, 1.5]);                                       /* the shelf of things to practise on (The things), bare till its things */
+    hourglass(8.85, 8.45, 1.5);                                                                      /* 6, the practice shelf's top, its front end */
+  }
 
   var owner = PLACE === 'staff-passage' ? 'staff-passage' : PLACE;
   byMat.forEach(function (list, mt) {
