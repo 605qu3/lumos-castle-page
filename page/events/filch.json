@@ -1213,7 +1213,9 @@
         "place = corridor",
         "chase = on",
         "hiding = yes",
-        "year != 2"
+        "year != 2",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1274,6 +1276,80 @@
       "canon": "req 933 (c), the friends (Godric's pick on corridor-chase-ideas-1022, all four): Nick points Filch down the wrong flight, a third partner of the hidden pass beside the Fat Lady's and Peeves's; B1 ch8 L2724; not in the Chamber's year"
     },
     {
+      "id": "filch.chase-hidden-nick-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 2,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "year != 2",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        },
+        {
+          "as": "nick",
+          "role": "voice",
+          "name": "nearly headless nick",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Nearly Headless Nick gliding out of the wall at the top of the stairs, one hand sweeping toward the far flight, and Filch going off down it"
+      ],
+      "lines": [
+        {
+          "speaker": "nick",
+          "medium": "heard",
+          "key": "filch.chase-nick-points-day",
+          "sound": "Nearly Headless Nick, gliding out of the wall at the top of the stairs",
+          "text": [
+            "Mr Filch! Forgive me, but if it is a pupil you are after, I rather think I saw one go down the far flight, in a great hurry.",
+            "Why, Mr Filch. Looking for someone? I believe whoever it was went down the far stair."
+          ],
+          "canon": "ours, in his voice (B1 ch8 L2724: Nearly Headless Nick was always happy to point new Gryffindors in the right direction, here pointing Filch the wrong way for them, kindly and with perfect courtesy), read in the canon tool, 22 October 2026; comic, nobody hurt, Filch shamed by nothing; not in the Chamber's year, when he is petrified"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-nick-filch-day",
+          "sound": "Filch at the top of the stairs, turning away",
+          "text": [
+            "The far flight. Hm. Come along, my sweet.",
+            "Down the far flight, was it. Come, my sweet."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091, checked against the text, 15 October 2026); he takes a ghost's word and goes"
+        },
+        {
+          "speaker": "nick",
+          "medium": "heard",
+          "key": "filch.chase-nick-soft-day",
+          "sound": "Nick, very low, once he has gone",
+          "text": [
+            "Off you go, then. Mind the stairs.",
+            "All quite safe now. I shall keep a look out."
+          ],
+          "canon": "ours, in his voice (B1 ch8 L2724); he knows where the boy is and says nothing to Filch"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 933 (c), the friends (Godric's pick on corridor-chase-ideas-1022, all four): Nick points Filch down the wrong flight, a third partner of the hidden pass beside the Fat Lady's and Peeves's; B1 ch8 L2724; not in the Chamber's year"
+    },
+    {
       "id": "filch.chase-hidden-neville",
       "tier": "fixed",
       "source": "device",
@@ -1285,7 +1361,9 @@
         "place = corridor",
         "chase = on",
         "hiding = yes",
-        "neville_out = yes"
+        "neville_out = yes",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1335,6 +1413,69 @@
       "canon": "req 933 (c), the friends: Neville's squeak (B1 ch9 L3243) draws the lamp to the locked-out Neville, not to the hidden boy; only while neville_out = yes; the running is not drawn (a cell would be People's, a spend put to Godric)"
     },
     {
+      "id": "filch.chase-hidden-neville-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "neville_out = yes",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        },
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "frame-foot"
+        }
+      ],
+      "show": [
+        "Neville at the foot of the frame, squeaking and shrinking against the wall as Filch's eyes sweep over him, and Filch going back down the stairs"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "filch.chase-neville-squeak-day",
+          "sound": "Neville, shut out, as Filch comes round the corner",
+          "text": [
+            "Eep!",
+            "Oh! Oh no, I haven't done anything, I'm only locked out!"
+          ],
+          "canon": "B1 ch9 L3243 (Neville suddenly let out a frightened squeak), the first for the squeak alone and the second ours; he is the locked-out Neville of neville.json, sitting at the frame's foot, and he runs nowhere"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-neville-filch-day",
+          "sound": "Filch, looming over him",
+          "text": [
+            "Longbottom. Locked out again, are you? Well, you are no use to me.",
+            "Longbottom! Hm. Nothing but a boy sitting in the draught. Come along, my sweet."
+          ],
+          "canon": "ours, in his voice (he names pupils by their surnames, CoS 8 L9037, \"Name...Harry Potter\"); the chase ends on a boy he does not mind, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 933 (c), the friends: Neville's squeak (B1 ch9 L3243) draws the lamp to the locked-out Neville, not to the hidden boy; only while neville_out = yes; the running is not drawn (a cell would be People's, a spend put to Godric)"
+    },
+    {
       "id": "filch.chase-hidden-cupboard",
       "tier": "fixed",
       "source": "device",
@@ -1346,7 +1487,9 @@
         "place = corridor",
         "chase = on",
         "hiding = yes",
-        "at = cupboard"
+        "at = cupboard",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1388,6 +1531,63 @@
         "set chase = off"
       ],
       "canon": "req 933 (d), the polite cupboard (B1 ch8 L2722): the boy in the broom cupboard, Filch cannot open its door and will not ask politely; a partner of the hidden pass at the cupboard's stop"
+    },
+    {
+      "id": "filch.chase-hidden-cupboard-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 4,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "at = cupboard",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 2,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch stopping at the broom cupboard, its door rattling on its latch and staying shut, and Filch turning away"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-cupboard-open-day",
+          "sound": "Filch at the broom cupboard, rattling the handle",
+          "text": [
+            "Open up, you. Open!",
+            "Come on, open. Open up, blast you."
+          ],
+          "canon": "ours, in his voice; B1 ch8 L2722 (doors that wouldn't open unless you asked politely), read in the canon tool, 22 October 2026"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-cupboard-please-day",
+          "sound": "Filch giving it up",
+          "text": [
+            "I'll not say please to a cupboard. Come along, my sweet.",
+            "Not saying please to a cupboard. Not in this life."
+          ],
+          "canon": "ours, in his voice; B1 ch9 L3295 and L3297 (he will not say please to Peeves, and does at last), carried to the cupboard, which stays shut"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 933 (d), the polite cupboard (B1 ch8 L2722): the boy in the broom cupboard, Filch cannot open its door and will not ask politely; a partner of the hidden pass at the cupboard's stop"
     },
     {
       "id": "filch.chase-armour-wobble",
@@ -1456,13 +1656,33 @@
       "moment": "filch lamp",
       "when": [
         "place = corridor",
-        "chase = on"
+        "chase = on",
+        "time != morning",
+        "time != day"
       ],
       "show": [
         "lamplight climbing the steps, the wheezing nearer"
       ],
       "starts": [],
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the page raises it five seconds after her whisk; his lamp's own light, nothing glowing to say tap me"
+    },
+    {
+      "id": "filch.chase-lamp-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch lamp",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "time != night",
+        "time != evening"
+      ],
+      "show": [
+        "his footsteps and wheeze coming up the steps, nearer"
+      ],
+      "starts": [],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; the page raises it five seconds after her whisk; his lamp's own light, nothing glowing to say tap me"
     },
     {
       "id": "filch.chase-top-open",
@@ -1473,7 +1693,9 @@
       "when": [
         "place = corridor",
         "chase = on",
-        "hiding = no"
+        "hiding = no",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1504,6 +1726,47 @@
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; in the open he stops at the top; the page waits there, never nearer, and, if the boy stands in the open a while, raises `filch catches` (the three endings, filch.catch-*), else raises `filch at top` again if the boy hides, `filch grumbles off` if he reaches home, `filch gone` if Back takes him down the stairs"
     },
     {
+      "id": "filch.chase-top-open-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 2,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch stopped at the top of the stairs, wheezing and getting his breath"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-top-open-day",
+          "sound": "Filch at the top of the stairs, wheezing, talking to Mrs Norris",
+          "text": [
+            "My knees, my sweet. My poor old knees.",
+            "Give me a moment, my sweet. Just a moment."
+          ],
+          "canon": "ours, in his voice (the design card events-filch-chase-1021: in the open he stops at the top wheezing until the boy hides or runs; his \"my sweet\" to her, CoS 8 L9091, checked against the text, 15 October 2026); comic, he never sees him (the world rules)"
+        }
+      ],
+      "starts": [],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; in the open he stops at the top; the page waits there, never nearer, and, if the boy stands in the open a while, raises `filch catches` (the three endings, filch.catch-*), else raises `filch at top` again if the boy hides, `filch grumbles off` if he reaches home, `filch gone` if Back takes him down the stairs"
+    },
+    {
       "id": "filch.chase-hidden",
       "tier": "fixed",
       "source": "device",
@@ -1514,7 +1777,9 @@
       "when": [
         "place = corridor",
         "chase = on",
-        "hiding = yes"
+        "hiding = yes",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1574,6 +1839,78 @@
       "canon": "req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; hidden, he shuffles past, asks the Fat Lady and goes down: the page walks his lamp along the corridor to her end and back to the stairs, never turning"
     },
     {
+      "id": "filch.chase-hidden-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        },
+        {
+          "as": "fat-lady",
+          "role": "voice",
+          "name": "the fat lady",
+          "mark": "her frame"
+        }
+      ],
+      "show": [
+        "Filch shuffling slowly along the corridor, never turning, on to the Fat Lady's end and back to the stairs"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-mutter-day",
+          "sound": "Filch muttering as he shuffles past, never turning",
+          "text": [
+            "They're in here somewhere... probably hiding."
+          ],
+          "canon": "PS 9 L3241 (\"They're in here somewhere,\" they heard him mutter, \"probably hiding.\"), checked against the text, 21 October 2026; the one line of that night kept, on Godric's pick of 3.42 pm (the card), overtaking filch.grumble's rule of none; it says nothing of anyone, and he never sees a boy (the world rules)"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-asks-day",
+          "sound": "Filch at the Fat Lady's portrait, asking her",
+          "text": [
+            "Seen anyone, my lady? Anyone out of their beds?",
+            "You've not seen anyone come by, have you, my lady?"
+          ],
+          "canon": "ours, in his voice (the design card events-filch-chase-1021: he asks the Fat Lady if she has seen anyone); comic"
+        },
+        {
+          "speaker": "fat-lady",
+          "medium": "heard",
+          "key": "filch.chase-lady-answers-day",
+          "sound": "the Fat Lady answering him from her frame",
+          "text": [
+            "Not a soul, Mr Filch. Not a soul.",
+            "Not a living soul, Mr Filch, and I would know."
+          ],
+          "canon": "ours, in her voice (her dignity and her loyalty to the house, PS 7 and PS 8; the card: she answers him and does not give a boy away); comic"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 879, the chase, never the catch (Godric's 1 on fawkes-filch-chase-1021, 3.42 pm, with his 1 on events-filch-chase-1021, 4.12 pm: on its own now and then after dark, and always at a toe out of line in front of Mrs Norris); PS 8 L2728 (a toe out of line, she'd whisk off for Filch, who'd appear, wheezing, two seconds later), checked against the text, 21 October 2026; hidden, he shuffles past, asks the Fat Lady and goes down: the page walks his lamp along the corridor to her end and back to the stairs, never turning"
+    },
+    {
       "id": "filch.chase-hidden-peeves",
       "tier": "fixed",
       "source": "device",
@@ -1585,7 +1922,9 @@
         "place = corridor",
         "chase = on",
         "hiding = yes",
-        "chase_by = peeves"
+        "chase_by = peeves",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1668,6 +2007,102 @@
       "canon": "req 933 (b), Peeves joins the chase (Godric's pick on corridor-chase-ideas-1022, all four ideas, relayed 1.50 pm 22 October 2026; the design is docs/notes/2026-10-22-corridor-chase-ideas.md, idea 1); canon read in the canon tool, 22 October 2026: B1 ch9 L3289 to L3299 (Filch asks Peeves which way they went, Peeves will say nothing without “please” and then says nothing at all; the hidden students are saved) and B1 ch7 L2669 (Peeves zooms away, rattling armour as he passes); the hidden pass when Peeves started the chase, the partner of filch.chase-hidden, ours in the wording and never the Charms corridor's night, a poltergeist and a caretaker at their old quarrel; Filch is never cross with the boy"
     },
     {
+      "id": "filch.chase-hidden-peeves-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "chase_by = peeves",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        },
+        {
+          "as": "peeves",
+          "role": "voice",
+          "name": "peeves",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Peeves whooshing away down the stairs with a cackle, the suit of armour rattling as he passes, and Filch going back down after him"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-asks-peeves-day",
+          "sound": "Filch at the top of the stairs, asking Peeves",
+          "text": [
+            "Which way did they go, Peeves? Quick, tell me.",
+            "Where did they get to, Peeves? Come on, which way?"
+          ],
+          "canon": "B1 ch9 L3289 (“Which way did they go, Peeves?” Filch was saying. “Quick, tell me.”), the first word for word and the second ours; he asks Peeves, never the boy, who is hidden"
+        },
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "filch.chase-peeves-please-day",
+          "sound": "Peeves, somewhere above him, in his singsong",
+          "text": [
+            "Say please.",
+            "Shan't say nothing if you don't say please."
+          ],
+          "canon": "B1 ch9 L3291 and L3295 (“Say ‘please.’”; “Shan’t say nothing if you don’t say please,” said Peeves in his annoying singsong voice), word for word"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-pleads-day",
+          "sound": "Filch, through his teeth",
+          "text": [
+            "All right — please.",
+            "Please. Please, you pest."
+          ],
+          "canon": "B1 ch9 L3297 (“All right — please.”), the first word for word and the second ours"
+        },
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "filch.chase-peeves-nothing-day",
+          "sound": "Peeves, whooshing away, cackling",
+          "text": [
+            "NOTHING! Ha haaa! Told you I wouldn't say nothing if you didn't say please! Ha ha! Haaaaaa!",
+            "Nothing! Nothing at all! Ha ha haaaaa!"
+          ],
+          "canon": "B1 ch9 L3299 (“NOTHING! Ha haaa! Told you I wouldn’t say nothing if you didn’t say please! Ha ha! Haaaaaa!” And they heard the sound of Peeves whooshing away and Filch cursing in rage), the first word for word and the second ours; B1 ch7 L2669 (zooming away, rattling coats of armor as he passed) for the armour in the cue"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-curses-peeves-day",
+          "sound": "Filch's curses going away down the stairs after him",
+          "text": [
+            "Peeves! PEEVES! I'll see the Headmaster hears of this!",
+            "That wretched poltergeist! One of these days, my sweet. One of these days."
+          ],
+          "canon": "ours, in his voice; he curses Peeves, never the boy (B1 ch9 L3299, Filch cursing in rage); comic"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 933 (b), Peeves joins the chase (Godric's pick on corridor-chase-ideas-1022, all four ideas, relayed 1.50 pm 22 October 2026; the design is docs/notes/2026-10-22-corridor-chase-ideas.md, idea 1); canon read in the canon tool, 22 October 2026: B1 ch9 L3289 to L3299 (Filch asks Peeves which way they went, Peeves will say nothing without “please” and then says nothing at all; the hidden students are saved) and B1 ch7 L2669 (Peeves zooms away, rattling armour as he passes); the hidden pass when Peeves started the chase, the partner of filch.chase-hidden, ours in the wording and never the Charms corridor's night, a poltergeist and a caretaker at their old quarrel; Filch is never cross with the boy"
+    },
+    {
       "id": "filch.catch-one",
       "tier": "fixed",
       "source": "device",
@@ -1680,7 +2115,9 @@
         "chase = on",
         "hiding = no",
         "catch_turn != two",
-        "catch_turn != three"
+        "catch_turn != three",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1735,6 +2172,75 @@
       "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 1 (a boy stood in the open at the top of the stairs; the page raises `filch catches` after he has stood there a while, hiding no): marched to his office and the form begun, then called off by Peeves; the office records carry the rest (`office_catch = held`)"
     },
     {
+      "id": "filch.catch-one-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 40,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "catch_turn != two",
+        "catch_turn != three",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 3,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch looms over the boy, peers at him and jerks his head at the stairs; the boy follows him down, Mrs Norris padding behind"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-aha-one-day",
+          "sound": "Filch at the top of the stairs, looming over the boy",
+          "text": [
+            "Aha. You."
+          ],
+          "canon": "ours, in his voice; CoS 8 L9037 (Filch at his desk with the roll of parchment, \"Name…Harry Potter. Crime…\"), read in the canon tool, 22 October 2026, a wink only"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-follow-one-day",
+          "sound": "Filch leading the way down the stairs",
+          "text": [
+            "Follow me, and no dawdling."
+          ],
+          "canon": "ours, in his voice; comic, no hand on the boy"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-usual-one-day",
+          "sound": "Filch on the stairs, grumbling to Mrs Norris",
+          "text": [
+            "The usual, my sweet. A form, and a long one.",
+            "A form for this, my sweet. A long one."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091, checked against the text); PoA 10 L17154 (\"hauled us off to his office and started threatening us with the usual\"), read in the canon tool, 22 October 2026, the threats left out: nothing is a punishment or a detention"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "set office_catch = held",
+        "set catch_turn = two"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 1 (a boy stood in the open at the top of the stairs; the page raises `filch catches` after he has stood there a while, hiding no): marched to his office and the form begun, then called off by Peeves; the office records carry the rest (`office_catch = held`)"
+    },
+    {
       "id": "filch.catch-two",
       "tier": "fixed",
       "source": "device",
@@ -1746,7 +2252,9 @@
         "place = corridor",
         "chase = on",
         "hiding = no",
-        "catch_turn = two"
+        "catch_turn = two",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1802,6 +2310,75 @@
       "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 2: the same march, and the office's drawer marked Confiscated and Highly Dangerous (PoA 10 L17160, read in the canon tool, 22 October 2026) rattles when he tries it once Filch has gone, in the years the drawer stands (year 3 on, Interiors' row 92); before then it is ending 1 again"
     },
     {
+      "id": "filch.catch-two-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 40,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "catch_turn = two",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 3,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch looms over the boy, peers at him and jerks his head at the stairs; the boy follows him down, Mrs Norris padding behind"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-aha-two-day",
+          "sound": "Filch at the top of the stairs, looming over the boy",
+          "text": [
+            "Aha. There you are."
+          ],
+          "canon": "ours, in his voice; CoS 8 L9037, a wink only"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-follow-two-day",
+          "sound": "Filch leading the way down the stairs",
+          "text": [
+            "This way. Mind the steps, I'll not be carrying you."
+          ],
+          "canon": "ours, in his voice; comic, no hand on the boy"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-usual-two-day",
+          "sound": "Filch on the stairs, grumbling to Mrs Norris",
+          "text": [
+            "Straight to the office, my sweet. Forms all round.",
+            "Straight down, my sweet. Forms all round."
+          ],
+          "canon": "ours, in his voice; PoA 10 L17154, as filch.catch-one"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "set office_catch = held",
+        "set drawer_gag = yes",
+        "set catch_turn = three"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 2: the same march, and the office's drawer marked Confiscated and Highly Dangerous (PoA 10 L17160, read in the canon tool, 22 October 2026) rattles when he tries it once Filch has gone, in the years the drawer stands (year 3 on, Interiors' row 92); before then it is ending 1 again"
+    },
+    {
       "id": "filch.catch-three",
       "tier": "fixed",
       "source": "device",
@@ -1813,7 +2390,9 @@
         "place = corridor",
         "chase = on",
         "hiding = no",
-        "catch_turn = three"
+        "catch_turn = three",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -1856,6 +2435,64 @@
         "set catch_turn = one"
       ],
       "canon": "req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 3: a short let-off in the corridor, no office"
+    },
+    {
+      "id": "filch.catch-three-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 40,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "catch_turn = three",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 4,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch looms over the boy, looks him up and down, sniffs and waves him on; he goes back down the stairs, Mrs Norris with him"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-paperwork-day",
+          "sound": "Filch at the top of the stairs, looking the boy over",
+          "text": [
+            "Hm. Not worth the paperwork. Off with you.",
+            "Hm. Not worth the ink. Off with you."
+          ],
+          "canon": "ours, in his voice (Godric's own words in the ruling, \"Not worth the paperwork\"); comic, a let-off, nothing written"
+        },
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.catch-all-that-day",
+          "sound": "Filch going down the stairs, grumbling to Mrs Norris",
+          "text": [
+            "All those stairs, my sweet, for nothing. Nothing at all.",
+            "All that wheezing, my sweet, and for what?"
+          ],
+          "canon": "ours, in his voice (his knees and his wheezing, the chase's own joke, filch.chase-top-open)"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "set catch_turn = one"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 879, the caught-in-the-open branch (Godric's own answer on events-filch-catch-1022, 22 October 2026, 11.36 am: \"Alternates between 1-3\"; world-rules.md, How the world behaves, 456b1a1d): a catch ends in turn as 1, 2 and 3, never a punishment, never a detention; ending 3: a short let-off in the corridor, no office"
     },
     {
       "id": "filch.chase-home",
@@ -1976,7 +2613,9 @@
         "chase = on",
         "hiding = yes",
         "chase_by = norris",
-        "norris_trust >= 9"
+        "norris_trust >= 9",
+        "time != morning",
+        "time != day"
       ],
       "who": [
         {
@@ -2009,6 +2648,53 @@
       "canon": "req 933 (the friends of the chase, Godric's pick on corridor-chase-ideas-1022, befriending Mrs Norris over time): once she trusts him fully (norris_trust 9 and over) and she is the one who started the chase, she leads Filch astray from a hidden boy, a fourth partner of the hidden pass; B2 ch8 L9025 (Filch is \"drawn to the spot by the mysterious power that seemed to connect him with his foul cat\", Mrs Norris's accusing stare at the boy), checked against the text in the canon tool, 22 October 2026; the lines are ours, in his voice (\"my sweet\", CoS 8 L9091); comic, nobody hurt, nothing punished"
     },
     {
+      "id": "filch.chase-hidden-norris-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 3,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "chase_by = norris",
+        "norris_trust >= 9",
+        "time != night",
+        "time != evening"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Mrs Norris pausing at the top of the stairs, looking past the hiding place, then padding off down the far flight with her tail high, and Filch going after her"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.chase-norris-astray-day",
+          "sound": "Filch at the top of the stairs, turning after Mrs Norris",
+          "text": [
+            "What is it, my sweet? This way?",
+            "What have you got, my sweet? Down here, is it? Lead on, then."
+          ],
+          "canon": "req 933 (the friends of the chase, Godric's pick on corridor-chase-ideas-1022, befriending Mrs Norris over time): once she trusts him fully (norris_trust 9 and over) and she is the one who started the chase, she leads Filch astray from a hidden boy, a fourth partner of the hidden pass; B2 ch8 L9025 (Filch is \"drawn to the spot by the mysterious power that seemed to connect him with his foul cat\", Mrs Norris's accusing stare at the boy), checked against the text in the canon tool, 22 October 2026; the lines are ours, in his voice (\"my sweet\", CoS 8 L9091); comic, nobody hurt, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off"
+      ],
+      "canon": "day variant, by morning and by day, no lamp in a bright place (req 973; Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm: \"he would not have a lamp in a bright place / daytime, but he would in torchlit areas and at night\"); the evening and the night keep the lamp twin; req 933 (the friends of the chase, Godric's pick on corridor-chase-ideas-1022, befriending Mrs Norris over time): once she trusts him fully (norris_trust 9 and over) and she is the one who started the chase, she leads Filch astray from a hidden boy, a fourth partner of the hidden pass; B2 ch8 L9025 (Filch is \"drawn to the spot by the mysterious power that seemed to connect him with his foul cat\", Mrs Norris's accusing stare at the boy), checked against the text in the canon tool, 22 October 2026; the lines are ours, in his voice (\"my sweet\", CoS 8 L9091); comic, nobody hurt, nothing punished"
+    },
+    {
       "id": "filch.catch-mcgonagall",
       "tier": "fixed",
       "source": "device",
@@ -2039,7 +2725,7 @@
         }
       ],
       "show": [
-        "Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch's lamp turns away down the stairs, Mrs Norris with it"
+        "Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch turns away down the stairs, Mrs Norris with him"
       ],
       "lines": [
         {
@@ -2057,7 +2743,7 @@
           "speaker": "filch",
           "medium": "heard",
           "key": "filch.catch-mcgonagall-filch",
-          "sound": "Filch, his lamp lowered, his jaw working",
+          "sound": "Filch, his head lowered, his jaw working",
           "text": [
             "But, Professor, he was— Yes, Professor.",
             "Professor. As you say, Professor. Come, my sweet."
@@ -2289,7 +2975,8 @@
         "hiding = yes",
         "night_quest = on",
         "days since mcg_round >= 14",
-        "days since mcg_cat >= 30"
+        "days since mcg_cat >= 30",
+        "time = night"
       ],
       "who": [
         {
@@ -2337,7 +3024,8 @@
         "hiding = yes",
         "night_quest = mcgonagall",
         "days since mcg_round >= 14",
-        "days since mcg_cat >= 30"
+        "days since mcg_cat >= 30",
+        "time = night"
       ],
       "who": [
         {
@@ -2385,7 +3073,8 @@
         "hiding = no",
         "night_quest = on",
         "days since mcg_round >= 14",
-        "days since mcg_cat >= 30"
+        "days since mcg_cat >= 30",
+        "time = night"
       ],
       "who": [
         {
@@ -2433,7 +3122,8 @@
         "hiding = no",
         "night_quest = mcgonagall",
         "days since mcg_round >= 14",
-        "days since mcg_cat >= 30"
+        "days since mcg_cat >= 30",
+        "time = night"
       ],
       "who": [
         {
@@ -2522,6 +3212,48 @@
         "stamp door_smell_on"
       ],
       "canon": "Godric's woven touch filch-office-fish (22 October 2026, 7.50 pm, relayed by Fawkes): passing Filch's office door, a faint smell of fried fish and wooden filing cabinets through the gap (CoS 8 L9029, \"A faint smell of fried fish lingered about the place. Wooden filing cabinets stood around the walls\", read in the canon tool, 22 October 2026); year 2, on the classroom corridor while his door stands ajar (filch.door-out), at most once a day; inside the office the same smell is the room rule's own"
+    },
+    {
+      "id": "filch.dungbombs",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 20-80 s",
+      "when": [
+        "place = corridor",
+        "year = 3",
+        "date = 12-18",
+        "time != night",
+        "chase != on",
+        "days since dungbombs_on >= 1"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "the corridor reeks of Dungbombs, and Filch shuffles through with a mop and a bucket, muttering"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.dungbombs-mutter",
+          "sound": "Filch shuffling past with his mop, muttering to Mrs Norris",
+          "text": [
+            "Dungbombs, my sweet. Every last day of term. Every last one."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); gentle, nothing punished"
+        }
+      ],
+      "starts": [
+        "stamp dungbombs_on"
+      ],
+      "canon": "Godric's woven touch filch-dungbombs (22 October 2026, 7.58 pm, relayed by Fawkes): on a term's last day the corridor reeks of Dungbombs and Filch shuffles through with a mop, muttering (PoA 11 L17511, \"Fred and George had set off half-a-dozen Dungbombs in a fit of end-of-term high spirits\", read in the canon tool, 22 October 2026; the smell and the mop are the touch's); year 3, on 18 December, the last day of the Christmas term (the decorating's date, castle-events CHRISTMAS from 12-18, a day before the holidays), by day, once a day; no lamp, it being day"
     }
   ]
 }

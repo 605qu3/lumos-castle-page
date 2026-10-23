@@ -481,6 +481,55 @@
         "set sticks_prev = no",
         "set sticks = gone"
       ]
+    },
+    {
+      "id": "peeves.wastepaper",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = first-year lessons",
+        "year = 1",
+        "lessons = on",
+        "time != night",
+        "days since wastepaper_on >= 7"
+      ],
+      "who": [
+        {
+          "as": "peeves",
+          "role": "voice",
+          "name": "peeves",
+          "mark": "the door"
+        }
+      ],
+      "show": [
+        "the door bangs open and a first-year comes in late with a wastepaper basket on his head, a cackle going away down the corridor, and the class sniggers"
+      ],
+      "lines": [
+        {
+          "speaker": "peeves",
+          "medium": "heard",
+          "key": "peeves.wastepaper-cackle",
+          "sound": "Peeves cackling away down the corridor",
+          "text": [
+            "Late, late, late for class! Hee hee hee!"
+          ],
+          "canon": "ours, in his voice (his taunting singsong, PS 8 L2724, read in the canon tool, 22 October 2026)"
+        }
+      ],
+      "starts": [
+        "stamp wastepaper_on"
+      ],
+      "canon": "Godric's woven touch peeves-wastepaper (22 October 2026, 7.58 pm, relayed by Fawkes): a pupil late for class gets a wastepaper basket dropped on his head by Peeves and comes in wearing it (PS 8 L2724, \"He would drop wastepaper baskets on your head\" when you were late for class, read in the canon tool, 22 October 2026); year 1, in a lesson hour in a first-year's classroom (Charms, Defence, History of Magic, Transfiguration), a week apart at the least; the late pupil is nobody by name"
     }
-  ]
+  ],
+  "places": {
+    "first-year lessons": [
+      "charms classroom",
+      "defence classroom",
+      "history of magic classroom",
+      "transfiguration classroom"
+    ]
+  }
 }

@@ -675,6 +675,26 @@
         "set armour_next = from bag specials",
         "log \"A moth flew out of the armour {day}\""
       ]
+    },
+    {
+      "id": "armour.christmas-lights",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = corridor",
+        "year = 3",
+        "occasion = christmas",
+        "days since armour_lights_on >= 1"
+      ],
+      "show": [
+        "a mysterious light glows inside the corridor's suit of armour, shining out through its visor"
+      ],
+      "starts": [
+        "stamp armour_lights_on"
+      ],
+      "canon": "Godric's woven touch armour-christmas-lights (corridor-armour-3d-1022, 22 October 2026, 8.03 pm, relayed by Fawkes): at Christmas a light glows inside the corridor's suit through its visor (PoA 11 L17727, \"mysterious lights shone from inside every suit of armour\", read in the canon tool, 22 October 2026); year 3, in the Christmas days (18 December to 2 January), by day and night, once a day; the suit is the corridor's own"
     }
   ]
 }
