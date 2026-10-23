@@ -2235,7 +2235,8 @@ var W1 = (function () {
     box(x0, y0, h - 0.04, x1, y1, h, mt);
     [[x0 + 0.03, y0 + 0.03], [x1 - 0.08, y0 + 0.03], [x0 + 0.03, y1 - 0.08], [x1 - 0.08, y1 - 0.08]].forEach(function (p) { box(p[0], p[1], -0.01, p[0] + 0.05, p[1] + 0.05, h - 0.04, mt); });
   }
-  function pedestalDesk(x0, y0, x1, y1, h) {   /* a master's desk: its top on two pedestals, a panel at its front (y0) */
+  function pedestalDesk(x0, y0, x1, y1, h, mt) {   /* a master's desk: its top on two pedestals, a panel at its front (y0) */
+    var dark = mt || mat('dark-wood', 0x3e342a);
     box(x0, y0, h - 0.04, x1, y1, h, dark);
     box(x0 + 0.02, y0 + 0.02, -0.01, x0 + 0.47, y1 - 0.02, h - 0.04, dark); box(x1 - 0.47, y0 + 0.02, -0.01, x1 - 0.02, y1 - 0.02, h - 0.04, dark);
     box(x0 + 0.47, y0 + 0.03, 0.3, x1 - 0.47, y0 + 0.05, h - 0.04, dark);
@@ -2606,12 +2607,15 @@ var W1 = (function () {
     /* req 964: docs/interiors/transfiguration-classroom.md, The things (x = 139.6 + y', y = 71.4 - x'): the pupils' single
        desks, four rows of four, two each side of the aisle, centred x' 1.1, 2.4, 5.6 and 6.9, 0.75 by 0.55 and 0.72 high,
        a chair behind each (0.42 square, the board-back form); her desk at the front, x' 3.2 to 4.8, y' 9.8 to 10.6, 0.75,
-       its panel to the class, and her chair behind it at (4.0, 11.05), facing the class. The toad is TOUCH's */
+       its panel to the class, and her chair behind it at (4.0, 11.05), facing the class. The toad is TOUCH's; her desk
+       is drawn apart (req 975, the pig is PIG's) */
     [2.2, 3.6, 5.0, 6.4].forEach(function (yp) { [1.1, 2.4, 5.6, 6.9].forEach(function (xc) {
       desk(xc - 0.375, yp, xc + 0.375, yp + 0.55, 0.72, wood);
       chair(xc, yp - 0.29, 90, 1, wood, 0.21);
     }); });
-    pedestalDesk(3.2, 9.8, 4.8, 10.6, 0.75);
+    var mcgDesk = mat('mcg-desk', 0x3e342a);
+    pedestalDesk(3.2, 9.8, 4.8, 10.6, 0.75, mcgDesk);
+    hidden.push(['pigdesk', mcgDesk, 'pigdesk']);
     chair(4.0, 11.05, 270, 0, dark, 0.3);
   }
 
@@ -4094,6 +4098,81 @@ function updateToad(dt) {
   T.g.rotation.set(0, Math.atan2(-(b.z - a.z), b.x - a.x), 0);
   T.g.children[0].scale.y = 0.042 * (u > 0 && u < 1 ? 1.25 : 1);   /* stretched in the air */
 }
+/* req 975 (a), transfiguration.json's transfiguration.desk-into-pig, word for word (PS 8 L2740): on the line her desk
+   (W1's, drawn apart) is gone and a pig (a pink one 0.9 m long, drawn here) stands where it stood, swelling to size in
+   0.4 s; it trots snuffling round the clear floor before the desks (x' 1.8 to 6.4, y' 7.4 to 9.3, the front row ends
+   at 6.95), its snout down to the flags now and then, back to the desk's place, stands a beat, and is the desk again.
+   Untappable, lit as the room. ?touch=pig plays it */
+var TF_PIG = 'Professor McGonagall flicks her wand and her desk becomes a pig, which trots snuffling round the clear floor before it; another flick, and it is a desk again';
+var PIG = (function () {
+  if (PLACE !== 'transfiguration-classroom' || !shell) return null;
+  var z0 = shell.place.floor, P = function (xp, yp) { return shell.toLocal(139.6 + yp, 71.4 - xp, z0); };
+  var g = new THREE.Group(), skin = new THREE.MeshStandardMaterial({ color: kit.col(0xd9a497), roughness: 0.8 }), eye = kit.solid(0x1e1a18);
+  var body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 18, 12), skin); body.scale.set(0.9, 0.5, 0.46); body.position.y = 0.5; g.add(body);
+  var head = new THREE.Group(); head.position.set(0.42, 0.56, 0); g.add(head);
+  var skull = new THREE.Mesh(new THREE.SphereGeometry(0.5, 14, 10), skin); skull.scale.set(0.32, 0.3, 0.3); head.add(skull);
+  var snout = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.085, 0.1, 14), skin); snout.rotation.z = Math.PI / 2; snout.position.set(0.17, -0.03, 0); head.add(snout);
+  [-1, 1].forEach(function (u) {
+    var e = new THREE.Mesh(new THREE.SphereGeometry(0.016, 8, 6), eye); e.position.set(0.12, 0.05, u * 0.08); head.add(e);
+    var n = new THREE.Mesh(new THREE.SphereGeometry(0.014, 6, 4), eye); n.position.set(0.222, -0.03, u * 0.03); head.add(n);
+    var ear = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.12, 4), skin); ear.position.set(0.02, 0.15, u * 0.09); ear.rotation.set(u * 0.5, 0, -0.5); head.add(ear);
+  });
+  var legs = [[0.26, 0.13], [0.26, -0.13], [-0.26, 0.13], [-0.26, -0.13]].map(function (p) {
+    var l = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.3, 0.08), skin); l.position.set(p[0], 0.15, p[1]); g.add(l); return l;
+  });
+  var tail = new THREE.Mesh(new THREE.TorusGeometry(0.035, 0.012, 6, 12), skin); tail.position.set(-0.46, 0.62, 0); g.add(tail);
+  g.traverse(function (o) { o.userData.owner = PLACE; o.raycast = function () {}; });
+  g.name = 'transfiguration-pig'; g.visible = false; scene.add(g);
+  /* the trot (x', y'): out from the desk's place, round the clear floor anticlockwise as he sees it, and back */
+  var way = [[4.0, 10.2], [4.0, 9.3], [5.5, 8.7], [6.3, 8.0], [5.4, 7.4], [3.0, 7.4], [1.8, 8.0], [2.4, 8.9], [3.6, 9.3], [4.0, 10.2]].map(function (w) { return P(w[0], w[1]); });
+  var len = [0]; for (var i = 1; i < way.length; i++) len.push(len[i - 1] + way[i].distanceTo(way[i - 1]));
+  return { g: g, head: head, legs: legs, way: way, len: len, t: -1, grow: 0.4, speed: 1.1, stand: 1.5,
+    go: function () { this.t = 0; } };
+})();
+function pigDesk(on) { (W1.pigdesk || []).forEach(function (m) { m.visible = on; }); }
+if (PIG) pigDesk(true);
+/* req 975 (b), charms.json's charms.mcgonagall-borrows, word for word (PS 9 L3051): on the line the classroom's door
+   (`charms-door`) swings in on its hinge, its edge 0.55 m out (wide enough for her head and the pupil), over 0.8 s, stands 8 s, and swings shut over 1.2 s;
+   she and the pupil stay the line's (no figures yet), her heard line the runtime's. ?touch=borrow plays it */
+var CH_BORROW = 'a knock at the door; Professor McGonagall puts her head round it, an older pupil gets up from the back and goes out with her, and the class whispers';
+var BORROW = (function () {
+  if (PLACE !== 'charms-classroom') return null;
+  var d = shell.doors.filter(function (x) { return x.id === 'charms-door'; })[0];
+  if (!d || !d.hinge) return null;
+  var h = d.hinge, a = Math.asin(Math.min(0.9, 0.55 / (2 * h.half))), mid = shell.toLocal(145.6, 67.4, shell.place.floor);   /* the room's middle (x' 4, y' 6) */
+  var end = function (s) { return h.at.clone().addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, s * a), 2 * h.half).distanceTo(mid); };
+  return { d: d, t: -1, open: 0.8, hold: 8, shut: 1.2, a: end(1) < end(-1) ? a : -a };   /* into the classroom, toward him */
+})();
+thingCues[CH_BORROW] = function () { showLines([{ medium: 'seen', sound: CH_BORROW, on: function () { if (BORROW && BORROW.t < 0) BORROW.t = 0; } }]); };
+if (BORROW && Q.get('touch') === 'borrow') setTimeout(function () { thingCues[CH_BORROW](); }, 1500);
+function updateBorrow(dt) {
+  if (!BORROW || BORROW.t < 0) return;
+  var B = BORROW, s = (B.t += dt), h = B.d.hinge, m = B.d.mesh, e = function (u) { return u * u * (3 - 2 * u); };
+  var f = s < B.open ? e(s / B.open) : s < B.open + B.hold ? 1 : Math.max(0, 1 - e((s - B.open - B.hold) / B.shut));
+  var a = f * B.a;
+  m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half); m.rotation.y = B.d.rest.rot + a;
+  if (s >= B.open + B.hold + B.shut) { m.position.copy(B.d.rest.pos); m.rotation.y = B.d.rest.rot; B.t = -1; }
+}
+thingCues[TF_PIG] = function () { showLines([{ medium: 'seen', sound: TF_PIG, on: function () { if (PIG) PIG.go(); } }]); };
+if (PIG && Q.get('touch') === 'pig') setTimeout(function () { thingCues[TF_PIG](); }, 1500);
+function updatePig(dt) {
+  if (!PIG || PIG.t < 0) return;
+  var G = PIG, s = (G.t += dt), run = G.len[G.len.length - 1] / G.speed, end = G.grow + run + G.stand;
+  if (s >= end + G.grow) { G.g.visible = false; G.t = -1; pigDesk(true); return; }
+  pigDesk(false); G.g.visible = true;
+  var k = s < G.grow ? 0.6 + 0.4 * s / G.grow : s > end ? 1 - 0.4 * (s - end) / G.grow : 1;   /* swelling from the desk, and back */
+  G.g.scale.setScalar(k);
+  var d = Math.max(0, Math.min(run, s - G.grow)) * G.speed, j = 1;
+  while (j < G.len.length - 1 && G.len[j] < d) j++;
+  var a = G.way[j - 1], b = G.way[j], u = (d - G.len[j - 1]) / Math.max(1e-6, G.len[j] - G.len[j - 1]);
+  G.g.position.lerpVectors(a, b, Math.min(1, u));
+  var moving = s > G.grow && s < G.grow + run;
+  if (d < G.len[G.len.length - 1]) G.g.rotation.set(0, Math.atan2(-(b.z - a.z), b.x - a.x), 0);
+  var ph = s * 11;
+  G.legs.forEach(function (l, i) { l.rotation.z = moving ? 0.45 * Math.sin(ph + (i === 0 || i === 3 ? 0 : Math.PI)) : 0; });
+  G.g.position.y += moving ? 0.015 * Math.abs(Math.sin(ph)) : 0;
+  G.head.rotation.z = -0.35 * Math.max(0, Math.sin(s * 1.7)) * (moving ? 1 : 0.4);   /* the snout down to the flags, snuffling */
+}
 /* req 964, great-hall.json's great-hall.christmas-mice, word for word: on the line six white mice (drawn here, 7 cm and
    a pink tail) drop from the benches' aisle edges 4 to 8 m before the start's eye and scurry off, zigzagging, under the
    two tables either side of the middle aisle, and are gone under them; Mrs Norris (People's norris-figure, cell 1,
@@ -4768,7 +4847,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateBorrow(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -5854,9 +5933,10 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
       lift: Object.keys(WOVEN.lifts).map(function (k) { return k + ' ' + WOVEN.lifts[k].t.toFixed(2); }).join(', '), flick: WOVEN.flick,
       sheet: WOVEN.sheet ? WOVEN.sheet.visible : null, singed: WOVEN.singed ? WOVEN.singed.visible : null, scorch: WOVEN.scorch ? WOVEN.scorch.visible : null,
       mine: WOVEN.mine ? WOVEN.mine[0].visible : null, fx: WOVEN.fx ? WOVEN.fx.kind + ' ' + WOVEN.fx.t.toFixed(2) : null, tries: WOVEN.tries } : null; },
-  touch: function (cue) { if (cue) cueTable[{ hagrid: EH_HAGRID, toad: TF_TOAD, mice: GH_MICE }[cue] || cue]();   /* req 964 */
+  touch: function (cue) { if (cue) cueTable[{ hagrid: EH_HAGRID, toad: TF_TOAD, mice: GH_MICE, pig: TF_PIG, borrow: CH_BORROW }[cue] || cue]();   /* req 964; the pig and the borrow req 975 */
+    if (BORROW) return { borrow: BORROW.t < 0 ? null : +BORROW.t.toFixed(2), leaf: +(BORROW.d.mesh.rotation.y - BORROW.d.rest.rot).toFixed(3), open: +BORROW.a.toFixed(3) };
     if (MICE) return { t: +MICE.t.toFixed(2), mice: MICE.mice.filter(function (m) { return m.g.visible; }).length, cat: MICE.cat.visible };
-    if (TOAD) return { hop: TOAD.t < 0 ? null : [TOAD.k, +TOAD.t.toFixed(2)], toad: TOAD.g.visible, at: TOAD.g.position.toArray().map(function (v) { return +v.toFixed(2); }) };
+    if (TOAD) return { pig: PIG.t < 0 ? null : +PIG.t.toFixed(2), pigShown: PIG.g.visible, desk: (W1.pigdesk || []).map(function (m) { return m.visible; }), pigAt: PIG.g.position.toArray().map(function (v) { return +v.toFixed(2); }), hop: TOAD.t < 0 ? null : [TOAD.k, +TOAD.t.toFixed(2)], toad: TOAD.g.visible, at: TOAD.g.position.toArray().map(function (v) { return +v.toFixed(2); }) };
     return TOUCH ? { walk: TOUCH.walk ? [TOUCH.walk.k, +TOUCH.walk.u.toFixed(2)] : null, cat: TOUCH.cat.visible, at: TOUCH.cat.visible ? TOUCH.cat.position.toArray().map(function (v) { return +v.toFixed(2); }) : null } : null; },
   elect: function () { return ELECT ? { board: ELECT.board.visible, room: ELECT.room.visible, cls: ELECT.cls.filter(function (m) { return m.visible; }).length } : null; },
   kitchens: function (cue) { if (cue) cueTable[cue]();
