@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=513"></script>
+<script src="castle-model.js?v=514"></script>
 <script src="castle-paint.js?v=105"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -2452,7 +2452,9 @@ var W1 = (function () {
             'staff-room': [128, 50.6, 1, 1, true], 'staff-passage': [128, 50.6, 1, 1, true],
             'kitchens': [0, 0, 1, 1, false], 'secret-s3': [0, 0, 1, 1, false], 'hall-chamber': [0, 0, 1, 1, false],
             'filchs-office': [104, 62, 1, 1, false], 'charms-classroom': [139.6, 71.4, 1, -1, true],
-            'transfiguration-classroom': [139.6, 71.4, 1, -1, true], 'defence-classroom': [48, 71.4, -1, -1, true] }[PLACE];
+            'transfiguration-classroom': [139.6, 71.4, 1, -1, true], 'defence-classroom': [48, 71.4, -1, -1, true],
+            'ancient-runes-classroom': [21.9, 71.4, 1, -1, true], 'arithmancy-classroom': [18.4, 17.4, 1, -1, true],
+            'muggle-studies-classroom': [19.1, 63.4, -1, 1, true] }[PLACE];
   if (!F) return out;
   out.on = true;
   var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'wave1-things'; shell.group.add(g);
@@ -3058,6 +3060,78 @@ var W1 = (function () {
       row[1].forEach(function (b) { box(b[0], 10.72, row[0], b[0] + b[1], 10.95, row[0] + b[2], bkM[b[3]]); });
     });
     box(5.75, 10.72, bcBase + 0.05, 5.97, 10.95, bcBase + 0.1, bkM[1]);                             /* one lying flat */
+  }
+  /* the electives on 5 (ledgers 252 to 254 and 238): each room's desks, shelves and boards are shell-w5b.js's (the
+     teachers' desks top at 0.78); here the common kit and the list's own things, in WOVEN's frames */
+  function inkBox(x0, y0, z) {   /* the box of spare ink and quills, 0.45 by 0.25: the stone bottle, the quills' box, a penknife */
+    var stone = mat('rt-stone', 0x9a8566), quill = mat('rt-quill', 0xd6d0c2);
+    box(x0, y0, z, x0 + 0.45, y0 + 0.25, z + 0.012, RT.deal);
+    box(x0, y0, z + 0.012, x0 + 0.45, y0 + 0.012, z + 0.08, RT.deal); box(x0, y0 + 0.238, z + 0.012, x0 + 0.45, y0 + 0.25, z + 0.08, RT.deal);
+    box(x0, y0 + 0.012, z + 0.012, x0 + 0.012, y0 + 0.238, z + 0.08, RT.deal); box(x0 + 0.438, y0 + 0.012, z + 0.012, x0 + 0.45, y0 + 0.238, z + 0.08, RT.deal);
+    drum(x0 + 0.1, y0 + 0.125, z + 0.012, z + 0.2, 0.05, 0.05, stone, 14);                          /* the quart bottle, its shoulder, lip and cork */
+    drum(x0 + 0.1, y0 + 0.125, z + 0.2, z + 0.235, 0.05, 0.018, stone, 14);
+    drum(x0 + 0.1, y0 + 0.125, z + 0.235, z + 0.255, 0.016, 0.016, RT.straw, 8);
+    box(x0 + 0.19, y0 + 0.03, z + 0.012, x0 + 0.42, y0 + 0.11, z + 0.05, RT.paint);                 /* the quills' box, two quills over it */
+    rod([x0 + 0.2, y0 + 0.15, z + 0.03], [x0 + 0.42, y0 + 0.17, z + 0.075], 0.004, quill, 5);
+    rod([x0 + 0.21, y0 + 0.19, z + 0.03], [x0 + 0.42, y0 + 0.2, z + 0.07], 0.004, quill, 5);
+    box(x0 + 0.24, y0 + 0.215, z + 0.012, x0 + 0.33, y0 + 0.232, z + 0.024, RT.coal);               /* the penknife, shut */
+  }
+  if (PLACE === 'ancient-runes-classroom') {
+    /* ledger 252: docs/interiors/ancient-runes-classroom.md, The real things (x = 21.9 + y', y = 71.4 - x'; the back
+       wall y' 0 with the door, an inner wall on the passage; the window wall x' 0) */
+    stove(5.95, 0.45, { z: 2.6, to: [5.95, -0.05] });                                                /* 1, its flue into the back wall */
+    scuttle(6.55, 0.3);
+    pegs(6.6, 7.8, 0.0, 1.6, 6, 1);                                                                  /* 2, a cloak and a scarf left */
+    cloak(6.9, 0.0, 1.6, 1); scarf(7.5, 0.0, 1.6, 1);
+    clock(4.0, 0.0, 2.8, 1);                                                                         /* 3, over the door */
+    pole([0.25, 3.85, 0.0], [0.04, 3.85, 2.3]);                                                      /* 4, at the first pier */
+    hourglass(4.6, 8.85, 0.78);                                                                      /* 5, the desk's end away from the windows */
+    inkBox(2.43, 0.06, 1.8);                                                                         /* 6, the dictionary shelf's top, its door end */
+  }
+  if (PLACE === 'arithmancy-classroom') {
+    /* ledger 253: docs/interiors/arithmancy-classroom.md, The real things (x = 18.4 + y', y = 17.4 - x'; as Runes') */
+    stove(5.95, 0.45, { z: 2.6, to: [5.95, -0.05] });                                                /* 1 */
+    scuttle(6.55, 0.3);
+    pegs(6.6, 7.8, 0.0, 1.6, 6, 1);                                                                  /* 2 */
+    cloak(6.9, 0.0, 1.6, 1); scarf(7.5, 0.0, 1.6, 1);
+    clock(4.0, 0.0, 2.8, 1);                                                                         /* 3 */
+    pole([0.25, 4.0, 0.0], [0.04, 4.0, 2.3]);                                                        /* 4 */
+    hourglass(3.85, 8.6, 0.78);                                                                      /* 5, between the reckoner and the essays */
+    inkBox(1.05, 0.03, 1.0);                                                                         /* 6, the low shelf's top, its window end */
+    /* 8, the counting rods' box, its lid slid half back, the rods' square ends showing; twelve slates, two pencils */
+    box(1.6, 0.05, 1.0, 1.9, 0.25, 1.07, RT.deal); box(1.75, 0.05, 1.07, 2.05, 0.25, 1.078, RT.deal);
+    for (var ar = 0; ar < 7; ar++) box(1.62 + ar * 0.018, 0.07, 1.07, 1.634 + ar * 0.018, 0.23, 1.075, RT.straw);
+    var slate = mat('rt-slate', 0x2f3236);
+    box(2.05, 0.04, 1.0, 2.35, 0.26, 1.144, RT.deal); box(2.07, 0.06, 1.144, 2.33, 0.24, 1.146, slate);
+    rod([2.1, 0.12, 1.149], [2.22, 0.14, 1.149], 0.003, RT.tin, 4); rod([2.12, 0.18, 1.149], [2.26, 0.17, 1.149], 0.003, RT.tin, 4);
+    /* 7, the class abacus on its own feet in the front corner by the windows, its face to the room: two uprights on
+       splayed feet, a top and a bottom rail, ten wires, ten beads on each in two colours, some slid across */
+    var bead = [mat('rt-bead-red', 0x6a3226), mat('rt-bead-pale', 0xc9b98f)], aY = 10.55;
+    [0.95, 2.05].forEach(function (xp) {
+      box(xp - 0.025, aY - 0.25, -0.01, xp + 0.025, aY + 0.25, 0.05, RT.deal);                        /* the foot */
+      box(xp - 0.025, aY - 0.025, 0.05, xp + 0.025, aY + 0.025, 1.4, RT.deal);                        /* the upright */
+    });
+    box(0.95, aY - 0.03, 1.34, 2.05, aY + 0.03, 1.4, RT.deal); box(0.95, aY - 0.03, 0.5, 2.05, aY + 0.03, 0.56, RT.deal);
+    for (var aw = 0; aw < 10; aw++) {
+      var az = 0.62 + aw * 0.075, moved = [3, 0, 5, 1, 0, 2, 7, 0, 4, 1][aw];
+      rod([0.975, aY, az], [2.025, aY, az], 0.002, RT.iron, 4);
+      for (var ab = 0; ab < 10; ab++) {
+        var ax = ab < 10 - moved ? 1.0 + ab * 0.045 : 2.0 - (9 - ab) * 0.045 - 0.04;                  /* most at the left, `moved` slid right */
+        rod([ax, aY, az], [ax + 0.04, aY, az], 0.024, bead[ab < 5 ? 0 : 1], 10);
+      }
+    }
+  }
+  if (PLACE === 'muggle-studies-classroom') {
+    /* ledger 254: docs/interiors/muggle-studies-classroom.md, The real things (x = 19.1 - y', y = 63.4 + x'; the frame
+       mirrored, the windows on x' 8; the back wall y' 0 with the door from x' 3.5). The demonstration table is Story's */
+    stove(2.05, 0.45, { z: 2.6, to: [2.05, -0.05] });                                                /* 1, the door's left */
+    scuttle(2.65, 0.3);                                                                              /*   its door side */
+    pegs(0.2, 1.4, 0.0, 1.6, 6, 1);                                                                  /* 2, in the corner */
+    cloak(0.5, 0.0, 1.6, 1); scarf(1.1, 0.0, 1.6, 1);
+    clock(4.0, 0.0, 2.8, 1);                                                                         /* 3 */
+    pole([7.75, 3.85, 0.0], [7.96, 3.85, 2.3]);                                                      /* 4 */
+    hourglass(3.4, 9.4, 0.78);                                                                       /* 5 */
+    cupboard(5.6, -0.02, 6.8, 0.5, 1.9, 0.5);                                                        /* 6, the ink and quills' cupboard */
   }
   if (PLACE === 'potions-dungeon') {
     /* ledger 239: docs/interiors/potions-dungeon.md, The real things (x = 16 + x', y = 15.4 + y'; the back wall and its
