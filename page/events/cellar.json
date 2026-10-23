@@ -1,0 +1,147 @@
+{
+  "chain": "cellar",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = drum room b",
+        "time = morning",
+        "date != 11-01"
+      ],
+      "show": [
+        "the bats hang asleep from the vault over the roost in tight dark rows, wings folded"
+      ],
+      "canon": "Interiors' req 997 (23 October 2026, 11.34 am; docs/interiors/gryffindor-cellar.md, Room states): the roost on the vault of the round cellar under the Gryffindor storeroom is the Great Hall's Halloween bats at home (PS 10, B1 ch10 L3536, \"A thousand live bats fluttered from the walls and ceiling\", and CoS 8, B2 ch8 L9153, \"the usual live bats\", both read in the canon tool, 23 October 2026); asleep by morning and by day, in every year (a cave is the same in any century, Godric's ruling of 23 October 2026, 10.07 am); nothing glows and nothing is harmed"
+    },
+    {
+      "when": [
+        "place = drum room b",
+        "time = day",
+        "date != 10-31"
+      ],
+      "show": [
+        "the bats hang asleep from the vault over the roost in tight dark rows, wings folded"
+      ],
+      "canon": "Interiors' req 997: asleep by day, except on Halloween afternoon (the next rule); same cue as the morning's"
+    },
+    {
+      "when": [
+        "place = drum room b",
+        "time = evening",
+        "date != 10-31"
+      ],
+      "show": [
+        "the bats let go of the vault one by one and drop away through the slit in the south wall toward the lake, the roost thinning"
+      ],
+      "canon": "Interiors' req 997: out at dusk through the slit to the lake; the evening band runs from five to dusk"
+    },
+    {
+      "when": [
+        "place = drum room b",
+        "time = night",
+        "date != 10-31"
+      ],
+      "show": [
+        "the vault nearly bare, a straggler or two hanging folded among the empty rows, the slit a pale line of sky"
+      ],
+      "canon": "Interiors' req 997: the vault nearly bare from dusk till dawn"
+    },
+    {
+      "when": [
+        "place = drum room b",
+        "date = 10-31",
+        "time != morning"
+      ],
+      "show": [
+        "the roost bare, not a bat on the vault, every one of them gone up to the Great Hall"
+      ],
+      "canon": "Interiors' req 997: on Halloween (a recurring day) the roost is empty from the afternoon, the bats being in the Great Hall (PS 10 L3536, CoS 8 L9153); from noon to the next dawn"
+    },
+    {
+      "when": [
+        "place = drum room b",
+        "date = 11-01",
+        "time = morning"
+      ],
+      "show": [
+        "only a few bats hang from the vault, the rest still coming in by ones and twos through the slit, the roost not yet full"
+      ],
+      "canon": "Interiors' req 997: back by morning, a few stragglers, on the day after Halloween"
+    }
+  ],
+  "records": [
+    {
+      "id": "cellar.drip",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "cellar-sound",
+      "weight": 3,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = drum room b"
+      ],
+      "who": [
+        {
+          "as": "pool",
+          "role": "voice",
+          "name": "the pool",
+          "mark": "the pool"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "pool",
+          "medium": "heard",
+          "key": "cellar.drip",
+          "sound": "a slow drip falling into the pool"
+        }
+      ],
+      "canon": "Interiors' req 997: the pool's drip as a sound, at every hour and on Halloween too, since the water does not leave with the bats"
+    },
+    {
+      "id": "cellar.rustle",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "cellar-sound",
+      "weight": 2,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = drum room b",
+        "date != 10-31"
+      ],
+      "who": [
+        {
+          "as": "roost",
+          "role": "voice",
+          "name": "the roost",
+          "mark": "the roost"
+        }
+      ],
+      "lines": [
+        {
+          "speaker": "roost",
+          "medium": "heard",
+          "key": "cellar.rustle",
+          "sound": "a dry rustle of folded wings from the roost"
+        }
+      ],
+      "canon": "Interiors' req 997: the roost's rustle as a sound; not on Halloween, when the roost is empty"
+    },
+    {
+      "id": "cellar.quiet",
+      "tier": "small",
+      "source": "device",
+      "leans": [],
+      "one_of": "cellar-sound",
+      "weight": 3,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = drum room b"
+      ],
+      "starts": [],
+      "canon": "the silent partner of the drip and the rustle, so a wait is sometimes quiet (Interiors' req 997)"
+    }
+  ]
+}
