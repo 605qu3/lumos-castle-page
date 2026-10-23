@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=511"></script>
+<script src="castle-model.js?v=512"></script>
 <script src="castle-paint.js?v=105"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -2789,6 +2789,100 @@ var W1 = (function () {
     pedestalDesk(3.2, 9.8, 4.8, 10.6, 0.75, mcgDesk);
     hidden.push(['pigdesk', mcgDesk, 'pigdesk']);
     chair(4.0, 11.05, 270, 0, dark, 0.3);
+  }
+
+  /* the classrooms' real things (ledger 238, the stoves; 242, Transfiguration's; Godric's 1s of 2.31 and 2.41 pm, 23
+     October 2026), placed by Interiors' schedules (docs/interiors/<room>.md, The real things), their forms the Curator's
+     (docs/curator/classroom-real-things.md, The common kit and each room's): worn, plain, nothing glints. A form still a
+     gap in req 1032 (the scuttle, the pegs' rail, the clock, the pole, the ink bottle, the mouse cage) is drawn from the
+     Curator's prose till its slot lands */
+  function rod(a, b, r, mt, n) {   /* a round bar from a to b, each [x', y', z] */
+    var A = P(a[0], a[1], a[2]), B = P(b[0], b[1], b[2]), d = B.clone().sub(A), L = d.length();
+    var m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, L, n || 8), mt);
+    m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return add(m);
+  }
+  function drum(xp, yp, za, zb, r0, r1, mt, n) {   /* an upright round piece, r0 at its foot, r1 at its head */
+    var a = P(xp, yp, za), m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, n || 16), mt);
+    m.position.set(a.x, a.y + (zb - za) / 2, a.z); return add(m);
+  }
+  var RT = { iron: mat('rt-iron', 0x262422), plate: mat('rt-plate', 0x33302c), coal: mat('rt-coal', 0x101010),
+    deal: mat('rt-deal', 0x8a7458), paint: mat('rt-paint', 0x5f6352), dial: mat('rt-dial', 0xd9d3c3), brass: mat('rt-brass', 0x6a5a3a),
+    glass: mat('rt-glass', 0xc4cbc6), sand: mat('rt-sand', 0xb9a57c), cloak: mat('rt-cloak', 0x1d1c20), scarlet: mat('rt-scarlet', 0x6e2420),
+    gold: mat('rt-gold', 0x9a7d3c), straw: mat('rt-straw', 0xa8924f), mouse: mat('rt-mouse', 0xe2ddd2), tin: mat('rt-tin', 0x7d7b74) };
+  function stove(xc, yc, flue) {   /* the Tortoise stove on its plate, its pipe up to `flue`: { z, to: [x', y'] } where it enters the wall */
+    box(xc - 0.35, yc - 0.35, 0.0, xc + 0.35, yc + 0.35, 0.012, RT.plate);                           /* the iron plate, 0.7 square */
+    [[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(function (s) { box(xc + s[0] * 0.17 - 0.025, yc + s[1] * 0.17 - 0.025, 0.01, xc + s[0] * 0.17 + 0.025, yc + s[1] * 0.17 + 0.025, 0.13, RT.iron); });
+    drum(xc, yc, 0.12, 0.74, 0.27, 0.29, RT.iron, 20);                                               /* the squat drum */
+    drum(xc, yc, 0.74, 0.78, 0.31, 0.31, RT.iron, 20);                                               /* its top's rim */
+    drum(xc, yc, 0.78, 0.84, 0.26, 0.12, RT.iron, 20);                                               /* the dished top */
+    drum(xc, yc, 0.84, 0.92, 0.095, 0.095, RT.iron, 14);                                             /* the collar */
+    rod([xc, yc, 0.92], [xc, yc, flue.z + 0.075], 0.075, RT.iron, 12);                                 /* the pipe up */
+    rod([xc, yc, flue.z], [flue.to[0], flue.to[1], flue.z], 0.075, RT.iron, 12);                       /* and into the flue */
+  }
+  function pegs(x0, x1, yw, z, n, side) {   /* the pegs' board on a wall at y' yw (side +1 the room toward +y'), n turned pegs */
+    box(x0, yw, z - 0.06, x1, yw + side * 0.022, z + 0.06, RT.paint);
+    for (var k = 0; k < n; k++) { var xp = x0 + 0.1 + k * (x1 - x0 - 0.2) / (n - 1); rod([xp, yw + side * 0.02, z], [xp, yw + side * 0.11, z + 0.02], 0.014, RT.deal, 6); }
+  }
+  function cloak(xp, yw, z, side) {   /* a cloak hung by its collar from a peg, narrow at the collar and widening to its hem, 1 m down */
+    var q = at(xp, yw, side > 0 ? 90 : 270, z - 0.52), m = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.25, 1.0, 12), RT.cloak);
+    m.scale.set(0.38, 1, 1); m.position.set(0.105, 0, 0); add(m, q);
+  }
+  function scarf(xp, yw, z, side) {   /* a house scarf over a peg, its two ends hanging, scarlet and gold */
+    [[-0.07, 6], [0.05, 5]].forEach(function (e) {   /* stripes of 0.1, the two ends level */
+      for (var b = 0; b < e[1]; b++) box(xp + e[0] - 0.05, yw + side * 0.07, z - 0.02 - (b + 1) * 0.1, xp + e[0] + 0.05, yw + side * 0.1, z - 0.02 - b * 0.1, b % 2 ? RT.gold : RT.scarlet);
+    });
+  }
+  function clock(xp, yw, z, side) {   /* the round schoolroom dial, 0.4 across, in its turned surround */
+    var q = at(xp, yw, side > 0 ? 90 : 270, z), disc = function (r, t0, t1, mt) {
+      var m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, t1 - t0, 28), mt); m.rotation.z = Math.PI / 2; m.position.set((t0 + t1) / 2, 0, 0); return add(m, q); };
+    disc(0.2, 0.0, 0.05, RT.deal); disc(0.165, 0.05, 0.058, RT.dial);
+    lb(q, [0.058, -0.006, 0], [0.062, 0.006, 0.1], RT.coal); lb(q, [0.058, 0, -0.006], [0.063, 0.13, 0.006], RT.coal);   /* the hands at ten past twelve */
+  }
+  function pole(foot, top) {   /* the window pole leant on its pier, its brass hook and pin at the top */
+    rod(foot, top, 0.016, RT.deal, 6);
+    rod(top, [top[0], top[1], top[2] + 0.1], 0.008, RT.brass, 6);
+  }
+  function hourglass(xp, yp, z) {   /* the class glass: round plates top and foot, three turned posts, pale sand */
+    drum(xp, yp, z, z + 0.014, 0.05, 0.05, RT.deal); drum(xp, yp, z + 0.186, z + 0.2, 0.05, 0.05, RT.deal);
+    [0, 120, 240].forEach(function (d) { var a = d * Math.PI / 180; drum(xp + 0.04 * Math.cos(a), yp + 0.04 * Math.sin(a), z + 0.014, z + 0.186, 0.006, 0.006, RT.deal, 6); });
+    drum(xp, yp, z + 0.014, z + 0.1, 0.032, 0.005, RT.glass, 12); drum(xp, yp, z + 0.1, z + 0.186, 0.005, 0.032, RT.glass, 12);
+    drum(xp, yp, z + 0.016, z + 0.05, 0.03, 0.02, RT.sand, 12);
+  }
+  function cupboard(x0, y0, x1, y1, h, frontY) {   /* the painted deal cupboard: plinth, body, cornice, two doors meeting at its middle */
+    var s = frontY > y0 ? 1 : -1;
+    box(x0 + 0.02, y0, 0.0, x1 - 0.02, y1 - s * 0.02, 0.1, RT.paint);
+    box(x0, y0, 0.1, x1, y1, h - 0.07, RT.paint);
+    box(x0 - 0.03, y0, h - 0.07, x1 + 0.03, y1 + s * 0.03, h, RT.paint);
+    box((x0 + x1) / 2 - 0.004, frontY - s * 0.002, 0.16, (x0 + x1) / 2 + 0.004, frontY + s * 0.006, h - 0.12, RT.coal);   /* the doors' meeting */
+    [-0.05, 0.05].forEach(function (u) { box((x0 + x1) / 2 + u - 0.012, frontY - s * 0.002, 0.95, (x0 + x1) / 2 + u + 0.012, frontY + s * 0.025, 0.99, RT.brass); });
+  }
+  function scuttle(xp, yp) {   /* the japanned coal scuttle, coal showing, the short shovel in it */
+    drum(xp, yp, 0.0, 0.3, 0.14, 0.16, RT.iron, 16); drum(xp, yp, 0.24, 0.28, 0.15, 0.13, RT.coal, 16);
+    rod([xp + 0.04, yp, 0.2], [xp + 0.06, yp + 0.05, 0.56], 0.012, RT.iron, 6);
+  }
+
+  if (PLACE === 'transfiguration-classroom') {
+    /* ledger 242 and 238: docs/interiors/transfiguration-classroom.md, The real things (x = 139.6 + y', y = 71.4 - x';
+       the back wall y' 0, the front y' 12, the window wall x' 0, the right wall x' 8, an inner wall) */
+    stove(7.55, 0.65, { z: 2.6, to: [8.05, 0.65] });                                                 /* 1, its flue into the right wall */
+    scuttle(6.95, 0.3);
+    cupboard(0.3, 0.05, 1.5, 0.55, 1.9, 0.55);                                                       /* 2 */
+    pegs(1.7, 3.2, 0.0, 1.6, 8, 1);                                                                  /* 3, two cloaks and a scarf left */
+    cloak(1.8, 0.0, 1.6, 1); cloak(2.43, 0.0, 1.6, 1); scarf(3.06, 0.0, 1.6, 1);
+    clock(4.0, 0.0, 2.8, 1);                                                                         /* 4, over the door */
+    pole([0.25, 3.6, 0.0], [0.04, 3.6, 2.3]);                                                        /* 5, in the bay nearest the door */
+    hourglass(4.6, 10.4, 0.75);                                                                      /* 6, her desk's right end */
+    desk(5.9, 11.35, 7.5, 11.9, 0.75, RT.deal);                                                      /* 7, the creatures table */
+    box(6.0, 11.45, 0.75, 6.38, 11.8, 0.78, RT.deal);                                                /*   the cage's base, its straw, its wires */
+    box(6.02, 11.47, 0.78, 6.36, 11.78, 0.8, RT.straw);
+    [[6.0, 11.45], [6.38, 11.45], [6.0, 11.8], [6.38, 11.8]].forEach(function (c) { rod([c[0], c[1], 0.78], [c[0], c[1], 0.98], 0.004, RT.iron, 4); });
+    for (var tcw = 1; tcw < 8; tcw++) { var tcx = 6.0 + tcw * 0.38 / 8; rod([tcx, 11.45, 0.78], [tcx, 11.45, 0.98], 0.0015, RT.iron, 3); rod([tcx, 11.8, 0.78], [tcx, 11.8, 0.98], 0.0015, RT.iron, 3); }
+    box(6.0, 11.45, 0.975, 6.38, 11.8, 0.985, RT.iron);
+    [[6.1, 11.55], [6.2, 11.68], [6.29, 11.57]].forEach(function (m) { box(m[0] - 0.03, m[1] - 0.014, 0.8, m[0] + 0.03, m[1] + 0.014, 0.83, RT.mouse); });   /* three white mice */
+    drum(6.65, 11.62, 0.75, 0.91, 0.06, 0.06, RT.glass, 14); drum(6.65, 11.62, 0.91, 0.92, 0.063, 0.063, RT.tin, 14);   /* the beetles' jar, its pierced tin lid */
+    [[6.63, 11.6], [6.68, 11.64], [6.64, 11.66]].forEach(function (b) { box(b[0] - 0.008, b[1] - 0.005, 0.752, b[0] + 0.008, b[1] + 0.005, 0.758, RT.coal); });
+    box(6.95, 11.5, 0.75, 7.25, 11.68, 0.81, RT.deal);                                              /* the box of buttons, its lid slid half back */
+    box(7.1, 11.5, 0.81, 7.4, 11.68, 0.818, RT.deal);
   }
 
   var owner = PLACE === 'staff-passage' ? 'staff-passage' : PLACE;
