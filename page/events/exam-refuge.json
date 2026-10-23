@@ -1,0 +1,57 @@
+{
+  "chain": "exam-refuge",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "exam-refuge.plate-rub",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap exam-hall-plate",
+      "when": [
+        "place = seventh floor north corridor east",
+        "exam_plate != found"
+      ],
+      "show": [
+        "a brass plate gone black on the plain oak door; one rub of a sleeve and it reads EXAMINATIONS. No wonder it had tarnished."
+      ],
+      "starts": [
+        "set exam_plate = found",
+        "log \"Rubbed the old examination hall's plate {day}\"",
+        "secret old-examination-hall"
+      ],
+      "canon": "Hidden Ways' H71 (docs/hidden-ways/busts-870.md, The old examination hall's card, Godric's 1 on hidden-ways-busts-exam-hall-1023, 2.22 pm, 23 October 2026; Events' req 1028): the brass plate tarnished black until a rub shows EXAMINATIONS, a find that stays open once found; nothing glows, nothing dated, nothing replayed; the exams are the books' (PS 16 L5458, the search of 1.46 pm), the line a joke at the word's expense, naming no one; the door opens from both sides whether or not he has rubbed it (Interaction's)"
+    },
+    {
+      "id": "exam-refuge.plate-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap exam-hall-plate",
+      "when": [
+        "place = seventh floor north corridor east",
+        "exam_plate = found"
+      ],
+      "show": [
+        "the brass plate, one corner rubbed bright, still reads EXAMINATIONS"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H71 (Events' req 1028): once rubbed, the plate stays rubbed, so a second tap only reads it again"
+    },
+    {
+      "id": "exam-refuge.whistle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap west-refuge-whistle",
+      "when": [
+        "place = west refuge ring"
+      ],
+      "show": [
+        "one soft low note from the little whistle, carried a way round the curve of the wall; nothing answers, and the passage settles back to its quiet"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H69 (docs/hidden-ways/west-tower-rings.md, req 1018 built, v172, ledger 240; Godric's 1 on architect-refuge-ring-built-1023, 2.53 pm; Events' req 1030): the boxwood whistle on its nail by the squint, the watcher's signal; invented, no canon device; one soft note, nothing answers, nothing replayed, a way out still open; the tap id is Events' own and Interaction matches it"
+    }
+  ]
+}
