@@ -3769,7 +3769,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -4768,7 +4768,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateToad(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -5667,6 +5667,147 @@ var STRAW = PLACE !== 'owlery' || !shell ? null : (function () {
   shell.group.add(g);
   return g;
 })();
+/* req 951 (d), Magic's 948 (Events' owlery.json, word for word), the parts with no owl in them: the droppings in the
+   straw; the sills darkened on the rain line and white on the snow lines, the weather blowing in at each loop; the
+   sun's beams through the loops that face it on the clear line, the light's way by the hour (east at 6, south at 12,
+   west at 18), a little further round on its line; a feather drifting down into the straw on its line, lying there
+   after. Nothing glows: the beams are the sun's own, faint. The owls and their perches wait (architect-owlery-owls-1022);
+   their lines stay the note's. ?owlery=rain|snow|sun|feather for checks; lumosGreybox.owlery(cue) */
+var OWL_STRAW = 'the floor entirely covered in straw, crunching a little under his steps, owl droppings here and there and a boy minding where he steps',
+    OWL_RAIN = 'rain blowing in through the loops and darkening the sills',
+    OWL_SNOW = 'snow blowing in through the loops onto the sills',
+    OWL_SNOWSILL = 'a little snow lying on the sills',
+    OWL_BEAMS = 'thick silvery beams of sunlight crisscrossing the circular room through the glassless windows',
+    OWL_VIEW = 'from each loop the grounds below: the lake, the Forest\'s edge, the Quidditch pitch, nothing in the view moving',
+    OWL_FEATHER = 'a feather drifting down and settling in the straw',
+    OWL_MOVE = 'the beams of sunlight a little further round the walls than before';
+var OWL = !STRAW ? null : (function () {
+  var rm = MODEL.rooms.filter(function (r) { return r.id === 'owlery'; })[0], C = rm.shape.circle, RR = rm.shape.r, z0 = shell.place.floor;
+  var P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); }, R = function (a, b) { return a + Math.random() * (b - a); };
+  var out = { sills: [], wet: false, snow: false, lying: false, beams: [], shift: 0, motes: [], weather: null, feather: null };
+  /* the droppings, a few white-grey splats, kept comic */
+  var dm = new THREE.MeshStandardMaterial({ color: kit.col(0xd8d4c8), roughness: 1 });
+  for (var i = 0; i < 14; i++) {
+    var a = R(0, Math.PI * 2), d = R(1.2, RR - 0.6), px = C[0] + Math.sin(a) * d, py = C[1] + Math.cos(a) * d;
+    if (px > C[0] + 2.4 && Math.abs(py - C[1]) < 1.2) continue;   /* clear of the arch's way */
+    var s = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 4, 0, Math.PI * 2, 0, Math.PI / 2), dm);
+    s.scale.set(R(0.025, 0.04), 0.012, R(0.02, 0.035)); s.position.copy(P(px, py, 0.035));
+    s.name = 'owlery-dropping-' + i; s.userData.owner = 'owlery'; s.raycast = function () {}; STRAW.add(s);
+  }
+  /* each loop's sill, found by rays in the built shell: its floor 1.0 up, its reveals either side, inner and outer ends */
+  shell.group.updateMatrixWorld(true);
+  var hits = function (o, dir, far) {
+    var w0 = shell.group.localToWorld(o.clone()), w1 = shell.group.localToWorld(o.clone().add(dir)).sub(w0).normalize();
+    var h = new THREE.Raycaster(w0, w1, 0, far).intersectObjects(shell.group.children, true).filter(function (x) { return x.object.visible && !x.object.userData.way; })[0];
+    return h ? h.distance : null;
+  };
+  var loops = MODEL.openings.filter(function (o) { return o.room === 'owlery' && /loop/.test(o.kind || ''); });
+  var wetM = new THREE.MeshStandardMaterial({ color: kit.col(0x1e1b18), roughness: 0.35, transparent: true, opacity: 0.6, depthWrite: false });
+  var snowM = new THREE.MeshStandardMaterial({ color: kit.col(0xeceef0), roughness: 0.95 });
+  loops.forEach(function (o) {
+    var b = o.compass * Math.PI / 180, ux = Math.sin(b), uy = Math.cos(b), vx = uy, vy = -ux, sill = o.sill || 1.0;
+    var side = function (r) {
+      var o3 = P(C[0] + ux * r, C[1] + uy * r, sill + 0.03), v3 = P(C[0] + vx, C[1] + vy, 0).sub(P(C[0], C[1], 0));
+      return [Math.min(hits(o3, v3, 2) || 0.15, 1.6), Math.min(hits(o3, v3.clone().negate(), 2) || 0.15, 1.6)];
+    };
+    var r0 = RR + 0.04, r1 = RR + (o.depth || 3.2) - 0.06, a0 = side(r0 + 0.02), a1 = side(r1 - 0.02);
+    var pts = [[r0, a0[0]], [r1, a1[0]], [r1, -a1[1]], [r0, -a0[1]]].map(function (q) { return P(C[0] + ux * q[0] + vx * q[1], C[1] + uy * q[0] + vy * q[1], 0); });
+    var mk = function (mat, dz, nm) {
+      var g = new THREE.BufferGeometry(), y = pts[0].y;
+      var v = []; [0, 1, 2, 0, 2, 3].forEach(function (k) { v.push(pts[k].x, y, pts[k].z); });
+      g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); g.computeVertexNormals();
+      var m = new THREE.Mesh(g, mat); m.material.side = THREE.DoubleSide; m.position.y = P(0, 0, sill + dz).y - y;
+      m.name = nm; m.userData.owner = 'owlery'; m.raycast = function () {}; m.visible = false; shell.group.add(m); return m;
+    };
+    out.sills.push({ o: o, ux: ux, uy: uy, vx: vx, vy: vy, sill: sill, w: a1[0] + a1[1],
+      wet: mk(wetM, 0.004, o.id + '-wet'), snow: mk(snowM, 0.012, o.id + '-snow') });
+  });
+  /* the weather blowing in: small motes from each loop's mouth, inward and down */
+  var mt = softTex(255, 255, 255);
+  out.sills.forEach(function (sl) {
+    for (var k = 0; k < 7; k++) {
+      var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: mt, color: 0xdfe4ea, transparent: true, opacity: 0.6, depthWrite: false }));
+      sp.visible = false; sp.raycast = function () {}; sp.userData.owner = 'owlery'; shell.group.add(sp);
+      out.motes.push({ s: sp, sl: sl, t: -k * 0.25, life: 1 });
+    }
+  });
+  /* the beams: one long faint box from each loop the sun stands before, along its light, to the floor or the far wall */
+  var beamM = new THREE.MeshBasicMaterial({ color: 0xf2f0e6, transparent: true, opacity: 0.09, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  out.layBeams = function () {
+    out.beams.forEach(function (m) { shell.group.remove(m); }); out.beams = [];
+    var h = HOUR + 0.5, az = (90 + (h - 6) * 15 + out.shift) * Math.PI / 180, el = Math.max(6, 28 * Math.sin(Math.PI * Math.min(Math.max(h - 5, 0), 14) / 14)) * Math.PI / 180;
+    var lx = -Math.sin(az) * Math.cos(el), ly = -Math.cos(az) * Math.cos(el), lz = -Math.sin(el);   /* the light's way */
+    out.sills.forEach(function (sl) {
+      var inward = -(lx * sl.ux + ly * sl.uy) / Math.cos(el);
+      if (inward < Math.cos(70 * Math.PI / 180)) return;
+      var r = RR + 0.02, sx = C[0] + sl.ux * r, sy = C[1] + sl.uy * r, sz = sl.sill + 0.6;
+      /* to the floor, or where it leaves the circle first */
+      var tf = sz / -lz, bq = 2 * ((sx - C[0]) * lx + (sy - C[1]) * ly), cq = (sx - C[0]) * (sx - C[0]) + (sy - C[1]) * (sy - C[1]) - RR * RR, aq = lx * lx + ly * ly;
+      var tw = (-bq + Math.sqrt(Math.max(bq * bq - 4 * aq * cq, 0))) / (2 * aq), t = Math.min(tf, tw);
+      var A = P(sx, sy, sz), B = P(sx + lx * t, sy + ly * t, sz + lz * t), len = A.distanceTo(B);
+      var m = new THREE.Mesh(new THREE.BoxGeometry(0.28, 1.0, len), beamM);
+      m.position.copy(A).add(B).multiplyScalar(0.5); m.lookAt(shell.group.localToWorld(B.clone()));
+      m.name = sl.o.id + '-beam'; m.userData.owner = 'owlery'; m.raycast = function () {}; shell.group.add(m); out.beams.push(m);
+    });
+  };
+  /* the feather: from high up the tower, swaying down, then lying in the straw */
+  var fc = document.createElement('canvas'); fc.width = 32; fc.height = 128; var fx = fc.getContext('2d');
+  fx.fillStyle = '#c9c0b0'; fx.beginPath(); fx.ellipse(16, 64, 9, 58, 0, 0, Math.PI * 2); fx.fill();
+  fx.strokeStyle = '#8a7f70'; fx.lineWidth = 2; fx.beginPath(); fx.moveTo(16, 4); fx.lineTo(16, 126); fx.stroke();
+  var ft = new THREE.CanvasTexture(fc); ft.encoding = THREE.sRGBEncoding;
+  out.drop = function () {
+    if (out.feather) shell.group.remove(out.feather.m);
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(0.035, 0.14), new THREE.MeshStandardMaterial({ map: ft, transparent: true, alphaTest: 0.4, roughness: 0.9, side: THREE.DoubleSide }));
+    m.name = 'owlery-feather'; m.userData.owner = 'owlery'; m.raycast = function () {}; shell.group.add(m);
+    var a = R(0, Math.PI * 2), d = R(0.8, 2.6);
+    out.feather = { m: m, x: C[0] + Math.sin(a) * d, y: C[1] + Math.cos(a) * d, h: (rm.ceiling - rm.z) - 0.4, t: 0, down: false };
+  };
+  return out;
+})();
+function owlerySet(k, on) { if (OWL) OWL.sills.forEach(function (sl) { sl[k].visible = on; }); }
+function owleryWeather(w) {   /* 'rain', 'snow' or null: the motes from the loops */
+  if (!OWL) return; OWL.weather = w;
+  OWL.motes.forEach(function (p) { p.s.visible = false; p.s.material.color.set(w === 'rain' ? 0xa9b2bc : 0xf4f6f8); });
+}
+function owlShown(shown) {
+  if (!OWL || OWL.fixed) return OWL ? OWL.fixed : [];
+  var on = function (s) { return shown.indexOf(s) >= 0; }, d = [OWL_STRAW, OWL_VIEW];
+  owlerySet('wet', on(OWL_RAIN)); owlerySet('snow', on(OWL_SNOW) || on(OWL_SNOWSILL));
+  owleryWeather(on(OWL_RAIN) ? 'rain' : on(OWL_SNOW) ? 'snow' : null);
+  if (on(OWL_BEAMS)) { if (!OWL.beams.length) OWL.layBeams(); } else { OWL.beams.forEach(function (m) { shell.group.remove(m); }); OWL.beams = []; }
+  [OWL_RAIN, OWL_SNOW, OWL_SNOWSILL, OWL_BEAMS].forEach(function (s) { if (on(s)) d.push(s); });
+  return d;
+}
+if (OWL) {
+  thingCues[OWL_FEATHER] = function () { showLines([{ medium: 'seen', sound: OWL_FEATHER, on: function () { OWL.drop(); } }]); };
+  thingCues[OWL_MOVE] = function () { showLines([{ medium: 'seen', sound: OWL_MOVE, on: function () { OWL.shift += 4; if (OWL.beams.length) OWL.layBeams(); } }]); };
+  var oq = Q.get('owlery');   /* checks: hold a state, the runtime's lines aside */
+  if (oq === 'rain' || oq === 'snow') { OWL.fixed = [OWL_STRAW, OWL_VIEW]; owlerySet(oq === 'rain' ? 'wet' : 'snow', true); owleryWeather(oq); }
+  if (oq === 'sun') { OWL.fixed = [OWL_STRAW, OWL_VIEW]; OWL.layBeams(); }
+  if (oq === 'feather') setTimeout(function () { thingCues[OWL_FEATHER](); }, 1200);
+}
+function updateOwlery(dt) {
+  if (!OWL) return;
+  var C = 0, z0 = shell.place.floor;
+  if (OWL.weather) OWL.motes.forEach(function (p) {
+    p.t += dt; if (p.t < 0) return;
+    var rain = OWL.weather === 'rain', life = rain ? 0.9 : 2.2;
+    if (p.t > life || !p.s.visible) { p.t = p.s.visible ? -Math.random() * 0.6 : 0; p.s.visible = true; p.o = Math.random() - 0.5; p.h = 0.3 + Math.random() * 0.9; if (p.t < 0) { p.s.visible = false; return; } }
+    var sl = p.sl, rm = OWL_ROOM, r = rm.shape.r + 3.0 - p.t * (rain ? 3.4 : 1.4), h = sl.sill + p.h - p.t * (rain ? 1.6 : 0.45) + (rain ? 0 : Math.sin(p.t * 5 + p.o * 9) * 0.05);
+    if (h < 0.02) { p.s.visible = false; return; }
+    var cx = rm.shape.circle[0] + sl.ux * r + sl.vx * p.o * 0.18, cy = rm.shape.circle[1] + sl.uy * r + sl.vy * p.o * 0.18;
+    p.s.position.copy(shell.toLocal(cx, cy, z0 + h)); var sz = rain ? 0.03 : 0.045; p.s.scale.set(sz, rain ? 0.12 : sz, 1);
+  });
+  var f = OWL.feather;
+  if (f && !f.down) {
+    f.t += dt; f.h -= dt * 0.32;
+    var sw = Math.sin(f.t * 1.7) * 0.35;
+    if (f.h <= 0.045) { f.h = 0.045; f.down = true; }
+    f.m.position.copy(shell.toLocal(f.x + sw, f.y + Math.cos(f.t * 1.3) * 0.12, z0 + f.h));
+    f.m.rotation.set(f.down ? -Math.PI / 2 : Math.sin(f.t * 1.7) * 0.9, f.t * 0.4, f.down ? 0.6 : Math.cos(f.t * 1.7) * 0.4);
+  }
+}
+var OWL_ROOM = MODEL.rooms.filter(function (r) { return r.id === 'owlery'; })[0];
 var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
   place: shell.place.id, places: shell.places.map(function (p) { return p.id; }),
   doors: shell.doors.map(function (d) { return { id: d.id, to: d.to }; }),
@@ -5707,6 +5848,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   cupboard: function (cue) { if (cue) cueTable[cue === 'small' ? CUP_SMALL : cue]();   /* req 947: a cue string, or 'small' for the bottle's small print */
     return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run, lift: CUP.lift } : null; },
   /* req 945: the tables' dishes and steam, the corridor's paintings and torches; a cue string passed in plays it */
+  owlery: function (cue) { if (cue && thingCues[cue]) thingCues[cue](); return OWL ? { sills: OWL.sills.length, wet: OWL.sills.filter(function (s) { return s.wet.visible; }).length, snow: OWL.sills.filter(function (s) { return s.snow.visible; }).length, beams: OWL.beams.map(function (m) { return m.name; }), weather: OWL.weather, feather: OWL.feather ? { h: +OWL.feather.h.toFixed(2), down: OWL.feather.down } : null, widths: OWL.sills.map(function (s) { return +s.w.toFixed(2); }) } : null; },
   woven: function (cue) { if (cue) cueTable[cue]();   /* req 960: a cue string; the things' state */
     return WOVEN ? { env: WOVEN.env ? WOVEN.env[0].visible : null, book: WOVEN.book ? WOVEN.book[0].visible : null, title: WOVEN.title ? WOVEN.title.visible : null,
       lift: Object.keys(WOVEN.lifts).map(function (k) { return k + ' ' + WOVEN.lifts[k].t.toFixed(2); }).join(', '), flick: WOVEN.flick,
