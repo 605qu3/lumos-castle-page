@@ -1834,7 +1834,7 @@ var ARMOUR_3D = (function () {
   g.position.set(only ? BAY_X : BAY_X + 0.9, 0, FAR_Z + 0.4);
   g.name = 'armour-3d'; scene.add(g);
   if (only) { armour.visible = false; armourShadow.visible = false; }
-  return { group: g, only: only, mats: [steel, etched, dark, rv.material, brass], env: [steel, etched, rv.material, brass] };
+  return { group: g, only: only, slit: slit, mats: [steel, etched, dark, rv.material, brass], env: [steel, etched, rv.material, brass] };
 })();
 function updateArmour3d() {   /* the torches' warmth by night, as the card's */
   if (!ARMOUR_3D) return;
@@ -1842,6 +1842,8 @@ function updateArmour3d() {   /* the torches' warmth by night, as the card's */
   if (ARMOUR_3D.only) { armour.visible = false; armourShadow.visible = false; }   /* something else shows the card each frame */
   ARMOUR_3D.mats.forEach(function (m) { m.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * 0.12 * k); });
   ARMOUR_3D.env.forEach(function (m) { m.envMapIntensity = 1 - 0.65 * k; });   /* the windows dark, the mirror dims */
+  var glow = visorLight && visorLight.userData.want ? visorLight.material.opacity : 0;   /* Christmas's light in its slit too */
+  ARMOUR_3D.slit.material.color.setHex(0x0c0c0e).lerp(col(0xffc070), glow);
 }
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
 /* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
@@ -3895,11 +3897,14 @@ function filchHides() {   /* is he at a hiding place now */
 }
 function filchDay() { return filch.q || (lightTime() !== 'night' && dayRand(23) < FILCH.chance); }
 function filchLamp() { return filch.light.position.clone(); }
-function filchPass() {
+function filchWalk() {   /* he shuffles past behind the boy, one way or the other */
   var at = camera.position.x;
   filch.dir = Math.random() < 0.5 ? 1 : -1;
   filch.from = at - filch.dir * FILCH.reach;
   filch.t = 0; filch.done = true;
+}
+function filchPass() {
+  filchWalk();
   if (castle && castle.moment) castle.moment('filch passes');
   showLines([{ medium: 'heard', speaker: 'filch', sound: filchBright() ? 'slow, shuffling steps, passing behind you' : 'slow, shuffling steps and the creak of a lamp, passing behind you' }]);   /* by day no lamp (Godric, 7.40 pm) */
 }
@@ -5098,11 +5103,12 @@ var visorLight = (function () {
 /* the flame's breath: the bar's opacity times CastleLight.flicker at a lamp's 0.06, the suit's own seed; half while the
    sun is up (the runtime's sun().up, read once a second), full from dusk: by day a quiet warm line, by night the
    "mysterious lights" */
-var VISOR = { seed: 7, day: 0.5, up: null, next: 0 };
+var VISOR = { seed: 7, day: 0.5, up: null, next: 0, swell: -1, swellFor: 6 };   /* swell: when year 3's moment woke it (req 982) */
 function updateVisorLight() {
   if (!visorLight.visible) return;
   if (t >= VISOR.next) { VISOR.next = t + 1; VISOR.up = castle && castle.sun ? !!castle.sun().up : lightTime() === 'day'; }
-  visorLight.material.opacity = Math.min(1, (VISOR.up ? VISOR.day : 1) * CastleLight.flicker(t, VISOR.seed, 0.06));
+  var sw = VISOR.swell >= 0 && t - VISOR.swell < VISOR.swellFor ? Math.sin(Math.PI * (t - VISOR.swell) / VISOR.swellFor) : 0;
+  visorLight.material.opacity = Math.min(1, ((VISOR.up ? VISOR.day : 1) + sw) * CastleLight.flicker(t, VISOR.seed, 0.06));
 }
 var CUE = {
   step: 'the armour a short step out from its pier into the corridor, on its second mark; its stop follows it',
@@ -5122,7 +5128,9 @@ var POSES = {
 var armourPose = null, armourJiggle = 0, sticksShown = 'gone', sticksQueue = [];
 var ARMOUR_ROCK = { time: 2.6, lean: 0.07, swings: 3 }, armourRock = 0;   /* the wobble's seconds, its first lean, its rocks */
 /* two stand-ins in the Neville card's idiom (grey, nothing glowing, square to the eye), each placed on a scaled plan put
-   to Godric through the name in Where it stands before it goes live; till then only with ?standins (a look).
+   to Godric through the name in Where it stands: live on his 1 and 1 (22 October 2026, 9.24 pm,
+   corridor-lost-first-year-place-1022, the stair head before the tapestry; corridor-lee-knot-place-1022, by the nearer
+   window); ?standins=0 hides them for a look, their cues told as before.
    The lost first-year (req 966 (2); Events' door.lost-ask, door.lost-lead, -friday; req 936 item 5, Story's year-1
    wins): on his arrival cue a small first-year stands at the stair head, his timetable in his hands (the record's mark
    `landing`, the top of the flight, where the arrival's view sees him); a tap on him is `lost first-year`, and on the
@@ -5130,7 +5138,7 @@ var ARMOUR_ROCK = { time: 2.6, lean: 0.07, swings: 3 }, armourRock = 0;   /* the
    stair.lee-tarantula-box, stair.lee-lid; PS 6): on the arrival cue a taller boy with a box in his arms and a small
    knot of pupils round him in the light of the nearer window (the mark `corridor`, in plain view); a tap on any of
    them is `tarantula box`, and the lid's cue is told. People's drawn figures replace both (student-stock) */
-var STANDINS = groundsQ.has('standins');
+var STANDINS = groundsQ.get('standins') !== '0';
 var LOST = { x: -8.2, z: -2.95, w: 0.46, h: 1.36, fade: 1.5, after: 1.0,
   ask: 'a first-year on the landing, turning his timetable one way and then the other, looking up and down the stair',
   lead: 'he walks the first-year along the corridor and down the stair by the plan, the boy trotting beside him with his timetable',
@@ -5171,7 +5179,7 @@ function drawStandIns(has) {
   var wantLee = STANDINS && (leeCued || has(LEE.cue));
   leeCards.forEach(function (c) { c.visible = wantLee; });
 }
-function standInArrives(which) {   /* his arrival cue: drawn with ?standins, told without (as before) */
+function standInArrives(which) {   /* his arrival cue: drawn, or told with ?standins=0 */
   return function () {
     if (which === 'lost') lost.cued = true; else leeCued = true;
     if (STANDINS) drawStandIns(function () { return false; });
@@ -5864,9 +5872,41 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* McGonagall passing, the rare fourth ending (req 966 (1); Events' filch.catch-mcgonagall, -night, -late; Godric's 1
        on events-catch-fourth-ending-1022): his lamp over the boy as at the others (his cell 3), then away down the
        stairs as at the let-off; she is not drawn yet (People's req 967), so she is told; no office, the turn kept */
-    'Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it': mcgonagallPasses('Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it'),
+    'Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch turns away down the stairs, Mrs Norris with him': mcgonagallPasses('Professor McGonagall coming along the corridor on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch turns away down the stairs, Mrs Norris with him'),   /* lampless by day (req 982) */
     'Professor McGonagall coming along the corridor on her rounds in a tartan bathrobe and a hair net, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it': mcgonagallPasses('Professor McGonagall coming along the corridor on her rounds in a tartan bathrobe and a hair net, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it'),
     'Professor McGonagall coming along the corridor late on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it': mcgonagallPasses('Professor McGonagall coming along the corridor late on her rounds, one long look at the boy over her glasses; she sees him back toward his house while Filch\'s lamp turns away down the stairs, Mrs Norris with it'),
+    /* by day, without his lamp (req 982, the page half of req 973; Events' -day twins, fc2c2e3e): each wants its lamp
+       twin's handler, the lamp's states standing for where he is; by day his drawn card carries no lamp and no light */
+    'his footsteps and wheeze coming up the steps, nearer': function () {
+      if (chase.on) chase.lamp = 'climb';
+      showLines([{ medium: 'heard', speaker: 'filch', sound: 'his footsteps and wheeze coming up the steps, nearer' }]);
+    },
+    'Filch stopped at the top of the stairs, wheezing and getting his breath': function () { if (chase.on) chase.lamp = 'top'; },
+    "Filch shuffling slowly along the corridor, never turning, on to the Fat Lady's end and back to the stairs": function () {
+      if (chase.on) { chase.lamp = 'pass'; chase.passT = 0; }
+    },
+    'Filch looms over the boy, peers at him and jerks his head at the stairs; the boy follows him down, Mrs Norris padding behind': function () { caught('march'); },
+    'Filch looms over the boy, looks him up and down, sniffs and waves him on; he goes back down the stairs, Mrs Norris with him': function () { caught('off'); },
+    'Peeves whooshing away down the stairs with a cackle, the suit of armour rattling as he passes, and Filch going back down after him': peevesSaves,
+    'Nearly Headless Nick gliding out of the wall at the top of the stairs, one hand sweeping toward the far flight, and Filch going off down it': nickPoints,
+    "Neville at the foot of the frame, squeaking and shrinking against the wall as Filch's eyes sweep over him, and Filch going back down the stairs": nevilleUnderLamp,
+    'Filch stopping at the broom cupboard, its door rattling on its latch and staying shut, and Filch turning away': cupboardRefuses,
+    'Mrs Norris pausing at the top of the stairs, looking past the hiding place, then padding off down the far flight with her tail high, and Filch going after her': function () {
+      norrisAstray();
+      norrisLine('Mrs Norris pausing at the top of the stairs, looking past the hiding place, then padding off down the far flight with her tail high, and Filch going after her');
+    },
+    /* the last day of the Christmas term, year 3 (req 982; Events' filch.dungbombs, PoA 11 L17511): he shuffles through
+       behind the boy with his mop, by day so without his lamp, the words told; his mutter is the record's own line */
+    'the corridor reeks of Dungbombs, and Filch shuffles through with a mop and a bucket, muttering': function () {
+      filchWalk();
+      showLines([{ medium: 'heard', speaker: 'filch', sound: 'the corridor reeks of Dungbombs, and Filch shuffles through with a mop and a bucket, muttering' }]);
+    },
+    /* the mysterious light, year 3's Christmas (req 982; Events' armour.christmas-lights, PoA 11 L17727; Godric's woven
+       touch of 8.03 pm): the season's visor light (req 600) is lit already; this moment swells it, as if something inside
+       had just woken, then lets it settle. On whichever suit stands: the drawing's slit, or the built suit's */
+    "a mysterious light glows inside the corridor's suit of armour, shining out through its visor": function () {
+      visorLight.userData.want = true; visorLight.visible = !ARMOUR_SIDE.on; VISOR.swell = t;
+    },
     /* befriending Mrs Norris (req 933 (a); Events' norris.json, its hundred-twenty-fifth paragraph's cues word for word) */
     "he crouches and sets a bit of his breakfast on the flags; Mrs Norris's lamp-like eyes watch it and hold off while he is near": function () {
       norrisScrapDown(); norrisLine("he crouches and sets a bit of his breakfast on the flags; Mrs Norris's lamp-like eyes watch it and hold off while he is near");
