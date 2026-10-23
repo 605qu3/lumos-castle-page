@@ -3855,7 +3855,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -4433,6 +4433,100 @@ function updateForms(dt) {
   var F = FORMS, s = (F.t += dt), desk = !(W1.pigdesk || [])[0] || W1.pigdesk[0].visible;
   F.slips.forEach(function (m, i) { m.visible = desk && s >= F.first + i * F.every; });
   F.spill.forEach(function (m) { m.visible = s >= F.tip; });
+}
+/* req 993, storeroom.json's room line and storeroom.banner-unrolled, word for word (Godric's woven touch
+   lion-bedsheet-banner, PS 11 L3801): in drum-room-g a plain standing shelf of deal against the wall across from the door (x 41.44 to
+   42.94, y -2.78 to -2.38; ours, till Interiors' 991 furnishes the room), three boards at 0.35, 0.95 and 1.55; on the
+   middle one the bedsheet rolled up (1.3 long, r 0.085), the painted mane showing on its outer turn at the end on his left as he comes in (x 42.84),
+   shown by the room line. The tap `banner` on the roll: on the record's line the roll goes from the shelf and the
+   sheet unrolls across the flags towards the door over 1.6 s (2.6 by 1.7, its top edge at y -1.95, the lion nearer
+   his eye under the letters), lies 20 s, the letters' paint changing colour every 0.5 s, then rolls up again and is
+   back on its shelf, plain paint. The letters are brush strokes that read as letters from the door and spell nothing
+   (no words written, the record's canon). Nothing glows. ?touch=banner plays it */
+var SR_ROOM = 'a bedsheet rolled up on a shelf, a painted lion\'s mane showing at one end',
+    SR_TAP = 'the old bedsheet banner unrolled across the flagstones, a painted Gryffindor lion under big letters that flash first one colour and then another; rolled up again, it is plain paint';
+var BANNER = PLACE !== 'drum-room-g' || !shell ? null : (function () {
+  var z0 = shell.place.floor, P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  var own = function (m) { m.userData.owner = PLACE; m.raycast = function () {}; shell.group.add(m); return m; };
+  var deal = new THREE.MeshStandardMaterial({ color: kit.col(0x7a6142), roughness: 0.9 });
+  [[41.44, 41.48], [42.9, 42.94]].forEach(function (x) { own(thingBox(shell.group, P, [x[0], -2.78, 0], [x[1], -2.38, 1.8], deal)); });
+  [0.35, 0.95, 1.55].forEach(function (h) { own(thingBox(shell.group, P, [41.48, -2.78, h - 0.025], [42.9, -2.38, h], deal)); });
+  own(thingBox(shell.group, P, [41.48, -2.79, 0.1], [42.9, -2.78, 1.8], deal));   /* the back boards */
+  function tex(w, h, draw) { var c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t; }
+  var LINEN = '#e6dfd0';
+  /* the roll: round the cylinder u, along it v (v 1 the east end); the mane's strokes on the last fifth */
+  var rollTex = tex(256, 512, function (x, W, H) {
+    x.fillStyle = LINEN; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(120,110,95,0.25)'; x.lineWidth = 2; for (var i = 0; i < 6; i++) { x.beginPath(); x.moveTo(0, 80 + i * 70); x.lineTo(W, 84 + i * 70); x.stroke(); }
+    for (var k = 0; k < 26; k++) { var u = (k * 37) % W, l = 40 + (k * 13) % 60; x.strokeStyle = k % 3 ? '#c98a2a' : '#a8541e'; x.lineWidth = 9; x.lineCap = 'round';
+      x.beginPath(); x.moveTo(u, 0); x.quadraticCurveTo(u + 14, l / 2, u + 4, l + 30); x.stroke(); }
+  });
+  var cap = new THREE.MeshStandardMaterial({ color: kit.col(0xd6cebd), roughness: 0.95 });
+  var rollMats = [new THREE.MeshStandardMaterial({ map: rollTex, roughness: 0.95 }), cap, cap];
+  function along(m, x0, x1, y, h) {   /* a cylinder's axis laid from (x0, y) to (x1, y) at height h */
+    var a = P(x0, y, h), b = P(x1, y, h); m.position.copy(a).add(b).multiplyScalar(0.5);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+  }
+  var roll = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 1.3, 20), rollMats);
+  along(roll, 41.54, 42.84, -2.56, 0.95 + 0.086); roll.name = 'storeroom-banner-roll';
+  roll.userData.owner = PLACE; roll.userData.tap = 'banner'; roll.visible = !window.CastleEvents; shell.group.add(roll);
+  /* the sheet: the lion in red and gold, the letters a second face on the same sheet in white paint whose colour turns */
+  var sheetTex = tex(1024, 672, function (x, W, H) {
+    x.fillStyle = LINEN; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(120,110,95,0.22)'; x.lineWidth = 3; [W / 3, 2 * W / 3].forEach(function (u) { x.beginPath(); x.moveTo(u, 0); x.lineTo(u + 6, H); x.stroke(); });
+    x.beginPath(); x.moveTo(0, H / 2); x.lineTo(W, H / 2 - 5); x.stroke();   /* the folds */
+    x.fillStyle = 'rgba(150,140,120,0.25)'; [[180, 560, 40], [860, 120, 28]].forEach(function (s) { x.beginPath(); x.arc(s[0], s[1], s[2], 0, Math.PI * 2); x.fill(); });   /* the old stains */
+    var cx = W / 2, cy = 450;
+    for (var k = 0; k < 30; k++) { var a = k * Math.PI * 2 / 30, r0 = 95, r1 = 165 + (k % 2) * 25;   /* the mane */
+      x.fillStyle = k % 2 ? '#c98a2a' : '#a8541e'; x.beginPath();
+      x.moveTo(cx + Math.cos(a - 0.12) * r0, cy + Math.sin(a - 0.12) * r0); x.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); x.lineTo(cx + Math.cos(a + 0.12) * r0, cy + Math.sin(a + 0.12) * r0); x.fill(); }
+    x.fillStyle = '#d9a64a'; x.beginPath(); x.ellipse(cx, cy + 5, 100, 112, 0, 0, Math.PI * 2); x.fill();   /* the face */
+    x.fillStyle = '#e8c27a'; x.beginPath(); x.ellipse(cx, cy + 55, 52, 40, 0, 0, Math.PI * 2); x.fill();   /* the muzzle */
+    x.fillStyle = '#2a1a10'; [-38, 38].forEach(function (d) { x.beginPath(); x.ellipse(cx + d, cy - 15, 11, 8, 0, 0, Math.PI * 2); x.fill(); });
+    x.beginPath(); x.moveTo(cx - 18, cy + 28); x.lineTo(cx + 18, cy + 28); x.lineTo(cx, cy + 48); x.fill();   /* the nose */
+    x.strokeStyle = '#2a1a10'; x.lineWidth = 5; x.beginPath(); x.moveTo(cx, cy + 48); x.lineTo(cx, cy + 66); x.moveTo(cx - 30, cy + 76); x.quadraticCurveTo(cx, cy + 62, cx + 30, cy + 76); x.stroke();
+    x.strokeStyle = '#a8241e'; x.lineWidth = 10; x.strokeRect(20, 20, W - 40, H - 40);   /* the border */
+  });
+  var lettersTex = tex(1024, 672, function (x, W) {   /* eight painted marks in a row across the top, spelling nothing */
+    x.strokeStyle = '#ffffff'; x.lineWidth = 26; x.lineCap = 'round'; x.lineJoin = 'round';
+    var marks = [[[0, 0, 0, 1], [0, 0, 1, 0], [0, 0.5, 0.8, 0.5]], [[0, 1, 0.5, 0], [0.5, 0, 1, 1]], [[0, 0, 0, 1], [1, 0, 1, 1], [0, 0.5, 1, 0.5]],
+      [[1, 0, 0, 0], [0, 0, 0, 1], [0, 1, 1, 1]], [[0, 0, 1, 1], [0, 1, 1, 0]], [[0.5, 0, 0.5, 1], [0, 0, 1, 0]], [[0, 1, 0, 0], [0, 0, 1, 1], [1, 1, 1, 0]], [[0, 0, 1, 0], [1, 0, 0, 1], [0, 1, 1, 1]]];
+    marks.forEach(function (g, i) { var ox = 70 + i * 113, oy = 70, s = 80, sy = 130;
+      g.forEach(function (l) { x.beginPath(); x.moveTo(ox + l[0] * s, oy + l[1] * sy); x.lineTo(ox + l[2] * s, oy + l[3] * sy); x.stroke(); }); });
+  });
+  var X0 = 40.89, X1 = 43.49, YT = -1.95, LEN = 1.7, geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(new Array(12).fill(0), 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute([1, 1, 0, 1, 1, 0, 0, 0], 2));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0], 3));
+  geo.setIndex([0, 1, 2, 1, 3, 2]);   /* faces up: the plan's x runs to his left as he faces north */
+  var sheet = own(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: sheetTex, roughness: 0.95, side: THREE.DoubleSide })));
+  var letters = own(new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: lettersTex, transparent: true, alphaTest: 0.3, roughness: 0.9, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -2 })));
+  sheet.name = 'storeroom-banner-sheet'; letters.name = 'storeroom-banner-letters'; sheet.visible = letters.visible = false;
+  var lead = own(new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 2.6, 20), rollMats)); lead.name = 'storeroom-banner-unrolling'; lead.visible = false;
+  return { roll: roll, sheet: sheet, letters: letters, lead: lead, geo: geo, x0: X0, x1: X1, yt: YT, len: LEN, along: along, P: P, t: -1, out: 1.6, stay: 20, back: 1.6, every: 0.5,
+    paints: [0xc8242a, 0xe0b030, 0x2a62b8, 0x3c8a3a, 0x8a2aa0, 0xf0f0f0], room: !window.CastleEvents };
+})();
+function bannerLay(f) {   /* the sheet unrolled to the fraction f from its top edge; the rest still on the roll at its leading edge */
+  var B = BANNER, y1 = B.yt + B.len * f, h = 0.003, p = B.geo.attributes.position, uv = B.geo.attributes.uv, r = 0.02 + 0.065 * Math.sqrt(1 - f);
+  [[B.x0, B.yt], [B.x1, B.yt], [B.x0, y1], [B.x1, y1]].forEach(function (c, i) { var v = B.P(c[0], c[1], h); p.setXYZ(i, v.x, v.y, v.z); });
+  uv.setY(2, 1 - f); uv.setY(3, 1 - f); p.needsUpdate = uv.needsUpdate = true; B.geo.computeBoundingSphere();
+  B.sheet.visible = B.letters.visible = f > 0.002;
+  B.lead.visible = f < 1; B.lead.scale.set(r, 1, r); B.along(B.lead, B.x0, B.x1, y1 + r, r);
+}
+thingCues[SR_TAP] = function () { showLines([{ medium: 'seen', sound: SR_TAP, on: function () { if (BANNER && BANNER.t < 0) { BANNER.t = 0; BANNER.roll.visible = false; } } }]); };
+if (BANNER && Q.get('touch') === 'banner') setTimeout(function () { thingCues[SR_TAP](); }, 1500);
+function storeShown(shown) {
+  if (!BANNER) return [];
+  BANNER.room = shown.indexOf(SR_ROOM) >= 0;
+  if (BANNER.t < 0) BANNER.roll.visible = BANNER.room;
+  return BANNER.room ? [SR_ROOM] : [];
+}
+function updateBanner(dt) {
+  if (!BANNER || BANNER.t < 0) return;
+  var B = BANNER, s = (B.t += dt), end = B.out + B.stay + B.back;
+  if (s >= end) { B.t = -1; B.sheet.visible = B.letters.visible = B.lead.visible = false; B.roll.visible = B.room; return; }
+  bannerLay(s < B.out ? s / B.out : s < B.out + B.stay ? 1 : 1 - (s - B.out - B.stay) / B.back);
+  B.letters.material.color.setHex(s < B.out + B.stay ? B.paints[Math.floor(s / B.every) % B.paints.length] : 0xffffff);
 }
 /* req 989 (a), transfiguration.json's transfiguration.animagus-lesson, word for word (PoA 6 L15398, L15400): on the line
    she is a tabby on her own desk, People's assets/layers/tabby-figure.png cell 0 (sitting upright, front on; the sitting
@@ -5292,6 +5386,9 @@ function tap(cx, cy) {
   if (hit && PLACE === 'stone-potions-room' && STONE.on2 && hit === STONE.on2.mesh) {   /* req 935, the black flames: never through */
     if (events) events.tap('black flames'); else thingCues[STONE_BLACK](); kit.tapped(true); return;
   }
+  if (hit && BANNER && hit === BANNER.roll) {   /* req 993, the bedsheet banner */
+    if (events) events.tap('banner'); else thingCues[SR_TAP](); kit.tapped(true); return;
+  }
   if (hit && WOVEN && WOVEN_SOLO[hit.userData.tap]) {   /* req 960, the woven touches' taps */
     if (events) events.tap(hit.userData.tap); else WOVEN_SOLO[hit.userData.tap](); kit.tapped(true); return;
   }
@@ -5395,7 +5492,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateTurban(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateTurban(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -6781,6 +6878,8 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return OWLTOAST ? { t: OWLTOAST.t < 0 ? null : +OWLTOAST.t.toFixed(2), owl: OWLTOAST.w.g.visible, at: OWLTOAST.w.g.position.toArray().map(function (v) { return +v.toFixed(2); }), toast: OWLTOAST.toast.visible, bitten: +(1 - OWLTOAST.toast.scale.x).toFixed(2) } : null; },
   turban: function (go) { if (go) thingCues[GR_TURBAN]();   /* req 975 (c) */
     return TURBAN ? { t: TURBAN.t < 0 ? null : +TURBAN.t.toFixed(2), shown: TURBAN.man.visible, white: TURBAN.white, st: TURBAN.st ? { a: TURBAN.st.a.map(function (v) { return +v.toFixed(1); }), d: TURBAN.st.d.map(function (v) { return +v.toFixed(2); }), side: TURBAN.st.side, D: TURBAN.st.D } : null, at: TURBAN.man.position.toArray().map(function (v) { return +v.toFixed(2); }) } : null; },
+  banner: function (go) { if (go && BANNER && BANNER.t < 0) thingCues[SR_TAP]();   /* req 993 */
+    return BANNER ? { t: BANNER.t < 0 ? null : +BANNER.t.toFixed(2), roll: BANNER.roll.visible, sheet: BANNER.sheet.visible, paint: BANNER.letters.material.color.getHexString() } : null; },
   elect: function () { return ELECT ? { board: ELECT.board.visible, room: ELECT.room.visible, cls: ELECT.cls.filter(function (m) { return m.visible; }).length } : null; },
   kitchens: function (cue) { if (cue) cueTable[cue]();
     return { dishes: KDISH ? KDISH.state : null, puffs: KDISH ? KDISH.puffs.filter(function (p) { return p.s.visible; }).length : null,
