@@ -2182,7 +2182,7 @@ if (STAFF.on) staffSet(Q.get('fire') || (HOUR >= 22 || HOUR < 6 ? 'low' : 'lit')
 var W1_STAIN = 'a dried, swollen splash stain up one wall',
     W1_PITS = 'a scorched patch of pale pitted spots on the flagstones, spreading from a third-row desk';
 var W1 = (function () {
-  var out = { on: false, pieces: 0, stain: null, pits: null, robes: 0, jaws: [], dent: null };
+  var out = { on: false, pieces: 0, stain: null, pits: null, robes: 0, jaws: [], dent: null, seats: [] };   /* seats: each pupil's place on a desk top, for the exam papers (req 987 (a)) */
   /* the schedule's frame to the castle's: [x0, y0, sx, sy, swap]; x = x0 + sx * (swap ? y' : x'), y = y0 + sy * (swap ? x' : y') */
   var F = { 'potions-dungeon': [16, 15.4, 1, 1, false], 'snape-office': [29, 11.6, -1, -1, false],
             'staff-room': [128, 50.6, 1, 1, true], 'staff-passage': [128, 50.6, 1, 1, true],
@@ -2601,7 +2601,7 @@ var W1 = (function () {
        a quarter of the desk in from each end; the board-back form). The scorch on the middle-row desk is WOVEN's */
     [2.4, 4.2, 6.0].forEach(function (yp) { [0.7, 2.3, 5.4, 7.0].forEach(function (xp) {
       desk(xp, yp, xp + 1.3, yp + 0.6, 0.72, wood);
-      [0.325, 0.975].forEach(function (u) { chair(xp + u, yp - 0.34, 90, 1, wood, 0.21); });
+      [0.325, 0.975].forEach(function (u) { chair(xp + u, yp - 0.34, 90, 1, wood, 0.21); out.seats.push(P(xp + u, yp + 0.22, 0.72)); });
     }); });
   }
 
@@ -2613,7 +2613,7 @@ var W1 = (function () {
        is drawn apart (req 975, the pig is PIG's) */
     [2.2, 3.6, 5.0, 6.4].forEach(function (yp) { [1.1, 2.4, 5.6, 6.9].forEach(function (xc) {
       desk(xc - 0.375, yp, xc + 0.375, yp + 0.55, 0.72, wood);
-      chair(xc, yp - 0.29, 90, 1, wood, 0.21);
+      chair(xc, yp - 0.29, 90, 1, wood, 0.21); out.seats.push(P(xc, yp + 0.22, 0.72));
     }); });
     var mcgDesk = mat('mcg-desk', 0x3e342a);
     pedestalDesk(3.2, 9.8, 4.8, 10.6, 0.75, mcgDesk);
@@ -4373,6 +4373,44 @@ function updateAnimagus(dt) {
   var c = camera.position, w = new THREE.Vector3(); m.parent.worldToLocal(w.copy(c));
   m.rotation.set(0, Math.atan2(w.x - m.position.x, w.z - m.position.z), 0);
 }
+/* req 987 (a), lessons.json's lessons.exam-quills, word for word (PS 16 L5458): on the line every pupil's place on the
+   desks (W1.seats, Charms' pair desks and Transfiguration's singles) has an exam paper, written down two thirds of its
+   length, a new white quill laid across it and an ink pot at the right hand, and keeps them for the visit. The pupils
+   bent over them stay the line's (no figures yet), and the spell is unseen. History of Magic and Defence have no
+   pupils' desks drawn yet, so there the line stays seen only. Untappable, lit as the room. ?touch=examquills plays it */
+var LS_EXAMQ = 'pupils bent over their desks write their papers in the heat with the new quills the school has given them for the exams, bewitched with an Anticheating spell';
+var EXAMQ = !W1.seats.length ? null : (function () {
+  var cv = document.createElement('canvas'); cv.width = 256; cv.height = 182;
+  var c = cv.getContext('2d'); c.fillStyle = '#e8dfc4'; c.fillRect(0, 0, 256, 182);
+  c.strokeStyle = 'rgba(52,44,34,0.8)'; c.lineWidth = 1.6;
+  for (var x = 236; x > 90; x -= 11) {   /* lines of writing, from the page's head (its far end) down two thirds */
+    c.beginPath(); var y0 = 16, y1 = x < 110 ? 90 : 166 - (x * 7) % 23;
+    for (var y = y0; y < y1; y += 3) c.lineTo(x + Math.sin(y * 0.9 + x) * 1.6, y);
+    c.stroke();
+  }
+  var tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4;
+  var n = W1.seats.length, mk = function (geo, mt) { var m = new THREE.InstancedMesh(geo, mt, n); m.userData.owner = PLACE; m.raycast = function () {}; m.visible = false; shell.group.add(m); return m; };
+  var paper = new THREE.PlaneGeometry(0.297, 0.21); paper.rotateX(-Math.PI / 2);
+  var parts = [
+    [mk(paper, new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95 })), new THREE.Vector3(0, 0.0015, 0), 0, [1, 1, 1]],
+    [mk(new THREE.SphereGeometry(1, 10, 6), kit.solid(0xf2efe6)), new THREE.Vector3(-0.03, 0.007, 0.115), 0.65, [0.11, 0.003, 0.017]],   /* the quill's vane, half off the paper by the ink */
+    [mk(new THREE.CylinderGeometry(0.0025, 0.0015, 1, 6).rotateZ(Math.PI / 2), kit.solid(0xcfc29e)), new THREE.Vector3(0.081, 0.004, 0.03), 0.65, [0.06, 1, 1]],   /* its bare shaft and nib, on from the vane's tip */
+    [mk(new THREE.CylinderGeometry(0.02, 0.025, 0.05, 10), kit.solid(0x1e2427)), new THREE.Vector3(0.05, 0.025, 0.19), 0, [1, 1, 1]]   /* the ink pot */
+  ];
+  var M = new THREE.Matrix4(), R = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), U = new THREE.Vector3(0, 1, 0);
+  W1.seats.forEach(function (s, i) {
+    var jit = ((i * 37) % 11 - 5) * 0.03;   /* each paper a little askew */
+    var base = new THREE.Matrix4().compose(s, Q4.setFromAxisAngle(U, jit), new THREE.Vector3(1, 1, 1));
+    parts.forEach(function (p) {
+      R.compose(p[1], new THREE.Quaternion().setFromAxisAngle(U, p[2]), new THREE.Vector3(p[3][0], p[3][1], p[3][2]));
+      p[0].setMatrixAt(i, M.multiplyMatrices(base, R));
+    });
+  });
+  parts.forEach(function (p) { p[0].instanceMatrix.needsUpdate = true; p[0].name = 'exam-papers'; });
+  return { parts: parts, on: false, show: function () { parts.forEach(function (p) { p[0].visible = true; }); this.on = true; } };
+})();
+thingCues[LS_EXAMQ] = function () { showLines([{ medium: 'seen', sound: LS_EXAMQ, on: function () { if (EXAMQ) EXAMQ.show(); } }]); };
+if (Q.get('touch') === 'examquills') setTimeout(function () { thingCues[LS_EXAMQ](); }, 1500);
 function updatePig(dt) {
   if (!PIG || PIG.t < 0) return;
   var G = PIG, s = (G.t += dt), run = G.len[G.len.length - 1] / G.speed, end = G.grow + run + G.stand;
@@ -6448,6 +6486,8 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     if (MICE) return { t: +MICE.t.toFixed(2), mice: MICE.mice.filter(function (m) { return m.g.visible; }).length, cat: MICE.cat.visible };
     if (TOAD) return { pig: PIG.t < 0 ? null : +PIG.t.toFixed(2), pigShown: PIG.g.visible, desk: (W1.pigdesk || []).map(function (m) { return m.visible; }), pigAt: PIG.g.position.toArray().map(function (v) { return +v.toFixed(2); }), hop: TOAD.t < 0 ? null : [TOAD.k, +TOAD.t.toFixed(2)], toad: TOAD.g.visible, at: TOAD.g.position.toArray().map(function (v) { return +v.toFixed(2); }) };
     return TOUCH ? { walk: TOUCH.walk ? [TOUCH.walk.k, +TOUCH.walk.u.toFixed(2)] : null, cat: TOUCH.cat.visible, at: TOUCH.cat.visible ? TOUCH.cat.position.toArray().map(function (v) { return +v.toFixed(2); }) : null } : null; },
+  examquills: function (go) { if (go) thingCues[LS_EXAMQ]();   /* req 987 (a) */
+    return EXAMQ ? { seats: W1.seats.length, on: EXAMQ.on, shown: EXAMQ.parts[0][0].visible } : null; },
   owltoast: function (at) { if (OWLTOAST && at != null) { OWLTOAST.hold = at < 0 ? null : at; OWLTOAST.t = Math.max(0, at); }   /* req 989 (b): a time holds a still, -1 plays it from the start */
     return OWLTOAST ? { t: OWLTOAST.t < 0 ? null : +OWLTOAST.t.toFixed(2), owl: OWLTOAST.w.g.visible, at: OWLTOAST.w.g.position.toArray().map(function (v) { return +v.toFixed(2); }), toast: OWLTOAST.toast.visible, bitten: +(1 - OWLTOAST.toast.scale.x).toFixed(2) } : null; },
   turban: function (go) { if (go) thingCues[GR_TURBAN]();   /* req 975 (c) */
