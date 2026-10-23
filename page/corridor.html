@@ -5001,6 +5001,77 @@ var POSES = {
 };
 var armourPose = null, armourJiggle = 0, sticksShown = 'gone', sticksQueue = [];
 var ARMOUR_ROCK = { time: 2.6, lean: 0.07, swings: 3 }, armourRock = 0;   /* the wobble's seconds, its first lean, its rocks */
+/* two stand-ins in the Neville card's idiom (grey, nothing glowing, square to the eye), each placed on a scaled plan put
+   to Godric through the name in Where it stands before it goes live; till then only with ?standins (a look).
+   The lost first-year (req 966 (2); Events' door.lost-ask, door.lost-lead, -friday; req 936 item 5, Story's year-1
+   wins): on his arrival cue a small first-year stands at the stair head, his timetable in his hands (the record's mark
+   `landing`, the top of the flight, where the arrival's view sees him); a tap on him is `lost first-year`, and on the
+   lead cue (told word for word) he fades from the landing. Lee Jordan's tarantula box (req 972; Events'
+   stair.lee-tarantula-box, stair.lee-lid; PS 6): on the arrival cue a taller boy with a box in his arms and a small
+   knot of pupils round him in the light of the nearer window (the mark `corridor`, in plain view); a tap on any of
+   them is `tarantula box`, and the lid's cue is told. People's drawn figures replace both (student-stock) */
+var STANDINS = groundsQ.has('standins');
+var LOST = { x: -8.2, z: -2.95, w: 0.46, h: 1.36, fade: 1.5, after: 1.0,
+  ask: 'a first-year on the landing, turning his timetable one way and then the other, looking up and down the stair',
+  lead: 'he walks the first-year along the corridor and down the stair by the plan, the boy trotting beside him with his timetable',
+  leadFriday: 'he walks the first-year the long way round by the plan, as the stair goes on a Friday, the boy trotting beside him with his timetable' };
+var LEE = { at: { x: -5.6, z: -3.05 }, w: 0.56, h: 1.66,
+  knot: [{ x: -5.0, z: -3.25, h: 1.52 }, { x: -5.3, z: -3.6, h: 1.46 }, { x: -5.25, z: -2.6, h: 1.58 }, { x: -4.95, z: -2.85, h: 1.5 }],
+  cue: 'a boy with dreadlocks among the older students, a box in his arms, a small knot of pupils crowding round him',
+  lid: 'the boy lifts the lid of the box in his arms and a long, hairy leg pokes out; the pupils round him shriek and yell' };
+function standInPupil(fill, held) {   /* a standing pupil's grey shape, and what he holds at his chest */
+  return function (g, w, h) {
+    g.beginPath(); g.arc(w * 0.5, h * 0.09, w * 0.13, 0, 2 * Math.PI); g.fill();                      /* the head */
+    g.beginPath(); g.moveTo(w * 0.18, h); g.lineTo(w * 0.24, h * 0.3); g.quadraticCurveTo(w * 0.3, h * 0.18, w * 0.5, h * 0.18);
+    g.quadraticCurveTo(w * 0.7, h * 0.18, w * 0.76, h * 0.3); g.lineTo(w * 0.82, h); g.closePath(); g.fill();   /* the robes */
+    if (held) held(g, w, h);
+  };
+}
+function standInCard(fill, held, w, h, name, thing) {
+  var m = cutoutMesh(cutoutTexture(80, Math.round(80 * h / w), fill, standInPupil(fill, held), name), w, h);
+  m.name = name; m.visible = false; m.material.transparent = true; m.userData.thing = thing;
+  scene.add(m); register(m, 1); tappables.push(m); return m;
+}
+var lostCard = standInCard('#8f8981', function (g, w, h) {   /* his timetable, held open at his chest */
+  g.fillStyle = '#b8b0a0'; g.fillRect(w * 0.3, h * 0.36, w * 0.4, h * 0.13);
+}, LOST.w, LOST.h, 'lost-first-year', 'lost first-year');
+lostCard.position.set(LOST.x, LOST.h / 2, LOST.z);
+var leeCards = [standInCard('#85807a', function (g, w, h) {   /* the box in his arms */
+  g.fillStyle = '#6b5440'; g.fillRect(w * 0.26, h * 0.34, w * 0.48, h * 0.12);
+}, LEE.w, LEE.h, 'lee-jordan', 'tarantula box')];
+leeCards[0].position.set(LEE.at.x, LEE.h / 2, LEE.at.z);
+LEE.knot.forEach(function (p, i) {
+  var c = standInCard(['#9a948b', '#8c867f', '#a09a91', '#938d85'][i], null, LEE.w * 0.9, p.h, 'lee-knot-' + i, 'tarantula box');
+  c.position.set(p.x, p.h / 2, p.z); leeCards.push(c);
+});
+var lost = { cued: false, shown: false, goneAt: -1 }, leeCued = false;   /* each arrival cue stands for the visit */
+function drawStandIns(has) {
+  var wantLost = STANDINS && (lost.cued || has(LOST.ask)) && lost.goneAt < 0;
+  if (wantLost !== lost.shown) { lost.shown = wantLost; lostCard.visible = wantLost; lostCard.material.opacity = 1; }
+  var wantLee = STANDINS && (leeCued || has(LEE.cue));
+  leeCards.forEach(function (c) { c.visible = wantLee; });
+}
+function standInArrives(which) {   /* his arrival cue: drawn with ?standins, told without (as before) */
+  return function () {
+    if (which === 'lost') lost.cued = true; else leeCued = true;
+    if (STANDINS) drawStandIns(function () { return false; });
+    else showLines([{ medium: 'heard', speaker: which === 'lost' ? 'lost' : 'knot', sound: which === 'lost' ? LOST.ask : LEE.cue }]);
+  };
+}
+function lostLead(cue) {   /* told, then he goes from the landing */
+  return function () { showLines([{ medium: 'heard', speaker: 'lost', sound: cue }]); if (lost.shown) lost.goneAt = t + LOST.after; };
+}
+function leeLid() { showLines([{ medium: 'heard', speaker: 'knot', sound: LEE.lid }]); }
+function updateStandIns() {
+  [lostCard].concat(leeCards).forEach(function (c) {
+    if (c.visible) c.rotation.y = Math.atan2(camera.position.x - c.position.x, camera.position.z - c.position.z);
+  });
+  if (lost.shown && lost.goneAt >= 0 && t >= lost.goneAt) {
+    var k = Math.max(0, 1 - (t - lost.goneAt) / LOST.fade);
+    lostCard.material.opacity = k;
+    if (k <= 0) { lostCard.visible = false; lost.shown = false; }
+  }
+}
 function corridorDrawRoom(shown) {
   function has(s) { return shown.indexOf(s) >= 0; }
   var mark = ARMOUR_MARKS[has(CUE.step) ? 'step' : has(CUE.window) ? 'window' : 'home'];
@@ -5022,6 +5093,7 @@ function corridorDrawRoom(shown) {
   boo.visible = has(CUE.boo) && !sticksQueue.length;
   drawTrevor(has, back);
   drawNevilleGlass(has);
+  drawStandIns(has);
   drawFoot(has);
   drawMap(has);
   /* the tapestry's woven sheep (req 129, Events' sheep.json, req 110): where they stand this visit, or one missing,
@@ -5624,6 +5696,12 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'he pushes at the door with a flat hand and it does not give, not a creak, as if it were waiting for something': function () {
       showLines([{ medium: 'heard', speaker: 'door', sound: 'he pushes at the door with a flat hand and it does not give, not a creak, as if it were waiting for something' }]);
     },
+    /* the lost first-year led away (req 966 (2); Events' door.lost-lead, -friday), and Lee's lid (req 972; stair.lee-lid) */
+    [LOST.ask]: standInArrives('lost'),
+    [LEE.cue]: standInArrives('lee'),
+    [LOST.lead]: lostLead(LOST.lead),
+    [LOST.leadFriday]: lostLead(LOST.leadFriday),
+    [LEE.lid]: leeLid,
     'the door laughs and swings open on what is behind it, then shuts itself after a few seconds': function () { doorSwings('the door laughs'); },
     'the door swings open with a dignified creak on what is behind it, then shuts itself after a few seconds': function () { doorSwings('a dignified creak'); },
     /* the grounds (req 115, Events' grounds.json): the snowball; the field and the lake are not in this window's view */
@@ -5917,6 +5995,7 @@ function frame() {
   updateChase(wdt);
   updateFilchFigure(wdt);
   updateArmour3d();
+  updateStandIns();
   updateVisorLight();
   updateCandleStub();
   updateFredScrap();
