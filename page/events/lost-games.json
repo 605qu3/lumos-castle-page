@@ -1,0 +1,83 @@
+{
+  "chain": "lost-games",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "lost-games.cup",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost-games-cup",
+      "when": [
+        "place = lost games room"
+      ],
+      "show": [
+        "a tall silver cup with a broom over waves on its side; the winners' names run down it by year from 1702 to 1746, and the last line reads 1747: not awarded (the giant squid)"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H70 (docs/hidden-ways/lost-games-room.md, 23 October 2026, req 1007; Events' req 1009): the Lake Broom Race cup; the squid is canon (PS 16 L5470, read in the canon tool, 23 October 2026), the trophy room's own joke about it is CoS 13 L11160; the names are invented, no real person; the card's words as Hidden Ways wrote them"
+    },
+    {
+      "id": "lost-games.shield-early",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost-games-shield",
+      "when": [
+        "place = lost games room",
+        "year < 3"
+      ],
+      "show": [
+        "a shield with a ring of small stones set round its rim, house against house, the names running to the 1830s; on the shelf under it a faint old stain"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H70 (docs/hidden-ways/lost-games-room.md, 23 October 2026, req 1007; Events' req 1009): the Gobstones League shield, before the boy has PoA the stain is just a stain (Hidden Ways' file); Gobstones are PoA 4 L14230, not named here"
+    },
+    {
+      "id": "lost-games.shield",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost-games-shield",
+      "when": [
+        "place = lost games room",
+        "year >= 3"
+      ],
+      "show": [
+        "the Gobstones League shield, a ring of small stones set round its rim, house against house, the names running to the 1830s; on the shelf under it a faint old stain and the ghost of a nasty smell"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H70 (docs/hidden-ways/lost-games-room.md, 23 October 2026, req 1007; Events' req 1009): the stain cited once the boy has PoA (year >= 3): Gobstones squirt a nasty-smelling liquid (PoA 4 L14230, read in the canon tool, 23 October 2026: \"the stones squirted a nasty-s[melling liquid]\")"
+    },
+    {
+      "id": "lost-games.plate",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost-games-plate",
+      "when": [
+        "place = lost games room"
+      ],
+      "show": [
+        "a pewter plate engraved with a ring of circles, arrows and one small hoop; under it the winners, Hufflepuff eleven years running, and then nothing; the rules of the game are written down nowhere in the room"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H70 (docs/hidden-ways/lost-games-room.md, 23 October 2026, req 1007; Events' req 1009): the plate whose game is not named, invented; nothing of the rules is given (the lawn-game touch is Fawkes's to weigh and is not built)"
+    },
+    {
+      "id": "lost-games.ribbon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost-games-ribbon",
+      "when": [
+        "place = lost games room"
+      ],
+      "show": [
+        "a faded rosette for a race up the West Tower's stair, pinned to a card in an old hand: Abandoned on the owls' complaint"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H70 (docs/hidden-ways/lost-games-room.md, 23 October 2026, req 1007; Events' req 1009): the Owlery Stairs ribbon, invented; the owls and the West Tower's stair are the castle's own"
+    }
+  ]
+}
