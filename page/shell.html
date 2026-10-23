@@ -4347,6 +4347,32 @@ function updateForms(dt) {
   F.slips.forEach(function (m, i) { m.visible = desk && s >= F.first + i * F.every; });
   F.spill.forEach(function (m) { m.visible = s >= F.tip; });
 }
+/* req 989 (a), transfiguration.json's transfiguration.animagus-lesson, word for word (PoA 6 L15398, L15400): on the line
+   she is a tabby on her own desk, People's assets/layers/tabby-figure.png cell 0 (sitting upright, front on; the sitting
+   cells read at 3250 px a metre, so 0.32 by 0.32), at the desk's middle (x' 4.0, y' 10.2) on its top (0.75), turned
+   to his eye about the upright; 9 s, then she is gone (the pop is the runtime's heard line; she herself stays the
+   line's, no figure yet). Not while the desk is a pig. Untappable. ?touch=animagus plays it */
+var TF_ANIMAGUS = 'in the middle of telling the class about Animagi, Professor McGonagall is a tabby cat with square markings round her eyes on her desk; with a faint pop she is herself again, and looks round as if waiting for applause';
+var ANIMAGUS = (function () {
+  if (PLACE !== 'transfiguration-classroom' || !shell) return null;
+  var t = new THREE.TextureLoader().load('../assets/layers/tabby-figure.png'); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+  var g = new THREE.PlaneGeometry(0.318, 0.324), uv = g.attributes.uv;
+  for (var i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) / 5);   /* cell 0, sitting */
+  var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide }));
+  m.position.copy(shell.toLocal(139.6 + 10.2, 71.4 - 4.0, shell.place.floor + 0.75 + 0.162));
+  m.name = 'transfiguration-tabby'; m.userData.owner = PLACE; m.raycast = function () {}; m.visible = false; shell.group.add(m);
+  return { cat: m, t: -1, stay: 9 };
+})();
+thingCues[TF_ANIMAGUS] = function () { showLines([{ medium: 'seen', sound: TF_ANIMAGUS, on: function () { if (ANIMAGUS && !(PIG && PIG.t >= 0)) ANIMAGUS.t = 0; } }]); };
+if (ANIMAGUS && Q.get('touch') === 'animagus') setTimeout(function () { thingCues[TF_ANIMAGUS](); }, 1500);
+function updateAnimagus(dt) {
+  if (!ANIMAGUS || ANIMAGUS.t < 0) return;
+  var A = ANIMAGUS, m = A.cat;
+  A.t += dt; m.visible = A.t < A.stay;
+  if (!m.visible) { A.t = -1; return; }
+  var c = camera.position, w = new THREE.Vector3(); m.parent.worldToLocal(w.copy(c));
+  m.rotation.set(0, Math.atan2(w.x - m.position.x, w.z - m.position.z), 0);
+}
 function updatePig(dt) {
   if (!PIG || PIG.t < 0) return;
   var G = PIG, s = (G.t += dt), run = G.len[G.len.length - 1] / G.speed, end = G.grow + run + G.stand;
@@ -5041,7 +5067,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBorrow(dt); updateBang(dt); updateTurban(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateTurban(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
