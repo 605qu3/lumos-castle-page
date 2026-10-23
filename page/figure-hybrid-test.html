@@ -70,17 +70,31 @@ function build(im) {
   var TOP = new Int16Array(W * H);
   for (var tx = 0; tx < W; tx++) for (var ty = 0, t0 = -1; ty < H; ty++) { if (body(tx, ty)) { if (t0 < 0) t0 = ty; TOP[ty * W + tx] = ty - t0; } else t0 = -1; }
   function lift(px, py) { px = Math.round(px); return px < 0 || px >= W || py < 0 || py >= H ? 0 : TOP[py * W + px]; }
-  var pos = [], uv = [], ind = [], cnt = 0;
+  var pos = [], uv = [], col = [], ind = [], cnt = 0;
+  function edge(r, py, side) {   /* the drawing's colour just inside one edge of a run, past its ink: what the back is painted with */
+    var n = 0, s = [0, 0, 0];
+    for (var k = 5; k < 16; k++) {
+      var px = side < 0 ? r[0] + k : r[1] - k, q = (py * W + px) * 4;
+      if (px < r[0] || px > r[1] || !body(px, py) || A[q] + A[q + 1] + A[q + 2] < 90) continue;
+      s[0] += A[q]; s[1] += A[q + 1]; s[2] += A[q + 2]; n++;
+    }
+    return n ? s.map(function (v) { return v / n / 255; }) : null;
+  }
   function ring(r, py, centre) {
-    var ym = (H - py) / PX, cx = (r[0] + r[1]) / 2, hw = (r[1] - r[0] + 1) / 2, at = cnt, zc = r[3] || 0;
-    if (centre) { pos.push((cx - W / 2) / PX, ym, zc); uv.push(cx / W, 1 - py / H); cnt++; }
+    var ym = (H - py) / PX, cx = (r[0] + r[1]) / 2, hw = (r[1] - r[0] + 1) / 2, at = cnt, zc = r[3] || 0, bk = r[4] || [[0.2, 0.2, 0.2], [0.2, 0.2, 0.2]];
+    if (centre) { pos.push((cx - W / 2) / PX, ym, zc); uv.push(cx / W, 1 - py / H); col.push(0, 0, 0, 0); cnt++; }
     for (var i = 0; i <= SEG; i++) {
       var th = (i / SEG - 0.5) * Math.PI * 2, s = Math.sin(th), co = Math.cos(th), a = Math.abs(th);
-      /* the suit folded its drawing back in to the middle behind; a face would show on the back of the head, so here the
-         drawing is laid on front on as far as the sides and its edge (hair, the robe's edge, fur) carried round the back */
-      var inner = Math.max(0.4, 1 - 16 / hw), un = Math.sign(s) * Math.min(Math.abs(s), inner);   /* held 16 px inside the outline toward the sides and all round the back, past the ink (the mesh's own line draws the edge) */
+      /* round 2 (Godric's 1 on corridor-figures-blender-1023, 1.44 pm): the drawing laid on front on, straight, as far as
+         the sides; past 55 degrees it gives way to the back's own colour (the run's edge colours, or the hair on a head),
+         all of it by 100, so the back no longer stretches one column of the drawing into stripes */
+      var from = 55 - 15 * (r[5] || 0);   /* a head hands over from 40 degrees, or its face smears round the cheeks */
+      var un = s * Math.max(0.5, 1 - 6 / hw), w = Math.min(1, Math.max(0, (a * 180 / Math.PI - from) / 45)), m = (1 - s) / 2;
+      w = w * w * (3 - 2 * w);
       var t = Math.min(1, lift(cx + hw * s, py) / DOME), dome = Math.max(0.2, Math.sqrt(1 - (1 - t) * (1 - t)));
-      pos.push((cx + hw * s - W / 2) / PX, ym, zc + r[2] * co * dome); uv.push((cx + hw * un) / W, 1 - py / H); cnt++;
+      pos.push((cx + hw * s - W / 2) / PX, ym, zc + r[2] * co * dome); uv.push((cx + hw * un) / W, 1 - py / H);
+      for (var c = 0; c < 3; c++) col.push(bk[0][c] * m + bk[1][c] * (1 - m));
+      col.push(w); cnt++;
     }
     return at;
   }
@@ -116,6 +130,42 @@ function build(im) {
     o.s[2] = F.deep ? Math.min(hw * 2.5, depth(ym)) : Math.min(hw, depth(ym));
     if (F.feet && ym < 0.08) { var front = 0.05 + 0.08 * Math.pow(1 - ym / 0.08, 1.6), back = -0.045; o.s[2] = (front - back) / 2; o.s[3] = (front + back) / 2; }   /* shoes, the toe toward the eye */
   });
+  /* the back's colours: each run's edge colours, smoothed along its chain over about 5 cm so no row stands out */
+  all.forEach(function (o) { o.e = [edge(o.r, o.py, -1), edge(o.r, o.py, 1)]; });
+  all.forEach(function (o) {
+    o.s[4] = [0, 1].map(function (k) {
+      var s = [0, 0, 0], n = 0, p = o, q = o.next;
+      for (var j = 0; j < 7 && p; j++, p = p.prev) if (p.e[k]) { s[0] += p.e[k][0]; s[1] += p.e[k][1]; s[2] += p.e[k][2]; n++; }
+      for (j = 0; j < 6 && q; j++, q = q.next) if (q.e[k]) { s[0] += q.e[k][0]; s[1] += q.e[k][1]; s[2] += q.e[k][2]; n++; }
+      return n ? s.map(function (v) { return v / n; }) : [0.2, 0.2, 0.2];
+    });
+  });
+  /* the head: the chain that runs longest down from the top (a raised hand or finger reaches head height but stops short),
+     down to its narrowest row 13 to 30 cm under the crown, past a bun; rounder than it is wide, set back a little, and
+     its back the hair's colour, averaged over the crown's top 4 cm (Filch's crown is his bald pate, as drawn) */
+  if (F.feet) {
+    var len = function (o) { for (var n = 0; o; o = o.next) n++; return n; }, top = null;
+    all.forEach(function (o) { if (!o.prev && o.py < FOOT * 0.15 && (!top || len(o) > len(top))) top = o; });
+    var sc = HM / 1.75, neck = null, chain = [];
+    for (var o = top; o; o = o.next) {
+      var dm = (o.py - top.py) / PX;
+      if (dm > 0.30 * sc) break;
+      chain.push(o);
+      if (dm >= 0.13 * sc && (!neck || wide(o) < wide(neck))) neck = o;
+    }
+    var hs = [0, 0, 0], hn = 0;
+    chain.forEach(function (o) {
+      if ((o.py - top.py) / PX > 0.04 * sc) return;
+      for (var px = o.r[0] + 3; px <= o.r[1] - 3; px++) { var q = (o.py * W + px) * 4; if (body(px, o.py)) { hs[0] += A[q]; hs[1] += A[q + 1]; hs[2] += A[q + 2]; hn++; } }
+    });
+    var hair = hs.map(function (v) { return v / Math.max(1, hn) / 255; });
+    for (var i = 0; i < chain.length && chain[i] !== neck; i++) {
+      var h = chain[i], hw = (h.s[1] - h.s[0] + 1) / 2 / PX, below = (neck.py - h.py) / PX, f = Math.min(1, below / 0.04);   /* eased in over the last 4 cm above the neck */
+      h.s[2] = hw * (1 + 0.2 * f); h.s[3] = -hw * 0.15 * f; h.s[5] = f;
+      h.s[4] = h.s[4].map(function (e) { return e.map(function (v, c) { return v + (hair[c] - v) * f; }); });
+    }
+    out.head = { top: top.py, neck: neck && neck.py, rows: chain.length, hair: hair };
+  }
   all.forEach(function (o) { o.at = ring(o.s, o.py); });
   function stitch(a, b) { for (var i = 0; i < SEG; i++) ind.push(a + i, b + i, b + i + 1, a + i, b + i + 1, a + i + 1); }
   all.forEach(function (o) {
@@ -125,9 +175,15 @@ function build(im) {
   });
   var geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  geo.setAttribute('back', new THREE.Float32BufferAttribute(col, 4));
   geo.setIndex(ind); geo.computeVertexNormals();
   var b = bleed(c), t = new THREE.CanvasTexture(b); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
-  var mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: t, roughness: 0.75, metalness: 0 }));
+  var mat = new THREE.MeshStandardMaterial({ map: t, roughness: 0.75, metalness: 0 });
+  mat.onBeforeCompile = function (sh) {   /* the back's colour (sRGB) over the drawing by its weight */
+    sh.vertexShader = 'attribute vec4 back;\nvarying vec4 vBack;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvBack = back;');
+    sh.fragmentShader = 'varying vec4 vBack;\n' + sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb = mix(diffuseColor.rgb, pow(vBack.rgb, vec3(2.2)), vBack.a);');
+  };
+  var mesh = new THREE.Mesh(geo, mat);
   scene.add(mesh);
   var ink = new THREE.MeshBasicMaterial({ color: 0x16120e, side: THREE.BackSide });
   ink.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * ' + (F.ink || 0.0068).toFixed(4) + ';'); };
@@ -141,7 +197,7 @@ window.lumosFigure = {
   export: function () {
     var g = out.geo;
     return JSON.stringify({ height: out.height, ink: F.ink || 0.0068, pos: r(g.attributes.position.array, 1e5), nor: r(g.attributes.normal.array, 1e3),
-      uv: r(g.attributes.uv.array, 1e4), idx: Array.from(g.index.array), tex: out.tex.toDataURL('image/png') });
+      uv: r(g.attributes.uv.array, 1e4), col: r(g.attributes.back.array, 1e3), idx: Array.from(g.index.array), tex: out.tex.toDataURL('image/png') });
   }
 };
 var im = new Image();
