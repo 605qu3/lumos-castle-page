@@ -314,7 +314,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (damp && R && R[key + '/below']) return hexOf(R[key + '/below']);
     if (R && R[key]) return hexOf(R[key]);
     if (S && S[key]) return hexOf(S[key].hex);
-    var FALL = { marble: 0xe2ded6, oak: 0x6e4c30, 'oak-boards': 0x7d5937, 'oak-beams': 0x5a3d26, iron: 0x34312e, plaster: 0xe8e2d4, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
+    var FALL = { marble: 0xe2ded6, oak: 0x6e4c30, 'oak-boards': 0x7d5937, 'oak-beams': 0x5a3d26, earth: 0x4f4130, iron: 0x34312e, plaster: 0xe8e2d4, 'sky-day': 0xb8cde6, 'sky-night': 0x10141f };
     return stone ? shade(stoneHex(stone), step || 1) : FALL[key] != null ? FALL[key] : GREY.wall;
   }
   function paintMat(hex, two) {
@@ -346,6 +346,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function floorMat(row, sx, sy, two) {
     var st = stoneAt(row, sx, sy);
     if (row.floor === 'boards' || row.floor === 'marble') return paintMat(tone(row.floor === 'boards' ? 'oak-boards' : 'marble'), two);
+    if (row.floor === 'earth') return paintMat(tone('earth'), two);   /* v72: the cellar under the Gryffindor storeroom, a cave's earthen floor (ledger 228) */
     return faced(st, 'flags', tone('flags-' + st, st, 0.86), two);
   }
   /* v53 (req 858, Design's stone-face.js on Godric's 1 on design-bright-rooms-1021): a stone the kit faces (late-pale
