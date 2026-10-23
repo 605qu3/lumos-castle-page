@@ -4539,6 +4539,158 @@ function updateOwlToast(dt) {
     var r = bez(O.edge, O.up, O.out, (s - T4) / (T5 - T4)); face(r); G.position.copy(r); flap();
   }
 }
+/* req 970, H63's room of the stopped clocks drawn from Interiors' table (docs/interiors/stopped-clocks.md, The table,
+   cited; the frame the model's, the drum's centre at 0, 0): six long-case clocks on r 3.7, each its wood, height and
+   arch (L1's sunrise, L2's moon at the half, L5's little ship aground, L6's weather hand on Drizzle, L4's three dull
+   finials), the cuckoo clock on its turned post with its door ajar and the perch empty, the dry water clock low between
+   the loops, the round table with the ebony bracket clock, the brass carriage clock in its open case and the stuck sand
+   glass, and the ledger open on its lectern by the door, its sloped top to the east, each clock's line in its own faded
+   hand. Every dial shows its own hour and every face is turned to the room's middle; nothing moves, nothing ticks, the
+   brass dull and nothing glints. Free-standing inside r 4.0 (the outer walls held). Untappable till Interaction's places
+   (req 971) and Events' winding; owner stopped-clocks */
+var STOPCLK = PLACE !== 'stopped-clocks' || !shell ? null : (function () {
+  var z0 = shell.place.floor, root = new THREE.Group(); root.name = 'stopped-clocks-things'; shell.group.add(root);
+  var mat = function (hex, r, mt) { return new THREE.MeshStandardMaterial({ color: kit.col(hex), roughness: r || 0.92, metalness: mt || 0 }); };
+  var brass = mat(0x7d6a43, 0.8, 0.25), iron = mat(0x34312e, 0.85), stoneM = mat(0x77736c, 0.95), ink = '#5b4630';
+  var own = function (m, to) { m.userData.owner = 'stopped-clocks'; m.raycast = function () {}; (to || root).add(m); return m; };
+  /* a group at (x, y) on the floor (h up), its +x turned to the plan direction (fx, fy) */
+  var at = function (x, y, h, fx, fy, nm) {
+    var g = new THREE.Group(), p0 = shell.toLocal(x, y, z0 + (h || 0)), p1 = shell.toLocal(x + fx, y + fy, z0 + (h || 0));
+    g.position.copy(p0); g.rotation.y = Math.atan2(-(p1.z - p0.z), p1.x - p0.x); g.name = nm; root.add(g); return g;
+  };
+  var bx = function (g, cx, cy, cz, sx, sy, sz, m) { var b = own(new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), m), g); b.position.set(cx, cy, cz); return b; };
+  var cyl = function (g, cx, cy, cz, r0, r1, h, m, seg) { var c = own(new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, h, seg || 16), m), g); c.position.set(cx, cy, cz); return c; };
+  var toCentre = function (x, y) { var l = Math.hypot(x, y); return [-x / l, -y / l]; };
+  /* a dial's canvas: the ivory face with its twelve marks and two still hands; above it, for a long-case clock, the
+     arch's painting */
+  function dialTex(hh, mm, arch, w, h) {
+    var c = document.createElement('canvas'); c.width = w || 256; c.height = h || 256;
+    var x = c.getContext('2d'), W = c.width, H = c.height, R = W * 0.42, cx = W / 2, cy = H - W / 2;
+    x.fillStyle = arch ? '#2b241d' : '#d8ccb0'; x.fillRect(0, 0, W, H);
+    if (arch) {
+      var ay = H - W, ar = W * 0.4;
+      x.save(); x.beginPath(); x.arc(cx, ay + 6, ar, Math.PI, 0); x.closePath(); x.clip();
+      var sky = { sunrise: '#c9a77a', moon: '#2f3a52', ship: '#8fa3a6', weather: '#cbbd98', plain: '#cdbf9e' }[arch];
+      x.fillStyle = sky; x.fillRect(0, 0, W, ay + 6);
+      if (arch === 'sunrise') { x.fillStyle = '#b8743a'; x.beginPath(); x.arc(cx, ay + 6, ar * 0.45, Math.PI, 0); x.fill();
+        x.strokeStyle = '#b8743a'; x.lineWidth = 3; for (var k = 1; k < 8; k++) { var a = Math.PI + k * Math.PI / 8; x.beginPath(); x.moveTo(cx + Math.cos(a) * ar * 0.55, ay + 6 + Math.sin(a) * ar * 0.55); x.lineTo(cx + Math.cos(a) * ar * 0.85, ay + 6 + Math.sin(a) * ar * 0.85); x.stroke(); } }
+      if (arch === 'moon') { var my = ay + 6 - ar * 0.45; x.fillStyle = '#d9cfa6'; x.beginPath(); x.arc(cx, my, ar * 0.32, 0, Math.PI * 2); x.fill();
+        x.fillStyle = '#2f3a52'; x.beginPath(); x.arc(cx, my, ar * 0.33, Math.PI / 2, Math.PI * 1.5); x.fill(); }   /* at the half */
+      if (arch === 'ship') { x.fillStyle = '#4d6a78'; x.fillRect(0, ay - ar * 0.2, W, ar * 0.3);
+        x.save(); x.translate(cx + 10, ay - ar * 0.22); x.rotate(0.35);   /* aground, tipped on the painted waves */
+        x.fillStyle = '#5a3d26'; x.fillRect(-30, 0, 60, 12); x.fillStyle = '#e4dccb'; x.beginPath(); x.moveTo(-4, 0); x.lineTo(-4, -44); x.lineTo(24, 0); x.fill(); x.restore(); }
+      if (arch === 'weather') { x.fillStyle = ink; x.font = 'bold 15px Georgia, serif'; x.textAlign = 'center';
+        ['Fair', 'Drizzle', 'Gales', 'Snow'].forEach(function (t, k) { var a = Math.PI + (k + 0.5) * Math.PI / 4; x.fillText(t, cx + Math.cos(a) * ar * 0.72, ay + 6 + Math.sin(a) * ar * 0.72); });
+        var ha = Math.PI + 1.5 * Math.PI / 4; x.strokeStyle = '#1e1a16'; x.lineWidth = 3; x.beginPath(); x.moveTo(cx, ay + 6); x.lineTo(cx + Math.cos(ha) * ar * 0.5, ay + 6 + Math.sin(ha) * ar * 0.5); x.stroke(); }
+      x.restore();
+    }
+    x.fillStyle = '#d6cbb0'; x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.fill();
+    x.strokeStyle = '#3a3128'; x.lineWidth = 2; x.stroke();
+    for (var i = 0; i < 12; i++) { var t = i * Math.PI / 6; x.lineWidth = i % 3 ? 2 : 4; x.beginPath(); x.moveTo(cx + Math.sin(t) * R * 0.82, cy - Math.cos(t) * R * 0.82); x.lineTo(cx + Math.sin(t) * R * 0.95, cy - Math.cos(t) * R * 0.95); x.stroke(); }
+    var hand = function (ang, len, wid) { x.lineWidth = wid; x.lineCap = 'round'; x.strokeStyle = '#1e1a16'; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + Math.sin(ang) * len, cy - Math.cos(ang) * len); x.stroke(); };
+    hand(((hh % 12) + mm / 60) * Math.PI / 6, R * 0.5, W * 0.03); hand(mm * Math.PI / 30, R * 0.78, W * 0.018);
+    var t2 = new THREE.CanvasTexture(c); t2.encoding = THREE.sRGBEncoding; t2.anisotropy = 4; return t2;
+  }
+  var face = function (g, fx, fy, w, h, hh, mm, arch) {   /* the dial plane on a front at local x = fx, its middle at height fy */
+    var p = own(new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: dialTex(hh, mm, arch, 256, arch ? Math.round(256 * h / w) : 256), roughness: 0.95 })), g);
+    p.rotation.y = Math.PI / 2; p.position.set(fx, fy, 0); return p;
+  };
+  /* the long-case clocks: [id, x, y, wide, deep, high, wood, hour, minute, arch, extra] */
+  [['l1', 3.64, 0.64, 0.5, 0.28, 2.1, 0x6e5233, 3, 17, 'sunrise', 'glass'], ['l2', 3.43, -1.39, 0.5, 0.28, 2.3, 0x4e3624, 11, 52, 'moon'],
+   ['l3', 2.28, -2.92, 0.45, 0.25, 1.9, 0x9c8058, 10, 40, 'plain'], ['l4', -2.28, -2.92, 0.55, 0.3, 2.45, 0x857560, 5, 55, 'plain', 'finials'],
+   ['l5', -3.48, -1.27, 0.5, 0.28, 2.0, 0x6d6450, 6, 30, 'ship'], ['l6', -3.57, 0.96, 0.5, 0.28, 2.2, 0x5a2e22, 8, 8, 'weather']].forEach(function (L) {
+    var f = toCentre(L[1], L[2]), g = at(L[1], L[2], 0, f[0], f[1], 'stopped-clock-' + L[0]), W = L[3], D = L[4], Hh = L[5], wood = mat(L[6]);
+    var hood = 0.62, plinth = 0.28;
+    bx(g, 0, plinth / 2 - 0.005, 0, D + 0.03, plinth + 0.01, W + 0.04, wood);                     /* the plinth */
+    bx(g, 0, plinth + (Hh - hood - plinth) / 2, 0, D, Hh - hood - plinth, W - 0.08, wood);   /* the trunk */
+    bx(g, D / 2 + 0.004, plinth + (Hh - hood - plinth) * 0.55, 0, 0.012, (Hh - hood - plinth) * 0.7, W - 0.16, wood);   /* its door, shut */
+    if (L[10] === 'glass') bx(g, D / 2 + 0.011, plinth + (Hh - hood - plinth) * 0.7, 0, 0.004, 0.14, 0.1, mat(0x1d1b19, 0.6));   /* the little glass, no pendulum behind */
+    bx(g, 0, Hh - hood / 2, 0, D + 0.02, hood, W, wood);                             /* the hood */
+    bx(g, -0.01, Hh + 0.015, 0, D + 0.05, 0.03, W + 0.05, wood);                     /* its cornice */
+    face(g, (D + 0.02) / 2 + 0.002, Hh - hood / 2, W - 0.1, hood - 0.08, L[7], L[8], L[9]);
+    if (L[10] === 'finials') [-1, 0, 1].forEach(function (u) { cyl(g, 0, Hh + 0.09, u * (W / 2 - 0.04), 0.012, 0.025, 0.12, brass, 8); cyl(g, 0, Hh + 0.17, u * (W / 2 - 0.04), 0.022, 0.012, 0.05, brass, 8); });
+  });
+  /* the cuckoo clock on its turned oak post: a round foot, the post, the carved pine box with its gable, the little door
+     ajar and the perch empty; its pine-cone weights hanging still */
+  (function () {
+    var f = toCentre(2.53, 2.28), g = at(2.53, 2.28, 0, f[0], f[1], 'stopped-clock-cuckoo'), oak = mat(0x6a5236), pine = mat(0x8a6a44);
+    cyl(g, 0, 0.025, 0, 0.16, 0.18, 0.06, oak); cyl(g, 0, 0.82, 0, 0.05, 0.06, 1.56, oak);
+    bx(g, 0, 1.6 + 0.16, 0, 0.15, 0.32, 0.3, pine);
+    [-1, 1].forEach(function (s) { var r = bx(g, 0, 1.6 + 0.37, s * 0.09, 0.17, 0.02, 0.2, pine); r.rotation.x = s * 0.6; });   /* the gable's two slopes */
+    face(g, 0.077, 1.6 + 0.12, 0.17, 0.17, 9, 0);
+    var door = bx(g, 0.09, 1.6 + 0.3, -0.03, 0.008, 0.07, 0.05, pine); door.rotation.y = 1.0;   /* ajar */
+    bx(g, 0.077, 1.6 + 0.3, 0, 0.004, 0.06, 0.045, mat(0x141210, 1));   /* the dark of the doorway */
+    cyl(g, 0.11, 1.6 + 0.27, 0, 0.004, 0.004, 0.05, pine, 6).rotation.z = Math.PI / 2;   /* the perch, empty */
+    [-0.07, 0.07].forEach(function (z) { cyl(g, 0.02, 1.6 - 0.15, z, 0.002, 0.002, 0.3, iron, 4); cyl(g, 0.02, 1.6 - 0.35, z, 0.022, 0.016, 0.11, pine, 8); });
+  })();
+  /* the water clock: the stone stand, the dry basin with its dusty floor, the brass float's rod and the dial on it at
+     1.4, low so the loops' view is kept */
+  (function () {
+    var g = at(0, -2.4, 0, 0, 1, 'stopped-clock-water');
+    cyl(g, 0, 0.275, 0, 0.2, 0.26, 0.56, stoneM); cyl(g, 0, 0.73, 0, 0.35, 0.28, 0.34, stoneM, 24);
+    cyl(g, 0, 0.905, 0, 0.3, 0.3, 0.01, mat(0x8e877a, 1), 24);   /* the dry floor of the basin, dust */
+    cyl(g, 0, 1.13, 0, 0.008, 0.008, 0.46, brass, 6); cyl(g, 0, 0.93, 0, 0.06, 0.06, 0.03, brass, 12);
+    var d = face(g, 0.012, 1.4, 0.18, 0.18, 7, 15); bx(g, 0, 1.4, 0, 0.02, 0.2, 0.2, brass);
+  })();
+  /* the round oak table and the three on it */
+  (function () {
+    var oak = mat(0x5f4a32), g = at(0.9, -0.6, 0, 1, 0, 'stopped-clocks-table');
+    cyl(g, 0, 0.73, 0, 0.5, 0.5, 0.04, oak, 32); cyl(g, 0, 0.37, 0, 0.05, 0.07, 0.68, oak, 12);
+    [0, 2.09, 4.19].forEach(function (a) { var foot = bx(g, Math.cos(a) * 0.17, 0.02, Math.sin(a) * 0.17, 0.36, 0.05, 0.06, oak); foot.rotation.y = -a; });
+    var on = function (x, y, nm) { var f = toCentre(x, y); return at(x, y, 0.75, f[0], f[1], nm); };
+    var b = on(0.9, -0.36, 'stopped-clock-bracket'), eb = mat(0x1e1a17, 0.85);
+    bx(b, 0, 0.205, 0, 0.2, 0.42, 0.3, eb); bx(b, 0, 0.435, 0, 0.16, 0.03, 0.24, eb);
+    var hdl = own(new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.006, 6, 16, Math.PI), brass), b); hdl.position.set(0, 0.45, 0);
+    face(b, 0.101, 0.25, 0.2, 0.2, 12, 0);
+    var cc = on(1.3, -0.6, 'stopped-clock-carriage'), leather = mat(0x4a2f22, 0.95);
+    bx(cc, -0.07, 0.08, 0, 0.012, 0.16, 0.13, leather); bx(cc, -0.005, 0.002, 0, 0.14, 0.008, 0.13, leather);   /* the case, open behind it */
+    bx(cc, 0, 0.083, 0, 0.08, 0.15, 0.1, brass); bx(cc, 0, 0.165, 0, 0.05, 0.012, 0.03, brass);
+    face(cc, 0.041, 0.09, 0.075, 0.075, 2, 50);
+    var sg = on(0.62, -0.88, 'stopped-sand-glass'), pale = new THREE.MeshStandardMaterial({ color: kit.col(0xc9cdc6), roughness: 0.6, transparent: true, opacity: 0.35 }), sand = mat(0xb39a6a, 1);
+    [0.003, 0.345].forEach(function (y) { cyl(sg, 0, y, 0, 0.06, 0.06, 0.01, iron, 12); });
+    [0, 2.09, 4.19].forEach(function (a) { cyl(sg, Math.cos(a) * 0.052, 0.175, Math.sin(a) * 0.052, 0.004, 0.004, 0.34, iron, 4); });
+    cyl(sg, 0, 0.255, 0, 0.045, 0.006, 0.17, pale); cyl(sg, 0, 0.095, 0, 0.006, 0.045, 0.17, pale);
+    cyl(sg, 0, 0.205, 0, 0.022, 0.005, 0.06, sand); cyl(sg, 0, 0.055, 0, 0.032, 0.043, 0.09, sand);   /* a quarter stuck in the top at the waist */
+  })();
+  /* the ledger open on its plain oak lectern by the door, the top sloped and facing east to the way in; each line in a
+     different hand, faded brown */
+  (function () {
+    var g = at(-0.6, 3.2, 0, -1, 0, 'stopped-clocks-lectern'), oak = mat(0x6a5338);   /* +x west: the reader stands east of it */
+    bx(g, 0, 0.015, 0, 0.36, 0.04, 0.36, oak); bx(g, 0, 0.53, 0, 0.08, 1.0, 0.08, oak);
+    var top = new THREE.Group(); top.position.set(0, 1.05, 0); top.rotation.z = 0.35; g.add(top);   /* rising away from the reader */
+    bx(top, 0, 0, 0, 0.4, 0.03, 0.5, oak); bx(top, -0.205, 0.03, 0, 0.012, 0.04, 0.5, oak);   /* the lip at its foot */
+    var lines = [['Clocks, whose, and why they stopped', 'bold 30px Georgia, serif'],
+      ['Oak. Given by the Governors, 1702. Stopped at 3.17 one afternoon, 1771, when Peeves borrowed its pendulum. He says he gave it back.', 'italic 19px Georgia, serif'],
+      ['Walnut, with the moon. A Matron’s, 1790. She went to Bath to take the waters and took the key with her.', '19px "Palatino Linotype", serif'],
+      ['Pine, from a first-years’ classroom. Floated to the ceiling in a Levitation lesson, 1866, and came down at twenty to eleven.', 'italic 18px "Times New Roman", serif'],
+      ['Ash. Struck so loudly at a prefects’ meeting, 1749, that it was asked to stop. It did, out of courtesy.', '20px "Segoe Script", cursive'],
+      ['From the boathouse, 1820. The little ship on its dial ran aground at half past six.', 'italic 19px "Book Antiqua", serif'],
+      ['Mahogany, with the weather. Stopped at 8.08 on a wet morning, 1857, its weather hand on Drizzle. It has been sulking since.', '18px Georgia, serif'],
+      ['Carved pine, a Hufflepuff’s, 1903. Its cuckoo popped out at nine and has not come back. Seen now and then in the Owlery, they say.', 'italic 19px "Palatino Linotype", serif'],
+      ['Stone, from the lake’s edge, 1610. Froze solid at quarter past seven in the hard winter of 1814. It thawed, but never forgave the cold.', '19px "Times New Roman", serif'],
+      ['Ebony, from the Head’s study, 1840. Struck thirteen once, and was too embarrassed to go on.', '20px "Segoe Script", cursive'],
+      ['Brass, a travelling clock. Left on the Hogsmeade platform by a visiting inspector from the Ministry, 1931, and sent up by the station master. It stopped the moment it arrived, at ten to three.', 'italic 18px Georgia, serif'],
+      ['The night class’s quarter-glass, 1888. Its sand stuck at the waist after a damp night on the tower, and will not run.', '19px "Book Antiqua", serif']];
+    var cv = document.createElement('canvas'); cv.width = 1400; cv.height = 1000;
+    var x = cv.getContext('2d'); x.fillStyle = '#d9cdae'; x.fillRect(0, 0, 1400, 1000); x.fillStyle = '#b9ab8a'; x.fillRect(696, 0, 8, 1000);
+    var page = 0, y = 70, wrap = function (t, f) {
+      x.font = f; var words = t.split(' '), ln = '', out = [];
+      words.forEach(function (w) { var tt = ln ? ln + ' ' + w : w; if (x.measureText(tt).width > 600 && ln) { out.push(ln); ln = w; } else ln = tt; }); out.push(ln); return out;
+    };
+    lines.forEach(function (L, k) {
+      var ls = wrap(L[0], L[1]), lh = parseInt(L[1].match(/(\d+)px/)[1], 10) * 1.35;
+      if (y + ls.length * lh > 960) { page = 1; y = 70; }
+      x.fillStyle = k ? 'rgba(91,70,48,' + (0.65 + (k % 3) * 0.1) + ')' : '#4a3a28'; x.font = L[1];
+      ls.forEach(function (s) { x.fillText(s, 50 + page * 700, y); y += lh; }); y += k ? 22 : 30;
+    });
+    var tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 8;
+    var book = own(new THREE.Mesh(new THREE.PlaneGeometry(0.45, 0.32), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95 })), top);
+    book.rotation.set(-Math.PI / 2, 0, -Math.PI / 2); book.position.set(0, 0.0245, 0);   /* the open spread, read from the east */
+    [-1, 1].forEach(function (s) { bx(top, 0, 0.018, s * 0.115, 0.33, 0.008, 0.23, mat(0xd2c6a6, 1)); });   /* the leaves' thickness */
+    bx(top, 0, 0.0155, 0, 0.34, 0.004, 0.47, mat(0x4a3324, 0.9));   /* the binding under the spread */
+  })();
+  return { root: root };
+})();
 /* req 927 (People's, on req 897 and Godric's 1 on people-painters-sitters-r1-1022; Events' req 928 strings,
    page/events/painters-room.json, word for word): the painters' room's two sitters drawn into their canvases
    (page/shell-w5a.js, the easels at (162.5, -1.4), the tea witch's with the cup, and (162.5, 1.1), the young wizard's).
