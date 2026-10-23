@@ -4386,10 +4386,12 @@ var MICE = (function () {
     out.mice.push({ g: g, a: [d[0], d[1]], b: [ex, d[2]], wait: d[3], run: 2.0 + (i % 2) * 0.4, seed: i * 1.7 });
   });
   var t = new THREE.TextureLoader().load('../assets/layers/norris-figure.png'); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
-  var gm = new THREE.PlaneGeometry(0.6, 0.7), uv = gm.attributes.uv;
+  /* People's word (22 October 2026, 10.45 pm): her still cells read at about 3200 px a metre, not the trot's 1548, so
+     the 0.6 by 0.7 cell stands 0.29 by 0.34 */
+  var gm = new THREE.PlaneGeometry(0.29, 0.339), uv = gm.attributes.uv;
   for (var i = 0; i < uv.count; i++) uv.setX(i, (1 + uv.getX(i)) / 6);   /* cell 1, sitting */
   out.cat = new THREE.Mesh(gm, new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide }));
-  out.cat.position.copy(L(65.5, 61.7, 0.35)); out.cat.name = 'great-hall-norris'; out.cat.userData.owner = PLACE; out.cat.raycast = function () {}; out.cat.visible = false; scene.add(out.cat);
+  out.cat.position.copy(L(65.5, 61.7, 0.17)); out.cat.name = 'great-hall-norris'; out.cat.userData.owner = PLACE; out.cat.raycast = function () {}; out.cat.visible = false; scene.add(out.cat);
   out.L = L; out.go = function () { out.t = 0; };
   return out;
 })();
