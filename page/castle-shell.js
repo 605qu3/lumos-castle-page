@@ -68,31 +68,36 @@ function toSite(M, gid, p) {
    polygon (counter-clockwise), its floor and ceiling as heights in the castle's frame */
 function findPlace(M, id) {
   var r = (M.rooms || []).filter(function (x) { return x.id === id; })[0];
+  /* v74 (model v176): a room with its own `z` (the level-T rooms: the head's office, Divination and its landing, the
+     owlery, secret-s1; there is no level T) stands at that height, its ceiling then in the castle's frame as the model
+     says; before, they stood from 0 */
+  var zb = r && r.z != null && !r.group ? r.z : null;
+  function ceilOf(b) { return zb != null ? (r.ceiling != null ? r.ceiling : zb + (M.site.storey || 5.2) - 0.7) : b + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7); }
   if (r && r.shape && r.shape.rect) {
-    var a = r.shape.rect, base = levelZ(M, r.level) + (r.group ? M.groups.filter(function (g) { return g.id === r.group; })[0].place.z - levelZ(M, r.level) : 0);
+    var a = r.shape.rect, base = zb != null ? zb : levelZ(M, r.level) + (r.group ? M.groups.filter(function (g) { return g.id === r.group; })[0].place.z - levelZ(M, r.level) : 0);
     var pts = [[a[0], a[1]], [a[2], a[1]], [a[2], a[3]], [a[0], a[3]]].map(function (p) { return toSite(M, r.group, p); });
     var floor = base + (r.floor || 0);
-    return { id: r.id, name: r.name, kind: 'room', poly: pts, floor: floor, ceiling: base + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7),
+    return { id: r.id, name: r.name, kind: 'room', poly: pts, floor: floor, ceiling: ceilOf(base),
       wall: r.wall || WALL_T, walls: r.walls || null, rec: r };
   }
   /* v12: a room drawn by its plan's corners ({ poly }, counter-clockwise: the gunners' casemate between two drums' faces,
      ledger line 94), floor and ceiling as a rect room's */
   if (r && r.shape && r.shape.poly) {
-    var pb = levelZ(M, r.level), pp = r.shape.poly.map(function (p) { return toSite(M, r.group, p); });
-    return { id: r.id, name: r.name, kind: 'room', poly: pp, floor: pb + (r.floor || 0), ceiling: pb + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7),
+    var pb = zb != null ? zb : levelZ(M, r.level), pp = r.shape.poly.map(function (p) { return toSite(M, r.group, p); });
+    return { id: r.id, name: r.name, kind: 'room', poly: pp, floor: pb + (r.floor || 0), ceiling: ceilOf(pb),
       wall: r.wall || WALL_T, walls: null, rec: r };
   }
   /* v10: a round room, SIDES sides about the circle, one side's middle on its first door, its wall as deep as its
      deepest loop (the West Tower's drum, 3.2) */
   if (r && r.shape && r.shape.circle) {
-    var cb = levelZ(M, r.level) + (r.group ? M.groups.filter(function (g) { return g.id === r.group; })[0].place.z - levelZ(M, r.level) : 0);
+    var cb = zb != null ? zb : levelZ(M, r.level) + (r.group ? M.groups.filter(function (g) { return g.id === r.group; })[0].place.z - levelZ(M, r.level) : 0);
     var cc = toSite(M, r.group, r.shape.circle), rr = r.shape.r, deep = 0;
     var first = (M.openings || []).filter(function (op) { return op.at && (op.between || []).indexOf(r.id) >= 0; })[0];
     var off = first ? angle(cc, toSite(M, first.group || null, first.at)) : 0, half = 180 / SIDES;
     var cp = arcPts(cc, rr / Math.cos(half * Math.PI / 180), off + half, off + 360 + half, SIDES).slice(0, SIDES);
     (M.openings || []).forEach(function (op) { if (op.room === r.id && op.depth) deep = Math.max(deep, op.depth); });
     return { id: r.id, name: r.name, kind: 'room', poly: cp, area: { outer: cp, holes: [] }, round: { c: cc, r: rr }, floor: cb + (r.floor || 0),
-      ceiling: cb + (r.ceiling != null ? r.ceiling : (M.site.storey || 5.2) - 0.7), wall: r.wall || deep || WALL_T, walls: null, rec: r };
+      ceiling: ceilOf(cb), wall: r.wall || deep || WALL_T, walls: null, rec: r };
   }
   /* v17 (model v44): a newel stair made a place (`place: "shaft"`, the south-west turret's): its round well from `from`
      to `to` and a turn's head room over, its wall the turret's 0.5, its sides long enough for its widest door (twelve at
