@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=514"></script>
-<script src="castle-paint.js?v=105"></script>
+<script src="castle-model.js?v=515"></script>
+<script src="castle-paint.js?v=106"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -302,7 +302,8 @@ PAINTED = PAINTED.concat(['drum-room-g', 'west-tower-room-g', 'transfiguration-s
 /* v163, req 869 A on B (ledger 228): the round cellar under it, off lake-corridor-b-west's east end; a rough build, the door only, its floor earth */
 PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', 'hospital-dispensary', 'hospital-linen',
   'defence-sitting-room', 'defence-bedroom', 'unused-classroom-2-west', 'unused-classroom-2-east', 'classroom-store-2-west', 'lost-games-room',
-  'west-refuge-ring', 'old-exam-hall', 'heads-corridor', 'old-exam-hall-store']);
+  'west-refuge-ring', 'old-exam-hall', 'heads-corridor', 'old-exam-hall-store',
+  'decoy-cupboard-5', 'true-hide-5', 'accounts-room-3']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
