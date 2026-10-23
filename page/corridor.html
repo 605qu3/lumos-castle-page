@@ -4403,6 +4403,7 @@ var tabby = { group: new THREE.Group(), mesh: null, state: 'away', k: 0, seen: f
     var tx = tex(im); tx.repeat.set(1 / TABBY.cells, 1);
     var m = cutoutMesh(tx, TABBY.w, TABBY.h); m.position.y = TABBY.h / 2; m.name = 'tabby-cell';
     tabby.mesh = m; tabby.group.add(m);
+    m.userData.thing = 'tabby'; tappables.push(m);   /* req 988 (a): a tap on her on the sill, the runtime's `tap tabby` */
   };
   im.src = '../assets/layers/tabby-figure.png';
   tabby.group.visible = false; tabby.group.name = 'tabby'; scene.add(tabby.group);
@@ -5209,7 +5210,8 @@ function tap(cx, cy) {
   raycaster.setFromCamera(pointer, camera);
   var hits = raycaster.intersectObjects(tappables.filter(function (m) {
     return m.visible && (m !== wayDown || (atStop === landingStop && footShown === 'window'))   /* only when the end is open */
-      && (m.userData.thing !== 'mrs norris' || (m.parent.visible && norrisTappable()));
+      && (m.userData.thing !== 'mrs norris' || (m.parent.visible && norrisTappable()))
+      && (m.userData.thing !== 'tabby' || tabby.state === 'sill');   /* the tabby only while she sits on the sill */
   }).concat(onCorridorFloor() ? FLOORS.concat(BLOCKERS) : []), false);
   /* walking freely (req 722): the floor walks him to its nearest place; nothing else keeps him where he is, with the
      mote, a wall's tap stopped at the wall so the nook's flags behind her wall never take it. Below the corridor (the
@@ -6344,6 +6346,20 @@ var castle = window.CastleEvents ? CastleEvents.start({
     },
     'a few third-years drift down the corridor a few inches off the floor, each sucking a Fizzing Whizzbee': function () {
       showLines([{ medium: 'heard', sound: 'a few third-years drift down the corridor a few inches off the floor, each sucking a Fizzing Whizzbee' }]);
+    },
+    /* req 988 (Godric's woven touches of 22 October 2026; Events' stair.json and armour.json, the cues word for word).
+       (a) a tap on the tabby on the sill: she does not move (cell 0, front on, is her stare), her time on the sill begun
+       again, and she still goes once he has looked away; the words told. (b) and (c), year 3's two pupils at the
+       suit, one or the other: not drawn (People's), so told */
+    'the tabby on the sill does not move; she only gives him a stern look': function () {
+      if (tabby.state === 'sill') { tabby.k = 0; tabbyCell(0, false); }
+      showLines([{ medium: 'heard', sound: 'the tabby on the sill does not move; she only gives him a stern look' }]);
+    },
+    "a pupil sits on the floor at the suit of armour's feet, repacking a bag too full of books to close": function () {
+      showLines([{ medium: 'heard', sound: "a pupil sits on the floor at the suit of armour's feet, repacking a bag too full of books to close" }]);
+    },
+    'a boy slips round behind the suit of armour and sits down on the floor in its shadow, finishing a bar of chocolate': function () {
+      showLines([{ medium: 'heard', sound: 'a boy slips round behind the suit of armour and sits down on the floor in its shadow, finishing a bar of chocolate' }]);
     },
     /* the mysterious light, year 3's Christmas (req 982; Events' armour.christmas-lights, PoA 11 L17727; Godric's woven
        touch of 8.03 pm): the season's visor light (req 600) is lit already; this moment swells it, as if something inside
