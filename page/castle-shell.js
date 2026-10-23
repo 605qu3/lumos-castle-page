@@ -889,8 +889,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var r = w / 2, sh = new THREE.Shape(), BR = 0.02;
           sh.moveTo(-r, 0); sh.lineTo(-r - BR, 0); sh.lineTo(-r - BR, r + BR); sh.lineTo(r + BR, r + BR); sh.lineTo(r + BR, 0); sh.lineTo(r, 0);
           sh.absarc(0, 0, r, 0, Math.PI, false);
+          /* v76 (the hundred-fifty-third, H74's cubby): a niche whose head is "flat" is cut square, no round head */
+          if (g.op.head !== 'flat') {
           var head = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: dp + 0.015, bevelEnabled: false, curveSegments: 16 }), mats.wall), LAYER.wall);
           head.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - r, mid.z + Math.cos(ang) * 0.005); head.rotation.y = ang; head.name = Q.id + '-niche-head-' + g.op.id; group.add(head);
+          }
           var fl = slab(w, 0.02, dp, mats.floor, 'floor'), fp = toLocal(a[0] + ux * sm + nx * dp / 2, a[1] + uy * sm + ny * dp / 2, Q.floor);
           fl.position.set(fp.x, fp.y + g.sill + 0.01, fp.z); fl.rotation.y = ang; fl.name = Q.id + '-niche-floor-' + g.op.id; group.add(fl);
           return;

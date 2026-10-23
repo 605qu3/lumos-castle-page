@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=516"></script>
+<script src="castle-model.js?v=517"></script>
 <script src="castle-paint.js?v=106"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -164,7 +164,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=1"></script>
-<script src="castle-shell.js?v=75"></script>
+<script src="castle-shell.js?v=76"></script>
 <script src="shell-w5b.js?v=17"></script>
 <script src="shell-w5a.js?v=21"></script>
 <script src="castle-events.js?v=40"></script>
@@ -2414,7 +2414,7 @@ var HIDES = (function () {
       var k = 0;
       rows.forEach(function (z) {   /* the calf ledgers, packed close, about 0.40 high and 0.30 deep, each a little different */
         for (var s = 0.03; s < L - 0.07; s += 0.065) {
-          k++; if (skip && z === skip[0] && Math.abs(s + 0.03 - skip[1]) < 0.06) continue;
+          k++; if (skip && z === skip[0] && Math.abs(s + 0.03 - skip[1]) < skip[2]) continue;
           var hgt = 0.36 + ((k * 37) % 5) * 0.01, b = c((s + 0.03) / L, 0.03 + 0.15);
           slab(b[0], b[1], z, 0.055, hgt, 0.30, ang, calf[k % 3]);
         }
@@ -2423,7 +2423,7 @@ var HIDES = (function () {
     run(152.20, 71.30, 152.20, 65.20, 1, 0);            /* the west shelves, back to the Charms wall */
     run(154.40, 66.50, 154.40, 68.40, -1, 0);           /* the drum shelves, the straight */
     var nl = Math.hypot(3.0, 0.8);
-    run(154.40, 68.40, 153.627, 71.30, -3.0 / nl, -0.8 / nl, [1.00, 1.5 / 2.9 * Math.hypot(0.773, 2.9)]);   /* and on along the drum side */
+    run(154.40, 68.40, 153.627, 71.30, -3.0 / nl, -0.8 / nl, [1.00, 1.5 / 2.9 * Math.hypot(0.773, 2.9), 0.23]);   /* and on along the drum side, the shelf at 1.0 bare before the cubby but for the stuck ledger */
     /* the sloped desk by the door: four legs, the slope from 0.85 at its front (west) to 1.00 at its back, a ledge */
     [[153.87, 65.47], [154.34, 65.47], [153.87, 66.29], [154.34, 66.29]].forEach(function (l) { box(l[0], l[1], 0.0, l[0] + 0.04, l[1] + 0.04, 0.85, oak); });
     var sl = Math.atan2(0.15, 0.55), top = new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(0.55, 0.15), 0.03, 0.9), oak), ta = P(154.125, 65.90, 0.925);
@@ -2434,12 +2434,33 @@ var HIDES = (function () {
     led.position.set(la.x, la.y, la.z); led.rotation.z = sl; own(led);
     var spine = new THREE.Mesh(new THREE.BoxGeometry(0.43, 0.012, 0.012), calf[0]), sa = P(154.10, 65.90, 0.962);
     spine.position.set(sa.x, sa.y, sa.z); spine.rotation.z = sl; own(spine);
-    /* the stuck ledger, before the cubby on the drum shelves' shelf at 1.0, a shade proud of its neighbours */
-    slab(154.0 - 0.20 * 3.0 / nl, 69.9 - 0.20 * 0.8 / nl, 1.00, 0.06, 0.40, 0.30, Math.atan2(71.30 - 68.40, 153.627 - 154.40), calf[1]);
+    /* the cubby (req 1057, Events' accounts-cubby-tip; the hollow the model's accounts-cubby-niche-3, cut square): a frame at
+       its mouth on the drum's face, x along the shelves (north), y up from the shelf at 1.0, z out into the room. The stuck
+       ledger stands in it, a shade proud, on a pivot at its front foot; the board behind it on its bottom hinge; the cash
+       box, iron-bound oak, its lid up, empty, and the key on a nail by the north cheek. Found (the secret accounts-cubby,
+       or ?cubby=open), the ledger and the board stand tipped 55 degrees out; the tip line tips them over 0.8 s */
+    var CU = shell.toLocal(154.0, 69.9, Z0 + 1.0), CX = shell.toLocal(154.0 + 0.773 / Math.hypot(0.773, 2.9) * -1, 69.9 + 2.9 / Math.hypot(0.773, 2.9), Z0 + 1.0).sub(CU).normalize(),
+        CZ = shell.toLocal(154.0 - 3.0 / nl, 69.9 - 0.8 / nl, Z0 + 1.0).sub(CU).normalize(), CY = new THREE.Vector3(0, 1, 0);
+    if (new THREE.Vector3().crossVectors(CX, CY).dot(CZ) < 0) CX.negate();
+    function frameAt(o, dz) { var fr = new THREE.Group(); fr.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(CX, CY, CZ)); fr.position.copy(CU).addScaledVector(CZ, dz || 0); g.add(fr); return fr; }
+    function part(fr, x0, y0, z0, x1, y1, z1, mt) { var bm = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mt); bm.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); bm.userData.owner = OWN; bm.userData.live = true; bm.userData.cubbyTap = true; fr.add(bm); return bm; }
+    var still = frameAt(0.05), ledgerP = frameAt(0.38), boardP = frameAt(0.05);   /* the drum's face 5 cm in front of the shelves' back line */
+    part(ledgerP, -0.03, 0, -0.27, 0.03, 0.40, 0, calf[1]);
+    part(boardP, -0.195, 0.024, -0.025, 0.195, 0.335, -0.005, oak);   /* inside the hollow, clear of its floor, head and cheeks */
+    part(still, -0.18, 0.02, -0.27, 0.10, 0.12, -0.07, oak); part(still, -0.18, 0.12, -0.27, 0.10, 0.32, -0.258, oak);   /* the box, the lid up */
+    part(still, -0.06, 0.02, -0.275, -0.04, 0.125, -0.065, iron); part(still, 0.04, 0.02, -0.275, 0.06, 0.125, -0.065, iron);   /* its bands */
+    part(still, 0.17, 0.275, -0.105, 0.2, 0.285, -0.095, iron); part(still, 0.186, 0.16, -0.106, 0.194, 0.25, -0.094, iron); part(still, 0.186, 0.25, -0.125, 0.194, 0.28, -0.075, iron);   /* the nail, the key's shank and bow */
+    out.cubby = { ledger: ledgerP, board: boardP, t: -1, open: false };
+    out.cubbyOpen = function (now) { var c = out.cubby; if (c.open) return; c.open = true; if (now) { c.ledger.rotation.x = c.board.rotation.x = 55 * Math.PI / 180; } else c.t = 0; };
+    out.update = function (dt) { var c = out.cubby;   /* found before: open from the first frame, once the runtime has started */
+      if (!c.seen) { c.seen = true; if (events && events.secrets && events.secrets().indexOf('accounts-cubby') >= 0) out.cubbyOpen(true); }
+      if (c.t < 0) return; c.t = Math.min(1, c.t + dt / 0.8);
+      var e = c.t * c.t * (3 - 2 * c.t), a = 55 * Math.PI / 180; c.ledger.rotation.x = a * Math.min(1, e * 1.6); c.board.rotation.x = a * Math.max(0, e * 1.6 - 0.6); if (c.t >= 1) c.t = -1; };
+    out.taps = function () { var l = []; [still, ledgerP, boardP].forEach(function (fr) { fr.children.forEach(function (bm) { l.push(bm); }); }); return l; };
   }
   /* one mesh a material, so the ledgers stay light */
   var by = new Map();
-  g.children.slice().forEach(function (m) { if (m.material.map) return; m.updateMatrix(); var geo = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone()).applyMatrix4(m.matrix);
+  g.children.slice().forEach(function (m) { if (!m.isMesh || m.material.map) return; m.updateMatrix(); var geo = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone()).applyMatrix4(m.matrix);
     var l = by.get(m.material) || []; l.push(geo); by.set(m.material, l); g.remove(m); });
   by.forEach(function (list, mt) {
     var pos = [], nor = [];
@@ -2447,8 +2468,11 @@ var HIDES = (function () {
     var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
     own(new THREE.Mesh(bg, mt));
   });
+  if (out.cubbyOpen && Q.get('cubby') === 'open') out.cubbyOpen(true);
   return out;
 })();
+var CUBBY_TIP = 'one ledger on the drum side will not come out; he pulls and it tips, and a cubby opens behind it with a cash box inside, its lid up, empty, and its key hanging on a nail beside it, as if somebody meant to be back';   /* Events' page/events/real-hides.json, accounts-cubby-tip */
+thingCues[CUBBY_TIP] = function () { showLines([{ medium: 'seen', sound: CUBBY_TIP, on: function () { if (HIDES.cubbyOpen) HIDES.cubbyOpen(); } }]); };
 /* the dungeon corridor's ironwork (req 1048; Godric's 2 on architect-ironwork-1023, B, the scroll grille; Design's kit,
    page/design/ironwork.js, whose header is the interface): a blind screen 0.15 off the corridor's wall at y 15, x 34 to
    120, to 2.9 under the vault's springing, in whole bays of about 2.4; black iron in the shell's tone, two meshes, two
@@ -6275,6 +6299,10 @@ function tap(cx, cy) {
   if (hit && hit.userData.tap === 'paper') {   /* req 941, the roll's verse */
     if (events) events.tap('paper'); else showLines(STONE_VERSE.map(function (l) { return { medium: 'seen', sound: l }; })); kit.tapped(true); return;
   }
+  if (HIDES.taps) {   /* H74's cubby (req 1057): the stuck ledger, its board, the box: the tap Events' on the opening's id */
+    var cb = raycaster.intersectObjects(HIDES.taps(), false);
+    if (cb.length && (!hits.length || cb[0].distance <= hits[0].distance + 0.05)) { if (events) events.tap('accounts-cubby-3'); else thingCues[CUBBY_TIP](); kit.tapped(true); return; }
+  }
   if (hit && hit.userData.bottle && !events && SILLY_TAP[hit.userData.bottle]) {   /* req 941 with no runtime: the bottle's own minute */
     var sk = SILLY_TAP[hit.userData.bottle]; sillyStart(sk); setTimeout(function () { sillyStop(sk); }, 60000); kit.tapped(true); return;
   }
@@ -6378,7 +6406,7 @@ var clock = new THREE.Clock();
 function frame() {
   var dt = Math.min(0.05, clock.getDelta());
   updateCamera(dt);
-  updateShakes(dt); updatePear(dt); updateKitchens(dt);
+  updateShakes(dt); updatePear(dt); updateKitchens(dt); if (HIDES.update) HIDES.update(dt);
   if (H71.spell) H71.spell.frame(dt);
   updateSwings(dt);
   updateFades(dt);
