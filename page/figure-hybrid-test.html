@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figure hybrid test</title>
+<style>html, body { margin: 0; height: 100%; background: #2a2622; overflow: hidden; } canvas { display: block; }</style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* Godric's ask on the desk's Talk (23 October 2026, 1.00 pm): a pupil, a professor, Hagrid and Mrs Norris built "to the
+   same degree of quality that we got the knight". A trial page, not a room: one drawn cell (?fig=pupil, professor, filch,
+   norris) built as the corridor's hybrid suit is (HYBRID in corridor.html): the outline cut into runs every few
+   millimetres, each run a ring as wide as the drawing and as deep as the figure's own depth at that height, linked to
+   the run it carries on as in the next row, smoothed along the links, the drawing laid on from the front and folded
+   round the flanks and back. The suit's steel is not here: the drawing all round. lumosFigure.export() hands the mesh
+   and the drawing to tools/corridor-figures-blender.py; ?view=<degrees> turns the eye for a quick look in the page. */
+var FIGS = {
+  /* src, the cell's box in the sheet [x0, y0, x1, y1], px a metre, half depths by fraction of height [f, m], and
+     deep: the depth may pass half the width (a sitting cat is deeper than she is wide) */
+  pupil: { src: 'student-stock-11-12-standing-gryffindor.png', box: [2818, 57, 3137, 1146], px: 751, dome: 0.09, feet: true,
+    caps: [[0, 0.05], [0.06, 0.055], [0.3, 0.07], [0.5, 0.1], [0.62, 0.1], [0.72, 0.11], [0.8, 0.1], [0.84, 0.06], [0.87, 0.09], [1, 0.09]] },
+  professor: { src: 'electives-teachers.png', box: [555, 0, 959, 1176], px: 631, dome: 0.09, feet: true,
+    caps: [[0, 0.06], [0.05, 0.12], [0.35, 0.12], [0.55, 0.11], [0.65, 0.11], [0.74, 0.12], [0.8, 0.1], [0.84, 0.06], [0.87, 0.095], [1, 0.095]] },
+  filch: { src: 'filch-figure.png', box: [2113, 0, 2576, 1124], px: 651, dome: 0.09, feet: true,
+    caps: [[0, 0.05], [0.06, 0.06], [0.3, 0.075], [0.5, 0.11], [0.62, 0.11], [0.72, 0.12], [0.8, 0.1], [0.84, 0.06], [0.87, 0.095], [1, 0.095]] },
+  norris: { src: 'norris-figure.png', box: [1136, 0, 1651, 1082], px: 3200, dome: 0.03, feet: false, deep: true, ink: 0.003,
+    caps: [[0, 0.05], [0.04, 0.12], [0.25, 0.12], [0.4, 0.08], [0.6, 0.055], [0.66, 0.04], [0.72, 0.045], [1, 0.045]] }
+};
+var sp = new URLSearchParams(location.search), F = FIGS[sp.get('fig') || 'pupil'];
+var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(innerWidth, innerHeight); renderer.outputEncoding = THREE.sRGBEncoding; document.body.appendChild(renderer.domElement);
+var scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.05, 50);
+scene.add(new THREE.HemisphereLight(0xdde4ee, 0x6a5c4c, 0.7));
+var sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(-2, 3, 3); scene.add(sun);
+var out = { ready: false };
+
+function bleed(c) {   /* the drawing's colours carried out past its edge, so a fold onto the flanks never samples the clear */
+  var W = c.width, H = c.height, b = document.createElement('canvas'); b.width = W; b.height = H;
+  var x = b.getContext('2d'); x.drawImage(c, 0, 0);
+  var S = x.getImageData(0, 0, W, H), d = S.data;   /* the faint fringe and the green spill cleared first, so neither bleeds */
+  for (var j = 0; j < d.length; j += 4) if (d[j + 3] < 128 || (d[j + 1] > d[j] + 25 && d[j + 1] > d[j + 2] + 25)) d[j + 3] = 0; else d[j + 3] = 255;
+  x.putImageData(S, 0, 0);
+  for (var k = 0; k < 24; k++) {
+    x.globalCompositeOperation = 'destination-over';
+    [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function (d) { x.drawImage(b, d[0], d[1]); });
+  }
+  x.globalCompositeOperation = 'source-over';
+  var A = x.getImageData(0, 0, W, H), a = A.data;
+  for (var i = 3; i < a.length; i += 4) a[i] = 255;
+  x.putImageData(A, 0, 0);
+  return b;
+}
+
+function build(im) {
+  var bx = F.box, W = bx[2] - bx[0], H = bx[3] - bx[1], PX = F.px, c = document.createElement('canvas');
+  c.width = W; c.height = H; var x = c.getContext('2d'); x.drawImage(im, bx[0], bx[1], W, H, 0, 0, W, H);
+  var A = x.getImageData(0, 0, W, H).data, FOOT = H - 1, HM = H / PX;
+  var ROW = Math.min(8, Math.round(PX * 0.0058)), SEG = 28, MIN = Math.round(PX * 0.009), DOME = F.dome * PX;
+  function body(px, py) {   /* the sheet's green spill at a cell's foot is clear */
+    var k = (py * W + px) * 4, r = A[k], g = A[k + 1], bl = A[k + 2];
+    return A[k + 3] > 127 && !(g > r + 25 && g > bl + 25);
+  }
+  function depth(ym) {
+    var f = ym / HM, cp = F.caps;
+    for (var i = 1; i < cp.length; i++) if (f <= cp[i][0]) { var a = cp[i - 1], b = cp[i]; return (a[1] + (b[1] - a[1]) * (f - a[0]) / (b[0] - a[0])) * (F.deep ? 1 : 1.25 * HM / 1.75); }   /* the caps are a grown-up's; a pupil's in proportion */
+    return cp[cp.length - 1][1];
+  }
+  var TOP = new Int16Array(W * H);
+  for (var tx = 0; tx < W; tx++) for (var ty = 0, t0 = -1; ty < H; ty++) { if (body(tx, ty)) { if (t0 < 0) t0 = ty; TOP[ty * W + tx] = ty - t0; } else t0 = -1; }
+  function lift(px, py) { px = Math.round(px); return px < 0 || px >= W || py < 0 || py >= H ? 0 : TOP[py * W + px]; }
+  var pos = [], uv = [], ind = [], cnt = 0;
+  function ring(r, py, centre) {
+    var ym = (H - py) / PX, cx = (r[0] + r[1]) / 2, hw = (r[1] - r[0] + 1) / 2, at = cnt, zc = r[3] || 0;
+    if (centre) { pos.push((cx - W / 2) / PX, ym, zc); uv.push(cx / W, 1 - py / H); cnt++; }
+    for (var i = 0; i <= SEG; i++) {
+      var th = (i / SEG - 0.5) * Math.PI * 2, s = Math.sin(th), co = Math.cos(th), a = Math.abs(th);
+      /* the suit folded its drawing back in to the middle behind; a face would show on the back of the head, so here the
+         drawing is laid on front on as far as the sides and its edge (hair, the robe's edge, fur) carried round the back */
+      var inner = Math.max(0.4, 1 - 16 / hw), un = Math.sign(s) * Math.min(Math.abs(s), inner);   /* held 16 px inside the outline toward the sides and all round the back, past the ink (the mesh's own line draws the edge) */
+      var t = Math.min(1, lift(cx + hw * s, py) / DOME), dome = Math.max(0.2, Math.sqrt(1 - (1 - t) * (1 - t)));
+      pos.push((cx + hw * s - W / 2) / PX, ym, zc + r[2] * co * dome); uv.push((cx + hw * un) / W, 1 - py / H); cnt++;
+    }
+    return at;
+  }
+  function capOf(r, py, up) { var o = ring(r, py, true); for (var i = 0; i < SEG; i++) { if (up) ind.push(o, o + 1 + i, o + 2 + i); else ind.push(o, o + 2 + i, o + 1 + i); } }
+  var rows = [];
+  for (var py = 0; py <= FOOT; py += ROW) {
+    var runs = [], s0 = -1;
+    for (var px = 0; px <= W; px++) {
+      var on = px < W && body(px, py);
+      if (on && s0 < 0) s0 = px;
+      if (!on && s0 >= 0) { if (px - s0 >= MIN) runs.push([s0, px - 1, 0]); s0 = -1; }
+    }
+    if (runs.length) rows.push([py, runs]);
+  }
+  function wide(o) { return o.r[1] - o.r[0]; }
+  function widest(l) { return l.reduce(function (m, o) { return !m || wide(o) > wide(m) ? o : m; }, null); }
+  var R = rows.map(function (row) { return row[1].map(function (r) { return { r: r.slice(), py: row[0], up: [], down: [], prev: null, next: null }; }); });
+  R.forEach(function (cur, j) { if (j) cur.forEach(function (b) { R[j - 1].forEach(function (a) { if (a.r[0] <= b.r[1] && b.r[0] <= a.r[1]) { a.down.push(b); b.up.push(a); } }); }); });
+  R.forEach(function (cur) {
+    cur.forEach(function (a) {
+      var b = a.down.length === 1 ? a.down[0] : widest(a.down.filter(function (o) { return o.up.length === 1; }));
+      if (!b || b.prev || wide(b) < 0.5 * wide(a)) return;
+      if (b.up.length > 1 && (widest(b.up) !== a || wide(a) < 0.5 * wide(b))) return;
+      a.next = b; b.prev = a;
+    });
+  });
+  var all = [].concat.apply([], R);
+  all.forEach(function (o) {
+    var s0 = o.r[0], s1 = o.r[1], m = 1, p = o, q = o;
+    for (var k = 0; k < 3; k++) { p = p && p.prev; q = q && q.next; if (p) { s0 += p.r[0]; s1 += p.r[1]; m++; } if (q) { s0 += q.r[0]; s1 += q.r[1]; m++; } }
+    o.s = [s0 / m, s1 / m, 0];
+    var hw = (o.s[1] - o.s[0] + 1) / 2 / PX, ym = (FOOT - o.py) / PX;
+    o.s[2] = F.deep ? Math.min(hw * 2.5, depth(ym)) : Math.min(hw, depth(ym));
+    if (F.feet && ym < 0.08) { var front = 0.05 + 0.08 * Math.pow(1 - ym / 0.08, 1.6), back = -0.045; o.s[2] = (front - back) / 2; o.s[3] = (front + back) / 2; }   /* shoes, the toe toward the eye */
+  });
+  all.forEach(function (o) { o.at = ring(o.s, o.py); });
+  function stitch(a, b) { for (var i = 0; i < SEG; i++) ind.push(a + i, b + i, b + i + 1, a + i, b + i + 1, a + i + 1); }
+  all.forEach(function (o) {
+    if (o.next) stitch(o.at, o.next.at);
+    if (!o.prev) { if (o.up.length) { var e = o.py - 3 * ROW; capOf(o.s, e, true); stitch(ring(o.s, e), o.at); } else capOf(o.s, o.py, true); }
+    if (!o.next) { if (o.down.length) { var f = o.py + 3 * ROW; stitch(o.at, ring(o.s, f)); capOf(o.s, f, false); } else capOf(o.s, o.py, false); }
+  });
+  var geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  geo.setIndex(ind); geo.computeVertexNormals();
+  var b = bleed(c), t = new THREE.CanvasTexture(b); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+  var mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: t, roughness: 0.75, metalness: 0 }));
+  scene.add(mesh);
+  var ink = new THREE.MeshBasicMaterial({ color: 0x16120e, side: THREE.BackSide });
+  ink.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * ' + (F.ink || 0.0068).toFixed(4) + ';'); };
+  scene.add(new THREE.Mesh(geo, ink));
+  out.geo = geo; out.tex = b; out.height = HM; out.ready = true;
+}
+
+function r(a, k) { var o = new Array(a.length); for (var i = 0; i < a.length; i++) o[i] = Math.round(a[i] * k) / k; return o; }
+window.lumosFigure = {
+  state: out,
+  export: function () {
+    var g = out.geo;
+    return JSON.stringify({ height: out.height, ink: F.ink || 0.0068, pos: r(g.attributes.position.array, 1e5), nor: r(g.attributes.normal.array, 1e3),
+      uv: r(g.attributes.uv.array, 1e4), idx: Array.from(g.index.array), tex: out.tex.toDataURL('image/png') });
+  }
+};
+var im = new Image();
+im.onload = function () { build(im); };
+im.src = '../assets/layers/' + F.src;
+var view = +(sp.get('view') || 0) * Math.PI / 180;
+(function loop() {
+  var hm = out.height || 1.7, d = hm * 3.2;
+  camera.position.set(Math.sin(view) * d, hm * 0.55, Math.cos(view) * d); camera.lookAt(0, hm * 0.5, 0);
+  renderer.render(scene, camera); requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
