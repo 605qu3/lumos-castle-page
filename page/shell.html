@@ -2420,6 +2420,25 @@ var W1 = (function () {
         rq.add(rb); out.robes++;
       }
       rq.position.sub(wd.mesh.position); rq.userData.owner = PLACE; wd.mesh.add(rq);
+      /* req 727 (staff.json, word for word): the wardrobe's two leaves on its front, y' 13.27 to 13.31 (1 cm into the
+         box), the left as he faces it (x' 3.005 to 3.73) hung at x' 3.73; from 29 May of the Chamber's castle it stands
+         an inch ajar, a dark fold of cloak poking from the gap (staffThingsSet). Children of the box, so the tap and the
+         wobble stay the box's. ?wardrobe=ajar for checks */
+      var wo = wd.mesh.position, leafM = mat('wardrobe-leaf', 0x4a3d31);
+      var wbox = function (x0, y0, za, x1, y1, zb, mt, par, org) {
+        var a3 = P(x0, y0, za), b3 = P(x1, y1, zb), m3 = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), mt);
+        m3.scale.set(Math.abs(b3.x - a3.x), Math.abs(b3.y - a3.y), Math.abs(b3.z - a3.z));
+        m3.position.set((a3.x + b3.x) / 2, (a3.y + b3.y) / 2, (a3.z + b3.z) / 2).sub(org); m3.userData.owner = PLACE; par.add(m3); return m3;
+      };
+      var piv = new THREE.Group(); piv.position.copy(P(3.73, 13.27, 0)).sub(wo); wd.mesh.add(piv);
+      var pw = P(3.73, 13.27, 0);
+      wbox(2.27, 13.27, 0.06, 2.995, 13.31, 2.14, leafM, wd.mesh, wo); wbox(3.005, 13.27, 0.06, 3.73, 13.31, 2.14, leafM, piv, pw);
+      wbox(2.94, 13.24, 1.08, 2.965, 13.271, 1.13, iron, wd.mesh, wo); wbox(3.035, 13.24, 1.08, 3.06, 13.271, 1.13, iron, piv, pw);
+      var fold = wbox(2.985, 13.235, 0.55, 3.012, 13.3, 1.62, mat('cloak-fold', 0x141416), wd.mesh, wo); fold.visible = false;
+      var edge = P(3.005, 13.27, 1).sub(pw), room = P(3.0, 10.0, 1).sub(pw), A = 0.025 / 0.725;
+      var dist = function (s) { return edge.clone().applyAxisAngle(Y_AXIS, s * A).distanceTo(room); };
+      piv.userData.ajar = dist(1) < dist(-1) ? A : -A;
+      out.wleaf = piv; out.wfold = fold;
     }
   }
 
@@ -2744,20 +2763,23 @@ var STAFF_PROPHET = /^the Daily Prophet on the third armchair's arm/,
     STAFF_ROTA3 = 'an old curling sheet half hidden under newer notices on the staff notice board: every lesson of the week and the teacher who walks each class to it',
     STAFF_COALS = 'the coals in the grate settle with a soft fall',
     STAFF_CUSHION = 'the seat cushion of the armchair square to the fire holds a faint hollow, as if someone had only that moment got up, and slowly fills out again';
+var STAFF_AJAR = "the wardrobe's left door standing an inch ajar, a dark fold of cloak showing in the gap";
 var staffMove = { dip: 0, dent: 0, jaw: 0 };
-function staffThingsSet(prophet, rota) {
+function staffThingsSet(prophet, rota, ajar) {
   if (!W1.on || PLACE !== 'staff-room') return;
   (W1.prophet || []).forEach(function (m) { m.visible = prophet; });
   (W1.rota2 || []).forEach(function (m) { m.visible = rota === 2; }); (W1.rota3 || []).forEach(function (m) { m.visible = rota === 3; });
+  if (W1.wleaf) { W1.wleaf.rotation.y = ajar ? W1.wleaf.userData.ajar : 0; W1.wfold.visible = !!ajar; }
 }
 function staffThingsShown(shown) {
   var drawn = [], q = Q.get('rota'), rota = shown.indexOf(STAFF_ROTA3) >= 0 ? 3 : shown.indexOf(STAFF_ROTA2) >= 0 ? 2 : 0;
   if (!W1.on || PLACE !== 'staff-room') return drawn;
   if (rota) drawn.push(rota === 3 ? STAFF_ROTA3 : STAFF_ROTA2);
-  staffThingsSet(shown.some(function (s) { return STAFF_PROPHET.test(s); }) || Q.get('prophet') === 'on', q ? +q : rota);
+  var ajar = shown.indexOf(STAFF_AJAR) >= 0; if (ajar && W1.wleaf) drawn.push(STAFF_AJAR);
+  staffThingsSet(shown.some(function (s) { return STAFF_PROPHET.test(s); }) || Q.get('prophet') === 'on', q ? +q : rota, ajar || Q.get('wardrobe') === 'ajar');
   return drawn;
 }
-if (W1.on) staffThingsSet(Q.get('prophet') === 'on', +(Q.get('rota') || 0));
+if (W1.on) staffThingsSet(Q.get('prophet') === 'on', +(Q.get('rota') || 0), Q.get('wardrobe') === 'ajar');
 /* req 914: the chess chamber's arrival (Events' stone-chambers.chess-dark), word for word: dark, then light flooding */
 var STONE_CHESS_DARK = 'the chamber dark until he steps in, then light flooding the room, the board and every piece in it at once in full light';
 thingCues[STONE_CHESS_DARK] = function () { stoneFlood(false); showLines([{ medium: 'seen', sound: STONE_CHESS_DARK }]); };
@@ -4176,14 +4198,21 @@ function updateBorrow(dt) {
 var PV_WASTE = 'the door bangs open and a first-year comes in late with a wastepaper basket on his head, a cackle going away down the corridor, and the class sniggers';
 var BANG = (function () {
   var id = { 'charms-classroom': 'charms-door', 'defence-classroom': 'defence-classroom-door',
-    'history-of-magic-classroom': 'history-of-magic-door', 'transfiguration-classroom': 'transfiguration-door' }[PLACE];
+    'history-of-magic-classroom': 'history-of-magic-door', 'transfiguration-classroom': 'transfiguration-door',
+    'staff-room': 'staff-room-door' }[PLACE];
   var d = id && shell.doors.filter(function (x) { return x.id === id; })[0];
   var room = MODEL && (MODEL.rooms || []).filter(function (r) { return r.id === PLACE; })[0];
   if (!d || !d.hinge || !room || !room.shape || !room.shape.rect) return null;
   var R = room.shape.rect, h = d.hinge, a = 1.0, mid = shell.toLocal((R[0] + R[2]) / 2, (R[1] + R[3]) / 2, shell.place.floor);
   var end = function (s) { return h.at.clone().addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, s * a), 2 * h.half).distanceTo(mid); };
-  return { d: d, t: -1, open: 0.25, hold: 6, shut: 1.4, a: end(1) < end(-1) ? a : -a };
+  return { d: d, t: -1, open: 0.25, hold: PLACE === 'staff-room' ? 2.5 : 6, shut: 1.4, a: end(1) < end(-1) ? a : -a };
 })();
+/* req 727, staff.json's staff.door-bangs, word for word (CoS 16 L12363): the staff room's door bangs open as BANG's,
+   stands 2.5 s on nobody and swings to; both portraits starting awake stay the line's (their sitters a picture, a
+   spend). ?touch=staffdoor */
+var STAFF_BANG = 'the staff room door bangs open and both portraits start awake, blink, and settle again';
+thingCues[STAFF_BANG] = function () { showLines([{ medium: 'seen', sound: STAFF_BANG, on: function () { if (BANG && BANG.t < 0) BANG.t = 0; } }]); };
+if (BANG && PLACE === 'staff-room' && Q.get('touch') === 'staffdoor') setTimeout(function () { thingCues[STAFF_BANG](); }, 1500);
 thingCues[PV_WASTE] = function () { showLines([{ medium: 'seen', sound: PV_WASTE, on: function () { if (BANG && BANG.t < 0 && !(BORROW && BORROW.t >= 0)) BANG.t = 0; } }]); };
 if (BANG && Q.get('touch') === 'wastepaper') setTimeout(function () { thingCues[PV_WASTE](); }, 1500);
 function updateBang(dt) {
