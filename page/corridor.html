@@ -1628,6 +1628,13 @@ ARMOUR_HER.dy = (-ARMOUR.h / 2 + 5 / 1369) - (-ARMOUR_HER.h / 2 + 4 / 1385);
 })();
 function updateArmourSide(a) {
   var S = ARMOUR_SIDE;
+  if (HYBRID && HYBRID.only) {   /* the hybrid is the suit: the card unseen, turned all the way to the eye for his tap */
+    S.on = false; armour.rotation.y = a; armour.material.visible = false;
+    if (S.her) S.her.visible = false;
+    if (visorLight) visorLight.visible = !!visorLight.userData.want && !armour.userData.back;
+    if (visorPatch && helmetEyes) { visorPatch.visible = !!visorPatch.userData.want; helmetEyes.visible = !!helmetEyes.userData.want; }
+    return;
+  }
   if (S.her) { if (!S.on && a > S.enter) S.on = true; else if (S.on && a < S.leave) S.on = false; }
   armour.rotation.y = S.on ? a : Math.max(-ARMOUR_TURN, Math.min(ARMOUR_TURN, a));
   armour.material.visible = !S.on;
@@ -2014,13 +2021,17 @@ function updateRelief() {   /* the torches' warmth by night, as the card's */
    the shape turns away (its flanks, its back) the built suit's steel and mirror take over, so side on it is a suit and
    not the drawing smeared. The halberd is cut from the outline and built apart: its shaft a round pole in the drawing's
    wood, its head the drawing on a flat blade, edge on from the side as a blade is. An ink line round it as the built
-   suit's. Still, never turning to the eye; by night the torches' warmth. ?hybrid stands it 1.1 m along from the drawn
-   suit toward the stair (2.2 with ?relief beside it); ?hybrid=only in the drawn suit's place, where the visor's things
-   (Trevor's eyes, the Christmas light) go with the card they ride on */
+   suit's. Still, never turning to the eye; by night the torches' warmth.
+   The corridor's suit since Godric's 1 on corridor-armour-hybrid-r3-1023 (23 October 2026, 11.46 am): it stands in the
+   drawn suit's place and the drawn card stays there unseen, turned to the eye, so his tap and the stop still find it;
+   the hybrid follows the card to its three marks, rocks with its wobble and Peeves's shake (about its feet), turns its
+   true back on the back cue, and takes the visor's things (Trevor's eyes, the visor's patch, the Christmas light) onto
+   its own helmet, seated on its face by a ray (seatVisor). ?drawn shows the drawn suit as it was; ?hybrid stands the
+   hybrid 1.1 m along from the drawn suit toward the stair (2.2 with ?relief beside it), the two to compare */
 var HYBRID = (function () {
-  var q = new URLSearchParams(location.search).get('hybrid');
-  if (q === null) return null;
-  var only = q === 'only', PX = 1369, ROW = 8, SEG = 28, FOOT = 2468, g = new THREE.Group();
+  var sp = new URLSearchParams(location.search), q = sp.get('hybrid');
+  if (sp.has('drawn')) return null;
+  var only = q === null || q === 'only', PX = 1369, ROW = 8, SEG = 28, FOOT = 2468, g = new THREE.Group();
   function pole(py) { return 208 + 0.0317 * (py - 1100); }   /* the shaft's middle in the drawing, leaning out a little */
   var POLE_R = 26, HEAD = { x: 400, y: 560 };                 /* the band cut for the shaft; the box round its head */
   var CAPS = [[0, 0.09], [0.08, 0.065], [0.5, 0.065], [0.58, 0.085], [0.85, 0.085], [0.95, 0.13], [1.05, 0.13], [1.15, 0.15], [1.3, 0.15], [1.42, 0.125], [1.48, 0.115], [9, 0.125]];
@@ -2038,7 +2049,7 @@ var HYBRID = (function () {
     };
     return m;
   }
-  var mat = blendMat(), mats = [mat];
+  var mat = blendMat(), mats = [mat], out = { group: g, only: only, mats: mats, body: null, seated: false };
   var ink = new THREE.MeshBasicMaterial({ color: 0x16120e, side: THREE.BackSide });
   ink.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0068;'); };
   var im = new Image();
@@ -2155,7 +2166,7 @@ var HYBRID = (function () {
     mat.map = tex(im); mat.needsUpdate = true;
     var poleMat = blendMat(); poleMat.map = mat.map; mats.push(poleMat);
     [[build(rows, false), mat], [build(shaft, true), poleMat]].forEach(function (p) {
-      var m = new THREE.Mesh(p[0], p[1]); m.name = 'armour-hybrid'; g.add(m);
+      var m = new THREE.Mesh(p[0], p[1]); m.name = 'armour-hybrid'; g.add(m); if (!out.body) out.body = m;
       var l = new THREE.Mesh(p[0], ink); l.name = 'armour-hybrid-ink'; g.add(l);
     });
     var hc = makeCanvas(HEAD.x, HEAD.y); hc.getContext('2d').drawImage(im, 0, 0, HEAD.x, HEAD.y, 0, 0, HEAD.x, HEAD.y);
@@ -2167,12 +2178,32 @@ var HYBRID = (function () {
   shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08, 0.003, 0.02); g.add(shadow);
   g.position.set(only ? BAY_X : BAY_X + (RELIEF && !RELIEF.only ? 2.2 : 1.1), 0, FAR_Z + 0.45);
   g.name = 'armour-hybrid'; scene.add(g);
-  return { group: g, only: only, mats: mats };
+  return out;
 })();
+/* the visor's things onto the hybrid's helmet: each where the drawing's slit is (the card's middle is its feet's 1.80 m
+   less the 5 px below them), on the face a ray from the front finds there */
+function seatVisor() {
+  var g = HYBRID.group, rc = new THREE.Raycaster(), lift = ARMOUR.h / 2 - 5 / 1369;
+  g.updateMatrixWorld(true);
+  var d = new THREE.Vector3(0, 0, -1).transformDirection(g.matrixWorld);
+  [[helmetEyes, ARMOUR.slitX, ARMOUR.slitY, 0], [visorPatch, ARMOUR.slitX, ARMOUR.slitY, 0.005],
+   [visorLight, (597 - 539) / 1369, (2473 / 2 - 327) / 1369, 0.006]].forEach(function (v) {
+    rc.set(g.localToWorld(new THREE.Vector3(v[1], v[2] + lift, 1)), d);
+    var hit = rc.intersectObject(HYBRID.body)[0], z = hit ? g.worldToLocal(hit.point.clone()).z : 0.12;
+    g.add(v[0]); v[0].position.set(v[1], v[2] + lift, z + v[3]);
+  });
+  HYBRID.seated = true;
+}
 function updateHybrid() {   /* the torches' warmth by night, the mirror dimmed with the windows, as the built suit's */
   if (!HYBRID) return;
   var k = nightK();
-  if (HYBRID.only) { armour.visible = false; armourShadow.visible = false; }
+  if (HYBRID.only) {   /* on the card's mark, its wobble about the feet, its back turned on the cue */
+    var g = HYBRID.group;
+    armourShadow.visible = false;
+    g.position.x = armour.position.x; g.position.z = armour.position.z;
+    g.rotation.set(0, armour.userData.back ? Math.PI : 0, armour.rotation.z);
+    if (HYBRID.body && !HYBRID.seated) seatVisor();
+  }
   HYBRID.mats.forEach(function (m) { m.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * 0.12 * k); m.envMapIntensity = 1 - 0.65 * k; });
 }
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
@@ -5646,6 +5677,7 @@ function corridorDrawRoom(shown) {
   armour.position.x = mark.x; armour.position.z = mark.z;
   placeArmourShadow();
   var back = has(CUE.back);
+  armour.userData.back = back;
   visorPatch.visible = false; visorPatch.userData.want = false;   /* the drawn visor is shut already; its open state waits for an edit of the drawing */
   armour.material.color.copy(armour.userData.base).multiplyScalar(back ? 0.6 : 1);
   var pose = 'straight';
@@ -5772,7 +5804,10 @@ var TCUE = {
 };
 var trevorAt = null, trevorHops = [], trevorWasIn = false, trevorSpot = null, trevorFollow = null;
 var TREVOR_STOP = { 'suit-feet': 'armour', 'suit-flags': 'armour', 'suit-sill': 'armour', halfway: 'portrait-a', 'by-her': 'her' };
-function helmetPos() { armour.updateMatrixWorld(); return armour.localToWorld(new THREE.Vector3(ARMOUR.slitX, ARMOUR.slitY, 0.05)); }
+function helmetPos() {   /* on the drawn card or the hybrid's helmet, wherever the eyes ride */
+  var p = helmetEyes.parent; p.updateMatrixWorld();
+  return p.localToWorld(helmetEyes.position.clone().setZ(helmetEyes.position.z + 0.05));
+}
 function trevorHopTo(to, from) {
   trevorHops = [];
   var p = from.clone();
@@ -6673,7 +6708,12 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { runtime: function () { return castle; }, chase: function () { return { on: chase.on, t: +chase.t.toFixed(1), lamp: chase.lamp, x: +chase.x.toFixed(2), k: +chase.lk.toFixed(2), whisk: !!chase.whisk, hiding: chaseHides(), openT: +chase.openT.toFixed(1), caught: chase.caught }; }, knit: function () { return { now: PORTRAIT_B.now, hold: KNIT.hold, release: +KNIT.release.toFixed(1), pass: !!KNIT.pass, passUntil: +KNIT.passUntil.toFixed(1), whisper: +KNIT.whisper.toFixed(1), t: +t.toFixed(1) }; }, herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+window.lumosGreybox = { runtime: function () { return castle; }, suit: function (keys, rock) {   /* a look at the suit's cues by name (step, window, back, day, night, christmas), its wobble on rock */
+    var C = { step: CUE.step, window: CUE.window, back: CUE.back, day: TCUE.day, night: TCUE.night, christmas: XMAS_CUE.armour };
+    if (keys) corridorDrawRoom(keys.map(function (k) { return C[k]; }));
+    if (rock) armourRock = ARMOUR_ROCK.time;
+    return { x: +armour.position.x.toFixed(2), z: +armour.position.z.toFixed(2), eyes: helmetEyes.visible, light: visorLight.visible, on: helmetEyes.parent.name };
+  }, chase: function () { return { on: chase.on, t: +chase.t.toFixed(1), lamp: chase.lamp, x: +chase.x.toFixed(2), k: +chase.lk.toFixed(2), whisk: !!chase.whisk, hiding: chaseHides(), openT: +chase.openT.toFixed(1), caught: chase.caught }; }, knit: function () { return { now: PORTRAIT_B.now, hold: KNIT.hold, release: +KNIT.release.toFixed(1), pass: !!KNIT.pass, passUntil: +KNIT.passUntil.toFixed(1), whisper: +KNIT.whisper.toFixed(1), t: +t.toFixed(1) }; }, herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
