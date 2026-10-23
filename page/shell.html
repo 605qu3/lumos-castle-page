@@ -1066,9 +1066,9 @@ var ROOM_THINGS = {
   /* docs/interiors/staff-room.md: against the far (east) end wall, x' 2.25 to 3.75 (y = 50.6 + x'), 0.7 deep, 2.2 high */
   'staff-room': [{ id: 'wardrobe', rect: [141.3, 52.85, 142.0, 54.35], z: [0, 2.2], col: 0x5a4c3e, stand: [139.3, 53.6], look: 1.3 }],
   /* docs/interiors/charms-classroom.md: the front row's desk on the aisle's left, x' 2.3 to 3.6 (y = 71.4 - x'),
-     y' 6.0 to 6.6 (x = 139.6 + y'), 0.72 high; the stand in the aisle short of it */
-  'charms-classroom': [{ id: 'pineapple-desk', rect: [145.6, 67.8, 146.2, 69.1], z: [0, 0.72], col: 0x6a5a48, show: PINE_SHOW, still: true },
-                       { id: 'pineapple', at: [145.9, 68.45], z: [0.72, 0.9], col: 0xb08a3a, show: PINE_SHOW, stand: [144.6, 66.7], look: 0.8 }],
+     y' 6.0 to 6.6 (x = 139.6 + y'), 0.72 high; the stand in the aisle short of it. The desk itself is W1's since req 968,
+     drawn every day, so only the pineapple stands here */
+  'charms-classroom': [{ id: 'pineapple', at: [145.9, 68.45], z: [0.72, 0.9], col: 0xb08a3a, show: PINE_SHOW, stand: [144.6, 66.7], look: 0.8 }],
   /* docs/interiors/divination-classroom.md, her shawl over the chair's back at (0, 4.8) toward the fire (W5B-48, its two
      pieces moved here from W5B_THINGS so the string shows it) */
   'divination-classroom': [{ id: 'shawl-top', rect: [159.7, 76.99, 160.3, 77.215], z: [1.185, 1.205], col: 0xc8c0ae, show: SHAWL, still: true },
@@ -2183,7 +2183,7 @@ var W1 = (function () {
   var F = { 'potions-dungeon': [16, 15.4, 1, 1, false], 'snape-office': [29, 11.6, -1, -1, false],
             'staff-room': [128, 50.6, 1, 1, true], 'staff-passage': [128, 50.6, 1, 1, true],
             'kitchens': [0, 0, 1, 1, false], 'secret-s3': [0, 0, 1, 1, false], 'hall-chamber': [0, 0, 1, 1, false],
-            'filchs-office': [104, 62, 1, 1, false] }[PLACE];
+            'filchs-office': [104, 62, 1, 1, false], 'charms-classroom': [139.6, 71.4, 1, -1, true] }[PLACE];
   if (!F) return out;
   out.on = true;
   var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'wave1-things'; shell.group.add(g);
@@ -2587,6 +2587,16 @@ var W1 = (function () {
     box(3.98, 56.35, 2.1, 4.35, 57.65, 2.8, sandC); box(3.98, 56.5, 2.8, 4.25, 57.5, 4.52, sandC);
     box(4.008, 56.35, -0.01, 4.016, 57.65, 1.4, soot);
     box(3.98, 56.35, -0.01, 4.51, 57.65, 0.015, soot); box(4.5, 55.9, -0.01, 5.3, 58.1, 0.02, sandC);
+  }
+
+  if (PLACE === 'charms-classroom') {
+    /* req 968: docs/interiors/charms-classroom.md, The things (x = 139.6 + y', y = 71.4 - x'): the pupils' pair desks,
+       three rows of four, two each side of the aisle, facing the front, and two chairs behind each (each chair's x' ours,
+       a quarter of the desk in from each end; the board-back form). The scorch on the middle-row desk is WOVEN's */
+    [2.4, 4.2, 6.0].forEach(function (yp) { [0.7, 2.3, 5.4, 7.0].forEach(function (xp) {
+      desk(xp, yp, xp + 1.3, yp + 0.6, 0.72, wood);
+      [0.325, 0.975].forEach(function (u) { chair(xp + u, yp - 0.34, 90, 1, wood, 0.21); });
+    }); });
   }
 
   var owner = PLACE === 'staff-passage' ? 'staff-passage' : PLACE;
@@ -4107,15 +4117,40 @@ var KW_DESK = 'a long envelope marked Kwikspell lying on the desk beside the for
     NUM_TAP = 'the copy of Numerology and Grammatica lying open at its flyleaf, a name inked in a neat hand',
     MS_ROOM = 'the board with an essay title chalked across it',
     MS_TAP = "the bulb in the teacher's hand flickering once as the title is read";
+/* req 968 (Events' strings for Godric's touch runes-ehwaz-slip and req 936 item 12 with People's charms-feather-fire,
+   electives.json and charms.json, 9ef7ce58 and 66877d32, word for word). The Ancient Runes classroom (x = 21.9 + y',
+   y = 71.4 - x'), on its aftermath line: a translation lying on the middle row's aisle desk right of the aisle (x' 4.8
+   to 5.995, y' 3.5 to 4.0; ours, provisional), Ehwaz circled in red ink, "defence" struck out above it and
+   "partnership" written in, the tap `translation`; on its line the sheet comes up before his eye as the Numerology
+   book does, and the written line is the record's. The Charms classroom (x = 139.6 + y', y = 71.4 - x'), from 31
+   October of the Stone's castle: the scorch on the middle-row desk (W1's, Interiors' schedule) and a feather lying
+   on the floor under the back row's desk right of the aisle, its burnt tip out in the aisle (x' 5.4 to 6.7, y' 2.4
+   to 3.0; Fawkes's 7.33 pm: a different desk from the scorch's, not beside it; ours, provisional), the tap
+   `singed feather`, lifted before his eye on its line; on the boys' desk in a lesson from that date (the lesson line
+   and the singed feather's both shown) a feather before each chair, 0.25 in from the near edge, the tap `my feather`:
+   the nearer one twitches or rises to his nose's height, turning slowly, and settles back, as the runtime's line says
+   (the one-in-three is the runtime's; with no runtime the first tap twitches, then two in three rise). Flitwick's
+   heard line needs nothing here. ?feather=on stands the boys' feathers for checks */
+var RU_ROOM = 'a translation left on a desk, one rune circled in red ink',
+    RU_TAP = 'the translation lying flat, the rune Ehwaz circled in red ink and the word "defence" struck out above it, "partnership" written in its place',
+    CH_SCORCH = 'a small black scorch on a middle-row desk top, near its aisle end, where a feather burned',
+    CH_FEATHER = 'a feather lying under a back desk, scorched black at one end',
+    CH_LESSON = "a lesson under way: Professor Flitwick perched on his pile of books behind his desk, the boys' desk theirs with the lesson's things out",
+    CH_LIFT = 'the feather lifted from under the desk and held up to the light, its tip burnt black and curled, the rest of it still white',
+    CH_TWITCH = 'his feather twitches on the desk, shivers once and settles flat again',
+    CH_RISE = 'his feather rises off the desk, wavers and floats up to the height of his nose, turning slowly';
 var WOVEN = (function () {
-  var F = {   /* each room's frame (Filch's office as FOFFICE's, the two classrooms as ELECT's) */
+  var F = {   /* each room's frame (Filch's office as FOFFICE's, the classrooms as ELECT's and W1's) */
     'filchs-office': function (a, b) { return [104 + a, 62 + b]; },
+    'charms-classroom': function (a, b) { return [139.6 + b, 71.4 - a]; },
+    'ancient-runes-classroom': function (a, b) { return [21.9 + b, 71.4 - a]; },
     'arithmancy-classroom': function (a, b) { return [18.4 + b, 17.4 - a]; },
     'muggle-studies-classroom': function (a, b) { return [19.1 - b, 63.4 + a]; }
   }[PLACE];
   if (!F || Q.get('woven') === 'off') return null;
   var z0 = shell.place.floor, P = function (a, b, z) { var w = F(a, b); return shell.toLocal(w[0], w[1], z0 + z); };
-  var out = { lift: -1, flick: -1, snatched: false };
+  var out = { lifts: {}, flick: -1, snatched: false, tries: 0, fx: null };
+  function liftable(k, list) { out.lifts[k] = { t: -1, parts: list.map(function (m) { return { m: m, at: m.position.clone(), q: m.quaternion.clone() }; }) }; }
   function own(m, tap) { m.userData.owner = PLACE; if (tap) m.userData.tap = tap; else m.raycast = function () {}; shell.group.add(m); return m; }
   function unseen(a, b, tap) { return own(thingBox(shell.group, P, a, b, new THREE.MeshBasicMaterial({ visible: false })), tap); }
   function canvasTex(w, h, draw) {
@@ -4155,8 +4190,63 @@ var WOVEN = (function () {
     var cq = flat(0.38, 0.26, null, 1.4, 3.75, 0.7235, [0, 1]); cover.quaternion.copy(cq.quaternion); cover.position.copy(cq.position); cover.scale.set(0.38, 0.26, 0.011);
     var leaf = own(flat(0.36, 0.25, new THREE.MeshStandardMaterial({ map: pages, roughness: 0.9 }), 1.4, 3.75, 0.7295, [0, 1]), 'numerology');
     cover.name = 'numerology-cover'; leaf.name = 'numerology-pages'; out.book = [cover, leaf];
-    out.bookParts = out.book.map(function (m) { return { m: m, at: m.position.clone(), q: m.quaternion.clone() }; });
+    liftable('book', out.book);
     out.book.forEach(function (m) { m.visible = !window.CastleEvents; });
+  }
+  function featherTex(burnt) {   /* an owl feather along the canvas, its quill at the left; a burnt one's tip black and curled */
+    return canvasTex(512, 96, function (x, w, h) {
+      x.clearRect(0, 0, w, h); x.fillStyle = '#ece8de';
+      x.beginPath(); x.moveTo(40, h / 2); x.bezierCurveTo(120, 2, 380, 4, 500, h / 2 - 6); x.bezierCurveTo(400, h - 2, 140, h, 40, h / 2); x.fill();
+      x.strokeStyle = '#b9b2a2'; x.lineWidth = 4; x.beginPath(); x.moveTo(4, h / 2); x.lineTo(496, h / 2 - 5); x.stroke();
+      x.strokeStyle = 'rgba(160,150,132,0.5)'; x.lineWidth = 1.5;
+      for (var i = 70; i < 480; i += 14) { x.beginPath(); x.moveTo(i, h / 2 - 1); x.lineTo(i + 26, i < 260 ? 16 : 22); x.moveTo(i, h / 2 + 1); x.lineTo(i + 24, h - 18); x.stroke(); }
+      if (burnt) {
+        var gr = x.createLinearGradient(380, 0, 470, 0); gr.addColorStop(0, 'rgba(26,22,18,0)'); gr.addColorStop(1, 'rgba(26,22,18,1)');
+        x.globalCompositeOperation = 'source-atop'; x.fillStyle = gr; x.fillRect(380, 0, 132, h); x.globalCompositeOperation = 'source-over';
+        x.fillStyle = '#1a1612'; x.beginPath(); x.arc(486, h / 2 - 12, 11, 0, Math.PI * 1.6); x.lineTo(486, h / 2 - 12); x.fill();
+      }
+    });
+  }
+  function feather(burnt, cx, cy, z, along) {   /* a feather 0.3 long lying flat at (x', y', z), its tip toward along */
+    var m = flat(0.3, 0.075, new THREE.MeshStandardMaterial({ map: featherTex(burnt), transparent: true, alphaTest: 0.4, roughness: 0.9, side: THREE.DoubleSide }), cx, cy, z, along);
+    m.rotateZ(Math.PI / 2); return own(m);   /* the canvas's length (its tip at +x) turned onto along */
+  }
+  if (PLACE === 'ancient-runes-classroom') {
+    /* the sheet 0.21 by 0.28 on the desk's top (0.72), 3 mm over it, read from the chair behind (y' 3.0 to 3.42) */
+    var sheet = canvasTex(420, 560, function (x, w, h) {
+      x.fillStyle = '#e8dfc6'; x.fillRect(0, 0, w, h);
+      x.fillStyle = '#4a3f33'; x.font = 'bold 26px Georgia, serif'; x.textAlign = 'left'; x.fillText('Translation', 30, 50);
+      x.fillStyle = '#8a8070'; for (var i = 0; i < 4; i++) x.fillRect(30, 80 + i * 26, 360, 3);
+      x.strokeStyle = '#2e2a26'; x.lineWidth = 6; x.lineCap = 'round';   /* Ehwaz: two staves and the cross between their heads */
+      x.beginPath(); x.moveTo(80, 330); x.lineTo(80, 230); x.lineTo(115, 265); x.lineTo(150, 230); x.lineTo(150, 330); x.stroke();
+      x.strokeStyle = '#b3241c'; x.lineWidth = 4; x.beginPath(); x.ellipse(115, 280, 62, 70, 0, 0, Math.PI * 2); x.stroke();
+      x.fillStyle = '#2a2a48'; x.font = 'italic 30px Georgia, serif'; x.fillText('defence', 205, 255);
+      x.strokeStyle = '#2a2a48'; x.lineWidth = 3; x.beginPath(); x.moveTo(200, 246); x.lineTo(318, 244); x.stroke();
+      x.fillText('partnership', 205, 300);
+      x.fillStyle = '#8a8070'; for (var j = 0; j < 6; j++) x.fillRect(30, 390 + j * 26, j === 5 ? 200 : 360, 3);
+    });
+    out.sheet = own(flat(0.21, 0.28, new THREE.MeshStandardMaterial({ map: sheet, roughness: 0.9 }), 5.3, 3.75, 0.723, [0, 1]), 'translation');
+    out.sheet.name = 'runes-translation'; out.sheet.visible = !window.CastleEvents;
+    liftable('sheet', [out.sheet]);
+  }
+  if (PLACE === 'charms-classroom') {
+    out.singed = feather(true, 5.47, 2.68, 0.006, [-1, 0.25]); out.singed.name = 'charms-singed-feather';
+    out.singed.visible = !window.CastleEvents;
+    liftable('singed', [out.singed]);
+    out.singedTap = unseen([5.2, 2.45, -0.01], [5.75, 2.9, 0.14], 'singed feather'); out.singedTap.name = 'charms-singed-feather-tap';
+    out.mine = [feather(false, 5.725, 6.25, 0.724, [0.6, 1]), feather(false, 6.375, 6.25, 0.724, [-0.6, 1])];
+    out.mine.forEach(function (m, i) { m.name = 'charms-my-feather-' + i; m.userData.at = m.position.clone(); m.userData.q = m.quaternion.clone(); m.visible = !window.CastleEvents || Q.get('feather') === 'on'; });
+    out.mineTap = unseen([5.45, 6.04, 0.71], [6.65, 6.46, 0.82], 'my feather'); out.mineTap.name = 'charms-my-feather-tap';
+    /* the scorch, Interiors' (3.3, 4.5) on the middle-row desk left of the aisle: a ragged burn 0.08 across fading out, 5 mm over the top */
+    var burn = canvasTex(128, 128, function (x, w, h) {
+      x.clearRect(0, 0, w, h);
+      for (var i = 0; i < 9; i++) {
+        var a = i * 0.7, r = 18 + (i * 37 % 13), cx = 64 + Math.cos(a) * 9, cy = 64 + Math.sin(a) * 7, g = x.createRadialGradient(cx, cy, 2, cx, cy, r);
+        g.addColorStop(0, 'rgba(20,16,12,0.55)'); g.addColorStop(0.6, 'rgba(40,30,22,0.3)'); g.addColorStop(1, 'rgba(60,44,30,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+      }
+    });
+    out.scorch = own(flat(0.12, 0.12, new THREE.MeshStandardMaterial({ map: burn, transparent: true, depthWrite: false, roughness: 1 }), 3.3, 4.5, 0.725, [0.4, 1]));
+    out.scorch.name = 'charms-desk-scorch'; out.scorch.visible = !window.CastleEvents || Q.get('scorch') === 'on';
   }
   if (PLACE === 'muggle-studies-classroom') {
     /* the title across the board (x' 2.5 to 5.5, its face at y' 10.65, 0.885 to 2.1), 5 mm before it, x' 3.05 to 5.45 and 1.65 to 1.95, clear of the teacher at the table's diagram end */
@@ -4179,33 +4269,67 @@ function wovenEnv(on) { if (WOVEN && WOVEN.env) { WOVEN.env.forEach(function (m)
 if (WOVEN && WOVEN.env) wovenEnv(!window.CastleEvents || Q.get('office') === 'held');
 thingCues[KW_DESK] = function () { if (WOVEN && WOVEN.env && !WOVEN.snatched) wovenEnv(true); showLines([{ medium: 'seen', sound: KW_DESK }]); };
 thingCues[KW_SNATCH] = function () { showLines([{ medium: 'seen', sound: KW_SNATCH, on: function () { if (WOVEN && WOVEN.env) { WOVEN.snatched = true; wovenEnv(false); } } }]); };
-thingCues[NUM_TAP] = function () { showLines([{ medium: 'seen', sound: NUM_TAP, on: function () { if (WOVEN && WOVEN.book && WOVEN.lift < 0) WOVEN.lift = 0; } }]); };
+function wovenLift(k) { var L = WOVEN && WOVEN.lifts[k]; if (L && L.t < 0) L.t = 0; }
+thingCues[NUM_TAP] = function () { showLines([{ medium: 'seen', sound: NUM_TAP, on: function () { wovenLift('book'); } }]); };
+thingCues[RU_TAP] = function () { wovenLift('sheet'); showLines([{ medium: 'seen', sound: RU_TAP }]); };   /* lifted at once: the record's written line, read off it, may show first */
+thingCues[CH_LIFT] = function () { showLines([{ medium: 'seen', sound: CH_LIFT, on: function () { wovenLift('singed'); } }]); };
+function featherGo(kind) {   /* the boys' feather nearer his eye: a twitch, or the rise to his nose's height */
+  if (!WOVEN || !WOVEN.mine || WOVEN.fx) return;
+  var e = shell.group.worldToLocal(camera.position.clone());
+  var m = WOVEN.mine.slice().sort(function (a, b) { return a.userData.at.distanceTo(e) - b.userData.at.distanceTo(e); })[0];
+  WOVEN.fx = { kind: kind, t: 0, m: m, top: Math.max(m.userData.at.y + 0.25, e.y - 0.1) };
+}
+thingCues[CH_TWITCH] = function () { showLines([{ medium: 'seen', sound: CH_TWITCH, on: function () { featherGo('twitch'); } }]); };
+thingCues[CH_RISE] = function () { showLines([{ medium: 'seen', sound: CH_RISE, on: function () { featherGo('rise'); } }]); };
 thingCues[MS_TAP] = function () { showLines([{ medium: 'seen', sound: MS_TAP, on: function () { if (WOVEN && WOVEN.spot) WOVEN.flick = 0; } }]); };
 var WOVEN_SOLO = {   /* with no runtime, each tap plays its own string */
   kwikspell: function () { if (!WOVEN.snatched) thingCues[KW_SNATCH](); else showLines([{ medium: 'seen', sound: KW_AGAIN }]); },
   chains: function () { showLines([{ medium: 'seen', sound: CH_RUB }]); },
   numerology: function () { thingCues[NUM_TAP](); showLines([{ medium: 'written', text: 'H. Granger' }]); },
-  'muggle board': function () { showLines([{ medium: 'written', text: 'Explain why Muggles Need Electricity' }]); thingCues[MS_TAP](); }
+  'muggle board': function () { showLines([{ medium: 'written', text: 'Explain why Muggles Need Electricity' }]); thingCues[MS_TAP](); },
+  translation: function () { thingCues[RU_TAP](); showLines([{ medium: 'written', text: 'Ehwaz: defence, struck out. Partnership.' }]); },
+  'singed feather': function () { thingCues[CH_LIFT](); },
+  'my feather': function () { var w = WOVEN.tries++ < 1 || Math.random() >= 2 / 3; thingCues[w ? CH_TWITCH : CH_RISE](); }
 };
 function wovenShown(shown) {
   if (!WOVEN) return [];
-  if (WOVEN.book && WOVEN.lift < 0) WOVEN.book.forEach(function (m) { m.visible = shown.indexOf(NUM_ROOM) >= 0; });
-  if (WOVEN.title) WOVEN.title.visible = shown.indexOf(MS_ROOM) >= 0;
-  if (WOVEN.env && shown.indexOf(KW_DESK) >= 0 && !WOVEN.snatched) wovenEnv(true);
-  return [NUM_ROOM, MS_ROOM, KW_DESK].filter(function (s) { return shown.indexOf(s) >= 0; });
+  var has = function (s) { return shown.indexOf(s) >= 0; };
+  if (WOVEN.book && WOVEN.lifts.book.t < 0) WOVEN.book.forEach(function (m) { m.visible = has(NUM_ROOM); });
+  if (WOVEN.title) WOVEN.title.visible = has(MS_ROOM);
+  if (WOVEN.env && has(KW_DESK) && !WOVEN.snatched) wovenEnv(true);
+  if (WOVEN.sheet && WOVEN.lifts.sheet.t < 0) WOVEN.sheet.visible = has(RU_ROOM);
+  if (WOVEN.singed && WOVEN.lifts.singed.t < 0) WOVEN.singedTap.visible = WOVEN.singed.visible = has(CH_FEATHER);
+  if (WOVEN.scorch) WOVEN.scorch.visible = has(CH_SCORCH) || Q.get('scorch') === 'on';
+  if (WOVEN.mine && !WOVEN.fx) WOVEN.mineTap.visible = WOVEN.mine.map(function (m) { return (m.visible = (has(CH_LESSON) && has(CH_FEATHER)) || Q.get('feather') === 'on'); })[0];
+  return [NUM_ROOM, MS_ROOM, KW_DESK, RU_ROOM, CH_FEATHER].concat(WOVEN.scorch ? [CH_SCORCH] : []).filter(has);
 }
 function updateWoven(dt) {
   if (!WOVEN) return;
-  if (WOVEN.lift >= 0) {   /* up to 0.38 m before his eye over 0.8 s, turned to him, held 5 s, back over 0.8 s */
-    var t = (WOVEN.lift += dt), f = t < 0.8 ? easeInOut(t / 0.8) : t < 5.8 ? 1 : t < 6.6 ? 1 - easeInOut((t - 5.8) / 0.8) : 0;
+  Object.keys(WOVEN.lifts).forEach(function (k) {   /* up to 0.38 m before his eye over 0.8 s, turned to him, held 5 s, back over 0.8 s */
+    var L = WOVEN.lifts[k];
+    if (L.t < 0) return;
+    var t = (L.t += dt), f = t < 0.8 ? easeInOut(t / 0.8) : t < 5.8 ? 1 : t < 6.6 ? 1 - easeInOut((t - 5.8) / 0.8) : 0;
     var fw = camera.getWorldDirection(new THREE.Vector3()), tgt = shell.group.worldToLocal(camera.position.clone().addScaledVector(fw, 0.38));
     var gq = shell.group.getWorldQuaternion(new THREE.Quaternion()).invert().multiply(camera.quaternion.clone());
-    var c = WOVEN.bookParts[0].at;
-    WOVEN.bookParts.forEach(function (p) {
+    var c = L.parts[0].at;
+    L.parts.forEach(function (p) {
       var off = p.at.clone().sub(c).applyQuaternion(p.q.clone().invert()).applyQuaternion(gq);
       p.m.position.lerpVectors(p.at, tgt.clone().add(off), f); p.m.quaternion.copy(p.q).slerp(gq, f);
     });
-    if (t >= 6.6) { WOVEN.lift = -1; WOVEN.bookParts.forEach(function (p) { p.m.position.copy(p.at); p.m.quaternion.copy(p.q); }); }
+    if (t >= 6.6) { L.t = -1; L.parts.forEach(function (p) { p.m.position.copy(p.at); p.m.quaternion.copy(p.q); }); }
+  });
+  if (WOVEN.fx) {   /* the twitch: a shiver of 0.7 s; the rise: up over 2 s, wavering and turning, held to 5 s, down by 7.5 s */
+    var x = WOVEN.fx, m = x.m, a = m.userData.at, q0 = m.userData.q, s = (x.t += dt), spin = new THREE.Quaternion();
+    if (x.kind === 'twitch') {
+      var d = s < 0.7 ? Math.sin(s * 40) * 0.12 * (1 - s / 0.7) : 0;
+      m.position.set(a.x, a.y + Math.abs(d) * 0.03, a.z); m.quaternion.copy(q0).multiply(spin.setFromAxisAngle(new THREE.Vector3(1, 0, 0), d));
+      if (s >= 0.7) WOVEN.fx = null;
+    } else {
+      var u = s < 2 ? easeInOut(s / 2) : s < 5 ? 1 : s < 7.5 ? 1 - easeInOut((s - 5) / 2.5) : 0, w = Math.sin(s * 2.3) * 0.04 * u;
+      m.position.set(a.x + w, a.y + (x.top - a.y) * u, a.z + Math.cos(s * 1.7) * 0.03 * u);
+      m.quaternion.copy(spin.setFromAxisAngle(new THREE.Vector3(0, 1, 0), s * 0.9 * u)).multiply(q0);
+      if (s >= 7.5) { m.position.copy(a); m.quaternion.copy(q0); WOVEN.fx = null; }
+    }
   }
   if (WOVEN.flick >= 0) {   /* once: on 0.09 s, off 0.07, on 0.12 */
     var k = (WOVEN.flick += dt);
@@ -5391,7 +5515,10 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return CUP ? { open: CUP.open, target: CUP.target, run: CUP.run, lift: CUP.lift } : null; },
   /* req 945: the tables' dishes and steam, the corridor's paintings and torches; a cue string passed in plays it */
   woven: function (cue) { if (cue) cueTable[cue]();   /* req 960: a cue string; the things' state */
-    return WOVEN ? { env: WOVEN.env ? WOVEN.env[0].visible : null, book: WOVEN.book ? WOVEN.book[0].visible : null, title: WOVEN.title ? WOVEN.title.visible : null, lift: WOVEN.lift, flick: WOVEN.flick } : null; },
+    return WOVEN ? { env: WOVEN.env ? WOVEN.env[0].visible : null, book: WOVEN.book ? WOVEN.book[0].visible : null, title: WOVEN.title ? WOVEN.title.visible : null,
+      lift: Object.keys(WOVEN.lifts).map(function (k) { return k + ' ' + WOVEN.lifts[k].t.toFixed(2); }).join(', '), flick: WOVEN.flick,
+      sheet: WOVEN.sheet ? WOVEN.sheet.visible : null, singed: WOVEN.singed ? WOVEN.singed.visible : null, scorch: WOVEN.scorch ? WOVEN.scorch.visible : null,
+      mine: WOVEN.mine ? WOVEN.mine[0].visible : null, fx: WOVEN.fx ? WOVEN.fx.kind + ' ' + WOVEN.fx.t.toFixed(2) : null, tries: WOVEN.tries } : null; },
   elect: function () { return ELECT ? { board: ELECT.board.visible, room: ELECT.room.visible, cls: ELECT.cls.filter(function (m) { return m.visible; }).length } : null; },
   kitchens: function (cue) { if (cue) cueTable[cue]();
     return { dishes: KDISH ? KDISH.state : null, puffs: KDISH ? KDISH.puffs.filter(function (p) { return p.s.visible; }).length : null,
