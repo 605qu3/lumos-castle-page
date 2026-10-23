@@ -1785,18 +1785,15 @@ function farView(F, M, toLocal, panes, paneMat) {
   rt.texture.mapping = THREE.CubeRefractionMapping;
   var cam = new THREE.CubeCamera(0.5, 5000, rt);
   cam.position.set(0, EYE, 0); scene.add(cam);
-  var glass = new THREE.MeshBasicMaterial({ envMap: rt.texture, refractionRatio: 1.0, side: THREE.DoubleSide });
-  /* refract() at ratio 1 passes the line of sight straight on only when the normal faces him; a pane whose normal
-     faces out (the shader does not turn it for a back face) would mirror the room's side instead, so turn each in */
-  panes.forEach(function (p) {
-    p.material = glass; p.updateMatrixWorld();
-    var w = new THREE.Vector3(), n = new THREE.Vector3(0, 0, 1);
-    p.getWorldPosition(w); n.transformDirection(p.matrixWorld);
-    if (n.x * w.x + n.z * w.z > 0) {
-      p.geometry = p.geometry.clone(); var a = p.geometry.attributes.normal;
-      for (var i = 0; i < a.count; i++) a.setXYZ(i, -a.getX(i), -a.getY(i), -a.getZ(i));
-    }
-  });
+  /* v71 (req 975 (c)): Phong, not Basic, so the line of sight is taken at each pixel; Basic takes it at the pane's four
+     corners and blends between them, which stretched and shifted the view from close to the glass (the turbaned
+     professor read as a tall sliver well off his place). Black, no shine, mixed wholly to the cube: lights do not touch it */
+  var glass = new THREE.MeshPhongMaterial({ color: 0x000000, specular: 0x000000, shininess: 0, envMap: rt.texture, refractionRatio: 1.0,
+    combine: THREE.MixOperation, reflectivity: 1.0, side: THREE.DoubleSide });
+  /* refract() at ratio 1 passes the line of sight straight on only when the normal faces him. Phong, two-sided, turns
+     the normal to face him on a back face itself (v71), so the panes keep their own normals: turned in by hand as for
+     Basic, a pane seen from its back was turned out again and mirrored the castle behind him */
+  panes.forEach(function (p) { p.material = glass; });
   var mode = false;
   function draw(night) {
     mode = !!night;
