@@ -457,6 +457,65 @@
       ],
       "starts": [],
       "canon": "the silent partner of transfiguration.trevor-hop; about one wait in six"
+    },
+    {
+      "id": "transfiguration.hogsmeade-forms",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 30-120 s",
+      "when": [
+        "place = transfiguration classroom",
+        "year = 3",
+        "lessons = on",
+        "time != night",
+        "date >= 10-01",
+        "date <= 10-30",
+        "days since forms_on >= 5"
+      ],
+      "who": [
+        {
+          "as": "mcgonagall",
+          "role": "voice",
+          "name": "mcgonagall",
+          "mark": "her desk"
+        },
+        {
+          "as": "pupil",
+          "role": "voice",
+          "name": "a third-year at the back",
+          "mark": "the aisle"
+        }
+      ],
+      "show": [
+        "third-years file past Professor McGonagall's desk handing her their signed Hogsmeade forms; one boy hunts through his bag, tipping out books and a squashed quill, for a form that is not there"
+      ],
+      "lines": [
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "transfiguration.hogsmeade-forms-says",
+          "sound": "Professor McGonagall at her desk, to the whole class",
+          "text": [
+            "No form, no visiting the village, so don't forget!"
+          ],
+          "canon": "hers, word for word: PoA 8 L16250 (\"No form, no visiting the village, so don't forget!\", read in the canon tool, 22 October 2026)"
+        },
+        {
+          "speaker": "pupil",
+          "medium": "heard",
+          "key": "transfiguration.hogsmeade-forms-bag",
+          "sound": "a third-year rummaging in his bag, under his breath",
+          "text": [
+            "It was in here this morning. I swear it was in here."
+          ],
+          "canon": "ours, in a pupil's voice; nothing punished, the form simply not there"
+        }
+      ],
+      "starts": [
+        "stamp forms_on"
+      ],
+      "canon": "Godric's woven touch hogsmeade-forms-halloween (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): before Hallowe'en the third-years hand McGonagall their signed Hogsmeade forms, one hunting through a bag for a form that is not there (PoA 8 L16250, read in the canon tool, 22 October 2026: \"you should hand Hogsmeade permission forms to me before Hallowe'en. No form, no visiting the village\"); year 3, in a lesson hour in her classroom, from 1 to 30 October, five days apart at the least; the pupil unnamed"
     }
   ]
 }

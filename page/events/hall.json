@@ -820,6 +820,94 @@
       ],
       "starts": [],
       "canon": "the silent partner of hall.norris-follows-hagrid; about one wait in six"
+    },
+    {
+      "id": "hall.hourglass-cheer",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "one_of": "hall-hourglass-watch",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = entrance hall",
+        "year = 1",
+        "time = morning",
+        "lessons = on",
+        "summer = no",
+        "days since hourglass_watch_on >= 2"
+      ],
+      "who": [
+        {
+          "as": "watcher",
+          "role": "voice",
+          "name": "a Gryffindor at the hourglasses",
+          "mark": "hall"
+        }
+      ],
+      "show": [
+        "a knot of pupils stops under the house hourglasses on the west wall, looking up; the rubies in Gryffindor's glass stand higher than they did yesterday, and the Gryffindors cheer"
+      ],
+      "lines": [
+        {
+          "speaker": "watcher",
+          "medium": "heard",
+          "key": "hall.hourglass-cheer-says",
+          "sound": "a Gryffindor under the hourglasses, to his friends",
+          "text": [
+            "We're up on yesterday! Somebody must have done something right."
+          ],
+          "canon": "ours, in a pupil's voice; PS 15 L5089, the Gryffindors who looked at the points the morning after (\"passing the giant hourglasses that recorded the house points the next day\"), read in the canon tool, 22 October 2026"
+        }
+      ],
+      "starts": [
+        "stamp hourglass_watch_on"
+      ],
+      "canon": "Godric's woven touch house-hourglasses (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): pupils stop at the house-points hourglasses and groan or cheer at how the rubies and emeralds moved overnight (PS 15 L5089, read in the canon tool, 22 October 2026: \"Gryffindors passing the giant hourglasses that recorded the house points the next day\"); year 1, in the morning of a term day, two days apart at the least; the cheer is the school's own level, never the boys' stones lost or gained (the page draws the glasses from schoolLevels())"
+    },
+    {
+      "id": "hall.hourglass-groan",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "one_of": "hall-hourglass-watch",
+      "weight": 1,
+      "moment": "wait 10-60 s",
+      "when": [
+        "place = entrance hall",
+        "year = 1",
+        "time = morning",
+        "lessons = on",
+        "summer = no",
+        "days since hourglass_watch_on >= 2"
+      ],
+      "who": [
+        {
+          "as": "watcher",
+          "role": "voice",
+          "name": "a Slytherin at the hourglasses",
+          "mark": "hall"
+        }
+      ],
+      "show": [
+        "a knot of pupils stops under the house hourglasses on the west wall, looking up; the emeralds in Slytherin's glass have slipped back since yesterday, and the Slytherins groan"
+      ],
+      "lines": [
+        {
+          "speaker": "watcher",
+          "medium": "heard",
+          "key": "hall.hourglass-groan-says",
+          "sound": "a Slytherin under the hourglasses, to his friends",
+          "text": [
+            "Back down again overnight. Who took them this time?"
+          ],
+          "canon": "ours, in a pupil's voice; PS 15 L5089, the house points read the morning after (\"passing the giant hourglasses that recorded the house points the next day\"), read in the canon tool, 22 October 2026"
+        }
+      ],
+      "starts": [
+        "stamp hourglass_watch_on"
+      ],
+      "canon": "Godric's woven touch house-hourglasses (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): the groan side of hall.hourglass-cheer, the emeralds' fall, the pair sharing one_of hall-hourglass-watch so one fires a visit; the school's own level, never the boys' stones"
     }
   ]
 }

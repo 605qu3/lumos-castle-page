@@ -960,6 +960,15 @@
             "Is this the way to Transfiguration? I've been up this stair three times and it keeps taking me somewhere else."
           ],
           "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): his question, any pupil's day after the first week; the stair that takes him elsewhere is PS 8 L2722 (\"some that led somewhere different on a Friday\"), read in the canon tool, 22 October 2026"
+        },
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-staircases",
+          "text": [
+            "They say there are a hundred and forty-two staircases in this castle, and one of them goes somewhere different on Fridays."
+          ],
+          "canon": "Godric's woven touch staircases-142 (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): the lost first-year moans of a hundred and forty-two staircases, one going somewhere different on Fridays (PS 8 L2722, read in the canon tool, 22 October 2026: \"There were a hundred and forty-two staircases at Hogwarts\" and \"some that led somewhere different on a Friday\"); his words ours; the record has no year gate, the first-year himself being a first-year in any year"
         }
       ],
       "starts": [

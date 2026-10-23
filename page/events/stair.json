@@ -962,6 +962,46 @@
         "stamp tabby_on"
       ],
       "canon": "Godric's woven touch mcgonagall-tabby-cat (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): early one morning a tabby cat with markings round its eyes sits very still on a corridor windowsill watching him, gone when he looks again (PS 1 L39, \"the same markings around its eyes\", and L95, \"square glasses exactly the shape of the markings the cat had had around its eyes\"; L95 also \"he turned to smile at the tabby, but it had gone\", read in the canon tool, 22 October 2026); year 1, between six and nine in the morning, a fortnight apart at the least; the cue names no Professor, it is only the cat (the same markings as transfiguration.cat's)"
+    },
+    {
+      "id": "stair.gobstones-squirt",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = corridor",
+        "year = 3",
+        "time != night",
+        "days since gobstones_on >= 3"
+      ],
+      "who": [
+        {
+          "as": "loser",
+          "role": "voice",
+          "name": "an older pupil on the ledge",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "two older pupils sit on a window ledge with a set of Gobstones between them; one loses a point, and the stones squirt a nasty-smelling liquid into his face"
+      ],
+      "lines": [
+        {
+          "speaker": "loser",
+          "medium": "heard",
+          "key": "stair.gobstones-spluttering",
+          "sound": "an older pupil spluttering on a window ledge, his friend laughing beside him",
+          "text": [
+            "Ugh! It's gone right up my nose!"
+          ],
+          "canon": "ours, in an older pupil's voice; nothing punished, the loser only wet and the other pupil laughing"
+        }
+      ],
+      "starts": [
+        "stamp gobstones_on"
+      ],
+      "canon": "Godric's woven touch gobstones-squirt (22 October 2026, 9.24 to 9.26 pm, relayed by Fawkes): two older pupils play Gobstones on a window ledge and one is squirted when he loses a point (PoA 4 L14230, read in the canon tool, 22 October 2026: \"a wizarding game rather like marbles, in which the stones squirted a nasty-smelling liquid into the other player's face when they lost a point\"); year 3, in the corridor by day, now and then, three days apart at the least; the pupils unnamed"
     }
   ]
 }
