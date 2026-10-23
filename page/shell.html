@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=512"></script>
+<script src="castle-model.js?v=513"></script>
 <script src="castle-paint.js?v=105"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -2197,6 +2197,35 @@ if (H71.on && window.CharmsDesks) {
       else if (r.why) showLines([{ medium: 'seen', sound: r.why[0] + '. ' + r.why[1] }]);
     } });
 }
+/* the head's gargoyle (the model's `heads-gargoyle`, ledger 256 part B: "a large and extremely ugly stone gargoyle",
+   CoS 11 L10578, "standing halfway along an empty corridor", GoF 28 L32119) against heads-corridor's east wall at
+   (158.6, 33.4), before the hidden way: a plinth, a hunched body on clawed feet, folded wings, a big head with an
+   underbite, fangs and horns, about 2.0 high, in the P4 high-grey weathered dark; plain pieces, no tap of its own yet
+   (the password and its hop aside are Events' and Charms'); u out from the wall, v along it (north +) */
+var HGARG = (function () {
+  if (PLACE !== 'heads-corridor') return null;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'heads-gargoyle'; g.userData.owner = PLACE; shell.group.add(g);
+  var t = window.CASTLE_TONES && CASTLE_TONES.surfaces && CASTLE_TONES.surfaces['high-grey'];
+  var st = kit.solid(new THREE.Color(t ? t.hex : '#8a8c88').multiplyScalar(0.72).getHex()), dark = kit.solid(0x1a1816);
+  var P = function (u, v, z) { return shell.toLocal(158.6 - u, 33.4 + v, z0 + z); };
+  function b(u0, v0, za, u1, v1, zb, mt) { var m = thingBox(g, P, [u0, v0, za], [u1, v1, zb], mt || st); m.userData.owner = PLACE; m.raycast = function () {}; return m; }
+  b(0, -0.45, 0, 0.6, 0.45, 0.55); b(0, -0.48, 0.55, 0.63, 0.48, 0.62);                 /* the plinth and its cap */
+  b(0.05, -0.38, 0.62, 0.48, 0.38, 1.0);                                                  /* the haunches */
+  [-1, 1].forEach(function (s) {
+    b(0.4, s * 0.12, 0.62, 0.62, s * 0.3, 0.72);                                          /* a clawed front foot */
+    b(0.38, s * 0.14, 0.7, 0.5, s * 0.27, 1.05);                                          /* its foreleg */
+    b(0.0, s * 0.3, 0.95, 0.3, s * 0.41, 1.6); b(0.0, s * 0.32, 1.6, 0.14, s * 0.4, 1.76);  /* a folded wing, its tip up */
+    b(0.25, s * 0.13, 1.78, 0.35, s * 0.2, 1.98);                                         /* a horn */
+    b(0.3, s * 0.22, 1.58, 0.42, s * 0.3, 1.72);                                          /* a flap of ear */
+    b(0.58, s * 0.08, 1.55, 0.6, s * 0.12, 1.6, dark);                                    /* an eye, sunk under the brow */
+    b(0.55, s * 0.06, 1.53, 0.6, s * 0.1, 1.58);                                          /* a fang over the lip */
+  });
+  b(0.05, -0.3, 1.0, 0.46, 0.3, 1.45);                                                    /* the hunched body */
+  b(0.2, -0.22, 1.4, 0.58, 0.22, 1.78);                                                   /* the big head */
+  b(0.52, -0.2, 1.6, 0.6, 0.2, 1.67);                                                     /* the brow, jutting */
+  b(0.46, -0.14, 1.42, 0.6, 0.14, 1.53);                                                  /* the underslung jaw */
+  return g;
+})();
 /* the lake rooms' seats (ledger 258; Godric's 1 at 4.03 pm on architect-lake-rooms-windows-1023, 23 October 2026): in
    each window the model gives a `recess` (castle-shell.js v75 draws the recess), its seat, in the recess's frame (u
    along the wall from the window's middle, v out from the corridor's face): in the hall range's embrasures two stone
