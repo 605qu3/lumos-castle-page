@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=502"></script>
-<script src="castle-paint.js?v=99"></script>
+<script src="castle-model.js?v=503"></script>
+<script src="castle-paint.js?v=100"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -297,7 +297,8 @@ PAINTED = PAINTED.concat(['lake-tower-b', 'lake-tower-g', 'lake-tower-1', 'lake-
 PAINTED = PAINTED.concat(['drum-room-g', 'west-tower-room-g', 'transfiguration-store', 'tapestry-room']);
 /* v163, req 869 A on B (ledger 228): the round cellar under it, off lake-corridor-b-west's east end; a rough build, the door only, its floor earth */
 PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', 'hospital-dispensary', 'hospital-linen',
-  'defence-sitting-room', 'defence-bedroom', 'unused-classroom-2-west', 'unused-classroom-2-east', 'classroom-store-2-west', 'lost-games-room']);
+  'defence-sitting-room', 'defence-bedroom', 'unused-classroom-2-west', 'unused-classroom-2-east', 'classroom-store-2-west', 'lost-games-room',
+  'west-refuge-ring']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
@@ -481,10 +482,14 @@ shell.places.forEach(function (p, pi) {
   var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
   /* a painted room's plain four scaled to its size, so a small office is not lit as the Potions dungeon (about 12 m across the full strength) */
   var painted = PAINTED.indexOf(p.id) >= 0, k = painted ? Math.max(0.3, Math.min(1, Math.sqrt((x1 - x0) * (y1 - y0)) / 12)) : 1;
-  [[0.25, 0.25], [0.75, 0.25], [0.75, 0.75], [0.25, 0.75]].forEach(function (f) {
+  /* v172 (H69): a room's own `lamps` (site points) in place of the four, where the quarter points of its box fall
+     outside it (a passage round a drum: all four stood in the room it rounds, behind its inner wall, which went black) */
+  var lamps = p.rec && p.rec.lamps ? p.rec.lamps : [[0.25, 0.25], [0.75, 0.25], [0.75, 0.75], [0.25, 0.75]].map(function (f) {
+    return [x0 + (x1 - x0) * f[0], y0 + (y1 - y0) * f[1]]; });
+  lamps.forEach(function (q) {
     var l = new THREE.PointLight(painted ? TORCH.hex : 0xffc98a, (pi ? 0.7 : 1.0) * k, 26, 1.6);
     var lz = PAINTED.indexOf(p.id) >= 0 && p.ceiling != null ? Math.min(p.floor + 3.2, p.ceiling - 0.4) : p.floor + 3.2;   /* under a low ceiling */
-    l.position.copy(shell.toLocal(x0 + (x1 - x0) * f[0], y0 + (y1 - y0) * f[1], lz));
+    l.position.copy(shell.toLocal(q[0], q[1], lz));
     scene.add(l);
   });
 });
