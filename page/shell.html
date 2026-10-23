@@ -4538,8 +4538,8 @@ if (BANNER && Q.get('touch') === 'banner') setTimeout(function () { thingCues[SR
    pieces and its torch, rough and plain, each at its schedule's place and turn (the centre (42.19, 1.95)); the four
    panels P1 to P4 on the table, the settle and the easel, each a flat gold ground in a pointed gilt frame, its sitter
    the atlas's cell sized by People's px a metre (the figure about four fifths of the panel), feet on the frame's foot;
-   P3 before P2, half over its lower corner on his right, so her piece reaches toward his board. The backdrops follow
-   on their own card. The sitters still; nothing glows but the torch's own flame */
+   P3 before P2, half over its lower corner on his right, so her piece reaches toward his board. Behind each its backdrop
+   (People's second atlas, below). The sitters still; nothing glows but the torch's own flame */
 var STORE = PLACE !== 'drum-room-g' || !shell ? null : (function () {
   var z0 = shell.place.floor, P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); }, C = [42.19, 1.95];
   var own = function (m, g) { m.userData.owner = PLACE; m.raycast = function () {}; (g || shell.group).add(m); return m; };
@@ -4595,21 +4595,38 @@ var STORE = PLACE !== 'drum-room-g' || !shell ? null : (function () {
   /* the four panels: a pointed gilt frame, the gold ground, the sitter (cell n of 4, People's px a metre) */
   var atlas = new THREE.TextureLoader().load('../assets/layers/store-paintings-992.png');
   atlas.encoding = THREE.sRGBEncoding; atlas.anisotropy = 4;
-  function ground(W, H) {
-    var c = document.createElement('canvas'); c.width = 256; c.height = Math.round(256 * H / W); var x = c.getContext('2d'), w = c.width, h = c.height, b = 18;
+  /* req 1004's backdrops (People's assets/layers/store-backdrops-992.png, four cells, their boxes measured on the
+     staged atlas, 2 px in, not the run's checks, which are the candidate's): each panel's ground its cell, cropped about its middle to the
+     panel's shape, inside the pointed head; the gold ground shows till the image loads */
+  var BACK = new Image(), BACKS = [], BOX = [[4, 3, 734, 1158], [761, 3, 1450, 1158], [1534, 3, 2150, 1158], [2334, 110, 2825, 1157]];
+  BACK.onload = function () { BACKS.forEach(function (f) { f(); }); };
+  BACK.src = '../assets/layers/store-backdrops-992.png?v=1';
+  function ground(W, H, cell) {
+    var c = document.createElement('canvas'); c.width = 512; c.height = Math.round(512 * H / W); var x = c.getContext('2d'), w = c.width, h = c.height, b = 36;
+    var sp = (w - 2 * b) * 0.62;   /* the pointed head: two arcs meeting over the middle */
+    function head() {
+      x.beginPath(); x.moveTo(b, h - b); x.lineTo(b, b + sp * 0.9); x.quadraticCurveTo(b, b + sp * 0.2, w / 2, b);
+      x.quadraticCurveTo(w - b, b + sp * 0.2, w - b, b + sp * 0.9); x.lineTo(w - b, h - b); x.closePath();
+    }
     x.fillStyle = '#5e4718'; x.fillRect(0, 0, w, h);
     var g = x.createLinearGradient(0, 0, w, h); g.addColorStop(0, '#c9a242'); g.addColorStop(0.5, '#b8902f'); g.addColorStop(1, '#a88028'); x.fillStyle = g;
-    var sp = (w - 2 * b) * 0.62;   /* the pointed head: two arcs meeting over the middle */
-    x.beginPath(); x.moveTo(b, h - b); x.lineTo(b, b + sp * 0.9); x.quadraticCurveTo(b, b + sp * 0.2, w / 2, b);
-    x.quadraticCurveTo(w - b, b + sp * 0.2, w - b, b + sp * 0.9); x.lineTo(w - b, h - b); x.closePath(); x.fill();
-    x.strokeStyle = '#3e2e10'; x.lineWidth = 3; x.stroke();
-    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t;
+    head(); x.fill(); x.strokeStyle = '#3e2e10'; x.lineWidth = 6; x.stroke();
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding;
+    function paint() {
+      var q = BOX[cell], cw = q[2] - q[0], ch = q[3] - q[1], iw = w - 2 * b, ih = h - 2 * b, sw = cw, sh = cw * ih / iw;
+      if (sh > ch) { sh = ch; sw = ch * iw / ih; }
+      x.save(); head(); x.clip();
+      x.drawImage(BACK, q[0] + (cw - sw) / 2, q[1] + (ch - sh) / 2, sw, sh, b, b, iw, ih);
+      x.restore(); head(); x.strokeStyle = '#3e2e10'; x.lineWidth = 6; x.stroke(); t.needsUpdate = true;
+    }
+    if (BACK.complete && BACK.naturalWidth) paint(); else BACKS.push(paint);
+    return t;
   }
   function panel(name, x, y, zb, face, W, H, lean, cell, ppm, shift) {
     var g = grp(x, y, face, zb); g.rotateX(-lean);
     var o = new THREE.Group(); o.position.x = shift || 0; g.add(o);
     box(o, W, H, 0.025, 0, H / 2, -0.0125, oakD);
-    var gm = own(new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshStandardMaterial({ map: ground(W, H), roughness: 0.55, metalness: 0.25 })), o);
+    var gm = own(new THREE.Mesh(new THREE.PlaneGeometry(W, H), new THREE.MeshStandardMaterial({ map: ground(W, H, cell), roughness: 0.8, metalness: 0 })), o);
     gm.position.set(0, H / 2, 0.001);
     [[W, 0.04, 0, 0.02], [0.04, H, -W / 2 + 0.02, H / 2], [0.04, H, W / 2 - 0.02, H / 2]].forEach(function (f) { box(o, f[0], f[1], 0.03, f[2], f[3], 0.012, gilt); });
     var fw = 952 / ppm, fh = 1351 / ppm, iw = W - 0.08, ih = H - 0.06, pw = Math.min(fw, iw), ph = Math.min(fh, ih);
