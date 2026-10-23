@@ -1573,13 +1573,16 @@ var paintingOpp = onWallZ(cutoutTexture(160, 176, '#b9a98c', function (g, w, h) 
   drawFrame(g, w, h); g.fillStyle = '#6d655b'; g.fillRect(w * 0.7, h * 0.3, w * 0.14, h * 0.58);
 }, 'painting'), PAINTING_OPP.w, PAINTING_OPP.h, PAINTING_OPP.x, PAINTING_OPP.y, FAR_FACE + 0.02, 1, 1, 'painting-opposite');
 var BAY_X = -3.55, PORTRAIT_XS = [-2.5, -4.6];
+/* the suit's foot line, its back a few cm off the far wall (Godric, 23 October 2026, 4.18 pm: right up to but not quite
+   touching the wall it guards; it stood 0.45 m out till then) */
+var ARMOUR_Z = FAR_Z + 0.2;
 /* the armour (Godric's Try 2 on corridor-armour-pick-1015, 5.11 pm; corridor-armour round 1, plain steel, visor shut,
    halberd in its right hand; the castle's suit-of-armour exemplar): 1078 x 2473 px, the suit from its helmet's top (row
    141) to its feet (row 2468) 1.70 m tall as the Curator measured the Met's (docs/exemplars.md), so 1369 px a metre and
    the card 0.787 by 1.806 m, the halberd's head above; the visor's slit at (584, 326) px, 0.033 m right of the card's
    middle and 0.665 m above it, where Trevor's eyes catch. Grey until it loads */
 var ARMOUR = { w: 1078 / 1369, h: 2473 / 1369, x: BAY_X, slitX: (584 - 539) / 1369, slitY: (2473 / 2 - 326) / 1369 };
-var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, FAR_Z + 0.45, 1, 1, 'armour');
+var armour = onWallZ(cutoutTexture(140, 420, '#9a9690', drawArmour, 'armour'), ARMOUR.w, ARMOUR.h, ARMOUR.x, ARMOUR.h / 2, ARMOUR_Z, 1, 1, 'armour');
 (function () {
   var im = new Image();
   im.onload = function () {
@@ -1648,15 +1651,7 @@ function updateArmourSide(a) {
     helmetEyes.visible = !!helmetEyes.userData.want && !S.on;
   }
 }
-/* the suit built in code, a test (Godric's yes, 22 October 2026, 7.43 pm, through the name in Where it stands: one corridor
-   suit of armour in 3D, the way the giant chess figures are built in shell.html, beside the painted one behind a switch,
-   lit to match; nothing spent). ?armour3d stands it 0.9 m along from the drawn suit, toward the stair; ?armour3d=only
-   stands it in the drawn suit's place with the card hidden. Built to the drawing (corridor-armour.png): plain steel,
-   1.70 m to the helmet's top, a close helmet with its visor shut and one slit, a rounded breastplate on a waist belt,
-   laminated tassets over a mail skirt, round shoulder plates, knee and elbow cops, the halberd upright in its right hand.
-   It faces +z, into the corridor; its right hand is -x. By night the steel takes the torches' warmth as the card does
-   (ARMOUR_BOUNCE), so it never goes black */
-/* the built suit's steel and its mirror, shared by the built suit (?armour3d) and the hybrid (?hybrid) */
+/* the hybrid's steel and its mirror (the built suit and the relief that first used them are gone: Godric, 23 October 2026, 4.18 pm, only the final suit) */
 /* Godric's 2 on corridor-armour-3d-1022 (8.03 pm): worked further, in code. The steel's own surface drawn once on a
    canvas, its u round each turned piece (u 0 the front) and its v down it: a brushed grain, scratches, a little
    pitting and grime, and an incised line just inside each plate's edges; on the breastplate, tassets and cuisses
@@ -1713,305 +1708,6 @@ function hallEnv() {
   var pm = new THREE.PMREMGenerator(renderer), e = pm.fromEquirectangular(t).texture; pm.dispose(); t.dispose();
   return e;
 }
-var ARMOUR_3D = (function () {
-  var q = new URLSearchParams(location.search).get('armour3d');   /* groundsQ comes later in the page */
-  if (q === null) return null;
-  var only = q === 'only', g = new THREE.Group(), UP = new THREE.Vector3(0, 1, 0), FWD = new THREE.Vector3(0, 0, 1);
-  var env = hallEnv();
-  function steelMat(etched) {
-    var c = steelCanvas(etched), t = tex(c), b = new THREE.CanvasTexture(c);
-    t.wrapS = b.wrapS = THREE.RepeatWrapping;
-    return new THREE.MeshStandardMaterial({ color: 0xc8ccd2, map: t, bumpMap: b, bumpScale: 0.0015, metalness: 0.85, roughness: 0.36, envMap: env });
-  }
-  var steel = steelMat(false), etched = steelMat(true);
-  /* the fourth look (Godric's 3 on corridor-armour-3d-r3-1022, 9.50 pm: further still in code): the drawing's plates are
-     plain, so the etched bands are gone from the breast, thighs and tassets (they read as stripes); the mail its own
-     rings; the hands larger, the elbow wings broader; and an ink line round the whole suit as the drawing has, its
-     back faces pushed out a few millimetres in black (ink, one mesh) */
-  function mailCanvas() {
-    var c = makeCanvas(256, 256), x = c.getContext('2d'), r, cx, cy;
-    x.fillStyle = '#26272a'; x.fillRect(0, 0, 256, 256);
-    for (cy = 0; cy < 264; cy += 8) for (cx = (cy / 8) % 2 ? 4 : 0; cx < 264; cx += 8) {
-      x.strokeStyle = '#9a9ea4'; x.lineWidth = 1.6; x.beginPath(); x.ellipse(cx, cy, 4.2, 3.4, 0, 0, Math.PI * 2); x.stroke();
-      x.strokeStyle = 'rgba(230,234,238,0.55)'; x.lineWidth = 0.8; x.beginPath(); x.arc(cx - 0.8, cy - 1, 3, 3.6, 5.2); x.stroke();
-    }
-    var t = tex(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 2); return t;
-  }
-  var dark = new THREE.MeshStandardMaterial({ color: 0xc0c4c8, map: mailCanvas(), metalness: 0.7, roughness: 0.5, envMap: env });   /* the mail */
-  var leather = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: 0.8 });
-  var wood = new THREE.MeshStandardMaterial({ color: 0x3a2a1e, roughness: 0.75 });
-  var brass = new THREE.MeshStandardMaterial({ color: 0xb59a5a, metalness: 0.8, roughness: 0.38, envMap: env });
-  steel.side = etched.side = THREE.DoubleSide;
-  var edge = new THREE.MeshStandardMaterial({ color: 0xd4d8dc, map: steel.map, metalness: 0.6, roughness: 0.42, envMap: env });   /* the halberd's blades, a rougher iron so a flat face is not a dark mirror */
-  /* the third look (Godric's 3 on corridor-armour-3d-r2-1022, 9.26 pm: its pose, the halberd's head, finer joints).
-     Measured off the drawing (1369 px a metre): the halberd held out at its right, the shaft 0.26 m off the middle
-     and leaning a little outward, its fist at 1.09 m held forward; the left elbow bowed out to 0.33 m and the hand
-     hanging by the thigh; the right leg straight under it, the left set out to the side, both feet turned out; the
-     slit at 1.57 m. Each limb is laid in its own frame from joint to joint (seg), the elbow or knee found from where
-     the hand or foot must be (bend), so the fist closes on the shaft and the feet stand on the flags. Everything
-     but the slit and the rivets is merged into one mesh a material at the end, so the finer pieces cost nothing */
-  var into = g, rivetAt = [], TX = 0.88;   /* the trunk narrowed side to side: a man's chest, not a barrel */
-  function v3(p) { return new THREE.Vector3(p[0], p[1], p[2]); }
-  function lathe(pts, mat, sx, sz, ph0, phL) {   /* ph0 and phL turn only part of the way round, from the front's -phL/2 */
-    var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 40, ph0 || 0, phL || Math.PI * 2), mat || steel);
-    m.scale.set(sx || 1, 1, sz || 1); into.add(m); return m;
-  }
-  function part(geo, x, y, z, mat) { var m = new THREE.Mesh(geo, mat || steel); m.position.set(x, y, z); into.add(m); return m; }
-  function ball(r, x, y, z, sx, sy, sz, mat) { var m = part(new THREE.SphereGeometry(r, 20, 14), x, y, z, mat); m.scale.set(sx || 1, sy || 1, sz || 1); return m; }
-  function band(r0, r1, h, y, th0, thL, mat) { return part(new THREE.CylinderGeometry(r1, r0, h, 28, 1, true, th0 || 0, thL || Math.PI * 2), 0, y, 0, mat); }   /* an open hoop of plate, r0 at its foot */
-  function rivet(x, y, z) { var o = new THREE.Object3D(); o.position.set(x, y, z); into.add(o); rivetAt.push(o); }
-  function span(a, b, n) { var o = []; for (var i = 0; i < n; i++) o.push(a + (b - a) * i / (n - 1)); return o; }
-  function rivetRow(r, y, sz, phis, sx) { phis.forEach(function (ph) { rivet((r + 0.003) * Math.sin(ph) * (sx || 1), y, (r + 0.003) * Math.cos(ph) * sz); }); }
-  function seg(a, b, pole, parent) {   /* a frame at a, its -y running to b, its +z turned toward pole; its length in userData */
-    var A = v3(a), y = A.clone().sub(v3(b)), len = y.length(); y.normalize();
-    var z = v3(pole), x = new THREE.Vector3(); z.sub(y.clone().multiplyScalar(z.dot(y))).normalize(); x.crossVectors(y, z);
-    var o = new THREE.Group(); o.position.copy(A); o.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
-    o.userData.len = len; (parent || g).add(o); return o;
-  }
-  function bend(a, t, l1, l2, pole) {   /* the joint l1 from a and l2 from t, bowed toward pole */
-    var A = v3(a), d = v3(t).sub(A), L = Math.min(d.length(), l1 + l2 - 1e-4); d.normalize();
-    var c = (l1 * l1 + L * L - l2 * l2) / (2 * l1 * L), s = Math.sqrt(Math.max(0, 1 - c * c)), p = v3(pole);
-    p.sub(d.clone().multiplyScalar(p.dot(d))).normalize();
-    return A.add(d.multiplyScalar(l1 * c)).add(p.multiplyScalar(l1 * s)).toArray();
-  }
-  function outIn(o, s) { return new THREE.Vector3(s, 0, 0).applyQuaternion(o.quaternion.clone().invert()); }   /* the suit's outward side in a frame */
-  /* the legs: s 1 its left (+x), set out to the side; -1 its right, straight under its weight */
-  [[1, [0.1, 0.9, 0], [0.2, 0.085, 0.03], 0.3], [-1, [-0.1, 0.9, 0], [-0.12, 0.085, 0.01], -0.22]].forEach(function (L) {
-    var s = L[0], hip = L[1], ank = L[2], knee = bend(hip, ank, 0.405, 0.42, [s * 0.15, 0, 1]);
-    var th = seg(hip, knee, [0, 0, 1]), sh = seg(knee, ank, [0, 0, 1]), o;
-    into = th;   /* the cuisse, its lames over the knee, the poleyn and its wing on the outside */
-    lathe([[0, 0.02], [0.082, 0.02], [0.079, -0.1], [0.068, -0.28], [0.06, -th.userData.len + 0.07], [0, -th.userData.len + 0.07]]);
-    [0.055, 0.032].forEach(function (d, i) { band(0.069 + i * 0.004, 0.067 + i * 0.004, 0.026, -th.userData.len + d, 0, 0, steel); });
-    ball(0.068, 0, -th.userData.len, 0.024, 1, 0.95, 0.8);
-    o = outIn(th, s);
-    var wing = part(new THREE.CylinderGeometry(0.054, 0.044, 0.008, 22), o.x * 0.062, -th.userData.len, o.z * 0.058 - 0.004); wing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), o);
-    rivet(o.x * 0.068, -th.userData.len, o.z * 0.068); rivet(0, -th.userData.len + 0.055, 0.073);
-    into = sh;   /* the greave, a calf to it, the knee's lames below */
-    lathe([[0, 0], [0.056, -0.03], [0.062, -0.13], [0.056, -0.24], [0.046, -sh.userData.len + 0.01], [0, -sh.userData.len + 0.01]]);
-    part(new THREE.BoxGeometry(0.006, sh.userData.len * 0.7, 0.01), 0, -sh.userData.len * 0.47, 0.056);   /* its ridge down the shin */
-    [0.04, 0.064].forEach(function (d, i) { band(0.064 - i * 0.003, 0.066 - i * 0.003, 0.024, -d, 0, 0, steel); });
-    rivet(0, -0.05, 0.068);
-    into = new THREE.Group(); into.position.set(ank[0], 0, ank[2]); into.rotation.y = L[3]; g.add(into);   /* the sabaton, turned out */
-    ball(0.052, 0, 0.07, -0.035, 1, 0.95, 1.05);   /* the ankle and heel */
-    [[0.06, -0.01], [0.056, 0.03], [0.051, 0.066], [0.046, 0.1], [0.041, 0.132]].forEach(function (b, i) {   /* its lames, stepping down to the toe */
-      var m = part(new THREE.CylinderGeometry(b[0], b[0], 0.1 - i * 0.008, 22, 1, false, 0, Math.PI), 0, 0.006, b[1]); m.rotation.z = Math.PI / 2; m.scale.x = 0.95;
-      rivet(0.05 - i * 0.004, 0.02, b[1]);
-    });
-    ball(0.038, 0, 0.012, 0.16, 1.05, 0.7, 1.5);   /* the toe */
-    into = g;
-  });
-  /* the mail skirt, the faulds under the belt and the two tassets, three lames each, curved round the thighs, the mail between them */
-  lathe([[0, 0.83], [0.186, 0.83], [0.19, 0.9], [0.155, 1.0], [0, 1.0]], dark, TX, 0.8);   /* its hem straight, not flared into its own shadow */
-  band(0.176, 0.17, 0.04, 0.99, -2.4, 4.8).scale.set(TX, 1, 0.8);   /* one fauld; below it the mail shows between the tassets, as drawn */
-  [[0.948, 0.182], [0.9, 0.192], [0.852, 0.203]].forEach(function (b, i) {
-    [0.78, -0.78].forEach(function (c) { band(b[1] + 0.012, b[1], 0.052, b[0], c - 0.5, 1.0).scale.set(TX, 1, 0.8); });
-    if (!i) rivetRow(b[1] + 0.006, b[0] + 0.014, 0.8, [-1.13, -0.43, 0.43, 1.13], TX);
-  });
-  [1, -1].forEach(function (s) {   /* the tassets' straps and buckles */
-    var ph = s * 0.78, r = 0.19;
-    var st = part(new THREE.BoxGeometry(0.024, 0.11, 0.008), r * Math.sin(ph) * TX, 0.935, r * Math.cos(ph) * 0.8 + 0.008, leather); st.rotation.y = ph;
-    part(new THREE.BoxGeometry(0.028, 0.02, 0.01), r * Math.sin(ph) * TX, 0.965, r * Math.cos(ph) * 0.8 + 0.012, brass).rotation.y = ph;
-  });
-  var belt = part(new THREE.TorusGeometry(0.152, 0.013, 8, 36), 0, 1.025, 0, leather); belt.rotation.x = Math.PI / 2; belt.scale.set(TX, 0.78, 1);   /* the belt, at a waist drawn in */
-  part(new THREE.BoxGeometry(0.04, 0.03, 0.012), 0, 1.025, 0.124, brass);
-  /* the breastplate, its ridge, the gorget's three lames */
-  lathe([[0, 1.0], [0.136, 1.0], [0.14, 1.06], [0.17, 1.17], [0.196, 1.28], [0.198, 1.36], [0.165, 1.43], [0.09, 1.46], [0, 1.46]], steel, TX, 0.8);
-  part(new THREE.BoxGeometry(0.01, 0.3, 0.016), 0, 1.21, 0.152).rotation.x = -0.06;
-  rivetRow(0.165, 1.425, 0.8, span(-1.0, 1.0, 7), TX);
-  rivetRow(0.15, 1.04, 0.8, span(-1.3, 1.3, 9), TX);
-  [[1.43, 0.118], [1.455, 0.108], [1.478, 0.098]].forEach(function (b) { band(b[1], b[1] - 0.01, 0.03, b[0]); });
-  rivetRow(0.12, 1.43, 1, span(-0.9, 0.9, 5));
-  /* the arms: the left bowed out, its hand hanging by the thigh; the right bent forward, its fist on the shaft */
-  var hB = [-0.235, 0, 0.2], hDir = new THREE.Vector3(-0.055, 1.8, 0).normalize(), GRIP = 1.095;
-  var grip = v3(hB).add(hDir.clone().multiplyScalar(GRIP));
-  [[1, [0.3, 0.9, 0.08], [1, -0.15, -0.6]], [-1, [grip.x + 0.03, grip.y + 0.025, grip.z - 0.075], [-0.35, -1, -0.45]]].forEach(function (A) {
-    var s = A[0], sho = [s * 0.215, 1.33, 0], elb = bend(sho, A[1], 0.25, 0.24, A[2]);
-    var up = seg(sho, elb, A[2]), fo = seg(elb, A[1], A[2]), o = outIn(up, s);
-    into = up;   /* the rerebrace, the couter and its wing on the outside */
-    lathe([[0, 0], [0.05, 0], [0.047, -0.12], [0.046, -up.userData.len + 0.03], [0, -up.userData.len + 0.03]]);
-    [0.055, 0.03].forEach(function (d, i) { band(0.05 + i * 0.003, 0.048 + i * 0.003, 0.022, -up.userData.len + d); });
-    ball(0.054, 0, -up.userData.len, 0.012, 1, 0.9, 1);
-    var wing = part(new THREE.CylinderGeometry(0.064, 0.052, 0.008, 22), o.x * 0.05, -up.userData.len - 0.005, o.z * 0.045 + 0.01); wing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), o);
-    rivet(o.x * 0.055, -up.userData.len - 0.005, o.z * 0.055 + 0.01);
-    into = fo;   /* the vambrace, its lames below the elbow, the gauntlet's flared cuff */
-    lathe([[0, -0.02], [0.046, -0.02], [0.045, -0.08], [0.039, -fo.userData.len + 0.01], [0, -fo.userData.len + 0.01]]);
-    [0.03, 0.052].forEach(function (d, i) { band(0.049 - i * 0.002, 0.051 - i * 0.002, 0.022, -d); });
-    band(0.062, 0.044, 0.062, -fo.userData.len + 0.012);
-    if (s > 0) {   /* the left hand, hanging, laid in its own frame (+z forward, +x out): the back plate outward, its
-                      knuckle lame, four fingers curled in toward the thigh, the thumb in front */
-      fo.updateMatrix();
-      var w = new THREE.Vector3(0, -fo.userData.len, 0).applyMatrix4(fo.matrix), hd = seg(w.toArray(), [w.x + 0.01, w.y - 0.1, w.z], [0, 0, 1]);
-      hd.scale.setScalar(1.3);   /* a gauntlet's hand is big, as drawn */
-      into = hd;
-      ball(0.04, 0.004, -0.045, 0, 0.62, 1.35, 1.15);
-      part(new THREE.CylinderGeometry(0.02, 0.02, 0.085, 14), 0.008, -0.088, 0).rotation.x = Math.PI / 2;
-      [-0.03, -0.01, 0.01, 0.03].forEach(function (dz) {
-        var f1 = part(new THREE.CylinderGeometry(0.0115, 0.012, 0.042, 10), 0.002, -0.114, dz); f1.rotation.z = -0.3;
-        var f2 = part(new THREE.CylinderGeometry(0.01, 0.0115, 0.038, 10), -0.012, -0.146 + Math.abs(dz) * 0.4, dz); f2.rotation.z = -0.9;
-        rivet(0.024, -0.088, dz);
-      });
-      var th2 = part(new THREE.CylinderGeometry(0.011, 0.013, 0.05, 10), -0.012, -0.075, 0.042); th2.rotation.x = 0.5; th2.rotation.z = -0.4;
-    }
-    into = g;
-    /* the pauldron, a broad plate over the shoulder, and three lames beneath it round the arm */
-    var dome = part(new THREE.SphereGeometry(0.118, 28, 14, 0, Math.PI * 2, 0, Math.PI * 0.52), s * 0.205, 1.36, 0.0);
-    dome.scale.set(1.08, 0.72, 1.0); dome.rotation.z = -s * 0.32;
-    rivet(s * 0.2, 1.445, 0.06); rivet(s * 0.27, 1.41, 0.07); rivet(s * 0.3, 1.36, 0.05);
-    into = up;
-    [0.015, 0.045, 0.075].forEach(function (d, i) { band(0.08 - i * 0.004, 0.072 - i * 0.004, 0.036, -d); rivet(o.x * (0.08 - i * 0.004), -d, o.z * 0.07); });
-    into = g;
-  });
-  /* the right fist round the shaft, laid in the halberd's frame below; the halberd itself, held out a little,
-     its butt on the flags beside the right foot, leaning outward as drawn */
-  var hal = new THREE.Group(); hal.position.copy(v3(hB)); hal.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), hDir); g.add(hal);
-  into = hal;
-  part(new THREE.CylinderGeometry(0.014, 0.016, 1.64, 12), 0, 0.82, 0, wood);
-  part(new THREE.CylinderGeometry(0.019, 0.017, 0.035, 12), 0, 0.017, 0);   /* its iron shoe */
-  ball(0.05, 0.014, GRIP, -0.022, 1.0, 1.25, 1.15);   /* the fist: its palm, four finger lames wrapped round the shaft, the thumb over them */
-  [0.03, 0.01, -0.01, -0.03].forEach(function (dy) { var f = part(new THREE.TorusGeometry(0.029, 0.013, 8, 16, Math.PI * 1.1), 0, GRIP + dy * 1.15, 0); f.rotation.x = Math.PI / 2; f.rotation.z = -0.25; });
-  ball(0.013, 0.02, GRIP + 0.05, 0.012, 1.6, 0.8, 1.0);
-  /* the head: a socket and two langets riveted down the shaft, the four-sided spike, the axe a convex crescent with a
-     horn at either end and a pierced hole, the fluke a hook curling up behind */
-  part(new THREE.CylinderGeometry(0.019, 0.02, 0.09, 12), 0, 1.655, 0);
-  [1, -1].forEach(function (k) { part(new THREE.BoxGeometry(0.012, 0.24, 0.004), 0, 1.5, k * 0.017); [1.42, 1.5, 1.58].forEach(function (y) { rivet(0, y, k * 0.02); }); });
-  var collar = part(new THREE.TorusGeometry(0.02, 0.006, 6, 16), 0, 1.7, 0); collar.rotation.x = Math.PI / 2;
-  part(new THREE.ConeGeometry(0.017, 0.13, 4), 0, 1.77, 0).rotation.y = Math.PI / 4;
-  function plate(pts, hole) {   /* a flat iron shape in the shaft's plane, beveled so its edges catch the light */
-    var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]);
-    pts.slice(1).forEach(function (p) { if (p.length === 2) sh.lineTo(p[0], p[1]); else sh.quadraticCurveTo(p[0], p[1], p[2], p[3]); });
-    if (hole) { var h = new THREE.Path(); h.absarc(hole[0], hole[1], hole[2], 0, Math.PI * 2, true); sh.holes.push(h); }
-    return part(new THREE.ExtrudeGeometry(sh, { depth: 0.005, bevelEnabled: true, bevelThickness: 0.0025, bevelSize: 0.004, bevelSegments: 2, curveSegments: 14 }), 0, 0, -0.0025, edge);
-  }
-  plate([[-0.012, 1.655], [-0.045, 1.66, -0.1, 1.705], [-0.175, 1.6, -0.11, 1.455], [-0.065, 1.505, -0.012, 1.525]], [-0.075, 1.585, 0.013]);   /* the axe, outward */
-  plate([[0.012, 1.615], [0.06, 1.615, 0.118, 1.675], [0.072, 1.6, 0.012, 1.575]]);   /* the fluke behind */
-  into = g;
-  /* the helmet, its top at 1.70, the slit at 1.57: the skull and its comb, the upper visor's flat brow with its one
-     slit, the lower visor drawn forward to a blunt ridge, the pivots, the neck plate behind; turned a touch to its right */
-  var head = new THREE.Group(); head.position.set(0, 1.46, 0); head.rotation.set(0.02, -0.07, 0.02); head.scale.setScalar(1.06); g.add(head); into = head;
-  ball(0.104, 0, 0.128, -0.008, 0.97, 1.0, 1.1);
-  var comb = part(new THREE.CylinderGeometry(0.114, 0.114, 0.007, 32, 1, false, 0.45, Math.PI - 0.9), 0, 0.126, -0.008); comb.rotation.z = Math.PI / 2;
-  band(0.114, 0.104, 0.068, 0.1, -1.75, 3.5).scale.z = 1.2;                    /* the upper visor */
-  var slit = part(new THREE.BoxGeometry(0.084, 0.011, 0.012), 0, 0.1, 0.132, new THREE.MeshBasicMaterial({ color: 0x0c0c0e })); slit.userData.keep = true;   /* its one slit, dark */
-  band(0.086, 0.114, 0.075, 0.03, -1.85, 3.7).scale.z = 1.3;                    /* the lower visor */
-  part(new THREE.BoxGeometry(0.008, 0.075, 0.012), 0, 0.03, 0.128).rotation.x = 0.33;   /* its ridge */
-  band(0.088, 0.098, 0.07, 0.04, 1.4, 3.5);                                    /* the neck plate behind */
-  [1, -1].forEach(function (s) { ball(0.013, s * 0.109, 0.067, 0.005, 0.6, 1, 1, brass); rivet(s * 0.1, 0.1, 0.065); });
-  rivetRow(0.088, 0.003, 1.3, span(-1.3, 1.3, 7));
-  into = g;
-  /* merge: every piece but the slit into one mesh a material, its place baked in */
-  g.updateMatrixWorld(true);
-  var byMat = new Map(), gone = [];
-  g.traverse(function (m) {
-    if (!m.isMesh || m.userData.keep) return;
-    var geo = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone()).applyMatrix4(m.matrixWorld);
-    if (!byMat.has(m.material)) byMat.set(m.material, []);
-    byMat.get(m.material).push(geo); gone.push(m);
-  });
-  gone.forEach(function (m) { m.parent.remove(m); m.geometry.dispose(); });
-  var inked = [];
-  byMat.forEach(function (geos, mat) {
-    var n = 0; geos.forEach(function (q) { n += q.attributes.position.count; });
-    var pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2), at = 0;
-    geos.forEach(function (q) {
-      pos.set(q.attributes.position.array, at * 3); nor.set(q.attributes.normal.array, at * 3);
-      if (q.attributes.uv) uv.set(q.attributes.uv.array, at * 2);
-      at += q.attributes.position.count; q.dispose();
-    });
-    var b = new THREE.BufferGeometry();
-    b.setAttribute('position', new THREE.BufferAttribute(pos, 3)); b.setAttribute('normal', new THREE.BufferAttribute(nor, 3)); b.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
-    g.add(new THREE.Mesh(b, mat)); inked.push(b);
-  });
-  var ink = new THREE.MeshBasicMaterial({ color: 0x16120e, side: THREE.BackSide });
-  ink.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0068;'); };
-  (function () {
-    var n = 0; inked.forEach(function (q) { n += q.attributes.position.count; });
-    var pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), at = 0;
-    inked.forEach(function (q) { pos.set(q.attributes.position.array, at * 3); nor.set(q.attributes.normal.array, at * 3); at += q.attributes.position.count; });
-    var b = new THREE.BufferGeometry();
-    b.setAttribute('position', new THREE.BufferAttribute(pos, 3)); b.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
-    var m = new THREE.Mesh(b, ink); m.name = 'armour-3d-ink'; g.add(m);
-  })();
-  var slitAt = new THREE.Vector3(); slit.getWorldPosition(slitAt); head.remove(slit); slit.position.copy(slitAt); slit.rotation.set(0.02, -0.07, 0.02); slit.scale.setScalar(1.06); g.add(slit);
-  var rv = new THREE.InstancedMesh(new THREE.SphereGeometry(0.0062, 8, 6), new THREE.MeshStandardMaterial({ color: 0xd8dce0, metalness: 0.85, roughness: 0.3, envMap: env }), rivetAt.length);
-  var mt = new THREE.Matrix4(), rp = new THREE.Vector3();
-  rivetAt.forEach(function (o, i) { o.getWorldPosition(rp); mt.makeTranslation(rp.x, rp.y, rp.z); rv.setMatrixAt(i, mt); });
-  g.add(rv);
-  var shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.42), armourShadow.material);
-  shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.03, 0.003, 0.05); g.add(shadow);
-  g.position.set(only ? BAY_X : BAY_X + 0.9, 0, FAR_Z + 0.4);
-  g.name = 'armour-3d'; scene.add(g);
-  if (only) { armour.visible = false; armourShadow.visible = false; }
-  return { group: g, only: only, slit: slit, mats: [steel, etched, dark, rv.material, brass, leather, wood, edge], env: [steel, etched, rv.material, brass, edge, dark] };
-})();
-function updateArmour3d() {   /* the torches' warmth by night, as the card's */
-  if (!ARMOUR_3D) return;
-  var k = nightK();
-  if (ARMOUR_3D.only) { armour.visible = false; armourShadow.visible = false; }   /* something else shows the card each frame */
-  ARMOUR_3D.mats.forEach(function (m) { m.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * 0.12 * k); });
-  ARMOUR_3D.env.forEach(function (m) { m.envMapIntensity = 1 - 0.65 * k; });   /* the windows dark, the mirror dims */
-  var glow = visorLight && visorLight.userData.want ? visorLight.material.opacity : 0;   /* Christmas's light in its slit too */
-  ARMOUR_3D.slit.material.color.setHex(0x0c0c0e).lerp(col(0xffc070), glow);
-}
-/* the drawing as a relief (Godric's 1 on corridor-armour-relief-1022: Blender from the drawing, on the page behind its
-   switch to walk past). The drawn suit's outline puffed into a rounded shape, as tools/corridor-armour-relief-prep.py:
-   each point raised by its distance to the outline on a round profile, 11 cm at most, smoothed, a back at four fifths;
-   the drawing laid on it from the front, so its etching and line are its own, and the corridor's light falls on it. It
-   stands still, never turning to the eye: solid for the few degrees the views turn, a carved relief past about 35.
-   ?relief stands it 1.1 m along from the drawn suit, toward the stair; ?relief=only in the drawn suit's place */
-var RELIEF = (function () {
-  var q = new URLSearchParams(location.search).get('relief');
-  if (q === null) return null;
-  var only = q === 'only', PX = 1369, STEP = 6, DEPTH = 0.11, g = new THREE.Group();
-  var mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.15, roughness: 0.45, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
-  var im = new Image();
-  im.onload = function () {
-    var W = im.width, H = im.height, cw = Math.floor(W / STEP) + 1, ch = Math.floor(H / STEP) + 1;
-    var c = makeCanvas(cw, ch), x = c.getContext('2d'); x.drawImage(im, 0, 0, cw, ch);
-    var a = x.getImageData(0, 0, cw, ch).data, n = cw * ch, d = new Float32Array(n), i, j, k;
-    for (i = 0; i < n; i++) d[i] = a[i * 4 + 3] > 127 ? 1e9 : 0;
-    /* the distance to the outline in cells, two chamfer passes */
-    for (j = 0; j < ch; j++) for (i = 0; i < cw; i++) { k = j * cw + i; if (!d[k]) continue;
-      d[k] = Math.min(d[k], i ? d[k - 1] + 1 : 1, j ? d[k - cw] + 1 : 1, i && j ? d[k - cw - 1] + 1.414 : 1.414, j && i < cw - 1 ? d[k - cw + 1] + 1.414 : 1.414); }
-    for (j = ch - 1; j >= 0; j--) for (i = cw - 1; i >= 0; i--) { k = j * cw + i; if (!d[k]) continue;
-      d[k] = Math.min(d[k], i < cw - 1 ? d[k + 1] + 1 : 1, j < ch - 1 ? d[k + cw] + 1 : 1, i < cw - 1 && j < ch - 1 ? d[k + cw + 1] + 1.414 : 1.414, j < ch - 1 && i ? d[k + cw - 1] + 1.414 : 1.414); }
-    var h = new Float32Array(n), t = new Float32Array(n), r, p;
-    for (k = 0; k < n; k++) { r = d[k] * STEP / PX; h[k] = !d[k] ? 0 : r < DEPTH ? Math.sqrt(r * (2 * DEPTH - r)) : DEPTH; }
-    for (p = 0; p < 2; p++) {   /* smoothed, so no ridge runs down each limb */
-      for (j = 0; j < ch; j++) for (i = 0; i < cw; i++) { var s = 0, m = 0; for (var u = -2; u <= 2; u++) { var ii = i + u; if (ii >= 0 && ii < cw) { s += h[j * cw + ii]; m++; } } t[j * cw + i] = s / m; }
-      for (j = 0; j < ch; j++) for (i = 0; i < cw; i++) { var s2 = 0, m2 = 0; for (var v = -2; v <= 2; v++) { var jj = j + v; if (jj >= 0 && jj < ch) { s2 += t[jj * cw + i]; m2++; } } h[j * cw + i] = d[j * cw + i] ? s2 / m2 : 0; }
-    }
-    var idx = new Int32Array(n).fill(-1), pos = [], uv = [], ind = [], cnt = 0;
-    for (k = 0; k < n; k++) if (d[k]) idx[k] = cnt++;
-    [1, -0.8].forEach(function (side, f) {   /* the front toward the corridor (+z), the back behind it */
-      for (k = 0; k < n; k++) if (d[k]) {
-        var cx = k % cw, cy = (k - cx) / cw, z = Math.max(h[k] - 0.012, 0.0004);   /* the outline's edge to the middle, so the two close */
-        pos.push((cx * STEP - W / 2) / PX, (H - cy * STEP) / PX, side * z); uv.push(cx * STEP / W, 1 - cy * STEP / H);
-      }
-      var o = f * cnt;
-      for (j = 0; j < ch - 1; j++) for (i = 0; i < cw - 1; i++) {
-        var A = idx[j * cw + i], B = idx[j * cw + i + 1], C = idx[(j + 1) * cw + i + 1], D = idx[(j + 1) * cw + i];
-        if (A < 0 || B < 0 || C < 0 || D < 0) continue;
-        if (side > 0) ind.push(A + o, D + o, C + o, A + o, C + o, B + o); else ind.push(A + o, C + o, D + o, A + o, B + o, C + o);
-      }
-    });
-    var geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    geo.setIndex(ind); geo.computeVertexNormals();
-    mat.map = tex(im); mat.needsUpdate = true;
-    var m = new THREE.Mesh(geo, mat); m.name = 'armour-relief'; g.add(m);
-  };
-  im.src = '../assets/layers/corridor-armour.png';
-  var shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.34), armourShadow.material);
-  shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08, 0.003, 0.02); g.add(shadow);
-  g.position.set(only ? BAY_X : BAY_X + 1.1, 0, FAR_Z + 0.45);
-  g.name = 'armour-relief'; scene.add(g);
-  return { group: g, only: only, mat: mat };
-})();
-function updateRelief() {   /* the torches' warmth by night, as the card's */
-  if (!RELIEF) return;
-  if (RELIEF.only) { armour.visible = false; armourShadow.visible = false; }
-  RELIEF.mat.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * 0.12 * nightK());
-}
 /* the hybrid (Godric's word after walking past ?relief, 22 October 2026, 10.45 pm: "it comes SO close to working", whole
    from the front, a thin slab side on; so the drawing on true shapes, the halberd apart, as his blueprint has it). Every
    8 px down the drawing its outline is cut into runs (the helmet, the trunk, each limb) and each run turned into a ring
@@ -2026,12 +1722,10 @@ function updateRelief() {   /* the torches' warmth by night, as the card's */
    drawn suit's place and the drawn card stays there unseen, turned to the eye, so his tap and the stop still find it;
    the hybrid follows the card to its three marks, rocks with its wobble and Peeves's shake (about its feet), turns its
    true back on the back cue, and takes the visor's things (Trevor's eyes, the visor's patch, the Christmas light) onto
-   its own helmet, seated on its face by a ray (seatVisor). ?drawn shows the drawn suit as it was; ?hybrid stands the
-   hybrid 1.1 m along from the drawn suit toward the stair (2.2 with ?relief beside it), the two to compare */
+   its own helmet, seated on its face by a ray (seatVisor). Godric's word of 23 October 2026, 4.18 pm: this is the suit
+   through the castle, and the only one here; the switches that stood trials beside it are gone */
 var HYBRID = (function () {
-  var sp = new URLSearchParams(location.search), q = sp.get('hybrid');
-  if (sp.has('drawn')) return null;
-  var only = q === null || q === 'only', PX = 1369, ROW = 8, SEG = 28, FOOT = 2468, g = new THREE.Group();
+  var only = true, PX = 1369, ROW = 8, SEG = 28, FOOT = 2468, g = new THREE.Group();
   function pole(py) { return 208 + 0.0317 * (py - 1100); }   /* the shaft's middle in the drawing, leaning out a little */
   var POLE_R = 26, HEAD = { x: 400, y: 560 };                 /* the band cut for the shaft; the box round its head */
   var CAPS = [[0, 0.09], [0.08, 0.065], [0.5, 0.065], [0.58, 0.085], [0.85, 0.085], [0.95, 0.13], [1.05, 0.13], [1.15, 0.15], [1.3, 0.15], [1.42, 0.125], [1.48, 0.115], [9, 0.125]];
@@ -2176,7 +1870,7 @@ var HYBRID = (function () {
   im.src = '../assets/layers/corridor-armour.png';
   var shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.34), armourShadow.material);
   shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08, 0.003, 0.02); g.add(shadow);
-  g.position.set(only ? BAY_X : BAY_X + (RELIEF && !RELIEF.only ? 2.2 : 1.1), 0, FAR_Z + 0.45);
+  g.position.set(BAY_X, 0, ARMOUR_Z);
   g.name = 'armour-hybrid'; scene.add(g);
   return out;
 })();
@@ -2206,7 +1900,7 @@ function updateHybrid() {   /* the torches' warmth by night, the mirror dimmed w
   }
   HYBRID.mats.forEach(function (m) { m.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * 0.12 * k); m.envMapIntensity = 1 - 0.65 * k; });
 }
-var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
+var ARMOUR_MARKS = { home: { x: BAY_X, z: ARMOUR_Z }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
 /* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
    her, 1.8 to 2.7 m up, a card turned to the eye as the armour is; hidden until the sticks chain hangs it */
 var STICKS = { x: -5.5, y: 2.25, w: 0.5, h: 0.9 };
@@ -6682,7 +6376,7 @@ function frame() {
   updateFilch(wdt);
   updateChase(wdt);
   updateFilchFigure(wdt);
-  updateArmour3d(); updateRelief(); updateHybrid();
+  updateHybrid();
   updateStandIns();
   updateVisorLight();
   updateCandleStub();
