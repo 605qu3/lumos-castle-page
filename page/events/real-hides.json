@@ -1,0 +1,180 @@
+{
+  "chain": "real-hides",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "real-hides.true-hide-knock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap true-hide-panel-5",
+      "when": [
+        "place = decoy cupboard 5",
+        "true_hide != found"
+      ],
+      "show": [
+        "one knock on the cupboard's back, and the sound comes back hollow, a whole room's worth; the panel gives under his hand and swings in on a little room beyond"
+      ],
+      "starts": [
+        "set true_hide = found",
+        "log \"Knocked on the back of the old cupboard and found the room behind it {day}\"",
+        "secret true-hide"
+      ],
+      "canon": "Hidden Ways' H72 (docs/hidden-ways/real-hides.md, The ground check and the ledger lines; Godric's 1 on hidden-ways-real-hides-1023, 3.52 pm, 23 October 2026; the Architect's ledger 262, model v189; Events' req 1057): the cupboard's back is a second panel found by the hollow sound of a knock; both panels open from both sides and stay open once found; nothing glows, nothing replayed. The tap id is the Architect's feature id, true-hide-panel-5, and Interaction's cupboard place faces it (docs/interaction-places/decoy-cupboard-5-1.json)"
+    },
+    {
+      "id": "real-hides.true-hide-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap true-hide-panel-5",
+      "when": [
+        "place = decoy cupboard 5",
+        "true_hide = found"
+      ],
+      "show": [
+        "the cupboard's back stands open on the little room; it sounded hollow because it was"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H72 (Events' req 1057): once found, the second panel stays open, so a second tap only looks through it"
+    },
+    {
+      "id": "real-hides.true-hide-note",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap true-hide-note",
+      "when": [
+        "place = true hide 5"
+      ],
+      "show": [
+        "a note pinned over the bench in an old round hand, the paper yellow and one corner curled: IF YOU FOUND THE FIRST ONE YOU WOULD HAVE STOPPED. Whoever wrote it was right, and was plainly rather proud of it"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H72 (Events' req 1057): the note's words are Hidden Ways', pinned to the bench's back board (Interiors' req 1055, docs/interiors/real-hides.md); the joke is on whoever stopped at the boot and the Gobstone; nobody named, nothing dated, nothing glows. Every tap reads it again, since it stays on the board"
+    },
+    {
+      "id": "real-hides.book-bay-pull",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap book-bay-door-4",
+      "when": [
+        "place = library",
+        "book_bay != found"
+      ],
+      "show": [
+        "a slim red spine among the brown, Open Sesame; he tips it and the whole bay of shelves swings away on a hinge into the stair lobby, Detentions I Did Not Deserve, volumes 1 to 9, and all. Beside the gap, How to Hide a Door looks rather pleased with itself"
+      ],
+      "starts": [
+        "set book_bay = found",
+        "log \"Pulled Open Sesame and a bay of the library's shelves swung open {day}\"",
+        "secret book-bay"
+      ],
+      "canon": "Hidden Ways' H73 (docs/hidden-ways/real-hides.md, The ground check and the ledger lines; Godric's 1 on hidden-ways-real-hides-1023, 3.52 pm, 23 October 2026; the ground req 1053, 2 (a); the Architect's ledger 263, model v189; Events' req 1057): a bay of the library's east wall, every spine a joke, invented; Open Sesame (a slim red spine, Interiors' req 1055) swings it into back-stair-lobby-4; it never leaves its shelf, no librarian is named (the year 1897, Story), nothing glows, stays open once found. The joke titles are Hidden Ways' own, after Chatsworth's dummy spines"
+    },
+    {
+      "id": "real-hides.book-bay-latch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap book-bay-door-4",
+      "when": [
+        "place = back stair lobby 4",
+        "book_bay != found"
+      ],
+      "show": [
+        "a plain plank door with a wooden latch; it lifts, and the door opens on the library seen from the back of its own books, the bay swung round on its hinge"
+      ],
+      "starts": [
+        "set book_bay = found",
+        "log \"Lifted a latch in the back stair's lobby and came out through the library's shelves {day}\"",
+        "secret book-bay"
+      ],
+      "canon": "Hidden Ways' H73 (Events' req 1057): from the lobby the bay is a plain plank door with a wooden latch, a way the same find as the pull from the library (one state, book_bay; one secret, once ever); opens from both sides, stays open once found, nothing glows"
+    },
+    {
+      "id": "real-hides.book-bay-open-library",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap book-bay-door-4",
+      "when": [
+        "place = library",
+        "book_bay = found"
+      ],
+      "show": [
+        "the bay of shelves stands open on the stair lobby, its jokes still in their rows"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H73 (Events' req 1057): once swung, the bay stays open, so a second tap only looks through it"
+    },
+    {
+      "id": "real-hides.book-bay-open-lobby",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap book-bay-door-4",
+      "when": [
+        "place = back stair lobby 4",
+        "book_bay = found"
+      ],
+      "show": [
+        "the plank door stands open on the library's shelves"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H73 (Events' req 1057): once found, the door stays open, so a second tap only looks through it"
+    },
+    {
+      "id": "real-hides.open-ledger",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap open-ledger",
+      "when": [
+        "place = accounts room 3"
+      ],
+      "show": [
+        "a calf ledger open on the clerk's sloped desk, in a neat dry hand: To mending the staircase that would not stay put, 4 Galleons. To mending it again, 4 Galleons. Again, 4 Galleons. The column runs down the page and over the leaf; the staircase, it seems, never meant to stay put"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H74 (docs/hidden-ways/real-hides.md, The ground check and the ledger lines; Godric's 1 on hidden-ways-real-hides-1023, 3.52 pm, 23 October 2026; the Architect's ledger 264, model v189; Events' req 1057): the staircases that change (PS 8 L2722, read in the canon tool at 7.30 pm, 23 October 2026: 'a hundred and forty-two staircases at Hogwarts ... some that led somewhere different'), the column of Galleons Hidden Ways' own invention; nothing dated, no name, no clerk or headmaster; the tap id is Interiors' open-ledger (docs/interiors/real-hides.md, provisional till Godric's card)"
+    },
+    {
+      "id": "real-hides.accounts-cubby-tip",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap accounts-cubby-3",
+      "when": [
+        "place = accounts room 3",
+        "accounts_cubby != found"
+      ],
+      "show": [
+        "one ledger on the drum side will not come out; he pulls and it tips, and a cubby opens behind it with a cash box inside, its lid up, empty, and its key hanging on a nail beside it, as if somebody meant to be back"
+      ],
+      "starts": [
+        "set accounts_cubby = found",
+        "log \"Tipped a stubborn ledger and found the empty cash box behind it {day}\"",
+        "secret accounts-cubby"
+      ],
+      "canon": "Hidden Ways' H74 (Events' req 1057): the ledger that will not come out tips open a cubby with the cash box, empty, its key on a nail; empty and ordinary, nothing dated, no name, nothing harmed; stays open once found, nothing glows. The tap id is the Architect's feature accounts-cubby-3 (ledger 264), which Interaction's place matches"
+    },
+    {
+      "id": "real-hides.accounts-cubby-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap accounts-cubby-3",
+      "when": [
+        "place = accounts room 3",
+        "accounts_cubby = found"
+      ],
+      "show": [
+        "the cubby stands open behind the ledger, the empty cash box in it and its key on the nail"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H74 (Events' req 1057): once tipped, the cubby stays open, so a second tap only looks in"
+    }
+  ]
+}
