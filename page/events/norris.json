@@ -13,6 +13,15 @@
         "norris_kind != yes",
         "norris_trust < 4"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "her spot"
+        }
+      ],
       "show": [
         "he crouches and sets a bit of his breakfast on the flags; Mrs Norris's lamp-like eyes watch it and hold off while he is near"
       ],
@@ -56,6 +65,15 @@
         "norris_trust >= 4",
         "norris_trust < 7"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 4,
+          "mark": "her spot"
+        }
+      ],
       "show": [
         "he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone"
       ],
@@ -87,6 +105,7 @@
           "as": "norris",
           "role": "voice",
           "name": "mrs norris",
+          "cell": 5,
           "mark": "her spot"
         }
       ],
@@ -125,6 +144,15 @@
         "norris_trust >= 7",
         "norris_bored != yes"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 4,
+          "mark": "her spot"
+        }
+      ],
       "show": [
         "he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone"
       ],
@@ -158,6 +186,7 @@
           "as": "norris",
           "role": "voice",
           "name": "mrs norris",
+          "cell": 5,
           "mark": "her spot"
         }
       ],
@@ -198,6 +227,15 @@
         "norris_bored = yes",
         "norris_last != hand"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 4,
+          "mark": "her spot"
+        }
+      ],
       "show": [
         "he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone"
       ],
@@ -227,6 +265,15 @@
         "norris_bored = yes",
         "norris_last = stroke"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 5,
+          "mark": "her spot"
+        }
+      ],
       "show": [
         "he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, her eyes already on the stairs"
       ],
@@ -252,6 +299,15 @@
         "norris_trust >= 7",
         "norris_bored = yes",
         "norris_last = hand"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 4,
+          "mark": "her spot"
+        }
       ],
       "show": [
         "he holds a bit of breakfast out on his flat hand; Mrs Norris looks at it, sniffs, and takes it with no great interest, her eyes already on the stairs"
@@ -281,6 +337,7 @@
           "as": "norris",
           "role": "voice",
           "name": "mrs norris",
+          "cell": 5,
           "mark": "her spot"
         }
       ],
@@ -319,6 +376,7 @@
           "as": "norris",
           "role": "voice",
           "name": "mrs norris",
+          "cell": 5,
           "mark": "her spot"
         }
       ],
@@ -355,6 +413,15 @@
         "norris_a = stroke",
         "norris_bored != yes"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 4,
+          "mark": "her spot"
+        }
+      ],
       "show": [
         "he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone"
       ],
@@ -376,6 +443,15 @@
         "norris_kind = yes",
         "norris_a = stroke",
         "norris_bored = yes"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 4,
+          "mark": "her spot"
+        }
       ],
       "show": [
         "he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone"
@@ -401,6 +477,15 @@
         "norris_kind = yes",
         "norris_a != hand",
         "norris_a != stroke"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "her spot"
+        }
       ],
       "show": [
         "Mrs Norris watches him from where she sits, quite still, and lets him be"
@@ -586,6 +671,15 @@
         "chase != on",
         "norris_trust < 3"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
@@ -607,6 +701,15 @@
         "chase != on",
         "norris_trust >= 3",
         "norris_trust < 6"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
       ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
@@ -630,6 +733,15 @@
         "norris_trust >= 6",
         "norris_trust < 9"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
@@ -650,6 +762,15 @@
         "norris != none",
         "chase != on",
         "norris_trust >= 9"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
       ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
@@ -672,6 +793,15 @@
         "chase != on",
         "norris_trust < 3",
         "norris_bored != yes"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
       ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
@@ -696,6 +826,15 @@
         "norris_trust < 6",
         "norris_bored != yes"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
@@ -719,6 +858,15 @@
         "norris_trust < 9",
         "norris_bored != yes"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
@@ -741,6 +889,15 @@
         "norris_trust >= 9",
         "norris_bored != yes"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
@@ -761,6 +918,15 @@
         "norris != none",
         "chase != on",
         "norris_bored = yes"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
       ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
@@ -783,6 +949,15 @@
         "nights since chase_night >= 1",
         "norris_trust >= 3",
         "norris_trust < 6"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
       ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
@@ -808,6 +983,15 @@
         "norris_trust >= 6",
         "norris_trust < 9"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
       ],
@@ -830,6 +1014,15 @@
         "chase != on",
         "nights since chase_night >= 1",
         "norris_trust >= 9"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
       ],
       "show": [
         "Mrs Norris, her lamp-like eyes on him, looks a long moment and does nothing"
@@ -860,6 +1053,13 @@
           "as": "filch",
           "role": "voice",
           "name": "filch",
+          "mark": "corridor"
+        },
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 3,
           "mark": "corridor"
         }
       ],
@@ -914,6 +1114,13 @@
           "role": "voice",
           "name": "filch",
           "mark": "corridor"
+        },
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 3,
+          "mark": "corridor"
         }
       ],
       "show": [
@@ -963,6 +1170,15 @@
         "brother norris_trust >= 3",
         "norris_bored != yes"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing"
       ],
@@ -985,6 +1201,15 @@
         "norris_trust < 3",
         "brother norris_trust >= 3"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing"
       ],
@@ -1006,6 +1231,15 @@
         "nights since chase_night >= 1",
         "norris_trust < 3",
         "brother norris_trust >= 3"
+      ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 1,
+          "mark": "corridor"
+        }
       ],
       "show": [
         "Mrs Norris turns her lamp-like eyes on him, seems to know whose brother he is, and does nothing"

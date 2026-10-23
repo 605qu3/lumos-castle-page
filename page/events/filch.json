@@ -1087,6 +1087,15 @@
         "chase != in-hand",
         "nights since chase_night >= 1"
       ],
+      "who": [
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 0,
+          "mark": "corridor"
+        }
+      ],
       "show": [
         "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
       ],
@@ -2147,6 +2156,13 @@
           "name": "filch",
           "cell": 3,
           "mark": "corridor"
+        },
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 2,
+          "mark": "corridor"
         }
       ],
       "show": [
@@ -2283,6 +2299,13 @@
           "role": "voice",
           "name": "filch",
           "cell": 3,
+          "mark": "corridor"
+        },
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 2,
           "mark": "corridor"
         }
       ],
@@ -2421,6 +2444,13 @@
           "role": "voice",
           "name": "filch",
           "cell": 4,
+          "mark": "corridor"
+        },
+        {
+          "as": "norris",
+          "role": "voice",
+          "name": "mrs norris",
+          "cell": 2,
           "mark": "corridor"
         }
       ],
