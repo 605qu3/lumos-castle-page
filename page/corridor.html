@@ -1681,7 +1681,7 @@ var ARMOUR_3D = (function () {
     if (etched) {
       function band(cx, w) {   /* a blackened strip, its two borders and a running scroll */
         [cx - 512, cx, cx + 512].forEach(function (c0) {
-          x.fillStyle = 'rgba(55,55,58,0.55)'; x.fillRect(c0 - w / 2, 0, w, 512);
+          x.fillStyle = 'rgba(55,55,58,0.28)'; x.fillRect(c0 - w / 2, 0, w, 512);
           x.strokeStyle = 'rgba(20,20,24,0.9)'; x.lineWidth = 2;
           [c0 - w / 2, c0 + w / 2].forEach(function (bx) { x.beginPath(); x.moveTo(bx, 0); x.lineTo(bx, 512); x.stroke(); });
           x.strokeStyle = 'rgba(205,208,212,0.8)'; x.lineWidth = 1.6;
@@ -1695,19 +1695,35 @@ var ARMOUR_3D = (function () {
     }
     return c;
   }
+  /* the second look (the seventy-first session): plain grey steel with nothing to mirror reads as plastic, so the steel
+     mirrors a drawn corridor, its own small panorama: a dark vault above, warm stone walls with two cool window lights
+     and a torch's glow, the flags below. Only this suit's materials take it; by night it dims to the torches' warmth */
+  function hallEnv() {
+    var c = makeCanvas(512, 256), x = c.getContext('2d'), gd = x.createLinearGradient(0, 0, 0, 256);
+    gd.addColorStop(0, '#2c2826'); gd.addColorStop(0.38, '#6a6058'); gd.addColorStop(0.5, '#8c8278'); gd.addColorStop(0.56, '#5a4d42'); gd.addColorStop(1, '#2e2620');
+    x.fillStyle = gd; x.fillRect(0, 0, 512, 256);
+    [[96, '#e8eef4'], [224, '#dfe7ee']].forEach(function (w) { x.fillStyle = w[1]; x.fillRect(w[0], 70, 44, 62); x.fillStyle = '#9aa6b0'; x.fillRect(w[0] + 20, 70, 4, 62); });
+    var tg = x.createRadialGradient(400, 96, 2, 400, 96, 40); tg.addColorStop(0, 'rgba(255,200,130,0.9)'); tg.addColorStop(1, 'rgba(255,200,130,0)');
+    x.fillStyle = tg; x.fillRect(360, 56, 80, 80);
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.mapping = THREE.EquirectangularReflectionMapping;
+    var pm = new THREE.PMREMGenerator(renderer), e = pm.fromEquirectangular(t).texture; pm.dispose(); t.dispose();
+    return e;
+  }
+  var env = hallEnv();
   function steelMat(etched) {
     var c = steelCanvas(etched), t = tex(c), b = new THREE.CanvasTexture(c);
     t.wrapS = b.wrapS = THREE.RepeatWrapping;
-    return new THREE.MeshStandardMaterial({ color: 0xc8ccd2, map: t, bumpMap: b, bumpScale: 0.0015, metalness: 0.5, roughness: 0.42 });
+    return new THREE.MeshStandardMaterial({ color: 0xc8ccd2, map: t, bumpMap: b, bumpScale: 0.0015, metalness: 0.85, roughness: 0.36, envMap: env });
   }
   var steel = steelMat(false), etched = steelMat(true);
   var dark = new THREE.MeshStandardMaterial({ color: 0x55585c, metalness: 0.3, roughness: 0.7 });   /* the mail, the slit */
   var leather = new THREE.MeshStandardMaterial({ color: 0x5a4030, roughness: 0.8 });
   var wood = new THREE.MeshStandardMaterial({ color: 0x4a3626, roughness: 0.75 });
-  var brass = new THREE.MeshStandardMaterial({ color: 0xb59a5a, metalness: 0.6, roughness: 0.4 });
+  var brass = new THREE.MeshStandardMaterial({ color: 0xb59a5a, metalness: 0.8, roughness: 0.38, envMap: env });
   var rivets = [];   /* each [x, y, z], one instanced mesh at the end */
-  function lathe(pts, mat, sx, sz) {
-    var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 40), mat || steel);
+  var TX = 0.88;   /* the trunk narrowed side to side: a man's chest, not a barrel */
+  function lathe(pts, mat, sx, sz, ph0, phL) {   /* ph0 and phL turn only part of the way round, from the front's -phL/2 */
+    var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 40, ph0 || 0, phL || Math.PI * 2), mat || steel);
     m.scale.set(sx || 1, 1, sz || 1); g.add(m); return m;
   }
   function part(geo, x, y, z, mat) { var m = new THREE.Mesh(geo, mat || steel); m.position.set(x, y, z); g.add(m); return m; }
@@ -1721,11 +1737,11 @@ var ARMOUR_3D = (function () {
     var m = part(new THREE.CylinderGeometry(r * 0.96, r * 1.06, 0.03, 24), p.x, p.y, p.z);
     m.quaternion.setFromUnitVectors(UP, A.sub(B).normalize()); return m;
   }
-  function legLame(x, y, r) { part(new THREE.CylinderGeometry(r * 0.97, r * 1.05, 0.028, 24), x, y, 0); }
+  function legLame(x, y, r) { part(new THREE.CylinderGeometry(r * 0.98, r * 1.03, 0.02, 24), x, y, 0); }
   function ball(r, x, y, z, sx, sy, sz, mat) { var m = part(new THREE.SphereGeometry(r, 24, 16), x, y, z, mat); m.scale.set(sx || 1, sy || 1, sz || 1); return m; }
   function ring(r, tube, y, sz, mat) { var m = part(new THREE.TorusGeometry(r, tube, 8, 36), 0, y, 0, mat); m.rotation.x = Math.PI / 2; m.scale.y = sz || 1; return m; }
-  function rivetRow(r, y, sz, phis, cx) {   /* rivets on a turned piece's edge: x r sin phi, z r cos phi (phi 0 the front) */
-    phis.forEach(function (ph) { rivets.push([(cx || 0) + (r + 0.003) * Math.sin(ph), y, (r + 0.003) * Math.cos(ph) * sz]); });
+  function rivetRow(r, y, sz, phis, cx, sx) {   /* rivets on a turned piece's edge: x r sin phi, z r cos phi (phi 0 the front) */
+    phis.forEach(function (ph) { rivets.push([(cx || 0) + (r + 0.003) * Math.sin(ph) * (sx || 1), y, (r + 0.003) * Math.cos(ph) * sz]); });
   }
   function span(a, b, n) { var o = []; for (var i = 0; i < n; i++) o.push(a + (b - a) * i / (n - 1)); return o; }
   [1, -1].forEach(function (s) {   /* s 1 its left (+x), -1 its right */
@@ -1736,32 +1752,36 @@ var ARMOUR_3D = (function () {
     });
     lathe([[0, 0.06], [0.05, 0.07], [0.058, 0.2], [0.066, 0.32], [0.06, 0.42], [0.058, 0.46], [0, 0.46]]).position.x = x;   /* the greave */
     legLame(x, 0.448, 0.062); legLame(x, 0.565, 0.07); legLame(x, 0.595, 0.075);   /* the knee's lames, below and above */
-    ball(0.068, x, 0.5, 0.015, 1, 1.05, 1);                                     /* the knee cop */
-    var fan = part(new THREE.CylinderGeometry(0.05, 0.05, 0.012, 24), x + s * 0.06, 0.5, 0.0); fan.rotation.z = Math.PI / 2;   /* its wing */
+    ball(0.062, x, 0.5, 0.02, 0.95, 1.0, 0.85);                                 /* the knee cop */
+    var fan = part(new THREE.CylinderGeometry(0.042, 0.042, 0.006, 24), x + s * 0.056, 0.5, 0.0); fan.rotation.z = Math.PI / 2;   /* its wing */
     rivets.push([x, 0.565, 0.078], [x, 0.445, 0.065], [x + s * 0.068, 0.5, 0.0]);
     lathe([[0, 0.53], [0.066, 0.54], [0.082, 0.7], [0.09, 0.86], [0, 0.86]], etched).position.x = x;   /* the cuisse */
   });
-  lathe([[0, 0.8], [0.2, 0.8], [0.19, 0.9], [0, 0.9]], dark, 1, 0.8);         /* the mail skirt */
-  [[0.86, 0.215], [0.9, 0.205], [0.94, 0.195], [0.98, 0.185]].forEach(function (b, i) {   /* the tassets' four lames */
-    lathe([[0, b[0] + 0.05], [b[1] - 0.012, b[0] + 0.05], [b[1], b[0]], [b[1] - 0.004, b[0] - 0.004]], etched, 1, 0.78);
-    rivetRow(b[1] - 0.002, b[0] + 0.012, 0.78, [-1.1, -0.45, 0.45, 1.1]);
+  lathe([[0, 0.78], [0.2, 0.78], [0.19, 0.9], [0.155, 1.0], [0, 1.0]], dark, TX, 0.8);   /* the mail skirt, up under the tassets */
+  etched.side = THREE.DoubleSide;
+  [[0.86, 0.205], [0.9, 0.192], [0.94, 0.178], [0.98, 0.165]].forEach(function (b, i) {   /* the two tassets, four lames each, one over either thigh, the mail between them as drawn */
+    [0.3, -1.4].forEach(function (p0) { lathe([[b[1] - 0.012, b[0] + 0.05], [b[1], b[0]], [b[1] - 0.004, b[0] - 0.004]], etched, TX, 0.78, p0, 1.1); });
+    rivetRow(b[1] - 0.002, b[0] + 0.012, 0.78, [-1.15, -0.45, 0.45, 1.15], 0, TX);
   });
   [1, -1].forEach(function (s) {                                                /* the tassets' straps and buckles */
     var ph = s * 0.45, r = 0.2;
-    var st = part(new THREE.BoxGeometry(0.026, 0.13, 0.008), r * Math.sin(ph), 0.95, r * Math.cos(ph) * 0.78 + 0.006, leather); st.rotation.y = ph;
-    part(new THREE.BoxGeometry(0.03, 0.022, 0.01), r * Math.sin(ph) * 1.02, 0.975, r * Math.cos(ph) * 0.78 + 0.01, brass).rotation.y = ph;
+    var st = part(new THREE.BoxGeometry(0.026, 0.13, 0.008), r * Math.sin(ph) * TX, 0.95, r * Math.cos(ph) * 0.78 + 0.006, leather); st.rotation.y = ph;
+    part(new THREE.BoxGeometry(0.03, 0.022, 0.01), r * Math.sin(ph) * 1.02 * TX, 0.975, r * Math.cos(ph) * 0.78 + 0.01, brass).rotation.y = ph;
   });
-  ring(0.165, 0.016, 1.02, 0.78, leather);                                     /* the belt */
-  part(new THREE.BoxGeometry(0.04, 0.03, 0.012), 0, 1.02, 0.135, brass);      /* its buckle */
-  lathe([[0, 1.0], [0.16, 1.0], [0.172, 1.1], [0.198, 1.24], [0.2, 1.36], [0.165, 1.43], [0.09, 1.46], [0, 1.46]], etched, 1, 0.72);   /* the breastplate */
+  ring(0.152, 0.014, 1.02, 0.78, leather).scale.x = TX;                         /* the belt, at a waist drawn in */
+  part(new THREE.BoxGeometry(0.04, 0.03, 0.012), 0, 1.02, 0.124, brass);      /* its buckle */
+  lathe([[0, 1.0], [0.148, 1.0], [0.152, 1.06], [0.176, 1.17], [0.196, 1.28], [0.198, 1.36], [0.165, 1.43], [0.09, 1.46], [0, 1.46]], etched, TX, 0.72);   /* the breastplate */
   part(new THREE.BoxGeometry(0.012, 0.32, 0.02), 0, 1.2, 0.143);               /* its ridge down the middle */
-  rivetRow(0.165, 1.425, 0.72, span(-1.0, 1.0, 7));                             /* round the neck */
-  rivetRow(0.162, 1.012, 0.72, span(-1.3, 1.3, 9));                             /* along the waist */
+  rivetRow(0.165, 1.425, 0.72, span(-1.0, 1.0, 7), 0, TX);                      /* round the neck */
+  rivetRow(0.15, 1.012, 0.72, span(-1.3, 1.3, 9), 0, TX);                      /* along the waist */
   lathe([[0, 1.43], [0.11, 1.43], [0.085, 1.5], [0, 1.5]]);                    /* the gorget */
   rivetRow(0.1, 1.462, 1, span(-0.9, 0.9, 5));
   [1, -1].forEach(function (s) {
-    ball(0.105, s * 0.205, 1.38, 0, 1.05, 0.85, 1.0);                          /* the shoulder plate */
-    [1.32, 1.28, 1.245].forEach(function (y, i) { ball(0.09 - i * 0.008, s * 0.235, y, 0, 1, 0.45, 0.95); });   /* its lames */
+    var dome = part(new THREE.SphereGeometry(0.1, 28, 14, 0, Math.PI * 2, 0, Math.PI * 0.56), s * 0.2, 1.355, 0);   /* the shoulder plate, a dome */
+    dome.scale.set(1.0, 0.85, 0.95); dome.rotation.z = -s * 0.25;
+    [1.31, 1.275, 1.24].forEach(function (y, i) {   /* its lames, bands round the arm's top, each a little narrower */
+      var b = part(new THREE.CylinderGeometry(0.068 - i * 0.004, 0.078 - i * 0.004, 0.036, 24), s * (0.228 + i * 0.008), y, 0); b.rotation.z = -s * 0.12;
+    });
     [-0.05, 0, 0.05].forEach(function (dz) { rivets.push([s * 0.24, 1.33, 0.07 + dz * 0.2 + 0.0]); });
     rivets.push([s * 0.205, 1.43, 0.06], [s * 0.26, 1.29, 0.07]);
   });
@@ -1785,9 +1805,9 @@ var ARMOUR_3D = (function () {
   [1.19, 1.165, 1.14].forEach(function (y) { ball(0.014, -0.39, y, 0.165, 1.4, 0.8, 1); });   /* its knuckles */
   /* the helmet, its top at 1.70 */
   ball(0.112, 0, 1.586, -0.005, 1, 1.02, 1.12);
-  part(new THREE.BoxGeometry(0.01, 0.05, 0.2), 0, 1.69, -0.01);                /* its comb */
-  var visor = ball(0.115, 0, 1.56, 0.01, 0.96, 0.8, 1.2);                       /* the visor, shut */
-  part(new THREE.BoxGeometry(0.085, 0.011, 0.012), 0, 1.6, 0.143, dark);      /* its one slit, set in the visor's face */
+  var comb = part(new THREE.CylinderGeometry(0.124, 0.124, 0.008, 32, 1, false, 0.35, Math.PI - 0.7), 0, 1.582, -0.005); comb.rotation.z = Math.PI / 2;   /* its comb, a raised plate along the skull */
+  var visor = ball(0.11, 0, 1.56, 0.022, 0.95, 0.78, 1.32);                    /* the visor, shut, drawn forward to a point */
+  var slit = part(new THREE.BoxGeometry(0.09, 0.012, 0.016), 0, 1.6, 0.15, new THREE.MeshBasicMaterial({ color: 0x0c0c0e })); slit.rotation.x = -0.35;   /* its one slit, dark */
   [1, -1].forEach(function (s) { ball(0.014, s * 0.108, 1.585, 0.0, 0.6, 1, 1, brass); });   /* the visor's pivots */
   lathe([[0, 1.47], [0.1, 1.48], [0.115, 1.52], [0, 1.52]]);                   /* the bevor's foot */
   rivetRow(0.112, 1.5, 1, span(-0.8, 0.8, 5));
@@ -1805,7 +1825,7 @@ var ARMOUR_3D = (function () {
   }
   blade([[0, 1.8], [0.08, 1.82], [0.15, 1.74], [0.19, 1.86], [0.2, 1.96], [0.19, 2.04], [0.15, 2.0], [0.08, 1.92], [0, 1.94]], -1);   /* the axe, outward */
   blade([[0, 1.85], [0.05, 1.86], [0.11, 1.95], [0.06, 1.91], [0, 1.9]], 1);   /* the fluke behind */
-  var rv = new THREE.InstancedMesh(new THREE.SphereGeometry(0.0065, 8, 6), new THREE.MeshStandardMaterial({ color: 0xd8dce0, metalness: 0.6, roughness: 0.3 }), rivets.length);
+  var rv = new THREE.InstancedMesh(new THREE.SphereGeometry(0.0065, 8, 6), new THREE.MeshStandardMaterial({ color: 0xd8dce0, metalness: 0.85, roughness: 0.3, envMap: env }), rivets.length);
   var mt = new THREE.Matrix4();
   rivets.forEach(function (p, i) { mt.makeTranslation(p[0], p[1], p[2]); rv.setMatrixAt(i, mt); });
   g.add(rv);
@@ -1814,12 +1834,14 @@ var ARMOUR_3D = (function () {
   g.position.set(only ? BAY_X : BAY_X + 0.9, 0, FAR_Z + 0.4);
   g.name = 'armour-3d'; scene.add(g);
   if (only) { armour.visible = false; armourShadow.visible = false; }
-  return { group: g, only: only, mats: [steel, etched, dark, rv.material] };
+  return { group: g, only: only, mats: [steel, etched, dark, rv.material, brass], env: [steel, etched, rv.material, brass] };
 })();
 function updateArmour3d() {   /* the torches' warmth by night, as the card's */
   if (!ARMOUR_3D) return;
   var k = nightK();
+  if (ARMOUR_3D.only) { armour.visible = false; armourShadow.visible = false; }   /* something else shows the card each frame */
   ARMOUR_3D.mats.forEach(function (m) { m.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * 0.12 * k); });
+  ARMOUR_3D.env.forEach(function (m) { m.envMapIntensity = 1 - 0.65 * k; });   /* the windows dark, the mirror dims */
 }
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
 /* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
