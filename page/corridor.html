@@ -1894,7 +1894,7 @@ function updateHybrid() {   /* the torches' warmth by night, the mirror dimmed w
   if (HYBRID.only) {   /* on the card's mark, its wobble about the feet, its back turned on the cue */
     var g = HYBRID.group;
     armourShadow.visible = false;
-    g.position.x = armour.position.x; g.position.z = armour.position.z;
+    g.position.x = armour.position.x; g.position.z = armour.position.z + (armour.userData.back ? 0.04 : 0);   /* turned, its deeper front faces the wall: 4 cm out keeps the 5 cm gap */
     g.rotation.set(0, armour.userData.back ? Math.PI : 0, armour.rotation.z);
     if (HYBRID.body && !HYBRID.seated) seatVisor();
   }
