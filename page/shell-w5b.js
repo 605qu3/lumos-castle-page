@@ -778,13 +778,64 @@ window.SHELL_W5B.build = function (ctx) {
     else if (k === 'as') arcShelves.apply(null, a); else if (k === 'sl') slope.apply(null, a);
     else if (k === 'fr') frames.apply(null, a); else if (k === 'ln') lean.apply(null, a);
   });
+  var merged = {};
   Object.keys(byMat).forEach(function (m) {   /* one mesh a material, as the lead's merge */
     var pos = [], nor = [];
     byMat[m].forEach(function (geo) { var gg = geo.index ? geo.toNonIndexed() : geo; Array.prototype.push.apply(pos, gg.attributes.position.array); Array.prototype.push.apply(nor, gg.attributes.normal.array); });
+    merged[m] = pos;
     var bg = new THREE.BufferGeometry();
     bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
     var mesh = new THREE.Mesh(bg, ctx.kit.solid(MATS[m] != null ? MATS[m] : 0x5a4c3e)); mesh.userData.owner = ctx.PLACE; mesh.name = 'w5b-' + m; g.add(mesh);
   });
+  /* the ties between things (the hundred-fifty-third, 23 October 2026, Godric's 7.22 pm glitch in Peeves's lumber room):
+     things of two materials that touch or pass through each other leave faces of both in one plane (a sock on a sock,
+     a slate flush with its frame, a boot through a boot), and the depth test cannot choose between them: the striped
+     patches. Every face of each material is keyed by its plane; two materials with overlapping faces in one plane are
+     tied, and each tied material takes the first depth step its ties have not taken (a greedy colouring), drawn that
+     many steps nearer (polygonOffset; a step is the depth buffer's least, under a millimetre within ten metres), so the
+     same one shows whole from everywhere. userData.rank carries the step for tools/architect-seams.mjs */
+  (function () {
+    var planes = {}, ties = {}, mats = Object.keys(merged);
+    mats.forEach(function (m) {
+      var p = merged[m];
+      for (var i = 0; i < p.length; i += 9) {
+        var ux = p[i + 3] - p[i], uy = p[i + 4] - p[i + 1], uz = p[i + 5] - p[i + 2], vx = p[i + 6] - p[i], vy = p[i + 7] - p[i + 1], vz = p[i + 8] - p[i + 2];
+        var nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx, nl = Math.hypot(nx, ny, nz);
+        if (nl < 2e-6) continue;
+        nx /= nl; ny /= nl; nz /= nl;
+        var d = nx * p[i] + ny * p[i + 1] + nz * p[i + 2], nk = Math.round(nx * 100) + ',' + Math.round(ny * 100) + ',' + Math.round(nz * 100);
+        var lo = [Math.min(p[i], p[i + 3], p[i + 6]), Math.min(p[i + 1], p[i + 4], p[i + 7]), Math.min(p[i + 2], p[i + 5], p[i + 8])],
+            hi = [Math.max(p[i], p[i + 3], p[i + 6]), Math.max(p[i + 1], p[i + 4], p[i + 7]), Math.max(p[i + 2], p[i + 5], p[i + 8])];
+        var dk = Math.round(d / 0.003), T = { m: m, d: d, lo: lo, hi: hi }, cells = [];
+        for (var cx = Math.floor(lo[0] / 0.5); cx <= Math.floor(hi[0] / 0.5); cx++)   /* half-metre cells, so a big room stays quick */
+          for (var cy = Math.floor(lo[1] / 0.5); cy <= Math.floor(hi[1] / 0.5); cy++)
+            for (var cz = Math.floor(lo[2] / 0.5); cz <= Math.floor(hi[2] / 0.5); cz++) cells.push(cx + ',' + cy + ',' + cz);
+        if (cells.length > 400) continue;   /* a face over 100 m2 of cells: no thing's */
+        cells.forEach(function (ck) {
+          [dk - 1, dk, dk + 1].forEach(function (q) {
+            var L0 = planes[nk + '|' + q + '|' + ck];
+            if (L0) L0.forEach(function (o) {
+              if (o.m === m || Math.abs(o.d - d) > 0.003 || (ties[m] && ties[m][o.m])) return;
+              var ov = [0, 1, 2].map(function (k) { return Math.min(hi[k], o.hi[k]) - Math.max(lo[k], o.lo[k]); });
+              ov.sort(function (a, b) { return b - a; });
+              if (ov[0] > 0.01 && ov[1] > 0.01) { (ties[m] = ties[m] || {})[o.m] = 1; (ties[o.m] = ties[o.m] || {})[m] = 1; }
+            });
+          });
+          var K = nk + '|' + dk + '|' + ck; (planes[K] = planes[K] || []).push(T);
+        });
+      }
+    });
+    var step = {};
+    Object.keys(ties).sort(function (a, b) { return Object.keys(ties[b]).length - Object.keys(ties[a]).length; }).forEach(function (m) {
+      var used = {}; Object.keys(ties[m]).forEach(function (o) { if (step[o] != null) used[step[o]] = 1; });
+      var s = 0; while (used[s]) s++; step[m] = s;
+    });
+    g.children.forEach(function (mesh) {
+      var s = step[mesh.name.slice(4)];
+      if (!s) return;
+      mesh.material.polygonOffset = true; mesh.material.polygonOffsetFactor = -s; mesh.material.polygonOffsetUnits = -s; mesh.userData.rank = -s;
+    });
+  })();
   (R.lights || []).forEach(function (l, i) {   /* a room W5B lights (window.SHELL_W5B.lit): [x, y, z, hex, intensity, distance] in its frame, { day: true } lit 7 am to 6 pm only */
     if (l[6] && l[6].day && !(ctx.HOUR >= 7 && ctx.HOUR < 18)) return;
     var pl = new THREE.PointLight(l[3], l[4], l[5], 1.6); pl.position.copy(L(l[0], l[1], l[2])); pl.name = 'w5b-light-' + i; g.add(pl);
