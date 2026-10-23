@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=491"></script>
-<script src="castle-paint.js?v=87"></script>
+<script src="castle-model.js?v=492"></script>
+<script src="castle-paint.js?v=88"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -291,6 +291,8 @@ PAINTED = PAINTED.concat(['astronomy-lantern-room', 'astronomy-night-books', 'as
 PAINTED = PAINTED.concat(['stopped-clocks']);
 /* v159, req 949 (ledger 224): the Owlery at the top of the West Tower, a rough build; straw on its floor (STRAW) and nothing else */
 PAINTED = PAINTED.concat(['owlery']);
+/* v161, req 869 A and B (ledger 226): the lake tower's rooms B to 3 and the Tudor bay's G to 3, a rough build; doors only */
+PAINTED = PAINTED.concat(['lake-tower-b', 'lake-tower-g', 'lake-tower-1', 'lake-tower-2', 'lake-tower-3', 'tudor-bay-g', 'tudor-bay-1', 'tudor-bay-2', 'tudor-bay-3']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
