@@ -160,6 +160,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
+<script src="design/ironwork.js?v=1"></script>
 <script src="castle-shell.js?v=75"></script>
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=20"></script>
@@ -2278,6 +2279,20 @@ var REFUGE = (function () {
   place(cut, df, 0.008, Y(1.9));
   g.children.forEach(function (m) { m.userData.owner = PLACE; m.raycast = function () {}; });
   return out;
+})();
+/* the dungeon corridor's ironwork (req 1048; Godric's 2 on architect-ironwork-1023, B, the scroll grille; Design's kit,
+   page/design/ironwork.js, whose header is the interface): a blind screen 0.15 off the corridor's wall at y 15, x 34 to
+   120, to 2.9 under the vault's springing, in whole bays of about 2.4; black iron in the shell's tone, two meshes, two
+   draw calls. No tap lands on it. */
+var IRONWORK = (function () {
+  if (PLACE !== 'dungeon-corridor' || !window.CastleIronwork) return null;
+  var t = window.CASTLE_TONES && CASTLE_TONES.surfaces && CASTLE_TONES.surfaces.iron;
+  var IW = CastleIronwork.forWall(THREE, shell.place, { toLocal: shell.toLocal, from: [34, 15], to: [120, 15], top: 2.9, bay: 2.4, proud: 0.15, pattern: 'B' },
+    { iron: kit.solid(t ? parseInt(t.hex.slice(1), 16) : 0x2e2b28) });
+  if (!IW) return null;
+  IW.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; });
+  shell.group.add(IW.group);
+  return IW;
 })();
 /* the hospital wing's lamps (Magic's req 677; Events' req 681, page/events/wing.json), where Interiors'
    docs/interiors/hospital-wing.md hangs them (req 678, cited; x = 151.4 + x', y = 25 + y'): six lanterns on chains
