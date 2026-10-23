@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=498"></script>
-<script src="castle-paint.js?v=94"></script>
+<script src="castle-model.js?v=499"></script>
+<script src="castle-paint.js?v=95"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -296,7 +296,7 @@ PAINTED = PAINTED.concat(['lake-tower-b', 'lake-tower-g', 'lake-tower-1', 'lake-
 /* v162, req 869 A on G (ledger 227): the Gryffindor Tower's round storeroom on G, off the bend; a rough build, the door only */
 PAINTED = PAINTED.concat(['drum-room-g', 'west-tower-room-g', 'transfiguration-store', 'tapestry-room']);
 /* v163, req 869 A on B (ledger 228): the round cellar under it, off lake-corridor-b-west's east end; a rough build, the door only, its floor earth */
-PAINTED = PAINTED.concat(['drum-room-b']);
+PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
