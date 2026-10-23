@@ -4143,7 +4143,7 @@ var BORROW = (function () {
   var end = function (s) { return h.at.clone().addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, s * a), 2 * h.half).distanceTo(mid); };
   return { d: d, t: -1, open: 0.8, hold: 8, shut: 1.2, a: end(1) < end(-1) ? a : -a };   /* into the classroom, toward him */
 })();
-thingCues[CH_BORROW] = function () { showLines([{ medium: 'seen', sound: CH_BORROW, on: function () { if (BORROW && BORROW.t < 0) BORROW.t = 0; } }]); };
+thingCues[CH_BORROW] = function () { showLines([{ medium: 'seen', sound: CH_BORROW, on: function () { if (BORROW && BORROW.t < 0 && !(BANG && BANG.t >= 0)) BORROW.t = 0; } }]); };
 if (BORROW && Q.get('touch') === 'borrow') setTimeout(function () { thingCues[CH_BORROW](); }, 1500);
 function updateBorrow(dt) {
   if (!BORROW || BORROW.t < 0) return;
@@ -4152,6 +4152,32 @@ function updateBorrow(dt) {
   var a = f * B.a;
   m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half); m.rotation.y = B.d.rest.rot + a;
   if (s >= B.open + B.hold + B.shut) { m.position.copy(B.d.rest.pos); m.rotation.y = B.d.rest.rot; B.t = -1; }
+}
+/* req 983, peeves.json's peeves.wastepaper, word for word (PS 8 L2724): in the four first-year classrooms, on the line
+   the classroom's door bangs open on its hinge into the room, 1.0 rad in 0.25 s with a small rebound off its swing, stands
+   6 s while the late pupil comes in, and swings shut over 1.4 s; the pupil and his basket stay the line's (no figures
+   yet), Peeves's cackle the runtime's heard line. In Charms it waits on the borrow's swing (one leaf). ?touch=wastepaper */
+var PV_WASTE = 'the door bangs open and a first-year comes in late with a wastepaper basket on his head, a cackle going away down the corridor, and the class sniggers';
+var BANG = (function () {
+  var id = { 'charms-classroom': 'charms-door', 'defence-classroom': 'defence-classroom-door',
+    'history-of-magic-classroom': 'history-of-magic-door', 'transfiguration-classroom': 'transfiguration-door' }[PLACE];
+  var d = id && shell.doors.filter(function (x) { return x.id === id; })[0];
+  var room = MODEL && (MODEL.rooms || []).filter(function (r) { return r.id === PLACE; })[0];
+  if (!d || !d.hinge || !room || !room.shape || !room.shape.rect) return null;
+  var R = room.shape.rect, h = d.hinge, a = 1.0, mid = shell.toLocal((R[0] + R[2]) / 2, (R[1] + R[3]) / 2, shell.place.floor);
+  var end = function (s) { return h.at.clone().addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, s * a), 2 * h.half).distanceTo(mid); };
+  return { d: d, t: -1, open: 0.25, hold: 6, shut: 1.4, a: end(1) < end(-1) ? a : -a };
+})();
+thingCues[PV_WASTE] = function () { showLines([{ medium: 'seen', sound: PV_WASTE, on: function () { if (BANG && BANG.t < 0 && !(BORROW && BORROW.t >= 0)) BANG.t = 0; } }]); };
+if (BANG && Q.get('touch') === 'wastepaper') setTimeout(function () { thingCues[PV_WASTE](); }, 1500);
+function updateBang(dt) {
+  if (!BANG || BANG.t < 0) return;
+  var B = BANG, s = (B.t += dt), h = B.d.hinge, m = B.d.mesh, e = function (u) { return u * u * (3 - 2 * u); };
+  var r = s - B.open, f = s < B.open ? Math.sin(s / B.open * Math.PI / 2) : r < 0.5 ? 1 - 0.08 * Math.sin(r / 0.5 * Math.PI) * (1 - r / 0.5) :
+    r < B.hold ? 1 : Math.max(0, 1 - e((r - B.hold) / B.shut));   /* flung, a shiver back off the swing, still, then pushed to */
+  var a = f * B.a;
+  m.position.copy(h.at).addScaledVector(h.along.clone().applyAxisAngle(Y_AXIS, a), h.half); m.rotation.y = B.d.rest.rot + a;
+  if (r >= B.hold + B.shut) { m.position.copy(B.d.rest.pos); m.rotation.y = B.d.rest.rot; B.t = -1; }
 }
 thingCues[TF_PIG] = function () { showLines([{ medium: 'seen', sound: TF_PIG, on: function () { if (PIG) PIG.go(); } }]); };
 if (PIG && Q.get('touch') === 'pig') setTimeout(function () { thingCues[TF_PIG](); }, 1500);
@@ -4847,7 +4873,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateBorrow(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateBorrow(dt); updateBang(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -5933,7 +5959,8 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
       lift: Object.keys(WOVEN.lifts).map(function (k) { return k + ' ' + WOVEN.lifts[k].t.toFixed(2); }).join(', '), flick: WOVEN.flick,
       sheet: WOVEN.sheet ? WOVEN.sheet.visible : null, singed: WOVEN.singed ? WOVEN.singed.visible : null, scorch: WOVEN.scorch ? WOVEN.scorch.visible : null,
       mine: WOVEN.mine ? WOVEN.mine[0].visible : null, fx: WOVEN.fx ? WOVEN.fx.kind + ' ' + WOVEN.fx.t.toFixed(2) : null, tries: WOVEN.tries } : null; },
-  touch: function (cue) { if (cue) cueTable[{ hagrid: EH_HAGRID, toad: TF_TOAD, mice: GH_MICE, pig: TF_PIG, borrow: CH_BORROW }[cue] || cue]();   /* req 964; the pig and the borrow req 975 */
+  touch: function (cue) { if (cue) cueTable[{ hagrid: EH_HAGRID, toad: TF_TOAD, mice: GH_MICE, pig: TF_PIG, borrow: CH_BORROW, wastepaper: PV_WASTE }[cue] || cue]();   /* req 964; the pig and the borrow req 975; the wastepaper req 983 */
+    if (BANG && (cue === 'wastepaper' || BANG.t >= 0)) return { bang: BANG.t < 0 ? null : +BANG.t.toFixed(2), leaf: +(BANG.d.mesh.rotation.y - BANG.d.rest.rot).toFixed(3), open: +BANG.a.toFixed(3), door: BANG.d.id };
     if (BORROW) return { borrow: BORROW.t < 0 ? null : +BORROW.t.toFixed(2), leaf: +(BORROW.d.mesh.rotation.y - BORROW.d.rest.rot).toFixed(3), open: +BORROW.a.toFixed(3) };
     if (MICE) return { t: +MICE.t.toFixed(2), mice: MICE.mice.filter(function (m) { return m.g.visible; }).length, cat: MICE.cat.visible };
     if (TOAD) return { pig: PIG.t < 0 ? null : +PIG.t.toFixed(2), pigShown: PIG.g.visible, desk: (W1.pigdesk || []).map(function (m) { return m.visible; }), pigAt: PIG.g.position.toArray().map(function (v) { return +v.toFixed(2); }), hop: TOAD.t < 0 ? null : [TOAD.k, +TOAD.t.toFixed(2)], toad: TOAD.g.visible, at: TOAD.g.position.toArray().map(function (v) { return +v.toFixed(2); }) };
