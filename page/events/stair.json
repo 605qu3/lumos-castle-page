@@ -941,6 +941,27 @@
         "the boy lifts the lid of the box in his arms and a long, hairy leg pokes out; the pupils round him shriek and yell"
       ],
       "canon": "Godric's woven touch lee-tarantula-box on people-student-stock-1022 (22 October 2026, 7.23 pm, relayed by Fawkes): among the older students a boy with dreadlocks keeps a box a long hairy leg pokes out of, a small knot of pupils crowding round it; PS 6 (B1 ch6 L1826 to L1830, read in the canon tool, 22 October 2026: \"A boy with dreadlocks was surrounded by a small crowd.\" \"Give us a look, Lee, go on.\" \"The boy lifted the lid of a box in his arms, and the people around him shrieked and yelled as something inside poked out a long, hairy leg.\"; the tarantula is Lee Jordan's, L1968); year 1, in a corridor in plain view; tapped, the lid lifts and the leg pokes out (PS 6 L1830); a leg only, never the whole spider, nothing frightens the boy who taps"
+    },
+    {
+      "id": "stair.tabby-cat",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = corridor",
+        "year = 1",
+        "hour >= 6",
+        "hour < 9",
+        "days since tabby_on >= 14"
+      ],
+      "show": [
+        "a tabby cat with square markings round its eyes sits very still on a corridor windowsill, watching him; when he looks again, it has gone"
+      ],
+      "starts": [
+        "stamp tabby_on"
+      ],
+      "canon": "Godric's woven touch mcgonagall-tabby-cat (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): early one morning a tabby cat with markings round its eyes sits very still on a corridor windowsill watching him, gone when he looks again (PS 1 L39, \"the same markings around its eyes\", and L95, \"square glasses exactly the shape of the markings the cat had had around its eyes\"; L95 also \"he turned to smile at the tabby, but it had gone\", read in the canon tool, 22 October 2026); year 1, between six and nine in the morning, a fortnight apart at the least; the cue names no Professor, it is only the cat (the same markings as transfiguration.cat's)"
     }
   ]
 }

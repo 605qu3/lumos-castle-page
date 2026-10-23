@@ -1,0 +1,28 @@
+{
+  "chain": "snap",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "snap.exploding",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 40-140 s",
+      "when": [
+        "place = common room",
+        "year = 2",
+        "date >= 12-20",
+        "date <= 12-31",
+        "time != night",
+        "days since snap_on >= 1"
+      ],
+      "show": [
+        "two pupils at the hearth playing Exploding Snap on the rug; the pack goes off with a bang and everyone in the room jumps"
+      ],
+      "starts": [
+        "stamp snap_on"
+      ],
+      "canon": "Godric's woven touch exploding-snap-common-room (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): at Christmas in the common room two pupils play Exploding Snap and a bang makes everyone jump (CoS 12 L10703, \"they could play Exploding Snap loudly without bothering anyone\", read in the canon tool, 22 October 2026; the pupils are nobody by name, the bang is the game's own); year 2, from 20 December to the 31st (the paper hat's days on the sofa), by day, at most once a day; the Common room's cue (row 969's lane is held, so it shows as a seen line until the room draws it)"
+    }
+  ]
+}

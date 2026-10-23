@@ -956,6 +956,47 @@
         "log \"Made his own feather rise in Charms {day}\""
       ],
       "canon": "req 936 item 12 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm) and People's touch charms-feather-fire on people-first-years-class-1022 (Godric wove it 7.03 pm), one moment; PS 10 (B1 ch10 L3508, read in the canon tool, 22 October 2026: \"Seamus got so impatient that he prodded it with his wand and set fire to it\"); the win is his: a steady swish and flick lifts it, about two tries in three once the first has missed"
+    },
+    {
+      "id": "charms.mcgonagall-borrows",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = charms classroom",
+        "year = 1",
+        "lessons = on",
+        "time != night",
+        "days since mcg_borrow_on >= 14"
+      ],
+      "who": [
+        {
+          "as": "mcgonagall",
+          "role": "voice",
+          "name": "mcgonagall",
+          "mark": "the door"
+        }
+      ],
+      "show": [
+        "a knock at the door; Professor McGonagall puts her head round it, an older pupil gets up from the back and goes out with her, and the class whispers"
+      ],
+      "lines": [
+        {
+          "speaker": "mcgonagall",
+          "medium": "heard",
+          "key": "charms.mcgonagall-borrows-says",
+          "sound": "Professor McGonagall at the classroom door, after a knock",
+          "text": [
+            "Excuse me, Professor Flitwick, could I borrow one of your pupils for a moment?"
+          ],
+          "canon": "Godric's woven touch mcgonagall-borrows-pupil (22 October 2026, 7.50 pm, relayed by Fawkes): hers, word for word but for the name, PS 9 L3051 (\"Excuse me, Professor Flitwick, could I borrow Wood for a moment?\", read in the canon tool, 22 October 2026); the pupil is an older one, unnamed (Wood is met elsewhere)"
+        }
+      ],
+      "starts": [
+        "stamp mcg_borrow_on"
+      ],
+      "canon": "Godric's woven touch mcgonagall-borrows-pupil (22 October 2026, 7.50 pm, relayed by Fawkes): mid-lesson McGonagall knocks, asks to borrow an older pupil for a moment, and leaves the class whispering (PS 9 L3051, read in the canon tool, 22 October 2026, in Flitwick's Charms); year 1, in a lesson hour in the Charms classroom, a fortnight apart at the least; Flitwick's reply left unwritten (the class whispers); the pupil is unnamed, the class being invented pupils of his year (Story's pick story-lesson-classmates-1022 1), the older one passing through"
     }
   ]
 }

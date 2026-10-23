@@ -1281,6 +1281,49 @@
       ],
       "starts": [],
       "canon": "the silent partner of great-hall.christmas-mice"
+    },
+    {
+      "id": "great-hall.remembrall-smoke",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "hall-remembrall",
+      "weight": 1,
+      "moment": "wait 10-40 s",
+      "when": [
+        "place = great hall",
+        "meal = breakfast",
+        "occasion = none",
+        "year = 1",
+        "days since hall_remembrall >= 14"
+      ],
+      "who": [
+        {
+          "as": "first-year",
+          "role": "voice",
+          "name": "a first-year at the next table",
+          "mark": "another table"
+        }
+      ],
+      "show": [
+        "at the next table a first-year holds up a glass ball the size of a large marble, full of white smoke; it glows scarlet in his fist and his face falls"
+      ],
+      "lines": [
+        {
+          "speaker": "first-year",
+          "medium": "heard",
+          "key": "great-hall.remembrall-oh",
+          "sound": "a first-year at the next table, holding a glass ball up to the light",
+          "text": [
+            "Look, it's gone red. Oh... I've forgotten something."
+          ],
+          "canon": "Godric's woven touch remembrall-smoke (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): ours, his voice, a boy of the boys' year at the next table, unnamed (Story's pick story-lesson-classmates-1022 1: the named classmates are met elsewhere as friends); the ball is a Remembrall, PS 9 L2931 (\"a glass ball the size of a large marble, which seemed to be full of white smoke\") and L2933 (\"the Remembrall had suddenly glowed scarlet, '...you've forgotten something....'\"), read in the canon tool, 22 October 2026"
+        }
+      ],
+      "starts": [
+        "stamp hall_remembrall"
+      ],
+      "canon": "Godric's woven touch remembrall-smoke (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): at breakfast a first-year at the next table shakes a marble-sized glass ball that fills with smoke and groans he has forgotten something (PS 9 L2931 and L2933, read in the canon tool, 22 October 2026); the card says red smoke, the text has white smoke that glows scarlet, so the cue is built to the text; year 1, now and then (a fortnight apart at the least), at breakfast on a day with no occasion; the pupil is unnamed, the Remembrall being Neville's in the book (Neville is met elsewhere)"
     }
   ]
 }

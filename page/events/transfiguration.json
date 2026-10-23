@@ -194,6 +194,27 @@
       "aside": "set aside 15 October 2026 (docs/ministry/set-aside.md): a canon lesson replayed (EV-27)"
     },
     {
+      "id": "transfiguration.desk-into-pig",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = transfiguration classroom",
+        "year = 1",
+        "time != evening",
+        "time != night",
+        "mcgonagall_desk_pig != done"
+      ],
+      "show": [
+        "Professor McGonagall flicks her wand and her desk becomes a pig, which trots snuffling round the clear floor before it; another flick, and it is a desk again"
+      ],
+      "starts": [
+        "set mcgonagall_desk_pig = done"
+      ],
+      "canon": "Godric's woven touch desk-into-pig (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): on a boy's first Transfiguration lesson, before they begin, she turns her desk into a pig and back (PS 8 L2740, read in the canon tool, 22 October 2026: \"Then she changed her desk into a pig and back again. They were all very impressed and couldn't wait to get started\"); year 1, once ever, at his first visit to the classroom by day (his own lesson is under way whenever he walks in, so the first arrival is his first lesson); the old record transfiguration.pig (the first week of the Stone's September, set aside 15 October 2026 as a canon lesson replayed, EV-27) stays set aside, its cue string the same word for word; the clear floor before her desk is the room rule's own"
+    },
+    {
       "id": "transfiguration.cat",
       "tier": "fixed",
       "source": "date",

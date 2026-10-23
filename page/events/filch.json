@@ -2231,6 +2231,297 @@
         "stamp mcg_round"
       ],
       "canon": "Godric's 1 on events-catch-fourth-ending-1022 (22 October 2026, 6.38 pm, relayed by Fawkes): a rare fourth way a catch ends, now and then and at most a few times a year, the three in turn staying the usual: Professor McGonagall passing on her rounds sees the boy back to his house, one look over her glasses, nothing punished and nothing written; ours after PS 8 L2726 (Professor Quirrell, who was passing, takes the boys' part when Filch has them), the teacher swapped, read in the canon tool, 22 October 2026; a group of its own with the three endings (about one catch in forty), at least fourteen days apart; it does not spend the turn"
+    },
+    {
+      "id": "filch.pops-up",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 90-300 s",
+      "when": [
+        "place = corridor",
+        "year = 1",
+        "time != night",
+        "chase != on",
+        "hiding = no",
+        "days since filch_pop_on >= 3"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "Filch steps out from under the hillside tapestry right beside the boy, as suddenly as any of the ghosts, looks him up and down, and shuffles off along the corridor"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.pops-up-mutter",
+          "sound": "Filch shuffling away, muttering to Mrs Norris",
+          "text": [
+            "Hmph. Nothing. Nothing again, my sweet.",
+            "Up to something, I'll be bound. Not today, my sweet. Not today."
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); gentle, nothing punished (Story, 1.48 pm, 22 October 2026)"
+        }
+      ],
+      "starts": [
+        "stamp filch_pop_on"
+      ],
+      "canon": "Godric's woven touch filch-pops-up (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): now and then Filch steps out of a tapestry or side door right beside the boy, as suddenly as a ghost, then shuffles off muttering (PS 8 L2728, \"could pop up as suddenly as any of the ghosts\", and CoS 8 L9025, \"Argus Filch burst suddenly through a tapestry\", read in the canon tool, 22 October 2026); on the corridor, out of the hillside tapestry by the Architect's passage (req 934, shortcut-door-7 to shortcut-door-5); year 1, by day (the chase is the night's), three days apart at the least, never in a chase and never while he hides; the cue names no lamp, since his lamp is only for torchlit places and the night (Godric, 22 October 2026, 7.40 pm); the Corridor lifts the tapestry (liftTapestry)"
+    },
+    {
+      "id": "filch.cat-lure",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 1,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "night_quest = on",
+        "days since mcg_round >= 14",
+        "days since mcg_cat >= 30"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "a tabby cat with square markings round its eyes slips along the top of the stairs; Mrs Norris freezes, bristles and goes after it down the far flight, and Filch's lamp goes after her"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.cat-lure-filch",
+          "sound": "Filch at the top of the stairs, his lamp turning after Mrs Norris",
+          "text": [
+            "What is it, my sweet? Who's there? Come back here!",
+            "What have you seen, my sweet? Not a rat? Wait for me!"
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); gentle, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "stamp mcg_round",
+        "stamp mcg_cat"
+      ],
+      "canon": "Godric's new idea (22 October 2026, 7.40 pm, on the Filch card, relayed by Fawkes): \"sometimes McGonagall rescues the boys by, in her cat form, chasing or luring Mrs Norris away. This is very rare and only done when the boys are on a quest that requires them to be out of bed, especially one for her.\" Provisional, Godric to confirm the odds: the gate is the var night_quest (none, on, or mcgonagall for a quest of hers), which nothing sets yet, so the rescue waits for the quest steps (Story's year steps, Magic) to raise it; she is a tabby with square markings round its eyes (PS 1 L95, read in the canon tool, 22 October 2026), the Professor never named in the cue; it shares mcg_round with the fourth ending so she never rounds twice in a fortnight, and has its own mcg_cat, a month apart at the least; this one lures Mrs Norris off while the boy hides, a partner of filch.chase-hidden-norris's group"
+    },
+    {
+      "id": "filch.cat-lure-hers",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "chase-hidden",
+      "weight": 2,
+      "moment": "filch at top",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = yes",
+        "night_quest = mcgonagall",
+        "days since mcg_round >= 14",
+        "days since mcg_cat >= 30"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 0,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "a tabby cat with square markings round its eyes slips along the top of the stairs; Mrs Norris freezes, bristles and goes after it down the far flight, and Filch's lamp goes after her"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.cat-lure-hers-filch",
+          "sound": "Filch at the top of the stairs, his lamp turning after Mrs Norris",
+          "text": [
+            "What is it, my sweet? Who's there? Come back here!",
+            "What have you seen, my sweet? Not a rat? Wait for me!"
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); gentle, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "stamp mcg_round",
+        "stamp mcg_cat"
+      ],
+      "canon": "Godric's new idea (22 October 2026, 7.40 pm, on the Filch card, relayed by Fawkes): \"sometimes McGonagall rescues the boys by, in her cat form, chasing or luring Mrs Norris away. This is very rare and only done when the boys are on a quest that requires them to be out of bed, especially one for her.\" Provisional, Godric to confirm the odds: the gate is the var night_quest (none, on, or mcgonagall for a quest of hers), which nothing sets yet, so the rescue waits for the quest steps (Story's year steps, Magic) to raise it; she is a tabby with square markings round its eyes (PS 1 L95, read in the canon tool, 22 October 2026), the Professor never named in the cue; it shares mcg_round with the fourth ending so she never rounds twice in a fortnight, and has its own mcg_cat, a month apart at the least; this one lures Mrs Norris off while the boy hides, a partner of filch.chase-hidden-norris's group"
+    },
+    {
+      "id": "filch.cat-chase",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 1,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "night_quest = on",
+        "days since mcg_round >= 14",
+        "days since mcg_cat >= 30"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 3,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "a tabby cat with square markings round its eyes steps out between the boy and Filch's lamp; Mrs Norris hisses and bolts, the tabby after her, and Filch's lamp turns away down the stairs on their heels, the boy let alone"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.cat-chase-filch",
+          "sound": "Filch at the top of the stairs, his lamp swinging after Mrs Norris",
+          "text": [
+            "Mrs Norris? My sweet! What is it? Come back!",
+            "Where are you off to, my sweet? Wait for me!"
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); he forgets the boy for his cat, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "stamp mcg_round",
+        "stamp mcg_cat"
+      ],
+      "canon": "Godric's new idea (22 October 2026, 7.40 pm, on the Filch card, relayed by Fawkes): \"sometimes McGonagall rescues the boys by, in her cat form, chasing or luring Mrs Norris away. This is very rare and only done when the boys are on a quest that requires them to be out of bed, especially one for her.\" Provisional, Godric to confirm the odds: the gate is the var night_quest (none, on, or mcgonagall for a quest of hers), which nothing sets yet, so the rescue waits for the quest steps (Story's year steps, Magic) to raise it; she is a tabby with square markings round its eyes (PS 1 L95, read in the canon tool, 22 October 2026), the Professor never named in the cue; it shares mcg_round with the fourth ending so she never rounds twice in a fortnight, and has its own mcg_cat, a month apart at the least; this one is a fifth ending of a catch, beside the Professor's own (filch.catch-mcgonagall), the tabby chasing Mrs Norris off in the open"
+    },
+    {
+      "id": "filch.cat-chase-hers",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "filch-catch-end",
+      "weight": 8,
+      "moment": "filch catches",
+      "when": [
+        "place = corridor",
+        "chase = on",
+        "hiding = no",
+        "night_quest = mcgonagall",
+        "days since mcg_round >= 14",
+        "days since mcg_cat >= 30"
+      ],
+      "who": [
+        {
+          "as": "filch",
+          "role": "voice",
+          "name": "filch",
+          "cell": 3,
+          "mark": "corridor"
+        }
+      ],
+      "show": [
+        "a tabby cat with square markings round its eyes steps out between the boy and Filch's lamp; Mrs Norris hisses and bolts, the tabby after her, and Filch's lamp turns away down the stairs on their heels, the boy let alone"
+      ],
+      "lines": [
+        {
+          "speaker": "filch",
+          "medium": "heard",
+          "key": "filch.cat-chase-hers-filch",
+          "sound": "Filch at the top of the stairs, his lamp swinging after Mrs Norris",
+          "text": [
+            "Mrs Norris? My sweet! What is it? Come back!",
+            "Where are you off to, my sweet? Wait for me!"
+          ],
+          "canon": "ours, in his voice (\"my sweet\", CoS 8 L9091); he forgets the boy for his cat, nothing punished"
+        }
+      ],
+      "starts": [
+        "set chase = off",
+        "stamp mcg_round",
+        "stamp mcg_cat"
+      ],
+      "canon": "Godric's new idea (22 October 2026, 7.40 pm, on the Filch card, relayed by Fawkes): \"sometimes McGonagall rescues the boys by, in her cat form, chasing or luring Mrs Norris away. This is very rare and only done when the boys are on a quest that requires them to be out of bed, especially one for her.\" Provisional, Godric to confirm the odds: the gate is the var night_quest (none, on, or mcgonagall for a quest of hers), which nothing sets yet, so the rescue waits for the quest steps (Story's year steps, Magic) to raise it; she is a tabby with square markings round its eyes (PS 1 L95, read in the canon tool, 22 October 2026), the Professor never named in the cue; it shares mcg_round with the fourth ending so she never rounds twice in a fortnight, and has its own mcg_cat, a month apart at the least; this one is a fifth ending of a catch, beside the Professor's own (filch.catch-mcgonagall), the tabby chasing Mrs Norris off in the open"
+    },
+    {
+      "id": "filch.quest-on",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night quest begins",
+      "when": [],
+      "starts": [
+        "set night_quest = on"
+      ],
+      "canon": "the gate of Godric's new idea (22 October 2026, 7.40 pm, relayed by Fawkes): McGonagall's rescue in her cat form is only for a boy on a quest that needs him out of bed, especially one for her; no quest raises this moment yet, so night_quest stays none and the rescue waits for Story's year steps and Magic's quests, which raise it where their step begins and ends"
+    },
+    {
+      "id": "filch.quest-hers",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night quest hers begins",
+      "when": [],
+      "starts": [
+        "set night_quest = mcgonagall"
+      ],
+      "canon": "the gate of Godric's new idea (22 October 2026, 7.40 pm, relayed by Fawkes): McGonagall's rescue in her cat form is only for a boy on a quest that needs him out of bed, especially one for her; no quest raises this moment yet, so night_quest stays none and the rescue waits for Story's year steps and Magic's quests, which raise it where their step begins and ends"
+    },
+    {
+      "id": "filch.quest-over",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night quest ends",
+      "when": [],
+      "starts": [
+        "set night_quest = none"
+      ],
+      "canon": "the gate of Godric's new idea (22 October 2026, 7.40 pm, relayed by Fawkes): McGonagall's rescue in her cat form is only for a boy on a quest that needs him out of bed, especially one for her; no quest raises this moment yet, so night_quest stays none and the rescue waits for Story's year steps and Magic's quests, which raise it where their step begins and ends"
+    },
+    {
+      "id": "filch.door-smell",
+      "tier": "fixed",
+      "source": "date",
+      "leans": [],
+      "moment": "wait 5-20 s",
+      "when": [
+        "place = classroom corridor",
+        "year = 2",
+        "filch_door = ajar",
+        "days since door_smell_on >= 1"
+      ],
+      "show": [
+        "through the gap of Filch's door a faint smell of fried fish, and of wooden filing cabinets"
+      ],
+      "starts": [
+        "stamp door_smell_on"
+      ],
+      "canon": "Godric's woven touch filch-office-fish (22 October 2026, 7.50 pm, relayed by Fawkes): passing Filch's office door, a faint smell of fried fish and wooden filing cabinets through the gap (CoS 8 L9029, \"A faint smell of fried fish lingered about the place. Wooden filing cabinets stood around the walls\", read in the canon tool, 22 October 2026); year 2, on the classroom corridor while his door stands ajar (filch.door-out), at most once a day; inside the office the same smell is the room rule's own"
     }
   ]
 }

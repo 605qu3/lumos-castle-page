@@ -1003,6 +1003,15 @@
         {
           "speaker": "lost",
           "medium": "said",
+          "key": "door.lost-lead-step",
+          "text": [
+            "Mind the stair up to the next floor. There's a step halfway up that vanishes, and you have to remember to jump it."
+          ],
+          "canon": "Godric's woven touch vanishing-step (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): the lost first-year warns him of a stair with a vanishing step halfway up that you must remember to jump (PS 8 L2722, read in the canon tool, 22 October 2026: \"some with a vanishing step halfway up that you had to remember to jump\"); his words ours; he comes in whatever year the lost first-year comes (the touch says year 1; the record has no year gate, the first-year himself being a first-year in any year), after he has been walked to his door"
+        },
+        {
+          "speaker": "lost",
+          "medium": "said",
           "key": "door.lost-lead-rumour",
           "text": [
             "A prefect told me there's a door on this floor that won't open unless you ask it nicely. I think he was having me on."
@@ -1058,6 +1067,15 @@
             "That's it! I'd still be going round. Thanks."
           ],
           "canon": "req 936 item 5 (Story's Year 1 small wins, docs/story/year-1-wins.md, b29142c9, Godric's yes 22 October 2026, 7.02 pm): ours, in his voice; earned, not lucky (the boy leads him by the plan)"
+        },
+        {
+          "speaker": "lost",
+          "medium": "said",
+          "key": "door.lost-lead-friday-step",
+          "text": [
+            "Mind the stair up to the next floor. There's a step halfway up that vanishes, and you have to remember to jump it."
+          ],
+          "canon": "Godric's woven touch vanishing-step (22 October 2026, 7.35 to 7.40 pm, relayed by Fawkes): the lost first-year warns him of a stair with a vanishing step halfway up that you must remember to jump (PS 8 L2722, read in the canon tool, 22 October 2026: \"some with a vanishing step halfway up that you had to remember to jump\"); his words ours; he comes in whatever year the lost first-year comes (the touch says year 1; the record has no year gate, the first-year himself being a first-year in any year), after he has been walked to his door"
         },
         {
           "speaker": "lost",
