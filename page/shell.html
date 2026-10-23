@@ -5642,7 +5642,14 @@ function placeLine(c) {
     lineV.copy(c.door.mid); lineV.y += c.door.sill + c.door.h * 0.75; lineV.project(camera);
     if (lineV.z < 1) { ax = (lineV.x + 1) / 2 * W; ay = (1 - lineV.y) / 2 * H; }
   }
-  el.style.transform = 'translate(' + Math.round(clamp(ax - w / 2, 12, W - w - 12)) + 'px,' + Math.round(clamp(ay - h / 2, 60, H - h - 12)) + 'px)';
+  var x = clamp(ax - w / 2, 12, W - w - 12), y = clamp(ay - h / 2, 60, H - h - 12);
+  /* never over the room's note (Fawkes, 23 October 2026: the cup's seen line printed on the In the room panel): a line
+     whose box would cross the note's stands just above it */
+  if (!noteEl.hidden) {
+    var r = noteEl.getBoundingClientRect();
+    if (x < r.right && x + w > r.left && y < r.bottom && y + h > r.top) y = Math.max(60, r.top - h - 8);
+  }
+  el.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
 }
 function updateLines(dt) {
   if (lineCur) {
