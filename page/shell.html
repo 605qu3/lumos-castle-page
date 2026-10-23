@@ -154,13 +154,13 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=510"></script>
+<script src="castle-model.js?v=511"></script>
 <script src="castle-paint.js?v=105"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="castle-shell.js?v=74"></script>
+<script src="castle-shell.js?v=75"></script>
 <script src="shell-w5b.js?v=16"></script>
 <script src="shell-w5a.js?v=20"></script>
 <script src="castle-events.js?v=40"></script>
@@ -2169,6 +2169,46 @@ var H71 = (function () {
       fuse(d); out.desks.push(d);
     });
   }
+  return out;
+})();
+/* the lake rooms' seats (ledger 258; Godric's 1 at 4.03 pm on architect-lake-rooms-windows-1023, 23 October 2026): in
+   each window the model gives a `recess` (castle-shell.js v75 draws the recess), its seat, in the recess's frame (u
+   along the wall from the window's middle, v out from the corridor's face): in the hall range's embrasures two stone
+   benches facing across, 0.45 high, each 1 cm off its side and 5 cm short of the glass's line, from 0.2 into the cut to
+   0.4 short of the glass's stone; in the south-east block a panelled oak box seat filling the recess, 0.45 high, its
+   front 2 cm back of the corridor's face, three panels on it. Plain and dull; untappable, owner the corridor */
+var LAKE_SEATS = (function () {
+  var out = { on: false, seats: [] };
+  var ops = MODEL.openings.filter(function (o) { return o.room === PLACE && o.recess && o.at; });
+  if (!ops.length) return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'lake-seats'; g.userData.owner = PLACE; shell.group.add(g);
+  var stone = kit.solid(0x9a8f7c), stoneTop = kit.solid(0xa89d89), oak = kit.solid(0x4a4136), panel = kit.solid(0x3f372d);
+  ops.forEach(function (o) {
+    var c = (o.compass || 180) * Math.PI / 180, ox = Math.round(Math.sin(c)), oy = Math.round(Math.cos(c));
+    if (Math.abs(ox) + Math.abs(oy) !== 1) return;                     /* square to the axes only, as every lake window is */
+    var R = o.recess, half = R.w / 2, gh = (o.w || 1) / 2, D = o.depth;
+    var P = function (u, v, z) { return shell.toLocal(o.at[0] + u * -oy + v * ox, o.at[1] + u * ox + v * oy, z0 + z); };
+    function box(u0, v0, za, u1, v1, zb, mt) { var m = thingBox(g, P, [u0, v0, za], [u1, v1, zb], mt); m.userData.owner = PLACE; m.raycast = function () {}; return m; }
+    if (/bench/.test(R.seat || '')) {
+      [[-half + 0.01, -gh - 0.05], [gh + 0.05, half - 0.01]].forEach(function (s) {
+        var left = s[0] < 0;
+        box(s[0], 0.2, 0.0, s[1], D - 0.4, 0.41, stone);                                       /* the bench's block, 1 cm into its slab */
+        box(s[0] - (left ? 0.005 : 0.03), 0.18, 0.4, s[1] + (left ? 0.03 : 0.005), D - 0.38, 0.45, stoneTop);   /* its top slab, 3 cm over the front */
+      });
+      out.seats.push(o.id);
+    } else {
+      var f = 0.02, b = D - 0.015;
+      box(-half + 0.01, f, 0.0, half - 0.01, b, 0.43, oak);                                      /* the box, 1 cm into its lid */
+      box(-half + 0.005, f - 0.03, 0.42, half - 0.005, b, 0.45, oak);                            /* its lid, 3 cm over the front */
+      var pw = (R.w - 0.02 - 0.08 * 4) / 3;
+      for (var k = 0; k < 3; k++) {                                                              /* three sunk panels in the front */
+        var u0 = -half + 0.01 + 0.08 + k * (pw + 0.08);
+        box(u0, f - 0.005, 0.08, u0 + pw, f + 0.01, 0.34, panel);
+      }
+      out.seats.push(o.id);
+    }
+  });
   return out;
 })();
 /* the Defence classroom's six plates (Magic's req 675; Events' req 680, page/events/defence.json), where Interiors'

@@ -643,10 +643,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }
       if (!e) return;
       var s0, s1;
+      /* v75 (ledger 258, the lake rooms' seats): a window in a recess deeper than its wall (`recess`: its own cut, w, h
+         and sill, from the floor; `back` the stone the glass stands in at its far end) is cut at the recess's size */
+      var RC = op.recess && !back ? op.recess : null;
       /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
          found on the next wall, its sill and head then running the length of this one */
       if (pts.length > 1) { var s2 = alongEdge(E, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
-      else { s0 = e.s - (op.w || 1) / 2; s1 = e.s + (op.w || 1) / 2; }
+      else { var cw = RC ? RC.w : op.w || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }
       /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
       if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
       /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut
@@ -668,12 +671,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (op.sills && op.sills[Q.id] != null) sill = op.sills[Q.id];      /* v23: a way's sill at a face whose floor lies lower */
       if (Q.shaft && op.z != null) sill += op.z - Q.floor;                /* v17: in a stair's well, at its own height */
       else if (Q.shaft) { var oQ = findPlace(M, other(op, Q.id)); if (oQ) sill += oQ.floor - Q.floor; }   /* v25: with no z, at its other room's floor */
-      var h = Q.sky ? (op.h || 2.2) + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, (op.h || 2.2) + sill);
+      if (RC) sill = RC.sill || 0;
+      var oh = RC ? RC.h : op.h || 2.2;
+      var h = Q.sky ? oh + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, oh + sill);
       /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
       var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
       if (near != null) h = near - Q.floor;
       gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
-        soffit: near != null ? [h, far != null ? far - Q.floor : h] : null });
+        soffit: near != null ? [h, far != null ? far - Q.floor : h] : null, recess: RC });
       spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
@@ -888,6 +893,30 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           head.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - r, mid.z + Math.cos(ang) * 0.005); head.rotation.y = ang; head.name = Q.id + '-niche-head-' + g.op.id; group.add(head);
           var fl = slab(w, 0.02, dp, mats.floor, 'floor'), fp = toLocal(a[0] + ux * sm + nx * dp / 2, a[1] + uy * sm + ny * dp / 2, Q.floor);
           fl.position.set(fp.x, fp.y + g.sill + 0.01, fp.z); fl.rotation.y = ang; fl.name = Q.id + '-niche-floor-' + g.op.id; group.add(fl);
+          return;
+        }
+        /* v75 (ledger 258): a recess deeper than this wall is drawn on beyond its outer face, from the niche's way: two
+           sides 5 mm outside the cut's jambs, bearing 2 cm into the wall; a soffit 5 mm over its head; a floor from the
+           inner face, its top 2 cm up; at its far end the stone the glass stands in (`back`), its face 5 mm short of the
+           sides' ends, sill and head bearing 1 cm into its jambs; the pane 3 cm inside that stone's outer face */
+        if (g.recess && (g.op.depth || 0) > t) {
+          var RD = g.op.depth, RB = g.recess.back || 0.6, RT = 0.3, rl = RD - t + 0.02, RM = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h / 2) : mats.wall, RY0 = g.sill - 0.1, RY1 = g.h + 0.305;
+          var rpos = function (m, s, n, y, nm) { var p = toLocal(a[0] + ux * s + nx * n, a[1] + uy * s + ny * n, Q.floor);
+            m.position.set(p.x, p.y + y, p.z); m.rotation.y = ang; m.name = Q.id + '-recess-' + nm + '-' + g.op.id; group.add(m); };
+          rpos(slab(RT, RY1 - RY0, rl, RM, 'wall'), g.s0 - 0.005 - RT / 2, t - 0.02 + rl / 2, (RY0 + RY1) / 2, 'side-a');
+          rpos(slab(RT, RY1 - RY0, rl, RM, 'wall'), g.s1 + 0.005 + RT / 2, t - 0.02 + rl / 2, (RY0 + RY1) / 2, 'side-b');
+          rpos(slab(w + 0.01 + 2 * RT, 0.3, rl, RM, 'wall'), sm, t - 0.02 + rl / 2, g.h + 0.155, 'soffit');
+          rpos(slab(w + 0.004, 0.02, RD, mats.floor, 'floor'), sm, RD / 2, g.sill + 0.01, 'floor');
+          var gw = g.op.w || 1, gsl = g.op.sill || 0, gh = g.op.h || 1, BW = w + 0.01 + 2 * RT, bn = RD - 0.005 + (RB + 0.005) / 2, bd = RB + 0.005;
+          var ja = (BW - gw) / 2;
+          rpos(slab(ja, RY1 - RY0, bd, RM, 'wall'), sm - gw / 2 - ja / 2, bn, (RY0 + RY1) / 2, 'jamb-a');
+          rpos(slab(ja, RY1 - RY0, bd, RM, 'wall'), sm + gw / 2 + ja / 2, bn, (RY0 + RY1) / 2, 'jamb-b');
+          rpos(slab(gw + 0.02, gsl - RY0, bd, RM, 'wall'), sm, bn, (RY0 + gsl) / 2, 'sill');
+          rpos(slab(gw + 0.02, RY1 - gsl - gh, bd, RM, 'wall'), sm, bn, (gsl + gh + RY1) / 2, 'head');
+          if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
+          var rp = new THREE.Mesh(new THREE.PlaneGeometry(gw, gh), mats.pane), pp = toLocal(a[0] + ux * sm + nx * (RD + RB - 0.03), a[1] + uy * sm + ny * (RD + RB - 0.03), Q.floor);
+          rp.position.set(pp.x, pp.y + gsl + gh / 2, pp.z); rp.rotation.y = ang; rp.raycast = function () {};
+          rp.name = Q.id + '-pane-' + g.op.id; rp.userData.owner = Q.id; group.add(rp); out.panes.push(rp);
           return;
         }
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
