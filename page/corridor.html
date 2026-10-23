@@ -3785,7 +3785,7 @@ function filchPass() {
   filch.from = at - filch.dir * FILCH.reach;
   filch.t = 0; filch.done = true;
   if (castle && castle.moment) castle.moment('filch passes');
-  showLines([{ medium: 'heard', speaker: 'filch', sound: 'slow, shuffling steps and the creak of a lamp, passing behind you' }]);
+  showLines([{ medium: 'heard', speaker: 'filch', sound: filchBright() ? 'slow, shuffling steps, passing behind you' : 'slow, shuffling steps and the creak of a lamp, passing behind you' }]);   /* by day no lamp (Godric, 7.40 pm) */
 }
 function updateFilch(dt) {
   if (filch.t >= 0) {
@@ -4011,24 +4011,28 @@ function chaseOff() { filch.light.intensity = 0; filch.light.position.y = -10; }
    people-filch-r1-1022: seven cells of 521 by 1124 px at 651 px a metre, 0.8 by 1.73 m, each facing screen right).
    Drawn on every walk, day pass and chase (Godric's 1 on corridor-filch-drawn-1022, 22 October 2026, 7.40 pm; ?filchFigure=0
    hides him for a look). His lamp only where it is torchlit or dark: by evening and night the lantern cells and his
-   lamp's light; by day (lightTime 'day', the window bright) no lamp, so neither the light nor a lantern, and the five
-   lampless cells People draws as 7 to 11, the same poses in the same order (cells 8 to 12 in People's count). Until the
-   atlas holds them (read from its width at load) he is unseen by day, as before. One Filch on the lamp's way, day pass and chase alike: cells 0 and 1 in turn at his step while he
+   lamp's light; by day (lightTime 'day', the window bright) no lamp, so neither the light nor a lantern: his own card
+   from People's filch-figure-lampless.png (Godric's 1, 7.58 pm), five cells of 475 by 1130 px at the same 651 px a
+   metre, the first five's poses in their order (3 shades his eyes where the lantern was). One Filch on the lamp's way, day pass and chase alike: cells 0 and 1 in turn at his step while he
    shuffles (mirrored when he goes left on the screen), 2 stopped at the top getting his breath, 3 lifting the lantern
    over the boy, 4 waving him on; 5 and 6 are his office's (shell.html). His lamp's light sits at the drawn lantern,
    a hand's breadth toward the eye so it lights him, measured once on the atlas (x from his middle, y from his feet) */
-var FILCH_FIG = { on: groundsQ.get('filchFigure') !== '0', w: 0.8, h: 1.726, n: 7, cellPx: 521, lampless: 7, toEye: 0.12,
+var FILCH_FIG = { on: groundsQ.get('filchFigure') !== '0', w: 0.8, h: 1.726, n: 7, toEye: 0.12,
   lantern: [[0.19, 0.50], [0.20, 0.53], [-0.21, 1.14], [0.29, 1.40], [-0.26, 0.49]] };
-var filchSheet = FILCH_FIG.on ? new THREE.TextureLoader().load('../assets/layers/filch-figure.png', function (tx) {
-  FILCH_FIG.n = Math.round(tx.image.width / FILCH_FIG.cellPx); }) : new THREE.Texture();
+var FILCH_DAY = { w: 475 / 651, h: 1130 / 651, n: 5 };
+function filchCard(url, w, h, name) {
+  var sheet = FILCH_FIG.on ? new THREE.TextureLoader().load(url) : new THREE.Texture();
+  sheet.encoding = THREE.sRGBEncoding;
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: sheet,
+    roughness: 0.95, metalness: 0, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide }));
+  m.name = name; m.visible = false; scene.add(m); return m;
+}
+var filchLit = filchCard('../assets/layers/filch-figure.png', FILCH_FIG.w, FILCH_FIG.h, 'filch');
+var filchDayFig = filchCard('../assets/layers/filch-figure-lampless.png', FILCH_DAY.w, FILCH_DAY.h, 'filch-day');
+var filchFig = filchLit;   /* the card showing now */
 function filchBright() { return lightTime() === 'day'; }
-function filchDayDrawn() { return FILCH_FIG.n >= FILCH_FIG.lampless + 5; }
-filchSheet.encoding = THREE.sRGBEncoding;
-var filchFig = new THREE.Mesh(new THREE.PlaneGeometry(FILCH_FIG.w, FILCH_FIG.h), new THREE.MeshStandardMaterial({ map: filchSheet,
-  roughness: 0.95, metalness: 0, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide }));
-filchFig.name = 'filch'; filchFig.visible = false; scene.add(filchFig);
 var filchWas = { x: null, flip: false, cell: 0 };
-function filchShow(cell, flip) { filchSheet.repeat.x = (flip ? -1 : 1) / FILCH_FIG.n; filchSheet.offset.x = (cell + (flip ? 1 : 0)) / FILCH_FIG.n; }
+function filchShow(cell, flip, n) { var sh = filchFig.material.map; sh.repeat.x = (flip ? -1 : 1) / n; sh.offset.x = (cell + (flip ? 1 : 0)) / n; }
 function updateFilchFigure(dt) {
   if (!FILCH_FIG.on) return;
   var x, y, a, still, cell;
@@ -4039,9 +4043,9 @@ function updateFilchFigure(dt) {
   } else if (chase.lamp !== 'none') {
     x = chase.x; y = chase.y; a = Math.min(1, chase.lk * 1.5);
     still = chase.lamp === 'top' || (chase.lamp === 'visit' && chase.visitT >= 0) || (chase.lamp === 'near' && chase.x === chase.nearX);
-  } else { filchFig.visible = false; filchWas.x = null; return; }
-  var bright = filchBright();
-  if (bright && !filchDayDrawn()) { filchFig.visible = false; filchWas.x = null; return; }   /* no lampless Filch yet */
+  } else { filchLit.visible = filchDayFig.visible = false; filchWas.x = null; return; }
+  var bright = filchBright(), sz0 = bright ? FILCH_DAY : FILCH_FIG;
+  if (filchFig !== (bright ? filchDayFig : filchLit)) { filchFig.visible = false; filchFig = bright ? filchDayFig : filchLit; }
   var moved = filchWas.x === null ? 0 : x - filchWas.x;
   if (!still && Math.abs(moved) > 1e-5) {
     var right = new THREE.Vector3(1, 0, 0).applyQuaternion(camera.quaternion);
@@ -4051,8 +4055,8 @@ function updateFilchFigure(dt) {
   if (still) cell = chase.lamp === 'near' ? (chase.how === 'off' ? 4 : 3) : 2;
   else cell = Math.sin(t * LAMP.step) > 0 ? 0 : 1;
   var flip = cell < 2 && filchWas.flip;
-  filchShow(bright ? FILCH_FIG.lampless + cell : cell, flip);
-  filchFig.position.set(x, y + FILCH_FIG.h / 2, MID_Z);
+  filchShow(cell, flip, sz0.n);
+  filchFig.position.set(x, y + sz0.h / 2, MID_Z);
   filchFig.rotation.y = Math.atan2(camera.position.x - x, camera.position.z - MID_Z);   /* square to the eye */
   filchFig.material.opacity = a; filchFig.visible = a > 0.02;
   /* the lamp's light at the drawn lantern, along the card's own right and toward the eye */
