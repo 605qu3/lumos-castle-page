@@ -71,10 +71,35 @@
         "occasion != start of term"
       ],
       "show": [
-        "a few rune stones left out on a desk, a dictionary not put back",
+        "a few rune stones left out on a desk, a dictionary not put back"
+      ],
+      "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term only, the summer hold's week included (ours); Interiors' words, 19 October 2026; the translation with its circled rune moved to its own rule below, from year 6 (Fawkes, 23 October 2026, Godric's 1 at 6.57 am)"
+    },
+    {
+      "when": [
+        "place = ancient runes classroom",
+        "year >= 6",
+        "lessons = off",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "occasion != start of term"
+      ],
+      "show": [
         "a translation left on a desk, one rune circled in red ink"
       ],
-      "canon": "Interiors' req 515, the aftermath a habit, word for word: after the day's lessons in term only, the summer hold's week included (ours); Interiors' words, 19 October 2026"
+      "canon": "Godric's touch runes-ehwaz-slip, gated (Fawkes, 23 October 2026, Godric's 1 at 6.57 am, kingsley-ehwaz-year-1023): Hermione's slip shows only from her Ancient Runes OWL on (OotP 31, June of year 5), in practice year 6 on since the clock has no month for it; the same after-lessons terms as the aftermath rule above"
+    },
+    {
+      "when": [
+        "place = common room",
+        "year = 2",
+        "occasion = easter"
+      ],
+      "show": [
+        "a copy of Ancient Runes Made Easy lying open face-down on a Gryffindor armchair"
+      ],
+      "canon": "Godric's touch runes-made-easy-armchair (Fawkes, 23 October 2026, Godric's 1 at 6.57 am, kingsley-ehwaz-year-1023): CoS 14, B2 ch14 L11537 (\"The second years were given something new to think about during their Easter holidays. The time had come to choose their subjects for the third year\") and L11583 (Hermione \"sitting alone, reading a book called Ancient Runes Made Easy\" in the Gryffindor common room), both read in the canon tool, 23 October 2026; the armchair and the book left lying open are ours; the Chamber's year only, the Easter fortnight (`occasion = easter`); a room state with no line, drawn by the Common room (row)"
     },
     {
       "when": [
@@ -243,7 +268,7 @@
       "moment": "tap translation",
       "when": [
         "place = ancient runes classroom",
-        "year >= 3",
+        "year >= 6",
         "lessons = off",
         "occasion != christmas",
         "occasion != christmas day",
@@ -266,7 +291,7 @@
         }
       ],
       "starts": [],
-      "canon": "Godric's touch runes-ehwaz-slip (22 October 2026, 6.40 pm, relayed by Fawkes): an Ancient Runes desk, a marked translation with ehwaz circled, \"defence\" corrected to \"partnership\" (OotP ch31, not in the canon tool); the room's bare state only (lessons off, term days), year 3 on"
+      "canon": "Godric's touch runes-ehwaz-slip (22 October 2026, 6.40 pm, relayed by Fawkes): an Ancient Runes desk, a marked translation with ehwaz circled, \"defence\" corrected to \"partnership\" (OotP ch31, not in the canon tool); the room's bare state only (lessons off, term days); year 6 on, after her Ancient Runes OWL (Fawkes, 23 October 2026, Godric's 1 at 6.57 am, replacing year 3 on)"
     }
   ]
 }

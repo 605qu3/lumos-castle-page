@@ -436,8 +436,28 @@
         "lessons = on",
         "year = 1"
       ],
+      "who": [
+        {
+          "as": "classmate",
+          "role": "voice",
+          "name": "a first-year across the desks",
+          "mark": "the aisle"
+        }
+      ],
       "show": [
         "a toad hopping out from under a first-year's desk, and a boy scrambling after it on hands and knees, hissing for it to come back"
+      ],
+      "lines": [
+        {
+          "speaker": "classmate",
+          "medium": "heard",
+          "key": "transfiguration.anyone-seen-a-toad",
+          "sound": "a first-year leaning across the desks, to the room",
+          "text": [
+            "Has anyone seen a toad?"
+          ],
+          "canon": "word for word from Hermione's question on the train (PS 6, B1 ch6 L2128: \"Has anyone seen a toad? Neville's lost one\", read in the canon tool, 23 October 2026; L2106, \"have you seen a toad at all?\"); the classroom, the classmate and the desks are ours, and the line stops at the question so that no name is asked after; Godric's woven touch anyone-seen-a-toad (people-toad-scramble-r1-1022, 22 October 2026, 11.04 pm, relayed by Fawkes)"
+        }
       ],
       "starts": [],
       "canon": "PS 6 L2284 and PS 7 (Neville forever losing Trevor the toad: on the train, in the boat, at the sorting), PS 16 L5660 (\"Trevor the toad, who looked as though he'd been making another bid for freedom\"), checked against the text in the canon tool, 22 October 2026; Godric's touch trevor-in-class (22 October 2026, relayed 5.55 pm): now and then a toad hops out from under a first-year desk in a lesson and someone scrambles after it; the lesson is ours, McGonagall's room; year 1 only, while the lesson runs"
