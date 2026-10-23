@@ -2032,8 +2032,8 @@ var HYBRID = (function () {
       sh.uniforms.steelMap = { value: steelMap };
       sh.vertexShader = 'attribute float wd;\nattribute vec2 uvS;\nvarying float vWd;\nvarying vec2 vUvS;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvWd = wd; vUvS = uvS;');
       sh.fragmentShader = 'uniform sampler2D steelMap;\nvarying float vWd;\nvarying vec2 vUvS;\n' + sh.fragmentShader
-        .replace('#include <map_fragment>', 'vec4 tD = mapTexelToLinear(texture2D(map, vUv)); vec4 tS = mapTexelToLinear(texture2D(steelMap, vUvS));\ndiffuseColor.rgb *= mix(tS.rgb * vec3(0.84, 0.86, 0.9), tD.rgb, vWd);')
-        .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = mix(0.85, 0.15, vWd);')
+        .replace('#include <map_fragment>', 'vec4 tD = mapTexelToLinear(texture2D(map, vUv)); vec4 tS = mapTexelToLinear(texture2D(steelMap, vUvS));\ndiffuseColor.rgb *= mix(tS.rgb * vec3(0.84, 0.86, 0.9), tD.rgb, 0.6 + 0.4 * vWd);')
+        .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = mix(0.6, 0.15, vWd);')
         .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = mix(0.36, 0.5, vWd);');
     };
     return m;
@@ -2046,14 +2046,27 @@ var HYBRID = (function () {
     var W = im.width, H = im.height, c = makeCanvas(W, H), x = c.getContext('2d'); x.drawImage(im, 0, 0);
     var A = x.getImageData(0, 0, W, H).data;
     function body(px, py) { return A[(py * W + px) * 4 + 3] > 127 && !(py < HEAD.y && px < HEAD.x) && Math.abs(px - pole(py)) > POLE_R; }
+    var TOP = new Int16Array(W * (FOOT + 1));   /* how far below the top of its column of the drawing each pixel lies, 0 off it */
+    for (var tx = 0; tx < W; tx++) for (var ty = 0, t0 = -1; ty <= FOOT; ty++) { if (body(tx, ty)) { if (t0 < 0) t0 = ty; TOP[ty * W + tx] = ty - t0; } else t0 = -1; }
     function build(rows, flat) {   /* rows: [py, [[x0, x1, D], ...]] top down; flat: the drawing all round (the shaft) */
       var pos = [], uv = [], uvS = [], ind = [], cnt = 0;
+      /* Godric's 2 on corridor-armour-hybrid-1023 (23 October 2026, 11.06 am: "this is REALLY close now. let's make your
+         changes and fix the feet"). The wide rings (the trunk, the pauldrons) squarer than an ellipse, so the shoulders
+         keep their body side on; the depth eased off near the top of each column of the drawing, so a shoulder is a
+         dome and not a box's lid; and the drawing folded round onto the flanks and back (front on to four fifths of
+         the width, then back in to the middle behind), so the plates, rivets and lames carry on round the suit where
+         the steel alone read as a smooth grey slab */
+      function lift(px, py) { px = Math.round(px); return px < 0 || px >= W || py < 0 || py > FOOT ? 0 : TOP[py * W + px]; }
       function ring(r, py, centre) {
-        var ym = (H - py) / PX, cx = (r[0] + r[1]) / 2, hw = (r[1] - r[0] + 1) / 2, at = cnt;
-        if (centre) { pos.push((cx - W / 2) / PX, ym, 0); uv.push(cx / W, 1 - py / H); uvS.push(0, ym * 2); cnt++; }
+        var ym = (H - py) / PX, cx = (r[0] + r[1]) / 2, hw = (r[1] - r[0] + 1) / 2, at = cnt, zc = r[3] || 0;
+        var ex = flat ? 1 : r[3] !== undefined ? 0.6 : 2 / (2 + Math.min(1, Math.max(0, (hw / PX - 0.1) / 0.1))), tf = Math.asin(Math.pow(0.8, 1 / ex));
+        if (centre) { pos.push((cx - W / 2) / PX, ym, zc); uv.push(cx / W, 1 - py / H); uvS.push(0, ym * 2); cnt++; }
         for (var i = 0; i <= SEG; i++) {
-          var th = (i / SEG - 0.5) * Math.PI * 2, s = Math.sin(th), u = cx + hw * s * (flat ? 0.8 : 1);   /* from the back round by the front, the seam behind */
-          pos.push((cx + hw * s - W / 2) / PX, ym, r[2] * Math.cos(th)); uv.push(u / W, 1 - py / H); uvS.push(i / SEG * 2, ym * 2); cnt++;
+          var th = (i / SEG - 0.5) * Math.PI * 2, s = Math.sin(th), c = Math.cos(th), a = Math.abs(th);   /* from the back round by the front, the seam behind */
+          var xs = Math.sign(s) * Math.pow(Math.abs(s), ex), zs = Math.sign(c) * Math.pow(Math.abs(c), ex);
+          var un = flat ? s * 0.8 : a <= tf ? xs : Math.sign(s) * 0.8 * (Math.PI - a) / (Math.PI - tf);
+          var t = flat ? 1 : Math.min(1, lift(cx + hw * xs, py) / PX / 0.1), dome = Math.max(0.35, Math.sqrt(1 - (1 - t) * (1 - t)));
+          pos.push((cx + hw * xs - W / 2) / PX, ym, zc + r[2] * zs * dome); uv.push((cx + hw * un) / W, 1 - py / H); uvS.push(i / SEG * 2, ym * 2); cnt++;
         }
         return at;
       }
@@ -2086,6 +2099,10 @@ var HYBRID = (function () {
         for (var k = 0; k < 3; k++) { p = p && p.prev; q = q && q.next; if (p) { s0 += p.r[0]; s1 += p.r[1]; m++; } if (q) { s0 += q.r[0]; s1 += q.r[1]; m++; } }
         o.s = [s0 / m, s1 / m, o.r[2]];
         if (!flat) o.s[2] = Math.min((o.s[1] - o.s[0] + 1) / 2 / PX, depth((FOOT - o.py) / PX));
+        /* the feet: sabatons, the heel a little behind the shin and the toe out toward the corridor, the instep
+           sloping down to it (a quarter of a metre from heel to toe at the sole, the toe blunt), so side on they are feet and not stumps */
+        var yf = (FOOT - o.py) / PX;
+        if (!flat && yf < 0.13) { var front = 0.065 + 0.125 * Math.pow(1 - yf / 0.13, 1.6), back = -0.065; o.s[2] = (front - back) / 2; o.s[3] = (front + back) / 2; }
       });
       all.forEach(function (o) { o.at = ring(o.s, o.py); });
       function stitch(a, b) { for (var i = 0; i < SEG; i++) ind.push(a + i, b + i, b + i + 1, a + i, b + i + 1, a + i + 1); }
