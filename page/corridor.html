@@ -1944,6 +1944,66 @@ function updateArmour3d() {   /* the torches' warmth by night, as the card's */
   var glow = visorLight && visorLight.userData.want ? visorLight.material.opacity : 0;   /* Christmas's light in its slit too */
   ARMOUR_3D.slit.material.color.setHex(0x0c0c0e).lerp(col(0xffc070), glow);
 }
+/* the drawing as a relief (Godric's 1 on corridor-armour-relief-1022: Blender from the drawing, on the page behind its
+   switch to walk past). The drawn suit's outline puffed into a rounded shape, as tools/corridor-armour-relief-prep.py:
+   each point raised by its distance to the outline on a round profile, 11 cm at most, smoothed, a back at four fifths;
+   the drawing laid on it from the front, so its etching and line are its own, and the corridor's light falls on it. It
+   stands still, never turning to the eye: solid for the few degrees the views turn, a carved relief past about 35.
+   ?relief stands it 1.1 m along from the drawn suit, toward the stair; ?relief=only in the drawn suit's place */
+var RELIEF = (function () {
+  var q = new URLSearchParams(location.search).get('relief');
+  if (q === null) return null;
+  var only = q === 'only', PX = 1369, STEP = 6, DEPTH = 0.11, g = new THREE.Group();
+  var mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.15, roughness: 0.45, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide });
+  var im = new Image();
+  im.onload = function () {
+    var W = im.width, H = im.height, cw = Math.floor(W / STEP) + 1, ch = Math.floor(H / STEP) + 1;
+    var c = makeCanvas(cw, ch), x = c.getContext('2d'); x.drawImage(im, 0, 0, cw, ch);
+    var a = x.getImageData(0, 0, cw, ch).data, n = cw * ch, d = new Float32Array(n), i, j, k;
+    for (i = 0; i < n; i++) d[i] = a[i * 4 + 3] > 127 ? 1e9 : 0;
+    /* the distance to the outline in cells, two chamfer passes */
+    for (j = 0; j < ch; j++) for (i = 0; i < cw; i++) { k = j * cw + i; if (!d[k]) continue;
+      d[k] = Math.min(d[k], i ? d[k - 1] + 1 : 1, j ? d[k - cw] + 1 : 1, i && j ? d[k - cw - 1] + 1.414 : 1.414, j && i < cw - 1 ? d[k - cw + 1] + 1.414 : 1.414); }
+    for (j = ch - 1; j >= 0; j--) for (i = cw - 1; i >= 0; i--) { k = j * cw + i; if (!d[k]) continue;
+      d[k] = Math.min(d[k], i < cw - 1 ? d[k + 1] + 1 : 1, j < ch - 1 ? d[k + cw] + 1 : 1, i < cw - 1 && j < ch - 1 ? d[k + cw + 1] + 1.414 : 1.414, j < ch - 1 && i ? d[k + cw - 1] + 1.414 : 1.414); }
+    var h = new Float32Array(n), t = new Float32Array(n), r, p;
+    for (k = 0; k < n; k++) { r = d[k] * STEP / PX; h[k] = !d[k] ? 0 : r < DEPTH ? Math.sqrt(r * (2 * DEPTH - r)) : DEPTH; }
+    for (p = 0; p < 2; p++) {   /* smoothed, so no ridge runs down each limb */
+      for (j = 0; j < ch; j++) for (i = 0; i < cw; i++) { var s = 0, m = 0; for (var u = -2; u <= 2; u++) { var ii = i + u; if (ii >= 0 && ii < cw) { s += h[j * cw + ii]; m++; } } t[j * cw + i] = s / m; }
+      for (j = 0; j < ch; j++) for (i = 0; i < cw; i++) { var s2 = 0, m2 = 0; for (var v = -2; v <= 2; v++) { var jj = j + v; if (jj >= 0 && jj < ch) { s2 += t[jj * cw + i]; m2++; } } h[j * cw + i] = d[j * cw + i] ? s2 / m2 : 0; }
+    }
+    var idx = new Int32Array(n).fill(-1), pos = [], uv = [], ind = [], cnt = 0;
+    for (k = 0; k < n; k++) if (d[k]) idx[k] = cnt++;
+    [1, -0.8].forEach(function (side, f) {   /* the front toward the corridor (+z), the back behind it */
+      for (k = 0; k < n; k++) if (d[k]) {
+        var cx = k % cw, cy = (k - cx) / cw, z = Math.max(h[k] - 0.012, 0.0004);   /* the outline's edge to the middle, so the two close */
+        pos.push((cx * STEP - W / 2) / PX, (H - cy * STEP) / PX, side * z); uv.push(cx * STEP / W, 1 - cy * STEP / H);
+      }
+      var o = f * cnt;
+      for (j = 0; j < ch - 1; j++) for (i = 0; i < cw - 1; i++) {
+        var A = idx[j * cw + i], B = idx[j * cw + i + 1], C = idx[(j + 1) * cw + i + 1], D = idx[(j + 1) * cw + i];
+        if (A < 0 || B < 0 || C < 0 || D < 0) continue;
+        if (side > 0) ind.push(A + o, D + o, C + o, A + o, C + o, B + o); else ind.push(A + o, C + o, D + o, A + o, B + o, C + o);
+      }
+    });
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+    geo.setIndex(ind); geo.computeVertexNormals();
+    mat.map = tex(im); mat.needsUpdate = true;
+    var m = new THREE.Mesh(geo, mat); m.name = 'armour-relief'; g.add(m);
+  };
+  im.src = '../assets/layers/corridor-armour.png';
+  var shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.34), armourShadow.material);
+  shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08, 0.003, 0.02); g.add(shadow);
+  g.position.set(only ? BAY_X : BAY_X + 1.1, 0, FAR_Z + 0.45);
+  g.name = 'armour-relief'; scene.add(g);
+  return { group: g, only: only, mat: mat };
+})();
+function updateRelief() {   /* the torches' warmth by night, as the card's */
+  if (!RELIEF) return;
+  if (RELIEF.only) { armour.visible = false; armourShadow.visible = false; }
+  RELIEF.mat.emissive.copy(col(0xffb070)).multiplyScalar(ARMOUR_BOUNCE * 0.12 * nightK());
+}
 var ARMOUR_MARKS = { home: { x: BAY_X, z: FAR_Z + 0.45 }, step: { x: BAY_X, z: -3.0 }, window: { x: -3.1, z: -3.25 } };
 /* Peeves's walking sticks (The corridor, "Peeves's walking sticks' spot"): a grey bundle on the middle line halfway to
    her, 1.8 to 2.7 m up, a card turned to the eye as the armour is; hidden until the sticks chain hangs it */
@@ -4160,8 +4220,8 @@ function norrisAstray() {
   chase.whisk.then = function () { if (chase.lamp !== 'none') chase.lamp = 'down'; };   /* at the foot of the flight */
 }
 /* McGonagall's cat rescue (req 974 (c); Events' filch.cat-lure and filch.cat-chase with their -hers twins; Godric's idea
-   of 22 October 2026, 7.40 pm: very rare, only on a night quest, which nothing raises yet): the tabby is told until
-   People draws her (req 978); Mrs Norris goes after her down the far flight at her whisk's own speed, and his lamp
+   of 22 October 2026, 7.40 pm: very rare, only on a night quest, which nothing raises yet): the tabby drawn (below) and
+   her words told; Mrs Norris goes after her down the far flight at her whisk's own speed, and his lamp
    after them. The lure starts where she leads him astray from, the rescue between the boy and the lamp */
 var CAT_RESCUE = { stare: 0.7, fadeIn: 0.3 };
 function norrisAfterCat(cue, from) {
@@ -4174,9 +4234,68 @@ function norrisAfterCat(cue, from) {
   chase.whisk = { k: 0, path: [from, head, foot], len: from.distanceTo(head) + head.distanceTo(foot), stare: CAT_RESCUE.stare, run: CHASE.run, fadeIn: CAT_RESCUE.fadeIn };
   chase.whisk.then = function () { if (chase.lamp !== 'none') chase.lamp = 'down'; };
 }
-function catLures(cue) { return function () { norrisAfterCat(cue, new THREE.Vector3(CHASE.topX + 0.9, 0, MID_Z + 0.35)); }; }
+function catLures(cue) { return function () { norrisAfterCat(cue, new THREE.Vector3(CHASE.topX + 0.9, 0, MID_Z + 0.35)); tabbyRuns('lure'); }; }
 function catRescues(cue) {
-  return function () { norrisAfterCat(cue, new THREE.Vector3((chase.x + camera.position.x) / 2, 0, MID_Z + 0.2)); };
+  return function () { norrisAfterCat(cue, new THREE.Vector3((chase.x + camera.position.x) / 2, 0, MID_Z + 0.2)); tabbyRuns('rescue'); };
+}
+/* the tabby drawn (People's req 978, candidate 2 staged on Godric's 2 at 10.29 pm): assets/layers/tabby-figure.png, five
+   cells in one row, 1033 by 1052 px at 1878 px a metre, her feet on each cell's foot: 0 sat front on, watching; 1 the
+   same side-on; 2 walking, 3 slipping low and quick, 4 bolting, all to the right, mirrored when she goes left on the
+   screen. Turned to the eye, as the figures are. On the sill she watches him and is gone once he has looked away; in
+   the lure she slips ahead of Mrs Norris down the far flight, in the rescue she steps out between the boy and the
+   lamp, then bolts ahead of her. The cue's words still told there, since the stair head is often behind him */
+var TABBY = { w: 1033 / 1878, h: 1052 / 1878, cells: 5, slip: 2.4, bolt: 3.4, step: 0.5, lead: 0.6, sill: 60 };
+var tabby = { group: new THREE.Group(), mesh: null, state: 'away', k: 0, seen: false, path: null, len: 0, kind: '' };
+(function () {
+  var im = new Image();
+  im.onload = function () {
+    var tx = tex(im); tx.repeat.set(1 / TABBY.cells, 1);
+    var m = cutoutMesh(tx, TABBY.w, TABBY.h); m.position.y = TABBY.h / 2; m.name = 'tabby-cell';
+    tabby.mesh = m; tabby.group.add(m);
+  };
+  im.src = '../assets/layers/tabby-figure.png';
+  tabby.group.visible = false; tabby.group.name = 'tabby'; scene.add(tabby.group);
+})();
+function tabbyCell(i, left) {
+  if (!tabby.mesh) return;
+  tabby.mesh.material.map.offset.x = i / TABBY.cells; tabby.mesh.scale.x = left ? -1 : 1;
+}
+function tabbyOnSill() {   /* stair.tabby-cat: on window 1's sill, front on */
+  var b = new THREE.Box3().setFromObject(windows[1].sill), c = b.getCenter(new THREE.Vector3());
+  tabby.group.position.set(c.x, b.max.y, c.z); tabbyCell(0, false);
+  tabby.state = 'sill'; tabby.k = 0; tabby.seen = false; tabby.group.visible = true;
+}
+function tabbyRuns(kind) {   /* along Mrs Norris's own path (chase.whisk), at floor height */
+  var w = chase.whisk;
+  if (!w) return;
+  tabby.path = w.path.map(function (p) { return new THREE.Vector3(p.x, 0, p.z); });
+  tabby.len = w.len; tabby.kind = kind; tabby.state = 'run'; tabby.k = 0;
+  tabby.group.position.copy(tabby.path[0]); tabby.group.visible = true;
+}
+function updateTabby(dt) {
+  if (tabby.state === 'away') return;
+  var g = tabby.group;
+  tabby.k += dt;
+  g.rotation.y = Math.atan2(camera.position.x - g.position.x, camera.position.z - g.position.z);
+  if (tabby.state === 'sill') {
+    var p = g.position.clone().add(new THREE.Vector3(0, TABBY.h / 2, 0)).project(camera), inView = Math.abs(p.x) < 1 && Math.abs(p.y) < 1 && p.z < 1;
+    if (inView) tabby.seen = true;
+    if ((tabby.seen && !inView) || tabby.k > TABBY.sill) { tabby.state = 'away'; g.visible = false; }
+    return;
+  }
+  /* the rescue: a few steps out first, while Mrs Norris stares; then away at a run, a little ahead of her */
+  var rescue = tabby.kind === 'rescue', walking = rescue && tabby.k < CAT_RESCUE.stare;
+  var d = walking ? tabby.k * TABBY.step
+    : rescue ? CAT_RESCUE.stare * TABBY.step + (tabby.k - CAT_RESCUE.stare) * TABBY.bolt + TABBY.lead
+    : tabby.k * TABBY.slip + TABBY.lead;
+  d = Math.min(d, tabby.len);
+  var P = tabby.path, l0 = P[0].distanceTo(P[1]), was = g.position.clone();
+  if (d < l0) g.position.lerpVectors(P[0], P[1], d / l0);
+  else g.position.lerpVectors(P[1], P[2], Math.min(1, (d - l0) / Math.max(0.01, tabby.len - l0)));
+  if (d > l0) g.position.y = stairY(g.position.x);
+  var right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0), mv = g.position.clone().sub(was);
+  if (mv.lengthSq() > 1e-8) tabbyCell(walking ? 2 : rescue ? 4 : 3, mv.dot(right) < 0);
+  if (d >= tabby.len) { tabby.state = 'away'; g.visible = false; }
 }
 function updateWhisk(dt) {
   var w = chase.whisk;
@@ -4211,7 +4330,7 @@ function chaseEnd(how) {   /* 'home' through her frame, or 'gone' */
   if (castle && castle.moment) castle.moment(how === 'home' ? 'filch grumbles off' : 'filch gone');
 }
 function updateChase(dt) {
-  updateWhisk(dt);
+  updateWhisk(dt); updateTabby(dt);
   if (chase.on) {
     chase.t += dt;
     if (!chase.wheezed && chase.t >= CHASE.wheeze) { chase.wheezed = true; castle.moment('filch wheezes'); }
@@ -6046,12 +6165,12 @@ var castle = window.CastleEvents ? CastleEvents.start({
       filchWalk();
       showLines([{ medium: 'heard', speaker: 'filch', sound: 'the corridor reeks of Dungbombs, and Filch shuffles through with a mop and a bucket, muttering' }]);
     },
-    /* req 974: Filch out from under the tapestry (a), the tabby on the sill (b), told until People draws her (req 978),
+    /* req 974: Filch out from under the tapestry (a), the tabby on the sill (b), drawn since People staged her (req 978),
        and McGonagall's cat rescue (c), the lure while he hides and the rescue when he is caught in the open */
     'Filch steps out from under the hillside tapestry right beside the boy, as suddenly as any of the ghosts, looks him up and down, and shuffles off along the corridor':
       function () { filchPopsUp('Filch steps out from under the hillside tapestry right beside the boy, as suddenly as any of the ghosts, looks him up and down, and shuffles off along the corridor'); },
     'a tabby cat with square markings round its eyes sits very still on a corridor windowsill, watching him; when he looks again, it has gone': function () {
-      showLines([{ medium: 'heard', sound: 'a tabby cat with square markings round its eyes sits very still on a corridor windowsill, watching him; when he looks again, it has gone' }]);
+      tabbyOnSill();   /* drawn now (req 978): she sits on window 1's sill until he has looked away */
     },
     "a tabby cat with square markings round its eyes slips along the top of the stairs; Mrs Norris freezes, bristles and goes after it down the far flight, and Filch's lamp goes after her":
       catLures("a tabby cat with square markings round its eyes slips along the top of the stairs; Mrs Norris freezes, bristles and goes after it down the far flight, and Filch's lamp goes after her"),
@@ -6327,7 +6446,7 @@ function frame() {
   updateFilch(wdt);
   updateChase(wdt);
   updateFilchFigure(wdt);
-  updateArmour3d();
+  updateArmour3d(); updateRelief();
   updateStandIns();
   updateVisorLight();
   updateCandleStub();
