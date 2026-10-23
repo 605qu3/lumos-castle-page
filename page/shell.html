@@ -2335,6 +2335,120 @@ var REFUGE = (function () {
   g.children.forEach(function (m) { m.userData.owner = PLACE; m.raycast = function () {}; });
   return out;
 })();
+/* H72's and H74's things (req 1055; Interiors' docs/interiors/real-hides.md, placed as proposed for Godric's card
+   interiors-real-hides-1023, built provisional on Fawkes's word at 7.05 pm, 23 October 2026; the finds and the note's
+   words Hidden Ways', docs/hidden-ways/real-hides.md), in the castle's frame, heights from the level's floor. H72 on 5:
+   the boot on the decoy cupboard's floor, the Gobstone on its plank shelf at 1.2; in the true hide the bench before the
+   north wall (seat 0.40, back board to 0.95), the note pinned to the board, the catapult, the bag of marbles and the
+   toy wand on the seat, the candle end out in its tin sconce on the east wall. H74 on 3: the west shelves and the
+   drum shelves (a plinth and shelves 0.45 apart to 2.4, the calf ledgers packed close), the sloped desk by the door
+   with its ledger open, the stuck ledger at the cubby. The cubby itself, its cash box and key wait on Events' tip
+   (req 1057): the wall stays whole till then. Drawn wherever either room shows (its own place and the room it opens
+   off); dull, nothing glows, untappable, owner the room */
+var HIDES = (function () {
+  var out = { on: false };
+  var h72 = ['decoy-cupboard-5', 'true-hide-5', 'drum-bend-5-west'].indexOf(PLACE) >= 0,
+      h74 = ['accounts-room-3', 'north-stair-foot-3'].indexOf(PLACE) >= 0;
+  if (!h72 && !h74) return out;
+  out.on = true;
+  var lz = function (id) { var l = (MODEL.levels || []).filter(function (v) { return v.id === id; })[0]; return l ? l.z : 0; };
+  var g = new THREE.Group(); g.name = 'hides-things'; shell.group.add(g);
+  var Z0 = 0, OWN = PLACE;
+  var P = function (x, y, z) { return shell.toLocal(x, y, Z0 + z); };
+  function own(m) { m.userData.owner = OWN; m.raycast = function () {}; g.add(m); return m; }
+  function box(x0, y0, za, x1, y1, zb, mt) { var m = thingBox(g, P, [x0, y0, za], [x1, y1, zb], mt); return own(m); }
+  function cyl(x, y, za, zb, r0, r1, mt, n) {
+    var a = P(x, y, za), m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, n || 10), mt);
+    m.position.set(a.x, a.y + (zb - za) / 2, a.z); return own(m);
+  }
+  function slab(cx, cy, z, w, h, d, ang, mt) {   /* a box w (along its own x) by d, h high, centred at (cx, cy) site, its foot at z, turned ang about up */
+    var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mt), a = P(cx, cy, z);
+    m.position.set(a.x, a.y + h / 2, a.z); m.rotation.y = ang; return own(m);
+  }
+  var deal = kit.solid(0x8a7558), oak = kit.solid(0x4a4136), iron = kit.solid(0x2e2b28), tin = kit.solid(0x7d7a72);
+  if (h72) {
+    Z0 = lz('5'); OWN = PLACE;
+    var leather = kit.solid(0x5d5650), stone = kit.solid(0x3b3f45), plank = kit.solid(0x6e5f4a), cloth = kit.solid(0x7a6a52),
+        paint = kit.solid(0x7a3a2c), wax = kit.solid(0xd8cfba), marble = kit.solid(0x6b7f8c);
+    /* the boot, toe to the back: the foot and the leg, cracked and grey */
+    box(33.87, 12.02, 0.0, 33.97, 12.30, 0.09, leather);
+    box(33.87, 12.02, 0.09, 33.97, 12.13, 0.25, leather);
+    /* the plank shelf on the east side wall at 1.2 and the Gobstone at its middle */
+    box(34.60, 12.00, 1.17, 34.77, 12.50, 1.20, plank);
+    var gob = new THREE.Mesh(new THREE.SphereGeometry(0.02, 10, 8), stone), ga = P(34.67, 12.25, 1.22); gob.position.set(ga.x, ga.y, ga.z); own(gob);
+    /* the bench: seat, two ends, the back board */
+    box(33.65, 17.13, 0.37, 34.85, 17.48, 0.40, deal);
+    box(33.65, 17.15, 0.0, 33.68, 17.46, 0.37, deal); box(34.82, 17.15, 0.0, 34.85, 17.46, 0.37, deal);
+    box(33.65, 17.45, 0.40, 34.85, 17.48, 0.95, deal);
+    /* the note on the back board, its foot at 0.70: Hidden Ways' words, an old round hand, the paper yellowed */
+    var cv = document.createElement('canvas'); cv.width = 256; cv.height = 320;
+    var cx = cv.getContext('2d'); cx.fillStyle = '#d9cba2'; cx.fillRect(0, 0, 256, 320);
+    cx.fillStyle = 'rgba(52,40,28,0.9)'; cx.textAlign = 'center'; cx.font = 'italic 30px Georgia, "Times New Roman", serif';
+    ['IF YOU', 'FOUND THE', 'FIRST ONE', 'YOU WOULD', 'HAVE', 'STOPPED.'].forEach(function (l, k) { cx.fillText(l, 128, 62 + k * 44); });
+    var tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+    var note = new THREE.Mesh(new THREE.PlaneGeometry(0.20, 0.25), new THREE.MeshStandardMaterial({ map: tex, roughness: 1 }));
+    var na = P(34.25, 17.445, 0.825); note.position.set(na.x, na.y, na.z);
+    note.lookAt(P(34.25, 16.0, 0.825)); own(note);
+    /* on the seat: the catapult (a fork), the bag of marbles with two out, the toy wand along the bench */
+    box(33.70, 17.29, 0.40, 33.79, 17.31, 0.415, plank); box(33.79, 17.25, 0.40, 33.81, 17.35, 0.415, plank);
+    box(33.81, 17.25, 0.40, 33.88, 17.27, 0.415, plank); box(33.81, 17.33, 0.40, 33.88, 17.35, 0.415, plank);
+    cyl(34.00, 17.30, 0.40, 0.52, 0.045, 0.03, cloth, 8);
+    cyl(34.06, 17.20, 0.40, 0.415, 0.008, 0.008, marble, 8); cyl(33.95, 17.19, 0.40, 0.415, 0.008, 0.008, marble, 8);
+    box(34.05, 17.265, 0.40, 34.35, 17.285, 0.42, paint);
+    /* the candle end out in its tin sconce on the east wall at 1.5 */
+    box(35.38, 16.84, 1.44, 35.42, 16.96, 1.56, tin);
+    cyl(35.36, 16.90, 1.44, 1.45, 0.04, 0.04, tin, 12);
+    cyl(35.36, 16.90, 1.45, 1.49, 0.01, 0.01, wax, 8);
+  }
+  if (h74) {
+    Z0 = lz('3'); OWN = PLACE;
+    var calf = [kit.solid(0x6b4a32), kit.solid(0x5a3d2a), kit.solid(0x7a5a3c)], page = kit.solid(0xd9cfb4), shelfM = oak;
+    var rows = [0.10, 0.55, 1.00, 1.45, 1.90];
+    function run(ax, ay, bx, by, nx, ny, skip) {   /* a shelf run, its back from a to b, its face 0.35 along the inward normal n */
+      var L = Math.hypot(bx - ax, by - ay), ang = Math.atan2(by - ay, bx - ax);
+      var c = function (t, o) { return [ax + (bx - ax) * t + nx * o, ay + (by - ay) * t + ny * o]; };
+      var m = c(0.5, 0.165);
+      slab(m[0], m[1], 0.0, L, 0.10, 0.37, ang, shelfM);
+      rows.slice(1).concat([2.37]).forEach(function (z) { slab(m[0], m[1], z - 0.03, L, 0.03, 0.37, ang, shelfM); });
+      [0.015 / L, 1 - 0.015 / L].forEach(function (t) { var e = c(t, 0.165); slab(e[0], e[1], 0.0, 0.03, 2.40, 0.37, ang, shelfM); });
+      var k = 0;
+      rows.forEach(function (z) {   /* the calf ledgers, packed close, about 0.40 high and 0.30 deep, each a little different */
+        for (var s = 0.03; s < L - 0.07; s += 0.065) {
+          k++; if (skip && z === skip[0] && Math.abs(s + 0.03 - skip[1]) < 0.06) continue;
+          var hgt = 0.36 + ((k * 37) % 5) * 0.01, b = c((s + 0.03) / L, 0.03 + 0.15);
+          slab(b[0], b[1], z, 0.055, hgt, 0.30, ang, calf[k % 3]);
+        }
+      });
+    }
+    run(152.20, 71.30, 152.20, 65.20, 1, 0);            /* the west shelves, back to the Charms wall */
+    run(154.40, 66.50, 154.40, 68.40, -1, 0);           /* the drum shelves, the straight */
+    var nl = Math.hypot(3.0, 0.8);
+    run(154.40, 68.40, 153.627, 71.30, -3.0 / nl, -0.8 / nl, [1.00, 1.5 / 2.9 * Math.hypot(0.773, 2.9)]);   /* and on along the drum side */
+    /* the sloped desk by the door: four legs, the slope from 0.85 at its front (west) to 1.00 at its back, a ledge */
+    [[153.87, 65.47], [154.34, 65.47], [153.87, 66.29], [154.34, 66.29]].forEach(function (l) { box(l[0], l[1], 0.0, l[0] + 0.04, l[1] + 0.04, 0.85, oak); });
+    var sl = Math.atan2(0.15, 0.55), top = new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(0.55, 0.15), 0.03, 0.9), oak), ta = P(154.125, 65.90, 0.925);
+    top.position.set(ta.x, ta.y, ta.z); top.rotation.z = sl; own(top);
+    box(153.83, 65.45, 0.84, 153.86, 66.35, 0.88, oak);
+    /* the open ledger on the slope, at the page of the staircases (its line Events') */
+    var led = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.02, 0.60), page), la = P(154.10, 65.90, 0.95);
+    led.position.set(la.x, la.y, la.z); led.rotation.z = sl; own(led);
+    var spine = new THREE.Mesh(new THREE.BoxGeometry(0.43, 0.012, 0.012), calf[0]), sa = P(154.10, 65.90, 0.962);
+    spine.position.set(sa.x, sa.y, sa.z); spine.rotation.z = sl; own(spine);
+    /* the stuck ledger, before the cubby on the drum shelves' shelf at 1.0, a shade proud of its neighbours */
+    slab(154.0 - 0.20 * 3.0 / nl, 69.9 - 0.20 * 0.8 / nl, 1.00, 0.06, 0.40, 0.30, Math.atan2(71.30 - 68.40, 153.627 - 154.40), calf[1]);
+  }
+  /* one mesh a material, so the ledgers stay light */
+  var by = new Map();
+  g.children.slice().forEach(function (m) { if (m.material.map) return; m.updateMatrix(); var geo = (m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone()).applyMatrix4(m.matrix);
+    var l = by.get(m.material) || []; l.push(geo); by.set(m.material, l); g.remove(m); });
+  by.forEach(function (list, mt) {
+    var pos = [], nor = [];
+    list.forEach(function (geo) { Array.prototype.push.apply(pos, geo.attributes.position.array); Array.prototype.push.apply(nor, geo.attributes.normal.array); });
+    var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); bg.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+    own(new THREE.Mesh(bg, mt));
+  });
+  return out;
+})();
 /* the dungeon corridor's ironwork (req 1048; Godric's 2 on architect-ironwork-1023, B, the scroll grille; Design's kit,
    page/design/ironwork.js, whose header is the interface): a blind screen 0.15 off the corridor's wall at y 15, x 34 to
    120, to 2.9 under the vault's springing, in whole bays of about 2.4; black iron in the shell's tone, two meshes, two
