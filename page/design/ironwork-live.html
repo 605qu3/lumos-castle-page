@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ironwork probe</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; color: #d8cfbf; font: 14px/1.4 Georgia, serif; overflow: hidden; }
+  canvas { display: block; touch-action: none; }
+  #say { position: fixed; left: 12px; bottom: 10px; right: 12px; text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="say"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="tones.js?v=3"></script>
+<script src="ironwork.js?v=1"></script>
+<script>
+/* ironwork-live.html: Design's probe for ironwork.js (req 1048, Godric's 2 on architect-ironwork-1023, B the scroll
+   grille), the dungeon corridor at the model's plan (page/castle-model.js: rect 16,12 to 120,15, P1), its barrel vault
+   as ceilings.js's rule (springing 3.0, crown 4.5), the screen on the wall at y 15 from x 34 to 120, 36 bays, 0.15 off
+   the stone, to 2.9 (the Architect's figures). Torches on the far wall as the light. ?view=walk (default, from x 40
+   looking east), elev (the wall square on, ?x the middle, default 40), end (down the run from x 121); ?at=x,y,z site
+   metres with y up; ?yaw, ?up degrees. Drag to look round. Not the shell: the shell calls CastleIronwork.forWall. */
+(function () {
+  'use strict';
+  var T = window.CASTLE_TONES, R = T.resolved, q = new URLSearchParams(location.search), view = q.get('view') || 'walk';
+  var C = { id: 'dungeon-corridor', rect: [16, 12, 120, 15], spring: 3.0, crown: 4.5, stone: 'founders-rubble' };
+  var lam = function (s) { var m = new THREE.MeshLambertMaterial({ color: new THREE.Color(s) }); m.side = THREE.DoubleSide; return m; };
+  var mats = { wall: lam(R[C.stone + '/coursed'] || '#5e5b4f'), floor: lam(R['flags-' + C.stone] || '#4a4840'), vault: lam(R['vault-' + C.stone] || R[C.stone + '/rubble'] || '#58564a'),
+    iron: new THREE.MeshLambertMaterial({ color: new THREE.Color(T.surfaces.iron.hex) }) };
+  var W = innerWidth, H = innerHeight, renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(W, H); document.body.appendChild(renderer.domElement);
+  var scene = new THREE.Scene();
+  var toLocal = function (x, y, z) { return new THREE.Vector3(x, z, y); };   /* site metres to the shell's frame: x east, y up, z south */
+  var r = C.rect, len = r[2] - r[0], wd = r[3] - r[1], mz = (r[1] + r[3]) / 2, WT = 0.8;
+  function box(w, h, d, m, x, y, z) { var b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); scene.add(b); return b; }
+  box(len, 0.1, wd, mats.floor, r[0] + len / 2, -0.05, mz);
+  box(len, C.spring, WT, mats.wall, r[0] + len / 2, C.spring / 2, r[1] - WT / 2);
+  box(len, C.spring, WT, mats.wall, r[0] + len / 2, C.spring / 2, r[3] + WT / 2);
+  box(WT, C.crown, wd, mats.wall, r[2] + WT / 2, C.crown / 2, mz); box(WT, C.crown, wd, mats.wall, r[0] - WT / 2, C.crown / 2, mz);
+  var vg = new THREE.CylinderGeometry(wd / 2, wd / 2, len, 24, 1, true, 0, Math.PI);   /* the barrel, a half round over the half-span */
+  vg.rotateZ(Math.PI / 2);   /* its axis east, the half from x 0 up */
+  var v = new THREE.Mesh(vg, mats.vault);
+  v.position.set(r[0] + len / 2, C.spring, mz); scene.add(v);
+  var Q = { id: C.id, poly: [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]], floor: 0 };
+  var IW = CastleIronwork.forWall(THREE, Q, { toLocal: toLocal, from: [34, 15], to: [120, 15], top: 2.9, bay: 2.4, proud: 0.15, pattern: 'B' }, mats);
+  scene.add(IW.group);
+  /* the light: torches in iron brackets on the far wall every 8 m at 2.2, a faint fill so the dark never reads black */
+  var L = T.lights;
+  scene.add(new THREE.HemisphereLight(0x6a645a, 0x1a1714, 0.30));
+  for (var x = 22; x < r[2]; x += 8) { var p = new THREE.PointLight(new THREE.Color(L.torch.hex), 1.1, 11, 1.5); p.position.set(x, 2.2, r[1] + 0.35); scene.add(p); }
+  var cam, say = document.getElementById('say'), yaw = 0, pitch = (+(q.get('up') || 2)) * Math.PI / 180;
+  cam = new THREE.PerspectiveCamera(view === 'elev' ? 50 : 70, W / H, 0.05, 200); cam.rotation.order = 'YXZ';
+  if (view === 'walk') { cam.position.set(40, 1.35, 13.4); yaw = -Math.PI / 2 + 0.12; }
+  if (view === 'elev') { cam.position.set(+(q.get('x') || 40), 1.45, 12.5); yaw = Math.PI; }
+  if (view === 'end') { cam.position.set(119.6, 1.35, 12.6); yaw = Math.PI / 2 - 0.14; }
+  if (q.get('at')) { var e = q.get('at').split(',').map(Number); cam.position.set(e[0], e[1], e[2]); }
+  yaw += (+(q.get('yaw') || 0)) * Math.PI / 180;
+  var drag = null;
+  renderer.domElement.addEventListener('pointerdown', function (e) { drag = [e.clientX, e.clientY, yaw, pitch]; });
+  addEventListener('pointerup', function () { drag = null; });
+  addEventListener('pointermove', function (e) { if (!drag) return; yaw = drag[2] - (e.clientX - drag[0]) * 0.006; pitch = Math.max(-1, Math.min(1.3, drag[3] - (e.clientY - drag[1]) * 0.004)); });
+  if (q.has('clean')) say.style.display = 'none';
+  var U = IW.group.userData;
+  say.textContent = 'The dungeon corridor: the scroll grille on the wall at y 15, x 34 to 120, ' + U.bays + ' bays of ' + U.bay.toFixed(3) +
+    ' m, ' + U.rows + ' rows of cells ' + U.cell[0].toFixed(2) + ' by ' + U.cell[1].toFixed(2) + ', ' + U.proud + ' m off the stone, to ' + U.top + ' m';
+  var frames = 0, calls0 = 0;
+  (function tick() {
+    cam.rotation.y = yaw; cam.rotation.x = pitch;
+    renderer.render(scene, cam);
+    if (++frames === 30) {
+      /* the screen's own draw calls: render it alone once and count */
+      var S2 = new THREE.Scene(); S2.add(IW.group); renderer.info.reset(); renderer.render(S2, cam); calls0 = renderer.info.render.calls; scene.add(IW.group);
+      window.ironworkReady = { bays: U.bays, bay: +U.bay.toFixed(4), rows: U.rows, meshes: IW.group.children.length, calls: calls0, triangles: U.triangles,
+        owners: IW.group.children.every(function (m) { return m.userData.owner === 'dungeon-corridor-ironwork'; }),
+        upright: IW.group.matrix.elements[5] > 0.99, intoRoom: IW.group.matrix.elements[10] };
+    }
+    requestAnimationFrame(tick);
+  })();
+})();
+</script>
+</body>
+</html>
