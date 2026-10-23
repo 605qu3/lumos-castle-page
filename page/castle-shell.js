@@ -516,7 +516,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v34 (req 716, Design's 756): its carved face, the atlas cell CastleCeilings.faces.cell(id, k), on a plane
              1 cm proud of its face to the room, the face's 0.25 m high; out.corbels(state) swaps the atlas */
           var FC = window.CastleCeilings.faces;
-          if (FC && FC.cell) {
+          if (FC && FC.cell && row.faces !== false) {
             /* v37: the head bows to the floor, tipped TILT (Design's FACE_TILT), its chin 1 cm proud; a stone wedge behind it
                back to the corbel's face, bearing 4 mm into it (the seams rule) */
             var TILT = FC.tilt || 0.35, fh = CH - 0.02, fw = fh * 0.351 / 0.393, st = Math.sin(TILT), ct = Math.cos(TILT);
@@ -532,6 +532,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             (vaultFaces[Q.id] = vaultFaces[Q.id] || []).push(fm);
           }
         });
+      }
+      if (CV && row.faces === false) {
+        /* v73 (model v171, ledger 236; Godric's note of 23 October 2026, 1.46 pm): a room whose paint row says faces false
+           keeps its corbels plain: each beam corbel's carved face goes, and the stone wedge ceilings.js stands behind it
+           (laid at the face's own position), so the corbel's upright face is the stone's again */
+        var FX = CV.group.children.filter(function (o) { return o.name.indexOf(Q.id + '-corbel-face-') === 0; });
+        CV.group.children.filter(function (o) {
+          return !o.name && FX.some(function (f) { return f.position.distanceTo(o.position) < 1e-6; });
+        }).concat(FX).forEach(function (o) { CV.group.remove(o); });
       }
       if (CV) {
         /* v40 (wave 5, floor B's places): ceilings.js lays a groin's piers over the plan's bounding box; in a plan not four
