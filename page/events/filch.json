@@ -1082,6 +1082,9 @@
         "place = corridor",
         "time = night",
         "chase != on",
+        "chase != by-suit",
+        "chase != homeward",
+        "chase != in-hand",
         "nights since chase_night >= 1"
       ],
       "show": [
@@ -1106,6 +1109,9 @@
         "place = corridor",
         "time = night",
         "chase != on",
+        "chase != by-suit",
+        "chase != homeward",
+        "chase != in-hand",
         "nights since chase_night >= 1"
       ],
       "starts": [],
@@ -1123,6 +1129,9 @@
         "place = corridor",
         "time = night",
         "chase != on",
+        "chase != by-suit",
+        "chase != homeward",
+        "chase != in-hand",
         "nights since chase_night >= 1"
       ],
       "who": [
@@ -1608,6 +1617,9 @@
         "at = armour",
         "time = night",
         "chase != on",
+        "chase != by-suit",
+        "chase != homeward",
+        "chase != in-hand",
         "nights since chase_night >= 1"
       ],
       "show": [
@@ -1633,6 +1645,9 @@
         "at = armour",
         "time = night",
         "chase != on",
+        "chase != by-suit",
+        "chase != homeward",
+        "chase != in-hand",
         "nights since chase_night >= 1"
       ],
       "starts": [],
