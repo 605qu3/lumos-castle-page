@@ -4604,6 +4604,104 @@ var EXAMQ = !W1.seats.length ? null : (function () {
 })();
 thingCues[LS_EXAMQ] = function () { showLines([{ medium: 'seen', sound: LS_EXAMQ, on: function () { if (EXAMQ) EXAMQ.show(); } }]); };
 if (Q.get('touch') === 'examquills') setTimeout(function () { thingCues[LS_EXAMQ](); }, 1500);
+/* req 987 (b) to (d), People's assets/layers/lesson-moments-987.png (Godric's 1, 10.45 am, 23 October 2026;
+   docs/handoff/people.md, The three pupils of req 987, *Staged*): four cells 838 by 1124 px, feet on the cell's foot;
+   0 and 1 seated at about 820 px a metre, 2 and 3 the player at about 640. The house trims are People's two keys,
+   magenta and blue, recoloured here as tools/people-house-keys.py does (each key pixel the house's colour scaled by its
+   value against the key's median), the house drawn at random each time (ours, provisional). Loaded only when a line
+   plays. (b) lessons.sugar-quill (cell 0) and (c) lessons.fingers-crossed (cell 1), word for word: in Charms and
+   Transfiguration, on the line the pupil sits on the chair behind the boys' own at the desk behind theirs, nearer the
+   aisle (Charms x' 5.725, y' 3.86; Transfiguration x' 5.6, y' 4.71; the card 0.15 forward of the chair's middle),
+   turned to the boys' desk, and stays for the visit; History of Magic and Defence have no pupils' desks drawn, so there
+   the lines stay seen. (d) hall.new-broom, word for word: in the Entrance Hall on the line the player comes down out
+   of the stair hall through the well's mouth (cell 2, 1.3 m a second), stops in the middle of the flags to show the
+   broom off (cell 3, 2.5 s), and walks on east out through the classrooms' archway, gone; mirrored to his heading on
+   the screen, turned to the boy's eye about the upright. Untappable, lit as the room, nothing glows.
+   ?touch=sugarquill|fingerscrossed|newbroom; lumosGreybox.moments(cue) */
+var LS_SUGAR = 'at a desk a third-year sucks a sugar quill with a faraway look, exactly like a boy thinking what to write next',
+    LS_CROSSED = 'a pupil at a desk waits for his marked work to come back with his fingers crossed under the desk',
+    EH_BROOM = 'a player of one of the house teams crosses the hall with a brand-new broom held out before him, showing it off to everyone he passes';
+var MOMENTS = (function () {
+  var seat = { 'charms-classroom': [5.725, 3.86, 6.05, 5.66], 'transfiguration-classroom': [5.6, 4.71, 6.25, 6.11] }[PLACE];   /* the chair, the boys' chairs' middle */
+  if (!shell || !(seat || PLACE === 'entrance-hall')) return null;
+  var z0 = shell.place.floor, CW = 838, CH = 1124, out = { img: null, waiting: [], seated: null, cell: -1, player: null, walk: null, house: '' };
+  var HOUSES = { gryffindor: [0x9b2318, 0xc49a3a], hufflepuff: [0xd4a62a, 0x1e1c1b], ravenclaw: [0x2a4a7a, 0x9a7040], slytherin: [0x2e5a3a, 0xa8aaac] };
+  function load(go) {
+    if (out.img && !out.waiting.length) { go(); return; }
+    out.waiting.push(go);
+    if (out.img) return;
+    out.img = new Image();
+    out.img.onload = function () { var w = out.waiting; out.waiting = []; w.forEach(function (f) { f(); }); };
+    out.img.src = '../assets/layers/lesson-moments-987.png';
+  }
+  function cellTex(cell, house) {   /* one cell on its own canvas, its two keys in the house's colours */
+    var cv = document.createElement('canvas'); cv.width = CW; cv.height = CH;
+    var c = cv.getContext('2d'); c.drawImage(out.img, cell * CW, 0, CW, CH, 0, 0, CW, CH);
+    var d = c.getImageData(0, 0, CW, CH), p = d.data, keys = [[], []];
+    for (var i = 0; i < p.length; i += 4) {
+      if (!p[i + 3]) continue;
+      var r = p[i], g = p[i + 1], b = p[i + 2], v = Math.max(r, g, b), n = Math.min(r, g, b);
+      if (v <= 25 || 255 * (v - n) / v <= 60) continue;
+      var h = v === r ? 60 * (g - b) / (v - n) : v === g ? 60 * (2 + (b - r) / (v - n)) : 60 * (4 + (r - g) / (v - n));
+      if (h < 0) h += 360;
+      if (h > 270 && h < 345) keys[0].push(i); else if (h > 205 && h < 260) keys[1].push(i);
+    }
+    keys.forEach(function (list, k) {
+      if (!list.length) return;
+      var vs = list.map(function (i) { return Math.max(p[i], p[i + 1], p[i + 2]); }).sort(function (a, b) { return a - b; });
+      var med = vs[vs.length >> 1] || 1, col = HOUSES[house][k], rgb = [col >> 16 & 255, col >> 8 & 255, col & 255];
+      list.forEach(function (i) { var f = Math.max(p[i], p[i + 1], p[i + 2]) / med; p[i] = rgb[0] * f; p[i + 1] = rgb[1] * f; p[i + 2] = rgb[2] * f; });
+    });
+    c.putImageData(d, 0, 0);
+    var t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t;
+  }
+  function card(cell, pxm, name) {   /* a cell standing on its foot, in a house drawn at random */
+    var hs = Object.keys(HOUSES); out.house = hs[Math.floor(Math.random() * hs.length)];
+    var w = CW / pxm, h = CH / pxm, g = new THREE.PlaneGeometry(w, h); g.translate(0, h / 2, 0);
+    var m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ map: cellTex(cell, out.house), transparent: true, alphaTest: 0.5, roughness: 0.9, side: THREE.DoubleSide }));
+    m.name = name; m.userData.owner = PLACE; m.raycast = function () {}; scene.add(m); return m;
+  }
+  function drop(m) { if (!m) return; scene.remove(m); m.geometry.dispose(); m.material.map.dispose(); m.material.dispose(); }
+  out.sit = function (cell) {
+    if (!seat) return;
+    load(function () {
+      drop(out.seated); out.cell = cell;
+      var F = function (a, b, z) { return shell.toLocal(139.6 + b, 71.4 - a, z); };
+      var m = out.seated = card(cell, 820, 'lesson-moment-pupil');
+      m.position.copy(F(seat[0], seat[1] + 0.15, z0)); var e = F(seat[2], seat[3], z0); m.lookAt(e.x, m.position.y, e.z);
+    });
+  };
+  /* the player's way: [x, y, metres a second to the next point, seconds stood there]; down from the stair hall, east out */
+  out.way = [[78.6, 47.6, 1.3, 0], [79.6, 58.6, 1.3, 2.5], [92.6, 59.2, 0, 0]];
+  out.cross = function () {
+    if (PLACE !== 'entrance-hall') return;
+    load(function () {
+      if (out.player) { out.player.userData.stop.dispose(); drop(out.player); }
+      var m = out.player = card(2, 640, 'hall-new-broom-player'); m.visible = false;
+      m.userData.walk = m.material.map; m.userData.stop = cellTex(3, out.house);   /* both cells in his house, made before he walks */
+      out.walk = { k: 0, u: 0, stood: 0 };
+    });
+  };
+  return out;
+})();
+thingCues[LS_SUGAR] = function () { showLines([{ medium: 'seen', sound: LS_SUGAR, on: function () { if (MOMENTS) MOMENTS.sit(0); } }]); };
+thingCues[LS_CROSSED] = function () { showLines([{ medium: 'seen', sound: LS_CROSSED, on: function () { if (MOMENTS) MOMENTS.sit(1); } }]); };
+thingCues[EH_BROOM] = function () { showLines([{ medium: 'seen', sound: EH_BROOM, on: function () { if (MOMENTS) MOMENTS.cross(); } }]); };
+if (MOMENTS) { var mq = { sugarquill: LS_SUGAR, fingerscrossed: LS_CROSSED, newbroom: EH_BROOM }[Q.get('touch')]; if (mq) setTimeout(function () { thingCues[mq](); }, 1500); }
+function updateMoments(dt) {
+  if (!MOMENTS || !MOMENTS.walk) return;
+  var w = MOMENTS.walk, m = MOMENTS.player, W = MOMENTS.way, a = W[w.k], b = W[w.k + 1];
+  if (w.u < 1) w.u = Math.min(1, w.u + dt * a[2] / Math.hypot(b[0] - a[0], b[1] - a[1]));
+  else if (w.stood < b[3]) w.stood += dt;   /* stood at the point, showing the broom off */
+  else { w.k++; w.u = 0; w.stood = 0; if (w.k >= W.length - 1) { m.visible = false; MOMENTS.walk = null; return; } a = W[w.k]; b = W[w.k + 1]; }
+  var still = w.u >= 1 && w.stood < b[3], map = still ? m.userData.stop : m.userData.walk;
+  if (m.material.map !== map) { m.material.map = map; m.material.needsUpdate = true; }
+  var x = a[0] + (b[0] - a[0]) * w.u, y = a[1] + (b[1] - a[1]) * w.u;
+  m.position.copy(shell.toLocal(x, y, shell.place.floor)); m.visible = true;
+  var c = camera.position; m.rotation.set(0, Math.atan2(c.x - m.position.x, c.z - m.position.z), 0);
+  var hd = shell.toLocal(b[0], b[1], 0).sub(shell.toLocal(a[0], a[1], 0)), side = new THREE.Vector3(Math.cos(m.rotation.y), 0, -Math.sin(m.rotation.y));
+  if (!still) m.scale.x = hd.dot(side) < 0 ? -1 : 1;   /* his face to his heading on the screen; at the stop he keeps the last */
+}
 function updatePig(dt) {
   if (!PIG || PIG.t < 0) return;
   var G = PIG, s = (G.t += dt), run = G.len[G.len.length - 1] / G.speed, end = G.grow + run + G.stand;
@@ -5504,7 +5602,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateTurban(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateTurban(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -6884,6 +6982,12 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     if (MICE) return { t: +MICE.t.toFixed(2), mice: MICE.mice.filter(function (m) { return m.g.visible; }).length, cat: MICE.cat.visible };
     if (TOAD) return { pig: PIG.t < 0 ? null : +PIG.t.toFixed(2), pigShown: PIG.g.visible, desk: (W1.pigdesk || []).map(function (m) { return m.visible; }), pigAt: PIG.g.position.toArray().map(function (v) { return +v.toFixed(2); }), hop: TOAD.t < 0 ? null : [TOAD.k, +TOAD.t.toFixed(2)], toad: TOAD.g.visible, at: TOAD.g.position.toArray().map(function (v) { return +v.toFixed(2); }) };
     return TOUCH ? { walk: TOUCH.walk ? [TOUCH.walk.k, +TOUCH.walk.u.toFixed(2)] : null, cat: TOUCH.cat.visible, at: TOUCH.cat.visible ? TOUCH.cat.position.toArray().map(function (v) { return +v.toFixed(2); }) : null } : null; },
+  moments: function (cue) { if (cue && MOMENTS) thingCues[{ sugarquill: LS_SUGAR, fingerscrossed: LS_CROSSED, newbroom: EH_BROOM }[cue]]();   /* req 987 (b) to (d) */
+    if (!MOMENTS) return null;
+    var p = MOMENTS.player, s = MOMENTS.seated;
+    return { house: MOMENTS.house, seated: s ? { cell: MOMENTS.cell, at: s.position.toArray().map(function (v) { return +v.toFixed(2); }) } : null,
+      walk: MOMENTS.walk ? [MOMENTS.walk.k, +MOMENTS.walk.u.toFixed(2), +MOMENTS.walk.stood.toFixed(1)] : null,
+      player: p && p.visible ? { stop: p.material.map === p.userData.stop, at: p.position.toArray().map(function (v) { return +v.toFixed(2); }) } : null }; },
   examquills: function (go) { if (go) thingCues[LS_EXAMQ]();   /* req 987 (a) */
     return EXAMQ ? { seats: W1.seats.length, on: EXAMQ.on, shown: EXAMQ.parts[0][0].visible } : null; },
   owltoast: function (at) { if (OWLTOAST && at != null) { OWLTOAST.hold = at < 0 ? null : at; OWLTOAST.t = Math.max(0, at); }   /* req 989 (b): a time holds a still, -1 plays it from the start */
