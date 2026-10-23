@@ -4438,6 +4438,57 @@ function updateMice(dt) {
   if (M.cat.visible) { var c = camera.position; M.cat.rotation.set(0, Math.atan2(c.x - M.cat.position.x, c.z - M.cat.position.z), 0); }
   if (M.t > M.sit) M.t = -1;
 }
+/* req 989 (b), great-hall.json's great-hall.owl-toast, word for word (PS 8 L2756): on the line the boys' owl comes in at
+   the high window over the Gryffindor table's near end (great-hall-window-n1, x 59), glides down to their place there
+   (the table's south edge by x 59.5, the nearer boy on the south bench, no figure yet), nibbles the slice of toast by it
+   three times, a bite gone each time, steps to the edge and nips twice at the nearer boy's ear, then flies up through
+   window n2 and is gone in its reveal. The owl is the Owlery's whole one (owlWhole), a tawny, provisional: no breed is
+   settled for the boys' owl, and never a snowy. The toast stays, bitten, till the line's 40 s are out. Untappable, lit
+   as the room. ?touch=owltoast plays it */
+var GH_OWLTOAST = "the boys' owl glides down to their place, nibbles a bit of toast and the nearer boy's ear, then flies up through the high windows to sleep in the Owlery with the other school owls";
+var OWLTOAST = PLACE !== 'great-hall' || !shell ? null : (function () {
+  var z0 = shell.place.floor, L = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  var w = owlWhole(owlKit().BREEDS[1], 1.0);
+  w.g.name = 'great-hall-owl'; w.g.traverse(function (o) { o.userData.owner = PLACE; o.raycast = function () {}; }); w.g.visible = false; shell.group.add(w.g);
+  var toast = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.012, 0.09), kit.solid(0xc08a48));
+  toast.position.copy(L(59.22, 66.45, 0.756)); toast.rotation.y = 0.3; toast.name = 'great-hall-toast'; toast.userData.owner = PLACE; toast.raycast = function () {}; toast.visible = false; shell.group.add(toast);
+  return { w: w, toast: toast, t: -1, stay: 40,
+    from: L(59, 70.6, 10.2), ctl: L(59.2, 68.2, 4.2), land: L(59.42, 66.5, 0.75), edge: L(59.6, 66.36, 0.75), ear: L(59.9, 65.95, 1.15),
+    up: L(56.0, 67.8, 6.5), out: L(53, 70.6, 10.4) };
+})();
+thingCues[GH_OWLTOAST] = function () { showLines([{ medium: 'seen', sound: GH_OWLTOAST, on: function () { if (OWLTOAST) OWLTOAST.t = 0; } }]); };
+if (OWLTOAST && Q.get('touch') === 'owltoast') setTimeout(function () { thingCues[GH_OWLTOAST](); }, 1500);
+function updateOwlToast(dt) {
+  if (!OWLTOAST || OWLTOAST.t < 0) return;
+  if (OWLTOAST.hold != null) OWLTOAST.t = OWLTOAST.hold;   /* checks: a still at a set time */
+  var O = OWLTOAST, s = (O.t += dt), w = O.w, G = w.g;
+  var bez = function (a, c, b, u) { return a.clone().multiplyScalar((1 - u) * (1 - u)).add(c.clone().multiplyScalar(2 * u * (1 - u))).add(b.clone().multiplyScalar(u * u)); };
+  var face = function (to) { var dx = to.x - G.position.x, dz = to.z - G.position.z; if (dx * dx + dz * dz > 1e-6) G.rotation.y = Math.atan2(-dz, dx); };
+  var wings = function (a) { w.wings.forEach(function (x) { x.p.rotation.x = x.sd * a; }); };
+  var flap = function () { wings(0.2 + 0.9 * (0.5 + 0.5 * Math.sin(s * 22))); };
+  O.toast.visible = s < O.stay;
+  if (s >= O.stay) { O.t = -1; O.toast.scale.x = 1; return; }
+  var T1 = 3.2, T2 = T1 + 3.0, T3 = T2 + 0.8, T4 = T3 + 2.0, T5 = T4 + 3.5;
+  G.visible = s < T5; w.head.rotation.z = 0;
+  if (s < T1) {   /* in at the window, a few beats, a long glide down, a beat or two to brake, folded as it lands */
+    var p = bez(O.from, O.ctl, O.land, s / T1); face(p); G.position.copy(p);
+    if (s < 0.8 || s > T1 - 0.45) flap(); else wings(0.3);
+    if (s > T1 - 0.1) wings(1.35);
+  } else if (s < T2) {   /* three nibbles at the toast */
+    G.position.copy(O.land); face(O.toast.position); wings(1.35);
+    var n = (s - T1) / (T2 - T1) * 3;
+    w.head.rotation.z = -0.55 * Math.abs(Math.sin(n * Math.PI));
+    O.toast.scale.x = 1 - 0.14 * Math.min(3, Math.floor(n + 0.5));
+  } else if (s < T3) {   /* a step to the table's edge */
+    var u = (s - T2) / (T3 - T2), q = O.land.clone().lerp(O.edge, u); q.y += 0.04 * Math.sin(u * Math.PI);
+    G.position.copy(q); face(O.ear);
+  } else if (s < T4) {   /* the ear: stretched up toward it, two nips */
+    G.position.copy(O.edge); face(O.ear);
+    w.head.rotation.z = 0.3 * Math.abs(Math.sin((s - T3) / (T4 - T3) * 2 * Math.PI));
+  } else if (s < T5) {   /* up and out through window n2, gone in its reveal */
+    var r = bez(O.edge, O.up, O.out, (s - T4) / (T5 - T4)); face(r); G.position.copy(r); flap();
+  }
+}
 /* req 927 (People's, on req 897 and Godric's 1 on people-painters-sitters-r1-1022; Events' req 928 strings,
    page/events/painters-room.json, word for word): the painters' room's two sitters drawn into their canvases
    (page/shell-w5a.js, the easels at (162.5, -1.4), the tea witch's with the cup, and (162.5, 1.1), the young wizard's).
@@ -5067,7 +5118,7 @@ function frame() {
   updateSway(dt);
   updateGlass(dt);
   updateLines(dt);
-  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateTurban(dt); updateMice(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
+  updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateTurban(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
   updateTrick(dt);
   updateMyrtle(dt);
   updateStaff(dt);
@@ -6109,6 +6160,41 @@ var OWL_CROWD = 'hundreds upon hundreds of owls of every breed imaginable nestle
     OWL_BACK = 'one owl turning its back on him with a ruffle',
     OWL_HOOT = 'a sleepy hoot from somewhere high up the tower',
     OWL_LEAVE = 'an owl stretching its wings, hopping to a loop and going out into the dark';
+/* the owls' parts, shared by the Owlery's crowd and the owls the cues draw in other rooms (req 989 (b)): facing +x,
+   standing on y 0; seven breeds [feathers, face, size]: barn, tawny, snowy, eagle, little, grey, brown */
+var owlKitCache;
+function owlKit() {
+  if (owlKitCache) return owlKitCache;
+  var mx = function (p, s) { return new THREE.Matrix4().compose(new THREE.Vector3(p[0], p[1], p[2]), new THREE.Quaternion(), new THREE.Vector3(s[0], s[1], s[2])); };
+  return (owlKitCache = {
+    BREEDS: [[0xc9a26b, 0xf1e8d8, 1.0], [0x7a5636, 0xa58360, 1.0], [0xeceae4, 0xf4f2ee, 1.1], [0x6b5034, 0x8e7150, 1.35],
+      [0x8b7656, 0xb9a688, 0.62], [0x8a8580, 0xa8a39c, 0.85], [0x5e4630, 0x7d644a, 0.95]],
+    PARTS: {
+      body: mx([0, 0.12, 0], [0.1, 0.13, 0.105]), head: mx([0.008, 0.245, 0], [0.08, 0.075, 0.088]),
+      face: mx([0.058, 0.243, 0], [0.03, 0.06, 0.07]), beak: mx([0.088, 0.228, 0], [0.012, 0.02, 0.01]),
+      eyeL: mx([0.084, 0.255, 0.03], [0.015, 0.015, 0.015]), eyeR: mx([0.084, 0.255, -0.03], [0.015, 0.015, 0.015])
+    },
+    ball: new THREE.SphereGeometry(1, 12, 9),
+    amber: new THREE.MeshStandardMaterial({ color: kit.col(0xd4901c), roughness: 0.25 })
+  });
+}
+/* an owl drawn whole, wings and all (a breed's row, its size): the head a group of its own, the wings on pivots, folded
+   down against the body at x rotation sd * 1.35 */
+function owlWhole(br, size) {
+  var K = owlKit(), G = new THREE.Group();
+  var part = function (k, col, mat, to) { var m = new THREE.Mesh(K.ball, mat || new THREE.MeshStandardMaterial({ color: kit.col(col), roughness: 0.95 })); m.applyMatrix4(K.PARTS[k]); m.raycast = function () {}; to.add(m); return m; };
+  part('body', br[0], null, G); var head = new THREE.Group(); G.add(head);
+  part('head', br[0], null, head); part('face', br[1], null, head); part('beak', 0x3a3128, null, head);
+  var eyes = ['eyeL', 'eyeR'].map(function (k) { return part(k, 0, K.amber, head); });
+  var wm = new THREE.MeshStandardMaterial({ color: kit.col(br[0]), roughness: 0.95 });
+  var wings = [1, -1].map(function (sd) {
+    var piv = new THREE.Group(); piv.position.set(-0.01, 0.2, 0.07 * sd);
+    var w = new THREE.Mesh(K.ball, wm); w.scale.set(0.09, 0.012, 0.16); w.position.set(-0.01, 0, 0.13 * sd); w.raycast = function () {};
+    piv.add(w); piv.rotation.x = sd * 1.35; G.add(piv); return { p: piv, sd: sd };
+  });
+  G.scale.setScalar(size);
+  return { g: G, head: head, eyes: eyes, wings: wings };
+}
 var OWLS = !OWL ? null : (function () {
   var rm = OWL_ROOM_REC(), C = rm.shape.circle, RR = rm.shape.r, z0 = shell.place.floor;
   var P = function (x, y, h) { return shell.toLocal(x, y, z0 + h); };
@@ -6163,19 +6249,10 @@ var OWLS = !OWL ? null : (function () {
       }
     });
   })();
-  /* the owls: one crowd, instanced (body, face, head, eyes); facing +x, standing on y 0 */
-  var BREEDS = [[0xc9a26b, 0xf1e8d8, 1.0], [0x7a5636, 0xa58360, 1.0], [0xeceae4, 0xf4f2ee, 1.1], [0x6b5034, 0x8e7150, 1.35],
-    [0x8b7656, 0xb9a688, 0.62], [0x8a8580, 0xa8a39c, 0.85], [0x5e4630, 0x7d644a, 0.95]];
-  var PARTS = {
-    body: new THREE.Matrix4().compose(new THREE.Vector3(0, 0.12, 0), new THREE.Quaternion(), new THREE.Vector3(0.1, 0.13, 0.105)),
-    head: new THREE.Matrix4().compose(new THREE.Vector3(0.008, 0.245, 0), new THREE.Quaternion(), new THREE.Vector3(0.08, 0.075, 0.088)),
-    face: new THREE.Matrix4().compose(new THREE.Vector3(0.058, 0.243, 0), new THREE.Quaternion(), new THREE.Vector3(0.03, 0.06, 0.07)),
-    beak: new THREE.Matrix4().compose(new THREE.Vector3(0.088, 0.228, 0), new THREE.Quaternion(), new THREE.Vector3(0.012, 0.02, 0.01)),
-    eyeL: new THREE.Matrix4().compose(new THREE.Vector3(0.084, 0.255, 0.03), new THREE.Quaternion(), new THREE.Vector3(0.015, 0.015, 0.015)),
-    eyeR: new THREE.Matrix4().compose(new THREE.Vector3(0.084, 0.255, -0.03), new THREE.Quaternion(), new THREE.Vector3(0.015, 0.015, 0.015))
-  };
-  var ball = new THREE.SphereGeometry(1, 12, 9), N = slots.length;
-  var feathers = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 }), amber = new THREE.MeshStandardMaterial({ color: kit.col(0xd4901c), roughness: 0.25 });
+  /* the owls: one crowd, instanced (body, face, head, eyes); facing +x, standing on y 0; the parts owlKit()'s */
+  var K = owlKit(), BREEDS = K.BREEDS, PARTS = K.PARTS;
+  var ball = K.ball, N = slots.length;
+  var feathers = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95 }), amber = K.amber;
   var inst = {};
   ['body', 'head', 'face'].forEach(function (k) { inst[k] = new THREE.InstancedMesh(ball, feathers, N); });
   inst.eye = new THREE.InstancedMesh(ball, amber, N * 2);
@@ -6206,19 +6283,10 @@ var OWLS = !OWL ? null : (function () {
   };
   /* an owl drawn whole, wings and all, for the cues; its crowd twin hidden while it moves */
   var whole = function (o) {
-    var G = new THREE.Group(), mk = function (col, mat, k) { var m = new THREE.Mesh(ball, mat || new THREE.MeshStandardMaterial({ color: kit.col(col), roughness: 0.95 })); m.applyMatrix4(PARTS[k]); m.raycast = function () {}; G.add(m); return m; };
-    mk(o.br[0], null, 'body'); var head = new THREE.Group(); G.add(head);
-    [['head', o.br[0]], ['face', o.br[1]], ['beak', 0x3a3128]].forEach(function (p) { var m = new THREE.Mesh(ball, new THREE.MeshStandardMaterial({ color: kit.col(p[1]), roughness: 0.95 })); m.applyMatrix4(PARTS[p[0]]); m.raycast = function () {}; head.add(m); });
-    var eyes = ['eyeL', 'eyeR'].map(function (k) { var m = new THREE.Mesh(ball, amber); m.applyMatrix4(PARTS[k]); m.raycast = function () {}; head.add(m); return m; });
-    var wm = new THREE.MeshStandardMaterial({ color: kit.col(o.br[0]), roughness: 0.95 });
-    var wings = [1, -1].map(function (sd) {
-      var piv = new THREE.Group(); piv.position.set(-0.01, 0.2, 0.07 * sd);
-      var w = new THREE.Mesh(ball, wm); w.scale.set(0.09, 0.012, 0.16); w.position.set(-0.01, 0, 0.13 * sd); w.raycast = function () {};
-      piv.add(w); piv.rotation.x = sd * 1.35; G.add(piv); return { p: piv, sd: sd };   /* folded down against the body */
-    });
-    G.scale.setScalar(o.size); G.position.copy(o.s.pos); G.rotation.y = o.s.yaw;
+    var w = owlWhole(o.br, o.size), G = w.g;
+    G.position.copy(o.s.pos); G.rotation.y = o.s.yaw;
     G.name = 'owlery-owl-whole'; G.userData.owner = 'owlery'; g.add(G);
-    return { g: G, head: head, eyes: eyes, wings: wings };
+    return w;
   };
   var take = function (o, kind, extra) {
     var i = owls.indexOf(o), a = Object.assign({ o: o, i: i, kind: kind, t: 0, w: whole(o) }, extra || {});
@@ -6380,6 +6448,8 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     if (MICE) return { t: +MICE.t.toFixed(2), mice: MICE.mice.filter(function (m) { return m.g.visible; }).length, cat: MICE.cat.visible };
     if (TOAD) return { pig: PIG.t < 0 ? null : +PIG.t.toFixed(2), pigShown: PIG.g.visible, desk: (W1.pigdesk || []).map(function (m) { return m.visible; }), pigAt: PIG.g.position.toArray().map(function (v) { return +v.toFixed(2); }), hop: TOAD.t < 0 ? null : [TOAD.k, +TOAD.t.toFixed(2)], toad: TOAD.g.visible, at: TOAD.g.position.toArray().map(function (v) { return +v.toFixed(2); }) };
     return TOUCH ? { walk: TOUCH.walk ? [TOUCH.walk.k, +TOUCH.walk.u.toFixed(2)] : null, cat: TOUCH.cat.visible, at: TOUCH.cat.visible ? TOUCH.cat.position.toArray().map(function (v) { return +v.toFixed(2); }) : null } : null; },
+  owltoast: function (at) { if (OWLTOAST && at != null) { OWLTOAST.hold = at < 0 ? null : at; OWLTOAST.t = Math.max(0, at); }   /* req 989 (b): a time holds a still, -1 plays it from the start */
+    return OWLTOAST ? { t: OWLTOAST.t < 0 ? null : +OWLTOAST.t.toFixed(2), owl: OWLTOAST.w.g.visible, at: OWLTOAST.w.g.position.toArray().map(function (v) { return +v.toFixed(2); }), toast: OWLTOAST.toast.visible, bitten: +(1 - OWLTOAST.toast.scale.x).toFixed(2) } : null; },
   turban: function (go) { if (go) thingCues[GR_TURBAN]();   /* req 975 (c) */
     return TURBAN ? { t: TURBAN.t < 0 ? null : +TURBAN.t.toFixed(2), shown: TURBAN.man.visible, white: TURBAN.white, st: TURBAN.st ? { a: TURBAN.st.a.map(function (v) { return +v.toFixed(1); }), d: TURBAN.st.d.map(function (v) { return +v.toFixed(2); }), side: TURBAN.st.side, D: TURBAN.st.D } : null, at: TURBAN.man.position.toArray().map(function (v) { return +v.toFixed(2); }) } : null; },
   elect: function () { return ELECT ? { board: ELECT.board.visible, room: ELECT.room.visible, cls: ELECT.cls.filter(function (m) { return m.visible; }).length } : null; },
