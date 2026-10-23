@@ -1321,9 +1321,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   (M.features || []).forEach(function (ft) {
     if (!ft.circle || !ft.r || ft.top == null || ft.z == null || ft.arc || ft.ring || slug(ft.room || '') !== P.id) return;
     var cyl = slab(1, 1, 1, mats.wall, 'wall');
-    cyl.geometry.dispose(); cyl.geometry = new THREE.CylinderGeometry(ft.r, ft.r, ft.top - ft.z, 48);
-    var p = toLocal(ft.circle[0], ft.circle[1], ft.z);
-    cyl.position.set(p.x, p.y + (ft.top - ft.z) / 2, p.z); cyl.name = P.id + '-masonry-' + ft.id; group.add(cyl);
+    /* v77: its foot 1 cm under the boards, so its base (the wall's double-sided stone) is not one plane with the floor
+       (30 m2 fighting in the drying loft, the 154th's sweep) */
+    cyl.geometry.dispose(); cyl.geometry = new THREE.CylinderGeometry(ft.r, ft.r, ft.top - ft.z + 0.01, 48);
+    var p = toLocal(ft.circle[0], ft.circle[1], ft.z - 0.01);
+    cyl.position.set(p.x, p.y + (ft.top - ft.z + 0.01) / 2, p.z); cyl.name = P.id + '-masonry-' + ft.id; group.add(cyl);
   });
 
   /* the stairs in the places built: a straight flight's treads along its rise, from its span's foot to its head; a

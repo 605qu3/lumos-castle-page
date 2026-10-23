@@ -164,7 +164,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=1"></script>
-<script src="castle-shell.js?v=76"></script>
+<script src="castle-shell.js?v=77"></script>
 <script src="shell-w5b.js?v=17"></script>
 <script src="shell-w5a.js?v=21"></script>
 <script src="castle-events.js?v=40"></script>
@@ -1473,13 +1473,14 @@ var STAIR = (function () {
     var tmp = new THREE.Group();
     for (var i = 0; i < n; i++) {
       var top = M3.from + rise * (i + 1), fy = y0 + i * go, list = LOOSE[i] ? keep : tidyR, listC = LOOSE[i] ? keepC : tidyC;
-      list.push(box(cx - hw, fy, top, cx + hw, fy + go, top + T, red, tmp));              /* on the tread */
-      list.push(box(cx - hw, fy - T, top - rise, cx + hw, fy, top + T, red, tmp));        /* down its riser */
-      [-1, 1].forEach(function (sd) {
-        var e = cx + sd * (hw - 0.09);
-        listC.push(box(e - 0.03, fy, top + T, e + 0.03, fy + go, top + T + 0.002, cream, tmp));
-        listC.push(box(e - 0.03, fy - T - 0.002, top - rise, e + 0.03, fy - T, top + T, cream, tmp));
-      });
+      /* the border woven in: red and cream strips side by side in one cloth, so no face lies 2 mm over another (the
+         stripes were slabs on the red, 51 fights in the 154th's sweep) */
+      var xs = [cx - hw, cx - hw + 0.06, cx - hw + 0.12, cx + hw - 0.12, cx + hw - 0.06, cx + hw];
+      for (var s = 0; s < 5; s++) {
+        var into = s % 2 ? listC : list, mt = s % 2 ? cream : red;
+        into.push(box(xs[s], fy, top, xs[s + 1], fy + go, top + T, mt, tmp));              /* on the tread */
+        into.push(box(xs[s], fy - T, top - rise, xs[s + 1], fy, top + T, mt, tmp));        /* down its riser */
+      }
       var rod = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 1.47, 8), brass);
       rod.rotation.z = Math.PI / 2; rod.position.copy(P(cx, fy - T - 0.012, top - rise + T + 0.008)); g.add(rod); rods.push(rod);
     }
@@ -2484,6 +2485,9 @@ var IRONWORK = (function () {
     { iron: kit.solid(t ? parseInt(t.hex.slice(1), 16) : 0x2e2b28) });
   if (!IW) return null;
   IW.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; });
+  /* the 154th: the scroll planes lie 1 mm inside the bars' faces, so where a scroll crosses a bar the two fought (10 m2
+     in the sweep); a depth step back on the scrolls, so the bar always shows whole in front */
+  IW.group.traverse(function (m) { if (m.isMesh && /-scrolls$/.test(m.name)) { m.material.polygonOffset = true; m.material.polygonOffsetFactor = 1; m.material.polygonOffsetUnits = 2; m.userData.rank = 1; } });
   shell.group.add(IW.group);
   return IW;
 })();
@@ -2978,8 +2982,9 @@ var W1 = (function () {
     function cabinets(alongX, w, s, a, b, n, skip) {
       function q(u0, u1, v0, v1, za, zb, mt) { return alongX ? box(u0, w + s * v0, za, u1, w + s * v1, zb, mt) : box(w + s * v0, u0, za, w + s * v1, u1, zb, mt); }
       q(a, b, -0.02, 0.7, -0.01, 1.35, oak);
-      DR.slice(0, 4).forEach(function (z) { q(a + 0.005, b - 0.005, 0.7, 0.703, z - 0.004, z + 0.004, line); });
-      for (var i = 1; i < n; i++) { var u = a + (b - a) * i / n; q(u - 0.004, u + 0.004, 0.7, 0.703, 0.03, 1.35, line); }
+      /* the 154th: the lines 8 mm proud (3 mm fought the oak's face, 0.9 m2 in the sweep) */
+      DR.slice(0, 4).forEach(function (z) { q(a + 0.005, b - 0.005, 0.7, 0.708, z - 0.004, z + 0.004, line); });
+      for (var i = 1; i < n; i++) { var u = a + (b - a) * i / n; q(u - 0.004, u + 0.004, 0.7, 0.708, 0.03, 1.35, line); }
       for (i = 0; i < n; i++) for (var k = 0; k < 4; k++) {
         var c = a + (b - a) * (i + 0.5) / n, zc = (DR[k] + DR[k + 1]) / 2;
         if (!(skip && skip(c, k))) q(c - 0.04, c + 0.04, 0.7, 0.716, zc - 0.008, zc + 0.008, pull);
