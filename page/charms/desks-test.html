@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exam hall desks, a test</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #15120f; overflow: hidden; font-family: Georgia, serif; }
+  canvas#c { display: block; width: 100vw; height: 100vh; }
+  #line { position: fixed; left: 50%; top: 14px; transform: translateX(-50%); max-width: 82vw; padding: 10px 16px;
+    color: #eadcbf; background: rgba(28, 22, 17, 0.88); border: 1px solid #5a4a38; border-radius: 6px; font-size: 17px;
+    text-align: center; }
+  #stats { position: fixed; right: 8px; bottom: 6px; color: #6d6252; font: 11px monospace; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="line">The old examination hall. Tap a desk to move it aside. <i>Mobiliarbus!</i></div>
+<div id="stats">starting</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="spells.js?v=41"></script>
+<script src="guide.js?v=6"></script>
+<script src="desks.js?v=1"></script>
+<script>
+/* A test page for req 1044 (the Charms lane, forty-fourth session, 23 October 2026; the owner is Godric): Mobiliarbus
+   on the old examination hall's 48 desks through CharmsDesks.forHall, in a plain hall drawn here in the shell's frame
+   (x' east, y' north, the shell's local x, up, -y), the desks as the shell's H71 lays them (page/shell.html, H71's
+   things: eight rows of six, x' 1.1, 2.4, 3.7, 6.3, 7.6, 8.9, rows y' 12.6 to 21.0, each its own group). Not the shell:
+   the shell calls CharmsDesks.forHall with its own desks. ?stand=floor-1 to floor-7, dais or start (Interaction's
+   places, the hall's model row); ?face=north or south; ?pitch= degrees (down negative); window.lumosDesks for checks.
+   He has learned the spell here (a test page). */
+(function () {
+  var Q = new URLSearchParams(location.search);
+  var STANDS = { start: [5.0, 23.0], dais: [5.0, 3.6], 'floor-1': [5.0, 19.0], 'floor-2': [5.0, 16.0], 'floor-3': [5.0, 13.0],
+    'floor-4': [5.0, 10.0], 'floor-5': [2.0, 8.0], 'floor-6': [8.0, 8.0], 'floor-7': [5.0, 6.6] };
+  var st = STANDS[Q.get('stand')] || STANDS['floor-4'], face = Q.get('face') || 'north', pitch = +(Q.get('pitch') || -24);
+  var cv = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x15120f);
+  var camera = new THREE.PerspectiveCamera(60, 1, 0.05, 80);
+  var P = function (x, y, z) { return new THREE.Vector3(x, z || 0, -y); };
+  scene.add(new THREE.HemisphereLight(0xe8dcc4, 0x2a2118, 0.75));
+  var sun = new THREE.DirectionalLight(0xffe8c0, 0.6); sun.position.set(3, 8, -4); scene.add(sun);
+  function solid(c) { return new THREE.MeshLambertMaterial({ color: c }); }
+  function box(parent, x0, y0, z0, x1, y1, z1, mt) {
+    var m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, z1 - z0, y1 - y0), mt), c = P((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    m.position.copy(c); parent.add(m); return m;
+  }
+  var hallG = new THREE.Group(); scene.add(hallG);
+  if (Q.get('shift')) { hallG.position.set(7, 0.5, -3); hallG.updateMatrixWorld(true); }   /* the hall off the origin, as a check */
+  box(hallG, 0, 0, -0.1, 10, 24, 0, solid(0x5a4c3c));                                      /* the boards */
+  box(hallG, -0.6, 0, 0, 0, 24, 3.2, solid(0x6d665c)); box(hallG, 10, 0, 0, 10.6, 24, 3.2, solid(0x6d665c));
+  box(hallG, -0.6, -0.6, 0, 10.6, 0, 3.2, solid(0x625b52)); box(hallG, -0.6, 24, 0, 10.6, 25.2, 3.2, solid(0x625b52));
+  box(hallG, 2.5, 0, 0, 7.5, 2.0, 0.3, solid(0x6b5a46));                                    /* the dais */
+  box(hallG, 4.4, 23.98, 0, 5.6, 24.0, 2.4, solid(0x2c241c));                               /* the door */
+  var oak = solid(0x4a4136), worn = solid(0x544737), desks = [];
+  [12.6, 13.8, 15.0, 16.2, 17.4, 18.6, 19.8, 21.0].forEach(function (yc) {
+    [1.1, 2.4, 3.7, 6.3, 7.6, 8.9].forEach(function (xc) {
+      var d = new THREE.Group(); d.name = 'exam-desk-' + (desks.length + 1); d.userData.mobiliarbus = true; hallG.add(d);
+      var x0 = xc - 0.3, x1 = xc + 0.3, ys = yc - 0.4;
+      box(d, x0, ys, 0, x1, yc + 0.4, 0.03, worn);
+      box(d, x0, ys + 0.02, 0.03, x0 + 0.03, ys + 0.42, 0.64, oak); box(d, x1 - 0.03, ys + 0.02, 0.03, x1, ys + 0.42, 0.64, oak);
+      box(d, x0 + 0.03, ys + 0.02, 0.6, x1 - 0.03, ys + 0.46, 0.68, oak);                  /* the lid */
+      box(d, x0 + 0.04, ys + 0.5, 0.4, x1 - 0.04, ys + 0.76, 0.43, oak);                    /* the bench */
+      box(d, x0 + 0.04, yc + 0.36, 0.43, x1 - 0.04, yc + 0.38, 0.75, oak);                   /* its back */
+      desks.push(d);
+    });
+  });
+  LumosSpells.learn('mobiliarbus');
+  var line = document.getElementById('line');
+  var H = CharmsDesks.forHall(THREE, { desks: desks, P: P, camera: camera, canvas: cv,
+    stands: Object.keys(STANDS).map(function (k) { return STANDS[k]; }),
+    onLook: function (t) {   /* his head turns to the desk and the wall square beside it, at once (the shell eases its own) */
+      var e = P(st[0], st[1], 0), q = P(t.x, t.y, 0);
+      yaw = Math.atan2(q.x - e.x, -(q.z - e.z)); aim(); camera.updateMatrixWorld();
+    },
+    onCast: function (r, n) {
+      if (!r) return;
+      if (r.verdict === 'moved') line.innerHTML = '<b>Mobiliarbus!</b> Desk ' + n + ' rises a few inches, drifts ' + LumosSpells.slideWords(r.dx, r.dy) + ' and lands with a soft thump.';
+      else if (r.why) line.innerHTML = r.why[0] + '. ' + r.why[1];
+    } });
+  var eye = P(st[0], st[1], 1.35).add(hallG.position), yaw = face === 'south' ? Math.PI : 0;
+  function aim() {
+    camera.position.copy(eye);
+    var p = pitch * Math.PI / 180, dir = new THREE.Vector3(Math.sin(yaw) * Math.cos(p), Math.sin(p), -Math.cos(yaw) * Math.cos(p));
+    camera.lookAt(eye.clone().add(dir));
+  }
+  function size() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+  size(); addEventListener('resize', size); aim(); camera.updateMatrixWorld();
+  var ray = new THREE.Raycaster();
+  cv.addEventListener('pointerup', function (ev) {
+    ray.setFromCamera(new THREE.Vector2(ev.clientX / innerWidth * 2 - 1, -(ev.clientY / innerHeight) * 2 + 1), camera);
+    if (!H.tap(ray, null)) line.textContent = 'The boards creak underfoot.';
+  });
+  var frames = 0, t0 = performance.now(), last = t0, stats = document.getElementById('stats');
+  function loop(now) {
+    var dt = (now - last) / 1000; last = now; frames++;
+    H.frame(dt); renderer.render(scene, camera);
+    if (now - t0 > 1000) { stats.textContent = Math.round(frames * 1000 / (now - t0)) + ' fps'; frames = 0; t0 = now; }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  window.lumosDesks = { H: H, camera: camera, P: P, state: function () { return H.state(); } };
+})();
+</script>
+</body>
+</html>
