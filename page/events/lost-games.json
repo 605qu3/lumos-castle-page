@@ -3,6 +3,26 @@
   "first_visit": [],
   "records": [
     {
+      "id": "lost-games.case-swing",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap lost-games-case",
+      "when": [
+        "place = trophy room",
+        "lost_games != found"
+      ],
+      "show": [
+        "Behind the cups, more cups. No detention ever got this far with a polishing cloth."
+      ],
+      "starts": [
+        "set lost_games = found",
+        "log \"Found the room behind the trophy case {day}\"",
+        "secret lost-games-room"
+      ],
+      "canon": "Hidden Ways' H70 (docs/hidden-ways/lost-games-room.md, req 1007; Events' req 1009): on the case's first swing, one line; Godric's 1 at 2.23 pm, 23 October 2026, on events-lost-games-line-1023 (Fawkes relayed), over Filch's detentions, since Filch is not at the castle in the 1890s; the polishing detention is CoS 7 L8902 as humour only, nothing replayed, no one named; the case's tap is the model's lost-games-case, at the trophy room where he stands when he finds it (Fawkes 2.17 pm)"
+    },
+    {
       "id": "lost-games.cup",
       "tier": "fixed",
       "source": "device",
