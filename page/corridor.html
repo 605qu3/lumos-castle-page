@@ -4239,12 +4239,14 @@ function catRescues(cue) {
   return function () { norrisAfterCat(cue, new THREE.Vector3((chase.x + camera.position.x) / 2, 0, MID_Z + 0.2)); tabbyRuns('rescue'); };
 }
 /* the tabby drawn (People's req 978, candidate 2 staged on Godric's 2 at 10.29 pm): assets/layers/tabby-figure.png, five
-   cells in one row, 1033 by 1052 px at 1878 px a metre, her feet on each cell's foot: 0 sat front on, watching; 1 the
+   cells in one row, 1033 by 1052 px, her feet on each cell's foot: 0 sat front on, watching; 1 the
    same side-on; 2 walking, 3 slipping low and quick, 4 bolting, all to the right, mirrored when she goes left on the
    screen. Turned to the eye, as the figures are. On the sill she watches him and is gone once he has looked away; in
    the lure she slips ahead of Mrs Norris down the far flight, in the rescue she steps out between the boy and the
    lamp, then bolts ahead of her. The cue's words still told there, since the stair head is often behind him */
-var TABBY = { w: 1033 / 1878, h: 1052 / 1878, cells: 5, slip: 2.4, bolt: 3.4, step: 0.5, lead: 0.6, sill: 60 };
+/* two scales (People, 10.41 pm): the sitting cells 0 and 1 at 3250 px a metre (0.32 m to the ears), the moving cells 2
+   to 4 at 1400 (the walker 0.54 m, the slipper and bolter 0.73 m stretched out); the plane is laid at 1400 */
+var TABBY = { w: 1033 / 1400, h: 1052 / 1400, sit: 1400 / 3250, cells: 5, slip: 2.4, bolt: 3.4, step: 0.5, lead: 0.6, sill: 60 };
 var tabby = { group: new THREE.Group(), mesh: null, state: 'away', k: 0, seen: false, path: null, len: 0, kind: '' };
 (function () {
   var im = new Image();
@@ -4258,7 +4260,8 @@ var tabby = { group: new THREE.Group(), mesh: null, state: 'away', k: 0, seen: f
 })();
 function tabbyCell(i, left) {
   if (!tabby.mesh) return;
-  tabby.mesh.material.map.offset.x = i / TABBY.cells; tabby.mesh.scale.x = left ? -1 : 1;
+  var k = i < 2 ? TABBY.sit : 1;
+  tabby.mesh.material.map.offset.x = i / TABBY.cells; tabby.mesh.scale.set(left ? -k : k, k, 1); tabby.mesh.position.y = TABBY.h * k / 2;
 }
 function tabbyOnSill() {   /* stair.tabby-cat: on window 1's sill, front on */
   var b = new THREE.Box3().setFromObject(windows[1].sill), c = b.getCenter(new THREE.Vector3());
