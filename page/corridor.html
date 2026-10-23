@@ -5487,7 +5487,18 @@ else if (kit.from === 'stair-hall') arriveFromBay();
    Every chain loads (the records' `place` keeps each to its page), this page answers `at`, the stop he stands at, and
    draws the armour and the sticks from the cues their state shows. Poses wait for the armour's sheet, so they are a
    console note; the lines are shown (req 66, below), and a sound is a heard line's words until it is recorded. */
-var visorPatch = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.1), new THREE.MeshBasicMaterial({ color: col(0x2e2c2a) }));
+/* the shut visor's slit by night (Fawkes, 12.10 pm, 23 October 2026, the Corridor's find at its seventy-seventh wrap: a flat
+   dark box on the helmet): the dark of the helmet seen through the slit, as long as the drawing's slit and soft at every
+   edge, so his eyes catch the torch inside it and no box shows */
+var visorPatch = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.036), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, map: tex((function () {
+  var c = makeCanvas(150, 36), g = c.getContext('2d'), w = c.width, h = c.height;
+  var gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(20,17,14,0)'); gr.addColorStop(0.35, 'rgba(20,17,14,0.88)'); gr.addColorStop(0.65, 'rgba(20,17,14,0.88)'); gr.addColorStop(1, 'rgba(20,17,14,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  g.globalCompositeOperation = 'destination-in';
+  var gx = g.createLinearGradient(0, 0, w, 0); gx.addColorStop(0, 'rgba(0,0,0,0)'); gx.addColorStop(0.12, '#000'); gx.addColorStop(0.88, '#000'); gx.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gx; g.fillRect(0, 0, w, h);
+  return c;
+})()) }));
 visorPatch.position.set(ARMOUR.slitX, ARMOUR.slitY, 0.005); visorPatch.visible = false; armour.add(visorPatch);
 /* the corridor's Christmas (req 600, the drawing of Events' req 599, page/events/armour.json; Magic's The seventh-floor
    corridor; PoA 11 L17727, "Thick streamers of holly and mistletoe were strung along the corridors, mysterious lights
@@ -5849,7 +5860,7 @@ function updateTrevor(dt) {
   if (helmetEyes.visible) {
     var night = helmetEyes.userData.night, blink = !night && (t % 3.4) < 0.14;
     helmetEyes.children.forEach(function (e, i) {
-      e.scale.y = blink ? 0.15 : 1;
+      e.scale.y = night ? 0.45 : blink ? 0.15 : 1; e.scale.x = night ? 0.8 : 1;   /* by night two glints in the slit */
       if (SET_ASIDE) {   /* the self-lit, pulsing eyes, set aside (GL-12) */
         e.material.color.setHex(night ? 0x8a7020 : 0xe8c840);
         e.material.color.multiplyScalar(night ? 0.7 + 0.3 * Math.sin(t * 1.3 + i) : 1);
