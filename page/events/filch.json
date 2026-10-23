@@ -1164,6 +1164,9 @@
       "when": [
         "place = corridor",
         "at = cupboard",
+        "chase != by-suit",
+        "chase != homeward",
+        "chase != in-hand",
         "norris != none",
         "chase != on"
       ],
@@ -1188,6 +1191,9 @@
       "when": [
         "place = corridor",
         "at = armour",
+        "chase != by-suit",
+        "chase != homeward",
+        "chase != in-hand",
         "norris != none",
         "chase != on"
       ],
