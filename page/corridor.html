@@ -6057,6 +6057,23 @@ var castle = window.CastleEvents ? CastleEvents.start({
       catLures("a tabby cat with square markings round its eyes slips along the top of the stairs; Mrs Norris freezes, bristles and goes after it down the far flight, and Filch's lamp goes after her"),
     "a tabby cat with square markings round its eyes steps out between the boy and Filch's lamp; Mrs Norris hisses and bolts, the tabby after her, and Filch's lamp turns away down the stairs on their heels, the boy let alone":
       catRescues("a tabby cat with square markings round its eyes steps out between the boy and Filch's lamp; Mrs Norris hisses and bolts, the tabby after her, and Filch's lamp turns away down the stairs on their heels, the boy let alone"),
+    /* Godric's woven touches of 22 October 2026 (reqs 984 and 986; Events' stair.json and peeves.json, the cues word
+       for word): each told until the page draws it, the heard lines the records' own, after the told cue (it goes to the queue's
+       head, since the record's line is queued first). Peeves unseen, only the suit
+       shaken as he zooms past (PS 7) */
+    'Peeves zooms away down the corridor, rattling the suits of armour as he passes': function () {
+      armourJiggle = 0.8;
+      showLines([{ medium: 'heard', speaker: 'peeves', sound: 'Peeves zooms away down the corridor, rattling the suits of armour as he passes' }]);
+    },
+    "a first-year holds out a bag of Bertie Bott's Every Flavour Beans to his friends; one takes a bean, bites it and pulls a dreadful face": function () {
+      lineQ.unshift({ medium: 'heard', sound: "a first-year holds out a bag of Bertie Bott's Every Flavour Beans to his friends; one takes a bean, bites it and pulls a dreadful face" });
+    },
+    "two older pupils sit on a window ledge with a set of Gobstones between them; one loses a point, and the stones squirt a nasty-smelling liquid into his face": function () {
+      lineQ.unshift({ medium: 'heard', sound: 'two older pupils sit on a window ledge with a set of Gobstones between them; one loses a point, and the stones squirt a nasty-smelling liquid into his face' });
+    },
+    'a few third-years drift down the corridor a few inches off the floor, each sucking a Fizzing Whizzbee': function () {
+      showLines([{ medium: 'heard', sound: 'a few third-years drift down the corridor a few inches off the floor, each sucking a Fizzing Whizzbee' }]);
+    },
     /* the mysterious light, year 3's Christmas (req 982; Events' armour.christmas-lights, PoA 11 L17727; Godric's woven
        touch of 8.03 pm): the season's visor light (req 600) is lit already; this moment swells it, as if something inside
        had just woken, then lets it settle. On whichever suit stands: the drawing's slit, or the built suit's */
