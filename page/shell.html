@@ -2235,6 +2235,50 @@ var DEF = (function () {
   return out;
 })();
 function defShown(shown) { return DEF.on && shown.indexOf(DEF_SIX) >= 0 ? [DEF_SIX] : []; }
+/* H69's three finds (ledger 243; docs/interiors/west-refuge-ring.md, cited, in the castle's frame): the knotted rope
+   coiled on its iron hook on the inner skin at bearing 304, the boxwood whistle on its nail by the squint at 202.5, and
+   the drill cut in three lines on the stone door's lintel. Each finds its face by a ray from the passage, so it sits on
+   the stone as the shell lays it (the ring's wall in 6 degree pieces); things 1 cm off it, the cuts 8 mm. One group, no
+   tap lands on it. */
+var REFUGE = (function () {
+  var out = { on: false };
+  if (PLACE !== 'west-refuge-ring') return out;
+  out.on = true;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'refuge-finds'; shell.group.add(g);
+  shell.group.updateMatrixWorld(true);
+  var walls = shell.group.children.filter(function (o) { return o !== g; }), ray = new THREE.Raycaster();
+  function face(from, to, z) {   /* the stone's face along the ray from `from` toward `to` (castle x, y) at height z: { p, n } local */
+    var a = shell.toLocal(from[0], from[1], z0 + z), b = shell.toLocal(to[0], to[1], z0 + z), d = b.clone().sub(a).normalize();
+    ray.set(shell.group.localToWorld(a.clone()), shell.group.localToWorld(b.clone()).sub(shell.group.localToWorld(a.clone())).normalize());
+    var h = ray.intersectObjects(walls, true)[0], dist = h ? h.distance : a.distanceTo(b);
+    return { p: a.clone().add(d.clone().multiplyScalar(dist)), n: d.clone().negate() };
+  }
+  function place(m, f, off, y) { m.position.copy(f.p).add(f.n.clone().multiplyScalar(off)); if (y != null) m.position.y = y; m.lookAt(m.position.clone().add(f.n)); g.add(m); return m; }
+  var iron = kit.solid(0x2e2b28), hemp = kit.solid(0x6f685c), box = kit.solid(0xb89a62), cord = kit.solid(0x6a5e4a);
+  /* the rope: the face found from the passage's middle (r 6.35) toward the drum's centre (0, 72) */
+  var Y = function (z) { return shell.toLocal(0, 0, z0 + z).y; };
+  var rf = face([-4.97 * 6.35 / 6, 72 + 3.36 * 6.35 / 6], [0, 72], 1.2);
+  [[1.24, 0.13, 0.028, 0.04], [1.21, 0.115, 0.025, 0.07], [1.26, 0.11, 0.024, 0.095]].forEach(function (c) {   /* three turns of the coil, hung from the hook */
+    place(new THREE.Mesh(new THREE.TorusGeometry(c[1], c[2], 8, 28), hemp), rf, c[3], Y(c[0]));
+  });
+  var hook = place(new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.12, 6), iron), rf, 0.05, Y(1.4)); hook.rotateX(Math.PI / 2);
+  /* the whistle: the face found the same way at bearing 202.5, its nail at 1.5, the cord's loop to the whistle at 1.4 */
+  var wf = face([-2.30 * 6.35 / 6, 72 - 5.54 * 6.35 / 6], [0, 72], 1.45);
+  var nail = place(new THREE.Mesh(new THREE.CylinderGeometry(0.003, 0.003, 0.03, 5), iron), wf, 0.012, Y(1.5)); nail.rotateX(Math.PI / 2);
+  place(new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.06, 4), cord), wf, 0.022, Y(1.47));
+  place(new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.007, 0.08, 10), box), wf, 0.022, Y(1.4));
+  /* the drill: the lintel's west face found from the stub's mouth (x 5.1), three lines in a round-topped capital hand */
+  var df = face([5.1, 68.4], [7.0, 68.4], 1.9), cv = document.createElement('canvas'); cv.width = 1024; cv.height = 240;
+  var cx = cv.getContext('2d'); cx.fillStyle = 'rgba(22,19,15,0.92)'; cx.textAlign = 'center'; cx.textBaseline = 'middle';
+  cx.font = 'bold 64px Georgia, "Times New Roman", serif';
+  ['YOVNGEST FIRST ·', 'BOOKES AFTER ·', 'BARRE THE DOORE'].forEach(function (l, k) { cx.fillText(l, 512, 42 + k * 78); });
+  var tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding;
+  var cut = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.164),
+    new THREE.MeshStandardMaterial({ map: tex, transparent: true, depthWrite: false, roughness: 1 }));
+  place(cut, df, 0.008, Y(1.9));
+  g.children.forEach(function (m) { m.userData.owner = PLACE; m.raycast = function () {}; });
+  return out;
+})();
 /* the hospital wing's lamps (Magic's req 677; Events' req 681, page/events/wing.json), where Interiors'
    docs/interiors/hospital-wing.md hangs them (req 678, cited; x = 151.4 + x', y = 25 + y'): six lanterns on chains
    over the aisle's middle, x' 4.0, at y' 1.75 to 16.75 every 3.0, each foot at 2.5, the chain to the ceiling. Lit
