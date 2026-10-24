@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=522"></script>
-<script src="castle-paint.js?v=108"></script>
+<script src="castle-model.js?v=523"></script>
+<script src="castle-paint.js?v=109"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=6"></script>
@@ -306,7 +306,7 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
   'defence-sitting-room', 'defence-bedroom', 'unused-classroom-2-west', 'unused-classroom-2-east', 'classroom-store-2-west', 'lost-games-room',
   'west-refuge-ring', 'old-exam-hall', 'heads-corridor', 'old-exam-hall-store',
   'decoy-cupboard-5', 'true-hide-5', 'accounts-room-3',
-  'sun-hide-g', 'bindery-way-2', 'seat-den-3']);
+  'sun-hide-g', 'bindery-way-2', 'seat-den-3', 'painted-door-room-5']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
@@ -2324,6 +2324,62 @@ var H71 = (function () {
   cyl(148.4, 24.925, 1.52, 1.54, 0.055, 0.05, brass, 16); cyl(148.4, 24.925, 1.54, 1.62, 0.025, 0.02, brass, 12);
   cyl(148.4, 24.925, 1.62, 1.70, 0.04, 0.05, brass, 16); cyl(148.4, 24.925, 1.70, 1.72, 0.05, 0.025, brass, 14);
   cyl(148.4, 24.925, 1.72, 1.76, 0.03, 0.03, brass, 12); cyl(148.4, 24.925, 1.76, 1.82, 0.03, 0.045, glass, 14); cyl(148.4, 24.925, 1.82, 1.92, 0.045, 0.022, glass, 14);
+})();
+/* H81, the painted door (ledger 288, req 1086; Hidden Ways' docs/hidden-ways/s2-s4-design.md, Godric's picks and the
+   ledger lines; Godric's 1 on hidden-ways-s4-1023, 10.20 pm, 23 October 2026). In lake-corridor-5-west (y 0.6 to 3.6,
+   the end wall at x 35.79): a doorway 2.5 wide and 2.8 high that is not there, standing at x 24, its frame 0.2 wide,
+   painted wherever a first-year's eye over the worn flagstone (10.0, 2.1, 1.35) sees it land: the threshold across the
+   floor at x 24, the jambs' feet running from it to the walls, the jambs up both side walls at x 26.8, the head along
+   both walls from 3.1 at 26.8 to 4.0 at the end wall and across it at 4.0. Each frame strip is cut into small cells,
+   each cell's corners carried along the sightline to the first face they meet, a cell kept only where all four land on
+   one face, 8 mm off it (the layered faces' rule). From the flagstone the bands close into one doorway round the real
+   door's faint joints; from anywhere else they are broken gold stripes. Dull gold, nothing glows; the paint turning
+   true and the door opening are Events' (req 1089) */
+(function () {
+  if (PLACE !== 'lake-corridor-5-west') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'painted-door'; g.userData.owner = PLACE; shell.group.add(g);
+  var E = [10.0, 2.1, 1.35], XD = 24.0, YS = 0.6, YN = 3.6, XE = 35.79, OFF = 0.008;
+  function hit(qy, qz) {   /* the sightline from E through (XD, qy, qz) to the first face beyond: [face, x, y, z] */
+    var d = [XD - E[0], qy - E[1], qz - E[2]], best = [null, Infinity];
+    if (d[2] < 0) best = ['floor', -E[2] / d[2]];
+    if (d[1] < 0 && (YS - E[1]) / d[1] < best[1]) best = ['south', (YS - E[1]) / d[1]];
+    if (d[1] > 0 && (YN - E[1]) / d[1] < best[1]) best = ['north', (YN - E[1]) / d[1]];
+    if ((XE - E[0]) / d[0] < best[1]) best = ['end', (XE - E[0]) / d[0]];
+    var t = best[1], p = [E[0] + t * d[0], E[1] + t * d[1], E[2] + t * d[2]];
+    if (best[0] === 'floor') p[2] = OFF; else if (best[0] === 'south') p[1] = YS + OFF; else if (best[0] === 'north') p[1] = YN - OFF; else p[0] = XE - OFF;
+    return [best[0], p];
+  }
+  var paint = [], joint = [];
+  function quad(list, a, b, c, d) { [a, b, c, a, c, d].forEach(function (p) { var l = shell.toLocal(p[0], p[1], z0 + p[2]); list.push(l.x, l.y, l.z); }); }
+  function cell(y0, z0c, y1, z1, depth) {
+    var cs = [hit(y0, z0c), hit(y1, z0c), hit(y1, z1), hit(y0, z1)];
+    if (cs.every(function (c) { return c[0] === cs[0][0]; })) { quad(paint, cs[0][1], cs[1][1], cs[2][1], cs[3][1]); return; }
+    if (depth >= 4) return;
+    var ym = (y0 + y1) / 2, zm = (z0c + z1) / 2;
+    cell(y0, z0c, ym, zm, depth + 1); cell(ym, z0c, y1, zm, depth + 1); cell(ym, zm, y1, z1, depth + 1); cell(y0, zm, ym, z1, depth + 1);
+  }
+  function strip(y0, z0s, y1, z1, n, m) {   /* a frame strip in the plane x = XD, cut n across and m up */
+    for (var i = 0; i < n; i++) for (var j = 0; j < m; j++)
+      cell(y0 + (y1 - y0) * i / n, z0s + (z1 - z0s) * j / m, y0 + (y1 - y0) * (i + 1) / n, z0s + (z1 - z0s) * (j + 1) / m, 0);
+  }
+  var W = 0.2, YA = 2.1 - 1.25, YB = 2.1 + 1.25, H = 2.8;   /* 0.2, not 0.15, so it reads on a phone from 14 m */
+  strip(YA, 0.0, YB, 0.03, 50, 1);                       /* the threshold, lying across the floor at x 24 */
+  strip(YA, 0.03, YA + W, H - W, 2, 64);                 /* the south jamb */
+  strip(YB - W, 0.03, YB, H - W, 2, 64);                 /* the north jamb */
+  strip(YA, H - W, YB, H, 80, 2);                        /* the head */
+  /* the real door's joints in the end wall, 0.8 by 2.2 on the axis, a hairline 8 mm off the stone */
+  var J = 0.006, X = XE - OFF;
+  quad(joint, [X, 1.7 - J, 0], [X, 1.7 + J, 0], [X, 1.7 + J, 2.2], [X, 1.7 - J, 2.2]);
+  quad(joint, [X, 2.5 - J, 0], [X, 2.5 + J, 0], [X, 2.5 + J, 2.2], [X, 2.5 - J, 2.2]);
+  quad(joint, [X, 1.7 - J, 2.2 - J], [X, 2.5 + J, 2.2 - J], [X, 2.5 + J, 2.2 + J], [X, 1.7 - J, 2.2 + J]);
+  /* the worn flagstone, paler where feet have stood, its wear 8 mm proud */
+  var flag = [];
+  quad(flag, [9.7, 1.8, OFF], [10.3, 1.8, OFF], [10.3, 2.4, OFF], [9.7, 2.4, OFF]);
+  [[paint, 0x8a6e36], [joint, 0x1c1916], [flag, 0x8c8478]].forEach(function (pm) {
+    var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pm[0], 3)); geo.computeVertexNormals();
+    var mt = kit.solid(pm[1]).clone(); mt.side = THREE.DoubleSide;
+    var m = new THREE.Mesh(geo, mt); m.userData.owner = PLACE; m.raycast = function () {}; m.userData.decal = true; g.add(m);
+  });
 })();
 /* Mobiliarbus on H71's desks (Charms' req 1052; page/charms/desks.js's head comment the spec): once he has learned the
    spell (?learned for a check), a tap on a desk lifts it a few inches and drifts it to the square he names; his head
