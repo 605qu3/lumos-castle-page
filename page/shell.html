@@ -3648,9 +3648,39 @@ var W1 = (function () {
   }
   if (PLACE === 'charms-classroom') {
     /* Flitwick's desk, under the metronome (docs/interiors/charms-classroom.md, The things: x' 3.7 to 5.3, y' 9.4 to 10.2,
-       0.75, its panel to the class; placed, provisional, and never drawn till now). His pile of books, the feather jar
-       and the darts' box on it are still to build */
+       0.75, its panel to the class; placed, provisional, and never drawn till now) */
     pedestalDesk(3.7, 9.4, 5.3, 10.2, 0.75);
+    /* req 1085 (ledger 283), the schedule's rows, The things. His pile of books behind the desk (x' 4.2 to 4.8, y' 10.3 to
+       10.75, 0.4 high): a dozen big books, none square on the next, the top board scuffed pale where he stands; two more
+       laid at its right as his step up, since the pile is half his height */
+    var CB = [mat('cb-oxblood', 0x5a2420), mat('cb-green', 0x2c3a2a), mat('cb-calf', 0x6a4a30), mat('cb-navy', 0x252a38), mat('cb-brown', 0x4a3424)];
+    var cz = 0, cx = [0.0, 0.012, -0.018, 0.026, -0.009, 0.019, -0.027, 0.004, 0.031, -0.014, 0.022, -0.005],
+        cy = [0.0, -0.016, 0.011, -0.024, 0.02, -0.008, 0.027, -0.019, 0.006, 0.015, -0.028, 0.009];
+    for (var bk = 0; bk < 12; bk++) {
+      var bt = [0.036, 0.031, 0.034, 0.03, 0.035, 0.032][bk % 6] + (bk === 11 ? 0.003 : 0), hw = 0.29 - (bk % 3) * 0.022, hd = 0.215 - (bk % 4) * 0.014;
+      box(4.5 + cx[bk] - hw, 10.525 + cy[bk] - hd, cz, 4.5 + cx[bk] + hw, 10.525 + cy[bk] + hd, cz + bt, bk === 11 ? mat('cb-scuffed', 0x9a8466) : CB[(bk * 3) % 5]);
+      cz += bt;
+    }
+    box(4.86, 10.37, 0, 5.12, 10.69, 0.062, CB[1]); box(4.873, 10.392, 0.062, 5.101, 10.661, 0.118, CB[2]);
+    /* the jar of feathers on his desk's right end (5.0, 9.8): plain glass 0.15 high, six owl feathers splayed from it, one
+       scorched black at the tip (PS 10 L3508) */
+    drum(5.0, 9.8, 0.745, 0.88, 0.045, 0.048, RT.glass, 16); drum(5.0, 9.8, 0.88, 0.895, 0.052, 0.052, RT.glass, 16);
+    var FT = mat('cb-owl', 0x8a7a62), FG = mat('cb-owl-grey', 0x9c968a);
+    [[0.05, 0.0], [0.035, 0.035], [-0.01, 0.05], [-0.045, 0.02], [-0.04, -0.03], [0.015, -0.05]].forEach(function (d, i) {
+      var foot = [5.0 + d[0] * 0.3, 9.8 + d[1] * 0.3, 0.76], mid = [5.0 + d[0] * 1.6, 9.8 + d[1] * 1.6, 0.9], tip = [5.0 + d[0] * 3.2, 9.8 + d[1] * 3.2, 1.06 - i * 0.008];
+      var q1 = [mid[0] + (tip[0] - mid[0]) * 0.45, mid[1] + (tip[1] - mid[1]) * 0.45, mid[2] + (tip[2] - mid[2]) * 0.45],
+          q2 = [mid[0] + (tip[0] - mid[0]) * 0.8, mid[1] + (tip[1] - mid[1]) * 0.8, mid[2] + (tip[2] - mid[2]) * 0.8];
+      rod(foot, mid, 0.003, RT.dial, 4); rod(mid, q1, 0.007, i % 2 ? FG : FT, 6); rod(q1, q2, 0.011, i % 2 ? FG : FT, 6); rod(q2, tip, 0.006, i % 2 ? FG : FT, 6);   /* the vane swells and narrows to its tip */
+      if (i === 2) rod([tip[0] - d[0] * 0.5, tip[1] - d[1] * 0.5, tip[2] - 0.03], tip, 0.012, N9.black, 4);
+    });
+    /* the open box for frozen paper darts on his desk's left end (x' 3.9 to 4.2, y' 9.6 to 9.8, 0.1 deep), plain deal, its
+       lid stood open back toward the front wall; two darts in it, rimed white (the darts Charms') */
+    box(3.9, 9.6, 0.745, 4.2, 9.8, 0.76, RT.deal);
+    box(3.9, 9.6, 0.76, 4.2, 9.612, 0.85, RT.deal); box(3.9, 9.788, 0.76, 4.2, 9.8, 0.85, RT.deal);
+    box(3.9, 9.612, 0.76, 3.912, 9.788, 0.85, RT.deal); box(4.188, 9.612, 0.76, 4.2, 9.788, 0.85, RT.deal);
+    box(3.9, 9.808, 0.85, 4.2, 9.818, 1.05, RT.deal);
+    var RIME = mat('cb-rime', 0xe4ebee);
+    [[9.66, 0.775], [9.73, 0.79]].forEach(function (dt) { rod([3.94, dt[0], dt[1]], [4.16, dt[0] + 0.01, dt[1] + 0.008], 0.014, RIME, 3); });
     /* 1 (ledger 269), the clockwork metronome on Flitwick's desk's front middle, wound and stopped, its face to the class
        (toward y' 0): the tapered case, the pendulum down its face, the weight high, the key in its side */
     var met = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.078, 0.22, 4), dark), mp = P(4.5, 9.5, 0.745);
