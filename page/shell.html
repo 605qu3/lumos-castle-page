@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=521"></script>
+<script src="castle-model.js?v=522"></script>
 <script src="castle-paint.js?v=108"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -2235,6 +2235,91 @@ var H71 = (function () {
     });
   }
   return out;
+})();
+/* H71's south store's things (ledger 285, req 1093; Interiors' docs/interiors/old-exam-hall.md, The south store's things,
+   Godric's 1 at 11.13 pm, 23 October 2026, all five as placed), in model coordinates in old-exam-hall-store (x 146 to
+   156, y 19.0 to 24.8): sixteen spare desks of the hall's kind stacked two high, lid to lid, along the south wall; the
+   slatted shelves of old scripts in taped, ticketed bundles on the east wall; the crate of dry inkpots in the south-west
+   corner; the invigilators' folding screen folded and leant on the west wall; the cold oil lamp in the niche by the
+   door. Plain shapes from the schedule's sizes; nothing glows, no touch; and on the stack nearest the door one script
+   that never went back in its bundle (board rule 7: a thing to find close) */
+(function () {
+  if (PLACE !== 'old-exam-hall-store') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'exam-store-things'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  var oak = kit.solid(0x4a4136), worn = kit.solid(0x544737), deal = kit.solid(0x7a6650), paper = kit.solid(0xcfc4a6),
+      paper2 = kit.solid(0xb8ab8a), tape = kit.solid(0x7a2a24), ticket = kit.solid(0xe2dccb), pot = kit.solid(0xd2ccbd),
+      crust = kit.solid(0x141210), straw = kit.solid(0x9a8650), baize = kit.solid(0x34402e), brass = kit.solid(0x6a5a3a),
+      glass = kit.solid(0xc4cbc6);
+  function own(m) { m.userData.owner = PLACE; m.raycast = function () {}; g.add(m); return m; }
+  function box(x0, y0, za, x1, y1, zb, mt) { return own(thingBox(g, P, [x0, y0, za], [x1, y1, zb], mt)); }
+  function cyl(x, y, za, zb, r0, r1, mt, n) {
+    var a = P(x, y, za), m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, n || 12), mt);
+    m.position.set(a.x, a.y + (zb - za) / 2, a.z); return own(m);
+  }
+  /* 1, the stacks, x 148.0 to 155.6 one every 1.0 m, y 19.05 to 19.85: the lower desk standing (its ledge to the wall, as
+     in the hall), the upper turned over onto it lid to lid, its floor board on top at 1.5. D(za, zb) flips the upper */
+  for (var s = 0; s < 8; s++) {
+    var x0 = 148.0 + s * 1.0, x1 = x0 + 0.6, ys = 19.05, yn = 19.85;
+    [false, true].forEach(function (up) {
+      function D(xa, ya, za, xb, yb, zb, mt) { return up ? box(xa, ya, 1.5 - zb, xb, yb, 1.5 - za, mt) : box(xa, ya, za, xb, yb, zb, mt); }
+      D(x0, ys, 0.0, x1, yn, 0.03, worn);                                                           /* the floor board */
+      [x0, x1 - 0.03].forEach(function (x) { D(x, ys + 0.02, 0.03, x + 0.03, ys + 0.42, 0.64, oak); D(x, ys + 0.42, 0.03, x + 0.03, ys + 0.5, 0.3, oak); });
+      D(x0 + 0.03, ys + 0.02, 0.64, x1 - 0.03, ys + 0.44, 0.67, oak);                               /* the lid, laid level for the stack */
+      D(x0 + 0.03, ys + 0.1, 0.36, x1 - 0.03, ys + 0.44, 0.39, worn);                               /* the shelf under it */
+      D(x0 + 0.04, ys + 0.5, 0.4, x1 - 0.04, ys + 0.76, 0.43, oak);                                 /* the bench seat */
+      [x0 + 0.04, x1 - 0.07].forEach(function (x) { D(x, ys + 0.52, 0.03, x + 0.03, ys + 0.74, 0.4, oak); });
+      D(x0 + 0.04, yn - 0.04, 0.43, x1 - 0.04, yn - 0.02, 0.67, oak);                               /* the back board, cut to meet */
+    });
+  }
+  box(148.12, 19.3, 1.5, 148.42, 19.72, 1.506, paper); box(148.15, 19.34, 1.506, 148.39, 19.36, 1.512, crust);   /* the stray script, its first line of ink */
+  /* 2, the shelves on the east wall, x 155.6 to 155.99, y 20.3 to 24.4: five slatted boards to 2.2 and four uprights; on
+     each board bundles of scripts tied with red tape, a ticket on each, the year's */
+  [20.3, 21.65, 23.0, 24.36].forEach(function (y) { box(155.6, y, 0.0, 155.99, y + 0.04, 2.2, deal); });
+  var rnd = (function () { var k = 1093; return function () { k = (k * 16807) % 2147483647; return k / 2147483647; }; })();
+  [0.12, 0.6, 1.08, 1.56, 2.04].forEach(function (h, b) {
+    [155.62, 155.76, 155.9].forEach(function (x) { box(x, 20.34, h - 0.025, x + 0.08, 24.36, h, deal); });   /* three slats, gaps between */
+    if (b === 4) return;
+    for (var y = 20.36; y < 24.3; ) {
+      var w = 0.24 + rnd() * 0.08, ht = 0.12 + rnd() * 0.1, yb = Math.min(y + w, 24.34);
+      if (Math.floor((y - 20.34) / 1.35) !== Math.floor((yb - 20.36) / 1.35)) { y = 20.34 + Math.ceil((y - 20.34) / 1.35) * 1.35 + 0.06; continue; }   /* keep clear of the uprights */
+      var xb = 155.64 + rnd() * 0.03;
+      box(xb, y, h, 155.96, yb, h + ht, rnd() < 0.5 ? paper : paper2);
+      box(xb - 0.008, y + (yb - y) / 2 - 0.012, h, 155.968, y + (yb - y) / 2 + 0.012, h + ht + 0.008, tape);   /* the tape round it, 8 mm proud */
+      box(xb - 0.016, y + 0.03, h + ht * 0.3, xb - 0.009, y + 0.09, h + ht * 0.3 + 0.05, ticket);       /* its ticket hung on the front */
+      y = yb + 0.02;
+    }
+  });
+  /* 3, the crate in the south-west corner, x 146.2 to 146.8, y 19.2 to 19.7, 0.4 high: plank sides with gaps, straw, the
+     dry inkpots packed in a layer at its top, each crusted black at the neck */
+  box(146.2, 19.2, 0.0, 146.8, 19.7, 0.03, deal);
+  [0.03, 0.17, 0.3].forEach(function (h) {
+    box(146.2, 19.2, h, 146.8, 19.222, h + 0.1, deal); box(146.2, 19.678, h, 146.8, 19.7, h + 0.1, deal);
+    box(146.2, 19.222, h, 146.222, 19.678, h + 0.1, deal); box(146.778, 19.222, h, 146.8, 19.678, h + 0.1, deal);
+  });
+  box(146.23, 19.23, 0.03, 146.77, 19.67, 0.3, straw);
+  for (var i = 0; i < 6; i++) for (var j = 0; j < 4; j++) if ((i * 4 + j) % 7 !== 3) {   /* two gaps where pots were taken */
+    var px = 146.27 + i * 0.092, py = 19.28 + j * 0.095;
+    cyl(px, py, 0.3, 0.36, 0.028, 0.028, pot, 10); cyl(px, py, 0.36, 0.375, 0.016, 0.014, crust, 8);
+  }
+  /* 4, the folding screen, three leaves folded flat, leant on the west wall: its foot at x 146.15, its head on the wall
+     at 146.008, y 21.0 to 22.6, 1.8 high; each leaf an oak frame with old green baize, the baize 8 mm proud of it */
+  var u = P(146, 22, 1).sub(P(146, 21, 1)).normalize(), foot = P(146.04, 21.8, 0.0), head = P(146.0, 21.8, 1.79);
+  var v = head.clone().sub(foot), len = v.length(); v.normalize(); var w3 = new THREE.Vector3().crossVectors(u, v).normalize();
+  if (w3.dot(P(147, 21.8, 0.9).sub(P(146, 21.8, 0.9))) < 0) { u.negate(); w3.negate(); }   /* w3 out from the wall, into the room */
+  var basis = new THREE.Matrix4().makeBasis(u, v, w3);
+  [0.025, 0.073, 0.121].forEach(function (off) {
+    var c = foot.clone().add(head).multiplyScalar(0.5).add(w3.clone().multiplyScalar(off));
+    [[1.6, len, 0.024, oak], [1.48, len - 0.12, 0.04, baize]].forEach(function (d) {
+      var m = own(new THREE.Mesh(new THREE.BoxGeometry(d[0], d[1], d[2]), d[3]));
+      m.quaternion.setFromRotationMatrix(basis); m.position.copy(c);
+    });
+  });
+  /* 5, the oil lamp in the niche (148.2 to 148.6, sill 1.5, the north wall at y 24.8), cold: the brass foot on the niche's floor (its top 1.52, 0.25 deep, v196),
+     its font, the burner and a clear glass chimney, unlit */
+  cyl(148.4, 24.925, 1.52, 1.54, 0.055, 0.05, brass, 16); cyl(148.4, 24.925, 1.54, 1.62, 0.025, 0.02, brass, 12);
+  cyl(148.4, 24.925, 1.62, 1.70, 0.04, 0.05, brass, 16); cyl(148.4, 24.925, 1.70, 1.72, 0.05, 0.025, brass, 14);
+  cyl(148.4, 24.925, 1.72, 1.76, 0.03, 0.03, brass, 12); cyl(148.4, 24.925, 1.76, 1.82, 0.03, 0.045, glass, 14); cyl(148.4, 24.925, 1.82, 1.92, 0.045, 0.022, glass, 14);
 })();
 /* Mobiliarbus on H71's desks (Charms' req 1052; page/charms/desks.js's head comment the spec): once he has learned the
    spell (?learned for a check), a tap on a desk lifts it a few inches and drifts it to the square he names; his head
