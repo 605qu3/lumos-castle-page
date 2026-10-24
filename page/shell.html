@@ -2425,6 +2425,73 @@ var H71 = (function () {
   var lm = ink.clone(); lm.side = THREE.DoubleSide;
   var lt = new THREE.Mesh(lg, lm); lt.userData.owner = PLACE; lt.raycast = function () {}; lt.userData.decal = true; g.add(lt);
 })();
+/* req 800 (Magic's docs/archive/magic-to-2026-10-22.md, The Divination classroom, the trapdoor answers; Events' req 799,
+   divination.json's divination.trapdoor, word for word): on the North Tower's landing the circular trapdoor in the ceiling
+   (the model's north-trapdoor: 0.9 across at (161.4, 66.6), its face 48.4, hinged on its north edge, swinging down, the
+   ladder folded on its back) with her brass plaque on its underside, the words in small capitals 8 mm off it. When he
+   arrives (the PoA castle on) the leaf swings down on its hinge to hang, then the silvery ladder slides out of its folds
+   down to his feet, its top at the hinge, its foot 0.6 south of it on the landing's flags (the model's pitch, 78
+   degrees, set to the floor), the crimson dark of the room showing through the hole. No one is seen above. The climb
+   itself is Interaction's walk. ?trapdoor=open stands it open for checks */
+var TRAP_SHOW = "the trapdoor suddenly opens, and a silvery ladder descends right at his feet";
+var TRAP = null;
+(function () {
+  if (PLACE !== 'north-tower-landing' || !MODEL) return;
+  var s = (MODEL.openings || []).filter(function (q) { return q.id === 'north-trapdoor'; })[0];
+  if (!s || !s.at || !s.d || s.z == null) return;
+  var z0 = shell.place.floor, r = s.d / 2, hy = s.at[1] + r, OFF = 0.008, top = Math.min(s.z, shell.place.ceiling || s.z) - OFF;
+  var oak = kit.solid(0x4a3a2c), brass = kit.solid(0x8a6e3a), ink = kit.solid(0x161514), silver = kit.solid(0xc4c8cc);
+  var dark = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x4a140c).convertSRGBToLinear() }), g = new THREE.Group(); g.name = 'north-trapdoor-things'; g.userData.owner = PLACE; shell.group.add(g);
+  function own(m, to) { m.userData.owner = PLACE; m.raycast = function () {}; (to || g).add(m); return m; }
+  /* the hole: the room's crimson dark, a disc 8 mm under the ceiling, seen only once the leaf is down */
+  var hole = own(new THREE.Mesh(new THREE.CircleGeometry(r, 32), dark)); hole.rotation.x = Math.PI / 2;
+  hole.position.copy(shell.toLocal(s.at[0], s.at[1], top)); hole.visible = false;
+  /* the leaf, on a pivot at the hinge (its axis east to west); shut, it lies 8 mm under the ceiling, 0.05 thick */
+  var pivot = new THREE.Group(); pivot.position.copy(shell.toLocal(s.at[0], hy, top - OFF)); g.add(pivot);
+  var leaf = own(new THREE.Mesh(new THREE.CylinderGeometry(r - 0.01, r - 0.01, 0.05, 32), oak), pivot); leaf.position.set(0, -0.025, r);
+  /* her plaque on the underside, 0.25 by 0.08, 8 mm under the leaf, and its words 8 mm under that */
+  var under = -0.05 - OFF;
+  var pl = own(new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.004, 0.08), brass), pivot); pl.position.set(0, under, r + 0.12);
+  var q = [], GL = { S: '011100010001110', Y: '101101010010010', B: '110101110101110', I: '111010010010111', L: '100100100100111',
+    T: '111010010010010', R: '110101110101101', E: '111100110100111', A: '010101111101101', W: '101101111111101', N: '101111111111101',
+    D: '110101101101110', V: '101101101101010', O: '010101101101010', C: '011100100100011', H: '101101111101101', ',': '000000000010100' };
+  ['SYBILL TRELAWNEY,', 'DIVINATION TEACHER'].forEach(function (ln, row) {
+    var cw = 0.0034, ch = 0.0042, w = 0.0125, x0 = -ln.length * w / 2, zc = r + 0.146 - row * 0.026, yv = under - 0.002 - OFF;
+    ln.split('').forEach(function (c, i) {
+      var gl = GL[c]; if (!gl) return;
+      for (var k = 0; k < 15; k++) if (gl[k] === '1') {
+        /* read by a boy under it facing north, as he climbs: the top of his view lies south, east to his right */
+        var xa = x0 + i * w + (k % 3) * cw, za = zc - (Math.floor(k / 3) + 1) * ch;
+        [[xa, za], [xa + cw, za], [xa + cw, za + ch], [xa, za], [xa + cw, za + ch], [xa, za + ch]].forEach(function (v) { q.push(v[0], yv, v[1]); });
+      }
+    });
+  });
+  var lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(q, 3)); lg.computeVertexNormals();
+  var lm = ink.clone(); lm.side = THREE.DoubleSide; own(new THREE.Mesh(lg, lm), pivot).userData.decal = true;
+  /* the ladder, 0.45 wide, two rails and rungs 0.28 apart, on its own pivot at the hinge; folded it lies 0.85 long on the
+     leaf's back, out of sight till the leaf is down */
+  var lad = new THREE.Group(); lad.position.copy(pivot.position); g.add(lad); lad.visible = false;
+  var rails = [-0.225, 0.225].map(function (x) {
+    var m = own(new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 1, 8), silver), lad); m.position.x = x; return m; });
+  var rungs = []; for (var k = 0; k < 12; k++) {
+    var rg = own(new THREE.Mesh(new THREE.CylinderGeometry(0.011, 0.011, 0.45, 8), silver), lad); rg.rotation.z = Math.PI / 2; rungs.push({ m: rg, d: 0.15 + k * 0.28 }); }
+  var pitch = (s.ladder && s.ladder.pitch || 78) * Math.PI / 180, drop = top - z0, tilt = Math.PI / 2 - pitch;
+  var full = drop / Math.cos(tilt);
+  function pose(L, t) {   /* the ladder L long, t radians off the vertical toward the south */
+    lad.rotation.x = -t;
+    rails.forEach(function (m) { m.scale.y = L; m.position.y = -L / 2; m.position.z = 0.05; });
+    rungs.forEach(function (u) { u.m.visible = u.d < L - 0.05; u.m.position.set(0, -u.d, 0.05); });
+  }
+  TRAP = { t: -1, set: function (u) {   /* u in seconds since the cue: the leaf 0.9 s, a breath, the ladder 1.4 s */
+    var a = Math.min(1, u / 0.9), e = a * a * (3 - 2 * a);
+    pivot.rotation.x = e * Math.PI / 2; hole.visible = u > 0;
+    var b = Math.max(0, Math.min(1, (u - 1.1) / 1.4)), f = 1 - Math.pow(1 - b, 3);
+    lad.visible = u > 1.0; pose(0.85 + (full - 0.85) * f, tilt * f);
+  } };
+  if (Q.get('trapdoor') === 'open') TRAP.set(10);
+})();
+function updateTrap(dt) { if (!TRAP || TRAP.t < 0 || TRAP.t > 3) return; TRAP.t += dt; TRAP.set(TRAP.t); }
+thingCues[TRAP_SHOW] = function () { showLines([{ medium: 'seen', sound: TRAP_SHOW, on: function () { if (TRAP && TRAP.t < 0) TRAP.t = 0; } }]); };
 /* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
    green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
    and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
@@ -7176,7 +7243,7 @@ function frame() {
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateTurban(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
-  updateTrick(dt);
+  updateTrick(dt); updateTrap(dt);
   updateMyrtle(dt);
   updateStaff(dt);
   updateStone(dt); updateStoneClimb(dt);
