@@ -2532,6 +2532,89 @@ var HIDES = (function () {
   return out;
 })();
 var CUBBY_TIP = 'one ledger on the drum side will not come out; he pulls and it tips, and a cubby opens behind it with a cash box inside, its lid up, empty, and its key hanging on a nail beside it, as if somebody meant to be back';   /* Events' page/events/real-hides.json, accounts-cubby-tip */
+/* H73's things (ledger 281, req 1083; Interiors' docs/interiors/real-hides.md, H73, on Godric's 1 at 10.39 pm, 23 October
+   2026; the titles Hidden Ways', docs/hidden-ways/real-hides.md), in the castle's frame, heights from floor 4. The library
+   side: the bay of books in the library's oak, 1.2 by 2.2 over y 64.4 to 65.6, a plinth 0.15 and six shelves (0.15, 0.48,
+   0.81, 1.14, 1.47, 1.80), its spines facing the room; it stands 0.3 proud of the wall (x 64.70 to 64.99), not in the
+   reveal as Interiors drew it, since the shell draws a hidden opening as wall from its outer side (castle-shell v10).
+   The named spines carry their gilt titles on the book's own face (no decal): Detentions I Did Not Deserve 1 to 9 at
+   1.14 from the north end, Open Sesame the one red spine at 0.81, 0.35 from the north end, The Other Bookcase: a Guide at
+   0.81's south end, Invisibility Made Simple and How to Hide a Door at 1.47's middle, Peeves: His Good Deeds, 8 mm thin,
+   alone at 0.48's middle between two tall plain spines; the rest worn calf, their gilt rubbed away. The lobby side: a
+   ledged plank door 8 mm off the lobby's face (x 66.008), three ledges, two iron straps from the north (hinge) edge, a
+   wooden latch bar at 1.0 by the south edge in its keeper on the jamb. Nothing glows, untappable (the hidden tap and the
+   way stay the shells'); the pull and the swing Events' (req 1057) */
+var BAY73 = (function () {
+  if (['library', 'back-stair-lobby-4'].indexOf(PLACE) < 0) return null;
+  var lv = (MODEL.levels || []).filter(function (v) { return v.id === '4'; })[0], Z0 = lv ? lv.z : 0;
+  var g = new THREE.Group(); g.name = 'h73-things'; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, Z0 + z); };
+  function own(m) { m.userData.owner = PLACE; m.raycast = function () {}; g.add(m); return m; }
+  function box(x0, y0, za, x1, y1, zb, mt) { return own(thingBox(g, P, [x0, y0, za], [x1, y1, zb], mt)); }
+  var oak = kit.solid(0x5a4c3e), plank = kit.solid(0x6e5f4a), iron = kit.solid(0x2e2b28);
+  var calf = [kit.solid(0x6b4a32), kit.solid(0x5a3d2a), kit.solid(0x7a5a3c), kit.solid(0x4e3a2a)];
+  function titled(text, bg, gilt, sm) {   /* a spine's face: the title read bottom to top, in gilt on its leather */
+    var c = document.createElement('canvas'); c.width = 64; c.height = 512;
+    var x = c.getContext('2d'); x.fillStyle = bg; x.fillRect(0, 0, 64, 512);
+    x.fillStyle = gilt; x.fillRect(0, 30, 64, 4); x.fillRect(0, 478, 64, 4);
+    x.save(); x.translate(34, 256); x.rotate(-Math.PI / 2); x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.font = (sm || 'bold 30px') + ' Georgia, "Times New Roman", serif'; x.fillText(text, 0, 0); x.restore();
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding;
+    return new THREE.MeshStandardMaterial({ map: t, roughness: 0.8 });
+  }
+  /* a book: its spine on the face x 64.70 (toward the room), its depth 0.24 back, y0 to y1 along the bay, standing at z */
+  function book(y0, y1, z, h, mt, face) {
+    var m = own(thingBox(g, P, [64.71, y0, z], [64.95, y1, z + h], mt));
+    if (face) {   /* the room's side is the box's -x face (index 1) */
+      var a = P(64.71, y0, z), b = P(64.95, y0, z), side = b.x - a.x < 0 ? 0 : 1;
+      var mats = [mt, mt, mt, mt, mt, mt]; mats[side] = face; m.material = mats;
+    }
+    return m;
+  }
+  /* the case: plinth, sides, top, six shelves */
+  box(64.70, 64.40, 0.0, 64.99, 65.60, 0.15, oak);
+  box(64.70, 64.40, 0.0, 64.99, 64.43, 2.2, oak); box(64.70, 65.57, 0.0, 64.99, 65.60, 2.2, oak);
+  box(64.70, 64.40, 2.17, 64.99, 65.60, 2.25, oak);
+  var ROWS = [0.15, 0.48, 0.81, 1.14, 1.47, 1.80];
+  ROWS.slice(1).forEach(function (z) { box(64.70, 64.43, z - 0.025, 64.99, 65.57, z, oak); });
+  var k = 0, rnd = function () { k++; return ((k * 7919) % 101) / 101; };
+  function filler(z, ya, yb, hmax) {   /* worn calf from ya to yb */
+    for (var y = ya; y < yb - 0.03;) {
+      var w = 0.03 + rnd() * 0.035; if (y + w > yb) break;
+      book(y, y + w - 0.002, z, Math.min(hmax, 0.20 + rnd() * 0.09), calf[k % 4]); y += w;
+    }
+  }
+  var N = 65.57, S = 64.43, red = 'rgb(122,30,26)', brown = 'rgb(84,58,38)', gilt = 'rgb(214,178,92)';
+  /* 1.14: Detentions I Did Not Deserve, nine alike from the north end */
+  for (var v = 0; v < 9; v++) book(N - (v + 1) * 0.05, N - v * 0.05 - 0.002, 1.14, 0.25, calf[1], titled('DETENTIONS I DID NOT DESERVE  ' + ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'][v], brown, gilt, 'bold 22px'));
+  filler(1.14, S, N - 0.45, 0.30);
+  /* 0.81: Open Sesame 0.35 from the north end, The Other Bookcase at the south end */
+  filler(0.81, N - 0.325, N, 0.30);
+  book(N - 0.375, N - 0.35, 0.81, 0.24, kit.solid(0x7a1e1a), titled('OPEN SESAME', red, gilt, 'bold 26px'));
+  filler(0.81, S + 0.06, N - 0.38, 0.30);
+  book(S, S + 0.055, 0.81, 0.26, calf[2], titled('THE OTHER BOOKCASE: A GUIDE', brown, gilt, 'bold 22px'));
+  /* 1.47: Invisibility Made Simple and How to Hide a Door side by side at its middle */
+  var mid = (S + N) / 2;
+  filler(1.47, S, mid - 0.10, 0.30);
+  book(mid - 0.10, mid - 0.052, 1.47, 0.24, calf[0], titled('INVISIBILITY MADE SIMPLE', brown, gilt, 'bold 22px'));
+  book(mid - 0.048, mid, 1.47, 0.24, calf[3], titled('HOW TO HIDE A DOOR', brown, gilt, 'bold 24px'));
+  filler(1.47, mid + 0.002, N, 0.30);
+  /* 0.48: Peeves: His Good Deeds, alone between two tall plain spines */
+  filler(0.48, S, mid - 0.08, 0.30);
+  book(mid - 0.07, mid - 0.012, 0.48, 0.30, calf[1]);
+  book(mid - 0.008, mid, 0.48, 0.22, calf[2], titled('PEEVES: HIS GOOD DEEDS', 'rgb(110,96,70)', gilt, 'bold 18px'));
+  book(mid + 0.004, mid + 0.062, 0.48, 0.30, calf[1]);
+  filler(0.48, mid + 0.07, N, 0.30);
+  /* the lowest and the top rows */
+  filler(0.15, S, N, 0.30); filler(1.80, S, N, 0.34);
+  /* the lobby side: the ledged plank door, its ledges and straps toward the lobby, the latch by its south edge */
+  box(66.008, 64.41, 0.0, 66.050, 65.59, 2.19, plank);
+  [0.30, 1.10, 1.90].forEach(function (z) { box(66.050, 64.45, z - 0.06, 66.078, 65.55, z + 0.06, plank); });
+  [0.30, 1.90].forEach(function (z) { box(66.078, 65.05, z - 0.02, 66.086, 65.58, z + 0.02, iron); });
+  box(66.050, 64.42, 0.96, 66.090, 64.70, 1.04, plank);   /* the latch bar, across the south edge */
+  box(66.0, 64.24, 0.93, 66.095, 64.40, 1.07, plank);      /* its keeper on the jamb */
+  return { group: g };
+})();
 thingCues[CUBBY_TIP] = function () { showLines([{ medium: 'seen', sound: CUBBY_TIP, on: function () { if (HIDES.cubbyOpen) HIDES.cubbyOpen(); } }]); };
 /* the dungeon corridor's ironwork (req 1048; Godric's 2 on architect-ironwork-1023, B, the scroll grille; Design's kit,
    page/design/ironwork.js, whose header is the interface): a blind screen 0.15 off the corridor's wall at y 15, x 34 to
