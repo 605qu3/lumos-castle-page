@@ -91,8 +91,8 @@
      wood, its head the drawing on a flat blade, edge on from the side as a blade is. An ink line round it as the built
      suit's. Still, never turning to the eye; by night the torches' warmth.
      Godric chose round 3 (corridor-armour-hybrid-r3-1023, 23 October 2026, 11.46 am) and made it the castle's suit (4.18 pm) */
-  function shared(src) {   /* the drawing's geometry and materials, built once */
-    var PX = 1369, ROW = 8, SEG = 28, FOOT = 2468;
+  function shared(src, D) {   /* the drawing's geometry and materials, built once; D the drawn kind's own (DRAWN) */
+    var PX = 1369, ROW = 8, SEG = 28, FOOT = 2468, X0, HALB = !D || D.halberd !== false, SHIELD = D && D.shield;
     function pole(py) { return 208 + 0.0317 * (py - 1100); }   /* the shaft's middle in the drawing, leaning out a little */
     var POLE_R = 26, HEAD = { x: 400, y: 560 };                 /* the band cut for the shaft; the box round its head */
     var FIST = [904, 1056];                                      /* the gauntlet's rows across the shaft */
@@ -124,7 +124,29 @@
     im.onload = function () {
       var W = im.width, H = im.height, c = makeCanvas(W, H), x = c.getContext('2d'); x.drawImage(im, 0, 0);
       var A = x.getImageData(0, 0, W, H).data;
-      function body(px, py) { return A[(py * W + px) * 4 + 3] > 127 && !(py < HEAD.y && px < HEAD.x) && Math.abs(px - pole(py)) > POLE_R; }
+      /* a drawn kind's soles where its drawing ends (the Gothic's pointed sabatons reach 32 px lower), and its middle
+         where the default's is (its helmet 61 px right of the drawing's middle), so every kind stands on the same spot */
+      for (FOOT = H - 1; FOOT > 0; FOOT--) { for (var fx = 0; fx < W && A[(FOOT * W + fx) * 4 + 3] <= 127; fx++); if (fx < W) break; }
+      X0 = D && D.x0 !== undefined ? D.x0 : W / 2;
+      var SR = SHIELD && new Int16Array(H).fill(-1);   /* the shield's right edge in each row: its last red, and its rim */
+      if (SHIELD) for (var sy = SHIELD[1]; sy <= SHIELD[3]; sy++) for (var sx = SHIELD[2]; sx >= SHIELD[0]; sx--) {
+        var si = (sy * W + sx) * 4; if (A[si] > A[si + 1] + 40 && A[si] > A[si + 2] + 40) { SR[sy] = sx + 10; break; }
+      }
+      if (SHIELD) {   /* behind the shield the drawing has no arm: the other arm mirrored about the helmet's middle (D.mirror) holds it */
+        var img = x.getImageData(0, 0, W, H), B = img.data;
+        for (sy = SHIELD[1]; sy <= SHIELD[3]; sy++) {
+          var se = Math.max(SR[Math.max(SHIELD[1], sy - 6)], SR[sy], SR[Math.min(SHIELD[3], sy + 6)]);
+          for (sx = SHIELD[0]; sx <= se; sx++) {
+            var mx = 2 * D.mirror - sx, o = (sy * W + sx) * 4, q = (sy * W + mx) * 4;
+            for (var ch = 0; ch < 4; ch++) B[o + ch] = mx >= 0 && mx < W ? A[q + ch] : 0;
+          }
+        }
+        x.putImageData(img, 0, 0); A = B;
+      }
+      function body(px, py) {
+        if (A[(py * W + px) * 4 + 3] <= 127) return false;
+        return !HALB || !(py < HEAD.y && px < HEAD.x) && Math.abs(px - pole(py)) > POLE_R;
+      }
       var TOP = new Int16Array(W * (FOOT + 1));   /* how far below the top of its column of the drawing each pixel lies, 0 off it */
       for (var tx = 0; tx < W; tx++) for (var ty = 0, t0 = -1; ty <= FOOT; ty++) { if (body(tx, ty)) { if (t0 < 0) t0 = ty; TOP[ty * W + tx] = ty - t0; } else t0 = -1; }
       function build(rows, flat) {   /* rows: [py, [[x0, x1, D], ...]] top down; flat: the drawing all round (the shaft) */
@@ -144,13 +166,13 @@
              0.15 m at 1.3 m to 0.115 at the gorget (CAPS), and each shoulder's dome taken over 0.18 m of its top, not 0.1 */
           var up = Math.min(1, Math.max(0, ((FOOT - py) / PX - 1.0) / 0.2));
           var ex = flat ? 1 : r[3] !== undefined ? 0.6 : 2 / (2 + (1 - up) * Math.min(1, Math.max(0, (hw / PX - 0.1) / 0.1))), tf = Math.asin(Math.pow(0.8, 1 / ex));
-          if (centre) { pos.push((cx - W / 2) / PX, ym, zc); uv.push(cx / W, 1 - py / H); uvS.push(0, ym * 2); cnt++; }
+          if (centre) { pos.push((cx - X0) / PX, ym, zc); uv.push(cx / W, 1 - py / H); uvS.push(0, ym * 2); cnt++; }
           for (var i = 0; i <= SEG; i++) {
             var th = (i / SEG - 0.5) * Math.PI * 2, s = Math.sin(th), c = Math.cos(th), a = Math.abs(th);   /* from the back round by the front, the seam behind */
             var xs = Math.sign(s) * Math.pow(Math.abs(s), ex), zs = Math.sign(c) * Math.pow(Math.abs(c), ex);
             var un = flat ? s * 0.8 : a <= tf ? xs : Math.sign(s) * 0.8 * (Math.PI - a) / (Math.PI - tf);
             var t = flat ? 1 : Math.min(1, lift(cx + hw * xs, py) / PX / 0.18), dome = Math.max(0.2, Math.sqrt(1 - (1 - t) * (1 - t)));
-            pos.push((cx + hw * xs - W / 2) / PX, ym, zc + r[2] * zs * dome); uv.push((cx + hw * un) / W, 1 - py / H); uvS.push(i / SEG * 2, ym * 2); cnt++;
+            pos.push((cx + hw * xs - X0) / PX, ym, zc + r[2] * zs * dome); uv.push((cx + hw * un) / W, 1 - py / H); uvS.push(i / SEG * 2, ym * 2); cnt++;
           }
           return at;
         }
@@ -231,7 +253,7 @@
       }
       var shaft = [];
       for (py = 150; py <= 2440; py += ROW) shaft.push([py, [[pole(py) - 22, pole(py) + 22, 22 / PX]]]);
-      mat.map = tex(im); mat.needsUpdate = true;
+      mat.map = tex(SHIELD ? c : im); mat.needsUpdate = true;
       var poleMat = blendMat(); poleMat.map = mat.map; mats.push(poleMat);
       var hc = makeCanvas(HEAD.x, HEAD.y); hc.getContext('2d').drawImage(im, 0, 0, HEAD.x, HEAD.y, 0, 0, HEAD.x, HEAD.y);
       var bladeMat = new THREE.MeshStandardMaterial({ map: tex(hc), alphaTest: 0.5, side: THREE.DoubleSide, metalness: 0.3, roughness: 0.45, envMap: env });
@@ -249,15 +271,27 @@
       out.parts = function (K) {
         var ms = lookMats(K.look), cut = K.cut || [0, FOOT], p = [];
         var trunk = once('trunk:' + cut, function () { return build(rows.filter(function (r) { return r[0] >= cut[0] && r[0] <= cut[1]; }), false); });
+        if (!HALB) {   /* a drawn kind with no halberd (the sword, the shield, the mace): its weapon is in the trunk's drawing */
+          p.push({ geo: trunk, mat: ms[0], name: 'armour-hybrid' }, { geo: trunk, mat: ink, name: 'armour-hybrid-ink' });
+          if (SHIELD) {   /* the shield flat on the forearm, its drawing on a board, in front of the hip it hides */
+            var sw = SHIELD[2] - SHIELD[0] + 1, shh = SHIELD[3] - SHIELD[1] + 1, scv = makeCanvas(sw, shh);
+            var sx2 = scv.getContext('2d'); sx2.drawImage(im, SHIELD[0], SHIELD[1], sw, shh, 0, 0, sw, shh);
+            for (var ry = 0; ry < shh; ry++) sx2.clearRect(Math.max(0, SR[SHIELD[1] + ry] - SHIELD[0] + 1), ry, sw, 1);   /* the breastplate's edge beside it stays the trunk's */
+            var shMat = once('shield-mat', function () { var m = new THREE.MeshStandardMaterial({ map: tex(scv), alphaTest: 0.5, side: THREE.DoubleSide, metalness: 0.05, roughness: 0.7, envMap: env }); mats.push(m); return m; });
+            p.push({ geo: once('shield', function () { return new THREE.PlaneGeometry(sw / PX, shh / PX); }), mat: shMat, name: 'armour-shield',
+                     at: [(SHIELD[0] + sw / 2 - X0) / PX, (H - SHIELD[1] - shh / 2) / PX, 0.12] });
+          }
+          return p;
+        }
         var sh = K.weapon === 'pike' ? [HEAD.y, 2440] : K.weapon && K.weapon !== 'halberd' ? FIST : [150, 2440];
         var pole = once('shaft:' + sh, function () { return build(shaft.filter(function (r) { return r[0] >= sh[0] && r[0] <= sh[1]; }), true); });
         p.push({ geo: trunk, mat: ms[0], name: 'armour-hybrid' }, { geo: trunk, mat: ink, name: 'armour-hybrid-ink' },
                { geo: pole, mat: poleMat, name: 'armour-hybrid-shaft' }, { geo: pole, mat: ink, name: 'armour-hybrid-ink' });
         if (!K.weapon || K.weapon === 'halberd')
-          p.push({ geo: once('blade', function () { return new THREE.PlaneGeometry(HEAD.x / PX, HEAD.y / PX); }), mat: bladeMat, name: 'armour-hybrid-blade', at: [(HEAD.x / 2 - W / 2) / PX, (H - HEAD.y / 2) / PX, 0] });
+          p.push({ geo: once('blade', function () { return new THREE.PlaneGeometry(HEAD.x / PX, HEAD.y / PX); }), mat: bladeMat, name: 'armour-hybrid-blade', at: [(HEAD.x / 2 - X0) / PX, (H - HEAD.y / 2) / PX, 0] });
         return p;
       };
-      out.at = function (py) { return [(pole(py) - W / 2) / PX, (H - py) / PX]; };   /* the shaft's middle at a row, metres */
+      out.at = function (py) { return [(pole(py) - X0) / PX, (H - py) / PX]; };   /* the shaft's middle at a row, metres */
       out.ink = ink; out.env = env;
       out.ready = true; out.waiters.splice(0).forEach(function (f) { f(); });
     };
@@ -275,57 +309,40 @@
      on corridor-armour-gallery-1023, "the suit we designed as the standard default, but where we know that there are
      varieties we need to create that variety"; built on Fawkes's word of 7.51 pm, nothing spent). scale is the whole
      suit's (feet, depth and all); cut the drawing's rows kept (py, 0 its top to 2468 its soles); weapon halberd, pike,
-     mace or none; shield; stand (the armoury's) or post (the three-quarter's); look (LOOKS). The seven that need a new
-     shape (corridor-armour-seven-1023) wait on Godric's card and stand as the default until then */
+     none; stand (the armoury's); look (LOOKS); drawn, a kind with its own drawing (DRAWN) */
   var KINDS = {
     default: { what: 'plain steel, a halberd: every corridor, the stair hall, the gallery\'s y 62' },
     boy: { what: 'a boy\'s suit, for a page of about twelve, 1.45 tall (the gallery, west y 56)', scale: 1.45 / 1.70 },
     tall: { what: '"a tall suit of armor" (PS 12 L4250; the library corridor\'s mirror-armour)', scale: 1.1 },
-    mace: { what: 'a mace hung at its belt (the gallery, west y 59)', weapon: 'mace' },
     tudor: { what: 'Tudor field armour, plain steel gone grey (the gallery, east y 47)', look: 'grey' },
-    'three-quarter': { what: 'three-quarter armour, no legs below the knee, a pike upright (the gallery, east y 50)', cut: [0, 1783], weapon: 'pike', post: true },
     'black-and-white': { what: 'black-and-white, the bands left dark (the gallery, east y 53)', look: 'bands' },
     munition: { what: 'a plain munition suit, the cheapest in the row (the gallery, east y 65)', look: 'munition' },
-    shield: { what: 'a shield of no arms, painted plain (the gallery, east y 68)', weapon: 'none', shield: true },
-    headless: { what: 'a suit with no head, on a wooden stand, waiting for one (the West armoury)', cut: [496, 2468], weapon: 'none', stand: true }
+    headless: { what: 'a suit with no head, on a wooden stand, waiting for one (the West armoury)', cut: [496, 2468], weapon: 'none', stand: true },
+    /* the drawn kinds, each its own drawing in the default's hand (Godric's picks on corridor-armour-all-1023, 10.04 pm,
+       23 October 2026: every boxed pick but Q6, which takes its 1; the places are docs/notes/2026-10-23-armour-varieties.md) */
+    gothic: { what: 'Gothic, fluted, long pointed sabatons (Q1, 1)', drawn: 'gothic' },
+    'gothic-visor': { what: 'Gothic, its visor raised a little (Q2, 1)', drawn: 'gothic-visor' },
+    jousting: { what: 'jousting armour, a great helm bolted on, a lance rest (Q3, 4)', drawn: 'jousting' },
+    maximilian: { what: 'fluted Maximilian, the mended gauntlet (Q4, 1)', drawn: 'maximilian' },
+    cuirassier: { what: 'a cuirassier\'s, the helm with a barred face (Q5, 2)', drawn: 'cuirassier' },
+    tilt: { what: 'tilt armour, heavy on the left (Q6, 1)', drawn: 'tilt' },
+    sword: { what: 'a sword point down before it, both hands on the pommel (Q7, 1)', drawn: 'sword' },
+    shield: { what: 'a shield of no arms, painted plain (Q8, 1)', drawn: 'shield' },
+    mace: { what: 'a mace at its belt (Q9, 1, the halberd\'s ghost cleared)', drawn: 'mace' },
+    'three-quarter': { what: 'three-quarter armour, boots below the knee, a halberd (Q10, 1)', drawn: 'three-quarter' }
+  };
+  /* each drawing's own: x0 the column under the default's middle (each helmet's middle less 61 px), where it is not the
+     drawing's middle; halberd false where it carries none (no shaft cut, no blade); shield the box round the shield,
+     built flat (px, its red at x 30 to 416, y 661 to 1388, and its rim). The halberds all lean as the default's, measured */
+  var DRAWN = {
+    gothic: {}, 'gothic-visor': {}, jousting: {}, maximilian: {}, cuirassier: {}, tilt: {}, 'three-quarter': {},
+    sword: { x0: 389, halberd: false },
+    shield: { x0: 504, halberd: false, shield: [20, 650, 430, 1410], mirror: 565 },
+    mace: { halberd: false }
   };
   var STAND = 0.06;   /* the armoury stand's board */
-  function extras(K, S, g, add) {   /* the pieces built in code: plain shapes in the shell's way, the ink round the larger */
-    var steel = new THREE.MeshStandardMaterial({ color: col(0xb4b8be), metalness: 0.6, roughness: 0.38, envMap: S.env });
+  function extras(K, S, g, add) {   /* the pieces built in code (the code-made pike, mace, shield and post gave way to the drawn kinds) */
     var wood = new THREE.MeshStandardMaterial({ color: col(0x4a3c31), roughness: 0.75 });
-    if (K.weapon === 'pike') {   /* the shaft carried on up past the halberd's head, leaning as it leans, to a leaf-shaped head */
-      var a = S.at(560), lean = 0.0317, top = 2.2, len = top - a[1];
-      var ext = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, len, 10), wood);
-      ext.position.set(a[0] - lean * len / 2, a[1] + len / 2, 0); ext.rotation.z = lean; add(ext, 'armour-pike-shaft');
-      var head = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.28, 4), steel); head.scale.z = 0.35;
-      head.position.set(a[0] - lean * (len + 0.14), top + 0.14, 0); head.rotation.z = lean; add(head, 'armour-pike-head');
-      var sock = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.018, 0.08, 10), steel);
-      sock.position.set(a[0] - lean * len, top - 0.02, 0); add(sock, 'armour-pike-socket');
-    }
-    if (K.weapon === 'mace') {   /* hung head down from the belt at the right hip, by a ring */
-      var m = new THREE.Group(); m.position.set(-0.2, 0, 0.06);
-      var haft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.46, 8), wood); haft.position.y = 0.77; m.add(haft);
-      var ring = new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.005, 6, 12), steel); ring.position.y = 1.015; m.add(ring);
-      var hd = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.16, 8), steel); hd.position.y = 0.5; m.add(hd);
-      for (var i = 0; i < 6; i++) {   /* the flanges */
-        var fl = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.14, 0.05), steel), t = i / 6 * Math.PI * 2;
-        fl.position.set(Math.sin(t) * 0.06, 0.5, Math.cos(t) * 0.06); fl.rotation.y = t; m.add(fl);
-      }
-      var knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), steel); knob.position.y = 0.41; m.add(knob);
-      add(m, 'armour-mace');
-    }
-    if (K.shield) {   /* a heater shield on the left forearm, painted one plain colour, no arms on it */
-      var sp = new THREE.Shape(), w = 0.21, h = 0.52;
-      sp.moveTo(-w, 0); sp.lineTo(w, 0); sp.lineTo(w, -0.2); sp.quadraticCurveTo(w, -0.4, 0, -h); sp.quadraticCurveTo(-w, -0.4, -w, -0.2); sp.lineTo(-w, 0);
-      var sg = new THREE.ExtrudeGeometry(sp, { depth: 0.018, bevelEnabled: true, bevelThickness: 0.006, bevelSize: 0.008, bevelSegments: 2, curveSegments: 10 });
-      var paint = new THREE.MeshStandardMaterial({ color: col(0x6e3b2f), roughness: 0.7, metalness: 0.05 });
-      var sh = new THREE.Mesh(sg, paint); sh.position.set(0.3, 1.28, 0.09); sh.rotation.y = -0.12; add(sh, 'armour-shield');
-      var si = new THREE.Mesh(sg, S.ink); sh.add(si); si.name = 'armour-hybrid-ink';
-    }
-    if (K.post) {   /* what holds a suit with no lower legs: a post up into it, on a small square foot */
-      var post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.95, 10), wood); post.position.set(0, 0.475, 0); add(post, 'armour-post');
-      var ft = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.04, 0.3), wood); ft.position.set(0, 0.02, 0); add(ft, 'armour-post-foot');
-    }
     if (K.stand) {   /* the armoury's stand: a board 0.6 square it stands on, and the post that would carry its head */
       var bd = new THREE.Mesh(new THREE.BoxGeometry(0.6, STAND, 0.6), wood); bd.position.set(0, STAND / 2, 0); add(bd, 'armour-stand', true);
       var nk = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.3, 10), wood); nk.position.set(0, 1.3 + 0.15, 0); add(nk, 'armour-stand-neck');
@@ -342,7 +359,8 @@
     THREE = T; renderer = r || renderer;
     var src = opts.src || '../assets/layers/corridor-armour.png', kind = opts.kind || 'default', K = KINDS[kind];
     if (!K) throw new Error('CastleSuit: no kind ' + kind + ' (' + Object.keys(KINDS).join(', ') + ')');
-    var S = cache[src] || (cache[src] = shared(src)), g = new THREE.Group(), waiting = [];
+    if (K.drawn) src = src.replace(/corridor-armour\.png/, 'corridor-armour-' + K.drawn + '.png');   /* beside the default's, wherever the page keeps it */
+    var S = cache[src] || (cache[src] = shared(src, DRAWN[K.drawn])), g = new THREE.Group(), waiting = [];
     var sc = K.scale || 1, inner = new THREE.Group(); inner.scale.setScalar(sc); if (K.stand) inner.position.y = STAND; g.add(inner);
     var suit = { group: g, kind: kind, mats: [], body: null, ready: false,
       back: K.stand ? 0.3 : 0.15 * sc,   /* metres behind the origin to its back: stand that far, and 5 cm, off its wall */
