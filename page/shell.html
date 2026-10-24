@@ -2386,6 +2386,45 @@ var H71 = (function () {
     var m = new THREE.Mesh(geo, mt); m.userData.owner = PLACE; m.raycast = function () {}; m.userData.decal = true; g.add(m);
   });
 })();
+/* H80, the two-handed door's things (ledger 289, req 1105; docs/interiors/double-stair.md, Hidden Ways' req 1087; Godric's
+   1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026), on gate-passage's west wall face at x 78.0: a brass left hand on
+   the south leaf (y 82.95) and its mirror, a right hand, on the north leaf (y 84.45), centred 1.10 up, 0.19 long and
+   0.02 proud, fingers up, palm out to be pressed, each thumb toward the spine as a boy's own hand pressed there lies;
+   the palms worn bright, 8 mm off. On the spine, centred y 83.70 and 0.92 up, the brass plate 0.30 by 0.07, its words
+   BRING SOMEONE. in small black capitals 8 mm off it. The press and the line are Events' (req 1089) */
+(function () {
+  if (PLACE !== 'gate-passage') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'two-handed-door-things'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  var brass = kit.solid(0x8a6e3a), worn = kit.solid(0xb0904e), ink = kit.solid(0x161514), X = 78.0, OFF = 0.008;
+  function box(x0, y0, za, x1, y1, zb, mt) { var m = thingBox(g, P, [x0, y0, za], [x1, y1, zb], mt); m.userData.owner = PLACE; m.raycast = function () {}; g.add(m); return m; }
+  function hand(yc, th) {   /* th: the thumb's side, +1 north, -1 south */
+    var H = 0.02;
+    box(X, yc - 0.045, 1.005, X + H, yc + 0.045, 1.11, brass);                                   /* the palm */
+    [[-0.033, 1.17], [-0.011, 1.195], [0.011, 1.19], [0.033, 1.165]].forEach(function (f) {      /* the fingers */
+      var fy = yc - th * f[0]; box(X, fy - 0.009, 1.115, X + H, fy + 0.009, f[1], brass); });
+    var ty = yc + th * 0.062; box(X, ty - 0.01, 1.03, X + H, ty + 0.01, 1.09, brass);             /* the thumb */
+    box(X + H + OFF - 0.001, yc - 0.03, 1.03, X + H + OFF, yc + 0.03, 1.09, worn);                /* the palm worn bright */
+  }
+  hand(82.95, 1);    /* the left hand, south: pressed palm to it, a left thumb lies north */
+  hand(84.45, -1);   /* the right hand, north: its thumb south */
+  var PX = X + OFF;
+  box(X, 83.55, 0.885, PX, 83.85, 0.955, brass);                                                 /* the plate */
+  /* the words, each capital three cells by five, one decal in the plane 8 mm off the plate, read south to north */
+  var GL = { B: '110101110101110', R: '110101110101101', I: '111010010010111', N: '101111111111101', G: '011100101101011',
+             S: '011100010001110', O: '010101101101010', M: '101111111101101', E: '111100110100111', '.': '000000000000010' };
+  var word = 'BRING SOMEONE.', w = 0.26 / word.length, cw = 0.0042, ch = 0.0052, LX = PX + OFF, q = [];
+  word.split('').forEach(function (c, i) {
+    var gl = GL[c]; if (!gl) return;
+    for (var k = 0; k < 15; k++) if (gl[k] === '1') {
+      var ya = 83.572 + i * w + (k % 3) * cw, za = 0.933 - (Math.floor(k / 3) + 1) * ch;
+      [[ya, za], [ya + cw, za], [ya + cw, za + ch], [ya, za], [ya + cw, za + ch], [ya, za + ch]].forEach(function (v) { var l = P(LX, v[0], v[1]); q.push(l.x, l.y, l.z); });
+    }
+  });
+  var lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(q, 3)); lg.computeVertexNormals();
+  var lm = ink.clone(); lm.side = THREE.DoubleSide;
+  var lt = new THREE.Mesh(lg, lm); lt.userData.owner = PLACE; lt.raycast = function () {}; lt.userData.decal = true; g.add(lt);
+})();
 /* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
    green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
    and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
