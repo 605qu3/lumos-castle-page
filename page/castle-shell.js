@@ -113,7 +113,7 @@ function findPlace(M, id) {
     /* v25 (model v57, the West Tower's): `from` and `to`, where not given, its first and last `floors` */
     var sfrom = st.from != null ? st.from : levelZ(M, st.floors[0]), sto = st.to != null ? st.to : levelZ(M, st.floors[st.floors.length - 1]);
     return { id: slug(st.id), name: st.name || st.id.replace(/-/g, ' '), kind: 'room', poly: scp, area: { outer: scp, holes: [] },
-      round: { c: scc, r: srr }, floor: sfrom, ceiling: sto + 2.4, wall: 0.5, walls: null, rec: st, shaft: true };
+      round: { c: scc, r: srr }, floor: sfrom, ceiling: sto + (st.double ? 5.2 : 2.4), wall: 0.5,   /* v80: a double stair's top room a storey */ walls: null, rec: st, shaft: true };
   }
   /* v10: a ring (the lamplighters' gallery, the old wall-walk): whole, or where two of its openings stand across it (the
      turret's landing on the wall-walk) an arc the long way round between them; its shutters and loops by bearing */
@@ -197,6 +197,11 @@ function viaStair(M, to, id) {
   if (!s || !s.rooms || s.rooms.length < 2 || s.place === 'shaft') return null;   /* v17: a stair that is a place is gone into */
   var r = s.rooms.filter(function (x) { return slug(x) !== id; })[0];
   return r ? slug(r) : null;
+}
+/* v80 (H80's climbing way): a hidden door onto a stair marked `via` leads on to the stair's other room, as a way does */
+function hiddenTo(M, op, id) {
+  var to = other(op, id), s = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
+  return s && s.via ? viaStair(M, to, id) || to : to;
 }
 /* v38: a door rusted fixed open (the old cells' eight, H16) is a way, its leaf not drawn, till a detail pass draws its bars */
 function isWay(kind) { return /open mouth|archway|arch\b|fixed open/.test(kind || ''); }
@@ -893,7 +898,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var hit = new THREE.Mesh(new THREE.PlaneGeometry(w, hh), new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
         hit.position.set(mid.x - nx * 0.02, mid.y + g.sill + hh / 2, mid.z + ny * 0.02); hit.rotation.y = ang;
         hit.name = 'hidden-' + g.op.id; hit.userData.hidden = g.op.id; group.add(hit);
-        out.hidden.push({ id: g.op.id, to: other(g.op, Q.id), mesh: hit, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: g.sill,
+        out.hidden.push({ id: g.op.id, to: hiddenTo(M, g.op, Q.id), mesh: hit, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: g.sill,
           lift: lift, level: Q.floor + lift, hidden: true });
       });
       var gs = gaps[i].filter(function (g) { return !g.hidden; }).sort(function (g, h) { return g.s0 - h.s0; }), at = 0;
@@ -1138,8 +1143,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       doors.push({ id: g.op.id, a: angle(c, toSite(M, g.op.group || null, g.op.at)), z: Q.floor + g.sill, top: Q.floor + g.h,
         w: g.s1 - g.s0, half: Math.atan2(g.s1 - g.s0, 2 * R) * 180 / Math.PI });
     }); });
-    var newel = F.register(new THREE.Mesh(new THREE.CylinderGeometry(NR, NR, Q.ceiling - Q.floor, 12), mats.wall), LAYER.wall);
-    newel.position.copy(toLocal(c[0], c[1], (Q.floor + Q.ceiling) / 2)); newel.name = Q.id + '-newel'; group.add(newel);
+    if (S.double) NR = 0.3;   /* v80: a double stair's open core, no newel */
+    else {
+      var newel = F.register(new THREE.Mesh(new THREE.CylinderGeometry(NR, NR, Q.ceiling - Q.floor, 12), mats.wall), LAYER.wall);
+      newel.position.copy(toLocal(c[0], c[1], (Q.floor + Q.ceiling) / 2)); newel.name = Q.id + '-newel'; group.add(newel);
+    }
     function wedge(a0, a1, top, thick, mat, name) {
       var r0 = a0 * Math.PI / 180, r1 = a1 * Math.PI / 180, s = new THREE.Shape();
       s.moveTo(NR * Math.cos(r0), NR * Math.sin(r0)); s.lineTo(R * Math.cos(r0), R * Math.sin(r0));
@@ -1152,6 +1160,47 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var off = function (a, b) { return Math.abs(norm(a - b + 180) - 180); };
     var at = function (a, r) { return [c[0] + r * Math.cos(a * Math.PI / 180), c[1] + r * Math.sin(a * Math.PI / 180)]; };
     var end = function (a, r, z, la, lr, up) { var p = at(a, r), l = at(la, lr); return { x: p[0], y: p[1], z: z, lx: l[0], ly: l[1], up: up || 0 }; };
+    if (S.double) { doubleStair(); return; }
+    /* v80 (the Architect's 161st, H80, ledger 287): a double stair (`double`, Chambord's way): two flights round the open
+       core, 30 steps a turn, clockwise as the newel stairs. Flight A from the well's floor, B from a landing spanning the
+       door above it, B kept 2.49 over A at every angle (A 2.71 over B), so each passes under the other with 2.1 to 2.3
+       clear; A stands where it is 0.11 under B's foot. Both run to `to`; the top floor there is drawn only where
+       neither flight needs its head room (2.2 over its last treads), each head's landing on it */
+    function doubleStair() {
+      var TURN = 5.2, rs = TURN / 30, t = 12, GAP = 2.49, HEAD = 2.2, top = S.to != null ? S.to : Q.ceiling - TURN;
+      var up = doors.filter(function (d) { return d.z > Q.floor + 0.05 && d.z < top - 0.05; }).sort(function (p, q) { return p.z - q.z; })[0];
+      if (!up) return;
+      var span = up.half + 4, aB = up.a - span;
+      wedge(aB, up.a + span, up.z, rs, mats.floor, Q.id + '-landing-' + Math.round(up.z * 10));
+      shaftFloors.push({ c: c, r: R, z: up.z });
+      var hA = up.z - GAP - Q.floor; if (hA < 0) hA += TURN;
+      var aA = aB + hA / rs * t, sweep = HEAD / rs * t;
+      var runs = [{ id: Q.id + '-flight-a', a0: aA, z0: Q.floor }, { id: Q.id + '-flight-b', a0: aB, z0: up.z }];
+      runs.forEach(function (F0) {
+        var n = Math.round((top - F0.z0) / rs), path = [];
+        F0.end = F0.a0 - n * t;
+        for (var k = 1; k <= n; k++) {
+          var a1 = F0.a0 - (k - 1) * t, a2 = F0.a0 - k * t, mid = (a1 + a2) / 2, tz = F0.z0 + k * rs;
+          if (k % 3 === 1 || k === n) { var pp = at(mid, PR); path.push([pp[0], pp[1], tz]); }
+          if (doors.some(function (d) { return tz > d.z + 0.05 && tz < d.top + rs && off(mid, d.a) < d.half + t / 2; })) continue;
+          wedge(k === n ? a2 : a2 - 0.5, a1, tz, rs, mats.floor, F0.id + '-' + k).userData.stair = F0.id;
+        }
+        F0.path = path;
+      });
+      /* the top floor: from each flight's head room on round to the other's last treads */
+      var A = runs[0], B = runs[1], dA = norm(A.end - (B.end + sweep)), dB = norm(B.end - (A.end + sweep));
+      [[A, dA], [B, dB]].forEach(function (p) {
+        if (p[1] < 1) return;
+        wedge(p[0].end - p[1], p[0].end, top, 0.3, mats.floor, Q.id + '-top-' + (p[0] === A ? 'a' : 'b'));
+        p[0].ha = p[0].end - Math.min(10, p[1] / 2);
+      });
+      shaftFloors.push({ c: c, r: R, z: top });
+      runs.forEach(function (F0) {
+        var ha = F0.ha != null ? F0.ha : F0.end;
+        shaftFlights.push({ id: F0.id, foot: end(F0.a0 + 6, PR, F0.z0, F0.a0 - 3 * t, PR, 0.9), head: end(ha, PR, top, ha - 20, R),
+          path: F0.path, lamp: [c[0], c[1], F0.z0 + 2.0] });
+      });
+    }
     /* the landings, each spanning its doors the short way round */
     var foot = doors.filter(function (d) { return d.z <= Q.floor + 0.05; })[0], lands = [];
     doors.filter(function (d) { return d.z > Q.floor + 0.05; }).sort(function (p, q) { return p.z - q.z; }).forEach(function (d) {
