@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=517"></script>
+<script src="castle-model.js?v=518"></script>
 <script src="castle-paint.js?v=106"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -166,6 +166,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=1"></script>
 <script src="castle-shell.js?v=77"></script>
 <script src="shell-w5b.js?v=17"></script>
+<script src="depth-ties.js?v=1"></script>
 <script src="shell-w5a.js?v=21"></script>
 <script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=2"></script>
@@ -6433,6 +6434,9 @@ function frame() {
   renderer.render(scene, camera);
   kit.stats(dt);
 }
+/* the ties (page/depth-ties.js, the 154th): every thing built, two faces of two looks in one plane or a few mm apart
+   take depth steps, the nearer in front, so none combs; walls, floors and ceilings left to their geometry */
+if (window.CastleTies) CastleTies.settle(THREE, shell.group);
 renderer.setAnimationLoop(frame);
 
 /* the events (board req 278, the page half of Events' req 265): the runtime starts with this shell's place (its
