@@ -197,6 +197,7 @@ Every grey shape is at its real size. Nothing is drawn yet but the torch, which 
 <script src="charms/spells.js?v=41"></script>
 <script src="design/castle-light.js?v=1"></script>
 <script src="corridor/suit.js?v=2"></script>
+<script src="depth-ties.js?v=1"></script>
 <script>
 (function () {
 'use strict';
@@ -3606,7 +3607,7 @@ function updateNorris(dt) {
     if (k > NORRIS.hold + 0.2) { norris.t = -1; norris.group.visible = false; }
     return;
   }
-  if ((nightK() < 1 && !norris.look) || norrisSits() || chase.on || chase.whisk) { norris.next = 0; return; }   /* not two of her at once */
+  if ((nightK() < 1 && !norris.look) || norrisSits() || norrisDoor.state === 'comes' || norrisDoor.state === 'heels' || chase.on || chase.whisk) { norris.next = 0; return; }   /* not two of her at once */
   if (!norris.next) {
     if (norris.tried && !norris.look) return;            /* once a visit */
     norris.tried = true;
@@ -3616,7 +3617,7 @@ function updateNorris(dt) {
   if (t < norris.next || tween) return;
   var p = norrisSpot(), q = p.clone().project(camera);
   if (camera.position.distanceTo(p) < 5 || Math.abs(q.x) > 0.9 || Math.abs(q.y) > 0.9 || q.z > 1) { norris.next = t + 3; return; }
-  norris.group.position.copy(p); norris.group.lookAt(camera.position); norris.group.visible = true; norris.t = 0;
+  norris.group.position.copy(p); norrisTurn(norris.group); norris.group.visible = true; norris.t = 0;
   norris.next = norris.look ? t + 5 : 0;
 }
 /* Mrs Norris before the broom cupboard (Godric's t1 on corridor-cupboard-place-1013, 6.53 pm; "Mrs. Norris turned her
@@ -3625,7 +3626,37 @@ function updateNorris(dt) {
    sits the cupboard's stop lowers its view to the floor so she shows in it. When he walks away from that stop her eyes
    slide off along the floor toward the fireside nook and fade, gone for the visit. Evening or night only, about one
    evening in three; ?norris=cupboard puts her there whatever the date or the hour */
-var NORRIS_DOOR = { chance: 0.34, r: 0.032, gap: 0.06, out: 0.32, slink: 2.2,
+/* Mrs Norris drawn (req 962's second half; Events' cells, a5da3f67; People's assets/layers/norris-figure.png, six cells
+   of 929 by 1082 px in one row, her feet on each cell's foot, facing screen right: 0 trotting, 1 sitting staring, 2
+   walking, 3 washing a paw with her back turned, 4 stretching to a hand, 5 arched). Two scales (People, 22 October 2026,
+   10.45 pm): the moving cells 0 and 2 at 1548 px a metre (0.6 by 0.7 m), the still ones at 3200 (0.34 m to her ears
+   sitting); the plane is laid at 1548. One card in each of her groups, before the cupboard (with its slink, whisks, hand,
+   stroke, washing and heels) and under the end's glints; lit as the room, turned to the eye about the upright only, so
+   her feet stay on the flags. Cell 1's eyes measured once on the atlas (x from the card's middle, y from her feet, at the
+   still scale): the glints sit on them. ?norrisFigure=0 keeps the code-drawn cat for a look */
+var NORRIS_FIG = { on: groundsQ.get('norrisFigure') !== '0' && !SET_ASIDE, w: 929 / 1548, h: 1082 / 1548, still: 1548 / 3200, n: 6,
+  eyeX: 0.041, eyeY: 0.28, eyeGap: 0.037 };
+function norrisCard(name) {
+  var sheet = new THREE.TextureLoader().load('../assets/layers/norris-figure.png');
+  sheet.encoding = THREE.sRGBEncoding; sheet.anisotropy = 4;
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(NORRIS_FIG.w, NORRIS_FIG.h), new THREE.MeshStandardMaterial({ map: sheet,
+    roughness: 0.95, metalness: 0, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, opacity: 0 }));
+  m.name = name; m.userData.peak = 1; m.userData.cell = -1;
+  return m;
+}
+function norrisCell(m, i, left) {   /* which pose, mirrored when she goes left on the screen */
+  if (!m) return;
+  var k = i === 0 || i === 2 ? 1 : NORRIS_FIG.still, map = m.material.map;
+  map.repeat.x = (left ? -1 : 1) / NORRIS_FIG.n; map.offset.x = (i + (left ? 1 : 0)) / NORRIS_FIG.n;
+  m.scale.set(k, k, 1); m.position.y = NORRIS_FIG.h * k / 2 - NORRIS.y; m.userData.cell = i;
+}
+function norrisTurn(g) { g.rotation.set(0, Math.atan2(camera.position.x - g.position.x, camera.position.z - g.position.z), 0); }
+function norrisLeft(was, now) {   /* is she going left on the screen */
+  var right = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+  return now.clone().sub(was).dot(right) < 0;
+}
+/* heel: how far behind Filch she pads; near: how close she comes to his hand; wash: how far ahead she sits to wash; trot and pad: her paces, m a second */
+var NORRIS_DOOR = { chance: 0.34, r: 0.032, gap: 0.06, out: 0.32, slink: 2.2, heel: 0.6, near: 2.4, wash: 4.5, trot: 1.6, pad: 0.8,
                     path: [[CUPBOARD.x, -0.32], [NOOK_X0 - 0.2, -0.32], [NOOK_X0 - 0.55, 0.45]] };   /* x, and z off her wall */
 var norrisDoor = { q: groundsQ.get('norris') === 'cupboard', group: new THREE.Group(), state: 'away', k: 0, a: 0, seen: false, blink: 2.5 };
 if (norrisDoor.q) norris.look = false;   /* the forced look is hers alone, not the end's glints */
@@ -3638,9 +3669,15 @@ if (norrisDoor.q) norris.look = false;   /* the forced look is hers alone, not t
       blending: SET_ASIDE ? THREE.AdditiveBlending : THREE.NormalBlending, opacity: 0 }));
     e.scale.set(NORRIS_DOOR.r * 2, NORRIS_DOOR.r * 2, 1); e.position.x = side * NORRIS_DOOR.gap / 2; e.name = 'norris-door-eye';
     e.userData.peak = SET_ASIDE ? 1 : 0.6;
+    if (NORRIS_FIG.on) {   /* on the drawn eyes, about their size */
+      e.scale.set(0.024, 0.024, 1); e.position.set(NORRIS_FIG.eyeX + side * NORRIS_FIG.eyeGap / 2, NORRIS_FIG.eyeY - NORRIS.y, 0.004);
+    }
     norrisDoor.group.add(e);
   });
-  if (!SET_ASIDE) {   /* a sitting cat, dark against the flags, the eyes near its top */
+  if (NORRIS_FIG.on) {
+    norrisDoor.card = norrisCard('norris-door-cat'); norrisCell(norrisDoor.card, 1, false);
+    norrisDoor.group.add(norrisDoor.card);
+  } else if (!SET_ASIDE) {   /* a sitting cat, dark against the flags, the eyes near its top */
     var cat = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.26), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0,
       map: cutoutTexture(44, 52, '#1e1a16', function (g, w, h) {
         g.beginPath(); g.ellipse(w * 0.5, h * 0.72, w * 0.36, h * 0.28, 0, 0, 2 * Math.PI); g.fill();             /* her haunches */
@@ -3652,7 +3689,22 @@ if (norrisDoor.q) norris.look = false;   /* the forced look is hers alone, not t
     norrisDoor.group.add(cat);
   }
   norrisDoor.group.visible = false; norrisDoor.group.name = 'mrs-norris-cupboard'; scene.add(norrisDoor.group);
+  if (NORRIS_FIG.on) {   /* the end's glints on her drawn eyes, a little wider apart than life as they are larger, sat */
+    norris.card = norrisCard('norris-cat'); norrisCell(norris.card, 1, false); norris.group.add(norris.card);
+    norris.group.children.forEach(function (e, i) {
+      if (e.name === 'norris-eye') e.position.set(NORRIS_FIG.eyeX + (i ? 1 : -1) * NORRIS.gap / 2, NORRIS_FIG.eyeY - NORRIS.y, 0.004);
+    });
+  }
 })();
+/* the cell and her eyes, each frame: the glints only on the front-on sitting cell */
+function norrisDoorPose(cell, left, a, shut) {
+  var g = norrisDoor.group;
+  norrisCell(norrisDoor.card, cell, left);
+  g.children.forEach(function (e) {
+    var cat = e.name === 'norris-door-cat';
+    e.material.opacity = (!cat && (shut || (norrisDoor.card && cell !== 1)) ? 0 : a) * e.userData.peak;
+  });
+}
 /* befriending her (req 933 (a); Events' norris.json; the design docs/notes/2026-10-22-corridor-norris-befriending.md,
    Godric's 1 on corridor-norris-befriending-1022, 3.11 pm, a bit of breakfast from his pocket): a tap on her, sat before
    the cupboard or her eyes at the end, is told as `mrs norris`; the scrap is set on the flags a little way toward her,
@@ -3680,7 +3732,7 @@ function norrisGoes(after) {   /* she slips away: from the cupboard along her pa
 }
 function norrisLooks() {   /* her eyes on him a long moment: sat before the cupboard she already is; else her glints at the end */
   if (norrisSits() || norris.t >= 0) return;
-  var p = norrisSpot(); norris.group.position.copy(p); norris.group.lookAt(camera.position); norris.group.visible = true; norris.t = 0;
+  var p = norrisSpot(); norris.group.position.copy(p); norrisTurn(norris.group); norris.group.visible = true; norris.t = 0;
 }
 function norrisLine(text) { showLines([{ medium: 'heard', speaker: 'norris', sound: text }]); }
 function norrisDoorEvening() {
@@ -3698,6 +3750,7 @@ function updateNorrisDoor(dt) {
     if (norrisDoor.k === 0 && norrisDoorEvening()) { norrisDoor.state = 'sits'; norrisDoor.k = 1; g.position.copy(norrisDoorAt(0)); }
     else return;
   }
+  var was = g.position.clone(), cell = 1, left = false;
   if (norrisDoor.state === 'sits') {
     norrisDoor.a = Math.min(1, norrisDoor.a + dt * 2);
     if (here) norrisDoor.seen = true;
@@ -3708,15 +3761,56 @@ function updateNorrisDoor(dt) {
     g.position.copy(norrisDoorAt(Math.min(1, u * u * (3 - 2 * u))));
     norrisDoor.a = u < 0.55 ? 1 : Math.max(0, 1 - (u - 0.55) / 0.45);
     if (u >= 1) { norrisDoor.state = 'gone'; g.visible = false; return; }
+    if (u > 0) { cell = 2; left = norrisLeft(was, g.position); }
+  } else if (norrisDoor.state === 'comes') {   /* to his hand (or down to wash, where she is set): a walk, the pose, gone */
+    var C = norrisDoor.come, w;
+    C.k += dt; w = C.walk ? Math.min(1, C.k / C.walk) : 1;
+    g.position.lerpVectors(C.from, C.to, w * w * (3 - 2 * w));
+    norrisDoor.a = C.k < C.fadeIn ? C.k / C.fadeIn : C.k > C.walk + C.hold ? Math.max(0, 1 - (C.k - C.walk - C.hold) / 0.6) : 1;
+    if (w < 1) { cell = C.trot ? 0 : 2; left = C.left = norrisLeft(C.from, C.to); } else { cell = C.cell; left = C.cell === 3 ? false : C.left; }
+    if (C.k > C.walk + C.hold + 0.6) { norrisDoor.state = 'gone'; g.visible = false; return; }
+  } else if (norrisDoor.state === 'heels') {   /* padding behind Filch's lamp, sat when he stands */
+    if (chase.lamp === 'none') { norrisDoor.state = 'gone'; g.visible = false; return; }
+    if (!filchFig.visible) { g.visible = false; return; }   /* till his figure is in */
+    var fx = filchFig.position.x;
+    if (norrisDoor.fx !== null && Math.abs(fx - norrisDoor.fx) > 1e-4) norrisDoor.heelDir = fx > norrisDoor.fx ? 1 : -1;
+    norrisDoor.fx = fx;
+    var bx = fx - norrisDoor.heelDir * NORRIS_DOOR.heel;   /* when he turns she goes round him at a trot, never a jump */
+    if (g.visible && norrisDoor.a > 0) bx = was.x + clamp(bx - was.x, -NORRIS_DOOR.trot * dt, NORRIS_DOOR.trot * dt);
+    var step = Math.abs(bx - was.x) > 1e-4;
+    g.position.set(bx, NORRIS.y + stairY(bx), filchFig.position.z + 0.12);
+    norrisDoor.a = Math.min(1, norrisDoor.a + dt * 3, filchFig.material.opacity);
+    if (step) { cell = 2; left = norrisLeft(was, g.position); norrisDoor.heelLeft = left; norrisDoor.heelStill = 0; }
+    else if ((norrisDoor.heelStill += dt) < 0.4) { cell = 2; left = norrisDoor.heelLeft; }
   } else return;
   norrisDoor.blink -= dt;
   var shut = norrisDoor.blink < 0;
   if (norrisDoor.blink < -0.13) norrisDoor.blink = 2.5 + Math.random() * 3.5;
-  g.lookAt(camera.position); g.visible = true;
-  g.children.forEach(function (e) {
-    var cat = e.name === 'norris-door-cat';
-    e.material.opacity = (shut && !cat ? 0 : norrisDoor.a) * e.userData.peak;
-  });
+  norrisTurn(g); g.visible = true;
+  norrisDoorPose(cell, left, norrisDoor.a, shut);
+}
+/* she comes to his hand (req 933 (a), Events' hand and stroke records, cells 4 and 5): from where she is, the cupboard
+   or the end's glints, along the flags toward him (trotting when far), and stops a little way off so the stop's view
+   still has her; the pose held while the line is told, then she fades. In the wash (cell 3) she is set down on the
+   flags ahead of him, her back to him */
+function norrisComes(cell, hold) {
+  var g = norrisDoor.group, from;
+  if (norrisSits() || norrisDoor.state === 'slinks') from = g.position.clone();
+  else if (norris.t >= 0) { from = norris.group.position.clone(); norris.t = -1; norris.group.visible = false; }
+  else return false;
+  var cam = new THREE.Vector3(camera.position.x, NORRIS.y, camera.position.z), d = from.distanceTo(cam), near = Math.min(d, NORRIS_DOOR.near);
+  var to = cam.clone().add(from.clone().sub(cam).setLength(near)), far = d - near;
+  norrisDoor.come = { from: from, to: to, k: 0, walk: far / (far > 2.5 ? NORRIS_DOOR.trot : NORRIS_DOOR.pad), trot: far > 2.5, hold: hold, cell: cell, fadeIn: 0, left: false };
+  norrisDoor.state = 'comes'; norrisDoor.a = 1; g.position.copy(from);
+  return true;
+}
+function norrisWashes(hold) {
+  var d = new THREE.Vector3(); camera.getWorldDirection(d); d.y = 0; d.normalize();
+  var p = camera.position.clone().addScaledVector(d, NORRIS_DOOR.wash);
+  p.x = clamp(p.x, STAIR_X + 0.6, END_X - 0.5); p.z = clamp(p.z, FAR_Z + 0.4, HER_Z - 0.4); p.y = NORRIS.y;
+  norris.t = -1; norris.group.visible = false;
+  norrisDoor.come = { from: p, to: p, k: 0, walk: 0, hold: hold, cell: 3, fadeIn: 0.4, left: false };
+  norrisDoor.state = 'comes'; norrisDoor.a = 0; norrisDoor.group.position.copy(p);
 }
 /* Filch's comic near miss (the Ministry's corridor list, New work; the world rules: comic, he never catches them; built
    heard and lit, no figure, on Fawkes's lead of 15 October 2026, 4.00 pm; settled by Godric's 1 on corridor-filch-pass-1015,
@@ -3994,17 +4088,16 @@ function updateWhisk(dt) {
   var w = chase.whisk;
   if (!w) return;
   w.k += dt;
-  var g = norrisDoor.group, d = Math.max(0, w.k - w.stare) * w.run, p = w.path, l0 = p[0].distanceTo(p[1]), a = w.fadeIn ? Math.min(1, w.k / w.fadeIn) : 1;
+  var g = norrisDoor.group, was = g.position.clone(), d = Math.max(0, w.k - w.stare) * w.run, p = w.path, l0 = p[0].distanceTo(p[1]), a = w.fadeIn ? Math.min(1, w.k / w.fadeIn) : 1;
   if (d < l0) g.position.lerpVectors(p[0], p[1], d / l0);
   else g.position.lerpVectors(p[1], p[2], Math.min(1, (d - l0) / Math.max(0.01, w.len - l0)));
   if (d > l0) g.position.y = NORRIS.y + stairY(g.position.x);
   if (d >= w.len) { a = Math.max(0, 1 - (d - w.len) / (w.run * 0.3)); if (w.then) { w.then(); w.then = null; } }
   var shut = w.k > 0.6 && w.k < 0.73;   /* one blink while she stares */
-  g.lookAt(camera.position); g.visible = a > 0;
-  g.children.forEach(function (e) {
-    var cat = e.name === 'norris-door-cat';
-    e.material.opacity = (shut && !cat ? 0 : a) * e.userData.peak;
-  });
+  /* drawn: sat staring, then whisking off (cell 0, Events' chase-night) or, at a walk, padding (cell 2: astray) */
+  if (w.k > w.stare && g.position.distanceToSquared(was) > 1e-8) w.left = norrisLeft(was, g.position);
+  norrisTurn(g); g.visible = a > 0;
+  norrisDoorPose(w.k <= w.stare ? 1 : w.run >= CHASE.run ? 0 : 2, !!w.left, a, shut);
   if (a <= 0) { chase.whisk = null; g.visible = false; norrisDoor.state = 'gone'; }
 }
 function chaseLampAt(x, y, k) {
@@ -4155,6 +4248,8 @@ function caught(how) {
   leaving = how === 'march'; chase.how = how;
   chase.nearX = camera.position.x > CHASE.topX ? Math.max(CHASE.topX, camera.position.x - CHASE.near) : CHASE.topX;
   chase.lamp = 'near';
+  /* Mrs Norris padding behind him (Events' catch-one to -three, cell 2): at his heels, toward the stairs he came up */
+  if (how !== 'mcgonagall' && NORRIS_FIG.on) { chase.whisk = null; norrisDoor.state = 'heels'; norrisDoor.a = 0; norrisDoor.heelDir = 1; norrisDoor.fx = null; norrisDoor.heelStill = 0; norrisDoor.heelLeft = false; }
   var since = Date.now();
   setTimeout(function wait() {
     if ((lineCur || lineQ.length) && Date.now() - since < CHASE.linesMax * 1000) { setTimeout(wait, 100); return; }
@@ -4379,7 +4474,7 @@ var STOPS = [
   /* the polite door, on the long wall since the switch: from the far side, as for any thing on her wall */
   { name: 'door', meshes: [door], stop: function () { return stopFor({ position: new THREE.Vector3(DOOR.x, 0, HER_Z) }, DOOR.h, 1.2); } },
   /* the broom cupboard (ledger line 2): square to it from across the corridor, as the polite door */
-  { name: 'cupboard', meshes: [cupboardDoor, broomCard, tagSide.front, tagSide.back], stop: function () { return stopFor({ position: new THREE.Vector3(CUPBOARD.x, 0, HER_Z) }, CUPBOARD.h, norrisSits() ? 1.05 : 1.15); } },   /* lower while Mrs Norris sits before it, so she shows */
+  { name: 'cupboard', meshes: [cupboardDoor, broomCard, tagSide.front, tagSide.back], stop: function () { return stopFor({ position: new THREE.Vector3(CUPBOARD.x, 0, HER_Z) }, CUPBOARD.h, norrisSits() ? (NORRIS_FIG.on ? 0.8 : 1.05) : 1.15); } },   /* lower while Mrs Norris sits before it, so she shows (drawn, her paws too) */
   /* the inglenook: from a hand off the far wall, square to the hearth, the settles either side */
   { name: 'nook', meshes: [hearth, breast].concat(settles), stop: function () { return stopFor({ position: new THREE.Vector3(NOOK_MID, 0, NOOK_BACK - BREAST) }, NOOK_H, 1.2); } },
   /* the landing at the flight's foot (req 59): reached by a tap on the flight, standing at its edge square to the end
@@ -5928,18 +6023,18 @@ var castle = window.CastleEvents ? CastleEvents.start({
     },
     'the bit of breakfast is gone from the flags, and her eyes with it': function () { norrisScrap.visible = false; norrisGoes(0); },
     'he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone': function () {
-      norrisLine('he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone'); norrisGoes(2.5);
+      norrisLine('he holds a bit of breakfast out on his flat hand; Mrs Norris comes along the flags, takes it from him, and is gone'); if (!norrisComes(4, 2.5)) norrisGoes(2.5);
     },
     'he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, arching under it': function () {
-      norrisLine('he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, arching under it'); norrisGoes(5);
+      norrisLine('he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, arching under it'); if (!norrisComes(5, 4)) norrisGoes(5);
     },
     /* her boredom (req 955; Events' norris.hand-bored, -stroke-bored and the second taps' bored kin): the same kindness
        alone wears thin, her eyes already on the stairs; no purr on the stroke */
     'he holds a bit of breakfast out on his flat hand; Mrs Norris looks at it, sniffs, and takes it with no great interest, her eyes already on the stairs': function () {
-      norrisLine('he holds a bit of breakfast out on his flat hand; Mrs Norris looks at it, sniffs, and takes it with no great interest, her eyes already on the stairs'); norrisGoes(2.5);
+      norrisLine('he holds a bit of breakfast out on his flat hand; Mrs Norris looks at it, sniffs, and takes it with no great interest, her eyes already on the stairs'); if (!norrisComes(4, 2.5)) norrisGoes(2.5);
     },
     'he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, her eyes already on the stairs': function () {
-      norrisLine('he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, her eyes already on the stairs'); norrisGoes(5);
+      norrisLine('he holds out a bit of breakfast; Mrs Norris takes it from his hand and lets him stroke her once, her eyes already on the stairs'); if (!norrisComes(5, 4)) norrisGoes(5);
     },
     /* Peeves saves a hidden boy (req 933 (b)) */
     "Peeves whooshing away down the stairs with a cackle, the suit of armour rattling as he passes, and Filch's lamp going back down after him": peevesSaves,
@@ -5965,6 +6060,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     /* in place of filch.chase-hidden (one group): his lamp passes all the same */
     "Mrs Norris sits down by the boy's hiding place and washes a paw, her back to it; Filch's lamp goes on along the corridor without turning": function () {
       if (chase.on) { chase.lamp = 'pass'; chase.passT = 0; }
+      norrisWashes(7);   /* drawn, cell 3 (Events' sniff-around) */
       norrisLine("Mrs Norris sits down by the boy's hiding place and washes a paw, her back to it; Filch's lamp goes on along the corridor without turning");
     },
     /* the lock's half turn (req 950 (a)); the open swing as ever, raised now by the runtime */
@@ -6203,6 +6299,19 @@ function frame() {
   renderer.render(scene, camera);
   kit.stats(dt);
 }
+/* the ties (page/depth-ties.js; board rule 6, the Architect's 154th): every thing built, two faces of two looks in one
+   plane or a few mm apart take depth steps, the nearer in front, so none combs. Once at the start and once more when the
+   drawn things have loaded. The suits are left out: each one's ink is a back-side hull pushed out 6.8 mm in its own
+   shader, which the pass would read as lying in the suit's own faces */
+var ties = [];
+function settleTies() {
+  if (!window.CastleTies || groundsQ.get('ties') === '0') return;   /* ?ties=0 for a look without it */
+  var out = scene.children.filter(function (c) { return !!c.getObjectByName('armour-hybrid-ink'); });
+  out.forEach(function (c) { scene.remove(c); });
+  ties.push(CastleTies.settle(THREE, scene));
+  out.forEach(function (c) { scene.add(c); });
+}
+settleTies(); setTimeout(settleTies, 4000);
 renderer.setAnimationLoop(frame);
 
 /* hooks for automated checks; harmless in normal use */
@@ -6211,7 +6320,7 @@ window.lumosGreybox = { runtime: function () { return castle; }, suit: function 
     if (keys) corridorDrawRoom(keys.map(function (k) { return C[k]; }));
     if (rock) armourRock = ARMOUR_ROCK.time;
     return { x: +armour.position.x.toFixed(2), z: +armour.position.z.toFixed(2), eyes: helmetEyes.visible, light: visorLight.visible, on: helmetEyes.parent.name };
-  }, chase: function () { return { on: chase.on, t: +chase.t.toFixed(1), lamp: chase.lamp, x: +chase.x.toFixed(2), k: +chase.lk.toFixed(2), whisk: !!chase.whisk, hiding: chaseHides(), openT: +chase.openT.toFixed(1), caught: chase.caught }; }, knit: function () { return { now: PORTRAIT_B.now, hold: KNIT.hold, release: +KNIT.release.toFixed(1), pass: !!KNIT.pass, passUntil: +KNIT.passUntil.toFixed(1), whisper: +KNIT.whisper.toFixed(1), t: +t.toFixed(1) }; }, herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible }; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
+  }, chase: function () { return { on: chase.on, t: +chase.t.toFixed(1), lamp: chase.lamp, x: +chase.x.toFixed(2), k: +chase.lk.toFixed(2), whisk: !!chase.whisk, hiding: chaseHides(), openT: +chase.openT.toFixed(1), caught: chase.caught }; }, knit: function () { return { now: PORTRAIT_B.now, hold: KNIT.hold, release: +KNIT.release.toFixed(1), pass: !!KNIT.pass, passUntil: +KNIT.passUntil.toFixed(1), whisper: +KNIT.whisper.toFixed(1), t: +t.toFixed(1) }; }, herFrame: function (s) { if (s) { herFrame.look = true; setHerFrame(s); } return { state: herFrame.state, slashed: herFrame.cards.slashed.visible, cadogan: herFrame.cards.cadogan.visible }; }, neville: function () { return { out: neville.out, asleep: neville.asleep, shown: nevilleCard.visible, glass: +neville.glass.toFixed(2), op: +nevilleCard.material.opacity.toFixed(2) }; }, nevilleStop: function () { goTo(nevilleStop); }, cupboard: { rattle: cupboardRattle, swing: cupboardSwing, offer: cupboardLockOffered, butterfly: function () { var p = butterfly.group.position; return { t: +butterfly.t.toFixed(2), shown: butterfly.group.visible, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) }; }, lockAt: cupboardLockOnScreen, offered: function () { return !!lockOffer; }, state: function () { return { ang: +cupboard.ang.toFixed(2), rattle: cupboard.rattle }; } }, norrisDoor: function () { var p = norrisDoor.group.position; return { state: norrisDoor.state, a: +norrisDoor.a.toFixed(2), x: +p.x.toFixed(2), z: +p.z.toFixed(2), shown: norrisDoor.group.visible, cell: norrisDoor.card ? norrisDoor.card.userData.cell : -1 }; }, norrisDo: function (what) { if (what === 'catch') { chase.on = true; chase.x = CHASE.topX; chase.y = 0; chase.lk = 1; caught('off'); return true; } if (what === 'wash') { norrisWashes(7); return true; } if (what === 'look') { norrisLooks(); return true; } return norrisComes(what === 'stroke' ? 5 : 4, what === 'stroke' ? 4 : 2.5); }, ties: function () { return ties; }, nickHome: function () { return { kind: home.kind, nick: home.nick, k: home.k, op: nickMesh.material.opacity, tip: nickHeadCut && nickHeadCut.head.visible ? +nickHeadCut.head.rotation.z.toFixed(2) : 0 }; }, stairAway: function () { return stairAway; }, sheep: function () { return tapestrySheep; }, tapestryCell: function () { return tapestryCell.shown; }, shepherd: shepherdCap, liftTapestry: liftTapestry, tapestryLift: function () { return TAPESTRY_LIFT; }, spark: function (x, y, house) { if (kit.spark) kit.spark(x, y, house); }, leanTorch: leanATorch, torchCtl: torchCtl, nickAfterLean: nickAfterLean, nick: function () { return nick.state; }, frame: frame, setView: setView, view: function () { return view; }, setTint: setTint, scene: scene, camera: camera, hinge: hinge,
   tap: tap, goBack: goBack, stir: function () { spoon.visible = true; spoonRun = { t: 0 }; }, rise: function () { turnRise = { t: 0 }; }, steam: function (lean, out) { steamLeanT = lean; steamOut = !!out; }, gust: function (leaf) { draught.next = 0; if (leaf) addLeaf(); return draught.leaves.length; }, goTo: function (name) { var s = STOPS.filter(function (x) { return x.name === name; })[0]; if (s) goTo(s); return !!s; },
   mode: function () { return mode; }, stop: function () { return atStop && atStop.name; }, busy: function () { return !!tween; },
   head: function () { return { yaw: headYaw, pitch: headPitch, limit: headLimit() }; },   /* req 208, for Interaction's step 11 */
