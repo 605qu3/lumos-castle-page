@@ -713,7 +713,8 @@ var HIDE = { z0: 0.06, z1: 0.72, lidT: 0.04, open: 0, want: 0, lid: null, hole: 
    shows it as drawn, the stair side mirrored, each arm at the nook's mouth. The arm's side and the ends keep the box
    colour, set darker to sit with the drawn oak. Parts of the drawing, as fractions of it (u from the left, v from the
    top), measured on the pick */
-var SETTLE_DRAW = { url: '../assets/layers/corridor-settle.png', oak: 0x4a3626,   /* Godric's pick, Try 3 (corridor-settle-r1-1016, relayed 19 October 2026, 2.27 pm); measured on it */
+var SETTLE_DRAW = { url: '../assets/layers/corridor-settle.png', oak: 0x4a3626, off: 0.008,   /* each part 8 mm off its box (board rule 6; was 2 mm) */
+    /* Godric's pick, Try 3 (corridor-settle-r1-1016, relayed 19 October 2026, 2.27 pm); measured on it */
   back: { u0: 0.041, u1: 0.955, v0: 0.003, v1: 0.5625 },   /* the back's outer stiles, its top rail to the rail behind the lids */
   front: { u0: 0.009, u1: 0.986, v0: 0.631, v1: 0.994 },   /* the arm post's outer edge to the right stile, the chest's top rail to the foot */
   arm: { u0: 0.009, u1: 0.041, v0: 0.35, v1: 0.631 },      /* the arm post from its rest down to the seat */
@@ -743,13 +744,13 @@ function settleFace(m, x, ya, yb, za, zb, z0, part) {   /* upright, facing acros
   im.onload = function () {
     var t = tex(im), m = new THREE.MeshStandardMaterial({ map: t, roughness: 0.92, metalness: 0, side: THREE.DoubleSide });
     [NOOK_X0, NOOK_X1].forEach(function (wx, i) {
-      var dir = i === 0 ? -1 : 1, z0 = NOOK_BACK - SETTLE.len, z1 = NOOK_BACK, f = wx + dir * (SETTLE.d + 0.002);
-      var xb = wx + dir * 0.08, xf = wx + dir * SETTLE.d, y = SETTLE.seat + 0.002;
+      var dir = i === 0 ? -1 : 1, z0 = NOOK_BACK - SETTLE.len, z1 = NOOK_BACK, f = wx + dir * (SETTLE.d + SETTLE_DRAW.off);
+      var xb = wx + dir * 0.08, xf = wx + dir * SETTLE.d, y = SETTLE.seat + SETTLE_DRAW.off;
       settleFace(m, f, 0, SETTLE.seat, z0, z1, z0, 'front');
-      settleFace(m, wx + dir * 0.082, SETTLE.seat, SETTLE.back, z0, z1, z0, 'back');
+      settleFace(m, wx + dir * (0.08 + SETTLE_DRAW.off), SETTLE.seat, SETTLE.back, z0, z1, z0, 'back');
       settleFace(m, f, SETTLE.seat, 0.75, z0, z0 + 0.06, z0, 'arm');
       /* the arm's end, toward the corridor and lit by it: a panelled end, the back's lower tier's first two panels */
-      var e = SETTLE_DRAW.end, ze = z0 - 0.002, ge = new THREE.BufferGeometry();
+      var e = SETTLE_DRAW.end, ze = z0 - SETTLE_DRAW.off, ge = new THREE.BufferGeometry();
       ge.setAttribute('position', new THREE.Float32BufferAttribute([wx, 0, ze, xf, 0, ze, xf, 0.75, ze, wx, 0.75, ze], 3));
       ge.setAttribute('uv', new THREE.Float32BufferAttribute([e.u0, 1 - e.v1, e.u1, 1 - e.v1, e.u1, 1 - e.v0, e.u0, 1 - e.v0], 2));
       ge.setIndex([0, 1, 2, 0, 2, 3]); ge.computeVertexNormals();
@@ -759,8 +760,9 @@ function settleFace(m, x, ya, yb, za, zb, z0, part) {   /* upright, facing acros
       spans.forEach(function (s) { settleQuad(m, nook, [[xb, y, s[0], 0], [xb, y, s[1], 0], [xf, y, s[1], 1], [xf, y, s[0], 1]], z0, 'lids'); });
       if (i === 0 && HIDE.lid) {
         var zm = (HIDE.a + HIDE.b) / 2, w = SETTLE.d - 0.08, ha = HIDE.a - zm, hb = HIDE.b - zm;
-        settleQuad(m, HIDE.lid, [[0, 0.002, ha, 0], [0, 0.002, hb, 0], [dir * w, 0.002, hb, 1], [dir * w, 0.002, ha, 1]], z0, 'lids', zm);
-        var yu = -HIDE.lidT - 0.002;   /* its underside, seen once it lifts */
+        var yo = SETTLE_DRAW.off;
+        settleQuad(m, HIDE.lid, [[0, yo, ha, 0], [0, yo, hb, 0], [dir * w, yo, hb, 1], [dir * w, yo, ha, 1]], z0, 'lids', zm);
+        var yu = -HIDE.lidT - SETTLE_DRAW.off;   /* its underside, seen once it lifts */
         settleQuad(m, HIDE.lid, [[0, yu, ha, 0], [0, yu, hb, 0], [dir * w, yu, hb, 1], [dir * w, yu, ha, 1]], z0, 'lids', zm);
       }
     });
