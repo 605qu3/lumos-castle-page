@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=520"></script>
-<script src="castle-paint.js?v=107"></script>
+<script src="castle-model.js?v=521"></script>
+<script src="castle-paint.js?v=108"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=4"></script>
@@ -264,7 +264,7 @@ PAINTED = PAINTED.concat(['elves-tunnel', 'elves-linen-room']);
 /* v110, G's paper rooms, the first batch: the south-east range off the lake-face corridor (the layout's e, i, l, o, r) */
 PAINTED = PAINTED.concat(['free-classroom-g', 'visitors-parlour', 'post-room', 'treatment-room', 'registers-archive']);
 /* v112, req 803 (c)'s 1: the stone steps down from the Entrance Hall and the kitchens' corridor (GoF 21) */
-PAINTED = PAINTED.concat(['kitchens-steps', 'kitchens-corridor']);
+PAINTED = PAINTED.concat(['kitchens-steps', 'kitchens-corridor', 'barrel-nook-b']);
 /* v113, G's ad, the teacher's study off the registers' archive (architect-study-door-1021's 1) */
 PAINTED = PAINTED.concat(['teachers-study-g']);
 /* v118, the study a hidden room: the passage round the south-east drum's shoulder behind the archive's turning shelf (Godric's Try 1 on architect-study-hidden-1021) */
@@ -2015,7 +2015,29 @@ var KCORR = PLACE !== 'kitchens-corridor' ? null : (function () {
    [47.0, 48.5, 'fowl'], [51.0, 48.5, 'pies'], [55.0, 48.5, 'steampie'], [59.0, 48.5, 'tarts'], [63.0, 48.5, 'birds']].forEach(function (p) {
     var g = hang(p[0], p[1], p[2]); if (g) out.paintings[p[2]] = g;
   });
-  [[48.5, 51.5], [52.5, 51.5], [62.4, 51.5], [49.0, 48.5], [53.0, 48.5], [57.0, 48.5], [61.0, 48.5], [65.2, 48.5]].forEach(function (t) { if (torch(t[0], t[1])) out.torches++; });
+  [[48.5, 51.5], [52.5, 51.5], [62.4, 51.5], [49.0, 48.5], [53.0, 48.5], [61.0, 48.5], [65.2, 48.5]].forEach(function (t) { if (torch(t[0], t[1])) out.torches++; });
+  /* H79 (ledger 284, req 1080): the stack of barrels in the nook in the south wall (barrel-nook-b, x 55.8 to 58.2), ten on
+     their sides, four, three, two and one, their lids to the corridor; oak, two iron hoops each, the lid's boards a shade
+     darker and 8 mm proud. The lid two from the bottom, middle of the second row (barrel-lid-b) never opens for him;
+     the taps, the vinegar and the pear's giggle are Events' (req 1081). The torch that stood at x 57 stands aside */
+  (function () {
+    var oak = kit.solid(0x5e4630, { roughness: 0.85 }), lidM = kit.solid(0x4c3826, { roughness: 0.9 }), hoop = kit.solid(0x2a2826, { roughness: 0.7 });
+    var r = 0.265, pitch = r * 2 * Math.sqrt(3) / 2, back = 47.65, front = 48.45, n = 0;
+    function lay(x, h, m, rr, y0, y1, nm) {   /* a barrel's round piece, its axis along y from y0 to y1 */
+      var a = P(x, y0, h), b = P(x, y1, h), c = new THREE.Mesh(new THREE.CylinderGeometry(rr, rr, a.distanceTo(b), 24), m);
+      c.position.copy(a).add(b).multiplyScalar(0.5); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize());
+      return own(c, nm);
+    }
+    [4, 3, 2, 1].forEach(function (k, row) {
+      for (var i = 0; i < k; i++) {
+        var x = 57.0 + (i - (k - 1) / 2) * 2 * r, h = r - 0.01 + row * pitch, id = row === 1 && i === 1 ? 'barrel-lid-b' : 'barrel-' + (++n);
+        lay(x, h, oak, r, back, front, id);
+        lay(x, h, hoop, r + 0.008, front - 0.12, front - 0.08, id + '-hoop'); lay(x, h, hoop, r + 0.008, back + 0.08, back + 0.12, id + '-hoop');
+        lay(x, h, lidM, r - 0.03, front, front + 0.008, id + '-lid');
+      }
+    });
+    out.barrels = n + 1;
+  })();
   [48, 55, 62].forEach(function (lx) { var l = new THREE.PointLight(0xffa860, 0.9, 8, 1.6); l.position.copy(P(lx, 50, 2.6)); scene.add(l); out.lights.push(l); });
   /* the loose grape: the bunch's fourteenth, its own small disc; and three wisps of the pie's steam */
   var gp = out.paintings.grapes, sp = out.paintings.steampie;
