@@ -364,7 +364,7 @@
     if (S.ready) fill(); else S.waiters.push(fill);
     if (opts.shadow !== false) {
       var shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.34), opts.shadow || S.shadow || (S.shadow = shadowMat()));
-      shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08 * sc, 0.003, 0.02); shadow.scale.set(sc * (K.stand ? 1.4 : 1), sc * (K.stand ? 1.8 : 1), 1); g.add(shadow);
+      shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08 * sc, 0.008, 0.02);   /* 8 mm over the floor (board rule 6) */ shadow.scale.set(sc * (K.stand ? 1.4 : 1), sc * (K.stand ? 1.8 : 1), 1); g.add(shadow);
     }
     g.name = 'armour-hybrid';
     return suit;
