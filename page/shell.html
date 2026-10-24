@@ -165,7 +165,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=1"></script>
 <script src="castle-shell.js?v=77"></script>
-<script src="shell-w5b.js?v=17"></script>
+<script src="shell-w5b.js?v=18"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="shell-w5a.js?v=22"></script>
@@ -2693,7 +2693,8 @@ var W1 = (function () {
             'filchs-office': [104, 62, 1, 1, false], 'charms-classroom': [139.6, 71.4, 1, -1, true],
             'transfiguration-classroom': [139.6, 71.4, 1, -1, true], 'defence-classroom': [48, 71.4, -1, -1, true],
             'ancient-runes-classroom': [21.9, 71.4, 1, -1, true], 'arithmancy-classroom': [18.4, 17.4, 1, -1, true],
-            'muggle-studies-classroom': [19.1, 63.4, -1, 1, true] }[PLACE];
+            'muggle-studies-classroom': [19.1, 63.4, -1, 1, true],
+            'history-of-magic-classroom': [124, 71.4, 1, -1, true] }[PLACE];
   if (!F) return out;
   out.on = true;
   var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'wave1-things'; shell.group.add(g);
@@ -3449,6 +3450,129 @@ var W1 = (function () {
     drum(2.48, 15.78, 0.0, 0.3, 0.12, 0.14, RT.tin, 16); drum(2.48, 15.78, 0.24, 0.26, 0.13, 0.13, RT.sand, 16);
     drum(2.96, 15.45, 0.0, 0.3, 0.12, 0.14, RT.tin, 16); drum(2.96, 15.45, 0.08, 0.2, 0.1, 0.12, PB.muslin, 12);
     rod([2.96, 15.45, 0.12], [2.96, 15.58, 1.4], 0.014, RT.deal, 6);
+  }
+
+  /* the 1890s things (reqs 1061 to 1069, ledger 267 to 275, the greenhouses' 268 and the paddock's 272 held with no place in the model; Godric's 1 at 8.12 pm, 23 October 2026, on
+     interiors-1890s-things-1023): each room's docs/interiors/<room>.md, The 1890s things, in its own frame. Plain shapes
+     from the schedules' sizes, Objects' forms (req 1050) not yet drawn; board rule 7, each made to be found close */
+  var N9 = { brass: mat('n9-brass', 0x8a6e3a), black: mat('n9-black', 0x161514), box: mat('n9-boxwood', 0xc9a86a),
+    paper: mat('n9-paper', 0xe6dfcc), key: mat('n9-key', 0xd8d2c2), leather: mat('n9-leather', 0x2a211b) };
+  function ring(c, r, tube, mt, n, P3) {   /* a hoop of n short bars about c in a plane, P3(u, v) its points */
+    for (var k = 0; k < n; k++) {
+      var a0 = k / n * Math.PI * 2, a1 = (k + 1) / n * Math.PI * 2;
+      rod(P3(c[0] + r * Math.cos(a0), c[1] + r * Math.sin(a0)), P3(c[0] + r * Math.cos(a1), c[1] + r * Math.sin(a1)), tube, mt, 6);
+    }
+  }
+  if (PLACE === 'potions-dungeon') {
+    /* 1 (ledger 267), the mercury thermometer in its brass case, laid shut on his desk's left end */
+    box(4.1, 13.45, 0.795, 4.45, 13.5, 0.82, N9.brass);
+    drum(4.1, 13.475, 0.795, 0.82, 0.014, 0.014, N9.brass, 10); box(4.12, 13.442, 0.805, 4.43, 13.446, 0.81, RT.glass);   /* its round end; the glass slit */
+    /* 2, two carboys of coloured water on the front wall's top shelf, green and red, unlit; their tops at 2.9 under the
+       vault, which springs at 2.65 from the corbels and stands about 3.9 over them at the wall (the model's groin vault) */
+    [[3.75, mat('n9-carboy-green', 0x24503a)], [6.2, mat('n9-carboy-red', 0x6a1e22)]].forEach(function (c) {
+      drum(c[0], 15.8, 2.34, 2.42, 0.15, 0.19, c[1], 20); drum(c[0], 15.8, 2.42, 2.66, 0.19, 0.19, c[1], 20);
+      drum(c[0], 15.8, 2.66, 2.8, 0.19, 0.07, c[1], 20); drum(c[0], 15.8, 2.8, 2.86, 0.045, 0.045, RT.glass, 12);
+      drum(c[0], 15.8, 2.86, 2.9, 0.055, 0.04, RT.glass, 12);                                          /* the shoulder, neck and its glass stopper */
+    });
+  }
+  if (PLACE === 'charms-classroom') {
+    /* Flitwick's desk, under the metronome (docs/interiors/charms-classroom.md, The things: x' 3.7 to 5.3, y' 9.4 to 10.2,
+       0.75, its panel to the class; placed, provisional, and never drawn till now). His pile of books, the feather jar
+       and the darts' box on it are still to build */
+    pedestalDesk(3.7, 9.4, 5.3, 10.2, 0.75);
+    /* 1 (ledger 269), the clockwork metronome on Flitwick's desk's front middle, wound and stopped, its face to the class
+       (toward y' 0): the tapered case, the pendulum down its face, the weight high, the key in its side */
+    var met = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.078, 0.22, 4), dark), mp = P(4.5, 9.5, 0.745);
+    met.position.set(mp.x, mp.y + 0.11, mp.z); met.rotation.y = Math.PI / 4; add(met);
+    rod([4.5, 9.44, 0.77], [4.5, 9.465, 0.95], 0.003, N9.brass, 5); box(4.485, 9.448, 0.88, 4.515, 9.46, 0.9, N9.brass);
+    rod([4.545, 9.5, 0.82], [4.585, 9.5, 0.82], 0.004, N9.brass, 5); box(4.585, 9.49, 0.8, 4.59, 9.51, 0.84, N9.brass);
+  }
+  if (PLACE === 'history-of-magic-classroom') {
+    /* 1 (ledger 270), the magic lantern on a small table in the back right corner, its lens down the room toward the
+       blackboard (+y'), oil-lit and never lit: the japanned body, its chimney and cap, the brass lens tube; the box of
+       painted glass slides beside it, a few standing in it */
+    desk(7.3, 0.2, 7.9, 0.8, 0.75, wood);
+    box(7.37, 0.28, 0.745, 7.62, 0.56, 1.03, N9.black);
+    drum(7.495, 0.42, 1.03, 1.14, 0.045, 0.045, N9.black, 14); drum(7.495, 0.42, 1.14, 1.17, 0.07, 0.03, N9.black, 14);
+    rod([7.495, 0.56, 0.87], [7.495, 0.74, 0.87], 0.05, N9.brass, 18); rod([7.495, 0.74, 0.87], [7.495, 0.76, 0.87], 0.042, RT.glass, 18);
+    box(7.62, 0.38, 0.84, 7.63, 0.46, 0.95, N9.brass);                                                /* the lamp's door, its knob */
+    box(7.66, 0.3, 0.745, 7.86, 0.42, 0.84, RT.deal);
+    [0.31, 0.33, 0.35, 0.37, 0.39].forEach(function (yp, i) { box(7.68, yp, 0.8, 7.84, yp + 0.006, 0.89 - (i % 2) * 0.02, i % 2 ? mat('n9-slide-blue', 0x3c4e6a) : mat('n9-slide-red', 0x7a3a2a)); });
+  }
+  if (PLACE === 'ancient-runes-classroom') {
+    /* 1 (ledger 273), the brass rubbing of a knight on the front wall (y' 10.7) right of the blackboard, pinned up: the
+       long paper 8 mm off the wall, the heelball black of the brass 8 mm off it, the incised lines left pale 8 mm again */
+    var RB = mat('n9-heelball', 0x121110);
+    box(6.0, 10.691, 0.6, 6.7, 10.692, 2.6, N9.paper);
+    [[6.27, 6.43, 2.18, 2.42], [6.22, 6.48, 1.5, 2.18], [6.25, 6.33, 0.9, 1.5], [6.37, 6.45, 0.9, 1.5],   /* helm, body, the legs */
+     [6.14, 6.24, 1.62, 2.1], [6.46, 6.56, 1.62, 2.1], [6.2, 6.5, 0.8, 0.9], [6.47, 6.63, 1.35, 1.75]].forEach(function (k) {   /* arms, the lion at his feet, the shield */
+      box(k[0], 10.683, k[2], k[1], 10.684, k[3], RB); });
+    box(6.33, 10.683, 0.95, 6.37, 10.684, 1.95, RB);                                                  /* the sword down his middle */
+    [[6.29, 6.41, 2.3, 2.31], [6.24, 6.46, 1.9, 1.91], [6.24, 6.46, 1.7, 1.71], [6.345, 6.355, 1.0, 1.85], [6.5, 6.6, 1.55, 1.56]].forEach(function (k) {
+      box(k[0], 10.675, k[2], k[1], 10.676, k[3], N9.paper); });                                       /* the lines: the visor's slit, the belt, the blade */
+    [[6.03, 2.57], [6.67, 2.57], [6.03, 0.63], [6.67, 0.63]].forEach(function (p) { rod([p[0], 10.705, p[1]], [p[0], 10.676, p[1]], 0.006, N9.brass, 6); });
+  }
+  if (PLACE === 'arithmancy-classroom') {
+    /* 1 (ledger 274), the boxwood slide rule on the blackboard's ledge (0.9, its front at y' 10.88), beside the tally
+       stick: the stock, the slide a shade darker, the brass cursor across */
+    box(3.05, 10.89, 0.89, 3.45, 10.93, 0.912, N9.box); box(3.05, 10.9, 0.912, 3.45, 10.92, 0.914, mat('n9-slide', 0xb59456));
+    box(3.22, 10.887, 0.889, 3.24, 10.933, 0.918, N9.brass);
+    /* 2 (ledger 274), the arithmometer on its own small table in the front right corner, mirroring the abacus: the
+       mahogany case, its brass plate with the eight setting slots, the long carriage of dials at the back, the crank */
+    desk(5.9, 10.2, 6.9, 10.8, 0.75, wood);
+    box(6.1, 10.4, 0.745, 6.7, 10.6, 0.83, mat('n9-mahogany', 0x4a2a1e)); box(6.11, 10.41, 0.83, 6.69, 10.59, 0.838, N9.brass);
+    for (var sl = 0; sl < 8; sl++) { box(6.16 + sl * 0.045, 10.43, 0.838, 6.17 + sl * 0.045, 10.5, 0.846, N9.black); box(6.155 + sl * 0.045, 10.46, 0.838, 6.175 + sl * 0.045, 10.475, 0.852, N9.key); }
+    box(6.08, 10.52, 0.838, 6.72, 10.6, 0.88, N9.brass);
+    for (var dl = 0; dl < 12; dl++) drum(6.12 + dl * 0.05, 10.56, 0.88, 0.884, 0.012, 0.012, N9.key, 10);
+    rod([6.65, 10.45, 0.846], [6.65, 10.45, 0.9], 0.006, N9.brass, 6); rod([6.65, 10.45, 0.9], [6.65, 10.38, 0.9], 0.006, N9.brass, 6);
+    rod([6.65, 10.38, 0.9], [6.65, 10.38, 0.95], 0.011, RT.deal, 8);                                   /* the crank toward the room, its ebony knob */
+  }
+  if (PLACE === 'muggle-studies-classroom') {
+    /* 1 (ledger 275), the safety bicycle leant along the left wall at the front, never bewitched: diamond frame in black
+       enamel, the wheels' tyres, rims and spokes, the chain on its rings, the saddle, the bars' left grip on the wall.
+       BK(along, up, side): along it from y' 9.0, up, and out from the wall, the whole leant 6 degrees onto x' 0 */
+    var BK = function (a, u, s) { return [0.34 - u * 0.102 + s, 9.0 + a, u]; };
+    var en = mat('n9-enamel', 0x141414), steel = mat('n9-steel', 0x8c8c88), tyre = mat('n9-tyre', 0x1c1b1a);
+    [0.37, 1.23].forEach(function (wa) {
+      ring([wa, 0.34], 0.34, 0.017, tyre, 28, function (a, u) { return BK(a, u, 0); });
+      ring([wa, 0.34], 0.315, 0.007, steel, 28, function (a, u) { return BK(a, u, 0); });
+      for (var sp = 0; sp < 16; sp++) { var sa = sp / 16 * Math.PI * 2; rod(BK(wa, 0.34, (sp % 2 ? 0.02 : -0.02)), BK(wa + 0.31 * Math.cos(sa), 0.34 + 0.31 * Math.sin(sa), 0), 0.0015, steel, 3); }
+      rod(BK(wa, 0.34, -0.035), BK(wa, 0.34, 0.035), 0.016, steel, 8);                                    /* the hub */
+    });
+    var RW = [0.37, 0.34], BB = [0.76, 0.3], ST = [0.7, 0.82], HT = [1.12, 0.86], HB = [1.15, 0.66], FW = [1.23, 0.34];
+    [[ST, BB, 0.014], [ST, HT, 0.013], [BB, HB, 0.015], [HB, HT, 0.018]].forEach(function (t) { rod(BK(t[0][0], t[0][1], 0), BK(t[1][0], t[1][1], 0), t[2], en, 10); });
+    [-0.035, 0.035].forEach(function (s) {
+      rod(BK(ST[0], ST[1], 0), BK(RW[0], RW[1], s), 0.008, en, 8); rod(BK(BB[0], BB[1], 0), BK(RW[0], RW[1], s), 0.009, en, 8);   /* the stays */
+      rod(BK(HB[0], HB[1], 0), BK(FW[0], FW[1], s), 0.01, en, 8);                                         /* the fork */
+    });
+    rod(BK(ST[0], ST[1], 0), BK(0.69, 0.88, 0), 0.011, steel, 8); rod(BK(0.6, 0.9, 0), BK(0.8, 0.9, 0), 0.04, N9.leather, 10);
+    rod(BK(HT[0], HT[1], 0), BK(1.11, 0.97, 0), 0.011, steel, 8);
+    rod(BK(1.11, 0.97, 0), BK(1.03, 0.97, -0.24), 0.01, steel, 8); rod(BK(1.11, 0.97, 0), BK(1.03, 0.97, 0.24), 0.01, steel, 8);
+    rod(BK(1.05, 0.97, -0.17), BK(1.03, 0.97, -0.25), 0.016, N9.leather, 8); rod(BK(1.05, 0.97, 0.17), BK(1.03, 0.97, 0.25), 0.016, N9.leather, 8);
+    ring([BB[0], BB[1]], 0.09, 0.006, steel, 20, function (a, u) { return BK(a, u, 0.05); });
+    ring([RW[0], RW[1]], 0.035, 0.005, steel, 10, function (a, u) { return BK(a, u, 0.05); });
+    rod(BK(BB[0], BB[1] + 0.09, 0.05), BK(RW[0], RW[1] + 0.035, 0.05), 0.004, en, 4); rod(BK(BB[0], BB[1] - 0.09, 0.05), BK(RW[0], RW[1] - 0.035, 0.05), 0.004, en, 4);
+    rod(BK(BB[0], BB[1], 0.06), BK(BB[0] + 0.06, BB[1] - 0.15, 0.06), 0.008, steel, 6); rod(BK(BB[0], BB[1], -0.06), BK(BB[0] - 0.06, BB[1] + 0.15, -0.06), 0.008, steel, 6);
+    rod(BK(BB[0] + 0.06, BB[1] - 0.15, 0.06), BK(BB[0] + 0.06, BB[1] - 0.15, 0.15), 0.012, N9.black, 6);   /* the cranks, one pedal */
+    /* 2 (ledger 275), the side table of the age's things right of the blackboard, each with its small card label (the
+       words Magic's): a typewriter, a box camera, a zoetrope, a candlestick telephone and an electric lamp, both dead */
+    desk(5.8, 10.1, 7.6, 10.7, 0.75, wood);
+    box(5.88, 10.3, 0.745, 6.22, 10.62, 0.8, N9.black);                                               /* the typewriter: its base, three rows of keys */
+    for (var kr = 0; kr < 3; kr++) for (var kk = 0; kk < 8; kk++) drum(5.92 + kk * 0.037 + kr * 0.012, 10.33 + kr * 0.045, 0.8 + kr * 0.018, 0.812 + kr * 0.018, 0.009, 0.009, N9.key, 8);
+    box(5.9, 10.47, 0.8, 6.2, 10.62, 0.9, N9.black);
+    rod([5.86, 10.56, 0.92], [6.24, 10.56, 0.92], 0.022, N9.black, 14); box(5.96, 10.575, 0.92, 6.14, 10.58, 1.12, N9.paper);
+    box(6.345, 10.38, 0.745, 6.495, 10.58, 0.9, N9.leather); rod([6.42, 10.38, 0.83], [6.42, 10.355, 0.83], 0.026, N9.brass, 14);   /* the box camera, its lens */
+    rod([6.42, 10.355, 0.83], [6.42, 10.353, 0.83], 0.02, RT.glass, 14); box(6.46, 10.39, 0.9, 6.49, 10.43, 0.92, N9.black);
+    drum(6.8, 10.42, 0.745, 0.77, 0.07, 0.06, wood, 16); drum(6.8, 10.42, 0.77, 0.9, 0.012, 0.012, N9.black, 8);   /* the zoetrope: foot, spindle, drum */
+    drum(6.8, 10.42, 0.9, 0.97, 0.15, 0.15, N9.black, 24);
+    for (var zs = 0; zs < 18; zs++) { var za = zs / 18 * Math.PI * 2; drum(6.8 + 0.145 * Math.cos(za), 10.42 + 0.145 * Math.sin(za), 0.97, 1.06, 0.011, 0.011, N9.black, 4); }
+    ring([6.8, 10.42], 0.145, 0.006, N9.black, 18, function (x, y) { return [x, y, 1.06]; });
+    drum(7.15, 10.45, 0.745, 0.78, 0.065, 0.05, N9.black, 16); drum(7.15, 10.45, 0.78, 1.05, 0.012, 0.012, N9.black, 8);   /* the candlestick telephone */
+    drum(7.15, 10.45, 1.05, 1.1, 0.02, 0.036, N9.black, 14); rod([7.15, 10.45, 1.0], [7.2, 10.45, 1.0], 0.005, N9.brass, 6);
+    drum(7.2, 10.45, 0.9, 0.99, 0.018, 0.026, N9.black, 12); rod([7.18, 10.42, 0.77], [7.2, 10.45, 0.9], 0.004, N9.leather, 4);
+    drum(7.45, 10.45, 0.745, 0.78, 0.075, 0.06, N9.brass, 18); drum(7.45, 10.45, 0.78, 1.1, 0.012, 0.012, N9.brass, 8);   /* the lamp, its bulb dead */
+    drum(7.45, 10.45, 1.1, 1.14, 0.018, 0.038, RT.glass, 14); drum(7.45, 10.45, 1.14, 1.2, 0.038, 0.004, RT.glass, 14);
+    [6.05, 6.42, 6.8, 7.15, 7.45].forEach(function (xp) { box(xp - 0.04, 10.13, 0.745, xp + 0.04, 10.18, 0.755, N9.paper); });   /* the cards */
   }
 
   var owner = PLACE === 'staff-passage' ? 'staff-passage' : PLACE;
