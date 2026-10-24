@@ -730,7 +730,10 @@ shell.doors.forEach(function (d) {
 /* the wear (Godric's note on architect-knots-284-1013, 6.51 to 6.56 pm: "slightly worn from use by students over the
    decades"; the Architect's ledger, line 4): on every shut leaf, both faces, the wood rubbed paler and smoother where
    hands push it, by the free edge at the corridor door's lock height (about 1.0 m up), a scuffed foot paler toward
-   that edge, and the threshold dished paler down its middle. Low contrast, a grey shell's; they swing with the leaf */
+   that edge, and the threshold dished paler down its middle. Low contrast, a grey shell's; they swing with the leaf.
+   The 159th (Godric's 11.03 pm, 23 October 2026, Filch's door on his phone, "a horrible interfering"): each patch 8 mm
+   off its face (rule 6), the leaf's at 0.068 (its faces at 0.06), the dish 0.008 over the threshold's top (0.01);
+   they stood 0.5 and 1 mm off and fought on a phone's coarser depth from across a room */
 var wearTex = (function () {
   var c = document.createElement('canvas'); c.width = c.height = 64;
   var g = c.getContext('2d'), gr = g.createRadialGradient(32, 32, 2, 32, 32, 32);
@@ -748,15 +751,15 @@ shell.doors.forEach(function (d) {
   d.wear = [];
   [1, -1].forEach(function (f) {
     var hand = wearPatch(WEAR.hand.w, WEAR.hand.h, 0x7a7168, 0.5);
-    hand.position.set(half - WEAR.hand.in, -H / 2 + WEAR.hand.up, f * 0.0605);
+    hand.position.set(half - WEAR.hand.in, -H / 2 + WEAR.hand.up, f * 0.068);
     var foot = wearPatch(half * 2 * 0.8, WEAR.foot.h, 0x6f675f, 0.42);
-    foot.position.set(half * 0.15, -H / 2 + WEAR.foot.h * 0.42, f * 0.0605);
+    foot.position.set(half * 0.15, -H / 2 + WEAR.foot.h * 0.42, f * 0.068);
     [hand, foot].forEach(function (p) { if (f < 0) p.rotation.y = Math.PI; p.name = 'wear-' + d.id; d.mesh.add(p); d.wear.push(p); });
   });
   var sill = shell.group.getObjectByName(d.place + '-threshold-' + d.id);
   if (sill) {
     var dish = wearPatch(d.w * WEAR.sill.frac, 0.6, 0x8a837b, 0.45);
-    dish.rotation.x = -Math.PI / 2; dish.position.y = 0.011; dish.scale.y = 0.75;
+    dish.rotation.x = -Math.PI / 2; dish.position.y = 0.018; dish.scale.y = 0.75;
     dish.name = 'wear-sill-' + d.id; sill.add(dish);
   }
 });
