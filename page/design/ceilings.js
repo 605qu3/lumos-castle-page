@@ -166,6 +166,8 @@
   }
 
   /* oak beams across the short span on stone corbels, under the flat ceiling the shell keeps */
+  /* the Architect's 159th (Godric's 11.15 pm, 23 October 2026: "the corbel is in front of the door"): each piece tagged
+     userData.beam (and .end, -1 or 1, on a corbel, its face and wedge) so the shell can slide a beam clear of a door */
   function beams(THREE, Q, B, mats) {
     var G = new THREE.Group(), alongX = B.x1 - B.x0 >= B.z1 - B.z0, L = alongX ? B.x1 - B.x0 : B.z1 - B.z0;
     var span = alongX ? B.z1 - B.z0 : B.x1 - B.x0, top = B.y + Q.ceiling - Q.floor, n = Math.max(1, Math.round(L / BEAM_STEP));
@@ -174,17 +176,17 @@
     for (var i = 0; i < n; i++) {
       var t = (alongX ? B.x0 : B.z0) + (i + 0.5) * L / n, mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
       var b = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw, bd, span) : new THREE.BoxGeometry(span, bd, bw), mats.beam);
-      b.position.set(alongX ? t : mid, top - bd / 2, alongX ? mid : t); b.name = Q.id + '-beam-' + i; G.add(b);
+      b.position.set(alongX ? t : mid, top - bd / 2, alongX ? mid : t); b.name = Q.id + '-beam-' + i; b.userData.beam = i; b.userData.axis = alongX ? 'x' : 'z'; G.add(b);
       [-1, 1].forEach(function (s) {   /* a corbel each end, out from the wall under the beam */
         var c = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw + 0.08, ch, cl) : new THREE.BoxGeometry(cl, ch, bw + 0.08), mats.stone);
         var e = mid + s * (span / 2 - cl / 2);
-        c.position.set(alongX ? t : e, top - bd - ch / 2, alongX ? e : t); c.name = Q.id + '-corbel-' + i + (s < 0 ? 'a' : 'b'); G.add(c);
+        c.position.set(alongX ? t : e, top - bd - ch / 2, alongX ? e : t); c.name = Q.id + '-corbel-' + i + (s < 0 ? 'a' : 'b'); c.userData.beam = i; c.userData.end = s; c.userData.corbel = true; G.add(c);
         /* the head bows to the floor below, FACE_TILT, its chin 1 cm proud of its corbel's face to the room (Design's look at the
            Architect's corridor shot, 20 October 2026: square to the room, a face under the beams read edge-on from below) */
         var fh = ch - 0.02, f = face(THREE, Q.id, 2 * i + (s < 0 ? 0 : 1), fh), o = e - s * (cl / 2 + 0.01 + fh / 2 * Math.sin(FACE_TILT));
         f.position.set(alongX ? t : o, top - bd - ch / 2, alongX ? o : t); f.rotation.order = 'YXZ'; f.rotation.x = FACE_TILT;
-        f.rotation.y = alongX ? (s < 0 ? 0 : Math.PI) : -s * Math.PI / 2; G.add(f);
-        var w = wedge(THREE, fh * FACE_ASPECT, fh, FACE_TILT, mats.stone); w.position.copy(f.position); w.rotation.copy(f.rotation); G.add(w);
+        f.rotation.y = alongX ? (s < 0 ? 0 : Math.PI) : -s * Math.PI / 2; f.userData.beam = i; f.userData.end = s; G.add(f);
+        var w = wedge(THREE, fh * FACE_ASPECT, fh, FACE_TILT, mats.stone); w.position.copy(f.position); w.rotation.copy(f.rotation); w.userData.beam = i; w.userData.end = s; G.add(w);
       });
     }
     corbels(Q.id, 'awake');

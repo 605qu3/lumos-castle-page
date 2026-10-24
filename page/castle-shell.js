@@ -689,6 +689,53 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (!e) return;
       gaps[e.i].push({ s0: e.s - ft.w / 2, s1: e.s + ft.w / 2, sill: ft.sill || 0, h: Math.min(H, (ft.h || 2.2) + (ft.sill || 0)), op: ft, niche: true });
     });
+    /* v78 (the Architect's 159th; Godric's 11.15 pm, 23 October 2026, Filch's office: "the corbel is in front of the
+       door"): a beam's corbels hang from 0.78 under the ceiling, so in a low room one landing over an opening stood
+       across its head. Each beam whose corbel meets an opening (its reveal 0.1 wider each side, up to 5 cm over its
+       head) slides along the room, at most 0.45 of the beams' spacing, till both its corbels clear; where none clears,
+       that corbel, its face and wedge go, the beam bearing straight into the wall over the head. out.corbelsCleared
+       lists them (and group.userData.corbelsCleared; corbelOps the openings it read, for checks) */
+    if (CV && CV.beams && CV.group) {
+      var base = toLocal(mx, my, Q.floor).y, OPS = [];
+      gaps.forEach(function (gs, i) { gs.forEach(function (g) {
+        if (g.spill) return;
+        var a = E[i].a, b = E[i].b, L = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / L, uy = (b[1] - a[1]) / L;
+        var p0 = toLocal(a[0] + ux * (g.s0 - 0.1), a[1] + uy * (g.s0 - 0.1), Q.floor), p1 = toLocal(a[0] + ux * (g.s1 + 0.1), a[1] + uy * (g.s1 + 0.1), Q.floor);
+        OPS.push({ p0: p0, p1: p1, head: g.h + 0.05, sill: g.sill, id: g.op && g.op.id });
+      }); });
+      var kids = CV.group.children, beamsN = kids.filter(function (o) { return o.userData.beam != null && !o.userData.corbel && o.userData.end == null; });
+      var step = beamsN.length > 1 ? Math.abs((beamsN[1].position[beamsN[0].userData.axis] - beamsN[0].position[beamsN[0].userData.axis])) : 1.2;
+      var hits = function (c, ax, d) {   /* the openings a corbel shifted d along ax meets */
+        var bx = new THREE.Box3().setFromObject(c); bx.min[ax] += d; bx.max[ax] += d;
+        return OPS.filter(function (o) {
+          if (bx.min.y - base > o.head || bx.max.y - base < o.sill) return false;
+          for (var t = 0; t <= 1.0001; t += 0.05) {
+            var x = o.p0.x + (o.p1.x - o.p0.x) * t, z = o.p0.z + (o.p1.z - o.p0.z) * t;
+            if (x > bx.min.x - 0.02 && x < bx.max.x + 0.02 && z > bx.min.z - 0.02 && z < bx.max.z + 0.02) return true;
+          }
+          return false;
+        });
+      };
+      var cleared = { moved: 0, dropped: 0, ids: [] };
+      beamsN.forEach(function (bm) {
+        var i = bm.userData.beam, ax = bm.userData.axis, parts = kids.filter(function (o) { return o.userData.beam === i; });
+        var cs = parts.filter(function (o) { return o.userData.corbel; });
+        var bad = cs.filter(function (c) { return hits(c, ax, 0).length; });
+        if (!bad.length) return;
+        var ids = bad.map(function (c) { return hits(c, ax, 0).map(function (o) { return o.id; }).join('+'); }).join(',');
+        var best = null;
+        for (var k = 1; k * 0.05 <= step * 0.45 + 1e-6 && best == null; k++) {
+          [k * 0.05, -k * 0.05].forEach(function (d) { if (best == null && cs.every(function (c) { return !hits(c, ax, d).length; })) best = d; });
+        }
+        if (best != null) { parts.forEach(function (o) { o.position[ax] += best; }); cleared.moved++; cleared.ids.push(Q.id + ' beam ' + i + ' ' + (best > 0 ? '+' : '') + best.toFixed(2) + ' (' + ids + ')'); }
+        else bad.forEach(function (c) {
+          parts.filter(function (o) { return o.userData.end === c.userData.end; }).forEach(function (o) { CV.group.remove(o); });
+          cleared.dropped++; cleared.ids.push(Q.id + ' corbel ' + c.name + ' dropped (' + ids + ')');
+        });
+      });
+      group.userData.corbelOps = OPS.map(function (o) { return [o.id, o.p0.x.toFixed(2), o.p0.z.toFixed(2), o.p1.x.toFixed(2), o.p1.z.toFixed(2), o.sill, o.head.toFixed(2)].join(" "); });
+      out.corbelsCleared = group.userData.corbelsCleared = (out.corbelsCleared || []).concat(cleared.ids);
+    }
     /* v47 (Godric's 1 on design-panelling-staff-1021, 20 October 2026, 10.07 pm, "carved, to the cornice"): a panelled
        room's oak panelling, Design's kit (page/design/panelling.js) at grade 2, tudor or, in a late-pale room, fielded;
        it stops under the vault's springing, else at the ceiling. It stops at every opening this wall cut (doors, windows,
