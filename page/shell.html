@@ -168,7 +168,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="shell-w5b.js?v=17"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=5"></script>
-<script src="shell-w5a.js?v=21"></script>
+<script src="shell-w5a.js?v=22"></script>
 <script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=2"></script>
 <script src="castle-sky.js?v=1"></script>
@@ -2567,6 +2567,21 @@ var MIRROR_ARMOUR = (function () {
   pl.raycast = function () {}; shell.group.add(pl);
   var s = CastleSuit.make(THREE, renderer, { kind: 'tall', src: '../assets/layers/corridor-armour.png' });
   s.group.position.copy(at); s.group.position.y += H; s.group.rotation.y = Math.atan2(west.x, west.z); s.group.name = 'mirror-armour';
+  s.onReady(function () { s.light(HOUR >= 21 || HOUR < 6 ? 1 : HOUR >= 18 ? 0.5 : 0); s.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); });
+  shell.group.add(s.group);
+  return s;
+})();
+/* the West armoury's headless suit, "a suit of armour with no head, on a wooden stand, facing the middle, waiting for
+   one" (H13, docs/interiors/hidden-ways-batch-3.md): the round 3 suit's headless kind (Corridor's suit.js), which
+   brings its own 0.6 stand, on bearing 165 from the drum's middle (0, 72), its origin at r 4.45 so the stand runs
+   r 4.15 to 4.75, its back 5 cm off the round wall (r 4.8), turned to face the middle. It replaces the old box suit
+   in shell-w5a.js. Lit inside by the hour as the gallery's; no tap lands on it (the 156th) */
+var HEADLESS_SUIT = (function () {
+  if (PLACE !== 'west-armoury' || !window.CastleSuit) return null;
+  var z0 = shell.place.floor, b = 165 * Math.PI / 180, r = 4.45;
+  var at = shell.toLocal(r * Math.sin(b), 72 + r * Math.cos(b), z0), mid = shell.toLocal(0, 72, z0).sub(at);
+  var s = CastleSuit.make(THREE, renderer, { kind: 'headless', src: '../assets/layers/corridor-armour.png' });
+  s.group.position.copy(at); s.group.rotation.y = Math.atan2(mid.x, mid.z); s.group.name = 'west-armoury-headless-suit';
   s.onReady(function () { s.light(HOUR >= 21 || HOUR < 6 ? 1 : HOUR >= 18 ? 0.5 : 0); s.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); });
   shell.group.add(s.group);
   return s;
