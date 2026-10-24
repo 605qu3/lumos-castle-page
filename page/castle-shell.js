@@ -505,9 +505,31 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          out as if the corbels were piers, then each pier gives way to a corbel bearing 2 cm into its wall */
       if (VB && VB.corbels && !(VB.piers || []).length)
         QC = Object.assign({}, Q, { rec: Object.assign({}, Q.rec, { vault: Object.assign({}, VB, { piers: VB.corbels }) }) });
+      /* v79 (the Architect's 159th, for Godric's card on the classrooms' beams; o.bays 'piers', the page's ?bays=piers):
+         a beamed room whose long walls carry windows at one even pitch takes its beams on the piers between them, at
+         that pitch on out toward the end walls while 0.6 clear of them, so each window stands in the middle of its bay */
+      if (o.bays === 'piers' && row.ceiling === 'beams' && Q.poly.length === 4 && !(VB && VB.kind && VB.kind !== 'beams')) {
+        var bAx = (x1 - x0) >= (y1 - y0), wins = [];
+        (M.openings || []).forEach(function (op) {
+          if (!op.at || !/window/.test(op.kind || '') || !((op.between || []).indexOf(Q.id) >= 0 || op.room === Q.id)) return;
+          var onLong = bAx ? Math.min(Math.abs(op.at[1] - y0), Math.abs(op.at[1] - y1)) < 1.2 : Math.min(Math.abs(op.at[0] - x0), Math.abs(op.at[0] - x1)) < 1.2;
+          if (!onLong) return;
+          var lp = toLocal(op.at[0], op.at[1], Q.floor), v = bAx ? lp.x : lp.z;
+          if (!wins.some(function (w) { return Math.abs(w - v) < 0.05; })) wins.push(v);
+        });
+        wins.sort(function (a, b) { return a - b; });
+        var pit = wins.length > 1 ? wins[1] - wins[0] : 0, even = pit > 1.5 && wins.every(function (w, k) { return !k || Math.abs(w - wins[k - 1] - pit) < 0.05; });
+        if (even) {
+          var c0 = toLocal(x0, y1, Q.floor), c1 = toLocal(x1, y0, Q.floor), lo = Math.min(bAx ? c0.x : c0.z, bAx ? c1.x : c1.z), hi = Math.max(bAx ? c0.x : c0.z, bAx ? c1.x : c1.z);
+          var at = [], p0 = wins[0] + pit / 2;
+          while (p0 - pit >= lo + 0.6) p0 -= pit;
+          for (var pb = p0; pb <= hi - 0.6; pb += pit) at.push(pb);
+          if (at.length) QC = Object.assign({}, QC, { beamsAt: at });
+        }
+      }
       CV = window.CastleCeilings.forPlace(THREE, QC, { toLocal: toLocal, kind: row.ceiling,
         mats: { vault: mats.ceil, stone: stoneM, beam: paintMat(tone('oak-beams'), true) } });
-      if (CV && QC !== Q) {
+      if (CV && QC !== Q && VB && VB.corbels) {
         CV.group.children.filter(function (o) { return o.name.indexOf(Q.id + '-pier-') === 0; }).forEach(function (o) { CV.group.remove(o); });
         VB.corbels.forEach(function (p, k) {
           var onX = Math.abs(p[0] - x0) < 0.05 || Math.abs(p[0] - x1) < 0.05, n = onX ? Math.sign(mx - p[0]) : Math.sign(my - p[1]);

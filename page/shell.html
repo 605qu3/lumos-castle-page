@@ -158,13 +158,13 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-paint.js?v=108"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
-<script src="design/ceilings.js?v=5"></script>
+<script src="design/ceilings.js?v=6"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=1"></script>
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
-<script src="castle-shell.js?v=78"></script>
+<script src="castle-shell.js?v=79"></script>
 <script src="shell-w5b.js?v=18"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -308,7 +308,7 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
   'decoy-cupboard-5', 'true-hide-5', 'accounts-room-3',
   'sun-hide-g', 'bindery-way-2', 'seat-den-3']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar') }) : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') }) : null;
 if (!shell) { kit.helpEl.hidden = false; kit.helpEl.textContent = 'No such place in the castle model: ' + PLACE; return; }
 scene.add(shell.group);
 document.title = shell.place.name + ', a shell';

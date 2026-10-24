@@ -167,14 +167,15 @@
 
   /* oak beams across the short span on stone corbels, under the flat ceiling the shell keeps */
   /* the Architect's 159th (Godric's 11.15 pm, 23 October 2026: "the corbel is in front of the door"): each piece tagged
-     userData.beam (and .end, -1 or 1, on a corbel, its face and wedge) so the shell can slide a beam clear of a door */
+     userData.beam (and .end, -1 or 1, on a corbel, its face and wedge) so the shell can slide a beam clear of a door;
+     Q.beamsAt, where the shell gives it, the beams' own places along the room (local), in place of the even step */
   function beams(THREE, Q, B, mats) {
     var G = new THREE.Group(), alongX = B.x1 - B.x0 >= B.z1 - B.z0, L = alongX ? B.x1 - B.x0 : B.z1 - B.z0;
-    var span = alongX ? B.z1 - B.z0 : B.x1 - B.x0, top = B.y + Q.ceiling - Q.floor, n = Math.max(1, Math.round(L / BEAM_STEP));
+    var span = alongX ? B.z1 - B.z0 : B.x1 - B.x0, top = B.y + Q.ceiling - Q.floor, n = Q.beamsAt ? Q.beamsAt.length : Math.max(1, Math.round(L / BEAM_STEP));
     var bw = 0.28, bd = 0.36, cl = 0.42, ch = 0.42;
     faceSets[Q.id] = [];
     for (var i = 0; i < n; i++) {
-      var t = (alongX ? B.x0 : B.z0) + (i + 0.5) * L / n, mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
+      var t = Q.beamsAt ? Q.beamsAt[i] : (alongX ? B.x0 : B.z0) + (i + 0.5) * L / n, mid = alongX ? (B.z0 + B.z1) / 2 : (B.x0 + B.x1) / 2;
       var b = new THREE.Mesh(alongX ? new THREE.BoxGeometry(bw, bd, span) : new THREE.BoxGeometry(span, bd, bw), mats.beam);
       b.position.set(alongX ? t : mid, top - bd / 2, alongX ? mid : t); b.name = Q.id + '-beam-' + i; b.userData.beam = i; b.userData.axis = alongX ? 'x' : 'z'; G.add(b);
       [-1, 1].forEach(function (s) {   /* a corbel each end, out from the wall under the beam */
