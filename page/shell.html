@@ -167,7 +167,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-shell.js?v=77"></script>
 <script src="shell-w5b.js?v=17"></script>
 <script src="depth-ties.js?v=1"></script>
-<script src="corridor/suit.js?v=5"></script>
+<script src="corridor/suit.js?v=6"></script>
 <script src="shell-w5a.js?v=22"></script>
 <script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=2"></script>
@@ -2530,13 +2530,13 @@ var IRONWORK = (function () {
    stone plinth 0.7 by 0.7, 0.3 high, its back 5 cm off its wall (west x 5.05 to 5.75, east x 10.25 to 10.95), the suit
    on its middle facing across the aisle, at 3 m centres from y 47 to 68, the east's 59 left for the tapestry; the west's 62 held,
    its plinth across west-stair-foot-3-door (y 60.9 to 62.1), on interiors-armour-gallery-door-1023 (req 1060). The kinds
-   Corridor has built stand in their places; the seven still drawn for Godric (the Gothic, the jousting armour, the
-   Maximilian, the tilt, the sword, the cuirassier, the Gothic with its visor raised) stand as the default till his picks
-   land. Lit inside by night, as the corridor's (s.light). No tap lands on them. */
+   Corridor has built stand in their places, the seven drawn on Godric's picks among them (suit.js v6, 22153ec0; the
+   slots docs/notes/2026-10-23-armour-varieties.md's), each weapon in its own drawing (his "The mace is floating in space",
+   10.30 pm, 23 October 2026). Lit inside by night, as the corridor's (s.light). No tap lands on them. */
 var GALLERY = (function () {
   if (PLACE !== 'armour-gallery' || !window.CastleSuit) return null;
-  var ROWS = [[47, 'default', 'tudor'], [50, 'default', 'three-quarter'], [53, 'default', 'black-and-white'], [56, 'boy', 'default'],
-    [59, 'mace', null], [62, null, 'default'], [65, 'default', 'munition'], [68, 'default', 'shield']];
+  var ROWS = [[47, 'gothic', 'tudor'], [50, 'jousting', 'three-quarter'], [53, 'maximilian', 'black-and-white'], [56, 'boy', 'cuirassier'],
+    [59, 'mace', null], [62, null, 'gothic-visor'], [65, 'tilt', 'munition'], [68, 'sword', 'shield']];
   var z0 = shell.place.floor, H = 0.3, stone = kit.solid(0x7d7973), out = { suits: [] };
   var k = HOUR >= 21 || HOUR < 6 ? 1 : HOUR >= 18 ? 0.5 : 0;
   function stand(cx, y, face, kind) {   /* face +1: on the west wall, facing east */
