@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The castle's suits</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #names { position: fixed; left: 0; right: 0; bottom: 10px; display: flex; justify-content: space-around; font: 13px Georgia, serif; color: #e8e0d0; pointer-events: none; }
+  #stats { position: fixed; left: 8px; top: 8px; font: 12px monospace; color: #aaa; }
+</style>
+</head>
+<body>
+<!-- the castle's suits of armour side by side (page/corridor/suit.js, the kinds made by code; Godric's answer of
+     23 October 2026, 7.14 pm, on corridor-armour-gallery-1023). ?view=45 or ?view=side turns them; ?night=1 the
+     torches' light; ?kinds=a,b picks which. A look for the eye, not a room. -->
+<canvas id="c"></canvas>
+<div id="names"></div>
+<div id="stats">starting</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="suit.js?v=4"></script>
+<script>
+(function () {
+  var Q = new URLSearchParams(location.search), night = Q.get('night') === '1', view = Q.get('view') || 'front';
+  var kinds = (Q.get('kinds') || Object.keys(CastleSuit.KINDS).join(',')).split(',');
+  var canvas = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b0a09);
+  function col(h) { return new THREE.Color(h).convertSRGBToLinear(); }
+  var gap = 0.9, n = kinds.length, span = (n - 1) * gap;
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(span + 4, 4), new THREE.MeshStandardMaterial({ color: col(night ? 0x4a4038 : 0x9a9084), roughness: 0.9 }));
+  floor.rotation.x = -Math.PI / 2; scene.add(floor);
+  var wall = new THREE.Mesh(new THREE.PlaneGeometry(span + 4, 4), new THREE.MeshStandardMaterial({ color: col(night ? 0x5a4c40 : 0xb8b0a4), roughness: 0.95 }));
+  wall.position.set(0, 2, -0.2); scene.add(wall);   /* each suit's back 5 cm off it */
+  scene.add(new THREE.HemisphereLight(col(night ? 0x6a5040 : 0xdfe6ee), col(night ? 0x201812 : 0x5a5048), night ? 0.5 : 1.0));
+  var key = new THREE.DirectionalLight(col(night ? 0xffb070 : 0xfff6ea), night ? 1.1 : 1.6); key.position.set(-2, 3, 3); scene.add(key);
+  var names = document.getElementById('names'), suits = [];
+  kinds.forEach(function (k, i) {
+    var s = CastleSuit.make(THREE, renderer, { kind: k, src: '../../assets/layers/corridor-armour.png' });
+    s.group.position.set(-span / 2 + i * gap, 0, -0.2 + s.back + 0.05);
+    scene.add(s.group); suits.push(s);
+    var d = document.createElement('div'); d.textContent = k; names.appendChild(d);
+  });
+  var cam = new THREE.PerspectiveCamera(30, 1, 0.1, 60), dist = Math.max(4.5, span * 1.25), a = view === '45' ? Math.PI / 4 : view === 'side' ? Math.PI / 2 * 0.92 : 0;
+  cam.position.set(Math.sin(a) * dist, 1.2, Math.cos(a) * dist); cam.lookAt(0, 1.0, 0);
+  function size() { var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+  addEventListener('resize', size); size();
+  var frames = 0, t0 = performance.now(), stats = document.getElementById('stats');
+  (function loop() {
+    suits.forEach(function (s) { s.light(night ? 1 : 0); });
+    renderer.render(scene, cam); frames++;
+    var t = performance.now(); if (t - t0 > 1000) { stats.textContent = Math.round(frames * 1000 / (t - t0)) + ' fps, ' + renderer.info.render.calls + ' draw calls'; frames = 0; t0 = t; }
+    requestAnimationFrame(loop);
+  })();
+  window.lumosSuits = { suits: suits, ready: function () { return suits.every(function (s) { return s.ready; }); } };
+})();
+</script>
+</body>
+</html>

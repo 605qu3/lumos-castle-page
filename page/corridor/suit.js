@@ -95,22 +95,29 @@
     var PX = 1369, ROW = 8, SEG = 28, FOOT = 2468;
     function pole(py) { return 208 + 0.0317 * (py - 1100); }   /* the shaft's middle in the drawing, leaning out a little */
     var POLE_R = 26, HEAD = { x: 400, y: 560 };                 /* the band cut for the shaft; the box round its head */
+    var FIST = [904, 1056];                                      /* the gauntlet's rows across the shaft */
     var CAPS = [[0, 0.09], [0.08, 0.065], [0.5, 0.065], [0.58, 0.085], [0.85, 0.085], [0.95, 0.13], [1.05, 0.13], [1.15, 0.15], [1.3, 0.15], [1.42, 0.125], [1.48, 0.115], [9, 0.125]];
     function depth(ym) { for (var i = 1; i < CAPS.length; i++) if (ym <= CAPS[i][0]) { var a = CAPS[i - 1], b = CAPS[i]; return a[1] + (b[1] - a[1]) * (ym - a[0]) / (b[0] - a[0]); } return 0.125; }
     var env = hallEnv(), steelMap = tex(steelCanvas(false)); steelMap.wrapS = steelMap.wrapT = THREE.RepeatWrapping;
-    function blendMat() {   /* the drawing where wd is 1, the steel where it is 0 */
-      var m = new THREE.MeshStandardMaterial({ color: 0xffffff, envMap: env });
+    /* a look (LOOKS) changes the steel's colour and shine and nothing else; the default's shader is left as it was */
+    function blendMat(look) {   /* the drawing where wd is 1, the steel where it is 0 */
+      var m = new THREE.MeshStandardMaterial({ color: 0xffffff, envMap: env }), L = look && LOOKS[look];
+      function f(v) { return (+v).toFixed(3); }
+      m.userData.env = L ? L.env : 1;
+      if (L) m.customProgramCacheKey = function () { return 'castle-suit-' + look; };   /* three caches a program by its onBeforeCompile's text, the same for every look */
       m.onBeforeCompile = function (sh) {
         sh.uniforms.steelMap = { value: steelMap };
-        sh.vertexShader = 'attribute float wd;\nattribute vec2 uvS;\nvarying float vWd;\nvarying vec2 vUvS;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvWd = wd; vUvS = uvS;');
-        sh.fragmentShader = 'uniform sampler2D steelMap;\nvarying float vWd;\nvarying vec2 vUvS;\n' + sh.fragmentShader
-          .replace('#include <map_fragment>', 'vec4 tD = mapTexelToLinear(texture2D(map, vUv)); vec4 tS = mapTexelToLinear(texture2D(steelMap, vUvS));\ndiffuseColor.rgb *= mix(tS.rgb * vec3(0.84, 0.86, 0.9), tD.rgb, 0.6 + 0.4 * vWd);')
-          .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = mix(0.6, 0.15, vWd);')
-          .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = mix(0.36, 0.5, vWd);');
+        sh.vertexShader = 'attribute float wd;\nattribute vec2 uvS;\nvarying float vWd;\nvarying vec2 vUvS;\n' + (L ? 'varying vec3 vPo;\n' : '') + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvWd = wd; vUvS = uvS;' + (L ? ' vPo = position;' : ''));
+        var look = !L ? '' : '\nfloat lum = dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)); diffuseColor.rgb = mix(vec3(lum), diffuseColor.rgb, ' + f(L.sat) + ') * vec3(' + L.tint.map(f).join(', ') + ');' +
+          (L.bands ? '\nfloat band = smoothstep(0.52, 0.62, abs(fract(vPo.x / 0.09 + 0.5) - 0.5) * 2.0); diffuseColor.rgb *= 1.0 - 0.72 * band;' : '');
+        sh.fragmentShader = 'uniform sampler2D steelMap;\nvarying float vWd;\nvarying vec2 vUvS;\n' + (L ? 'varying vec3 vPo;\n' : '') + sh.fragmentShader
+          .replace('#include <map_fragment>', 'vec4 tD = mapTexelToLinear(texture2D(map, vUv)); vec4 tS = mapTexelToLinear(texture2D(steelMap, vUvS));\ndiffuseColor.rgb *= mix(tS.rgb * vec3(0.84, 0.86, 0.9), tD.rgb, 0.6 + 0.4 * vWd);' + look)
+          .replace('#include <metalnessmap_fragment>', 'float metalnessFactor = mix(0.6, 0.15, vWd)' + (L ? ' * ' + f(L.metal) : '') + ';')
+          .replace('#include <roughnessmap_fragment>', 'float roughnessFactor = mix(0.36, 0.5, vWd)' + (L ? ' + ' + f(L.rough) + (L.bands ? ' + 0.25 * band' : '') : '') + ';');
       };
       return m;
     }
-    var mat = blendMat(), mats = [mat], out = { mats: mats, parts: null, waiters: [] };
+    var mat = blendMat(), mats = [mat], out = { mats: mats, ready: false, waiters: [] };
     var ink = new THREE.MeshBasicMaterial({ color: 0x16120e, side: THREE.BackSide });
     ink.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0068;'); };
     var im = new Image();
@@ -226,18 +233,103 @@
       for (py = 150; py <= 2440; py += ROW) shaft.push([py, [[pole(py) - 22, pole(py) + 22, 22 / PX]]]);
       mat.map = tex(im); mat.needsUpdate = true;
       var poleMat = blendMat(); poleMat.map = mat.map; mats.push(poleMat);
-      var parts = [];
-      [[build(rows, false), mat], [build(shaft, true), poleMat]].forEach(function (p) {
-        parts.push({ geo: p[0], mat: p[1], name: 'armour-hybrid' }, { geo: p[0], mat: ink, name: 'armour-hybrid-ink' });
-      });
       var hc = makeCanvas(HEAD.x, HEAD.y); hc.getContext('2d').drawImage(im, 0, 0, HEAD.x, HEAD.y, 0, 0, HEAD.x, HEAD.y);
       var bladeMat = new THREE.MeshStandardMaterial({ map: tex(hc), alphaTest: 0.5, side: THREE.DoubleSide, metalness: 0.3, roughness: 0.45, envMap: env });
-      parts.push({ geo: new THREE.PlaneGeometry(HEAD.x / PX, HEAD.y / PX), mat: bladeMat, name: 'armour-hybrid-blade', at: [(HEAD.x / 2 - W / 2) / PX, (H - HEAD.y / 2) / PX, 0] });
       mats.push(bladeMat);
-      out.parts = parts; out.waiters.splice(0).forEach(function (f) { f(); });
+      /* each kind's pieces (KINDS), every geometry and look built once, at its first asking. The trunk cut where the kind
+         says (rows between two heights of the drawing, py), capped at the cut as a limb's end is; the shaft whole (the
+         halberd's), from below its head (the pike's), or only through the fist (no weapon: the fingers are drawn on that
+         piece of the shaft, so the hand stays a closed fist) */
+      var geos = {}, looks = {};
+      function once(k, f) { return geos[k] || (geos[k] = f()); }
+      function lookMats(name) {
+        if (!name) return [mat, poleMat];
+        return looks[name] || (looks[name] = (function () { var a = blendMat(name); a.map = mat.map; return [a]; })());   /* the shaft keeps the default's, so its wood stays wood */
+      }
+      out.parts = function (K) {
+        var ms = lookMats(K.look), cut = K.cut || [0, FOOT], p = [];
+        var trunk = once('trunk:' + cut, function () { return build(rows.filter(function (r) { return r[0] >= cut[0] && r[0] <= cut[1]; }), false); });
+        var sh = K.weapon === 'pike' ? [HEAD.y, 2440] : K.weapon && K.weapon !== 'halberd' ? FIST : [150, 2440];
+        var pole = once('shaft:' + sh, function () { return build(shaft.filter(function (r) { return r[0] >= sh[0] && r[0] <= sh[1]; }), true); });
+        p.push({ geo: trunk, mat: ms[0], name: 'armour-hybrid' }, { geo: trunk, mat: ink, name: 'armour-hybrid-ink' },
+               { geo: pole, mat: poleMat, name: 'armour-hybrid-shaft' }, { geo: pole, mat: ink, name: 'armour-hybrid-ink' });
+        if (!K.weapon || K.weapon === 'halberd')
+          p.push({ geo: once('blade', function () { return new THREE.PlaneGeometry(HEAD.x / PX, HEAD.y / PX); }), mat: bladeMat, name: 'armour-hybrid-blade', at: [(HEAD.x / 2 - W / 2) / PX, (H - HEAD.y / 2) / PX, 0] });
+        return p;
+      };
+      out.at = function (py) { return [(pole(py) - W / 2) / PX, (H - py) / PX]; };   /* the shaft's middle at a row, metres */
+      out.ink = ink; out.env = env;
+      out.ready = true; out.waiters.splice(0).forEach(function (f) { f(); });
     };
     im.src = src;
     return out;
+  }
+  /* the steel's looks: sat (1 the drawing's colour, 0 grey), tint, metal (times the default's), rough (added), env (the
+     mirror's share) and bands (black-and-white's blackened strips, about 4 cm in each 9, down the suit) */
+  var LOOKS = {
+    grey: { sat: 0, tint: [0.7, 0.72, 0.75], metal: 0.7, rough: 0.2, env: 0.4 },
+    munition: { sat: 0.5, tint: [0.64, 0.6, 0.55], metal: 0.5, rough: 0.32, env: 0.25 },
+    bands: { sat: 1, tint: [1, 1, 1], metal: 1, rough: 0, env: 1, bands: true }
+  };
+  /* the kinds made from the one drawing by code (docs/notes/2026-10-23-armour-varieties.md; Godric's answer of 7.14 pm
+     on corridor-armour-gallery-1023, "the suit we designed as the standard default, but where we know that there are
+     varieties we need to create that variety"; built on Fawkes's word of 7.51 pm, nothing spent). scale is the whole
+     suit's (feet, depth and all); cut the drawing's rows kept (py, 0 its top to 2468 its soles); weapon halberd, pike,
+     mace or none; shield; stand (the armoury's) or post (the three-quarter's); look (LOOKS). The seven that need a new
+     shape (corridor-armour-seven-1023) wait on Godric's card and stand as the default until then */
+  var KINDS = {
+    default: { what: 'plain steel, a halberd: every corridor, the stair hall, the gallery\'s y 62' },
+    boy: { what: 'a boy\'s suit, for a page of about twelve, 1.45 tall (the gallery, west y 56)', scale: 1.45 / 1.70 },
+    tall: { what: '"a tall suit of armor" (PS 12 L4250; the library corridor\'s mirror-armour)', scale: 1.1 },
+    mace: { what: 'a mace hung at its belt (the gallery, west y 59)', weapon: 'mace' },
+    tudor: { what: 'Tudor field armour, plain steel gone grey (the gallery, east y 47)', look: 'grey' },
+    'three-quarter': { what: 'three-quarter armour, no legs below the knee, a pike upright (the gallery, east y 50)', cut: [0, 1783], weapon: 'pike', post: true },
+    'black-and-white': { what: 'black-and-white, the bands left dark (the gallery, east y 53)', look: 'bands' },
+    munition: { what: 'a plain munition suit, the cheapest in the row (the gallery, east y 65)', look: 'munition' },
+    shield: { what: 'a shield of no arms, painted plain (the gallery, east y 68)', weapon: 'none', shield: true },
+    headless: { what: 'a suit with no head, on a wooden stand, waiting for one (the West armoury)', cut: [496, 2468], weapon: 'none', stand: true }
+  };
+  var STAND = 0.06;   /* the armoury stand's board */
+  function extras(K, S, g, add) {   /* the pieces built in code: plain shapes in the shell's way, the ink round the larger */
+    var steel = new THREE.MeshStandardMaterial({ color: col(0xb4b8be), metalness: 0.6, roughness: 0.38, envMap: S.env });
+    var wood = new THREE.MeshStandardMaterial({ color: col(0x4a3c31), roughness: 0.75 });
+    if (K.weapon === 'pike') {   /* the shaft carried on up past the halberd's head, leaning as it leans, to a leaf-shaped head */
+      var a = S.at(560), lean = 0.0317, top = 2.2, len = top - a[1];
+      var ext = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, len, 10), wood);
+      ext.position.set(a[0] - lean * len / 2, a[1] + len / 2, 0); ext.rotation.z = lean; add(ext, 'armour-pike-shaft');
+      var head = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.28, 4), steel); head.scale.z = 0.35;
+      head.position.set(a[0] - lean * (len + 0.14), top + 0.14, 0); head.rotation.z = lean; add(head, 'armour-pike-head');
+      var sock = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.018, 0.08, 10), steel);
+      sock.position.set(a[0] - lean * len, top - 0.02, 0); add(sock, 'armour-pike-socket');
+    }
+    if (K.weapon === 'mace') {   /* hung head down from the belt at the right hip, by a ring */
+      var m = new THREE.Group(); m.position.set(-0.2, 0, 0.06);
+      var haft = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.46, 8), wood); haft.position.y = 0.77; m.add(haft);
+      var ring = new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.005, 6, 12), steel); ring.position.y = 1.015; m.add(ring);
+      var hd = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.16, 8), steel); hd.position.y = 0.5; m.add(hd);
+      for (var i = 0; i < 6; i++) {   /* the flanges */
+        var fl = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.14, 0.05), steel), t = i / 6 * Math.PI * 2;
+        fl.position.set(Math.sin(t) * 0.06, 0.5, Math.cos(t) * 0.06); fl.rotation.y = t; m.add(fl);
+      }
+      var knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), steel); knob.position.y = 0.41; m.add(knob);
+      add(m, 'armour-mace');
+    }
+    if (K.shield) {   /* a heater shield on the left forearm, painted one plain colour, no arms on it */
+      var sp = new THREE.Shape(), w = 0.21, h = 0.52;
+      sp.moveTo(-w, 0); sp.lineTo(w, 0); sp.lineTo(w, -0.2); sp.quadraticCurveTo(w, -0.4, 0, -h); sp.quadraticCurveTo(-w, -0.4, -w, -0.2); sp.lineTo(-w, 0);
+      var sg = new THREE.ExtrudeGeometry(sp, { depth: 0.018, bevelEnabled: true, bevelThickness: 0.006, bevelSize: 0.008, bevelSegments: 2, curveSegments: 10 });
+      var paint = new THREE.MeshStandardMaterial({ color: col(0x6e3b2f), roughness: 0.7, metalness: 0.05 });
+      var sh = new THREE.Mesh(sg, paint); sh.position.set(0.3, 1.28, 0.09); sh.rotation.y = -0.12; add(sh, 'armour-shield');
+      var si = new THREE.Mesh(sg, S.ink); sh.add(si); si.name = 'armour-hybrid-ink';
+    }
+    if (K.post) {   /* what holds a suit with no lower legs: a post up into it, on a small square foot */
+      var post = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.95, 10), wood); post.position.set(0, 0.475, 0); add(post, 'armour-post');
+      var ft = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.04, 0.3), wood); ft.position.set(0, 0.02, 0); add(ft, 'armour-post-foot');
+    }
+    if (K.stand) {   /* the armoury's stand: a board 0.6 square it stands on, and the post that would carry its head */
+      var bd = new THREE.Mesh(new THREE.BoxGeometry(0.6, STAND, 0.6), wood); bd.position.set(0, STAND / 2, 0); add(bd, 'armour-stand', true);
+      var nk = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.035, 0.3, 10), wood); nk.position.set(0, 1.3 + 0.15, 0); add(nk, 'armour-stand-neck');
+    }
   }
   function shadowMat() {
     var sc = makeCanvas(64, 64), sg = sc.getContext('2d'), grd = sg.createRadialGradient(32, 32, 6, 32, 32, 32);
@@ -248,28 +340,34 @@
   function make(T, r, opts) {
     opts = opts || {};
     THREE = T; renderer = r || renderer;
-    var src = opts.src || '../assets/layers/corridor-armour.png';
+    var src = opts.src || '../assets/layers/corridor-armour.png', kind = opts.kind || 'default', K = KINDS[kind];
+    if (!K) throw new Error('CastleSuit: no kind ' + kind + ' (' + Object.keys(KINDS).join(', ') + ')');
     var S = cache[src] || (cache[src] = shared(src)), g = new THREE.Group(), waiting = [];
-    var suit = { group: g, mats: S.mats, body: null, ready: false,
+    var sc = K.scale || 1, inner = new THREE.Group(); inner.scale.setScalar(sc); if (K.stand) inner.position.y = STAND; g.add(inner);
+    var suit = { group: g, kind: kind, mats: [], body: null, ready: false,
+      back: K.stand ? 0.3 : 0.15 * sc,   /* metres behind the origin to its back: stand that far, and 5 cm, off its wall */
       onReady: function (f) { if (suit.ready) f(suit); else waiting.push(f); },
       light: function (k, bounce) {
         var b = bounce === undefined ? 0.35 : bounce;
-        S.mats.forEach(function (m) { m.emissive.copy(col(0xffb070)).multiplyScalar(b * 0.12 * k); m.envMapIntensity = 1 - 0.65 * k; });
+        suit.mats.forEach(function (m) { m.emissive.copy(col(0xffb070)).multiplyScalar(b * 0.12 * k); m.envMapIntensity = (m.userData.env === undefined ? 1 : m.userData.env) * (1 - 0.65 * k); });
       } };
     function fill() {
-      S.parts.forEach(function (p) {
-        var m = new THREE.Mesh(p.geo, p.mat); m.name = p.name; if (p.at) m.position.set(p.at[0], p.at[1], p.at[2]);
-        g.add(m); if (!suit.body && p.name === 'armour-hybrid') suit.body = m;
+      function add(m, name, outside) { m.name = name; (outside ? g : inner).add(m); }
+      S.parts(K).forEach(function (p) {
+        var m = new THREE.Mesh(p.geo, p.mat); if (p.at) m.position.set(p.at[0], p.at[1], p.at[2]);
+        add(m, p.name); if (!suit.body && p.name === 'armour-hybrid') suit.body = m;
       });
+      extras(K, S, g, add);
+      g.traverse(function (o) { if (o.material && o.material.isMeshStandardMaterial && suit.mats.indexOf(o.material) < 0) suit.mats.push(o.material); });
       suit.ready = true; waiting.splice(0).forEach(function (f) { f(suit); });
     }
-    if (S.parts) fill(); else S.waiters.push(fill);
+    if (S.ready) fill(); else S.waiters.push(fill);
     if (opts.shadow !== false) {
       var shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.34), opts.shadow || S.shadow || (S.shadow = shadowMat()));
-      shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08, 0.003, 0.02); g.add(shadow);
+      shadow.rotation.x = -Math.PI / 2; shadow.position.set(0.08 * sc, 0.003, 0.02); shadow.scale.set(sc * (K.stand ? 1.4 : 1), sc * (K.stand ? 1.8 : 1), 1); g.add(shadow);
     }
     g.name = 'armour-hybrid';
     return suit;
   }
-  window.CastleSuit = { make: make };
+  window.CastleSuit = { make: make, KINDS: KINDS };
 })();
