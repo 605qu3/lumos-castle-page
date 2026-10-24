@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=525"></script>
-<script src="castle-paint.js?v=111"></script>
+<script src="castle-model.js?v=526"></script>
+<script src="castle-paint.js?v=112"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=6"></script>
@@ -164,7 +164,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
-<script src="castle-shell.js?v=80"></script>
+<script src="castle-shell.js?v=81"></script>
 <script src="shell-w5b.js?v=18"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -306,7 +306,8 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
   'defence-sitting-room', 'defence-bedroom', 'unused-classroom-2-west', 'unused-classroom-2-east', 'classroom-store-2-west', 'lost-games-room',
   'west-refuge-ring', 'old-exam-hall', 'heads-corridor', 'old-exam-hall-store',
   'decoy-cupboard-5', 'true-hide-5', 'accounts-room-3',
-  'sun-hide-g', 'bindery-way-2', 'seat-den-3', 'painted-door-room-5']);
+  'sun-hide-g', 'bindery-way-2', 'seat-den-3', 'painted-door-room-5',
+  'h82-way', 'h82-glass-house']);   /* v200, req 1099 (H82): the fern well's way and the glass house under the lake, rough */
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
@@ -2384,6 +2385,23 @@ var H71 = (function () {
     var mt = kit.solid(pm[1]).clone(); mt.side = THREE.DoubleSide;
     var m = new THREE.Mesh(geo, mt); m.userData.owner = PLACE; m.raycast = function () {}; m.userData.decal = true; g.add(m);
   });
+})();
+/* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
+   green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
+   and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
+(function () {
+  if (PLACE !== 'h82-glass-house') return;
+  var z0 = shell.place.floor, X0 = 12.0, X1 = 28.0, Y0 = -31.0, Y1 = -13.0, SP = 6.0, CR = 10.5, OFF = 0.008;
+  shell.group.traverse(function (m) {
+    if (!m.isMesh || m.name !== PLACE + '-barrel') return;
+    var mt = m.material.clone(); mt.color = new THREE.Color(0x9fd8c0).convertSRGBToLinear(); mt.map = null;
+    mt.transparent = true; mt.opacity = 0.32; mt.depthWrite = false; mt.side = THREE.DoubleSide; m.material = mt;
+  });
+  var a = shell.toLocal(X0 + OFF, Y0 + OFF, z0 + SP + OFF), b = shell.toLocal(X1 - OFF, Y1 - OFF, z0 + CR + 1.2);
+  var w = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)),
+    new THREE.MeshBasicMaterial({ color: new THREE.Color(0x1d4a40).convertSRGBToLinear(), side: THREE.BackSide }));
+  w.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); w.name = 'h82-lake-water';
+  w.userData.owner = PLACE; w.raycast = function () {}; shell.group.add(w);
 })();
 /* Mobiliarbus on H71's desks (Charms' req 1052; page/charms/desks.js's head comment the spec): once he has learned the
    spell (?learned for a check), a tap on a desk lifts it a few inches and drifts it to the square he names; his head

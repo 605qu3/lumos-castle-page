@@ -1169,13 +1169,20 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     function doubleStair() {
       var TURN = 5.2, rs = TURN / 30, t = 12, GAP = 2.49, HEAD = 2.2, top = S.to != null ? S.to : Q.ceiling - TURN;
       var up = doors.filter(function (d) { return d.z > Q.floor + 0.05 && d.z < top - 0.05; }).sort(function (p, q) { return p.z - q.z; })[0];
-      if (!up) return;
-      var span = up.half + 4, aB = up.a - span;
-      wedge(aB, up.a + span, up.z, rs, mats.floor, Q.id + '-landing-' + Math.round(up.z * 10));
-      shaftFloors.push({ c: c, r: R, z: up.z });
-      var hA = up.z - GAP - Q.floor; if (hA < 0) hA += TURN;
-      var aA = aB + hA / rs * t, sweep = HEAD / rs * t;
-      var runs = [{ id: Q.id + '-flight-a', a0: aA, z0: Q.floor }, { id: Q.id + '-flight-b', a0: aB, z0: up.z }];
+      /* v81 (the Architect's 162nd, H82, the fern well): with no door between the floor and the top, both flights rise
+         from the floor half a turn apart (each 2.6 over the other), B's foot 6 degrees short of the foot door, in the
+         only gap the two leave under 2.4 */
+      var foot0 = doors.filter(function (d) { return d.z <= Q.floor + 0.05; })[0], aB, aA, z0B;
+      if (!up && !foot0) return;
+      if (up) {
+        var span = up.half + 4; aB = up.a - span; z0B = up.z;
+        wedge(aB, up.a + span, up.z, rs, mats.floor, Q.id + '-landing-' + Math.round(up.z * 10));
+        shaftFloors.push({ c: c, r: R, z: up.z });
+        var hA = up.z - GAP - Q.floor; if (hA < 0) hA += TURN;
+        aA = aB + hA / rs * t;
+      } else { aB = foot0.a - 6; z0B = Q.floor; aA = aB + 180; }
+      var sweep = HEAD / rs * t;
+      var runs = [{ id: Q.id + '-flight-a', a0: aA, z0: Q.floor }, { id: Q.id + '-flight-b', a0: aB, z0: z0B }];
       runs.forEach(function (F0) {
         var n = Math.round((top - F0.z0) / rs), path = [];
         F0.end = F0.a0 - n * t;
