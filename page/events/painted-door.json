@@ -1,0 +1,42 @@
+{
+  "chain": "painted-door",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "painted-door.flagstone-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap painted-door-flag-5",
+      "when": [
+        "place = lake corridor 5 west",
+        "painted_door != found"
+      ],
+      "show": [
+        "on the one worn flagstone the broken gold stripes along the floor and walls pull together all at once into a tall painted doorway at the corridor's far end, true in every line; and in the end wall under it the real little door has opened on a room behind. A step to either side and it is stripes again, and a shut door"
+      ],
+      "starts": [
+        "set painted_door = found",
+        "log \"Stood on a worn flagstone and the painted stripes turned into a doorway, with a real door beneath {day}\"",
+        "secret painted-door"
+      ],
+      "canon": "Hidden Ways' H81 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s4-1023, 10.20 pm, 23 October 2026; Interaction's painted-door-flag-5, req 1088; Events' req 1089): from the worn flagstone only (Borromini's gallery and Pozzo's marble disc, s2-s4-precedents.md) the paint lies true and the real door opens; one step off, stripes again and the door shut; invented, no canon moment; nothing glows, nothing marks the stone"
+    },
+    {
+      "id": "painted-door.flagstone-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap painted-door-flag-5",
+      "when": [
+        "place = lake corridor 5 west",
+        "painted_door = found"
+      ],
+      "show": [
+        "on the worn flagstone the stripes draw together into the doorway again, and the little door in the end wall stands open; a step off and it is paint and a shut door"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H81 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s4-1023, 10.20 pm, 23 October 2026; Interaction's painted-door-flag-5, req 1088; Events' req 1089): found, the flagstone does the same each time he stands on it"
+    }
+  ]
+}

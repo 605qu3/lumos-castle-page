@@ -3,6 +3,7 @@
     "armour",
     "astronomy-rooms",
     "astronomy-tower",
+    "barrels",
     "bedtime",
     "booklist",
     "cake",
@@ -37,6 +38,8 @@
     "howler",
     "kitchens",
     "knitting-witch",
+    "lake-glimpse",
+    "lake-seats",
     "lessons",
     "library",
     "locks",
@@ -51,6 +54,7 @@
     "notice",
     "omnioculars",
     "owlery",
+    "painted-door",
     "painters-room",
     "painting",
     "passers",
@@ -77,6 +81,7 @@
     "trevor",
     "trophy",
     "trunk",
+    "two-handed-door",
     "visitors",
     "wing"
   ]

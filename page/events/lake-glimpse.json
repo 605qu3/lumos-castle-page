@@ -1,0 +1,359 @@
+{
+  "chain": "lake-glimpse",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "lake-glimpse.door-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap h82-door-corridor",
+      "when": [
+        "place = lake corridor b west",
+        "lake_door != found"
+      ],
+      "show": [
+        "under the plain oak door in the corridor's south wall a cold draught that smells of wet stone and green leaves; the door gives, and beyond it a round well going down, a stair winding round an open core and, far below, a green dimness"
+      ],
+      "starts": [
+        "set lake_door = found",
+        "log \"Felt a cold green draught under a plain oak door in the lake corridor, and the door opened on a well going down {day}\"",
+        "secret fern-well"
+      ],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): found by the draught under the door, never marked; invented, no canon moment; nothing glows"
+    },
+    {
+      "id": "lake-glimpse.door-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap h82-door-corridor",
+      "when": [
+        "place = lake corridor b west",
+        "lake_door = found"
+      ],
+      "show": [
+        "the plain oak door, the cold green draught under it, and the well beyond it winding down into the green"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): found, the door stays open and the draught is the same each time"
+    },
+    {
+      "id": "lake-glimpse.head-alone-ferns",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "well-head-alone",
+      "weight": 3,
+      "moment": "tap head-a",
+      "when": [
+        "place = h82 fern well",
+        "together = no"
+      ],
+      "show": [
+        "at the head of the flights, ferns hang thick down the well's wall in the daylight that comes in through slits cut to the lawn's edge; lower down they thin to moss, then to bare wet stone, and at the bottom there is only a green dimness"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the well's top: ferns thick where the slits give daylight (the 1890s fern craze, Hibberd's case already in the castle's things), thinning to moss and bare stone as the daylight fails; a pupil on the other flight now and then, never a scene, no names (the replay test passes, an ordinary pupil on an ordinary stair)"
+    },
+    {
+      "id": "lake-glimpse.head-alone-pupil",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "well-head-alone",
+      "weight": 1,
+      "moment": "tap head-a",
+      "when": [
+        "place = h82 fern well",
+        "together = no"
+      ],
+      "show": [
+        "at the head of the flights, ferns thick on the wall in the slit-light; across the open core, on the other flight, a pupil's torch goes round and down and is gone behind the stair"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the well's top: ferns thick where the slits give daylight (the 1890s fern craze, Hibberd's case already in the castle's things), thinning to moss and bare stone as the daylight fails; a pupil on the other flight now and then, never a scene, no names (the replay test passes, an ordinary pupil on an ordinary stair)"
+    },
+    {
+      "id": "lake-glimpse.head-together-ferns",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "well-head-together",
+      "weight": 1,
+      "moment": "tap head-a",
+      "when": [
+        "place = h82 fern well",
+        "together = yes"
+      ],
+      "show": [
+        "at the head of the flights, ferns hang thick down the well's wall in the slit-light and thin to moss below; across the open core, on the other flight, his brother's torch goes round and down, a hand up to wave"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the two flights half a turn apart round the 0.6 open core, so a boy on one sees his brother on the other and does not meet him till the foot (the Architect's numbers, cited not copied); nothing ranks one brother over the other"
+    },
+    {
+      "id": "lake-glimpse.head-together-ferns-brother",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "well-head-together",
+      "weight": 1,
+      "moment": "tap head-a",
+      "when": [
+        "place = h82 fern well",
+        "together = yes"
+      ],
+      "show": [
+        "at the head of the flights, ferns thick on the wall, thinning to moss and wet stone far below; his brother already two turns down the other flight, his voice coming up the shaft a half beat late"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the two flights half a turn apart round the 0.6 open core, so a boy on one sees his brother on the other and does not meet him till the foot (the Architect's numbers, cited not copied); nothing ranks one brother over the other"
+    },
+    {
+      "id": "lake-glimpse.foot-alone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap foot-a",
+      "when": [
+        "place = h82 fern well",
+        "together = no"
+      ],
+      "show": [
+        "at the foot, many turns down: the ferns gave out to moss long ago and here the stone is bare and beaded wet, the torchlight gone green on it, the air cold; to the south an arch, and a way going on under the rock"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the well's foot, 54 m down, torchlight going green (the books' own green under the lake, DH hp7 line 3734, CoS 12 hp2 line 5954, read in the canon tool); the arch to the way south; nothing glows, the green is the light's own colour on wet stone"
+    },
+    {
+      "id": "lake-glimpse.foot-together",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap foot-a",
+      "when": [
+        "place = h82 fern well",
+        "together = yes"
+      ],
+      "show": [
+        "at the foot, many turns down: moss and then bare beaded stone, the torchlight gone green on it, the air cold; up the shaft the other flight winds away with his brother's torch a green spark on it, coming down; to the south an arch, and a way going on under the rock"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the well's foot with his brother still coming down the other flight; nothing ranks one brother over the other"
+    },
+    {
+      "id": "lake-glimpse.footb-alone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap foot-b",
+      "when": [
+        "place = h82 fern well",
+        "together = no"
+      ],
+      "show": [
+        "at the foot, many turns down: the ferns gave out to moss long ago and here the stone is bare and beaded wet, the torchlight gone green on it, the air cold; to the south an arch, and a way going on under the rock"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the well's foot, 54 m down, torchlight going green (the books' own green under the lake, DH hp7 line 3734, CoS 12 hp2 line 5954, read in the canon tool); the arch to the way south; nothing glows, the green is the light's own colour on wet stone; the same foot seen from the other flight (foot-b), the page tapping the thing it stands at"
+    },
+    {
+      "id": "lake-glimpse.footb-together",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap foot-b",
+      "when": [
+        "place = h82 fern well",
+        "together = yes"
+      ],
+      "show": [
+        "at the foot, many turns down: moss and then bare beaded stone, the torchlight gone green on it, the air cold; up the shaft the other flight winds away with his brother's torch a green spark on it, coming down; to the south an arch, and a way going on under the rock"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the well's foot with his brother still coming down the other flight; nothing ranks one brother over the other; the same foot seen from the other flight (foot-b), the page tapping the thing it stands at"
+    },
+    {
+      "id": "lake-glimpse.well-drip",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "well-sound",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = h82 fern well"
+      ],
+      "show": [
+        "somewhere far down the well, water drips, each drop a long time coming back up the shaft"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): a sound of the well, now and then; with its silent partner so it is not at every wait"
+    },
+    {
+      "id": "lake-glimpse.well-drip-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "well-sound",
+      "weight": 2,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = h82 fern well"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the silent partner of well-drip"
+    },
+    {
+      "id": "lake-glimpse.way-south",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap way-south",
+      "when": [
+        "place = h82 way"
+      ],
+      "show": [
+        "the last treads open square on a door, and past it a green light, wide and low and moving, as though the room ahead were underwater"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the way's end: a door into the glass house and its green light from above, the lake lying on the panes"
+    },
+    {
+      "id": "lake-glimpse.way-lapping",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "way-sound",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = h82 way"
+      ],
+      "show": [
+        "overhead, through the rock, the lake's slow lapping, muffled and far, like a sea heard from a cellar"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): a sound of the way under the cliff, now and then; PS 8's lake heard through stone at the corridor's end (the grotto wall) is the same water"
+    },
+    {
+      "id": "lake-glimpse.way-lapping-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "way-sound",
+      "weight": 2,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = h82 way"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the silent partner of way-lapping"
+    },
+    {
+      "id": "lake-glimpse.house-door-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap house-door",
+      "when": [
+        "place = h82 glass house",
+        "lake_house != found"
+      ],
+      "show": [
+        "behind him the way's cold draught; before him the iron and glass of the house, and over every pane the lake lies green and close, so that the light on the floor moves like the light in a pond"
+      ],
+      "starts": [
+        "set lake_house = found",
+        "log \"Came down a well and a way under the cliff to a house of glass with the lake lying on its roof {day}\"",
+        "secret glass-house"
+      ],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the house under the lake, its vault of iron and glass springing at -58 and the water 7.5 m over the crown (the Architect's numbers, cited not copied); invented, of the 1890s castle, Herbology's greenhouses the books' only glass; stays open"
+    },
+    {
+      "id": "lake-glimpse.house-door-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap house-door",
+      "when": [
+        "place = h82 glass house",
+        "lake_house = found"
+      ],
+      "show": [
+        "the way's draught at his back; ahead the glass house, the lake green on every pane"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): found, the house is as it was"
+    },
+    {
+      "id": "lake-glimpse.house-ripple-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = h82 glass house",
+        "time != night"
+      ],
+      "show": [
+        "the lake's light comes down through the panes in slow green ripples and moves over the floor, the tree ferns and the pool, and is never quite the same twice"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the lake's light rippling on the floor: sunlight through 7.5 m of water, its own colour and movement, nothing marked"
+    },
+    {
+      "id": "lake-glimpse.house-ripple-night",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = h82 glass house",
+        "time = night"
+      ],
+      "show": [
+        "a pale green light lies on the panes from the moon on the water far above, and ripples slowly over the floor, the tree ferns and the pool"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the same light by night, the moon's through the lake"
+    },
+    {
+      "id": "lake-glimpse.squid-shadow",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "house-squid",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = h82 glass house",
+        "time != night"
+      ],
+      "show": [
+        "a long slow shadow crosses the glass overhead and the ripples on the floor go dark as it passes, a tentacle's curl at its edge, and then the green light comes back"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): PS 16, hp1 line 5013, 'the giant squid basking in the warm shallows' (the canon tool, 24 October 2026): the squid alive and at its ease over the roof, nothing harmed, never plot; the replay test passes (a pupil could stand in this house on any day)"
+    },
+    {
+      "id": "lake-glimpse.squid-shadow-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "house-squid",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = h82 glass house",
+        "time != night"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the silent partner of squid-shadow, so the shadow comes now and then and not at every wait"
+    }
+  ]
+}

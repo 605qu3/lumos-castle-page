@@ -1,0 +1,1141 @@
+{
+  "chain": "lake-seats",
+  "targets": {
+    "bench-g-west": "bench-g",
+    "bench-g-east": "bench-g",
+    "bench-1-west": "bench-1",
+    "bench-1-east": "bench-1",
+    "bench-2-west": "bench-2",
+    "bench-2-east": "bench-2",
+    "strip-flags-2-95.9": "strip-flags-2",
+    "strip-flags-1-98.6": "strip-flags-1",
+    "seat-compartment-1-150.4": "seat-compartment-1",
+    "seat-1-150.4": "seat-1-end",
+    "seat-2-152.2": "seat-2-end",
+    "seat-3-150.9": "seat-3-end"
+  },
+  "first_visit": [],
+  "records": [
+    {
+      "id": "lake-seats.rose-look-g",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-rose-g",
+      "when": [
+        "place = lake corridor g east"
+      ],
+      "show": [
+        "a five-petalled Tudor rose cut in the middle panel of the seat's front, worn smooth at its middle as if many thumbs had turned it; it gives a quarter-turn under his own, and the seat does not stir, as if it would rather be sat on first"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): standing before the seat the boy only finds the rose and turns it a little; the seat takes someone sitting. Nothing glows, nothing marks it (Interaction's seat-rose place)"
+    },
+    {
+      "id": "lake-seats.seat-g-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-g",
+      "when": [
+        "place = lake corridor g east",
+        "seat_rose != found"
+      ],
+      "show": [
+        "he sits, turns the carved rose under his hand, and the seat rises, slowly, boy and all, up inside the wall with its sides boxed round him and an iron bar to hold, the stone going past in a slow dark, until it stops and is simply a window seat again, on the floor above"
+      ],
+      "starts": [
+        "set seat_rose = found",
+        "log \"Turned a carved rose on a window seat and the seat carried me through the wall {day}\"",
+        "secret seats-change-places"
+      ],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on G turns on its rose and carries the boy to the next seat in the column, slow, never stopping between floors, a hand rail on the seat itself (Interiors' reading, confirmed), each seat a seat again on arrival; invented, no canon moment, nothing glows (the Architect's ground, req 1070, cited not copied)"
+    },
+    {
+      "id": "lake-seats.seat-g-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-g",
+      "when": [
+        "place = lake corridor g east",
+        "seat_rose = found"
+      ],
+      "show": [
+        "the rose turns, and the seat rises through the wall, slow and boxed in, and is a window seat again on the floor above"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on G turns on its rose and the find stays open, so every later turn is the same ride"
+    },
+    {
+      "id": "lake-seats.seat-g-wave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-g",
+      "when": [
+        "place = lake corridor g east",
+        "together = yes"
+      ],
+      "show": [
+        "in the next column, going the other way, close enough to wave to, his brother, who does; he waves back with the hand that is not on the bar"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on G turns on its rose and the passing: G with 1 and 1 with 2 pass side by side in the wall, close enough to wave (2 and 3 pass apart in the stone, so seat 3 has none). Both boys at the iPad (`together`) stands for both turning at once"
+    },
+    {
+      "id": "lake-seats.rose-look-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-rose-1",
+      "when": [
+        "place = lake corridor 1 east"
+      ],
+      "show": [
+        "a five-petalled Tudor rose cut in the middle panel of the seat's front, worn smooth at its middle as if many thumbs had turned it; it gives a quarter-turn under his own, and the seat does not stir, as if it would rather be sat on first"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): standing before the seat the boy only finds the rose and turns it a little; the seat takes someone sitting. Nothing glows, nothing marks it (Interaction's seat-rose place)"
+    },
+    {
+      "id": "lake-seats.seat-1-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "seat_rose != found"
+      ],
+      "show": [
+        "he sits, turns the carved rose under his hand, and the seat sinks, slowly, boy and all, down inside the wall with its sides boxed round him and an iron bar to hold, the stone going past in a slow dark, until it stops and is simply a window seat again, on the floor below; the seat that was there has gone up past him in its own column, empty"
+      ],
+      "starts": [
+        "set seat_rose = found",
+        "log \"Turned a carved rose on a window seat and the seat carried me through the wall {day}\"",
+        "secret seats-change-places"
+      ],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 1 turns on its rose and carries the boy to the next seat in the column, slow, never stopping between floors, a hand rail on the seat itself (Interiors' reading, confirmed), each seat a seat again on arrival; invented, no canon moment, nothing glows (the Architect's ground, req 1070, cited not copied)"
+    },
+    {
+      "id": "lake-seats.seat-1-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "seat_rose = found"
+      ],
+      "show": [
+        "the rose turns, and the seat sinks through the wall, slow and boxed in, and is a window seat again on the floor below"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 1 turns on its rose and the find stays open, so every later turn is the same ride"
+    },
+    {
+      "id": "lake-seats.seat-1-wave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "together = yes"
+      ],
+      "show": [
+        "in the next column, going the other way, close enough to wave to, his brother, who does; he waves back with the hand that is not on the bar"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 1 turns on its rose and the passing: G with 1 and 1 with 2 pass side by side in the wall, close enough to wave (2 and 3 pass apart in the stone, so seat 3 has none). Both boys at the iPad (`together`) stands for both turning at once"
+    },
+    {
+      "id": "lake-seats.rose-look-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-rose-2",
+      "when": [
+        "place = lake corridor 2 east"
+      ],
+      "show": [
+        "a five-petalled Tudor rose cut in the middle panel of the seat's front, worn smooth at its middle as if many thumbs had turned it; it gives a quarter-turn under his own, and the seat does not stir, as if it would rather be sat on first"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): standing before the seat the boy only finds the rose and turns it a little; the seat takes someone sitting. Nothing glows, nothing marks it (Interaction's seat-rose place)"
+    },
+    {
+      "id": "lake-seats.seat-2-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "seat_rose != found"
+      ],
+      "show": [
+        "he sits, turns the carved rose under his hand, and the seat sinks, slowly, boy and all, down inside the wall with its sides boxed round him and an iron bar to hold, the stone going past in a slow dark, until it stops and is simply a window seat again, on the floor below; the seat that was there has gone up past him in its own column, empty"
+      ],
+      "starts": [
+        "set seat_rose = found",
+        "log \"Turned a carved rose on a window seat and the seat carried me through the wall {day}\"",
+        "secret seats-change-places"
+      ],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 2 turns on its rose and carries the boy to the next seat in the column, slow, never stopping between floors, a hand rail on the seat itself (Interiors' reading, confirmed), each seat a seat again on arrival; invented, no canon moment, nothing glows (the Architect's ground, req 1070, cited not copied)"
+    },
+    {
+      "id": "lake-seats.seat-2-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "seat_rose = found"
+      ],
+      "show": [
+        "the rose turns, and the seat sinks through the wall, slow and boxed in, and is a window seat again on the floor below"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 2 turns on its rose and the find stays open, so every later turn is the same ride"
+    },
+    {
+      "id": "lake-seats.seat-2-wave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "together = yes"
+      ],
+      "show": [
+        "in the next column, going the other way, close enough to wave to, his brother, who does; he waves back with the hand that is not on the bar"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 2 turns on its rose and the passing: G with 1 and 1 with 2 pass side by side in the wall, close enough to wave (2 and 3 pass apart in the stone, so seat 3 has none). Both boys at the iPad (`together`) stands for both turning at once"
+    },
+    {
+      "id": "lake-seats.rose-look-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-rose-3",
+      "when": [
+        "place = lake corridor 3 east"
+      ],
+      "show": [
+        "a five-petalled Tudor rose cut in the middle panel of the seat's front, worn smooth at its middle as if many thumbs had turned it; it gives a quarter-turn under his own, and the seat does not stir, as if it would rather be sat on first"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): standing before the seat the boy only finds the rose and turns it a little; the seat takes someone sitting. Nothing glows, nothing marks it (Interaction's seat-rose place)"
+    },
+    {
+      "id": "lake-seats.seat-3-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-3",
+      "when": [
+        "place = lake corridor 3 east",
+        "seat_rose != found"
+      ],
+      "show": [
+        "he sits, turns the carved rose under his hand, and the seat sinks, slowly, boy and all, down inside the wall with its sides boxed round him and an iron bar to hold, the stone going past in a slow dark, until it stops and is simply a window seat again, on the floor below; the seat that was there went up on its own side of the stone"
+      ],
+      "starts": [
+        "set seat_rose = found",
+        "log \"Turned a carved rose on a window seat and the seat carried me through the wall {day}\"",
+        "secret seats-change-places"
+      ],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 3 turns on its rose and carries the boy to the next seat in the column, slow, never stopping between floors, a hand rail on the seat itself (Interiors' reading, confirmed), each seat a seat again on arrival; invented, no canon moment, nothing glows (the Architect's ground, req 1070, cited not copied)"
+    },
+    {
+      "id": "lake-seats.seat-3-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-3",
+      "when": [
+        "place = lake corridor 3 east",
+        "seat_rose = found"
+      ],
+      "show": [
+        "the rose turns, and the seat sinks through the wall, slow and boxed in, and is a window seat again on the floor below"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H75 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 3 turns on its rose and the find stays open, so every later turn is the same ride"
+    },
+    {
+      "id": "lake-seats.bench-g",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-g",
+      "when": [
+        "place = lake corridor g east"
+      ],
+      "show": [
+        "a stone bench in the embrasure, worn into a dip by generations of sitters, the far bench across the strip, and the lake going about its business beyond the glass"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the embrasure on G is the foot of the lower flight, so its benches are only benches"
+    },
+    {
+      "id": "lake-seats.bench-2-first-alone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "bench_stair_two != found",
+        "together = no"
+      ],
+      "show": [
+        "he sits on one bench and swings his satchel onto the other for want of anyone else, and the stone shivers; the flags of the strip between the benches sink, step after step, into a newel stair winding down in the wall beside the window"
+      ],
+      "starts": [
+        "set bench_stair_two = found",
+        "log \"Sat on a window bench with my bag on the other and the floor between them turned into a stair {day}\"",
+        "secret bench-stairs"
+      ],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 2 down to the one on 1: weight on both benches at once (one boy and his satchel on the far bench, or both boys) sinks the strip's flags into the newel stair; it stays until he is through and folds back up; invented, nothing glows"
+    },
+    {
+      "id": "lake-seats.bench-2-first-together",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "bench_stair_two != found",
+        "together = yes"
+      ],
+      "show": [
+        "he sits on one bench and his brother on the other, and the stone shivers; the flags of the strip between them sink, step after step, into a newel stair winding down in the wall beside the window"
+      ],
+      "starts": [
+        "set bench_stair_two = found",
+        "log \"Sat on a window bench with my brother opposite and the floor between us turned into a stair {day}\"",
+        "secret bench-stairs"
+      ],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 2 down to the one on 1: the same find with both boys on the benches (`together`)"
+    },
+    {
+      "id": "lake-seats.bench-2-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "bench_stair_two = found"
+      ],
+      "show": [
+        "with weight on both benches the flags of the strip sink away again, step by step, into the stair"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 2 down to the one on 1: once found, every sitting gives the same stair"
+    },
+    {
+      "id": "lake-seats.strip-2-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap strip-flags-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "bench_stair_two != found"
+      ],
+      "show": [
+        "the flags of the strip between the benches, each worn into the same shallow dip by generations of boots, set so close you could not slide a knife between them"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 2 down to the one on 1: the head of the stair, before it is found"
+    },
+    {
+      "id": "lake-seats.strip-2-level",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap strip-flags-2",
+      "when": [
+        "place = lake corridor 2 east",
+        "bench_stair_two = found"
+      ],
+      "show": [
+        "the flags lie level and still between the benches, as if no stair had ever gone down through them"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 2 down to the one on 1: the head of the stair, found: it folds back up once he is through"
+    },
+    {
+      "id": "lake-seats.bench-1-first-alone",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "bench_stair_one != found",
+        "together = no"
+      ],
+      "show": [
+        "he sits on one bench and swings his satchel onto the other for want of anyone else, and the stone shivers; the flags of the strip between the benches sink, step after step, into a newel stair winding down in the wall beside the window"
+      ],
+      "starts": [
+        "set bench_stair_one = found",
+        "log \"Sat on a window bench with my bag on the other and the floor between them turned into a stair {day}\"",
+        "secret bench-stairs"
+      ],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 1 down to the one on G: weight on both benches at once (one boy and his satchel on the far bench, or both boys) sinks the strip's flags into the newel stair; it stays until he is through and folds back up; invented, nothing glows"
+    },
+    {
+      "id": "lake-seats.bench-1-first-together",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "bench_stair_one != found",
+        "together = yes"
+      ],
+      "show": [
+        "he sits on one bench and his brother on the other, and the stone shivers; the flags of the strip between them sink, step after step, into a newel stair winding down in the wall beside the window"
+      ],
+      "starts": [
+        "set bench_stair_one = found",
+        "log \"Sat on a window bench with my brother opposite and the floor between us turned into a stair {day}\"",
+        "secret bench-stairs"
+      ],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 1 down to the one on G: the same find with both boys on the benches (`together`)"
+    },
+    {
+      "id": "lake-seats.bench-1-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "bench_stair_one = found"
+      ],
+      "show": [
+        "with weight on both benches the flags of the strip sink away again, step by step, into the stair"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 1 down to the one on G: once found, every sitting gives the same stair"
+    },
+    {
+      "id": "lake-seats.strip-1-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap strip-flags-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "bench_stair_one != found"
+      ],
+      "show": [
+        "the flags of the strip between the benches, each worn into the same shallow dip by generations of boots, set so close you could not slide a knife between them"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 1 down to the one on G: the head of the stair, before it is found"
+    },
+    {
+      "id": "lake-seats.strip-1-level",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap strip-flags-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "bench_stair_one = found"
+      ],
+      "show": [
+        "the flags lie level and still between the benches, as if no stair had ever gone down through them"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): from the embrasure on 1 down to the one on G: the head of the stair, found: it folds back up once he is through"
+    },
+    {
+      "id": "lake-seats.bench-door-1-west-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-door-1-west",
+      "when": [
+        "place = lake corridor 1 east",
+        "bench_stair_two != found"
+      ],
+      "show": [
+        "a hair-line round the end of the bench, and at hand height a plain iron pull; a push, and the bench's end swings out on a newel stair going up into the wall, its treads hollowed in the middle by old use"
+      ],
+      "starts": [
+        "set bench_stair_two = found",
+        "log \"Pushed on the end of a window bench and found a stair behind it {day}\"",
+        "secret bench-stairs"
+      ],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the foot of the newel, on 1, from 2: from below the cheek opens on a push (the Architect's ground, cited); the same find as the strip's sinking (one state, one secret); invented, nothing glows"
+    },
+    {
+      "id": "lake-seats.bench-door-1-west-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-door-1-west",
+      "when": [
+        "place = lake corridor 1 east",
+        "bench_stair_two = found"
+      ],
+      "show": [
+        "the bench's end stands swung out on its stair, the treads going up into the wall"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the foot of the newel, on 1, from 2: once found it stays open"
+    },
+    {
+      "id": "lake-seats.bench-door-g-east-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-door-g-east",
+      "when": [
+        "place = lake corridor g east",
+        "bench_stair_one != found"
+      ],
+      "show": [
+        "a hair-line round the end of the bench, and at hand height a plain iron pull; a push, and the bench's end swings out on a newel stair going up into the wall, its treads hollowed in the middle by old use and, far up at the stair's old outer end, one chink of green light from the lake"
+      ],
+      "starts": [
+        "set bench_stair_one = found",
+        "log \"Pushed on the end of a window bench and found a stair behind it {day}\"",
+        "secret bench-stairs"
+      ],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the foot of the newel, on G, from 1: from below the cheek opens on a push (the Architect's ground, cited); the same find as the strip's sinking (one state, one secret); invented, nothing glows, and on G the old gun channel's chink of lake light (ledger line, the walled outer end)"
+    },
+    {
+      "id": "lake-seats.bench-door-g-east-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bench-door-g-east",
+      "when": [
+        "place = lake corridor g east",
+        "bench_stair_one = found"
+      ],
+      "show": [
+        "the bench's end stands swung out on its stair, the treads going up into the wall and, far up at the stair's old outer end, one chink of green light from the lake"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H76 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the foot of the newel, on G, from 1: once found it stays open"
+    },
+    {
+      "id": "lake-seats.sun-winter",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "season = winter",
+        "hour = 14",
+        "weather = clear",
+        "sun_hatch != found"
+      ],
+      "show": [
+        "the low sun lies on the little carved sun in the cheek as if the stone were holding it; he presses the carving, and a hatch in the recess's ceiling drops on its hinge, a ladder folded inside, up into the wall over the window"
+      ],
+      "starts": [
+        "set sun_hatch = found",
+        "log \"Pressed a carved sun while the real one lay on it, and a hatch dropped open over the window {day}\"",
+        "secret sun-hatch"
+      ],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: pressed when the patch is on it (2 to 3 pm by the boy's own clock, November to February, a clear sky) it drops the hatch; the Architect's ground (lake-seats-ground.md, W3), the sun's reading Events'. Winter is December to February in the runtime's seasons"
+    },
+    {
+      "id": "lake-seats.sun-november",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "season = autumn",
+        "date >= 11-01",
+        "hour = 14",
+        "weather = clear",
+        "sun_hatch != found"
+      ],
+      "show": [
+        "the low sun lies on the little carved sun in the cheek as if the stone were holding it; he presses the carving, and a hatch in the recess's ceiling drops on its hinge, a ladder folded inside, up into the wall over the window"
+      ],
+      "starts": [
+        "set sun_hatch = found",
+        "log \"Pressed a carved sun while the real one lay on it, and a hatch dropped open over the window {day}\"",
+        "secret sun-hatch"
+      ],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: the same in November, which the runtime's autumn holds, so it has a record of its own"
+    },
+    {
+      "id": "lake-seats.sun-wand",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wand light on",
+      "when": [
+        "place = lake corridor g east",
+        "sun_hatch != found"
+      ],
+      "show": [
+        "he holds his lit wand to the carved sun, and the stone takes the light as it would an afternoon's; a hatch in the recess's ceiling drops on its hinge, a ladder folded inside, up into the wall over the window"
+      ],
+      "starts": [
+        "set sun_hatch = found",
+        "log \"Held a lit wand to a carved sun, and a hatch dropped open over the window {day}\"",
+        "secret sun-hatch"
+      ],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: by night, by cloud or out of season a lit wand held to the carving does the sun's work (the ledger line; it also covers hills a later lane draws across the lake, the Architect's caveat). The page raises `wand light on` here only with the wand held at the carving (Interaction's, as at the Snare)"
+    },
+    {
+      "id": "lake-seats.sun-open",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "sun_hatch = found"
+      ],
+      "show": [
+        "the hatch hangs open in the recess's ceiling, its ladder folded inside"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: found, it stays open"
+    },
+    {
+      "id": "lake-seats.sun-plain-hour",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "sun_hatch != found",
+        "hour != 14"
+      ],
+      "show": [
+        "a small sun cut into the stone of the cheek, its rays worn shallow; it is cold under his thumb, and nothing happens"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: pressed without the sun (hour, cloud or season out), only stone; the cases are exclusive so one line fires: another hour"
+    },
+    {
+      "id": "lake-seats.sun-plain-cloud",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "sun_hatch != found",
+        "hour = 14",
+        "weather != clear"
+      ],
+      "show": [
+        "a small sun cut into the stone of the cheek, its rays worn shallow; it is cold under his thumb, and nothing happens"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: pressed without the sun (hour, cloud or season out), only stone; the cases are exclusive so one line fires: 2 to 3 pm under cloud"
+    },
+    {
+      "id": "lake-seats.sun-plain-spring",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "sun_hatch != found",
+        "hour = 14",
+        "weather = clear",
+        "season = spring"
+      ],
+      "show": [
+        "a small sun cut into the stone of the cheek, its rays worn shallow; it is cold under his thumb, and nothing happens"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: pressed without the sun (hour, cloud or season out), only stone; the cases are exclusive so one line fires: 2 to 3 pm, clear, spring"
+    },
+    {
+      "id": "lake-seats.sun-plain-summer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "sun_hatch != found",
+        "hour = 14",
+        "weather = clear",
+        "season = summer"
+      ],
+      "show": [
+        "a small sun cut into the stone of the cheek, its rays worn shallow; it is cold under his thumb, and nothing happens"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: pressed without the sun (hour, cloud or season out), only stone; the cases are exclusive so one line fires: 2 to 3 pm, clear, summer"
+    },
+    {
+      "id": "lake-seats.sun-plain-autumn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap sun-carving-g",
+      "when": [
+        "place = lake corridor g east",
+        "sun_hatch != found",
+        "hour = 14",
+        "weather = clear",
+        "season = autumn",
+        "date <= 10-31"
+      ],
+      "show": [
+        "a small sun cut into the stone of the cheek, its rays worn shallow; it is cold under his thumb, and nothing happens"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the sun carved on the east cheek of the lone embrasure on G: pressed without the sun (hour, cloud or season out), only stone; the cases are exclusive so one line fires: 2 to 3 pm, clear, September or October"
+    },
+    {
+      "id": "lake-seats.scope-day",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "sun-scope",
+      "weight": 1,
+      "moment": "tap sun-hide-slit-g",
+      "when": [
+        "place = sun hide g",
+        "time != night",
+        "weather = clear"
+      ],
+      "show": [
+        "the telescope's cracked glass cuts the lake into five little lakes at once, the same ripples in each, and in the middle one something very large and slow turns over under the water and is gone"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the telescope with a cracked lens in the hide over the lone embrasure, looked through the slit by the boy's own hour: a clear day; the giant squid is the lake's (PoA 16, a creature alive and well in its lake), nothing harmed, nothing dead"
+    },
+    {
+      "id": "lake-seats.scope-grey",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "sun-scope",
+      "weight": 1,
+      "moment": "tap sun-hide-slit-g",
+      "when": [
+        "place = sun hide g",
+        "time != night",
+        "weather != clear"
+      ],
+      "show": [
+        "the cracked glass gives the lake in five pieces, every piece the same grey, which is the lake's weather and not the lens's fault"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the telescope with a cracked lens in the hide over the lone embrasure, looked through the slit by the boy's own hour: a cloudy, wet or foggy day"
+    },
+    {
+      "id": "lake-seats.scope-moon",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "sun-scope",
+      "weight": 1,
+      "moment": "tap sun-hide-slit-g",
+      "when": [
+        "place = sun hide g",
+        "time = night",
+        "moon up = yes"
+      ],
+      "show": [
+        "five small moons on five small lakes in the cracked glass, and it is hard to be sure which is the real one"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the telescope with a cracked lens in the hide over the lone embrasure, looked through the slit by the boy's own hour: a night with the moon up (the real moon's, the runtime's)"
+    },
+    {
+      "id": "lake-seats.scope-dark",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "sun-scope",
+      "weight": 1,
+      "moment": "tap sun-hide-slit-g",
+      "when": [
+        "place = sun hide g",
+        "time = night",
+        "moon up = no"
+      ],
+      "show": [
+        "five patches of dark in the cracked glass, and across all five, a row of lit windows from the castle's low floors laid on the water"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H77 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the telescope with a cracked lens in the hide over the lone embrasure, looked through the slit by the boy's own hour: a night without the moon"
+    },
+    {
+      "id": "lake-seats.breath-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-1-end",
+      "when": [
+        "place = lake corridor 1 east"
+      ],
+      "show": [
+        "he breathes on the cold glass, and in the fog a long-ago finger shows through, drawn on the pane: an arrow pointing down, and a small round mark beside it, like a coin"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 1 at the corridor's end: the finger drawing points down, at the box's own floor (the compartment, its own place); invented, nothing dated, no name; shown at every breath"
+    },
+    {
+      "id": "lake-seats.compartment-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-compartment-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "seat_compartment != found"
+      ],
+      "show": [
+        "the box seat's floor lifts whole on a hollow beneath: a Gobstones set two stones short, a paper bag of Acid Pops gone to a single lump, and a note folded in four, half under the box's corner: To whoever sits here next. The Pops have gone to one lump, the stones are two short, and none of it was my doing."
+      ],
+      "starts": [
+        "set seat_compartment = found",
+        "log \"Lifted the floor of a window seat and found someone's old things {day}\"",
+        "secret seat-compartment"
+      ],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the compartment under the box seat on 1 (Interiors' req 1076: the set, the bag, the note); the note's words are Events', an old hand, nothing dated, no name, nothing shaming; the Gobstones are a wink to H70's shield a floor down, not the books' moment"
+    },
+    {
+      "id": "lake-seats.compartment-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-compartment-1",
+      "when": [
+        "place = lake corridor 1 east",
+        "seat_compartment = found"
+      ],
+      "show": [
+        "the compartment stands open under the lifted floor: the Gobstones set, the lump of Acid Pops and the folded note"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): found, it stays open"
+    },
+    {
+      "id": "lake-seats.breath-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-2-end",
+      "when": [
+        "place = lake corridor 2 east",
+        "finger_two != seen",
+        "bindery_way != found"
+      ],
+      "show": [
+        "he breathes on the cold glass, and in the fog a long-ago finger shows through, drawn on the pane: an arrow pointing along the sill to the east, and a small round mark beside it, like a coin"
+      ],
+      "starts": [
+        "set finger_two = seen"
+      ],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 2 at the corridor's end: the finger drawing points sideways; the next tap follows it"
+    },
+    {
+      "id": "lake-seats.follow-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-2-end",
+      "when": [
+        "place = lake corridor 2 east",
+        "finger_two = seen",
+        "bindery_way != found"
+      ],
+      "show": [
+        "he follows the arrow and leans on the box's east end; it gives under his shoulder, a panel the width of a boy swinging in on a low crawl going east through the wall, bare stone and a smell of binder's paste"
+      ],
+      "starts": [
+        "set bindery_way = found",
+        "log \"Followed a finger drawing on a window pane and the seat's end opened on a way through the wall {day}\"",
+        "secret seat-bindery-way"
+      ],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the way the arrow points opens from the seat (the Architect's ground, W4, cited); opens from both sides and stays open once found; nothing glows"
+    },
+    {
+      "id": "lake-seats.breath-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-3-end",
+      "when": [
+        "place = lake corridor 3 east",
+        "finger_three != seen",
+        "seat_den != found"
+      ],
+      "show": [
+        "he breathes on the cold glass, and in the fog a long-ago finger shows through, drawn on the pane: an arrow pointing straight up, and a small round mark beside it, like a coin"
+      ],
+      "starts": [
+        "set finger_three = seen"
+      ],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the box seat on 3 at the corridor's end: the finger drawing points up; the next tap follows it"
+    },
+    {
+      "id": "lake-seats.follow-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-3-end",
+      "when": [
+        "place = lake corridor 3 east",
+        "finger_three = seen",
+        "seat_den != found"
+      ],
+      "show": [
+        "he follows the arrow: iron rungs run up the window's east cheek, and above them a hatch lifts at a push on a little room over the window, dim, with a rug in it"
+      ],
+      "starts": [
+        "set seat_den = found",
+        "log \"Followed a finger drawing up some rungs into a den over a window seat {day}\"",
+        "secret seat-den"
+      ],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the way the arrow points opens from the seat (the Architect's ground, W4, cited); opens from both sides and stays open once found; nothing glows"
+    },
+    {
+      "id": "lake-seats.way-2-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-2-end",
+      "when": [
+        "place = lake corridor 2 east",
+        "bindery_way = found"
+      ],
+      "show": [
+        "the end of the box stands open on the low crawl east through the wall"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the way to the bindery from the seat on 2, found: it stays open"
+    },
+    {
+      "id": "lake-seats.way-3-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap seat-3-end",
+      "when": [
+        "place = lake corridor 3 east",
+        "seat_den = found"
+      ],
+      "show": [
+        "the rungs go up the window's east cheek to the open hatch and the little room over it"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the den over the seat on 3, found: it stays open"
+    },
+    {
+      "id": "lake-seats.panel-bindery-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bindery-way-panel-2-bindery",
+      "when": [
+        "place = bindery",
+        "bindery_way != found"
+      ],
+      "show": [
+        "one panel in the wainscot gives to a push, hinged on the wall, and behind it a low crawl runs west into the dark, bare stone, going the way a draught goes"
+      ],
+      "starts": [
+        "set bindery_way = found",
+        "log \"Pushed a panel in the bindery wall and found a crawl behind it {day}\"",
+        "secret seat-bindery-way"
+      ],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the same way found from the bindery's side (H45's bindery, its second way in, arriving south of its own door); one state, one secret; opens from both sides, stays open"
+    },
+    {
+      "id": "lake-seats.panel-bindery-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bindery-way-panel-2-bindery",
+      "when": [
+        "place = bindery",
+        "bindery_way = found"
+      ],
+      "show": [
+        "the panel stands open on the low crawl, and the draught from it smells of old oak"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): found, it stays open"
+    },
+    {
+      "id": "lake-seats.panel-way",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap bindery-way-panel-2",
+      "when": [
+        "place = bindery way 2"
+      ],
+      "show": [
+        "at the east end of the crawl the panel stands open on the bindery, the dry marbling trough on its trestles in the middle of the floor"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H78 (docs/hidden-ways/entrances-precedents.md, The window seats' ground and ledger lines; Godric's 1 on hidden-ways-window-seats-1023, 8.25 pm, 23 October 2026; the Architect's v194, ledgers 277 to 280; Interaction's places, req 1077; Events' req 1078): the panel from inside the crawl: the way is found by then, so the panel only looks through"
+    },
+    {
+      "id": "lake-seats.squid-g",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-g",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor g east",
+        "time != night"
+      ],
+      "show": [
+        "a pupil sits curled in a window seat with their chin on their knees, watching the giant squid push itself dreamily across the surface of the lake, one lazy tentacle waving"
+      ],
+      "starts": [],
+      "canon": "Godric's woven touch squid-from-window-seat (22 October 2026, relayed by Fawkes; Events' req 1078, the window seats built): PoA 16 L19616, read in the canon tool, 24 October 2026: 'watching the giant squid propel itself dreamily across the surface of the lake'; any pupil, by day, now and then; the squid alive and at its ease, nothing harmed; the replay test passes (an ordinary pupil at an ordinary window)"
+    },
+    {
+      "id": "lake-seats.squid-g-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-g",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor g east",
+        "time != night"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "The silent partner of squid-g, so a pupil is at the window now and then and not at every wait"
+    },
+    {
+      "id": "lake-seats.squid-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-1",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 1 east",
+        "time != night"
+      ],
+      "show": [
+        "a pupil sits curled in a window seat with their chin on their knees, watching the giant squid push itself dreamily across the surface of the lake, one lazy tentacle waving"
+      ],
+      "starts": [],
+      "canon": "Godric's woven touch squid-from-window-seat (22 October 2026, relayed by Fawkes; Events' req 1078, the window seats built): PoA 16 L19616, read in the canon tool, 24 October 2026: 'watching the giant squid propel itself dreamily across the surface of the lake'; any pupil, by day, now and then; the squid alive and at its ease, nothing harmed; the replay test passes (an ordinary pupil at an ordinary window)"
+    },
+    {
+      "id": "lake-seats.squid-1-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-1",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 1 east",
+        "time != night"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "The silent partner of squid-1, so a pupil is at the window now and then and not at every wait"
+    },
+    {
+      "id": "lake-seats.squid-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-2",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 2 east",
+        "time != night"
+      ],
+      "show": [
+        "a pupil sits curled in a window seat with their chin on their knees, watching the giant squid push itself dreamily across the surface of the lake, one lazy tentacle waving"
+      ],
+      "starts": [],
+      "canon": "Godric's woven touch squid-from-window-seat (22 October 2026, relayed by Fawkes; Events' req 1078, the window seats built): PoA 16 L19616, read in the canon tool, 24 October 2026: 'watching the giant squid propel itself dreamily across the surface of the lake'; any pupil, by day, now and then; the squid alive and at its ease, nothing harmed; the replay test passes (an ordinary pupil at an ordinary window)"
+    },
+    {
+      "id": "lake-seats.squid-2-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-2",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 2 east",
+        "time != night"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "The silent partner of squid-2, so a pupil is at the window now and then and not at every wait"
+    },
+    {
+      "id": "lake-seats.squid-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-3",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 3 east",
+        "time != night"
+      ],
+      "show": [
+        "a pupil sits curled in a window seat with their chin on their knees, watching the giant squid push itself dreamily across the surface of the lake, one lazy tentacle waving"
+      ],
+      "starts": [],
+      "canon": "Godric's woven touch squid-from-window-seat (22 October 2026, relayed by Fawkes; Events' req 1078, the window seats built): PoA 16 L19616, read in the canon tool, 24 October 2026: 'watching the giant squid propel itself dreamily across the surface of the lake'; any pupil, by day, now and then; the squid alive and at its ease, nothing harmed; the replay test passes (an ordinary pupil at an ordinary window)"
+    },
+    {
+      "id": "lake-seats.squid-3-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "squid-seat-3",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 3 east",
+        "time != night"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "The silent partner of squid-3, so a pupil is at the window now and then and not at every wait"
+    }
+  ]
+}

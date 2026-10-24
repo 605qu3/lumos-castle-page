@@ -1,0 +1,94 @@
+{
+  "chain": "barrels",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "barrels.pass",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "barrels-pass",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = kitchens corridor",
+        "year >= 4"
+      ],
+      "show": [
+        "a boy in a black and yellow scarf comes along the corridor, stops at the stack of barrels in its nook, raps one two from the bottom, in the middle of the second row, in a quick little rhythm, and the barrel's lid swings in; he ducks through, and it swings shut behind him"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H79 (docs/hidden-ways/entrances-precedents.md, E3's ledger line; Godric's 1 on hidden-ways-entrances-1023, 10.00 pm, 23 October 2026: the barrels counted; the Architect's barrel-nook-b, req 1080; Interaction's barrel-lid-b, req 1082; Events' req 1081): now and then a Hufflepuff passes and taps the barrel two from the bottom, middle of the second row, in the rhythm of the founder's name; never a scene, no names; the lid is the Hufflepuffs' own and never opens for the boy (the common room stays Out, docs/places.md row 56). The rhythm and the barrel are Rowling's own writing outside the seven books, which the canon tool does not hold, counted here by Godric's ruling; the line says no more than the ledger line. From the GoF castle on, as the pear in this corridor is (kitchens.json)"
+    },
+    {
+      "id": "barrels.pass-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "barrels-pass",
+      "weight": 3,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = kitchens corridor",
+        "year >= 4"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Hidden Ways' H79 (docs/hidden-ways/entrances-precedents.md, E3's ledger line; Godric's 1 on hidden-ways-entrances-1023, 10.00 pm, 23 October 2026: the barrels counted; the Architect's barrel-nook-b, req 1080; Interaction's barrel-lid-b, req 1082; Events' req 1081): the silent partner, so a Hufflepuff passes now and then and not at every wait"
+    },
+    {
+      "id": "barrels.try-1",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "barrels-try",
+      "weight": 1,
+      "moment": "tap barrel-lid-b",
+      "when": [
+        "place = kitchens corridor",
+        "year >= 4"
+      ],
+      "show": [
+        "a sniff of vinegar sharp enough to make his eyes water, and from the pear in the painted fruit bowl a little way along, a giggle, quickly smothered"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H79 (docs/hidden-ways/entrances-precedents.md, E3's ledger line; Godric's 1 on hidden-ways-entrances-1023, 10.00 pm, 23 October 2026: the barrels counted; the Architect's barrel-nook-b, req 1080; Interaction's barrel-lid-b, req 1082; Events' req 1081): his own try, right or wrong, gives a sniff of vinegar and a giggle from the painted pear next along (GoF 21), never a soaking, nothing shames; the lid never opens for him; nothing glows. Three wordings, one drawn each tap"
+    },
+    {
+      "id": "barrels.try-2",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "barrels-try",
+      "weight": 1,
+      "moment": "tap barrel-lid-b",
+      "when": [
+        "place = kitchens corridor",
+        "year >= 4"
+      ],
+      "show": [
+        "the barrel answers with a smell of vinegar and nothing else, and the pear in its painted bowl snorts with laughter, as if it knew a joke about it"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H79 (docs/hidden-ways/entrances-precedents.md, E3's ledger line; Godric's 1 on hidden-ways-entrances-1023, 10.00 pm, 23 October 2026: the barrels counted; the Architect's barrel-nook-b, req 1080; Interaction's barrel-lid-b, req 1082; Events' req 1081): his own try, right or wrong, gives a sniff of vinegar and a giggle from the painted pear next along (GoF 21), never a soaking, nothing shames; the lid never opens for him; nothing glows. Three wordings, one drawn each tap"
+    },
+    {
+      "id": "barrels.try-3",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "barrels-try",
+      "weight": 1,
+      "moment": "tap barrel-lid-b",
+      "when": [
+        "place = kitchens corridor",
+        "year >= 4"
+      ],
+      "show": [
+        "vinegar again, and the pear in the painted bowl shaking very slightly in its frame, trying not to laugh"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H79 (docs/hidden-ways/entrances-precedents.md, E3's ledger line; Godric's 1 on hidden-ways-entrances-1023, 10.00 pm, 23 October 2026: the barrels counted; the Architect's barrel-nook-b, req 1080; Interaction's barrel-lid-b, req 1082; Events' req 1081): his own try, right or wrong, gives a sniff of vinegar and a giggle from the painted pear next along (GoF 21), never a soaking, nothing shames; the lid never opens for him; nothing glows. Three wordings, one drawn each tap"
+    }
+  ]
+}

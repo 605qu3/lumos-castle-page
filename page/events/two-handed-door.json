@@ -1,0 +1,166 @@
+{
+  "chain": "two-handed-door",
+  "first_visit": [],
+  "records": [
+    {
+      "id": "two-handed-door.press-together-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap s2-door-gate",
+      "when": [
+        "place = gate passage",
+        "together = yes",
+        "two_door != found"
+      ],
+      "show": [
+        "a brass hand each, too far apart for one boy, and the door swings in on two ways side by side through the stone, the level one on the north and the one that climbs on the south"
+      ],
+      "starts": [
+        "set two_door = found",
+        "log \"Pressed two brass hands, one each, and a door in the old gate passage opened on two stairs {day}\"",
+        "secret two-handed-door"
+      ],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): the two brass hands 1.5 apart, too far for one boy's reach; both boys at the iPad press one each and the door opens on its two ways; invented, no canon moment; nothing glows"
+    },
+    {
+      "id": "two-handed-door.press-together-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap s2-door-gate",
+      "when": [
+        "place = gate passage",
+        "together = yes",
+        "two_door = found"
+      ],
+      "show": [
+        "a brass hand each, and the door swings in again on its two ways, the level one and the one that climbs"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): found, the door is still a two-handed door every time"
+    },
+    {
+      "id": "two-handed-door.press-alone-note",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "two-door-alone",
+      "weight": 3,
+      "moment": "tap s2-door-gate",
+      "when": [
+        "place = gate passage",
+        "together = no"
+      ],
+      "show": [
+        "one hand on the one brass hand and the door does not stir; the other hand is too far to reach, and under the pair, in small letters, a note: Bring someone."
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): alone the door stays shut with the note Bring someone. (Interiors' hands and note, req 1087); a passing pupil now and then helps, so the same tap can open it"
+    },
+    {
+      "id": "two-handed-door.press-alone-pupil-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "two-door-alone",
+      "weight": 1,
+      "moment": "tap s2-door-gate",
+      "when": [
+        "place = gate passage",
+        "together = no",
+        "two_door != found"
+      ],
+      "show": [
+        "one hand on the one brass hand; a pupil going by in the passage stops, sets a hand on the other without a word, and the door swings in on two ways side by side through the stone; the pupil takes the one that climbs and is gone"
+      ],
+      "starts": [
+        "set two_door = found",
+        "log \"A passing pupil took the other brass hand and a door in the old gate passage opened on two stairs {day}\"",
+        "secret two-handed-door"
+      ],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): a passing pupil now and then sets a hand on the other brass hand and walks on up the other stair; never a scene, no names; the boy can open it and the two climbers glimpse each other through the core"
+    },
+    {
+      "id": "two-handed-door.press-alone-pupil-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "two-door-alone",
+      "weight": 1,
+      "moment": "tap s2-door-gate",
+      "when": [
+        "place = gate passage",
+        "together = no",
+        "two_door = found"
+      ],
+      "show": [
+        "one hand on the one brass hand; a pupil going by stops, sets a hand on the other, and the door swings in; the pupil takes the one that climbs and is gone"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): found, the same help comes now and then"
+    },
+    {
+      "id": "two-handed-door.level-foot",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap level-foot",
+      "when": [
+        "place = s2 level way g"
+      ],
+      "show": [
+        "the level way ends at the foot of a stair wound round an open core, going up into the light of the drum's loops; half a turn higher, across the core, the other stair's foot"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): the level way to the lower flight's foot (a turn a storey, two flights wound round a 0.6 open core, half a turn apart, Chambord's way); the numbers are the Architect's, cited not copied"
+    },
+    {
+      "id": "two-handed-door.other-stair-brother",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap foot-b",
+      "when": [
+        "place = s2 double stair",
+        "together = yes"
+      ],
+      "show": [
+        "through the open core, across the shaft, his brother on the other flight, climbing at the same slow pace, a hand up to wave"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): the two climbers glimpse each other through the core; nothing ranks one brother over the other"
+    },
+    {
+      "id": "two-handed-door.other-stair-pupil",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap foot-b",
+      "when": [
+        "place = s2 double stair",
+        "together = no"
+      ],
+      "show": [
+        "through the open core, across the shaft, a pupil on the other flight, climbing at the same slow pace, who nods through the gap and goes on"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): alone, the glimpse through the core is the pupil who took the other hand; never a scene, no names"
+    },
+    {
+      "id": "two-handed-door.round-room",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap arrive-b",
+      "when": [
+        "place = s2 room 2"
+      ],
+      "show": [
+        "the round room is tall under its vault, with two of everything: two chairs, two cups, two candles, and across the open core the other stair's top"
+      ],
+      "starts": [],
+      "canon": "Hidden Ways' H80 (docs/hidden-ways/s2-s4-design.md, Godric's picks and the ledger lines; Godric's 1 on hidden-ways-s2-1023, 10.18 pm, 23 October 2026; the Architect's S2, model v199, eac3754b; Interaction's places, req 1088; Events' req 1089): the round room on 2 where the two flights arrive opposite each other; two of everything (Interiors' req 1087); storey 3 left whole"
+    }
+  ]
+}
