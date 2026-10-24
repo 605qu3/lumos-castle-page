@@ -3,14 +3,17 @@
    "rose a few inches off the ground, drifted sideways and landed with a soft thump"). The Charms lane, forty-fourth
    session; the owner is Godric. Every desk and its bench is a target on its own, cast with Charms' moveThing
    (spells.js), once he has learned the spell in Charms.
-   The squares (1044.1, option 1, provisional, Godric to confirm; Fawkes agreed 5.31 pm): one square per desk place.
+   The squares (1044.1, option 1, Godric's at 10.07 pm, 23 October 2026, with the aisle: "We should allow the boys to
+   move them into the aisle, or it will feel too prescribed"): one square per desk place.
    Across the hall nine columns: a strip against the west wall (x' 0 to 0.8, its middle 0.4), the six desk columns
    (x' 1.1, 2.4, 3.7, 6.3, 7.6, 8.9), the aisle (5.0) between them, and a strip against the east wall (9.6); down the
    hall sixteen rows of 1.2 m on the desk rows (y' 3.0 to 21.0). A desk slid into a wall square turns a quarter as it
    drifts, its seat to the wall, two to a square (y' its row's middle and 0.3 either side), so all 48 can stand
-   aside, 32 a side; slid out again it turns back to face the dais. A desk square holds one desk. What is in the way is
-   judged at the square he names: the aisle to the door (never set down there), another desk, the dais, the walls,
-   the way to the door past the last row, or a spot where he stands. The words right and left, up and down are the
+   aside, 32 a side; slid out again it turns back to face the dais. A desk square holds one desk. An aisle square
+   (x' 4.3 to 5.7) holds one desk too, facing the dais, set down against the aisle's side it came from (its middle at
+   x' 4.6 from the west, 5.4 from the east), so the way down the aisle's middle, where the places stand, stays 1.1 m
+   clear to the door. What is in the way is judged at the square he names: another desk, the dais, the walls, the way
+   to the door past the last row, or a spot where he stands (the places in the aisle among them). The words right and left, up and down are the
    way he faces when he taps: looking south to the dais, right is west and down is toward him (north). The desks stay
    where he puts them for the visit; a reload brings the rows back (the armchair's precedent, req 252).
    Nothing glows or says tap me: the squares show in faint chalk only while a desk is in the air or waiting for his
@@ -23,7 +26,7 @@
      known: optional function () true once he has learned Mobiliarbus (LumosSpells.learned('mobiliarbus') by default),
      onCast(result): optional, the spell's answer after the thump or the miss, for the room's line,
      onLook({ n, x, y }): optional, called as the spell starts with the point (x', y') midway between the desk and the
-       wall square beside it in its row: the room turns his head there (no sideways turn past 90 degrees), since from
+       wall square beside it in its row (an aisle desk: its own side's wall): the room turns his head there (no sideways turn past 90 degrees), since from
        the aisle a wall square is off the screen,
      wait, stray, exits: as moveThing's }
    Returns { tap(raycaster, nearest): true when the ray meets a desk before `nearest` and the spell starts,
@@ -47,6 +50,7 @@ function xOf(c) {
 function rowOf(y) { return (y - ROW0) / ROW; }
 function yOf(r) { return ROW0 + r * ROW; }
 function strip(c) { return c === STRIPS[0] ? -1 : (c === STRIPS[1] ? 1 : 0); }
+var AISLE_X = [4.6, 5.4];                                 /* an aisle desk's middle, against the aisle's west or east side */
 function forHall(THREE, opts) {
   var S = root.LumosSpells, P = opts.P, cam = opts.camera, cv = opts.canvas;
   var par = opts.desks[0].parent; par.updateMatrixWorld(true);
@@ -77,13 +81,19 @@ function forHall(THREE, opts) {
     d.g.matrix.copy(m); d.g.matrixWorldNeedsUpdate = true;
   }
   function turnFor(c) { return -strip(c) * Math.PI / 2; }   /* west strip: seat to the west wall, facing east; east: facing west */
-  function spotFor(c, r, slot) { var s = strip(c); return { x: XC[c], y: yOf(r) + (s ? (slot ? 0.3 : -0.3) : 0) }; }
+  function spotFor(c, r, slot) {
+    if (c === AISLE) return { x: AISLE_X[slot ? 1 : 0], y: yOf(r) };
+    var s = strip(c); return { x: XC[c], y: yOf(r) + (s ? (slot ? 0.3 : -0.3) : 0) };
+  }
+  function slotFor(c, r, d, fromC) {   /* a wall square's second place; an aisle square's side, the side it came from */
+    if (c === AISLE) return fromC < AISLE ? 0 : (fromC > AISLE ? 1 : d.slot);
+    var h = holders(c, r, d); return h.length ? 1 - h[0].slot : 0;
+  }
   function holders(c, r, not) { return D.filter(function (d) { return d !== not && d.c === c && d.r === r; }); }
   function blockedAt(d, c, r) {
     if (c < 0 || c > 8) return 'the wall';
     if (r > ROWS - 1) return 'the way to the door';
     if (r < 0) { var x = XC[c]; return x > DAIS[0] - 0.3 && x < DAIS[1] + 0.3 ? 'the dais' : 'the wall'; }
-    if (c === AISLE) return 'the aisle to the door';
     var held = holders(c, r, d);
     if (held.length >= (strip(c) ? 2 : 1)) return held.length > 1 ? 'two desks there already' : 'the desk there';
     var s = spotFor(c, r, 0), hw = strip(c) ? 0.4 : 0.3, hd = strip(c) ? 0.6 : 0.4;
@@ -112,7 +122,7 @@ function forHall(THREE, opts) {
   function start(d) {
     if (!chalkMesh) chalkMesh = chalkLines();
     if (opts.onLook) {   /* the room turns his head to bring the desk and the wall square beside it into view */
-      var w = d.c <= 4 ? 0 : 8, s0 = spotFor(d.c, d.r, d.slot);
+      var w = d.c < AISLE || (d.c === AISLE && !d.slot) ? 0 : 8, s0 = spotFor(d.c, d.r, d.slot);
       opts.onLook({ n: d.i + 1, x: strip(d.c) ? s0.x : (s0.x + XC[w]) / 2, y: s0.y });
     }
     var look = new THREE.Vector3(); cam.getWorldDirection(look);
@@ -129,7 +139,7 @@ function forHall(THREE, opts) {
       onPiece: function (p) { var b = onDeskScreen(d); return p.x >= b.x0 && p.x <= b.x1 && p.y >= b.y0 && p.y <= b.y1; },
       blocked: function (dx, dy) { return blockedAt(d, from.c - fs * dx, from.r + fs * dy); },
       onDrift: function (p) {
-        if (!to) { var c = from.c - fs * p.dx, r = from.r + fs * p.dy, n = holders(c, r, d).length; to = { c: c, r: r, slot: n ? 1 - holders(c, r, d)[0].slot : 0 }; }
+        if (!to) { var c = from.c - fs * p.dx, r = from.r + fs * p.dy; to = { c: c, r: r, slot: slotFor(c, r, d, from.c) }; }
         var h = floorAt(p), end = spotFor(to.c, to.r, to.slot), mid = { x: xOf(to.c), y: yOf(to.r) };
         d.at.x = h.x + (end.x - mid.x) * p.k + (from.at.x - xOf(from.c)) * (1 - p.k);
         d.at.y = h.y + (end.y - mid.y) * p.k + (from.at.y - yOf(from.r)) * (1 - p.k);
