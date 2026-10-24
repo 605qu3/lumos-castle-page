@@ -414,9 +414,13 @@ var HALL_LIGHT = (function () {
       var home = PLACE === 'armour-gallery';
       if (home) LIT_BY[p.id] = true;
       [48.5, 54.5, 60.5, 66.5].forEach(function (y) { torch([5, y, [1, 0]], 2.2, home ? 9 : 0); torch([11, y, [-1, 0]], 2.2, home ? 9 : 0); });
+      /* req 1095 (the walk back in time, Godric's 1 on interiors-gallery-walls-1023): two more by the end wall at 2.4 for
+         the knight, lit from 6 pm to 6 am only, since by day he stands against the lancet's light */
+      var dusk = HOUR >= 18 || HOUR < 6;
+      torch([5, 69.0, [1, 0]], 2.4, home && dusk ? 9 : 0); torch([11, 69.0, [-1, 0]], 2.4, home && dusk ? 9 : 0);
       /* "low by night": from 9 pm to 6 am at 0.6, the evening between; ?torches=full keeps them full, for checks */
       var low = /[?&]torches=full/.test(location.search) ? 1 : HOUR >= 21 || HOUR < 6 ? 0.6 : HOUR >= 18 ? 0.8 : 1;
-      out.torches.slice(-8).forEach(function (t) { if (t.light) t.light.intensity *= low; });
+      out.torches.slice(-10).forEach(function (t) { if (t.light) t.light.intensity *= low; });
     }
     if (p.id === 'great-hall') {
       LIT_BY[p.id] = true;
@@ -2851,8 +2855,10 @@ var IRONWORK = (function () {
    10.30 pm, 23 October 2026). Lit inside by night, as the corridor's (s.light). No tap lands on them. */
 var GALLERY = (function () {
   if (PLACE !== 'armour-gallery' || !window.CastleSuit) return null;
-  var ROWS = [[47, 'gothic', 'tudor'], [50, 'jousting', 'three-quarter'], [53, 'maximilian', 'black-and-white'], [56, 'boy', 'cuirassier'],
-    [59, 'mace', null], [62, null, 'gothic-visor'], [65, 'tilt', 'munition'], [68, 'sword', 'shield']];
+  /* req 1095 (Godric's 1 on interiors-gallery-walls-1023, 11.34 pm, 23 October 2026; docs/interiors/armour-gallery.md, The
+     walls and the end): the walk back in time, the newest by the trophy room, the Gothic pair at the knight's end */
+  var ROWS = [[47, 'cuirassier', 'three-quarter'], [50, 'munition', 'black-and-white'], [53, 'tilt', 'sword'], [56, 'boy', 'shield'],
+    [59, 'mace', null], [62, null, 'tudor'], [65, 'maximilian', 'jousting'], [68, 'gothic', 'gothic-visor']];
   var z0 = shell.place.floor, H = 0.3, stone = kit.solid(0x7d7973), out = { suits: [] };
   var k = HOUR >= 21 || HOUR < 6 ? 1 : HOUR >= 18 ? 0.5 : 0;
   function stand(cx, y, face, kind) {   /* face +1: on the west wall, facing east */
@@ -2868,6 +2874,85 @@ var GALLERY = (function () {
     if (r[1]) stand(5.4, r[0], 1, r[1]);
     if (r[2]) stand(10.6, r[0], -1, r[2]);
   });
+  /* the walls by age (the same schedule's table): over each plinth its suit's era piece, a shield on two crossed weapons
+     1.4 across, 2.55 to 3.75; banners on iron poles 0.9 out at 3.9 in the bays without torches, hung across the aisle's
+     line so they are seen down it; on the end wall the sun of blades round the lancet and the east trophy; the knight's
+     plinth on the axis (his figure Corridor's, req 1096). Invented arms, faded, nothing dated; dull steel, nothing glows.
+     Every piece 1 cm off its stone or more, so the seams rule holds */
+  var ERA = { cuirassier: 'c17', 'three-quarter': 'c17', munition: 'c17', 'black-and-white': 'c16', tilt: 'c16', sword: 'c16', boy: 'c16',
+    shield: 'c16', mace: 'c16', tudor: 'c16', maximilian: 'c15', jousting: 'c15', gothic: 'gothic', 'gothic-visor': 'gothic' };
+  var steel = kit.solid(0x8e9093), iron = kit.solid(0x3a3836), wood = kit.solid(0x5a4330);
+  var paint = { gothic: kit.solid(0x7a3b2c), c15: kit.solid(0x4f5f78), c16: kit.solid(0x8e8a80), c17: kit.solid(0x6b6a66) };
+  var cloth = function (hex) { var m = kit.solid(hex).clone(); m.side = THREE.DoubleSide; return m; };
+  function onWall(x, y, z, ox, oy, name) {   /* a frame on the wall: x along it, y up, z out into the room */
+    var g = new THREE.Group(), at = shell.toLocal(x, y, z0 + z), o = shell.toLocal(x + ox, y + oy, z0 + z).sub(at);   /* z over the floor */
+    g.position.copy(at); g.rotation.y = Math.atan2(o.x, o.z); g.name = name; shell.group.add(g); return g;
+  }
+  function add(g, geo, mat, x, y, z, rz) {
+    var m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); if (rz) m.rotation.z = rz; m.raycast = function () {}; g.add(m); return m;
+  }
+  function weapon(g, len, rz, head, z) {   /* a shaft on the diagonal, its head at the upper end */
+    add(g, new THREE.BoxGeometry(0.035, len, 0.03), wood, 0, 0, z, rz);
+    var hx = -Math.sin(rz) * len / 2, hy = Math.cos(rz) * len / 2;
+    var h = head === 'blade' ? new THREE.BoxGeometry(0.05, 0.5, 0.012) : head === 'axe' ? new THREE.BoxGeometry(0.22, 0.24, 0.012) : new THREE.BoxGeometry(0.07, 0.3, 0.02);
+    add(g, h, steel, hx, hy, z + 0.03, rz);   /* 9 mm proud of the shaft's face, for the phone's coarser depth */
+  }
+  var HEADS = { gothic: ['axe', 'blade'], c15: ['spike', 'blade'], c16: ['axe', 'spike'], c17: ['blade', 'blade'] };
+  ROWS.forEach(function (r) {
+    [[r[1], 5, 1], [r[2], 11, -1]].forEach(function (w) {
+      if (!w[0]) return;
+      var e = ERA[w[0]] || 'c16', g = onWall(w[1] + w[2] * 0.01, r[0], 3.15, w[2], 0, 'gallery-era-' + r[0] + (w[2] > 0 ? 'w' : 'e'));
+      var a = Math.atan2(1.4, 1.2), len = Math.hypot(1.4, 1.2);
+      weapon(g, len, a, HEADS[e][0], 0.02); weapon(g, len, -a, HEADS[e][1], 0.06);
+      var sh = e === 'gothic' ? new THREE.BoxGeometry(0.55, 0.6, 0.03) : e === 'c15' ? new THREE.BoxGeometry(0.5, 0.5, 0.03)
+        : new THREE.CylinderGeometry(e === 'c16' ? 0.3 : 0.25, e === 'c16' ? 0.3 : 0.25, 0.03, 24);
+      var s = add(g, sh, paint[e], 0, 0, 0.11); if (e === 'c16' || e === 'c17') s.rotation.x = Math.PI / 2;
+      if (e !== 'gothic') add(g, new THREE.SphereGeometry(0.06, 10, 6), steel, 0, 0, 0.13).scale.z = 0.5;   /* the boss */
+      else add(g, new THREE.BoxGeometry(0.08, 0.6, 0.02), paint.gothic, 0, 0, 0.13);                       /* the pavise's ridge */
+    });
+  });
+  /* the banners: a cornet where the 1600s stand (51.5), guidons in the 1540 to 1600 stretch (57.5), Landsknecht flags at
+     its Maximilian end (63.5), the cloth in the pole's plane */
+  [[5, 51.5, 1, 'cornet'], [11, 51.5, -1, 'cornet'], [5, 57.5, 1, 'guidon'], [5, 63.5, 1, 'flag'], [11, 63.5, -1, 'flag']].forEach(function (b) {
+    var g = onWall(b[0] + b[2] * 0.01, b[1], 3.9, b[2], 0, 'gallery-banner-' + b[1] + (b[2] > 0 ? 'w' : 'e'));
+    add(g, new THREE.BoxGeometry(0.03, 0.03, 0.9), iron, 0, 0, 0.45);
+    var sh = new THREE.Shape(), W = 0.7, L = b[3] === 'cornet' ? 0.65 : 1.2;
+    sh.moveTo(0, 0); sh.lineTo(W, 0);
+    if (b[3] === 'guidon') { sh.lineTo(W, -L); sh.lineTo(W / 2, -L + 0.35); sh.lineTo(0, -L); } else { sh.lineTo(W, -L); sh.lineTo(0, -L); }
+    sh.lineTo(0, 0);
+    var hex = b[3] === 'cornet' ? 0x7c3a3a : b[3] === 'guidon' ? 0x5b6b52 : 0xa08a4a;
+    var c = add(g, new THREE.ShapeGeometry(sh), cloth(hex), 0, -0.03, 0.15); c.rotation.y = -Math.PI / 2;
+    if (b[3] === 'cornet') { var fr = add(g, new THREE.BoxGeometry(0.012, 0.05, W), kit.solid(0xb89a4a), 0, -0.03 - L - 0.02, 0.15 + W / 2); }
+    if (b[3] === 'flag') { var st = add(g, new THREE.BoxGeometry(0.014, 0.18, W), kit.solid(0x2e2a26), 0, -0.03 - L / 2, 0.15 + W / 2); }
+  });
+  /* the sun of blades on the end wall (y 70), round the lancet: 28 swords, hilts on a ring 0.78 out, blades to 1.75, cut
+     short at 4.3 and 2.25; a sword that would cross the lancet's reveal (x 7.6 to 8.4, 2.35 to 4.25) is left out */
+  var sun = onWall(8.0, 69.99, 3.3, 0, -1, 'gallery-sun'), drawn = 0;
+  for (var i = 0; i < 28; i++) {
+    var ph = (i + 0.5) * Math.PI * 2 / 28, cx = Math.cos(ph), cy = Math.sin(ph), r1 = 1.75;
+    if (cy > 0.01) r1 = Math.min(r1, (4.3 - 3.3) / cy); if (cy < -0.01) r1 = Math.min(r1, (2.25 - 3.3) / cy);
+    var hits = false;
+    for (var q = 0.66; q <= r1; q += 0.05) if (Math.abs(q * cx) < 0.4 && 3.3 + q * cy > 2.35 && 3.3 + q * cy < 4.25) hits = true;
+    if (hits || r1 - 0.78 < 0.3) continue;
+    var bl = r1 - 0.78, rz = ph - Math.PI / 2;
+    add(sun, new THREE.BoxGeometry(0.045, bl, 0.01), steel, cx * (0.78 + bl / 2), cy * (0.78 + bl / 2), 0.012, rz);
+    add(sun, new THREE.BoxGeometry(0.2, 0.025, 0.025), iron, cx * 0.78, cy * 0.78, 0.02, rz);
+    add(sun, new THREE.BoxGeometry(0.03, 0.12, 0.03), wood, cx * 0.71, cy * 0.71, 0.02, rz);
+    drawn++;
+  }
+  out.sunBlades = drawn;
+  /* the east trophy (x 9.5 to 10.9, 0.9 to 3.9): two pairs of crossed halberds and a painted round shield at 2.4 */
+  var tr = onWall(10.2, 69.99, 2.4, 0, -1, 'gallery-trophy');
+  [[1.4, 0.02], [0.9, 0.06]].forEach(function (p, k) {
+    var a = Math.atan2(p[0], 3.0), len = Math.hypot(p[0], 3.0);
+    weapon(tr, len, a, 'axe', p[1]); weapon(tr, len, -a, 'axe', p[1] + 0.02);
+  });
+  add(tr, new THREE.CylinderGeometry(0.32, 0.32, 0.03, 28), paint.c16, 0, 0, 0.13).rotation.x = Math.PI / 2;
+  add(tr, new THREE.SphereGeometry(0.07, 10, 6), steel, 0, 0, 0.15).scale.z = 0.5;
+  /* the knight's plinth on the axis, x 7.4 to 8.6, y 66.6 to 69.4, 0.3 high (his figure waits on Corridor's req 1096) */
+  var kp = new THREE.Mesh(new THREE.BoxGeometry(1.2, H + 0.01, 2.8), stone), kat = shell.toLocal(8.0, 68.0, z0), kn = shell.toLocal(8.0, 69.0, z0).sub(kat);
+  kp.position.copy(kat); kp.position.y += (H - 0.01) / 2; kp.rotation.y = Math.atan2(kn.x, kn.z); kp.name = 'gallery-knight-plinth'; kp.raycast = function () {};
+  shell.group.add(kp);
   return out;
 })();
 /* mirror-armour, "a tall suit of armor" (PS 12 L4250, L4308 to L4310; the model's mirror-armour, ledger 24): the round 3
