@@ -1423,19 +1423,38 @@ var STAIR = (function () {
   /* the armour (item 2): 1.70 high on a plinth 0.8 along the wall, 0.7 deep, 0.15 high, facing across the well. A step
      is 0.35: the most the tightest suits have (the east wall on 2 and 5 at y 27.2, between the hidden doorway's kept
      zone to 26.45 and the portraits from 28.0), so every suit steps alike */
-  var steel = kit.solid(0x8b8e92, { metalness: 0.55, roughness: 0.45 }), stone = kit.solid(0x7d7973), dark = kit.solid(0x1c1b1a);
-  var warm = new THREE.MeshBasicMaterial({ color: 0xffc46e });
+  var stone = kit.solid(0x7d7973);
+  /* the round 3 suit (the 155th; Godric's 7.14 pm word on corridor-armour-gallery-1023, "the suit we designed as the
+     standard default"; Corridor's page/corridor/suit.js, kind default) on the plinth, for the boxes drawn before it. At
+     Christmas the visor's glow (PoA 11) where the drawing's slit is, as the corridor seats its own (seatVisor in
+     page/corridor.html), 8 mm off the helm's face */
+  var glowTex = (function () {
+    var c = document.createElement('canvas'); c.width = 128; c.height = 32; var x = c.getContext('2d'), gr = x.createLinearGradient(0, 0, 0, 32);
+    gr.addColorStop(0, 'rgba(226,128,52,0)'); gr.addColorStop(0.5, 'rgba(255,196,112,1)'); gr.addColorStop(1, 'rgba(226,128,52,0)');
+    x.fillStyle = gr; x.fillRect(0, 0, 128, 32); x.globalCompositeOperation = 'destination-in';
+    var gx = x.createLinearGradient(0, 0, 128, 0); gx.addColorStop(0, 'rgba(0,0,0,0)'); gx.addColorStop(0.5, 'rgba(0,0,0,1)'); gx.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = gx; x.fillRect(0, 0, 128, 32); return srgb(new THREE.CanvasTexture(c)); })();
+  var glowMat = new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false });
+  var nightK = HOUR >= 21 || HOUR < 6 ? 1 : HOUR >= 18 ? 0.5 : 0;
   function suit(wallX, face, y, z) {
-    var s = new THREE.Group(), add = function (w, h, d, x, yy, zz, mat) { var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat || steel); m.position.set(x, yy, zz); s.add(m); return m; };
-    add(0.7, 0.15, 0.8, 0, 0.075, 0, stone);                                          /* the plinth; x across the well, z along the wall */
-    add(0.16, 0.78, 0.15, 0.02, 0.54, -0.1); add(0.16, 0.78, 0.15, 0.02, 0.54, 0.1);  /* the legs */
-    add(0.24, 0.07, 0.17, 0.06, 0.18, -0.1); add(0.24, 0.07, 0.17, 0.06, 0.18, 0.1);   /* the sabatons */
-    add(0.28, 0.2, 0.42, 0, 1.02, 0); add(0.3, 0.42, 0.44, 0, 1.33, 0);                /* the tassets, the breastplate */
-    add(0.2, 0.14, 0.15, 0, 1.49, -0.3); add(0.2, 0.14, 0.15, 0, 1.49, 0.3);          /* the pauldrons */
-    add(0.12, 0.52, 0.11, 0.02, 1.18, -0.3); add(0.12, 0.52, 0.11, 0.02, 1.18, 0.3);  /* the arms */
-    add(0.18, 0.06, 0.2, 0, 1.57, 0); add(0.25, 0.25, 0.22, 0.01, 1.725, 0);         /* the gorget, the helm */
-    add(0.005, 0.025, 0.15, 0.137, 1.75, 0, dark);                                     /* the visor's slit */
-    var lit = add(0.006, 0.025, 0.15, 0.139, 1.75, 0, warm); lit.visible = false;
+    var s = new THREE.Group();
+    var pl = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.15, 0.8), stone); pl.position.y = 0.075; s.add(pl);   /* the plinth; x across the well, z along the wall */
+    var lit = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 0.03), glowMat); lit.visible = false; lit.name = 'stair-armour-visor-light';
+    if (window.CastleSuit) {
+      var cs = CastleSuit.make(THREE, renderer, { kind: 'default', src: '../assets/layers/corridor-armour.png' });
+      cs.group.position.y = 0.15; cs.group.rotation.y = Math.PI / 2;   /* it faces +z; across the well is the group's +x */
+      s.add(cs.group);
+      cs.onReady(function () {
+        cs.light(nightK);
+        cs.group.add(lit);
+        var rc = new THREE.Raycaster(), lx = (597 - 539) / 1369, ly = 2141 / 1369;   /* the corridor's slit, 1.56 over the feet */
+        cs.group.updateMatrixWorld(true);
+        rc.set(cs.group.localToWorld(new THREE.Vector3(lx, ly, 1)), new THREE.Vector3(0, 0, -1).transformDirection(cs.group.matrixWorld));
+        var hit = cs.body ? rc.intersectObject(cs.body)[0] : null;
+        lit.position.set(lx, ly, (hit ? cs.group.worldToLocal(hit.point.clone()).z : 0.12) + 0.008);
+        cs.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; });
+      });
+    }
     var home = P(wallX + face * 0.35, y, z);
     s.position.copy(home); s.rotation.y = face > 0 ? 0 : Math.PI; g.add(s);
     /* its own left: a west suit faces east (+x), its left north (+y); an east suit faces west, its left south */
@@ -2533,6 +2552,24 @@ var GALLERY = (function () {
     if (r[2]) stand(10.6, r[0], -1, r[2]);
   });
   return out;
+})();
+/* mirror-armour, "a tall suit of armor" (PS 12 L4250, L4308 to L4310; the model's mirror-armour, ledger 24): the round 3
+   suit's tall kind (Corridor's suit.js) on a plain stone plinth 0.7 along the library corridor's east wall, 0.5 deep and
+   0.4 high, a boy can sit on (docs/interiors/mirror-classroom.md, the tall suit of armour), its back 5 cm off the wall
+   (x 70.45 to 70.95, y 62.3 to 63.0), facing across the corridor; the unused classroom's door 1.0 north of it, on his
+   left as he faces it. No tap lands on it (the 155th) */
+var MIRROR_ARMOUR = (function () {
+  if (PLACE !== 'library-corridor' || !window.CastleSuit) return null;
+  var z0 = shell.place.floor, H = 0.4, at = shell.toLocal(70.70, 62.65, z0);
+  var west = shell.toLocal(69.70, 62.65, z0).sub(at);
+  var pl = new THREE.Mesh(new THREE.BoxGeometry(0.7, H, 0.5), kit.solid(0x7d7973));   /* its depth (z) turned to face west */
+  pl.position.copy(at); pl.position.y += H / 2; pl.rotation.y = Math.atan2(west.x, west.z); pl.name = 'mirror-armour-plinth';
+  pl.raycast = function () {}; shell.group.add(pl);
+  var s = CastleSuit.make(THREE, renderer, { kind: 'tall', src: '../assets/layers/corridor-armour.png' });
+  s.group.position.copy(at); s.group.position.y += H; s.group.rotation.y = Math.atan2(west.x, west.z); s.group.name = 'mirror-armour';
+  s.onReady(function () { s.light(HOUR >= 21 || HOUR < 6 ? 1 : HOUR >= 18 ? 0.5 : 0); s.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); });
+  shell.group.add(s.group);
+  return s;
 })();
 /* the hospital wing's lamps (Magic's req 677; Events' req 681, page/events/wing.json), where Interiors'
    docs/interiors/hospital-wing.md hangs them (req 678, cited; x = 151.4 + x', y = 25 + y'): six lanterns on chains
