@@ -1012,12 +1012,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         out.lined = out.lined || {};
         if (g.op.depth > t + 0.05 && !g.soffit && !g.back && !out.lined[g.op.id] && !/window|loop|lancet|oriel|dormer|cleft/.test(g.op.kind || '')) {
           out.lined[g.op.id] = Q.id;
-          var D = g.op.depth, dm = D / 2, ln = D - 0.02, lp = function (s, y, wd, hg, mat, kind, nm) {
-            var m = slab(wd, hg, ln, mat, kind), q = toLocal(a[0] + ux * s + nx * dm, a[1] + uy * s + ny * dm, Q.floor);
+          /* v83 (the 166th: sw-turret-stair's wind-dial door, where the turret's round face leaves the passage's mouth open):
+             the floor and head run under and over the sides, so their ends shared the sides' end planes in a 5 mm strip;
+             they stop 8 mm short of the sides' ends now */
+          var D = g.op.depth, dm = D / 2, ln = D - 0.02, lp = function (s, y, wd, hg, mat, kind, nm, dp) {
+            var m = slab(wd, hg, dp || ln, mat, kind), q = toLocal(a[0] + ux * s + nx * dm, a[1] + uy * s + ny * dm, Q.floor);
             m.position.set(q.x, q.y + y, q.z); m.rotation.y = ang; m.name = Q.id + '-lining-' + nm + '-' + g.op.id; m.userData.owner = Q.id; group.add(m);
           };
-          lp(sm, g.sill + 0.015 - 0.05, w + 0.02, 0.1, mats.floor, 'floor', 'floor');
-          lp(sm, g.h + 0.005 + 0.15, w + 0.02, 0.3, mats.wall, 'wall', 'head');
+          lp(sm, g.sill + 0.015 - 0.05, w + 0.02, 0.1, mats.floor, 'floor', 'floor', ln - 0.016);
+          lp(sm, g.h + 0.005 + 0.15, w + 0.02, 0.3, mats.wall, 'wall', 'head', ln - 0.016);
           lp(g.s0 - 0.155, g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', 'a');
           lp(g.s1 + 0.155, g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', 'b');
         }
