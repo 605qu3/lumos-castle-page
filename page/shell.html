@@ -2327,6 +2327,68 @@ var LAKE_SEATS = (function () {
   });
   return out;
 })();
+/* H75, H77 and H78's things (ledger 282, req 1084; Interiors' docs/interiors/window-seats.md on Godric's 1 at 8.25 pm, 23
+   October 2026; the finds Hidden Ways'), heights from each room's own floor. H75: on the four seats that change places
+   (G 146.15, 1 145.0, 2 143.9, 3 146.6) a five-petalled rose on the middle sunk panel, 0.12 across, centred 0.21 up and
+   standing 12 mm proud of the panel, and an iron hand rail across the lid 0.15 in from its back, 0.18 over it on two
+   posts (Interiors' reading: the rail rides on the seat). H77, in sun-hide-g: the faded red cushion before the slit and
+   the brass telescope laid on it, its glass cracked. H78: under seat 1 150.4's floor (the compartment, the stone left
+   whole till the floor lifts) the Gobstones box with its lid off and fourteen stones, the bag of Acid Pops and the
+   folded note; in seat-den-3 the hooked rug, the candle stub in its jar (out) and the tin of toffees. Dull, nothing
+   glows, untappable; the turns, lifts and lines Events' */
+var SEAT_THINGS = (function () {
+  var H75 = { 'lake-sash-g-146.15': 1, 'lake-sash-1-145': 1, 'lake-sash-2-143.9': 1, 'lake-sash-3-146.6': 1 };
+  var mine = MODEL.openings.filter(function (o) { return o.room === PLACE && H75[o.id] && o.recess && o.at; });
+  var hide = PLACE === 'sun-hide-g', den = PLACE === 'seat-den-3', comp = PLACE === 'lake-corridor-1-east';
+  if (!mine.length && !hide && !den && !comp) return null;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'seat-things'; g.userData.owner = PLACE; shell.group.add(g);
+  function own(m) { m.userData.owner = PLACE; m.raycast = function () {}; g.add(m); return m; }
+  var oak = kit.solid(0x4a4136), iron = kit.solid(0x2e2b28), brass = kit.solid(0x7a6334), glass = kit.solid(0x9fb2b8),
+      wool = kit.solid(0x8a4a42), rag = kit.solid(0x7d5a4c), jar = kit.solid(0x8f8676), wax = kit.solid(0xd8cfba),
+      tin = kit.solid(0x6d6a63), wood = kit.solid(0x6e5f4a), stone = kit.solid(0x55524c), paper = kit.solid(0xb9a77e), note = kit.solid(0xd2c49e);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  function box(x0, y0, za, x1, y1, zb, mt) { return own(thingBox(g, P, [x0, y0, za], [x1, y1, zb], mt)); }
+  function cyl(x, y, za, zb, r, mt, n) { var a = P(x, y, za), m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, zb - za, n || 12), mt); m.position.set(a.x, a.y + (zb - za) / 2, a.z); return own(m); }
+  mine.forEach(function (o) {   /* the recess's frame as LAKE_SEATS's: u along the wall, v out from the corridor's face */
+    var c = (o.compass || 180) * Math.PI / 180, ox = Math.round(Math.sin(c)), oy = Math.round(Math.cos(c)), half = o.recess.w / 2, b = o.depth - 0.015;
+    var Q = function (u, v, z) { return P(o.at[0] + u * -oy + v * ox, o.at[1] + u * ox + v * oy, z); };
+    var fb = function (u0, v0, za, u1, v1, zb, mt) { return own(thingBox(g, Q, [u0, v0, za], [u1, v1, zb], mt)); };
+    /* the rose: a boss and five petals, 12 mm proud of the middle panel's face (v 0.015) */
+    var face = Q(0, 0.015, 0.21), out = Q(0, -1, 0.21).sub(face).normalize();
+    var rose = new THREE.Group(); rose.position.copy(face); rose.lookAt(face.clone().add(out)); g.add(rose);
+    for (var k = 0; k < 5; k++) {
+      var a = k * 2 * Math.PI / 5, pm = new THREE.Mesh(new THREE.SphereGeometry(0.026, 10, 8), oak);
+      pm.scale.set(1, 1, 0.3); pm.position.set(Math.cos(a) * 0.033, Math.sin(a) * 0.033, 0.004); pm.userData.owner = PLACE; pm.raycast = function () {}; rose.add(pm);
+    }
+    var boss = new THREE.Mesh(new THREE.SphereGeometry(0.02, 10, 8), oak); boss.scale.set(1, 1, 0.55); boss.position.set(0, 0, 0.002); boss.userData.owner = PLACE; boss.raycast = function () {}; rose.add(boss);
+    /* the rail: two posts and the bar, 0.15 in from the lid's back */
+    var v = b - 0.15, u0 = -half + 0.05, u1 = half - 0.05;
+    fb(u0, v - 0.0125, 0.45, u0 + 0.025, v + 0.0125, 0.63, iron); fb(u1 - 0.025, v - 0.0125, 0.45, u1, v + 0.0125, 0.63, iron);
+    fb(u0, v - 0.0125, 0.63, u1, v + 0.0125, 0.655, iron);
+  });
+  if (hide) {   /* the cushion before the slit and the telescope on it, its eyepiece toward the slit */
+    box(112.15, -2.35, 0.0, 112.65, -1.85, 0.10, wool);
+    var t0 = P(112.20, -2.125, 0.1225), t1 = P(112.60, -2.125, 0.1225), ax = t1.clone().sub(t0);
+    [[0, 0.22, 0.019, brass], [0.22, 0.395, 0.0225, brass], [0.395, 0.40, 0.021, glass]].forEach(function (s) {
+      var m = new THREE.Mesh(new THREE.CylinderGeometry(s[2], s[2], (s[1] - s[0]) * ax.length(), 14), s[3]);
+      m.position.copy(t0).addScaledVector(ax, (s[0] + s[1]) / 2); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), ax.clone().normalize()); own(m);
+    });
+  }
+  if (comp) {   /* under the box's floor, the compartment's floor 0.45 down */
+    box(150.12, 0.05, -0.45, 150.32, 0.19, -0.39, wood);
+    box(150.12, -0.13, -0.45, 150.32, 0.01, -0.44, wood);   /* its lid, off beside it */
+    for (var r = 0; r < 2; r++) for (var s = 0; s < (r ? 6 : 7); s++) cyl(150.145 + s * 0.025, 0.09 + r * 0.06, -0.44, -0.425, 0.01, stone, 8);
+    box(150.50, 0.06, -0.45, 150.62, 0.16, -0.40, paper);
+    box(150.35, -0.18, -0.45, 150.49, -0.04, -0.446, note);
+  }
+  if (den) {
+    box(150.2, -1.5, 0.0, 151.6, -0.8, 0.012, rag);
+    cyl(150.10, -1.00, 0.0, 0.12, 0.05, jar, 14); cyl(150.10, -1.00, 0.12, 0.124, 0.042, iron, 14);
+    cyl(150.10, -1.00, 0.02, 0.06, 0.012, wax, 8);
+    cyl(151.775, -1.325, 0.0, 0.05, 0.075, tin, 18);
+  }
+  return { group: g };
+})();
 /* the Defence classroom's six plates (Magic's req 675; Events' req 680, page/events/defence.json), where Interiors'
    docs/interiors/defence-classroom.md hangs them (req 675's centres, cited; x = 48 - y', y = 71.4 - x'): three a side
    at y' 3.2, 4.8 and 8.0, the window wall (x' 0) and the left wall (x' 8), each 0.5 wide by 0.6 high, centred at 1.8.
