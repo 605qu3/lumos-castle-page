@@ -1140,8 +1140,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var S = Q.rec, c = Q.round.c, R = Q.round.r, NR = 0.15, rise = S.rise || 0.2, PR = 0.95 * R / 1.7, GO = 0.25, doors = [];   /* v25: the walk's radius scaled to the well's (0.95 at r 1.7) */
     gaps.forEach(function (gs) { gs.forEach(function (g) {
       if (g.spill || g.niche || !g.op.at) return;
+      /* v82 (the Architect's 164th, H82's slits): a window in a double stair's wall is no door: it takes no landing and
+         cuts no tread under it */
+      if (S.double && /window|loop|lancet|oriel|dormer|cleft|slit/.test(g.op.kind || '')) return;
       doors.push({ id: g.op.id, a: angle(c, toSite(M, g.op.group || null, g.op.at)), z: Q.floor + g.sill, top: Q.floor + g.h,
-        w: g.s1 - g.s0, half: Math.atan2(g.s1 - g.s0, 2 * R) * 180 / Math.PI });
+        w: g.s1 - g.s0, half: Math.atan2(g.s1 - g.s0, 2 * R) * 180 / Math.PI, flight: g.op.flight || null });
     }); });
     if (S.double) NR = 0.3;   /* v80: a double stair's open core, no newel */
     else {
@@ -1168,7 +1171,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        neither flight needs its head room (2.2 over its last treads), each head's landing on it */
     function doubleStair() {
       var TURN = 5.2, rs = TURN / 30, t = 12, GAP = 2.49, HEAD = 2.2, top = S.to != null ? S.to : Q.ceiling - TURN;
-      var up = doors.filter(function (d) { return d.z > Q.floor + 0.05 && d.z < top - 0.05; }).sort(function (p, q) { return p.z - q.z; })[0];
+      /* v82 (the Architect's 164th, req 1103's grotto): a door naming its flight (`flight: "a"` or `"b"`) opens off that
+         flight's treads where they pass it, so it never starts B; only an unnamed door between the floor and the top does */
+      var up = doors.filter(function (d) { return !d.flight && d.z > Q.floor + 0.05 && d.z < top - 0.05; }).sort(function (p, q) { return p.z - q.z; })[0];
       /* v81 (the Architect's 162nd, H82, the fern well): with no door between the floor and the top, both flights rise
          from the floor half a turn apart (each 2.6 over the other), B's foot 6 degrees short of the foot door, in the
          only gap the two leave under 2.4 */
