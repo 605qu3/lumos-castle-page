@@ -3929,6 +3929,50 @@ var W1 = (function () {
     box(7.62, 0.38, 0.84, 7.63, 0.46, 0.95, N9.brass);                                                /* the lamp's door, its knob */
     box(7.66, 0.3, 0.745, 7.86, 0.42, 0.84, RT.deal);
     [0.31, 0.33, 0.35, 0.37, 0.39].forEach(function (yp, i) { box(7.68, yp, 0.8, 7.84, yp + 0.006, 0.89 - (i % 2) * 0.02, i % 2 ? mat('n9-slide-blue', 0x3c4e6a) : mat('n9-slide-red', 0x7a3a2a)); });
+    /* ledger 249: docs/interiors/history-of-magic-classroom.md, The real things (x = 124 + y', y = 71.4 - x'; the back
+       wall y' 0, the front y' 11, the window wall x' 0). No stove: the cold hearth stays cold. Its desks first, as The
+       things place them (none drawn till now, and the hourglass stands on his): three rows of four double desks, 1.2
+       by 0.5 and 0.72 high, two chairs behind each; his desk 0.78 high, his chair behind it facing the room */
+    [2.1, 3.5, 4.9].forEach(function (yp) { [0.8, 2.0, 4.8, 6.0].forEach(function (xp) {
+      desk(xp + 0.005, yp, xp + 1.195, yp + 0.5, 0.72, wood);
+      [0.3, 0.9].forEach(function (u) { chair(xp + u, yp - 0.275, 90, 1, wood, 0.21); out.seats.push(P(xp + u, yp + 0.2, 0.72)); });
+    }); });
+    pedestalDesk(3.2, 8.2, 4.8, 9.0, 0.78, dark);
+    chair(4.0, 9.45, 270, 0, dark, 0.25);
+    /* 1, the wall map of wizarding Europe on its roller, right of the door, never pulled down: the paper faded, its
+       lands' colours 8 mm off it, the roller and the bottom batten, the roller's two cords to their hooks */
+    box(5.2, 0.008, 1.3, 7.0, 0.009, 2.6, mat('h-map', 0xcabf9f));
+    [[5.25, 6.1, 1.35, 2.55, 0x9aa9a3], [6.1, 6.95, 1.35, 1.75, 0x9aa9a3]].forEach(function (s) { box(s[0], 0.016, s[2], s[1], 0.017, s[3], mat('h-map-sea', s[4])); });   /* the seas */
+    [[5.5, 5.95, 1.8, 2.3, 0xa58a6a], [6.15, 6.6, 2.0, 2.5, 0x8f9a72], [6.4, 6.9, 1.8, 2.15, 0xb09a7a], [6.15, 6.5, 1.8, 1.98, 0x9b7f84]].forEach(function (s, i) {
+      box(s[0], 0.024, s[2], s[1], 0.025, s[3], mat('h-map-land-' + i, s[4])); });                    /* the lands, 8 mm off the seas */
+    rod([5.12, 0.035, 2.63], [7.08, 0.035, 2.63], 0.025, RT.deal, 10);
+    rod([5.18, 0.022, 1.3], [7.02, 0.022, 1.3], 0.012, RT.deal, 8);
+    [5.3, 6.9].forEach(function (xp) { rod([xp, 0.035, 2.655], [xp, 0.02, 2.82], 0.003, RT.coal, 4); rod([xp, 0.02, 2.82], [xp, 0.06, 2.82], 0.006, RT.iron, 4); });
+    /* 2, the terrestrial globe on its turned stand in the front corner by the windows, its brass meridian */
+    drum(0.5, 9.8, 0.0, 0.04, 0.2, 0.18, wood, 16); drum(0.5, 9.8, 0.04, 0.5, 0.035, 0.05, wood, 10);
+    var hg = new THREE.Mesh(new THREE.SphereGeometry(0.22, 22, 16), mat('h-globe', 0x9a8c62)); hg.position.y = 0.76; add(hg, at(0.5, 9.8, 0, 0));
+    ring([0.5, 0.76], 0.235, 0.007, N9.brass, 28, function (a, u) { return [a, 9.8, u]; });
+    rod([0.5, 9.8, 0.5], [0.5, 9.8, 0.525], 0.03, wood, 10);
+    /* 3, the small glazed case of old things on the front wall, 0.15 proud: the goblin-made coin, the wand broken clean
+       in two, the wax seal and its brass matrix, each on a card in his hand 8 mm off the back */
+    var hpane = mats['rt-pane'] || (mats['rt-pane'] = kit.solid(0xb8c4c2, { transparent: true, opacity: 0.16, depthWrite: false }));
+    box(5.75, 10.97, 1.15, 6.45, 11.0, 1.65, dark);                                                   /* the back */
+    box(5.75, 10.85, 1.15, 5.78, 10.97, 1.65, dark); box(6.42, 10.85, 1.15, 6.45, 10.97, 1.65, dark);  /* the sides */
+    box(5.78, 10.85, 1.15, 6.42, 10.97, 1.18, dark); box(5.78, 10.85, 1.62, 6.42, 10.97, 1.65, dark);  /* the floor, the head */
+    box(5.78, 10.858, 1.18, 6.42, 10.86, 1.62, hpane);                                                 /* the glass */
+    [5.85, 6.05, 6.25].forEach(function (xp) { box(xp, 10.961, 1.42, xp + 0.13, 10.962, 1.5, N9.paper); });
+    drum(5.915, 10.93, 1.18, 1.184, 0.016, 0.016, mat('h-goblin-gold', 0x9c7c3a), 14);               /* the coin, dull */
+    rod([6.05, 10.92, 1.187], [6.12, 10.925, 1.187], 0.005, mat('h-wand', 0x3a2a1e), 6); rod([6.125, 10.93, 1.187], [6.19, 10.915, 1.187], 0.005, mat('h-wand', 0x3a2a1e), 6);
+    drum(6.28, 10.93, 1.18, 1.188, 0.018, 0.018, mat('h-wax', 0x6e2622), 12); drum(6.35, 10.93, 1.18, 1.235, 0.007, 0.011, N9.brass, 10);
+    /* 4, the cupboard of spare ink and quills left of the door; 5, the pegs between it and the door, a cloak and two
+       scarves left; 6, the plain round clock over the door, facing his desk; 7, the window pole at the first pier */
+    cupboard(0.4, 0.05, 1.6, 0.55, 1.9, 0.55);
+    pegs(1.8, 3.2, 0.0, 1.6, 7, 1);
+    cloak(1.9, 0.0, 1.6, 1); scarf(2.5, 0.0, 1.6, 1); scarf(3.1, 0.0, 1.6, 1);
+    clock(4.0, 0.0, 2.8, 1);
+    pole([0.25, 4.0, 0.0], [0.04, 4.0, 2.3]);
+    /* 8, the hourglass long run out on his desk's window-side back corner, never turned */
+    hourglass(3.42, 8.72, 0.78);
   }
   if (PLACE === 'ancient-runes-classroom') {
     /* 1 (ledger 273), the brass rubbing of a knight on the front wall (y' 10.7) right of the blackboard, pinned up: the
