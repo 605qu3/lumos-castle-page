@@ -3637,12 +3637,21 @@ function updateNorris(dt) {
    her feet stay on the flags. Cell 1's eyes measured once on the atlas (x from the card's middle, y from her feet, at the
    still scale): the glints sit on them. ?norrisFigure=0 keeps the code-drawn cat for a look */
 var NORRIS_FIG = { on: groundsQ.get('norrisFigure') !== '0' && !SET_ASIDE, w: 929 / 1548, h: 1082 / 1548, still: 1548 / 3200, n: 6,
-  eyeX: 0.041, eyeY: 0.28, eyeGap: 0.037 };
+  eyeX: 0.041, eyeY: 0.28, eyeGap: 0.037, fill: 1, nightFill: 0.04, lit: 0.3 };
+/* her own grey: her card faces the eye with the corridor's light behind her, so it took mostly the warm bounce off the
+   flags and read ginger; a neutral fill of her own drawing (fill by day, nightFill at full night, updateNight), the
+   room's light on her turned down (lit), keeps her dust-grey (PS 8) by day and evening and dim at night */
+function norrisFill(k) {
+  [norrisDoor.card, norris.card].forEach(function (m) {
+    if (m) m.material.emissive.setScalar(NORRIS_FIG.fill * (1 - k) + NORRIS_FIG.nightFill * k);
+  });
+}
 function norrisCard(name) {
   var sheet = new THREE.TextureLoader().load('../assets/layers/norris-figure.png');
   sheet.encoding = THREE.sRGBEncoding; sheet.anisotropy = 4;
   var m = new THREE.Mesh(new THREE.PlaneGeometry(NORRIS_FIG.w, NORRIS_FIG.h), new THREE.MeshStandardMaterial({ map: sheet,
-    roughness: 0.95, metalness: 0, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, opacity: 0 }));
+    emissiveMap: sheet, emissive: new THREE.Color(NORRIS_FIG.fill, NORRIS_FIG.fill, NORRIS_FIG.fill),
+    color: new THREE.Color(NORRIS_FIG.lit, NORRIS_FIG.lit, NORRIS_FIG.lit), roughness: 0.95, metalness: 0, transparent: true, alphaTest: 0.5, side: THREE.DoubleSide, opacity: 0 }));
   m.name = name; m.userData.peak = 1; m.userData.cell = -1;
   return m;
 }
@@ -4381,6 +4390,7 @@ function updateNight(dt) {
   scene.fog.color.copy(NIGHT.fog0).lerp(NIGHT.dark, k); scene.background.copy(NIGHT.bg0).lerp(NIGHT.dark, k);
   if (BEAMS.mat) BEAMS.mat.emissive.copy(col(BEAMS.boards)).multiplyScalar(BEAMS.bounce * (1 - k));   /* the nook's boards by day */
   NIGHT.torchBoost = 1 + 0.35 * k;
+  if (NORRIS_FIG.on) norrisFill(k);
   /* the suit's torchlight: every torch near it hangs on its own wall, in line with its card, so their light grazes it
      edge on and by night it went near black; the steel takes their warmth back off the walls instead (ARMOUR_BOUNCE
      at full night), its own drawing lit by it */
