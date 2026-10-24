@@ -167,6 +167,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-shell.js?v=77"></script>
 <script src="shell-w5b.js?v=17"></script>
 <script src="depth-ties.js?v=1"></script>
+<script src="corridor/suit.js?v=5"></script>
 <script src="shell-w5a.js?v=21"></script>
 <script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=2"></script>
@@ -358,7 +359,7 @@ var HALL_LIGHT = (function () {
     if (PAINTED.indexOf(p.id) < 0) return;
     var g = new THREE.Group(); g.name = p.id + '-lights'; shell.group.add(g);
     var P = function (x, y, z) { return shell.toLocal(x, y, p.floor + z); };
-    if (p.id === 'entrance-hall' || p.id === 'stair-hall') {
+    if (p.id === 'entrance-hall' || p.id === 'stair-hall' || p.id === 'armour-gallery') {
       var iron = kit.solid(0x34312e), flame = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
       var soot = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, depthWrite: false, alphaMap: (function () {   /* the fan: black, grey for its opacity, so it only darkens */
         var c = document.createElement('canvas'); c.width = 64; c.height = 128; var x = c.getContext('2d');
@@ -400,6 +401,17 @@ var HALL_LIGHT = (function () {
           torch([w[0], y, w[1]], 5.2 * fl + 2.4, lit ? 18 : 0);
         });
       });
+    }
+    if (p.id === 'armour-gallery') {
+      /* Interiors' eight (docs/interiors/armour-gallery.md, The torches): iron brackets at 2.2 on both long walls between
+         the suits, y 48.5, 54.5, 60.5 and 66.5, lit always; seen from the gallery each carries a light, so the plinths'
+         fronts are not left to the plain four's fill by night (the hundred-fifty-fifth); from a neighbour, flames only */
+      var home = PLACE === 'armour-gallery';
+      if (home) LIT_BY[p.id] = true;
+      [48.5, 54.5, 60.5, 66.5].forEach(function (y) { torch([5, y, [1, 0]], 2.2, home ? 9 : 0); torch([11, y, [-1, 0]], 2.2, home ? 9 : 0); });
+      /* "low by night": from 9 pm to 6 am at 0.6, the evening between; ?torches=full keeps them full, for checks */
+      var low = /[?&]torches=full/.test(location.search) ? 1 : HOUR >= 21 || HOUR < 6 ? 0.6 : HOUR >= 18 ? 0.8 : 1;
+      out.torches.slice(-8).forEach(function (t) { if (t.light) t.light.intensity *= low; });
     }
     if (p.id === 'great-hall') {
       LIT_BY[p.id] = true;
@@ -2491,6 +2503,36 @@ var IRONWORK = (function () {
   IW.group.traverse(function (m) { if (m.isMesh && /-scrolls$/.test(m.name)) { m.material.polygonOffset = true; m.material.polygonOffsetFactor = 1; m.material.polygonOffsetUnits = 2; m.userData.rank = 1; } });
   shell.group.add(IW.group);
   return IW;
+})();
+/* the armour gallery's suits, fourteen (req 1045's rest and req 1060; Godric's 7.14 pm word on corridor-armour-gallery-1023, the
+   round 3 suit through the castle; Corridor's page/corridor/suit.js, its kinds; the places Interiors'
+   docs/interiors/armour-gallery.md, the suits, and docs/notes/2026-10-23-castle-armour-places.md): each on a dressed
+   stone plinth 0.7 by 0.7, 0.3 high, its back 5 cm off its wall (west x 5.05 to 5.75, east x 10.25 to 10.95), the suit
+   on its middle facing across the aisle, at 3 m centres from y 47 to 68, the east's 59 left for the tapestry; the west's 62 held,
+   its plinth across west-stair-foot-3-door (y 60.9 to 62.1), on interiors-armour-gallery-door-1023 (req 1060). The kinds
+   Corridor has built stand in their places; the seven still drawn for Godric (the Gothic, the jousting armour, the
+   Maximilian, the tilt, the sword, the cuirassier, the Gothic with its visor raised) stand as the default till his picks
+   land. Lit inside by night, as the corridor's (s.light). No tap lands on them. */
+var GALLERY = (function () {
+  if (PLACE !== 'armour-gallery' || !window.CastleSuit) return null;
+  var ROWS = [[47, 'default', 'tudor'], [50, 'default', 'three-quarter'], [53, 'default', 'black-and-white'], [56, 'boy', 'default'],
+    [59, 'mace', null], [62, null, 'default'], [65, 'default', 'munition'], [68, 'default', 'shield']];
+  var z0 = shell.place.floor, H = 0.3, stone = kit.solid(0x7d7973), out = { suits: [] };
+  var k = HOUR >= 21 || HOUR < 6 ? 1 : HOUR >= 18 ? 0.5 : 0;
+  function stand(cx, y, face, kind) {   /* face +1: on the west wall, facing east */
+    var at = shell.toLocal(cx, y, z0), east = shell.toLocal(cx + 1, y, z0).sub(at), north = shell.toLocal(cx, y + 1, z0).sub(at);
+    var pl = new THREE.Mesh(new THREE.BoxGeometry(0.7, H, 0.7), stone);
+    pl.position.copy(at); pl.position.y += H / 2; pl.rotation.y = Math.atan2(north.x, north.z); pl.name = 'gallery-plinth-' + y + (face > 0 ? 'w' : 'e');
+    pl.raycast = function () {}; shell.group.add(pl);
+    var s = CastleSuit.make(THREE, renderer, { kind: kind, src: '../assets/layers/corridor-armour.png' }), d = east.multiplyScalar(face);
+    s.group.position.copy(at); s.group.position.y += H; s.group.rotation.y = Math.atan2(d.x, d.z); s.group.name = 'gallery-suit-' + y + (face > 0 ? 'w' : 'e');    s.onReady(function () { s.light(k); s.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); });
+    shell.group.add(s.group); out.suits.push(s);
+  }
+  ROWS.forEach(function (r) {
+    if (r[1]) stand(5.4, r[0], 1, r[1]);
+    if (r[2]) stand(10.6, r[0], -1, r[2]);
+  });
+  return out;
 })();
 /* the hospital wing's lamps (Magic's req 677; Events' req 681, page/events/wing.json), where Interiors'
    docs/interiors/hospital-wing.md hangs them (req 678, cited; x = 151.4 + x', y = 25 + y'): six lanterns on chains
