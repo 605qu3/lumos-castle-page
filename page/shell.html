@@ -165,7 +165,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-shell.js?v=82"></script>
-<script src="shell-w5b.js?v=19"></script>
+<script src="shell-w5b.js?v=20"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="shell-w5a.js?v=22"></script>
@@ -2492,6 +2492,84 @@ var TRAP = null;
 })();
 function updateTrap(dt) { if (!TRAP || TRAP.t < 0 || TRAP.t > 3) return; TRAP.t += dt; TRAP.set(TRAP.t); }
 thingCues[TRAP_SHOW] = function () { showLines([{ medium: 'seen', sound: TRAP_SHOW, on: function () { if (TRAP && TRAP.t < 0) TRAP.t = 0; } }]); };
+/* req 800, the classroom (Magic's table, the warmth and the perfume, the crimson light, the crystal balls; Events'
+   divination.json, word for word): a faint perfumed haze in the crimson light, always, the PoA castle on (a dim red
+   fog, thin enough that the far wall shows); the fire under the mantel flickering and the draped lamps wavering a
+   little as their scarves stir in the warm air (W5B's lights by name, w5b-light-0 to -6 the lamps, -7 the fire); on
+   Events' divination.kettle the copper kettle's lid lifts and rattles and a puff of steam drifts up into the light; in
+   the summer term the crystal balls on their small stands, full of pearly white mist turning slowly, on every little
+   table in a lesson or on the boys' own out of one, the boys' lighting the faces bent over it (one dim light), showing
+   nothing (Interiors' table centres, docs/interiors/divination-classroom.md, The things; x = 160 + x', y = 72 + y').
+   ?balls=on stands every ball for checks, ?kettle=on lifts the lid over and over */
+var KETTLE_SHOW = "the copper kettle's lid lifts and rattles on the fire, and a puff of perfumed steam drifts into the crimson light";
+var BALLS_ALL = ["a crystal ball full of pearly white mist on every little table",
+  "the mist turning slowly in each crystal ball, lighting the faces bent over it, showing nothing to anyone"];
+var BALLS_BOYS = ["a crystal ball full of pearly white mist on the boys' own little table", "the mist turning slowly in the crystal ball, showing nothing"];
+var DIV = null;
+(function () {
+  if (PLACE !== 'divination-classroom') return;
+  var z0 = shell.place.floor, P = function (xp, yp, z) { return shell.toLocal(160 + xp, 72 + yp, z0 + z); };
+  var g = new THREE.Group(); g.name = 'divination-air'; g.userData.owner = PLACE; shell.group.add(g);
+  function own(m, to) { m.userData.owner = PLACE; m.raycast = function () {}; (to || g).add(m); return m; }
+  scene.fog = new THREE.FogExp2(new THREE.Color(0x6a3024).convertSRGBToLinear(), 0.04);
+  /* the kettle's lid on its top (the kettle W5B's, r 0.15 to 0.4 at (0, 6.45)), and a knob; the steam's four puffs */
+  var brass = kit.solid(0x9a7a3a), lid = new THREE.Group(); lid.position.copy(P(0, 6.45, 0.4)); g.add(lid);
+  own(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.02, 20), brass), lid).position.y = 0.01;
+  own(new THREE.Mesh(new THREE.SphereGeometry(0.018, 10, 8), brass), lid).position.y = 0.03;
+  var puffs = [0, 1, 2, 3].map(function (i) {
+    var m = own(new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), new THREE.MeshBasicMaterial({ color: 0xd8c8c0, transparent: true, opacity: 0, depthWrite: false })));
+    m.visible = false; return m; });
+  /* the balls: a clear glass sphere r 0.06 on a small black stand at each table's centre, its mist inside, a second wisp
+     turning round in it */
+  var C = [[-3.1, 3.9], [3.65, 3.9], [-4.22, 1.95], [-1.97, 1.95], [0.28, 1.95], [2.53, 1.95], [4.78, 1.95], [-5.35, 0], [-3.1, 0],
+    [-0.85, 0], [1.4, 0], [3.65, 0], [-4.22, -1.95], [-1.97, -1.95], [0.28, -1.95], [2.53, -1.95], [4.78, -1.95], [-3.1, -3.9], [-0.85, -3.9], [3.65, -3.9]];
+  var stand = kit.solid(0x1c1916), glass = kit.solid(0xc8d0d8).clone(); glass.transparent = true; glass.opacity = 0.22; glass.depthWrite = false;
+  var mist = new THREE.MeshBasicMaterial({ color: 0xe6e2ee, transparent: true, opacity: 0.55, depthWrite: false });
+  var wisp = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.4, depthWrite: false });
+  var balls = C.map(function (c, i) {
+    var b = new THREE.Group(); b.position.copy(P(c[0], c[1], 0.65)); g.add(b); b.visible = false;
+    var st = own(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.03, 12), stand), b); st.position.y = 0.015;
+    own(new THREE.Mesh(new THREE.SphereGeometry(0.06, 20, 14), glass), b).position.y = 0.09;
+    own(new THREE.Mesh(new THREE.SphereGeometry(0.045, 16, 12), mist), b).position.y = 0.09;
+    var turn = new THREE.Group(); turn.position.y = 0.09; b.add(turn);
+    own(new THREE.Mesh(new THREE.SphereGeometry(0.022, 10, 8), wisp), turn).position.set(0.022, 0.006, 0);
+    return { g: b, turn: turn, ph: i * 0.7 };
+  });
+  var glow = new THREE.PointLight(0xdcd6f0, 0.35, 2.4, 1.6); glow.position.copy(P(-3.1, 3.9, 0.9)); glow.visible = false; g.add(glow);
+  DIV = { lid: lid, puffs: puffs, balls: balls, glow: glow, k: -1, t: 0, lights: null, all: Q.get('balls') === 'on', boys: false };
+  if (Q.get('kettle') === 'on') DIV.k = 0;
+})();
+function divShown(shown) {   /* the strings the classroom draws: the balls */
+  if (!DIV) return [];
+  var all = DIV.all || BALLS_ALL.some(function (x) { return shown.indexOf(x) >= 0; }), boys = all || BALLS_BOYS.some(function (x) { return shown.indexOf(x) >= 0; });
+  DIV.balls.forEach(function (b, i) { b.g.visible = all || (boys && i === 0); });
+  DIV.glow.visible = boys;
+  return BALLS_ALL.concat(BALLS_BOYS).filter(function (x) { return shown.indexOf(x) >= 0; });
+}
+function updateDiv(dt) {
+  if (!DIV) return;
+  var t = (DIV.t += dt);
+  if (!DIV.lights) DIV.lights = [0, 1, 2, 3, 4, 5, 6, 7].map(function (i) { var l = scene.getObjectByName('w5b-light-' + i); return l ? { l: l, base: l.intensity } : null; });
+  DIV.lights.forEach(function (o, i) {
+    if (!o) return;
+    var f = i === 7 ? 0.8 + 0.12 * Math.sin(t * 7.3) * Math.sin(t * 2.1 + 1) + 0.08 * Math.sin(t * 13.7 + 2) : 0.96 + 0.04 * Math.sin(t * 0.9 + i * 1.7);
+    o.l.intensity = o.base * f;
+  });
+  DIV.balls.forEach(function (b) { if (b.g.visible) b.turn.rotation.y = t * 0.6 + b.ph; });
+  if (DIV.glow.visible) DIV.glow.intensity = 0.3 + 0.06 * Math.sin(t * 0.8);
+  if (DIV.k < 0) return;
+  var k = (DIV.k += dt), lift = k < 2.2 ? Math.abs(Math.sin(k * 14)) * 0.018 * (1 - k / 2.2) : 0;
+  DIV.lid.position.copy(shell.toLocal(160, 78.45, shell.place.floor + 0.4 + lift));
+  DIV.lid.rotation.z = k < 2.2 ? Math.sin(k * 23) * 0.12 * (1 - k / 2.2) : 0;
+  DIV.puffs.forEach(function (m, i) {
+    var u = (k - i * 0.35) / 3.2; m.visible = u > 0 && u < 1;
+    if (!m.visible) return;
+    m.position.copy(shell.toLocal(160 + 0.05 * Math.sin(u * 3 + i), 78.45 - 0.15 * u, shell.place.floor + 0.45 + u * 1.1));
+    m.scale.setScalar(0.6 + u * 2.2); m.material.opacity = 0.32 * Math.sin(u * Math.PI);
+  });
+  if (k > 4.5) DIV.k = Q.get('kettle') === 'on' ? 0 : -1;
+}
+thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTLE_SHOW, on: function () { if (DIV) DIV.k = 0; } }]); };
 /* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
    green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
    and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
@@ -5376,7 +5454,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -7243,7 +7321,7 @@ function frame() {
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateTurban(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
-  updateTrick(dt); updateTrap(dt);
+  updateTrick(dt); updateTrap(dt); updateDiv(dt);
   updateMyrtle(dt);
   updateStaff(dt);
   updateStone(dt); updateStoneClimb(dt);
