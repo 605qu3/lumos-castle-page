@@ -6,7 +6,7 @@
    the picture (they are 1.9 m further back). The card's foot is the front hooves' line, on the plinth; under the hind
    hooves a shadow lies on the plinth top where the eye at a boy's height reads them standing (0.2 m behind the card from
    1.4 m away, 0.6 m from 4 m: drawn from 0.2 to 0.9), and a soft shadow lies under the whole body, 2.3 m long, so the
-   horse has weight on the stone from any way down the aisle. Every shadow 8 mm over the stone (board rule 6).
+   horse has weight on the stone from any way down the aisle. The body's shadow 8 mm over the stone, the hooves' 16 mm (board rule 6).
 
    CastleKnight.make(THREE, renderer, opts)  opts { src (default '../assets/layers/mounted-gothic-knight.png') }.
        Returns { group, mat, light(k) }: the group's origin is on the plinth top under the middle of the front hooves,
@@ -39,15 +39,15 @@
     card.position.set((1072 / 2 - HORSE_X) / PXM, H / 2 - bottom / PXM, 0);
     card.name = 'gallery-knight';
     g.add(card);
-    function lay(m, x, z, w, d) {
+    function lay(m, x, z, w, d, y) {
       var s = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), m);
-      s.rotation.x = -Math.PI / 2; s.position.set(x, 0.008, z); s.scale.set(w, d, 1); s.raycast = function () {};
+      s.rotation.x = -Math.PI / 2; s.position.set(x, y, z); s.scale.set(w, d, 1); s.raycast = function () {};
       g.add(s);
     }
     var body = shade(THREE, renderer, 0.42), hoof = shade(THREE, renderer, 0.75), hind = shade(THREE, renderer, 0.6);
-    lay(body, 0, -1.1, 1.0, 2.6);
-    FRONT.forEach(function (f) { lay(hoof, (f[0] - HORSE_X) / PXM, 0.02, 0.26, 0.2); });
-    HIND.forEach(function (f) { lay(hind, (f[0] - HORSE_X) / PXM, -0.56, 0.24, 0.7); });
+    lay(body, 0, -1.1, 1.0, 2.6, 0.008);                 /* the body 8 mm over the stone, the hooves 8 mm over it (board rule 6) */
+    FRONT.forEach(function (f) { lay(hoof, (f[0] - HORSE_X) / PXM, 0.02, 0.26, 0.2, 0.016); });
+    HIND.forEach(function (f) { lay(hind, (f[0] - HORSE_X) / PXM, -0.56, 0.24, 0.7, 0.016); });
     var day = new THREE.Color(1, 1, 1), night = new THREE.Color(0.62, 0.5, 0.4);
     function light(k) { mat.color.copy(day).lerp(night, Math.max(0, Math.min(1, k))); }
     return { group: g, mat: mat, light: light };
