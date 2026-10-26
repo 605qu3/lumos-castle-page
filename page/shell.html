@@ -309,7 +309,7 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
   'sun-hide-g', 'bindery-way-2', 'seat-den-3', 'painted-door-room-5',
   'h82-way', 'h82-glass-house']);   /* v200, req 1099 (H82): the fern well's way and the glass house under the lake, rough */
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') }) : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers' }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
    black headless twice with a clean console; the line now says which year it stands from and the query that opens it */
 if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(function (r) { return r.id === PLACE && !stands(r); })[0];
@@ -2571,6 +2571,46 @@ function updateDiv(dt) {
   if (k > 4.5) DIV.k = Q.get('kettle') === 'on' ? 0 : -1;
 }
 thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTLE_SHOW, on: function () { if (DIV) DIV.k = 0; } }]); };
+/* the founders' well (H7, founders-well; docs/interiors/hidden-ways-batch-2.md, H7's things) with Godric's 1 on
+   architect-well-lid-1024, the glass eye: the round curb 1.6 across and 0.75 high at (80.0, 6.8); on it the oak lid 1.7
+   across and 0.1 thick, shut (his safeguard, ledger 50), two iron bands across it 0.45 either side of its middle and a
+   hasp on its east edge over a staple in the curb; in its middle a bullseye of old glass a hand across (0.2), 8 mm
+   proud, and far down in it the green of the founders' water gate (docs/architect/lake-glimpse-ground.md, The founders'
+   well lit), drawn on its face; the windlass's two posts 0.2 square and 1.6 high at y 5.8 and 7.8, the drum 0.25 across
+   at 1.2 between them with its rope wound, the crank on the north post. Each piece's foot is sunk 5 cm into the floor or
+   1 cm into the piece under it, so no face lies on another's plane. The eye's tap and its line are Events' */
+(function () {
+  if (PLACE !== 'founders-undercroft') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'founders-well-things'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); }, CX = 80.0, CY = 6.8;
+  var stone = kit.solid(0x8a8478), oak = kit.solid(0x6e4c2e), iron = kit.solid(0x2f2f33), rope = kit.solid(0x9a8560);
+  function box(x0, y0, za, x1, y1, zb, mt) { var m = thingBox(g, P, [x0, y0, za], [x1, y1, zb], mt); m.userData.owner = PLACE; return m; }
+  function drum(r, za, zb, mt, seg, y, along) {   /* upright at (CX, CY) from za to zb; along: lying north-south at height y */
+    var m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, zb - za, seg || 24), mt), c;
+    if (along) { c = P(CX, (za + zb) / 2, y); m.position.copy(c); m.lookAt(P(CX, zb, y)); m.rotateX(Math.PI / 2); }
+    else c = P(CX, CY, (za + zb) / 2);
+    m.position.copy(c); m.userData.owner = PLACE; g.add(m); return m;
+  }
+  drum(0.8, -0.05, 0.76, stone);                                              /* the curb */
+  drum(0.85, 0.75, 0.85, oak);                                                /* the lid, shut */
+  [-0.45, 0.45].forEach(function (o) { box(CX - 0.7, CY + o - 0.03, 0.84, CX + 0.7, CY + o + 0.03, 0.858, iron); });   /* its bands */
+  box(CX + 0.84, CY - 0.04, 0.62, CX + 0.87, CY + 0.04, 0.845, iron);         /* the hasp, over the lid's east edge */
+  box(CX + 0.77, CY - 0.02, 0.64, CX + 0.83, CY + 0.02, 0.70, iron);          /* the staple in the curb */
+  /* the eye: its face a disc of old glass, black at the rim and the green far down at its middle, unlit by the room */
+  var c = document.createElement('canvas'); c.width = c.height = 128; var x = c.getContext('2d');
+  var gr = x.createRadialGradient(64, 64, 2, 64, 64, 64);
+  gr.addColorStop(0, '#9ff0c0'); gr.addColorStop(0.12, '#5cc890'); gr.addColorStop(0.3, '#1d5a46'); gr.addColorStop(0.65, '#0b201b'); gr.addColorStop(1, '#050807');
+  x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
+  x.fillStyle = 'rgba(255,255,255,0.18)'; x.beginPath(); x.ellipse(44, 40, 16, 8, -0.6, 0, 2 * Math.PI); x.fill();   /* the glass's sheen */
+  var face = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c) });
+  var eye = drum(0.1, 0.80, 0.858, iron, 32); eye.material = [iron, face, iron]; eye.name = 'founders-well-eye';
+  [5.8, 7.8].forEach(function (y) { box(CX - 0.1, y - 0.1, -0.05, CX + 0.1, y + 0.1, 1.6, oak); });                   /* the windlass's posts */
+  drum(0.125, 5.85, 7.75, oak, 16, 1.2, true);                                /* its drum, its ends in the posts */
+  drum(0.14, 6.35, 7.25, rope, 16, 1.2, true);                                /* the rope wound on it */
+  drum(0.03, 7.8, 8.02, iron, 8, 1.2, true);                                  /* the crank's axle through the north post */
+  box(CX - 0.02, 7.96, 0.9, CX + 0.02, 8.0, 1.22, iron);                      /* its arm */
+  drum(0.02, 7.99, 8.15, oak, 8, 0.93, true);                                 /* its handle */
+})();
 /* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
    green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
    and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
