@@ -130,7 +130,7 @@
    Dumbledore's paces his study (Godric's events-map-brother-1013, 1, with t1, PoA 10), else still (v=27). Since 14
    October 2026 the brothers share one iPad (the charter): the player selection and the satchels hold, the owl post
    between two paired iPads is set aside (req 420) and the brother's dot with it (BROTHER_DOT_ASIDE); each visit ends
-   with a turn of the hourglass home, at the edge of the woods, and the first night, going home and the plan wait for
+   with a turn of the hourglass home (OVERTAKEN, settled 49, req 1107: the boys may sleep once sorted, and nothing ends a visit but the boy), at the edge of the woods, and the first night, going home and the plan wait for
    the change list's rows 18, 24, 25 and 34 (the world rules; the Ministry's set-aside). `brother X` in a `when` reads
    the var X of the boy who is not playing, from his satchel (Godric's events-norris-lets-pass-1022: Mrs Norris
    trusts a boy a little for his brother's sake); unset, or with no brother in the link, a count reads 0.
@@ -424,7 +424,8 @@
        ?season=spring. ?date=2026-12-20 moves the whole clock to that day at the real time of day (docs/room-states.md
        §7 1, req 414): `date`, `weekday`, `week`, `castle date`, `easter`, the weather, the moon and every stamp read
        from it, as if he had come that day; a dated look keeps nothing and posts nothing, so his own castle is as it
-       was once the link is closed. */
+       was once the link is closed. (Settled 50, req 1110, 26 October 2026: the date is the real day only till Story
+       settles the story day per boy; then `?date=` moves the story day, not the clock.) */
     var weatherOverride = /^(clear|cloudy|rain|snow|fog|windy|frost|wet)$/.test(params.get('weather') || '') ? params.get('weather') : null;
     var seasonOverride = /^(spring|summer|autumn|winter)$/.test(params.get('season') || '') ? params.get('season') : null;
     var weatherDate = /^\d{4}-\d\d-\d\d$/.test(params.get('date') || '') ? params.get('date') : null;
@@ -755,12 +756,15 @@
       var m = /^(\d\d)-(\d\d)$/.exec(md || '');
       return m ? n * 1000 + ((+m[1] + 3) % 12) * 31 + +m[2] : null;
     }
-    function castleDateKey() { return schoolKey(castleYear(), monthDay(castleDay())); }
+    function castleDateKey() { return schoolKey(castleYear(), monthDay(castleDay())); }   /* real calendar till req 1110's story day (settled 50) */
     /* The castle's calendar day (docs/room-states.md §7 6; the change list's Rework 3; the world rules, Time): the real
        day, except in the summer holidays, from the day after the leaving feast to 31 August, when the castle holds in
        the feast week of the term just finished, repeating, each day on the same weekday (a summer Tuesday is the feast
        week's Tuesday). `date`, `weekday`, `day of week`, `easter`, `castle date`, `occasion` and `lessons` read it; the
-       hour, the weather, the moon, the week and every stamp stay real. */
+       hour, the weather, the moon, the week and every stamp stay real. OVERTAKEN IN PART (Godric, 25 October 2026,
+       settled 50; req 1110): the real day and the summer hold below are the stand-in until Story settles a story day
+       per boy, stepped by events; the hour of day keeps his own clock (req 439). Proposal: docs/handoff/events.md,
+       "Req 1110, the story's date by progress". */
     var heldBack = {};        /* days the summer holds each day back, by its day number, worked once a day */
     function castleDay() {
       var now = nowDate(), k = dayNumber(now), off = heldBack[k];
@@ -802,7 +806,7 @@
       if (md === '12-25') return 'christmas day';
       if (md >= CHRISTMAS.from || md <= CHRISTMAS.to) return 'christmas';
       if (md === '10-31') return 'halloween';
-      if (md === '09-01') return 'start of term';
+      if (md === '09-01') return 'start of term';      /* the story's is 3 September 1897 (settled 65); req 1110 */
       if (isoDay(now) === feastDay(now.getFullYear())) return 'leaving feast';
       if (easterNear(now)) return 'easter';
       return 'none';
@@ -811,7 +815,8 @@
        (the charter, 15 October 2026: "Lessons run whenever they visit, weekends included"; Fawkes's 1, 16 October
        2026, 9.48 am); off on a match day, the school at the pitch, over Christmas and Easter, and on the
        start-of-term and leaving-feast days. The summer holds in the feast week (§7 6), so its days but the feast's
-       have lessons, the last week of term. */
+       have lessons, the last week of term. (Req 1110: the day that decides it becomes the story day; classes open
+       on the Monday after the sorting, settled 64.) */
     function lessonsNow() {
       if (lessonsOverride) return lessonsOverride;
       if (timeOverride) return 'off';
