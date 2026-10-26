@@ -154,8 +154,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=534"></script>
-<script src="castle-paint.js?v=113"></script>
+<script src="castle-model.js?v=535"></script>
+<script src="castle-paint.js?v=114"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=6"></script>
@@ -308,7 +308,7 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
   'west-refuge-ring', 'old-exam-hall', 'heads-corridor', 'old-exam-hall-store',
   'decoy-cupboard-5', 'true-hide-5', 'accounts-room-3',
   'sun-hide-g', 'bindery-way-2', 'seat-den-3', 'painted-door-room-5',
-  'h82-way', 'h82-glass-house']);   /* v200, req 1099 (H82): the fern well's way and the glass house under the lake, rough */
+  'h82-way', 'h82-glass-house', 'h82-gallery-way']);   /* v200, req 1099 (H82): the fern well's way and the glass house under the lake, rough; v209 the balcony's passage */
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers' }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
@@ -2719,11 +2719,90 @@ thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE
     var mt = m.material.clone(); mt.color = new THREE.Color(0x9fd8c0).convertSRGBToLinear(); mt.map = null;
     mt.transparent = true; mt.opacity = 0.32; mt.depthWrite = false; mt.side = THREE.DoubleSide; m.material = mt;
   });
-  var a = shell.toLocal(X0 + OFF, Y0 + OFF, z0 + SP + OFF), b = shell.toLocal(X1 - OFF, Y1 - OFF, z0 + CR + 1.2);
+  /* the lake round the house (Godric, 7.17 pm 26 October 2026, on architect-h82-move-1026: "keep as is (to avoid a long
+     corridor) and reconfigure the lake bed to meet the ceiling such that none of the glass is touching rock"): the bed cut
+     down to the springing in an apron 2 m wide east, west and south of the house, banks rising from it at one in one to
+     the lake's own bed (2 m at the waterline, 0.3 m more a metre south; docs/architect/lake-glimpse-ground.md), so every
+     pane stands in open water; on the north the cliff's rock stands sheer over the stone end, never on the glass. The
+     water an open box out to 30 m, its top the lake's face at -46; the bed's colour sinks into the water's with distance */
+  var GX0 = -18, GX1 = 58, GY0 = -61, GY1 = -13, AP = 2.0, LAKE = -46.0, ZS = z0 + SP;
+  function natural(y) { return -48.0 - 0.3 * Math.max(0, -8.75 - y); }
+  function bedAt(x, y) {
+    var dx = Math.max(X0 - AP - x, 0, x - (X1 + AP)), dy = Math.max(Y0 - AP - y, 0);
+    return Math.min(natural(y), ZS - 0.05 + Math.hypot(dx, dy));
+  }
+  var WCOL = new THREE.Color(0x1d4a40).convertSRGBToLinear(), SILT = new THREE.Color(0x56603e).convertSRGBToLinear();
+  var lake = new THREE.MeshBasicMaterial({ color: WCOL, side: THREE.BackSide }), NONE = new THREE.MeshBasicMaterial({ visible: false });
+  var face = new THREE.MeshBasicMaterial({ color: new THREE.Color(0x4f8f7a).convertSRGBToLinear(), side: THREE.BackSide });
+  var a = shell.toLocal(GX0, GY0, ZS - 12), b = shell.toLocal(GX1, GY1 + 1.0, LAKE);   /* its unseen north face 1 m into the rock, off the walls' planes */
   var w = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)),
-    new THREE.MeshBasicMaterial({ color: new THREE.Color(0x1d4a40).convertSRGBToLinear(), side: THREE.BackSide }));
+    [lake, lake, face, NONE, lake, NONE]);   /* no floor (the bed is it) and no north face (the cliff) */
   w.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); w.name = 'h82-lake-water';
   w.userData.owner = PLACE; w.raycast = function () {}; shell.group.add(w);
+  var NX = GX1 - GX0, NY = GY1 - GY0, pos = [], col = [], idx = [], c = new THREE.Color();
+  for (var gy = 0; gy <= NY; gy++) for (var gx = 0; gx <= NX; gx++) {
+    var x = GX0 + gx, y = GY0 + gy, h = bedAt(x, y), v = shell.toLocal(x, y, h);
+    var far = Math.min(1, Math.hypot(Math.max(X0 - x, 0, x - X1), Math.max(Y0 - y, 0)) / 26);
+    c.copy(SILT).lerp(WCOL, 0.25 + 0.7 * far); pos.push(v.x, v.y, v.z); col.push(c.r, c.g, c.b);
+  }
+  for (gy = 0; gy < NY; gy++) for (gx = 0; gx < NX; gx++) {
+    var cx = GX0 + gx + 0.5, cy = GY0 + gy + 0.5;
+    if (cx > X0 && cx < X1 && cy > Y0 && cy < Y1) continue;   /* under the house: its own walls and floor */
+    var k = gy * (NX + 1) + gx; idx.push(k, k + 1, k + NX + 1, k + 1, k + NX + 2, k + NX + 1);
+  }
+  var bg = new THREE.BufferGeometry(); bg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  bg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); bg.setIndex(idx);
+  var bed = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+  bed.name = 'h82-lake-bed'; bed.userData.owner = PLACE; bed.raycast = function () {}; shell.group.add(bed);
+  /* the cliff's rock over the house's north end and along the cut's north edge: from the bed (or the barrel's line over
+     the stone end) up to the lake's bed there, 8 mm north of the end's face */
+  var R9 = 9.36, CC9 = CR - R9, rp = [], ri = [], N = 152;
+  for (var q = 0; q <= N; q++) {
+    var rx = GX0 + (GX1 - GX0) * q / N, lo = rx > X0 && rx < X1 ? z0 + CC9 + Math.sqrt(Math.max(0, R9 * R9 - (rx - 20.0) * (rx - 20.0))) : bedAt(rx, GY1);
+    var top = natural(GY1), p0 = shell.toLocal(rx, GY1 + 0.008, Math.min(lo, top)), p1 = shell.toLocal(rx, GY1 + 0.008, top);
+    rp.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z);
+    if (q) { var e = 2 * q; ri.push(e - 2, e, e - 1, e, e + 1, e - 1); }
+  }
+  var rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.Float32BufferAttribute(rp, 3)); rg.setIndex(ri);
+  var rock = new THREE.Mesh(rg, new THREE.MeshBasicMaterial({ color: new THREE.Color(0x2c3029).convertSRGBToLinear(), side: THREE.DoubleSide }));
+  rock.name = 'h82-cliff-rock'; rock.userData.owner = PLACE; rock.raycast = function () {}; shell.group.add(rock);
+  /* the shell stands a room's walls to its crown outside its vault; here they stop at the springing, so the glass meets
+     the water, not stone (a clipping plane on the walls' own copies of their stone; the stone end over the north and its
+     balcony arch keep theirs), and the south end over the springing is glazed as the barrel is, 16 mm inside its face */
+  renderer.localClippingEnabled = true;
+  var cut = new THREE.Plane(new THREE.Vector3(0, -1, 0), shell.group.localToWorld(shell.toLocal(20.0, -22.0, z0 + SP)).y), GL = null, cuts = {};
+  shell.group.traverse(function (m) {
+    if (!m.isMesh) return;
+    if (m.name === PLACE + '-barrel') GL = m.material;
+    if (m.name.indexOf(PLACE + '-wall-') === 0) {
+      var k = m.material.uuid; if (!cuts[k]) { cuts[k] = m.material.clone(); cuts[k].clippingPlanes = [cut]; cuts[k].onBeforeCompile = m.material.onBeforeCompile; if (m.material.customProgramCacheKey) cuts[k].customProgramCacheKey = m.material.customProgramCacheKey; }
+      m.material = cuts[k];
+    }
+  });
+  if (GL) {
+    var sh2 = new THREE.Shape(); sh2.moveTo(X0, SP);
+    for (var k2 = 1; k2 < 48; k2++) { var ex2 = X0 + (X1 - X0) * k2 / 48; sh2.lineTo(ex2, CC9 + Math.sqrt(R9 * R9 - (ex2 - 20.0) * (ex2 - 20.0))); }
+    sh2.lineTo(X1, SP); sh2.lineTo(X0, SP);
+    var sg = new THREE.Mesh(new THREE.ShapeGeometry(sh2), GL), sp2 = shell.toLocal(0, Y0 + 2 * OFF, z0);
+    sg.position.copy(sp2); sg.name = 'h82-south-glass'; sg.userData.owner = PLACE; sg.raycast = function () {}; shell.group.add(sg);
+  }
+  /* the north end over the springing in stone, not glass (the house stands against the cliff's foot there; Godric's
+     "keep as is", 7.17 pm 26 October 2026, so the cliff's rock meets this stone, never the glass): the end's half-moon under the barrel (r 9.36 about x 20.0, 1.14 over the
+     floor) 16 mm inside the wall's face, the balcony's arch notched up through it (h82-balcony-arch, x 19.3 to 20.3, to
+     2.1 over the balcony), and the arch's jambs and head through the 0.6 wall, 8 mm behind the end's face */
+  var stone = null;
+  shell.group.traverse(function (m) { if (!stone && m.isMesh && m.name.indexOf(PLACE + '-wall-') === 0) stone = m.material; });
+  stone = stone || kit.solid(0xa89c84);
+  var R = 9.36, CC = CR - R, AX0 = 19.3, AX1 = 20.3, AH = SP + 2.09, sh = new THREE.Shape();
+  sh.moveTo(X0, SP); sh.lineTo(AX0, SP); sh.lineTo(AX0, AH); sh.lineTo(AX1, AH); sh.lineTo(AX1, SP); sh.lineTo(X1, SP);
+  for (var k = 1; k < 48; k++) { var ex = X1 - (X1 - X0) * k / 48; sh.lineTo(ex, CC + Math.sqrt(R * R - (ex - 20.0) * (ex - 20.0))); }
+  sh.lineTo(X0, SP);
+  var tm = new THREE.Mesh(new THREE.ShapeGeometry(sh), stone), tp = shell.toLocal(0, Y1 - 2 * OFF, z0);
+  tm.position.copy(tp); tm.name = 'h82-north-end'; tm.userData.owner = PLACE; shell.group.add(tm);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  [[AX0 - 0.1, AX0], [AX1, AX1 + 0.1]].forEach(function (j, i) {
+    var m = thingBox(shell.group, P, [j[0], Y1 - OFF, SP - 0.01], [j[1], Y1 + 0.6, AH], stone); m.name = 'h82-balcony-jamb-' + i; m.userData.owner = PLACE; });
+  var hd = thingBox(shell.group, P, [AX0 - 0.1, Y1 - OFF, AH], [AX1 + 0.1, Y1 + 0.6, AH + 0.3], stone); hd.name = 'h82-balcony-head'; hd.userData.owner = PLACE;
 })();
 /* Mobiliarbus on H71's desks (Charms' req 1052; page/charms/desks.js's head comment the spec): once he has learned the
    spell (?learned for a check), a tap on a desk lifts it a few inches and drifts it to the square he names; his head
