@@ -2426,6 +2426,64 @@ var H71 = (function () {
   var lm = ink.clone(); lm.side = THREE.DoubleSide;
   var lt = new THREE.Mesh(lg, lm); lt.userData.owner = PLACE; lt.raycast = function () {}; lt.userData.decal = true; g.add(lt);
 })();
+/* H80, the round room's two sets (ledger 289, req 1105's rest; docs/interiors/double-stair.md, The round room; Godric's
+   1 on hidden-ways-s2-1023: "two of everything"), at the double stair's top (the model's `to`, 10.4), drawn in the
+   shaft since s2-room-2 is never built: on each head's landing (the outer ring past each flight's head, castle-shell
+   v85) a plain oak chair centred on r 1.62, its back to the wall, facing the core, the back carved with a hand (A the
+   left at site angle -33, B the right at 147), and over it on the wall at 1.00 an oak shelf on two iron brackets with a
+   china cup and saucer at one end and a pewter stick at the other, its stub unlit and run down. "Left as seen from the
+   chair" read as a boy at the chair facing the shelf: cup A at the left end, handle left; cup B at the right, handle
+   right, so the two mirror as the flights do. Each set is built in a frame turned to its angle, +z out to the wall */
+(function () {
+  if (PLACE !== 's2-double-stair' || !MODEL) return;
+  var S = (MODEL.stairs || []).filter(function (s) { return s.id === 's2-double-stair'; })[0];
+  if (!S || S.to == null) return;
+  var cx = (S.rect[0] + S.rect[2]) / 2, cy = (S.rect[1] + S.rect[3]) / 2, R = (S.rect[2] - S.rect[0]) / 2, top = S.to;
+  var oak = kit.solid(0x5a4632), dark = kit.solid(0x3e3022), iron = kit.solid(0x2a2826), china = kit.solid(0xe8e4da),
+      pewter = kit.solid(0x8c8c88), wax = kit.solid(0xd8cfb4);
+  function set(deg, hand) {   /* hand: +1 the left (A), -1 the right (B); the group's +x is a boy's left facing the wall */
+    var a = deg * Math.PI / 180, at = function (r) { return shell.toLocal(cx + r * Math.cos(a), cy + r * Math.sin(a), top); };
+    var g = new THREE.Group(), o = at(0), d = at(1).sub(o);
+    g.name = 's2-set-' + (hand > 0 ? 'a' : 'b'); g.userData.owner = PLACE; g.position.copy(o); g.rotation.y = Math.atan2(d.x, d.z); shell.group.add(g);
+    function box(x0, y0, z0, x1, y1, z1, mt) {
+      var m = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), mt);
+      m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.userData.owner = PLACE; m.raycast = function () {}; g.add(m); return m;
+    }
+    function cyl(r0, r1, h, x, y, z, mt) {
+      var m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, h, 14), mt);
+      m.position.set(x, y + h / 2, z); m.userData.owner = PLACE; m.raycast = function () {}; g.add(m); return m;
+    }
+    /* the chair: r 1.42 to 1.82, 0.40 wide, seat 0.42, back 0.85 */
+    var F = 1.42, B = 1.82, W = 0.2, L = 0.035;
+    [[-W, F], [W - L, F]].forEach(function (p) { box(p[0], 0, p[1], p[0] + L, 0.40, p[1] + L, oak); });       /* front legs */
+    [[-W, B - L], [W - L, B - L]].forEach(function (p) { box(p[0], 0, p[1], p[0] + L, 0.85, p[1] + L, oak); });  /* back legs, the stiles */
+    box(-W + 0.008, 0.40, F, W - 0.008, 0.42, B - 0.008, oak);                                                  /* the seat, 8 mm inside the legs' faces */
+    box(-W + L, 0.12, F + 0.005, W - L, 0.15, F + 0.025, dark);                                                 /* the stretcher */
+    var PF = B - 0.03;                                                                                          /* the back panel's face to the core */
+    box(-W + L, 0.52, PF, W - L, 0.82, B - 0.005, oak);
+    /* the carved hand, fingers up, palm out to the core, 12 mm proud of the panel: a left hand held up palm out shows its
+       thumb on the looker's left, so +x for A and -x for B */
+    var HF = PF - 0.012;
+    box(-0.04, 0.58, HF, 0.04, 0.68, PF, dark);                                                                 /* the palm */
+    [-0.03, -0.01, 0.01, 0.03].forEach(function (f, i) { box(f - 0.008, 0.68, HF, f + 0.008, [0.75, 0.77, 0.765, 0.745][i], PF, dark); });
+    var tx = 0.058 * hand; box(tx - 0.01, 0.6, HF, tx + 0.01, 0.655, PF, dark);                                 /* the thumb */
+    /* the shelf: 0.30 along the wall, 0.14 deep, its top at 1.00; its back 6 mm inside the wall's round face */
+    var WB = R + 0.006, SF = WB - 0.14;
+    box(-0.15, 0.97, SF, 0.15, 1.00, WB, oak);
+    [-0.1, 0.1].forEach(function (x) { box(x - 0.01, 0.86, WB - 0.11, x + 0.01, 0.97, WB, iron); });            /* the brackets */
+    var cupX = 0.085 * hand, stickX = -0.09 * hand, mz = (SF + WB) / 2 - 0.01;
+    cyl(0.06, 0.06, 0.008, cupX, 1.0, mz, china);                                                               /* the saucer */
+    cyl(0.028, 0.04, 0.055, cupX, 1.008, mz, china);                                                            /* the cup, dry */
+    var hx = cupX + 0.047 * hand; box(hx - 0.008, 1.02, mz - 0.003, hx + 0.008, 1.05, mz + 0.003, china);       /* its handle out to the shelf's end */
+    cyl(0.035, 0.035, 0.006, stickX, 1.0, mz, pewter);                                                          /* the stick's dish */
+    cyl(0.009, 0.009, 0.034, stickX, 1.006, mz, pewter);                                                        /* its stem */
+    cyl(0.014, 0.02, 0.01, stickX, 1.04, mz, pewter);                                                           /* its cup */
+    cyl(0.011, 0.011, 0.058, stickX, 1.052, mz, wax);                                                            /* the stub, unlit */
+    cyl(0.02, 0.016, 0.012, stickX, 1.05, mz, wax);                                                             /* its wax run down over the lip */
+  }
+  set(-33, 1);
+  set(147, -1);
+})();
 /* req 800 (Magic's docs/archive/magic-to-2026-10-22.md, The Divination classroom, the trapdoor answers; Events' req 799,
    divination.json's divination.trapdoor, word for word): on the North Tower's landing the circular trapdoor in the ceiling
    (the model's north-trapdoor: 0.9 across at (161.4, 66.6), its face 48.4, hinged on its north edge, swinging down, the
