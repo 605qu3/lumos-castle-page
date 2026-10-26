@@ -1172,10 +1172,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var newel = F.register(new THREE.Mesh(new THREE.CylinderGeometry(NR, NR, Q.ceiling - Q.floor, 12), mats.wall), LAYER.wall);
       newel.position.copy(toLocal(c[0], c[1], (Q.floor + Q.ceiling) / 2)); newel.name = Q.id + '-newel'; group.add(newel);
     }
-    function wedge(a0, a1, top, thick, mat, name) {
-      var r0 = a0 * Math.PI / 180, r1 = a1 * Math.PI / 180, s = new THREE.Shape();
-      s.moveTo(NR * Math.cos(r0), NR * Math.sin(r0)); s.lineTo(R * Math.cos(r0), R * Math.sin(r0));
-      s.absarc(0, 0, R, r0, r1, false); s.lineTo(NR * Math.cos(r1), NR * Math.sin(r1));
+    function wedge(a0, a1, top, thick, mat, name, ri, ro) {   /* v85: ri, ro an inner and outer radius (the core and the wall) */
+      var r0 = a0 * Math.PI / 180, r1 = a1 * Math.PI / 180, s = new THREE.Shape(), wi = ri != null ? ri : NR, wo = ro != null ? ro : R;
+      s.moveTo(wi * Math.cos(r0), wi * Math.sin(r0)); s.lineTo(wo * Math.cos(r0), wo * Math.sin(r0));
+      s.absarc(0, 0, wo, r0, r1, false); s.lineTo(wi * Math.cos(r1), wi * Math.sin(r1));
       var m = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: thick, bevelEnabled: false, curveSegments: 4 }), mat), LAYER.wall);
       m.rotation.x = -Math.PI / 2; m.position.copy(toLocal(c[0], c[1], top - thick)); m.name = name; group.add(m);
       return m;
@@ -1192,6 +1192,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        neither flight needs its head room (2.2 over its last treads), each head's landing on it */
     function doubleStair() {
       var TURN = 5.2, rs = TURN / 30, t = 12, GAP = 2.49, HEAD = 2.2, top = S.to != null ? S.to : Q.ceiling - TURN;
+      /* v85 (the Architect's 165th, landed by the 167th, H80's top floor, option 1 on architect-s2-top-floor-1024): `gallery`, the outer radius
+         of an inner gallery all round the core at the top; the flights' last half turn on the ring outside it, so either
+         head reaches the other along it, never blocked */
+      var GAL = S.gallery && S.gallery > NR + 0.3 && S.gallery < R - 0.5 ? S.gallery : 0;
       /* v82 (the Architect's 164th, req 1103's grotto): a door naming its flight (`flight: "a"` or `"b"`) opens off that
          flight's treads where they pass it, so it never starts B; only an unnamed door between the floor and the top does */
       var up = doors.filter(function (d) { return !d.flight && d.z > Q.floor + 0.05 && d.z < top - 0.05; }).sort(function (p, q) { return p.z - q.z; })[0];
@@ -1214,9 +1218,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         F0.end = F0.a0 - n * t;
         for (var k = 1; k <= n; k++) {
           var a1 = F0.a0 - (k - 1) * t, a2 = F0.a0 - k * t, mid = (a1 + a2) / 2, tz = F0.z0 + k * rs;
-          if (k % 3 === 1 || k === n) { var pp = at(mid, PR); path.push([pp[0], pp[1], tz]); }
+          var under = GAL && tz > top - HEAD - 0.3;   /* v85: under the gallery's head room, on the outer ring only */
+          if (k % 3 === 1 || k === n) { var pp = at(mid, under ? (GAL + R) / 2 : PR); path.push([pp[0], pp[1], tz]); }
           if (doors.some(function (d) { return tz > d.z + 0.05 && tz < d.top + rs && off(mid, d.a) < d.half + t / 2; })) continue;
-          wedge(k === n ? a2 : a2 - 0.5, a1, tz, rs, mats.floor, F0.id + '-' + k).userData.stair = F0.id;
+          wedge(k === n ? a2 : a2 - 0.5, a1, tz, rs, mats.floor, F0.id + '-' + k, under ? GAL : null).userData.stair = F0.id;
         }
         F0.path = path;
       });
@@ -1224,9 +1229,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var A = runs[0], B = runs[1], dA = norm(A.end - (B.end + sweep)), dB = norm(B.end - (A.end + sweep));
       [[A, dA], [B, dB]].forEach(function (p) {
         if (p[1] < 1) return;
-        wedge(p[0].end - p[1], p[0].end, top, 0.3, mats.floor, Q.id + '-top-' + (p[0] === A ? 'a' : 'b'));
+        wedge(p[0].end - p[1], p[0].end, top, 0.3, mats.floor, Q.id + '-top-' + (p[0] === A ? 'a' : 'b'), GAL || null);
         p[0].ha = p[0].end - Math.min(10, p[1] / 2);
       });
+      if (GAL) {   /* the gallery: a ring from the core to GAL, its edge open on the core */
+        var gs = new THREE.Shape(), gh = new THREE.Path(); gs.absarc(0, 0, GAL, 0, Math.PI * 2, false); gh.absarc(0, 0, NR, 0, Math.PI * 2, true); gs.holes.push(gh);
+        var gm = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(gs, { depth: 0.3, bevelEnabled: false, curveSegments: 24 }), mats.floor), LAYER.wall);
+        gm.rotation.x = -Math.PI / 2; gm.position.copy(toLocal(c[0], c[1], top - 0.3)); gm.name = Q.id + '-gallery'; group.add(gm);
+      }
       shaftFloors.push({ c: c, r: R, z: top });
       runs.forEach(function (F0) {
         var ha = F0.ha != null ? F0.ha : F0.end;
