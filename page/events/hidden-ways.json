@@ -3940,6 +3940,41 @@
       "canon": "Magic's req 730 (docs/magic/rooms.md, The founders' undercroft; Fawkes's 1 of 11.44), every year once found: a tap on the lid, as any shut thing; nothing invites him to open it"
     },
     {
+      "id": "hidden-ways.undercroft-well-eye-first",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap founders-well-eye",
+      "when": [
+        "place = founders undercroft",
+        "well_eye != seen"
+      ],
+      "show": [
+        "he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water"
+      ],
+      "starts": [
+        "set well_eye = seen",
+        "log \"Knelt at the glass let into the lid of the founders' well and saw a green light far down in it {day}\""
+      ],
+      "canon": "The Architect's glass eye in the founders' well's shut lid (docs/architect/lake-glimpse-ground.md, The founders' well lit, req 1104 idea 5; Godric's 1 on architect-well-lid-1024: the lid stays shut, a bullseye of thick old glass a hand across let into it, the founders' water gate's green far down; built in the Architect's 167th, 7df69d50; the lid's safeguard, ledger 50, kept: never open water); the eye's tap and line are Events', no row; every year once found, a find that stays"
+    },
+    {
+      "id": "hidden-ways.undercroft-well-eye-again",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap founders-well-eye",
+      "when": [
+        "place = founders undercroft",
+        "well_eye = seen"
+      ],
+      "show": [
+        "the round of old glass in the lid, and far down the shaft the small green, wavering as before"
+      ],
+      "starts": [],
+      "canon": "The Architect's glass eye in the founders' well's shut lid (docs/architect/lake-glimpse-ground.md, The founders' well lit, req 1104 idea 5; Godric's 1 on architect-well-lid-1024): the second look and after, the same green; the lid itself still answers its own tap (`hidden-ways.undercroft-well-lid`)"
+    },
+    {
       "id": "hidden-ways.up-only-stair-echo",
       "tier": "fixed",
       "source": "device",
