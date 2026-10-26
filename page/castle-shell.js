@@ -113,7 +113,8 @@ function findPlace(M, id) {
     /* v25 (model v57, the West Tower's): `from` and `to`, where not given, its first and last `floors` */
     var sfrom = st.from != null ? st.from : levelZ(M, st.floors[0]), sto = st.to != null ? st.to : levelZ(M, st.floors[st.floors.length - 1]);
     return { id: slug(st.id), name: st.name || st.id.replace(/-/g, ' '), kind: 'room', poly: scp, area: { outer: scp, holes: [] },
-      round: { c: scc, r: srr }, floor: sfrom, ceiling: sto + (st.double ? 5.2 : 2.4), wall: 0.5,   /* v80: a double stair's top room a storey */ walls: null, rec: st, shaft: true };
+      round: { c: scc, r: srr }, floor: sfrom, ceiling: sto + (st.double ? 5.2 : 2.4), wall: 0.5,   /* v80: a double stair's top room a storey */ walls: null, rec: st, shaft: true,
+      openTop: !!st.open_top };   /* v84 (the Architect's 165th, H82's cleft): `open_top`, its top open to the sky, no ceiling */
   }
   /* v10: a ring (the lamplighters' gallery, the old wall-walk): whole, or where two of its openings stand across it (the
      turret's landing on the wall-walk) an arc the long way round between them; its shutters and loops by bearing */
@@ -590,7 +591,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         CV.group.traverse(function (o) { o.userData.owner = Q.id; }); group.add(CV.group);
       }
     }
-    if (Q.roof) buildRoof(Q);
+    if (Q.openTop) {   /* v84: open to the sky (H82's cleft): no ceiling, a pane of sky 1 cm over its rim as a window's,
+         out past the wall's outer face so a look up and out over a cleft meets it */
+      if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
+      var disc = Q.round ? { area: { outer: arcPts(Q.round.c, Q.round.r / Math.cos(Math.PI / 16) + (Q.wall || 0.5) + 0.1, 0, 360, 48).slice(0, 48), holes: [] } } : Q;
+      var sk = areaMesh(disc, Q.ceiling + 0.01, mats.pane, 'ceiling'); sk.name = Q.id + '-pane-sky'; sk.raycast = function () {}; sk.userData.owner = Q.id; group.add(sk); out.panes.push(sk);
+    }
+    else if (Q.roof) buildRoof(Q);
     else if (CV && !CV.flat) { /* the vault is the ceiling */ }
     else if (Q.ceiling != null && Q.area) { var ca = areaMesh(Q, Q.ceiling, mats.ceilD, 'ceiling'); ca.name = Q.id + '-ceiling'; group.add(ca); }
     else if (Q.ceiling != null) {
@@ -682,7 +689,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut
          on into the next side too, where that side turns less than 30 degrees; no second leaf (powder-door, Events 1.44 am) */
       var spill = [];
-      if (!Q.area && !hid) {
+      /* v84: a shaft's round wall too, for a cleft or window (its sides 1.0; H82's cleft 1.8 across the corner due south was cut on one side only; its doors as before) */
+      if ((!Q.area || (Q.shaft && /cleft|window|slit|loop/.test(op.kind || ''))) && !hid) {
         var dirOf = function (k) { var ed = E[k]; return [ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]]; };
         var gentle = function (k) { var u = dirOf(e.i), v = dirOf(k), lu = Math.hypot(u[0], u[1]), lv = Math.hypot(v[0], v[1]);
           return lu > 1e-6 && lv > 1e-6 && (u[0] * v[0] + u[1] * v[1]) / (lu * lv) > Math.cos(Math.PI / 6); };
@@ -707,6 +715,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
         soffit: near != null ? [h, far != null ? far - Q.floor : h] : null, recess: RC });
       spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
+      /* v84: a shaft's opening over a corner (H82's cleft): a round wall's sides meet at their inner faces, leaving a V
+         outside each corner that the wall's height hides; a sill across the corner shows its top, so a cap over it */
+      if (Q.shaft && sill > 0) spill.forEach(function (sp) {
+        var c = sp.k === (e.i + 1) % E.length ? E[e.i].b : E[e.i].a, t = Q.wall || 0.5, z = Q.floor + sill;
+        var nrm = function (k) { var ed = E[k], l = Math.hypot(ed.b[0] - ed.a[0], ed.b[1] - ed.a[1]); return [(ed.b[1] - ed.a[1]) / l, -(ed.b[0] - ed.a[0]) / l]; };
+        var n0 = nrm(e.i), n1 = nrm(sp.k), cg = new THREE.BufferGeometry().setFromPoints([toLocal(c[0], c[1], z),
+          toLocal(c[0] + n0[0] * t, c[1] + n0[1] * t, z), toLocal(c[0] + n1[0] * t, c[1] + n1[1] * t, z)]);
+        cg.computeVertexNormals();
+        var cm = F.register(new THREE.Mesh(cg, mats.wall), LAYER.wall); cm.name = Q.id + '-cap-' + op.id; cm.userData.owner = Q.id; group.add(cm);
+      });
     });
     /* a niche in the wall (a feature with a depth: the hourglasses', Godric's 13.1): cut, its back the wall's outer
        part, its head round */
@@ -1767,7 +1785,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (!rk) return;
     o.userData.rank = rk; o.onBeforeRender = rankOn; o.onAfterRender = rankOff;
   });
-  if (out.panes.length && F.renderer && o.far) out.far = farView(F, M, toLocal, out.panes, mats.pane);
+  if (out.panes.length && F.renderer && o.far) out.far = farView(F, M, toLocal, out.panes, mats.pane, P.shaft);
   return out;
 } };
 
@@ -1781,7 +1799,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
    tones.js names them (far-lawn, far-water-day, far-water-night, far-forest, far-hills, far-stone, far-rock,
    far-roof), else these, provisional. v66 (req 906, Design's thirteen far tones, f0bdf4ab): by night the castle's own
    windows on the far walls take far-window-night, lit from within (PS 6, "windows sparkling"), their own light. */
-function farView(F, M, toLocal, panes, paneMat) {
+function farView(F, M, toLocal, panes, paneMat, shaft) {
   var LAWN = -1.2, LAKE = -46.0, BASE = -20.0;      /* tools/architect-sections-pdf.py's lawn and lake; the castle's foot */
   var FALL = { 'far-lawn': 0x7d8a5c, 'far-pitch': 0x8d9a64, 'far-water-day': 0x6f8797, 'far-water-night': 0x141b24,
     'far-forest': 0x3a4630, 'far-hills': 0x7c8794, 'far-stone': 0xa9a194, 'far-rock': 0x8b8478, 'far-roof': 0x5f6670,
@@ -1967,6 +1985,12 @@ function farView(F, M, toLocal, panes, paneMat) {
   rt.texture.mapping = THREE.CubeRefractionMapping;
   var cam = new THREE.CubeCamera(0.5, 5000, rt);
   cam.position.set(0, EYE, 0); scene.add(cam);
+  /* v84: in a shaft the cube at its lowest pane, 0.45 over its foot (H82's cleft is 54 m over the well's foot, which
+     lies under the lake: from there the cleft showed the lake from below) */
+  if (shaft) {
+    var lo = Math.min.apply(null, panes.map(function (p) { p.geometry.computeBoundingBox(); return p.position.y + p.geometry.boundingBox.min.y; }));
+    if (lo > EYE + 2) cam.position.y = lo + 0.45;
+  }
   /* v71 (req 975 (c)): Phong, not Basic, so the line of sight is taken at each pixel; Basic takes it at the pane's four
      corners and blends between them, which stretched and shifted the view from close to the glass (the turbaned
      professor read as a tall sliver well off his place). Black, no shine, mixed wholly to the cube: lights do not touch it */
