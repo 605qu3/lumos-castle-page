@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The mounted knight</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #stats { position: fixed; left: 8px; top: 8px; font: 12px monospace; color: #aaa; }
+</style>
+</head>
+<body>
+<!-- the armour gallery's mounted knight on his plinth (page/corridor/knight.js; req 1096, Godric's 1 on
+     corridor-knight-1026). ?view=floor5 (the view place, 1.4 m before the plinth), far (4.5 m down the aisle), side (from
+     the tower door, 0.9 m west of the plinth), 45; ?night=1 the torches' light. A look for the eye, not a room. -->
+<canvas id="c"></canvas>
+<div id="stats">starting</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="knight.js?v=1"></script>
+<script>
+(function () {
+  var Q = new URLSearchParams(location.search), night = Q.get('night') === '1', view = Q.get('view') || 'floor5';
+  var canvas = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b0a09);
+  function col(h) { return new THREE.Color(h).convertSRGBToLinear(); }
+  var stone = new THREE.MeshStandardMaterial({ color: col(night ? 0x5a5048 : 0x9a9084), roughness: 0.9 });
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(6, 12), new THREE.MeshStandardMaterial({ color: col(night ? 0x4a4038 : 0x8a7a68), roughness: 0.9 }));
+  floor.rotation.x = -Math.PI / 2; floor.position.z = 1; scene.add(floor);
+  var wall = new THREE.Mesh(new THREE.PlaneGeometry(6, 4.5), new THREE.MeshStandardMaterial({ color: col(night ? 0x5a4c40 : 0xb8a888), roughness: 0.95 }));
+  wall.position.set(0, 2.25, -2.95); scene.add(wall);   /* the end wall, y 70, 0.6 behind the plinth */
+  /* the plinth, 1.2 by 2.8, 0.3 high; its front 0.35 before the front hooves (y 66.6 against 66.95) */
+  var plinth = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.3, 2.8), stone);
+  plinth.position.set(0, 0.15, 0.35 - 1.4); scene.add(plinth);
+  scene.add(new THREE.HemisphereLight(col(night ? 0x6a5040 : 0xdfe6ee), col(night ? 0x201812 : 0x5a5048), night ? 0.5 : 1.0));
+  var key = new THREE.DirectionalLight(col(night ? 0xffb070 : 0xfff6ea), night ? 1.1 : 1.4); key.position.set(-2, 3, 3); scene.add(key);
+  var k = CastleKnight.make(THREE, renderer, { src: '../../assets/layers/mounted-gothic-knight.png' });
+  k.group.position.y = 0.3; scene.add(k.group); k.light(night ? 1 : 0);
+  var camera = new THREE.PerspectiveCamera(60, 1, 0.05, 50), at = new THREE.Vector3(0, 1.5, -0.6);
+  if (view === 'far') camera.position.set(0.3, 1.45, 4.85);
+  else if (view === 'side') { camera.position.set(-1.5, 1.45, -2.25); at.set(0, 1.3, -0.5); }
+  else if (view === '45') { camera.position.set(-2.4, 1.45, 2.4); at.set(0, 1.4, -0.4); }
+  else camera.position.set(0.2, 1.45, 1.75);
+  camera.lookAt(at);
+  window.lumosGreybox = { camera: camera };
+  function size() { var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  addEventListener('resize', size); size();
+  var frames = 0, t0 = performance.now(), stats = document.getElementById('stats');
+  (function loop() {
+    renderer.render(scene, camera); frames++;
+    var t = performance.now(); if (t - t0 > 1000) { stats.textContent = Math.round(frames * 1000 / (t - t0)) + ' fps'; frames = 0; t0 = t; }
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+</body>
+</html>
