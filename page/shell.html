@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=532"></script>
+<script src="castle-model.js?v=533"></script>
 <script src="castle-paint.js?v=113"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -164,7 +164,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
-<script src="castle-shell.js?v=85"></script>
+<script src="castle-shell.js?v=86"></script>
 <script src="shell-w5b.js?v=20"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -2603,7 +2603,7 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
   x.fillStyle = gr; x.fillRect(0, 0, 128, 128);
   x.fillStyle = 'rgba(255,255,255,0.18)'; x.beginPath(); x.ellipse(44, 40, 16, 8, -0.6, 0, 2 * Math.PI); x.fill();   /* the glass's sheen */
   var face = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c) });
-  var eye = drum(0.1, 0.80, 0.858, iron, 32); eye.material = [iron, face, iron]; eye.name = 'founders-well-eye';
+  var eye = drum(0.1, 0.80, 0.858, iron, 32); eye.material = [iron, face, iron]; eye.name = 'founders-well-eye'; eye.userData.tap = 'founders-well-eye'; shell.group.add(eye);   /* a tap ray reads shell.group's children only */
   [5.8, 7.8].forEach(function (y) { box(CX - 0.1, y - 0.1, -0.05, CX + 0.1, y + 0.1, 1.6, oak); });                   /* the windlass's posts */
   drum(0.125, 5.85, 7.75, oak, 16, 1.2, true);                                /* its drum, its ends in the posts */
   drum(0.14, 6.35, 7.25, rope, 16, 1.2, true);                                /* the rope wound on it */
@@ -2611,6 +2611,9 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
   box(CX - 0.02, 7.96, 0.9, CX + 0.02, 8.0, 1.22, iron);                      /* its arm */
   drum(0.02, 7.99, 8.15, oak, 8, 0.93, true);                                 /* its handle */
 })();
+/* the eye's tap (Events, hidden-ways.json's undercroft-well-eye-first and -again): the same string on the page with no runtime */
+var WELL_EYE = 'he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water';
+thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE }]); };
 /* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
    green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
    and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
@@ -7114,6 +7117,9 @@ function tap(cx, cy) {
     if (events) events.tap('cauldron');
     else { POT.miss = !POT.miss; (POT.miss ? CURE_MISS : [CURE_RIGHT]).forEach(function (l) { thingCues[l](); }); }
     kit.tapped(true); return;
+  }
+  if (hit && hit.userData.tap === 'founders-well-eye') {   /* the glass in the founders' well's lid: a look, never open water */
+    if (events) events.tap('founders-well-eye'); else thingCues[WELL_EYE](); kit.tapped(true); return;
   }
   if (hit && hit.userData.tap === 'paper') {   /* req 941, the roll's verse */
     if (events) events.tap('paper'); else showLines(STONE_VERSE.map(function (l) { return { medium: 'seen', sound: l }; })); kit.tapped(true); return;

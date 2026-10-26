@@ -436,6 +436,52 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* a roof seen from below (v6, ledger line 15): its flat part a ceiling; its hip over roof.rect open beneath, the
      planes cut round each lantern on the ridge (a feature in this place with a centre, r and ridge: well-lantern), whose
      drum rises from the curb where the slopes meet it, glazed from its z to its top, under its cap */
+  /* v86 (the Architect's 167th, the scroll hall, ledger 292): a room whose model row names a gable roof part (`gable`,
+     its id in a mass's roof.parts) takes that roof's two slopes as its ceiling, cut to the room's rect, its walls to the
+     ridge behind them; oak principals at an even pitch near 3.2 m (the windows' bays) and a ridge beam, each bearing
+     2 cm up into the boards (the seams rule) */
+  function gableOf(Q) {
+    var g = Q.rec && !Q.rec.group && Q.rec.gable, p = null;
+    if (!g) return null;
+    (M.masses || []).forEach(function (m) { ((m.roof && m.roof.parts) || []).forEach(function (q) { if (q.id === g) p = q; }); });
+    return p && p.kind === 'gable' && p.rect ? p : null;
+  }
+  function buildGable(Q, P, x0, y0, x1, y1) {
+    var r = P.rect, alongX = (r[2] - r[0]) >= (r[3] - r[1]), mid = alongX ? (r[1] + r[3]) / 2 : (r[0] + r[2]) / 2;
+    var half = alongX ? (r[3] - r[1]) / 2 : (r[2] - r[0]) / 2, pitch = (P.ridge - P.eaves) / half;
+    function h(X, Y) { return P.ridge - pitch * Math.abs((alongX ? Y : X) - mid); }
+    var lo = alongX ? y0 : x0, hi = alongX ? y1 : x1, cuts = [lo];
+    if (mid > lo + 0.01 && mid < hi - 0.01) cuts.push(mid);
+    cuts.push(hi);
+    var cm = mats.ceil && mats.ceil.side === THREE.DoubleSide ? mats.ceil : mats.roof;
+    for (var i = 0; i < cuts.length - 1; i++) {
+      var a = cuts[i], b = cuts[i + 1], pts = alongX ? [[x0, a], [x1, a], [x1, b], [x0, b]] : [[a, y0], [b, y0], [b, y1], [a, y1]];
+      var sh = new THREE.Shape(); sh.moveTo(pts[0][0], pts[0][1]);
+      for (var k = 1; k < 4; k++) sh.lineTo(pts[k][0], pts[k][1]);
+      var geo = new THREE.ShapeGeometry(sh), pos = geo.attributes.position;
+      for (var k2 = 0; k2 < pos.count; k2++) { var X = pos.getX(k2), Y = pos.getY(k2), v = toLocal(X, Y, h(X, Y)); pos.setXYZ(k2, v.x, v.y, v.z); }
+      geo.computeVertexNormals();
+      var m = F.register(new THREE.Mesh(geo, cm), LAYER.ceiling); m.name = Q.id + '-ceiling-gable-' + i; m.userData.owner = Q.id; group.add(m);
+    }
+    var om = paintMat(tone('oak-beams'), true), run = alongX ? x1 - x0 : y1 - y0, n = Math.max(1, Math.round(run / 3.2)), DROP = 0.13;
+    function beam(A, B, w, d, name) {   /* a timber from A to B (castle x, y, h), w wide, d deep */
+      var a = toLocal(A[0], A[1], A[2]), b = toLocal(B[0], B[1], B[2]), L = a.distanceTo(b);
+      var bm = slab(w, d, L, om, 'ceiling'); bm.position.copy(a).add(b).multiplyScalar(0.5); bm.lookAt(b);
+      bm.name = Q.id + '-' + name; bm.userData.owner = Q.id; group.add(bm);
+    }
+    for (var j = 1; j < n; j++) {
+      var t = (alongX ? x0 : y0) + run * j / n;
+      for (var c = 0; c < cuts.length - 1; c++) {
+        var wa = cuts[c] === lo ? lo - 0.02 : cuts[c], wb = cuts[c + 1] === hi ? hi + 0.02 : cuts[c + 1];
+        var A = alongX ? [t, wa, h(t, wa) - DROP] : [wa, t, h(wa, t) - DROP], B = alongX ? [t, wb, h(t, wb) - DROP] : [wb, t, h(wb, t) - DROP];
+        beam(A, B, 0.2, 0.3, 'principal-' + j + '-' + c);
+      }
+    }
+    if (cuts.length === 3) {
+      var rz = P.ridge - 0.13;
+      beam(alongX ? [x0 - 0.02, mid, rz] : [mid, y0 - 0.02, rz], alongX ? [x1 + 0.02, mid, rz] : [mid, y1 + 0.02, rz], 0.25, 0.3, 'ridge-beam');
+    }
+  }
   function buildRoof(Q) {
     var R = Q.roof, f = R.flat.rect, r = R.rect, x0 = r[0], y0 = r[1], x1 = r[2], y1 = r[3];
     var fl = quad(f[2] - f[0], f[3] - f[1], mats.ceil, 'ceiling');
@@ -488,6 +534,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var H = (Q.ceiling != null ? Q.ceiling : Q.floor + 12) - Q.floor;
     if (Q.sky) H = Q.sky.breast;                                         /* v10: the leads' walls are their breast */
     var HD = (Q.rec && !Q.rec.group && !Q.area && Q.rec.heads || []).map(function (k) { return { a: k.rect[0], b: k.rect[2], h: k.z - Q.floor }; });
+    var GBL = gableOf(Q);   /* v86 */
     function headAt(x) { var z = H; HD.forEach(function (k) { if (x > k.a - 0.01 && x < k.b + 0.01) z = Math.max(z, k.h); }); return z; }
     var c = toLocal((x0 + x1) / 2, (y0 + y1) / 2, Q.floor);
     var row = rowOf(Q), mx = (x0 + x1) / 2, my = (y0 + y1) / 2;      /* v28: a painted place's own tones, kept to this place */
@@ -505,7 +552,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        square keeps its flat ceiling till ceilings.js draws it */
     var CV = null;
     /* v33 (req 714, Design's 2c3ebaab): the star drawn too, its crossings each one owner (a springer at each springing) */
-    if (row && !Q.roof && !Q.area && !HD.length && Q.ceiling != null && window.CastleCeilings && (Q.poly.length === 4 || (Q.rec && Q.rec.vault))) {
+    if (row && !Q.roof && !GBL && !Q.area && !HD.length && Q.ceiling != null && window.CastleCeilings && (Q.poly.length === 4 || (Q.rec && Q.rec.vault))) {
       var vst = stoneAt(row, mx, my), VB = Q.rec && Q.rec.vault, QC = Q, stoneM = paintMat(tone(vst + '/ashlar', vst), true);
       /* v32 (model v71, ledger line 116): a groin with no free pier springs from corbels on its walls; the bays are laid
          out as if the corbels were piers, then each pier gives way to a corbel bearing 2 cm into its wall */
@@ -597,6 +644,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var disc = Q.round ? { area: { outer: arcPts(Q.round.c, Q.round.r / Math.cos(Math.PI / 16) + (Q.wall || 0.5) + 0.1, 0, 360, 48).slice(0, 48), holes: [] } } : Q;
       var sk = areaMesh(disc, Q.ceiling + 0.01, mats.pane, 'ceiling'); sk.name = Q.id + '-pane-sky'; sk.raycast = function () {}; sk.userData.owner = Q.id; group.add(sk); out.panes.push(sk);
     }
+    else if (GBL) buildGable(Q, GBL, x0, y0, x1, y1);
     else if (Q.roof) buildRoof(Q);
     else if (CV && !CV.flat) { /* the vault is the ceiling */ }
     else if (Q.ceiling != null && Q.area) { var ca = areaMesh(Q, Q.ceiling, mats.ceilD, 'ceiling'); ca.name = Q.id + '-ceiling'; group.add(ca); }
