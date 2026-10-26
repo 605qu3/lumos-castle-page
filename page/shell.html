@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=533"></script>
+<script src="castle-model.js?v=534"></script>
 <script src="castle-paint.js?v=113"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -168,6 +168,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="shell-w5b.js?v=20"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
+<script src="corridor/knight.js?v=2"></script>
 <script src="shell-w5a.js?v=22"></script>
 <script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=2"></script>
@@ -3171,14 +3172,14 @@ var GALLERY = (function () {
     if (b[3] === 'cornet') { var fr = add(g, new THREE.BoxGeometry(0.012, 0.05, W), kit.solid(0xb89a4a), 0, -0.03 - L - 0.02, 0.15 + W / 2); }
     if (b[3] === 'flag') { var st = add(g, new THREE.BoxGeometry(0.014, 0.18, W), kit.solid(0x2e2a26), 0, -0.03 - L / 2, 0.15 + W / 2); }
   });
-  /* the sun of blades on the end wall (y 70), round the lancet: 28 swords, hilts on a ring 0.78 out, blades to 1.75, cut
-     short at 4.3 and 2.25; a sword that would cross the lancet's reveal (x 7.6 to 8.4, 2.35 to 4.25) is left out */
-  var sun = onWall(8.0, 69.99, 3.3, 0, -1, 'gallery-sun'), drawn = 0;
+  /* the sun of blades on the end wall (y 70), round the round window (req 1111): 28 swords, hilts on a ring 0.78 out,
+     blades to 1.75, cut short at 4.3 and 2.25; the lancet that stood here left four out, the round window none */
+  var ROSE_R = 0.7, sun = onWall(8.0, 69.99, 3.3, 0, -1, 'gallery-sun'), drawn = 0;
   for (var i = 0; i < 28; i++) {
     var ph = (i + 0.5) * Math.PI * 2 / 28, cx = Math.cos(ph), cy = Math.sin(ph), r1 = 1.75;
     if (cy > 0.01) r1 = Math.min(r1, (4.3 - 3.3) / cy); if (cy < -0.01) r1 = Math.min(r1, (2.25 - 3.3) / cy);
     var hits = false;
-    for (var q = 0.66; q <= r1; q += 0.05) if (Math.abs(q * cx) < 0.4 && 3.3 + q * cy > 2.35 && 3.3 + q * cy < 4.25) hits = true;
+    if (0.78 - 0.0125 < ROSE_R + 0.04) hits = true;   /* a hilt's guard over the window's hole */
     if (hits || r1 - 0.78 < 0.3) continue;
     var bl = r1 - 0.78, rz = ph - Math.PI / 2;
     add(sun, new THREE.BoxGeometry(0.045, bl, 0.01), steel, cx * (0.78 + bl / 2), cy * (0.78 + bl / 2), 0.012, rz);
@@ -3187,6 +3188,42 @@ var GALLERY = (function () {
     drawn++;
   }
   out.sunBlades = drawn;
+  /* req 1111 (Godric's note on the knight, 4.49 am 24 October 2026: "change it to a stained glass circular window that fills
+     the void between the sword hilts behind his head"): the model's square cut (1.4, sill 2.6) behind a carved stone panel
+     8 mm off the wall with a round hole r 0.7, the hilts' ring 0.78 round it, and a rose of stained glass 0.1 into the
+     reveal, lit by day as the lancet was, dimmed toward the torches at night */
+  (function () {
+    var c = document.createElement('canvas'); c.width = c.height = 512;
+    var g = c.getContext('2d'), C = 256, LEAD = '#1c1a1d';
+    g.fillStyle = LEAD; g.fillRect(0, 0, 512, 512);
+    function ring(r0, r1, n, cols, off) {
+      for (var i = 0; i < n; i++) {
+        var a0 = (i + off) * 2 * Math.PI / n, a1 = (i + 1 + off) * 2 * Math.PI / n;
+        g.beginPath(); g.arc(C, C, r1, a0, a1); g.arc(C, C, r0, a1, a0, true); g.closePath();
+        g.fillStyle = cols[i % cols.length]; g.fill(); g.lineWidth = 7; g.strokeStyle = LEAD; g.stroke();
+      }
+    }
+    ring(176, 250, 16, ['#9b1b30', '#1f3f8f', '#c99a2e', '#1f3f8f'], 0);
+    ring(96, 176, 8, ['#2f6b3a', '#7a1f6b'], 0.5);
+    for (var i = 0; i < 8; i++) {   /* a trefoil of gold in each of the inner ring's lights */
+      var a = (i + 1) * Math.PI / 4;
+      g.beginPath(); g.arc(C + Math.cos(a) * 136, C + Math.sin(a) * 136, 22, 0, 2 * Math.PI);
+      g.fillStyle = '#e0b84a'; g.fill(); g.lineWidth = 6; g.strokeStyle = LEAD; g.stroke();
+    }
+    g.beginPath(); g.arc(C, C, 96, 0, 2 * Math.PI); g.fillStyle = '#d8c9a0'; g.fill(); g.lineWidth = 8; g.strokeStyle = LEAD; g.stroke();
+    g.fillStyle = '#9b1b30'; g.fillRect(C - 14, C - 70, 28, 140); g.fillRect(C - 70, C - 14, 140, 28);   /* a red cross on the roundel */
+    g.beginPath(); g.arc(C, C, 252, 0, 2 * Math.PI); g.lineWidth = 10; g.strokeStyle = LEAD; g.stroke();
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding;
+    var gm = new THREE.MeshBasicMaterial({ map: t }), day = new THREE.Color(0xffffff), night = new THREE.Color(0x3a3434);
+    gm.color.copy(day).lerp(night, k);
+    var rose = add(sun, new THREE.CircleGeometry(ROSE_R + 0.01, 64), gm, 0, 0, -0.11); rose.name = 'gallery-rose-glass';
+    var sh = new THREE.Shape(), hw = 0.72;
+    sh.moveTo(-hw, -hw); sh.lineTo(hw, -hw); sh.lineTo(hw, hw); sh.lineTo(-hw, hw); sh.lineTo(-hw, -hw);
+    var hole = new THREE.Path(); hole.absarc(0, 0, ROSE_R, 0, Math.PI * 2, true); sh.holes.push(hole);
+    var panel = add(sun, new THREE.ShapeGeometry(sh, 32), kit.solid(0x8a857c), 0, 0, -0.002); panel.name = 'gallery-rose-panel';
+    out.rose = { r: ROSE_R, glass: rose, k: k };
+  })();
+
   /* the east trophy (x 9.5 to 10.9, 0.9 to 3.9): two pairs of crossed halberds and a painted round shield at 2.4 */
   var tr = onWall(10.2, 69.99, 2.4, 0, -1, 'gallery-trophy');
   [[1.4, 0.02], [0.9, 0.06]].forEach(function (p, k) {
@@ -3195,10 +3232,19 @@ var GALLERY = (function () {
   });
   add(tr, new THREE.CylinderGeometry(0.32, 0.32, 0.03, 28), paint.c16, 0, 0, 0.13).rotation.x = Math.PI / 2;
   add(tr, new THREE.SphereGeometry(0.07, 10, 6), steel, 0, 0, 0.15).scale.z = 0.5;
-  /* the knight's plinth on the axis, x 7.4 to 8.6, y 66.6 to 69.4, 0.3 high (his figure waits on Corridor's req 1096) */
+  /* the knight's plinth on the axis, x 7.4 to 8.6, y 66.6 to 69.4, 0.3 high */
   var kp = new THREE.Mesh(new THREE.BoxGeometry(1.2, H + 0.01, 2.8), stone), kat = shell.toLocal(8.0, 68.0, z0), kn = shell.toLocal(8.0, 69.0, z0).sub(kat);
   kp.position.copy(kat); kp.position.y += (H - 0.01) / 2; kp.rotation.y = Math.atan2(kn.x, kn.z); kp.name = 'gallery-knight-plinth'; kp.raycast = function () {};
   shell.group.add(kp);
+  /* req 1118 (Corridor's knight.js, Godric's 1 on corridor-knight-1026, 6.50 pm 26 October 2026: "1 but it needs to not be
+     floating"): the mounted knight on the plinth, the front hooves' middle at (8.0, 66.95) on its top, facing south down
+     the aisle; his shadows lie 8 mm over the stone (knight.js); dimmed toward the torches at night as the suits are */
+  if (window.CastleKnight) {
+    var kv = CastleKnight.make(THREE, renderer), ko = shell.toLocal(8.0, 66.95, z0), ks = kn.clone().negate();
+    kv.group.position.copy(ko); kv.group.position.y += H; kv.group.rotation.y = Math.atan2(ks.x, ks.z); kv.group.name = 'gallery-knight-group';
+    kv.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); kv.light(k);
+    shell.group.add(kv.group); out.knight = kv;
+  }
   return out;
 })();
 /* mirror-armour, "a tall suit of armor" (PS 12 L4250, L4308 to L4310; the model's mirror-armour, ledger 24): the round 3
