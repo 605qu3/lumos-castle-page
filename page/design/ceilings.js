@@ -148,12 +148,14 @@
     (faceSets[id] = faceSets[id] || []).push(m);
     return m;
   }
-  /* the stone behind a bowed face, from its plane back to the corbel's upright face: a wedge, thin at the chin */
+  /* the stone behind a bowed face, from its plane back to the corbel's upright face: a wedge, thin at the chin. v7 (req
+     1114, the Architect's 167th): its front parallel to the face and 10 mm behind it, never the 2 to 6 mm it leaned
+     through before (the 8 mm rule, conventions.md, the layered faces); its back edge then bears 0.6 mm into the corbel */
   function wedge(THREE, w, h, tilt, mat) {
     var sh = new THREE.Shape();
-    sh.moveTo(0, -h / 2); sh.lineTo(0.004, h / 2); sh.lineTo(h * Math.tan(tilt), h / 2); sh.lineTo(0, -h / 2);
+    sh.moveTo(0, -h / 2); sh.lineTo(0, h / 2); sh.lineTo(h * Math.tan(tilt), h / 2); sh.lineTo(0, -h / 2);
     var g = new THREE.ExtrudeGeometry(sh, { depth: w * 0.96, bevelEnabled: false });
-    g.translate(0, 0, -w * 0.48); g.rotateY(Math.PI / 2); g.translate(0, 0, -0.002);   /* the shape's x to the face's back (-z), its depth across the face */
+    g.translate(0, 0, -w * 0.48); g.rotateY(Math.PI / 2); g.translate(0, 0, -0.01);   /* the shape's x to the face's back (-z), its depth across the face */
     return new THREE.Mesh(g, mat);
   }
   /* CastleCeilings.corbels(id, state): a place's faces to 'awake', 'dozing' or 'sleeping'; returns how many it set */
