@@ -21,11 +21,11 @@
          still (on the clear floor, turned ?angle= degrees from facing the eye)
      ?t=seconds  run to that moment and hold it (for a shot); ?night=1 the candles; ?card=1 a painted teacher card
      beside him (electives-teachers.png, cell 3) and a painted pupil at a free chair (class-at-desks.png, cell 0), reference only; ?fig=0 no figures (the fps check, off); ?pickett=0 the class
-     alone; ?model=1 Pickett's shapes made in Blender. -->
+     alone; ?model=1 Pickett's shapes and the seated pupils' made in Blender. -->
 <canvas id="c"></canvas>
 <div id="stats">starting</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="figure.js?v=2"></script>
+<script src="figure.js?v=3"></script>
 <script>
 (function () {
   var Q = new URLSearchParams(location.search), night = Q.get('night') === '1', view = Q.get('view') || 'door';
@@ -66,9 +66,11 @@
   else { var sun = new THREE.DirectionalLight(col(0xfff6ea), 1.5); sun.position.set(-6, 5, -5); sun.target.position.set(4.5, 0, -7); scene.add(sun); scene.add(sun.target); }
 
   /* the figures */
-  /* ?model=1: Pickett's shapes made in Blender (models/pickett.json, tools/people-figure-blender.py), read before he is built */
-  var model = null;
-  if (Q.get('model') === '1') { var rq = new XMLHttpRequest(); rq.open('GET', 'models/pickett.json', false); rq.send(); model = JSON.parse(rq.responseText); }
+  /* ?model=1: Pickett's shapes and the seated pupils' made in Blender (models/pickett.json, models/pupil.json,
+     tools/people-figure-blender.py), read before they are built */
+  var model = null, pupilModel = null;
+  function readModel(f) { var rq = new XMLHttpRequest(); rq.open('GET', 'models/' + f + '.json', false); rq.send(); return JSON.parse(rq.responseText); }
+  if (Q.get('model') === '1') { model = readModel('pickett'); pupilModel = readModel('pupil'); }
   var P = CastleFigure.make(THREE, { look: 'pickett', model: model }), H = CastleFigure.HOUSES;
   P.light(night ? 1 : 0);
   function chair(xp, yp, u) { return [xp + u, 0, -(yp - 0.34)]; }
@@ -79,7 +81,7 @@
     { at: chair(7.0, 6.0, 0.325), rot: Math.PI, trim: H.ravenclaw, skin: 0x8a5a3a, hair: 0x141010, curly: true, face: 5, scale: 1.0 },
     { at: chair(2.3, 4.2, 0.325), rot: Math.PI, trim: H.slytherin, skin: 0xf2cfb4, hair: 0xa04a20, face: 4, scale: 1.05 },
     { at: chair(5.4, 4.2, 0.975), rot: Math.PI, trim: H.ravenclaw, skin: 0xd8a888, hair: 0x3a2618, long: true, girl: true, face: 7, scale: 0.98 }
-  ]);
+  ], pupilModel);
   pupils.light(night ? 1 : 0);
   if (showFig) { if (showP) scene.add(P.group); scene.add(pupils.group); }
 
@@ -99,6 +101,7 @@
   if (view === 'desk') { camera.position.set(5.725, 1.05, -5.66); camera.lookAt(5.0, 1.3, -9.5); }
   else if (view === 'front') { camera.position.set(4.5, 1.6, -9.9); camera.lookAt(3.4, 0.8, -4.5); }   /* his eye from the clear floor, over the class (for the pupils' faces) */
   else { camera.position.set(4.5, 1.35, -0.4); camera.lookAt(4.5, 1.15, -8); }
+  if (Q.has('cam')) { var cq = Q.get('cam').split(',').map(Number); camera.position.set(cq[0], cq[1], cq[2]); camera.lookAt(cq[3], cq[4], cq[5]); }   /* ?cam=x,y,z,lookx,looky,lookz: any eye, for close shots */
   if (act === 'still') { var tc = Math.atan2(camera.position.x - 4.5, camera.position.z + 8.0); P.group.rotation.y = tc + angle; }
 
   /* a painted teacher beside him, for comparison: electives-teachers.png, cell 3 (505 by 1177 px, 631 px a metre) */

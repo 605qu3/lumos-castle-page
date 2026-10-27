@@ -15,7 +15,7 @@
        { wait: s }. update(dt) runs them and the idle between; busy() is true while any step is left. light(k): k 0 to 1
        as the room's own candles burn (not by the hour: an unlit room at night is light(0); Design, req 1140), a little
        of tones.js's candle on the cloth.
-   CastleFigure.crowd(THREE, list)  seated pupils, instanced: the whole class is two draw calls. list of { at: [x, y,
+   CastleFigure.crowd(THREE, list, model)  seated pupils (model: models/pupil.json, the shapes made in Blender, or none), instanced: the whole class is two draw calls. list of { at: [x, y,
        z] (the chair's middle on the floor), rot (radians, 0 facing +z, toward the desk), scale, trim (house), skin,
        hair (hex), long (long hair), curly, face (0 to 7, the drawn faces), girl (a skirt, not trousers) }. Returns
        { group, mesh, ink, update(t), light(k) }; update(t) gives each a slow breath and a small look about.
@@ -546,7 +546,7 @@
     { smile: 0.4, lids: 0.4, iris: '80,96,120' },
     { smile: 0.7, lashes: 1, freckles: 11, iris: '96,70,44', blush: 0.6 }
   ];
-  function crowd(T, list) {
+  function crowd(T, list, Mo) {   /* Mo: the seated pupil's shapes made in Blender (models/pupil.json), when given */
     THREE = T;
     var kit = new Kit(), hr = 0.1, robe = 0x23201f, shoe = 0x17120f, grey = 0x8a8884, dgrey = 0x6c6a66, shirt = 0xeeeae0;
     var TR = { slot: 1 }, SK = { slot: 2 }, HA = { slot: 3 }, LO = { slot: 4 }, CU = { slot: 6 }, CAP = { slot: 7 };
@@ -554,23 +554,29 @@
     /* the jumper: its V at the front, the house's stripe round the V and at the waist; the shirt and tie in the V */
     var prof = [[0.001, 0.44], [0.16, 0.44], [0.158, 0.54], [0.15, 0.66], [0.155, 0.78], [0.152, 0.86], [0.12, 0.905], [0.06, 0.935]]
       .map(function (q) { return new THREE.Vector2(q[0], q[1]); });
-    kit.add(new THREE.LatheGeometry(prof, 20), M(0, 0, -0.02, 0, 0, 0, 1, 1, 0.7), function (v) {
+    var jumper = function (v) {
       var a = Math.abs(Math.atan2(v.x, (v.z + 0.02) / 0.7)), vy = 0.93 - a * 0.42;
       if (v.y > vy + 0.02) return shirt;
       if (v.y > vy - 0.012) return TR;
       if (v.y > 0.48 && v.y < 0.5) return TR;
       return grey;
-    }, 0);
+    };
+    kit.add(Mo ? modelPart(Mo, 'body') : new THREE.LatheGeometry(prof, 20), Mo ? null : M(0, 0, -0.02, 0, 0, 0, 1, 1, 0.7), jumper, 0);
     kit.add(new THREE.BoxGeometry(0.04, 0.17, 0.012), M(0, 0.8, 0.088, -0.12, 0, 0), TR, 0);   /* the tie */
     kit.add(new THREE.BoxGeometry(0.03, 0.025, 0.02), M(0, 0.895, 0.082, -0.2, 0, 0), TR, 0);
     [-1, 1].forEach(function (s) { kit.add(new THREE.BoxGeometry(0.04, 0.03, 0.008), M(s * 0.03, 0.905, 0.07, 0.35, 0, s * 0.55), shirt, 0); });
-    kit.add(new THREE.CylinderGeometry(0.045, 0.05, 0.1, 12), M(0, 0.96, -0.012), SK, 0, { pen: 2 });
+    kit.add(Mo ? modelPart(Mo, 'neck') : new THREE.CylinderGeometry(0.045, 0.05, 0.1, 12), Mo ? null : M(0, 0.96, -0.012), SK, 0, { pen: 2 });
     /* the robe, open down the front, hung from the shoulders over the chair's seat, lined in the house's colour */
-    var rows = [[0.3, 0.215, 0.95, 1], [0.44, 0.2, 0.9, 0.8], [0.56, 0.172, 0.6, 0.4], [0.7, 0.163, 0.42, 0.15], [0.8, 0.168, 0.36, 0],
-                [0.86, 0.165, 0.38, 0], [0.9, 0.14, 0.46, 0], [0.925, 0.09, 0.7, 0], [0.945, 0.06, 0.9, 0]];
-    kit.add(robeShell(rows, 28, 0.7, 1, false), M(0, 0, -0.02), function (v, u) { return (u < 0.04 || u > 0.96) ? TR : robe; }, 0);
-    kit.add(robeShell(rows, 28, 0.7, 1, true), M(0, 0, -0.02), TR, 0);
-    hood(kit, 0.86, 0.16, robe, TR, 0);
+    if (Mo) {   /* draped by Blender's cloth over the body, the thighs and the seat */
+      kit.add(modelPart(Mo, 'robe'), null, function (v, u) { return (u < 0.02 || u > 0.98) ? TR : robe; }, 0);
+      kit.add(modelPart(Mo, 'robe', 0.004), null, TR, 0, { pen: 1, inner: true });
+    } else {
+      var rows = [[0.3, 0.215, 0.95, 1], [0.44, 0.2, 0.9, 0.8], [0.56, 0.172, 0.6, 0.4], [0.7, 0.163, 0.42, 0.15], [0.8, 0.168, 0.36, 0],
+                  [0.86, 0.165, 0.38, 0], [0.9, 0.14, 0.46, 0], [0.925, 0.09, 0.7, 0], [0.945, 0.06, 0.9, 0]];
+      kit.add(robeShell(rows, 28, 0.7, 1, false), M(0, 0, -0.02), function (v, u) { return (u < 0.04 || u > 0.96) ? TR : robe; }, 0);
+      kit.add(robeShell(rows, 28, 0.7, 1, true), M(0, 0, -0.02), TR, 0);
+    }
+    hood(kit, 0.86, 0.16, robe, TR, 0, !!Mo);
     /* the legs: trousers to the shoe, or the skirt over the knee and grey socks below */
     [-1, 1].forEach(function (s) {
       var hip = V(s * 0.085, 0.49, 0.0), knee = V(s * 0.09, 0.5, 0.36), ankle = V(s * 0.09, 0.08, 0.38);
@@ -580,6 +586,12 @@
       kit.add(new THREE.SphereGeometry(0.045, 10, 6), M(ankle.x, 0.035, ankle.z + 0.05, 0, 0, 0, 1, 0.72, 2.2), shoe, 0);
       /* the arms on the desk: the robe's sleeve, its lined bell, the jumper's cuff and the hand */
       var sh = V(s * 0.16, 0.86, -0.01), el = V(s * 0.185, 0.69, 0.1), wr = V(s * 0.1, 0.76, 0.36), bell = V(s * 0.115, 0.755, 0.32);
+      if (Mo) {   /* the jumper's arm, and the robe's sleeve draped over it, its bell fallen onto the desk */
+        var side = s < 0 ? 'L' : 'R';
+        kit.add(modelPart(Mo, 'arm' + side), null, function (v) { return v.y > 0.8 ? robe : grey; }, 0);   /* above the sleeve's cap, the robe's shoulder */
+        kit.add(modelPart(Mo, 'sleeve' + side), null, robe, 0);
+        kit.add(modelPart(Mo, 'sleeve' + side, 0.004), null, 0x141210, 0, { inner: true });
+      } else {
       kit.add(between(sh, el, 0.052, 0.058), null, robe, 0);
       kit.add(new THREE.SphereGeometry(0.058, 10, 6), M(el.x, el.y, el.z), robe, 0);
       /* the bell lined dark: a lining in the house's colour, seen end on across the desk, read as a disc (and a rim of it
@@ -587,11 +599,12 @@
       kit.add(between(el, bell, 0.058, 0.074, 12, true), null, robe, 0);
       kit.add(flip(between(el, bell, 0.055, 0.071, 12, true)), null, 0x141210, 0);
       kit.add(between(el, wr, 0.04, 0.036, 8), null, grey, 0);
+      }
       kit.add(new THREE.SphereGeometry(0.038, 10, 6), M(wr.x - s * 0.02, wr.y - 0.004, wr.z + 0.045, 0, s * 0.3, 0, 0.95, 0.5, 1.3), SK, 0, { pen: 2 });
     });
     kit.add(robeShell([[0.36, 0.2, 0.0, 0], [0.47, 0.19, 0.0, 0]], 24, 1.0, 0, false), M(0, 0, 0.12, 0, 0, 0, 1, 1, 1.05), SKIRT, 0, {
       deform: function (p) { p.z = Math.max(p.z, -0.05); } });   /* the skirt, its pleats left to the pen */
-    head(kit, V(0, 1.06, 0.02), hr, { skin: SK, hair: HA, hairCap: CAP, long: LO, curly: CU }, 0);
+    head(kit, V(0, 1.06, 0.02), hr, { skin: SK, hair: HA, hairCap: CAP, long: LO, curly: CU, model: Mo }, 0);
     var geo = kit.geometry(false), n = list.length;
     var aT = new Float32Array(n * 3), aS = new Float32Array(n * 3), aH = new Float32Array(n * 3), aF = new Float32Array(n * 4);
     list.forEach(function (p, i) {
@@ -626,7 +639,10 @@
       sh.vertexShader = DECL + sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0068;\n' + GONE);
     };
     inkMat.customProgramCacheKey = function () { return 'castle-crowd-ink'; };
-    var mesh = new THREE.InstancedMesh(geo, mat, n), ink = new THREE.InstancedMesh(geo, inkMat, n);
+    var inkGeo = new THREE.BufferGeometry();   /* the same points and instance colours, drawn only as far as the linings */
+    Object.keys(geo.attributes).forEach(function (k) { inkGeo.setAttribute(k, geo.attributes[k]); });
+    inkGeo.setDrawRange(0, kit.outer); inkGeo.boundingSphere = geo.boundingSphere;
+    var mesh = new THREE.InstancedMesh(geo, mat, n), ink = new THREE.InstancedMesh(inkGeo, inkMat, n);
     ink.instanceMatrix = mesh.instanceMatrix;
     mesh.frustumCulled = ink.frustumCulled = false;
     var group = new THREE.Group(); group.add(mesh); group.add(ink); group.name = 'figure-crowd';
