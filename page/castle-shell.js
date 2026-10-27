@@ -339,7 +339,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var lv = (M.levels || []).filter(function (l) { return Math.abs(l.z - Q.floor) < 0.05; })[0];
     var ms = PAINT.masses.filter(function (m) { return slug(m.id) === Q.id; });
     var m = ms.filter(function (q) { return lv && q.level === lv.id; })[0] || ms[0];
-    return m ? { stone: m.runs[0][2], dress: m.dress, floor: 'flags', ceiling: 'rib', light: 'torches', mass: m } : null;
+    if (m) return { stone: m.runs[0][2], dress: m.dress, floor: 'flags', ceiling: 'rib', light: 'torches', mass: m };
+    /* v88: a stair that is a place on its own (H82's fern well) takes its stair's stone, rubble-dressed, as a well cut in rock */
+    var sp = PAINT.stairs && PAINT.stairs[Q.id];
+    return sp && sp.stone !== 'marble' ? { stone: sp.stone, dress: 'rubble', floor: 'flags', ceiling: 'barrel', light: 'torches' } : null;
   }
   function stoneAt(row, sx, sy, z) {
     if (row.band && z != null && z < row.band.top) return row.band.stone;

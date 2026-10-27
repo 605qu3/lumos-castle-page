@@ -164,7 +164,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
-<script src="castle-shell.js?v=87"></script>
+<script src="castle-shell.js?v=88"></script>
 <script src="shell-w5b.js?v=20"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -311,6 +311,8 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
   'h82-way', 'h82-glass-house', 'h82-gallery-way']);   /* v200, req 1099 (H82): the fern well's way and the glass house under the lake, rough; v209 the balcony's passage */
 /* req 1126 (Design's round rooms): the head's office and Clementine's study painted, their rows' panelling on their flat sides (castle-shell v87) */
 PAINTED = PAINTED.concat(['dumbledores-office', 'study']);
+/* castle-shell v88: H82's fern well painted, its stair's stone (houses-sandstone, rubble), provisional, Godric to confirm */
+PAINTED = PAINTED.concat(['h82-fern-well']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers' }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
