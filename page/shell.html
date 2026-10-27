@@ -3993,6 +3993,216 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
     });
   }
 })();
+/* the girls' west rooms on 2 (req 1006; Interiors' docs/interiors/girls-west-rooms.md, its five tables, every row of the
+   castle's furniture, model coordinates; ledger 305). The Defence teacher's sitting room: two worn velvet armchairs
+   facing across a low table on a rug, the bookcases on the west wall, the writing table and its chair, a candlestick
+   unlit, the dresser with its plates, a small table and chair by the lake window. His bedroom: the bed in plain covers,
+   the bedside table and candlestick, the wardrobe, the washstand with jug and basin, the trunk at the bed's foot, shut.
+   The teachers' own things by year are not drawn: in 1897 the teacher is to come (defence-classroom.md's 1897 note,
+   Kingsley's ruling of 24 October: Quirrell's garlic out). The two unused classrooms: desks and chairs piled against the
+   walls, the chairs upturned on the desk tops, legs up; the west room's old teacher's desk and its blackboard on the
+   easel turned to the window, the east room's last row of three desks facing it. The store: chalk, slates, inkwells and
+   a bundle of quills; stacked textbooks, a rolled wall map and a box of candles; four desks stacked in pairs; a globe
+   with the coasts a little wrong. Every foot 5 cm into the floor; the piles' and books' parts instanced */
+(function () {
+  var ROOMS = ['defence-sitting-room', 'defence-bedroom', 'unused-classroom-2-west', 'unused-classroom-2-east', 'classroom-store-2-west'];
+  if (ROOMS.indexOf(PLACE) < 0) return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'girls-west-things'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); }, seed = 31;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var oak = kit.solid(0x6e5034), darkOak = kit.solid(0x4e3824), pine = kit.solid(0x8a6a44), iron = kit.solid(0x2f2f33, { roughness: 0.7 }),
+    brass = kit.solid(0xb8913a, { metalness: 0.7, roughness: 0.35 }), china = kit.solid(0xf4f1ea, { roughness: 0.3 }), marble = kit.solid(0xe2ded6, { roughness: 0.3 });
+  var M4 = new THREE.Matrix4(), Q0 = new THREE.Quaternion(), V3 = new THREE.Vector3(), C3 = new THREE.Color();
+  function own(m) { m.userData.owner = PLACE; g.add(m); return m; }
+  function box(a, b, mt) { var m = thingBox(g, P, a, b, mt); m.userData.owner = PLACE; return m; }
+  function cyl(x, y, r0, r1, za, zb, mt, seg) { var m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, seg || 16), mt); m.position.copy(P(x, y, (za + zb) / 2)); return own(m); }
+  function lathe(x, y, z, pts, mt, seg) { var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), seg || 20), mt); m.position.copy(P(x, y, z)); return own(m); }
+  function legs(x0, y0, x1, y1, h, mt, s) { s = s || 0.04; [[x0, y0], [x1 - s, y0], [x0, y1 - s], [x1 - s, y1 - s]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + s, q[1] + s, h], mt); }); }
+  function tex(w, h, draw) { var cv = document.createElement('canvas'); cv.width = w; cv.height = h; draw(cv.getContext('2d'), w, h); var t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; return t; }
+  function candlestick(x, y, z) {
+    lathe(x, y, z, [[0.001, 0], [0.05, 0], [0.04, 0.015], [0.012, 0.03], [0.012, 0.13], [0.022, 0.14], [0.022, 0.15], [0.001, 0.15]], brass, 14);
+    cyl(x, y, 0.011, 0.011, z + 0.14, z + 0.3, kit.solid(0xf4f0e4), 10);
+  }
+  /* pieces built from parts: a root at the group's frame, a piece at a place, turn and flip, its parts as unit boxes;
+     every part's matrix gathered into one instanced mesh per material */
+  var root = new THREE.Object3D(), parts = { oak: [], pine: [] };
+  function piece(x, y, z, turn, flip, list, mat) {   /* list of [dx, dy, dz, sx, sy, sz] in the piece's frame, z up */
+    var pc = new THREE.Object3D(); pc.position.copy(P(x, y, z)); pc.rotation.set(flip ? Math.PI : 0, turn, 0, 'YXZ'); root.add(pc);
+    list.forEach(function (q) { var d = new THREE.Object3D(); d.position.set(q[0], q[2], -q[1]); d.scale.set(q[3], q[5], q[4]); pc.add(d); });
+    root.updateMatrixWorld(true);
+    pc.children.forEach(function (d) { parts[mat || 'oak'].push(d.matrixWorld.clone()); });
+    root.remove(pc);
+  }
+  function flush() {
+    Object.keys(parts).forEach(function (k) {
+      if (!parts[k].length) return;
+      var im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), k === 'pine' ? pine : oak, parts[k].length);
+      parts[k].forEach(function (m, i) { im.setMatrixAt(i, m); }); own(im);
+    });
+  }
+  /* a school desk 1.0 by 0.55, its top at 0.76, a shelf under; a chair 0.4 square, its seat at 0.45, its back to 0.9;
+     both about their own middles, the floor at 0 (a flipped one hangs down from its z) */
+  var DESK = [[0, 0, 0.74, 1.0, 0.55, 0.04], [0, 0.04, 0.5, 0.94, 0.4, 0.02], [-0.47, -0.245, 0.36, 0.04, 0.04, 0.76], [0.47, -0.245, 0.36, 0.04, 0.04, 0.76], [-0.47, 0.245, 0.36, 0.04, 0.04, 0.76], [0.47, 0.245, 0.36, 0.04, 0.04, 0.76], [0, 0.245, 0.12, 0.94, 0.03, 0.03]];
+  var CHAIR = [[0, 0, 0.44, 0.4, 0.4, 0.03], [-0.18, -0.18, 0.22, 0.035, 0.035, 0.45], [0.18, -0.18, 0.22, 0.035, 0.035, 0.45], [-0.18, 0.18, 0.45, 0.035, 0.035, 0.9], [0.18, 0.18, 0.45, 0.035, 0.035, 0.9], [0, 0.18, 0.78, 0.36, 0.02, 0.18]];
+  function desk(x, y, z, turn, flip) { piece(x, y, flip ? z + 0.76 : z, turn, flip, DESK); }
+  function chair(x, y, z, turn, flip) { piece(x, y, flip ? z + 0.9 : z, turn, flip, CHAIR, 'pine'); }
+  /* a pile against a wall, between two corners; along x (wall north or south) or along y (wall east or west): desks
+     in a row, every other one with a second desk upturned on it, chairs upturned on the tops, legs up, to about h */
+  function pile(x0, y0, x1, y1, rx, ry) {   /* (rx, ry) the way to the room */
+    var alongX = (x1 - x0) >= (y1 - y0), len = alongX ? x1 - x0 : y1 - y0, n = Math.max(1, Math.floor((len + 0.06) / 1.06)), turn = alongX ? 0 : Math.PI / 2;
+    var back = Math.atan2(rx, -ry);   /* an upturned chair's turn that hangs its back down on the room side */
+    for (var k = 0; k < n; k++) {
+      var t = (k + 0.5) * len / n, x = alongX ? x0 + t : (x0 + x1) / 2, y = alongX ? (y0 + y1) / 2 : y0 + t;
+      desk(x, y, 0, turn + (rnd() - 0.5) * 0.05, false);
+      if (k % 2 === 1) { desk(x, y, 0.76, turn + (rnd() - 0.5) * 0.06, true); continue; }   /* a second desk upturned on it, to 1.54 */
+      [-0.25, 0.25].forEach(function (o) {   /* or two chairs upturned on its top, seats down, legs up to 1.66, backs over its edge */
+        chair(x + (alongX ? o : 0) + rx * 0.13, y + (alongX ? 0 : o) + ry * 0.13, 0.76 - 0.445, back + (rnd() - 0.5) * 0.1, true);
+      });
+    }
+  }
+
+  if (PLACE === 'defence-sitting-room') {
+    var velvet = kit.solid(0x5a2a2e, { roughness: 1 }), velvetWorn = kit.solid(0x6e3a3a, { roughness: 1 });
+    /* S1 and S2, the armchairs facing each other across the table: S1 faces east, S2 west */
+    [[57.0, 57.8, 1], [59.6, 60.4, -1]].forEach(function (a) {
+      var back = a[2] > 0 ? a[0] : a[1] - 0.18, x0 = a[0], x1 = a[1];
+      box([x0, 10.0, 0.08], [x1, 10.8, 0.42], velvet); box([back, 10.0, 0.42], [back + 0.18, 10.8, 1.0], velvet);
+      box([x0, 10.0, 0.42], [x1, 10.14, 0.65], velvet); box([x0, 10.66, 0.42], [x1, 10.8, 0.65], velvet);
+      box([x0 + 0.1, 10.16, 0.42], [x1 - 0.1, 10.64, 0.47], velvetWorn);   /* the cushion, worn paler */
+      [[x0 + 0.04, 10.04], [x1 - 0.08, 10.04], [x0 + 0.04, 10.72], [x1 - 0.08, 10.72]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.09], darkOak); });
+    });
+    /* S3, the low table; the rug under it between the chairs */
+    box([58.2, 10.1, 0.41], [59.2, 10.7, 0.45], oak); legs(58.24, 10.14, 59.16, 10.66, 0.42, oak);
+    var rug = tex(128, 128, function (c, w, h) { c.fillStyle = '#6a3a2a'; c.fillRect(0, 0, w, h); c.strokeStyle = '#c8a46a'; c.lineWidth = 6; c.strokeRect(10, 10, w - 20, h - 20); c.fillStyle = '#2a3a4a'; c.fillRect(36, 36, w - 72, h - 72); c.fillStyle = '#c8a46a'; c.beginPath(); c.arc(64, 64, 14, 0, 6.3); c.fill(); });
+    var rg = own(new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.8), new THREE.MeshStandardMaterial({ map: rug, roughness: 1 })));
+    rg.rotation.x = -Math.PI / 2; rg.position.copy(P(58.7, 10.4, 0.008)); rg.userData.decal = true;
+    /* S4, the bookcases on the west wall: three bays, five shelves, the castle's books */
+    [3.0, 5.0, 7.0, 8.96].forEach(function (y) { box([56.0, y, -0.05], [56.4, y + 0.04, 2.2], oak); });
+    box([55.98, 2.98, 2.17], [56.42, 9.02, 2.22], darkOak);
+    var books = [], BK = [0x5a1e1e, 0x1e3a2a, 0x2a2a4a, 0x6a4a2a, 0x3a2a1e, 0x7a6a4a];
+    [0.08, 0.5, 0.92, 1.34, 1.76].forEach(function (z) {
+      box([56.0, 3.0, z], [56.4, 9.0, z + 0.025], oak);
+      for (var y = 3.06; y < 8.92;) {
+        if (y > 4.96 && y < 5.06 || y > 6.96 && y < 7.06) { y += 0.1; continue; }
+        var w = 0.03 + rnd() * 0.035, h = 0.22 + rnd() * 0.12;
+        if (rnd() < 0.06) { y += 0.1; continue; }   /* a gap, a book out */
+        books.push([56.2, y + w / 2, z + 0.025 + h / 2 - 0.004, 0.24 + rnd() * 0.06, w - 0.003, h, BK[Math.floor(rnd() * 6)]]); y += w;
+      }
+    });
+    var bm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), kit.solid(0xffffff, { roughness: 0.8 }), books.length);
+    books.forEach(function (q, k) { M4.compose(P(q[0], q[1], q[2]), Q0, V3.set(q[3], q[5], q[4])); bm.setMatrixAt(k, M4); bm.setColorAt(k, C3.set(q[6])); }); own(bm);
+    /* S5 and S6, the writing table on the north wall and its chair, the candlestick unlit */
+    box([56.6, 13.4, 0.72], [58.0, 14.0, 0.76], oak); legs(56.62, 13.42, 57.98, 13.98, 0.73, oak);
+    candlestick(57.75, 13.8, 0.755);
+    chair(57.3, 13.05, 0, Math.PI, false);
+    /* S7, the dresser on the east wall: a cupboard to 0.9, its rack of plates above, facing west */
+    box([61.4, 4.0, -0.05], [61.9, 6.0, 0.9], oak); box([61.38, 3.98, 0.88], [61.9, 6.02, 0.92], darkOak);
+    box([61.392, 4.98, 0.08], [61.4, 5.02, 0.84], darkOak);
+    box([61.75, 4.0, 0.9], [61.9, 6.0, 1.9], oak); box([61.6, 4.0, 1.86], [61.9, 6.0, 1.9], darkOak);
+    [4.0, 5.96].forEach(function (y) { box([61.6, y, 0.9], [61.9, y + 0.04, 1.9], oak); });
+    [1.2, 1.55].forEach(function (z) {
+      box([61.6, 4.04, z], [61.75, 5.96, z + 0.02], oak); box([61.6, 4.04, z + 0.06], [61.62, 5.96, z + 0.075], oak);   /* the shelf and its plate rail */
+      for (var y = 4.2; y < 5.9; y += 0.27) { var pl = own(new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.1, 0.015, 24), kit.solid(z > 1.3 ? 0xf2eee4 : 0x3a5a8a, { roughness: 0.3 }))); pl.position.copy(P(61.69, y, z + 0.13)); pl.rotation.z = Math.PI / 2 - 0.2; }
+    });
+    /* S8, by the lake window, free-standing: the small table and one chair */
+    box([58.3, 1.4, 0.7], [59.0, 2.1, 0.74], oak); legs(58.33, 1.43, 58.97, 2.07, 0.71, oak);
+    chair(59.35, 1.75, 0, -Math.PI / 2, false);
+  }
+
+  if (PLACE === 'defence-bedroom') {
+    /* B1, the bed in plain covers, its head to the west wall */
+    box([62.4, 6.4, -0.05], [62.46, 7.4, 1.05], oak); box([64.34, 6.4, -0.05], [64.4, 7.4, 0.7], oak);
+    box([62.46, 6.4, 0.25], [64.34, 6.45, 0.36], oak); box([62.46, 7.35, 0.25], [64.34, 7.4, 0.36], oak);
+    box([62.47, 6.46, 0.35], [64.33, 7.34, 0.52], kit.solid(0xe8e2d2));
+    var cover = kit.solid(0x7a7a6a, { roughness: 1 });
+    box([62.85, 6.385, 0.4], [64.36, 7.415, 0.55], cover);
+    box([62.52, 6.55, 0.52], [62.9, 7.25, 0.62], kit.solid(0xf2efe6));
+    /* B2, the bedside table and its candlestick */
+    box([62.4, 7.7, 0.62], [62.9, 8.2, 0.66], oak); legs(62.42, 7.72, 62.88, 8.18, 0.63, oak);
+    candlestick(62.65, 7.95, 0.655);
+    /* B3, the wardrobe on the west wall, shut, its doors to the room (east) */
+    box([62.4, 2.6, -0.05], [63.0, 4.0, 2.0], oak); box([62.4, 2.57, 1.95], [63.03, 4.03, 2.04], darkOak);
+    box([63.0, 3.29, 0.1], [63.008, 3.31, 1.9], darkOak);
+    [3.22, 3.38].forEach(function (y) { cyl(63.02, y, 0.012, 0.012, 1.0, 1.05, brass, 8); });
+    /* B4, the washstand on the north wall: marble, jug and basin */
+    legs(63.4, 9.1, 64.4, 9.6, 0.78, oak); box([63.4, 9.1, 0.76], [64.4, 9.6, 0.8], marble);
+    lathe(63.9, 9.33, 0.795, [[0.001, 0], [0.08, 0], [0.18, 0.08], [0.19, 0.1], [0.175, 0.1], [0.07, 0.012], [0.001, 0.012]], china, 24);
+    lathe(63.9, 9.33, 0.805, [[0.001, 0], [0.06, 0], [0.08, 0.1], [0.06, 0.2], [0.05, 0.26], [0.065, 0.28]], china, 18);
+    /* B5, the trunk at the bed's foot, shut */
+    box([64.7, 6.5, -0.01], [65.5, 7.0, 0.5], kit.solid(0x3a2a20)); box([64.69, 6.49, 0.42], [65.51, 7.01, 0.44], iron);
+    [64.85, 65.35].forEach(function (x) { box([x, 6.49, -0.01], [x + 0.03, 7.01, 0.51], iron); });
+    box([65.06, 6.486, 0.3], [65.14, 6.49, 0.42], brass);
+  }
+
+  if (PLACE === 'unused-classroom-2-west') {
+    pile(22.6, 13.4, 27.4, 14.0, 0, -1); pile(30.0, 13.4, 34.8, 14.0, 0, -1);   /* W1, W2, either side of the door */
+    pile(22.1, 6.6, 22.9, 12.4, 1, 0);                                       /* W3, against the west wall */
+    /* W4, the old teacher's desk, facing north: two pedestals of empty drawers and the top */
+    box([27.9, 3.0, 0.74], [29.5, 3.8, 0.78], darkOak);
+    [[27.92, 28.4], [29.0, 29.48]].forEach(function (p) {
+      box([p[0], 3.02, -0.05], [p[1], 3.78, 0.75], darkOak);
+      [0.2, 0.42, 0.62].forEach(function (z) { box([p[0] + 0.03, 3.772, z], [p[1] - 0.03, 3.78, z + 0.008], oak); cyl((p[0] + p[1]) / 2, 3.79, 0.012, 0.012, z - 0.07, z - 0.05, brass, 8); });
+    });
+    box([28.4, 3.02, 0.6], [29.0, 3.06, 0.75], darkOak);
+    /* W5, the blackboard on its easel, turned to face the window: the room sees its plain back */
+    function strut(a, b, r, mt) { var A = P(a[0], a[1], a[2]), B = P(b[0], b[1], b[2]), m = own(new THREE.Mesh(new THREE.CylinderGeometry(r, r, A.distanceTo(B), 8), mt)); m.position.copy(A).add(B).multiplyScalar(0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize()); return m; }
+    /* the two front legs lean north as they rise (y 3.25 at the foot, 3.5 at 1.85), the back leg props them from the north;
+       the board leans on their south side, its face to the window, its back to the room */
+    var LY = function (z) { return 3.25 + 0.25 * z / 1.85; }, tilt = Math.atan2(0.25, 1.85);
+    [31.0, 32.2].forEach(function (x) { strut([x, 3.25, -0.05], [x, 3.5, 1.85], 0.022, pine); });
+    strut([31.6, 4.2, -0.05], [31.6, 3.52, 1.78], 0.02, pine); strut([31.0, 3.5, 1.82], [32.2, 3.5, 1.82], 0.018, pine);
+    var bd = new THREE.Group(); bd.position.copy(P(31.6, LY(1.2) - 0.04, 1.2)); bd.rotation.x = -tilt; own(bd);
+    var back = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.9, 0.02), pine); back.position.z = 0.0; back.userData.owner = PLACE; bd.add(back);
+    var face = new THREE.Mesh(new THREE.BoxGeometry(1.16, 0.86, 0.008), kit.solid(0x1e2420)); face.position.z = 0.016; face.userData.owner = PLACE; bd.add(face);
+    [31.0, 32.2].forEach(function (x) { strut([x, LY(0.72) - 0.08, 0.72], [x, LY(0.72) + 0.03, 0.72], 0.01, iron); });   /* the pins */
+    var ledge = new THREE.Mesh(new THREE.BoxGeometry(1.24, 0.03, 0.08), pine); ledge.position.set(0, -0.465, 0.03); ledge.userData.owner = PLACE; bd.add(ledge);
+  }
+
+  if (PLACE === 'unused-classroom-2-east') {
+    pile(49.7, 13.4, 51.3, 14.0, 0, -1); pile(53.3, 13.4, 55.5, 14.0, 0, -1);   /* E1, E2 */
+    pile(54.9, 3.0, 55.5, 11.0, -1, 0);                                       /* E3, against the east wall */
+    [50.9, 51.9, 52.9].forEach(function (x) { desk(x, 3.1, 0, Math.PI, false); });   /* E4, the last row, facing the window */
+  }
+
+  if (PLACE === 'classroom-store-2-west') {
+    /* C1 and C2, the shelves on the east wall either side of the door, their things to the room (west) */
+    [[1.4, 3.6], [6.2, 8.4]].forEach(function (s) {
+      [s[0], s[1] - 0.04].forEach(function (y) { box([21.0, y, -0.05], [21.6, y + 0.04, 2.0], oak); });
+      [0.1, 0.55, 1.0, 1.45, 1.96].forEach(function (z) { box([21.0, s[0], z], [21.6, s[1], z + 0.03], oak); });
+    });
+    /* C1: boxes of chalk, the slates stacked, inkwells in a tray, the bundle of quills */
+    for (var k = 0; k < 6; k++) box([21.1, 1.5 + k * 0.33, 0.125], [21.4, 1.78 + k * 0.33, 0.27], kit.solid(k % 2 ? 0xc8b894 : 0xb8a884));
+    for (var k = 0; k < 3; k++) for (var s = 0; s < 6; s++) box([21.08, 1.5 + k * 0.68, 0.575 + s * 0.022], [21.5, 2.1 + k * 0.68, 0.595 + s * 0.022], kit.solid(s % 2 ? 0x3a3e42 : 0x34383c));
+    box([21.1, 1.6, 1.025], [21.5, 2.6, 1.045], oak);
+    for (var k = 0; k < 10; k++) lathe(21.2 + (k % 2) * 0.18, 1.7 + Math.floor(k / 2) * 0.2, 1.04, [[0.001, 0], [0.035, 0], [0.035, 0.04], [0.012, 0.055], [0.012, 0.065], [0.001, 0.065]], kit.solid(0x2a2a30, { roughness: 0.2 }), 10);
+    for (var k = 0; k < 12; k++) { var q = own(new THREE.Mesh(new THREE.ConeGeometry(0.008, 0.3, 5), kit.solid(0xe8e0d0))); q.position.copy(P(21.3 + (k % 3) * 0.012, 3.0, 1.06 + Math.floor(k / 3) * 0.012)); q.rotation.x = Math.PI / 2; }
+    cyl(21.31, 3.0, 0.03, 0.03, 1.07, 1.1, kit.solid(0xc8b88a), 8).rotation.x = Math.PI / 2;
+    /* C2: old textbooks in stacks, the rolled wall map, the box of spare candles */
+    var tb = [];
+    for (var k = 0; k < 8; k++) { var y = 6.3 + (k % 4) * 0.5, z = k < 4 ? 0.125 : 0.575; for (var j = 0; j < 4 + (k % 3); j++) tb.push([21.3, y + 0.17, z + 0.02 + j * 0.045, 0.24 + rnd() * 0.04, 0.32, 0.04, [0x5a1e1e, 0x2a3a2a, 0x4a3a2a, 0x2a2a4a][j % 4]]); }
+    var tm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), kit.solid(0xffffff, { roughness: 0.85 }), tb.length);
+    tb.forEach(function (q, k) { M4.compose(P(q[0], q[1], q[2]), Q0, V3.set(q[3], q[5], q[4])); tm.setMatrixAt(k, M4); tm.setColorAt(k, C3.set(q[6])); }); own(tm);
+    var mp = own(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 1.5, 14), kit.solid(0xe0d4b4))); mp.position.copy(P(21.3, 7.3, 1.08)); mp.rotation.x = Math.PI / 2;
+    [6.53, 8.07].forEach(function (y) { var e = own(new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.06, 8), darkOak)); e.position.copy(P(21.3, y, 1.08)); e.rotation.x = Math.PI / 2; });
+    box([21.08, 6.4, 1.475], [21.45, 7.2, 1.6], pine);
+    /* C3, four desks stacked in pairs, the top ones upturned */
+    [2.5, 3.5].forEach(function (y) { desk(17.7, y, 0, 0, false); desk(17.7, y, 0.76, 0, true); });
+    /* C4, the globe on its stand: three legs, the meridian ring, the world as it was drawn long ago */
+    [0, 2.09, 4.19].forEach(function (a) { var l = own(new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.02, 0.62, 8), darkOak)); l.position.copy(P(18.0 + Math.cos(a) * 0.14, 7.0 + Math.sin(a) * 0.14, 0.27)); l.rotation.set(Math.sin(a) * 0.4, 0, -Math.cos(a) * 0.4); });
+    lathe(18.0, 7.0, 0.55, [[0.29, 0], [0.3, 0.02], [0.28, 0.03]], darkOak, 32);
+    var world = tex(256, 128, function (c, w, h) {
+      c.fillStyle = '#c8b88a'; c.fillRect(0, 0, w, h);
+      c.fillStyle = '#7a8a5a'; [[40, 40, 26, 20], [62, 80, 14, 26], [128, 38, 30, 16], [140, 72, 18, 24], [196, 48, 34, 18], [220, 92, 14, 9]].forEach(function (b) { c.beginPath(); c.ellipse(b[0], b[1], b[2], b[3], 0.4, 0, 6.3); c.fill(); });
+      c.strokeStyle = 'rgba(80,60,40,0.4)'; for (var k = 1; k < 8; k++) { c.beginPath(); c.moveTo(k * 32, 0); c.lineTo(k * 32, h); c.stroke(); }
+      c.fillStyle = '#a89a6a'; c.fillRect(0, 118, w, 10);
+    });
+    var gl = own(new THREE.Mesh(new THREE.SphereGeometry(0.26, 28, 18), new THREE.MeshStandardMaterial({ map: world, roughness: 0.6 })));
+    gl.position.copy(P(18.0, 7.0, 0.84)); gl.rotation.z = 0.41;
+    var mr = own(new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.008, 6, 40), brass)); mr.position.copy(P(18.0, 7.0, 0.84)); mr.rotation.z = 0.41;
+    cyl(18.0, 7.0, 0.012, 0.012, 0.56, 0.6, brass, 8);
+  }
+  flush();
+})();
 /* the eye's tap (Events, hidden-ways.json's undercroft-well-eye-first and -again): the same string on the page with no runtime */
 var WELL_EYE = 'he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water';
 thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE }]); };
