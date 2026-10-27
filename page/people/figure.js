@@ -51,6 +51,9 @@
   function Kit() { this.p = []; this.n = []; this.c = []; this.s = []; this.u = []; this.pen = []; this.si = []; this.sw = []; }
   Kit.prototype.add = function (geo, m, colour, bone, o) {
     o = o || {};
+    if (o.inner) {   /* a lining: kept at the end, past the ink's range, since no outline is seen from within */
+      (this.inner = this.inner || new Kit()).add(geo, m, colour, bone, Object.assign({}, o, { inner: false })); return;
+    }
     var g = geo;
     if (o.deform) {   /* bend the part's points, then its normals smooth again */
       var P0 = g.attributes.position, w = V(0, 0, 0);
@@ -71,13 +74,15 @@
         this.p.push(P[q], py, P[q + 2]); this.n.push(N[q], N[q + 1], N[q + 2]); this.c.push(cc.r, cc.g, cc.b); this.s.push(slot);
         if (o.face && UV) this.u.push(UV[(t / 3 + j) * 2], UV[(t / 3 + j) * 2 + 1]); else this.u.push(CORNER[0], CORNER[1]);
         this.pen.push(o.pen !== undefined ? o.pen : 1);
-        var b = typeof bone === 'function' ? bone(py) : [bone, 0, 1];
+        var b = typeof bone === 'function' ? bone(py, P[q], P[q + 2]) : [bone, 0, 1];
         this.si.push(b[0], b[1], 0, 0); this.sw.push(b[2], 1 - b[2], 0, 0);
       }
     }
   };
   Kit.prototype.geometry = function (skinned) {
-    var g = new THREE.BufferGeometry();
+    var g = new THREE.BufferGeometry(), self = this;
+    this.outer = this.p.length / 3;
+    if (this.inner) ['p', 'n', 'c', 's', 'u', 'pen', 'si', 'sw'].forEach(function (k) { self[k] = self[k].concat(self.inner[k]); });
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
@@ -98,6 +103,20 @@
     var q = new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
     g.applyMatrix4(new THREE.Matrix4().compose(a.clone().add(d.multiplyScalar(0.5)), q, V(1, 1, 1)));
     return g;
+  }
+  /* a part of a figure made in Blender (tools/people-figure-blender.py): its points, normals, uv and triangles; inward, it
+     comes back turned inside out and drawn in a little, a lining */
+  function modelPart(Mo, name, inward) {
+    var d = Mo.parts[name], g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(d.p, 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute(d.n, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(d.uv, 2));
+    g.setIndex(d.i);
+    if (!inward) return g;
+    g = g.toNonIndexed();
+    var P = g.attributes.position.array, N = g.attributes.normal.array;
+    for (var i = 0; i < P.length; i++) P[i] -= N[i] * inward;
+    return flip(g);
   }
   function flip(g) {   /* turned inside out: a lining, seen from within */
     g = g.index ? g.toNonIndexed() : g;
@@ -259,11 +278,14 @@
      skin, hair, hairCap (the cap's own colour or slot), long, curly, moustache, goatee, hat, hatCol, band, slick } */
   function head(kit, c, r, o, bone) {
     var skin = o.skin, hair = o.hair, cap = o.hairCap || hair;
-    kit.add(new THREE.SphereGeometry(r, 18, 12), M(c.x, c.y, c.z, 0, 0, 0, 0.84, 1.13, 0.96), skin, bone, { face: true, pen: 2 });
-    kit.add(new THREE.SphereGeometry(r * 0.52, 10, 6), M(c.x, c.y - r * 0.52, c.z + r * 0.16, 0, 0, 0, 1.12, 0.82, 1.1), skin, bone, { pen: 2 });   /* the jaw */
-    kit.add(new THREE.SphereGeometry(r * 0.13, 8, 6), M(c.x, c.y - r * 0.12, c.z + r * 0.9, 0.35, 0, 0, 0.8, 1.6, 1.0), skin, bone, { pen: 2 });   /* the nose */
+    if (o.model) kit.add(modelPart(o.model, 'head'), null, skin, bone, { face: true, pen: 2 });   /* shaped in Blender: brow, sockets, nose, chin */
+    else {
+      kit.add(new THREE.SphereGeometry(r, 18, 12), M(c.x, c.y, c.z, 0, 0, 0, 0.84, 1.13, 0.96), skin, bone, { face: true, pen: 2 });
+      kit.add(new THREE.SphereGeometry(r * 0.52, 10, 6), M(c.x, c.y - r * 0.52, c.z + r * 0.16, 0, 0, 0, 1.12, 0.82, 1.1), skin, bone, { pen: 2 });   /* the jaw */
+      kit.add(new THREE.SphereGeometry(r * 0.13, 8, 6), M(c.x, c.y - r * 0.12, c.z + r * 0.9, 0.35, 0, 0, 0.8, 1.6, 1.0), skin, bone, { pen: 2 });   /* the nose */
+    }
     [-1, 1].forEach(function (s) {
-      kit.add(new THREE.SphereGeometry(r * 0.21, 8, 6), M(c.x + s * r * 0.87, c.y - r * 0.06, c.z - r * 0.02, 0, s * 0.3, 0, 0.42, 1, 0.72), skin, bone, { pen: 2 });
+      kit.add(new THREE.SphereGeometry(r * 0.21, 6, 4), M(c.x + s * r * 0.87, c.y - r * 0.06, c.z - r * 0.02, 0, s * 0.3, 0, 0.42, 1, 0.72), skin, bone, { pen: 2 });
     });
     /* the hair: a cap tipped back so the brow is clear and the nape covered; slicked, curly or with a fall behind */
     var capG = new THREE.SphereGeometry(r * 1.07, 14, 7, 0, TAU, 0, Math.PI * 0.56), capM = M(c.x, c.y + r * 0.05, c.z - r * 0.04, -0.42, 0, 0, 0.93, o.slick ? 0.98 : 1.06, 1.0);
@@ -299,10 +321,10 @@
     }
   }
   /* the hood, down on the back of the shoulders: a soft fold of the robe, its lining along the rim */
-  function hood(kit, y, w, robe, lining, bone) {
+  function hood(kit, y, w, robe, lining, bone, rimless) {
     kit.add(new THREE.SphereGeometry(1, 12, 6, 0, TAU, Math.PI * 0.35, Math.PI * 0.65), M(0, y - w * 0.32, -w * 0.64, 0.25, 0, 0, w * 0.8, w * 0.95, w * 0.42), robe, bone,
             { deform: function (p) { p.x *= 1 + 0.06 * Math.sin(p.y * 9); } });
-    kit.add(new THREE.TorusGeometry(1, 0.1, 5, 14, Math.PI), M(0, y + w * 0.06, -w * 0.52, Math.PI * 0.5 + 0.35, 0, Math.PI, w * 0.78, w * 0.62, w * 0.62), lining, bone);
+    if (!rimless) kit.add(new THREE.TorusGeometry(1, 0.1, 5, 14, Math.PI), M(0, y + w * 0.06, -w * 0.52, Math.PI * 0.5 + 0.35, 0, Math.PI, w * 0.78, w * 0.62, w * 0.62), lining, bone);
   }
 
   /* ---- the standing figure ---- */
@@ -326,7 +348,7 @@
     var L = Object.assign({}, LOOKS[opts.look || 'pickett'], opts), child = (opts.look === 'pupil');
     var kit = new Kit();
     var hr = child ? 0.118 : 0.108, neckY = 1.52, hc = V(0, neckY + hr * 1.0, 0.012);
-    var robe = L.robe, lining = L.lining;
+    var robe = L.robe, lining = L.lining, Mo = opts.model || null;   /* Mo: the shapes made in Blender, when given */
     var bodyW = function (y) {
       if (y < 0.5) return [B.hem, 0, 1];
       if (y < 0.85) return [B.hem, B.hips, 1 - (y - 0.5) / 0.35];
@@ -334,45 +356,68 @@
       return [B.spine, 0, 1];
     };
     /* the legs in their trousers, each carried by its foot below and the hips above, so the walk shows under the robe */
+    if (Mo) {   /* the body in one piece: each leg carried by its foot and the hips, the torso as the robe; the coat's skirt */
+      kit.add(modelPart(Mo, 'body'), null, function (v) {
+        if (v.y < 0.88) return L.trousers;
+        if (v.y > 1.47) return L.skin;
+        return (Math.abs(Math.atan2(v.x, v.z / 0.7)) < 0.42 && v.y > 0.9 && v.y < 1.45) ? L.waist : L.coat;
+      }, function (y, x) {
+        var f = x < 0 ? B.footL : B.footR;
+        return y < 0.12 ? [f, 0, 1] : y < 0.85 ? [f, B.hips, 1 - (y - 0.12) / 0.73] : bodyW(y); });
+      kit.add(modelPart(Mo, 'skirt'), null, L.coat, bodyW);
+    }
     [[-1, B.footL], [1, B.footR]].forEach(function (f) {
-      kit.add(between(V(f[0] * 0.085, 0.07, 0.02), V(f[0] * 0.09, 0.92, 0), 0.052, 0.075, 10), null, L.trousers, function (y) {
+      if (!Mo) kit.add(between(V(f[0] * 0.085, 0.07, 0.02), V(f[0] * 0.09, 0.92, 0), 0.052, 0.075, 10), null, L.trousers, function (y) {
         return y < 0.12 ? [f[1], 0, 1] : y < 0.85 ? [f[1], B.hips, 1 - (y - 0.12) / 0.73] : [B.hips, 0, 1]; });
-      kit.add(new THREE.SphereGeometry(0.05, 10, 6), M(f[0] * 0.085, 0.036, 0.1, 0, 0, 0, 1, 0.72, 2.4), L.shoe, f[1], { deform: function (p) { if (p.y < -0.02) p.y = -0.02; } });
+      kit.add(new THREE.SphereGeometry(0.05, 8, 5), M(f[0] * 0.085, 0.036, 0.1, 0, 0, 0, 1, 0.72, 2.4), L.shoe, f[1], { deform: function (p) { if (p.y < -0.02) p.y = -0.02; } });
     });
     /* the frock coat beneath (to the knee), the waistcoat at its front with a row of buttons, the collar and cravat */
     var coatProf = [[0.001, 0.5], [0.19, 0.49], [0.18, 0.7], [0.16, 0.9], [0.15, 1.02], [0.165, 1.18], [0.18, 1.3], [0.178, 1.4],
                     [0.15, 1.46], [0.09, 1.5], [0.06, 1.53]].map(function (q) { return new THREE.Vector2(q[0], q[1]); });
-    kit.add(new THREE.LatheGeometry(coatProf, 20), M(0, 0, 0, 0, 0, 0, 1, 1, 0.7), function (v) {
+    if (!Mo) kit.add(new THREE.LatheGeometry(coatProf, 20), M(0, 0, 0, 0, 0, 0, 1, 1, 0.7), function (v) {
       var a = Math.abs(Math.atan2(v.x, v.z / 0.7));
       if (a < 0.42 && v.y > 0.9 && v.y < 1.45) return L.waist;
       return L.coat;
     }, bodyW);
-    for (var bi = 0; bi < 5; bi++) kit.add(new THREE.SphereGeometry(0.009, 6, 4), M(0, 1.0 + bi * 0.085, 0.112 - Math.abs(bi - 2) * 0.004), 0xb8a070, B.spine);
-    kit.add(new THREE.CylinderGeometry(0.052, 0.058, 0.13, 12), M(0, neckY + 0.03, 0.0), L.skin, B.head, { pen: 2 });
+    for (var bi = 0; bi < 5; bi++) kit.add(new THREE.SphereGeometry(0.009, 4, 3), M(0, 1.0 + bi * 0.085, 0.112 - Math.abs(bi - 2) * 0.004), 0xb8a070, B.spine);
+    if (!Mo) kit.add(new THREE.CylinderGeometry(0.052, 0.058, 0.13, 12), M(0, neckY + 0.03, 0.0), L.skin, B.head, { pen: 2 });
     kit.add(new THREE.CylinderGeometry(hr * 0.52, hr * 0.58, 0.06, 16, 1, true), M(0, neckY, 0.006), L.collar, B.spine);
     [-1, 1].forEach(function (s) { kit.add(new THREE.BoxGeometry(0.035, 0.03, 0.01), M(s * 0.024, neckY - 0.03, 0.06, 0.3, 0, s * 0.5), L.collar, B.spine); });
-    if (L.cravat) kit.add(new THREE.SphereGeometry(0.04, 10, 8), M(0, neckY - 0.065, 0.075, 0, 0, 0, 1.15, 1.3, 0.5), L.cravat, B.spine);
+    if (L.cravat) kit.add(new THREE.SphereGeometry(0.04, 8, 5), M(0, neckY - 0.065, 0.075, 0, 0, 0, 1.15, 1.3, 0.5), L.cravat, B.spine);
     head(kit, hc, hr, { skin: L.skin, hair: L.hair, moustache: L.moustache, goatee: L.goatee, long: L.long, slick: L.slick,
-                         hat: L.hat, hatCol: L.hatCol || robe, band: L.band }, B.head);
+                         hat: L.hat, hatCol: L.hatCol || robe, band: L.band, model: Mo }, B.head);
     /* the robe, open down the front, hung in folds; the fronts turned back on the lining; the lining within */
     var rows = [[0.07, 0.272, 0.36, 1], [0.3, 0.256, 0.34, 0.9], [0.6, 0.228, 0.3, 0.65], [0.9, 0.2, 0.27, 0.35], [1.05, 0.194, 0.26, 0.2],
                 [1.2, 0.203, 0.25, 0.08], [1.32, 0.214, 0.26, 0], [1.4, 0.21, 0.3, 0], [1.46, 0.182, 0.42, 0], [1.5, 0.125, 0.6, 0], [1.53, 0.08, 0.8, 0]];
-    kit.add(robeShell(rows, 34, 0.68, 1, false), null, function (v, u) { return (u < 0.035 || u > 0.965) ? lining : robe; }, bodyW);
-    kit.add(robeShell(rows, 34, 0.68, 1, true), null, lining, bodyW, { pen: 1 });
-    hood(kit, 1.39, 0.2, robe, lining, B.spine);
+    if (Mo) {   /* draped by Blender's cloth over the body */
+      kit.add(modelPart(Mo, 'robe'), null, function (v, u) { return (u < 0.02 || u > 0.98) ? lining : robe; }, bodyW);
+      kit.add(modelPart(Mo, 'robe', 0.004), null, lining, bodyW, { pen: 1, inner: true });
+    } else {
+      kit.add(robeShell(rows, 34, 0.68, 1, false), null, function (v, u) { return (u < 0.035 || u > 0.965) ? lining : robe; }, bodyW);
+      kit.add(robeShell(rows, 34, 0.68, 1, true), null, lining, bodyW, { pen: 1, inner: true });
+    }
+    hood(kit, 1.39, 0.2, robe, lining, B.spine, !!Mo);   /* on the draped robe its lined rim read as a rope */
     /* the arms: the robe's sleeve to the elbow and its bell to the wrist, lined; within, the coat's sleeve, the shirt's
        cuff and the hand; the wand in the right, pointing ahead */
     [[-1, B.shL, B.elL], [1, B.shR, B.elR]].forEach(function (a) {
       var s = a[0], sh = V(s * 0.19, 1.41, 0), el = V(s * 0.215, 1.13, 0.0), wr = V(s * 0.215, 0.87, 0.03), bell = V(s * 0.218, 0.9, 0.028);
+      if (Mo) {   /* the coat's sleeve and the robe's, draped, each carried by the shoulder above the elbow and the elbow below */
+        var arm = function (y) { return y > 1.18 ? [a[1], 0, 1] : y > 1.08 ? [a[2], a[1], 1 - (y - 1.08) / 0.1] : [a[2], 0, 1]; };
+        var side = s < 0 ? 'L' : 'R';
+        kit.add(modelPart(Mo, 'arm' + side), null, function (v) { return v.y > 1.33 ? robe : L.coat; }, arm);   /* above the sleeve's cap, the robe's shoulder */
+        kit.add(modelPart(Mo, 'sleeve' + side), null, robe, arm);
+        kit.add(modelPart(Mo, 'sleeve' + side, 0.004), null, lining, arm, { inner: true });
+      } else {
       kit.add(between(sh, el, 0.062, 0.068, 12), null, robe, a[1]);
       kit.add(new THREE.SphereGeometry(0.068, 10, 6), M(el.x, el.y, el.z), robe, a[1]);
       var bg = between(el, bell, 0.068, 0.118, 12, true);
       kit.add(bg, null, robe, a[2], { deform: function (p) { var d = Math.max(0, (1.1 - p.y) / 0.2); p.x += s * 0.01 * d * Math.sin(p.z * 60); } });
-      kit.add(flip(between(el, bell, 0.064, 0.112, 12, true)), null, lining, a[2]);
+      kit.add(flip(between(el, bell, 0.064, 0.112, 12, true)), null, lining, a[2], { inner: true });
       kit.add(between(V(el.x, el.y - 0.05, el.z), V(wr.x, wr.y + 0.01, wr.z), 0.045, 0.04, 10), null, L.coat, a[2]);
+      }
       kit.add(new THREE.CylinderGeometry(0.042, 0.042, 0.022, 12, 1, true), M(wr.x, wr.y + 0.005, wr.z), L.collar, a[2]);
       /* the hand: the palm and the fingers together, the thumb forward */
-      kit.add(new THREE.SphereGeometry(0.044, 10, 6), M(wr.x, wr.y - 0.055, wr.z + 0.008, 0, 0, s * 0.1, 0.62, 1.25, 0.95), L.skin, a[2], { pen: 2 });
+      kit.add(new THREE.SphereGeometry(0.044, 8, 5), M(wr.x, wr.y - 0.055, wr.z + 0.008, 0, 0, s * 0.1, 0.62, 1.25, 0.95), L.skin, a[2], { pen: 2 });
       kit.add(new THREE.SphereGeometry(0.016, 6, 4), M(wr.x - s * 0.006, wr.y - 0.04, wr.z + 0.035, 0.5, 0, 0, 0.8, 1.7, 0.9), L.skin, a[2], { pen: 2 });
       if (s > 0 && L.wand) {
         var w0 = V(wr.x, wr.y - 0.07, wr.z - 0.02), w1 = V(wr.x, wr.y - 0.12, wr.z + 0.33);
@@ -396,7 +441,10 @@
     var parent = [-1, 0, 1, 1, 3, 3, 5, 3, 7, 0, 0];
     pos.forEach(function (p, i) { var b = new THREE.Bone(); b.position.fromArray(p); bones.push(b); if (parent[i] >= 0) bones[parent[i]].add(b); });
     var base = bones.map(function (b) { return b.position.clone(); });
-    var mesh = new THREE.SkinnedMesh(geo, mat), ink = new THREE.SkinnedMesh(geo, inkMat);
+    var inkGeo = new THREE.BufferGeometry();   /* the same points, drawn only as far as the linings */
+    Object.keys(geo.attributes).forEach(function (k) { inkGeo.setAttribute(k, geo.attributes[k]); });
+    inkGeo.setDrawRange(0, kit.outer); inkGeo.boundingSphere = geo.boundingSphere;
+    var mesh = new THREE.SkinnedMesh(geo, mat), ink = new THREE.SkinnedMesh(inkGeo, inkMat);
     mesh.add(bones[0]); mesh.updateMatrixWorld(true);
     var skel = new THREE.Skeleton(bones);
     mesh.bind(skel); ink.bind(skel, mesh.bindMatrix);
