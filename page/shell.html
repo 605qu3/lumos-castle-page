@@ -1748,7 +1748,8 @@ if (CHARMS.on) charmsSet(Q.get('candles') === 'lit');
    page/people/figure.js and its shapes made in Blender (models/pickett.json, models/pupil.json; ?figmodel=0 the code's
    own) at Interiors' docs/interiors/charms-classroom.md positions (x = 139.6 + y', y = 71.4 - x'): Professor Pickett
    behind his desk (x' 3.9, y' 10.55), facing the class, and People's six seated pupils on the schedule's chairs (y' the
-   desk's front less 0.34), the boys' desk left free, as People's page/people/figure-test.html seats them. Lit as the
+   desk's front less 0.34) in the middle and back rows, the front row free for the boys (the schedule's 1897 line: "free
+   front desks"; People, 4.14 pm: seating is Interiors'). Lit as the
    chandelier is (light(1) with its candles). No tap lands on them; nothing glows. lumosGreybox.fig3d() gives the draw
    calls and triangles with and without them */
 var FIG3D = { on: false };
@@ -1757,7 +1758,7 @@ if (CHARMS.on && Q.get('figure3d') === '1') (function () {
   function loc(a, b) { return shell.toLocal(139.6 + b, 71.4 - a, z0); }
   function turn(a, b, da, db) { var d = loc(a + da, b + db).sub(loc(a, b)); return Math.atan2(d.x, d.z); }
   function json(f) { return fetch('people/models/' + f + '.json').then(function (r) { return r.json(); }); }
-  var s = document.createElement('script'); s.src = 'people/figure.js?v=3';
+  var s = document.createElement('script'); s.src = 'people/figure.js?v=4';
   s.onload = function () {
     var want = Q.get('figmodel') !== '0';
     Promise.all(want ? [json('pickett'), json('pupil')] : [null, null]).then(function (mo) {
@@ -1766,10 +1767,10 @@ if (CHARMS.on && Q.get('figure3d') === '1') (function () {
       function chair(xp, yp, u) { var v = loc(xp + u, yp - 0.34); return [v.x, v.y, v.z]; }
       var front = turn(4.5, 5, 0, 1);
       var C = CastleFigure.crowd(THREE, [
-        { at: chair(0.7, 6.0, 0.325), rot: front, trim: H.gryffindor, skin: 0xf0c8a8, hair: 0x8a4a22, long: true, girl: true, face: 1, scale: 0.97 },
-        { at: chair(0.7, 6.0, 0.975), rot: front, trim: H.gryffindor, skin: 0xc89070, hair: 0x1c1410, face: 2, scale: 1.03 },
-        { at: chair(2.3, 6.0, 0.975), rot: front, trim: H.hufflepuff, skin: 0xeac0a0, hair: 0xc89a5a, long: true, girl: true, face: 3, scale: 0.94 },
-        { at: chair(7.0, 6.0, 0.325), rot: front, trim: H.ravenclaw, skin: 0x8a5a3a, hair: 0x141010, curly: true, face: 5, scale: 1.0 },
+        { at: chair(0.7, 4.2, 0.325), rot: front, trim: H.gryffindor, skin: 0xf0c8a8, hair: 0x8a4a22, long: true, girl: true, face: 1, scale: 0.97 },
+        { at: chair(0.7, 4.2, 0.975), rot: front, trim: H.gryffindor, skin: 0xc89070, hair: 0x1c1410, face: 2, scale: 1.03 },
+        { at: chair(2.3, 2.4, 0.975), rot: front, trim: H.hufflepuff, skin: 0xeac0a0, hair: 0xc89a5a, long: true, girl: true, face: 3, scale: 0.94 },
+        { at: chair(7.0, 4.2, 0.325), rot: front, trim: H.ravenclaw, skin: 0x8a5a3a, hair: 0x141010, curly: true, face: 5, scale: 1.0 },
         { at: chair(2.3, 4.2, 0.325), rot: front, trim: H.slytherin, skin: 0xf2cfb4, hair: 0xa04a20, face: 4, scale: 1.05 },
         { at: chair(5.4, 4.2, 0.975), rot: front, trim: H.ravenclaw, skin: 0xd8a888, hair: 0x3a2618, long: true, girl: true, face: 7, scale: 0.98 }
       ], mo[1]);
