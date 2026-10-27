@@ -2484,6 +2484,148 @@ var H71 = (function () {
   set(-33, 1);
   set(147, -1);
 })();
+/* The trophy room's things (Interiors' docs/interiors/trophy-room.md, The things, every row placed; Godric's 1 on
+   interiors-trophy-middle-1013, nothing in the middle; the Curator's forms in docs/curator/trophy-room.md, read there):
+   eight cases down the east wall facing the windows, three in the west wall's pier, two each side of each door, every
+   one 2.0 wide, 0.55 deep, 2.3 high, glazed on three sides above a wooden base 0.15 high whose ledge runs 0.1 before the
+   glass, shelves at 0.9, 1.35 and 1.8; on them the tall things at the back (plates on edge, shields) and the small in
+   front (cups, statuettes), each under its shelf's gap less 0.05. The east run's fourth from the south holds the
+   Quidditch cup alone on its one shelf (0.9 to 1.61), fingermarks on its glass at a boy's height and Filch's tin and
+   cloth on its ledge; the northmost has the Medal for Magical Merit laid in its open case at the shelf's north end. In
+   the north-east corner the cabinet, its glass on the diagonal, Riddle's shield on its north panel (Harry's and Ron's
+   come later, Events' trace); on the north wall near its west corner the board of old Head Boys, gilt names down it
+   (Percy's fresh at the foot from the Azkaban castle). Each case 1 cm off its wall; every layered face 8 mm or more.
+   Invented silver, nothing named but what the books name; nothing glows. The moonlight across the floor (Magic's req
+   693, Events' 718) is the next step */
+(function () {
+  if (PLACE !== 'trophy-room') return;
+  var z0 = shell.place.floor, root = new THREE.Group(); root.name = 'trophy-things'; root.userData.owner = PLACE; shell.group.add(root);
+  var wood = kit.solid(0x4a3524), dark = kit.solid(0x2e2219), gold = kit.solid(0xb8933a, { roughness: 0.38, metalness: 0.35 }),
+      silver = kit.solid(0xb9bcbf, { roughness: 0.32, metalness: 0.35 }), bronze = kit.solid(0x8a6236, { roughness: 0.5, metalness: 0.25 }),
+      tin = kit.solid(0x77797a, { roughness: 0.5 }), cloth = kit.solid(0x8a8780), red = kit.solid(0x6a2a24),
+      glass = new THREE.MeshStandardMaterial({ color: 0xdfe8ec, roughness: 0.08, transparent: true, opacity: 0.13, depthWrite: false, side: THREE.DoubleSide }),
+      smear = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.07, depthWrite: false, side: THREE.DoubleSide });
+  var metals = [gold, silver, silver, bronze];
+  function frame(x, y, ox, oy, name) {   /* +x along the wall, +y up, +z out into the room, the origin on the wall at the floor */
+    var g = new THREE.Group(), at = shell.toLocal(x, y, z0), o = shell.toLocal(x + ox, y + oy, z0).sub(at);
+    g.position.copy(at); g.rotation.y = Math.atan2(o.x, o.z); g.name = name; g.userData.owner = PLACE; root.add(g); return g;
+  }
+  function add(g, geo, mat, x, y, z) {
+    var m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.userData.owner = PLACE; m.raycast = function () {}; g.add(m); return m;
+  }
+  function slab(g, x0, y0, z0_, x1, y1, z1, mat) { return add(g, new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0_), mat, (x0 + x1) / 2, (y0 + y1) / 2, (z0_ + z1) / 2); }
+  function lathe(g, pts, mat, x, y, z) {
+    var mt = mat.clone(); mt.side = THREE.DoubleSide;
+    return add(g, new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 20), mt, x, y, z);
+  }
+  function rng(s) { return function () { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
+  /* the silver: a cup on a foot and stem, its bowl flared, a pair of handles on the bigger ones */
+  function cup(g, x, y, z, h, mat) {
+    var r = h * 0.32;
+    lathe(g, [[0, 0], [r * 0.75, 0], [r * 0.75, h * 0.04], [r * 0.18, h * 0.12], [r * 0.14, h * 0.42], [r * 0.6, h * 0.55], [r * 0.95, h * 0.78], [r, h]], mat, x, y, z);
+    if (h > 0.2) [-1, 1].forEach(function (s) {
+      var t = add(g, new THREE.TorusGeometry(r * 0.38, 0.005 + h * 0.012, 6, 12, Math.PI), mat, x + s * r * 0.8, y + h * 0.72, z);
+      t.rotation.z = s > 0 ? -Math.PI / 2 : Math.PI / 2;
+    });
+  }
+  function plate(g, x, y, z, r, mat) { var p = add(g, new THREE.CylinderGeometry(r, r, 0.012, 24), mat, x, y + r, z); p.rotation.x = Math.PI / 2 - 0.12; }
+  function shield(g, x, y, z, w, h, mat) {
+    var s = new THREE.Shape(); s.moveTo(-w / 2, h); s.lineTo(w / 2, h); s.lineTo(w / 2, h * 0.45); s.quadraticCurveTo(w / 2, h * 0.08, 0, 0); s.quadraticCurveTo(-w / 2, h * 0.08, -w / 2, h * 0.45); s.lineTo(-w / 2, h);
+    var m = add(g, new THREE.ExtrudeGeometry(s, { depth: 0.012, bevelEnabled: false }), mat, x, y, z); m.rotation.x = -0.1; return m;
+  }
+  function statuette(g, x, y, z, h, mat) {
+    slab(g, x - 0.035, y, z - 0.035, x + 0.035, y + 0.03, z + 0.035, dark);
+    add(g, new THREE.CylinderGeometry(0.012, 0.022, h * 0.6, 8), mat, x, y + 0.03 + h * 0.3, z);
+    add(g, new THREE.SphereGeometry(0.018, 10, 8), mat, x, y + 0.03 + h * 0.6 + 0.016, z);
+  }
+  function fill(g, v, gap, seed, keep) {   /* one shelf's things, u from -0.85 to 0.85, none in the kept stretch */
+    var R = rng(seed), u = -0.82;
+    while (u < 0.8) {
+      var w = 0.16 + R() * 0.14, c = u + w / 2;
+      if (!(keep && c > keep[0] - 0.12 && c < keep[1] + 0.12)) {
+        var back = R(), m = metals[Math.floor(R() * metals.length)];
+        /* each thing inside its own slot, so no two plates or shields share a plane */
+        if (back < 0.45) plate(g, c, v, 0.14, Math.min(w / 2 - 0.006, 0.08 + R() * 0.035), m);
+        else if (back < 0.7) shield(g, c, v + 0.002, 0.1, Math.min(w - 0.02, 0.12 + R() * 0.06), Math.min(gap - 0.07, 0.18 + R() * 0.12), m);
+        if (R() < 0.5) cup(g, c, v, 0.36, Math.min(gap - 0.05, w / 0.8, 0.12 + R() * 0.24), m);
+        else statuette(g, c, v, 0.36, Math.min(gap - 0.06, 0.15 + R() * 0.15), m);
+      }
+      u += w + 0.04;
+    }
+  }
+  /* a case in its frame: the back 1 cm off the wall; base 0 to 0.15 out to 0.66; the glass front at 0.54, between posts */
+  function tcase(x, y, ox, oy, name, opt) {
+    opt = opt || {};
+    var g = frame(x, y, ox, oy, name), B = 0.01, F = 0.54, U = 1.0, TOP = 2.2;
+    slab(g, -U, 0, B, U, 0.15, B + 0.65, wood);                                  /* the base and its ledge */
+    slab(g, -U, 0.15, B, U, TOP, B + 0.03, dark);                                /* the back */
+    [-1, 1].forEach(function (s) { slab(g, s * U - (s > 0 ? 0.04 : 0), 0.15, F - 0.02, s * U + (s < 0 ? 0.04 : 0), TOP, F + 0.02, wood); });   /* the front posts */
+    slab(g, -U - 0.02, TOP, B, U + 0.02, 2.3, B + 0.58, wood);                   /* the cornice */
+    var fp = add(g, new THREE.PlaneGeometry(2 * U - 0.08, TOP - 0.15), glass, 0, (0.15 + TOP) / 2, F);
+    [-1, 1].forEach(function (s) { var p = add(g, new THREE.PlaneGeometry(F - 0.05, TOP - 0.15), glass, s * (U - 0.015), (0.15 + TOP) / 2, (B + 0.03 + F - 0.02) / 2); p.rotation.y = Math.PI / 2; });
+    (opt.shelves || [0.9, 1.35, 1.8]).forEach(function (v, i, a) {
+      slab(g, -U + 0.04, v - 0.02, B + 0.03, U - 0.04, v, F - 0.03, wood);
+      if (opt.fill !== false) fill(g, v, (a[i + 1] || TOP) - v, opt.seed * 7 + i + 1, opt.keep && opt.keep[0] === v ? opt.keep.slice(1) : null);
+    });
+    return g;
+  }
+  /* the east run, facing the windows: from y 25.4, each 2.0 with 0.17 between; frame +x runs south here */
+  for (var i = 0; i < 8; i++) {
+    var yc = 26.4 + i * 2.17;
+    if (i === 3) {   /* the Quidditch cup's case */
+      var cg = tcase(16, yc, -1, 0, 'trophy-case-cup', { shelves: [0.9], fill: false });
+      cup(cg, 0, 0.9, 0.28, 0.71, silver);
+      [[-0.1, 1.12], [-0.03, 1.2], [0.06, 1.08], [0.13, 1.3], [-0.16, 1.32], [0.02, 1.36]].forEach(function (p) {   /* fingermarks, 8 mm outside the glass */
+        add(cg, new THREE.CircleGeometry(0.022 + Math.abs(p[0]) * 0.05, 12), smear, p[0], p[1], 0.548);
+      });
+      /* Filch's tin, its lid off beside it, and the grey cloth folded over the ledge's edge, at the case's south end */
+      add(cg, new THREE.CylinderGeometry(0.04, 0.04, 0.05, 16), tin, 0.86, 0.175, 0.6);
+      add(cg, new THREE.CylinderGeometry(0.042, 0.042, 0.008, 16), tin, 0.74, 0.154, 0.6);
+      slab(cg, 0.48, 0.15, 0.56, 0.68, 0.158, 0.668, cloth);
+      slab(cg, 0.48, 0.05, 0.668, 0.68, 0.158, 0.676, cloth);
+    } else {
+      var eg = tcase(16, yc, -1, 0, 'trophy-case-e' + i, { seed: i + 1, keep: i === 7 ? [0.9, -0.96, -0.62] : null });
+      if (i === 7) {   /* the Medal for Magical Merit in its open case, at the shelf's north end, the lid up to the wall */
+        slab(eg, -0.87, 0.9, 0.24, -0.744, 0.925, 0.305, red);
+        slab(eg, -0.87, 0.925, 0.215, -0.744, 0.99, 0.232, red);
+        add(eg, new THREE.CylinderGeometry(0.022, 0.022, 0.004, 18), gold, -0.807, 0.927, 0.272);
+      }
+    }
+  }
+  /* the west wall's three in the pier between windows 1 and 4 */
+  [29.75, 34.0, 38.25].forEach(function (y, k) { tcase(0, y, 1, 0, 'trophy-case-w' + k, { seed: 20 + k }); });
+  /* the end walls: two each side of each door, 1.0 clear of its frame */
+  [3.23, 5.4, 10.6, 12.77].forEach(function (x, k) {
+    tcase(x, 24, 0, 1, 'trophy-case-s' + k, { seed: 30 + k });
+    tcase(x, 44, 0, -1, 'trophy-case-n' + k, { seed: 40 + k });
+  });
+  /* the corner cabinet: its glass on the diagonal from (15, 44) to (16, 43), the base and cornice triangles */
+  var tri = function (h, y0) {
+    var s = new THREE.Shape(); s.moveTo(-1, 0); s.lineTo(0, 0); s.lineTo(0, -1); s.lineTo(-1, 0);
+    var m = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: false }), wood);
+    m.rotation.x = -Math.PI / 2; m.position.copy(shell.toLocal(15.99, 43.99, z0 + y0)); m.userData.owner = PLACE; m.raycast = function () {}; root.add(m);
+  };
+  tri(0.15, 0); tri(0.1, 2.2);
+  var dg = frame(15.5, 43.5, -1, -1, 'trophy-cabinet-glass');
+  add(dg, new THREE.PlaneGeometry(1.3, 2.05), glass, 0, 1.175, 0);
+  var ng = frame(15.6, 44, 0, -1, 'trophy-cabinet-north');   /* the north panel facing south, Riddle's board and shield on it */
+  slab(ng, -0.54, 0.15, 0.01, 0.38, 2.2, 0.03, dark);
+  slab(ng, -0.3, 1.2, 0.03, 0.3, 1.95, 0.05, wood);
+  shield(ng, 0, 1.3, 0.058, 0.42, 0.55, silver).rotation.x = 0;
+  var eg2 = frame(16, 43.5, -1, 0, 'trophy-cabinet-east');
+  slab(eg2, -0.47, 0.15, 0.04, 0.3, 2.2, 0.06, dark);
+  /* the old Head Boys: a dark board 1.4 by 2.0 hung 1.0 to 3.0 on the north wall, x 0.7 to 2.1, the names gilt lines */
+  var hg = frame(1.4, 44, 0, -1, 'trophy-head-boys');
+  slab(hg, -0.7, 1.0, 0.01, 0.7, 3.0, 0.04, dark);
+  slab(hg, -0.42, 2.82, 0.04, 0.42, 2.9, 0.05, gold);                          /* the heading */
+  var HR = rng(91), rows = BOOK >= 2 ? 27 : 26;
+  for (var n = 0; n < rows; n++) {
+    var v = 2.7 - n * 0.064, fresh = BOOK >= 2 && n === rows - 1, nw = 0.3 + HR() * 0.28;
+    slab(hg, -0.6, v, 0.04, -0.6 + nw, v + 0.022, 0.049, gold);                /* the name */
+    slab(hg, 0.42, v, 0.04, 0.6, v + 0.022, 0.049, gold);                      /* its years */
+    if (fresh) { slab(hg, -0.6, v, 0.049, -0.6 + nw, v + 0.022, 0.057, kit.solid(0xe2c463, { roughness: 0.3, metalness: 0.3 })); }
+  }
+})();
 /* req 800 (Magic's docs/archive/magic-to-2026-10-22.md, The Divination classroom, the trapdoor answers; Events' req 799,
    divination.json's divination.trapdoor, word for word): on the North Tower's landing the circular trapdoor in the ceiling
    (the model's north-trapdoor: 0.9 across at (161.4, 66.6), its face 48.4, hinged on its north edge, swinging down, the
