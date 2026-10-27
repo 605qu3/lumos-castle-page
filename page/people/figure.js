@@ -29,11 +29,18 @@
   var CANDLE = 0xffb466;   /* tones.js's candle (Design, req 1140) */
   var TAU = Math.PI * 2;
   function lin(h) { return new THREE.Color(h).convertSRGBToLinear(); }
-  function tones() {   /* four steps of light, softer than a cartoon's three: the hatching does the rest */
+  function tones() {   /* a painted light: soft from shade to light, the shade a little cool, the light a little warm; the hatching does the rest */
     if (grad) return grad;
-    var d = new Uint8Array([92, 92, 92, 255, 150, 150, 150, 255, 210, 210, 210, 255, 255, 255, 255, 255]);
-    grad = new THREE.DataTexture(d, 4, 1, THREE.RGBAFormat);
-    grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true;
+    var n = 32, d = new Uint8Array(n * 4);
+    for (var i = 0; i < n; i++) {
+      var t = i / (n - 1), e = t * t * (3 - 2 * t), v = 0.36 + 0.64 * (0.25 * t + 0.75 * e);
+      d[i * 4] = Math.round(255 * Math.min(1, v * (0.94 + 0.07 * t)));
+      d[i * 4 + 1] = Math.round(255 * Math.min(1, v * (0.95 + 0.04 * t)));
+      d[i * 4 + 2] = Math.round(255 * Math.min(1, v * (1.04 - 0.06 * t)));
+      d[i * 4 + 3] = 255;
+    }
+    grad = new THREE.DataTexture(d, n, 1, THREE.RGBAFormat);
+    grad.minFilter = grad.magFilter = THREE.LinearFilter; grad.generateMipmaps = false; grad.needsUpdate = true;
     return grad;
   }
   function V(x, y, z) { return new THREE.Vector3(x, y, z); }
@@ -292,6 +299,21 @@
       var r = (function (s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(f.freckles);
       for (var i = 0; i < 40; i++) { var a2 = (r() - 0.5) * 0.9, b2 = 0.08 + r() * 0.3; if (Math.abs(a2) < 0.05) continue; var q2 = P(a2, b2); x.beginPath(); x.arc(q2[0], q2[1], (0.8 + r()) * lw, 0, TAU); x.fill(); }
     }
+    /* the painted shade: the lid's crease above each eye, the nose's side, under the lower lip */
+    function shade(p, rx, ry, a) {
+      var g = x.createRadialGradient(p[0], p[1], 0, p[0], p[1], 1);
+      g.addColorStop(0, 'rgba(150,96,80,' + a + ')'); g.addColorStop(1, 'rgba(150,96,80,0)');
+      x.save(); x.translate(p[0], p[1]); x.scale(rx, ry); x.translate(-p[0], -p[1]); x.fillStyle = g;
+      x.beginPath(); x.arc(p[0], p[1], 1, 0, TAU); x.fill(); x.restore();
+    }
+    [-1, 1].forEach(function (s) {
+      shade(P(s * 0.36, -0.1), 0.16 * kx, 0.05 * ky, 0.22);
+      x.strokeStyle = 'rgba(120,72,58,0.55)'; x.lineWidth = 1.0 * lw;
+      var e = P(s * 0.36, -0.01), ew = 0.17 * kx * (f.eye || 1), eh = 0.075 * ky * (f.eye || 1);
+      x.beginPath(); x.moveTo(e[0] - s * ew * 0.85, e[1] - eh * 1.25); x.quadraticCurveTo(e[0], e[1] - eh * 2.0, e[0] + s * ew * 0.95, e[1] - eh * 1.15); x.stroke();
+    });
+    shade(P(0.07, 0.06), 0.035 * kx, 0.12 * ky, 0.2);
+    shade(P(0, 0.56), 0.09 * kx, 0.03 * ky, 0.22);
     /* the chin and jaw, a fine shade line */
     var c0 = P(-0.16, 0.74), c1 = P(0.16, 0.74), c2 = P(0, 0.8);
     x.strokeStyle = 'rgba(190,140,120,1)'; x.lineWidth = 1.3 * lw;
@@ -466,15 +488,15 @@
     });
 
     var geo = kit.geometry(true);
-    var c = document.createElement('canvas'); c.width = 1024; c.height = 512;
-    drawFace(c.getContext('2d'), 0, 0, 1024, 512, L.face || {});
+    var c = document.createElement('canvas'); c.width = 2048; c.height = 1024;
+    drawFace(c.getContext('2d'), 0, 0, 2048, 1024, L.face || {});
     var mat = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: tones(), skinning: true, map: canvasTex(c) });
     mat.onBeforeCompile = ownColour;
     var nightU = nightTone(mat);
     pen(mat, 55, hc);
     mat.customProgramCacheKey = function () { return 'castle-figure'; };
     var inkMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide, skinning: true });
-    inkMat.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0085;'); };
+    inkMat.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0055;'); };
 
     /* the skeleton */
     var bones = [], pos = [[0, 0, 0], [0, 0.95, 0], [0, -0.35, 0], [0, 0.05, 0], [0, 0.57, 0.01], [-0.19, 0.41, 0], [-0.025, -0.28, 0],
@@ -663,9 +685,9 @@
     /* a part a pupil lacks folds to one point inside the head, so it draws nothing */
     var GONE = 'if ((aSlot > 3.5 && aSlot < 4.5 && iFlags.x < 0.5) || (aSlot > 5.5 && aSlot < 6.5 && iFlags.y < 0.5) || (aSlot > 6.5 && aSlot < 7.5 && iFlags.y > 0.5)' +
                ' || (aSlot > 7.5 && aSlot < 8.5 && iFlags.z > 0.5) || (aSlot > 8.5 && iFlags.z < 0.5)) transformed = vec3(0.0, 1.06, 0.0);\n';
-    var atlas = document.createElement('canvas'); atlas.width = 2048; atlas.height = 512;
+    var atlas = document.createElement('canvas'); atlas.width = 4096; atlas.height = 1024;
     var ax = atlas.getContext('2d');
-    FACES.forEach(function (f, i) { drawFace(ax, (i % 4) * 512, Math.floor(i / 4) * 256, 512, 256, f); });
+    FACES.forEach(function (f, i) { drawFace(ax, (i % 4) * 1024, Math.floor(i / 4) * 512, 1024, 512, f); });
     var mat = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: tones(), map: canvasTex(atlas) });
     mat.onBeforeCompile = function (sh) {
       sh.vertexShader = DECL + sh.vertexShader
@@ -679,7 +701,7 @@
     mat.customProgramCacheKey = function () { return 'castle-crowd'; };
     var inkMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
     inkMat.onBeforeCompile = function (sh) {
-      sh.vertexShader = DECL + sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0068;\n' + GONE);
+      sh.vertexShader = DECL + sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0042;\n' + GONE);
     };
     inkMat.customProgramCacheKey = function () { return 'castle-crowd-ink'; };
     var inkGeo = new THREE.BufferGeometry();   /* the same points and instance colours, drawn only as far as the linings */
