@@ -736,7 +736,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
          found on the next wall, its sill and head then running the length of this one */
       if (pts.length > 1) { var s2 = alongEdge(E, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
-      else { var cw = RC ? RC.w : op.w || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }
+      else { var cw = RC ? RC.w : (op.splay > (op.w || 1) ? op.splay : op.w) || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }   /* v89: a splayed loop cut at its inside width */
       /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
       if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
       /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut
@@ -1126,7 +1126,28 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v54 (Design's find, 21 October 2026, 11.23 am: the oriel's lights black at noon): nothing is drawn beyond a
              shell's window, so each takes a pane of sky 3 cm inside its outer face, the day's colour (shell.html turns it
              to the night's), unlit and untappable: daylight in the opening, not a lamp */
-          pane(g, '');
+          /* v89 (Godric's 1 on architect-h82-slits-1026, 8.33 am, 27 October 2026): a loop with a `splay` is cut at that
+             width on the inner face and narrows through the wall to its `w` at the outer face, as real arrow loops do: a
+             cheek of the wall's stone each side from the cut's inner corner to the slot's edge, the pane the slot's width
+             there and 1 cm behind each cheek */
+          var w0 = g.op.w || 1;
+          if (g.op.splay > w0 && w > w0 + 0.02) {
+            var pd = Math.max(0.02, t - 0.03), wp = w0 + (w - w0) * (1 - pd / t) + 0.02;
+            pane({ s0: sm - wp / 2, s1: sm + wp / 2, sill: g.sill, h: g.h, op: g.op }, '');
+            [-1, 1].forEach(function (k) {
+              var si = (k < 0 ? g.s0 : g.s1) + k * 0.04, so_ = sm + k * w0 / 2;   /* 4 cm into the piece beside it: the columns' ends lie a cm or two off the cut's, and a crack showed */
+              var A = [a[0] + ux * si, a[1] + uy * si], B = [a[0] + ux * so_ + nx * t, a[1] + uy * so_ + ny * t];
+              var pA = toLocal(A[0], A[1], Q.floor), pB = toLocal(B[0], B[1], Q.floor), y0 = g.sill, y1 = g.h;
+              var vs = [pA.x, pA.y + y0, pA.z, pB.x, pB.y + y0, pB.z, pB.x, pB.y + y1, pB.z, pA.x, pA.y + y1, pA.z];
+              var cg = new THREE.BufferGeometry(); cg.setAttribute('position', new THREE.Float32BufferAttribute(vs, 3));
+              cg.setIndex([0, 1, 2, 0, 2, 3]); cg.computeVertexNormals();
+              var nrmv = new THREE.Vector3().fromBufferAttribute(cg.attributes.normal, 0), toMid = new THREE.Vector3(mid.x - pA.x, 0, mid.z - pA.z);
+              if (nrmv.dot(toMid) < 0) { cg.setIndex([0, 2, 1, 0, 3, 2]); cg.computeVertexNormals(); }
+              var cmat = row ? wallMat(row, (A[0] + B[0]) / 2, (A[1] + B[1]) / 2, (y0 + y1) / 2) : mats.wall;
+              var cm = F.register(new THREE.Mesh(cg, cmat), LAYER.wall);
+              cm.name = Q.id + '-cheek-' + (k < 0 ? 'a' : 'b') + '-' + g.op.id; cm.userData.owner = Q.id; group.add(cm);
+            });
+          } else pane(g, '');
         }
       });
       if (!col) piece(at, L, 0, HE, Q.id + '-wall-' + i + '-end');
