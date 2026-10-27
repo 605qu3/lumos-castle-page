@@ -1648,6 +1648,35 @@ var LIB = (function () {
   g.add(new THREE.Mesh(bg, wood));
   return out;
 })();
+/* the scroll hall's hoist landing (req 1119; Interiors' docs/interiors/library.md, the hoist row, eb474204; scroll-store.md
+   thing 11): a small oak table at the librarian's desk's far end (x' 7.6 to 8.4, y' 3.1 to 3.7, 0.75 high), and over it the
+   hatch through the vault: an oak-lined trunk 0.6 by 0.8 from 9.42 up past the web (9.56 to 9.71 there, by a ray) into the
+   slab under the scroll hall's floor at +10.4, its inside black at 9.5; the rope (0.024) down from it to a wicker basket
+   hanging 0.25 over the table, a few finished books standing in it. Straight under the hall's own hatch and rope */
+(function () {
+  if (PLACE !== 'library') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'library-hoist'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  var oak = kit.solid(0x6e4c2e), straw = kit.solid(0xc9a85a), iron = kit.solid(0x2f2f33), black = new THREE.MeshBasicMaterial({ color: 0x070605 });
+  function box(a, b, mt) { var m = thingBox(g, P, a, b, mt); m.userData.owner = PLACE; return m; }
+  function post(cx, cy, r, za, zb, mt, seg) {
+    var m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, zb - za, seg || 16), mt); m.position.copy(P(cx, cy, (za + zb) / 2)); m.userData.owner = PLACE; g.add(m); return m;
+  }
+  /* the table: its top 0.04, four legs 5 cm into the floor and 1 cm into the top */
+  box([61.3, 69.0, 0.71], [61.9, 69.8, 0.75], oak);
+  [[61.33, 69.03], [61.82, 69.03], [61.33, 69.72], [61.82, 69.72]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.05, q[1] + 0.05, 0.72], oak); });
+  /* the hatch's trunk, four boards 0.04 round the opening, and its black inside */
+  box([61.26, 68.96, 9.42], [61.30, 69.84, 10.45], oak); box([61.90, 68.96, 9.42], [61.94, 69.84, 10.45], oak);
+  box([61.30, 68.96, 9.42], [61.90, 69.00, 10.45], oak); box([61.30, 69.80, 9.42], [61.90, 69.84, 10.45], oak);
+  box([61.31, 69.01, 9.49], [61.89, 69.79, 9.5], black);   /* 1 cm clear of the boards, so no side lies on theirs */
+  /* the rope to the basket's iron bail, the basket and its books */
+  post(61.6, 69.4, 0.012, 1.45, 9.52, straw, 6);
+  box([61.38, 69.38, 1.2], [61.41, 69.42, 1.48], iron); box([61.79, 69.38, 1.2], [61.82, 69.42, 1.48], iron);
+  box([61.41, 69.38, 1.44], [61.79, 69.42, 1.48], iron);   /* the bail: two straps 5 cm down into the basket's side, a bar over the books */
+  post(61.6, 69.4, 0.22, 1.0, 1.25, straw, 16);
+  [[61.47, 69.31, 0x6b2a22], [61.54, 69.44, 0x2c3d5a], [61.64, 69.32, 0x4d4a2a], [61.70, 69.45, 0x5a3a26]].forEach(function (b) {
+    box([b[0], b[1], 1.12], [b[0] + 0.05, b[1] + 0.13, 1.36], kit.solid(b[2])); });
+})();
 function libSet(lit) { if (!LIB.on) return; LIB.lit = lit; LIB.flames.forEach(function (f) { f.visible = lit; }); }
 function libShown(shown) {   /* which of the shown strings the library draws, and drawn so */
   var drawn = [], q = Q.get('lamps');
