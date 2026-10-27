@@ -154,7 +154,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=535"></script>
+<script src="castle-model.js?v=536"></script>
 <script src="castle-paint.js?v=114"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -3205,6 +3205,101 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
 /* the eye's tap (Events, hidden-ways.json's undercroft-well-eye-first and -again): the same string on the page with no runtime */
 var WELL_EYE = 'he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water';
 thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE }]); };
+/* H82's fern well, its bands (req 1120; Interiors' docs/interiors/glass-house.md, Down the well, every band; the slits
+   h82-slit-1 to -4, model v211): thick from the lawn to 1.5 under the lowest slit (-15.85), hart's-tongue, maidenhair,
+   polypody, spleenwort and wall-rue from the outer wall's joints, hanging over the cleft's drop at the top; thinning the
+   next two turns (to -26.25), the fronds smaller and fewer, leaning to the slits' side; moss the next two (to -36.65),
+   dark green streaks in the drip lines only, 8 mm off the stone; bare below to the foot. Each clump is placed by rays:
+   outward to the wall's face (its base 1 cm into the stone), down to the tread under it (0.3 clear at least) and up to
+   the flight over it, so nothing grows on a tread, on the core's rail or across a slit, the door or the cleft; a
+   frond reaches at most 0.25 out from the stone. Fronds and streaks are two instanced meshes */
+(function () {
+  if (PLACE !== 'h82-fern-well') return;
+  var CX = 18.0, CY = -2.4, LOW = -14.35 - 1.5, THIN = LOW - 10.4, MOSS = THIN - 10.4, seed = 23, D2R = Math.PI / 180;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var L = function (x, y, z) { return shell.toLocal(x, y, z); };
+  var walls = [], steps = [];
+  shell.group.traverse(function (o) {
+    if (!o.isMesh || o.userData.owner && o.userData.owner !== PLACE && o.userData.owner !== 'h82-fern-well') return;
+    if (/^h82-fern-well-(wall|lining|cap|sill|head)/.test(o.name)) walls.push(o);
+    else if (/^h82-fern-well-(flight|top|floor)/.test(o.name)) steps.push(o);
+  });
+  shell.group.updateMatrixWorld(true);
+  var R = new THREE.Raycaster(), up = L(CX, CY, 1).sub(L(CX, CY, 0)).normalize(), dn = up.clone().negate();
+  var g = new THREE.Group(); g.name = 'h82-well-ferns'; g.userData.owner = PLACE; shell.group.add(g);
+  /* a frond, as the glass house's: base at the origin along +z, drooping, pinnae a zigzag */
+  var fp = [], N = 12;
+  for (var i = 0; i < N; i++) {
+    var t0 = i / N, t1 = (i + 1) / N;
+    var w = function (t, k) { return 0.11 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.08)), 0.8) * (k % 2 ? 0.45 : 1); };
+    var y = function (t) { return -0.5 * t * t; };
+    var a0 = [-w(t0, i), y(t0), t0], b0 = [w(t0, i), y(t0), t0], a1 = [-w(t1, i + 1), y(t1), t1], b1 = [w(t1, i + 1), y(t1), t1];
+    [a0, b0, b1, a0, b1, a1].forEach(function (q) { fp.push(q[0], q[1] + Math.abs(q[0]) * 0.5, q[2]); });
+  }
+  var fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute(fp, 3)); fg.computeVertexNormals();
+  var fronds = [], streaks = [];
+  /* the stone's face at angle a and height z: the ray from the core outward; null where it meets no wall (an opening) */
+  function face(a, z) {
+    var o = L(CX, CY, z), e = L(CX + Math.cos(a), CY + Math.sin(a), z).sub(o).normalize();
+    R.set(o, e); R.far = 3.2; var h = R.intersectObjects(walls, false)[0];
+    if (!h || !/-wall-/.test(h.object.name)) return null;
+    return { d: h.distance, e: e };
+  }
+  function clear(p, dir, far) { R.set(p, dir); R.far = far; return !R.intersectObjects(steps, false).length; }
+  var TOP = -0.15, dz = 0.55, da = 0.45 / 2.5;
+  for (var z = TOP; z > MOSS; z -= dz) {
+    var band = z > LOW ? 0 : z > THIN ? 1 : 2;
+    for (var a = rnd() * da; a < Math.PI * 2; a += da) {
+      var az = z - rnd() * dz * 0.8, aa = a + (rnd() - 0.5) * da * 0.6;
+      /* toward the slits' side (due south, -90 degrees) in the thinning band */
+      var south = Math.cos(aa + Math.PI / 2);
+      if (band === 1 && rnd() > 0.12 + 0.3 * Math.max(0, south)) continue;
+      if (band === 2 && rnd() > 0.35) continue;
+      var f = face(aa, az); if (!f) continue;
+      var base = L(CX, CY, az).addScaledVector(f.e, f.d + 0.01), inP = L(CX, CY, az).addScaledVector(f.e, f.d - 0.22);
+      if (!clear(inP, dn, 0.3) || !clear(inP, up, 0.18)) continue;
+      if (band === 2) {   /* a streak under a wet joint: 3 to 5 cm wide, 0.3 to 1.0 long, 8 mm off the face */
+        var sl = 0.3 + rnd() * 0.7;
+        if (!clear(L(CX, CY, az).addScaledVector(f.e, f.d - 0.1), dn, sl + 0.05)) continue;
+        streaks.push({ p: L(CX, CY, az - sl / 2).addScaledVector(f.e, f.d - 0.008), e: f.e, h: sl, w: 0.03 + rnd() * 0.02 });
+        continue;
+      }
+      var nf = band === 0 ? 4 + Math.floor(rnd() * 3) : 2 + Math.floor(rnd() * 2), L0 = band === 0 ? 0.2 + rnd() * 0.1 : 0.12 + rnd() * 0.08;
+      var hd = f.e.clone().negate();
+      for (var k = 0; k < nf; k++) {
+        var tw = (k / nf - 0.5) * 1.6 + (rnd() - 0.5) * 0.3, dir = hd.clone().applyAxisAngle(up, tw);
+        if (Math.cos(tw) < 0.2) continue;
+        fronds.push({ p: base, yaw: Math.atan2(dir.x, dir.z), pitch: (5 + rnd() * 30) * D2R, len: L0 * (0.8 + rnd() * 0.35) });
+      }
+    }
+  }
+  /* over the cleft's drop: ferns from its two cut sides and its lip, hanging out toward the cliff */
+  [[17.1, 1], [18.9, -1]].forEach(function (c) {
+    for (var cz = -0.3; cz > -4.2; cz -= 0.35) for (var cy = -5.0; cy > -5.9; cy -= 0.3) {
+      if (rnd() > 0.7) continue;
+      var bp = L(c[0] - c[1] * 0.01, cy - rnd() * 0.1, cz - rnd() * 0.2);
+      for (var k = 0; k < 4; k++) { var dir = L(c[0] + c[1], cy - 0.6 + (rnd() - 0.5) * 0.8, cz).sub(L(c[0], cy, cz)).normalize();
+        fronds.push({ p: bp, yaw: Math.atan2(dir.x, dir.z), pitch: (rnd() * 25) * D2R, len: 0.2 + rnd() * 0.12 }); }
+    }
+  });
+  var M4 = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), V3 = new THREE.Vector3(), C3 = new THREE.Color(), E = new THREE.Euler(0, 0, 0, 'YXZ');
+  if (fronds.length) {
+    var fm = new THREE.InstancedMesh(fg, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.75, side: THREE.DoubleSide }), fronds.length);
+    fronds.forEach(function (f, k) {
+      E.set(-f.pitch, f.yaw, 0); Q4.setFromEuler(E); V3.set(f.len, f.len, f.len); M4.compose(f.p, Q4, V3); fm.setMatrixAt(k, M4);
+      C3.setHSL(0.26 + rnd() * 0.07, 0.4 + rnd() * 0.2, 0.18 + rnd() * 0.12); fm.setColorAt(k, C3);
+    });
+    fm.name = 'h82-well-fronds'; fm.userData.owner = PLACE; fm.raycast = function () {}; g.add(fm);
+  }
+  if (streaks.length) {
+    var sm = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshStandardMaterial({ color: 0x24351f, roughness: 1, side: THREE.DoubleSide }), streaks.length);
+    streaks.forEach(function (st, k) {
+      Q4.setFromEuler(E.set(0, Math.atan2(st.e.x, st.e.z), 0)); V3.set(st.w, st.h, 1); M4.compose(st.p, Q4, V3); sm.setMatrixAt(k, M4);
+    });
+    sm.name = 'h82-well-moss'; sm.userData.owner = PLACE; sm.userData.decal = true; sm.raycast = function () {}; g.add(sm);
+  }
+  window.lumosWellFerns = { fronds: fronds.length, streaks: streaks.length };
+})();
 /* H82's glass house planted (req 1120; Interiors' docs/interiors/glass-house.md, The glass house and The arrival
    balcony's rail, every row; the ferns, pool and benches Godric's pick, "ferns thick ... tree ferns, a pool, an iron bench
    or two"; ledger 297): the gravel over the floor 8 mm up (the walks and the ring between the beds), the round pool at
@@ -3229,6 +3324,27 @@ thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE
   }
   /* the gravel: the whole floor inside the glass less 0.05, 8 mm up */
   var gr = box(12.05, -30.95, 0.0, 27.95, -13.05, 0.008, gravel, 'h82-gravel'); gr.userData.decal = true;
+  /* the walks' stone edging (Interiors' the walks, 0.1): on the beds' side of every walk edge, 5 cm into the floor, its top
+     0.06; the ring walk's inner edge 1.0 inside the glass, broken where the door's walk crosses; the door's walk both sides,
+     from the ring to the pool's ring walk; that ring's outer edge at r 3.5, 0.07 high so the straight runs end inside it
+     with their tops 1 cm apart, broken at the door's walk and behind the two benches. One instanced mesh */
+  var kerbs = [];
+  function kerb(x0, y0, x1, y1, top) { kerbs.push([x0, y0, x1, y1, top || 0.06]); }
+  [[13.0, -14.05, 17.25, -14.05], [18.75, -14.05, 27.0, -14.05], [13.0, -29.95, 17.25, -29.95], [18.75, -29.95, 27.0, -29.95]].forEach(function (e) { kerb(e[0], e[1], e[2], e[3]); });
+  kerb(13.05, -14.1, 13.05, -29.9); kerb(26.95, -14.1, 26.95, -29.9);
+  [17.2, 18.8].forEach(function (x) { kerb(x, -14.1, x, -22 + 3.41); kerb(x, -22 - 3.41, x, -29.9); });
+  for (var ka = 0; ka < 72; ka++) {
+    var A0 = ka / 72 * Math.PI * 2, A1 = (ka + 1) / 72 * Math.PI * 2, am = (A0 + A1) / 2, kx = 18 + 3.55 * Math.cos(am);
+    if (Math.abs(kx - 18) < 0.75 || Math.abs(Math.sin(am)) < 0.26) continue;   /* the door's walk; the benches, W and E */
+    kerb(18 + 3.55 * Math.cos(A0), -22 + 3.55 * Math.sin(A0), 18 + 3.55 * Math.cos(A1), -22 + 3.55 * Math.sin(A1), 0.07);
+  }
+  var km = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), stone, kerbs.length), KM = new THREE.Matrix4(), KQ = new THREE.Quaternion(), KS = new THREE.Vector3(), KY = new THREE.Vector3(0, 1, 0);
+  kerbs.forEach(function (e, k) {
+    var a = L(e[0], e[1], -0.05), b = L(e[2], e[3], -0.05), d = b.clone().sub(a), len = Math.hypot(d.x, d.z) + 0.002;
+    KQ.setFromAxisAngle(KY, Math.atan2(-d.z, d.x)); KS.set(len, e[4] + 0.05, 0.1);
+    KM.compose(a.clone().add(b).multiplyScalar(0.5).setY(a.y + (e[4] + 0.05) / 2), KQ, KS); km.setMatrixAt(k, KM);
+  });
+  own(km, 'h82-walk-edging');
   /* the pool: coping r 1.7 to 2.0, 0.35 high; the water at 0.25 */
   var cp = own(new THREE.Mesh(new THREE.LatheGeometry([[1.7, 0], [2.0, 0], [2.0, 0.35], [1.7, 0.35], [1.7, 0]].map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 48), stone), 'h82-pool-coping');
   cp.position.copy(L(18, -22, 0));
