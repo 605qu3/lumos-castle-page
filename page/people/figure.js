@@ -10,7 +10,8 @@
        group's origin is on the floor between the feet, facing +z. act([...]) queues steps, each one of { to: [x, z] }
        (walk there in the parent's x and z), { face: radians } (turn on the spot; rotation.y, 0 facing +z), { flick: 1 }
        (the wand flicked, no glow, no trail), { wait: s }. update(dt) runs them and the idle between; busy() is true
-       while any step is left. light(k): k 0 by day to 1 at full night, a little of the candles' warmth on the cloth.
+       while any step is left. light(k): k 0 to 1 as the room's own candles burn (not by the hour: an unlit
+       room at night is light(0); Design, req 1140), a little of tones.js's candle on the cloth.
    CastleFigure.crowd(THREE, list)  seated pupils, instanced: the whole class is two draw calls. list of { at: [x, y,
        z] (the chair's middle on the floor), rot (radians, 0 facing +z, toward the desk), scale, trim (house), skin,
        hair (hex), long (true for long hair), hat }. Returns { group, mesh, ink, update(t), light(k) }; update(t) gives
@@ -21,7 +22,8 @@
   'use strict';
   var THREE, grad = null;
   var HOUSES = { gryffindor: 0x9b2318, hufflepuff: 0xd4a62a, ravenclaw: 0x2a4a7a, slytherin: 0x2e5a3a };
-  var INK = 0x16120e;
+  var INK = 0x16120e;   /* the suit's, the castle's one ink (Design, req 1140) */
+  var CANDLE = 0xffb466;   /* tones.js's candle (Design, req 1140) */
   function lin(h) { return new THREE.Color(h).convertSRGBToLinear(); }
   function tones() {   /* three steps of light on the cloth: the shade, the half, the lit */
     if (grad) return grad;
@@ -281,7 +283,7 @@
       act: function (steps) { steps.forEach(function (s) { q.push(Object.assign({}, s)); }); },
       update: function (dt) { step(Math.min(dt, 0.1)); },
       busy: function () { return !!cur || q.length > 0 || flickT >= 0; },
-      light: function (k) { mat.color.copy(day).lerp(new THREE.Color(1, 0.9, 0.78), 0.5 * k); }
+      light: function (k) { mat.color.copy(day).lerp(lin(CANDLE), 0.5 * k); }
     };
   }
 
@@ -359,7 +361,7 @@
     place(0);
     var day = mat.color.clone();
     return { group: group, mesh: mesh, ink: ink, update: place,
-             light: function (k) { mat.color.copy(day).lerp(new THREE.Color(1, 0.9, 0.78), 0.5 * k); } };
+             light: function (k) { mat.color.copy(day).lerp(lin(CANDLE), 0.5 * k); } };
   }
 
   window.CastleFigure = { make: make, crowd: crowd, HOUSES: HOUSES };
