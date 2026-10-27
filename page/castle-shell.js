@@ -1992,7 +1992,17 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
         });
       });
     }
-    else if (g.id === 'greenhouses' && s.rects) s.rects.forEach(function (r) { prism(rect(r), LAWN, LAWN + 3.2, 'far-glass'); roof(r, LAWN + 3.2, LAWN + 5.0, 'gable'); });
+    else if (g.id === 'greenhouses' && s.rects) s.rects.forEach(function (r, i) {
+      /* v214, req 1180's 1: a house with its own nave (house one, the Crystal Palace manner) stands as aisles to its eaves
+         under a low ridge-and-furrow, the nave and the transept to their springing, each under its barrel (a gable far off) */
+      var h = (g.houses || [])[i];
+      if (h && h.nave) {
+        prism(rect(r), LAWN, LAWN + h.eaves, 'far-glass'); roof(r, LAWN + h.eaves, LAWN + h.ridge_and_furrow, 'gable');
+        [h.nave, h.transept].forEach(function (v) { if (!v) return; prism(rect(v.rect), LAWN + h.eaves, LAWN + v.springing, 'far-glass'); roof(v.rect, LAWN + v.springing, LAWN + v.crown, 'gable'); });
+        return;
+      }
+      prism(rect(r), LAWN, LAWN + 3.2, 'far-glass'); roof(r, LAWN + 3.2, LAWN + 5.0, 'gable');
+    });
     else if (g.id === 'hagrids-cabin' && s.point) { prism(circ(s.point, 3.5, 12), LAWN, LAWN + 3.5, 'far-timber'); cone(s.point, 3.6, LAWN + 3.5, LAWN + 7); }
     else if (g.id === 'vegetable-patch' && s.rect) flat(shape(rect(s.rect)), LAWN + 0.04, 'far-forest');
   });
