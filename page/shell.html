@@ -2626,6 +2626,63 @@ var H71 = (function () {
     if (fresh) { slab(hg, -0.6, v, 0.049, -0.6 + nw, v + 0.022, 0.057, kit.solid(0xe2c463, { roughness: 0.3, metalness: 0.3 })); }
   }
 })();
+/* The trophy room's light through its two west windows (Magic's req 693, Events' req 718, page/events/trophy.json, word
+   for word): the moon low in the south-west (8 degrees up, its light carried 18 degrees north of east, as Interiors'
+   surfaces note has it), so each window throws a long pale slant across the floor, window 1's reaching the east run
+   at the Quidditch cup's case and lighting its glass from the base to 1.72, window 4's running out at the north end's
+   cases; small glints on the silver in the lit cases. The evening and the afternoon sun take the same slant, warm. Each
+   patch 8 mm over the flags, the glass's 16 mm outside it (the fingermarks hold 8); additive, nothing glows of itself */
+var TROPHY_MOON = "moonlight through the west windows across the floor and onto the east run of cases, the crystal glass glimmering where it catches, cups, shields, plates and statues winking silver and gold in the darkness";
+var TROPHY_SUN = ["in the afternoon the sun low through the west windows, up the east run's glass, the silver bright",
+  "the evening sun through the west windows, long across the floor to the east run's glass"];
+var TROPHY_LIGHT = (function () {
+  if (PLACE !== 'trophy-room') return null;
+  var z0 = shell.place.floor, E = Math.tan(8 * Math.PI / 180), cs = Math.cos(18 * Math.PI / 180), sn = Math.sin(18 * Math.PI / 180);
+  var XMAX = 15.3, YMAX = 43.3, SILL = 1.0, HEAD = 4.0;
+  function clip(poly, f) {   /* keep the side of a line where f(p) <= 0 */
+    var out = [];
+    poly.forEach(function (p, i) {
+      var q = poly[(i + 1) % poly.length], fp = f(p), fq = f(q);
+      if (fp <= 0) out.push(p);
+      if ((fp < 0) !== (fq < 0) && fp !== fq) { var t = fp / (fp - fq); out.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]); }
+    });
+    return out;
+  }
+  function make(col, op) {
+    var g = new THREE.Group(); g.name = 'trophy-light'; g.visible = false; shell.group.add(g);
+    var mat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: op, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+    [[26.8, 28.2], [39.8, 41.2]].forEach(function (w) {
+      var d1 = SILL / E, d2 = HEAD / E;
+      var poly = [[d1 * cs, w[0] + d1 * sn], [d1 * cs, w[1] + d1 * sn], [d2 * cs, w[1] + d2 * sn], [d2 * cs, w[0] + d2 * sn]];
+      poly = clip(clip(poly, function (p) { return p[0] - XMAX; }), function (p) { return p[1] - YMAX; });
+      if (poly.length < 3) return;
+      var pos = [];
+      for (var k = 1; k < poly.length - 1; k++) [poly[0], poly[k], poly[k + 1]].forEach(function (p) { var l = shell.toLocal(p[0], p[1], z0 + 0.008); pos.push(l.x, l.y, l.z); });
+      var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      var m = new THREE.Mesh(geo, mat); m.raycast = function () {}; m.userData.owner = PLACE; m.userData.decal = true; g.add(m);
+    });
+    /* window 1 on the cup case's glass: where its rays meet x 15.45 they have dropped 2.28, so the base to 1.72 */
+    var d = 15.45 / cs, drop = d * E, ya = 26.8 + d * sn, yb = 28.2 + d * sn, h0 = 0.15, h1 = HEAD - drop, X = 15.45 - 0.016, q = [];
+    [[ya, h0], [yb, h0], [yb, h1], [ya, h0], [yb, h1], [ya, h1]].forEach(function (p) { var l = shell.toLocal(X, p[0], z0 + p[1]); q.push(l.x, l.y, l.z); });
+    var gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(q, 3));
+    var gm = new THREE.Mesh(gg, mat); gm.raycast = function () {}; gm.userData.owner = PLACE; gm.userData.decal = true; g.add(gm);
+    return g;
+  }
+  var moon = make(0xa9bcd8, 0.22), sun = make(0xffc483, 0.3);
+  /* the glints: a few small bright stars on the lit case's glass, before the cup */
+  var star = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8, depthWrite: false, blending: THREE.AdditiveBlending }), glints = [];
+  [[32.4, 1.18], [33.0, 1.42], [32.7, 1.55], [32.1, 0.95]].forEach(function (p, i) {
+    var s = new THREE.Mesh(new THREE.PlaneGeometry(0.03, 0.03), star); s.position.copy(shell.toLocal(15.45 - 0.024, p[0], z0 + p[1]));
+    s.rotation.y = Math.PI / 4; s.raycast = function () {}; s.userData.owner = PLACE; s.userData.decal = true; moon.add(s); glints.push(s);
+  });
+  return { moon: moon, sun: sun, glints: glints };
+})();
+function trophyShown(shown) {
+  if (!TROPHY_LIGHT) return [];
+  var m = shown.indexOf(TROPHY_MOON) >= 0 || Q.get('moonlight') === 'on', s = TROPHY_SUN.some(function (x) { return shown.indexOf(x) >= 0; });
+  TROPHY_LIGHT.moon.visible = m; TROPHY_LIGHT.sun.visible = s && !m;
+  return [TROPHY_MOON].concat(TROPHY_SUN).filter(function (x) { return shown.indexOf(x) >= 0; });
+}
 /* req 800 (Magic's docs/archive/magic-to-2026-10-22.md, The Divination classroom, the trapdoor answers; Events' req 799,
    divination.json's divination.trapdoor, word for word): on the North Tower's landing the circular trapdoor in the ceiling
    (the model's north-trapdoor: 0.9 across at (161.4, 66.6), its face 48.4, hinged on its north edge, swinging down, the
@@ -5916,7 +5973,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
