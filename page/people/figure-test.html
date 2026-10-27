@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pickett in 3D</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+  #stats { position: fixed; left: 8px; top: 8px; font: 12px monospace; color: #ddd; background: rgba(0,0,0,0.45); padding: 4px 6px; white-space: pre; }
+</style>
+</head>
+<body>
+<!-- The Pickett pilot (req 1139; page/people/figure.js). A plain stand-in of the Charms classroom, not the room: its desks,
+     his desk, the slate and the door where docs/interiors/charms-classroom.md puts them (x' across from the window wall,
+     y' from the back wall and its door; here x = x', z = -y'). Six pupils seated, the boys' desk (front row, right of the
+     aisle) left free. A look for the eye.
+     ?view=door (a boy's eye, 1.35, inside the door), desk (seated at the boys' desk) or front (from the clear floor, over
+         the class, for the pupils' faces)
+     ?act=loop (desk, slate and back, to the boys' desk, a flick; the default), toward (down the aisle toward the eye),
+         still (on the clear floor, turned ?angle= degrees from facing the eye)
+     ?t=seconds  run to that moment and hold it (for a shot); ?night=1 the candles; ?card=1 a painted teacher card
+     beside him (electives-teachers.png, cell 3, reference only); ?fig=0 no figures (the fps check, off); ?pickett=0 the class
+     alone. -->
+<canvas id="c"></canvas>
+<div id="stats">starting</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="figure.js?v=1"></script>
+<script>
+(function () {
+  var Q = new URLSearchParams(location.search), night = Q.get('night') === '1', view = Q.get('view') || 'door';
+  var act = Q.get('act') || 'loop', angle = +(Q.get('angle') || 0) * Math.PI / 180, holdT = Q.has('t') ? +Q.get('t') : -1;
+  var showFig = Q.get('fig') !== '0', showCard = Q.get('card') === '1', showP = Q.get('pickett') !== '0';
+  var canvas = document.getElementById('c'), renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(night ? 0x0b0a09 : 0x2a2622);
+  function col(h) { return new THREE.Color(h).convertSRGBToLinear(); }
+  function std(h, r) { return new THREE.MeshStandardMaterial({ color: col(h), roughness: r || 0.9 }); }
+  function box(x0, y0, z0, x1, y1, z1, m) {   /* in x' and y' (z = -y'), heights z0 to z1 */
+    var b = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, z1 - z0, y1 - y0), m);
+    b.position.set((x0 + x1) / 2, (z0 + z1) / 2, -(y0 + y1) / 2); scene.add(b); return b;
+  }
+  /* the room: 9 by 12, 3.6 high */
+  var wall = std(0x8a8072), wood = std(0x684e38, 0.75), dark = std(0x2a2420, 0.6);
+  box(0, 0, -0.05, 9, 12, 0, std(0x765a40, 0.8));
+  box(-0.3, 0, 0, 0, 12, 3.6, wall); box(9, 0, 0, 9.3, 12, 3.6, wall); box(0, 12, 0, 9, 12.3, 3.6, wall);
+  box(0, -0.3, 0, 3.9, 0, 3.6, wall); box(5.1, -0.3, 0, 9, 0, 3.6, wall); box(3.9, -0.3, 2.4, 5.1, 0, 3.6, wall);
+  box(0, 0, 3.6, 9, 12, 3.7, std(0xe8e2d4));
+  [2.5, 6.5, 10].forEach(function (y) { box(-0.02, y - 0.6, 1.0, 0.01, y + 0.6, 2.9, std(0xc8d4dc, 0.3)); });   /* the windows on his left */
+  /* the pupils' pair desks, three rows of four, a chair behind each place (the shell's req 968) */
+  [2.4, 4.2, 6.0].forEach(function (yp) { [0.7, 2.3, 5.4, 7.0].forEach(function (xp) {
+    box(xp, yp, 0.69, xp + 1.3, yp + 0.6, 0.72, wood); box(xp, yp + 0.56, 0.3, xp + 1.3, yp + 0.6, 0.69, wood);
+    [0.325, 0.975].forEach(function (u) { var cx = xp + u, cy = yp - 0.34;
+      box(cx - 0.19, cy - 0.19, 0.42, cx + 0.19, cy + 0.19, 0.45, wood); box(cx - 0.19, cy - 0.23, 0.45, cx + 0.19, cy - 0.19, 0.9, wood);
+      [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (l) { box(cx + l[0] * 0.16 - 0.02, cy + l[1] * 0.16 - 0.02, 0, cx + l[0] * 0.16 + 0.02, cy + l[1] * 0.16 + 0.02, 0.42, wood); });
+    });
+  }); });
+  box(3.7, 9.4, 0, 5.3, 10.2, 0.75, wood);                                    /* his desk, its panel to the class */
+  box(5.35, 11.94, 1.3, 6.75, 12.0, 2.1, dark);                               /* the slate */
+  box(7.0, 11.45, 0, 8.4, 12.0, 2.0, wood);                                   /* the cupboard */
+  box(4.2, 10.3, 0, 4.8, 10.75, 0.4, std(0x5a2420));                          /* the pile of books */
+  /* the light: by day the windows on the left; by night the chandelier's candles over the clear floor */
+  scene.add(new THREE.HemisphereLight(col(night ? 0x6a5040 : 0xdfe6ee), col(night ? 0x201812 : 0x5a5048), night ? 0.35 : 0.9));
+  if (night) { var ch = new THREE.PointLight(col(0xffb466), 2.2, 14, 1.6); ch.position.set(4.5, 2.7, -7.9); scene.add(ch); }
+  else { var sun = new THREE.DirectionalLight(col(0xfff6ea), 1.5); sun.position.set(-6, 5, -5); sun.target.position.set(4.5, 0, -7); scene.add(sun); scene.add(sun.target); }
+
+  /* the figures */
+  var P = CastleFigure.make(THREE, { look: 'pickett' }), H = CastleFigure.HOUSES;
+  P.light(night ? 1 : 0);
+  function chair(xp, yp, u) { return [xp + u, 0, -(yp - 0.34)]; }
+  var pupils = CastleFigure.crowd(THREE, [
+    { at: chair(0.7, 6.0, 0.325), rot: Math.PI, trim: H.gryffindor, skin: 0xf0c8a8, hair: 0x7a4a24, long: true, scale: 0.97 },
+    { at: chair(0.7, 6.0, 0.975), rot: Math.PI, trim: H.gryffindor, skin: 0xc89070, hair: 0x1c1410, scale: 1.03 },
+    { at: chair(2.3, 6.0, 0.975), rot: Math.PI, trim: H.hufflepuff, skin: 0xeac0a0, hair: 0xc89a5a, long: true, scale: 0.94 },
+    { at: chair(7.0, 6.0, 0.325), rot: Math.PI, trim: H.ravenclaw, skin: 0x8a5a3a, hair: 0x141010, scale: 1.0 },
+    { at: chair(2.3, 4.2, 0.325), rot: Math.PI, trim: H.slytherin, skin: 0xf2cfb4, hair: 0xb04a20, scale: 1.05 },
+    { at: chair(5.4, 4.2, 0.975), rot: Math.PI, trim: H.ravenclaw, skin: 0xd8a888, hair: 0x3a2618, long: true, scale: 0.98 }
+  ]);
+  pupils.light(night ? 1 : 0);
+  if (showFig) { if (showP) scene.add(P.group); scene.add(pupils.group); }
+
+  var DESK = [3.9, -10.55];
+  if (act === 'still') { P.group.position.set(4.5, 0, -8.0); }
+  else if (act === 'toward') { P.group.position.set(4.5, 0, -9.6); P.act([{ to: [4.5, -5.0] }, { wait: 2 }]); }
+  else { P.group.position.set(DESK[0], 0, DESK[1]); }
+  function loop() {
+    P.act([{ wait: 2 }, { to: [5.55, -10.75] }, { to: [6.05, -11.35] }, { face: Math.PI }, { flick: 1 }, { wait: 1 },
+           { to: [5.55, -10.75] }, { to: DESK }, { face: 0 }, { wait: 1.5 },
+           { to: [5.65, -10.4] }, { to: [5.95, -8.9] }, { to: [6.05, -7.0] }, { face: 0 }, { wait: 0.6 }, { flick: 1 }, { wait: 2 },
+           { to: [5.95, -8.9] }, { to: [5.65, -10.4] }, { to: DESK }, { face: 0 }]);
+  }
+
+  /* the eye */
+  var camera = new THREE.PerspectiveCamera(55, 1, 0.05, 60);
+  if (view === 'desk') { camera.position.set(5.725, 1.05, -5.66); camera.lookAt(5.0, 1.3, -9.5); }
+  else if (view === 'front') { camera.position.set(4.5, 1.6, -9.9); camera.lookAt(3.4, 0.8, -4.5); }   /* his eye from the clear floor, over the class (for the pupils' faces) */
+  else { camera.position.set(4.5, 1.35, -0.4); camera.lookAt(4.5, 1.15, -8); }
+  if (act === 'still') { var tc = Math.atan2(camera.position.x - 4.5, camera.position.z + 8.0); P.group.rotation.y = tc + angle; }
+
+  /* a painted teacher beside him, for comparison: electives-teachers.png, cell 3 (505 by 1177 px, 631 px a metre) */
+  var card = null;
+  if (showCard) {
+    new THREE.TextureLoader().load('../../assets/layers/electives-teachers.png', function (t) {
+      t.encoding = THREE.sRGBEncoding; t.repeat.set(505 / 3030, 1); t.offset.set(1515 / 3030, 0);
+      card = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.865), new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.4, color: night ? 0x9a7a5a : 0xe0dcd4 }));
+      var at = view === 'desk' ? [5.7, -8.6] : act === 'still' ? [3.3, -8.0] : [3.1, -8.4];
+      card.position.set(at[0], 0.9325, at[1]); scene.add(card);
+    });
+  }
+
+  function size() { var w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  addEventListener('resize', size); size();
+
+  /* run to the held moment, if one is asked */
+  var t = 0, dt = 1 / 60;
+  if (act === 'loop') loop();
+  if (holdT >= 0) { while (t < holdT) { P.update(dt); t += dt; } pupils.update(t); }
+
+  /* the counts: the room alone, then with Pickett, then with the class */
+  function count() {
+    var vis = [P.group.visible, pupils.group.visible], out = {};
+    P.group.visible = false; pupils.group.visible = false; renderer.render(scene, camera); out.room = [renderer.info.render.calls, renderer.info.render.triangles];
+    P.group.visible = true; renderer.render(scene, camera); out.p = [renderer.info.render.calls - out.room[0], renderer.info.render.triangles - out.room[1]];
+    P.group.visible = false; pupils.group.visible = true; renderer.render(scene, camera); out.c = [renderer.info.render.calls - out.room[0], renderer.info.render.triangles - out.room[1]];
+    P.group.visible = vis[0]; pupils.group.visible = vis[1];
+    return out;
+  }
+  var counts = count(), frames = 0, last = performance.now(), fps = 0, prev = last;
+  window.FIGURE_COUNTS = counts;
+  function tick(now) {
+    var d = Math.min(0.1, (now - prev) / 1000); prev = now;
+    if (holdT < 0) {
+      t += d; P.update(d); pupils.update(t);
+      if (act === 'loop' && !P.busy()) loop();
+      if (act === 'toward' && !P.busy()) { P.group.position.set(4.5, 0, -9.6); P.group.rotation.y = 0; P.act([{ to: [4.5, -5.0] }, { wait: 2 }]); }
+    }
+    if (card) { card.rotation.y = Math.atan2(camera.position.x - card.position.x, camera.position.z - card.position.z); }
+    renderer.render(scene, camera);
+    frames++;
+    if (now - last > 1000) { fps = frames * 1000 / (now - last); frames = 0; last = now; }
+    var i = renderer.info.render;
+    document.getElementById('stats').textContent = (night ? 'night' : 'day') + '  ' + view + '  ' + act + (holdT >= 0 ? ' t ' + holdT : '') +
+      '\n' + fps.toFixed(0) + ' fps   ' + i.calls + ' calls   ' + i.triangles + ' tris   figures ' + (showFig ? 'on' : 'off') +
+      '\nPickett +' + counts.p[0] + ' calls +' + counts.p[1] + ' tris   pupils (6) +' + counts.c[0] + ' calls +' + counts.c[1] + ' tris';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
