@@ -604,10 +604,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             for (var u = 0; u < fuv.count; u++) fuv.setX(u, (cell + fuv.getX(u)) / 6);
             var fm = new THREE.Mesh(fg, vaultFaceMat('awake')); fm.name = Q.id + '-corbel-face-' + k;
             fm.position.set(n * (0.185 + 0.01 + fh / 2 * st), 0, 0); fm.rotation.order = 'YXZ'; fm.rotation.y = n * Math.PI / 2; fm.rotation.x = TILT; cb.add(fm);
-            var ws = new THREE.Shape(), d0 = 0.01 / ct + 0.004, d1 = (0.01 + fh * st) / ct + 0.004;
-            ws.moveTo(0, -fh / 2); ws.lineTo(0.004, fh / 2); ws.lineTo(d1, fh / 2); ws.lineTo(d0, -fh / 2); ws.lineTo(0, -fh / 2);
+            /* v87 (req 1114, Design's ceilings.js v7): the wedge's front parallel to the face and 10 mm behind it, never the
+               2 to 6 mm it leaned through (the 8 mm rule); its back where it was, 4 mm into the corbel */
+            var ws = new THREE.Shape(), d0 = 0.01 / ct - 0.004, d1 = (0.01 + fh * st) / ct - 0.004;
+            ws.moveTo(0, -fh / 2); ws.lineTo(0, fh / 2); ws.lineTo(d1, fh / 2); ws.lineTo(d0, -fh / 2); ws.lineTo(0, -fh / 2);
             var wg = new THREE.ExtrudeGeometry(ws, { depth: fw * 0.96, bevelEnabled: false });
-            wg.translate(0, 0, -fw * 0.48); wg.rotateY(Math.PI / 2); wg.translate(0, 0, -0.002);
+            wg.translate(0, 0, -fw * 0.48); wg.rotateY(Math.PI / 2); wg.translate(0, 0, -0.01);
             var wm = new THREE.Mesh(wg, stoneM); wm.name = Q.id + '-corbel-wedge-' + k; wm.position.copy(fm.position); wm.rotation.copy(fm.rotation); cb.add(wm);
             (vaultFaces[Q.id] = vaultFaces[Q.id] || []).push(fm);
           }
@@ -833,8 +835,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        room's oak panelling, Design's kit (page/design/panelling.js) at grade 2, tudor or, in a late-pale room, fielded;
        it stops under the vault's springing, else at the ceiling. It stops at every opening this wall cut (doors, windows,
        niches, the hidden ways too, so a jib's tap is not covered) and round each fireplace (w + 0.4, from the floor to
-       0.15 over its head: the surround stands on the wall face); every piece the room's own */
-    if (row && row.dress === 'panelled' && !Q.area && !Q.loops && Q.ceiling != null && window.CastlePanelling) {
+       0.15 over its head: the surround stands on the wall face); every piece the room's own. v87 (req 1126, Design's
+       round rooms): a round room too (the study, dumbledores-office), its plan the SIDES flat sides its wall is built
+       of (0.58 m in the study, 1.18 in the office), so each panel stands flat on a flat side and the mitres take the
+       15 degrees between them; a shaft or ring still bare */
+    if (row && row.dress === 'panelled' && (!Q.area || (Q.round && !Q.shaft)) && !Q.loops && Q.ceiling != null && window.CastlePanelling) {
       var pops = [];
       gaps.forEach(function (gs, i) { gs.forEach(function (g) {
         if (g.spill) return;

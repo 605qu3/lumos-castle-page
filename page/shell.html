@@ -158,13 +158,13 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-paint.js?v=114"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
-<script src="design/ceilings.js?v=6"></script>
+<script src="design/ceilings.js?v=7"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=1"></script>
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
-<script src="castle-shell.js?v=86"></script>
+<script src="castle-shell.js?v=87"></script>
 <script src="shell-w5b.js?v=20"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -309,6 +309,8 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
   'decoy-cupboard-5', 'true-hide-5', 'accounts-room-3',
   'sun-hide-g', 'bindery-way-2', 'seat-den-3', 'painted-door-room-5',
   'h82-way', 'h82-glass-house', 'h82-gallery-way']);   /* v200, req 1099 (H82): the fern well's way and the glass house under the lake, rough; v209 the balcony's passage */
+/* req 1126 (Design's round rooms): the head's office and Clementine's study painted, their rows' panelling on their flat sides (castle-shell v87) */
+PAINTED = PAINTED.concat(['dumbledores-office', 'study']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers' }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
@@ -505,6 +507,9 @@ function updateStone(dt) {
   var k = Math.max(0, Math.min(1, (STONE_LIGHT.flood - 0.4) / 0.5));
   STONE_LIGHT.chess.forEach(function (l) { l.intensity = 1.3 * k; });
 }
+/* req 1125 (Godric's 2 on design-night-light-2-1026, 9.06 pm, 26 October 2026: "that looks perfect"): in a painted
+   place from 10 pm to 7 am the plain four burn at an eighth, so the rooms go dark as the fill does; by day as before */
+var NIGHT_FOUR = PAINT_ON && (HOUR >= 22 || HOUR < 7) ? 0.125 : 1;
 shell.places.forEach(function (p, pi) {
   if (LIT_BY[p.id]) return;
   var xs = p.poly.map(function (q) { return q[0]; }), ys = p.poly.map(function (q) { return q[1]; });
@@ -516,7 +521,7 @@ shell.places.forEach(function (p, pi) {
   var lamps = p.rec && p.rec.lamps ? p.rec.lamps : [[0.25, 0.25], [0.75, 0.25], [0.75, 0.75], [0.25, 0.75]].map(function (f) {
     return [x0 + (x1 - x0) * f[0], y0 + (y1 - y0) * f[1]]; });
   lamps.forEach(function (q) {
-    var l = new THREE.PointLight(painted ? TORCH.hex : 0xffc98a, (pi ? 0.7 : 1.0) * k, 26, 1.6);
+    var l = new THREE.PointLight(painted ? TORCH.hex : 0xffc98a, (pi ? 0.7 : 1.0) * k * NIGHT_FOUR, 26, 1.6);
     var lz = PAINTED.indexOf(p.id) >= 0 && p.ceiling != null ? Math.min(p.floor + 3.2, p.ceiling - 0.4) : p.floor + 3.2;   /* under a low ceiling */
     l.position.copy(shell.toLocal(q[0], q[1], lz));
     scene.add(l);
