@@ -3202,6 +3202,115 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
   [69.05, 69.75].forEach(function (y) { box(62.5, y - 0.06, -0.05, 62.7, y + 0.06, 1.2, oak); });
   roller(62.6, 69.10, 69.70, 1.0, 0.1, oak); roller(62.6, 69.70, 69.95, 1.0, 0.025, iron);
 })();
+/* the West Tower's cool room on G, the feasts' cold larder (req 1000; Interiors' docs/interiors/west-tower-cool-room.md,
+   The table, every row, model coordinates; ledger 301): the setting table, slate on oak, its copper jelly moulds in a row,
+   turned out on plates or still setting under muslin, a covered trifle bowl and a lit lantern at its west end; the
+   slatted rack of butter crocks, jugs of cream under beaded covers and eggs in wire baskets; the oak ice cream chest on its
+   drip tray, its lid shut and the chalk list on a slate on it, the last line crossed out and written again (PS 7 L2561);
+   three churns, a ladle on the nearest; the low trestle of fruit in shallow baskets. Every foot 5 cm into the floor, every
+   thing 1 cm into what it stands on; eggs, berries and slats instanced */
+(function () {
+  if (PLACE !== 'west-tower-room-g') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'cool-room-things'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); }, seed = 5;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var oak = kit.solid(0x6e5034), slate = kit.solid(0x3a3d42), copper = kit.solid(0xb5703a, { metalness: 0.6, roughness: 0.35 }),
+    tin = kit.solid(0xa8acae, { metalness: 0.6, roughness: 0.4 }), zinc = kit.solid(0x8a8f90, { metalness: 0.4, roughness: 0.5 }),
+    muslin = kit.solid(0xe9e2cf), crock = kit.solid(0xc9b48c), cream = kit.solid(0xf2ecdc), wicker = kit.solid(0xb89558), iron = kit.solid(0x2f2f33),
+    china = kit.solid(0xf4f1ea), glassM = new THREE.MeshStandardMaterial({ color: 0xdfe8e4, transparent: true, opacity: 0.35, roughness: 0.1, depthWrite: false });
+  function own(m) { m.userData.owner = PLACE; g.add(m); return m; }
+  function box(a, b, mt) { var m = thingBox(g, P, a, b, mt); m.userData.owner = PLACE; return m; }
+  function cyl(x, y, r0, r1, za, zb, mt, seg) { var m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, seg || 16), mt); m.position.copy(P(x, y, (za + zb) / 2)); return own(m); }
+  function lathe(x, y, z, pts, mt, seg) { var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), seg || 20), mt); m.position.copy(P(x, y, z)); return own(m); }
+  /* 1, the setting table: slate top 0.80 to 0.85 on six oak legs */
+  box([-2.0, 74.6, 0.80], [2.0, 75.4, 0.85], slate);
+  [-1.9, 0, 1.85].forEach(function (x) { [74.66, 75.28].forEach(function (y) { box([x, y, -0.05], [x + 0.06, y + 0.06, 0.81], oak); }); });
+  box([-1.9, 74.98, 0.12], [1.91, 75.02, 0.18], oak);   /* the stretcher */
+  var JELLY = [0xa3162a, 0xd88a1c, 0x3f8a2e, 0xe24a2a, 0x7a1f5c, 0xc8b02a], fl = [];
+  for (var k = 0; k <= 16; k++) { var t = k / 16; fl.push([Math.max(0.002, 0.08 - 0.035 * t + (k % 2 ? 0.006 : 0)), 0.14 * t]); }
+  fl.push([0.001, 0.14]);
+  [-1.45, -1.0, -0.55, -0.1, 0.35, 0.8].forEach(function (x, k) {
+    if (k % 3 === 2) {   /* still setting: the copper mould, muslin over it */
+      lathe(x, 75.0, 0.84, [[0.001, 0], [0.07, 0], [0.09, 0.12], [0.088, 0.125], [0.068, 0.006], [0.001, 0.006]], copper);
+      lathe(x, 75.0, 0.84, [[0.001, 0.135], [0.1, 0.13], [0.105, 0.08], [0.11, 0.06]], muslin);
+    } else {             /* turned out on a plate, the fluted jelly */
+      cyl(x, 75.0, 0.11, 0.11, 0.84, 0.852, china, 24);
+      var jm = new THREE.MeshStandardMaterial({ color: JELLY[k], transparent: true, opacity: 0.82, roughness: 0.15 });
+      lathe(x, 75.0, 0.845, fl, jm, 16);
+    }
+  });
+  /* the trifle bowl on its foot, covered */
+  lathe(1.45, 75.0, 0.84, [[0.001, 0], [0.07, 0], [0.05, 0.05], [0.16, 0.1], [0.2, 0.24], [0.195, 0.24], [0.155, 0.105], [0.001, 0.1]], glassM, 28);
+  lathe(1.45, 75.0, 0.84, [[0.001, 0.26], [0.2, 0.245], [0.215, 0.2], [0.22, 0.17]], muslin, 28);
+  /* the lantern at the west end, lit */
+  box([-1.92, 74.9, 0.84], [-1.72, 75.1, 0.87], iron);
+  cyl(-1.82, 75.0, 0.07, 0.07, 0.87, 1.1, glassM, 12); box([-1.92, 74.9, 1.1], [-1.72, 75.1, 1.13], iron);
+  var flame = own(new THREE.Mesh(new THREE.SphereGeometry(0.018, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffc46a })));
+  flame.scale.y = 2; flame.position.copy(P(-1.82, 75.0, 0.96)); cyl(-1.82, 75.0, 0.012, 0.012, 0.86, 0.93, cream, 8);
+  var lt = new THREE.PointLight(0xffb565, 0.6, 6, 1.6); lt.position.copy(P(-1.82, 75.0, 1.0)); scene.add(lt);
+  /* 2, the rack: four posts, three shelves of slats along x */
+  [-1.8, 1.76].forEach(function (x) { [68.5, 68.96].forEach(function (y) { box([x, y, -0.05], [x + 0.04, y + 0.04, 1.6], oak); }); });
+  var SH = [0.3, 0.8, 1.3], slats = [];
+  SH.forEach(function (z) { [68.52, 68.68, 68.84].forEach(function (y) { slats.push([y, z]); }); });
+  var sm = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), oak, slats.length), M4 = new THREE.Matrix4(), Q0 = new THREE.Quaternion(), V3 = new THREE.Vector3();
+  slats.forEach(function (q, k) {   /* each slat 3.56 long, 0.12 wide, 0.025 deep, 1 cm into the posts at its ends */
+    var a = P(-1.77, q[0], q[1] - 0.025), b = P(1.77, q[0] + 0.12, q[1]);
+    V3.set(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)); M4.compose(a.clone().add(b).multiplyScalar(0.5), Q0, V3); sm.setMatrixAt(k, M4);
+  });
+  own(sm);
+  [-1.45, -0.75, -0.05, 0.65, 1.35].forEach(function (x) {   /* the butter crocks, lids on */
+    cyl(x, 68.74, 0.1, 0.09, 0.29, 0.47, crock, 16); cyl(x, 68.74, 0.095, 0.095, 0.469, 0.49, crock, 16); cyl(x, 68.74, 0.02, 0.02, 0.489, 0.52, crock, 8);
+  });
+  [-1.4, -0.8, -0.2, 0.4, 1.0].forEach(function (x) {        /* the jugs of cream, beaded covers */
+    cyl(x, 68.74, 0.07, 0.06, 0.79, 1.0, cream, 14); box([x + 0.055, 68.72, 0.87], [x + 0.1, 68.76, 0.97], cream);
+    lathe(x, 68.74, 0.995, [[0.001, 0.012], [0.08, 0.004], [0.085, -0.02]], muslin, 14);
+  });
+  var eggs = [];
+  [-1.3, -0.45, 0.4, 1.25].forEach(function (x) {             /* the eggs, a wire basket each */
+    var wb = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.13, 0.14, 14, 1, true), new THREE.MeshStandardMaterial({ color: 0x2f2f33, wireframe: true }));
+    wb.position.copy(P(x, 68.74, 1.36)); own(wb); cyl(x, 68.74, 0.13, 0.13, 1.29, 1.3, iron, 14);
+    for (var e = 0; e < 11; e++) { var ea = e * 2.4 + rnd(), er = e === 0 ? 0 : 0.05 + (e % 3) * 0.03; eggs.push([x + er * Math.cos(ea), 68.74 + er * Math.sin(ea), 1.335 + (e > 7 ? 0.05 : 0)]); }
+  });
+  var em = new THREE.InstancedMesh(new THREE.SphereGeometry(0.024, 10, 8), kit.solid(0xe8d6b8), eggs.length), ES = new THREE.Vector3(1, 1.3, 1);
+  eggs.forEach(function (q, k) { M4.compose(P(q[0], q[1], q[2]), Q0, ES); em.setMatrixAt(k, M4); });
+  own(em);
+  /* 3, the ice cream chest on its drip tray, lid shut, the slate on it */
+  box([-3.95, 71.15, 0.0], [-3.05, 72.85, 0.025], zinc);
+  box([-3.9, 71.2, 0.015], [-3.1, 72.8, 0.86], oak); box([-3.92, 71.18, 0.85], [-3.08, 72.82, 0.9], oak);
+  [71.5, 72.5].forEach(function (y) { box([-3.08, y - 0.02, 0.6], [-3.06, y + 0.02, 0.88], iron); });   /* the hasps, east side */
+  box([-3.75, 71.7, 0.895], [-3.3, 72.3, 0.91], kit.solid(0x5a4630));                                   /* the slate's frame */
+  var cv = document.createElement('canvas'); cv.width = 512; cv.height = 360; var c = cv.getContext('2d');
+  c.fillStyle = '#2c3034'; c.fillRect(0, 0, 512, 360);
+  c.fillStyle = 'rgba(235,232,222,0.88)'; c.strokeStyle = 'rgba(235,232,222,0.8)'; c.font = '44px "Segoe Script", "Brush Script MT", cursive';
+  ['Vanilla', 'Strawberry', 'Chocolate', 'Peppermint'].forEach(function (w, k) { c.fillText(w, 40, 66 + k * 62); });
+  c.font = '24px "Segoe Script", "Brush Script MT", cursive'; c.fillText('every flavour you could think of', 30, 330);
+  c.lineWidth = 3; c.beginPath(); c.moveTo(24, 322); c.lineTo(440, 318); c.stroke();
+  c.font = '24px "Segoe Script", "Brush Script MT", cursive'; c.fillText('every flavour you could think of', 40, 296);
+  var tx = new THREE.CanvasTexture(cv); tx.encoding = THREE.sRGBEncoding;
+  /* the face 8 mm over the frame; its lines run north (+y), their tops to the west, read from the door */
+  var A = P(-3.72, 71.73, 0.918), B = P(-3.72, 72.27, 0.918), C = P(-3.33, 72.27, 0.918), D = P(-3.33, 71.73, 0.918);
+  var qg = new THREE.BufferGeometry();
+  qg.setAttribute('position', new THREE.Float32BufferAttribute([A.x, A.y, A.z, D.x, D.y, D.z, C.x, C.y, C.z, A.x, A.y, A.z, C.x, C.y, C.z, B.x, B.y, B.z], 3));
+  qg.setAttribute('uv', new THREE.Float32BufferAttribute([0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1], 2)); qg.computeVertexNormals();
+  var face = own(new THREE.Mesh(qg, new THREE.MeshStandardMaterial({ map: tx, roughness: 0.95, side: THREE.DoubleSide }))); face.userData.decal = true;
+  /* 4, three churns, lids on, a ladle hung on the nearest */
+  [2.48, 2.8, 3.12].forEach(function (x) {
+    lathe(x, 73.6, -0.01, [[0.001, 0], [0.15, 0], [0.15, 0.55], [0.1, 0.72], [0.085, 0.78], [0.09, 0.8], [0.001, 0.8]], tin, 20);
+    cyl(x, 73.6, 0.095, 0.095, 0.795, 0.86, tin, 20); cyl(x, 73.6, 0.03, 0.03, 0.855, 0.9, tin, 10);
+  });
+  box([2.94, 73.44, 0.5], [2.95, 73.46, 0.86], tin); var ld = cyl(2.945, 73.43, 0.05, 0.05, 0.42, 0.5, tin, 12);
+  /* 5, the low trestle of fruit: its top 0.56 to 0.6, three shallow baskets */
+  box([2.3, 70.1, 0.56], [3.3, 70.7, 0.6], oak);
+  [[2.35, 70.15], [3.21, 70.15], [2.35, 70.61], [3.21, 70.61]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.57], oak); });
+  var fruit = [], FR = [[2.48, 0.016, 0xc8202a, 26], [2.8, 0.012, 0x5e0a18, 30], [3.12, 0.04, 0x9c2a1c, 9]];
+  FR.forEach(function (f) {
+    lathe(f[0], 70.4, 0.59, [[0.001, 0], [0.13, 0], [0.15, 0.06], [0.145, 0.065], [0.125, 0.008], [0.001, 0.008]], wicker, 18);
+    for (var k = 0; k < f[3]; k++) { var a = k * 2.4 + rnd(), r = Math.sqrt(k / f[3]) * (0.13 - f[1]); fruit.push([f[0] + r * Math.cos(a), 70.4 + r * Math.sin(a), 0.6 + f[1] + (k % 4 === 3 ? f[1] * 1.4 : 0), f[1], f[2]]); }
+  });
+  var fm = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 10, 8), kit.solid(0xffffff), fruit.length), C3 = new THREE.Color();
+  fruit.forEach(function (q, k) { V3.set(q[3], q[3], q[3]); M4.compose(P(q[0], q[1], q[2]), Q0, V3); fm.setMatrixAt(k, M4); fm.setColorAt(k, C3.set(q[4])); });
+  own(fm);
+})();
 /* the eye's tap (Events, hidden-ways.json's undercroft-well-eye-first and -again): the same string on the page with no runtime */
 var WELL_EYE = 'he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water';
 thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE }]); };
