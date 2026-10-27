@@ -2003,6 +2003,13 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
       }
       prism(rect(r), LAWN, LAWN + 3.2, 'far-glass'); roof(r, LAWN + 3.2, LAWN + 5.0, 'gable');
     });
+    else if (g.id === 'apiary' && g.wall) {
+      /* v215, req 1121: the bee-bole wall (its gate a gap) and the painted bee house; the hives and skeps are things, too
+         small to tell from a window and two dozen draws more in every room if drawn here */
+      var wr = g.wall.rect, gx = g.wall.gate ? g.wall.gate.x : null;
+      (gx ? [[wr[0], wr[1], gx[0], wr[3]], [gx[1], wr[1], wr[2], wr[3]]] : [wr]).forEach(function (r) { prism(rect(r), LAWN, LAWN + g.wall.h, 'far-stone'); });
+      if (g.bee_house) { var bh = g.bee_house; prism(rect(bh.rect), LAWN, LAWN + bh.eaves, 'far-timber'); roof(bh.rect, LAWN + bh.eaves, LAWN + bh.ridge, 'gable'); }
+    }
     else if (g.id === 'hagrids-cabin' && s.point) { prism(circ(s.point, 3.5, 12), LAWN, LAWN + 3.5, 'far-timber'); cone(s.point, 3.6, LAWN + 3.5, LAWN + 7); }
     else if (g.id === 'vegetable-patch' && s.rect) flat(shape(rect(s.rect)), LAWN + 0.04, 'far-forest');
   });
