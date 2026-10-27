@@ -14,7 +14,8 @@
        radians } (turn on the spot; rotation.y, 0 facing +z), { flick: 1 } (the wand flicked, no glow, no trail),
        { wait: s }. update(dt) runs them and the idle between; busy() is true while any step is left. light(k): k 0 to 1
        as the room's own candles burn (not by the hour: an unlit room at night is light(0); Design, req 1140), a little
-       of tones.js's candle on the cloth.
+       of tones.js's candle on the colours, and the shader's candle tone (nightTone: faces and shirts keep their own
+       colour; asked of Design, req 1190).
    CastleFigure.crowd(THREE, list, model)  seated pupils (model: models/pupil.json, the shapes made in Blender, or none), instanced: the whole class is two draw calls. list of { at: [x, y,
        z] (the chair's middle on the floor), rot (radians, 0 facing +z, toward the desk), scale, trim (house), skin,
        hair (hex), long (long hair), curly, face (0 to 7, the drawn faces), girl (a skirt, not trousers) }. Returns
