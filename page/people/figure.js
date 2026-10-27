@@ -257,7 +257,7 @@
       own([eye, function () { x.beginPath(); x.arc(ix, iy, eh * 0.95, 0, TAU); }], f.iris || '88,60,38');
       own([eye, function () { x.beginPath(); x.arc(ix, iy, eh * 0.5, 0, TAU); }], '18,12,10');
       own([function () { x.beginPath(); x.arc(ix - eh * 0.3, iy - eh * 0.32, eh * 0.2, 0, TAU); }], '250,246,236');   /* the catch-light */
-      x.strokeStyle = ink; x.lineWidth = 2.6 * lw;
+      x.strokeStyle = ink; x.lineWidth = (f.child ? 3.1 : 2.6) * lw;
       x.beginPath(); x.moveTo(e[0] - s * ew * 1.05, e[1] + eh * 0.25);
       x.quadraticCurveTo(e[0], e[1] - eh * (1.55 - (f.lids || 0) * 0.6), e[0] + s * ew * 1.12, e[1] + eh * 0.05); x.stroke();
       if (f.lashes) { x.lineWidth = 1.6 * lw; x.beginPath(); x.moveTo(e[0] + s * ew * 1.05, e[1]); x.lineTo(e[0] + s * ew * 1.35, e[1] - eh * 0.6); x.stroke(); }
@@ -286,8 +286,8 @@
     }
     /* the mouth: the parting line in ink, the lower lip a soft colour over the skin */
     var m = P(0, 0.47), mw = 0.2 * kx * (f.mouthW || 1), sm = (f.smile !== undefined ? f.smile : 0.5);
-    x.fillStyle = f.child ? 'rgba(214,140,128,0.55)' : 'rgba(214,140,128,1)';
-    x.beginPath(); x.ellipse(m[0], m[1] + (f.child ? 2.2 : 3.5) * lw, mw * (f.child ? 0.45 : 0.62), (f.child ? 1.8 : 3.6) * lw, 0, 0, TAU); x.fill();
+    x.fillStyle = f.child ? 'rgba(208,118,112,0.8)' : 'rgba(214,140,128,1)';
+    x.beginPath(); x.ellipse(m[0], m[1] + (f.child ? 2.2 : 3.5) * lw, mw * (f.child ? 0.55 : 0.62), (f.child ? 2.6 : 3.6) * lw, 0, 0, TAU); if (!f.age) x.fill();   /* a grown face under a moustache shows no lip, it read as a tongue */
     x.strokeStyle = 'rgba(110,52,44,1)'; x.lineWidth = 2.1 * lw;
     x.beginPath(); x.moveTo(m[0] - mw, m[1] - sm * 4 * lw); x.quadraticCurveTo(m[0], m[1] + sm * 6 * lw, m[0] + mw, m[1] - sm * 4 * lw); x.stroke();
     if (f.age) {   /* the lines from nose to mouth */
@@ -295,9 +295,9 @@
       [-1, 1].forEach(function (s) { var a = P(s * 0.17, 0.2), b = P(s * 0.25, 0.48); x.beginPath(); x.moveTo(a[0], a[1]); x.quadraticCurveTo(a[0] + s * 8 * lw, (a[1] + b[1]) / 2, b[0], b[1]); x.stroke(); });
     }
     if (f.freckles) {
-      x.fillStyle = 'rgba(170,100,70,1)';
+      x.fillStyle = 'rgba(176,112,84,0.55)';
       var r = (function (s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(f.freckles);
-      for (var i = 0; i < 40; i++) { var a2 = (r() - 0.5) * 0.9, b2 = 0.08 + r() * 0.3; if (Math.abs(a2) < 0.05) continue; var q2 = P(a2, b2); x.beginPath(); x.arc(q2[0], q2[1], (0.8 + r()) * lw, 0, TAU); x.fill(); }
+      for (var i = 0; i < 26; i++) { var a2 = (r() - 0.5) * 0.8, b2 = 0.06 + r() * 0.22; if (Math.abs(a2) < 0.05) continue; var q2 = P(a2, b2); x.beginPath(); x.arc(q2[0], q2[1], (0.45 + 0.6 * r()) * lw, 0, TAU); x.fill(); }
     }
     /* the painted shade: the lid's crease above each eye, the nose's side, under the lower lip */
     function shade(p, rx, ry, a) {
@@ -312,6 +312,13 @@
       var e = P(s * 0.36, -0.01), ew = 0.17 * kx * (f.eye || 1), eh = 0.075 * ky * (f.eye || 1);
       x.beginPath(); x.moveTo(e[0] - s * ew * 0.85, e[1] - eh * 1.25); x.quadraticCurveTo(e[0], e[1] - eh * 2.0, e[0] + s * ew * 0.95, e[1] - eh * 1.15); x.stroke();
     });
+    if (f.child) {   /* the painted look: the fringe's shadow on the brow, the temples and jaw turning away, the nose's bridge catching light */
+      shade(P(0, -0.34), 0.5 * kx, 0.09 * ky, 0.3);
+      [-1, 1].forEach(function (s) { shade(P(s * 0.62, 0.15), 0.12 * kx, 0.3 * ky, 0.3); shade(P(s * 0.3, 0.62), 0.2 * kx, 0.1 * ky, 0.18); });
+      var hb = P(0.0, 0.0), hg = x.createRadialGradient(hb[0], hb[1], 0, hb[0], hb[1], 1);
+      hg.addColorStop(0, 'rgba(255,236,220,0.35)'); hg.addColorStop(1, 'rgba(255,236,220,0)');
+      x.save(); x.translate(hb[0], hb[1]); x.scale(0.03 * kx, 0.11 * ky); x.translate(-hb[0], -hb[1]); x.fillStyle = hg; x.beginPath(); x.arc(hb[0], hb[1], 1, 0, TAU); x.fill(); x.restore();
+    }
     shade(P(0.07, 0.06), 0.035 * kx, 0.12 * ky, 0.2);
     shade(P(0, 0.56), 0.09 * kx, 0.03 * ky, 0.22);
     /* the chin and jaw, a fine shade line */
@@ -397,7 +404,7 @@
     pickett: { height: 1.86, robe: 0x2a2421, lining: 0x6e2a2e, coat: 0x5a3a48, waist: 0x8e7440, trousers: 0x37332f, skin: 0xd8ab90,
                hair: 0x2e2018, hat: true, hatCol: 0x2a2421, band: 0x6e2a2e, wand: true, moustache: true, goatee: true, slick: true,
                collar: 0xe6e0d2, cravat: 0x6e2a2e, shoe: 0x17120f,
-               face: { iris: '82,62,40', arch: 0.6, browW: 3.4, smile: 0.7, age: 1, lids: 0.25, blush: 0.35, mouthW: 0.9 } },
+               face: { iris: '82,62,40', arch: 0.6, browW: 3.4, smile: 0.7, age: 1, lids: 0.25, blush: 0.35, mouthW: 0.9, eye: 1.3 } },
     pupil: { height: 1.45, robe: 0x23201f, lining: HOUSES.gryffindor, coat: 0x8a8884, waist: 0x8a8884, trousers: 0x6e6c68, skin: 0xe8bfa0,
              hair: 0x5a3a22, hat: false, wand: true, collar: 0xeeeae0, cravat: HOUSES.gryffindor, shoe: 0x17120f,
              face: { smile: 0.6, blush: 0.5 } }
