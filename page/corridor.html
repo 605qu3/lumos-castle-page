@@ -2405,6 +2405,69 @@ function updateSnowball(dt) {
   } else snowball = null;
   snowTex.needsUpdate = true;
 }
+/* the snowball's splat on the pane (req 276, Events' grounds.snowball-splat, Godric's t1 on events-snowball-262: by day
+   while snow lies, at most once a week): the snowball above, the same packed ball, colours and pen line (Object
+   persistence; the dormitory's splatFly, req 277, draws it the same way), rises fast into a light of the grounds' window,
+   smacks flat into a round white splat about 22 cm across with a few flecks, and slides slowly down the pane, thinning,
+   until it is gone. It strikes no higher than the thrown snowball peaks, so the lump stuck high (snowLump) stays the
+   only snow up there. Its own canvas over the thrown one's, so the two never wipe each other; lumosGreybox.splat()
+   throws one for a shot, ?splat one every few seconds */
+var splat = null, splatLook = groundsQ.has('splat'), splatNext = 3, splatCanvas = null, splatTex = null;
+var SPLAT_PX = 720;   /* three times the thrown one's, so the splat's pen line stays crisp up close */
+function splatFly() {
+  if (splat) return false;
+  if (!splatCanvas) {
+    var sky = groundsWin.sky, gw = GROUNDS.w, gh = sky.geometry.parameters.height;
+    splatCanvas = makeCanvas(SPLAT_PX, Math.round(SPLAT_PX * gh / gw)); splatTex = tex(splatCanvas);
+    var m = new THREE.Mesh(new THREE.PlaneGeometry(gw, gh), new THREE.MeshBasicMaterial({ map: splatTex, transparent: true, depthWrite: false }));
+    m.position.z = 0.005; m.renderOrder = 6; m.name = 'grounds-splat'; sky.add(m);
+  }
+  var flecks = [];
+  for (var i = 0; i < 7; i++) flecks.push({ a: Math.random() * Math.PI * 2, d: 1.15 + Math.random() * 0.5, k: 0.12 + Math.random() * 0.14 });
+  splat = { t: 0, rise: 0.45, slide: 9, x: (Math.random() < 0.5 ? 0.27 : 0.73) + (Math.random() - 0.5) * 0.08,   /* inside one light */
+    y: 0.55 + 0.15 * Math.random(), flecks: flecks };
+  return true;
+}
+function updateSplat(dt) {
+  if (splatLook && !splat && (splatNext -= dt) <= 0) { splatNext = 12; splatFly(); }
+  if (!splat) return;
+  var s = splat, g = splatCanvas.getContext('2d'), w = splatCanvas.width, h = splatCanvas.height, r = w * 0.14 / GROUNDS.w / 2;
+  s.t += dt;
+  g.clearRect(0, 0, w, h);
+  var x = s.x * w, y0 = s.y * h;
+  if (s.t < s.rise) {                                /* up from below, fast, straight at the glass */
+    var u = s.t / s.rise, ry = h + r - (h + r - y0) * (1 - (1 - u) * (1 - u)), rr = r * (0.8 + 0.2 * u);
+    var grd = g.createRadialGradient(x - rr * 0.35, ry - rr * 0.35, rr * 0.15, x, ry, rr);
+    grd.addColorStop(0, '#fbfcfe'); grd.addColorStop(0.6, '#e6eaf1'); grd.addColorStop(1, '#b9c2d0');
+    g.fillStyle = grd; g.beginPath();
+    for (var i = 0; i <= 10; i++) {
+      var a = i / 10 * Math.PI * 2, k = rr * (0.92 + 0.08 * Math.sin(i * 2.7));
+      if (i) g.lineTo(x + k * Math.cos(a), ry + k * Math.sin(a)); else g.moveTo(x + k, ry);
+    }
+    g.fill(); g.strokeStyle = '#6f7a8c'; g.lineWidth = 3.5; g.stroke();
+  } else {
+    var v = Math.min(1, (s.t - s.rise) / s.slide), fall = v * v * (h - y0 + r * 2) * 0.9, y = y0 + fall;
+    var fade = v < 0.7 ? 1 : 1 - (v - 0.7) / 0.3, R = r * 1.55;
+    g.globalAlpha = 0.55 * fade;                     /* the wet track it leaves behind as it slides */
+    g.fillStyle = '#e6eaf1'; g.fillRect(x - R * 0.55, y0, R * 1.1, fall);
+    g.globalAlpha = fade;
+    var grd2 = g.createRadialGradient(x - R * 0.2, y - R * 0.25, R * 0.1, x, y, R);
+    grd2.addColorStop(0, '#fbfcfe'); grd2.addColorStop(0.7, '#e6eaf1'); grd2.addColorStop(1, '#c9d0db');
+    g.fillStyle = grd2; g.beginPath();
+    for (var j = 0; j <= 42; j++) {                  /* flattened on the glass: round, its edge ragged */
+      var b = j / 42 * Math.PI * 2, q = R * (0.93 + 0.04 * Math.sin(b * 5 + 1) + 0.03 * Math.sin(b * 9) + 0.02 * Math.sin(b * 13 + 2));
+      if (j) g.lineTo(x + q * Math.cos(b), y + q * Math.sin(b) * (1 + v * 0.25)); else g.moveTo(x + q, y);
+    }
+    g.closePath(); g.fill(); g.strokeStyle = '#6f7a8c'; g.lineWidth = 3.5; g.stroke();
+    s.flecks.forEach(function (f) {                  /* flecks thrown out at the smack, sliding with it a little */
+      g.fillStyle = '#eef1f6';
+      g.beginPath(); g.arc(x + Math.cos(f.a) * R * f.d, y0 + Math.sin(f.a) * R * f.d + fall * 0.4, R * f.k, 0, Math.PI * 2); g.fill();
+    });
+    g.globalAlpha = 1;
+    if (v >= 1) { g.clearRect(0, 0, w, h); splat = null; }
+  }
+  splatTex.needsUpdate = true;
+}
 /* a bewitched snowball (Godric's touch on Q30, 11 October 2026: "Fred and George ... bewitching several snowballs so
    that they followed Quirrell around, bouncing off the back of his turban", PS 12): by day while snow lies, now and then
    at the window's stop a student runs across the far lawn with a snowball hunting him a little behind and above, it turns
@@ -3151,6 +3214,9 @@ function doorSwings(sound) {
    The offer covers the page, so it goes by itself after LOCK_WAIT_S quiet seconds since his last touch (openLock's
    wait, the vocabulary's §9; req 220; 12, as the hump and the common room, req 224), never midway through a turn */
 var LOCK_WAIT_S = 12, lockOffer = null, lockV = new THREE.Vector3();
+/* ?alohomora treats the spell as learned for this visit only, writing nothing to the device, so an Apparate url can
+   stage the door's huff (req 704); nothing else sets it */
+function knowsAlohomora() { return groundsQ.has('alohomora') || !!(window.LumosSpells && LumosSpells.learned('alohomora')); }
 function lockAt(uv) { return uv && Math.hypot((uv.x - LOCK.u) * DOOR.w, (uv.y - LOCK.v) * DOOR.h) < LOCK.r; }
 function lockOnScreen() {
   door.updateMatrixWorld();
@@ -4889,7 +4955,7 @@ function tap(cx, cy) {
     lastTickle = atDoor ? tickleAt(hits[0].uv) : null;   /* none from afar, so no tickle record fires on the walk-up */
     /* on its lock, once he has Alohomora, his spell (req 154): no tickle, so no record giggles, but the tap is still
        told, so the ear for please opens; the week's spot wins where the two meet */
-    if (atDoor && !lastTickle.hit && lockAt(hits[0].uv) && window.LumosSpells && LumosSpells.learned('alohomora')) {
+    if (atDoor && !lastTickle.hit && lockAt(hits[0].uv) && knowsAlohomora()) {
       lastTickle = null;
       if (castle && castle.visit()) castle.tap('polite door');
       lockOffered(); said(true); return;
@@ -4911,7 +4977,7 @@ function tap(cx, cy) {
       said(true); return;
     }
     tell('broom cupboard');
-    if (cupboard.ang < 0.1 && cupboardLockAt(hits[0].uv) && window.LumosSpells && LumosSpells.learned('alohomora')) cupboardLockOffered();
+    if (cupboard.ang < 0.1 && cupboardLockAt(hits[0].uv) && knowsAlohomora()) cupboardLockOffered();
     else if (cupboard.ang < 0.1) cupboardRattle();
     said(true); return;
   }
@@ -5914,6 +5980,7 @@ var castle = window.CastleEvents ? CastleEvents.start({
     'the door swings open with a dignified creak on what is behind it, then shuts itself after a few seconds': function () { doorSwings('a dignified creak'); },
     /* the grounds (req 115, Events' grounds.json): the snowball; the field and the lake are not in this window's view */
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
+    'a snowball smacks into the glass, a round white splat that slides slowly down the pane': function () { splatFly(); },
     /* the leaning torch and his deathday (req 131, castle.js's torchCues; Events' req 132) */
     "a corridor torch's flame leans and dips blue for a moment, then burns gold again": function () { leanATorch(); },
     /* the blue minute, CoS 8 staged as an effect, set aside (Rework 7); the black candle stub is its trace */
@@ -6270,7 +6337,7 @@ function frame() {
   updateHerPatches(wdt);
   updateKnit();
   updateGrounds(wdt);
-  updateSnowball(wdt);
+  updateSnowball(wdt); updateSplat(wdt);
   updateNick(wdt);
   updateNickHome(wdt);
   updateCupboard(wdt);
@@ -6342,7 +6409,7 @@ window.lumosGreybox = { runtime: function () { return castle; }, suit: function 
   yaw: function () { return yaw; }, yawTarget: function () { return yawT; },
   enter: enter, herDoor: herDoor, herArm: setHerArm, primp: primpHer, herPatch: herPatch, cake: setHerCake, grounds: { cross: function () { grounds.crossing = { t: 0, dur: 10 }; }, state: function () { return { pumpkinR: pumpkinR(), washing: washing(), wind: groundsWind(), crossing: !!grounds.crossing, hut: +hutK().toFixed(2) }; } }, events: castle, mapPlay: mapPlay, armour: armour, sticks: sticks, openDoor: openDoor, setGlimpse: setGlimpse, doorLeaf: doorLeaf, lock: function () { return { offer: lockOffer, at: lockOnScreen() }; }, offerLock: lockOffered, firstCast: firstCast,
   tickle: { spot: tickleSpot, last: function () { return lastTickle; }, door: door },
-  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
+  sizeLandingWindow: sizeLandingWindow, trevor: trevorHit, trevorMarks: TREVOR_MARKS, paintingSitter: setPaintingSitter, oppMoment: oppMoment, snowball: function () { snowballFly(); return !!snowball; }, splat: splatFly, bewitched: function () { bewitchedGo(); return !!BEWITCHED.run; }, galleryVisitor: setGalleryVisitor, drawRoom: corridorDrawRoom, lookBack: function () { lookBack.asked = true; goBack(); }, stair: { step: vanishingStep, down: goDownStair, foot: function () { return footNamed; } },
   /* her landing (req 178), for Charms' callable (req 163) and req 180: her card, her stop, the plinth and its back face */
   witch: function () { var s = STOPS.filter(function (x) { return x.name === 'witch'; })[0];
     return { card: witchCard, plinth: witchPlinth, landing: witchLanding, stop: s.stop(), shown: footShown === 'witch',
