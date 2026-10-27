@@ -107,7 +107,7 @@
       pcard = new THREE.Mesh(new THREE.PlaneGeometry(0.556, 1.51), new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.4, color: night ? 0x9a7a5a : 0xe0dcd4 }));
       var c0 = chair(2.3, 6.0, 0.325); pcard.position.set(c0[0], 0.755, c0[2] + 0.15); scene.add(pcard);
     });
-    new THREE.TextureLoader().load('../../assets/layers/electives-teachers.png', function (t) {
+    if (showP) new THREE.TextureLoader().load('../../assets/layers/electives-teachers.png', function (t) {
       t.encoding = THREE.sRGBEncoding; t.repeat.set(505 / 3030, 1); t.offset.set(1515 / 3030, 0);
       card = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 1.865), new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.4, color: night ? 0x9a7a5a : 0xe0dcd4 }));
       var at = view === 'desk' ? [5.7, -8.6] : act === 'still' ? [3.3, -8.0] : [3.1, -8.4];

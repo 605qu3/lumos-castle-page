@@ -134,9 +134,10 @@
   }
 
   /* ---- the pen: the castle's ink hatched into the shade, as the drawn figures are shaded ----
-     The light a point takes, against its own colour, sets how much: one set of strokes in the half shade, crossed in the
-     deep. The strokes run on the figure's own body (its rest pose), so they stay on the cloth as he moves, and thin
-     out where they would be finer than a pixel */
+     Only where the room's first light (a window's sun, else a candle) turns away from the cloth: one set of strokes past
+     the edge of the light, crossed deeper in; never on the skin. The strokes run on the figure's own body (its rest
+     pose), so they stay on the cloth as he moves; each thins to nothing, not to a pixel's grey, and they fade out where
+     they would be finer than a pixel */
   function pen(mat, density) {
     mat.extensions = { derivatives: true };
     var prev = mat.onBeforeCompile;
@@ -146,12 +147,18 @@
         sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvObj = position; vPen = aPen;');
       sh.fragmentShader = 'varying vec3 vObj;\nvarying float vPen;\n' +
         'float strokes(float c, float t) { float d = abs(fract(c + 0.5) - 0.5), w = fwidth(c);\n' +
-        '  return (1.0 - smoothstep(t - w, t + w, d)) * (1.0 - smoothstep(0.22, 0.45, w)); }\n' +
+        '  return (1.0 - smoothstep(max(t - w, 0.0), t + w, d)) * smoothstep(0.0, w, t) * (1.0 - smoothstep(0.22, 0.45, w)); }\n' +
         sh.fragmentShader.replace('#include <dithering_fragment>', [
           '#include <dithering_fragment>',
-          'float lum = dot(outgoingLight, vec3(0.299, 0.587, 0.114)) / max(0.02, dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)));',
-          'float hard = vPen < 0.5 ? 0.0 : vPen < 1.5 ? 1.0 : vPen < 2.5 ? 0.15 : 0.7;',
-          'float t1 = clamp((0.5 - lum) * 0.5, 0.0, 0.2) * hard, t2 = clamp((0.3 - lum) * 0.55, 0.0, 0.18) * hard;',
+          'vec3 toL = normalize(vec3(-0.5, 0.6, 0.6));',
+          '#if NUM_DIR_LIGHTS > 0',
+          'toL = directionalLights[0].direction;',
+          '#elif NUM_POINT_LIGHTS > 0',
+          'toL = normalize(pointLights[0].position + vViewPosition);',
+          '#endif',
+          'float nl = dot(normalize(normal), toL);',
+          'float hard = vPen < 0.5 ? 0.0 : vPen < 1.5 ? 1.0 : vPen < 2.5 ? 0.0 : 0.6;',
+          'float t1 = clamp((0.0 - nl) * 0.45, 0.0, 0.16) * hard, t2 = clamp((-0.45 - nl) * 0.5, 0.0, 0.14) * hard;',
           'float c1 = (vObj.x * 0.62 + vObj.y + vObj.z * 0.48) * ' + density.toFixed(1) + ';',
           'float c2 = (-vObj.x * 0.7 + vObj.y * 0.55 - vObj.z * 0.6) * ' + (density * 0.9).toFixed(1) + ';',
           'float h = max(strokes(c1, t1), strokes(c2, t2));',
@@ -172,28 +179,33 @@
   function drawFace(x, X, Y, W, H, f) {
     var kx = W / TAU, ky = H / Math.PI, cx = X + W * 0.25, cy = Y + H * 0.5;
     function P(a, b) { return [cx + a * kx, cy + b * ky]; }
+    /* a colour of its own: the region cleared and filled faint, so its alpha stays under the half that marks skin */
+    function own(paths, rgb) {
+      x.save(); paths.forEach(function (p) { p(); x.clip(); });
+      x.clearRect(X, Y, W, H); x.fillStyle = 'rgba(' + rgb + ',0.3)'; x.fillRect(X, Y, W, H); x.restore();
+    }
     x.save(); x.beginPath(); x.rect(X, Y, W, H); x.clip();
     x.fillStyle = '#ffffff'; x.fillRect(X, Y, W, H);
     x.lineCap = 'round'; x.lineJoin = 'round';
-    var lw = W / 512, ink = 'rgba(70,42,30,1)', soft = 'rgba(150,100,82,1)';
+    var px = W / 512, lw = px * (f.bold || 1.7), ink = 'rgba(52,30,22,1)', soft = 'rgba(128,80,64,1)';   /* lines bold enough to read at a boy's desk */
     /* the cheeks' warmth and the shade under the brow and beside the nose: over the skin */
     [-1, 1].forEach(function (s) {
-      var p = P(s * 0.5, 0.3), g = x.createRadialGradient(p[0], p[1], 1, p[0], p[1], 22 * lw);
+      var p = P(s * 0.5, 0.3), g = x.createRadialGradient(p[0], p[1], 1, p[0], p[1], 22 * px);
       g.addColorStop(0, 'rgba(232,168,150,' + (f.blush || 0.5) + ')'); g.addColorStop(1, 'rgba(232,168,150,0)');
-      x.fillStyle = g; x.fillRect(p[0] - 30 * lw, p[1] - 30 * lw, 60 * lw, 60 * lw);
-      var e = P(s * 0.38, -0.08), g2 = x.createRadialGradient(e[0], e[1], 2, e[0], e[1], 16 * lw);
+      x.fillStyle = g; x.fillRect(p[0] - 30 * px, p[1] - 30 * px, 60 * px, 60 * px);
+      var e = P(s * 0.38, -0.08), g2 = x.createRadialGradient(e[0], e[1], 2, e[0], e[1], 16 * px);
       g2.addColorStop(0, 'rgba(205,160,140,0.55)'); g2.addColorStop(1, 'rgba(205,160,140,0)');
-      x.fillStyle = g2; x.fillRect(e[0] - 20 * lw, e[1] - 20 * lw, 40 * lw, 40 * lw);
+      x.fillStyle = g2; x.fillRect(e[0] - 20 * px, e[1] - 20 * px, 40 * px, 40 * px);
     });
     /* the eyes: the white and the iris their own colours; the upper lid in ink, heavier, the lower a fine line */
     [-1, 1].forEach(function (s) {
-      var e = P(s * 0.37, -0.01), ew = 0.15 * kx, eh = 0.055 * ky;
-      x.fillStyle = 'rgba(236,230,218,0.3)';
-      x.beginPath(); x.ellipse(e[0], e[1], ew, eh, 0, 0, TAU); x.fill();
-      x.fillStyle = 'rgba(' + (f.iris || '88,60,38') + ',0.3)';
-      x.beginPath(); x.arc(e[0] + s * (f.look || 0) * ew * 0.3, e[1] + eh * 0.12, eh * 0.95, 0, TAU); x.fill();
-      x.fillStyle = 'rgba(18,12,10,0.3)';
-      x.beginPath(); x.arc(e[0] + s * (f.look || 0) * ew * 0.3, e[1] + eh * 0.12, eh * 0.42, 0, TAU); x.fill();
+      var e = P(s * 0.36, -0.01), ew = 0.17 * kx, eh = 0.075 * ky;
+      var ix = e[0] + s * (f.look || 0) * ew * 0.3, iy = e[1] + eh * 0.12;
+      function eye() { x.beginPath(); x.ellipse(e[0], e[1], ew, eh, 0, 0, TAU); }
+      own([eye], '236,230,218');
+      own([eye, function () { x.beginPath(); x.arc(ix, iy, eh * 0.95, 0, TAU); }], f.iris || '88,60,38');
+      own([eye, function () { x.beginPath(); x.arc(ix, iy, eh * 0.5, 0, TAU); }], '18,12,10');
+      own([function () { x.beginPath(); x.arc(ix - eh * 0.3, iy - eh * 0.32, eh * 0.2, 0, TAU); }], '250,246,236');   /* the catch-light */
       x.strokeStyle = ink; x.lineWidth = 2.6 * lw;
       x.beginPath(); x.moveTo(e[0] - s * ew * 1.05, e[1] + eh * 0.25);
       x.quadraticCurveTo(e[0], e[1] - eh * (1.55 - (f.lids || 0) * 0.6), e[0] + s * ew * 1.12, e[1] + eh * 0.05); x.stroke();
@@ -205,7 +217,7 @@
         x.beginPath(); x.moveTo(e[0] + s * ew * 1.35, e[1] + eh * 0.2); x.lineTo(e[0] + s * ew * 1.7, e[1] + eh * 0.6); x.stroke();
       }
       /* the brow */
-      var b = P(s * 0.38, -0.26 - (f.arch || 0) * 0.04);
+      var b = P(s * 0.37, -0.2 - (f.arch || 0) * 0.04);
       x.strokeStyle = f.brow || 'rgba(60,38,26,1)'; x.lineWidth = (f.browW || 3.2) * lw;
       x.beginPath(); x.moveTo(b[0] - s * ew * 1.0, b[1] + eh * 0.5); x.quadraticCurveTo(b[0], b[1] - eh * (0.8 + (f.arch || 0)), b[0] + s * ew * 1.15, b[1] + eh * 0.4); x.stroke();
     });
@@ -239,6 +251,7 @@
   function canvasTex(c) {
     var t = new THREE.CanvasTexture(c);
     t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+    t.minFilter = THREE.LinearFilter; t.generateMipmaps = false;   /* no mip levels: they blurred the eyes' own colours into the skin's */
     return t;
   }
 
@@ -246,23 +259,23 @@
      skin, hair, hairCap (the cap's own colour or slot), long, curly, moustache, goatee, hat, hatCol, band, slick } */
   function head(kit, c, r, o, bone) {
     var skin = o.skin, hair = o.hair, cap = o.hairCap || hair;
-    kit.add(new THREE.SphereGeometry(r, 24, 16), M(c.x, c.y, c.z, 0, 0, 0, 0.88, 1.08, 0.96), skin, bone, { face: true, pen: 2 });
-    kit.add(new THREE.SphereGeometry(r * 0.52, 12, 8), M(c.x, c.y - r * 0.52, c.z + r * 0.16, 0, 0, 0, 1.12, 0.82, 1.1), skin, bone, { pen: 2 });   /* the jaw */
+    kit.add(new THREE.SphereGeometry(r, 18, 12), M(c.x, c.y, c.z, 0, 0, 0, 0.84, 1.13, 0.96), skin, bone, { face: true, pen: 2 });
+    kit.add(new THREE.SphereGeometry(r * 0.52, 10, 6), M(c.x, c.y - r * 0.52, c.z + r * 0.16, 0, 0, 0, 1.12, 0.82, 1.1), skin, bone, { pen: 2 });   /* the jaw */
     kit.add(new THREE.SphereGeometry(r * 0.13, 8, 6), M(c.x, c.y - r * 0.12, c.z + r * 0.9, 0.35, 0, 0, 0.8, 1.6, 1.0), skin, bone, { pen: 2 });   /* the nose */
     [-1, 1].forEach(function (s) {
       kit.add(new THREE.SphereGeometry(r * 0.21, 8, 6), M(c.x + s * r * 0.87, c.y - r * 0.06, c.z - r * 0.02, 0, s * 0.3, 0, 0.42, 1, 0.72), skin, bone, { pen: 2 });
     });
     /* the hair: a cap tipped back so the brow is clear and the nape covered; slicked, curly or with a fall behind */
-    var capG = new THREE.SphereGeometry(r * 1.07, 22, 10, 0, TAU, 0, Math.PI * 0.56), capM = M(c.x, c.y + r * 0.05, c.z - r * 0.04, -0.42, 0, 0, 0.93, o.slick ? 0.98 : 1.06, 1.0);
+    var capG = new THREE.SphereGeometry(r * 1.07, 14, 7, 0, TAU, 0, Math.PI * 0.56), capM = M(c.x, c.y + r * 0.05, c.z - r * 0.04, -0.42, 0, 0, 0.93, o.slick ? 0.98 : 1.06, 1.0);
     kit.add(capG, capM, cap, bone, { pen: 3 });
     if (o.curly) {
-      var cg = new THREE.SphereGeometry(r * 1.13, 26, 14, 0, TAU, 0, Math.PI * 0.62);
+      var cg = new THREE.SphereGeometry(r * 1.13, 20, 10, 0, TAU, 0, Math.PI * 0.62);
       kit.add(cg, M(c.x, c.y + r * 0.08, c.z - r * 0.06, -0.38, 0, 0, 0.98, 1.08, 1.04), o.curly, bone, { pen: 3, deform: function (w) {
         var k = 1 + 0.07 * Math.sin(w.x * 90) * Math.sin(w.y * 85) * Math.sin(w.z * 95 + 1.3); w.multiplyScalar(k);
       } });
     }
     if (o.long) {
-      kit.add(new THREE.SphereGeometry(r, 16, 12), M(c.x, c.y - r * 0.5, c.z - r * 0.48, 0.12, 0, 0, 1.0, 1.35, 0.6), o.long, bone, { pen: 3 });
+      kit.add(new THREE.SphereGeometry(r, 12, 8), M(c.x, c.y - r * 0.5, c.z - r * 0.48, 0.12, 0, 0, 1.0, 1.35, 0.6), o.long, bone, { pen: 3 });
       [-1, 1].forEach(function (s) { kit.add(new THREE.SphereGeometry(r * 0.32, 10, 8), M(c.x + s * r * 0.84, c.y - r * 0.45, c.z - r * 0.12, 0, 0, s * 0.1, 0.6, 2.0, 0.9), o.long, bone, { pen: 3 }); });
       for (var k = 0; k < 5; k++) {   /* a plait down the back, as the drawn girl's */
         kit.add(new THREE.SphereGeometry(r * 0.2, 8, 6), M(c.x + r * 0.08, c.y - r * (1.25 + k * 0.32), c.z - r * (0.62 - k * 0.04), 0.3, 0, (k % 2 ? 0.4 : -0.4), 0.85, 1.2, 0.8), o.long, bone, { pen: 3 });
@@ -271,15 +284,15 @@
     if (o.moustache) {   /* waxed, the ends curled up: a showman's */
       [-1, 1].forEach(function (s) {
         var cv = new THREE.CatmullRomCurve3([V(c.x, c.y - r * 0.33, c.z + r * 0.97), V(c.x + s * r * 0.3, c.y - r * 0.4, c.z + r * 0.9),
-          V(c.x + s * r * 0.58, c.y - r * 0.3, c.z + r * 0.74), V(c.x + s * r * 0.66, c.y - r * 0.1, c.z + r * 0.66)]);
-        kit.add(new THREE.TubeGeometry(cv, 12, r * 0.055, 6, false), null, hair, bone, { pen: 3 });
+          V(c.x + s * r * 0.46, c.y - r * 0.34, c.z + r * 0.8), V(c.x + s * r * 0.54, c.y - r * 0.18, c.z + r * 0.74)]);
+        kit.add(new THREE.TubeGeometry(cv, 8, r * 0.055, 5, false), null, hair, bone, { pen: 3 });
       });
     }
     if (o.goatee) kit.add(new THREE.ConeGeometry(r * 0.16, r * 0.5, 10), M(c.x, c.y - r * 0.98, c.z + r * 0.6, Math.PI - 0.38, 0, 0), hair, bone, { pen: 3 });
     if (o.hat) {   /* the pointed hat, its crown a little crumpled, its tip bent back, a band round it */
       var hb = c.y + r * 0.6, hc = o.hatCol;
-      kit.add(new THREE.CylinderGeometry(r * 1.85, r * 1.9, r * 0.06, 28), M(c.x, hb, c.z - r * 0.05, -0.1, 0, 0), hc, bone, { deform: function (w) { w.y += 0.012 * Math.sin(Math.atan2(w.x, w.z) * 3); } });
-      kit.add(new THREE.CylinderGeometry(r * 0.34, r * 1.04, r * 2.1, 18, 4, true), M(c.x, hb + r * 1.05, c.z - r * 0.12, -0.12, 0, 0), hc, bone,
+      kit.add(new THREE.CylinderGeometry(r * 1.85, r * 1.9, r * 0.06, 20), M(c.x, hb, c.z - r * 0.05, -0.1, 0, 0), hc, bone, { deform: function (w) { w.y += 0.012 * Math.sin(Math.atan2(w.x, w.z) * 3); } });
+      kit.add(new THREE.CylinderGeometry(r * 0.34, r * 1.04, r * 2.1, 14, 3, true), M(c.x, hb + r * 1.05, c.z - r * 0.12, -0.12, 0, 0), hc, bone,
               { deform: function (w) { var a = Math.atan2(w.x, w.z); w.x *= 1 + 0.05 * Math.sin(a * 5 + w.y * 30); w.z *= 1 + 0.05 * Math.sin(a * 5 + w.y * 30); } });
       kit.add(new THREE.CylinderGeometry(0, r * 0.35, r * 1.35, 12, 2, true), M(c.x, hb + r * 2.48, c.z - r * 0.58, -0.66, 0, 0.08), hc, bone);
       if (o.band !== undefined) kit.add(new THREE.CylinderGeometry(r * 0.99, r * 1.05, r * 0.24, 18, 1, true), M(c.x, hb + r * 0.16, c.z - r * 0.06, -0.12, 0, 0), o.band, bone);
@@ -287,9 +300,9 @@
   }
   /* the hood, down on the back of the shoulders: a soft fold of the robe, its lining along the rim */
   function hood(kit, y, w, robe, lining, bone) {
-    kit.add(new THREE.SphereGeometry(1, 18, 10, 0, TAU, Math.PI * 0.35, Math.PI * 0.65), M(0, y - w * 0.32, -w * 0.64, 0.25, 0, 0, w * 0.8, w * 0.95, w * 0.42), robe, bone,
+    kit.add(new THREE.SphereGeometry(1, 12, 6, 0, TAU, Math.PI * 0.35, Math.PI * 0.65), M(0, y - w * 0.32, -w * 0.64, 0.25, 0, 0, w * 0.8, w * 0.95, w * 0.42), robe, bone,
             { deform: function (p) { p.x *= 1 + 0.06 * Math.sin(p.y * 9); } });
-    kit.add(new THREE.TorusGeometry(1, 0.1, 6, 22, Math.PI), M(0, y + w * 0.06, -w * 0.52, Math.PI * 0.5 + 0.35, 0, Math.PI, w * 0.78, w * 0.62, w * 0.62), lining, bone);
+    kit.add(new THREE.TorusGeometry(1, 0.1, 5, 14, Math.PI), M(0, y + w * 0.06, -w * 0.52, Math.PI * 0.5 + 0.35, 0, Math.PI, w * 0.78, w * 0.62, w * 0.62), lining, bone);
   }
 
   /* ---- the standing figure ---- */
@@ -324,12 +337,12 @@
     [[-1, B.footL], [1, B.footR]].forEach(function (f) {
       kit.add(between(V(f[0] * 0.085, 0.07, 0.02), V(f[0] * 0.09, 0.92, 0), 0.052, 0.075, 10), null, L.trousers, function (y) {
         return y < 0.12 ? [f[1], 0, 1] : y < 0.85 ? [f[1], B.hips, 1 - (y - 0.12) / 0.73] : [B.hips, 0, 1]; });
-      kit.add(new THREE.SphereGeometry(0.05, 12, 8), M(f[0] * 0.085, 0.036, 0.1, 0, 0, 0, 1, 0.72, 2.4), L.shoe, f[1], { deform: function (p) { if (p.y < -0.02) p.y = -0.02; } });
+      kit.add(new THREE.SphereGeometry(0.05, 10, 6), M(f[0] * 0.085, 0.036, 0.1, 0, 0, 0, 1, 0.72, 2.4), L.shoe, f[1], { deform: function (p) { if (p.y < -0.02) p.y = -0.02; } });
     });
     /* the frock coat beneath (to the knee), the waistcoat at its front with a row of buttons, the collar and cravat */
     var coatProf = [[0.001, 0.5], [0.19, 0.49], [0.18, 0.7], [0.16, 0.9], [0.15, 1.02], [0.165, 1.18], [0.18, 1.3], [0.178, 1.4],
                     [0.15, 1.46], [0.09, 1.5], [0.06, 1.53]].map(function (q) { return new THREE.Vector2(q[0], q[1]); });
-    kit.add(new THREE.LatheGeometry(coatProf, 32), M(0, 0, 0, 0, 0, 0, 1, 1, 0.7), function (v) {
+    kit.add(new THREE.LatheGeometry(coatProf, 20), M(0, 0, 0, 0, 0, 0, 1, 1, 0.7), function (v) {
       var a = Math.abs(Math.atan2(v.x, v.z / 0.7));
       if (a < 0.42 && v.y > 0.9 && v.y < 1.45) return L.waist;
       return L.coat;
@@ -344,23 +357,23 @@
     /* the robe, open down the front, hung in folds; the fronts turned back on the lining; the lining within */
     var rows = [[0.07, 0.272, 0.36, 1], [0.3, 0.256, 0.34, 0.9], [0.6, 0.228, 0.3, 0.65], [0.9, 0.2, 0.27, 0.35], [1.05, 0.194, 0.26, 0.2],
                 [1.2, 0.203, 0.25, 0.08], [1.32, 0.214, 0.26, 0], [1.4, 0.21, 0.3, 0], [1.46, 0.182, 0.42, 0], [1.5, 0.125, 0.6, 0], [1.53, 0.08, 0.8, 0]];
-    kit.add(robeShell(rows, 56, 0.68, 1, false), null, function (v, u) { return (u < 0.035 || u > 0.965) ? lining : robe; }, bodyW);
-    kit.add(robeShell(rows, 56, 0.68, 1, true), null, lining, bodyW, { pen: 1 });
+    kit.add(robeShell(rows, 34, 0.68, 1, false), null, function (v, u) { return (u < 0.035 || u > 0.965) ? lining : robe; }, bodyW);
+    kit.add(robeShell(rows, 34, 0.68, 1, true), null, lining, bodyW, { pen: 1 });
     hood(kit, 1.39, 0.2, robe, lining, B.spine);
     /* the arms: the robe's sleeve to the elbow and its bell to the wrist, lined; within, the coat's sleeve, the shirt's
        cuff and the hand; the wand in the right, pointing ahead */
     [[-1, B.shL, B.elL], [1, B.shR, B.elR]].forEach(function (a) {
       var s = a[0], sh = V(s * 0.19, 1.41, 0), el = V(s * 0.215, 1.13, 0.0), wr = V(s * 0.215, 0.87, 0.03), bell = V(s * 0.218, 0.9, 0.028);
       kit.add(between(sh, el, 0.062, 0.068, 12), null, robe, a[1]);
-      kit.add(new THREE.SphereGeometry(0.068, 12, 8), M(el.x, el.y, el.z), robe, a[1]);
-      var bg = between(el, bell, 0.068, 0.118, 16, true);
+      kit.add(new THREE.SphereGeometry(0.068, 10, 6), M(el.x, el.y, el.z), robe, a[1]);
+      var bg = between(el, bell, 0.068, 0.118, 12, true);
       kit.add(bg, null, robe, a[2], { deform: function (p) { var d = Math.max(0, (1.1 - p.y) / 0.2); p.x += s * 0.01 * d * Math.sin(p.z * 60); } });
-      kit.add(flip(between(el, bell, 0.064, 0.112, 16, true)), null, lining, a[2]);
+      kit.add(flip(between(el, bell, 0.064, 0.112, 12, true)), null, lining, a[2]);
       kit.add(between(V(el.x, el.y - 0.05, el.z), V(wr.x, wr.y + 0.01, wr.z), 0.045, 0.04, 10), null, L.coat, a[2]);
       kit.add(new THREE.CylinderGeometry(0.042, 0.042, 0.022, 12, 1, true), M(wr.x, wr.y + 0.005, wr.z), L.collar, a[2]);
       /* the hand: the palm and the fingers together, the thumb forward */
-      kit.add(new THREE.SphereGeometry(0.044, 12, 8), M(wr.x, wr.y - 0.055, wr.z + 0.008, 0, 0, s * 0.1, 0.62, 1.25, 0.95), L.skin, a[2], { pen: 2 });
-      kit.add(new THREE.SphereGeometry(0.016, 8, 6), M(wr.x - s * 0.006, wr.y - 0.04, wr.z + 0.035, 0.5, 0, 0, 0.8, 1.7, 0.9), L.skin, a[2], { pen: 2 });
+      kit.add(new THREE.SphereGeometry(0.044, 10, 6), M(wr.x, wr.y - 0.055, wr.z + 0.008, 0, 0, s * 0.1, 0.62, 1.25, 0.95), L.skin, a[2], { pen: 2 });
+      kit.add(new THREE.SphereGeometry(0.016, 6, 4), M(wr.x - s * 0.006, wr.y - 0.04, wr.z + 0.035, 0.5, 0, 0, 0.8, 1.7, 0.9), L.skin, a[2], { pen: 2 });
       if (s > 0 && L.wand) {
         var w0 = V(wr.x, wr.y - 0.07, wr.z - 0.02), w1 = V(wr.x, wr.y - 0.12, wr.z + 0.33);
         kit.add(between(w0, w1, 0.009, 0.0045, 6), null, function (v) { return v.z < wr.z + 0.06 ? 0x3a2418 : 0x7a5e44; }, a[2], { pen: 0 });
@@ -493,7 +506,7 @@
     /* the jumper: its V at the front, the house's stripe round the V and at the waist; the shirt and tie in the V */
     var prof = [[0.001, 0.44], [0.16, 0.44], [0.158, 0.54], [0.15, 0.66], [0.155, 0.78], [0.152, 0.86], [0.12, 0.905], [0.06, 0.935]]
       .map(function (q) { return new THREE.Vector2(q[0], q[1]); });
-    kit.add(new THREE.LatheGeometry(prof, 32), M(0, 0, -0.02, 0, 0, 0, 1, 1, 0.7), function (v) {
+    kit.add(new THREE.LatheGeometry(prof, 20), M(0, 0, -0.02, 0, 0, 0, 1, 1, 0.7), function (v) {
       var a = Math.abs(Math.atan2(v.x, (v.z + 0.02) / 0.7)), vy = 0.93 - a * 0.42;
       if (v.y > vy + 0.02) return shirt;
       if (v.y > vy - 0.012) return TR;
@@ -507,8 +520,8 @@
     /* the robe, open down the front, hung from the shoulders over the chair's seat, lined in the house's colour */
     var rows = [[0.3, 0.215, 0.95, 1], [0.44, 0.2, 0.9, 0.8], [0.56, 0.172, 0.6, 0.4], [0.7, 0.163, 0.42, 0.15], [0.8, 0.168, 0.36, 0],
                 [0.86, 0.165, 0.38, 0], [0.9, 0.14, 0.46, 0], [0.925, 0.09, 0.7, 0], [0.945, 0.06, 0.9, 0]];
-    kit.add(robeShell(rows, 40, 0.7, 1, false), M(0, 0, -0.02), function (v, u) { return (u < 0.04 || u > 0.96) ? TR : robe; }, 0);
-    kit.add(robeShell(rows, 40, 0.7, 1, true), M(0, 0, -0.02), TR, 0);
+    kit.add(robeShell(rows, 28, 0.7, 1, false), M(0, 0, -0.02), function (v, u) { return (u < 0.04 || u > 0.96) ? TR : robe; }, 0);
+    kit.add(robeShell(rows, 28, 0.7, 1, true), M(0, 0, -0.02), TR, 0);
     hood(kit, 0.86, 0.16, robe, TR, 0);
     /* the legs: trousers to the shoe, or the skirt over the knee and grey socks below */
     [-1, 1].forEach(function (s) {
@@ -521,8 +534,10 @@
       var sh = V(s * 0.16, 0.86, -0.01), el = V(s * 0.185, 0.69, 0.1), wr = V(s * 0.1, 0.76, 0.36), bell = V(s * 0.115, 0.755, 0.32);
       kit.add(between(sh, el, 0.052, 0.058), null, robe, 0);
       kit.add(new THREE.SphereGeometry(0.058, 10, 6), M(el.x, el.y, el.z), robe, 0);
-      kit.add(between(el, bell, 0.058, 0.088, 12, true), null, robe, 0);
-      kit.add(flip(between(el, bell, 0.055, 0.084, 12, true)), null, TR, 0);
+      /* the bell lined dark: a lining in the house's colour, seen end on across the desk, read as a disc (and a rim of it
+         as a ring) */
+      kit.add(between(el, bell, 0.058, 0.074, 12, true), null, robe, 0);
+      kit.add(flip(between(el, bell, 0.055, 0.071, 12, true)), null, 0x141210, 0);
       kit.add(between(el, wr, 0.04, 0.036, 8), null, grey, 0);
       kit.add(new THREE.SphereGeometry(0.038, 10, 6), M(wr.x - s * 0.02, wr.y - 0.004, wr.z + 0.045, 0, s * 0.3, 0, 0.95, 0.5, 1.3), SK, 0, { pen: 2 });
     });
