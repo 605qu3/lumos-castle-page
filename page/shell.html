@@ -2683,6 +2683,212 @@ function trophyShown(shown) {
   TROPHY_LIGHT.moon.visible = m; TROPHY_LIGHT.sun.visible = s && !m;
   return [TROPHY_MOON].concat(TROPHY_SUN).filter(function (x) { return shown.indexOf(x) >= 0; });
 }
+/* The round cellar under the Gryffindor storeroom, the cave (Interiors' docs/interiors/gryffindor-cellar.md, The table,
+   every row placed; Godric's note on architect-south-range-west-busts-1023: "an earthen floor and look like a cave.
+   There should be bats, stalagmites, etc."; ledger 296): the rock lining over the drum's wall, bulging and folded, r 4.42
+   to 4.86, standing to 3.0, leaning in to 3.7 and rounding over into a rough vault whose highest is 4.4 over the middle,
+   under the room's flat 4.5; the door's mouth left clear 1.1 by 2.2, its cheeks running back to 8 mm off the wall. Eight
+   stalagmites, the Old Man (a knobbed one, a hooded figure sitting from the door), the column, the sunk cask with its
+   finger of stalagmite, the still pool and its drip, stalactites never under 2.6 over open earth, the drapery's fringe
+   in the south-west, the torch north of the door. The bats' roost (the Great Hall's Halloween bats at home, PS 10, CoS
+   8) one instanced mesh, as many hanging as Events' page/events/cellar.json says, word for word: the full roost by
+   morning and day, thinning in the evening, a straggler or two at night, bare from Halloween's afternoon, a few back on
+   the morning of 1 November. The bats' crack (K) through the drum's wall at bearing 180 is the model's feature
+   drum-room-crack-b (2.85 to 3.65, lowered from the schedule's 3.6 foot so it stands under the vault's rounding), the
+   sky's light on its far end: day warm, night a pale line. Nothing glows; nothing is harmed; nobody is staged here */
+var CAVE_FULL = 'the bats hang asleep from the vault over the roost in tight dark rows, wings folded',
+    CAVE_EVE = 'the bats let go of the vault one by one and drop away through the slit in the south wall toward the lake, the roost thinning',
+    CAVE_NIGHT = 'the vault nearly bare, a straggler or two hanging folded among the empty rows, the slit a pale line of sky',
+    CAVE_BARE = 'the roost bare, not a bat on the vault, every one of them gone up to the Great Hall',
+    CAVE_FEW = 'only a few bats hang from the vault, the rest still coming in by ones and twos through the slit, the roost not yet full';
+var CAVE = PLACE !== 'drum-room-b' || !shell ? null : (function () {
+  var z0 = shell.place.floor, CX = 42.19, CY = 1.95, RW = 4.992, D2R = Math.PI / 180;
+  var root = new THREE.Group(); root.name = 'cave-things'; root.userData.owner = PLACE; shell.group.add(root);
+  var rock = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, side: THREE.DoubleSide }), flow = kit.solid(0x7a7062, { roughness: 0.85 }),
+      pale = kit.solid(0x938a79, { roughness: 0.8 }), stave = kit.solid(0x77736b, { roughness: 0.95 }), iron = kit.solid(0x3a3330, { roughness: 0.7 }),
+      batM = kit.solid(0x2b221c, { roughness: 0.95 }), mud = kit.solid(0x3e3127, { roughness: 0.9 }),
+      water = new THREE.MeshStandardMaterial({ color: new THREE.Color(0x232b2e).convertSRGBToLinear(), roughness: 0.18, metalness: 0.1 }), torchHead = kit.solid(0x4a3a2a),
+      flameM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
+  function own(m, name, g) { m.name = name; m.userData.owner = PLACE; m.raycast = function () {}; (g || root).add(m); return m; }
+  function at(b, r) { return [CX + r * Math.sin(b * D2R), CY + r * Math.cos(b * D2R)]; }
+  function L(x, y, h) { return shell.toLocal(x, y, z0 + h); }
+  function brg(x, y) { var b = Math.atan2(x - CX, y - CY) / D2R; return b < 0 ? b + 360 : b; }
+  /* the lining's inner face: r by bearing and height, the same function for the face, its cheeks and the vault */
+  function rIn(b, z) {
+    var a = b * D2R, n = 0.09 * Math.sin(3 * a + 1.3) + 0.07 * Math.sin(7 * a + 1.7 * z) + 0.05 * Math.sin(13 * a + 2.1 * z) + 0.04 * Math.sin(5 * a + 2.3 * z)
+      + 0.06 * Math.sin(23 * a + 0.4 * z) + 0.035 * Math.sin(41 * a + 1.1 + 0.3 * z);
+    var r = Math.min(4.86, Math.max(4.42, 4.6 + n));
+    return z > 3.0 ? r * (1 - 0.12 * Math.min(1, (z - 3.0) / 0.7)) : r;
+  }
+  var VS = 3.7, VH = 0.7;   /* the vault springs at 3.7 and rises 0.7 to 4.4 */
+  function vaultN(b, t) { var a = b * D2R; return (0.05 * Math.sin(4 * a + 6 * t) + 0.03 * Math.sin(9 * a + 2)) * Math.sin(t * Math.PI) * (1 - t); }
+  function vaultZ(b, t) { return VS + VH * Math.sin(t * Math.PI / 2) + vaultN(b, t); }
+  function capZ(x, y) {   /* the vault's underside over a point */
+    var b = brg(x, y), d = Math.hypot(x - CX, y - CY), rt = rIn(b, VS);
+    if (d >= rt) return VS;
+    var t = Math.acos(d / rt) * 2 / Math.PI;
+    return vaultZ(b, t);
+  }
+  /* the openings in the lining: [bearing, half-width at the face, half-width at the wall, foot, head] */
+  var HOLES = [[271.34, 0.55, 0.55, 0, 2.2], [180, 0.16, 0.08, 2.85, 3.65]];
+  var holeB = HOLES.map(function (h) { var w = h[1] / rIn(h[0], (h[3] + h[4]) / 2) / D2R; return [h[0] - w, h[0] + w]; });
+  var B = []; for (var b = 0; b < 360; b += 1.25) B.push(b);
+  holeB.forEach(function (p) { B.push((p[0] + 360) % 360, p[1] % 360); });
+  B = B.filter(function (v, i, a) { return a.indexOf(v) === i; }).sort(function (p, q) { return p - q; });
+  var ZW = [0, 0.3, 0.7, 1.1, 1.5, 1.9, 2.2, 2.5, 2.85, 3.0, 3.25, 3.65, VS], TS = [0.12, 0.25, 0.4, 0.55, 0.7, 0.85, 1];
+  function inHole(b0, b1, z0_, z1_) {
+    for (var k = 0; k < HOLES.length; k++) {
+      var p = holeB[k], m = (b0 + b1) / 2;
+      if (m > p[0] && m < p[1] && (z0_ + z1_) / 2 > HOLES[k][3] && (z0_ + z1_) / 2 < HOLES[k][4]) return true;
+    }
+    return false;
+  }
+  var pos = [], col = [], cA = new THREE.Color(0x4f483f).convertSRGBToLinear(), cB = new THREE.Color(0x8f846f).convertSRGBToLinear(), cT = new THREE.Color();
+  function tint(v) {   /* pale where the flutes stand proud and water ran, dark in the folds */
+    var a = v.b * D2R, k = 0.5 + 0.5 * Math.sin(23 * a + 0.4 * v.h) * Math.sin(7 * a + 0.9);
+    k = Math.max(0, Math.min(1, k * k * 1.2 + 0.08 * Math.sin(3 * v.h + a)));
+    cT.copy(cA).lerp(cB, k); return cT;
+  }
+  function quad(a, b, c, d) { [a, b, c, a, c, d].forEach(function (p) { pos.push(p.x, p.y, p.z); var t = tint(p); col.push(t.r, t.g, t.b); }); }
+  function face(b, z) { var p = at(b, rIn(b, z)), v = L(p[0], p[1], z); v.b = b; v.h = z; return v; }
+  for (var i = 0; i < B.length; i++) {
+    var b0 = B[i], b1 = i + 1 < B.length ? B[i + 1] : B[0] + 360;
+    for (var j = 0; j + 1 < ZW.length; j++) {
+      if (inHole(b0, b1, ZW[j], ZW[j + 1])) continue;
+      quad(face(b0, ZW[j]), face(b1, ZW[j]), face(b1, ZW[j + 1]), face(b0, ZW[j + 1]));
+    }
+    var prev = [face(b0, VS), face(b1, VS)];
+    TS.forEach(function (t) {
+      var r0 = rIn(b0, VS) * Math.cos(t * Math.PI / 2), r1 = rIn(b1, VS) * Math.cos(t * Math.PI / 2);
+      var p0 = at(b0, r0), p1 = at(b1, r1), q0 = L(p0[0], p0[1], vaultZ(b0, t)), q1 = L(p1[0], p1[1], vaultZ(b1, t));
+      q0.b = b0; q0.h = 3.7 + t * 3; q1.b = b1; q1.h = 3.7 + t * 3;
+      quad(prev[0], prev[1], q1, q0); prev = [q0, q1];
+    });
+  }
+  /* each hole's cheeks: from the face back to 8 mm off the drum's wall, narrowing to the wall's own opening */
+  HOLES.forEach(function (h, k) {
+    var bf = holeB[k], ww = h[2] / RW / D2R, bw = [h[0] - ww, h[0] + ww];
+    function back(s, z) { var p = at(bw[s], RW), v = L(p[0], p[1], z); v.b = bw[s]; v.h = z; return v; }
+    function front(s, z) { return face(bf[s], z); }
+    var zs = ZW.filter(function (z) { return z >= h[3] && z <= h[4]; });
+    [0, 1].forEach(function (s) {
+      for (var j = 0; j + 1 < zs.length; j++) quad(front(s, zs[j]), back(s, zs[j]), back(s, zs[j + 1]), front(s, zs[j + 1]));
+    });
+    if (h[3] > 0) quad(front(0, h[3]), front(1, h[3]), back(1, h[3]), back(0, h[3]));
+    quad(front(0, h[4]), front(1, h[4]), back(1, h[4]), back(0, h[4]));
+  });
+  var lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); lg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); lg.computeVertexNormals();
+  own(new THREE.Mesh(lg, rock), 'cave-lining');
+  /* a stalagmite (or a stalactite, down): a lathe on a lumpy profile, 0 at the foot */
+  function lathe(prof, mat, name, x, y, h, down) {
+    var g = new THREE.LatheGeometry(prof.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 14), P = g.attributes.position, ph = (x * 7.3 + y * 3.1) % 6.28;
+    if (mat !== stave) for (var i = 0; i < P.count; i++) {   /* lumps and drip rings, the same at the seam so it stays shut */
+      var vx = P.getX(i), vy = P.getY(i), vz = P.getZ(i), th = Math.atan2(vz, vx), f = 1 + 0.13 * Math.sin(3 * th + 4 * vy + ph) + 0.07 * Math.sin(5 * th - 7 * vy) + 0.05 * Math.sin(vy * 31 + ph);
+      P.setX(i, vx * f); P.setZ(i, vz * f);
+    }
+    g.computeVertexNormals();
+    var m = own(new THREE.Mesh(g, mat), name); m.position.copy(L(x, y, h === 0 && !down ? -0.03 : h));   /* a foot 3 cm into the earth */
+    if (down) m.rotation.x = Math.PI;
+    return m;
+  }
+  function mite(rb, h) { return [[0, 0], [rb * 1.15, 0], [rb * 1.02, h * 0.04], [rb * 0.82, h * 0.15], [rb * 0.6, h * 0.42], [rb * 0.38, h * 0.72], [rb * 0.15, h * 0.95], [0, h]]; }
+  [[1, 44.79, 3.85, 0.25, 1.1], [2, 45.29, 3.15, 0.175, 0.6], [5, 40.39, -1.25, 0.2, 0.8], [6, 39.79, -0.55, 0.15, 0.45],
+   [7, 41.59, 5.35, 0.225, 0.9], [8, 42.59, 5.55, 0.15, 0.5]].forEach(function (s) { lathe(mite(s[3], s[4]), flow, 'cave-stalagmite-' + s[0], s[1], s[2], 0); });
+  /* 3, the Old Man: broad shoulders, a neck, a knob for a hooded head, leaning a little toward the door */
+  var om = lathe([[0, 0], [0.3, 0], [0.3, 0.25], [0.27, 0.55], [0.24, 0.82], [0.17, 0.98], [0.11, 1.06], [0.14, 1.14], [0.15, 1.22],
+    [0.12, 1.32], [0.06, 1.38], [0, 1.4]], flow, 'cave-old-man', 44.39, -0.65, 0, 0);
+  om.rotation.z = 4 * D2R;
+  /* 4, the column: floor to vault, 0.45 at the foot and the head, 0.25 at the waist */
+  var cz = capZ(45.59, 0.95) + 0.06;
+  lathe([[0, 0], [0.225, 0], [0.19, cz * 0.2], [0.135, cz * 0.42], [0.125, cz * 0.5], [0.14, cz * 0.62], [0.19, cz * 0.82], [0.225, cz], [0, cz]], flow, 'cave-column', 45.59, 0.95, 0, 0);
+  /* stalactites: over 1 (tip 3.2), over the pool (tip 3.0), five small on the north-east vault */
+  function tite(name, x, y, tip, rb) { var top = capZ(x, y) + 0.05; lathe(mite(rb, top - tip), pale, name, x, y, top, 1); }
+  tite('cave-stalactite-1', 44.79, 3.85, 3.2, 0.09);
+  tite('cave-stalactite-pool', 43.6, 4.3, 3.0, 0.08);
+  [[44.0, 3.6, 0.35], [44.4, 3.1, 0.22], [43.6, 3.3, 0.6], [44.7, 3.4, 0.28], [44.2, 2.75, 0.45]].forEach(function (s, k) {
+    tite('cave-stalactite-ne-' + k, s[0], s[1], capZ(s[0], s[1]) - s[2], 0.035 + s[2] * 0.06);
+  });
+  /* the drapery's fringe along the lining in the south-west: a wavy curtain from the haunch, 0.35 to 0.6 deep */
+  var dp = [];
+  for (var db = 200; db < 250; db += 0.625) {
+    var e0 = db, e1 = db + 0.625, zt = 3.68, f0 = 0.04 * Math.sin(e0 * 0.5), f1 = 0.04 * Math.sin(e1 * 0.5);
+    var d0 = 0.3 + 0.18 * Math.abs(Math.sin(e0 * 0.9)) + 0.1 * Math.abs(Math.sin(e0 * 2.3)), d1 = 0.3 + 0.18 * Math.abs(Math.sin(e1 * 0.9)) + 0.1 * Math.abs(Math.sin(e1 * 2.3));
+    var t0 = at(e0, rIn(e0, zt) + 0.02), t1 = at(e1, rIn(e1, zt) + 0.02), u0 = at(e0, rIn(e0, zt) - 0.05 + f0), u1 = at(e1, rIn(e1, zt) - 0.05 + f1);
+    [L(t0[0], t0[1], zt), L(t1[0], t1[1], zt), L(u1[0], u1[1], zt - d1), L(t0[0], t0[1], zt), L(u1[0], u1[1], zt - d1), L(u0[0], u0[1], zt - d0)]
+      .forEach(function (p) { dp.push(p.x, p.y, p.z); });
+  }
+  var dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.Float32BufferAttribute(dp, 3)); dg.computeVertexNormals();
+  own(new THREE.Mesh(dg, kit.solid(0x837968, { roughness: 0.85, side: THREE.DoubleSide })), 'cave-drapery');
+  /* C, the cask: 0.6 across, sunk to its middle, 0.4 showing, grey staves, one iron hoop 8 mm proud, the finger on its lid */
+  lathe([[0, -0.1], [0.29, -0.1], [0.3, 0.05], [0.295, 0.2], [0.28, 0.4], [0, 0.4]], stave, 'cave-cask', 38.99, 4.15, 0, 0);
+  var hp = own(new THREE.Mesh(new THREE.CylinderGeometry(0.296, 0.299, 0.05, 20, 1, true), iron), 'cave-cask-hoop'); hp.position.copy(L(38.99, 4.15, 0.31));
+  lathe(mite(0.025, 0.12), pale, 'cave-cask-finger', 39.05, 4.1, 0.4, 0);
+  /* P, the pool: the wet earth's rim 8 mm over the floor, the water 8 mm over that; the drip's rings */
+  function ellipse(rx, ry, mat, h, name) {
+    var m = own(new THREE.Mesh(new THREE.CircleGeometry(1, 28), mat), name); m.scale.set(rx, ry, 1);
+    m.position.copy(L(43.49, 4.35, h)); m.rotation.x = -Math.PI / 2; m.userData.decal = true; return m;
+  }
+  ellipse(0.72, 0.47, mud, 0.008, 'cave-pool-rim'); ellipse(0.65, 0.4, water, 0.016, 'cave-pool');
+  var ringM = new THREE.MeshBasicMaterial({ color: 0xb8c4c8, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+  var ring = own(new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 32), ringM), 'cave-pool-ring'); ring.rotation.x = -Math.PI / 2;
+  ring.position.copy(L(43.6, 4.3, 0.024)); ring.userData.decal = true;
+  /* T, the torch north of the door on the lining, its head at 2.0 */
+  var tb = brg(37.34, 2.90), tp = at(tb, rIn(tb, 2.0)), tg = new THREE.Group(); tg.position.copy(L(tp[0], tp[1], 1.75));
+  var tin = L(CX, CY, 1.75).sub(tg.position); tg.rotation.y = Math.atan2(tin.x, tin.z); tg.name = 'cave-torch'; root.add(tg);
+  own(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.05, 0.34), iron), 'cave-torch-bracket', tg).position.set(0, -0.02, 0.13);
+  own(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.32, 10), torchHead), 'cave-torch-head', tg).position.set(0, 0.1, 0.28);
+  var fl = own(new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), flameM), 'cave-torch-flame', tg); fl.scale.y = 2.0; fl.position.set(0, 0.36, 0.28);
+  /* K's far end: the sky's light on the crack's back, by day warm, at night a pale line */
+  var skyM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xfff3dc).convertSRGBToLinear(), transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+  var sk = own(new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.78), skyM), 'cave-crack-sky'); sk.position.copy(L(42.162, -4.2416, 3.25)); sk.userData.decal = true;   /* on the crack's axis, square to its side of the 24 */
+  var kin = L(42.19, -3.05, 3.25).sub(sk.position); sk.rotation.y = Math.atan2(kin.x, kin.z);
+  if (!(HOUR >= 7 && HOUR < 18)) { skyM.color.set(0x6f7f9e).convertSRGBToLinear(); skyM.opacity = 0.45; }
+  /* B, the roost: small brown bats hanging asleep, wings folded, packed in rows about (42.99, -0.65), 2.0 across */
+  var spots = [], seed = 7;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  for (var gy = -1; gy <= 1; gy += 0.1) for (var gx = -1; gx <= 1; gx += 0.085) {
+    var x = gx + (rnd() - 0.5) * 0.03 + (Math.round(gy * 10) % 2 ? 0.04 : 0), y = gy + (rnd() - 0.5) * 0.03;
+    if (x * x + y * y > 1 - rnd() * 0.25) continue;
+    spots.push({ x: 42.99 + x, y: -0.65 + y, k: rnd(), turn: rnd() * Math.PI * 2, s: 0.85 + rnd() * 0.3 });
+  }
+  spots.sort(function (p, q) { return p.k - q.k; });
+  var bg = new THREE.SphereGeometry(0.02, 6, 4); bg.scale(1, 2.6, 0.8);
+  var bats = new THREE.InstancedMesh(bg, batM, spots.length); own(bats, 'cave-bats');
+  var mtx = new THREE.Matrix4(), qq = new THREE.Quaternion(), sv = new THREE.Vector3(), ax = new THREE.Vector3(0, 1, 0);
+  function place(k, lean) {
+    var s = spots[k], c = capZ(s.x, s.y), h = 0.052 * s.s;
+    qq.setFromAxisAngle(ax, s.turn); if (lean) qq.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), lean));
+    sv.set(s.s, s.s, s.s); mtx.compose(L(s.x, s.y, c - h + 0.01), qq, sv); bats.setMatrixAt(k, mtx);
+  }
+  for (var k = 0; k < spots.length; k++) place(k, 0);
+  bats.instanceMatrix.needsUpdate = true;
+  var N = spots.length;
+  return { bats: bats, N: N, place: place, ring: ring, ringM: ringM, t: 0, drip: 3, shift: null, wait: 5,
+    set: function (n) { bats.count = Math.max(0, Math.min(N, n)); } };
+})();
+function caveShown(shown) {
+  if (!CAVE) return [];
+  var N = CAVE.N, q = Q.get('roost'), n = { full: N, evening: Math.round(N * 0.4), night: 2, bare: 0, few: 12 }[q];
+  if (n == null) n = shown.indexOf(CAVE_BARE) >= 0 ? 0 : shown.indexOf(CAVE_NIGHT) >= 0 ? 2 : shown.indexOf(CAVE_FEW) >= 0 ? 12
+    : shown.indexOf(CAVE_EVE) >= 0 ? Math.round(N * 0.4) : N;
+  CAVE.set(n);
+  return [CAVE_FULL, CAVE_EVE, CAVE_NIGHT, CAVE_BARE, CAVE_FEW].filter(function (x) { return shown.indexOf(x) >= 0; });
+}
+function updateCave(dt) {
+  if (!CAVE) return;
+  /* the drip: a ring spreading on the pool every few seconds */
+  CAVE.drip -= dt;
+  if (CAVE.drip <= 0) { CAVE.drip = 5 + Math.random() * 7; CAVE.t = 0; }
+  CAVE.t += dt;
+  var u = Math.min(1, CAVE.t / 1.6), r = 0.03 + u * 0.3; CAVE.ring.scale.set(r, r, 1); CAVE.ringM.opacity = 0.35 * (1 - u);
+  /* now and then one bat shifts on the vault, a slow lean and back */
+  if (!CAVE.bats.count) return;
+  if (CAVE.shift) {
+    CAVE.shift.t += dt; var s = CAVE.shift, a = Math.sin(Math.min(1, s.t / 1.4) * Math.PI) * 0.35;
+    CAVE.place(s.k, a); CAVE.bats.instanceMatrix.needsUpdate = true;
+    if (s.t >= 1.4) { CAVE.place(s.k, 0); CAVE.shift = null; CAVE.wait = 4 + Math.random() * 8; }
+  } else if ((CAVE.wait -= dt) <= 0) CAVE.shift = { k: Math.floor(Math.random() * CAVE.bats.count), t: 0 };
+}
 /* req 800 (Magic's docs/archive/magic-to-2026-10-22.md, The Divination classroom, the trapdoor answers; Events' req 799,
    divination.json's divination.trapdoor, word for word): on the North Tower's landing the circular trapdoor in the ceiling
    (the model's north-trapdoor: 0.9 across at (161.4, 66.6), its face 48.4, hinged on its north edge, swinging down, the
@@ -5973,7 +6179,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown), caveShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -7718,7 +7924,7 @@ function frame() {
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
-  updateTrick(dt); updateTrap(dt); updateDiv(dt);
+  updateTrick(dt); updateTrap(dt); updateDiv(dt); updateCave(dt);
   updateMyrtle(dt);
   updateStaff(dt);
   updateStone(dt); updateStoneClimb(dt);
