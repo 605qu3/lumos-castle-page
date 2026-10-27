@@ -2533,6 +2533,7 @@ var H71 = (function () {
    (Percy's fresh at the foot from the Azkaban castle). Each case 1 cm off its wall; every layered face 8 mm or more.
    Invented silver, nothing named but what the books name; nothing glows. The moonlight across the floor (Magic's req
    693, Events' 718) is the next step */
+var TROPHY_STAT = null;
 (function () {
   if (PLACE !== 'trophy-room') return;
   var z0 = shell.place.floor, root = new THREE.Group(); root.name = 'trophy-things'; root.userData.owner = PLACE; shell.group.add(root);
@@ -2606,6 +2607,7 @@ var H71 = (function () {
     return g;
   }
   /* the east run, facing the windows: from y 25.4, each 2.0 with 0.17 between; frame +x runs south here */
+  var statCases = {};
   for (var i = 0; i < 8; i++) {
     var yc = 26.4 + i * 2.17;
     if (i === 3) {   /* the Quidditch cup's case */
@@ -2620,7 +2622,8 @@ var H71 = (function () {
       slab(cg, 0.48, 0.15, 0.56, 0.68, 0.158, 0.668, cloth);
       slab(cg, 0.48, 0.05, 0.668, 0.68, 0.158, 0.676, cloth);
     } else {
-      var eg = tcase(16, yc, -1, 0, 'trophy-case-e' + i, { seed: i + 1, keep: i === 7 ? [0.9, -0.96, -0.62] : null });
+      var eg = tcase(16, yc, -1, 0, 'trophy-case-e' + i, { seed: i + 1, keep: i === 7 ? [0.9, -0.96, -0.62] : i === 2 ? [1.35, -0.1, 0.1] : null });
+      if (i === 2) statCases.rider = eg;
       if (i === 7) {   /* the Medal for Magical Merit in its open case, at the shelf's north end, the lid up to the wall */
         slab(eg, -0.87, 0.9, 0.24, -0.744, 0.925, 0.305, red);
         slab(eg, -0.87, 0.925, 0.215, -0.744, 0.99, 0.232, red);
@@ -2629,7 +2632,7 @@ var H71 = (function () {
     }
   }
   /* the west wall's three in the pier between windows 1 and 4 */
-  [29.75, 34.0, 38.25].forEach(function (y, k) { tcase(0, y, 1, 0, 'trophy-case-w' + k, { seed: 20 + k }); });
+  [29.75, 34.0, 38.25].forEach(function (y, k) { var wg = tcase(0, y, 1, 0, 'trophy-case-w' + k, { seed: 20 + k, keep: k === 1 ? [1.35, -0.1, 0.1] : null }); if (k === 1) statCases.wizard = wg; });
   /* the end walls: two each side of each door, 1.0 clear of its frame */
   [3.23, 5.4, 10.6, 12.77].forEach(function (x, k) {
     tcase(x, 24, 0, 1, 'trophy-case-s' + k, { seed: 30 + k });
@@ -2661,7 +2664,61 @@ var H71 = (function () {
     slab(hg, 0.42, v, 0.04, 0.6, v + 0.022, 0.049, gold);                      /* its years */
     if (fresh) { slab(hg, -0.6, v, 0.049, -0.6 + nw, v + 0.022, 0.057, kit.solid(0xe2c463, { roughness: 0.3, metalness: 0.3 })); }
   }
+  /* req 718, the statuettes (trophy.json's trophy.statuette-rider, -wizard and -moon): two old gilt cups with domed lids,
+     each lid carrying a small gilt figure, in the front row of the 1.35 shelf at the middle of the east run's third case
+     (the broom rider, where the moon's slant reaches) and of the west pier's middle case (the wizard). Each moves once
+     when its string comes, inside the case, never toward him, then is still again */
+  function oldCup(g) {
+    var h = 0.2, r = h * 0.32, y = 1.35;
+    cup(g, 0, y, 0.36, h, gold);
+    lathe(g, [[r * 1.03, 0], [r * 0.95, 0.012], [r * 0.6, 0.026], [0.012, 0.031], [0.005, 0.036], [0, 0.036]], gold, 0, y + h, 0.36);
+    var p = new THREE.Group(); p.position.set(0, y + h + 0.036, 0.36); g.add(p); return p;
+  }
+  var rp = oldCup(statCases.rider), rf = new THREE.Group(); rp.add(rf);
+  add(rp, new THREE.CylinderGeometry(0.0025, 0.0025, 0.02, 6), gold, 0, 0.01, 0);                 /* the post */
+  var stick = add(rf, new THREE.CylinderGeometry(0.003, 0.003, 0.1, 6), gold, 0, 0.022, 0); stick.rotation.z = Math.PI / 2;
+  var tail = add(rf, new THREE.ConeGeometry(0.009, 0.026, 8), gold, -0.06, 0.022, 0); tail.rotation.z = Math.PI / 2;
+  var body = add(rf, new THREE.CylinderGeometry(0.007, 0.01, 0.034, 8), gold, 0.004, 0.041, 0); body.rotation.z = -0.35;
+  add(rf, new THREE.SphereGeometry(0.0075, 10, 8), gold, 0.012, 0.063, 0);
+  [-1, 1].forEach(function (s) { var l = add(rf, new THREE.CylinderGeometry(0.003, 0.003, 0.026, 6), gold, 0.006, 0.014, s * 0.008); l.rotation.z = 0.5; });
+  var wp = oldCup(statCases.wizard), wf = new THREE.Group(); wp.add(wf);
+  add(wf, new THREE.ConeGeometry(0.014, 0.05, 10), gold, 0, 0.025, 0);                                /* the robe */
+  add(wf, new THREE.SphereGeometry(0.0075, 10, 8), gold, 0, 0.057, 0);
+  add(wf, new THREE.ConeGeometry(0.009, 0.022, 10), gold, 0, 0.074, 0);                               /* the hat */
+  var arm = new THREE.Group(); arm.position.set(0, 0.044, 0.006); wf.add(arm);
+  var fore = add(arm, new THREE.CylinderGeometry(0.0025, 0.0025, 0.02, 6), gold, 0, -0.004, 0.009); fore.rotation.x = 1.1;
+  var wand = add(arm, new THREE.CylinderGeometry(0.0012, 0.0012, 0.03, 5), gold, 0, -0.002, 0.03); wand.rotation.x = 1.45;
+  arm.rotation.x = 0.35;
+  TROPHY_STAT = { rider: rf, wizard: arm, t: { rider: -1, wizard: -1 } };
 })();
+var TROPHY_STAT_SHOW = { rider: ["inside a case a small gilt broom rider on an old cup's lid leans into a turn, and is still again",
+    "in the moonlight a small gilt broom rider on an old cup's lid leans into a turn, and is still again"],
+  wizard: ["inside a case a small gilt wizard on an old cup's lid lifts his wand an inch, and is still again"] };
+var statPrev = [];
+function statShown(shown) {   /* a string newly shown starts its figure's one move; the strings leave the note */
+  if (!TROPHY_STAT) return [];
+  var out = [];
+  Object.keys(TROPHY_STAT_SHOW).forEach(function (k) {
+    TROPHY_STAT_SHOW[k].forEach(function (s) {
+      if (shown.indexOf(s) < 0) return;
+      out.push(s); if (statPrev.indexOf(s) < 0) TROPHY_STAT.t[k] = 0;
+    });
+  });
+  statPrev = out; return out;
+}
+function updateStat(dt) {
+  if (!TROPHY_STAT) return;
+  var T = TROPHY_STAT, q = Q.get('statuette');
+  if (q && T.q == null) { T.q = 2; }
+  if (T.q != null && (T.q -= dt) <= 0) { T.q = 6; if (T.t[q] != null && T.t[q] < 0) T.t[q] = 0; }   /* ?statuette=rider|wizard, every 6 s for checks */
+  ['rider', 'wizard'].forEach(function (k) {
+    if (T.t[k] < 0) return;
+    T.t[k] += dt; var a = Math.sin(Math.min(1, T.t[k] / 2.2) * Math.PI);
+    if (k === 'rider') { T.rider.rotation.x = 0.42 * a; T.rider.rotation.y = 0.25 * a; }
+    else T.wizard.rotation.x = 0.35 - 0.6 * a;
+    if (T.t[k] >= 2.2) { T.t[k] = -1; if (k === 'rider') T.rider.rotation.set(0, 0, 0); else T.wizard.rotation.x = 0.35; }
+  });
+}
 /* The trophy room's light through its two west windows (Magic's req 693, Events' req 718, page/events/trophy.json, word
    for word): the moon low in the south-west (8 degrees up, its light carried 18 degrees north of east, as Interiors'
    surfaces note has it), so each window throws a long pale slant across the floor, window 1's reaching the east run
@@ -7512,7 +7569,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown), caveShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown), statShown(shown), caveShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -9257,7 +9314,7 @@ function frame() {
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
-  updateTrick(dt); updateTrap(dt); updateDiv(dt); updateCave(dt);
+  updateTrick(dt); updateTrap(dt); updateDiv(dt); updateCave(dt); updateStat(dt);
   updateMyrtle(dt);
   updateStaff(dt);
   updateStone(dt); updateStoneClimb(dt);
