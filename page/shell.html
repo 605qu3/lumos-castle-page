@@ -1810,7 +1810,7 @@ thingCues[CURE_MISS[1]] = function () { showLines([{ medium: 'seen', sound: CURE
 thingCues[CURE_MISS[2]] = function () { showLines([{ medium: 'seen', sound: CURE_MISS[2], on: function () { potLiquid(0x8a9a92, 0.45); } }]); };
 thingCues[CURE_RIGHT] = function () { showLines([{ medium: 'seen', sound: CURE_RIGHT, on: function () { potLiquid(0x4f8f3a, 0.85); } }]); };
 /* req 951 (b), Magic's 944 (Events' kitchens.json, word for word): the kitchens' fire by its room line */
-var KFIRE = null, KIT_LIT = "a great brick fireplace at the other end, lit, a low roar and the firebasket's iron ticking as it warms",
+var KFIRE = null, MFIRE = null, KIT_LIT = "a great brick fireplace at the other end, lit, a low roar and the firebasket's iron ticking as it warms",
     KIT_BANKED = 'the great brick fireplace banked to embers, the room dark but for their red and his own light';
 function kitchensFire(night) {
   if (!KFIRE) return;
@@ -5606,11 +5606,49 @@ var W1 = (function () {
     var H = [0.4, 0.885, 1.37, 1.855, 2.35];
     shelves(false, 0, 1, 0, 16, 0.4, H); shelves(false, 10, -1, 0, 16, 0.4, H);
     shelves(true, 0, 1, 0.4, 4.39, 0.4, H); shelves(true, 0, 1, 5.61, 9.6, 0.4, H);   /* 1 cm short of the door's jambs, never flush (the seams rule; castle-shell.js v42) */
-    shelves(true, 16, -1, 1.6, 4.0, 0.4, H);
+    shelves(true, 16, -1, 1.6, 3.92, 0.4, H);   /* to 1 cm onto the hearth's breast (ledger 310) */
     /* the front right run stands over the nest of drawers (ledger 239, The real things 1): its boards from 1.15, its
-       uprights from the drawers' top at 1.0, the run's left end from the floor */
-    [1.15, 1.6, 2.0, 2.35].forEach(function (h) { box(6.01, 15.6, h - 0.03, 8.39, 16.02, h, wood); });
-    box(6.0, 15.62, -0.01, 6.03, 16.02, 2.32, wood);
+       uprights from the drawers' top at 1.0, the run's left end from the floor, 1 cm onto the hearth's breast */
+    [1.15, 1.6, 2.0, 2.35].forEach(function (h) { box(6.09, 15.6, h - 0.03, 8.39, 16.02, h, wood); });
+    box(6.08, 15.62, -0.01, 6.11, 16.02, 2.32, wood);
+    /* ledger 310, Marchpane's hearth (marchpane-hearth; Godric, 11.11 am, 27 October 2026: "Keep the hearth and flue";
+       Interiors' docs/interiors/potions-dungeon.md, Marchpane's dungeon, 1897, the hearth's row, cited): the breast of the
+       wall's stone x' 3.9 to 6.1, 0.35 out, to the vault's springing at 2.65 (the height ours), the opening x' 4.3 to 5.7
+       and 1.0 high, sooted inside, a plain stone shelf at 1.3, the hearthstone before it; a coal fire in an iron grate,
+       lit by day and banked to embers at night, with its own light (the bat cave's rule, Godric's 1 on req 1151); the
+       coal scuttle and tongs at its left end; no crane, the cauldrons heat at the desks. Its flue is in the wall (the
+       model's feature says its way) */
+    var coal = mat('coal', 0x121110);
+    box(3.9, 15.65, -0.01, 4.3, 16.02, 1.0, stone); box(5.7, 15.65, -0.01, 6.1, 16.02, 1.0, stone);   /* the cheeks */
+    box(3.9, 15.65, 1.0, 6.1, 16.02, 2.65, stone);                                                     /* the breast over the opening */
+    box(3.84, 15.55, 1.24, 6.16, 15.66, 1.3, stone);                                                   /* the shelf, 1 cm into the breast */
+    box(3.9, 15.25, -0.01, 6.1, 15.66, 0.04, stone);                                                   /* the hearthstone */
+    box(4.29, 15.98, 0.03, 5.71, 16.02, 1.01, soot);                                                   /* the back, sooted */
+    box(4.29, 15.65, 0.03, 4.31, 15.99, 1.01, soot); box(5.69, 15.65, 0.03, 5.71, 15.99, 1.01, soot);  /* the cheeks' insides */
+    box(4.29, 15.64, 0.98, 5.71, 15.99, 1.0, soot);                                                    /* the soffit */
+    box(4.3, 15.66, -0.01, 5.7, 15.98, 0.035, soot);                                                   /* the hearth inside */
+    box(4.55, 15.7, 0.14, 5.45, 15.96, 0.17, iron);                                                    /* the grate's bed */
+    [4.58, 4.76, 4.94, 5.12, 5.3].forEach(function (u) { box(u, 15.69, 0.17, u + 0.02, 15.71, 0.36, iron); });   /* its front bars */
+    [[4.57, 15.71], [5.41, 15.71], [4.57, 15.93], [5.41, 15.93]].forEach(function (p) { box(p[0], p[1], 0.025, p[0] + 0.03, p[1] + 0.03, 0.14, iron); });
+    box(4.6, 15.73, 0.17, 5.4, 15.95, 0.27, coal);                                                     /* the coals */
+    box(3.95, 15.3, 0.03, 4.27, 15.58, 0.3, iron); box(3.97, 15.32, 0.29, 4.25, 15.56, 0.31, coal);   /* the scuttle, full */
+    rod([4.2, 15.3, 0.045], [4.2, 15.635, 0.78], 0.007, iron, 6); rod([4.24, 15.3, 0.045], [4.24, 15.635, 0.78], 0.007, iron, 6);   /* the tongs against the cheek */
+    MFIRE = { lit: [], banked: [] };
+    [false, true].forEach(function (night) {
+      var fm = new THREE.MeshBasicMaterial({ color: new THREE.Color(night ? 0x6a1e0c : 0xe8782a).convertSRGBToLinear() });
+      if (night) {   /* the embers, a glow on the coals 8 mm over them */
+        var a = P(4.64, 15.76, 0.27), b = P(5.36, 15.92, 0.278), gm = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), fm);
+        gm.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); gm.userData.owner = PLACE; scene.add(gm); MFIRE.banked.push(gm); return;
+      }
+      [4.75, 5.0, 5.25].forEach(function (u, i) {
+        var fz = 0.12 + i % 2 * 0.06, fc = new THREE.Mesh(new THREE.ConeGeometry(0.055, fz, 8), fm);
+        fc.position.copy(P(u, 15.84, 0.27 + fz / 2)); fc.userData.owner = PLACE; scene.add(fc); MFIRE.lit.push(fc);   /* unmerged, so it can change */
+      });
+    });
+    var mbank = HOUR >= 22 || HOUR < 6;
+    MFIRE.lit.forEach(function (m) { m.visible = !mbank; }); MFIRE.banked.forEach(function (m) { m.visible = mbank; });
+    MFIRE.light = new THREE.PointLight(0xff9a50, mbank ? 0.35 : 1.2, 9, 1.6); MFIRE.light.name = 'marchpane-hearth-light';
+    MFIRE.light.position.copy(P(5.0, 15.5, 0.45)); scene.add(MFIRE.light);
     [7.185, 8.37].forEach(function (u) { box(u, 15.62, 0.99, u + 0.03, 16.02, 2.32, wood); });
     /* the stone basin in the front left corner, its rim 0.8; the gargoyle's head over it, its mouth at 1.3 */
     box(0.41, 15.3, -0.01, 1.4, 16.02, 0.6, stone);
