@@ -4204,6 +4204,83 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
   flush();
 })();
 /* the eye's tap (Events, hidden-ways.json's undercroft-well-eye-first and -again): the same string on the page with no runtime */
+/* H81's second trick, the painted arcade (req 1122, ledger 295; Interiors' docs/interiors/painted-door-room.md, option 1,
+   Godric's 1 on interiors-painted-door-room-1024, 5.08 am, 24 October 2026). The east wall of painted-door-room-5 (x 39.6,
+   y 1.35 to 2.85, 2.6 high) painted as an arcade going on and on, Borromini's false perspective at the Palazzo Spada
+   (1653) cited for form: an arcade drawn in 3D beyond the wall, columns on the room's own side lines, round arches
+   between them, a coffered barrel vault, flagstones, forty bays fading to dusk, and every point carried along its
+   sightline from the stand (37.0, 2.1) at a first-year's eye (1.35) onto the wall, so from there the room runs on, and
+   one step aside it is a flat wall. The canvas is the paint, 8 mm off the stone (the layered faces' rule); dull, nothing
+   glows; the far end is dusk, not light. By it the painter's stool (x 38.9 to 39.3, y 2.35 to 2.75, 0.45 high), a
+   dried palette caked with the painted door's gold and three brushes; three old drips of gold at the wall's foot.
+   Whether a figure walks in the arcade is Magic's, later */
+(function () {
+  if (PLACE !== 'painted-door-room-5') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'painted-arcade'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); };
+  var XW = 39.6, YS = 1.35, YN = 2.85, H = 2.6, OFF = 0.008, E = [37.0, 2.1, 1.35], CW = 768, CH = 1331;
+  function own(m) { m.userData.owner = PLACE; g.add(m); return m; }
+  function box(a, b, mt) { var m = thingBox(g, P, a, b, mt); m.userData.owner = PLACE; return m; }
+  function cyl(x, y, r0, r1, za, zb, mt, seg) { var m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, seg || 16), mt); m.position.copy(P(x, y, (za + zb) / 2)); return own(m); }
+  /* a point behind the wall to the canvas: along the sightline from E onto the plane x = XW */
+  function pr(X, Y, Z) { var t = (XW - E[0]) / (X - E[0]), y = E[1] + t * (Y - E[1]), z = E[2] + t * (Z - E[2]); return [(YN - y) / (YN - YS) * CW, (H - z) / H * CH]; }
+  var DUSK = [62, 54, 44];
+  function shade(rgb, X) { var f = 1 - Math.exp(-(X - XW) / 9); return 'rgb(' + rgb.map(function (c, i) { return Math.round(c + (DUSK[i] - c) * f); }).join(',') + ')'; }
+  function poly(c, pts, fill) { c.beginPath(); pts.forEach(function (p, i) { var q = pr(p[0], p[1], p[2]); if (i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }); c.closePath(); c.fillStyle = fill; c.fill(); }
+  var BAY = 0.9, CD = 0.18, YA = YS + CD, YB = YN - CD, ZS = 1.55, ZV = 2.0, R = (YB - YA) / 2, YC = (YA + YB) / 2, N = 40;
+  function arcY(X, a0, a1, n) { var p = []; for (var k = 0; k <= n; k++) { var a = a0 + (a1 - a0) * k / n; p.push([X, YC - R * Math.cos(a), ZV + R * Math.sin(a)]); } return p; }
+  var cv = document.createElement('canvas'); cv.width = CW; cv.height = CH; var c = cv.getContext('2d');
+  c.fillStyle = 'rgb(' + DUSK.join(',') + ')'; c.fillRect(0, 0, CW, CH);                /* the far dusk, under all */
+  for (var i = N - 1; i >= 0; i--) {
+    var X0 = XW + i * BAY, X1 = X0 + BAY, XC = X0 + CD;
+    /* the flagstones, four across, two along a bay */
+    for (var a = 0; a < 2; a++) for (var b = 0; b < 4; b++) {
+      var xa = X0 + a * BAY / 2, ya = YS + b * (YN - YS) / 4;
+      poly(c, [[xa, ya, 0], [xa + BAY / 2, ya, 0], [xa + BAY / 2, ya + (YN - YS) / 4, 0], [xa, ya + (YN - YS) / 4, 0]], shade((a + b) % 2 ? [128, 112, 92] : [110, 96, 80], xa));
+    }
+    /* each side: the aisle dark behind, the spandrel wall with its arch, the column's face */
+    [[YA, YS], [YB, YN]].forEach(function (s) {
+      var Yf = s[0], Yb = s[1], ac = (XC + X1) / 2, ar = (X1 - XC) / 2, arch = [];
+      for (var k = 0; k <= 16; k++) { var t = Math.PI * k / 16; arch.push([ac + ar * Math.cos(t), Yf, ZS + ar * Math.sin(t)]); }
+      poly(c, [[XC, Yf, 0], [X1, Yf, 0]].concat(arch).concat([[XC, Yf, 0]]), shade([52, 44, 36], ac));
+      poly(c, [[XC, Yf, ZS], [XC, Yf, ZV], [X1, Yf, ZV], [X1, Yf, ZS]].concat(arch), shade([150, 130, 100], ac));
+      poly(c, [[X0, Yb, 0], [X0, Yf, 0], [X0, Yf, ZV], [X0, Yb, ZV]], shade([172, 152, 118], X0));       /* the column's front */
+      poly(c, [[X0, Yf, 0], [XC, Yf, 0], [XC, Yf, ZV], [X0, Yf, ZV]], shade([140, 122, 96], X0));       /* its inner side */
+      poly(c, [[X0, Yf, ZS - 0.06], [XC, Yf, ZS - 0.06], [XC, Yf, ZS], [X0, Yf, ZS]], shade([186, 166, 130], X0));   /* its capital */
+    });
+    /* the barrel vault over the bay, coffered: six strips, alternate deep */
+    for (var k = 0; k < 6; k++) {
+      var a0 = Math.PI * k / 6, a1 = Math.PI * (k + 1) / 6, p0 = arcY(XC, a0, a1, 3), p1 = arcY(X1, a0, a1, 3).reverse();
+      poly(c, p0.concat(p1), shade(k % 2 ? [120, 104, 82] : [146, 128, 100], XC));
+    }
+    poly(c, arcY(X0, 0, Math.PI, 18).concat(arcY(XC, 0, Math.PI, 18).reverse()), shade([176, 156, 122], X0));   /* the transverse rib */
+  }
+  /* the first rib frames the wall: the stone above it is the wall's own */
+  c.fillStyle = 'rgb(160,140,108)'; c.beginPath();
+  var top = arcY(XW, 0, Math.PI, 24).map(function (p) { return pr(p[0], p[1], p[2]); });
+  c.moveTo(0, 0); c.lineTo(CW, 0); c.lineTo(CW, top[0][1]);
+  top.forEach(function (q) { c.lineTo(q[0], q[1]); }); c.lineTo(0, top[0][1]); c.closePath(); c.fill();
+  var tex = new THREE.CanvasTexture(cv); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4;
+  var geo = new THREE.BufferGeometry(), x = XW - OFF, pos = [], uv = [];
+  [[YN, H, 0, 1], [YS, H, 1, 1], [YS, 0, 1, 0], [YN, H, 0, 1], [YS, 0, 1, 0], [YN, 0, 0, 0]].forEach(function (q) { var l = P(x, q[0], q[1]); pos.push(l.x, l.y, l.z); uv.push(q[2], q[3]); });
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.computeVertexNormals();
+  own(new THREE.Mesh(geo, kit.solid(0xffffff, { map: tex, roughness: 0.92, side: THREE.DoubleSide })));
+  /* the painter's stool: a square seat on four legs, a stretcher on each side */
+  var oak = kit.solid(0x6e5034), gold = kit.solid(0x8a6e36, { roughness: 0.8 }), pal = kit.solid(0xa8875c, { roughness: 0.7 });
+  box([38.9, 2.35, 0.41], [39.3, 2.75, 0.45], oak);
+  [[38.92, 2.37], [39.24, 2.37], [38.92, 2.69], [39.24, 2.69]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.41], oak); });
+  box([38.96, 2.37, 0.14], [39.24, 2.41, 0.17], oak); box([38.96, 2.69, 0.14], [39.24, 2.73, 0.17], oak);
+  /* the palette, a flat kidney of thin board, gold caked on it in lumps, and three brushes across it */
+  var pm = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.006, 24), pal); pm.scale.set(1, 1, 0.75); pm.position.copy(P(39.1, 2.55, 0.453)); own(pm);
+  [[39.04, 2.5, 0.022], [39.08, 2.6, 0.018], [39.15, 2.53, 0.026], [39.17, 2.62, 0.015], [39.01, 2.58, 0.012]].forEach(function (q) {
+    var d = new THREE.Mesh(new THREE.SphereGeometry(q[2], 8, 6), gold); d.scale.set(1, 0.45, 1); d.position.copy(P(q[0], q[1], 0.456)); own(d); });
+  [[2.44, 0.2], [2.68, -0.3], [2.74, 0.6]].forEach(function (q, j) {
+    var br = new THREE.Group(), h = new THREE.Mesh(new THREE.CylinderGeometry(0.004, 0.006, 0.24, 8), oak), f = new THREE.Mesh(new THREE.CylinderGeometry(0.006, 0.003, 0.03, 8), gold);
+    f.position.y = 0.135; br.add(h); br.add(f); br.position.copy(P(39.1, q[0], 0.462 + j * 0.008)); br.rotation.set(0, q[1], Math.PI / 2, 'YXZ'); own(br);
+  });
+  /* three old drips of gold at the wall's foot, flat on the floor */
+  [[39.5, 2.2, 0.03], [39.45, 1.9, 0.02], [39.52, 2.48, 0.025]].forEach(function (q) { cyl(q[0], q[1], q[2], q[2], OFF - 0.002, OFF, gold, 12); });
+})();
 var WELL_EYE = 'he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water';
 thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE }]); };
 /* H82's fern well, its bands (req 1120; Interiors' docs/interiors/glass-house.md, Down the well, every band; the slits
