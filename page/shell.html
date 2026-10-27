@@ -3311,6 +3311,270 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
   fruit.forEach(function (q, k) { V3.set(q[3], q[3], q[3]); M4.compose(P(q[0], q[1], q[2]), Q0, V3); fm.setMatrixAt(k, M4); fm.setColorAt(k, C3.set(q[4])); });
   own(fm);
 })();
+/* the North Tower's Transfiguration store on 1 (req 1002; Interiors' docs/interiors/north-tower-rooms.md, 1, every row,
+   model coordinates; ledger 302): the oak shelves on the west wall, boxes of matches stacked by the hundred, the tin
+   labelled NEEDLES, teapots in rows with their lids on, a tray of snuffboxes and a jar of buttons; the rabbits' hutch and
+   run under the north loop, white rabbits on clean straw, a water bottle and a full hay rack, the tartan slippers on the
+   hutch's roof; the mice's wire-fronted house on its stand, a wheel, a nest box and a rind of cheese; the beetles'
+   glass-sided boxes on their table, one box's beetles notably fit; the sack of straw and the bin of feed, a scoop on its
+   lid. Every creature alive and well. Every foot 5 cm into the floor, every thing 1 cm into what it stands on; matches,
+   straw, beetles and buttons instanced */
+(function () {
+  if (PLACE !== 'transfiguration-store') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'store-things'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); }, seed = 11;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var oak = kit.solid(0x6e5034), iron = kit.solid(0x2f2f33), straw = kit.solid(0xd2b56a), fur = kit.solid(0xf3f0ea),
+    pink = kit.solid(0xe0a6a6), tin = kit.solid(0xa8acae, { metalness: 0.6, roughness: 0.4 }), sack = kit.solid(0x9c8257),
+    china = kit.solid(0xf1ece2),
+    glassM = new THREE.MeshStandardMaterial({ color: 0xdfe8e4, transparent: true, opacity: 0.3, roughness: 0.1, depthWrite: false });
+  var M4 = new THREE.Matrix4(), Q0 = new THREE.Quaternion(), V3 = new THREE.Vector3(), C3 = new THREE.Color();
+  function own(m) { m.userData.owner = PLACE; g.add(m); return m; }
+  function box(a, b, mt) { var m = thingBox(g, P, a, b, mt); m.userData.owner = PLACE; return m; }
+  function cyl(x, y, r0, r1, za, zb, mt, seg) { var m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, seg || 16), mt); m.position.copy(P(x, y, (za + zb) / 2)); return own(m); }
+  function lathe(x, y, z, pts, mt, seg) { var m = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (q) { return new THREE.Vector2(q[0], q[1]); }), seg || 20), mt); m.position.copy(P(x, y, z)); return own(m); }
+  function blob(x, y, z, sx, sy, sz, mt) { var m = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 9), mt); m.position.copy(P(x, y, z)); m.scale.set(sx, sz, sy); return own(m); }
+  var mc = document.createElement('canvas'); mc.width = mc.height = 32; var mx = mc.getContext('2d');
+  mx.strokeStyle = '#3a3a3e'; mx.lineWidth = 3; mx.strokeRect(0, 0, 32, 32);
+  var meshTex = new THREE.CanvasTexture(mc); meshTex.wrapS = meshTex.wrapT = THREE.RepeatWrapping;
+  function wire(w, h) {   /* a plane of wire mesh, 2.5 cm squares */
+    var t = meshTex.clone(); t.repeat.set(w / 0.025, h / 0.025); t.needsUpdate = true;
+    return own(new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.3, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4 })));
+  }
+  function inst(geo, mt, list) {   /* list of [x, y, z, sx, sy, sz, colour?] */
+    var im = new THREE.InstancedMesh(geo, mt, list.length);
+    list.forEach(function (q, k) { V3.set(q[3], q[5], q[4]); M4.compose(P(q[0], q[1], q[2]), Q0, V3); im.setMatrixAt(k, M4); if (q[6] !== undefined) im.setColorAt(k, C3.set(q[6])); });
+    return own(im);
+  }
+  /* 1, the shelves: four uprights on the wall's face (x 157.3), five boards to 2.2 */
+  [69.0, 71.32, 73.64, 75.96].forEach(function (y) { box([157.3, y, -0.05], [157.8, y + 0.04, 2.2], oak); });
+  var BD = [0.12, 0.58, 1.04, 1.5, 1.96];
+  BD.forEach(function (z) { box([157.3, 69.0, z], [157.8, 76.0, z + 0.03], oak); });
+  box([157.3, 69.0, 2.17], [157.8, 76.0, 2.2], oak);
+  /* the matches: stacks of little boxes by the hundred on the second board, the bay's length */
+  var mb = [];
+  for (var y = 69.1; y < 71.25; y += 0.075) for (var c = 0; c < 6; c++) for (var s = 0; s < 8; s++) mb.push([157.36 + c * 0.065, y + 0.03, 0.61 + 0.016 * s + 0.008, 0.06, 0.035, 0.016, s % 3 ? 0x7a5a2c : 0x8c6a34]);
+  inst(new THREE.BoxGeometry(1, 1, 1), kit.solid(0xffffff), mb);
+  /* the tin labelled NEEDLES, on the end of the matches' board, its label read from the room */
+  cyl(157.62, 71.0, 0.07, 0.07, 0.6, 0.78, tin, 18); cyl(157.62, 71.0, 0.072, 0.072, 0.77, 0.79, tin, 18);
+  var cv = document.createElement('canvas'); cv.width = 256; cv.height = 96; var cx = cv.getContext('2d');
+  cx.fillStyle = '#efe6cf'; cx.fillRect(0, 0, 256, 96); cx.fillStyle = '#2a2420'; cx.font = 'bold 44px Georgia, serif'; cx.textAlign = 'center'; cx.fillText('NEEDLES', 128, 64);
+  var tx = new THREE.CanvasTexture(cv); tx.encoding = THREE.sRGBEncoding;
+  var lab = own(new THREE.Mesh(new THREE.CylinderGeometry(0.078, 0.078, 0.07, 18, 1, true, Math.PI * 0.25, Math.PI * 0.5), new THREE.MeshStandardMaterial({ map: tx, roughness: 0.9 })));
+  lab.position.copy(P(157.62, 71.0, 0.69)); lab.userData.decal = true;   /* 8 mm off the tin */
+  /* the teapots in rows on the third and fourth boards, every kind, lids on */
+  var TEA = [0xf1ece2, 0x2c4f7a, 0x8a3a2a, 0x3b5b3a, 0xd9c8a0, 0x1e1e22, 0xb88a3a];
+  [1.07, 1.53].forEach(function (z, r) {
+    for (var k = 0; k < 11; k++) {
+      var y = 69.35 + k * 0.6 + (r ? 0.3 : 0); if (y > 75.8) continue;
+      var m = kit.solid(TEA[(k + r * 3) % TEA.length], { roughness: 0.35 }), w = 0.08 + 0.025 * ((k + r) % 3);
+      lathe(157.56, y, z - 0.005, [[0.001, 0], [w * 0.8, 0], [w, w * 0.5], [w * 0.95, w * 0.95], [w * 0.55, w * 1.25], [w * 0.5, w * 1.3], [0.02, w * 1.42], [0.001, w * 1.45]], m, 18);
+      var sp = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.022, w * 1.2, 8), m); sp.position.copy(P(157.56, y + w * 1.15, z + w * 0.75)); sp.rotation.x = -0.8; own(sp);
+      var hd = new THREE.Mesh(new THREE.TorusGeometry(w * 0.45, 0.012, 6, 12, Math.PI), m); hd.position.copy(P(157.56, y - w * 0.95, z + w * 0.7)); hd.rotation.set(0, Math.PI / 2, Math.PI / 2); own(hd);
+    }
+  });
+  /* the snuffboxes in a tray on the bottom board, plain and pretty */
+  box([157.4, 72.2, 0.145], [157.75, 72.9, 0.17], oak);
+  var SN = [0x8c8c90, 0xb8913a, 0x5a3a2a, 0x2a3a5a, 0xc0c0c4, 0x7a2a2a];
+  for (var k = 0; k < 12; k++) box([157.43 + (k % 3) * 0.105, 72.24 + Math.floor(k / 3) * 0.16, 0.165], [157.52 + (k % 3) * 0.105, 72.36 + Math.floor(k / 3) * 0.16, 0.19], kit.solid(SN[k % 6], { metalness: k % 2 ? 0.5 : 0, roughness: 0.4 }));
+  /* the jar of buttons on the top board */
+  lathe(157.56, 74.4, 1.985, [[0.001, 0], [0.08, 0], [0.085, 0.2], [0.06, 0.22], [0.06, 0.25]], glassM, 18);
+  cyl(157.56, 74.4, 0.065, 0.065, 2.23, 2.25, kit.solid(0xa8acae, { metalness: 0.6 }), 18);
+  var bt = [], BC = [0x1e1e22, 0xf1ece2, 0x7a4a2a, 0xb8913a, 0x2a4a7a, 0x8a2a2a];
+  for (var k = 0; k < 90; k++) { var a = k * 2.4 + rnd(), r = Math.sqrt(rnd()) * 0.065; bt.push([157.56 + r * Math.cos(a), 74.4 + r * Math.sin(a), 1.995 + (k / 90) * 0.15, 0.012, 0.012, 0.004, BC[k % 6]]); }
+  inst(new THREE.CylinderGeometry(1, 1, 1, 10), kit.solid(0xffffff), bt);
+  /* 2, the hutch (west, 158.6 to 159.8) and the run (159.8 to 161.4), under the north loop */
+  [[158.6, 75.8], [159.76, 75.8], [158.6, 76.76], [159.76, 76.76]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.32], oak); });
+  box([158.6, 75.8, 0.31], [159.8, 76.8, 0.34], oak);                  /* its floor */
+  box([158.6, 76.76, 0.33], [159.8, 76.8, 0.9], oak);                  /* the back */
+  box([158.6, 75.8, 0.33], [158.64, 76.8, 0.9], oak); box([159.76, 75.8, 0.33], [159.8, 76.8, 0.9], oak);
+  box([158.58, 75.78, 0.89], [159.82, 76.82, 0.92], oak);              /* the roof, the slippers on it */
+  box([158.64, 75.8, 0.62], [159.2, 75.84, 0.89], oak);                /* the sleeping end's half door */
+  var wf = wire(0.56, 0.28); wf.position.copy(P(159.48, 75.82, 0.48));
+  box([158.64, 75.84, 0.335], [159.76, 76.76, 0.35], straw);
+  /* the run: a low frame of oak, wire on every side, straw on the floor */
+  [[159.8, 75.8], [161.36, 75.8], [159.8, 76.76], [161.36, 76.76]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.62], oak); });
+  box([159.8, 75.8, 0.58], [161.4, 75.84, 0.62], oak); box([159.8, 76.76, 0.58], [161.4, 76.8, 0.62], oak); box([161.36, 75.8, 0.58], [161.4, 76.8, 0.62], oak);
+  [75.82, 76.78].forEach(function (y) { var p = wire(1.56, 0.58); p.position.copy(P(160.6, y, 0.3)); });
+  var pe = wire(0.92, 0.58); pe.position.copy(P(161.38, 76.3, 0.3)); pe.rotation.y = Math.PI / 2;
+  var pt = wire(1.56, 0.92); pt.position.copy(P(160.6, 76.3, 0.6)); pt.rotation.x = -Math.PI / 2;
+  box([159.82, 75.84, -0.01], [161.36, 76.76, 0.015], straw);
+  var stw = [];
+  for (var k = 0; k < 160; k++) stw.push([159.85 + rnd() * 1.48, 75.86 + rnd() * 0.88, 0.016, 0.12, 0.004, 0.004, 0xd8bc70]);
+  inst(new THREE.BoxGeometry(1, 1, 1), kit.solid(0xffffff), stw);
+  /* three white rabbits: the body, the head, two ears, a pink nose */
+  [[160.15, 76.25, 0.5], [160.75, 76.05, -0.6], [161.05, 76.5, 2.6]].forEach(function (q) {
+    var hx = Math.cos(q[2]), hy = Math.sin(q[2]);
+    blob(q[0], q[1], 0.11, 0.13, 0.09, 0.1, fur);
+    blob(q[0] + hx * 0.13, q[1] + hy * 0.13, 0.17, 0.06, 0.055, 0.055, fur);
+    [-1, 1].forEach(function (sd) { blob(q[0] + hx * 0.11 - hy * sd * 0.025, q[1] + hy * 0.11 + hx * sd * 0.025, 0.27, 0.018, 0.012, 0.07, fur); });
+    blob(q[0] + hx * 0.19, q[1] + hy * 0.19, 0.17, 0.01, 0.01, 0.008, pink);
+  });
+  /* the water bottle on the run's south side, the hay rack on its back */
+  cyl(160.35, 75.78, 0.035, 0.035, 0.25, 0.45, glassM, 12); box([160.34, 75.76, 0.2], [160.36, 75.8, 0.26], tin);
+  box([160.9, 76.7, 0.25], [161.3, 76.75, 0.5], iron);
+  var hay = [];
+  for (var k = 0; k < 60; k++) hay.push([160.92 + rnd() * 0.36, 76.69 + rnd() * 0.04, 0.3 + rnd() * 0.18, 0.004, 0.004, 0.12, 0xc8b06a]);
+  inst(new THREE.BoxGeometry(1, 1, 1), kit.solid(0xffffff), hay);
+  /* the tartan slippers on the hutch's roof, the lesson's goal */
+  var tc = document.createElement('canvas'); tc.width = tc.height = 64; var tt = tc.getContext('2d');
+  tt.fillStyle = '#7a1a1e'; tt.fillRect(0, 0, 64, 64); tt.fillStyle = 'rgba(20,50,30,0.7)';
+  [0, 32].forEach(function (o) { tt.fillRect(o + 4, 0, 12, 64); tt.fillRect(0, o + 4, 64, 12); });
+  tt.fillStyle = 'rgba(230,200,90,0.8)'; [0, 32].forEach(function (o) { tt.fillRect(o + 22, 0, 2, 64); tt.fillRect(0, o + 22, 64, 2); });
+  var tartan = new THREE.CanvasTexture(tc); tartan.wrapS = tartan.wrapT = THREE.RepeatWrapping; tartan.encoding = THREE.sRGBEncoding;
+  var tm = new THREE.MeshStandardMaterial({ map: tartan, roughness: 0.95 });
+  [158.95, 159.12].forEach(function (x) { blob(x, 76.3, 0.945, 0.055, 0.13, 0.035, tm); box([x - 0.05, 76.38, 0.91], [x + 0.05, 76.45, 0.93], kit.solid(0x3a2a22)); });
+  /* 3, the mice's house on its stand, its wire front to the room (west) */
+  [[164.0, 71.0], [164.76, 71.0], [164.0, 72.56], [164.76, 72.56]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.81], oak); });
+  box([164.0, 71.0, 0.8], [164.8, 72.6, 0.83], oak);
+  box([164.76, 71.0, 0.82], [164.8, 72.6, 1.3], oak); box([164.0, 71.0, 0.82], [164.8, 71.04, 1.3], oak); box([164.0, 72.56, 0.82], [164.8, 72.6, 1.3], oak);
+  box([163.98, 70.98, 1.29], [164.82, 72.62, 1.32], oak);
+  var mw = wire(1.52, 0.46); mw.position.copy(P(164.01, 71.8, 1.06)); mw.rotation.y = Math.PI / 2;
+  box([164.04, 71.04, 0.825], [164.76, 72.56, 0.84], kit.solid(0xcdb48a));   /* sawdust */
+  box([164.45, 72.1, 0.83], [164.75, 72.55, 1.0], oak);                        /* the nest box */
+  var wh = own(new THREE.Mesh(new THREE.TorusGeometry(0.1, 0.008, 6, 20), tin)); wh.position.copy(P(164.6, 71.4, 0.95)); wh.rotation.y = Math.PI / 2;
+  box([164.7, 71.38, 0.83], [164.76, 71.42, 0.96], tin);
+  var ch = own(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.03, 3), kit.solid(0xe8c04a))); ch.position.copy(P(164.25, 71.6, 0.855));
+  [[164.2, 71.25, 0x8a6a4a, 0.3], [164.35, 71.9, 0xf1ece2, 2.0], [164.18, 72.3, 0x6e5040, 4.2], [164.55, 71.75, 0xf1ece2, 1.1]].forEach(function (q) {
+    var m = kit.solid(q[2]), hx = Math.cos(q[3]), hy = Math.sin(q[3]);
+    blob(q[0], q[1], 0.865, 0.035, 0.022, 0.022, m); blob(q[0] + hx * 0.035, q[1] + hy * 0.035, 0.87, 0.015, 0.013, 0.013, m);
+    box([q[0] - hx * 0.03, q[1] - hy * 0.03, 0.845], [q[0] - hx * 0.03 + 0.004, q[1] - hy * 0.03 + 0.004, 0.85], pink);
+  });
+  /* 4, the beetles' table, three glass-sided boxes with leaves and bark on it */
+  [[161.8, 68.2], [163.16, 68.2], [161.8, 68.86], [163.16, 68.86]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.77], oak); });
+  box([161.8, 68.2, 0.76], [163.2, 68.9, 0.8], oak);
+  var bee = [];
+  [161.9, 162.35, 162.8].forEach(function (x, b) {
+    box([x, 68.3, 0.79], [x + 0.36, 68.8, 0.81], oak);
+    var gb = own(new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), glassM)); gb.position.copy(P(x + 0.18, 68.55, 0.92)); gb.scale.copy(P(x + 0.36, 68.8, 1.03).sub(P(x, 68.3, 0.81))); gb.scale.set(Math.abs(gb.scale.x), Math.abs(gb.scale.y), Math.abs(gb.scale.z));
+    box([x, 68.3, 1.02], [x + 0.36, 68.8, 1.04], oak);
+    box([x + 0.02, 68.32, 0.81], [x + 0.34, 68.78, 0.83], kit.solid(0x5a3e28));   /* the earth */
+    var bk = own(new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.03, 0.26, 7), kit.solid(0x4a3a2a))); bk.position.copy(P(x + 0.18, 68.5, 0.85)); bk.rotation.z = Math.PI / 2;
+    for (var k = 0; k < 7; k++) { var lf = own(new THREE.Mesh(new THREE.CircleGeometry(0.03, 6), kit.solid(k % 2 ? 0x4e7a32 : 0x6a8a3a))); lf.position.copy(P(x + 0.05 + rnd() * 0.26, 68.34 + rnd() * 0.42, 0.832)); lf.rotation.x = -Math.PI / 2; lf.scale.y = 1.6; }
+    var n = b === 2 ? 9 : 6;   /* the third box's beetles the fit ones, given a lot of exercise: more of them up and about on the bark */
+    for (var k = 0; k < n; k++) bee.push([x + 0.05 + rnd() * 0.26, 68.35 + rnd() * 0.4, (b === 2 && k % 2) ? 0.88 : 0.842, 0.016, 0.011, 0.007, k % 3 ? 0x1d2a1a : 0x2a3a1a]);
+  });
+  inst(new THREE.SphereGeometry(1, 8, 6), kit.solid(0xffffff, { roughness: 0.2, metalness: 0.3 }), bee);
+  /* 5, the sack of straw and the bin of feed, a scoop on its lid */
+  lathe(162.4, 74.8, -0.01, [[0.001, 0], [0.17, 0], [0.2, 0.3], [0.17, 0.62], [0.08, 0.72], [0.09, 0.78], [0.001, 0.78]], sack, 14);
+  var sw = [];
+  for (var k = 0; k < 24; k++) { var a = rnd() * 6.28; sw.push([162.4 + Math.cos(a) * 0.05, 74.8 + Math.sin(a) * 0.05, 0.8, 0.004, 0.004, 0.08, 0xd8bc70]); }
+  inst(new THREE.BoxGeometry(1, 1, 1), kit.solid(0xffffff), sw);
+  cyl(162.8, 75.2, 0.18, 0.18, -0.01, 0.76, tin, 20); cyl(162.8, 75.2, 0.19, 0.19, 0.75, 0.8, tin, 20); cyl(162.8, 75.2, 0.025, 0.025, 0.79, 0.82, iron, 8);
+  box([162.66, 75.08, 0.79], [162.9, 75.16, 0.83], tin);   /* the scoop */
+})();
+/* the North Tower's tapestry room on 3 (req 1002; Interiors' docs/interiors/north-tower-rooms.md, 2, every row, model
+   coordinates; ledger 302): the two long oak racks, west and east, three tiers of arms with the castle's spare and faded
+   tapestries rolled face in across them, a linen tag on a string at each roll's end in an old hand; the mending frame
+   under the north loop, a woodland half mended, new wool bright beside old faded, a needle threaded and pinned in it;
+   the mender's stool; a basket of wool skeins on a low stand, greens and golds sorted by shade. The pillar left clear.
+   Every foot 5 cm into the floor; skeins instanced */
+(function () {
+  if (PLACE !== 'tapestry-room') return;
+  var z0 = shell.place.floor, g = new THREE.Group(); g.name = 'tapestry-things'; g.userData.owner = PLACE; shell.group.add(g);
+  var P = function (x, y, z) { return shell.toLocal(x, y, z0 + z); }, seed = 17;
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var oak = kit.solid(0x6e5034), linen = kit.solid(0xe6dcc2), iron = kit.solid(0x2f2f33), wicker = kit.solid(0xb89558);
+  var M4 = new THREE.Matrix4(), Q0 = new THREE.Quaternion(), V3 = new THREE.Vector3(), C3 = new THREE.Color();
+  function own(m) { m.userData.owner = PLACE; g.add(m); return m; }
+  function box(a, b, mt) { var m = thingBox(g, P, a, b, mt); m.userData.owner = PLACE; return m; }
+  function cyl(x, y, r0, r1, za, zb, mt, seg) { var m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r0, zb - za, seg || 16), mt); m.position.copy(P(x, y, (za + zb) / 2)); return own(m); }
+  function tagTex(w) {
+    var cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; var c = cv.getContext('2d');
+    c.fillStyle = '#e6dcc2'; c.fillRect(0, 0, 256, 128); c.fillStyle = '#3a2a1e'; c.textAlign = 'center';
+    var parts = w.split('|'); c.font = 'italic ' + (parts[0].length > 14 ? 22 : 28) + 'px Georgia, serif';
+    parts.forEach(function (p, k) { c.fillText(p, 128, 50 + k * 34); });
+    var t = new THREE.CanvasTexture(cv); t.encoding = THREE.sRGBEncoding; return t;
+  }
+  /* a roll's back: rolled face in, so the weave's back shows, the pattern ghosting through in blotches */
+  var bc = document.createElement('canvas'); bc.width = bc.height = 64; var bx = bc.getContext('2d');
+  bx.fillStyle = '#d8d0c0'; bx.fillRect(0, 0, 64, 64);
+  for (var k = 0; k < 18; k++) { bx.fillStyle = ['rgba(90,110,70,0.18)', 'rgba(140,80,60,0.16)', 'rgba(70,80,110,0.16)'][k % 3]; bx.fillRect((k * 23) % 60, (k * 41) % 60, 6 + (k % 4) * 3, 4 + (k % 3) * 3); }
+  bx.fillStyle = 'rgba(0,0,0,0.08)'; for (var k = 0; k < 64; k += 2) bx.fillRect(0, k, 64, 1);
+  var backTex = new THREE.CanvasTexture(bc); backTex.wrapS = backTex.wrapT = THREE.RepeatWrapping; backTex.encoding = THREE.sRGBEncoding;
+  /* a rack: three posts each side of its 0.8, arms across x at three tiers, rails along y; rolls lie along it */
+  function rack(x0, x1, inner, rolls) {
+    var ys = [69.5, 72.0, 74.46];
+    ys.forEach(function (y) { [x0, x1 - 0.06].forEach(function (x) { box([x, y, -0.05], [x + 0.06, y + 0.04, 2.0], oak); }); });
+    [0.55, 1.2, 1.85].forEach(function (z) {
+      ys.forEach(function (y) { box([x0, y, z - 0.04], [x1, y + 0.04, z], oak); });
+      [x0 + 0.04, x1 - 0.08].forEach(function (x) { box([x, 69.5, z - 0.03], [x + 0.04, 74.5, z], oak); });
+    });
+    rolls.forEach(function (r) {   /* [tier z, along y from, to, radius, colour, tag or null, x offset] */
+      var t = backTex.clone(); t.needsUpdate = true; t.repeat.set(2, (r[2] - r[1]) * 1.5);
+      var m = new THREE.MeshStandardMaterial({ map: t, color: kit.col(r[4]), roughness: 0.97 }), y = (r[1] + r[2]) / 2, xm = (x0 + x1) / 2 + (r[6] || 0), zc = r[0] + r[3] - 0.005;
+      var cy = own(new THREE.Mesh(new THREE.CylinderGeometry(r[3], r[3], r[2] - r[1], 18), m)); cy.position.copy(P(xm, y, zc)); cy.rotation.x = Math.PI / 2;
+      if (r[5]) {   /* the tag on a string over the roll's room side, near its end, 8 mm off it, its face to the room */
+        var sd = inner ? -1 : 1, tx = xm + sd * (r[3] + 0.008), ty = r[2] - 0.2;
+        box([tx - 0.002, ty - 0.002, zc + 0.035], [tx + 0.002, ty + 0.002, zc + r[3] * 0.75], linen);
+        var tg = own(new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.08), new THREE.MeshStandardMaterial({ map: tagTex(r[5]), roughness: 0.95, side: THREE.DoubleSide })));
+        tg.position.copy(P(tx, ty, zc)); tg.rotation.y = sd * Math.PI / 2; tg.userData.decal = true;
+      }
+    });
+  }
+  /* A, west: THE UNICORN, SECOND BEST; SIEGE OF THE TOWER (MOTHS); HUNTING PARTY, THE DOG MISSING; KNIGHTS, TOO MANY */
+  rack(155.5, 156.3, false, [
+    [0.55, 69.6, 71.9, 0.16, 0x8a7a5a, 'THE UNICORN,|SECOND BEST', -0.15], [0.55, 69.6, 71.6, 0.13, 0x6a5a4a, null, 0.17],
+    [0.55, 72.1, 74.4, 0.14, 0x7a6248, 'SIEGE OF THE TOWER|(MOTHS)', 0],
+    [1.2, 69.6, 72.1, 0.15, 0x5a6a5a, 'HUNTING PARTY,|THE DOG MISSING', 0],
+    [1.2, 72.1, 74.4, 0.12, 0x8a6a5a, null, -0.15], [1.2, 72.3, 74.3, 0.11, 0x6e6250, null, 0.15],
+    [1.85, 69.6, 72.4, 0.17, 0x7a6a62, 'KNIGHTS,|TOO MANY', 0], [1.85, 72.6, 74.4, 0.12, 0x6a6a58, null, 0]
+  ]);
+  /* B, east, under the east loop's light: FOUR SEASONS (SPRING FADED); THE LAKE, BEFORE THE SQUID; GARDEN, UPSIDE DOWN */
+  rack(163.7, 164.5, true, [
+    [0.55, 69.6, 71.9, 0.15, 0x7a8a6a, 'FOUR SEASONS|(SPRING FADED)', 0],
+    [0.55, 72.1, 74.4, 0.13, 0x6a6a5a, null, -0.15], [0.55, 72.1, 74.2, 0.12, 0x7a6a52, null, 0.15],
+    [1.2, 69.6, 72.2, 0.16, 0x5a6a7a, 'THE LAKE,|BEFORE THE SQUID', 0],
+    [1.2, 72.4, 74.4, 0.13, 0x8a7a5a, null, 0],
+    [1.85, 69.6, 72.0, 0.14, 0x6a7a5a, 'GARDEN, UPSIDE DOWN|(HUNG WRONG 1611)', 0], [1.85, 72.2, 74.4, 0.15, 0x7a6a62, null, 0]
+  ]);
+  /* C, the mending frame under the north loop: two trestles, the rails, the half-mended woodland stretched on it */
+  [158.0, 162.0].forEach(function (x) {
+    box([x - 0.03, 75.62, -0.05], [x + 0.03, 75.68, 0.78], oak); box([x - 0.03, 76.52, -0.05], [x + 0.03, 76.58, 0.78], oak);
+    box([x - 0.03, 75.62, 0.3], [x + 0.03, 76.58, 0.34], oak);
+  });
+  box([157.8, 75.6, 0.77], [162.2, 75.68, 0.82], oak); box([157.8, 76.52, 0.77], [162.2, 76.6, 0.82], oak);
+  box([157.8, 75.6, 0.77], [157.88, 76.6, 0.82], oak); box([162.12, 75.6, 0.77], [162.2, 76.6, 0.82], oak);
+  var wc = document.createElement('canvas'); wc.width = 1024; wc.height = 220; var w = wc.getContext('2d');
+  function wood(bright) {   /* a woodland: sky, trees, a deer, flowers; faded or new */
+    w.fillStyle = bright ? '#6e8ea6' : '#a6aa98'; w.fillRect(0, 0, 1024, 90);
+    w.fillStyle = bright ? '#3c6a2a' : '#7e866a'; w.fillRect(0, 90, 1024, 130);
+    for (var t = 0; t < 14; t++) {
+      var tx0 = 30 + t * 72; w.fillStyle = bright ? '#5a3a1e' : '#857560'; w.fillRect(tx0, 70, 12, 120);
+      w.fillStyle = bright ? (t % 2 ? '#2e6a2a' : '#4a8a2e') : (t % 2 ? '#7a8466' : '#8a9272'); w.beginPath(); w.arc(tx0 + 6, 62, 34, 0, 6.3); w.fill();
+    }
+    w.fillStyle = bright ? '#a0622a' : '#9a8a72'; w.fillRect(470, 150, 70, 26); w.fillRect(530, 128, 14, 26); w.fillRect(476, 176, 6, 26); w.fillRect(528, 176, 6, 26);
+    for (var f = 0; f < 40; f++) { w.fillStyle = bright ? ['#e0b02a', '#c03a3a', '#f0e6c8'][f % 3] : ['#b8aa82', '#a68a7a', '#c8c0aa'][f % 3]; w.fillRect((f * 263) % 1024, 180 + (f * 37) % 34, 6, 6); }
+  }
+  wood(false); var old = w.getImageData(0, 0, 1024, 220); wood(true); var neu = w.getImageData(0, 0, 1024, 220);
+  for (var y = 0; y < 220; y++) for (var x = 0; x < 1024; x++) {   /* the mended half west, a ragged edge between */
+    var edge = 470 + 60 * Math.sin(y * 0.09) + 30 * Math.sin(y * 0.31), i = (y * 1024 + x) * 4;
+    if (x > edge) for (var q = 0; q < 4; q++) neu.data[i + q] = old.data[i + q];
+  }
+  w.putImageData(neu, 0, 0);
+  w.fillStyle = 'rgba(80,70,55,0.55)'; for (var h = 0; h < 30; h++) w.fillRect(560 + (h * 97) % 440, (h * 53) % 210, 10, 4);   /* the bare warp, still to mend */
+  var tex = new THREE.CanvasTexture(wc); tex.encoding = THREE.sRGBEncoding;
+  var cl = new THREE.BufferGeometry(), a = P(157.88, 75.68, 0.828), b = P(162.12, 75.68, 0.828), c2 = P(162.12, 76.52, 0.828), d = P(157.88, 76.52, 0.828);
+  cl.setAttribute('position', new THREE.Float32BufferAttribute([a.x, a.y, a.z, b.x, b.y, b.z, c2.x, c2.y, c2.z, a.x, a.y, a.z, c2.x, c2.y, c2.z, d.x, d.y, d.z], 3));
+  cl.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1], 2)); cl.computeVertexNormals();
+  var cloth = own(new THREE.Mesh(cl, new THREE.MeshStandardMaterial({ map: tex, roughness: 0.98, side: THREE.DoubleSide }))); cloth.userData.decal = true;   /* 8 mm over the rails */
+  /* the needle, threaded with a green wool, pinned at the mend's edge */
+  var nd = own(new THREE.Mesh(new THREE.CylinderGeometry(0.0015, 0.0015, 0.06, 5), kit.solid(0xc0c0c4, { metalness: 0.8, roughness: 0.3 }))); nd.position.copy(P(160.0, 76.1, 0.832)); nd.rotation.z = Math.PI / 2;
+  box([159.97, 76.1, 0.8315], [160.25, 76.104, 0.834], kit.solid(0x3c6a2a));
+  /* D, the mender's stool at the frame */
+  box([159.7, 74.8, 0.44], [160.3, 75.3, 0.48], oak);
+  [[159.72, 74.82], [160.24, 74.82], [159.72, 75.24], [160.24, 75.24]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.45], oak); });
+  /* E, the basket of skeins on its low stand, greens and golds sorted by shade */
+  box([161.4, 67.6, 0.3], [162.2, 68.4, 0.34], oak);
+  [[161.42, 67.62], [162.14, 67.62], [161.42, 68.34], [162.14, 68.34]].forEach(function (q) { box([q[0], q[1], -0.05], [q[0] + 0.04, q[1] + 0.04, 0.31], oak); });
+  var bl = own(new THREE.Mesh(new THREE.LatheGeometry([[0.001, 0], [0.3, 0], [0.36, 0.24], [0.355, 0.25], [0.29, 0.01], [0.001, 0.01]].map(function (q) { return new THREE.Vector2(q[0], q[1]); }), 24), wicker));
+  bl.position.copy(P(161.8, 68.0, 0.33));
+  var SK = [0x23421c, 0x2e5a24, 0x3e6e2a, 0x5a8a34, 0x7aa040, 0x8a7a1e, 0xa88a24, 0xc8a02a, 0xd8b84a, 0xe6cc6a], sk = [];
+  for (var k = 0; k < 30; k++) { var ka = (k / 30) * 6.28, kr = k % 3 ? 0.22 : 0.1; sk.push([161.8 + kr * Math.cos(ka), 68.0 + kr * Math.sin(ka), 0.43 + (k % 2) * 0.03, 0.08, 0.035, 0.035, SK[Math.floor(k / 3)]]); }
+  var im = new THREE.InstancedMesh(new THREE.TorusGeometry(1, 0.45, 8, 14), kit.solid(0xffffff), sk.length), Q1 = new THREE.Quaternion();
+  sk.forEach(function (q, k) { Q1.setFromEuler(new THREE.Euler(Math.PI / 2, (k / 30) * 6.28, 0)); V3.set(q[3], q[3], q[5] * 2); M4.compose(P(q[0], q[1], q[2]), Q1, V3); im.setMatrixAt(k, M4); im.setColorAt(k, C3.set(q[6])); });
+  own(im);
+})();
 /* the eye's tap (Events, hidden-ways.json's undercroft-well-eye-first and -again): the same string on the page with no runtime */
 var WELL_EYE = 'he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water';
 thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE }]); };
