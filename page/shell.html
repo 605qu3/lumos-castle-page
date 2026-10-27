@@ -3171,6 +3171,109 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
 /* the eye's tap (Events, hidden-ways.json's undercroft-well-eye-first and -again): the same string on the page with no runtime */
 var WELL_EYE = 'he kneels to the round of thick old glass in the middle of the lid; far down the shaft, in the black, a small green light, wavering, like daylight through water';
 thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE }]); };
+/* H82's glass house planted (req 1120; Interiors' docs/interiors/glass-house.md, The glass house and The arrival
+   balcony's rail, every row; the ferns, pool and benches Godric's pick, "ferns thick ... tree ferns, a pool, an iron bench
+   or two"; ledger 297): the gravel over the floor 8 mm up (the walks and the ring between the beds), the round pool at
+   (18, -22) with its coping 0.3 wide and 0.35 high and its dark water, six beds of Victorian rockwork with ferns to 1.2,
+   seven Dicksonia tree ferns (the two under the balcony cut to 4.0, their crowns under its slab), the two cast-iron
+   benches facing over the pool, hart's-tongue and maidenhair on the north end's stone, and the balcony's black iron
+   rail, 1.0 high, its balusters 0.1 inside the slab's edge, the arch left open. Fronds and rocks are two instanced
+   meshes. The sealed carboy waits on Godric's card (interiors-glass-house-1024); the walks' stone edging is not drawn */
+(function () {
+  if (PLACE !== 'h82-glass-house') return;
+  var z0 = shell.place.floor, D2R = Math.PI / 180, seed = 11;
+  var root = new THREE.Group(); root.name = 'h82-planting'; root.userData.owner = PLACE; shell.group.add(root);
+  function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  function L(x, y, h) { return shell.toLocal(x, y, z0 + h); }
+  function own(m, name) { m.name = name; m.userData.owner = PLACE; m.raycast = function () {}; root.add(m); return m; }
+  var gravel = kit.solid(0x6f6a5b, { roughness: 1 }), stone = kit.solid(0x5f5c55, { roughness: 0.9 }), soil = kit.solid(0x3a2e24, { roughness: 1 }),
+      iron = kit.solid(0x1c1d1c, { roughness: 0.55, metalness: 0.3 }), green = kit.solid(0x3d5a44, { roughness: 0.6, metalness: 0.2 }),
+      bark = kit.solid(0x4a3626, { roughness: 1 }), water = new THREE.MeshStandardMaterial({ color: new THREE.Color(0x1d2a28).convertSRGBToLinear(), roughness: 0.15, metalness: 0.1 });
+  function box(x0, y0, h0, x1, y1, h1, mat, name) {
+    var a = L(x0, y0, h0), b = L(x1, y1, h1), g = new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z));
+    var m = own(new THREE.Mesh(g, mat), name); m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); return m;
+  }
+  /* the gravel: the whole floor inside the glass less 0.05, 8 mm up */
+  var gr = box(12.05, -30.95, 0.0, 27.95, -13.05, 0.008, gravel, 'h82-gravel'); gr.userData.decal = true;
+  /* the pool: coping r 1.7 to 2.0, 0.35 high; the water at 0.25 */
+  var cp = own(new THREE.Mesh(new THREE.LatheGeometry([[1.7, 0], [2.0, 0], [2.0, 0.35], [1.7, 0.35], [1.7, 0]].map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 48), stone), 'h82-pool-coping');
+  cp.position.copy(L(18, -22, 0));
+  var wt = own(new THREE.Mesh(new THREE.CircleGeometry(1.7, 48), water), 'h82-pool-water'); wt.position.copy(L(18, -22, 0.25)); wt.rotation.x = -Math.PI / 2;
+  /* a frond: base at the origin along +z, drooping, its pinnae a zigzag edge; one geometry, instanced */
+  var fp = [], N = 26;
+  for (var i = 0; i < N; i++) {
+    var t0 = i / N, t1 = (i + 1) / N;
+    var w = function (t, k) { return 0.13 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.08)), 0.8) * (k % 2 ? 0.45 : 1); };
+    var y = function (t) { return -0.38 * t * t; };
+    var a0 = [-w(t0, i), y(t0), t0], b0 = [w(t0, i), y(t0), t0], a1 = [-w(t1, i + 1), y(t1), t1], b1 = [w(t1, i + 1), y(t1), t1];
+    [a0, b0, b1, a0, b1, a1].forEach(function (p) { fp.push(p[0], p[1] + Math.abs(p[0]) * 0.6, p[2]); });   /* the pinnae lift a little: a shallow V */
+  }
+  var fg = new THREE.BufferGeometry(); fg.setAttribute('position', new THREE.Float32BufferAttribute(fp, 3)); fg.computeVertexNormals();
+  var fronds = [];
+  function frond(x, y, h, dx, dy, pitch, len, wide) {
+    var p = L(x, y, h), d = L(x + dx, y + dy, h).sub(p); fronds.push({ p: p, yaw: Math.atan2(d.x, d.z), pitch: pitch, len: len, wide: wide || 1 });
+  }
+  /* the beds: soil at 0.3, rocks round the edge 0.3 to 0.6, clumps of ferns 0.5 to 1.1 long */
+  var rocks = [];
+  [[13, -18.5, 16.9, -14], [19.1, -18.5, 27, -14], [21.8, -26, 27, -18.8], [13, -25.2, 14.2, -18.8], [13, -30, 16.9, -25.8], [19.1, -30, 27, -26.3]].forEach(function (b, k) {
+    box(b[0] + 0.12, b[1] + 0.12, 0.0, b[2] - 0.12, b[3] - 0.12, 0.3, soil, 'h82-bed-' + k);
+    var per = [[b[0], b[1], b[2], b[1]], [b[2], b[1], b[2], b[3]], [b[2], b[3], b[0], b[3]], [b[0], b[3], b[0], b[1]]];
+    per.forEach(function (e) {
+      var len = Math.hypot(e[2] - e[0], e[3] - e[1]), n = Math.max(2, Math.round(len / 0.42));
+      for (var j = 0; j < n; j++) { var t = (j + 0.5) / n; rocks.push({ x: e[0] + (e[2] - e[0]) * t, y: e[1] + (e[3] - e[1]) * t, h: 0.3 + rnd() * 0.3, r: rnd() }); }
+    });
+    for (var cx = b[0] + 0.45; cx < b[2] - 0.3; cx += 0.75) for (var cy = b[1] + 0.45; cy < b[3] - 0.3; cy += 0.75) {
+      var ox = cx + (rnd() - 0.5) * 0.25, oy = cy + (rnd() - 0.5) * 0.25, nf = 6 + Math.floor(rnd() * 4), L0 = 0.5 + rnd() * 0.55;
+      for (var f = 0; f < nf; f++) { var a = (f / nf + rnd() * 0.1) * Math.PI * 2; frond(ox, oy, 0.3, Math.sin(a), Math.cos(a), (45 + rnd() * 25) * D2R, L0 * (0.8 + rnd() * 0.3)); }
+    }
+  });
+  var rg = new THREE.IcosahedronGeometry(0.17, 0), rm = new THREE.InstancedMesh(rg, stone, rocks.length), M4 = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), V3 = new THREE.Vector3();
+  rocks.forEach(function (r, k) {
+    Q4.setFromEuler(new THREE.Euler(r.r * 3, r.r * 7, r.r * 5)); V3.set(1.0 + r.r * 0.3, r.h / 0.36, 0.9);
+    M4.compose(L(r.x, r.y, r.h * 0.42), Q4, V3); rm.setMatrixAt(k, M4);
+  });
+  own(rm, 'h82-rockwork');
+  /* the tree ferns: trunks 0.3 to 0.4, 3 to 5 tall (the two under the balcony 4.0), crowns of 14 fronds about 3 across */
+  [[14.9, -16.2, 3.7, 0.36], [21.0, -16.0, 3.7, 0.34], [24.5, -15.8, 4.0, 0.38], [24.2, -20.5, 3.0, 0.32], [25.0, -24.0, 4.2, 0.4], [22.8, -28.2, 3.3, 0.34], [14.9, -28.0, 3.8, 0.37]].forEach(function (t, k) {
+    var tr = own(new THREE.Mesh(new THREE.CylinderGeometry(t[3] / 2 * 0.85, t[3] / 2, t[2], 9), bark), 'h82-tree-fern-' + k); tr.position.copy(L(t[0], t[1], t[2] / 2));
+    for (var f = 0; f < 20; f++) { var a = (f / 20) * Math.PI * 2 + k + rnd() * 0.2; frond(t[0], t[1], t[2] - 0.05, Math.sin(a), Math.cos(a), [22, 38, 55][f % 3] * D2R, (f % 3 === 2 ? 1.5 : 2.0) + rnd() * 0.25, 1.6); }
+  });
+  /* hart's-tongue and maidenhair on the north end's stone, 1.5 to 5.5 up, out of the joints, the arch's wall bare */
+  [[12.5, 14.3], [21.7, 27.5]].forEach(function (s) {
+    for (var x = s[0] + 0.15; x < s[1]; x += 0.32) for (var h = 1.5 + rnd() * 0.3; h < 5.5; h += 0.45 + rnd() * 0.3) {
+      if (rnd() < 0.35) continue;
+      var n = 2 + Math.floor(rnd() * 3);
+      for (var f = 0; f < n; f++) frond(x + (rnd() - 0.5) * 0.12, -13.0 + 0.01, h, (rnd() - 0.5) * 0.8, -1, (10 + rnd() * 30) * D2R, 0.22 + rnd() * 0.18, f % 2 ? 0.5 : 0.9);
+    }
+  });
+  var fm = new THREE.InstancedMesh(fg, new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.75, side: THREE.DoubleSide }), fronds.length), C3 = new THREE.Color();
+  var e = new THREE.Euler(0, 0, 0, 'YXZ');
+  fronds.forEach(function (f, k) {
+    e.set(-f.pitch, f.yaw, 0); Q4.setFromEuler(e); V3.set(f.len * f.wide, f.len, f.len); M4.compose(f.p, Q4, V3); fm.setMatrixAt(k, M4);
+    C3.setHSL(0.27 + rnd() * 0.06, 0.45 + rnd() * 0.15, 0.22 + rnd() * 0.1); fm.setColorAt(k, C3);
+  });
+  own(fm, 'h82-fronds');
+  /* the benches, cast iron, green worn: W's back on the west, E's on the east, ends 0.06 thick */
+  [[14.55, 15.15, -1], [20.85, 21.45, 1]].forEach(function (b, k) {
+    var back = b[2] < 0 ? b[0] : b[1], front = b[2] < 0 ? b[1] : b[0], s = b[2] < 0 ? 1 : -1;
+    [-22.75, -21.31].forEach(function (y, j) { box(Math.min(back, front), y, 0.0, Math.max(back, front), y + 0.06, 0.45, green, 'h82-bench-' + k + '-end-' + j); });
+    for (var q = 0; q < 5; q++) { var x0 = back + s * (0.04 + q * 0.11); box(Math.min(x0, x0 + s * 0.08), -22.69, 0.42, Math.max(x0, x0 + s * 0.08), -21.31, 0.46, green, 'h82-bench-' + k + '-slat-' + q); }
+    for (var q2 = 0; q2 < 4; q2++) box(Math.min(back, back + s * 0.05), -22.69, 0.52 + q2 * 0.09, Math.max(back, back + s * 0.05), -21.31, 0.58 + q2 * 0.09, green, 'h82-bench-' + k + '-back-' + q2);
+    [-22.75, -21.31].forEach(function (y, j) { box(Math.min(back, back + s * 0.06), y, 0.45, Math.max(back, back + s * 0.06), y + 0.06, 0.9, green, 'h82-bench-' + k + '-post-' + j); });
+  });
+  /* the balcony's rail: the slab's top at 6.0; balusters 0.1 inside its south edge (y -14.9), returns at x 14.6 and 21.4 */
+  var SL = 6.0, runs = [[14.6, -14.9, 21.4, -14.9], [14.6, -14.9, 14.6, -13.0], [21.4, -14.9, 21.4, -13.0]], bal = [];
+  runs.forEach(function (r, k) {
+    var len = Math.hypot(r[2] - r[0], r[3] - r[1]), ux = (r[2] - r[0]) / len, uy = (r[3] - r[1]) / len;
+    box(Math.min(r[0], r[2]) - 0.025, Math.min(r[1], r[3]) - 0.025, SL + 0.95, Math.max(r[0], r[2]) + 0.025, Math.max(r[1], r[3]) + 0.025, SL + 1.0, iron, 'h82-rail-top-' + k);
+    box(Math.min(r[0], r[2]) - 0.012, Math.min(r[1], r[3]) - 0.012, SL + 0.11, Math.max(r[0], r[2]) + 0.012, Math.max(r[1], r[3]) + 0.012, SL + 0.13, iron, 'h82-rail-bottom-' + k);
+    for (var d = 0.06; d < len - 0.03; d += 0.12) bal.push([r[0] + ux * d, r[1] + uy * d]);
+    for (var pd = 0; pd <= len + 0.001; pd += Math.min(1.17, len)) box(r[0] + ux * pd - 0.03, r[1] + uy * pd - 0.03, SL - 0.01, r[0] + ux * pd + 0.03, r[1] + uy * pd + 0.03, SL + 0.95, iron, 'h82-rail-post-' + k + '-' + Math.round(pd * 100));
+  });
+  var bm = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.01, 0.01, 0.82, 6), iron, bal.length);
+  bal.forEach(function (p, k) { M4.makeTranslation(0, 0, 0); M4.setPosition(L(p[0], p[1], SL + 0.13 + 0.41)); bm.setMatrixAt(k, M4); });
+  own(bm, 'h82-rail-balusters');
+})();
 /* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
    green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
    and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
