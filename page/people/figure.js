@@ -157,7 +157,7 @@
      the edge of the light, crossed deeper in; never on the skin. The strokes run on the figure's own body (its rest
      pose), so they stay on the cloth as he moves; each thins to nothing, not to a pixel's grey, and they fade out where
      they would be finer than a pixel */
-  function pen(mat, density) {
+  function pen(mat, density, hc) {
     mat.extensions = { derivatives: true };
     var prev = mat.onBeforeCompile;
     mat.onBeforeCompile = function (sh) {
@@ -176,14 +176,38 @@
           'toL = normalize(pointLights[0].position + vViewPosition);',
           '#endif',
           'float nl = dot(normalize(normal), toL);',
-          'float hard = vPen < 0.5 ? 0.0 : vPen < 1.5 ? 1.0 : vPen < 2.5 ? 0.0 : 0.6;',
+          'float hard = vPen < 0.5 ? 0.0 : vPen < 1.5 ? 1.0 : 0.0;',
           'float t1 = clamp((0.0 - nl) * 0.45, 0.0, 0.16) * hard, t2 = clamp((-0.45 - nl) * 0.5, 0.0, 0.14) * hard;',
           'float c1 = (vObj.x * 0.62 + vObj.y + vObj.z * 0.48) * ' + density.toFixed(1) + ';',
           'float c2 = (-vObj.x * 0.7 + vObj.y * 0.55 - vObj.z * 0.6) * ' + (density * 0.9).toFixed(1) + ';',
           'float h = max(strokes(c1, t1), strokes(c2, t2));',
-          'gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.075, 0.058, 0.045), h * 0.82);'
+          'gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.075, 0.058, 0.045), h * 0.82);',
+          /* the hair: strands from the crown, fine in the light and fuller in the shade, in the hair's own darker tone */
+          'if (vPen > 2.5) { vec3 dh = vObj - vec3(' + hc.x.toFixed(3) + ', ' + hc.y.toFixed(3) + ', ' + hc.z.toFixed(3) + ');',
+          '  float ca = (atan(dh.x, dh.z) + 0.05 * sin(dh.y * 40.0) + 0.03 * sin(dh.y * 97.0)) * 7.0;',
+          '  float hs = strokes(ca, mix(0.05, 0.16, clamp(0.5 - nl, 0.0, 1.0)));',
+          '  gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * 0.55, hs); }'
         ].join('\n'));
     };
+  }
+  /* ---- the candle's tone: the room's orange light keeps its strength and its steps but gives the colours a softer
+     warmth, as the painted cards are toned by night (figure-test.html's card colour), the skin most, so faces and white
+     shirts keep their own colour and do not go one orange. Its k is light(k)'s ---- */
+  function nightTone(mat) {
+    var u = { value: 0 }, w = lin(0xffe4c8), lw = 0.2126 * w.r + 0.7152 * w.g + 0.0722 * w.b;
+    var tint = 'vec3(' + [w.r, w.g, w.b].map(function (c) { return (c / lw).toFixed(3); }).join(', ') + ')';
+    var prev = mat.onBeforeCompile;
+    mat.onBeforeCompile = function (sh) {
+      if (prev) prev(sh);
+      sh.uniforms.uNight = u;
+      sh.fragmentShader = 'uniform float uNight;\n' + sh.fragmentShader.replace('#include <dithering_fragment>', [
+        'if (uNight > 0.0) { vec3 lw = vec3(0.2126, 0.7152, 0.0722);',
+        '  float lv = dot(outgoingLight, lw) / max(dot(diffuseColor.rgb, lw), 0.002);',
+        '  vec3 nc = diffuseColor.rgb * lv * ' + tint + ';',
+        '  gl_FragColor.rgb = mix(gl_FragColor.rgb, linearToOutputTexel(vec4(nc, 1.0)).rgb, uNight * (vPen > 1.5 && vPen < 2.5 ? 0.9 : 0.7)); }',
+        '#include <dithering_fragment>'].join('\n'));
+    };
+    return u;
   }
   /* the drawing's own colours: where it is opaque it is ink and shading over the part's colour (the skin's tone); where
      it is faint it is a colour of its own (the whites of the eyes, the iris), not tinted by the skin */
@@ -218,8 +242,8 @@
     });
     /* the eyes: the white and the iris their own colours; the upper lid in ink, heavier, the lower a fine line */
     [-1, 1].forEach(function (s) {
-      var e = P(s * 0.36, -0.01), ew = 0.17 * kx, eh = 0.075 * ky;
-      var ix = e[0] + s * (f.look || 0) * ew * 0.3, iy = e[1] + eh * 0.12;
+      var e = P(s * 0.36, -0.01), ew = 0.17 * kx * (f.eye || 1), eh = 0.075 * ky * (f.eye || 1);
+      var ix = e[0] + s * (f.look || 0) * ew * 0.3, iy = e[1] + eh * (0.12 + 0.3 * (f.down || 0));   /* down: at the work on the desk */
       function eye() { x.beginPath(); x.ellipse(e[0], e[1], ew, eh, 0, 0, TAU); }
       own([eye], '236,230,218');
       own([eye, function () { x.beginPath(); x.arc(ix, iy, eh * 0.95, 0, TAU); }], f.iris || '88,60,38');
@@ -242,14 +266,20 @@
     });
     /* the nose: its shadowed side, the nostrils */
     var n0 = P(0.06, -0.06), n1 = P(0.1, 0.17);
+    if (f.child) {
+      var t0 = P(0.05, 0.12), t1 = P(0.0, 0.2), t2 = P(-0.05, 0.17);
+      x.strokeStyle = soft; x.lineWidth = 1.1 * lw;
+      x.beginPath(); x.moveTo(t0[0], t0[1]); x.quadraticCurveTo(t0[0] + 2 * lw, t1[1], t1[0], t1[1]); x.quadraticCurveTo(t2[0], t1[1], t2[0], t2[1]); x.stroke();
+    } else {
     x.strokeStyle = soft; x.lineWidth = 1.5 * lw;
     x.beginPath(); x.moveTo(n0[0], n0[1]); x.quadraticCurveTo(n1[0] + 3 * lw, n1[1] - 8 * lw, n1[0], n1[1]); x.stroke();
     x.strokeStyle = ink; x.lineWidth = 1.6 * lw;
     [-1, 1].forEach(function (s) { var q = P(s * 0.07, 0.2); x.beginPath(); x.arc(q[0], q[1], 3.2 * lw, s > 0 ? Math.PI * 0.9 : Math.PI * 0.1, s > 0 ? Math.PI * 1.9 : -Math.PI * 0.9, s < 0); x.stroke(); });
+    }
     /* the mouth: the parting line in ink, the lower lip a soft colour over the skin */
     var m = P(0, 0.47), mw = 0.2 * kx * (f.mouthW || 1), sm = (f.smile !== undefined ? f.smile : 0.5);
-    x.fillStyle = 'rgba(214,140,128,1)';
-    x.beginPath(); x.ellipse(m[0], m[1] + 3.5 * lw, mw * 0.62, 3.6 * lw, 0, 0, TAU); x.fill();
+    x.fillStyle = f.child ? 'rgba(214,140,128,0.55)' : 'rgba(214,140,128,1)';
+    x.beginPath(); x.ellipse(m[0], m[1] + (f.child ? 2.2 : 3.5) * lw, mw * (f.child ? 0.45 : 0.62), (f.child ? 1.8 : 3.6) * lw, 0, 0, TAU); x.fill();
     x.strokeStyle = 'rgba(110,52,44,1)'; x.lineWidth = 2.1 * lw;
     x.beginPath(); x.moveTo(m[0] - mw, m[1] - sm * 4 * lw); x.quadraticCurveTo(m[0], m[1] + sm * 6 * lw, m[0] + mw, m[1] - sm * 4 * lw); x.stroke();
     if (f.age) {   /* the lines from nose to mouth */
@@ -274,6 +304,15 @@
     return t;
   }
 
+  /* hair in locks: a sphere's points pushed out in ridges round it (n of them, depth d of its radius R), and below the
+     height lo (of R) its edge hung in points, one to each lock, so its rim reads as hair and not as a shell */
+  function locks(R, n, d, lo) {
+    return function (w) {
+      var a = Math.atan2(w.x, w.z), k = 1 + d * Math.sin(a * n) * Math.min(1, (R - w.y) / R);
+      w.x *= k; w.z *= k;
+      if (w.y < lo * R) w.y -= R * 0.1 * (0.5 + 0.5 * Math.cos(a * n)) * Math.min(1, (lo * R - w.y) / (R * 0.15));
+    };
+  }
   /* The head: c its middle, r its radius; the face drawn on the skin (the head's uv), the nose and ears modelled. o {
      skin, hair, hairCap (the cap's own colour or slot), long, curly, moustache, goatee, hat, hatCol, band, slick } */
   function head(kit, c, r, o, bone) {
@@ -288,8 +327,8 @@
       kit.add(new THREE.SphereGeometry(r * 0.21, 6, 4), M(c.x + s * r * 0.87, c.y - r * 0.06, c.z - r * 0.02, 0, s * 0.3, 0, 0.42, 1, 0.72), skin, bone, { pen: 2 });
     });
     /* the hair: a cap tipped back so the brow is clear and the nape covered; slicked, curly or with a fall behind */
-    var capG = new THREE.SphereGeometry(r * 1.07, 14, 7, 0, TAU, 0, Math.PI * 0.56), capM = M(c.x, c.y + r * 0.05, c.z - r * 0.04, -0.42, 0, 0, 0.93, o.slick ? 0.98 : 1.06, 1.0);
-    kit.add(capG, capM, cap, bone, { pen: 3 });
+    var capG = new THREE.SphereGeometry(r * 1.07, 30, 10, 0, TAU, 0, Math.PI * 0.56), capM = M(c.x, c.y + r * 0.05, c.z - r * 0.04, -0.42, 0, 0, 0.93, o.slick ? 0.98 : 1.06, 1.0);
+    kit.add(capG, capM, cap, bone, { pen: 3, deform: o.slick ? null : locks(r * 1.07, 13, 0.035, -0.12) });
     if (o.curly) {
       var cg = new THREE.SphereGeometry(r * 1.13, 20, 10, 0, TAU, 0, Math.PI * 0.62);
       kit.add(cg, M(c.x, c.y + r * 0.08, c.z - r * 0.06, -0.38, 0, 0, 0.98, 1.08, 1.04), o.curly, bone, { pen: 3, deform: function (w) {
@@ -297,7 +336,7 @@
       } });
     }
     if (o.long) {
-      kit.add(new THREE.SphereGeometry(r, 12, 8), M(c.x, c.y - r * 0.5, c.z - r * 0.48, 0.12, 0, 0, 1.0, 1.35, 0.6), o.long, bone, { pen: 3 });
+      kit.add(new THREE.SphereGeometry(r, 22, 10), M(c.x, c.y - r * 0.5, c.z - r * 0.48, 0.12, 0, 0, 1.0, 1.35, 0.6), o.long, bone, { pen: 3, deform: locks(r, 9, 0.06, -0.55) });
       [-1, 1].forEach(function (s) { kit.add(new THREE.SphereGeometry(r * 0.32, 10, 8), M(c.x + s * r * 0.84, c.y - r * 0.45, c.z - r * 0.12, 0, 0, s * 0.1, 0.6, 2.0, 0.9), o.long, bone, { pen: 3 }); });
       for (var k = 0; k < 5; k++) {   /* a plait down the back, as the drawn girl's */
         kit.add(new THREE.SphereGeometry(r * 0.2, 8, 6), M(c.x + r * 0.08, c.y - r * (1.25 + k * 0.32), c.z - r * (0.62 - k * 0.04), 0.3, 0, (k % 2 ? 0.4 : -0.4), 0.85, 1.2, 0.8), o.long, bone, { pen: 3 });
@@ -430,7 +469,8 @@
     drawFace(c.getContext('2d'), 0, 0, 1024, 512, L.face || {});
     var mat = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: tones(), skinning: true, map: canvasTex(c) });
     mat.onBeforeCompile = ownColour;
-    pen(mat, 55);
+    var nightU = nightTone(mat);
+    pen(mat, 55, hc);
     mat.customProgramCacheKey = function () { return 'castle-figure'; };
     var inkMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide, skinning: true });
     inkMat.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0085;'); };
@@ -527,7 +567,7 @@
       act: function (steps) { steps.forEach(function (s) { q.push(Object.assign({}, s)); }); },
       update: function (dt) { step(Math.min(dt, 0.1)); },
       busy: function () { return !!cur || q.length > 0 || flickT >= 0; },
-      light: function (k) { mat.color.copy(day).lerp(lin(CANDLE), 0.5 * k); }
+      light: function (k) { mat.color.copy(day).lerp(lin(CANDLE), 0.15 * k); nightU.value = k; }
     };
   }
 
@@ -536,16 +576,17 @@
      stripe at its V, a white collar and the house tie, grey trousers or skirt, grey socks, black shoes; the robe lined in
      the house's colour. slots: 1 the house, 2 skin, 3 hair, 4 long hair (gone when short), 6 curly hair (gone when not),
      7 the plain cap (gone when curly), 8 trousers (gone for a skirt), 9 skirt and socks (gone for trousers) */
+  var CHILD = { eye: 1.22, bold: 2.1, child: 1, mouthW: 0.8 };   /* a child's face: larger eyes, lines bold enough to read across the room */
   var FACES = [
     { smile: 0.6, blush: 0.5 },
-    { smile: 0.3, lashes: 1, freckles: 7, blush: 0.6, iris: '70,90,60' },
+    { smile: 0.3, lashes: 1, freckles: 7, blush: 0.6, iris: '70,90,60', down: 1, lids: 0.5 },
     { smile: 0.8, arch: 0.4, iris: '60,40,28' },
-    { smile: 0.2, lids: 0.6, lashes: 1, iris: '70,80,110', blush: 0.4 },
+    { smile: 0.2, lids: 0.7, lashes: 1, iris: '70,80,110', blush: 0.4, down: 1 },
     { smile: 0.5, browW: 3.8, freckles: 3, iris: '90,64,40' },
     { smile: 0.9, lashes: 1, arch: 0.5, iris: '50,34,22', blush: 0.55 },
-    { smile: 0.4, lids: 0.4, iris: '80,96,120' },
+    { smile: 0.4, lids: 0.6, iris: '80,96,120', down: 1 },
     { smile: 0.7, lashes: 1, freckles: 11, iris: '96,70,44', blush: 0.6 }
-  ];
+  ].map(function (f) { return Object.assign({}, CHILD, f); });
   function crowd(T, list, Mo) {   /* Mo: the seated pupil's shapes made in Blender (models/pupil.json), when given */
     THREE = T;
     var kit = new Kit(), hr = 0.1, robe = 0x23201f, shoe = 0x17120f, grey = 0x8a8884, dgrey = 0x6c6a66, shirt = 0xeeeae0;
@@ -632,7 +673,8 @@
         .replace('#include <color_vertex>', '#include <color_vertex>\nvColor.xyz *= aSlot < 0.5 ? vec3(1.0) : aSlot < 1.5 ? iTrim : aSlot < 2.5 ? iSkin : (aSlot < 4.5 || (aSlot > 5.5 && aSlot < 7.5)) ? iHair : vec3(1.0);');
       ownColour(sh);
     };
-    pen(mat, 70);
+    var nightU = nightTone(mat);
+    pen(mat, 70, V(0, 1.06, 0.02));
     mat.customProgramCacheKey = function () { return 'castle-crowd'; };
     var inkMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
     inkMat.onBeforeCompile = function (sh) {
@@ -659,7 +701,7 @@
     place(0);
     var day = mat.color.clone();
     return { group: group, mesh: mesh, ink: ink, update: place,
-             light: function (k) { mat.color.copy(day).lerp(lin(CANDLE), 0.5 * k); } };
+             light: function (k) { mat.color.copy(day).lerp(lin(CANDLE), 0.15 * k); nightU.value = k; } };
   }
 
   window.CastleFigure = { make: make, crowd: crowd, HOUSES: HOUSES };
