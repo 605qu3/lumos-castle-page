@@ -1743,6 +1743,56 @@ function updateSway(dt) {   /* a small swing on its chain, dying away over about
   if (u >= 1) CHARMS.sway = null;
 }
 if (CHARMS.on) charmsSet(Q.get('candles') === 'lit');
+/* req 1141 (Godric's 1 on Dumbledore's 3D report, 27 October 2026; docs/ministry/reviews/2026-10-27-dumbledore-3d-figures.md,
+   part 4): the Pickett pilot in the room, behind ?figure3d=1 and off without it, as req 1118 did for the knight. People's
+   page/people/figure.js and its shapes made in Blender (models/pickett.json, models/pupil.json; ?figmodel=0 the code's
+   own) at Interiors' docs/interiors/charms-classroom.md positions (x = 139.6 + y', y = 71.4 - x'): Professor Pickett
+   behind his desk (x' 3.9, y' 10.55), facing the class, and People's six seated pupils on the schedule's chairs (y' the
+   desk's front less 0.34), the boys' desk left free, as People's page/people/figure-test.html seats them. Lit as the
+   chandelier is (light(1) with its candles). No tap lands on them; nothing glows. lumosGreybox.fig3d() gives the draw
+   calls and triangles with and without them */
+var FIG3D = { on: false };
+if (CHARMS.on && Q.get('figure3d') === '1') (function () {
+  var z0 = shell.place.floor;
+  function loc(a, b) { return shell.toLocal(139.6 + b, 71.4 - a, z0); }
+  function turn(a, b, da, db) { var d = loc(a + da, b + db).sub(loc(a, b)); return Math.atan2(d.x, d.z); }
+  function json(f) { return fetch('people/models/' + f + '.json').then(function (r) { return r.json(); }); }
+  var s = document.createElement('script'); s.src = 'people/figure.js?v=3';
+  s.onload = function () {
+    var want = Q.get('figmodel') !== '0';
+    Promise.all(want ? [json('pickett'), json('pupil')] : [null, null]).then(function (mo) {
+      var P = CastleFigure.make(THREE, { look: 'pickett', model: mo[0] }), H = CastleFigure.HOUSES;
+      P.group.position.copy(loc(3.9, 10.55)); P.group.rotation.y = turn(3.9, 10.55, 0, -1); P.group.name = 'fig3d-pickett';
+      function chair(xp, yp, u) { var v = loc(xp + u, yp - 0.34); return [v.x, v.y, v.z]; }
+      var front = turn(4.5, 5, 0, 1);
+      var C = CastleFigure.crowd(THREE, [
+        { at: chair(0.7, 6.0, 0.325), rot: front, trim: H.gryffindor, skin: 0xf0c8a8, hair: 0x8a4a22, long: true, girl: true, face: 1, scale: 0.97 },
+        { at: chair(0.7, 6.0, 0.975), rot: front, trim: H.gryffindor, skin: 0xc89070, hair: 0x1c1410, face: 2, scale: 1.03 },
+        { at: chair(2.3, 6.0, 0.975), rot: front, trim: H.hufflepuff, skin: 0xeac0a0, hair: 0xc89a5a, long: true, girl: true, face: 3, scale: 0.94 },
+        { at: chair(7.0, 6.0, 0.325), rot: front, trim: H.ravenclaw, skin: 0x8a5a3a, hair: 0x141010, curly: true, face: 5, scale: 1.0 },
+        { at: chair(2.3, 4.2, 0.325), rot: front, trim: H.slytherin, skin: 0xf2cfb4, hair: 0xa04a20, face: 4, scale: 1.05 },
+        { at: chair(5.4, 4.2, 0.975), rot: front, trim: H.ravenclaw, skin: 0xd8a888, hair: 0x3a2618, long: true, girl: true, face: 7, scale: 0.98 }
+      ], mo[1]);
+      C.group.name = 'fig3d-pupils';
+      [P.group, C.group].forEach(function (g) { g.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; }); shell.group.add(g); });
+      FIG3D = { on: true, P: P, C: C, k: -1, t: 0 };
+    });
+  };
+  document.head.appendChild(s);
+})();
+function updateFig3d(dt) {
+  if (!FIG3D.on) return;
+  var k = CHARMS.lit ? 1 : 0;
+  if (k !== FIG3D.k) { FIG3D.k = k; FIG3D.P.light(k); FIG3D.C.light(k); }
+  FIG3D.t += dt; FIG3D.P.update(dt); FIG3D.C.update(FIG3D.t);
+}
+function fig3dCount() {   /* the draw calls and triangles of one render, without the figures and with them */
+  if (!FIG3D.on) return null;
+  var a = [FIG3D.P.group, FIG3D.C.group], out = {};
+  a.forEach(function (g) { g.visible = false; }); renderer.render(scene, camera); out.without = [renderer.info.render.calls, renderer.info.render.triangles];
+  a.forEach(function (g) { g.visible = true; }); renderer.render(scene, camera); out.with = [renderer.info.render.calls, renderer.info.render.triangles];
+  return out;
+}
 /* the Potions dungeon's cauldrons on their fires (Magic's req 665; Events' req 664, page/events/potions.json, word for
    word), where Interiors' docs/interiors/potions-dungeon.md puts them (cited; x = 16 + x', y = 15.4 + y'): twenty
    iron stands at the five rows' desk ends (x' 1.75, 3.85, 6.15, 8.25; y' 2.4 to 10.4), fixed; on each in a lesson a
@@ -9433,7 +9483,7 @@ function frame() {
   updatePairs();
   updateHops(dt);
   updateCranks(dt);
-  updateSway(dt);
+  updateSway(dt); updateFig3d(dt);
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
@@ -10779,7 +10829,7 @@ var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
   ways: shell.ways.map(function (d) { return { id: d.id, to: d.to, built: !!d.built }; }),
   stands: shell.stands.map(function (s) { return s.name; }) };
 /* hooks for automated checks; harmless in normal use */
-window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; }, toLocal: shell.toLocal, far: shell.far, renderer: renderer, panes: shell.panes,
+window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; }, toLocal: shell.toLocal, far: shell.far, renderer: renderer, panes: shell.panes, fig3d: fig3dCount,
   goTo: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; return d ? goTo(d) : false; },
   flight: function (id) { var f = shell.flights.filter(function (x) { return x.id === id; })[0]; return f ? useFlight(f) : false; },
   flights: function () { return shell.flights.map(function (f) { return f.id; }); },
