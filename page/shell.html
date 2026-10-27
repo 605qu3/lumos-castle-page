@@ -2931,6 +2931,8 @@ var CAVE = PLACE !== 'drum-room-b' || !shell ? null : (function () {
   own(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.05, 0.34), iron), 'cave-torch-bracket', tg).position.set(0, -0.02, 0.13);
   own(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.32, 10), torchHead), 'cave-torch-head', tg).position.set(0, 0.1, 0.28);
   var fl = own(new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), flameM), 'cave-torch-flame', tg); fl.scale.y = 2.0; fl.position.set(0, 0.36, 0.28);
+  /* its own pool, lit at every hour as the flame is, 5 cm under the flame (Godric's 1 on req 1151, req 1169) */
+  var tl = new THREE.PointLight(0xffb060, 1.6, 8, 1.6); tl.name = 'cave-torch-light'; tl.position.set(0, 0.31, 0.28); tg.add(tl);
   /* K's far end: the sky's light on the crack's back, by day warm, at night a pale line */
   var skyM = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xfff3dc).convertSRGBToLinear(), transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
   var sk = own(new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.78), skyM), 'cave-crack-sky'); sk.position.copy(L(42.162, -4.2416, 3.25)); sk.userData.decal = true;   /* on the crack's axis, square to its side of the 24 */
@@ -3175,8 +3177,8 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
    corner, where casks rotted where they stood; the stone salting trough along the west wall, a crust of old salt in it;
    four iron hooks hung from the vault on y 6.8 in the east bay, each meeting the vault where a ray finds it (the table's
    x 82 to 88 at 4.0 runs into the pier at 83 and a vault 3.5 high at 82 and 88, so they hang at 84.5 to 87.5, where it
-   stands 3.9 to 4.2); two iron torch brackets with torches either side of the low door at 1.9, their flames burning
-   with no light of their own, as the bat cave's (whether they light a pool is Godric's, req 1151). Every foot 5 cm into
+   stands 3.9 to 4.2); two iron torch brackets with torches either side of the low door at 1.9, each flame lighting
+   its own pool, as the bat cave's (Godric's 1 on req 1151, req 1169). Every foot 5 cm into
    the floor or 1 cm into what it meets */
 (function () {
   if (PLACE !== 'founders-undercroft') return;
@@ -3248,6 +3250,7 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
     put(new THREE.CylinderGeometry(0.03, 0.025, 0.34, 10), wood, tx, 11.2, 1.92);
     put(new THREE.CylinderGeometry(0.042, 0.033, 0.14, 10), pitch, tx, 11.2, 2.15);
     var f = put(new THREE.SphereGeometry(0.06, 8, 6), flameM, tx, 11.2, 2.3); f.scale.y = 2.0;
+    var tl = new THREE.PointLight(0xffb060, 1.6, 8, 1.6); tl.position.copy(P(tx, 11.2, 2.25)); tl.name = 'undercroft-torch-light'; g.add(tl);   /* its own pool, as the bat cave's (req 1169) */
   });
 })();
 /* the scroll hall's things (ledger 292; Godric's 1 on interiors-scroll-store-1023, 24 October 2026; Interiors'
