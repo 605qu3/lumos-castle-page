@@ -1,54 +1,77 @@
 /* figure.js: the castle's people in simple 3D, the Pickett pilot (req 1139; Godric's 1 on Dumbledore's 3D report, 27
-   October 2026, docs/ministry/reviews/2026-10-27-dumbledore-3d-figures.md, part 4). Built in code, no drawing: a robed
-   figure of turned and rounded parts, toon tones (three steps, MeshToonMaterial) and the suit's dark ink line pushed out
-   from the surface (page/corridor/suit.js). Three r128, the global the pages load. A trial: the rooms stay 2.5D and no
-   built figure is touched.
+   October 2026, docs/ministry/reviews/2026-10-27-dumbledore-3d-figures.md, part 4). Built in code, no drawing. Round 2
+   (Godric, 10.39 am: "they do not look anything like the drawn figures ... take on the aesthetic of the drawn figures"):
+   drawn in the painted cells' manner (assets/layers/electives-teachers.png, class-at-desks.png, the 11-to-12 stock) as
+   far as code goes: a body's proportions, the robe open over the clothes beneath and hung in folds, its lining showing
+   along the fronts and in the sleeves, the castle's ink round the outline (page/corridor/suit.js, Design's req 1140) and
+   hatched in pen into the shade, muted colours, and a face drawn on the head (eyes, lids, brows, nose, lips). Three
+   r128, the global the pages load. A trial: the rooms stay 2.5D and no built figure is touched.
 
    CastleFigure.make(THREE, opts)  one standing figure, skinned, two draw calls (the body and its ink).
-       opts { look: 'pickett' (default) or 'pupil', height (m), robe, trim, skin, hair (hex), hat (true by default for
-       Pickett), wand (true) }. Returns { group, mesh, ink, bones, act(steps), update(dt), busy(), light(k) }: the
-       group's origin is on the floor between the feet, facing +z. act([...]) queues steps, each one of { to: [x, z] }
-       (walk there in the parent's x and z), { face: radians } (turn on the spot; rotation.y, 0 facing +z), { flick: 1 }
-       (the wand flicked, no glow, no trail), { wait: s }. update(dt) runs them and the idle between; busy() is true
-       while any step is left. light(k): k 0 to 1 as the room's own candles burn (not by the hour: an unlit
-       room at night is light(0); Design, req 1140), a little of tones.js's candle on the cloth.
+       opts { look: 'pickett' (default) or 'pupil', height (m), and any colour of LOOKS below }. Returns { group, mesh,
+       ink, bones, act(steps), update(dt), busy(), light(k) }: the group's origin is on the floor between the feet,
+       facing +z. act([...]) queues steps, each one of { to: [x, z] } (walk there in the parent's x and z), { face:
+       radians } (turn on the spot; rotation.y, 0 facing +z), { flick: 1 } (the wand flicked, no glow, no trail),
+       { wait: s }. update(dt) runs them and the idle between; busy() is true while any step is left. light(k): k 0 to 1
+       as the room's own candles burn (not by the hour: an unlit room at night is light(0); Design, req 1140), a little
+       of tones.js's candle on the cloth.
    CastleFigure.crowd(THREE, list)  seated pupils, instanced: the whole class is two draw calls. list of { at: [x, y,
        z] (the chair's middle on the floor), rot (radians, 0 facing +z, toward the desk), scale, trim (house), skin,
-       hair (hex), long (true for long hair), hat }. Returns { group, mesh, ink, update(t), light(k) }; update(t) gives
-       each a slow breath and a small look about, in its own time.
-   CastleFigure.HOUSES  the house colours, tools/people-house-keys.py's: first colour for the hood's lining and the
-       robe's facings. */
+       hair (hex), long (long hair), curly, face (0 to 7, the drawn faces), girl (a skirt, not trousers) }. Returns
+       { group, mesh, ink, update(t), light(k) }; update(t) gives each a slow breath and a small look about.
+   CastleFigure.HOUSES  the house colours, tools/people-house-keys.py's: the robe's lining, the jumper's stripe, the tie. */
 (function () {
   'use strict';
   var THREE, grad = null;
   var HOUSES = { gryffindor: 0x9b2318, hufflepuff: 0xd4a62a, ravenclaw: 0x2a4a7a, slytherin: 0x2e5a3a };
-  var INK = 0x16120e;   /* the suit's, the castle's one ink (Design, req 1140) */
+  var INK = 0x16120e;      /* the suit's, the castle's one ink (Design, req 1140) */
   var CANDLE = 0xffb466;   /* tones.js's candle (Design, req 1140) */
+  var TAU = Math.PI * 2;
   function lin(h) { return new THREE.Color(h).convertSRGBToLinear(); }
-  function tones() {   /* three steps of light on the cloth: the shade, the half, the lit */
+  function tones() {   /* four steps of light, softer than a cartoon's three: the hatching does the rest */
     if (grad) return grad;
-    var d = new Uint8Array([105, 105, 105, 255, 178, 178, 178, 255, 255, 255, 255, 255]);
-    grad = new THREE.DataTexture(d, 3, 1, THREE.RGBAFormat);
+    var d = new Uint8Array([92, 92, 92, 255, 150, 150, 150, 255, 210, 210, 210, 255, 255, 255, 255, 255]);
+    grad = new THREE.DataTexture(d, 4, 1, THREE.RGBAFormat);
     grad.minFilter = grad.magFilter = THREE.NearestFilter; grad.generateMipmaps = false; grad.needsUpdate = true;
     return grad;
   }
+  function V(x, y, z) { return new THREE.Vector3(x, y, z); }
+  function M(x, y, z, rx, ry, rz, sx, sy, sz) {
+    var m = new THREE.Matrix4();
+    m.compose(V(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx || 0, ry || 0, rz || 0)),
+              V(sx || 1, sy || sx || 1, sz || sx || 1));
+    return m;
+  }
 
-  /* The kit: every part baked into one geometry, its colour per triangle (or a slot the crowd fills per pupil) and its
-     bone. colour(c) is given the triangle's middle and returns a hex, or { slot: n } for the crowd's own colours */
-  function Kit() { this.p = []; this.n = []; this.c = []; this.s = []; this.si = []; this.sw = []; }
-  Kit.prototype.add = function (geo, m, colour, bone) {
-    var g = geo.index ? geo.toNonIndexed() : geo.clone();
+  /* ---- the kit: every part baked into one geometry ----
+     Each part: its colour per triangle (a hex, or { slot } for the crowd's own colours, from colour(middle, u)), its
+     bone (a number, or bone(y) giving [a, b, weight of a]), its pen (0 none, 1 cloth, 2 skin, 3 hair: how hard the
+     shade is hatched) and, for a head, its uv into the face drawing; every other part reads the drawing's plain corner */
+  var CORNER = [0.995, 0.995];
+  function Kit() { this.p = []; this.n = []; this.c = []; this.s = []; this.u = []; this.pen = []; this.si = []; this.sw = []; }
+  Kit.prototype.add = function (geo, m, colour, bone, o) {
+    o = o || {};
+    var g = geo;
+    if (o.deform) {   /* bend the part's points, then its normals smooth again */
+      var P0 = g.attributes.position, w = V(0, 0, 0);
+      for (var i = 0; i < P0.count; i++) { w.fromBufferAttribute(P0, i); o.deform(w); P0.setXYZ(i, w.x, w.y, w.z); }
+      g.computeVertexNormals();
+    }
+    g = g.index ? g.toNonIndexed() : g.clone();
     if (!g.attributes.normal) g.computeVertexNormals();
     if (m) g.applyMatrix4(m);
-    var P = g.attributes.position.array, N = g.attributes.normal.array, v = new THREE.Vector3();
+    var P = g.attributes.position.array, N = g.attributes.normal.array, UV = g.attributes.uv ? g.attributes.uv.array : null, v = V(0, 0, 0);
     for (var t = 0; t < P.length; t += 9) {
       v.set((P[t] + P[t + 3] + P[t + 6]) / 3, (P[t + 1] + P[t + 4] + P[t + 7]) / 3, (P[t + 2] + P[t + 5] + P[t + 8]) / 3);
-      var k = typeof colour === 'function' ? colour(v) : colour, slot = 0, cc;
+      var tu = UV ? (UV[t / 3 * 2] + UV[t / 3 * 2 + 2] + UV[t / 3 * 2 + 4]) / 3 : 0;
+      var k = typeof colour === 'function' ? colour(v, tu) : colour, slot = 0, cc;
       if (k !== null && typeof k === 'object') { slot = k.slot; cc = lin(k.base !== undefined ? k.base : 0xffffff); } else cc = lin(k);
-      for (var j = 0; j < 9; j += 3) {
-        var px = P[t + j], py = P[t + j + 1], pz = P[t + j + 2];
-        this.p.push(px, py, pz); this.n.push(N[t + j], N[t + j + 1], N[t + j + 2]); this.c.push(cc.r, cc.g, cc.b); this.s.push(slot);
-        var b = typeof bone === 'function' ? bone(py) : [bone, 0, 1];   /* [bone a, bone b, weight of a] */
+      for (var j = 0; j < 3; j++) {
+        var q = t + j * 3, py = P[q + 1];
+        this.p.push(P[q], py, P[q + 2]); this.n.push(N[q], N[q + 1], N[q + 2]); this.c.push(cc.r, cc.g, cc.b); this.s.push(slot);
+        if (o.face && UV) this.u.push(UV[(t / 3 + j) * 2], UV[(t / 3 + j) * 2 + 1]); else this.u.push(CORNER[0], CORNER[1]);
+        this.pen.push(o.pen !== undefined ? o.pen : 1);
+        var b = typeof bone === 'function' ? bone(py) : [bone, 0, 1];
         this.si.push(b[0], b[1], 0, 0); this.sw.push(b[2], 1 - b[2], 0, 0);
       }
     }
@@ -58,7 +81,9 @@
     g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
     g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
     g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(this.u, 2));
     g.setAttribute('aSlot', new THREE.Float32BufferAttribute(this.s, 1));
+    g.setAttribute('aPen', new THREE.Float32BufferAttribute(this.pen, 1));
     if (skinned) {
       g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(this.si, 4));
       g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(this.sw, 4));
@@ -66,78 +91,219 @@
     g.computeBoundingSphere();
     return g;
   };
-  function M(x, y, z, rx, ry, rz, sx, sy, sz) {
-    var m = new THREE.Matrix4();
-    m.compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx || 0, ry || 0, rz || 0)),
-              new THREE.Vector3(sx || 1, sy || sx || 1, sz || sx || 1));
-    return m;
-  }
-  /* a tapered sleeve or limb from a to b, its radius ra at a and rb at b */
-  function between(a, b, ra, rb, seg) {
+  /* a tapered limb or sleeve from a to b, radius ra at a and rb at b; open, it is a bell with no ends */
+  function between(a, b, ra, rb, seg, open) {
     var d = new THREE.Vector3().subVectors(b, a), len = d.length();
-    var g = new THREE.CylinderGeometry(rb, ra, len, seg || 10, 1, false);
-    var q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
-    g.applyMatrix4(new THREE.Matrix4().compose(a.clone().add(d.multiplyScalar(0.5)), q, new THREE.Vector3(1, 1, 1)));
+    var g = new THREE.CylinderGeometry(rb, ra, len, seg || 10, 1, !!open);
+    var q = new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), d.clone().normalize());
+    g.applyMatrix4(new THREE.Matrix4().compose(a.clone().add(d.multiplyScalar(0.5)), q, V(1, 1, 1)));
     return g;
   }
-  function V(x, y, z) { return new THREE.Vector3(x, y, z); }
-  /* the turn round a lathe of n segments of a triangle's middle, taken at its segment's middle, so both triangles of
-     a quad fall the same side of a band's edge (no sawtooth) */
-  function round(x, z, n) {
-    var st = Math.PI * 2 / n, a = Math.atan2(x, z); if (a < 0) a += Math.PI * 2;
-    a = (Math.floor(a / st) + 0.5) * st; return Math.abs(a > Math.PI ? a - Math.PI * 2 : a);
+  function flip(g) {   /* turned inside out: a lining, seen from within */
+    g = g.index ? g.toNonIndexed() : g;
+    var P = g.attributes.position.array, N = g.attributes.normal.array, U = g.attributes.uv ? g.attributes.uv.array : null;
+    for (var t = 0; t < P.length; t += 9) for (var k = 0; k < 3; k++) {
+      var a = t + 3 + k, b = t + 6 + k, x = P[a]; P[a] = P[b]; P[b] = x; x = N[a]; N[a] = N[b]; N[b] = x;
+    }
+    if (U) for (var s = 0; s < U.length; s += 6) for (var h = 0; h < 2; h++) { var x2 = U[s + 2 + h]; U[s + 2 + h] = U[s + 4 + h]; U[s + 4 + h] = x2; }
+    for (var i = 0; i < N.length; i++) N[i] = -N[i];
+    return g;
+  }
+  /* the robe: an open shell round the body, rows [y, radius, half gap at the front] from the hem up; folds hung into it,
+     deepest at the hem; its two front edges turned back to show the lining (facing); the lining inside */
+  function robeShell(rows, n, depth, folds, inner) {
+    var P = [], U = [], I = [], nr = rows.length;
+    rows.forEach(function (row, i) {
+      for (var j = 0; j <= n; j++) {
+        var t = j / n, th = row[2] + t * (TAU - 2 * row[2]), y = row[0];
+        var f = folds * Math.max(0, Math.min(1, (row[3] !== undefined ? row[3] : 1)));
+        var R = row[1] * (1 + f * (0.07 * Math.sin(th * 7 + 0.4) + 0.035 * Math.sin(th * 13 + 1.1))) * (inner ? 0.965 : 1);
+        P.push(R * Math.sin(th), y + (i === 0 ? 0.012 * Math.sin(th * 7 + 0.4) : 0), R * Math.cos(th) * depth);
+        U.push(t, i / (nr - 1));
+      }
+    });
+    for (var i = 0; i < nr - 1; i++) for (var j = 0; j < n; j++) {
+      var a = i * (n + 1) + j, b = a + 1, c = a + n + 1, d = c + 1;
+      if (inner) I.push(a, c, b, b, c, d); else I.push(a, b, c, b, d, c);
+    }
+    var g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
+    g.setIndex(I); g.computeVertexNormals();
+    return g;
   }
 
-  /* The head, shared by the standing figure and the crowd: c its middle, r its radius. o { skin, hair (hex or slot
-     objects), long, moustache, goatee, hat, hatCol, band, eyes } */
-  function head(kit, c, r, o, bone) {
-    var skin = o.skin, hair = o.hair, dark = 0x1a1410;
-    kit.add(new THREE.SphereGeometry(r, 18, 12), M(c.x, c.y, c.z, 0, 0, 0, 0.9, 1.07, 0.97), skin, bone);
-    kit.add(new THREE.SphereGeometry(r * 0.5, 10, 6), M(c.x, c.y - r * 0.55, c.z + r * 0.18, 0, 0, 0, 1.15, 0.8, 1.1), skin, bone);   /* the jaw */
+  /* ---- the pen: the castle's ink hatched into the shade, as the drawn figures are shaded ----
+     The light a point takes, against its own colour, sets how much: one set of strokes in the half shade, crossed in the
+     deep. The strokes run on the figure's own body (its rest pose), so they stay on the cloth as he moves, and thin
+     out where they would be finer than a pixel */
+  function pen(mat, density) {
+    mat.extensions = { derivatives: true };
+    var prev = mat.onBeforeCompile;
+    mat.onBeforeCompile = function (sh) {
+      if (prev) prev(sh);
+      sh.vertexShader = 'attribute float aPen;\nvarying vec3 vObj;\nvarying float vPen;\n' +
+        sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvObj = position; vPen = aPen;');
+      sh.fragmentShader = 'varying vec3 vObj;\nvarying float vPen;\n' +
+        'float strokes(float c, float t) { float d = abs(fract(c + 0.5) - 0.5), w = fwidth(c);\n' +
+        '  return (1.0 - smoothstep(t - w, t + w, d)) * (1.0 - smoothstep(0.22, 0.45, w)); }\n' +
+        sh.fragmentShader.replace('#include <dithering_fragment>', [
+          '#include <dithering_fragment>',
+          'float lum = dot(outgoingLight, vec3(0.299, 0.587, 0.114)) / max(0.02, dot(diffuseColor.rgb, vec3(0.299, 0.587, 0.114)));',
+          'float hard = vPen < 0.5 ? 0.0 : vPen < 1.5 ? 1.0 : vPen < 2.5 ? 0.15 : 0.7;',
+          'float t1 = clamp((0.5 - lum) * 0.5, 0.0, 0.2) * hard, t2 = clamp((0.3 - lum) * 0.55, 0.0, 0.18) * hard;',
+          'float c1 = (vObj.x * 0.62 + vObj.y + vObj.z * 0.48) * ' + density.toFixed(1) + ';',
+          'float c2 = (-vObj.x * 0.7 + vObj.y * 0.55 - vObj.z * 0.6) * ' + (density * 0.9).toFixed(1) + ';',
+          'float h = max(strokes(c1, t1), strokes(c2, t2));',
+          'gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.075, 0.058, 0.045), h * 0.82);'
+        ].join('\n'));
+    };
+  }
+  /* the drawing's own colours: where it is opaque it is ink and shading over the part's colour (the skin's tone); where
+     it is faint it is a colour of its own (the whites of the eyes, the iris), not tinted by the skin */
+  function ownColour(sh) {
+    sh.fragmentShader = sh.fragmentShader.replace('#include <color_fragment>',
+      '#ifdef USE_MAP\n  diffuseColor.rgb *= mix(vec3(1.0), vColor, step(0.5, texelColor.a));\n#else\n#include <color_fragment>\n#endif');
+  }
+
+  /* ---- the faces, drawn on a canvas round the head ----
+     The head's uv: u round it, the front at u 0.25; v down it, the eyes about the middle. A cell w by h holds one face;
+     its points by angle from the front (radians across, radians down) */
+  function drawFace(x, X, Y, W, H, f) {
+    var kx = W / TAU, ky = H / Math.PI, cx = X + W * 0.25, cy = Y + H * 0.5;
+    function P(a, b) { return [cx + a * kx, cy + b * ky]; }
+    x.save(); x.beginPath(); x.rect(X, Y, W, H); x.clip();
+    x.fillStyle = '#ffffff'; x.fillRect(X, Y, W, H);
+    x.lineCap = 'round'; x.lineJoin = 'round';
+    var lw = W / 512, ink = 'rgba(70,42,30,1)', soft = 'rgba(150,100,82,1)';
+    /* the cheeks' warmth and the shade under the brow and beside the nose: over the skin */
     [-1, 1].forEach(function (s) {
-      kit.add(new THREE.SphereGeometry(r * 0.115, 8, 6), M(c.x + s * r * 0.36, c.y + r * 0.02, c.z + r * 0.86, 0, 0, 0, 1, 1.25, 0.5), dark, bone);
-      kit.add(new THREE.BoxGeometry(r * 0.34, r * 0.07, r * 0.08), M(c.x + s * r * 0.37, c.y + r * 0.27, c.z + r * 0.86, 0, 0, s * -0.12), hair, bone);
-      kit.add(new THREE.SphereGeometry(r * 0.22, 8, 6), M(c.x + s * r * 0.9, c.y - r * 0.05, c.z, 0, 0, 0, 0.45, 1, 0.7), skin, bone);
+      var p = P(s * 0.5, 0.3), g = x.createRadialGradient(p[0], p[1], 1, p[0], p[1], 22 * lw);
+      g.addColorStop(0, 'rgba(232,168,150,' + (f.blush || 0.5) + ')'); g.addColorStop(1, 'rgba(232,168,150,0)');
+      x.fillStyle = g; x.fillRect(p[0] - 30 * lw, p[1] - 30 * lw, 60 * lw, 60 * lw);
+      var e = P(s * 0.38, -0.08), g2 = x.createRadialGradient(e[0], e[1], 2, e[0], e[1], 16 * lw);
+      g2.addColorStop(0, 'rgba(205,160,140,0.55)'); g2.addColorStop(1, 'rgba(205,160,140,0)');
+      x.fillStyle = g2; x.fillRect(e[0] - 20 * lw, e[1] - 20 * lw, 40 * lw, 40 * lw);
     });
-    kit.add(new THREE.SphereGeometry(r * 0.14, 8, 6), M(c.x, c.y - r * 0.18, c.z + r * 0.95, 0.2, 0, 0, 0.9, 1.25, 1.1), skin, bone);   /* the nose */
-    if (!o.moustache) kit.add(new THREE.BoxGeometry(r * 0.3, r * 0.045, r * 0.05), M(c.x, c.y - r * 0.5, c.z + r * 0.88), 0x5a3028, bone);   /* the mouth */
-    /* the hair: a cap tipped back so the brow is clear and the nape covered */
-    kit.add(new THREE.SphereGeometry(r * 1.07, 18, 8, 0, Math.PI * 2, 0, Math.PI * 0.55), M(c.x, c.y + r * 0.04, c.z - r * 0.03, -0.42, 0, 0, 0.93, 1.06, 1.0), hair, bone);
+    /* the eyes: the white and the iris their own colours; the upper lid in ink, heavier, the lower a fine line */
+    [-1, 1].forEach(function (s) {
+      var e = P(s * 0.37, -0.01), ew = 0.15 * kx, eh = 0.055 * ky;
+      x.fillStyle = 'rgba(236,230,218,0.3)';
+      x.beginPath(); x.ellipse(e[0], e[1], ew, eh, 0, 0, TAU); x.fill();
+      x.fillStyle = 'rgba(' + (f.iris || '88,60,38') + ',0.3)';
+      x.beginPath(); x.arc(e[0] + s * (f.look || 0) * ew * 0.3, e[1] + eh * 0.12, eh * 0.95, 0, TAU); x.fill();
+      x.fillStyle = 'rgba(18,12,10,0.3)';
+      x.beginPath(); x.arc(e[0] + s * (f.look || 0) * ew * 0.3, e[1] + eh * 0.12, eh * 0.42, 0, TAU); x.fill();
+      x.strokeStyle = ink; x.lineWidth = 2.6 * lw;
+      x.beginPath(); x.moveTo(e[0] - s * ew * 1.05, e[1] + eh * 0.25);
+      x.quadraticCurveTo(e[0], e[1] - eh * (1.55 - (f.lids || 0) * 0.6), e[0] + s * ew * 1.12, e[1] + eh * 0.05); x.stroke();
+      if (f.lashes) { x.lineWidth = 1.6 * lw; x.beginPath(); x.moveTo(e[0] + s * ew * 1.05, e[1]); x.lineTo(e[0] + s * ew * 1.35, e[1] - eh * 0.6); x.stroke(); }
+      x.strokeStyle = soft; x.lineWidth = 1.2 * lw;
+      x.beginPath(); x.moveTo(e[0] - s * ew * 0.8, e[1] + eh * 0.85); x.quadraticCurveTo(e[0], e[1] + eh * 1.3, e[0] + s * ew * 0.9, e[1] + eh * 0.7); x.stroke();
+      if (f.age) {   /* the lines of a grown face: under the eye, at its corner */
+        x.lineWidth = 1 * lw; x.beginPath(); x.moveTo(e[0] - s * ew * 0.5, e[1] + eh * 1.9); x.quadraticCurveTo(e[0] + s * ew * 0.2, e[1] + eh * 2.3, e[0] + s * ew * 0.8, e[1] + eh * 1.7); x.stroke();
+        x.beginPath(); x.moveTo(e[0] + s * ew * 1.35, e[1] + eh * 0.2); x.lineTo(e[0] + s * ew * 1.7, e[1] + eh * 0.6); x.stroke();
+      }
+      /* the brow */
+      var b = P(s * 0.38, -0.26 - (f.arch || 0) * 0.04);
+      x.strokeStyle = f.brow || 'rgba(60,38,26,1)'; x.lineWidth = (f.browW || 3.2) * lw;
+      x.beginPath(); x.moveTo(b[0] - s * ew * 1.0, b[1] + eh * 0.5); x.quadraticCurveTo(b[0], b[1] - eh * (0.8 + (f.arch || 0)), b[0] + s * ew * 1.15, b[1] + eh * 0.4); x.stroke();
+    });
+    /* the nose: its shadowed side, the nostrils */
+    var n0 = P(0.06, -0.06), n1 = P(0.1, 0.17);
+    x.strokeStyle = soft; x.lineWidth = 1.5 * lw;
+    x.beginPath(); x.moveTo(n0[0], n0[1]); x.quadraticCurveTo(n1[0] + 3 * lw, n1[1] - 8 * lw, n1[0], n1[1]); x.stroke();
+    x.strokeStyle = ink; x.lineWidth = 1.6 * lw;
+    [-1, 1].forEach(function (s) { var q = P(s * 0.07, 0.2); x.beginPath(); x.arc(q[0], q[1], 3.2 * lw, s > 0 ? Math.PI * 0.9 : Math.PI * 0.1, s > 0 ? Math.PI * 1.9 : -Math.PI * 0.9, s < 0); x.stroke(); });
+    /* the mouth: the parting line in ink, the lower lip a soft colour over the skin */
+    var m = P(0, 0.47), mw = 0.2 * kx * (f.mouthW || 1), sm = (f.smile !== undefined ? f.smile : 0.5);
+    x.fillStyle = 'rgba(214,140,128,1)';
+    x.beginPath(); x.ellipse(m[0], m[1] + 3.5 * lw, mw * 0.62, 3.6 * lw, 0, 0, TAU); x.fill();
+    x.strokeStyle = 'rgba(110,52,44,1)'; x.lineWidth = 2.1 * lw;
+    x.beginPath(); x.moveTo(m[0] - mw, m[1] - sm * 4 * lw); x.quadraticCurveTo(m[0], m[1] + sm * 6 * lw, m[0] + mw, m[1] - sm * 4 * lw); x.stroke();
+    if (f.age) {   /* the lines from nose to mouth */
+      x.strokeStyle = soft; x.lineWidth = 1.2 * lw;
+      [-1, 1].forEach(function (s) { var a = P(s * 0.17, 0.2), b = P(s * 0.25, 0.48); x.beginPath(); x.moveTo(a[0], a[1]); x.quadraticCurveTo(a[0] + s * 8 * lw, (a[1] + b[1]) / 2, b[0], b[1]); x.stroke(); });
+    }
+    if (f.freckles) {
+      x.fillStyle = 'rgba(170,100,70,1)';
+      var r = (function (s) { return function () { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(f.freckles);
+      for (var i = 0; i < 40; i++) { var a2 = (r() - 0.5) * 0.9, b2 = 0.08 + r() * 0.3; if (Math.abs(a2) < 0.05) continue; var q2 = P(a2, b2); x.beginPath(); x.arc(q2[0], q2[1], (0.8 + r()) * lw, 0, TAU); x.fill(); }
+    }
+    /* the chin and jaw, a fine shade line */
+    var c0 = P(-0.16, 0.74), c1 = P(0.16, 0.74), c2 = P(0, 0.8);
+    x.strokeStyle = 'rgba(190,140,120,1)'; x.lineWidth = 1.3 * lw;
+    x.beginPath(); x.moveTo(c0[0], c0[1]); x.quadraticCurveTo(c2[0], c2[1], c1[0], c1[1]); x.stroke();
+    x.restore();
+  }
+  function canvasTex(c) {
+    var t = new THREE.CanvasTexture(c);
+    t.encoding = THREE.sRGBEncoding; t.anisotropy = 4;
+    return t;
+  }
+
+  /* The head: c its middle, r its radius; the face drawn on the skin (the head's uv), the nose and ears modelled. o {
+     skin, hair, hairCap (the cap's own colour or slot), long, curly, moustache, goatee, hat, hatCol, band, slick } */
+  function head(kit, c, r, o, bone) {
+    var skin = o.skin, hair = o.hair, cap = o.hairCap || hair;
+    kit.add(new THREE.SphereGeometry(r, 24, 16), M(c.x, c.y, c.z, 0, 0, 0, 0.88, 1.08, 0.96), skin, bone, { face: true, pen: 2 });
+    kit.add(new THREE.SphereGeometry(r * 0.52, 12, 8), M(c.x, c.y - r * 0.52, c.z + r * 0.16, 0, 0, 0, 1.12, 0.82, 1.1), skin, bone, { pen: 2 });   /* the jaw */
+    kit.add(new THREE.SphereGeometry(r * 0.13, 8, 6), M(c.x, c.y - r * 0.12, c.z + r * 0.9, 0.35, 0, 0, 0.8, 1.6, 1.0), skin, bone, { pen: 2 });   /* the nose */
+    [-1, 1].forEach(function (s) {
+      kit.add(new THREE.SphereGeometry(r * 0.21, 8, 6), M(c.x + s * r * 0.87, c.y - r * 0.06, c.z - r * 0.02, 0, s * 0.3, 0, 0.42, 1, 0.72), skin, bone, { pen: 2 });
+    });
+    /* the hair: a cap tipped back so the brow is clear and the nape covered; slicked, curly or with a fall behind */
+    var capG = new THREE.SphereGeometry(r * 1.07, 22, 10, 0, TAU, 0, Math.PI * 0.56), capM = M(c.x, c.y + r * 0.05, c.z - r * 0.04, -0.42, 0, 0, 0.93, o.slick ? 0.98 : 1.06, 1.0);
+    kit.add(capG, capM, cap, bone, { pen: 3 });
+    if (o.curly) {
+      var cg = new THREE.SphereGeometry(r * 1.13, 26, 14, 0, TAU, 0, Math.PI * 0.62);
+      kit.add(cg, M(c.x, c.y + r * 0.08, c.z - r * 0.06, -0.38, 0, 0, 0.98, 1.08, 1.04), o.curly, bone, { pen: 3, deform: function (w) {
+        var k = 1 + 0.07 * Math.sin(w.x * 90) * Math.sin(w.y * 85) * Math.sin(w.z * 95 + 1.3); w.multiplyScalar(k);
+      } });
+    }
     if (o.long) {
-      var lh = o.long === true ? hair : o.long;
-      kit.add(new THREE.SphereGeometry(r, 14, 10), M(c.x, c.y - r * 0.55, c.z - r * 0.42, 0, 0, 0, 1.0, 1.25, 0.62), lh, bone);
-      [-1, 1].forEach(function (s) { kit.add(new THREE.SphereGeometry(r * 0.3, 8, 8), M(c.x + s * r * 0.82, c.y - r * 0.55, c.z - r * 0.05, 0, 0, 0, 0.7, 2.0, 0.9), lh, bone); });
+      kit.add(new THREE.SphereGeometry(r, 16, 12), M(c.x, c.y - r * 0.5, c.z - r * 0.48, 0.12, 0, 0, 1.0, 1.35, 0.6), o.long, bone, { pen: 3 });
+      [-1, 1].forEach(function (s) { kit.add(new THREE.SphereGeometry(r * 0.32, 10, 8), M(c.x + s * r * 0.84, c.y - r * 0.45, c.z - r * 0.12, 0, 0, s * 0.1, 0.6, 2.0, 0.9), o.long, bone, { pen: 3 }); });
+      for (var k = 0; k < 5; k++) {   /* a plait down the back, as the drawn girl's */
+        kit.add(new THREE.SphereGeometry(r * 0.2, 8, 6), M(c.x + r * 0.08, c.y - r * (1.25 + k * 0.32), c.z - r * (0.62 - k * 0.04), 0.3, 0, (k % 2 ? 0.4 : -0.4), 0.85, 1.2, 0.8), o.long, bone, { pen: 3 });
+      }
     }
     if (o.moustache) {   /* waxed, the ends curled up: a showman's */
       [-1, 1].forEach(function (s) {
-        var cv = new THREE.CatmullRomCurve3([V(c.x, c.y - r * 0.38, c.z + r * 1.0), V(c.x + s * r * 0.34, c.y - r * 0.43, c.z + r * 0.93),
-          V(c.x + s * r * 0.62, c.y - r * 0.3, c.z + r * 0.76), V(c.x + s * r * 0.68, c.y - r * 0.1, c.z + r * 0.68)]);
-        kit.add(new THREE.TubeGeometry(cv, 10, r * 0.065, 6, false), null, hair, bone);
+        var cv = new THREE.CatmullRomCurve3([V(c.x, c.y - r * 0.33, c.z + r * 0.97), V(c.x + s * r * 0.3, c.y - r * 0.4, c.z + r * 0.9),
+          V(c.x + s * r * 0.58, c.y - r * 0.3, c.z + r * 0.74), V(c.x + s * r * 0.66, c.y - r * 0.1, c.z + r * 0.66)]);
+        kit.add(new THREE.TubeGeometry(cv, 12, r * 0.055, 6, false), null, hair, bone, { pen: 3 });
       });
     }
-    if (o.goatee) kit.add(new THREE.ConeGeometry(r * 0.17, r * 0.5, 8), M(c.x, c.y - r * 1.0, c.z + r * 0.62, Math.PI - 0.35, 0, 0), hair, bone);
-    if (o.hat) {   /* the pointed hat, its tip bent back, a band round it */
-      var hb = c.y + r * 0.62, hc = o.hatCol;
-      kit.add(new THREE.CylinderGeometry(r * 1.8, r * 1.8, r * 0.07, 20), M(c.x, hb, c.z - r * 0.05, -0.1, 0, 0), hc, bone);
-      kit.add(new THREE.CylinderGeometry(r * 0.32, r * 1.04, r * 2.1, 16, 1, true), M(c.x, hb + r * 1.05, c.z - r * 0.12, -0.12, 0, 0), hc, bone);
-      kit.add(new THREE.CylinderGeometry(0, r * 0.33, r * 1.3, 10, 1, true), M(c.x, hb + r * 2.45, c.z - r * 0.55, -0.62, 0, 0), hc, bone);
-      if (o.band !== undefined) kit.add(new THREE.CylinderGeometry(r * 0.99, r * 1.05, r * 0.26, 16, 1, true), M(c.x, hb + r * 0.17, c.z - r * 0.06, -0.12, 0, 0), o.band, bone);
+    if (o.goatee) kit.add(new THREE.ConeGeometry(r * 0.16, r * 0.5, 10), M(c.x, c.y - r * 0.98, c.z + r * 0.6, Math.PI - 0.38, 0, 0), hair, bone, { pen: 3 });
+    if (o.hat) {   /* the pointed hat, its crown a little crumpled, its tip bent back, a band round it */
+      var hb = c.y + r * 0.6, hc = o.hatCol;
+      kit.add(new THREE.CylinderGeometry(r * 1.85, r * 1.9, r * 0.06, 28), M(c.x, hb, c.z - r * 0.05, -0.1, 0, 0), hc, bone, { deform: function (w) { w.y += 0.012 * Math.sin(Math.atan2(w.x, w.z) * 3); } });
+      kit.add(new THREE.CylinderGeometry(r * 0.34, r * 1.04, r * 2.1, 18, 4, true), M(c.x, hb + r * 1.05, c.z - r * 0.12, -0.12, 0, 0), hc, bone,
+              { deform: function (w) { var a = Math.atan2(w.x, w.z); w.x *= 1 + 0.05 * Math.sin(a * 5 + w.y * 30); w.z *= 1 + 0.05 * Math.sin(a * 5 + w.y * 30); } });
+      kit.add(new THREE.CylinderGeometry(0, r * 0.35, r * 1.35, 12, 2, true), M(c.x, hb + r * 2.48, c.z - r * 0.58, -0.66, 0, 0.08), hc, bone);
+      if (o.band !== undefined) kit.add(new THREE.CylinderGeometry(r * 0.99, r * 1.05, r * 0.24, 18, 1, true), M(c.x, hb + r * 0.16, c.z - r * 0.06, -0.12, 0, 0), o.band, bone);
     }
   }
-
-  /* the hood, down on the back of the shoulders: a soft fold of the robe's cloth, its lining showing along the rim. y the
-     shoulders' height, w their half width */
+  /* the hood, down on the back of the shoulders: a soft fold of the robe, its lining along the rim */
   function hood(kit, y, w, robe, lining, bone) {
-    kit.add(new THREE.SphereGeometry(1, 16, 10, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.65), M(0, y - w * 0.32, -w * 0.62, 0.25, 0, 0, w * 0.8, w * 0.95, w * 0.42), robe, bone);
-    kit.add(new THREE.TorusGeometry(1, 0.09, 6, 20, Math.PI), M(0, y + w * 0.06, -w * 0.5, Math.PI * 0.5 + 0.35, 0, Math.PI, w * 0.78, w * 0.62, w * 0.62), lining, bone);
+    kit.add(new THREE.SphereGeometry(1, 18, 10, 0, TAU, Math.PI * 0.35, Math.PI * 0.65), M(0, y - w * 0.32, -w * 0.64, 0.25, 0, 0, w * 0.8, w * 0.95, w * 0.42), robe, bone,
+            { deform: function (p) { p.x *= 1 + 0.06 * Math.sin(p.y * 9); } });
+    kit.add(new THREE.TorusGeometry(1, 0.1, 6, 22, Math.PI), M(0, y + w * 0.06, -w * 0.52, Math.PI * 0.5 + 0.35, 0, Math.PI, w * 0.78, w * 0.62, w * 0.62), lining, bone);
   }
 
   /* ---- the standing figure ---- */
   var LOOKS = {
-    pickett: { height: 1.86, robe: 0x4a2340, trim: 0xb08a48, skin: 0xd9a888, hair: 0x3a2618, hat: true, wand: true,
-               moustache: true, goatee: true, collar: 0xeeeae0, cravat: 0x7a1e2a, under: 0x231a22, shoe: 0x15110f },
-    pupil: { height: 1.45, robe: 0x1c1a1e, trim: HOUSES.gryffindor, skin: 0xe8bfa0, hair: 0x5a3a22, hat: false, wand: true,
-             collar: 0xeeeae0, under: 0x55524e, shoe: 0x15110f }
+    /* Pickett (settled 71 writes no look; ours, provisional): a showman kept to the drawn figures' muted palette, as
+       Design asked of the plum (req 1140): a near-black robe lined in claret, over a dusty mulberry frock coat and an
+       old-gold waistcoat, a white collar and claret cravat, charcoal trousers; the waxed moustache and pointed beard */
+    pickett: { height: 1.86, robe: 0x2a2421, lining: 0x6e2a2e, coat: 0x5a3a48, waist: 0x8e7440, trousers: 0x37332f, skin: 0xd8ab90,
+               hair: 0x2e2018, hat: true, hatCol: 0x2a2421, band: 0x6e2a2e, wand: true, moustache: true, goatee: true, slick: true,
+               collar: 0xe6e0d2, cravat: 0x6e2a2e, shoe: 0x17120f,
+               face: { iris: '82,62,40', arch: 0.6, browW: 3.4, smile: 0.7, age: 1, lids: 0.25, blush: 0.35, mouthW: 0.9 } },
+    pupil: { height: 1.45, robe: 0x23201f, lining: HOUSES.gryffindor, coat: 0x8a8884, waist: 0x8a8884, trousers: 0x6e6c68, skin: 0xe8bfa0,
+             hair: 0x5a3a22, hat: false, wand: true, collar: 0xeeeae0, cravat: HOUSES.gryffindor, shoe: 0x17120f,
+             face: { smile: 0.6, blush: 0.5 } }
   };
   /* the bones, in the bind pose (metres, at the built height of 1.80; the group scales to opts.height) */
   var B = { root: 0, hips: 1, hem: 2, spine: 3, head: 4, shL: 5, elL: 6, shR: 7, elR: 8, footL: 9, footR: 10 };
@@ -146,53 +312,70 @@
     THREE = T; opts = opts || {};
     var L = Object.assign({}, LOOKS[opts.look || 'pickett'], opts), child = (opts.look === 'pupil');
     var kit = new Kit();
-    var hr = child ? 0.122 : 0.113, neckY = 1.52, hc = V(0, neckY + hr * 0.98, 0.012);
-    var robe = L.robe, trim = L.trim;
-    /* the robe: turned, flattened front to back; the facings and the hem's band in the trim, the hood's lining showing
-       across the back of the shoulders, and between the facings above the waist the coat beneath */
-    var prof = [[0.001, 0.075], [0.255, 0.06], [0.245, 0.3], [0.215, 0.6], [0.18, 0.88], [0.168, 1.0], [0.18, 1.15],
-                [0.196, 1.28], [0.194, 1.37], [0.172, 1.43], [0.125, 1.475], [0.075, 1.51], [0.058, 1.54]].map(function (q) { return new THREE.Vector2(q[0], q[1]); });
-    var robeCol = function (v) {
-      var a = round(v.x, v.z / 0.68, 48);
-      if (v.y < 0.11 && v.y > 0.06) return trim;
-      if (a < 0.14 && v.y < 1.45) return L.under;
-      if (a < 0.27 && v.y < 1.46) return trim;
-      return robe;
-    };
-    var robeW = function (y) {
+    var hr = child ? 0.118 : 0.108, neckY = 1.52, hc = V(0, neckY + hr * 1.0, 0.012);
+    var robe = L.robe, lining = L.lining;
+    var bodyW = function (y) {
       if (y < 0.5) return [B.hem, 0, 1];
       if (y < 0.85) return [B.hem, B.hips, 1 - (y - 0.5) / 0.35];
       if (y < 1.0) return [B.hips, B.spine, 1 - (y - 0.85) / 0.15];
       return [B.spine, 0, 1];
     };
-    kit.add(new THREE.LatheGeometry(prof, 48), M(0, 0, 0, 0, 0, 0, 1, 1, 0.68), robeCol, robeW);
-    hood(kit, 1.39, 0.205, robe, trim, B.spine);
-    /* the neck, the collar and (Pickett's) the cravat */
-    kit.add(new THREE.CylinderGeometry(hr * 0.4, hr * 0.44, 0.12, 12), M(0, neckY + 0.02, 0.0), L.skin, B.head);
-    kit.add(new THREE.CylinderGeometry(hr * 0.5, hr * 0.56, 0.07, 14, 1, true), M(0, neckY - 0.01, 0.005), L.collar, B.spine);
-    if (L.cravat) kit.add(new THREE.SphereGeometry(0.045, 10, 8), M(0, neckY - 0.06, 0.07, 0, 0, 0, 1.1, 1.3, 0.55), L.cravat, B.spine);
-    head(kit, hc, hr, { skin: L.skin, hair: L.hair, moustache: L.moustache, goatee: L.goatee, long: L.long,
-                         hat: L.hat, hatCol: robe, band: trim }, B.head);
-    /* the arms: a sleeve to the elbow, a wide sleeve to the wrist, the hand; the wand in the right, pointing ahead */
-    [[-1, B.shL, B.elL], [1, B.shR, B.elR]].forEach(function (a) {
-      var s = a[0], sh = V(s * 0.19, 1.41, 0), el = V(s * 0.215, 1.13, 0.0), wr = V(s * 0.215, 0.87, 0.03);
-      kit.add(between(sh, el, 0.06, 0.066), null, robe, a[1]);
-      kit.add(new THREE.SphereGeometry(0.066, 10, 8), M(el.x, el.y, el.z), robe, a[1]);
-      kit.add(between(el, wr, 0.066, 0.1, 14), null, function (v) { return v.y < 0.92 ? trim : robe; }, a[2]);
-      kit.add(new THREE.SphereGeometry(0.043, 10, 8), M(wr.x, wr.y - 0.05, wr.z + 0.01, 0, 0, 0, 0.85, 1.2, 1), L.skin, a[2]);
-      if (s > 0 && L.wand) {
-        var w0 = V(wr.x, wr.y - 0.06, wr.z + 0.0), w1 = V(wr.x, wr.y - 0.1, wr.z + 0.33);
-        kit.add(between(w0, w1, 0.009, 0.0045, 6), null, function (v) { return v.z < wr.z + 0.08 ? 0x3a2418 : 0x8a6a48; }, a[2]);
-      }
-    });
+    /* the legs in their trousers, each carried by its foot below and the hips above, so the walk shows under the robe */
     [[-1, B.footL], [1, B.footR]].forEach(function (f) {
-      kit.add(new THREE.SphereGeometry(0.05, 10, 8), M(f[0] * 0.085, 0.035, 0.1, 0, 0, 0, 1, 0.75, 2.3), L.shoe, f[1]);
+      kit.add(between(V(f[0] * 0.085, 0.07, 0.02), V(f[0] * 0.09, 0.92, 0), 0.052, 0.075, 10), null, L.trousers, function (y) {
+        return y < 0.12 ? [f[1], 0, 1] : y < 0.85 ? [f[1], B.hips, 1 - (y - 0.12) / 0.73] : [B.hips, 0, 1]; });
+      kit.add(new THREE.SphereGeometry(0.05, 12, 8), M(f[0] * 0.085, 0.036, 0.1, 0, 0, 0, 1, 0.72, 2.4), L.shoe, f[1], { deform: function (p) { if (p.y < -0.02) p.y = -0.02; } });
+    });
+    /* the frock coat beneath (to the knee), the waistcoat at its front with a row of buttons, the collar and cravat */
+    var coatProf = [[0.001, 0.5], [0.19, 0.49], [0.18, 0.7], [0.16, 0.9], [0.15, 1.02], [0.165, 1.18], [0.18, 1.3], [0.178, 1.4],
+                    [0.15, 1.46], [0.09, 1.5], [0.06, 1.53]].map(function (q) { return new THREE.Vector2(q[0], q[1]); });
+    kit.add(new THREE.LatheGeometry(coatProf, 32), M(0, 0, 0, 0, 0, 0, 1, 1, 0.7), function (v) {
+      var a = Math.abs(Math.atan2(v.x, v.z / 0.7));
+      if (a < 0.42 && v.y > 0.9 && v.y < 1.45) return L.waist;
+      return L.coat;
+    }, bodyW);
+    for (var bi = 0; bi < 5; bi++) kit.add(new THREE.SphereGeometry(0.009, 6, 4), M(0, 1.0 + bi * 0.085, 0.112 - Math.abs(bi - 2) * 0.004), 0xb8a070, B.spine);
+    kit.add(new THREE.CylinderGeometry(0.052, 0.058, 0.13, 12), M(0, neckY + 0.03, 0.0), L.skin, B.head, { pen: 2 });
+    kit.add(new THREE.CylinderGeometry(hr * 0.52, hr * 0.58, 0.06, 16, 1, true), M(0, neckY, 0.006), L.collar, B.spine);
+    [-1, 1].forEach(function (s) { kit.add(new THREE.BoxGeometry(0.035, 0.03, 0.01), M(s * 0.024, neckY - 0.03, 0.06, 0.3, 0, s * 0.5), L.collar, B.spine); });
+    if (L.cravat) kit.add(new THREE.SphereGeometry(0.04, 10, 8), M(0, neckY - 0.065, 0.075, 0, 0, 0, 1.15, 1.3, 0.5), L.cravat, B.spine);
+    head(kit, hc, hr, { skin: L.skin, hair: L.hair, moustache: L.moustache, goatee: L.goatee, long: L.long, slick: L.slick,
+                         hat: L.hat, hatCol: L.hatCol || robe, band: L.band }, B.head);
+    /* the robe, open down the front, hung in folds; the fronts turned back on the lining; the lining within */
+    var rows = [[0.07, 0.272, 0.36, 1], [0.3, 0.256, 0.34, 0.9], [0.6, 0.228, 0.3, 0.65], [0.9, 0.2, 0.27, 0.35], [1.05, 0.194, 0.26, 0.2],
+                [1.2, 0.203, 0.25, 0.08], [1.32, 0.214, 0.26, 0], [1.4, 0.21, 0.3, 0], [1.46, 0.182, 0.42, 0], [1.5, 0.125, 0.6, 0], [1.53, 0.08, 0.8, 0]];
+    kit.add(robeShell(rows, 56, 0.68, 1, false), null, function (v, u) { return (u < 0.035 || u > 0.965) ? lining : robe; }, bodyW);
+    kit.add(robeShell(rows, 56, 0.68, 1, true), null, lining, bodyW, { pen: 1 });
+    hood(kit, 1.39, 0.2, robe, lining, B.spine);
+    /* the arms: the robe's sleeve to the elbow and its bell to the wrist, lined; within, the coat's sleeve, the shirt's
+       cuff and the hand; the wand in the right, pointing ahead */
+    [[-1, B.shL, B.elL], [1, B.shR, B.elR]].forEach(function (a) {
+      var s = a[0], sh = V(s * 0.19, 1.41, 0), el = V(s * 0.215, 1.13, 0.0), wr = V(s * 0.215, 0.87, 0.03), bell = V(s * 0.218, 0.9, 0.028);
+      kit.add(between(sh, el, 0.062, 0.068, 12), null, robe, a[1]);
+      kit.add(new THREE.SphereGeometry(0.068, 12, 8), M(el.x, el.y, el.z), robe, a[1]);
+      var bg = between(el, bell, 0.068, 0.118, 16, true);
+      kit.add(bg, null, robe, a[2], { deform: function (p) { var d = Math.max(0, (1.1 - p.y) / 0.2); p.x += s * 0.01 * d * Math.sin(p.z * 60); } });
+      kit.add(flip(between(el, bell, 0.064, 0.112, 16, true)), null, lining, a[2]);
+      kit.add(between(V(el.x, el.y - 0.05, el.z), V(wr.x, wr.y + 0.01, wr.z), 0.045, 0.04, 10), null, L.coat, a[2]);
+      kit.add(new THREE.CylinderGeometry(0.042, 0.042, 0.022, 12, 1, true), M(wr.x, wr.y + 0.005, wr.z), L.collar, a[2]);
+      /* the hand: the palm and the fingers together, the thumb forward */
+      kit.add(new THREE.SphereGeometry(0.044, 12, 8), M(wr.x, wr.y - 0.055, wr.z + 0.008, 0, 0, s * 0.1, 0.62, 1.25, 0.95), L.skin, a[2], { pen: 2 });
+      kit.add(new THREE.SphereGeometry(0.016, 8, 6), M(wr.x - s * 0.006, wr.y - 0.04, wr.z + 0.035, 0.5, 0, 0, 0.8, 1.7, 0.9), L.skin, a[2], { pen: 2 });
+      if (s > 0 && L.wand) {
+        var w0 = V(wr.x, wr.y - 0.07, wr.z - 0.02), w1 = V(wr.x, wr.y - 0.12, wr.z + 0.33);
+        kit.add(between(w0, w1, 0.009, 0.0045, 6), null, function (v) { return v.z < wr.z + 0.06 ? 0x3a2418 : 0x7a5e44; }, a[2], { pen: 0 });
+      }
     });
 
     var geo = kit.geometry(true);
-    var mat = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: tones(), skinning: true });
+    var c = document.createElement('canvas'); c.width = 1024; c.height = 512;
+    drawFace(c.getContext('2d'), 0, 0, 1024, 512, L.face || {});
+    var mat = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: tones(), skinning: true, map: canvasTex(c) });
+    mat.onBeforeCompile = ownColour;
+    pen(mat, 55);
+    mat.customProgramCacheKey = function () { return 'castle-figure'; };
     var inkMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide, skinning: true });
-    inkMat.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0075;'); };
+    inkMat.onBeforeCompile = function (sh) { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0085;'); };
 
     /* the skeleton */
     var bones = [], pos = [[0, 0, 0], [0, 0.95, 0], [0, -0.35, 0], [0, 0.05, 0], [0, 0.57, 0.01], [-0.19, 0.41, 0], [-0.025, -0.28, 0],
@@ -213,7 +396,7 @@
     /* ---- moving: a queue of steps, the walk and the idle laid over each other ---- */
     var q = [], cur = null, phase = 0, walkW = 0, flickT = -1, clock = 0, turnT = 0;
     var STRIDE = 1.25 * L.height / 1.8, SPEED = child ? 0.95 : 1.05;
-    function angDiff(a, b) { var d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
+    function angDiff(a, b) { var d = b - a; while (d > Math.PI) d -= TAU; while (d < -Math.PI) d += TAU; return d; }
     function turnToward(h, dt, rate) {
       var d = angDiff(group.rotation.y, h), m = rate * dt;
       group.rotation.y += Math.abs(d) < m ? d : Math.sign(d) * m;
@@ -251,7 +434,7 @@
     }
     function pose() {
       bones.forEach(function (b, i) { b.position.copy(base[i]); b.rotation.set(0, 0, 0); });
-      var s = Math.sin(2 * Math.PI * phase), c = Math.cos(2 * Math.PI * phase), w = walkW;
+      var s = Math.sin(TAU * phase), c = Math.cos(TAU * phase), w = walkW;
       /* the idle: a breath, the chin a little high (he knows he is watched), a slow look about */
       bones[B.spine].rotation.x = 0.012 * Math.sin(clock * 1.7);
       bones[B.head].rotation.x = child ? 0.02 : -0.07;
@@ -260,7 +443,7 @@
       /* the walk */
       bones[B.footL].position.z += 0.17 * s * w; bones[B.footL].position.y += 0.035 * Math.max(0, c) * w;
       bones[B.footR].position.z -= 0.17 * s * w; bones[B.footR].position.y += 0.035 * Math.max(0, -c) * w;
-      bones[B.hips].position.y += (0.012 * Math.cos(4 * Math.PI * phase) - 0.008) * w;
+      bones[B.hips].position.y += (0.012 * Math.cos(2 * TAU * phase) - 0.008) * w;
       bones[B.hips].rotation.y = 0.07 * s * w; bones[B.spine].rotation.y = -0.09 * s * w;
       bones[B.hem].rotation.x = 0.05 * w; bones[B.hem].rotation.z = 0.03 * s * w;
       bones[B.shL].rotation.x = 0.32 * s * w; bones[B.shR].rotation.x = -0.2 * s * w;
@@ -287,72 +470,108 @@
     };
   }
 
-  /* ---- the seated class: one geometry, instanced, the pupil's own colours per instance ----
-     slots: 1 the trim (house), 2 skin, 3 hair, 4 long hair (hair, gone when short), 5 the hat (gone when bare) */
+  /* ---- the seated class: one geometry, instanced, each pupil's own colours, hair and face per instance ----
+     dressed as the drawn stock (student-stock-11-12-seated.png): the robe open over a grey jumper with the house's
+     stripe at its V, a white collar and the house tie, grey trousers or skirt, grey socks, black shoes; the robe lined in
+     the house's colour. slots: 1 the house, 2 skin, 3 hair, 4 long hair (gone when short), 6 curly hair (gone when not),
+     7 the plain cap (gone when curly), 8 trousers (gone for a skirt), 9 skirt and socks (gone for trousers) */
+  var FACES = [
+    { smile: 0.6, blush: 0.5 },
+    { smile: 0.3, lashes: 1, freckles: 7, blush: 0.6, iris: '70,90,60' },
+    { smile: 0.8, arch: 0.4, iris: '60,40,28' },
+    { smile: 0.2, lids: 0.6, lashes: 1, iris: '70,80,110', blush: 0.4 },
+    { smile: 0.5, browW: 3.8, freckles: 3, iris: '90,64,40' },
+    { smile: 0.9, lashes: 1, arch: 0.5, iris: '50,34,22', blush: 0.55 },
+    { smile: 0.4, lids: 0.4, iris: '80,96,120' },
+    { smile: 0.7, lashes: 1, freckles: 11, iris: '96,70,44', blush: 0.6 }
+  ];
   function crowd(T, list) {
     THREE = T;
-    var kit = new Kit(), hr = 0.1, robe = 0x1c1a1e, shoe = 0x15110f;
-    var TR = { slot: 1 }, SK = { slot: 2 }, HA = { slot: 3 }, LO = { slot: 4 }, HT = { slot: 5, base: robe };
-    var prof = [[0.001, 0.44], [0.165, 0.44], [0.16, 0.58], [0.145, 0.7], [0.158, 0.8], [0.15, 0.87], [0.1, 0.915], [0.05, 0.94]]
+    var kit = new Kit(), hr = 0.1, robe = 0x23201f, shoe = 0x17120f, grey = 0x8a8884, dgrey = 0x6c6a66, shirt = 0xeeeae0;
+    var TR = { slot: 1 }, SK = { slot: 2 }, HA = { slot: 3 }, LO = { slot: 4 }, CU = { slot: 6 }, CAP = { slot: 7 };
+    var TROU = { slot: 8, base: dgrey }, SKIRT = { slot: 9, base: dgrey }, SOCK = { slot: 9, base: 0x9a9894 }, SHIN = { slot: 8, base: dgrey };
+    /* the jumper: its V at the front, the house's stripe round the V and at the waist; the shirt and tie in the V */
+    var prof = [[0.001, 0.44], [0.16, 0.44], [0.158, 0.54], [0.15, 0.66], [0.155, 0.78], [0.152, 0.86], [0.12, 0.905], [0.06, 0.935]]
       .map(function (q) { return new THREE.Vector2(q[0], q[1]); });
-    kit.add(new THREE.LatheGeometry(prof, 28), M(0, 0, -0.02, 0, 0, 0, 1, 1, 0.68), function (v) {
-      var a = round(v.x, (v.z + 0.02) / 0.68, 28);
-      if (a < 0.12 && v.y > 0.66 && v.y < 0.9) return 0x55524e;
-      if (a < 0.35 && v.y < 0.9) return TR;
-      return robe;
+    kit.add(new THREE.LatheGeometry(prof, 32), M(0, 0, -0.02, 0, 0, 0, 1, 1, 0.7), function (v) {
+      var a = Math.abs(Math.atan2(v.x, (v.z + 0.02) / 0.7)), vy = 0.93 - a * 0.42;
+      if (v.y > vy + 0.02) return shirt;
+      if (v.y > vy - 0.012) return TR;
+      if (v.y > 0.48 && v.y < 0.5) return TR;
+      return grey;
     }, 0);
-    hood(kit, 0.85, 0.165, robe, TR, 0);
-    kit.add(new THREE.CylinderGeometry(0.05, 0.056, 0.05, 12, 1, true), M(0, 0.93, -0.015), 0xeeeae0, 0);   /* the collar */
-    kit.add(new THREE.CylinderGeometry(0.04, 0.044, 0.1, 10), M(0, 0.96, -0.01), SK, 0);
+    kit.add(new THREE.BoxGeometry(0.04, 0.17, 0.012), M(0, 0.8, 0.088, -0.12, 0, 0), TR, 0);   /* the tie */
+    kit.add(new THREE.BoxGeometry(0.03, 0.025, 0.02), M(0, 0.895, 0.082, -0.2, 0, 0), TR, 0);
+    [-1, 1].forEach(function (s) { kit.add(new THREE.BoxGeometry(0.04, 0.03, 0.008), M(s * 0.03, 0.905, 0.07, 0.35, 0, s * 0.55), shirt, 0); });
+    kit.add(new THREE.CylinderGeometry(0.045, 0.05, 0.1, 12), M(0, 0.96, -0.012), SK, 0, { pen: 2 });
+    /* the robe, open down the front, hung from the shoulders over the chair's seat, lined in the house's colour */
+    var rows = [[0.3, 0.215, 0.95, 1], [0.44, 0.2, 0.9, 0.8], [0.56, 0.172, 0.6, 0.4], [0.7, 0.163, 0.42, 0.15], [0.8, 0.168, 0.36, 0],
+                [0.86, 0.165, 0.38, 0], [0.9, 0.14, 0.46, 0], [0.925, 0.09, 0.7, 0], [0.945, 0.06, 0.9, 0]];
+    kit.add(robeShell(rows, 40, 0.7, 1, false), M(0, 0, -0.02), function (v, u) { return (u < 0.04 || u > 0.96) ? TR : robe; }, 0);
+    kit.add(robeShell(rows, 40, 0.7, 1, true), M(0, 0, -0.02), TR, 0);
+    hood(kit, 0.86, 0.16, robe, TR, 0);
+    /* the legs: trousers to the shoe, or the skirt over the knee and grey socks below */
     [-1, 1].forEach(function (s) {
       var hip = V(s * 0.085, 0.49, 0.0), knee = V(s * 0.09, 0.5, 0.36), ankle = V(s * 0.09, 0.08, 0.38);
-      kit.add(between(hip, knee, 0.085, 0.07), null, robe, 0);
-      kit.add(between(knee, ankle, 0.06, 0.045), null, 0x2a2826, 0);
-      kit.add(new THREE.SphereGeometry(0.045, 8, 6), M(ankle.x, 0.035, ankle.z + 0.05, 0, 0, 0, 1, 0.75, 2.1), shoe, 0);
-      var sh = V(s * 0.16, 0.86, -0.01), el = V(s * 0.185, 0.69, 0.1), wr = V(s * 0.1, 0.76, 0.36);
+      kit.add(between(hip, knee, 0.082, 0.066), null, TROU, 0);
+      kit.add(between(knee, ankle, 0.056, 0.045), null, SHIN, 0);
+      kit.add(between(V(knee.x, knee.y - 0.08, knee.z), ankle, 0.05, 0.043), null, SOCK, 0);
+      kit.add(new THREE.SphereGeometry(0.045, 10, 6), M(ankle.x, 0.035, ankle.z + 0.05, 0, 0, 0, 1, 0.72, 2.2), shoe, 0);
+      /* the arms on the desk: the robe's sleeve, its lined bell, the jumper's cuff and the hand */
+      var sh = V(s * 0.16, 0.86, -0.01), el = V(s * 0.185, 0.69, 0.1), wr = V(s * 0.1, 0.76, 0.36), bell = V(s * 0.115, 0.755, 0.32);
       kit.add(between(sh, el, 0.052, 0.058), null, robe, 0);
-      kit.add(new THREE.SphereGeometry(0.058, 8, 6), M(el.x, el.y, el.z), robe, 0);
-      kit.add(between(el, wr, 0.058, 0.08, 10), null, robe, 0);
-      kit.add(new THREE.SphereGeometry(0.038, 8, 6), M(wr.x - s * 0.03, wr.y - 0.005, wr.z + 0.04, 0, 0, 0, 1.1, 0.6, 1.2), SK, 0);
+      kit.add(new THREE.SphereGeometry(0.058, 10, 6), M(el.x, el.y, el.z), robe, 0);
+      kit.add(between(el, bell, 0.058, 0.088, 12, true), null, robe, 0);
+      kit.add(flip(between(el, bell, 0.055, 0.084, 12, true)), null, TR, 0);
+      kit.add(between(el, wr, 0.04, 0.036, 8), null, grey, 0);
+      kit.add(new THREE.SphereGeometry(0.038, 10, 6), M(wr.x - s * 0.02, wr.y - 0.004, wr.z + 0.045, 0, s * 0.3, 0, 0.95, 0.5, 1.3), SK, 0, { pen: 2 });
     });
-    head(kit, V(0, 1.06, 0.02), hr, { skin: SK, hair: HA, long: LO, hat: true, hatCol: HT }, 0);
+    kit.add(robeShell([[0.36, 0.2, 0.0, 0], [0.47, 0.19, 0.0, 0]], 24, 1.0, 0, false), M(0, 0, 0.12, 0, 0, 0, 1, 1, 1.05), SKIRT, 0, {
+      deform: function (p) { p.z = Math.max(p.z, -0.05); } });   /* the skirt, its pleats left to the pen */
+    head(kit, V(0, 1.06, 0.02), hr, { skin: SK, hair: HA, hairCap: CAP, long: LO, curly: CU }, 0);
     var geo = kit.geometry(false), n = list.length;
-    var aT = new Float32Array(n * 3), aS = new Float32Array(n * 3), aH = new Float32Array(n * 3), aL = new Float32Array(n), aHat = new Float32Array(n);
+    var aT = new Float32Array(n * 3), aS = new Float32Array(n * 3), aH = new Float32Array(n * 3), aF = new Float32Array(n * 4);
     list.forEach(function (p, i) {
       lin(p.trim !== undefined ? p.trim : HOUSES.gryffindor).toArray(aT, i * 3);
       lin(p.skin !== undefined ? p.skin : 0xe8bfa0).toArray(aS, i * 3);
       lin(p.hair !== undefined ? p.hair : 0x5a3a22).toArray(aH, i * 3);
-      aL[i] = p.long ? 1 : 0; aHat[i] = p.hat ? 1 : 0;
+      aF[i * 4] = p.long ? 1 : 0; aF[i * 4 + 1] = p.curly ? 1 : 0; aF[i * 4 + 2] = p.girl ? 1 : 0; aF[i * 4 + 3] = (p.face || 0) % 8;
     });
     geo.setAttribute('iTrim', new THREE.InstancedBufferAttribute(aT, 3));
     geo.setAttribute('iSkin', new THREE.InstancedBufferAttribute(aS, 3));
     geo.setAttribute('iHair', new THREE.InstancedBufferAttribute(aH, 3));
-    geo.setAttribute('iLong', new THREE.InstancedBufferAttribute(aL, 1));
-    geo.setAttribute('iHat', new THREE.InstancedBufferAttribute(aHat, 1));
-    var DECL = 'attribute float aSlot;\nattribute vec3 iTrim;\nattribute vec3 iSkin;\nattribute vec3 iHair;\nattribute float iLong;\nattribute float iHat;\n';
+    geo.setAttribute('iFlags', new THREE.InstancedBufferAttribute(aF, 4));
+    var DECL = 'attribute float aSlot;\nattribute vec3 iTrim;\nattribute vec3 iSkin;\nattribute vec3 iHair;\nattribute vec4 iFlags;\n';
     /* a part a pupil lacks folds to one point inside the head, so it draws nothing */
-    var GONE = 'if ((aSlot > 3.5 && aSlot < 4.5 && iLong < 0.5) || (aSlot > 4.5 && iHat < 0.5)) transformed = vec3(0.0, 1.06, 0.0);\n';
-    var mat = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: tones() });
+    var GONE = 'if ((aSlot > 3.5 && aSlot < 4.5 && iFlags.x < 0.5) || (aSlot > 5.5 && aSlot < 6.5 && iFlags.y < 0.5) || (aSlot > 6.5 && aSlot < 7.5 && iFlags.y > 0.5)' +
+               ' || (aSlot > 7.5 && aSlot < 8.5 && iFlags.z > 0.5) || (aSlot > 8.5 && iFlags.z < 0.5)) transformed = vec3(0.0, 1.06, 0.0);\n';
+    var atlas = document.createElement('canvas'); atlas.width = 2048; atlas.height = 512;
+    var ax = atlas.getContext('2d');
+    FACES.forEach(function (f, i) { drawFace(ax, (i % 4) * 512, Math.floor(i / 4) * 256, 512, 256, f); });
+    var mat = new THREE.MeshToonMaterial({ vertexColors: true, gradientMap: tones(), map: canvasTex(atlas) });
     mat.onBeforeCompile = function (sh) {
       sh.vertexShader = DECL + sh.vertexShader
         .replace('#include <begin_vertex>', '#include <begin_vertex>\n' + GONE)
-        .replace('#include <color_vertex>', '#include <color_vertex>\nvColor.xyz *= aSlot < 0.5 ? vec3(1.0) : aSlot < 1.5 ? iTrim : aSlot < 2.5 ? iSkin : aSlot < 4.5 ? iHair : vec3(1.0);');
+        .replace('#include <uv_vertex>', '#include <uv_vertex>\nvUv = vec2((vUv.x + mod(iFlags.w, 4.0)) / 4.0, (vUv.y + 1.0 - floor(iFlags.w / 4.0)) / 2.0);')
+        .replace('#include <color_vertex>', '#include <color_vertex>\nvColor.xyz *= aSlot < 0.5 ? vec3(1.0) : aSlot < 1.5 ? iTrim : aSlot < 2.5 ? iSkin : (aSlot < 4.5 || (aSlot > 5.5 && aSlot < 7.5)) ? iHair : vec3(1.0);');
+      ownColour(sh);
     };
+    pen(mat, 70);
     mat.customProgramCacheKey = function () { return 'castle-crowd'; };
     var inkMat = new THREE.MeshBasicMaterial({ color: INK, side: THREE.BackSide });
     inkMat.onBeforeCompile = function (sh) {
-      sh.vertexShader = DECL + sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0065;\n' + GONE);
+      sh.vertexShader = DECL + sh.vertexShader.replace('#include <begin_vertex>', 'vec3 transformed = position + normal * 0.0068;\n' + GONE);
     };
     inkMat.customProgramCacheKey = function () { return 'castle-crowd-ink'; };
     var mesh = new THREE.InstancedMesh(geo, mat, n), ink = new THREE.InstancedMesh(geo, inkMat, n);
     ink.instanceMatrix = mesh.instanceMatrix;
     mesh.frustumCulled = ink.frustumCulled = false;
     var group = new THREE.Group(); group.add(mesh); group.add(ink); group.name = 'figure-crowd';
-    var m = new THREE.Matrix4(), qq = new THREE.Quaternion(), e = new THREE.Euler(), sc = new THREE.Vector3(), at = new THREE.Vector3();
+    var m = new THREE.Matrix4(), qq = new THREE.Quaternion(), e = new THREE.Euler(), sc = V(1, 1, 1), at = V(0, 0, 0);
     function place(t) {
       list.forEach(function (p, i) {
         var k = i * 1.731, s = p.scale || 1;
-        e.set(0.015 * Math.sin(t * 0.9 + k) + 0.02, (p.rot || 0) + 0.06 * Math.sin(t * 0.21 + k * 2.3), 0.01 * Math.sin(t * 0.5 + k));
+        e.set(0.015 * Math.sin(t * 0.9 + k) + 0.03, (p.rot || 0) + 0.06 * Math.sin(t * 0.21 + k * 2.3), 0.01 * Math.sin(t * 0.5 + k));
         qq.setFromEuler(e); sc.set(s, s * (1 + 0.006 * Math.sin(t * 1.6 + k)), s); at.fromArray(p.at);
         m.compose(at, qq, sc); mesh.setMatrixAt(i, m);
       });
