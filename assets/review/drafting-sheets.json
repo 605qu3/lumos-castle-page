@@ -198,5 +198,29 @@
   "version": 224,
   "model_date": "28 October 2026, 00.04",
   "drawn": "28 October 2026, 01.56"
+ },
+ "D-501": {
+  "name": "drafting-d501",
+  "title": "The Astronomy Tower's top: plan at 1:50",
+  "group": "The Astronomy Tower's top, 1:50 at A2",
+  "version": 233,
+  "model_date": "28 October 2026, 18.24",
+  "drawn": "28 October 2026, 18.24"
+ },
+ "D-502": {
+  "name": "drafting-d502",
+  "title": "The Astronomy Tower's top: section A-A at 1:50",
+  "group": "The Astronomy Tower's top, 1:50 at A2",
+  "version": 233,
+  "model_date": "28 October 2026, 18.24",
+  "drawn": "28 October 2026, 18.24"
+ },
+ "D-503": {
+  "name": "drafting-d503",
+  "title": "The Astronomy Tower's top: north elevation at 1:50",
+  "group": "The Astronomy Tower's top, 1:50 at A2",
+  "version": 233,
+  "model_date": "28 October 2026, 18.24",
+  "drawn": "28 October 2026, 18.24"
  }
 }
