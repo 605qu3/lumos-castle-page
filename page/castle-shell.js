@@ -505,9 +505,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      its hourglass niches; the waiting chamber's and the cupboard's stood 0.3 m proud of its walls). floorQs is the floor's
      places, found before any is built */
   var floorQs = [];
+  /* v103 (the sweep, Godric's 7.32 am): halfGap reads every place the model stands on this floor, built or not (gapQs):
+     the east courtyard is built later, through a way, and the staff rooms' south walls stood their whole 0.8 m in it */
+  var gapQs = [];
   function halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) {
     var best = t, top = Q.ceiling != null ? Q.ceiling : Q.floor + 3;
-    floorQs.forEach(function (q) {
+    gapQs.forEach(function (q) {
       var qt = q.ceiling != null ? q.ceiling : q.floor + 3;
       if (q.id === Q.id || q.floor >= top - 0.1 || qt <= Q.floor + 0.1) return;
       var pts = q.area ? q.area.outer : q.poly, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
@@ -521,6 +524,25 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         });
         if (lo < hi && lo > 0.02 && (!q.area || inArea(q, px + nx * (lo + 0.05), py + ny * (lo + 0.05)))) best = Math.min(best, lo / 2);
       }
+    });
+    return best;
+  }
+  function endRun(Q, e, dx, dy, nx, ny, t, ext) {   /* v103: how far a corner block runs past e before a place beside */
+    var best = ext, top = Q.ceiling != null ? Q.ceiling : Q.floor + 3;
+    gapQs.forEach(function (q) {
+      var qt = q.ceiling != null ? q.ceiling : q.floor + 3;
+      if (q.id === Q.id || q.floor >= top - 0.1 || qt <= Q.floor + 0.1) return;
+      var pts = q.area ? q.area.outer : q.poly, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      pts.forEach(function (p) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+      [0.25, 0.75].forEach(function (f) {
+        var px = e[0] + nx * t * f, py = e[1] + ny * t * f, lo = 0, hi = 2 * ext;
+        [[px, dx, x0, x1], [py, dy, y0, y1]].forEach(function (A) {
+          if (Math.abs(A[1]) < 1e-9) { if (A[0] <= A[2] + 0.01 || A[0] >= A[3] - 0.01) lo = Infinity; return; }
+          var ta = (A[2] - A[0]) / A[1], tb = (A[3] - A[0]) / A[1];
+          lo = Math.max(lo, Math.min(ta, tb)); hi = Math.min(hi, Math.max(ta, tb));
+        });
+        if (lo < hi && lo < best && (!q.area || inArea(q, px + dx * (lo + 0.05), py + dy * (lo + 0.05)))) best = Math.max(0, lo);
+      });
     });
     return best;
   }
@@ -1200,6 +1222,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var cT = (ux * (ne.b[0] - ne.a[0]) + uy * (ne.b[1] - ne.a[1])) / nL, sT = turn(ed, ne) / (L * nL);
         if (cT > 1e-6 && ext1 * cT - t * sT > s0n - 0.02) ext1 = Math.max(0, (s0n - 0.02 + t * sT) / cT);
       }
+      /* v103 (the sweep): on a floor built whole, a corner block runs no further than the face of a place beside the
+         corner (the cupboard's south wall ran 0.4 into the Entrance Hall, the pale sliver beside its door; Filch's
+         office and store into the classroom corridor) */
+      if (gapQs.length > 1) {
+        if (ext1) ext1 = endRun(Q, ed.b, ux, uy, nx, ny, t, ext1);
+        if (ext0) ext0 = endRun(Q, ed.a, -ux, -uy, nx, ny, t, ext0);
+      }
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
@@ -1213,7 +1242,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           if (cutS != null) { piece(s0, cutS, ya, yb, name + '-a'); piece(cutS, s1, ya, yb, name + '-b'); return; }
           if (cutY != null) { piece(s0, s1, ya, cutY, name + '-low'); piece(s0, s1, cutY, yb, name); return; }
         }
-        var tp = floorQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) : t;   /* v102 */
+        var tp = gapQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) : t;   /* v102 */
         var sm = (s0 + s1) / 2, p = toLocal(a[0] + ux * sm + nx * tp / 2, a[1] + uy * sm + ny * tp / 2, Q.floor);
         var wm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, (ya + yb) / 2) : mats.wall;   /* the band's top is over the floor */
         var m = slab(s1 - s0 + (s0 <= 0.01 ? ext0 : 0) + (s1 >= L - 0.01 ? ext1 : 0), yb - ya, tp, wm, 'wall');
@@ -1703,6 +1732,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var Q = findPlace(M, id);
       if (!Q || (Q.rec && Q.rec.page) || Q.shaft || Math.abs(Q.floor - P.floor) > 0.05) return;
       floorQs.push(Q);
+    });
+    var gseen = {};   /* v103: every place on the floor, for halfGap */
+    (M.rooms || []).map(function (r) { return r.id; }).concat((M.stairs || []).map(function (x) { return slug(x.id); }),
+      [].concat.apply([], (M.openings || []).map(function (op) { return op.between || []; })).map(slug)).forEach(function (id) {
+      if (!id || gseen[id]) return;
+      gseen[id] = 1;
+      var Q = floorQs.filter(function (q) { return q.id === id; })[0] || findPlace(M, id);
+      /* any place standing across this floor's height: the stair hall and the West Tower's spiral rise from the ground */
+      if (Q && !Q.glasshouse && (Q.poly || Q.area) && Q.floor < P.floor + 2.5 && (Q.ceiling != null ? Q.ceiling : Q.floor + 3) > P.floor + 0.5) gapQs.push(Q);
     });
   }
   buildPlace(P);
