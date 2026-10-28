@@ -1922,7 +1922,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      `to`, `treads`, `per_turn` and `foot_bearing`, no span or rect): an oak newel from the floor to a rail's height over
      the top, and each tread a plank wedge 60 mm thick, 360 / per_turn round, clockwise up seen from above from its foot,
      the treads lapped 3 degrees under the next; the last reaches 0.2 further out, onto the gallery's edge it serves, its
-     top the gallery's. A thin baluster at each tread's outer end. Drawn only; the walk up it waits (stands carry no z) */
+     top the gallery's. A thin baluster at each tread's outer end. v99 (req 1237, the 195th): walked as a turret's flight is,
+     its foot a step out from the foot tread on the floor looking level across it, its head a step off the top tread onto the
+     gallery looking along it, the eye round the newel at half its reach every third tread */
   (M.stairs || []).forEach(function (s) {
     if (!s.newel || !s.r || !s.treads || !s.per_turn || s.foot_bearing == null || s.span || s.rect) return;
     var inIt = out.places.filter(function (q) { return (s.rooms || [s.room]).some(function (r) { return slug(r) === q.id; }); })[0];
@@ -1944,6 +1946,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var bal = slab(0.035, RAIL, 0.035, omat, 'stair');
       bal.position.set(bp.x, bp.y + RAIL / 2, bp.z); bal.name = s.id + '-baluster-' + k; bal.userData.owner = inIt.id; group.add(bal);
     }
+    var sat = function (b, r) { return [c[0] + r * Math.cos(b * Math.PI / 180), c[1] + r * Math.sin(b * Math.PI / 180)]; };
+    var hb = s.foot_bearing - n * step, fo = sat(s.foot_bearing, s.r + 0.9), fl = sat(s.foot_bearing - step, s.r / 2);
+    var ho = sat(hb, s.r + 0.6), ha = (hb + 90) * Math.PI / 180, wp = [];
+    for (var j = 1; j <= n; j++) if (j % 3 === 1 || j === n) { var q = sat(s.foot_bearing - (j - 0.5) * step, s.r / 2); wp.push([q[0], q[1], s.from + rise * j]); }
+    shaftFlights.push({ id: s.id, foot: { x: fo[0], y: fo[1], z: s.from, lx: fl[0], ly: fl[1], up: 0 },
+      head: { x: ho[0], y: ho[1], z: s.to, lx: ho[0] + Math.cos(ha) * 20, ly: ho[1] + Math.sin(ha) * 20, up: 0 }, path: wp });
     out.stairs.push({ id: s.id, place: inIt.id });
   });
 
