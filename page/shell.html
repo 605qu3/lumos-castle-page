@@ -7215,7 +7215,8 @@ function updateStoneThings(dt, t) {
    minute, a breath's pause at the full, a comet crossing the corner once a round), a planet's loop, an eclipse; the
    tap `night-log` turns it. Still while the room is shut. ?sky=on for checks; lumosGreybox.astro. */
 var ASTRO = { on: PLACE === 'astronomy-chart-room' || PLACE === 'astronomy-night-books' || PLACE === 'astronomy-tower-top',page: 'moons', turn: 0, live: !events, t: 0, sky: null, cloud: null, cloudOn: false, log: null, at: 0 };
-var ASTRO_TOP_SKY = 'open to "the cold night air", the castle\'s sky everywhere above';
+var ASTRO_TOP_SKY = 'open to "the cold night air", the castle\'s sky everywhere above',
+    ASTRO_TOP_CLOUD = "the stars coming and going in the castle's own cloud, through the glass as by eye";
 var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars and the moon where they really stand tonight, the beams crossing it with the sky between them',
     ASTRO_SKY_DIM = "the sky's dim light, the stars' and the moon's own, faint on the long table's charts",
     ASTRO_CLOUD = "the stars coming and going in the castle's own cloud across the ceiling",
@@ -7277,16 +7278,7 @@ var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars a
     var disc = fan(C[0], C[1], R + 0.05, CEIL - 0.005, 96, new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }), 'astronomy-chart-sky');
     scene.add(own(disc)); ASTRO.sky = { cv: cv, tex: tex, mesh: disc, R: R, cat: null };
     /* the castle's cloud: soft grey drifts on a second disc a centimetre under, turning slowly */
-    var cc = document.createElement('canvas'); cc.width = cc.height = 512;
-    var cx2 = cc.getContext('2d'), seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-    for (var k = 0; k < 70; k++) {
-      var x = rnd() * 512, y = rnd() * 512, r = 30 + rnd() * 70, gr = cx2.createRadialGradient(x, y, 0, x, y, r);
-      gr.addColorStop(0, 'rgba(58,62,74,0.55)'); gr.addColorStop(1, 'rgba(58,62,74,0)'); cx2.fillStyle = gr;
-      [-512, 0, 512].forEach(function (ox) { [-512, 0, 512].forEach(function (oy) {   /* drawn wrapped, so the tile repeats with no seam */
-        cx2.save(); cx2.translate(ox, oy); cx2.fillRect(x - r, y - r, 2 * r, 2 * r); cx2.restore();
-      }); });
-    }
-    var ctex = new THREE.CanvasTexture(cc); ctex.encoding = THREE.sRGBEncoding; ctex.wrapS = ctex.wrapT = THREE.RepeatWrapping; ctex.repeat.set(2, 2);
+    var ctex = astroCloudTex(2);
     var cloud = fan(C[0], C[1], R + 0.05, CEIL - 0.015, 96, new THREE.MeshBasicMaterial({ map: ctex, transparent: true, depthWrite: false, side: THREE.DoubleSide }), 'astronomy-chart-cloud');
     cloud.visible = false; scene.add(own(cloud)); ASTRO.cloud = cloud;
     fetch('sky/stars.json').then(function (r) { return r.json(); }).then(function (cat) { ASTRO.sky.cat = cat; astroSky(); }).catch(function () { astroSky(); });
@@ -7314,8 +7306,15 @@ var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars a
     var ttex = new THREE.CanvasTexture(tcv); ttex.encoding = THREE.sRGBEncoding; ttex.anisotropy = 4;
     var dome = new THREE.Mesh(dg, new THREE.MeshBasicMaterial({ map: ttex, side: THREE.DoubleSide, fog: false })); dome.name = 'astronomy-top-sky'; dome.frustumCulled = false;
     scene.add(own(dome)); ASTRO.sky = { cv: tcv, tex: ttex, mesh: dome, R: DR, cat: null };
+    /* req 663, Events' line "the stars coming and going in the castle's own cloud": the chart room's drifts on a dome
+       at 95 m, so a clouded night hides and shows the stars over the whole top, not the ceiling's disc */
+    var cg = dg.clone(), cpa = cg.attributes.position, c0 = P(TC[0], TC[1], 0);
+    for (var ci = 0; ci < cpa.count; ci++) cpa.setXYZ(ci, c0.x + (cpa.getX(ci) - c0.x) * 0.95, c0.y + (cpa.getY(ci) - c0.y) * 0.95, c0.z + (cpa.getZ(ci) - c0.z) * 0.95);
+    var tcl = new THREE.Mesh(cg, new THREE.MeshBasicMaterial({ map: astroCloudTex(3), transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: false }));
+    tcl.name = 'astronomy-top-cloud'; tcl.frustumCulled = false; tcl.visible = false; scene.add(own(tcl)); ASTRO.cloud = tcl;
     fetch('sky/stars.json').then(function (r) { return r.json(); }).then(function (cat) { ASTRO.sky.cat = cat; astroSky(); }).catch(function () { astroSky(); });
     astroSky(); dome.visible = ASTRO.live || Q.get('sky') === 'on';
+    cloudShow(!events && Q.get('weather') === 'cloudy');
     scene.background = kit.col(DAY ? 0xa9bfd6 : 0x10141f);
     if (!DAY) scene.add(new THREE.HemisphereLight(kit.col(0x8798c4), kit.col(0x2a2a30), 0.3));   /* starlight on the leads, provisional */
   }
@@ -7331,6 +7330,19 @@ var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars a
     astroLog(0);
   }
 })();
+function astroCloudTex(rep) {   /* the castle's cloud: soft grey drifts, a wrapped tile so it turns with no seam */
+  var cc = document.createElement('canvas'); cc.width = cc.height = 512;
+  var cx2 = cc.getContext('2d'), seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (var k = 0; k < 70; k++) {
+    var x = rnd() * 512, y = rnd() * 512, r = 30 + rnd() * 70, gr = cx2.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, 'rgba(58,62,74,0.55)'); gr.addColorStop(1, 'rgba(58,62,74,0)'); cx2.fillStyle = gr;
+    [-512, 0, 512].forEach(function (ox) { [-512, 0, 512].forEach(function (oy) {   /* drawn wrapped, so the tile repeats with no seam */
+      cx2.save(); cx2.translate(ox, oy); cx2.fillRect(x - r, y - r, 2 * r, 2 * r); cx2.restore();
+    }); });
+  }
+  var ctex = new THREE.CanvasTexture(cc); ctex.encoding = THREE.sRGBEncoding; ctex.wrapS = ctex.wrapT = THREE.RepeatWrapping; ctex.repeat.set(rep, rep);
+  return ctex;
+}
 function cloudShow(on) { ASTRO.cloudOn = on; if (ASTRO.cloud) ASTRO.cloud.visible = on && (!ASTRO.sky || ASTRO.sky.mesh.visible); return false; }
 function astroSky() {   /* the real sky over home() now; by day tonight's at eleven */
   var S = ASTRO.sky; if (!S || !window.CastleSky) return;
@@ -7416,8 +7428,9 @@ function astroShown(shown) {
   if (ASTRO.sky) {
     var SKY_LINE = PLACE === 'astronomy-tower-top' ? ASTRO_TOP_SKY : ASTRO_SKY;   /* the top's is Events' req 488 line, the sky "everywhere above" */
     ASTRO.live = shown.indexOf(SKY_LINE) >= 0 || !events || Q.get('sky') === 'on';
-    ASTRO.sky.mesh.visible = ASTRO.live; cloudShow(shown.indexOf(ASTRO_CLOUD) >= 0 || (!events && Q.get('weather') === 'cloudy'));
-    drawn = [SKY_LINE, ASTRO_SKY_DIM, ASTRO_CLOUD];
+    var CLOUD_LINE = PLACE === 'astronomy-tower-top' ? ASTRO_TOP_CLOUD : ASTRO_CLOUD;
+    ASTRO.sky.mesh.visible = ASTRO.live; cloudShow(shown.indexOf(CLOUD_LINE) >= 0 || (!events && Q.get('weather') === 'cloudy'));
+    drawn = [SKY_LINE, ASTRO_SKY_DIM, CLOUD_LINE];
   }
   if (ASTRO.log) {
     var pg = shown.indexOf(ASTRO_PLANET) >= 0 ? 'planet' : shown.indexOf(ASTRO_ECLIPSE) >= 0 ? 'eclipse' : shown.indexOf(ASTRO_MOONS) >= 0 ? 'moons' : null;
