@@ -318,6 +318,7 @@
     'black-and-white': { what: 'black-and-white, the bands left dark (the gallery, east y 53)', look: 'bands' },
     munition: { what: 'a plain munition suit, the cheapest in the row (the gallery, east y 65)', look: 'munition' },
     headless: { what: 'a suit with no head, on a wooden stand, waiting for one (the West armoury)', cut: [496, 2468], weapon: 'none', stand: true },
+    bareheaded: { what: 'a suit without its helmet, both gauntlets cupped where the head should be (night hunt touch 20, req 1252)', drawn: 'bareheaded' },
     /* the drawn kinds, each its own drawing in the default's hand (Godric's picks on corridor-armour-all-1023, 10.04 pm,
        23 October 2026: every boxed pick but Q6, which takes its 1; the places are docs/notes/2026-10-23-armour-varieties.md) */
     gothic: { what: 'Gothic, fluted, long pointed sabatons (Q1, 1)', drawn: 'gothic' },
@@ -338,7 +339,8 @@
     gothic: {}, 'gothic-visor': {}, jousting: {}, maximilian: {}, cuirassier: {}, tilt: {}, 'three-quarter': {},
     sword: { x0: 389, halberd: false },
     shield: { x0: 504, halberd: false, shield: [20, 650, 430, 1410], mirror: 565 },
-    mace: { halberd: false }
+    mace: { halberd: false },
+    bareheaded: { x0: 606, halberd: false }
   };
   var STAND = 0.06;   /* the armoury stand's board */
   function extras(K, S, g, add) {   /* the pieces built in code (the code-made pike, mace, shield and post gave way to the drawn kinds) */
