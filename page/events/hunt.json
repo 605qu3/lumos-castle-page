@@ -1,0 +1,283 @@
+{
+  "chain": "hunt",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = lantern gallery",
+        "windy = yes"
+      ],
+      "show": [
+        "round the lantern the eight painted wind faces: the one whose wind is blowing today has its cheeks puffed full, and the other seven doze with their mouths shut"
+      ]
+    },
+    {
+      "when": [
+        "place = lantern gallery",
+        "windy = no"
+      ],
+      "show": [
+        "all eight painted wind faces round the lantern doze with their mouths shut"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "day of week <= 3"
+      ],
+      "show": [
+        "on the watch seat the nine men's morris cut in the stone has its pebbles in a game half played: two black pebbles hard against the middle ring"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "day of week >= 4",
+        "day of week <= 5"
+      ],
+      "show": [
+        "on the watch seat the nine men's morris game has gone on since he was last here: a white pebble has stepped in to block, and nobody is about"
+      ]
+    },
+    {
+      "when": [
+        "place = watch bartizan",
+        "day of week >= 6"
+      ],
+      "show": [
+        "on the watch seat the nine men's morris has been swept clear and set out again, nine pebbles to a side and none yet moved"
+      ]
+    },
+    {
+      "when": [
+        "place = falconers room",
+        "hour >= 7",
+        "hour < 9"
+      ],
+      "show": [
+        "the string of brass hawk bells shivers and tinkles, as the owls stream over to the Hall for the post"
+      ]
+    },
+    {
+      "when": [
+        "place = chandlery"
+      ],
+      "show": [
+        "one of the half-dipped candles on the hoop has risen a hand's breadth off its string and hangs there by itself, unlit, practising for the Great Hall"
+      ]
+    },
+    {
+      "when": [
+        "place = arras room",
+        "day of week <= 5"
+      ],
+      "show": [
+        "on the torn hunting piece the woven riders and hounds have gathered at the edge of the tear and wait, one rider sitting on the unpicked threads"
+      ]
+    },
+    {
+      "when": [
+        "place = arras room",
+        "day of week >= 6"
+      ],
+      "show": [
+        "the hunting piece is rewoven across its tear, and the riders and hounds are gone round the border, out of sight"
+      ]
+    },
+    {
+      "when": [
+        "place = camera obscura",
+        "time = day",
+        "weather = clear",
+        "hour >= 15",
+        "hour < 18"
+      ],
+      "show": [
+        "on the white table, tiny figures circle a little pitch and pass a Quaffle between them, all in silence, the house team at practice"
+      ]
+    },
+    {
+      "when": [
+        "place = feast loft",
+        "date >= 11-01",
+        "date <= 11-07"
+      ],
+      "show": [
+        "a few of the feast's bats hang asleep from the rafters"
+      ]
+    },
+    {
+      "when": [
+        "place = fencing room"
+      ],
+      "show": [
+        "the painted fencer on the wall turns to face him and salutes with his foil, then goes back to his guard"
+      ]
+    },
+    {
+      "when": [
+        "place = bindery",
+        "year >= 3"
+      ],
+      "show": [
+        "on the sewing frame, in for a new spine, a Monster Book of Monsters strapped shut with a belt, rustling crossly now and then"
+      ]
+    },
+    {
+      "when": [
+        "place = orrery room"
+      ],
+      "show": [
+        "the orrery's planets stand where the real ones are tonight, as if someone had turned the crank in the night"
+      ]
+    },
+    {
+      "when": [
+        "place = lost property"
+      ],
+      "show": [
+        "among the brown tags an empty shoebox with holes in its lid, the tag reading \"Toad, one. Claimed.\" and below it, in other hands, the same twice more"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "day of week <= 2"
+      ],
+      "show": [
+        "the wax tablet's last lesson is a sum scratched in an old hand: 7 and 8 and 9, and the answer left blank"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "day of week >= 3",
+        "day of week <= 4"
+      ],
+      "show": [
+        "the wax tablet's last lesson is a sum scratched in an old hand: a dozen less five, and the answer left blank"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "day of week >= 5",
+        "day of week <= 6"
+      ],
+      "show": [
+        "the wax tablet's last lesson is a sum scratched in an old hand: three sixes, and the answer left blank"
+      ]
+    },
+    {
+      "when": [
+        "place = first schoolroom",
+        "day of week >= 7"
+      ],
+      "show": [
+        "the wax tablet's last lesson is a sum scratched in an old hand: twenty shared among four, and the answer left blank"
+      ]
+    },
+    {
+      "when": [
+        "place = curiosities cabinet"
+      ],
+      "show": [
+        "the long horn's label reads \"unicorn's horn\", crossed out to \"narwhal\", under it in another hand \"unicorn\", then \"NARWHAL\" in capitals: the argument runs down the card in four hands"
+      ]
+    },
+    {
+      "when": [
+        "place = filchs office"
+      ],
+      "show": [
+        "on the door a notice: MISSING, three buckets, two mops, one duster. Information to the caretaker. Under it someone has chalked a raspberry face"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy cloak room",
+        "weekday = thursday"
+      ],
+      "show": [
+        "on the peg rail the mittens are pinned in pairs, and one pair is gone since the class night"
+      ]
+    },
+    {
+      "when": [
+        "place = astronomy cloak room",
+        "weekday = friday"
+      ],
+      "show": [
+        "on the peg rail the mittens are pinned in pairs, and among them a third mitten pinned on that matches neither"
+      ]
+    },
+    {
+      "when": [
+        "place = still room"
+      ],
+      "show": [
+        "the old receipt book lies open at \"For ye Boyles\", nettles and snake fangs in the old spelling, the same potion every first-year makes"
+      ]
+    },
+    {
+      "when": [
+        "place = herbarium",
+        "year = 2"
+      ],
+      "show": [
+        "one swollen drawer's label reads \"Mandrake, leaf only (pressed). Earmuffs not required.\""
+      ]
+    },
+    {
+      "when": [
+        "place = staff room",
+        "year >= 2"
+      ],
+      "show": [
+        "on the tray by the fire the staff's used teacups wash themselves in a basin, clinking gently, and stack themselves to drain"
+      ]
+    },
+    {
+      "when": [
+        "place = kitchens",
+        "year >= 5"
+      ],
+      "show": [
+        "a row of heavy knives chops vegetables of its own accord on the scrubbed table, nobody at them"
+      ]
+    },
+    {
+      "when": [
+        "place = staff room",
+        "year >= 6",
+        "hour >= 15",
+        "hour < 17"
+      ],
+      "show": [
+        "at teatime a loaf on its board slices itself, the knife setting itself down after"
+      ]
+    },
+    {
+      "when": [
+        "place = dormitory",
+        "year >= 4",
+        "season = winter",
+        "time = evening"
+      ],
+      "show": [
+        "between the sheets of his four-poster a warming pan has been put by no one he sees"
+      ]
+    },
+    {
+      "when": [
+        "place = dormitory",
+        "year >= 5",
+        "occasion = leaving feast"
+      ],
+      "show": [
+        "a trunk is packing itself, books and socks soaring in pell-mell and the lid not quite shutting"
+      ]
+    }
+  ],
+  "records": []
+}
