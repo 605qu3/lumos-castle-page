@@ -23,7 +23,10 @@
    CastleCeilings.corbels(id, state)  the beam corbels' carved faces in place id to 'awake' (one or two of them dozing,
        fixed by the place), 'dozing' or 'sleeping' (req 756); 0 where the place has none. Each face a plane 1 cm proud
        of its corbel's face to the room, named <id>-corbel-face-<k>; faces.cell(id, k) the vault corbels' cell by the
-       same rule; faces.base(path) sets where the atlases load from (default ../assets/layers/)
+       same rule; faces.base(path) sets where the atlases load from (default ../assets/layers/); faces.list(id) the
+       place's face meshes in k order
+   CastleCeilings.yawn  { levels(xs, boy, t, o), set(id, k, level), rule }: the sleeping faces' yawn by night (req 1313),
+       its timing; the yawning frame waits on its drawing (see the yawn, below)
    CastleCeilings.surround(THREE, op, mats)  an opening's surround in its reveal: op { w, h, d, kind } (width, the head
        of the shell's cut over the sill, the wall's depth; kind 'round'); a group whose origin is the opening's foot at
        the wall's middle, x along the wall, z through it; the stone that turns the cut's square head round. */
@@ -165,6 +168,35 @@
     if (n > 2 && (h >>> 8) % 2) doze.push((doze[0] + 1 + (h >>> 9) % (n - 1)) % n);
     F.forEach(function (m, k) { m.material = faceMat(T3, state === 'awake' && doze.indexOf(k) >= 0 ? 'dozing' : state); });
     return n;
+  }
+
+  /* the yawn (req 1313 (a), Corridor's; Godric's 1 on req 1307, 27 October 2026, 11.47 pm: the corridor that yawns). By
+     night the sleeping faces yawn in their sleep, lids still down, one face to a breath, in time with the slow breathing
+     Events' cue (req 1312) gives, as the boy walks toward the locked door; nearer the door, a wider and longer yawn.
+     yawn.levels(xs, boy, t, o) is the timing alone: xs the faces' places along the walk (metres, rising toward the door),
+     boy his, t seconds; o { breath (s, the cue's period, else BREATH), start, door (the walk's ends, else xs's) }.
+     Returns a level 0 to 1 a face: at most one face a breath, the next ahead of him within RANGE, taken in turn so a
+     boy standing still sees them ripple on toward the door; the jaw rides the in-breath and is shut by the out-breath.
+     yawn.set(id, k, level) shows it on a face, the yawning frame above OPEN, else sleeping; it returns false and leaves
+     the face asleep while the yawning atlas is not drawn (a drawing, a spend card for Godric), never a stand-in */
+  var YAWN = { BREATH: 7.0, RANGE: 6.0, OPEN: 0.4, IN: 0.6 };
+  function yawnLevels(xs, boy, t, o) {
+    o = o || {};
+    var P = o.breath || YAWN.BREATH, n = Math.floor(t / P), u = t / P - n, out = xs.map(function () { return 0; });
+    var a = o.start != null ? o.start : Math.min.apply(null, xs), b = o.door != null ? o.door : Math.max.apply(null, xs);
+    var ahead = xs.map(function (x, k) { return k; }).filter(function (k) { return xs[k] >= boy && xs[k] - boy <= YAWN.RANGE; })
+      .sort(function (i, j) { return xs[i] - xs[j]; });
+    if (!ahead.length) return out;
+    var k = ahead[n % ahead.length], near = b > a ? Math.min(1, Math.max(0, (xs[k] - a) / (b - a))) : 1;
+    var len = YAWN.IN * (0.75 + 0.25 * near);                   /* the in-breath's share the yawn takes, longer by the door */
+    if (u < len) out[k] = +((0.55 + 0.45 * near) * Math.pow(Math.sin(Math.PI * u / len), 2)).toFixed(3);
+    return out;
+  }
+  function yawnSet(id, k, level) {
+    var m = (faceSets[id] || [])[k];
+    if (!m || !FACES.yawning) return false;
+    m.material = faceMat(T3, level > YAWN.OPEN ? 'yawning' : 'sleeping');
+    return true;
   }
 
   /* oak beams across the short span on stone corbels, under the flat ceiling the shell keeps */
@@ -392,5 +424,5 @@
     return G;
   }
 
-  window.CastleCeilings = { forPlace: forPlace, surround: surround, corbels: corbels, faces: { files: FACES, cell: function (id, k) { return (hash(id) + k) % 6; }, base: function (b) { if (b) facesBase = b; return facesBase; } }, arch: arch, rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
+  window.CastleCeilings = { forPlace: forPlace, surround: surround, corbels: corbels, yawn: { levels: yawnLevels, set: yawnSet, rule: YAWN }, faces: { files: FACES, list: function (id) { return (faceSets[id] || []).slice(); }, cell: function (id, k) { return (hash(id) + k) % 6; }, base: function (b) { if (b) facesBase = b; return facesBase; } }, arch: arch, rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
 })();
