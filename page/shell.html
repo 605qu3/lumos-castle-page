@@ -9602,8 +9602,12 @@ var cueTable = window.Proxy ? new Proxy(allCues, { get: function (o, k) {
   if (typeof k !== 'string' || k in o) return o[k];
   return function () { showLines([{ medium: 'seen', sound: k }]); };
 } }) : allCues;
+/* a place whose id is not Events' word for it (reqs 690 and 717, the Architect's 190th): Events keep the houses as one
+   place, `greenhouses` (page/events/greenhouses.json, castle-wide.json, filch.json), house one in the Stone's castle and
+   three from the Chamber's on; until house three is a place, its lines play in house one */
+var EVENTS_PLACE = { 'greenhouse-one': 'greenhouses' };
 var events = window.CastleEvents ? CastleEvents.start({
-  chains: 'all', place: PLACE.replace(/-/g, ' '), drawRoom: roomDraw, cues: cueTable, showLines: showLines,
+  chains: 'all', place: EVENTS_PLACE[PLACE] || PLACE.replace(/-/g, ' '), drawRoom: roomDraw, cues: cueTable, showLines: showLines,
   builtins: Object.assign({ tickle: function () { return lastTickle ? (lastTickle.hit ? 'hit' : 'miss') : 'none'; } },
     { together: function () { return Q.get('together') === 'yes' || (GPLAY && GPLAY.together) ? 'yes' : 'no'; } },   /* req 922 */
     TURN ? { doors: function () { return TURN; } } : {})
