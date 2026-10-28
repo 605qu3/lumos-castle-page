@@ -109,7 +109,8 @@
         "occasion = halloween",
         "year = 2",
         "time != evening",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "Hagrid's four vast pumpkins carved into lanterns, standing before the tables' east ends"
@@ -121,7 +122,8 @@
         "occasion = halloween",
         "year = 2",
         "time = night",
-        "meal = none"
+        "meal = none",
+        "era = books"
       ],
       "show": [
         "Hagrid's four vast pumpkins carved into lanterns, standing before the tables' east ends"
@@ -132,7 +134,8 @@
         "place = great hall",
         "occasion = halloween",
         "year = 2",
-        "time = evening"
+        "time = evening",
+        "era = books"
       ],
       "show": [
         "Hagrid's four vast pumpkins carved into lanterns before the tables' east ends, lit"
@@ -144,7 +147,8 @@
         "occasion = halloween",
         "year = 2",
         "time = night",
-        "meal != none"
+        "meal != none",
+        "era = books"
       ],
       "show": [
         "Hagrid's four vast pumpkins carved into lanterns before the tables' east ends, lit"
@@ -1254,7 +1258,8 @@
         "occasion = christmas day",
         "meal = dinner",
         "year >= 1",
-        "days since hall_mice >= 1"
+        "days since hall_mice >= 1",
+        "era = books"
       ],
       "show": [
         "white mice from the wizard crackers scurrying off under the long tables, and Mrs Norris sitting in the doorway, her lamp-like eyes following them"

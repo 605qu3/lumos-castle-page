@@ -187,7 +187,8 @@
     },
     {
       "when": [
-        "place = filchs office"
+        "place = filchs office",
+        "era = books"
       ],
       "show": [
         "on the door a notice: MISSING, three buckets, two mops, one duster. Information to the caretaker. Under it someone has chalked a raspberry face"

@@ -775,7 +775,8 @@
       "when": [
         "place = entrance hall",
         "time != night",
-        "year >= 1"
+        "year >= 1",
+        "era = books"
       ],
       "who": [
         {
@@ -816,7 +817,8 @@
       "when": [
         "place = entrance hall",
         "time != night",
-        "year >= 1"
+        "year >= 1",
+        "era = books"
       ],
       "starts": [],
       "canon": "the silent partner of hall.norris-follows-hagrid; about one wait in six"

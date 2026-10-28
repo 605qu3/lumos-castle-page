@@ -216,17 +216,27 @@
         "time = night"
       ],
       "show": [
-        "the torches only, every classroom door shut",
-        "Filch's door shut, dark under it"
+        "the torches only, every classroom door shut"
       ],
       "canon": "Magic's req 734 (docs/magic/rooms.md, The classroom corridor; Fawkes's 1 of 11.50), every year: by night; Filch's door shut and locked by night, dark under it, he on his rounds (Magic's req 749)"
     },
     {
       "when": [
         "place = classroom corridor",
+        "time = night",
+        "era = books"
+      ],
+      "show": [
+        "Filch's door shut, dark under it"
+      ]
+    },
+    {
+      "when": [
+        "place = classroom corridor",
         "time != evening",
         "time != night",
-        "filch_door != ajar"
+        "filch_door != ajar",
+        "era = books"
       ],
       "show": [
         "Filch's door shut, a lamp's light under it"
@@ -238,7 +248,8 @@
         "place = classroom corridor",
         "time != evening",
         "time != night",
-        "filch_door = ajar"
+        "filch_door = ajar",
+        "era = books"
       ],
       "show": [
         "Filch's door left a hand's width ajar, the lamp inside turned low"
@@ -248,7 +259,8 @@
     {
       "when": [
         "place = classroom corridor",
-        "time = evening"
+        "time = evening",
+        "era = books"
       ],
       "show": [
         "Filch's door left a hand's width ajar, the lamp inside turned low"
@@ -258,7 +270,8 @@
     {
       "when": [
         "place = classroom corridor",
-        "weather = rain"
+        "weather = rain",
+        "era = books"
       ],
       "show": [
         "muddy footprints coming in from the grounds along the corridor's far end, stopping dead a yard short of Filch's door, where the flags are scrubbed pale"
@@ -268,7 +281,8 @@
     {
       "when": [
         "place = classroom corridor",
-        "weather = snow"
+        "weather = snow",
+        "era = books"
       ],
       "show": [
         "muddy footprints coming in from the grounds along the corridor's far end, stopping dead a yard short of Filch's door, where the flags are scrubbed pale"

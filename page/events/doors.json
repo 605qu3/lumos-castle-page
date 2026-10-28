@@ -142,7 +142,8 @@
       "moment": "tap great-hall-doors",
       "when": [
         "place = entrance hall",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "who": [
         {

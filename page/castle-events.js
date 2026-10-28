@@ -116,7 +116,8 @@
    and the twins' dots are marked `aside` in map.json and out of play; the dots' rounds and `map()` stay for Clementine's
    plan, which shows places first as he finds them and a few regulars later as a stacked reward, never the trio (the
    world rules; built with the first night and the plan, the change list's row 18, not before). `reading` is a
-   deprecated alias of `year`, the castle's year (Rework 2); nothing is gated on the book he is reading.
+   deprecated alias of `year`, the castle's year (Rework 2); nothing is gated on the book he is reading. `era` is
+   `1890s` or `books` (req 1376): the books' own castle, with Filch, Mrs Norris and Hagrid in it, is `era = books`.
    Then one castle (Godric's fawkes-one-castle-1013, his option 4: no passwords, a player selection, one castle,
    shared points, sending things to each other): the pairing link also names the two boys (`p`, each a random id made
    once at the deploy, with his name if the family file holds one, which stays on the iPad). On opening, and at a new
@@ -725,6 +726,7 @@
         case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
         case 'year': return castleYear();                              /* the last book he finished, 0 to 7 (Rework 2) */
         case 'castle date': return castleDateKey();                    /* compared with `N mm-dd` (docs/room-states.md) */
+        case 'era': return castleEra();                                /* 1890s or books (req 1376, Godric's 2) */
         case 'who plays': return playersNow().ask ? 'ask' : (owl.players || []).length >= 2 ? 'chosen' : 'one';   /* one castle: his name to tap */
         case 'parcel': var pc = parcelFor(me()); return pc && playerOf(owl.playing) ? (pc.landed ? 'sill' : 'coming') : 'none';   /* B26 */
         case 'parcel thing': var pt = parcelFor(me()); return pt ? pt.name : parcelOpened || 'none';
@@ -760,6 +762,11 @@
       var r = Math.floor(+(params.get('year') || params.get('finished') || params.get('reading') || settings.finished || settings.reading || 0));
       return r >= 1 && r <= 7 ? r : 0;
     }
+    /* The castle's era (req 1376, Godric's 2 of 28 October 2026): `1890s` always, the school the boys play in; `books`
+       for the books' own castle, which the walk-throughs of Book 4 on will open (settled 41, 42). Filch, Mrs Norris and
+       Hagrid, and anything else that belongs to the books' castle, carry `era = books` in their `when`. Only ?era=books
+       (a test) turns it for now: no setting reads it until those walk-throughs are built. */
+    function castleEra() { return params.get('era') === 'books' ? 'books' : '1890s'; }
     /* The castle's date as a school-year key (docs/room-states.md): the year, then the day from 1 September, so a
        trace of book N from its own date reads `castle date >= N mm-dd` and holds in every later year too (the world
        rules, traces keep their dates). Months September to August, each given 31 days. */

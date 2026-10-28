@@ -11,7 +11,8 @@
         "place = corridor",
         "norris != none",
         "norris_kind != yes",
-        "norris_trust < 4"
+        "norris_trust < 4",
+        "era = books"
       ],
       "who": [
         {
@@ -42,7 +43,8 @@
       "moment": "after tap mrs norris 6-12 s",
       "when": [
         "place = corridor",
-        "norris_scrap = down"
+        "norris_scrap = down",
+        "era = books"
       ],
       "show": [
         "the bit of breakfast is gone from the flags, and her eyes with it"
@@ -63,7 +65,8 @@
         "norris != none",
         "norris_kind != yes",
         "norris_trust >= 4",
-        "norris_trust < 7"
+        "norris_trust < 7",
+        "era = books"
       ],
       "who": [
         {
@@ -98,7 +101,8 @@
         "norris != none",
         "norris_kind != yes",
         "norris_trust >= 7",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -142,7 +146,8 @@
         "norris != none",
         "norris_kind != yes",
         "norris_trust >= 7",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -179,7 +184,8 @@
         "norris_kind != yes",
         "norris_trust >= 7",
         "norris_bored = yes",
-        "norris_last != stroke"
+        "norris_last != stroke",
+        "era = books"
       ],
       "who": [
         {
@@ -225,7 +231,8 @@
         "norris_kind != yes",
         "norris_trust >= 7",
         "norris_bored = yes",
-        "norris_last != hand"
+        "norris_last != hand",
+        "era = books"
       ],
       "who": [
         {
@@ -263,7 +270,8 @@
         "norris_kind != yes",
         "norris_trust >= 7",
         "norris_bored = yes",
-        "norris_last = stroke"
+        "norris_last = stroke",
+        "era = books"
       ],
       "who": [
         {
@@ -298,7 +306,8 @@
         "norris_kind != yes",
         "norris_trust >= 7",
         "norris_bored = yes",
-        "norris_last = hand"
+        "norris_last = hand",
+        "era = books"
       ],
       "who": [
         {
@@ -330,7 +339,8 @@
         "norris != none",
         "norris_kind = yes",
         "norris_a = hand",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -369,7 +379,8 @@
         "norris != none",
         "norris_kind = yes",
         "norris_a = hand",
-        "norris_bored = yes"
+        "norris_bored = yes",
+        "era = books"
       ],
       "who": [
         {
@@ -411,7 +422,8 @@
         "norris != none",
         "norris_kind = yes",
         "norris_a = stroke",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -442,7 +454,8 @@
         "norris != none",
         "norris_kind = yes",
         "norris_a = stroke",
-        "norris_bored = yes"
+        "norris_bored = yes",
+        "era = books"
       ],
       "who": [
         {
@@ -476,7 +489,8 @@
         "norris != none",
         "norris_kind = yes",
         "norris_a != hand",
-        "norris_a != stroke"
+        "norris_a != stroke",
+        "era = books"
       ],
       "who": [
         {
@@ -502,7 +516,8 @@
       "when": [
         "place = corridor",
         "days since norris_seen >= 21",
-        "norris_trust >= 3"
+        "norris_trust >= 3",
+        "era = books"
       ],
       "starts": [
         "add norris_trust -1",
@@ -519,7 +534,8 @@
       "moment": "arrive",
       "when": [
         "place = corridor",
-        "norris_a = both"
+        "norris_a = both",
+        "era = books"
       ],
       "starts": [
         "set norris_last = both",
@@ -538,7 +554,8 @@
       "when": [
         "place = corridor",
         "norris_a = hand",
-        "norris_last != hand"
+        "norris_last != hand",
+        "era = books"
       ],
       "starts": [
         "set norris_last = hand",
@@ -558,7 +575,8 @@
         "place = corridor",
         "norris_a = hand",
         "norris_last = hand",
-        "norris_run < 2"
+        "norris_run < 2",
+        "era = books"
       ],
       "starts": [
         "add norris_run 1",
@@ -577,7 +595,8 @@
         "place = corridor",
         "norris_a = hand",
         "norris_last = hand",
-        "norris_run >= 2"
+        "norris_run >= 2",
+        "era = books"
       ],
       "starts": [
         "add norris_run 1",
@@ -595,7 +614,8 @@
       "when": [
         "place = corridor",
         "norris_a = stroke",
-        "norris_last != stroke"
+        "norris_last != stroke",
+        "era = books"
       ],
       "starts": [
         "set norris_last = stroke",
@@ -615,7 +635,8 @@
         "place = corridor",
         "norris_a = stroke",
         "norris_last = stroke",
-        "norris_run < 2"
+        "norris_run < 2",
+        "era = books"
       ],
       "starts": [
         "add norris_run 1",
@@ -634,7 +655,8 @@
         "place = corridor",
         "norris_a = stroke",
         "norris_last = stroke",
-        "norris_run >= 2"
+        "norris_run >= 2",
+        "era = books"
       ],
       "starts": [
         "add norris_run 1",
@@ -649,7 +671,9 @@
       "source": "device",
       "leans": [],
       "moment": "leave",
-      "when": [],
+      "when": [
+        "era = books"
+      ],
       "starts": [
         "set norris_kind = no",
         "set norris_scrap = none"
@@ -669,7 +693,8 @@
         "at = cupboard",
         "norris != none",
         "chase != on",
-        "norris_trust < 3"
+        "norris_trust < 3",
+        "era = books"
       ],
       "who": [
         {
@@ -700,7 +725,8 @@
         "norris != none",
         "chase != on",
         "norris_trust >= 3",
-        "norris_trust < 6"
+        "norris_trust < 6",
+        "era = books"
       ],
       "who": [
         {
@@ -731,7 +757,8 @@
         "norris != none",
         "chase != on",
         "norris_trust >= 6",
-        "norris_trust < 9"
+        "norris_trust < 9",
+        "era = books"
       ],
       "who": [
         {
@@ -761,7 +788,8 @@
         "at = cupboard",
         "norris != none",
         "chase != on",
-        "norris_trust >= 9"
+        "norris_trust >= 9",
+        "era = books"
       ],
       "who": [
         {
@@ -792,7 +820,8 @@
         "norris != none",
         "chase != on",
         "norris_trust < 3",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -824,7 +853,8 @@
         "chase != on",
         "norris_trust >= 3",
         "norris_trust < 6",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -856,7 +886,8 @@
         "chase != on",
         "norris_trust >= 6",
         "norris_trust < 9",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -887,7 +918,8 @@
         "norris != none",
         "chase != on",
         "norris_trust >= 9",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -917,7 +949,8 @@
         "at = armour",
         "norris != none",
         "chase != on",
-        "norris_bored = yes"
+        "norris_bored = yes",
+        "era = books"
       ],
       "who": [
         {
@@ -948,7 +981,8 @@
         "chase != on",
         "nights since chase_night >= 1",
         "norris_trust >= 3",
-        "norris_trust < 6"
+        "norris_trust < 6",
+        "era = books"
       ],
       "who": [
         {
@@ -981,7 +1015,8 @@
         "chase != on",
         "nights since chase_night >= 1",
         "norris_trust >= 6",
-        "norris_trust < 9"
+        "norris_trust < 9",
+        "era = books"
       ],
       "who": [
         {
@@ -1013,7 +1048,8 @@
         "time = night",
         "chase != on",
         "nights since chase_night >= 1",
-        "norris_trust >= 9"
+        "norris_trust >= 9",
+        "era = books"
       ],
       "who": [
         {
@@ -1046,7 +1082,8 @@
         "hiding = yes",
         "norris_trust >= 3",
         "norris_trust < 6",
-        "chase_by != peeves"
+        "chase_by != peeves",
+        "era = books"
       ],
       "who": [
         {
@@ -1106,7 +1143,8 @@
         "chase = on",
         "hiding = yes",
         "norris_trust >= 6",
-        "chase_by != peeves"
+        "chase_by != peeves",
+        "era = books"
       ],
       "who": [
         {
@@ -1168,7 +1206,8 @@
         "chase != on",
         "norris_trust < 3",
         "brother norris_trust >= 3",
-        "norris_bored != yes"
+        "norris_bored != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -1199,7 +1238,8 @@
         "norris != none",
         "chase != on",
         "norris_trust < 3",
-        "brother norris_trust >= 3"
+        "brother norris_trust >= 3",
+        "era = books"
       ],
       "who": [
         {
@@ -1230,7 +1270,8 @@
         "chase != on",
         "nights since chase_night >= 1",
         "norris_trust < 3",
-        "brother norris_trust >= 3"
+        "brother norris_trust >= 3",
+        "era = books"
       ],
       "who": [
         {
@@ -1259,7 +1300,8 @@
         "place = corridor",
         "norris_head != yes",
         "norris_trust < 3",
-        "brother norris_trust >= 3"
+        "brother norris_trust >= 3",
+        "era = books"
       ],
       "starts": [
         "set norris_head = yes",

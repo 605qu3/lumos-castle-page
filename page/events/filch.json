@@ -40,7 +40,8 @@
   "room": [
     {
       "when": [
-        "place = filchs office"
+        "place = filchs office",
+        "era = books"
       ],
       "show": [
         "a single oil lamp dangling from the low ceiling over the desk, turned low, the room's only light",
@@ -54,7 +55,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "box_thing = snap-cards"
+        "box_thing = snap-cards",
+        "era = books"
       ],
       "show": [
         "in his hand, out of Filch's box: a pack of Exploding Snap cards, the edges singed"
@@ -65,7 +67,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "box_thing = filibuster"
+        "box_thing = filibuster",
+        "era = books"
       ],
       "show": [
         "in his hand, out of Filch's box: an unlit Filibuster firework"
@@ -76,7 +79,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "box_thing = folded-note"
+        "box_thing = folded-note",
+        "era = books"
       ],
       "show": [
         "in his hand, out of Filch's box: a note passed in class, folded very small"
@@ -87,7 +91,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "box_thing = frisbee"
+        "box_thing = frisbee",
+        "era = books"
       ],
       "show": [
         "in his hand, out of Filch's box: a Fanged Frisbee in a tied sack, still trying to bite"
@@ -98,7 +103,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "box_thing = dungbomb"
+        "box_thing = dungbomb",
+        "era = books"
       ],
       "show": [
         "in his hand, out of Filch's box: a Dungbomb wrapped in a rag"
@@ -109,7 +115,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "box_thing = teacup"
+        "box_thing = teacup",
+        "era = books"
       ],
       "show": [
         "in his hand, out of Filch's box: a Nose-Biting Teacup from Zonko's"
@@ -120,7 +127,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "box_thing = hiccough-sweets"
+        "box_thing = hiccough-sweets",
+        "era = books"
       ],
       "show": [
         "in his hand, out of Filch's box: a bag of Hiccough Sweets from Zonko's"
@@ -130,7 +138,8 @@
     {
       "when": [
         "place = filchs office",
-        "office_catch = left"
+        "office_catch = left",
+        "era = books"
       ],
       "show": [
         "the form left half written on the desk, the quill thrown across it"
@@ -148,7 +157,8 @@
       "when": [
         "place = corridor",
         "time != night",
-        "norris != cupboard"
+        "norris != cupboard",
+        "era = books"
       ],
       "who": [
         {
@@ -183,7 +193,8 @@
       "when": [
         "place = corridor",
         "time != night",
-        "norris = cupboard"
+        "norris = cupboard",
+        "era = books"
       ],
       "who": [
         {
@@ -396,7 +407,8 @@
       "when": [
         "place = trophy room",
         "time != night",
-        "trophy_polish != yes"
+        "trophy_polish != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -431,7 +443,8 @@
       "moment": "filch passes",
       "when": [
         "place = library",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "who": [
         {
@@ -466,7 +479,8 @@
       "moment": "filch passes",
       "when": [
         "place = stair hall",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "who": [
         {
@@ -501,7 +515,8 @@
       "moment": "filch passes",
       "when": [
         "place = entrance hall",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "who": [
         {
@@ -537,7 +552,8 @@
       "when": [
         "place = greenhouses",
         "time != night",
-        "hour >= 13"
+        "hour >= 13",
+        "era = books"
       ],
       "who": [
         {
@@ -572,7 +588,8 @@
       "moment": "filch passes",
       "when": [
         "place = myrtles bathroom",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "who": [
         {
@@ -611,7 +628,8 @@
         "place = filch door",
         "time != evening",
         "time != night",
-        "filch_drawn != yes"
+        "filch_drawn != yes",
+        "era = books"
       ],
       "starts": [
         "set filch_door = ajar",
@@ -631,7 +649,8 @@
         "place = filch door",
         "time != evening",
         "time != night",
-        "filch_drawn != yes"
+        "filch_drawn != yes",
+        "era = books"
       ],
       "starts": [
         "set filch_door = shut",
@@ -646,7 +665,8 @@
       "weight": 1,
       "moment": "arrive",
       "when": [
-        "place = filchs office"
+        "place = filchs office",
+        "era = books"
       ],
       "show": [
         "a faint smell of fried fish lingering about the place",
@@ -665,7 +685,8 @@
       "moment": "arrive",
       "when": [
         "place = filchs office",
-        "office_catch != held"
+        "office_catch != held",
+        "era = books"
       ],
       "show": [
         "Mrs Norris watching him from her place, bulging, lamp-like eyes just like Filch's"
@@ -685,7 +706,8 @@
       "moment": "arrive",
       "when": [
         "place = filchs office",
-        "office_catch != held"
+        "office_catch != held",
+        "era = books"
       ],
       "starts": []
     },
@@ -699,7 +721,8 @@
       "when": [
         "place = filchs office",
         "office_norris = here",
-        "office_catch != held"
+        "office_catch != held",
+        "era = books"
       ],
       "show": [
         "Mrs Norris gone from her place"
@@ -719,7 +742,8 @@
       "moment": "wait 60-240 s",
       "when": [
         "place = filchs office",
-        "office_catch != held"
+        "office_catch != held",
+        "era = books"
       ],
       "show": [
         "Filch's shuffle and his muttering coming along the corridor, stopping outside the door",
@@ -739,7 +763,8 @@
       "moment": "wait 60-240 s",
       "when": [
         "place = filchs office",
-        "office_catch != held"
+        "office_catch != held",
+        "era = books"
       ],
       "starts": []
     },
@@ -753,7 +778,8 @@
       "when": [
         "place = filchs office",
         "took_box != yes",
-        "office_catch != held"
+        "office_catch != held",
+        "era = books"
       ],
       "starts": [
         "set box_thing = from bag confiscations",
@@ -772,7 +798,8 @@
       "when": [
         "place = filchs office",
         "took_box = yes",
-        "office_catch != held"
+        "office_catch != held",
+        "era = books"
       ],
       "show": [
         "the heap in the box settling, a paper tag rustling"
@@ -788,7 +815,8 @@
       "moment": "arrive",
       "when": [
         "place = filchs office",
-        "office_catch = held"
+        "office_catch = held",
+        "era = books"
       ],
       "who": [
         {
@@ -829,7 +857,8 @@
       "moment": "wait 12-18 s",
       "when": [
         "place = filchs office",
-        "office_catch = held"
+        "office_catch = held",
+        "era = books"
       ],
       "who": [
         {
@@ -873,7 +902,8 @@
         "place = filchs office",
         "office_catch = held",
         "year >= 2",
-        "kwik_away != yes"
+        "kwik_away != yes",
+        "era = books"
       ],
       "show": [
         "a long envelope marked Kwikspell lying on the desk beside the form"
@@ -891,7 +921,8 @@
         "place = filchs office",
         "office_catch = held",
         "year >= 2",
-        "kwik_away != yes"
+        "kwik_away != yes",
+        "era = books"
       ],
       "who": [
         {
@@ -943,7 +974,8 @@
         "place = filchs office",
         "office_catch = held",
         "year >= 2",
-        "kwik_away = yes"
+        "kwik_away = yes",
+        "era = books"
       ],
       "who": [
         {
@@ -981,7 +1013,8 @@
       "when": [
         "place = filchs office",
         "office_catch = held",
-        "year >= 2"
+        "year >= 2",
+        "era = books"
       ],
       "who": [
         {
@@ -1021,7 +1054,8 @@
         "office_catch = left",
         "drawer_gag = yes",
         "year >= 3",
-        "drawer_tried != yes"
+        "drawer_tried != yes",
+        "era = books"
       ],
       "show": [
         "the drawer marked Confiscated and Highly Dangerous rattling hard in its cabinet, something inside snapping at the lock, then the whole drawer going still; it stays shut and locked"
@@ -1042,7 +1076,8 @@
         "office_catch = left",
         "drawer_gag = yes",
         "year >= 3",
-        "drawer_tried = yes"
+        "drawer_tried = yes",
+        "era = books"
       ],
       "show": [
         "one small snap from inside the drawer marked Confiscated and Highly Dangerous, which stays shut and locked"
@@ -1057,7 +1092,9 @@
       "leans": [],
       "weight": 1,
       "moment": "leave",
-      "when": [],
+      "when": [
+        "era = books"
+      ],
       "starts": [
         "set took_box = no",
         "set office_norris = gone",
@@ -1085,7 +1122,8 @@
         "chase != by-suit",
         "chase != homeward",
         "chase != in-hand",
-        "nights since chase_night >= 1"
+        "nights since chase_night >= 1",
+        "era = books"
       ],
       "who": [
         {
@@ -1121,7 +1159,8 @@
         "chase != by-suit",
         "chase != homeward",
         "chase != in-hand",
-        "nights since chase_night >= 1"
+        "nights since chase_night >= 1",
+        "era = books"
       ],
       "starts": [],
       "canon": "the silent partner of filch.chase-night"
@@ -1141,7 +1180,8 @@
         "chase != by-suit",
         "chase != homeward",
         "chase != in-hand",
-        "nights since chase_night >= 1"
+        "nights since chase_night >= 1",
+        "era = books"
       ],
       "who": [
         {
@@ -1186,7 +1226,8 @@
         "chase != homeward",
         "chase != in-hand",
         "norris != none",
-        "chase != on"
+        "chase != on",
+        "era = books"
       ],
       "show": [
         "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
@@ -1213,7 +1254,8 @@
         "chase != homeward",
         "chase != in-hand",
         "norris != none",
-        "chase != on"
+        "chase != on",
+        "era = books"
       ],
       "show": [
         "Mrs Norris, her bulging, lamp-like eyes on him, whisks off down the stairs"
@@ -1239,7 +1281,8 @@
         "hiding = yes",
         "year != 2",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -1313,7 +1356,8 @@
         "hiding = yes",
         "year != 2",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -1387,7 +1431,8 @@
         "hiding = yes",
         "neville_out = yes",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -1450,7 +1495,8 @@
         "hiding = yes",
         "neville_out = yes",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -1513,7 +1559,8 @@
         "hiding = yes",
         "at = cupboard",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -1570,7 +1617,8 @@
         "hiding = yes",
         "at = cupboard",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -1629,7 +1677,8 @@
         "chase != by-suit",
         "chase != homeward",
         "chase != in-hand",
-        "nights since chase_night >= 1"
+        "nights since chase_night >= 1",
+        "era = books"
       ],
       "show": [
         "the suit of armour rocking on its stand with a long clank and settling again, never falling"
@@ -1657,7 +1706,8 @@
         "chase != by-suit",
         "chase != homeward",
         "chase != in-hand",
-        "nights since chase_night >= 1"
+        "nights since chase_night >= 1",
+        "era = books"
       ],
       "starts": [],
       "canon": "req 933 (d), the silent partner of the armour's wobble"
@@ -1670,7 +1720,8 @@
       "moment": "filch wheezes",
       "when": [
         "place = corridor",
-        "chase = on"
+        "chase = on",
+        "era = books"
       ],
       "show": [
         "a wheeze coming up the stairs from the stair hall, still out of sight"
@@ -1688,7 +1739,8 @@
         "place = corridor",
         "chase = on",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "show": [
         "lamplight climbing the steps, the wheezing nearer"
@@ -1706,7 +1758,8 @@
         "place = corridor",
         "chase = on",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "show": [
         "his footsteps and wheeze coming up the steps, nearer"
@@ -1725,7 +1778,8 @@
         "chase = on",
         "hiding = no",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -1766,7 +1820,8 @@
         "chase = on",
         "hiding = no",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -1809,7 +1864,8 @@
         "chase = on",
         "hiding = yes",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -1881,7 +1937,8 @@
         "chase = on",
         "hiding = yes",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -1954,7 +2011,8 @@
         "hiding = yes",
         "chase_by = peeves",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -2050,7 +2108,8 @@
         "hiding = yes",
         "chase_by = peeves",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -2147,7 +2206,8 @@
         "catch_turn != two",
         "catch_turn != three",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -2223,7 +2283,8 @@
         "catch_turn != two",
         "catch_turn != three",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -2291,7 +2352,8 @@
         "hiding = no",
         "catch_turn = two",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -2367,7 +2429,8 @@
         "hiding = no",
         "catch_turn = two",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -2436,7 +2499,8 @@
         "hiding = no",
         "catch_turn = three",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -2501,7 +2565,8 @@
         "hiding = no",
         "catch_turn = three",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -2553,7 +2618,8 @@
       "moment": "filch grumbles off",
       "when": [
         "place = corridor",
-        "chase = on"
+        "chase = on",
+        "era = books"
       ],
       "who": [
         {
@@ -2590,7 +2656,8 @@
       "moment": "filch gone",
       "when": [
         "place = corridor",
-        "chase = on"
+        "chase = on",
+        "era = books"
       ],
       "starts": [
         "set chase = off"
@@ -2607,7 +2674,8 @@
         "place = corridor",
         "speech = on",
         "lady = asking",
-        "chase = on"
+        "chase = on",
+        "era = books"
       ],
       "who": [
         {
@@ -2643,7 +2711,9 @@
       "source": "device",
       "leans": [],
       "moment": "leave",
-      "when": [],
+      "when": [
+        "era = books"
+      ],
       "starts": [
         "set chase = off",
         "set office_catch = none",
@@ -2666,7 +2736,8 @@
         "chase_by = norris",
         "norris_trust >= 9",
         "time != morning",
-        "time != day"
+        "time != day",
+        "era = books"
       ],
       "who": [
         {
@@ -2713,7 +2784,8 @@
         "chase_by = norris",
         "norris_trust >= 9",
         "time != night",
-        "time != evening"
+        "time != evening",
+        "era = books"
       ],
       "who": [
         {
@@ -2758,7 +2830,8 @@
         "chase = on",
         "hiding = no",
         "days since mcg_round >= 14",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "who": [
         {
@@ -2833,7 +2906,8 @@
         "hiding = no",
         "days since mcg_round >= 14",
         "time = night",
-        "year = 1"
+        "year = 1",
+        "era = books"
       ],
       "who": [
         {
@@ -2908,7 +2982,8 @@
         "hiding = no",
         "days since mcg_round >= 14",
         "time = night",
-        "year != 1"
+        "year != 1",
+        "era = books"
       ],
       "who": [
         {
@@ -2981,7 +3056,8 @@
         "time != night",
         "chase != on",
         "hiding = no",
-        "days since filch_pop_on >= 3"
+        "days since filch_pop_on >= 3",
+        "era = books"
       ],
       "who": [
         {
@@ -3027,7 +3103,8 @@
         "night_quest = on",
         "days since mcg_round >= 14",
         "days since mcg_cat >= 30",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "who": [
         {
@@ -3076,7 +3153,8 @@
         "night_quest = mcgonagall",
         "days since mcg_round >= 14",
         "days since mcg_cat >= 30",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "who": [
         {
@@ -3125,7 +3203,8 @@
         "night_quest = on",
         "days since mcg_round >= 14",
         "days since mcg_cat >= 30",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "who": [
         {
@@ -3174,7 +3253,8 @@
         "night_quest = mcgonagall",
         "days since mcg_round >= 14",
         "days since mcg_cat >= 30",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "who": [
         {
@@ -3214,7 +3294,9 @@
       "source": "device",
       "leans": [],
       "moment": "tap night quest begins",
-      "when": [],
+      "when": [
+        "era = books"
+      ],
       "starts": [
         "set night_quest = on"
       ],
@@ -3226,7 +3308,9 @@
       "source": "device",
       "leans": [],
       "moment": "tap night quest hers begins",
-      "when": [],
+      "when": [
+        "era = books"
+      ],
       "starts": [
         "set night_quest = mcgonagall"
       ],
@@ -3238,7 +3322,9 @@
       "source": "device",
       "leans": [],
       "moment": "tap night quest ends",
-      "when": [],
+      "when": [
+        "era = books"
+      ],
       "starts": [
         "set night_quest = none"
       ],
@@ -3254,7 +3340,8 @@
         "place = classroom corridor",
         "year = 2",
         "filch_door = ajar",
-        "days since door_smell_on >= 1"
+        "days since door_smell_on >= 1",
+        "era = books"
       ],
       "show": [
         "through the gap of Filch's door a faint smell of fried fish, and of wooden filing cabinets"
@@ -3276,7 +3363,8 @@
         "date = 12-18",
         "time != night",
         "chase != on",
-        "days since dungbombs_on >= 1"
+        "days since dungbombs_on >= 1",
+        "era = books"
       ],
       "who": [
         {

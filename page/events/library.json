@@ -147,7 +147,8 @@
     {
       "when": [
         "place = library",
-        "hour >= 20"
+        "hour >= 20",
+        "era = books"
       ],
       "show": [
         "the lamps out: \"Madam Pince had extinguished all the lamps\""
@@ -158,7 +159,8 @@
       "when": [
         "place = library",
         "time = night",
-        "hour < 12"
+        "hour < 12",
+        "era = books"
       ],
       "show": [
         "the lamps out: \"Madam Pince had extinguished all the lamps\""
@@ -407,7 +409,8 @@
       "moment": "wait 20-150 s",
       "when": [
         "place = library",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "from an aisle he is not in, \"the slight squeaking of one of Madam Pince's shoes, as the librarian prowled the aisles\", nearer, then away"
@@ -425,7 +428,8 @@
       "moment": "wait 20-150 s",
       "when": [
         "place = library",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "starts": []
     },

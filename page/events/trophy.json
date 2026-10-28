@@ -495,7 +495,8 @@
       "when": [
         "place = trophy room",
         "time = evening",
-        "weekday = tuesday"
+        "weekday = tuesday",
+        "era = books"
       ],
       "starts": [
         "set trophy_polish = yes"
@@ -511,7 +512,8 @@
       "when": [
         "place = trophy room",
         "time = evening",
-        "weekday = friday"
+        "weekday = friday",
+        "era = books"
       ],
       "starts": [
         "set trophy_polish = yes"

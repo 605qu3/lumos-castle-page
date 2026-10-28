@@ -634,7 +634,8 @@
       "moment": "wait 40-200 s",
       "when": [
         "place = dungeon corridor",
-        "time = evening"
+        "time = evening",
+        "era = books"
       ],
       "show": [
         "a lamp's light coming round the far end, a pair of lamp-like eyes low down first, then Filch's muttering; it turns away down another passage and is gone"
@@ -651,7 +652,8 @@
       "moment": "wait 40-200 s",
       "when": [
         "place = dungeon corridor",
-        "time = evening"
+        "time = evening",
+        "era = books"
       ],
       "starts": []
     },
@@ -665,7 +667,8 @@
       "moment": "wait 40-200 s",
       "when": [
         "place = dungeon corridor",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "a lamp's light coming round the far end, a pair of lamp-like eyes low down first, then Filch's muttering; it turns away down another passage and is gone"
@@ -682,7 +685,8 @@
       "moment": "wait 40-200 s",
       "when": [
         "place = dungeon corridor",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "starts": []
     }
