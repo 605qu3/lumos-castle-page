@@ -222,5 +222,85 @@
   "version": 233,
   "model_date": "28 October 2026, 18.24",
   "drawn": "28 October 2026, 18.24"
+ },
+ "D-601": {
+  "name": "drafting-d601",
+  "title": "The cellars, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-602": {
+  "name": "drafting-d602",
+  "title": "The ground floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-603": {
+  "name": "drafting-d603",
+  "title": "The first floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-604": {
+  "name": "drafting-d604",
+  "title": "The second floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-605": {
+  "name": "drafting-d605",
+  "title": "The third floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-606": {
+  "name": "drafting-d606",
+  "title": "The fourth floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-607": {
+  "name": "drafting-d607",
+  "title": "The fifth floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-608": {
+  "name": "drafting-d608",
+  "title": "The sixth floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-609": {
+  "name": "drafting-d609",
+  "title": "The seventh floor, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
+ },
+ "D-610": {
+  "name": "drafting-d610",
+  "title": "The towers' tops, built and to be built",
+  "group": "Levels: built and to be built, 1:250 at A1",
+  "version": 234,
+  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
+  "drawn": "28 October 2026, 18.27"
  }
 }
