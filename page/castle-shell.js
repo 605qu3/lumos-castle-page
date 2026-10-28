@@ -508,6 +508,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* v103 (the sweep, Godric's 7.32 am): halfGap reads every place the model stands on this floor, built or not (gapQs):
      the east courtyard is built later, through a way, and the staff rooms' south walls stood their whole 0.8 m in it */
   var gapQs = [], wallRuns = [];   /* v104: every wall run built, for the shared lines */
+  /* v113: the places beside Q, for a corner's run on: the floor's when it is built whole, else those its openings join */
+  var besideMemo = {};
+  function besideQs(Q) {
+    if (gapQs.length > 1) return gapQs;
+    if (!besideMemo[Q.id]) besideMemo[Q.id] = (M.openings || []).filter(function (op) { return op.between && matches(M, op, Q.id); })
+      .map(function (op) { return findPlace(M, other(op, Q.id)); }).filter(function (R) { return R && R.poly; });
+    return besideMemo[Q.id];
+  }
   function halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) {
     var best = t, top = Q.ceiling != null ? Q.ceiling : Q.floor + 3;
     gapQs.forEach(function (q) {
@@ -536,7 +544,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
   function endRun(Q, e, dx, dy, nx, ny, t, ext) {   /* v103: how far a corner block runs past e before a place beside */
     var best = ext, top = Q.ceiling != null ? Q.ceiling : Q.floor + 3;
-    gapQs.forEach(function (q) {
+    besideQs(Q).forEach(function (q) {   /* v113: a place built alone reads the places its openings join */
       var qt = q.ceiling != null ? q.ceiling : q.floor + 3;
       if (q.id === Q.id || q.floor >= top - 0.1 || qt <= Q.floor + 0.1) return;
       var pts = q.area ? q.area.outer : q.poly, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
@@ -1237,6 +1245,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var turn = function (e0, e1) { return (e0.b[0] - e0.a[0]) * (e1.b[1] - e1.a[1]) - (e0.b[1] - e0.a[1]) * (e1.b[0] - e1.a[0]); };
       if (ext0 && pL >= 1e-6 && turn(pe, ed) < -1e-9) ext0 = 0;
       if (ext1 && turn(ed, ne) < -1e-9) ext1 = 0;
+      /* v113 (the 227th, req 1511's floor 1 seams): where a place beside has its own side on this wall's line past the
+         corner, its wall carries the face on and the corner block would stand in it (the stair hall's west wall ran 0.8
+         into the Entrance Hall's, one face at x 68 over its 9.7, 7.76 m2) */
+      var runsOn = function (p) { return besideQs(Q).some(function (R) { var e = R.id !== Q.id && R.poly && onEdge(R.poly, p);
+        return e && e.d < 0.02 && R.floor < (Q.ceiling == null ? Infinity : Q.ceiling) - 0.05 && (R.ceiling == null ? Infinity : R.ceiling) > Q.floor + 0.05; }); };
+      if (ext0 && runsOn([a[0] - ux * t / 2, a[1] - uy * t / 2])) ext0 = 0;
+      if (ext1 && runsOn([b[0] + ux * t / 2, b[1] + uy * t / 2])) ext1 = 0;
       /* v60 (model v143, req 895: the casemate's west embrasure stood uncut, Interiors' shots of 7.27 and 7.29 pm): on a
          gentle turn (a curved face drawn in short sides) this wall's corner block runs on along the next side's line and
          stood in an opening near its start; held short of that opening, still past the t sin(turn) that closes the corner */
@@ -1248,7 +1263,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       /* v103 (the sweep): on a floor built whole, a corner block runs no further than the face of a place beside the
          corner (the cupboard's south wall ran 0.4 into the Entrance Hall, the pale sliver beside its door; Filch's
          office and store into the classroom corridor) */
-      if (gapQs.length > 1) {
+      if (besideQs(Q).length) {   /* v113: alone too (east-first-floor-corridor's east wall stood 0.8 into the corridor's floor) */
         if (ext1) ext1 = endRun(Q, ed.b, ux, uy, nx, ny, t, ext1);
         if (ext0) ext0 = endRun(Q, ed.a, -ux, -uy, nx, ny, t, ext0);
       }
