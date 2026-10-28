@@ -403,9 +403,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
   /* v91 (the Architect's 182nd, Godric's word of 27 October 2026, 8.06 pm: trim on both faces of every opening; a pilot,
      o.trim, shell.html?trim=1): an opening's dressing is its wall's stone cut and laid smooth, a shade lighter */
+  /* v94 (the Architect's 184th, Godric's 27 October note on req 1240: "shouldn't there be contrasting colors in some cases?"):
+     o.trim 2, shell.html?trim=2, dresses an opening in a different stone from its wall's, as the sources do (Beaumaris:
+     limestone walls, sandstone dressings): the dark rubble and the grey in the pale stone, the sandstone in the warm one,
+     the Tudor pink in the pale, the pale in the cool grey */
+  var DRESSED = { 'founders-rubble': 'late-pale', 'houses-sandstone': 'tudor-pink', 'high-grey': 'late-pale', 'tudor-pink': 'late-pale', 'late-pale': 'high-grey' };
   function trimMat(row, sx, sy, z) {
     if (!row) return paintMat(shade(GREY.wall, 1.12), true);
-    var st = stoneAt(row, sx, sy, z);
+    var st = stoneAt(row, sx, sy, z), ds = o.trim === 2 && DRESSED[st] || null;
+    if (ds) return faced(ds, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(ds + '/ashlar', ds, 1.0), true);
     return faced(st, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(st + '/ashlar', st, 1.08), true);
   }
   function floorMat(row, sx, sy, two) {
