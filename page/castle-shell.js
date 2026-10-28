@@ -143,6 +143,12 @@ function findPlace(M, id) {
     var first = (M.openings || []).filter(function (op) { return op.at && (op.between || []).indexOf(r.id) >= 0; })[0];
     var off = first ? angle(cc, toSite(M, first.group || null, first.at)) : 0, half = 180 / SIDES;
     var cp = arcPts(cc, rr / Math.cos(half * Math.PI / 180), off + half, off + 360 + half, SIDES).slice(0, SIDES);
+    /* v100 (req 1390, her study): a D (`half`, the bearing it bulges toward, in its group's frame): eleven sides over
+       the half, the apex side's middle on that bearing, the ends on the flat through the centre, the chord closing it */
+    if (r.shape.half != null) {
+      var dh = 180 / 22, ax = angle(cc, toSite(M, r.group || null, atBearing(r.shape.circle, 1, r.shape.half)));
+      cp = arcPts(cc, rr / Math.cos(dh * Math.PI / 180), ax - 90, ax + 90, 11);
+    }
     (M.openings || []).forEach(function (op) { if (op.room === r.id && op.depth) deep = Math.max(deep, op.depth); });
     return { id: r.id, name: r.name, kind: 'room', poly: cp, area: { outer: cp, holes: [] }, round: { c: cc, r: rr }, floor: cb + (r.floor || 0),
       ceiling: ceilOf(cb), wall: r.wall || deep || WALL_T, walls: null, rec: r };
