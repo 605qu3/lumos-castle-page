@@ -835,7 +835,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     damp = Q.floor < -0.5;
     var keep = { floor: mats.floor, floorD: mats.floorD, ceil: mats.ceil, ceilD: mats.ceilD, door: mats.door };
     if (row) { mats.door = paintMat(tone('oak')); mats.floor = floorMat(row, mx, my); mats.floorD = floorMat(row, mx, my, true); mats.ceil = mats.ceilD = ceilMat(row, mx, my); }
-    if (Q.area) { var fa = areaMesh(Q, Q.floor, mats.floorD, 'floor'); fa.name = Q.id + '-floor'; group.add(fa); }
+    /* v107 (the 208th): a room the model draws as an outline (shape.poly) that is no plain rectangle lays its floor and
+       ceiling to its own outline, not its box (study-void's ceiling stood at 3 m in the fencing room's drum, a dark
+       blade across its wall; 20 such rooms, McGonagall's office, the lake towers, the casemate among them) */
+    var PA = Q.area || HD.length || (Q.poly.length === 4 && xs.every(function (x) { return Math.abs(x - x0) < 0.01 || Math.abs(x - x1) < 0.01; })
+      && ys.every(function (y) { return Math.abs(y - y0) < 0.01 || Math.abs(y - y1) < 0.01; })) ? null : { area: { outer: Q.poly, holes: [] } };
+    if (Q.area || PA) { var fa = areaMesh(Q.area ? Q : PA, Q.floor, mats.floorD, 'floor'); fa.name = Q.id + '-floor'; group.add(fa); }
     else {
       var floor = quad(x1 - x0, y1 - y0, mats.floor, 'floor');
       floor.rotation.x = -Math.PI / 2; floor.position.copy(c); floor.name = Q.id + '-floor'; group.add(floor);
@@ -953,7 +958,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     else if (GBL) buildGable(Q, GBL, x0, y0, x1, y1);
     else if (Q.roof) buildRoof(Q);
     else if (CV && !CV.flat) { /* the vault is the ceiling */ }
-    else if (Q.ceiling != null && Q.area) { var ca = areaMesh(Q, Q.ceiling, mats.ceilD, 'ceiling'); ca.name = Q.id + '-ceiling'; group.add(ca); }
+    else if (Q.ceiling != null && (Q.area || PA)) { var ca = areaMesh(Q.area ? Q : PA, Q.ceiling, mats.ceilD, 'ceiling'); ca.name = Q.id + '-ceiling'; group.add(ca); }
     else if (Q.ceiling != null) {
       /* v23 (the Found list): a room's `heads`, strips right across it where its ceiling stands higher (the listeners'
          gallery over its two flights, model v53), the ceiling drawn strip by strip at its height, a riser between */
