@@ -77,8 +77,12 @@ function findPlace(M, id) {
     var a = r.shape.rect, base = zb != null ? zb : levelZ(M, r.level) + (r.group ? M.groups.filter(function (g) { return g.id === r.group; })[0].place.z - levelZ(M, r.level) : 0);
     var pts = [[a[0], a[1]], [a[2], a[1]], [a[2], a[3]], [a[0], a[3]]].map(function (p) { return toSite(M, r.group, p); });
     var floor = base + (r.floor || 0);
+    /* v93 (model v224, ledger 311 and 312): a glasshouse room (`glasshouse`: the grounds record and its house) carries
+       that house's record; buildPlace hands it to buildGlasshouse */
+    var GH = r.glasshouse ? (M.grounds || []).filter(function (g) { return g.id === r.glasshouse.ground; })[0] : null;
     return { id: r.id, name: r.name, kind: 'room', poly: pts, floor: floor, ceiling: ceilOf(base),
-      wall: r.wall || WALL_T, walls: r.walls || null, rec: r };
+      wall: r.wall || WALL_T, walls: r.walls || null, rec: r,
+      glasshouse: GH ? { house: (GH.houses || [])[r.glasshouse.house - 1], building: GH.building || {} } : null };
   }
   /* v12: a room drawn by its plan's corners ({ poly }, counter-clockwise: the gunners' casemate between two drums' faces,
      ledger line 94), floor and ceiling as a rect room's */
@@ -589,7 +593,178 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
 
   /* one place: floor, ceiling and its walls with their openings */
+  /* v93 (model v224, ledger 311 and 312, req 1180's 1): a glasshouse, house one in the Crystal Palace manner, built from
+     its grounds record and nothing copied: the brick dwarf wall to glass_from, the door's gap in the west gable; cast-iron
+     columns on the grid, to the eaves, or to the springing on the nave's and the transept's lines; the glass walls, the
+     clerestories over the aisles' roofs and a half-round lunette at each end of both barrels; the aisles under
+     ridge-and-furrow (a ridge each pane's width, across the aisle); the nave and the transept under glazed barrels on iron
+     ribs, a rib each pane, the grid's heavier. The fittings (the walk, beds, staging, lesson bay, butt, trough, the tank
+     and the vine's wires) from the house's `fittings`. Every glass face joins out.panes, so it shows the grounds through
+     the far view's cube (house one is left out of that view when it holds the eye). Boxes go in instanced meshes */
+  function buildGlasshouse(Q) {
+    var h = Q.glasshouse.house, B = Q.glasshouse.building, FT = h.fittings || {}, n0 = group.children.length;
+    var R = h.rect, G = h.grid, f = Q.floor, X0 = R[0], Y0 = R[1], X1 = R[2], Y1 = R[3];
+    var E = h.eaves, RF = h.ridge_and_furrow, NV = h.nave, TR = h.transept, S = NV.springing, C = NV.crown, GF = B.glass_from || 0.8;
+    var PW = 2.44, NY0 = NV.rect[1], NY1 = NV.rect[3], TX0 = TR ? TR.rect[0] : null, TX1 = TR ? TR.rect[2] : null, NC = (NY0 + NY1) / 2, TC = TR ? (TX0 + TX1) / 2 : null, RR = (NY1 - NY0) / 2;
+    var D = B.door || { w: 1.2, h: 2.2 }, DY = h.door ? h.door[1] : NC;
+    var iron = F.solid(0x2a2d2c), brick = F.solid(0x8a4b38), earth = F.solid(0x5a4a3a), slat = F.solid(0x8b6d4c), soil = F.solid(0x3a2e24),
+        flag = F.solid(0xb9b2a2), stone = F.solid(0x8e897e), wood = F.solid(0x6b4e33), leaf = F.solid(0x4f6b3c), wattle = F.solid(0x7a6244),
+        water = F.solid(0x1f2f2c);
+    if (!mats.pane) mats.pane = new THREE.MeshBasicMaterial({ color: new THREE.Color(tone('sky-day')).convertSRGBToLinear(), side: THREE.DoubleSide });
+    function L(x, y, z) { return toLocal(x, y, f + z); }
+    function own(m, name, hit) { m.name = Q.id + '-' + name; if (!hit) m.raycast = function () {}; group.add(m); return m; }
+    var boxes = {};
+    function box(k, x0, y0, z0, x1, y1, z1) { (boxes[k] = boxes[k] || []).push([Math.min(x0, x1), Math.min(y0, y1), Math.min(z0, z1), Math.max(x0, x1), Math.max(y0, y1), Math.max(z0, z1)]); }
+    function flush(k, m) {
+      var l = boxes[k] || [], im = new THREE.InstancedMesh(new THREE.BoxGeometry(1, 1, 1), m, l.length), MX = new THREE.Matrix4(), QI = new THREE.Quaternion(), SC = new THREE.Vector3();
+      l.forEach(function (b, i) { var a = L(b[0], b[1], b[2]), c = L(b[3], b[4], b[5]); SC.set(Math.abs(c.x - a.x), Math.abs(c.y - a.y), Math.abs(c.z - a.z)); MX.compose(a.clone().add(c).multiplyScalar(0.5), QI, SC); im.setMatrixAt(i, MX); });
+      return own(im, k);
+    }
+    var glass = {};
+    function tri(k, a, b, c) { (glass[k] = glass[k] || []).push(a.x, a.y, a.z, b.x, b.y, b.z, c.x, c.y, c.z); }
+    function quadG(k, p) { var v = p.map(function (q) { return L(q[0], q[1], q[2]); }); tri(k, v[0], v[1], v[2]); tri(k, v[0], v[2], v[3]); }
+    /* a vertical glass face on the line from (xa, ya) to (xb, yb), z0 to z1, its bars each pane's width (on y or x) */
+    function wallG(xa, ya, xb, yb, z0, z1) {
+      quadG('glass-walls', [[xa, ya, z0], [xb, yb, z0], [xb, yb, z1], [xa, ya, z1]]);
+      var len = Math.hypot(xb - xa, yb - ya), n = Math.max(1, Math.round(len / PW));
+      for (var i = 1; i < n; i++) { var t = i / n, x = xa + (xb - xa) * t, y = ya + (yb - ya) * t; box('bars', x - 0.025, y - 0.025, z0, x + 0.025, y + 0.025, z1); }
+    }
+    /* a half-round lunette over the springing, centred at (cx, cy) on a face along x (ax 1) or y (ax 0) */
+    function lunette(cx, cy, ax) {
+      var c = L(cx, cy, S), n = 24;
+      for (var i = 0; i < n; i++) {
+        var a0 = Math.PI * i / n, a1 = Math.PI * (i + 1) / n;
+        var p0 = ax ? L(cx + RR * Math.cos(a0), cy, S + RR * Math.sin(a0)) : L(cx, cy + RR * Math.cos(a0), S + RR * Math.sin(a0));
+        var p1 = ax ? L(cx + RR * Math.cos(a1), cy, S + RR * Math.sin(a1)) : L(cx, cy + RR * Math.cos(a1), S + RR * Math.sin(a1));
+        tri('glass-lunettes', c, p0, p1);
+      }
+      [-0.5, 0, 0.5].forEach(function (s) { var x = ax ? cx + s * RR : cx, y = ax ? cy : cy + s * RR, top = Math.sqrt(Math.max(0, 1 - s * s)) * RR;
+        box('bars', x - 0.025, y - 0.025, S, x + 0.025, y + 0.025, S + top - 0.02); });
+    }
+    /* a glazed barrel from a to b along x (ax 1) or y (ax 0), its axis at c across, r RR, springing S; its ribs as tubes */
+    var ribs = [];
+    function barrel(a, b, c, ax) {
+      var n = 24, steps = Math.max(1, Math.round((b - a) / PW));
+      function P(s, an) { var u = c + RR * Math.cos(an), z = S + RR * Math.sin(an); return ax ? [s, u, z] : [u, s, z]; }
+      for (var i = 0; i < n; i++) {
+        var a0 = Math.PI * i / n, a1 = Math.PI * (i + 1) / n;
+        quadG('glass-barrels', [P(a, a0), P(b, a0), P(b, a1), P(a, a1)]);
+      }
+      for (var k = 0; k <= steps; k++) ribs.push({ s: a + (b - a) * k / steps, c: c, ax: ax, heavy: Math.abs(((a + (b - a) * k / steps) - (ax ? X0 : Y0)) / G % 1) < 0.01 || k === 0 || k === steps });
+    }
+    /* the brick dwarf wall, 0.3 thick outside the glass line, the west door's gap */
+    var T = 0.3, dy0 = DY - D.w / 2, dy1 = DY + D.w / 2;
+    box('dwarf', X0 - T, Y0 - T, 0, X1 + T, Y0, GF); box('dwarf', X0 - T, Y1, 0, X1 + T, Y1 + T, GF);
+    box('dwarf', X1, Y0, 0, X1 + T, Y1, GF); box('dwarf', X0 - T, Y0, 0, X0, dy0, GF); box('dwarf', X0 - T, dy1, 0, X0, Y1, GF);
+    /* the columns: r 0.11, to the springing on the nave's and the transept's lines, else to the eaves */
+    var cols = [];
+    for (var i = 0; i <= Math.round((X1 - X0) / G); i++) for (var j = 0; j <= Math.round((Y1 - Y0) / G); j++) {
+      var x = X0 + i * G, y = Y0 + j * G, tall = Math.abs(y - NY0) < 0.01 || Math.abs(y - NY1) < 0.01 || (TR && (Math.abs(x - TX0) < 0.01 || Math.abs(x - TX1) < 0.01));
+      cols.push([x, y, tall ? S : E]);
+    }
+    var cg = new THREE.CylinderGeometry(0.11, 0.13, 1, 10), cm = new THREE.InstancedMesh(cg, iron, cols.length), M4 = new THREE.Matrix4(), Q4 = new THREE.Quaternion(), S4 = new THREE.Vector3();
+    cols.forEach(function (c, k) { var p = L(c[0], c[1], c[2] / 2); S4.set(1, c[2], 1); M4.compose(p, Q4, S4); cm.setMatrixAt(k, M4); });
+    own(cm, 'columns');
+    /* the walls' glass: each long wall to the eaves, up to the springing across the transept's end; each gable to the eaves,
+       up to the springing across the nave, the west's door gap below its head */
+    [Y0, Y1].forEach(function (y) {
+      if (TR) { wallG(X0, y, TX0, y, GF, E); wallG(TX0, y, TX1, y, GF, S); wallG(TX1, y, X1, y, GF, E); lunette(TC, y, 1); }
+      else wallG(X0, y, X1, y, GF, E);
+    });
+    [X0, X1].forEach(function (x) {
+      wallG(x, Y0, x, NY0, GF, E); wallG(x, NY1, x, Y1, GF, E);
+      if (x === X0) { wallG(x, NY0, x, dy0, GF, S); wallG(x, dy1, x, NY1, GF, S); wallG(x, dy0, x, dy1, D.h, S); }
+      else wallG(x, NY0, x, NY1, GF, S);
+      lunette(x, NC, 0);
+    });
+    /* the door: an iron-framed glazed leaf, shut, in the gable's line */
+    quadG('glass-walls', [[X0, dy0, 0.15], [X0, dy1, 0.15], [X0, dy1, D.h - 0.08], [X0, dy0, D.h - 0.08]]);
+    box('frame', X0 - 0.04, dy0, 0, X0 + 0.04, dy0 + 0.08, D.h); box('frame', X0 - 0.04, dy1 - 0.08, 0, X0 + 0.04, dy1, D.h);
+    box('frame', X0 - 0.04, dy0, D.h - 0.08, X0 + 0.04, dy1, D.h); box('frame', X0 - 0.04, dy0, 0, X0 + 0.04, dy1, 0.15);
+    box('frame', X0 - 0.04, DY - 0.02, 0.15, X0 + 0.04, DY + 0.02, D.h - 0.08);
+    /* the clerestories over the aisles' roofs, the eaves to the springing */
+    [NY0, NY1].forEach(function (y) { if (TR) { wallG(X0, y, TX0, y, E, S); wallG(TX1, y, X1, y, E, S); } else wallG(X0, y, X1, y, E, S); });
+    if (TR) [TX0, TX1].forEach(function (x) { wallG(x, Y0, x, NY0, E, S); wallG(x, NY1, x, Y1, E, S); });
+    /* the aisles' ridge-and-furrow: across each aisle, a ridge each pane's width along it, the furrow at the eaves */
+    var aisles = [];
+    [[Y0, NY0], [NY1, Y1]].forEach(function (yy) { if (TR) { aisles.push([X0, yy[0], TX0, yy[1]], [TX1, yy[0], X1, yy[1]]); } else aisles.push([X0, yy[0], X1, yy[1]]); });
+    aisles.forEach(function (a) {
+      var n = Math.round((a[2] - a[0]) / PW), w = (a[2] - a[0]) / n;
+      for (var k = 0; k < n; k++) {
+        var xa = a[0] + k * w, xm = xa + w / 2, xb = xa + w;
+        quadG('glass-roofs', [[xa, a[1], E], [xm, a[1], RF], [xm, a[3], RF], [xa, a[3], E]]);
+        quadG('glass-roofs', [[xm, a[1], RF], [xb, a[1], E], [xb, a[3], E], [xm, a[3], RF]]);
+        box('bars', xm - 0.03, a[1], RF - 0.05, xm + 0.03, a[3], RF + 0.01); box('bars', xb - 0.05, a[1], E - 0.06, xb + 0.05, a[3], E);
+      }
+      [a[1], a[3]].forEach(function (y) { box('girders', a[0], y - 0.08, E - 0.35, a[2], y + 0.08, E); });
+      for (var gx = a[0]; gx <= a[2] + 0.01; gx += G) box('girders', gx - 0.08, a[1], E - 0.35, gx + 0.08, a[3], E);
+    });
+    /* the barrels: the nave along the house, the transept across it; their springing beams */
+    barrel(X0, X1, NC, 1); [NY0, NY1].forEach(function (y) { box('girders', X0, y - 0.1, S - 0.4, X1, y + 0.1, S); });
+    if (TR) { barrel(Y0, Y1, TC, 0); [TX0, TX1].forEach(function (x) { box('girders', x - 0.1, Y0, S - 0.4, x + 0.1, Y1, S); }); }
+    ribs.forEach(function (rb, k) {
+      var t = new THREE.Mesh(new THREE.TorusGeometry(RR - 0.04, rb.heavy ? 0.07 : 0.035, 5, 24, Math.PI), iron);
+      t.position.copy(rb.ax ? L(rb.s, rb.c, S) : L(rb.c, rb.s, S)); if (rb.ax) t.rotation.y = Math.PI / 2;
+      own(t, 'rib-' + k);
+    });
+    /* the floor: earth, the walk's brick over it */
+    var fl = quad(X1 - X0, Y1 - Y0, earth, 'floor'); fl.rotation.x = -Math.PI / 2; fl.position.copy(L((X0 + X1) / 2, (Y0 + Y1) / 2, 0)); fl.name = Q.id + '-floor'; group.add(fl);
+    if (FT.walk) { var wr = FT.walk.rect, wk = quad(wr[2] - wr[0], wr[3] - wr[1], brick, 'floor'); wk.rotation.x = -Math.PI / 2; wk.position.copy(L((wr[0] + wr[2]) / 2, (wr[1] + wr[3]) / 2, 0.008)); wk.name = Q.id + '-walk'; group.add(wk); }
+    if (FT.lesson_bay) {
+      var lb = FT.lesson_bay, lr = lb.rect, lq = quad(lr[2] - lr[0], lr[3] - lr[1], flag, 'floor'); lq.rotation.x = -Math.PI / 2; lq.position.copy(L((lr[0] + lr[2]) / 2, (lr[1] + lr[3]) / 2, 0.008)); lq.name = Q.id + '-lesson-bay'; group.add(lq);
+      if (lb.hurdle) { var hr = lb.hurdle.rect; box('wattle', hr[0], hr[1], 0, hr[2], hr[3], lb.hurdle.h); }
+      if (lb.trough) { var tr = lb.trough.rect; box('stone', tr[0], tr[1], 0, tr[2], tr[3], 0.5); }
+      if (lb.butt) { var br = lb.butt.rect, bt = new THREE.Mesh(new THREE.CylinderGeometry((br[2] - br[0]) / 2, (br[2] - br[0]) / 2 * 0.9, 0.9, 14), wood); bt.position.copy(L((br[0] + br[2]) / 2, (br[1] + br[3]) / 2, 0.45)); own(bt, 'butt'); }
+    }
+    /* the raised beds: brick to h, soil 5 cm under */
+    if (FT.beds) FT.beds.rects.forEach(function (r) {
+      box('dwarf', r[0], r[1], 0, r[2], r[1] + 0.12, FT.beds.h); box('dwarf', r[0], r[3] - 0.12, 0, r[2], r[3], FT.beds.h);
+      box('dwarf', r[0], r[1], 0, r[0] + 0.12, r[3], FT.beds.h); box('dwarf', r[2] - 0.12, r[1], 0, r[2], r[3], FT.beds.h);
+      box('soil', r[0] + 0.12, r[1] + 0.12, 0, r[2] - 0.12, r[3] - 0.12, FT.beds.h - 0.05);
+    });
+    /* the staging: slats 0.1 wide with 0.05 between, along its length, on legs each pane's width */
+    if (FT.staging) {
+      var sg = FT.staging, runs = [sg.south, sg.north].concat(sg.island_south || [], sg.island_north || []);
+      runs.forEach(function (r) {
+        if (!r) return;
+        for (var y = r[1] + 0.02; y + 0.1 <= r[3] + 0.001; y += 0.15) box('slats', r[0], y, sg.top - 0.03, r[2], y + 0.1, sg.top);
+        box('slats', r[0], r[1], sg.top - 0.12, r[2], r[1] + 0.05, sg.top - 0.03); box('slats', r[0], r[3] - 0.05, sg.top - 0.12, r[2], r[3], sg.top - 0.03);
+        for (var x = r[0] + 0.05; x <= r[2] - 0.05 + 0.001; x += Math.min(PW, (r[2] - r[0] - 0.1) || PW)) {
+          box('slats', x - 0.03, r[1], 0, x + 0.03, r[1] + 0.06, sg.top - 0.03); box('slats', x - 0.03, r[3] - 0.06, 0, x + 0.03, r[3], sg.top - 0.03);
+        }
+      });
+    }
+    /* the tank: its dressed-stone kerb, the warm water under it, plain round leaves till Magic names the plant (req 1207) */
+    if (FT.tank) {
+      var tk = FT.tank, kr = tk.kerb || { h: 0.45, t: 0.3 }, tc = tk.centre;
+      var kerb = new THREE.Mesh(new THREE.LatheGeometry([[tk.r, 0], [tk.r + kr.t, 0], [tk.r + kr.t, kr.h], [tk.r, kr.h], [tk.r, 0]].map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 48), stone);
+      kerb.position.copy(L(tc[0], tc[1], 0)); own(kerb, 'tank-kerb');
+      var wt = new THREE.Mesh(new THREE.CircleGeometry(tk.r, 48), water); wt.rotation.x = -Math.PI / 2; wt.position.copy(L(tc[0], tc[1], kr.h - 0.15)); own(wt, 'tank-water');
+      [[0.9, 30, 0.55], [1.7, 100, 0.45], [2.2, 200, 0.5], [1.2, 250, 0.4], [2.3, 320, 0.38], [0.4, 160, 0.3], [1.9, 20, 0.42]].forEach(function (lf, k) {
+        var a = lf[1] * Math.PI / 180, d = new THREE.Mesh(new THREE.CircleGeometry(lf[2], 20, 0.3, Math.PI * 2 - 0.3), leaf); d.rotation.x = -Math.PI / 2; d.rotation.z = a;
+        d.position.copy(L(tc[0] + lf[0] * Math.cos(a), tc[1] + lf[0] * Math.sin(a), kr.h - 0.14)); own(d, 'tank-leaf-' + k);
+      });
+    }
+    /* the vine's wires: the Architect's (the bunches Objects'), along its rod from the root up the column and the rib */
+    if (FT.vine && FT.vine.rod) {
+      var vr = FT.vine.rod;
+      for (var v = 0; v < vr.length - 1; v++) {
+        var va = L(vr[v][0], vr[v][1], Math.max(0.3, vr[v][2])), vb = L(vr[v + 1][0], vr[v + 1][1], vr[v + 1][2]), dl = vb.clone().sub(va);
+        var wire = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, dl.length(), 4), iron);
+        wire.position.copy(va.clone().add(vb).multiplyScalar(0.5)); wire.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dl.normalize()); own(wire, 'vine-wire-' + v);
+      }
+    }
+    flush('dwarf', brick); flush('bars', iron); flush('frame', iron); flush('girders', iron); flush('slats', slat); flush('soil', soil);
+    if (boxes.wattle) flush('wattle', wattle); if (boxes.stone) flush('stone', stone);
+    for (var gk in glass) {
+      var gg = new THREE.BufferGeometry(); gg.setAttribute('position', new THREE.Float32BufferAttribute(glass[gk], 3)); gg.computeVertexNormals();
+      var gm = F.register(new THREE.Mesh(gg, mats.pane), LAYER.wall); gm.name = Q.id + '-' + gk; group.add(gm); out.panes.push(gm);
+    }
+    for (var kn = n0; kn < group.children.length; kn++) group.children[kn].userData.owner = Q.id;
+  }
+
   function buildPlace(Q) {
+    if (Q.glasshouse) return buildGlasshouse(Q);
     var n0 = group.children.length;                                     /* v30: what this place builds is its own */
     var xs = Q.poly.map(function (p) { return p[0]; }), ys = Q.poly.map(function (p) { return p[1]; });
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
@@ -2110,6 +2285,7 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
       /* v214, req 1180's 1: a house with its own nave (house one, the Crystal Palace manner) stands as aisles to its eaves
          under a low ridge-and-furrow, the nave and the transept to their springing, each under its barrel (a gable far off) */
       var h = (g.houses || [])[i];
+      if (holds(rect(r), LAWN - 1, LAWN + 20)) return;   /* v93: the house he stands in (greenhouse-one) is the place's own */
       if (h && h.nave) {
         prism(rect(r), LAWN, LAWN + h.eaves, 'far-glass'); roof(r, LAWN + h.eaves, LAWN + h.ridge_and_furrow, 'gable');
         [h.nave, h.transept].forEach(function (v) { if (!v) return; prism(rect(v.rect), LAWN + h.eaves, LAWN + v.springing, 'far-glass'); roof(v.rect, LAWN + v.springing, LAWN + v.crown, 'gable'); });

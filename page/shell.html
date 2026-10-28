@@ -316,6 +316,8 @@ PAINTED = PAINTED.concat(['drum-room-b', 'hall-undercroft', 'pomfrey-bedroom', '
 PAINTED = PAINTED.concat(['dumbledores-office', 'study']);
 /* castle-shell v88: H82's fern well painted, its stair's stone (houses-sandstone, rubble), provisional, Godric to confirm */
 PAINTED = PAINTED.concat(['h82-fern-well']);
+/* model v224 (ledger 311 and 312): greenhouse one, glass on iron, built by castle-shell.js's buildGlasshouse, a rough build */
+PAINTED = PAINTED.concat(['greenhouse-one']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers', trim: Q.has('trim') ? +Q.get('trim') : 2 }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
