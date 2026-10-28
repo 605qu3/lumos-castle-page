@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gates probe</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0b0a09; color: #d8cfbf; font: 14px/1.4 Georgia, serif; overflow: hidden; }
+  canvas { display: block; touch-action: none; }
+  #say { position: fixed; left: 12px; bottom: 10px; right: 12px; text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="say"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="tones.js?v=3"></script>
+<script src="ironwork.js?v=2"></script>
+<script>
+/* gates-live.html: Design's probe for ironwork.js's pattern G (req 1269, the Architect's, on Godric's 1 on req 1265),
+   the old cells' passage at the model's plan (page/castle-model.js v223: the passage x 31.4 to 32.6, y 15.3 to 26.0;
+   the cells' walls 0.3 thick; the eight doors 0.8 wide at y 16.75, 19.35, 21.95 and 24.55, round-headed, springing
+   1.8, crown 2.2). Each gate hangs on the cell's face of its wall and stands open into the cell. A torch by the way in
+   and a low light in the cells as the light. ?view=passage (default, from the way in looking north), elev (square on
+   to w2 from the passage), cell (inside w2 looking out at its gate), side (along the w2 gate edge on); ?leaves=1 for
+   one leaf; ?shut every gate closed, ?lit a study light (both for the sheet only); ?at=x,y,z site metres with y up; ?yaw, ?up degrees. Drag to look round. Not the shell: the shell calls
+   CastleIronwork.gates. */
+(function () {
+  'use strict';
+  var T = window.CASTLE_TONES, R = T.resolved, q = new URLSearchParams(location.search), view = q.get('view') || 'passage';
+  var lam = function (s) { var m = new THREE.MeshLambertMaterial({ color: new THREE.Color(s) }); m.side = THREE.DoubleSide; return m; };
+  var stone = 'founders-rubble';
+  var mats = { wall: lam(R[stone + '/coursed'] || '#5e5b4f'), floor: lam(R['flags-' + stone] || '#4a4840'), vault: lam(R['vault-' + stone] || R[stone + '/rubble'] || '#58564a'),
+    iron: new THREE.MeshLambertMaterial({ color: new THREE.Color(CastleIronwork.RUSTED) }) };
+  var W = innerWidth, H = innerHeight, renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(W, H); document.body.appendChild(renderer.domElement);
+  var scene = new THREE.Scene();
+  var toLocal = function (x, y, z) { return new THREE.Vector3(x, z, y); };   /* site metres to the shell's frame: x east, y up, z south */
+  function box(x0, x1, y0, y1, z0, z1, m) {   /* site x, height, site y */
+    var b = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); b.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); scene.add(b); return b;
+  }
+  var Y0 = 15.3, Y1 = 26.0, DOORS = [16.75, 19.35, 21.95, 24.55], SPRING = 1.8, CROWN = 2.2, DW = 0.8, TOP = 3.4;
+  /* the passage's floor and ceiling, the cells' floors, back walls and ceilings */
+  box(26.0, 38.0, -0.1, 0, Y0, Y1, mats.floor);
+  box(31.4, 32.6, TOP, TOP + 0.1, Y0, Y1, mats.vault);
+  box(26.5, 31.1, 2.6, 2.7, Y0, Y1, mats.vault); box(32.9, 37.5, 2.6, 2.7, Y0, Y1, mats.vault);
+  box(26.3, 26.5, 0, 2.6, Y0, Y1, mats.wall); box(37.5, 37.7, 0, 2.6, Y0, Y1, mats.wall);
+  box(26.5, 37.5, 0, TOP, Y1, Y1 + 0.2, mats.wall); box(26.5, 31.4, 0, TOP, Y0 - 0.2, Y0, mats.wall); box(32.6, 37.5, 0, TOP, Y0 - 0.2, Y0, mats.wall);
+  [18.05, 20.65, 23.25].forEach(function (y) { box(26.5, 31.1, 0, 2.6, y - 0.08, y + 0.08, mats.wall); box(32.9, 37.5, 0, 2.6, y - 0.08, y + 0.08, mats.wall); });
+  /* the two walls of the passage, each pierced by four round-headed doors */
+  function pierced(xFace) {
+    var s = new THREE.Shape(); s.moveTo(Y0, 0); s.lineTo(Y1, 0); s.lineTo(Y1, TOP); s.lineTo(Y0, TOP); s.lineTo(Y0, 0);
+    DOORS.forEach(function (y) {
+      var h = new THREE.Path(), r = DW / 2; h.moveTo(y - r, 0); h.lineTo(y + r, 0); h.lineTo(y + r, SPRING);
+      h.absarc(y, SPRING, r, 0, Math.PI, false); h.lineTo(y - r, 0); s.holes.push(h);
+    });
+    var g = new THREE.ExtrudeGeometry(s, { depth: 0.3, bevelEnabled: false, curveSegments: 24 });
+    var m = new THREE.Mesh(g, mats.wall); m.rotation.y = -Math.PI / 2; m.position.set(xFace, 0, 0); scene.add(m);
+  }
+  pierced(31.4); pierced(32.9);
+  /* the gates, hung on the cells' faces (west x 31.1, east x 32.9), open into the cells, each leaf at its own angle */
+  var opens = q.has('shut') ? [[0, 0], [0, 0], [0, 0], [0, 0]] : [[78, 86], [84, 72], [90, 80], [74, 88]], doors = [];
+  DOORS.forEach(function (y, i) {
+    doors.push({ a: [31.1, y - DW / 2], b: [31.1, y + DW / 2], floor: 0, toward: [28.8, y], open: opens[i] });
+    doors.push({ a: [32.9, y - DW / 2], b: [32.9, y + DW / 2], floor: 0, toward: [35.2, y], open: opens[3 - i] });
+  });
+  var leaves = q.get('leaves') === '1' ? 1 : 2;
+  var G = CastleIronwork.gates(THREE, doors, { toLocal: toLocal, spring: SPRING, crown: CROWN, leaves: leaves, owner: 'old-cells-gates' }, mats);
+  scene.add(G.group);
+  /* the light: the torch by the way in, a low fill, a low light near in each row of cells (the per-boy dark) */
+  var L = T.lights;
+  scene.add(new THREE.HemisphereLight(0x6a645a, 0x1a1714, q.has('lit') ? 0.9 : 0.32));
+  if (q.has('lit')) { var lp = new THREE.PointLight(0xfff0dc, 1.0, 8, 1.2); lp.position.set(29.6, 2.0, 18.6); scene.add(lp); }
+  var tp = new THREE.PointLight(new THREE.Color(L.torch.hex), 1.2, 12, 1.5); tp.position.set(32.4, 2.1, 15.7); scene.add(tp);
+  [[29.0, 20.6], [35.0, 20.6]].forEach(function (p) { var c = new THREE.PointLight(0xd8c8a8, 0.35, 9, 1.5); c.position.set(p[0], 2.2, p[1]); scene.add(c); });
+  var cam = new THREE.PerspectiveCamera(view === 'elev' ? 50 : 65, W / H, 0.05, 200), say = document.getElementById('say'), yaw = 0, pitch = (+(q.get('up') || 4)) * Math.PI / 180;
+  cam.rotation.order = 'YXZ';
+  if (view === 'passage') { cam.position.set(32.0, 1.35, 15.8); yaw = Math.PI; }
+  if (view === 'elev') { cam.position.set(32.55, 1.2, 19.35); yaw = Math.PI / 2; pitch = 0.1; }
+  if (view === 'cell') { cam.position.set(28.6, 1.3, 19.35); yaw = -Math.PI / 2; pitch = 0.12; }
+  if (view === 'side') { cam.position.set(30.0, 1.3, 17.6); yaw = -Math.PI / 4 - 0.2; pitch = 0.08; }
+  if (q.get('at')) { var e = q.get('at').split(',').map(Number); cam.position.set(e[0], e[1], e[2]); }
+  yaw += (+(q.get('yaw') || 0)) * Math.PI / 180;
+  var drag = null;
+  renderer.domElement.addEventListener('pointerdown', function (e) { drag = [e.clientX, e.clientY, yaw, pitch]; });
+  addEventListener('pointerup', function () { drag = null; });
+  addEventListener('pointermove', function (e) { if (!drag) return; yaw = drag[2] - (e.clientX - drag[0]) * 0.006; pitch = Math.max(-1, Math.min(1.3, drag[3] - (e.clientY - drag[1]) * 0.004)); });
+  if (q.has('clean')) say.style.display = 'none';
+  say.textContent = 'The old cells: ' + G.gates + ' gates, ' + G.leaves + ' leaves, ' + Math.round(G.triangles) + ' triangles, open into the cells';
+  var frames = 0;
+  (function tick() {
+    cam.rotation.y = yaw; cam.rotation.x = pitch;
+    renderer.render(scene, cam);
+    if (++frames === 30) {
+      var S2 = new THREE.Scene(); S2.add(G.group); renderer.info.reset(); renderer.render(S2, cam); var calls = renderer.info.render.calls; scene.add(G.group);
+      window.gatesReady = { gates: G.gates, leaves: G.leaves, meshes: G.group.children.length, calls: calls, triangles: Math.round(G.triangles),
+        owners: G.group.children.every(function (m) { return m.userData.owner === 'old-cells-gates'; }) };
+    }
+    requestAnimationFrame(tick);
+  })();
+})();
+</script>
+</body>
+</html>
