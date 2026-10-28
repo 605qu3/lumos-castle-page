@@ -4,7 +4,9 @@
    Pure geometry, no scene and no model: CastleTrim.geometry(THREE, s) gives one merged BufferGeometry for one face of
    one opening, in the wall's frame, x along the wall from the opening's middle, y up from the place's floor, z out of
    the wall's face at the origin, so the caller turns it about y by the wall's angle and sets it where the face is.
-   s: { cls: 'door' | 'window' | 'loop', age: 'P1'..'P7', w, h (the cut, h over the sill), sill, face: 'in' | 'out' }.
+   s: { cls: 'door' | 'window' | 'loop', age: 'P1'..'P7', w, h (the cut, h over the sill), sill, face: 'in' | 'out',
+   lim: { x0, x1, ymax } (the wall segment's ends from the opening's middle, along the wall, and 8 mm under the ceiling;
+   every piece is cut to it, a piece gone to a sliver dropped) }.
    'in' is the face the room sees (the trim stands out into the room), 'out' the far face (out into the next room or
    the open). Off unless the page asks (shell.html?trim=1); castle-shell.js v91 calls it. */
 (function () {
@@ -26,7 +28,12 @@
      inside, the embrasure's frame under a plain lintel, a little proud */
   function loopMould(face) { return face === 'out' ? { bw: 0.07, proj: 0.012, chamfer: false } : { bw: 0.1, proj: 0.03, chamfer: false }; }
 
+  var CLIP = null;   /* the wall segment and the ceiling, set by geometry() for its pieces (v2, the clamp: unclamped, 48 of 142 places went over baseline) */
+
   function rect(THREE, x0, x1, y0, y1, P, chamfer) {   /* a block standing P out of the face, its arrises chamfered 1.2 cm if asked */
+    if (CLIP) { x0 = Math.max(x0, CLIP.x0); x1 = Math.min(x1, CLIP.x1); y1 = Math.min(y1, CLIP.ymax); }
+    if (x1 - x0 < 0.01 || y1 - y0 < 0.01) return null;
+    if (chamfer && (x1 - x0 < 0.05 || y1 - y0 < 0.05)) chamfer = false;
     var sh = new THREE.Shape();
     sh.moveTo(x0, y0); sh.lineTo(x1, y0); sh.lineTo(x1, y1); sh.lineTo(x0, y1); sh.lineTo(x0, y0);
     var b = chamfer ? Math.min(0.012, P / 3) : 0, g = new THREE.ExtrudeGeometry(sh, b
@@ -37,6 +44,7 @@
   }
 
   function merge(THREE, list) {
+    list = list.filter(Boolean);
     var n = 0; list.forEach(function (g) { n += g.attributes.position.count; });
     var pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2), o = 0;
     list.forEach(function (g) {
@@ -53,22 +61,27 @@
 
   function geometry(THREE, s) {
     var M = s.cls === 'loop' ? loopMould(s.face) : mould(s.age, s.cls), w = s.w, y0 = s.sill, y1 = s.sill + s.h, bw = M.bw, P = M.proj, ch = M.chamfer;
-    var X = w / 2 + bw, parts = [];
-    parts.push(rect(THREE, -X, -w / 2, y0, y1, P, ch));                      /* the jambs */
-    parts.push(rect(THREE, w / 2, X, y0, y1, P, ch));
-    parts.push(rect(THREE, -X, X, y1, y1 + bw, P, ch));                      /* the head, over the jambs' ends */
+    /* v3: every edge that meets the cut, the jambs' feet and tops and the head's top, stand 6 mm into it or clear, so no face of the trim lies in the plane of the wall's own jamb, head
+       or sill (the back's 5 mm embed overlapped them: 41 places fought, the all-places run with ?trim=1) */
+    var J = 0.006, wi = w - 2 * J, X = w / 2 + bw, parts = [], lim = s.lim;
+    /* the face 'in' is turned half about y after it is built, so its x runs the other way: clip it by the mirror */
+    CLIP = lim ? { x0: s.face === 'in' ? -lim.x1 : lim.x0, x1: s.face === 'in' ? -lim.x0 : lim.x1, ymax: lim.ymax } : null;
+    parts.push(rect(THREE, -X, -wi / 2, y0 + J, y1 - J, P, ch));                     /* the jambs */
+    parts.push(rect(THREE, wi / 2, X, y0 + J, y1 - J, P, ch));
+    parts.push(rect(THREE, -X, X, y1 - J, y1 + bw - J, P, ch));                  /* the head, over the jambs' ends */
     if (s.cls === 'window' && s.sill > 0.05)                                  /* a window's sill stone, proud of the jambs and a little wider */
-      parts.push(rect(THREE, -X - 0.04, X + 0.04, y0 - 0.07, y0, P + 0.04, ch));
-    if (M.hood) parts.push(rect(THREE, -X - 0.06, X + 0.06, y1 + bw, y1 + bw + 0.06, P + 0.03, false));   /* the hood mould over the head */
+      parts.push(rect(THREE, -X - 0.04, X + 0.04, y0 - 0.07, y0 + J, P + 0.04, ch));
+    if (M.hood) parts.push(rect(THREE, -X - 0.06, X + 0.06, y1 + bw - J, y1 + bw + 0.06 - J, P + 0.03, false));   /* the hood mould over the head */
     if (M.lugs) {                                                             /* the lugs: the architrave's ears at the head's two corners */
-      parts.push(rect(THREE, -X - 0.05, -X, y1 - 0.25, y1 + bw, P + 0.015, false));
-      parts.push(rect(THREE, X, X + 0.05, y1 - 0.25, y1 + bw, P + 0.015, false));
+      parts.push(rect(THREE, -X - 0.05, -X, y1 - 0.25, y1 + bw - J, P + 0.015, false));
+      parts.push(rect(THREE, X, X + 0.05, y1 - 0.25, y1 + bw - J, P + 0.015, false));
     }
-    if (M.key) parts.push(rect(THREE, -0.11, 0.11, y1, y1 + bw + 0.08, P + 0.025, false));   /* the keystone, rising above the head */
+    if (M.key) parts.push(rect(THREE, -0.11, 0.11, y1 - J, y1 + bw + 0.08, P + 0.025, false));   /* the keystone, rising above the head */
+    CLIP = null;
     var g = merge(THREE, parts);
     if (s.face === 'in') g.rotateY(Math.PI);      /* stands out of the near face into the room, its front turned to it */
     return g;
   }
 
-  window.CastleTrim = { version: 1, geometry: geometry, merge: merge, mould: mould };
+  window.CastleTrim = { version: 7, geometry: geometry, merge: merge, mould: mould };
 })();

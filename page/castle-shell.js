@@ -1028,7 +1028,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          loop, a door to the open), on the far face; a door between two rooms is trimmed by each on its own face; a hidden
          way takes none (a trim would say tap me). One merged mesh a stone, page/castle-trim.js; a loop's is the British
          precedent's (materials.md section 2): flush outside, a frame under a lintel inside */
-      function trimGap(g, sm, w) {
+      function trimGap(g, sm, w, L, HE) {   /* v93: L the wall's length, HE its ceiling: every piece is cut to them */
         var k = g.op.kind || '', cls = /hidden|window, round/.test(k) ? null : /loop|slit|squint|grating|cleft/.test(k) ? 'loop'   /* a round window is the room's own drawing (the gallery's rose) */
           : /window|lancet|oriel|dormer/.test(k) ? 'window' : isDoor(k) || (isWay(k) && w <= 3.5) ? 'door' : null;
         if (!cls) return;
@@ -1037,7 +1037,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var slot = cls === 'loop' && g.op.splay > (g.op.w || 1) ? g.op.w : w;   /* the slot's width at the outer face */
         ['in', 'out'].forEach(function (face) {
           if (face === 'out' && (beyond || g.op.depth > t + 0.05)) return;
-          var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: face === 'out' ? slot : w, h: g.h - g.sill, sill: g.sill, face: face });
+          var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: face === 'out' ? slot : w, h: g.h - g.sill, sill: g.sill, face: face,
+            lim: { x0: -sm, x1: L - sm, ymax: HE - 0.008 } });
           var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sm + nx * off, a[1] + uy * sm + ny * off, Q.floor);
           geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
           var mt = trimMat(row, a[0] + ux * sm, a[1] + uy * sm, g.sill);
@@ -1151,7 +1152,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           rp.name = Q.id + '-pane-' + g.op.id; rp.userData.owner = Q.id; group.add(rp); out.panes.push(rp);
           return;
         }
-        if (TRIM && !g.back) trimGap(g, sm, w);   /* v91 */
+        if (TRIM && !g.back) trimGap(g, sm, w, L, HE);   /* v91 */
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
         if (via) {
           var sv = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
