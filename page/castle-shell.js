@@ -1664,6 +1664,20 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
   var shaftFloors = [];
   buildPlace(P);
+  /* v94 (req 1335, Godric's 1 at 12.14 am, 28 October 2026: "whole floor builds"): o.floor builds every painted place on
+     this place's floor in the same frame ('all': every place the model gives there), so he walks the floor's length; a
+     door between two built places takes him through on either side (its far stand, below); a stair, a shaft or a room
+     with its own page is still a page away. out.floorBuilt counts the places and the build's milliseconds */
+  if (o.floor) {
+    var ft0 = Date.now(), fids = o.floor === 'all' ? (M.rooms || []).map(function (r) { return r.id; }) : painted;
+    fids.forEach(function (id) {
+      if (!id || out.places.some(function (q) { return q.id === id; })) return;
+      var Q = findPlace(M, id);
+      if (!Q || (Q.rec && Q.rec.page) || Q.shaft || Math.abs(Q.floor - P.floor) > 0.05) return;
+      out.places.push(Q); buildPlace(Q);
+    });
+    out.floorBuilt = { places: out.places.length, ms: Date.now() - ft0 };
+  }
   /* one step on: the ways joined to this one by an open mouth, built in the same frame */
   /* (only a place whose wall the mouth is in; a way to a place not yet in the model, or not beside it, shows a dark
      recess beyond the mouth for now) */
@@ -2049,6 +2063,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
                       look: toLocal(mx + (wide ? 20 : 0), my + (wide ? 0 : 20), P.floor + EYE) });
   }
   all.forEach(function (d) { var s = standAt(d, d.id); d.stand = s; out.stands.push(s); });
+  /* v94: on a floor built whole, a door or way whose two sides are both built gets a second stand on its far side,
+     facing back through it (`far`), so a tap there walks him through in the frame (shell.html's through) */
+  if (o.floor) all.forEach(function (d) {
+    if (d.back || d.hatch || d.via || !d.mid || !d.inward || d.to === d.place) return;
+    var built = function (id) { return out.places.some(function (q) { return q.id === id; }); };
+    if (!built(d.to) || !built(d.place)) return;
+    d.built = true;
+    var m = { id: d.id, mesh: d.mesh, mid: d.mid, inward: d.inward.clone().negate(), w: d.w, h: d.h, lift: d.lift || 0, level: d.level, place: d.to };
+    d.far = standAt(m, d.id + '-far'); out.stands.push(d.far);
+  });
   /* v17: a stair's well, its flights: a stand at each end, walked along its treads */
   shaftFlights.forEach(function (f) {
     var mk = function (e, name) { return { name: name, pos: toLocal(e.x, e.y, e.z + EYE), look: toLocal(e.lx, e.ly, e.z + EYE + e.up), thing: null, level: e.z }; };

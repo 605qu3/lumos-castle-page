@@ -319,7 +319,10 @@ PAINTED = PAINTED.concat(['h82-fern-well']);
 /* model v224 (ledger 311 and 312): greenhouse one, glass on iron, built by castle-shell.js's buildGlasshouse, a rough build */
 PAINTED = PAINTED.concat(['greenhouse-one']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers', trim: Q.has('trim') ? +Q.get('trim') : 2 }) : null;
+/* req 1335 (Godric's 1, 12.14 am, 28 October 2026): &floor=on builds every painted place on this floor in one frame,
+   &floor=all every place; he walks it through, door to door, with no page between (castle-shell.js v94) */
+var FLOOR_WALK = /^(on|all)$/.test(Q.get('floor') || '') ? Q.get('floor') : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), floor: FLOOR_WALK, bays: Q.get('bays') || 'piers', trim: Q.has('trim') ? +Q.get('trim') : 2 }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
    black headless twice with a clean console; the line now says which year it stands from and the query that opens it */
 if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(function (r) { return r.id === PLACE && !stands(r); })[0];
@@ -688,6 +691,8 @@ function placeOf(d) {
   return (doorPlaces[d.id] = s ? { s: s, look: look } : { s: d.stand });
 }
 function goTo(d) {
+  /* req 1335: a door with a far stand is walked up to on whichever side he is */
+  if (d.far && here.pos.distanceTo(d.far.pos) < here.pos.distanceTo(d.stand.pos)) return goStand(d.far);
   var q = placeOf(d);
   if (!q.look || here === q.s) return goStand(q.s);
   if (!sameLevel(here.level, q.s.level)) return false;
@@ -9336,8 +9341,17 @@ var turnCues = {
 };
 function through(d) {
   if (hooks.onWay) hooks.onWay({ id: d.id, to: d.to, place: d.place });
+  /* req 1335: on a floor built whole, a door or way with both sides built is walked through in the frame, the leaf
+     swung open as he goes, to the stand on its other side */
+  if (FLOOR_WALK && d.far) {
+    var tgt = here === d.far ? d.stand : d.far, mp = d.mid.clone(); mp.y = tgt.pos.y;
+    if (d.hinge && d.rest && d.glow) swing(d, false);
+    walkTo([mp], tgt, false);
+    return;
+  }
   /* a built room has its own page (the bay's mouth to corridor.html); a way still a shell, this page */
-  kit.travel((d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE));
+  kit.travel((d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE) +
+    (FLOOR_WALK && !d.page ? '&floor=' + FLOOR_WALK : ''));
 }
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
@@ -9431,7 +9445,7 @@ function tap(cx, cy) {
   }
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
-  if (d && (here === d.stand || here === placeOf(d).s)) { if ((d.mesh.userData.way && d.built) || (d === FDOOR && filchOpen) || (d === SDOOR && (snapeOpen || PLACE === 'snape-office'))) through(d); else answer(d, hits[0].point); acted = true; }
+  if (d && (here === d.stand || here === placeOf(d).s || (d.far && here === d.far))) { if ((d.mesh.userData.way && d.built) || (FLOOR_WALK && d.far) || (d === FDOOR && filchOpen) || (d === SDOOR && (snapeOpen || PLACE === 'snape-office'))) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) {
     acted = goTo(d);
     /* req 550: walking up to an open way is its tap to the events (gun-room-arch's draught), since a second tap takes him through */
