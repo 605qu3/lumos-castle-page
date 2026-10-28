@@ -67,7 +67,7 @@
         "place = charms classroom"
       ],
       "show": [
-        "a lesson under way: Professor Flitwick perched on his pile of books behind his desk, the boys' desk theirs with the lesson's things out",
+        "a lesson under way: Professor Pickett perched on his pile of books behind his desk, the boys' desk theirs with the lesson's things out",
         "a pineapple sitting on a front-row desk",
         "the windows on his left, their light over the desks, the real sky",
         "the chandelier's plain iron ring of candles hanging over the clear floor before the desks"
@@ -369,7 +369,7 @@
         "place = charms classroom"
       ],
       "show": [
-        "Professor Flitwick leans too far over the edge of his desk, gives a squeak and topples off his pile of books out of sight, then clambers back up, straightening his robes"
+        "Professor Pickett leans too far over the edge of his desk, gives a squeak and topples off his pile of books out of sight, then clambers back up, straightening his robes"
       ],
       "canon": "the Ministry's Interiors list, Rework 5 (docs/ministry/changes/interiors.md): he topples off his pile now and then, a habit, any lesson, the pile behind the desk so he falls out of the stand's sight; PS 8 L2734's toppling at a name set aside with the roll call; the squeak his (PS 10 L3506, \"squeaked Professor Flitwick\"); ours as a habit; checked against the text, 15 October 2026"
     },
@@ -879,7 +879,7 @@
           "speaker": "flitwick",
           "medium": "heard",
           "key": "charms.flitwick-no-prodding",
-          "sound": "Professor Flitwick squeaking from his pile of books",
+          "sound": "Professor Pickett squeaking from his pile of books",
           "text": [
             "Swish and flick! And no prodding, please. We have had quite enough singed feathers this term."
           ],
@@ -988,7 +988,7 @@
           "key": "charms.mcgonagall-borrows-says",
           "sound": "Professor McGonagall at the classroom door, after a knock",
           "text": [
-            "Excuse me, Professor Flitwick, could I borrow one of your pupils for a moment?"
+            "Excuse me, Professor Pickett, could I borrow one of your pupils for a moment?"
           ],
           "canon": "Godric's woven touch mcgonagall-borrows-pupil (22 October 2026, 7.50 pm, relayed by Fawkes): hers, word for word but for the name, PS 9 L3051 (\"Excuse me, Professor Flitwick, could I borrow Wood for a moment?\", read in the canon tool, 22 October 2026); the pupil is an older one, unnamed (Wood is met elsewhere)"
         }
