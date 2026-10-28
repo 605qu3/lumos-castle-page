@@ -1400,8 +1400,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
         if (g.op.grille) for (var gb = 1; gb <= 3; gb++) bar(g.s0 + w * gb / 4, g.sill, g.h, 0.1, Q.id + '-grille-' + g.op.id + '-' + gb);
         if (g.niche) {
-          var dp = Math.min(g.op.depth, t - 0.05), back = slab(w, hh, t - dp, mats.wall, 'wall');
-          var bp = toLocal(a[0] + ux * sm + nx * (dp + (t - dp) / 2), a[1] + uy * sm + ny * (dp + (t - dp) / 2), Q.floor);
+          /* v109 (the 210th, the sweep): the niche keeps to the wall's depth as built (halfGap, v102), not its full t; the
+             accounts cubby's back stood 25 cm out of the drum's face into the tapestry room */
+          var tn = gapQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, g.s0, g.s1, t) : t;
+          var dp = Math.min(g.op.depth, tn - 0.05), back = slab(w, hh, tn - dp, mats.wall, 'wall');
+          var bp = toLocal(a[0] + ux * sm + nx * (dp + (tn - dp) / 2), a[1] + uy * sm + ny * (dp + (tn - dp) / 2), Q.floor);
           back.position.set(bp.x, bp.y + g.sill + hh / 2, bp.z); back.rotation.y = ang; back.name = Q.id + '-niche-' + g.op.id; group.add(back);
           /* v30 (one owner per face): the head bears 2 cm into the wall over it and either side, its face 2 mm back of the
              wall's, so no face of it lies in a plane of the pieces round it (the hourglass niches' crowns and springings) */
