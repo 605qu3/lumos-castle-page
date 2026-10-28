@@ -129,10 +129,21 @@
         "place = north tower landing"
       ],
       "show": [
+        "overhead, a circular trapdoor in the ceiling",
+        "no doors off this tiny landing"
+      ],
+      "canon": "Magic's req 1373 (1) (docs/magic/rooms.md, The Divination room at the North Tower's top, 1897): the trapdoor and the bare landing stand in 1897, its brass plaque not drawn until Story names the 1897 teacher; the plaque's words are the next rule, set aside (Events, 151st session). PoA 6 L15268, \"a tiny landing\", \"no doors off this landing\", read in the canon tool, 20 October 2026"
+    },
+    {
+      "when": [
+        "place = north tower landing"
+      ],
+      "show": [
         "overhead, a circular trapdoor in the ceiling with a brass plaque on it: Sybill Trelawney, Divination teacher",
         "no doors off this tiny landing"
       ],
-      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: \"a tiny landing\", \"no doors off this landing\", \"a circular trap door with a brass plaque on it\", \"Sybill Trelawney, Divination teacher\" (PoA 6 L15268, L15270, read in the canon tool, 20 October 2026); in every year, an everyday thing a later book names first (Kingsley's rule of 16 October)"
+      "canon": "Magic's req 799 (docs/magic/rooms.md, The Divination classroom, the North Tower's top; Interiors' docs/interiors/divination-classroom.md, cited), the PoA castle on: \"a tiny landing\", \"no doors off this landing\", \"a circular trap door with a brass plaque on it\", \"Sybill Trelawney, Divination teacher\" (PoA 6 L15268, L15270, read in the canon tool, 20 October 2026); in every year, an everyday thing a later book names first (Kingsley's rule of 16 October)",
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1373 (1) and (3), docs/magic/rooms.md, The Divination room at the North Tower's top, 1897: Trelawney's plaque is not drawn until Story names the 1897 teacher; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 151st session, provisional, Godric to confirm; the board's req 1376 may return it with an era driver)"
     },
     {
       "when": [
