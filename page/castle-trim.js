@@ -28,7 +28,12 @@
        P6, P7  Georgian: an architrave in three steps (two fasciae and an edge moulding), lugged, keyed; a door under
                a plain frieze and a cornice; a window's sill on two brackets
      The weather's pieces (a drip mould over a window, a sill sloped to shed rain, a sill's brackets) only on a window's
-     outer face; a door's label and cornice on both faces, as a hall's doors had them */
+     outer face; a door's label and cornice on both faces, as a hall's doors had them
+     v9 (the old cells' gates, Godric's 1 on req 1265, 27 October 2026, 10.31 pm: "under round stone arches"): an
+     opening whose model record says `head: "round"` (s.head) has its cut round over a springing w/2 under h, the
+     shell filling the spandrels; its dressing turns over it as a ring of eleven voussoirs, the jambs, imposts and
+     shafts stopping at the springing, a roll or bead turning with the ring; no label or architrave head over it. The
+     cells' own faces are P3, round by his word, not by P3's square rule (req 1268's schedule must keep it) */
   function mould(age, cls) {
     var n = +String(age || 'P3').replace(/\D/g, '') || 3, win = cls === 'window';
     if (n <= 2) return { n: n, bw: win ? 0.12 : 0.16, proj: 0.04, chamfer: false, impost: true, shaft: !win, roll: n === 2 };
@@ -79,6 +84,29 @@
     return g;
   }
 
+  /* v9: a round head's ring, n voussoirs from r0 to r1 about (0, cy), each standing P out, 6 mm joints between them
+     (the wall shows in each, as a mortar line); left out whole where the ceiling or the wall's ends cut it */
+  function ring(THREE, cy, r0, r1, P, n) {
+    if (CLIP && (cy + r1 > CLIP.ymax || -r1 < CLIP.x0 || r1 > CLIP.x1)) return [];
+    var out = [], jg = 0.006 / r1, step = (Math.PI - jg * (n - 1)) / n;
+    for (var k = 0; k < n; k++) {
+      var a0 = k * (step + jg), a1 = a0 + step, sh = new THREE.Shape();
+      sh.moveTo(r0 * Math.cos(a0), cy + r0 * Math.sin(a0)); sh.lineTo(r1 * Math.cos(a0), cy + r1 * Math.sin(a0));
+      sh.absarc(0, cy, r1, a0, a1, false); sh.lineTo(r0 * Math.cos(a1), cy + r0 * Math.sin(a1));
+      sh.absarc(0, cy, r0, a1, a0, true);
+      var g = new THREE.ExtrudeGeometry(sh, { depth: P, bevelEnabled: false, steps: 1, curveSegments: 3 });
+      g.translate(0, 0, -EMBED); out.push(g);
+    }
+    return out;
+  }
+  /* v9: a roll turned over a round head, its middle on radius rr about (0, cy), at z v */
+  function arcRod(THREE, cy, rr, v, r) {
+    if (CLIP && (cy + rr + r > CLIP.ymax || -rr - r < CLIP.x0 || rr + r > CLIP.x1)) return null;
+    var g = new THREE.TorusGeometry(rr, r, 8, 24, Math.PI).toNonIndexed();
+    g.translate(0, cy, v);
+    return g;
+  }
+
   function merge(THREE, list) {
     list = list.filter(Boolean);
     var n = 0; list.forEach(function (g) { n += g.attributes.position.count; });
@@ -107,10 +135,29 @@
        8 mm off it; a step's outer side and top lie 8 mm inside the step above (conventions.md) */
     var win = s.cls === 'window', out = s.face === 'out', xi = wi / 2, ys = y0 + J, yh = y1 + bw - J, E = EMBED, tall = y1 - y0;
     function pair(a, b, ya, yb, p, c) { parts.push(rect(THREE, -b, -a, ya, yb, p, c), rect(THREE, a, b, ya, yb, p, c)); }   /* a to b out from the middle, both sides */
-    var imp = M.impost && tall > 0.6, jb = ys, jt = y1 - J;
+    var RH = s.head === 'round' && s.cls !== 'loop' ? w / 2 : 0, yr = y1 - RH;   /* v9: yr the springing, y1 the crown */
+    var imp = M.impost && tall > 0.6, jb = ys, jt = yr - J;
     if (M.shaft && tall > 1.2) jb = ys + 0.22;
     if (M.stop && tall > 0.9) jb = ys + 0.32;
-    if (imp) jt = y1 - J - 0.18;
+    if (imp) jt = yr - J - 0.18;
+    if (RH) {
+      /* v9: the jambs to the springing, the ring over the cut; the ring's springers stand on the jambs' tops (6 mm up,
+         never in their plane) and on the imposts where the age has them */
+      pair(xi, X, jb, jt, P, ch);
+      parts.push.apply(parts, ring(THREE, yr, xi, X, M.steps ? 0.06 : P, 11));
+      if (imp) pair(xi, X + 0.05, jt, yr - J, M.shaft && jb > ys ? P + 0.07 : P + 0.04, true);
+      if (M.shaft && jb > ys) {
+        pair(xi, xi + 0.15, ys, jb, P + 0.07, true);
+        [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, jt, sd * (xi + 0.065), P - E, 0.055)); });
+      }
+      if (M.roll || M.bead) parts.push(arcRod(THREE, yr, xi + 0.035, P - E, 0.035));
+      if (M.bead) [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, yr, sd * (xi + 0.03), P - E, 0.03)); });
+      if (M.stop && jb > ys) pair(xi, X + 0.008, ys, jb, P + 0.016, false);
+      CLIP = null;
+      var gr = merge(THREE, parts);
+      if (s.face === 'in') gr.rotateY(Math.PI);
+      return gr;
+    }
     if (M.steps) {
       /* P6, P7: the architrave in three steps, the lowest the whole width, a broader fascia, an edge moulding */
       [[bw, 0.04], [bw * 0.6, 0.06], [0.04, 0.08]].forEach(function (st, k) {
@@ -161,5 +208,5 @@
     return g;
   }
 
-  window.CastleTrim = { version: 8, geometry: geometry, merge: merge, mould: mould };
+  window.CastleTrim = { version: 9, geometry: geometry, merge: merge, mould: mould };
 })();

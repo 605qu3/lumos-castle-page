@@ -1045,7 +1045,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var slot = cls === 'loop' && g.op.splay > (g.op.w || 1) ? g.op.w : w;   /* the slot's width at the outer face */
         ['in', 'out'].forEach(function (face) {
           if (face === 'out' && (beyond || g.op.depth > t + 0.05)) return;
-          var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: face === 'out' ? slot : w, h: g.h - g.sill, sill: g.sill, face: face,
+          var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: face === 'out' ? slot : w, h: g.h - g.sill, sill: g.sill, face: face, head: g.op.head,
             lim: { x0: -sm, x1: L - sm, ymax: HE - 0.008 } });
           var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sm + nx * off, a[1] + uy * sm + ny * off, Q.floor);
           geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
@@ -1161,6 +1161,24 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           return;
         }
         if (TRIM && !g.back) trimGap(g, sm, w, L, HE);   /* v91 */
+        /* v97 (the old cells' gates, Godric's 1 on req 1265): a door or way whose record says `head: "round"` is cut
+           square to its crown (h) and its two spandrels filled in stone, as a niche's head is (v51): 2 cm into the
+           jambs and the wall over it, its faces 5 mm inside each face; through the whole depth once where the way is
+           lined (deeper than this wall), else through this wall alone, each room its own */
+        if (g.op.head === 'round' && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind))) {
+          out.rounded = out.rounded || {};
+          var deep = g.op.depth > t + 0.05;
+          if (!(deep && out.rounded[g.op.id])) {
+            if (deep) out.rounded[g.op.id] = Q.id;
+            var rr = w / 2, BR = 0.02, sp = new THREE.Shape(), dd = (deep ? g.op.depth : t) - 0.01;
+            sp.moveTo(-rr, 0); sp.lineTo(-rr - BR, 0); sp.lineTo(-rr - BR, rr + BR); sp.lineTo(rr + BR, rr + BR); sp.lineTo(rr + BR, 0); sp.lineTo(rr, 0);
+            sp.absarc(0, 0, rr, 0, Math.PI, false);
+            var spm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h) : mats.wall;
+            var spd = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sp, { depth: dd, bevelEnabled: false, curveSegments: 16 }), spm), LAYER.wall);
+            spd.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - rr, mid.z + Math.cos(ang) * 0.005); spd.rotation.y = ang;
+            spd.name = Q.id + '-round-head-' + g.op.id; spd.userData.owner = Q.id; group.add(spd);
+          }
+        }
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
         if (via) {
           var sv = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
