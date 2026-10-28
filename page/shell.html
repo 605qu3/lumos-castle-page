@@ -158,7 +158,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=544"></script>
+<script src="castle-model.js?v=545"></script>
 <script src="castle-paint.js?v=114"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
@@ -170,7 +170,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=98"></script>
+<script src="castle-shell.js?v=99"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -3463,14 +3463,8 @@ thingCues[KETTLE_SHOW] = function () { showLines([{ medium: 'seen', sound: KETTL
   for (var kx = 35.0; kx < 64; kx += 3.0) box(kx - 0.03, 60.19, 4.8, kx + 0.03, 60.8, 5.13, oak);
   for (var px = 35.4; px <= 64.001; px += 1.2) box(px - 0.02, 61.32, 5.19, px + 0.02, 61.36, 6.2, iron);
   box(35.38, 61.31, 6.18, 64.0, 61.37, 6.23, iron);
-  /* 3, the spiral at (34.4, 62.4), r 0.8: 26 oak treads up two turns to the gallery, the last facing it, round an oak newel */
-  post(34.4, 62.4, 0.08, -0.05, 6.2, oak);
-  var sc = P(34.4, 62.4, 0), sd = P(34.4, 61.4, 0).sub(sc), aTop = Math.atan2(sd.z, sd.x);
-  for (var s = 0; s < 26; s++) {
-    var a = aTop - (25 - s) * Math.PI * 2 / 13, tr = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.05, 0.26), oak);
-    tr.position.set(sc.x + Math.cos(a) * 0.44, sc.y + 0.2 * (s + 1) - 0.025, sc.z + Math.sin(a) * 0.44); tr.rotation.y = -a;
-    tr.userData.owner = PLACE; g.add(tr);
-  }
+  /* 3, the spiral at (34.4, 62.4), r 0.8: drawn from the model's scroll-hall-spiral by castle-shell v98 (the Architect's 194th, model
+     v225), its treads 12 a turn as the record; the hand-drawn one here (13 a turn) is gone */
   /* 4 and 5, the tablets: five stone shelves on the west wall, the tablets standing on each, and four lidded jars */
   [63.6, 65.35, 67.1, 68.85, 70.6].forEach(function (y) { box(32.98, y - 0.03, -0.05, 33.5, y + 0.03, 2.0, stone); });
   var lv = [0.0, 0.4, 0.8, 1.2, 1.6], tg = new THREE.BoxGeometry(0.04, 0.2, 0.13), tabs = new THREE.InstancedMesh(tg, clay, lv.length * 40), q = new THREE.Object3D(), n = 0;

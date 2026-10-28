@@ -1918,6 +1918,35 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     out.stairs.push({ id: s.id, place: inIt.id });
   });
 
+  /* v98 (req 1237, the scroll hall's oak spiral, model v225): an open spiral in a room (a stair with `newel`, `r`, `from`,
+     `to`, `treads`, `per_turn` and `foot_bearing`, no span or rect): an oak newel from the floor to a rail's height over
+     the top, and each tread a plank wedge 60 mm thick, 360 / per_turn round, clockwise up seen from above from its foot,
+     the treads lapped 3 degrees under the next; the last reaches 0.2 further out, onto the gallery's edge it serves, its
+     top the gallery's. A thin baluster at each tread's outer end. Drawn only; the walk up it waits (stands carry no z) */
+  (M.stairs || []).forEach(function (s) {
+    if (!s.newel || !s.r || !s.treads || !s.per_turn || s.foot_bearing == null || s.span || s.rect) return;
+    var inIt = out.places.filter(function (q) { return (s.rooms || [s.room]).some(function (r) { return slug(r) === q.id; }); })[0];
+    if (!inIt) return;
+    var c = s.newel, n = s.treads, rise = (s.to - s.from) / n, step = 360 / s.per_turn, T = 0.06, NR = 0.1, RAIL = 0.95;
+    var row = rowOf(inIt), omat = row ? paintMat(tone('oak')) : mats.stair;
+    var nw = slab(1, 1, 1, omat, 'stair');
+    nw.geometry.dispose(); nw.geometry = new THREE.CylinderGeometry(NR, NR, s.to + RAIL - s.from, 16);
+    var np = toLocal(c[0], c[1], (s.from + s.to + RAIL) / 2); nw.position.copy(np); nw.name = s.id + '-newel'; nw.userData.stair = s.id; nw.userData.owner = inIt.id; group.add(nw);
+    for (var k = 1; k <= n; k++) {
+      var a1 = s.foot_bearing - (k - 1) * step, a2 = s.foot_bearing - k * step - (k < n ? 3 : 0), ro = k === n ? s.r + 0.2 : s.r;
+      var r0 = a2 * Math.PI / 180, r1 = a1 * Math.PI / 180, sh = new THREE.Shape(), ri = NR - 0.01;
+      sh.moveTo(ri * Math.cos(r0), ri * Math.sin(r0)); sh.lineTo(ro * Math.cos(r0), ro * Math.sin(r0));
+      sh.absarc(0, 0, ro, r0, r1, false); sh.lineTo(ri * Math.cos(r1), ri * Math.sin(r1));
+      var tz = s.from + rise * k, tr = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 4 }), omat), LAYER.stair);
+      tr.rotation.x = -Math.PI / 2; tr.position.copy(toLocal(c[0], c[1], tz - T)); tr.name = s.id + '-' + k; tr.userData.stair = s.id; tr.userData.owner = inIt.id; group.add(tr);
+      if (k === n) continue;
+      var am = (a1 - step / 2) * Math.PI / 180, bp = toLocal(c[0] + (s.r - 0.05) * Math.cos(am), c[1] + (s.r - 0.05) * Math.sin(am), tz);
+      var bal = slab(0.035, RAIL, 0.035, omat, 'stair');
+      bal.position.set(bp.x, bp.y + RAIL / 2, bp.z); bal.name = s.id + '-baluster-' + k; bal.userData.owner = inIt.id; group.add(bal);
+    }
+    out.stairs.push({ id: s.id, place: inIt.id });
+  });
+
   /* standing on a floor: a site point is on the floor at height z if a slab's top is there, or the floor of a place
      built is */
   function onLevel(x, y, z) {
