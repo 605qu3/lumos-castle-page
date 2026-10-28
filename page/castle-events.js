@@ -250,6 +250,7 @@
     ['add', /^add ([a-z_]+) (-?\d+)$/],
     ['stamp', /^stamp ([a-z_]+)(?: \+(\d+)(?:-(\d+))? days)?$/],
     ['stamp-night', /^stamp ([a-z_]+) by night$/],
+    ['stamp-real', /^stamp ([a-z_]+) by real day$/],
     ['slot', /^(take|free) slot$/],
     ['log', /^log "(.+)"$/],
     ['secret', /^secret ([a-z\-]+)$/],
@@ -614,6 +615,8 @@
     function today() { return dayNumber(nowDate()); }
     /* the night as one count, a night belonging to the evening it began, so 10 pm and 2 am are one night */
     function tonight() { return dayNumber(new Date(nowDate().getTime() - 12 * 3600000)); }
+    /* the real day, for a stamp that must count real days when the story's date is paced by events (req 1127: a boy's seeds wait in real days) */
+    function realToday() { return dayNumber(nowDate()); }
 
     function timeOfDay() {
       if (timeOverride) return timeOverride;
@@ -987,6 +990,10 @@
         var s = state.stamps[name.slice(11)];
         return s == null ? Infinity : today() - s;     /* a stamp never made reads as forever */
       }
+      if (name.indexOf('real days since ') === 0) {     /* for a stamp made `by real day` (req 1127) */
+        var sr = state.stamps[name.slice(16)];
+        return sr == null ? Infinity : realToday() - sr;
+      }
       if (name.indexOf('nights since ') === 0) {      /* for a stamp made `by night` (the full moon's owl, req 101) */
         var sn = state.stamps[name.slice(13)];
         return sn == null ? Infinity : tonight() - sn;
@@ -1170,6 +1177,7 @@
           case 'add': state.vars[m[1]] = (+state.vars[m[1]] || 0) + (+m[2]); return;
           case 'stamp': state.stamps[m[1]] = today() + (m[2] ? between(+m[2], +(m[3] || m[2])) : 0); return;
           case 'stamp-night': state.stamps[m[1]] = tonight(); return;
+          case 'stamp-real': state.stamps[m[1]] = realToday(); return;
           case 'slot': state.slot = m[1] === 'take' ? rec.id : null; return;
           case 'log': logLine(m[1]); return;
           case 'secret': if (state.secrets.indexOf(m[1]) < 0) state.secrets.push(m[1]); return;   /* once ever (req 180) */
