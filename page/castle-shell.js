@@ -534,13 +534,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (q.id === Q.id || q.floor >= top - 0.1 || qt <= Q.floor + 0.1) return;
       var pts = q.area ? q.area.outer : q.poly, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
       pts.forEach(function (p) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
-      [0.25, 0.75].forEach(function (f) {
+      /* v106 (the 207th): a round place's box is not its face; from the box's edge the ray walks on to the face, and a
+         sample on the wall's own face line finds where the drum meets it (west-tower-way-g's east corner block stood
+         0.3 m into the West Tower spiral beside its arch, a flat face in the drum, as the ray met the box clear of the round) */
+      (q.area ? [0.02, 0.25, 0.75] : [0.25, 0.75]).forEach(function (f) {
         var px = e[0] + nx * t * f, py = e[1] + ny * t * f, lo = 0, hi = 2 * ext;
         [[px, dx, x0, x1], [py, dy, y0, y1]].forEach(function (A) {
           if (Math.abs(A[1]) < 1e-9) { if (A[0] <= A[2] + 0.01 || A[0] >= A[3] - 0.01) lo = Infinity; return; }
           var ta = (A[2] - A[0]) / A[1], tb = (A[3] - A[0]) / A[1];
           lo = Math.max(lo, Math.min(ta, tb)); hi = Math.min(hi, Math.max(ta, tb));
         });
+        if (q.area) while (lo < hi && lo < best && !inArea(q, px + dx * (lo + 0.05), py + dy * (lo + 0.05))) lo += 0.02;
         if (lo < hi && lo < best && (!q.area || inArea(q, px + dx * (lo + 0.05), py + dy * (lo + 0.05)))) best = Math.max(0, lo);
       });
     });
