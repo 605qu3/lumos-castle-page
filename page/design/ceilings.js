@@ -26,7 +26,7 @@
        same rule; faces.base(path) sets where the atlases load from (default ../assets/layers/); faces.list(id) the
        place's face meshes in k order
    CastleCeilings.yawn  { levels(xs, boy, t, o), set(id, k, level), rule }: the sleeping faces' yawn by night (req 1313),
-       its timing; the yawning frame waits on its drawing (see the yawn, below)
+       its timing and its frame (see the yawn, below)
    CastleCeilings.surround(THREE, op, mats)  an opening's surround in its reveal: op { w, h, d, kind } (width, the head
        of the shell's cut over the sill, the wall's depth; kind 'round'); a group whose origin is the opening's foot at
        the wall's middle, x along the wall, z through it; the stone that turns the cut's square head round. */
@@ -132,7 +132,8 @@
   /* the corbels' faces (req 756, the Architect's 716; Godric's picks, ccca86c1): one atlas a state, six faces in a row,
      a cell the image's width over six, 1963 px a metre; a face's cell is chosen by its plane's UVs, so a state is one
      material and a swap is one assignment. In an awake place one or two of its faces (fixed by the place) doze */
-  var FACES = { awake: 'corbels-faces.png', dozing: 'corbels-faces-dozing.png', sleeping: 'corbels-faces-sleeping.png' };
+  var FACES = { awake: 'corbels-faces.png', dozing: 'corbels-faces-dozing.png', sleeping: 'corbels-faces-sleeping.png',
+    yawning: 'corbels-faces-yawning.png' };   /* the yawn (req 1313): Godric's candidate 1 on req 1336, 28 October 2026, 12.15 am */
   var FACE_TILT = 0.35, FACE_ASPECT = 0.351 / 0.393, facesBase = '../assets/layers/', faceMats = {}, faceSets = {}, T3 = null;
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function faceMat(THREE, state) {
@@ -177,8 +178,8 @@
      boy his, t seconds; o { breath (s, the cue's period, else BREATH), start, door (the walk's ends, else xs's) }.
      Returns a level 0 to 1 a face: at most one face a breath, the next ahead of him within RANGE, taken in turn so a
      boy standing still sees them ripple on toward the door; the jaw rides the in-breath and is shut by the out-breath.
-     yawn.set(id, k, level) shows it on a face, the yawning frame above OPEN, else sleeping; it returns false and leaves
-     the face asleep while the yawning atlas is not drawn (a drawing, a spend card for Godric), never a stand-in */
+     yawn.set(id, k, level) shows it on a face, the yawning frame above OPEN, else sleeping (the yawning atlas the
+     sleeping one's six faces, eyes still shut, jaws wide: Godric's candidate 1 on req 1336); false where k has no face */
   var YAWN = { BREATH: 7.0, RANGE: 6.0, OPEN: 0.4, IN: 0.6 };
   function yawnLevels(xs, boy, t, o) {
     o = o || {};
