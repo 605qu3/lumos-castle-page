@@ -636,14 +636,19 @@ function flightLeg(g, up) {
   if (g.path) return up ? g.path.slice() : g.path.slice().reverse().concat([g.footPt]);
   return up ? [g.footPt, g.headPt] : [g.headPt, g.footPt];
 }
-function flightChain(f) {
-  var queue = [{ s: here, pts: [] }], seen = [here], k, node, to, i, g, ends, e, pts;
+/* req 1237's last piece (the Architect's 196th): with a place `goal` and no flight, the same search ends at that place on
+   another floor of his room, and he arrives facing the way he walked (a floor tap's look, req 848), or with the place's
+   own face where `own` (a tap on its thing) */
+function flightChain(f, goal, own) {
+  var queue = [{ s: here, pts: [] }], seen = [here], k, node, to, i, g, ends, e, pts, dir;
   for (k = 0; k < 64 && queue.length; k++) {
     node = queue.shift();
-    to = [f.foot, f.head].filter(function (x) { return sameLevel(node.s.level, x.level); })[0];
+    to = goal ? (sameLevel(node.s.level, goal.level) ? goal : null)
+      : [f.foot, f.head].filter(function (x) { return sameLevel(node.s.level, x.level); })[0];
     if (to && node.s !== here) {
       pts = node.pts.concat(shell.route(node.s.pos, to.pos, to.level) || []);
-      walkTo(pts, to, true);
+      if (goal && !own) { dir =to.pos.clone().sub(pts.length ? pts[pts.length - 1] : node.s.pos); dir.y = 0; }
+      walkTo(pts, to, true, goal && !own && dir.lengthSq() > 1e-4 ? to.pos.clone().add(dir.setLength(10)) : undefined);
       return true;
     }
     for (i = 0; i < shell.flights.length; i++) {
@@ -9579,7 +9584,20 @@ function freeTap(h) {
   if (o.name && named[o.name]) { s = shell.stands.filter(function (x) { return x.name === o.name; })[0]; byThing = true; }
   else {
     var n = h.face ? h.face.normal.clone().transformDirection(o.matrixWorld) : null, fy = here.pos.y - EYE;
-    if (!n || n.y < 0.7 || Math.abs(h.point.y - fy) > 0.3) return false;
+    if (!n) return false;
+    /* req 1237's last piece: a floor of his room off his own (the scroll hall's gallery from the hall, the gallery's
+       underside counting as its floor; the hall's floor from the gallery) walks him to its nearest place by the flights */
+    var gy = n.y > 0.7 ? h.point.y : n.y < -0.7 && (o.userData.landing || /-gallery$/.test(o.name || '')) ? new THREE.Box3().setFromObject(o).max.y : null;
+    if (gy != null && Math.abs(gy - fy) > 0.3) {
+      var far = null, fd = 1e9;
+      FREE.forEach(function (x) {
+        if (sameLevel(x.level, here.level) || Math.abs(x.pos.y - EYE - gy) > 0.3 || (named[x.name] && named[x.name].tapOnly)) return;
+        var dd = Math.hypot(x.pos.x - h.point.x, x.pos.z - h.point.z);
+        if (dd < fd) { fd = dd; far = x; }
+      });
+      return far ? flightChain(null, far) : false;
+    }
+    if (n.y < 0.7) return false;
     var best = 1e9;
     FREE.forEach(function (x) {
       if (!sameLevel(x.level, here.level)) return;
@@ -9588,7 +9606,8 @@ function freeTap(h) {
       if (dd < best) { best = dd; s = x; }
     });
   }
-  if (!s || s === here || !sameLevel(s.level, here.level)) return false;
+  if (!s || s === here) return false;
+  if (!sameLevel(s.level, here.level)) return byThing ? flightChain(null, s, !!(named[s.name] && named[s.name].face)) : false;
   var pts = shell.route(here.pos, s.pos, s.level) || [], walkLook = null;
   if (!byThing || !(named[s.name] && named[s.name].face)) {
     var dir = s.pos.clone().sub(pts.length ? pts[pts.length - 1] : here.pos); dir.y = 0;
@@ -11035,7 +11054,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
   /* a stand by name at once, and the head set and held within its limits (the shots at both limits) */
   standNamed: function (n) {
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
-    tween = null; legs = []; here = s; hy = hyT = hp = hpT = 0; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
+    tween = null; legs = []; here = s; hereLook = null; hy = hyT = hp = hpT = 0; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
   },
   look: function (y, p) { var lm = limits(here); hy = hyT = lm.yaw == null ? y : clamp(y, -lm.yaw, lm.yaw); hp = hpT = clamp(p, lm.lo, lm.hi); return { yaw: hy, pitch: hp }; },
   /* a shut door's tap; x and y (metres across and up from the leaf's middle) put it on a spot, as on a knot */
