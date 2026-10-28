@@ -88,29 +88,48 @@ function findPlace(M, id) {
       wall: r.wall || WALL_T, walls: null, rec: r };
   }
   /* v90 (model v218, the Astronomy Tower's top, req 663): a round room open to the sky (`open_sky`): the drum's roof inside
-     a breast-high parapet, and a turret standing up through its edge (`notch`: centre, r, h) a notch in the plan, its walls
-     as tall as the turret and its door cut there; no ceiling, the sky over it. One loop, each side its own height. */
+     its parapet, and a turret standing up through the edge (a notch in the plan, its walls as tall as the turret, its door
+     cut there); no ceiling, the sky over it. One loop, each side its own height. v92 (model v219): the parapet and the turret
+     read from the room's `tower` (the model's towers: `platform.parapet.crenellated`, twenty merlons round the ring, and
+     `turret`), the merlons' sides 2.2 high and the gaps at the breast; with no tower, a plain breast and a `notch` of its own. */
   if (r && r.shape && r.shape.circle && r.open_sky) {
     var ob = zb != null ? zb : levelZ(M, r.level), oc = toSite(M, r.group, r.shape.circle), orr = r.shape.r, osk = r.open_sky;
-    var oloop = [], oh = [], on = osk.notch;
+    var otw = osk.tower ? (M.towers || []).filter(function (x) { return x.id === osk.tower; })[0] : null, opf = otw && otw.platform, ocr = opf && opf.parapet.crenellated;
+    var ostep = null, oBreast = ocr ? ocr.sill : osk.breast, oloop = [], oh = [], on = osk.notch || (otw && otw.turret ? { c: otw.turret.c, r: otw.turret.r, h: otw.turret.cap - ob } : null);
     if (on) {
       var dx = on.c[0] - oc[0], dy = on.c[1] - oc[1], dd = Math.hypot(dx, dy), th = Math.atan2(dy, dx) * 180 / Math.PI;
       var aa = (orr * orr - on.r * on.r + dd * dd) / (2 * dd), al = Math.acos(Math.max(-1, Math.min(1, aa / orr))) * 180 / Math.PI;
-      var nOut = Math.max(8, Math.ceil((360 - 2 * al) / 12));
-      oloop = arcPts(oc, orr, th + al, th - al + 360, nOut);                 /* the long way round, the parapet's inner face */
+      var a0 = th + al, a1 = th - al + 360, cuts = [a0, a1], mer = [];
+      if (ocr) {   /* merlon k centred on bearing first_merlon + k * 360 / bays, its width taken at the parapet's middle line */
+        var half = ocr.merlon_w / 2 / ((opf.parapet.inner_r + opf.parapet.outer_r) / 2) * 180 / Math.PI;
+        for (var mk = 0; mk < ocr.bays; mk++) for (var sh = -360; sh <= 360; sh += 360) {
+          var mc = 90 - (ocr.first_merlon + mk * 360 / ocr.bays) + sh;
+          if (mc + half > a0 && mc - half < a1) { mer.push([mc - half, mc + half]); [mc - half, mc + half].forEach(function (c) { if (c > a0 + 0.02 && c < a1 - 0.02) cuts.push(c); }); }
+        }
+      } else { for (var ck = 1; ck < Math.ceil((a1 - a0) / 12); ck++) cuts.push(a0 + (a1 - a0) * ck / Math.ceil((a1 - a0) / 12)); }
+      cuts.sort(function (p, q) { return p - q; });
+      for (var ci = 0; ci < cuts.length - 1; ci++) {
+        var mid = (cuts[ci] + cuts[ci + 1]) / 2;
+        oloop.push(arcPts(oc, orr, cuts[ci], cuts[ci], 1)[0]);
+        oh.push(mer.some(function (m) { return mid > m[0] && mid < m[1]; }) ? ocr.merlon_top : oBreast);
+      }
+      oloop.push(arcPts(oc, orr, a1, a1, 1)[0]);
       var pb = oloop[oloop.length - 1], pa = oloop[0], ph0 = Math.atan2(oc[1] - on.c[1], oc[0] - on.c[0]);
       var wrap = function (v) { while (v > Math.PI) v -= 2 * Math.PI; while (v < -Math.PI) v += 2 * Math.PI; return v; };
       var db = wrap(Math.atan2(pb[1] - on.c[1], pb[0] - on.c[0]) - ph0), da = wrap(Math.atan2(pa[1] - on.c[1], pa[0] - on.c[0]) - ph0);
       var nIn = Math.max(8, Math.ceil(Math.abs(da - db) * on.r / 0.7));       /* the turret's face in sides about 0.7 long */
-      for (var ik = 1; ik <= nIn; ik++) { var ia = ph0 + db + (da - db) * ik / nIn; oloop.push([on.c[0] + on.r * Math.cos(ia), on.c[1] + on.r * Math.sin(ia)]); }
-      oloop.pop();   /* the last point is the first again */
-      /* oh[i] is the side from oloop[i] to oloop[i+1]: the parapet's nOut sides first, the turret's after */
-      oh = oloop.map(function (p, i) { return i < nOut ? osk.breast : on.h; });
+      for (var ik = 1; ik <= nIn; ik++) { var ia = ph0 + db + (da - db) * ik / nIn; oloop.push([on.c[0] + on.r * Math.cos(ia), on.c[1] + on.r * Math.sin(ia)]); oh.push(on.h); }
+      oloop.pop();   /* the last point is the first again; oh[i] is the side from oloop[i] to the next: the parapet's first, the turret's after */
+      if (opf && opf.step) {   /* v92: the step round the parapet's foot (`platform.step`: inner r, h), cut by the turret's face as the floor is */
+        var sr = opf.step.inner_r, sal = Math.acos(Math.max(-1, Math.min(1, (sr * sr + dd * dd - on.r * on.r) / (2 * sr * dd)))) * 180 / Math.PI, sn = Math.ceil((360 - 2 * sal) / 7.5);
+        var sin_ = arcPts(oc, sr, th + sal, th - sal + 360, sn), sout = arcPts(oc, orr, th - al + 360, th + al, Math.ceil((360 - 2 * al) / 7.5));
+        ostep = { inner: sin_, ring: sin_.concat(sout), h: opf.step.h };
+      }
     } else {
-      oloop = arcPts(oc, orr, 0, 360, 30).slice(0, 30); oh = oloop.map(function () { return osk.breast; });
+      oloop = arcPts(oc, orr, 0, 360, 30).slice(0, 30); oh = oloop.map(function () { return oBreast; });
     }
     return { id: r.id, name: r.name, kind: 'room', poly: oloop, loops: [oloop], loopH: [oh], area: { outer: oloop, holes: [] },
-      floor: ob + (r.floor || 0), ceiling: null, wall: r.wall || 0.5, walls: null, rec: r, sky: { breast: osk.breast, merlons: 0 } };
+      floor: ob + (r.floor || 0), ceiling: null, wall: r.wall || (opf ? opf.parapet.outer_r - opf.parapet.inner_r : 0.5), walls: null, rec: r, sky: { breast: oBreast, merlons: 0 }, step: ostep };
   }
   /* v10: a round room, SIDES sides about the circle, one side's middle on its first door, its wall as deep as its
      deepest loop (the West Tower's drum, 3.2) */
@@ -580,6 +599,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     else {
       var floor = quad(x1 - x0, y1 - y0, mats.floor, 'floor');
       floor.rotation.x = -Math.PI / 2; floor.position.copy(c); floor.name = Q.id + '-floor'; group.add(floor);
+    }
+    if (Q.step) {   /* v92 (model v219, ledger line 42): the step round the parapet's foot, its top a floor's stone h up, its riser inward */
+      var stm = areaMesh({ area: { outer: Q.step.ring, holes: [] } }, Q.floor + Q.step.h, mats.floorD, 'floor'); stm.name = Q.id + '-step'; group.add(stm);
+      var spos = [], si = Q.step.inner;
+      for (var sk = 0; sk < si.length - 1; sk++) {
+        var s0 = toLocal(si[sk][0], si[sk][1], Q.floor), s1 = toLocal(si[sk + 1][0], si[sk + 1][1], Q.floor), t0 = toLocal(si[sk][0], si[sk][1], Q.floor + Q.step.h), t1 = toLocal(si[sk + 1][0], si[sk + 1][1], Q.floor + Q.step.h);
+        [s0, s1, t1, s0, t1, t0].forEach(function (v) { spos.push(v.x, v.y, v.z); });
+      }
+      var sgeo = new THREE.BufferGeometry(); sgeo.setAttribute('position', new THREE.Float32BufferAttribute(spos, 3)); sgeo.computeVertexNormals();
+      var srm = F.register(new THREE.Mesh(sgeo, mats.floorD), LAYER.floor); srm.name = Q.id + '-step-riser'; group.add(srm);
     }
     /* v31 (req 643's second half, Design's ceilings.js; the build sequence's wave 1): a painted room's vault, barrel,
        groin, beams, ribs or star as its row names it (the model's vault block wins), its pieces the room's own; where
