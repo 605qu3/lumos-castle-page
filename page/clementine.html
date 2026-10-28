@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Clementine's study, greybox</title>
+<style>
+  :root {
+    --bg: #0b0a09;
+    --hud-bg: rgba(24, 21, 18, 0.78);
+    --hud-fg: #d9d2c6;
+    --hud-dim: #8e877c;
+    --hud-on: #e9b86a;
+    --hud-line: rgba(255, 255, 255, 0.16);
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0a09; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0a09; }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    font-family: -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+  }
+  #c { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+  #hud {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  #stats {
+    font-size: 12px;
+    line-height: 1.35;
+    background: var(--hud-bg);
+    padding: 6px 9px;
+    border-radius: 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--hud-dim);
+    white-space: pre;
+  }
+  #btns { display: flex; flex-wrap: wrap; gap: 6px; max-width: 320px; pointer-events: auto; }
+  button {
+    font: 500 13px/1 -apple-system, system-ui, "Segoe UI", sans-serif;
+    color: var(--hud-fg);
+    background: var(--hud-bg);
+    border: 1px solid var(--hud-line);
+    border-radius: 6px;
+    min-height: 38px;
+    min-width: 44px;
+    padding: 0 12px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+  }
+  button.on { color: var(--hud-on); border-color: var(--hud-on); }
+  button:focus-visible { outline: 2px solid var(--hud-on); outline-offset: 2px; }
+  #back {
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+    min-height: 46px;
+    padding: 0 18px;
+    font-size: 15px;
+  }
+  #help {
+    position: fixed;
+    left: calc(env(safe-area-inset-left, 0px) + 10px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    max-width: min(420px, calc(100vw - 20px));
+    background: var(--hud-bg);
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.45;
+    pointer-events: none;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<!--
+Clementine's study in grey (the study lane's page, second session, 28 October 2026; docs/handoff/clementine.md). Her
+workroom in autumn 1897, at real size, nothing drawn: every piece a grey placeholder.
+- The building is the Architect's. page/castle-shell.js builds the study's floor, ceiling and round wall from
+  page/castle-model.js, so a model change re-shapes this room. Since 28 October 2026 (req 1390, the Architect's 201st) the
+  shell draws the study as a D with its window and the bookcase cut, so the page stands no stand-ins.
+- What stands where is Interiors' schedule, docs/interiors/clementines-study.md, *The things* and *1897: her
+  workroom*, its numbers in the block marked SCHEDULE below; a move past what it allows goes back to Interiors.
+- The room's own frame: u from the study's centre toward the window, t across it to the right, metres, built in the
+  group R (x is u, z is t). The window's bearing turns R about the centre. He stands at u 0.45, t -0.12, eye 1.35.
+- The room shows what the clock says (docs/room-states.md, the study's chain page/events/study.json): her lamp lit
+  from 6 pm to 10 pm, from the runtime's cues, with ?time= and ?hour= to see it. Nothing glows and nothing marks
+  a thing to tap (docs/ministry/readers/GL.md); the one light is her lamp's own flame.
+- The three things held for Story (the box and key, her hourglass notes, her photograph) are not here.
+-->
+<canvas id="c" tabindex="0" aria-label="Clementine's study, greybox"></canvas>
+<div id="hud">
+  <div id="stats">starting</div>
+  <div id="btns">
+    <button type="button" data-act="layers">Layers</button>
+    <button type="button" data-act="res">Res</button>
+    <button type="button" data-act="exp">Exp</button>
+    <button type="button" data-act="reset">Reset</button>
+    <button type="button" data-act="help">?</button>
+  </div>
+</div>
+<button id="back" type="button" hidden>Back</button>
+<div id="help">Drag to look around.</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="castle.js?v=15"></script>
+<script src="castle-model.js?v=488"></script>
+<script src="castle-paint.js?v=84"></script>
+<script src="design/tones.js?v=6"></script>
+<script src="design/stone-face.js?v=1"></script>
+<script src="design/ceilings.js?v=4"></script>
+<script src="design/panelling.js?v=2"></script>
+<script src="castle-shell.js?v=70"></script>
+<script src="castle-events.js?v=39"></script>
+<script src="castle-sound.js?v=1"></script>
+<script>
+(function () {
+'use strict';
+
+var Q = new URLSearchParams(location.search);
+var kit = castleFrame({ background: 0x0b0a09, fog: 0.004, zoom: { max: 3 }, onAct: function (act) { if (act === 'reset') { hyT = hpT = 0; } } });
+var canvas = kit.canvas, clamp = kit.clamp, lerp = kit.lerp, col = kit.col, renderer = kit.renderer, scene = kit.scene, camera = kit.camera;
+camera.far = 60; camera.updateProjectionMatrix();
+
+var shell = CastleShell.build(kit, CASTLE_MODEL, 'study', { from: kit.from, paint: ['study'] });
+if (!shell) { kit.helpEl.textContent = 'The study is not in the castle model.'; return; }
+scene.add(shell.group);
+scene.add(new THREE.HemisphereLight(0xfff2dc, 0x6a5a48, 1.0));
+
+/* the clock: the runtime's cues for this place (page/events/study.json); ?hour=19 stands in for the real hour */
+var events = window.CastleEvents ? CastleEvents.start({ chains: 'all', place: 'study', drawRoom: function () { if (READY) draw(); }, cues: {}, showLines: function () {} }) : null;
+var READY = false;
+
+/* ================= SCHEDULE: Interiors' numbers (docs/interiors/clementines-study.md), cited, never settled here */
+var D2R = Math.PI / 180;
+var WIN_DEG = 26.8;   /* study-window's bearing on the study (the model): the room's u axis turned from the shell's east toward north */
+var S = {
+  r: 2.2, wall: 0.35, eye: 1.35, stand: [0.45, -0.12], ceil: 3.0,
+  win: { w: 0.6, sill: 0.75, h: 0.75 },
+  bookcase: { w: 1.2, hinge: 0.51 },
+  desk: { w: 0.58, back: 2.12, front: 1.57, lo: 0.68, hi: 0.75, strip: 0.12 },
+  chair: { w: 0.43, d: 0.41, back: 1.31, seat: 0.45, high: 0.88 },
+  lamp: { t: -0.21, base: 0.15, h: 0.5 },
+  bottle: { t: 0.22, h: 0.15 },
+  jars: { t: [-0.08, -0.01, 0.06], w: 0.05, h: 0.07 },
+  brush: { t0: 0.10, t1: 0.17 },
+  recipe: { t0: -0.27, t1: -0.07, u0: 1.65, u1: 1.80 },
+  bird: { t: 0.15, len: 0.10 },
+  plan: { deg: -42, w: 0.6, y0: 1.0, y1: 1.7 },
+  shelves: { deep: 0.28, gap: 0.32, off: 22, end: 87, right: { hi: 2.95 }, left: { lo: 2.0, hi: 2.95 } },
+  ladder: { deg: 28, foot: 0.45, rail: 2.3, w: 0.45 }
+};
+
+/* the room's own frame: R's x is u, its z is t, its y is up, turned about the shell's centre by the window's bearing */
+var CEN = new THREE.Vector3();   /* the D's circle centre in the shell's frame (its origin is the D's middle): found from the floor, the flat's midpoint */
+(function () {
+  var fl = null, c0 = Math.cos(WIN_DEG * D2R), s0 = Math.sin(WIN_DEG * D2R), uMin = 1e9, tLo = 1e9, tHi = -1e9, i, p, uu, tt, pos;
+  shell.group.traverse(function (o) { if (o.name === 'study-floor') fl = o; });
+  if (!fl) return;
+  pos = fl.geometry.attributes.position;
+  for (i = 0; i < pos.count; i++) { p = new THREE.Vector3().fromBufferAttribute(pos, i).applyMatrix4(fl.matrixWorld); uu = p.x * c0 - p.z * s0; if (uu < uMin) uMin = uu; }
+  for (i = 0; i < pos.count; i++) { p = new THREE.Vector3().fromBufferAttribute(pos, i).applyMatrix4(fl.matrixWorld); uu = p.x * c0 - p.z * s0; if (uu < uMin + 0.01) { tt = p.x * s0 + p.z * c0; tLo = Math.min(tLo, tt); tHi = Math.max(tHi, tt); } }
+  tt = (tLo + tHi) / 2; CEN.set(uMin * c0 + tt * s0, 0, -uMin * s0 + tt * c0);
+})();
+var R = new THREE.Group(); R.rotation.y = WIN_DEG * D2R; R.position.set(CEN.x, 0, CEN.z); scene.add(R);
+function ut(u, t, y, v) { return (v || new THREE.Vector3()).set(u, y, t); }
+function mat(hex, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: col(hex), roughness: 0.9, metalness: 0 }, o || {})); }
+var M = { oak: mat(0x7a6a58), dark: mat(0x55483c), light: mat(0x9a8e7e), paper: mat(0xc9c2b4), red: mat(0xa23a32), glass: mat(0x4a5560, { roughness: 0.3 }),
+          brass: mat(0xa68a4a, { roughness: 0.5, metalness: 0.5 }), jar: mat(0x8a9a94, { transparent: true, opacity: 0.75 }), book: mat(0x6a5c4e),
+          wall: mat(0x8c8070), flame: new THREE.MeshBasicMaterial({ color: 0xffd080 }) };
+function add(g, m, u, t, y, o) { var x = new THREE.Mesh(g, m); x.position.set(u, y, t); if (o) { if (o.ry) x.rotation.y = o.ry; if (o.rz) x.rotation.z = o.rz; if (o.rx) x.rotation.x = o.rx; } (o && o.p || R).add(x); return x; }
+/* a box du long (along u), h high, dt wide (along t), its foot centred at (u, t, y0) */
+function box(du, h, dt, u, t, y0, m, o) { return add(new THREE.BoxGeometry(du, h, dt), m, u, t, y0 + h / 2, o); }
+/* a sector of the ring from r0 to r1, between angles a0 and a1 (degrees from u toward t), from y0 to y1 */
+function sector(r0, r1, a0, a1, y0, y1, m) {
+  var sh = new THREE.Shape(), n = Math.max(2, Math.ceil(Math.abs(a1 - a0) / 3)), i, a;
+  for (i = 0; i <= n; i++) { a = (a0 + (a1 - a0) * i / n) * D2R; sh[i ? 'lineTo' : 'moveTo'](r1 * Math.cos(a), r1 * Math.sin(a)); }
+  for (i = n; i >= 0; i--) { a = (a0 + (a1 - a0) * i / n) * D2R; sh.lineTo(r0 * Math.cos(a), r0 * Math.sin(a)); }
+  var g = new THREE.ExtrudeGeometry(sh, { depth: y1 - y0, bevelEnabled: false });
+  var x = new THREE.Mesh(g, m); x.rotation.x = Math.PI / 2; x.position.y = y1; R.add(x); return x;   /* shape x is u, shape y is t, extrude runs down from y1 */
+}
+function polar(r, deg) { return [r * Math.cos(deg * D2R), r * Math.sin(deg * D2R)]; }
+
+/* ---- her desk, a davenport: body, slope, back strip */
+var D = S.desk, slopeLen = (D.back - D.strip) - D.front, slopeAng = Math.atan2(D.hi - D.lo, slopeLen);
+box(D.back - D.front, D.lo - 0.04, D.w, (D.back + D.front) / 2, 0, 0, M.oak).name = 'desk-body';
+box(D.strip, 0.04, D.w, D.back - D.strip / 2, 0, D.hi - 0.04, M.oak).name = 'desk-strip';
+var slope = box(slopeLen / Math.cos(slopeAng), 0.02, D.w, D.front + slopeLen / 2, 0, (D.lo + D.hi) / 2 - 0.02, M.dark, { rz: slopeAng });
+slope.name = 'desk-slope';
+function slopeY(u) { return D.lo + (u - D.front) * Math.tan(slopeAng); }
+
+/* ---- her chair, tucked: seat, back, legs; her ribbon over its back (bright red in 1897) */
+var C = S.chair, cu = C.back + C.d / 2;
+box(C.d, 0.03, C.w, cu, 0, C.seat - 0.03, M.light).name = 'chair-seat';
+box(0.03, C.high - C.seat, C.w, C.back, 0, C.seat, M.light).name = 'chair-back';
+[[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (k) { box(0.03, C.seat - 0.03, 0.03, cu + k[0] * (C.d / 2 - 0.02), k[1] * (C.w / 2 - 0.02), 0, M.light); });
+box(0.035, 0.12, 0.035, C.back - 0.025, 0.05, C.high - 0.16, M.red).name = 'ribbon';
+
+/* ---- on the back strip: her lamp (lit when the clock says), the glaze jars and the brush, the ink bottle */
+var LAMP = new THREE.Group(); R.add(LAMP);
+function lampPart(g, m, y) { var x = new THREE.Mesh(g, m); x.position.set(D.back - D.strip / 2, y, S.lamp.t); LAMP.add(x); return x; }
+lampPart(new THREE.CylinderGeometry(0.075, 0.075, 0.03, 16), M.brass, D.hi + 0.015);
+lampPart(new THREE.CylinderGeometry(0.02, 0.03, 0.2, 12), M.brass, D.hi + 0.13);
+lampPart(new THREE.SphereGeometry(0.06, 14, 10), M.jar, D.hi + 0.30);
+var FLAME = lampPart(new THREE.SphereGeometry(0.02, 8, 6), M.flame, D.hi + 0.30);
+var lampLight = new THREE.PointLight(0xffd9a0, 0, 7, 2); lampLight.position.set(D.back - D.strip / 2, D.hi + 0.30, S.lamp.t); R.add(lampLight);
+box(0.05, S.bottle.h, 0.05, D.back - D.strip / 2, S.bottle.t, D.hi, M.jar).name = 'ink-bottle';
+S.jars.t.forEach(function (t, i) { add(new THREE.CylinderGeometry(S.jars.w / 2, S.jars.w / 2, S.jars.h, 12), M.jar, D.back - D.strip / 2, t, D.hi + S.jars.h / 2).name = 'glaze-jar-' + i; });
+box(0.15, 0.012, 0.012, D.back - D.strip / 2, (S.brush.t0 + S.brush.t1) / 2, D.hi, M.dark).name = 'brush';
+
+/* ---- on the slope: her recipe, flush, and the half-folded bird at the lip */
+var RC = S.recipe;
+add(new THREE.BoxGeometry((RC.u1 - RC.u0) / Math.cos(slopeAng), 0.004, RC.t1 - RC.t0), M.paper, (RC.u0 + RC.u1) / 2, (RC.t0 + RC.t1) / 2, slopeY((RC.u0 + RC.u1) / 2) + 0.004, { rz: slopeAng }).name = 'recipe';
+add(new THREE.BoxGeometry(S.bird.len, 0.04, 0.05), M.paper, D.front + 0.08, S.bird.t, slopeY(D.front + 0.08) + 0.025, { rz: slopeAng }).name = 'paper-bird';
+
+/* ---- the curved wall: the shelves (0.28 deep), the ladder's rail, her plan */
+var SH = S.shelves, rIn = S.r - 0.03 - SH.deep, rightA = [SH.off, SH.end], leftA = [-SH.end, -SH.off];
+function bank(a, y0, y1, name) {
+  var boards = Math.round((y1 - y0) / SH.gap), i, y;
+  for (i = 0; i <= boards; i++) { y = y0 + (y1 - y0) * i / boards; sector(rIn, S.r - 0.03, a[0], a[1], y - 0.01, y + 0.01, M.oak).name = name + '-board-' + i; }
+  [a[0], a[1]].forEach(function (d) { var p = polar(S.r - SH.deep / 2, d); box(SH.deep, y1 - y0, 0.03, p[0], p[1], y0, M.oak, { ry: -d * D2R }).name = name + '-upright'; });
+}
+bank(rightA, 0.02, SH.right.hi, 'shelf-right');
+bank(leftA, SH.left.lo, SH.left.hi, 'shelf-left');
+/* on the right-hand shelves: the glaze tries at a girl's reach (the shelf near 1.1 and the one above), paper at 0.9, books the rest */
+var rnd = (function (seed) { return function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; }; })(1897);
+var shelfY = []; for (var si = 0; si <= Math.round((SH.right.hi - 0.02) / SH.gap); si++) shelfY.push(0.02 + (SH.right.hi - 0.02) * si / Math.round((SH.right.hi - 0.02) / SH.gap));
+function onShelf(y) { return shelfY.reduce(function (b, v) { return Math.abs(v - y) < Math.abs(b - y) ? v : b; }); }
+var jarShelf = onShelf(1.1);
+var JARS = 0;
+for (var ja = SH.off + 8; ja < SH.end - 6 && JARS < 14; ja += 4.2) {
+  [jarShelf, jarShelf + SH.gap].forEach(function (y, k) {
+    var p = polar(S.r - SH.deep / 2 - 0.02, ja + k * 1.6); add(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 10), M.jar, p[0], p[1], y + 0.05).name = 'glaze-try';
+    JARS++;
+  });
+}
+var pp = polar(S.r - SH.deep / 2, SH.off + 14), pY = onShelf(0.9);
+box(0.22, 0.06, 0.16, pp[0], pp[1], pY + 0.01, M.paper, { ry: -(SH.off + 14) * D2R }).name = 'paper-stack';
+var BOOKS = 0;
+shelfY.slice(0, -1).forEach(function (y, k) {
+  if (y === jarShelf || y === jarShelf + SH.gap || y === pY) return;
+  for (var a = SH.off + 2; a < SH.end - 3; a += 3.4) {
+    if (rnd() < 0.18) continue;
+    var h = 0.18 + rnd() * 0.1, p = polar(S.r - SH.deep / 2, a);
+    box(0.2, h, 0.04, p[0], p[1], y + 0.01, M.book, { ry: -a * D2R }).name = 'book'; BOOKS++;
+  }
+});
+shelfY.filter(function (y) { return y >= SH.left.lo - 0.01; }).slice(0, -1).forEach(function (y) {
+  for (var a = -SH.end + 3; a < -SH.off - 3; a += 3.4) {
+    if (rnd() < 0.18) continue;
+    var h = 0.18 + rnd() * 0.1, p = polar(S.r - SH.deep / 2, a);
+    box(0.2, h, 0.04, p[0], p[1], y + 0.01, M.book, { ry: -a * D2R }).name = 'book'; BOOKS++;
+  }
+});
+/* the brass rail along the right-hand shelves' face at 2.3, and the ladder resting at 28 degrees, foot 0.45 out, its pitch steep */
+var rail = new THREE.Mesh(new THREE.TorusGeometry(rIn - 0.04, 0.012, 6, 40, (SH.end - 6 - 24) * D2R), M.brass);
+rail.rotation.x = Math.PI / 2; rail.rotation.z = 24 * D2R; rail.position.y = S.ladder.rail; rail.scale.set(1, 1, 1); R.add(rail); rail.name = 'rail';
+(function () {
+  var L = S.ladder, top = polar(rIn - 0.04, L.deg), foot = polar(rIn - L.foot, L.deg), dx = top[0] - foot[0], dz = top[1] - foot[1], run = Math.hypot(dx, dz);
+  var len = Math.hypot(run, L.rail), g = new THREE.Group(); g.position.set(foot[0], 0, foot[1]); g.rotation.y = -Math.atan2(dz, dx); R.add(g); g.name = 'ladder';
+  var tilt = new THREE.Group(); g.add(tilt); tilt.rotation.z = Math.atan2(run, L.rail) * -1;   /* leans back toward the rail */
+  [-1, 1].forEach(function (s) { var x = new THREE.Mesh(new THREE.BoxGeometry(0.03, len, 0.05), M.oak); x.position.set(0, len / 2, s * L.w / 2); tilt.add(x); });
+  for (var k = 1; k < Math.floor(len / 0.28); k++) { var r = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, L.w, 8), M.oak); r.rotation.x = Math.PI / 2; r.position.set(0, k * 0.28, 0); tilt.add(r); }
+})();
+var PL = S.plan, pc = polar(S.r - 0.05, PL.deg);
+box(0.012, PL.y1 - PL.y0, PL.w, pc[0], pc[1], PL.y0, M.paper, { ry: -PL.deg * D2R }).name = 'castle-plan';
+
+/* ================= what the clock says: her lamp lit 6 to 10 pm (page/events/study.json) */
+function hourNow() { return Q.has('hour') ? +Q.get('hour') : new Date().getHours(); }
+var STATE = {};
+function draw() {
+  var cues = events ? events.cues() : [], lit = cues.some(function (c) { return c.indexOf('on the desk her lamp is lit') === 0; });
+  if (!events && hourNow() >= 18 && hourNow() < 22) lit = true;
+  if (Q.get('lamp') === 'on') lit = true; else if (Q.get('lamp') === 'off') lit = false;
+  FLAME.visible = lit; lampLight.intensity = lit ? 1.4 : 0;
+  STATE = { lit: lit, cues: cues.slice(0, 12) };
+}
+READY = true;
+draw();
+
+/* ================= standing and looking (the shell's way; one stand, as the model gives it, set to the schedule's) */
+var su = S.stand[0], st = S.stand[1], c = Math.cos(WIN_DEG * D2R), sn = Math.sin(WIN_DEG * D2R);
+/* u and t as the shell's local x and z: u = (c, -sn), t = (sn, c) */
+var POS = new THREE.Vector3(CEN.x + su * c + st * sn, S.eye, CEN.z - su * sn + st * c), LOOK = new THREE.Vector3(POS.x + c * 10, S.eye - 0.4133, POS.z - sn * 10);
+var LIM = shell.stands[0].lim;
+var hy = 0, hp = 0, hyT = 0, hpT = 0, lookTmp = new THREE.Vector3();
+function limits() {
+  var d = LOOK.clone().sub(POS), el0 = Math.atan2(d.y, Math.hypot(d.x, d.z));
+  return { yaw: LIM.turn >= 180 ? null : LIM.turn * D2R, lo: Math.min(0, LIM.down * D2R - el0), hi: Math.max(0, Math.min(88 * D2R, LIM.up * D2R) - el0) };
+}
+function headPose(pos, look) {
+  pos.copy(POS);
+  var d = LOOK.clone().sub(POS), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
+  look.set(pos.x + Math.sin(a) * Math.cos(el) * 10, pos.y + Math.sin(el) * 10, pos.z + Math.cos(a) * Math.cos(el) * 10);
+}
+var dragging = false, sx = 0, sy = 0, px = 0, py = 0;
+canvas.addEventListener('pointerdown', function (e) { dragging = true; sx = px = e.clientX; sy = py = e.clientY; try { canvas.setPointerCapture(e.pointerId); } catch (err) {} e.preventDefault(); });
+canvas.addEventListener('pointermove', function (e) {
+  if (!dragging) return;
+  var dx = e.clientX - px, dy = e.clientY - py; px = e.clientX; py = e.clientY;
+  var lm = limits(); hyT = lm.yaw == null ? hyT - dx * 0.003 : clamp(hyT - dx * 0.003, -lm.yaw, lm.yaw); hpT = clamp(hpT - dy * 0.003, lm.lo, lm.hi);
+});
+function endDrag(e) { if (!dragging) return; dragging = false; if (Math.abs(e.clientX - sx) + Math.abs(e.clientY - sy) <= 8 && e.type === 'pointerup' && kit.tapped) kit.tapped(e.clientX, e.clientY); }
+canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+headPose(camera.position, lookTmp); camera.lookAt(lookTmp);
+kit.reveal();
+
+var clock = new THREE.Clock(), T = 0;
+renderer.setAnimationLoop(function () {
+  var dt = Math.min(0.05, clock.getDelta()), s = Math.min(1, dt * 7);
+  T += dt;
+  hy = lerp(hy, hyT, s); hp = lerp(hp, hpT, s);
+  FLAME.scale.setScalar(1 + 0.12 * Math.sin(T * 9) * Math.sin(T * 5.3));
+  if (window.TOP) { camera.position.set(0, 9, 0.001); camera.up.set(1, 0, 0); camera.lookAt(0, 0, 0); } else { camera.up.set(0, 1, 0); headPose(camera.position, lookTmp); camera.lookAt(lookTmp); }
+  renderer.render(scene, camera); kit.stats(dt);
+});
+
+/* hooks for automated checks; harmless in normal use */
+window.lumosGreybox = { scene: scene, camera: camera, shell: shell, kit: kit, R: R, events: events, state: function () { return STATE; }, redraw: draw,
+  counts: function () { return { books: BOOKS, glazeTries: JARS }; },
+  look: function (y, p) { var lm = limits(); hy = hyT = lm.yaw == null ? y : clamp(y, -lm.yaw, lm.yaw); hp = hpT = clamp(p, lm.lo, lm.hi); return { yaw: hy, pitch: hp }; },
+  head: function () { var lm = limits(); return { yaw: hy, pitch: hp, lo: lm.lo, hi: lm.hi }; } };
+})();
+</script>
+</body>
+</html>
