@@ -544,7 +544,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       /* v106 (the 207th): a round place's box is not its face; from the box's edge the ray walks on to the face, and a
          sample on the wall's own face line finds where the drum meets it (west-tower-way-g's east corner block stood
          0.3 m into the West Tower spiral beside its arch, a flat face in the drum, as the ray met the box clear of the round) */
-      (q.area ? [0.02, 0.25, 0.75] : [0.25, 0.75]).forEach(function (f) {
+      /* v110 (the 211th, the sweep): a rect place also gets a sample by the wall's back face; the third floor's north
+         corridor's south-east block stood 0.2 m into the stair hall, which began at three quarters of its 0.8 m wall */
+      (q.area ? [0.02, 0.25, 0.75] : [0.25, 0.75, 0.95]).forEach(function (f) {
         var px = e[0] + nx * t * f, py = e[1] + ny * t * f, lo = 0, hi = 2 * ext;
         [[px, dx, x0, x1], [py, dy, y0, y1]].forEach(function (A) {
           if (Math.abs(A[1]) < 1e-9) { if (A[0] <= A[2] + 0.01 || A[0] >= A[3] - 0.01) lo = Infinity; return; }
