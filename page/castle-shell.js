@@ -1271,6 +1271,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           R.meshes.forEach(function (m) { if (m.parent) m.parent.remove(m); });
           R.gone = true; (out.sharedLines = out.sharedLines || []).push(Q.id + ' keeps ' + R.owner + "'s line");
         } else YL.push([r0, r1, y0, y1]);
+        (out.sharedPairs = out.sharedPairs || []).push({ later: Q.id + ' ' + i, L: +L.toFixed(2), earlier: R.owner, RL: +Math.abs(sb - sa).toFixed(2), s: [+sa.toFixed(2), +sb.toFixed(2)], plain: R.plain, gone: R.gone });
       });
       if (YL.length) (out.sharedLines = out.sharedLines || []).push(Q.id + ' wall ' + i + ' leaves ' + YL.length + ' stretch(es)');
       wallRuns.push(run);
@@ -1816,15 +1817,21 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (Q && !Q.glasshouse && (Q.poly || Q.area) && Q.floor < P.floor + 2.5 && (Q.ceiling != null ? Q.ceiling : Q.floor + 3) > P.floor + 0.5) gapQs.push(Q);
     });
   }
-  buildPlace(P);
+  if (!o.floor) buildPlace(P);
   /* v94 (req 1335, Godric's 1 at 12.14 am, 28 October 2026: "whole floor builds"): o.floor builds every painted place on
      this place's floor in the same frame ('all': every place the model gives there), so he walks the floor's length; a
      door between two built places takes him through on either side (its far stand, below); a stair, a shaft or a room
      with its own page is still a page away. out.floorBuilt counts the places and the build's milliseconds */
   if (o.floor) {
-    floorQs.forEach(function (Q) {
-      if (out.places.some(function (q) { return q.id === Q.id; })) return;
-      out.places.push(Q); buildPlace(Q);
+    /* v112 (the 213th, the sweep's order question): the floor's places build longest wall first, whatever the entry, so
+       on a line two rooms share in part (neither run inside the other) v104 lets the through run keep it, and the
+       building is the same from every door (the library gallery's head over the way's mouth stood in the way from the
+       fifth's corridor and in the gallery from the way) */
+    var longest = function (Q) { var m = 0, pp = Q.poly || []; pp.forEach(function (p, k) { var q = pp[(k + 1) % pp.length]; m = Math.max(m, Math.hypot(q[0] - p[0], q[1] - p[1])); }); return m; };
+    floorQs.slice().sort(function (A, B) { return longest(B) - longest(A) || (A.id < B.id ? -1 : A.id > B.id ? 1 : 0); }).forEach(function (Q) {
+      if (Q !== P && out.places.some(function (q) { return q.id === Q.id; })) return;
+      if (Q !== P) out.places.push(Q);
+      buildPlace(Q);
     });
     out.floorBuilt = { places: out.places.length, ms: Date.now() - ft0 };
   }
