@@ -1464,14 +1464,31 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v83 (the 166th: sw-turret-stair's wind-dial door, where the turret's round face leaves the passage's mouth open):
              the floor and head run under and over the sides, so their ends shared the sides' end planes in a 5 mm strip;
              they stop 8 mm short of the sides' ends now */
-          var D = g.op.depth, dm = D / 2, ln = D - 0.02, lp = function (s, y, wd, hg, mat, kind, nm, dp) {
-            var m = slab(wd, hg, dp || ln, mat, kind), q = toLocal(a[0] + ux * s + nx * dm, a[1] + uy * s + ny * dm, Q.floor);
+          var D = g.op.depth, dm = D / 2, ln = D - 0.02, lp = function (s, y, wd, hg, mat, kind, nm, dp, dc) {
+            var m = slab(wd, hg, dp || ln, mat, kind), c = dc || dm, q = toLocal(a[0] + ux * s + nx * c, a[1] + uy * s + ny * c, Q.floor);
             m.position.set(q.x, q.y + y, q.z); m.rotation.y = ang; m.name = Q.id + '-lining-' + nm + '-' + g.op.id; m.userData.owner = Q.id; group.add(m);
           };
           lp(sm, g.sill + 0.015 - 0.05, w + 0.02, 0.1, mats.floor, 'floor', 'floor', ln - 0.016);
           lp(sm, g.h + 0.005 + 0.15, w + 0.02, 0.3, mats.wall, 'wall', 'head', ln - 0.016);
-          lp(g.s0 - 0.155, g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', 'a');
-          lp(g.s1 + 0.155, g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', 'b');
+          /* v105 (the 205th, the sweep's linings): a side meeting a far face that is not square to the passage (a round
+             room's: the fencing room, the winter and apple stores) stops 1 cm inside that face along its own line, else
+             one jamb's side ran 14 cm on into the room */
+          var far = findPlace(M, other(g.op, Q.id)), fpts = far && (far.area ? far.area.outer : far.poly);
+          var farReach = function (s) {
+            var px = a[0] + ux * s, py = a[1] + uy * s, best = D;
+            if (fpts) fpts.forEach(function (p0, k) {
+              var p1 = fpts[(k + 1) % fpts.length], ex = p1[0] - p0[0], ey = p1[1] - p0[1], den = nx * ey - ny * ex;
+              if (Math.abs(den) < 1e-9) return;
+              var d = ((p0[0] - px) * ey - (p0[1] - py) * ex) / den, e = ((p0[0] - px) * ny - (p0[1] - py) * nx) / den;
+              if (e >= 0 && e <= 1 && d > 0.05 && d < best) best = d;
+            });
+            return best;
+          };
+          [['a', g.s0 - 0.155, g.s0 - 0.305, g.s0 - 0.005], ['b', g.s1 + 0.155, g.s1 + 0.005, g.s1 + 0.305]].forEach(function (sd) {
+            var r = Math.min(farReach(sd[2]), farReach(sd[3]));
+            if (r < D - 0.005) lp(sd[1], g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', sd[0], r - 0.02, r / 2);
+            else lp(sd[1], g.sill + hh / 2, 0.3, hh + 0.2, mats.wall, 'wall', sd[0]);
+          });
         }
         if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
           var leaf = slab(w - 0.08, hh - 0.04, 0.12, mats.door, 'door');   /* v44: on its threshold (0.02), its foot not the threshold's */
