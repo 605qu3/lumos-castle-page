@@ -21,7 +21,8 @@
 //            pools under the bands (spot lights pointing down over the tables, Interiors' *The look up*, trick 5:
 //            the gold plates lit under the bands, the aisles darker), the flames' own colour
 //   occasion { pumpkin, tree, lantern }: each the emissive colour and strength of a thing lit by its own candle
-//            (the pumpkins' carved faces, the trees' little candles, Hagrid's lanterns), or null when not that day
+//            (the pumpkins' carved faces, the trees' little candles, the lanterns by the cabin), or null when not that day;
+//            the lanterns only with d.cabin (req 1263, Godric 27 October 2026: no cabin in 1897)
 //   level    0..1, the daylight's strength, for a page's own uses (a sound's brightness, a shot's caption)
 (function () {
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -79,7 +80,7 @@
     const occasion = {
       pumpkin: occ === 'halloween' ? { colour: 0xff8a2a, intensity: +(0.35 + 0.65 * dark).toFixed(3) } : null,
       tree: /^christmas/.test(occ) ? { colour: 0xffd27a, intensity: +(0.5 + 0.5 * dark).toFixed(3) } : null,
-      lantern: occ === 'halloween' && d.year === 2 ? { colour: 0xff9a3a, intensity: +(0.4 + 0.6 * dark).toFixed(3) } : null,
+      lantern: occ === 'halloween' && d.year === 2 && d.cabin ? { colour: 0xff9a3a, intensity: +(0.4 + 0.6 * dark).toFixed(3) } : null,
     };
     if (occasion.pumpkin && cs === 'gold') candles.colour = mix(candles.colour, 0xff9a4a, 0.25);
     const note = `${sky}, the sun ${alt > 0 ? 'up at ' + alt : alt > -6 ? 'just set' : 'down'}; candles ${cs}`;

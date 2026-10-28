@@ -217,7 +217,8 @@
         if (g.id === 'road-to-hogsmeade') labels += lab([-230, 405], 'to Hogsmeade', lp, { italic: true, rot: -8 }); }
       else if (s.point) {
         const q = P(s.point), r = Math.max(2.4, 4 * k);
-        if (g.id === 'hagrids-cabin') { ground += `<path d="M${f(q[0] - r)},${f(q[1] + r * 0.6)} h${f(2 * r)} v${f(-r)} l${f(-r)},${f(-r * 0.8)} l${f(-r)},${f(r * 0.8)} Z" fill="none" stroke="${L.ink}" stroke-width="${f(0.8 * L.w)}"/>`;
+        if (g.id === 'hagrids-cabin') { if (!o.cabin) continue;   // req 1263 (Godric, 27 October 2026, 9.50 pm): no cabin in 1897; o.cabin brings it back once it is built
+          ground += `<path d="M${f(q[0] - r)},${f(q[1] + r * 0.6)} h${f(2 * r)} v${f(-r)} l${f(-r)},${f(-r * 0.8)} l${f(-r)},${f(r * 0.8)} Z" fill="none" stroke="${L.ink}" stroke-width="${f(0.8 * L.w)}"/>`;
           labels += lab(s.point, 'Hagrid’s hut', lp, { dy: r * 2.4 }); }
         else if (g.id === 'whomping-willow' || g.id === 'beech') { for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + (i - 3) * 0.42;
             ground += `<path d="M${f(q[0])},${f(q[1] + r)} Q${f(q[0] + Math.cos(a) * r * 0.7)},${f(q[1] - r * 0.4)} ${f(q[0] + Math.cos(a) * r * 1.4)},${f(q[1] + Math.sin(a) * r * 1.2 + r)}" fill="none" stroke="${L.ink}" stroke-width="${f(0.6 * L.w)}"/>`; }
