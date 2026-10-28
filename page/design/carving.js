@@ -8,7 +8,7 @@
        of stiff leaves round a round boss), 'round' (a plain round boss);
        light, the side the light comes from in radians (a ceiling boss is lit from below: Math.PI / 2 on a sheet);
        fade 0..1, how far it has gone to the crown's ghost (2.1: thinning with its ribs, a little more body than they)
-   LumosCarving.mark(ctx, id, x, y, size, { stone, light })  one mason's mark cut in a dressed face; ids in MARKS */
+   LumosCarving.mark(ctx, id, x, y, size, { stone, light })  one mason's mark cut in a dressed face; ids in MARKS (the eight for piers) or SUN, the sun-days' own */
 (function () {
   const rgb = h => { const n = typeof h === 'number' ? h : parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   const css = (c, k = 1, a = 1) => `rgba(${c.map(v => Math.max(0, Math.min(255, Math.round(v * k)))).join(',')},${a})`;
@@ -62,6 +62,13 @@
     bow: [[[-0.8, 0.8], [0.8, -0.8]], [[-0.8, 0.8], [-0.2, 0.8]], [[-0.8, 0.8], [-0.8, 0.2]], [[0.2, -0.95], [0.95, -0.2]]],
     fish: [[[-0.9, 0], [-0.3, -0.45], [0.5, 0], [-0.3, 0.45], [-0.9, 0]], [[0.5, 0], [0.95, -0.4], [0.95, 0.4], [0.5, 0]]],
   };
+  // the sun-days' own mark (req 1275, Godric's 1 on 27 October 2026): a half-sun on a line with three short rays, used
+  // only where the winter stripe, the summer bar and the equinox sun rest, so it is not among the eight a pier may bear
+  const sunArc = [];
+  for (let a = Math.PI; a <= 2 * Math.PI + 0.001; a += Math.PI / 14) sunArc.push([Math.cos(a) * 0.5, 0.5 + Math.sin(a) * 0.5]);
+  const sunRays = [225, 270, 315].map(d => { const a = d * Math.PI / 180; return [[Math.cos(a) * 0.68, 0.5 + Math.sin(a) * 0.68], [Math.cos(a) * 1.0, 0.5 + Math.sin(a) * 1.0]]; });
+  MARKS.sun = [[[-0.95, 0.5], [0.95, 0.5]], sunArc, ...sunRays];
+
   function mark(ctx, id, x, y, size, o = {}) {
     const c = stoneOf(o), light = o.light ?? -Math.PI * 0.75, w = Math.max(1.2, size * 0.09);
     const dx = Math.cos(light) * w * 0.35, dy = Math.sin(light) * w * 0.35;
@@ -76,6 +83,6 @@
     ctx.restore();
   }
 
-  const C = { boss, mark, MARKS: Object.keys(MARKS), BEASTS: ['lion', 'eagle', 'badger', 'snake'] };
+  const C = { boss, mark, MARKS: Object.keys(MARKS).filter(k => k !== 'sun'), SUN: 'sun', BEASTS: ['lion', 'eagle', 'badger', 'snake'] };
   if (typeof window !== 'undefined') window.LumosCarving = C;
 })();
