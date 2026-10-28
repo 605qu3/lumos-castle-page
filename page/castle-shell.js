@@ -407,7 +407,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      o.trim 2, shell.html?trim=2, dresses an opening in a different stone from its wall's, as the sources do (Beaumaris:
      limestone walls, sandstone dressings): the dark rubble and the grey in the pale stone, the sandstone in the warm one,
      the Tudor pink in the pale, the pale in the cool grey */
-  var DRESSED = { 'founders-rubble': 'late-pale', 'houses-sandstone': 'tudor-pink', 'high-grey': 'late-pale', 'tudor-pink': 'late-pale', 'late-pale': 'high-grey' };
+  /* v96 (Godric's 3 on req 1264, 27 October 2026, 10.09 pm): contrast in the five older ages, tone on tone in the two
+     palest, P6 and P7 (late-pale keeps its own stone a shade lighter); o.trim 2 is the default now (shell.html) */
+  var DRESSED = { 'founders-rubble': 'late-pale', 'houses-sandstone': 'tudor-pink', 'high-grey': 'late-pale', 'tudor-pink': 'late-pale' };
   function trimMat(row, sx, sy, z) {
     if (!row) return paintMat(shade(GREY.wall, 1.12), true);
     var st = stoneAt(row, sx, sy, z), ds = o.trim === 2 && DRESSED[st] || null;

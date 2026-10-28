@@ -165,7 +165,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=7"></script>
-<script src="castle-shell.js?v=95"></script>
+<script src="castle-shell.js?v=96"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -317,7 +317,7 @@ PAINTED = PAINTED.concat(['dumbledores-office', 'study']);
 /* castle-shell v88: H82's fern well painted, its stair's stone (houses-sandstone, rubble), provisional, Godric to confirm */
 PAINTED = PAINTED.concat(['h82-fern-well']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers', trim: +Q.get('trim') || 0 }) : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers', trim: Q.has('trim') ? +Q.get('trim') : 2 }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
    black headless twice with a clean console; the line now says which year it stands from and the query that opens it */
 if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(function (r) { return r.id === PLACE && !stands(r); })[0];
