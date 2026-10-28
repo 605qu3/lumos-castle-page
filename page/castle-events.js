@@ -428,6 +428,8 @@
        was once the link is closed. (Settled 50, req 1110, 26 October 2026: the date is the real day only till Story
        settles the story day per boy; then `?date=` moves the story day, not the clock.) */
     var weatherOverride = /^(clear|cloudy|rain|snow|fog|windy|frost|wet)$/.test(params.get('weather') || '') ? params.get('weather') : null;
+    /* ?tomorrow=rain (or clear) forces the front the signs read; otherwise the next day's own weather (Magic's req 1273, 1) */
+    var tomorrowOverride = /^(rain|clear)$/.test(params.get('tomorrow') || '') ? params.get('tomorrow') : null;
     var seasonOverride = /^(spring|summer|autumn|winter)$/.test(params.get('season') || '') ? params.get('season') : null;
     var weatherDate = /^\d{4}-\d\d-\d\d$/.test(params.get('date') || '') ? params.get('date') : null;
     var dateShift = 0;        /* how far ?date= moves the clock, in ms, the real time of day kept */
@@ -670,6 +672,11 @@
       return w;
     }
 
+    function rainTomorrow() {
+      var d = nowDate(), t = tomorrowOverride || weatherAt(new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)).sky;
+      return t === 'rain' && weatherNow().sky !== 'rain';
+    }
+
     function builtin(name) {
       var now = nowDate();
       if (builtins[name]) return builtins[name]();
@@ -684,6 +691,7 @@
         case 'ground': return weatherNow().ground;    /* dry, wet, frost or snow */
         case 'season': return weatherNow().season;
         case 'cold': return weatherNow().cold ? 'yes' : 'no';
+        case 'rain tomorrow': return rainTomorrow() ? 'yes' : 'no';     /* a front the day after this: tomorrow rains and today does not (req 1273) */
         case 'place': return (leaving && state.visitPlace) || place;
         case 'at': return 'none';                 /* a page with stops answers this itself */
         case 'hour': return now.getHours();

@@ -1,0 +1,117 @@
+{
+  "chain": "study",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = study",
+        "hour >= 18",
+        "hour < 22"
+      ],
+      "show": [
+        "on the desk her lamp is lit, her work spread out under it"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the lamp lit 6 to 10 pm, lessons over; out by day and by night, the room then lit by her window alone"
+    },
+    {
+      "when": [
+        "place = study",
+        "time = day",
+        "weather = clear"
+      ],
+      "show": [
+        "through the window the glen lies plain in the day's light, hills behind hills"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the glen's own hour and weather, by day, clear"
+    },
+    {
+      "when": [
+        "place = study",
+        "time = day",
+        "weather = cloudy"
+      ],
+      "show": [
+        "through the window the glen lies under a grey sky, its hills half lost"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the glen's own hour and weather, by day, cloudy"
+    },
+    {
+      "when": [
+        "place = study",
+        "time = day",
+        "weather = rain"
+      ],
+      "show": [
+        "rain streaks the window, and far down the glen a burn runs loud"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the glen's own weather, rain; the burn far off is the sound the table asks for"
+    },
+    {
+      "when": [
+        "place = study",
+        "time = day",
+        "weather = snow"
+      ],
+      "show": [
+        "snow drifts past the window, and the glen beyond is white"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the glen's own weather, snow"
+    },
+    {
+      "when": [
+        "place = study",
+        "time = day",
+        "weather = fog"
+      ],
+      "show": [
+        "fog fills the window, and the glen is gone behind it"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the glen's own weather, fog"
+    },
+    {
+      "when": [
+        "place = study",
+        "time = night"
+      ],
+      "show": [
+        "the window is dark over the glen, a few stars above its hills"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the glen dark at night, a few stars (the sky's own, not the castle's bearing)"
+    },
+    {
+      "when": [
+        "place = study",
+        "windy = yes"
+      ],
+      "show": [
+        "the wind moves faintly in the glen beyond the glass"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the sound table: with her shutters open, the glen faint through the glass, by weather"
+    },
+    {
+      "when": [
+        "place = study",
+        "weekday = tuesday",
+        "hour >= 18",
+        "hour < 22"
+      ],
+      "show": [
+        "the bookcase stands a little ajar, as if it had been left so"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the bookcase ajar on her evenings; Tuesday and Thursday are my reading of 'some evenings', the Clementine lane or Story to correct"
+    },
+    {
+      "when": [
+        "place = study",
+        "weekday = thursday",
+        "hour >= 18",
+        "hour < 22"
+      ],
+      "show": [
+        "the bookcase stands a little ajar, as if it had been left so"
+      ],
+      "canon": "Clementine's study, req 1206 (docs/handoff/clementine.md, The study's layers; room-states 4 and 6): the study is invented, her seventh-year workroom in 1897, no trace of the books; the glen through her window is her home (Godric's 1 on req 1198), never named and nothing to place it by; the window's light is the glen's own hour and weather; the bookcase ajar on her evenings: see the rule above"
+    }
+  ],
+  "records": []
+}

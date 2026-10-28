@@ -322,6 +322,42 @@
       "canon": "Hidden Ways' H82, the fern well and the glass house under the lake (docs/hidden-ways/lake-glimpse-notes.md, The ground and the ledger line; Godric's 1 on hidden-ways-lake-glimpse-1023, 11.41 pm, 23 October 2026; the Architect's req 1099, model v200; Interaction's places, req 1101; Events' req 1102): the same light by night, the moon's through the lake"
     },
     {
+      "id": "lake-glimpse.house-rain-light",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = h82 glass house",
+        "time != night",
+        "weather = rain",
+        "windy = no"
+      ],
+      "show": [
+        "every raindrop on the lake above makes a ring of daylight that slides over the floor and the ferns, one now and one then"
+      ],
+      "starts": [],
+      "canon": "Magic's castle-wide table 4 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026, 9.50 pm; Events' req 1273): rain on the lake seen from below, the rings of daylight sliding over the floor, additive to the ripples; the squid's shadow stays Story's gate (req 1260)"
+    },
+    {
+      "id": "lake-glimpse.house-rain-heavy",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = h82 glass house",
+        "time != night",
+        "weather = rain",
+        "windy = yes"
+      ],
+      "show": [
+        "the rain on the lake above has the whole floor busy with rings of daylight, crowding and crossing over the ferns and the pool"
+      ],
+      "starts": [],
+      "canon": "Magic's castle-wide table 4 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026, 9.50 pm; Events' req 1273): rain on the lake seen from below, the rings of daylight sliding over the floor, additive to the ripples; the squid's shadow stays Story's gate (req 1260)"
+    },
+    {
       "id": "lake-glimpse.squid-shadow",
       "tier": "fixed",
       "source": "device",

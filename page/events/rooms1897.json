@@ -1,0 +1,936 @@
+{
+  "chain": "rooms1897",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = hospital wing",
+        "hour >= 8",
+        "hour < 11"
+      ],
+      "show": [
+        "on the open shelf inside the matron's office door the clean bandages are rolling themselves up one after another into tight white rolls, a long strip winding in from the shelf's edge, and stacking, until the shelf is still"
+      ],
+      "canon": "Magic's req 1352 (1), docs/magic/rooms.md, The hospital wing, 1897: a household charm of the castle's sort (the hunt's housework, 27 to 34), ours, no line cited, since the books' bandages that wind by themselves do so on a plot night (PoA 19) and stay out; the bandages are clean and unused, nothing hurt is seen; the morning hours stand for 'with her office door open', the door being the page's own state, which the runtime does not read"
+    },
+    {
+      "when": [
+        "place = library",
+        "hour >= 20",
+        "hour < 21"
+      ],
+      "show": [
+        "down the long room the lamps on the tables are going out one by one, put out by a step he does not see"
+      ],
+      "canon": "Magic's req 1362 (2), docs/magic/rooms.md, The library, 1897: the lamps are lit on the tables from dusk and out at eight, put out by the librarian (the hour ours; the books' 'Madam Pince had extinguished all the lamps', GoF 26 L30889, is her own and held for the books' years); the librarian is only heard, not seen"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "hour >= 10",
+        "hour < 11"
+      ],
+      "show": [
+        "on the hob by the fire a copper kettle gives a sudden blast of steam from its spout as a passing wand taps it, and the cups on the tray fill"
+      ],
+      "canon": "Magic's req 1354 (1), docs/magic/rooms.md, The staff room, 1897: PoA 8 L16364 'a blast of steam issued suddenly from the spout', a teacher's way with a kettle, an everyday thing a later book names first; the teacher is People's, never a canon teacher of the books' years; the mid-morning break (10 to 11), the cups before the teacups' washing (housework.json) after"
+    },
+    {
+      "when": [
+        "place = staff room",
+        "hour >= 16",
+        "hour < 17"
+      ],
+      "show": [
+        "on the hob by the fire a copper kettle gives a sudden blast of steam from its spout as a passing wand taps it, and the cups on the tray fill"
+      ],
+      "canon": "Magic's req 1354 (1), at teatime (16 to 17): see the rule above"
+    },
+    {
+      "when": [
+        "place = common room",
+        "hour >= 23"
+      ],
+      "show": [
+        "the fire has burned down to a bed of red coals under grey ash, one or two ticking in the grate"
+      ],
+      "canon": "Magic's req 1317, docs/magic/rooms.md, The Gryffindor common room, 1897 (cites read there): CoS 15 L12121, the fire burned low to glowing ash late at night; the hours ours"
+    },
+    {
+      "when": [
+        "place = common room",
+        "hour < 5"
+      ],
+      "show": [
+        "the fire has burned down to a bed of red coals under grey ash, one or two ticking in the grate"
+      ],
+      "canon": "Magic's req 1317, docs/magic/rooms.md, The Gryffindor common room, 1897 (cites read there): see the rule above, the small hours"
+    },
+    {
+      "when": [
+        "place = common room",
+        "hour >= 6",
+        "hour < 9"
+      ],
+      "show": [
+        "the fire is burning high again in the grate, freshly made up, and no one is ever seen doing it"
+      ],
+      "canon": "Magic's req 1317, docs/magic/rooms.md, The Gryffindor common room, 1897 (cites read there): CoS 15 L12121, the fire made up again by morning, unseen; the hours ours"
+    },
+    {
+      "when": [
+        "place = common room",
+        "hour >= 19",
+        "hour < 22"
+      ],
+      "show": [
+        "on the rug two older pupils crouch over a game of wizard chess; the pieces shout advice at their players, and a taken piece is dragged off the board, grumbling"
+      ],
+      "canon": "Magic's req 1317, docs/magic/rooms.md, The Gryffindor common room, 1897 (cites read there): PS 12 L4104, wizard chessmen that talk back and a taken piece dragged off; older pupils' game, an everyday thing; the evening hours ours"
+    },
+    {
+      "when": [
+        "place = potions dungeon",
+        "lessons = on"
+      ],
+      "show": [
+        "on the other desks the brass scales dip and settle as one ingredient after another goes in"
+      ],
+      "canon": "Magic's req 1331, docs/magic/rooms.md, Professor Marchpane's Potions dungeon, 1897 (cites read there; Marchpane provisional, settled 131) (3): CoS 11 L10260 and PS 5 L1571, brass scales between the desks; nothing marks the boys' against another's"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "the air smells faintly of honey"
+      ],
+      "canon": "Magic's req 1334, docs/magic/rooms.md, Professor Naso's Transfiguration classroom, 1897 (cites read there; Story's settled 141 to 150) (3): the honey on the air, a word only (settled 149)"
+    },
+    {
+      "when": [
+        "place = transfiguration classroom",
+        "time = night",
+        "weather = clear"
+      ],
+      "show": [
+        "in the north window the Great Bear stands framed against the dark, nothing drawn between the stars"
+      ],
+      "canon": "Magic's req 1334, docs/magic/rooms.md, Professor Naso's Transfiguration classroom, 1897 (cites read there; Story's settled 141 to 150) (4): settled 146 and 150; the boys' two bears on the sill wait on their lesson's state (the lesson, not the clock), held"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "date >= 09-03",
+        "date < 11-01"
+      ],
+      "show": [
+        "on the desk lies a thin pile of detention slips, each filled in at length in a careful hand, the line for the punishment left blank or trailing off half a word in"
+      ],
+      "canon": "Magic's req 1345, docs/magic/rooms.md, Mr. Grimbleton's Office, 1897 (cites read there; Story's settled 86 to 88) (1): settled 88, never sent; a thin pile in the autumn"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "date >= 11-01"
+      ],
+      "show": [
+        "on the desk lies a fair pile of detention slips, each filled in at length in a careful hand, the line for the punishment left blank or trailing off half a word in"
+      ],
+      "canon": "Magic's req 1345, docs/magic/rooms.md, Mr. Grimbleton's Office, 1897 (cites read there; Story's settled 86 to 88) (1): settled 88, never sent; the pile grows through the term, November to December"
+    },
+    {
+      "when": [
+        "place = filchs office",
+        "date < 09-03"
+      ],
+      "show": [
+        "on the desk lies a tall pile of detention slips, each filled in at length in a careful hand, the line for the punishment left blank or trailing off half a word in"
+      ],
+      "canon": "Magic's req 1345, docs/magic/rooms.md, Mr. Grimbleton's Office, 1897 (cites read there; Story's settled 86 to 88) (1): settled 88, never sent; the pile grows through the term, January to the summer"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time = night"
+      ],
+      "show": [
+        "toward the locked door at the east end the torches thin out, one lit in three, and the dark gathers between them"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (a): the torches thin toward the locked door by night; the breathing and the yawning faces wait on an 1897 owner behind that door (Design's critique on req 1313 (a); asked of Story); by day nothing"
+    },
+    {
+      "when": [
+        "place = third floor north corridor"
+      ],
+      "show": [
+        "from the mouth of the Defence passage a trail of black ink splashes runs west along the foot of the north wall, thinning as it goes"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (b): the spilt-ink trail, x 49.4 west to x 26; the portrait that answers back near the witch waits on People's portrait and its lines"
+    },
+    {
+      "when": [
+        "place = second floor corridor"
+      ],
+      "show": [
+        "on the north wall a wide dark patch of damp spreads down the stone from the ceiling, old and never quite dry"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (c): the damp patch (x 24), plain old plumbing; Myrtle's sob struck until the books' years (Magic's req 1360, Corridor's answer)"
+    },
+    {
+      "when": [
+        "place = second floor corridor",
+        "weather != rain"
+      ],
+      "show": [
+        "a thin trickle of water runs out from under the unused classroom's door and along the foot of the wall"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (c): the trickle at the unused classroom's east door (x 52.3, Architect's move from x 60)"
+    },
+    {
+      "when": [
+        "place = second floor corridor",
+        "weather = rain"
+      ],
+      "show": [
+        "a trickle of water runs out from under the unused classroom's door and along the foot of the wall, quicker with the rain"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (c): the trickle in rain"
+    },
+    {
+      "when": [
+        "place = lake corridor g east"
+      ],
+      "show": [
+        "at the foot of the wall the lake laps against the stone, slow and close"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    },
+    {
+      "when": [
+        "place = lake corridor 1 east"
+      ],
+      "show": [
+        "a long deep hush of water against the wall, and now and then, far down, a soft knock"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    },
+    {
+      "when": [
+        "place = lake corridor 2 east"
+      ],
+      "show": [
+        "reeds whisper beyond the glass, and a moored boat's rope creaks against its post"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    },
+    {
+      "when": [
+        "place = lake corridor 3 east"
+      ],
+      "show": [
+        "gulls cry over the water, near and far"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    },
+    {
+      "when": [
+        "place = lake corridor 4 east"
+      ],
+      "show": [
+        "the wind hums in the window frames"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    },
+    {
+      "when": [
+        "place = lake corridor 5 east"
+      ],
+      "show": [
+        "the wind is fuller here, and the glass hums low as a cloud's edge goes past"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    },
+    {
+      "when": [
+        "place = lake corridor 6 east"
+      ],
+      "show": [
+        "the wind sings round the tower's edge, and the gulls are small and far below"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    }
+  ],
+  "records": [
+    {
+      "id": "rooms1897.falling-star-astronomy-tower-top-early-star",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-astronomy-tower-top-early",
+      "weight": 1,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date < 11-14"
+      ],
+      "show": [
+        "high over the castle a short pale streak crosses the sky and is gone in under a second"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-astronomy-tower-top-early-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-astronomy-tower-top-early",
+      "weight": 11,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date < 11-14"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-astronomy-tower-top-november-star",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-astronomy-tower-top-november",
+      "weight": 1,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date >= 11-14",
+        "date <= 11-20"
+      ],
+      "show": [
+        "high over the castle a short pale streak crosses the sky and is gone in under a second"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-astronomy-tower-top-november-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-astronomy-tower-top-november",
+      "weight": 2,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date >= 11-14",
+        "date <= 11-20"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-astronomy-tower-top-late-star",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-astronomy-tower-top-late",
+      "weight": 1,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date > 11-20"
+      ],
+      "show": [
+        "high over the castle a short pale streak crosses the sky and is gone in under a second"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-astronomy-tower-top-late-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-astronomy-tower-top-late",
+      "weight": 11,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = astronomy tower top",
+        "time = night",
+        "weather = clear",
+        "date > 11-20"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-great-hall-early-star",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-great-hall-early",
+      "weight": 1,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = great hall",
+        "time = evening",
+        "weather = clear",
+        "date < 11-14"
+      ],
+      "show": [
+        "far above the candles a short pale streak crosses the ceiling's sky and is gone in under a second"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-great-hall-early-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-great-hall-early",
+      "weight": 11,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = great hall",
+        "time = evening",
+        "weather = clear",
+        "date < 11-14"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-great-hall-november-star",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-great-hall-november",
+      "weight": 1,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = great hall",
+        "time = evening",
+        "weather = clear",
+        "date >= 11-14",
+        "date <= 11-20"
+      ],
+      "show": [
+        "far above the candles a short pale streak crosses the ceiling's sky and is gone in under a second"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-great-hall-november-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-great-hall-november",
+      "weight": 2,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = great hall",
+        "time = evening",
+        "weather = clear",
+        "date >= 11-14",
+        "date <= 11-20"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-great-hall-late-star",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-great-hall-late",
+      "weight": 1,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = great hall",
+        "time = evening",
+        "weather = clear",
+        "date > 11-20"
+      ],
+      "show": [
+        "far above the candles a short pale streak crosses the ceiling's sky and is gone in under a second"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.falling-star-great-hall-late-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "falling-star-great-hall-late",
+      "weight": 11,
+      "moment": "wait 40-150 s",
+      "when": [
+        "place = great hall",
+        "time = evening",
+        "weather = clear",
+        "date > 11-20"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1349 (3) and req 1367 (1), docs/magic/rooms.md, Professor Alcor's Astronomy Tower top, 1897, and The Great Hall, 1897: ours, the real sky, no book line cited since the books' downpour of shooting stars (PS 1 L49) is a plot night's and stays out; a short pale streak in under a second, the sky's own light, in no fixed place and never toward the castle; more round the middle of November, the Leonids (14 to 20 November); nothing strikes anything, nothing in the hall turns, nothing asks to be tapped; the ceiling is the sky outside, PS 7 L2365"
+    },
+    {
+      "id": "rooms1897.librarian-heard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "librarian-heard",
+      "weight": 1,
+      "moment": "wait 60-200 s",
+      "when": [
+        "place = library",
+        "time != night"
+      ],
+      "show": [
+        "from an aisle he is not in, a slow step, and the soft clack of a book set back on its shelf; nearer, then away"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1362 (1), docs/magic/rooms.md, The library, 1897: ours, in place of Madam Pince's squeaking shoe (OotP 24 L47276, held for the books' years); the librarian is not named yet and is only heard, never seen; the step's sound and the figure are People's once named"
+    },
+    {
+      "id": "rooms1897.librarian-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "librarian-heard",
+      "weight": 4,
+      "moment": "wait 60-200 s",
+      "when": [
+        "place = library",
+        "time != night"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1362 (1), docs/magic/rooms.md, The library, 1897: ours, in place of Madam Pince's squeaking shoe (OotP 24 L47276, held for the books' years); the librarian is not named yet and is only heard, never seen; the step's sound and the figure are People's once named"
+    },
+    {
+      "id": "rooms1897.snap-bang-snap",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "snap-bang-1897",
+      "weight": 1,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = common room",
+        "hour >= 19",
+        "hour < 22"
+      ],
+      "show": [
+        "at a table by the window a pack of Exploding Snap goes off with a bang and a puff of smoke, and the pupils round it laugh"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1317, docs/magic/rooms.md, The Gryffindor common room, 1897 (cites read there): CoS 12 L10703, an Exploding Snap game's bang and laughter now and then"
+    },
+    {
+      "id": "rooms1897.snap-bang-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "snap-bang-1897",
+      "weight": 5,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = common room",
+        "hour >= 19",
+        "hour < 22"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1317, docs/magic/rooms.md, The Gryffindor common room, 1897 (cites read there): see the record above"
+    },
+    {
+      "id": "rooms1897.potions-stands-catch",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-20 s",
+      "when": [
+        "place = potions dungeon",
+        "lessons = on",
+        "days since stands_caught >= 1"
+      ],
+      "show": [
+        "at the start of the lesson the stands under the cauldrons catch, row by row from the front, each a breath after the one before"
+      ],
+      "starts": [
+        "stamp stands_caught"
+      ],
+      "canon": "Magic's req 1331, docs/magic/rooms.md, Professor Marchpane's Potions dungeon, 1897 (cites read there; Marchpane provisional, settled 131) (1): the stands catching at the start of his lesson, ours"
+    },
+    {
+      "id": "rooms1897.potions-brews-turn-turn",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "potions-brews-turn",
+      "weight": 1,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = potions dungeon",
+        "lessons = on"
+      ],
+      "show": [
+        "at one of the other desks a brew turns, from grey to a deep green, a minute after the one beside it; nobody looks up"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1331, docs/magic/rooms.md, Professor Marchpane's Potions dungeon, 1897 (cites read there; Marchpane provisional, settled 131) (2): the other pairs' brews each turning at its own minute (settled 133; PS 8 L2784), nothing marking the boys' against another's"
+    },
+    {
+      "id": "rooms1897.potions-brews-turn-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "potions-brews-turn",
+      "weight": 2,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = potions dungeon",
+        "lessons = on"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1331, docs/magic/rooms.md, Professor Marchpane's Potions dungeon, 1897 (cites read there; Marchpane provisional, settled 131) (2): see the record above"
+    },
+    {
+      "id": "rooms1897.transfiguration-tale-hush",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-tale-hush",
+      "weight": 1,
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "the scratching of quills stops while she walks between the desks telling a tale, and begins again when she sets the task"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1334, docs/magic/rooms.md, Professor Naso's Transfiguration classroom, 1897 (cites read there; Story's settled 141 to 150) (1): the tale's hush (settled 144)"
+    },
+    {
+      "id": "rooms1897.transfiguration-tale-hush-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-tale-hush",
+      "weight": 1,
+      "moment": "wait 120-300 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1334, docs/magic/rooms.md, Professor Naso's Transfiguration classroom, 1897 (cites read there; Story's settled 141 to 150) (1): see the record above"
+    },
+    {
+      "id": "rooms1897.transfiguration-stubs-bear",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-stubs",
+      "weight": 1,
+      "moment": "wait 60-150 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another desk someone mutters over a beeswax stub; it half-turns into a small bear with a wick for a tail, and they let out a sigh, or a small pleased breath"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1334, docs/magic/rooms.md, Professor Naso's Transfiguration classroom, 1897 (cites read there; Story's settled 141 to 150) (2): PoA 16 L19668, CoS 6 L8441, settled 148; nothing marks the boys' against another's"
+    },
+    {
+      "id": "rooms1897.transfiguration-stubs-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "transfiguration-stubs",
+      "weight": 1,
+      "moment": "wait 60-150 s",
+      "when": [
+        "place = transfiguration classroom",
+        "lessons = on"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 1334, docs/magic/rooms.md, Professor Naso's Transfiguration classroom, 1897 (cites read there; Story's settled 141 to 150) (2): see the record above"
+    },
+    {
+      "id": "rooms1897.lakestone-g",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor g east",
+        "days since lakestone_g >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, smooth as a coin, as if someone meant to skip it and thought better"
+      ],
+      "starts": [
+        "stamp lakestone_g"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-1-pair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 1 east",
+        "days since lakestone_g < 36500",
+        "days since lakestone_one >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, the pair of the one on the floor below"
+      ],
+      "starts": [
+        "stamp lakestone_one"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-1-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 1 east",
+        "days since lakestone_g >= 36500",
+        "days since lakestone_one >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, smooth as a coin, as if someone meant to skip it and thought better"
+      ],
+      "starts": [
+        "stamp lakestone_one"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-2-pair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 2 east",
+        "days since lakestone_one < 36500",
+        "days since lakestone_two >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, the pair of the one on the floor below"
+      ],
+      "starts": [
+        "stamp lakestone_two"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-2-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 2 east",
+        "days since lakestone_one >= 36500",
+        "days since lakestone_two >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, smooth as a coin, as if someone meant to skip it and thought better"
+      ],
+      "starts": [
+        "stamp lakestone_two"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-3-pair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 3 east",
+        "days since lakestone_two < 36500",
+        "days since lakestone_three >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, the pair of the one on the floor below"
+      ],
+      "starts": [
+        "stamp lakestone_three"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-3-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 3 east",
+        "days since lakestone_two >= 36500",
+        "days since lakestone_three >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, smooth as a coin, as if someone meant to skip it and thought better"
+      ],
+      "starts": [
+        "stamp lakestone_three"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-4-pair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 4 east",
+        "days since lakestone_three < 36500",
+        "days since lakestone_four >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, the pair of the one on the floor below"
+      ],
+      "starts": [
+        "stamp lakestone_four"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-4-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 4 east",
+        "days since lakestone_three >= 36500",
+        "days since lakestone_four >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, smooth as a coin, as if someone meant to skip it and thought better"
+      ],
+      "starts": [
+        "stamp lakestone_four"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-5-pair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 5 east",
+        "days since lakestone_four < 36500",
+        "days since lakestone_five >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, the pair of the one on the floor below"
+      ],
+      "starts": [
+        "stamp lakestone_five"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-5-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 5 east",
+        "days since lakestone_four >= 36500",
+        "days since lakestone_five >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, smooth as a coin, as if someone meant to skip it and thought better"
+      ],
+      "starts": [
+        "stamp lakestone_five"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-6-pair",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 6 east",
+        "days since lakestone_five < 36500",
+        "days since lakestone_six >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, the pair of the one on the floor below"
+      ],
+      "starts": [
+        "stamp lakestone_six"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    },
+    {
+      "id": "rooms1897.lakestone-6-plain",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 5-15 s",
+      "when": [
+        "place = lake corridor 6 east",
+        "days since lakestone_five >= 36500",
+        "days since lakestone_six >= 1"
+      ],
+      "show": [
+        "on the sill of the next sash lies a small flat grey stone, smooth as a coin, as if someone meant to skip it and thought better"
+      ],
+      "starts": [
+        "stamp lakestone_six"
+      ],
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): one find on a sill per floor, a flat grey stone in the sash east of the window seat; a boy who has seen the stone on the floor below finds its pair here. My reading of the find (Interiors' to place; provisional, Godric to confirm)"
+    }
+  ]
+}

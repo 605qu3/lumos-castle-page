@@ -3,11 +3,44 @@
   "room": [
     {
       "when": [
-        "cold = yes"
+        "cold = yes",
+        "ground != frost"
       ],
       "show": [
         "the lower panes of both windows misted on arrival, paler glass from the room",
         "in one pane an old finger doodle by someone long ago, a small broom, strokes only, showing in the fog"
+      ]
+    },
+    {
+      "when": [
+        "cold = yes",
+        "ground = frost",
+        "hour >= 12"
+      ],
+      "show": [
+        "the lower panes of both windows misted on arrival, paler glass from the room",
+        "in one pane an old finger doodle by someone long ago, a small broom, strokes only, showing in the fog"
+      ]
+    },
+    {
+      "when": [
+        "cold = yes",
+        "ground = frost",
+        "hour < 10"
+      ],
+      "show": [
+        "the lower panes of both windows grown over with ice ferns, white feathers of frost on the inside of the glass, the upper panes clear"
+      ]
+    },
+    {
+      "when": [
+        "cold = yes",
+        "ground = frost",
+        "hour >= 10",
+        "hour < 12"
+      ],
+      "show": [
+        "the frost on the lower panes thinning from the top down, the ferns shrunk to a few white feathers at the corners and weeping a little"
       ]
     },
     {
@@ -28,10 +61,47 @@
       "leans": [],
       "moment": "rub window",
       "when": [
-        "cold = yes"
+        "cold = yes",
+        "ground != frost"
       ],
       "show": [
         "the glass rubs clear under his finger, drips run from the cleared patch, and it fogs back slowly from the edges"
+      ],
+      "starts": [
+        "set fog_marks = yes"
+      ]
+    },
+    {
+      "id": "fog.rub-frost-pm",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "rub window",
+      "when": [
+        "cold = yes",
+        "ground = frost",
+        "hour >= 12"
+      ],
+      "show": [
+        "the glass rubs clear under his finger, drips run from the cleared patch, and it fogs back slowly from the edges"
+      ],
+      "starts": [
+        "set fog_marks = yes"
+      ]
+    },
+    {
+      "id": "fog.rub-frost-am",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "rub window",
+      "when": [
+        "cold = yes",
+        "ground = frost",
+        "hour < 12"
+      ],
+      "show": [
+        "the ferns melt away under his finger into a clear patch of glass with drips running from its edge, and the frost creeps back over it slowly from the edges"
       ],
       "starts": [
         "set fog_marks = yes"

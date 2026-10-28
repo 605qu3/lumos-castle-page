@@ -227,56 +227,6 @@
       "show": [
         "one swollen drawer's label reads \"Mandrake, leaf only (pressed). Earmuffs not required.\""
       ]
-    },
-    {
-      "when": [
-        "place = staff room",
-        "year >= 2"
-      ],
-      "show": [
-        "on the tray by the fire the staff's used teacups wash themselves in a basin, clinking gently, and stack themselves to drain"
-      ]
-    },
-    {
-      "when": [
-        "place = kitchens",
-        "year >= 5"
-      ],
-      "show": [
-        "a row of heavy knives chops vegetables of its own accord on the scrubbed table, nobody at them"
-      ]
-    },
-    {
-      "when": [
-        "place = staff room",
-        "year >= 6",
-        "hour >= 15",
-        "hour < 17"
-      ],
-      "show": [
-        "at teatime a loaf on its board slices itself, the knife setting itself down after"
-      ]
-    },
-    {
-      "when": [
-        "place = dormitory",
-        "year >= 4",
-        "season = winter",
-        "time = evening"
-      ],
-      "show": [
-        "between the sheets of his four-poster a warming pan has been put by no one he sees"
-      ]
-    },
-    {
-      "when": [
-        "place = dormitory",
-        "year >= 5",
-        "occasion = leaving feast"
-      ],
-      "show": [
-        "a trunk is packing itself, books and socks soaring in pell-mell and the lid not quite shutting"
-      ]
     }
   ],
   "records": []

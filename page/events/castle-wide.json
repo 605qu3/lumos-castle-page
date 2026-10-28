@@ -1,0 +1,357 @@
+{
+  "chain": "castle-wide",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = stair hall",
+        "rain tomorrow = yes"
+      ],
+      "show": [
+        "the stone of the stair well's lower walls is beaded with damp, though nothing has wet it"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "rain tomorrow = yes"
+      ],
+      "show": [
+        "the old outer wall beside the great doors is beaded with damp, a cold sweat on the stone, and the flags under it are dull"
+      ]
+    },
+    {
+      "when": [
+        "place = entrance hall",
+        "rain tomorrow = yes"
+      ],
+      "show": [
+        "the great oak doors have swollen in their frames: they drag on the flags and open with a longer creak than usual"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "rain tomorrow = yes",
+        "season = summer",
+        "time != night"
+      ],
+      "show": [
+        "the swifts and martins skim low over the lawn, near enough to the grass to brush it"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "rain tomorrow = yes",
+        "season = autumn",
+        "time != night"
+      ],
+      "show": [
+        "the rooks and jackdaws keep to the trees along the lawn's edge, and a robin sits close by on the nearest sill"
+      ]
+    },
+    {
+      "when": [
+        "place = flying lawn",
+        "rain tomorrow = yes",
+        "season = winter",
+        "time != night"
+      ],
+      "show": [
+        "the rooks and jackdaws keep to the trees along the lawn's edge, and a robin sits close by on the nearest sill"
+      ]
+    },
+    {
+      "when": [
+        "place = keep leads",
+        "time != night"
+      ],
+      "show": [
+        "from the head of a cold flue a pair of jackdaws call back and forth, chack, chack, and fall quiet when he comes near"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouse set",
+        "date >= 10-01",
+        "date <= 10-31"
+      ],
+      "show": [
+        "under the greenhouse staging, among last season's leaves, something small and spiny snuffles about and goes on snuffling, not minding him at all"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouse set",
+        "date >= 11-01"
+      ],
+      "show": [
+        "under the greenhouse staging a heap of leaves rises and falls, slowly, with something curled asleep in it"
+      ]
+    },
+    {
+      "when": [
+        "place = greenhouse set",
+        "date <= 03-31"
+      ],
+      "show": [
+        "under the greenhouse staging a heap of leaves rises and falls, slowly, with something curled asleep in it"
+      ]
+    },
+    {
+      "when": [
+        "place = north tower passage",
+        "season = autumn",
+        "time = evening"
+      ],
+      "show": [
+        "a small bat has come in at an open loop and flutters up and down under the roof of the passage, round and round, as if looking for the way out"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "occasion = start of term",
+        "time = evening"
+      ],
+      "show": [
+        "far down the valley a long string of lit windows slides along beside the water, with a smudge of steam over it, and goes on out of sight"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "date = 12-19",
+        "time = morning"
+      ],
+      "show": [
+        "far down the valley a long plume of steam stands over the line, and the train beneath it draws away and is gone"
+      ]
+    },
+    {
+      "when": [
+        "place = keep wall walk",
+        "summer = yes",
+        "weekday = saturday",
+        "time = morning"
+      ],
+      "show": [
+        "far down the valley a long plume of steam stands over the line, and the train beneath it draws away and is gone"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "time = evening"
+      ],
+      "show": [
+        "down the well the lamps are being lit, gallery by gallery, the high ones already burning and the ones below him still dark, a flame at a time"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "time = night",
+        "hour >= 19"
+      ],
+      "show": [
+        "on every gallery down the well the lamps burn steady"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "time = night",
+        "hour < 5"
+      ],
+      "show": [
+        "the lamps down the well burn low, and only a few are left alight on each gallery"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "time = evening",
+        "day of week <= 3"
+      ],
+      "show": [
+        "Mr. Grimbleton goes slowly down the galleries with a taper, lighting the lamps the dusk has not reached, and grumbling at each"
+      ]
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "time = night",
+        "hour >= 21",
+        "hour < 24",
+        "day of week <= 3"
+      ],
+      "show": [
+        "Mr. Grimbleton goes slowly down the galleries with a taper on a long pole, putting out a lamp here and there, and grumbling at each"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "castle-wide.osprey-lake-corridor-g-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor g east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [
+        "high over the water an osprey circles, hangs on the wind, folds and drops toward the lake, and is out of sight below the shore"
+      ],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    },
+    {
+      "id": "castle-wide.osprey-none-lake-corridor-g-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 5,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor g east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    },
+    {
+      "id": "castle-wide.osprey-lake-corridor-1-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 1 east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [
+        "high over the water an osprey circles, hangs on the wind, folds and drops toward the lake, and is out of sight below the shore"
+      ],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    },
+    {
+      "id": "castle-wide.osprey-none-lake-corridor-1-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 5,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 1 east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    },
+    {
+      "id": "castle-wide.osprey-lake-corridor-2-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 2 east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [
+        "high over the water an osprey circles, hangs on the wind, folds and drops toward the lake, and is out of sight below the shore"
+      ],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    },
+    {
+      "id": "castle-wide.osprey-none-lake-corridor-2-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 5,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 2 east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    },
+    {
+      "id": "castle-wide.osprey-lake-corridor-3-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 1,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 3 east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [
+        "high over the water an osprey circles, hangs on the wind, folds and drops toward the lake, and is out of sight below the shore"
+      ],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    },
+    {
+      "id": "castle-wide.osprey-none-lake-corridor-3-east",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "osprey-window",
+      "weight": 5,
+      "moment": "wait 60-240 s",
+      "when": [
+        "place = lake corridor 3 east",
+        "date >= 04-01",
+        "date <= 08-31",
+        "weather = clear",
+        "time = day"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's castle-wide table 5 (docs/magic/castle-wide-1027.md; req 1273, Godric's yeses of 27 October 2026): ours, the Highlands in the windows, PS 6 L2252 and PS 11 L3715 for the mountains and the lake (nothing past 'the lake', no loch or peak named); the osprey hangs and may swoop to the water and is out of sight beyond the shore, never shown rising with anything, nothing caught on his watch; rare, as one_of with its silent partner"
+    }
+  ]
+}

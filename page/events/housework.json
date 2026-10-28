@@ -1,0 +1,74 @@
+{
+  "chain": "housework",
+  "first_visit": [],
+  "room": [
+    {
+      "when": ["place = staff room", "last meal != none", "meal = none", "hour >= 9", "hour < 11"],
+      "show": ["on the tray by the fire the staff's used teacups are washing themselves in the basin, clinking gently, and stacking themselves on the rack to drain"],
+      "canon": "Magic's req 1296, 27 (docs/magic/hunt-2026-10-22.md, The castle's housework; Godric's 1 on req 1292, all eight from Year 1): CoS 3 L7298 \"flicked her wand casually at the dishes in the sink, which began to clean themselves, clinking gently in the background\", read in the canon tool by Magic; after a meal is the hours just after breakfast, lunch and dinner (the meals' table is the runtime's, castle-events.js MEALS); no one at the basin, no house-elf seen; the things are Interiors' req 1295"
+    },
+    {
+      "when": ["place = staff room", "meal = none", "hour >= 14", "hour < 16"],
+      "show": ["on the tray by the fire the staff's used teacups are washing themselves in the basin, clinking gently, and stacking themselves on the rack to drain"],
+      "canon": "Magic's req 1296, 27, after lunch: see the rule above"
+    },
+    {
+      "when": ["place = staff room", "meal = none", "hour >= 20", "hour < 22"],
+      "show": ["on the tray by the fire the staff's used teacups are washing themselves in the basin, clinking gently, and stacking themselves on the rack to drain"],
+      "canon": "Magic's req 1296, 27, after dinner: see the first rule"
+    },
+    {
+      "when": ["place = staff room", "hour >= 16", "hour < 17"],
+      "show": ["at the end of the long table a loaf on its board slices itself, the bread knife setting itself down after, three slices falling over"],
+      "canon": "Magic's req 1296, 31: HBP 5 L55788 \"as the loaf sliced itself\", read in the canon tool by Magic; teatime is four to five o'clock (my reading, Magic to correct; the meals' table has no tea); the board and loaf are Interiors' req 1295"
+    },
+    {
+      "when": ["place = staff room", "time != day"],
+      "show": ["by the fire a pair of knitting needles is knitting on its own, and a long striped scarf is piling up on the hearthrug"],
+      "canon": "Magic's req 1296, 34: OotP 14 L41974 \"a pair of knitting needles flashed in midair\", read in the canon tool by Magic; the needles are the charm only and they knit a scarf, never an elf hat, never a sock; kept to the fire's hours (morning, evening and night), Magic to correct; no one at it"
+    },
+    {
+      "when": ["place = kitchens"],
+      "show": ["on the scrubbed table a row of heavy knives is chopping vegetables of its own accord, nobody at them"],
+      "canon": "Magic's req 1296, 30: OotP 5 L37087 \"a series of heavy knives were chopping meat and vegetables of their own accord\", read in the canon tool by Magic, the meat left out; stands wherever the kitchens are open to him (req 944's gate is the page's, so the rule names no hour); nobody is seen at the table (kitchens.json); the knives are never raised and never point toward the way in (Interiors' req 1295)"
+    },
+    {
+      "when": ["place = dormitory", "cold = yes", "time = evening"],
+      "show": ["between the sheets of his bed a warming pan has been put, long-handled and copper, and no one he saw put it there"],
+      "canon": "Magic's req 1296, 32: GoF 12 L25507 \"Someone ... had placed warming pans between the sheets\", the elf words left out, read in the canon tool by Magic; his own bed on a cold evening, since the boys may sleep there (settled 49); nothing glows, a pan is warm only in the telling"
+    },
+    {
+      "when": ["place = dormitory", "cold = yes", "time = night"],
+      "show": ["between the sheets of his bed a warming pan has been put, long-handled and copper, and no one he saw put it there"],
+      "canon": "Magic's req 1296, 32, on a cold night: see the rule above"
+    },
+    {
+      "when": ["place = dormitory", "occasion = leaving feast", "time != night"],
+      "show": ["at the foot of his bed his trunk is packing itself, books and socks and scales soaring in pell-mell, and the lid not quite shutting"],
+      "canon": "Magic's req 1296, 33: OotP 3 L36415, read in the canon tool by Magic; on the year's last day, the leaving feast (settled 101); only the trunk's kept layer shows, the keepsakes of req 1242 stay inside and are not shown (Interiors' req 1295)"
+    },
+    {
+      "when": ["place = dormitory", "weather = snow", "time = night"],
+      "show": ["the window beside his bed holds the snow falling past it in the dark"],
+      "canon": "Magic's req 1303, the window's weather: CoS 11 L10448, HBP 18 L61483, read in the canon tool by Magic; the weather is the sky's (castle-events.js weatherAt), the room's window draws it"
+    },
+    {
+      "when": ["place = dormitory", "weather = rain", "time = day"],
+      "show": ["the window beside his bed is rain-washed, the panes running"],
+      "canon": "Magic's req 1303, the window's weather: see the rule above; by day, on a wet day"
+    },
+    {
+      "when": ["place = dormitory", "occasion = christmas day", "time = morning"],
+      "show": ["at the foot of his bed a small heap of parcels, appeared in the night and unseen"],
+      "canon": "Magic's req 1303, Christmas morning's heap: PS 12 L4108, PoA 11 L17733, read in the canon tool by Magic; what is in them is Story's; the Dormitory's req 1243 cited; the Dormitory lane's own heap (Interiors' req 1304) is the thing, this is only the cue"
+    },
+    {
+      "when": ["place = dormitory", "occasion = christmas day", "time = morning"],
+      "show": [
+        "the dormitory door stands ajar, and caught beside it a torn strip of wrapping paper",
+        "at the foot of a bed that is not his, a lumpy parcel waits, soft and badly wrapped, a knitted jumper by the feel of it"
+      ],
+      "canon": "the Dormitory's req 1243 (3), the room state for Christmas Day (docs/room-states.md): PS 12 L4108 and PoA 11 L17733 for the parcels, read in the canon tool by Magic under req 1303; the day is the holiday calendar's (occasion = christmas day, ?occasion=christmas-day shows it); the jumper is a trace for a bed that is not a boy's own, never his; no name of the books' years"
+    }
+  ]
+}
