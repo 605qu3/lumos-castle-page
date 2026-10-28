@@ -104,7 +104,25 @@
   // torch's, its light a shade below the torches', swaying with his step
   const LAMP = { colour: 0xf2a860, intensity: 1.15, reach: 4.5, decay: 1.6, height: 0.85, sway: 0.04, bob: 0.03, step: 5.5 };
 
-  const api = { at, mix, SKY, flicker, LAMP };
+  // the stair well's lamps at dusk (req 1275, Godric's 1 on 27 October 2026; sheet design-sundays-lamps-1027): top
+  // gallery first, the left lamp of a gallery then the right one a second after, a gallery every 8 seconds, the whole
+  // well in under a minute, whether he is there or not. Each lamp is its own light (flicker with its own seed, LAMP's
+  // colour): touched with a taper, a spark at a quarter, a flare to 1.2 by 2 s, settled to 1 by 4 s.
+  //   lampLightTime(gallery, side, t0)  seconds at which that lamp is touched; gallery 0 is the top, side 0 left, 1 right
+  //   lampLevel(s)                      its strength, s seconds after the taper (0 before), to multiply by the lamp's
+  //                                     own intensity and flicker(t, seed, 0.06)
+  const LAMPLIGHT = { pace: 8, side: 1, spark: 0.25, flare: 1.2 };
+  const lampLightTime = (gallery, side, t0 = 0) => t0 + gallery * LAMPLIGHT.pace + side * LAMPLIGHT.side;
+  function lampLevel(s) {
+    const { spark, flare } = LAMPLIGHT;
+    if (s < 0) return 0;
+    if (s < 0.5) return spark;
+    if (s < 2) return spark + (flare - spark) * ease((s - 0.5) / 1.5);
+    if (s < 4) return flare - (flare - 1) * ease((s - 2) / 2);
+    return 1;
+  }
+
+  const api = { at, mix, SKY, flicker, LAMP, LAMPLIGHT, lampLightTime, lampLevel };
   if (typeof window !== 'undefined') window.CastleLight = api;
   if (typeof module !== 'undefined') module.exports = api;
 })();
