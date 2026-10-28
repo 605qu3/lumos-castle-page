@@ -7302,10 +7302,12 @@ var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars a
       var d0 = ja * (nAz + 1) + jz, d1 = d0 + 1, d2 = d0 + nAz + 1, d3 = d2 + 1; didx.push(d0, d1, d2, d1, d3, d2);
     }
     var dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.Float32BufferAttribute(dpos, 3)); dg.setAttribute('uv', new THREE.Float32BufferAttribute(duv, 2)); dg.setIndex(didx);
-    var tcv = document.createElement('canvas'); tcv.width = tcv.height = 2048;
+    /* req 1388: 4096 on the top (22.8 px a degree, about the screen's own) and a finer star law in astroSky, so Mizar
+       and Alcor, 0.2 degrees apart, stand as two points with dark between (Magic's rooms.md, her star) */
+    var tcv = document.createElement('canvas'); tcv.width = tcv.height = 4096;
     var ttex = new THREE.CanvasTexture(tcv); ttex.encoding = THREE.sRGBEncoding; ttex.anisotropy = 4;
     var dome = new THREE.Mesh(dg, new THREE.MeshBasicMaterial({ map: ttex, side: THREE.DoubleSide, fog: false })); dome.name = 'astronomy-top-sky'; dome.frustumCulled = false;
-    scene.add(own(dome)); ASTRO.sky = { cv: tcv, tex: ttex, mesh: dome, R: DR, cat: null };
+    scene.add(own(dome)); ASTRO.sky = { cv: tcv, tex: ttex, mesh: dome, R: DR, cat: null, fine: true };
     /* req 663, Events' line "the stars coming and going in the castle's own cloud": the chart room's drifts on a dome
        at 95 m, so a clouded night hides and shows the stars over the whole top, not the ceiling's disc */
     var cg = dg.clone(), cpa = cg.attributes.position, c0 = P(TC[0], TC[1], 0);
@@ -7348,23 +7350,23 @@ function astroSky() {   /* the real sky over home() now; by day tonight's at ele
   var S = ASTRO.sky; if (!S || !window.CastleSky) return;
   var home = events && events.home ? events.home() : { lat: 42, lon: -75 }, when = new Date(), sky = CastleSky.at(when, home);
   if (!sky.sun.dark) { when = new Date(when.getFullYear(), when.getMonth(), when.getDate(), 23, 0, 0); sky = CastleSky.at(when, home); }
-  var c = S.cv.getContext('2d'), W = S.cv.width, h = W / 2;
+  var c = S.cv.getContext('2d'), W = S.cv.width, h = W / 2, k = W / 2048;
   function at(alt, az) { var r = (90 - alt) / 90 * h, a = az * Math.PI / 180; return [h + Math.sin(a) * r, h - Math.cos(a) * r]; }
   var base = (window.CASTLE_TONES && CASTLE_TONES.surfaces['sky-night'] || {}).hex || '#10141f';
   c.fillStyle = base; c.fillRect(0, 0, W, W);
   var gr = c.createRadialGradient(h, h, 0, h, h, h); gr.addColorStop(0, 'rgba(0,0,0,0.25)'); gr.addColorStop(1, 'rgba(40,46,64,0.35)'); c.fillStyle = gr; c.fillRect(0, 0, W, W);
   (S.cat ? CastleSky.stars(sky, S.cat, 5.5) : []).forEach(function (s) {
-    var p = at(s.alt, s.az), r = Math.max(1.2, 5.2 - s.mag * 0.75), a = Math.max(0.28, Math.min(0.85, 0.95 - s.mag * 0.11));
+    var p = at(s.alt, s.az), r = S.fine ? Math.max(1.0, 3.6 - s.mag * 0.6) : Math.max(1.2, 5.2 - s.mag * 0.75), a = Math.max(0.28, Math.min(0.85, 0.95 - s.mag * 0.11));
     var tint = s.bv > 1 ? '255,214,170' : s.bv > 0.4 ? '255,240,215' : '215,226,255';
     c.fillStyle = 'rgba(' + tint + ',' + a + ')'; c.beginPath(); c.arc(p[0], p[1], r, 0, 6.2832); c.fill();
   });
   sky.planets.forEach(function (pl) {
     if (pl.alt <= 0) return;
-    var p = at(pl.alt, pl.az); c.fillStyle = 'rgba(255,236,196,0.85)'; c.beginPath(); c.arc(p[0], p[1], Math.max(3, 6 - pl.mag), 0, 6.2832); c.fill();
+    var p = at(pl.alt, pl.az); c.fillStyle = 'rgba(255,236,196,0.85)'; c.beginPath(); c.arc(p[0], p[1], Math.max(3, 6 - pl.mag) * k, 0, 6.2832); c.fill();
   });
   if (sky.moon.alt > 0) {   /* the moon a little larger than true, its bright side toward the sun */
     var m = at(sky.moon.alt, sky.moon.az), su = at(Math.max(-60, sky.sun.alt), sky.sun.az), dir = Math.atan2(su[1] - m[1], su[0] - m[0]);
-    inkMoon(c, m[0], m[1], 26, sky.moon.lit, dir, 'rgba(232,228,212,0.9)', 'rgba(40,44,58,0.85)');
+    inkMoon(c, m[0], m[1], 26 * k, sky.moon.lit, dir, 'rgba(232,228,212,0.9)', 'rgba(40,44,58,0.85)');
   }
   S.tex.needsUpdate = true; ASTRO.at = 0; ASTRO.when = when; ASTRO.moon = sky.moon;
 }
