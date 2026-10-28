@@ -87,6 +87,31 @@ function findPlace(M, id) {
     return { id: r.id, name: r.name, kind: 'room', poly: pp, floor: pb + (r.floor || 0), ceiling: ceilOf(pb),
       wall: r.wall || WALL_T, walls: null, rec: r };
   }
+  /* v90 (model v218, the Astronomy Tower's top, req 663): a round room open to the sky (`open_sky`): the drum's roof inside
+     a breast-high parapet, and a turret standing up through its edge (`notch`: centre, r, h) a notch in the plan, its walls
+     as tall as the turret and its door cut there; no ceiling, the sky over it. One loop, each side its own height. */
+  if (r && r.shape && r.shape.circle && r.open_sky) {
+    var ob = zb != null ? zb : levelZ(M, r.level), oc = toSite(M, r.group, r.shape.circle), orr = r.shape.r, osk = r.open_sky;
+    var oloop = [], oh = [], on = osk.notch;
+    if (on) {
+      var dx = on.c[0] - oc[0], dy = on.c[1] - oc[1], dd = Math.hypot(dx, dy), th = Math.atan2(dy, dx) * 180 / Math.PI;
+      var aa = (orr * orr - on.r * on.r + dd * dd) / (2 * dd), al = Math.acos(Math.max(-1, Math.min(1, aa / orr))) * 180 / Math.PI;
+      var nOut = Math.max(8, Math.ceil((360 - 2 * al) / 12));
+      oloop = arcPts(oc, orr, th + al, th - al + 360, nOut);                 /* the long way round, the parapet's inner face */
+      var pb = oloop[oloop.length - 1], pa = oloop[0], ph0 = Math.atan2(oc[1] - on.c[1], oc[0] - on.c[0]);
+      var wrap = function (v) { while (v > Math.PI) v -= 2 * Math.PI; while (v < -Math.PI) v += 2 * Math.PI; return v; };
+      var db = wrap(Math.atan2(pb[1] - on.c[1], pb[0] - on.c[0]) - ph0), da = wrap(Math.atan2(pa[1] - on.c[1], pa[0] - on.c[0]) - ph0);
+      var nIn = Math.max(8, Math.ceil(Math.abs(da - db) * on.r / 0.7));       /* the turret's face in sides about 0.7 long */
+      for (var ik = 1; ik <= nIn; ik++) { var ia = ph0 + db + (da - db) * ik / nIn; oloop.push([on.c[0] + on.r * Math.cos(ia), on.c[1] + on.r * Math.sin(ia)]); }
+      oloop.pop();   /* the last point is the first again */
+      /* oh[i] is the side from oloop[i] to oloop[i+1]: the parapet's nOut sides first, the turret's after */
+      oh = oloop.map(function (p, i) { return i < nOut ? osk.breast : on.h; });
+    } else {
+      oloop = arcPts(oc, orr, 0, 360, 30).slice(0, 30); oh = oloop.map(function () { return osk.breast; });
+    }
+    return { id: r.id, name: r.name, kind: 'room', poly: oloop, loops: [oloop], loopH: [oh], area: { outer: oloop, holes: [] },
+      floor: ob + (r.floor || 0), ceiling: null, wall: r.wall || 0.5, walls: null, rec: r, sky: { breast: osk.breast, merlons: 0 } };
+  }
   /* v10: a round room, SIDES sides about the circle, one side's middle on its first door, its wall as deep as its
      deepest loop (the West Tower's drum, 3.2) */
   if (r && r.shape && r.shape.circle) {
@@ -228,7 +253,7 @@ function inPoly(pts, x, y) {
 /* a place's walls as edges, loop by loop (a ring has two), each with its own height where the place gives one */
 function edgesOf(loops, hs, ts) {
   var E = [];
-  loops.forEach(function (pts, j) { pts.forEach(function (a, i) { E.push({ a: a, b: pts[(i + 1) % pts.length], H: hs ? hs[j] : null, T: ts ? ts[j] : null }); }); });
+  loops.forEach(function (pts, j) { pts.forEach(function (a, i) { E.push({ a: a, b: pts[(i + 1) % pts.length], H: hs ? (Array.isArray(hs[j]) ? hs[j][i] : hs[j]) : null, T: ts ? ts[j] : null }); }); });
   return E;
 }
 
@@ -312,7 +337,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      rows of docs/architect/materials-by-room.md) gives the stone, dressing, floor and ceiling, a mass's runs of stone
      along it and a hall's older band below; page/design/tones.js (Design's, req 643) the colours, the model's
      materials.stones the fallback. Provisional until Design's tones are settled; nothing drawn, nothing generated. */
-  var PAINT = window.CASTLE_PAINT || null, TONES = window.CASTLE_TONES || null, painted = o.paint || [];
+  var PAINT = window.CASTLE_PAINT || null, TONES = window.CASTLE_TONES || null, painted = o.paint || [], TRIM = !!o.trim && !!window.CastleTrim;   /* v91 */
   var paintMats = {}, damp = false;   /* v45: a place below ground reads Design's damp keys first (req 824) */
   function hexOf(v) { return typeof v === 'string' ? parseInt(v.replace('#', ''), 16) : v; }
   function shade(h, k) { return (Math.min(255, Math.round((h >> 16 & 255) * k)) << 16) | (Math.min(255, Math.round((h >> 8 & 255) * k)) << 8) | Math.min(255, Math.round((h & 255) * k)); }
@@ -356,6 +381,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (!(R && R[st + '/' + row.dress]) && (row.dress === 'panelled' || row.dress === 'limewash'))
       return paintMat(tone(row.dress === 'panelled' ? 'oak' : 'plaster'), true);
     return faced(st, window.CastleStoneFace && CastleStoneFace.kind(row.dress), tone(st + '/' + row.dress, st), true);
+  }
+  /* v91 (the Architect's 182nd, Godric's word of 27 October 2026, 8.06 pm: trim on both faces of every opening; a pilot,
+     o.trim, shell.html?trim=1): an opening's dressing is its wall's stone cut and laid smooth, a shade lighter */
+  function trimMat(row, sx, sy, z) {
+    if (!row) return paintMat(shade(GREY.wall, 1.12), true);
+    var st = stoneAt(row, sx, sy, z);
+    return faced(st, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(st + '/ashlar', st, 1.08), true);
   }
   function floorMat(row, sx, sy, two) {
     var st = stoneAt(row, sx, sy);
@@ -705,7 +737,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var cap = F.register(new THREE.Mesh(new THREE.ConeGeometry(Ln.r + 0.2, Ln.ridge - Ln.top, 40, 1, true), mats.roof), LAYER.ceiling);
       cap.position.copy(toLocal(Ln.centre[0], Ln.centre[1], (Ln.top + Ln.ridge) / 2)); cap.name = Ln.id + '-cap'; group.add(cap);
     }
-    var E = edgesOf(Q.loops || [Q.poly], Q.loopH, Q.loopT);
+    var E = edgesOf(Q.loops || [Q.poly], Q.loopH, Q.loopT), trimB = {};   /* v91: the trim's geometries, by material */
     /* the openings on each edge: a gap [s0, s1] up to its head h */
     var gaps = E.map(function () { return []; });
     (M.openings || []).concat(Q.ops || []).forEach(function (op) {
@@ -963,6 +995,26 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var p = toLocal(a[0] + ux * s + nx * off, a[1] + uy * s + ny * off, Q.floor), m = slab(0.04, yb - ya, 0.04, mats.grille, 'wall');
         m.position.set(p.x, p.y + (ya + yb) / 2, p.z); m.rotation.y = ang; m.name = name; group.add(m);
       }
+      /* v91: the dressing round an opening on this face and, where nothing of a room's own stands beyond it (a window, a
+         loop, a door to the open), on the far face; a door between two rooms is trimmed by each on its own face; a hidden
+         way takes none (a trim would say tap me). One merged mesh a stone, page/castle-trim.js; a loop's is the British
+         precedent's (materials.md section 2): flush outside, a frame under a lintel inside */
+      function trimGap(g, sm, w) {
+        var k = g.op.kind || '', cls = /hidden|window, round/.test(k) ? null : /loop|slit|squint|grating|cleft/.test(k) ? 'loop'   /* a round window is the room's own drawing (the gallery's rose) */
+          : /window|lancet|oriel|dormer/.test(k) ? 'window' : isDoor(k) || (isWay(k) && w <= 3.5) ? 'door' : null;
+        if (!cls) return;
+        var rm = (M.rooms || []).filter(function (r) { return slug(r.id) === Q.id; })[0], age = rm && rm.age || 'P3';
+        var beyond = (cls === 'door') && g.op.between && findPlace(M, other(g.op, Q.id));
+        var slot = cls === 'loop' && g.op.splay > (g.op.w || 1) ? g.op.w : w;   /* the slot's width at the outer face */
+        ['in', 'out'].forEach(function (face) {
+          if (face === 'out' && (beyond || g.op.depth > t + 0.05)) return;
+          var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: face === 'out' ? slot : w, h: g.h - g.sill, sill: g.sill, face: face });
+          var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sm + nx * off, a[1] + uy * sm + ny * off, Q.floor);
+          geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
+          var mt = trimMat(row, a[0] + ux * sm, a[1] + uy * sm, g.sill);
+          (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
+        });
+      }
       /* v10: a hidden opening seen from its outer side stays wall, with an unseen tap over its face; v58 (model v134,
          H62's head door): a `oneway` opening opens from its inside only, so from its outer side it is wall, no tap */
       gaps[i].filter(function (g) { return g.hidden && !g.op.oneway; }).forEach(function (g) {
@@ -1070,6 +1122,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           rp.name = Q.id + '-pane-' + g.op.id; rp.userData.owner = Q.id; group.add(rp); out.panes.push(rp);
           return;
         }
+        if (TRIM && !g.back) trimGap(g, sm, w);   /* v91 */
         var to = other(g.op, Q.id), via = isWay(g.op.kind) ? viaStair(M, to, Q.id) : null;
         if (via) {
           var sv = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
@@ -1189,6 +1242,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             if (clear(cb, cb)) bar(cb, HE, MER, t / 2, Q.id + '-bar-' + i + '-' + Math.round(cb * 10));
         }
       }
+    });
+    /* v91: the trim, one mesh a stone, untappable */
+    Object.keys(trimB).forEach(function (key) {
+      var b = trimB[key], tm = F.register(new THREE.Mesh(CastleTrim.merge(THREE, b.geos), b.mat), LAYER.wall);
+      tm.name = Q.id + '-trim'; tm.userData.owner = Q.id; tm.raycast = function () {}; group.add(tm);
     });
     /* v59 (model v138, H65): a room hung in this place's air (its `hung` names this place: the hollow under the vanishing
        step, in the stair hall's well under well-M4) is a stone box from here, its walls `wall` thick round its plan, a

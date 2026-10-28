@@ -164,7 +164,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
-<script src="castle-shell.js?v=91"></script>
+<script src="castle-trim.js?v=1"></script>
+<script src="castle-shell.js?v=92"></script>
 <script src="shell-w5b.js?v=20"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -294,6 +295,8 @@ PAINTED = PAINTED.concat(['se-round-room-1']);
 PAINTED = PAINTED.concat(['forbidden-corridor', 'stone-bay', 'stone-pit', 'stone-keys-chamber', 'stone-chess-chamber', 'stone-troll-room', 'stone-potions-room', 'stone-last-chamber']);
 /* v154, req 917 on Godric's 1 on interiors-astronomy-rooms-1022 (ledger 218): the Astronomy drum's six class rooms off the spiral, 2 to 7 */
 PAINTED = PAINTED.concat(['astronomy-lantern-room', 'astronomy-night-books', 'astronomy-chart-room', 'astronomy-instrument-room', 'astronomy-telescope-store', 'astronomy-cloak-room']);
+/* model v218, req 663: the Astronomy Tower's top, the drum's open roof under the sky; its things are Interiors' */
+PAINTED = PAINTED.concat(['astronomy-tower-top']);
 /* v158, req 877 (H63, ledger 223): the room of the stopped clocks, the south-west drum on 4, a rough build; its clocks Interiors' */
 PAINTED = PAINTED.concat(['stopped-clocks']);
 /* v159, req 949 (ledger 224): the Owlery at the top of the West Tower, a rough build; straw on its floor (STRAW) and nothing else */
@@ -314,7 +317,7 @@ PAINTED = PAINTED.concat(['dumbledores-office', 'study']);
 /* castle-shell v88: H82's fern well painted, its stair's stone (houses-sandstone, rubble), provisional, Godric to confirm */
 PAINTED = PAINTED.concat(['h82-fern-well']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
-var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers' }) : null;
+var shell = window.CastleShell && MODEL ? CastleShell.build(kit, MODEL, PLACE, { from: kit.from, start: STARTS[PLACE], paint: PAINTED, far: !Q.has('nofar'), bays: Q.get('bays') || 'piers', trim: Q.get('trim') === '1' }) : null;
 /* the 160th: a room later than his year builds nothing, and said only "no such place", so Divination (from PoA) shot
    black headless twice with a clean console; the line now says which year it stands from and the query that opens it */
 if (!shell) { var later = ((window.CASTLE_MODEL || {}).rooms || []).filter(function (r) { return r.id === PLACE && !stands(r); })[0];
@@ -1758,7 +1761,7 @@ if (CHARMS.on && Q.get('figure3d') === '1') (function () {
   function loc(a, b) { return shell.toLocal(139.6 + b, 71.4 - a, z0); }
   function turn(a, b, da, db) { var d = loc(a + da, b + db).sub(loc(a, b)); return Math.atan2(d.x, d.z); }
   function json(f) { return fetch('people/models/' + f + '.json').then(function (r) { return r.json(); }); }
-  var s = document.createElement('script'); s.src = 'people/figure.js?v=4';
+  var s = document.createElement('script'); s.src = 'people/figure.js?v=6';
   s.onload = function () {
     var want = Q.get('figmodel') !== '0';
     Promise.all(want ? [json('pickett'), json('pupil')] : [null, null]).then(function (mo) {
@@ -7094,7 +7097,8 @@ function updateStoneThings(dt, t) {
    the open log's two pages in ink and wash, moving as the table says: the month of moons (a round of about half a
    minute, a breath's pause at the full, a comet crossing the corner once a round), a planet's loop, an eclipse; the
    tap `night-log` turns it. Still while the room is shut. ?sky=on for checks; lumosGreybox.astro. */
-var ASTRO = { on: PLACE === 'astronomy-chart-room' || PLACE === 'astronomy-night-books', page: 'moons', turn: 0, live: !events, t: 0, sky: null, cloud: null, cloudOn: false, log: null, at: 0 };
+var ASTRO = { on: PLACE === 'astronomy-chart-room' || PLACE === 'astronomy-night-books' || PLACE === 'astronomy-tower-top',page: 'moons', turn: 0, live: !events, t: 0, sky: null, cloud: null, cloudOn: false, log: null, at: 0 };
+var ASTRO_TOP_SKY = 'open to "the cold night air", the castle\'s sky everywhere above';
 var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars and the moon where they really stand tonight, the beams crossing it with the sky between them',
     ASTRO_SKY_DIM = "the sky's dim light, the stars' and the moon's own, faint on the long table's charts",
     ASTRO_CLOUD = "the stars coming and going in the castle's own cloud across the ceiling",
@@ -7172,6 +7176,31 @@ var ASTRO_SKY = 'the ceiling bewitched to look like the sky outside, the stars a
     astroSky();
     cloudShow(false); disc.visible = ASTRO.live || Q.get('sky') === 'on';
     if (Q.get('weather') === 'cloudy' && !events) cloudShow(true);
+  }
+  if (PLACE === 'astronomy-tower-top') {
+    /* req 663 (model v218): the real sky over the open top, the same star drawing as the chart room's ceiling (astroSky),
+       laid on a dome 100 m out, each point where its altitude and bearing put it (the canvas's uv is that drawing's own:
+       zenith at its middle, north up); below the horizon and by day the page's own flat colour */
+    var TC = shell.place.round ? shell.place.round.c : [80, 77], DR = 100, nAz = 48, nAlt = 12, dpos = [], duv = [], didx = [];
+    for (var ia = 0; ia <= nAlt; ia++) {
+      var alt = 90 * ia / nAlt, rr = (90 - alt) / 90 * 0.5;
+      for (var iz = 0; iz <= nAz; iz++) {
+        var az = iz / nAz * 6.2832, v = P(TC[0] + DR * Math.cos(alt * 0.017453) * Math.sin(az), TC[1] + DR * Math.cos(alt * 0.017453) * Math.cos(az), DR * Math.sin(alt * 0.017453));
+        dpos.push(v.x, v.y, v.z); duv.push(0.5 + Math.sin(az) * rr, 0.5 + Math.cos(az) * rr);
+      }
+    }
+    for (var ja = 0; ja < nAlt; ja++) for (var jz = 0; jz < nAz; jz++) {
+      var d0 = ja * (nAz + 1) + jz, d1 = d0 + 1, d2 = d0 + nAz + 1, d3 = d2 + 1; didx.push(d0, d1, d2, d1, d3, d2);
+    }
+    var dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.Float32BufferAttribute(dpos, 3)); dg.setAttribute('uv', new THREE.Float32BufferAttribute(duv, 2)); dg.setIndex(didx);
+    var tcv = document.createElement('canvas'); tcv.width = tcv.height = 2048;
+    var ttex = new THREE.CanvasTexture(tcv); ttex.encoding = THREE.sRGBEncoding; ttex.anisotropy = 4;
+    var dome = new THREE.Mesh(dg, new THREE.MeshBasicMaterial({ map: ttex, side: THREE.DoubleSide, fog: false })); dome.name = 'astronomy-top-sky'; dome.frustumCulled = false;
+    scene.add(own(dome)); ASTRO.sky = { cv: tcv, tex: ttex, mesh: dome, R: DR, cat: null };
+    fetch('sky/stars.json').then(function (r) { return r.json(); }).then(function (cat) { ASTRO.sky.cat = cat; astroSky(); }).catch(function () { astroSky(); });
+    astroSky(); dome.visible = ASTRO.live || Q.get('sky') === 'on';
+    scene.background = kit.col(DAY ? 0xa9bfd6 : 0x10141f);
+    if (!DAY) scene.add(new THREE.HemisphereLight(kit.col(0x8798c4), kit.col(0x2a2a30), 0.3));   /* starlight on the leads, provisional */
   }
   if (PLACE === 'astronomy-night-books') {
     /* the open log's two pages, a millimetre over the paper (Interiors' place, shell-w5a.js), its tap `night-log` */
@@ -7268,9 +7297,10 @@ function astroShown(shown) {
   if (!ASTRO.on) return [];
   var drawn = [];
   if (ASTRO.sky) {
-    ASTRO.live = shown.indexOf(ASTRO_SKY) >= 0 || !events || Q.get('sky') === 'on';
+    var SKY_LINE = PLACE === 'astronomy-tower-top' ? ASTRO_TOP_SKY : ASTRO_SKY;   /* the top's is Events' req 488 line, the sky "everywhere above" */
+    ASTRO.live = shown.indexOf(SKY_LINE) >= 0 || !events || Q.get('sky') === 'on';
     ASTRO.sky.mesh.visible = ASTRO.live; cloudShow(shown.indexOf(ASTRO_CLOUD) >= 0 || (!events && Q.get('weather') === 'cloudy'));
-    drawn = [ASTRO_SKY, ASTRO_SKY_DIM, ASTRO_CLOUD];
+    drawn = [SKY_LINE, ASTRO_SKY_DIM, ASTRO_CLOUD];
   }
   if (ASTRO.log) {
     var pg = shown.indexOf(ASTRO_PLANET) >= 0 ? 'planet' : shown.indexOf(ASTRO_ECLIPSE) >= 0 ? 'eclipse' : shown.indexOf(ASTRO_MOONS) >= 0 ? 'moons' : null;
