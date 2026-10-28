@@ -275,8 +275,8 @@ scene.add(fireGlow);
    wide, 0.425 high. The mattress top at 0.55 and the clear 0.25 beneath the frame stay this lane's guesses (verify). */
 var BED = { w: 1.0, l: 2.0, h: 2.2, mattress: 0.55, under: 0.25 };
 var TRUNK = { l: 0.925, w: 0.545, h: 0.425 };
-var BED_DEGS = [-24, 24, -53, 53, -82], HIS_DEG = 24;
-var frameMat = solid(0x5a4a40), hangMat = solid(0x6e5450), hisHangMat = solid(0x7a4a48), linenMat = solid(0xa8a09a), trunkMat = solid(0x6b5236);
+var BED_DEGS = [-24, 24, -53, 53, -82], KNEEL_BED = 'bed-2';   /* the bed at the stair end: the look under it stays (Rework 6) */
+var frameMat = solid(0x5a4a40), hangMat = solid(0x6e5450), linenMat = solid(0xa8a09a), trunkMat = solid(0x6b5236);
 var darkMat = new THREE.MeshBasicMaterial({ color: col(0x0e0c0b) });   /* the dark under a bed: unlit, so no light reaches it */
 var beds = [];
 BED_DEGS.forEach(function (deg, i) {
@@ -284,7 +284,7 @@ BED_DEGS.forEach(function (deg, i) {
   g.position.copy(pol(WALL_R - 0.02, deg));
   g.rotation.y = -deg * Math.PI / 180;
   scene.add(g);
-  var his = deg === HIS_DEG, name = his ? 'bed-his' : 'bed-' + (i + 1), hm = his ? hisHangMat : hangMat;
+  var name = 'bed-' + (i + 1), hm = hangMat;
   var parts = [];
   parts.push(box(g, BED.w - 0.1, 1.3, 0.08, 0, 0.65, 0.06, frameMat, 1));                 /* headboard */
   parts.push(box(g, BED.w - 0.1, BED.mattress - BED.under, BED.l - 0.2, 0, (BED.mattress + BED.under) / 2, BED.l / 2, linenMat, 1));   /* the bed itself, on its frame above the dark */
@@ -305,19 +305,14 @@ BED_DEGS.forEach(function (deg, i) {
   [-1, 1].forEach(function (s) { drawn.push(box(g, 0.12, BED.h - 0.4, BED.l - 0.1, s * (BED.w / 2 + 0.02), (BED.h - 0.4) / 2, BED.l / 2, hm, 1)); });
   [-1, 1].forEach(function (s) { drawn.push(box(g, (BED.w + 0.16) / 2, BED.h - 0.4, 0.12, s * (BED.w + 0.16) / 4, (BED.h - 0.4) / 2, BED.l + 0.02, hm, 1)); });
   drawn.forEach(function (m) { m.visible = false; m.name = name + '-drawn'; });
-  parts.push(box(g, TRUNK.l, TRUNK.h, TRUNK.w, 0, TRUNK.h / 2, BED.l + 0.15 + TRUNK.w / 2, his ? trunkMat.clone() : trunkMat, 1));   /* the trunk at the foot, its long side across it; his own material, for its glow (req 287) */
-  parts[parts.length - 1].name = his ? 'trunk-his' : 'trunk-' + (i + 1);
+  parts.push(box(g, TRUNK.l, TRUNK.h, TRUNK.w, 0, TRUNK.h / 2, BED.l + 0.15 + TRUNK.w / 2, name === KNEEL_BED ? trunkMat.clone() : trunkMat, 1));   /* the trunk at the foot, its long side across it; one has its own material for the set-aside glow (req 287) */
+  parts[parts.length - 1].name = 'trunk-' + (i + 1);
   parts.forEach(function (m) { if (!m.name) m.name = name; });
-  /* the dark under the bed: an unlit block under the frame, open 0.6 m at the foot end; under his bed, two grey
-     stand-ins for his own things in that mouth (Magic's thread, an event; nothing drawn) */
+  /* the dark under the bed: an unlit block under the frame, open 0.6 m at the foot end; no things of his lie
+     there (Rework 6, 27 October 2026: their own things are in their satchel); what lies there is an everyday event's */
   var under = [box(g, BED.w - 0.3, BED.under - 0.03, BED.l - 0.85, 0, (BED.under - 0.03) / 2, (BED.l - 0.85) / 2 + 0.15, darkMat, 1)];
-  under[0].name = his ? 'under-his' : 'under-' + (i + 1);
-  if (his) {
-    under.push(box(g, 0.32, 0.18, 0.22, -0.22, 0.09, BED.l - 0.45, solid(0x5e5852), 1));
-    under.push(box(g, 0.02, 0.15, 0.11, 0.24, 0.075, BED.l - 0.4, solid(0x7a736c), 1));
-    under[1].name = under[2].name = 'things-his';
-  }
-  beds.push({ deg: deg, his: his, name: name, group: g, meshes: parts, under: under, tied: tied, drawn: drawn });
+  under[0].name = 'under-' + (i + 1);
+  beds.push({ deg: deg, name: name, group: g, meshes: parts, under: under, tied: tied, drawn: drawn });
 });
 
 /* three high narrow windows, 0.6 by 1.9 m, sills 1.1 m up: a pale sky plane on the wall naming its view (the views are
@@ -522,7 +517,7 @@ function updateSplat(dt) {
    for a shot. */
 var TRUNK_GLOW = { secs: 3.2, wait: 60, color: 0x2e1e0a };
 var trunkGlow = null;
-function trunkGlowStart() { trunkGlow = { m: beds.filter(function (b) { return b.his; })[0].meshes.filter(function (m) { return m.name === 'trunk-his'; })[0], t: -1, wait: TRUNK_GLOW.wait }; return true; }
+function trunkGlowStart() { trunkGlow = { m: beds.filter(function (b) { return b.name === KNEEL_BED; })[0].meshes.filter(function (m) { return m.name === 'trunk-2'; })[0], t: -1, wait: TRUNK_GLOW.wait }; return true; }
 var trunkGlowV = new THREE.Vector3();
 function updateTrunkGlow(dt) {
   if (!trunkGlow) return;
@@ -759,7 +754,7 @@ function dim(on) {
 }
 /* the others' beds as the clock finds them on waking: drawn by night, tied back and empty by day */
 function othersAsTheClock() {
-  beds.forEach(function (b) { if (!b.his) hangings(b.name, light === 'night' ? 1 : 0); });
+  beds.forEach(function (b) { hangings(b.name, light === 'night' ? 1 : 0); });
 }
 function hangings(name, k) {
   var b = beds.filter(function (x) { return x.name === name; })[0];
@@ -777,7 +772,7 @@ function hangings(name, k) {
 /* for shots: hold the eye at pos looking at look, each [x, y, z], in his bed's frame when local (the head at the
    wall, +z down the bed, -x the hearth's side) */
 function pose(pos, look, local) {
-  var g = beds.filter(function (x) { return x.his; })[0].group;
+  var g = beds.filter(function (x) { return x.name === KNEEL_BED; })[0].group;
   var p = new THREE.Vector3().fromArray(pos), l = new THREE.Vector3().fromArray(look);
   if (local) { g.localToWorld(p); g.localToWorld(l); }
   arriving = false; tween = null; atStop = null; mode = 'pose'; backBtn.hidden = false;
@@ -850,14 +845,14 @@ beds.forEach(function (b) { STOPS.push({ name: b.name, meshes: b.meshes, stop: f
    stop as built with his things in the trunk, a kneel at 0.6 beside the flank (it showed the flank) and one at 0.45
    from the foot's corner (the trunk and a post). This view gets its own drawing later, as the board's walk-up does. */
 (function () {
-  var his = beds.filter(function (b) { return b.his; })[0], g = his.group;
+  var kb = beds.filter(function (b) { return b.name === KNEEL_BED; })[0], g = kb.group;
   function kneel() {
     return { pos: g.localToWorld(new THREE.Vector3(-1.2, 0.22, BED.l - 0.45)), look: g.localToWorld(new THREE.Vector3(0.3, 0.1, BED.l - 0.5)) };
   }
-  STOPS.push({ name: 'under-his', meshes: his.under, stop: kneel });
+  STOPS.push({ name: 'under-2', meshes: kb.under, stop: kneel });
   /* the bedtime's waking frame, for shots and for the bedtime once it is designed: the eye on his pillow looking down
      the bed to the room; nothing taps it */
-  STOPS.push({ name: 'pillow-his', meshes: [], stop: function () {
+  STOPS.push({ name: 'pillow-2', meshes: [], stop: function () {
     return { pos: g.localToWorld(new THREE.Vector3(0, 0.85, 0.6)), look: g.localToWorld(new THREE.Vector3(0, 0.45, BED.l + 3.0)) };
   } });
 })();
@@ -871,7 +866,7 @@ var mode = 'rest', atStop = null, tween = null;
    bed a small turn, 20, the frame's mouth); he arrives square to the thing and a tap on another stop's thing walks him
    straight there from wherever he is looking */
 var HEAD_MAX = Math.PI / 3, HEAD_PITCH = 0.15, here = null, hy = 0, hp = 0, hyT = 0, hpT = 0;
-function headLimit(s) { return s && s.name === 'under-his' ? Math.PI / 9 : HEAD_MAX; }
+function headLimit(s) { return s && s.name === 'under-2' ? Math.PI / 9 : HEAD_MAX; }
 function headPose(pos, look) {
   pos.copy(here.pos);
   var d = here.look.clone().sub(here.pos), a = Math.atan2(d.x, d.z) + hy, el = Math.atan2(d.y, Math.hypot(d.x, d.z)) + hp;
@@ -910,17 +905,18 @@ function descend(dry) {
   leaving = true;
   var stairStop = STOPS[1];
   function drop() {
-    swingDoor(SCREEN.OPEN, 0.8);   /* the door at the stair head opens into the room, and he goes through it */
+    if (!doorShut) swingDoor(SCREEN.OPEN, 0.8);   /* the door at the stair head opens into the room, and he goes through it; by night it stays shut */
     setTimeout(function () {
       glideTo({ pos: NEWEL.clone().add(pol(0.45, roomSide)).setY(0.4), look: NEWEL.clone().setY(-2.0) });
       setTimeout(function () {
         kit.travel('common-room.html?from=dormitory', { place: { room: 'common-room' }, dry: dry, done: function () {
-          leaving = false; atStop = null; mode = 'stop'; goTo(stairStop); swingDoor(0, 1.4, 0.6);
+          leaving = false; atStop = null; if (doorShut) { mode = 'shut'; return; } mode = 'stop'; goTo(stairStop); swingDoor(0, 1.4, 0.6);
         } });
       }, tween.dur * 600);
     }, 650);
   }
-  if (atStop !== stairStop) {
+  if (doorShut) drop();
+  else if (atStop !== stairStop) {
     goTo(stairStop);
     var wait = setInterval(function () { if (!tween) { clearInterval(wait); drop(); } }, 50);
   } else drop();
@@ -941,6 +937,7 @@ function descend(dry) {
 var ARRIVE = { climb: 2.5, breath: 1.5, settle: 1.7, treads: 5, r: 0.55, step: 0.75 };
 var STAIR_GAZE = new THREE.Vector3(); stairPose(0, 0, new THREE.Vector3(), STAIR_GAZE);
 function climbPose(s, pos, look) {
+  if (doorShut && s > ARRIVE_DOOR.from) s = ARRIVE_DOOR.from;   /* a few treads below the door, its sign before him, no further */
   if (s < ARRIVE.step) {                                  /* the spiral: tread 6 up to tread 0, flush with the floor */
     var k = ARRIVE.treads * (1 - s / ARRIVE.step), b = (roomSide - k * TREAD) * Math.PI / 180;
     pos.set(NEWEL.x + Math.sin(b) * ARRIVE.r, EYE - k * 0.2, NEWEL.z - Math.cos(b) * ARRIVE.r);   /* the eye 0.55 m out, the tread's outer half */
@@ -949,13 +946,18 @@ function climbPose(s, pos, look) {
     pos.copy(NEWEL).add(pol(ARRIVE.r + (1.0 - ARRIVE.r) * u, roomSide)); pos.y = EYE;
   }
   /* inside the screen he looks up the stair to the door and its sign until it opens, then on into the room */
-  var o = clamp((s - ARRIVE_DOOR.from) / (ARRIVE.step - ARRIVE_DOOR.from), 0, 1);
+  var o = doorShut ? 0 : clamp((s - ARRIVE_DOOR.from) / (ARRIVE.step - ARRIVE_DOOR.from), 0, 1);
   look.lerpVectors(CLIMB_DOOR, STAIR_GAZE, easeInOut(o));
 }
 var CLIMB_DOOR = NEWEL.clone().add(pol(0.65, roomSide)).setY(1.45);   /* the door's sign, ledger line 5 */
 var arriving = false, arriveT = 0, arriveHold = false;
+/* By night the door at the stair head stays shut (Rework 9; the Ministry's list, 27 October 2026: the room is the boys'
+   mates' at night, glimpsed never met): he climbs to a few treads below the door, it and its sign before him, and that is as far
+   as he goes; a tap goes back down. The clock is read once, at the arrival. */
+var doorShut = false;
 function arrivalPose(t, pos, look) {
   var tc = ARRIVE.climb, tb = tc + ARRIVE.breath, ts = tb + ARRIVE.settle;
+  if (doorShut) { climbPose(easeInOut(clamp(t / tc, 0, 1)), pos, look); return t >= tc; }
   if (t <= tc) climbPose(easeInOut(t / tc), pos, look);
   else if (t <= tb) climbPose(1, pos, look);
   else {
@@ -970,6 +972,7 @@ function arrivalPose(t, pos, look) {
    again while the view settles */
 var ARRIVE_DOOR = { from: 0.42, to: 0.68 };
 function arrivalDoor(t) {
+  if (doorShut) return 0;
   var tc = ARRIVE.climb, tb = tc + ARRIVE.breath, s = easeInOut(clamp(t / tc, 0, 1));
   var open = SCREEN.OPEN * easeInOut(clamp((s - ARRIVE_DOOR.from) / (ARRIVE_DOOR.to - ARRIVE_DOOR.from), 0, 1));
   return t <= tb ? open : SCREEN.OPEN * (1 - easeInOut(clamp((t - tb) / (ARRIVE.settle + 0.6), 0, 1)));
@@ -977,9 +980,10 @@ function arrivalDoor(t) {
 function updateArrival(dt) {
   if (!arriveHold) arriveT += dt;
   setDoor(arrivalDoor(arriveT)); doorSwing = null;
-  if (arrivalPose(arriveT, camera.position, lookTmp) && !arriveHold) { arriving = false; mode = 'rest'; if (doorA > 0) swingDoor(0, 0.6); }
+  if (arrivalPose(arriveT, camera.position, lookTmp) && !arriveHold) { arriving = false; mode = doorShut ? 'shut' : 'rest'; if (doorA > 0) swingDoor(0, 0.6); }
 }
 function arriveFromRoom() {
+  doorShut = light === 'night';
   kit.savePlace({ room: 'dormitory' });
   arriving = true; arriveHold = false; arriveT = 0; mode = 'arrive'; tween = null; atStop = null; backBtn.hidden = true;
   yaw = yawT = 0; pitch = pitchT = 0;
@@ -1005,7 +1009,7 @@ function holdArrival(t) {
    `bedtime`; and when lights out comes while he is already up here, the runtime's cue for the dormitory runs the same
    night from where he stands: the eye glides to the stage, no climb (HERE). Either way, once the screen is dark the
    page ends the visit (events.leave). lumosGreybox.holdNight('here', t) freezes that one. */
-var NIGHT = { start: 4.5, draw: 0.8, gap: 0.45, hold: 1.2, fade: 1.6, order: ['bed-5', 'bed-3', 'bed-4', 'bed-1', 'bed-his'] };
+var NIGHT = { start: 4.5, draw: 0.8, gap: 0.45, hold: 1.2, fade: 1.6, order: ['bed-5', 'bed-3', 'bed-4', 'bed-1', 'bed-2'] };
 var HERE = { settle: 1.7, start: 1.2 };   /* lights out with him already up here: the glide to the stage, and when the first hangings begin */
 var WAKE = { breath: 2.4, settle: 2.0, pos: [0, 1.1, 1.0], look: [-2.4, 0.85, 1.5] };
 var endVeil = document.createElement('div');
@@ -1028,7 +1032,7 @@ function nightPose(t) {
     var f0 = nightEnd('bedtime', night.here) - NIGHT.fade;
     endVeil.style.opacity = String(clamp((t - f0) / NIGHT.fade, 0, 1));
   } else {
-    var g = beds.filter(function (x) { return x.his; })[0].group;
+    var g = beds.filter(function (x) { return x.name === KNEEL_BED; })[0].group;
     var a = { pos: g.localToWorld(new THREE.Vector3().fromArray(WAKE.pos)), look: g.localToWorld(new THREE.Vector3().fromArray(WAKE.look)) };
     var r = { pos: new THREE.Vector3(), look: new THREE.Vector3() }; restPose(r.pos, r.look);
     var k = easeInOut(clamp((t - (nightEnd('waking') - WAKE.settle)) / WAKE.settle, 0, 1));
@@ -1066,6 +1070,7 @@ var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 function tap(cx, cy) {
   /* the help line is the frame's now (req 203, 205): it stays through taps and goes at his first look-drag */
   if (tween || leaving || arriving || night) return;
+  if (doorShut) { if (mode === 'shut') descend(); if (kit.tapped) kit.tapped(true); return; }   /* by night a tap goes back down */
   var r = canvas.getBoundingClientRect();
   pointer.set(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(pointer, camera);
@@ -1086,13 +1091,13 @@ function tapName(hit) {
   var o = hit.object;
   if (o.userData.stop === STOPS[1]) return 'the dormitory stair';
   if (o.userData.stop === STOPS[0]) return 'the dormitory hearth';
-  if (o.userData.stop.name === 'under-his') return 'his things under the bed';
+  if (o.userData.stop.name === 'under-2') return null;
   var w = windows.filter(function (q) { return q.sky === o || q.sill === o; })[0];
   if (w) return (w.name === MOON.win && o === w.sky && lookW3(hit)) || 'the dormitory windows';
   var b = beds.filter(function (q) { return q.meshes.indexOf(o) >= 0; })[0];
   if (!b) return null;
-  if (o.name.indexOf('trunk') === 0) return b.his ? 'his trunk' : 'the trunks';
-  return b.his ? 'his four-poster' : b.name === CORNER_BED ? "neville's four-poster" : 'the four-posters';
+  if (o.name.indexOf('trunk') === 0) return 'the trunks';
+  return b.name === CORNER_BED ? "neville's four-poster" : 'the four-posters';
 }
 
 function updateCamera(dt) {
@@ -1272,28 +1277,32 @@ function updateLines(dt) {
 /* the Marauder's Map in his hands (req 269, the play of req 242; castle-map.js): its pocket button, the parchment over
    the room, the oath's and Mischief managed's cards and Closer are the script's; the room only passes its cues, its
    draw and its lines through, as the corridor does (req 268) */
+/* SET ASIDE (a ruling of 14 and 15 October 2026, logged 27 October 2026): the bedtime and lights out, the waking, the twins' Christmas fling, the trunk's glow, the hangings' stir and the
+   Omnioculars' shimmer stay in this file, dead, until Godric's yes deletes them; ?setaside wakes them for a look only.
+   Their records are Events'. */
+var SETASIDE = new URLSearchParams(location.search).has('setaside');
 var mapPlay = window.CastleMap ? CastleMap.make({ castle: function () { return castle; } }) : null;
 var castle = window.CastleEvents ? CastleEvents.start({
   chains: 'all',
   place: 'dormitory',
   cues: Object.assign({
     'the room begins to wind down: the fire banks a little, the sitters yawn, students drift up the stair': function () {
-      console.info('[dormitory] the bedtime warning: the room winds down (drawn later)');
+      if (SETASIDE) console.info('[dormitory] the bedtime warning: the room winds down (drawn later)');
     },
     "the dormitory's lights out: the room dimmed, the hangings drawn bed by bed, his last, and the screen darkens; then the page ends the visit": function () {
-      if (night || leaving) return;
+      if (!SETASIDE || night || leaving) return;
       startNight('bedtime', 0, false, { pos: camera.position.clone(), look: lookTmp.clone() });
     },
     /* Neville's snore on a night waking (board req 89): his line comes from the corner bed (SPEAKER_AT) */
-    'behind the drawn hangings of the corner bed, a loud snore, and the hangings stir': function () { stir(CORNER_BED); },
+    'behind the drawn hangings of the corner bed, a loud snore, and the hangings stir': function () { if (SETASIDE) stir(CORNER_BED); },   /* by night the snore is heard through the shut door; no hangings seen (Rework 3) */
     /* the grounds by day while snow lies (board req 117) and the full moon's owl at W3 (req 103), drawn past the glass */
     'a snowball flies up past the window from a fight on the grounds below and drops out of sight': function () { snowballFly(); },
     "an owl's dark shape crosses the full moon, wings out, and is gone": moonOwlFly,
     /* the twins' snowball that misses (req 277) and his trunk after a restore (req 287) */
     'a snowball smacks into the glass, a round white splat that slides slowly down the pane': function () { splatFly(); },
-    'his trunk already at the foot of his bed, brought up ahead of him, as on his first night': trunkGlowStart,
+    'his trunk already at the foot of his bed, brought up ahead of him, as on his first night': function () { if (SETASIDE) trunkGlowStart(); },
     /* the twins' Christmas morning (Godric's t1 on dormitory-sign-door-1013, PS 12), the record asked of Events */
-    'the dormitory door flung open, and Fred and George bound in': doorFling
+    'the dormitory door flung open, and Fred and George bound in': function () { if (SETASIDE) doorFling(); }
   }, mapPlay ? mapPlay.cues : {}),
   drawRoom: function (shown) {
     if (!mapPlay) return;
@@ -1311,13 +1320,13 @@ var castle = window.CastleEvents ? CastleEvents.start({
 /* the light first, by the clock, then the way he came: the arrival, either night, or the waking */
 setLight(clockTime());
 /* the lights-out trip's flag is bare (&bedtime); ?bedtime=N is a test's visit length in minutes, not a trip */
-var lightsOutTrip = new URLSearchParams(location.search).get('bedtime') === '';
+var lightsOutTrip = SETASIDE && new URLSearchParams(location.search).get('bedtime') === '';
 if ((kit.from === 'room' || kit.from === 'corridor') && lightsOutTrip) startNight('bedtime');
 else if (kit.from === 'room') arriveFromRoom();
-else if (kit.from === 'sleep') startNight('waking');
+else if (SETASIDE && kit.from === 'sleep') startNight('waking');
 /* the door's sign reads his year (req 263; ?yearin=N for a test), and ?fling flings the door every twelve seconds */
 if (castle && castle.yearIn) drawSign(castle.yearIn());
-if (new URLSearchParams(location.search).has('fling')) setInterval(function () { if (!doorSwing && doorA === 0) doorFling(); }, 12000);
+if (SETASIDE && new URLSearchParams(location.search).has('fling')) setInterval(function () { if (!doorSwing && doorA === 0) doorFling(); }, 12000);
 
 /* ---------- looking close (board req 139, the Omnioculars' count, the dormitory's half; req 126 and 133) ----------
    Held at double or closer for a second, the thing at the middle of the view is named to the runtime's lookClose,
@@ -1334,9 +1343,8 @@ function lookW3(hit) {
   return Math.hypot(a.x - b.x, a.y - b.y) <= MOON.d * 0.47 ? 'the moon' : null;   /* the disc drawn 60 of 128 across */
 }
 beds.forEach(function (b) {
-  kit.zoom.look(b.group, b.his ? 'his four-poster' : b.name === CORNER_BED ? "neville's four-poster" : 'the four-posters');
-  b.meshes.forEach(function (m) { if (m.name.indexOf('trunk') === 0) kit.zoom.look(m, b.his ? 'his trunk' : 'the trunks'); });
-  if (b.his) b.under.slice(1).forEach(function (m) { kit.zoom.look(m, 'his things under the bed'); });
+  kit.zoom.look(b.group, b.name === CORNER_BED ? "neville's four-poster" : 'the four-posters');
+  b.meshes.forEach(function (m) { if (m.name.indexOf('trunk') === 0) kit.zoom.look(m, 'the trunks'); });
 });
 [hearth, firebox].forEach(function (m) { kit.zoom.look(m, 'the dormitory hearth'); });
 windows.forEach(function (w) { kit.zoom.look(w.sill, 'the dormitory windows'); if (w.name === MOON.win) kit.zoom.look(w.sky, lookW3); });
@@ -1344,8 +1352,8 @@ kit.zoom.look(well, 'the dormitory stair');
 kit.zoom.onLook(function (name) { if (castle) castle.lookClose(name); });
 /* the Omnioculars once his pair is held (req 159, as the common room's req 158): the knobs only then, a hidden thing
    (req 157) only shimmers, and the gold line names what is held still at the middle, in the room's own plain words */
-kit.zoom.held(function () { return !!(castle && castle.state().vars.omni === 'held'); });
-kit.zoom.hidden(function (name) { return !!(castle && castle.hidden && castle.hidden(name)); });
+kit.zoom.held(function () { return !!(SETASIDE && castle && castle.state().vars.omni === 'held'); });   /* no Omnioculars before GoF's year (Rework 7) */
+kit.zoom.hidden(function (name) { return !!(SETASIDE && castle && castle.hidden && castle.hidden(name)); });   /* nothing shimmers (Rework 7) */
 kit.zoom.shown({ 'the dormitory hearth': 'The hearth', 'the dormitory windows': 'The windows', 'the dormitory stair': 'The stair' });
 
 /* ---------- per frame ---------- */
@@ -1394,7 +1402,7 @@ window.lumosGreybox = { frame: frame, setView: setView, view: function () { retu
   bedtime: function () { startNight('bedtime'); }, waking: function () { startNight('waking'); },
   holdNight: function (kind, t) {
     if (kind !== 'here') { startNight(kind, t, true); return nightEnd(kind); }
-    var s = STOPS.filter(function (x) { return x.name === 'bed-his'; })[0].stop();   /* for a shot: from his bed's stop */
+    var s = STOPS.filter(function (x) { return x.name === KNEEL_BED; })[0].stop();   /* for a shot: from that bed's stop */
     startNight('bedtime', t, true, s); return nightEnd('bedtime', true);
   },
   events: castle,
