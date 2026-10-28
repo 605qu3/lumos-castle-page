@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lake views probe</title>
+<style>
+  html, body { margin: 0; background: #0b0a09; color: #d8cfbf; font: 14px/1.4 Georgia, serif; }
+  canvas { display: block; }
+  #labels { position: absolute; left: 0; top: 0; width: 1080px; pointer-events: none; }
+  #labels div { position: absolute; padding: 4px 8px; background: rgba(11, 10, 9, 0.62); font-size: 15px; }
+</style>
+</head>
+<body>
+<div id="labels"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../castle-model.js"></script>
+<script src="castle-light.js?v=4"></script>
+<script src="lake-views.js?v=1"></script>
+<script>
+/* lake-live.html: Design's probe for lake-views.js (req 1313 (b), Corridor's; Godric's 1 on reqs 1308 and 1316). The
+   seven lake-face corridors' windows, G to 6, each from its own eye (the model's levels, the eye 1.35 over the floor) at
+   x 122 on the corridor's south wall (y 0.6), looking south 12 degrees down, 60 degrees across: the lake at -46.0 from
+   the model's outline, the lawn round it, the Highland ranges, and each floor's own piece. ?night=1 by night, ?winter=1
+   the lake frozen (floor 1's squid under the ice), ?t=seconds for the moving pieces. Not the shell: the shell's far
+   scene (castle-shell.js, farView) calls CastleLakeViews. window.lakeReady { views } once drawn. */
+(function () {
+  'use strict';
+  var q = new URLSearchParams(location.search), night = q.get('night') === '1', winter = q.get('winter') === '1', T0 = +(q.get('t') || 0);
+  var M = window.CASTLE_MODEL, lake = (M.grounds || []).filter(function (g) { return g.id === 'lake'; })[0];
+  var LAKE = -46.0, LAWN = -1.2, W = 1080, CW = 540, CH = 330, LV = ['G', '1', '2', '3', '4', '5', '6'];
+  function V(x, y, z) { return new THREE.Vector3(x, z, -y); }
+  var r = new THREE.WebGLRenderer({ antialias: true });
+  r.setPixelRatio(1); r.setSize(W, CH * 4); r.outputEncoding = THREE.sRGBEncoding; r.setScissorTest(true);
+  document.body.appendChild(r.domElement);
+  var L = window.CastleLight ? CastleLight.at({ sun: { up: !night, altitude: night ? -20 : 28 }, moon: { up: night, light: 0.7 }, weather: { sky: 'clear' } }) : null;
+  var sky = new THREE.Color(L ? L.sky : (night ? 0x10141f : 0xb8cde6)).convertSRGBToLinear();
+  var scene = new THREE.Scene(); scene.background = sky;
+  scene.add(new THREE.HemisphereLight(night ? 0x2a3550 : 0xcfd8e6, night ? 0x0a0a0c : 0x3a332c, night ? 0.18 : 0.75));
+  var sun = new THREE.DirectionalLight(night ? 0x9aa6c8 : 0xfff1dc, night ? 0.12 : 0.8); sun.position.copy(V(-300, -800, 600)); scene.add(sun);
+  scene.fog = new THREE.Fog(sky, 2500, 16000);     /* the air: the far ranges pale toward the sky */
+  var lam = function (c) { var m = new THREE.MeshLambertMaterial({ color: new THREE.Color(c).convertSRGBToLinear() }); m.side = THREE.DoubleSide; return m; };
+  function flat(pts, z, mat, holes) {
+    var sh = new THREE.Shape(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }));
+    (holes || []).forEach(function (h) { sh.holes.push(new THREE.Path(h.map(function (p) { return new THREE.Vector2(p[0], p[1]); }))); });
+    var g = new THREE.ShapeGeometry(sh, 8), a = g.attributes.position;
+    for (var i = 0; i < a.count; i++) { var v = V(a.getX(i), a.getY(i), z); a.setXYZ(i, v.x, v.y, v.z); }
+    g.computeVertexNormals(); var m = new THREE.Mesh(g, mat); scene.add(m); return m;
+  }
+  var poly = lake.shape.poly;
+  flat(poly, LAKE, lam(night ? 0x141b24 : 0x6f8797));
+  /* the lawn round the lake: its hole the outline taken every sixth point (the roughened shore crosses itself in places,
+     which the hole cannot take); the banks below follow the full outline */
+  flat([[-12000, -12000], [12000, -12000], [12000, 12000], [-12000, 12000]], LAWN, lam(0x7d8a5c), [poly.filter(function (p, i) { return i % 6 === 0; })]);
+  /* the lake's banks, the lawn down to the water along the outline */
+  var bank = [];
+  for (var i = 0; i < poly.length; i++) {
+    var a = poly[i], b = poly[(i + 1) % poly.length];
+    bank.push(V(a[0], a[1], LAKE), V(b[0], b[1], LAKE), V(b[0], b[1], LAWN), V(a[0], a[1], LAKE), V(b[0], b[1], LAWN), V(a[0], a[1], LAWN));
+  }
+  var bg = new THREE.BufferGeometry().setFromPoints(bank); bg.computeVertexNormals(); scene.add(new THREE.Mesh(bg, lam(0x8b8478)));
+  scene.add(CastleLakeViews.ranges(THREE, V, { lawn: LAWN }));
+  var pieces = LV.map(function (lv) {
+    var P = CastleLakeViews.forLevel(THREE, lv, V, { lake: LAKE, ground: lake, night: night, season: winter ? 'winter' : '' });
+    P.tick(T0); P.group.visible = false; scene.add(P.group); return P;
+  });
+  if (winter) { var ic = CastleLakeViews.ice(THREE, V, lake, { lake: LAKE }); if (ic) scene.add(ic); }
+  var cam = new THREE.PerspectiveCamera(60, CW / CH, 0.3, 12000), labels = document.getElementById('labels');
+  LV.forEach(function (lv, k) {
+    var col = k % 2, row = Math.floor(k / 2), x = col * CW, y = row * CH;
+    pieces.forEach(function (P, j) { P.group.visible = j === k; });
+    var eye = CastleLakeViews.LEVELZ[lv] + 1.35;
+    cam.position.copy(V(122, 0.6, eye)); cam.lookAt(V(122, -100, eye - 100 * Math.tan(12 * Math.PI / 180)));
+    r.setViewport(x, CH * 4 - y - CH, CW, CH); r.setScissor(x, CH * 4 - y - CH, CW, CH); r.render(scene, cam);
+    var d = document.createElement('div'); d.style.left = (x + 6) + 'px'; d.style.top = (y + 6) + 'px';
+    d.textContent = (lv === 'G' ? 'G' : 'floor ' + lv) + ', ' + Math.round(eye - LAKE) + ' m over the water: ' + pieces[k].about; labels.appendChild(d);
+  });
+  var x = CW, y = 3 * CH, d = document.createElement('div'); d.style.left = (x + 12) + 'px'; d.style.top = (y + 12) + 'px'; d.style.background = 'none';
+  d.innerHTML = 'Each from x 122 on the corridor\'s south wall, 12 degrees down, 60 across.<br>' + (night ? 'By night.' : 'By day.') + (winter ? ' Winter: the lake frozen.' : '') + '<br>The ranges: the braes 1.25 km, the middle 3.4 km, the summits 9 km.';
+  labels.appendChild(d);
+  r.setViewport(x, 0, CW, CH); r.setScissor(x, 0, CW, CH); r.setClearColor(0x0b0a09); r.clear();
+  window.lakeProbe = { scene: scene, pieces: pieces, V: V };
+  window.lakeReady = { views: LV.length };
+})();
+</script>
+</body>
+</html>
