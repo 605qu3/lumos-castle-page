@@ -2387,7 +2387,11 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
     add(g, 'far-window').material.side = THREE.DoubleSide;
   });
 
-  /* far hills, a ring of rounded silhouettes past the grounds, fixed by a sine (no random) */
+  /* far hills, a ring of rounded silhouettes past the grounds, fixed by a sine (no random). req 1348 (Design's
+     page/design/lake-views.js; Godric's 1 on req 1316: "the land would be high out there"): where the page loads it,
+     the Highland ranges instead, the braes off the far shore, a middle range and the far summits to 9 km */
+  if (window.CastleLakeViews) scene.add(CastleLakeViews.ranges(THREE, V, { lawn: LAWN, tone: function (k) { return S && S[k] && S[k].hex ? new THREE.Color(S[k].hex) : null; } }));
+  else {
   var hills = [], HN = 96;
   for (var i = 0; i <= HN; i++) {
     var t = i / HN * Math.PI * 2, h = 60 + 45 * Math.sin(t * 3 + 1) + 30 * Math.sin(t * 7 + 2) + 15 * Math.sin(t * 13);
@@ -2398,13 +2402,14 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
   for (var i = 0; i < HN; i++) hp.push(hills[2 * i], hills[2 * i + 2], hills[2 * i + 3], hills[2 * i], hills[2 * i + 3], hills[2 * i + 1]);
   var hg = new THREE.BufferGeometry().setFromPoints(hp); hg.computeVertexNormals();
   add(hg, 'far-hills').material.side = THREE.DoubleSide;
+  }
 
   /* light: the day's sun from the south-west and its sky; the night's moon, low */
   var hemi = new THREE.HemisphereLight(0xffffff, 0x666655, 0.85), sun = new THREE.DirectionalLight(0xffffff, 0.75);
   sun.position.copy(V(-400, -500, 600)); scene.add(hemi); scene.add(sun);
   var rt = new THREE.WebGLCubeRenderTarget(512, { format: THREE.RGBAFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter });
   rt.texture.mapping = THREE.CubeRefractionMapping;
-  var cam = new THREE.CubeCamera(0.5, 5000, rt);
+  var cam = new THREE.CubeCamera(0.5, 10500, rt);   /* req 1348: to the far summits at 9 km */
   cam.position.set(0, EYE, 0); scene.add(cam);
   /* v84: in a shaft the cube at its lowest pane, 0.45 over its foot (H82's cleft is 54 m over the well's foot, which
      lies under the lake: from there the cleft showed the lake from below) */

@@ -169,7 +169,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
-<script src="castle-shell.js?v=97"></script>
+<script src="design/lake-views.js?v=1"></script>
+<script src="castle-shell.js?v=98"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -2896,6 +2897,25 @@ var GH = (function () {
   var AY = [[h.rect[1], h.nave.rect[1]], [h.nave.rect[3], h.rect[3]]];
   return { mist: mist, snow: snow, rain: rain, rainMat: rainMat, moon: moon, sun: sun, drop: drop, z0: z0, E: E, sg: sg, AY: AY, X: [h.rect[0] + 1, h.rect[2] - 1], wait: 3, fall: null };
 })();
+/* req 1348 (Design's page/design/lake-views.js, for Corridor's req 1313 (b); Godric's 1 on req 1308, height-true): each
+   lake-face corridor east of the keep sees the lake as its height gives, into the far scene: G the moored boat and its
+   lamp, 1 the squid's shadow, 2 the reed beds, 3 gulls, 4 cat's-paws, 5 the cloud's edge, 6 nothing added. Built on
+   the first frame (the season is the weather's), night as the page's hour; what moves moves where the cube is drawn
+   again, five times a second */
+var LV = null, LV_AT = (PLACE.match(/^lake-corridor-([g1-6])-east$/) || PLACE.match(/^tudor-bay-([g1-3])$/) || [])[1];   /* the bays on G to 3 look out the same way */
+function updateLakeView(dt) {
+  if (!LV_AT || !shell || !shell.far || !window.CastleLakeViews) return;
+  if (!LV) {
+    var wx = events && events.weather ? events.weather() : null, lake = (window.CASTLE_MODEL.grounds || []).filter(function (g) { return g.id === 'lake'; })[0];
+    LV = CastleLakeViews.forLevel(THREE, LV_AT.toUpperCase(), shell.toLocal, { lake: -45.5,   /* farView's water face, LAKE + 0.5 */
+       ground: lake, night: !DAY, season: wx ? wx.season : '' });
+    LV.t = 0; LV.wait = 0; LV.tick(0); shell.far.scene.add(LV.group); shell.far.night(!DAY);
+  }
+  if (LV_AT === '2' || LV_AT === '6') return;   /* nothing there moves */
+  LV.t += dt;
+  if ((LV.wait -= dt) > 0) return;
+  LV.wait = 0.2; LV.tick(LV.t); shell.far.night(!DAY);
+}
 function ghShown(shown) {
   if (!GH) return [];
   var on = function (s) { return shown.indexOf(s) >= 0; }, mo = events && events.moon ? events.moon() : null;
@@ -9638,7 +9658,7 @@ function frame() {
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
-  updateTrick(dt); updateTrap(dt); updateDiv(dt); updateCave(dt); updateGh(dt); updateStat(dt);
+  updateTrick(dt); updateTrap(dt); updateDiv(dt); updateCave(dt); updateGh(dt); updateLakeView(dt); updateStat(dt);
   updateMyrtle(dt);
   updateStaff(dt);
   updateStone(dt); updateStoneClimb(dt);
