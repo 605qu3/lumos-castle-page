@@ -24,7 +24,8 @@
       "show": [
         "shimmering lights along the cornice and across the window heads that turn out to be real, fluttering fairies"
       ],
-      "canon": "Interiors' req 361: PoA 10 L17110, two weeks before the end of term Flitwick had already decorated his classroom with real fluttering fairies; every year, as a teacher's Christmas habit, from two weeks before term ends through the holidays; checked against the text, 14 October 2026; not by night, when they sleep (Magic's req 666, its own rule below), 19 October 2026"
+      "canon": "Interiors' req 361: PoA 10 L17110, two weeks before the end of term Flitwick had already decorated his classroom with real fluttering fairies; every year, as a teacher's Christmas habit, from two weeks before term ends through the holidays; checked against the text, 14 October 2026; not by night, when they sleep (Magic's req 666, its own rule below), 19 October 2026",
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "when": [
@@ -35,7 +36,8 @@
       "show": [
         "shimmering lights along the cornice and across the window heads that turn out to be real, fluttering fairies"
       ],
-      "canon": "as above: the fairies stay through the holidays, down after Twelfth Night; not by night, when they sleep (Magic's req 666, its own rule below), 19 October 2026"
+      "canon": "as above: the fairies stay through the holidays, down after Twelfth Night; not by night, when they sleep (Magic's req 666, its own rule below), 19 October 2026",
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "when": [
@@ -113,7 +115,8 @@
       "show": [
         "the fairies asleep along the cornice, their light low"
       ],
-      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the fairies by night (PoA 10 L17110, read in the canon tool; Interiors' habit, Events' req 361), their light their own"
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the fairies by night (PoA 10 L17110, read in the canon tool; Interiors' habit, Events' req 361), their light their own",
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "when": [
@@ -124,7 +127,8 @@
       "show": [
         "the fairies asleep along the cornice, their light low"
       ],
-      "canon": "as above, through the holidays to Twelfth Night"
+      "canon": "as above, through the holidays to Twelfth Night",
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "when": [
@@ -425,10 +429,10 @@
         "lessons = on"
       ],
       "show": [
-        "at another pair's desk a quill lifts a hand's width and drops, with a squeak"
+        "at another pair's desk a feather lifts a hand's width and drops, with a squeak"
       ],
       "starts": [],
-      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the busy air at the other pairs' desks with the class; GoF 26 L30757, \"objects kept flying across the room\" (a Charms room's way a later book names first, never that lesson; read in the canon tool); the things and the squeak or laugh ours; nothing comes near the boys' desk or flies at him; something about one lesson visit in two"
+      "canon": "Magic's req 1358 (1), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the busy air at the other pairs' desks with the class (req 666; GoF 26 L30757, \"objects kept flying across the room\", a Charms room's way a later book names first, never that lesson; as Magic read it in the canon tool, 28 October 2026), the things Pickett's table sets out (a feather, an inkwell, a teacup, a small book; Interiors' 1897 line, settled 73 and 106's \"gentle, happy muddle\"); here a feather. The earlier words (a quill, a button, a pencil) are in git (before the 150th). The squeak, the laugh and the clink ours; nothing comes near the boys' desk or flies at him"
     },
     {
       "id": "charms.busy-button",
@@ -443,10 +447,10 @@
         "lessons = on"
       ],
       "show": [
-        "at another pair's desk a button skids along the top, with a laugh"
+        "at another pair's desk an inkwell lifts an inch off the desk and sets itself down again, not a drop spilt, with a laugh"
       ],
       "starts": [],
-      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the busy air at the other pairs' desks with the class; GoF 26 L30757, \"objects kept flying across the room\" (a Charms room's way a later book names first, never that lesson; read in the canon tool); the things and the squeak or laugh ours; nothing comes near the boys' desk or flies at him; something about one lesson visit in two"
+      "canon": "Magic's req 1358 (1), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the busy air at the other pairs' desks with the class (req 666; GoF 26 L30757, \"objects kept flying across the room\", a Charms room's way a later book names first, never that lesson; as Magic read it in the canon tool, 28 October 2026), the things Pickett's table sets out (a feather, an inkwell, a teacup, a small book; Interiors' 1897 line, settled 73 and 106's \"gentle, happy muddle\"); here an inkwell. The earlier words (a quill, a button, a pencil) are in git (before the 150th). The squeak, the laugh and the clink ours; nothing comes near the boys' desk or flies at him"
     },
     {
       "id": "charms.busy-pencil",
@@ -461,10 +465,28 @@
         "lessons = on"
       ],
       "show": [
-        "at another pair's desk a pencil spins once on its end, with a laugh"
+        "at another pair's desk a teacup rises a hand's width, turns once in the air and settles, with a clink"
       ],
       "starts": [],
-      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the busy air at the other pairs' desks with the class; GoF 26 L30757, \"objects kept flying across the room\" (a Charms room's way a later book names first, never that lesson; read in the canon tool); the things and the squeak or laugh ours; nothing comes near the boys' desk or flies at him; something about one lesson visit in two"
+      "canon": "Magic's req 1358 (1), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the busy air at the other pairs' desks with the class (req 666; GoF 26 L30757, \"objects kept flying across the room\", a Charms room's way a later book names first, never that lesson; as Magic read it in the canon tool, 28 October 2026), the things Pickett's table sets out (a feather, an inkwell, a teacup, a small book; Interiors' 1897 line, settled 73 and 106's \"gentle, happy muddle\"); here a teacup. The earlier words (a quill, a button, a pencil) are in git (before the 150th). The squeak, the laugh and the clink ours; nothing comes near the boys' desk or flies at him"
+    },
+    {
+      "id": "charms.busy-book",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "charms-busy",
+      "weight": 1,
+      "moment": "wait 20-90 s",
+      "when": [
+        "place = charms classroom",
+        "lessons = on"
+      ],
+      "show": [
+        "at another pair's desk a small book flaps its covers, lifts and drops back flat, with a laugh"
+      ],
+      "starts": [],
+      "canon": "Magic's req 1358 (1), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the busy air at the other pairs' desks with the class (req 666; GoF 26 L30757, \"objects kept flying across the room\", a Charms room's way a later book names first, never that lesson; as Magic read it in the canon tool, 28 October 2026), the things Pickett's table sets out (a feather, an inkwell, a teacup, a small book; Interiors' 1897 line, settled 73 and 106's \"gentle, happy muddle\"); here a small book. The earlier words (a quill, a button, a pencil) are in git (before the 150th). The squeak, the laugh and the clink ours; nothing comes near the boys' desk or flies at him"
     },
     {
       "id": "charms.busy-none",
@@ -472,7 +494,7 @@
       "source": "device",
       "leans": [],
       "one_of": "charms-busy",
-      "weight": 3,
+      "weight": 4,
       "moment": "wait 20-90 s",
       "when": [
         "place = charms classroom",
@@ -529,7 +551,8 @@
         "now and then one of the fairies leaves the cornice, crosses to a window head and settles"
       ],
       "starts": [],
-      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the fairies, now and then (ours), by day and evening; PoA 10 L17110, \"shimmering lights that turned out to be real, fluttering fairies\" (read in the canon tool); about one visit in two"
+      "canon": "Magic's req 666 (docs/handoff/magic.md, The Charms classroom), every year: the fairies, now and then (ours), by day and evening; PoA 10 L17110, \"shimmering lights that turned out to be real, fluttering fairies\" (read in the canon tool); about one visit in two",
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "id": "charms.fairy-cross-january",
@@ -548,7 +571,8 @@
         "now and then one of the fairies leaves the cornice, crosses to a window head and settles"
       ],
       "starts": [],
-      "canon": "as above, through the holidays to Twelfth Night"
+      "canon": "as above, through the holidays to Twelfth Night",
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "id": "charms.fairy-still",
@@ -563,7 +587,8 @@
         "date >= 12-05",
         "time != night"
       ],
-      "starts": []
+      "starts": [],
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "id": "charms.fairy-still-january",
@@ -578,7 +603,8 @@
         "date <= 01-06",
         "time != night"
       ],
-      "starts": []
+      "starts": [],
+      "aside": "set aside for the 1897 castle, held for the books' years, every word kept (Magic's req 1358 (3), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897: the fairies before Christmas are Flitwick's own habit, PoA 10 L17110; whether Pickett has a Christmas way of his own is Story's, req 1359; the Ministry's reversible mechanism, docs/ministry/set-aside.md; Events, 150th session, provisional, Godric to confirm)"
     },
     {
       "id": "charms.corridor-suits",

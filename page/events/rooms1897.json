@@ -260,6 +260,66 @@
         "the wind sings round the tower's edge, and the gulls are small and far below"
       ],
       "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (d): the lake-face corridors' sound per floor (Design's req 1313 (b) names what each floor's windows show); the sound file is castle-sound's, none yet, the cue stays silent till one is placed"
+    },
+    {
+      "when": [
+        "place = charms classroom",
+        "learned leviosa = yes"
+      ],
+      "show": [
+        "on his desk the bust of himself, whole by gravity, two cracks showing across it, never moving by itself"
+      ],
+      "canon": "Magic's req 1358 (1), docs/magic/rooms.md, Professor Pickett's Charms classroom, 1897 (2), settled 99 to 105: the bust sits whole by gravity with its two cracks showing (settled 105), never sealed, never moving by itself after the first lesson's botched trick (his charm floated it, not the bust's own); nothing points at it. 'From the first lesson on' is read as after he has cast Leviosa on the Charms page (`learned leviosa`), the lesson Pickett teaches (the Charms handoff, Pickett's Monday lesson); my reading, provisional, Charms or Story to correct"
+    },
+    {
+      "when": [
+        "place = trophy room"
+      ],
+      "show": [
+        "the Head Boys' board, gilt names down it with their years, plain old names, every one a stranger's, and at its foot this year's Head Boy and Head Girl freshly gilt since September"
+      ],
+      "canon": "Magic's req 1368 (1), docs/magic/rooms.md, The trophy room, 1897: the gilt names run down to last year's, none of the books' names on it yet; this year's two freshly gilt from September (their names Story's, asked); nothing explains a name. Replaces the books' board (set aside in trophy.json)"
+    },
+    {
+      "when": [
+        "place = trophy room"
+      ],
+      "show": [
+        "in the east run's case an old Medal for Magical Merit laid flat in its open case, a stranger's name and a date long before"
+      ],
+      "canon": "Magic's req 1368 (2), docs/magic/rooms.md, The trophy room, 1897: the award is an everyday one (CoS 13 L11196, \"an old Medal for Magical Merit\", as Magic read it in the canon tool, 28 October 2026); here a stranger's name and a date long before, laid where Interiors puts the books' medal"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = morning",
+        "weekday = wednesday"
+      ],
+      "show": [
+        "the cases Mr. Grimbleton polished last night brighter than the rest, a smell of polish in the air"
+      ],
+      "canon": "Magic's req 1368 (3), docs/magic/rooms.md, The trophy room, 1897, and req 692: the built row with the 1897 caretaker for Filch (CoS 7 L8902, \"polishing the silver\" and \"elbow grease\", as Magic read it in the canon tool, 28 October 2026); the evenings (Tuesday and Friday) and the morning after are the built rows' own"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "time = morning",
+        "weekday = saturday"
+      ],
+      "show": [
+        "the cases Mr. Grimbleton polished last night brighter than the rest, a smell of polish in the air"
+      ],
+      "canon": "Magic's req 1368 (3), docs/magic/rooms.md, The trophy room, 1897, and req 692: as the Wednesday row, the Friday evening's polish"
+    },
+    {
+      "when": [
+        "place = trophy room",
+        "trophy_polish = yes"
+      ],
+      "show": [
+        "Mr. Grimbleton at a case with his tin and cloth, polishing the silver, his back to the room"
+      ],
+      "canon": "Magic's req 1368 (3), docs/magic/rooms.md, The trophy room, 1897, and req 692: the built row with the 1897 caretaker (CoS 7 L8902, as Magic read it in the canon tool, 28 October 2026); the mark trophy_polish is the trophy chain's arrive records' own (Tuesday and Friday evenings)"
     }
   ],
   "records": [
