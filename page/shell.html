@@ -160,7 +160,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=7"></script>
 <script src="design/panelling.js?v=2"></script>
-<script src="design/ironwork.js?v=1"></script>
+<script src="design/ironwork.js?v=2"></script>
 <script src="charms/spells.js?v=41"></script>
 <script src="charms/guide.js?v=6"></script>
 <script src="charms/desks.js?v=2"></script>
@@ -5238,22 +5238,30 @@ var BAY73 = (function () {
   return { group: g };
 })();
 thingCues[CUBBY_TIP] = function () { showLines([{ medium: 'seen', sound: CUBBY_TIP, on: function () { if (HIDES.cubbyOpen) HIDES.cubbyOpen(); } }]); };
-/* the dungeon corridor's ironwork (req 1048; Godric's 2 on architect-ironwork-1023, B, the scroll grille; Design's kit,
-   page/design/ironwork.js, whose header is the interface): a blind screen 0.15 off the corridor's wall at y 15, x 34 to
-   120, to 2.9 under the vault's springing, in whole bays of about 2.4; black iron in the shell's tone, two meshes, two
-   draw calls. No tap lands on it. */
-var IRONWORK = (function () {
-  if (PLACE !== 'dungeon-corridor' || !window.CastleIronwork) return null;
-  var t = window.CASTLE_TONES && CASTLE_TONES.surfaces && CASTLE_TONES.surfaces.iron;
-  var IW = CastleIronwork.forWall(THREE, shell.place, { toLocal: shell.toLocal, from: [34, 15], to: [120, 15], top: 2.9, bay: 2.4, proud: 0.15, pattern: 'B' },
-    { iron: kit.solid(t ? parseInt(t.hex.slice(1), 16) : 0x2e2b28) });
-  if (!IW) return null;
-  IW.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; });
-  /* the 154th: the scroll planes lie 1 mm inside the bars' faces, so where a scroll crosses a bar the two fought (10 m2
-     in the sweep); a depth step back on the scrolls, so the bar always shows whole in front */
-  IW.group.traverse(function (m) { if (m.isMesh && /-scrolls$/.test(m.name)) { m.material.polygonOffset = true; m.material.polygonOffsetFactor = 1; m.material.polygonOffsetUnits = 2; m.userData.rank = 1; } });
-  shell.group.add(IW.group);
-  return IW;
+/* the dungeon corridor's blind iron screen (req 1048) taken out on Godric's 1 to req 1271 (11.35 pm, 27 October 2026): plain
+   wall; the only bars are the cells' real gates. */
+/* the old cells' gates, eight (req 1269, Design's CastleIronwork.gates, pattern G; Godric's 1 on req 1265, 27 October 2026,
+   10.31 pm: barred gates under round stone arches): each hung on its cell's face of the 0.3 wall (x 31.1 west, 32.9 east),
+   two leaves, rusted fixed open into the cell, each leaf at its own angle (Design's probe page/design/gates-live.html,
+   its angles). Read from the model's old-cell-*-door records, so a moved door takes its gate with it. Two meshes, two
+   draw calls. No tap lands on them. */
+var CELL_GATES = (function () {
+  if (!/^old-cell(s-passage|-[ew][1-4])$/.test(PLACE) || !window.CastleIronwork || !CastleIronwork.gates) return null;
+  var rooms = {}; (MODEL.rooms || []).forEach(function (r) { rooms[r.id] = r; });
+  var OPEN = { w1: [78, 86], w2: [84, 72], w3: [90, 80], w4: [74, 88], e1: [88, 74], e2: [80, 90], e3: [72, 84], e4: [86, 78] };
+  var doors = (MODEL.openings || []).filter(function (o) { return /^old-cell-[ew][1-4]-door$/.test(o.id) && o.head === 'round'; }).map(function (o) {
+    var cell = rooms[o.between[1]], r = cell && cell.shape && cell.shape.rect, k = o.id.slice(9, 11), h = o.w / 2;
+    if (!r) return null;
+    var cx = (r[0] + r[2]) / 2, x = cx < o.at[0] ? o.at[0] - o.depth / 2 : o.at[0] + o.depth / 2;
+    return { a: [x, o.at[1] - h], b: [x, o.at[1] + h], floor: shell.place.floor + (o.sill || 0), toward: [cx, o.at[1]], open: OPEN[k] || 80, h: o.h, w: o.w };
+  }).filter(Boolean);
+  if (!doors.length) return null;
+  var G = CastleIronwork.gates(THREE, doors, { toLocal: shell.toLocal, spring: doors[0].h - doors[0].w / 2, crown: doors[0].h, leaves: 2, owner: 'old-cells-gates' },
+    { iron: kit.solid(CastleIronwork.RUSTED) });
+  if (!G) return null;
+  G.group.traverse(function (m) { if (m.isMesh) m.raycast = function () {}; });
+  shell.group.add(G.group);
+  return G;
 })();
 /* the armour gallery's suits, fourteen (req 1045's rest and req 1060; Godric's 7.14 pm word on corridor-armour-gallery-1023, the
    round 3 suit through the castle; Corridor's page/corridor/suit.js, its kinds; the places Interiors'
