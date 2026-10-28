@@ -544,9 +544,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       /* v106 (the 207th): a round place's box is not its face; from the box's edge the ray walks on to the face, and a
          sample on the wall's own face line finds where the drum meets it (west-tower-way-g's east corner block stood
          0.3 m into the West Tower spiral beside its arch, a flat face in the drum, as the ray met the box clear of the round) */
-      /* v110 (the 211th, the sweep): a rect place also gets a sample by the wall's back face; the third floor's north
+      /* v110 (the 211th, the sweep): a rect place beside the corner (its box begins at e, not across the run, v111) also gets a sample 15 cm short of the wall's back face; the third floor's north
          corridor's south-east block stood 0.2 m into the stair hall, which began at three quarters of its 0.8 m wall */
-      (q.area ? [0.02, 0.25, 0.75] : [0.25, 0.75, 0.95]).forEach(function (f) {
+      var dmin = Math.min((x0 - e[0]) * dx, (x1 - e[0]) * dx) + Math.min((y0 - e[1]) * dy, (y1 - e[1]) * dy);   /* v111: q's box behind e */
+      (q.area ? [0.02, 0.25, 0.75] : [0.25, 0.75, Math.max(0.75, 1 - 0.15 / t)]).forEach(function (f, fk) {
+        if (fk === 2 && !q.area && dmin < -0.02) return;   /* v111: a place across the wall's own run is halfGap's (the wall stands there at half the gap) */
         var px = e[0] + nx * t * f, py = e[1] + ny * t * f, lo = 0, hi = 2 * ext;
         [[px, dx, x0, x1], [py, dy, y0, y1]].forEach(function (A) {
           if (Math.abs(A[1]) < 1e-9) { if (A[0] <= A[2] + 0.01 || A[0] >= A[3] - 0.01) lo = Infinity; return; }
@@ -554,7 +556,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           lo = Math.max(lo, Math.min(ta, tb)); hi = Math.min(hi, Math.max(ta, tb));
         });
         if (q.area) while (lo < hi && lo < best && !inArea(q, px + dx * (lo + 0.05), py + dy * (lo + 0.05))) lo += 0.02;
-        if (lo < hi && lo < best && (!q.area || inArea(q, px + dx * (lo + 0.05), py + dy * (lo + 0.05)))) best = Math.max(0, lo);
+        if (lo < hi && lo < best && (!q.area || inArea(q, px + dx * (lo + 0.05), py + dy * (lo + 0.05)))) {
+          if (fk === 2 && !q.area) (out.endRunBack = out.endRunBack || []).push({ id: Q.id, by: q.id, e: e, d: [dx, dy], n: [nx, ny], t: t, ext: best, z: Q.floor });   /* v110's sample, listed */
+          best = Math.max(0, lo);
+        }
       });
     });
     return best;
