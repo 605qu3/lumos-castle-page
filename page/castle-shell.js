@@ -522,7 +522,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var ta = (A[2] - A[0]) / A[1], tb = (A[3] - A[0]) / A[1];
           lo = Math.max(lo, Math.min(ta, tb)); hi = Math.min(hi, Math.max(ta, tb));
         });
-        if (lo < hi && lo > 0.02 && (!q.area || inArea(q, px + nx * (lo + 0.05), py + ny * (lo + 0.05)))) best = Math.min(best, lo / 2);
+        /* v108 (the 209th): a round place's box is not its face, here as in endRun; the ray walks on to the face, from the
+           wall's own line when that line is already inside the box (down-only-stair-way-1's head stood 0.4 m into the
+           newel's well over its mouth and cut up through the treads, the way's edge 5 cm inside the shaft's box) */
+        if (q.area) {
+          lo = Math.max(lo, 0.01); if (inArea(q, px + nx * lo, py + ny * lo)) continue;   /* the line is in it: shared, as before */
+          while (lo < hi && lo < 2 * best && !inArea(q, px + nx * lo, py + ny * lo)) lo += 0.01;
+          if (lo < hi && lo < 2 * best) best = Math.min(best, lo / 2);
+        } else if (lo < hi && lo > 0.02) best = Math.min(best, lo / 2);
       }
     });
     return best;
