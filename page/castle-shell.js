@@ -507,7 +507,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var floorQs = [];
   /* v103 (the sweep, Godric's 7.32 am): halfGap reads every place the model stands on this floor, built or not (gapQs):
      the east courtyard is built later, through a way, and the staff rooms' south walls stood their whole 0.8 m in it */
-  var gapQs = [];
+  var gapQs = [], wallRuns = [];   /* v104: every wall run built, for the shared lines */
   function halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) {
     var best = t, top = Q.ceiling != null ? Q.ceiling : Q.floor + 3;
     gapQs.forEach(function (q) {
@@ -1230,8 +1230,38 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         if (ext0) ext0 = endRun(Q, ed.a, -ux, -uy, nx, ny, t, ext0);
       }
       var ang = Math.atan2(uy, ux);                                      /* the wall's turn about y, in the local frame */
+      /* v104 (the sweep's shared lines, the 205th): where a wall built earlier stands on this one's line (both rooms built
+         one wall: each lake corridor's west end against the stair hall, keep-east-stairwell, the West Tower's ways), the
+         longer wall keeps the line, so the shorter room's end steps in by the wall and the longer room's face runs true:
+         a shorter, plain earlier run (no hidden door, niche, recess or soffit in it) inside this one's length and height is
+         taken down; any other, this wall leaves its stretch and height to it (YL) */
+      var run = { owner: Q.id, a: a, b: b, z0: Q.floor, z1: Q.floor + HE, meshes: [], gone: false,
+        plain: !(gaps[i] || []).some(function (g) { return g.hidden || g.niche || g.recess || g.soffit; }) }, YL = [];
+      wallRuns.forEach(function (R) {
+        if (R.gone || R.owner === Q.id) return;
+        var d0 = (R.a[0] - a[0]) * nx + (R.a[1] - a[1]) * ny, d1 = (R.b[0] - a[0]) * nx + (R.b[1] - a[1]) * ny;
+        if (Math.abs(d0) > 0.05 || Math.abs(d1) > 0.05) return;
+        var sa = (R.a[0] - a[0]) * ux + (R.a[1] - a[1]) * uy, sb = (R.b[0] - a[0]) * ux + (R.b[1] - a[1]) * uy;
+        var r0 = Math.max(0, Math.min(sa, sb)), r1 = Math.min(L, Math.max(sa, sb)), y0 = R.z0 - Q.floor, y1 = R.z1 - Q.floor;
+        if (r1 - r0 < 0.05 || y0 > HE - 0.05 || y1 < 0.05) return;
+        if (R.plain && Math.abs(sb - sa) < L - 0.05 && Math.min(sa, sb) > -0.05 && Math.max(sa, sb) < L + 0.05 && y0 > -0.05 && y1 < HE + 0.05) {
+          R.meshes.forEach(function (m) { if (m.parent) m.parent.remove(m); });
+          R.gone = true; (out.sharedLines = out.sharedLines || []).push(Q.id + ' keeps ' + R.owner + "'s line");
+        } else YL.push([r0, r1, y0, y1]);
+      });
+      if (YL.length) (out.sharedLines = out.sharedLines || []).push(Q.id + ' wall ' + i + ' leaves ' + YL.length + ' stretch(es)');
+      wallRuns.push(run);
       function piece(s0, s1, ya, yb, name) {
         if (s1 - s0 < 0.02 || yb - ya < 0.02) return;
+        for (var yk = 0; yk < YL.length; yk++) {
+          var Y = YL[yk];
+          if (Y[0] < s1 - 0.02 && Y[1] > s0 + 0.02 && Y[2] < yb - 0.02 && Y[3] > ya + 0.02) {
+            var c0 = Math.max(s0, Y[0]), c1 = Math.min(s1, Y[1]);
+            piece(s0, c0, ya, yb, name + '-ya'); piece(c1, s1, ya, yb, name + '-yb');
+            piece(c0, c1, ya, Math.max(ya, Y[2]), name + '-yl'); piece(c0, c1, Math.min(yb, Y[3]), yb, name + '-yh');
+            return;
+          }
+        }
         if (row) {   /* v28: cut where the stone changes, along a mass's runs or at a hall's older band */
           var cutS = null, cutY = null;
           if (row.mass) row.mass.runs.forEach(function (q) {
@@ -1248,7 +1278,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var m = slab(s1 - s0 + (s0 <= 0.01 ? ext0 : 0) + (s1 >= L - 0.01 ? ext1 : 0), yb - ya, tp, wm, 'wall');
         var shift = ((s1 >= L - 0.01 ? ext1 : 0) - (s0 <= 0.01 ? ext0 : 0)) / 2;
         m.position.set(p.x + ux * shift, p.y + (ya + yb) / 2, p.z - uy * shift);
-        m.rotation.y = ang; m.name = name; group.add(m);
+        m.rotation.y = ang; m.name = name; group.add(m); run.meshes.push(m);
       }
       /* v54: a window's pane of sky 3 cm inside the wall's outer face (below, where the gaps are drawn) */
       function pane(g, suf) {
