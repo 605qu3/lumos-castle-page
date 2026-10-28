@@ -170,7 +170,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=101"></script>
+<script src="castle-shell.js?v=102"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -9575,6 +9575,8 @@ function tap(cx, cy) {
   }
   if (events && hit && hit === FBOX) { FBOX.userData.taps = (FBOX.userData.taps || 0) + 1; events.tap('confiscations'); kit.tapped(true); return; }   /* req 750, the box */
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
+  /* req 1402 (castle-shell v102): a way that opens onto a flight (the well mouth) is that flight's tap, to its foot, then up */
+  if (d && d.onto) { f = shell.flights.filter(function (x) { return x.id === d.onto; })[0] || null; d = null; }
   if (d && (here === d.stand || here === placeOf(d).s || (d.far && here === d.far))) { if ((d.mesh.userData.way && d.built) || (FLOOR_WALK && d.far) || (d === FDOOR && filchOpen) || (d === SDOOR && (snapeOpen || PLACE === 'snape-office'))) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) {
     acted = goTo(d);
@@ -11181,7 +11183,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
       when: ASTRO.when ? ASTRO.when.toString() : null, moon: ASTRO.moon || null, page: ASTRO.page, live: ASTRO.live, log: !!ASTRO.log, drawn: d.length } : null; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
 /* req 1335, for checks: the floor as built, and n doors with a far stand walked through and back by through() */
-window.lumosGreybox.floorWalk = FLOOR_WALK ? {
+window.lumosGreybox.floorWalk = FLOOR_WALK ? { shell: shell, things: things,   /* req 1402: the sweep reads the build */
   info: function () { var lit = floorLamps ? floorLamps.filter(function (L) { return L.layers.test(camera.layers); }).length : null;
     return { built: shell.floorBuilt, places: shell.places.length, stands: shell.stands.length, fars: things.filter(function (d) { return d.far; }).length, lamps: floorLamps ? floorLamps.length : null, lit: lit,
       leaves: things.filter(function (d) { return !d.far && (d.page || (d.mesh.userData.way && d.built)); }).map(function (d) { return d.id + ' > ' + wayUrl(d); }) }; },

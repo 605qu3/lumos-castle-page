@@ -499,6 +499,31 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     geo.computeVertexNormals();
     return F.register(new THREE.Mesh(geo, mat), LAYER[layer]);
   }
+  /* v102 (req 1402, Godric's "major glitches", 28 October 2026, 7.15 am): on a floor built whole, a wall piece stands no
+     deeper than half the way to the next built place behind it, so two rooms' walls meet in the masonry's middle and
+     neither shows through the other's face (the Great Hall's east wall stood in the Entrance Hall's west face and filled
+     its hourglass niches; the waiting chamber's and the cupboard's stood 0.3 m proud of its walls). floorQs is the floor's
+     places, found before any is built */
+  var floorQs = [];
+  function halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) {
+    var best = t, top = Q.ceiling != null ? Q.ceiling : Q.floor + 3;
+    floorQs.forEach(function (q) {
+      var qt = q.ceiling != null ? q.ceiling : q.floor + 3;
+      if (q.id === Q.id || q.floor >= top - 0.1 || qt <= Q.floor + 0.1) return;
+      var pts = q.area ? q.area.outer : q.poly, x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      pts.forEach(function (p) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+      for (var k = 0; k <= 4; k++) {
+        var s = s0 + (s1 - s0) * (0.05 + 0.9 * k / 4), px = a[0] + ux * s, py = a[1] + uy * s, lo = 0, hi = 2 * best;
+        [[px, nx, x0, x1], [py, ny, y0, y1]].forEach(function (A) {   /* where the ray out from the wall enters q's box */
+          if (Math.abs(A[1]) < 1e-9) { if (A[0] < A[2] || A[0] > A[3]) lo = Infinity; return; }
+          var ta = (A[2] - A[0]) / A[1], tb = (A[3] - A[0]) / A[1];
+          lo = Math.max(lo, Math.min(ta, tb)); hi = Math.min(hi, Math.max(ta, tb));
+        });
+        if (lo < hi && lo > 0.02 && (!q.area || inArea(q, px + nx * (lo + 0.05), py + ny * (lo + 0.05)))) best = Math.min(best, lo / 2);
+      }
+    });
+    return best;
+  }
   function inArea(q, x, y) {
     if (q.area) return inPoly(q.area.outer, x, y) && !q.area.holes.some(function (h) { return inPoly(h, x, y); });
     var xs = q.poly.map(function (p) { return p[0]; }), ys = q.poly.map(function (p) { return p[1]; });
@@ -1188,9 +1213,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           if (cutS != null) { piece(s0, cutS, ya, yb, name + '-a'); piece(cutS, s1, ya, yb, name + '-b'); return; }
           if (cutY != null) { piece(s0, s1, ya, cutY, name + '-low'); piece(s0, s1, cutY, yb, name); return; }
         }
-        var sm = (s0 + s1) / 2, p = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
+        var tp = floorQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) : t;   /* v102 */
+        var sm = (s0 + s1) / 2, p = toLocal(a[0] + ux * sm + nx * tp / 2, a[1] + uy * sm + ny * tp / 2, Q.floor);
         var wm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, (ya + yb) / 2) : mats.wall;   /* the band's top is over the floor */
-        var m = slab(s1 - s0 + (s0 <= 0.01 ? ext0 : 0) + (s1 >= L - 0.01 ? ext1 : 0), yb - ya, t, wm, 'wall');
+        var m = slab(s1 - s0 + (s0 <= 0.01 ? ext0 : 0) + (s1 >= L - 0.01 ? ext1 : 0), yb - ya, tp, wm, 'wall');
         var shift = ((s1 >= L - 0.01 ? ext1 : 0) - (s0 <= 0.01 ? ext0 : 0)) / 2;
         m.position.set(p.x + ux * shift, p.y + (ya + yb) / 2, p.z - uy * shift);
         m.rotation.y = ang; m.name = name; group.add(m);
@@ -1669,17 +1695,24 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     }
   }
   var shaftFloors = [];
+  if (o.floor) {   /* v102: the floor's places found first, so each wall knows the built place behind it (halfGap) */
+    var ft0 = Date.now(), fids = o.floor === 'all' ? (M.rooms || []).map(function (r) { return r.id; }) : painted;
+    floorQs.push(P);
+    fids.forEach(function (id) {
+      if (!id || floorQs.some(function (q) { return q.id === id; })) return;
+      var Q = findPlace(M, id);
+      if (!Q || (Q.rec && Q.rec.page) || Q.shaft || Math.abs(Q.floor - P.floor) > 0.05) return;
+      floorQs.push(Q);
+    });
+  }
   buildPlace(P);
   /* v94 (req 1335, Godric's 1 at 12.14 am, 28 October 2026: "whole floor builds"): o.floor builds every painted place on
      this place's floor in the same frame ('all': every place the model gives there), so he walks the floor's length; a
      door between two built places takes him through on either side (its far stand, below); a stair, a shaft or a room
      with its own page is still a page away. out.floorBuilt counts the places and the build's milliseconds */
   if (o.floor) {
-    var ft0 = Date.now(), fids = o.floor === 'all' ? (M.rooms || []).map(function (r) { return r.id; }) : painted;
-    fids.forEach(function (id) {
-      if (!id || out.places.some(function (q) { return q.id === id; })) return;
-      var Q = findPlace(M, id);
-      if (!Q || (Q.rec && Q.rec.page) || Q.shaft || Math.abs(Q.floor - P.floor) > 0.05) return;
+    floorQs.forEach(function (Q) {
+      if (out.places.some(function (q) { return q.id === Q.id; })) return;
       out.places.push(Q); buildPlace(Q);
     });
     out.floorBuilt = { places: out.places.length, ms: Date.now() - ft0 };
@@ -2159,6 +2192,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     fs.flight = hs.flight = true;   /* req 856: a flight's end, for the look below */
     out.flights.push({ id: F0.s.id, foot: fs, head: hs, footPt: footPt, headPt: headPt });
     out.stands.push(fs, hs);
+  });
+  /* v102 (req 1402, Godric's fault, 28 October 2026, 7.15 am): on a floor built whole, a way that opens onto a flight's
+     foot (the well mouth onto the marble staircase) has no far stand: its far side on his floor is the flight, and the
+     stand 10 m on put him on the well's shut ground under the half-landing, the pit. Its tap takes the flight (`onto`) */
+  if (o.floor) all.forEach(function (d) {
+    if (!d.far || !d.mesh.userData.way) return;
+    var w = d.inward.clone(); w.y = 0; w.normalize();
+    var f = out.flights.filter(function (F) {
+      if (Math.abs(F.foot.level - d.level) > 0.05) return false;
+      var v = F.foot.pos.clone().sub(d.mid); v.y = 0;
+      var perp = v.dot(w), along = v.clone().sub(w.clone().multiplyScalar(perp)).length();
+      return Math.abs(perp) < 3 && along <= d.w / 2;
+    })[0];
+    if (!f) return;
+    out.stands.splice(out.stands.indexOf(d.far), 1);
+    d.far = null; d.built = false; d.onto = f.id;
   });
 
   /* the look up and down (the model's look a place, version 19, from docs/architect/vertical-views.md): each stand's
