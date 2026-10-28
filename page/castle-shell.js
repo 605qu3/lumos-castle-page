@@ -2104,7 +2104,10 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
       (gx ? [[wr[0], wr[1], gx[0], wr[3]], [gx[1], wr[1], wr[2], wr[3]]] : [wr]).forEach(function (r) { prism(rect(r), LAWN, LAWN + g.wall.h, 'far-stone'); });
       if (g.bee_house) { var bh = g.bee_house; prism(rect(bh.rect), LAWN, LAWN + bh.eaves, 'far-timber'); roof(bh.rect, LAWN + bh.eaves, LAWN + bh.ridge, 'gable'); }
     }
-    else if (g.id === 'hagrids-cabin' && s.point) { prism(circ(s.point, 3.5, 12), LAWN, LAWN + 3.5, 'far-timber'); cone(s.point, 3.6, LAWN + 3.5, LAWN + 7); }
+    else if (g.id === 'hagrids-cabin' && s.point) {   /* v95 (req 1261, Godric's word of 27 October 2026, 9.50 pm: no Hagrid, Fang or cabin in 1897): not drawn; ?cabin=1 shows it for a books' year */
+      if (!/[?&]cabin=1/.test(location.search)) return;
+      prism(circ(s.point, 3.5, 12), LAWN, LAWN + 3.5, 'far-timber'); cone(s.point, 3.6, LAWN + 3.5, LAWN + 7);
+    }
     else if (g.id === 'vegetable-patch' && s.rect) flat(shape(rect(s.rect)), LAWN + 0.04, 'far-forest');
   });
 

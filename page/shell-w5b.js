@@ -40,6 +40,7 @@ window.SHELL_W5B = {
                                        dir the room's side, +1 or -1), a0 to a1, feet at z0 or over, heads at z1 or under, 0.3 to wmax
                                        wide, gilt, black or oak round a dark canvas, picked by a hash of seed (the same every load)
    ['ln', x0, x1, y, dir, out, len, m] a frame leaning face to the wall at y (the room at dir): its foot out from it, len long
+   ['tp', b, m]                        a light tripod and draw telescope at bearing b of c, the telescope of material m (req 1246)
    A last element { from: 'PoA' } draws the item only from that book's castle on (?book=).
    A room's lights: [[x, y, z, hex, intensity, distance], ...] in its frame, point lights in its group (the place in `lit`).
    The house rules (the lead, 6.56 pm): a thing bears 2 cm into the wall behind it, stops 1 cm short of a jamb or a face
@@ -649,7 +650,29 @@ var W5B_THINGS = {
     ['t', 35.78, 7.8, 39.2, 8.37, 0.9, 'oak'], ['b', 35.78, 8.1, 1.5, 39.2, 8.37, 1.53, 'oak'], ['b', 35.78, 8.1, 1.9, 39.2, 8.37, 1.93, 'oak'], ['y', 36.2, 8.23, 0.08, 1.525, 1.75, 'stone'], ['y', 36.7, 8.23, 0.08, 1.525, 1.75, 'stone'], ['y', 37.2, 8.23, 0.08, 1.525, 1.75, 'stone'], ['y', 37.7, 8.23, 0.08, 1.525, 1.75, 'stone'], ['y', 38.2, 8.23, 0.08, 1.525, 1.75, 'stone'], ['y', 38.7, 8.23, 0.08, 1.525, 1.75, 'stone'], ['y', 36.3, 8.23, 0.06, 1.925, 2.1, 'black'], ['y', 36.8, 8.23, 0.06, 1.925, 2.1, 'black'], ['y', 37.3, 8.23, 0.06, 1.925, 2.1, 'black'], ['y', 36.4, 8.05, 0.1, 0.895, 1.15, 'black'], ['y', 37.0, 8.05, 0.1, 0.895, 1.15, 'black'], ['y', 38.3, 8.05, 0.14, 0.895, 1.05, 'stone'], ['b', 37.4, 7.85, 0.895, 38.0, 8.2, 0.91, 'slate'], ['y', 36.25, 5.6, 0.28, -0.01, 0.55, 'oak'], ['y', 36.25, 5.6, 0.25, 0.5, 0.57, 'wicker']] },
   /* W5B-40: the corridors' lamps and oil on 5: shelves on the north and east walls, lamps on them, a basket of wicks, the oil cask */
   'lamp-store-5': { items: [
-    ['s', 44.78, 7.95, 48.62, 8.37, [0.3, 0.8, 1.3, 1.8], 'pine'], ['s', 48.2, 4.98, 48.62, 6.54, [0.3, 0.8, 1.3, 1.8], 'pine'], ['y', 45.4, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 45.9, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 46.4, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 46.9, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 47.4, 8.16, 0.06, 1.295, 1.55, 'brass'], ['y', 47.9, 8.16, 0.06, 1.295, 1.55, 'brass'], ['y', 48.4, 5.4, 0.06, 0.795, 1.05, 'brass'], ['y', 48.4, 5.9, 0.06, 0.795, 1.05, 'brass'], ['b', 45.3, 8.0, 0.295, 46.3, 8.3, 0.5, 'wicker'], ['y', 46.6, 7.3, 0.28, -0.01, 0.75, 'oak']] }
+    ['s', 44.78, 7.95, 48.62, 8.37, [0.3, 0.8, 1.3, 1.8], 'pine'], ['s', 48.2, 4.98, 48.62, 6.54, [0.3, 0.8, 1.3, 1.8], 'pine'], ['y', 45.4, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 45.9, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 46.4, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 46.9, 8.16, 0.06, 0.795, 1.05, 'brass'], ['y', 47.4, 8.16, 0.06, 1.295, 1.55, 'brass'], ['y', 47.9, 8.16, 0.06, 1.295, 1.55, 'brass'], ['y', 48.4, 5.4, 0.06, 0.795, 1.05, 'brass'], ['y', 48.4, 5.9, 0.06, 0.795, 1.05, 'brass'], ['b', 45.3, 8.0, 0.295, 46.3, 8.3, 0.5, 'wicker'], ['y', 46.6, 7.3, 0.28, -0.01, 0.75, 'oak']] },
+  /* req 1246 (Interiors' docs/interiors/astronomy-tower-top.md, The things and On the model's ground): the teacher's round table at the centre on one
+     pedestal (1.2 across, 0.75 high), the night's chart weighted with four stones, the lantern at its south edge (r 0.45, bearing 180) with its
+     panes shaded toward the ring, lit by night only; the step is the shell's (platform.step). The pupils' light tripods stand at the crenellated
+     parapet's gaps (merlons at 0 and every 18 degrees, so gaps at 9 + 18k): the eighteen clear of the turret's door (3.0 either side), 16 the pupils'
+     and 2 the boys' (351 and 9), each a tripod 0.44 across, one leg inward, its feet inside r 7.1, its draw telescope pointed up and out through the gap
+     (['tp', bearing, scope]; the draw telescope's eyepiece at 1.3 here, Interiors' 1.5 being a first year's eye line, provisional). The boys' board and
+     the pupils' charts lie flat on a gap's sill, 1.2 up, never on a merlon (the Architect's take on req 1238, 3). Provisional on req 1259 (the parapet): a
+     solid parapet would put the tripods back at Interiors' twenty round r 7.0. Always drawn, the lesson's occupancy (Events' clock) not yet gating them */
+  'astronomy-tower-top': { c: [80, 77], items: [
+    ['y', 80, 77, 0.3, 0, 0.05, 'stone'], ['y', 80, 77, 0.12, 0.05, 0.71, 'oak'], ['y', 80, 77, 0.6, 0.71, 0.75, 'oak'],
+    ['b', 79.675, 76.675, 0.75, 80.325, 77.325, 0.758, 'paper'],
+    ['y', 79.72, 76.72, 0.045, 0.758, 0.8, 'stone'], ['y', 80.28, 76.72, 0.045, 0.758, 0.8, 'stone'], ['y', 79.72, 77.28, 0.045, 0.758, 0.8, 'stone'], ['y', 80.28, 77.28, 0.045, 0.758, 0.8, 'stone'],
+    ['y', 80, 76.55, 0.1, 0.758, 0.77, 'iron'], ['y', 79.93, 76.48, 0.012, 0.77, 1.02, 'iron'], ['y', 80.07, 76.48, 0.012, 0.77, 1.02, 'iron'],
+    ['y', 79.93, 76.62, 0.012, 0.77, 1.02, 'iron'], ['y', 80.07, 76.62, 0.012, 0.77, 1.02, 'iron'], ['b', 79.92, 76.47, 1.02, 80.08, 76.63, 1.05, 'iron'],
+    ['y', 80, 76.55, 0.02, 0.77, 0.9, 'white'], ['b', 79.92, 76.455, 0.8, 80.08, 76.462, 1.0, 'iron'],
+    ['tp', 9, 'brass'], ['tp', 351, 'brass'], ['tp', 27, 'brass'], ['tp', 81, 'leather'], ['tp', 99, 'brass'], ['tp', 117, 'leather'], ['tp', 135, 'leather'], ['tp', 153, 'brass'],
+    ['tp', 171, 'leather'], ['tp', 189, 'brass'], ['tp', 207, 'leather'], ['tp', 225, 'leather'], ['tp', 243, 'brass'], ['tp', 261, 'leather'], ['tp', 279, 'brass'], ['tp', 297, 'leather'],
+    ['tp', 315, 'leather'], ['tp', 333, 'brass'],
+    ['p', 9, 7.75, 0.5, 0.4, 1.2, 1.215, 'wood'], ['p', 9, 7.75, 0.44, 0.34, 1.215, 1.223, 'paper'],
+    ['p', 117, 7.75, 0.5, 0.4, 1.2, 1.215, 'wood'], ['p', 117, 7.75, 0.44, 0.34, 1.215, 1.223, 'paper'], ['p', 207, 7.75, 0.5, 0.4, 1.2, 1.215, 'wood'], ['p', 207, 7.75, 0.44, 0.34, 1.215, 1.223, 'paper'],
+    ['p', 297, 7.75, 0.5, 0.4, 1.2, 1.215, 'wood'], ['p', 297, 7.75, 0.44, 0.34, 1.215, 1.223, 'paper'], ['p', 333, 7.75, 0.5, 0.4, 1.2, 1.215, 'wood'], ['p', 333, 7.75, 0.44, 0.34, 1.215, 1.223, 'paper']],
+    lights: [[80, 76.55, 0.95, 0xffb865, 1.0, 6, { night: true }]] }
 };
 var W5B_MATS = { wood: 0x5a4c3e, dark: 0x3e342a, oak: 0x6a5a48, pine: 0x8a7456, iron: 0x2e2b28, brass: 0x9a7a3a, plaster: 0xe8e2d4,
   stone: 0x8c867c, slate: 0x3c4046, cloth: 0x6b3b34, linen: 0xc8c0ae, wicker: 0x9a8460, paper: 0xd9cfb4, books: 0x5b4636, books2: 0x6b2e26, books3: 0x2f4636, books4: 0x2e3850, books5: 0x7a6448, books6: 0x4a2a36,
@@ -697,6 +720,16 @@ window.SHELL_W5B.build = function (ctx) {
   }
   function cyl(x, y, r, za, zb, m) {
     var geo = new THREE.CylinderGeometry(r, r, zb - za, 20), p = L(x, y, (za + zb) / 2); geo.translate(p.x, p.y, p.z); put(geo, m);
+  }
+  function tube(x0, y0, z0, x1, y1, z1, rad, m) {   /* req 1246: a slanted round rod between two points (castle x, y; height above the floor) */
+    var a = L(x0, y0, z0), b = L(x1, y1, z1), d = b.clone().sub(a), len = d.length(), geo = new THREE.CylinderGeometry(rad, rad, len, 8), mid = a.clone().add(b).multiplyScalar(0.5);
+    geo.applyMatrix4(new THREE.Matrix4().makeRotationFromQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()))); geo.translate(mid.x, mid.y, mid.z); put(geo, m);
+  }
+  function tripod(b, scope) {   /* req 1246: a light collapsible tripod 0.44 across at bearing b, one leg outward, its feet inside r 7.1, the draw telescope up and out through the gap */
+    var P = function (r, off, z) { var a = b * Math.PI / 180, p = polar(b, r); return [p[0] + off * Math.cos(a), p[1] - off * Math.sin(a), z]; }, hd = P(6.85, 0, 1.38);
+    [P(7.06, 0, 0), P(6.7, -0.19, 0), P(6.7, 0.19, 0)].forEach(function (f) { tube(f[0], f[1], f[2], hd[0], hd[1], hd[2], 0.012, 'wood'); });
+    var e = P(6.62, 0, 1.3), o = P(7.12, 0, 1.78), mid = P(6.9, 0, 1.5);
+    tube(e[0], e[1], e[2], o[0], o[1], o[2], 0.03, scope); tube(mid[0], mid[1], mid[2], o[0], o[1], o[2], 0.04, scope);
   }
   function polar(b, r) { var a = b * Math.PI / 180; return [c[0] + r * Math.sin(a), c[1] + r * Math.cos(a)]; }
   function pbox(b, r, len, dep, za, zb, m) {   /* a box at bearing b, its long side along the wall */
@@ -776,7 +809,7 @@ window.SHELL_W5B.build = function (ctx) {
     if (k === 'b') box.apply(null, a); else if (k === 'y') cyl.apply(null, a); else if (k === 'a') arc.apply(null, a);
     else if (k === 'p') pbox.apply(null, a); else if (k === 't') table.apply(null, a); else if (k === 's') shelves.apply(null, a);
     else if (k === 'as') arcShelves.apply(null, a); else if (k === 'sl') slope.apply(null, a);
-    else if (k === 'fr') frames.apply(null, a); else if (k === 'ln') lean.apply(null, a);
+    else if (k === 'fr') frames.apply(null, a); else if (k === 'ln') lean.apply(null, a); else if (k === 'tp') tripod.apply(null, a);
   });
   var merged = {};
   Object.keys(byMat).forEach(function (m) {   /* one mesh a material, as the lead's merge */
@@ -838,6 +871,7 @@ window.SHELL_W5B.build = function (ctx) {
   })();
   (R.lights || []).forEach(function (l, i) {   /* a room W5B lights (window.SHELL_W5B.lit): [x, y, z, hex, intensity, distance] in its frame, { day: true } lit 7 am to 6 pm only */
     if (l[6] && l[6].day && !(ctx.HOUR >= 7 && ctx.HOUR < 18)) return;
+    if (l[6] && l[6].night && ctx.HOUR >= 7 && ctx.HOUR < 18) return;   /* req 1246: the table's lantern, by night */
     var pl = new THREE.PointLight(l[3], l[4], l[5], 1.6); pl.position.copy(L(l[0], l[1], l[2])); pl.name = 'w5b-light-' + i; g.add(pl);
   });
 };
