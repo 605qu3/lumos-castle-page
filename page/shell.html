@@ -9549,8 +9549,23 @@ function frame() {
   updateStoneThings(dt, clock.elapsedTime);
   updateAstro(dt);
   if (events && events.tick) events.tick(dt);
+  updateFloorLights(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
+}
+/* req 1335: a floor built whole brings every room's lamps (230 on the ground floor), and the renderer compiles each
+   material against them all, which held the first frame past a minute; only the FLOOR_LIT nearest him light, re-picked
+   as he goes, always the same count so nothing recompiles (a lamp put out stays on layer 1, which the camera skips) */
+var FLOOR_LIT = 24, floorLamps = null, floorT = 0;
+function updateFloorLights(dt) {
+  if (!FLOOR_WALK || (floorT -= dt) > 0) return;
+  floorT = 0.4;
+  if (!floorLamps) { floorLamps = []; scene.traverse(function (o) { if (o.isPointLight || o.isSpotLight) floorLamps.push(o); }); }
+  if (floorLamps.length <= FLOOR_LIT) return;
+  var c = camera.position, w = new THREE.Vector3();
+  floorLamps.map(function (L) { return [L.getWorldPosition(w).distanceToSquared(c), L]; })
+    .sort(function (a, b) { return a[0] - b[0]; })
+    .forEach(function (e, i) { e[1].layers.set(i < FLOOR_LIT ? 0 : 1); });
 }
 /* the ties (page/depth-ties.js, the 154th): every thing built, two faces of two looks in one plane or a few mm apart
    take depth steps, the nearer in front, so none combs; walls, floors and ceilings left to their geometry */
@@ -11017,6 +11032,24 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     return ASTRO.on ? { sky: !!(ASTRO.sky && ASTRO.sky.mesh.visible), stars: !!(ASTRO.sky && ASTRO.sky.cat), cloud: !!(ASTRO.cloud && ASTRO.cloud.visible),
       when: ASTRO.when ? ASTRO.when.toString() : null, moon: ASTRO.moon || null, page: ASTRO.page, live: ASTRO.live, log: !!ASTRO.log, drawn: d.length } : null; },
   knots: function (id) { var d = shell.doors.filter(function (x) { return x.id === id; })[0]; return d && d.knots ? knotSpots(d) : null; } };
+/* req 1335, for checks: the floor as built, and n doors with a far stand walked through and back by through() */
+window.lumosGreybox.floorWalk = FLOOR_WALK ? {
+  info: function () { var lit = floorLamps ? floorLamps.filter(function (L) { return L.layers.test(camera.layers); }).length : null;
+    return { built: shell.floorBuilt, places: shell.places.length, stands: shell.stands.length, fars: things.filter(function (d) { return d.far; }).length, lamps: floorLamps ? floorLamps.length : null, lit: lit }; },
+  test: async function (n) {
+    var frame = function () { return new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); }); };
+    var settle = async function () { for (var i = 0; i < 900 && tween; i++) await frame(); await frame(); };
+    var out = [], seen = {}, picks = [];
+    things.forEach(function (d) { var k = d.place + '>' + d.to; if (d.far && !seen[k] && seen[d.to + '>' + d.place] == null && picks.length < n) { seen[k] = 1; picks.push(d); } });
+    for (var i = 0; i < picks.length; i++) {
+      var d = picks[i];
+      tween = null; legs = []; here = d.stand; hy = hyT = hp = hpT = 0;
+      through(d); await settle(); var a = here;
+      through(d); await settle(); var b = here;
+      out.push((a === d.far && b === d.stand ? 'ok ' : 'MISS ') + d.id + ' (' + d.place + ' to ' + d.to + '): through to ' + a.name + ', back to ' + b.name);
+    }
+    return out.join('\n');
+  } } : null;
 })();
 </script>
 </body>
