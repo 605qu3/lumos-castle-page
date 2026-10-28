@@ -2842,6 +2842,84 @@ function trophyShown(shown) {
   TROPHY_LIGHT.moon.visible = m; TROPHY_LIGHT.sun.visible = s && !m;
   return [TROPHY_MOON].concat(TROPHY_SUN).filter(function (x) { return shown.indexOf(x) >= 0; });
 }
+/* Greenhouse one's glass by the day (req 690's drawn half, the Architect's 192nd; Events' req 717, page/events/
+   greenhouses.json, word for word): each state a skin over castle-shell.js's own panes (their geometry shared, drawn
+   in front by polygon offset, never a second plane at 8 mm), so the real sky still shows through. The mist is pale
+   and even on the inside, a drop now and then from a roof bar to the staging or the walk; the rain runs down every
+   face in streaks; the snow lies on the roofs only and greys their light; the moon and the June sun fall on the
+   staging's tops, the moon as much as its phase gives. Nothing glows of itself */
+var GH_MIST = "greenhouse one's glass misted on the inside, a drip now and then from a glazing bar";
+var GH_RAIN = "rain drumming on the glass roof and running down the glass";
+var GH_SNOW = "snow lying on the glass roof, the light coming grey through it";
+var GH_MOON = "moonlight through the glass roof on the staging, the plants' shapes against the glass, as much as the moon's phase gives";
+var GH_SUN = "a baking hot sun on the glass, the house close and warm";
+var GH = (function () {
+  if (PLACE !== 'greenhouse-one' || !MODEL) return null;
+  var gr = (MODEL.grounds || []).filter(function (g) { return g && g.id === 'greenhouses'; })[0], h = gr && gr.houses && gr.houses[0];
+  if (!h) return null;
+  var z0 = shell.place.floor, sg = (h.fittings || {}).staging, E = h.eaves;
+  function panes(keys) { return keys.map(function (k) { return shell.group.getObjectByName('greenhouse-one-glass-' + k); }).filter(Boolean); }
+  var ALL = panes(['walls', 'roofs', 'barrels', 'lunettes']), TOPS = panes(['roofs', 'barrels']);
+  function skin(list, mat, name) {
+    var g = new THREE.Group(); g.name = 'gh-' + name; g.visible = false; shell.group.add(g);
+    list.forEach(function (p) { var m = new THREE.Mesh(p.geometry, mat); m.matrix.copy(p.matrix); m.matrixAutoUpdate = false; m.renderOrder = 2; m.raycast = function () {}; m.userData.owner = PLACE; m.userData.decal = true; g.add(m); });
+    return g;
+  }
+  function film(col, op) { return new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -4 }); }
+  var mist = skin(ALL, film(0xdde4e2, 0.42), 'mist'), snow = skin(TOPS, film(0xeef1f3, 0.86), 'snow');
+  /* the rain: streaks by the face's world place, falling; a faint wet sheen between them */
+  var rainMat = new THREE.ShaderMaterial({
+    uniforms: { t: { value: 0 } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -4,
+    vertexShader: 'varying vec3 W; void main() { vec4 w = modelMatrix * vec4(position, 1.0); W = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
+    fragmentShader: 'uniform float t; varying vec3 W; float hs(float n) { return fract(sin(n * 91.7) * 43758.5); }' +
+      'void main() { float h = (W.x + W.z) * 22.0, c = floor(h), r = hs(c), f = fract(h); float s = fract(W.y * 0.35 + t * (0.25 + 0.35 * r) + r * 7.0);' +
+      ' float a = 0.06 + step(0.55, r) * smoothstep(0.0, 0.5, s) * (1.0 - smoothstep(0.75, 1.0, s)) * (1.0 - smoothstep(0.15, 0.5, abs(f - 0.5))) * 0.38;' +
+      ' gl_FragColor = vec4(0.82, 0.87, 0.9, a); }'
+  });
+  var rain = skin(ALL, rainMat, 'rain');
+  /* the moon and the sun on the staging's tops, 8 mm over the slats */
+  function patches(col, name) {
+    var g = new THREE.Group(); g.name = 'gh-' + name; g.visible = false; shell.group.add(g);
+    var mat = new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.2, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
+    if (sg) [sg.south, sg.north].concat(sg.island_south || [], sg.island_north || []).forEach(function (r) {
+      if (!r) return;
+      var pos = [], c = [[r[0], r[1]], [r[2], r[1]], [r[2], r[3]], [r[0], r[3]]];
+      [0, 1, 2, 0, 2, 3].forEach(function (i) { var l = shell.toLocal(c[i][0], c[i][1], z0 + sg.top + 0.008); pos.push(l.x, l.y, l.z); });
+      var geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      var m = new THREE.Mesh(geo, mat); m.raycast = function () {}; m.userData.owner = PLACE; m.userData.decal = true; g.add(m);
+    });
+    g.userData.mat = mat; return g;
+  }
+  var moon = patches(0xa9bcd8, 'moon'), sun = patches(0xffc483, 'sun');
+  /* the drop: from a furrow bar at the eaves down to the staging's top (or the floor between), one at a time */
+  var drop = new THREE.Mesh(new THREE.SphereGeometry(0.012, 6, 4), film(0xe8eeee, 0.75)); drop.visible = false; drop.raycast = function () {}; drop.userData.owner = PLACE; shell.group.add(drop);
+  var AY = [[h.rect[1], h.nave.rect[1]], [h.nave.rect[3], h.rect[3]]];
+  return { mist: mist, snow: snow, rain: rain, rainMat: rainMat, moon: moon, sun: sun, drop: drop, z0: z0, E: E, sg: sg, AY: AY, X: [h.rect[0] + 1, h.rect[2] - 1], wait: 3, fall: null };
+})();
+function ghShown(shown) {
+  if (!GH) return [];
+  var on = function (s) { return shown.indexOf(s) >= 0; }, mo = events && events.moon ? events.moon() : null;
+  GH.mist.visible = on(GH_MIST); GH.rain.visible = on(GH_RAIN); GH.snow.visible = on(GH_SNOW);
+  GH.moon.visible = on(GH_MOON); GH.moon.userData.mat.opacity = 0.06 + 0.18 * (mo && mo.lit != null ? mo.lit : 1);
+  GH.sun.visible = on(GH_SUN) && !GH.moon.visible; GH.sun.userData.mat.opacity = 0.28;
+  if (!GH.mist.visible) { GH.drop.visible = false; GH.fall = null; }
+  return [GH_MIST, GH_RAIN, GH_SNOW, GH_MOON, GH_SUN].filter(on);
+}
+function updateGh(dt) {
+  if (!GH) return;
+  if (GH.rain.visible) GH.rainMat.uniforms.t.value += dt;
+  if (!GH.mist.visible) return;
+  if (!GH.fall) {
+    if ((GH.wait -= dt) > 0) return;
+    var a = GH.AY[Math.random() < 0.5 ? 0 : 1], x = GH.X[0] + Math.random() * (GH.X[1] - GH.X[0]), y = a[0] + 0.3 + Math.random() * (a[1] - a[0] - 0.6);
+    var onBench = GH.sg && [GH.sg.south, GH.sg.north].concat(GH.sg.island_south || [], GH.sg.island_north || []).some(function (r) { return r && x >= r[0] && x <= r[2] && y >= r[1] && y <= r[3]; });
+    GH.fall = { x: x, y: y, z: GH.E - 0.08, to: onBench ? GH.sg.top + 0.01 : 0.01, v: 0, hang: 0.9 };
+  }
+  var f = GH.fall;
+  if (f.hang > 0) f.hang -= dt; else { f.v += 9.8 * dt; f.z -= f.v * dt; }
+  GH.drop.visible = true; GH.drop.position.copy(shell.toLocal(f.x, f.y, GH.z0 + Math.max(f.z, f.to)));
+  if (f.z <= f.to) { GH.fall = null; GH.drop.visible = false; GH.wait = 4 + Math.random() * 6; }
+}
 /* The round cellar under the Gryffindor storeroom, the cave (Interiors' docs/interiors/gryffindor-cellar.md, The table,
    every row placed; Godric's note on architect-south-range-west-busts-1023: "an earthen floor and look like a cave.
    There should be bats, stalagmites, etc."; ledger 296): the rock lining over the drum's wall, bulging and folded, r 4.42
@@ -7793,7 +7871,7 @@ function thingsDrawRoom(shown) {
     drawn[d.t.show] = true;
     if (Q.get(d.id.split('-')[0]) !== 'on') d.mesh.visible = shown.indexOf(d.t.show) >= 0;
   });
-  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown), statShown(shown), caveShown(shown)).forEach(function (x) { drawn[x] = true; });
+  CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown), ghShown(shown), statShown(shown), caveShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
   noteEl.hidden = !rest.length;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
@@ -9560,7 +9638,7 @@ function frame() {
   updateGlass(dt);
   updateLines(dt);
   updateFilch(dt); updateFilchOffice(dt); updateWoven(dt); updateTouch(dt); updateOwlery(dt); updateToad(dt); updatePig(dt); updateForms(dt); updateBanner(dt); updateAnimagus(dt); updateBorrow(dt); updateBang(dt); updateMoments(dt); updateMice(dt); updateOwlToast(dt); updateSnapeOffice(dt); updateSilly(dt); updateGiant(dt);
-  updateTrick(dt); updateTrap(dt); updateDiv(dt); updateCave(dt); updateStat(dt);
+  updateTrick(dt); updateTrap(dt); updateDiv(dt); updateCave(dt); updateGh(dt); updateStat(dt);
   updateMyrtle(dt);
   updateStaff(dt);
   updateStone(dt); updateStoneClimb(dt);
