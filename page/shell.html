@@ -6,7 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>A castle shell, greybox</title>
+<!-- req 1335: arrived by a door, the page is black from its first paint, before castle.js's veil exists (the
+     buttons on black came first, for the two seconds of the build); the veil takes over and this is taken off -->
+<script>if (/[?&]from=/.test(location.search)) document.documentElement.className += ' arriving';</script>
 <style>
+  html.arriving::after { content: ''; position: fixed; left: 0; top: 0; right: 0; bottom: 0; background: #000; z-index: 2147483000; }
   :root {
     --bg: #0b0a09;
     --hud-bg: rgba(24, 21, 18, 0.78);
@@ -602,6 +606,7 @@ function walkTo(points, s, fast, look) {
     legs.push({ pos: p.clone(), look: p.clone().add(dir.setLength(10)), fast: fast }); prev = p;
   });
   here = s; hereLook = look || null; hy = hyT = hp = hpT = 0;
+  fetchAhead(s);
   var fp = new THREE.Vector3(), fl = new THREE.Vector3(); headPose(fp, fl);
   legs.push({ pos: fp, look: fl, fast: fast });
   trail = trail.concat(points.map(function (p) { return p.clone(); }), [s.pos.clone()]);
@@ -9349,9 +9354,22 @@ function through(d) {
     walkTo([mp], tgt, false);
     return;
   }
-  /* a built room has its own page (the bay's mouth to corridor.html); a way still a shell, this page */
-  kit.travel((d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent(PLACE) +
-    (FLOOR_WALK && !d.page ? '&floor=' + FLOOR_WALK : ''));
+  kit.travel(wayUrl(d));
+}
+/* a built room has its own page (the bay's mouth to corridor.html); a way still a shell, this page */
+function wayUrl(d) {
+  /* on a floor built whole he leaves from the room the way is in, not the page's first */
+  return (d.page || 'shell.html?place=' + encodeURIComponent(d.to)) + (d.page ? '?' : '&') + 'from=' + encodeURIComponent((FLOOR_WALK && d.place) || PLACE) +
+    (FLOOR_WALK && !d.page ? '&floor=' + FLOOR_WALK : '');
+}
+/* req 1335, the door load: as he walks to the stand of a way that leaves this page, its page is fetched ahead, so the
+   tap there finds it in the cache (a phone over the air gains most; the files it loads are the same, already cached) */
+var fetchedAhead = {};
+function fetchAhead(s) {
+  var d = s && s.thing ? thingOf(s.thing) : null;
+  if (!d || (FLOOR_WALK && d.far) || !(d.page || (d.mesh.userData.way && d.built))) return;
+  var u = wayUrl(d); if (fetchedAhead[u]) return; fetchedAhead[u] = true;
+  var l = document.createElement('link'); l.rel = 'prefetch'; l.href = u; document.head.appendChild(l);
 }
 
 var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
@@ -9552,7 +9570,11 @@ function frame() {
   updateFloorLights(dt);
   renderer.render(scene, camera);
   kit.stats(dt);
+  /* req 1335: the first frame drawn (its shaders compiled), the head's black cover comes off under the veil and the
+     veil lifts now, not at castle.js's 2.5 s safety */
+  if (!revealed) { revealed = true; document.documentElement.classList.remove('arriving'); if (kit.reveal) kit.reveal(); }
 }
+var revealed = false;
 /* req 1335: a floor built whole brings every room's lamps (230 on the ground floor), and the renderer compiles each
    material against them all, which held the first frame past a minute; only the FLOOR_LIT nearest him light, re-picked
    as he goes, always the same count so nothing recompiles (a lamp put out stays on layer 1, which the camera skips) */
@@ -11035,7 +11057,8 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
 /* req 1335, for checks: the floor as built, and n doors with a far stand walked through and back by through() */
 window.lumosGreybox.floorWalk = FLOOR_WALK ? {
   info: function () { var lit = floorLamps ? floorLamps.filter(function (L) { return L.layers.test(camera.layers); }).length : null;
-    return { built: shell.floorBuilt, places: shell.places.length, stands: shell.stands.length, fars: things.filter(function (d) { return d.far; }).length, lamps: floorLamps ? floorLamps.length : null, lit: lit }; },
+    return { built: shell.floorBuilt, places: shell.places.length, stands: shell.stands.length, fars: things.filter(function (d) { return d.far; }).length, lamps: floorLamps ? floorLamps.length : null, lit: lit,
+      leaves: things.filter(function (d) { return !d.far && (d.page || (d.mesh.userData.way && d.built)); }).map(function (d) { return d.id + ' > ' + wayUrl(d); }) }; },
   test: async function (n) {
     var frame = function () { return new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); }); };
     var settle = async function () { for (var i = 0; i < 900 && tween; i++) await frame(); await frame(); };
