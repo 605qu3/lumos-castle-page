@@ -89,7 +89,7 @@ function findPlace(M, id) {
   if (r && r.shape && r.shape.poly) {
     var pb = zb != null ? zb : levelZ(M, r.level), pp = r.shape.poly.map(function (p) { return toSite(M, r.group, p); });
     return { id: r.id, name: r.name, kind: 'room', poly: pp, floor: pb + (r.floor || 0), ceiling: ceilOf(pb),
-      wall: r.wall || WALL_T, walls: null, rec: r };
+      wall: r.wall || WALL_T, walls: Array.isArray(r.walls) ? r.walls : null, rec: r };
   }
   /* v90 (model v218, the Astronomy Tower's top, req 663): a round room open to the sky (`open_sky`): the drum's roof inside
      its parapet, and a turret standing up through the edge (a notch in the plan, its walls as tall as the turret, its door
@@ -1229,7 +1229,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (L < 1e-6) return;
       if (sharedE(ed)) return;
       var ux = dx / L, uy = dy / L, nx = uy, ny = -ux;                 /* outward, the polygon counter-clockwise */
-      var t = ed.T || (Q.walls ? (Q.walls[['south', 'east', 'north', 'west'][i]] || Q.wall) : Q.wall);
+      /* v124: a poly room's `walls` is a list, side by side from its first corner (down-only-stair-way-1's south side 0.3) */
+      var t = ed.T || (Q.walls ? ((Array.isArray(Q.walls) ? Q.walls[i] : Q.walls[['south', 'east', 'north', 'west'][i]]) || Q.wall) : Q.wall);
       var ext = Q.area ? 0 : t;                                          /* a round wall's sides meet at their faces */
       /* v35: no wrap round a corner whose next side is the other place's wall (the North Tower passage's sides ran
          0.8 into the seventh floor's east run past their mouth's end, and a tap there met them) */
@@ -1540,11 +1541,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         }
         if (isDoor(g.op.kind) && !g.back && !out.doors.some(function (d) { return d.id === g.op.id; })) {
           var leaf = slab(w - 0.08, hh - 0.04, 0.12, mats.door, 'door');   /* v44: on its threshold (0.02), its foot not the threshold's */
-          var lo = g.far ? g.far - 0.1 : t * 0.5;                        /* a passage's leaves hang at its far face */
+          /* v124 (req 1622, Gate 0 on the first floor, the Architect's 264th): a door onto a stair in this wall's thickness
+             (the still room's onto the West Tower's spiral, 0.5 through the drum's 3.2) is that door's depth deep, not the
+             wall's: hung at half the wall it stood 1.6 in, against the newel, and no stand saw its leaf */
+          var oS = findPlace(M, to), td = oS && oS.shaft && g.op.depth > 0.1 && g.op.depth < t - 0.05 ? g.op.depth : t;
+          var lo = g.far ? g.far - 0.1 : td * 0.5;                       /* a passage's leaves hang at its far face */
           leaf.position.set(mid.x + nx * lo, mid.y + g.sill + 0.02 + (hh - 0.04) / 2, mid.z - ny * lo);
           leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
           /* its threshold through the wall (v4, req 284): the floor under a leaf that swings, else the void shows */
-          var sl = slab(w, 0.02, t, mats.floor, 'floor'), sp = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
+          var sl = slab(w, 0.02, td, mats.floor, 'floor'), sp = toLocal(a[0] + ux * sm + nx * td / 2, a[1] + uy * sm + ny * td / 2, Q.floor);
           sl.position.set(sp.x, sp.y + g.sill + 0.01, sp.z); sl.rotation.y = ang; sl.name = Q.id + '-threshold-' + g.op.id; group.add(sl);
           out.doors.push({ id: g.op.id, to: to, mesh: leaf, w: w, h: hh, mid: mid, inward: inward, place: Q.id, sill: g.sill, lift: lift, level: level });
         } else if ((g.back || isWay(g.op.kind)) && !out.ways.some(function (d) { return d.id === g.op.id; })) {
