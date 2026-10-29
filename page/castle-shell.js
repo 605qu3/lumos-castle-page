@@ -1812,7 +1812,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }
       /* v57 (req 861 (1)): a head under the next landing (less than 2.45 above, so under 0.9 over his eye) stands at
          its landing's middle instead (the West Tower's +5.2 under the wall passage's +7.2) */
-      /* v122 (req 1622, Gate 0 on the first floor): a landing with two doors (the West Tower's +10.4, the arch and the
+      /* v123 (req 1622, Gate 0 on the first floor): a landing with two doors (the West Tower's +10.4, the arch and the
          refuge) had its head look at the middle between them, a wall end 1.1 m off, and no touch went on: he looks at
          the door on its own level nearest where he stands */
       var headLook = function (B, ha) {
@@ -2347,7 +2347,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var d = Math.hypot(G.foot[0] - F0.head[0], G.foot[1] - F0.head[1]);
       if (d < bd) { bd = d; best = G; }
     });
-    /* v122 (req 1622, Gate 0 on the first floor, the Architect's 263rd): on a narrow dog-leg or a spiral (the tapestry stair,
+    /* v123 (req 1622, Gate 0 on the first floor, the Architect's 263rd): on a narrow dog-leg or a spiral (the tapestry stair,
        the west tower) the next foot stands 1.1 m off and he looked level at it, his back 0.4 m from the well's wall, the
        next treads under the phone's frame: no touch went on, a PIT. Where the next foot is within 2.5 m he looks up the
        next flight to its middle, as a foot looks up its own */
