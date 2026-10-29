@@ -2343,6 +2343,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var fs = endStand(F0, F0.zf, true, F0.s.id + ' foot', headPt.clone());
     var hs = endStand(F0, F0.zh, false, F0.s.id + ' head', onward(F0));
     fs.flight = hs.flight = true;   /* req 856: a flight's end, for the look below */
+    /* v119 (req 1574, Interaction's walk of the dungeon stair, 29 October 2026): a short flight's foot looked up at the head's
+       eye (dungeon-steps-flight-2, six treads, 24 degrees up), so its treads lay under the phone's frame and every touch met
+       the ceiling or the far mouth, which is Back to the start. Where the flight's middle lies more than 15 degrees under
+       his eye, the foot looks down to put that middle 20 degrees under the view's centre, the head's landing still in it */
+    var mid = toLocal((F0.foot[0] + F0.head[0]) / 2, (F0.foot[1] + F0.head[1]) / 2, (F0.zf + F0.zh) / 2).sub(fs.pos);
+    var mh = Math.hypot(mid.x, mid.z), aM = Math.atan2(mid.y, mh), LOW = 15 * Math.PI / 180;
+    if (mh > 0.05 && aM < -LOW) {
+      var lv = fs.look.clone().sub(fs.pos), lh = Math.hypot(lv.x, lv.z);
+      if (lh > 0.05) { lv.y = lh * Math.tan(aM + 20 * Math.PI / 180); fs.look = fs.pos.clone().add(lv); }
+    }
     out.flights.push({ id: F0.s.id, foot: fs, head: hs, footPt: footPt, headPt: headPt });
     out.stands.push(fs, hs);
   });
