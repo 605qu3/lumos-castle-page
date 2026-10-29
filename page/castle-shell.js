@@ -1799,7 +1799,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       });
     });
     /* the flights: from the foot to the first landing, and from each landing's clockwise end to the next one's other end */
-    var stops = [{ z: Q.floor, out: foot ? foot.a - foot.half - 4 : 0 }].concat(lands.map(function (L) { return { z: L.z, in: L.hi, out: L.lo, mid: L.mid }; }));
+    var stops = [{ z: Q.floor, out: foot ? foot.a - foot.half - 4 : 0 }].concat(lands.map(function (L) { return { z: L.z, in: L.hi, out: L.lo, mid: L.mid, doors: L.doors }; }));
     for (var j = 0; j + 1 < stops.length; j++) {
       var A = stops[j], B = stops[j + 1], n = Math.round((B.z - A.z) / rise), D = norm(A.out - B.in), best = D;
       for (var m = 0; m < 12; m++) { var Dm = D + 360 * m; if (Dm / n >= 12 && (Math.abs(Dm / n - 30) < Math.abs(best / n - 30) || best / n < 12)) best = Dm; }
@@ -1812,9 +1812,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }
       /* v57 (req 861 (1)): a head under the next landing (less than 2.45 above, so under 0.9 over his eye) stands at
          its landing's middle instead (the West Tower's +5.2 under the wall passage's +7.2) */
+      /* v122 (req 1622, Gate 0 on the first floor): a landing with two doors (the West Tower's +10.4, the arch and the
+         refuge) had its head look at the middle between them, a wall end 1.1 m off, and no touch went on: he looks at
+         the door on its own level nearest where he stands */
+      var headLook = function (B, ha) {
+        var ds = (B.doors || []).filter(function (d) { return Math.abs(d.z - B.z) < 0.05; }).sort(function (p, q) { return off(p.a, ha) - off(q.a, ha); });
+        return ds.length > 1 ? ds[0].a : (B.mid != null ? B.mid : B.in);
+      };
       var ha = B.in - 6;
       if (lands.some(function (U) { return U.z > B.z && U.z - B.z < 2.45 && off(ha, U.mid) < (U.hi - U.lo) / 2 + 4; })) ha = B.mid;
-      shaftFlights.push({ id: fid, foot: end(A.out + 6, PR, A.z, A.out - 3 * t, PR, 0.9), head: end(ha, PR, B.z, B.mid != null ? B.mid : B.in, R),
+      shaftFlights.push({ id: fid, foot: end(A.out + 6, PR, A.z, A.out - 3 * t, PR, 0.9), head: end(ha, PR, B.z, headLook(B, ha), R),
         path: path, lamp: [c[0], c[1], B.z + 2.0] });
     }
   }
@@ -2340,6 +2347,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var d = Math.hypot(G.foot[0] - F0.head[0], G.foot[1] - F0.head[1]);
       if (d < bd) { bd = d; best = G; }
     });
+    /* v122 (req 1622, Gate 0 on the first floor, the Architect's 263rd): on a narrow dog-leg or a spiral (the tapestry stair,
+       the west tower) the next foot stands 1.1 m off and he looked level at it, his back 0.4 m from the well's wall, the
+       next treads under the phone's frame: no touch went on, a PIT. Where the next foot is within 2.5 m he looks up the
+       next flight to its middle, as a foot looks up its own */
+    if (best && bd < 2.5) return toLocal((best.foot[0] + best.head[0]) / 2, (best.foot[1] + best.head[1]) / 2, (best.zf + best.zh) / 2 + EYE);
     if (best) return toLocal(best.foot[0], best.foot[1], F0.zh + EYE);
     var w = out.ways.filter(function (x) { return Math.abs(x.level - F0.zh) < 0.3; })[0];
     if (w) { var v = w.mid.clone(); v.y = F0.zh - z0 + EYE; return v; }
