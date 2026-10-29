@@ -11229,5 +11229,31 @@ window.lumosGreybox.floorWalk = FLOOR_WALK ? { shell: shell, things: things,   /
   } } : null;
 })();
 </script>
+<script>
+/* req 1621 (castle-shell v122, the Architect's 262nd): &fps=1 puts a small line in the top corner with the device's own
+   numbers, for Godric's iPad: frames a second, the slowest frame, draw calls, seconds to ready and the pixel ratio. Kept
+   out of #hud so &clean leaves it; nothing shows without the flag. */
+if (/[?&]fps=1/.test(location.search)) (function () {
+  var ready = null, el = document.createElement('div');
+  el.id = 'fpsline';
+  el.style.cssText = 'position:fixed;top:4px;left:4px;z-index:99;font:12px/1.3 monospace;color:#fff;background:rgba(0,0,0,.6);padding:3px 6px;border-radius:4px;pointer-events:none';
+  document.body.appendChild(el);
+  var n = 0, worst = 0, last = performance.now(), from = last;
+  (function tick() {
+    requestAnimationFrame(function () {
+      var now = performance.now(), G = window.lumosGreybox;
+      if (G && ready === null) ready = now / 1000;   /* from the tap that opened the page: load, build and first frame */
+      n++; worst = Math.max(worst, now - last); last = now;
+      if (now - from >= 2000) {
+        var R = G && G.renderer, calls = R ? R.info.render.calls : '?';
+        el.textContent = (n * 1000 / (now - from)).toFixed(0) + ' fps, slowest ' + worst.toFixed(0) + ' ms, ' + calls + ' calls, ready ' +
+          (ready === null ? '?' : ready.toFixed(1)) + ' s, ratio ' + (R ? R.getPixelRatio() : '?') + ' of ' + (window.devicePixelRatio || 1);
+        n = 0; worst = 0; from = now;
+      }
+      tick();
+    });
+  })();
+})();
+</script>
 </body>
 </html>
