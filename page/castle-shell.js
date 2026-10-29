@@ -2179,6 +2179,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
     /* v8: never off the floor (a small room, the commentator's box): nearer the door until he stands on it */
     while (off > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
+    /* v115 (req 1557, Gate 0): on a floor built whole the next room is floor too, so a 3 m corridor's stand 3.4 m back stood
+       in the room beyond its far wall, the door out of sight; he stands in the door's own place, 0.4 m clear of its far side */
+    var own = o.floor && out.places.filter(function (q) { return q.id === d.place; })[0];
+    if (own) while (off > 0.6 && !inArea(own, d.mid.x + d.inward.x * (off + 0.4) + cx, cy - (d.mid.z + d.inward.z * (off + 0.4)))) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
     if (P.ring && d.place === P.id) pos = midRing(pos);
     var look = d.mid.clone(); look.y = d.mid.y + d.lift + (d.lift ? EYE : Math.max(EYE, d.h * 0.45));
     return { name: name, pos: pos, look: look, thing: d.mesh, level: d.level };
