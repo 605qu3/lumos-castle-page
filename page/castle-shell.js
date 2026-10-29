@@ -2332,7 +2332,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     if (w) { var v = w.mid.clone(); v.y = F0.zh - z0 + EYE; return v; }
     return null;
   }
+  /* v116 (req 1558, Gate 0): on a floor built whole, a way that climbs through the wall behind a hidden door (S2's, H80) is
+     drawn but not walked till the shell opens that door (the two hands pressed, Events' req 1089): its foot stood outside the
+     shut door, where no touch could climb */
+  var shutVia = function (s) { return s.via && (M.openings || []).some(function (op) { return (op.between || []).indexOf(s.id) >= 0 && /^hidden/.test(op.kind || ''); }); };
   raw.forEach(function (F0) {
+    if (o.floor && shutVia(F0.s)) return;
     var headPt = toLocal(F0.head[0], F0.head[1], F0.zh + EYE), footPt = toLocal(F0.foot[0], F0.foot[1], F0.zf + EYE);
     var fs = endStand(F0, F0.zf, true, F0.s.id + ' foot', headPt.clone());
     var hs = endStand(F0, F0.zh, false, F0.s.id + ' head', onward(F0));
