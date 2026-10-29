@@ -4,7 +4,7 @@
 window.CASTLE_ROOM_TAGS = window.CASTLE_ROOM_TAGS || {};
 window.CASTLE_ROOM_TAGS.G = {
  "_meta": {
-  "written": "29 October 2026, 18:04 (Design, make-room-tags.py), req 1598",
+  "written": "29 October 2026, 18:30 (Design, make-room-tags.py), req 1598",
   "floor": "G",
   "model": 242,
   "floor_version": 9,
@@ -133,9 +133,9 @@ window.CASTLE_ROOM_TAGS.G = {
     "night_floor": 0.3,
     "read": true
    },
-   "surface": "oak",
+   "surface": "flagstone",
    "acoustic": "dry",
-   "surface_note": "oak boards by the type doc; the schedule says flags (Architect to confirm)"
+   "surface_note": "flags by the schedule (req 1609, provisional, Godric to confirm); the type doc oak waits for floors above; Pass 2 rugs soften"
   },
   "filchs-store": {
    "use": "store",
@@ -204,9 +204,9 @@ window.CASTLE_ROOM_TAGS.G = {
     "night_floor": 0.3,
     "read": true
    },
-   "surface": "oak",
+   "surface": "flagstone",
    "acoustic": "dry",
-   "surface_note": "oak boards by the type doc; the schedule says flags (Architect to confirm)",
+   "surface_note": "flags by the schedule (req 1609, provisional, Godric to confirm); the type doc oak waits for floors above; Pass 2 rugs soften",
    "hearth": [
     "staff-fireplace"
    ]
@@ -514,9 +514,9 @@ window.CASTLE_ROOM_TAGS.G = {
     "night_floor": 0.3,
     "read": true
    },
-   "surface": "oak",
+   "surface": "flagstone",
    "acoustic": "dry",
-   "surface_note": "oak boards by the type doc; the schedule says flags (Architect to confirm)"
+   "surface_note": "flags by the schedule (req 1609, provisional, Godric to confirm); the type doc oak waits for floors above; Pass 2 rugs soften"
   },
   "study-void": {
    "use": "hidden",
@@ -1079,9 +1079,9 @@ window.CASTLE_ROOM_TAGS.G = {
     "night_floor": 0.3,
     "read": true
    },
-   "surface": "oak",
+   "surface": "flagstone",
    "acoustic": "dry",
-   "surface_note": "oak boards by the type doc; the schedule says flags (Architect to confirm)",
+   "surface_note": "flags by the schedule (req 1609, provisional, Godric to confirm); the type doc oak waits for floors above; Pass 2 rugs soften",
    "hearth": [
     "herbology-study-g-hearth"
    ]
@@ -1151,9 +1151,9 @@ window.CASTLE_ROOM_TAGS.G = {
     "night_floor": 0.3,
     "read": true
    },
-   "surface": "oak",
+   "surface": "flagstone",
    "acoustic": "dry",
-   "surface_note": "oak boards by the type doc; the schedule says flags (Architect to confirm)",
+   "surface_note": "flags by the schedule (req 1609, provisional, Godric to confirm); the type doc oak waits for floors above; Pass 2 rugs soften",
    "hearth": [
     "staff-dining-room-hearth"
    ]
@@ -1240,9 +1240,9 @@ window.CASTLE_ROOM_TAGS.G = {
     "night_floor": 0.3,
     "read": true
    },
-   "surface": "oak",
+   "surface": "flagstone",
    "acoustic": "dry",
-   "surface_note": "oak boards by the type doc; the schedule says flags (Architect to confirm)",
+   "surface_note": "flags by the schedule (req 1609, provisional, Godric to confirm); the type doc oak waits for floors above; Pass 2 rugs soften",
    "hearth": [
     "staff-bedroom-g-hearth"
    ]
