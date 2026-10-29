@@ -2313,10 +2313,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var e = F0.u, sd = F0.side, P0 = back ? F0.foot : F0.head, sg = back ? -1 : 1, off = F0.half + so;
     var tries = [[P0[0] + sg * e[0] * so, P0[1] + sg * e[1] * so]];
     [-1, 1].forEach(function (k) { tries.push([P0[0] - sg * e[0] * 1.5 + k * sd[0] * off, P0[1] - sg * e[1] * 1.5 + k * sd[1] * off]); });
-    var at = tries.filter(function (p) { return onLevel(p[0], p[1], z); })[0] || tries[0];
+    var at = tries.filter(function (p) { return onLevel(p[0], p[1], z); })[0];
+    var off = !at; at = at || tries[0];                                  /* v118: no floor of his under any try (req 1572) */
     var pos = toLocal(at[0], at[1], z + EYE);
     var look = lookAt || toLocal(at[0] + e[0] * 20, at[1] + e[1] * 20, z + EYE);
-    return { name: name, pos: pos, look: look, thing: null, level: z };
+    return { name: name, pos: pos, look: look, thing: null, level: z, off: off };
   }
   /* at a flight's head he faces where he goes on (req 318): the nearest flight up from that floor, else the way out on
      it, else on along the flight */
@@ -2344,6 +2345,23 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     fs.flight = hs.flight = true;   /* req 856: a flight's end, for the look below */
     out.flights.push({ id: F0.s.id, foot: fs, head: hs, footPt: footPt, headPt: headPt });
     out.stands.push(fs, hs);
+  });
+  /* v118 (req 1572, Interaction's walk of the dungeon stair, 29 October 2026): a flight whose foot steps off into a place this
+     floor does not build (dungeon-steps-flight-1 into dungeon-steps-way, from the Entrance Hall) had its foot stand in the
+     dark past the mouth, where every touch met the mouth's open plane and none climbed. The foot stands where the way's own
+     stand stood and is that way's stand: a touch on the treads climbs, a touch on the mouth leaves for the far place's page */
+  out.flights.forEach(function (F) {
+    if (!F.foot.off) return;
+    var d = all.filter(function (x) {
+      if (!x.stand || !x.mid || !x.inward || Math.abs(x.level - F.foot.level) > 0.05) return false;
+      var w = x.inward.clone(); w.y = 0; w.normalize();
+      var v = F.foot.pos.clone().sub(x.mid); v.y = 0;
+      var perp = v.dot(w), along = v.clone().sub(w.clone().multiplyScalar(perp)).length();
+      return Math.abs(perp) < 3 && along <= x.w / 2;
+    })[0];
+    if (!d) return;
+    out.stands.splice(out.stands.indexOf(d.stand), 1);
+    F.foot.pos = d.stand.pos.clone(); F.foot.off = false; d.stand = F.foot;
   });
   /* v102 (req 1402, Godric's fault, 28 October 2026, 7.15 am): on a floor built whole, a way that opens onto a flight's
      foot (the well mouth onto the marble staircase) has no far stand: its far side on his floor is the flight, and the
