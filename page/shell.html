@@ -181,7 +181,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=113"></script>
+<script src="castle-shell.js?v=114"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -9490,7 +9490,7 @@ function wayUrl(d) {
 var fetchedAhead = {};
 function fetchAhead(s) {
   var d = s && s.thing ? thingOf(s.thing) : null;
-  if (!d || (FLOOR_WALK && d.far) || !(d.page || (d.mesh.userData.way && d.built))) return;
+  if (!d || (FLOOR_WALK && d.far) || !(d.page || d.leaves || (d.mesh.userData.way && d.built))) return;
   var u = wayUrl(d); if (fetchedAhead[u]) return; fetchedAhead[u] = true;
   var l = document.createElement('link'); l.rel = 'prefetch'; l.href = u; document.head.appendChild(l);
 }
@@ -9588,7 +9588,7 @@ function tap(cx, cy) {
   var d = hit && tappables.indexOf(hit) >= 0 ? thingOf(hit) : null, f = hit && !d ? flightOf(hit) : null;
   /* req 1402 (castle-shell v102): a way that opens onto a flight (the well mouth) is that flight's tap, to its foot, then up */
   if (d && d.onto) { f = shell.flights.filter(function (x) { return x.id === d.onto; })[0] || null; d = null; }
-  if (d && (here === d.stand || here === placeOf(d).s || (d.far && here === d.far))) { if ((d.mesh.userData.way && d.built) || (FLOOR_WALK && d.far) || (d === FDOOR && filchOpen) || (d === SDOOR && (snapeOpen || PLACE === 'snape-office'))) through(d); else answer(d, hits[0].point); acted = true; }
+  if (d && (here === d.stand || here === placeOf(d).s || (d.far && here === d.far))) { if ((d.mesh.userData.way && d.built) || (FLOOR_WALK && (d.far || d.leaves)) || (d === FDOOR && filchOpen) || (d === SDOOR && (snapeOpen || PLACE === 'snape-office'))) through(d); else answer(d, hits[0].point); acted = true; }
   else if (d) {
     acted = goTo(d);
     /* req 550: walking up to an open way is its tap to the events (gun-room-arch's draught), since a second tap takes him through */
@@ -11197,7 +11197,7 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
 window.lumosGreybox.floorWalk = FLOOR_WALK ? { shell: shell, things: things,   /* req 1402: the sweep reads the build */
   info: function () { var lit = floorLamps ? floorLamps.filter(function (L) { return L.layers.test(camera.layers); }).length : null;
     return { built: shell.floorBuilt, places: shell.places.length, stands: shell.stands.length, fars: things.filter(function (d) { return d.far; }).length, lamps: floorLamps ? floorLamps.length : null, lit: lit,
-      leaves: things.filter(function (d) { return !d.far && (d.page || (d.mesh.userData.way && d.built)); }).map(function (d) { return d.id + ' > ' + wayUrl(d); }) }; },
+      leaves: things.filter(function (d) { return !d.far && (d.page || d.leaves || (d.mesh.userData.way && d.built)); }).map(function (d) { return d.id + ' > ' + wayUrl(d); }) }; },
   test: async function (n) {
     var frame = function () { return new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); }); };
     var settle = async function () { for (var i = 0; i < 900 && tween; i++) await frame(); await frame(); };

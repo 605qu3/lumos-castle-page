@@ -1815,6 +1815,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   var shaftFloors = [];
   if (o.floor) {   /* v102: the floor's places found first, so each wall knows the built place behind it (halfGap) */
     var ft0 = Date.now(), fids = o.floor === 'all' ? (M.rooms || []).map(function (r) { return r.id; }) : painted;
+    /* v114 (req 1556, Gate 0): 'on' builds the floor files' rooms too (entered_from), painted or not, so a door into one has
+       its far stand and a tap walks him through; their paint and lamps still follow the painted list */
+    if (o.floor !== 'all') fids = fids.concat((M.rooms || []).filter(function (r) { return r.entered_from; }).map(function (r) { return r.id; }));
     floorQs.push(P);
     fids.forEach(function (id) {
       if (!id || floorQs.some(function (q) { return q.id === id; })) return;
@@ -2277,6 +2280,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   if (o.floor) all.forEach(function (d) {
     if (d.back || d.hatch || d.via || !d.mid || !d.inward || d.to === d.place) return;
     var built = function (id) { return out.places.some(function (q) { return q.id === id; }); };
+    /* v114 (req 1556, Gate 0): a plain door from a built place into one the model has but this floor does not build (the
+       kitchens' steps on B, a turret's stair) leaves for that place's page, as a way does (shell.html's tap), not a shut door */
+    if (built(d.place) && !built(d.to) && out.doors.indexOf(d) >= 0) {
+      var Q = findPlace(M, d.to);
+      if (Q) { d.leaves = true; if (Q.rec && Q.rec.page) d.page = Q.rec.page; }
+      return;
+    }
     if (!built(d.to) || !built(d.place)) return;
     d.built = true;
     var m = { id: d.id, mesh: d.mesh, mid: d.mid, inward: d.inward.clone().negate(), w: d.w, h: d.h, lift: d.lift || 0, level: d.level, place: d.to };
