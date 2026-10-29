@@ -173,6 +173,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-model-7.js?v=5"></script>
 <!-- /the floor files -->
 <script src="castle-paint.js?v=114"></script>
+<script src="design/room-tags-G.js?v=1"></script>
 <script src="design/tones.js?v=6"></script>
 <script src="design/stone-face.js?v=1"></script>
 <script src="design/ceilings.js?v=7"></script>
@@ -183,7 +184,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=120"></script>
+<script src="castle-shell.js?v=121"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -336,6 +337,8 @@ PAINTED = PAINTED.concat(['dumbledores-office', 'study']);
 PAINTED = PAINTED.concat(['h82-fern-well']);
 /* model v224 (ledger 311 and 312): greenhouse one, glass on iron, built by castle-shell.js's buildGlasshouse, a rough build */
 PAINTED = PAINTED.concat(['greenhouse-one']);
+/* the ground floor's Pass 1 item 2 (the Architect's 261st): every G room painted, the last 36 (Design's tags, req 1598, page/design/room-tags-G.js) */
+PAINTED = PAINTED.concat(['s2-level-way-g', 'old-trophies-overflow', 'exam-desks-store', 'potting-room', 'herbology-study-g', 'elves-service-stair-g', 'owl-treats-store', 'classroom-eleven', 'staff-dining-room', 'elves-linen-room-g', 'gryffindor-store-g', 'washrooms-g-north', 'washrooms-g-east', 'staff-bedroom-g', 'cloakroom-g', 'porters-lodge', 'school-brooms-store', 'spare-desks-store', 'linen-cupboard-g-west', 'hall-slot-cupboard', 'classroom-corridor-east', 'west-wing-corridor-g', 'east-wing-corridor-g', 'hall-chamber-way', 'great-hall-doors-passage', 'ravenclaw-tower-room-g', 'headmasters-tower-room-g', 'loop-gallery-g', 'postern-lobby-g', 'countermine-gallery', 'countermine-chamber', 'hoist-landing-g', 'east-lift-shaft-g', 'west-pole-shaft-g', 'west-dumbwaiter-shaft-g', 'loop-gallery-stair-g']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
 /* req 1335 (Godric's 1, 12.14 am, 28 October 2026): &floor=on builds every painted place on this floor in one frame,
    &floor=all every place; he walks it through, door to door, with no page between (castle-shell.js v94) */
