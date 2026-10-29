@@ -2311,6 +2311,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   function endStand(F0, z, back, name, lookAt) {
     var so = F0.s.step || STEP_OFF;                                     /* v8: a flight's own step off (the tapestry stair's 0.5) */
     var e = F0.u, sd = F0.side, P0 = back ? F0.foot : F0.head, sg = back ? -1 : 1, off = F0.half + so;
+    /* v120 (h82-gallery-flight, req 1575's last line, the Architect's 244th): a step off that lands on the end wall's plane
+       (the passage's north wall, 1.2 past the foot) stood him in the wall, and every touch met it at 0 m. Where the floor
+       does not run 0.25 past the step, it is pulled back by tenths, no shorter than 0.4 */
+    var CLR = 0.25, s1 = so;
+    while (s1 > 0.4 && !onLevel(P0[0] + sg * e[0] * (s1 + CLR), P0[1] + sg * e[1] * (s1 + CLR), z)) s1 -= 0.1;
+    if (s1 !== so && onLevel(P0[0] + sg * e[0] * (s1 + CLR), P0[1] + sg * e[1] * (s1 + CLR), z)) { so = s1; out.pulled = (out.pulled || []).concat(name); }
     var tries = [[P0[0] + sg * e[0] * so, P0[1] + sg * e[1] * so]];
     [-1, 1].forEach(function (k) { tries.push([P0[0] - sg * e[0] * 1.5 + k * sd[0] * off, P0[1] - sg * e[1] * 1.5 + k * sd[1] * off]); });
     var at = tries.filter(function (p) { return onLevel(p[0], p[1], z); })[0];

@@ -160,7 +160,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <div id="roomnote" hidden></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="castle.js?v=15"></script>
-<script src="castle-model.js?v=550"></script>
+<script src="castle-model.js?v=551"></script>
 <!-- the floor files: tools/castle-floor.py writes this block, never by hand -->
 <script src="castle-model-B.js?v=4"></script>
 <script src="castle-model-G.js?v=8"></script>
@@ -183,7 +183,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=119"></script>
+<script src="castle-shell.js?v=120"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -11074,7 +11074,7 @@ var hooks = window.lumosShell = { onDoorTap: null, onWay: null,
   place: shell.place.id, places: shell.places.map(function (p) { return p.id; }),
   doors: shell.doors.map(function (d) { return { id: d.id, to: d.to }; }),
   ways: shell.ways.map(function (d) { return { id: d.id, to: d.to, built: !!d.built }; }),
-  stands: shell.stands.map(function (s) { return s.name; }) };
+  stands: shell.stands.map(function (s) { return s.name; }), pulled: shell.pulled || [] };   /* v120: flights whose step off was pulled back */
 /* hooks for automated checks; harmless in normal use */
 window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, goBack: goBack, busy: function () { return !!tween; }, toLocal: shell.toLocal, far: shell.far, renderer: renderer, panes: shell.panes, fig3d: fig3dCount,
   goTo: function (id) { var d = things.filter(function (x) { return x.id === id; })[0]; return d ? goTo(d) : false; },
