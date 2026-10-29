@@ -107,6 +107,8 @@
     color: #e9dfc6;
     pointer-events: none;
   }
+  /* req 1559: on a phone the note spans the width, so it stands clear above Back (46 px tall, 14 up) */
+  @media (max-width: 520px) { #roomnote { bottom: calc(env(safe-area-inset-bottom, 0px) + 70px); } }
   [hidden] { display: none !important; }
   /* the events' lines by a shut door (req 278), as the dormitory and the corridor show a heard line */
   #lines { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
@@ -181,7 +183,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=116"></script>
+<script src="castle-shell.js?v=117"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -7907,6 +7909,15 @@ var noteEl = document.getElementById('roomnote');
    whichever chain holds it, and the old per-room chain list is gone. A record's cue with nothing to move (the trophy
    case's cup, the hospital wing's sweets, Flitwick's topple) shows a moment as a seen line (FALLBACK below) */
 var lastShown = [];
+/* req 1559 (Gate 0, the phone walk): the runtime holds this page's place alone, so on a floor built whole the note shows
+   while he stands in it and clears in every other place he reaches, back when he returns (shell.placeAt, castle-shell v117) */
+var noteHere = null, noteHome = true;
+function noteFollow() {
+  if (!FLOOR_WALK || !shell || !shell.placeAt || here === noteHere) return;
+  noteHere = here;
+  var home = shell.placeAt(here.pos, here.level) === PLACE;
+  if (home !== noteHome) { noteHome = home; thingsDrawRoom(lastShown); }
+}
 var DRAWN_ELSE = ["the broom cupboard's door in the west wall beside the Great Hall's doors, shut"];   /* the cupboard's shut leaf */
 function thingsDrawRoom(shown) {
   lastShown = shown;
@@ -7918,7 +7929,7 @@ function thingsDrawRoom(shown) {
   });
   CUP_OPEN_SHOWS.concat(CUP ? DRAWN_ELSE : [], glassShown(shown), stairShown(shown), libShown(shown), charmsShown(shown), potShown(shown), transShown(shown), defShown(shown), wingShown(shown), staffShown(shown), staffThingsShown(shown), w1Shown(shown), w0Shown(shown), myrtleShown(shown), upOnlyShown(shown), stoneShown(shown), astroShown(shown), astroUpShown(shown), foShown(shown), sittersShown(shown), soShown(shown), ehallShown(shown), wovenShown(shown), owlShown(shown), storeShown(shown), divShown(shown), trophyShown(shown), ghShown(shown), statShown(shown), caveShown(shown)).forEach(function (x) { drawn[x] = true; });
   var rest = shown.filter(function (s) { return !drawn[s]; }).filter(function (s, i, a) { return a.indexOf(s) === i; });
-  noteEl.hidden = !rest.length;
+  noteEl.hidden = !rest.length || !noteHome;
   noteEl.textContent = rest.length ? 'In the room: ' + rest.join('; ') + '.' : '';
 }
 /* req 771 (Events' cues for Magic's 750, filch.json and staff.json, 059df40a; Godric's 2 on interiors-filch-inside-1020):
@@ -9707,6 +9718,7 @@ function frame() {
   updateAstro(dt);
   if (events && events.tick) events.tick(dt);
   updateFloorLights(dt);
+  noteFollow();
   renderer.render(scene, camera);
   kit.stats(dt);
   /* req 1335: the first frame drawn (its shaders compiled), the head's black cover comes off under the veil and the

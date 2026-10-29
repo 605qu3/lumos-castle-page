@@ -2412,6 +2412,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var lost = here_.filter(function (d) { return seen.indexOf(d) < 0; });
     if (lost.length) { st0.lim.turn = 180; st0.wide = lost.map(function (d) { return d.id; }).join(' '); }
   }
+  /* v117 (req 1559, Gate 0): the place a stand stands in, by its foot and storey (null on a flight's treads), so on a
+     floor built whole shell.html's room note shows only in the page's own place */
+  out.placeAt = function (v, z) {
+    var t = siteOf(v), q = out.places.filter(function (q) { return Math.abs(q.floor - z) <= 0.3 && inArea(q, t[0], t[1]); })[0];
+    return q ? q.id : null;
+  };
   out.look = LK;
   /* v30 (Godric, 20 October 2026, 8.56 am: the glitches at thresholds and corners): one owner per face. The places
      built in one frame meet on shared lines (a wall's body lies in its neighbour's plan, a landing ends on a wall's
