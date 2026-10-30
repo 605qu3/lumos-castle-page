@@ -1083,6 +1083,16 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          found on the next wall, its sill and head then running the length of this one */
       if (pts.length > 1) { var s2 = alongEdge(E, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
       else { var cw = RC ? RC.w : (op.splay > (op.w || 1) ? op.splay : op.w) || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }   /* v89: a splayed loop cut at its inside width */
+      /* v137 (req 1701, the Architect's 285th): a span whose first end sits on a corner found the wall square across it
+         (drum-bend-mouth-5-nw at drum-bend-5's south-west corner), a gap of no width whose plane took the way's id, so the
+         mouth's own wall never hung one; such a span is found again from its middle, or is in no wall of this place */
+      if (pts.length > 1 && s1 - s0 < 0.05 && Math.hypot(pts[1][0] - pts[0][0], pts[1][1] - pts[0][1]) > 0.3) {
+        var em = onEdgeE(E, [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2], op.depth ? op.depth + 0.2 : null);
+        if (!em || em.i === e.i) return;
+        var ea = alongEdge(E, em.i, pts[0]), eb = alongEdge(E, em.i, pts[1]);
+        e = em; s0 = Math.min(ea, eb); s1 = Math.max(ea, eb);
+        if (s1 - s0 < 0.05) return;
+      }
       /* v10: held to its side; on a round wall an opening narrower than the side is moved along to fit it whole */
       if (Q.area && s1 - s0 <= e.L) { if (s0 < 0) { s1 -= s0; s0 = 0; } if (s1 > e.L) { s0 -= s1 - e.L; s1 = e.L; } }
       /* v15: on a curved face drawn in short sides (the casemate's round the drum), an opening wider than its side is cut

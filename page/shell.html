@@ -184,7 +184,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=136"></script>
+<script src="castle-shell.js?v=137"></script>
 <script src="shell-w5b.js?v=23"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -9555,15 +9555,18 @@ function tap(cx, cy) {
   }
   /* v20 (Events' ninety-second, 4.01 am): a tap through an open way at a way or door beyond it is a tap on that one
      (lake-passage-b-north seen through lake-passage-b-south's mouth, its plane always first on the ray); the near way
-     keeps the tap where the ray meets wall or floor beyond it */
-  while (hits.length > 1 && hits[0].object.userData.way && tappables.indexOf(hits[0].object) >= 0 &&
+     keeps the tap where the ray meets wall or floor beyond it; the Architect's 285th (req 1701): and so does a way
+     tapped from its own stand (stone-troll-door-out's, the black flames' way 12 m beyond it took the tap) */
+  var ownStand = function (o) { var od = thingOf(o); return od && here === od.stand; };
+  while (hits.length > 1 && hits[0].object.userData.way && tappables.indexOf(hits[0].object) >= 0 && !ownStand(hits[0].object) &&
          tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
   /* the Architect's 279th (req 1697): at a hidden place's own way out, the tap that meets its plane within 1 m is that
      way's, whatever of the outer place's stone stands before it (study-void's archive wall end tied with its plane at
-     0.61; the two-handed door's stone, left whole by design, 0.25 before s2-door-north's) */
-  if (hits.length > 1 && !hits[0].object.userData.way) for (var wi = 1; wi < hits.length && hits[wi].distance < 1.0; wi++) {
+     0.61; the two-handed door's stone, left whole by design, 0.25 before s2-door-north's); the 285th (req 1701): and at
+     any way's own stand, the plane met with a wall in its own line (nook-mouth's and west-corridor-7's at 3.89, a tie) */
+  if (hits.length > 1 && !hits[0].object.userData.way) for (var wi = 1; wi < hits.length && (hits[wi].distance < 1.0 || hits[wi].distance < hits[0].distance + 0.05); wi++) {
     if (!hits[wi].object.userData.way || tappables.indexOf(hits[wi].object) < 0) continue;
-    var wd = thingOf(hits[wi].object); if (wd && wd.back && here === wd.stand) hits.splice(0, wi);
+    var wd = thingOf(hits[wi].object); if (wd && here === wd.stand && (wd.back || hits[wi].distance < hits[0].distance + 0.05)) hits.splice(0, wi);
     break;
   }
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
