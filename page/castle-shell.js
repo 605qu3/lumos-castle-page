@@ -258,6 +258,18 @@ function hiddenTo(M, op, id) {
   var to = other(op, id), s = (M.stairs || []).filter(function (x) { return slug(x.id) === to; })[0];
   return s && s.via ? viaStair(M, to, id) || to : to;
 }
+/* v135 (the 283rd, the 282nd's sweep): the places whose every opening is a hidden kind (35 not `use: hidden` on model
+   v251: the elves' passages, the back-stair lobbies, gate-room, peeves-lumber-room and more), read once a model; a place
+   with no openings (a tower top, a stair's own place) is not one */
+function onlyHidden(M) {
+  if (M._onlyHidden) return M._onlyHidden;
+  var st = {};
+  (M.openings || []).forEach(function (o) {
+    var hid = /hidden/.test(o.kind || '');
+    (o.between || []).forEach(function (b) { var k = slug(b); st[k] = st[k] === false ? false : hid; });
+  });
+  return (M._onlyHidden = st);
+}
 /* v38: a door rusted fixed open (the old cells' eight, H16) is a way, its leaf not drawn, till a detail pass draws its bars */
 function isWay(kind) { return /open mouth|archway|arch\b|fixed open/.test(kind || ''); }
 function isDoor(kind) { return /door/.test(kind || '') && !isWay(kind); }
@@ -1314,8 +1326,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       run.hides = [];
       if (gapQs.length > 1) gapQs.forEach(function (q) {
         /* v134 (req 1696 (1)): and a place whose way out is a flag overhead (`hatch`: secret-s4b, use store, stood 0.8 m
-           of the stair hall's west wall along its east side on a floor page) */
-        if (q.id === Q.id || q.area || !q.poly || !(q.rec && (q.rec.use === 'hidden' || (M.openings || []).some(function (o) { return o.hatch && o.inside && slug(o.inside) === q.id; })))) return;
+           of the stair hall's west wall along its east side on a floor page); v135: and every place reached only by hidden
+           ways (23 wall pieces stood up to 0.84 m inside 13 of them on v134: elves-passage-5 and -6, back-stair-lobby-4,
+           peeves-lumber-room, feast-ladder-well; docs/architect/hidden-way-walls-282.txt). secret-s4b is one of them; the
+           hatch test stays for a flag place with an open door too */
+        if (q.id === Q.id || q.area || !q.poly || !(q.rec && (q.rec.use === 'hidden' || onlyHidden(M)[q.id] === true || (M.openings || []).some(function (o) { return o.hatch && o.inside && slug(o.inside) === q.id; })))) return;
         var qt = q.ceiling != null ? q.ceiling : q.floor + 3, n0 = Infinity, n1 = -Infinity, u0 = Infinity, u1 = -Infinity;
         if (q.floor >= Q.floor + HE - 0.05 || qt <= Q.floor + 0.05) return;
         q.poly.forEach(function (p) {
@@ -1325,7 +1340,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         if (n0 < -0.02 || n0 >= t || n1 < n0 + 0.1) return;   /* v133: in the wall's depth, flush or not (chimney-hide 0.25 m off its bedroom's line) */
         var r0 = Math.max(0, u0), r1 = Math.min(L, u1);
         if (r1 - r0 < 0.05) return;
-        run.hides.push([r0, r1, Math.max(0, q.floor - Q.floor), Math.min(HE, qt - Q.floor), Math.max(0.02, n0 / 2)]);
+        var wide = q.rec.use !== 'hidden' && !(M.openings || []).some(function (o) { return o.hatch && o.inside && slug(o.inside) === q.id; });
+        run.hides.push([r0, r1, Math.max(0, q.floor - Q.floor), Math.min(HE, qt - Q.floor), Math.max(0.02, n0 / 2), wide ? n0 : null]);
         (out.hideSkins = out.hideSkins || []).push(Q.id + ' wall ' + i + ' skin ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2));
       });
       wallRuns.forEach(function (R) {
@@ -1359,6 +1375,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         for (var hk = 0; hk < run.hides.length; hk++) {
           var Hd = run.hides[hk];
           if (!(Hd[0] < s1 - 0.02 && Hd[1] > s0 + 0.02 && Hd[2] < yb - 0.02 && Hd[3] > ya + 0.02)) continue;
+          /* v135: a place reached only by hidden ways (not `use: hidden`) cuts and thins only a piece that stands inside it
+             (halfGap's depth past its near face); a wall short of it keeps its pieces and depth */
+          if (Hd[5] != null && (gapQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) : t) <= Hd[5] + 0.01) continue;
           if (Hd[0] > s0 + 0.02 || Hd[1] < s1 - 0.02) {
             var h0 = Math.max(s0, Hd[0]), h1 = Math.min(s1, Hd[1]);
             piece(s0, h0, ya, yb, name + '-ha'); piece(h0, h1, ya, yb, name + '-h'); piece(h1, s1, ya, yb, name + '-hb');
@@ -2675,7 +2694,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   out.merged = mergeDrawn(group, function (m) { return m.parent === group && m.userData.stair && !m.userData.way && !m.userData.hidden; },
     function (m) { return m.userData.stair + '|' + (m.userData.owner || ''); });
   group.children.filter(function (g) { return !g.isMesh && /-(ceilings|panelling)$/.test(g.name); }).forEach(function (g) {
-    out.merged += mergeDrawn(g, function (m) { return !/-corbel/.test(m.name) && !inFace(m); }, function () { return ''; });
+    /* v136 (the towers' Pass 1.3, the 283rd: ravenclaw-tower-room-2 1,357 calls, 311 of them corbel stones in view): a
+       place's corbel stones go into its one mesh too; still a tap, since shell.html's CORBELS finds the merged mesh by
+       its first stone's name and the ray meets every stone in it. The carved faces stay whole (their atlas is swapped) */
+    out.merged += mergeDrawn(g, function (m) { return !/-corbel-face/.test(m.name) && !inFace(m); }, function () { return ''; });
   });
   /* v129 (req 1687, Architect 3's measure, the Architect's 274th): the places around the stand's own, drawn as few. Every
      other place's walls, floors, ceilings, joists, beams and caps (layers wall and floor, straight under the group, no
