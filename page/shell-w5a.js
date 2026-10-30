@@ -2105,3 +2105,21 @@ window.SHELL_W5A = {
     T['astronomy-lantern-room'] = { c: C, items: it };
   })();
 })(window.SHELL_W5A.things, window.SHELL_W5A.mats);
+/* G-TOUCHES begin */
+/* req 1864: the ground floor's lived-in touches (docs/interiors/ground-floor-lived-in-1029.md), written by
+   tools/architect-g-touches.py: never edit by hand. Each adds to its room's things. */
+(function (T) {
+  function add(id, items) { T[id] = T[id] || { items: [] }; T[id].items = T[id].items.concat(items); }
+  /* G-TOUCHES cloakroom-g */
+  /* cloakroom-g: a cloak left on the far hook, a satchel on the bench, drip in the bucket */
+  add('cloakroom-g', [
+    ['b', 111.21, 50.88, 0.55, 111.65, 51.01, 1.6, 'black'], ['b', 111.16, 53.63, 0.42, 111.38, 53.95, 0.66, 'leather'], ['b', 111.155, 53.62, 0.56, 111.385, 53.96, 0.67, 'mahog'], ['y', 116.78, 54.05, 0.13, 0.3, 0.303, 'ink']]);
+  /* G-TOUCHES end cloakroom-g */
+  /* G-TOUCHES porters-lodge */
+  /* porters-lodge: the kettle lid ajar, a parcel waiting with its tag, a cushion on the Windsor */
+  add('porters-lodge', [
+    ['y', 104.72, 51.3, 0.06, 0.98, 1.0, 'copper'], ['b', 107.68, 50.99, 1.0, 107.96, 51.25, 1.13, 'deal'], ['b', 107.815, 50.99, 1.13, 107.825, 51.25, 1.135, 'rope'], ['b', 107.68, 51.115, 1.13, 107.96, 51.125, 1.135, 'rope'],
+    ['b', 107.96, 51.09, 1.05, 107.965, 51.15, 1.1, 'paper'], ['b', 104.52, 52.75, 0.45, 104.9, 53.15, 0.49, 'tartan'], ['b', 104.63, 52.85, 0.49, 104.81, 53.05, 0.495, 'tartan']]);
+  /* G-TOUCHES end porters-lodge */
+})(window.SHELL_W5A.things);
+/* G-TOUCHES finish */
