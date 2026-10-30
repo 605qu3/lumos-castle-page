@@ -2126,5 +2126,45 @@ window.SHELL_W5A = {
   add('staff-dining-room', [
     ['b', 134.33, 64.375, 0, 134.63, 64.575, 0.012, 'linen'], ['b', 134.33, 64.375, 0.012, 134.48, 64.575, 0.02, 'linen']]);
   /* G-TOUCHES end staff-dining-room */
+  /* G-TOUCHES potting-room */
+  /* potting-room: a seed packet torn open on the staging, a trowel left standing in a pot at the staging's end */
+  add('potting-room', [
+    ['b', 155.85, 18.65, 1.4, 155.94, 18.72, 1.404, 'paper'], ['b', 155.94, 18.67, 1.4, 155.97, 18.71, 1.403, 'paper'], ['b', 155.99, 18.68, 1.4, 156.0, 18.69, 1.403, 'dark'], ['b', 156.015, 18.695, 1.4, 156.025, 18.705, 1.403, 'dark'],
+    ['b', 156.04, 18.68, 1.4, 156.05, 18.69, 1.403, 'dark'], ['b', 156.065, 18.695, 1.4, 156.075, 18.705, 1.403, 'dark'], ['y', 158.65, 18.5, 0.09, 0, 0.17, 'brick'], ['y', 158.65, 18.5, 0.08, 0.17, 0.175, 'dark'],
+    ['b', 158.62, 18.492, 0.1, 158.68, 18.508, 0.25, 'iron'], ['y', 158.65, 18.5, 0.014, 0.25, 0.37, 'wood']]);
+  /* G-TOUCHES end potting-room */
+  /* G-TOUCHES staff-bedroom-g */
+  /* staff-bedroom-g: a book face down on the armchair's arm, the rug's near corner turned back */
+  add('staff-bedroom-g', [
+    ['b', 154.08, 52.63, 0.65, 154.185, 52.78, 0.69, 'books2'], ['b', 154.195, 52.63, 0.65, 154.3, 52.78, 0.69, 'books2'], ['b', 154.185, 52.63, 0.67, 154.195, 52.78, 0.7, 'dark'], ['b', 157.645, 52.36, 0.01, 157.895, 52.61, 0.02, 'cloth'],
+    ['b', 157.645, 52.59, 0.01, 157.895, 52.61, 0.045, 'dark'], ['b', 157.655, 52.595, 0, 157.9, 52.62, 0.002, 'stone']]);
+  /* G-TOUCHES end staff-bedroom-g */
+  /* G-TOUCHES washrooms-g-north */
+  /* washrooms-g-north: one towel hung long at one end, a scrubbing brush left on a basin's rim */
+  add('washrooms-g-north', [
+    ['b', 98.46, 57.135, 0.42, 98.59, 57.185, 0.62, 'white'], ['b', 100.185, 51.27, 0.85, 100.365, 51.33, 0.88, 'wood'], ['b', 100.195, 51.28, 0.83, 100.355, 51.32, 0.85, 'straw']]);
+  /* G-TOUCHES end washrooms-g-north */
+  /* G-TOUCHES washrooms-g-east */
+  /* washrooms-g-east: one towel hung long at one end, a scrubbing brush left on a basin's rim */
+  add('washrooms-g-east', [
+    ['b', 149.6, 57.135, 0.42, 149.73, 57.185, 0.62, 'white'], ['b', 147.635, 51.27, 0.85, 147.815, 51.33, 0.88, 'wood'], ['b', 147.645, 51.28, 0.83, 147.805, 51.32, 0.85, 'straw']]);
+  /* G-TOUCHES end washrooms-g-east */
+  /* G-TOUCHES spare-desks-store */
+  /* spare-desks-store: initials cut in a stacked desk, a duster laid on the stack */
+  add('spare-desks-store', [
+    ['b', 95.246, 51.5, 0.6, 95.25, 51.506, 0.645, 'dark'], ['b', 95.246, 51.53, 0.6, 95.25, 51.536, 0.66, 'dark'], ['b', 95.246, 51.572, 0.6, 95.25, 51.578, 0.645, 'dark'], ['b', 95.246, 51.59, 0.6, 95.25, 51.596, 0.66, 'dark'],
+    ['b', 95.246, 51.62, 0.6, 95.25, 51.626, 0.645, 'dark'], ['b', 95.246, 51.662, 0.6, 95.25, 51.668, 0.66, 'dark'], ['b', 95.458, 52.4, 0.78, 95.482, 52.75, 0.804, 'wood'], ['b', 95.42, 52.75, 0.78, 95.52, 52.95, 0.86, 'dust']]);
+  /* G-TOUCHES end spare-desks-store */
+  /* G-TOUCHES exam-desks-store */
+  /* exam-desks-store: initials cut in a desk lid, a duster leant on the stack */
+  add('exam-desks-store', [
+    ['b', 9.45, 45.646, 0.7, 9.456, 45.65, 0.745, 'dark'], ['b', 9.48, 45.646, 0.7, 9.486, 45.65, 0.76, 'dark'], ['b', 9.522, 45.646, 0.7, 9.528, 45.65, 0.745, 'dark'], ['b', 9.54, 45.646, 0.7, 9.546, 45.65, 0.76, 'dark'],
+    ['b', 9.57, 45.646, 0.7, 9.576, 45.65, 0.745, 'dark'], ['b', 9.612, 45.646, 0.7, 9.618, 45.65, 0.76, 'dark'], ['y', 10.18, 43.605, 0.012, 0.25, 0.75, 'wood'], ['y', 10.18, 43.605, 0.06, 0.02, 0.25, 'dust']]);
+  /* G-TOUCHES end exam-desks-store */
+  /* G-TOUCHES owl-treats-store */
+  /* owl-treats-store: the bag on its peg left open, a ladle stood in a crock */
+  add('owl-treats-store', [
+    ['b', 0.41, 32.33, 1.47, 0.49, 32.47, 1.49, 'leather'], ['b', 0.36, 32.34, 1.53, 0.405, 32.46, 1.555, 'straw'], ['y', 2.45, 38.8, 0.012, 1.0, 1.42, 'wood'], ['b', 2.44, 38.77, 1.42, 2.46, 38.83, 1.44, 'iron']]);
+  /* G-TOUCHES end owl-treats-store */
 })(window.SHELL_W5A.things);
 /* G-TOUCHES finish */
