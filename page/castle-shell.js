@@ -1079,10 +1079,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       /* v75 (ledger 258, the lake rooms' seats): a window in a recess deeper than its wall (`recess`: its own cut, w, h
          and sill, from the floor; `back` the stone the glass stands in at its far end) is cut at the recess's size */
       var RC = op.recess && !back ? op.recess : null;
+      /* v142 (Godric's 1 on req 1812, req 1807): a window of `lights` with a `reveal` is cut at its embrasure, the lights'
+         width and both splays at the inner face, from the seat to the rere-arch's crown (equilateral, springing
+         reveal.spring), and its lights stand in a screen of stone at the reveal's depth (below, where the gaps are drawn) */
+      var LT = op.lights && op.reveal && op.reveal.spring && !back ? op.reveal : null;
+      var LW = LT ? (op.w || 1) + ((LT.splay || [])[0] || 0) + ((LT.splay || [])[1] || 0) : 0;
       /* v7: the far end measured along the same edge, so an end on a corner (the first floor's mouth at x 92) is not
          found on the next wall, its sill and head then running the length of this one */
       if (pts.length > 1) { var s2 = alongEdge(E, e.i, pts[1]); s0 = Math.min(e.s, s2); s1 = Math.max(e.s, s2); }
-      else { var cw = RC ? RC.w : (op.splay > (op.w || 1) ? op.splay : op.w) || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }   /* v89: a splayed loop cut at its inside width */
+      else { var cw = RC ? RC.w : LT ? LW : (op.splay > (op.w || 1) ? op.splay : op.w) || 1; s0 = e.s - cw / 2; s1 = e.s + cw / 2; }   /* v89: a splayed loop cut at its inside width */
       /* v137 (req 1701, the Architect's 285th): a span whose first end sits on a corner found the wall square across it
          (drum-bend-mouth-5-nw at drum-bend-5's south-west corner), a gap of no width whose plane took the way's id, so the
          mouth's own wall never hung one; such a span is found again from its middle, or is in no wall of this place */
@@ -1116,13 +1121,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       if (Q.shaft && op.z != null) sill += op.z - Q.floor;                /* v17: in a stair's well, at its own height */
       else if (Q.shaft) { var oQ = findPlace(M, other(op, Q.id)); if (oQ) sill += oQ.floor - Q.floor; }   /* v25: with no z, at its other room's floor */
       if (RC) sill = RC.sill || 0;
-      var oh = RC ? RC.h : op.h || 2.2;
+      if (LT && LT.seat != null) sill = LT.seat;
+      var oh = RC ? RC.h : LT ? LT.spring + Math.sqrt(3) / 2 * LW - sill : op.h || 2.2;
       var h = Q.sky ? oh + sill : Math.min(E[e.i].H != null ? E[e.i].H : H, oh + sill);
       /* v23: an arch's `soffit` gives its head at each room's face (absolute), under a room's raised head */
       var sof = op.soffit && !hid ? op.soffit : null, near = sof && sof[Q.id], far = sof && sof[other(op, Q.id)];
       if (near != null) h = near - Q.floor;
       gaps[e.i].push({ s0: s0, s1: s1, sill: sill, h: h, op: op, far: op.depth && e.d > 0.5 ? e.d : 0, back: back, hidden: hid,
-        soffit: near != null ? [h, far != null ? far - Q.floor : h] : null, recess: RC });
+        soffit: near != null ? [h, far != null ? far - Q.floor : h] : null, recess: RC, lights: LT });
       spill.forEach(function (sp) { gaps[sp.k].push({ s0: sp.s0, s1: sp.s1, sill: sill, h: h, op: op, back: back, hidden: false, spill: true }); });
       /* v84: a shaft's opening over a corner (H82's cleft): a round wall's sides meet at their inner faces, leaving a V
          outside each corner that the wall's height hides; a sill across the corner shows its top, so a cap over it */
@@ -1429,6 +1435,40 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         pn_.name = Q.id + '-pane-' + g.op.id + suf; pn_.userData.owner = Q.id; group.add(pn_);
         out.panes.push(pn_);
       }
+      /* v142 (req 1807): a window's `lights` in a screen of stone at its reveal's depth: each light's sill, its jambs to
+         `spring` and its head two arcs struck on the springing line to its crown (sill + h), the stone between them the
+         pier; the embrasure's cheeks run from the cut's inner corners to the lights' outer jambs at that depth, up to the
+         rere-arch's springing and half its span on (inside the head's stone over it); the pane of sky stands behind */
+      function lights(g, sm, w, mid) {
+        var op = g.op, LT = g.lights, D = Math.min(t - 0.05, LT.deep != null ? LT.deep : t - 0.15), w0 = op.w || 1;
+        var wm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h / 2) : mats.wall;
+        var sx = Math.cos(ang) * ux + Math.sin(ang) * uy >= 0 ? 1 : -1;   /* the shape's x along the wall's run */
+        var sh = new THREE.Shape(), X0 = -w / 2 - 0.02, X1 = w / 2 + 0.02, Y1 = g.h - g.sill + 0.02;
+        sh.moveTo(X0, 0); sh.lineTo(X1, 0); sh.lineTo(X1, Y1); sh.lineTo(X0, Y1); sh.lineTo(X0, 0);
+        var S0 = op.sill - g.sill, SP = op.spring - g.sill, RI = op.sill + op.h - op.spring;
+        op.lights.forEach(function (lt) {
+          var l0 = Math.min(lt[0] * sx, lt[1] * sx), l1 = Math.max(lt[0] * sx, lt[1] * sx), wl = l1 - l0;
+          var R = (wl * wl / 4 + RI * RI) / wl, th = Math.atan2(RI, R - wl / 2), ho = new THREE.Path();
+          ho.moveTo(l0, S0); ho.lineTo(l1, S0); ho.lineTo(l1, SP);
+          ho.absarc(l1 - R, SP, R, 0, th, false); ho.absarc(l0 + R, SP, R, Math.PI - th, Math.PI, false); ho.lineTo(l0, S0);
+          sh.holes.push(ho);
+        });
+        var sc = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: t - D - 0.005, bevelEnabled: false, curveSegments: 12 }), wm), LAYER.wall);
+        var sp = toLocal(a[0] + ux * sm + nx * D, a[1] + uy * sm + ny * D, Q.floor);
+        sc.position.set(sp.x, sp.y + g.sill, sp.z); sc.rotation.y = ang; sc.name = Q.id + '-lights-' + op.id; sc.userData.owner = Q.id; group.add(sc);
+        [-1, 1].forEach(function (k) {
+          var si = sm + k * (w / 2 + 0.04), so_ = sm + k * w0 / 2;
+          var A = [a[0] + ux * si, a[1] + uy * si], B = [a[0] + ux * so_ + nx * D, a[1] + uy * so_ + ny * D];
+          var pA = toLocal(A[0], A[1], Q.floor), pB = toLocal(B[0], B[1], Q.floor), y0 = g.sill, y1 = Math.min(g.h, LT.spring + w / 2);
+          var vs = [pA.x, pA.y + y0, pA.z, pB.x, pB.y + y0, pB.z, pB.x, pB.y + y1, pB.z, pA.x, pA.y + y1, pA.z];
+          var cg = new THREE.BufferGeometry(); cg.setAttribute('position', new THREE.Float32BufferAttribute(vs, 3));
+          cg.setIndex([0, 1, 2, 0, 2, 3]); cg.computeVertexNormals();
+          var nrmv = new THREE.Vector3().fromBufferAttribute(cg.attributes.normal, 0), toMid = new THREE.Vector3(mid.x - pA.x, 0, mid.z - pA.z);
+          if (nrmv.dot(toMid) < 0) { cg.setIndex([0, 2, 1, 0, 3, 2]); cg.computeVertexNormals(); }
+          var cm = F.register(new THREE.Mesh(cg, wm), LAYER.wall);
+          cm.name = Q.id + '-cheek-' + (k < 0 ? 'a' : 'b') + '-' + op.id; cm.userData.owner = Q.id; group.add(cm);
+        });
+      }
       /* v10: an iron bar standing in the wall's line, `off` out from its face (a grille's, a crenel's) */
       function bar(s, ya, yb, off, name) {
         var p = toLocal(a[0] + ux * s + nx * off, a[1] + uy * s + ny * off, Q.floor), m = slab(0.04, yb - ya, 0.04, mats.grille, 'wall');
@@ -1447,13 +1487,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var slot = cls === 'loop' && g.op.splay > (g.op.w || 1) ? g.op.w : w;   /* the slot's width at the outer face */
         ['in', 'out'].forEach(function (face) {
           if (face === 'out' && (beyond || g.op.depth > t + 0.05)) return;
-          var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: face === 'out' ? slot : w, h: g.h - g.sill, sill: g.sill, face: face, head: g.op.head,
-            late: !!(rm && rm.late), grand: !!g.op.grand,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
-            lim: { x0: -sm, x1: L - sm, ymax: HE - 0.008 } });
-          var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sm + nx * off, a[1] + uy * sm + ny * off, Q.floor);
-          geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
-          var mt = trimMat(row, a[0] + ux * sm, a[1] + uy * sm, g.sill);
-          (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
+          /* v142: outside, a window of `lights` is dressed light by light at the lights' own sill and crown */
+          var each = face === 'out' && g.lights ? g.op.lights.map(function (lt) { return [(lt[0] + lt[1]) / 2, lt[1] - lt[0], g.op.h, g.op.sill]; })
+            : [[0, face === 'out' ? slot : w, g.h - g.sill, g.sill]];
+          each.forEach(function (E1) {
+            var sE = sm + E1[0];
+            var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: E1[1], h: E1[2], sill: E1[3], face: face, head: g.op.head,
+              late: !!(rm && rm.late), grand: !!g.op.grand,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
+              lim: { x0: -sE, x1: L - sE, ymax: HE - 0.008 } });
+            var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sE + nx * off, a[1] + uy * sE + ny * off, Q.floor);
+            geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
+            var mt = trimMat(row, a[0] + ux * sE, a[1] + uy * sE, E1[3]);
+            (trimB[mt.uuid] = trimB[mt.uuid] || { mat: mt, geos: [] }).geos.push(geo);
+          });
         });
       }
       /* v10: a hidden opening seen from its outer side stays wall, with an unseen tap over its face; v58 (model v134,
@@ -1672,6 +1718,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
              cheek of the wall's stone each side from the cut's inner corner to the slot's edge, the pane the slot's width
              there and 1 cm behind each cheek */
           var w0 = g.op.w || 1;
+          if (g.lights) lights(g, sm, w, mid);   /* v142: its pane below stands behind the screen */
           if (g.op.splay > w0 && w > w0 + 0.02) {
             var pd = Math.max(0.02, t - 0.03), wp = w0 + (w - w0) * (1 - pd / t) + 0.02;
             pane({ s0: sm - wp / 2, s1: sm + wp / 2, sill: g.sill, h: g.h, op: g.op }, '');
