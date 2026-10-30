@@ -1006,7 +1006,13 @@ window.castleFrame = function (opts) {
          Each window an arched embrasure centred on its light, the common room's 13 degree splay the same each side, the
          head round and concentric with the glass's (Godric's Try 1 on architect-windows-1015, 15 October 2026, 5.46 pm;
          the Architect's model v29, corridor-window-1 and -2; req 469): Q22's glimpse from the stair head given up */
-      WINDOW: { w: 1.2, h: 2.4, sill: 0.9, deep: 0.45, xs: [-2.5, -4.6], splays: [[0.11, 0.11], [0.11, 0.11]] },
+      /* v16 (req 1807, the Architect's model v254, Godric's 1 on req 1812, 30 October 2026): each window a pair of P3 lancets,
+         the lake wall 0.8 thick with the glass 0.15 in from its outer face, so the embrasure is 0.65 deep and 1.5 wide all
+         the way back, its cheeks square (v255, Godric's 5.09 pm note; `splays` is now the 0.15 the screen's face returns each side); the two lights 0.45 wide either side of a 0.30 pier (`lights`, x about the window's centre),
+         sill 0.9, springing 2.45, apex 2.92 (h 2.02); an equilateral pointed rere-arch springing 2.6 over the embrasure's
+         1.5 at the room's face; a stone seat across the embrasure at 0.45, the glass's sill a step up at 0.9 */
+      WINDOW: { w: 1.2, h: 2.02, sill: 0.9, deep: 0.65, seat: 0.45, spring: 2.45, rere: 2.6, lights: [[-0.6, -0.15], [0.15, 0.6]],
+        xs: [-2.5, -4.6], splays: [[0.15, 0.15], [0.15, 0.15]] },
       DOOR: { w: 1.0, h: 2.2, x: 0 },
       HOLE: { r: 0.6, y: 1.2, depth: 0.81 },
       PORTRAIT: { w: 1.4, h: 1.7 } };
@@ -1091,6 +1097,23 @@ window.castleFrame = function (opts) {
     pts.push(new THREE.Vector2(x + r, yb));
     return pts;
   }
+  /* v16: the same from the bottom of one jamb to the bottom of the other, but the head an equilateral point: each arc
+     struck from the opposite springing, radius the whole span, hw the half span; n points on each arc */
+  function pointedOutline(x, hw, ys, yb, n) {
+    var R = 2 * hw, pts = [new THREE.Vector2(x - hw, yb)];
+    for (var i = 0; i <= n; i++) { var a = Math.PI - (Math.PI / 3) * i / n; pts.push(new THREE.Vector2(x + hw + R * Math.cos(a), ys + R * Math.sin(a))); }
+    for (var j = 0; j <= n; j++) { var b = Math.PI / 3 - (Math.PI / 3) * j / n; pts.push(new THREE.Vector2(x - hw + R * Math.cos(b), ys + R * Math.sin(b))); }
+    pts.push(new THREE.Vector2(x + hw, yb));
+    return pts;
+  }
+  /* v16: one lancet light's outline in window coordinates (x across, y up from the floor): the jambs from the sill to the
+     springing, the head two arcs struck on the springing line to the apex (the shell's `lights`, the same curve) */
+  function lancetPts(l0, l1, sill, spring, apex, n) {
+    var wl = l1 - l0, RI = apex - spring, R = (wl * wl / 4 + RI * RI) / wl, th = Math.atan2(RI, R - wl / 2), pts = [[l0, sill], [l1, sill], [l1, spring]];
+    for (var i = 1; i <= n; i++) { var a = th * i / n; pts.push([l1 - R + R * Math.cos(a), spring + R * Math.sin(a)]); }
+    for (var j = 0; j <= n; j++) { var b = Math.PI - th + th * j / n; pts.push([l0 + R + R * Math.cos(b), spring + R * Math.sin(b)]); }
+    return pts;
+  }
   function buildCorridor(parent, o) {
     o = o || {};
     var C = CORRIDOR, W = C.WINDOW, layer = o.layer || 0;
@@ -1109,10 +1132,11 @@ window.castleFrame = function (opts) {
     var y0 = C.WALL_Y - C.WALL_H / 2, y1 = C.WALL_Y + C.WALL_H / 2;
 
     /* the outer wall, cut with the two windows' openings at their inner (splayed) outline */
-    var r = W.w / 2, yb = W.sill - 0.03, ys = W.sill + W.h - r, N = 24;
+    var r = W.w / 2, N = 24, apex = W.sill + W.h;
     var outlines = W.xs.map(function (wx, i) {
       var s = W.splays[i], ri = r + (s[0] + s[1]) / 2, xi = wx + (s[1] - s[0]) / 2;
-      return { x: wx, inner: windowOutline(xi, ri, ys, yb, N), outer: windowOutline(wx, r, ys, yb, N), splay: s };
+      /* the cut at the room's face: the seat to the rere-arch; the cheeks run square straight back to the screen at the glass (the Architect's model v255, Godric's 5.09 pm note: 1.5 wide all the way), the sill's step to the same springing */
+      return { x: wx, inner: pointedOutline(xi, ri, W.rere, W.seat, N), outer: pointedOutline(wx, ri, W.rere, W.sill, N), splay: s };
     });
     var farShape = rect(C.FAR_END_X, y0, C.END_X, y1);
     outlines.forEach(function (ol) { farShape.holes.push(holeOf(ol.inner)); });
@@ -1131,31 +1155,67 @@ window.castleFrame = function (opts) {
       var rev = add(new THREE.Mesh(g, o.reveal || new THREE.MeshStandardMaterial({ color: wallMat.color, roughness: 0.92, metalness: 0, side: THREE.DoubleSide })), (i ? 'window' : 'window-2') + '-reveal');
       ol.reveal = rev;
     });
-    /* the windows themselves, at the back of each reveal: the sky behind the glass and the frame in it (a narrow band
-       round the head and jambs, a bottom rail and a mullion), and the deep sill filling the reveal's floor, 5 cm proud */
+    /* the windows themselves, at the back of each reveal: the sky behind the glass, the leaded lights in it (a lattice of
+       diamond quarries, no wooden frame), a screen of stone at the glass with the two lancets cut through it and the pier
+       between, and the seat across the embrasure with the glass's sill a step up (req 1807, model v254) */
+    function lancetsOn(g, w, h, wl) {   /* the pair's lights traced on a canvas whose x spans the window's width and y its h, from the sill */
+      W.lights.forEach(function (lt) {
+        var pts = lancetPts(lt[0], lt[1], W.sill, W.spring, apex, 14);
+        g.beginPath();
+        pts.forEach(function (q, k) { var cx = (q[0] + W.w / 2) / W.w * w, cy = (apex - q[1]) / W.h * h; if (k) g.lineTo(cx, cy); else g.moveTo(cx, cy); });
+        g.closePath(); wl(g);
+      });
+    }
+    function frameTexture(name) {
+      return cutoutTexture(240, 480, '#8e8a84', function (g, w, h) {
+        g.clearRect(0, 0, w, h);
+        g.strokeStyle = '#8e8a84'; g.fillStyle = 'rgba(0,0,0,0)';
+        lancetsOn(g, w, h, function (g2) {
+          g2.save(); g2.clip();
+          g2.lineWidth = 2; g2.globalAlpha = 0.55;       /* the leading: diamond quarries, 6 cm across */
+          for (var k = -40; k < 80; k++) {
+            g2.beginPath(); g2.moveTo(k * 12, 0); g2.lineTo(k * 12 + h * 0.45, h); g2.moveTo(k * 12 + h * 0.45, 0); g2.lineTo(k * 12, h); g2.stroke();
+          }
+          g2.restore(); g2.globalAlpha = 1; g2.lineWidth = 5; g2.stroke();   /* the lead round each light */
+        });
+      }, /[?&]labels(=|&|$)/.test(location.search) ? name : null);
+    }
+    out.frameTexture = frameTexture;
     outlines.forEach(function (ol, i) {
       var name = i ? 'window' : 'window-2', wx = ol.x;
-      var sky = cutoutMesh(cutoutTexture(120, 240, '#c9d6e2', function (g, w, h) { arch(g, 0, 0, w, h); }), W.w, W.h);
+      var sky = cutoutMesh(cutoutTexture(120, 240, '#c9d6e2', function (g, w, h) { g.fillRect(0, 0, w, h); }), W.w, W.h);
       sky.material = new THREE.MeshBasicMaterial({ map: sky.material.map, alphaTest: 0.5, color: col(0xdfe8f0) });
       sky.position.set(wx, W.sill + W.h / 2, C.GLASS_Z + 0.005);
       add(sky, name + '-sky', 3);
-      var frame = cutoutMesh(cutoutTexture(240, 480, '#8e8a84', function (g, w, h) {
-        arch(g, 0, 0, w, h);
-        g.globalCompositeOperation = 'destination-out'; arch(g, w * 0.06, w * 0.06, w * 0.88, h * 0.97 - w * 0.06); g.globalCompositeOperation = 'source-over';
-        g.fillRect(w * 0.47, w * 0.04, w * 0.06, h * 0.94);
-      }, /[?&]labels(=|&|$)/.test(location.search) ? name : null), W.w, W.h);   /* its name only for a test (?labels), never for the boy */
+      var frame = cutoutMesh(frameTexture(name), W.w, W.h);   /* its name only for a test (?labels), never for the boy */
       frame.position.set(wx, W.sill + W.h / 2, C.GLASS_Z + 0.01);
       add(frame, name, 1);
-      var s = ol.splay, sh = new THREE.Shape();      /* the sill's plan, v = -z: back at the glass, front 5 cm proud */
-      sh.moveTo(wx - r, -C.GLASS_Z); sh.lineTo(wx + r, -C.GLASS_Z);
-      sh.lineTo(wx + r + s[1] * (W.deep + 0.05) / W.deep, -(C.FAR_Z + 0.05)); sh.lineTo(wx - r - s[0] * (W.deep + 0.05) / W.deep, -(C.FAR_Z + 0.05));
-      sh.lineTo(wx - r, -C.GLASS_Z);
+      /* the screen: stone across the glass's plane from the lights' outer jambs up to the rere-arch's head, the two lancets
+         cut through it, 2 cm deep so the sky, the view and the weather's panes (all within 1 cm of the glass) stand behind it */
+      var sc = new THREE.Shape(), ri = r + (ol.splay[0] + ol.splay[1]) / 2, ow = ri + 0.05, pts = pointedOutline(0, ri, W.rere, W.sill - 0.05, 24);
+      sc.moveTo(-ow, W.sill - 0.05); sc.lineTo(-ow, W.rere);
+      pts.slice(1, -1).forEach(function (q) { sc.lineTo(q.x, q.y); });
+      sc.lineTo(ow, W.rere); sc.lineTo(ow, W.sill - 0.05); sc.lineTo(-ow, W.sill - 0.05);
+      W.lights.forEach(function (lt) {
+        var lp = lancetPts(lt[0], lt[1], W.sill, W.spring, apex, 14), ho = new THREE.Path();
+        lp.forEach(function (q, k) { if (k) ho.lineTo(q[0], q[1]); else ho.moveTo(q[0], q[1]); });
+        sc.holes.push(ho);
+      });
+      var scr = new THREE.Mesh(new THREE.ExtrudeGeometry(sc, { depth: 0.02, bevelEnabled: false, curveSegments: 1 }), wallMat);
+      scr.position.set(wx, 0, C.GLASS_Z); add(scr, name + '-screen', 1);
+      var s = ol.splay, sh = new THREE.Shape();      /* the seat's plan, v = -z: back at the glass, front 5 cm proud */
+      sh.moveTo(wx - ri, -C.GLASS_Z); sh.lineTo(wx + ri, -C.GLASS_Z);
+      sh.lineTo(wx + ri, -(C.FAR_Z + 0.05)); sh.lineTo(wx - ri, -(C.FAR_Z + 0.05));
+      sh.lineTo(wx - ri, -C.GLASS_Z);
       var sg = new THREE.ExtrudeGeometry(sh, { depth: 0.06, bevelEnabled: false });
       var sill = new THREE.Mesh(sg, sillMat);
-      sill.rotation.x = -Math.PI / 2; sill.position.y = W.sill - 0.03;
+      sill.rotation.x = -Math.PI / 2; sill.position.y = W.seat - 0.03;
       add(sill, name + '-sill', 1);
       sill.userData.front = C.FAR_Z + 0.05;
-      out.windows.push({ x: wx, name: name, frame: frame, sky: sky, sill: sill, reveal: ol.reveal });
+      /* the step up to the glass's sill at 0.9, 0.2 deep, as wide as the lights */
+      var step = new THREE.Mesh(new THREE.BoxGeometry(ri * 2, W.sill - W.seat + 0.03, 0.2), sillMat);
+      step.position.set(wx, (W.sill + W.seat - 0.03) / 2, C.GLASS_Z + 0.1); add(step, name + '-step', 1);
+      out.windows.push({ x: wx, name: name, frame: frame, sky: sky, sill: sill, step: step, screen: scr, reveal: ol.reveal });
     });
 
     /* the long wall, the door's opening at x 0 and the inglenook's mouth under its lintel */
