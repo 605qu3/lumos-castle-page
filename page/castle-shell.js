@@ -1863,10 +1863,17 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        its far stand and a tap walks him through; their paint and lamps still follow the painted list */
     if (o.floor !== 'all') fids = fids.concat((M.rooms || []).filter(function (r) { return r.entered_from; }).map(function (r) { return r.id; }));
     floorQs.push(P);
+    /* v130 (req 1688): a turret's open spiral (`turret_r`, `newel`) from a room on this floor builds the room at its head
+       too, so its top step lands on a floor and he leaves it there (the North Tower's landing over the seventh's passage) */
+    var tops = {};
+    (M.stairs || []).forEach(function (s) {
+      var rs = s.rooms || [];
+      if (s.turret_r && s.newel && rs.length > 1 && (rs[0] === P.id || fids.indexOf(rs[0]) >= 0)) { tops[rs[rs.length - 1]] = 1; fids = fids.concat([rs[rs.length - 1]]); }
+    });
     fids.forEach(function (id) {
       if (!id || floorQs.some(function (q) { return q.id === id; })) return;
       var Q = findPlace(M, id);
-      if (!Q || (Q.rec && Q.rec.page) || Q.shaft || Math.abs(Q.floor - P.floor) > 0.05) return;
+      if (!Q || (Q.rec && Q.rec.page) || Q.shaft || (Math.abs(Q.floor - P.floor) > 0.05 && !tops[id])) return;
       floorQs.push(Q);
     });
     var gseen = {};   /* v103: every place on the floor, for halfGap */
@@ -2143,32 +2150,42 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      the treads lapped 3 degrees under the next; the last reaches 0.2 further out, onto the gallery's edge it serves, its
      top the gallery's. A thin baluster at each tread's outer end. v99 (req 1237, the 195th): walked as a turret's flight is,
      its foot a step out from the foot tread on the floor looking level across it, its head a step off the top tread onto the
-     gallery looking along it, the eye round the newel at half its reach every third tread */
+     gallery looking along it, the eye round the newel at half its reach every third tread. v130 (req 1688, the Architect's
+     276th): the model's `hand` is honoured (anticlockwise up winds the other way), and a stair with `bearing_from: "north"`
+     gives its bearings by the compass (the North Tower's, about its door and arch), read here as degrees from east; a
+     turret's spiral (`turret_r`) has its foot stand inside its door from the room below, between the treads and the wall,
+     and its head stands 0.4 m out through the top's opening, looking on. A stair whose wound head misses its `head_bearing` says so */
   (M.stairs || []).forEach(function (s) {
     if (!s.newel || !s.r || !s.treads || !s.per_turn || s.foot_bearing == null || s.span || s.rect) return;
     var inIt = out.places.filter(function (q) { return (s.rooms || [s.room]).some(function (r) { return slug(r) === q.id; }); })[0];
     if (!inIt) return;
     var c = s.newel, n = s.treads, rise = (s.to - s.from) / n, step = 360 / s.per_turn, T = 0.06, NR = 0.1, RAIL = 0.95;
+    var d = /anticlockwise/.test(s.hand || '') ? 1 : -1, bn = function (b) { return s.bearing_from === 'north' ? 90 - b : b; }, b0 = bn(s.foot_bearing);
     var row = rowOf(inIt), omat = row ? paintMat(tone('oak')) : mats.stair;
     var nw = slab(1, 1, 1, omat, 'stair');
     nw.geometry.dispose(); nw.geometry = new THREE.CylinderGeometry(NR, NR, s.to + RAIL - s.from, 16);
     var np = toLocal(c[0], c[1], (s.from + s.to + RAIL) / 2); nw.position.copy(np); nw.name = s.id + '-newel'; nw.userData.stair = s.id; nw.userData.owner = inIt.id; group.add(nw);
     for (var k = 1; k <= n; k++) {
-      var a1 = s.foot_bearing - (k - 1) * step, a2 = s.foot_bearing - k * step - (k < n ? 3 : 0), ro = k === n ? s.r + 0.2 : s.r;
-      var r0 = a2 * Math.PI / 180, r1 = a1 * Math.PI / 180, sh = new THREE.Shape(), ri = NR - 0.01;
+      var a1 = b0 + d * (k - 1) * step, a2 = b0 + d * (k * step + (k < n ? 3 : 0)), ro = k === n ? s.r + 0.2 : s.r;
+      var r0 = Math.min(a1, a2) * Math.PI / 180, r1 = Math.max(a1, a2) * Math.PI / 180, sh = new THREE.Shape(), ri = NR - 0.01;
       sh.moveTo(ri * Math.cos(r0), ri * Math.sin(r0)); sh.lineTo(ro * Math.cos(r0), ro * Math.sin(r0));
       sh.absarc(0, 0, ro, r0, r1, false); sh.lineTo(ri * Math.cos(r1), ri * Math.sin(r1));
       var tz = s.from + rise * k, tr = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: T, bevelEnabled: false, curveSegments: 4 }), omat), LAYER.stair);
       tr.rotation.x = -Math.PI / 2; tr.position.copy(toLocal(c[0], c[1], tz - T)); tr.name = s.id + '-' + k; tr.userData.stair = s.id; tr.userData.owner = inIt.id; group.add(tr);
       if (k === n) continue;
-      var am = (a1 - step / 2) * Math.PI / 180, bp = toLocal(c[0] + (s.r - 0.05) * Math.cos(am), c[1] + (s.r - 0.05) * Math.sin(am), tz);
+      var am = (a1 + d * step / 2) * Math.PI / 180, bp = toLocal(c[0] + (s.r - 0.05) * Math.cos(am), c[1] + (s.r - 0.05) * Math.sin(am), tz);
       var bal = slab(0.035, RAIL, 0.035, omat, 'stair');
       bal.position.set(bp.x, bp.y + RAIL / 2, bp.z); bal.name = s.id + '-baluster-' + k; bal.userData.owner = inIt.id; group.add(bal);
     }
     var sat = function (b, r) { return [c[0] + r * Math.cos(b * Math.PI / 180), c[1] + r * Math.sin(b * Math.PI / 180)]; };
-    var hb = s.foot_bearing - n * step, fo = sat(s.foot_bearing, s.r + 0.9), fl = sat(s.foot_bearing - step, s.r / 2);
-    var ho = sat(hb, s.r + 0.6), ha = (hb + 90) * Math.PI / 180, wp = [];
-    for (var j = 1; j <= n; j++) if (j % 3 === 1 || j === n) { var q = sat(s.foot_bearing - (j - 0.5) * step, s.r / 2); wp.push([q[0], q[1], s.from + rise * j]); }
+    var hb = b0 + d * n * step, fo = sat(b0, s.r + 0.9), fl = sat(b0 + d * step, s.r / 2);
+    var ho = sat(hb, s.r + 0.6), ha = (s.turret_r ? hb : hb + 90) * Math.PI / 180, wp = [];
+    if (s.head_bearing != null && Math.abs(((hb - bn(s.head_bearing)) % 360 + 540) % 360 - 180) > 0.5) console.warn('castle-shell: ' + s.id + ' winds to ' + hb.toFixed(1) + ', not its head_bearing');
+    var fd = s.turret_r && (M.openings || []).filter(function (op) { return op.at && (op.between || []).indexOf(s.id) >= 0 && (op.between || []).indexOf((s.rooms || [])[0]) >= 0; })[0];
+    if (fd) { var ux = fd.at[0] - c[0], uy = fd.at[1] - c[1], ul = Math.hypot(ux, uy); fo = [c[0] + ux / ul * (s.r + 0.45), c[1] + uy / ul * (s.r + 0.45)]; }
+    var hd = s.turret_r && (M.openings || []).filter(function (op) { return op.at && (op.between || []).indexOf(s.id) >= 0 && (op.between || []).indexOf((s.rooms || [])[(s.rooms || []).length - 1]) >= 0; })[0];
+    if (hd) { var vx = hd.at[0] - c[0], vy = hd.at[1] - c[1], vl = Math.hypot(vx, vy); ho = [hd.at[0] + 0.4 * vx / vl, hd.at[1] + 0.4 * vy / vl]; ha = Math.atan2(vy, vx); }
+    for (var j = 1; j <= n; j++) if (j % 3 === 1 || j === n) { var q = sat(b0 + d * (j - 0.5) * step, s.r / 2); wp.push([q[0], q[1], s.from + rise * j]); }
     shaftFlights.push({ id: s.id, foot: { x: fo[0], y: fo[1], z: s.from, lx: fl[0], ly: fl[1], up: 0 },
       head: { x: ho[0], y: ho[1], z: s.to, lx: ho[0] + Math.cos(ha) * 20, ly: ho[1] + Math.sin(ha) * 20, up: 0 }, path: wp });
     out.stairs.push({ id: s.id, place: inIt.id });
