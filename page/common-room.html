@@ -6841,7 +6841,7 @@ var DEN = { at: new THREE.Vector3(0, -40, 0), r: 2.25, wall: 0.4, hWall: 2.2, hT
   down: -3.0, up: 3.58,   /* how far a drag tilts his look, -45 to +50 degrees: her note on the low table below, the beams meeting above (req 302; docs/architect/vertical-views.md, the den's row) */
   band: [0.95, 1.35], from: -115, to: 165,   /* the ring of slots (D1): degrees round from the far wall, + to his right */
   cards: 83,          /* a slot a card: the deck frogs in page/events/sofa.json's 82 and Hypatia's (req 185, Magic) */
-  rare: { agrippa: -5, ptolemy: 5 },         /* their slots pencilled in faint grey across from the door (D1 t1) */
+  rare: { agrippa: -5, ptolemy: 5 },         /* no longer slots: the ring has none empty; Agrippa is a pencilled wish on the doorframe (changes README) */
   /* Hypatia, the notice board's own card (card 51, page/events/card.json), not in the deck: her slot among the first
      by the door, "Hypatia" in her pencil and "on the notice board" under it, filled once frog_card = yes (the card's
      room rule, CARD_PINNED, read in drawRoom) */
@@ -6962,17 +6962,11 @@ function denFound() {                                  /* each card once, in the
   for (var i = 0; i < all.length; i++) if (out.indexOf(all[i]) < 0) out.push(all[i]);
   return out;
 }
-function denSlotsOf(order) {                           /* Agrippa's, Ptolemy's and Hypatia's slots their own; the rest fill in order */
-  var slots = new Array(DEN.cards), held = {}, k, free = 0, hs = denSlotNear(DEN.board.deg);
-  for (k in DEN.rare) held[denSlotNear(DEN.rare[k])] = k;
-  held[hs] = DEN.board.name;                           /* never a deck card's: hers comes by the board, not the sofa */
-  if (denState.boardCard) slots[hs] = DEN.board.name;
-  order.forEach(function (c) {
-    for (var s in held) if (held[s] === c) { slots[+s] = c; return; }
-    while (free < DEN.cards && held[free] != null) free++;
-    if (free < DEN.cards) slots[free++] = c;
-  });
-  return slots;
+function denSlotsOf(order) {                           /* no empty slots (Godric, 14 October 2026): the ring grows as cards are pinned, Hypatia's first by the door once the board's card is pinned, then each in the order found */
+  var slots = [];
+  if (denState.boardCard) slots.push(DEN.board.name);
+  order.forEach(function (c) { if (c !== DEN.board.name) slots.push(c); });
+  return slots.slice(0, DEN.cards);
 }
 function denPaint() {                                  /* her hand's things, once the faces have loaded */
   var g = denNoteCanvas.getContext('2d');
@@ -6995,6 +6989,8 @@ function denPaint() {                                  /* her hand's things, onc
     g.beginPath(); g.moveTo(14, px(h)); g.lineTo(72, px(h)); g.stroke();
     g.fillStyle = 'rgba(60,56,52,0.85)'; g.fillText('C.A. ' + (DEN.year0 + i), 78, px(h) - 1);
   });
+  g.fillStyle = 'rgba(60,56,52,0.4)'; g.font = '22px ' + F.clerk; g.textAlign = 'left'; g.textBaseline = 'middle';   /* her pencilled wish, high on the frame (changes README: Agrippa is hers, not a slot) */
+  g.fillText('Agrippa, one day?', 20, px(1.92));
   g.strokeStyle = '#2e2b28'; g.lineWidth = 3;
   var mine = (castle && castle.height && castle.height()) || DEN.mine;   /* a grown-up's setting, in metres (req 187) */
   g.beginPath(); g.moveTo(14, px(mine)); g.lineTo(72, px(mine)); g.stroke();
@@ -7008,26 +7004,11 @@ function denRefresh() {
   var g = denRingCanvas.getContext('2d'), W = DEN_RING.W, H = DEN_RING.H, cw = W * CARD_W / ((DEN.r - 0.012) * (DEN.to - DEN.from) * Math.PI / 180), ch = cw * CARD_H / CARD_W;
   g.fillStyle = '#99948c'; g.fillRect(0, 0, W, H);
   g.fillStyle = '#7f7a73'; g.fillRect(0, 0, W, 4); g.fillRect(0, H - 4, W, 4);
-  var rare = {}; for (var k in DEN.rare) rare[denSlotNear(DEN.rare[k])] = k;
-  for (var i = 0; i < DEN.cards; i++) {
+  for (var i = 0; i < denState.slots.length; i++) {
     var x = (DEN.to - denSlotDeg(i)) / (DEN.to - DEN.from) * W, y = H * 0.44, c = denState.slots[i];
     g.save(); g.translate(x, y); g.scale(-1, 1);       /* seen from inside the round, the band's canvas reads mirrored */
-    if (c) {
-      drawFindStandIn({ find: 'card', card: c, card_side: 'front', card_face: 'there', houdini_lock: 'shut' }, denScratch);
-      g.drawImage(denScratch, -cw / 2, -ch / 2, cw, ch);
-    } else {
-      g.fillStyle = '#7b766f'; g.fillRect(-cw / 2, -ch / 2, cw, ch);
-      g.strokeStyle = '#4a4744'; g.lineWidth = 2; g.strokeRect(-cw / 2 + 1, -ch / 2 + 1, cw - 2, ch - 2);
-    }
-    if (rare[i] && !c) {
-      g.fillStyle = 'rgba(58,55,51,0.5)'; g.font = '15px ' + F.clerk; g.textAlign = 'center'; g.textBaseline = 'top';
-      g.fillText(rare[i].charAt(0).toUpperCase() + rare[i].slice(1), 0, ch / 2 + 6);
-    }
-    if (i === denSlotNear(DEN.board.deg) && !c) {     /* Hypatia's, in the same faint pencil, where to find her */
-      g.fillStyle = 'rgba(58,55,51,0.5)'; g.font = '15px ' + F.clerk; g.textAlign = 'center'; g.textBaseline = 'top';
-      g.fillText('Hypatia', 0, ch / 2 + 6);
-      g.font = '12px ' + F.clerk; g.fillText(DEN.board.under, 0, ch / 2 + 24);
-    }
+    drawFindStandIn({ find: 'card', card: c, card_side: 'front', card_face: 'there', houdini_lock: 'shut' }, denScratch);
+    g.drawImage(denScratch, -cw / 2, -ch / 2, cw, ch);
     g.restore();
   }
   denRingTex.needsUpdate = true;
