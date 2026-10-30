@@ -2565,6 +2565,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   group.children.filter(function (g) { return !g.isMesh && /-(ceilings|panelling)$/.test(g.name); }).forEach(function (g) {
     out.merged += mergeDrawn(g, function (m) { return !/-corbel/.test(m.name) && !inFace(m); }, function () { return ''; });
   });
+  /* v129 (req 1687, Architect 3's measure, the Architect's 274th): the places around the stand's own, drawn as few. Every
+     other place's walls, floors, ceilings, joists, beams and caps (layers wall and floor, straight under the group, no
+     tap, stair, way or hook) are put together by depth rank and material across the floor, so a room that sees the
+     floor's far rooms sends one mesh a stone, not one a wall piece. The rank (v30, below) stays whole, since a bin holds
+     one rank; the stand's own place is never merged, so the page's hooks on its own walls (PLACE-wall-, its thresholds)
+     find them as before; panes, thresholds and anything the shell hands out in a list stay single */
+  var KEPT = new Set();
+  Object.keys(out).forEach(function (k) { if (Array.isArray(out[k])) out[k].forEach(function (m) { if (m && m.isObject3D) KEPT.add(m); }); });
+  var RK0 = {};
+  out.places.forEach(function (q, i) { RK0[q.id] = i ? 1 + (i - 1) % 6 : 0; });
+  out.mergedAround = /[?&]merge=0\b/.test(location.search) ? 0 : mergeDrawn(group, function (m) {   /* merge=0: the A/B */
+    var u = m.userData;
+    return m.parent === group && u.owner && u.owner !== P.id && RK0[u.owner] != null && (u.layer === LAYER.wall || u.layer === LAYER.floor) &&
+      !u.stair && !u.way && !u.hidden && !u.tap && !KEPT.has(m) && !/-(pane|threshold|glass|sky)/.test(m.name);
+  }, function (m) { return RK0[m.userData.owner] + '|' + m.userData.layer; });
+  out.merged += out.mergedAround;
   out.mergeDrawn = mergeDrawn;
   /* v30 (Godric, 20 October 2026, 8.56 am: the glitches at thresholds and corners): one owner per face. The places
      built in one frame meet on shared lines (a wall's body lies in its neighbour's plan, a landing ends on a wall's
