@@ -34,12 +34,30 @@
      shell filling the spandrels; its dressing turns over it as a ring of eleven voussoirs, the jambs, imposts and
      shafts stopping at the springing, a roll or bead turning with the ring; no label or architrave head over it. The
      cells' own faces are P3, round by his word, not by P3's square rule (req 1268's schedule must keep it) */
-  function mould(age, cls) {
+  /* v10 (req 1749, the trim sheet's cells, docs/architect/trim-sheet-1030.html, Godric's 1 on req 1735 and his Gothick
+     on req 1750; materials.md section 2 after req 1583's rulings): only the cells those rulings moved change.
+       P1      the door: no nook shaft; a raised fillet 15 by 5 cm round jambs and head, imposts at the springing
+       P2      the door and window: plain dressed jambs under imposts, no roll; a door's nook shafts only where its record
+               says `grand` (the hall, the chapel)
+       P6      to about 1700, the Jacobean: an architrave, no lugs, no keystone; a door under a frieze and cornice, a
+               window under a small pediment, its sill on corbels. From about 1700 (a room whose record says `late`; none
+               yet, a row names them): the door in a lugged architrave with a keystone; the window the Gothick, a
+               chamfered surround under a plain hood, pointed where its record's head is
+       P7      the door Gothic Revival: a roll on the arris, a label on carved stops, no lugs, no key; the window the
+               Jacobean's until req 1755 answers
+     The head is the record's (s.head, its first word): round or pointed (equilateral, the sheet's apex 0.866 w) turn
+     the dressing over it; an opening whose record names none stays square, as the shell cuts it */
+  function mould(age, cls, o) {
     var n = +String(age || 'P3').replace(/\D/g, '') || 3, win = cls === 'window';
-    if (n <= 2) return { n: n, bw: win ? 0.12 : 0.16, proj: 0.04, chamfer: false, impost: true, shaft: !win, roll: n === 2 };
+    o = o || {};
+    if (n === 1) return { n: n, bw: win ? 0.12 : 0.15, proj: win ? 0.04 : 0.05, chamfer: false, impost: true };
+    if (n === 2) return { n: n, bw: win ? 0.12 : 0.16, proj: 0.04, chamfer: false, impost: true, shaft: !win && !!o.grand };
     if (n === 3) return { n: n, bw: win ? 0.12 : 0.14, proj: 0.05, chamfer: true, stop: true, hood: 0.18 };
     if (n <= 5) return { n: n, bw: win ? 0.14 : 0.16, proj: 0.06, chamfer: true, stop: true, bead: true, hood: n === 4 ? 0.26 : 0.34 };
-    return { n: n, bw: win ? 0.15 : 0.18, proj: 0.06, chamfer: false, steps: true, lugs: true, key: true, cornice: !win, brackets: win };
+    if (n === 6 && o.late) return win ? { n: n, bw: 0.14, proj: 0.05, chamfer: true, hood: 0.22 }
+      : { n: n, bw: 0.18, proj: 0.06, chamfer: false, steps: true, lugs: true, key: true };
+    if (n === 7 && !win) return { n: n, bw: 0.16, proj: 0.06, chamfer: true, bead: true, hood: 0.26 };
+    return { n: n, bw: win ? 0.15 : 0.18, proj: 0.06, chamfer: false, steps: true, cornice: !win, pediment: win, brackets: win };
   }
 
   /* a loop's trim is the precedent's: outside, dressed jambs flush with the wall (a 1 cm lip, no mould, no hood);
@@ -107,6 +125,44 @@
     return g;
   }
 
+  /* v10: a head's line d out from the cut (a the cut's half width), t from the left springing (0) to the right (1),
+     about the springing's middle: round about one centre; pointed, equilateral, each half struck from the far springing */
+  function prof(kind, a, d, t) {
+    if (kind === 'round') { var q = Math.PI * (1 - t); return [(a + d) * Math.cos(q), (a + d) * Math.sin(q)]; }
+    if (t > 0.5) { var m = prof(kind, a, d, 1 - t); return [-m[0], m[1]]; }
+    var R = 2 * a + d, e = Math.acos(-a / R), th = Math.PI - (Math.PI - e) * t / 0.5;
+    return [a + R * Math.cos(th), R * Math.sin(th)];
+  }
+  function rise(kind, a, d) { return prof(kind, a, d || 0, 0.5)[1]; }
+  /* v10: a pointed head's ring, n stones each half (a joint at the apex, as a two-centred arch has), from d0 to d1 out of
+     the cut, standing P out; 6 mm joints; left out whole where the ceiling or the wall's ends cut it */
+  function pring(THREE, kind, a, cy, d0, d1, P, n) {
+    if (CLIP && (cy + rise(kind, a, d1) > CLIP.ymax || -a - d1 < CLIP.x0 || a + d1 > CLIP.x1)) return [];
+    var out = [], L = (Math.PI - Math.acos(-a / (2 * a))) * 2 * a * 2, g = 0.003 / L, S = 4;
+    for (var k = 0; k < 2 * n; k++) {
+      var t0 = k / (2 * n) + g, t1 = (k + 1) / (2 * n) - g, sh = new THREE.Shape(), i, p;
+      for (i = 0; i <= S; i++) { p = prof(kind, a, d0, t0 + (t1 - t0) * i / S); i ? sh.lineTo(p[0], cy + p[1]) : sh.moveTo(p[0], cy + p[1]); }
+      for (i = S; i >= 0; i--) { p = prof(kind, a, d1, t0 + (t1 - t0) * i / S); sh.lineTo(p[0], cy + p[1]); }
+      var gg = new THREE.ExtrudeGeometry(sh, { depth: P, bevelEnabled: false, steps: 1 });
+      gg.translate(0, 0, -EMBED); out.push(gg);
+    }
+    return out;
+  }
+  /* v10: a roll turned over a pointed head, its middle d out from the cut, at z v */
+  function pRod(THREE, kind, a, cy, d, v, r) {
+    if (CLIP && (cy + rise(kind, a, d) + r > CLIP.ymax || -a - d - r < CLIP.x0 || a + d + r > CLIP.x1)) return null;
+    var pts = [];
+    for (var i = 0; i <= 24; i++) { var p = prof(kind, a, d, i / 24); pts.push(new THREE.Vector3(p[0], cy + p[1], v)); }
+    return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, r, 8, false).toNonIndexed();
+  }
+  /* v10: a small pediment over a window's head, x0 to x1 at y, its apex `up` higher, a triangle standing P out */
+  function pediment(THREE, x0, x1, y, up, P) {
+    if (CLIP && (x0 < CLIP.x0 || x1 > CLIP.x1 || y + up > CLIP.ymax)) return null;
+    var sh = new THREE.Shape(); sh.moveTo(x0, y); sh.lineTo(x1, y); sh.lineTo((x0 + x1) / 2, y + up); sh.lineTo(x0, y);
+    var g = new THREE.ExtrudeGeometry(sh, { depth: P, bevelEnabled: false, steps: 1 });
+    g.translate(0, 0, -EMBED); return g;
+  }
+
   function merge(THREE, list) {
     list = list.filter(Boolean);
     var n = 0; list.forEach(function (g) { n += g.attributes.position.count; });
@@ -124,7 +180,7 @@
   }
 
   function geometry(THREE, s) {
-    var M = s.cls === 'loop' ? loopMould(s.face) : mould(s.age, s.cls), w = s.w, y0 = s.sill, y1 = s.sill + s.h, bw = M.bw, P = M.proj, ch = M.chamfer;
+    var M = s.cls === 'loop' ? loopMould(s.face) : mould(s.age, s.cls, s), w = s.w, y0 = s.sill, y1 = s.sill + s.h, bw = M.bw, P = M.proj, ch = M.chamfer;
     /* v3: every edge that meets the cut, the jambs' feet and tops and the head's top, stand 6 mm into it or clear, so no face of the trim lies in the plane of the wall's own jamb, head
        or sill (the back's 5 mm embed overlapped them: 41 places fought, the all-places run with ?trim=1) */
     var J = 0.006, wi = w - 2 * J, X = w / 2 + bw, parts = [], lim = s.lim;
@@ -135,11 +191,37 @@
        8 mm off it; a step's outer side and top lie 8 mm inside the step above (conventions.md) */
     var win = s.cls === 'window', out = s.face === 'out', xi = wi / 2, ys = y0 + J, yh = y1 + bw - J, E = EMBED, tall = y1 - y0;
     function pair(a, b, ya, yb, p, c) { parts.push(rect(THREE, -b, -a, ya, yb, p, c), rect(THREE, a, b, ya, yb, p, c)); }   /* a to b out from the middle, both sides */
-    var RH = s.head === 'round' && s.cls !== 'loop' ? w / 2 : 0, yr = y1 - RH;   /* v9: yr the springing, y1 the crown */
+    var HK = s.cls === 'loop' ? '' : String(s.head || '').split(',')[0].trim();   /* v10: the record's head, its first word */
+    if (HK === 'pointed' && !(w > 0.1)) HK = '';
+    var RH = HK === 'round' ? w / 2 : HK === 'pointed' ? rise('pointed', w / 2, 0) : 0, yr = y1 - RH;   /* v9: yr the springing, y1 the crown */
     var imp = M.impost && tall > 0.6, jb = ys, jt = yr - J;
     if (M.shaft && tall > 1.2) jb = ys + 0.22;
     if (M.stop && tall > 0.9) jb = ys + 0.32;
     if (imp) jt = yr - J - 0.18;
+    if (RH && HK === 'pointed') {
+      /* v10: a pointed head: the jambs to the springing, the ring over the cut (a joint at the apex), a roll or bead
+         turned with it, and the hood following the head where the age has one (a door's on both faces, a window's
+         outside), its ends stopped on blocks at the springing */
+      var a = w / 2, PP = M.steps ? 0.06 : P;
+      pair(xi, X, jb, jt, PP, ch);
+      parts.push.apply(parts, pring(THREE, 'pointed', a, yr, -J, bw, PP, w > 1.6 ? 6 : 4));
+      if (imp) pair(xi, X + 0.05, jt, yr - J, P + 0.04, true);
+      if (M.roll || M.bead) parts.push(pRod(THREE, 'pointed', a, yr, 0.03, PP - E, 0.03));
+      if (M.bead) [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, yr, sd * (xi + 0.03), PP - E, 0.03)); });
+      if (M.stop && jb > ys) pair(xi, X + 0.008, ys, jb, PP + 0.016, false);
+      if (M.hood && (!win || out)) {
+        parts.push.apply(parts, pring(THREE, 'pointed', a, yr, bw, bw + 0.08, PP + 0.05, w > 1.6 ? 6 : 4));
+        pair(X + 0.008, X + 0.1, yr - 0.14, yr - J, PP + 0.07, true);
+      }
+      if (win && s.sill > 0.05) {
+        if (out) parts.push(prism(THREE, -X - 0.05, X + 0.05, [[-E, y0 - 0.09], [PP + 0.07, y0 - 0.09], [PP + 0.07, y0 - 0.04], [PP + 0.015, ys], [-E, ys]]));
+        else parts.push(rect(THREE, -X - 0.05, X + 0.05, y0 - 0.09, ys, PP + 0.05, ch));
+      }
+      CLIP = null;
+      var gp = merge(THREE, parts);
+      if (s.face === 'in') gp.rotateY(Math.PI);
+      return gp;
+    }
     if (RH) {
       /* v9: the jambs to the springing, the ring over the cut; the ring's springers stand on the jambs' tops (6 mm up,
          never in their plane) and on the imposts where the age has them */
@@ -202,11 +284,15 @@
       parts.push(rect(THREE, -(X - 0.012), X - 0.012, yh - 0.008, yf, 0.035, false));
       parts.push(prism(THREE, -X - 0.1, X + 0.1, [[-E, yf - 0.008], [0.06, yf - 0.008], [0.14, yf + 0.07], [0.14, yf + 0.13], [-E, yf + 0.13]]));
     }
+    if (M.pediment && out) {                                                    /* v10: P6 to 1700, the Jacobean window's small pediment on a shelf of cornice */
+      parts.push(prism(THREE, -X - 0.06, X + 0.06, [[-E, yh - 0.008], [0.1, yh - 0.008], [0.1, yh + 0.06], [-E, yh + 0.06]]));
+      parts.push(pediment(THREE, -X - 0.02, X + 0.02, yh + 0.06 + J, Math.min(0.32, (X + 0.02) * 0.45), 0.07));
+    }
     CLIP = null;
     var g = merge(THREE, parts);
     if (s.face === 'in') g.rotateY(Math.PI);      /* stands out of the near face into the room, its front turned to it */
     return g;
   }
 
-  window.CastleTrim = { version: 9, geometry: geometry, merge: merge, mould: mould };
+  window.CastleTrim = { version: 10, geometry: geometry, merge: merge, mould: mould, prof: prof, rise: rise };
 })();

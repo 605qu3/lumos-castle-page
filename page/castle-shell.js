@@ -1448,6 +1448,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         ['in', 'out'].forEach(function (face) {
           if (face === 'out' && (beyond || g.op.depth > t + 0.05)) return;
           var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: face === 'out' ? slot : w, h: g.h - g.sill, sill: g.sill, face: face, head: g.op.head,
+            late: !!(rm && rm.late), grand: !!g.op.grand,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
             lim: { x0: -sm, x1: L - sm, ymax: HE - 0.008 } });
           var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sm + nx * off, a[1] + uy * sm + ny * off, Q.floor);
           geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
@@ -1570,17 +1571,22 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            square to its crown (h) and its two spandrels filled in stone, as a niche's head is (v51): 2 cm into the
            jambs and the wall over it, its faces 5 mm inside each face; through the whole depth once where the way is
            lined (deeper than this wall), else through this wall alone, each room its own */
-        if (g.op.head === 'round' && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind))) {
+        /* v141 (req 1749, castle-trim v10): the head is the record's first word, and a pointed head (equilateral, each
+           half struck from the far springing, its crown 0.866 w over the springing) is cut the same way; a window with a
+           round or pointed head too (its pane of sky stands inside the fill, so only the head's opening shows it) */
+        var hk = String(g.op.head || '').split(',')[0].trim(), win_ = /window|lancet/.test(g.op.kind || '') && !/loop|slit|round window|window, round/.test(g.op.kind || '');
+        if ((hk === 'round' && g.op.head === 'round' || hk === 'pointed') && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind) || win_)) {
           out.rounded = out.rounded || {};
           var deep = g.op.depth > t + 0.05;
           if (!(deep && out.rounded[g.op.id])) {
             if (deep) out.rounded[g.op.id] = Q.id;
-            var rr = w / 2, BR = 0.02, sp = new THREE.Shape(), dd = (deep ? g.op.depth : t) - 0.01;
-            sp.moveTo(-rr, 0); sp.lineTo(-rr - BR, 0); sp.lineTo(-rr - BR, rr + BR); sp.lineTo(rr + BR, rr + BR); sp.lineTo(rr + BR, 0); sp.lineTo(rr, 0);
-            sp.absarc(0, 0, rr, 0, Math.PI, false);
+            var rr = w / 2, BR = 0.02, sp = new THREE.Shape(), dd = (deep ? g.op.depth : t) - 0.01, up = hk === 'pointed' ? Math.sqrt(3) * rr : rr;
+            sp.moveTo(-rr, 0); sp.lineTo(-rr - BR, 0); sp.lineTo(-rr - BR, up + BR); sp.lineTo(rr + BR, up + BR); sp.lineTo(rr + BR, 0); sp.lineTo(rr, 0);
+            if (hk === 'pointed') { sp.absarc(-rr, 0, 2 * rr, 0, Math.PI / 3, false); sp.absarc(rr, 0, 2 * rr, 2 * Math.PI / 3, Math.PI, false); }
+            else sp.absarc(0, 0, rr, 0, Math.PI, false);
             var spm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h) : mats.wall;
             var spd = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sp, { depth: dd, bevelEnabled: false, curveSegments: 16 }), spm), LAYER.wall);
-            spd.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - rr, mid.z + Math.cos(ang) * 0.005); spd.rotation.y = ang;
+            spd.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - up, mid.z + Math.cos(ang) * 0.005); spd.rotation.y = ang;
             spd.name = Q.id + '-round-head-' + g.op.id; spd.userData.owner = Q.id; group.add(spd);
           }
         }
