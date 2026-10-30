@@ -6,6 +6,21 @@
 window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a },
   things: {
+    /* G-THINGS staff-bedroom-g */
+    /* docs/interiors/staff-dining-room.md (G-ad, req 1841): the iron bedstead made with its counterpane, the blanket at its foot and the rug beside it, the bedside cupboard and alarm clock, the wardrobe shut, the writing desk and chair under the window (the model's window is on the left wall), the bookcase, the washstand with jug and bowl, the leather armchair and side table by the hearth (not yet built; its front kept clear); the walk from the door clear */
+    'staff-bedroom-g': { items: [
+      ['y', 155.455, 50.9, 0.025, 0, 1.15, 'iron'], ['y', 156.855, 50.9, 0.025, 0, 1.15, 'iron'], ['y', 155.455, 52.84, 0.025, 0, 0.8, 'iron'], ['y', 156.855, 52.84, 0.025, 0, 0.8, 'iron'],
+      ['b', 155.425, 50.88, 0.75, 156.825, 50.92, 0.78, 'iron'], ['b', 155.425, 50.88, 1.1, 156.825, 50.92, 1.13, 'iron'], ['y', 155.625, 50.9, 0.008, 0.75, 1.1, 'iron'], ['y', 155.825, 50.9, 0.008, 0.75, 1.1, 'iron'],
+      ['y', 156.025, 50.9, 0.008, 0.75, 1.1, 'iron'], ['y', 156.225, 50.9, 0.008, 0.75, 1.1, 'iron'], ['y', 156.425, 50.9, 0.008, 0.75, 1.1, 'iron'], ['y', 156.625, 50.9, 0.008, 0.75, 1.1, 'iron'],
+      ['b', 155.425, 52.82, 0.6, 156.825, 52.86, 0.63, 'iron'], ['b', 155.445, 50.93, 0.3, 156.805, 52.81, 0.35, 'iron'], ['b', 155.465, 50.94, 0.35, 156.785, 52.8, 0.52, 'linen'], ['b', 155.445, 51.32, 0.52, 156.805, 52.82, 0.54, 'white'],
+      ['b', 155.625, 50.97, 0.52, 156.625, 51.29, 0.62, 'white'], ['b', 155.435, 52.37, 0.54, 156.815, 52.81, 0.58, 'blanket'], ['b', 156.905, 51.32, 0, 157.905, 52.62, 0.01, 'cloth'], ['b', 154.925, 50.83, 0, 155.375, 51.25, 0.7, 'mahog'],
+      ['b', 155.095, 51.025, 0.7, 155.215, 51.075, 0.82, 'brass'], ['b', 155.11, 51.023, 0.72, 155.2, 51.025, 0.8, 'white'], ['b', 159.45, 51.05, 0, 160.02, 52.25, 2.0, 'mahog'], ['b', 159.44, 51.645, 0.1, 159.45, 51.655, 1.9, 'dark'],
+      ['t', 159.44, 53.55, 159.99, 54.55, 0.76, 'oak'], ['b', 159.58, 53.75, 0.76, 159.88, 53.97, 0.84, 'paper'], ['b', 159.6, 54.15, 0.76, 159.8, 54.18, 0.86, 'ink'], ['t', 158.94, 53.84, 159.36, 54.26, 0.46, 'oak'],
+      ['b', 158.94, 53.84, 0.46, 158.98, 54.26, 0.91, 'oak'], ['s', 156.825, 56.97, 157.725, 57.27, [0.02, 0.4, 0.8, 1.2, 1.7], 'oak'], ['b', 156.855, 57.01, 0.04, 157.653, 57.23, 0.3, 'books'], ['b', 156.855, 57.01, 0.42, 157.527, 57.23, 0.68, 'books2'],
+      ['b', 156.855, 57.01, 0.82, 157.611, 57.23, 1.08, 'books4'], ['b', 156.855, 57.01, 1.22, 157.359, 57.23, 1.48, 'books5'], ['b', 159.5, 56.75, 0, 160.02, 57.27, 0.78, 'mahog'], ['b', 159.5, 57.23, 0.78, 160.02, 57.27, 1.0, 'mahog'],
+      ['y', 159.75, 57.0, 0.17, 0.78, 0.86, 'white'], ['y', 159.75, 57.0, 0.07, 0.8, 1.06, 'white'], ['y', 152.5, 52.85, 0.2, 0, 0.62, 'mahog'], ['t', 153.45, 52.25, 154.25, 53.05, 0.42, 'leather'],
+      ['b', 153.45, 52.25, 0.42, 154.25, 52.4, 1.1, 'leather'], ['b', 153.45, 52.25, 0.42, 153.57, 53.03, 0.65, 'leather'], ['b', 154.13, 52.25, 0.42, 154.25, 53.03, 0.65, 'leather']] },
+    /* G-THINGS end staff-bedroom-g */
     /* G-THINGS staff-dining-room */
     /* docs/interiors/staff-dining-room.md (G-u, req 1841): the long table and its linen, eight chairs and the head's, the settings at nine places, the ring chandelier, the sideboard and its silver, the longcase clock, three portraits on the back wall, the hearth's fender, rug, irons and basket (the hearth itself not yet built); the way round the table and the door's swing clear */
     'staff-dining-room': { items: [
