@@ -726,6 +726,7 @@
         case 'best year': return bestYear() ? 'yes' : 'no';            /* this year's heap past last year's, once a year */
         case 'year': return castleYear();                              /* the last book he finished, 0 to 7 (Rework 2) */
         case 'castle date': return castleDateKey();                    /* compared with `N mm-dd` (docs/room-states.md) */
+        case 'story year': return storyYear();                         /* the boy's own 1897 school year, 1 to 3, 4 once the castle is open (req 1777) */
         case 'era': return castleEra();                                /* 1890s or books (req 1376, Godric's 2) */
         case 'who plays': return playersNow().ask ? 'ask' : (owl.players || []).length >= 2 ? 'chosen' : 'one';   /* one castle: his name to tap */
         case 'parcel': var pc = parcelFor(me()); return pc && playerOf(owl.playing) ? (pc.landed ? 'sill' : 'coming') : 'none';   /* B26 */
@@ -761,6 +762,15 @@
     function castleYear() {
       var r = Math.floor(+(params.get('year') || params.get('finished') || params.get('reading') || settings.finished || settings.reading || 0));
       return r >= 1 && r <= 7 ? r : 0;
+    }
+    /* The boy's own 1897 school year (req 1777; Godric's ruling of 30 October 2026, 2.59 pm: the 1897 story is paced by
+       its own year and events, never by books finished; settled 20, 50, 189, 191): 1, 2 or 3, and 4 for the open castle
+       after the close. A grown-up's setting (settings.storyYear), ?storyyear=N for a test; 1 till set. `year` stays the
+       books finished, for `era = books` and the spoiler guard (FDP-37). What turns one year to the next is Story's,
+       still open; nothing steps it yet. */
+    function storyYear() {
+      var r = Math.floor(+(params.get('storyyear') || settings.storyYear || 1));
+      return r >= 1 && r <= 4 ? r : 1;
     }
     /* The castle's era (req 1376, Godric's 2 of 28 October 2026): `1890s` always, the school the boys play in; `books`
        for the books' own castle, which the walk-throughs of Book 4 on will open (settled 41, 42). Filch, Mrs Norris and
@@ -2533,6 +2543,8 @@
       reading: readingBook,
       /* The castle's year, the last book he has finished, 0 to 7 (Rework 2, req 431): pages read this, never ?finished=. */
       year: castleYear,
+      /* The boy's own 1897 school year, 1 to 3, 4 once open (req 1777); never the books finished. */
+      storyYear: storyYear,
       /* The castle's secrets he has found, in the order found, each once (req 180; for the Map, B10). */
       secrets: function () { return (state.secrets || []).slice(); },
       /* The house points earned on this iPad, a slip each in the order earned: { kind, thing, points, on (yyyy-mm-dd),
