@@ -354,7 +354,7 @@ window.SHELL_W5A = {
     /* G-THINGS staff-dining-room */
     /* docs/interiors/staff-dining-room.md (G-u, req 1841): the long table and its linen, eight chairs and the head's, the settings at nine places, the ring chandelier, the sideboard and its silver, the longcase clock, three portraits on the back wall, the hearth's fender, rug, irons and basket (the hearth itself not yet built); the way round the table and the door's swing clear */
     'staff-dining-room': { items: [
-      ['t', 134.75, 64.275, 135.75, 68.475, 0.76, 'oak'], ['b', 134.7, 64.225, 0.76, 135.8, 68.525, 0.765, 'linen'], ['t', 134.23, 64.655, 134.67, 65.095, 0.46, 'oak'], ['b', 134.23, 64.655, 0.46, 134.27, 65.095, 0.91, 'oak'],
+      ['t', 134.75, 64.275, 135.75, 68.475, 0.76, 'oak'], ['b', 134.7, 64.225, 0.76, 135.8, 68.525, 0.765, 'linen'], ['t', 133.88, 64.655, 134.32, 65.095, 0.46, 'oak'], ['b', 133.88, 64.655, 0.46, 133.92, 65.095, 0.91, 'oak'],
       ['t', 135.83, 64.655, 136.27, 65.095, 0.46, 'oak'], ['b', 136.23, 64.655, 0.46, 136.27, 65.095, 0.91, 'oak'], ['t', 134.23, 65.655, 134.67, 66.095, 0.46, 'oak'], ['b', 134.23, 65.655, 0.46, 134.27, 66.095, 0.91, 'oak'],
       ['t', 135.83, 65.655, 136.27, 66.095, 0.46, 'oak'], ['b', 136.23, 65.655, 0.46, 136.27, 66.095, 0.91, 'oak'], ['t', 134.23, 66.655, 134.67, 67.095, 0.46, 'oak'], ['b', 134.23, 66.655, 0.46, 134.27, 67.095, 0.91, 'oak'],
       ['t', 135.83, 66.655, 136.27, 67.095, 0.46, 'oak'], ['b', 136.23, 66.655, 0.46, 136.27, 67.095, 0.91, 'oak'], ['t', 134.23, 67.655, 134.67, 68.095, 0.46, 'oak'], ['b', 134.23, 67.655, 0.46, 134.27, 68.095, 0.91, 'oak'],
@@ -2121,5 +2121,10 @@ window.SHELL_W5A = {
     ['y', 104.72, 51.3, 0.06, 0.98, 1.0, 'copper'], ['b', 107.68, 50.99, 1.0, 107.96, 51.25, 1.13, 'deal'], ['b', 107.815, 50.99, 1.13, 107.825, 51.25, 1.135, 'rope'], ['b', 107.68, 51.115, 1.13, 107.96, 51.125, 1.135, 'rope'],
     ['b', 107.96, 51.09, 1.05, 107.965, 51.15, 1.1, 'paper'], ['b', 104.52, 52.75, 0.45, 104.9, 53.15, 0.49, 'tartan'], ['b', 104.63, 52.85, 0.49, 104.81, 53.05, 0.495, 'tartan']]);
   /* G-TOUCHES end porters-lodge */
+  /* G-TOUCHES staff-dining-room */
+  /* staff-dining-room: one chair pulled out (in the things tool), a napkin dropped beside it */
+  add('staff-dining-room', [
+    ['b', 134.33, 64.375, 0, 134.63, 64.575, 0.012, 'linen'], ['b', 134.33, 64.375, 0.012, 134.48, 64.575, 0.02, 'linen']]);
+  /* G-TOUCHES end staff-dining-room */
 })(window.SHELL_W5A.things);
 /* G-TOUCHES finish */
