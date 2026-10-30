@@ -158,7 +158,18 @@
       "show": [
         "toward the locked door at the east end the torches thin out, one lit in three, and the dark gathers between them"
       ],
-      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (a): the torches thin toward the locked door by night; the breathing and the yawning faces wait on an 1897 owner behind that door (Design's critique on req 1313 (a); asked of Story); by day nothing"
+      "canon": "Corridor's req 1312 (Godric's 1 on reqs 1306 to 1309, 27 October 2026), positions by the Architect's answer to req 1311 against model v224; no canon scene staged (a): the torches thin toward the locked door by night; the breathing and the yawning faces are the next rule (req 1386); by day nothing"
+    },
+    {
+      "when": [
+        "place = charms corridor",
+        "time = night"
+      ],
+      "show": [
+        "through the gap under the locked door at the east end a slow draught rises and falls, loudest at the door, as the keep cools",
+        "the stone faces on the corbels open their mouths wide in time with it, one after another down the corridor, and settle"
+      ],
+      "canon": "Corridor's req 1312 (a), Godric's 1 on req 1307 and Design's critique on req 1313 (a); Story's answer to req 1386 (30 October 2026, 7.35 am, option 1, provisional inside settled ground, Godric may strike): the castle itself, a night draught through the door's gap as the keep cools, no creature and nothing named (nothing lives behind that door in 1897; settled 184); no canon scene staged; the draught takes about eight seconds a breath, the faces yawn a beat behind it, nearest the door last; by day nothing; the sound half waits on castle-sound's table"
     },
     {
       "when": [
