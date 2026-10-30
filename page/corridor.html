@@ -5137,11 +5137,23 @@ canvas.addEventListener('pointerup', endDrag);
 canvas.addEventListener('pointercancel', endDrag);
 canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
+/* up from the store under the landing (req 1698; the lead's castle-shell v134: a touch on the hatch from below leaves for
+   ?from=secret-s4b): he comes up through the flag, so it stands lifted already (and kept found), and he is set at its
+   edge looking down the rungs, the landing-flag stop, from which Back walks him to the landing as from any lifted flag */
+function arriveFromStore() {
+  liftStoreFlag(); STORE.open = 1;
+  var fs = STOPS.filter(function (t) { return t.name === 'landing-flag'; })[0], p = fs.stop();
+  atStop = fs; mode = 'stop'; backBtn.hidden = false;
+  camera.position.copy(p.pos); lookTmp.copy(p.look); setFov(p.fov);
+  stopPose = { pos: p.pos.clone(), look: p.look.clone() }; headReset();
+  kit.reveal();
+}
 /* HUD: Layers, Res, Exp and ? are the shared frame's; View and Reset are this page's (onAct, above) */
 backBtn.addEventListener('click', goBack);
 setView(view);
 if (kit.from === 'room') arriveFromRoom();
 else if (kit.from === 'stair-hall') arriveFromBay();
+else if (kit.from === 'secret-s4b') arriveFromStore();
 
 /* ---------- the events runtime (castle-events.js, board req 23) ----------
    Every chain loads (the records' `place` keeps each to its page), this page answers `at`, the stop he stands at, and
