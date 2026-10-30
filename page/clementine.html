@@ -208,30 +208,74 @@ box(D.strip, 0.04, D.w, D.back - D.strip / 2, 0, D.hi - 0.04, M.oak).name = 'des
 var slope = box(slopeLen / Math.cos(slopeAng), 0.02, D.w, D.front + slopeLen / 2, 0, (D.lo + D.hi) / 2 - 0.02, M.dark, { rz: slopeAng });
 slope.name = 'desk-slope';
 function slopeY(u) { return D.lo + (u - D.front) * Math.tan(slopeAng); }
+/* the drawn davenport (assets/layers/clementine-davenport.png, Godric's pick of 28 October 2026): a card square to the eye at the desk's back, so every
+   prop stands in front of it; the grey desk above stays in the scene for the surfaces' numbers and shows with ?grey */
+var deskCard = null;
+(function () {
+  var h = 0.58 * 464 / 348;
+  if (Q.has('grey')) return;
+  ['desk-body', 'desk-strip', 'desk-slope'].forEach(function (n) { R.getObjectByName(n).visible = false; });
+  new THREE.TextureLoader().load('../assets/layers/clementine-davenport.png', function (tx) {
+    tx.encoding = THREE.sRGBEncoding; tx.anisotropy = 4;
+    deskCard = new THREE.Mesh(new THREE.PlaneGeometry(0.58, h), new THREE.MeshBasicMaterial({ map: tx, transparent: true, alphaTest: 0.02 }));
+    deskCard.rotation.y = -Math.PI / 2; deskCard.position.set(D.back - 0.03, h / 2, 0); deskCard.name = 'desk-card'; R.add(deskCard);
+  });
+})();
 
 /* ---- her chair, tucked: seat, back, legs; her ribbon over its back (bright red in 1897) */
 var C = S.chair, cu = C.back + C.d / 2;
+if (Q.has('grey')) {
 box(C.d, 0.03, C.w, cu, 0, C.seat - 0.03, M.light).name = 'chair-seat';
 box(0.03, C.high - C.seat, C.w, C.back, 0, C.seat, M.light).name = 'chair-back';
 [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (k) { box(0.03, C.seat - 0.03, 0.03, cu + k[0] * (C.d / 2 - 0.02), k[1] * (C.w / 2 - 0.02), 0, M.light); });
-box(0.035, 0.12, 0.035, C.back - 0.025, 0.05, C.high - 0.16, M.red).name = 'ribbon';
+} else {   /* her chair, drawn (assets/layers/clementine-chair.png, Godric's pick of 28 October 2026): a card at the chair's back, 0.88 high as the schedule has it, face to the eye */
+  var chairCard = new THREE.Mesh(new THREE.PlaneGeometry(C.high * 1106 / 2064, C.high), new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.02 }));
+  new THREE.TextureLoader().load('../assets/layers/clementine-chair.png', function (tx) { tx.encoding = THREE.sRGBEncoding; tx.anisotropy = 4; chairCard.material.map = tx; chairCard.material.needsUpdate = true; });
+  chairCard.rotation.y = -Math.PI / 2; chairCard.position.set(C.back + 0.02, C.high / 2, 0); chairCard.name = 'chair-card'; R.add(chairCard);
+}
+if (Q.has('grey')) box(0.035, 0.12, 0.035, C.back - 0.025, 0.05, C.high - 0.16, M.red).name = 'ribbon';
+else {   /* her ribbon, drawn (assets/layers/clementine-ribbon.png, Godric's pick of 28 October 2026): a card hung over the chair's back, 0.14 wide, 0.19 high, on the eye's side of the chair card */
+  var ribbonCard = new THREE.Mesh(new THREE.PlaneGeometry(0.14, 0.19), new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.02 }));
+  new THREE.TextureLoader().load('../assets/layers/clementine-ribbon.png', function (tx) { tx.encoding = THREE.sRGBEncoding; tx.anisotropy = 4; ribbonCard.material.map = tx; ribbonCard.material.needsUpdate = true; });
+  ribbonCard.rotation.y = -Math.PI / 2; ribbonCard.position.set(C.back - 0.02, C.high + 0.015 - 0.095, 0.05); ribbonCard.name = 'ribbon-card'; R.add(ribbonCard);
+}
 
+/* her glaze jar, drawn once (assets/layers/clementine-glaze-jar.png, Godric's pick of 28 October 2026) and stood upright as a card facing the room's centre
+   wherever a try stands; ?grey keeps the grey cylinders */
+var JAR_CARD = Q.has('grey') ? null : new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.02 });
+if (JAR_CARD) new THREE.TextureLoader().load('../assets/layers/clementine-glaze-jar.png', function (tx) { tx.encoding = THREE.sRGBEncoding; tx.anisotropy = 4; JAR_CARD.map = tx; JAR_CARD.needsUpdate = true; });
+function jarAt(u, t, y, deg, name) {
+  var w = 0.05, m = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 320 / 240), JAR_CARD);
+  m.position.set(u, y + w * 320 / 480, t); m.rotation.y = Math.atan2(-Math.cos(deg * D2R), -Math.sin(deg * D2R)); m.name = name; R.add(m); return m;
+}
 /* ---- on the back strip: her lamp (lit when the clock says), the glaze jars and the brush, the ink bottle */
 var LAMP = new THREE.Group(); R.add(LAMP);
 function lampPart(g, m, y) { var x = new THREE.Mesh(g, m); x.position.set(D.back - D.strip / 2, y, S.lamp.t); LAMP.add(x); return x; }
+if (Q.has('grey')) {
 lampPart(new THREE.CylinderGeometry(0.075, 0.075, 0.03, 16), M.brass, D.hi + 0.015);
 lampPart(new THREE.CylinderGeometry(0.02, 0.03, 0.2, 12), M.brass, D.hi + 0.13);
 lampPart(new THREE.SphereGeometry(0.06, 14, 10), M.jar, D.hi + 0.30);
+}
+else {   /* her lamp, drawn unlit (assets/layers/clementine-lamp.png, Godric's pick of 28 October 2026): a card on the back strip, facing the room; the flame and light below are the page's */
+  var lampCard = new THREE.Mesh(new THREE.PlaneGeometry(0.17, 0.49), new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.02 }));
+  new THREE.TextureLoader().load('../assets/layers/clementine-lamp.png', function (tx) { tx.encoding = THREE.sRGBEncoding; tx.anisotropy = 4; lampCard.material.map = tx; lampCard.material.needsUpdate = true; });
+  lampCard.rotation.y = -Math.PI / 2; lampCard.position.set(D.back - D.strip / 2, D.hi + 0.245, S.lamp.t); lampCard.name = 'lamp-card'; LAMP.add(lampCard);
+}
 var FLAME = lampPart(new THREE.SphereGeometry(0.02, 8, 6), M.flame, D.hi + 0.30);
 var lampLight = new THREE.PointLight(0xffd9a0, 0, 7, 2); lampLight.position.set(D.back - D.strip / 2, D.hi + 0.30, S.lamp.t); R.add(lampLight);
 box(0.05, S.bottle.h, 0.05, D.back - D.strip / 2, S.bottle.t, D.hi, M.jar).name = 'ink-bottle';
-S.jars.t.forEach(function (t, i) { add(new THREE.CylinderGeometry(S.jars.w / 2, S.jars.w / 2, S.jars.h, 12), M.jar, D.back - D.strip / 2, t, D.hi + S.jars.h / 2).name = 'glaze-jar-' + i; });
+S.jars.t.forEach(function (t, i) { if (JAR_CARD) jarAt(D.back - D.strip / 2, t, D.hi, 0, 'glaze-jar-' + i); else add(new THREE.CylinderGeometry(S.jars.w / 2, S.jars.w / 2, S.jars.h, 12), M.jar, D.back - D.strip / 2, t, D.hi + S.jars.h / 2).name = 'glaze-jar-' + i; });
 box(0.15, 0.012, 0.012, D.back - D.strip / 2, (S.brush.t0 + S.brush.t1) / 2, D.hi, M.dark).name = 'brush';
 
 /* ---- on the slope: her recipe, flush, and the half-folded bird at the lip */
 var RC = S.recipe;
 add(new THREE.BoxGeometry((RC.u1 - RC.u0) / Math.cos(slopeAng), 0.004, RC.t1 - RC.t0), M.paper, (RC.u0 + RC.u1) / 2, (RC.t0 + RC.t1) / 2, slopeY((RC.u0 + RC.u1) / 2) + 0.004, { rz: slopeAng }).name = 'recipe';
-add(new THREE.BoxGeometry(S.bird.len, 0.04, 0.05), M.paper, D.front + 0.08, S.bird.t, slopeY(D.front + 0.08) + 0.025, { rz: slopeAng }).name = 'paper-bird';
+if (Q.has('grey')) add(new THREE.BoxGeometry(S.bird.len, 0.04, 0.05), M.paper, D.front + 0.08, S.bird.t, slopeY(D.front + 0.08) + 0.025, { rz: slopeAng }).name = 'paper-bird';
+else {   /* her half-folded bird, drawn (assets/layers/clementine-bird.png, Godric's pick of 28 October 2026): a card 0.12 wide, its foot on the slope at the lip */
+  var birdCard = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 0.12 * 1443 / 1769), new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.02 }));
+  new THREE.TextureLoader().load('../assets/layers/clementine-bird.png', function (tx) { tx.encoding = THREE.sRGBEncoding; tx.anisotropy = 4; birdCard.material.map = tx; birdCard.material.needsUpdate = true; });
+  birdCard.rotation.y = -Math.PI / 2; birdCard.position.set(D.front + 0.08, slopeY(D.front + 0.08) + 0.049, S.bird.t); birdCard.name = 'bird-card'; R.add(birdCard);
+}
 
 /* ---- the curved wall: the shelves (0.28 deep), the ladder's rail, her plan */
 var SH = S.shelves, rIn = S.r - 0.03 - SH.deep, rightA = [SH.off, SH.end], leftA = [-SH.end, -SH.off];
@@ -250,7 +294,7 @@ var jarShelf = onShelf(1.1);
 var JARS = 0;
 for (var ja = SH.off + 8; ja < SH.end - 6 && JARS < 14; ja += 4.2) {
   [jarShelf, jarShelf + SH.gap].forEach(function (y, k) {
-    var p = polar(S.r - SH.deep / 2 - 0.02, ja + k * 1.6); add(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 10), M.jar, p[0], p[1], y + 0.05).name = 'glaze-try';
+    var p = polar(S.r - SH.deep / 2 - 0.02, ja + k * 1.6); if (JAR_CARD) jarAt(p[0], p[1], y, ja + k * 1.6, 'glaze-try'); else add(new THREE.CylinderGeometry(0.03, 0.03, 0.08, 10), M.jar, p[0], p[1], y + 0.05).name = 'glaze-try';
     JARS++;
   });
 }
@@ -279,8 +323,13 @@ rail.rotation.x = Math.PI / 2; rail.rotation.z = 24 * D2R; rail.position.y = S.l
   var L = S.ladder, top = polar(rIn - 0.04, L.deg), foot = polar(rIn - L.foot, L.deg), dx = top[0] - foot[0], dz = top[1] - foot[1], run = Math.hypot(dx, dz);
   var len = Math.hypot(run, L.rail), g = new THREE.Group(); g.position.set(foot[0], 0, foot[1]); g.rotation.y = -Math.atan2(dz, dx); R.add(g); g.name = 'ladder';
   var tilt = new THREE.Group(); g.add(tilt); tilt.rotation.z = Math.atan2(run, L.rail) * -1;   /* leans back toward the rail */
-  [-1, 1].forEach(function (s) { var x = new THREE.Mesh(new THREE.BoxGeometry(0.03, len, 0.05), M.oak); x.position.set(0, len / 2, s * L.w / 2); tilt.add(x); });
-  for (var k = 1; k < Math.floor(len / 0.28); k++) { var r = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, L.w, 8), M.oak); r.rotation.x = Math.PI / 2; r.position.set(0, k * 0.28, 0); tilt.add(r); }
+  if (!Q.has('grey')) {   /* her ladder, drawn (assets/layers/clementine-ladder.png, Godric's pick of 28 October 2026): a card sized by the ladder's length, its face to the room */
+    var lc = new THREE.Mesh(new THREE.PlaneGeometry(len * 889 / 2464, len), new THREE.MeshBasicMaterial({ transparent: true, alphaTest: 0.02 }));
+    new THREE.TextureLoader().load('../assets/layers/clementine-ladder.png', function (tx) { tx.encoding = THREE.sRGBEncoding; tx.anisotropy = 4; lc.material.map = tx; lc.material.needsUpdate = true; });
+    lc.rotation.y = -Math.PI / 2; lc.position.set(0, len / 2, 0); lc.name = 'ladder-card'; tilt.add(lc);
+  }
+  [-1, 1].forEach(function (s) { if (!Q.has('grey')) return; var x = new THREE.Mesh(new THREE.BoxGeometry(0.03, len, 0.05), M.oak); x.position.set(0, len / 2, s * L.w / 2); tilt.add(x); });
+  for (var k = 1; Q.has('grey') && k < Math.floor(len / 0.28); k++) { var r = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, L.w, 8), M.oak); r.rotation.x = Math.PI / 2; r.position.set(0, k * 0.28, 0); tilt.add(r); }
 })();
 var PL = S.plan, pc = polar(S.r - 0.05, PL.deg);
 box(0.012, PL.y1 - PL.y0, PL.w, pc[0], pc[1], PL.y0, M.paper, { ry: -PL.deg * D2R }).name = 'castle-plan';
@@ -293,7 +342,11 @@ function draw() {
   if (!events && hourNow() >= 18 && hourNow() < 22) lit = true;
   if (Q.get('lamp') === 'on') lit = true; else if (Q.get('lamp') === 'off') lit = false;
   FLAME.visible = lit; lampLight.intensity = lit ? 1.4 : 0;
-  STATE = { lit: lit, cues: cues.slice(0, 12) };
+  /* sound: the glen's cues are the room's bed, handed to the castle's one player at every draw (castle-sound.js);
+     the table has no files yet, so ?sound=log notes each as a cue without a sound */
+  var heard = cues.filter(function (c) { return /^(rain streaks the window|the wind moves faintly)/.test(c); });
+  if (window.CastleSound) CastleSound.bed(heard);
+  STATE = { lit: lit, cues: cues.slice(0, 12), sound: heard };
 }
 READY = true;
 draw();
