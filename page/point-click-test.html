@@ -71,7 +71,7 @@ button.t.on { background: #5b4021; }
       <button class="arrow" id="al" aria-label="Look left">&#8249;</button>
       <button class="arrow" id="ar" aria-label="Look right">&#8250;</button>
       <div id="card"></div>
-      <div id="stub"><p id="stubtext"></p><a class="t" id="stublink" href="corridor.html" style="display:none;text-decoration:none;margin-bottom:10px">Walk the corridor</a><button class="t" id="stubback">Back to the room</button></div>
+      <div id="stub"><p id="stubtext"></p><a class="t" id="stublink" href="corridor.html?from=still&stills=1" style="display:none;text-decoration:none;margin-bottom:10px">Walk the corridor</a><button class="t" id="stubback">Back to the room</button></div>
     </div>
   </div>
   <div id="bar">
@@ -88,14 +88,14 @@ button.t.on { background: #5b4021; }
 var VIEWS = [
   { id: 'a', img: '../assets/review/pc-room-left.jpg?v=2', name: 'the bookcase side', spots: [
     { n: 'bookcase', x: 16, y: 50, w: 14, kind: 'look', z: 2.2, say: 'The bookcase stand-in, a grey slab for now.' },
-    { n: 'portrait hole', x: 34.5, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html' },
+    { n: 'portrait hole', x: 34.5, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html?from=still&stills=1' },
     { n: 'cloak', x: 27, y: 52, w: 6, kind: 'look', z: 2.8, say: 'A hand-me-down cloak on its hook, a moth hole in the hem.' },
     { n: 'fire', x: 57, y: 55, w: 14, kind: 'look', z: 2.4, say: 'The fire, low and orange.' },
     { n: 'sleeper', x: 74, y: 57, w: 13, kind: 'look', z: 2.6, say: 'Someone asleep on the sofa, boots up.' },
     { n: 'stairs', x: 91, y: 40, w: 12, kind: 'up', z: 2.4, say: 'The stair winds up into the dark.', to: 'the dormitory stair' } ] },
   { id: 'b', img: '../assets/review/pc-room-centre.jpg?v=2', name: 'the fireside', spots: [
     { n: 'fire', x: 48, y: 52, w: 14, kind: 'look', z: 2.4, say: 'The fire pops and settles.' },
-    { n: 'portrait hole', x: 21, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html' },
+    { n: 'portrait hole', x: 21, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html?from=still&stills=1' },
     { n: 'cloak', x: 12.5, y: 54, w: 5, kind: 'look', z: 3, say: 'A hand-me-down cloak on its hook, a moth hole in the hem.' },
     { n: 'letter', x: 27, y: 66, w: 10, kind: 'look', z: 3, say: 'A letter, an inkwell and a long feather on the round table.' },
     { n: 'portrait', x: 49.5, y: 22, w: 7, kind: 'look', z: 3.4, say: 'A portrait. She is reading.' },
@@ -111,7 +111,7 @@ var VIEWS = [
     { n: 'stairs', x: 78, y: 28, w: 14, kind: 'up', z: 2.2, say: 'The stair winds up into the dark.', to: 'the dormitory stair' },
     { n: 'letter', x: 70, y: 66, w: 11, kind: 'look', z: 3, say: 'A letter, an inkwell and a long feather on the round table.' },
     { n: 'window', x: 15, y: 48, w: 13, kind: 'look', z: 2.4, say: 'A window on the dark grounds.' },
-    { n: 'portrait hole', x: 3.5, y: 50, w: 8, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html' } ] },
+    { n: 'portrait hole', x: 3.5, y: 50, w: 8, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html?from=still&stills=1' } ] },
   { id: 'd', img: '../assets/review/pc-room-den.jpg?v=2', name: 'Clementine’s den', hidden: true, spots: [
     { n: 'lamp', x: 47, y: 18, w: 10, kind: 'look', z: 3, say: 'A small lamp, lit, on a low round table.' },
     { n: 'note', x: 56, y: 38, w: 9, kind: 'look', z: 4, say: '“I made this when I was small enough to fit. It’s yours now. C.A.”' },
@@ -370,6 +370,14 @@ var _leave = leaveStub; leaveStub = function () { _leave(); setTimeout(function 
 document.getElementById('stubback').onclick = leaveStub;
 backBtn.onclick = stepBack;
 show(1, 0);
+/* coming back from the corridor (?from=corridor): a black start that lifts once the still is up, as castle.js reveal does for the walk */
+if (/[?&]from=corridor/.test(location.search)) {
+  veil.style.transition = 'none'; veil.classList.add('on'); void veil.offsetWidth; veil.style.transition = ''; busy = true;
+  var lift = function () { veil.classList.remove('on'); busy = false; lift = function () {}; };
+  var im1 = VIEWS[1].el;
+  if (im1.complete) setTimeout(function () { lift(); }, 200); else im1.addEventListener('load', function () { lift(); });
+  setTimeout(function () { lift(); }, 4000);
+}
 </script>
 </body>
 </html>
