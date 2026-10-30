@@ -1307,6 +1307,25 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           (out.wellLines = out.wellLines || []).push(Q.id + ' wall ' + i + ' leaves ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2));
         });
       });
+      /* v132 (reqs 1694 to 1696, the 280th): a hidden place drawn flush on this wall's line, across it, takes the wall no
+         deeper than a 2 cm skin where it stands (v131's skin on a hollow's face): halfGap's ray met its box at the line
+         (lo under 0.02), passed it by and stood the wall its whole depth inside the hide (lake-corridor-6-east's south
+         wall 0.46 m into rose-room-way, the inglenook's west wall 0.13 m in secret-s4a) */
+      run.hides = [];
+      if (gapQs.length > 1) gapQs.forEach(function (q) {
+        if (q.id === Q.id || q.area || !q.poly || !(q.rec && q.rec.use === 'hidden')) return;
+        var qt = q.ceiling != null ? q.ceiling : q.floor + 3, n0 = Infinity, n1 = -Infinity, u0 = Infinity, u1 = -Infinity;
+        if (q.floor >= Q.floor + HE - 0.05 || qt <= Q.floor + 0.05) return;
+        q.poly.forEach(function (p) {
+          var dn = (p[0] - a[0]) * nx + (p[1] - a[1]) * ny, du = (p[0] - a[0]) * ux + (p[1] - a[1]) * uy;
+          n0 = Math.min(n0, dn); n1 = Math.max(n1, dn); u0 = Math.min(u0, du); u1 = Math.max(u1, du);
+        });
+        if (Math.abs(n0) > 0.02 || n1 < 0.1) return;
+        var r0 = Math.max(0, u0), r1 = Math.min(L, u1);
+        if (r1 - r0 < 0.05) return;
+        run.hides.push([r0, r1, Math.max(0, q.floor - Q.floor), Math.min(HE, qt - Q.floor)]);
+        (out.hideSkins = out.hideSkins || []).push(Q.id + ' wall ' + i + ' skin ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2));
+      });
       wallRuns.forEach(function (R) {
         if (R.gone || R.owner === Q.id) return;
         if (run.wells.indexOf(R.owner) >= 0 || (R.wells || []).indexOf(Q.id) >= 0) return;   /* v128: the well keeps its own */
@@ -1334,6 +1353,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             return;
           }
         }
+        var skin = false;   /* v132: cut round a flush hide, along the run, then over and under it */
+        for (var hk = 0; hk < run.hides.length; hk++) {
+          var Hd = run.hides[hk];
+          if (!(Hd[0] < s1 - 0.02 && Hd[1] > s0 + 0.02 && Hd[2] < yb - 0.02 && Hd[3] > ya + 0.02)) continue;
+          if (Hd[0] > s0 + 0.02 || Hd[1] < s1 - 0.02) {
+            var h0 = Math.max(s0, Hd[0]), h1 = Math.min(s1, Hd[1]);
+            piece(s0, h0, ya, yb, name + '-ha'); piece(h0, h1, ya, yb, name + '-h'); piece(h1, s1, ya, yb, name + '-hb');
+            return;
+          }
+          if (Hd[3] < yb - 0.02) { piece(s0, s1, ya, Hd[3], name); piece(s0, s1, Hd[3], yb, name + '-over'); return; }
+          if (Hd[2] > ya + 0.02) { piece(s0, s1, ya, Hd[2], name + '-under'); piece(s0, s1, Hd[2], yb, name); return; }
+          skin = true;
+        }
         if (row) {   /* v28: cut where the stone changes, along a mass's runs or at a hall's older band */
           var cutS = null, cutY = null;
           if (row.mass) row.mass.runs.forEach(function (q) {
@@ -1344,7 +1376,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           if (cutS != null) { piece(s0, cutS, ya, yb, name + '-a'); piece(cutS, s1, ya, yb, name + '-b'); return; }
           if (cutY != null) { piece(s0, s1, ya, cutY, name + '-low'); piece(s0, s1, cutY, yb, name); return; }
         }
-        var tp = gapQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) : t;   /* v102 */
+        var tp = skin ? 0.02 : gapQs.length > 1 ? halfGap(Q, a, ux, uy, nx, ny, s0, s1, t) : t;   /* v102; v132 the skin */
         var sm = (s0 + s1) / 2, p = toLocal(a[0] + ux * sm + nx * tp / 2, a[1] + uy * sm + ny * tp / 2, Q.floor);
         var wm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, (ya + yb) / 2) : mats.wall;   /* the band's top is over the floor */
         var m = slab(s1 - s0 + (s0 <= 0.01 ? ext0 : 0) + (s1 >= L - 0.01 ? ext1 : 0), yb - ya, tp, wm, 'wall');
