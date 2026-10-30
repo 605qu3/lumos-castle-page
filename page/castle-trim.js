@@ -40,8 +40,8 @@
        P2      the door and window: plain dressed jambs under imposts, no roll; a door's nook shafts only where its record
                says `grand` (the hall, the chapel)
        P6      to about 1700, the Jacobean: an architrave, no lugs, no keystone; a door under a frieze and cornice, a
-               window under a small pediment, its sill on corbels. From about 1700 (a room whose record says `late`; none
-               yet, a row names them): the door in a lugged architrave with a keystone; the window the Gothick, a
+               window under a small pediment, its sill on corbels. From about 1700 (a room whose record says `late`: by
+               Godric's 1 on req 1767, the oriel's two storeys, the painted-door room, the bartizan, the long gallery): the door in a lugged architrave with a keystone; the window the Gothick, a
                chamfered surround under a plain hood, pointed where its record's head is
        P7      the door Gothic Revival: a roll on the arris, a label on carved stops, no lugs, no key; the window the
                same dressing (Godric's 1 on req 1755: intersecting tracery)
