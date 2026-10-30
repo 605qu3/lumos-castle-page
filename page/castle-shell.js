@@ -1282,8 +1282,34 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          taken down; any other, this wall leaves its stretch and height to it (YL) */
       var run = { owner: Q.id, a: a, b: b, z0: Q.floor, z1: Q.floor + HE, meshes: [], gone: false,
         plain: !(gaps[i] || []).some(function (g) { return g.hidden || g.niche || g.recess || g.soffit; }) }, YL = [];
+      /* v128 (the 272nd, req 1671 (b): keep-east-stair-flight-2 a pit): a narrow place whose side lies on this wall's line,
+         reaching out across it no deeper than this wall and a hand (a mural stair's well in the wall's thickness), keeps
+         its own wall on that stretch, whichever is built first; v104 gave the line to the longer run, and the stair hall's
+         east wall stood 0.57 m into keep-east-stairwell's 0.9 m well, its head over floor 1's lecture-hall door across the
+         landing. This wall leaves the well's stretch and height, and the well's run is never taken down by it. Only a
+         place whose record asks (`keeps_line`): read for every narrow place, it moved five lines on frozen floors (the
+         Great Hall's doors passage, the down-only stair ways on 1 and 6, the feast ladder well, barrel-nook-b) */
+      run.wells = [];
+      besideQs(Q).forEach(function (q) {
+        if (q.id === Q.id || !q.poly || q.area || !(q.rec && q.rec.keeps_line)) return;
+        var qt = q.ceiling != null ? q.ceiling : q.floor + 3, deep = 0;
+        if (q.floor >= Q.floor + HE - 0.05 || qt <= Q.floor + 0.05) return;
+        q.poly.forEach(function (p) { deep = Math.max(deep, (p[0] - a[0]) * nx + (p[1] - a[1]) * ny); });
+        if (deep < 0.05 || deep > t + 0.35) return;
+        q.poly.forEach(function (p, k) {
+          var p2 = q.poly[(k + 1) % q.poly.length], qx = p2[0] - p[0], qy = p2[1] - p[1], qL = Math.hypot(qx, qy);
+          if (qL < 0.05 || (qx * ux + qy * uy) / qL > -0.99) return;
+          if (Math.abs((p[0] - a[0]) * nx + (p[1] - a[1]) * ny) > 0.05 || Math.abs((p2[0] - a[0]) * nx + (p2[1] - a[1]) * ny) > 0.05) return;
+          var sa = (p[0] - a[0]) * ux + (p[1] - a[1]) * uy, sb = (p2[0] - a[0]) * ux + (p2[1] - a[1]) * uy;
+          var r0 = Math.max(0, Math.min(sa, sb)), r1 = Math.min(L, Math.max(sa, sb));
+          if (r1 - r0 < 0.05) return;
+          YL.push([r0, r1, Math.max(0, q.floor - Q.floor), Math.min(HE, qt - Q.floor)]); run.wells.push(q.id);
+          (out.wellLines = out.wellLines || []).push(Q.id + ' wall ' + i + ' leaves ' + q.id + ' ' + r0.toFixed(2) + '-' + r1.toFixed(2));
+        });
+      });
       wallRuns.forEach(function (R) {
         if (R.gone || R.owner === Q.id) return;
+        if (run.wells.indexOf(R.owner) >= 0 || (R.wells || []).indexOf(Q.id) >= 0) return;   /* v128: the well keeps its own */
         var d0 = (R.a[0] - a[0]) * nx + (R.a[1] - a[1]) * ny, d1 = (R.b[0] - a[0]) * nx + (R.b[1] - a[1]) * ny;
         if (Math.abs(d0) > 0.05 || Math.abs(d1) > 0.05) return;
         var sa = (R.a[0] - a[0]) * ux + (R.a[1] - a[1]) * uy, sb = (R.b[0] - a[0]) * ux + (R.b[1] - a[1]) * uy;
