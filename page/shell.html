@@ -6153,6 +6153,12 @@ var W1 = (function () {
     chair(5.15, 5.75, 195, 3, mat('moth', 0x6e6250));   /* the moth-eaten chair, a visitor's, nobody's */
     /* the quill pot and the ink pot, right front */
     cyl(4.4, 5.8, 0.75, 0.86, 0.04, mat('stoneware', 0x8c8478)); cyl(4.2, 5.75, 0.75, 0.81, 0.03, line);
+    /* req 1864's touches (ground-floor-lived-in-1029.md): a cold enamel mug at the left front corner, the tea in it and
+       the ring it left on the desk where it stood before; beside it a snuffbox, its lid stood open */
+    var enam = mat('enamel', 0xd9d4c6), tea = mat('tea', 0x4a3322), pewt = mat('pewter', 0x8f8c86);
+    cyl(3.45, 5.78, 0.76, 0.86, 0.045, enam); cyl(3.45, 5.78, 0.86, 0.862, 0.038, tea);
+    box(3.49, 5.77, 0.78, 3.51, 5.79, 0.84, enam); cyl(3.5, 5.9, 0.76, 0.7605, 0.045, tea);
+    box(3.62, 5.72, 0.76, 3.72, 5.78, 0.78, pewt); box(3.62, 5.78, 0.78, 3.72, 5.786, 0.84, pewt);
     /* the chains and manacles, x' 3.0 to 5.0 on hooks at 2.0, hanging to about 1.1: loops between the hooks, and from
        three of them a length ending in a pair of manacles */
     var hooks = [3.1, 3.55, 4.0, 4.45, 4.9];
