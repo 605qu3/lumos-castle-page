@@ -1043,7 +1043,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* the openings on each edge: a gap [s0, s1] up to its head h */
     var gaps = E.map(function () { return []; });
     (M.openings || []).concat(Q.ops || []).forEach(function (op) {
-      if (!matches(M, op, Q.id)) return;
+      if (!matches(M, op, Q.id) || op.hatch) return;   /* v134: a flag in a floor (`hatch`) is in no wall; built below as a hatch */
       /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
          `inside`, the tapestry stair's well), a way out, its sill there `inside_sill`; v10: from its outer side the
          wall takes a tap there, unseen (the events' `tap <id>`) */
@@ -1313,7 +1313,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          wall 0.46 m into rose-room-way, the inglenook's west wall 0.13 m in secret-s4a) */
       run.hides = [];
       if (gapQs.length > 1) gapQs.forEach(function (q) {
-        if (q.id === Q.id || q.area || !q.poly || !(q.rec && q.rec.use === 'hidden')) return;
+        /* v134 (req 1696 (1)): and a place whose way out is a flag overhead (`hatch`: secret-s4b, use store, stood 0.8 m
+           of the stair hall's west wall along its east side on a floor page) */
+        if (q.id === Q.id || q.area || !q.poly || !(q.rec && (q.rec.use === 'hidden' || (M.openings || []).some(function (o) { return o.hatch && o.inside && slug(o.inside) === q.id; })))) return;
         var qt = q.ceiling != null ? q.ceiling : q.floor + 3, n0 = Infinity, n1 = -Infinity, u0 = Infinity, u1 = -Infinity;
         if (q.floor >= Q.floor + HE - 0.05 || qt <= Q.floor + 0.05) return;
         q.poly.forEach(function (p) {
@@ -2036,6 +2038,33 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     out.ways.push({ id: s.id, to: to, mesh: sq, w: Math.min(wx, wy), h: 0.8, mid: mid, foot: toLocal(mx, my, P.floor), inward: new THREE.Vector3(ix / il, 0, -iy / il),
       place: P.id, at: [mx, my], half: Math.max(wx, wy) / 2, sill: 0, lift: 0, level: P.floor, back: false, via: false, depth: 0,
       hatch: down ? 'down' : 'up', built: !!findPlace(M, to) });
+  });
+  /* v134 (model v251, req 1696 (1), the 281st): a hidden place's way out through a flag in the floor over it (secret-s4b
+     under the corridor's landing, 0.32 m of floor between): an opening from this place (its `inside`) marked `hatch`
+     'up' (the edge test's 1.2 m reach took the flag, 0.45 m off the south wall, for a door in it) is a dark square `w`
+     wide in its ceiling at `at`, stood at as a ladder's hatch, the place over it a tap away; where that is a landing of
+     a room with its own page (`room`), that page */
+  (M.openings || []).forEach(function (op) {
+    if (!op.at || op.hatch !== 'up' || !op.inside || slug(op.inside) !== P.id) return;
+    var at = toSite(M, op.group || null, op.at);
+    var to = other(op, P.id), Q = findPlace(M, to), page = Q && Q.rec && Q.rec.page;
+    if (!Q) {
+      var st = (M.stairs || []).filter(function (x) { return slug(x.id) === to && x.room; })[0], RQ = st && findPlace(M, slug(st.room));
+      page = RQ && RQ.rec && RQ.rec.page;
+    }
+    if (!Q && !page) return;
+    var s = op.w || 0.7, y = P.ceiling - P.floor - 0.012;
+    var sq = new THREE.Mesh(new THREE.PlaneGeometry(s, s), F.solid(0x141210));
+    sq.rotation.x = Math.PI / 2; sq.position.copy(toLocal(at[0], at[1], P.floor)); sq.position.y = y;
+    sq.name = 'way-' + op.id; sq.userData.way = op.id; sq.userData.hatch = 'up'; sq.userData.owner = P.id; group.add(sq);
+    var xs = P.poly.map(function (p) { return p[0]; }), ys = P.poly.map(function (p) { return p[1]; });
+    var ix = (Math.min.apply(null, xs) + Math.max.apply(null, xs)) / 2 - at[0], iy = (Math.min.apply(null, ys) + Math.max.apply(null, ys)) / 2 - at[1], il = Math.hypot(ix, iy);
+    if (il < 0.3) { ix = 0; iy = -1; il = 1; }
+    var mid = toLocal(at[0], at[1], P.floor); mid.y = y;
+    var wy = { id: op.id, to: to, mesh: sq, w: s, h: 0.8, mid: mid, foot: toLocal(at[0], at[1], P.floor), inward: new THREE.Vector3(ix / il, 0, -iy / il),
+      place: P.id, at: at, half: s / 2, sill: 0, lift: 0, level: P.floor, back: false, via: false, depth: 0, hatch: 'up', built: true };
+    if (page) wy.page = page;
+    out.ways.push(wy);
   });
   /* v46 (model v100, the cores): a core stair (a stair with `core`, a `rect` and `rooms` on several floors: two flights a
      storey about a half-landing) in each of its rooms: the flight up from this floor along `up` on its `first` half to the
