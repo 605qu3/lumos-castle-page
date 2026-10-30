@@ -2436,6 +2436,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   Object.keys(named).forEach(function (n) {
     var L = named[n]; if (!L.at) return;
     var z = P.floor + (L.z || 0), f = L.face || [0, 1], ex = out.stands.filter(function (s) { return s.name === n; })[0];
+    /* v126 (req 1668, floor 4's library-door NO MOVE, the Architect's 269th): a spot named for a door built from the other
+       room's wall (the corridor's `library-door`, the door the library's) moved that door's own stand, the library's, so
+       both its stands stood in the corridor and a touch walked him to the leaf and back: it moves the far stand, this side's, and the two swap names so the spot keeps its own */
+    var od = ex && out.doors.concat(out.ways).filter(function (d) { return d.stand === ex && d.place !== P.id && d.far; })[0];
+    if (od) { od.stand.name = od.far.name; od.far.name = n; ex = od.far; }
     var pos = toLocal(L.at[0], L.at[1], z + EYE), look = toLocal(L.at[0] + f[0] * 20, L.at[1] + f[1] * 20, z + EYE);
     if (ex) { ex.pos = pos; ex.look = look; ex.level = z; }          /* a default stand the model moves (the awe stand) */
     else out.stands.push({ name: n, pos: pos, look: look, thing: null, level: z });
