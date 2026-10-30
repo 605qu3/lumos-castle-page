@@ -2610,6 +2610,14 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     out.stands.splice(out.stands.indexOf(d.far), 1);
     d.far = null; d.built = false; d.onto = f.id;
   });
+  /* v140 (req 1739, Interaction's walk of the towers on v139, the Architect's 294th): a door whose far side is a stair the
+     model holds as a stair, not a place (north-spiral-door-7 into the North Tower's open spiral), had no far stand and no
+     page to leave for, so his tap only answered, a shut door. Where this floor builds that stair, its tap takes the flight */
+  if (o.floor) all.forEach(function (d) {
+    if (d.far || d.leaves || d.onto || d.back || d.hatch || !d.to || out.doors.indexOf(d) < 0) return;   /* a plain door only: a hidden one keeps its own answer */
+    var f = out.flights.filter(function (F) { return F.id === d.to; })[0];
+    if (f) d.onto = f.id;
+  });
 
   /* the look up and down (the model's look a place, version 19, from docs/architect/vertical-views.md): each stand's
      limits in degrees about the eye, its own by name or else the place's (14 each way where the model gives none),
