@@ -6,6 +6,20 @@
 window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a },
   things: {
+    /* G-THINGS herbology-study-g */
+    /* docs/interiors/thistlewoods-study.md (G-z, req 1841): the worktable and its heaps, the herb rack, the herbarium cabinet, the iron stove and kettle, her desk and Windsor chair under the window, the thermometer, the shelf, can, apron and hat by the door; the walk door to desk, the stove's front and the lift panel clear */
+    'herbology-study-g': { items: [
+      ['t', 153.55, 30.52, 154.45, 32.92, 0.85, 'oak'], ['b', 153.7, 30.82, 0.85, 153.85, 31.02, 0.88, 'paper'], ['b', 154.05, 30.84, 0.85, 154.08, 30.99, 0.862, 'white'], ['b', 154.17, 30.82, 0.85, 154.18, 30.98, 0.858, 'pencil'],
+      ['b', 153.7, 31.37, 0.85, 153.85, 31.57, 0.89, 'paper'], ['b', 154.05, 31.39, 0.85, 154.08, 31.54, 0.862, 'white'], ['b', 154.17, 31.37, 0.85, 154.18, 31.53, 0.858, 'pencil'], ['b', 153.7, 31.92, 0.85, 153.85, 32.12, 0.9, 'paper'],
+      ['b', 154.05, 31.94, 0.85, 154.08, 32.09, 0.862, 'white'], ['b', 154.17, 31.92, 0.85, 154.18, 32.08, 0.858, 'pencil'], ['b', 153.7, 32.47, 0.85, 153.85, 32.67, 0.91, 'paper'], ['b', 154.05, 32.49, 0.85, 154.08, 32.64, 0.862, 'white'],
+      ['b', 154.17, 32.47, 0.85, 154.18, 32.63, 0.858, 'pencil'], ['y', 154.0, 30.72, 0.008, 2.42, 4.5, 'rope'], ['y', 154.0, 32.72, 0.008, 2.42, 4.5, 'rope'], ['b', 153.98, 30.62, 2.38, 154.02, 32.82, 2.42, 'wood'],
+      ['b', 153.94, 30.81, 2.0, 154.06, 30.93, 2.38, 'straw'], ['b', 153.94, 31.15, 2.0, 154.06, 31.27, 2.38, 'green'], ['b', 153.94, 31.49, 2.0, 154.06, 31.61, 2.38, 'straw'], ['b', 153.94, 31.83, 2.0, 154.06, 31.95, 2.38, 'green'],
+      ['b', 153.94, 32.17, 2.0, 154.06, 32.29, 2.38, 'straw'], ['b', 153.94, 32.51, 2.0, 154.06, 32.63, 2.38, 'green'], ['b', 159.5, 37.88, 0, 160.02, 38.88, 1.9, 'oak'], ['b', 159.38, 37.98, 1.1, 159.5, 38.78, 1.2, 'oak'],
+      ['y', 159.6, 29.92, 0.25, 0, 0.8, 'iron'], ['y', 159.7, 29.92, 0.06, 0.8, 4.5, 'iron'], ['y', 159.53, 29.92, 0.12, 0.8, 1.0, 'copper'], ['t', 158.45, 35.95, 159.1, 37.25, 0.76, 'oak'],
+      ['b', 158.5, 36.9, 0.76, 158.75, 37.2, 0.84, 'paper'], ['t', 159.29, 36.39, 159.71, 36.81, 0.45, 'wood'], ['b', 159.67, 36.39, 0.45, 159.71, 36.81, 0.9, 'wood'], ['b', 159.98, 36.14, 1.35, 160.01, 36.18, 1.65, 'white'],
+      ['b', 147.83, 32.45, 1.08, 148.1, 33.25, 1.11, 'oak'], ['b', 147.9, 32.55, 1.11, 148.05, 32.8, 1.14, 'iron'], ['b', 147.93, 32.95, 1.11, 147.97, 33.17, 1.14, 'wood'], ['y', 148.05, 32.85, 0.12, 0, 0.4, 'tin'],
+      ['b', 148.02, 32.97, 0.25, 148.08, 33.25, 0.29, 'tin'], ['b', 147.87, 34.89, 1.6, 147.95, 34.91, 1.62, 'iron'], ['b', 147.87, 34.65, 0.6, 147.91, 35.15, 1.6, 'leather'], ['b', 147.91, 34.73, 1.6, 148.05, 35.07, 1.7, 'straw']] },
+    /* G-THINGS end herbology-study-g */
     /* G-THINGS potting-room */
     /* docs/interiors/potting-room.md (G-x, req 1841): the staging in four 4.0 runs (two tiers) with trays and pots, the seed sacks and crock, the trough and butt under the window, the leather bucket, the barrow, rake and spade, six pairs of earmuffs; the hearth's front and the 1.4 aisle clear */
     'potting-room': { items: [
