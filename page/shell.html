@@ -425,7 +425,11 @@ var HALL_LIGHT = (function () {
       LIT_BY[p.id] = true;
       /* [x, y, the wall's inward normal]: west wall x 68, east x 92, north y 70 */
       [[68, 66.5, [1, 0]], [68, 68.6, [1, 0]], [92, 52.5, [-1, 0]], [92, 56.0, [-1, 0]], [92, 62.5, [-1, 0]], [92, 68.6, [-1, 0]],
-       [74, 70, [0, -1]], [86, 70, [0, -1]]].forEach(function (t) { torch(t, 2.45, 16); });
+       [74, 70, [0, -1]], [86, 70, [0, -1]],
+       /* the ninth (req 1638, Interiors' 146th, on Godric's 7.48 pm word, 29 October 2026): the staircase-end wall's east stub
+          (x 87.5 to 92), slid from Interiors' x 89.8 to 88.25, 0.75 clear of the well mouth's end and of the dungeon stair's
+          arch (89.0 to 90.4, 2.6 high), which 89.8 stood in; the Architect's 264th */
+       [88.25, 50, [0, 1]]].forEach(function (t) { torch(t, 2.45, 16); });
     }
     if (p.id === 'stair-hall') {
       /* req 710 (1) (docs/interiors/stair-hall.md, The things, item 4, cited): brackets as the Entrance Hall's at 2.4
