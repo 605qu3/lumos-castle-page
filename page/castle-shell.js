@@ -880,7 +880,37 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        blade across its wall; 20 such rooms, McGonagall's office, the lake towers, the casemate among them) */
     var PA = Q.area || HD.length || (Q.poly.length === 4 && xs.every(function (x) { return Math.abs(x - x0) < 0.01 || Math.abs(x - x1) < 0.01; })
       && ys.every(function (y) { return Math.abs(y - y0) < 0.01 || Math.abs(y - y1) < 0.01; })) ? null : { area: { outer: Q.poly, holes: [] } };
-    if (Q.area || PA) { var fa = areaMesh(Q.area ? Q : PA, Q.floor, mats.floorD, 'floor'); fa.name = Q.id + '-floor'; group.add(fa); }
+    /* v144 (model v256, req 1747): an eye through a place's floor (a feature's `oculus`: r, kerb_w, kerb_h, depth; H91's,
+       the lantern's over s2-room-2): the floor laid with that hole, a stone kerb round it on the wall layer (a tap there
+       stands him beside it, never in it), its depth lined below, and a dark disc at the lining's foot for the vault's
+       dark under it, which takes no tap; nothing walks through it, so it is no opening */
+    var FPA = null, OC = (M.features || []).filter(function (ft) { return ft.oculus && ft.at && ft.room && (ft.room === Q.id || slug(ft.room) === Q.id); });
+    if (OC.length) {
+      var OB = Q.area || (PA ? PA.area : { outer: Q.poly, holes: [] });
+      FPA = { area: { outer: OB.outer, holes: OB.holes.slice() } };
+      OC.forEach(function (ft) {
+        var o = ft.oculus, oc = toSite(M, ft.group || null, ft.at), ro = o.r + (o.kerb_w || 0), kh = o.kerb_h || 0, N = 24;
+        var inner = arcPts(oc, o.r, 0, 360, N).slice(0, N), outer = arcPts(oc, ro, 0, 360, N).slice(0, N);
+        FPA.area.holes.push(inner);
+        function band(pts, z0, z1, mat, layer, name) {
+          var v = [];
+          for (var k = 0; k < N; k++) {
+            var a = pts[k], b = pts[(k + 1) % N], p = [toLocal(a[0], a[1], z0), toLocal(b[0], b[1], z0), toLocal(b[0], b[1], z1), toLocal(a[0], a[1], z1)];
+            [0, 1, 2, 0, 2, 3].forEach(function (i) { v.push(p[i].x, p[i].y, p[i].z); });
+          }
+          var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); g.computeVertexNormals();
+          var m = F.register(new THREE.Mesh(g, mat), LAYER[layer]); m.name = Q.id + '-' + ft.id + '-' + name; group.add(m); return m;
+        }
+        band(inner, Q.floor - (o.depth || 0.5), Q.floor + kh, mats.wall, 'wall', 'lining');
+        if (kh > 0 && ro > o.r) {
+          band(outer, Q.floor, Q.floor + kh, mats.wall, 'wall', 'kerb-face');
+          var kt = areaMesh({ area: { outer: outer, holes: [inner] } }, Q.floor + kh, mats.wall, 'wall'); kt.name = Q.id + '-' + ft.id + '-kerb'; group.add(kt);
+        }
+        var dk = areaMesh({ area: { outer: inner, holes: [] } }, Q.floor - (o.depth || 0.5), new THREE.MeshBasicMaterial({ color: 0x0c0b0a, side: THREE.DoubleSide }), 'floor');
+        dk.name = Q.id + '-' + ft.id + '-dark'; dk.raycast = function () {}; group.add(dk);
+      });
+    }
+    if (Q.area || PA || FPA) { var fa = areaMesh(FPA || (Q.area ? Q : PA), Q.floor, mats.floorD, 'floor'); fa.name = Q.id + '-floor'; group.add(fa); }
     else {
       var floor = quad(x1 - x0, y1 - y0, mats.floor, 'floor');
       floor.rotation.x = -Math.PI / 2; floor.position.copy(c); floor.name = Q.id + '-floor'; group.add(floor);
