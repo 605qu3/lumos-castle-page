@@ -6,6 +6,42 @@
 window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a },
   things: {
+    /* G-THINGS linen-cupboard-g-west */
+    /* docs/interiors/elves-service-stair.md (G-ae, req 1841): the linen press on the end wall, the sock basket, the slatted rack on the left wall, the mop and pail behind the door; no airer (too small); the walk to the press clear */
+    'linen-cupboard-g-west': { items: [
+      ['s', 1.175, 50.83, 2.575, 51.45, [0.1, 0.55, 1.0, 1.45, 1.9], 'pine'], ['b', 1.235, 50.91, 0.12, 1.615, 51.37, 0.37, 'white'], ['b', 1.685, 50.91, 0.12, 2.065, 51.37, 0.37, 'white'], ['b', 2.135, 50.91, 0.12, 2.515, 51.37, 0.37, 'white'],
+      ['b', 1.235, 50.91, 0.57, 1.615, 51.37, 0.82, 'white'], ['b', 1.685, 50.91, 0.57, 2.065, 51.37, 0.82, 'white'], ['b', 2.135, 50.91, 0.57, 2.515, 51.37, 0.82, 'white'], ['b', 1.235, 50.91, 1.02, 1.615, 51.37, 1.27, 'white'],
+      ['b', 1.685, 50.91, 1.02, 2.065, 51.37, 1.27, 'white'], ['b', 2.135, 50.91, 1.02, 2.515, 51.37, 1.27, 'white'], ['b', 1.235, 50.91, 1.47, 1.615, 51.37, 1.62, 'linen'], ['b', 1.685, 50.91, 1.47, 2.065, 51.37, 1.62, 'linen'],
+      ['b', 2.135, 50.91, 1.47, 2.515, 51.37, 1.62, 'linen'], ['y', 3.025, 51.2, 0.25, 0, 0.3, 'wicker'], ['y', 3.025, 51.2, 0.22, 0.3, 0.36, 'tartan'], ['s', 3.25, 53.05, 3.77, 55.05, [0.1, 0.55, 1.0, 1.45, 1.9], 'pine'],
+      ['b', 3.33, 53.11, 0.12, 3.69, 53.49, 0.37, 'white'], ['b', 3.33, 53.56, 0.12, 3.69, 53.94, 0.37, 'white'], ['b', 3.33, 54.01, 0.12, 3.69, 54.39, 0.37, 'white'], ['b', 3.33, 54.46, 0.12, 3.69, 54.84, 0.37, 'white'],
+      ['b', 3.33, 53.11, 0.57, 3.69, 53.49, 0.82, 'white'], ['b', 3.33, 53.56, 0.57, 3.69, 53.94, 0.82, 'white'], ['b', 3.33, 54.01, 0.57, 3.69, 54.39, 0.82, 'white'], ['b', 3.33, 54.46, 0.57, 3.69, 54.84, 0.82, 'white'],
+      ['b', 3.33, 53.11, 1.02, 3.69, 53.49, 1.27, 'white'], ['b', 3.33, 53.56, 1.02, 3.69, 53.94, 1.27, 'white'], ['b', 3.33, 54.01, 1.02, 3.69, 54.39, 1.27, 'white'], ['b', 3.33, 54.46, 1.02, 3.69, 54.84, 1.27, 'white'],
+      ['b', 3.33, 53.11, 1.47, 3.69, 53.49, 1.62, 'linen'], ['b', 3.33, 53.56, 1.47, 3.69, 53.94, 1.62, 'linen'], ['b', 3.33, 54.01, 1.47, 3.69, 54.39, 1.62, 'linen'], ['b', 3.33, 54.46, 1.47, 3.69, 54.84, 1.62, 'linen'],
+      ['y', 1.0, 57.0, 0.15, 0, 0.3, 'wood'], ['y', 1.0, 57.0, 0.155, 0.06, 0.08, 'iron'], ['y', 1.0, 57.0, 0.155, 0.24, 0.26, 'iron'], ['y', 0.7, 57.1, 0.09, 0, 0.18, 'rope'],
+      ['y', 0.7, 57.1, 0.015, 0.18, 1.35, 'wood']] },
+    /* G-THINGS end linen-cupboard-g-west */
+    /* G-THINGS elves-linen-room-g */
+    /* docs/interiors/elves-service-stair.md (G-ac, req 1841): the linen press beside the window (its glass kept open), the sock basket by it, the slatted rack of folded linen on the left wall, the pulley airer over the middle with two sheets; both doors' swings and the walk between them clear */
+    'elves-linen-room-g': { items: [
+      ['s', 148.15, 71.4, 149.55, 72.02, [0.1, 0.55, 1.0, 1.45, 1.9], 'pine'], ['b', 148.21, 71.48, 0.12, 148.59, 71.94, 0.37, 'white'], ['b', 148.66, 71.48, 0.12, 149.04, 71.94, 0.37, 'white'], ['b', 149.11, 71.48, 0.12, 149.49, 71.94, 0.37, 'white'],
+      ['b', 148.21, 71.48, 0.57, 148.59, 71.94, 0.82, 'white'], ['b', 148.66, 71.48, 0.57, 149.04, 71.94, 0.82, 'white'], ['b', 149.11, 71.48, 0.57, 149.49, 71.94, 0.82, 'white'], ['b', 148.21, 71.48, 1.02, 148.59, 71.94, 1.27, 'white'],
+      ['b', 148.66, 71.48, 1.02, 149.04, 71.94, 1.27, 'white'], ['b', 149.11, 71.48, 1.02, 149.49, 71.94, 1.27, 'white'], ['b', 148.21, 71.48, 1.47, 148.59, 71.94, 1.62, 'linen'], ['b', 148.66, 71.48, 1.47, 149.04, 71.94, 1.62, 'linen'],
+      ['b', 149.11, 71.48, 1.47, 149.49, 71.94, 1.62, 'linen'], ['y', 147.75, 71.65, 0.25, 0, 0.3, 'wicker'], ['y', 147.75, 71.65, 0.22, 0.3, 0.36, 'tartan'], ['s', 141.23, 65.375, 141.75, 67.375, [0.1, 0.55, 1.0, 1.45, 1.9], 'pine'],
+      ['b', 141.31, 65.435, 0.12, 141.67, 65.815, 0.37, 'white'], ['b', 141.31, 65.885, 0.12, 141.67, 66.265, 0.37, 'white'], ['b', 141.31, 66.335, 0.12, 141.67, 66.715, 0.37, 'white'], ['b', 141.31, 66.785, 0.12, 141.67, 67.165, 0.37, 'white'],
+      ['b', 141.31, 65.435, 0.57, 141.67, 65.815, 0.82, 'white'], ['b', 141.31, 65.885, 0.57, 141.67, 66.265, 0.82, 'white'], ['b', 141.31, 66.335, 0.57, 141.67, 66.715, 0.82, 'white'], ['b', 141.31, 66.785, 0.57, 141.67, 67.165, 0.82, 'white'],
+      ['b', 141.31, 65.435, 1.02, 141.67, 65.815, 1.27, 'white'], ['b', 141.31, 65.885, 1.02, 141.67, 66.265, 1.27, 'white'], ['b', 141.31, 66.335, 1.02, 141.67, 66.715, 1.27, 'white'], ['b', 141.31, 66.785, 1.02, 141.67, 67.165, 1.27, 'white'],
+      ['b', 141.31, 65.435, 1.47, 141.67, 65.815, 1.62, 'linen'], ['b', 141.31, 65.885, 1.47, 141.67, 66.265, 1.62, 'linen'], ['b', 141.31, 66.335, 1.47, 141.67, 66.715, 1.62, 'linen'], ['b', 141.31, 66.785, 1.47, 141.67, 67.165, 1.62, 'linen'],
+      ['b', 145.78, 66.075, 2.55, 145.82, 66.675, 2.7, 'iron'], ['y', 145.8, 66.375, 0.005, 2.7, 4.5, 'rope'], ['b', 147.68, 66.075, 2.55, 147.72, 66.675, 2.7, 'iron'], ['y', 147.7, 66.375, 0.005, 2.7, 4.5, 'rope'],
+      ['b', 145.75, 66.12, 2.6, 147.75, 66.15, 2.63, 'wood'], ['b', 145.75, 66.28, 2.6, 147.75, 66.31, 2.63, 'wood'], ['b', 145.75, 66.44, 2.6, 147.75, 66.47, 2.63, 'wood'], ['b', 145.75, 66.6, 2.6, 147.75, 66.63, 2.63, 'wood'],
+      ['b', 145.95, 66.12, 1.9, 147.55, 66.13, 2.6, 'white'], ['b', 145.95, 66.44, 1.9, 147.55, 66.45, 2.6, 'white']] },
+    /* G-THINGS end elves-linen-room-g */
+    /* G-THINGS elves-service-stair-g */
+    /* docs/interiors/elves-service-stair.md (G-w, req 1841): the pail and mop and the scrubbing brush on its hook on the right wall, the two-plank tray bench on the back wall clear of the pole's hatch; items 1 and 2 wait for a flight (none built here), the room's middle clear */
+    'elves-service-stair-g': { items: [
+      ['y', 9.15, 28.22, 0.15, 0, 0.3, 'wood'], ['y', 9.15, 28.22, 0.155, 0.06, 0.08, 'iron'], ['y', 9.15, 28.22, 0.155, 0.24, 0.26, 'iron'], ['y', 9.45, 28.3, 0.09, 0, 0.18, 'rope'],
+      ['y', 9.45, 28.3, 0.015, 0.18, 1.35, 'wood'], ['b', 9.73, 28.37, 1.0, 9.77, 28.44, 1.04, 'iron'], ['b', 9.62, 28.32, 0.9, 9.88, 28.38, 0.96, 'wood'], ['b', 9.64, 28.3, 0.88, 9.86, 28.32, 0.9, 'straw'],
+      ['t', 0.23, 22.55, 0.55, 24.15, 0.75, 'deal'], ['b', 0.25, 22.55, 0.72, 0.55, 24.15, 0.75, 'deal']] },
+    /* G-THINGS end elves-service-stair-g */
     /* G-THINGS staff-bedroom-g */
     /* docs/interiors/staff-dining-room.md (G-ad, req 1841): the iron bedstead made with its counterpane, the blanket at its foot and the rug beside it, the bedside cupboard and alarm clock, the wardrobe shut, the writing desk and chair under the window (the model's window is on the left wall), the bookcase, the washstand with jug and bowl, the leather armchair and side table by the hearth (not yet built; its front kept clear); the walk from the door clear */
     'staff-bedroom-g': { items: [
