@@ -4,9 +4,9 @@
 window.CASTLE_ROOM_TAGS = window.CASTLE_ROOM_TAGS || {};
 window.CASTLE_ROOM_TAGS.G = {
  "_meta": {
-  "written": "29 October 2026, 18:30 (Design, make-room-tags.py), req 1598",
+  "written": "29 October 2026, 21:53 (Design, make-room-tags.py), req 1598",
   "floor": "G",
-  "model": 242,
+  "model": 244,
   "floor_version": 9,
   "rule": "A tag is a check, not a tone: the shell sets no wall lighter to meet a brightness floor (a lifted wall turns to paint, design-bright-rooms-1021); a room under its floor gets one more lamp. Nothing glows. Fire light waits on its own key: a hearth is listed, never counted as a light.",
   "light": {
@@ -21,7 +21,8 @@ window.CASTLE_ROOM_TAGS.G = {
    "flagstone": "laid flags, the ground floor's own (materials.md 4)",
    "stone": "worn or rough flags: stores, service, hidden ways, shafts",
    "oak": "oak boards over the floor (lived-in rooms, the type doc)",
-   "marble": "the marble staircase only (PS 7)",
+   "marble": "the marble staircase (PS 7) and any room the schedule floors in marble",
+   "earth": "beaten earth, where the schedule gives it (the bat cave)",
    "iron": "a ladder's rungs",
    "rug": "a rug is a Pass 2 object and carries its own kind"
   },

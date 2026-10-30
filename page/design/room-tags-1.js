@@ -4,7 +4,7 @@
 window.CASTLE_ROOM_TAGS = window.CASTLE_ROOM_TAGS || {};
 window.CASTLE_ROOM_TAGS.1 = {
  "_meta": {
-  "written": "29 October 2026, 21:52 (Design, make-room-tags.py), req 1598, req 1650",
+  "written": "29 October 2026, 21:53 (Design, make-room-tags.py), req 1598, req 1650",
   "floor": "1",
   "model": 244,
   "floor_version": 5,
@@ -21,7 +21,8 @@ window.CASTLE_ROOM_TAGS.1 = {
    "flagstone": "laid flags, the ground floor's own (materials.md 4)",
    "stone": "worn or rough flags: stores, service, hidden ways, shafts",
    "oak": "oak boards over the floor (lived-in rooms, the type doc)",
-   "marble": "the marble staircase only (PS 7)",
+   "marble": "the marble staircase (PS 7) and any room the schedule floors in marble",
+   "earth": "beaten earth, where the schedule gives it (the bat cave)",
    "iron": "a ladder's rungs",
    "rug": "a rug is a Pass 2 object and carries its own kind"
   },
