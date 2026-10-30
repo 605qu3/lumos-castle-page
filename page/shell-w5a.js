@@ -6,6 +6,19 @@
 window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a },
   things: {
+    /* G-THINGS gryffindor-store-g */
+    /* docs/interiors/ground-floor-gaps-1028.md (G-f, req 1841): the two strapped trunks on the back wall with the folded banner on a blanket, the sheeted cheval glass in the back left corner, the retired armchair with its cushion and the book crate, the bedside cupboard ajar, the stripped bedstead on its side on the right wall; the walk from the door and the loop kept clear */
+    'gryffindor-store-g': { items: [
+      ['b', 44.0, 17.54, 0, 44.75, 17.99, 0.39, 'leather'], ['b', 44.15, 17.535, 0, 44.2, 17.995, 0.395, 'dark'], ['b', 44.55, 17.535, 0, 44.6, 17.995, 0.395, 'dark'], ['b', 44.0, 17.54, 0.4, 44.75, 17.99, 0.79, 'leather'],
+      ['b', 44.15, 17.535, 0.4, 44.2, 17.995, 0.795, 'dark'], ['b', 44.55, 17.535, 0.4, 44.6, 17.995, 0.795, 'dark'], ['b', 44.05, 17.57, 0.79, 44.7, 17.96, 0.85, 'blanket'], ['b', 44.12, 17.58, 0.85, 44.62, 17.95, 0.88, 'scarlet'],
+      ['b', 36.1, 17.45, 0, 36.7, 17.95, 1.5, 'linen'], ['b', 36.2, 17.55, 1.5, 36.6, 17.85, 1.6, 'linen'], ['t', 36.1, 16.0, 36.9, 16.8, 0.42, 'leather'], ['b', 36.1, 16.0, 0.42, 36.25, 16.8, 1.1, 'leather'],
+      ['b', 36.1, 16.0, 0.42, 36.88, 16.12, 0.65, 'leather'], ['b', 36.1, 16.68, 0.42, 36.88, 16.8, 0.65, 'leather'], ['b', 36.26, 16.13, 0.42, 36.86, 16.67, 0.5, 'scarlet'], ['b', 37.05, 16.15, 0, 37.55, 16.5, 0.3, 'deal'],
+      ['b', 37.08, 16.18, 0.3, 37.52, 16.47, 0.34, 'books'], ['b', 36.03, 13.575, 0, 36.45, 14.025, 0.7, 'mahog'], ['b', 36.45, 14.0, 0.08, 36.77, 14.02, 0.62, 'mahog'], ['b', 48.23, 13.8, 0.0, 48.27, 15.8, 0.04, 'iron'],
+      ['b', 48.23, 13.8, 0.91, 48.27, 15.8, 0.95, 'iron'], ['b', 47.9, 13.8, 0.0, 48.27, 13.84, 0.04, 'iron'], ['b', 47.9, 13.8, 0.91, 48.27, 13.84, 0.95, 'iron'], ['b', 47.9, 13.8, 0.0, 47.92, 13.84, 0.95, 'iron'],
+      ['b', 47.99, 13.8, 0.0, 48.01, 13.84, 0.95, 'iron'], ['b', 48.08, 13.8, 0.0, 48.1, 13.84, 0.95, 'iron'], ['b', 48.17, 13.8, 0.0, 48.19, 13.84, 0.95, 'iron'], ['b', 48.26, 13.8, 0.0, 48.28, 13.84, 0.95, 'iron'],
+      ['b', 47.9, 15.76, 0.0, 48.27, 15.8, 0.04, 'iron'], ['b', 47.9, 15.76, 0.91, 48.27, 15.8, 0.95, 'iron'], ['b', 47.9, 15.76, 0.0, 47.92, 15.8, 0.95, 'iron'], ['b', 47.99, 15.76, 0.0, 48.01, 15.8, 0.95, 'iron'],
+      ['b', 48.08, 15.76, 0.0, 48.1, 15.8, 0.95, 'iron'], ['b', 48.17, 15.76, 0.0, 48.19, 15.8, 0.95, 'iron'], ['b', 48.26, 15.76, 0.0, 48.28, 15.8, 0.95, 'iron']] },
+    /* G-THINGS end gryffindor-store-g */
     /* G-THINGS linen-cupboard-g-west */
     /* docs/interiors/elves-service-stair.md (G-ae, req 1841): the linen press on the end wall, the sock basket, the slatted rack on the left wall, the mop and pail behind the door; no airer (too small); the walk to the press clear */
     'linen-cupboard-g-west': { items: [
