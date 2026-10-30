@@ -2166,5 +2166,15 @@ window.SHELL_W5A = {
   add('owl-treats-store', [
     ['b', 0.41, 32.33, 1.47, 0.49, 32.47, 1.49, 'leather'], ['b', 0.36, 32.34, 1.53, 0.405, 32.46, 1.555, 'straw'], ['y', 2.45, 38.8, 0.012, 1.0, 1.42, 'wood'], ['b', 2.44, 38.77, 1.42, 2.46, 38.83, 1.44, 'iron']]);
   /* G-TOUCHES end owl-treats-store */
+  /* G-TOUCHES entrance-hall */
+  /* entrance-hall: the mat inside the front doors, one corner kicked up by the last pupil in at a run */
+  add('entrance-hall', [
+    ['b', 79.2, 69.15, 0, 80.8, 69.7, 0.02, 'straw'], ['b', 79.2, 68.9, 0, 80.55, 69.15, 0.02, 'straw'], ['b', 80.3, 69.15, 0.02, 80.55, 69.4, 0.035, 'straw']]);
+  /* G-TOUCHES end entrance-hall */
+  /* G-TOUCHES staff-room */
+  /* staff-room: a cup and saucer on the leather armchair's arm, a master stepped out */
+  add('staff-room', [
+    ['y', 133.092, 55.292, 0.07, 0.62, 0.63, 'white'], ['y', 133.092, 55.292, 0.04, 0.63, 0.69, 'white'], ['y', 133.092, 55.292, 0.035, 0.68, 0.685, 'dark']]);
+  /* G-TOUCHES end staff-room */
 })(window.SHELL_W5A.things);
 /* G-TOUCHES finish */
