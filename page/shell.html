@@ -9558,6 +9558,14 @@ function tap(cx, cy) {
      keeps the tap where the ray meets wall or floor beyond it */
   while (hits.length > 1 && hits[0].object.userData.way && tappables.indexOf(hits[0].object) >= 0 &&
          tappables.indexOf(hits[1].object) >= 0 && hits[1].distance > hits[0].distance + 0.3) hits.shift();
+  /* the Architect's 279th (req 1697): at a hidden place's own way out, the tap that meets its plane within 1 m is that
+     way's, whatever of the outer place's stone stands before it (study-void's archive wall end tied with its plane at
+     0.61; the two-handed door's stone, left whole by design, 0.25 before s2-door-north's) */
+  if (hits.length > 1 && !hits[0].object.userData.way) for (var wi = 1; wi < hits.length && hits[wi].distance < 1.0; wi++) {
+    if (!hits[wi].object.userData.way || tappables.indexOf(hits[wi].object) < 0) continue;
+    var wd = thingOf(hits[wi].object); if (wd && wd.back && here === wd.stand) hits.splice(0, wi);
+    break;
+  }
   var hit = hits.length ? hits[0].object : null, wasStand = here !== START, acted = false;
   if (GPLAY && GPLAY.tap(raycaster, hits.length ? hits[0].distance : null)) { kit.tapped(true); return; }   /* req 922, the giant board */
   if (H71.spell && H71.spell.tap(raycaster, hits.length ? hits[0].distance : null)) { kit.tapped(true); return; }   /* req 1052, Mobiliarbus */
