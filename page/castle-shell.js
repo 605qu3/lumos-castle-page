@@ -1680,15 +1680,35 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       }
       block(bx0, by0, bx1, by1, z0 - 0.2, z0, 'under');
       block(bx0, by0, bx1, by1, z1 - 0.1, z1, 'roof');
-      block(bx0, by0, r[0], by1, z0, z1 - 0.1, 'west');
-      block(r[2], by0, bx1, by1, z0, z1 - 0.1, 'east');
-      block(r[0], by0, r[2], r[1], z0, z1 - 0.1, 'south');
-      block(r[0], r[3], r[2], by1, z0, z1 - 0.1, 'north');
-      (M.openings || []).forEach(function (op) {
-        if (!op.at || op.oneway || !/hidden/.test(op.kind || '') || (op.between || []).indexOf(R.id) < 0) return;
-        if (out.hidden.some(function (d) { return d.id === op.id; })) return;
+      var sideOf = function (op) {
         var dW = Math.abs(op.at[0] - r[0]), dE = Math.abs(op.at[0] - r[2]), dS = Math.abs(op.at[1] - r[1]), dN = Math.abs(op.at[1] - r[3]);
-        var dm = Math.min(dW, dE, dS, dN), sx = dm === dW ? -1 : dm === dE ? 1 : 0, sy = sx ? 0 : dm === dS ? -1 : 1;
+        var dm = Math.min(dW, dE, dS, dN), sx = dm === dW ? -1 : dm === dE ? 1 : 0; return [sx, sx ? 0 : dm === dS ? -1 : 1];
+      };
+      var hid = (M.openings || []).filter(function (op) { return op.at && /hidden/.test(op.kind || '') && (op.between || []).indexOf(R.id) >= 0; });
+      /* v131 (req 1697): a face with a hidden door in it is cut round the door, a 2 cm skin left on its outer face (wall
+         from outside, v10); whole, its inner face lay in the plane of the hollow's own way out and took every tap there */
+      function face(ax, ay, bx, by, sx, sy, name) {
+        var op = hid.filter(function (o2) { var s2 = sideOf(o2); return s2[0] === sx && s2[1] === sy; })[0];
+        if (!op) return block(ax, ay, bx, by, z0, z1 - 0.1, name);
+        var c = sx ? op.at[1] : op.at[0], lo = c - (op.w || 0.9) / 2, hi = c + (op.w || 0.9) / 2, zt = Math.min(z1 - 0.1, z0 + (op.h || 2.0)), k = 0.02;
+        if (sx) {
+          block(ax, ay, bx, lo, z0, z1 - 0.1, name); block(ax, hi, bx, by, z0, z1 - 0.1, name + '-b');
+          if (zt < z1 - 0.1) block(ax, lo, bx, hi, zt, z1 - 0.1, name + '-head');
+          block(sx > 0 ? bx - k : ax, lo, sx > 0 ? bx : ax + k, hi, z0, zt, name + '-skin');
+        } else {
+          block(ax, ay, lo, by, z0, z1 - 0.1, name); block(hi, ay, bx, by, z0, z1 - 0.1, name + '-b');
+          if (zt < z1 - 0.1) block(lo, ay, hi, by, zt, z1 - 0.1, name + '-head');
+          block(lo, sy > 0 ? by - k : ay, hi, sy > 0 ? by : ay + k, z0, zt, name + '-skin');
+        }
+      }
+      face(bx0, by0, r[0], by1, -1, 0, 'west');
+      face(r[2], by0, bx1, by1, 1, 0, 'east');
+      face(r[0], by0, r[2], r[1], 0, -1, 'south');
+      face(r[0], r[3], r[2], by1, 0, 1, 'north');
+      hid.forEach(function (op) {
+        if (op.oneway) return;
+        if (out.hidden.some(function (d) { return d.id === op.id; })) return;
+        var s2 = sideOf(op), sx = s2[0], sy = s2[1];
         var fx = sx < 0 ? bx0 : sx > 0 ? bx1 : op.at[0], fy = sy < 0 ? by0 : sy > 0 ? by1 : op.at[1];
         var w = op.w || 0.9, hh = op.h || 2.0, sill = z0 - Q.floor, lift = sill > RAISED ? sill : 0;
         var mid = toLocal(fx, fy, Q.floor), inward = new THREE.Vector3(sx, 0, -sy);
@@ -2343,8 +2363,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* v94: on a floor built whole, a door or way whose two sides are both built gets a second stand on its far side,
      facing back through it (`far`), so a tap there walks him through in the frame (shell.html's through) */
   if (o.floor) all.forEach(function (d) {
-    if (d.back || d.hatch || d.via || !d.mid || !d.inward || d.to === d.place) return;
     var built = function (id) { return out.places.some(function (q) { return q.id === id; }); };
+    /* v131 (req 1697, Architect 3's find on req 1690): a hidden place's way out (`back`), its outer place built too, walks
+       him out to the stand outside it, the hidden opening's own there (its tap from the outer side), else one made as a
+       door's far stand; it had no far and no `built`, so a tap from the hide only answered, and he could not leave */
+    if (d.back && !d.hatch && d.mid && d.inward && d.to !== d.place) {
+      if (!built(d.to) || !built(d.place)) return;
+      var tw = out.hidden.filter(function (h) { return h.id === d.id && h.place === d.to && h.stand; })[0];
+      d.built = true;
+      if (tw) d.far = tw.stand;
+      else { d.far = standAt({ id: d.id, mesh: d.mesh, mid: d.mid, inward: d.inward.clone().negate(), w: d.w, h: d.h, lift: d.lift || 0, level: d.level, place: d.to }, d.id + '-far'); out.stands.push(d.far); }
+      return;
+    }
+    if (d.back || d.hatch || d.via || !d.mid || !d.inward || d.to === d.place) return;
     /* v114 (req 1556, Gate 0): a plain door from a built place into one the model has but this floor does not build (the
        kitchens' steps on B, a turret's stair) leaves for that place's page, as a way does (shell.html's tap), not a shut door */
     if (built(d.place) && !built(d.to) && out.doors.indexOf(d) >= 0) {
@@ -2458,7 +2489,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      foot (the well mouth onto the marble staircase) has no far stand: its far side on his floor is the flight, and the
      stand 10 m on put him on the well's shut ground under the half-landing, the pit. Its tap takes the flight (`onto`) */
   if (o.floor) all.forEach(function (d) {
-    if (!d.far || !d.mesh.userData.way) return;
+    /* v131 (req 1697): never a hidden place's way out, whose far is the outer place's stand: keep-east-stair-panel-3's own
+       flight, inside the hide within the 3 m either side, took its tap up the stair and its far was cut */
+    if (!d.far || !d.mesh.userData.way || d.back) return;
     var w = d.inward.clone(); w.y = 0; w.normalize();
     var f = out.flights.filter(function (F) {
       if (Math.abs(F.foot.level - d.level) > 0.05) return false;
