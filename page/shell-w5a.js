@@ -6,6 +6,22 @@
 window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a },
   things: {
+    /* G-THINGS porters-lodge */
+    /* docs/interiors/keeper-of-keys-room.md (G-l, req 1841): the high desk and keys-out book under the window (no hatch built), its chair and oil lamp, the tortoise stove on its fender with flue and kettle, the Windsor chair, the key board, the notice board, the umbrella stand; the walk door to desk and the stove's front clear; item 2 gone (req 1758) */
+    'porters-lodge': { items: [
+      ['t', 106.8, 50.86, 108.0, 51.51, 1.0, 'oak'], ['b', 107.2, 51.05, 1.0, 107.6, 51.35, 1.03, 'paper'], ['b', 107.39, 51.05, 1.0, 107.41, 51.35, 1.035, 'leather'], ['t', 107.19, 51.64, 107.61, 52.06, 0.65, 'wood'],
+      ['b', 107.19, 52.02, 0.65, 107.61, 52.06, 1.1, 'wood'], ['y', 106.92, 51.35, 0.06, 1.0, 1.04, 'brass'], ['y', 106.92, 51.35, 0.045, 1.04, 1.16, 'glass'], ['y', 106.92, 51.35, 0.02, 1.16, 1.22, 'brass'],
+      ['b', 104.27, 50.87, 0, 105.07, 51.67, 0.01, 'iron'], ['y', 104.67, 51.27, 0.225, 0.01, 0.8, 'iron'], ['y', 104.37, 50.97, 0.06, 0.8, 4.5, 'iron'], ['b', 104.37, 51.23, 0.6, 104.37, 51.31, 0.68, 'iron'],
+      ['y', 104.67, 51.27, 0.11, 0.8, 0.98, 'copper'], ['t', 104.45, 52.7, 104.95, 53.2, 0.45, 'wood'], ['b', 104.45, 52.7, 0.45, 104.49, 53.2, 0.9, 'wood'], ['b', 110.6, 55.95, 1.3, 110.64, 56.65, 1.8, 'oak'],
+      ['b', 110.57, 56.015, 1.68, 110.6, 56.025, 1.69, 'brass'], ['b', 110.57, 56.077, 1.68, 110.6, 56.087, 1.69, 'brass'], ['b', 110.57, 56.139, 1.68, 110.6, 56.149, 1.69, 'brass'], ['b', 110.575, 56.132, 1.59, 110.585, 56.156, 1.68, 'brass'],
+      ['b', 110.57, 56.201, 1.68, 110.6, 56.211, 1.69, 'brass'], ['b', 110.57, 56.263, 1.68, 110.6, 56.273, 1.69, 'brass'], ['b', 110.57, 56.325, 1.68, 110.6, 56.335, 1.69, 'brass'], ['b', 110.57, 56.387, 1.68, 110.6, 56.397, 1.69, 'brass'],
+      ['b', 110.57, 56.449, 1.68, 110.6, 56.459, 1.69, 'brass'], ['b', 110.57, 56.511, 1.68, 110.6, 56.521, 1.69, 'brass'], ['b', 110.57, 56.573, 1.68, 110.6, 56.583, 1.69, 'brass'], ['b', 110.57, 56.015, 1.45, 110.6, 56.025, 1.46, 'brass'],
+      ['b', 110.57, 56.077, 1.45, 110.6, 56.087, 1.46, 'brass'], ['b', 110.57, 56.139, 1.45, 110.6, 56.149, 1.46, 'brass'], ['b', 110.57, 56.201, 1.45, 110.6, 56.211, 1.46, 'brass'], ['b', 110.57, 56.263, 1.45, 110.6, 56.273, 1.46, 'brass'],
+      ['b', 110.57, 56.325, 1.45, 110.6, 56.335, 1.46, 'brass'], ['b', 110.57, 56.387, 1.45, 110.6, 56.397, 1.46, 'brass'], ['b', 110.575, 56.38, 1.36, 110.585, 56.404, 1.45, 'iron'], ['b', 110.57, 56.449, 1.45, 110.6, 56.459, 1.46, 'brass'],
+      ['b', 110.57, 56.511, 1.45, 110.6, 56.521, 1.46, 'brass'], ['b', 110.57, 56.573, 1.45, 110.6, 56.583, 1.46, 'brass'], ['b', 104.23, 54.2, 1.2, 104.28, 55.1, 1.8, 'oak'], ['b', 104.28, 54.23, 1.23, 104.285, 55.07, 1.77, 'pine'],
+      ['b', 104.285, 54.35, 1.45, 104.29, 54.55, 1.6, 'white'], ['b', 104.285, 54.7, 1.3, 104.29, 54.95, 1.65, 'paper'], ['y', 106.635, 56.95, 0.125, 0, 0.7, 'brass'], ['y', 106.585, 56.91, 0.03, 0.3, 0.88, 'black'],
+      ['y', 106.685, 56.92, 0.03, 0.3, 0.91, 'black'], ['y', 106.605, 57.0, 0.03, 0.3, 0.94, 'black'], ['y', 106.675, 56.99, 0.03, 0.3, 0.97, 'black']] },
+    /* G-THINGS end porters-lodge */
     /* G-THINGS herbology-study-g */
     /* docs/interiors/thistlewoods-study.md (G-z, req 1841): the worktable and its heaps, the herb rack, the herbarium cabinet, the iron stove and kettle, her desk and Windsor chair under the window, the thermometer, the shelf, can, apron and hat by the door; the walk door to desk, the stove's front and the lift panel clear */
     'herbology-study-g': { items: [
