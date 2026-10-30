@@ -7,6 +7,21 @@ window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a,
     deal: 0xa88a5e, mahog: 0x5a2a1e, scarlet: 0x8a1c1c, blanket: 0x7e7262, tartan: 0x6a2a2a, ink: 0x1a1c2a, tallow: 0xe0d4a8 },
   things: {
+    /* G-THINGS staff-room */
+    /* docs/interiors/staff-room.md (req 1841): what the room's build (req 715) does not draw: the candlesticks and the mantel clock on the mantel, the copper kettle cold on its trivet at the hearth (req 1355), the washing-up table with basin, tray of cups and plate rack (req 1295); the folded Prophet waits on Precedents' run 32 */
+    'staff-room': { items: [
+      ['y', 130.75, 56.35, 0.05, 1.4, 1.42, 'brass'], ['y', 130.75, 56.35, 0.015, 1.42, 1.62, 'brass'], ['y', 130.75, 56.35, 0.03, 1.62, 1.64, 'brass'], ['y', 130.75, 56.35, 0.012, 1.64, 1.72, 'white'],
+      ['y', 132.25, 56.35, 0.05, 1.4, 1.42, 'brass'], ['y', 132.25, 56.35, 0.015, 1.42, 1.62, 'brass'], ['y', 132.25, 56.35, 0.03, 1.62, 1.64, 'brass'], ['y', 132.25, 56.35, 0.012, 1.64, 1.72, 'white'],
+      ['b', 131.375, 56.29, 1.4, 131.625, 56.43, 1.66, 'dark'], ['y', 131.5, 56.36, 0.1, 1.66, 1.7, 'dark'], ['b', 131.42, 56.285, 1.47, 131.58, 56.29, 1.62, 'white'], ['b', 131.9, 56.1, 0.1, 132.2, 56.4, 0.12, 'iron'],
+      ['b', 131.92, 56.12, 0, 131.94, 56.14, 0.1, 'iron'], ['b', 132.16, 56.12, 0, 132.18, 56.14, 0.1, 'iron'], ['b', 132.04, 56.36, 0, 132.06, 56.38, 0.1, 'iron'], ['y', 132.05, 56.25, 0.125, 0.12, 0.34, 'copper'],
+      ['y', 132.05, 56.25, 0.07, 0.34, 0.4, 'copper'], ['y', 132.05, 56.25, 0.02, 0.4, 0.43, 'brass'], ['b', 132.035, 56.0, 0.2, 132.065, 56.13, 0.26, 'copper'], ['b', 132.04, 56.18, 0.4, 132.06, 56.2, 0.5, 'copper'],
+      ['b', 132.04, 56.3, 0.4, 132.06, 56.32, 0.5, 'copper'], ['b', 132.04, 56.18, 0.48, 132.06, 56.32, 0.5, 'copper'], ['t', 132.6, 56.0, 133.8, 56.6, 0.8, 'oak'], ['y', 132.95, 56.3, 0.25, 0.62, 0.81, 'white'],
+      ['y', 132.95, 56.3, 0.22, 0.72, 0.8, 'glass'], ['b', 133.22, 56.08, 0.8, 133.72, 56.43, 0.82, 'tin'], ['y', 133.32, 56.18, 0.04, 0.82, 0.89, 'white'], ['y', 133.32, 56.33, 0.04, 0.82, 0.89, 'white'],
+      ['y', 133.47, 56.18, 0.04, 0.82, 0.89, 'white'], ['y', 133.47, 56.33, 0.04, 0.82, 0.89, 'white'], ['y', 133.62, 56.18, 0.04, 0.82, 0.89, 'white'], ['y', 133.62, 56.33, 0.04, 0.82, 0.89, 'white'],
+      ['b', 133.2, 56.45, 1.1, 133.7, 56.61, 1.13, 'wood'], ['b', 133.22, 56.46, 1.13, 133.23, 56.58, 1.4, 'wood'], ['b', 133.31, 56.46, 1.13, 133.32, 56.58, 1.4, 'wood'], ['b', 133.4, 56.46, 1.13, 133.41, 56.58, 1.4, 'wood'],
+      ['b', 133.49, 56.46, 1.13, 133.5, 56.58, 1.4, 'wood'], ['b', 133.58, 56.46, 1.13, 133.59, 56.58, 1.4, 'wood'], ['b', 133.67, 56.46, 1.13, 133.68, 56.58, 1.4, 'wood'], ['y', 133.3, 56.52, 0.07, 1.13, 1.15, 'white'],
+      ['y', 133.48, 56.52, 0.07, 1.13, 1.15, 'white'], ['y', 133.66, 56.52, 0.07, 1.13, 1.15, 'white']] },
+    /* G-THINGS end staff-room */
     /* G-THINGS old-trophies-overflow */
     /* docs/interiors/ground-floor-gaps-1028.md (G-ab, req 1841): eight glass-fronted trophy cases on the long walls, cups, statuettes, shields and cased medals on their shelves, the honours board stood face-in on the back wall, packing book crates, folded linen over a case, the feather duster on a case; the middle and both doors clear */
     'old-trophies-overflow': { items: [
