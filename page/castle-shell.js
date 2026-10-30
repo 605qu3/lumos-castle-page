@@ -2490,6 +2490,56 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     return q ? q.id : null;
   };
   out.look = LK;
+  /* v127 (req 1685 (2), Architect 6's measure, the Architect's 270th): many small pieces drawn as one, so a room with
+     the stair hall's well in view sends a phone hundreds of calls fewer. mergeDrawn(root, take, key): every mesh under
+     root that take(mesh) passes (a leaf, one material, no hook of its own) is put with the others of its key and its
+     material into one mesh in root's frame, its name, owner, stair, layer and raycast the first's (userData.merged the count); the pieces leave.
+     Each flight's treads become one mesh carrying userData.stair, so flightOf() in shell.html finds it as it found a
+     tread; Design's ceilings and panelling (each place's -ceilings and -panelling groups) one mesh a material, their
+     corbels and every carved face kept whole (the faces' atlas is swapped by state, the corbels are taps) */
+  var NOHOOK = THREE.Object3D.prototype.onBeforeRender;
+  function mergeDrawn(root, take, key) {
+    var bins = new Map();
+    root.updateMatrixWorld(true);
+    var inv = new THREE.Matrix4().copy(root.matrixWorld).invert();
+    root.traverse(function (m) {
+      if (m === root || !m.isMesh || m.isInstancedMesh || m.isSkinnedMesh || m.children.length || Array.isArray(m.material)) return;
+      if (!m.visible || m.onBeforeRender !== NOHOOK || m.geometry.morphAttributes.position || !take(m)) return;
+      var k = key(m) + '|' + m.material.uuid + '|' + (m.raycast === THREE.Mesh.prototype.raycast) + '|' + m.castShadow + m.receiveShadow + '|' + m.renderOrder;
+      (bins.get(k) || bins.set(k, []).get(k)).push(m);
+    });
+    var n = 0;
+    bins.forEach(function (list) {
+      if (list.length < 2) return;
+      var names = ['position', 'normal', 'uv'].filter(function (a) { return list.every(function (m) { return m.geometry.attributes[a]; }); });
+      if (names[0] !== 'position') return;
+      var arrs = {}, mx = new THREE.Matrix4();
+      names.forEach(function (a) { arrs[a] = []; });
+      list.forEach(function (m) {
+        var geo = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+        geo.applyMatrix4(mx.multiplyMatrices(inv, m.matrixWorld));
+        names.forEach(function (a) { var s = geo.attributes[a].array; for (var i = 0; i < s.length; i++) arrs[a].push(s[i]); });
+        geo.dispose();
+      });
+      var bg = new THREE.BufferGeometry(), f = list[0];
+      names.forEach(function (a) { bg.setAttribute(a, new THREE.Float32BufferAttribute(arrs[a], a === 'uv' ? 2 : 3)); });
+      if (names.indexOf('normal') < 0) bg.computeVertexNormals();
+      var one = new THREE.Mesh(bg, f.material);
+      one.name = f.name; one.castShadow = f.castShadow; one.receiveShadow = f.receiveShadow; one.renderOrder = f.renderOrder;
+      ['owner', 'stair', 'layer', 'base'].forEach(function (u) { if (f.userData[u] != null) one.userData[u] = f.userData[u]; });
+      one.userData.merged = list.length;
+      if (f.raycast !== THREE.Mesh.prototype.raycast) one.raycast = function () {};
+      list.forEach(function (m) { m.parent.remove(m); }); root.add(one); n += list.length - 1;
+    });
+    return n;
+  }
+  function inFace(m) { for (var p = m.parent; p; p = p.parent) if (p.isMesh) return true; return false; }
+  out.merged = mergeDrawn(group, function (m) { return m.parent === group && m.userData.stair && !m.userData.way && !m.userData.hidden; },
+    function (m) { return m.userData.stair + '|' + (m.userData.owner || ''); });
+  group.children.filter(function (g) { return !g.isMesh && /-(ceilings|panelling)$/.test(g.name); }).forEach(function (g) {
+    out.merged += mergeDrawn(g, function (m) { return !/-corbel/.test(m.name) && !inFace(m); }, function () { return ''; });
+  });
+  out.mergeDrawn = mergeDrawn;
   /* v30 (Godric, 20 October 2026, 8.56 am: the glitches at thresholds and corners): one owner per face. The places
      built in one frame meet on shared lines (a wall's body lies in its neighbour's plan, a landing ends on a wall's
      face, two rooms' floors at one storey), drawn to the exact plane of what they meet, so the depth test tied pixel

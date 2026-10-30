@@ -184,7 +184,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=9"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=126"></script>
+<script src="castle-shell.js?v=127"></script>
 <script src="shell-w5b.js?v=22"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -418,7 +418,7 @@ var HALL_LIGHT = (function () {
     var g = new THREE.Group(); g.name = p.id + '-lights'; shell.group.add(g);
     var P = function (x, y, z) { return shell.toLocal(x, y, p.floor + z); };
     if (p.id === 'entrance-hall' || p.id === 'stair-hall' || p.id === 'armour-gallery') {
-      var iron = kit.solid(0x34312e), flame = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
+      var iron = kit.solid(0x34312e), wood = kit.solid(0x4a3a2a), flame = new THREE.MeshBasicMaterial({ color: new THREE.Color(0xffc46a).convertSRGBToLinear() });
       var soot = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, depthWrite: false, alphaMap: (function () {   /* the fan: black, grey for its opacity, so it only darkens */
         var c = document.createElement('canvas'); c.width = 64; c.height = 128; var x = c.getContext('2d');
         x.fillStyle = '#000'; x.fillRect(0, 0, 64, 128); x.scale(1, 2);
@@ -429,7 +429,7 @@ var HALL_LIGHT = (function () {
         var n = t[2], b = P(t[0] + n[0] * 0.15, t[1] + n[1] * 0.15, z);
         var arm = new THREE.Mesh(new THREE.BoxGeometry(n[0] ? 0.3 : 0.05, 0.05, n[1] ? 0.3 : 0.05), iron); arm.position.copy(b); g.add(arm);
         var cup = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.04, 0.12, 10), iron); var cp = P(t[0] + n[0] * 0.3, t[1] + n[1] * 0.3, z + 0.1); cup.position.copy(cp); g.add(cup);
-        var head = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.45, 8), kit.solid(0x4a3a2a)); head.position.copy(cp); head.position.y -= 0.2; g.add(head);
+        var head = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.03, 0.45, 8), wood); head.position.copy(cp); head.position.y -= 0.2; g.add(head);
         var f = new THREE.Mesh(new THREE.SphereGeometry(0.06, 10, 8), flame); f.scale.y = 2.0; f.position.copy(cp); f.position.y += 0.14; g.add(f);
         var sp = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 1.2), soot), sw = P(t[0] + n[0] * 0.01, t[1] + n[1] * 0.01, z + 0.75);
         sp.position.copy(sw); sp.rotation.y = n[0] ? (n[0] > 0 ? Math.PI / 2 : -Math.PI / 2) : (n[1] > 0 ? Math.PI : 0); g.add(sp);
@@ -517,6 +517,12 @@ var HALL_LIGHT = (function () {
       var fl = new THREE.PointLight(TORCH.hex, 0.9 * TORCH.gain, 7, 1.8); fl.position.copy(P(108.0, 68.0, 1.95)); scene.add(fl);
       fl.userData.rest = fl.position.clone(); lamp.light = fl; lamp.low = fl.intensity; out.filchLamp = lamp;   /* req 916 turns it up and rattles it */
     }
+  });
+  /* castle-shell.js v127 (req 1685 (2)): the torch places' brackets, cups, heads, flames and soot fans drawn one mesh a
+     material (the stair hall's 56 torches were 280 calls wherever its well is in view); their heads now share one wood */
+  ['entrance-hall', 'stair-hall', 'armour-gallery'].forEach(function (id) {
+    var g = shell.mergeDrawn && shell.group.getObjectByName(id + '-lights');
+    if (g) shell.merged += shell.mergeDrawn(g, function () { return true; }, function () { return ''; });
   });
   return out;
 })();
