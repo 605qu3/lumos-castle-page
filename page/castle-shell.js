@@ -2345,9 +2345,19 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   /* the default stands: square to each door and each mouth, STAND_OFF inside it, the eye at EYE (§11); the start is
      inside the way he arrives by (o.from), or else inside the first door of this place that leads out of the castle's
      ways, facing in. A raised way (the bay's mouth) is stood at on its own floor, a step inside it */
+  var standShaft = {};
   function standAt(d, name) {
     if (d.hatch) return hatchStand(d, name, false);
-    var off = d.back ? 0.5 : P.shaft && d.place === P.id ? (shaftStepped[d.id] ? 0.35 : Math.min(1.0, 0.6 * P.round.r)) : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
+    /* v139 (Interaction's re-walk of the towers on v138, req 1706, the Architect's 291st): a door or way of a newel stair
+       built from another place's page (the West Tower's spiral from a Ravenclaw room's) took a room door's 3.4 m, cut to
+       2.0 where the floor ran out, past the newel, so no stand saw west-tower-room-door-6's leaf; it stands a landing's
+       depth in, as on the stair's own page */
+    var dS = P.shaft && d.place === P.id ? P : null;
+    if (!dS && !d.back && d.place !== P.id) {
+      if (!(d.place in standShaft)) { var sq = findPlace(M, d.place); standShaft[d.place] = sq && sq.shaft && sq.round ? sq : null; }
+      dS = standShaft[d.place];
+    }
+    var off = d.back ? 0.5 : dS ? (dS === P && shaftStepped[d.id] ? 0.35 : Math.min(1.0, 0.6 * dS.round.r)) : d.lift ? STAND_OFF : Math.min(10, Math.max(STAND_OFF, d.w * 1.1, d.h * 1.6));   /* far enough back to see it whole; a hidden place's way out a step in, its landings narrow */
     var pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE;
     /* v8: never off the floor (a small room, the commentator's box): nearer the door until he stands on it */
     while (off > 0.6 && !onLevel(pos.x + cx, cy - pos.z, d.level)) { off -= 0.2; pos = d.mid.clone().add(d.inward.clone().multiplyScalar(off)); pos.y = d.mid.y + d.lift + EYE; }
