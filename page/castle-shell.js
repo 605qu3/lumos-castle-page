@@ -1457,7 +1457,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
         var sp = toLocal(a[0] + ux * sm + nx * D, a[1] + uy * sm + ny * D, Q.floor);
         sc.position.set(sp.x, sp.y + g.sill, sp.z); sc.rotation.y = ang; sc.name = Q.id + '-lights-' + op.id; sc.userData.owner = Q.id; group.add(sc);
         [-1, 1].forEach(function (k) {
-          var si = sm + k * (w / 2 + 0.04), so_ = sm + k * w0 / 2;
+          /* v143 (Godric, 30 October 2026, 5.09 pm): a `square` reveal's cheeks turn at 90 degrees to the wall, straight
+             back to the screen, whose face closes the return to the lights' outer jambs; else they slant to those jambs */
+          var si = sm + k * (w / 2 + 0.04), so_ = LT.square ? sm + k * w / 2 : sm + k * w0 / 2;
           var A = [a[0] + ux * si, a[1] + uy * si], B = [a[0] + ux * so_ + nx * D, a[1] + uy * so_ + ny * D];
           var pA = toLocal(A[0], A[1], Q.floor), pB = toLocal(B[0], B[1], Q.floor), y0 = g.sill, y1 = Math.min(g.h, LT.spring + w / 2);
           var vs = [pA.x, pA.y + y0, pA.z, pB.x, pB.y + y0, pB.z, pB.x, pB.y + y1, pB.z, pA.x, pA.y + y1, pA.z];
