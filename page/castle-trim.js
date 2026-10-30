@@ -44,7 +44,7 @@
                yet, a row names them): the door in a lugged architrave with a keystone; the window the Gothick, a
                chamfered surround under a plain hood, pointed where its record's head is
        P7      the door Gothic Revival: a roll on the arris, a label on carved stops, no lugs, no key; the window the
-               Jacobean's until req 1755 answers
+               same dressing (Godric's 1 on req 1755: intersecting tracery)
      The head is the record's (s.head, its first word): round or pointed (equilateral, the sheet's apex 0.866 w) turn
      the dressing over it; an opening whose record names none stays square, as the shell cuts it */
   function mould(age, cls, o) {
@@ -56,7 +56,7 @@
     if (n <= 5) return { n: n, bw: win ? 0.14 : 0.16, proj: 0.06, chamfer: true, stop: true, bead: true, hood: n === 4 ? 0.26 : 0.34 };
     if (n === 6 && o.late) return win ? { n: n, bw: 0.14, proj: 0.05, chamfer: true, hood: 0.22 }
       : { n: n, bw: 0.18, proj: 0.06, chamfer: false, steps: true, lugs: true, key: true };
-    if (n === 7 && !win) return { n: n, bw: 0.16, proj: 0.06, chamfer: true, bead: true, hood: 0.26 };
+    if (n === 7) return { n: n, bw: win ? 0.15 : 0.16, proj: 0.06, chamfer: true, bead: true, hood: 0.26 };   /* req 1755: the window too, intersecting tracery's dressing (the tracery is the glazing's) */
     return { n: n, bw: win ? 0.15 : 0.18, proj: 0.06, chamfer: false, steps: true, cornice: !win, pediment: win, brackets: win };
   }
 
