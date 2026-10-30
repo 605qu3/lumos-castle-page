@@ -7,7 +7,10 @@
 <style>
 /* A test of the point-and-click idea for Godric: the common room as three staged views of one room (the 2.5D room's
    own render from three looks), with tap targets that bring the view toward a thing. Nothing here is the game; the
-   stills are shots of page/common-room.html, and the lines are stand-ins. */
+   stills are shots of page/common-room.html, and the lines are stand-ins. The stills are 2560 wide so the close views hold
+   to 4x. There is no tilt drift here: a tilt of the iPad turns the hourglass (world-rules.md), so the stills only drift on
+   their own. The little door goes through to the den, a one-look still of the unbuilt den (a plain stand-in, not its
+   final look), and out again; the round hole leaves for the walked corridor. */
 html, body { margin: 0; height: 100%; background: #0b0807; color: #e7d9bd; font: 15px/1.4 Georgia, serif;
   overscroll-behavior: none; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 #app { position: fixed; inset: 0; display: flex; flex-direction: column; }
@@ -68,7 +71,7 @@ button.t.on { background: #5b4021; }
       <button class="arrow" id="al" aria-label="Look left">&#8249;</button>
       <button class="arrow" id="ar" aria-label="Look right">&#8250;</button>
       <div id="card"></div>
-      <div id="stub"><p id="stubtext"></p><button class="t" id="stubback">Back to the room</button></div>
+      <div id="stub"><p id="stubtext"></p><a class="t" id="stublink" href="corridor.html" style="display:none;text-decoration:none;margin-bottom:10px">Walk the corridor</a><button class="t" id="stubback">Back to the room</button></div>
     </div>
   </div>
   <div id="bar">
@@ -83,16 +86,16 @@ button.t.on { background: #5b4021; }
    look (the view moves toward it, a line), through (the view moves in, the iris closes, a stub for the next room's view),
    up (the view climbs). Every line here is a stand-in for the test. */
 var VIEWS = [
-  { id: 'a', img: '../assets/review/pc-room-left.jpg?v=1', name: 'the bookcase side', spots: [
+  { id: 'a', img: '../assets/review/pc-room-left.jpg?v=2', name: 'the bookcase side', spots: [
     { n: 'bookcase', x: 16, y: 50, w: 14, kind: 'look', z: 2.2, say: 'The bookcase stand-in, a grey slab for now.' },
-    { n: 'portrait hole', x: 34.5, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor, a view of its own' },
+    { n: 'portrait hole', x: 34.5, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html' },
     { n: 'cloak', x: 27, y: 52, w: 6, kind: 'look', z: 2.8, say: 'A hand-me-down cloak on its hook, a moth hole in the hem.' },
     { n: 'fire', x: 57, y: 55, w: 14, kind: 'look', z: 2.4, say: 'The fire, low and orange.' },
     { n: 'sleeper', x: 74, y: 57, w: 13, kind: 'look', z: 2.6, say: 'Someone asleep on the sofa, boots up.' },
     { n: 'stairs', x: 91, y: 40, w: 12, kind: 'up', z: 2.4, say: 'The stair winds up into the dark.', to: 'the dormitory stair' } ] },
-  { id: 'b', img: '../assets/review/pc-room-centre.jpg?v=1', name: 'the fireside', spots: [
+  { id: 'b', img: '../assets/review/pc-room-centre.jpg?v=2', name: 'the fireside', spots: [
     { n: 'fire', x: 48, y: 52, w: 14, kind: 'look', z: 2.4, say: 'The fire pops and settles.' },
-    { n: 'portrait hole', x: 21, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor, a view of its own' },
+    { n: 'portrait hole', x: 21, y: 50, w: 12, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html' },
     { n: 'cloak', x: 12.5, y: 54, w: 5, kind: 'look', z: 3, say: 'A hand-me-down cloak on its hook, a moth hole in the hem.' },
     { n: 'letter', x: 27, y: 66, w: 10, kind: 'look', z: 3, say: 'A letter, an inkwell and a long feather on the round table.' },
     { n: 'portrait', x: 49.5, y: 22, w: 7, kind: 'look', z: 3.4, say: 'A portrait. She is reading.' },
@@ -101,15 +104,22 @@ var VIEWS = [
     { n: 'sofa', x: 67, y: 58, w: 11, kind: 'look', z: 2.8, say: 'A boy asleep on the sofa. His boots are up.' },
     { n: 'cat', x: 54, y: 64, w: 6, kind: 'look', z: 4, say: 'The cat, going about her business.' },
     { n: 'stairs', x: 95, y: 40, w: 10, kind: 'up', z: 2.4, say: 'The stair winds up into the dark.', to: 'the dormitory stair' } ] },
-  { id: 'c', img: '../assets/review/pc-room-right.jpg?v=1', name: 'the stair side', spots: [
+  { id: 'c', img: '../assets/review/pc-room-right.jpg?v=2', name: 'the stair side', spots: [
     { n: 'chess', x: 37, y: 66, w: 14, kind: 'look', z: 3, say: 'Two first years bent over a game, quiet as stones.' },
     { n: 'notice board', x: 61, y: 42, w: 9, kind: 'look', z: 3.4, say: 'The notice board, thick with notes.' },
-    { n: 'little door', x: 82, y: 56, w: 7, kind: 'through', z: 4, say: 'A small old door, low in the wall under the stair.', to: 'Clementine’s den, a view of its own' },
+    { n: 'little door', x: 82, y: 56, w: 7, kind: 'in', z: 4, say: 'A small old door, low in the wall under the stair.', to: 3 },
     { n: 'stairs', x: 78, y: 28, w: 14, kind: 'up', z: 2.2, say: 'The stair winds up into the dark.', to: 'the dormitory stair' },
     { n: 'letter', x: 70, y: 66, w: 11, kind: 'look', z: 3, say: 'A letter, an inkwell and a long feather on the round table.' },
     { n: 'window', x: 15, y: 48, w: 13, kind: 'look', z: 2.4, say: 'A window on the dark grounds.' },
-    { n: 'portrait hole', x: 3.5, y: 50, w: 8, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor, a view of its own' } ] }
+    { n: 'portrait hole', x: 3.5, y: 50, w: 8, kind: 'through', z: 3.2, say: 'The round hole in the wall, out to the corridor.', to: 'the corridor', href: 'corridor.html' } ] },
+  { id: 'd', img: '../assets/review/pc-room-den.jpg?v=2', name: 'Clementine’s den', hidden: true, spots: [
+    { n: 'lamp', x: 47, y: 18, w: 10, kind: 'look', z: 3, say: 'A small lamp, lit, on a low round table.' },
+    { n: 'note', x: 56, y: 38, w: 9, kind: 'look', z: 4, say: '“I made this when I was small enough to fit. It’s yours now. C.A.”' },
+    { n: 'cushion', x: 8, y: 52, w: 16, kind: 'look', z: 2.6, say: 'A worn cushion on the floor, the size of a small girl.' },
+    { n: 'cushion', x: 90, y: 66, w: 16, kind: 'look', z: 2.6, say: 'Another cushion, a little flattened.' },
+    { n: 'little door', x: 50, y: 90, w: 18, kind: 'out', z: 2, say: 'The little door, back out to the common room.', to: 2 } ] }
 ];
+var LOOKN = 3;   /* the looks round the room; the den is reached through the little door and left through it */
 
 var cur = 1, zoomed = false, busy = false;
 var stage = document.getElementById('stage'), frame = document.getElementById('frame'), card = document.getElementById('card');
@@ -121,23 +131,23 @@ VIEWS.forEach(function (v, i) {
   v.el = im; v.layer = document.createElement('div'); v.layer.style.cssText = 'position:absolute;inset:0;display:none';
   v.spots.forEach(function (s) {
     var d = document.createElement('div'); d.className = 'spot'; d.setAttribute('data-n', s.n);
-    d.style.cssText = 'left:' + s.x + '%;top:' + s.y + '%;width:' + s.w + '%;aspect-ratio:1';
+    d.style.cssText = 'left:' + s.x + '%;top:' + s.y + '%;width:' + Math.max(s.w, 9) + '%;aspect-ratio:1';   /* never under 9% of the view, a child's finger on a phone held sideways */
     d.addEventListener('click', function (e) { e.stopPropagation(); tapSpot(s); });
     v.layer.appendChild(d);
   });
   stage.appendChild(v.layer);
 });
 
-function say(t) { card.textContent = t; card.classList.add('on'); clearTimeout(cardTimer); cardTimer = setTimeout(function () { card.classList.remove('on'); }, 3800); }
+function say(t) { card.textContent = t; card.classList.add('on'); clearTimeout(cardTimer); cardTimer = setTimeout(function () { card.classList.remove('on'); }, Math.max(6000, 2500 + t.length * 110)); }   /* long enough for a slow young reader */
 function show(i, dir) {
   VIEWS.forEach(function (v, k) {
     v.el.classList.toggle('on', k === i); v.layer.style.display = k === i ? 'block' : 'none';
     v.el.style.transform = k === i ? 'none' : 'translateX(' + (k < i ? -3 : 3) + '%)';
   });
-  cur = i; document.getElementById('al').disabled = i === 0; document.getElementById('ar').disabled = i === VIEWS.length - 1;
-  document.getElementById('pos').textContent = VIEWS[i].name + ' (' + (i + 1) + ' of ' + VIEWS.length + ')';
+  cur = i; document.getElementById('al').disabled = i === 0 || i >= LOOKN; document.getElementById('ar').disabled = i >= LOOKN - 1;
+  document.getElementById('pos').textContent = VIEWS[i].name + (i < LOOKN ? ' (' + (i + 1) + ' of ' + LOOKN + ')' : '');
 }
-function look(d) { if (zoomed || busy) return; var n = cur + d; if (n < 0 || n >= VIEWS.length) return; card.classList.remove('on'); show(n, d); }
+function look(d) { if (zoomed || busy) return; var n = cur + d; if (cur >= LOOKN || n < 0 || n >= LOOKN) return; card.classList.remove('on'); show(n, d); }
 function zoomTo(s) {
   var z = s.z || 2.4;
   /* move the view so the spot sits near the middle at scale z: translate by the offset of the spot from the centre */
@@ -158,13 +168,26 @@ function tapSpot(s) {
   if (busy) return;
   if (zoomed) { stepBack(); return; }
   zoomTo(s); say(s.say);
-  if (s.kind === 'through' || s.kind === 'up') {
+  if (s.kind === 'in' || s.kind === 'out') {
+    /* a move to another view of this test: the iris closes, the veil falls, the far view opens, the veil lifts */
     busy = true;
     iris.style.setProperty('--ix', '50%'); iris.style.setProperty('--iy', '46%');
     setTimeout(function () { iris.classList.add('on'); }, 450);
     setTimeout(function () { veil.classList.add('on'); }, 1100);
     setTimeout(function () {
-      document.getElementById('stubtext').innerHTML = (s.kind === 'up' ? 'Up the stair: ' : 'Through: ') + s.to + '.<br><small>This is where the next staged view would open.</small>';
+      stage.style.transition = 'none'; stage.style.transformOrigin = '50% 50%'; stage.style.transform = 'none'; zoomed = false; void stage.offsetWidth; stage.style.transition = '';
+      iris.classList.remove('on'); card.classList.remove('on'); show(s.to, 0); backBtn.disabled = true;
+    }, 1750);
+    setTimeout(function () { veil.classList.remove('on'); busy = false; }, 2000);
+  } else if (s.kind === 'through' || s.kind === 'up') {
+    busy = true;
+    iris.style.setProperty('--ix', '50%'); iris.style.setProperty('--iy', '46%');
+    setTimeout(function () { iris.classList.add('on'); }, 450);
+    setTimeout(function () { veil.classList.add('on'); }, 1100);
+    setTimeout(function () {
+      var link = document.getElementById('stublink');
+      document.getElementById('stubtext').innerHTML = (s.kind === 'up' ? 'Up the stair: ' : 'Through: ') + s.to + (s.href ? ', which is walked.' : '.<br><small>This is where the next staged view would open.</small>');
+      link.style.display = s.href ? 'inline-block' : 'none'; if (s.href) link.href = s.href;
       stub.classList.add('on'); veil.classList.remove('on'); busy = false;
     }, 1750);
   }
@@ -194,7 +217,8 @@ document.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') l
 var FXV = {
   a: { fire: { x: 58.5, y: 51, w: 8, str: .55 }, sleeper: { L: 72, T: 51, W: 9, H: 10 } },
   b: { fire: { x: 50, y: 54, w: 9, str: 1 }, sleeper: { L: 61, T: 49, W: 11, H: 10 } },
-  c: { fire: { x: 34.5, y: 56, w: 7, str: .4 } }
+  c: { fire: { x: 34.5, y: 56, w: 7, str: .4 } },
+  d: { fire: { x: 50, y: 20, w: 6, str: 0 } }
 };
 var fxState = { flare: 0, t: 0 };
 function noiseAt(t) { return .5 + .26 * Math.sin(t * 7.3) + .14 * Math.sin(t * 13.9 + 1.7) + .1 * Math.sin(t * 3.1 + .4); }
@@ -317,7 +341,7 @@ var Snd = (function () {
   function set(param, v, tc) { if (!ctx) return; var t = ctx.currentTime; param.cancelScheduledValues(t); param.setTargetAtTime(v, t, tc || .5); }
   /* what is heard in each view, and what a zoom on a spot brings forward */
   function mix(i, spot) {
-    if (!awake) return; var id = VIEWS[i].id, fire = { a: .5, b: .8, c: .4 }[id], wind = { a: .05, b: .05, c: .13 }[id], snore = { a: .045, b: .05, c: 0 }[id], purr = 0, tk = id === 'c' ? 1 : 0, n = spot && spot.n;
+    if (!awake) return; var id = VIEWS[i].id, fire = { a: .5, b: .8, c: .4, d: .05 }[id], wind = { a: .05, b: .05, c: .13, d: 0 }[id], snore = { a: .045, b: .05, c: 0, d: 0 }[id], purr = 0, tk = id === 'c' ? 1 : 0, n = spot && spot.n;
     if (n === 'fire') fire = Math.min(1, fire * 1.5);
     if (n === 'sleeper' || n === 'sofa') snore = .16;
     if (n === 'cat') purr = .1;
@@ -340,7 +364,7 @@ var Snd = (function () {
 })();
 var _show = show, _zoomTo = zoomTo, _stepBack = stepBack;
 show = function (i, d) { _show(i, d); Snd.mix(i, null); };
-zoomTo = function (s) { _zoomTo(s); Snd.mix(cur, s); if (s.kind === 'through' || s.kind === 'up') Snd.whoosh(s.kind === 'up'); else Snd.tick(); };
+zoomTo = function (s) { _zoomTo(s); Snd.mix(cur, s); if (s.kind === 'through' || s.kind === 'up' || s.kind === 'in' || s.kind === 'out') Snd.whoosh(s.kind === 'up'); else Snd.tick(); };
 stepBack = function () { var was = zoomed; _stepBack(); if (was) Snd.mix(cur, null); };
 var _leave = leaveStub; leaveStub = function () { _leave(); setTimeout(function () { Snd.mix(cur, null); }, 700); };
 document.getElementById('stubback').onclick = leaveStub;
