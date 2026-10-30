@@ -3,304 +3,329 @@
   "name": "drafting-d101",
   "title": "Below ground: the cellars and dungeons",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-102": {
   "name": "drafting-d102",
   "title": "The ground floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-103": {
   "name": "drafting-d103",
   "title": "The first floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-104": {
   "name": "drafting-d104",
   "title": "The second floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-105": {
   "name": "drafting-d105",
   "title": "The third floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-106": {
   "name": "drafting-d106",
   "title": "The fourth floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-107": {
   "name": "drafting-d107",
   "title": "The fifth floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-108": {
   "name": "drafting-d108",
   "title": "The sixth floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-109": {
   "name": "drafting-d109",
   "title": "The seventh floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-110": {
   "name": "drafting-d110",
   "title": "The tower levels, above the seventh floor",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-111": {
   "name": "drafting-d111",
   "title": "The roofs",
   "group": "Plans, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-201": {
   "name": "drafting-d201",
   "title": "Section A-A: the spine, north to south through the Astronomy Tower, the Entrance Hall, the stair hall and the keep",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-202": {
   "name": "drafting-d202",
   "title": "Section B-B: west to east across both courts, through Ravenclaw Tower and Dumbledore's tower",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-203": {
   "name": "drafting-d203",
   "title": "Section C-C: west to east along the north range, through the Great Hall and the Entrance Hall",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-204": {
   "name": "drafting-d204",
   "title": "Section D-D: west to east along the lake front, through the south-west drum, Gryffindor Tower and the south-east tower",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-205": {
   "name": "drafting-d205",
   "title": "Section E-E: north to south through Gryffindor Tower and its girls' tower, and the north range",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-206": {
   "name": "drafting-d206",
   "title": "Section F-F: north to south through the North Tower, the east range and the south-east tower",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-207": {
   "name": "drafting-d207",
   "title": "Section G-G: north to south through the West Tower, the west range and the south-west drum",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-208": {
   "name": "drafting-d208",
   "title": "Section H-H: north to south through Dumbledore's tower",
   "group": "Sections, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-301": {
   "name": "drafting-d301",
   "title": "The north face, the front, seen from the lawn",
   "group": "Elevations, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-302": {
   "name": "drafting-d302",
   "title": "The south face, over the lake, seen from the water",
   "group": "Elevations, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-303": {
   "name": "drafting-d303",
   "title": "The east face, seen from the east",
   "group": "Elevations, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.50",
+  "checked": 256
  },
  "D-304": {
   "name": "drafting-d304",
   "title": "The west face, seen from the west",
   "group": "Elevations, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51",
+  "checked": 256
  },
  "D-305": {
   "name": "drafting-d305",
   "title": "The west courtyard, its four inner faces",
   "group": "Elevations, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51",
+  "checked": 256
  },
  "D-306": {
   "name": "drafting-d306",
   "title": "The east courtyard, its four inner faces",
   "group": "Elevations, 1:250 at A1",
-  "version": 224,
-  "model_date": "28 October 2026, 00.04",
-  "drawn": "28 October 2026, 01.56"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51",
+  "checked": 256
  },
  "D-501": {
   "name": "drafting-d501",
   "title": "The Astronomy Tower's top: plan at 1:50",
   "group": "The Astronomy Tower's top, 1:50 at A2",
-  "version": 233,
-  "model_date": "28 October 2026, 18.24",
-  "drawn": "28 October 2026, 18.24"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-502": {
   "name": "drafting-d502",
   "title": "The Astronomy Tower's top: section A-A at 1:50",
   "group": "The Astronomy Tower's top, 1:50 at A2",
-  "version": 233,
-  "model_date": "28 October 2026, 18.24",
-  "drawn": "28 October 2026, 18.24"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-503": {
   "name": "drafting-d503",
   "title": "The Astronomy Tower's top: north elevation at 1:50",
   "group": "The Astronomy Tower's top, 1:50 at A2",
-  "version": 233,
-  "model_date": "28 October 2026, 18.24",
-  "drawn": "28 October 2026, 18.24"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-601": {
   "name": "drafting-d601",
   "title": "The cellars, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-602": {
   "name": "drafting-d602",
   "title": "The ground floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-603": {
   "name": "drafting-d603",
   "title": "The first floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-604": {
   "name": "drafting-d604",
   "title": "The second floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-605": {
   "name": "drafting-d605",
   "title": "The third floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-606": {
   "name": "drafting-d606",
   "title": "The fourth floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-607": {
   "name": "drafting-d607",
   "title": "The fifth floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-608": {
   "name": "drafting-d608",
   "title": "The sixth floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-609": {
   "name": "drafting-d609",
   "title": "The seventh floor, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  },
  "D-610": {
   "name": "drafting-d610",
   "title": "The towers' tops, built and to be built",
   "group": "Levels: built and to be built, 1:250 at A1",
-  "version": 234,
-  "model_date": "28 October 2026, 18.24 (and changes not yet committed)",
-  "drawn": "28 October 2026, 18.27"
+  "version": 256,
+  "model_date": "30 October 2026, 18.21",
+  "drawn": "30 October 2026, 18.51"
  }
 }
