@@ -2358,6 +2358,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        next flight to its middle, as a foot looks up its own */
     if (best && bd < 2.5) return toLocal((best.foot[0] + best.head[0]) / 2, (best.foot[1] + best.head[1]) / 2, (best.zf + best.zh) / 2 + EYE);
     if (best) return toLocal(best.foot[0], best.foot[1], F0.zh + EYE);
+    /* v125 (req 1649, the dungeons' Gate 0.1, the Architect's 268th): a head with a door or way of its floor within 2.5 m looks
+       at it (kitchens-steps-flight-1's head, 0.8 short of kitchens-door, looked 10 m east at the floor's first way, a PIT) */
+    var nd = null, nb = 2.5;
+    out.doors.concat(out.ways).forEach(function (x) {
+      if (!x.mid || Math.abs(x.level - F0.zh) > 0.3) return;
+      var hp = toLocal(F0.head[0], F0.head[1], F0.zh), dd = Math.hypot(x.mid.x - hp.x, x.mid.z - hp.z);
+      if (dd < nb) { nb = dd; nd = x; }
+    });
+    if (nd) { var v0 = nd.mid.clone(); v0.y = F0.zh - z0 + EYE; return v0; }
     var w = out.ways.filter(function (x) { return Math.abs(x.level - F0.zh) < 0.3; })[0];
     if (w) { var v = w.mid.clone(); v.y = F0.zh - z0 + EYE; return v; }
     return null;
