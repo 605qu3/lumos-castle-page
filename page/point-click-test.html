@@ -54,6 +54,9 @@ button.t.on { background: #5b4021; }
 .fx .fl { transform-origin: 50% 100%; mix-blend-mode: screen; filter: blur(1.5px); }
 .fx canvas { inset: 0; width: 100%; height: 100%; }
 .fx .breath { transform-origin: 50% 100%; -webkit-mask-image: radial-gradient(ellipse at 50% 55%, #000 45%, transparent 75%); mask-image: radial-gradient(ellipse at 50% 55%, #000 45%, transparent 75%); animation: breathe 4.2s ease-in-out infinite; }
+.fx .breath.soft { animation-name: breathe2; }
+.fx .bed { transform: translate(-50%, -50%); mix-blend-mode: screen; }
+@keyframes breathe2 { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.014); } }
 @keyframes breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.03) translateY(-.3%); } }
 .plate.on { animation: drift 26s ease-in-out infinite alternate; }
 @keyframes drift { from { transform: scale(1) translate(0, 0); } to { transform: scale(1.012) translate(-.25%, -.15%); } }
@@ -216,8 +219,10 @@ document.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') l
    nothing costs. Sound wakes on the first tap (Safari), has a mute kept on this device, and sits low. */
 var FXV = {
   a: { fire: { x: 58.5, y: 51, w: 8, str: .55 }, sleeper: { L: 72, T: 51, W: 9, H: 10 } },
-  b: { fire: { x: 50, y: 54, w: 9, str: 1 }, sleeper: { L: 61, T: 49, W: 11, H: 10 } },
-  c: { fire: { x: 34.5, y: 56, w: 7, str: .4 } },
+  b: { fire: { x: 50, y: 54, w: 9, str: 1 }, sleeper: { L: 61, T: 49, W: 11, H: 10 },
+       soft: [{ L: 47.3, T: 14, W: 5.5, H: 13, d: 7.3 }, { L: 56.3, T: 15.5, W: 5.5, H: 11.5, d: 9.1 }, { L: 41, T: 60.5, W: 5, H: 7, d: 3.6 }],
+       candle: { x: 55.2, y: 42 }, snow: [[28.5, 14, 7, 25], [65, 14, 7, 25], [31, 41, 6.5, 16], [62.8, 41, 6.5, 15]] },
+  c: { fire: { x: 34.5, y: 56, w: 7, str: .4 }, candle: { x: 40.5, y: 44 }, snow: [[11.5, 6, 8, 31], [48, 18, 6.5, 22], [11.5, 36, 8.5, 24], [46, 42, 5, 12]] },
   d: { fire: { x: 50, y: 20, w: 6, str: 0 } }
 };
 var fxState = { flare: 0, t: 0 };
@@ -229,9 +234,9 @@ VIEWS.forEach(function (v) {
   var glow = document.createElement('div'); glow.className = 'glow';
   glow.style.cssText = 'left:' + cfg.fire.x + '%;top:' + cfg.fire.y + '%;width:' + (cfg.fire.w * 3.2) + '%;aspect-ratio:1;background:radial-gradient(circle, rgba(255,170,70,.9) 0, rgba(255,120,30,.4) 38%, transparent 68%)';
   fx.appendChild(wash); fx.appendChild(glow); v.fx.wash = wash; v.fx.glow = glow; v.fx.fl = [];
-  for (var k = 0; k < 4; k++) {
+  for (var k = 0; k < 6; k++) {
     var f = document.createElement('div'); f.className = 'fl';
-    var fw = cfg.fire.w * (.34 + .1 * (k % 2)), fh = fw * 1.9, fxp = cfg.fire.x + (k - 1.5) * cfg.fire.w * .2;
+    var fw = cfg.fire.w * (.26 + .06 * (k % 3)), fh = fw * (1.6 + .5 * (k % 2)), fxp = cfg.fire.x + (k - 2.5) * cfg.fire.w * .14;
     f.style.cssText = 'left:' + (fxp - fw / 2) + '%;top:' + (cfg.fire.y + cfg.fire.w * .14 - fh * .56) + '%;width:' + fw + '%;height:' + fh * (16 / 9) + '%;background:radial-gradient(ellipse at 50% 70%, rgba(255,226,140,.95) 0, rgba(255,150,40,.7) 38%, transparent 70%)';
     fx.appendChild(f); v.fx.fl.push(f);
   }
@@ -240,7 +245,17 @@ VIEWS.forEach(function (v) {
     b.style.cssText = 'left:' + sl.L + '%;top:' + sl.T + '%;width:' + sl.W + '%;height:' + sl.H + '%;background-image:url(' + v.img + ');background-size:' + (10000 / sl.W) + '% ' + (10000 / sl.H) + '%;background-position:' + (sl.L / (100 - sl.W) * 100) + '% ' + (sl.T / (100 - sl.H) * 100) + '%';
     fx.appendChild(b);
   }
-  var cv = document.createElement('canvas'); cv.width = 640; cv.height = 360; fx.appendChild(cv); v.fx.cv = cv; v.fx.ctx = cv.getContext('2d'); v.fx.parts = [];
+  var bed = document.createElement('div'); bed.className = 'bed';
+  bed.style.cssText = 'left:' + cfg.fire.x + '%;top:' + (cfg.fire.y + cfg.fire.w * .2) + '%;width:' + (cfg.fire.w * 1.5) + '%;aspect-ratio:3;background:radial-gradient(ellipse, rgba(255,110,30,.9) 0, rgba(200,60,10,.4) 45%, transparent 72%)';
+  fx.appendChild(bed); v.fx.bed = bed;
+  if (cfg.candle) { var cd = document.createElement('div'); cd.className = 'glow'; cd.style.cssText = 'left:' + cfg.candle.x + '%;top:' + cfg.candle.y + '%;width:1.8%;aspect-ratio:1;background:radial-gradient(circle, rgba(190,215,255,.7) 0, rgba(120,150,255,.25) 45%, transparent 70%)'; fx.appendChild(cd); v.fx.candle = cd; }
+  (cfg.soft || []).forEach(function (sl) {
+    var q = document.createElement('div'); q.className = 'breath soft';
+    q.style.cssText = 'left:' + sl.L + '%;top:' + sl.T + '%;width:' + sl.W + '%;height:' + sl.H + '%;animation-duration:' + sl.d + 's;background-image:url(' + v.img + ');background-size:' + (10000 / sl.W) + '% ' + (10000 / sl.H) + '%;background-position:' + (sl.L / (100 - sl.W) * 100) + '% ' + (sl.T / (100 - sl.H) * 100) + '%';
+    fx.appendChild(q);
+  });
+  var cv = document.createElement('canvas'); cv.width = 640; cv.height = 360; fx.appendChild(cv); v.fx.cv = cv; v.fx.ctx = cv.getContext('2d'); v.fx.parts = []; v.fx.snow = [];
+  for (var sn = 0; sn < 70; sn++) v.fx.snow.push({ x: Math.random() * 640, y: Math.random() * 360, vy: 7 + Math.random() * 9, ph: Math.random() * 6, r: .7 + Math.random() });
   for (var m = 0; m < 16; m++) v.fx.parts.push({ dust: true, x: Math.random() * 640, y: Math.random() * 360, vx: (Math.random() - .5) * 3, vy: -1 - Math.random() * 2, a: .05 + Math.random() * .1, r: 1 });
   v.layer.insertBefore(fx, v.layer.firstChild);
 });
@@ -248,20 +263,34 @@ var last = 0;
 function frameFx(ms) {
   var t = ms / 1000, dt = Math.min(.1, t - last); last = t;
   var v = VIEWS[cur], fx = v.fx, c = fx.cfg.fire;
-  fxState.flare *= Math.pow(.02, dt);
-  var f = noiseAt(t) + fxState.flare * .5, str = c.str;
-  fx.wash.style.opacity = (.05 + .09 * f) * str;
-  fx.glow.style.opacity = Math.min(1, (.18 + .34 * f) * str);
-  fx.glow.style.transform = 'translate(-50%,-50%) scale(' + (.92 + .16 * f) + ')';
+  fxState.flare *= Math.pow(.08, dt);
+  var f = noiseAt(t * .5) + fxState.flare * .25, str = c.str;
+  fx.wash.style.opacity = (.05 + .05 * f) * str;
+  fx.glow.style.opacity = Math.min(1, (.2 + .2 * f) * str);
+  fx.glow.style.transform = 'translate(-50%,-50%) scale(' + (.95 + .1 * f) + ')';
+  fx.bed.style.opacity = (.35 + .2 * (.5 + .5 * Math.sin(t * .8)) + .08 * f) * str;
+  if (fx.candle) fx.candle.style.opacity = .55 + .3 * noiseAt(t * 1.6 + 3);
   fx.fl.forEach(function (el, k) {
-    var g = noiseAt(t * (1.1 + k * .23) + k * 2.1) + fxState.flare * .4;
-    el.style.opacity = Math.min(1, (.25 + .55 * g) * (.5 + .5 * str));
-    el.style.transform = 'scaleY(' + (.8 + .55 * g) + ') translateX(' + (Math.sin(t * (4 + k) + k) * 6) + '%) skewX(' + (Math.sin(t * (3 + k * .7) + k * 1.3) * 7) + 'deg)';
+    var g = noiseAt(t * (.45 + k * .13) + k * 2.1) + fxState.flare * .2;
+    el.style.opacity = Math.min(1, (.2 + .4 * g) * (.5 + .5 * str));
+    el.style.transform = 'scaleY(' + (.85 + .3 * g) + ') translateX(' + (Math.sin(t * (1.3 + k * .5) + k) * 4) + '%) skewX(' + (Math.sin(t * (1.1 + k * .4) + k * 1.3) * 4) + 'deg)';
   });
   var cx = fx.ctx, ps = fx.parts; cx.clearRect(0, 0, 640, 360);
-  if (Math.random() < dt * 3.5 * str) ps.push({ x: c.x * 6.4 + (Math.random() - .5) * c.w * 3, y: c.y * 3.6 - c.w * .6, vx: (Math.random() - .5) * 10, vy: -(14 + Math.random() * 18), a: 1, r: 1.1 + Math.random(), life: 1.4 + Math.random() * 1.2, age: 0 });
+  if (Math.random() < dt * .5 * str) ps.push({ x: c.x * 6.4 + (Math.random() - .5) * c.w * 3, y: c.y * 3.6 - c.w * .6, vx: (Math.random() - .5) * 10, vy: -(14 + Math.random() * 18), a: 1, r: 1.1 + Math.random(), life: 1.4 + Math.random() * 1.2, age: 0 });
+  if (str > 0 && Math.random() < dt * 1.1) ps.push({ smoke: true, x: c.x * 6.4 + (Math.random() - .5) * c.w * 1.5, y: c.y * 3.6 - c.w * 1.3, vx: 0, vy: -(7 + Math.random() * 5), r: 3, life: 4 + Math.random() * 2.5, age: 0 });
+  var sw = fx.cfg.snow;
+  if (sw) {
+    cx.save(); cx.beginPath(); sw.forEach(function (w) { cx.rect(w[0] * 6.4, w[1] * 3.6, w[2] * 6.4, w[3] * 3.6); }); cx.clip();
+    fx.snow.forEach(function (s) { s.y += s.vy * dt; if (s.y > 370) { s.y = -4; s.x = Math.random() * 640; } cx.fillStyle = 'rgba(235,242,255,.6)'; cx.beginPath(); cx.arc(s.x + Math.sin(t * .7 + s.ph) * 7, s.y, s.r, 0, 6.3); cx.fill(); });
+    cx.restore();
+  }
   for (var i = ps.length - 1; i >= 0; i--) {
     var p = ps[i];
+    if (p.smoke) {
+      p.age += dt; if (p.age > p.life) { ps.splice(i, 1); continue; }
+      var u = p.age / p.life; p.x += Math.sin(t * .5 + i) * 5 * dt; p.y += p.vy * dt;
+      cx.fillStyle = 'rgba(170,150,135,' + (.07 * Math.sin(u * 3.14) * str) + ')'; cx.beginPath(); cx.arc(p.x, p.y, p.r + u * 9, 0, 6.3); cx.fill(); continue;
+    }
     if (p.dust) {
       p.x += (p.vx + Math.sin(t * .6 + i) * 2) * dt; p.y += p.vy * dt * .4;
       if (p.y < -4) { p.y = 364; p.x = Math.random() * 640; } if (p.x < -4) p.x = 644; if (p.x > 644) p.x = -4;
@@ -303,9 +332,9 @@ var Snd = (function () {
   }
   function crackle() {
     var r = Math.random();
-    if (r < .12) { burst('pop', .55 + Math.random() * .4); fxState.flare = Math.min(1, fxState.flare + .6); }
-    else { var k = 1 + (Math.random() * 3 | 0); for (var i = 0; i < k; i++) setTimeout(function () { burst('tick', .15 + Math.random() * .35); }, i * (8 + Math.random() * 30)); if (Math.random() < .3) fxState.flare = Math.min(1, fxState.flare + .25); }
-    timers[0] = setTimeout(crackle, 50 + Math.random() * Math.random() * 700);
+    if (r < .035) { burst('pop', .22 + Math.random() * .2); fxState.flare = Math.min(1, fxState.flare + .6); }
+    else { var k = 1 + (Math.random() * 2 | 0); for (var i = 0; i < k; i++) setTimeout(function () { burst('tick', .05 + Math.random() * .14); }, i * (8 + Math.random() * 30)); if (Math.random() < .2) fxState.flare = Math.min(1, fxState.flare + .15); }
+    timers[0] = setTimeout(crackle, 200 + Math.random() * Math.random() * 1800);
   }
   function breathe() {
     if (awake && !muted && amb.snore.level > .01) {
@@ -327,7 +356,7 @@ var Snd = (function () {
     ctx = new AC(); ctx.resume(); mkBuffers();
     master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
     var fireBus = ctx.createGain(); fireBus.gain.value = 0; fireBus.connect(master); amb.fireBus = fireBus;
-    var rum = loop(brown, 'lowpass', 380, .5, 1, fireBus), hiss = loop(noiseBuf, 'highpass', 5200, .5, .035, fireBus);
+    var rum = loop(brown, 'lowpass', 300, .5, .5, fireBus), hiss = loop(noiseBuf, 'highpass', 5200, .5, .012, fireBus);
     amb.rum = rum;
     var wind = loop(noiseBuf, 'bandpass', 420, 1.1, 0), lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = .11; lg.gain.value = 260; lfo.connect(lg); lg.connect(wind.f.frequency); lfo.start();
     var lfo2 = ctx.createOscillator(), lg2 = ctx.createGain(); lfo2.frequency.value = .17; lg2.gain.value = .35; lfo2.connect(lg2); lg2.connect(wind.g.gain); lfo2.start();
@@ -341,8 +370,8 @@ var Snd = (function () {
   function set(param, v, tc) { if (!ctx) return; var t = ctx.currentTime; param.cancelScheduledValues(t); param.setTargetAtTime(v, t, tc || .5); }
   /* what is heard in each view, and what a zoom on a spot brings forward */
   function mix(i, spot) {
-    if (!awake) return; var id = VIEWS[i].id, fire = { a: .5, b: .8, c: .4, d: .05 }[id], wind = { a: .05, b: .05, c: .13, d: 0 }[id], snore = { a: .045, b: .05, c: 0, d: 0 }[id], purr = 0, tk = id === 'c' ? 1 : 0, n = spot && spot.n;
-    if (n === 'fire') fire = Math.min(1, fire * 1.5);
+    if (!awake) return; var id = VIEWS[i].id, fire = { a: .3, b: .45, c: .25, d: .03 }[id], wind = { a: .05, b: .05, c: .13, d: 0 }[id], snore = { a: .045, b: .05, c: 0, d: 0 }[id], purr = 0, tk = id === 'c' ? 1 : 0, n = spot && spot.n;
+    if (n === 'fire') fire = Math.min(.7, fire * 1.5);
     if (n === 'sleeper' || n === 'sofa') snore = .16;
     if (n === 'cat') purr = .1;
     if (n === 'window') wind = .24;
