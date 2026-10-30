@@ -2484,6 +2484,12 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var mk = function (e, name) { return { name: name, pos: toLocal(e.x, e.y, e.z + EYE), look: toLocal(e.lx, e.ly, e.z + EYE + e.up), thing: null, level: e.z }; };
     var fs = mk(f.foot, f.id + ' foot'), hs = mk(f.head, f.id + ' head');
     fs.flight = hs.flight = true;   /* req 856 */
+    /* v138 (req 1702, Interaction's walk of the towers, the Architect's 288th): a newel stair's foot looked 0.9 up at a spot
+       three treads round, 44 degrees over the level, so from a room with no free look (the Ravenclaw rooms on 2 and 5) the
+       phone showed only the drum's underside and no touch climbed west-tower-spiral-flight-1. Where it rises more than 30
+       degrees, the foot looks along its first treads 3 degrees under the level, as a free room's flight end does */
+    var fv = fs.look.clone().sub(fs.pos), fh = Math.hypot(fv.x, fv.z);
+    if (fh > 0.05 && Math.atan2(fv.y, fh) > 30 * Math.PI / 180) { fv.y = -fh * Math.tan(3 * Math.PI / 180); fs.look = fs.pos.clone().add(fv); }
     out.flights.push({ id: f.id, foot: fs, head: hs, footPt: fs.pos.clone(), headPt: hs.pos.clone(), lamp: f.lamp || null,
       path: f.path.map(function (p) { return toLocal(p[0], p[1], p[2] + EYE); }).concat([hs.pos.clone()]) });
     out.stands.push(fs, hs);
