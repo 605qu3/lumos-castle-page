@@ -2950,9 +2950,16 @@ function farView(F, M, toLocal, panes, paneMat, shaft) {
     var lp = lake.shape.poly, sh = lake.shores || [], lc = [0, 0];
     lp.forEach(function (p) { lc[0] += p[0] / lp.length; lc[1] += p[1] / lp.length; });
     function kindAt(i) { var k = 'grass'; sh.forEach(function (s) { if (i >= s[1]) k = s[0]; }); return k; }
+    /* v147 (req 1957, the 1.9 km loch): each bank point leaves along its own shore's outward normal (the chord of the twelve
+       points either side, turned away from the water), not along the line from the lake's centre, which folded the ring
+       back over the water at the bays and the headland of a long, bent outline */
+    var area2 = 0, nn = lp.length;
+    for (var ai = 0; ai < nn; ai++) { var aj = (ai + 1) % nn; area2 += lp[ai][0] * lp[aj][1] - lp[aj][0] * lp[ai][1]; }
+    var side = area2 > 0 ? 1 : -1;
     ring = lp.map(function (p, i) {
-      var dx = p[0] - lc[0], dy = p[1] - lc[1], d = Math.hypot(dx, dy) || 1, k = kindAt(i), w = /cliff|rock/.test(k) ? 6 : 40;
-      return [p[0] + dx / d * w, p[1] + dy / d * w];
+      var a = lp[(i + nn - 12) % nn], c = lp[(i + 12) % nn], tx = c[0] - a[0], ty = c[1] - a[1], d = Math.hypot(tx, ty) || 1,
+        k = kindAt(i), w = /cliff|rock/.test(k) ? 6 : 40;
+      return [p[0] + side * ty / d * w, p[1] - side * tx / d * w];
     });
     var ground = shape([[-4000, -4000], [4000, -4000], [4000, 4000], [-4000, 4000]]);
     ground.holes.push(new THREE.Path(ring.map(function (p) { return new THREE.Vector2(p[0], p[1]); })));
