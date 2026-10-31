@@ -1974,8 +1974,11 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var A = runs[0], B = runs[1], dA = norm(A.end - (B.end + sweep)), dB = norm(B.end - (A.end + sweep));
       [[A, dA], [B, dB]].forEach(function (p) {
         if (p[1] < 1) return;
-        wedge(p[0].end - p[1], p[0].end, top, 0.3, mats.floor, Q.id + '-top-' + (p[0] === A ? 'a' : 'b'), GAL || null);
-        p[0].ha = p[0].end - Math.min(10, p[1] / 2);
+        /* v149 (req 1985, Interaction's pass 2.5 re-walk): the top is data only (no door, no way), so a head had nothing to leave
+           to but its own foot. The floor round from a flight's head toward the OTHER flight's last treads is that other
+           flight's tap: from here it walks him round the ring to its head, from where he can go down it */
+        wedge(p[0].end - p[1], p[0].end, top, 0.3, mats.floor, Q.id + '-top-' + (p[0] === A ? 'a' : 'b'), GAL || null).userData.stair = (p[0] === A ? B : A).id;
+        p[0].ha = p[0].end - Math.min(10, p[1] / 2); p[0].dA = p[1];
       });
       if (GAL) {   /* the gallery: a ring from the core to GAL, its edge open on the core */
         var gs = new THREE.Shape(), gh = new THREE.Path(); gs.absarc(0, 0, GAL, 0, Math.PI * 2, false); gh.absarc(0, 0, NR, 0, Math.PI * 2, true); gs.holes.push(gh);
@@ -1985,7 +1988,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       shaftFloors.push({ c: c, r: R, z: top });
       runs.forEach(function (F0) {
         var ha = F0.ha != null ? F0.ha : F0.end;
-        shaftFlights.push({ id: F0.id, foot: end(F0.a0 + 6, PR, F0.z0, F0.a0 - 3 * t, PR, 0.9), head: end(ha, PR, top, ha - 20, R),
+        shaftFlights.push({ id: F0.id, foot: end(F0.a0 + 6, PR, F0.z0, F0.a0 - 3 * t, PR, 0.9), head: F0.dA ? end(ha, PR, top, ha - Math.min(45, F0.dA - (F0.end - ha)), PR, -2 * PR * Math.sin(Math.min(45, F0.dA - (F0.end - ha)) * Math.PI / 360) * Math.tan(40 * Math.PI / 180)) : end(ha, PR, top, ha - 20, R),   /* v149 (req 1985): the head looks 40 degrees down at the top floor ahead of it, in frame, so a touch there goes round to the other flight's head */
           path: F0.path, lamp: [c[0], c[1], F0.z0 + 2.0] });
       });
     }
@@ -2602,6 +2605,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var mk = function (e, name) { return { name: name, pos: toLocal(e.x, e.y, e.z + EYE), look: toLocal(e.lx, e.ly, e.z + EYE + e.up), thing: null, level: e.z }; };
     var fs = mk(f.foot, f.id + ' foot'), hs = mk(f.head, f.id + ' head');
     fs.flight = hs.flight = true;   /* req 856 */
+    if (f.head.up < 0) hs.keepLook = true;   /* v149 (req 1985): a head the stair aims down at the floor ahead keeps that look, not the free room's rest pitch */
     /* v138 (req 1702, Interaction's walk of the towers, the Architect's 288th): a newel stair's foot looked 0.9 up at a spot
        three treads round, 44 degrees over the level, so from a room with no free look (the Ravenclaw rooms on 2 and 5) the
        phone showed only the drum's underside and no touch climbed west-tower-spiral-flight-1. Where it rises more than 30
@@ -2752,7 +2756,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
        rest about the level, not the default 60 and a look up the flight's slope */
     var fl = LK.free && st.flight && !named[st.name];
     st.lim = { rest: pick(L, 'rest', null), down: pick(L, 'down', -14), up: pick(L, 'up', 14), turn: pick(L, 'turn', fl ? 180 : 60) };
-    if (st.lim.rest != null && (st.name === 'start' || named[st.name] || fl)) {
+    if (st.keepLook) st.lim.down = Math.min(st.lim.down, -70);   /* v149 (req 1985): his look is already down, so he may look as far under the level as the stair's own */
+    if (st.lim.rest != null && !st.keepLook && (st.name === 'start' || named[st.name] || fl)) {
       var d = st.look.clone().sub(st.pos), hz = Math.hypot(d.x, d.z) || 1, k = 10 / hz;
       st.look = st.pos.clone().add(new THREE.Vector3(d.x * k, Math.tan(st.lim.rest * Math.PI / 180) * 10, d.z * k));
     }
