@@ -189,7 +189,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="corridor/knight.js?v=2"></script>
-<script src="shell-w5a.js?v=43"></script>
+<script src="shell-w5a.js?v=46"></script>
 <script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=2"></script>
 <script src="castle-sky.js?v=1"></script>
@@ -5950,7 +5950,11 @@ var W1 = (function () {
     [[4.6, 1], [7.8, 3]].forEach(function (c) {
       wc(1.2, c[0], 0, c[1]); wc(1.9, c[0] + 0.7, -90, (c[1] + 1) % 4); wc(2.6, c[0], 180, (c[1] + 2) % 4); wc(1.9, c[0] - 0.7, 90, (c[1] + 3) % 4);
     });
-    [2.0, 6.9, 8.1, 9.3].forEach(function (yp, i) { wc(5.675, yp, 180, (i + 2) % 4); });
+    [2.0, 6.9].forEach(function (yp, i) { wc(5.675, yp, 180, (i + 2) % 4); });
+    /* req 1903 (Interiors' fixtures and density): two armchairs for the wooden chairs at y' 8.1 and 9.3, five in all, no
+       two alike (PoA 7), each turned 20 degrees toward the way, the side table and lamp between them the tool's */
+    armchair(5.1, 8.05, 200, 0.8, 0.42, 0.95, mat('cloth-chintz', 0x8d6a62), true);
+    armchair(5.1, 9.4, 160, 0.8, 0.42, 0.95, mat('leather-green', 0x34402f), false);
     /* the notice board by the door on the window wall, its frame proud of the cork; the two plain frames */
     box(-0.02, 0.5, 1.1, 0.03, 1.4, 1.7, mat('cork', 0x8a6a48));
     [[0.5, 0.54], [1.36, 1.4]].forEach(function (y) { box(0.02, y[0], 1.1, 0.04, y[1], 1.7, dark); });
