@@ -1825,7 +1825,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           /* v16: both sides take the tap; one-sided, its face turned out, a tap from its own room passed through to the
              dark or the room beyond (Events' orrery-stair-arch, 1.56 am, 16 October; every open way alike) */
           fill.material.side = THREE.DoubleSide;
-          if (/fixed open/.test(g.op.kind || '') && !group.getObjectByName(Q.id + '-threshold-' + g.op.id)) {   /* v38: its threshold, as a door's */
+          /* v158 (req 2062, Architect 3: a black strip on the floor across every open mouth between a passage and its corridor,
+             floor 3's): each place draws its floor to its own face and the wall's thickness between them is nobody's, so a
+             mouth on the level (no stair through it, no lift, not lined above) takes a threshold through the wall as a door does */
+          if ((/fixed open/.test(g.op.kind || '') || (!g.back && !via && !lift && !(g.op.depth > t + 0.05))) && !group.getObjectByName(Q.id + '-threshold-' + g.op.id)) {   /* v38: its threshold, as a door's */
             var tl = slab(w, 0.02, t, mats.floor, 'floor'), tp = toLocal(a[0] + ux * sm + nx * t / 2, a[1] + uy * sm + ny * t / 2, Q.floor);
             tl.position.set(tp.x, tp.y + g.sill + 0.01, tp.z); tl.rotation.y = ang; tl.name = Q.id + '-threshold-' + g.op.id; group.add(tl);
           }
