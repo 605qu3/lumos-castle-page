@@ -8618,6 +8618,28 @@ var STORE = PLACE !== 'drum-room-g' || !shell ? null : (function () {
     f.position.set(0, 0.04 + ph / 2, 0.004); f.name = 'storeroom-sitter-' + name;
     return g;
   }
+  /* req 1909, Fixtures and density n 10 to 13 (docs/interiors/gryffindor-storeroom.md): the rack of three rolled hangings on two iron
+     pegs at the west wall (bearing 276); the peg rail on the wall east of the shelf (bearing 160, taken on the wall's face, the cloaks'
+     fronts reaching the schedule's r 4.7); four paintings leaning face-in at bearing 20, their backs to the room; the candle mould and
+     the snuffer on the chest's lid, east of the curtains. Plain, still, nothing glows */
+  var RK = grp(37.76, 2.42, toC(37.76, 2.42));
+  [-0.78, 0.78].forEach(function (u) { box(RK, 0.06, 1.5, 0.06, u, 0.75, -0.15, oak); box(RK, 0.06, 0.04, 0.34, u, 0.02, 0.02, oak); });
+  box(RK, 1.6, 0.5, 0.04, 0, 1.15, -0.15, oakD);
+  [-0.5, 0.5].forEach(function (u) { cyl(RK, 0.02, 0.34, u, 1.1, 0.02, iron, 'x'); });
+  [[-0.09, wool], [0.02, green], [0.13, sheetM]].forEach(function (r) { cyl(RK, 0.055, 1.5, 0, 1.18, r[0], r[1], 'z'); box(RK, 0.02, 0.13, 0.13, -0.4, 1.18, r[0], twig); });
+  var CR = grp(43.9, -2.75, toC(43.9, -2.75));
+  box(CR, 0.9, 0.05, 0.03, 0, 1.5, 0.005, oak);
+  [-0.33, -0.11, 0.11, 0.33].forEach(function (u) { cyl(CR, 0.015, 0.12, u, 1.5, 0.06, iron, 'x'); });
+  [[-0.33, wool], [-0.11, green], [0.11, oakD]].forEach(function (c) { box(CR, 0.2, 0.9, 0.04, c[0], 0.99, 0.13, c[1]); });
+  cyl(CR, 0.045, 0.85, 0.33, 1.05, 0.13, wool); cyl(CR, 0.047, 0.05, 0.33, 1.2, 0.13, gilt);
+  var LP = grp(43.87, 6.55, toC(43.87, 6.55));
+  [[-0.12, 0.6, 0.8], [0.05, 0.55, 0.75], [-0.02, 0.6, 0.7], [0.1, 0.5, 0.8]].forEach(function (p, k) {
+    var s = new THREE.Group(); s.position.set(p[0], 0, 0.12 + 0.05 * k); s.rotateX(-0.125); LP.add(s);
+    box(s, p[1], p[2], 0.03, 0, p[2] / 2, 0, oakD);
+    box(s, p[1] * 0.9, 0.05, 0.02, 0, p[2] * 0.3, 0.025, oak); box(s, p[1] * 0.9, 0.05, 0.02, 0, p[2] * 0.7, 0.025, oak);
+  });
+  box(K, 0.12, 0.14, 0.18, 0.58, 0.72, 0.12, pewter);
+  cyl(K, 0.012, 0.32, 0.58, 0.665, -0.15, iron, 'x'); box(K, 0.05, 0.05, 0.05, 0.58, 0.69, -0.31, brass);
   /* 8 the easel, P4 on it turned to the walk (east), his right as he comes in */
   var E = grp(40.59, 4.45, [1, 0]);
   [-0.33, 0.33].forEach(function (u) { box(E, 0.05, 1.8, 0.05, u, 0.89, 0.02, oak); });   /* the front legs, behind the panel */
