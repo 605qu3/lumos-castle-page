@@ -6055,6 +6055,14 @@ var W1 = (function () {
     shelves(true, 4, -1, 0.4, 1.6, 0.4, SH); shelves(true, 4, -1, 3.4, 4.6, 0.4, SH);
     pedestalDesk(1.7, 1.9, 3.3, 2.7, 0.78);
     chair(2.5, 2.925, -90, 3, dark, 0.275);
+    /* req 2123 (floor B, Pass 3.1, Architect B's draft, docs/interiors/floor-b-and-2-lived-in-1029.md): the marking half done,
+       a sheet on his side of the desk (x' 2.1 to 2.4, y' 2.35 to 2.57, 0.78) with five red lines and two ticks, a dip pen laid
+       across it with its nib in the last line; provisional on Pass 2's yes */
+    var soPaper = mat('so-paper', 0xd8cdb0), soRed = mat('so-red', 0x7a2a22);
+    box(2.1, 2.35, 0.78, 2.4, 2.57, 0.782, soPaper);
+    [[2.14, 2.52, 2.36], [2.14, 2.47, 2.33], [2.14, 2.42, 2.37], [2.14, 2.37, 2.3]].forEach(function (l) { box(l[0], l[1], 0.782, l[2], l[1] + 0.008, 0.7826, soRed); });
+    box(2.36, 2.46, 0.782, 2.38, 2.48, 0.7826, soRed); box(2.36, 2.41, 0.782, 2.38, 2.43, 0.7826, soRed);
+    rod([2.12, 2.64, 0.789], [2.34, 2.39, 0.795], 0.005, dark, 6); rod([2.34, 2.39, 0.795], [2.37, 2.36, 0.789], 0.0022, iron, 4);
     /* req 930: the hard chair set opposite his desk, a plain board back, pushed in to 2 cm off the desk's front panel */
     chair(2.5, 1.71, 90, 1, dark, 0.2);
     /* his private stores, locked: the cupboard on the right wall, its leaves to the room */
@@ -6248,6 +6256,14 @@ var W1 = (function () {
     cyl(64.75, 62.6, 0.9, 1.15, 0.08, crockM, 0.06); cyl(64.75, 64.8, 0.9, 1.12, 0.07, crockM, 0.055);
     /* K8: two flour sacks and the bread crock at the dresser's south end */
     cyl(64.65, 60.95, -0.01, 0.8, 0.22, sackM, 0.14); cyl(64.65, 61.4, -0.01, 0.8, 0.22, sackM, 0.14); cyl(64.0, 61.6, -0.01, 0.45, 0.2, crockM, 0.16);
+    /* req 2123 (floor B, Pass 3.1, Architect B's draft; provisional on Pass 2's yes): a saucepan left unscoured on the hearthstone's
+       south end (x 16.2, y 58.75, 0.11 across, soot-dark inside, its handle out over the stone's edge), and the preserve pot on the
+       dresser base between the jugs (x 64.75, y 63.7) with a linen cloth tied over its mouth */
+    var kPan = mat('pan-unscoured', 0x4a3e2c);
+    cyl(16.2, 58.75, 0.02, 0.1, 0.11, kPan, 0.12); cyl(16.2, 58.75, 0.095, 0.1, 0.1, soot);
+    box(16.3, 58.735, 0.075, 16.56, 58.765, 0.09, iron);
+    var kLin = mat('k-linen', 0xd9d2bd);
+    cyl(64.75, 63.7, 0.9, 1.14, 0.1, crockM, 0.095); cyl(64.75, 63.7, 1.1, 1.16, 0.128, kLin, 0.112); cyl(64.75, 63.7, 1.1, 1.12, 0.108, mat('k-string', 0x7a6a4c), 0.108);
     /* K6: the stone sink on two piers in the south-west corner, its rim at 0.8, the pump on the west wall over it, two buckets under */
     box(15.48, 51.48, 0.55, 17.3, 52.1, 0.8, sinkM); box(15.6, 51.6, 0.8, 17.18, 51.98, 0.808, soot);
     box(15.48, 51.48, -0.01, 15.75, 52.1, 0.55, sinkM); box(17.03, 51.48, -0.01, 17.3, 52.1, 0.55, sinkM);
@@ -6663,6 +6679,13 @@ var W1 = (function () {
     drum(2.48, 15.78, 0.0, 0.3, 0.12, 0.14, RT.tin, 16); drum(2.48, 15.78, 0.24, 0.26, 0.13, 0.13, RT.sand, 16);
     drum(2.96, 15.45, 0.0, 0.3, 0.12, 0.14, RT.tin, 16); drum(2.96, 15.45, 0.08, 0.2, 0.1, 0.12, PB.muslin, 12);
     rod([2.96, 15.45, 0.12], [2.96, 15.58, 1.4], 0.014, RT.deal, 6);
+    /* req 2123 (floor B, Pass 3.1, Architect B's draft, docs/interiors/floor-b-and-2-lived-in-1029.md; provisional on Pass 2's
+       yes): a scoured cauldron upturned to dry on the flags 0.4 in front of the spare nest (its dome x' 9.3, y' 12.85,
+       0.25 across), and a wooden fork laid across the sand bucket's rim, handle to the room, tines over the wall side */
+    var pdDry = new THREE.Mesh(new THREE.SphereGeometry(0.25, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), mat('pd-scoured', 0x46423c));
+    pdDry.material.side = THREE.DoubleSide; pdDry.position.copy(P(9.3, 12.85, 0.005)); add(pdDry);
+    rod([2.06, 15.78, 0.314], [2.56, 15.78, 0.314], 0.013, RT.deal, 6); box(2.56, 15.72, 0.302, 2.62, 15.84, 0.326, RT.deal);
+    [15.73, 15.78, 15.83].forEach(function (ty) { rod([2.62, ty, 0.314], [2.78, ty, 0.314], 0.005, RT.deal, 4); });
   }
 
   /* the 1890s things (reqs 1061 to 1069, ledger 267 to 275, the greenhouses' 268 and the paddock's 272 held with no place in the model; Godric's 1 at 8.12 pm, 23 October 2026, on
