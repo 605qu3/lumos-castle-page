@@ -848,10 +848,20 @@ window.CastleShell = { build: function (F, M, placeId, o) {
       var kerb = new THREE.Mesh(new THREE.LatheGeometry([[tk.r, 0], [tk.r + kr.t, 0], [tk.r + kr.t, kr.h], [tk.r, kr.h], [tk.r, 0]].map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 48), stone);
       kerb.position.copy(L(tc[0], tc[1], 0)); own(kerb, 'tank-kerb');
       var wt = new THREE.Mesh(new THREE.CircleGeometry(tk.r, 48), water); wt.rotation.x = -Math.PI / 2; wt.position.copy(L(tc[0], tc[1], kr.h - 0.15)); own(wt, 'tank-water');
-      [[0.9, 30, 0.55], [1.7, 100, 0.45], [2.2, 200, 0.5], [1.2, 250, 0.4], [2.3, 320, 0.38], [0.4, 160, 0.3], [1.9, 20, 0.42]].forEach(function (lf, k) {
-        var a = lf[1] * Math.PI / 180, d = new THREE.Mesh(new THREE.CircleGeometry(lf[2], 20, 0.3, Math.PI * 2 - 0.3), leaf); d.rotation.x = -Math.PI / 2; d.rotation.z = a;
-        d.position.copy(L(tc[0] + lf[0] * Math.cos(a), tc[1] + lf[0] * Math.sin(a), kr.h - 0.14)); own(d, 'tank-leaf-' + k);
+      var padList = [];
+      if (tk.pads) tk.pads.rings.forEach(function (rg) {                /* v146: the hush-lily's twelve pads (req 1380), each one a mesh at its own centre so it turns about it */
+        for (var pi = 0; pi < rg.n; pi++) padList.push([rg.r, rg.start + pi * 360 / rg.n, tk.pads.d / 2, tk.pads.cleft]);
       });
+      else padList = [[0.9, 30, 0.55], [1.7, 100, 0.45], [2.2, 200, 0.5], [1.2, 250, 0.4], [2.3, 320, 0.38], [0.4, 160, 0.3], [1.9, 20, 0.42]].map(function (lf) { return lf.concat(0.3); });
+      padList.forEach(function (lf, k) {
+        var a = lf[1] * Math.PI / 180, d = new THREE.Mesh(new THREE.CircleGeometry(lf[2], 24, lf[3], Math.PI * 2 - lf[3]), leaf); d.rotation.x = -Math.PI / 2; d.rotation.z = a;
+        d.position.copy(L(tc[0] + lf[0] * Math.cos(a), tc[1] + lf[0] * Math.sin(a), kr.h - 0.14)); own(d, 'tank-' + (tk.pads ? 'pad-' : 'leaf-') + k);
+      });
+      if (tk.bud) {                                                       /* the closed white bud, a teardrop 0.25 across and 0.2 tall, standing on the water */
+        var br = tk.bud.d / 2, bh = tk.bud.h, bp = [[0, 0], [br * 0.8, 0.02], [br, bh * 0.4], [br * 0.7, bh * 0.75], [br * 0.25, bh * 0.95], [0, bh]];
+        var bud = new THREE.Mesh(new THREE.LatheGeometry(bp.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 16), F.solid(0xf1ede2));
+        bud.position.copy(L(tc[0], tc[1], kr.h - 0.15)); own(bud, 'tank-bud');
+      }
     }
     /* the vine's wires: the Architect's (the bunches Objects'), along its rod from the root up the column and the rib */
     if (FT.vine && FT.vine.rod) {
