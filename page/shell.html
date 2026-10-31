@@ -1062,6 +1062,36 @@ var CUP = (function () {
   panG(bw + 0.008, 63.88, bw + 0.02, 64.02, pan[2] + 0.012, pan[2] + 0.17, kit.solid(0x3a332b, { roughness: 1 }), 'cupboard-brush-bristles');
   panG(bw + 0.02, 63.885, bw + 0.04, 64.015, pan[2] + 0.012, pan[2] + 0.17, wood, 'cupboard-brush-back');
   panG(bw + 0.024, 63.935, bw + 0.036, 63.965, pan[2] + 0.17, pan[2] + 0.27, wood, 'cupboard-brush-handle');
+  /* req 1909 / 1900 (docs/interiors/hall-cupboard.md, Fixtures and density, cited), the Architect's: a second plain board on two
+     brackets below the first, top 0.8 up, y 63.76 to 64.6 (the schedule's 63.5 starts inside the south mop, whose stick stands
+     at y 63.62, so it begins 0.04 clear of it), holding a tin of blacking and a bar of soap, both clear of the pan (its lip at
+     0.95); three hooks on the north wall at 1.7, x 66.58, 66.86 and 67.0 (the schedule's span ends at 67.2, but the near besom's
+     handle meets the wall at 67.1), the leather apron on the first, the feather duster on the second, the third bare; a rag
+     bag on the flags by the south wall at x 66.8 (west of the upturned bucket's rim, south of the grains' crack, which begins at
+     y 63.45) and a pail of sand at x 67.3, y 63.38, clear of the rim by 0.2 and of the door's span (y 63.6 to 64.4) by 0.1.
+     The pieces named in the table (feather-duster-1, leather-apron-1, hessian-sack-1, tin-bucket-1) are drawn plain here, as the
+     shelf and the besoms are; the soap bar has no piece yet */
+  var leather = kit.solid(0x5a4030, { roughness: 0.9 }), hess = kit.solid(0x8a7b5c, { roughness: 1 }), fluff = kit.solid(0x8a8070, { roughness: 1 }),
+      sandM = kit.solid(0xb8a67c, { roughness: 1 }), blk = kit.solid(0x22201e, { roughness: 0.4 }), soapM = kit.solid(0x9a8f78, { roughness: 0.7 });
+  panG(bw - 0.02, 63.76, bw + 0.22, 64.6, 0.78, 0.8, wood, 'cupboard-shelf-low');
+  [63.84, 64.52].forEach(function (y) { panG(bw - 0.02, y - 0.01, bw + 0.16, y + 0.01, 0.62, 0.78, ironC, 'cupboard-shelf-low-bracket'); });
+  var bk = own(new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.05, 18), blk), 'cupboard-blacking-tin'); bk.position.copy(P(bw + 0.12, 64.28, 0.825));
+  var bkl = own(new THREE.Mesh(new THREE.CylinderGeometry(0.047, 0.047, 0.008, 18), tin), 'cupboard-blacking-lid'); bkl.position.copy(P(bw + 0.12, 64.28, 0.853));
+  panG(bw + 0.08, 63.93, bw + 0.16, 63.99, 0.8, 0.83, soapM, 'cupboard-soap');
+  [66.58, 66.86, 67.0].forEach(function (x) {
+    panG(x - 0.012, r[3] - 0.05, x + 0.012, r[3], 1.69, 1.71, ironC, 'cupboard-hook');
+    panG(x - 0.012, r[3] - 0.05, x + 0.012, r[3] - 0.034, 1.71, 1.74, ironC, 'cupboard-hook-tip');
+  });
+  panG(66.43, r[3] - 0.03, 66.73, r[3] - 0.01, 1.12, 1.62, leather, 'cupboard-apron');
+  panG(66.565, r[3] - 0.045, 66.595, r[3] - 0.01, 1.62, 1.7, leather, 'cupboard-apron-loop');
+  panG(66.45, r[3] - 0.035, 66.71, r[3] - 0.03, 1.38, 1.4, hess, 'cupboard-apron-pocket');
+  panG(66.852, r[3] - 0.03, 66.868, r[3] - 0.012, 1.44, 1.7, wood, 'cupboard-duster-handle');
+  var dp = own(new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.058, 0.34, 12), fluff), 'cupboard-duster-plume'); dp.position.copy(P(66.86, r[3] - 0.062, 1.28));
+  var rb = own(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.28, 14), hess), 'cupboard-rag-bag'); rb.position.copy(P(66.8, 63.33, 0.14));
+  var rbn = own(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.1, 0.1, 12), hess), 'cupboard-rag-bag-neck'); rbn.position.copy(P(66.8, 63.33, 0.33));
+  var rbc = own(new THREE.Mesh(new THREE.TorusGeometry(0.036, 0.006, 6, 14), leather), 'cupboard-rag-bag-cord'); rbc.rotation.x = Math.PI / 2; rbc.position.copy(P(66.8, 63.33, 0.37));
+  var sp = bucket(67.3, 63.38, false, 1); sp.name = 'cupboard-sand-pail'; sp.userData.owner = 'hall-cupboard'; sp.raycast = function () {};
+  var sd = own(new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.135, 0.01, 18), sandM), 'cupboard-sand'); sd.position.copy(P(67.3, 63.38, 0.26));
   var taps = [['hall-cupboard-bucket', ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, 0.17, 0.36], ['hall-cupboard-bottle', sx, 64.3, 0.1, 0.24],
               ['hall-cupboard-tin', sx, 64.08, 0.08, 0.09]].map(function (t) {
     var m = new THREE.Mesh(new THREE.BoxGeometry(t[3] * 2, t[4], t[3] * 2), new THREE.MeshBasicMaterial({ visible: false }));
