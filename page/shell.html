@@ -4885,6 +4885,61 @@ thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE
   bal.forEach(function (p, k) { M4.makeTranslation(0, 0, 0); M4.setPosition(L(p[0], p[1], SL + 0.13 + 0.41)); bm.setMatrixAt(k, M4); });
   own(bm, 'h82-rail-balusters');
 })();
+/* H82's watering fixtures (req 1380, ledger 313; Interiors' docs/interiors/glass-house.md, *The lake-cock and the opera
+   glasses*, the roses revised for req 1383): the cast-iron standard with its brass valve and handwheel on the pool's
+   coping, the copper pipe clipped up it to 9.5 and in to the ridge, the six drops with their roses, the overflow grating.
+   The standard stands on the coping's mid-line (r 1.85, on the schedule's bearing from the pool's centre) since the
+   built coping is r 1.7 to 2.0 and the schedule's (19.0, -23.9) is r 2.15, off it: flag for Interiors. The vault's
+   height over a point is the barrel's ellipse (springs 6.0 at y -31 and -13, crown 10.5 at y -22), 0.05 inside the glass.
+   Drawn plain; the wheel's turn, the rain and the beds' look are Events' */
+(function () {
+  if (PLACE !== 'h82-glass-house') return;
+  var z0 = shell.place.floor;
+  var root = new THREE.Group(); root.name = 'h82-watering'; root.userData.owner = PLACE; shell.group.add(root);
+  function L(x, y, h) { return shell.toLocal(x, y, z0 + h); }
+  function own(m, name) { m.name = name; m.userData.owner = PLACE; m.raycast = function () {}; root.add(m); return m; }
+  var iron = kit.solid(0x3d5a44, { roughness: 0.6, metalness: 0.2 }), brass = kit.solid(0xb08d3a, { roughness: 0.4, metalness: 0.6 }),
+      copper = kit.solid(0xb5651d, { roughness: 0.45, metalness: 0.6 }), dark = kit.solid(0x1c1d1c, { roughness: 0.55, metalness: 0.3 });
+  function box(x0, y0, h0, x1, y1, h1, mat, name) {
+    var a = L(x0, y0, h0), b = L(x1, y1, h1), m = own(new THREE.Mesh(new THREE.BoxGeometry(Math.abs(b.x - a.x), Math.abs(b.y - a.y), Math.abs(b.z - a.z)), mat), name);
+    m.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, (a.z + b.z) / 2); return m;
+  }
+  function rod(a, b, r, mat, name) {                                  /* a cylinder between two model points [x, y, h] */
+    var pa = L(a[0], a[1], a[2]), pb = L(b[0], b[1], b[2]), d = pb.clone().sub(pa), m = own(new THREE.Mesh(new THREE.CylinderGeometry(r, r, d.length(), 8), mat), name);
+    m.position.copy(pa.clone().add(pb).multiplyScalar(0.5)); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return m;
+  }
+  function vault(y) { var t = (y + 22) / 9; return 6.0 + 4.5 * Math.sqrt(Math.max(0, 1 - t * t)) - 0.05; }
+  /* the lake-cock: base 0.3 square 0.1 high on the coping (0.35), the standard 0.1 across, the brass valve body at 0.7 to 0.9,
+     the handwheel 0.16 across at 1.0 on a short spindle south, the label 0.1 by 0.04 on the valve's south face */
+  var ang = Math.atan2(-23.9 + 22, 19.0 - 18), sx = 18 + 1.85 * Math.cos(ang), sy = -22 + 1.85 * Math.sin(ang);
+  box(sx - 0.15, sy - 0.15, 0.35, sx + 0.15, sy + 0.15, 0.45, iron, 'h82-cock-base');
+  rod([sx, sy, 0.45], [sx, sy, 1.15], 0.05, iron, 'h82-cock-standard');
+  rod([sx, sy, 0.7], [sx, sy, 0.9], 0.065, brass, 'h82-cock-valve');
+  rod([sx, sy, 1.0], [sx, sy - 0.1, 1.0], 0.012, brass, 'h82-cock-spindle');
+  var wh = own(new THREE.Mesh(new THREE.TorusGeometry(0.07, 0.01, 6, 20), brass), 'h82-cock-wheel');
+  wh.position.copy(L(sx, sy - 0.1, 1.0)); wh.rotation.x = Math.PI / 2;
+  box(sx - 0.05, sy - 0.07, 0.78, sx + 0.05, sy - 0.066, 0.82, brass, 'h82-cock-label');
+  /* the pipe: 0.04 across, clipped to the standard's east side, up to 9.5, in to the ridge over the pool, then the six drops */
+  var px = sx + 0.075;
+  rod([px, sy, 0.45], [px, sy, 9.5], 0.02, copper, 'h82-pipe-riser');
+  for (var c = 1; c * 1.2 < 9.5; c++) rod([px, sy, c * 1.2 - 0.015], [px, sy, c * 1.2 + 0.015], 0.03, brass, 'h82-pipe-clip-' + c);
+  var RZ = vault(-22) - 0.15;
+  rod([px, sy, 9.5], [18, -22, RZ], 0.02, copper, 'h82-pipe-feed');
+  [[14.95, -16.25, 7.0], [23.05, -16.25, 7.0], [24.4, -22.4, 7.0], [14.95, -27.9, 7.0], [23.05, -28.15, 7.0], [13.6, -22.0, 4.0]].forEach(function (r, k) {
+    var prev = [r[0], -22, RZ], steps = 6;                          /* along the ridge to the rose's x, then down its rib's arc to its y */
+    rod([18, -22, RZ], prev, 0.02, copper, 'h82-pipe-ridge-' + k);
+    for (var s = 1; s <= steps; s++) {
+      var y = -22 + (r[1] + 22) * s / steps, nx = [r[0], y, vault(y) - 0.1];
+      rod(prev, nx, 0.02, copper, 'h82-pipe-rib-' + k + '-' + s); prev = nx;
+    }
+    rod(prev, [r[0], r[1], r[2]], 0.015, copper, 'h82-drop-' + k);
+    var rose = own(new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.08, 20), brass), 'h82-rose-' + k);
+    rose.position.copy(L(r[0], r[1], r[2] - 0.04));
+  });
+  /* the overflow grating, flush in the gravel (8 mm) at the coping's foot, south-west: iron 0.3 by 0.2, five slits */
+  box(16.75, -23.8, 0.006, 17.05, -23.6, 0.011, dark, 'h82-grating');
+  for (var gs = 0; gs < 5; gs++) box(16.78 + gs * 0.055, -23.78, 0.011, 16.82 + gs * 0.055, -23.62, 0.0125, kit.solid(0x14100c, { roughness: 1 }), 'h82-grating-slit-' + gs);
+})();
 /* H82's glass house under the lake (req 1099, rough): the model's barrel vault (springs 6.0, crown 10.5) turned to a pale
    green glass seen through, and the lake behind it as one box of deep green water, its faces 8 mm inside the room's walls
    and from the springing to 1.2 over the crown, drawn from inside; the lake bed's weeds and light are the next pass */
