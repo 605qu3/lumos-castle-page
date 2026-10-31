@@ -1697,7 +1697,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           var deep = g.op.depth > t + 0.05;
           if (!(deep && out.rounded[g.op.id])) {
             if (deep) out.rounded[g.op.id] = Q.id;
-            var rr = w / 2, BR = 0.02, sp = new THREE.Shape(), dd = (deep ? g.op.depth : t) - 0.01, up = hk === 'pointed' ? Math.sqrt(3) * rr : hk === 'tudor' ? CastleTrim.rise('tudor', rr, 0) : rr;
+            var rr = w / 2, BR = 0.02, sp = new THREE.Shape(), fin = TRIM ? 0.0008 : 0.005, dd = (deep ? g.op.depth : t) - 2 * fin, up = hk === 'pointed' ? Math.sqrt(3) * rr : hk === 'tudor' ? CastleTrim.rise('tudor', rr, 0) : rr;
             sp.moveTo(-rr, 0); sp.lineTo(-rr - BR, 0); sp.lineTo(-rr - BR, up + BR); sp.lineTo(rr + BR, up + BR); sp.lineTo(rr + BR, 0); sp.lineTo(rr, 0);
             if (hk === 'tudor') { for (var ti = 24; ti >= 0; ti--) { var tp = CastleTrim.prof('tudor', rr, 0, ti / 24); sp.lineTo(tp[0], tp[1]); } }
             else if (hk === 'pointed') { sp.absarc(-rr, 0, 2 * rr, 0, Math.PI / 3, false); sp.absarc(rr, 0, 2 * rr, 2 * Math.PI / 3, Math.PI, false); }
@@ -1710,7 +1710,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
             var spSide = TRIM && row ? trimMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h) : null;   /* v152 (req 2011): the fill's two caps stay wall, its sides (the head's intrados through the wall's depth) are the casing's dressed stone, so the ring and the reveal read as one */
             var spd = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sp, { depth: dd, bevelEnabled: false, curveSegments: 16 }), spm), LAYER.wall);
             if (spSide) spd.material = [spm, spSide];
-            spd.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - up, mid.z + Math.cos(ang) * 0.005); spd.rotation.y = ang;
+            spd.position.set(mid.x + Math.sin(ang) * fin, mid.y + g.h - up, mid.z + Math.cos(ang) * fin);   /* v154 (req 2011): under TRIM the fill stands 0.8 mm inside each face, not 5, so the cut's reveal at the springing is no hairline */ spd.rotation.y = ang;
             spd.name = Q.id + '-round-head-' + g.op.id; spd.userData.owner = Q.id; group.add(spd);
           }
         }
