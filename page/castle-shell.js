@@ -968,6 +968,39 @@ window.CastleShell = { build: function (F, M, placeId, o) {
          out as if the corbels were piers, then each pier gives way to a corbel bearing 2 cm into its wall */
       if (VB && VB.corbels && !(VB.piers || []).length)
         QC = Object.assign({}, Q, { rec: Object.assign({}, Q.rec, { vault: Object.assign({}, VB, { piers: VB.corbels }) }) });
+      /* v157 (req 2048, Architect 3: the Charms store's pier stood straight ahead of its door; the scan found 24 rooms with one):
+         a groin whose model gives no piers takes ceilings.js's rule (aisles no wider than 6 m, bays about as long as an aisle is wide,
+         the piers on the centre line of a room of two aisles); where a door in an end wall, the wall the row runs toward, has that
+         row's pier within the doorway's width and a pier's radius and a hand's breadth (0.6) of its line, the row is moved sideways,
+         the least that clears every such door, and the piers are given as site points. No door in the way, no change */
+      if (row.ceiling === 'groin' && QC === Q && !(VB && ((VB.piers || []).length || VB.corbels)) && Q.poly.length === 4 && Q.poly.every(function (v) {
+        return (Math.abs(v[0] - x0) < 0.01 || Math.abs(v[0] - x1) < 0.01) && (Math.abs(v[1] - y0) < 0.01 || Math.abs(v[1] - y1) < 0.01); })) {
+        var gW = x1 - x0, gD = y1 - y0, gWide = Math.min(gW, gD), gLong = Math.max(gW, gD), gNa = Math.max(1, Math.ceil(gWide / 6 - 1e-6)), gAw = gWide / gNa,
+          gNb = Math.max(1, Math.round(gLong / gAw)), gRowX = gW < gD;   /* the row runs along y at one x when the room is longer in y */
+        if (gNa > 1) {
+          var gEnds = (M.openings || []).filter(function (op) {
+            if (!op.at || /window|hidden|loop|slit/.test(op.kind || '') || !matches(M, op, Q.id)) return false;
+            return gRowX ? Math.min(Math.abs(op.at[1] - y0), Math.abs(op.at[1] - y1)) < 0.6 : Math.min(Math.abs(op.at[0] - x0), Math.abs(op.at[0] - x1)) < 0.6; });
+          var gLo = gRowX ? x0 : y0, gSpan = gWide, gMoved = false, gAcross = [];
+          for (var gi = 1; gi < gNa; gi++) gAcross.push(gLo + gi * gSpan / gNa);
+          gAcross = gAcross.map(function (c) {
+            var need = function (op) { return (op.w || 0.9) / 2 + 0.45 + 0.6; }, at = function (op) { return gRowX ? op.at[0] : op.at[1]; };
+            if (gEnds.every(function (op) { return Math.abs(c - at(op)) >= need(op); })) return c;
+            var cands = [];
+            gEnds.forEach(function (op) { cands.push(at(op) - need(op), at(op) + need(op)); });
+            cands = cands.filter(function (v) { return v > gLo + 1.0 && v < gLo + gSpan - 1.0 && gEnds.every(function (op) { return Math.abs(v - at(op)) >= need(op) - 1e-6; }); })
+              .sort(function (u, v) { return Math.abs(u - c) - Math.abs(v - c); });
+            if (!cands.length) return c;
+            gMoved = true; return cands[0];
+          });
+          if (gMoved) {
+            var gAlong = [], gOff = gRowX ? y0 : x0, gLen = gRowX ? gD : gW, gPiers = [];
+            for (var gj = 1; gj < gNb; gj++) gAlong.push(gOff + gj * gLen / gNb);
+            gAcross.forEach(function (c) { gAlong.forEach(function (u) { gPiers.push(gRowX ? [c, u] : [u, c]); }); });
+            QC = Object.assign({}, Q, { rec: Object.assign({}, Q.rec, { vault: Object.assign({}, VB || {}, { piers: gPiers }) }) });
+          }
+        }
+      }
       /* v79 (the Architect's 159th, for Godric's card on the classrooms' beams; o.bays 'piers', the page's ?bays=piers):
          a beamed room whose long walls carry windows at one even pitch takes its beams on the piers between them, at
          that pitch on out toward the end walls while 0.6 clear of them, so each window stands in the middle of its bay */
