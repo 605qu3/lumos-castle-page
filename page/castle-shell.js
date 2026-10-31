@@ -383,7 +383,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      (worn or rough flags: stores, service, shafts, hidden ways; page/design/room-tags-<F>.js) lays the schedule's flags a
      tenth darker; the schedule (castle-paint.js) stays the floor's kind, the tag only its wear */
   var TAGS = window.CASTLE_ROOM_TAGS || {};
-  function wornAt(id) { for (var f in TAGS) { var t = TAGS[f].rooms && TAGS[f].rooms[id]; if (t) return t.surface === 'stone'; } return false; }
+  function wornAt(id) { var t = TAGS.G && TAGS.G.rooms && TAGS.G.rooms[id]; return !!t && t.surface === 'stone'; }   /* v145: G's alone, as when only its tags loaded */
+  /* v145 (req 1928, Design's floors by room use, Godric's 1 on req 1921, 30 October 2026): a room's floor kind by its use
+     (page/design/room-use.js, from Design's room tags; the textures page/design/floor-kit.js). A use not listed here keeps the
+     flat floor its schedule gives, and is listed back to Design: library, display, workroom, defence, lookout, loft, magic, hidden, stair, unset */
+  var FLOOR_USE = { hall: 'flags', passage: 'flags', cellar: 'flags', teaching: 'oak', sleeping: 'oak', living: 'oak', sick: 'oak',
+    study: 'quarry', store: 'setts', service: 'setts', wash: 'encaustic' };
+  var ROOM_USE = window.CASTLE_ROOM_USE || {};
   var paintMats = {}, damp = false;   /* v45: a place below ground reads Design's damp keys first (req 824) */
   function hexOf(v) { return typeof v === 'string' ? parseInt(v.replace('#', ''), 16) : v; }
   function shade(h, k) { return (Math.min(255, Math.round((h >> 16 & 255) * k)) << 16) | (Math.min(255, Math.round((h >> 8 & 255) * k)) << 8) | Math.min(255, Math.round((h & 255) * k)); }
@@ -406,7 +412,10 @@ window.CastleShell = { build: function (F, M, placeId, o) {
   }
   function rowOf(Q) {   /* a room's row, or a mass's (the stair hall) with its runs at Q's floor */
     if (!PAINT || painted.indexOf(Q.id) < 0) return null;
-    if (PAINT.rooms[Q.id]) return wornAt(Q.id) ? Object.assign({ worn: true }, PAINT.rooms[Q.id]) : PAINT.rooms[Q.id];   /* v121 */
+    if (PAINT.rooms[Q.id]) {   /* v121 worn; v145 use */
+      var wn = wornAt(Q.id), us = ROOM_USE[Q.id];
+      return wn || us ? Object.assign({ worn: wn, use: us }, PAINT.rooms[Q.id]) : PAINT.rooms[Q.id];
+    }
     var lv = (M.levels || []).filter(function (l) { return Math.abs(l.z - Q.floor) < 0.05; })[0];
     var ms = PAINT.masses.filter(function (m) { return slug(m.id) === Q.id; });
     var m = ms.filter(function (q) { return lv && q.level === lv.id; })[0] || ms[0];
@@ -444,7 +453,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     return faced(st, window.CastleStoneFace && CastleStoneFace.kind('ashlar'), tone(st + '/ashlar', st, 1.08), true);
   }
   function floorMat(row, sx, sy, two) {
-    var st = stoneAt(row, sx, sy);
+    var st = stoneAt(row, sx, sy), kind = FLOOR_USE[row.use];
+    /* v145: a schedule's marble and earth stand; every other floor takes its use's kind when the kit is loaded */
+    if (kind && window.FloorKit && row.floor !== 'marble' && row.floor !== 'earth' && !row.mass) return FloorKit.mat(paintMat(0x808080, two), kind, 0.6);
     if (row.floor === 'boards' || row.floor === 'marble') return paintMat(tone(row.floor === 'boards' ? 'oak-boards' : 'marble'), two);
     if (row.floor === 'earth') return paintMat(tone('earth'), two);   /* v72: the cellar under the Gryffindor storeroom, a cave's earthen floor (ledger 228) */
     var fh = tone('flags-' + st, st, 0.86);
