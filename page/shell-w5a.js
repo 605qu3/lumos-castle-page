@@ -3057,6 +3057,153 @@ window.SHELL_W5A = {
   /* G-ADDS end elves-linen-room */
 })(window.SHELL_W5A.things);
 /* G-ADDS finish */
+/* G-PURPOSE begin */
+/* req 1969: the by-purpose fixtures (docs/interiors/ground-floor-by-purpose-1031.md), written by
+   tools/architect-g-purpose.py: never edit by hand. Each adds to its room's things. */
+(function (T) {
+  function add(id, items) { T[id] = T[id] || { items: [] }; T[id].items = T[id].items.concat(items); }
+  /* G-PURPOSE cloakroom-g */
+  /* req 1969, by-purpose n 2: a boot rack with dubbin tins and a bucket, three umbrellas, a drying rail, a mud brush and pan, a basket of odd gloves */
+  add('cloakroom-g', [
+    ['b', 111.37, 56.93, 0, 112.57, 57.23, 0.4, 'oak'], ['y', 112.7, 57.18, 0.05, 0, 0.1, 'tin'], ['y', 112.88, 57.18, 0.05, 0, 0.1, 'tin'], ['y', 113.16, 57.08, 0.15, 0, 0.3, 'leather'],
+    ['y', 111.17, 56.38, 0.03, 0, 0.9, 'black'], ['y', 111.17, 56.52, 0.03, 0, 0.9, 'black'], ['y', 111.17, 56.66, 0.03, 0, 0.9, 'black'], ['b', 117.43, 51.85, 1.9, 117.5, 53.51, 1.96, 'iron'],
+    ['b', 117.35, 51.93, 1.84, 117.45, 53.43, 1.9, 'wood'], ['b', 111.14, 55.9, 0, 111.32, 56.2, 0.12, 'wood'], ['y', 116.37, 56.98, 0.25, 0, 0.35, 'wicker'], ['b', 116.7, 57.11, 0, 116.95, 57.23, 0.08, 'scarlet']]);
+  /* G-PURPOSE end cloakroom-g */
+  /* G-PURPOSE classroom-eleven */
+  /* req 1969, by-purpose n 3: slates and chalk on a shelf, a fire bucket, a lectern, the register on a shelf, a coat stand by the door */
+  add('classroom-eleven', [
+    ['b', 129.07, 65.1, 1.0, 129.27, 67.74, 1.03, 'oak'], ['b', 129.19, 65.18, 1.03, 129.21, 65.48, 1.25, 'slate'], ['b', 129.19, 65.56, 1.03, 129.21, 65.86, 1.25, 'slate'], ['b', 129.19, 65.94, 1.03, 129.21, 66.24, 1.25, 'slate'],
+    ['b', 129.19, 66.32, 1.03, 129.21, 66.62, 1.25, 'slate'], ['b', 129.19, 66.7, 1.03, 129.21, 67.0, 1.25, 'slate'], ['b', 129.19, 67.08, 1.03, 129.21, 67.38, 1.25, 'slate'], ['b', 129.09, 67.46, 1.03, 129.21, 67.66, 1.11, 'oak'],
+    ['y', 129.08, 62.05, 0.15, 0, 0.28, 'tin'], ['b', 124.8, 60.77, 0, 125.3, 61.17, 1.1, 'oak'], ['b', 118.23, 66.2, 1.3, 118.49, 66.61, 1.33, 'oak'], ['b', 118.29, 66.28, 1.33, 118.47, 66.53, 1.38, 'leather'],
+    ['b', 118.8, 60.77, 0, 119.6, 61.07, 1.8, 'oak']]);
+  /* G-PURPOSE end classroom-eleven */
+  /* G-PURPOSE potting-room */
+  /* req 1969, by-purpose n 4: sacks of soil, a sieve, a watering can, six seed trays, cut pots, an apron and gloves, bean canes (gap), the sowing ledger */
+  add('potting-room', [
+    ['y', 148.07, 20.25, 0.2, 0, 0.6, 'canvas'], ['y', 148.07, 20.73, 0.2, 0, 0.6, 'canvas'], ['y', 148.07, 21.21, 0.2, 0, 0.6, 'canvas'], ['b', 159.95, 20.25, 1.6, 160.02, 20.71, 1.66, 'iron'],
+    ['b', 159.87, 20.33, 1.55, 159.97, 20.63, 1.6, 'wood'], ['y', 147.98, 25.16, 0.11, 0, 0.3, 'tin'], ['b', 159.66, 21.75, 0.9, 160.02, 25.01, 0.93, 'oak'], ['b', 159.66, 21.83, 0.93, 159.96, 22.28, 1.0, 'wood'],
+    ['b', 159.66, 22.36, 0.93, 159.96, 22.81, 1.0, 'wood'], ['b', 159.66, 22.89, 0.93, 159.96, 23.34, 1.0, 'wood'], ['b', 159.66, 23.42, 0.93, 159.96, 23.87, 1.0, 'wood'], ['b', 159.66, 23.95, 0.93, 159.96, 24.4, 1.0, 'wood'],
+    ['b', 159.66, 24.48, 0.93, 159.96, 24.93, 1.0, 'wood'], ['y', 158.875, 18.395, 0.125, 0, 0.25, 'brick'], ['y', 159.205, 18.395, 0.125, 0, 0.25, 'brick'], ['y', 159.535, 18.395, 0.125, 0, 0.25, 'brick'],
+    ['b', 158.45, 18.23, 1.7, 159.39, 18.3, 1.76, 'iron'], ['b', 158.53, 18.28, 0.9, 158.98, 18.33, 1.7, 'leather'], ['b', 159.06, 18.28, 1.64, 159.31, 18.43, 1.7, 'leather'], ['y', 159.88, 27.1, 0.1, 0, 1.2, 'wood'],
+    ['y', 159.88, 27.38, 0.1, 0, 1.2, 'wood'], ['b', 152.6, 18.23, 1.2, 153.01, 18.49, 1.23, 'oak'], ['b', 152.68, 18.29, 1.23, 152.93, 18.47, 1.28, 'leather']]);
+  /* G-PURPOSE end potting-room */
+  /* G-PURPOSE herbology-study-g */
+  /* req 1969, by-purpose n 5: a reading desk with lamp, catalogue and marking, spare boots, a pot of cuttings and a cup, a watering can */
+  add('herbology-study-g', [
+    ['t', 151.25, 38.46, 152.45, 39.06, 0.75, 'oak'], ['y', 151.445, 38.925, 0.075, 0.75, 1.05, 'brass'], ['b', 151.6, 38.8, 0.75, 151.9, 39.0, 0.9, 'leather'], ['b', 148.5, 28.94, 0, 149.1, 29.34, 0.03, 'straw'],
+    ['b', 159.69, 34.47, 0.9, 160.02, 35.04, 0.93, 'oak'], ['y', 159.835, 34.675, 0.125, 0.93, 1.18, 'brick'], ['y', 159.92, 34.92, 0.04, 0.93, 0.99, 'blue'], ['y', 147.98, 37.03, 0.11, 0, 0.3, 'tin']]);
+  /* G-PURPOSE end herbology-study-g */
+  /* G-PURPOSE porters-lodge */
+  /* req 1969, by-purpose n 6: the great key, a lost-property shelf and basket, the visitors book, an armchair, a table with mug and sugar bowl, a notice board, a lantern */
+  add('porters-lodge', [
+    ['b', 104.98, 50.86, 1.6, 105.16, 50.89, 1.9, 'iron'], ['b', 104.23, 55.1, 1.1, 104.43, 55.67, 1.13, 'oak'], ['b', 104.29, 55.18, 1.13, 104.41, 55.43, 1.21, 'scarlet'], ['b', 104.29, 55.51, 1.13, 104.41, 55.59, 1.17, 'blue'],
+    ['y', 104.52, 55.85, 0.25, 0, 0.35, 'wicker'], ['t', 104.8, 56.63, 106.4, 57.23, 0.8, 'pine'], ['b', 104.92, 56.99, 0.8, 105.17, 57.17, 0.85, 'leather'], ['b', 105.25, 57.13, 0.8, 105.4, 57.17, 0.83, 'wood'],
+    ['b', 109.8, 53.7, 0, 110.6, 54.5, 0.9, 'leather'], ['t', 110.0, 55.2, 110.6, 56.8, 0.8, 'pine'], ['y', 110.5, 55.36, 0.04, 0.8, 0.89, 'white'], ['y', 110.49, 55.53, 0.05, 0.8, 0.87, 'white'],
+    ['b', 108.73, 57.21, 1.2, 109.53, 57.24, 1.8, 'paper'], ['y', 110.5, 51.69, 0.11, 1.8, 2.2, 'brass']]);
+  /* G-PURPOSE end porters-lodge */
+  /* G-PURPOSE staff-dining-room */
+  /* req 1969, by-purpose n 7: a cruet and salt box, a tea urn and cups, a knife and napkins, a clock on a shelf */
+  add('staff-dining-room', [
+    ['t', 129.77, 64.0, 130.37, 65.6, 0.8, 'pine'], ['b', 129.83, 64.12, 0.8, 129.97, 64.32, 1.0, 'oak'], ['y', 129.89, 64.46, 0.06, 0.8, 1.0, 'white'], ['t', 140.13, 63.15, 140.73, 64.75, 0.8, 'pine'],
+    ['y', 140.58, 63.36, 0.09, 0.8, 1.0, 'steel'], ['y', 140.63, 63.57, 0.04, 0.8, 0.9, 'steel'], ['y', 140.63, 63.73, 0.04, 0.8, 0.9, 'steel'], ['y', 140.63, 63.89, 0.04, 0.8, 0.9, 'steel'],
+    ['y', 140.63, 64.05, 0.04, 0.8, 0.9, 'steel'], ['t', 136.4, 71.38, 138.0, 71.98, 0.8, 'pine'], ['b', 136.52, 71.88, 0.8, 136.77, 71.92, 0.82, 'steel'], ['b', 136.85, 71.72, 0.8, 137.1, 71.92, 0.82, 'white'],
+    ['b', 136.25, 60.73, 1.5, 136.66, 60.93, 1.53, 'oak'], ['b', 136.33, 60.79, 1.53, 136.58, 60.91, 1.83, 'wood']]);
+  /* G-PURPOSE end staff-dining-room */
+  /* G-PURPOSE staff-bedroom-g */
+  /* req 1969, by-purpose n 8: a chair and coat, slippers, a bedside cupboard with book and clock, a jug and basin, a trunk */
+  add('staff-bedroom-g', [
+    ['b', 152.27, 55.4, 0, 152.72, 55.85, 0.9, 'oak'], ['b', 152.23, 55.4, 1.9, 152.3, 56.06, 1.96, 'iron'], ['b', 152.28, 55.48, 1.0, 152.43, 55.98, 1.9, 'dark'], ['b', 159.86, 54.55, 0, 159.98, 54.63, 0.04, 'blue'],
+    ['b', 159.86, 54.71, 0, 159.98, 54.79, 0.04, 'blue'], ['t', 159.58, 53.1, 159.98, 53.55, 0.65, 'oak'], ['b', 159.72, 53.22, 0.65, 159.92, 53.52, 0.8, 'leather'], ['b', 159.84, 53.2, 1.0, 160.02, 53.46, 1.03, 'oak'],
+    ['y', 159.91, 53.33, 0.05, 1.03, 1.15, 'brass'], ['t', 157.75, 56.83, 158.25, 57.23, 0.85, 'white'], ['y', 157.93, 57.11, 0.06, 0.85, 1.05, 'white'], ['b', 153.65, 56.73, 0, 154.55, 57.23, 0.5, 'leather']]);
+  /* G-PURPOSE end staff-bedroom-g */
+  /* G-PURPOSE elves-service-stair-g */
+  /* req 1969, by-purpose n 9: tea cloths, a laundry sack, coal scuttle, scrubbing pail, a call slate, a lantern, polish tins, a stool, a tray trolley (gap) */
+  add('elves-service-stair-g', [
+    ['b', 11.81, 24.35, 1.0, 12.17, 25.39, 1.03, 'oak'], ['b', 11.81, 24.43, 1.03, 12.11, 24.83, 1.15, 'linen'], ['b', 11.81, 24.91, 1.03, 12.11, 25.31, 1.15, 'linen'], ['y', 0.47, 26.2, 0.2, 0, 0.6, 'canvas'],
+    ['y', 0.52, 21.4, 0.25, 0, 0.35, 'wicker'], ['b', 0.27, 21.73, 0, 0.3, 21.78, 0.08, 'tin'], ['y', 6.1, 28.25, 0.15, 0, 0.3, 'wood'], ['b', 6.33, 28.33, 0, 6.53, 28.4, 0.06, 'wood'],
+    ['b', 6.28, 18.26, 1.4, 6.58, 18.28, 1.62, 'slate'], ['y', 0.37, 23.39, 0.11, 2.0, 2.4, 'brass'], ['b', 2.5, 18.23, 1.3, 3.3, 18.41, 1.33, 'oak'], ['y', 2.63, 18.34, 0.05, 1.33, 1.43, 'tin'],
+    ['y', 2.81, 18.34, 0.05, 1.33, 1.43, 'tin'], ['y', 2.99, 18.34, 0.05, 1.33, 1.43, 'tin'], ['y', 3.17, 18.34, 0.05, 1.33, 1.43, 'tin'], ['y', 9.71, 28.24, 0.16, 0, 0.45, 'wood'],
+    ['b', 11.63, 21.4, 0, 12.13, 22.3, 0.85, 'wood']]);
+  /* G-PURPOSE end elves-service-stair-g */
+  /* G-PURPOSE elves-linen-room */
+  /* req 1969, by-purpose n 10: two sorting tables, baskets, a copper tub, a mangle and a clothes horse (gap), a second airing rail, a mending box, tagged sheets, a linen ledger, soap and starch, lavender */
+  add('elves-linen-room', [
+    ['y', 12.4, 69.43, 0.25, 0, 0.35, 'wicker'], ['y', 12.98, 69.43, 0.25, 0, 0.35, 'wicker'], ['b', 8.2, 69.18, 0, 9.2, 69.68, 0.4, 'stone'], ['y', 9.43, 69.53, 0.15, 0, 0.28, 'tin'],
+    ['b', 8.55, 69.65, 2.0, 10.21, 69.72, 2.06, 'iron'], ['b', 8.63, 69.57, 1.94, 10.13, 69.67, 2.0, 'wood'], ['b', 14.22, 68.7, 1.0, 14.42, 69.22, 1.03, 'oak'], ['b', 14.35, 68.78, 1.03, 14.36, 68.86, 1.15, 'paper'],
+    ['b', 14.24, 68.94, 1.03, 14.36, 69.14, 1.11, 'oak'], ['b', 12.15, 69.36, 1.0, 13.33, 69.72, 1.03, 'oak'], ['b', 12.23, 69.36, 1.03, 12.63, 69.66, 1.15, 'linen'], ['b', 12.71, 69.36, 1.03, 13.11, 69.66, 1.15, 'linen'],
+    ['b', 13.19, 69.65, 1.03, 13.25, 69.66, 1.13, 'paper'], ['b', 7.58, 63.75, 1.2, 7.8, 64.11, 1.23, 'oak'], ['b', 7.64, 63.83, 1.23, 7.78, 64.03, 1.43, 'oak'], ['b', 7.93, 63.61, 1.7, 8.03, 63.71, 2.05, 'straw']]);
+  /* G-PURPOSE end elves-linen-room */
+  /* G-PURPOSE linen-cupboard-g-west */
+  /* req 1969, by-purpose n 11: a mending basket and needle card, pillow-slips, a drying rail, lavender, a rolled blanket */
+  add('linen-cupboard-g-west', [
+    ['y', 0.27, 54.45, 0.25, 0, 0.35, 'wicker'], ['b', 0.02, 54.78, 0, 0.03, 54.86, 0.12, 'paper'], ['b', 3.41, 55.05, 0.5, 3.77, 56.09, 0.53, 'oak'], ['b', 3.41, 55.13, 0.53, 3.71, 55.53, 0.65, 'linen'],
+    ['b', 3.41, 55.61, 0.53, 3.71, 56.01, 0.65, 'linen'], ['b', -0.02, 52.3, 1.9, 0.05, 53.96, 1.96, 'iron'], ['b', 0.03, 52.38, 1.84, 0.13, 53.88, 1.9, 'wood'], ['b', 3.64, 55.88, 1.5, 3.74, 55.98, 1.85, 'straw'],
+    ['b', 2.6, 50.83, 1.0, 3.26, 51.19, 1.03, 'oak'], ['b', 2.68, 50.89, 1.03, 3.18, 51.24, 1.13, 'blanket']]);
+  /* G-PURPOSE end linen-cupboard-g-west */
+  /* G-PURPOSE washrooms-g-north */
+  /* req 1969, by-purpose n 13: a pail and mop, towels and a soap dish, a rota slate, a waste basket */
+  add('washrooms-g-north', [
+    ['y', 96.8, 51.02, 0.15, 0, 0.3, 'wood'], ['y', 97.065, 50.905, 0.035, 0, 1.3, 'wood'], ['b', 103.41, 53.5, 1.0, 103.77, 54.24, 1.03, 'oak'], ['b', 103.41, 53.58, 1.03, 103.71, 53.98, 1.15, 'linen'],
+    ['y', 103.66, 54.11, 0.05, 1.03, 1.07, 'white'], ['b', 103.72, 52.13, 1.4, 103.74, 52.43, 1.62, 'slate'], ['y', 102.5, 57.08, 0.15, 0, 0.35, 'wicker']]);
+  /* G-PURPOSE end washrooms-g-north */
+  /* G-PURPOSE washrooms-g-east */
+  /* req 1969, by-purpose n 14: a sand bucket, a hand brush, towels and soap, a drying rail */
+  add('washrooms-g-east', [
+    ['y', 145.15, 51.02, 0.15, 0, 0.28, 'tin'], ['b', 145.5, 50.87, 0, 145.8, 51.05, 0.12, 'wood'], ['b', 144.23, 53.5, 1.0, 144.59, 54.24, 1.03, 'oak'], ['b', 144.29, 53.58, 1.03, 144.59, 53.98, 1.15, 'linen'],
+    ['y', 144.34, 54.11, 0.05, 1.03, 1.07, 'white'], ['b', 151.7, 54.3, 1.8, 151.77, 55.96, 1.86, 'iron'], ['b', 151.62, 54.38, 1.74, 151.72, 55.88, 1.8, 'wood']]);
+  /* G-PURPOSE end washrooms-g-east */
+  /* G-PURPOSE spare-desks-store */
+  /* req 1969, by-purpose n 15: a repair bench with glue, mallet and screws, a chair seat-up, a numbered ledger, a brush */
+  add('spare-desks-store', [
+    ['t', 95.13, 55.3, 95.73, 56.9, 0.8, 'pine'], ['y', 95.62, 55.47, 0.05, 0.8, 0.92, 'glass'], ['b', 95.57, 55.6, 0.8, 95.67, 55.9, 0.9, 'wood'], ['b', 95.55, 55.98, 0.8, 95.67, 56.18, 0.88, 'oak'],
+    ['b', 92.27, 55.65, 0, 92.72, 56.1, 0.9, 'oak'], ['b', 92.23, 53.4, 1.2, 92.49, 53.81, 1.23, 'oak'], ['b', 92.29, 53.48, 1.23, 92.47, 53.73, 1.28, 'leather'], ['b', 95.55, 56.9, 0, 95.73, 57.2, 0.12, 'wood']]);
+  /* G-PURPOSE end spare-desks-store */
+  /* G-PURPOSE school-brooms-store */
+  /* req 1969, docs/interiors/ground-floor-by-purpose-1031.md n 16: a rail of mallet, hatchet and needle card, a nail tin and a box on a shelf, the bench stool, sand and water buckets, a brush by the door, three tar tins, two tied twig bundles (gap, plain) */
+  add('school-brooms-store', [
+    ['b', 120.98, 50.83, 1.5, 121.98, 50.9, 1.56, 'iron'], ['b', 121.06, 50.88, 1.4, 121.36, 50.98, 1.5, 'wood'], ['b', 121.44, 50.88, 1.38, 121.74, 50.92, 1.5, 'steel'], ['b', 121.82, 50.88, 1.38, 121.9, 50.89, 1.5, 'paper'],
+    ['b', 122.98, 50.83, 1.1, 123.52, 51.03, 1.13, 'oak'], ['b', 123.06, 50.89, 1.13, 123.26, 51.01, 1.21, 'oak'], ['y', 123.39, 50.94, 0.05, 1.13, 1.23, 'tin'], ['y', 121.99, 51.03, 0.16, 0, 0.45, 'wood'],
+    ['y', 124.18, 56.05, 0.15, 0, 0.28, 'tin'], ['y', 124.18, 56.43, 0.15, 0, 0.3, 'leather'], ['b', 124.15, 52.0, 0, 124.33, 52.3, 0.12, 'wood'], ['b', 123.23, 57.09, 1.2, 123.85, 57.27, 1.23, 'oak'],
+    ['y', 123.36, 57.16, 0.05, 1.23, 1.33, 'tin'], ['y', 123.54, 57.16, 0.05, 1.23, 1.33, 'tin'], ['y', 123.72, 57.16, 0.05, 1.23, 1.33, 'tin'], ['y', 123.28, 51.02, 0.15, 0, 1.1, 'straw'],
+    ['y', 123.66, 51.02, 0.15, 0, 1.1, 'straw']]);
+  /* G-PURPOSE end school-brooms-store */
+  /* G-PURPOSE owl-treats-store */
+  /* req 1969, by-purpose n 17: cages (gap), pouches, a straw bale (gap) and sack, a grooming shelf, a perch and balance, a glove, a trough, mealworms and grit, three parcels, a stool, a brush */
+  add('owl-treats-store', [
+    ['b', 10.0, 28.94, 0, 10.5, 29.34, 0.55, 'wicker'], ['b', 10.58, 28.94, 0, 11.08, 29.34, 0.55, 'wicker'], ['b', 11.16, 28.94, 0, 11.66, 29.34, 0.55, 'wicker'], ['b', 12.1, 36.82, 1.5, 12.17, 38.55, 1.56, 'iron'],
+    ['b', 12.02, 36.9, 1.25, 12.12, 37.2, 1.5, 'leather'], ['b', 12.02, 37.28, 1.25, 12.12, 37.58, 1.5, 'leather'], ['b', 12.02, 37.66, 1.25, 12.12, 37.96, 1.5, 'leather'], ['b', 12.02, 38.04, 1.28, 12.12, 38.29, 1.5, 'leather'],
+    ['y', 12.07, 38.42, 0.05, 1.38, 1.5, 'leather'], ['b', 1.0, 38.61, 0, 1.8, 39.06, 0.45, 'straw'], ['y', 2.08, 38.86, 0.2, 0, 0.6, 'canvas'], ['b', 0.23, 36.37, 1.0, 0.51, 37.24, 1.03, 'oak'],
+    ['b', 0.29, 36.45, 1.03, 0.36, 36.65, 1.09, 'wood'], ['b', 0.29, 36.73, 1.03, 0.49, 36.98, 1.05, 'leather'], ['y', 0.34, 37.11, 0.05, 1.03, 1.13, 'tin'], ['b', 11.83, 31.77, 0, 12.13, 32.17, 1.0, 'oak'],
+    ['b', 12.03, 32.25, 0, 12.13, 32.55, 0.3, 'brass'], ['b', 11.99, 35.1, 1.4, 12.14, 35.35, 1.46, 'leather'], ['b', 0.27, 36.37, 0, 0.77, 37.37, 0.4, 'stone'], ['y', 0.42, 37.6, 0.15, 0, 0.28, 'tin'],
+    ['b', 10.0, 28.9, 0.9, 10.62, 29.18, 0.93, 'oak'], ['b', 10.08, 28.96, 0.93, 10.38, 29.16, 0.98, 'paper'], ['y', 10.5, 29.0, 0.04, 0.93, 1.08, 'glass'], ['b', 0.23, 37.27, 1.0, 0.49, 38.76, 1.03, 'oak'],
+    ['b', 0.29, 37.35, 1.03, 0.47, 37.6, 1.13, 'paper'], ['b', 0.29, 37.68, 1.03, 0.47, 37.93, 1.13, 'paper'], ['b', 0.29, 38.01, 1.03, 0.47, 38.26, 1.13, 'paper'], ['b', 0.29, 38.34, 1.03, 0.3, 38.4, 1.13, 'paper'],
+    ['b', 0.29, 38.48, 1.03, 0.3, 38.54, 1.13, 'paper'], ['b', 0.29, 38.62, 1.03, 0.3, 38.68, 1.13, 'paper'], ['y', 0.81, 38.9, 0.16, 0, 0.45, 'wood'], ['b', 0.35, 38.88, 0, 0.65, 39.06, 0.12, 'wood']]);
+  /* G-PURPOSE end owl-treats-store */
+  /* G-PURPOSE exam-desks-store */
+  /* req 1969, by-purpose n 18: a hand trolley (gap), a cleaning shelf and bucket, a tally ledger, a crate of ink wells, a stepladder */
+  add('exam-desks-store', [
+    ['b', 6.45, 39.6, 0, 6.95, 40.1, 1.1, 'iron'], ['b', 5.9, 49.49, 0.9, 6.59, 49.77, 0.93, 'oak'], ['b', 5.98, 49.64, 0.93, 6.18, 49.71, 0.99, 'wood'], ['b', 6.26, 49.51, 0.93, 6.51, 49.71, 0.95, 'leather'],
+    ['y', 2.75, 49.58, 0.15, 0, 0.28, 'tin'], ['b', 0.23, 45.48, 1.1, 0.49, 45.89, 1.13, 'oak'], ['b', 0.29, 45.56, 1.13, 0.47, 45.81, 1.18, 'leather'], ['b', 11.78, 47.38, 0, 12.13, 47.88, 0.3, 'oak'],
+    ['b', 0.27, 48.38, 0, 0.35, 48.83, 1.6, 'wood']]);
+  /* G-PURPOSE end exam-desks-store */
+  /* G-PURPOSE old-trophies-overflow */
+  /* req 1969, by-purpose n 19: a dusting table, wrapped cups, a ledger, a stepladder, a lamp, a case under a sheet */
+  add('old-trophies-overflow', [
+    ['t', 147.87, 40.23, 148.52, 42.03, 0.8, 'pine'], ['b', 147.93, 40.35, 0.8, 148.13, 40.6, 0.82, 'leather'], ['y', 147.98, 40.73, 0.05, 0.8, 0.9, 'tin'], ['y', 159.905, 44.455, 0.075, 0, 0.3, 'gold'],
+    ['y', 159.905, 44.685, 0.075, 0, 0.3, 'gold'], ['b', 159.68, 44.84, 0, 159.98, 45.24, 0.12, 'linen'], ['b', 147.83, 45.68, 1.2, 148.09, 46.09, 1.23, 'oak'], ['b', 147.89, 45.76, 1.23, 148.07, 46.01, 1.28, 'leather'],
+    ['b', 159.9, 48.38, 0, 159.98, 48.83, 1.6, 'wood'], ['b', 151.1, 39.56, 1.3, 151.41, 39.79, 1.33, 'oak'], ['y', 151.255, 39.695, 0.075, 1.33, 1.63, 'brass'], ['b', 147.95, 39.6, 0, 148.95, 40.0, 1.6, 'oak'],
+    ['b', 149.03, 39.6, 0, 149.43, 39.9, 0.12, 'linen']]);
+  /* G-PURPOSE end old-trophies-overflow */
+  /* G-PURPOSE staff-room */
+  /* req 1969, by-purpose n 20: a rota board, a kettle on a side table, a coat stand and three gowns, a marking pile and biscuit tin, a clock */
+  add('staff-room', [
+    ['b', 134.63, 50.61, 1.3, 135.43, 50.64, 1.9, 'paper'], ['t', 141.38, 52.9, 141.98, 54.5, 0.8, 'pine'], ['y', 141.81, 53.13, 0.11, 0.8, 1.02, 'copper'], ['b', 141.72, 53.32, 0.8, 141.92, 53.52, 0.83, 'iron'],
+    ['b', 131.95, 50.62, 0, 132.75, 50.92, 1.8, 'oak'], ['b', 132.8, 50.58, 1.8, 134.62, 50.65, 1.86, 'iron'], ['b', 132.88, 50.63, 0.5, 133.38, 50.73, 1.8, 'dark'], ['b', 133.46, 50.63, 0.5, 133.96, 50.73, 1.8, 'dark'],
+    ['b', 134.04, 50.63, 0.5, 134.54, 50.73, 1.8, 'dark'], ['t', 134.25, 56.38, 135.85, 56.98, 0.8, 'pine'], ['b', 134.37, 56.72, 0.8, 134.67, 56.92, 0.95, 'leather'], ['y', 134.8, 56.87, 0.05, 0.8, 0.9, 'tin'],
+    ['b', 129.75, 56.82, 1.5, 130.16, 57.02, 1.53, 'oak'], ['b', 129.83, 56.84, 1.53, 130.08, 56.96, 1.83, 'wood']]);
+  /* G-PURPOSE end staff-room */
+})(window.SHELL_W5A.things);
+/* G-PURPOSE finish */
 /* G-TOUCHES begin */
 /* req 1864: the ground floor's lived-in touches (docs/interiors/ground-floor-lived-in-1029.md), written by
    tools/architect-g-touches.py: never edit by hand. Each adds to its room's things. */
