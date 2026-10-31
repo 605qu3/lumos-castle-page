@@ -3,12 +3,14 @@
 (function (T) {
   var things = {
     /* 1-THINGS tudor-bay-1 */
-    /* docs/story/settled.md 211 (req 2110: tudor-bay-1 is the photographic club's daylit studio): a stool before a painted backdrop hung from a rail on the east wall, a brass camera on its tripod facing it with a focusing cloth over the back, a white reflector panel on the north side; the archway's way and the south wall kept clear; the backdrop, camera and reflector are plain stand-ins; nothing glows */
+    /* docs/story/settled.md 211 (req 2110: tudor-bay-1 is the photographic club's daylit studio): a stool before a painted backdrop hung from a rail on the east wall, a brass camera on its tripod facing it with a focusing cloth over the back, a white reflector panel on the north side, a plate table at the west end; the archway's way and the south wall kept clear; the backdrop, camera and reflector are plain stand-ins; nothing glows */
     'tudor-bay-1': { items: [
       ['b', 110.85, -6.0, 2.2, 111.0, -3.6, 2.26, 'wood'], ['b', 110.88, -5.95, 0.05, 110.93, -3.65, 2.2, 'blue'], ['b', 110.88, -5.95, 0.0, 110.93, -3.65, 0.05, 'wood'], ['t', 109.3, -5.0, 109.75, -4.55, 0.45, 'wood'],
       ['b', 106.5, -5.1, 0, 106.54, -5.06, 1.2, 'wood'], ['b', 106.5, -4.6, 0, 106.54, -4.56, 1.2, 'wood'], ['b', 106.95, -4.85, 0, 106.99, -4.81, 1.2, 'wood'], ['b', 106.4, -5.15, 1.2, 107.05, -4.55, 1.24, 'brass'],
       ['b', 106.5, -5.0, 1.24, 106.8, -4.7, 1.54, 'wood'], ['b', 106.8, -4.96, 1.28, 107.3, -4.74, 1.5, 'leather'], ['b', 107.3, -4.97, 1.26, 107.34, -4.73, 1.52, 'wood'], ['b', 107.34, -4.9, 1.34, 107.42, -4.8, 1.44, 'brass'],
-      ['b', 106.44, -5.02, 1.3, 106.56, -4.68, 1.62, 'black'], ['b', 108.0, -3.55, 0, 108.9, -3.4, 0.04, 'wood'], ['b', 108.1, -3.52, 0.04, 108.8, -3.46, 1.5, 'white']] },
+      ['b', 106.44, -5.02, 1.3, 106.56, -4.68, 1.62, 'black'], ['b', 108.0, -3.55, 0, 108.9, -3.4, 0.04, 'wood'], ['b', 108.1, -3.52, 0.04, 108.8, -3.46, 1.5, 'white'], ['b', 101.2, -5.95, 0.75, 101.95, -4.75, 0.78, 'wood'],
+      ['b', 101.22, -5.93, 0, 101.29, -5.85, 0.75, 'wood'], ['b', 101.88, -5.93, 0, 101.95, -5.85, 0.75, 'wood'], ['b', 101.22, -4.83, 0, 101.29, -4.75, 0.75, 'wood'], ['b', 101.88, -4.83, 0, 101.95, -4.75, 0.75, 'wood'],
+      ['b', 101.35, -5.8, 0.78, 101.8, -5.52, 0.8, 'white'], ['b', 101.35, -5.45, 0.78, 101.8, -5.17, 0.8, 'white'], ['b', 101.35, -5.1, 0.78, 101.8, -4.82, 0.8, 'white']] },
     /* 1-THINGS end tudor-bay-1 */
     /* 1-THINGS mcgonagall-landing-passage-1 */
     /* docs/interiors/first-floor-gaps-1028.md (mcgonagall-landing-passage-1, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening (stair feet: the treads and rails are the Architects own stair pieces, not placed here; the bracket is the familys one; no placeholders) */
