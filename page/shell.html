@@ -172,7 +172,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="castle-model-6.js?v=6"></script>
 <script src="castle-model-7.js?v=8"></script>
 <!-- /the floor files -->
-<script src="castle-paint.js?v=115"></script>
+<script src="castle-paint.js?v=116"></script>
 <script src="design/room-tags-G.js?v=1"></script>
 <script src="design/room-use.js?v=1"></script>
 <script src="design/floor-kit.js?v=1"></script>
@@ -186,7 +186,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="charms/desks.js?v=2"></script>
 <script src="castle-trim.js?v=10"></script>
 <script src="design/lake-views.js?v=1"></script>
-<script src="castle-shell.js?v=147"></script>
+<script src="castle-shell.js?v=148"></script>
 <script src="shell-w5b.js?v=23"></script>
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
@@ -360,6 +360,8 @@ PAINTED = PAINTED.concat(['s2-room-2', 'drum-room-2', 'gobstones-club-room', 'st
 /* floor B's Pass 1.2 (Fawkes's ask, the Architect's 269th): its 48 tagged rooms painted, its own and the base's on B */
 PAINTED = PAINTED.concat(['stone-passage-down', 'stone-passage-up', 'slytherin-common-room', 'potions-classroom-b', 'hufflepuff-basement-corridor', 'wizard-chess-room', 'dungeon-bench-store', 'armour-spare-parts-store', 'coal-and-log-store', 'banner-and-linen-store', 'prefects-patrol-room', 'detention-dungeon', 'christmas-decorations-store', 'service-store-b', 'portraits-store', 'potions-dungeon-newt', 'peeves-chalk-den', 'spell-practice-room', 'potions-dungeon-owl', 'potions-ingredients-store', 'east-corner-store-b', 'ghosts-gathering-room', 'feast-cold-room', 'house-elves-quarters', 'scullery', 'quill-ink-store', 'candle-store', 'spare-robes-store', 'laundry', 'bakery-ovens', 'broom-cupboard', 'washrooms-sw', 'sw-stair-foot-b', 'spare-desks-store-b', 'north-stair-foot-b', 'potions-link-corridor', 'east-wing-corridor-b', 'west-stair-corridor-b', 'slytherin-way', 'kitchen-stores', 'brewing-cellar', 'butterbeer-cellar', 'caretakers-confiscations-store', 'spare-cauldrons-store', 'service-corridor-b', 'boat-and-lamp-store', 'drum-back-store-b', 'trunk-room']);
 PAINTED = PAINTED.concat(W5B.painted || []); Object.assign(STARTS, W5B.starts || {});
+/* castle-shell v148, req 1982 (31 October 2026): the 23 model rooms the schedule (castle-paint v262, 814 rows) now carries and no list painted: floor 1's and 4's drum bends, the loop galleries and their stairs on 1 to 6, the long gallery on 2, the stair lantern on 3, floor 4's nooks and returns store. The lift, pole and dumbwaiter shafts stay unpainted (shafts, no floor to lay). */
+PAINTED = PAINTED.concat(['drum-bend-1-west', 'drum-bend-1', 'drum-bend-1-east', 'drum-bend-4-west', 'drum-bend-4', 'drum-bend-4-east', 'loop-gallery-1', 'loop-gallery-2', 'loop-gallery-3', 'loop-gallery-4', 'loop-gallery-5', 'loop-gallery-6', 'loop-gallery-stair-1', 'loop-gallery-stair-2', 'loop-gallery-stair-3', 'loop-gallery-stair-4', 'loop-gallery-stair-5', 'loop-gallery-stair-6', 'long-gallery-2', 'stair-lantern-3', 'newspaper-room-4-nook', 'elves-linen-room-4-lake-nook', 'library-returns-store-4-east']);
 /* req 1335 (Godric's 1, 12.14 am, 28 October 2026): &floor=on builds every painted place on this floor in one frame,
    &floor=all every place; he walks it through, door to door, with no page between (castle-shell.js v94) */
 var FLOOR_WALK = /^(on|all)$/.test(Q.get('floor') || '') ? Q.get('floor') : null;

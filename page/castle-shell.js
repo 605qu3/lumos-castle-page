@@ -388,7 +388,9 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      (page/design/room-use.js, from Design's room tags; the textures page/design/floor-kit.js). A use not listed here keeps the
      flat floor its schedule gives, and is listed back to Design: library, display, workroom, defence, lookout, loft, magic, hidden, stair, unset */
   var FLOOR_USE = { hall: 'flags', passage: 'flags', cellar: 'flags', teaching: 'oak', sleeping: 'oak', living: 'oak', sick: 'oak',
-    study: 'quarry', store: 'setts', service: 'setts', wash: 'encaustic' };
+    study: 'quarry', store: 'setts', service: 'setts', wash: 'encaustic',
+    /* v148 (req 1982, Design's kinds for the 149 on req 1930, provisional till Godric's eye): stair and unset keep the flat floor */
+    hidden: 'flags', lookout: 'flags', magic: 'flags', library: 'oak', workroom: 'oak', defence: 'oak', display: 'oak', loft: 'oak' };
   var ROOM_USE = window.CASTLE_ROOM_USE || {};
   var paintMats = {}, damp = false;   /* v45: a place below ground reads Design's damp keys first (req 824) */
   function hexOf(v) { return typeof v === 'string' ? parseInt(v.replace('#', ''), 16) : v; }
