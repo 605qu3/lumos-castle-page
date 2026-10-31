@@ -2,6 +2,22 @@
    (tools/floor_things_file.py); never edit by hand. Each block adds one room to SHELL_W5A.things. */
 (function (T) {
   var things = {
+    /* 2-THINGS disused-classroom-2-northwest */
+    /* docs/interiors/upper-floors-gaps-1028.md (disused-classroom-2-northwest, x, disused classrooms): a later decade, double desks under dust sheets with every other one gone, one blackboard on the west wall still chalked; the way out is the door */
+    'disused-classroom-2-northwest': { items: [
+      ['b', 9.0, 6.8, 0.0, 10.2, 7.3, 0.74, 'linen'], ['b', 8.96, 6.76, 0.74, 10.24, 7.34, 0.8, 'linen'], ['b', 11.6, 9.2, 0.0, 12.8, 9.7, 0.74, 'linen'], ['b', 11.56, 9.16, 0.74, 12.84, 9.74, 0.8, 'linen'],
+      ['b', 9.0, 11.6, 0.0, 10.2, 12.1, 0.74, 'linen'], ['b', 8.96, 11.56, 0.74, 10.24, 12.14, 0.8, 'linen'], ['b', 11.6, 14.0, 0.0, 12.8, 14.5, 0.74, 'linen'], ['b', 11.56, 13.96, 0.74, 12.84, 14.54, 0.8, 'linen'],
+      ['b', 7.23, 8.0, 1.0, 7.29, 11.0, 2.2, 'black'], ['b', 7.23, 8.0, 0.95, 7.33, 11.0, 1.0, 'oak'], ['b', 7.23, 8.5, 1.5, 7.305, 9.3, 1.52, 'white']] },
+    /* 2-THINGS end disused-classroom-2-northwest */
+    /* 2-THINGS disused-classroom-2-east */
+    /* docs/interiors/upper-floors-gaps-1028.md (disused-classroom-2-east, af, disused classrooms): double desks under dust sheets in two blocks either side of the doors' aisle, one blackboard on the north wall still chalked; the way out is the door */
+    'disused-classroom-2-east': { items: [
+      ['b', 143.0, 61.4, 0.0, 144.2, 61.9, 0.74, 'linen'], ['b', 142.96, 61.36, 0.74, 144.24, 61.94, 0.8, 'linen'], ['b', 145.8, 61.4, 0.0, 147.0, 61.9, 0.74, 'linen'], ['b', 145.76, 61.36, 0.74, 147.04, 61.94, 0.8, 'linen'],
+      ['b', 143.0, 68.2, 0.0, 144.2, 68.7, 0.74, 'linen'], ['b', 142.96, 68.16, 0.74, 144.24, 68.74, 0.8, 'linen'], ['b', 145.8, 68.2, 0.0, 147.0, 68.7, 0.74, 'linen'], ['b', 145.76, 68.16, 0.74, 147.04, 68.74, 0.8, 'linen'],
+      ['b', 148.6, 68.2, 0.0, 149.8, 68.7, 0.74, 'linen'], ['b', 148.56, 68.16, 0.74, 149.84, 68.74, 0.8, 'linen'], ['b', 143.0, 70.2, 0.0, 144.2, 70.7, 0.74, 'linen'], ['b', 142.96, 70.16, 0.74, 144.24, 70.74, 0.8, 'linen'],
+      ['b', 145.8, 70.2, 0.0, 147.0, 70.7, 0.74, 'linen'], ['b', 145.76, 70.16, 0.74, 147.04, 70.74, 0.8, 'linen'], ['b', 148.6, 70.2, 0.0, 149.8, 70.7, 0.74, 'linen'], ['b', 148.56, 70.16, 0.74, 149.84, 70.74, 0.8, 'linen'],
+      ['b', 144.6, 59.23, 1.0, 147.6, 59.29, 2.2, 'black'], ['b', 144.6, 59.23, 0.95, 147.6, 59.33, 1.0, 'oak'], ['b', 145.1, 59.23, 1.5, 145.9, 59.305, 1.52, 'white']] },
+    /* 2-THINGS end disused-classroom-2-east */
     /* 2-THINGS teachers-study-2-southeast */
     /* docs/interiors/upper-floors-gaps-1028.md (teachers-study-2-southeast, aj): bookcases on the west and east walls, a writing desk with lamp, sheet and inkwell and a Windsor chair, a leather armchair on a rug, a longcase clock on the north wall, one portrait on the west wall; one door, no hearth in the model */
     'teachers-study-2-southeast': { items: [
