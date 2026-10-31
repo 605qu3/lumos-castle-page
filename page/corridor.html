@@ -4815,6 +4815,7 @@ var leaving = false, herOpening = false;
    which holds the Common room's point-click-test.html unedited), and ?from=still brings him back out standing at her
    stop, turned to face down the corridor */
 var STILLS = /[?&]stills\b/.test(location.search);
+var LETMEIN = /[?&]letmein\b/.test(location.search);
 function enter(dry, url, room) {
   if (leaving || view !== 'length') return false;
   url = url || (STILLS ? 'seam-test.html?from=corridor' : 'common-room.html?from=corridor'); room = room || 'common-room';
@@ -4855,6 +4856,14 @@ function arriveFromStill() {
   herDoor.ang = DOOR_OPEN; herDoor.target = DOOR_OPEN;
   setTimeout(function () { herDoor.target = 0; }, 700);
   kit.savePlace({ room: 'corridor', stop: 'her' });
+  kit.reveal();
+}
+/* ?stills opened cold: he starts at her stop facing her, not at the stair head, so the walk link begins at the hole */
+function arriveAtHer() {
+  var herStop = STOPS[0], p = herStop.stop();
+  atStop = herStop; mode = 'stop'; backBtn.hidden = false;
+  camera.position.copy(p.pos); lookTmp.copy(p.look); setFov(p.fov);
+  stopPose = { pos: p.pos.clone(), look: p.look.clone() }; headReset();
   kit.reveal();
 }
 function arriveFromRoom() {
@@ -5001,6 +5010,8 @@ function tap(cx, cy) {
   /* her (req 79): from afar a tap on her is her walk-up; at her stop it wakes her for the password, raised here inside
      the tap's own handler, since the runtime opens the ear in it and iOS lets a page listen only from a touch */
   if (hit.thing === 'her' && !(atStop && atStop.name === 'her')) { tell('her'); said(true); goTo(hit.stop); return; }
+  /* ?letmein (for a look, writing nothing to the device): at her stop a tap opens the hole without the spoken word */
+  if (LETMEIN && hit.thing === 'her' && atStop && atStop.name === 'her') { enter(); said(true); return; }
   /* the mended seam, at her stop: she will not discuss it */
   if (hits[0].object === her && atStop && atStop.name === 'her' && herPatch.seam.visible && seamAt(hits[0].uv)) {
     tell('her seam');
@@ -5172,6 +5183,7 @@ if (kit.from === 'still') arriveFromStill();
 else if (kit.from === 'room') arriveFromRoom();
 else if (kit.from === 'stair-hall') arriveFromBay();
 else if (kit.from === 'secret-s4b') arriveFromStore();
+else if (STILLS && !kit.from) arriveAtHer();
 
 /* ---------- the events runtime (castle-events.js, board req 23) ----------
    Every chain loads (the records' `place` keeps each to its page), this page answers `at`, the stop he stands at, and
