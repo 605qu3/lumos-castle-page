@@ -3128,5 +3128,56 @@ window.SHELL_W5A = {
   add('staff-room', [
     ['y', 133.092, 55.292, 0.07, 0.62, 0.63, 'white'], ['y', 133.092, 55.292, 0.04, 0.63, 0.69, 'white'], ['y', 133.092, 55.292, 0.035, 0.68, 0.685, 'dark']]);
   /* G-TOUCHES end staff-room */
+  /* G-TOUCHES visitors-parlour */
+  /* visitors-parlour: a pamphlet on the tea tray, tea left in a cup */
+  add('visitors-parlour', [
+    ['b', 114.21, 13.29, 0.565, 114.39, 13.39, 0.572, 'paper'], ['b', 114.21, 13.29, 0.572, 114.39, 13.305, 0.575, 'scarlet'], ['y', 114.48, 13.2, 0.026, 0.61, 0.613, 'mahog']]);
+  /* G-TOUCHES end visitors-parlour */
+  /* G-TOUCHES post-room */
+  /* post-room: one slot of the south bank stuffed with letters, not yet sorted */
+  add('post-room', [
+    ['b', 122.472, 17.64, 1.49, 122.703, 18.02, 1.71, 'paper'], ['b', 122.472, 17.625, 1.57, 122.703, 18.02, 1.59, 'rope'], ['b', 122.522, 17.62, 1.63, 122.632, 18.02, 1.7, 'white']]);
+  /* G-TOUCHES end post-room */
+  /* G-TOUCHES treatment-room */
+  /* treatment-room: a brown inch in the medicine glass and a drip ring by it */
+  add('treatment-room', [
+    ['y', 138.7, 17.85, 0.022, 2.1, 2.135, 'mahog'], ['y', 138.82, 17.88, 0.013, 2.1, 2.103, 'mahog']]);
+  /* G-TOUCHES end treatment-room */
+  /* G-TOUCHES registers-archive */
+  /* registers-archive: a dip pen across the open register */
+  add('registers-archive', [
+    ['b', 142.46, 17.675, 1.045, 142.69, 17.69, 1.058, 'wood'], ['b', 142.69, 17.678, 1.045, 142.74, 17.687, 1.05, 'steel']]);
+  /* G-TOUCHES end registers-archive */
+  /* G-TOUCHES free-classroom-g */
+  /* free-classroom-g: a sum half rubbed out on the board, the felt on the tray */
+  add('free-classroom-g', [
+    ['b', 97.85, 17.965, 1.8, 98.25, 17.99, 1.812, 'white'], ['b', 97.85, 17.965, 1.66, 98.15, 17.99, 1.672, 'white'], ['b', 97.85, 17.965, 1.48, 98.27, 17.99, 1.492, 'white'], ['b', 97.85, 17.965, 1.38, 98.3, 17.99, 1.4, 'white'],
+    ['b', 98.95, 17.966, 1.1, 99.5, 17.99, 1.6, 'stone'], ['b', 99.2, 17.95, 1.0, 99.45, 18.02, 1.05, 'cloth']]);
+  /* G-TOUCHES end free-classroom-g */
+  /* G-TOUCHES duelling-practice-room */
+  /* duelling-practice-room: a pair of gauntlets left on the east bench */
+  add('duelling-practice-room', [
+    ['b', 21.085, 10.45, 0.45, 21.295, 10.57, 0.5, 'leather'], ['b', 21.085, 10.445, 0.45, 21.165, 10.575, 0.55, 'dark'], ['b', 21.085, 10.64, 0.45, 21.295, 10.76, 0.5, 'leather'], ['b', 21.085, 10.635, 0.45, 21.165, 10.765, 0.55, 'dark']]);
+  /* G-TOUCHES end duelling-practice-room */
+  /* G-TOUCHES quidditch-kit-room */
+  /* quidditch-kit-room: a jumper and a scarf hung on the drying rail */
+  add('quidditch-kit-room', [
+    ['b', 21.925, 16.45, 1.5, 22.055, 16.98, 1.97, 'green'], ['b', 21.925, 17.54, 1.2, 22.055, 17.66, 1.97, 'amber'], ['b', 21.925, 17.54, 1.2, 22.055, 17.66, 1.26, 'scarlet']]);
+  /* G-TOUCHES end quidditch-kit-room */
+  /* G-TOUCHES classroom-corridor */
+  /* classroom-corridor: a scarf over the bench end */
+  add('classroom-corridor', [
+    ['b', 109.7, 57.52, 0.45, 110.2, 57.9, 0.47, 'scarlet'], ['b', 110.2, 57.55, 0.14, 110.23, 57.87, 0.47, 'scarlet'], ['b', 109.85, 57.52, 0.47, 109.875, 57.9, 0.472, 'amber'], ['b', 109.95, 57.52, 0.47, 109.975, 57.9, 0.472, 'amber']]);
+  /* G-TOUCHES end classroom-corridor */
+  /* G-TOUCHES lake-corridor-g-east */
+  /* lake-corridor-g-east: a wet umbrella leant at the wall, a damp ring at its foot */
+  add('lake-corridor-g-east', [
+    ['y', 116.8, 3.54, 0.035, 0.1, 0.8, 'black'], ['y', 116.8, 3.54, 0.012, 0.8, 0.9, 'wood'], ['b', 116.73, 3.528, 0.88, 116.812, 3.552, 0.9, 'wood'], ['y', 116.8, 3.5, 0.16, 0, 0.004, 'ink']]);
+  /* G-TOUCHES end lake-corridor-g-east */
+  /* G-TOUCHES washrooms-g */
+  /* washrooms-g: a towel hung long and uneven on the rail */
+  add('washrooms-g', [
+    ['b', 6.94, 16.26, 0.4, 7.02, 16.5, 0.64, 'white']]);
+  /* G-TOUCHES end washrooms-g */
 })(window.SHELL_W5A.things);
 /* G-TOUCHES finish */
