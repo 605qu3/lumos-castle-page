@@ -2,6 +2,14 @@
    (tools/floor_things_file.py); never edit by hand. Each block adds one room to SHELL_W5A.things. */
 (function (T) {
   var things = {
+    /* 1-THINGS tudor-bay-1 */
+    /* docs/story/settled.md 211 (req 2110: tudor-bay-1 is the photographic club's daylit studio): a stool before a painted backdrop hung from a rail on the east wall, a brass camera on its tripod facing it with a focusing cloth over the back, a white reflector panel on the north side; the archway's way and the south wall kept clear; the backdrop, camera and reflector are plain stand-ins; nothing glows */
+    'tudor-bay-1': { items: [
+      ['b', 110.85, -6.0, 2.2, 111.0, -3.6, 2.26, 'wood'], ['b', 110.88, -5.95, 0.05, 110.93, -3.65, 2.2, 'blue'], ['b', 110.88, -5.95, 0.0, 110.93, -3.65, 0.05, 'wood'], ['t', 109.3, -5.0, 109.75, -4.55, 0.45, 'wood'],
+      ['b', 106.5, -5.1, 0, 106.54, -5.06, 1.2, 'wood'], ['b', 106.5, -4.6, 0, 106.54, -4.56, 1.2, 'wood'], ['b', 106.95, -4.85, 0, 106.99, -4.81, 1.2, 'wood'], ['b', 106.4, -5.15, 1.2, 107.05, -4.55, 1.24, 'brass'],
+      ['b', 106.5, -5.0, 1.24, 106.8, -4.7, 1.54, 'wood'], ['b', 106.8, -4.96, 1.28, 107.3, -4.74, 1.5, 'leather'], ['b', 107.3, -4.97, 1.26, 107.34, -4.73, 1.52, 'wood'], ['b', 107.34, -4.9, 1.34, 107.42, -4.8, 1.44, 'brass'],
+      ['b', 106.44, -5.02, 1.3, 106.56, -4.68, 1.62, 'black'], ['b', 108.0, -3.55, 0, 108.9, -3.4, 0.04, 'wood'], ['b', 108.1, -3.52, 0.04, 108.8, -3.46, 1.5, 'white']] },
+    /* 1-THINGS end tudor-bay-1 */
     /* 1-THINGS mcgonagall-landing-passage-1 */
     /* docs/interiors/first-floor-gaps-1028.md (mcgonagall-landing-passage-1, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening (stair feet: the treads and rails are the Architects own stair pieces, not placed here; the bracket is the familys one; no placeholders) */
     'mcgonagall-landing-passage-1': { items: [
@@ -970,14 +978,25 @@
       ['b', 112.32, 0.8, 0.52, 112.34, 0.92, 0.55, 'leather'], ['b', 112.61, 0.8, 0.52, 112.63, 0.92, 0.55, 'leather']] },
     /* 1-THINGS end lake-corridor-1-east */
     /* 1-THINGS lake-tower-1 */
-    /* docs/interiors/first-floor-completion-1029.md (lake-tower-1, A): the plank bench on the east wall with a folded blanket at its north end and a writing slate at its south end, a boarded chest on the west wall with an unlit lantern on its lid, one lantern hung from the roof over the middle at 1.9; the middle clear to 3.8; the model draws no window and no hearth here, so none is leaned on; the plank-bench, wool-blanket and slate pieces are plain stand-ins; no placeholders besides */
+    /* docs/story/settled.md 190 and 211 (req 2110: lake-tower-1 is the pupils' photographic darkroom): a developing bench on the east wall with three tin trays, two brown bottles, a jug and a red lamp, a second red lamp hung over the trays, a drying line across the south with six prints on pegs and the old print with two small blurred figures at its west end, a print rack on the west wall, a stool; the red lamps stand unlit, nothing glows; the middle clear to 3.8; the model draws no window and no hearth here; trays, lamps, bottles and prints are plain stand-ins; the old watch pieces (bench, blanket, slate, chest, lantern) are gone */
     'lake-tower-1': { items: [
-      ['b', 134.2, -4.8, 0, 134.64, -3.2, 0.06, 'wood'], ['b', 134.2, -4.8, 0.42, 134.64, -3.2, 0.46, 'pine'], ['b', 134.2, -4.78, 0, 134.64, -4.72, 0.42, 'wood'], ['b', 134.2, -3.3, 0, 134.64, -3.24, 0.42, 'wood'],
-      ['b', 134.25, -3.55, 0.46, 134.6, -3.2, 0.5, 'linen'], ['b', 134.27, -3.52, 0.5, 134.58, -3.23, 0.54, 'blue'], ['b', 125.4, -4.65, 0, 125.9, -3.75, 0.46, 'deal'], ['b', 125.39, -4.66, 0.46, 125.91, -3.74, 0.5, 'pine'],
-      ['b', 125.52, -4.662, 0, 125.56, -3.738, 0.5, 'iron'], ['b', 125.74, -4.662, 0, 125.78, -3.738, 0.5, 'iron'], ['b', 125.55, -4.3, 0.5, 125.75, -4.1, 0.53, 'iron'], ['b', 125.57, -4.28, 0.53, 125.73, -4.12, 0.77, 'glass'],
-      ['b', 125.55, -4.3, 0.77, 125.75, -4.1, 0.8, 'iron'], ['y', 125.65, -4.2, 0.05, 0.8, 0.84, 'iron'], ['y', 130.0, -4.2, 0.008, 2.2, 4.5, 'rope'], ['b', 129.9, -4.3, 1.9, 130.1, -4.1, 1.93, 'iron'],
-      ['b', 129.92, -4.28, 1.93, 130.08, -4.12, 2.17, 'glass'], ['b', 129.9, -4.3, 2.17, 130.1, -4.1, 2.2, 'iron'], ['y', 130.0, -4.2, 0.05, 2.2, 2.24, 'iron'], ['b', 134.3, -4.75, 0.46, 134.6, -4.55, 0.48, 'slate'],
-      ['b', 134.31, -4.74, 0.48, 134.59, -4.56, 0.49, 'white']] },
+      ['t', 133.3, -5.3, 134.5, -2.9, 0.9, 'pine'], ['b', 133.5, -5.1, 0.9, 134.2, -4.6, 0.92, 'tin'], ['b', 133.5, -5.1, 0.92, 134.2, -5.08, 0.98, 'tin'], ['b', 133.5, -4.62, 0.92, 134.2, -4.6, 0.98, 'tin'],
+      ['b', 133.5, -5.08, 0.92, 133.52, -4.62, 0.98, 'tin'], ['b', 134.18, -5.08, 0.92, 134.2, -4.62, 0.98, 'tin'], ['b', 133.52, -5.08, 0.92, 134.18, -4.62, 0.96, 'ink'], ['b', 133.5, -4.45, 0.9, 134.2, -3.95, 0.92, 'tin'],
+      ['b', 133.5, -4.45, 0.92, 134.2, -4.43, 0.98, 'tin'], ['b', 133.5, -3.97, 0.92, 134.2, -3.95, 0.98, 'tin'], ['b', 133.5, -4.43, 0.92, 133.52, -3.97, 0.98, 'tin'], ['b', 134.18, -4.43, 0.92, 134.2, -3.97, 0.98, 'tin'],
+      ['b', 133.52, -4.43, 0.92, 134.18, -3.97, 0.96, 'ink'], ['b', 133.5, -3.8, 0.9, 134.2, -3.3, 0.92, 'tin'], ['b', 133.5, -3.8, 0.92, 134.2, -3.78, 0.98, 'tin'], ['b', 133.5, -3.32, 0.92, 134.2, -3.3, 0.98, 'tin'],
+      ['b', 133.5, -3.78, 0.92, 133.52, -3.32, 0.98, 'tin'], ['b', 134.18, -3.78, 0.92, 134.2, -3.32, 0.98, 'tin'], ['b', 133.52, -3.78, 0.92, 134.18, -3.32, 0.96, 'ink'], ['b', 133.45, -3.28, 0.9, 133.6, -3.22, 1.1, 'amber'],
+      ['b', 133.45, -3.08, 0.9, 133.6, -3.02, 1.1, 'amber'], ['b', 133.8, -3.2, 0.9, 133.98, -3.02, 1.05, 'white'], ['b', 134.1, -3.1, 0.9, 134.3, -2.9, 0.93, 'iron'], ['b', 134.12, -3.08, 0.93, 134.28, -2.92, 1.17, 'ruby'],
+      ['b', 134.1, -3.1, 1.17, 134.3, -2.9, 1.2, 'iron'], ['y', 134.2, -3.0, 0.05, 1.2, 1.24, 'iron'], ['y', 133.0, -5.2, 0.008, 2.0, 4.5, 'rope'], ['b', 132.9, -5.3, 1.7, 133.1, -5.1, 1.73, 'iron'],
+      ['b', 132.92, -5.28, 1.73, 133.08, -5.12, 1.97, 'ruby'], ['b', 132.9, -5.3, 1.97, 133.1, -5.1, 2.0, 'iron'], ['y', 133.0, -5.2, 0.05, 2.0, 2.04, 'iron'], ['b', 126.4, -6.6, 1.9, 133.6, -6.588, 1.912, 'rope'],
+      ['b', 126.37, -6.62, 1.86, 126.43, -6.57, 1.94, 'iron'], ['b', 133.52, -6.62, 1.86, 133.58, -6.57, 1.94, 'iron'], ['b', 128.2, -6.61, 1.66, 128.4, -6.58, 1.9, 'paper'], ['b', 128.28, -6.615, 1.88, 128.32, -6.575, 1.93, 'wood'],
+      ['b', 128.75, -6.61, 1.66, 128.95, -6.58, 1.9, 'paper'], ['b', 128.83, -6.615, 1.88, 128.87, -6.575, 1.93, 'wood'], ['b', 129.3, -6.61, 1.66, 129.5, -6.58, 1.9, 'paper'], ['b', 129.38, -6.615, 1.88, 129.42, -6.575, 1.93, 'wood'],
+      ['b', 130.1, -6.61, 1.66, 130.3, -6.58, 1.9, 'paper'], ['b', 130.18, -6.615, 1.88, 130.22, -6.575, 1.93, 'wood'], ['b', 131.5, -6.61, 1.66, 131.7, -6.58, 1.9, 'paper'], ['b', 131.58, -6.615, 1.88, 131.62, -6.575, 1.93, 'wood'],
+      ['b', 132.4, -6.61, 1.66, 132.6, -6.58, 1.9, 'paper'], ['b', 132.48, -6.615, 1.88, 132.52, -6.575, 1.93, 'wood'], ['b', 126.7, -6.61, 1.5, 127.1, -6.58, 1.9, 'paper'], ['b', 126.85, -6.615, 1.88, 126.95, -6.575, 1.93, 'wood'],
+      ['b', 126.82, -6.62, 1.62, 126.87, -6.59, 1.74, 'ink'], ['b', 126.95, -6.62, 1.6, 127.0, -6.59, 1.72, 'ink'], ['b', 125.36, -5.0, 0, 125.41, -4.95, 1.6, 'pine'], ['b', 125.36, -3.35, 0, 125.41, -3.3, 1.6, 'pine'],
+      ['b', 125.85, -5.0, 0, 125.9, -4.95, 1.6, 'pine'], ['b', 125.85, -3.35, 0, 125.9, -3.3, 1.6, 'pine'], ['b', 125.36, -5.0, 0.2, 125.9, -3.3, 0.23, 'pine'], ['b', 125.4, -4.94, 0.23, 125.84, -3.36, 0.27, 'paper'],
+      ['b', 125.36, -5.0, 0.52, 125.9, -3.3, 0.55, 'pine'], ['b', 125.4, -4.94, 0.55, 125.84, -3.36, 0.61, 'paper'], ['b', 125.36, -5.0, 0.84, 125.9, -3.3, 0.87, 'pine'], ['b', 125.4, -4.94, 0.87, 125.84, -3.36, 0.95, 'paper'],
+      ['b', 125.36, -5.0, 1.16, 125.9, -3.3, 1.19, 'pine'], ['b', 125.4, -4.94, 1.19, 125.84, -3.36, 1.23, 'paper'], ['b', 125.36, -5.0, 1.48, 125.9, -3.3, 1.51, 'pine'], ['b', 125.4, -4.94, 1.51, 125.84, -3.36, 1.57, 'paper'],
+      ['t', 131.5, -2.0, 131.95, -1.55, 0.45, 'wood']] },
     /* 1-THINGS end lake-tower-1 */
     /* 1-THINGS drum-room-1 */
     /* docs/interiors/first-floor-completion-1029.md (drum-room-1, A): three trunks stacked on the west arc and two to the north-west, the winter hangings folded on a slatted staging on the east arc, a boarded chest with a folded linen on its lid to the north-east (set 0.2 m in and turned long side east-west so its far corner is inside r 4.3, the table's centre being 4.0), a pulley airer drawn up and empty at 2.3 over the north-west; the walk x 41.29 to 43.09 is clear; no threshold (the door stands 1.4 through the drum's wall, beyond the circle); the house names on the trunk lids (engraved-lettering-1) are the Curator's and stand plain; no placeholders besides */
