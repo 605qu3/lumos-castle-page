@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The seam</title>
+<style>
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #000; }
+#veil { position: fixed; inset: 0; background: #000; opacity: 1; pointer-events: none; z-index: 5; transition: opacity .7s ease-out; }
+</style>
+</head>
+<body>
+<iframe id="still" src="point-click-test.html" title="The common room, as stills"></iframe>
+<div id="veil"></div>
+<script>
+/* The point-and-click seam (board req 1880): the corridor walk's hole opens on the common room's staged stills, and the
+   still's portrait hole leads back out to the walk. point-click-test.html is the Common room lane's and is held here
+   unedited, in a frame; this page only dresses the step (the dark the walk uses between rooms) and reads when the still
+   shows its stub for the corridor, then sends him to corridor.html?from=still&stills, standing at the Fat Lady,
+   turned to face down the corridor. Until that lane's page leads out by itself this wrapper is the hand-off. */
+var veil = document.getElementById('veil'), fr = document.getElementById('still'), going = false;
+function lift() { requestAnimationFrame(function () { requestAnimationFrame(function () { veil.style.opacity = '0'; }); }); }
+fr.addEventListener('load', function () {
+  lift();
+  var d; try { d = fr.contentDocument; } catch (e) { return; }
+  var stub = d.getElementById('stub'), text = d.getElementById('stubtext');
+  if (!stub || !text) return;
+  new MutationObserver(function () {
+    if (going || !stub.classList.contains('on') || !/corridor/i.test(text.textContent)) return;
+    going = true;
+    veil.style.transition = 'opacity .45s ease-in'; veil.style.opacity = '1';
+    setTimeout(function () { location.href = 'corridor.html?from=still&stills=1'; }, 500);
+  }).observe(stub, { attributes: true, attributeFilter: ['class'] });
+});
+setTimeout(lift, 2500);
+</script>
+</body>
+</html>

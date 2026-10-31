@@ -1736,6 +1736,11 @@ windows.forEach(function (w) { w.sky.userData.base = w.sky.material.color.clone(
 var GROUNDS = { w: 1.2, px: 800, py: 1760, ov: [200, 850, 600, 420] };   /* the overlay's box in the drawing: x, y, w, h */
 GROUNDS.h = GROUNDS.w * GROUNDS.py / GROUNDS.px;
 var groundsWin = windows[1], groundsSill = groundsWin.sky.position.y - groundsWin.sky.geometry.parameters.height / 2;
+/* the window's view is an empty forest edge with one fallen oak now (Godric, 30 October 2026, 4.00 pm: "1" on req 1792; Story's
+   settled 189 and req 1416; Magic's req 1262: "drop hagrid and fang. and the cabin"): the hut, its patch, pumpkins, washing,
+   lit window, smoke and chimney, Hagrid's crossing and both sets of prints are gated by this one flag, left in the code for the
+   cabin's eight steps (cabin-and-squid.md), each a later redraw; today's drawings are kept as corridor-grounds-view-hut*.png */
+var CABIN_IN_VIEW = false;
 var grounds = { overlay: null, canvas: null, tex: null, img: null, crossing: null, next: 0, last: -1 };
 (function () {
   var im = new Image();
@@ -1912,8 +1917,7 @@ function makeFrostedGrounds(day) {
   im.onload = function () {
     var W = im.width, H = im.height, cv = makeCanvas(W, H), g = cv.getContext('2d');
     g.drawImage(im, 0, 0);
-    rimeRoof(g, day);
-    bootPrints(g);
+    if (CABIN_IN_VIEW) { rimeRoof(g, day); bootPrints(g); }
     var sky = groundsWin.sky;
     var m = new THREE.Mesh(new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h),
       new THREE.MeshBasicMaterial({ map: tex(cv), transparent: true, opacity: 0, depthWrite: false }));
@@ -2011,9 +2015,7 @@ function makeSnowyGrounds(day) {
   im.onload = function () {
     var W = im.width, H = im.height, cv = makeCanvas(W, H), g = cv.getContext('2d');
     g.drawImage(im, 0, 0);
-    dayChimney(g, day);
-    bootPrints(g, true);
-    fangPrints(g);
+    if (CABIN_IN_VIEW) { dayChimney(g, day); bootPrints(g, true); fangPrints(g); }
     var sky = groundsWin.sky;
     var m = new THREE.Mesh(new THREE.PlaneGeometry(GROUNDS.w, GROUNDS.h),
       new THREE.MeshBasicMaterial({ map: tex(cv), transparent: true, depthWrite: false }));
@@ -2271,6 +2273,7 @@ function drawGrounds(t) {
   if (!grounds.canvas) return;
   var g = grounds.canvas.getContext('2d'), o = GROUNDS.ov;
   g.clearRect(0, 0, o[2], o[3]);
+  if (!CABIN_IN_VIEW) { grounds.tex.needsUpdate = true; return; }
   g.save(); g.translate(-o[0], -o[1]);
   var r = snowShowing() ? 0 : pumpkinR();   /* under the snow the patch is buried, Fang's hump the only sign */
   if (r) PUMPKINS.forEach(function (pk) { drawPumpkin(g, pk[0], pk[1], r * pk[2]); });
@@ -2302,7 +2305,7 @@ function updateGrounds(dt) {
   var here = atStop && atStop.name === 'window';
   if (here && grounds.last !== atStop) {
     grounds.last = atStop;
-    if (nightK() >= 0.5) grounds.next = 0;
+    if (nightK() >= 0.5 || !CABIN_IN_VIEW) grounds.next = 0;
     else if (groundsQ.has('hagrid') || Math.random() < 0.34) grounds.next = t + 3 + Math.random() * 3; else grounds.next = 0;
   }
   if (!here) grounds.last = -1;
@@ -4377,6 +4380,7 @@ function makeNightView() {
 function drawNightView(cold) {   /* cold: a frosty morning, the smoke only (Godric's touch on Q26) */
   var g = NIGHT.canvas.getContext('2d'), b = NIGHT.BOX;
   g.clearRect(0, 0, b[2], b[3]);
+  if (!CABIN_IN_VIEW) { NIGHT.tex.needsUpdate = true; return; }
   if (!cold && !hagridHome()) { NIGHT.tex.needsUpdate = true; return; }
   var L = cold ? 1 : hutK(), since = cold ? 1e9 : t - HUT.on;
   if (!L) { NIGHT.tex.needsUpdate = true; return; }
@@ -4807,9 +4811,13 @@ function goBack() {
    for shots. Coming out of the room
    (?from=room) he arrives at her stop as she shuts; Back goes to the stair head as from any stop. */
 var leaving = false, herOpening = false;
+/* ?stills (the point-and-click seam, board req 1880): the hole leads to the common room's staged stills (seam-test.html,
+   which holds the Common room's point-click-test.html unedited), and ?from=still brings him back out standing at her
+   stop, turned to face down the corridor */
+var STILLS = /[?&]stills\b/.test(location.search);
 function enter(dry, url, room) {
   if (leaving || view !== 'length') return false;
-  url = url || 'common-room.html?from=corridor'; room = room || 'common-room';
+  url = url || (STILLS ? 'seam-test.html?from=corridor' : 'common-room.html?from=corridor'); room = room || 'common-room';
   leaving = true;
   var herStop = STOPS[0];
   function swingAndWalk() {
@@ -4838,11 +4846,24 @@ function enter(dry, url, room) {
   } else swingAndWalk();
   return true;
 }
+function arriveFromStill() {
+  var herStop = STOPS[0], p = herStop.stop();
+  atStop = herStop; mode = 'stop'; backBtn.hidden = false;
+  var out = p.look.clone().sub(p.pos); out.x = -out.x; out.y = 0;
+  camera.position.copy(p.pos); lookTmp.copy(p.pos).add(out); setFov(p.fov);
+  stopPose = { pos: p.pos.clone(), look: lookTmp.clone() }; headReset();
+  herDoor.ang = DOOR_OPEN; herDoor.target = DOOR_OPEN;
+  setTimeout(function () { herDoor.target = 0; }, 700);
+  kit.savePlace({ room: 'corridor', stop: 'her' });
+  kit.reveal();
+}
 function arriveFromRoom() {
   var herStop = STOPS[0], p = herStop.stop();
   atStop = herStop; mode = 'stop'; backBtn.hidden = false;
-  camera.position.copy(p.pos); lookTmp.copy(p.look); setFov(p.fov);
-  stopPose = { pos: p.pos.clone(), look: p.look.clone() }; headReset();
+  /* a step out of her hole, turned to walk on down the corridor, not back at her (req 1892, Godric 30 October 2026) */
+  var out = p.look.clone().sub(p.pos); out.x = -out.x; out.y = 0;
+  camera.position.copy(p.pos); lookTmp.copy(p.pos).add(out); setFov(p.fov);
+  stopPose = { pos: p.pos.clone(), look: lookTmp.clone() }; headReset();
   herDoor.ang = DOOR_OPEN; herDoor.target = DOOR_OPEN;
   setTimeout(function () { herDoor.target = 0; }, 700);
   kit.savePlace({ room: 'corridor', stop: 'her' });
@@ -5147,7 +5168,8 @@ function arriveFromStore() {
 /* HUD: Layers, Res, Exp and ? are the shared frame's; View and Reset are this page's (onAct, above) */
 backBtn.addEventListener('click', goBack);
 setView(view);
-if (kit.from === 'room') arriveFromRoom();
+if (kit.from === 'still') arriveFromStill();
+else if (kit.from === 'room') arriveFromRoom();
 else if (kit.from === 'stair-hall') arriveFromBay();
 else if (kit.from === 'secret-s4b') arriveFromStore();
 
