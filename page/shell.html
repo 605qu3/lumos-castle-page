@@ -11202,6 +11202,11 @@ window.lumosGreybox = { scene: scene, camera: camera, zoom: kit.zoom, tap: tap, 
     var s = shell.stands.filter(function (x) { return x.name === n; })[0]; if (!s) return false;
     tween = null; legs = []; here = s; hereLook = null; hy = hyT = hp = hpT = 0; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
   },
+  /* a probe stand at a model point looking at another (model x, y, height), for a close shot of a placed thing */
+  pose: function (px, py, pz, lx, ly, lz) {
+    here = Object.assign({}, here, { name: 'pose', pos: shell.toLocal(px, py, pz), look: shell.toLocal(lx, ly, lz) });
+    tween = null; legs = []; hereLook = null; hy = hyT = hp = hpT = 0; headPose(camera.position, lookTmp); camera.lookAt(lookTmp); return true;
+  },
   look: function (y, p) { var lm = limits(here); hy = hyT = lm.yaw == null ? y : clamp(y, -lm.yaw, lm.yaw); hp = hpT = clamp(p, lm.lo, lm.hi); return { yaw: hy, pitch: hp }; },
   /* a shut door's tap; x and y (metres across and up from the leaf's middle) put it on a spot, as on a knot */
   answer: function (id, x, y) {
