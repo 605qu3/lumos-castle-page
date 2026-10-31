@@ -1,13 +1,13 @@
 /* room-tags-1.js: the light, surface and acoustic tags of floor 1's rooms, written by
    assets/design/materials/make-room-tags.py (req 1598). A plain script tag loads it; the shell reads
-   window.CASTLE_ROOM_TAGS.1.rooms[id].light / .surface / .acoustic and .stairs[id]. */
+   window.CASTLE_ROOM_TAGS["1"].rooms[id].light / .surface / .acoustic and .stairs[id]. */
 window.CASTLE_ROOM_TAGS = window.CASTLE_ROOM_TAGS || {};
-window.CASTLE_ROOM_TAGS.1 = {
+window.CASTLE_ROOM_TAGS["1"] = {
  "_meta": {
-  "written": "29 October 2026, 21:53 (Design, make-room-tags.py), req 1598, req 1650",
+  "written": "30 October 2026, 20:49 (Design, make-room-tags.py), req 1598, req 1650",
   "floor": "1",
-  "model": 244,
-  "floor_version": 5,
+  "model": 256,
+  "floor_version": 6,
   "rule": "A tag is a check, not a tone: the shell sets no wall lighter to meet a brightness floor (a lifted wall turns to paint, design-bright-rooms-1021); a room under its floor gets one more lamp. Nothing glows. Fire light waits on its own key: a hearth is listed, never counted as a light.",
   "light": {
    "day": "the room has at least one window-family opening in the model (the day driver reaches it)",
@@ -1396,6 +1396,91 @@ window.CASTLE_ROOM_TAGS.1 = {
    },
    "surface": "stone",
    "acoustic": "vaulted"
+  },
+  "east-lift-shaft-1": {
+   "use": "passage",
+   "age": "P3",
+   "area": 16,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 1,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "vaulted"
+  },
+  "west-pole-shaft-1": {
+   "use": "passage",
+   "age": "P3",
+   "area": 20,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 1,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "passage"
+  },
+  "west-dumbwaiter-shaft-1": {
+   "use": "passage",
+   "age": "P3",
+   "area": 20,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "torch",
+    "lamps": 1,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "passage"
+  },
+  "loop-gallery-stair-1": {
+   "use": "passage",
+   "age": "P3",
+   "area": 6,
+   "h": 4.5,
+   "light": {
+    "day": false,
+    "windows": 0,
+    "lamp": "lantern",
+    "lamps": 1,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "close"
+  },
+  "loop-gallery-1": {
+   "use": "passage",
+   "age": "P3",
+   "area": 46,
+   "h": 3.7,
+   "light": {
+    "day": true,
+    "windows": 3,
+    "lamp": "torch",
+    "lamps": 3,
+    "day_floor": 0.3,
+    "night_floor": 0.14,
+    "read": false
+   },
+   "surface": "flagstone",
+   "acoustic": "passage"
   }
  },
  "stairs": {
