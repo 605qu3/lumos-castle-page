@@ -118,7 +118,18 @@
     /* req 1990: a pale veined marble for the prefects' rooms (honed, a little polished): two-by-two slabs, thin grey veins, a soft sheen */
     'marble-pale': { rep: 2.4, draw: function (g, N, r) { slab(g, N, r, [226, 223, 216], [118, 124, 132], 0.30); } },
     /* the same slabs in a warm cream with brown-gold veins */
-    'marble-cream': { rep: 2.4, draw: function (g, N, r) { slab(g, N, r, [224, 214, 192], [150, 116, 70], 0.34); } }
+    'marble-cream': { rep: 2.4, draw: function (g, N, r) { slab(g, N, r, [224, 214, 192], [150, 116, 70], 0.34); } },
+    /* req 1995: the Victorian black and white, nine-inch glazed squares (about 0.23 m) on the chequer, a keyline of grey grout, the white a
+       little warm and crazed, the black a soft iron black; the washroom and hall floor of the 1860s to the 1890s (Butterfield's All Saints,
+       Margaret Street; the Rothesay Pier toilets of 1899 lay a cream mosaic with the same black bands) */
+    'victorian-bw': { rep: 2.3, draw: function (g, N, r) {
+      var n = 10, s = N / n;
+      for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) { var wht = (x + y) % 2 === 0, t = (r() - 0.5) * 10, c = wht ? [228 + t, 222 + t, 208 + t] : [38 + t, 38 + t, 42 + t];
+        g.fillStyle = rgb(c[0], c[1], c[2]); g.fillRect(x * s + 1.5, y * s + 1.5, s - 3, s - 3);
+        var sh = g.createLinearGradient(x * s, y * s, x * s + s, y * s + s); sh.addColorStop(0, 'rgba(255,255,255,0.12)'); sh.addColorStop(1, 'rgba(0,0,0,0.07)'); g.fillStyle = sh; g.fillRect(x * s + 1.5, y * s + 1.5, s - 3, s - 3);
+        if (wht) for (var k = 0; k < 4; k++) { g.strokeStyle = 'rgba(120,108,88,0.22)'; g.lineWidth = 0.7; g.beginPath(); var px = x * s + r() * s, py = y * s + r() * s; g.moveTo(px, py); g.lineTo(px + (r() - 0.5) * s * 0.6, py + (r() - 0.5) * s * 0.6); g.stroke(); } }
+      g.fillStyle = 'rgba(128,124,116,0.85)'; for (var q = 0; q <= n; q++) { g.fillRect(q * s - 1.5, 0, 3, N); g.fillRect(0, q * s - 1.5, N, 3); }
+      blots(g, N, r, 30, 30, 120, true); grain(g, N, r, 8); } }
   };
   var maps = {}, mats = {};
   function tex(kind) {
