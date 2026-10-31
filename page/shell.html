@@ -191,7 +191,7 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="depth-ties.js?v=1"></script>
 <script src="corridor/suit.js?v=6"></script>
 <script src="corridor/knight.js?v=2"></script>
-<script src="shell-w5a.js?v=68"></script>
+<script src="shell-w5a.js?v=69"></script>
 <script src="castle-events.js?v=40"></script>
 <script src="chess-core.js?v=2"></script>
 <script src="castle-sky.js?v=1"></script>
@@ -1092,6 +1092,31 @@ var CUP = (function () {
   var rbc = own(new THREE.Mesh(new THREE.TorusGeometry(0.036, 0.006, 6, 14), leather), 'cupboard-rag-bag-cord'); rbc.rotation.x = Math.PI / 2; rbc.position.copy(P(66.8, 63.33, 0.37));
   var sp = bucket(67.3, 63.38, false, 1); sp.name = 'cupboard-sand-pail'; sp.userData.owner = 'hall-cupboard'; sp.raycast = function () {};
   var sd = own(new THREE.Mesh(new THREE.CylinderGeometry(0.135, 0.135, 0.01, 18), sandM), 'cupboard-sand'); sd.position.copy(P(67.3, 63.38, 0.26));
+  /* req 1969 (docs/interiors/ground-floor-by-purpose-1031.md n 1), the Architect's: depth, not width. A third plain board at 2.05 on
+     two brackets (y 63.75 to 64.65, 0.3 deep; the bottle tops out at 1.8), holding a folded dust sheet, a tin of polish and a tin
+     of blacking with a chamois between; a hard and a soft scrubbing brush on the upper shelf's free end (y 64.40 to 64.57, past the
+     bottle at 64.3); a tin of tacks with a ball of string on its lid on the low shelf's north end (y 64.40 to 64.58, past the blacking
+     tin); on the south wall, above the rag bag and the sand pail, a second mop and a besom each hung by a loop from a nail at 1.9 (x
+     67.4 and 67.1; their heads at 0.5 to 0.75 clear the pail's top at 0.28). The floor is full: no bucket, no lantern (LATER: the
+     lantern wants the depth check), and the duster rail waits for Godric's line on the feather duster. Drawn plain, ids in the list. */
+  var chamM = kit.solid(0xb59a62, { roughness: 0.95 }), sheetM = kit.solid(0xcfc8b4, { roughness: 1 }), bristleM = kit.solid(0x7a6a48, { roughness: 1 });
+  panG(bw - 0.02, 63.75, bw + 0.28, 64.65, 2.03, 2.05, wood, 'cupboard-shelf-top');
+  [63.85, 64.55].forEach(function (y) { panG(bw - 0.02, y - 0.01, bw + 0.2, y + 0.01, 1.9, 2.03, ironC, 'cupboard-shelf-top-bracket'); });
+  panG(bw + 0.03, 64.2, bw + 0.25, 64.6, 2.05, 2.17, sheetM, 'cupboard-dust-sheet');
+  [[63.88, tin, 'cupboard-polish-tin-2'], [64.0, blk, 'cupboard-blacking-tin-2']].forEach(function (t) {
+    var m = own(new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.045, 16), t[1]), t[2]); m.position.copy(P(bw + 0.14, t[0], 2.05 + 0.0225));
+  });
+  panG(bw + 0.05, 64.07, bw + 0.21, 64.17, 2.05, 2.058, chamM, 'cupboard-chamois-2');
+  panG(bw + 0.01, 64.40, bw + 0.21, 64.46, 1.6, 1.665, wood, 'cupboard-brush-hard');
+  panG(bw + 0.01, 64.51, bw + 0.21, 64.57, 1.6, 1.665, wood, 'cupboard-brush-soft');
+  panG(bw + 0.03, 64.40, bw + 0.15, 64.58, 0.8, 0.88, wood, 'cupboard-tacks-box');
+  var ball = own(new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.05, 12), hess), 'cupboard-string'); ball.position.copy(P(bw + 0.09, 64.49, 0.88 + 0.025));
+  [[67.1, 'cupboard-besom-2'], [67.4, 'cupboard-mop-2']].forEach(function (n) {
+    panG(n[0] - 0.015, r[1] - 0.02, n[0] + 0.015, r[1] + 0.03, 1.88, 1.9, ironC, n[1] + '-nail');
+    panG(n[0] - 0.015, r[1] + 0.01, n[0] + 0.015, r[1] + 0.04, 0.72, 1.88, wood, n[1] + '-stick');
+  });
+  panG(67.04, r[1] + 0.01, 67.16, r[1] + 0.1, 0.5, 0.72, bristleM, 'cupboard-besom-2-head');
+  panG(67.33, r[1] + 0.01, 67.5, r[1] + 0.16, 0.57, 0.72, rag, 'cupboard-mop-2-head');
   var taps = [['hall-cupboard-bucket', ub ? ub.at[0] : r[0] + 0.6, ub ? ub.at[1] : r[1] + 0.4, 0.17, 0.36], ['hall-cupboard-bottle', sx, 64.3, 0.1, 0.24],
               ['hall-cupboard-tin', sx, 64.08, 0.08, 0.09]].map(function (t) {
     var m = new THREE.Mesh(new THREE.BoxGeometry(t[3] * 2, t[4], t[3] * 2), new THREE.MeshBasicMaterial({ visible: false }));
@@ -8729,6 +8754,19 @@ var STORE = PLACE !== 'drum-room-g' || !shell ? null : (function () {
   });
   box(K, 0.12, 0.14, 0.18, 0.58, 0.72, 0.12, pewter);
   cyl(K, 0.012, 0.32, 0.58, 0.665, -0.15, iron, 'x'); box(K, 0.05, 0.05, 0.05, 0.58, 0.69, -0.31, brass);
+  /* req 1969, by-purpose NOW list n 12 (docs/interiors/ground-floor-by-purpose-1031.md): the rolled banner in its stand by the peg rail,
+     a stack of old cushions on the settle and one on the floor before it, a second chair under a dust sheet beside the first, the
+     lantern hung off the walk, the rolled rug standing against the south-east wall. Plain, still; the dismantled bed stays LATER */
+  var BN = grp(44.9, -1.9, toC(44.9, -1.9));
+  cyl(BN, 0.15, 0.04, 0, 0.02, 0, iron); cyl(BN, 0.02, 2.0, 0, 1.0, 0, oakD);
+  cyl(BN, 0.065, 1.3, 0, 1.3, 0.02, wool); cyl(BN, 0.07, 0.04, 0, 1.0, 0.02, gilt); cyl(BN, 0.07, 0.04, 0, 1.6, 0.02, gilt);
+  box(ST, 0.5, 0.1, 0.42, 0.35, 0.49, 0.03, wool); box(ST, 0.44, 0.1, 0.38, 0.33, 0.59, 0.05, green); box(ST, 0.4, 0.09, 0.36, 0.36, 0.68, 0.02, mat(0x8a6c48, 0.95));
+  cyl(ST, 0.25, 0.1, -0.2, 0.05, 0.7, wool);
+  box(grp(45.35, 3.65, toC(45.35, 3.65)), 0.55, 1.05, 0.5, 0, 0.52, 0, sheetM);
+  var LN = grp(41.4, 3.3, toC(41.4, 3.3));
+  cyl(LN, 0.006, 2.1, 0, 3.35, 0, iron); box(LN, 0.2, 0.34, 0.2, 0, 2.15, 0, brass); box(LN, 0.12, 0.2, 0.12, 0, 2.15, 0, mat(0xe8d49a, 0.6)); box(LN, 0.26, 0.04, 0.26, 0, 2.35, 0, iron);
+  var RG = grp(45.48, 5.19, toC(45.48, 5.19));
+  cyl(RG, 0.14, 1.5, 0, 0.75, 0, mat(0x7a3a3a, 0.95)); cyl(RG, 0.145, 0.06, 0, 0.35, 0, iron); cyl(RG, 0.145, 0.06, 0, 1.15, 0, iron);
   /* 8 the easel, P4 on it turned to the walk (east), his right as he comes in */
   var E = grp(40.59, 4.45, [1, 0]);
   [-0.33, 0.33].forEach(function (u) { box(E, 0.05, 1.8, 0.05, u, 0.89, 0.02, oak); });   /* the front legs, behind the panel */
