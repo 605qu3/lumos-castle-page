@@ -17,7 +17,7 @@
    from the first year; a later first marks only what opens with a book or would give one away. A room's "alias" is
    an old id that still opens it; "shell": "never" keeps a room model data only, never built or walked. */
 window.CASTLE_MODEL = {
-  "version": 258,
+  "version": 259,
   "units": "metres",
   "site": {
     "block": [0, 0, 160, 72], "front": "north", "lake": "south", "state": "designed",
@@ -1813,6 +1813,10 @@ window.CASTLE_MODEL = {
       "from": 0, "to": 27.8, "treads": 139, "rise": 0.2, "hand": "clockwise up, seen from above", "state": "built", "cite": "PS 7",
       "drawn_to": 5.6, "drawn_treads": 28,
       "about": "Godric's Q68, 68.1 (12 October 2026, 6.51 pm; req 191, 201): the common room draws 28, since no view shows it above 5.37 m. Godric's 235.1 (13 October 2026, 12.18 pm; req 235, sheet architect-req235-0935): the stair climbs on unseen past six doors, a room a level (PoA 13, \"Doors opened behind them\"), walled in below the top, to the built room's floor at 27.8 m; the dormitory page's stair head, once open, is closed by a screen round the newel and its door (dorm-stair-screen, dorm-door; Godric's 1 on dormitory-sign-door-1013, ledger line 5)" },
+    { "id": "girls-stair", "first": "OotP", "group": "gryffindor-suite", "kind": "stair, its first flight straight from the door's sill, the slide's own treads", "room": "Gryffindor girls' tower",
+      "span": [[41.69, 8.35], [42.69, 11.05]], "up": [0, 1], "from": 0, "to": 1.08, "treads": 6, "rise": 0.18, "going": 0.45, "state": "proposed", "cite": "OotP 17",
+      "slide": { "state": "cue", "from_tread": 6, "ramp": {"len": 2.9, "w": 1.0, "deg": 22, "top": 1.08, "foot": [42.19, 8.35], "material": "the stair's own stone, same colour, no new light"}, "cue": "Events' req 1317", "landing_rug": "the common room's, Interiors' (docs/interiors/common-room.md): centre (-3.14, 3.57) in the page's frame, the slide's foot meeting its outer end", "sound": "the klaxon, held for when sound comes" },
+      "about": "the girls' stair's foot (ledger line 331; req 1363, Interiors' table in docs/interiors/common-room.md): behind `girls-door`, the first flight is six plain treads of 0.18 rise and 0.45 going, a straight run of 2.7 m due north from the door's sill on the girls' side of the shared wall (y 8.35; the girls' drum's centre (42.19, 13.95), inner radius 5.6), 1.0 wide, the sixth tread's top 1.08 above the sill; the stair stands always, and the slide is its state: when a boy sets his foot on the sixth tread the six treads re-set as one smooth ramp from that tread's top to the sill, 22 degrees and 2.9 m long, the same stone, nothing glows (OotP 17 L43255). Events cues it (req 1317); the shell draws the stair's first flight and the ramp state when the girls' drum is a place. Above the sixth tread the stair's newel, hand (anticlockwise up, seen from above, if the boys' is mirrored across the shared wall) and head to the girls' dormitories wait for the girls' drum to be drawn: the model has no room in it yet; provisional, Godric to confirm" },
     { "id": "corridor-flight", "group": "gryffindor-suite", "kind": "straight flight down", "room": "corridor", "span": [[-1.5, 20.11], [1.5, 23.41]],
       "from": 0, "to": -1.98, "treads": 11, "rise": 0.18, "state": "built" },
     { "id": "corridor-landing", "kind": "landing, one of the moving stair's places", "room": "corridor",
