@@ -26,6 +26,21 @@
       if (alongX) g.fillRect(x, y + o, w, 1 + r()); else g.fillRect(x + o, y, 1 + r(), h);
     }
   }
+  function slab(g, N, r, base, vein, va) {   /* four slabs a side; each its own tint, long veins that wander, a sheen, a pale joint */
+    var n = 2, s = N / n;
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) {
+      var t = (r() - 0.5) * 14, c = [base[0] + t, base[1] + t, base[2] + t];
+      g.fillStyle = rgb(c[0], c[1], c[2]); g.fillRect(x * s, y * s, s, s);
+      var sh = g.createLinearGradient(x * s, y * s, x * s + s, y * s + s); sh.addColorStop(0, 'rgba(255,255,255,0.10)'); sh.addColorStop(0.5, 'rgba(255,255,255,0)'); sh.addColorStop(1, 'rgba(0,0,0,0.05)');
+      g.fillStyle = sh; g.fillRect(x * s, y * s, s, s);
+      for (var v = 0; v < 5; v++) {
+        g.strokeStyle = 'rgba(' + vein[0] + ',' + vein[1] + ',' + vein[2] + ',' + (va * (0.4 + r() * 0.8)).toFixed(2) + ')'; g.lineWidth = 0.8 + r() * 2.2; g.beginPath();
+        var px = x * s + r() * s, py = y * s + r() * s; g.moveTo(px, py);
+        for (var k = 0; k < 3; k++) { px += (r() - 0.35) * 220; py += (r() - 0.5) * 220; g.bezierCurveTo(px - 60 + r() * 40, py + r() * 80 - 40, px + r() * 80 - 40, py + r() * 80 - 40, px, py); }
+        g.stroke(); }
+      for (var f = 0; f < 3; f++) { g.strokeStyle = 'rgba(' + vein[0] + ',' + vein[1] + ',' + vein[2] + ',0.10)'; g.lineWidth = 6; g.beginPath(); g.moveTo(x * s + r() * s, y * s + r() * s); g.lineTo(x * s + r() * s, y * s + r() * s); g.stroke(); } }
+    g.fillStyle = 'rgba(150,150,148,0.6)'; for (var q = 0; q <= n; q++) { g.fillRect(q * s - 1, 0, 2, N); g.fillRect(0, q * s - 1, N, 2); }
+    grain(g, N, r, 6); }
   var KINDS = {
     /* the flags as the shell lays them now, but worn: big irregular stones, soft edges, a dark joint */
     flags: { rep: 4, draw: function (g, N, r) {
@@ -99,7 +114,11 @@
         for (var v = 0; v < 6; v++) { g.strokeStyle = wht ? 'rgba(120,124,132,0.35)' : 'rgba(210,214,220,0.22)'; g.lineWidth = 1 + r() * 1.5; g.beginPath();
           var px = x * s + r() * s, py = y * s + r() * s; g.moveTo(px, py); g.bezierCurveTo(px + r() * 120 - 60, py + r() * 120 - 60, px + r() * 160 - 80, py + r() * 160 - 80, px + r() * 200 - 100, py + r() * 200 - 100); g.stroke(); } }
       g.fillStyle = 'rgba(30,30,30,0.5)'; for (var q = 0; q <= n; q++) { g.fillRect(q * s - 1, 0, 2, N); g.fillRect(0, q * s - 1, N, 2); }
-      grain(g, N, r, 10); } }
+      grain(g, N, r, 10); } },
+    /* req 1990: a pale veined marble for the prefects' rooms (honed, a little polished): two-by-two slabs, thin grey veins, a soft sheen */
+    'marble-pale': { rep: 2.4, draw: function (g, N, r) { slab(g, N, r, [226, 223, 216], [118, 124, 132], 0.30); } },
+    /* the same slabs in a warm cream with brown-gold veins */
+    'marble-cream': { rep: 2.4, draw: function (g, N, r) { slab(g, N, r, [224, 214, 192], [150, 116, 70], 0.34); } }
   };
   var maps = {}, mats = {};
   function tex(kind) {
