@@ -127,7 +127,25 @@
 
   /* v10: a head's line d out from the cut (a the cut's half width), t from the left springing (0) to the right (1),
      about the springing's middle: round about one centre; pointed, equilateral, each half struck from the far springing */
+  /* req 1996 preview: a four-centred (Tudor) head, each half two arcs: a small one of radius r1 = a/4 on the springing line,
+     then a larger one that meets its end tangent and reaches the apex over the middle (rise 0.65 a); d offsets both radii */
+  function tudor(a) {
+    var r1 = a / 4, ph = Math.PI / 3, ux = -Math.cos(ph), uy = Math.sin(ph), c1x = -a + r1, h = 0.65 * a;
+    /* C2 = C1 + (r1 - r2) u, |(0,h) - C2| = r2: a quadratic in r2 */
+    var qx = 0 - c1x - r1 * ux, qy = h - r1 * uy;   /* P - C1 - r1 u = P - J'; (qx + r2 ux)^2 + (qy + r2 uy)^2 = r2^2 */
+    var A = ux * ux + uy * uy - 1, B = 2 * (qx * ux + qy * uy), C = qx * qx + qy * qy, r2;
+    r2 = Math.abs(A) < 1e-9 ? -C / B : (-B - Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+    if (!(r2 > 0)) r2 = (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+    return { r1: r1, ph: ph, c1x: c1x, c2x: c1x + (r1 - r2) * ux, c2y: (r1 - r2) * uy, r2: r2 };
+  }
   function prof(kind, a, d, t) {
+    if (kind === 'tudor') {
+      if (t > 0.5) { var mm = prof(kind, a, d, 1 - t); return [-mm[0], mm[1]]; }
+      var T = tudor(a), f = 0.2, R2 = T.r2 + d, thA = Math.acos(Math.max(-1, Math.min(1, -T.c2x / R2)));
+      if (t / 0.5 <= f) { var th1 = Math.PI - T.ph * (t / 0.5) / f; return [T.c1x + (T.r1 + d) * Math.cos(th1), (T.r1 + d) * Math.sin(th1)]; }
+      var u = ((t / 0.5) - f) / (1 - f), thJ = Math.PI - T.ph, th2 = thJ + (thA - thJ) * u;
+      return [T.c2x + R2 * Math.cos(th2), T.c2y + R2 * Math.sin(th2)];
+    }
     if (kind === 'round') { var q = Math.PI * (1 - t); return [(a + d) * Math.cos(q), (a + d) * Math.sin(q)]; }
     if (t > 0.5) { var m = prof(kind, a, d, 1 - t); return [-m[0], m[1]]; }
     var R = 2 * a + d, e = Math.acos(-a / R), th = Math.PI - (Math.PI - e) * t / 0.5;
@@ -183,6 +201,7 @@
     var M = s.cls === 'loop' ? loopMould(s.face) : mould(s.age, s.cls, s), w = s.w, y0 = s.sill, y1 = s.sill + s.h, bw = M.bw, P = M.proj, ch = M.chamfer;
     /* v3: every edge that meets the cut, the jambs' feet and tops and the head's top, stand 6 mm into it or clear, so no face of the trim lies in the plane of the wall's own jamb, head
        or sill (the back's 5 mm embed overlapped them: 41 places fought, the all-places run with ?trim=1) */
+    if (s.mv) for (var mk in s.mv) M[mk] = s.mv[mk];   /* req 1996 preview: a moulding set by hand */
     var J = 0.006, wi = w - 2 * J, X = w / 2 + bw, parts = [], lim = s.lim;
     /* the face 'in' is turned half about y after it is built, so its x runs the other way: clip it by the mirror */
     /* v8: 8 mm short of the wall's ends, so a piece cut there never lies in the end's plane (pomfrey-bedroom's widened sill) */
@@ -192,25 +211,25 @@
     var win = s.cls === 'window', out = s.face === 'out', xi = wi / 2, ys = y0 + J, yh = y1 + bw - J, E = EMBED, tall = y1 - y0;
     function pair(a, b, ya, yb, p, c) { parts.push(rect(THREE, -b, -a, ya, yb, p, c), rect(THREE, a, b, ya, yb, p, c)); }   /* a to b out from the middle, both sides */
     var HK = s.cls === 'loop' ? '' : String(s.head || '').split(',')[0].trim();   /* v10: the record's head, its first word */
-    if (HK === 'pointed' && !(w > 0.1)) HK = '';
-    var RH = HK === 'round' ? w / 2 : HK === 'pointed' ? rise('pointed', w / 2, 0) : 0, yr = y1 - RH;   /* v9: yr the springing, y1 the crown */
+    if ((HK === 'pointed' || HK === 'tudor') && !(w > 0.1)) HK = '';
+    var RH = HK === 'round' ? w / 2 : HK === 'pointed' || HK === 'tudor' ? rise(HK, w / 2, 0) : 0, yr = y1 - RH;   /* v9: yr the springing, y1 the crown */
     var imp = M.impost && tall > 0.6, jb = ys, jt = yr - J;
     if (M.shaft && tall > 1.2) jb = ys + 0.22;
     if (M.stop && tall > 0.9) jb = ys + 0.32;
     if (imp) jt = yr - J - 0.18;
-    if (RH && HK === 'pointed') {
+    if (RH && (HK === 'pointed' || HK === 'tudor')) {
       /* v10: a pointed head: the jambs to the springing, the ring over the cut (a joint at the apex), a roll or bead
          turned with it, and the hood following the head where the age has one (a door's on both faces, a window's
          outside), its ends stopped on blocks at the springing */
       var a = w / 2, PP = M.steps ? 0.06 : P;
       pair(xi, X, jb, jt, PP, ch);
-      parts.push.apply(parts, pring(THREE, 'pointed', a, yr, -J, bw, PP, w > 1.6 ? 6 : 4));
+      parts.push.apply(parts, pring(THREE, HK, a, yr, -J, bw, PP, w > 1.6 ? 6 : 4));
       if (imp) pair(xi, X + 0.05, jt, yr - J, P + 0.04, true);
-      if (M.roll || M.bead) parts.push(pRod(THREE, 'pointed', a, yr, 0.03, PP - E, 0.03));
+      if (M.roll || M.bead) parts.push(pRod(THREE, HK, a, yr, 0.03, PP - E, 0.03));
       if (M.bead) [-1, 1].forEach(function (sd) { parts.push(rod(THREE, 'y', jb, yr, sd * (xi + 0.03), PP - E, 0.03)); });
       if (M.stop && jb > ys) pair(xi, X + 0.008, ys, jb, PP + 0.016, false);
       if (M.hood && (!win || out)) {
-        parts.push.apply(parts, pring(THREE, 'pointed', a, yr, bw, bw + 0.08, PP + 0.05, w > 1.6 ? 6 : 4));
+        parts.push.apply(parts, pring(THREE, HK, a, yr, bw, bw + 0.08, PP + 0.05, w > 1.6 ? 6 : 4));
         pair(X + 0.008, X + 0.1, yr - 0.14, yr - J, PP + 0.07, true);
       }
       if (win && s.sill > 0.05) {
@@ -294,5 +313,5 @@
     return g;
   }
 
-  window.CastleTrim = { version: 10, geometry: geometry, merge: merge, mould: mould, prof: prof, rise: rise };
+  window.CastleTrim = { version: 10, tudor: tudor, geometry: geometry, merge: merge, mould: mould, prof: prof, rise: rise };
 })();
