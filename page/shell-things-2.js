@@ -2,6 +2,100 @@
    (tools/floor_things_file.py); never edit by hand. Each block adds one room to SHELL_W5A.things. */
 (function (T) {
   var things = {
+    /* 2-THINGS astronomy-stair-foot-2 */
+    /* docs/interiors/upper-floors-gaps-1028.md (astronomy-stair-foot-2, stair feet; the treads and rails are the Architects own stair pieces, not placed here; hidden ways left to the ledger and Hidden Ways): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'astronomy-stair-foot-2': { items: [
+      ['b', 88.55, 60.55, 0, 88.77, 61.45, 0.012, 'stone'], ['b', 87.55, 59.23, 0, 88.45, 59.45, 0.012, 'stone'], ['b', 82.45, 68.55, 0, 83.35, 68.77, 0.012, 'stone'], ['b', 84.28, 59.23, 2.15, 84.32, 59.53, 2.2, 'iron'],
+      ['y', 84.3, 59.51, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end astronomy-stair-foot-2 */
+    /* 2-THINGS north-stair-foot-2 */
+    /* docs/interiors/upper-floors-gaps-1028.md (north-stair-foot-2, stair feet; the treads and rails are the Architects own stair pieces, not placed here; hidden ways left to the ledger and Hidden Ways): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'north-stair-foot-2': { items: [
+      ['b', 152.95, 58.98, 0, 153.85, 59.2, 0.012, 'stone'], ['b', 152.48, 61.05, 0, 152.7, 61.95, 0.012, 'stone'], ['b', 159.72, 59.405, 2.15, 160.02, 59.445, 2.2, 'iron'], ['y', 159.74, 59.425, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end north-stair-foot-2 */
+    /* 2-THINGS west-stair-foot-2 */
+    /* docs/interiors/upper-floors-gaps-1028.md (west-stair-foot-2, stair feet; the treads and rails are the Architects own stair pieces, not placed here; hidden ways left to the ledger and Hidden Ways): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'west-stair-foot-2': { items: [
+      ['b', 6.05, 63.8, 0, 6.95, 64.02, 0.012, 'stone'], ['b', 7.275, 58.98, 0, 7.975, 59.2, 0.012, 'stone'], ['b', 7.8, 61.05, 0, 8.02, 61.95, 0.012, 'stone'], ['b', -0.02, 59.455, 2.15, 0.28, 59.495, 2.2, 'iron'],
+      ['y', 0.26, 59.475, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end west-stair-foot-2 */
+    /* 2-THINGS sw-stair-foot-2 */
+    /* docs/interiors/upper-floors-gaps-1028.md (sw-stair-foot-2, stair feet; the treads and rails are the Architects own stair pieces, not placed here; hidden ways left to the ledger and Hidden Ways): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'sw-stair-foot-2': { items: [
+      ['b', 2.925, 11.8, 0, 3.825, 12.02, 0.012, 'stone'], ['b', 6.72, 9.18, 2.15, 7.02, 9.22, 2.2, 'iron'], ['y', 6.74, 9.2, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end sw-stair-foot-2 */
+    /* 2-THINGS west-corridor-2-south */
+    /* docs/interiors/upper-floors-gaps-1028.md (west-corridor-2-south, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'west-corridor-2-south': { items: [
+      ['b', 2.925, 53.15, 0, 3.825, 53.37, 0.012, 'stone'], ['b', 7.55, 53.15, 0, 8.45, 53.37, 0.012, 'stone'], ['b', 11.55, 53.15, 0, 12.45, 53.37, 0.012, 'stone'], ['b', 14.47, 51.78, 2.15, 14.77, 51.82, 2.2, 'iron'],
+      ['y', 14.49, 51.8, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end west-corridor-2-south */
+    /* 2-THINGS west-wing-corridor-2 */
+    /* docs/interiors/upper-floors-gaps-1028.md (west-wing-corridor-2, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'west-wing-corridor-2': { items: [
+      ['b', 12.63, 44.215, 0, 12.85, 45.115, 0.012, 'stone'], ['b', 12.63, 33.55, 0, 12.85, 34.45, 0.012, 'stone'], ['b', 12.63, 22.885, 0, 12.85, 23.785, 0.012, 'stone'], ['b', 13.45, 18.23, 0, 14.35, 18.45, 0.012, 'stone'],
+      ['b', 14.87, 33.83, 2.15, 15.17, 33.87, 2.2, 'iron'], ['y', 14.89, 33.85, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end west-wing-corridor-2 */
+    /* 2-THINGS north-range-corridor-2 */
+    /* docs/interiors/upper-floors-gaps-1028.md (north-range-corridor-2, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'north-range-corridor-2': { items: [
+      ['b', 66.55, 53.15, 0, 67.45, 53.37, 0.012, 'stone'], ['b', 68.8, 53.15, 0, 69.7, 53.37, 0.012, 'stone'], ['b', 70.55, 53.15, 0, 71.45, 53.37, 0.012, 'stone'], ['b', 79.05, 53.15, 0, 79.95, 53.37, 0.012, 'stone'],
+      ['b', 87.55, 53.15, 0, 88.45, 53.37, 0.012, 'stone'], ['b', 92.05, 53.15, 0, 92.95, 53.37, 0.012, 'stone'], ['b', 99.55, 53.15, 0, 100.45, 53.37, 0.012, 'stone'], ['b', 107.95, 53.15, 0, 108.85, 53.37, 0.012, 'stone'],
+      ['b', 113.35, 53.15, 0, 114.25, 53.37, 0.012, 'stone'], ['b', 126.25, 53.15, 0, 127.15, 53.37, 0.012, 'stone'], ['b', 139.15, 53.15, 0, 140.05, 53.37, 0.012, 'stone'], ['b', 141.85, 53.15, 0, 142.75, 53.37, 0.012, 'stone'],
+      ['b', 147.55, 53.15, 0, 148.45, 53.37, 0.012, 'stone'], ['b', 152.8, 53.15, 0, 153.7, 53.37, 0.012, 'stone'], ['b', 156.925, 53.15, 0, 157.825, 53.37, 0.012, 'stone'], ['b', 159.72, 51.78, 2.15, 160.02, 51.82, 2.2, 'iron'],
+      ['y', 159.74, 51.8, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end north-range-corridor-2 */
+    /* 2-THINGS passage-2-study */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-2-study, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'passage-2-study': { items: [
+      ['b', 139.15, 53.83, 0, 140.05, 54.05, 0.012, 'stone'], ['b', 139.15, 58.55, 0, 140.05, 58.77, 0.012, 'stone'], ['b', 138.83, 56.28, 2.15, 139.13, 56.32, 2.2, 'iron'], ['y', 139.11, 56.3, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end passage-2-study */
+    /* 2-THINGS passage-2-middle */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-2-middle, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'passage-2-middle': { items: [
+      ['b', 113.35, 53.83, 0, 114.25, 54.05, 0.012, 'stone'], ['b', 113.35, 58.55, 0, 114.25, 58.77, 0.012, 'stone'], ['b', 113.03, 56.28, 2.15, 113.33, 56.32, 2.2, 'iron'], ['y', 113.31, 56.3, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end passage-2-middle */
+    /* 2-THINGS passage-2-gate */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-2-gate, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'passage-2-gate': { items: [
+      ['b', 87.55, 53.83, 0, 88.45, 54.05, 0.012, 'stone'], ['b', 87.55, 58.55, 0, 88.45, 58.77, 0.012, 'stone'], ['b', 87.23, 56.28, 2.15, 87.53, 56.32, 2.2, 'iron'], ['y', 87.51, 56.3, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end passage-2-gate */
+    /* 2-THINGS passage-2-linen */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-2-linen, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'passage-2-linen': { items: [
+      ['b', 70.55, 53.83, 0, 71.45, 54.05, 0.012, 'stone'], ['b', 70.45, 58.55, 0, 71.35, 58.77, 0.012, 'stone'], ['b', 70.23, 56.28, 2.15, 70.53, 56.32, 2.2, 'iron'], ['y', 70.51, 56.3, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end passage-2-linen */
+    /* 2-THINGS passage-2-west */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-2-west, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'passage-2-west': { items: [
+      ['b', 7.275, 58.55, 0, 7.975, 58.77, 0.012, 'stone'], ['b', 7.55, 53.83, 0, 8.45, 54.05, 0.012, 'stone'], ['b', 8.47, 56.68, 2.15, 8.77, 56.72, 2.2, 'iron'], ['y', 8.49, 56.7, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end passage-2-west */
+    /* 2-THINGS service-passage-2-lobby */
+    /* docs/interiors/upper-floors-gaps-1028.md (service-passage-2-lobby, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'service-passage-2-lobby': { items: [
+      ['b', 68.8, 53.83, 0, 69.7, 54.05, 0.012, 'stone'], ['b', 68.63, 55.9, 0, 68.85, 56.8, 0.012, 'stone'], ['b', 68.63, 58.405, 2.15, 68.93, 58.445, 2.2, 'iron'], ['y', 68.91, 58.425, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end service-passage-2-lobby */
+    /* 2-THINGS passage-2-east */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-2-east, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'passage-2-east': { items: [
+      ['b', 152.8, 53.83, 0, 153.7, 54.05, 0.012, 'stone'], ['b', 152.95, 58.55, 0, 153.85, 58.77, 0.012, 'stone'], ['b', 152.23, 56.58, 2.15, 152.53, 56.62, 2.2, 'iron'], ['y', 152.51, 56.6, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end passage-2-east */
+    /* 2-THINGS service-passage-2-east */
+    /* docs/interiors/upper-floors-gaps-1028.md (service-passage-2-east, corridors and passages): bare flags, a worn stone threshold at each real door, one unlit torch bracket clear of every opening; no placeholders */
+    'service-passage-2-east': { items: [
+      ['b', 150.05, 18.23, 0, 150.95, 18.45, 0.012, 'stone'], ['b', 156.55, 18.23, 0, 157.45, 18.45, 0.012, 'stone'], ['b', 147.83, 18.55, 0, 148.05, 19.45, 0.012, 'stone'], ['b', 159.72, 19.28, 2.15, 160.02, 19.32, 2.2, 'iron'],
+      ['y', 159.74, 19.3, 0.05, 2.2, 2.32, 'iron']] },
+    /* 2-THINGS end service-passage-2-east */
+    /* 2-THINGS lake-tower-2 */
+    /* docs/interiors/floor-b-and-2-completion-1029.md (lake-tower-2, B3) and floor-b-and-2-lived-in-1029.md: a stool inside each window (0.9 in from its centre line), the plank bench on the east wall with a folded blanket at its north end and the slate at its south end, one lantern hung from the roof over the middle at 1.9, the middle clear to 3.8; a pair of field glasses on the stool by the south-south-west window; the three-legged-stool, plank-bench, wool-blanket, writing-slate, hanging-lantern and field-glasses pieces are plain stand-ins */
+    'lake-tower-2': { items: [
+      ['b', 128.665, -7.755, 0.41, 129.015, -7.405, 0.45, 'wood'], ['b', 128.685, -7.735, 0, 128.715, -7.705, 0.41, 'wood'], ['b', 128.685, -7.455, 0, 128.715, -7.425, 0.41, 'wood'], ['b', 128.965, -7.735, 0, 128.995, -7.705, 0.41, 'wood'],
+      ['b', 128.965, -7.455, 0, 128.995, -7.425, 0.41, 'wood'], ['b', 130.985, -7.755, 0.41, 131.335, -7.405, 0.45, 'wood'], ['b', 131.005, -7.735, 0, 131.035, -7.705, 0.41, 'wood'], ['b', 131.005, -7.455, 0, 131.035, -7.425, 0.41, 'wood'],
+      ['b', 131.285, -7.735, 0, 131.315, -7.705, 0.41, 'wood'], ['b', 131.285, -7.455, 0, 131.315, -7.425, 0.41, 'wood'], ['b', 134.2, -4.8, 0.42, 134.64, -3.2, 0.46, 'pine'], ['b', 134.2, -4.8, 0, 134.64, -4.74, 0.42, 'wood'],
+      ['b', 134.2, -3.28, 0, 134.64, -3.22, 0.42, 'wood'], ['b', 134.25, -3.55, 0.46, 134.6, -3.2, 0.5, 'linen'], ['b', 134.27, -3.52, 0.5, 134.58, -3.23, 0.54, 'blue'], ['b', 134.3, -4.75, 0.46, 134.6, -4.55, 0.48, 'slate'],
+      ['b', 134.31, -4.74, 0.48, 134.59, -4.56, 0.49, 'white'], ['y', 130.0, -4.2, 0.008, 2.2, 4.5, 'rope'], ['b', 129.9, -4.3, 1.9, 130.1, -4.1, 1.93, 'iron'], ['b', 129.92, -4.28, 1.93, 130.08, -4.12, 2.17, 'glass'],
+      ['b', 129.9, -4.3, 2.17, 130.1, -4.1, 2.2, 'iron'], ['b', 128.74, -7.66, 0.45, 128.94, -7.58, 0.5, 'leather']] },
+    /* 2-THINGS end lake-tower-2 */
     /* 2-THINGS lake-corridor-2-east */
     /* docs/interiors/upper-floors-gaps-1028.md (lake-corridor-2-east): eight plank benches against the lake wall in the runs between its openings, the aisle to the south doors kept open */
     'lake-corridor-2-east': { items: [
@@ -382,7 +476,7 @@
       ['b', 152.912, 41.66, 1.0, 152.972, 42.76, 1.47, 'linen'], ['b', 147.83, 43.55, 0, 148.05, 44.45, 0.012, 'stone'], ['b', 153.55, 37.73, 0, 154.45, 37.95, 0.012, 'stone'], ['b', 159.8, 39.55, 0, 160.02, 40.45, 0.012, 'stone']] },
     /* 2-THINGS end elves-linen-room-2 */
     /* 2-THINGS teachers-office-2-north */
-    /* docs/interiors/upper-floors-gaps-1028.md (teachers-office-2-north, teachers' studies): a writing desk with a windsor chair on a hearth rug, a bookcase and a longcase clock and one portrait, an oil lamp; the leaf's sweep kept clear */
+    /* docs/interiors/upper-floors-gaps-1028.md (teachers-office-2-north, teachers' studies): a writing desk with a windsor chair on a hearth rug, a bookcase and a longcase clock and one portrait, an oil lamp; the leaf's sweep kept clear; lived-in touch (floor-b-and-2-lived-in-1029.md): a cup on the desk (the half-turned chair is not placed: a chair cannot be angled, and the family chair back is req 2122); plain stand-ins */
     'teachers-office-2-north': { items: [
       ['t', 109.75, 15.4, 111.15, 16.1, 0.76, 'oak'], ['b', 109.8, 15.45, 0.45, 110.2, 16.05, 0.72, 'dark'], ['b', 109.85, 15.5, 0.76, 110.25, 15.85, 0.78, 'paper'], ['y', 110.9, 15.75, 0.06, 0.76, 0.79, 'brass'],
       ['y', 110.9, 15.75, 0.04, 0.79, 0.88, 'glass'], ['y', 110.9, 15.75, 0.025, 0.88, 1.06, 'glass'], ['t', 110.24, 14.74, 110.66, 15.16, 0.45, 'wood'], ['b', 110.24, 15.12, 0.45, 110.66, 15.16, 0.9, 'wood'],
@@ -409,10 +503,11 @@
       ['b', 109.61, 9.96, 0.4, 109.81, 10.86, 1.0, 'leather'], ['b', 108.97, 9.96, 0.4, 109.61, 10.08, 0.62, 'leather'], ['b', 108.97, 10.74, 0.4, 109.61, 10.86, 0.62, 'leather'], ['y', 108.09, 9.51, 0.4, 0.0, 0.42, 'oak'],
       ['y', 108.09, 9.51, 0.46, 0.42, 0.45, 'oak'], ['y', 108.09, 9.36, 0.06, 0.45, 0.48, 'brass'], ['y', 108.09, 9.36, 0.04, 0.48, 0.57, 'glass'], ['y', 108.09, 9.36, 0.025, 0.57, 0.75, 'glass'],
       ['b', 108.19, 9.56, 0.45, 108.41, 9.81, 0.49, 'paper'], ['b', 108.14, 10.96, 0.41, 108.44, 11.26, 0.45, 'wood'], ['b', 108.16, 10.98, 0, 108.19, 11.01, 0.41, 'wood'], ['b', 108.16, 11.21, 0, 108.19, 11.24, 0.41, 'wood'],
-      ['b', 108.39, 10.98, 0, 108.42, 11.01, 0.41, 'wood'], ['b', 108.39, 11.21, 0, 108.42, 11.24, 0.41, 'wood'], ['b', 108.55, 3.83, 0, 109.45, 4.05, 0.012, 'stone']] },
+      ['b', 108.39, 10.98, 0, 108.42, 11.01, 0.41, 'wood'], ['b', 108.39, 11.21, 0, 108.42, 11.24, 0.41, 'wood'], ['b', 108.55, 3.83, 0, 109.45, 4.05, 0.012, 'stone'], ['y', 110.55, 15.95, 0.04, 0.76, 0.83, 'blue'],
+      ['b', 110.585, 15.938, 0.78, 110.62, 15.962, 0.815, 'blue']] },
     /* 2-THINGS end teachers-office-2-north */
     /* 2-THINGS defence-office-2-north */
-    /* docs/interiors/upper-floors-gaps-1028.md (defence-office-2-north, teachers' studies): a writing desk with a windsor chair on a hearth rug, a bookcase and no clock and one portrait, an oil lamp; the leaf's sweep kept clear */
+    /* docs/interiors/upper-floors-gaps-1028.md (defence-office-2-north, teachers' studies): a writing desk with a windsor chair on a hearth rug, a bookcase and no clock and one portrait, an oil lamp; the leaf's sweep kept clear; lived-in touch (floor-b-and-2-lived-in-1029.md): a pen laid across the marked paper; plain stand-ins */
     'defence-office-2-north': { items: [
       ['t', 97.45, 15.4, 98.85, 16.1, 0.76, 'oak'], ['b', 97.5, 15.45, 0.45, 97.9, 16.05, 0.72, 'dark'], ['b', 97.55, 15.5, 0.76, 97.95, 15.85, 0.78, 'paper'], ['y', 98.6, 15.75, 0.06, 0.76, 0.79, 'brass'],
       ['y', 98.6, 15.75, 0.04, 0.79, 0.88, 'glass'], ['y', 98.6, 15.75, 0.025, 0.88, 1.06, 'glass'], ['t', 97.94, 14.74, 98.36, 15.16, 0.45, 'wood'], ['b', 97.94, 15.12, 0.45, 98.36, 15.16, 0.9, 'wood'],
@@ -439,7 +534,7 @@
       ['b', 96.67, 9.96, 0.4, 97.31, 10.08, 0.62, 'leather'], ['b', 96.67, 10.74, 0.4, 97.31, 10.86, 0.62, 'leather'], ['y', 95.79, 9.51, 0.4, 0.0, 0.42, 'oak'], ['y', 95.79, 9.51, 0.46, 0.42, 0.45, 'oak'],
       ['y', 95.79, 9.36, 0.06, 0.45, 0.48, 'brass'], ['y', 95.79, 9.36, 0.04, 0.48, 0.57, 'glass'], ['y', 95.79, 9.36, 0.025, 0.57, 0.75, 'glass'], ['b', 95.89, 9.56, 0.45, 96.11, 9.81, 0.49, 'paper'],
       ['b', 95.84, 10.96, 0.41, 96.14, 11.26, 0.45, 'wood'], ['b', 95.86, 10.98, 0, 95.89, 11.01, 0.41, 'wood'], ['b', 95.86, 11.21, 0, 95.89, 11.24, 0.41, 'wood'], ['b', 96.09, 10.98, 0, 96.12, 11.01, 0.41, 'wood'],
-      ['b', 96.09, 11.21, 0, 96.12, 11.24, 0.41, 'wood'], ['b', 96.05, 3.83, 0, 96.95, 4.05, 0.012, 'stone']] },
+      ['b', 96.09, 11.21, 0, 96.12, 11.24, 0.41, 'wood'], ['b', 96.05, 3.83, 0, 96.95, 4.05, 0.012, 'stone'], ['b', 97.62, 15.55, 0.78, 97.65, 15.8, 0.795, 'wood'], ['b', 97.62, 15.55, 0.795, 97.65, 15.58, 0.805, 'ink']] },
     /* 2-THINGS end defence-office-2-north */
     /* 2-THINGS staff-bedrooms-2-east */
     /* docs/interiors/upper-floors-gaps-1028.md (staff-bedrooms-2-east, staff bedrooms): two iron bedsteads, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come */
@@ -481,7 +576,7 @@
       ['y', 141.7, 8.4, 0.07, 0.9, 1.1, 'white'], ['b', 146.9, 3.83, 0, 147.8, 4.05, 0.012, 'stone'], ['b', 145.65, 17.55, 0, 146.55, 17.77, 0.012, 'stone'], ['b', 150.05, 17.55, 0, 150.95, 17.77, 0.012, 'stone']] },
     /* 2-THINGS end staff-bedrooms-2-east */
     /* 2-THINGS staff-bedroom-2-west */
-    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedroom-2-west, staff bedrooms): an iron bedstead, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come */
+    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedroom-2-west, staff bedrooms): an iron bedstead, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come; lived-in touch (floor-b-and-2-lived-in-1029.md): a snuffed candle and a glass on the night cupboard; plain stand-ins */
     'staff-bedroom-2-west': { items: [
       ['b', 0.27, 40.78, 0.3, 2.25, 41.73, 0.36, 'iron'], ['b', 2.21, 40.78, 0, 2.25, 40.82, 0.3, 'iron'], ['b', 2.21, 41.69, 0, 2.25, 41.73, 0.3, 'iron'], ['b', 0.27, 40.78, 0, 0.31, 40.82, 0.3, 'iron'],
       ['b', 0.27, 41.69, 0, 0.31, 41.73, 0.3, 'iron'], ['b', 0.27, 40.78, 0.36, 0.31, 41.73, 1.05, 'iron'], ['b', 2.22, 40.78, 0.36, 2.25, 41.73, 0.6, 'iron'], ['b', 0.31, 40.81, 0.36, 2.22, 41.7, 0.5, 'linen'],
@@ -512,7 +607,8 @@
       ['y', 7.302, 45.885, 0.025, 0.57, 0.75, 'glass'], ['b', 6.852, 45.985, 0.45, 7.102, 46.205, 0.49, 'paper'], ['b', 5.402, 45.935, 0.41, 5.702, 46.235, 0.45, 'wood'], ['b', 5.422, 45.955, 0, 5.452, 45.985, 0.41, 'wood'],
       ['b', 5.422, 46.185, 0, 5.452, 46.215, 0.41, 'wood'], ['b', 5.652, 45.955, 0, 5.682, 45.985, 0.41, 'wood'], ['b', 5.652, 46.185, 0, 5.682, 46.215, 0.41, 'wood'], ['b', 3.92, 40.68, 0.0, 3.95, 41.16, 1.7, 'cloth'],
       ['b', 3.82, 41.18, 0.0, 3.85, 41.66, 1.7, 'cloth'], ['b', 3.92, 41.68, 0.0, 3.95, 42.16, 1.7, 'cloth'], ['b', 6.7, 39.56, 0, 9.1, 40.03, 0.9, 'oak'], ['y', 8.6, 39.83, 0.07, 0.9, 1.1, 'white'],
-      ['b', 11.95, 44.215, 0, 12.17, 45.115, 0.012, 'stone'], ['b', 0.23, 42.75, 0, 0.45, 43.55, 0.012, 'stone']] },
+      ['b', 11.95, 44.215, 0, 12.17, 45.115, 0.012, 'stone'], ['b', 0.23, 42.75, 0, 0.45, 43.55, 0.012, 'stone'], ['y', 0.38, 42.0, 0.05, 0.67, 0.69, 'brass'], ['y', 0.38, 42.0, 0.025, 0.69, 0.8, 'tallow'],
+      ['y', 0.38, 42.0, 0.006, 0.8, 0.82, 'black'], ['y', 0.55, 41.9, 0.032, 0.67, 0.75, 'glass']] },
     /* 2-THINGS end staff-bedroom-2-west */
     /* 2-THINGS staff-bedroom-2-east */
     /* docs/interiors/upper-floors-gaps-1028.md (staff-bedroom-2-east, staff bedrooms): an iron bedstead, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come */
@@ -729,7 +825,7 @@
       ['b', 144.6, 59.23, 1.0, 147.6, 59.29, 2.2, 'black'], ['b', 144.6, 59.23, 0.95, 147.6, 59.33, 1.0, 'oak'], ['b', 145.1, 59.23, 1.5, 145.9, 59.305, 1.52, 'white']] },
     /* 2-THINGS end disused-classroom-2-east */
     /* 2-THINGS teachers-study-2-southeast */
-    /* docs/interiors/upper-floors-gaps-1028.md (teachers-study-2-southeast, aj): bookcases on the west and east walls, a writing desk with lamp, sheet and inkwell and a Windsor chair, a leather armchair on a rug, a longcase clock on the north wall, one portrait on the west wall; one door, no hearth in the model */
+    /* docs/interiors/upper-floors-gaps-1028.md (teachers-study-2-southeast, aj): bookcases on the west and east walls, a writing desk with lamp, sheet and inkwell and a Windsor chair, a leather armchair on a rug, a longcase clock on the north wall, one portrait on the west wall; one door, no hearth in the model; lived-in touch (floor-b-and-2-lived-in-1029.md): a plaid shawl over the armchair back; plain stand-ins */
     'teachers-study-2-southeast': { items: [
       ['s', 153.73, 8.0, 154.1, 12.0, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 153.81, 8.06, 0.11, 154.06, 8.26, 0.41, 'leather'], ['b', 153.81, 8.28, 0.11, 154.06, 8.51, 0.43, 'dark'], ['b', 153.81, 8.53, 0.11, 154.06, 8.79, 0.45, 'scarlet'],
       ['b', 153.81, 8.81, 0.11, 154.06, 9.01, 0.47, 'blue'], ['b', 153.81, 9.03, 0.11, 154.06, 9.26, 0.41, 'green'], ['b', 153.81, 9.28, 0.11, 154.06, 9.54, 0.43, 'leather'], ['b', 153.81, 9.56, 0.11, 154.06, 9.76, 0.45, 'dark'],
@@ -774,10 +870,11 @@
       ['y', 156.3, 10.35, 0.04, 0.8, 1.0, 'glass'], ['b', 156.6, 10.2, 0.765, 156.95, 10.5, 0.768, 'paper'], ['y', 157.2, 10.3, 0.03, 0.765, 0.8, 'iron'], ['t', 156.49, 11.09, 156.91, 11.51, 0.45, 'wood'],
       ['b', 156.49, 11.09, 0.45, 156.91, 11.13, 0.9, 'wood'], ['b', 157.6, 13.2, 0, 159.6, 15.4, 0.012, 'tartan'], ['b', 158.48, 13.85, 0, 159.32, 14.75, 0.4, 'leather'], ['b', 158.48, 13.97, 0.4, 159.12, 14.63, 0.48, 'dark'],
       ['b', 159.12, 13.85, 0.4, 159.32, 14.75, 1.0, 'leather'], ['b', 158.48, 13.85, 0.4, 159.12, 13.97, 0.62, 'leather'], ['b', 158.48, 14.63, 0.4, 159.12, 14.75, 0.62, 'leather'], ['b', 156.75, 6.73, 0, 157.25, 7.05, 1.95, 'dark'],
-      ['b', 156.88, 7.03, 1.45, 157.12, 7.08, 1.75, 'paper'], ['b', 153.73, 14.0, 1.6, 153.79, 14.6, 2.2, 'dark'], ['b', 153.77, 14.04, 1.64, 153.81, 14.56, 2.16, 'blue']] },
+      ['b', 156.88, 7.03, 1.45, 157.12, 7.08, 1.75, 'paper'], ['b', 153.73, 14.0, 1.6, 153.79, 14.6, 2.2, 'dark'], ['b', 153.77, 14.04, 1.64, 153.81, 14.56, 2.16, 'blue'], ['b', 159.1, 13.95, 0.96, 159.34, 14.65, 1.0, 'tartan'],
+      ['b', 159.08, 13.95, 0.7, 159.12, 14.65, 0.96, 'tartan']] },
     /* 2-THINGS end teachers-study-2-southeast */
     /* 2-THINGS teachers-study-2-southwest */
-    /* docs/interiors/upper-floors-gaps-1028.md (teachers-study-2-southwest, ag): bookcases on the east wall north of the hidden panel and on the west wall south of the door, a writing desk with lamp, sheet and inkwell and a Windsor chair, a leather armchair on a rug, a longcase clock on the south wall, one portrait on the north wall; no hearth in the model */
+    /* docs/interiors/upper-floors-gaps-1028.md (teachers-study-2-southwest, ag): bookcases on the east wall north of the hidden panel and on the west wall south of the door, a writing desk with lamp, sheet and inkwell and a Windsor chair, a leather armchair on a rug, a longcase clock on the south wall, one portrait on the north wall; no hearth in the model; lived-in touch (floor-b-and-2-lived-in-1029.md): a cup and an open book on the desk; plain stand-ins */
     'teachers-study-2-southwest': { items: [
       ['s', 14.4, 61.2, 14.77, 64.8, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 14.44, 61.26, 0.11, 14.69, 61.46, 0.41, 'leather'], ['b', 14.44, 61.48, 0.11, 14.69, 61.71, 0.43, 'dark'], ['b', 14.44, 61.73, 0.11, 14.69, 61.99, 0.45, 'scarlet'],
       ['b', 14.44, 62.01, 0.11, 14.69, 62.21, 0.47, 'blue'], ['b', 14.44, 62.23, 0.11, 14.69, 62.46, 0.41, 'green'], ['b', 14.44, 62.48, 0.11, 14.69, 62.74, 0.43, 'leather'], ['b', 14.44, 62.76, 0.11, 14.69, 62.96, 0.45, 'dark'],
@@ -835,10 +932,11 @@
       ['b', 11.0, 64.6, 0.765, 11.35, 64.9, 0.768, 'paper'], ['y', 11.6, 64.7, 0.03, 0.765, 0.8, 'iron'], ['t', 10.89, 65.39, 11.31, 65.81, 0.45, 'wood'], ['b', 10.89, 65.39, 0.45, 11.31, 65.43, 0.9, 'wood'],
       ['b', 9.0, 68.6, 0, 12.0, 70.8, 0.012, 'tartan'], ['b', 9.38, 69.25, 0, 10.22, 70.15, 0.4, 'leather'], ['b', 9.58, 69.37, 0.4, 10.22, 70.03, 0.48, 'dark'], ['b', 9.38, 69.25, 0.4, 9.58, 70.15, 1.0, 'leather'],
       ['b', 9.58, 69.25, 0.4, 10.22, 69.37, 0.62, 'leather'], ['b', 9.58, 70.03, 0.4, 10.22, 70.15, 0.62, 'leather'], ['b', 11.25, 71.45, 0, 11.75, 71.77, 1.95, 'dark'], ['b', 11.38, 71.42, 1.45, 11.62, 71.47, 1.75, 'paper'],
-      ['b', 9.4, 59.23, 1.6, 10.0, 59.29, 2.2, 'dark'], ['b', 9.44, 59.27, 1.64, 9.96, 59.31, 2.16, 'blue']] },
+      ['b', 9.4, 59.23, 1.6, 10.0, 59.29, 2.2, 'dark'], ['b', 9.44, 59.27, 1.64, 9.96, 59.31, 2.16, 'blue'], ['b', 10.55, 64.5, 0.765, 11.01, 64.8, 0.773, 'leather'], ['b', 10.565, 64.515, 0.773, 10.775, 64.785, 0.785, 'paper'],
+      ['b', 10.785, 64.515, 0.773, 10.995, 64.785, 0.785, 'paper'], ['y', 11.45, 64.85, 0.04, 0.765, 0.835, 'blue'], ['b', 11.485, 64.838, 0.785, 11.52, 64.862, 0.82, 'blue']] },
     /* 2-THINGS end teachers-study-2-southwest */
     /* 2-THINGS study-room-2-west */
-    /* docs/interiors/upper-floors-gaps-1028.md (study-room-2-west, ab): two joined tables each side of the doors' way with a stool each side, bookcases on the north and south walls, a satchel rail on the east wall north of the door; no window or hearth in the model */
+    /* docs/interiors/upper-floors-gaps-1028.md (study-room-2-west, ab): two joined tables each side of the doors' way with a stool each side, bookcases on the north and south walls, a satchel rail on the east wall north of the door; no window or hearth in the model; lived-in touch (floor-b-and-2-lived-in-1029.md): a slate with sums half done on the first table; plain stand-ins */
     'study-room-2-west': { items: [
       ['s', 2.5, 28.9, 7.0, 29.27, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 2.56, 28.98, 0.11, 2.76, 29.23, 0.41, 'leather'], ['b', 2.78, 28.98, 0.11, 3.01, 29.23, 0.43, 'dark'], ['b', 3.03, 28.98, 0.11, 3.29, 29.23, 0.45, 'scarlet'],
       ['b', 3.31, 28.98, 0.11, 3.51, 29.23, 0.47, 'blue'], ['b', 3.53, 28.98, 0.11, 3.76, 29.23, 0.41, 'green'], ['b', 3.78, 28.98, 0.11, 4.04, 29.23, 0.43, 'leather'], ['b', 4.06, 28.98, 0.11, 4.26, 29.23, 0.45, 'dark'],
@@ -908,10 +1006,11 @@
       ['b', 8.27, 37.42, 0, 8.3, 37.45, 0.41, 'wood'], ['b', 8.27, 37.65, 0, 8.3, 37.68, 0.41, 'wood'], ['b', 8.5, 37.42, 0, 8.53, 37.45, 0.41, 'wood'], ['b', 8.5, 37.65, 0, 8.53, 37.68, 0.41, 'wood'],
       ['y', 7.6, 36.5, 0.04, 0.76, 0.8, 'iron'], ['b', 7.9, 36.4, 0.76, 8.25, 36.7, 0.763, 'paper'], ['b', 12.09, 29.8, 1.5, 12.17, 32.2, 1.56, 'wood'], ['b', 12.05, 30.2, 1.44, 12.17, 30.24, 1.5, 'iron'],
       ['b', 11.91, 30.06, 1.02, 12.07, 30.38, 1.46, 'leather'], ['b', 12.05, 30.9, 1.44, 12.17, 30.94, 1.5, 'iron'], ['b', 11.91, 30.76, 1.02, 12.07, 31.08, 1.46, 'leather'], ['b', 12.05, 31.6, 1.44, 12.17, 31.64, 1.5, 'iron'],
-      ['b', 11.91, 31.46, 1.02, 12.07, 31.78, 1.46, 'leather']] },
+      ['b', 11.91, 31.46, 1.02, 12.07, 31.78, 1.46, 'leather'], ['b', 3.4, 31.45, 0.76, 3.8, 31.8, 0.775, 'slate'], ['b', 3.45, 31.52, 0.775, 3.72, 31.54, 0.78, 'white'], ['b', 3.45, 31.62, 0.775, 3.6, 31.64, 0.78, 'white'],
+      ['b', 3.45, 31.72, 0.775, 3.6, 31.74, 0.78, 'white']] },
     /* 2-THINGS end study-room-2-west */
     /* 2-THINGS second-years-study-room */
-    /* docs/interiors/upper-floors-gaps-1028.md (second-years-study-room, 1993): two lines of three 3.0 m tables with a stool each side, bookcases along the north and south walls, a satchel rail with satchels on the west wall either side of the door; no window or hearth in the model */
+    /* docs/interiors/upper-floors-gaps-1028.md (second-years-study-room, 1993): two lines of three 3.0 m tables with a stool each side, bookcases along the north and south walls, a satchel rail with satchels on the west wall either side of the door; no window or hearth in the model; lived-in touch (floor-b-and-2-lived-in-1029.md): an open book at the long table end and a satchel on the floor beyond it; plain stand-ins */
     'second-years-study-room': { items: [
       ['s', 128.0, 59.23, 132.4, 59.6, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 128.06, 59.31, 0.11, 128.26, 59.56, 0.41, 'leather'], ['b', 128.28, 59.31, 0.11, 128.51, 59.56, 0.43, 'dark'], ['b', 128.53, 59.31, 0.11, 128.79, 59.56, 0.45, 'scarlet'],
       ['b', 128.81, 59.31, 0.11, 129.01, 59.56, 0.47, 'blue'], ['b', 129.03, 59.31, 0.11, 129.26, 59.56, 0.41, 'green'], ['b', 129.28, 59.31, 0.11, 129.54, 59.56, 0.43, 'leather'], ['b', 129.56, 59.31, 0.11, 129.76, 59.56, 0.45, 'dark'],
@@ -1036,7 +1135,8 @@
       ['b', 127.03, 61.61, 1.02, 127.19, 61.93, 1.46, 'leather'], ['b', 126.93, 62.35, 1.44, 127.05, 62.39, 1.5, 'iron'], ['b', 127.03, 62.21, 1.02, 127.19, 62.53, 1.46, 'leather'], ['b', 126.93, 62.95, 1.44, 127.05, 62.99, 1.5, 'iron'],
       ['b', 127.03, 62.81, 1.02, 127.19, 63.13, 1.46, 'leather'], ['b', 126.93, 67.4, 1.5, 127.01, 70.8, 1.56, 'wood'], ['b', 126.93, 67.75, 1.44, 127.05, 67.79, 1.5, 'iron'], ['b', 127.03, 67.61, 1.02, 127.19, 67.93, 1.46, 'leather'],
       ['b', 126.93, 68.35, 1.44, 127.05, 68.39, 1.5, 'iron'], ['b', 127.03, 68.21, 1.02, 127.19, 68.53, 1.46, 'leather'], ['b', 126.93, 68.95, 1.44, 127.05, 68.99, 1.5, 'iron'], ['b', 127.03, 68.81, 1.02, 127.19, 69.13, 1.46, 'leather'],
-      ['b', 126.93, 69.55, 1.44, 127.05, 69.59, 1.5, 'iron'], ['b', 127.03, 69.41, 1.02, 127.19, 69.73, 1.46, 'leather'], ['b', 126.93, 70.15, 1.44, 127.05, 70.19, 1.5, 'iron'], ['b', 127.03, 70.01, 1.02, 127.19, 70.33, 1.46, 'leather']] },
+      ['b', 126.93, 69.55, 1.44, 127.05, 69.59, 1.5, 'iron'], ['b', 127.03, 69.41, 1.02, 127.19, 69.73, 1.46, 'leather'], ['b', 126.93, 70.15, 1.44, 127.05, 70.19, 1.5, 'iron'], ['b', 127.03, 70.01, 1.02, 127.19, 70.33, 1.46, 'leather'],
+      ['b', 137.38, 61.72, 0.76, 137.84, 62.04, 0.768, 'leather'], ['b', 137.395, 61.735, 0.768, 137.605, 62.025, 0.78, 'paper'], ['b', 137.615, 61.735, 0.768, 137.825, 62.025, 0.78, 'paper'], ['b', 138.3, 61.7, 0, 138.8, 62.3, 0.3, 'leather']] },
     /* 2-THINGS end second-years-study-room */
     /* 2-THINGS teachers-study-2-west */
     /* docs/interiors/upper-floors-gaps-1028.md (teachers-study-2-west, y): bookcase on the north wall, writing desk with lamp, sheet and inkwell and a Windsor chair, a leather armchair on a rug, a longcase clock on the south wall, one portrait on the west wall; no hearth in the model, so no fender or irons */
@@ -1065,7 +1165,7 @@
       ['b', 8.2, 28.12, 0, 8.7, 28.44, 1.95, 'dark'], ['b', 8.33, 28.09, 1.45, 8.57, 28.14, 1.75, 'paper'], ['b', 0.23, 21.0, 1.6, 0.29, 21.6, 2.2, 'dark'], ['b', 0.27, 21.04, 1.64, 0.31, 21.56, 2.16, 'blue']] },
     /* 2-THINGS end teachers-study-2-west */
     /* 2-THINGS map-room */
-    /* docs/interiors/upper-floors-gaps-1028.md (map-room, t): a second worktable south of the doors' way, a map chest of drawers each side of both doors with a wall map above, a worktable north of the doors' way with a flat map under a brass weight, a lamp and an inkwell, a stool each side; the nest of flat drawers on the north wall; the rolled map is Precedents' gap, no magic map */
+    /* docs/interiors/upper-floors-gaps-1028.md (map-room, t): a second worktable south of the doors' way, a map chest of drawers each side of both doors with a wall map above, a worktable north of the doors' way with a flat map under a brass weight, a lamp and an inkwell, a stool each side; the nest of flat drawers on the north wall; the rolled map is Precedents' gap, no magic map; lived-in touch (floor-b-and-2-lived-in-1029.md): a map half unrolled on the near worktable, weighted by two stones (the nest-of-drawers drawer is not placed: its piece is not in the room); plain stand-ins */
     'map-room': { items: [
       ['t', 120.15, 61.2, 121.35, 64.4, 0.85, 'oak'], ['b', 120.2, 61.25, 0.85, 121.3, 64.35, 0.86, 'leather'], ['b', 120.27, 61.5, 0.86, 121.23, 62.7, 0.864, 'paper'], ['b', 120.45, 61.7, 0.864, 121.05, 61.76, 0.867, 'ink'],
       ['y', 120.4, 64.1, 0.05, 0.86, 0.9, 'brass'], ['y', 121.15, 64.15, 0.04, 0.86, 0.9, 'iron'], ['y', 120.75, 64.05, 0.07, 0.86, 0.92, 'brass'], ['y', 120.75, 64.05, 0.05, 0.92, 1.12, 'glass'],
@@ -1090,10 +1190,11 @@
       ['b', 125.77, 61.7, 0.45, 125.84, 61.9, 0.5, 'brass'], ['b', 125.82, 62.387, 0.1, 125.87, 63.44, 0.9, 'dark'], ['b', 125.77, 62.813, 0.45, 125.84, 63.013, 0.5, 'brass'], ['b', 126.42, 60.25, 1.4, 126.47, 63.35, 2.4, 'paper'],
       ['b', 126.41, 60.55, 1.8, 126.47, 63.05, 1.84, 'ink'], ['b', 125.85, 67.45, 0, 126.47, 70.95, 1.0, 'oak'], ['b', 125.82, 67.56, 0.1, 125.87, 68.613, 0.9, 'dark'], ['b', 125.77, 67.987, 0.45, 125.84, 68.187, 0.5, 'brass'],
       ['b', 125.82, 68.673, 0.1, 125.87, 69.727, 0.9, 'dark'], ['b', 125.77, 69.1, 0.45, 125.84, 69.3, 0.5, 'brass'], ['b', 125.82, 69.787, 0.1, 125.87, 70.84, 0.9, 'dark'], ['b', 125.77, 70.213, 0.45, 125.84, 70.413, 0.5, 'brass'],
-      ['b', 126.42, 67.65, 1.4, 126.47, 70.75, 2.4, 'paper'], ['b', 126.41, 67.95, 1.8, 126.47, 70.45, 1.84, 'ink']] },
+      ['b', 126.42, 67.65, 1.4, 126.47, 70.75, 2.4, 'paper'], ['b', 126.41, 67.95, 1.8, 126.47, 70.45, 1.84, 'ink'], ['b', 120.3, 62.7, 0.86, 121.2, 63.3, 0.866, 'paper'], ['b', 120.3, 63.3, 0.86, 121.2, 63.45, 0.97, 'paper'],
+      ['b', 120.32, 61.52, 0.864, 120.4, 61.6, 0.9, 'stone'], ['b', 121.1, 61.52, 0.864, 121.18, 61.6, 0.9, 'stone']] },
     /* 2-THINGS end map-room */
     /* 2-THINGS slug-club-dining-room */
-    /* docs/interiors/upper-floors-gaps-1028.md (slug-club-dining-room, o): a joined table laid for eight under a damask cloth, chargers and gilt goblets, eight chairs, the hanging lamp, the sideboard with the silver teapot and sugar bowl, two wingbacks with a side table in the north-east corner (no hearth is drawn); the aisle from the stair door stays 1.2 wide */
+    /* docs/interiors/upper-floors-gaps-1028.md (slug-club-dining-room, o): a joined table laid for eight under a damask cloth, chargers and gilt goblets, eight chairs, the hanging lamp, the sideboard with the silver teapot and sugar bowl, two wingbacks with a side table in the north-east corner (no hearth is drawn); the aisle from the stair door stays 1.2 wide; lived-in touch (floor-b-and-2-lived-in-1029.md): a candle burnt to a stub at the table head and a napkin dropped at its foot; plain stand-ins */
     'slug-club-dining-room': { items: [
       ['t', 93.4, 65.5, 96.6, 66.5, 0.76, 'oak'], ['b', 93.36, 65.46, 0.76, 96.64, 66.54, 0.775, 'linen'], ['t', 93.59, 65.02, 94.01, 65.44, 0.45, 'wood'], ['b', 93.59, 65.4, 0.45, 94.01, 65.44, 0.9, 'wood'],
       ['t', 93.59, 66.56, 94.01, 66.98, 0.45, 'wood'], ['b', 93.59, 66.56, 0.45, 94.01, 66.6, 0.9, 'wood'], ['y', 93.8, 65.75, 0.15, 0.775, 0.785, 'tin'], ['y', 94.02, 65.63, 0.03, 0.775, 0.9, 'gilt'],
@@ -1109,10 +1210,11 @@
       ['y', 94.55, 71.73, 0.04, 1.05, 1.1, 'tin'], ['b', 94.65, 71.71, 0.97, 94.77, 71.75, 1.0, 'tin'], ['y', 95.35, 71.73, 0.06, 0.93, 1.0, 'tin'], ['b', 99.78, 61.0, 0, 100.62, 61.9, 0.4, 'leather'],
       ['b', 99.78, 61.12, 0.4, 100.42, 61.78, 0.48, 'dark'], ['b', 100.42, 61.0, 0.4, 100.62, 61.9, 1.0, 'leather'], ['b', 99.78, 61.0, 0.4, 100.42, 61.12, 0.62, 'leather'], ['b', 99.78, 61.78, 0.4, 100.42, 61.9, 0.62, 'leather'],
       ['b', 99.78, 63.0, 0, 100.62, 63.9, 0.4, 'leather'], ['b', 99.78, 63.12, 0.4, 100.42, 63.78, 0.48, 'dark'], ['b', 100.42, 63.0, 0.4, 100.62, 63.9, 1.0, 'leather'], ['b', 99.78, 63.0, 0.4, 100.42, 63.12, 0.62, 'leather'],
-      ['b', 99.78, 63.78, 0.4, 100.42, 63.9, 0.62, 'leather'], ['t', 99.85, 62.15, 100.25, 62.75, 0.55, 'oak'], ['y', 100.05, 62.45, 0.06, 0.55, 0.6, 'tin']] },
+      ['b', 99.78, 63.78, 0.4, 100.42, 63.9, 0.62, 'leather'], ['t', 99.85, 62.15, 100.25, 62.75, 0.55, 'oak'], ['y', 100.05, 62.45, 0.06, 0.55, 0.6, 'tin'], ['y', 96.3, 66.0, 0.04, 0.76, 0.78, 'brass'],
+      ['y', 96.3, 66.0, 0.025, 0.78, 0.84, 'tallow'], ['b', 93.55, 65.85, 0.76, 93.85, 66.12, 0.77, 'linen']] },
     /* 2-THINGS end slug-club-dining-room */
     /* 2-THINGS duelling-practice-room-2 */
-    /* docs/interiors/upper-floors-gaps-1028.md (duelling-practice-room-2, s): a chalked strip with centre line and marks, benches along both long walls, a padded mat in each south corner, a score slate on the east wall, a plank bench on the west wall, the rack of padded practice swords on the south wall, an unlit torch bracket at each corner */
+    /* docs/interiors/upper-floors-gaps-1028.md (duelling-practice-room-2, s): a chalked strip with centre line and marks, benches along both long walls, a padded mat in each south corner, a score slate on the east wall, a plank bench on the west wall, the rack of padded practice swords on the south wall, an unlit torch bracket at each corner; lived-in touch (floor-b-and-2-lived-in-1029.md): a jumper folded on the west bench and a satchel at its foot; plain stand-ins */
     'duelling-practice-room-2': { items: [
       ['t', 129.18, 10.15, 129.48, 12.35, 0.45, 'wood'], ['b', 133.35, 17.96, 0.9, 136.75, 18.02, 2.3, 'dark'], ['b', 133.535, 17.9, 1.17, 133.565, 18.02, 1.2, 'iron'], ['b', 134.535, 17.9, 1.17, 134.565, 18.02, 1.2, 'iron'],
       ['b', 133.45, 17.91, 1.2, 134.65, 17.98, 1.24, 'wood'], ['b', 134.4, 17.9, 1.195, 134.7, 17.98, 1.245, 'cloth'], ['b', 135.235, 17.9, 1.17, 135.265, 18.02, 1.2, 'iron'], ['b', 136.235, 17.9, 1.17, 136.265, 18.02, 1.2, 'iron'],
@@ -1126,10 +1228,11 @@
       ['b', 132.02, 7.25, 0, 132.08, 14.6, 0.012, 'white'], ['b', 138.02, 7.25, 0, 138.08, 14.6, 0.012, 'white'], ['b', 132.05, 10.895, 0, 138.05, 10.955, 0.012, 'white'], ['b', 134.9, 8.275, 0, 135.2, 8.575, 0.012, 'white'],
       ['b', 134.9, 13.275, 0, 135.2, 13.575, 0.012, 'white'], ['t', 140.62, 10.15, 140.92, 12.35, 0.45, 'wood'], ['t', 140.62, 13.15, 140.92, 15.35, 0.45, 'wood'], ['t', 129.18, 13.15, 129.48, 15.35, 0.45, 'wood'],
       ['b', 129.75, 16.6, 0, 131.75, 17.9, 0.1, 'blue'], ['b', 138.35, 16.6, 0, 140.35, 17.9, 0.1, 'blue'], ['b', 140.91, 6.85, 1.3, 140.97, 9.05, 2.2, 'dark'], ['b', 140.86, 7.05, 1.4, 140.93, 7.07, 2.1, 'white'],
-      ['b', 140.86, 7.5, 1.4, 140.93, 7.52, 2.1, 'white'], ['b', 140.86, 7.95, 1.4, 140.93, 7.97, 2.1, 'white'], ['b', 140.86, 8.4, 1.4, 140.93, 8.42, 2.1, 'white']] },
+      ['b', 140.86, 7.5, 1.4, 140.93, 7.52, 2.1, 'white'], ['b', 140.86, 7.95, 1.4, 140.93, 7.97, 2.1, 'white'], ['b', 140.86, 8.4, 1.4, 140.93, 8.42, 2.1, 'white'], ['b', 129.2, 10.3, 0.45, 129.47, 11.1, 0.49, 'blue'],
+      ['b', 129.2, 12.45, 0, 129.6, 12.85, 0.3, 'leather']] },
     /* 2-THINGS end duelling-practice-room-2 */
     /* 2-THINGS gobstones-club-room */
-    /* docs/interiors/upper-floors-gaps-1028.md (gobstones-club-room, p): a plank bench along each long wall, a tartan hearth rug with a ring of chalk dashes on the flags, four square game tables with stools, a low shelf cupboard on the south wall, pennants beside the door, a notice board on the east wall, a pack of worn cards and three fanned on the west bench; the Gobstones set is Objects' gap (req 1838), no stones placed */
+    /* docs/interiors/upper-floors-gaps-1028.md (gobstones-club-room, p): a plank bench along each long wall, a tartan hearth rug with a ring of chalk dashes on the flags, four square game tables with stools, a low shelf cupboard on the south wall, pennants beside the door, a notice board on the east wall, a pack of worn cards and three fanned on the west bench; the Gobstones set is Objects' gap (req 1838), no stones placed; lived-in touch (floor-b-and-2-lived-in-1029.md): a house scarf on the north end of the west bench; plain stand-ins */
     'gobstones-club-room': { items: [
       ['t', 116.88, 8.825, 117.18, 14.225, 0.45, 'wood'], ['t', 128.32, 8.825, 128.62, 14.225, 0.45, 'wood'], ['b', 121.55, 10.625, 0, 123.95, 12.425, 0.018, 'tartan'], ['b', 121.55, 10.625, 0.018, 123.95, 10.685, 0.022, 'scarlet'],
       ['b', 121.55, 12.365, 0.018, 123.95, 12.425, 0.022, 'scarlet'], ['b', 124.465, 11.49, 0, 124.535, 11.56, 0.012, 'white'], ['b', 124.443, 11.764, 0, 124.513, 11.834, 0.012, 'white'], ['b', 124.379, 12.031, 0, 124.449, 12.101, 0.012, 'white'],
@@ -1169,7 +1272,8 @@
       ['b', 120.85, 17.58, 1.0, 124.65, 18.02, 1.03, 'dark'], ['b', 120.85, 17.58, 1.5, 124.65, 18.02, 1.53, 'dark'], ['b', 121.15, 17.65, 1.03, 121.45, 17.97, 1.3, 'tin'], ['b', 121.85, 17.65, 1.03, 122.15, 17.97, 1.3, 'tin'],
       ['b', 122.55, 17.65, 1.03, 122.85, 17.97, 1.3, 'tin'], ['b', 123.25, 17.65, 1.03, 123.55, 17.97, 1.3, 'tin'], ['b', 123.95, 17.65, 1.03, 124.25, 17.97, 1.3, 'tin'], ['b', 117.55, 3.83, 2.5, 117.95, 3.88, 3.5, 'scarlet'],
       ['b', 118.15, 3.83, 2.5, 118.55, 3.88, 3.5, 'blue'], ['b', 126.95, 3.83, 2.5, 127.35, 3.88, 3.5, 'green'], ['b', 127.55, 3.83, 2.5, 127.95, 3.88, 3.5, 'scarlet'], ['b', 128.61, 6.85, 1.3, 128.67, 8.85, 2.2, 'wood'],
-      ['b', 128.56, 7.0, 1.5, 128.63, 7.4, 2.0, 'paper'], ['b', 128.56, 7.6, 1.5, 128.63, 8.0, 2.0, 'paper'], ['b', 128.56, 8.2, 1.5, 128.63, 8.6, 2.0, 'paper']] },
+      ['b', 128.56, 7.0, 1.5, 128.63, 7.4, 2.0, 'paper'], ['b', 128.56, 7.6, 1.5, 128.63, 8.0, 2.0, 'paper'], ['b', 128.56, 8.2, 1.5, 128.63, 8.6, 2.0, 'paper'], ['b', 116.9, 13.4, 0.45, 117.16, 14.2, 0.47, 'scarlet'],
+      ['b', 116.9, 13.6, 0.47, 117.16, 13.68, 0.475, 'gold'], ['b', 116.9, 13.8, 0.47, 117.16, 13.88, 0.475, 'gold']] },
     /* 2-THINGS end gobstones-club-room */
   };
   Object.keys(things).forEach(function (k) {

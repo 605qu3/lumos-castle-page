@@ -2,6 +2,644 @@
    (tools/floor_things_file.py); never edit by hand. Each block adds one room to SHELL_W5A.things. */
 (function (T) {
   var things = {
+    /* 5-THINGS drum-room-5 */
+    /* docs/interiors/upper-floors-completion-1029.md, B1 (drum-room-5, the lantern room): a trestle bench of four hanging lanterns (west; the scheduled spot (38.9, 2.0) is inside the wall mass of painted-door-room-5, so it stands 1.45 m south at (38.9, 0.55), reported), a boarded chest of candle boxes (north-west), two stacked sliding-lid boxes of stearin candles (north-east), a shut linen press of lamp glasses and trimmers (east), a tin bucket of wicks (south-east), a candlestick row of six on a stand (south-west), a worktable with an oil lamp being trimmed, its glass off (south); every piece inside r 4.3, the door walk 0.9 either side and the middle kept clear; all unlit. Placeholders: hanging-lantern-1, sliding-lid-box-1, linen-press-1, stearin-candle-1, candlestick-1, trestle-bench-1 (plain boxes and cylinders, none drawn) */
+    'drum-room-5': { items: [
+      ['b', 38.6, -0.2, 0.76, 39.2, 1.3, 0.8, 'oak'], ['b', 38.64, -0.2, 0, 38.69, -0.15, 0.76, 'oak'], ['b', 39.12, -0.2, 0, 39.17, -0.15, 0.76, 'oak'], ['b', 38.64, 1.25, 0, 38.69, 1.3, 0.76, 'oak'],
+      ['b', 39.12, 1.25, 0, 39.17, 1.3, 0.76, 'oak'], ['b', 38.64, -0.15, 0.1, 38.69, 1.25, 0.14, 'oak'], ['b', 39.12, -0.15, 0.1, 39.17, 1.25, 0.14, 'oak'], ['y', 38.9, 0.05, 0.09, 0.8, 0.83, 'iron'],
+      ['y', 38.9, 0.05, 0.085, 0.83, 1.05, 'glass'], ['y', 38.9, 0.05, 0.095, 1.05, 1.09, 'iron'], ['b', 38.88, 0.04, 1.09, 38.92, 0.06, 1.17, 'iron'], ['y', 38.9, 0.41, 0.09, 0.8, 0.83, 'iron'],
+      ['y', 38.9, 0.41, 0.085, 0.83, 1.05, 'glass'], ['y', 38.9, 0.41, 0.095, 1.05, 1.09, 'iron'], ['b', 38.88, 0.4, 1.09, 38.92, 0.42, 1.17, 'iron'], ['y', 38.9, 0.77, 0.09, 0.8, 0.83, 'iron'],
+      ['y', 38.9, 0.77, 0.085, 0.83, 1.05, 'glass'], ['y', 38.9, 0.77, 0.095, 1.05, 1.09, 'iron'], ['b', 38.88, 0.76, 1.09, 38.92, 0.78, 1.17, 'iron'], ['y', 38.9, 1.13, 0.09, 0.8, 0.83, 'iron'],
+      ['y', 38.9, 1.13, 0.085, 0.83, 1.05, 'glass'], ['y', 38.9, 1.13, 0.095, 1.05, 1.09, 'iron'], ['b', 38.88, 1.12, 1.09, 38.92, 1.14, 1.17, 'iron'], ['b', 39.55, 4.25, 0, 40.45, 4.75, 0.5, 'deal'],
+      ['b', 39.54, 4.24, 0.5, 40.46, 4.76, 0.55, 'pine'], ['b', 39.67, 4.238, 0, 39.71, 4.762, 0.55, 'iron'], ['b', 40.29, 4.238, 0, 40.33, 4.762, 0.55, 'iron'], ['b', 39.97, 4.235, 0.4, 40.03, 4.26, 0.56, 'iron'],
+      ['b', 39.97, 4.74, 0.4, 40.03, 4.765, 0.56, 'iron'], ['b', 39.65, 4.32, 0.55, 40.0, 4.68, 0.7, 'pine'], ['b', 40.05, 4.32, 0.55, 40.4, 4.68, 0.7, 'pine'], ['b', 44.9, 3.95, 0.0, 45.5, 4.45, 0.28, 'pine'],
+      ['b', 44.9, 3.95, 0.28, 45.5, 4.45, 0.3, 'wood'], ['b', 44.9, 3.95, 0.3, 45.5, 4.45, 0.58, 'pine'], ['b', 44.9, 3.95, 0.58, 45.5, 4.45, 0.6, 'wood'], ['b', 45.35, 3.93, 0.1, 45.4, 3.95, 0.2, 'iron'],
+      ['b', 45.65, 0.55, 0, 46.15, 2.05, 1.8, 'oak'], ['b', 45.6, 0.5, 1.8, 46.2, 2.1, 1.84, 'oak'], ['b', 45.62, 0.6, 0.1, 45.65, 1.28, 1.7, 'dark'], ['b', 45.62, 1.32, 0.1, 45.65, 2.0, 1.7, 'dark'],
+      ['b', 45.61, 1.26, 0.9, 45.64, 1.34, 1.0, 'brass'], ['y', 44.0, -1.4, 0.2, 0, 0.3, 'tin'], ['y', 44.0, -1.4, 0.17, 0.3, 0.34, 'tallow'], ['y', 43.9, -1.4, 0.01, 0.34, 0.45, 'rope'],
+      ['y', 43.95, -1.37, 0.01, 0.34, 0.45, 'rope'], ['y', 44.0, -1.4, 0.01, 0.34, 0.45, 'rope'], ['y', 44.05, -1.37, 0.01, 0.34, 0.45, 'rope'], ['y', 44.1, -1.4, 0.01, 0.34, 0.45, 'rope'],
+      ['b', 39.9, -1.55, 0.9, 40.5, -1.05, 0.94, 'oak'], ['b', 39.92, -1.53, 0, 39.96, -1.49, 0.9, 'oak'], ['b', 40.44, -1.53, 0, 40.48, -1.49, 0.9, 'oak'], ['b', 39.92, -1.11, 0, 39.96, -1.07, 0.9, 'oak'],
+      ['b', 40.44, -1.11, 0, 40.48, -1.07, 0.9, 'oak'], ['y', 39.97, -1.3, 0.025, 0.94, 0.96, 'brass'], ['y', 39.97, -1.3, 0.008, 0.96, 1.1, 'brass'], ['y', 39.97, -1.3, 0.012, 1.1, 1.2, 'tallow'],
+      ['y', 40.07, -1.3, 0.025, 0.94, 0.96, 'brass'], ['y', 40.07, -1.3, 0.008, 0.96, 1.1, 'brass'], ['y', 40.07, -1.3, 0.012, 1.1, 1.17, 'tallow'], ['y', 40.17, -1.3, 0.025, 0.94, 0.96, 'brass'],
+      ['y', 40.17, -1.3, 0.008, 0.96, 1.1, 'brass'], ['y', 40.17, -1.3, 0.012, 1.1, 1.2, 'tallow'], ['y', 40.27, -1.3, 0.025, 0.94, 0.96, 'brass'], ['y', 40.27, -1.3, 0.008, 0.96, 1.1, 'brass'],
+      ['y', 40.27, -1.3, 0.012, 1.1, 1.2, 'tallow'], ['y', 40.37, -1.3, 0.025, 0.94, 0.96, 'brass'], ['y', 40.37, -1.3, 0.008, 0.96, 1.1, 'brass'], ['y', 40.37, -1.3, 0.012, 1.1, 1.17, 'tallow'],
+      ['y', 40.47, -1.3, 0.025, 0.94, 0.96, 'brass'], ['y', 40.47, -1.3, 0.008, 0.96, 1.1, 'brass'], ['y', 40.47, -1.3, 0.012, 1.1, 1.2, 'tallow'], ['b', 41.49, -2.05, 0.74, 42.89, -1.35, 0.8, 'oak'],
+      ['b', 41.54, -2.0, 0, 41.59, -1.95, 0.74, 'oak'], ['b', 41.54, -1.45, 0, 41.59, -1.4, 0.74, 'oak'], ['b', 42.79, -2.0, 0, 42.84, -1.95, 0.74, 'oak'], ['b', 42.79, -1.45, 0, 42.84, -1.4, 0.74, 'oak'],
+      ['y', 42.0, -1.7, 0.06, 0.8, 0.83, 'brass'], ['y', 42.0, -1.7, 0.04, 0.83, 0.92, 'brass'], ['y', 42.45, -1.55, 0.025, 0.8, 0.98, 'glass'], ['b', 42.55, -1.75, 0.8, 42.8, -1.7, 0.82, 'iron']] },
+    /* 5-THINGS end drum-room-5 */
+    /* 5-THINGS lake-tower-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (lake-tower-5; polygon-rooms-1029.md, Plain store, laid as How a round store is laid): 15 places round the curve alternating book crates, a boarded chest, sacks and a school trunk, one slot in four bare, the door's arc clear for 1.0 each side of its jamb; this room's one thing: a damp ring on the flags under each crate stack and a tin bucket in a bare slot (the model draws no slit and no door in this tower yet, req on the lead's board, so the bucket stands against the curve, not under a slit, and no door arc is kept clear) */
+    'lake-tower-5': { items: [
+      ['b', 127.38, -0.612, 0, 127.94, -0.052, 0.35, 'pine'], ['b', 127.375, -0.617, 0.1, 127.945, -0.047, 0.14, 'wood'], ['b', 127.41, -0.582, 0.35, 127.91, -0.082, 0.45, 'books'], ['b', 127.4, -0.602, 0.35, 127.92, -0.062, 0.7, 'pine'],
+      ['b', 127.395, -0.607, 0.45, 127.925, -0.057, 0.49, 'wood'], ['b', 127.43, -0.572, 0.7, 127.89, -0.092, 0.8, 'books'], ['b', 126.446, -1.509, 0, 127.346, -1.009, 0.5, 'deal'], ['b', 126.436, -1.519, 0.5, 127.356, -0.999, 0.55, 'pine'],
+      ['b', 126.566, -1.521, 0, 126.606, -0.997, 0.55, 'iron'], ['b', 127.186, -1.521, 0, 127.226, -0.997, 0.55, 'iron'], ['b', 126.866, -1.524, 0.4, 126.926, -1.499, 0.56, 'iron'], ['b', 126.866, -1.019, 0.4, 126.926, -0.994, 0.56, 'iron'],
+      ['y', 126.099, -2.114, 0.24, 0, 0.525, 'canvas'], ['y', 126.099, -2.114, 0.18, 0.525, 0.7, 'canvas'], ['y', 126.099, -2.114, 0.187, 0.434, 0.462, 'rope'], ['y', 125.846, -2.522, 0.24, 0, 0.465, 'canvas'],
+      ['y', 125.846, -2.522, 0.18, 0.465, 0.62, 'canvas'], ['y', 125.846, -2.522, 0.187, 0.384, 0.409, 'rope'], ['b', 125.39, -4.873, 0, 125.89, -3.973, 0.34, 'leather'], ['b', 125.39, -4.853, 0.34, 125.89, -3.993, 0.46, 'leather'],
+      ['b', 125.43, -4.813, 0.46, 125.85, -4.033, 0.5, 'leather'], ['b', 125.382, -4.881, 0, 125.43, -4.833, 0.12, 'brass'], ['b', 125.382, -4.013, 0, 125.43, -3.965, 0.12, 'brass'], ['b', 125.85, -4.881, 0, 125.898, -4.833, 0.12, 'brass'],
+      ['b', 125.85, -4.013, 0, 125.898, -3.965, 0.12, 'brass'], ['b', 125.6, -4.883, 0.3, 125.68, -4.863, 0.4, 'brass'], ['b', 125.6, -3.983, 0.3, 125.68, -3.963, 0.4, 'brass'], ['b', 125.693, -5.869, 0, 126.253, -5.309, 0.35, 'pine'],
+      ['b', 125.688, -5.874, 0.1, 126.258, -5.304, 0.14, 'wood'], ['b', 125.723, -5.839, 0.35, 126.223, -5.339, 0.45, 'books'], ['b', 125.713, -5.859, 0.35, 126.233, -5.319, 0.7, 'pine'], ['b', 125.708, -5.864, 0.45, 126.238, -5.314, 0.49, 'wood'],
+      ['b', 125.743, -5.829, 0.7, 126.203, -5.349, 0.8, 'books'], ['b', 126.433, -6.962, 0, 126.933, -6.062, 0.5, 'deal'], ['b', 126.423, -6.972, 0.5, 126.943, -6.052, 0.55, 'pine'], ['b', 126.553, -6.974, 0, 126.593, -6.05, 0.55, 'iron'],
+      ['b', 126.773, -6.974, 0, 126.813, -6.05, 0.55, 'iron'], ['b', 126.653, -6.977, 0.4, 126.713, -6.952, 0.56, 'iron'], ['b', 126.653, -6.072, 0.4, 126.713, -6.047, 0.56, 'iron'], ['y', 128.404, -7.982, 0.24, 0, 0.525, 'canvas'],
+      ['y', 128.404, -7.982, 0.18, 0.525, 0.7, 'canvas'], ['y', 128.404, -7.982, 0.187, 0.434, 0.462, 'rope'], ['y', 128.84, -8.184, 0.24, 0, 0.465, 'canvas'], ['y', 128.84, -8.184, 0.18, 0.465, 0.62, 'canvas'],
+      ['y', 128.84, -8.184, 0.187, 0.384, 0.409, 'rope'], ['b', 129.109, -8.573, 0, 130.009, -8.073, 0.34, 'leather'], ['b', 129.109, -8.553, 0.34, 130.009, -8.093, 0.46, 'leather'], ['b', 129.149, -8.513, 0.46, 129.969, -8.133, 0.5, 'leather'],
+      ['b', 129.101, -8.581, 0, 129.149, -8.533, 0.12, 'brass'], ['b', 129.101, -8.113, 0, 129.149, -8.065, 0.12, 'brass'], ['b', 129.969, -8.581, 0, 130.017, -8.533, 0.12, 'brass'], ['b', 129.969, -8.113, 0, 130.017, -8.065, 0.12, 'brass'],
+      ['b', 129.519, -8.583, 0.3, 129.599, -8.563, 0.4, 'brass'], ['b', 129.519, -8.083, 0.3, 129.599, -8.063, 0.4, 'brass'], ['b', 130.456, -8.501, 0, 131.016, -7.941, 0.35, 'pine'], ['b', 130.451, -8.506, 0.1, 131.021, -7.936, 0.14, 'wood'],
+      ['b', 130.486, -8.471, 0.35, 130.986, -7.971, 0.45, 'books'], ['b', 130.476, -8.491, 0.35, 130.996, -7.951, 0.7, 'pine'], ['b', 130.471, -8.496, 0.45, 131.001, -7.946, 0.49, 'wood'], ['b', 130.506, -8.461, 0.7, 130.966, -7.981, 0.8, 'books'],
+      ['b', 132.586, -7.591, 0, 133.086, -6.691, 0.5, 'deal'], ['b', 132.576, -7.601, 0.5, 133.096, -6.681, 0.55, 'pine'], ['b', 132.706, -7.603, 0, 132.746, -6.679, 0.55, 'iron'], ['b', 132.926, -7.603, 0, 132.966, -6.679, 0.55, 'iron'],
+      ['b', 132.806, -7.606, 0.4, 132.866, -7.581, 0.56, 'iron'], ['b', 132.806, -6.701, 0.4, 132.866, -6.676, 0.56, 'iron'], ['y', 133.618, -6.242, 0.24, 0, 0.525, 'canvas'], ['y', 133.618, -6.242, 0.18, 0.525, 0.7, 'canvas'],
+      ['y', 133.618, -6.242, 0.187, 0.434, 0.462, 'rope'], ['y', 133.823, -5.808, 0.24, 0, 0.465, 'canvas'], ['y', 133.823, -5.808, 0.18, 0.465, 0.62, 'canvas'], ['y', 133.823, -5.808, 0.187, 0.384, 0.409, 'rope'],
+      ['b', 134.054, -5.602, 0, 134.554, -4.702, 0.34, 'leather'], ['b', 134.054, -5.582, 0.34, 134.554, -4.722, 0.46, 'leather'], ['b', 134.094, -5.542, 0.46, 134.514, -4.762, 0.5, 'leather'], ['b', 134.046, -5.61, 0, 134.094, -5.562, 0.12, 'brass'],
+      ['b', 134.046, -4.742, 0, 134.094, -4.694, 0.12, 'brass'], ['b', 134.514, -5.61, 0, 134.562, -5.562, 0.12, 'brass'], ['b', 134.514, -4.742, 0, 134.562, -4.694, 0.12, 'brass'], ['b', 134.264, -5.612, 0.3, 134.344, -5.592, 0.4, 'brass'],
+      ['b', 134.264, -4.712, 0.3, 134.344, -4.692, 0.4, 'brass'], ['b', 133.955, -2.949, 0, 134.515, -2.389, 0.35, 'pine'], ['b', 133.95, -2.954, 0.1, 134.52, -2.384, 0.14, 'wood'], ['b', 133.985, -2.919, 0.35, 134.485, -2.419, 0.45, 'books'],
+      ['b', 133.975, -2.939, 0.35, 134.495, -2.399, 0.7, 'pine'], ['b', 133.97, -2.944, 0.45, 134.5, -2.394, 0.49, 'wood'], ['b', 134.005, -2.909, 0.7, 134.465, -2.429, 0.8, 'books'], ['b', 133.264, -2.195, 0, 133.764, -1.295, 0.5, 'deal'],
+      ['b', 133.254, -2.205, 0.5, 133.774, -1.285, 0.55, 'pine'], ['b', 133.384, -2.207, 0, 133.424, -1.283, 0.55, 'iron'], ['b', 133.604, -2.207, 0, 133.644, -1.283, 0.55, 'iron'], ['b', 133.484, -2.21, 0.4, 133.544, -2.185, 0.56, 'iron'],
+      ['b', 133.484, -1.305, 0.4, 133.544, -1.28, 0.56, 'iron'], ['y', 132.867, -0.669, 0.24, 0, 0.525, 'canvas'], ['y', 132.867, -0.669, 0.18, 0.525, 0.7, 'canvas'], ['y', 132.867, -0.669, 0.187, 0.434, 0.462, 'rope'],
+      ['y', 132.482, -0.383, 0.24, 0, 0.465, 'canvas'], ['y', 132.482, -0.383, 0.18, 0.465, 0.62, 'canvas'], ['y', 132.482, -0.383, 0.187, 0.384, 0.409, 'rope'], ['b', 127.32, -0.672, 0, 128.0, 0.008, 0.006, 'dark'],
+      ['b', 125.633, -5.929, 0, 126.313, -5.249, 0.006, 'dark'], ['b', 130.396, -8.561, 0, 131.076, -7.881, 0.006, 'dark'], ['b', 133.895, -3.009, 0, 134.575, -2.329, 0.006, 'dark'], ['y', 125.589, -3.199, 0.15, 0, 0.3, 'tin'],
+      ['y', 125.589, -3.199, 0.14, 0.26, 0.28, 'iron']] },
+    /* 5-THINGS end lake-tower-5 */
+    /* 5-THINGS headmasters-tower-room-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (headmasters-tower-room-5; polygon-rooms-1029.md, Plain store, laid as How a round store is laid): 13 places round the curve alternating book crates, a boarded chest, sacks and a school trunk, one slot in four bare, the door's arc clear for 1.0 each side of its jamb; this room's one thing: an open sack of birdseed, a few seed hulls spilled on the flags and a tin scoop beside it, in a bare slot (the phoenix is a later year's) */
+    'headmasters-tower-room-5': { items: [
+      ['b', 162.263, 37.775, 0, 162.823, 38.335, 0.35, 'pine'], ['b', 162.258, 37.77, 0.1, 162.828, 38.34, 0.14, 'wood'], ['b', 162.293, 37.805, 0.35, 162.793, 38.305, 0.45, 'books'], ['b', 162.283, 37.785, 0.35, 162.803, 38.325, 0.7, 'pine'],
+      ['b', 162.278, 37.78, 0.45, 162.808, 38.33, 0.49, 'wood'], ['b', 162.313, 37.815, 0.7, 162.773, 38.295, 0.8, 'books'], ['b', 162.822, 36.881, 0, 163.722, 37.381, 0.5, 'deal'], ['b', 162.812, 36.871, 0.5, 163.732, 37.391, 0.55, 'pine'],
+      ['b', 162.942, 36.869, 0, 162.982, 37.393, 0.55, 'iron'], ['b', 163.562, 36.869, 0, 163.602, 37.393, 0.55, 'iron'], ['b', 163.242, 36.866, 0.4, 163.302, 36.891, 0.56, 'iron'], ['b', 163.242, 37.371, 0.4, 163.302, 37.396, 0.56, 'iron'],
+      ['y', 164.181, 36.385, 0.24, 0, 0.525, 'canvas'], ['y', 164.181, 36.385, 0.18, 0.525, 0.7, 'canvas'], ['y', 164.181, 36.385, 0.187, 0.434, 0.462, 'rope'], ['y', 164.61, 36.169, 0.24, 0, 0.465, 'canvas'],
+      ['y', 164.61, 36.169, 0.18, 0.465, 0.62, 'canvas'], ['y', 164.61, 36.169, 0.187, 0.384, 0.409, 'rope'], ['b', 166.072, 35.74, 0, 166.972, 36.24, 0.34, 'leather'], ['b', 166.072, 35.76, 0.34, 166.972, 36.22, 0.46, 'leather'],
+      ['b', 166.112, 35.8, 0.46, 166.932, 36.18, 0.5, 'leather'], ['b', 166.064, 35.732, 0, 166.112, 35.78, 0.12, 'brass'], ['b', 166.064, 36.2, 0, 166.112, 36.248, 0.12, 'brass'], ['b', 166.932, 35.732, 0, 166.98, 35.78, 0.12, 'brass'],
+      ['b', 166.932, 36.2, 0, 166.98, 36.248, 0.12, 'brass'], ['b', 166.482, 35.73, 0.3, 166.562, 35.75, 0.4, 'brass'], ['b', 166.482, 36.23, 0.3, 166.562, 36.25, 0.4, 'brass'], ['b', 167.384, 36.07, 0, 167.944, 36.63, 0.35, 'pine'],
+      ['b', 167.379, 36.065, 0.1, 167.949, 36.635, 0.14, 'wood'], ['b', 167.414, 36.1, 0.35, 167.914, 36.6, 0.45, 'books'], ['b', 167.404, 36.08, 0.35, 167.924, 36.62, 0.7, 'pine'], ['b', 167.399, 36.075, 0.45, 167.929, 36.625, 0.49, 'wood'],
+      ['b', 167.434, 36.11, 0.7, 167.894, 36.59, 0.8, 'books'], ['b', 168.164, 36.784, 0, 169.064, 37.284, 0.5, 'deal'], ['b', 168.154, 36.774, 0.5, 169.074, 37.294, 0.55, 'pine'], ['b', 168.284, 36.772, 0, 168.324, 37.296, 0.55, 'iron'],
+      ['b', 168.904, 36.772, 0, 168.944, 37.296, 0.55, 'iron'], ['b', 168.584, 36.769, 0.4, 168.644, 36.794, 0.56, 'iron'], ['b', 168.584, 37.274, 0.4, 168.644, 37.299, 0.56, 'iron'], ['y', 169.95, 38.976, 0.24, 0, 0.525, 'canvas'],
+      ['y', 169.95, 38.976, 0.18, 0.525, 0.7, 'canvas'], ['y', 169.95, 38.976, 0.187, 0.434, 0.462, 'rope'], ['y', 170.07, 39.441, 0.24, 0, 0.465, 'canvas'], ['y', 170.07, 39.441, 0.18, 0.465, 0.62, 'canvas'],
+      ['y', 170.07, 39.441, 0.187, 0.384, 0.409, 'rope'], ['b', 169.83, 39.733, 0, 170.33, 40.633, 0.34, 'leather'], ['b', 169.83, 39.753, 0.34, 170.33, 40.613, 0.46, 'leather'], ['b', 169.87, 39.793, 0.46, 170.29, 40.573, 0.5, 'leather'],
+      ['b', 169.822, 39.725, 0, 169.87, 39.773, 0.12, 'brass'], ['b', 169.822, 40.593, 0, 169.87, 40.641, 0.12, 'brass'], ['b', 170.29, 39.725, 0, 170.338, 39.773, 0.12, 'brass'], ['b', 170.29, 40.593, 0, 170.338, 40.641, 0.12, 'brass'],
+      ['b', 170.04, 39.723, 0.3, 170.12, 39.743, 0.4, 'brass'], ['b', 170.04, 40.623, 0.3, 170.12, 40.643, 0.4, 'brass'], ['b', 169.547, 41.074, 0, 170.107, 41.634, 0.35, 'pine'], ['b', 169.542, 41.069, 0.1, 170.112, 41.639, 0.14, 'wood'],
+      ['b', 169.577, 41.104, 0.35, 170.077, 41.604, 0.45, 'books'], ['b', 169.567, 41.084, 0.35, 170.087, 41.624, 0.7, 'pine'], ['b', 169.562, 41.079, 0.45, 170.092, 41.629, 0.49, 'wood'], ['b', 169.597, 41.114, 0.7, 170.057, 41.594, 0.8, 'books'],
+      ['b', 167.879, 42.901, 0, 168.779, 43.401, 0.5, 'deal'], ['b', 167.869, 42.891, 0.5, 168.789, 43.411, 0.55, 'pine'], ['b', 167.999, 42.889, 0, 168.039, 43.413, 0.55, 'iron'], ['b', 168.619, 42.889, 0, 168.659, 43.413, 0.55, 'iron'],
+      ['b', 168.299, 42.886, 0.4, 168.359, 42.911, 0.56, 'iron'], ['b', 168.299, 43.391, 0.4, 168.359, 43.416, 0.56, 'iron'], ['y', 167.364, 43.885, 0.24, 0, 0.525, 'canvas'], ['y', 167.364, 43.885, 0.18, 0.525, 0.7, 'canvas'],
+      ['y', 167.364, 43.885, 0.187, 0.434, 0.462, 'rope'], ['b', 165.722, 43.833, 0, 166.622, 44.333, 0.34, 'leather'], ['b', 165.722, 43.853, 0.34, 166.622, 44.313, 0.46, 'leather'], ['b', 165.762, 43.893, 0.46, 166.582, 44.273, 0.5, 'leather'],
+      ['b', 165.714, 43.825, 0, 165.762, 43.873, 0.12, 'brass'], ['b', 165.714, 44.293, 0, 165.762, 44.341, 0.12, 'brass'], ['b', 166.582, 43.825, 0, 166.63, 43.873, 0.12, 'brass'], ['b', 166.582, 44.293, 0, 166.63, 44.341, 0.12, 'brass'],
+      ['b', 166.132, 43.823, 0.3, 166.212, 43.843, 0.4, 'brass'], ['b', 166.132, 44.323, 0.3, 166.212, 44.343, 0.4, 'brass'], ['b', 163.647, 43.09, 0, 164.207, 43.65, 0.35, 'pine'], ['b', 163.642, 43.085, 0.1, 164.212, 43.655, 0.14, 'wood'],
+      ['b', 163.677, 43.12, 0.35, 164.177, 43.62, 0.45, 'books'], ['b', 163.667, 43.1, 0.35, 164.187, 43.64, 0.7, 'pine'], ['b', 163.662, 43.095, 0.45, 164.192, 43.645, 0.49, 'wood'], ['b', 163.697, 43.13, 0.7, 164.157, 43.61, 0.8, 'books'],
+      ['y', 165.326, 36.062, 0.26, 0, 0.55, 'canvas'], ['y', 165.326, 36.062, 0.19, 0.55, 0.62, 'canvas'], ['y', 165.326, 36.062, 0.2, 0.5, 0.54, 'rope'], ['b', 165.626, 35.862, 0, 165.656, 35.892, 0.012, 'straw'],
+      ['b', 165.696, 35.952, 0, 165.726, 35.982, 0.012, 'straw'], ['b', 165.766, 36.042, 0, 165.796, 36.072, 0.012, 'straw'], ['b', 165.836, 35.862, 0, 165.866, 35.892, 0.012, 'straw'], ['b', 165.906, 35.952, 0, 165.936, 35.982, 0.012, 'straw'],
+      ['y', 165.846, 36.282, 0.07, 0, 0.09, 'tin']] },
+    /* 5-THINGS end headmasters-tower-room-5 */
+    /* 5-THINGS ravenclaw-tower-room-5 */
+    /* docs/interiors/polygon-rooms-1029.md, ravenclaw-tower-room-5 (ravenclaw-tower-room-5, polygon route): the prefects' bathroom's towel and soap store: a four-board shelf of towels folded in threes on the curve at the north (two spare cloths flat on its top), a book crate of soap in two rows of six on the south-east curve, a pail by the door's south jamb; the door's arc and the middle kept clear. Placeholders: folded-linen-1, wooden-pail-1 (plain boxes and a cylinder, no drawn piece) */
+    'ravenclaw-tower-room-5': { items: [
+      ['b', -8.3, 40.4, 0, -8.24, 40.8, 1.7, 'wood'], ['b', -6.76, 40.4, 0, -6.7, 40.8, 1.7, 'wood'], ['b', -8.3, 40.4, 0.15, -6.7, 40.8, 0.19, 'pine'], ['b', -8.3, 40.4, 0.6, -6.7, 40.8, 0.64, 'pine'],
+      ['b', -8.3, 40.4, 1.05, -6.7, 40.8, 1.09, 'pine'], ['b', -8.3, 40.4, 1.5, -6.7, 40.8, 1.54, 'pine'], ['b', -8.2, 40.45, 0.19, -7.8, 40.75, 0.255, 'linen'], ['b', -8.2, 40.45, 0.26, -7.8, 40.75, 0.325, 'linen'],
+      ['b', -8.2, 40.45, 0.33, -7.8, 40.75, 0.395, 'linen'], ['b', -7.7, 40.45, 0.19, -7.3, 40.75, 0.255, 'linen'], ['b', -7.7, 40.45, 0.26, -7.3, 40.75, 0.325, 'linen'], ['b', -7.7, 40.45, 0.33, -7.3, 40.75, 0.395, 'linen'],
+      ['b', -7.2, 40.45, 0.19, -6.8, 40.75, 0.255, 'linen'], ['b', -7.2, 40.45, 0.26, -6.8, 40.75, 0.325, 'linen'], ['b', -7.2, 40.45, 0.33, -6.8, 40.75, 0.395, 'linen'], ['b', -8.2, 40.45, 0.64, -7.8, 40.75, 0.705, 'linen'],
+      ['b', -8.2, 40.45, 0.71, -7.8, 40.75, 0.775, 'linen'], ['b', -8.2, 40.45, 0.78, -7.8, 40.75, 0.845, 'linen'], ['b', -7.7, 40.45, 0.64, -7.3, 40.75, 0.705, 'linen'], ['b', -7.7, 40.45, 0.71, -7.3, 40.75, 0.775, 'linen'],
+      ['b', -7.7, 40.45, 0.78, -7.3, 40.75, 0.845, 'linen'], ['b', -7.2, 40.45, 0.64, -6.8, 40.75, 0.705, 'linen'], ['b', -7.2, 40.45, 0.71, -6.8, 40.75, 0.775, 'linen'], ['b', -7.2, 40.45, 0.78, -6.8, 40.75, 0.845, 'linen'],
+      ['b', -8.2, 40.45, 1.09, -7.8, 40.75, 1.155, 'linen'], ['b', -8.2, 40.45, 1.16, -7.8, 40.75, 1.225, 'linen'], ['b', -8.2, 40.45, 1.23, -7.8, 40.75, 1.295, 'linen'], ['b', -7.7, 40.45, 1.09, -7.3, 40.75, 1.155, 'linen'],
+      ['b', -7.7, 40.45, 1.16, -7.3, 40.75, 1.225, 'linen'], ['b', -7.7, 40.45, 1.23, -7.3, 40.75, 1.295, 'linen'], ['b', -8.2, 40.48, 1.54, -7.6, 40.72, 1.6, 'linen'], ['b', -7.5, 40.48, 1.54, -6.9, 40.72, 1.6, 'linen'],
+      ['b', -3.027, 29.292, 0, -2.467, 29.852, 0.35, 'pine'], ['b', -3.032, 29.287, 0.1, -2.462, 29.857, 0.14, 'wood'], ['b', -2.987, 29.452, 0.35, -2.917, 29.602, 0.4, 'white'], ['b', -2.907, 29.452, 0.35, -2.837, 29.602, 0.4, 'white'],
+      ['b', -2.827, 29.452, 0.35, -2.757, 29.602, 0.4, 'white'], ['b', -2.747, 29.452, 0.35, -2.677, 29.602, 0.4, 'white'], ['b', -2.667, 29.452, 0.35, -2.597, 29.602, 0.4, 'white'], ['b', -2.587, 29.452, 0.35, -2.517, 29.602, 0.4, 'white'],
+      ['b', -2.987, 29.652, 0.35, -2.917, 29.802, 0.4, 'white'], ['b', -2.907, 29.652, 0.35, -2.837, 29.802, 0.4, 'white'], ['b', -2.827, 29.652, 0.35, -2.757, 29.802, 0.4, 'white'], ['b', -2.747, 29.652, 0.35, -2.677, 29.802, 0.4, 'white'],
+      ['b', -2.667, 29.652, 0.35, -2.597, 29.802, 0.4, 'white'], ['b', -2.587, 29.652, 0.35, -2.517, 29.802, 0.4, 'white'], ['y', -1.109, 32.162, 0.17, 0, 0.3, 'wood'], ['y', -1.109, 32.162, 0.15, 0.26, 0.29, 'iron']] },
+    /* 5-THINGS end ravenclaw-tower-room-5 */
+    /* 5-THINGS painted-door-room-5 */
+    /* docs/interiors/painted-door-room.md (H81, option 1, Godric's 1, req 1122): the painter's stool by the east wall with a dried palette, gold caked on it, and three brushes; the painted arcade on the east wall is the ledger's (295) and not placed here; the way from the door to the back wall kept clear */
+    'painted-door-room-5': { items: [
+      ['b', 38.905, 2.355, 0, 38.955, 2.405, 0.42, 'wood'], ['b', 39.205, 2.355, 0, 39.255, 2.405, 0.42, 'wood'], ['b', 38.905, 2.655, 0, 38.955, 2.705, 0.42, 'wood'], ['b', 39.205, 2.655, 0, 39.255, 2.705, 0.42, 'wood'],
+      ['b', 38.9, 2.35, 0.42, 39.3, 2.75, 0.45, 'wood'], ['b', 38.98, 2.45, 0.45, 39.2, 2.62, 0.462, 'wood'], ['b', 39.04, 2.5, 0.462, 39.08, 2.56, 0.468, 'gilt'], ['b', 39.04, 2.58, 0.462, 39.07, 2.74, 0.47, 'wood'],
+      ['b', 39.08, 2.59, 0.462, 39.11, 2.75, 0.47, 'wood'], ['b', 39.12, 2.6, 0.462, 39.15, 2.76, 0.47, 'wood']] },
+    /* 5-THINGS end painted-door-room-5 */
+    /* 5-THINGS true-hide-5 */
+    /* docs/interiors/real-hides.md (H72, true-hide-5): a deal bench against the north wall with a back board, the yellowed note pinned to it, the catapult, a bag of marbles with two out beside it and the toy wand on the seat, a tin sconce with a drowned candle end on the east wall at 1.5; the way from the panel to the bench left clear */
+    'true-hide-5': { items: [
+      ['b', 33.65, 17.15, 0.4, 34.85, 17.5, 0.44, 'deal'], ['b', 33.7, 17.17, 0, 33.77, 17.4, 0.4, 'deal'], ['b', 34.75, 17.17, 0, 34.82, 17.4, 0.4, 'deal'], ['b', 33.65, 17.45, 0.44, 34.85, 17.5, 0.95, 'deal'],
+      ['b', 34.15, 17.43, 0.7, 34.35, 17.45, 0.95, 'paper'], ['b', 35.34, 16.84, 1.5, 35.4, 16.96, 1.62, 'tin'], ['y', 35.3, 16.9, 0.04, 1.5, 1.52, 'tin'], ['y', 35.3, 16.9, 0.02, 1.52, 1.56, 'tallow'],
+      ['b', 33.7, 17.25, 0.44, 33.88, 17.4, 0.46, 'wood'], ['b', 33.7, 17.25, 0.46, 33.73, 17.4, 0.62, 'wood'], ['b', 33.95, 17.27, 0.44, 34.07, 17.39, 0.56, 'canvas'], ['y', 34.12, 17.22, 0.008, 0.44, 0.456, 'glass'],
+      ['y', 34.18, 17.22, 0.008, 0.44, 0.456, 'glass'], ['b', 34.05, 17.28, 0.44, 34.35, 17.31, 0.456, 'wood']] },
+    /* 5-THINGS end true-hide-5 */
+    /* 5-THINGS decoy-cupboard-5 */
+    /* docs/interiors/real-hides.md (H72, decoy-cupboard-5): the one old boot on the floor against the west side wall, toe to the back; the dusty Gobstone on a plank shelf on the east side wall at 1.2; the way through kept clear 0.78 wide */
+    'decoy-cupboard-5': { items: [
+      ['b', 33.87, 12.02, 0, 33.97, 12.3, 0.25, 'leather'], ['b', 33.87, 12.02, 0, 34.0, 12.12, 0.06, 'leather'], ['b', 34.6, 12.0, 1.17, 34.75, 12.5, 1.2, 'wood'], ['y', 34.68, 12.25, 0.02, 1.2, 1.24, 'stone']] },
+    /* 5-THINGS end decoy-cupboard-5 */
+    /* 5-THINGS chimney-hide */
+    /* docs/interiors/hidden-ways-batch-2.md (H10, chimney-hide): a plank seat on two iron brackets across the north end, a folded moth-eaten blanket and a dry leather bottle on it, a tin candle holder with a stub unlit in a niche in the east wall at 1.4; the floor from the panel to the seat left clear */
+    'chimney-hide': { items: [
+      ['b', 20.6, 10.1, 0.43, 21.8, 10.4, 0.47, 'wood'], ['b', 20.7, 10.1, 0.28, 20.76, 10.34, 0.43, 'iron'], ['b', 21.6, 10.1, 0.28, 21.66, 10.34, 0.43, 'iron'], ['b', 21.4, 10.1, 0.47, 21.8, 10.4, 0.57, 'canvas'],
+      ['y', 21.28, 10.25, 0.06, 0.47, 0.72, 'leather'], ['y', 21.28, 10.25, 0.02, 0.72, 0.76, 'wood'], ['b', 21.72, 9.8, 1.4, 21.8, 10.0, 1.55, 'dark'], ['y', 21.76, 9.9, 0.04, 1.4, 1.46, 'tin'],
+      ['y', 21.76, 9.9, 0.02, 1.46, 1.5, 'tallow']] },
+    /* 5-THINGS end chimney-hide */
+    /* 5-THINGS east-wing-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (east-wing-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'east-wing-5': { items: [
+      ['b', 148.15, 18.23, 0, 149.05, 18.45, 0.012, 'stone'], ['b', 159.8, 39.55, 0, 160.02, 40.45, 0.012, 'stone'], ['b', 159.8, 32.95, 0, 160.02, 33.95, 0.012, 'stone'], ['b', 143.98, 34.28, 2.15, 144.28, 34.32, 2.2, 'iron'],
+      ['y', 144.26, 34.3, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end east-wing-5 */
+    /* 5-THINGS loop-gallery-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (loop-gallery-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'loop-gallery-5': { items: [
+      ['b', 107.65, 0.0, 0, 108.35, 0.22, 0.012, 'stone'], ['b', 117.32, -1.57, 2.15, 117.62, -1.53, 2.2, 'iron'], ['y', 117.34, -1.55, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end loop-gallery-5 */
+    /* 5-THINGS loop-gallery-stair-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (loop-gallery-stair-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'loop-gallery-stair-5': { items: [
+      ['b', 100.65, 0.0, 0, 101.35, 0.22, 0.012, 'stone'], ['b', 101.62, -1.57, 2.15, 101.92, -1.53, 2.2, 'iron'], ['y', 101.64, -1.55, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end loop-gallery-stair-5 */
+    /* 5-THINGS tudor-bay-5-entry */
+    /* docs/interiors/upper-floors-gaps-1028.md (tudor-bay-5-entry, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'tudor-bay-5-entry': { items: [
+      ['b', 102.3, -0.1, 0, 104.7, 0.12, 0.012, 'stone'], ['b', 102.3, -2.52, 0, 104.7, -2.3, 0.012, 'stone'], ['b', 104.42, -1.52, 2.15, 104.72, -1.48, 2.2, 'iron'], ['y', 104.44, -1.5, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end tudor-bay-5-entry */
+    /* 5-THINGS west-wing-corridor-5-north */
+    /* docs/interiors/upper-floors-gaps-1028.md (west-wing-corridor-5-north, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'west-wing-corridor-5-north': { items: [
+      ['b', 13.45, 18.23, 0, 14.35, 18.45, 0.012, 'stone'], ['b', 12.63, 21.55, 0, 12.85, 22.45, 0.012, 'stone'], ['b', 13.45, 25.55, 0, 14.35, 25.77, 0.012, 'stone'], ['b', 12.63, 24.68, 2.15, 12.93, 24.72, 2.2, 'iron'],
+      ['y', 12.91, 24.7, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end west-wing-corridor-5-north */
+    /* 5-THINGS west-wing-corridor-5-south */
+    /* docs/interiors/upper-floors-gaps-1028.md (west-wing-corridor-5-south, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'west-wing-corridor-5-south': { items: [
+      ['b', 13.45, 40.23, 0, 14.35, 40.45, 0.012, 'stone'], ['b', 12.63, 44.55, 0, 12.85, 45.45, 0.012, 'stone'], ['b', 12.63, 48.18, 2.15, 12.93, 48.22, 2.2, 'iron'], ['y', 12.91, 48.2, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end west-wing-corridor-5-south */
+    /* 5-THINGS north-range-corridor-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (north-range-corridor-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'north-range-corridor-5': { items: [
+      ['b', 66.55, 53.15, 0, 67.45, 53.37, 0.012, 'stone'], ['b', 2.925, 53.15, 0, 3.825, 53.37, 0.012, 'stone'], ['b', 6.8, 53.15, 0, 7.7, 53.37, 0.012, 'stone'], ['b', 19.55, 53.15, 0, 20.45, 53.37, 0.012, 'stone'],
+      ['b', 31.55, 53.15, 0, 32.45, 53.37, 0.012, 'stone'], ['b', 40.3, 53.15, 0, 41.2, 53.37, 0.012, 'stone'], ['b', 55.8, 53.15, 0, 56.7, 53.37, 0.012, 'stone'], ['b', 68.8, 53.15, 0, 69.7, 53.37, 0.012, 'stone'],
+      ['b', 70.6, 53.15, 0, 71.5, 53.37, 0.012, 'stone'], ['b', 79.1, 53.15, 0, 80.0, 53.37, 0.012, 'stone'], ['b', 87.6, 53.15, 0, 88.5, 53.37, 0.012, 'stone'], ['b', 92.1, 53.15, 0, 93.0, 53.37, 0.012, 'stone'],
+      ['b', 99.55, 53.15, 0, 100.45, 53.37, 0.012, 'stone'], ['b', 108.0, 53.15, 0, 108.9, 53.37, 0.012, 'stone'], ['b', 113.4, 53.15, 0, 114.3, 53.37, 0.012, 'stone'], ['b', 126.25, 53.15, 0, 127.15, 53.37, 0.012, 'stone'],
+      ['b', 139.15, 53.15, 0, 140.05, 53.37, 0.012, 'stone'], ['b', 141.9, 53.15, 0, 142.8, 53.37, 0.012, 'stone'], ['b', 147.55, 53.15, 0, 148.45, 53.37, 0.012, 'stone'], ['b', 152.8, 53.15, 0, 153.7, 53.37, 0.012, 'stone'],
+      ['b', 156.9, 53.15, 0, 157.8, 53.37, 0.012, 'stone'], ['b', 159.72, 51.78, 2.15, 160.02, 51.82, 2.2, 'iron'], ['y', 159.74, 51.8, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end north-range-corridor-5 */
+    /* 5-THINGS passage-5-study */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-5-study, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'passage-5-study': { items: [
+      ['b', 139.15, 53.83, 0, 140.05, 54.05, 0.012, 'stone'], ['b', 139.2, 57.35, 0, 140.0, 57.57, 0.012, 'stone'], ['b', 138.83, 55.98, 2.15, 139.13, 56.02, 2.2, 'iron'], ['y', 139.11, 56.0, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end passage-5-study */
+    /* 5-THINGS passage-5-middle */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-5-middle, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'passage-5-middle': { items: [
+      ['b', 113.4, 53.83, 0, 114.3, 54.05, 0.012, 'stone'], ['b', 113.45, 57.35, 0, 114.25, 57.57, 0.012, 'stone'], ['b', 113.03, 55.98, 2.15, 113.33, 56.02, 2.2, 'iron'], ['y', 113.31, 56.0, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end passage-5-middle */
+    /* 5-THINGS passage-5-astronomy */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-5-astronomy, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'passage-5-astronomy': { items: [
+      ['b', 87.6, 53.83, 0, 88.5, 54.05, 0.012, 'stone'], ['b', 87.65, 57.35, 0, 88.45, 57.57, 0.012, 'stone'], ['b', 87.23, 55.98, 2.15, 87.53, 56.02, 2.2, 'iron'], ['y', 87.51, 56.0, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end passage-5-astronomy */
+    /* 5-THINGS passage-5-cleaning */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-5-cleaning, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'passage-5-cleaning': { items: [
+      ['b', 70.6, 53.83, 0, 71.5, 54.05, 0.012, 'stone'], ['b', 70.65, 57.35, 0, 71.45, 57.57, 0.012, 'stone'], ['b', 70.23, 55.98, 2.15, 70.53, 56.02, 2.2, 'iron'], ['y', 70.51, 56.0, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end passage-5-cleaning */
+    /* 5-THINGS passage-5-southwest */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-5-southwest, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'passage-5-southwest': { items: [
+      ['b', 31.55, 53.83, 0, 32.45, 54.05, 0.012, 'stone'], ['b', 31.55, 58.55, 0, 32.45, 58.77, 0.012, 'stone'], ['b', 31.23, 56.58, 2.15, 31.53, 56.62, 2.2, 'iron'], ['y', 31.51, 56.6, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end passage-5-southwest */
+    /* 5-THINGS passage-5-west */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-5-west, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'passage-5-west': { items: [
+      ['b', 6.8, 53.83, 0, 7.7, 54.05, 0.012, 'stone'], ['b', 6.8, 58.55, 0, 7.7, 58.77, 0.012, 'stone'], ['b', 6.48, 56.58, 2.15, 6.78, 56.62, 2.2, 'iron'], ['y', 6.76, 56.6, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end passage-5-west */
+    /* 5-THINGS service-passage-5-lobby */
+    /* docs/interiors/upper-floors-gaps-1028.md (service-passage-5-lobby, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'service-passage-5-lobby': { items: [
+      ['b', 68.8, 53.83, 0, 69.7, 54.05, 0.012, 'stone'], ['b', 68.63, 55.25, 0, 68.85, 56.15, 0.012, 'stone'], ['b', 68.85, 57.35, 0, 69.65, 57.57, 0.012, 'stone'], ['b', 69.57, 55.693, 2.15, 69.87, 55.733, 2.2, 'iron'],
+      ['y', 69.59, 55.712, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end service-passage-5-lobby */
+    /* 5-THINGS passage-5-east */
+    /* docs/interiors/upper-floors-gaps-1028.md (passage-5-east, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'passage-5-east': { items: [
+      ['b', 152.8, 53.83, 0, 153.7, 54.05, 0.012, 'stone'], ['b', 152.95, 57.35, 0, 153.85, 57.57, 0.012, 'stone'], ['b', 152.23, 55.98, 2.15, 152.53, 56.02, 2.2, 'iron'], ['y', 152.51, 56.0, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end passage-5-east */
+    /* 5-THINGS astronomy-stair-foot-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (astronomy-stair-foot-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'astronomy-stair-foot-5': { items: [
+      ['b', 87.6, 59.23, 0, 88.5, 59.45, 0.012, 'stone'], ['b', 82.23, 63.55, 0, 82.45, 64.45, 0.012, 'stone'], ['b', 88.55, 63.55, 0, 88.77, 64.45, 0.012, 'stone'], ['b', 85.78, 68.47, 2.15, 85.82, 68.77, 2.2, 'iron'],
+      ['y', 85.8, 68.49, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end astronomy-stair-foot-5 */
+    /* 5-THINGS armour-corridor-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (armour-corridor-5, corridors and passages; completion-1029 armour-corridor-5-suit*): 2 suits of armour on low stone plinths along the north wall, one every 6 m, facing across the aisle (one with a sword point-down, one with a halberd, one with a raised visor); bare flags, a worn threshold, one unlit torch bracket clear of every opening */
+    'armour-corridor-5': { items: [
+      ['b', 97.7, 3.83, 0, 98.6, 4.05, 0.012, 'stone'], ['b', 94.8, 17.2, 0, 95.5, 17.9, 0.3, 'stone'], ['y', 95.05, 17.55, 0.075, 0.3, 0.88, 'steel'], ['b', 94.96, 17.44, 0.86, 95.14, 17.66, 0.93, 'steel'],
+      ['y', 95.25, 17.55, 0.075, 0.3, 0.88, 'steel'], ['b', 95.16, 17.44, 0.86, 95.34, 17.66, 0.93, 'steel'], ['b', 94.93, 17.41, 0.93, 95.37, 17.69, 1.12, 'steel'], ['b', 94.94, 17.41, 1.12, 95.36, 17.69, 1.52, 'steel'],
+      ['b', 94.9, 17.45, 1.45, 95.4, 17.65, 1.52, 'steel'], ['b', 94.8, 17.49, 1.0, 94.9, 17.61, 1.46, 'steel'], ['b', 95.4, 17.49, 1.0, 95.5, 17.61, 1.46, 'steel'], ['y', 95.15, 17.55, 0.11, 1.52, 1.74, 'steel'],
+      ['b', 95.09, 17.39, 1.58, 95.21, 17.47, 1.68, 'dark'], ['b', 95.12, 17.21, 0.9, 95.18, 17.37, 1.0, 'iron'], ['b', 95.12, 17.23, 0.45, 95.18, 17.29, 0.92, 'iron'], ['b', 100.8, 17.2, 0, 101.5, 17.9, 0.3, 'stone'],
+      ['y', 101.05, 17.55, 0.075, 0.3, 0.88, 'steel'], ['b', 100.96, 17.44, 0.86, 101.14, 17.66, 0.93, 'steel'], ['y', 101.25, 17.55, 0.075, 0.3, 0.88, 'steel'], ['b', 101.16, 17.44, 0.86, 101.34, 17.66, 0.93, 'steel'],
+      ['b', 100.93, 17.41, 0.93, 101.37, 17.69, 1.12, 'steel'], ['b', 100.94, 17.41, 1.12, 101.36, 17.69, 1.52, 'steel'], ['b', 100.9, 17.45, 1.45, 101.4, 17.65, 1.52, 'steel'], ['b', 100.8, 17.49, 1.0, 100.9, 17.61, 1.46, 'steel'],
+      ['b', 101.4, 17.49, 1.0, 101.5, 17.61, 1.46, 'steel'], ['y', 101.15, 17.55, 0.11, 1.52, 1.74, 'steel'], ['b', 101.09, 17.39, 1.58, 101.21, 17.47, 1.68, 'dark'], ['y', 101.15, 17.55, 0.03, 1.74, 1.86, 'iron'],
+      ['y', 101.45, 17.45, 0.02, 0.3, 2.2, 'wood'], ['b', 92.23, 11.205, 2.15, 92.53, 11.245, 2.2, 'iron'], ['y', 92.51, 11.225, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end armour-corridor-5 */
+    /* 5-THINGS drum-bend-5-east */
+    /* docs/interiors/upper-floors-gaps-1028.md (drum-bend-5-east, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'drum-bend-5-east': { items: [
+      ['b', 48.58, 6.55, 0, 48.8, 7.45, 0.012, 'stone'], ['b', 50.38, 11.07, 2.15, 50.42, 11.37, 2.2, 'iron'], ['y', 50.4, 11.09, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end drum-bend-5-east */
+    /* 5-THINGS drum-bend-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (drum-bend-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'drum-bend-5': { items: [
+      ['b', 41.74, 8.33, 0, 42.64, 8.55, 0.012, 'stone'], ['b', 41.75, 11.15, 0, 42.65, 11.37, 0.012, 'stone'], ['b', 46.205, 11.07, 2.15, 46.245, 11.37, 2.2, 'iron'], ['y', 46.225, 11.09, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end drum-bend-5 */
+    /* 5-THINGS drum-bend-5-west */
+    /* docs/interiors/upper-floors-gaps-1028.md (drum-bend-5-west, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'drum-bend-5-west': { items: [
+      ['b', 35.6, 6.55, 0, 35.82, 7.45, 0.012, 'stone'], ['b', 33.85, 11.15, 0, 34.75, 11.37, 0.012, 'stone'], ['b', 32.78, 7.605, 2.15, 33.08, 7.645, 2.2, 'iron'], ['y', 33.06, 7.625, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end drum-bend-5-west */
+    /* 5-THINGS west-stair-foot-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (west-stair-foot-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'west-stair-foot-5': { items: [
+      ['b', 6.05, 63.8, 0, 6.95, 64.02, 0.012, 'stone'], ['b', 6.8, 58.98, 0, 7.7, 59.2, 0.012, 'stone'], ['b', 7.8, 61.05, 0, 8.02, 61.95, 0.012, 'stone'], ['b', 7.72, 59.405, 2.15, 8.02, 59.445, 2.2, 'iron'],
+      ['y', 7.74, 59.425, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end west-stair-foot-5 */
+    /* 5-THINGS west-tower-way-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (west-tower-way-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'west-tower-way-5': { items: [
+      ['b', 6.05, 70.1, 0, 6.95, 70.32, 0.012, 'stone'], ['b', 6.05, 63.98, 0, 6.95, 64.2, 0.012, 'stone'], ['b', 6.72, 67.255, 2.15, 7.02, 67.295, 2.2, 'iron'], ['y', 6.74, 67.275, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end west-tower-way-5 */
+    /* 5-THINGS north-stair-foot-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (north-stair-foot-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'north-stair-foot-5': { items: [
+      ['b', 152.1, 57.98, 0, 152.9, 58.2, 0.012, 'stone'], ['b', 158.05, 64.3, 0, 158.95, 64.52, 0.012, 'stone'], ['b', 152.95, 57.98, 0, 153.85, 58.2, 0.012, 'stone'], ['b', 152.48, 61.55, 0, 152.7, 62.45, 0.012, 'stone'],
+      ['b', 152.48, 64.055, 2.15, 152.78, 64.095, 2.2, 'iron'], ['y', 152.76, 64.075, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end north-stair-foot-5 */
+    /* 5-THINGS sw-corner-lobby-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (sw-corner-lobby-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'sw-corner-lobby-5': { items: [
+      ['b', 6.98, 7.5, 0, 7.2, 8.5, 0.012, 'stone'], ['b', 8.78, 8.72, 2.15, 8.82, 9.02, 2.2, 'iron'], ['y', 8.8, 8.74, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end sw-corner-lobby-5 */
+    /* 5-THINGS sw-stair-foot-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (sw-stair-foot-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'sw-stair-foot-5': { items: [
+      ['b', 6.8, 7.5, 0, 7.02, 8.5, 0.012, 'stone'], ['b', 1.1, 6.98, 0, 1.9, 7.2, 0.012, 'stone'], ['b', 2.925, 11.8, 0, 3.825, 12.02, 0.012, 'stone'], ['b', 4.73, 6.98, 2.15, 4.77, 7.28, 2.2, 'iron'],
+      ['y', 4.75, 7.26, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end sw-stair-foot-5 */
+    /* 5-THINGS lake-corridor-5-west */
+    /* docs/interiors/upper-floors-gaps-1028.md (lake-corridor-5-west, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'lake-corridor-5-west': { items: [
+      ['b', 35.59, 1.7, 0, 35.81, 2.5, 0.012, 'stone'], ['b', 19.6, 0.58, 0, 20.4, 0.8, 0.012, 'stone'], ['b', 34.15, 0.58, 0, 35.05, 0.8, 0.012, 'stone'], ['b', 14.85, 3.4, 0, 15.75, 3.62, 0.012, 'stone'],
+      ['b', 26.85, 3.4, 0, 27.75, 3.62, 0.012, 'stone'], ['b', 6.98, 2.38, 2.15, 7.28, 2.42, 2.2, 'iron'], ['y', 7.26, 2.4, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end lake-corridor-5-west */
+    /* 5-THINGS lake-corridor-5-east */
+    /* docs/interiors/upper-floors-gaps-1028.md (lake-corridor-5-east, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening; the bracket stands on the south wall at x 104.3 (the west end wall is the bend's and hides one set there) */
+    'lake-corridor-5-east': { items: [
+      ['b', 153.3, -0.45, 0, 153.52, 0.45, 0.012, 'stone'], ['b', 153.3, 1.7, 0, 153.52, 2.5, 0.012, 'stone'], ['b', 97.7, 3.4, 0, 98.6, 3.62, 0.012, 'stone'], ['b', 110.0, 3.4, 0, 110.9, 3.62, 0.012, 'stone'],
+      ['b', 122.3, 3.4, 0, 123.2, 3.62, 0.012, 'stone'], ['b', 134.6, 3.4, 0, 135.5, 3.62, 0.012, 'stone'], ['b', 146.9, 3.4, 0, 147.8, 3.62, 0.012, 'stone'], ['b', 102.3, 0.58, 0, 104.7, 0.8, 0.012, 'stone'],
+      ['b', 129.55, 0.58, 0, 130.45, 0.8, 0.012, 'stone'], ['b', 100.65, 0.58, 0, 101.35, 0.8, 0.012, 'stone'], ['b', 107.65, 0.58, 0, 108.35, 0.8, 0.012, 'stone'], ['b', 104.28, 3.32, 2.15, 104.32, 3.62, 2.2, 'iron'],
+      ['y', 104.3, 3.34, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end lake-corridor-5-east */
+    /* 5-THINGS library-gallery-way */
+    /* docs/interiors/upper-floors-gaps-1028.md (library-gallery-way, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'library-gallery-way': { items: [
+      ['b', 65.72, 56.13, 2.15, 66.02, 56.17, 2.2, 'iron'], ['y', 65.74, 56.15, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end library-gallery-way */
+    /* 5-THINGS library-gallery */
+    /* docs/interiors/upper-floors-gaps-1028.md (library-gallery, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'library-gallery': { items: [
+      ['b', 34.05, 58.98, 0, 34.95, 59.2, 0.012, 'stone'], ['b', 32.98, 60.03, 2.15, 33.28, 60.07, 2.2, 'iron'], ['y', 33.26, 60.05, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end library-gallery */
+    /* 5-THINGS elves-passage-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (elves-passage-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'elves-passage-5': { items: [
+      ['b', 67.6, 57.98, 0, 68.4, 58.2, 0.012, 'stone'], ['b', 152.1, 57.98, 0, 152.9, 58.2, 0.012, 'stone'], ['b', 68.85, 57.98, 0, 69.65, 58.2, 0.012, 'stone'], ['b', 70.65, 57.98, 0, 71.45, 58.2, 0.012, 'stone'],
+      ['b', 87.65, 57.98, 0, 88.45, 58.2, 0.012, 'stone'], ['b', 113.45, 57.98, 0, 114.25, 58.2, 0.012, 'stone'], ['b', 139.2, 57.98, 0, 140.0, 58.2, 0.012, 'stone'], ['b', 70.6, 58.8, 0, 71.4, 59.02, 0.012, 'stone'],
+      ['b', 87.6, 58.8, 0, 88.5, 59.02, 0.012, 'stone'], ['b', 113.4, 58.8, 0, 114.3, 59.02, 0.012, 'stone'], ['b', 139.15, 58.8, 0, 140.05, 59.02, 0.012, 'stone'], ['b', 100.93, 58.72, 2.15, 100.97, 59.02, 2.2, 'iron'],
+      ['y', 100.95, 58.74, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end elves-passage-5 */
+    /* 5-THINGS back-stair-lobby-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (back-stair-lobby-5, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'back-stair-lobby-5': { items: [
+      ['b', 67.8, 58.1, 0, 68.02, 58.9, 0.012, 'stone'], ['b', 66.55, 53.58, 0, 67.45, 53.8, 0.012, 'stone'], ['b', 67.8, 55.25, 0, 68.02, 56.15, 0.012, 'stone'], ['b', 66.68, 64.72, 2.15, 66.72, 65.02, 2.2, 'iron'],
+      ['y', 66.7, 64.74, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end back-stair-lobby-5 */
+    /* 5-THINGS fifth-floor-south-corridor */
+    /* docs/interiors/upper-floors-gaps-1028.md (fifth-floor-south-corridor, corridors and passages): bare flags, a worn stone threshold at each door, one unlit torch bracket clear of every opening */
+    'fifth-floor-south-corridor': { items: [
+      ['b', 59.1, 0.43, 0, 59.9, 0.65, 0.012, 'stone'], ['b', 59.35, 3.25, 0, 60.25, 3.47, 0.012, 'stone'], ['b', 48.58, 1.63, 2.15, 48.88, 1.67, 2.2, 'iron'], ['y', 48.86, 1.65, 0.05, 2.2, 2.32, 'iron']] },
+    /* 5-THINGS end fifth-floor-south-corridor */
+    /* 5-THINGS tudor-bay-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (tudor-bay-5, as tudor-bay-4): an oak window seat along the back wall with six squab cushions, the third dented and a book left on it, a hearth rug, a bookcase */
+    'tudor-bay-5': { items: [
+      ['b', 102.0, -6.52, 0, 110.0, -6.0, 0.45, 'oak'], ['b', 108.697, -6.52, 0.45, 109.97, -6.02, 0.52, 'scarlet'], ['b', 107.363, -6.52, 0.45, 108.637, -6.02, 0.52, 'blue'], ['b', 106.03, -6.52, 0.45, 107.303, -6.02, 0.5, 'scarlet'],
+      ['b', 104.697, -6.52, 0.45, 105.97, -6.02, 0.52, 'blue'], ['b', 103.363, -6.52, 0.45, 104.637, -6.02, 0.52, 'scarlet'], ['b', 102.03, -6.52, 0.45, 103.303, -6.02, 0.52, 'blue'], ['b', 106.633, -6.42, 0.5, 106.933, -6.18, 0.55, 'paper'],
+      ['b', 104.4, -5.975, 0, 107.6, -4.225, 0.012, 'green'], ['b', 102.3, -3.2, 0, 104.7, -2.98, 0.012, 'stone']] },
+    /* 5-THINGS end tudor-bay-5 */
+    /* 5-THINGS gryffindor-storeroom-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (gryffindor-storeroom-5, plain stores): book crates stacked one or two high, boarded chests, sacks, tea chests and school trunks along the back wall and the door wall each side of the door; the aisle from the door stays clear */
+    'gryffindor-storeroom-5': { items: [
+      ['b', 36.45, 17.55, 0, 37.05, 18.0, 0.4, 'deal'], ['b', 36.45, 17.55, 0.4, 37.05, 18.0, 0.8, 'deal'], ['b', 36.5, 17.6, 0.8, 37.0, 17.95, 0.83, 'paper'], ['b', 37.15, 17.55, 0, 37.75, 18.0, 0.4, 'deal'],
+      ['b', 37.2, 17.6, 0.4, 37.7, 17.95, 0.43, 'paper'], ['y', 38.15, 17.775, 0.23, 0, 0.7, 'canvas'], ['y', 38.15, 17.775, 0.16, 0.7, 0.76, 'canvas'], ['b', 38.55, 17.55, 0, 39.15, 18.0, 0.5, 'oak'],
+      ['b', 38.55, 17.55, 0.5, 39.15, 18.0, 0.54, 'iron'], ['b', 39.25, 17.55, 0, 39.85, 18.0, 0.55, 'deal'], ['b', 39.3, 17.6, 0.55, 39.8, 17.95, 0.58, 'paper'], ['b', 39.95, 17.55, 0, 40.55, 18.0, 0.42, 'leather'],
+      ['b', 39.95, 17.55, 0.42, 40.55, 18.0, 0.46, 'iron'], ['b', 40.65, 17.55, 0, 41.25, 18.0, 0.4, 'deal'], ['b', 40.65, 17.55, 0.4, 41.25, 18.0, 0.8, 'deal'], ['b', 40.7, 17.6, 0.8, 41.2, 17.95, 0.83, 'paper'],
+      ['b', 41.35, 17.55, 0, 41.95, 18.0, 0.4, 'deal'], ['b', 41.4, 17.6, 0.4, 41.9, 17.95, 0.43, 'paper'], ['y', 42.35, 17.775, 0.23, 0, 0.7, 'canvas'], ['y', 42.35, 17.775, 0.16, 0.7, 0.76, 'canvas'],
+      ['b', 42.75, 17.55, 0, 43.35, 18.0, 0.5, 'oak'], ['b', 42.75, 17.55, 0.5, 43.35, 18.0, 0.54, 'iron'], ['b', 43.45, 17.55, 0, 44.05, 18.0, 0.55, 'deal'], ['b', 43.5, 17.6, 0.55, 44.0, 17.95, 0.58, 'paper'],
+      ['b', 44.15, 17.55, 0, 44.75, 18.0, 0.42, 'leather'], ['b', 44.15, 17.55, 0.42, 44.75, 18.0, 0.46, 'iron'], ['b', 44.85, 17.55, 0, 45.45, 18.0, 0.4, 'deal'], ['b', 44.85, 17.55, 0.4, 45.45, 18.0, 0.8, 'deal'],
+      ['b', 44.9, 17.6, 0.8, 45.4, 17.95, 0.83, 'paper'], ['b', 45.55, 17.55, 0, 46.15, 18.0, 0.4, 'deal'], ['b', 45.6, 17.6, 0.4, 46.1, 17.95, 0.43, 'paper'], ['y', 46.55, 17.775, 0.23, 0, 0.7, 'canvas'],
+      ['y', 46.55, 17.775, 0.16, 0.7, 0.76, 'canvas'], ['b', 46.95, 17.55, 0, 47.55, 18.0, 0.5, 'oak'], ['b', 46.95, 17.55, 0.5, 47.55, 18.0, 0.54, 'iron'], ['b', 36.45, 11.6, 0, 37.05, 12.05, 0.4, 'deal'],
+      ['b', 36.5, 11.65, 0.4, 37.0, 12.0, 0.43, 'paper'], ['y', 37.45, 11.825, 0.23, 0, 0.7, 'canvas'], ['y', 37.45, 11.825, 0.16, 0.7, 0.76, 'canvas'], ['b', 37.85, 11.6, 0, 38.45, 12.05, 0.5, 'oak'],
+      ['b', 37.85, 11.6, 0.5, 38.45, 12.05, 0.54, 'iron'], ['b', 38.55, 11.6, 0, 39.15, 12.05, 0.55, 'deal'], ['b', 38.6, 11.65, 0.55, 39.1, 12.0, 0.58, 'paper'], ['b', 39.25, 11.6, 0, 39.85, 12.05, 0.42, 'leather'],
+      ['b', 39.25, 11.6, 0.42, 39.85, 12.05, 0.46, 'iron'], ['b', 39.95, 11.6, 0, 40.55, 12.05, 0.4, 'deal'], ['b', 39.95, 11.6, 0.4, 40.55, 12.05, 0.8, 'deal'], ['b', 40.0, 11.65, 0.8, 40.5, 12.0, 0.83, 'paper'],
+      ['b', 43.75, 11.6, 0, 44.35, 12.05, 0.55, 'deal'], ['b', 43.8, 11.65, 0.55, 44.3, 12.0, 0.58, 'paper'], ['b', 44.45, 11.6, 0, 45.05, 12.05, 0.42, 'leather'], ['b', 44.45, 11.6, 0.42, 45.05, 12.05, 0.46, 'iron'],
+      ['b', 45.15, 11.6, 0, 45.75, 12.05, 0.4, 'deal'], ['b', 45.15, 11.6, 0.4, 45.75, 12.05, 0.8, 'deal'], ['b', 45.2, 11.65, 0.8, 45.7, 12.0, 0.83, 'paper'], ['b', 45.85, 11.6, 0, 46.45, 12.05, 0.4, 'deal'],
+      ['b', 45.9, 11.65, 0.4, 46.4, 12.0, 0.43, 'paper'], ['y', 46.85, 11.825, 0.23, 0, 0.7, 'canvas'], ['y', 46.85, 11.825, 0.16, 0.7, 0.76, 'canvas'], ['b', 47.25, 11.6, 0, 47.85, 12.05, 0.5, 'oak'],
+      ['b', 47.25, 11.6, 0.5, 47.85, 12.05, 0.54, 'iron'], ['b', 41.75, 11.58, 0, 42.65, 11.8, 0.012, 'stone']] },
+    /* 5-THINGS end gryffindor-storeroom-5 */
+    /* 5-THINGS dormitory-linen-store-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (dormitory-linen-store-5): linen presses along both long walls and the back, a pulley airer with sheets down the middle (the airer drawn as a post and rail frame) */
+    'dormitory-linen-store-5': { items: [
+      ['b', 22.32, 6.36, 0, 22.89, 7.66, 2.0, 'oak'], ['b', 22.32, 7.0, 0.05, 22.91, 7.02, 1.95, 'dark'], ['b', 22.32, 6.46, 1.7, 22.91, 7.56, 1.9, 'linen'], ['b', 22.32, 9.12, 0, 22.89, 10.42, 2.0, 'oak'],
+      ['b', 22.32, 9.76, 0.05, 22.91, 9.78, 1.95, 'dark'], ['b', 22.32, 9.22, 1.7, 22.91, 10.32, 1.9, 'linen'], ['b', 22.32, 11.88, 0, 22.89, 13.18, 2.0, 'oak'], ['b', 22.32, 12.52, 0.05, 22.91, 12.54, 1.95, 'dark'],
+      ['b', 22.32, 11.98, 1.7, 22.91, 13.08, 1.9, 'linen'], ['b', 22.32, 14.64, 0, 22.89, 15.94, 2.0, 'oak'], ['b', 22.32, 15.28, 0.05, 22.91, 15.3, 1.95, 'dark'], ['b', 22.32, 14.74, 1.7, 22.91, 15.84, 1.9, 'linen'],
+      ['b', 31.7, 6.36, 0, 32.27, 7.66, 2.0, 'oak'], ['b', 31.68, 7.0, 0.05, 32.27, 7.02, 1.95, 'dark'], ['b', 31.68, 6.46, 1.7, 32.27, 7.56, 1.9, 'linen'], ['b', 31.7, 9.12, 0, 32.27, 10.42, 2.0, 'oak'],
+      ['b', 31.68, 9.76, 0.05, 32.27, 9.78, 1.95, 'dark'], ['b', 31.68, 9.22, 1.7, 32.27, 10.32, 1.9, 'linen'], ['b', 31.7, 11.88, 0, 32.27, 13.18, 2.0, 'oak'], ['b', 31.68, 12.52, 0.05, 32.27, 12.54, 1.95, 'dark'],
+      ['b', 31.68, 11.98, 1.7, 32.27, 13.08, 1.9, 'linen'], ['b', 31.7, 14.64, 0, 32.27, 15.94, 2.0, 'oak'], ['b', 31.68, 15.28, 0.05, 32.27, 15.3, 1.95, 'dark'], ['b', 31.68, 14.74, 1.7, 32.27, 15.84, 1.9, 'linen'],
+      ['b', 24.663, 17.5, 0, 25.963, 18.07, 2.0, 'oak'], ['b', 25.303, 17.48, 0.05, 25.323, 18.07, 1.95, 'dark'], ['b', 24.763, 17.48, 1.7, 25.863, 18.07, 1.9, 'linen'], ['b', 28.627, 17.5, 0, 29.927, 18.07, 2.0, 'oak'],
+      ['b', 29.267, 17.48, 0.05, 29.287, 18.07, 1.95, 'dark'], ['b', 28.727, 17.48, 1.7, 29.827, 18.07, 1.9, 'linen'], ['b', 26.055, 8.35, 0, 26.135, 8.43, 1.95, 'oak'], ['b', 26.055, 13.87, 0, 26.135, 13.95, 1.95, 'oak'],
+      ['b', 26.065, 8.39, 1.9, 26.125, 13.91, 1.96, 'oak'], ['b', 28.455, 8.35, 0, 28.535, 8.43, 1.95, 'oak'], ['b', 28.455, 13.87, 0, 28.535, 13.95, 1.95, 'oak'], ['b', 28.465, 8.39, 1.9, 28.525, 13.91, 1.96, 'oak'],
+      ['b', 26.095, 8.57, 1.9, 28.495, 8.61, 1.96, 'oak'], ['b', 26.095, 11.13, 1.9, 28.495, 11.17, 1.96, 'oak'], ['b', 26.095, 13.69, 1.9, 28.495, 13.73, 1.96, 'oak'], ['b', 26.195, 8.58, 1.0, 27.095, 8.6, 1.9, 'linen'],
+      ['b', 27.495, 8.58, 1.0, 28.395, 8.6, 1.9, 'linen'], ['b', 26.195, 11.14, 1.0, 27.095, 11.16, 1.9, 'linen'], ['b', 27.495, 11.14, 1.0, 28.395, 11.16, 1.9, 'linen'], ['b', 26.195, 13.7, 1.0, 27.095, 13.72, 1.9, 'linen'],
+      ['b', 27.495, 13.7, 1.0, 28.395, 13.72, 1.9, 'linen'], ['b', 26.85, 4.23, 0, 27.75, 4.45, 0.012, 'stone']] },
+    /* 5-THINGS end dormitory-linen-store-5 */
+    /* 5-THINGS prefects-common-room */
+    /* docs/interiors/upper-floors-gaps-1028.md (prefects-common-room): three leather armchairs round a hearth rug, a small table with an oil lamp and a cup, a house scarf on an arm, bookcases and a chest of drawers; occupant to come */
+    'prefects-common-room': { items: [
+      ['b', 4.6, 19.8, 0, 7.8, 24.2, 0.012, 'scarlet'], ['b', 6.78, 20.25, 0, 7.62, 21.15, 0.4, 'leather'], ['b', 6.78, 20.37, 0.4, 7.42, 21.03, 0.48, 'dark'], ['b', 7.42, 20.25, 0.4, 7.62, 21.15, 1.0, 'leather'],
+      ['b', 6.78, 20.25, 0.4, 7.42, 20.37, 0.62, 'leather'], ['b', 6.78, 21.03, 0.4, 7.42, 21.15, 0.62, 'leather'], ['b', 6.78, 22.85, 0, 7.62, 23.75, 0.4, 'leather'], ['b', 6.78, 22.97, 0.4, 7.42, 23.63, 0.48, 'dark'],
+      ['b', 7.42, 22.85, 0.4, 7.62, 23.75, 1.0, 'leather'], ['b', 6.78, 22.85, 0.4, 7.42, 22.97, 0.62, 'leather'], ['b', 6.78, 23.63, 0.4, 7.42, 23.75, 0.62, 'leather'], ['b', 4.18, 21.55, 0, 5.02, 22.45, 0.4, 'leather'],
+      ['b', 4.38, 21.67, 0.4, 5.02, 22.33, 0.48, 'dark'], ['b', 4.18, 21.55, 0.4, 4.38, 22.45, 1.0, 'leather'], ['b', 4.38, 21.55, 0.4, 5.02, 21.67, 0.62, 'leather'], ['b', 4.38, 22.33, 0.4, 5.02, 22.45, 0.62, 'leather'],
+      ['t', 5.8, 21.6, 6.4, 22.4, 0.55, 'oak'], ['y', 6.1, 21.9, 0.06, 0.55, 0.58, 'brass'], ['y', 6.1, 21.9, 0.04, 0.58, 0.67, 'glass'], ['y', 6.1, 21.9, 0.025, 0.67, 0.85, 'glass'],
+      ['y', 6.1, 22.2, 0.035, 0.55, 0.61, 'blue'], ['b', 6.9, 20.35, 0.62, 7.5, 20.55, 0.66, 'scarlet'], ['s', 0.23, 18.65, 0.6, 21.05, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 0.31, 18.71, 0.11, 0.56, 18.91, 0.41, 'leather'],
+      ['b', 0.31, 18.93, 0.11, 0.56, 19.16, 0.43, 'dark'], ['b', 0.31, 19.18, 0.11, 0.56, 19.44, 0.45, 'scarlet'], ['b', 0.31, 19.46, 0.11, 0.56, 19.66, 0.47, 'blue'], ['b', 0.31, 19.68, 0.11, 0.56, 19.91, 0.41, 'green'],
+      ['b', 0.31, 19.93, 0.11, 0.56, 20.19, 0.43, 'leather'], ['b', 0.31, 20.21, 0.11, 0.56, 20.41, 0.45, 'dark'], ['b', 0.31, 20.43, 0.11, 0.56, 20.66, 0.47, 'scarlet'], ['b', 0.31, 20.68, 0.11, 0.56, 20.94, 0.41, 'blue'],
+      ['b', 0.31, 18.71, 0.51, 0.56, 18.94, 0.87, 'dark'], ['b', 0.31, 18.96, 0.51, 0.56, 19.22, 0.81, 'scarlet'], ['b', 0.31, 19.24, 0.51, 0.56, 19.44, 0.83, 'blue'], ['b', 0.31, 19.46, 0.51, 0.56, 19.69, 0.85, 'green'],
+      ['b', 0.31, 19.71, 0.51, 0.56, 19.97, 0.87, 'leather'], ['b', 0.31, 19.99, 0.51, 0.56, 20.19, 0.81, 'dark'], ['b', 0.31, 20.21, 0.51, 0.56, 20.44, 0.83, 'scarlet'], ['b', 0.31, 20.46, 0.51, 0.56, 20.72, 0.85, 'blue'],
+      ['b', 0.31, 20.74, 0.51, 0.56, 20.94, 0.87, 'green'], ['b', 0.31, 18.71, 0.91, 0.56, 18.97, 1.25, 'scarlet'], ['b', 0.31, 18.99, 0.91, 0.56, 19.19, 1.27, 'blue'], ['b', 0.31, 19.21, 0.91, 0.56, 19.44, 1.21, 'green'],
+      ['b', 0.31, 19.46, 0.91, 0.56, 19.72, 1.23, 'leather'], ['b', 0.31, 19.74, 0.91, 0.56, 19.94, 1.25, 'dark'], ['b', 0.31, 19.96, 0.91, 0.56, 20.19, 1.27, 'scarlet'], ['b', 0.31, 20.21, 0.91, 0.56, 20.47, 1.21, 'blue'],
+      ['b', 0.31, 20.49, 0.91, 0.56, 20.69, 1.23, 'green'], ['b', 0.31, 20.71, 0.91, 0.56, 20.94, 1.25, 'leather'], ['b', 0.31, 18.71, 1.31, 0.56, 18.91, 1.63, 'blue'], ['b', 0.31, 18.93, 1.31, 0.56, 19.16, 1.65, 'green'],
+      ['b', 0.31, 19.18, 1.31, 0.56, 19.44, 1.67, 'leather'], ['b', 0.31, 19.46, 1.31, 0.56, 19.66, 1.61, 'dark'], ['b', 0.31, 19.68, 1.31, 0.56, 19.91, 1.63, 'scarlet'], ['b', 0.31, 19.93, 1.31, 0.56, 20.19, 1.65, 'blue'],
+      ['b', 0.31, 20.21, 1.31, 0.56, 20.41, 1.67, 'green'], ['b', 0.31, 20.43, 1.31, 0.56, 20.66, 1.61, 'leather'], ['b', 0.31, 20.68, 1.31, 0.56, 20.94, 1.63, 'dark'], ['b', 0.31, 18.71, 1.71, 0.56, 18.94, 2.01, 'green'],
+      ['b', 0.31, 18.96, 1.71, 0.56, 19.22, 2.03, 'leather'], ['b', 0.31, 19.24, 1.71, 0.56, 19.44, 2.05, 'dark'], ['b', 0.31, 19.46, 1.71, 0.56, 19.69, 2.07, 'scarlet'], ['b', 0.31, 19.71, 1.71, 0.56, 19.97, 2.01, 'blue'],
+      ['b', 0.31, 19.99, 1.71, 0.56, 20.19, 2.03, 'green'], ['b', 0.31, 20.21, 1.71, 0.56, 20.44, 2.05, 'leather'], ['b', 0.31, 20.46, 1.71, 0.56, 20.72, 2.07, 'dark'], ['b', 0.31, 20.74, 1.71, 0.56, 20.94, 2.01, 'scarlet'],
+      ['s', 0.23, 23.25, 0.6, 25.65, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 0.31, 23.31, 0.11, 0.56, 23.51, 0.41, 'leather'], ['b', 0.31, 23.53, 0.11, 0.56, 23.76, 0.43, 'dark'], ['b', 0.31, 23.78, 0.11, 0.56, 24.04, 0.45, 'scarlet'],
+      ['b', 0.31, 24.06, 0.11, 0.56, 24.26, 0.47, 'blue'], ['b', 0.31, 24.28, 0.11, 0.56, 24.51, 0.41, 'green'], ['b', 0.31, 24.53, 0.11, 0.56, 24.79, 0.43, 'leather'], ['b', 0.31, 24.81, 0.11, 0.56, 25.01, 0.45, 'dark'],
+      ['b', 0.31, 25.03, 0.11, 0.56, 25.26, 0.47, 'scarlet'], ['b', 0.31, 25.28, 0.11, 0.56, 25.54, 0.41, 'blue'], ['b', 0.31, 23.31, 0.51, 0.56, 23.54, 0.87, 'dark'], ['b', 0.31, 23.56, 0.51, 0.56, 23.82, 0.81, 'scarlet'],
+      ['b', 0.31, 23.84, 0.51, 0.56, 24.04, 0.83, 'blue'], ['b', 0.31, 24.06, 0.51, 0.56, 24.29, 0.85, 'green'], ['b', 0.31, 24.31, 0.51, 0.56, 24.57, 0.87, 'leather'], ['b', 0.31, 24.59, 0.51, 0.56, 24.79, 0.81, 'dark'],
+      ['b', 0.31, 24.81, 0.51, 0.56, 25.04, 0.83, 'scarlet'], ['b', 0.31, 25.06, 0.51, 0.56, 25.32, 0.85, 'blue'], ['b', 0.31, 25.34, 0.51, 0.56, 25.54, 0.87, 'green'], ['b', 0.31, 23.31, 0.91, 0.56, 23.57, 1.25, 'scarlet'],
+      ['b', 0.31, 23.59, 0.91, 0.56, 23.79, 1.27, 'blue'], ['b', 0.31, 23.81, 0.91, 0.56, 24.04, 1.21, 'green'], ['b', 0.31, 24.06, 0.91, 0.56, 24.32, 1.23, 'leather'], ['b', 0.31, 24.34, 0.91, 0.56, 24.54, 1.25, 'dark'],
+      ['b', 0.31, 24.56, 0.91, 0.56, 24.79, 1.27, 'scarlet'], ['b', 0.31, 24.81, 0.91, 0.56, 25.07, 1.21, 'blue'], ['b', 0.31, 25.09, 0.91, 0.56, 25.29, 1.23, 'green'], ['b', 0.31, 25.31, 0.91, 0.56, 25.54, 1.25, 'leather'],
+      ['b', 0.31, 23.31, 1.31, 0.56, 23.51, 1.63, 'blue'], ['b', 0.31, 23.53, 1.31, 0.56, 23.76, 1.65, 'green'], ['b', 0.31, 23.78, 1.31, 0.56, 24.04, 1.67, 'leather'], ['b', 0.31, 24.06, 1.31, 0.56, 24.26, 1.61, 'dark'],
+      ['b', 0.31, 24.28, 1.31, 0.56, 24.51, 1.63, 'scarlet'], ['b', 0.31, 24.53, 1.31, 0.56, 24.79, 1.65, 'blue'], ['b', 0.31, 24.81, 1.31, 0.56, 25.01, 1.67, 'green'], ['b', 0.31, 25.03, 1.31, 0.56, 25.26, 1.61, 'leather'],
+      ['b', 0.31, 25.28, 1.31, 0.56, 25.54, 1.63, 'dark'], ['b', 0.31, 23.31, 1.71, 0.56, 23.54, 2.01, 'green'], ['b', 0.31, 23.56, 1.71, 0.56, 23.82, 2.03, 'leather'], ['b', 0.31, 23.84, 1.71, 0.56, 24.04, 2.05, 'dark'],
+      ['b', 0.31, 24.06, 1.71, 0.56, 24.29, 2.07, 'scarlet'], ['b', 0.31, 24.31, 1.71, 0.56, 24.57, 2.01, 'blue'], ['b', 0.31, 24.59, 1.71, 0.56, 24.79, 2.03, 'green'], ['b', 0.31, 24.81, 1.71, 0.56, 25.04, 2.05, 'leather'],
+      ['b', 0.31, 25.06, 1.71, 0.56, 25.32, 2.07, 'dark'], ['b', 0.31, 25.34, 1.71, 0.56, 25.54, 2.01, 'scarlet'], ['s', 5.0, 18.23, 7.4, 18.6, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 5.06, 18.31, 0.11, 5.26, 18.56, 0.41, 'leather'],
+      ['b', 5.28, 18.31, 0.11, 5.51, 18.56, 0.43, 'dark'], ['b', 5.53, 18.31, 0.11, 5.79, 18.56, 0.45, 'scarlet'], ['b', 5.81, 18.31, 0.11, 6.01, 18.56, 0.47, 'blue'], ['b', 6.03, 18.31, 0.11, 6.26, 18.56, 0.41, 'green'],
+      ['b', 6.28, 18.31, 0.11, 6.54, 18.56, 0.43, 'leather'], ['b', 6.56, 18.31, 0.11, 6.76, 18.56, 0.45, 'dark'], ['b', 6.78, 18.31, 0.11, 7.01, 18.56, 0.47, 'scarlet'], ['b', 7.03, 18.31, 0.11, 7.29, 18.56, 0.41, 'blue'],
+      ['b', 5.06, 18.31, 0.51, 5.29, 18.56, 0.87, 'dark'], ['b', 5.31, 18.31, 0.51, 5.57, 18.56, 0.81, 'scarlet'], ['b', 5.59, 18.31, 0.51, 5.79, 18.56, 0.83, 'blue'], ['b', 5.81, 18.31, 0.51, 6.04, 18.56, 0.85, 'green'],
+      ['b', 6.06, 18.31, 0.51, 6.32, 18.56, 0.87, 'leather'], ['b', 6.34, 18.31, 0.51, 6.54, 18.56, 0.81, 'dark'], ['b', 6.56, 18.31, 0.51, 6.79, 18.56, 0.83, 'scarlet'], ['b', 6.81, 18.31, 0.51, 7.07, 18.56, 0.85, 'blue'],
+      ['b', 7.09, 18.31, 0.51, 7.29, 18.56, 0.87, 'green'], ['b', 5.06, 18.31, 0.91, 5.32, 18.56, 1.25, 'scarlet'], ['b', 5.34, 18.31, 0.91, 5.54, 18.56, 1.27, 'blue'], ['b', 5.56, 18.31, 0.91, 5.79, 18.56, 1.21, 'green'],
+      ['b', 5.81, 18.31, 0.91, 6.07, 18.56, 1.23, 'leather'], ['b', 6.09, 18.31, 0.91, 6.29, 18.56, 1.25, 'dark'], ['b', 6.31, 18.31, 0.91, 6.54, 18.56, 1.27, 'scarlet'], ['b', 6.56, 18.31, 0.91, 6.82, 18.56, 1.21, 'blue'],
+      ['b', 6.84, 18.31, 0.91, 7.04, 18.56, 1.23, 'green'], ['b', 7.06, 18.31, 0.91, 7.29, 18.56, 1.25, 'leather'], ['b', 5.06, 18.31, 1.31, 5.26, 18.56, 1.63, 'blue'], ['b', 5.28, 18.31, 1.31, 5.51, 18.56, 1.65, 'green'],
+      ['b', 5.53, 18.31, 1.31, 5.79, 18.56, 1.67, 'leather'], ['b', 5.81, 18.31, 1.31, 6.01, 18.56, 1.61, 'dark'], ['b', 6.03, 18.31, 1.31, 6.26, 18.56, 1.63, 'scarlet'], ['b', 6.28, 18.31, 1.31, 6.54, 18.56, 1.65, 'blue'],
+      ['b', 6.56, 18.31, 1.31, 6.76, 18.56, 1.67, 'green'], ['b', 6.78, 18.31, 1.31, 7.01, 18.56, 1.61, 'leather'], ['b', 7.03, 18.31, 1.31, 7.29, 18.56, 1.63, 'dark'], ['b', 5.06, 18.31, 1.71, 5.29, 18.56, 2.01, 'green'],
+      ['b', 5.31, 18.31, 1.71, 5.57, 18.56, 2.03, 'leather'], ['b', 5.59, 18.31, 1.71, 5.79, 18.56, 2.05, 'dark'], ['b', 5.81, 18.31, 1.71, 6.04, 18.56, 2.07, 'scarlet'], ['b', 6.06, 18.31, 1.71, 6.32, 18.56, 2.01, 'blue'],
+      ['b', 6.34, 18.31, 1.71, 6.54, 18.56, 2.03, 'green'], ['b', 6.56, 18.31, 1.71, 6.79, 18.56, 2.05, 'leather'], ['b', 6.81, 18.31, 1.71, 7.07, 18.56, 2.07, 'dark'], ['b', 7.09, 18.31, 1.71, 7.29, 18.56, 2.01, 'scarlet'],
+      ['s', 5.0, 25.4, 7.4, 25.77, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 5.06, 25.44, 0.11, 5.26, 25.69, 0.41, 'leather'], ['b', 5.28, 25.44, 0.11, 5.51, 25.69, 0.43, 'dark'], ['b', 5.53, 25.44, 0.11, 5.79, 25.69, 0.45, 'scarlet'],
+      ['b', 5.81, 25.44, 0.11, 6.01, 25.69, 0.47, 'blue'], ['b', 6.03, 25.44, 0.11, 6.26, 25.69, 0.41, 'green'], ['b', 6.28, 25.44, 0.11, 6.54, 25.69, 0.43, 'leather'], ['b', 6.56, 25.44, 0.11, 6.76, 25.69, 0.45, 'dark'],
+      ['b', 6.78, 25.44, 0.11, 7.01, 25.69, 0.47, 'scarlet'], ['b', 7.03, 25.44, 0.11, 7.29, 25.69, 0.41, 'blue'], ['b', 5.06, 25.44, 0.51, 5.29, 25.69, 0.87, 'dark'], ['b', 5.31, 25.44, 0.51, 5.57, 25.69, 0.81, 'scarlet'],
+      ['b', 5.59, 25.44, 0.51, 5.79, 25.69, 0.83, 'blue'], ['b', 5.81, 25.44, 0.51, 6.04, 25.69, 0.85, 'green'], ['b', 6.06, 25.44, 0.51, 6.32, 25.69, 0.87, 'leather'], ['b', 6.34, 25.44, 0.51, 6.54, 25.69, 0.81, 'dark'],
+      ['b', 6.56, 25.44, 0.51, 6.79, 25.69, 0.83, 'scarlet'], ['b', 6.81, 25.44, 0.51, 7.07, 25.69, 0.85, 'blue'], ['b', 7.09, 25.44, 0.51, 7.29, 25.69, 0.87, 'green'], ['b', 5.06, 25.44, 0.91, 5.32, 25.69, 1.25, 'scarlet'],
+      ['b', 5.34, 25.44, 0.91, 5.54, 25.69, 1.27, 'blue'], ['b', 5.56, 25.44, 0.91, 5.79, 25.69, 1.21, 'green'], ['b', 5.81, 25.44, 0.91, 6.07, 25.69, 1.23, 'leather'], ['b', 6.09, 25.44, 0.91, 6.29, 25.69, 1.25, 'dark'],
+      ['b', 6.31, 25.44, 0.91, 6.54, 25.69, 1.27, 'scarlet'], ['b', 6.56, 25.44, 0.91, 6.82, 25.69, 1.21, 'blue'], ['b', 6.84, 25.44, 0.91, 7.04, 25.69, 1.23, 'green'], ['b', 7.06, 25.44, 0.91, 7.29, 25.69, 1.25, 'leather'],
+      ['b', 5.06, 25.44, 1.31, 5.26, 25.69, 1.63, 'blue'], ['b', 5.28, 25.44, 1.31, 5.51, 25.69, 1.65, 'green'], ['b', 5.53, 25.44, 1.31, 5.79, 25.69, 1.67, 'leather'], ['b', 5.81, 25.44, 1.31, 6.01, 25.69, 1.61, 'dark'],
+      ['b', 6.03, 25.44, 1.31, 6.26, 25.69, 1.63, 'scarlet'], ['b', 6.28, 25.44, 1.31, 6.54, 25.69, 1.65, 'blue'], ['b', 6.56, 25.44, 1.31, 6.76, 25.69, 1.67, 'green'], ['b', 6.78, 25.44, 1.31, 7.01, 25.69, 1.61, 'leather'],
+      ['b', 7.03, 25.44, 1.31, 7.29, 25.69, 1.63, 'dark'], ['b', 5.06, 25.44, 1.71, 5.29, 25.69, 2.01, 'green'], ['b', 5.31, 25.44, 1.71, 5.57, 25.69, 2.03, 'leather'], ['b', 5.59, 25.44, 1.71, 5.79, 25.69, 2.05, 'dark'],
+      ['b', 5.81, 25.44, 1.71, 6.04, 25.69, 2.07, 'scarlet'], ['b', 6.06, 25.44, 1.71, 6.32, 25.69, 2.01, 'blue'], ['b', 6.34, 25.44, 1.71, 6.54, 25.69, 2.03, 'green'], ['b', 6.56, 25.44, 1.71, 6.79, 25.69, 2.05, 'leather'],
+      ['b', 6.81, 25.44, 1.71, 7.07, 25.69, 2.07, 'dark'], ['b', 7.09, 25.44, 1.71, 7.29, 25.69, 2.01, 'scarlet'], ['b', 0.23, 21.5, 0, 0.75, 22.5, 0.9, 'oak'], ['b', 0.23, 21.55, 0.9, 0.75, 22.45, 0.92, 'stone'],
+      ['b', 0.73, 21.58, 0.1, 0.76, 22.42, 0.12, 'dark'], ['b', 0.73, 21.58, 0.36, 0.76, 22.42, 0.38, 'dark'], ['b', 0.73, 21.58, 0.62, 0.76, 22.42, 0.64, 'dark'], ['b', 0.23, 21.6, 1.5, 0.29, 22.4, 2.0, 'gilt'],
+      ['b', 0.23, 21.65, 1.55, 0.3, 22.35, 1.95, 'dark'], ['b', 11.95, 21.55, 0, 12.17, 22.45, 0.012, 'stone']] },
+    /* 5-THINGS end prefects-common-room */
+    /* 5-THINGS house-points-ledgers-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (house-points-ledgers-5, ledgers): a writing desk with a ledger open and a slip stuck half out of a hole in the pigeonholes, honours boards, nests of drawers of ledgers, pigeonholes along three walls */
+    'house-points-ledgers-5': { items: [
+      ['t', 106.45, 64.6, 107.25, 66.4, 0.76, 'oak'], ['b', 106.55, 65.6, 0.76, 107.05, 66.3, 0.8, 'paper'], ['b', 106.6, 65.0, 0.76, 106.95, 65.3, 0.78, 'paper'], ['t', 105.74, 65.29, 106.16, 65.71, 0.45, 'wood'],
+      ['b', 105.74, 65.29, 0.45, 105.78, 65.71, 0.9, 'wood'], ['b', 105.35, 64.1, 0, 107.75, 66.9, 0.012, 'scarlet'], ['y', 107.05, 64.8, 0.06, 0.76, 0.79, 'brass'], ['y', 107.05, 64.8, 0.04, 0.79, 0.88, 'glass'],
+      ['y', 107.05, 64.8, 0.025, 0.88, 1.06, 'glass'], ['b', 112.05, 67.8, 0, 112.57, 69.2, 0.8, 'oak'], ['b', 112.25, 67.8, 0.8, 112.57, 69.2, 2.0, 'oak'], ['b', 112.22, 68.92, 0.9, 112.28, 69.14, 1.2, 'dark'],
+      ['b', 112.21, 69.02, 0.95, 112.26, 69.1, 1.1, 'paper'], ['b', 112.22, 68.66, 0.9, 112.28, 68.88, 1.2, 'dark'], ['b', 112.22, 68.4, 0.9, 112.28, 68.62, 1.2, 'dark'], ['b', 112.22, 68.14, 0.9, 112.28, 68.36, 1.2, 'dark'],
+      ['b', 112.21, 68.24, 0.95, 112.26, 68.32, 1.1, 'paper'], ['b', 112.22, 67.88, 0.9, 112.28, 68.1, 1.2, 'dark'], ['b', 112.22, 68.92, 1.26, 112.28, 69.14, 1.56, 'dark'], ['b', 112.22, 68.66, 1.26, 112.28, 68.88, 1.56, 'dark'],
+      ['b', 112.22, 68.4, 1.26, 112.28, 68.62, 1.56, 'dark'], ['b', 112.21, 68.5, 1.31, 112.26, 68.58, 1.46, 'paper'], ['b', 112.22, 68.14, 1.26, 112.28, 68.36, 1.56, 'dark'], ['b', 112.22, 67.88, 1.26, 112.28, 68.1, 1.56, 'dark'],
+      ['b', 112.22, 68.92, 1.62, 112.28, 69.14, 1.92, 'dark'], ['b', 112.22, 68.66, 1.62, 112.28, 68.88, 1.92, 'dark'], ['b', 112.21, 68.76, 1.67, 112.26, 68.84, 1.82, 'paper'], ['b', 112.22, 68.4, 1.62, 112.28, 68.62, 1.92, 'dark'],
+      ['b', 112.22, 68.14, 1.62, 112.28, 68.36, 1.92, 'dark'], ['b', 112.22, 67.88, 1.62, 112.28, 68.1, 1.92, 'dark'], ['b', 112.21, 67.98, 1.67, 112.26, 68.06, 1.82, 'paper'], ['b', 112.05, 61.8, 0, 112.57, 63.2, 0.8, 'oak'],
+      ['b', 112.25, 61.8, 0.8, 112.57, 63.2, 2.0, 'oak'], ['b', 112.22, 62.92, 0.9, 112.28, 63.14, 1.2, 'dark'], ['b', 112.21, 63.02, 0.95, 112.26, 63.1, 1.1, 'paper'], ['b', 112.22, 62.66, 0.9, 112.28, 62.88, 1.2, 'dark'],
+      ['b', 112.22, 62.4, 0.9, 112.28, 62.62, 1.2, 'dark'], ['b', 112.22, 62.14, 0.9, 112.28, 62.36, 1.2, 'dark'], ['b', 112.21, 62.24, 0.95, 112.26, 62.32, 1.1, 'paper'], ['b', 112.22, 61.88, 0.9, 112.28, 62.1, 1.2, 'dark'],
+      ['b', 112.22, 62.92, 1.26, 112.28, 63.14, 1.56, 'dark'], ['b', 112.22, 62.66, 1.26, 112.28, 62.88, 1.56, 'dark'], ['b', 112.22, 62.4, 1.26, 112.28, 62.62, 1.56, 'dark'], ['b', 112.21, 62.5, 1.31, 112.26, 62.58, 1.46, 'paper'],
+      ['b', 112.22, 62.14, 1.26, 112.28, 62.36, 1.56, 'dark'], ['b', 112.22, 61.88, 1.26, 112.28, 62.1, 1.56, 'dark'], ['b', 112.22, 62.92, 1.62, 112.28, 63.14, 1.92, 'dark'], ['b', 112.22, 62.66, 1.62, 112.28, 62.88, 1.92, 'dark'],
+      ['b', 112.21, 62.76, 1.67, 112.26, 62.84, 1.82, 'paper'], ['b', 112.22, 62.4, 1.62, 112.28, 62.62, 1.92, 'dark'], ['b', 112.22, 62.14, 1.62, 112.28, 62.36, 1.92, 'dark'], ['b', 112.22, 61.88, 1.62, 112.28, 62.1, 1.92, 'dark'],
+      ['b', 112.21, 61.98, 1.67, 112.26, 62.06, 1.82, 'paper'], ['b', 105.95, 71.71, 1.3, 107.75, 71.77, 2.2, 'gilt'], ['b', 106.01, 71.69, 1.36, 107.69, 71.77, 2.14, 'dark'], ['b', 106.15, 71.675, 1.5, 106.45, 71.77, 1.55, 'gilt'],
+      ['b', 106.617, 71.675, 1.5, 106.917, 71.77, 1.55, 'gilt'], ['b', 107.083, 71.675, 1.5, 107.383, 71.77, 1.55, 'gilt'], ['b', 106.15, 71.675, 1.67, 106.45, 71.77, 1.72, 'gilt'], ['b', 106.617, 71.675, 1.67, 106.917, 71.77, 1.72, 'gilt'],
+      ['b', 107.083, 71.675, 1.67, 107.383, 71.77, 1.72, 'gilt'], ['b', 106.15, 71.675, 1.84, 106.45, 71.77, 1.89, 'gilt'], ['b', 106.617, 71.675, 1.84, 106.917, 71.77, 1.89, 'gilt'], ['b', 107.083, 71.675, 1.84, 107.383, 71.77, 1.89, 'gilt'],
+      ['b', 106.15, 71.675, 2.01, 106.45, 71.77, 2.06, 'gilt'], ['b', 106.617, 71.675, 2.01, 106.917, 71.77, 2.06, 'gilt'], ['b', 107.083, 71.675, 2.01, 107.383, 71.77, 2.06, 'gilt'], ['b', 105.95, 59.23, 1.3, 107.75, 59.29, 2.2, 'gilt'],
+      ['b', 106.01, 59.23, 1.36, 107.69, 59.31, 2.14, 'dark'], ['b', 106.15, 59.23, 1.5, 106.45, 59.325, 1.55, 'gilt'], ['b', 106.617, 59.23, 1.5, 106.917, 59.325, 1.55, 'gilt'], ['b', 107.083, 59.23, 1.5, 107.383, 59.325, 1.55, 'gilt'],
+      ['b', 106.15, 59.23, 1.67, 106.45, 59.325, 1.72, 'gilt'], ['b', 106.617, 59.23, 1.67, 106.917, 59.325, 1.72, 'gilt'], ['b', 107.083, 59.23, 1.67, 107.383, 59.325, 1.72, 'gilt'], ['b', 106.15, 59.23, 1.84, 106.45, 59.325, 1.89, 'gilt'],
+      ['b', 106.617, 59.23, 1.84, 106.917, 59.325, 1.89, 'gilt'], ['b', 107.083, 59.23, 1.84, 107.383, 59.325, 1.89, 'gilt'], ['b', 106.15, 59.23, 2.01, 106.45, 59.325, 2.06, 'gilt'], ['b', 106.617, 59.23, 2.01, 106.917, 59.325, 2.06, 'gilt'],
+      ['b', 107.083, 59.23, 2.01, 107.383, 59.325, 2.06, 'gilt'], ['b', 112.05, 69.3, 0, 112.57, 70.7, 0.9, 'oak'], ['b', 112.05, 69.35, 0.9, 112.57, 70.65, 0.92, 'stone'], ['b', 112.04, 69.38, 0.1, 112.07, 70.62, 0.12, 'dark'],
+      ['b', 112.04, 69.38, 0.36, 112.07, 70.62, 0.38, 'dark'], ['b', 112.04, 69.38, 0.62, 112.07, 70.62, 0.64, 'dark'], ['b', 103.3, 71.25, 0, 104.7, 71.77, 0.9, 'oak'], ['b', 103.35, 71.25, 0.9, 104.65, 71.77, 0.92, 'stone'],
+      ['b', 103.38, 71.24, 0.1, 104.62, 71.27, 0.12, 'dark'], ['b', 103.38, 71.24, 0.36, 104.62, 71.27, 0.38, 'dark'], ['b', 103.38, 71.24, 0.62, 104.62, 71.27, 0.64, 'dark'], ['b', 103.3, 59.23, 0, 104.7, 59.75, 0.9, 'oak'],
+      ['b', 103.35, 59.23, 0.9, 104.65, 59.75, 0.92, 'stone'], ['b', 103.38, 59.73, 0.1, 104.62, 59.76, 0.12, 'dark'], ['b', 103.38, 59.73, 0.36, 104.62, 59.76, 0.38, 'dark'], ['b', 103.38, 59.73, 0.62, 104.62, 59.76, 0.64, 'dark'],
+      ['b', 109.0, 71.25, 0, 110.4, 71.77, 0.8, 'oak'], ['b', 109.0, 71.45, 0.8, 110.4, 71.77, 2.0, 'oak'], ['b', 109.06, 71.42, 0.9, 109.28, 71.48, 1.2, 'dark'], ['b', 109.1, 71.41, 0.95, 109.18, 71.46, 1.1, 'paper'],
+      ['b', 109.32, 71.42, 0.9, 109.54, 71.48, 1.2, 'dark'], ['b', 109.58, 71.42, 0.9, 109.8, 71.48, 1.2, 'dark'], ['b', 109.84, 71.42, 0.9, 110.06, 71.48, 1.2, 'dark'], ['b', 109.88, 71.41, 0.95, 109.96, 71.46, 1.1, 'paper'],
+      ['b', 110.1, 71.42, 0.9, 110.32, 71.48, 1.2, 'dark'], ['b', 109.06, 71.42, 1.26, 109.28, 71.48, 1.56, 'dark'], ['b', 109.32, 71.42, 1.26, 109.54, 71.48, 1.56, 'dark'], ['b', 109.58, 71.42, 1.26, 109.8, 71.48, 1.56, 'dark'],
+      ['b', 109.62, 71.41, 1.31, 109.7, 71.46, 1.46, 'paper'], ['b', 109.84, 71.42, 1.26, 110.06, 71.48, 1.56, 'dark'], ['b', 110.1, 71.42, 1.26, 110.32, 71.48, 1.56, 'dark'], ['b', 109.06, 71.42, 1.62, 109.28, 71.48, 1.92, 'dark'],
+      ['b', 109.32, 71.42, 1.62, 109.54, 71.48, 1.92, 'dark'], ['b', 109.36, 71.41, 1.67, 109.44, 71.46, 1.82, 'paper'], ['b', 109.58, 71.42, 1.62, 109.8, 71.48, 1.92, 'dark'], ['b', 109.84, 71.42, 1.62, 110.06, 71.48, 1.92, 'dark'],
+      ['b', 110.1, 71.42, 1.62, 110.32, 71.48, 1.92, 'dark'], ['b', 110.14, 71.41, 1.67, 110.22, 71.46, 1.82, 'paper'], ['b', 109.0, 59.23, 0, 110.4, 59.75, 0.8, 'oak'], ['b', 109.0, 59.23, 0.8, 110.4, 59.55, 2.0, 'oak'],
+      ['b', 109.06, 59.52, 0.9, 109.28, 59.58, 1.2, 'dark'], ['b', 109.1, 59.54, 0.95, 109.18, 59.59, 1.1, 'paper'], ['b', 109.32, 59.52, 0.9, 109.54, 59.58, 1.2, 'dark'], ['b', 109.58, 59.52, 0.9, 109.8, 59.58, 1.2, 'dark'],
+      ['b', 109.84, 59.52, 0.9, 110.06, 59.58, 1.2, 'dark'], ['b', 109.88, 59.54, 0.95, 109.96, 59.59, 1.1, 'paper'], ['b', 110.1, 59.52, 0.9, 110.32, 59.58, 1.2, 'dark'], ['b', 109.06, 59.52, 1.26, 109.28, 59.58, 1.56, 'dark'],
+      ['b', 109.32, 59.52, 1.26, 109.54, 59.58, 1.56, 'dark'], ['b', 109.58, 59.52, 1.26, 109.8, 59.58, 1.56, 'dark'], ['b', 109.62, 59.54, 1.31, 109.7, 59.59, 1.46, 'paper'], ['b', 109.84, 59.52, 1.26, 110.06, 59.58, 1.56, 'dark'],
+      ['b', 110.1, 59.52, 1.26, 110.32, 59.58, 1.56, 'dark'], ['b', 109.06, 59.52, 1.62, 109.28, 59.58, 1.92, 'dark'], ['b', 109.32, 59.52, 1.62, 109.54, 59.58, 1.92, 'dark'], ['b', 109.36, 59.54, 1.67, 109.44, 59.59, 1.82, 'paper'],
+      ['b', 109.58, 59.52, 1.62, 109.8, 59.58, 1.92, 'dark'], ['b', 109.84, 59.52, 1.62, 110.06, 59.58, 1.92, 'dark'], ['b', 110.1, 59.52, 1.62, 110.32, 59.58, 1.92, 'dark'], ['b', 110.14, 59.54, 1.67, 110.22, 59.59, 1.82, 'paper'],
+      ['b', 101.13, 65.05, 0, 101.35, 65.95, 0.012, 'stone'], ['b', 112.35, 65.05, 0, 112.57, 65.95, 0.012, 'stone']] },
+    /* 5-THINGS end house-points-ledgers-5 */
+    /* 5-THINGS star-chart-room-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (star-chart-room-5, stars): a worktable with a writing slate of sums and a lamp, two more worktables, nests of flat drawers (one drawer an inch open), bookcases; star charts to come (Precedents' gap) */
+    'star-chart-room-5': { items: [
+      ['t', 94.45, 64.225, 95.45, 66.625, 0.78, 'oak'], ['b', 94.49, 66.525, 0, 94.55, 66.585, 0.74, 'oak'], ['b', 95.35, 66.525, 0, 95.41, 66.585, 0.74, 'oak'], ['b', 94.49, 64.265, 0, 94.55, 64.325, 0.74, 'oak'],
+      ['b', 95.35, 64.265, 0, 95.41, 64.325, 0.74, 'oak'], ['b', 94.65, 66.025, 0.78, 94.95, 66.425, 0.8, 'dark'], ['y', 95.15, 64.625, 0.06, 0.78, 0.81, 'brass'], ['y', 95.15, 64.625, 0.04, 0.81, 0.9, 'glass'],
+      ['y', 95.15, 64.625, 0.025, 0.9, 1.08, 'glass'], ['t', 93.74, 65.415, 94.16, 65.835, 0.45, 'wood'], ['b', 93.74, 65.415, 0.45, 93.78, 65.835, 0.9, 'wood'], ['b', 93.25, 63.625, 0, 96.15, 67.225, 0.012, 'blue'],
+      ['t', 97.65, 68.8, 98.55, 70.8, 0.78, 'oak'], ['b', 97.69, 70.7, 0, 97.75, 70.76, 0.74, 'oak'], ['b', 98.45, 70.7, 0, 98.51, 70.76, 0.74, 'oak'], ['b', 97.69, 68.84, 0, 97.75, 68.9, 0.74, 'oak'],
+      ['b', 98.45, 68.84, 0, 98.51, 68.9, 0.74, 'oak'], ['t', 91.65, 60.65, 92.55, 62.65, 0.78, 'oak'], ['b', 91.69, 62.55, 0, 91.75, 62.61, 0.74, 'oak'], ['b', 92.45, 62.55, 0, 92.51, 62.61, 0.74, 'oak'],
+      ['b', 91.69, 60.69, 0, 91.75, 60.75, 0.74, 'oak'], ['b', 92.45, 60.69, 0, 92.51, 60.75, 0.74, 'oak'], ['b', 100.15, 67.825, 0, 100.67, 69.425, 0.9, 'oak'], ['b', 100.15, 67.875, 0.9, 100.67, 69.375, 0.92, 'stone'],
+      ['b', 100.14, 67.905, 0.1, 100.17, 69.345, 0.12, 'dark'], ['b', 100.14, 67.905, 0.36, 100.17, 69.345, 0.38, 'dark'], ['b', 100.14, 67.905, 0.62, 100.17, 69.345, 0.64, 'dark'], ['b', 100.09, 67.905, 0.36, 100.15, 69.345, 0.58, 'oak'],
+      ['b', 100.15, 61.825, 0, 100.67, 63.425, 0.9, 'oak'], ['b', 100.15, 61.875, 0.9, 100.67, 63.375, 0.92, 'stone'], ['b', 100.14, 61.905, 0.1, 100.17, 63.345, 0.12, 'dark'], ['b', 100.14, 61.905, 0.36, 100.17, 63.345, 0.38, 'dark'],
+      ['b', 100.14, 61.905, 0.62, 100.17, 63.345, 0.64, 'dark'], ['b', 94.15, 71.5, 0, 95.75, 72.02, 0.9, 'oak'], ['b', 94.2, 71.5, 0.9, 95.7, 72.02, 0.92, 'stone'], ['b', 94.23, 71.49, 0.1, 95.67, 71.52, 0.12, 'dark'],
+      ['b', 94.23, 71.49, 0.36, 95.67, 71.52, 0.38, 'dark'], ['b', 94.23, 71.49, 0.62, 95.67, 71.52, 0.64, 'dark'], ['s', 93.75, 59.23, 96.15, 59.6, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 93.81, 59.31, 0.11, 94.01, 59.56, 0.41, 'leather'],
+      ['b', 94.03, 59.31, 0.11, 94.26, 59.56, 0.43, 'dark'], ['b', 94.28, 59.31, 0.11, 94.54, 59.56, 0.45, 'scarlet'], ['b', 94.56, 59.31, 0.11, 94.76, 59.56, 0.47, 'blue'], ['b', 94.78, 59.31, 0.11, 95.01, 59.56, 0.41, 'green'],
+      ['b', 95.03, 59.31, 0.11, 95.29, 59.56, 0.43, 'leather'], ['b', 95.31, 59.31, 0.11, 95.51, 59.56, 0.45, 'dark'], ['b', 95.53, 59.31, 0.11, 95.76, 59.56, 0.47, 'scarlet'], ['b', 95.78, 59.31, 0.11, 96.04, 59.56, 0.41, 'blue'],
+      ['b', 93.81, 59.31, 0.51, 94.04, 59.56, 0.87, 'dark'], ['b', 94.06, 59.31, 0.51, 94.32, 59.56, 0.81, 'scarlet'], ['b', 94.34, 59.31, 0.51, 94.54, 59.56, 0.83, 'blue'], ['b', 94.56, 59.31, 0.51, 94.79, 59.56, 0.85, 'green'],
+      ['b', 94.81, 59.31, 0.51, 95.07, 59.56, 0.87, 'leather'], ['b', 95.09, 59.31, 0.51, 95.29, 59.56, 0.81, 'dark'], ['b', 95.31, 59.31, 0.51, 95.54, 59.56, 0.83, 'scarlet'], ['b', 95.56, 59.31, 0.51, 95.82, 59.56, 0.85, 'blue'],
+      ['b', 95.84, 59.31, 0.51, 96.04, 59.56, 0.87, 'green'], ['b', 93.81, 59.31, 0.91, 94.07, 59.56, 1.25, 'scarlet'], ['b', 94.09, 59.31, 0.91, 94.29, 59.56, 1.27, 'blue'], ['b', 94.31, 59.31, 0.91, 94.54, 59.56, 1.21, 'green'],
+      ['b', 94.56, 59.31, 0.91, 94.82, 59.56, 1.23, 'leather'], ['b', 94.84, 59.31, 0.91, 95.04, 59.56, 1.25, 'dark'], ['b', 95.06, 59.31, 0.91, 95.29, 59.56, 1.27, 'scarlet'], ['b', 95.31, 59.31, 0.91, 95.57, 59.56, 1.21, 'blue'],
+      ['b', 95.59, 59.31, 0.91, 95.79, 59.56, 1.23, 'green'], ['b', 95.81, 59.31, 0.91, 96.04, 59.56, 1.25, 'leather'], ['b', 93.81, 59.31, 1.31, 94.01, 59.56, 1.63, 'blue'], ['b', 94.03, 59.31, 1.31, 94.26, 59.56, 1.65, 'green'],
+      ['b', 94.28, 59.31, 1.31, 94.54, 59.56, 1.67, 'leather'], ['b', 94.56, 59.31, 1.31, 94.76, 59.56, 1.61, 'dark'], ['b', 94.78, 59.31, 1.31, 95.01, 59.56, 1.63, 'scarlet'], ['b', 95.03, 59.31, 1.31, 95.29, 59.56, 1.65, 'blue'],
+      ['b', 95.31, 59.31, 1.31, 95.51, 59.56, 1.67, 'green'], ['b', 95.53, 59.31, 1.31, 95.76, 59.56, 1.61, 'leather'], ['b', 95.78, 59.31, 1.31, 96.04, 59.56, 1.63, 'dark'], ['b', 93.81, 59.31, 1.71, 94.04, 59.56, 2.01, 'green'],
+      ['b', 94.06, 59.31, 1.71, 94.32, 59.56, 2.03, 'leather'], ['b', 94.34, 59.31, 1.71, 94.54, 59.56, 2.05, 'dark'], ['b', 94.56, 59.31, 1.71, 94.79, 59.56, 2.07, 'scarlet'], ['b', 94.81, 59.31, 1.71, 95.07, 59.56, 2.01, 'blue'],
+      ['b', 95.09, 59.31, 1.71, 95.29, 59.56, 2.03, 'green'], ['b', 95.31, 59.31, 1.71, 95.54, 59.56, 2.05, 'leather'], ['b', 95.56, 59.31, 1.71, 95.82, 59.56, 2.07, 'dark'], ['b', 95.84, 59.31, 1.71, 96.04, 59.56, 2.01, 'scarlet'],
+      ['s', 90.95, 71.65, 93.35, 72.02, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 91.01, 71.69, 0.11, 91.21, 71.94, 0.41, 'leather'], ['b', 91.23, 71.69, 0.11, 91.46, 71.94, 0.43, 'dark'], ['b', 91.48, 71.69, 0.11, 91.74, 71.94, 0.45, 'scarlet'],
+      ['b', 91.76, 71.69, 0.11, 91.96, 71.94, 0.47, 'blue'], ['b', 91.98, 71.69, 0.11, 92.21, 71.94, 0.41, 'green'], ['b', 92.23, 71.69, 0.11, 92.49, 71.94, 0.43, 'leather'], ['b', 92.51, 71.69, 0.11, 92.71, 71.94, 0.45, 'dark'],
+      ['b', 92.73, 71.69, 0.11, 92.96, 71.94, 0.47, 'scarlet'], ['b', 92.98, 71.69, 0.11, 93.24, 71.94, 0.41, 'blue'], ['b', 91.01, 71.69, 0.51, 91.24, 71.94, 0.87, 'dark'], ['b', 91.26, 71.69, 0.51, 91.52, 71.94, 0.81, 'scarlet'],
+      ['b', 91.54, 71.69, 0.51, 91.74, 71.94, 0.83, 'blue'], ['b', 91.76, 71.69, 0.51, 91.99, 71.94, 0.85, 'green'], ['b', 92.01, 71.69, 0.51, 92.27, 71.94, 0.87, 'leather'], ['b', 92.29, 71.69, 0.51, 92.49, 71.94, 0.81, 'dark'],
+      ['b', 92.51, 71.69, 0.51, 92.74, 71.94, 0.83, 'scarlet'], ['b', 92.76, 71.69, 0.51, 93.02, 71.94, 0.85, 'blue'], ['b', 93.04, 71.69, 0.51, 93.24, 71.94, 0.87, 'green'], ['b', 91.01, 71.69, 0.91, 91.27, 71.94, 1.25, 'scarlet'],
+      ['b', 91.29, 71.69, 0.91, 91.49, 71.94, 1.27, 'blue'], ['b', 91.51, 71.69, 0.91, 91.74, 71.94, 1.21, 'green'], ['b', 91.76, 71.69, 0.91, 92.02, 71.94, 1.23, 'leather'], ['b', 92.04, 71.69, 0.91, 92.24, 71.94, 1.25, 'dark'],
+      ['b', 92.26, 71.69, 0.91, 92.49, 71.94, 1.27, 'scarlet'], ['b', 92.51, 71.69, 0.91, 92.77, 71.94, 1.21, 'blue'], ['b', 92.79, 71.69, 0.91, 92.99, 71.94, 1.23, 'green'], ['b', 93.01, 71.69, 0.91, 93.24, 71.94, 1.25, 'leather'],
+      ['b', 91.01, 71.69, 1.31, 91.21, 71.94, 1.63, 'blue'], ['b', 91.23, 71.69, 1.31, 91.46, 71.94, 1.65, 'green'], ['b', 91.48, 71.69, 1.31, 91.74, 71.94, 1.67, 'leather'], ['b', 91.76, 71.69, 1.31, 91.96, 71.94, 1.61, 'dark'],
+      ['b', 91.98, 71.69, 1.31, 92.21, 71.94, 1.63, 'scarlet'], ['b', 92.23, 71.69, 1.31, 92.49, 71.94, 1.65, 'blue'], ['b', 92.51, 71.69, 1.31, 92.71, 71.94, 1.67, 'green'], ['b', 92.73, 71.69, 1.31, 92.96, 71.94, 1.61, 'leather'],
+      ['b', 92.98, 71.69, 1.31, 93.24, 71.94, 1.63, 'dark'], ['b', 91.01, 71.69, 1.71, 91.24, 71.94, 2.01, 'green'], ['b', 91.26, 71.69, 1.71, 91.52, 71.94, 2.03, 'leather'], ['b', 91.54, 71.69, 1.71, 91.74, 71.94, 2.05, 'dark'],
+      ['b', 91.76, 71.69, 1.71, 91.99, 71.94, 2.07, 'scarlet'], ['b', 92.01, 71.69, 1.71, 92.27, 71.94, 2.01, 'blue'], ['b', 92.29, 71.69, 1.71, 92.49, 71.94, 2.03, 'green'], ['b', 92.51, 71.69, 1.71, 92.74, 71.94, 2.05, 'leather'],
+      ['b', 92.76, 71.69, 1.71, 93.02, 71.94, 2.07, 'dark'], ['b', 93.04, 71.69, 1.71, 93.24, 71.94, 2.01, 'scarlet'], ['b', 89.23, 63.55, 0, 89.45, 64.45, 0.012, 'stone'], ['b', 100.45, 65.05, 0, 100.67, 65.95, 0.012, 'stone']] },
+    /* 5-THINGS end star-chart-room-5 */
+    /* 5-THINGS owl-examiners-rooms-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (owl-examiners-rooms-5, owl): a joined table with desk chairs, one pushed back with a cup beside it, a sealed bundle of papers on the table (a plain bundle: Precedents' gap), two worktables, a longcase clock, bookcases and chests of drawers */
+    'owl-examiners-rooms-5': { items: [
+      ['t', 108.25, 10.325, 112.65, 11.525, 0.78, 'oak'], ['b', 110.25, 10.725, 0.78, 110.65, 11.125, 0.84, 'paper'], ['t', 108.64, 9.615, 109.06, 10.035, 0.45, 'wood'], ['b', 108.64, 9.615, 0.45, 109.06, 9.655, 0.9, 'wood'],
+      ['t', 108.64, 11.815, 109.06, 12.235, 0.45, 'wood'], ['b', 108.64, 12.195, 0.45, 109.06, 12.235, 0.9, 'wood'], ['t', 109.64, 9.615, 110.06, 10.035, 0.45, 'wood'], ['b', 109.64, 9.615, 0.45, 110.06, 9.655, 0.9, 'wood'],
+      ['t', 109.64, 11.815, 110.06, 12.235, 0.45, 'wood'], ['b', 109.64, 12.195, 0.45, 110.06, 12.235, 0.9, 'wood'], ['t', 110.64, 9.615, 111.06, 10.035, 0.45, 'wood'], ['b', 110.64, 9.615, 0.45, 111.06, 9.655, 0.9, 'wood'],
+      ['t', 110.64, 11.815, 111.06, 12.235, 0.45, 'wood'], ['b', 110.64, 12.195, 0.45, 111.06, 12.235, 0.9, 'wood'], ['t', 111.64, 9.615, 112.06, 10.035, 0.45, 'wood'], ['b', 111.64, 9.615, 0.45, 112.06, 9.655, 0.9, 'wood'],
+      ['t', 111.64, 11.815, 112.06, 12.235, 0.45, 'wood'], ['b', 111.64, 12.195, 0.45, 112.06, 12.235, 0.9, 'wood'], ['t', 111.14, 9.215, 111.56, 9.635, 0.45, 'wood'], ['b', 111.14, 9.215, 0.45, 111.56, 9.255, 0.9, 'wood'],
+      ['y', 112.05, 10.575, 0.035, 0.78, 0.84, 'blue'], ['t', 113.35, 6.05, 115.35, 6.95, 0.78, 'oak'], ['b', 113.39, 6.09, 0, 113.45, 6.15, 0.74, 'oak'], ['b', 113.39, 6.85, 0, 113.45, 6.91, 0.74, 'oak'],
+      ['b', 115.25, 6.09, 0, 115.31, 6.15, 0.74, 'oak'], ['b', 115.25, 6.85, 0, 115.31, 6.91, 0.74, 'oak'], ['t', 105.55, 14.8, 107.55, 15.7, 0.78, 'oak'], ['b', 105.59, 14.84, 0, 105.65, 14.9, 0.74, 'oak'],
+      ['b', 105.59, 15.6, 0, 105.65, 15.66, 0.74, 'oak'], ['b', 107.45, 14.84, 0, 107.51, 14.9, 0.74, 'oak'], ['b', 107.45, 15.6, 0, 107.51, 15.66, 0.74, 'oak'], ['b', 110.2, 17.7, 0, 110.65, 18.02, 2.0, 'dark'],
+      ['b', 110.25, 17.69, 1.5, 110.6, 18.02, 1.75, 'brass'], ['s', 104.53, 9.725, 104.9, 12.125, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 104.61, 9.785, 0.11, 104.86, 9.985, 0.41, 'leather'], ['b', 104.61, 10.005, 0.11, 104.86, 10.235, 0.43, 'dark'],
+      ['b', 104.61, 10.255, 0.11, 104.86, 10.515, 0.45, 'scarlet'], ['b', 104.61, 10.535, 0.11, 104.86, 10.735, 0.47, 'blue'], ['b', 104.61, 10.755, 0.11, 104.86, 10.985, 0.41, 'green'], ['b', 104.61, 11.005, 0.11, 104.86, 11.265, 0.43, 'leather'],
+      ['b', 104.61, 11.285, 0.11, 104.86, 11.485, 0.45, 'dark'], ['b', 104.61, 11.505, 0.11, 104.86, 11.735, 0.47, 'scarlet'], ['b', 104.61, 11.755, 0.11, 104.86, 12.015, 0.41, 'blue'], ['b', 104.61, 9.785, 0.51, 104.86, 10.015, 0.87, 'dark'],
+      ['b', 104.61, 10.035, 0.51, 104.86, 10.295, 0.81, 'scarlet'], ['b', 104.61, 10.315, 0.51, 104.86, 10.515, 0.83, 'blue'], ['b', 104.61, 10.535, 0.51, 104.86, 10.765, 0.85, 'green'], ['b', 104.61, 10.785, 0.51, 104.86, 11.045, 0.87, 'leather'],
+      ['b', 104.61, 11.065, 0.51, 104.86, 11.265, 0.81, 'dark'], ['b', 104.61, 11.285, 0.51, 104.86, 11.515, 0.83, 'scarlet'], ['b', 104.61, 11.535, 0.51, 104.86, 11.795, 0.85, 'blue'], ['b', 104.61, 11.815, 0.51, 104.86, 12.015, 0.87, 'green'],
+      ['b', 104.61, 9.785, 0.91, 104.86, 10.045, 1.25, 'scarlet'], ['b', 104.61, 10.065, 0.91, 104.86, 10.265, 1.27, 'blue'], ['b', 104.61, 10.285, 0.91, 104.86, 10.515, 1.21, 'green'], ['b', 104.61, 10.535, 0.91, 104.86, 10.795, 1.23, 'leather'],
+      ['b', 104.61, 10.815, 0.91, 104.86, 11.015, 1.25, 'dark'], ['b', 104.61, 11.035, 0.91, 104.86, 11.265, 1.27, 'scarlet'], ['b', 104.61, 11.285, 0.91, 104.86, 11.545, 1.21, 'blue'], ['b', 104.61, 11.565, 0.91, 104.86, 11.765, 1.23, 'green'],
+      ['b', 104.61, 11.785, 0.91, 104.86, 12.015, 1.25, 'leather'], ['b', 104.61, 9.785, 1.31, 104.86, 9.985, 1.63, 'blue'], ['b', 104.61, 10.005, 1.31, 104.86, 10.235, 1.65, 'green'], ['b', 104.61, 10.255, 1.31, 104.86, 10.515, 1.67, 'leather'],
+      ['b', 104.61, 10.535, 1.31, 104.86, 10.735, 1.61, 'dark'], ['b', 104.61, 10.755, 1.31, 104.86, 10.985, 1.63, 'scarlet'], ['b', 104.61, 11.005, 1.31, 104.86, 11.265, 1.65, 'blue'], ['b', 104.61, 11.285, 1.31, 104.86, 11.485, 1.67, 'green'],
+      ['b', 104.61, 11.505, 1.31, 104.86, 11.735, 1.61, 'leather'], ['b', 104.61, 11.755, 1.31, 104.86, 12.015, 1.63, 'dark'], ['b', 104.61, 9.785, 1.71, 104.86, 10.015, 2.01, 'green'], ['b', 104.61, 10.035, 1.71, 104.86, 10.295, 2.03, 'leather'],
+      ['b', 104.61, 10.315, 1.71, 104.86, 10.515, 2.05, 'dark'], ['b', 104.61, 10.535, 1.71, 104.86, 10.765, 2.07, 'scarlet'], ['b', 104.61, 10.785, 1.71, 104.86, 11.045, 2.01, 'blue'], ['b', 104.61, 11.065, 1.71, 104.86, 11.265, 2.03, 'green'],
+      ['b', 104.61, 11.285, 1.71, 104.86, 11.515, 2.05, 'leather'], ['b', 104.61, 11.535, 1.71, 104.86, 11.795, 2.07, 'dark'], ['b', 104.61, 11.815, 1.71, 104.86, 12.015, 2.01, 'scarlet'], ['s', 116.0, 9.725, 116.37, 12.125, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'],
+      ['b', 116.04, 9.785, 0.11, 116.29, 9.985, 0.41, 'leather'], ['b', 116.04, 10.005, 0.11, 116.29, 10.235, 0.43, 'dark'], ['b', 116.04, 10.255, 0.11, 116.29, 10.515, 0.45, 'scarlet'], ['b', 116.04, 10.535, 0.11, 116.29, 10.735, 0.47, 'blue'],
+      ['b', 116.04, 10.755, 0.11, 116.29, 10.985, 0.41, 'green'], ['b', 116.04, 11.005, 0.11, 116.29, 11.265, 0.43, 'leather'], ['b', 116.04, 11.285, 0.11, 116.29, 11.485, 0.45, 'dark'], ['b', 116.04, 11.505, 0.11, 116.29, 11.735, 0.47, 'scarlet'],
+      ['b', 116.04, 11.755, 0.11, 116.29, 12.015, 0.41, 'blue'], ['b', 116.04, 9.785, 0.51, 116.29, 10.015, 0.87, 'dark'], ['b', 116.04, 10.035, 0.51, 116.29, 10.295, 0.81, 'scarlet'], ['b', 116.04, 10.315, 0.51, 116.29, 10.515, 0.83, 'blue'],
+      ['b', 116.04, 10.535, 0.51, 116.29, 10.765, 0.85, 'green'], ['b', 116.04, 10.785, 0.51, 116.29, 11.045, 0.87, 'leather'], ['b', 116.04, 11.065, 0.51, 116.29, 11.265, 0.81, 'dark'], ['b', 116.04, 11.285, 0.51, 116.29, 11.515, 0.83, 'scarlet'],
+      ['b', 116.04, 11.535, 0.51, 116.29, 11.795, 0.85, 'blue'], ['b', 116.04, 11.815, 0.51, 116.29, 12.015, 0.87, 'green'], ['b', 116.04, 9.785, 0.91, 116.29, 10.045, 1.25, 'scarlet'], ['b', 116.04, 10.065, 0.91, 116.29, 10.265, 1.27, 'blue'],
+      ['b', 116.04, 10.285, 0.91, 116.29, 10.515, 1.21, 'green'], ['b', 116.04, 10.535, 0.91, 116.29, 10.795, 1.23, 'leather'], ['b', 116.04, 10.815, 0.91, 116.29, 11.015, 1.25, 'dark'], ['b', 116.04, 11.035, 0.91, 116.29, 11.265, 1.27, 'scarlet'],
+      ['b', 116.04, 11.285, 0.91, 116.29, 11.545, 1.21, 'blue'], ['b', 116.04, 11.565, 0.91, 116.29, 11.765, 1.23, 'green'], ['b', 116.04, 11.785, 0.91, 116.29, 12.015, 1.25, 'leather'], ['b', 116.04, 9.785, 1.31, 116.29, 9.985, 1.63, 'blue'],
+      ['b', 116.04, 10.005, 1.31, 116.29, 10.235, 1.65, 'green'], ['b', 116.04, 10.255, 1.31, 116.29, 10.515, 1.67, 'leather'], ['b', 116.04, 10.535, 1.31, 116.29, 10.735, 1.61, 'dark'], ['b', 116.04, 10.755, 1.31, 116.29, 10.985, 1.63, 'scarlet'],
+      ['b', 116.04, 11.005, 1.31, 116.29, 11.265, 1.65, 'blue'], ['b', 116.04, 11.285, 1.31, 116.29, 11.485, 1.67, 'green'], ['b', 116.04, 11.505, 1.31, 116.29, 11.735, 1.61, 'leather'], ['b', 116.04, 11.755, 1.31, 116.29, 12.015, 1.63, 'dark'],
+      ['b', 116.04, 9.785, 1.71, 116.29, 10.015, 2.01, 'green'], ['b', 116.04, 10.035, 1.71, 116.29, 10.295, 2.03, 'leather'], ['b', 116.04, 10.315, 1.71, 116.29, 10.515, 2.05, 'dark'], ['b', 116.04, 10.535, 1.71, 116.29, 10.765, 2.07, 'scarlet'],
+      ['b', 116.04, 10.785, 1.71, 116.29, 11.045, 2.01, 'blue'], ['b', 116.04, 11.065, 1.71, 116.29, 11.265, 2.03, 'green'], ['b', 116.04, 11.285, 1.71, 116.29, 11.515, 2.05, 'leather'], ['b', 116.04, 11.535, 1.71, 116.29, 11.795, 2.07, 'dark'],
+      ['b', 116.04, 11.815, 1.71, 116.29, 12.015, 2.01, 'scarlet'], ['b', 105.95, 17.5, 0, 106.95, 18.02, 0.9, 'oak'], ['b', 106.0, 17.5, 0.9, 106.9, 18.02, 0.92, 'stone'], ['b', 106.03, 17.49, 0.1, 106.87, 17.52, 0.12, 'dark'],
+      ['b', 106.03, 17.49, 0.36, 106.87, 17.52, 0.38, 'dark'], ['b', 106.03, 17.49, 0.62, 106.87, 17.52, 0.64, 'dark'], ['b', 113.95, 17.5, 0, 114.95, 18.02, 0.9, 'oak'], ['b', 114.0, 17.5, 0.9, 114.9, 18.02, 0.92, 'stone'],
+      ['b', 114.03, 17.49, 0.1, 114.87, 17.52, 0.12, 'dark'], ['b', 114.03, 17.49, 0.36, 114.87, 17.52, 0.38, 'dark'], ['b', 114.03, 17.49, 0.62, 114.87, 17.52, 0.64, 'dark'], ['b', 114.05, 17.96, 1.5, 114.85, 18.02, 2.0, 'gilt'],
+      ['b', 114.1, 17.95, 1.55, 114.8, 18.02, 1.95, 'dark'], ['b', 110.0, 3.83, 0, 110.9, 4.05, 0.012, 'stone']] },
+    /* 5-THINGS end owl-examiners-rooms-5 */
+    /* 5-THINGS music-room-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (music-room-5, music): a joined table bare with stools round it, a tabor left on a stool, an upright piano standing as a plain placeholder (Objects' gap), bookcases and chests of drawers along the long walls */
+    'music-room-5': { items: [
+      ['t', 120.75, 10.325, 124.75, 11.525, 0.78, 'oak'], ['b', 121.1, 9.675, 0.41, 121.4, 9.975, 0.45, 'wood'], ['b', 121.12, 9.695, 0, 121.15, 9.725, 0.41, 'wood'], ['b', 121.12, 9.925, 0, 121.15, 9.955, 0.41, 'wood'],
+      ['b', 121.35, 9.695, 0, 121.38, 9.725, 0.41, 'wood'], ['b', 121.35, 9.925, 0, 121.38, 9.955, 0.41, 'wood'], ['b', 121.1, 11.875, 0.41, 121.4, 12.175, 0.45, 'wood'], ['b', 121.12, 11.895, 0, 121.15, 11.925, 0.41, 'wood'],
+      ['b', 121.12, 12.125, 0, 121.15, 12.155, 0.41, 'wood'], ['b', 121.35, 11.895, 0, 121.38, 11.925, 0.41, 'wood'], ['b', 121.35, 12.125, 0, 121.38, 12.155, 0.41, 'wood'], ['b', 122.1, 9.675, 0.41, 122.4, 9.975, 0.45, 'wood'],
+      ['b', 122.12, 9.695, 0, 122.15, 9.725, 0.41, 'wood'], ['b', 122.12, 9.925, 0, 122.15, 9.955, 0.41, 'wood'], ['b', 122.35, 9.695, 0, 122.38, 9.725, 0.41, 'wood'], ['b', 122.35, 9.925, 0, 122.38, 9.955, 0.41, 'wood'],
+      ['b', 122.1, 11.875, 0.41, 122.4, 12.175, 0.45, 'wood'], ['b', 122.12, 11.895, 0, 122.15, 11.925, 0.41, 'wood'], ['b', 122.12, 12.125, 0, 122.15, 12.155, 0.41, 'wood'], ['b', 122.35, 11.895, 0, 122.38, 11.925, 0.41, 'wood'],
+      ['b', 122.35, 12.125, 0, 122.38, 12.155, 0.41, 'wood'], ['b', 123.1, 9.675, 0.41, 123.4, 9.975, 0.45, 'wood'], ['b', 123.12, 9.695, 0, 123.15, 9.725, 0.41, 'wood'], ['b', 123.12, 9.925, 0, 123.15, 9.955, 0.41, 'wood'],
+      ['b', 123.35, 9.695, 0, 123.38, 9.725, 0.41, 'wood'], ['b', 123.35, 9.925, 0, 123.38, 9.955, 0.41, 'wood'], ['b', 123.1, 11.875, 0.41, 123.4, 12.175, 0.45, 'wood'], ['b', 123.12, 11.895, 0, 123.15, 11.925, 0.41, 'wood'],
+      ['b', 123.12, 12.125, 0, 123.15, 12.155, 0.41, 'wood'], ['b', 123.35, 11.895, 0, 123.38, 11.925, 0.41, 'wood'], ['b', 123.35, 12.125, 0, 123.38, 12.155, 0.41, 'wood'], ['b', 124.1, 9.675, 0.41, 124.4, 9.975, 0.45, 'wood'],
+      ['b', 124.12, 9.695, 0, 124.15, 9.725, 0.41, 'wood'], ['b', 124.12, 9.925, 0, 124.15, 9.955, 0.41, 'wood'], ['b', 124.35, 9.695, 0, 124.38, 9.725, 0.41, 'wood'], ['b', 124.35, 9.925, 0, 124.38, 9.955, 0.41, 'wood'],
+      ['b', 124.1, 11.875, 0.41, 124.4, 12.175, 0.45, 'wood'], ['b', 124.12, 11.895, 0, 124.15, 11.925, 0.41, 'wood'], ['b', 124.12, 12.125, 0, 124.15, 12.155, 0.41, 'wood'], ['b', 124.35, 11.895, 0, 124.38, 11.925, 0.41, 'wood'],
+      ['b', 124.35, 12.125, 0, 124.38, 12.155, 0.41, 'wood'], ['b', 120.1, 10.775, 0.41, 120.4, 11.075, 0.45, 'wood'], ['b', 120.12, 10.795, 0, 120.15, 10.825, 0.41, 'wood'], ['b', 120.12, 11.025, 0, 120.15, 11.055, 0.41, 'wood'],
+      ['b', 120.35, 10.795, 0, 120.38, 10.825, 0.41, 'wood'], ['b', 120.35, 11.025, 0, 120.38, 11.055, 0.41, 'wood'], ['b', 121.05, 10.775, 0.78, 121.25, 11.075, 0.82, 'leather'], ['b', 121.95, 17.4, 0, 123.55, 18.02, 1.25, 'ebony'],
+      ['b', 122.0, 17.2, 0.7, 123.5, 17.42, 0.76, 'white'], ['s', 116.83, 9.725, 117.2, 12.125, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 116.91, 9.785, 0.11, 117.16, 9.985, 0.41, 'leather'], ['b', 116.91, 10.005, 0.11, 117.16, 10.235, 0.43, 'dark'],
+      ['b', 116.91, 10.255, 0.11, 117.16, 10.515, 0.45, 'scarlet'], ['b', 116.91, 10.535, 0.11, 117.16, 10.735, 0.47, 'blue'], ['b', 116.91, 10.755, 0.11, 117.16, 10.985, 0.41, 'green'], ['b', 116.91, 11.005, 0.11, 117.16, 11.265, 0.43, 'leather'],
+      ['b', 116.91, 11.285, 0.11, 117.16, 11.485, 0.45, 'dark'], ['b', 116.91, 11.505, 0.11, 117.16, 11.735, 0.47, 'scarlet'], ['b', 116.91, 11.755, 0.11, 117.16, 12.015, 0.41, 'blue'], ['b', 116.91, 9.785, 0.51, 117.16, 10.015, 0.87, 'dark'],
+      ['b', 116.91, 10.035, 0.51, 117.16, 10.295, 0.81, 'scarlet'], ['b', 116.91, 10.315, 0.51, 117.16, 10.515, 0.83, 'blue'], ['b', 116.91, 10.535, 0.51, 117.16, 10.765, 0.85, 'green'], ['b', 116.91, 10.785, 0.51, 117.16, 11.045, 0.87, 'leather'],
+      ['b', 116.91, 11.065, 0.51, 117.16, 11.265, 0.81, 'dark'], ['b', 116.91, 11.285, 0.51, 117.16, 11.515, 0.83, 'scarlet'], ['b', 116.91, 11.535, 0.51, 117.16, 11.795, 0.85, 'blue'], ['b', 116.91, 11.815, 0.51, 117.16, 12.015, 0.87, 'green'],
+      ['b', 116.91, 9.785, 0.91, 117.16, 10.045, 1.25, 'scarlet'], ['b', 116.91, 10.065, 0.91, 117.16, 10.265, 1.27, 'blue'], ['b', 116.91, 10.285, 0.91, 117.16, 10.515, 1.21, 'green'], ['b', 116.91, 10.535, 0.91, 117.16, 10.795, 1.23, 'leather'],
+      ['b', 116.91, 10.815, 0.91, 117.16, 11.015, 1.25, 'dark'], ['b', 116.91, 11.035, 0.91, 117.16, 11.265, 1.27, 'scarlet'], ['b', 116.91, 11.285, 0.91, 117.16, 11.545, 1.21, 'blue'], ['b', 116.91, 11.565, 0.91, 117.16, 11.765, 1.23, 'green'],
+      ['b', 116.91, 11.785, 0.91, 117.16, 12.015, 1.25, 'leather'], ['b', 116.91, 9.785, 1.31, 117.16, 9.985, 1.63, 'blue'], ['b', 116.91, 10.005, 1.31, 117.16, 10.235, 1.65, 'green'], ['b', 116.91, 10.255, 1.31, 117.16, 10.515, 1.67, 'leather'],
+      ['b', 116.91, 10.535, 1.31, 117.16, 10.735, 1.61, 'dark'], ['b', 116.91, 10.755, 1.31, 117.16, 10.985, 1.63, 'scarlet'], ['b', 116.91, 11.005, 1.31, 117.16, 11.265, 1.65, 'blue'], ['b', 116.91, 11.285, 1.31, 117.16, 11.485, 1.67, 'green'],
+      ['b', 116.91, 11.505, 1.31, 117.16, 11.735, 1.61, 'leather'], ['b', 116.91, 11.755, 1.31, 117.16, 12.015, 1.63, 'dark'], ['b', 116.91, 9.785, 1.71, 117.16, 10.015, 2.01, 'green'], ['b', 116.91, 10.035, 1.71, 117.16, 10.295, 2.03, 'leather'],
+      ['b', 116.91, 10.315, 1.71, 117.16, 10.515, 2.05, 'dark'], ['b', 116.91, 10.535, 1.71, 117.16, 10.765, 2.07, 'scarlet'], ['b', 116.91, 10.785, 1.71, 117.16, 11.045, 2.01, 'blue'], ['b', 116.91, 11.065, 1.71, 117.16, 11.265, 2.03, 'green'],
+      ['b', 116.91, 11.285, 1.71, 117.16, 11.515, 2.05, 'leather'], ['b', 116.91, 11.535, 1.71, 117.16, 11.795, 2.07, 'dark'], ['b', 116.91, 11.815, 1.71, 117.16, 12.015, 2.01, 'scarlet'], ['s', 128.3, 9.725, 128.67, 12.125, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'],
+      ['b', 128.34, 9.785, 0.11, 128.59, 9.985, 0.41, 'leather'], ['b', 128.34, 10.005, 0.11, 128.59, 10.235, 0.43, 'dark'], ['b', 128.34, 10.255, 0.11, 128.59, 10.515, 0.45, 'scarlet'], ['b', 128.34, 10.535, 0.11, 128.59, 10.735, 0.47, 'blue'],
+      ['b', 128.34, 10.755, 0.11, 128.59, 10.985, 0.41, 'green'], ['b', 128.34, 11.005, 0.11, 128.59, 11.265, 0.43, 'leather'], ['b', 128.34, 11.285, 0.11, 128.59, 11.485, 0.45, 'dark'], ['b', 128.34, 11.505, 0.11, 128.59, 11.735, 0.47, 'scarlet'],
+      ['b', 128.34, 11.755, 0.11, 128.59, 12.015, 0.41, 'blue'], ['b', 128.34, 9.785, 0.51, 128.59, 10.015, 0.87, 'dark'], ['b', 128.34, 10.035, 0.51, 128.59, 10.295, 0.81, 'scarlet'], ['b', 128.34, 10.315, 0.51, 128.59, 10.515, 0.83, 'blue'],
+      ['b', 128.34, 10.535, 0.51, 128.59, 10.765, 0.85, 'green'], ['b', 128.34, 10.785, 0.51, 128.59, 11.045, 0.87, 'leather'], ['b', 128.34, 11.065, 0.51, 128.59, 11.265, 0.81, 'dark'], ['b', 128.34, 11.285, 0.51, 128.59, 11.515, 0.83, 'scarlet'],
+      ['b', 128.34, 11.535, 0.51, 128.59, 11.795, 0.85, 'blue'], ['b', 128.34, 11.815, 0.51, 128.59, 12.015, 0.87, 'green'], ['b', 128.34, 9.785, 0.91, 128.59, 10.045, 1.25, 'scarlet'], ['b', 128.34, 10.065, 0.91, 128.59, 10.265, 1.27, 'blue'],
+      ['b', 128.34, 10.285, 0.91, 128.59, 10.515, 1.21, 'green'], ['b', 128.34, 10.535, 0.91, 128.59, 10.795, 1.23, 'leather'], ['b', 128.34, 10.815, 0.91, 128.59, 11.015, 1.25, 'dark'], ['b', 128.34, 11.035, 0.91, 128.59, 11.265, 1.27, 'scarlet'],
+      ['b', 128.34, 11.285, 0.91, 128.59, 11.545, 1.21, 'blue'], ['b', 128.34, 11.565, 0.91, 128.59, 11.765, 1.23, 'green'], ['b', 128.34, 11.785, 0.91, 128.59, 12.015, 1.25, 'leather'], ['b', 128.34, 9.785, 1.31, 128.59, 9.985, 1.63, 'blue'],
+      ['b', 128.34, 10.005, 1.31, 128.59, 10.235, 1.65, 'green'], ['b', 128.34, 10.255, 1.31, 128.59, 10.515, 1.67, 'leather'], ['b', 128.34, 10.535, 1.31, 128.59, 10.735, 1.61, 'dark'], ['b', 128.34, 10.755, 1.31, 128.59, 10.985, 1.63, 'scarlet'],
+      ['b', 128.34, 11.005, 1.31, 128.59, 11.265, 1.65, 'blue'], ['b', 128.34, 11.285, 1.31, 128.59, 11.485, 1.67, 'green'], ['b', 128.34, 11.505, 1.31, 128.59, 11.735, 1.61, 'leather'], ['b', 128.34, 11.755, 1.31, 128.59, 12.015, 1.63, 'dark'],
+      ['b', 128.34, 9.785, 1.71, 128.59, 10.015, 2.01, 'green'], ['b', 128.34, 10.035, 1.71, 128.59, 10.295, 2.03, 'leather'], ['b', 128.34, 10.315, 1.71, 128.59, 10.515, 2.05, 'dark'], ['b', 128.34, 10.535, 1.71, 128.59, 10.765, 2.07, 'scarlet'],
+      ['b', 128.34, 10.785, 1.71, 128.59, 11.045, 2.01, 'blue'], ['b', 128.34, 11.065, 1.71, 128.59, 11.265, 2.03, 'green'], ['b', 128.34, 11.285, 1.71, 128.59, 11.515, 2.05, 'leather'], ['b', 128.34, 11.535, 1.71, 128.59, 11.795, 2.07, 'dark'],
+      ['b', 128.34, 11.815, 1.71, 128.59, 12.015, 2.01, 'scarlet'], ['b', 116.83, 6.888, 0, 117.35, 7.887, 0.9, 'oak'], ['b', 116.83, 6.938, 0.9, 117.35, 7.838, 0.92, 'stone'], ['b', 117.33, 6.968, 0.1, 117.36, 7.807, 0.12, 'dark'],
+      ['b', 117.33, 6.968, 0.36, 117.36, 7.807, 0.38, 'dark'], ['b', 117.33, 6.968, 0.62, 117.36, 7.807, 0.64, 'dark'], ['b', 116.83, 6.988, 1.5, 116.89, 7.787, 2.0, 'gilt'], ['b', 116.83, 7.037, 1.55, 116.9, 7.737, 1.95, 'dark'],
+      ['b', 128.15, 13.963, 0, 128.67, 14.963, 0.9, 'oak'], ['b', 128.15, 14.013, 0.9, 128.67, 14.912, 0.92, 'stone'], ['b', 128.14, 14.043, 0.1, 128.17, 14.883, 0.12, 'dark'], ['b', 128.14, 14.043, 0.36, 128.17, 14.883, 0.38, 'dark'],
+      ['b', 128.14, 14.043, 0.62, 128.17, 14.883, 0.64, 'dark'], ['b', 128.61, 14.062, 1.5, 128.67, 14.863, 2.0, 'gilt'], ['b', 128.6, 14.113, 1.55, 128.67, 14.812, 1.95, 'dark'], ['b', 117.55, 17.96, 1.3, 118.95, 18.02, 2.2, 'gilt'],
+      ['b', 117.61, 17.94, 1.36, 118.89, 18.02, 2.14, 'dark'], ['b', 117.75, 17.925, 1.5, 118.05, 18.02, 1.55, 'gilt'], ['b', 118.083, 17.925, 1.5, 118.383, 18.02, 1.55, 'gilt'], ['b', 118.417, 17.925, 1.5, 118.717, 18.02, 1.55, 'gilt'],
+      ['b', 117.75, 17.925, 1.67, 118.05, 18.02, 1.72, 'gilt'], ['b', 118.083, 17.925, 1.67, 118.383, 18.02, 1.72, 'gilt'], ['b', 118.417, 17.925, 1.67, 118.717, 18.02, 1.72, 'gilt'], ['b', 117.75, 17.925, 1.84, 118.05, 18.02, 1.89, 'gilt'],
+      ['b', 118.083, 17.925, 1.84, 118.383, 18.02, 1.89, 'gilt'], ['b', 118.417, 17.925, 1.84, 118.717, 18.02, 1.89, 'gilt'], ['b', 117.75, 17.925, 2.01, 118.05, 18.02, 2.06, 'gilt'], ['b', 118.083, 17.925, 2.01, 118.383, 18.02, 2.06, 'gilt'],
+      ['b', 118.417, 17.925, 2.01, 118.717, 18.02, 2.06, 'gilt'], ['b', 122.3, 3.83, 0, 123.2, 4.05, 0.012, 'stone']] },
+    /* 5-THINGS end music-room-5 */
+    /* 5-THINGS head-boy-girl-study-5 */
+    /* docs/interiors/upper-floors-gaps-1028.md (head-boy-girl-study-5, head): two pairs of writing desks facing across the room, a lamp and a cup (one half drunk) at each, a leather armchair on a rug, bookcases and honours boards on three walls, chests of drawers; occupant to come */
+    'head-boy-girl-study-5': { items: [
+      ['b', 55.8, 9.525, 0, 58.6, 12.925, 0.012, 'scarlet'], ['t', 56.6, 10.025, 57.8, 10.625, 0.76, 'oak'], ['b', 56.64, 10.065, 0.45, 57.0, 10.585, 0.72, 'dark'], ['b', 56.7, 10.125, 0.76, 57.0, 10.425, 0.78, 'paper'],
+      ['t', 56.99, 9.415, 57.41, 9.835, 0.45, 'wood'], ['b', 56.99, 9.415, 0.45, 57.41, 9.455, 0.9, 'wood'], ['t', 56.6, 11.225, 57.8, 11.825, 0.76, 'oak'], ['b', 56.64, 11.265, 0.45, 57.0, 11.785, 0.72, 'dark'],
+      ['b', 56.7, 11.325, 0.76, 57.0, 11.625, 0.78, 'paper'], ['t', 56.99, 12.015, 57.41, 12.435, 0.45, 'wood'], ['b', 56.99, 12.395, 0.45, 57.41, 12.435, 0.9, 'wood'], ['y', 57.6, 10.325, 0.06, 0.76, 0.79, 'brass'],
+      ['y', 57.6, 10.325, 0.04, 0.79, 0.88, 'glass'], ['y', 57.6, 10.325, 0.025, 0.88, 1.06, 'glass'], ['y', 57.3, 10.325, 0.035, 0.76, 0.82, 'white'], ['y', 57.6, 11.525, 0.06, 0.76, 0.79, 'brass'],
+      ['y', 57.6, 11.525, 0.04, 0.79, 0.88, 'glass'], ['y', 57.6, 11.525, 0.025, 0.88, 1.06, 'glass'], ['y', 57.3, 11.525, 0.035, 0.76, 0.82, 'white'], ['b', 60.8, 9.525, 0, 63.6, 12.925, 0.012, 'scarlet'],
+      ['t', 61.6, 10.025, 62.8, 10.625, 0.76, 'oak'], ['b', 61.64, 10.065, 0.45, 62.0, 10.585, 0.72, 'dark'], ['b', 61.7, 10.125, 0.76, 62.0, 10.425, 0.78, 'paper'], ['t', 61.99, 9.415, 62.41, 9.835, 0.45, 'wood'],
+      ['b', 61.99, 9.415, 0.45, 62.41, 9.455, 0.9, 'wood'], ['t', 61.6, 11.225, 62.8, 11.825, 0.76, 'oak'], ['b', 61.64, 11.265, 0.45, 62.0, 11.785, 0.72, 'dark'], ['b', 61.7, 11.325, 0.76, 62.0, 11.625, 0.78, 'paper'],
+      ['t', 61.99, 12.015, 62.41, 12.435, 0.45, 'wood'], ['b', 61.99, 12.395, 0.45, 62.41, 12.435, 0.9, 'wood'], ['y', 62.6, 10.325, 0.06, 0.76, 0.79, 'brass'], ['y', 62.6, 10.325, 0.04, 0.79, 0.88, 'glass'],
+      ['y', 62.6, 10.325, 0.025, 0.88, 1.06, 'glass'], ['y', 62.3, 10.325, 0.035, 0.76, 0.82, 'white'], ['y', 62.6, 11.525, 0.06, 0.76, 0.79, 'brass'], ['y', 62.6, 11.525, 0.04, 0.79, 0.88, 'glass'],
+      ['y', 62.6, 11.525, 0.025, 0.88, 1.06, 'glass'], ['y', 62.3, 11.525, 0.035, 0.76, 0.82, 'white'], ['b', 63.95, 5.85, 0, 66.35, 8.05, 0.012, 'green'], ['b', 64.73, 6.4, 0, 65.57, 7.3, 0.4, 'leather'],
+      ['b', 64.73, 6.52, 0.4, 65.37, 7.18, 0.48, 'dark'], ['b', 65.37, 6.4, 0.4, 65.57, 7.3, 1.0, 'leather'], ['b', 64.73, 6.4, 0.4, 65.37, 6.52, 0.62, 'leather'], ['b', 64.73, 7.18, 0.4, 65.37, 7.3, 0.62, 'leather'],
+      ['s', 54.6, 17.65, 57.0, 18.02, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 54.66, 17.69, 0.11, 54.86, 17.94, 0.41, 'leather'], ['b', 54.88, 17.69, 0.11, 55.11, 17.94, 0.43, 'dark'], ['b', 55.13, 17.69, 0.11, 55.39, 17.94, 0.45, 'scarlet'],
+      ['b', 55.41, 17.69, 0.11, 55.61, 17.94, 0.47, 'blue'], ['b', 55.63, 17.69, 0.11, 55.86, 17.94, 0.41, 'green'], ['b', 55.88, 17.69, 0.11, 56.14, 17.94, 0.43, 'leather'], ['b', 56.16, 17.69, 0.11, 56.36, 17.94, 0.45, 'dark'],
+      ['b', 56.38, 17.69, 0.11, 56.61, 17.94, 0.47, 'scarlet'], ['b', 56.63, 17.69, 0.11, 56.89, 17.94, 0.41, 'blue'], ['b', 54.66, 17.69, 0.51, 54.89, 17.94, 0.87, 'dark'], ['b', 54.91, 17.69, 0.51, 55.17, 17.94, 0.81, 'scarlet'],
+      ['b', 55.19, 17.69, 0.51, 55.39, 17.94, 0.83, 'blue'], ['b', 55.41, 17.69, 0.51, 55.64, 17.94, 0.85, 'green'], ['b', 55.66, 17.69, 0.51, 55.92, 17.94, 0.87, 'leather'], ['b', 55.94, 17.69, 0.51, 56.14, 17.94, 0.81, 'dark'],
+      ['b', 56.16, 17.69, 0.51, 56.39, 17.94, 0.83, 'scarlet'], ['b', 56.41, 17.69, 0.51, 56.67, 17.94, 0.85, 'blue'], ['b', 56.69, 17.69, 0.51, 56.89, 17.94, 0.87, 'green'], ['b', 54.66, 17.69, 0.91, 54.92, 17.94, 1.25, 'scarlet'],
+      ['b', 54.94, 17.69, 0.91, 55.14, 17.94, 1.27, 'blue'], ['b', 55.16, 17.69, 0.91, 55.39, 17.94, 1.21, 'green'], ['b', 55.41, 17.69, 0.91, 55.67, 17.94, 1.23, 'leather'], ['b', 55.69, 17.69, 0.91, 55.89, 17.94, 1.25, 'dark'],
+      ['b', 55.91, 17.69, 0.91, 56.14, 17.94, 1.27, 'scarlet'], ['b', 56.16, 17.69, 0.91, 56.42, 17.94, 1.21, 'blue'], ['b', 56.44, 17.69, 0.91, 56.64, 17.94, 1.23, 'green'], ['b', 56.66, 17.69, 0.91, 56.89, 17.94, 1.25, 'leather'],
+      ['b', 54.66, 17.69, 1.31, 54.86, 17.94, 1.63, 'blue'], ['b', 54.88, 17.69, 1.31, 55.11, 17.94, 1.65, 'green'], ['b', 55.13, 17.69, 1.31, 55.39, 17.94, 1.67, 'leather'], ['b', 55.41, 17.69, 1.31, 55.61, 17.94, 1.61, 'dark'],
+      ['b', 55.63, 17.69, 1.31, 55.86, 17.94, 1.63, 'scarlet'], ['b', 55.88, 17.69, 1.31, 56.14, 17.94, 1.65, 'blue'], ['b', 56.16, 17.69, 1.31, 56.36, 17.94, 1.67, 'green'], ['b', 56.38, 17.69, 1.31, 56.61, 17.94, 1.61, 'leather'],
+      ['b', 56.63, 17.69, 1.31, 56.89, 17.94, 1.63, 'dark'], ['b', 54.66, 17.69, 1.71, 54.89, 17.94, 2.01, 'green'], ['b', 54.91, 17.69, 1.71, 55.17, 17.94, 2.03, 'leather'], ['b', 55.19, 17.69, 1.71, 55.39, 17.94, 2.05, 'dark'],
+      ['b', 55.41, 17.69, 1.71, 55.64, 17.94, 2.07, 'scarlet'], ['b', 55.66, 17.69, 1.71, 55.92, 17.94, 2.01, 'blue'], ['b', 55.94, 17.69, 1.71, 56.14, 17.94, 2.03, 'green'], ['b', 56.16, 17.69, 1.71, 56.39, 17.94, 2.05, 'leather'],
+      ['b', 56.41, 17.69, 1.71, 56.67, 17.94, 2.07, 'dark'], ['b', 56.69, 17.69, 1.71, 56.89, 17.94, 2.01, 'scarlet'], ['s', 51.83, 9.725, 52.2, 12.125, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 51.91, 9.785, 0.11, 52.16, 9.985, 0.41, 'leather'],
+      ['b', 51.91, 10.005, 0.11, 52.16, 10.235, 0.43, 'dark'], ['b', 51.91, 10.255, 0.11, 52.16, 10.515, 0.45, 'scarlet'], ['b', 51.91, 10.535, 0.11, 52.16, 10.735, 0.47, 'blue'], ['b', 51.91, 10.755, 0.11, 52.16, 10.985, 0.41, 'green'],
+      ['b', 51.91, 11.005, 0.11, 52.16, 11.265, 0.43, 'leather'], ['b', 51.91, 11.285, 0.11, 52.16, 11.485, 0.45, 'dark'], ['b', 51.91, 11.505, 0.11, 52.16, 11.735, 0.47, 'scarlet'], ['b', 51.91, 11.755, 0.11, 52.16, 12.015, 0.41, 'blue'],
+      ['b', 51.91, 9.785, 0.51, 52.16, 10.015, 0.87, 'dark'], ['b', 51.91, 10.035, 0.51, 52.16, 10.295, 0.81, 'scarlet'], ['b', 51.91, 10.315, 0.51, 52.16, 10.515, 0.83, 'blue'], ['b', 51.91, 10.535, 0.51, 52.16, 10.765, 0.85, 'green'],
+      ['b', 51.91, 10.785, 0.51, 52.16, 11.045, 0.87, 'leather'], ['b', 51.91, 11.065, 0.51, 52.16, 11.265, 0.81, 'dark'], ['b', 51.91, 11.285, 0.51, 52.16, 11.515, 0.83, 'scarlet'], ['b', 51.91, 11.535, 0.51, 52.16, 11.795, 0.85, 'blue'],
+      ['b', 51.91, 11.815, 0.51, 52.16, 12.015, 0.87, 'green'], ['b', 51.91, 9.785, 0.91, 52.16, 10.045, 1.25, 'scarlet'], ['b', 51.91, 10.065, 0.91, 52.16, 10.265, 1.27, 'blue'], ['b', 51.91, 10.285, 0.91, 52.16, 10.515, 1.21, 'green'],
+      ['b', 51.91, 10.535, 0.91, 52.16, 10.795, 1.23, 'leather'], ['b', 51.91, 10.815, 0.91, 52.16, 11.015, 1.25, 'dark'], ['b', 51.91, 11.035, 0.91, 52.16, 11.265, 1.27, 'scarlet'], ['b', 51.91, 11.285, 0.91, 52.16, 11.545, 1.21, 'blue'],
+      ['b', 51.91, 11.565, 0.91, 52.16, 11.765, 1.23, 'green'], ['b', 51.91, 11.785, 0.91, 52.16, 12.015, 1.25, 'leather'], ['b', 51.91, 9.785, 1.31, 52.16, 9.985, 1.63, 'blue'], ['b', 51.91, 10.005, 1.31, 52.16, 10.235, 1.65, 'green'],
+      ['b', 51.91, 10.255, 1.31, 52.16, 10.515, 1.67, 'leather'], ['b', 51.91, 10.535, 1.31, 52.16, 10.735, 1.61, 'dark'], ['b', 51.91, 10.755, 1.31, 52.16, 10.985, 1.63, 'scarlet'], ['b', 51.91, 11.005, 1.31, 52.16, 11.265, 1.65, 'blue'],
+      ['b', 51.91, 11.285, 1.31, 52.16, 11.485, 1.67, 'green'], ['b', 51.91, 11.505, 1.31, 52.16, 11.735, 1.61, 'leather'], ['b', 51.91, 11.755, 1.31, 52.16, 12.015, 1.63, 'dark'], ['b', 51.91, 9.785, 1.71, 52.16, 10.015, 2.01, 'green'],
+      ['b', 51.91, 10.035, 1.71, 52.16, 10.295, 2.03, 'leather'], ['b', 51.91, 10.315, 1.71, 52.16, 10.515, 2.05, 'dark'], ['b', 51.91, 10.535, 1.71, 52.16, 10.765, 2.07, 'scarlet'], ['b', 51.91, 10.785, 1.71, 52.16, 11.045, 2.01, 'blue'],
+      ['b', 51.91, 11.065, 1.71, 52.16, 11.265, 2.03, 'green'], ['b', 51.91, 11.285, 1.71, 52.16, 11.515, 2.05, 'leather'], ['b', 51.91, 11.535, 1.71, 52.16, 11.795, 2.07, 'dark'], ['b', 51.91, 11.815, 1.71, 52.16, 12.015, 2.01, 'scarlet'],
+      ['s', 67.4, 9.725, 67.77, 12.125, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 67.44, 9.785, 0.11, 67.69, 9.985, 0.41, 'leather'], ['b', 67.44, 10.005, 0.11, 67.69, 10.235, 0.43, 'dark'], ['b', 67.44, 10.255, 0.11, 67.69, 10.515, 0.45, 'scarlet'],
+      ['b', 67.44, 10.535, 0.11, 67.69, 10.735, 0.47, 'blue'], ['b', 67.44, 10.755, 0.11, 67.69, 10.985, 0.41, 'green'], ['b', 67.44, 11.005, 0.11, 67.69, 11.265, 0.43, 'leather'], ['b', 67.44, 11.285, 0.11, 67.69, 11.485, 0.45, 'dark'],
+      ['b', 67.44, 11.505, 0.11, 67.69, 11.735, 0.47, 'scarlet'], ['b', 67.44, 11.755, 0.11, 67.69, 12.015, 0.41, 'blue'], ['b', 67.44, 9.785, 0.51, 67.69, 10.015, 0.87, 'dark'], ['b', 67.44, 10.035, 0.51, 67.69, 10.295, 0.81, 'scarlet'],
+      ['b', 67.44, 10.315, 0.51, 67.69, 10.515, 0.83, 'blue'], ['b', 67.44, 10.535, 0.51, 67.69, 10.765, 0.85, 'green'], ['b', 67.44, 10.785, 0.51, 67.69, 11.045, 0.87, 'leather'], ['b', 67.44, 11.065, 0.51, 67.69, 11.265, 0.81, 'dark'],
+      ['b', 67.44, 11.285, 0.51, 67.69, 11.515, 0.83, 'scarlet'], ['b', 67.44, 11.535, 0.51, 67.69, 11.795, 0.85, 'blue'], ['b', 67.44, 11.815, 0.51, 67.69, 12.015, 0.87, 'green'], ['b', 67.44, 9.785, 0.91, 67.69, 10.045, 1.25, 'scarlet'],
+      ['b', 67.44, 10.065, 0.91, 67.69, 10.265, 1.27, 'blue'], ['b', 67.44, 10.285, 0.91, 67.69, 10.515, 1.21, 'green'], ['b', 67.44, 10.535, 0.91, 67.69, 10.795, 1.23, 'leather'], ['b', 67.44, 10.815, 0.91, 67.69, 11.015, 1.25, 'dark'],
+      ['b', 67.44, 11.035, 0.91, 67.69, 11.265, 1.27, 'scarlet'], ['b', 67.44, 11.285, 0.91, 67.69, 11.545, 1.21, 'blue'], ['b', 67.44, 11.565, 0.91, 67.69, 11.765, 1.23, 'green'], ['b', 67.44, 11.785, 0.91, 67.69, 12.015, 1.25, 'leather'],
+      ['b', 67.44, 9.785, 1.31, 67.69, 9.985, 1.63, 'blue'], ['b', 67.44, 10.005, 1.31, 67.69, 10.235, 1.65, 'green'], ['b', 67.44, 10.255, 1.31, 67.69, 10.515, 1.67, 'leather'], ['b', 67.44, 10.535, 1.31, 67.69, 10.735, 1.61, 'dark'],
+      ['b', 67.44, 10.755, 1.31, 67.69, 10.985, 1.63, 'scarlet'], ['b', 67.44, 11.005, 1.31, 67.69, 11.265, 1.65, 'blue'], ['b', 67.44, 11.285, 1.31, 67.69, 11.485, 1.67, 'green'], ['b', 67.44, 11.505, 1.31, 67.69, 11.735, 1.61, 'leather'],
+      ['b', 67.44, 11.755, 1.31, 67.69, 12.015, 1.63, 'dark'], ['b', 67.44, 9.785, 1.71, 67.69, 10.015, 2.01, 'green'], ['b', 67.44, 10.035, 1.71, 67.69, 10.295, 2.03, 'leather'], ['b', 67.44, 10.315, 1.71, 67.69, 10.515, 2.05, 'dark'],
+      ['b', 67.44, 10.535, 1.71, 67.69, 10.765, 2.07, 'scarlet'], ['b', 67.44, 10.785, 1.71, 67.69, 11.045, 2.01, 'blue'], ['b', 67.44, 11.065, 1.71, 67.69, 11.265, 2.03, 'green'], ['b', 67.44, 11.285, 1.71, 67.69, 11.515, 2.05, 'leather'],
+      ['b', 67.44, 11.535, 1.71, 67.69, 11.795, 2.07, 'dark'], ['b', 67.44, 11.815, 1.71, 67.69, 12.015, 2.01, 'scarlet'], ['b', 62.9, 17.96, 1.3, 64.7, 18.02, 2.2, 'gilt'], ['b', 62.96, 17.94, 1.36, 64.64, 18.02, 2.14, 'dark'],
+      ['b', 63.1, 17.925, 1.5, 63.4, 18.02, 1.55, 'gilt'], ['b', 63.567, 17.925, 1.5, 63.867, 18.02, 1.55, 'gilt'], ['b', 64.033, 17.925, 1.5, 64.333, 18.02, 1.55, 'gilt'], ['b', 63.1, 17.925, 1.67, 63.4, 18.02, 1.72, 'gilt'],
+      ['b', 63.567, 17.925, 1.67, 63.867, 18.02, 1.72, 'gilt'], ['b', 64.033, 17.925, 1.67, 64.333, 18.02, 1.72, 'gilt'], ['b', 63.1, 17.925, 1.84, 63.4, 18.02, 1.89, 'gilt'], ['b', 63.567, 17.925, 1.84, 63.867, 18.02, 1.89, 'gilt'],
+      ['b', 64.033, 17.925, 1.84, 64.333, 18.02, 1.89, 'gilt'], ['b', 63.1, 17.925, 2.01, 63.4, 18.02, 2.06, 'gilt'], ['b', 63.567, 17.925, 2.01, 63.867, 18.02, 2.06, 'gilt'], ['b', 64.033, 17.925, 2.01, 64.333, 18.02, 2.06, 'gilt'],
+      ['b', 51.83, 7.825, 1.3, 51.89, 9.625, 2.2, 'gilt'], ['b', 51.83, 7.885, 1.36, 51.91, 9.565, 2.14, 'dark'], ['b', 51.83, 8.025, 1.5, 51.925, 8.325, 1.55, 'gilt'], ['b', 51.83, 8.492, 1.5, 51.925, 8.792, 1.55, 'gilt'],
+      ['b', 51.83, 8.958, 1.5, 51.925, 9.258, 1.55, 'gilt'], ['b', 51.83, 8.025, 1.67, 51.925, 8.325, 1.72, 'gilt'], ['b', 51.83, 8.492, 1.67, 51.925, 8.792, 1.72, 'gilt'], ['b', 51.83, 8.958, 1.67, 51.925, 9.258, 1.72, 'gilt'],
+      ['b', 51.83, 8.025, 1.84, 51.925, 8.325, 1.89, 'gilt'], ['b', 51.83, 8.492, 1.84, 51.925, 8.792, 1.89, 'gilt'], ['b', 51.83, 8.958, 1.84, 51.925, 9.258, 1.89, 'gilt'], ['b', 51.83, 8.025, 2.01, 51.925, 8.325, 2.06, 'gilt'],
+      ['b', 51.83, 8.492, 2.01, 51.925, 8.792, 2.06, 'gilt'], ['b', 51.83, 8.958, 2.01, 51.925, 9.258, 2.06, 'gilt'], ['b', 67.25, 7.595, 0, 67.77, 8.595, 0.9, 'oak'], ['b', 67.25, 7.645, 0.9, 67.77, 8.545, 0.92, 'stone'],
+      ['b', 67.24, 7.675, 0.1, 67.27, 8.515, 0.12, 'dark'], ['b', 67.24, 7.675, 0.36, 67.27, 8.515, 0.38, 'dark'], ['b', 67.24, 7.675, 0.62, 67.27, 8.515, 0.64, 'dark'], ['b', 67.71, 7.695, 1.5, 67.77, 8.495, 2.0, 'gilt'],
+      ['b', 67.7, 7.745, 1.55, 67.77, 8.445, 1.95, 'dark'], ['b', 59.3, 17.5, 0, 60.3, 18.02, 0.9, 'oak'], ['b', 59.35, 17.5, 0.9, 60.25, 18.02, 0.92, 'stone'], ['b', 59.38, 17.49, 0.1, 60.22, 17.52, 0.12, 'dark'],
+      ['b', 59.38, 17.49, 0.36, 60.22, 17.52, 0.38, 'dark'], ['b', 59.38, 17.49, 0.62, 60.22, 17.52, 0.64, 'dark'], ['b', 59.4, 17.96, 1.5, 60.2, 18.02, 2.0, 'gilt'], ['b', 59.45, 17.95, 1.55, 60.15, 18.02, 1.95, 'dark'],
+      ['b', 59.35, 3.83, 0, 60.25, 4.05, 0.012, 'stone']] },
+    /* 5-THINGS end head-boy-girl-study-5 */
     /* 5-THINGS elves-linen-room-5 */
     /* docs/interiors/upper-floors-gaps-1028.md (elves-linen-room-5, the house-elves' linen rooms): linen presses with folded linen on the back wall, a stone sink on the door wall with its pail and a sack of laundry, a pulley airer on four ropes with sheets over it, set clear of the door and its head; the elves' own things stay with floor B */
     'elves-linen-room-5': { items: [
@@ -85,7 +723,7 @@
       ['b', 144.6, 17.695, 1.5, 145.4, 17.77, 1.52, 'white'], ['b', 146.9, 3.83, 0, 147.8, 4.05, 0.012, 'stone'], ['b', 153.05, 11.8, 0, 153.27, 12.7, 0.012, 'stone'], ['b', 148.15, 17.55, 0, 149.05, 17.77, 0.012, 'stone']] },
     /* 5-THINGS end disused-classroom-5-east */
     /* 5-THINGS staff-bedrooms-5-east */
-    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedrooms-5-east, staff bedrooms): two iron bedsteads, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come */
+    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedrooms-5-east, staff bedrooms): two iron bedsteads, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come (upper-floors-lived-in-1029.md and floor 7's fuller set, scaled to the room: a rug and slippers at the side of each bed, a school trunk at its foot, a print over its head, a snuffed candle and a glass on the night cupboard, a bookcase, two reading groups a bay apart) */
     'staff-bedrooms-5-east': { items: [
       ['b', 129.55, 16.0, 0.3, 130.5, 17.98, 0.36, 'iron'], ['b', 129.55, 16.0, 0, 129.59, 16.04, 0.3, 'iron'], ['b', 130.46, 16.0, 0, 130.5, 16.04, 0.3, 'iron'], ['b', 129.55, 17.94, 0, 129.59, 17.98, 0.3, 'iron'],
       ['b', 130.46, 17.94, 0, 130.5, 17.98, 0.3, 'iron'], ['b', 129.55, 17.94, 0.36, 130.5, 17.98, 1.05, 'iron'], ['b', 129.55, 16.0, 0.36, 130.5, 16.03, 0.6, 'iron'], ['b', 129.58, 16.03, 0.36, 130.47, 17.94, 0.5, 'linen'],
@@ -99,10 +737,48 @@
       ['b', 129.21, 6.49, 0.45, 129.55, 6.85, 0.72, 'dark'], ['b', 129.25, 6.55, 0.76, 129.55, 6.9, 0.78, 'paper'], ['y', 129.65, 7.45, 0.06, 0.76, 0.79, 'brass'], ['y', 129.65, 7.45, 0.04, 0.79, 0.88, 'glass'],
       ['y', 129.65, 7.45, 0.025, 0.88, 1.06, 'glass'], ['t', 130.04, 6.84, 130.46, 7.26, 0.45, 'wood'], ['b', 130.42, 6.84, 0.45, 130.46, 7.26, 0.9, 'wood'], ['b', 136.31, 14.0, 0, 138.51, 15.7, 0.012, 'green'],
       ['b', 136.96, 14.38, 0, 137.86, 15.22, 0.4, 'leather'], ['b', 137.08, 14.38, 0.4, 137.74, 15.02, 0.48, 'dark'], ['b', 136.96, 15.02, 0.4, 137.86, 15.22, 1.0, 'leather'], ['b', 136.96, 14.38, 0.4, 137.08, 15.02, 0.62, 'leather'],
-      ['b', 137.74, 14.38, 0.4, 137.86, 15.02, 0.62, 'leather'], ['b', 134.6, 3.83, 0, 135.5, 4.05, 0.012, 'stone']] },
+      ['b', 137.74, 14.38, 0.4, 137.86, 15.02, 0.62, 'leather'], ['b', 134.6, 3.83, 0, 135.5, 4.05, 0.012, 'stone'], ['y', 130.63, 17.8, 0.05, 0.67, 0.69, 'brass'], ['y', 130.63, 17.8, 0.012, 0.69, 0.79, 'brass'],
+      ['y', 130.63, 17.8, 0.028, 0.79, 0.81, 'brass'], ['y', 130.63, 17.8, 0.014, 0.81, 0.83, 'tallow'], ['y', 130.92, 17.8, 0.035, 0.67, 0.77, 'glass'], ['b', 129.6, 15.25, 0, 130.45, 15.7, 0.34, 'leather'],
+      ['b', 129.6, 15.27, 0.34, 130.45, 15.68, 0.46, 'leather'], ['b', 129.64, 15.31, 0.46, 130.41, 15.64, 0.5, 'leather'], ['b', 129.592, 15.242, 0, 129.64, 15.29, 0.12, 'brass'], ['b', 129.592, 15.66, 0, 129.64, 15.708, 0.12, 'brass'],
+      ['b', 130.41, 15.242, 0, 130.458, 15.29, 0.12, 'brass'], ['b', 130.41, 15.66, 0, 130.458, 15.708, 0.12, 'brass'], ['b', 129.985, 15.24, 0.3, 130.065, 15.26, 0.4, 'brass'], ['b', 129.985, 15.69, 0.3, 130.065, 15.71, 0.4, 'brass'],
+      ['b', 129.7, 17.96, 1.55, 130.35, 18.02, 2.0, 'gilt'], ['b', 129.75, 17.95, 1.6, 130.3, 18.02, 1.95, 'dark'], ['y', 140.08, 17.8, 0.05, 0.67, 0.69, 'brass'], ['y', 140.08, 17.8, 0.012, 0.69, 0.79, 'brass'],
+      ['y', 140.08, 17.8, 0.028, 0.79, 0.81, 'brass'], ['y', 140.08, 17.8, 0.014, 0.81, 0.83, 'tallow'], ['y', 140.37, 17.8, 0.035, 0.67, 0.77, 'glass'], ['b', 139.05, 15.25, 0, 139.9, 15.7, 0.34, 'leather'],
+      ['b', 139.05, 15.27, 0.34, 139.9, 15.68, 0.46, 'leather'], ['b', 139.09, 15.31, 0.46, 139.86, 15.64, 0.5, 'leather'], ['b', 139.042, 15.242, 0, 139.09, 15.29, 0.12, 'brass'], ['b', 139.042, 15.66, 0, 139.09, 15.708, 0.12, 'brass'],
+      ['b', 139.86, 15.242, 0, 139.908, 15.29, 0.12, 'brass'], ['b', 139.86, 15.66, 0, 139.908, 15.708, 0.12, 'brass'], ['b', 139.435, 15.24, 0.3, 139.515, 15.26, 0.4, 'brass'], ['b', 139.435, 15.69, 0.3, 139.515, 15.71, 0.4, 'brass'],
+      ['b', 139.15, 17.96, 1.55, 139.8, 18.02, 2.0, 'gilt'], ['b', 139.2, 17.95, 1.6, 139.75, 18.02, 1.95, 'dark'], ['b', 132.38, 10.025, 0, 134.78, 12.125, 0.012, 'green'], ['t', 133.28, 10.925, 134.18, 11.525, 0.74, 'oak'],
+      ['b', 133.38, 11.025, 0.74, 133.68, 11.275, 0.77, 'paper'], ['t', 133.37, 10.315, 133.79, 10.735, 0.45, 'wood'], ['b', 133.37, 10.315, 0.45, 133.79, 10.355, 0.9, 'wood'], ['t', 133.37, 11.715, 133.79, 12.135, 0.45, 'wood'],
+      ['b', 133.37, 12.095, 0.45, 133.79, 12.135, 0.9, 'wood'], ['b', 132.38, 6.025, 0, 134.78, 8.125, 0.012, 'green'], ['t', 133.28, 6.925, 134.18, 7.525, 0.74, 'oak'], ['b', 133.38, 7.025, 0.74, 133.68, 7.275, 0.77, 'paper'],
+      ['t', 133.37, 6.315, 133.79, 6.735, 0.45, 'wood'], ['b', 133.37, 6.315, 0.45, 133.79, 6.355, 0.9, 'wood'], ['t', 133.37, 7.715, 133.79, 8.135, 0.45, 'wood'], ['b', 133.37, 8.095, 0.45, 133.79, 8.135, 0.9, 'wood'],
+      ['s', 140.6, 8.593, 140.97, 10.993, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 140.64, 8.653, 0.11, 140.89, 8.853, 0.41, 'leather'], ['b', 140.64, 8.873, 0.11, 140.89, 9.103, 0.43, 'dark'], ['b', 140.64, 9.123, 0.11, 140.89, 9.383, 0.45, 'scarlet'],
+      ['b', 140.64, 9.403, 0.11, 140.89, 9.603, 0.47, 'blue'], ['b', 140.64, 9.623, 0.11, 140.89, 9.853, 0.41, 'green'], ['b', 140.64, 9.873, 0.11, 140.89, 10.133, 0.43, 'leather'], ['b', 140.64, 10.153, 0.11, 140.89, 10.353, 0.45, 'dark'],
+      ['b', 140.64, 10.373, 0.11, 140.89, 10.603, 0.47, 'scarlet'], ['b', 140.64, 10.623, 0.11, 140.89, 10.883, 0.41, 'blue'], ['b', 140.64, 8.653, 0.51, 140.89, 8.883, 0.87, 'dark'], ['b', 140.64, 8.903, 0.51, 140.89, 9.163, 0.81, 'scarlet'],
+      ['b', 140.64, 9.183, 0.51, 140.89, 9.383, 0.83, 'blue'], ['b', 140.64, 9.403, 0.51, 140.89, 9.633, 0.85, 'green'], ['b', 140.64, 9.653, 0.51, 140.89, 9.913, 0.87, 'leather'], ['b', 140.64, 9.933, 0.51, 140.89, 10.133, 0.81, 'dark'],
+      ['b', 140.64, 10.153, 0.51, 140.89, 10.383, 0.83, 'scarlet'], ['b', 140.64, 10.403, 0.51, 140.89, 10.663, 0.85, 'blue'], ['b', 140.64, 10.683, 0.51, 140.89, 10.883, 0.87, 'green'], ['b', 140.64, 8.653, 0.91, 140.89, 8.913, 1.25, 'scarlet'],
+      ['b', 140.64, 8.933, 0.91, 140.89, 9.133, 1.27, 'blue'], ['b', 140.64, 9.153, 0.91, 140.89, 9.383, 1.21, 'green'], ['b', 140.64, 9.403, 0.91, 140.89, 9.663, 1.23, 'leather'], ['b', 140.64, 9.683, 0.91, 140.89, 9.883, 1.25, 'dark'],
+      ['b', 140.64, 9.903, 0.91, 140.89, 10.133, 1.27, 'scarlet'], ['b', 140.64, 10.153, 0.91, 140.89, 10.413, 1.21, 'blue'], ['b', 140.64, 10.433, 0.91, 140.89, 10.633, 1.23, 'green'], ['b', 140.64, 10.653, 0.91, 140.89, 10.883, 1.25, 'leather'],
+      ['b', 140.64, 8.653, 1.31, 140.89, 8.853, 1.63, 'blue'], ['b', 140.64, 8.873, 1.31, 140.89, 9.103, 1.65, 'green'], ['b', 140.64, 9.123, 1.31, 140.89, 9.383, 1.67, 'leather'], ['b', 140.64, 9.403, 1.31, 140.89, 9.603, 1.61, 'dark'],
+      ['b', 140.64, 9.623, 1.31, 140.89, 9.853, 1.63, 'scarlet'], ['b', 140.64, 9.873, 1.31, 140.89, 10.133, 1.65, 'blue'], ['b', 140.64, 10.153, 1.31, 140.89, 10.353, 1.67, 'green'], ['b', 140.64, 10.373, 1.31, 140.89, 10.603, 1.61, 'leather'],
+      ['b', 140.64, 10.623, 1.31, 140.89, 10.883, 1.63, 'dark'], ['b', 140.64, 8.653, 1.71, 140.89, 8.883, 2.01, 'green'], ['b', 140.64, 8.903, 1.71, 140.89, 9.163, 2.03, 'leather'], ['b', 140.64, 9.183, 1.71, 140.89, 9.383, 2.05, 'dark'],
+      ['b', 140.64, 9.403, 1.71, 140.89, 9.633, 2.07, 'scarlet'], ['b', 140.64, 9.653, 1.71, 140.89, 9.913, 2.01, 'blue'], ['b', 140.64, 9.933, 1.71, 140.89, 10.133, 2.03, 'green'], ['b', 140.64, 10.153, 1.71, 140.89, 10.383, 2.05, 'leather'],
+      ['b', 140.64, 10.403, 1.71, 140.89, 10.663, 2.07, 'dark'], ['b', 140.64, 10.683, 1.71, 140.89, 10.883, 2.01, 'scarlet'], ['b', 140.45, 13.255, 0, 140.97, 14.255, 0.9, 'oak'], ['b', 140.45, 13.305, 0.9, 140.97, 14.205, 0.92, 'stone'],
+      ['b', 140.91, 13.355, 1.5, 140.97, 14.155, 2.0, 'gilt'], ['b', 140.9, 13.405, 1.55, 140.97, 14.105, 1.95, 'dark'], ['b', 140.45, 6.8, 0, 140.97, 7.8, 0.9, 'oak'], ['b', 140.45, 6.85, 0.9, 140.97, 7.75, 0.92, 'stone'],
+      ['b', 140.91, 6.9, 1.5, 140.97, 7.7, 2.0, 'gilt'], ['b', 140.9, 6.95, 1.55, 140.97, 7.65, 1.95, 'dark'], ['s', 129.13, 8.593, 129.5, 10.993, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 129.21, 8.653, 0.11, 129.46, 8.853, 0.41, 'leather'],
+      ['b', 129.21, 8.873, 0.11, 129.46, 9.103, 0.43, 'dark'], ['b', 129.21, 9.123, 0.11, 129.46, 9.383, 0.45, 'scarlet'], ['b', 129.21, 9.403, 0.11, 129.46, 9.603, 0.47, 'blue'], ['b', 129.21, 9.623, 0.11, 129.46, 9.853, 0.41, 'green'],
+      ['b', 129.21, 9.873, 0.11, 129.46, 10.133, 0.43, 'leather'], ['b', 129.21, 10.153, 0.11, 129.46, 10.353, 0.45, 'dark'], ['b', 129.21, 10.373, 0.11, 129.46, 10.603, 0.47, 'scarlet'], ['b', 129.21, 10.623, 0.11, 129.46, 10.883, 0.41, 'blue'],
+      ['b', 129.21, 8.653, 0.51, 129.46, 8.883, 0.87, 'dark'], ['b', 129.21, 8.903, 0.51, 129.46, 9.163, 0.81, 'scarlet'], ['b', 129.21, 9.183, 0.51, 129.46, 9.383, 0.83, 'blue'], ['b', 129.21, 9.403, 0.51, 129.46, 9.633, 0.85, 'green'],
+      ['b', 129.21, 9.653, 0.51, 129.46, 9.913, 0.87, 'leather'], ['b', 129.21, 9.933, 0.51, 129.46, 10.133, 0.81, 'dark'], ['b', 129.21, 10.153, 0.51, 129.46, 10.383, 0.83, 'scarlet'], ['b', 129.21, 10.403, 0.51, 129.46, 10.663, 0.85, 'blue'],
+      ['b', 129.21, 10.683, 0.51, 129.46, 10.883, 0.87, 'green'], ['b', 129.21, 8.653, 0.91, 129.46, 8.913, 1.25, 'scarlet'], ['b', 129.21, 8.933, 0.91, 129.46, 9.133, 1.27, 'blue'], ['b', 129.21, 9.153, 0.91, 129.46, 9.383, 1.21, 'green'],
+      ['b', 129.21, 9.403, 0.91, 129.46, 9.663, 1.23, 'leather'], ['b', 129.21, 9.683, 0.91, 129.46, 9.883, 1.25, 'dark'], ['b', 129.21, 9.903, 0.91, 129.46, 10.133, 1.27, 'scarlet'], ['b', 129.21, 10.153, 0.91, 129.46, 10.413, 1.21, 'blue'],
+      ['b', 129.21, 10.433, 0.91, 129.46, 10.633, 1.23, 'green'], ['b', 129.21, 10.653, 0.91, 129.46, 10.883, 1.25, 'leather'], ['b', 129.21, 8.653, 1.31, 129.46, 8.853, 1.63, 'blue'], ['b', 129.21, 8.873, 1.31, 129.46, 9.103, 1.65, 'green'],
+      ['b', 129.21, 9.123, 1.31, 129.46, 9.383, 1.67, 'leather'], ['b', 129.21, 9.403, 1.31, 129.46, 9.603, 1.61, 'dark'], ['b', 129.21, 9.623, 1.31, 129.46, 9.853, 1.63, 'scarlet'], ['b', 129.21, 9.873, 1.31, 129.46, 10.133, 1.65, 'blue'],
+      ['b', 129.21, 10.153, 1.31, 129.46, 10.353, 1.67, 'green'], ['b', 129.21, 10.373, 1.31, 129.46, 10.603, 1.61, 'leather'], ['b', 129.21, 10.623, 1.31, 129.46, 10.883, 1.63, 'dark'], ['b', 129.21, 8.653, 1.71, 129.46, 8.883, 2.01, 'green'],
+      ['b', 129.21, 8.903, 1.71, 129.46, 9.163, 2.03, 'leather'], ['b', 129.21, 9.183, 1.71, 129.46, 9.383, 2.05, 'dark'], ['b', 129.21, 9.403, 1.71, 129.46, 9.633, 2.07, 'scarlet'], ['b', 129.21, 9.653, 1.71, 129.46, 9.913, 2.01, 'blue'],
+      ['b', 129.21, 9.933, 1.71, 129.46, 10.133, 2.03, 'green'], ['b', 129.21, 10.153, 1.71, 129.46, 10.383, 2.05, 'leather'], ['b', 129.21, 10.403, 1.71, 129.46, 10.663, 2.07, 'dark'], ['b', 129.21, 10.683, 1.71, 129.46, 10.883, 2.01, 'scarlet'],
+      ['b', 129.13, 13.255, 0, 129.65, 14.255, 0.9, 'oak'], ['b', 129.13, 13.305, 0.9, 129.65, 14.205, 0.92, 'stone'], ['b', 129.13, 13.355, 1.5, 129.19, 14.155, 2.0, 'gilt'], ['b', 129.13, 13.405, 1.55, 129.2, 14.105, 1.95, 'dark'],
+      ['b', 129.13, 11.093, 0, 129.65, 12.093, 0.9, 'oak'], ['b', 129.13, 11.143, 0.9, 129.65, 12.043, 0.92, 'stone'], ['b', 129.13, 11.193, 1.5, 129.19, 11.993, 2.0, 'gilt'], ['b', 129.13, 11.243, 1.55, 129.2, 11.943, 1.95, 'dark']] },
     /* 5-THINGS end staff-bedrooms-5-east */
     /* 5-THINGS staff-bedroom-5-east */
-    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedroom-5-east, staff bedrooms): a four-poster, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come */
+    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedroom-5-east, staff bedrooms): a four-poster, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come (upper-floors-lived-in-1029.md and floor 7's fuller set, scaled to the room: a rug and slippers at the side of each bed, a school trunk at its foot, a print over its head, a snuffed candle and a glass on the night cupboard, a bookcase, two reading groups a bay apart) */
     'staff-bedroom-5-east': { items: [
       ['b', 124.45, 62.9, 0.3, 126.43, 63.85, 0.36, 'iron'], ['b', 124.45, 63.81, 0, 124.49, 63.85, 0.3, 'iron'], ['b', 124.45, 62.9, 0, 124.49, 62.94, 0.3, 'iron'], ['b', 126.39, 63.81, 0, 126.43, 63.85, 0.3, 'iron'],
       ['b', 126.39, 62.9, 0, 126.43, 62.94, 0.3, 'iron'], ['b', 126.39, 62.9, 0.36, 126.43, 63.85, 1.05, 'iron'], ['b', 124.45, 62.9, 0.36, 124.48, 63.85, 0.6, 'iron'], ['b', 124.48, 62.93, 0.36, 126.39, 63.82, 0.5, 'linen'],
@@ -111,12 +787,59 @@
       ['b', 124.45, 62.9, 0.36, 124.51, 62.96, 1.9, 'dark'], ['b', 124.45, 62.9, 1.9, 126.43, 63.85, 1.95, 'dark'], ['b', 125.05, 59.23, 0, 126.15, 59.8, 2.0, 'oak'], ['b', 125.59, 59.23, 0.05, 125.61, 59.82, 1.95, 'dark'],
       ['b', 115.35, 59.23, 0, 115.9, 59.65, 0.85, 'oak'], ['b', 115.34, 59.23, 0.85, 115.91, 59.67, 0.88, 'stone'], ['y', 115.625, 59.45, 0.17, 0.88, 0.94, 'white'], ['t', 115.65, 71.38, 116.85, 71.98, 0.76, 'oak'],
       ['b', 115.69, 71.6, 0.45, 116.05, 71.94, 0.72, 'dark'], ['b', 115.75, 71.6, 0.76, 116.1, 71.9, 0.78, 'paper'], ['y', 116.65, 71.5, 0.06, 0.76, 0.79, 'brass'], ['y', 116.65, 71.5, 0.04, 0.79, 0.88, 'glass'],
-      ['y', 116.65, 71.5, 0.025, 0.88, 1.06, 'glass'], ['t', 116.04, 70.69, 116.46, 71.11, 0.45, 'wood'], ['b', 116.04, 71.07, 0.45, 116.46, 71.11, 0.9, 'wood'], ['b', 122.45, 61.975, 0, 124.15, 64.175, 0.012, 'green'],
+      ['y', 116.65, 71.5, 0.025, 0.88, 1.06, 'glass'], ['t', 116.04, 70.69, 116.46, 71.11, 0.45, 'wood'], ['b', 116.04, 70.69, 0.45, 116.46, 70.73, 0.9, 'wood'], ['b', 122.45, 61.975, 0, 124.15, 64.175, 0.012, 'green'],
       ['b', 122.83, 62.625, 0, 123.67, 63.525, 0.4, 'leather'], ['b', 122.83, 62.745, 0.4, 123.47, 63.405, 0.48, 'dark'], ['b', 123.47, 62.625, 0.4, 123.67, 63.525, 1.0, 'leather'], ['b', 122.83, 62.625, 0.4, 123.47, 62.745, 0.62, 'leather'],
-      ['b', 122.83, 63.405, 0.4, 123.47, 63.525, 0.62, 'leather'], ['b', 113.4, 59.23, 0, 114.3, 59.45, 0.012, 'stone'], ['b', 113.03, 65.05, 0, 113.25, 65.95, 0.012, 'stone'], ['b', 126.25, 65.05, 0, 126.47, 65.95, 0.012, 'stone']] },
+      ['b', 122.83, 63.405, 0.4, 123.47, 63.525, 0.62, 'leather'], ['b', 113.4, 59.23, 0, 114.3, 59.45, 0.012, 'stone'], ['b', 113.03, 65.05, 0, 113.25, 65.95, 0.012, 'stone'], ['b', 126.25, 65.05, 0, 126.47, 65.95, 0.012, 'stone'],
+      ['y', 126.25, 62.77, 0.05, 0.67, 0.69, 'brass'], ['y', 126.25, 62.77, 0.012, 0.69, 0.79, 'brass'], ['y', 126.25, 62.77, 0.028, 0.79, 0.81, 'brass'], ['y', 126.25, 62.77, 0.014, 0.81, 0.83, 'tallow'],
+      ['y', 126.25, 62.48, 0.035, 0.67, 0.77, 'glass'], ['b', 124.15, 61.45, 0, 125.95, 61.95, 0.012, 'blanket'], ['b', 124.85, 61.67, 0.012, 125.05, 61.8, 0.05, 'leather'], ['b', 124.87, 61.52, 0.012, 125.07, 61.65, 0.05, 'leather'],
+      ['b', 123.7, 62.95, 0, 124.15, 63.8, 0.34, 'leather'], ['b', 123.7, 62.97, 0.34, 124.15, 63.78, 0.46, 'leather'], ['b', 123.74, 63.01, 0.46, 124.11, 63.74, 0.5, 'leather'], ['b', 123.692, 62.942, 0, 123.74, 62.99, 0.12, 'brass'],
+      ['b', 123.692, 63.76, 0, 123.74, 63.808, 0.12, 'brass'], ['b', 124.11, 62.942, 0, 124.158, 62.99, 0.12, 'brass'], ['b', 124.11, 63.76, 0, 124.158, 63.808, 0.12, 'brass'], ['b', 123.885, 62.94, 0.3, 123.965, 62.96, 0.4, 'brass'],
+      ['b', 123.885, 63.79, 0.3, 123.965, 63.81, 0.4, 'brass'], ['b', 126.41, 63.05, 1.55, 126.47, 63.7, 2.0, 'gilt'], ['b', 126.4, 63.1, 1.6, 126.47, 63.65, 1.95, 'dark'], ['s', 126.1, 69.2, 126.47, 71.6, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'],
+      ['b', 126.14, 69.26, 0.11, 126.39, 69.46, 0.41, 'leather'], ['b', 126.14, 69.48, 0.11, 126.39, 69.71, 0.43, 'dark'], ['b', 126.14, 69.73, 0.11, 126.39, 69.99, 0.45, 'scarlet'], ['b', 126.14, 70.01, 0.11, 126.39, 70.21, 0.47, 'blue'],
+      ['b', 126.14, 70.23, 0.11, 126.39, 70.46, 0.41, 'green'], ['b', 126.14, 70.48, 0.11, 126.39, 70.74, 0.43, 'leather'], ['b', 126.14, 70.76, 0.11, 126.39, 70.96, 0.45, 'dark'], ['b', 126.14, 70.98, 0.11, 126.39, 71.21, 0.47, 'scarlet'],
+      ['b', 126.14, 71.23, 0.11, 126.39, 71.49, 0.41, 'blue'], ['b', 126.14, 69.26, 0.51, 126.39, 69.49, 0.87, 'dark'], ['b', 126.14, 69.51, 0.51, 126.39, 69.77, 0.81, 'scarlet'], ['b', 126.14, 69.79, 0.51, 126.39, 69.99, 0.83, 'blue'],
+      ['b', 126.14, 70.01, 0.51, 126.39, 70.24, 0.85, 'green'], ['b', 126.14, 70.26, 0.51, 126.39, 70.52, 0.87, 'leather'], ['b', 126.14, 70.54, 0.51, 126.39, 70.74, 0.81, 'dark'], ['b', 126.14, 70.76, 0.51, 126.39, 70.99, 0.83, 'scarlet'],
+      ['b', 126.14, 71.01, 0.51, 126.39, 71.27, 0.85, 'blue'], ['b', 126.14, 71.29, 0.51, 126.39, 71.49, 0.87, 'green'], ['b', 126.14, 69.26, 0.91, 126.39, 69.52, 1.25, 'scarlet'], ['b', 126.14, 69.54, 0.91, 126.39, 69.74, 1.27, 'blue'],
+      ['b', 126.14, 69.76, 0.91, 126.39, 69.99, 1.21, 'green'], ['b', 126.14, 70.01, 0.91, 126.39, 70.27, 1.23, 'leather'], ['b', 126.14, 70.29, 0.91, 126.39, 70.49, 1.25, 'dark'], ['b', 126.14, 70.51, 0.91, 126.39, 70.74, 1.27, 'scarlet'],
+      ['b', 126.14, 70.76, 0.91, 126.39, 71.02, 1.21, 'blue'], ['b', 126.14, 71.04, 0.91, 126.39, 71.24, 1.23, 'green'], ['b', 126.14, 71.26, 0.91, 126.39, 71.49, 1.25, 'leather'], ['b', 126.14, 69.26, 1.31, 126.39, 69.46, 1.63, 'blue'],
+      ['b', 126.14, 69.48, 1.31, 126.39, 69.71, 1.65, 'green'], ['b', 126.14, 69.73, 1.31, 126.39, 69.99, 1.67, 'leather'], ['b', 126.14, 70.01, 1.31, 126.39, 70.21, 1.61, 'dark'], ['b', 126.14, 70.23, 1.31, 126.39, 70.46, 1.63, 'scarlet'],
+      ['b', 126.14, 70.48, 1.31, 126.39, 70.74, 1.65, 'blue'], ['b', 126.14, 70.76, 1.31, 126.39, 70.96, 1.67, 'green'], ['b', 126.14, 70.98, 1.31, 126.39, 71.21, 1.61, 'leather'], ['b', 126.14, 71.23, 1.31, 126.39, 71.49, 1.63, 'dark'],
+      ['b', 126.14, 69.26, 1.71, 126.39, 69.49, 2.01, 'green'], ['b', 126.14, 69.51, 1.71, 126.39, 69.77, 2.03, 'leather'], ['b', 126.14, 69.79, 1.71, 126.39, 69.99, 2.05, 'dark'], ['b', 126.14, 70.01, 1.71, 126.39, 70.24, 2.07, 'scarlet'],
+      ['b', 126.14, 70.26, 1.71, 126.39, 70.52, 2.01, 'blue'], ['b', 126.14, 70.54, 1.71, 126.39, 70.74, 2.03, 'green'], ['b', 126.14, 70.76, 1.71, 126.39, 70.99, 2.05, 'leather'], ['b', 126.14, 71.01, 1.71, 126.39, 71.27, 2.07, 'dark'],
+      ['b', 126.14, 71.29, 1.71, 126.39, 71.49, 2.01, 'scarlet'], ['b', 118.85, 66.037, 0, 120.95, 68.438, 0.012, 'green'], ['t', 119.75, 66.638, 120.35, 67.537, 0.74, 'oak'], ['b', 119.85, 67.138, 0.74, 120.1, 67.438, 0.77, 'paper'],
+      ['t', 119.14, 67.028, 119.56, 67.447, 0.45, 'wood'], ['b', 119.14, 67.028, 0.45, 119.18, 67.447, 0.9, 'wood'], ['t', 120.54, 67.028, 120.96, 67.447, 0.45, 'wood'], ['b', 120.92, 67.028, 0.45, 120.96, 67.447, 0.9, 'wood'],
+      ['b', 114.85, 66.037, 0, 116.95, 68.438, 0.012, 'green'], ['t', 115.75, 66.638, 116.35, 67.537, 0.74, 'oak'], ['b', 115.85, 67.138, 0.74, 116.1, 67.438, 0.77, 'paper'], ['t', 115.14, 67.028, 115.56, 67.447, 0.45, 'wood'],
+      ['b', 115.14, 67.028, 0.45, 115.18, 67.447, 0.9, 'wood'], ['t', 116.54, 67.028, 116.96, 67.447, 0.45, 'wood'], ['b', 116.92, 67.028, 0.45, 116.96, 67.447, 0.9, 'wood'], ['s', 117.478, 59.23, 119.878, 59.6, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'],
+      ['b', 117.538, 59.31, 0.11, 117.738, 59.56, 0.41, 'leather'], ['b', 117.758, 59.31, 0.11, 117.988, 59.56, 0.43, 'dark'], ['b', 118.008, 59.31, 0.11, 118.268, 59.56, 0.45, 'scarlet'], ['b', 118.288, 59.31, 0.11, 118.488, 59.56, 0.47, 'blue'],
+      ['b', 118.508, 59.31, 0.11, 118.738, 59.56, 0.41, 'green'], ['b', 118.758, 59.31, 0.11, 119.018, 59.56, 0.43, 'leather'], ['b', 119.038, 59.31, 0.11, 119.238, 59.56, 0.45, 'dark'], ['b', 119.258, 59.31, 0.11, 119.488, 59.56, 0.47, 'scarlet'],
+      ['b', 119.508, 59.31, 0.11, 119.768, 59.56, 0.41, 'blue'], ['b', 117.538, 59.31, 0.51, 117.768, 59.56, 0.87, 'dark'], ['b', 117.788, 59.31, 0.51, 118.048, 59.56, 0.81, 'scarlet'], ['b', 118.068, 59.31, 0.51, 118.268, 59.56, 0.83, 'blue'],
+      ['b', 118.288, 59.31, 0.51, 118.518, 59.56, 0.85, 'green'], ['b', 118.538, 59.31, 0.51, 118.798, 59.56, 0.87, 'leather'], ['b', 118.818, 59.31, 0.51, 119.018, 59.56, 0.81, 'dark'], ['b', 119.038, 59.31, 0.51, 119.268, 59.56, 0.83, 'scarlet'],
+      ['b', 119.288, 59.31, 0.51, 119.548, 59.56, 0.85, 'blue'], ['b', 119.568, 59.31, 0.51, 119.768, 59.56, 0.87, 'green'], ['b', 117.538, 59.31, 0.91, 117.798, 59.56, 1.25, 'scarlet'], ['b', 117.818, 59.31, 0.91, 118.018, 59.56, 1.27, 'blue'],
+      ['b', 118.038, 59.31, 0.91, 118.268, 59.56, 1.21, 'green'], ['b', 118.288, 59.31, 0.91, 118.548, 59.56, 1.23, 'leather'], ['b', 118.568, 59.31, 0.91, 118.768, 59.56, 1.25, 'dark'], ['b', 118.788, 59.31, 0.91, 119.018, 59.56, 1.27, 'scarlet'],
+      ['b', 119.038, 59.31, 0.91, 119.298, 59.56, 1.21, 'blue'], ['b', 119.318, 59.31, 0.91, 119.518, 59.56, 1.23, 'green'], ['b', 119.538, 59.31, 0.91, 119.768, 59.56, 1.25, 'leather'], ['b', 117.538, 59.31, 1.31, 117.738, 59.56, 1.63, 'blue'],
+      ['b', 117.758, 59.31, 1.31, 117.988, 59.56, 1.65, 'green'], ['b', 118.008, 59.31, 1.31, 118.268, 59.56, 1.67, 'leather'], ['b', 118.288, 59.31, 1.31, 118.488, 59.56, 1.61, 'dark'], ['b', 118.508, 59.31, 1.31, 118.738, 59.56, 1.63, 'scarlet'],
+      ['b', 118.758, 59.31, 1.31, 119.018, 59.56, 1.65, 'blue'], ['b', 119.038, 59.31, 1.31, 119.238, 59.56, 1.67, 'green'], ['b', 119.258, 59.31, 1.31, 119.488, 59.56, 1.61, 'leather'], ['b', 119.508, 59.31, 1.31, 119.768, 59.56, 1.63, 'dark'],
+      ['b', 117.538, 59.31, 1.71, 117.768, 59.56, 2.01, 'green'], ['b', 117.788, 59.31, 1.71, 118.048, 59.56, 2.03, 'leather'], ['b', 118.068, 59.31, 1.71, 118.268, 59.56, 2.05, 'dark'], ['b', 118.288, 59.31, 1.71, 118.518, 59.56, 2.07, 'scarlet'],
+      ['b', 118.538, 59.31, 1.71, 118.798, 59.56, 2.01, 'blue'], ['b', 118.818, 59.31, 1.71, 119.018, 59.56, 2.03, 'green'], ['b', 119.038, 59.31, 1.71, 119.268, 59.56, 2.05, 'leather'], ['b', 119.288, 59.31, 1.71, 119.548, 59.56, 2.07, 'dark'],
+      ['b', 119.568, 59.31, 1.71, 119.768, 59.56, 2.01, 'scarlet'], ['b', 121.93, 59.23, 0, 122.93, 59.75, 0.9, 'oak'], ['b', 121.98, 59.23, 0.9, 122.88, 59.75, 0.92, 'stone'], ['b', 122.03, 59.23, 1.5, 122.83, 59.29, 2.0, 'gilt'],
+      ['b', 122.08, 59.23, 1.55, 122.78, 59.3, 1.95, 'dark'], ['b', 116.0, 59.23, 0, 117.0, 59.75, 0.9, 'oak'], ['b', 116.05, 59.23, 0.9, 116.95, 59.75, 0.92, 'stone'], ['b', 116.1, 59.23, 1.5, 116.9, 59.29, 2.0, 'gilt'],
+      ['b', 116.15, 59.23, 1.55, 116.85, 59.3, 1.95, 'dark'], ['s', 117.478, 71.65, 119.878, 72.02, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 117.538, 71.69, 0.11, 117.738, 71.94, 0.41, 'leather'], ['b', 117.758, 71.69, 0.11, 117.988, 71.94, 0.43, 'dark'],
+      ['b', 118.008, 71.69, 0.11, 118.268, 71.94, 0.45, 'scarlet'], ['b', 118.288, 71.69, 0.11, 118.488, 71.94, 0.47, 'blue'], ['b', 118.508, 71.69, 0.11, 118.738, 71.94, 0.41, 'green'], ['b', 118.758, 71.69, 0.11, 119.018, 71.94, 0.43, 'leather'],
+      ['b', 119.038, 71.69, 0.11, 119.238, 71.94, 0.45, 'dark'], ['b', 119.258, 71.69, 0.11, 119.488, 71.94, 0.47, 'scarlet'], ['b', 119.508, 71.69, 0.11, 119.768, 71.94, 0.41, 'blue'], ['b', 117.538, 71.69, 0.51, 117.768, 71.94, 0.87, 'dark'],
+      ['b', 117.788, 71.69, 0.51, 118.048, 71.94, 0.81, 'scarlet'], ['b', 118.068, 71.69, 0.51, 118.268, 71.94, 0.83, 'blue'], ['b', 118.288, 71.69, 0.51, 118.518, 71.94, 0.85, 'green'], ['b', 118.538, 71.69, 0.51, 118.798, 71.94, 0.87, 'leather'],
+      ['b', 118.818, 71.69, 0.51, 119.018, 71.94, 0.81, 'dark'], ['b', 119.038, 71.69, 0.51, 119.268, 71.94, 0.83, 'scarlet'], ['b', 119.288, 71.69, 0.51, 119.548, 71.94, 0.85, 'blue'], ['b', 119.568, 71.69, 0.51, 119.768, 71.94, 0.87, 'green'],
+      ['b', 117.538, 71.69, 0.91, 117.798, 71.94, 1.25, 'scarlet'], ['b', 117.818, 71.69, 0.91, 118.018, 71.94, 1.27, 'blue'], ['b', 118.038, 71.69, 0.91, 118.268, 71.94, 1.21, 'green'], ['b', 118.288, 71.69, 0.91, 118.548, 71.94, 1.23, 'leather'],
+      ['b', 118.568, 71.69, 0.91, 118.768, 71.94, 1.25, 'dark'], ['b', 118.788, 71.69, 0.91, 119.018, 71.94, 1.27, 'scarlet'], ['b', 119.038, 71.69, 0.91, 119.298, 71.94, 1.21, 'blue'], ['b', 119.318, 71.69, 0.91, 119.518, 71.94, 1.23, 'green'],
+      ['b', 119.538, 71.69, 0.91, 119.768, 71.94, 1.25, 'leather'], ['b', 117.538, 71.69, 1.31, 117.738, 71.94, 1.63, 'blue'], ['b', 117.758, 71.69, 1.31, 117.988, 71.94, 1.65, 'green'], ['b', 118.008, 71.69, 1.31, 118.268, 71.94, 1.67, 'leather'],
+      ['b', 118.288, 71.69, 1.31, 118.488, 71.94, 1.61, 'dark'], ['b', 118.508, 71.69, 1.31, 118.738, 71.94, 1.63, 'scarlet'], ['b', 118.758, 71.69, 1.31, 119.018, 71.94, 1.65, 'blue'], ['b', 119.038, 71.69, 1.31, 119.238, 71.94, 1.67, 'green'],
+      ['b', 119.258, 71.69, 1.31, 119.488, 71.94, 1.61, 'leather'], ['b', 119.508, 71.69, 1.31, 119.768, 71.94, 1.63, 'dark'], ['b', 117.538, 71.69, 1.71, 117.768, 71.94, 2.01, 'green'], ['b', 117.788, 71.69, 1.71, 118.048, 71.94, 2.03, 'leather'],
+      ['b', 118.068, 71.69, 1.71, 118.268, 71.94, 2.05, 'dark'], ['b', 118.288, 71.69, 1.71, 118.518, 71.94, 2.07, 'scarlet'], ['b', 118.538, 71.69, 1.71, 118.798, 71.94, 2.01, 'blue'], ['b', 118.818, 71.69, 1.71, 119.018, 71.94, 2.03, 'green'],
+      ['b', 119.038, 71.69, 1.71, 119.268, 71.94, 2.05, 'leather'], ['b', 119.288, 71.69, 1.71, 119.548, 71.94, 2.07, 'dark'], ['b', 119.568, 71.69, 1.71, 119.768, 71.94, 2.01, 'scarlet'], ['b', 121.93, 71.5, 0, 122.93, 72.02, 0.9, 'oak'],
+      ['b', 121.98, 71.5, 0.9, 122.88, 72.02, 0.92, 'stone'], ['b', 122.03, 71.96, 1.5, 122.83, 72.02, 2.0, 'gilt'], ['b', 122.08, 71.95, 1.55, 122.78, 72.02, 1.95, 'dark'], ['b', 119.978, 71.5, 0, 120.978, 72.02, 0.9, 'oak'],
+      ['b', 120.028, 71.5, 0.9, 120.928, 72.02, 0.92, 'stone'], ['b', 120.078, 71.96, 1.5, 120.878, 72.02, 2.0, 'gilt'], ['b', 120.128, 71.95, 1.55, 120.828, 72.02, 1.95, 'dark']] },
     /* 5-THINGS end staff-bedroom-5-east */
     /* 5-THINGS staff-bedroom-5-west */
-    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedroom-5-west, staff bedrooms): an iron bedstead, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come */
+    /* docs/interiors/upper-floors-gaps-1028.md (staff-bedroom-5-west, staff bedrooms): an iron bedstead, a bedside cupboard with an oil lamp, a wardrobe, a washstand, a writing desk and chair, a leather armchair on a rug; the bed heads against the inner wall; occupant to come (upper-floors-lived-in-1029.md and floor 7's fuller set, scaled to the room: a rug and slippers at the side of each bed, a school trunk at its foot, a print over its head, a snuffed candle and a glass on the night cupboard, a bookcase, two reading groups a bay apart) */
     'staff-bedroom-5-west': { items: [
       ['b', 15.55, 15.75, 0.3, 16.5, 17.73, 0.36, 'iron'], ['b', 15.55, 15.75, 0, 15.59, 15.79, 0.3, 'iron'], ['b', 16.46, 15.75, 0, 16.5, 15.79, 0.3, 'iron'], ['b', 15.55, 17.69, 0, 15.59, 17.73, 0.3, 'iron'],
       ['b', 16.46, 17.69, 0, 16.5, 17.73, 0.3, 'iron'], ['b', 15.55, 17.69, 0.36, 16.5, 17.73, 1.05, 'iron'], ['b', 15.55, 15.75, 0.36, 16.5, 15.78, 0.6, 'iron'], ['b', 15.58, 15.78, 0.36, 16.47, 17.69, 0.5, 'linen'],
@@ -127,7 +850,42 @@
       ['y', 10.75, 7.45, 0.04, 0.79, 0.88, 'glass'], ['y', 10.75, 7.45, 0.025, 0.88, 1.06, 'glass'], ['t', 11.14, 6.84, 11.56, 7.26, 0.45, 'wood'], ['b', 11.52, 6.84, 0.45, 11.56, 7.26, 0.9, 'wood'],
       ['b', 16.22, 13.75, 0, 18.42, 15.45, 0.012, 'green'], ['b', 16.87, 14.13, 0, 17.77, 14.97, 0.4, 'leather'], ['b', 16.99, 14.13, 0.4, 17.65, 14.77, 0.48, 'dark'], ['b', 16.87, 14.77, 0.4, 17.77, 14.97, 1.0, 'leather'],
       ['b', 16.87, 14.13, 0.4, 16.99, 14.77, 0.62, 'leather'], ['b', 17.65, 14.13, 0.4, 17.77, 14.77, 0.62, 'leather'], ['b', 20.15, 9.6, 0, 20.37, 10.2, 0.012, 'stone'], ['b', 14.85, 3.83, 0, 15.75, 4.05, 0.012, 'stone'],
-      ['b', 13.45, 17.55, 0, 14.35, 17.77, 0.012, 'stone']] },
+      ['b', 13.45, 17.55, 0, 14.35, 17.77, 0.012, 'stone'], ['y', 16.63, 17.55, 0.05, 0.67, 0.69, 'brass'], ['y', 16.63, 17.55, 0.012, 0.69, 0.79, 'brass'], ['y', 16.63, 17.55, 0.028, 0.79, 0.81, 'brass'],
+      ['y', 16.63, 17.55, 0.014, 0.81, 0.83, 'tallow'], ['y', 16.92, 17.55, 0.035, 0.67, 0.77, 'glass'], ['b', 17.45, 15.45, 0, 17.95, 17.25, 0.012, 'blanket'], ['b', 17.6, 16.15, 0.012, 17.73, 16.35, 0.05, 'leather'],
+      ['b', 17.75, 16.17, 0.012, 17.88, 16.37, 0.05, 'leather'], ['b', 15.6, 15.0, 0, 16.45, 15.45, 0.34, 'leather'], ['b', 15.6, 15.02, 0.34, 16.45, 15.43, 0.46, 'leather'], ['b', 15.64, 15.06, 0.46, 16.41, 15.39, 0.5, 'leather'],
+      ['b', 15.592, 14.992, 0, 15.64, 15.04, 0.12, 'brass'], ['b', 15.592, 15.41, 0, 15.64, 15.458, 0.12, 'brass'], ['b', 16.41, 14.992, 0, 16.458, 15.04, 0.12, 'brass'], ['b', 16.41, 15.41, 0, 16.458, 15.458, 0.12, 'brass'],
+      ['b', 15.985, 14.99, 0.3, 16.065, 15.01, 0.4, 'brass'], ['b', 15.985, 15.44, 0.3, 16.065, 15.46, 0.4, 'brass'], ['b', 15.7, 17.71, 1.55, 16.35, 17.77, 2.0, 'gilt'], ['b', 15.75, 17.7, 1.6, 16.3, 17.77, 1.95, 'dark'],
+      ['b', 12.885, 9.9, 0, 15.285, 12.0, 0.012, 'green'], ['t', 13.785, 10.8, 14.685, 11.4, 0.74, 'oak'], ['b', 13.885, 10.9, 0.74, 14.185, 11.15, 0.77, 'paper'], ['t', 13.875, 10.19, 14.295, 10.61, 0.45, 'wood'],
+      ['b', 13.875, 10.19, 0.45, 14.295, 10.23, 0.9, 'wood'], ['t', 13.875, 11.59, 14.295, 12.01, 0.45, 'wood'], ['b', 13.875, 11.97, 0.45, 14.295, 12.01, 0.9, 'wood'], ['b', 12.885, 5.9, 0, 15.285, 8.0, 0.012, 'green'],
+      ['t', 13.785, 6.8, 14.685, 7.4, 0.74, 'oak'], ['b', 13.885, 6.9, 0.74, 14.185, 7.15, 0.77, 'paper'], ['t', 13.875, 6.19, 14.295, 6.61, 0.45, 'wood'], ['b', 13.875, 6.19, 0.45, 14.295, 6.23, 0.9, 'wood'],
+      ['t', 13.875, 7.59, 14.295, 8.01, 0.45, 'wood'], ['b', 13.875, 7.97, 0.45, 14.295, 8.01, 0.9, 'wood'], ['s', 20.0, 6.6, 20.37, 9.0, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 20.04, 6.66, 0.11, 20.29, 6.86, 0.41, 'leather'],
+      ['b', 20.04, 6.88, 0.11, 20.29, 7.11, 0.43, 'dark'], ['b', 20.04, 7.13, 0.11, 20.29, 7.39, 0.45, 'scarlet'], ['b', 20.04, 7.41, 0.11, 20.29, 7.61, 0.47, 'blue'], ['b', 20.04, 7.63, 0.11, 20.29, 7.86, 0.41, 'green'],
+      ['b', 20.04, 7.88, 0.11, 20.29, 8.14, 0.43, 'leather'], ['b', 20.04, 8.16, 0.11, 20.29, 8.36, 0.45, 'dark'], ['b', 20.04, 8.38, 0.11, 20.29, 8.61, 0.47, 'scarlet'], ['b', 20.04, 8.63, 0.11, 20.29, 8.89, 0.41, 'blue'],
+      ['b', 20.04, 6.66, 0.51, 20.29, 6.89, 0.87, 'dark'], ['b', 20.04, 6.91, 0.51, 20.29, 7.17, 0.81, 'scarlet'], ['b', 20.04, 7.19, 0.51, 20.29, 7.39, 0.83, 'blue'], ['b', 20.04, 7.41, 0.51, 20.29, 7.64, 0.85, 'green'],
+      ['b', 20.04, 7.66, 0.51, 20.29, 7.92, 0.87, 'leather'], ['b', 20.04, 7.94, 0.51, 20.29, 8.14, 0.81, 'dark'], ['b', 20.04, 8.16, 0.51, 20.29, 8.39, 0.83, 'scarlet'], ['b', 20.04, 8.41, 0.51, 20.29, 8.67, 0.85, 'blue'],
+      ['b', 20.04, 8.69, 0.51, 20.29, 8.89, 0.87, 'green'], ['b', 20.04, 6.66, 0.91, 20.29, 6.92, 1.25, 'scarlet'], ['b', 20.04, 6.94, 0.91, 20.29, 7.14, 1.27, 'blue'], ['b', 20.04, 7.16, 0.91, 20.29, 7.39, 1.21, 'green'],
+      ['b', 20.04, 7.41, 0.91, 20.29, 7.67, 1.23, 'leather'], ['b', 20.04, 7.69, 0.91, 20.29, 7.89, 1.25, 'dark'], ['b', 20.04, 7.91, 0.91, 20.29, 8.14, 1.27, 'scarlet'], ['b', 20.04, 8.16, 0.91, 20.29, 8.42, 1.21, 'blue'],
+      ['b', 20.04, 8.44, 0.91, 20.29, 8.64, 1.23, 'green'], ['b', 20.04, 8.66, 0.91, 20.29, 8.89, 1.25, 'leather'], ['b', 20.04, 6.66, 1.31, 20.29, 6.86, 1.63, 'blue'], ['b', 20.04, 6.88, 1.31, 20.29, 7.11, 1.65, 'green'],
+      ['b', 20.04, 7.13, 1.31, 20.29, 7.39, 1.67, 'leather'], ['b', 20.04, 7.41, 1.31, 20.29, 7.61, 1.61, 'dark'], ['b', 20.04, 7.63, 1.31, 20.29, 7.86, 1.63, 'scarlet'], ['b', 20.04, 7.88, 1.31, 20.29, 8.14, 1.65, 'blue'],
+      ['b', 20.04, 8.16, 1.31, 20.29, 8.36, 1.67, 'green'], ['b', 20.04, 8.38, 1.31, 20.29, 8.61, 1.61, 'leather'], ['b', 20.04, 8.63, 1.31, 20.29, 8.89, 1.63, 'dark'], ['b', 20.04, 6.66, 1.71, 20.29, 6.89, 2.01, 'green'],
+      ['b', 20.04, 6.91, 1.71, 20.29, 7.17, 2.03, 'leather'], ['b', 20.04, 7.19, 1.71, 20.29, 7.39, 2.05, 'dark'], ['b', 20.04, 7.41, 1.71, 20.29, 7.64, 2.07, 'scarlet'], ['b', 20.04, 7.66, 1.71, 20.29, 7.92, 2.01, 'blue'],
+      ['b', 20.04, 7.94, 1.71, 20.29, 8.14, 2.03, 'green'], ['b', 20.04, 8.16, 1.71, 20.29, 8.39, 2.05, 'leather'], ['b', 20.04, 8.41, 1.71, 20.29, 8.67, 2.07, 'dark'], ['b', 20.04, 8.69, 1.71, 20.29, 8.89, 2.01, 'scarlet'],
+      ['b', 19.85, 13.08, 0, 20.37, 14.08, 0.9, 'oak'], ['b', 19.85, 13.13, 0.9, 20.37, 14.03, 0.92, 'stone'], ['b', 20.31, 13.18, 1.5, 20.37, 13.98, 2.0, 'gilt'], ['b', 20.3, 13.23, 1.55, 20.37, 13.93, 1.95, 'dark'],
+      ['b', 19.85, 11.9, 0, 20.37, 12.9, 0.9, 'oak'], ['b', 19.85, 11.95, 0.9, 20.37, 12.85, 0.92, 'stone'], ['b', 20.31, 12.0, 1.5, 20.37, 12.8, 2.0, 'gilt'], ['b', 20.3, 12.05, 1.55, 20.37, 12.75, 1.95, 'dark'],
+      ['s', 10.23, 8.488, 10.6, 10.888, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 10.31, 8.548, 0.11, 10.56, 8.748, 0.41, 'leather'], ['b', 10.31, 8.768, 0.11, 10.56, 8.998, 0.43, 'dark'], ['b', 10.31, 9.018, 0.11, 10.56, 9.278, 0.45, 'scarlet'],
+      ['b', 10.31, 9.298, 0.11, 10.56, 9.498, 0.47, 'blue'], ['b', 10.31, 9.518, 0.11, 10.56, 9.748, 0.41, 'green'], ['b', 10.31, 9.768, 0.11, 10.56, 10.028, 0.43, 'leather'], ['b', 10.31, 10.048, 0.11, 10.56, 10.248, 0.45, 'dark'],
+      ['b', 10.31, 10.268, 0.11, 10.56, 10.498, 0.47, 'scarlet'], ['b', 10.31, 10.518, 0.11, 10.56, 10.778, 0.41, 'blue'], ['b', 10.31, 8.548, 0.51, 10.56, 8.778, 0.87, 'dark'], ['b', 10.31, 8.798, 0.51, 10.56, 9.058, 0.81, 'scarlet'],
+      ['b', 10.31, 9.078, 0.51, 10.56, 9.278, 0.83, 'blue'], ['b', 10.31, 9.298, 0.51, 10.56, 9.528, 0.85, 'green'], ['b', 10.31, 9.548, 0.51, 10.56, 9.808, 0.87, 'leather'], ['b', 10.31, 9.828, 0.51, 10.56, 10.028, 0.81, 'dark'],
+      ['b', 10.31, 10.048, 0.51, 10.56, 10.278, 0.83, 'scarlet'], ['b', 10.31, 10.298, 0.51, 10.56, 10.558, 0.85, 'blue'], ['b', 10.31, 10.578, 0.51, 10.56, 10.778, 0.87, 'green'], ['b', 10.31, 8.548, 0.91, 10.56, 8.808, 1.25, 'scarlet'],
+      ['b', 10.31, 8.828, 0.91, 10.56, 9.028, 1.27, 'blue'], ['b', 10.31, 9.048, 0.91, 10.56, 9.278, 1.21, 'green'], ['b', 10.31, 9.298, 0.91, 10.56, 9.558, 1.23, 'leather'], ['b', 10.31, 9.578, 0.91, 10.56, 9.778, 1.25, 'dark'],
+      ['b', 10.31, 9.798, 0.91, 10.56, 10.028, 1.27, 'scarlet'], ['b', 10.31, 10.048, 0.91, 10.56, 10.308, 1.21, 'blue'], ['b', 10.31, 10.328, 0.91, 10.56, 10.528, 1.23, 'green'], ['b', 10.31, 10.548, 0.91, 10.56, 10.778, 1.25, 'leather'],
+      ['b', 10.31, 8.548, 1.31, 10.56, 8.748, 1.63, 'blue'], ['b', 10.31, 8.768, 1.31, 10.56, 8.998, 1.65, 'green'], ['b', 10.31, 9.018, 1.31, 10.56, 9.278, 1.67, 'leather'], ['b', 10.31, 9.298, 1.31, 10.56, 9.498, 1.61, 'dark'],
+      ['b', 10.31, 9.518, 1.31, 10.56, 9.748, 1.63, 'scarlet'], ['b', 10.31, 9.768, 1.31, 10.56, 10.028, 1.65, 'blue'], ['b', 10.31, 10.048, 1.31, 10.56, 10.248, 1.67, 'green'], ['b', 10.31, 10.268, 1.31, 10.56, 10.498, 1.61, 'leather'],
+      ['b', 10.31, 10.518, 1.31, 10.56, 10.778, 1.63, 'dark'], ['b', 10.31, 8.548, 1.71, 10.56, 8.778, 2.01, 'green'], ['b', 10.31, 8.798, 1.71, 10.56, 9.058, 2.03, 'leather'], ['b', 10.31, 9.078, 1.71, 10.56, 9.278, 2.05, 'dark'],
+      ['b', 10.31, 9.298, 1.71, 10.56, 9.528, 2.07, 'scarlet'], ['b', 10.31, 9.548, 1.71, 10.56, 9.808, 2.01, 'blue'], ['b', 10.31, 9.828, 1.71, 10.56, 10.028, 2.03, 'green'], ['b', 10.31, 10.048, 1.71, 10.56, 10.278, 2.05, 'leather'],
+      ['b', 10.31, 10.298, 1.71, 10.56, 10.558, 2.07, 'dark'], ['b', 10.31, 10.578, 1.71, 10.56, 10.778, 2.01, 'scarlet'], ['b', 10.23, 13.08, 0, 10.75, 14.08, 0.9, 'oak'], ['b', 10.23, 13.13, 0.9, 10.75, 14.03, 0.92, 'stone'],
+      ['b', 10.23, 13.18, 1.5, 10.29, 13.98, 2.0, 'gilt'], ['b', 10.23, 13.23, 1.55, 10.3, 13.93, 1.95, 'dark'], ['b', 10.23, 10.988, 0, 10.75, 11.988, 0.9, 'oak'], ['b', 10.23, 11.038, 0.9, 10.75, 11.938, 0.92, 'stone'],
+      ['b', 10.23, 11.088, 1.5, 10.29, 11.888, 2.0, 'gilt'], ['b', 10.23, 11.138, 1.55, 10.3, 11.838, 1.95, 'dark']] },
     /* 5-THINGS end staff-bedroom-5-west */
     /* 5-THINGS study-room-5 */
     /* docs/interiors/upper-floors-gaps-1028.md (study-room-5, study rooms): a joined table with joint stools either side, papers and inkwells, a bookcase on the back wall, satchels on a hook board; the leaf's sweep kept clear */
@@ -192,7 +950,7 @@
     /* docs/interiors/upper-floors-gaps-1028.md (teachers-study-5-southwest, teachers' studies): a writing desk with a windsor chair on a hearth rug, a bookcase and a longcase clock, an oil lamp; the leaf's sweep kept clear */
     'teachers-study-5-southwest': { items: [
       ['t', 26.05, 69.4, 27.45, 70.1, 0.76, 'oak'], ['b', 26.1, 69.45, 0.45, 26.5, 70.05, 0.72, 'dark'], ['b', 26.15, 69.5, 0.76, 26.55, 69.85, 0.78, 'paper'], ['y', 27.2, 69.75, 0.06, 0.76, 0.79, 'brass'],
-      ['y', 27.2, 69.75, 0.04, 0.79, 0.88, 'glass'], ['y', 27.2, 69.75, 0.025, 0.88, 1.06, 'glass'], ['t', 26.54, 68.74, 26.96, 69.16, 0.45, 'wood'], ['b', 26.54, 69.12, 0.45, 26.96, 69.16, 0.9, 'wood'],
+      ['y', 27.2, 69.75, 0.04, 0.79, 0.88, 'glass'], ['y', 27.2, 69.75, 0.025, 0.88, 1.06, 'glass'], ['t', 26.54, 68.74, 26.96, 69.16, 0.45, 'wood'], ['b', 26.54, 68.74, 0.45, 26.96, 68.78, 0.9, 'wood'],
       ['b', 25.65, 68.2, 0, 27.85, 70.4, 0.012, 'scarlet'], ['s', 21.25, 71.65, 24.25, 72.02, [0.1, 0.5, 0.9, 1.3000000000000003, 1.7000000000000002, 2.1], 'oak'], ['b', 21.31, 71.69, 0.11, 21.51, 71.94, 0.41, 'leather'], ['b', 21.53, 71.69, 0.11, 21.76, 71.94, 0.43, 'dark'],
       ['b', 21.78, 71.69, 0.11, 22.04, 71.94, 0.45, 'scarlet'], ['b', 22.06, 71.69, 0.11, 22.26, 71.94, 0.47, 'blue'], ['b', 22.28, 71.69, 0.11, 22.51, 71.94, 0.41, 'green'], ['b', 22.53, 71.69, 0.11, 22.79, 71.94, 0.43, 'leather'],
       ['b', 22.81, 71.69, 0.11, 23.01, 71.94, 0.45, 'dark'], ['b', 23.03, 71.69, 0.11, 23.26, 71.94, 0.47, 'scarlet'], ['b', 23.28, 71.69, 0.11, 23.54, 71.94, 0.41, 'blue'], ['b', 23.56, 71.69, 0.11, 23.76, 71.94, 0.43, 'green'],
