@@ -8537,6 +8537,8 @@ var BANNER = PLACE !== 'drum-room-g' || !shell ? null : (function () {
   [[41.44, 41.48], [42.9, 42.94]].forEach(function (x) { own(thingBox(shell.group, P, [x[0], -2.78, 0], [x[1], -2.38, 1.8], deal)); });
   [0.35, 0.95, 1.55].forEach(function (h) { own(thingBox(shell.group, P, [41.48, -2.78, h - 0.025], [42.9, -2.38, h], deal)); });
   own(thingBox(shell.group, P, [41.48, -2.79, 0.1], [42.9, -2.78, 1.8], deal));   /* the back boards */
+  /* req 1955 (2): the stacked turned wooden bowls on the bottom board (a gap piece of req 1844, a plain placeholder of its size until Objects draws it): two stacks of three, 0.2 across, each bowl 0.07 high */
+  [42.0, 42.35].forEach(function (cx) { [0, 1, 2].forEach(function (k) { own(thingBox(shell.group, P, [cx - 0.1, -2.68, 0.35 + k * 0.07], [cx + 0.1, -2.48, 0.35 + (k + 1) * 0.07 - 0.005], deal)); }); });
   function tex(w, h, draw) { var c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 4; return t; }
   var LINEN = '#e6dfd0';
   /* the roll: round the cylinder u, along it v (v 1 the east end); the mane's strokes on the last fifth */
@@ -8635,6 +8637,7 @@ var STORE = PLACE !== 'drum-room-g' || !shell ? null : (function () {
   box(K, 1.3, 0.65, 0.6, 0, 0.32, 0, oakD);
   [-0.45, 0, 0.45].forEach(function (u) { box(K, 0.05, 0.66, 0.61, u, 0.32, 0, iron); });
   box(K, 1.0, 0.1, 0.45, 0, 0.7, 0, wool);
+  box(K, 0.04, 0.6, 0.45, 0.71, 0.3, 0.02, oak); box(K, 0.045, 0.2, 0.2, 0.71, 0.32, 0.02, mat(0x8a3a2a, 0.95));   /* req 1955 (2): the oak shield leaning on the chest's end, its lion nearly gone (a gap piece of req 1844, a plain placeholder) */
   /* 3 the aumbry, its back to the wall; the horn lantern on its top, unlit */
   var A = grp(39.79, -1.05, toC(39.79, -1.05));
   box(A, 1.1, 1.8, 0.5, 0, 0.89, 0, oakD); box(A, 0.02, 1.5, 0.01, 0, 0.9, 0.255, oak);
@@ -8646,6 +8649,7 @@ var STORE = PLACE !== 'drum-room-g' || !shell ? null : (function () {
   var ST = grp(45.79, 2.15, toC(45.79, 2.15));
   box(ST, 1.6, 0.45, 0.55, 0, 0.215, 0, oak); box(ST, 1.6, 0.86, 0.08, 0, 0.87, -0.235, oak);
   box(ST, 0.06, 0.25, 0.5, -0.77, 0.56, 0, oakD); box(ST, 0.06, 0.25, 0.5, 0.77, 0.56, 0, oakD);
+  box(ST, 0.07, 0.46, 0.42, -0.95, 0.23, 0.02, oakD);   /* req 1955 (2): the folding X-framed stool, folded, propped at the settle's end (a gap piece of req 1844, a plain placeholder) */
   box(grp(44.64, 4.6, toC(44.64, 4.6)), 0.7, 1.6, 0.65, 0, 0.79, 0, sheetM);
   var B = grp(45.09, -0.35, toC(45.09, -0.35));
   box(B, 2.1, 0.1, 0.5, 0, 0.05, 0, oakD);
