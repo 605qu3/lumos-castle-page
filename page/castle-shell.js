@@ -1556,7 +1556,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           each.forEach(function (E1) {
             var sE = sm + E1[0];
             var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: E1[1], h: E1[2], sill: E1[3], face: face, head: g.op.head,
-              late: !!(rm && rm.late), grand: !!g.op.grand, mv: cls === 'door' && DPRE ? DPRE.mv : null,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
+              late: !!(rm && rm.late), grand: !!g.op.grand, mv: cls === 'door' ? (DPRE ? DPRE.mv : g.op.hmv || null) : null,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
               lim: { x0: -sE, x1: L - sE, ymax: HE - 0.008 } });
             var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sE + nx * off, a[1] + uy * sE + ny * off, Q.floor);
             geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
@@ -1674,6 +1674,18 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           rp.position.set(pp.x, pp.y + gsl + gh / 2, pp.z); rp.rotation.y = ang; rp.raycast = function () {};
           rp.name = Q.id + '-pane-' + g.op.id; rp.userData.owner = Q.id; group.add(rp); out.panes.push(rp);
           return;
+        }
+        /* v155 (req 2046, Godric's 3.05 pm on 31 October 2026: 'a fair mix of Options one, two, and three'): a door or way of 3.5 m
+           or less whose record names no head takes one by class, never by chance: 1 a pointed head under a hood mould (a grand
+           door, or the first ages P1 and P2), 3 a Tudor head (a later age, P5 and after, or the fourth age on the floors from the fourth up),
+           2 a pointed head in a plain ring. Decided once on the opening from the older of its two rooms, so both faces agree;
+           a record's own head (round, pointed, square) stands. Under TRIM only; the preview ?dpre= still overrides */
+        if (TRIM && !DPRE && !g.back && !g.op.head && (isDoor(g.op.kind || '') || (isWay(g.op.kind || '') && w <= 3.5))) {
+          var hAge = function (id) { var r_ = (M.rooms || []).filter(function (r) { return slug(r.id) === id; })[0]; return +String(r_ && r_.age || 'P3').replace(/\D/g, '') || 3; };
+          var hn = Math.min.apply(null, (g.op.between || [Q.id]).map(function (b) { return hAge(slug(b)); }));
+          var hcl = g.op.grand || hn <= 2 ? 1 : hn >= 5 || (hn === 4 && Q.floor > 15) ? 3 : 2;
+          g.op.head = hcl === 3 ? 'tudor' : 'pointed'; g.op.hmv = hcl === 1 ? { hood: 0.18, stop: true } : { hood: 0 };
+          window.__headMix = window.__headMix || { 1: 0, 2: 0, 3: 0 }; window.__headMix[hcl]++;
         }
         if (DPRE && !g.back && (isDoor(g.op.kind || '') || (isWay(g.op.kind || '') && w <= 3.5)) && DPRE.head) g.op.head = DPRE.head;   /* req 1996: a preview of door surrounds, ?dpre=A to D, never in a build */
         if (TRIM && !g.back) trimGap(g, sm, w, L, HE);   /* v91 */
