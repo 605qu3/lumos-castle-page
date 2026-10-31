@@ -847,6 +847,31 @@ shell.doors.forEach(function (d) {
     dish.name = 'wear-sill-' + d.id; sill.add(dish);
   }
 });
+/* req 1976 (Interiors' 166th, Godric's 1 on req 1975: "kept out" shows): a rim lock with its keyhole plate at 1.0 and an iron
+   bolt at 1.55 on the CORRIDOR face of the four stores' leaves (the spare desks, brooms, exam desks and old trophies), on
+   the free edge, a latch and a bolt, never a trap. Children of the leaf like the wear, so they swing with it; the corridor
+   side is found from the model (the door's step toward its corridor, n), not from the leaf's own side. rim-lock-1 is
+   drawn plain at its size. Page comments name no one. */
+(function () {
+  var iron = kit.solid(0x2b2a28, { roughness: 0.6 }), brass = kit.solid(0xa8863a, { roughness: 0.4 });
+  var z0 = shell.place.floor;
+  [['spare-desks-store-door', 94.0, 57.375, 0, 1], ['school-brooms-store-door', 124.475, 54.05, 1, 0],
+   ['exam-desks-store-door', 12.4, 44.665, 1, 0], ['old-trophies-overflow-door', 147.6, 44.665, -1, 0]].forEach(function (s) {
+    var d = shell.doors.filter(function (x) { return x.id === s[0]; })[0]; if (!d || !d.rest) return;
+    var p0 = shell.toLocal(s[1], s[2], z0), p1 = shell.toLocal(s[1] + s[3], s[2] + s[4], z0);
+    var zax = new THREE.Vector3(0, 0, 1).applyAxisAngle(Y_AXIS, d.rest.rot);
+    var sg = zax.x * (p1.x - p0.x) + zax.z * (p1.z - p0.z) > 0 ? 1 : -1;
+    var half = d.hinge.half, H = d.h - 0.02, y0 = -H / 2;
+    function bx(w, h, t, x, y, zf, mat, name) {
+      var m = new THREE.Mesh(new THREE.BoxGeometry(w, h, t), mat);
+      m.position.set(x, y0 + y, sg * zf); m.name = name + '-' + d.id; d.mesh.add(m); return m;
+    }
+    bx(0.18, 0.14, 0.04, half - 0.2, 1.0, 0.08, iron, 'rim-lock');          /* the case, 0.02 proud of the face at 0.06 */
+    bx(0.05, 0.06, 0.012, half - 0.2, 0.96, 0.106, brass, 'rim-lock-key');  /* the keyhole plate on it */
+    bx(0.26, 0.04, 0.035, half - 0.21, 1.55, 0.0775, iron, 'rim-bolt');     /* the bolt's body */
+    bx(0.04, 0.02, 0.02, half - 0.13, 1.55, 0.095, iron, 'rim-bolt-knob');
+  });
+})();
 /* a pair of leaves (the model's `leaves: 2`; ledger line 115, the hospital wing's double doors, OotP 32 L51266): the
    one leaf halved on its own hinge, and its mate on the far jamb, mirrored each frame (updatePairs), so every swing,
    shake, fade and turn moves both; the seam, the crack's light and the spill at the middle; a tap on either is the door's */
