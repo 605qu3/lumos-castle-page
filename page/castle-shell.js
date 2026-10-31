@@ -378,7 +378,13 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      rows of docs/architect/materials-by-room.md) gives the stone, dressing, floor and ceiling, a mass's runs of stone
      along it and a hall's older band below; page/design/tones.js (Design's, req 643) the colours, the model's
      materials.stones the fallback. Provisional until Design's tones are settled; nothing drawn, nothing generated. */
-  var PAINT = window.CASTLE_PAINT || null, TONES = window.CASTLE_TONES || null, painted = o.paint || [], TRIM = !!o.trim && !!window.CastleTrim;   /* v91 */
+  var PAINT = window.CASTLE_PAINT || null, TONES = window.CASTLE_TONES || null, painted = o.paint || [], TRIM = !!o.trim && !!window.CastleTrim;
+  var DPRE = (function () {   /* req 1996: door-surround options for Godric's eye, the page's ?dpre=A|B|C|D; the plain build has none */
+    var m = /[?&]dpre=([A-D])/.exec(window.location.search || ''); if (!m) return null;
+    var rev = { n: 3, bw: 0.12, proj: 0.025, chamfer: true, stop: false, bead: false, hood: 0 };
+    var hood = { n: 3, bw: 0.12, proj: 0.03, chamfer: true, stop: true, bead: false, hood: 0.18 };
+    return { A: { mv: rev }, B: { mv: rev, head: 'pointed' }, C: { mv: hood, head: 'pointed' }, D: { mv: rev, head: 'tudor' } }[m[1]];
+  })();   /* v91 */
   /* v121 (the ground floor's Pass 1 item 2, the Architect's 261st; Design's tags, req 1598): a room Design tags `stone`
      (worn or rough flags: stores, service, shafts, hidden ways; page/design/room-tags-<F>.js) lays the schedule's flags a
      tenth darker; the schedule (castle-paint.js) stays the floor's kind, the tag only its wear */
@@ -388,7 +394,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
      (page/design/room-use.js, from Design's room tags; the textures page/design/floor-kit.js). A use not listed here keeps the
      flat floor its schedule gives, and is listed back to Design: library, display, workroom, defence, lookout, loft, magic, hidden, stair, unset */
   var FLOOR_USE = { hall: 'flags', passage: 'flags', cellar: 'flags', teaching: 'oak', sleeping: 'oak', living: 'oak', sick: 'oak',
-    study: 'quarry', store: 'setts', service: 'setts', wash: 'encaustic',
+    study: 'quarry', store: 'setts', service: 'setts', wash: 'victorian-bw',   /* v150: req 2000, Godric's 1 */
     /* v148 (req 1982, Design's kinds for the 149 on req 1930, provisional till Godric's eye): stair and unset keep the flat floor */
     hidden: 'flags', lookout: 'flags', magic: 'flags', library: 'oak', workroom: 'oak', defence: 'oak', display: 'oak', loft: 'oak' };
   var ROOM_USE = window.CASTLE_ROOM_USE || {};
@@ -458,6 +464,8 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     var st = stoneAt(row, sx, sy), kind = FLOOR_USE[row.use];
     /* v145: a schedule's marble and earth stand; every other floor takes its use's kind when the kit is loaded */
     if (kind && window.FloorKit && row.floor !== 'marble' && row.floor !== 'earth' && !row.mass) return FloorKit.mat(paintMat(0x808080, two), kind, 0.6);
+    /* v150 (req 2001, Godric's yes on req 1992, canon GoF 23: the prefects' bathroom 'everything was made of white marble'): a schedule's marble takes Design's marble-pale (prefects' bathroom, common room, patrol room) */
+    if (row.floor === 'marble' && window.FloorKit && !row.mass && FloorKit.kinds.indexOf('marble-pale') >= 0) return FloorKit.mat(paintMat(0x808080, two), 'marble-pale', 0.6);
     if (row.floor === 'boards' || row.floor === 'marble') return paintMat(tone(row.floor === 'boards' ? 'oak-boards' : 'marble'), two);
     if (row.floor === 'earth') return paintMat(tone('earth'), two);   /* v72: the cellar under the Gryffindor storeroom, a cave's earthen floor (ledger 228) */
     var fh = tone('flags-' + st, st, 0.86);
@@ -1548,7 +1556,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           each.forEach(function (E1) {
             var sE = sm + E1[0];
             var geo = CastleTrim.geometry(THREE, { cls: cls, age: age, w: E1[1], h: E1[2], sill: E1[3], face: face, head: g.op.head,
-              late: !!(rm && rm.late), grand: !!g.op.grand,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
+              late: !!(rm && rm.late), grand: !!g.op.grand, mv: cls === 'door' && DPRE ? DPRE.mv : null,   /* v141: castle-trim v10's P6 from 1700 and P2's grand door */
               lim: { x0: -sE, x1: L - sE, ymax: HE - 0.008 } });
             var off = face === 'out' ? t : 0, p = toLocal(a[0] + ux * sE + nx * off, a[1] + uy * sE + ny * off, Q.floor);
             geo.applyMatrix4(new THREE.Matrix4().makeRotationY(ang).setPosition(p.x, p.y, p.z));
@@ -1667,7 +1675,15 @@ window.CastleShell = { build: function (F, M, placeId, o) {
           rp.name = Q.id + '-pane-' + g.op.id; rp.userData.owner = Q.id; group.add(rp); out.panes.push(rp);
           return;
         }
+        if (DPRE && !g.back && (isDoor(g.op.kind || '') || (isWay(g.op.kind || '') && w <= 3.5)) && DPRE.head) g.op.head = DPRE.head;   /* req 1996: a preview of door surrounds, ?dpre=A to D, never in a build */
         if (TRIM && !g.back) trimGap(g, sm, w, L, HE);   /* v91 */
+        /* v153 (req 2011): how far this face stands from the other place's, where two places' faces are a thin wall apart (the
+           classroom's and its corridor's, 0.24); null if there is none or no other place is built */
+        var faceGap = null;
+        if (TRIM && g.op.between) {
+          var fq = other(g.op, Q.id), fR = out.places.filter(function (R) { return R.id === fq; })[0], fe = fR && fR.poly ? onEdge(fR.poly, [a[0] + ux * sm, a[1] + uy * sm]) : null;
+          if (fe && fe.d > 0.02) faceGap = fe.d;
+        }
         /* v97 (the old cells' gates, Godric's 1 on req 1265): a door or way whose record says `head: "round"` is cut
            square to its crown (h) and its two spandrels filled in stone, as a niche's head is (v51): 2 cm into the
            jambs and the wall over it, its faces 5 mm inside each face; through the whole depth once where the way is
@@ -1676,17 +1692,24 @@ window.CastleShell = { build: function (F, M, placeId, o) {
            half struck from the far springing, its crown 0.866 w over the springing) is cut the same way; a window with a
            round or pointed head too (its pane of sky stands inside the fill, so only the head's opening shows it) */
         var hk = String(g.op.head || '').split(',')[0].trim(), win_ = /window|lancet/.test(g.op.kind || '') && !/loop|slit|round window|window, round/.test(g.op.kind || '');
-        if ((hk === 'round' && g.op.head === 'round' || hk === 'pointed') && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind) || win_)) {
+        if ((hk === 'round' && g.op.head === 'round' || hk === 'pointed' || hk === 'tudor') && !g.back && !g.soffit && (isDoor(g.op.kind) || isWay(g.op.kind) || win_)) {
           out.rounded = out.rounded || {};
           var deep = g.op.depth > t + 0.05;
           if (!(deep && out.rounded[g.op.id])) {
             if (deep) out.rounded[g.op.id] = Q.id;
-            var rr = w / 2, BR = 0.02, sp = new THREE.Shape(), dd = (deep ? g.op.depth : t) - 0.01, up = hk === 'pointed' ? Math.sqrt(3) * rr : rr;
+            var rr = w / 2, BR = 0.02, sp = new THREE.Shape(), dd = (deep ? g.op.depth : t) - 0.01, up = hk === 'pointed' ? Math.sqrt(3) * rr : hk === 'tudor' ? CastleTrim.rise('tudor', rr, 0) : rr;
             sp.moveTo(-rr, 0); sp.lineTo(-rr - BR, 0); sp.lineTo(-rr - BR, up + BR); sp.lineTo(rr + BR, up + BR); sp.lineTo(rr + BR, 0); sp.lineTo(rr, 0);
-            if (hk === 'pointed') { sp.absarc(-rr, 0, 2 * rr, 0, Math.PI / 3, false); sp.absarc(rr, 0, 2 * rr, 2 * Math.PI / 3, Math.PI, false); }
+            if (hk === 'tudor') { for (var ti = 24; ti >= 0; ti--) { var tp = CastleTrim.prof('tudor', rr, 0, ti / 24); sp.lineTo(tp[0], tp[1]); } }
+            else if (hk === 'pointed') { sp.absarc(-rr, 0, 2 * rr, 0, Math.PI / 3, false); sp.absarc(rr, 0, 2 * rr, 2 * Math.PI / 3, Math.PI, false); }
             else sp.absarc(0, 0, rr, 0, Math.PI, false);
-            var spm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h) : mats.wall;
+            /* v153 (req 2011): two rooms' faces 0.24 apart each draw a wall 0.79 deep, so a fill ran 0.55 into the other room, a
+               wall-coloured cap standing in front of that room's hood mould or Tudor ring; under TRIM a fill that is not the
+               lined way's one goes no deeper than half the gap to the other room's face (and its sides are still the casing's stone) */
+            if (TRIM && !deep && faceGap && faceGap < 2 * dd) dd = Math.max(0.06, faceGap / 2 + 0.02);
+            var spm = row ? wallMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h + 0.6) : mats.wall;
+            var spSide = TRIM && row ? trimMat(row, a[0] + ux * sm, a[1] + uy * sm, g.h) : null;   /* v152 (req 2011): the fill's two caps stay wall, its sides (the head's intrados through the wall's depth) are the casing's dressed stone, so the ring and the reveal read as one */
             var spd = F.register(new THREE.Mesh(new THREE.ExtrudeGeometry(sp, { depth: dd, bevelEnabled: false, curveSegments: 16 }), spm), LAYER.wall);
+            if (spSide) spd.material = [spm, spSide];
             spd.position.set(mid.x + Math.sin(ang) * 0.005, mid.y + g.h - up, mid.z + Math.cos(ang) * 0.005); spd.rotation.y = ang;
             spd.name = Q.id + '-round-head-' + g.op.id; spd.userData.owner = Q.id; group.add(spd);
           }
@@ -1743,6 +1766,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
              wall's: hung at half the wall it stood 1.6 in, against the newel, and no stand saw its leaf */
           var oS = findPlace(M, to), td = oS && oS.shaft && g.op.depth > 0.1 && g.op.depth < t - 0.05 ? g.op.depth : t;
           var lo = g.far ? g.far - 0.1 : td * 0.5;                       /* a passage's leaves hang at its far face */
+          if (faceGap && !g.far && faceGap < td) lo = faceGap / 2;       /* v153: in a thin wall, in the middle of the wall that is there, behind both casings */
           leaf.position.set(mid.x + nx * lo, mid.y + g.sill + 0.02 + (hh - 0.04) / 2, mid.z - ny * lo);
           leaf.rotation.y = ang; leaf.name = 'door-' + g.op.id; leaf.userData.door = g.op.id; group.add(leaf);
           /* its threshold through the wall (v4, req 284): the floor under a leaf that swings, else the void shows */
