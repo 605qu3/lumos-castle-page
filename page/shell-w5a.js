@@ -7,6 +7,26 @@ window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a,
     deal: 0xa88a5e, mahog: 0x5a2a1e, scarlet: 0x8a1c1c, blanket: 0x7e7262, tartan: 0x6a2a2a, ink: 0x1a1c2a, tallow: 0xe0d4a8 },
   things: {
+    /* G-THINGS lake-tower-g */
+    /* docs/story/settled.md 211 (req 2110: lake-tower-g is the Gobstones Club's room), docs/interiors/ground-floor-completion-1029.md n 1 to 9: the club table with chalk rings and four chairs pushed in, the captain's armchair at its west end, the cabinet of sets on the east wall, a board of past captains hung stepped along the north-east wall, a log basket and fire irons by the hearth, a lantern over the table, a bench with a scarf at the south-east; the schedule's board and bench coordinates lie outside the diagonal walls so both are moved to the walls (see the builder); nothing glows, the door's swing kept clear; 0 dropped by trim */
+    'lake-tower-g': { items: [
+      ['t', 129.0, -4.65, 131.4, -3.75, 0.75, 'oak'], ['y', 129.55, -4.2, 0.27, 0.75, 0.756, 'white'], ['y', 129.55, -4.2, 0.245, 0.756, 0.762, 'oak'], ['y', 130.2, -4.2, 0.27, 0.75, 0.756, 'white'],
+      ['y', 130.2, -4.2, 0.245, 0.756, 0.762, 'oak'], ['y', 130.85, -4.2, 0.27, 0.75, 0.756, 'white'], ['y', 130.85, -4.2, 0.245, 0.756, 0.762, 'oak'], ['y', 129.45, -4.25, 0.018, 0.762, 0.802, 'stone'],
+      ['y', 129.62, -4.12, 0.018, 0.762, 0.802, 'stone'], ['y', 130.8, -4.3, 0.018, 0.762, 0.802, 'stone'], ['t', 129.29, -3.73, 129.71, -3.31, 0.45, 'oak'], ['b', 129.29, -3.35, 0.45, 129.71, -3.31, 0.9, 'oak'],
+      ['t', 129.29, -5.09, 129.71, -4.67, 0.45, 'oak'], ['b', 129.29, -5.09, 0.45, 129.71, -5.05, 0.9, 'oak'], ['t', 130.69, -3.73, 131.11, -3.31, 0.45, 'oak'], ['b', 130.69, -3.35, 0.45, 131.11, -3.31, 0.9, 'oak'],
+      ['t', 130.69, -5.09, 131.11, -4.67, 0.45, 'oak'], ['b', 130.69, -5.09, 0.45, 131.11, -5.05, 0.9, 'oak'], ['b', 128.18, -4.65, 0, 129.02, -3.75, 0.4, 'leather'], ['b', 128.38, -4.53, 0.4, 129.02, -3.87, 0.48, 'dark'],
+      ['b', 128.18, -4.65, 0.4, 128.38, -3.75, 1.0, 'leather'], ['b', 128.38, -4.65, 0.4, 129.02, -4.53, 0.62, 'leather'], ['b', 128.38, -3.87, 0.4, 129.02, -3.75, 0.62, 'leather'], ['b', 128.45, -4.45, 0.48, 128.95, -3.95, 0.54, 'scarlet'],
+      ['b', 134.2, -5.0, 0, 134.66, -3.4, 1.8, 'oak'], ['b', 134.17, -4.95, 0.08, 134.2, -4.23, 0.36, 'dark'], ['b', 134.14, -4.65, 0.2, 134.17, -4.53, 0.24, 'brass'], ['b', 134.17, -4.17, 0.08, 134.2, -3.45, 0.36, 'dark'],
+      ['b', 134.14, -3.87, 0.2, 134.17, -3.75, 0.24, 'brass'], ['b', 134.17, -4.95, 0.4, 134.2, -4.23, 0.68, 'dark'], ['b', 134.14, -4.65, 0.52, 134.17, -4.53, 0.56, 'brass'], ['b', 134.17, -4.17, 0.4, 134.2, -3.45, 0.68, 'dark'],
+      ['b', 134.14, -3.87, 0.52, 134.17, -3.75, 0.56, 'brass'], ['b', 134.17, -4.95, 0.72, 134.2, -4.23, 1.0, 'dark'], ['b', 134.14, -4.65, 0.84, 134.17, -4.53, 0.88, 'brass'], ['b', 134.17, -4.17, 0.72, 134.2, -3.45, 1.0, 'dark'],
+      ['b', 134.14, -3.87, 0.84, 134.17, -3.75, 0.88, 'brass'], ['b', 134.17, -4.95, 1.04, 134.2, -4.23, 1.32, 'dark'], ['b', 134.14, -4.65, 1.16, 134.17, -4.53, 1.2, 'brass'], ['b', 134.17, -4.17, 1.04, 134.2, -3.45, 1.32, 'dark'],
+      ['b', 134.14, -3.87, 1.16, 134.17, -3.75, 1.2, 'brass'], ['b', 134.17, -4.95, 1.36, 134.2, -4.23, 1.64, 'dark'], ['b', 134.14, -4.65, 1.48, 134.17, -4.53, 1.52, 'brass'], ['b', 134.17, -4.17, 1.36, 134.2, -3.45, 1.64, 'dark'],
+      ['b', 134.14, -3.87, 1.48, 134.17, -3.75, 1.52, 'brass'], ['b', 134.3, -4.7, 1.8, 134.6, -4.5, 1.84, 'stone'], ['b', 133.138, -0.957, 1.6, 133.378, -0.717, 2.2, 'dark'], ['b', 133.208, -0.887, 1.9, 133.308, -0.787, 2.0, 'paper'],
+      ['b', 133.37, -1.282, 1.6, 133.61, -1.042, 2.2, 'dark'], ['b', 133.44, -1.212, 1.9, 133.54, -1.112, 2.0, 'paper'], ['b', 133.603, -1.608, 1.6, 133.843, -1.368, 2.2, 'dark'], ['b', 133.673, -1.538, 1.9, 133.773, -1.438, 2.0, 'paper'],
+      ['y', 126.4, -5.5, 0.25, 0, 0.35, 'rope'], ['y', 126.4, -5.5, 0.2, 0.35, 0.45, 'dark'], ['y', 126.1, -2.7, 0.08, 0, 0.03, 'iron'], ['y', 126.1, -2.7, 0.012, 0.03, 0.7, 'iron'],
+      ['b', 126.04, -2.78, 0.62, 126.16, -2.62, 0.7, 'iron'], ['y', 131.2, -4.2, 0.01, 2.25, 4.5, 'iron'], ['b', 131.12, -4.28, 1.9, 131.28, -4.12, 2.2, 'amber'], ['b', 131.1, -4.3, 2.2, 131.3, -4.1, 2.25, 'iron'],
+      ['b', 131.1, -4.3, 1.87, 131.3, -4.1, 1.9, 'iron'], ['t', 131.2, -7.9, 132.8, -7.45, 0.45, 'wood'], ['b', 132.55, -7.9, 0.45, 132.75, -7.45, 0.5, 'scarlet'], ['b', 132.55, -7.92, 0.2, 132.75, -7.88, 0.5, 'scarlet']] },
+    /* G-THINGS end lake-tower-g */
     /* G-THINGS teachers-study-g */
     /* docs/interiors/ground-floor-north-range-1029.md (G-af, req 1922): the master's desk with its lamp, globe, sheet and inkwell and his chair, the waste basket, the bookcase between the east windows, the leather armchair with its side table, two book presses on the far wall, the corner cupboard of drawers, the window seat with squab, bolster and rug; no hearth drawn, so no fender or irons */
     'teachers-study-g': { items: [
