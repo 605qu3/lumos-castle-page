@@ -5047,49 +5047,100 @@ thingCues[WELL_EYE] = function () { showLines([{ medium: 'seen', sound: WELL_EYE
   bg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); bg.setIndex(idx);
   var bed = new THREE.Mesh(bg, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }));
   bed.name = 'h82-lake-bed'; bed.userData.owner = PLACE; bed.raycast = function () {}; shell.group.add(bed);
-  /* the lake-bed weed (req 2185; docs/interiors/glass-house.md, The lake-bed weed round the rim; Godric, 31 October 2026,
-     9.16 pm: "If there is 2 feet of weed at the bottom of the loch they should be visible around the rim of our underwater
-     viewing room"; provisional): pondweed and milfoil, ribbon leaves 0.45 to 0.6 long, on the apron and its banks east, west
-     and south, 0.6 at the glass's foot tapering to 0.3 about 2.8 out, a clump every 0.3 m of six to twelve leaves, each leaf 0.05 wide at the base (the schedule's 0.01 to 0.02 was invisible at ten metres), all
-     bowing 15 to 25 degrees east (the lake's drift), swaying on a 5 to 7 second cycle each a little out of step. Nothing
-     within 0.1 of the pane, nothing on the walls, the north ledge's moss tufts not drawn. One instanced mesh, unlit like the bed */
+  /* the lake-bed weed, second go (req 2185, then 2188: the first read as a thin grass fringe, not two feet of loch weed;
+     docs/interiors/glass-house.md, The lake-bed weed round the rim; PS 6 L2272, 0.6 m thick; Godric, 31 October 2026,
+     9.16 pm: "If there is 2 feet of weed at the bottom of the loch they should be visible around the rim of our
+     underwater viewing room"; provisional). Three parts on the apron and its first bank, east, west and south:
+     (1) the mat, a dense clump every 0.18 m of 7 to 11 short ribbon leaves, 0.6 at the glass's foot tapering to 0.3 about
+     2.8 out, 0.035 wide, near black at the root to olive-brown at the tip, some browner, some greener;
+     (2) the fronds, long ribbons 0.02 wide rising out of the mat to 0.9 to 1.3, each curved, in clumps every 0.4 m;
+     (3) the north ledge's tufts: moss-green, 0.3 to 0.5, on the wall's top at the end's foot, x 12.0 to 14.3 and
+     21.7 to 28.0, the arch left bare. All bow 10 to 28 degrees east (the lake's drift) and sway on a 5 to 7 second
+     cycle each a little out of step (Events' req 2186 keeps it). Nothing within 0.1 of the pane. Unlit like the bed */
   (function () {
-    var wseed = 2185, wr = function () { wseed = (wseed * 16807) % 2147483647; return wseed / 2147483647; };
-    var gp = [], gc = [], gi = [], SEG = 4, BASE = new THREE.Color(0x2c3519).convertSRGBToLinear(), TIP = new THREE.Color(0x6e7a34).convertSRGBToLinear();
-    for (var s = 0; s <= SEG; s++) {
-      var t = s / SEG, hw = 0.022 * (1 - 0.6 * t) + 0.004, cc = BASE.clone().lerp(TIP, t);
-      gp.push(-hw, t, 0, hw, t, 0); gc.push(cc.r, cc.g, cc.b, cc.r, cc.g, cc.b);
-      if (s) { var e = 2 * s; gi.push(e - 2, e - 1, e, e - 1, e + 1, e); }
+    var wseed = 2188, wr = function () { wseed = (wseed * 16807) % 2147483647; return wseed / 2147483647; };
+    function ribbon(SEG, w0, w1, bend, c0, c1) {
+      var gp = [], gc = [], gi = [], A = new THREE.Color(c0).convertSRGBToLinear(), B = new THREE.Color(c1).convertSRGBToLinear();
+      for (var s = 0; s <= SEG; s++) {
+        var t = s / SEG, hw = (w0 + (w1 - w0) * t) / 2, cc = A.clone().lerp(B, t), bx = bend * t * t;
+        gp.push(bx - hw, t, 0, bx + hw, t, 0); gc.push(cc.r, cc.g, cc.b, cc.r, cc.g, cc.b);
+        if (s) { var e = 2 * s; gi.push(e - 2, e - 1, e, e - 1, e + 1, e); }
+      }
+      var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3));
+      g.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3)); g.setIndex(gi); return g;
     }
-    var wg = new THREE.BufferGeometry(); wg.setAttribute('position', new THREE.Float32BufferAttribute(gp, 3));
-    wg.setAttribute('color', new THREE.Float32BufferAttribute(gc, 3)); wg.setIndex(gi);
-    var blades = [], gx, gy;
-    for (gx = X0 - AP - 0.9; gx <= X1 + AP + 0.9; gx += 0.3) for (gy = Y0 - AP - 0.9; gy < Y1 - 0.4; gy += 0.3) {
-      var cx0 = gx + (wr() - 0.5) * 0.28, cy0 = gy + (wr() - 0.5) * 0.28;
+    var WU = { value: 0 };
+    function wmat(amp) {
+      var m = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
+      if (!amp) return m;
+      m.onBeforeCompile = function (sh) {
+        sh.uniforms.uT = WU;
+        sh.vertexShader = 'uniform float uT;\n' + sh.vertexShader.replace('#include <project_vertex>',
+          '#include <project_vertex>\n float wph = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 2.3;' +
+          ' float wsw = sin(uT * (1.0 + 0.16 * sin(wph * 3.1)) * 1.0472 + wph) * ' + amp.toFixed(3) + ' * position.y * position.y;' +
+          ' mvPosition.xyz += (modelViewMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz * wsw; gl_Position = projectionMatrix * mvPosition;');
+      };
+      m.customProgramCacheKey = function () { return 'h82weed' + amp; };
+      return m;
+    }
+    var AY = new THREE.Vector3(0, 1, 0), AZ = new THREE.Vector3(0, 0, 1), TINTS = [[1, 1, 1], [1.2, 0.9, 0.6], [0.8, 1.1, 0.9], [1.1, 0.95, 0.7]];
+    function mesh(geo, mat, list, name) {
+      var im = new THREE.InstancedMesh(geo, mat, list.length), M = new THREE.Matrix4(), Q = new THREE.Quaternion(), Q2 = new THREE.Quaternion(), S = new THREE.Vector3(), C = new THREE.Color();
+      list.forEach(function (b, k) {
+        Q.setFromAxisAngle(AZ, -b.tilt); Q2.setFromAxisAngle(AY, b.yaw); Q.multiply(Q2); S.set(b.flip, b.len, 1);
+        M.compose(b.p, Q, S); im.setMatrixAt(k, M); im.setColorAt(k, C.setRGB(b.tint[0] * b.v, b.tint[1] * b.v, b.tint[2] * b.v));
+      });
+      im.name = name; im.userData.owner = PLACE; im.raycast = function () {}; im.frustumCulled = false; shell.group.add(im); return im;
+    }
+    var mat = [], fro = [], gx, gy;
+    for (gx = X0 - AP - 0.9; gx <= X1 + AP + 0.9; gx += 0.22) for (gy = Y0 - AP - 0.9; gy < Y1 - 0.4; gy += 0.22) {
+      var cx0 = gx + (wr() - 0.5) * 0.17, cy0 = gy + (wr() - 0.5) * 0.17;
       var ddx = Math.max(X0 - cx0, 0, cx0 - X1), ddy = Math.max(Y0 - cy0, 0), dd = Math.hypot(ddx, ddy);
       if (dd < 0.15 || dd > AP + 0.8) continue;   /* 0.1 clear of the pane, and only the apron and its first bank */
-      var taper = 0.6 - 0.3 * Math.min(1, dd / 2.8), hgt = taper * (0.75 + 0.25 * wr()), nl = 6 + Math.floor(wr() * 7), cph = wr() * 6.2832;
+      var taper = 0.6 - 0.3 * Math.min(1, dd / 2.8), nl = 5 + Math.floor(wr() * 4), tn = TINTS[Math.floor(wr() * 4)];
       for (var q = 0; q < nl; q++) {
-        var bx = cx0 + (wr() - 0.5) * 0.1, by = cy0 + (wr() - 0.5) * 0.1;
-        blades.push({ p: shell.toLocal(bx, by, bedAt(bx, by) - 0.02), len: hgt * (0.85 + 0.15 * wr()), yaw: wr() * Math.PI, tilt: (15 + 10 * wr()) * D2R, ph: cph, tint: 0.85 + 0.3 * wr() });
+        var bx = cx0 + (wr() - 0.5) * 0.14, by = cy0 + (wr() - 0.5) * 0.14;
+        mat.push({ p: shell.toLocal(bx, by, bedAt(bx, by) - 0.02), len: taper * (0.6 + 0.4 * wr()), yaw: wr() * Math.PI, tilt: (10 + 20 * wr()) * D2R, flip: wr() < 0.5 ? -1 : 1, tint: tn, v: 0.7 + 0.5 * wr() });
       }
     }
-    var wm = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide });
-    var WU = { value: 0 };
-    wm.onBeforeCompile = function (sh) {
-      sh.uniforms.uT = WU;
-      sh.vertexShader = 'uniform float uT;\n' + sh.vertexShader.replace('#include <project_vertex>',
-        '#include <project_vertex>\n float wph = instanceMatrix[3].x * 1.7 + instanceMatrix[3].z * 2.3;' +
-        ' float wsw = sin(uT * (1.0 + 0.16 * sin(wph * 3.1)) * 1.0472 + wph) * 0.05 * position.y * position.y;' +
-        ' mvPosition.xyz += (modelViewMatrix * vec4(1.0, 0.0, 0.0, 0.0)).xyz * wsw; gl_Position = projectionMatrix * mvPosition;');
-    };
-    var wmesh = new THREE.InstancedMesh(wg, wm, blades.length), WM = new THREE.Matrix4(), WQ = new THREE.Quaternion(), WQ2 = new THREE.Quaternion(), WS = new THREE.Vector3(), WC = new THREE.Color();
-    var AY = new THREE.Vector3(0, 1, 0), AZ = new THREE.Vector3(0, 0, 1);
-    blades.forEach(function (b, k) {
-      WQ.setFromAxisAngle(AZ, -b.tilt); WQ2.setFromAxisAngle(AY, b.yaw); WQ.multiply(WQ2); WS.set(1, b.len, 1);
-      WM.compose(b.p, WQ, WS); wmesh.setMatrixAt(k, WM); wmesh.setColorAt(k, WC.setRGB(b.tint, b.tint, b.tint));
+    for (gx = X0 - AP - 0.9; gx <= X1 + AP + 0.9; gx += 0.28) for (gy = Y0 - AP - 0.9; gy < Y1 - 0.4; gy += 0.28) {
+      var fx = gx + (wr() - 0.5) * 0.26, fy = gy + (wr() - 0.5) * 0.26;
+      var fdx = Math.max(X0 - fx, 0, fx - X1), fdy = Math.max(Y0 - fy, 0), fd = Math.hypot(fdx, fdy);
+      if (fd < 0.2 || fd > AP + 0.8) continue;
+      var fh = 1.5 - 0.5 * Math.min(1, fd / 2.8), fn = 4 + Math.floor(wr() * 3), ft = TINTS[Math.floor(wr() * 4)];
+      for (var r = 0; r < fn; r++) {
+        var ex = fx + (wr() - 0.5) * 0.2, ey = fy + (wr() - 0.5) * 0.2;
+        fro.push({ p: shell.toLocal(ex, ey, bedAt(ex, ey) - 0.02), len: fh * (0.7 + 0.3 * wr()), yaw: wr() * Math.PI, tilt: (10 + 18 * wr()) * D2R, flip: wr() < 0.5 ? -1 : 1, tint: ft, v: 0.75 + 0.35 * wr() });
+      }
+    }
+    var tuf = [], tx;
+    [[12.0, 14.3], [21.7, 28.0]].forEach(function (rg2) {
+      for (tx = rg2[0] + 0.1; tx < rg2[1]; tx += 0.22) for (var ty = Y1 - 0.5; ty < Y1 - 0.1; ty += 0.2) {
+        var cx1 = tx + (wr() - 0.5) * 0.2, cy1 = ty + (wr() - 0.5) * 0.12, nb = 5 + Math.floor(wr() * 4);
+        for (var u = 0; u < nb; u++) tuf.push({ p: shell.toLocal(cx1 + (wr() - 0.5) * 0.08, cy1 + (wr() - 0.5) * 0.08, ZS), len: 0.3 + 0.2 * wr(), yaw: wr() * Math.PI, tilt: (8 + 30 * wr()) * D2R, flip: wr() < 0.5 ? -1 : 1, tint: [1, 1, 1], v: 0.8 + 0.4 * wr() });
+      }
     });
-    wmesh.name = 'h82-lake-weed'; wmesh.userData.owner = PLACE; wmesh.raycast = function () {}; wmesh.frustumCulled = false; shell.group.add(wmesh);
+    (function () {   /* the mat's body: a lumpy dark surface over the ring, 0.6 at the glass's foot tapering to 0.3 about 2.8 out */
+      var mp = [], mc = [], mi = [], mx0 = X0 - AP - 0.9, my0 = Y0 - AP - 0.9, NXm = Math.round((X1 + AP + 0.9 - mx0) / 0.15), NYm = Math.round((Y1 - 0.4 - my0) / 0.15);
+      var K0 = new THREE.Color(0x20250f).convertSRGBToLinear(), K1 = new THREE.Color(0x4a4521).convertSRGBToLinear(), kc = new THREE.Color(), ix, iy;
+      function dist(x, y) { return Math.hypot(Math.max(X0 - x, 0, x - X1), Math.max(Y0 - y, 0)); }
+      for (iy = 0; iy <= NYm; iy++) for (ix = 0; ix <= NXm; ix++) {
+        var mx = mx0 + ix * 0.15, my = my0 + iy * 0.15, md = dist(mx, my), nz = 0.5 + 0.25 * Math.sin(mx * 3.1 + my * 1.7) + 0.25 * Math.sin(mx * 7.3 - my * 5.9);
+        var mh = (0.6 - 0.3 * Math.min(1, md / 2.8)) * (0.7 + 0.3 * nz), mv = shell.toLocal(mx, my, bedAt(mx, my) + mh);
+        mp.push(mv.x, mv.y, mv.z); kc.copy(K0).lerp(K1, 0.15 + 0.7 * nz * nz); mc.push(kc.r, kc.g, kc.b);
+      }
+      for (iy = 0; iy < NYm; iy++) for (ix = 0; ix < NXm; ix++) {
+        var cd = dist(mx0 + (ix + 0.5) * 0.15, my0 + (iy + 0.5) * 0.15); if (cd < 0.12 || cd > AP + 0.8) continue;
+        var kk = iy * (NXm + 1) + ix; mi.push(kk, kk + 1, kk + NXm + 1, kk + 1, kk + NXm + 2, kk + NXm + 1);
+      }
+      var mg = new THREE.BufferGeometry(); mg.setAttribute('position', new THREE.Float32BufferAttribute(mp, 3));
+      mg.setAttribute('color', new THREE.Float32BufferAttribute(mc, 3)); mg.setIndex(mi);
+      var mm = new THREE.Mesh(mg, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide }));
+      mm.name = 'h82-lake-weed-mat'; mm.userData.owner = PLACE; mm.raycast = function () {}; shell.group.add(mm);
+    })();
+    mesh(ribbon(3, 0.09, 0.02, 0.12, 0x12170a, 0x363a16), wmat(0.05), mat, 'h82-lake-weed');
+    mesh(ribbon(6, 0.1, 0.022, 0.3, 0x18240c, 0x40591c), wmat(0.11), fro, 'h82-lake-weed-fronds');
+    mesh(ribbon(2, 0.07, 0.012, 0.1, 0x3a5522, 0x86a244), wmat(0.03), tuf, 'h82-lake-weed-ledge');
     (function tickWeed(now) { WU.value = now / 1000; requestAnimationFrame(tickWeed); })(0);
   })();
   /* the cliff's rock over the house's north end and along the cut's north edge: from the bed (or the barrel's line over
