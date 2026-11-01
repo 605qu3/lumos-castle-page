@@ -183,6 +183,62 @@
       "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): ours: nothing is left over and nothing is lost"
     },
     {
+      "id": "prefects-bathroom.win-remark",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = prefects bathroom",
+        "year = 1",
+        "boris != asked",
+        "boris != righted"
+      ],
+      "show": [
+        "Win Hartley, passing the statue of Boris the Bewildered in the corridor by the door, says only that he has been dressed wrong since before her mother, and that if anyone put him right the door would let them in"
+      ],
+      "starts": [
+        "set boris = asked"
+      ],
+      "canon": "Settled 218 (Godric, 1 November 2026, 12.51 pm; docs/story/settled.md; Magic's req 2557, docs/magic/rooms.md, The prefects' bathroom, the door-and-gloves row): Boris's gloves on the wrong hands (GoF 23 L29902); Win Hartley, Gryffindor prefect (docs/story/names-1897.md); it always begins with her remark, in the first year; the books' password and Cedric's tip stay out"
+    },
+    {
+      "id": "prefects-bathroom.boris-gloves",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap boris gloves",
+      "when": [
+        "place = prefects bathroom",
+        "boris = asked"
+      ],
+      "show": [
+        "the statue's stone gloves lifted onto the right hands; a click in the fourth door to its left; the boy looks round the bath from the edge and does not bathe"
+      ],
+      "starts": [
+        "set boris = righted"
+      ],
+      "canon": "Settled 218 (Godric, 1 November 2026, 12.51 pm; Magic's req 2557): the fourth door left of the statue clicks (the door is a board-row question to the Architect and Story: the model has no fourth door, Interiors' req 2558); the boy does not bathe (FDP-25); the tap id boris gloves waits on Interiors' placement of the statue"
+    },
+    {
+      "id": "prefects-bathroom.boris-put-back",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "leave",
+      "when": [
+        "boris = righted"
+      ],
+      "show": [],
+      "starts": [
+        "set boris = wrong"
+      ],
+      "canon": "Settled 218 (Godric, 1 November 2026, 12.51 pm; Magic's req 2557): after he goes the prefects put the gloves back wrong, so the statue rests as the books have him"
+    },
+    {
       "id": "prefects-bathroom.room-left",
       "tier": "fixed",
       "source": "device",

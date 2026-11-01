@@ -115,9 +115,9 @@
         "hour < 22"
       ],
       "show": [
-        "a game going in the chalk rings, the stones rolled; a point lost and a stone squirts a nasty-smelling liquid across a player's cuff, and he laughs and takes the cloth that hangs by the door"
+        "a game going in the chalk rings, the stones rolled; a point lost and a stone squirts a nasty-smelling liquid across a player's cuff, never his face, and he laughs as the club hands him the cloth; every regular's cuff is stained, and the stain is the club's badge"
       ],
-      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): \"squirt a nasty-smelling liquid\" (PA 4 L14230, read in the canon tool, 1 November 2026); the club's players take it on a cuff; if the boys join (Story's pair against a pair, never brother against brother) it lands on a sleeve and a cloth is handed them, never a face (FDP-11); the softening is provisional, Story to confirm (req 2480, put to Godric as req 2483)"
+      "canon": "Magic's req 2478, amended by req 2557 (settled 217, Godric, 1 November 2026, 12.51 pm; docs/magic/rooms.md, the Gobstones Club's room): \"squirt a nasty-smelling liquid\" (PA 4 L14230, read in the canon tool, 1 November 2026); a lost point lands on the cuff, never the face (FDP-11), the club hands him the cloth; every regular has a stained cuff, so a boy who gets one is told he has the club's mark; the club plays the brothers as a pair against a pair, never brother against brother, so a stained cuff is shared and nothing ranks one over the other"
     },
     {
       "when": [
@@ -218,11 +218,27 @@
         "time = day"
       ],
       "show": [
-        "a grown-up visitor is shown in by the Keeper of Keys, who clicks her fingers; a fire bursts into life in the grate, and she goes"
+        "a grown-up visitor she knows is shown in by the Keeper of Keys, who clicks her fingers; a fire bursts into life in the grate, and she goes, saying nothing"
       ],
       "starts": [],
-      "canon": "Magic's req 2473, the visitors' parlour row, offered to Story as req 2474 and put to Godric as req 2477: the Keeper's click of her fingers (B3 ch3 L14089, the Leaky Cauldron's parlour, an everyday wizard's way with a fire, read in the canon tool, 1 November 2026); no words given to her",
-      "aside": "held for Story's answer on req 2474 (Godric's req 2477): the click of the fingers is an offer not yet taken; remove this key when it is, drop the record when it is not"
+      "canon": "Settled 216 (Godric, 1 November 2026, 12.51 pm; docs/story/settled.md; Magic's req 2557, docs/magic/rooms.md, the visitors' parlour): the Keeper's click of her fingers (B3 ch3 L14089, the Leaky Cauldron's parlour, an everyday wizard's way with a fire, read in the canon tool, 1 November 2026); no words in either case"
+    },
+    {
+      "id": "ground-floor-1897.parlour-fire-taper",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = visitors parlour",
+        "time = day"
+      ],
+      "show": [
+        "a grown-up visitor she does not know is shown in; the Keeper of Keys lays a taper to the grate by hand, slowly, and the room stays banked a little longer; she says nothing, and goes"
+      ],
+      "starts": [],
+      "canon": "Settled 216 (Godric, 1 November 2026, 12.51 pm; Magic's req 2557): a stranger gets a taper laid by hand, slowly, the room banked a little longer than the click's, no words, so a boy can tell whom she trusts without being told; the taper's flame is its own"
     },
     {
       "id": "ground-floor-1897.own-letter",
