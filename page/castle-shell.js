@@ -1149,7 +1149,7 @@ window.CastleShell = { build: function (F, M, placeId, o) {
     /* the openings on each edge: a gap [s0, s1] up to its head h */
     var gaps = E.map(function () { return []; });
     (M.openings || []).concat(Q.ops || []).forEach(function (op) {
-      if (!matches(M, op, Q.id) || op.hatch) return;   /* v134: a flag in a floor (`hatch`) is in no wall; built below as a hatch */
+      if (!matches(M, op, Q.id) || op.hatch || op.state === 'set aside') return;   /* v159 (req 2137): an opening the model sets aside builds no door. v134: a flag in a floor (`hatch`) is in no wall; built below as a hatch */
       /* a doorway behind a panel or a tapestry reads as wall; v8 (req 520): from the hidden place it opens off (its
          `inside`, the tapestry stair's well), a way out, its sill there `inside_sill`; v10: from its outer side the
          wall takes a tap there, unseen (the events' `tap <id>`) */
