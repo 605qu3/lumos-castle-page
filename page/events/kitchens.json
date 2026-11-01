@@ -679,6 +679,117 @@
         "secret fruit-bowl-painting"
       ],
       "canon": "Magic's req 2285 (6), docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897 (Story's settled 204, Godric's 1 on desk req 2061, 31 October 2026, 3.52 pm; the date is settled 191's, the gate the story's, not a book's): from then on the pear stays a tap away, and shut again the handle is a pear; before the feast a tap does nothing, as the painted still life has it"
+    },
+    {
+      "id": "kitchens.elf-hearth",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = kitchens",
+        "era = 1890s",
+        "pear_door = yes",
+        "occasion != christmas day",
+        "year >= 4",
+        "kitchens_elf != hearth"
+      ],
+      "show": [
+        "one small house-elf at the hearth in a tea towel stamped with the school's crest, tied like a toga, great brown eyes, seeing to the fire; she bows very low, and a cup of tea stands on a small silver tray at the near table's west end, a teapot, a milk jug, a plate of biscuits; \"Tea, if it is wanted.\""
+      ],
+      "starts": [
+        "set kitchens_elf = hearth"
+      ],
+      "canon": "Magic's req 2389 (docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897, Contents and the elf; Story's settled 215, Godric's '1, otherwise 3' of 1 November 2026 on req 2296, row 2378): the boy has finished Goblet of Fire (year >= 4, the books-finished list), read when the door is open to him, from the visit after the feast night; once, then 'seen the hearth' on his own record, so a boy finishing mid-year meets her next visit; GoF 21 L28858, L28868, L28878, L28880 for the towel, eyes, tray and bow; one quiet elf, no name, never wages, clothes or freedom (215); the line ours; nothing glows"
+    },
+    {
+      "id": "kitchens.elf-kettle",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = kitchens",
+        "era = 1890s",
+        "pear_door = yes",
+        "occasion != christmas day",
+        "kitchens_elf = hearth",
+        "kitchens_kettle != yes"
+      ],
+      "show": [
+        "the small elf at the hearth looks up from the fire; \"The kettle is on.\""
+      ],
+      "starts": [
+        "set kitchens_kettle = yes"
+      ],
+      "canon": "Magic's req 2389 (docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897, Contents and the elf; Story's settled 215, Godric's '1, otherwise 3' of 1 November 2026 on req 2296, row 2378): the hearth version's second visit line (rooms.md, Her lines); once; ours"
+    },
+    {
+      "id": "kitchens.elf-fire",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 60-200 s",
+      "when": [
+        "place = kitchens",
+        "era = 1890s",
+        "pear_door = yes",
+        "occasion != christmas day",
+        "year >= 4",
+        "kitchens_elf = hearth",
+        "kitchens_fire != yes"
+      ],
+      "show": [
+        "the small elf nods at him warming his hands; \"The fire is kept.\""
+      ],
+      "starts": [
+        "set kitchens_fire = yes"
+      ],
+      "canon": "Magic's req 2389 (docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897, Contents and the elf; Story's settled 215, Godric's '1, otherwise 3' of 1 November 2026 on req 2296, row 2378): Her lines: when he warms his hands (read as a quiet while by the fire); once; ours"
+    },
+    {
+      "id": "kitchens.elf-voice",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "arrive",
+      "when": [
+        "place = kitchens",
+        "era = 1890s",
+        "pear_door = yes",
+        "occasion != christmas day",
+        "year < 4",
+        "kitchens_elf != voice",
+        "kitchens_elf != hearth"
+      ],
+      "show": [
+        "a small unseen voice from behind the near table says \"Tea, if it is wanted.\"; when he turns back, a tray stands at the table's west end, a teapot, one cup, a milk jug, biscuits, and nobody is there"
+      ],
+      "starts": [
+        "set kitchens_elf = voice"
+      ],
+      "canon": "Magic's req 2389 (docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897, Contents and the elf; Story's settled 215, Godric's '1, otherwise 3' of 1 November 2026 on req 2296, row 2378): a boy who has not finished Goblet of Fire hears a voice and finds a tray, never a face; nothing in it says elf, house, service or wages (FDP-37); once, 'heard the voice' on his own record; the room stays warm and empty to the eye; ours"
+    },
+    {
+      "id": "kitchens.elf-pear",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "era = 1890s",
+        "pear_door = yes",
+        "occasion != christmas day",
+        "kitchens_pear != yes",
+        "been kitchens = yes"
+      ],
+      "show": [
+        "\"Mind the pear. It has moods.\""
+      ],
+      "starts": [
+        "set kitchens_pear = yes"
+      ],
+      "canon": "Magic's req 2389 (docs/magic/rooms.md, The kitchens' corridor and the kitchens, 1897, Contents and the elf; Story's settled 215, Godric's '1, otherwise 3' of 1 November 2026 on req 2296, row 2378): Her lines: leaving, once, a wink at the pear's chuckle he met at the feast, said by the elf or from behind the table; the voice version has only this and the first line; explains nothing a book has not shown; ours"
     }
   ]
 }
