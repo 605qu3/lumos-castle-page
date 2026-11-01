@@ -136,12 +136,25 @@
     yawning: 'corbels-faces-yawning.png' };   /* the yawn (req 1313): Godric's candidate 1 on req 1336, 28 October 2026, 12.15 am */
   var FACE_TILT = 0.35, FACE_ASPECT = 0.351 / 0.393, facesBase = '../assets/layers/', faceMats = {}, faceSets = {}, T3 = null;
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  /* v? (Architect, 1 November 2026, Godric on the hospital wing: "the corbel faces are still the wrong colour"): the atlases are drawn
+     in copper pink (mean 173, 133, 123), the walls are stone; once loaded each atlas is turned to its light-and-shade alone, lifted a
+     little, and the material's colour gives it a warm stone. The vault faces in castle-shell.js use faces.stone(THREE, tex) too. */
+  function stoneTexture(tex) {
+    var im = tex.image;
+    if (!im || !im.width || typeof document === 'undefined') return tex;
+    var c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+    var x = c.getContext('2d'); x.drawImage(im, 0, 0);
+    var d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+    for (var i = 0; i < p.length; i += 4) { var l = Math.min(255, (0.3 * p[i] + 0.59 * p[i + 1] + 0.11 * p[i + 2]) * 1.4); p[i] = p[i + 1] = p[i + 2] = l; }
+    x.putImageData(d, 0, 0); tex.image = c; tex.needsUpdate = true; return tex;
+  }
+  var STONE_FACE = 0xe3d8c4;
   function faceMat(THREE, state) {
     T3 = THREE;
     if (!faceMats[state]) {
-      var t = new THREE.TextureLoader().load(facesBase + FACES[state]);
+      var t = new THREE.TextureLoader().load(facesBase + FACES[state], stoneTexture);
       if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; else if (THREE.sRGBEncoding) t.encoding = THREE.sRGBEncoding;
-      faceMats[state] = new THREE.MeshLambertMaterial({ map: t, alphaTest: 0.5 });
+      faceMats[state] = new THREE.MeshLambertMaterial({ map: t, color: STONE_FACE, alphaTest: 0.5 });
     }
     return faceMats[state];
   }
@@ -425,5 +438,5 @@
     return G;
   }
 
-  window.CastleCeilings = { forPlace: forPlace, surround: surround, corbels: corbels, yawn: { levels: yawnLevels, set: yawnSet, rule: YAWN }, faces: { files: FACES, list: function (id) { return (faceSets[id] || []).slice(); }, cell: function (id, k) { return (hash(id) + k) % 6; }, base: function (b) { if (b) facesBase = b; return facesBase; } }, arch: arch, rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
+  window.CastleCeilings = { forPlace: forPlace, surround: surround, corbels: corbels, yawn: { levels: yawnLevels, set: yawnSet, rule: YAWN }, faces: { files: FACES, stone: stoneTexture, color: STONE_FACE, list: function (id) { return (faceSets[id] || []).slice(); }, cell: function (id, k) { return (hash(id) + k) % 6; }, base: function (b) { if (b) facesBase = b; return facesBase; } }, arch: arch, rule: { SPRING_MIN: SPRING_MIN, RISE_MAX: RISE_MAX, AISLE_MAX: AISLE_MAX, BEAM_STEP: BEAM_STEP, PIER_R: PIER_R } };
 })();
