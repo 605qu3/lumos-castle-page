@@ -195,13 +195,33 @@
         "occasion != christmas day",
         "occasion != easter",
         "log_page != planet",
-        "log_page != eclipse"
+        "log_page != eclipse",
+        "log_page != shower",
+        "era = books"
       ],
       "show": [
         "the open log on the sloped desk, its drawn moon going through the phases the class logged, a slow round of about half a minute with a breath's pause at the full",
         "once a round a small comet crossing the page's corner, its tail an inked stroke, and gone"
       ],
       "canon": "Magic's req 925, the log's moving page: wizard pictures move (PS 6 L2088, OotP 23 L46499), the class's own sky log (PS 8 L2732); no name on the page, the year on its spine, nothing more"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page != planet",
+        "log_page != eclipse",
+        "log_page != shower",
+        "era = 1890s"
+      ],
+      "show": [
+        "the open log on the sloped desk, its drawn moon going through the phases the class logged, a slow round of about half a minute with a breath's pause at the full",
+        "once a round a meteor's short inked streak crossing the page's corner, one stroke of the pen, and gone"
+      ],
+      "canon": "Magic's req 2470 (docs/magic/rooms.md, Professor Alcor's star-chart room, 1897): no comet is named for the boys' autumn, and a comet in a log would have to be one the 1897 sky really had, so the corner's crossing is a meteor's short inked streak; the books' comet stays in the books' castle (era = books)"
     },
     {
       "when": [
@@ -237,12 +257,43 @@
         "time = night",
         "occasion != christmas",
         "occasion != christmas day",
-        "occasion != easter"
+        "occasion != easter",
+        "era = books"
       ],
       "show": [
         "the open log's spine marked with its year, no name on the page"
       ],
       "canon": "Magic's req 925: the year on its spine, nothing more"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "era = 1890s",
+        "date >= 09-01"
+      ],
+      "show": [
+        "the open log's spine marked 1897, no name on the page"
+      ],
+      "canon": "Magic's req 2470 (docs/magic/rooms.md, Professor Alcor's star-chart room, 1897): the open log is Professor Alcor's own class's, its spine reading the castle's year, 1897 from the start of the school year"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "era = 1890s",
+        "date < 09-01"
+      ],
+      "show": [
+        "the open log's spine marked 1898, no name on the page"
+      ],
+      "canon": "Magic's req 2470 (docs/magic/rooms.md, Professor Alcor's star-chart room, 1897): the same spine after the New Year, the castle's year turned"
     },
     {
       "when": [
@@ -252,6 +303,20 @@
         "the shelved logs in their rows, shut and still, each spine a year; only the open one moves"
       ],
       "canon": "Magic's req 925, the shelves' logs; Interiors' row (docs/interiors/astronomy-rooms.md, floor 3): a log pulled is Interaction's and stays shut"
+    },
+    {
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = shower"
+      ],
+      "show": [
+        "the open log's page turned to the shower's, a handful of short ink strokes crossing it one after another from a point in the Lion and gone, none of them striking anything"
+      ],
+      "canon": "Magic's req 2470 (docs/magic/rooms.md, Professor Alcor's star-chart room, 1897): the real extra streaks that night's sky has in the weeks round the middle of November (the Leonids, 14 to 20 November; the top's falling stars, req 1349); a page she drew with her class, not a page of the 1866 storm; no comet named on it; the strokes fall on nothing"
     }
   ],
   "records": [
@@ -268,7 +333,8 @@
         "occasion != christmas day",
         "occasion != easter",
         "log_page != planet",
-        "log_page != eclipse"
+        "log_page != eclipse",
+        "log_page != shower"
       ],
       "show": [
         "the log's page turning to a planet's slow loop against the stars, inked over weeks"
@@ -301,7 +367,7 @@
       "canon": "Magic's req 925, his tap on the log (ours): the page turns to another night the class drew, three pages, round again; the log never closes"
     },
     {
-      "id": "astronomy-rooms.log-moons",
+      "id": "astronomy-rooms.log-moons-early",
       "tier": "fixed",
       "source": "device",
       "leans": [],
@@ -312,7 +378,8 @@
         "occasion != christmas",
         "occasion != christmas day",
         "occasion != easter",
-        "log_page = eclipse"
+        "log_page = eclipse",
+        "date < 11-08"
       ],
       "show": [
         "the log's page turning back to the class's month of moons"
@@ -321,6 +388,75 @@
         "set log_page = moons"
       ],
       "canon": "Magic's req 925, his tap on the log (ours): the page turns to another night the class drew, three pages, round again; the log never closes"
+    },
+    {
+      "id": "astronomy-rooms.log-moons-late",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night-log",
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = eclipse",
+        "date > 11-26"
+      ],
+      "show": [
+        "the log's page turning back to the class's month of moons"
+      ],
+      "starts": [
+        "set log_page = moons"
+      ],
+      "canon": "Magic's req 925, his tap on the log (ours): the page turns to another night the class drew, three pages, round again; the log never closes"
+    },
+    {
+      "id": "astronomy-rooms.log-shower",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night-log",
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = eclipse",
+        "date >= 11-08",
+        "date <= 11-26"
+      ],
+      "show": [
+        "the log's page turning to the shower's, a handful of short ink strokes crossing it from a point in the Lion"
+      ],
+      "starts": [
+        "set log_page = shower"
+      ],
+      "canon": "Magic's req 2470 (docs/magic/rooms.md, Professor Alcor's star-chart room, 1897): a fourth page of the same kind as the three, round only in the weeks of the middle of November, beside req 1349's falling stars; the real streaks of the castle's date"
+    },
+    {
+      "id": "astronomy-rooms.log-moons-from-shower",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "tap night-log",
+      "when": [
+        "place = astronomy night books",
+        "time = night",
+        "occasion != christmas",
+        "occasion != christmas day",
+        "occasion != easter",
+        "log_page = shower"
+      ],
+      "show": [
+        "the log's page turning back to the class's month of moons"
+      ],
+      "starts": [
+        "set log_page = moons"
+      ],
+      "canon": "Magic's req 2470 (docs/magic/rooms.md, Professor Alcor's star-chart room, 1897): the round closes on the moons"
     },
     {
       "id": "astronomy-rooms.log-planet-leave",
@@ -343,6 +479,19 @@
       "moment": "leave",
       "when": [
         "log_page = eclipse"
+      ],
+      "starts": [
+        "set log_page = moons"
+      ]
+    },
+    {
+      "id": "astronomy-rooms.log-shower-leave",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "leave",
+      "when": [
+        "log_page = shower"
       ],
       "starts": [
         "set log_page = moons"

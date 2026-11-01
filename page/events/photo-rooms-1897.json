@@ -1,0 +1,69 @@
+{
+  "chain": "photo-rooms-1897",
+  "about": "The first floor's photographic rooms of 1897 (Magic's req 2481): the pupils' darkroom (the tray, the drying line, the old print) and the club's studio (the camera's flash). Professor Naso's records room and the staff library are silent by Magic's table.",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = lake tower 1"
+      ],
+      "show": [
+        "a line of prints hung to dry across the room, the people on them waving at a boy who passes under"
+      ],
+      "canon": "Magic's req 2481 (docs/magic/rooms.md, The first floor's photographic rooms, 1897): \"smiling and waving at him from every page\" (PS 17 L6465, wizard photographs, read in the canon tool, 1 November 2026); plain prints of the castle and the club's friends, no wave is a greeting from anyone the boys know"
+    },
+    {
+      "when": [
+        "place = lake tower 1"
+      ],
+      "show": [
+        "at the line's far end an old print with two small blurred figures in a corridor, walking out of the frame at one side, the corridor standing empty a while, then the figures back"
+      ],
+      "canon": "Magic's req 2481 (docs/magic/rooms.md, The first floor's photographic rooms, 1897): Story's settled 190 and 211: taken years before the boys came; never explained, a seed that tells a reader of a later book nothing early (FDP-37); ours for how it moves"
+    },
+    {
+      "when": [
+        "place = tudor bay 1"
+      ],
+      "show": [
+        "the stool and the backdrop, the brass camera under a cloth on its legs, nothing set up and no one to pose for"
+      ],
+      "canon": "Magic's req 2481 (docs/magic/rooms.md, The first floor's photographic rooms, 1897): the studio otherwise bare; ours"
+    }
+  ],
+  "records": [
+    {
+      "id": "photo-rooms-1897.tray-develops",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap developing tray",
+      "when": [
+        "place = lake tower 1"
+      ],
+      "show": [
+        "a print laid in the tray lies still for a moment; then its figures begin to move"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2481 (docs/magic/rooms.md, The first floor's photographic rooms, 1897): \"if I develop the film in the right potion, the pictures'll move\" (CoS 6 L8469, a pupil's own camera, read in the canon tool, 1 November 2026); a plate is a still thing until the potion has it, ours for the moment's length; nothing glows (the potion is only a liquid)"
+    },
+    {
+      "id": "photo-rooms-1897.camera-flash",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap brass camera",
+      "when": [
+        "place = tudor bay 1",
+        "time != night"
+      ],
+      "show": [
+        "the brass camera flashes blindingly, a puff of purple smoke curling up and dying away; the plate is his to take through to the darkroom next door, and what he makes there is his own and stays private on his iPad"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2481 (docs/magic/rooms.md, The first floor's photographic rooms, 1897): \"emitted puffs of purple smoke with every blinding flash\" (CoS 4 L7793, an everyday wizard camera); the flash is the camera's own light; what a boy makes is private (FDP-25)"
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "chain": "ground-floor-1897",
+  "about": "Eight ground-floor rooms of 1897 from Magic's catalogue (reqs 2473 and 2478): the duelling practice room, the visitors' parlour, the post room, the staff dining room, the Gobstones Club's room, the old music room, the Keeper's Key Room (the old lodge) and the Quidditch kit room. The visitors' fire waits on Story (req 2474) and the squirt's softening on Story and Godric (req 2480, 2483); both marked.",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = duelling practice room",
+        "hour >= 19",
+        "hour < 22"
+      ],
+      "show": [
+        "pairs of pupils at the club's practice, wands in hand, facing one another along the chalked floor; an ordinary evening's practice"
+      ],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): an ordinary practice evening (world rules, Classes; never CoS 11's night); the spells are the lesson's, never this table's; the club's evening stands for hour 19 to 22, ours"
+    },
+    {
+      "when": [
+        "place = duelling practice room",
+        "hour < 19"
+      ],
+      "show": [
+        "the room empty and still, the gauntlets on the plank bench, no mark on the wall, nothing left that tells what was done"
+      ],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): after the club and before it, outside the club's night: empty, unmarked; ours"
+    },
+    {
+      "when": [
+        "place = duelling practice room",
+        "hour >= 22"
+      ],
+      "show": [
+        "the room empty and still, the gauntlets on the plank bench, no mark on the wall, nothing left that tells what was done"
+      ],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): after the club: empty, unmarked; ours"
+    },
+    {
+      "when": [
+        "place = visitors parlour"
+      ],
+      "show": [
+        "the fire banked low in the grate, the room cool, nobody there to be waited on; a pamphlet and a teacup on the pedestal table"
+      ],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): quiet and banked, the pamphlet and teacup as Interiors has them (docs/interiors/ground-floor-lived-in-1029.md)"
+    },
+    {
+      "when": [
+        "place = post room",
+        "hour >= 8",
+        "hour < 10",
+        "meal = none"
+      ],
+      "show": [
+        "the morning's letters sliding one by one out of the sack and into the pigeonholes, each to its own slot, the overstuffed slot taking one more than it should and holding"
+      ],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): the letters the owls leave here rather than at the table (\"about a hundred owls\", PS 8 L2754, read in the canon tool, 1 November 2026); the sorting is the post's housekeeping, ours; the hours stand for after breakfast"
+    },
+    {
+      "when": [
+        "place = post room"
+      ],
+      "show": [
+        "the pigeonholes colour-coded by how fast a letter is wanted, a letter staying in its colour and gone by next morning"
+      ],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): \"colour-coded depending on how fast you want your letter to get there\" (B3 ch8 L16466, the village's own way, an everyday thing a later book names first and this room may keep)"
+    },
+    {
+      "when": [
+        "place = staff dining room",
+        "meal = dinner"
+      ],
+      "show": [
+        "the supper laid on the golden plates as the door is opened, the dishes there and no one yet in; a boy who walks in is not served"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): \"the feast appeared suddenly on the golden plates\" (PS 10 L3536, the Hall's own way, here for the few places a master takes); ours for the room; the boys' tables are the Hall's and the kitchens'; meal = dinner is the evening meal, 18.30"
+    },
+    {
+      "when": [
+        "place = staff dining room",
+        "meal = none",
+        "hour >= 19",
+        "hour < 22"
+      ],
+      "show": [
+        "the plates wiped clean and the cloth bare, the one pulled-out chair left as it was"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): \"wiped clean\" (GoF 16 L26713, a later book's everyday thing, which may stand in every year); the chair is Interiors'"
+    },
+    {
+      "when": [
+        "place = staff dining room",
+        "meal = none",
+        "hour < 19"
+      ],
+      "show": [
+        "a bare table, the chairs in, nothing laid; the kettle is the staff room's"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): otherwise: bare"
+    },
+    {
+      "when": [
+        "place = staff dining room",
+        "meal = none",
+        "hour >= 22"
+      ],
+      "show": [
+        "a bare table, the chairs in, nothing laid; the kettle is the staff room's"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): otherwise: bare"
+    },
+    {
+      "when": [
+        "place = lake tower g",
+        "hour >= 19",
+        "hour < 22"
+      ],
+      "show": [
+        "a game going in the chalk rings, the stones rolled; a point lost and a stone squirts a nasty-smelling liquid across a player's cuff, and he laughs and takes the cloth that hangs by the door"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): \"squirt a nasty-smelling liquid\" (PA 4 L14230, read in the canon tool, 1 November 2026); the club's players take it on a cuff; if the boys join (Story's pair against a pair, never brother against brother) it lands on a sleeve and a cloth is handed them, never a face (FDP-11); the softening is provisional, Story to confirm (req 2480, put to Godric as req 2483)"
+    },
+    {
+      "when": [
+        "place = lake tower g"
+      ],
+      "show": [
+        "one old set in the cabinet with a stone missing, the stone lying loose in the corner"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): \"an old set of Gobstones\" (GoF 20 L28353) and \"old Gobstones\" (OotP 14 L41614), a later book's everyday thing that may stand in every year; ours for the room"
+    },
+    {
+      "when": [
+        "place = lake tower g"
+      ],
+      "show": [
+        "the board of past captains in gilt, strangers all, not a name the boys know"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): strangers all (Story), none from a later book's years; the captain's photograph (HBP 25 L63954) is held for the books' years and is not hung; the name is never read aloud to a boy (FDP-37); the names are Story's (req 2480)"
+    },
+    {
+      "when": [
+        "place = tudor bay g"
+      ],
+      "show": [
+        "the school song's sheet on the square piano's stand, words only, no notes; a cupboard of school instruments by the wall"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): \"everyone pick their favorite tune\" (PS 7 L2617): a boy who sings it picks his own, and the room does not correct it; ours for the stand"
+    },
+    {
+      "when": [
+        "place = porters lodge",
+        "time != night",
+        "hour < 18"
+      ],
+      "show": [
+        "each key hanging under its door's brass tag on the board; a key a master borrowed is not back yet"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): the board of keys; the room is Mrs. Wardlaw's (settled 203); ours"
+    },
+    {
+      "when": [
+        "place = porters lodge",
+        "hour >= 18"
+      ],
+      "show": [
+        "every key back on its hook under its brass tag, no hand having hung them, the doors they open locked again"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): a key a master has borrowed is back on its hook by the evening bell with no hand to hang it, the door locked again as alohomora-1897.md (rule 5) has locks lock; ours"
+    },
+    {
+      "when": [
+        "place = quidditch kit room"
+      ],
+      "show": [
+        "a strapped ball chest by the wall"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): the chest strapped shut (\"the three balls left inside the box\", PS 10 L3456)"
+    },
+    {
+      "when": [
+        "place = quidditch kit room",
+        "weather = rain"
+      ],
+      "show": [
+        "a jumper and a scarf hung on the airer, dry within the hour"
+      ],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): \"Professor Flitwick had dried himself off with a wave of his wand\" (HBP 17 L60868, a later book's everyday thing that may stand in every year); the airer is Interiors'"
+    }
+  ],
+  "records": [
+    {
+      "id": "ground-floor-1897.duelling-sparks",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 20-70 s",
+      "when": [
+        "place = duelling practice room",
+        "hour >= 19",
+        "hour < 22"
+      ],
+      "show": [
+        "a charm goes wide and a stream of red and gold sparks spills out of a wand's end, throwing dancing spots of light on the stone, drifting along it and going out; the wall is as it was"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): \"a stream of red and gold sparks ... throwing dancing spots of light on to the walls\" (PS 5 L1649, a wand's sparks, read in the canon tool, 1 November 2026); the sparks fade on their own, no rule drinks them; nothing is struck, nothing is harmed"
+    },
+    {
+      "id": "ground-floor-1897.parlour-fire-click",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = visitors parlour",
+        "time = day"
+      ],
+      "show": [
+        "a grown-up visitor is shown in by the Keeper of Keys, who clicks her fingers; a fire bursts into life in the grate, and she goes"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2473, the visitors' parlour row, offered to Story as req 2474 and put to Godric as req 2477: the Keeper's click of her fingers (B3 ch3 L14089, the Leaky Cauldron's parlour, an everyday wizard's way with a fire, read in the canon tool, 1 November 2026); no words given to her",
+      "aside": "held for Story's answer on req 2474 (Godric's req 2477): the click of the fingers is an offer not yet taken; remove this key when it is, drop the record when it is not"
+    },
+    {
+      "id": "ground-floor-1897.own-letter",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "post-own-letter",
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = post room",
+        "time != night",
+        "hour >= 8",
+        "hour < 17"
+      ],
+      "show": [
+        "a letter for him among the day's, in the slot of his house, and he takes it down"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): a boy's own letter now and then, taken by his hand; Howlers are the brother-post's and not this room's, and the owl post between the boys (B26) is the owls' own and not routed through here; what it says is the boy's and private (FDP-25)"
+    },
+    {
+      "id": "ground-floor-1897.own-letter-none",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "post-own-letter",
+      "weight": 3,
+      "moment": "arrive",
+      "when": [
+        "place = post room",
+        "time != night",
+        "hour >= 8",
+        "hour < 17"
+      ],
+      "show": [],
+      "starts": [],
+      "canon": "Magic's req 2473 (docs/magic/rooms.md, Three ground-floor rooms the catalogue lacked, 1897): the other half of the draw: no letter this time"
+    },
+    {
+      "id": "ground-floor-1897.instrument-cupboard",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap instrument cupboard",
+      "when": [
+        "place = tudor bay g"
+      ],
+      "show": [
+        "he takes one out, and it sounds a little truer in his hands than it should; the square piano stays out of tune"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): ours: as a piano out of tune never is for long to a child who is trying; nothing lights, nothing is marked"
+    },
+    {
+      "id": "ground-floor-1897.bell-board",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 40-120 s",
+      "when": [
+        "place = porters lodge",
+        "time != night"
+      ],
+      "show": [
+        "a bell on the board rings and its numbered flag drops for the room that called; a while later the flag rights itself, the Keeper having been"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): a master or a prefect calls; ours, an 1897 household thing; whose bell board it is stays Story's (req 2480, question 3), so the cue says only the room's"
+    },
+    {
+      "id": "ground-floor-1897.keepers-ring",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = porters lodge",
+        "time != night"
+      ],
+      "show": [
+        "her ring of keys jingling nearby, heard before she is seen"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): the Keeper's ring at her belt (settled 203); the sound is the sound schedule's single drop (docs/magic/sound-day.md), this cue is the line a boy would read"
+    },
+    {
+      "id": "ground-floor-1897.ball-chest-knock",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "wait 60-180 s",
+      "when": [
+        "place = quidditch kit room"
+      ],
+      "show": [
+        "a dull knock from inside the strapped chest, the lid lifting a finger's width and settling, a Bludger testing it"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): the ordinary two, never aimed at anyone; the rogue one of CoS 10 L10025 is the book's and is not used; ours for the knock"
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "chain": "prefects-bathroom",
+  "about": "The prefects' bathroom of 1897 (Magic's req 2495; Interiors' taps req 2496, the mermaid People's req 2498, the pool the Architect's req 2497). Held: the egg, Myrtle, Cedric's password (plot).",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = prefects bathroom",
+        "time != night"
+      ],
+      "show": [
+        "softly lit, the high windows carrying the light across white marble; the chandelier's candles unlit by day"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): \"softly lit by a splendid candle-filled chandelier, and everything was made of white marble\" (GoF 25 L30368, read in the canon tool, 1 November 2026); the candles lit with the castle's lamplighting"
+    },
+    {
+      "when": [
+        "place = prefects bathroom",
+        "time = night"
+      ],
+      "show": [
+        "softly lit by a splendid chandelier of candles, everything made of white marble"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): same source, the candles lit from dusk"
+    },
+    {
+      "when": [
+        "place = prefects bathroom"
+      ],
+      "show": [
+        "about a hundred golden taps standing around the pool's edge, each with a differently coloured jewel set into its handle; long white linen curtains at the windows and a pile of fluffy white towels in a corner"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): GoF 25 L30368; the taps' jewels are stones and nothing glows; the pool is the Architect's option 1, a shallow marble basin set into the floor, queued behind req 2404 (Architect's answer on req 2497: the shell has no pool yet)"
+    },
+    {
+      "when": [
+        "place = prefects bathroom"
+      ],
+      "show": [
+        "a blonde mermaid fast asleep on a rock in a single golden-framed painting on the wall, her long hair over her face, fluttering every time she snores"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): \"a single golden-framed painting on the wall. It featured a blonde mermaid who was fast asleep on a rock, her long hair over her face. It fluttered every time she snored\" (GoF 25 L30368); asleep always in 1897; she does not wake or speak (awake is the egg night's, held); the painting is People's (req 2498)"
+    },
+    {
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = pink"
+      ],
+      "show": [
+        "pink and blue bubbles the size of footballs heaped on the water, coloured steam wafting over it"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): (GoF 25 L30372, L30374)"
+    },
+    {
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = ice"
+      ],
+      "show": [
+        "ice-white foam so thick it would bear a boy's weight, white steam wafting over the water"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): (GoF 25 L30372, L30374)"
+    },
+    {
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = purple"
+      ],
+      "show": [
+        "heavily perfumed purple clouds hovering over the water, purple steam wafting"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): (GoF 25 L30372, L30374)"
+    },
+    {
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = jet"
+      ],
+      "show": [
+        "a jet bouncing off the water in large arcs, blue steam wafting over it"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): (GoF 25 L30372, L30374)"
+    }
+  ],
+  "records": [
+    {
+      "id": "prefects-bathroom.tap-pink",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "bath-tap",
+      "weight": 1,
+      "moment": "tap bath tap",
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = off"
+      ],
+      "show": [
+        "the pool filling in a very short time with hot water and foam, pink and blue bubbles the size of footballs rising out of it"
+      ],
+      "starts": [
+        "set bath_run = pink"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): a tap turned, the pool full of hot water, foam and bubbles in \"a very short time considering its size\" (GoF 25 L30372); the books name four kinds, so there are four, and the other taps repeat them (ours); the boys do not bathe: they turn taps and watch from the edge (FDP-25); the basin is the Architect's option 1, queued"
+    },
+    {
+      "id": "prefects-bathroom.tap-ice",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "bath-tap",
+      "weight": 1,
+      "moment": "tap bath tap",
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = off"
+      ],
+      "show": [
+        "the pool filling in a very short time with hot water and ice-white foam, so thick it would bear a boy's weight"
+      ],
+      "starts": [
+        "set bath_run = ice"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): a tap turned, the pool full of hot water, foam and bubbles in \"a very short time considering its size\" (GoF 25 L30372); the books name four kinds, so there are four, and the other taps repeat them (ours); the boys do not bathe: they turn taps and watch from the edge (FDP-25); the basin is the Architect's option 1, queued"
+    },
+    {
+      "id": "prefects-bathroom.tap-purple",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "bath-tap",
+      "weight": 1,
+      "moment": "tap bath tap",
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = off"
+      ],
+      "show": [
+        "the pool filling in a very short time with hot water, heavily perfumed purple clouds hovering over it"
+      ],
+      "starts": [
+        "set bath_run = purple"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): a tap turned, the pool full of hot water, foam and bubbles in \"a very short time considering its size\" (GoF 25 L30372); the books name four kinds, so there are four, and the other taps repeat them (ours); the boys do not bathe: they turn taps and watch from the edge (FDP-25); the basin is the Architect's option 1, queued"
+    },
+    {
+      "id": "prefects-bathroom.tap-jet",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "one_of": "bath-tap",
+      "weight": 1,
+      "moment": "tap bath tap",
+      "when": [
+        "place = prefects bathroom",
+        "bath_run = off"
+      ],
+      "show": [
+        "the pool filling in a very short time, a jet from the tap bouncing off the water in large arcs"
+      ],
+      "starts": [
+        "set bath_run = jet"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): a tap turned, the pool full of hot water, foam and bubbles in \"a very short time considering its size\" (GoF 25 L30372); the books name four kinds, so there are four, and the other taps repeat them (ours); the boys do not bathe: they turn taps and watch from the edge (FDP-25); the basin is the Architect's option 1, queued"
+    },
+    {
+      "id": "prefects-bathroom.taps-off",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap bath tap",
+      "when": [
+        "place = prefects bathroom",
+        "bath_run != off"
+      ],
+      "show": [
+        "the tap turned off; the foam stays a while and thins as foam does"
+      ],
+      "starts": [
+        "set bath_run = off"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): ours: nothing is left over and nothing is lost"
+    },
+    {
+      "id": "prefects-bathroom.room-left",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "leave",
+      "when": [
+        "bath_run != off"
+      ],
+      "show": [],
+      "starts": [
+        "set bath_run = off"
+      ],
+      "canon": "Magic's req 2495 (docs/magic/rooms.md, The prefects' bathroom, 1897): by the next visit the pool is empty and the taps dry, ours"
+    }
+  ]
+}

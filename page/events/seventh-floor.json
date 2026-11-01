@@ -221,45 +221,49 @@
       "when": [
         "place = stair hall",
         "castle date <= 3 10-31",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
         "place = stair hall",
         "castle date <= 3 10-31",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
         "place = stair hall",
         "castle date >= 3 02-08",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
         "place = stair hall",
         "castle date >= 3 02-08",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -267,12 +271,13 @@
         "castle date >= 3 02-02",
         "castle date <= 3 02-07",
         "day of week = 7",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -280,12 +285,13 @@
         "castle date >= 3 02-02",
         "castle date <= 3 02-07",
         "day of week = 7",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -293,12 +299,13 @@
         "castle date >= 3 02-03",
         "castle date <= 3 02-03",
         "day of week <= 1",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -306,12 +313,13 @@
         "castle date >= 3 02-03",
         "castle date <= 3 02-03",
         "day of week <= 1",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -319,12 +327,13 @@
         "castle date >= 3 02-04",
         "castle date <= 3 02-04",
         "day of week <= 2",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -332,12 +341,13 @@
         "castle date >= 3 02-04",
         "castle date <= 3 02-04",
         "day of week <= 2",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -345,12 +355,13 @@
         "castle date >= 3 02-05",
         "castle date <= 3 02-05",
         "day of week <= 3",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -358,12 +369,13 @@
         "castle date >= 3 02-05",
         "castle date <= 3 02-05",
         "day of week <= 3",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -371,12 +383,13 @@
         "castle date >= 3 02-06",
         "castle date <= 3 02-06",
         "day of week <= 4",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -384,12 +397,13 @@
         "castle date >= 3 02-06",
         "castle date <= 3 02-06",
         "day of week <= 4",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -397,12 +411,13 @@
         "castle date >= 3 02-07",
         "castle date <= 3 02-07",
         "day of week <= 5",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: \"A fat, dapple-grey pony\" (PoA 6 L15238), the sword too long for him (PoA 6 L15242), read in the canon tool, 20 October 2026; an everyday thing a later book names first (Kingsley's rule of 16 October); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -410,35 +425,38 @@
         "castle date >= 3 02-07",
         "castle date <= 3 02-07",
         "day of week <= 5",
-        "time = night"
+        "time = night",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), every year: by night snoring in his armour, the pony still grazing (ours, Magic's 1.3); his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
         "place = stair hall",
         "castle date >= 3 11-01",
-        "castle date <= 3 02-01"
+        "castle date <= 3 02-01",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
         "place = stair hall",
         "castle date >= 3 02-02",
         "castle date <= 3 02-02",
-        "day of week <= 6"
+        "day of week <= 6",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -446,12 +464,13 @@
         "castle date >= 3 02-03",
         "castle date <= 3 02-03",
         "day of week >= 2",
-        "day of week <= 6"
+        "day of week <= 6",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -459,12 +478,13 @@
         "castle date >= 3 02-04",
         "castle date <= 3 02-04",
         "day of week >= 3",
-        "day of week <= 6"
+        "day of week <= 6",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -472,12 +492,13 @@
         "castle date >= 3 02-05",
         "castle date <= 3 02-05",
         "day of week >= 4",
-        "day of week <= 6"
+        "day of week <= 6",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -485,12 +506,13 @@
         "castle date >= 3 02-06",
         "castle date <= 3 02-06",
         "day of week >= 5",
-        "day of week <= 6"
+        "day of week <= 6",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
     },
     {
       "when": [
@@ -498,12 +520,35 @@
         "castle date >= 3 02-07",
         "castle date <= 3 02-07",
         "day of week >= 6",
-        "day of week <= 6"
+        "day of week <= 6",
+        "era = books"
       ],
       "show": [
         "on the seventh floor's north landing, the wall bare where Sir Cadogan's painting hung, a paler patch the size of its frame"
       ],
-      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026"
+      "canon": "Magic's req 798 (docs/magic/rooms.md, The seventh floor's north corridor, The east run, to the North Tower's passage, rows Sir Cadogan's painting, Sir Cadogan's dash, his months on her door); his painting on the stair hall's north landing on 7, its east wall, facing west (Godric's 1 on interiors-cadogan-1020, 20 October 2026, 3.59 pm; Interiors' docs/interiors/seventh-floor-corridor.md, The east run, cited), the PoA castle: his months on her door, never staged, nothing shows it moving; the paler patch ours; his landing bare from 1 November, when his portrait replaced the Fat Lady's ripped canvas (PoA 9 L16647), to the Sunday after the first Saturday of February, when it was \"taken back to its lonely landing on the seventh floor\" (PoA 14 L18706), the span of stairhall.json's Fat Lady in the map of Argyllshire, cited; both read in the canon tool, 20 October 2026 | held for the books' years (req 2469): the castle-date window is the PoA castle's, so the rule reads era = books and the 1890s have their own rule beside it"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "era = 1890s",
+        "time != night"
+      ],
+      "show": [
+        "on the seventh floor's north landing, Sir Cadogan's large painting of bare grass, a fat, dapple-grey pony grazing in it and a small knight in armour stamping about, his sword too long for him"
+      ],
+      "canon": "Magic's req 2469 (docs/magic/rooms.md, The seventh floor's north corridor and its east run, 1897): his painting is old enough to hang there (Story's names-1897-floors.md, floor 7) and never leaves its landing, so it stands in every year (PoA 6 L15238 to L15246, read in the canon tool, 1 November 2026); the Fat Lady's canvas is never ripped in 1897, so the bare patch of the PoA castle's Halloween week is not staged (held, era = books)"
+    },
+    {
+      "when": [
+        "place = stair hall",
+        "era = 1890s",
+        "time = night"
+      ],
+      "show": [
+        "on the seventh floor's north landing, Sir Cadogan snoring in his armour on the grass of his painting, the fat grey pony still grazing"
+      ],
+      "canon": "Magic's req 2469 (docs/magic/rooms.md, The seventh floor's north corridor and its east run, 1897): his night snoring in every year, same sources as the day rule"
     }
   ],
   "records": [
@@ -731,7 +776,8 @@
         "place = stair hall",
         "year >= 3",
         "castle date <= 3 10-31",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -752,7 +798,8 @@
       "when": [
         "place = stair hall",
         "castle date >= 3 02-08",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -775,7 +822,8 @@
         "castle date >= 3 02-02",
         "castle date <= 3 02-07",
         "day of week = 7",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -798,7 +846,8 @@
         "castle date >= 3 02-03",
         "castle date <= 3 02-03",
         "day of week <= 1",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -821,7 +870,8 @@
         "castle date >= 3 02-04",
         "castle date <= 3 02-04",
         "day of week <= 2",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -844,7 +894,8 @@
         "castle date >= 3 02-05",
         "castle date <= 3 02-05",
         "day of week <= 3",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -867,7 +918,8 @@
         "castle date >= 3 02-06",
         "castle date <= 3 02-06",
         "day of week <= 4",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -890,7 +942,8 @@
         "castle date >= 3 02-07",
         "castle date <= 3 02-07",
         "day of week <= 5",
-        "time != night"
+        "time != night",
+        "era = books"
       ],
       "show": [
         "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
@@ -954,6 +1007,28 @@
         "set cadogan_quest = off"
       ],
       "canon": "Magic's req 798: the dash lasts one visit"
+    },
+    {
+      "id": "seventh-floor.cadogan-dash-1890s",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap cadogan",
+      "when": [
+        "place = stair hall",
+        "year >= 3",
+        "era = 1890s",
+        "time != night"
+      ],
+      "show": [
+        "\"A quest!\" The small knight clanks to his feet: \"Come follow me, dear friends, and we shall find our goal, or else shall perish bravely in the charge!\"",
+        "he tries and fails to mount the fat pony, cries \"On foot then, good sirs! On! On!\" and runs clanking into the left-hand side of the frame and out of sight"
+      ],
+      "starts": [
+        "set cadogan_quest = run"
+      ],
+      "canon": "Magic's req 2469 (docs/magic/rooms.md, The seventh floor's north corridor and its east run, 1897): the dash from the boys' third castle year, the same gate as the Divination classroom's trapdoor (req 1373): the electives open in the third year and until then no one goes up the North Tower's spiral, so no one asks (the cadogan-challenge rows stand for the first two years); the words are PoA 6 L15252 to L15256, read in the canon tool, 1 November 2026; the book's three pupils are not the boys, and the line is said to any pupil who asks; never by night; the PoA castle's bare-patch months do not apply in 1897"
     }
   ]
 }
