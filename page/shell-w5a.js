@@ -7,6 +7,13 @@ window.SHELL_W5A = {
   mats: { tin: 0x8a8a82, amber: 0xb07a1e, blue: 0x23407a, ruby: 0x8a1c22, lavender: 0x6d6585, petals: 0xa89a8e, copper: 0x8a4a2a, steel: 0x8f9296, dust: 0x77706a,
     deal: 0xa88a5e, mahog: 0x5a2a1e, scarlet: 0x8a1c1c, blanket: 0x7e7262, tartan: 0x6a2a2a, ink: 0x1a1c2a, tallow: 0xe0d4a8 },
   things: {
+    /* H-THINGS k-hide */
+    /* docs/interiors/k-hide.md H56 (req 2164, 2167): a three-legged elm stool facing the way in, a never-lit candle stub in its grease on a ledge in the north wall at 0.45, a grey blanket gone stiff, folded in the west corner; the way in (x 66.6 to 67.4, y 70.3 to 70.9) kept clear */
+    'k-hide': { items: [
+      ['y', 67.65, 71.05, 0.14, 0.26, 0.3, 'oak'], ['y', 67.65, 71.14, 0.02, 0.0, 0.26, 'oak'], ['y', 67.572, 71.005, 0.02, 0.0, 0.26, 'oak'], ['y', 67.728, 71.005, 0.02, 0.0, 0.26, 'oak'],
+      ['b', 67.55, 71.48, 0.4, 67.99, 71.6, 0.45, 'stone'], ['y', 67.8, 71.5, 0.026, 0.45, 0.46, 'tallow'], ['y', 67.8, 71.5, 0.015, 0.46, 0.49, 'tallow'], ['b', 67.797, 71.497, 0.49, 67.803, 71.503, 0.505, 'black'],
+      ['b', 66.18, 70.95, 0, 66.73, 71.35, 0.08, 'dust'], ['b', 66.18, 70.95, 0.08, 66.3, 71.08, 0.105, 'dust']] },
+    /* H-THINGS end k-hide */
     /* H-THINGS listeners-gallery */
     /* docs/interiors/hidden-ways-batch-7.md H42 (req 2163): the small drum laid flat on its rimmed tray halfway along the south wall with dried peas on its skin, the iron lamp on its bracket on the north wall at x 72.8; the flanker's lamp, gun bed and ring bolts are H-THINGS bastion-flanker */
     'listeners-gallery': { items: [
