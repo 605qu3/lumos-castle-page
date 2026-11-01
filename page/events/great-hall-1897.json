@@ -1,0 +1,169 @@
+{
+  "chain": "great-hall-1897",
+  "about": "The Great Hall of 1897 as a table to join (Godric's yes on req 2585, 1 November 2026, under req 2312): he sits at the Gryffindor table and the first-year beside him hands him the toast; he may ask the house ghost, and the candles over that table dip to the question; a dish he takes at dinner comes back changed after the night. Tap ids (gryffindor table, house ghost, pie dish, pudding dish) wait on the Hall's page. The 1990s doings (hall panel, post owl, howler) stay in great-hall.json.",
+  "first_visit": [],
+  "room": [],
+  "records": [
+    {
+      "id": "great-hall-1897.toast",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap gryffindor table",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal = breakfast"
+      ],
+      "show": [
+        "he sits where there is room; the first-year beside him, mid-bite, slides the toast rack over without looking up, and the marmalade after it, as if it were always his"
+      ],
+      "starts": [],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    },
+    {
+      "id": "great-hall-1897.pass-dish",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap gryffindor table",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal != breakfast",
+        "meal != none"
+      ],
+      "show": [
+        "he sits where there is room; the first-year beside him passes the nearest dish along with a nod and goes on talking across the table"
+      ],
+      "starts": [],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    },
+    {
+      "id": "great-hall-1897.ghost-ask",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap house ghost",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal != none"
+      ],
+      "show": [
+        "the house ghost, drifting along the bench behind the diners, inclines his head to the question; the candles above that table dip their flames, all at once, as if leaning in to listen, and rise again when the answer is given"
+      ],
+      "starts": [],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    },
+    {
+      "id": "great-hall-1897.ghost-ask-late",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap house ghost",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal = none"
+      ],
+      "show": [
+        "the house ghost, drifting between the empty benches, inclines his head to the question; the candles over the table dip a little and rise again as he answers"
+      ],
+      "starts": [],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    },
+    {
+      "id": "great-hall-1897.dish-pie",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap pie dish",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal = dinner",
+        "hall_dish != pie"
+      ],
+      "show": [
+        "he takes a helping of the pie; the first-year beside him says it is the best on the table and asks for the crust, and the dish is half-empty by the time it comes round again"
+      ],
+      "starts": [
+        "set hall_dish = pie",
+        "stamp hall_dish_on"
+      ],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    },
+    {
+      "id": "great-hall-1897.dish-pudding",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap pudding dish",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal = dinner",
+        "hall_dish != pudding"
+      ],
+      "show": [
+        "he takes a spoon of the pudding; the first-year beside him leans over to see what it is, then asks for the same"
+      ],
+      "starts": [
+        "set hall_dish = pudding",
+        "stamp hall_dish_on"
+      ],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    },
+    {
+      "id": "great-hall-1897.dish-returns-pie",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal != none",
+        "hall_dish = pie",
+        "nights since hall_dish_on >= 1"
+      ],
+      "show": [
+        "the pie is back on the table with a fresh crust and a little spiced apple tucked in at the edge, the first-year beside him nodding at it as at a thing arranged"
+      ],
+      "starts": [
+        "set hall_dish = none"
+      ],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    },
+    {
+      "id": "great-hall-1897.dish-returns-pudding",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "arrive",
+      "when": [
+        "place = great hall",
+        "era = 1890s",
+        "meal != none",
+        "hall_dish = pudding",
+        "nights since hall_dish_on >= 1"
+      ],
+      "show": [
+        "the pudding is back, with cream poured over it this time, and the first-year beside him already holding out a spoon"
+      ],
+      "starts": [
+        "set hall_dish = none"
+      ],
+      "canon": "Godric's yes on req 2585 (1 November 2026, 1.48 pm, option 1, a table to join), under req 2312 (the ground floor as a game); the tables, the toast and marmalade and the house ghost at his own table are everyday Hall (PS 7 L2545 to L2559; PS 8 L2724; toast and marmalade carried out of the Hall, CoS 7 L8712); the neighbour, the candles' dip and the changed dish are ours"
+    }
+  ]
+}

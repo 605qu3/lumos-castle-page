@@ -42,6 +42,15 @@
     },
     {
       "when": [
+        "place = high street"
+      ],
+      "show": [
+        "a bucket of sand by every shop door, where a stray charm may land harmlessly, and the shopkeepers shrug at one (a spark, a hiccup of light, a hat that floats an inch) and sweep or smile; nothing shames a boy whose spell goes sideways"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The High Street: ours (settled 220))"
+    },
+    {
+      "when": [
         "place = honeydukes"
       ],
       "show": [
@@ -75,6 +84,15 @@
         "the shop is crowded by hours and empty at others: the morning bustle and the after-school crush on the street's days, the quiet of a weekday afternoon, the counter's bell the same either way"
       ],
       "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: B3 ch10 L17246 (crowded with students); ours (the hours))"
+    },
+    {
+      "when": [
+        "place = honeydukes"
+      ],
+      "show": [
+        "now and then the shopkeeper, up a step-stool and short of a reach, asks a boy to float a jar of sweets down from the high shelf ('would you float that down from the high shelf?'), the Levitation Charm the boy has been taught (the books' lesson, B1 ch10 L3518); the jar comes down gently, the shopkeeper thanks him, and nothing more is made of it"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: ours; the charm B1 ch10 L3512, L3518 (the first-years' lesson))"
     },
     {
       "when": [
@@ -121,6 +139,15 @@
         "a few odd magical folk at the back tables, a hag at the end of a bench, never close to the door"
       ],
       "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: B4 ch19 L27904 (a variety of magical people Harry rarely saw elsewhere))"
+    },
+    {
+      "when": [
+        "place = three broomsticks"
+      ],
+      "show": [
+        "now and then, when the back corner is dim, the keeper asks a boy to give it a wand-light for a minute while she finds the lost tankard (Lumos); it is asked as a favour, never as a test, and he is thanked either way"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: ours; the charm B2 ch15 L11941, B3 ch3 L13877)"
     },
     {
       "when": [
@@ -301,6 +328,15 @@
         "a smell of oil and brass polish at the door; a mender's tap-tap on a small cog at the back"
       ],
       "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Dervish and Banges: ours, ordinary)"
+    },
+    {
+      "when": [
+        "place = dervish and banges"
+      ],
+      "show": [
+        "now and then the shopkeeper asks a boy to float a clock or a brass instrument down from the top shelf, or to light a dark corner of the back room with a wand-light (Lumos); the boy does it, the shopkeeper nods, and nothing is made of it"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Dervish and Banges: ours; the charms B1 ch10 L3518, B2 ch15 L11941)"
     },
     {
       "when": [

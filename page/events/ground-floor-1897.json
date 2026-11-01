@@ -139,6 +139,15 @@
     },
     {
       "when": [
+        "place = lake tower g"
+      ],
+      "show": [
+        "a board of past captains on the wall, a dozen Scottish surnames in gilt down the forty years to now, each with a small brown thumb-smudge beside it, the last line this year's captain; strangers all, seen and never read aloud, nothing on it to tap"
+      ],
+      "canon": "Magic's req 2593, from Story's settled 219 (Godric, 1 November 2026, 1.43 pm, his 1 on req 2555; docs/magic/rooms.md, the Gobstones Club's room, the board of captains): a dozen Scottish surnames (Ferrier, Tulloch, Lorimer, Menzies and so on, in none of the seven books, by Story's search), the stained-cuff badge of settled 217 carried onto the board as a thumb-smudge; nobody on it is anyone the boys know, no name from a later book hangs there; a captain's photograph (HBP 25 L63954) is held for the books' years and not hung; the name is never read aloud to a boy (FDP-37); a thing seen, not tapped"
+    },
+    {
+      "when": [
         "place = tudor bay g"
       ],
       "show": [
