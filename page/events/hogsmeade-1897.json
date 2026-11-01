@@ -1,0 +1,569 @@
+{
+  "chain": "hogsmeade-1897",
+  "about": "The 1897 village's hooks from Magic's docs/magic/pass2-hooks-hogsmeade.md (req 2576): the High Street, the shops and inns by shop not by front, the village edge, the station and road. No spell is answered until Story rules (held in every row); the keepers are name to come. Place ids are provisional until Hogsmeade's pages name them. Built by tools/make-hogsmeade-1897-chain.py.",
+  "first_visit": [],
+  "room": [
+    {
+      "when": [
+        "place = high street",
+        "season = winter"
+      ],
+      "show": [
+        "smoke from the thatch chimneys leans down the street the same way on a cold day, thickest over the inns, and rain or snow lies on the heather thatch as on any roof; in December holly wreaths on the doors and strings of enchanted candles in the trees, a lamp in each upper window from dusk"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The High Street: B3 ch10 L17310 (snow on the thatched cottages and shops, holly wreaths, enchanted candles in the trees); B6 ch25 L64340 (lights twinkling in the windows over the shops at night))"
+    },
+    {
+      "when": [
+        "place = high street"
+      ],
+      "show": [
+        "the wind off the mountain funnels along the street: scarves lift, a door-hung board swings, a hat is held on; heads go down going up the street toward the castle road"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The High Street: B3 ch10 L17312, L17322 (the wind fierce, heads bowed, 'up the street'))"
+    },
+    {
+      "when": [
+        "place = high street"
+      ],
+      "show": [
+        "a few villagers about their errands, in and out of the doors, a witch with a basket, a wizard's hat set straight at a window; no name, no spoken line; now and then a hooded figure crosses and nobody looks"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The High Street: B4 ch19 L27904 (the only all-wizard village, a haven for hags and other magical folk); B5 ch16 L42876 (hoods a fashion); ours (the walkers))"
+    },
+    {
+      "when": [
+        "place = high street"
+      ],
+      "show": [
+        "an owl crosses the street high and fast from the post office's roof toward the castle and, later, one comes back down"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The High Street: B5 ch16 L42870 (owls issuing at regular intervals))"
+    },
+    {
+      "when": [
+        "place = honeydukes"
+      ],
+      "show": [
+        "the door's bell tinkles as it opens and shuts; behind the counter a door to the cellar stair, the owners' feet overhead (they live over the shop), a kettle singing up there"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: B3 ch10 L17236 (the tinkle of a bell and the opening and shutting of a door), L17244 (the door at the stair's top behind the counter), L17292 (the owners live over the shop); the kettle ours)"
+    },
+    {
+      "when": [
+        "place = honeydukes"
+      ],
+      "show": [
+        "shelves upon shelves: nougat, coconut ice, toffees, chocolate in neat rows, a barrel of Every Flavour Beans and another of Fizzing Whizzbees, from which a few sherbet balls rise an inch and settle again"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: B3 ch10 L17248 (the shelves; Fizzing Whizzbees 'the levitating sherbert balls'), L17306 (the barrel, Jelly Slugs, Acid Pops))"
+    },
+    {
+      "when": [
+        "place = honeydukes"
+      ],
+      "show": [
+        "a tray of fudge samples at the counter, one taken and, a breath later, another set in its place by the keeper's hand; a Pepper Imp lets out a small curl of smoke from a jar's mouth; Ice Mice squeak in their box"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: B3 ch8 L16468 (free samples of the new fudge); B3 ch5 L14771 (Pepper Imps 'make you smoke at the mouth'); B3 ch10 L17248 (Ice Mice, 'hear your teeth chatter and squeak'))"
+    },
+    {
+      "when": [
+        "place = honeydukes"
+      ],
+      "show": [
+        "the shop is crowded by hours and empty at others: the morning bustle and the after-school crush on the street's days, the quiet of a weekday afternoon, the counter's bell the same either way"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: B3 ch10 L17246 (crowded with students); ours (the hours))"
+    },
+    {
+      "when": [
+        "place = three broomsticks"
+      ],
+      "show": [
+        "crowded, noisy, warm and smoky: a fire in the fireplace, the bar served by the keeper (name to come), talk with no one's words in it, tankards set down"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: B3 ch10 L17324 (extremely crowded, noisy, warm and smoky), L17328 (a small vacant table between the window and the fireplace); the keeper is 1990s Rosmerta's place, name to come)"
+    },
+    {
+      "when": [
+        "place = three broomsticks",
+        "season = winter"
+      ],
+      "show": [
+        "in December a handsome Christmas tree stands by the fire; the door opens now and then and the snowflakes come in with whoever does"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: B3 ch10 L17328 (the handsome Christmas tree next to the fireplace), L17336 (a flurry of snowflakes))"
+    },
+    {
+      "when": [
+        "place = three broomsticks"
+      ],
+      "show": [
+        "tankards of hot Butterbeer carried to the tables foaming, steam off each"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: B3 ch8 L16464 (foaming mugs of hot Butterbeer); B3 ch10 L17328)"
+    },
+    {
+      "when": [
+        "place = three broomsticks"
+      ],
+      "show": [
+        "the sign over the door, a bracketed board of three painted broomsticks, swings a little on its arm in a gust and the iron answers"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: docs/hogsmeade (the sheet's iron arm, two hangers); ours (the creak, as the Hog's Head's is the books'))"
+    },
+    {
+      "when": [
+        "place = three broomsticks"
+      ],
+      "show": [
+        "a few odd magical folk at the back tables, a hag at the end of a bench, never close to the door"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: B4 ch19 L27904 (a variety of magical people Harry rarely saw elsewhere))"
+    },
+    {
+      "when": [
+        "place = hogs head"
+      ],
+      "show": [
+        "the sign over the door creaks on its rusty bracket in the wintry wind, and again on a still day, a little, with no breeze at all"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Hog's Head: B5 ch24 L46994 (the sign creaking in the wintry wind); B6 ch25 L64346 (creaked a little, though there was no breeze))"
+    },
+    {
+      "when": [
+        "place = hogs head"
+      ],
+      "show": [
+        "one small, dingy, very dirty bar room: candle stubs lit on the wooden tables, the bay windows so grimed the daylight barely comes through, a smell that might be goats"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Hog's Head: B5 ch16 L42874 (the room, the candle stubs, the grimed bay windows, the smell of goats))"
+    },
+    {
+      "when": [
+        "place = hogs head"
+      ],
+      "show": [
+        "a goat bleats once from the yard behind, a sack is dragged, a pail set down"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Hog's Head: ours, from the smell of goats (B5 ch16 L42874); an ordinary village yard)"
+    },
+    {
+      "when": [
+        "place = hogs head"
+      ],
+      "show": [
+        "two or three hooded customers at the far tables, talking low and keeping to themselves; the talk stops for a breath when the door opens and goes on"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Hog's Head: B5 ch16 L42876 (hoods a fashion in the Hog's Head), B1 ch16 L5512 (a lot of funny folk in the Hog's Head))"
+    },
+    {
+      "when": [
+        "place = hogs head"
+      ],
+      "show": [
+        "quieter than the Three Broomsticks: of an evening it is almost empty, the fire low"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Hog's Head: B6 ch25 L64346 (in contrast to the Three Broomsticks, completely empty))"
+    },
+    {
+      "when": [
+        "place = inn 1612"
+      ],
+      "show": [
+        "the oldest house on the street, long and low at the bend: a thin line of smoke, a settle by the door, a lamp lit in its small windows long before the others"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The 1612 inn (name to come): B3 ch5 L14773 (the inn was the goblin rebellion's headquarters in 1612; the books name no inn); lots.json note (the oldest house at the bend); ours (the smoke, the lamp))"
+    },
+    {
+      "when": [
+        "place = inn 1612"
+      ],
+      "show": [
+        "a dog asleep across the doorstep, and it lifts its head at a boy and lowers it"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The 1612 inn (name to come): ours, ordinary)"
+    },
+    {
+      "when": [
+        "place = post office"
+      ],
+      "show": [
+        "about two hundred owls on shelves, colour-coded by how fast the letter should go, from Great Greys down to tiny Scops owls marked 'Local Deliveries Only', hooting softly, ruffling, one shifting its weight"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The post office: B3 ch8 L16466 (about two hundred owls on shelves, colour-coded); B3 ch14 L18886 (hooting softly, Great Greys to Scops owls, 'Local Deliveries Only'))"
+    },
+    {
+      "when": [
+        "place = post office"
+      ],
+      "show": [
+        "owls issue from it at regular intervals, one out through the roof hatch, a minute later a returning owl drops onto a shelf and a clerk's hand takes the parcel from its leg"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The post office: B5 ch16 L42870 (owls issued at regular intervals); the hatch and the clerk are ours)"
+    },
+    {
+      "when": [
+        "place = post office"
+      ],
+      "show": [
+        "owls along the ridge of the roof outside, three or four, turning their heads to follow a boy up the street"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The post office: docs/hogsmeade sheet (owls along the ridge); ours)"
+    },
+    {
+      "when": [
+        "place = post office"
+      ],
+      "show": [
+        "feathers on the floor boards, swept now and then into a drift by the door"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The post office: ours, ordinary)"
+    },
+    {
+      "when": [
+        "place = zonkos"
+      ],
+      "show": [
+        "tins and boxes of jokes and tricks to the rafters, a hundred small things going off a little each: a hiccup from a tin of Belch Powder when its lid is lifted a crack, a soft pop from a box of Whizzing Worms, a faint stink from the back room's door and never at the front"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Zonko's Joke Shop: B3 ch8 L16336 (Stink Pellets, Belch Powder and Whizzing Worms), L16146 (Stink Pellets); B3 ch14 L18888 (jokes and tricks to fulfil the wildest dreams); the small sounds ours)"
+    },
+    {
+      "when": [
+        "place = zonkos"
+      ],
+      "show": [
+        "packed with pupils on the street's days, so a boy goes carefully not to tread on anyone; an empty, quiet shop the other days"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Zonko's Joke Shop: B3 ch14 L18888 (so packed with students that Harry had to take great care not to tread on anyone))"
+    },
+    {
+      "when": [
+        "place = zonkos"
+      ],
+      "show": [
+        "a window of hung goods, a rattle of something in a drawer the keeper shuts with a knee"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Zonko's Joke Shop: docs/hogsmeade sheet (goods hung in the window, the red fascia); ours)"
+    },
+    {
+      "when": [
+        "place = scrivenshafts"
+      ],
+      "show": [
+        "a handsome display of pheasant-feather quills in the window, their vanes lifting and lying down together in the draught each time the door opens"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Scrivenshaft's Quill Shop: B5 ch16 L43156 (a handsome display of pheasant feather quills in the window); the draught ours, ordinary)"
+    },
+    {
+      "when": [
+        "place = scrivenshafts"
+      ],
+      "show": [
+        "a dry scratch from the back of the shop where a clerk trims a nib, shavings curling into a tin, an inkwell stopper set down"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Scrivenshaft's Quill Shop: ours, ordinary)"
+    },
+    {
+      "when": [
+        "place = scrivenshafts"
+      ],
+      "show": [
+        "on a wet day a drip from the awning onto the step and a mat inside for boots"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Scrivenshaft's Quill Shop: B5 ch25 L47633 (rain as they passed Scrivenshaft's); ours)"
+    },
+    {
+      "when": [
+        "place = dervish and banges"
+      ],
+      "show": [
+        "a wizarding equipment shop: brass and glass instruments hung in the window and from the beams on cords, turning slowly in the door's draught, a needle swinging to a quarter and settling, never pointing out a person"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Dervish and Banges: B3 ch5 L14763 (magical instruments and stuff), B3 ch8 L16464 (the wizarding equipment shop); the hung brass is the sheet's; the turning is ours)"
+    },
+    {
+      "when": [
+        "place = dervish and banges"
+      ],
+      "show": [
+        "the last shop before the lane to the stile: a boy walking up the High Street passes its dressed stone corners and its tall chimney, and the street's sounds thin behind him"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Dervish and Banges: B4 ch27 L31246, L31402 (past Dervish and Banges and out to the village's edge))"
+    },
+    {
+      "when": [
+        "place = dervish and banges"
+      ],
+      "show": [
+        "a smell of oil and brass polish at the door; a mender's tap-tap on a small cog at the back"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Dervish and Banges: ours, ordinary)"
+    },
+    {
+      "when": [
+        "place = gladrags"
+      ],
+      "show": [
+        "robes hung in the wide window on stands, a sleeve settling now and then as if someone had just moved it; hats on pegs"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Gladrags Wizardwear: docs/hogsmeade sheet (robes hung in the wide window); ours)"
+    },
+    {
+      "when": [
+        "place = gladrags"
+      ],
+      "show": [
+        "a drawer of socks, lurid ones: a pair patterned with gold and silver stars that wink on and off as the pattern's own, and a pair that cries out loudly when they have been worn too long"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Gladrags Wizardwear: B4 ch27 L31402 (the most lurid socks, a pair patterned with flashing gold and silver stars, another that screamed loudly when they became too smelly))"
+    },
+    {
+      "when": [
+        "place = gladrags"
+      ],
+      "show": [
+        "a tape measure unspools and measures a customer's arm by itself while the clerk speaks with him; a pincushion on the counter"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Gladrags Wizardwear: ours, ordinary shop magic (the books' Madam Malkin's, B1 ch5, is a different shop, never cited here))"
+    },
+    {
+      "when": [
+        "place = puddifoots"
+      ],
+      "show": [
+        "a cramped, steamy little teashop up a side road, everything decorated with frills and bows, the window steamed over and the street only a blur in it"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Madam Puddifoot's Tea Shop: B5 ch25 L47639 (up a side road, cramped, steamy, frills and bows), L47649 (the steamy window))"
+    },
+    {
+      "when": [
+        "place = puddifoots"
+      ],
+      "show": [
+        "the small round tables each with a teapot, a stand of cakes, a lace cloth, a kettle's whistle behind a curtain; the owner stout, shiny black bun, squeezing between the tables"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Madam Puddifoot's Tea Shop: B5 ch25 L47639, L47651 (a very stout woman with a shiny black bun); the keeper is 1990s, name to come)"
+    },
+    {
+      "when": [
+        "place = puddifoots"
+      ],
+      "show": [
+        "in the week of 14 February (1898) golden cherubs hover over each table throwing pink confetti; the rest of the year the same ceiling has only the frills"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Madam Puddifoot's Tea Shop: B5 ch25 L47645 (decorated for Valentine's Day, golden cherubs hovering over the tables, throwing pink confetti))"
+    },
+    {
+      "when": [
+        "place = village edge"
+      ],
+      "show": [
+        "the street runs out past the last shop into a winding lane, the cottages fewer and their gardens larger, the mountain close above: a kailyard with kale and a bean row, peat smoke thin from a chimney, a hen scratching, a dog barking once down a garden"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The lane to the stile and the village's edge: B4 ch27 L31404 (the winding lane into the wild countryside, cottages fewer, gardens larger, the foot of the mountain); the kailyards, peat and hen are ours (docs/hogsmeade, the setting))"
+    },
+    {
+      "when": [
+        "place = village edge"
+      ],
+      "show": [
+        "a hammer on an anvil now and then from the smithy and, near the burn, a mill-race over a slow wheel"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The lane to the stile and the village's edge: ours (lots.json: smithy and mill, era ours); sound-schedule-hogsmeade.json)"
+    },
+    {
+      "when": [
+        "place = village edge"
+      ],
+      "show": [
+        "on the slope above, the Whistler, an old shepherd's bothy, sings in its chimney when the wind comes up, a long soft note that is the village's joke"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The lane to the stile and the village's edge: settled 205 (the Whistler; the gale sings in its chimney); Godric, 31 October 2026)"
+    },
+    {
+      "when": [
+        "place = village edge"
+      ],
+      "show": [
+        "at the lane's end a slab stile or field gate on the moor, the wind in the heather; nothing waits there"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The lane to the stile and the village's edge: B4 ch27 L31404 (the stile at the lane's end); the field gate is ours)"
+    },
+    {
+      "when": [
+        "place = station road"
+      ],
+      "show": [
+        "a tiny platform, freezing, rain driving in icy sheets, a loud whistle and the guards slamming the doors on term days; owls hoot, cats miaow, a toad croaks from under a hat"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The station, the carriage road and the road to the gates: B3 ch5 L15015 (the tiny platform, freezing, rain in icy sheets, owls hooting, cats miaowing), L14693 (a loud whistle, guards slamming the doors); term days only)"
+    },
+    {
+      "when": [
+        "place = station road"
+      ],
+      "show": [
+        "a rough mud track from the platform to the coach yard, the coaches waiting, and the long road on to the gates; at its far end the road runs 85 m through a sunk lane between banks, the village's sounds arriving a place at a time as it rises"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The station, the carriage road and the road to the gates: B3 ch5 L15019 (the rough mud track, the coaches); B6 ch8 L57315 (how far Hogwarts is from the station); docs/grounds/build.json (road-holloway))"
+    },
+    {
+      "when": [
+        "place = station road"
+      ],
+      "show": [
+        "wheels and hooves on the rough road, far off then near, at the term's ends"
+      ],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The station, the carriage road and the road to the gates: B3 ch5 L15019, L15021 (the coach smelling of mould and straw); ours (the sound))"
+    }
+  ],
+  "records": [
+    {
+      "id": "hogsmeade-1897.whizzbee",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap whizzbee barrel",
+      "when": [
+        "place = honeydukes"
+      ],
+      "show": [
+        "a boy at the Fizzing Whizzbees barrel: a tap lifts one; it rises from the barrel, drifts to his hand and is his to eat or keep, one a visit"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: B3 ch10 L17248; ours (the tap, Events' to size))"
+    },
+    {
+      "id": "hogsmeade-1897.fudge-tray",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap fudge tray",
+      "when": [
+        "place = honeydukes"
+      ],
+      "show": [
+        "a boy at the sample tray: a tap takes a square of fudge, and the tray is whole again by his next visit"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Honeydukes, the sweetshop: B3 ch8 L16468; ours)"
+    },
+    {
+      "id": "hogsmeade-1897.butterbeer",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap broomsticks table",
+      "when": [
+        "place = three broomsticks"
+      ],
+      "show": [
+        "a boy finds a table by the window or the fire: a tankard of hot Butterbeer comes to it from the bar, warm all the way down, and the boy drinks"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The Three Broomsticks: B3 ch10 L17328, L17332 (hot, delicious, heats him through); ours (the coming to the table, Events' to size))"
+    },
+    {
+      "id": "hogsmeade-1897.owl-look",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap post shelf",
+      "when": [
+        "place = post office"
+      ],
+      "show": [
+        "a boy at the counter looks up at the shelves and one owl looks back and tilts its head; the rest is the village's own post, and a boy's letter to his brother is the common room's owl (req 293)"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, The post office: B3 ch14 L18886; ours; req 293 and 294 (B26) are cited, not copied)"
+    },
+    {
+      "id": "hogsmeade-1897.tin-hiccup",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap zonko tin",
+      "when": [
+        "place = zonkos"
+      ],
+      "show": [
+        "a boy at a shelf lifts the lid of a tin and it hiccups at him, once; the keeper, behind the counter, does not look up and the tin stays put"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Zonko's Joke Shop: B3 ch8 L16336; ours (a hiccup, nothing harmed))"
+    },
+    {
+      "id": "hogsmeade-1897.quill",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap scriven quill",
+      "when": [
+        "place = scrivenshafts"
+      ],
+      "show": [
+        "a boy at the window or the shelves lifts a quill and it is a plain quill, weighted right; the clerk nods at the pheasant ones and he takes it or puts it back"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Scrivenshaft's Quill Shop: B5 ch16 L43156; ours)"
+    },
+    {
+      "id": "hogsmeade-1897.top",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap dervish top",
+      "when": [
+        "place = dervish and banges"
+      ],
+      "show": [
+        "a boy at the shelf spins a small glass top with a finger: it hums a note and slows and stops, and the shopkeeper does not mind"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Dervish and Banges: ours; the books give only 'magical instruments' (B3 ch5 L14763))"
+    },
+    {
+      "id": "hogsmeade-1897.socks",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap gladrags socks",
+      "when": [
+        "place = gladrags"
+      ],
+      "show": [
+        "a boy at the sock drawer holds up the shrieking pair: it cries out once, loudly, and the clerk laughs; a pair is the boy's to buy"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Gladrags Wizardwear: B4 ch27 L31402; ours)"
+    },
+    {
+      "id": "hogsmeade-1897.window",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap puddifoot window",
+      "when": [
+        "place = puddifoots"
+      ],
+      "show": [
+        "a boy at the steamed window wipes a clear patch with his sleeve and sees the street, then the glass fogs again"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Madam Puddifoot's Tea Shop: B5 ch25 L47649; ours)"
+    }
+  ]
+}
