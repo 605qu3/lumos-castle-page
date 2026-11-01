@@ -600,6 +600,24 @@
       ],
       "starts": [],
       "canon": "Magic's req 2576 (docs/magic/pass2-hooks-hogsmeade.md, Madam Puddifoot's Tea Shop: B5 ch25 L47649; ours)"
+    },
+    {
+      "id": "hogsmeade-1897.blank-heart",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap paper heart",
+      "when": [
+        "place = puddifoots",
+        "date >= 02-10",
+        "date <= 02-17"
+      ],
+      "show": [
+        "the paper hearts the cherubs throw are blank; a boy may write or say a few words on one for his brother, fold it, and the windowsill owl carries it to him, for the two of them alone"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2614 (settled 221, Godric, 1 November 2026, 2.03 pm; docs/magic/pass2-hooks-hogsmeade.md, Madam Puddifoot's Tea Shop): the week of 14 February 1898; the same brother-post record as B26 (reqs 293 and 294), private to the two (FDP-25); no couple staged, no heart read to anyone else. The writing and recording are the page's; paper heart tap id waits on the Hogsmeade page"
     }
   ]
 }

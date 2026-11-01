@@ -318,7 +318,24 @@
         "a bell on the board rings and its numbered flag drops for the room that called; a while later the flag rights itself, the Keeper having been"
       ],
       "starts": [],
-      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): a master or a prefect calls; ours, an 1897 household thing; whose bell board it is stays Story's (req 2480, question 3), so the cue says only the room's"
+      "canon": "Magic's req 2478 (docs/magic/rooms.md, Five more ground-floor rooms of 1897): a master or a prefect calls; ours, an 1897 household thing; the board is Mrs. Wardlaw's (settled 222, req 2614)"
+    },
+    {
+      "id": "ground-floor-1897.bell-pull-tea",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "weight": 1,
+      "moment": "tap bell pull",
+      "when": [
+        "time != night"
+      ],
+      "show": [
+        "the pull gives, and far off a bell rings; on the Key Room's board that room's numbered flag drops",
+        "the ring of keys sounds first, then Mrs. Wardlaw at the door with a biscuit in her pocket: 'Rang for me? Then you will want tea.'"
+      ],
+      "starts": [],
+      "canon": "Magic's req 2614 (settled 222, Godric, 1 November 2026, 2.03 pm; docs/magic/rooms.md, Mrs. Wardlaw's Key Room, the bell board): any room's bell-pull, ours; the ring sounds before she is seen (sound-day.md single drop); no scolding, no count of rings, nothing ranks a boy; the tea is the visitors' parlour's (settled 216). Bell-pull tap ids wait on the pages"
     },
     {
       "id": "ground-floor-1897.keepers-ring",
