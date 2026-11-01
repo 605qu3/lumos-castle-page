@@ -1747,8 +1747,8 @@ window.SHELL_W5A = {
       ['y', 159.05, 30.63, 0.01, 0.02, 0.45, 'iron'], ['b', 157.6, 28.92, 1.1, 158.5, 29.12, 1.13, 'oak'], ['b', 157.68, 28.92, 1.0, 157.72, 29.1, 1.1, 'oak'], ['b', 158.38, 28.92, 1.0, 158.42, 29.1, 1.1, 'oak'],
       ['b', 157.72, 28.97, 1.13, 157.92, 29.07, 1.15, 'iron'], ['b', 158.05, 28.97, 1.13, 158.22, 29.07, 1.2, 'tin'], ['b', 157.8, 38.96, 1.9, 159.0, 39.08, 1.94, 'oak'], ['b', 157.9, 38.98, 1.5, 158.0, 39.06, 1.9, 'straw'],
       ['b', 158.12, 38.98, 1.5, 158.22, 39.06, 1.9, 'green'], ['b', 158.34, 38.98, 1.5, 158.44, 39.06, 1.9, 'straw'], ['b', 158.56, 38.98, 1.5, 158.66, 39.06, 1.9, 'green'], ['b', 158.78, 38.98, 1.5, 158.88, 39.06, 1.9, 'straw'],
-      ['y', 158.8, 36.6, 0.006, 3.0, 4.5, 'iron'], ['y', 158.8, 36.6, 0.1, 2.75, 3.0, 'brass'], ['y', 158.8, 36.6, 0.14, 2.68, 2.75, 'brass'], ['b', 156.24, 39.04, 1.4, 156.36, 39.1, 2.3, 'mahog'],
-      ['b', 156.17, 39.02, 1.95, 156.43, 39.04, 2.21, 'brass'], ['b', 156.2, 39.015, 1.98, 156.4, 39.02, 2.18, 'white'], ['b', 156.29, 39.02, 1.55, 156.31, 39.04, 1.93, 'glass'], ['y', 156.3, 39.01, 0.035, 1.4, 1.5, 'brass']] },
+      ['y', 158.8, 36.6, 0.006, 3.0, 4.5, 'iron'], ['y', 158.8, 36.6, 0.1, 2.75, 3.0, 'brass'], ['y', 158.8, 36.6, 0.14, 2.68, 2.75, 'brass'], ['b', 155.54, 39.04, 1.4, 155.66, 39.1, 2.3, 'mahog'],
+      ['b', 155.47, 39.02, 1.95, 155.73, 39.04, 2.21, 'brass'], ['b', 155.5, 39.015, 1.98, 155.7, 39.02, 2.18, 'white'], ['b', 155.59, 39.02, 1.55, 155.61, 39.04, 1.93, 'glass'], ['y', 155.6, 39.01, 0.035, 1.4, 1.5, 'brass']] },
     /* G-THINGS end herbology-study-g */
     /* G-THINGS potting-room */
     /* docs/interiors/potting-room.md (G-x, req 1841): the staging in four 4.0 runs (two tiers) with trays and pots, the seed sacks and crock, the trough and butt under the window, the leather bucket, the barrow, rake and spade, six pairs of earmuffs; req 1910: the potting bench with its slatted shelf, compost, sieve and tools, the hanging rail of bunches and the lantern over it, the pot rack, the seed-drawer chest, the tool rack and the compost bay; the hearth's front and the 1.4 aisle clear */
