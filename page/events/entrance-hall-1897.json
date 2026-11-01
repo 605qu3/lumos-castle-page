@@ -1,0 +1,246 @@
+{
+ "chain": "entrance-hall-1897",
+ "about": "The Entrance Hall of 1897 as points to earn (Godric's 1 on req 2610, 1 November 2026, under req 2312): a dropped glove, scarf, quill, mitten or cap lies on the flags; handed to the nearest prefect on the stair it sends a few stones up into his house's hourglass, once for each kind of thing, no race and no count. Tap id (prefect) waits on the Hall's page. The 1990s doings (broom cupboard, gate doors) stay in ground-floor.json and doors.json.",
+ "first_visit": [],
+ "room": [],
+ "records": [
+  {
+   "id": "entrance-hall-1897.lost-glove",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 40-150 s",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = none",
+    "hall_lost_glove != done"
+   ],
+   "show": [
+    "a woollen glove lies on the flags by the stair where somebody dropped it, the wet of the doorstep still on it"
+   ],
+   "starts": [
+    "set hall_lost = glove"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.hand-over-glove",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap prefect",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = glove"
+   ],
+   "show": [
+    "he gives a woollen glove to the nearest prefect on the stair, who nods, says it will find its owner, and the stones in his house's glass slide a few higher with a small dry rattle",
+    "the prefect has already gone on up; nobody is keeping count"
+   ],
+   "starts": [
+    "set hall_lost = none",
+    "set hall_lost_glove = done",
+    "point turn glove 3"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.lost-scarf",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 40-150 s",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = none",
+    "hall_lost_scarf != done"
+   ],
+   "show": [
+    "a striped scarf lies on the flags by the stair where somebody dropped it, the wet of the doorstep still on it"
+   ],
+   "starts": [
+    "set hall_lost = scarf"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.hand-over-scarf",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap prefect",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = scarf"
+   ],
+   "show": [
+    "he gives a striped scarf to the nearest prefect on the stair, who nods, says it will find its owner, and the stones in his house's glass slide a few higher with a small dry rattle",
+    "the prefect has already gone on up; nobody is keeping count"
+   ],
+   "starts": [
+    "set hall_lost = none",
+    "set hall_lost_scarf = done",
+    "point turn scarf 3"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.lost-quill",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 40-150 s",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = none",
+    "hall_lost_quill != done"
+   ],
+   "show": [
+    "a long grey quill lies on the flags by the stair where somebody dropped it, the wet of the doorstep still on it"
+   ],
+   "starts": [
+    "set hall_lost = quill"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.hand-over-quill",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap prefect",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = quill"
+   ],
+   "show": [
+    "he gives a long grey quill to the nearest prefect on the stair, who nods, says it will find its owner, and the stones in his house's glass slide a few higher with a small dry rattle",
+    "the prefect has already gone on up; nobody is keeping count"
+   ],
+   "starts": [
+    "set hall_lost = none",
+    "set hall_lost_quill = done",
+    "point turn quill 3"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.lost-mitten",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 40-150 s",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = none",
+    "hall_lost_mitten != done"
+   ],
+   "show": [
+    "a child's mitten lies on the flags by the stair where somebody dropped it, the wet of the doorstep still on it"
+   ],
+   "starts": [
+    "set hall_lost = mitten"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.hand-over-mitten",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap prefect",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = mitten"
+   ],
+   "show": [
+    "he gives a child's mitten to the nearest prefect on the stair, who nods, says it will find its owner, and the stones in his house's glass slide a few higher with a small dry rattle",
+    "the prefect has already gone on up; nobody is keeping count"
+   ],
+   "starts": [
+    "set hall_lost = none",
+    "set hall_lost_mitten = done",
+    "point turn mitten 3"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.lost-cap",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 40-150 s",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = none",
+    "hall_lost_cap != done"
+   ],
+   "show": [
+    "a first-year's school cap lies on the flags by the stair where somebody dropped it, the wet of the doorstep still on it"
+   ],
+   "starts": [
+    "set hall_lost = cap"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.hand-over-cap",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap prefect",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = cap"
+   ],
+   "show": [
+    "he gives a first-year's school cap to the nearest prefect on the stair, who nods, says it will find its owner, and the stones in his house's glass slide a few higher with a small dry rattle",
+    "the prefect has already gone on up; nobody is keeping count"
+   ],
+   "starts": [
+    "set hall_lost = none",
+    "set hall_lost_cap = done",
+    "point turn cap 3"
+   ],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  },
+  {
+   "id": "entrance-hall-1897.nothing-to-hand",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap prefect",
+   "when": [
+    "place = entrance hall",
+    "era = 1890s",
+    "hall_lost = none"
+   ],
+   "show": [
+    "the prefect on the stair nods him by and goes on up, a book under one arm; the glasses glitter as they always do"
+   ],
+   "starts": [],
+   "canon": "Godric's 1 on req 2610 (1 November 2026, 4.22 pm, Points to earn), under req 2312 (the ground floor as a game); the four house hourglasses fill and empty with points (PS 7 L2459 to L2461, PS 17), prefects keep order on the stairs (PS 7); a lost thing handed to a prefect and a few stones sent up for it are ours; the hourglass remembers (the world keeps his good turns), the points go as in the books with no race and nothing ranks a boy"
+  }
+ ]
+}

@@ -1,0 +1,148 @@
+{
+ "chain": "chess-pawn-1897",
+ "about": "The brothers' chess pawn of 1897 (Story's settled 223, Godric's 1 on req 2619; Magic's cue, req 2642): a boy tells a pawn a few words; the other brother takes it and it says them once, aloud, to him alone; then it is an ordinary pawn again. Three records for the common room and the den. `pawn_words` is the brothers' carried state (B26's rule, reqs 293 and 294): `held` becomes `waiting` for the other brother when the post carries it, which is the Reader's and Interaction's, not here. Tap id (chess pawn) waits on the pages.",
+ "first_visit": [],
+ "room": [],
+ "records": [
+  {
+   "id": "chess-pawn-1897.holds-words-common-room",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap chess pawn",
+   "when": [
+    "place = common room",
+    "era = 1890s",
+    "pawn_words != held"
+   ],
+   "show": [
+    "he holds a pawn and speaks to it; the pawn leans its small stone head toward him, listens, and straightens; nothing glows and nothing marks it from the rest"
+   ],
+   "starts": [
+    "set pawn_words = held"
+   ],
+   "canon": "Godric's 1 on req 2619 (1 November 2026, 4.15 pm; settled 223) via Magic's req 2642 (docs/magic/rooms.md, The brothers' chess pawn, 1897); the pieces alive (PS 12 L4104, L4106); the brothers' chess by the fire (PS 11 L10462); a pawn that keeps a message is ours; the recording and playback are the Reader's and Interaction's, the carrying rule between the years is B26's (reqs 293, 294); private to the two (FDP-25), nothing scored, nothing shown or listed"
+  },
+  {
+   "id": "chess-pawn-1897.speaks-once-common-room",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap chess pawn",
+   "when": [
+    "place = common room",
+    "era = 1890s",
+    "pawn_words = waiting"
+   ],
+   "show": [
+    "he takes the pawn, and as it steps off the board it says his brother's words aloud, once, in his brother's voice, to him only; then it steps on again as a pawn does"
+   ],
+   "starts": [
+    "set pawn_words = spent"
+   ],
+   "canon": "Godric's 1 on req 2619 (1 November 2026, 4.15 pm; settled 223) via Magic's req 2642 (docs/magic/rooms.md, The brothers' chess pawn, 1897); the pieces alive (PS 12 L4104, L4106); the brothers' chess by the fire (PS 11 L10462); a pawn that keeps a message is ours; the recording and playback are the Reader's and Interaction's, the carrying rule between the years is B26's (reqs 293, 294); private to the two (FDP-25), nothing scored, nothing shown or listed"
+  },
+  {
+   "id": "chess-pawn-1897.ordinary-again-common-room",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap chess pawn",
+   "when": [
+    "place = common room",
+    "era = 1890s",
+    "pawn_words = spent"
+   ],
+   "show": [
+    "the pawn stands as every pawn stands, empty again; either brother may tell it, or another, a few words anew"
+   ],
+   "starts": [
+    "set pawn_words = none"
+   ],
+   "canon": "Godric's 1 on req 2619 (1 November 2026, 4.15 pm; settled 223) via Magic's req 2642 (docs/magic/rooms.md, The brothers' chess pawn, 1897); the pieces alive (PS 12 L4104, L4106); the brothers' chess by the fire (PS 11 L10462); a pawn that keeps a message is ours; the recording and playback are the Reader's and Interaction's, the carrying rule between the years is B26's (reqs 293, 294); private to the two (FDP-25), nothing scored, nothing shown or listed"
+  },
+  {
+   "id": "chess-pawn-1897.holds-words-den",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap chess pawn",
+   "when": [
+    "place = den",
+    "era = 1890s",
+    "pawn_words != held"
+   ],
+   "show": [
+    "he holds a pawn and speaks to it; the pawn leans its small stone head toward him, listens, and straightens; nothing glows and nothing marks it from the rest"
+   ],
+   "starts": [
+    "set pawn_words = held"
+   ],
+   "canon": "Godric's 1 on req 2619 (1 November 2026, 4.15 pm; settled 223) via Magic's req 2642 (docs/magic/rooms.md, The brothers' chess pawn, 1897); the pieces alive (PS 12 L4104, L4106); the brothers' chess by the fire (PS 11 L10462); a pawn that keeps a message is ours; the recording and playback are the Reader's and Interaction's, the carrying rule between the years is B26's (reqs 293, 294); private to the two (FDP-25), nothing scored, nothing shown or listed"
+  },
+  {
+   "id": "chess-pawn-1897.speaks-once-den",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap chess pawn",
+   "when": [
+    "place = den",
+    "era = 1890s",
+    "pawn_words = waiting"
+   ],
+   "show": [
+    "he takes the pawn, and as it steps off the board it says his brother's words aloud, once, in his brother's voice, to him only; then it steps on again as a pawn does"
+   ],
+   "starts": [
+    "set pawn_words = spent"
+   ],
+   "canon": "Godric's 1 on req 2619 (1 November 2026, 4.15 pm; settled 223) via Magic's req 2642 (docs/magic/rooms.md, The brothers' chess pawn, 1897); the pieces alive (PS 12 L4104, L4106); the brothers' chess by the fire (PS 11 L10462); a pawn that keeps a message is ours; the recording and playback are the Reader's and Interaction's, the carrying rule between the years is B26's (reqs 293, 294); private to the two (FDP-25), nothing scored, nothing shown or listed"
+  },
+  {
+   "id": "chess-pawn-1897.ordinary-again-den",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "tap chess pawn",
+   "when": [
+    "place = den",
+    "era = 1890s",
+    "pawn_words = spent"
+   ],
+   "show": [
+    "the pawn stands as every pawn stands, empty again; either brother may tell it, or another, a few words anew"
+   ],
+   "starts": [
+    "set pawn_words = none"
+   ],
+   "canon": "Godric's 1 on req 2619 (1 November 2026, 4.15 pm; settled 223) via Magic's req 2642 (docs/magic/rooms.md, The brothers' chess pawn, 1897); the pieces alive (PS 12 L4104, L4106); the brothers' chess by the fire (PS 11 L10462); a pawn that keeps a message is ours; the recording and playback are the Reader's and Interaction's, the carrying rule between the years is B26's (reqs 293, 294); private to the two (FDP-25), nothing scored, nothing shown or listed"
+  },
+  {
+   "id": "chess-pawn-1897.carried",
+   "tier": "fixed",
+   "source": "device",
+   "leans": [],
+   "weight": 1,
+   "moment": "wait 5-20 s",
+   "when": [
+    "era = 1890s",
+    "pawn_words = held",
+    "parcel = coming"
+   ],
+   "show": [
+    "on the board a pawn stands where it was left, keeping still; no mark, no light and no sound says it holds anything"
+   ],
+   "starts": [
+    "set pawn_words = waiting"
+   ],
+   "canon": "Godric's 1 on req 2619 (1 November 2026, 4.15 pm; settled 223) via Magic's req 2642 (docs/magic/rooms.md, The brothers' chess pawn, 1897); the pieces alive (PS 12 L4104, L4106); the brothers' chess by the fire (PS 11 L10462); a pawn that keeps a message is ours; the recording and playback are the Reader's and Interaction's, the carrying rule between the years is B26's (reqs 293, 294); private to the two (FDP-25), nothing scored, nothing shown or listed; the carry itself rides the brother-post's turn (parcel = coming)"
+  }
+ ]
+}
