@@ -268,6 +268,55 @@
           "canon": "PS 11, Neville was snoring loudly; CoS 15, his snuffling snores from the corner; checked against the text, 10 October 2026"
         }
       ]
+    },
+    {
+      "id": "bedtime.door-shut-snore",
+      "tier": "fixed",
+      "source": "device",
+      "leans": [],
+      "moment": "wait 4-9 s",
+      "when": [
+        "place = dormitory",
+        "time = night",
+        "era = books"
+      ],
+      "who": [
+        {
+          "as": "neville",
+          "role": "voice",
+          "name": "neville",
+          "mark": "the corner bed"
+        }
+      ],
+      "show": [
+        "through the shut door at the stair head, a loud snore from the corner bed, and then a sleepy mumble"
+      ],
+      "lines": [
+        {
+          "speaker": "neville",
+          "medium": "heard",
+          "key": "bedtime.door-shut-snore",
+          "sound": "a loud snore from behind the shut dormitory door, then a sleepy mumble",
+          "text": [
+            "Trevor... come back..."
+          ],
+          "canon": "PS 6 (Neville's toad, Trevor) and CoS 15 (his snuffling snores from the corner), as bedtime.waking-snore; by night the door is shut (the page's doorShut), so it is heard from the stair; needs no waking and no drawn hangings"
+        }
+      ]
+    }
+  ],
+  "room": [
+    {
+      "when": [
+        "place = dormitory",
+        "occasion = christmas day",
+        "era = books"
+      ],
+      "show": [
+        "the door at the stair head standing ajar, a torn strip of wrapping paper caught by its foot",
+        "at the foot of one bed, not a boy's own, a lumpy parcel in plain paper that will be a hand-knitted jumper"
+      ],
+      "canon": "Dormitory's req 1243 (3) and (4), 27 October 2026; era = books because Neville and PS 12's parcel are the books' castles'. Christmas Day's room state (docs/room-states.md: the occasion is the clock's, `?occasion=christmas-day` shows it); the trace of PS 12 (Harry's parcels and the Weasley jumper), the morning's mess of paper left, never the scene; the dated Christmas Day is the holiday calendar's"
     }
   ]
 }
