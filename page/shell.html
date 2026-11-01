@@ -178,6 +178,8 @@ line, the mote, travel and reveal) is castle.js's, unedited.
 <script src="design/floor-kit.js?v=1"></script>
 <script src="design/tones.js?v=7"></script>
 <script src="design/stone-face.js?v=1"></script>
+<script>/* trial (the Architect's 392nd, Godric's stone-finish note of 31 October 2026): ?faceall=1 lays the stone face on every stone, not only late-pale, so the other floors' walls can be compared; off by default */
+if (/[?&]faceall=1/.test(location.search) && window.CastleStoneFace) ['founders-rubble', 'tudor-pink', 'high-grey', 'houses-sandstone'].forEach(function (s) { CastleStoneFace.FACED[s] = true; });</script>
 <script src="design/ceilings.js?v=7"></script>
 <script src="design/panelling.js?v=2"></script>
 <script src="design/ironwork.js?v=2"></script>
